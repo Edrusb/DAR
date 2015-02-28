@@ -8,6 +8,7 @@
 
 
 
+
 <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR/LIBDAR Internals - Notes</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -1570,10 +1571,11 @@ application developer.<br>
 
   <tbody>
     <tr>
-      <td style="vertical-align: top; width: 20%; font-weight: bold;">Date<br>
+      <td style="vertical-align: top; width: 15%; font-weight: bold;">Date<br>
       </td>
-      <td style="vertical-align: top; width: 20%; text-align: center; font-weight: bold;">released
-package and dar version<br>
+      <td style="vertical-align: top; width: 15%; text-align: center; font-weight: bold;">released
+package <br>
+and dar version<br>
       </td>
       <td style="vertical-align: top; text-align: center;"><span style="font-weight: bold;">Archive format</span><br>
       </td>
@@ -1587,7 +1589,8 @@ version<br>
       <td style="vertical-align: top; width: 10%; font-weight: bold; text-align: center;">dar_manager<br>
       </td>
       <td style="vertical-align: top; width: 10%; font-weight: bold; text-align: center;">dar_cp<br>
-      </td>
+      </td><td style="vertical-align: top; font-weight: bold; width: 10%; text-align: center;">dar_split</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">April 2nd,
@@ -1601,7 +1604,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">-----</td>
       <td style="vertical-align: top; text-align: center;">-----</td>
       <td style="vertical-align: top; text-align: center;">-----</td>
-      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">-----</td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">April 24th,
@@ -1615,7 +1619,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">-----</td>
       <td style="vertical-align: top; text-align: center;">-----</td>
       <td style="vertical-align: top; text-align: center;">-----</td>
-      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">-----</td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">May 8th, 2002<br>
@@ -1628,7 +1633,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">-----</td>
       <td style="vertical-align: top; text-align: center;">-----</td>
       <td style="vertical-align: top; text-align: center;">-----</td>
-      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">-----</td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">May 27th, 2002<br>
@@ -1641,7 +1647,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">-----</td>
       <td style="vertical-align: top; text-align: center;">-----</td>
       <td style="vertical-align: top; text-align: center;">-----</td>
-      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">-----</td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">June 26th,
@@ -1657,7 +1664,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">-----</td>
-      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">-----</td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Nov. 4th, 2002<br>
@@ -1673,7 +1681,8 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">-----</td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Jan. 10th,
@@ -1688,7 +1697,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.1.0</td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">-----</td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">May 19th, 2003<br>
@@ -1704,7 +1714,8 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.1.0<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">-----</td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Nov. 2nd, 2003<br>
@@ -1722,7 +1733,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Nov. 21th,
@@ -1741,7 +1753,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Dec. 7th, 2003<br>
@@ -1759,7 +1772,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Dec. 14th,
@@ -1778,7 +1792,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Jan. 3rd, 2004<br>
@@ -1796,7 +1811,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Feb. 8th, 2004<br>
@@ -1814,7 +1830,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">March 5th,
@@ -1833,7 +1850,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">March 12th,
@@ -1852,7 +1870,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">May 6th, 2004<br>
@@ -1870,7 +1889,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.1<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">July 13th,
@@ -1889,7 +1909,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.1<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Sept. 12th,
@@ -1908,7 +1929,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.1<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Jan. 29th, 2005<br>
@@ -1926,7 +1948,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.1<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Jan. 30th, 2005<br>
@@ -1944,7 +1967,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.3.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.1<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Feb. 20th,
@@ -1963,7 +1987,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.1<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">May 12th, 2005<br>
@@ -1981,7 +2006,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.2<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Sept. 13th,
@@ -2000,7 +2026,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.2<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Nov. 5th, 2005<br>
@@ -2018,7 +2045,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.2<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Dec. 6th, 2005<br>
@@ -2036,7 +2064,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.2<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Jan.
@@ -2055,7 +2084,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.3<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Feb. 24th, 2006<br>
@@ -2073,7 +2103,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.3<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Feb. 24th, 2006<br>
@@ -2091,7 +2122,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.1.0<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">June 26th, 2006<br>
@@ -2109,7 +2141,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.1.0<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Oct. 30th, 2006<br>
@@ -2123,7 +2156,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.0</td>
       <td style="vertical-align: top; text-align: center;">1.3.2</td>
       <td style="vertical-align: top; text-align: center;">1.4.0</td>
-      <td style="vertical-align: top; text-align: center;">1.1.0</td>
+      <td style="vertical-align: top; text-align: center;">1.1.0</td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Feb. 24th, 2007<br>
@@ -2141,7 +2175,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.0<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">June 30th, 2007<br>
       </td>
@@ -2158,7 +2193,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.0<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">Aug. 28th, 2007<br>
       </td>
@@ -2175,7 +2211,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.1<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">Sept. 29th, 2007<br>
       </td>
@@ -2192,7 +2229,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.1<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">Feb. 10th, 2008<br>
       </td>
@@ -2209,7 +2247,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.3<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top;">
 
@@ -2229,7 +2268,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.3<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">May 22nd, 2009<br>
       </td>
@@ -2246,7 +2286,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.3<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">April 9th, 2010<br>
       </td>
@@ -2263,7 +2304,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.3<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top;">
       <div style="margin-left: 40px; text-align: right;">March 13th, 2011<br>
@@ -2283,7 +2325,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.3
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.2
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">February 25th, 2012</td>
       <td style="vertical-align: top; text-align: center;">2.3.12</td>
@@ -2292,7 +2335,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.3</td>
       <td style="vertical-align: top; text-align: center;">1.3.4</td>
       <td style="vertical-align: top; text-align: center;">1.4.3</td>
-      <td style="vertical-align: top; text-align: center;">1.2.2</td>
+      <td style="vertical-align: top; text-align: center;">1.2.2</td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
 <tr>
       <td style="vertical-align: top; text-align: right;">June 2nd, 2011<br>
@@ -2308,7 +2352,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.5.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.3<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">July 21st, 2011<br>
       </td>
@@ -2325,7 +2370,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.6.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.3<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">Sept. 5th, 2011<br>
       </td>
@@ -2342,7 +2388,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.6.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.3<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">February 25th, 2012<br>
       </td>
@@ -2357,7 +2404,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.3<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">March 17th, 2012<br>
       </td>
@@ -2374,7 +2422,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.3<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">April 15th, 2012<br>
       </td>
@@ -2391,7 +2440,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.4<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">June 24th, 2012<br>
       </td>
@@ -2408,7 +2458,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.3<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.5<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">July 5th, 2012<br>
       </td>
@@ -2425,7 +2476,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.3<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.5<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">September 9th, 2012<br>
       </td>
@@ -2442,7 +2494,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.4<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.6<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">January 6th, 2013<br>
       </td>
@@ -2459,7 +2512,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.4<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.7<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">March 9th, 2013<br>
       </td>
@@ -2476,7 +2530,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.4<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.7<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">Aug. 26th, 2013<br>
       </td>
@@ -2493,7 +2548,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.5<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.8<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">January 19th, 2014<br>
       </td>
@@ -2510,7 +2566,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.6<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.8<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">April 21st, 2014<br>
       </td>
@@ -2527,7 +2584,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.7<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.8<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">June 15th, 2014<br>
       </td>
@@ -2544,7 +2602,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.7<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.8<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">September 6th, 2014<br>
       </td>
@@ -2561,7 +2620,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.8<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.8<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">January 18th, 2015<br>
       </td>
@@ -2578,7 +2638,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.8<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.8<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr><tr>
       <td style="vertical-align: top; text-align: right;">January 31th, 2015<br>
       </td>
@@ -2595,7 +2656,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.8<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.8<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">-----</td>
+
     </tr>
 
 

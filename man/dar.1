@@ -1,16 +1,16 @@
 .TH DAR 1 "January 31th, 2015"
 .UC 8
 .SH NAME
-dar \- create, test, list, extract, compare, merge, isolate  dar archives
+dar \- create, test, list, extract, compare, merge, isolate dar archives
 .SH SYNOPSIS
-dar [-c | -x | -l | -d | -t | -C | -+] [<path>/]<basename> [<options>] [<user targets>]
+dar [-c | -t | -l | -x | -d | -+ | -C] [<path>/]<basename> [<options>] [<user targets>]
 .P
 dar -h
 .P
 dar -V
 .SH DESCRIPTION
 .B dar
-is a full featured backup tool, aimed for disks (floppy, CD-R(W), DVD-R(W), zip, jazz, etc.) and since release 2.4.0 adapted to tapes.
+is a full featured backup tool, aimed for disks (floppy, CD-R(W), DVD-R(W), zip, jazz, hard-disks, usb keys, etc.) and since release 2.4.0 also adapted to tapes.
 
 .PP
 .B dar
@@ -1167,12 +1167,13 @@ if set, dar looks for Dar User Command (DUC files, see -E, -F, -~, -= options) t
 You can find some more examples of use in the tutorial, mini-howto, sample scripts, and other related documentation. All these are available in dar's source package, and are also installed beside dar in the <--prefix>/share/dar directory. This documentation is also available on-line at http://dar.linux.free.fr/doc/index.html#2
 
 .SH SEE ALSO
-dar_xform(1), dar_slave(1), dar_manager(1), dar_cp(1), TUTORIAL and NOTES included in the source package and also available at http://dar.linux.free.fr/doc/index.html
+dar_xform(1), dar_slave(1), dar_manager(1), dar_cp(1), dar_split(1), TUTORIAL and NOTES included in the source package and also available at http://dar.linux.free.fr/doc/index.html
+
+.SH KNOWN LIMITATIONS
+dar saves and restores atime, mtime, birthtime but cannot restore ctime (last inode change), there does not seems to be a standard call to do that under UNIX.
 
 .SH KNOWN BUGS
-dar cannot restore time of symbolic links. Many (all ?) UNIX do not provide any way to do that, the utime() system call changes the file pointed to by the link rather than the date of the link itself.
-.P
-dar saves and restores atime and mtime, but cannot restore ctime (last inode change), there does not seems to be a standard call to do that under UNIX.
+http://sourceforge.net/p/dar/bugs/
 
 .SH AUTHOR
 .nf

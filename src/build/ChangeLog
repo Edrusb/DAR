@@ -55,6 +55,8 @@ from 2.4.x to 2.5.0
 - added the possibility to use -s and -S options when using -Tslicing with
   an isolated catalogue, to face the case when the archive of reference has
   been resliced after the isolated catalogue has been built.
+- added dar_split command to provide on-fly multi-volume archive support
+  on tape medium
 
 from 2.4.16 to 2.4.17
 - fixing issue when case insensitive comparison was requested and invalid

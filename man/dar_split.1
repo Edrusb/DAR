@@ -1,0 +1,90 @@
+.TH DAR_SPLIT 1 "Februrary 28th, 2015"
+.UC 8
+.SH NAME
+dar_split \- dar helper to split an archive over several tapes
+.SH SYNOPSIS
+dar_split { split_input | split_output } <filename>
+.P
+dar_split -v
+.P
+dar_split -h
+.SH DESCRIPTION
+.B dar_split
+is to be used with dar to read or write a large archive from or to several tapes.
+
+.SH OPTIONS
+.B dar_split
+has two modes of operation: split_input and split_output
+.TP 20
+split_input
+in this mode dar_split copies <filename> to its standard output. <filename> may be a special device like /dev/tape or any other inode that has the ability to access removeable volumes. When dar_split reaches the end of <filename> it suspends and waits for the user to press the return key in order to continue. In the meanwhile the user can rewind and change the tape. When dar_split is awaken again, it reopens <filename> and sends its content to its standard output as if it was the continuation of what was read so far before reaching the end of file.
+.TP 20
+split_output
+in this mode dar_split copies its standard input to <filename>. However if <filename> is full, dar_split suspends and waits for the user to press the return key in order to continue. In the meanwhile, the user can rewind and change the tape. When dar_split is awaken again, it reopens <filename> and continues the copy from its standard input to it.
+
+.SH EXAMPLES OF USE
+creating an archive over several tapes
+.RS
+.PP
+dar -c - ...possibily other dar options... | dar_split split_output /dev/tape
+.PP
+.RE
+Here dar generates the archive to its standard output which is read by dar_split and copied to /dev/tape. When the tape reaches its send, dar_split asks for the user to hit return to continue.
+
+reading an archive splitted over several tapes
+.RS
+.PP
+dar_split split_input /dev/tape | dar -t - --sequential-read ...possibily other dar options...
+.PP
+.RE
+Here dar_split reads /dev/tape and sends its content to dar which *must* be used in --senquential-read mode in order to read an archive from its standard input without the help of dar_slave. When the tape reaches its end, dar_split asks for the user to hit return to continue.
+.PP
+Note that dar_split can also be used with tar for the same purpose as with dar:
+.RS
+.PP
+tar -cz ... | dar_split split_output /dev/tape
+.PP
+.RE
+without -f option nor TAPE environment variable, tar sends the tar archive to stdout, which get fet to dar_split for slicing
+.RS
+.PP
+dar_split split_input /dev/tape | tar -tz
+.PP
+.RE
+without -f option nor TAPE environement variable, tar read the tar archive from stdin, however you must specify the correct option corresponding to the compression used at archive creation time.
+.PP
+The advantage here is to be able to save a huge dar or tar archive on several tapes that could be either partially filled or having different sizes, without having to calculate in advance the size of slices to specify. The drawback is that this implies sequential reading for dar (for tar also, but tar cannot do else).
+
+.SH With or without filesystem
+You can use dar_split with floppies, zip/jazz disks or usb key too, but it has many disadvantages compared to the normal way of using this media: doing that way avoids you relying on a filesystem, thus you cannot have direct access to file contents, which dar know how to take advantage of, and you are instead stuck with sequential read access which is long as it requires reading the whole archive (same way as tar).
+.PP
+When instead using dar alone in normal mode (non sequential reading mode using filenames instead of standard input/output), you have the opportunity to create redundancy data beside dar slices thanks to par2, which is not possible without a filesystem. At restorationt time, thanks to dar archive's catalog, dar can directly seek to the file's data you want to restore, which is very quick compared to reading/unciphering/uncompressing the whole archive...
+
+.SH EXIT CODES
+.B dar_split
+exists with the following codes:
+.TP 10
+0
+upon normal execution
+.TP 10
+1
+syntax error on command-line
+.TP 10
+2
+could not open source or destination files
+
+.SH SIGNALS
+Any signal sent to dar_split except SIG_PIPE will abort the program immediately
+
+.SH SEE ALSO
+dar(1), dar_xform(1), dar_manager(1), dar_slave(1), dar_cp(1)
+
+.SH KNOWN BUGS
+http://sourceforge.net/p/dar/bugs/
+
+.SH AUTHOR
+.nf
+http://dar.linux.free.fr/
+Denis Corbin
+France
+Europe

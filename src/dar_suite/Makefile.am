@@ -72,7 +72,7 @@ endif
 # unconditionnal part
 #
 
-bin_PROGRAMS = dar dar_xform dar_slave dar_manager dar_cp $(ALSO_BUILD)
+bin_PROGRAMS = dar dar_xform dar_slave dar_manager dar_cp dar_split $(ALSO_BUILD)
 LDADD = ../libdar/$(MYLIB).la $(GPGME_LIBS)
 if DEBUG_STATIC
 AM_LDFLAGS = -all-static @LTLIBINTL@ $(LD_PROF)
@@ -94,6 +94,8 @@ dar_manager_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 dar_cp_SOURCES = dar_suite.cpp dar_suite.hpp dar_cp.cpp shell_interaction.cpp shell_interaction.hpp line_tools.hpp line_tools.cpp
 dar_cp_DEPENDENCIES = ../libdar/$(MYLIB).la
+
+dar_split_SOURCES = dar_split.c
 
 #
 # dar_static ( --enable-dar-static )
