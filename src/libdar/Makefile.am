@@ -51,6 +51,7 @@ endif
 AM_LDFLAGS = @LTLIBINTL@  $(LD_PROF)
 LDADD = $(GPGME_LIBS)
 lib_LTLIBRARIES = $(MYLIB)
+CXXSTDFLAGS = @CXXSTDFLAGS@
 
 LIBDAR_MAJOR=`grep LIBDAR_COMPILE_TIME_MAJOR libdar.hpp | cut -f 2 -d "=" | cut -f 1 -d ';' | sed -e 's% %%g'`
 LIBDAR_MEDIUM=`grep LIBDAR_COMPILE_TIME_MEDIUM libdar.hpp | cut -f 2 -d "=" | cut -f 1 -d ';' | sed -e 's% %%g'`
@@ -86,7 +87,7 @@ uninstall-local:
 all-local : libdar.pc
 
 libdar.pc : libdar.pc.tmpl
-	sed -e "s%#LIBDAR_VERSION#%$(LIBDAR_VERSION_OUT)%g" -e "s%#LIBDAR_SUFFIX#%$(LIBDAR_SUFFIX)%g" -e "s%#LIBDAR_MODE#%$(LIBDAR_MODE)%g" -e "s%#CXXFLAGS#%$(CXXFLAGS)%g" libdar.pc.tmpl > libdar.pc
+	sed -e "s%#LIBDAR_VERSION#%$(LIBDAR_VERSION_OUT)%g" -e "s%#LIBDAR_SUFFIX#%$(LIBDAR_SUFFIX)%g" -e "s%#LIBDAR_MODE#%$(LIBDAR_MODE)%g" -e "s%#CXXFLAGS#%$(CXXFLAGS)%g" -e "s%#CXXSTDFLAGS#%$(CXXSTDFLAGS)%g" libdar.pc.tmpl > libdar.pc
 
 # header files that are internal to libdar and that must not be installed (make install)
 noinst_HEADERS = defile.hpp ea_filesystem.hpp filesystem.hpp filtre.hpp header.hpp macro_tools.hpp null_file.hpp sar.hpp sar_tools.hpp terminateur.hpp tronc.hpp zapette.hpp cygwin_adapt.hpp elastic.hpp database_header.hpp sparse_file.hpp semaphore.hpp memory_check.hpp messaging.hpp slave_thread.hpp generic_thread.hpp cat_blockdev.hpp cat_chardev.hpp cat_detruit.hpp cat_device.hpp cat_door.hpp cat_eod.hpp cat_file.hpp cat_ignored.hpp cat_ignored_dir.hpp cat_lien.hpp cat_mirage.hpp cat_prise.hpp cat_tube.hpp cat_etoile.hpp cat_all_entrees.hpp cat_tools.hpp
