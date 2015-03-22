@@ -1412,6 +1412,7 @@ namespace libdar
 		    ent.set_ea_status(tmp_inode->ea_get_saved_status());
 		    if(tmp_inode->has_last_change())
 			ent.set_last_change(tmp_inode->get_last_change());
+		    ent.set_fsa_status(tmp_inode->fsa_get_saved_status());
 		}
 
 		if(tmp_file != NULL)
