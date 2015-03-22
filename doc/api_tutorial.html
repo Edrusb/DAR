@@ -12,6 +12,9 @@
 
 
 
+
+
+
   <meta content="Denis Corbin" name="author">
   <meta content="Tutorial for using libdar library" name="description"></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
@@ -26,7 +29,7 @@
       <h1 style="text-align: center;">APPLICATION INTERFACE <br>
       </h1>
       <h1 style="text-align: center;">TUTORIAL</h1>
-      <div style="text-align: center;"> for API version 5.x.x<br>
+      <div style="text-align: center;"> for API version 5.7.x and above<br>
       </div>
       <h1 style="text-align: center;"> </h1>
       </td>
@@ -41,11 +44,7 @@
     <tr>
       <td style="vertical-align: top;">
       <h2>Presentation</h2>
-      <p style="text-align: justify;">The Libdar library has been built
-from source code originally
-located directly in the <em><strong>dar</strong></em> command line
-application. Libdar provides a complete abstraction layer for handling Disk
-ARchive (<em>dar</em>)'s archives. The general operations provided are:</p>
+      <p style="text-align: justify;">The Libdar library provides a complete abstraction layer for handling <span style="font-style: italic;">Dar</span><em></em> archives. The general operations provided are:</p>
       <div style="text-align: justify;"></div>
       <div></div>
       <ul style="text-align: justify;">
@@ -54,25 +53,31 @@ ARchive (<em>dar</em>)'s archives. The general operations provided are:</p>
         <li>archive listing, </li>
         <li>archive testing, </li>
         <li>archive comparison,</li>
-        <li>catalogue isolation</li>
-        <li>archive merging</li>
+        <li>catalogue isolation,</li>
+        <li>archive merging,</li>
         <li>dar_manager database manipulations<br>
         </li>
       </ul>
       <div style="text-align: justify;"></div>
+      <div style="text-align: justify;">
 Note that <span style="font-style: italic;">Disk ARchive</span> <em>and</em>
 libdar
 have been released under the <span style="font-style: italic;">Gnu
 General Public License </span>(GPL). All code linked to libdar
 (statically or dynamically), <span style="font-weight: bold;"> must
-also be covered by the GPL.</span><br>
-      <div style="text-align: justify;"> <br>
+also be covered by the GPL.</span> Commercial use is prohibited unless a contract has been agreeded with libdar's author.<br>
+
       </div>
+<div style="text-align: justify;"> <br>
+      </div>
+      <div style="text-align: justify;">
 This tutorial will show you how to
-use the libdar API. As <span style="font-style: italic;">dar</span> since its release 2.0.0 also uses this API, looking at it's code may also provide a good
-illustration. The file <span style="font-style: italic;">src/dar_suite/dar.cpp</span>
+use the libdar API.&nbsp; Since release 2.0.0 the <span style="font-style: italic;">dar</span> command-line executable also relies on this API, looking at it's code may provide a good
+illustration on the way to use libdar, the file <span style="font-style: italic;">src/dar_suite/dar.cpp</span>
 is the primary consumer of the libdar API. <br>
-      <div style="text-align: justify;"> <br>
+
+      </div>
+<div style="text-align: justify;"> <br>
 The sample codes provided here is
 solely illustrative and is not guaranteed to compile. More detailed API
 documentation is contained in the source code and can be compiled to
@@ -94,9 +99,15 @@ the doc/html directory using Doxygen, which is also provided <a href="http://dar
       <div style="text-align: justify;">Dar and libdar are written in
 C++, and so is the libdar API. While
 written in C++, libdar is easily usable by both C and C++ code.
-Access from other languages can be provided by specific bindings. I
-would only say that you are welcome to provide the necessary bindings
-yourself. :-) </div>
+Access from other languages can be provided by specific bindings, like <a href="http://darbinding.sourceforge.net/">python bindings</a>.<br>
+ </div>
+      <span style="font-weight: bold;"><br>
+Header files</span><br>
+      <br>
+Only one include file is required in your program to have access to libdar:<br>
+      <br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">#include &lt;dar/libdar.hpp&gt;</span><br>
+      </div>
       <h4>Libdar namespace</h4>
 All libdar symbols are defined under
 the <span style="font-style: italic; font-weight: bold;">libdar </span><span style="font-weight: bold;">namespace</span>. You
@@ -123,7 +134,7 @@ namespace libdar;<br>
     <tr>
       <td style="vertical-align: top; text-align: justify;">&nbsp;or,
 as shown below, you can
-explicitly use the namespace in front of libdar objects : </td>
+explicitly use the namespace in front of libdar symbols: </td>
     </tr>
   </tbody>
 </table>
@@ -143,9 +154,12 @@ libdar::get_version(....);<br>
   <tbody>
     <tr>
       <td style="vertical-align: top;">
-      <h4>Exceptions or no Exceptions</h4>
+      <h4>Exceptions or no Exception</h4>
       <div style="text-align: justify;">The library can be used with or
-without <span style="font-style: italic;">exceptions.</span> For each example we will see a sample code for both ways. To the left is with exceptions, to the right without:<br>
+without <span style="font-style: italic;">exceptions.</span>
+For each example we will see a sample code for both ways. On the left
+you will find code relying on exceptions, on the right without
+exception:<br>
       </div>
       </td>
     </tr>
@@ -366,8 +380,7 @@ void my_sample_function()<br>
 get_version()<br>
       <br>
 &nbsp;&nbsp; libdar::<span style="font-weight: bold;">get_version_noexcept</span>(maj,
-med, min, <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+med, min, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 excode, msg);<br>
       <br>
 &nbsp;&nbsp; if(excode != LIBDAR_NOEXCEPT)<br>
@@ -407,17 +420,16 @@ number must be greater or equal to the one used at compilation time to
 be sure that all the features you want are available in the libdar
 library you dynamically linked with. Changes between minor versions
 correspond to bug fixes and is not to imply any API change, thus no
-constraints are present there (except the presence of more bugs in lower numbers).<br>
+constraints is present there (just note the presence of more bugs in lower numbers).<br>
           </div>
         </li>
         <li style="text-align: justify;">the
-get_version() call, as
-well as
+get_version() call, beside
 returning version information, does important initialization tasks for
 libdar. If not called first, the libdar library will not initialized
 properly and its behavior will be unpredictable. Note that you may call
-get_version() several time if you wish, the secon time only the version
-information are returned, the libdar library is not reset or the like.<br>
+get_version() several time if you wish, the second time only the version
+information is returned, the libdar library is not reset or the like.<br>
 </li>
 	<li style="text-align: justify;">Last, if strong encryption support is activated at compilation time, libdar will by default
 performs libgcrypt initialization when get_version() is called if libgcrypt is
@@ -428,28 +440,29 @@ with an additional argument set to "false" :</li></ul>
 
       <ul style="text-align: justify;">
         <li>Note
-that in multi-thread environment with strong encryption activated in
-libdar at compilation time, libgcrypt requires to be initialized from
-the application, thus you *must* avoid having libdar initializing
-libgcrypt by using the get_version() described just above and proceed
-from the application to the initialization of libgcrypt before calling
-get_version(). For more details see libgcrypt documentation.</li></ul>
+that <a href="https://www.gnupg.org/documentation/manuals/gcrypt/Initializing-the-library.html#Initializing-the-library">libgcrypt documentation</a> indicates that libgcrypt must be initialized directly from
+the application not from an intermediate library, thus you should avoid having libdar initializing
+libgcrypt by using the <span style="font-family: monospace;">get_version(maj, med, min, false) </span>described just above and proceed
+from the application itslef to the initialization of libgcrypt *before* calling
+get_version(). This is particularily true in multi-thread environment with strong encryption activated in
+libdar at compilation time, if other part of your program (outside of libdar) also relies on libgcrypt.<br>
+</li></ul>
       <ul>
 
 
       </ul>
 
       <br>
-      <h2>1 bis - We must prepare the end right now!<br>
+      <h2>2 - We should prepare the end right now!<br>
       </h2>
 <br>
       <div style="text-align: justify;">As we saw, libdar used
 some
 datastructures (mutex, secured memory, etc.) that need to be released
-properly before ending the program. It is mandatory to invoke the
-following function before exiting your program if you invoked
-get_version() previously. It is a good idea to implement this right now
-not to forget later:<br>
+properly before ending the program. It is important to invoke the
+following function before exiting your program once you invoked
+get_version(). It is a good idea to implement this right now
+not to forget about it later:<br>
 
       </div>
 
@@ -482,13 +495,13 @@ makes the necessary for memory to be released in the proper order. <span style="
 calling close_and_clean() at the end of your program may result in uncaught exception message from libdar at the end of
 the execution</span>. This depends on the compiler, libc and option activated in libdar at compilation time.<br>
       <br>
-      <h2>1 ter - Intercepting signals</h2>
+      <h2>3 - Intercepting signals</h2>
 libdar by itself does not make use of any signal (see signal(2) and
-kill(2)). However, gpgme library with which libdar may be linked to
+kill(2)). However, gpgme library with which libdar may be linked with to
 support asymetrical strong encryption (i.e. encryption using
-public/private kes) uses the signal PIPE. Your application shall thus
+public/private keys) may trigger the PIPE signal. Your application shall thus
 either ignore it (signal(SIGPIPE, SIG_IGN)) or provide an adhoc handle.
-By default a the PIPE signal leads the receiver processus to terminate.<br>
+By default the PIPE signal leads the receiving processus to terminate.<br>
       <br>
 
       <br>
@@ -496,7 +509,8 @@ By default a the PIPE signal leads the receiver processus to terminate.<br>
 
       </div>
 
-      <h2>2 - Let's see the available features</h2>
+      <h2>4 - Let's see the available features (Optional)<br>
+</h2>
 
 once we have called one of the <span style="font-style: italic;">get_version*</span>
 function it is possible to access the list of features activated at compilation
@@ -530,21 +544,20 @@ bool thread = libdar::compile_time::thread_safe();<br>
 bool libz = libdar::compile_time::libz();<br>
 bool libbz2 = libdar::compile_time::libbz2();<br>
 bool liblzo = libdar::compile_time::liblzo();<br>
+bool libxz = libdar::compile_time::libxz();<br>
 bool libcrypto = libdar::compile_time::libgcrypt();<br>
 bool furtive_read = libdar::compile_time::furtive_read</code>();<br>
+      <br>
+      <span style="font-family: monospace;">// to get the complete list of available routines check the file</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">// src/libdar/compile_time.hpp from source package *or* </span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">// /usr/include/dar/compile_time.hpp from system header files</span><br>
       </div>
       <code>
       </code><br>
 }<br>
       <br>
       </td>
-      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code>
-      <code><br>
-      <br>
-&nbsp;// here there is no difference because no exceptions<br>
-&nbsp;// are thrown by the get_compile_time_feature() <br>
-&nbsp;// function<br>
-      </code> </td>
+      
     </tr>
   </tbody>
 </table>
@@ -555,8 +568,8 @@ bool furtive_read = libdar::compile_time::furtive_read</code>();<br>
       <td style="vertical-align: top;">
       <div style="text-align: justify;">You can do what you want with
 the
-resulting values. It's possible to display the available libdar
-features or to terminate if you don't find a desired feature. However,
+resulting values, like just to displaying the available libdar
+features (this is what <span style="font-family: monospace;">dar -V</span> does) or to terminating your program if you don't find a desired feature. However,
 verifying that features are available is not strictly necessary because
 libdar will tell you if an operation you call requires a feature that
 has not been activated at compilation time, by throwing an Ecompile
@@ -566,32 +579,29 @@ code if you are not using exceptions).<br>
       </div>
       <br>
       <br>
-      <h2>3 -User interaction</h2>
+      <h2>5 - User Interaction</h2>
       <div style="text-align: justify;">
-      <h3>The generic <span style="font-style: italic;">user_interaction</span>
+      <h3>a) The generic <span style="font-style: italic;">user_interaction</span>
 class</h3>
-To be able to report messages to the user and prompt for feedback a
-special class called<span style="font-style: italic;"> <span style="font-weight: bold;">user_interaction </span></span>has been
-introduced. Simply put, <span style="font-style: italic;">user_interaction</span>
-is a virtual class which you can derive to provide user interaction (a
-GUI's graphical interaction, for example). There are four methods whose
-prototypes you must override:<br>
+To be able to send messages to and retreive information from the user, a
+special class called<span style="font-style: italic;"> <span style="font-weight: bold;">user_interaction </span></span>is defined. Simply put, <span style="font-style: italic;">user_interaction</span>
+is a virtual class from which you have to derive your own class in order to provide user interaction (a
+GUI's graphical interaction, for example). There is four methods among which only three have to be overridden:<br>
       </div>
       <br style="font-style: italic; font-weight: bold;">
-      <span style="font-style: italic; font-weight: bold;">void&nbsp;</span><span style="font-style: italic; font-weight: bold;" class="el">pause</span><span style="font-style: italic; font-weight: bold;"> (const std::string
+      <span style="font-style: italic; font-weight: bold;">void&nbsp;</span><span style="font-style: italic; font-weight: bold;" class="el">pause</span><span style="font-style: italic; font-weight: bold;">(const std::string
 &amp;message);</span><br>
       <div style="margin-left: 40px; text-align: justify;">this method
 is
-called by libdar when the library needs a yes or no ("continue" or
-"kill")
-answer to a question, which is provided by the string <em>message</em>.
-The question posed by <em>pause()</em> must be answered by returning
+called by libdar when the library needs a yes/no answer to a question, which question is provided by the std::string <em>message</em>.
+The question given to <em>pause()</em> must be answered by returning
 normally (= "true") or throwing a <em><strong>Euser_abort</strong></em>
 exception if the user refused the proposition<span style="font-weight: bold;"><span style="font-weight: bold;">. </span></span>Don't
 worry about throwing an exception in your code; it will be trapped by
 libdar if you don't want to manage exceptions, and are using libdar in
 the "no exception" method. But if you really don't want to throw
-exception from your code see next:<br>
+exception from your code ignore this method (don't overwrite it in your
+class) but rather consider the following one instead:<br>
       <span style="font-weight: bold;"><span style="font-weight: bold;"><br>
       <br>
       </span></span></div>
@@ -605,45 +615,36 @@ difference with <span style="font-style: italic;">pause()</span> is
 that the user answer to the question is returned by a boolean value,
 your code does no more have to throw a <span style="font-style: italic;">Euser_abort</span> exception to say "no".
 Note that <span style="font-weight: bold;">you must not redefine both
-pause() and pause2(). </span><span style="text-decoration: underline;"><br>
+pause() and pause2()</span><span style="text-decoration: underline;"><br>
       </span></div>
       <span style="font-weight: bold;"><br>
-      </span><span style="font-style: italic; font-weight: bold;">void </span><span style="font-style: italic; font-weight: bold;" class="el">inherited_warning</span><span style="font-style: italic; font-weight: bold;"> (const std::string
+      </span><span style="font-style: italic; font-weight: bold;">void </span><span style="font-style: italic; font-weight: bold;" class="el">inherited_warning</span><span style="font-style: italic; font-weight: bold;">(const std::string
 &amp;message);</span><br>
       <div style="margin-left: 40px; text-align: justify;">libdar calls
-this <span style="font-weight: bold;">protected</span> method (through
-the
-public method named <span style="font-style: italic;">warning()</span>)
-to display an informational message to the user. It is not
+this <span style="font-weight: bold;">protected</span> method to display an informational message to the user. It is not
 always a warning as the name suggests, but sometimes just normal
-information. In API 3.0.x this method did not exist,&nbsp; but the
-public warning() method itself was pure virtual and thus needed to be
-overwritten. Today, the <span style="font-style: italic;">warning()</span>
-method is no more pure virtual nor it is even virtual, so the user
-defined implementation of message display has to be done in the <span style="font-style: italic;">inherited_warning()</span> method.<br>
+information.  <br>
       </div>
       <br>
-      <span style="font-style: italic; font-weight: bold;">std::string&nbsp;</span><span style="font-style: italic; font-weight: bold;" class="el">get_string</span><span style="font-style: italic; font-weight: bold;"> (const std::string
+      <span style="font-style: italic; font-weight: bold;">std::string&nbsp;</span><span style="font-style: italic; font-weight: bold;" class="el">get_string</span><span style="font-style: italic; font-weight: bold;">(const std::string
 &amp;message, bool echo);</span><br>
       <div style="margin-left: 40px; text-align: justify;">This call is
 used
 to get an arbitrary answer from the user. This is mainly used to get a
 password from the user (when no password has been supplied for an
 encrypted archive), the <span style="font-style: italic;">echo </span>argument
-indicates if the user response should be displayed back on the screen
-(again, very useful for handling password input). If <span style="font-style: italic;">echo</span> is set to "false" the
+indicates whether the user response should be displayed back on the screen. If <span style="font-style: italic;">echo</span> is set to "false" the
 implementation of <span style="font-style: italic;">get_string() </span>should
-hide the characters typed by the user.<br>
+hide the characters typed by the user (a password requested from the user).<br>
       </div>
       <br style="font-style: italic; font-weight: bold;">
-      <span style="font-style: italic; font-weight: bold;">&nbsp;</span><span style="font-style: italic; font-weight: bold;" class="el">user_interaction</span><span style="font-style: italic; font-weight: bold;"> *&nbsp;</span><span style="font-style: italic; font-weight: bold;" class="el">clone</span><span style="font-style: italic; font-weight: bold;">
-() const;</span><br>
-      <div style="margin-left: 40px;">
-A deep copy
-operation must be implemented here. This is because libdar stores the
-reference to the <span style="font-style: italic;">user_interaction</span>
-class as a pointer but may want to keep a complete internal copy at
-some point. A simple implementation of this method should be something
+      <span style="font-style: italic; font-weight: bold;">&nbsp;</span><span style="font-style: italic; font-weight: bold;" class="el">user_interaction</span><span style="font-style: italic; font-weight: bold;"> *&nbsp;</span><span style="font-style: italic; font-weight: bold;" class="el">clone</span><span style="font-style: italic; font-weight: bold;">() const;</span><br>
+      <div style="margin-left: 40px; text-align: justify;">
+A copy
+operation must be implemented here. This is because libdar does not stores a
+reference to the <span style="font-style: italic;">user_interaction</span> class it receives but rather keeps an&nbsp; internal copy of it, so your class should also be ready to support a copy
+constructor and an assignement operator. A simple implementation of this
+method should be something
 like this (even if you don't want to use exceptions): </div>
 </td>
     </tr>
@@ -654,18 +655,29 @@ like this (even if you don't want to use exceptions): </div>
 <table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code><br>
-      </code><code>user_interaction
-*my_own_class::clone() const<br>
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>#include &lt;new&gt;<br>
+#include &lt;dar/libdar.hpp&gt;<br>
+      <br>
+class my_interaction : public libdar::user_interaction<br>
 {<br>
-&nbsp;&nbsp;&nbsp; my_own_class *ret = new my_own_class(*this);<br>
+public:<br>
+&nbsp;&nbsp; bool pause2(const std::string &amp; message);<br>
+&nbsp;&nbsp; user_interaction *clone() const;<br>
+protected:<br>
+&nbsp;&nbsp; void inherited_warning(const std::string &amp; message);<br>
+};<br>
+<br>
+<br>
+      </code><code>user_interaction
+*my_interaction::clone() const<br>
+{<br>
+&nbsp;&nbsp;&nbsp; user_interaction *ret = new (std::nothow) my_interaction(*this);<br>
 &nbsp;&nbsp;&nbsp; if(ret == NULL)<br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; throw
 Ememory("user_interaction_callback::clone");<br>
 &nbsp;&nbsp;&nbsp; else<br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return ret;<br>
-}<br>
-      </code><br>
+}</code><br>
       </td>
     </tr>
   </tbody>
@@ -675,18 +687,18 @@ Ememory("user_interaction_callback::clone");<br>
   <tbody>
     <tr>
       <td style="vertical-align: top;">
-      <h3>The callback interaction class</h3>
-      <div style="text-align: justify;">An inherited class from<span style="font-style: italic;"> user_interaction</span> called <span style="font-weight: bold; font-style: italic;">user_interaction_callback</span>
-provides an implementation of the user interaction based on callback
+      <h3>b) Or The callback interaction class <br>
+</h3>
+      <div style="text-align: justify;">As an alternative to defining your own inherited class from <span style="font-style: italic;">libdar::user_interaction</span>, libdar provides a class called <span style="font-weight: bold; font-style: italic;">user_interaction_callback</span> which is an implementation of the user interaction, based on callback
 functions. This allows you to replace the three interactions methods
 (pause, warning and get_string) by three normal functions of your
 choice, which must be given to the <span style="font-style: italic;">user_interaction_callback</span>'s
 constructor. The <span style="font-style: italic;">clone()</span>
 method is implemented internally, leaving only the three callback
 functions to be implemented. Look at <span style="font-style: italic;">
-dar</span>'s command line code for a practical example. <span style="font-style: italic;">dar</span>'s user interaction code is
+dar</span>'s command line code for a practical example: <span style="font-style: italic;">dar</span>'s user interaction code is
 implemented using an instance of <span style="font-style: italic;">user_interaction_callback</span>
-and three static functions in the module<span style="font-style: italic;"> dar_suite/shell_interaction.cpp</span> <br>
+and three static functions in the module<span style="font-style: italic;"> src/dar_suite/shell_interaction.cpp</span> <br>
       </div>
       <br>
 Pay attention to the <span style="font-style: italic;">contextual</span>
@@ -754,7 +766,8 @@ different window objects<br>
 libdar::user_interaction_callback dialog = <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 libdar::user_interaction_callback(&amp;warning_callback,
-&amp;answer_callback, &amp;string_callback,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&amp;answer_callback, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&amp;string_callback,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 (void *)get_current_windows_id());<br>
       <br>
 &nbsp; // just the "context" argument changes, and will be passed as is
@@ -771,262 +784,25 @@ from the constructor to the callback<br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top;">
-      <h2>4 - Masks</h2>
-      <div style="text-align: justify;">Mask are used to define which
-files
-will be considered and which will not. Libdar implements masks as
-several classes that all inherit from a virtual class that defines the
-way masks are used. This root class is the <span style="font-weight: bold; font-style: italic;">class mask</span> and
-provides the <span style="font-style: italic;">is_covered()</span>
-method which libdar uses to determine which files are considered. There
-are many different basic masks classes you can use to build fairly
-complex masks: </div>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; width: 200px;">class libdar::mask<br>
-      </td>
-      <td style="vertical-align: top;">the generic class, parent of all
-masks (a pure virtual class)<br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">class libdar::bool_mask<br>
-      </td>
-      <td style="vertical-align: top;">boolean mask, either always true
-or false, it matches either all files or no files at all<br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">class libdar::simple_mask<br>
-      </td>
-      <td style="vertical-align: top;">matches as done by the shell on
-the command
-lines (see "man 7 glob")<br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">class libdar::regular_mask<br>
-      </td>
-      <td style="vertical-align: top;">matches regular expressions (see
-"man 7 regex")<br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">class libdar::not_mask<br>
-      </td>
-      <td style="vertical-align: top;">negation of another mask<br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">class libdar::et_mask<br>
-      </td>
-      <td style="vertical-align: top;">makes an *AND* operator between
-two or more masks<br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">class libdar::ou_mask<br>
-      </td>
-      <td style="vertical-align: top;">makes the *OR* operator
-between&nbsp; two or more masks <br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">class lbdar::simple_path_mask<br>
-      </td>
-      <td style="vertical-align: top;">
-      <p>string matches if it is subdirectory of mask or is a directory
-that contains the specified path itself<br>
-      </p>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">class libdar::same_path_mask<br>
-      </td>
-      <td style="vertical-align: top;">matches if the string is exactly
-the
-given mask (no wild card expression)<br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; width: 210px;">class
-libdar::exclude_dir_mask<br>
-      </td>
-      <td style="vertical-align: top;">matches if string is the given
-string or a sub directory of it<br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">class libdar::mask_list<br>
-      </td>
-      <td style="vertical-align: top;">matches a list of files defined
-in a given file<br>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top;">Let's play with some masks : </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-<code></code><code></code>
-<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code><br>
-      </code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // all files will be
-elected by this mask</code><br>
-      <code>&nbsp; libdar::bool_mask m1 = true;&nbsp;&nbsp;&nbsp; <br>
-      <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // all file that match the glob
-expession "A*~" will match. <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // the second argument of the
-constructor tell if the match is case sensitive so here <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // any file beginning by 'A' or by 'a'
-and ending by '~' will be selected by this mask<br>
-&nbsp; libdar::simple_mask m2 = libdar::simple_mask(std::string("A*~"),
-false);<br>
-      <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // m3 is the negation if m2. This mask
-will thus match<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // any file that does not begin by 'A'
-or 'a' and also finish by '~'<br>
-&nbsp; libdar::not_mask m3 = m2;<br>
-      <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // this mask matches any file that is a
-subdirectory of "/home/joe"<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // and any directory that contains
-/home/joe, meaning<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // "/", "/home", "/jome/joe" and any
-subdirectory are matched.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // here, the second argument is also
-case sensitivity (so<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp; "/HoMe" will not be selected by
-this mask.<br>
-&nbsp; libdar::simple_path_mask m4 = simple_path_mask("/home/joe",
-true);<br>
-      <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // now let's do some more complex things:<br>
-      </code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // m5 will now match
-only files that are selected by both m2 AND m4</code><br>
-      <code>&nbsp; libdar::et_mask m5;<br>
-&nbsp; m5.add_mask(m2);<br>
-&nbsp; m5.add_mask(m4);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // we can make more silly things like
-this, where m5 will select files<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // that match m2 AND m4 AND m3. But <span style="font-style: italic;">m3 =
-not m2</span> so now m5 will never<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // match any file...<br>
-&nbsp; m5.add_mask(m3);<br>
-      <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // but we could do the same with an
-"ou_mask" and would get a silly<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // counterpart of m1 (a mask that
-matches any files)<br>
-&nbsp; libdar::ou_mask m6;<br>
-&nbsp; m6.add_mask(m2);<br>
-&nbsp; m6.add_mask(m4);<br>
-&nbsp; m6.add_mask(m3);<br>
-      <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // lastly, the NOT, AND and OR operation
-can be used recursively.<br>
-      </code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Frankly, it's
-possible to have masks reference each other!</code><br>
-      <code>&nbsp; libdar::not_mask m7 = m6;<br>
-&nbsp; m6.add_mask(m7);<br>
-      <br>
-      </code></td>
-    </tr>
-  </tbody>
-</table>
-<br>
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top;">Now that you've seen the power
-of these masks, you should know that in
-libdar there are three masks that are required: <br>
-      <ul style="text-align: justify;">
-        <li>The first mask is used against
-the
-names of all files except directories. It is applied solely to the
-names themselves (not the file path). This mask may be any combination
-of the masks seen previously; it will only be applied to socket, named
-pipes, symbolic links, char or block devices, plain files, but again
-not to directories. This way you can filter by file type for save,
-restore, list, compare, compress, and other library operations.</li>
-        <li>The second mask is applied to
-any
-file including directories, including the path part of the filename. So
-with it you can prune directories, or in any other way restrict the
-operation to a particular subdirectory, as well as to a particular
-plain file for example. <span style="font-weight: bold;">Important note</span>
-about this second mask: what your own mask will be compared to by
-libdar is the filesystem root (as defined under the argument "fs_root"
-of the same call you will give your own mask to) plus the current file
-being&nbsp; proceeded:</li>
-      </ul>
-      <div style="text-align: justify;"> </div>
-      <div style="margin-left: 80px; text-align: justify;">Assuming you
-choose for example <span style="font-style: italic;">tmp/A</span> as
-argument to <span style="font-style: italic;">fs_root</span> (which
-argument is present
-when creating an archive, for example), your mask will be used against
-strings like "<span style="font-style: italic;">tmp/A/some/file</span>"
-. This is true up to libdar version 3.0.x (alias release 2.2.x).
-Instead, since libdar 4.0.0 the <span style="font-style: italic;">fs_root</span>
-argument is expended to an absolute path, so if in the previous
-example, your current directory was <span style="font-style: italic;">/var</span>
-your masks will be used against strings like "<span style="font-style: italic;">/var/tmp/A/some/file</span>". Of course
-there is no difference between these two libdar revisions when the <span style="font-style: italic;">fs_root</span> argument is an absolute
-path <span style="font-style: italic;">[this change was necessary to support masks based on a list of files]</span><br>
-      <br>
-An exception is the test operation, which has no <span style="font-style: italic;">fs_root</span> argument (because the
-operation is not relative to an existing filesystem), however the <span style="font-style: italic;">subtree</span> argument exist to receive a
-mask for comparing the path of file to include or exclude from the test
-operation. In this case the situation is as if the <span style="font-style: italic;">fs_root</span> was set to the value "<span style="font-style: italic;">&lt;ROOT&gt;</span>". For example, masks
-will be compared to <span style="font-style: italic;">&lt;ROOT&gt;/some/file</span>
-when performing an archive test operation.<br>
-</div>
-      <div style="margin-left: 80px; text-align: justify;">
-      </div>
-
-
-      <ul>
-        <li>The third mask --- which is not always needed --- concerns
-Extended Attributes (EA). It is applied to the full EA name in the form
-&lt;domain&gt;.&lt;name&gt; where &lt;domain&gt; is any string value
-like but not limited to the usual "user" or "system" domains.<br>
-        </li>
-      </ul>
-
-
-      <h2><br>
+      <td style="vertical-align: top;"><br>
+<h2><br>
 </h2>
-      <h2>5 - Let's create a simple archive</h2>
+      <h2>6 - Let's create a simple archive</h2>
 
-Now that we have seen masks and exceptions let's start the real thing:<br>
+Now that we have seen user_interaction and exceptions let's start the real thing:<br>
       <br>
-All the operations on archives are handled by the archive class which
-is defined in libdar/archive.hpp. Each operation requires some
+      <div style="text-align: justify;">All the operations on archives
+are handled by the archive class which
+is defined in libdar/archive.hpp (no need to include this file it is
+done from &lt;dar/libdar.hpp&gt;). Each operation requires some
 mandatory parameters and some optional parameters. Optional parameters
-are gathered in a archive_option auxilliary class, which default
-constructor set them to default values. We will see a bit further how
+are gathered in an archive_option auxilliary class, which default
+constructor set them to their default values. We will see a bit further
+how
 to set these options, but for now let's keep the things simple:<br>
-      </td>
+
+      </div>
+</td>
     </tr>
   </tbody>
 </table>
@@ -1035,39 +811,32 @@ to set these options, but for now let's keep the things simple:<br>
   <tbody>
     <tr>
       <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;">
+      
       <p><code>&nbsp; // creating an archive is simple; it is just<br>
 &nbsp; // a matter of calling the "create" constructor<br>
 &nbsp; // of the archive class. It may be used for full or<br>
-&nbsp; // differential archives. We'll see an example of<br>
-&nbsp; // of differential archives later.<br>
-      <br>
-&nbsp; // note that while this example uses a pointer to store<br>
-&nbsp; // my_arch, it is perhaps better practice to use a plain<br>
-&nbsp; // stack object. In your code, use an object instead of<br>
-&nbsp; // a pointer to an object under normal circumstances.<br>
-      <br>
-libdar::user_interaction_callback dialog =
+&nbsp; // differential archives. We'll see an example for<br>
+&nbsp; // a differential backup later.<br>
+      <br>&nbsp; // <span style="font-weight: bold;">first</span> we need a user_interaction object, here<br>
+&nbsp; // we will use three callback functions to set it up</code></p>
+      
+      <p><code>libdar::user_interaction_callback dialog =
 libdar::user_interaction_callback(ptr1, ptr2, ptr3);<br>
 &nbsp; // where ptr1, ptr2 and ptr3 are three callback<br>
 &nbsp; // functions.<br>
-libdar::statistics ret;<br>
-&nbsp; // we will see this structure a bit further<br>
-      <br>
-libdar::archive *my_arch = <br>
+      </code></p>
+      
+      <p><code>libdar::archive *my_arch = <br>
 &nbsp; &nbsp;&nbsp; new <span style="font-weight: bold;">libdar::archive</span>(dialog,
-      <br>
-&nbsp;&nbsp;&nbsp; &nbsp;"/home",&nbsp; // saving all under this "root"<br>
-&nbsp;&nbsp;&nbsp; &nbsp;"/tmp",&nbsp;&nbsp; // where the slices will go<br>
-&nbsp;&nbsp;&nbsp;&nbsp; "my_archive", // the basename of the slices<br>
-&nbsp;&nbsp;&nbsp;&nbsp; "dar",&nbsp; // the extension used for slices<br>
-&nbsp;&nbsp;&nbsp;&nbsp; archive_options_create(), // default options<br>
-&nbsp;&nbsp;&nbsp;&nbsp; &amp;ret); // this value is
-returned by libdar<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-if you don't want to have statistics of the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-operation you can set this parameter to NULL<br>
-      </code> </p>
+      <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "/home",// saving all under this directory<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "/tmp", // where the slices will go<br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; "my_archive", // the basename of the slices<br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; "dar",&nbsp; // the extension used for slices<br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; archive_options_create(), // default options<br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; NULL);&nbsp; // we will see later this parameter <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // in the progressive_report section<br>
+&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; // for now let ignore it by using NULL</code></p>
+
+
 
       </td>
       <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code>&nbsp;&nbsp;
@@ -1076,25 +845,20 @@ operation you can set this parameter to NULL<br>
 &nbsp; // of the archive class. It may be used for full or<br>
 &nbsp; // differential archives. We'll see an example of<br>
 &nbsp; // of differential archives later.<br>
-      <br>
-&nbsp; // note that while this example uses a pointer to store<br>
-&nbsp; // my_arch, it is perhaps better practice to use a plain<br>
-&nbsp; // stack object. In your code, use an object instead of<br>
-&nbsp; // a pointer to an object under normal circumstances.<br>
-      </code><code><br>
+      </code><code><br></code><code>&nbsp; // <span style="font-weight: bold;">first</span> we need a user_interaction object, here<br>
+&nbsp; // we will use three callback functions to set it up</code><code></code><br>
+&nbsp;
+      <code> </code><code><br>
 libdar::user_interaction_callback dialog =
 libdar::user_interaction_callback(ptr1, ptr2, ptr3);<br>
 &nbsp; // where ptr1, ptr2 and ptr3 are three callback<br>
-&nbsp; // functions.<br>
-libdar::statistics ret;<br>
-&nbsp; </code><code>// we will see this structure a bit further<br>
-      <br>
+&nbsp; // functions.<br></code><code><br>
       </code><code>U_16 exception, <br>
 std::string except_msg;</code><br>
       <br>
       <code><span class="el">libdar::archive *my_arch
 =&nbsp;&nbsp;&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">libdar::create_archive_noexcept</span>(dialog,</span></code><span class="el"><code>&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp; new <span style="font-weight: bold;">libdar::create_archive_noexcept</span>(dialog,</span></code><span class="el"><code>&nbsp; <br>
 &nbsp;&nbsp;&nbsp;&nbsp; "/home",&nbsp; // saving all under this "root"<br>
 &nbsp;&nbsp;&nbsp; &nbsp;"/tmp",&nbsp;&nbsp; // where the slices will go<br>
 &nbsp;&nbsp;&nbsp;&nbsp; "my_archive",&nbsp; <br>
@@ -1102,13 +866,7 @@ std::string except_msg;</code><br>
 the basename of the slices <br>
 &nbsp;&nbsp;&nbsp; &nbsp;"dar", // dar's slice extensions<br>
 &nbsp;&nbsp;&nbsp;&nbsp; archive_options_create(), // default options</code></span><span class="el"><code></code><br>
-      </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;
-&amp;ret,&nbsp; // this value is returned by
-libdar<br>
-      </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// if you don't want to have statistics of the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-operation you can set this parameter to NULL</code><br>
+      </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp; NULL, </code></span><code>// see the progressive_report section below</code><span class="el"><code></code><br>
       </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp; exception,
 // this gives the status of the call<br>
 &nbsp;&nbsp;&nbsp;&nbsp; except_msg); // and in case of error the cause.<br>
@@ -1127,9 +885,9 @@ if(exception != LIBDAR_NOEXCEPT)<br>
   <tbody>
     <tr>
       <td style="vertical-align: top;">
-      <div style="text-align: justify;">When creating an archive, the
-created
-archive object can be used only as reference for an isolation or for
+      <div style="text-align: justify;">When
+creating an archive, the just created object once the backup has
+complete can be used only as reference for an isolation or for
 a differential backups. You cannot use it for restoration, listing, or
 comparison, because the underlying file descriptors are opened in
 write only mode. An implementation which uses file descriptors in
@@ -1142,10 +900,9 @@ occurred
 in the file you would not notice it.<br>
       </div>
       <br>
-      <div style="text-align: justify;">So to totally complete the
-archive creation we must destroy the archive
+      <div style="text-align: justify;">So to totally complete the cycle as we do not perform archive isolation or differential backup here, we must destroy the archive
 object we have just created, which will also close any file descriptors
-used by the object : </div>
+used by the object: </div>
       </td>
     </tr>
   </tbody>
@@ -1178,29 +935,46 @@ std::endl;<br>
   <tbody>
     <tr>
       <td style="vertical-align: top;">
+      <div style="text-align: justify;">H<span style="font-weight: normal;">ere
+we have been using pointers to simplify the way to describe object
+terminason. Of course, it is also possible to use plain variable in
+place of pointers. The archive object is destructed at end of the block:</span><br>
+      <span style="font-weight: normal;"></span></div>
+      <span style="font-weight: normal;"><br>
+      <span style="font-family: monospace;">{</span><br style="font-family: monospace;">
+      </span>
+      <div style="margin-left: 40px; font-family: monospace;">libdar::archive my_arch = libdar::archive(...);<br>
+      </div>
+      <span style="font-family: monospace;">}</span><br style="font-family: monospace;">
+      <br>
+      <br>
+      <br>
       <h3>Optional Arguments:</h3>
+
       <br>
       <div style="text-align: justify;">Back on the optional arguments.
 The archive constructor used above to
-create an archive uses an argument of type "archive_option_create". In
+create an archive uses an argument of type <span style="font-weight: bold; font-style: italic;">l<span style="font-style: italic;">i</span>bdar::archive_option_create</span>. In
 the above example, we called the constructor of this class directly
-withing the argument list of the constructor. Thsi has for effect to
+withing the argument list of the class <span style="font-style: italic;">libdar::archive</span>'s constructor. This has for effect to
 built
-a anonymous temporary object of this class. Such a "just borned" object
+an anonymous temporary object of this class. Such a "just born" object
 has
-all the necessary options set to the default values inside it (like
-default masks for example) to
-correspond to the default options. If you want to use non default
-options like compression, slicing, encryption , file filtering and so
+all the necessary options set to their default values. If you want to use non default
+options like compression, slicing, encryption, file filtering and so
 on, you must
 change the options to your need thanks to the appropriate method
-provided by the archive_options_create class. Assuming we want to make
+provided by the<span style="font-style: italic;"> libdar::archive_options_create</span> class. Assuming we want to make
 a
 compressed an sliced archive we would use the following code:<br>
 
       </div>
       </td>
+    </tr><tr>
+      <td style="vertical-align: top;"><br>
+      </td>
     </tr>
+
   </tbody>
 </table>
 <br>
@@ -1208,34 +982,28 @@ compressed an sliced archive we would use the following code:<br>
 <tbody><tr><td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;">
 
       <p><code>&nbsp; <br>
-&nbsp;// we define an options object to be able to use <br>
+&nbsp;&nbsp; // we define an options object to be able to use <br>
 &nbsp;&nbsp; // non default options:<br>
 libdar::archive_options_create options;<br>
       </code></p>
-      <p><code>&nbsp; // so now we can modify only the option we wish to<br>
-options.set_slicing(1024); // 1024 bytes, well that's small<br>
+      <p><code>&nbsp; // so now we can modify it:<br>
+options.set_slicing(1024); // 1024 *bytes* per slice, well that's small<br>
 options.set_compression(bzip2); // default is no compression<br>
-options.set_compression_level(6); // default is 9<br>
-      </code></p>
+options.set_compression_level(6); // default is 9</code></p>
+      <p>&nbsp; <span style="font-family: monospace;">// "dialog" below is the user_interaction object<br>
+&nbsp;// we created earlier<br>
+      </span></p>
 
-<p><code>
-libdar::statistics ret;<br>
-&nbsp; // we will see this structure a bit further<br>
-      <br>
-libdar::archive *my_arch = <br>
+
+<p><code>libdar::archive *my_arch = <br>
 &nbsp; &nbsp;&nbsp; new <span style="font-weight: bold;">libdar::archive</span>(dialog,
       <br>
 &nbsp;&nbsp;&nbsp; &nbsp;"/home",&nbsp; // saving all under this "root"<br>
 &nbsp;&nbsp;&nbsp; &nbsp;"/tmp",&nbsp;&nbsp; // where the slices will go<br>
 &nbsp;&nbsp;&nbsp;&nbsp; "my_archive", // the basename of the slices<br>
 &nbsp;&nbsp;&nbsp;&nbsp; "dar",&nbsp; // the extension used for slices<br>
-&nbsp;&nbsp;&nbsp;&nbsp; options, // the object we modified above<br>
-&nbsp;&nbsp;&nbsp;&nbsp; &amp;ret); // this value is
-returned by libdar<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-if you don't want to have statistics of the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-operation you can set this parameter to NULL<br>
+&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">options</span>, // the object we modified above<br>
+&nbsp;&nbsp;&nbsp;&nbsp; NULL); <br>
       </code> </p>
 
       </td><td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code></code>
@@ -1245,15 +1013,15 @@ libdar::archive_options_create options;<br>
 </code></p>
 
 
-      <p><code>&nbsp; // so now we can modify only the option we wish to<br>
-options.set_slicing(1024); </code><code>// 1024 bytes, well that's small</code><br>
+      <p><code>&nbsp; // so now we can modify it:<br>
+options.set_slicing(1024); </code><code>// 1024 *bytes* per slice, well that's small</code><br>
       <code>
 options.set_compression(bzip2);&nbsp; // default is no compression<br>
 options.set_compression_level(6); // default is 9<br>
       </code></p>
-      <code>libdar::statistics ret;<br>
-&nbsp; </code><code>// we will see this structure a bit further<br>
-      <br>
+      <code></code>&nbsp; <span style="font-family: monospace;">// "dialog" below is the user_interaction object<br>
+&nbsp;// we created earlier</span><br>
+      <code><br>
       </code><code>U_16 exception, <br>
 std::string except_msg;</code><br>
       <br>
@@ -1265,14 +1033,8 @@ std::string except_msg;</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp; "my_archive", //
 the basename of the slices <br>
 &nbsp;&nbsp;&nbsp; &nbsp;"dar", // dar's slice extensions<br>
-&nbsp;&nbsp;&nbsp;&nbsp; options, // the object we modified above</code></span><span class="el"><code></code><br>
-      </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;
-&amp;ret,&nbsp; // this value is returned by
-libdar<br>
-      </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// if you don't want to have statistics of the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-operation you can set this parameter to NULL</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">options</span>, // the object we modified above</code></span><span class="el"><code></code><br>
+      </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp; NULL,&nbsp; </code></span><span class="el"><code></code><br>
       </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp; exception,
 // this gives the status of the call<br>
 &nbsp;&nbsp;&nbsp;&nbsp; except_msg); // and in case of error the cause.<br>
@@ -1295,22 +1057,23 @@ if(exception != LIBDAR_NOEXCEPT)<br>
       <p style="text-align: justify;">In
 the same way, each other
 operation (diff, testing, extraction, merging, ...) has a specific
-class that gathers the options parameters. These classes are defined
-in the file libdar/archive_options.hpp you are welcome to refer to for
-a complete up to date list of available options. The advantage of this
+class that gathers the optional parameters. These classes are defined
+in the file dar/archive_options.hpp you are welcome to refer to for
+a complete up to date list of available fields. The advantage of this
 class is to not break ascendant compatibility of the API when new
-features get added, while it also improve readability of your code.
+features get added, while it also improve readability of the code.
 This way, the major current number '5' of the API should stay for a
-longer time than previous numbers, as for thoses each new feature
+longer time than previous numbers, because each new feature
 implementation broke the ascendant compatibility by adding an new
-argument to an API call.<br>
+argument to API calls.<br>
       </p>
       <span style="font-weight: bold;"></span>
-      <h2>6 - Testing the archive we have created</h2>
+      <h2>7 - Testing the archive we have created</h2>
 
-      <br>
-So, as explained previously, we must create a new archive object but
-this time with the "read" constructor: </td>
+      <br>So,
+as explained previously, we must create a new archive object but
+this time using the "read" constructor, which difers from the "create"
+constructor we used earlier by the nature of its arguments: </td>
     </tr>
   </tbody>
 </table>
@@ -1319,7 +1082,10 @@ this time with the "read" constructor: </td>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;">&nbsp; <span style="font-family: monospace;">// "dialog" below is the user_interaction object<br>
+&nbsp;// we created earlier<br>
+      <br>
+      </span><code>
 my_arch = new </code><code>libdar::archive(dialog,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "/tmp",&nbsp; // where is the
@@ -1329,7 +1095,10 @@ archive <br>
 archive extensions<br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; archive_options_read()); // default options<br>
       </code> </td>
-      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;">&nbsp; <span style="font-family: monospace;">// "dialog" below is the user_interaction object<br>
+&nbsp;// we created earlier<br>
+      <br>
+      </span><code>
 my_arch = </code><code>libdar::open_archive_noexcept(</code><code>dialog,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "/tmp",&nbsp; // where is the
@@ -1372,23 +1141,23 @@ Let's thus start by testing the archive coherence: </td>
     <tr>
       <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
 &nbsp;&nbsp; // for the exercice, we will change the default options:<br>
-archive_options_test options;<br>
+archive_options_test <span style="font-weight: bold;">options</span>;<br>
       <br>
-options.clear(); // this set back all options to default<br>
-&nbsp;// here this is not required as the object has just bee<br>
-&nbsp;// created, however it is used here for illustration that<br>
-&nbsp;// you can recycle an archive_option_* object.<br>
+options.clear(); // this sets back all options to their <br>
+&nbsp;// default values, this is for demonstration only as<br>
+&nbsp;// here it was not necessary because the object had<br>
+&nbsp;// just been created.<br>
 options.set_info_details(true); // to have a verbose output<br>
 <br>
 ret = my_arch-&gt;<span class="el">op_test</span>(<span class="el"></span>dialog,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; options; // the non default options set above</code><code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">options</span>; // the non default options set above</code><code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 NULL);&nbsp; // we don't want a progressive report</code><code></code><br>
       <br>
       </td>
       <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code><br>
 &nbsp;&nbsp; // for the exercice, we will change the default options:<br>
-archive_options_test options;<br>
+archive_options_test <span style="font-weight: bold;">options</span>;<br>
 <br>
 options.clear(); // this set back all options to default<br>
 &nbsp;// here this is not required as the object has just bee<br>
@@ -1400,7 +1169,7 @@ options.set_info_details(true); // to have a verbose output</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 my_arch,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // the archive
 to test<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code></span><span class="el"><code>options, // the non default options set above<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code></span><span class="el"><code><span style="font-weight: bold;">options</span>, // the non default options set above<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NULL,&nbsp; // we don't want a
 progressive report<br>
       </code> </span> <span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -1425,120 +1194,12 @@ std::endl;<br>
   <tbody>
     <tr>
       <td style="vertical-align: top;">
-      <div style="text-align: justify;">We have tested the archive, but
-have
-not yet seen the libdar::statistics variable. It can be used when
-creating an archive as well as when testing it.&nbsp; This object
-reports the number of files treated, as well as the number files with
-errors and the type of error. You can have a look at the API reference
-guide concerning the archive class methods, for more information about
-the uses of these different fields. Here is
-an example, which relies on the <span style="font-style: italic;"><span style="font-weight: bold;">class deci</span> </span>to display the
-value of an infinint variable:<br>
-      </div>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-<code></code><code></code>
-<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; background-color: rgb(204, 204, 204);">&nbsp;&nbsp;
-      <code>&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp;&nbsp; // we need the <span style="font-style: italic;">class deci</span> to display the value of
-an infinint:<br>
-      </code><code></code><code>#include "deci.hpp"<br>
-      <br>
-&nbsp;std::cout &lt;&lt; std::string("Number of file treated :")
-&lt;&lt; libdar::deci(ret.treated).human() &lt;&lt; std::endl;<br>
-      <br>
-&nbsp; &nbsp; // or much simpler (but totally equivalent):<br>
-&nbsp;std::cout &lt;&lt; std::string("Number of file treated :")
-libdar::&lt;&lt; ret.treated &lt;&lt; std::endl;<br>
-      </code><br>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top;">
-      <div style="text-align: justify;">Note that the use of the <span style="font-style: italic;">class
-deci
-      </span>may throw exceptions (in case of lack of memory, for example), and
-there is actually no wrapper available to trap the exceptions that may
-be thrown by the class<span style="font-style: italic;"> deci</span>.
-So you have to protect the code using a<span style="font-style: italic;">
-      <span style="font-weight: bold;">try {} catch {}</span></span>&nbsp;
-statement.<br>
-      <br>
-You may have noticed that we used NULL as argument for
-"progressive_report". This argument must either receive NULL as
-argument or the address of a real allocated statistics object. This
-object will be updated by the libdar call and if multi-threaded support is
-enabled it will let a concurrent thread able to reading its value to display the
-current number of file treated, for example. Note that there is a little
-overhead passing a variable to progressive_report, due to the mutex
-that need be used to avoid one reading data while it is updated by
-another thread. Follows a example of use of this <span style="font-style: italic;">progressive report</span> feature:<br>
-      </div>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-<code></code><code></code>
-<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>&nbsp;
-&nbsp; &nbsp; <br>
-&nbsp; &nbsp; &nbsp;&nbsp;&nbsp; // we need a variable that will be
-visible by two threads: <br>
-&nbsp;&nbsp;&nbsp; </code><code>libdar::statistics report;<br>
-      <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // and we need store the
-libdar call returned value<br>
-&nbsp;&nbsp;&nbsp; libdar::statistics final_result;<br>
-      <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // we spawn a first task
-with a libdar call passing &amp;report as argument to
-"progressive_report"<br>
-&nbsp;&nbsp;&nbsp; final_result =
-some_call_to_be_defined_to_call_op_test_in_another_tread(...,
-&amp;report);<br>
-      <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // doing a endless loop
-(assuming the current thread will be signaled or interrupted once the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // previously libdar call running in another thread
-will end)<br>
-      <br>
-&nbsp;&nbsp;&nbsp;&nbsp; while(true)<br>
-&nbsp;&nbsp;&nbsp;&nbsp; {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sleep(1); // updating
-the display each second<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-some_function_to_update_the_display_with(report);<br>
-&nbsp;&nbsp;&nbsp;&nbsp; }<br>
-      </code><br>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top;">
       <h2><br>
       </h2>
-      <h2>7 - listing archive contents</h2>
+      <h2>8 - listing archive contents</h2>
       <br>
-The simple way:<br>
+      <h3>a) The simple way:</h3>
+
       </td>
     </tr>
   </tbody>
@@ -1547,12 +1208,17 @@ The simple way:<br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;">&nbsp; <span style="font-family: monospace;">// "dialog" below is the user_interaction object<br>
+&nbsp;// we created earlier<br>
+      <br>
+      </span><code>
 my_arch-&gt;<span class="el">op_listing</span>(<span class="el"></span>dialog,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; archive_option_listing()); // default options<br>
       </code><br>
       </td>
-      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>&nbsp;
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;">&nbsp; <span style="font-family: monospace;">// "dialog" below is the user_interaction object<br>
+&nbsp;// we created earlier</span><br>
+      <code>&nbsp;
       <br>
 li<span class="el">bdar::op_test_listing(</span></code><span class="el"><code><span class="el"></span>dialog,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; archive_options_listing(), // default options</code></span><span class="el"><code></code></span><br>
@@ -1578,59 +1244,23 @@ endl;<br>
   <tbody>
     <tr>
       <td style="vertical-align: top;">
-      <div style="text-align: justify;">By default the library will
-complete
+      <div style="text-align: justify;">Using this method, the library will performs
 the listing by calling the<span style="font-style: italic;"> warning()</span>
 method of the <span style="font-style: italic;">dialog</span> object
-one time for each file listed. The warning text will consist of a
-string for each file with the relevant information in columns that
+once for each file listed. The warning text will consist of a
+string for each file with the relevant information concatenated that
 would need to be parsed if individual information was desired. This may
-not be appropriate for you and as such there is another way to get
-listing information. This requires a simple reimplementation of the <em>user_interaction</em>
-object.<br>
-      </div>
+not be appropriate for your need and as such there is another way to get
+listing information:<br>
       <br>
-      <div style="text-align: justify;">The <span style="font-style: italic;">user_interaction</span> class
-has a<span style="font-style: italic;"> </span><span style="font-weight: bold; font-style: italic;">listing()</span> method
-which provides separate arguments for each piece of information that
-can be displayed:<br>
+      <h3>b) The flexible way:</h3>
+      <br>
+This new method gives information per directory <span style="font-weight: bold; font-style: italic;">libdar::archive::get_children_in_table(const std::string &amp; dir)</span>
+so you have to specify the directory you want to get content from.
+Second this method will return a list of object each one corresponding
+to an inode contained in that directory. Objects are of type <span style="font-weight: bold; font-style: italic;">libdar::list_entry</span><br>
       </div>
-      <ul>
-        <li>filename, </li>
-        <li>permission, </li>
-        <li>user, </li>
-        <li>group, </li>
-        <li>file size,</li>
-        <li>last modification date,</li>
-        <li>if the file is a directory</li>
-        <li>if the file has children or is an empty dir</li>
-        <li>file type</li>
-        <li>flag about saved data / saved EA / compression used</li>
-      </ul>
-      <p><br>
-      </p>
-      <div style="text-align: justify;"><strong>Technical note:</strong>
-      <em>You may notice that file
-type is
-not explicitly given as a parameter in the listing method. File type is
-available as the first byte of the permissions string. This is standard
-POSIX stuff except for an extension: </em>"h"<em> for files hard
-linked several times (it has been removed after release 2.3.0 / API 4.0.0). See </em><strong>man 2 stat</strong> <em>
-for
-more information about POSIX permissions. Note however that the last
-arguments of this call, let you easily know whether a file is a
-directory or not and whether it
-is empty or not.</em></div>
-      <div style="text-align: justify;">In the <span style="font-style: italic;">user_interaction</span> class
-(a virtual class), the <span style="font-style: italic;">listing()</span>
-method is not a pure virtual method, so you are not obliged to
-overwrite it, but it has just an empty implementation so it does
-nothing.
-You understand now that, by default, this method is not used. To
-activate it, you must call&nbsp;<span style="font-style: italic;">
-set_use_listing(true) </span>protected method and of course you will
-have to overwrite the <span style="font-style: italic;">listing()</span>
-method to have a less silly behavior: </div>
+      
       </td>
     </tr>
   </tbody>
@@ -1642,58 +1272,13 @@ method to have a less silly behavior: </div>
 <table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>&nbsp;&nbsp;&nbsp;
-// here follows the definition of our own implementation of<br>
-&nbsp;&nbsp;&nbsp; // of a user_interaction class <br>
-      <br>
-class my_user_interaction : public user_interaction<br>
-{<br>
-public :<br>
-&nbsp; &nbsp;&nbsp; // the inherited pure virtual methods we must define<br>
-&nbsp; &nbsp;&nbsp; // as seen at the beginning of this tutorial:<br>
-&nbsp; &nbsp;&nbsp; &nbsp; void pause(const std::string &amp; message);<br>
-      </code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; void
-warning(const std::string &amp; message);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; std::string get_string(const
-std::string &amp; message, bool echo);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user_interaction *clone() const;<br>
-      <br>
-&nbsp;&nbsp;&nbsp; // we can overwrite this method to have splitted
-fields for listing:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; void listing(const
-std::string &amp; flag,<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; const std::string
-&amp; perm,<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; const
-std::string &amp; uid,<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; const
-std::string &amp; gid,<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
-&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp;
-size,<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; const
-std::string &amp; date,<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
-&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp;
-filename,<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; bool
-is_dir,<br>
-&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; bool
-has_children);<br>
-      <br>
-&nbsp;&nbsp;&nbsp;&nbsp; // but it will not get used by libdar unless
-we call the protected method set_use_listing()<br>
-&nbsp;&nbsp;&nbsp;&nbsp; // for example this can be done in the class
-constructor :<br>
-      <br>
-&nbsp;&nbsp;&nbsp;&nbsp; my_user_interaction() { <span style="font-weight: bold;">set_use_listing(true);</span> };<br>
-};<br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255);"><span style="font-family: monospace;">&nbsp;&nbsp; // first we define the list that will receive information about the directory</span><br style="font-family: monospace;">
+<code style="font-family: monospace;"></code><code><span style="font-family: monospace;">std::vector&lt;libdar::list_entry&gt; info;</span><br style="font-family: monospace;">
+      <br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp; // now we can ask the archive object for directory content,</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp; // the empty string corresponds to the root within</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp; // the archive:</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">info = my_arch-&gt;get_children_in_table(""); </span><br>
       <br>
       </code> </td>
     </tr>
@@ -1703,160 +1288,33 @@ constructor :<br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top;">
-      <div style="text-align: justify;">Now assuming we have
-implemented the <span style="font-style: italic;">listing()</span>
-method in&nbsp; <span style="font-style: italic;">my_user_interaction</span>
-class, calling <span style="font-style: italic;">op_listing()</span>
-exactly as we did
-before, only replacing the <span style="font-style: italic;">dialog</span>
-object by one of the <span style="font-style: italic;">my_user_interaction</span>
-class. Then this <span style="font-style: italic;">listing()</span>
-method will be called for each file to be listed, in place of the <span style="font-style: italic;">warning()</span> method.<br>
-      </div>
-      <br>
-      <div style="text-align: justify;">As seen at the beginning of
-this
-tutorial, there is a child class of <span style="font-style: italic;">user_interaction</span>
-based on callback functions which is called <span style="font-style: italic;">user_interaction_callback</span>. The <span style="font-style: italic;">listing()</span> method must also be
-activated here. This is done automatically when you give a callback
-function to the object, thanks to the <span style="font-weight: bold; font-style: italic;">set_listing_callback()</span>
-method : </div>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-<code></code><code></code>
-<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>&nbsp;
-      </code><code><br>
-&nbsp; // our mandatory callback functions:<br>
-      <br>
-void warning_callback(const std::string &amp;x, void *context)<br>
-{<br>
-&nbsp;&nbsp;&nbsp; ....<br>
-}<br>
-&nbsp;<br>
-bool answer_callback(const std::string &amp;x, void *context)<br>
-{<br>
-&nbsp; &nbsp; ....<br>
-}<br>
-      <br>
-std::string string_callback(const std::string &amp;x, bool echo, void
-*context)<br>
-{<br>
-&nbsp;&nbsp;&nbsp; ....<br>
-}<br>
-      <br>
-&nbsp; // let's build a user_interaction_callback object:<br>
-      <br>
-libdar::user_interaction_callback dialog = <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-libdar::user_interaction_callback(&amp;warning_callback,
-&amp;answer_callback, &amp;string_callback, NULL);<br>
-      <br>
-&nbsp;&nbsp; // at this point our dialog object is perfectly
-operational for listing<br>
-&nbsp;&nbsp; // but libdar will call the warning_callback function to
-list the archive<br>
-&nbsp;&nbsp; // contents<br>
-      <br>
-&nbsp;&nbsp; // a new callback function for listing :<br>
-      <br>
-void listing_callback(const std::string &amp; flag,<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; const std::string &amp; perm,<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; const std::string &amp; uid,<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; const std::string &amp; gid,<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; const std::string &amp; size,<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; const std::string &amp; date,<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; const std::string &amp; filename,<br>
-&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp; bool is_dir,<br>
-&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; bool has_children,<br>
-&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; void *context)<br>
-{<br>
-&nbsp;&nbsp;&nbsp; ....<br>
-}<br>
-      <br>
-      <span style="font-weight: bold;">dialog.set_listing_callback(&amp;listing_callback);</span><br>
-      <br>
-&nbsp;&nbsp; // now libdar will call the listing_callback function when
-we <br>
-&nbsp;&nbsp; // use this <span style="font-style: italic;">dialog </span>object
-for listing the archive contents.<br>
-      </code><br>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top;">
-      <div style="text-align: justify;">
-      </div>
-      <div style="text-align: justify;">Last point about listing, if
-you examin the definition of the archive_option_listing class in file
-libdar/archive_options.hpp, you will notice the the&nbsp;
-set_list_mode() method. It may receive either <span style="font-weight: bold; font-style: italic;">normal,</span> <span style="font-style: italic; font-weight: bold;">tree</span> or <span style="font-style: italic; font-weight: bold;">xml</span> <span style="font-style: italic;">(normal</span> being the default).<br>
-      </div>
-      <ul style="text-align: justify;">
-        <li><span style="font-style: italic;">normal</span>, produces (if the <span style="font-style: italic;">listing()</span>
-method of the given
-user_interaction object is not overwritten) a listing like tar would
-do. <br>
-        </li>
-        <li><span style="font-style: italic;"></span><span style="font-style: italic;">tree </span>produces a tree like directory listing (this was the original listing format in dar version 1.0.0)<span style="font-style: italic; font-weight: bold;"><br>
-          </span></li>
-        <li><span style="font-style: italic;">xml</span>, produces a XML output as described in doc/dar-catalog-1.0.dtd</li>
+      <td style="vertical-align: top;">Now we have to exploit the table <span style="font-weight: bold; font-style: italic;">info</span>. The class <span style="font-style: italic; font-weight: bold;">libdar::list_entry</span> provides a set of method to retreive information about the directory entry:<br>
+      <ul>
+        <li>the filename</li>
+        <li>inode type</li>
+        <li>whether the entry is a directory</li>
+        <li>whether the entry is a plain file</li>
+        <li>whether the entry is hard linked</li>
+        <li>whether the entry has EA</li>
+        <li>uid</li>
+        <li>gid</li>
+        <li>permission</li>
+        <li>last access date</li>
+        <li>last modification date</li>
+        <li>last change date</li>
+        <li>file size</li>
+        <li>compression ratio</li>
+        <li>whether the file is stored as a sparse file</li>
+        <li>whether the file is dirty (was modified at the time it was read for backup)</li>
+        <li>slice location</li>
       </ul>
-      <div style="text-align: justify;">Note that for these two last formats (tree and xml) the <span style="font-style: italic;">listing()</span> is never used, so even if
-you provide a object which listing() method is overwritten, the <span style="font-style: italic;">archive::op_listing()</span> method will
-still use the <span style="font-style: italic;">warning()</span>
-method of this <span style="font-style: italic;">user_interaction</span>
-object to report the archive contents.
-
+This is not an exhaustive list of method available for <span style="font-style: italic;">libdar::list_entry</span>,
+more methods will come in future version, but existing ones should not
+change. Please refer to the file &lt;dar/list_entry.hpp&gt; for more
+information, or check the documentation about the class <span style="font-style: italic;">libdar::list_entry</span>.<br>
       <br>
-
-      </div>
-<h2>7 bis - Dynamic archive contents listing</h2>
-      <div style="text-align: justify;">Well, in the previous chapter,
-we saw
-how to list the archive contents. You can imagine that when you have a
-huge archive this op_listing() call may take a long time to complete and produces a
-long output. If your application uses some graphical components and you
-want to have a more interesting way for listing the archive contents,
-you would maybe like to have just the first level of the directory tree
-and let the user open the subdirectories and list their contents when needed,
-having a sort of iterative archive listing. This would avoid having to
-wait for the long listing to complete as well as it would avoid having
-to allocate memory for all this graphical components representing each
-directories and files, entries that will most of the time would not be
-read by the user.<br>
-      </div>
-      <br>
-First step, we need to use the listing() method of the
-user_interaction() as seen above. <br>
-Second step, we have to call the get_children_of() method of a given
-archive class, instead of the op_listing() method.<br>
-      <div style="text-align: justify;">In the following example, we
-will use
-the <span style="font-style: italic;">user_interaction_callback</span>
-class, but you can use your own inherited class from <span style="font-style: italic;">user_interaction</span>, and its <span style="font-style: italic;">listing()</span> class.<br>
-      </div>
-      </td>
+Here follows an simple example of use:<br>
+</td>
     </tr>
   </tbody>
 </table>
@@ -1865,100 +1323,32 @@ class, but you can use your own inherited class from <span style="font-style: it
 <table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>&nbsp;
-      </code><code><br>
-&nbsp; // our mandatory callback functions:<br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255);"><code><span style="font-family: monospace;">std::vector&lt;libdar::list_entry&gt; info;<br>
+std::vector&lt;libdar::list_entry&gt; tmp;<br style="font-family: monospace;">
+</span>
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp; // now we can ask the archive object for the content</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp; // the empty string corresponds to the root within</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp; // the archive:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">info = my_arch-&gt;get_children_in_table(""); <br>
       <br>
-void warning_callback(const std::string &amp;x, void *context)<br>
-{<br>
-&nbsp;&nbsp;&nbsp; ....<br>
-}<br>
-&nbsp;<br>
-bool answer_callback(const std::string &amp;x, void *context)<br>
-{<br>
-&nbsp; &nbsp; ....<br>
-}<br>
+</span></code><span style="font-family: monospace;">std::vector&lt;libdar::list_entry&gt;::iterator it = info.begin();</span><br style="font-family: monospace;">
+      <br style="font-family: monospace;">
+      <span style="font-family: monospace;">while(it != info.end())</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">{</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp; std::cout &lt;&lt; it-&gt;get_name();<br>
+&nbsp;&nbsp; if(it-&gt;is_dir())<br>
+&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tmp = my_arch-&gt;get_children_in_table(it-&gt;get_name());<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; std::cout &lt;&lt; "directory with " &lt;&lt; tmp.size() &lt;&lt; " entries" &lt;&lt; std::endl;<br>
+&nbsp;&nbsp; }<br>
+&nbsp;&nbsp; else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; std::cout &lt;&lt; std::endl;<br>
       <br>
-std::string string_callback(const std::string &amp;x, bool echo, void
-*context)<br>
-{<br>
-&nbsp;&nbsp;&nbsp; ....<br>
-}<br>
+&nbsp;&nbsp; ++it;</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">}<br>
       <br>
-&nbsp; // Now the callback function implementing the listing() method
-of class user_interaction<br>
-      <br>
-      </code><code>void listing_callback(const std::string &amp; flag,<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; const std::string &amp; perm,<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; const std::string &amp; uid,<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; const std::string &amp; gid,<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; const std::string &amp; size,<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; const std::string &amp; date,<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; const std::string &amp; filename,<br>
-&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp; bool is_dir,<br>
-&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; bool has_children,<br>
-&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; void *context)<br>
-{<br>
-&nbsp;&nbsp;&nbsp; ....<br>
-} <br>
-      <br>
-&nbsp; // Now that our callback functions are ready, let's create a
-user_interaction callback object named "dialog"<br>
-      </code><code><br>
-libdar::user_interaction_callback dialog = <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-libdar::user_interaction_callback(&amp;warning_callback,
-&amp;answer_callback, &amp;string_callback, NULL);<br>
-      <br>
-&nbsp; // now we must assign the listing_callback() function to
-"dialog".<br>
-      <span style="font-weight: bold;">dialog.set_listing_callback(&amp;listing_callback);</span><br>
-      <br>
-&nbsp;
-// Let's open an archive:<br>
-archive some_archive = archive(dialog, "/some/dir", "basename", "dar", archive_option_read()); <br>
-&nbsp; // we are reading a new archive,
-but we could have created one instead...<br>
-      <br>
-      </code><code>&nbsp; // now, instead of calling op_listing()
-method of some_archive giving our dialog object as argument, we can
-rather call:<br>
-      <span style="font-weight: bold;">some_archive.get_children_of(dialog,
-"");</span><br>
-&nbsp; // the second argument is the directory of which we want to know
-the subdirectories and subfiles. Here "" means the <br>
-&nbsp; // root of the archive (we cannot use absolute path here).<br>
-&nbsp; // get_chidren_of() method will call listing()'s dialog method
-(here our listing_callback() function through the<br>
-&nbsp; // user_interaction_callback implementation) for each entry of
-the root directory.<br>
-      <br>
-&nbsp; // let suppose that thanks to listing_callback() during the
-previous call to get_chidren_of() we know that the entry <br>
-&nbsp; // "var" exists (filename == var) and is a directory (is_dir ==
-true) and has some children (has_children == true),<br>
-&nbsp; // suppose the user want to know what is inside this directory,
-we would then only have to call:<br>
-      <br>
-      <span style="font-weight: bold;">some_archive.get_children_of(dialog,
-"var");</span><br>
-&nbsp; // assuming through listing_callback we know that a subdirectory
-tmp exist and is not empty, assuming that the user<br>
-&nbsp; // want to know what is in it:<br>
-      <br>
-s<span style="font-weight: bold;">ome_archive.get_children_of(dialog,
-"var/tmp");</span><br>
-&nbsp; // and so on.<br>
-      </code> </td>
+      </span></td>
     </tr>
   </tbody>
 </table>
@@ -1969,7 +1359,7 @@ s<span style="font-weight: bold;">ome_archive.get_children_of(dialog,
       <td style="vertical-align: top;">
       <h2><br>
       </h2>
-      <h2>8 - comparing with filesystem</h2>
+      <h2>9 - comparing with filesystem</h2>
 We can compare file in an archive with the filesystem by calling the<span style="font-weight: bold; font-style: italic;"> op_diff</span> method
 of the <span style="font-style: italic;">class archive</span>. </td>
     </tr>
@@ -2045,25 +1435,25 @@ std::endl;<br>
     <tr>
       <td style="vertical-align: top;">Simple, no?<br>
       <br>
-Just a note about the <span style="font-style: italic;">set_what_to_check() </span>method<span style="font-style: italic;"> </span>argument of the archive_options_diff class.
+Just a note about the <span style="font-style: italic;">set_what_to_check() </span>method<span style="font-style: italic;"> </span>argument of the <span style="font-style: italic; font-weight: bold;">libdar::archive_options_diff</span> class.
 It may take several values:<br>
       <ul>
-        <li>cf_inode_type (default value): a file is considered as changed if its
+        <li><span style="font-weight: bold;">libdar::cf_inode_type</span> (default value): a file is considered as changed if its
 inode type
 has changed (directory/plain file/symbolic link/ ...)</li>
-        <li>cf_mtime : permission change is ignored, as well as
+        <li><span style="font-weight: bold;">libdar::cf_mtime</span> : permission change is ignored, as well as
 ownership
 change</li>
-        <li>cf_ignore_owner : ownership change is ignored</li>
-        <li>cf_all : all fields denoting a content's file change
+        <li><span style="font-weight: bold;">libdar::cf_ignore_owner</span> : ownership change is ignored</li>
+        <li><span style="font-weight: bold;">lbdar::cf_all</span> : all fields denoting a content's file change
 triggers a
 file changed status (ownership, permission, dates, inode type).<br>
 </li>
       </ul>
       <br style="font-style: italic;">
-      <h2>9 - restoring files</h2>
+      <h2>10 - restoring files</h2>
 Restoration of files is done by calling the&nbsp;<span style="font-style: italic;"> </span><span style="font-weight: bold; font-style: italic;">op_extract</span>
-method of <em>class archive</em>. </td>
+method of <em>class libdar::archive</em>. </td>
     </tr>
   </tbody>
 </table>
@@ -2110,16 +1500,17 @@ std::endl;<br>
   <tbody>
     <tr>
       <td style="text-align: justify; vertical-align: top;">Here as we used default options, we restore all the files stored in the
-archive in the directory /tmp (we also restore there the directory
+archive into the directory /tmp (we also restore there the directory
 structure stored in the archive), but we could also make a flat
 restoration (ignore directory structure), as well as restore only some
 of the files. By default too, dar asks user confirmation before
 overwriting a file. You can change these options and many others using
-the methods the class archive_options_extract. We will here restore all
+the methods the class <span style="font-weight: bold; font-style: italic;">libdar::archive_options_extract</span>. We will here restore all
 that is under usr/lib and only files which filename ends with ".a", we
 want libdar to skip file that would lead to overwriting an existing
 file and also have libdar display files that have been skipped from the
-restoration.</td>
+restoration. Note that a specific paragraph is designated to masks further in this tutorial, so don't panic :-)<br>
+</td>
     </tr>
   </tbody>
 </table>
@@ -2172,7 +1563,7 @@ error the <br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top;">last point about optional parameter concerns the <span style="font-style: italic;">set</span>_<span style="font-style: italic;">what_to_check</span> method. It serves two roles here: <br>
+      <td style="vertical-align: top;">Last point about optional parameter concerns the <span style="font-style: italic;">set</span>_<span style="font-style: italic;">what_to_check</span> method. It serves two roles here: <br>
       <ol style="text-align: justify;">
         <li>Which field are to be ignored when looking whether a file is
 more
@@ -2185,7 +1576,7 @@ having a plethora of failure to restore ownership messages).<br>
       </ol>
       <h2><br>
 </h2>
-      <h2>10 - Isolating the Catalogue</h2>
+      <h2>11 - Isolating the Catalogue</h2>
 
       <div style="text-align: justify;">OK, I know, <span style="font-style: italic;">catalogue </span>is not an English word
 (one would rather write <span style="font-style: italic;">catalog</span>),
@@ -2197,12 +1588,12 @@ class (if you really don't like French).<br>
       <div style="text-align: justify;">Isolating the catalogue creates
 a new
 archive that only contains the list of files and their attributes
-(ownership, dates, size, etc.), but no data and no EA are stored in it.
+(ownership, dates, size, etc.), but no data, no EA and no FSA are stored in it.
 It is very similar to the same archive one gets if one makes a
 differential backup of a filesystem that has not changed since the
-creation of a reference archive. The usage is very similar to the
+creation of a reference archive. Archive isolation usage is very similar to the
 archive creation, but it uses a different constructor that has less
-arguments:<br>
+arguments. Also we have optional arguments contained in class <span style="font-style: italic; font-weight: bold;">libdar::archive_options_isolate</span>:<br>
       </div>
       </td>
     </tr>
@@ -2212,7 +1603,7 @@ arguments:<br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code>archive_options_isolate options;<br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><span style="font-weight: bold;">archive_options_isolate </span>options;<br>
       <br>
 &nbsp; // we just want to have a compressed isolated catalogue<br>
 options.set_compression(gzip);<br>
@@ -2239,7 +1630,7 @@ options) // non default options set above<br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; <br>
       </code><br>
       </td>
-      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code>archive_options_isolate options;<br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code><span style="font-weight: bold;">archive_options_isolate</span> options;<br>
 <br>
 &nbsp; // we just want to have a compressed isolated catalogue<br>
 options.set_compression(gzip);<br>
@@ -2298,7 +1689,7 @@ std::endl;<br>
       <div style="text-align: justify;">Now we have two archive
 objects. <span style="font-style: italic;">my_arch</span> is a
 read-only object
-created by the "read" constructor. You can do any operations with it,
+created by the "read" constructor in a previous paragraph of this tutorial. You can do any operations with it,
 like file restoration, file comparison, archive testing, as we have
 done in the previous sections. The second archive object is <span style="font-style: italic;">my_cat</span> which is a write only
 object. It can only be used as a reference for another backup (a
@@ -2306,12 +1697,12 @@ differential backup) or as a reference for a subsequent catalogue
 isolation (which would just clone the already isolated catalogue object
 here). <br>
       <br>
-Note that once closed (object destruction) you can re-open the isolated
-catalogue and use it as a read-only object (you can then test its
+Note that once closed (i.e.: object has been destructed) you can re-open the isolated
+catalogue using the "read" constructor and use it as a read-only object (you can then test its
 integrity as seen previously).<br>
       <br>
 So for now we will just destroy
-the extracted catalogue object, so that all its file descriptors are
+the extracted catalogue object, so that all its file descriptors get
 closed: </div>
       </td>
     </tr>
@@ -2347,13 +1738,13 @@ std::endl;</code></span><code> <br>
     <tr>
       <td style="vertical-align: top;">and we keep the <span style="font-style: italic;">my_arch</span>
 object for our last operation:<br>
-      <h2>11 - creating a differential backup</h2>
+      <h2>12 - creating a differential backup</h2>
       <div style="text-align: justify;">This operation is the same as
 the
 first one we did (archive creation). We will just provide the archive of reference as an optional parameter. If we had
 not destroyed <span style="font-style: italic;">my_cat </span>above,
-we could have used it in place of <span style="font-style: italic;">my_arch</span>
-for exactly the same result.<br>
+we could have also used it in place of <span style="font-style: italic;">my_arch</span>
+for exactly the same result:<br>
       </div>
       </td>
     </tr>
@@ -2372,7 +1763,7 @@ for exactly the same result.<br>
 options.set_reference(my_arch);<br>
       <br>
 &nbsp;&nbsp; // as we are now used to options, we will set a more<br>
-&nbsp;&nbsp; // complex set of other options:<br>
+&nbsp;&nbsp; // complex set of other optional fields:<br>
 options.set_selection(not_mask(simple_mask("*~")));<br>
 options.set_empty_dir(true);<br>
 options.set_compression(bzip2);<br>
@@ -2387,14 +1778,14 @@ options.set_crypto_algo(crypto_blowfish);<br>
 options.set_slicing(100000000, 20480);<br>
 &nbsp;
       <br>
-libdar::archive *my_other_arch = <br>
+libdar::archive *<span style="font-weight: bold;">my_other_arch</span> = <br>
 &nbsp; &nbsp;&nbsp; new libdar::archive(dialog, <br>
 &nbsp;&nbsp;&nbsp; &nbsp;"/home",&nbsp; // saving all under this "root"<br>
 &nbsp;&nbsp;&nbsp; &nbsp;"/tmp",&nbsp;&nbsp; // where the slices will go<br>
 &nbsp;&nbsp;&nbsp; &nbsp;"my_archive", //
 the basename of the slices <br>
 &nbsp;&nbsp;&nbsp; &nbsp;"dar", // dar's slice extensions<br>
-&nbsp;&nbsp;&nbsp;&nbsp; options, // the optional parameter as defined above</code><code></code><br>
+&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">options</span>, // the optional parameter as defined above</code><code></code><br>
       <code>&nbsp;&nbsp;&nbsp;&nbsp; NULL); // no progressive report</code><br>
       </td>
       <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>archive_options_create options;<br>
@@ -2405,7 +1796,7 @@ the basename of the slices <br>
 options.set_reference(my_arch);<br>
 <br>
 &nbsp;&nbsp; // as we are now used to options, we will set a more<br>
-&nbsp;&nbsp; // complex set of other options:<br>
+&nbsp;&nbsp; // complex set of other optional fields:<br>
 options.set_selection(not_mask(simple_mask("*~")));<br>
 options.set_empty_dir(true);<br>
 options.set_compression(bzip2);<br>
@@ -2420,17 +1811,15 @@ options.set_crypto_algo(crypto_blowfish);<br>
 options.set_slicing(100000000, 20480);</code><code><br>
       <br>
       </code><code></code>
-      <code><span class="el">libdar::archive *my_other_arch
+      <code><span class="el">libdar::archive *<span style="font-weight: bold;">my_other_arch</span>
 =&nbsp;&nbsp;&nbsp;&nbsp; <br>
 &nbsp;&nbsp;&nbsp;&nbsp; libdar::create_archive_noexcept(dialog,</span></code><span class="el"><code>&nbsp; <br>
 &nbsp;&nbsp;&nbsp;&nbsp; "/home",&nbsp; // saving all under this "root"<br>
-&nbsp;&nbsp;&nbsp; &nbsp;"/tmp",&nbsp;&nbsp; // where the slices will go<br>
-      </code></span><span class="el"><code><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; my_arch,&nbsp; //
-differential backup </span></code></span><span class="el"><code><br>
-&nbsp;&nbsp;&nbsp; &nbsp;"my_archive", //
+&nbsp;&nbsp;&nbsp; &nbsp;"/tmp",&nbsp;&nbsp; // where the slices will go<br>&nbsp;
+      </code></span><span class="el"><code><span style="font-weight: bold;"></span></code></span><span class="el"><code>&nbsp;&nbsp; "my_archive", //
 the basename of the slices <br>
 &nbsp;&nbsp;&nbsp; &nbsp;"dar", // dar's slice extensions<br>
-&nbsp;&nbsp;&nbsp;&nbsp; </code></span><code>options, // the optional parameter as defined above</code><span class="el"><code><br></code></span><span class="el"></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp; exception,
+&nbsp;&nbsp;&nbsp;&nbsp; </code></span><code><span style="font-weight: bold;">options</span>, // the optional parameter as defined above</code><span class="el"><code><br></code></span><span class="el"></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp; exception,
 // thisgives the status of the call<br>
 &nbsp;&nbsp;&nbsp;&nbsp; except_msg); // and in case of error the cause.<br>
       <br>
@@ -2519,20 +1908,400 @@ std::endl;<br>
   </tbody>
 </table>
 <br>
+<br>
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h2>13 - Masks (Optional)<br>
+</h2>
+      <div style="text-align: justify;">Mask are used to define which
+files
+will be considered and which will not. Libdar implements masks as
+several classes that all inherit from a virtual class that defines the
+way masks are used. This root class is the <span style="font-weight: bold; font-style: italic;">class mask</span> and
+provides the <span style="font-style: italic; font-weight: bold;">mask::is_covered()</span><span style="font-weight: bold;"> </span>method
+which libdar uses to determine which files are considered for the
+operation. There is several different basic masks classes you can use
+to build fairly
+complex masks, while it is possible you should not have to define you
+own mask classes, if the need arises, please contact libdar developer
+if you thing an additional class should take place beside the following
+ones:<br>
+ </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    
+    <tr>
+      <td style="vertical-align: top;">class libdar::bool_mask<br>
+      </td>
+      <td style="vertical-align: top;">boolean mask, either always true
+or false, it matches either all files or no files at all<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">class libdar::simple_mask<br>
+      </td>
+      <td style="vertical-align: top;">matches as done by the shell on
+the command
+lines (see "man 7 glob")<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">class libdar::regular_mask<br>
+      </td>
+      <td style="vertical-align: top;">matches regular expressions (see
+"man 7 regex")<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">class libdar::not_mask<br>
+      </td>
+      <td style="vertical-align: top;">negation of another mask<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">class libdar::et_mask<br>
+      </td>
+      <td style="vertical-align: top;">makes an *AND* operator between
+two or more masks<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">class libdar::ou_mask<br>
+      </td>
+      <td style="vertical-align: top;">makes the *OR* operator
+between&nbsp; two or more masks <br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">class lbdar::simple_path_mask<br>
+      </td>
+      <td style="vertical-align: top;">
+      <p>matches if it is subdirectory of mask or is a directory
+that contains the specified path itself<br>
+      </p>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">class libdar::same_path_mask<br>
+      </td>
+      <td style="vertical-align: top;">matches if the string is exactly
+the
+given mask (no wild card expression)<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; width: 210px;">class
+libdar::exclude_dir_mask<br>
+      </td>
+      <td style="vertical-align: top;">matches if string is the given
+string or a sub directory of it<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">class libdar::mask_list<br>
+      </td>
+      <td style="vertical-align: top;">matches a list of files defined
+in a given file<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">Let's play with some masks : </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<code></code><code></code>
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code><br>
+      </code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // all files will be
+elected by this mask</code><br>
+      <code>&nbsp; libdar::bool_mask m1 = true;&nbsp;&nbsp;&nbsp; <br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // all file that match the glob
+expession "A*~" will match. <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // the second argument of the
+constructor tell whether the match is case sensitive so here <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // any file beginning by 'A' or by 'a'
+and ending by '~' will be selected by this mask:<br>
+&nbsp; libdar::simple_mask m2 = libdar::simple_mask(std::string("A*~"),
+false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // m3 is the negation if m2. This mask
+will thus match<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // any file that does not begin by 'A'
+or 'a' and finishing by '~'<br>
+&nbsp; libdar::not_mask m3 = m2;<br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // this mask matches any file that is a
+subdirectory of "/home/joe"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // and any directory that contains
+/home/joe, meaning<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // "/", "/home", "/jome/joe" and any
+subdirectory are matched.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // here, the second argument is also
+case sensitivity (so<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp; "/HoMe" will not be selected by
+this mask as we set it to "true" here.<br>
+&nbsp; libdar::simple_path_mask m4 = simple_path_mask("/home/joe",
+true);<br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // now let's do some more complex things:<br>
+      </code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // m5 will now match
+only files that are selected by both m2 AND m4</code><br>
+      <code>&nbsp; libdar::et_mask m5;<br>
+&nbsp; m5.add_mask(m2);<br>
+&nbsp; m5.add_mask(m4);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // we can make more interesting things like
+this, where m5 will select files<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // that match m2 AND m4 AND m3. But <span style="font-style: italic;">m3 =
+not m2</span> so now m5 will never<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // match any file...<br>
+&nbsp; m5.add_mask(m3);<br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // but we could do the same with an
+"ou_mask" and would get a silly<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // counterpart of m1 (a mask that
+matches any files)<br>
+&nbsp; libdar::ou_mask m6;<br>
+&nbsp; m6.add_mask(m2);<br>
+&nbsp; m6.add_mask(m4);<br>
+&nbsp; m6.add_mask(m3);<br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // lastly, the NOT, AND and OR operation
+can be used recursively.<br>
+      </code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Frankly, it's
+possible to have masks reference each other!</code><br>
+      <code>&nbsp; libdar::not_mask m7 = m6;<br>
+&nbsp; m6.add_mask(m7);<br>
+<br>
+      <br>
+      </code></td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<table style="text-align: left; width: 90%;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">The idea here is not to create object manually, but to link their
+creation to the action and choices the user makes from the user
+interface (Graphical User Interface of your aplication, for example)<br>
+
+      <br>
+
+Now that you've seen the power
+of these masks, you should know that in
+libdar masks are used at several places:<br>
+
+      
+      <ul style="text-align: justify;"><li>A first place is to select files against
+their
+names (without path information) this the argument of the <span style="font-weight: bold;">set_selection()</span> method of <span style="font-style: italic;">libdar::archive_options_*</span> classes. The mask here does not apply to directories.<br>
+</li><li>A second place is to select files against their
+path+name and it applies here to all type of files including
+directories, this is the argument of the <span style="font-weight: bold;">set_subtree()</span> method of <span style="font-style: italic;">libdar::archive_options_*</span> classes. So
+with it you can prune directories, or in any other way restrict the
+operation to a particular subdirectory, as well as to a particular
+plain file for example. <span style="font-weight: bold;">Important note</span>
+about this second mask: what your own mask will be compared to by
+libdar is the <span style="font-weight: bold;">absolute path</span> of the file under consideration. If you want to exclude /usr/local/bin from the operation whatever is the <span style="font-style: italic;">fs_root</span> value (which correspond the -R option of dar) using here a <span style="font-style: italic;">libdar::simple_mask("/usr/local/bin")</span> as argument of <span style="font-style: italic;">libdar::archive_options_*::get_subtree()</span> will do the trick.<br>
+</li></ul>
+
+      
+      <div style="text-align: justify;"> </div>
+
+      
+      <div style="margin-left: 80px; text-align: justify;"><span style="font-style: italic;"></span>An exception is the archive testing operation, which has no <span style="font-style: italic;">fs_root</span> argument (because the
+operation is not relative to an existing filesystem), however the <span style="font-style: italic;">subtree</span> argument exist to receive a
+mask for comparing the path of file to include or exclude from the testing
+operation. In this case the situation is as if the <span style="font-style: italic;">fs_root</span> was set to the value "<span style="font-style: italic;">&lt;ROOT&gt;</span>". For example, masks
+will be compared to <span style="font-style: italic;">"&lt;ROOT&gt;/some/file"</span>
+when performing an archive test operation.<br>
+      </div>
+
+      
+      <div style="margin-left: 80px; text-align: justify;">
+      </div>
+
+
+
+      
+      <ul><li>A third place concerns
+Extended Attributes (EA), this is the argument of the <span style="font-weight: bold;">set_ea_mask() </span>method of archive_options classes. It is applied to the full EA name in the form
+&lt;domain&gt;.&lt;name&gt; where &lt;domain&gt; is any string value
+like but not limited to the usual "user" or "system" domains.</li><li>A fourth place concerne the file to compress or to avoid compressing. This is the argument of the <span style="font-weight: bold;">set_compr_mask()</span>
+method of <span style="font-style: italic;">libdar::archive_options_*</span> classes. it is works the same as
+set_selection() seen above, based only to filename without any path
+consideration.</li><li>A fifth place concern files that have need be prepared for backup, this is the argument of the s<span style="font-weight: bold;">et_backup_hook() </span>method
+of <span style="font-style: italic;">libdar::archive_option_create</span> class. I has to be used the same as
+set_subtree(). For more about this feature see the backup-hook feature
+in dar man page (-&lt;, -&gt; and -= options).<br>
+  </li></ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <div style="text-align: justify;">
+      <h3><br>
+      </h3>
+      <h2>14 - Progressive Report (Optional)<br>
+      </h2>
+      <br>
+Several method we saw previously of the class archive have an argument called<span style="font-weight: bold;"> progressive_report</span> of type <span style="font-style: italic;">libdar::statistics*</span> we have so far set to NULL. We will see here how to use this feature.<br>
+      <br>
+      The <span style="font-style: italic;">libdar::statistics</span> pointed to object i(if progressive_report is not given NULL) is regularily modified by the
+      <span style="font-style: italic;">libdar::archive</span> object during an operation (archive creation, archive
+testing and so on) and can also be accessed by another thread at the same
+time so this other thread can display the current status of the libdar
+operation, by mean of number of file treated, skipped, excluded, and so on.<br>
+      <br>
+      <span style="font-style: italic;">libdar::statistics</span> class
+is defined in &lt;dar/statistics.hpp&gt; header file and provides
+several methods to consult the different fields of the object:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; infinint get_treated()
+const;&nbsp;&nbsp;&nbsp;&nbsp; ///&lt; returns the current value of the
+treated counter</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+infinint get_hard_links() const;&nbsp; ///&lt; returns the current
+value of the hard_links counter</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+infinint get_skipped() const;&nbsp;&nbsp;&nbsp;&nbsp; ///&lt; returns
+the current value of the skipped counter</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+infinint get_ignored() const;&nbsp;&nbsp;&nbsp;&nbsp; ///&lt; returns
+the current value of the ignored counter</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+infinint get_tooold() const;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ///&lt;
+returns the current value of the tooold counter</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+infinint get_errored() const;&nbsp;&nbsp;&nbsp;&nbsp; ///&lt; returns
+the current value of the errored counter</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+infinint get_deleted() const;&nbsp;&nbsp;&nbsp;&nbsp; ///&lt; returns
+the current value of the deleted counter</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+infinint get_ea_treated() ;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ///&lt;
+returns the current value of the ea_treated cou</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+infinint get_byte_amount() const; ///&lt; returns the current value of
+the byte_amount counter</span><br style="font-family: monospace;">
+      <br>
+As you see, the value returned by this methods is of type <span style="font-style: italic; font-weight: bold;">libdar::infinint</span>
+(libdar's integer), whatever is the libdar flavor (infinint, 32bits or
+64 bits). In order to display decimal representation of this type of
+variable you can use the <span style="font-weight: bold; font-style: italic;">class libdar::deci</span><span style="font-style: italic;"><span style="font-weight: bold;">. </span></span>Here is
+an example, which relies on the <span style="font-style: italic;"><span style="font-weight: bold;">class deci</span> </span>to display the
+value of an infinint variable:<br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<code></code><code></code>
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>libdar::statistics report;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // assuming we have given <span style="font-weight: bold;">&amp;report</span> in place of NULL to libdar::archive operation<br>
+&nbsp;&nbsp;&nbsp; // which is now running in another thread<br>
+      <br>
+&nbsp;std::string value = </code><code>libdar::deci(report.get_treated()).human();</code><br>
+      <code><br>
+&nbsp;std::cout &lt;&lt; std::string("Number of file treated so far: ")
+&lt;&lt; value &lt;&lt; std::endl;<br>
+      <br></code></td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <div style="text-align: justify;">Some <span style="font-style: italic;">libdar::archive </span>methods (archive restoration, comparison, testing) also return a value of type <span style="font-style: italic;">libdar::statistics </span>which can be used the same way to have a global summary of the operation but only once the operation has completed.<br>
+      <br>
+Last point all fields of <span style="font-style: italic;">libdar::statistics</span>
+are not used for all operations, because they are not always meaningful
+(like filesystem error while doing a merging operation).<br>
+Please refer to the <span style="font-style: italic;">libdar::archive </span>class documentation (<a href="http://dar.linux.free.fr/doc/html/classlibdar_1_1archive.html">Doxygen</a>) or to the &lt;dar/archive.hpp&gt; header file to have the details of class <span style="font-style: italic;">libdar::statistics</span> used fields and their meaning in relation to each <span style="font-style: italic;">libdar::archive</span> operation.<br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+<br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">For more detailed information
 about the API you can build the API
-documentation from the source code using Doxygen or get it online from <a href="http://dar.linux.free.fr/doc/man/index.html">dar home page</a> or <a href="http://dar.sourceforge.net/doc/man/index.html">mirror site</a>.<br>
+documentation from the source code using Doxygen or get it online from <a href="http://dar.linux.free.fr/doc/man/index.html">dar home page</a> or its <a href="http://dar.sourceforge.net/doc/man/index.html">mirror site</a>.<br>
       <br>
       <br>
-      <h2>12 - Compilation &amp; Linking<br>
+      <h2>15 - Compilation &amp; Linking<br>
       </h2>
       <h3>Compilation</h3>
-All the symbols found in the libdar API are defined via <span style="font-style: italic; font-weight: bold;">&lt;dar/libdar.h&gt;</span>
-so you should only need to include this header.<br>
-      </td>
+      <div style="text-align: justify;">
+All the symbols found in the libdar API except the one relative to dar_manager (see below) are defined from <span style="font-style: italic; font-weight: bold;">&lt;dar/libdar.h&gt;</span>.
+So
+you should only need to include this header. If the header file is not
+located in a standard directory, in order to compile your code, you may
+need some extra
+flags to pass to the compiler (like -I/opt/...). The <span style="font-weight: bold;">pkg-config</span> tool can help here to avoid system dependent
+invocation:<br>
+
+      </div>
+</td>
     </tr>
   </tbody>
 </table>
@@ -2542,15 +2311,17 @@ so you should only need to include this header.<br>
   <tbody>
     <tr>
       <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><br>
-      <code></code>&gt; cat my_prog.cpp<span style="font-weight: bold;"><br>
-#include &lt;dar/libdar.h&gt;</span><br>
-      <br>
-main()<br>
-{<br>
-&nbsp;&nbsp; libdar::get_version(...);<br>
-&nbsp;&nbsp; ...<br>
-}<br>
-&gt; gcc -c my_prog.cpp<br>
+      <code></code><span style="font-family: monospace;">&gt; cat my_prog.cpp</span><br style="font-family: monospace;">
+      <br style="font-family: monospace;">
+<span style="font-weight: bold; font-family: monospace;">
+#include &lt;dar/libdar.h&gt;</span><br style="font-family: monospace;">
+      <br style="font-family: monospace;"><span style="font-family: monospace;">
+main()</span><br style="font-family: monospace;"><span style="font-family: monospace;">
+{</span><br style="font-family: monospace;"><span style="font-family: monospace;">
+&nbsp;&nbsp; libdar::get_version(...);</span><br style="font-family: monospace;"><span style="font-family: monospace;">
+&nbsp;&nbsp; ...</span><br style="font-family: monospace;"><span style="font-family: monospace;">}</span><br style="font-family: monospace;">
+<br style="font-family: monospace;"><span style="font-family: monospace;">
+&gt; <span style="font-weight: bold;">gcc `pkg-config --cflags libdar` -c my_prog.cpp</span></span><br>
       <br>
       </td>
     </tr>
@@ -2566,8 +2337,11 @@ main()<br>
       <h3>Linking</h3>
       <br>
 Of course, you need to link your program with libdar. This is done by
-adding <span style="font-style: italic; font-weight: bold;">-ldar</span>
-plus other library libdar can be built to use like libz, libbzip2, liblzo or libgcrypt :<code></code><code></code> <code>&nbsp; </code> </td>
+adding <span style="font-style: italic; font-weight: bold;">-ldar</span> plus
+other library libdar can rely on like libz, libbzip2, liblzo or
+libgcrypt, depending on the feature activated at compilation time. Here
+too, <span style="font-weight: bold;">pkg-config</span> can provide a great help to avoid having system
+dependent invocation:<code> </code> </td>
     </tr>
   </tbody>
 </table>
@@ -2576,7 +2350,7 @@ plus other library libdar can be built to use like libz, libbzip2, liblzo or lib
   <tbody>
     <tr>
       <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code></code><code></code><span style="font-weight: bold;"></span><br>
-&gt; gcc <span style="font-weight: bold;">-ldar</span> -lz -lbzip2 -llzo -lgcrypt my_prog.o -o
+&gt; gcc <span style="font-weight: bold;">pkg-confg --libs libdar`</span> my_prog.o -o
 my_prog<br>
       <br>
       </td>
@@ -2613,10 +2387,15 @@ linking.<br>
 versions can
 coexist on the same system, they
 share the same include files. But the LIBDAR_MODE macro must be set to 32
-or 64 when compiling for linking with libdar32 or libdar64
-respectively. The LIBDAR_MODE macro defines the way the "<span style="font-style: italic;">class infinint" </span>type is
+or 64 when compiling or linking with libdar32 or libdar64
+respectively. The LIBDAR_MODE macro defines the way the "<span style="font-style: italic;">class infinint" </span>type
+is
 implemented in libdar, and thus changes the way the libdar headers
-files are interpreted by the compiler. </div>
+files are interpreted by the compiler. <span style="font-weight: bold;">pkg-config --cflags</span> will set the
+correct LIBDAR_MODE, so you should only bother calling it with either
+libdar, libdar32 or libdar64 depending on your need : "<span style="font-weight: bold;">pkg-confg
+--cflags libdar64</span>" for example.<br>
+ </div>
       </td>
     </tr>
   </tbody>
@@ -2635,11 +2414,11 @@ main()<br>
 &nbsp;&nbsp; libdar::get_version(...);<br>
 &nbsp;&nbsp; ...<br>
 }<br>
-&gt; gcc -c <span style="font-weight: bold;">-DLIBDAR_MODE=32</span>
+&gt; gcc -c <span style="font-weight: bold;">`pkg-config --cflags libdar32`</span>
 my_prog.cpp<br>
       <br>
       <code></code><code></code><span style="font-weight: bold;"></span><br>
-&gt; gcc <span style="font-weight: bold;">-ldar32</span> my_prog.o -o
+&gt; gcc <span style="font-weight: bold;">`pkg-config --libs libdar32`</span> my_prog.o -o
 my_prog<br>
       <br>
       </td>
@@ -2653,47 +2432,10 @@ my_prog<br>
       <td style="vertical-align: top;">and replace 32 by 64 to link
 with libdar64. <br>
       <br>
-      <div style="text-align: justify;">Note that libdar*.pc files are
-installed in the <span style="font-style: italic;">$(PREFIX)/lib/pkgconfig</span>
-file that should simplify (depending on the point of view) all these
-operations.
-For example, if you have all different flavors of libdar installed, the
-      <span style="font-style: italic;">$(PREFIX)/lib/pkgconfig</span>
-dir will contain (among other files) the three
-following ones:<br>
-      </div>
-      <ul>
-        <li>libdar.pc</li>
-        <li>libdar32.pc</li>
-        <li>libdar64.pc</li>
-      </ul>
-      <div style="text-align: justify;">Thus, if you want to build your
-application with libdar32 for example, you will have to call (assuming
-you have <span style="font-style: italic;">pkg-config</span> installed)<br>
-      </div>
-      </td>
+</td>
     </tr>
   </tbody>
 </table>
-<br>
-<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code></code>&gt;
-gcc <span style="font-weight: bold;">`pkg-config --cflags libdar32`</span>
--c
-my_prog.cpp<br>
-      <br>
-      <code></code><code></code><span style="font-weight: bold;"></span><br>
-&gt; gcc <span style="font-weight: bold;">`pkg-config --libs libdar32`</span>
-my_prog.o -o
-my_prog<br>
-      <br>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<br>
 <br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
@@ -2701,7 +2443,7 @@ my_prog<br>
       <td style="vertical-align: top;"><br>
       <br>
       <br>
-      <h2>13 - Aborting an Operation</h2>
+      <h2>16 - Aborting an Operation</h2>
       <div style="text-align: justify;">If the POSIX thread support is
 available,<span style="font-style: italic;"> libdar</span> will be
 built in a
@@ -2710,7 +2452,7 @@ at the same time. You may then wish to interrupt a given thread. But
 aborting a thread form the outside (like sending it a KILL signal) will
 most of the time let some memory allocated or even worse can lead to
 dead-lock
-situation, when the killed thread was in a critical section and had not
+situation, when the killed thread was inside a critical section and had not
 got&nbsp; the opportunity to release a <span style="font-style: italic;">mutex</span>.
 For that reason, libdar proposes a set
 of calls to abort any processing libdar call which is ran by a given
@@ -2722,18 +2464,18 @@ thread. <br>
 </table>
 <br>
 <code></code><code></code>
-<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto; font-family: monospace;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code></code>&nbsp;&nbsp;
-      <span style="font-style: italic;"></span>&nbsp; // next is the
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code></code>&nbsp;&nbsp; // next is the
 thread ID in which we want to have
 lidbar call canceled<br>
-&nbsp;&nbsp;&nbsp; // here for simplicity we don't describe the way the
+
+&nbsp;&nbsp; // here for simplicity we don't describe the way the
 ID has been obtained<br>
 pthread_t thread_id = 161720;<br>
 &nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp; // the most simple call is :<br>
+&nbsp;&nbsp; // the most simple call is :<br>
 libdar::cancel_thread(thread_id);<br>
 &nbsp;&nbsp; // this will make any libdar call in this thread be
 canceled immediately<br>
@@ -2835,25 +2577,25 @@ cancellation process if it has not yet been engaged.<br>
 <table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top; background-color: rgb(204, 204, 204);">&nbsp;pthread_t
-tid;<br>
-&nbsp;&nbsp; <br>
-&nbsp;&nbsp; // how to know if the thread <span style="font-style: italic;">tid</span> is under cancellation process ?<br>
-if(<span style="font-weight: bold;">libdar::cancel_status</span>(tid))<br>
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><span style="font-family: monospace;">&nbsp;pthread_t
+tid;</span><br style="font-family: monospace;"><span style="font-family: monospace;">
+&nbsp;&nbsp; </span><br style="font-family: monospace;"><span style="font-family: monospace;">
+&nbsp;&nbsp; // how to know if the thread </span><span style="font-style: italic; font-family: monospace;">tid</span><span style="font-family: monospace;"> is under cancellation process ?</span><br style="font-family: monospace;"><span style="font-family: monospace;">
+if(</span><span style="font-weight: bold; font-family: monospace;">libdar::cancel_status</span><span style="font-family: monospace;">(tid))</span><br style="font-family: monospace;"><span style="font-family: monospace;">
 &nbsp;&nbsp;&nbsp;&nbsp; cout &lt;&lt; "thread cancellation is under
-progress for thread : " &lt;&lt; tid &lt;&lt; endl;<br>
-else<br>
+progress for thread : " &lt;&lt; tid &lt;&lt; endl;</span><br style="font-family: monospace;"><span style="font-family: monospace;">
+else</span><br style="font-family: monospace;"><span style="font-family: monospace;">
 &nbsp;&nbsp;&nbsp;&nbsp; cout &lt;&lt; "no thread cancellation is under
-progress for thread : " &lt;&lt; endl;<br>
-      <br>
-&nbsp;&nbsp; // how to cancel a pending thread cancellation ?<br>
-if(<span style="font-weight: bold;">libdar::cancel_clear</span>(tid))<br>
+progress for thread : " &lt;&lt; endl;</span><br style="font-family: monospace;">
+      <br style="font-family: monospace;"><span style="font-family: monospace;">
+&nbsp;&nbsp; // how to cancel a pending thread cancellation ?</span><br style="font-family: monospace;"><span style="font-family: monospace;">
+if(</span><span style="font-weight: bold; font-family: monospace;">libdar::cancel_clear</span><span style="font-family: monospace;">(tid))</span><br style="font-family: monospace;"><span style="font-family: monospace;">
 &nbsp;&nbsp;&nbsp; cout &lt;&lt; "pending thread cancellation has been
 reset, thread " &lt;&lt; tid &lt;&lt; " has not been canceled" &lt;&lt;
-endl;<br>
-else<br>
+endl;</span><br style="font-family: monospace;"><span style="font-family: monospace;">
+else</span><br style="font-family: monospace;"><span style="font-family: monospace;">
 &nbsp;&nbsp; cout &lt;&lt; "too late, could not avoid thread
-cancellation for thread "&lt;&lt; tid &lt;&lt; endl;<br>
+cancellation for thread "&lt;&lt; tid &lt;&lt; endl;</span><br>
       <br>
       </td>
     </tr>
@@ -2871,7 +2613,7 @@ catch it: </td>
 </table>
 <br>
 <code></code><code></code>
-<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto; font-family: monospace;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code></code>try<br>
@@ -2933,7 +2675,7 @@ object be accessed by more than one thread. See the <a href="http://dar.sourcefo
       <br>
       <br>
       <br>
-      <h2 style="text-align: justify;">14 - Dar_manager API</h2>
+      <h2 style="text-align: justify;">17 - Dar_manager API</h2>
 
       <br>
       <div style="text-align: justify;">For more about <span style="font-style: italic;">dar_manager</span>, please read the&nbsp;<span style="font-style: italic;"></span>man page where are described in
@@ -2948,8 +2690,8 @@ ones described above.<br>
       <div style="text-align: justify;">To get dar_manager features you
 need to use the <span style="font-weight: bold; font-style: italic;">class
 database</span>
-which is defined in the <span style="font-style: italic;">libdar/database.hpp</span>
-header file so you first need to include that file. Most of the methods of the <span style="font-style: italic;">database</span> class do use options. For the same reason as previously seen for <span style="font-style: italic;">archive</span> manipulation, these options are passed thanks to a container class. These container classes for options used by the <span style="font-style: italic;">database</span> class are defined in the<span style="font-style: italic;"> libdar/database_options.hpp</span> file. Let's see the
+which is defined in the <span style="font-style: italic; font-weight: bold;">libdar/database.hpp</span>
+header file so <span style="text-decoration: underline;">you first need to include that file</span>. Most of the methods of the <span style="font-style: italic;">database</span> class do use options. For the same reason as previously seen for <span style="font-style: italic;">archive</span> manipulation, these options are passed thanks to a container class. These container classes for options used by the <span style="font-style: italic;">database</span> class are defined in the<span style="font-style: italic;"> libdar/database_options.hpp</span> file. Let's see the
 different method of the class <span style="font-style: italic;">database</span>
 :<br>
       </div>

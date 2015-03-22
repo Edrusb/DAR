@@ -1,20 +1,21 @@
 from 2.4.x to 2.5.0
 - added support for posix_fadvise
-- added entrepot class hierarchy to support other storage than local
+- added entrepot class hierarchy to support other storage for slices than local
   filesystem in the future
-- added access to the entrepot through the API (new option)
-- class hash_fichier becomes entrepot independent
+- added access to the entrepot through the API (new options)
+- modified class hash_fichier for it becomes entrepot independent
 - extended libdar API with an additional and more simple way to read an
-  archive: archive::get_children_in_table() method
-- added support for extX (see lsattr) and HFS+ (birthtime date) FSA
+  archive: archive::get_children_in_table() method, see doc/API_tutorial.html
+- added support for extX (see lsattr(1)) and HFS+ (birthtime date)
+  Filesystem Specific Attributes (FSA).
 - dar is now able to skip backward when a file is found to be "dirty" at
-  backup time (changed at the time it was read). This avoid wasting space in
-  archive but is only possible if the backward position is located in the
-  current slice and no hash is used and no strong encryption is used neither.
+  backup time. This avoids wasting space in archive but is only possible if
+  the backward position is located in the current slice and no slice hashing is
+  used and no strong encryption is used neither.
   Of course if the archive is written to a pipe or stdout, skipping back to
   retry saving data at the same place is not possible which lead dar, if
   wasting bytes is allowed (see --retry-on-change option) to add a new copy of
-  the files that changed up to the maximum allowed number of retry.
+  the files that changed up to the maximum allowed number of retries.
 - by default dar now performs up to 3 retries but do not allow for wasting bytes
   if file has changed at the time it was read for backup (see --retry-on-change
   option)
@@ -22,41 +23,47 @@ from 2.4.x to 2.5.0
   compressed but its compressed data uses more space than uncompressed,
   the file's data is resaved as uncompressed. If skipping backward is
   not possible, data is kept compressed.
-- if system provides it, dar uses linux capabilities to check for the ability
-  to set file ownership when not run as root.
+- if system provides it, dar uses "Linux capabilities" to check for the ability
+  to set file ownership when not run as root, this allows dar to restore
+  ownership even when it is not run as root.
 - removing dar-help tool used to build dar -h message. That tool became useless
   for a long time now.
-- added more specific -vm and -vt verbose options
+- added two more specific verbosity options: -vm and -vt options
 - added support for microsecond timestamps (atime, mtime, ctime, birthtime)
 - added support for lutime() to restore atime/mtimes of symlink on systems
   that support it.
-- removed backward compatible API with old libdar 4.4.x
+- removed backward compatible API for old libdar 4.4.x
 - simplified implementation of archive isolation thanks to
   archive isolation evolution features brought by release 2.4.0. Memory
-  requirement is devided by two compared to previous release.
+  requirement is devided by two compared to releases of previous branch (2.4.x).
 - added feature: exclude-by-ea to avoid saving inodes that have a particular
   user defined EA set.
 - added feature: comparison of an isolated catalogue with a filesystem,
   relying on embedded data CRC and inode metadata in absence of the saved
   data.
 - This new archive format (version 9) holds the ciphering algorithm used
-  at creation time, only the passphrase is required at reading time.
+  at creation time, only the passphrase is now required at reading time.
 - Adding support for public key encryption (GnuPG) relying on gpgme
 - Adding support for public key signature of an archive
 - While listing archive contents, directories show the size and average
-  compression of the data they contain
+  compression ratio of the data they contain
 - added the -vd switch to only display current directory under process for
   creation, diff, test, extraction and merging operations
 - added xz/lzma compression support
-- added -Tslicing option to list slice localization of files
+- added feature: -Tslicing option modify archive listing to provide slice
+  localization of files data EA and FSA.
 - isolated catalogues now keep a record of the slicing layout of their
   archive of reference in order to provide -Tslicing feature when used
   on the isolated catalogue alone.
-- added the possibility to use -s and -S options when using -Tslicing with
-  an isolated catalogue, to face the case when the archive of reference has
-  been resliced after the isolated catalogue has been built.
+- However if an archive has been resliced (using dar_xform) after its
+  isolated catalogue has been generated, using -Tslicing option with the
+  isolated catalogue requires to specify what is the new slicing of the
+  archive of reference which is possible by using the -s and -S options
+  in conjunction with -Tslicing
 - added dar_split command to provide on-fly multi-volume archive support
   on tape medium
+- libdar relies on libthreadar (if available) to split its work among
+  several threads
 
 from 2.4.16 to 2.4.17
 - fixing issue when case insensitive comparison was requested and invalid

@@ -1295,7 +1295,7 @@ fi
 
 if [ -z "$build_mode" ] ; then
    echo ""
-   echo "--------------------- N O T E ---------------------------------------"
+   echo "--------------------- N O T E -------------------------------------------"
    echo "Note: You are about to build a libdar/dar binary relying on \"infinint\""
    echo "integer type. You shall also consider using 64 bits integers (whatever"
    echo "your CPU has 32 or 64 bits registers) for better performances and reduced"
@@ -1304,20 +1304,20 @@ if [ -z "$build_mode" ] ; then
    echo "Document which is also available online at:"
    echo "   http://dar.linux.free.fr/doc/Limitations.html#Integers"
    echo "Unless you are impacted by these limitations, you can rerun ./configure"
-   echo "adding the option --enable-mode=64 for better performances"
-   echo "---------------------------------------------------------------------"
+   echo "adding the option --enable-mode=64 for dar/libdar better performances"
+   echo "-------------------------------------------------------------------------"
 fi
 
 if [ "$libgcrypt_hash_bug" = "yes" ] ; then
    echo ""
    echo ""
-   echo "#################### W A R N I N G ##################################"
+   echo "#################### W A R N I N G ######################################"
    echo ""
    echo "libgcrypt version is lower than $min_version_gcrypt_hash_bug and has a bug"
    echo "concerning hash calculation for large files. Expect sha1 and md5 hash"
    echo "results for slices larger than 256 Gio (gibioctet) to be incorrect."
    echo ""
-   echo "#################### W A R N I N G ##################################"
+   echo "#################### W A R N I N G ######################################"
 fi
 
 echo ""

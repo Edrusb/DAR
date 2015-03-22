@@ -26,9 +26,7 @@ retrieved the latest version of a particular branch (not the `master' branch),
 you are welcome to use this version for your own backup, ask for support in the
 dar-support mailing-list (precising the way you got the source code). If you
 find a problem with the latest release, and can still reproduce it with the
-version of that branch, you are welcome to open a bug report. If the problem
-is new to that GIT version, please ask for support on dar-support mailing-list.
-
+version of that branch, you are welcome to open a bug report.
 
 COMPILATION IN BRIEF:
 
@@ -42,7 +40,7 @@ developpers provide a Makefile that let the building much more easy (just type
 Here dar is not a small program, it uses several Makefiles, and overall it must
 be able to work under Linux, Solaris, FreeBSD, MacOS X, Cygwin, and many other
 operating systems. Thus a single type of Makefile will not work because system
-include files, system library to link with do vary from system to system. For
+include files, system libraries to link with do vary from system to system. For
 that reason, automake, autoconf, libtool and gettext are used to generate the
 correct Makefiles for the current system. These Makefiles, and the configure
 script are usually provided in each released package, but here as they are
@@ -89,9 +87,11 @@ configure.ac -+-[autoconf]--> configure
 
 Makefile.am ---[automake]---> Makefile.in
 
+
 Makefile.in -+-[configure]-+--> Makefile
              |             |
 config.h.in -+             +--> config.h
+
 
 Source code -+-[make dist]-+--> dar-<version>.tar.gz (standalone source package)
 

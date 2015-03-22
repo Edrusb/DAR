@@ -5,6 +5,7 @@
 
 
 
+
 <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Dar's Documentation - Compiling From Source</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
@@ -45,9 +46,9 @@ for additional steps)
       </div>
       <ol style="margin-left: 40px; text-align: justify;">
         <li>a C++ compiler supporting g++11 syntax (for <a href="http://gcc.gnu.org/">gcc</a>
-that means version 4.8. minimum). For version older than dar-2.5.0
+that means version 4.8. minimum, <a href="http://clang.llvm.org/">clang</a> is also supported). For version older than dar-2.5.0
 g++11 support is not required but if using gcc you need at least
-version 3.4.x. clang++ is supported as well as libc++ as replacement of stdlibc++ standard C++ library.<br>
+version 3.4.x. A standard C++ library is also required, compilation has been tested with libc++ and stdlibc++.<br>
 </li>
         <li>a linker like "ld" the <a href="http://www.gnu.org/software/binutils/">GNU Linker</a><br>
         </li>
@@ -87,7 +88,7 @@ dar_suite upx compressed binaries</li>
         <li><a href="http://www.gnu.org/software/groff/groff.html">groff</a>
 to generate html version of man pages <br>
 </li>
-        <li>libthreadar for libdar using several threads<br>
+        <li><a href="http://libthreadar.sourceforge.net/">libthreadar</a> for libdar using several threads<br>
         </li>
 
       </ul>
@@ -245,7 +246,7 @@ replace "infinint" integers by 32 or 64 bits integers. This makes a
 faster
 executable and less fond of memory, but with several restrictions
 (about for example ability to handle large files, or high dates. See
-the <a href="Limitations.html#Integers">limitations</a> for more).<br>
+the <a href="Limitations.html#Integers">limitations</a> for more). Note that 64 bits integers are available on 32 bits CPU plateforms.<br>
       </div>
       <br>
       </td>
@@ -409,6 +410,12 @@ information on self diagnostic bugs even<br>
       <td style="vertical-align: top;">Avoid linking with libthreadar even if available, libdar will not create threads<br>
       </td>
     </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">--disable-birthtime<br>
+      </td>
+      <td style="vertical-align: top;">disable the HFS+ Filesystem Specific Attribute support<br>
+      </td>
+    </tr>
 <tr>
       <td style="vertical-align: top; width: 33%;"><span style="text-decoration: underline;">Troubleshooting option:</span><br>
       </td>
@@ -499,8 +506,8 @@ of branches. In dar repository, there are thus a lot of them: the first
 and main one is called "master". It contains current development and
 most probably unstable code. There are other permanent branches that
 hold stable code. They are all named by "<span style="font-weight: bold;">branch_A.B.x</span>" where A and B are the
-numbers corresponding to a released versions family. For example, "<span style="font-weight: bold;">branch_2.4.x</span>" holds the stable code
-for releases 2.4.0, 2.4.1, 2.4.2 and so on. <span style="text-decoration: underline;">It also holds pending fixes for
+numbers corresponding to a released versions family. For example, "<span style="font-weight: bold;">branch_2.5.x</span>" holds the stable code
+for releases 2.5.0, 2.5.1, 2.5.2 and so on. <span style="text-decoration: underline;">It also holds pending fixes for
 the next release on that branch you might be interested in.</span> <br>
       <br>
 The global organisation of the repository is thus the following:<br>
@@ -548,7 +555,7 @@ repository hosted at sourceforge:<br>
       <br>
       </div>
       <div style="margin-left: 120px;"><span style="font-family: monospace;"></span><code>git clone git://git.code.sf.net/p/dar/code dar-code<br>
-cd dar<br>
+cd dar-code<br>
       </code> </div>
       <div style="margin-left: 80px;"><br>
 You will probably not want to use current development code so you have
@@ -557,7 +564,7 @@ to the branch "branch_A.B.x" of you choice:<br>
       <br>
       </div>
       <div style="margin-left: 120px;"><code></code><code>git checkout
-branch_2.4.x<br>
+branch_2.5.x<br>
       </code> </div>
       <div style="margin-left: 80px;"><br>
 That's all. You now have the most recent stable code (for branch_2.4.x
@@ -573,7 +580,7 @@ is as easy as using (no need to clone the repository from scratch
 again):&nbsp; <code></code><br>
       <br>
       </div>
-      <div style="margin-left: 120px;"><code>git pull origin branch_2.4.x</code><code></code>
+      <div style="margin-left: 120px;"><code>git pull origin branch_2.5.x</code><code></code>
       </div>
       <div style="margin-left: 80px;"><br>
 There is also a web interface to git: <a href="http://sourceforge.net/p/dar/code/">gitweb</a><br>
