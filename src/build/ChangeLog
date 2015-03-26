@@ -28,7 +28,7 @@ from 2.4.x to 2.5.0
   ownership even when it is not run as root.
 - removing dar-help tool used to build dar -h message. That tool became useless
   for a long time now.
-- added two more specific verbosity options: -vm and -vt options
+- added several more specific verbosity options: -vm, -vf, -vd and -vt options
 - added support for microsecond timestamps (atime, mtime, ctime, birthtime)
 - added support for lutime() to restore atime/mtimes of symlink on systems
   that support it.
@@ -43,7 +43,8 @@ from 2.4.x to 2.5.0
   data.
 - This new archive format (version 9) holds the ciphering algorithm used
   at creation time, only the passphrase is now required at reading time.
-- Adding support for public key encryption (GnuPG) relying on gpgme
+- Adding support for public key encryption (GnuPG) supporting
+  several encryption keys/recipients for a given archive
 - Adding support for public key signature of an archive
 - While listing archive contents, directories show the size and average
   compression ratio of the data they contain
