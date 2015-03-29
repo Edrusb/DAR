@@ -48,6 +48,7 @@ from 2.4.x to 2.5.0
 - Adding support for public key signature of an archive
 - While listing archive contents, directories show the size and average
   compression ratio of the data they contain
+- Archive summary (-l with -q options) now reports the global compression ratio
 - added the -vd switch to only display current directory under process for
   creation, diff, test, extraction and merging operations
 - added xz/lzma compression support

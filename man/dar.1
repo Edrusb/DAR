@@ -1,4 +1,4 @@
-.TH DAR 1 "January 31th, 2015"
+.TH DAR 1 "March 29th, 2015"
 .UC 8
 .SH NAME
 dar \- create, test, list, extract, compare, merge, isolate dar archives
@@ -19,10 +19,10 @@ Like its grand-brother, the great "tar" command,
 .B dar
 may also use compression, at the difference that compression is used inside the archive to be able to have compressed slices of the defined size. But the most important feature of
 .B dar
-is its ability to make differential backups. In other words, backups that contain only new files or files that have changed from a backup of reference.
+is its ability to make differential and decremental backups. In other words, backups that contain only new files or files that have changed from a backup of reference.
 Moreover with differential backup,
 .B dar
-also stores files that have been deleted since the backup of reference. Thus, when restoring, first a full backup, then additional differential backups, at each restoration you get the exact state of the filesystem at the time of the backup. And of course, the reference backup may be a full or a differential backup itself.
+also stores files that have been deleted since the backup of reference. Thus, when restoring, first a full backup, then additional differential backups, at each restoration you get the exact state of the filesystem at the time the differential backup was made. And of course, the reference backup may be a full or a differential backup itself, so you can make the same way incremental backups.
 .PP
 .B dar
 is the first backup program I know that can also remove files during restoration! By the way, in this document, "archive" and "backup" mean the same thing, and are used interchangeably.
@@ -31,12 +31,19 @@ Unlike the
 .B tar
 command,
 .B dar
-has not to read a whole archive nor to stick together the different parts (the slices) to get its contents: dar archive contains a table of contents (aka "catalogue") located at the end of the archive, so it seeks into the archive forth and backward to extract only the required files, which is much faster than what tar is used to do. Since release 2.4.0 dar can also use a sequential reading mode, in which dar acts like tar, just reading byte by byte the whole archive to know its contents and eventually extracting file at each step. In other words, the archive contents is located at both locations, all along the archive used for tar-like behavior suitable for sequential access media (tapes) and at the end for faster access, suitable for random access media (disks).  However note that tar archive and dar archive are not compatible. Dar does not known anything about tar archive structure, neither tar known anything about dar archive structure. So keep using tar if you are used to it or find no advantage in using dar. Note also that the sequential reading mode let you extract data from a partially written archive (those that failed to complete due to a lack of disk space for example).
+has not to read a whole archive nor to stick together the different parts (the slices) to get its contents: dar archive contains a table of contents (aka "catalogue") located at the end of the archive, so it seeks into the archive forth and backward to extract only the required files, which is much faster than what tar is used to do. The "catalogue" can be copied out of the archive (operation called isolation) to be used as reference for further backup and as backup of the internal catalogue in case of archive corruption.
 .PP
-Since release 2.4.0, a "relax" reading mode is available that let dar to either ignore some incoherence in archive structure, or use internal redundant information to overcome what seems to be data corruption, and in last resort ask the user on what to do when some archive structure information is missing. This relax mode can be used with both sequential and direct access read modes. Note however that you should rather use Parchive to protect your data rather than just relying on the "relax" mode, which has to be seen as a the last chance solution, as this mode cannot repair the archive, but may only lead to partial archive extraction upon archive corruption. For immediate Parchive integration with dar, use the "par2" user target defined in /etc/darrc.
+Dar can also use a sequential reading mode, in which dar acts like tar, just reading byte by byte the whole archive to know its contents and eventually extracting file at each step. In other words, the archive contents is located at both locations, all along the archive used for tar-like behavior suitable for sequential access media (tapes) and at the end for faster access, suitable for random access media (disks).  However note that tar archive and dar archive are not compatible. Dar does not known anything about tar archive structure, neither tar known anything about dar archive structure. So keep using tar if you are used to it or find no advantage in using dar. Note also that the sequential reading mode let you extract data from a partially written archive (those that failed to complete due to a lack of disk space for example).
+.PP
+If you want to use dar (or tar) to span an archive over several tapes see dar_split(1) command
+.PP
+A "relax" reading mode is available which let dar to either ignore some incoherence in archive structure, or use internal redundant information to overcome data corruption or in last resort asking the user on what to do when some archive structure information is missing. This relax mode can be used with both sequential and direct access read modes. Note however that you should rather use Parchive to protect your data rather than just relying on the "relax" mode, which has to be seen as a the last chance solution, as this mode cannot repair the archive, but may only lead to partial archive extraction upon strong archive corruption. For immediate Parchive integration with dar, use the "par2" user target defined in /etc/darrc.
 .PP
 .B dar
-can take care of POSIX Extended Attributes (EA in short) that are used under Linux to carry File Access Control List (FACL) as well as security attributes for SELinux, under MacOS X EA are used to store file forks as well as on any other filesystem that support POSIX EA. EA also have room for user to add any key / value paire to any file, this is known as user EA. These attributes are not specific to any particular filesystem, they exist the same way under ext3/4, HFS+ and any other filesystem. At the opposit, Filesystem Specific Attributes (FSA in short) are, as you can guess, specific to one or several filesystem(s). For example the Birth date of a file exists for HFS+ and NTFS but not for ext2/3/4 filesystem. The immutable attribute exists for ext2/3/4 but not for NTFS while the nodump files does not exists for NTFS but exists for HFS+, ext2/3/4 and many other Unix filesystems. For
+takes care of POSIX Extended Attributes (EA in short) that are used in particular under Linux to carry File Access Control List (FACL) as well as security attributes for SELinux, and also under MacOS X EA they are used to store file forks. EA also have room for user to add any key / value paire to any file, this is known as user EA. These attributes are not specific to any particular filesystem, they exist the same way under ext3/4, HFS+ and any other filesystem.
+.PP
+.B dar
+also takes care of Filesystem Specific Attributes (FSA in short) which are, as you can guess, specific to one or several filesystem(s). For example the Birth date of a file exists for HFS+ and NTFS but not for ext2/3/4 filesystem. The immutable attribute exists for ext2/3/4 but not for NTFS while the nodump files does not exists for NTFS but exists for HFS+, ext2/3/4 and many other Unix filesystems. For
 .B dar
 an inode (file, symlink, named pipe, socket, device, door, directory, ...)  is thus not only a piece of data to backup and restore but also a set of common attributes (permission, ownership, atime, mtime, ctime, ...) eventually followed by its EA set and/or FSA. FSA are grouped by family each more or less corresponding to a given filesystem supported. For example extX family carries FSA of ext2, ext3 and ext4 filesystems. HFS+ those of MacOS X HFS+ filesystem. Some family may be disabled at compilation time if the uderlying system used to compile dar/libdar has not enough support for it. In that case dar is not able to save or restore attributes of such family, but archive merging is not affected and FSA are taken into consideration normally. For more details on how to act on FSA families see option --fsa-scope.
 .PP
@@ -45,23 +52,70 @@ A few words about slice before going deeper in detail: a slice is just a simple 
 Let's take an example:
 considering the basename "joe", dar will make one or several slices during backup process (depending on your choice). The filenames of these slices will be: joe.1.dar joe.2.dar ... joe.10.dar ... etc.
 If you want to extract, list, or use this backup as reference, you will only have to use the basename, which is the string "joe" in this example.
+.PP
+The rest of this document is organized that way:
+.RS
+.TP 5
+COMMANDS
+The seven actions you can performs with dar
+.TP 5
+GENERAL OPTIONS
+A set of options common to all actions
+.TP 5
+SAVING, ISOLATING AND MERGING SPECIFIC OPTIONS
+A set of options that are specific to the operation of backup, catalogue isolation and archive merging
+.TP 5
+RESTORATION SPECIFIC OPTIONS
+A set of options that are specific to the restoration operation
+.TP 5
+TESTING AND DIFFERENCE SPECIFIC OPTIONS
+A set of options that are specific to the operation of archive testing and archive comparison with a filesystem
+.TP 5
+LISTING OPTIONS
+A set of options that are specific to archive listing operation
+.TP 5
+EXPICIT OPTIONAL ARGUMENTS
+Some system do not allow optional arguments to options, this chapter explain how to overcome this restriction
+.TP 5
+EXIT CODES
+List of values
+.B dar
+returns at end of execution. This chapter should be read if you intend to create scripts relying on dar
+.TP 5
+SIGNALS
+details the signal and their action on a running dar process
+.TP 5
+FILES
+List configuration files that dar checks for
+.TP 5
+CONDITIONAL SYNTAX
+Over command line, command and options can be passed to dar thanks to a plain file (known as DCF file). This plain file can also contain a specific syntax that will let you pass an option to dar only under certain situation/condition. This chapter describes this simple syntax and the different available conditions.
+.TP 5
+USER TARGETS
+User can add their own conditions known as user targets. This chapter describes what they are and how to use them
+.TP 5
+ENVIRONMENT
+Dar may rely on environment variables to look for DCF files and DUC files
+.RE
 
 .SH OPTIONS
 
 .PP
 .B COMMANDS:
 .PP
-Only seven commands define what action will be done by dar: Archive creation, archive extraction, archive listing, archive testing, archive comparison with filesystem, catalogue isolation and archive merging. These commands are described here below. Once defined, a large set of options can be used to modify the way the command is performed. These options are described just after the commands chapter. Last, optional user targets may follow options, their use is described at the end of this document.
+Only seven commands define what action will be done by dar: Archive creation, archive extraction, archive listing, archive testing, archive comparison with filesystem, catalogue isolation and archive merging. These commands are described here below.
+
+Once defined, a large set of options can be used to modify the way the command is performed. These options are described just after the commands chapter.
 .PP
 .B Important note:
 Not all system actually support long options (Solaris, FreeBSD, ...). For example --create will not be available on these systems, and you will have to use -c instead. In the same way, not all system do support optional arguments (FreeBSD without GNU getopt for example), you then need to explicitly give the argument, for example in place of "-z" you will need to give "-z 9", see "EXPLICIT OPTIONAL ARGUMENTS" paragraph near the end of this document for details on that point.
 
 .TP 20
 -c, --create [<path>/]<basename>
-creates a backup with the name based on <basename>. All the slices will be created in the directory <path> if specified, else in the current directory. If the destination filesystem is too small to contain all the slices of the backup, the -p option (pausing before starting new slices) might be of interest. Else, in the case the filesystem is full, dar will suspend the operation, asking for the user to make free space, then continue its operation. To make free space, the only thing you cannot do is to touch the slice being written. If the filename is "-" *and* no slicing is asked for (no -s option) the archive is produced on the standard output allowing the user to send the resulting archive through a pipe (or into a tape device).
+creates a backup with the name based on <basename>. All the slices will be created in the directory <path> if specified, else in the current directory. If the destination filesystem is too small to contain all the slices of the backup, the -p option (pausing before starting new slices) might be of interest. Else, in the case the filesystem is full, dar will suspend the operation, asking for the user to make free space, then continue its operation. To make free space, the only thing you cannot do is to touch the slice being written. If the filename is "-" *and* no slicing is asked for (no -s option) the archive is produced on the standard output allowing the user to send the resulting archive through a pipe (or into a tape device directly or using the dar_split command).
 .TP 20
 -x, --extract [<path>/]<basename>
-extracts files from the given backup. Slices are expected to be in the current directory or in the directory given by <path>. It is also possible to use symbolic links to gather slices that are not in the same directory. Path may also point to a removable device (floppy, CD, etc.), in this case, to be able to mount/unmount the device, you must not launch dar from that directory. In other words, the current directory must not be that directory (see tutorial for details). The basename may be set to "-", in direct access mode (the default an historical mode), you will need dar_slave to work with dar (see -i and -o options, as well as dar_slave man page). However in sequential read mode (--sequential-mode is used on command-line), dar will read the archive from standard input (see also -i option).
+extracts files from the given backup. Slices are expected to be in the current directory or in the directory given by <path>. It is also possible to use symbolic links to gather slices that are not in the same directory. Path may also point to a removable device (floppy, CD, USB key, etc.), in this case, to be able to mount/unmount the device, you must not launch dar from that directory. In other words, the current directory must not on the removable media you plan to unmount (see tutorial for details). The basename may be set to "-", in direct access mode (the default historical mode), you will then need dar_slave to work with dar (see -i and -o options, as well as dar_slave man page). However in sequential read mode (--sequential-mode is used on command-line), dar will read the archive from standard input (see also -i option), this can eventually be used in combination with dar_split.
 .TP 20
 -l, --list [<path>/]<basename>
 lists the contents of the given backup.
@@ -69,16 +123,16 @@ lists the contents of the given backup.
 will only require the last slice of the archive in direct access mode. If however sequential mode is used, dar will read the overall archive, from the first slice to the last one. "-" can be used as basename, the behavior is the same as with -x option (read just above).
 .TP 20
 -t, --test [<path>/]<basename>
-checks the backup integrity. Even without compression, dar is able to detect at least one error per file in the archive, thanks to a variable length CRC recorded per file in the catalogue. Same remark here, "-" may be used as basename (see -x option above for details).
+checks the backup integrity. Even without compression, dar is able to detect at least one error per file in the archive, thanks to a variable length CRC recorded per file data, file EA and file FSA in the catalogue. Archive structure (slice header, archive header, catalogue) is also protected by CRC to be able to detect any kind of archive corruption. Same remark here, "-" may be used as basename (see -x option above for details).
 .TP 20
 -d, --diff [<path>/]<basename>
-compares saved files in the backup with those in the filesystem. <basename> may also be "-" (see -x option above for details).
+compares saved files in the backup with those on the filesystem. <basename> may also be "-" (see -x option above for details). Note that the target for this operation is to be seen as a step further than archive testing, where in addition to archive coherence, the archive contents is verified to be the same as what is found on the filesystem. But if new files are present on the filesystem, dar ignores them. If you want to check for changes since a archive has been made, better use dry-run differential backup.
 .TP 20
 -C, --isolate [<path>/]<basename>
-isolate a catalogue from its archive (that's to say make a copy of it in its own archive container). The argument is the basename of the file that will contain the catalogue. The -A option is mandatory here to give the name of the archive to copy the catalogue from. Slicing is available (-s -S -p -b etc.). If the filename is "-" *and* no slice is asked (no -s option) the isolated catalogue is produced on the standard output, allowing the user to send the resulting archive through a pipe. Note that there is quite no difference in concept between an isolated catalogue and an archive. Thus you can do all operations on an isolated catalogue, in particular take it as reference for a differential archive. Note however that comparison (-d option) relies on embedded CRC rather than comparing byte by byte the data (what is done for normal archive), and no comparison can be performed concerning EA or FSA even if each of them have their own CRC in the catalogue (different ordering as provided by the OS of the items composing EA and FSA may lead the CRC to be different while the EA or FSA are exactly the same). An archive produced with -C is almost equivalent to a differential archive done right after a full backup, (no data is in it). Since release 2.4.0 you can use an isolated catalogue to rescue the corrupted internal catalogue of the archive it has been based on (see -A option).
+isolate a catalogue from its archive (that's to say make a copy of the internal catalogue to its own archive container). The argument is the basename of the file to create which will contain the catalogue's copy. The -A option is mandatory here to give the name of the archive to copy the catalogue from, this archive is not modified at all. Slicing is available (-s -S -p -b etc.). If the filename is "-" *and* no slice is asked (no -s option) the isolated catalogue is produced on the standard output, allowing the user to send the resulting archive through a pipe. Note that there is quite no difference in concept between an isolated catalogue and an archive. Thus you can do all operations on an isolated catalogue, in particular take it in place of the original backup as reference for a differential archive, archive testing, archive comparison. Note however that for comparison (-d option) as data is not present in the isolated catalogue, dar relies on embedded CRC rather than comparing data byte by byte  (what is done with a plain archive), and no comparison can be performed concerning EA or FSA even if each of them have their own CRC in the catalogue because different ordering as provided by the OS of the items composing EA and FSA may lead the CRC to be different while the EA or FSA are exactly the same, so CRC here is used only to dectect archive corruption. Since release 2.4.0 you can use an isolated catalogue to rescue a corrupted internal catalogue of the archive it has been based on (see -A option).
 .TP 20
 -+, --merge [<path>/]<basename>
-create a subset archive from one or two existing archives (the resulting archive name is the argument to this command). The dar file selection mechanism (see below) let the user decide which files will be present in the resulting archive and which one will be ignored. This option thus let the user merge two archives in a single one (with a filtering mechanism that accepts all files), as well as this option let the user create a smaller archive which data is taken from one or two archives of reference. Note that at no time the contents of the archives of reference is extracted to real files and directories: this is an archive to archive transfer, thus you may lack support for Extended Attribute while you will be able to fully manipulate files with their Extended Attributes from one archive to the resulting one. If the basename is "-" *and* no slice is asked (no -s option), the archive is produced on standard output allowing the user to send the resulting archive through a pipe. The first mandatory archive of reference if provided thanks to the -A option, while the second "auxiliary" (and optional) archive of reference is provided thanks to the -@ option. When a tie contention occurs (same file names from both archive have to be merged), the overwriting policy (-/ option) is used to define the one to keep in the resulting archive. By default, archive data selected for merging is uncompressed, and re-compressed. Thus the merging operation can be used to change compression algorithm of given archive as well as change its encryption. But, for better performance it is also possible thanks to the -ak option (see below the -ak option for usage restrictions) to merge files keeping them compressed, thus no decompression/re-compression is performed at all, which make the operation faster. Last it is not possible to merge two isolated catalogues.
+create a subset archive from one or two existing archives (the resulting archive name is the argument to this command). The dar file selection mechanism (see GENERAL OPTIONS) let the user decide which files will be present in the resulting archive and which one will be ignored. This option thus let the user merge two archives in a single one (with a filtering mechanism that accepts all files), as well as this option let the user create a smaller archive which data is taken from one or two archives of reference. Note that at no time the contents of the archives of reference is extracted to real files and directories: this is an archive to archive transfer, thus you may lack support for Extended Attribute while you will be able to fully manipulate files with their Extended Attributes from one archive to the resulting one. If the basename is "-" *and* no slice is asked (no -s option), the archive is produced on standard output allowing the user to send the resulting archive through a pipe. The first mandatory archive of reference is provided thanks to the -A option, while the second "auxiliary" (and optional) archive of reference is provided thanks to the -@ option. When a tie contention occurs (same file names from both archive have to be merged), the overwriting policy (-/ option) is used to define the one to keep in the resulting archive. By default, archive data selected for merging is uncompressed, and re-compressed. Thus the merging operation can be used to change compression algorithm of given archive as well as change its encryption. But, for better performance it is also possible thanks to the -ak option (see below the -ak option for usage restrictions) to merge files keeping them compressed, thus no decompression/re-compression is performed at all, which make the operation faster. Last it is not possible to merge two isolated catalogues.
 .TP 20
 -h, --help
 displays help usage.
@@ -88,25 +142,127 @@ displays version information.
 .PP
 .B GENERAL OPTIONS:
 .TP 20
--v, --verbose[={s[kipped]|t[reated]|d[ir]|m[essages]|f[inished]|a[ll]}]
-verbose output for respectively skipped files (-vs), treated files (-vt), directories under processing (-vd), processing messages (-vm), completed directories (-vf), all type of message (-va). By default --verbose without argument is equivalent to "-vt -vm" for backward compatiblity with releases prior to version 2.5.0. You can activate the diffrent verbosity type independently except -vt and -vd which are mutally exclusive. For example to see details about skipped and treated files and not about processing messages use the following without the quotes "--verbose=skipped --verbose=treated" which is equivalent to "-vs -vt". The -vt option is not available for archive isolation and is useless for archive listing (always set unless -q is used). Like -vd the -vf only concerns directories but shows after a directory has completed and provides the amont of data saved in that directory as well as the average compression ratio. -vf is only available for archive creation. Note: When using dar from a script better use dar's exit status to known which way the operation has ended (seen EXIT CODES at the end of this document). See also -Q and -q options.
+-v, --verbose
+For backward compatibility, this is an alias to "-vt -vm" (both options set).
+.TP 20
+-vs, --verbose=skipped
+Display files skipped because of file filtering exclusion specified by the user
+.TP 20
+-vt, --verbose=treated
+Display treated files because of file filtering inclusion specified by the user or no file filtering specified at all. For each file a message is displayed *before* the file is treated. This option is not available for archive isolation and is useless for archive listing as it is always set, unless -q is used.
+.TP 20
+-vd, --verbose=dir
+Display the directory under process. The messages shows *before* entering a directory. You can have a less verbose output than -vt while are still able to follow what's dar is doing. Note that -vt and -vd are mutually exclusive.
+.TP 20
+-vm, --verbose=messages
+Display detailed messages about what dar is currently performing but not related to currently treated or skipped files and directories
+.TP 20
+-vf, --verbose=finished
+Issues a summary *after* each treated directory containing the amount of data backed up in that directory as well as the average compression ratio. This option is only available for archive creation.
+.TP 20
+-va, --verbose=all
+activates all the previously described verbose options, see also -Q and -q options below. Note: When using dar from a script better use dar's exit status to know which way the operation has ended (seen EXIT CODES at the end of this document).
+
 .TP 20
 -q, --quiet
-Suppress the final statistics report. If no verbose output is asked beside this option, nothing is displayed if the operation succeeds. When using dar from a script better use dar's exit status to known which way the operation has ended (seen EXIT CODES at the end of this document)
+Suppress the final statistics report. If no verbose output is asked beside this option, nothing is displayed if the operation succeeds. When using dar from a script better use dar's exit status to know which way the operation has ended (seen EXIT CODES at the end of this document)
+
 .TP 20
 -b, --beep
 makes the terminal ring when user action is required (like for example the creation of a new slice using the -p option)
 .TP 20
+-B, --batch <filename>
+In the file which name is given in argument to this option, You can put any option or argument as used on command line, that will be parsed as if they were in place of the "-B <filename>" option. This way you can overcome the command line size limitation. Commands in the file may be disposed on several lines, and -B option can also be used inside files, leading a file to include other files. But an error occurs in case of loop (a file that includes itself directly or not) and DAR aborts immediately. Comments are allowed, and must start by a hash `#' character on each line. Note that for a line to be considered as a comment the hash character must be the first character of the line (space or tab can still precede the hash). See
+.B Conditional Syntax
+below for a more rich syntax in this type of configuration files known as DCF file (Dar Configuration File). See also the environment variable DAR_DCF_PATH in the ENVIRONMENT section at the end of this document.
+.P
+Note that you can use quotes simple (\') double (") and back-quotes (`) inside such file, but they need to be balanced (have an ending one). To use such character without the meaning of a quote, for example as an apostrophe, you need to escape it using a back-slack ("That\\'s an example"). Of course to add a single back-slash as a normal character in the file you will have to double it ("c:\\\\windows" for example)
+.TP 20
+-N, --noconf
+Do not try to read neither ~/.darrc nor /etc/darrc configuration files. See
+.B files
+section below.
+.TP 20
+-Q
+Do not display an initial warning on stderr when not launched from a terminal
+(when launched from a cronjob for example). This means that all
+questions to the user will be answered by 'no', which most of the time
+will abort the program. Please note that this option cannot be used in
+a configuration file (-B option). Since version 2.2.2, giving this option also forces
+the non-interactive mode, even if dar is launched from a terminal. This makes it possible for dar
+to run in the background. When you do, it's recommended to also redirect
+stdout and/or sterr to files: dar -Q ... &> /dev/null &
+.TP 20
 -n, --no-overwrite
-do not allow overwriting of any slice.
+do not allow overwriting
 
-If an overwriting policy is specified (see -/ option) -n option do only apply to slices overwriting, the overwriting of files during restoration or merging is handled by the overwriting policy. -n option stay valid to forbid slice overwriting (merging, saving, isolation).
+If an overwriting policy is specified (see -/ option) -n option do only apply to slices overwriting, the overwriting of files during restoration or merging is handled by the overwriting policy. Without overwriting policy, -n applies to restored files as well as generated slices.
 .TP 20
 -w, --no-warn
 Do not warn before overwriting (applied for slice overwriting and for overwriting decision make by the overwriting policy). By default overwriting is allowed but a warning is issued before proceeding. This option may receive 'a' as argument (see just below):
 .TP 20
 -wa, --no-warn=all
-This implies the -w option, and means that over avoiding warning for file overwriting, DAR also avoid signaling a file about to be removed when its type is not the expected one. File are removed when they have been recorded as deleted since the archive of reference. At restoration of the differential archive, if a file of the given name exists, it is remove, but if the type does not match the file that was present at the time of the archive of reference (directory, plain file, fifo, socket, char or block device, etc.), a warning is normally issued to prevent the accidental removal of data that was not saved in the backup of reference. (See also -k option)
+This implies the -w option, and means that over avoiding warning for file overwriting, DAR also avoids signaling a file about to be removed when its type is not the expected one. File are removed when they have been recorded as deleted since the archive of reference. At restoration of the differential archive, if a file of the given name exists, it is remove, but if the type does not match the file that was present at the time of the archive of reference (directory, plain file, fifo, socket, char or block device, etc.), a warning is normally issued to prevent the accidental removal of data that was not saved in the backup of reference. (See also -k option)
+.TP 20
+-A, --ref [<path>]/<basename>
+Depending on the context, it specifies the archive to use as reference, which is mandatory for archive isolation (-C option) and merging operation (-+ option). Else it specifies the rescue catalogue to use when restoring (-x command), testing (-t command) or comparing (-d command) an archive. All slices of the reference backup are expected to be on the same directory given by <path> or the current directory by default. Usually only the last slice is required to extract the catalogue of reference. If necessary the use of symbolic links is also possible here to gather slices that do not reside in the same directory. You can also point <path> to a USB key, DVD-R(W) or any other mounted directory, because
+.B dar
+will pause and ask the user for required slices if they are not present. The argument to -A may be of four types:
+.RS
+.RS
+.TP 5
+- An existing archive basename, which will be taken as reference
+.TP 5
+- a dash ("-") in direct access mode (default mode, when --senquential-read is not used) it may imply the use of -o and -i options, this allows the archive of reference to be read from a pair of pipes with dar_slave at the other ends. Dar_slave can be run through ssh on a remote host for example. Note that this type of argument ("-") is only available when -A is used for isolation (-C option) and merging (-+ options). In sequential mode (--sequential-mode is used), the archive of reference is read from standard input or from the named pipe specified by -i option. -o option has no use in sequential mode. Note that merging operation (-+ option) cannot read archive of reference in sequential mode.
+.TP 5
+- a plus sign ("+") which makes the reference be the current directory status. This argument is only available for archive creation (-c option). In other word, no file's data will be saved, just the current status of the inodes will be recorded in the catalogue. This feature is known as the "snapshot" backup. A snapshot backup can be used as reference later on to detect or save only the files that have changed since the snapshot was made.
+.TP 5
+- a <date>, if -af option has been placed before -A on the command-line or in a included file (see -B option). For more about that feature see -af option below. This form is only available for archive creation (-c option).
+.RE
+.PP
+During backup operation (-c option) the archive of reference, given thanks to the -A option, is used for comparison with existing files on the filesystem. Dar will then backup only files that have changed since the archive of reference was done. If no -A option is given, the backup operation is a full backup. With -A option if the archive of reference is a full backup some call it a differential backup, while if the archive of reference is differential backup, some call this type of backup an incremental backup. For dar there is no difference in structure between incremental and differential backup, both are usually designed globally as "differential" backup in the documentation.
+.PP
+During merging operation (-+ option), the contents of the -A given archive will been taken eventually with the contents of the -@ auxiliary archive if specified (see below), to form a new archive from files of this or these archives. Note that you can filter out files from the operation and setup subset of the original archive(s).
+.PP
+During Catalogue isolation (-C option), dar will create the isolated catalogue from the one given with -A option.
+.PP
+During testing, diff or extraction, (-t, -d or -x options respectively), the table of contents (the catalogue) will be read from the archive given with -A instead of using the internal catalogue of the archive. The archive given for rescue must has been previously isolated from this same archive (else the contents will not match and dar will refuse to proceed to this operation). This acts as a backup solution to the case of corruption inside an archive's catalogue, while the best way is still to use Parchive to protect your data against media error.
+.RE
+.TP 20
+-af, --alter=fixed-date
+Modify the -A option behavior, making it receiving a <date> as argument in place of the [<path>]/<basename> default argument. The <date> is used to define which file to save: file which modification is newer or equal to <date>, and which to consider unchanged: those older than <date>. This option has only a meaning when creating an archive (-c option) and must be placed before -A option to have an effect.
+.RS
+.P
+<date> must be a date in the two following possible formats:
+.RS
+.TP 30
+- a number of second since Jan 1st, 1970
+.TP 30
+- a date in the following form [[[year/]month/]day-]hour:minute[:second]
+.RE
+.P
+Here are some examples of date:
+.RS
+91836383927108078
+.P
+2005/11/19-19:38:48 Which is 38 past 7 PM and 48 seconds, the 19th of November 2005
+.P
+20:20 Which is 8 PM of the current day
+.P
+2-00:08 Which is 8 past noon, the second day of the current month
+.P
+2/2-14:59 Which is 1 to 3 PM, the 2nd of February in the current year
+.RE
+.RE
+.TP 20
+-@, --aux [<path>]/<basename>, --on-fly-isolate [<path>]/<basename>
+specifies an auxiliary archive of reference (merging context) or the name of the on-fly isolated catalogue (creation context). This option is thus only available with -+ option (merging) and -c option (archive creation). Note that --aux and --on-fly-isolate are really aliases to the same option, this is the context of use (archive creation or merging) which lead it to behave a way or another.
+.RS
+.P
+In a merging context, over -A option which is mandatory, you may give a second archive of reference thanks to the -@ option. This allows you to merge two archives into a single one. See also -$ option (encryption) -~ option (command execution) and -% (crypto block size) for other options concerning auxiliary archive of reference. They are the respective equivalent of -J, -F and -* options relative to archive given thanks to -A option.
+.P
+In a backup context -@ option let the user specify the archive name for an on-fly isolation. With on-fly isolation, you can also use -$ option (to define encryption algorithm and passphrase), -~ option (to execute a command once the on-fly isolated catalogue is completed) and -% option (crypto block size). On-fly isolated catalogue is always bzip2 if possible else gzip else lzo compressed (using compression level 9) else not compressed, and it is also always a single sliced archive. Due to command-line exiguity, it is not possible to change compression algo nor slice size for the on-fly isolation. If you need a more complicated isolation, either look for a GUI over libdar, or do a normal (= not an on-fly) isolation operation (By the way it is possible to isolate an already isolated catalogue, this is equivalent to doing a copy, but you can change encryption, compression or slicing, for example), you can also use dar_xform on an isolated catalogue if you only want to change slices size (this is faster as no decompression/re-compression nor encryption/decryption is necessary). Using the merging operation on an isolated catalogue instead of isolating the isolated catalogue, leads the resulting archive to not be able to be used as a rescue for internal catalogue of the original archive. --aux-ref is a synonym to --aux.
+.RE
 .TP 20
 -R, --fs-root <path>
 The path points to the directory tree containing all the files that will be enrolled in the operation (backup, restoration or comparison). By default the current directory is used. All other paths used in -P or -g options on the command line are and must be relative to this path (or to current directory if -R is not present). Note that -R is useless for testing (-t option) isolation (-C option) and merging (-+ option)
@@ -131,7 +287,7 @@ Files or directory to only take in account, as opposed to -P. -g may be present 
 Files listed in the listing file are included for the operation. No wildcard expression is interpreted in the listing file, the null character is not allowed and the carriage return is used to separate file names (one file name per line). Note that this option applies to any files and directory exactly as -g does, with an important difference however: -g option only uses relative paths to the root directory (the directory given with the -R option), while -[ can use absolute path as well. Another difference is when the argument is a directory -g will include all the subdirectories under that directory, while when the same entry is found in a listing file given to -[ only that directory will be included, no subdirectory or subfile would be enrolled in the backup, with -[ you need to list the exact set of file you want to backup. You can thus generate a listing file with the 'find / -print > somefile' command and give 'somefile' as argument to -[ option. Note that however, dar will never save files out of the -R given root directory tree, even if some are listed in the 'somefile' file.
 .TP 20
 -], --exclude-from-file <listing_file>
-Files listed in the listing file are excluded from the operation. If a directory is listed in the file all its contents is excluded (unless using ordered method and another mask includes some of its subfiles or subdirectories). This option is the opposite of -[ and acts the same was as -P option does (in particular it is compared to the whole path+filename and applies to files and directories). As for -[ option, -] listing file can contain absolute paths, but wildcards are not expanded, neither.
+Files listed in the listing file are excluded from the operation. If a directory is listed in the file all its contents is excluded. This option is the opposite of -[ and acts the same was as -P option does (in particular it is compared to the whole path+filename and applies to files and directories). As for -[ option, -] listing file can contain absolute paths, but wildcards are not expanded, neither.
 .P
 .B File selection in brief:
 .P
@@ -141,7 +297,7 @@ since version 2.2.0 two modes of interpretation of these options exist. The norm
 .RS
 .TP 5
 the normal method is the default and is the one that has been presented above:
-A directory is elected for operation if no -P or -] option excludes it. If at least one -g or -[ option is given one command line, one -g option must cover it, else it is not elected for operation. If a directory is not selected, no recursion is done in it (the directory is pruned). For non directories files, the same is true (P, -g, -[ and -] do apply) and a second test must also be satisfied: no -X option must exclude the filename, and if at least one -I option is given, one must match the given filename (using or not wildcards).
+A directory is elected for operation if no -P or -] option excludes it. If at least one -g or -[ option is given one command line, one -g or -[ option must cover it, else it is not elected for operation. If a directory is not selected, no recursion is done in it (the directory is pruned). For non directories files, the same is true (P, -g, -[ and -] do apply) and a second test must also be satisfied: no -X option must exclude the filename, and if at least one -I option is given, one must match the given filename (using or not wildcards).
 .TP 5
 the ordered method (when -am option is given on command-line):
 The ordered method takes care of the order of presence between -X and -I in one hand and of -P, -g, -[ and -] in the other hand (note that it has also the same action concerning EA selection when using -u and -U options, but that's no more file selection). In the ordered method the last argument take precedence over all the previous ones, let's take an example:
@@ -175,7 +331,7 @@ Since version 2.3.x the name of EA entries include the namespace for dar be able
 namespace.name
 where "namespace" is for example "user". Note that the mask may or may not include the dot (.) and may match arbitrary part of the EA namespace+name, just remind that masks will be applied to the "namespace.name" global string.
 .P
-the -am flag here also enables the ordered method, for EA selection too. The ordered versus normal method have been explained above in the file selection note, with some examples using -X and -I. Here this is the same with -U and -u, (just replace -X by -u and -I by -U and remember that the corresponding mask will apply to Extended Attribute selection in place of file selection).
+the -am flag here also enables the ordered method, for EA selection too. The ordered versus normal method have been explained above in the file selection note, with some examples using -X and -I. Here this is the same with -U and -u, (just replace -X by -u and -I by -U, the corresponding mask will apply to Extended Attribute selection in place of file selection).
 
 Another point, independently of the -am option the -ae option can be used at restoration time only. If set, when a file is about to be overwritten, all EA will be first erased before restoring those selected for restoration in the archive (according to the -U and -u options given). If not set, the EA of the existing file will be overwritten, those extra EA that are not in the archive or are not selected for restoration in regard to the -u and -U options will be preserved. If you have not used any -u/-U option at backup time and want to restore from a set of full/differential backups the EA exactly as they were, you have to use -ae for dar removes the EA before overwriting their set of EA as stored in the archive. Without -ae option dar will simply add EA to existing ones, thus get a different set of EA for a give file than those recorded at the time of the backup.
 .P
@@ -200,14 +356,37 @@ none
 .P
 By default no restriction is done and FSA of all families are considered at restoration time, but if a family has not been activated at compilation time a warning is issued for each file that cannot have its FSA restored completely (unless this family is excluded from the scope thanks to the -4 option). At backup time, if an FSA family has not been activated at compilation time, no warning is issued and FSA of that family are ignored. Still at backup time, you can also ignore FSA that have compilation time support by excluding them from the operation thanks to this -4 option.
 .P
-Example of use: --fsa extX,HFS+
+Example of use: --fsa-scope extX,HFS+
 .RE
+.TP 20
+-am, --alter=mask
+set the ordered mode for mask. This affects the way -I and -X options are interpreted, as well as -g, -P, -[ and -] options, -Z and -Y options and -U and -u options. It can take any place on the command-line and can be placed only once. See the
+.B file selection in brief
+paragraph above for a detailed explanation of this option. It has also an incidence on the --backup-hook-exclude and --backup-hook-include options.
+.TP 20
+-an, --alter=no-case
+set the filters in case insensitive mode. This concerns only masks specified after this option (see also -acase option below). This changes the behavior of -I, -X, -g, -P, -Z, -Y, -u and -U options.
+.P
+Warning: case insensitivity requires interpreting filenames which depends on the locale with which dar is run (defined by the LANG environment variable). For example if you create files with LANG set to fr_FR.UTF-8 and use non plain ASCII characters in filename, there is chances that these non ASCII characters will be stored over several bytes in that filename: so called "wide characters". If then you run dar with LANG set to another value like ru_RU.koi8r, there is much chances that these wide characters do not correspond to the same letter or worse, that they do not match any valid wide character for that locale. A filename is always a sequence of bytes and always saved as such, but using --alter=no-case implies interpreting that sequence in a way that depends on the given locale (as defined by the LANG environment variable). As such, dar cannot know if a given file has to be read with fr_FR.UTF-8 locale or with it_IT.iso88591 or ru_RU.koi8r and so on, because this information is not stored in filenames. In consequence, if different locales are used on your system and you are doing a system wide backup, using --alter=no-case option may lead dar to detect invalid wide character, in that case it falls back to a byte by byte case sensitivity comparison (ASCII characters), which may not be what you would expect at first sight: Most of the time, an upper case wide character (stored on several bytes) does not match the equivalent lower case wide character (several bytes too), when case sensitivity comparison is performed byte by byte.
+.TP 20
+-acase, --alter=case
+set back to case sensitive mode for filters. All following masks are case sensitive, up to end of parsing or up to the next -an option. This changes the behavior of -I, -X, -g, -P, -Z, -Y, -u and -U options.
+.TP 20
+-ar, --alter=regex
+set the filters to be interpreted as regular expressions (man
+.B regex(7)
+) instead of the default glob expression (man
+.B glob(7)
+) This modifies the -I, -X, -g, -P, -Z, -Y, -u and -U options that follows up to an eventual -ag option (see just below). Note that for -P option, the given mask matches the relative path part of the files path: Let's take an example, assuming you have provided /usr/local to the -R option, the mask "^foo$" will replaced internally by "^/usr/local/foo$" while the mask "foo$" will be replaced internally by "^/usr/local/.*foo$".
+.TP 20
+-ag, --alter=glob
+This option returns to glob expressions mode (which is the default) after an -ar option has been used, this applies to any -I, -X, -g, -P, -Z, -Y, -u and -U options that follow up to an eventual new -ar option (see just above).
 .TP 20
 -i, --input <path>
 is available when reading from pipe (basename is "-" for -x, -l, -t, -d or for -A when -c, -C or -+ is used). When reading from pipe, standard input is used, but with this option, the file <path> (usually a named pipe) is used instead.  This option is to receive output from dar_slave program (see doc/usage_notes.html for examples of use). Note that when --sequential-read is used, dar uses a single pipe and does no more rely on dar_slave, -i option can be used to tell dar which named pipe to read the archive from, instead of the standard input.
 .TP 20
 -o, --output <path>
-is available when reading from pipe (basename is "-" for -x, -l, -t, -d or for -A when -c, -C or -+ is used). When reading from pipe, standard output is used to send request to dar_slave, but with this option, the file <path> (usually a named pipe) is used instead. When standard output is used, all messages goes to standard error (not only interactive messages). See doc/usage_notes.html for examples of use.
+is available when reading from pipe (basename is "-" for -x, -l, -t, -d or for -A when -c, -C or -+ is used). When reading from pipe, standard output is used to send request to dar_slave, but with this option, the file <path> (usually a named pipe) is used instead. When standard output is used, all messages goes to standard error (not only interactive messages). See doc/usage_notes.html for examples of use. This option is not to be used in --sequential-read mode.
 .TP 20
 -O, --comparison-field[=<flag>]
 When comparing with the archive of reference (-c -A) during a differential backup, when extracting (-x) or when comparing (-d) do only considers certain fields. The available flags are:
@@ -233,7 +412,7 @@ if -H is used, two dates are considered equal if they differ from a integer numb
 -E, --execute <string>
 the string is a
 .B user command-line
-to be launched between slices. For reading (thus using -t, -d, -l or -x options), the command is executed before the slice is read or even asked, for writing instead (thus using -c, -C or -+ option), the command is executed once the slice has been completed. Some substitution string can be used in the string:
+to be launched between slices. For reading an archive (thus using -t, -d, -l or -x commands), the given string is executed before the slice is read or even asked, for writing an archive instead (thus using -c, -C or -+ commands), the given string is executed once the slice has been completed. Some substitution macros can be used in the string:
 .RS
 .TP 10
 %%
@@ -246,7 +425,7 @@ will be replaced by the slice path
 will be replaced by the slice basename
 .TP 10
 %n
-will be replaced by the slice number (to be read or just written). For reading, dar often needs the last slice, but initially it does not know its number. If it cannot be found in the current directory, the user command-line is then called with %n equal to 0. This is a convenient way to inform the user command to provide the last slice. If after it is still not present, dar asks the user (as usually) with a message on the terminal. Once the last slice is found, the user command-line is called a second time, with %n equal to the value of the last slice number.
+will be replaced by the slice number (to be read or just written). For reading, dar often needs the last slice, but initially it does not know its number. If it cannot be found in the current directory, the user command-line is then called with %n equal to 0. This is a convenient way to inform the user command to provide the last slice. If after executing the string the requested slice is still not present, dar asks the user (as usually) with a message on the terminal. Once the last slice is found, the user command-line is called a second time, with %n equal to the value of the last slice number.
 .TP 10
 %N
 is the slice number with the leading zero as defined by --min-digits option. If this option is not used, %N is equivalent to %n.
@@ -255,12 +434,15 @@ is the slice number with the leading zero as defined by --min-digits option. If 
 will be replaced by the slice extension (always substituted by "dar")
 .TP 10
 %c
-will be replaced by the context. Actually three possible values exist: "init", "operation" and "last_slice". When reading an archive for (testing, extraction, diff, listing, or while reading the archive of reference, see below the -F option), the "init" context takes place from the beginning up to the time the catalogue is retrieved. On a multiple slice archive this correspond to the first slice request and to the last slice requests. After, that point comes the "operation" context.  While creating an archive, the context is always "operation" except when the last slice has been created, in which case the context is set to "last_slice".
+will be replaced by the context. Actually three possible values exist: "init", "operation" and "last_slice". When reading an archive for (testing, extraction, diff, listing, or while reading the archive of reference, see below the -F option), the "init" context takes place from the beginning up to the time the catalogue is retrieved. On a multiple slice archive this correspond to the last slice request. After, that point comes the "operation" context.  While creating an archive, the context is always "operation" except when the last slice has been created, in which case the context is set to "last_slice".
 .RE
-Several -E option can be given, given commands will then be called in the order they appear on the command line, and included files. See also the environment variable DAR_DUC_PATH in the ENVIRONMENT section at the end of this document.
+Several -E option can be given, given commands will then be called in the order they appear on the command line and -B included files. Such file given to -E option are known as DUC files (Dar User Command). See also the environment variable DAR_DUC_PATH in the ENVIRONMENT section at the end of this document.
 .TP 20
 -F, --ref-execute <string>
 same as -E but is applied between slices of the reference archive (-A option). --execute-ref is a synonym.
+.TP 20
+-~, --aux-execute <string>
+same as -E and -F but is applied between slices of the auxiliary archive (-@ option).
 .TP 20
 -K, --key [[<algo>]:]<string>
 .TP 20
@@ -280,28 +462,22 @@ Note that if you have set a passphrase on your private key, dar will ask it dyna
 .RE
 .TP 20
 -6, --key-length <number>
-defines the length of the automatically generated key encrypted with gnupg inside the archive. Key length is not fixed, but is randomly added up to 255 bytes. By default the key length is 512 bytes (4096 bits), "--key-length 0" set the key length to the default value. For example "-6 1000", will lead libdar to generate a random key which length is also randomly chosen from 1000 to 1255 bytes.
+defines the minimum length in octets of the automatically generated key encrypted with gnupg inside the archive. Key length is not fixed, but is randomly added up to 255 bytes (255 octets). By default the key minimum length is 512 bytes (thus the key length range from 4096 to 6136 bits). For example "--key-length 1000", will lead libdar to generate a random key which length is also randomly chosen from 1000 to 1255 bytes (8000 to 10040 bits). "--key-length 0" set back the key length to the default value. The last occurence of this option met on command line or included files takes precedence.
 .TP 20
 -J, --ref-key [[<algo>]:]<string>
-same as -K but the given key is used to decrypt the archive of reference (given with -A option). --key-ref is a synonym. Note that for archive generated using dar release 2.5.0 and above this option is no more necessary, unless you want to give the passphrase on command-line (not recommended) or in DCF file with restricted permissions.
+same meaning/use as -K option's first syntax, but the given key is used to decrypt the archive of reference (given with -A option). --key-ref is a synonym. Note that for archives generated using dar release 2.5.0 and above this option is no more necessary, unless you want to give the passphrase on command-line (not recommended) or in DCF file (which file would be set with restricted access permissions and/or ACL).
+.TP 20
+-$, --aux-key [[<algo>]:]<string>
+same as -J but for the auxiliary archive of reference (given with -@ option). Here too, this option is no more necessary to read archives generated by dar release 2.5.0 and above.
 .TP 20
 -#, --crypto-block <size>
-to be able to randomly access data in an archive, it is not encrypted globally but block by block. You can define the encryption block size thanks to this argument which default to 10240 bytes. Note that syntax used for -s option is also available here (k, M, G, etc.). Note also that crypto-block is stored as a 32 bits integer thus value larger than 4GB will cause an error. Note last, that the block size given here must be provided when reading this resulting archive (through the -* ,-# or -% options). If it is not the correct one, the archive will not be possible to decrypt, it is thus safe to keep the default value (and not use at all the -# option).
+to be able to randomly access data in an archive, it is not encrypted globally but block by block. You can define the encryption block size thanks to this argument which default to 10240 bytes. Note that the syntax used for -s option is also available here (k, M, G, etc.). Note also that crypto-block is stored as a 32 bits integer thus value larger than 4GB will cause an error. Note last, that the block size given here must be provided when reading this resulting archive, using the -* option if the archive is the archive of reference (given to -A option) using -% options if the archive is the auxiliary archive of reference (given to -@ option) or using this -# option if it is the subject of the operation (listing, comparing, testing that archive). If the value is not the default and the given value is not correct in regard to the value given at archive creation time, the archive will not be possible to decrypt, it is thus safer to keep the default value (and not using at all the -#, -*, -% options).
 .TP 20
 -*, --ref-crypto-block <size>
-same as --crypto-block but for the archive of reference (same default value). --crypto-block-ref is a synonym.
+same as --crypto-block but to read the archive of reference (-A option). --crypto-block-ref is a synonym.
 .TP 20
--B, --batch <filename>
-You can put in the file any option or argument as used on command line, that will be parsed as if they were in place of the "-B <filename>" option. This way you can overcome the command line size limitation. Commands in the file may be disposed on several lines, and -B option can also be used inside files, leading a file to include other files. But an error occurs in case of loop (a file includes itself) and DAR aborts immediately. Comments are allowed, and must start by a hash `#' character on each line. Note that for a line to be considered as a comment the hash character must be the first character of the line (space or tab can still precede the hash). See
-.B Conditional Syntax
-bellow for a more rich syntax in configuration files. See also the environment variable DAR_DCF_PATH in the ENVIRONMENT section at the end of this document.
-.P
-Note that you can use quotes simple (\') double (") and back-quotes (`) inside such file, but they need to be balanced (have an ending one). To use such character without the meaning of a quote, for example as an apostrophe, you need to escape it using a back-slack ("That\\'s an example"). Of course to add a single back-slash as a normal character in the file you will have to double it ("c:\\\\windows" for example)
-.TP 20
--N, --noconf
-Do not try to read neither ~/.darrc nor /etc/darrc configuration files. See
-.B files
-section bellow.
+-%, --aux-crypto-block <size>
+same as --crypto-block but to read the auxiliary archive of reference (-@ option).
 .TP 20
 -e, --dry-run
 Do not perform any action (backup, restoration or merging), displays all messages as if it was for real ("dry run" action). The --empty option is a synonym.
@@ -313,17 +489,6 @@ when using k M G T E Z Y prefixes to define a size, use the SI meaning: multiple
 when using k M G T E Z Y prefixes to define a size, use the historical computer science meaning: multiple of 2^10  (a Mega is 1,048,576).
 .P
 The --alter=SI and --alter=binary options can be used several times on the command line. They affect all prefixes which follow, even those found in files included by the -B option, up to the next --alter=binary or --alter=SI occurrence. Note that if in a file included by the -B option, an --alter=binary or --alter=SI is encountered, it affects all the following prefixes, even those outside the included files. For example, when running with the parameters "-B some.dcf -s 1K", 1K may be equal to 1000 or 1024, depending on --alter=binary or --alter=SI being present in the some.dcf file. By default (before any --alter=SI/binary option is reached), binary interpretation of prefixes is done, for compatibility with older versions.
-.TP 20
--Q
-Do not display an initial warning on stderr when not launched from a terminal
-(when launched from a cronjob for example). This means that all
-questions to the user will be answered by 'no', which most of the time
-will abort the program. Please note that this option cannot be used in
-a configuration file. Since version 2.2.2, giving this option also forces
-the non-interactive mode,
-even if dar is launched from a terminal. This makes it possible for dar
-to run in the background. When you do, it's recommended to redirect
-stdout and/or sterr to files.
 .TP 20
 -ac, --alter=ctime
 When reading a filesystem (during a backup or comparison), restores the
@@ -346,7 +511,7 @@ the opinion of this writer that any software susceptible to atime
 changes is flakey or even broken (because of the afore mentioned reasons
 why atimes can change). But, that doesn't take away that there are
 programs who rely on atimes remaining the same, like Leafnode NNTP
-chaching software. Therefore this option exists.
+caching software. Therefore this option exists.
 .TP 20
 -aa, --alter=atime
 When specifying -aa (by opposition to -ac), the atime of every read file and directory
@@ -363,42 +528,16 @@ is a mode in which neither atime nor ctime are modified while dar reads each fil
 also better performances as nothing has to be wrote back to disk. A known Unix kernel
 that supports this feature is Linux 2.6.8 and above (support must also be present in the
 standard C library of the system for dar to be able to activate this feature at compilation time).
-When this feature is activated, it becomes the default behavior of dar for super user ; for other users the default is -aa. If however as root user, you do not want to use "furtive read mode" (while it has been activated at compilation time), you need to explicitly specify either -aa or -ac option.
-.TP 20
--am, --alter=mask
-set the ordered mode for mask. This affects the way -I and -X options are interpreted, as well as -g, -P, -[ and -] options, -Z and -Y options and -U and -u options. It can take any place on the command-line and can be placed only once. See the
-.B file selection in brief
-paragraph above for a detailed explanation of this option. It has also an incidence on the --backup-hook-exclude and --backup-hook-include options.
-.TP 20
--an, --alter=no-case
-set the filters in case insensitive mode. This concerns only masks specified after this option (see also -acase option below). This changes the behavior of -I, -X, -g, -P, -Z, -Y, -u and -U options.
-.P
-Warning: case insensitivity requires interpreting filenames which depends on the locale with which dar is run (defined by the LANG environment variable). For example if you create files with LANG set to fr_FR.UTF-8 and use non plain ASCII characters in filename, there is chances that these non ASCII characters will be stored over several bytes in that filename: so called "wide characters". If then you run dar with LANG set to another value like ru_RU.koi8r, there is much chances that these wide characters do not correspond to the same letter or worse, that they do not match any valid wide character for that locale. A filename is always a sequence of bytes and always saved as such, but using --alter=no-case implies interpreting that sequence in a way that depends on the given locale (as defined by the LANG environment variable). As such, dar cannot know if a given file has to be read with fr_FR.UTF-8 locale or with it_IT.iso88591 or ru_RU.koi8r and so on, because this information is not stored in filenames. In consequence, if different locales are used on your system and you are doing a system wide backup, using --alter=no-case option may lead dar to detect invalid wide character, in that case it falls back to a byte by byte case sensitivity comparison (ASCII characters), which may not be what you would expect at first sight: Most of the time, an upper case wide character (stored on several bytes) does not match the equivalent lower case wide character (several bytes too), when case sensitivity comparison is performed byte by byte.
-.TP 20
--acase, --alter=case
-set back to case sensitive mode for filters. All following masks are case sensitive, up to end of parsing or up to the next -an option. This changes the behavior of -I, -X, -g, -P, -Z, -Y, -u and -U options.
-.TP 20
--ar, --alter=regex
-set the filters to be interpreted as regular expressions (man
-.B regex(7)
-) instead of the default glob expression (man
-.B glob(7)
-) This modifies the -I, -X, -g, -P, -Z, -Y, -u and -U options that follows up to an eventual -ag option (see just below). Note that for -P option, the given mask matches the relative path part of the files path: Let's take an example, assuming you have provided /usr/local to the -R option, the mask "^foo$" will replaced internally by "^/usr/local/foo$" while the mask "foo$" will be replaced internally by "^/usr/local/.*foo$".
-.TP 20
--ag, --alter=glob
-This option returns to glob expressions mode (which is the default) after an -ar option has been used, this applies to any -I, -X, -g, -P, -Z, -Y, -u and -U options that follow up to an eventual new -ar option (see just above).
+When this feature is activated, it becomes the default behavior of dar for super user ; for other users the default is -aa. If however as root user, you do not want to use "furtive read mode" (while it has been activated at compilation time), you can specify either -aa or -ac option.
 .TP 20
 -at, --alter=tape-marks
-For archive creation and merging, the default behavior (since release 2.4.0) is to add escape sequences (aka tape marks) followed by inode information all along the archive. If -at is given, dar will not add this information to the archive, resulting in a slightly smaller archive and faster backup. When reading an archive, the default behavior is to ignore these escape sequences and rather rely on the catalogue located at the end of the archive. If instead --sequential-read is given on command-line (see below), dar will avoid using the catalogue at the end of the archive and will rely on these escape sequences to know the contents of the archive, which will lead to a sequential reading of the archive, operation suitable for tape media. Note that it is not recommended to disable escape sequences (aka tape marks) by using -at option except if you are more concerned by the resulting size and execution speed of your backup (in particular if you have a lot of small files) than by the possibility to recover your data in case of corrupted or partially written archive.  Without escape sequences, dar cannot sequential read an archive, which is the only way to use an archive that has a corrupted catalogue or has no catalogue at all, thing that happens if a system crash occurred during the archive creation or due to lack of disk space to complete the archive.
+For archive creation and merging, the default behavior (since release 2.4.0) is to add escape sequences (aka tape marks) followed by inode information all along the archive. If -at is given, dar will not add this information to the archive, resulting in a slightly smaller archive and faster backup. When reading an archive, the default behavior is to ignore these escape sequences and rather rely on the catalogue located at the end of the archive. If instead --sequential-read is given on command-line (see below), dar will avoid using the catalogue at the end of the archive and will rely on these escape sequences to know the contents of the archive, which will lead to a sequential reading of the archive, operation suitable for tape media. Note that it is not recommended to disable escape sequences (aka tape marks) by using -at option except if you are more concerned by the resulting size and execution speed of your backup (in particular if you have a lot of small files) than by the possibility to recover your data in case of corrupted or partially written archive.  Without escape sequences, dar cannot sequential read an archive, which is the only way beside using an isolated catalogue to use an archive that has a corrupted catalogue or has no catalogue at all, thing that happens if a system crash occurred during the archive creation or due to lack of disk space to complete the archive.
 .TP 20
 -0, --sequential-read
-Change dar's behavior when reading an archive. By default, the traditional way is used, which relies on the table of contents (aka "the catalogue") located at the end of the archive. With the --sequential-read option instead, dar will rely on escape sequences that are inserted all along the archive with each file's inode information. This will lead to a sequential reading of the archive, operation suitable for tape medium. However, this feature is only available for archive format starting revision "08" (i.e.: since release 2.4.0) and if -at option has no been used during archive creation or merging. This option is available for archive testing (-t), comparison (-d), restoration (-x), listing (-l) and to read the archive of reference (-A option) for isolation (-C) archive creation (-c). The sequential reading of an archive is always much slower than the usual reading method, so you should not use this option unless you really need it.
-.TP 20
--j, --jog
-when virtual memory is exhausted, ask user to make room before trying to continue. By default, when memory is exhausted dar aborts. Note that on several system, when memory is exhausted the kernel is likely to kill the process that failed to obtain virtual memory, thus on some systems, dar may not be able to ask user for what to do when memory is exhausted.
+Change dar's behavior when reading an archive. By default, the traditional way is used, which relies on the table of contents (aka "the catalogue") located at the end of the archive. With the --sequential-read option instead, dar will rely on escape sequences that are inserted all along the archive with each file's inode information. This will lead to a sequential reading of the archive, operation suitable for tape medium. However, this feature is only available for archive format starting revision "08" (i.e.: since release 2.4.0) and if -at option has no been used during archive creation or merging. This option is available for archive testing (-t), comparison (-d), restoration (-x), listing (-l) and to read the archive of reference (-A option) for isolation (-C) and archive creation (-c). The sequential reading of an archive is always much slower than the usual reading method, so you should not use this option unless you really need it.
 .TP 20
 -9, --min-digits <num>[,<num ref>[,<num aux>]]
-By default slice number contained in filename do not have any padded zeros, which, when sorting a directory contents alphabetically leads to read all the slice starting by '1', then by '2'. for example, slice 1, 10, 11, 12, 13, ... 2, 20, 21, 23, ... etc. While dar is absolutely not perturbed by this display problem, some user shall like to have the slices sorted by order. For that reason, the --min-digits option lets you ask dar to prepend enough zeros in the slice number for it be as wide as the argument passed to --min-digits. For example, if you provide 3 for that number, dar will store the slice number as 001, 002, 003, ... 999. Well, next slice will be 1000, thus it will break again the alphabetical sorting order. You are thus advised to use a number large enough to convert the number of slice you expect to use. Then, when reading your archive, you will also need to provide this same argument, else dar will fail finding the slice. In effect, when looking for slice 1 for example, dar should try opening the file "basename.1.dar", but if it fails, it should try opening the file "basename.01.dar", then "basename.001.dar", ... up to infinity. If the slice is just missing, dar would never ask you to provide it, being still looking for a slice name with an additional leading zero. The problem also arise when doing differential backup, merging or on-fly isolation, dar must know the number of zero to prepend for each of these archive. This is why the --min-digits option may receive up to three integer values, the first for the archive to create or read, the second for the archive of reference (-A option), the third for the auxiliary archive of reference (-@ option).  By default, no zero is added, and it is also well working this way. But you might well set for example "--min-digits 5,5,5" in your ($HOME)/.darrc file to do it once and for all. Last important point, on command-line (not in DCF files).
+By default slice number contained in filename do not have any padded zeros, which, when sorting a directory contents alphabetically leads to read all the slice starting by '1', then by '2'. for example, slice 1, 10, 11, 12, 13, ... 2, 20, 21, 23, ... etc. While dar is absolutely not perturbed by this display problem, some user shall like to have the slices sorted by order. For that reason, the --min-digits option lets you ask dar to prepend enough zeros in the slice number for it be as wide as the argument passed to --min-digits. For example, if you provide 3 for that number, dar will store the slice number as 001, 002, 003, ... 999. Well, next slice will be 1000, thus it will break again the alphabetical sorting order. You are thus advised to use a number large enough to convert the number of slice you expect to use. Then, when reading your archive, you will also need to provide this same argument, else dar will fail finding the slice. In effect, when looking for slice 1 for example, dar should try opening the file "basename.1.dar", but if it fails, it should try opening the file "basename.01.dar", then "basename.001.dar", ... up to infinity. If the slice is just missing, dar would never ask you to provide it, being still looking for a slice name with an additional leading zero. The problem also arise when doing differential backup, merging or on-fly isolation, dar must know the number of zero to prepend for each of these archive. This is why the --min-digits option may receive up to three integer values, the first for the archive to create or read, the second for the archive of reference (-A option), the third for the auxiliary archive of reference (-@ option).  By default, no zero is added, and it is also well working this way. But you might well set for example "--min-digits 5,5,5" in your ($HOME)/.darrc file to do it once and for all.
 .TP 20
 --pipe-fd <num>
 will read further arguments from the file-descriptor <num>. The arguments read through this file-descriptor must follow a TLV (Type/Length/Value) list format. This option is not intended for human use, but for other programs launching dar like dar_manager. This feature has been added to overcome the command line length limit.
@@ -406,52 +545,23 @@ will read further arguments from the file-descriptor <num>. The arguments read t
 --single-thread, -G
 When libdar is compiled against libthreadar, it can make use of several threads. The number of thread is not parametrable but depends on the number of feature activated (compression, encryption, tape marks, sparse file, etc.) that require CPU intensive operations. The load-balancing type per thread used is called "pipeline". This is the most adapted multi threading model to dar's work which in brief is the construction of a single (eventually sliced) archive (backup operation). Other operations based on archive read (restoration, listing, testing,...) could make use of a tree-like paralellism but would stuck due to I/O performance of the disk (even with a RAID array). If you find that dar creates a too high load average on your production servers, use --single-thread option to have dar/libdar stay single threaded. This option has no effect when libdar is not compiled against libthreadar.
 .PP
-.B SAVING, ISOLATION AND MERGING OPTIONS (to use with -c, -C or -+)
+.B SAVING, ISOLATION AND MERGING SPECIFIC OPTIONS (to use with -c, -C or -+)
 .PP
 .TP 20
 -z[[algo:]level], --compression[=[algo][:][level]]
 add compression within slices using gzip, bzip2, lzo or xz algorithm (if -z is not specified, no compression is performed). The compression level (an integer from 1 to 9) is optional, and is 9 by default. Be careful when using xz algorithm better specify a compression ratio less than or equal to 6 to avoid important memory requirements. A ratio of 1 means less compression and faster processing, while at the opposite a ratio of 9 gives the best compression but longest procesing time. "Algo" is optional, it specifies the compression algorithm to use and can take the following values "gzip", "bzip2", "lzo" or "xz". "gzip" algorithm is used by default (for historical reasons see --gzip below). If both algorithm and compression are given, a ':' must be placed between them. Valid usage of -z option is for example: -z, -z9, -zlzo, -zgzip, -zbzip2, -zlzo:6, -zbzip2:2, -zgzip:1, -zxz:6 and so on. Usage for long option is the same: --compression, --compression=9, --compression=lzo, --compression=gzip, --compression=bzip2, --compression=lzo:6, --compression=bzip2:2, --compression=gzip:1 --compression=xz:9 and so on.
 .TP 20
 --gzip[=level]
-Same as -z (see just above). Historically -z/--gzip was for gzip while -y/--bzip2 was for bzip2. But due to the lack of available unused letter for command line options, lzo compression could not be added without extending -z option grammar. For backward compatibility --gzip is kept, but is deprecated. Rather use --compression[=level] or -z[level].
-.TP 20
--y[level], --bzip2[=level]
-compresses using bzip2 algorithm. See -z above for usage details. This option is DEPRECATED and WILL DISAPPEAR in a future version. Please use -zbzip2:level or --compression=bzip2:level.
+Same as -z (see just above). This option is deprecated, please use --compression or -z.
 .TP 20
 -s, --slice <number>
-Size of the slices in bytes. If the number is appended by k (or K), M, G, T, P E, Z or Y the size is in kilobytes, megabytes, gigabytes, terabytes, petabytes, exabytes, zettabytes or yottabytes respectively. Example: "20M" means 20 megabytes, by default, it is the same as giving 20971520 as argument (see also -aSI and -abinary options). If -s is not present the backup will be written to a single slice whatever the size of the backup may be (there is probably some filesystem limitation, thus you might expect problems for file size over 2 gigabytes, depending on your filesystem, but this is not a limitation of dar).
+Size of the slices in bytes. If the number is appended by k (or K), M, G, T, P E, Z or Y the size is in kilobytes, megabytes, gigabytes, terabytes, petabytes, exabytes, zettabytes or yottabytes respectively. Example: "20M" means 20 megabytes, by default, it is the same as giving 20971520 as argument (see also -aSI and -abinary options). If -s is not present the backup will be written to a single slice whatever the size of the backup may be (assuming your operating system can support arbitrarily large files).
 .TP 20
 -S, --first-slice <number>
--S gives the size of the first slice which may be chosen independently of the size of following slices. This option needs -s and by default, the size of the first slice is the same as the one of the following slices.
+-S gives the size of the first slice which may be chosen independently of the size of following slices (either bigger or smaller). This option needs -s option and by default of -S option, the size of the first slice is the same as the one of the following slices.
 .TP 20
 -p [<integer>], --pause[=<integer>]
 pauses before writing to a new slice (this requires -s). By default there is no pause, all slices are written in the same directory, up to the end of the backup or until the filesystem is full. In this later case, the user is informed of the lack of disk space and dar stops for user action. As soon as some disk space is available, the user can continue the backup. The optional integer that this option can receive tells dar to only pause very 'n' slice. Giving 3 for 'n' will make dar pause only after slices 3, 6, 9 and so on. If this integer is not specified, the behavior is as if '1' was given as argument which makes dar pause after each slice.
-.TP 20
--A, --ref [<path>]/<basename>
-Depending on the context, it specifies the archive to use as reference (mandatory with -C and -+) or the rescue catalogue to use (when used with -x -t or -d). All slices of the reference backup are expected to be on the same directory given by <path> or the current directory by default. Usually only the last slice is required to extract the catalogue of reference. If necessary the use of symbolic links is also possible here to gather slices that do not reside in the same directory. You can also point <path> to a floppy or any other mounted directory, because
-.B dar
-will pause and ask the user for required slices if they are not present. The argument to -A may be of four types:
-.RS
-.TP 5
-- An existing archive basename, which will be taken as reference
-.TP 5
-- a dash ("-") in direct access mode (default mode) it may imply the use of -o and -i options, this allows the archive of reference to be read from a pair of pipes with dar_slave at the other ends. Dar_slave can be run through ssh on a remote host for example. Note that this type of argument ("-") is not available when -A is used with -x, -d or -t. In sequential mode (--sequential-mode is used), the archive of reference is read from standard input or on named pipe specified by -i option. -o option has no use in sequential mode. Note that merging (-+ option) cannot read archive of reference in sequential mode.
-.TP 5
-- a plus sign ("+") which makes the reference be the current directory status (only available with -c option). In other word, no file's data will be saved, just the current status of the inodes will be recorded in the catalogue. This is like an extracted catalogue form a virtual full backup, it can be taken for further reference without having to make the full backup itself. This feature is known as the "snapshot" backup.
-.TP 5
-- a <date>, if -af option has been placed before -A on the command-line (or in a included file, see -B option). For more about that feature see -af option below.
-.PP
-During backup (-c option) the archive of reference given thanks to this option is used to compare existing files on the filesystem. Dar will then backup only files that have changed since the archive of reference was done. During merging (-+ option), the contents of the given archive will been taken with the contents of the archive specified with -@ option (see below). During Catalogue isolation (-C option), dar will create the isolated catalogue from the one given with -A option. During testing, diff or extraction, (-t, -d or -x options respectively), the table of contents (the catalogue) will be read from the archive given with -A instead of using the internal catalogue of the archive (given with -t, -d or -x option). The archive given for rescue must has been previously isolated from this same archive (else the contents will not match and dar will refuse to proceed to this operation). This gives a solution to the case of corruption inside an archive's catalogue, while the best way is still to use Parchive to protect your data against media error.
-.RE
-.TP 20
--@, --aux [<path>]/<basename>, --on-fly-isolate [<path>]/<basename>
-specifies an auxiliary archive of reference (merging context) or the name of the on-fly isolated catalogue (creation context). This option is thus only available with -+ option (merging) and -c option (archive creation).
-.RS
-.P
-In a merging context, over -A option which is mandatory, you may give a second archive of reference thanks to the -@ option. This allows you to merge two archives into a single one. See also -$ option (encryption) -~ option (command execution) and -% (crypto block size) for other options concerning auxiliary archive of reference. They are the respective equivalent of -J, -F and -* options relative to archive given thanks to -A option.
-.P
-In a backup context -@ option let the user specify the archive name for an on-fly isolation (former -G option). With on-fly isolation, you can also use -$ option (to define encryption algorithm and passphrase), -~ option (to execute a command once the on-fly isolated catalogue is completed) and -% option (crypto block size). On-fly isolated catalogue is always bzip2 if possible else gzip else lzo compressed (using compression level 9) else not compressed, and it is also always a single sliced archive. Due to command-line exiguity, it is not possible to change compression algo nor slice size for the on-fly isolation. If you need a more complicated isolation, either look for a GUI over libdar, or do a normal (= not an on-fly) isolation operation (By the way it is possible to isolate an already isolated catalogue, this is equivalent to doing a copy, but you can change encryption, compression or slicing, for example), you can also use dar_xform on an isolated catalogue if you only want to change slices size (this is faster as no decompression/re-compression nor encryption/decryption is necessary). Using the merging operation on an isolated catalogue instead of isolating the isolated catalogue, leads the resulting archive to not be able to be used as a rescue for internal catalogue of the original archive. --aux-ref is a synonym to --aux.
-.RE
 .TP 20
 -D, --empty-dir
 At backup time, when excluding directories either explicitly using -P or -] options, or implicitly by giving a -g or -[ options (a directory is excluded if it does not match mask given with -g options or -[ options)
@@ -459,17 +569,17 @@ At backup time, when excluding directories either explicitly using -P or -] opti
 does not store anything about these. But with -D option, dar stores them as empty directories. This can be useful, if excluding a mount point (like /proc or /dev/pts). At restoration time, dar will then recreate these directories (if necessary). This option has no meaning with -C and is ignored in that case. Independently of that, -D can also be used at restoration time, but it activates a slightly different feature (see restoration options below).
 .TP 20
 -Z, --exclude-compression <mask>
-Filenames covered by this mask are not compressed. It is only useful with -z option. By default, all file are compressed (if compression is used). This option can be used several times, in that case a file that matches one of the -Z mask will not be compressed. Argument given to -Z must not be include any path, just the filename (eventually/probably using wildcards).
+Filenames covered by this mask are not compressed. It is only useful in conjunction with -z option. By default, all file are compressed (if compression is used). This option can be used several times, in that case a file that matches one of the -Z mask will not be compressed. Argument given to -Z must not be include any path, just the filename (eventually/probably using wildcards).
 .TP 20
 -Y, --include-compression <mask>
-Filenames covered by this mask (and not covered by -Z) are the only to be compressed. It is only available with -z option. By default all files are compressed. This option can be used several times, in that case all files that match one of the -Y will be compressed, if they do not also match on of the -Z masks. The ordered method here applies too when activated (with -am option), it works exactly the same as -I and -X options, but apply to file compression, not file selection. In other word, it matches only on the file name, not on the path of files.
+Filenames covered by this mask (and not covered masks given to -Z option(s)) are the only to be compressed. It is only available with -z option. By default all files are compressed. This option can be used several times, in that case all files that match one of the -Y will be compressed, if they do not also match on of the -Z masks. The ordered method here applies too when activated (with -am option), it works exactly the same as -I and -X options, but apply to file compression, not file selection. In other word, it matches only on the file name, not on the path of files.
 .TP 20
 -m, --mincompr <number>
 files which size is below this value will not be compressed. If -m is not specified it is equivalent to giving
 .B -m 100
 as argument. If you want to compress all file whatever their size is you thus need to type
 .B -m 0
-on the command line. The same number extensions as those used with -s or -S are available here, if you want to specify the size in kilobyte, megabyte, gigabyte etc.
+on the command line. The size unit is the byte (octet) and the same number extensions as those used with -s or -S are available here, if you want to specify the size in kilobyte, megabyte, gigabyte etc.
 .TP 20
 -1, --sparse-file-min-size <number>
 Define the minimum length of zeroed bytes to replace by "holes". By default, this feature is activated with a value of 15 bytes. To completely disable it, set the size to zero. Disabling this feature will bring some noticeable speed improvement but will probably make the archive slightly bigger (depending on the nature of the data). Sparse files are files that contain so called holes. On a filesystem, the portion of zeroed bytes is not stored on disk, thus an arbitrary large file with huge portion of zeros may only require a few bytes of disk storage. While dar cannot detect how is allocated a given file because it makes a filesystem abstraction (it does not know the implementation of any particular filesystem, where from its portability), however when it finds a sequence of zeroed bytes larger than the given threshold it can assume that it is in presence of a hole. Doing so, it does not store the given zeroed bytes into the archive, but place a tag beside the saved data to record the size of the hole and thus where to place the next no zeroed bytes. This makes dar archive disk space requirement much smaller when a sparse files is met. At restoration time, dar will restore holes writing normal data and seeking over the hole to write down the normal data after each hole. If the underlying file system supports sparse files, this will restore the holes. Note that there is no difference for applications whether a file is sparse or not, thus dar may well transform normal files into sparse files and viceversa, only the disk requirement will change. Last point, if dar can reduce disk requirement for archive with holes as small as 15 bytes (smaller value works but the overhead cost more than what is required to store the zeroed bytes normally), it may not be the same at restoration, because filesystem allocation unit is usually several kilobytes, however restored file will never be larger than it could be without holes. The only drawback of this feature is the additional CPU cycle it requires.
@@ -479,28 +589,6 @@ During merging operation, keep files compressed, this has several restrictions :
 .TP 20
 -ah, --alter=holes-recheck
 For merging, the sparse file detection mechanism is disabled by default. However if you want to activate it (assuming you have an old archive you want to convert the current archive format taking care of sparse files), you need to use -ah option to reactivate the sparse file detection mechanism. Then for merging  --sparse-file-min-size can be used as described above for archive creation. In particular setting --sparse-file-min-size to zero beside -ah during merging, may also be used to convert file saved as sparse file into plain normal files.
-.TP 20
--af, --alter=fixed-date
-Modify the -A option behavior, making it receiving a <date> as argument in place of the [<path>]/<basename> default argument. The <date> is used to define which file to save (file which modification is newer or equal to <date>) and which to consider unchanged (those older than <date>). This option has only a sense when creating an archive (not when merging or isolating).
-.P
-<date> must be a date in the following possible formats:
-.TP 30
-- a number of second since Jan 1st, 1970
-.TP 30
-- a date in the following form [[[year/]month/]day-]hour:minute[:second]
-.P
-Here are some examples of date:
-.RS
-91836383927108078
-.P
-2005/11/19-19:38:48 Which is 38 past 7 PM and 48 seconds, the 19th of November 2005
-.P
-20:20 Which is 8 PM of the current day
-.P
-2-00:08 Which is 8 past noon, the second day of the current month
-.P
-2/2-14:59 Which is 1 to 3 PM, the 2nd of February in the current year
-.RE
 .TP 20
 --nodump
 do not save files which have the 'd' flag set (see chattr(1) lsattr(1) ext2 commands). This option may not be available if the system dar has been compiled on did not provide support for ext2 flags. Note that this option does nothing with -+ option (merging) as no filesystem is used for that operation.
@@ -514,21 +602,14 @@ stay in the same filesystem as the root directory (see -R option), subdirectory 
 -, ,  --cache-directory-tagging
 don't save contents of directories that use the Cache Directory Tagging Standard. See http://www.brynosaurus.com/cachedir/spec.html for details. (this option is useless with -+ option)
 .TP 20
--$, --aux-key [[<algo>]:]<string>
-same as -J but for the auxiliary archive of reference (-@ option). Same as for -J this option is no more necessary to read archives generated by dar release 2.5.0 and above.
-.TP 20
--~, --aux-execute <string>
-same as -F but for the auxiliary archive of reference (-@ option).
-.TP 20
--%, --aux-crypto-block <size>
-same as -* but for the auxiliary archive of reference (-@ option).
-.TP 20
 -/ , --overwriting-policy <policy>
 This option let the user define when or how file overwriting can occur at restoration or archive merging time. It does no apply to slice overwriting which are driven by the -n option, it does instead apply to file during extraction and files inside archives when merging two of them. When considering overwriting, a file is said to be 'in place' while an other is known as 'new' or 'to be added'. At restoration time, the 'in place' is the one that is present in filesystem while the 'to be added' is the one from the archive. At merging time, the 'in place' is the one of the '-A' archive of reference while the 'to be added' is the one from the auxiliary '-@' archive or reference.
+.RS
 .P
 As soon as you use -/ option -n only applies only to slice overwriting and the -r, -k and -ae options are ignored (restoration options).
 .P
 The given <policy> argument is composed of actions and eventually of conditional expressions. Actions do define how to solve overwriting conflict about file's data on one side and file's Attributes (Extended and Filesystem Specific) on the other side. An action is thus a couple of action for Data and for EA+FSA. Actions for Data are represented by uppercase letters, while action for EA+FSA are defined by lowercase letters. Both actions are independent of each other:
+.RE
 .RS
 .TP 5
 P
@@ -612,7 +693,7 @@ The first expression will evaluate to either P* or O*. At this step, as the acti
 We now have one last thing to see: the available conditions (what to place between braces '{' and '}'). Conditions are defined each by a letter, eventually followed by an argument between parenthesis. The usual logical operators are available: negation (!), conjunction (&) disjunction (|). These characters must be escaped or quoted to not be interpreted by the shell when used on command-line. In particular the '!' under most shell must be quoted and escaped (-/ '{\\!R}[..]..', The escape character '\\' is not necessary inside DCF files (those given to -B option) as no shell is used to interpret these files. To these usual operators has been added a new one: the "inversion" operator, noted '~'. Like the negation, it is an unary operator but unlike the negation, it inverses the roles of 'in place' and 'to be added' for the evaluation, which is slightly different from taking the negation of the result of the evaluation. All these operators follow the usual precedence: unary operators ('!' and '~') are evaluated first, then the conjunction '&' then the disjunction '|'. To override this, you can use parenthesis '(' and ')' inside the condition. Over these logical operators, the conditions are based on atomic operator that compare the 'in place' file to the 'to be added' file. Here they follow:
 .TP 5
 I
-true only if the 'in place' entry is an inode (a 'detruit' which record the fact that a file has been removed since the archive of reference is not an inode for example). This condition do not have any consideration toward the to be added object, as some others but not all below.
+true only if the 'in place' entry is an inode (a 'detruit' which record the fact that a file has been removed since the archive of reference is not an inode for example). This condition do not have any consideration toward the to be added object. Note that ~I can be used to check the nature of the 'to be added' object.
 .TP 5
 D
 true only if the 'in place' entry is a directory. To know whether the 'to be added' is a directory or not, one would use the "inversion" operator: ~D
@@ -688,15 +769,19 @@ defines the permission and ownership to use for created slices. By default, dar 
 .TP 20
 -_, --retry-on-change count[:max-byte]
 When a file has changed at the time it was read for backup, you can ask dar to retry saving it again. By default a file can be re-saved up to 3 times (this is the 'count' field), you can set it to zero to disable this feature. In option the overall maximum amount of byte allowed to be wasted due to retry changing file's backup can be given after a column charactrer (:), this is the 'max-byte' field. By default (no --retry-on-change option specified) a limit of 1 wasted byte is allowed which is the mininum. Specifying zero for max-byte set no limit on the amount of wasted bytes (same as if no 'max-byte' was specified), each changing file is then saved up to 'count' times if necessary.
-.BR
-A file is considered as changed when the last modification time has changed between the time the file has been opened for backup and the time it has been completely read. In some situation it is not possible to replace the already saved data for a file (writing archive to a pipe for example), in that situation only, a second copy of the file is added just after the first previous try which leads that previous try to becomes inaccessible, however it holds some place in the archive, where from the designation of "wasted bytes". You can remove all wasted bytes from an archive using the merging/fitering feature: dar -+ new_arch -A old_arch -ak. Note since release 2.5.0, in normal condition (except backup to pipe using '-c -' option) no byte is wasted when a file changes at the time it is read for backup, for that reason the default behavior has been changed to allow a default of 3 retries and only 1 wasted byte.
+.RS
+.PP
+A file is considered as changed when the last modification time has changed between the time the file has been opened for backup and the time it has been completely read. In some situation it is not possible to replace the already saved data for a file (writing archive to a pipe for example), in that situation only, a second copy of the file is added just after the first previous try which leads that previous try to becomes inaccessible, however it holds some place in the archive, where from the designation of "wasted bytes". You can remove all wasted bytes from an archive using the merging/fitering feature: dar -+ new_arch -A old_arch -ak.
+.PP
+Note: since release 2.5.0, in normal condition no byte is wasted when a file changed at the time it was read for backup, except when doing a backup to pipe (using '-c -' option), except if the beginning of the modified file is located in a previous slice and except if slice hashing or strong encryption is used.
+.RE
 .P
 .TP 20
 -ad, --alter=decremental
-This flag is to be used only when merging two archives. Instead of the usual merging where each files of both archives are added to the resulting archive with eventually a tie using the overwriting policy (see -/ option), here the merging builds an archive which corresponds to the decremental backup done based on two full backups. the -A backup is expected to receive the older archive while the -@ is expected to point to the more recent one. If this option is used, the eventually overwriting policy is ignored and replaced by -/ "{T&R&~R&(A|!H)}[S*] P* ; {(e&~e&r&~r)|(!e&!~e)}[*s] *p". Additionally, files found int the newer archive that do not existed in the older are replaced by a 'detruit' entry, which marks them to be remove at restoration time. For more information about decremental backups read the usage_notes.html file in the documentation.
+This flag is to be used only when merging two archives. Instead of the usual merging where each files of both archives are added to the resulting archive with eventually a tie using the overwriting policy (see -/ option), here the merging builds an archive which corresponds to the decremental backup done based on two full backups. the -A backup is expected to receive the older archive while the -@ is expected to point to the more recent one. If this option is used, the eventually overwriting policy is ignored and replaced internally by -/ "{T&R&~R&(A|!H)}[S*] P* ; {(e&~e&r&~r)|(!e&!~e)}[*s] *p". Additionally, files found int the newer archive that do not existed in the older are replaced by a 'detruit' entry, which marks them to be remove at restoration time. For more information about decremental backups read the usage_notes.html file in the documentation.
 .TP 20
 -asecu, --alter=secu
-This option disable the ctime check done by default during an incremental backup: If the ctime of an plain file has changed since the archive of reference was done while all other values stay unchanged (inode type, ownership, permission, last modification date), dar issues a "SECURITY WARNING", as this may be the sign of the presence of a rootkit. You should use the -asecu option to disable this type of warning globally, if you are doing a differential backup of a just restored data (a differential backup with the archive used for restoration taken as reference). Effectively in that situation, as it is not possible to restore ctime, the restored data's ctime will have changed while other parameters will be unchanged for all restored files, leading dar to issue a warning for all restored files. This security check is disabled (implicitly) if dar is run with -ac option. Last, if a file has only its EA changed since the archive of reference was done (new EA, removed EA, modified EA), the security warning will show (false positive).
+This option disable the ctime check done by default during an differential backup: If the ctime of an plain file has changed since the archive of reference was done while all other values stay unchanged (inode type, ownership, permission, last modification date), dar issues a "SECURITY WARNING", as this may be the sign of the presence of a rootkit. You should use the -asecu option to disable this type of warning globally, if you are doing a differential backup of a just restored data (a differential backup with the archive used for restoration taken as reference). Effectively in that situation, as it is not possible to restore ctime, the restored data's ctime will have changed while other parameters will be unchanged for all restored files, leading dar to issue a warning for all restored files. This security check is disabled (implicitly) if dar is run with -ac option. Last, if a file has only its EA changed since the archive of reference was done (new EA, removed EA, modified EA), the security warning will show (false positive).
 .TP 20
 -., --user-comment "<message>"
 This option let the user add an arbitrary message into the archive header. Warning! this message is always stored in clear text, even if the archive is encrypted. You can see the message inserted in an archive displaying the archive summary (dar -l <archive> -q). Some macro can be used inside the <message>:
@@ -722,7 +807,7 @@ the % character.
 .RE
 .TP 20
 -3, --hash <algo>
-When creating, isolating or merging an archive, beside each slice is generated an on-fly hash file using the specified algorithm. Available algorithm are "md5" and "sha1", by default no hash file is generated. The hash file generated is named based on the name of the slice with the .md5 or .sha1 extension added to it at the end. These hash files can be processes by md5sum and sha1sum usual commands (md5sum -c <hash file>) to verify that the slice has not been corrupted. Note that the result is different than generating the hash file using md5sum or sha1sum once the slice is created, in particular if the media is faulty: calling md5sum or sha1sum on the written slice will make you compute the hash result on an already corrupted file, thus the corruption will not be seen when testing the file against the hash at a later time. Note also that the creation of a hash file is not available when producing the archive on a pipe ("dar -c -").
+With this option set, when creating, isolating or merging an archive, beside each generated slices an on-fly hash file of the slice is created using the specified algorithm. Available algorithm are "md5" and "sha1", by default no hash file is generated. The hash file generated is named based on the name of the slice with the .md5 or .sha1 extension added to it at the end. These hash files can be processes by md5sum and sha1sum usual commands (md5sum -c <hash file>) to verify that the slice has not been corrupted. Note that the result is different than generating the hash file using md5sum or sha1sum once the slice is created, in particular if the media is faulty: calling md5sum or sha1sum on the written slice will make you compute the hash result on a possibly already corrupted file, thus the corruption will not be seen when testing the file against the hash at a later time. Note also that the creation of a hash file is not available when producing the archive on a pipe ("dar -c -").
 .TP 20
 -7, --sign email[,email[,...email]]
 When creating an archive with public key encryption (read -K option) it is also possible to sign it with one or more of your private key(s). At the difference of the hash feature above, only the randomly generated key used to cipher the archive, key that is dropped at the beginning and at the end of the archive, is signed. If the archive is modified at some place, that part will not be possible to decipher, but signature verification will stay quick and valid, unless the part that has been tempered is the key inside the archive in which case signature check will report a failure and archive will not be readable at all. If the signature is valid and the archive could be extracted without error, the whole archive could be assumed to be signed by the gnupg key owners, but read below the security note.
@@ -744,7 +829,7 @@ The mask is applied to path+filename during backup operation only. If a given fi
 The mask is applied to path+filename during backup operation only. If a given file matches the mask, even if it matches a mask given after -< option, no user command will be executed before and after its backup. The -< and -> options act like -g and -P, they can receive wildcard expression and thus have their comportment driven by the --alter=globe and --alter=regex expressions seen above, as well as the --alter=mask option. Last the --alter=case and --alter=no-case modify also the way case sensitivity is considered for these masks. By default, no -> or -< option, no file get selected for backup hook. IMPORTANT: if using the short option, you need to enclose it between quotes: '->' for the shell not to interpret the > as a redirection.
 .TP 20
 -=, --backup-hook-execute <string>
-for files covered by the mask provided thanks to the -< and -> options, the given string is executed by a shell before the backup of that file starts and once it has completed. Several macro can be used that are substituted at run time:
+for files covered by the mask provided thanks to the -< and -> options, the given string is executed before the backup of that file starts and once it has completed. Several macro can be used that are substituted at run time:
 .RS
 .TP 10
 %%
@@ -765,13 +850,13 @@ will be replaced by the GID of the file
 %c
 and most interesting, %c (c for context), will be replaced by "start" or by "end" when the command is executed before or after the backup respectively.
 .RE
-This way, one can stop a database just before it was about to be backed up, and restart it once the backup is completed. Note that the masks seen above that drive the execution of this command can be applied to a directory or a plain file for example. When a directory is selected for this feature, the command is logically ran before starting (with the context "start") to backup any file located in that directory or in a subdirectory of it, and once all file in that directory or subdirectories have been saved, the command is ran a second time (with the context "end"). During that time, if any file do match the backup-hook masks, no command will be executed for these. It is assumed that when a directory has been asked for a backup-hook to be executed this hook (or user command) is prepare for backup all data located in that directory. The environment variable DAR_DUC_PATH also applies to these user commands (see -E above, or the ENVIRONMENT paragraph below).
+This way, one can stop a database just before it is about to be backed up, and restart it once the backup has completed. Note that the masks seen above that drive the execution of this command can be applied to a directory or a plain file for example. When a directory is selected for this feature, the command is logically ran before starting (with the context "start") to backup any file located in that directory or in a subdirectory of it, and once all file in that directory or subdirectories have been saved, the command is ran a second time (with the context "end"). During that time, if any file do match the backup-hook masks, no command will be executed for these. It is assumed that when a directory has been asked for a backup-hook to be executed this hook (or user command) is prepare for backup all data located in that directory. The environment variable DAR_DUC_PATH also applies to these user commands (see -E above, or the ENVIRONMENT paragraph below).
 .TP 20
 -ai, --alter=ignore-unknown-inode-type
 When dar meets an inode type it is not aware about (some times ago, it was the case for Door inode on Solaris for example, Door inodes are handled by dar since release 2.4.0), it issues a warning about its inability to handle such inode. This warning occurs even if that entry is filtered out by mean of -X, -I, -P, -g, -[ or -] options, as soon as some other entry in that same directory has to be considered for backup, leading dar to read that directory contents and failing on that unknown inode type (filtering is done based on the result of directory listing). This option is to avoid dar issuing such warning in that situation.
 .PP
 .PP
-.B RESTORATION OPTIONS (to use with -x)
+.B RESTORATION SPECIFIC OPTIONS (to use with -x)
 .TP 20
 -k[{ignored|only}], --deleted[={ignore|only}]
 Without argument or with the "ignore" argument, this option leads dar at restoration time to not delete files that have been deleted since the backup of reference (file overwriting can still occur). By default, files that have been destroyed since the backup of reference are deleted during restoration, but a warning is issued before proceeding, except if -w is used. If -n is used, no file will be deleted (nor overwritten), thus -k is useless when using -n. If -/ option is used, this option without argument is ignored! With the "only" argument, this option only consider files marked as to be removed in the archive to restore, no file are restored but some file are removed. When -konly (or --deleted=only) is used, the -/ option is ignored (at the opposition of the "--no-delete=ignore" option which is ignored when the -/ is used). Of course "--no-delete=ignore" and "--no-delete=only" are mutually exclusive, because if both of them were available at the same time dar would do nothing at all.
@@ -787,30 +872,30 @@ do not restore directory structure. All file will be restored in the directory g
 .B Note concerning Extended Attributes (EA)
 above for a detailed explanation about this behavior. If -/ option is used, this option is ignored!
 .TP 20
--A, --ref [<path>]/<basename>
--A takes a different meaning when used with -x, -d or -t. The archive given after -A must be an extracted catalogue based on the archive given after -x, -d or -t.  This extracted catalogue will be used for the operation in place of the catalogue located in the archive. This feature is intended for the case of corruption within an archive that affects the internal catalogue. If you have a sane extracted catalogue of a given archive you can use it as replacement of the one located in the archive itself. Note that with the -A option are also available the following options: -F, -J and -*.
-.TP 20
 -D, --empty-dir
 At restoration time, if -D is not specified (default) any file and directory is restored in regard to the filtering mechanism specified (see -I, -X, -P, -g, -[ and -] options). But if -D option is provided the restoration skips directory trees that do not contain saved files. This avoid having a huge empty tree with a few restored files especially when restoring a differential archive in an empty place. Note: This feature cannot work when --sequential-read is used, as it is not possible to know whether a directory contains or not some saved files at the time the directory inode is read from the archive in sequential reading mode.
 .TP 20
 -2, --dirty-behavior { ignore | no-warn }
-At restoration time, if a file in the archive is flagged as "dirty" (meaning that it had changed at the time it was saved), user is asked for confirmation before restoring it. Specifying "ignore" will skip those dirty files, while "no-warn" will restore them without user confirmation. This feature is incompatible with sequential reading mode, in this mode dar cannot know whether a file is dirty before having restored it, in consequences, dar cannot warn nor ignore that a file is dirty before restoring it, at that time if a file is dirty it will be removed unless dirty-behavior is set to "no-warn".
+At restoration time, if a file in the archive is flagged as "dirty" (meaning that it had changed at the time it was saved), user is asked for confirmation before restoring it. Specifying "ignore" will skip those dirty files, while "no-warn" will restore them without user confirmation. This feature is incompatible with sequential reading mode, in this mode dar cannot know whether a file is dirty before having restored it. In consequences, in --sequential-read, once a file has been restored, if it is found to be dirty it will be removed unless dirty-behavior is set to "no-warn".
 .TP 20
 -al, --alter=lax
 Dar will try to workaround data corruption of slice header, archive header and catalogue. This option is to be used as last resort solution when facing media corruption. It is rather and still strongly encourage to test archives before relying on them as well as using Parchive to do parity data of each slice to be able to recover data corruption in a much more effective manner and with much more chance of success. Dar also has the possibility to backup a catalogue using an isolated catalogue, but this does not face slice header corruption or even saved file's data corruption (dar will detect but will not correct such event).
 .TP 20
 -/, --overwriting-policy <policy>
 Overwriting policy can be used for archive restoration to define when and how file overwriting can occur. See above the description of this option.
+.TP 20
+-A, --ref [<path>]/<basename>
+The --ref option can be used with an isolated catalogue to rescue an archive that has a corruption in the catalogue part, see GENERAL OPTIONS above for more details.
 .PP
-.B TESTING AND DIFFERENCE OPTIONS (to use with -t or -d)
+.B TESTING AND DIFFERENCE SPECIFIC OPTIONS (to use with -t or -d)
 .PP
 .TP 20
 -ado-not-compare-symlink-mtime, --alter=do-not-compare-symlink-mtime
 With this option set, when comparing a symlink, no message shows when symlink in archive and symlink on filesystem do only differ by their mtime. See also -O option.
 .P
-No other specific option, but all general options are available except for example -w which is useless, as testing and comparing only read data. -A option is available as described just above for extraction (backup of internal catalogue).
+No other specific option, but all general options are available except for example -w which is useless, as testing and comparing only read data. -A option is available as described in GENERAL OPTIONS to backup of internal catalogue of the archive (assuming you have a previously isolated catalogue available).
 .P
-Doing a difference in sequential read mode is allowed but hard linked inodes can only be compared to the filesystem the first time they are met, next hard links to this same inode cannot obtain the corresponding data because skipping backward in sequential read mode is forbidden. In that situation, the hard links are reported as skipped, meaning that data comparison could not be performed.
+Doing a difference in sequential read mode is possible but hard linked inodes can only be compared to the filesystem the first time they are met, next hard links to this same inode cannot obtain the corresponding data because skipping backward in sequential read mode is forbidden. In that situation, the hard links are reported as skipped, meaning that data comparison could not be performed.
 .PP
 .B LISTING OPTIONS (to use with -l)
 .PP
@@ -831,7 +916,7 @@ list Extended Attributes name for each file that has some.
 -I, -X, -P, -g, -[, -]
 can be used to filter file to list base on their name or path.
 .P
-Else only -v and -b from general options are useful. Note that -v displays an archive summary first, where a detailed of information about the archive can be obtained. If you want to display only this summary use -q with -l option.
+From the general options it seems only -vm and -b stay useful here. Note that -vm displays an archive summary first, where a detailed of information about the archive can be obtained. If you want to display only this summary use -q with -l option.
 .TP 10
 displayed
 fields
@@ -882,7 +967,12 @@ the last modification date of the file. The last access time is also saved and r
 .TP 10
 filename
 The name of the file.
-.TP 10 When using --alist-ea option, for hard linked inode, the filename is followed by an integer between braces: Entries with the same number do point the the same inode.
+.TP 10
+Extended Attributes
+When using -alist-ea option, for hard linked inode, the filename is followed by an integer between braces: Entries with the same number do point the the same inode.
+.TP 10
+Slice(s)
+In -Tslice mode, each file is given the range of slices it is located in. If slice size is chosen particularily small, some slices may contain no file, EA, FSA data but only tape marks or the internal catalogue, leading the aggregation of reported slices not to cover all available slices of the archive.
 .PP
 .SH EXPLICIT OPTIONAL ARGUMENTS
 
@@ -928,7 +1018,7 @@ exits with the following code:
 Operation successful.
 .TP 10
 1
-Syntax error on command-line.
+Syntax error on command-line or DCF included file
 .TP 10
 2
 Error due to a hardware problem or a lack of memory.
@@ -943,22 +1033,22 @@ Code issued when the user has aborted the program upon dar question from dar. Th
 is returned when an error concerning the treated data has been detected. While saving, this is the case when a file could not be opened or read. While restoring, it is the case when a file could not be created or replaced. While comparing, it is the case when a file in the archive does not match the one in the filesystem. While testing, it is the case when a file is corrupted in the archive.
 .TP 10
 6
-an error occurred while executing user command (given with -E or -F option). Mainly because the creation of a new process is not possible (process table is full) or the user command returned an error code (exit status different of zero).
+an error occurred while executing user command (given with -E or -F option). Mainly because the creation of a new process is not possible (process table is full) or the user command returned an error code (exit status different from zero).
 .TP 10
 7
-an error has occurred when calling a libdar routine. This means the caller (dar program), did not respect the specification of the API (and this can be considered as a particular case of a bug).
+an error has occurred when calling a libdar routine. This means the caller (dar program), did not respect the specification of the API (and this can be considered as a particular case of bug).
 .TP 10
 8
 the version of dar used is based in finite length integers (it has been compiled with the option --enable-mode=...). This code is returned when an integer overflow occurred. use the full version (based in the so called "infinint" class) to avoid this error.
 .TP 10
 9
-this code indicates an unknown error. I have probably forgotten to update the exception caching code to take care of new exceptions... this is a minor bug you are welcome to report.
+this code indicates an unknown error. The exception caching code to take care of new exceptions has probably been forgotten to be update ... this is a minor bug you are welcome to report.
 .TP 10
 10
 you have tried to use a feature that has been disabled at compilation time.
 .TP 10
 11
-some saved files have changed while dar was reading them, this may lead the data saved for this file not correspond to a valid state for this file. For example, if the beginning and the end of the file have been modified at the same time (while dar is reading it), only the change at the end will be saved (the beginning has already been read), the resulting state of the file as recorded by dar has never existed and may cause problem to the application using it.
+some saved files have changed while dar was reading them, this may lead the data saved for this file not correspond to a valid state for this file. For example, if the beginning and the end of the file have been modified at the same time (while dar is reading it), only the change at the end will be saved (the beginning has already been read), the resulting state of the file as recorded by dar has never existed and may cause problem to the application using it. This is known as a "dirty" file in the archive.
 
 .SH SIGNALS
 
@@ -1005,7 +1095,7 @@ None of these file need to be present, but if they are they are parsed AFTER any
 
 Else you can see
 .B conditional syntax
-bellow, and -N option above that leads dar to ignore the /etc/darrc and $HOME/.darrc files.
+below, and -N option above that leads dar to ignore the /etc/darrc and $HOME/.darrc files.
 
 .SH CONDITIONAL SYNTAX
 configuration files (-B option, $HOME/.darrc and /etc/darrc) usually contain a simple list of command-line arguments, split or not over several lines, and eventually mixed with comments (see -B option for more). But, you can also use make-like targets to ask for a particular set of commands to be used in certain conditions.
@@ -1128,7 +1218,7 @@ last we use two user targets "verbose:" and "home:" in addition the the "create:
 .P
 Note that if the last option *may* receive an argument, the first user target that follows it will be assumed an argument to that option. To avoid this, either change the order of options on command line for the last option been an option that never or always uses an argument (for example -b never has an argument while -s always has one). Or separate the options from the user targets by the -- word. And of course you can also use the explicit argument of the last option (see EXPLICIT OPTIONAL ARGUMENT section, above).
 .P
-Second point: It is allowed to have user targets inside a DCF file. Note however that targets are collected in a first phase, which leads some part of the file to be hidden (because the corresponding conditional syntax or user target is not present). Then, the remaining part of the file is then parsed and actions for each option found is taken. At that time, new user targets found are just recorded, but they do not modify the current DCF file layout, in particular, hidden part of the file stay hidden even if the corresponding user target is read in this same file. Next DCF parsing (which may be triggered by a second -B option on the command line, or by a -B option inside the current parsed DCF file) will thus be done with the additional targets found in that first DCF file, so in a way you may have user targets that activate other user targets. Here follows an examples of two DCF files, first.dcf and second.dcf:
+Second point: It is allowed to have user targets inside a DCF file. Note however that targets are collected in a first phase, which leads some part of the file to be hidden (because the corresponding conditional syntax or user target is not present). Then, the remaining part of the file is then parsed and actions for each option found is taken. At that time, new user targets found are just recorded, but they do not modify the current DCF file layout, in particular, hidden part of the file stay hidden even if the corresponding user target is read in this same file. Next DCF parsing (which may be triggered by a second -B option on the command line, or by a -B option inside the current parsed DCF file) will thus be done with the additional targets found in that first DCF file, so in a way you may have user targets that activate other user targets, but they will be activated in starting the next -B file. Here follows an examples of two DCF files, first.dcf and second.dcf:
 .RS
 
 # cat first.dcf
@@ -1164,7 +1254,7 @@ if set, dar looks for Dar User Command (DUC files, see -E, -F, -~, -= options) t
 
 
 .SH EXAMPLES
-You can find some more examples of use in the tutorial, mini-howto, sample scripts, and other related documentation. All these are available in dar's source package, and are also installed beside dar in the <--prefix>/share/dar directory. This documentation is also available on-line at http://dar.linux.free.fr/doc/index.html#2
+You can find some more examples of use in the tutorial, mini-howto, sample scripts, and other related documentation. All these are available in dar's source package, and are also installed beside dar in the <--prefix>/share/dar directory. This documentation is also available on-line at http://dar.linux.free.fr/doc/index.html
 
 .SH SEE ALSO
 dar_xform(1), dar_slave(1), dar_manager(1), dar_cp(1), dar_split(1), TUTORIAL and NOTES included in the source package and also available at http://dar.linux.free.fr/doc/index.html
