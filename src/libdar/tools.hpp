@@ -19,19 +19,19 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \defgroup Tools Tools
-    /// \brief a set of tool routine
-    ///
-    /// these routines are available from libdar for historical
-    /// reason, but are not part of the API.
-    /// They are shared and used by dar, dar_slave, dar_xform,
-    /// and dar_manager command. You should avoid using them in
-    /// external program as they may be removed or changed without
-    /// backward compatibility support.
+/// \defgroup Tools Tools
+/// \brief a set of tool routine
+///
+/// these routines are available from libdar for historical
+/// reason, but are not part of the API.
+/// They are shared and used by dar, dar_slave, dar_xform,
+/// and dar_manager command. You should avoid using them in
+/// external program as they may be removed or changed without
+/// backward compatibility support.
 
-    /// \file tools.hpp
-    /// \brief a set of general purpose routines
-    /// \ingroup Tools
+/// \file tools.hpp
+/// \brief a set of general purpose routines
+/// \ingroup Tools
 
 
 #ifndef TOOLS_HPP
@@ -87,42 +87,42 @@ namespace libdar
 	/// \note Do not use this function, use std::string::c_str(). The allocated memory must be released by the caller thanks to the "delete []" operator
     extern char *tools_str2charptr(const std::string &x);
 
-        /// write a string to a file with a '\\0' at then end
+	/// write a string to a file with a '\\0' at then end
 
-        /// \param[in] f the file to write to
-        /// \param[in] s the string to write to file
+	/// \param[in] f the file to write to
+	/// \param[in] s the string to write to file
     extern void tools_write_string(generic_file & f, const std::string & s);
 
-        /// read a string from a file expecting it to terminate by '\\0'
+	/// read a string from a file expecting it to terminate by '\\0'
 
-        /// \param f the file to read from
-        /// \param s the string to put the data to (except the ending '\\0')
+	/// \param f the file to read from
+	/// \param s the string to put the data to (except the ending '\\0')
     extern void tools_read_string(generic_file & f, std::string & s);
 
-        /// write a string to a file, '\\0' has no special meaning nor is added at the end
+	/// write a string to a file, '\\0' has no special meaning nor is added at the end
 
-        /// \param[in] f the file to write to
-        /// \param[in] s the string to write to file
+	/// \param[in] f the file to write to
+	/// \param[in] s the string to write to file
     extern void tools_write_string_all(generic_file & f, const std::string & s);
 
-        /// read a string if given size from a file '\\0' has no special meaning
+	/// read a string if given size from a file '\\0' has no special meaning
 
-        /// \param[in] f is the file to read from
-        /// \param[in] s is the string to put read data in
-        /// \param[in] taille is the size in byte to read
+	/// \param[in] f is the file to read from
+	/// \param[in] s is the string to put read data in
+	/// \param[in] taille is the size in byte to read
     extern void tools_read_string_size(generic_file & f, std::string & s, infinint taille);
 
-        /// retrieve the size in byte of a file
+	/// retrieve the size in byte of a file
 
-        /// \param[in] p is the path to the file which size is to get
-        /// \return the size of the file in byte
+	/// \param[in] p is the path to the file which size is to get
+	/// \return the size of the file in byte
     extern infinint tools_get_filesize(const path &p);
 
-        /// convert the given string to infinint taking care of multiplication suffixes like k, M, T, etc.
+	/// convert the given string to infinint taking care of multiplication suffixes like k, M, T, etc.
 
-        /// \param[in] s is the string to read
-        /// \param[in] base is the multiplication factor (base = 1000 for SI, base = 1024 for computer science use)
-        /// \return the value encoded in the given string
+	/// \param[in] s is the string to read
+	/// \param[in] base is the multiplication factor (base = 1000 for SI, base = 1024 for computer science use)
+	/// \return the value encoded in the given string
     extern infinint tools_get_extended_size(std::string s, U_I base);
 
 	/// convert an integer to its decimal representation with the highest unit of metric system
@@ -132,7 +132,7 @@ namespace libdar
 	/// \return the string representing the number in metric system (ex: "1 ko", "200 Mio", ...)
     extern std::string tools_display_integer_in_metric_system(infinint number, const std::string & unit, bool binary);
 
-        /// extracts the basename of a file (removing path part)
+	/// extracts the basename of a file (removing path part)
 
 	/// \param[in] command_name is the full path of the file
 	/// \param[out] basename the basename of the file
@@ -158,33 +158,33 @@ namespace libdar
 	/// be able to return a iterator on the string (and not a const_interator). There is probably other ways to do that (using const_cast) for example
     extern std::string::iterator tools_find_first_char_of(std::string &s, unsigned char v);
 
-        /// split a given full path in path part and basename part
+	/// split a given full path in path part and basename part
 
-        /// \param[in] all is the path to split
-        /// \param[out] chemin is the resulting path part, it points to a newly allocated path object
-        /// \param[out] base is the resulting basename
+	/// \param[in] all is the path to split
+	/// \param[out] chemin is the resulting path part, it points to a newly allocated path object
+	/// \param[out] base is the resulting basename
 	/// \param[in] pool memory pool to use for allocation or NULL for default memory allocation
-        /// \note chemin argument must be release by the caller thanks to the "delete" operator.
+	/// \note chemin argument must be release by the caller thanks to the "delete" operator.
     extern void tools_split_path_basename(const char *all, path * &chemin, std::string & base, memory_pool *pool = NULL);
 
-        /// split a given full path in path part and basename part
+	/// split a given full path in path part and basename part
 
-        /// \param[in] all is the path to split
-        /// \param[out] chemin is the resulting path part, it points to a newly allocated path object
-        /// \param[out] base is the resulting basename
+	/// \param[in] all is the path to split
+	/// \param[out] chemin is the resulting path part, it points to a newly allocated path object
+	/// \param[out] base is the resulting basename
 	/// \param[in] pool memory pool to use for allocation or NULL for default memory allocation
-        /// \note chemin argument must be release by the caller thanks to the "delete" operator.
+	/// \note chemin argument must be release by the caller thanks to the "delete" operator.
     extern void tools_split_path_basename(const std::string &all, std::string & chemin, std::string & base, memory_pool *pool = NULL);
 
-        /// open a pair of tuyau objects encapsulating two named pipes.
+	/// open a pair of tuyau objects encapsulating two named pipes.
 
-        /// \param[in,out] dialog for user interaction
-        /// \param[in] input path to the input named pipe
-        /// \param[in] output path to the output named pipe
-        /// \param[out] in resulting tuyau object for input
-        /// \param[out] out resulting tuyau object for output
+	/// \param[in,out] dialog for user interaction
+	/// \param[in] input path to the input named pipe
+	/// \param[in] output path to the output named pipe
+	/// \param[out] in resulting tuyau object for input
+	/// \param[out] out resulting tuyau object for output
 	/// \param[in] pool memory pool to use for allocation or NULL for default memory allocation
-        /// \note in and out parameters must be released by the caller thanks to the "delete" operator
+	/// \note in and out parameters must be released by the caller thanks to the "delete" operator
     extern void tools_open_pipes(user_interaction & dialog,
 				 const std::string &input,
 				 const std::string & output,
@@ -192,69 +192,69 @@ namespace libdar
 				 tuyau *&out,
 				 memory_pool *pool = NULL);
 
-        /// set blocking/not blocking mode for reading on a file descriptor
+	/// set blocking/not blocking mode for reading on a file descriptor
 
-        /// \param[in] fd file descriptor to read on
-        /// \param[in] mode set to true for a blocking read and to false for non blocking read
+	/// \param[in] fd file descriptor to read on
+	/// \param[in] mode set to true for a blocking read and to false for non blocking read
     extern void tools_blocking_read(int fd, bool mode);
 
-        /// convert uid to name in regards to the current system's configuration
+	/// convert uid to name in regards to the current system's configuration
 
-        /// \param[in] uid the User ID number
-        /// \return the name of the corresponding user or the uid if none corresponds
+	/// \param[in] uid the User ID number
+	/// \return the name of the corresponding user or the uid if none corresponds
     extern std::string tools_name_of_uid(const infinint & uid);
 
-        /// convert gid to name in regards of the current system's configuration
+	/// convert gid to name in regards of the current system's configuration
 
-        /// \param[in] gid the Group ID number
-        /// \return the name of the corresponding group or the gid if none corresponds
+	/// \param[in] gid the Group ID number
+	/// \return the name of the corresponding group or the gid if none corresponds
     extern std::string tools_name_of_gid(const infinint & gid);
 
-        /// convert unsigned word to string
+	/// convert unsigned word to string
 
-        /// \param[in] x the unsigned word to convert
-        /// \return the decimal representation of the given integer
+	/// \param[in] x the unsigned word to convert
+	/// \return the decimal representation of the given integer
     extern std::string tools_uword2str(U_16 x);
 
-        /// convert integer to string
+	/// convert integer to string
 
-        /// \param[in] x the integer to convert
-        /// \return the decimal representation of the given integer
+	/// \param[in] x the integer to convert
+	/// \return the decimal representation of the given integer
     extern std::string tools_int2str(S_I x);
     extern std::string tools_uint2str(U_I x);
 
-        /// convert an integer written in decimal notation to the corresponding value
+	/// convert an integer written in decimal notation to the corresponding value
 
-        /// \param[in] x the decimal representation of the integer
-        /// \return the value corresponding to the decimal representation given
+	/// \param[in] x the decimal representation of the integer
+	/// \return the value corresponding to the decimal representation given
     extern U_I tools_str2int(const std::string & x);
 
-        /// convert a signed integer written in decimal notation to the corresponding value
+	/// convert a signed integer written in decimal notation to the corresponding value
 
-        /// \param[in] x the decimal representation of the integer
-        /// \return the value corresponding to the decimal representation given
+	/// \param[in] x the decimal representation of the integer
+	/// \return the value corresponding to the decimal representation given
     extern S_I tools_str2signed_int(const std::string & x);
 
-        /// ascii to integer conversion
+	/// ascii to integer conversion
 
-        /// \param[in] a is the ascii string to convert
-        /// \param[out] val is the resulting value
-        /// \return true if the conversion could be done false if the given string does not
-        /// correspond to the decimal representation of an unsigned integer
+	/// \param[in] a is the ascii string to convert
+	/// \param[out] val is the resulting value
+	/// \return true if the conversion could be done false if the given string does not
+	/// correspond to the decimal representation of an unsigned integer
 	/// \note this call is now a warapper around tools_str2int
     extern bool tools_my_atoi(const char *a, U_I & val);
 
-        /// prepend spaces before the given string
+	/// prepend spaces before the given string
 
-        /// \param[in] s the string to append spaces to
-        /// \param[in] expected_size the minimum size of the resulting string
-        /// \return a string at least as much long as expected_size with prepended leading spaces if necessary
+	/// \param[in] s the string to append spaces to
+	/// \param[in] expected_size the minimum size of the resulting string
+	/// \return a string at least as much long as expected_size with prepended leading spaces if necessary
     extern std::string tools_addspacebefore(std::string s, U_I expected_size);
 
-        /// convert a date in second to its human readable representation
+	/// convert a date in second to its human readable representation
 
-        /// \param[in] date the date in second
-        /// \return the human representation corresponding to the argument
+	/// \param[in] date the date in second
+	/// \return the human representation corresponding to the argument
     extern std::string tools_display_date(const datetime & date);
 
 	/// convert a human readable date representation in number of second since the system reference date
@@ -264,10 +264,10 @@ namespace libdar
 	/// \note the string expected format is "[[[year/]month/]day-]hour:minute[:second]"
     extern infinint tools_convert_date(const std::string & repres);
 
-        /// wrapper to the "system" system call.
+	/// wrapper to the "system" system call.
 
-        /// \param[in,out] dialog for user interaction
-        /// \param[in] argvector the equivalent to the argv[] vector
+	/// \param[in,out] dialog for user interaction
+	/// \param[in] argvector the equivalent to the argv[] vector
     extern void tools_system(user_interaction & dialog, const std::vector<std::string> & argvector);
 
 	/// wrapper to the "system" system call using anonymous pipe to tranmit arguments to the child process
@@ -283,58 +283,51 @@ namespace libdar
 				       const std::vector<std::string> & argvpipe,
 				       memory_pool *pool = NULL);
 
-        /// write a list of string to file
+	/// write a list of string to file
 
-        /// \param[in] f the file to write to
-        /// \param[in] x the list of string to write
+	/// \param[in] f the file to write to
+	/// \param[in] x the list of string to write
     extern void tools_write_vector(generic_file & f, const std::vector<std::string> & x);
 
-        /// read a list of string from a file
+	/// read a list of string from a file
 
-        /// \param[in] f the file to read from
-        /// \param[out] x the list to fill from file
+	/// \param[in] f the file to read from
+	/// \param[out] x the list to fill from file
     extern void tools_read_vector(generic_file & f, std::vector<std::string> & x);
 
-        /// concatenate a vectors of strings in a single string
+	/// concatenate a vectors of strings in a single string
 
-        /// \param[in] separator string to insert between two elements
-        /// \param[in] x the list string
-        /// \return the result of the concatenation of the members of the list with separtor between two consecutive members
+	/// \param[in] separator string to insert between two elements
+	/// \param[in] x the list string
+	/// \return the result of the concatenation of the members of the list with separtor between two consecutive members
     extern std::string tools_concat_vector(const std::string & separator,
                                            const std::vector<std::string> & x);
 
-        /// concatenate two vectors
+	/// concatenate two vectors
 
-        /// \param[in] a the first vector
-        /// \param[in] b the second vector
-        /// \return a vector containing the elements of a and the element of b
+	/// \param[in] a the first vector
+	/// \param[in] b the second vector
+	/// \return a vector containing the elements of a and the element of b
     std::vector<std::string> operator + (std::vector<std::string> a, std::vector<std::string> b);
 
-        /// test the presence of a value in a list
 
-        /// \param[in] val is the value to look for
-        /// \param[in] liste is the list to look in
-        /// \return true if val has been found as a member of the list
-    extern bool tools_is_member(const std::string & val, const std::vector<std::string> & liste);
+	/// display the compilation time features of libdar
 
-
-        /// display the compilation time features of libdar
-
-        /// \param[in,out] dialog for user interaction
+	/// \param[in,out] dialog for user interaction
 	/// \note this call uses the compile_time:: routines, and will
 	/// not change its interface upon new feature addition
     extern void tools_display_features(user_interaction & dialog);
 
 
-        /// test if two dates are equal taking care of a integer hour of difference
+	/// test if two dates are equal taking care of a integer hour of difference
 
-        /// \param[in] hourshift is the number of integer hour more or less two date can be considered equal
-        /// \param[in] date1 first date to compare
-        /// \param[in] date2 second date to compare to
-        /// \return whether dates are equal or not
+	/// \param[in] hourshift is the number of integer hour more or less two date can be considered equal
+	/// \param[in] date1 first date to compare
+	/// \param[in] date2 second date to compare to
+	/// \return whether dates are equal or not
     extern bool tools_is_equal_with_hourshift(const infinint & hourshift, const datetime & date1, const datetime & date2);
 
-        /// template function to add two vectors
+	/// template function to add two vectors
 
     template <class T> std::vector<T> operator +=(std::vector<T> & a, const std::vector<T> & b)
     {
@@ -343,78 +336,78 @@ namespace libdar
     }
 
 
-        /// isolate the value of a given variable from the environment vector
+	/// isolate the value of a given variable from the environment vector
 
-        /// \param[in] env the environment vector as retreived from the third argument of the main() function
-        /// \param[in] clef the key or variable name too look for
-        /// \return NULL if the key could not be find or a pointer to the env data giving the value of the requested key
-        /// \note the returned value must not be released by any mean as it is just a pointer to an system allocated memory (the env vector).
+	/// \param[in] env the environment vector as retreived from the third argument of the main() function
+	/// \param[in] clef the key or variable name too look for
+	/// \return NULL if the key could not be find or a pointer to the env data giving the value of the requested key
+	/// \note the returned value must not be released by any mean as it is just a pointer to an system allocated memory (the env vector).
     extern const char *tools_get_from_env(const char **env, const char *clef);
 
-        /// does sanity checks on a slice name, check presence and detect whether the given basename is not rather a filename
+	/// does sanity checks on a slice name, check presence and detect whether the given basename is not rather a filename
 
-        /// \param[in,out] dialog for user interaction
-        /// \param[in] loc the path where resides the slice
-        /// \param[in,out] base the basename of the slice
-        /// \param[in] extension the extension of dar's slices
+	/// \param[in,out] dialog for user interaction
+	/// \param[in] loc the path where resides the slice
+	/// \param[in,out] base the basename of the slice
+	/// \param[in] extension the extension of dar's slices
 	/// \param[in] pool memory pool to use of NULL for default memory allocation
-        /// \note if user accepted the change of slice name proposed by libdar through dialog the base argument is changed
+	/// \note if user accepted the change of slice name proposed by libdar through dialog the base argument is changed
     extern void tools_check_basename(user_interaction & dialog,
                                      const path & loc,
 				     std::string & base,
 				     const std::string & extension,
 				     memory_pool *pool = NULL);
 
-        /// get current working directory
+	/// get current working directory
 
     extern std::string tools_getcwd();
 
-        /// returns the file pointed to by a symbolic link (or transparent if the file is not a symlink).
+	/// returns the file pointed to by a symbolic link (or transparent if the file is not a symlink).
 
-        /// \param root the path to the file to read
-        /// \return the file pointed to by the symlink or the value given in argument if it is not a symlink
-        /// \note an exception can occur if lack of memory or invalid argument given (NULL or empty string), system call error...
+	/// \param root the path to the file to read
+	/// \return the file pointed to by the symlink or the value given in argument if it is not a symlink
+	/// \note an exception can occur if lack of memory or invalid argument given (NULL or empty string), system call error...
     extern std::string tools_readlink(const char *root);
 
-        /// test the presence of an argument
+	/// test the presence of an argument
 
-        /// \param[in] argument is the command line argument to look for
-        /// \param[in] argc is the number of argument on the command line
-        /// \param[in] argv is the list of argument on the command line
-        /// \return true if the argument is present in the list
+	/// \param[in] argument is the command line argument to look for
+	/// \param[in] argc is the number of argument on the command line
+	/// \param[in] argv is the list of argument on the command line
+	/// \return true if the argument is present in the list
 	/// \note THIS ROUTINE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE VERSION OF LIBDAR
     extern bool tools_look_for(const char *argument, S_I argc, char *const argv[]);
 
 
-        /// set dates of a given file, no exception thrown
+	/// set dates of a given file, no exception thrown
 
-        /// \param[in] chem the path to the file to set
+	/// \param[in] chem the path to the file to set
 	/// \param[in] symlink true if the file is a symlink
-        /// \param[in] last_acc last access date to use
-        /// \param[in] last_mod last modification date to use
+	/// \param[in] last_acc last access date to use
+	/// \param[in] last_mod last modification date to use
 	/// \param[in] birth creation date of the file, if not known, use the value of last_mod for efficiency
     extern void tools_noexcept_make_date(const std::string & chem, bool symlink, const datetime & last_acc, const datetime & last_mod, const datetime & birth);
 
-        /// set dates of a given file, may throw exception
+	/// set dates of a given file, may throw exception
 
-        /// \param[in] chemin the path to the file to set
+	/// \param[in] chemin the path to the file to set
 	/// \param[in] symlink true if the file is a symlink
-        /// \param[in] access last access date to use
-        /// \param[in] modif last modification date to use
+	/// \param[in] access last access date to use
+	/// \param[in] modif last modification date to use
 	/// \param[in] birth time of creation of the file
 	/// \note if birth time is not known, it should be set to the value of modif for efficiency
     extern void tools_make_date(const std::string & chemin, bool symlink, const datetime & access, const datetime & modif, const datetime & birth);
 
-        /// compare two string in case insensitive manner
+	/// compare two string in case insensitive manner
 
-        /// \param[in] a first string to compare
-        /// \param[in] b second string to compare
-        /// \return whether the two string given in argument are equal in case insensitive comparison
+	/// \param[in] a first string to compare
+	/// \param[in] b second string to compare
+	/// \return whether the two string given in argument are equal in case insensitive comparison
     extern bool tools_is_case_insensitive_equal(const std::string & a, const std::string & b);
 
-        /// \brief convert a string to upper case
-        ///
-        /// \param[in] r the string to convert
+	/// \brief convert a string to upper case
+	///
+	/// \param[in] r the string to convert
 	/// \param[out] uppered resulting upper cased string
 	/// \note in case of invalid wide char met in source string, the upper case convertion
 	/// is done in ASCII mode (byte by byte)
@@ -430,69 +423,69 @@ namespace libdar
     extern void tools_to_wupper(std::wstring & r);
 #endif
 
-        /// remove last character of a string is it equal to a given value
+	/// remove last character of a string is it equal to a given value
 
-        /// \param[in] c the given value to compare the last char with
-        /// \param[in,out] s the string to modify
+	/// \param[in] c the given value to compare the last char with
+	/// \param[in,out] s the string to modify
     extern void tools_remove_last_char_if_equal_to(char c, std::string & s);
 
-        /// from a string with a range notation (min-max) extract the range values
+	/// from a string with a range notation (min-max) extract the range values
 
-        /// \param[in] s the string to parse
-        /// \param[out] min the minimum value of the range
-        /// \param[out] max the maximum value of the range
-        /// \exception Erange is thrown is the string to parse is incorrect
+	/// \param[in] s the string to parse
+	/// \param[out] min the minimum value of the range
+	/// \param[out] max the maximum value of the range
+	/// \exception Erange is thrown is the string to parse is incorrect
 	/// \note: either a single number (positive or negative) is returned in min
 	/// (max is set to min if min is positive or to zero if min is negative)
 	/// or a range of positive numbers.
     extern void tools_read_range(const std::string & s, S_I & min, U_I & max);
 
 
-        /// make printf-like formating to a std::string
+	/// make printf-like formating to a std::string
 
-        /// \param[in] format the format string
-        /// \param[in] ... list of argument to use against the format string
-        /// \return the resulting string
-        /// \note the supported masks for the format are:
-        /// - \%s \%c \%d \%\%  (usual behavior)
+	/// \param[in] format the format string
+	/// \param[in] ... list of argument to use against the format string
+	/// \return the resulting string
+	/// \note the supported masks for the format are:
+	/// - \%s \%c \%d \%\%  (usual behavior)
 	/// - \%x display an integer under hexadecimal notation
-        /// - \%i (matches infinint *)
-        /// - \%S (matches std::string *)
-        /// .
+	/// - \%i (matches infinint *)
+	/// - \%S (matches std::string *)
+	/// .
     extern std::string tools_printf(const char *format, ...);
 
-        /// make printf-like formating to a std::string
+	/// make printf-like formating to a std::string
 
-        /// \param[in] format the format string
-        /// \param[in] ap list of argument to use against the format string
-        /// \return the resulting string
-        /// \note the supported masks for the format are:
-        /// - \%s \%c \%d \%\%  (normal behavior)
-        /// - \%i (matches infinint *)
-        /// - \%S (matches std::string *)
-        /// .
+	/// \param[in] format the format string
+	/// \param[in] ap list of argument to use against the format string
+	/// \return the resulting string
+	/// \note the supported masks for the format are:
+	/// - \%s \%c \%d \%\%  (normal behavior)
+	/// - \%i (matches infinint *)
+	/// - \%S (matches std::string *)
+	/// .
     extern std::string tools_vprintf(const char *format, va_list ap);
 
-        /// test the presence of files corresponding to a given mask in a directory (regex mask)
+	/// test the presence of files corresponding to a given mask in a directory (regex mask)
 
-        /// \param[in,out] ui for user interaction
-        /// \param[in] c_chemin directory where file have to be looked for
-        /// \param[in] file_mask regex expression which designates the files to look for
-        /// \return true if some files have found matching the file_mask
+	/// \param[in,out] ui for user interaction
+	/// \param[in] c_chemin directory where file have to be looked for
+	/// \param[in] file_mask regex expression which designates the files to look for
+	/// \return true if some files have found matching the file_mask
     extern bool tools_do_some_files_match_mask_regex(user_interaction & ui, const std::string & c_chemin, const std::string & file_mask);
 
 
-        /// remove files from a given directory
+	/// remove files from a given directory
 
-        /// \param[in,out] dialog for user interaction
-        /// \param[in] c_chemin directory where files have to be removed
-        /// \param[in] file_mask regex expression which designates the files to remove
-        /// \param[in] info_details whether user must be displayed details of the operation
-        /// \note This is equivalent to the 'rm' command with regex expression in place of glob one
+	/// \param[in,out] dialog for user interaction
+	/// \param[in] c_chemin directory where files have to be removed
+	/// \param[in] file_mask regex expression which designates the files to remove
+	/// \param[in] info_details whether user must be displayed details of the operation
+	/// \note This is equivalent to the 'rm' command with regex expression in place of glob one
     extern void tools_unlink_file_mask_regex(user_interaction & dialog, const std::string & c_chemin, const std::string & file_mask, bool info_details);
 
 
-        /// prevents slice overwriting: check the presence of slice and if necessary ask the user if they can be removed
+	/// prevents slice overwriting: check the presence of slice and if necessary ask the user if they can be removed
 
 	/// \param[in,out] dialog for user interaction
 	/// \param[in] chemin where slice is about to be created
@@ -510,28 +503,28 @@ namespace libdar
 						    bool warn_overwriting,
 						    bool dry_run);
 
-        /// append an elastic buffer of given size to the file
+	/// append an elastic buffer of given size to the file
 
-        /// \param[in,out] f file to append elastic buffer to
-        /// \param[in] max_size size of the elastic buffer to add
+	/// \param[in,out] f file to append elastic buffer to
+	/// \param[in] max_size size of the elastic buffer to add
     extern void tools_add_elastic_buffer(generic_file & f, U_32 max_size);
 
 
-        /// tells whether two files are on the same mounted filesystem
+	/// tells whether two files are on the same mounted filesystem
 
-        /// \param[in] file1 first file
-        /// \param[in] file2 second file
-        /// \return true if the two file are located under the same mounting point
-        /// \note if one of the file is not present or if the filesystem information
-        ///   is not possible to be read an exception is throw (Erange)
+	/// \param[in] file1 first file
+	/// \param[in] file2 second file
+	/// \return true if the two file are located under the same mounting point
+	/// \note if one of the file is not present or if the filesystem information
+	///   is not possible to be read an exception is throw (Erange)
     extern bool tools_are_on_same_filesystem(const std::string & file1, const std::string & file2);
 
 
-        /// transform a relative path to an absolute one given the current directory value
+	/// transform a relative path to an absolute one given the current directory value
 
-        /// \param[in] src the relative path to transform
-        /// \param[in] cwd the value to take for the current directory
-        /// \return the corresponding absolute path
+	/// \param[in] src the relative path to transform
+	/// \param[in] cwd the value to take for the current directory
+	/// \return the corresponding absolute path
     extern path tools_relative2absolute_path(const path & src, const path & cwd);
 
 	/// block all signals (based on POSIX sigprocmask)
@@ -706,12 +699,12 @@ namespace libdar
 	/// \return uid value
     extern uid_t tools_ownership2gid(const std::string & group);
 
-        /// change ownership of the file which descriptor is given
+	/// change ownership of the file which descriptor is given
 
-        /// \param[in] filedesc file's descriptor
-        /// \param[in] slice_user the user to set the file to. For empty string, no attempts to change the user ownership is done
-        /// \param[in] slice_group the group to set the file to. For empty string, no attempts to change the group ownership is done
-        /// \note this call may throw Erange exception upon system error
+	/// \param[in] filedesc file's descriptor
+	/// \param[in] slice_user the user to set the file to. For empty string, no attempts to change the user ownership is done
+	/// \param[in] slice_group the group to set the file to. For empty string, no attempts to change the group ownership is done
+	/// \note this call may throw Erange exception upon system error
     extern void tools_set_ownership(S_I filedesc, const std::string & slice_user, const std::string & slice_group);
 
 	/// Produces in "dest" the XORed value of "dest" and "src"
@@ -823,6 +816,13 @@ namespace libdar
 	/// convert a std::wstring to std::string
     extern std::string tools_wstring_to_string(const std::wstring & val);
 #endif
+
+	/// add in 'a', element of 'b' not already found in 'a'
+    extern void tools_merge_to_vector(std::vector<std::string> & a, const  std::vector<std::string> & b);
+
+	/// remove from 'a' elements found in 'b' and return the resulting vector
+    extern std::vector<std::string> tools_substract_from_vector(const std::vector<std::string> & a, const std::vector<std::string> & b);
+
 
 } /// end of namespace
 

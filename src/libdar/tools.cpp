@@ -154,13 +154,13 @@ namespace libdar
 {
 
 #ifdef __DYNAMIC__
-	// Yes, this is a static variable,
-	// it contains the necessary mutex to keep libdar thread-safe
+        // Yes, this is a static variable,
+        // it contains the necessary mutex to keep libdar thread-safe
     static const user_group_bases *user_group = NULL;
 #endif
 
-	// the following variable is static this breaks the threadsafe support
-	// while it also concerns the signaling which is out process related
+        // the following variable is static this breaks the threadsafe support
+        // while it also concerns the signaling which is out process related
 
     static void runson(user_interaction & dialog, char * const argv[]);
     static void ignore_deadson(S_I sig);
@@ -171,23 +171,23 @@ namespace libdar
     void tools_init()
     {
 #ifdef __DYNAMIC__
-	if(user_group == NULL)
-	{
-	    user_group = new (nothrow) user_group_bases();
-	    if(user_group == NULL)
-		throw Ememory("tools_init");
-	}
+        if(user_group == NULL)
+        {
+            user_group = new (nothrow) user_group_bases();
+            if(user_group == NULL)
+                throw Ememory("tools_init");
+        }
 #endif
     }
 
     void tools_end()
     {
 #ifdef __DYNAMIC__
-	if(user_group != NULL)
-	{
-	    delete user_group;
-	    user_group = NULL;
-	}
+        if(user_group != NULL)
+        {
+            delete user_group;
+            user_group = NULL;
+        }
 #endif
     }
 
@@ -199,7 +199,7 @@ namespace libdar
 
         if(ret == NULL)
             throw Ememory("tools_str2charptr");
-	(void)memcpy(ret, x.c_str(), size);
+        (void)memcpy(ret, x.c_str(), size);
         ret[size] = '\0';
 
         return ret;
@@ -231,7 +231,7 @@ namespace libdar
 
     void tools_write_string_all(generic_file & f, const string & s)
     {
-	f.write(s.c_str(), s.size());
+        f.write(s.c_str(), s.size());
     }
 
     void tools_read_string_size(generic_file & f, string & s, infinint taille)
@@ -261,13 +261,13 @@ namespace libdar
     {
         struct stat buf;
 
-	if(lstat(p.display().c_str(), &buf) < 0)
-	{
-	    string tmp = tools_strerror_r(errno);
-	    throw Erange("tools_get_filesize", tools_printf(dar_gettext("Cannot get file size: %s"), tmp.c_str()));
-	}
+        if(lstat(p.display().c_str(), &buf) < 0)
+        {
+            string tmp = tools_strerror_r(errno);
+            throw Erange("tools_get_filesize", tools_printf(dar_gettext("Cannot get file size: %s"), tmp.c_str()));
+        }
 
-	return (U_32)buf.st_size;
+        return (U_32)buf.st_size;
     }
 
     infinint tools_get_extended_size(string s, U_I base)
@@ -330,56 +330,56 @@ namespace libdar
 
     string tools_display_integer_in_metric_system(infinint number, const string & unit, bool binary)
     {
-	string ret = "";
-	infinint multiple = binary ? 1024 : 1000;
-	U_I power = 0;
-	    // 1 = 'k', 2 = 'M', 3 = 'G', 4 = 'T', 5 = 'P', 6 = 'E', 7 = 'Z', 8 = 'Y'
+        string ret = "";
+        infinint multiple = binary ? 1024 : 1000;
+        U_I power = 0;
+            // 1 = 'k', 2 = 'M', 3 = 'G', 4 = 'T', 5 = 'P', 6 = 'E', 7 = 'Z', 8 = 'Y'
 
-	while(number >= multiple && power < 8)
-	{
-	    ++power;
-	    number /= multiple;
-	}
+        while(number >= multiple && power < 8)
+        {
+            ++power;
+            number /= multiple;
+        }
 
-	ret = deci(number).human();
-	if(unit.size() > 0)
-	    ret += " "; // a space is required by convention to separate the number from its unit
+        ret = deci(number).human();
+        if(unit.size() > 0)
+            ret += " "; // a space is required by convention to separate the number from its unit
 
-	switch(power)
-	{
-	case 0:
-	    if(number > 0)
-		ret += unit;
-		// not displaying unit for zero for clarity in particular when octets symbol is used
-		// which would give "0 o" that is somehow not very easy to read/understand
-	    break;
-	case 1:
-	    ret += (binary ? "ki" : "k") + unit;
-	    break;
-	case 2:
-	    ret += (binary ? "Mi" : "M") + unit;
-	    break;
-	case 3:
-	    ret += (binary ? "Gi" : "G") + unit;
-	    break;
-	case 4:
-	    ret += (binary ? "Ti" : "T") + unit;
-	    break;
-	case 5:
-	    ret += (binary ? "Pi" : "P") + unit;
-	    break;
-	case 6:
-	    ret += (binary ? "Ei" : "E") + unit;
-	    break;
-	case 7:
-	    ret += (binary ? "Zi" : "Z") + unit;
-	    break;
-	default:
-	    ret += (binary ? "Yi" : "Y") + unit;
-	    break;
-	}
+        switch(power)
+        {
+        case 0:
+            if(number > 0)
+                ret += unit;
+                // not displaying unit for zero for clarity in particular when octets symbol is used
+                // which would give "0 o" that is somehow not very easy to read/understand
+            break;
+        case 1:
+            ret += (binary ? "ki" : "k") + unit;
+            break;
+        case 2:
+            ret += (binary ? "Mi" : "M") + unit;
+            break;
+        case 3:
+            ret += (binary ? "Gi" : "G") + unit;
+            break;
+        case 4:
+            ret += (binary ? "Ti" : "T") + unit;
+            break;
+        case 5:
+            ret += (binary ? "Pi" : "P") + unit;
+            break;
+        case 6:
+            ret += (binary ? "Ei" : "E") + unit;
+            break;
+        case 7:
+            ret += (binary ? "Zi" : "Z") + unit;
+            break;
+        default:
+            ret += (binary ? "Yi" : "Y") + unit;
+            break;
+        }
 
-	return ret;
+        return ret;
     }
 
     void tools_extract_basename(const char *command_name, string &basename)
@@ -389,74 +389,74 @@ namespace libdar
 
     string::iterator tools_find_last_char_of(string &s, unsigned char v)
     {
-	if(s.empty())
-	    return s.end();
+        if(s.empty())
+            return s.end();
 
-	string::iterator back, it = s.begin();
-	bool valid = (it != s.end()) && (*it == v);
+        string::iterator back, it = s.begin();
+        bool valid = (it != s.end()) && (*it == v);
 
-	while(it != s.end())
-	{
-	    back = it;
-	    it = find(it + 1, s.end(), v);
-	}
+        while(it != s.end())
+        {
+            back = it;
+            it = find(it + 1, s.end(), v);
+        }
 
-	if(!valid && (back == s.begin())) // no char found at all (back has been sticked at the beginning and the first character is not the one we look for
-	    return s.end();
-	else
-	    return back;
+        if(!valid && (back == s.begin())) // no char found at all (back has been sticked at the beginning and the first character is not the one we look for
+            return s.end();
+        else
+            return back;
     }
 
 
     string::iterator tools_find_first_char_of(string &s, unsigned char v)
     {
-	string::iterator it = s.begin();
+        string::iterator it = s.begin();
 
-	while(it != s.end() && *it != v)
-	    ++it;
+        while(it != s.end() && *it != v)
+            ++it;
 
-	return it;
+        return it;
     }
 
     void tools_split_path_basename(const char *all, path * &chemin, string & base, memory_pool *pool)
     {
         chemin = NULL;
-	string src = all;
-	string::iterator it = tools_find_last_char_of(src, '/');
+        string src = all;
+        string::iterator it = tools_find_last_char_of(src, '/');
 
 
-	if(it != src.end()) // path separator found (pointed to by "it")
-	{
-	    base = string(it + 1, src.end());
-	    chemin = new (pool) path(string(src.begin(), it), true);
-	}
-	else
-	{
-	    base = src;
-	    chemin = new (pool) path(".");
-	}
+        if(it != src.end()) // path separator found (pointed to by "it")
+        {
+            base = string(it + 1, src.end());
+            chemin = new (pool) path(string(src.begin(), it), true);
+        }
+        else
+        {
+            base = src;
+            chemin = new (pool) path(".");
+        }
 
-	if(chemin == NULL)
-	    throw Ememory("tools_split_path_basename");
+        if(chemin == NULL)
+            throw Ememory("tools_split_path_basename");
     }
 
     void tools_split_path_basename(const string & all, string & chemin, string & base, memory_pool *pool)
     {
         path *tmp = NULL;
 
-	tools_split_path_basename(all.c_str(), tmp, base, pool);
-	if(tmp == NULL)
-	    throw SRC_BUG;
-	chemin = tmp->display();
-	delete tmp;
+        tools_split_path_basename(all.c_str(), tmp, base, pool);
+        if(tmp == NULL)
+            throw SRC_BUG;
+        chemin = tmp->display();
+        delete tmp;
     }
 
     void tools_open_pipes(user_interaction & dialog,
-			  const string &input,
-			  const string & output,
-			  tuyau *&in,
-			  tuyau *&out,
-			  memory_pool *pool)
+                          const string &input,
+                          const string & output,
+                          tuyau *&in,
+                          tuyau *&out,
+                          memory_pool *pool)
     {
         in = out = NULL;
         try
@@ -489,26 +489,26 @@ namespace libdar
     void tools_blocking_read(S_I fd, bool mode)
     {
         S_I flags = fcntl(fd, F_GETFL, 0);
-	if(flags < 0)
-	    throw Erange("tools_blocking_read", string(dar_gettext("Cannot read \"fcntl\" file's flags : "))+tools_strerror_r(errno));
+        if(flags < 0)
+            throw Erange("tools_blocking_read", string(dar_gettext("Cannot read \"fcntl\" file's flags : "))+tools_strerror_r(errno));
         if(!mode)
             flags |= O_NONBLOCK;
         else
             flags &= ~O_NONBLOCK;
         if(fcntl(fd, F_SETFL, flags) < 0)
-	    throw Erange("tools_blocking_read", string(dar_gettext("Cannot set \"fcntl\" file's flags : "))+tools_strerror_r(errno));
+            throw Erange("tools_blocking_read", string(dar_gettext("Cannot set \"fcntl\" file's flags : "))+tools_strerror_r(errno));
     }
 
     string tools_name_of_uid(const infinint & uid)
     {
 #ifndef  __DYNAMIC__
-	string name = "";
+        string name = "";
 #else
-	string name;
-	if(user_group != NULL)
-	    name = user_group->get_username(uid);
-	else
-	    throw SRC_BUG;
+        string name;
+        if(user_group != NULL)
+            name = user_group->get_username(uid);
+        else
+            throw SRC_BUG;
 #endif
 
         if(name.empty()) // uid not associated with a name
@@ -523,18 +523,18 @@ namespace libdar
     string tools_name_of_gid(const infinint & gid)
     {
 #ifndef __DYNAMIC__
-	string name = "";
+        string name = "";
 #else
-	string name;
-	if(user_group != NULL)
-	    name = user_group->get_groupname(gid);
-	else
-	    throw SRC_BUG;
+        string name;
+        if(user_group != NULL)
+            name = user_group->get_groupname(gid);
+        else
+            throw SRC_BUG;
 #endif
 
         if(name.empty()) // uid not associated with a name
         {
-	    deci d = gid;
+            deci d = gid;
             return d.human();
         }
         else
@@ -543,27 +543,27 @@ namespace libdar
 
     string tools_uword2str(U_16 x)
     {
-	ostringstream tmp;
+        ostringstream tmp;
 
-	tmp << x;
+        tmp << x;
 
-	return tmp.str();
+        return tmp.str();
     }
 
     string tools_int2str(S_I x)
     {
-	ostringstream tmp;
+        ostringstream tmp;
 
-	tmp << x;
+        tmp << x;
 
         return tmp.str();
     }
 
     string tools_uint2str(U_I x)
     {
-	ostringstream tmp;
+        ostringstream tmp;
 
-	tmp << x;
+        tmp << x;
 
         return tmp.str();
     }
@@ -571,258 +571,258 @@ namespace libdar
 
     U_I tools_str2int(const string & x)
     {
-	stringstream tmp(x);
-	U_I ret;
-	string residu;
+        stringstream tmp(x);
+        U_I ret;
+        string residu;
 
-	if((tmp >> ret).fail())
-	    throw Erange("tools_str2string", string(dar_gettext("Invalid number: ")) + x);
+        if((tmp >> ret).fail())
+            throw Erange("tools_str2string", string(dar_gettext("Invalid number: ")) + x);
 
-	tmp >> residu;
-	for(U_I i = 0; i < residu.size(); ++i)
-	    if(residu[i] != ' ')
-		throw Erange("tools_str2string", string(dar_gettext("Invalid number: ")) + x);
+        tmp >> residu;
+        for(U_I i = 0; i < residu.size(); ++i)
+            if(residu[i] != ' ')
+                throw Erange("tools_str2string", string(dar_gettext("Invalid number: ")) + x);
 
-	return ret;
+        return ret;
     }
 
     S_I tools_str2signed_int(const string & x)
     {
-	stringstream tmp(x);
-	S_I ret;
-	string residu;
+        stringstream tmp(x);
+        S_I ret;
+        string residu;
 
-	if((tmp >> ret).fail())
-	    throw Erange("tools_str2string", string(dar_gettext("Invalid number: ")) + x);
+        if((tmp >> ret).fail())
+            throw Erange("tools_str2string", string(dar_gettext("Invalid number: ")) + x);
 
-	tmp >> residu;
-	for(U_I i = 0; i < residu.size(); ++i)
-	    if(residu[i] != ' ')
-		throw Erange("tools_str2string", string(dar_gettext("Invalid number: ")) + x);
+        tmp >> residu;
+        for(U_I i = 0; i < residu.size(); ++i)
+            if(residu[i] != ' ')
+                throw Erange("tools_str2string", string(dar_gettext("Invalid number: ")) + x);
 
-	return ret;
+        return ret;
     }
 
     bool tools_my_atoi(const char *a, U_I & val)
     {
-	try
-	{
-	    val = tools_str2int(a);
-	    return true;
-	}
-	catch(Erange & e)
-	{
-	    val = 0;
-	    return false;
-	}
+        try
+        {
+            val = tools_str2int(a);
+            return true;
+        }
+        catch(Erange & e)
+        {
+            val = 0;
+            return false;
+        }
     }
 
     string tools_addspacebefore(string s, U_I expected_size)
     {
-    	return string(expected_size - s.size(), ' ') + s;
+        return string(expected_size - s.size(), ' ') + s;
     }
 
     string tools_display_date(const datetime & date)
     {
         time_t pas = 0;
-	time_t frac = 0;
+        time_t frac = 0;
 
-	if(!date.get_value(pas, frac, datetime::tu_second)) // conversion to system type failed. Using a replacement string
-	    return deci(date.get_second_value()).human();
-	else
-	{
-	    char *str = ctime(&pas);
-	    if(str == NULL) // ctime() failed
-		return tools_int2str(pas);
-	    else
-	    {
-		string ret = str;
+        if(!date.get_value(pas, frac, datetime::tu_second)) // conversion to system type failed. Using a replacement string
+            return deci(date.get_second_value()).human();
+        else
+        {
+            char *str = ctime(&pas);
+            if(str == NULL) // ctime() failed
+                return tools_int2str(pas);
+            else
+            {
+                string ret = str;
 
-		return string(ret.begin(), ret.end() - 1); // -1 to remove the ending '\n'
-	    }
-	}
+                return string(ret.begin(), ret.end() - 1); // -1 to remove the ending '\n'
+            }
+        }
     }
 
     infinint tools_convert_date(const string & repres)
     {
-	enum status { init, year, month, day, hour, min, sec, error, finish };
+        enum status { init, year, month, day, hour, min, sec, error, finish };
 
-	    /// first we define a helper class
-	class scan
-	{
-	public:
-	    scan(const tm & now)
-	    {
-		etat = init;
-		when = now;
-		when.tm_sec = when.tm_min = when.tm_hour = 0;
-		when.tm_wday = 0;            // ignored by mktime
-		when.tm_yday = 0;            // ignored by mktime
-		when.tm_isdst = 1;           // provided time is local daylight saving time
-		tmp = 0;
-	    };
+            /// first we define a helper class
+        class scan
+        {
+        public:
+            scan(const tm & now)
+            {
+                etat = init;
+                when = now;
+                when.tm_sec = when.tm_min = when.tm_hour = 0;
+                when.tm_wday = 0;            // ignored by mktime
+                when.tm_yday = 0;            // ignored by mktime
+                when.tm_isdst = 1;           // provided time is local daylight saving time
+                tmp = 0;
+            };
 
-	    status get_etat() const { return etat; };
-	    tm get_struct() const { return when; };
-	    void add_digit(char a)
-	    {
-		if(a < 48 || a > 57) // ascii code for zero is 48, for nine is 57
-		    throw SRC_BUG;
-		tmp = tmp*10 + (a-48);
-	    };
+            status get_etat() const { return etat; };
+            tm get_struct() const { return when; };
+            void add_digit(char a)
+            {
+                if(a < 48 || a > 57) // ascii code for zero is 48, for nine is 57
+                    throw SRC_BUG;
+                tmp = tmp*10 + (a-48);
+            };
 
-	    void set_etat(const status & val)
-	    {
-		switch(etat)
-		{
-		case year:
-		    if(tmp < 1970)
-			throw Erange("tools_convert_date", dar_gettext("date before 1970 is not allowed"));
-		    when.tm_year = tmp - 1900;
-		    break;
-		case month:
-		    if(tmp < 1 || tmp > 12)
-			throw Erange("tools_convert_date", dar_gettext("Incorrect month"));
-		    when.tm_mon = tmp - 1;
-		    break;
-		case day:
-		    if(tmp < 1 || tmp > 31)
-			throw Erange("tools_convert_date", dar_gettext("Incorrect day of month"));
-		    when.tm_mday = tmp;
-		    break;
-		case hour:
-		    if(tmp < 0 || tmp > 23)
-			throw Erange("tools_convert_date", dar_gettext("Incorrect hour"));
-		    when.tm_hour = tmp;
-		    break;
-		case min:
-		    if(tmp < 0 || tmp > 59)
-			throw Erange("tools_convert_date", dar_gettext("Incorrect minute"));
-		    when.tm_min = tmp;
-		    break;
-		case sec:
-		    if(tmp < 0 || tmp > 59)
-			throw Erange("tools_convert_date", dar_gettext("Incorrect second"));
-		    when.tm_sec = tmp;
-		    break;
-		case error:
-		    throw Erange("tools_convert_date", dar_gettext("Bad formatted date expression"));
-		default:
-		    break; // nothing to do
-		}
-		tmp = 0;
-		etat = val;
-	    };
+            void set_etat(const status & val)
+            {
+                switch(etat)
+                {
+                case year:
+                    if(tmp < 1970)
+                        throw Erange("tools_convert_date", dar_gettext("date before 1970 is not allowed"));
+                    when.tm_year = tmp - 1900;
+                    break;
+                case month:
+                    if(tmp < 1 || tmp > 12)
+                        throw Erange("tools_convert_date", dar_gettext("Incorrect month"));
+                    when.tm_mon = tmp - 1;
+                    break;
+                case day:
+                    if(tmp < 1 || tmp > 31)
+                        throw Erange("tools_convert_date", dar_gettext("Incorrect day of month"));
+                    when.tm_mday = tmp;
+                    break;
+                case hour:
+                    if(tmp < 0 || tmp > 23)
+                        throw Erange("tools_convert_date", dar_gettext("Incorrect hour"));
+                    when.tm_hour = tmp;
+                    break;
+                case min:
+                    if(tmp < 0 || tmp > 59)
+                        throw Erange("tools_convert_date", dar_gettext("Incorrect minute"));
+                    when.tm_min = tmp;
+                    break;
+                case sec:
+                    if(tmp < 0 || tmp > 59)
+                        throw Erange("tools_convert_date", dar_gettext("Incorrect second"));
+                    when.tm_sec = tmp;
+                    break;
+                case error:
+                    throw Erange("tools_convert_date", dar_gettext("Bad formatted date expression"));
+                default:
+                    break; // nothing to do
+                }
+                tmp = 0;
+                etat = val;
+            };
 
-	private:
-	    struct tm when;
-	    status etat;
-	    S_I tmp;
-	};
+        private:
+            struct tm when;
+            status etat;
+            S_I tmp;
+        };
 
-	    // then we define local variables
-	time_t now = ::time(NULL), when;
-	scan scanner = scan(*(localtime(&now)));
-	U_I c, size = repres.size(), ret;
-	struct tm tmp;
+            // then we define local variables
+        time_t now = ::time(NULL), when;
+        scan scanner = scan(*(localtime(&now)));
+        U_I c, size = repres.size(), ret;
+        struct tm tmp;
 
-	    // now we parse the string to update the stucture tm "when"
+            // now we parse the string to update the stucture tm "when"
 
-	    // first, determining initial state
-	switch(tools_count_in_string(repres, '/'))
-	{
-	case 0:
-	    switch(tools_count_in_string(repres, '-'))
-	    {
-	    case 0:
-		scanner.set_etat(hour);
-		break;
-	    case 1:
-		scanner.set_etat(day);
-		break;
-	    default:
-		scanner.set_etat(error);
-	    }
-	    break;
-	case 1:
-	    scanner.set_etat(month);
-	    break;
-	case 2:
-	    scanner.set_etat(year);
-	    break;
-	default:
-	    scanner.set_etat(error);
-	}
+            // first, determining initial state
+        switch(tools_count_in_string(repres, '/'))
+        {
+        case 0:
+            switch(tools_count_in_string(repres, '-'))
+            {
+            case 0:
+                scanner.set_etat(hour);
+                break;
+            case 1:
+                scanner.set_etat(day);
+                break;
+            default:
+                scanner.set_etat(error);
+            }
+            break;
+        case 1:
+            scanner.set_etat(month);
+            break;
+        case 2:
+            scanner.set_etat(year);
+            break;
+        default:
+            scanner.set_etat(error);
+        }
 
-	    // second, parsing the string
-	for(c = 0; c < size && scanner.get_etat() != error; ++c)
-	    switch(repres[c])
-	    {
-	    case '/':
-		switch(scanner.get_etat())
-		{
-		case year:
-		    scanner.set_etat(month);
-		    break;
-		case month:
-		    scanner.set_etat(day);
-		    break;
-		default:
-		    scanner.set_etat(error);
-		}
-		break;
-	    case ':':
-		switch(scanner.get_etat())
-		{
-		case hour:
-		    scanner.set_etat(min);
-		    break;
-		case min:
-		    scanner.set_etat(sec);
-		    break;
-		default:
-		    scanner.set_etat(error);
-		}
-		break;
-	    case '-':
-		switch(scanner.get_etat())
-		{
-		case day:
-		    scanner.set_etat(hour);
-		    break;
-		default:
-		    scanner.set_etat(error);
-		}
-		break;
-	    case ' ':
-	    case '\t':
-	    case '\n':
-	    case '\r':
-		break; // we ignore spaces, tabs, CR and LF
-	    case '0':
-	    case '1':
-	    case '2':
-	    case '3':
-	    case '4':
-	    case '5':
-	    case '6':
-	    case '7':
-	    case '8':
-	    case '9':
-		scanner.add_digit(repres[c]);
-		break;
-	    default:
-		scanner.set_etat(error);
-	    }
+            // second, parsing the string
+        for(c = 0; c < size && scanner.get_etat() != error; ++c)
+            switch(repres[c])
+            {
+            case '/':
+                switch(scanner.get_etat())
+                {
+                case year:
+                    scanner.set_etat(month);
+                    break;
+                case month:
+                    scanner.set_etat(day);
+                    break;
+                default:
+                    scanner.set_etat(error);
+                }
+                break;
+            case ':':
+                switch(scanner.get_etat())
+                {
+                case hour:
+                    scanner.set_etat(min);
+                    break;
+                case min:
+                    scanner.set_etat(sec);
+                    break;
+                default:
+                    scanner.set_etat(error);
+                }
+                break;
+            case '-':
+                switch(scanner.get_etat())
+                {
+                case day:
+                    scanner.set_etat(hour);
+                    break;
+                default:
+                    scanner.set_etat(error);
+                }
+                break;
+            case ' ':
+            case '\t':
+            case '\n':
+            case '\r':
+                break; // we ignore spaces, tabs, CR and LF
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                scanner.add_digit(repres[c]);
+                break;
+            default:
+                scanner.set_etat(error);
+            }
 
-	scanner.set_etat(finish);
-	tmp = scanner.get_struct();
-	when = mktime(&tmp);
-	if(when > now)
-	    throw Erange("tools_convert_date", dar_gettext("Given date must be in the past"));
-	ret = when;
+        scanner.set_etat(finish);
+        tmp = scanner.get_struct();
+        when = mktime(&tmp);
+        if(when > now)
+            throw Erange("tools_convert_date", dar_gettext("Given date must be in the past"));
+        ret = when;
 
-	return ret;
+        return ret;
     }
 
     void tools_system(user_interaction & dialog, const vector<string> & argvector)
@@ -830,187 +830,187 @@ namespace libdar
         if(argvector.empty())
             return; // nothing to do
 
-	    // ISO C++ forbids variable-size array
-	char **argv = new (nothrow) char * [argvector.size()+1];
+            // ISO C++ forbids variable-size array
+        char **argv = new (nothrow) char * [argvector.size()+1];
 
-	for(U_I i = 0; i <= argvector.size(); i++)
-	    argv[i] = NULL;
+        for(U_I i = 0; i <= argvector.size(); i++)
+            argv[i] = NULL;
 
-	try
-	{
-	    S_I status;
-	    bool loop;
+        try
+        {
+            S_I status;
+            bool loop;
 
-	    for(U_I i = 0; i < argvector.size(); i++)
-		argv[i] = tools_str2charptr(argvector[i]);
-	    argv[argvector.size()] = NULL; // this is already done above but that does not hurt doing it twice :-)
+            for(U_I i = 0; i < argvector.size(); i++)
+                argv[i] = tools_str2charptr(argvector[i]);
+            argv[argvector.size()] = NULL; // this is already done above but that does not hurt doing it twice :-)
 
-	    do
-	    {
-		ignore_deadson(0);
-		loop = false;
-		S_I pid = fork();
+            do
+            {
+                ignore_deadson(0);
+                loop = false;
+                S_I pid = fork();
 
-		switch(pid)
-		{
-		case -1:
-		    throw Erange("tools_system", string(dar_gettext("Error while calling fork() to launch dar: ")) + tools_strerror_r(errno));
-		case 0: // fork has succeeded, we are the child process
-		    try
-		    {
-			runson(dialog, argv); // function that never returns or throws exceptions
-			throw SRC_BUG; // just in case the previous function returned
-		    }
-		    catch(...)
-		    {
-			throw SRC_BUG;
-		    }
-		default:
-		    if(wait(&status) <= 0)
-			throw Erange("tools_system",
-				     string(dar_gettext("Unexpected error while waiting for dar to terminate: ")) + tools_strerror_r(errno));
-		    else // checking the way dar has exit
-			if(WIFSIGNALED(status)) // exited because of a signal
-			{
-			    try
-			    {
-				dialog.pause(string(dar_gettext("DAR terminated upon signal reception: "))
+                switch(pid)
+                {
+                case -1:
+                    throw Erange("tools_system", string(dar_gettext("Error while calling fork() to launch dar: ")) + tools_strerror_r(errno));
+                case 0: // fork has succeeded, we are the child process
+                    try
+                    {
+                        runson(dialog, argv); // function that never returns or throws exceptions
+                        throw SRC_BUG; // just in case the previous function returned
+                    }
+                    catch(...)
+                    {
+                        throw SRC_BUG;
+                    }
+                default:
+                    if(wait(&status) <= 0)
+                        throw Erange("tools_system",
+                                     string(dar_gettext("Unexpected error while waiting for dar to terminate: ")) + tools_strerror_r(errno));
+                    else // checking the way dar has exit
+                        if(WIFSIGNALED(status)) // exited because of a signal
+                        {
+                            try
+                            {
+                                dialog.pause(string(dar_gettext("DAR terminated upon signal reception: "))
 #if HAVE_DECL_SYS_SIGLIST
-					     + (WTERMSIG(status) < NSIG ? sys_siglist[WTERMSIG(status)] : tools_int2str(WTERMSIG(status)))
+                                             + (WTERMSIG(status) < NSIG ? sys_siglist[WTERMSIG(status)] : tools_int2str(WTERMSIG(status)))
 #else
-					     + tools_int2str(WTERMSIG(status))
+                                             + tools_int2str(WTERMSIG(status))
 #endif
-					     + dar_gettext(" . Retry to launch dar as previously ?"));
-				loop = true;
-			    }
-			    catch(Euser_abort & e)
-			    {
-				dialog.pause(dar_gettext(" Continue anyway ?"));
-			    }
-			}
-			else // normal terminaison checking exit status code
-			    if(WEXITSTATUS(status) != 0)
-				dialog.pause(string(dar_gettext("DAR sub-process has terminated with exit code "))
-					     + tools_int2str(WEXITSTATUS(status))
-					     + dar_gettext(" Continue anyway ?"));
-		}
-	    }
-	    while(loop);
-	}
-	catch(...)
-	{
-	    for(U_I i = 0; i <= argvector.size(); i++)
-		if(argv[i] != NULL)
-		    delete [] argv[i];
-	    delete argv;
-	    throw;
-	}
+                                             + dar_gettext(" . Retry to launch dar as previously ?"));
+                                loop = true;
+                            }
+                            catch(Euser_abort & e)
+                            {
+                                dialog.pause(dar_gettext(" Continue anyway ?"));
+                            }
+                        }
+                        else // normal terminaison checking exit status code
+                            if(WEXITSTATUS(status) != 0)
+                                dialog.pause(string(dar_gettext("DAR sub-process has terminated with exit code "))
+                                             + tools_int2str(WEXITSTATUS(status))
+                                             + dar_gettext(" Continue anyway ?"));
+                }
+            }
+            while(loop);
+        }
+        catch(...)
+        {
+            for(U_I i = 0; i <= argvector.size(); i++)
+                if(argv[i] != NULL)
+                    delete [] argv[i];
+            delete argv;
+            throw;
+        }
 
-	for(U_I i = 0; i <= argvector.size(); i++)
-	    if(argv[i] != NULL)
-		delete [] argv[i];
-	delete argv;
+        for(U_I i = 0; i <= argvector.size(); i++)
+            if(argv[i] != NULL)
+                delete [] argv[i];
+        delete argv;
     }
 
     void tools_system_with_pipe(user_interaction & dialog,
-				const string & dar_cmd,
-				const vector<string> & argvpipe,
-				memory_pool *pool)
+                                const string & dar_cmd,
+                                const vector<string> & argvpipe,
+                                memory_pool *pool)
     {
-	const char *argv[] = { dar_cmd.c_str(), "--pipe-fd", NULL, NULL };
-	bool loop = false;
+        const char *argv[] = { dar_cmd.c_str(), "--pipe-fd", NULL, NULL };
+        bool loop = false;
 
-	do
-	{
-	    tuyau *tube = NULL;
+        do
+        {
+            tuyau *tube = NULL;
 
-	    try
-	    {
-		tube = new (pool) tuyau(dialog);
-		if(tube == NULL)
-		    throw Ememory("tools_system_with_pipe");
+            try
+            {
+                tube = new (pool) tuyau(dialog);
+                if(tube == NULL)
+                    throw Ememory("tools_system_with_pipe");
 
-		const string read_fd = tools_int2str(tube->get_read_fd());
-		tlv_list pipeargs;
-		S_I status;
+                const string read_fd = tools_int2str(tube->get_read_fd());
+                tlv_list pipeargs;
+                S_I status;
 
-		argv[2] = read_fd.c_str();
-		signal(SIGCHLD, &abort_on_deadson); // do not accept child death
+                argv[2] = read_fd.c_str();
+                signal(SIGCHLD, &abort_on_deadson); // do not accept child death
 
-		loop = false;
-		S_I pid = fork();
+                loop = false;
+                S_I pid = fork();
 
-		switch(pid)
-		{
-		case -1:
-		    throw Erange("tools_system_with_pipe", string(dar_gettext("Error while calling fork() to launch dar: ")) + tools_strerror_r(errno));
-		case 0: // fork has succeeded, we are the child process
-		    try
-		    {
-			if(tube != NULL)
-			{
-			    tube->do_not_close_read_fd();
-			    delete tube; // C++ object is destroyed but read filedescriptor has been kept open
-			    tube = NULL;
-			    runson(dialog, const_cast<char * const*>(argv));
-			    throw SRC_BUG;
-			}
-			else
-			    throw SRC_BUG;
-		    }
-		    catch(...)
-		    {
-			throw SRC_BUG;
-		    }
-		default: // fork has succeeded, we are the parent process
-		    tube->close_read_fd();
-		    pipeargs = tools_string2tlv_list(dialog, 0, argvpipe);
-		    pipeargs.dump(*tube);
-		    ignore_deadson(0); // now we can ignore SIGCHLD signals just before destroying the pipe filedescriptor, which will trigger and EOF while reading on pipe
-		                       // in the child process
-		    delete tube;
-		    tube = NULL;
+                switch(pid)
+                {
+                case -1:
+                    throw Erange("tools_system_with_pipe", string(dar_gettext("Error while calling fork() to launch dar: ")) + tools_strerror_r(errno));
+                case 0: // fork has succeeded, we are the child process
+                    try
+                    {
+                        if(tube != NULL)
+                        {
+                            tube->do_not_close_read_fd();
+                            delete tube; // C++ object is destroyed but read filedescriptor has been kept open
+                            tube = NULL;
+                            runson(dialog, const_cast<char * const*>(argv));
+                            throw SRC_BUG;
+                        }
+                        else
+                            throw SRC_BUG;
+                    }
+                    catch(...)
+                    {
+                        throw SRC_BUG;
+                    }
+                default: // fork has succeeded, we are the parent process
+                    tube->close_read_fd();
+                    pipeargs = tools_string2tlv_list(dialog, 0, argvpipe);
+                    pipeargs.dump(*tube);
+                    ignore_deadson(0); // now we can ignore SIGCHLD signals just before destroying the pipe filedescriptor, which will trigger and EOF while reading on pipe
+                        // in the child process
+                    delete tube;
+                    tube = NULL;
 
-		    if(wait(&status) <= 0)
-			throw Erange("tools_system",
-				     string(dar_gettext("Unexpected error while waiting for dar to terminate: ")) + tools_strerror_r(errno));
-		    else // checking the way dar has exit
-			if(WIFSIGNALED(status)) // exited because of a signal
-			{
-			    try
-			    {
-				dialog.pause(string(dar_gettext("DAR terminated upon signal reception: "))
+                    if(wait(&status) <= 0)
+                        throw Erange("tools_system",
+                                     string(dar_gettext("Unexpected error while waiting for dar to terminate: ")) + tools_strerror_r(errno));
+                    else // checking the way dar has exit
+                        if(WIFSIGNALED(status)) // exited because of a signal
+                        {
+                            try
+                            {
+                                dialog.pause(string(dar_gettext("DAR terminated upon signal reception: "))
 #if HAVE_DECL_SYS_SIGLIST
-					     + (WTERMSIG(status) < NSIG ? sys_siglist[WTERMSIG(status)] : tools_int2str(WTERMSIG(status)))
+                                             + (WTERMSIG(status) < NSIG ? sys_siglist[WTERMSIG(status)] : tools_int2str(WTERMSIG(status)))
 #else
-					     + tools_int2str(WTERMSIG(status))
+                                             + tools_int2str(WTERMSIG(status))
 #endif
-					     + dar_gettext(" . Retry to launch dar as previously ?"));
-				loop = true;
-			    }
-			    catch(Euser_abort & e)
-			    {
-				dialog.pause(dar_gettext(" Continue anyway ?"));
-			    }
-			}
-			else // normal terminaison checking exit status code
-			    if(WEXITSTATUS(status) != 0)
-				dialog.pause(string(dar_gettext("DAR sub-process has terminated with exit code "))
-					     + tools_int2str(WEXITSTATUS(status))
-					     + dar_gettext(" Continue anyway ?"));
+                                             + dar_gettext(" . Retry to launch dar as previously ?"));
+                                loop = true;
+                            }
+                            catch(Euser_abort & e)
+                            {
+                                dialog.pause(dar_gettext(" Continue anyway ?"));
+                            }
+                        }
+                        else // normal terminaison checking exit status code
+                            if(WEXITSTATUS(status) != 0)
+                                dialog.pause(string(dar_gettext("DAR sub-process has terminated with exit code "))
+                                             + tools_int2str(WEXITSTATUS(status))
+                                             + dar_gettext(" Continue anyway ?"));
 
-		}
-	    }
-	    catch(...)
-	    {
-		if(tube != NULL)
-		    delete tube;
-		throw;
-	    }
-	    if(tube != NULL)
-		delete tube;
-	}
-	while(loop);
+                }
+            }
+            catch(...)
+            {
+                if(tube != NULL)
+                    delete tube;
+                throw;
+            }
+            if(tube != NULL)
+                delete tube;
+        }
+        while(loop);
 
     }
 
@@ -1086,92 +1086,81 @@ namespace libdar
         return ret;
     }
 
-
-    bool tools_is_member(const string & val, const vector<string> & liste)
-    {
-        U_I index = 0;
-
-        while(index < liste.size() && liste[index] != val)
-            index++;
-
-        return index <liste.size();
-    }
-
     void tools_display_features(user_interaction & dialog)
     {
-	NLS_SWAP_IN;
-	try
-	{
-	    const char *endy = NULL;
-	    string time_accuracy = "";
+        NLS_SWAP_IN;
+        try
+        {
+            const char *endy = NULL;
+            string time_accuracy = "";
 
-	    dialog.printf(gettext("   Libz compression (gzip)      : %s\n"), YES_NO(compile_time::libz()));
-	    dialog.printf(gettext("   Libbz2 compression (bzip2)   : %s\n"), YES_NO(compile_time::libbz2()));
-	    dialog.printf(gettext("   Liblzo2 compression (lzo)    : %s\n"), YES_NO(compile_time::liblzo()));
-	    dialog.printf(gettext("   Liblxz compression (xz)      : %s\n"), YES_NO(compile_time::libxz()));
-	    dialog.printf(gettext("   Strong encryption (libgcrypt): %s\n"), YES_NO(compile_time::libgcrypt()));
-	    dialog.printf(gettext("   Public key ciphers (gpgme)   : %s\n"), YES_NO(compile_time::public_key_cipher()));
-	    dialog.printf(gettext("   Extended Attributes support  : %s\n"), YES_NO(compile_time::ea()));
-	    dialog.printf(gettext("   Large files support (> 2GB)  : %s\n"), YES_NO(compile_time::largefile()));
-	    dialog.printf(gettext("   ext2fs NODUMP flag support   : %s\n"), YES_NO(compile_time::nodump()));
-	    dialog.printf(gettext("   Special allocation scheme    : %s\n"), YES_NO(compile_time::special_alloc()));
-	    if(compile_time::bits() == 0)
-		dialog.printf(gettext("   Integer size used            : unlimited\n"));
-	    else
-		dialog.printf(gettext("   Integer size used            : %d bits\n"), compile_time::bits());
-	    dialog.printf(gettext("   Thread safe support          : %s\n"), YES_NO(compile_time::thread_safe()));
-	    dialog.printf(gettext("   Furtive read mode support    : %s\n"), YES_NO(compile_time::furtive_read()));
-	    dialog.printf(gettext("   Linux ext2/3/4 FSA support   : %s\n"), YES_NO(compile_time::FSA_linux_extX()));
-	    dialog.printf(gettext("   Mac OS X HFS+ FSA support    : %s\n"), YES_NO(compile_time::FSA_birthtime()));
+            dialog.printf(gettext("   Libz compression (gzip)      : %s\n"), YES_NO(compile_time::libz()));
+            dialog.printf(gettext("   Libbz2 compression (bzip2)   : %s\n"), YES_NO(compile_time::libbz2()));
+            dialog.printf(gettext("   Liblzo2 compression (lzo)    : %s\n"), YES_NO(compile_time::liblzo()));
+            dialog.printf(gettext("   Liblxz compression (xz)      : %s\n"), YES_NO(compile_time::libxz()));
+            dialog.printf(gettext("   Strong encryption (libgcrypt): %s\n"), YES_NO(compile_time::libgcrypt()));
+            dialog.printf(gettext("   Public key ciphers (gpgme)   : %s\n"), YES_NO(compile_time::public_key_cipher()));
+            dialog.printf(gettext("   Extended Attributes support  : %s\n"), YES_NO(compile_time::ea()));
+            dialog.printf(gettext("   Large files support (> 2GB)  : %s\n"), YES_NO(compile_time::largefile()));
+            dialog.printf(gettext("   ext2fs NODUMP flag support   : %s\n"), YES_NO(compile_time::nodump()));
+            dialog.printf(gettext("   Special allocation scheme    : %s\n"), YES_NO(compile_time::special_alloc()));
+            if(compile_time::bits() == 0)
+                dialog.printf(gettext("   Integer size used            : unlimited\n"));
+            else
+                dialog.printf(gettext("   Integer size used            : %d bits\n"), compile_time::bits());
+            dialog.printf(gettext("   Thread safe support          : %s\n"), YES_NO(compile_time::thread_safe()));
+            dialog.printf(gettext("   Furtive read mode support    : %s\n"), YES_NO(compile_time::furtive_read()));
+            dialog.printf(gettext("   Linux ext2/3/4 FSA support   : %s\n"), YES_NO(compile_time::FSA_linux_extX()));
+            dialog.printf(gettext("   Mac OS X HFS+ FSA support    : %s\n"), YES_NO(compile_time::FSA_birthtime()));
 
-	    switch(compile_time::system_endian())
-	    {
-	    case compile_time::big:
-		endy = gettext("big");
-		break;
-	    case compile_time::little:
-		endy = gettext("little");
-		break;
-	    case compile_time::error:
-		endy = gettext("error!");
-		break;
-	    default:
-		throw SRC_BUG;
-	    }
-	    dialog.printf(gettext("   Detected system/CPU endian   : %s"), endy);
-	    dialog.printf(gettext("   Posix fadvise support        : %s"), YES_NO(compile_time::posix_fadvise()));
-	    dialog.printf(gettext("   Large dir. speed optimi.     : %s"), YES_NO(compile_time::fast_dir()));
-	    if(compile_time::microsecond_read())
-		time_accuracy = "1 microsecond";
-	    else
-		time_accuracy = "1 s";
-	    dialog.printf(gettext("   Timestamp read accuracy      : %S\n"), &time_accuracy);
-	    if(compile_time::microsecond_write())
-		time_accuracy = "1 microsecond";
-	    else
-		time_accuracy = "1 s";
-	    dialog.printf(gettext("   Timestamp write accuracy     : %S\n"), &time_accuracy);
-	    dialog.printf(gettext("   Restores dates of symlinks   : %s\n"), YES_NO(compile_time::symlink_restore_dates()));
-	    dialog.printf(gettext("   Can uses multiple threads    : %s\n"), YES_NO(compile_time::libthreadar()));
-	}
-	catch(...)
-	{
-	    NLS_SWAP_OUT;
-	    throw;
-	}
-	NLS_SWAP_OUT;
+            switch(compile_time::system_endian())
+            {
+            case compile_time::big:
+                endy = gettext("big");
+                break;
+            case compile_time::little:
+                endy = gettext("little");
+                break;
+            case compile_time::error:
+                endy = gettext("error!");
+                break;
+            default:
+                throw SRC_BUG;
+            }
+            dialog.printf(gettext("   Detected system/CPU endian   : %s"), endy);
+            dialog.printf(gettext("   Posix fadvise support        : %s"), YES_NO(compile_time::posix_fadvise()));
+            dialog.printf(gettext("   Large dir. speed optimi.     : %s"), YES_NO(compile_time::fast_dir()));
+            if(compile_time::microsecond_read())
+                time_accuracy = "1 microsecond";
+            else
+                time_accuracy = "1 s";
+            dialog.printf(gettext("   Timestamp read accuracy      : %S\n"), &time_accuracy);
+            if(compile_time::microsecond_write())
+                time_accuracy = "1 microsecond";
+            else
+                time_accuracy = "1 s";
+            dialog.printf(gettext("   Timestamp write accuracy     : %S\n"), &time_accuracy);
+            dialog.printf(gettext("   Restores dates of symlinks   : %s\n"), YES_NO(compile_time::symlink_restore_dates()));
+            dialog.printf(gettext("   Can uses multiple threads    : %s\n"), YES_NO(compile_time::libthreadar()));
+        }
+        catch(...)
+        {
+            NLS_SWAP_OUT;
+            throw;
+        }
+        NLS_SWAP_OUT;
     }
 
     bool tools_is_equal_with_hourshift(const infinint & hourshift, const datetime & date1, const datetime & date2)
     {
         infinint num, rest;
-	datetime t_delta = date1 > date2 ? date1.loose_diff(date2) : date2.loose_diff(date1);
-	infinint delta;
+        datetime t_delta = date1 > date2 ? date1.loose_diff(date2) : date2.loose_diff(date1);
+        infinint delta;
 
-	if(!t_delta.is_integer_second())
-	    return false;
-	else
-	    delta = t_delta.get_second_value();
+        if(!t_delta.is_integer_second())
+            return false;
+        else
+            delta = t_delta.get_second_value();
 
             // delta = 3600*num + rest
             // with 0 <= rest < 3600
@@ -1186,153 +1175,153 @@ namespace libdar
 
     void tools_check_basename(user_interaction & dialog, const path & loc, string & base, const string & extension, memory_pool *pool)
     {
-	NLS_SWAP_IN;
-	try
-	{
-	    regular_mask suspect = regular_mask(string(".+\\.[1-9][0-9]*\\.")+extension, true);
-	    string old_path = (loc+base).display();
+        NLS_SWAP_IN;
+        try
+        {
+            regular_mask suspect = regular_mask(string(".+\\.[1-9][0-9]*\\.")+extension, true);
+            string old_path = (loc+base).display();
 
-		// is basename is suspect ?
-	    if(!suspect.is_covered(base))
-		return; // not a suspect basename
+                // is basename is suspect ?
+            if(!suspect.is_covered(base))
+                return; // not a suspect basename
 
-		// is there a slice available ?
-	    if(is_a_slice_available(dialog, old_path, extension, pool))
-		return; // yes, thus basename is not a mistake
+                // is there a slice available ?
+            if(is_a_slice_available(dialog, old_path, extension, pool))
+                return; // yes, thus basename is not a mistake
 
-		// removing the suspicious end (.<number>.extension)
-		// and checking the avaibility of such a slice
+                // removing the suspicious end (.<number>.extension)
+                // and checking the avaibility of such a slice
 
-	    string new_base = retreive_basename(base, extension);
-	    string new_path = (loc+new_base).display();
-	    if(is_a_slice_available(dialog, new_path, extension, pool))
-	    {
-		try
-		{
-		    dialog.pause(tools_printf(gettext("Warning, %S seems more to be a slice name than a base name. Do you want to replace it by %S ?"), &base, &new_base));
-		    base = new_base;
-		}
-		catch(Euser_abort & e)
-		{
-		    dialog.warning(tools_printf(gettext("OK, keeping %S as basename"), &base));
-		}
-	    }
-	}
-	catch(...)
-	{
-	    NLS_SWAP_OUT;
-	    throw;
-	}
-	NLS_SWAP_OUT;
+            string new_base = retreive_basename(base, extension);
+            string new_path = (loc+new_base).display();
+            if(is_a_slice_available(dialog, new_path, extension, pool))
+            {
+                try
+                {
+                    dialog.pause(tools_printf(gettext("Warning, %S seems more to be a slice name than a base name. Do you want to replace it by %S ?"), &base, &new_base));
+                    base = new_base;
+                }
+                catch(Euser_abort & e)
+                {
+                    dialog.warning(tools_printf(gettext("OK, keeping %S as basename"), &base));
+                }
+            }
+        }
+        catch(...)
+        {
+            NLS_SWAP_OUT;
+            throw;
+        }
+        NLS_SWAP_OUT;
     }
 
     string tools_getcwd()
     {
-	const U_I step = 1024;
-	U_I length = step;
-	char *buffer = NULL, *ret;
-	string cwd;
-	try
-	{
-	    do
-	    {
-		buffer = new (nothrow) char[length];
-		if(buffer == NULL)
-		    throw Ememory("tools_getcwd()");
-		ret = getcwd(buffer, length-1); // length-1 to keep a place for ending '\0'
-		if(ret == NULL) // could not get the CWD
-		{
-		    if(errno == ERANGE) // buffer too small
-		    {
-			delete [] buffer;
-			buffer = NULL;
-			length += step;
-		    }
-		    else // other error
-			throw Erange("tools_getcwd", string(dar_gettext("Cannot get full path of current working directory: ")) + tools_strerror_r(errno));
-		}
-	    }
-	    while(ret == NULL);
+        const U_I step = 1024;
+        U_I length = step;
+        char *buffer = NULL, *ret;
+        string cwd;
+        try
+        {
+            do
+            {
+                buffer = new (nothrow) char[length];
+                if(buffer == NULL)
+                    throw Ememory("tools_getcwd()");
+                ret = getcwd(buffer, length-1); // length-1 to keep a place for ending '\0'
+                if(ret == NULL) // could not get the CWD
+                {
+                    if(errno == ERANGE) // buffer too small
+                    {
+                        delete [] buffer;
+                        buffer = NULL;
+                        length += step;
+                    }
+                    else // other error
+                        throw Erange("tools_getcwd", string(dar_gettext("Cannot get full path of current working directory: ")) + tools_strerror_r(errno));
+                }
+            }
+            while(ret == NULL);
 
-	    buffer[length - 1] = '\0';
-	    cwd = buffer;
-	}
-	catch(...)
-	{
-	    if(buffer != NULL)
-		delete [] buffer;
-	    throw;
-	}
-	if(buffer != NULL)
-	    delete [] buffer;
-	return cwd;
+            buffer[length - 1] = '\0';
+            cwd = buffer;
+        }
+        catch(...)
+        {
+            if(buffer != NULL)
+                delete [] buffer;
+            throw;
+        }
+        if(buffer != NULL)
+            delete [] buffer;
+        return cwd;
     }
 
     string tools_readlink(const char *root)
     {
-	U_I length = 10240;
-	char *buffer = NULL;
-	S_I lu;
-	string ret = "";
+        U_I length = 10240;
+        char *buffer = NULL;
+        S_I lu;
+        string ret = "";
 
-	if(root == NULL)
-	    throw Erange("tools_readlink", dar_gettext("NULL argument given to tools_readlink()"));
-	if(strcmp(root, "") == 0)
-	    throw Erange("tools_readlink", dar_gettext("Empty string given as argument to tools_readlink()"));
+        if(root == NULL)
+            throw Erange("tools_readlink", dar_gettext("NULL argument given to tools_readlink()"));
+        if(strcmp(root, "") == 0)
+            throw Erange("tools_readlink", dar_gettext("Empty string given as argument to tools_readlink()"));
 
-	try
-	{
-	    do
-	    {
-		buffer = new (nothrow) char[length];
-		if(buffer == NULL)
-		    throw Ememory("tools_readlink");
-		lu = readlink(root, buffer, length-1); // length-1 to have room to add '\0' at the end
+        try
+        {
+            do
+            {
+                buffer = new (nothrow) char[length];
+                if(buffer == NULL)
+                    throw Ememory("tools_readlink");
+                lu = readlink(root, buffer, length-1); // length-1 to have room to add '\0' at the end
 
-		if(lu < 0) // error occured with readlink
-		{
-		    string tmp;
+                if(lu < 0) // error occured with readlink
+                {
+                    string tmp;
 
-		    switch(errno)
-		    {
-		    case EINVAL: // not a symbolic link (thus we return the given argument)
-			ret = root;
-			break;
-		    case ENAMETOOLONG: // too small buffer
-			delete [] buffer;
-			buffer = NULL;
-			length *= 2;
-			break;
-		    default: // other error
-			tmp = tools_strerror_r(errno);
-			throw Erange("get_readlink", tools_printf(dar_gettext("Cannot read file information for %s : %s"), root, tmp.c_str()));
-		    }
-		}
-		else // got the correct real path of symlink
-		    if((U_I)(lu) < length)
-		    {
-			buffer[lu] = '\0';
-			ret = buffer;
-		    }
-		    else // "lu" should not be greater than length: readlink system call error
-		    {
-			    // trying to workaround with a larger buffer
-			delete [] buffer;
-			buffer = NULL;
-			length *= 2;
-		    }
-	    }
-	    while(ret == "");
-	}
-	catch(...)
-	{
-	    if(buffer != NULL)
-		delete [] buffer;
-	    throw;
-	}
-	if(buffer != NULL)
-	    delete [] buffer;
-	return ret;
+                    switch(errno)
+                    {
+                    case EINVAL: // not a symbolic link (thus we return the given argument)
+                        ret = root;
+                        break;
+                    case ENAMETOOLONG: // too small buffer
+                        delete [] buffer;
+                        buffer = NULL;
+                        length *= 2;
+                        break;
+                    default: // other error
+                        tmp = tools_strerror_r(errno);
+                        throw Erange("get_readlink", tools_printf(dar_gettext("Cannot read file information for %s : %s"), root, tmp.c_str()));
+                    }
+                }
+                else // got the correct real path of symlink
+                    if((U_I)(lu) < length)
+                    {
+                        buffer[lu] = '\0';
+                        ret = buffer;
+                    }
+                    else // "lu" should not be greater than length: readlink system call error
+                    {
+                            // trying to workaround with a larger buffer
+                        delete [] buffer;
+                        buffer = NULL;
+                        length *= 2;
+                    }
+            }
+            while(ret == "");
+        }
+        catch(...)
+        {
+            if(buffer != NULL)
+                delete [] buffer;
+            throw;
+        }
+        if(buffer != NULL)
+            delete [] buffer;
+        return ret;
     }
 
 
@@ -1349,91 +1338,91 @@ namespace libdar
     void tools_make_date(const std::string & chemin, bool symlink, const datetime & access, const datetime & modif, const datetime & birth)
     {
 #ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
-	struct timeval temps[2];
+        struct timeval temps[2];
 #else
         struct utimbuf temps;
 #endif
         time_t tmp = 0;
-	time_t usec = 0;
-	int ret;
+        time_t usec = 0;
+        int ret;
 
-	if(!access.get_value(tmp, usec, datetime::tu_microsecond))
-	    throw Erange("tools_make_date", "cannot set atime of file, value too high for the system integer type");
+        if(!access.get_value(tmp, usec, datetime::tu_microsecond))
+            throw Erange("tools_make_date", "cannot set atime of file, value too high for the system integer type");
 
-	    // the first time, setting modification time to the value of birth time
-	    // systems that supports birth time update birth time if the given mtime is older than the current birth time
-	    // so here we assume birth < modif (if not the birth time will be set to modif)
-	    // we run a second time the same call but with the real mtime, which should not change the birthtime if this
-	    // one is as expected older than mtime.
-	else
-	{
+            // the first time, setting modification time to the value of birth time
+            // systems that supports birth time update birth time if the given mtime is older than the current birth time
+            // so here we assume birth < modif (if not the birth time will be set to modif)
+            // we run a second time the same call but with the real mtime, which should not change the birthtime if this
+            // one is as expected older than mtime.
+        else
+        {
 #ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
-	    temps[0].tv_sec = tmp;
-	    temps[0].tv_usec = usec;
+            temps[0].tv_sec = tmp;
+            temps[0].tv_usec = usec;
 #else
-	    temps.actime = tmp;
+            temps.actime = tmp;
 #endif
-	}
+        }
 
-	if(birth != modif)
-	{
-	    if(!birth.get_value(tmp, usec, datetime::tu_microsecond))
-		throw Erange("tools_make_date", "cannot set birth time of file, value too high for the system integer type");
-	    else
-	    {
+        if(birth != modif)
+        {
+            if(!birth.get_value(tmp, usec, datetime::tu_microsecond))
+                throw Erange("tools_make_date", "cannot set birth time of file, value too high for the system integer type");
+            else
+            {
 #ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
-		temps[1].tv_sec = tmp;
-		temps[1].tv_usec = usec;
+                temps[1].tv_sec = tmp;
+                temps[1].tv_usec = usec;
 #else
-		temps.modtime = tmp;
+                temps.modtime = tmp;
 #endif
-	    }
-
-#ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
-#ifdef HAVE_LUTIMES
-	    ret = lutimes(chemin.c_str(), temps);
-#else
-	    if(symlink)
-		return; // not able to restore dates of symlinks
-	    ret = utimes(chemin.c_str(), temps);
-#endif
-#else
-	    if(symlink)
-		return; // not able to restore dates of symlinks
-	    ret = utime(chemin.c_str() , &temps);
-#endif
-	    if(ret < 0)
-		Erange("tools_make_date", string(dar_gettext("Cannot set birth time: ")) + tools_strerror_r(errno));
-	}
-
-	    // we set atime and mtime here
-	if(!modif.get_value(tmp, usec, datetime::tu_microsecond))
-	    throw Erange("tools_make_date", "cannot set last modification time of file, value too high for the system integer type");
-	else
-	{
-#ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
-	    temps[1].tv_sec = tmp;
-	    temps[1].tv_usec = usec;
-#else
-	    temps.modtime = tmp;
-#endif
-	}
+            }
 
 #ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
 #ifdef HAVE_LUTIMES
-	ret = lutimes(chemin.c_str(), temps);
+            ret = lutimes(chemin.c_str(), temps);
 #else
-	if(symlink)
-	    return; // not able to restore dates of symlinks
-	ret = utimes(chemin.c_str(), temps);
+            if(symlink)
+                return; // not able to restore dates of symlinks
+            ret = utimes(chemin.c_str(), temps);
 #endif
 #else
-	if(symlink)
-	    return; // not able to restore dates of symlinks
-	ret = utime(chemin.c_str() , &temps);
+            if(symlink)
+                return; // not able to restore dates of symlinks
+            ret = utime(chemin.c_str() , &temps);
 #endif
-	if(ret < 0)
-	    Erange("tools_make_date", string(dar_gettext("Cannot set last access and last modification time: ")) + tools_strerror_r(errno));
+            if(ret < 0)
+                Erange("tools_make_date", string(dar_gettext("Cannot set birth time: ")) + tools_strerror_r(errno));
+        }
+
+            // we set atime and mtime here
+        if(!modif.get_value(tmp, usec, datetime::tu_microsecond))
+            throw Erange("tools_make_date", "cannot set last modification time of file, value too high for the system integer type");
+        else
+        {
+#ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
+            temps[1].tv_sec = tmp;
+            temps[1].tv_usec = usec;
+#else
+            temps.modtime = tmp;
+#endif
+        }
+
+#ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
+#ifdef HAVE_LUTIMES
+        ret = lutimes(chemin.c_str(), temps);
+#else
+        if(symlink)
+            return; // not able to restore dates of symlinks
+        ret = utimes(chemin.c_str(), temps);
+#endif
+#else
+        if(symlink)
+            return; // not able to restore dates of symlinks
+        ret = utime(chemin.c_str() , &temps);
+#endif
+        if(ret < 0)
+            Erange("tools_make_date", string(dar_gettext("Cannot set last access and last modification time: ")) + tools_strerror_r(errno));
     }
 
     void tools_noexcept_make_date(const string & chem, bool symlink, const datetime & last_acc, const datetime & last_mod, const datetime & birth)
@@ -1467,23 +1456,23 @@ namespace libdar
     void tools_to_upper(const string & r, string & uppered)
     {
 #if HAVE_WCTYPE_H && HAVE_WCHAR_H
-	try
-	{
-	    wstring tmp = tools_string_to_wstring(r);
-	    tools_to_wupper(tmp);
-	    uppered = tools_wstring_to_string(tmp);
-	}
-	catch(Erange & e)
-	{
-	    U_I taille = r.size();
-	    uppered = r;
+        try
+        {
+            wstring tmp = tools_string_to_wstring(r);
+            tools_to_wupper(tmp);
+            uppered = tools_wstring_to_string(tmp);
+        }
+        catch(Erange & e)
+        {
+            U_I taille = r.size();
+            uppered = r;
 
-	    for(U_I x = 0; x < taille; ++x)
-		uppered[x] = toupper(uppered[x]);
-	}
+            for(U_I x = 0; x < taille; ++x)
+                uppered[x] = toupper(uppered[x]);
+        }
 #else
         U_I taille = r.size();
-	uppered = r;
+        uppered = r;
 
         for(U_I x = 0; x < taille; ++x)
             uppered[x] = toupper(uppered[x]);
@@ -1493,13 +1482,13 @@ namespace libdar
 #if HAVE_WCTYPE_H
     void tools_to_wupper(wstring & r)
     {
-	wstring::iterator it = r.begin();
+        wstring::iterator it = r.begin();
 
-	while(it != r.end())
-	{
-	    *it = towupper(*it);
-	    ++it;
-	}
+        while(it != r.end())
+        {
+            *it = towupper(*it);
+            ++it;
+        }
     }
 #endif
 
@@ -1516,28 +1505,28 @@ namespace libdar
 
     static void abort_on_deadson(S_I sig)
     {
-	    // we cannot throw exception in a handler (it would not be caught) we have no other way to report to standard error
-	cerr << dar_gettext("Aborting program: child process died unexpectedly") << endl;
+            // we cannot throw exception in a handler (it would not be caught) we have no other way to report to standard error
+        cerr << dar_gettext("Aborting program: child process died unexpectedly") << endl;
     }
 
     static void runson(user_interaction & dialog, char * const argv[])
     {
         if(execvp(argv[0], argv) < 0)
-	{
-	    string tmp = tools_strerror_r(errno);
-	    dialog.warning(tools_printf(dar_gettext("Error trying to run %s: %s"), argv[0], tmp.c_str()));
-	}
+        {
+            string tmp = tools_strerror_r(errno);
+            dialog.warning(tools_printf(dar_gettext("Error trying to run %s: %s"), argv[0], tmp.c_str()));
+        }
         else
-	    dialog.warning(string(dar_gettext("execvp() failed but did not returned error code")));
+            dialog.warning(string(dar_gettext("execvp() failed but did not returned error code")));
 #ifndef EXIT_ERROR
 #define EXIT_ERROR 2
-	exit(EXIT_ERROR);
-	    // we need the appropriate dar exit status
-	    // but we are in libdar thus cannot include dar_suite.hpp header
-	    // we thus copy
+        exit(EXIT_ERROR);
+            // we need the appropriate dar exit status
+            // but we are in libdar thus cannot include dar_suite.hpp header
+            // we thus copy
 #undef EXIT_ERROR
 #else
-	exit(EXIT_ERROR);
+        exit(EXIT_ERROR);
 #endif
     }
 
@@ -1599,21 +1588,21 @@ namespace libdar
         while(it < s.end() && *it != '-')
             it++;
 
-	try
-	{
-	    if(it < s.end())
-	    {
-		min = tools_str2int(string(s.begin(), it));
-		max = tools_str2int(string(++it, s.end()));
-	    }
-	    else
-		min = max = tools_str2int(s);
-	}
-	catch(Erange & e)
-	{
-	    min = tools_str2signed_int(s);
-	    max = 0;
-	}
+        try
+        {
+            if(it < s.end())
+            {
+                min = tools_str2int(string(s.begin(), it));
+                max = tools_str2int(string(++it, s.end()));
+            }
+            else
+                min = max = tools_str2int(s);
+        }
+        catch(Erange & e)
+        {
+            min = tools_str2signed_int(s);
+            max = 0;
+        }
     }
 
 
@@ -1681,10 +1670,10 @@ namespace libdar
                         test = va_arg(ap, U_I);
                         output += deci(test).human();
                         break;
-		    case 'x':
-			test = va_arg(ap, U_I);
-			output += tools_string_to_hexa(deci(test).human());
-			break;
+                    case 'x':
+                        test = va_arg(ap, U_I);
+                        output += tools_string_to_hexa(deci(test).human());
+                        break;
                     case 's':
                         output += va_arg(ap, char *);
                         break;
@@ -1718,63 +1707,63 @@ namespace libdar
 
     void tools_unlink_file_mask_regex(user_interaction & dialog, const string & c_chemin, const string & file_mask, bool info_details)
     {
-	regular_mask my_mask = regular_mask(file_mask, true);
+        regular_mask my_mask = regular_mask(file_mask, true);
 
-	etage dir = etage(dialog, c_chemin.c_str(), datetime(0), datetime(0), false, false);
-	path chemin = path(c_chemin);
-	string entry;
+        etage dir = etage(dialog, c_chemin.c_str(), datetime(0), datetime(0), false, false);
+        path chemin = path(c_chemin);
+        string entry;
 
-	while(dir.read(entry))
-	    if(my_mask.is_covered(entry))
-	    {
-		const string c_entry = (chemin + entry).display();
-		if(info_details)
-		    dialog.warning(tools_printf(dar_gettext("Removing file %s"), c_entry.c_str()));
-		if(unlink(c_entry.c_str()) != 0)
-		{
-		    string tmp = tools_strerror_r(errno);
-		    dialog.warning(tools_printf(dar_gettext("Error removing file %s: %s"), c_entry.c_str(), tmp.c_str()));
-		}
-	    }
+        while(dir.read(entry))
+            if(my_mask.is_covered(entry))
+            {
+                const string c_entry = (chemin + entry).display();
+                if(info_details)
+                    dialog.warning(tools_printf(dar_gettext("Removing file %s"), c_entry.c_str()));
+                if(unlink(c_entry.c_str()) != 0)
+                {
+                    string tmp = tools_strerror_r(errno);
+                    dialog.warning(tools_printf(dar_gettext("Error removing file %s: %s"), c_entry.c_str(), tmp.c_str()));
+                }
+            }
     }
 
     bool tools_do_some_files_match_mask_regex(user_interaction & ui, const string & c_chemin, const string & file_mask)
     {
-	regular_mask my_mask = regular_mask(file_mask, true);
+        regular_mask my_mask = regular_mask(file_mask, true);
 
-	etage dir = etage(ui, c_chemin.c_str(), datetime(0), datetime(0), false, false);
-	string entry;
-	bool ret = false;
+        etage dir = etage(ui, c_chemin.c_str(), datetime(0), datetime(0), false, false);
+        string entry;
+        bool ret = false;
 
-	while(!ret && dir.read(entry))
-	    if(my_mask.is_covered(entry))
-		ret = true;
+        while(!ret && dir.read(entry))
+            if(my_mask.is_covered(entry))
+                ret = true;
 
-	return ret;
+        return ret;
     }
 
     void tools_avoid_slice_overwriting_regex(user_interaction & dialog, const path & chemin, const string & file_mask, bool info_details, bool allow_overwriting, bool warn_overwriting, bool dry_run)
     {
-	const string c_chemin = chemin.display();
-	if(tools_do_some_files_match_mask_regex(dialog, c_chemin, file_mask))
-	{
-	    if(!allow_overwriting)
-		throw Erange("tools_avoid_slice_overwriting", tools_printf(dar_gettext("Overwriting not allowed while a slice of a previous archive with the same basename has been found in the %s directory, Operation aborted"), c_chemin.c_str()));
-	    else
-	    {
-		try
-		{
-		    if(warn_overwriting)
-			dialog.pause(tools_printf(dar_gettext("At least one slice of an old archive with the same name remains in the directory %s. It is advised to remove all the old archive's slices before creating an archive of same name. Can I remove these old slices?"), c_chemin.c_str()));
-		    if(!dry_run)
-			tools_unlink_file_mask_regex(dialog, c_chemin, file_mask, info_details);
-		}
-		catch(Euser_abort & e)
-		{
-			// nothing to do, just continue
-		}
-	    }
-	}
+        const string c_chemin = chemin.display();
+        if(tools_do_some_files_match_mask_regex(dialog, c_chemin, file_mask))
+        {
+            if(!allow_overwriting)
+                throw Erange("tools_avoid_slice_overwriting", tools_printf(dar_gettext("Overwriting not allowed while a slice of a previous archive with the same basename has been found in the %s directory, Operation aborted"), c_chemin.c_str()));
+            else
+            {
+                try
+                {
+                    if(warn_overwriting)
+                        dialog.pause(tools_printf(dar_gettext("At least one slice of an old archive with the same name remains in the directory %s. It is advised to remove all the old archive's slices before creating an archive of same name. Can I remove these old slices?"), c_chemin.c_str()));
+                    if(!dry_run)
+                        tools_unlink_file_mask_regex(dialog, c_chemin, file_mask, info_details);
+                }
+                catch(Euser_abort & e)
+                {
+                        // nothing to do, just continue
+                }
+            }
+        }
     }
 
     void tools_add_elastic_buffer(generic_file & f, U_32 max_size)
@@ -1782,19 +1771,19 @@ namespace libdar
         elastic tic = 1 + tools_pseudo_random(max_size); // range from 1 to max_size
         char *buffer = new (nothrow) char[max_size];
 
-	if(buffer == NULL)
-	    throw Ememory("tools_add_elastic_buffer");
-	try
-	{
-	    tic.dump((unsigned char *)buffer, max_size);
-	    f.write(buffer, tic.get_size());
-	}
-	catch(...)
-	{
-	    delete [] buffer;
-	    throw;
-	}
-	delete [] buffer;
+        if(buffer == NULL)
+            throw Ememory("tools_add_elastic_buffer");
+        try
+        {
+            tic.dump((unsigned char *)buffer, max_size);
+            f.write(buffer, tic.get_size());
+        }
+        catch(...)
+        {
+            delete [] buffer;
+            throw;
+        }
+        delete [] buffer;
     }
 
     bool tools_are_on_same_filesystem(const string & file1, const string & file2)
@@ -1802,18 +1791,18 @@ namespace libdar
         dev_t id;
         struct stat sstat;
 
-	if(stat(file1.c_str(), &sstat) < 0)
-	{
-	    string tmp = tools_strerror_r(errno);
-	    throw Erange("tools:tools_are_on_same_filesystem", tools_printf(dar_gettext("Cannot get inode information for %s: %s"), file1.c_str(), tmp.c_str()));
-	}
-	id = sstat.st_dev;
+        if(stat(file1.c_str(), &sstat) < 0)
+        {
+            string tmp = tools_strerror_r(errno);
+            throw Erange("tools:tools_are_on_same_filesystem", tools_printf(dar_gettext("Cannot get inode information for %s: %s"), file1.c_str(), tmp.c_str()));
+        }
+        id = sstat.st_dev;
 
-	if(stat(file2.c_str(), &sstat) < 0)
-	{
-	    string tmp = tools_strerror_r(errno);
-	    throw Erange("tools:tools_are_on_same_filesystem", tools_printf(dar_gettext("Cannot get inode information for %s: %s"), file2.c_str(), tmp.c_str()));
-	}
+        if(stat(file2.c_str(), &sstat) < 0)
+        {
+            string tmp = tools_strerror_r(errno);
+            throw Erange("tools:tools_are_on_same_filesystem", tools_printf(dar_gettext("Cannot get inode information for %s: %s"), file2.c_str(), tmp.c_str()));
+        }
 
         return id == sstat.st_dev;
     }
@@ -1831,53 +1820,53 @@ namespace libdar
 
     void tools_block_all_signals(sigset_t &old_mask)
     {
-	sigset_t all;
+        sigset_t all;
 
-	sigfillset(&all);
+        sigfillset(&all);
 #if HAVE_LIBPTHREAD
-	if(pthread_sigmask(SIG_BLOCK, &all, &old_mask) != 0)
+        if(pthread_sigmask(SIG_BLOCK, &all, &old_mask) != 0)
 #else
-	    if(sigprocmask(SIG_BLOCK, &all, &old_mask) != 0)
+            if(sigprocmask(SIG_BLOCK, &all, &old_mask) != 0)
 #endif
-		throw Erange("tools_block_all_signals", string(dar_gettext("Cannot block signals: "))+tools_strerror_r(errno));
+                throw Erange("tools_block_all_signals", string(dar_gettext("Cannot block signals: "))+tools_strerror_r(errno));
     }
 
     void tools_set_back_blocked_signals(sigset_t old_mask)
     {
 #if HAVE_LIBPTHREAD
-	if(pthread_sigmask(SIG_SETMASK, &old_mask, NULL))
+        if(pthread_sigmask(SIG_SETMASK, &old_mask, NULL))
 #else
-	    if(sigprocmask(SIG_SETMASK, &old_mask, NULL))
+            if(sigprocmask(SIG_SETMASK, &old_mask, NULL))
 #endif
-		throw Erange("tools_set_back_block_all_signals", string(dar_gettext("Cannot unblock signals: "))+tools_strerror_r(errno));
+                throw Erange("tools_set_back_block_all_signals", string(dar_gettext("Cannot unblock signals: "))+tools_strerror_r(errno));
     }
 
     U_I tools_count_in_string(const string & s, const char a)
     {
-	U_I ret = 0, c, size = s.size();
+        U_I ret = 0, c, size = s.size();
 
-	for(c = 0; c < size; ++c)
-	    if(s[c] == a)
-		++ret;
-	return ret;
+        for(c = 0; c < size; ++c)
+            if(s[c] == a)
+                ++ret;
+        return ret;
     }
 
     datetime tools_get_mtime(const std::string & s)
     {
         struct stat buf;
 
-	if(lstat(s.c_str(), &buf) < 0)
-	{
-	    string tmp = tools_strerror_r(errno);
-	    throw Erange("tools_get_mtime", tools_printf(dar_gettext("Cannot get last modification date: %s"), tmp.c_str()));
-	}
+        if(lstat(s.c_str(), &buf) < 0)
+        {
+            string tmp = tools_strerror_r(errno);
+            throw Erange("tools_get_mtime", tools_printf(dar_gettext("Cannot get last modification date: %s"), tmp.c_str()));
+        }
 
 #ifdef LIBDAR_MICROSECOND_READ_ACCURACY
-	datetime val = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec, datetime::tu_nanosecond);
-	if(val.is_null()) // assuming an error avoids getting time that way
-	    val = datetime(buf.st_mtime, 0, datetime::tu_second);
+        datetime val = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec, datetime::tu_nanosecond);
+        if(val.is_null()) // assuming an error avoids getting time that way
+            val = datetime(buf.st_mtime, 0, datetime::tu_second);
 #else
-	datetime val = datetime(buf.st_mtime, 0, datetime::tu_second);
+        datetime val = datetime(buf.st_mtime, 0, datetime::tu_second);
 #endif
 
         return val;
@@ -1887,16 +1876,16 @@ namespace libdar
     {
         struct stat buf;
 
-	if(lstat(s.c_str(), &buf) < 0)
-	{
-	    string tmp = tools_strerror_r(errno);
-	    throw Erange("tools_get_size", tools_printf(dar_gettext("Cannot get last modification date: %s"), tmp.c_str()));
-	}
+        if(lstat(s.c_str(), &buf) < 0)
+        {
+            string tmp = tools_strerror_r(errno);
+            throw Erange("tools_get_size", tools_printf(dar_gettext("Cannot get last modification date: %s"), tmp.c_str()));
+        }
 
-	if(!S_ISREG(buf.st_mode))
-	    throw Erange("tools_get_size", tools_printf(dar_gettext("Cannot get size of %S: not a plain file"), &s));
+        if(!S_ISREG(buf.st_mode))
+            throw Erange("tools_get_size", tools_printf(dar_gettext("Cannot get size of %S: not a plain file"), &s));
 
-	return buf.st_size;
+        return buf.st_size;
     }
 
 
@@ -1904,30 +1893,30 @@ namespace libdar
     {
         struct stat buf;
 
-	if(lstat(s.c_str(), &buf) < 0)
-	{
-	    string tmp = tools_strerror_r(errno);
-	    throw Erange("tools_get_mtime", tools_printf(dar_gettext("Cannot get mtime: %s"), tmp.c_str()));
-	}
+        if(lstat(s.c_str(), &buf) < 0)
+        {
+            string tmp = tools_strerror_r(errno);
+            throw Erange("tools_get_mtime", tools_printf(dar_gettext("Cannot get mtime: %s"), tmp.c_str()));
+        }
 
 #ifdef LIBDAR_MICROSECOND_READ_ACCURACY
-	datetime ret = datetime(buf.st_ctim.tv_sec, buf.st_ctim.tv_nsec, datetime::tu_nanosecond);
-	if(ret.is_null()) // assuming an error avoids getting time that way
-	    ret = datetime(buf.st_ctime, 0, datetime::tu_second);
+        datetime ret = datetime(buf.st_ctim.tv_sec, buf.st_ctim.tv_nsec, datetime::tu_nanosecond);
+        if(ret.is_null()) // assuming an error avoids getting time that way
+            ret = datetime(buf.st_ctime, 0, datetime::tu_second);
 #else
-	datetime ret = datetime(buf.st_ctime, 0, datetime::tu_second);
+        datetime ret = datetime(buf.st_ctime, 0, datetime::tu_second);
 #endif
         return ret;
     }
 
     vector<string> tools_split_in_words(generic_file & f)
     {
-	vector <string> mots;
-	vector <char> quotes;
-	string current = "";
-	char a;
-	bool loop = true;
-	bool escaped = false;
+        vector <string> mots;
+        vector <char> quotes;
+        string current = "";
+        char a;
+        bool loop = true;
+        bool escaped = false;
 
 
         while(loop)
@@ -1938,20 +1927,20 @@ namespace libdar
                 a = ' '; // to close the last word
             }
 
-	    if(escaped)
-	    {
-		current += a; // added without consideration of quoting of any sort
-		escaped = false;
-		continue; // continuing at beginning of the while loop
-	    }
-	    else
-	    {
-		if(a == '\\')
-		{
-		    escaped = true;
-		    continue; // continuing at beginning of the while loop
-		}
-	    }
+            if(escaped)
+            {
+                current += a; // added without consideration of quoting of any sort
+                escaped = false;
+                continue; // continuing at beginning of the while loop
+            }
+            else
+            {
+                if(a == '\\')
+                {
+                    escaped = true;
+                    continue; // continuing at beginning of the while loop
+                }
+            }
 
             if(quotes.empty()) // outside a word
                 switch(a)
@@ -1968,7 +1957,7 @@ namespace libdar
                     break;
                 default:
                     quotes.push_back(' '); // the quote space means no quote
-		    current += a; // a new argument is starting
+                    current += a; // a new argument is starting
                     break;
                 }
             else // inside a word
@@ -1977,8 +1966,8 @@ namespace libdar
                 case '\t':
                     if(quotes.back() != ' ')
                     {
-			    // this is the end of the wor(l)d ;-)
-			    // ...once again... 1000, 1999, 2012, and the next ones to come...
+                            // this is the end of the wor(l)d ;-)
+                            // ...once again... 1000, 1999, 2012, and the next ones to come...
                         break;
                     }
                         // no break !
@@ -1996,7 +1985,7 @@ namespace libdar
                         if(quotes.empty()) // reached end of word
                         {
                             mots.push_back(current);
-			    current = "";
+                            current = "";
                         }
                         else
                             current += a;
@@ -2015,34 +2004,34 @@ namespace libdar
         if(!quotes.empty())
             throw Erange("make_args_from_file", tools_printf(dar_gettext("Parse error: Unmatched `%c'"), quotes.back()));
 
-	return mots;
+        return mots;
     }
 
 
     bool tools_find_next_char_out_of_parenthesis(const string & data, const char what,  U_32 start, U_32 & found)
     {
-	U_32 nested_parenth = 0;
+        U_32 nested_parenth = 0;
 
-	while(start < data.size() && (nested_parenth != 0 || data[start] != what))
-	{
-	    if(data[start] == '(')
-		nested_parenth++;
-	    if(data[start] == ')' && nested_parenth > 0)
-		nested_parenth--;
-	    start++;
-	}
+        while(start < data.size() && (nested_parenth != 0 || data[start] != what))
+        {
+            if(data[start] == '(')
+                nested_parenth++;
+            if(data[start] == ')' && nested_parenth > 0)
+                nested_parenth--;
+            start++;
+        }
 
-	if(start < data.size() && nested_parenth == 0 && data[start] == what)
-	{
-	    found = start;
-	    return true;
-	}
-	else
-	    return false;
+        if(start < data.size() && nested_parenth == 0 && data[start] == what)
+        {
+            found = start;
+            return true;
+        }
+        else
+            return false;
     }
 
     string tools_substitute(const string & hook,
-			    const map<char, string> & corres)
+                            const map<char, string> & corres)
     {
         string ret = "";
         string::iterator it = const_cast<string &>(hook).begin();
@@ -2054,16 +2043,16 @@ namespace libdar
                 it++;
                 if(it != hook.end())
                 {
-		    map<char, string>::const_iterator mptr = corres.find(*it);
-		    if(mptr == corres.end())
-			throw Escript("tools_substitute", string(dar_gettext("Unknown substitution string: %")) + *it);
-		    else
-			ret += mptr->second;
+                    map<char, string>::const_iterator mptr = corres.find(*it);
+                    if(mptr == corres.end())
+                        throw Escript("tools_substitute", string(dar_gettext("Unknown substitution string: %")) + *it);
+                    else
+                        ret += mptr->second;
                     it++;
                 }
                 else // reached end of "hook" string
                 {
-		    throw Escript("tools_hook_substitute", dar_gettext("last char of user command-line to execute is '%', (use '%%' instead to avoid this message)"));
+                    throw Escript("tools_hook_substitute", dar_gettext("last char of user command-line to execute is '%', (use '%%' instead to avoid this message)"));
                 }
             }
             else
@@ -2077,693 +2066,693 @@ namespace libdar
     }
 
     string tools_hook_substitute(const string & hook,
-				 const string & path,
-				 const string & basename,
-				 const string & num,
-				 const string & padded_num,
-				 const string & ext,
-				 const string & context)
+                                 const string & path,
+                                 const string & basename,
+                                 const string & num,
+                                 const string & padded_num,
+                                 const string & ext,
+                                 const string & context)
     {
-	map<char, string> corres;
+        map<char, string> corres;
 
-	corres['%'] = "%";
-	corres['p'] = path;
-	corres['b'] = basename;
-	corres['n'] = num;
-	corres['N'] = padded_num;
-	corres['e'] = ext;
-	corres['c'] = context;
+        corres['%'] = "%";
+        corres['p'] = path;
+        corres['b'] = basename;
+        corres['n'] = num;
+        corres['N'] = padded_num;
+        corres['e'] = ext;
+        corres['c'] = context;
 
         return tools_substitute(hook, corres);
     }
 
 
     void tools_hook_execute(user_interaction & ui,
-			    const string & cmd_line)
+                            const string & cmd_line)
     {
-	NLS_SWAP_IN;
-	try
-	{
-	    const char *ptr = cmd_line.c_str();
-	    bool loop = false;
-	    do
-	    {
-		try
-		{
-		    S_I code = system(ptr);
-		    switch(code)
-		    {
-		    case 0:
-			loop = false;
-			break; // All is fine, script did not report error
-		    case 127:
-			throw Erange("tools_hook_execute", gettext("execve() failed. (process table is full ?)"));
-		    case -1:
-			throw Erange("tools_hook_execute", string(gettext("system() call failed: ")) + tools_strerror_r(errno));
-		    default:
-			throw Erange("tools_hook_execute", tools_printf(gettext("execution of [ %S ] returned error code: %d"), &cmd_line, code));
-		    }
-		}
-		catch(Erange & e)
-		{
-		    try
-		    {
-			ui.pause(string(gettext("Error during user command line execution: ")) + e.get_message() + gettext(" . Retry command-line ?"));
-			loop = true;
-		    }
-		    catch(Euser_abort & f)
-		    {
-			ui.pause(gettext("Ignore previous error on user command line and continue ?"));
-			loop = false;
-		    }
-		}
-	    }
-	    while(loop);
-	}
-	catch(...)
-	{
-	    NLS_SWAP_OUT;
-	    throw;
-	}
-	NLS_SWAP_OUT;
+        NLS_SWAP_IN;
+        try
+        {
+            const char *ptr = cmd_line.c_str();
+            bool loop = false;
+            do
+            {
+                try
+                {
+                    S_I code = system(ptr);
+                    switch(code)
+                    {
+                    case 0:
+                        loop = false;
+                        break; // All is fine, script did not report error
+                    case 127:
+                        throw Erange("tools_hook_execute", gettext("execve() failed. (process table is full ?)"));
+                    case -1:
+                        throw Erange("tools_hook_execute", string(gettext("system() call failed: ")) + tools_strerror_r(errno));
+                    default:
+                        throw Erange("tools_hook_execute", tools_printf(gettext("execution of [ %S ] returned error code: %d"), &cmd_line, code));
+                    }
+                }
+                catch(Erange & e)
+                {
+                    try
+                    {
+                        ui.pause(string(gettext("Error during user command line execution: ")) + e.get_message() + gettext(" . Retry command-line ?"));
+                        loop = true;
+                    }
+                    catch(Euser_abort & f)
+                    {
+                        ui.pause(gettext("Ignore previous error on user command line and continue ?"));
+                        loop = false;
+                    }
+                }
+            }
+            while(loop);
+        }
+        catch(...)
+        {
+            NLS_SWAP_OUT;
+            throw;
+        }
+        NLS_SWAP_OUT;
     }
 
     extern void tools_hook_substitute_and_execute(user_interaction & ui,
-						  const string & hook,
-						  const string & path,
-						  const string & basename,
-						  const string & num,
-						  const string & padded_num,
-						  const string & ext,
-						  const string & context)
+                                                  const string & hook,
+                                                  const string & path,
+                                                  const string & basename,
+                                                  const string & num,
+                                                  const string & padded_num,
+                                                  const string & ext,
+                                                  const string & context)
     {
-	string cmd_line;
+        string cmd_line;
 
-	cmd_line = tools_hook_substitute(hook,
-					 path,
-					 basename,
-					 num,
-					 padded_num,
-					 ext,
-					 context);
+        cmd_line = tools_hook_substitute(hook,
+                                         path,
+                                         basename,
+                                         num,
+                                         padded_num,
+                                         ext,
+                                         context);
 
-	try
-	{
-	    tools_hook_execute(ui, cmd_line);
-	}
-	catch(Euser_abort & g)
-	{
-	    throw Escript("sar::hook_execute", string(dar_gettext("Fatal error on user command line: ")) + g.get_message());
-	}
+        try
+        {
+            tools_hook_execute(ui, cmd_line);
+        }
+        catch(Euser_abort & g)
+        {
+            throw Escript("sar::hook_execute", string(dar_gettext("Fatal error on user command line: ")) + g.get_message());
+        }
     }
 
 
-/*************************************************************/
+        /*************************************************************/
 
 
 
     string tools_build_regex_for_exclude_mask(const string & prefix,
-					      const string & relative_part)
+                                              const string & relative_part)
     {
-	string result = "^";
-	string::const_iterator it = prefix.begin();
+        string result = "^";
+        string::const_iterator it = prefix.begin();
 
-	    // prepending any non alpha numeric char of the root by a anti-slash
+            // prepending any non alpha numeric char of the root by a anti-slash
 
-	for( ; it != prefix.end() ; ++it)
-	{
- 	    if(isalnum(*it) || *it == '/' || *it == ' ')
-		result += *it;
-	    else
-	    {
-		result += '\\';
-		result += *it;
-	    }
-	}
+        for( ; it != prefix.end() ; ++it)
+        {
+            if(isalnum(*it) || *it == '/' || *it == ' ')
+                result += *it;
+            else
+            {
+                result += '\\';
+                result += *it;
+            }
+        }
 
-	    // adding a trailing / if necessary
+            // adding a trailing / if necessary
 
- 	string::reverse_iterator tr = result.rbegin();
-	if(tr == result.rend() || *tr != '/')
-	    result += '/';
+        string::reverse_iterator tr = result.rbegin();
+        if(tr == result.rend() || *tr != '/')
+            result += '/';
 
-	    // adapting and adding the relative_part
+            // adapting and adding the relative_part
 
-	it = relative_part.begin();
+        it = relative_part.begin();
 
-	if(it != relative_part.end() && *it == '^')
-	    it++; // skipping leading ^
-	else
-	    result += ".*"; // prepending wilde card sub-expression
+        if(it != relative_part.end() && *it == '^')
+            it++; // skipping leading ^
+        else
+            result += ".*"; // prepending wilde card sub-expression
 
-	for( ; it != relative_part.end() && *it != '$' ; ++it)
-	    result += *it;
+        for( ; it != relative_part.end() && *it != '$' ; ++it)
+            result += *it;
 
-	result += "(/.+)?$";
+        result += "(/.+)?$";
 
-	return result;
+        return result;
     }
 
     string tools_output2xml(const string & src)
     {
-	string ret = "";
-	U_I cur = 0, size = src.size();
+        string ret = "";
+        U_I cur = 0, size = src.size();
 
-	while(cur < size)
-	{
-	    switch(src[cur])
-	    {
-	    case '<':
-		ret += "&lt;";
-		break;
-	    case '>':
-		ret += "&gt;";
-	        break;
-	    case '&':
-		ret += "&amp;";
-		break;
-	    case '\'':
-		ret += "&apos;";
-		break;
-	    case'\"':
-		ret += "&quot;";
-    	        break;
-	    default:
-		ret += src[cur];
-	    }
-	    ++cur;
-	}
+        while(cur < size)
+        {
+            switch(src[cur])
+            {
+            case '<':
+                ret += "&lt;";
+                break;
+            case '>':
+                ret += "&gt;";
+                break;
+            case '&':
+                ret += "&amp;";
+                break;
+            case '\'':
+                ret += "&apos;";
+                break;
+            case'\"':
+                ret += "&quot;";
+                break;
+            default:
+                ret += src[cur];
+            }
+            ++cur;
+        }
 
-	return ret;
+        return ret;
     }
 
     U_I tools_octal2int(const std::string & perm)
     {
-	U_I len = perm.size();
-	U_I ret = 0;
-	enum { init , octal , trail, error } etat = init;
+        U_I len = perm.size();
+        U_I ret = 0;
+        enum { init , octal , trail, error } etat = init;
 
-	if(perm == "")
-	    return 0666; // permission used by default (compatible with dar's previous behavior)
+        if(perm == "")
+            return 0666; // permission used by default (compatible with dar's previous behavior)
 
-	for(U_I i = 0; i < len ; i++)
-	    switch(etat)
-	    {
-	    case init:
-		switch(perm[i])
-		{
-		case ' ':
-		case '\t':
-		case '\n':
-		case '\r':
-		    break;
-		case '0':
-		    etat = octal;
-		    break;
-		default:
-		    etat = error;
-		    break;
-		}
-		break;
-	    case octal:
-		if(perm[i] == ' ')
-		    etat = trail;
-		else
-		    if(perm[i] >= '0' && perm[i] <= '7')
-			ret = ret*8 + perm[i] - '0';
-		    else
-			etat = error;
-		break;
-	    case trail:
-		if(perm[i] != ' ')
-		    etat = error;
-		break;
-	    case error:
-		throw Erange("tools_octal2int", dar_gettext("Badly formated octal number"));
-	    default:
-		throw SRC_BUG;
-	    }
+        for(U_I i = 0; i < len ; i++)
+            switch(etat)
+            {
+            case init:
+                switch(perm[i])
+                {
+                case ' ':
+                case '\t':
+                case '\n':
+                case '\r':
+                    break;
+                case '0':
+                    etat = octal;
+                    break;
+                default:
+                    etat = error;
+                    break;
+                }
+                break;
+            case octal:
+                if(perm[i] == ' ')
+                    etat = trail;
+                else
+                    if(perm[i] >= '0' && perm[i] <= '7')
+                        ret = ret*8 + perm[i] - '0';
+                    else
+                        etat = error;
+                break;
+            case trail:
+                if(perm[i] != ' ')
+                    etat = error;
+                break;
+            case error:
+                throw Erange("tools_octal2int", dar_gettext("Badly formated octal number"));
+            default:
+                throw SRC_BUG;
+            }
 
-	if(etat == error || etat == init)
-	    throw Erange("tools_octal2int", dar_gettext("Badly formated octal number"));
+        if(etat == error || etat == init)
+            throw Erange("tools_octal2int", dar_gettext("Badly formated octal number"));
 
-	return ret;
+        return ret;
     }
 
     string tools_int2octal(const U_I & perm)
     {
-	vector<U_I> digits = tools_number_base_decomposition_in_big_endian(perm, (U_I)8);
-	vector<U_I>::iterator it = digits.begin();
-	string ret = "";
+        vector<U_I> digits = tools_number_base_decomposition_in_big_endian(perm, (U_I)8);
+        vector<U_I>::iterator it = digits.begin();
+        string ret = "";
 
-	while(it != digits.end())
-	{
-	    string tmp;
-	    tmp += '0' + (*it);
-	    ret = tmp + ret;
-	    ++it;
-	}
+        while(it != digits.end())
+        {
+            string tmp;
+            tmp += '0' + (*it);
+            ret = tmp + ret;
+            ++it;
+        }
 
-	return string("0") + ret;  // leading zero for octal format indication
+        return string("0") + ret;  // leading zero for octal format indication
     }
 
     string tools_get_permission_string(char type, U_32 perm, bool hard)
     {
-	string ret = hard ? "*" : " ";
+        string ret = hard ? "*" : " ";
 
-	if(type == 'f') // plain files
-	    type = '-';
-	if(type == 'o') // door "files"
-	    type = 'D';
-	ret += type;
+        if(type == 'f') // plain files
+            type = '-';
+        if(type == 'o') // door "files"
+            type = 'D';
+        ret += type;
 
-	if((perm & 0400) != 0)
-	    ret += 'r';
-	else
-	    ret += '-';
-	if((perm & 0200) != 0)
-	    ret += 'w';
-	else
-	    ret += '-';
-	if((perm & 0100) != 0)
-	    if((perm & 04000) != 0)
-		ret += 's';
-	    else
-		ret += 'x';
-	else
-	    if((perm & 04000) != 0)
-		ret += 'S';
-	    else
-		ret += '-';
-	if((perm & 040) != 0)
-	    ret += 'r';
-	else
-	    ret += '-';
-	if((perm & 020) != 0)
-	    ret += 'w';
-	else
-	    ret += '-';
-	if((perm & 010) != 0)
-	    if((perm & 02000) != 0)
-		ret += 's';
-	    else
-		ret += 'x';
-	else
-	    if((perm & 02000) != 0)
-		ret += 'S';
-	    else
-		ret += '-';
-	if((perm & 04) != 0)
-	    ret += 'r';
-	else
-	    ret += '-';
-	if((perm & 02) != 0)
-	    ret += 'w';
-	else
-	    ret += '-';
-	if((perm & 01) != 0)
-	    if((perm & 01000) != 0)
-		ret += 't';
-	    else
-		ret += 'x';
-	else
-	    if((perm & 01000) != 0)
-		ret += 'T';
-	    else
-		ret += '-';
+        if((perm & 0400) != 0)
+            ret += 'r';
+        else
+            ret += '-';
+        if((perm & 0200) != 0)
+            ret += 'w';
+        else
+            ret += '-';
+        if((perm & 0100) != 0)
+            if((perm & 04000) != 0)
+                ret += 's';
+            else
+                ret += 'x';
+        else
+            if((perm & 04000) != 0)
+                ret += 'S';
+            else
+                ret += '-';
+        if((perm & 040) != 0)
+            ret += 'r';
+        else
+            ret += '-';
+        if((perm & 020) != 0)
+            ret += 'w';
+        else
+            ret += '-';
+        if((perm & 010) != 0)
+            if((perm & 02000) != 0)
+                ret += 's';
+            else
+                ret += 'x';
+        else
+            if((perm & 02000) != 0)
+                ret += 'S';
+            else
+                ret += '-';
+        if((perm & 04) != 0)
+            ret += 'r';
+        else
+            ret += '-';
+        if((perm & 02) != 0)
+            ret += 'w';
+        else
+            ret += '-';
+        if((perm & 01) != 0)
+            if((perm & 01000) != 0)
+                ret += 't';
+            else
+                ret += 'x';
+        else
+            if((perm & 01000) != 0)
+                ret += 'T';
+            else
+                ret += '-';
 
-	return ret;
+        return ret;
     }
 
 
     U_I tools_get_permission(S_I fd)
     {
-	struct stat buf;
-	int err = fstat(fd, &buf);
+        struct stat buf;
+        int err = fstat(fd, &buf);
 
-	if(err < 0)
-	    throw Erange("tools_get_permission", string(gettext("Cannot get effective permission given a file descriptor: ")) + tools_strerror_r(errno));
+        if(err < 0)
+            throw Erange("tools_get_permission", string(gettext("Cannot get effective permission given a file descriptor: ")) + tools_strerror_r(errno));
 
-	return buf.st_mode & ~(S_IFMT);
+        return buf.st_mode & ~(S_IFMT);
     }
 
 
     void tools_set_permission(S_I fd, U_I perm)
     {
-	NLS_SWAP_IN;
-	try
-	{
-	    if(fd < 0)
-		throw SRC_BUG;
-	    if(fchmod(fd, (mode_t) perm) < 0)
-	    {
-		string tmp = tools_strerror_r(errno);
-		throw Erange("tools_set_permission", tools_printf(gettext("Error while setting file permission: %s"), tmp.c_str()));
-	    }
-	}
-	catch(...)
-	{
-	    NLS_SWAP_OUT;
-	    throw;
-	}
-	NLS_SWAP_OUT;
+        NLS_SWAP_IN;
+        try
+        {
+            if(fd < 0)
+                throw SRC_BUG;
+            if(fchmod(fd, (mode_t) perm) < 0)
+            {
+                string tmp = tools_strerror_r(errno);
+                throw Erange("tools_set_permission", tools_printf(gettext("Error while setting file permission: %s"), tmp.c_str()));
+            }
+        }
+        catch(...)
+        {
+            NLS_SWAP_OUT;
+            throw;
+        }
+        NLS_SWAP_OUT;
     }
 
     uid_t tools_ownership2uid(const string & user)
     {
-	uid_t ret = -1;
+        uid_t ret = -1;
 
-	NLS_SWAP_IN;
-	try
-	{
-	    bool direct_uid_set = false;
+        NLS_SWAP_IN;
+        try
+        {
+            bool direct_uid_set = false;
 
-	    if(user.empty())
-		throw Erange("tools_ownership2uid", gettext("An empty given as user name"));
+            if(user.empty())
+                throw Erange("tools_ownership2uid", gettext("An empty given as user name"));
 
-	    try
-	    {
-		ret = tools_str2int(user);
-		direct_uid_set = true;
-	    }
-	    catch(Erange & e)
-	    {
-		    // the given user is not an uid
-	    }
+            try
+            {
+                ret = tools_str2int(user);
+                direct_uid_set = true;
+            }
+            catch(Erange & e)
+            {
+                    // the given user is not an uid
+            }
 
-	    if(!direct_uid_set)
-	    {
-		char *c_user = tools_str2charptr(user);
-		try
-		{
+            if(!direct_uid_set)
+            {
+                char *c_user = tools_str2charptr(user);
+                try
+                {
 #ifdef __DYNAMIC__
-		    struct passwd *puser = getpwnam(c_user);
-		    if(puser == NULL)
-			throw Erange("tools_ownership2uid", tools_printf(gettext("Unknown user: %s"), c_user));
-		    else
-			ret = puser->pw_uid;
+                    struct passwd *puser = getpwnam(c_user);
+                    if(puser == NULL)
+                        throw Erange("tools_ownership2uid", tools_printf(gettext("Unknown user: %s"), c_user));
+                    else
+                        ret = puser->pw_uid;
 #else
-		    throw Erange("tools_ownership2uid", dar_gettext("Cannot convert username to uid in statically linked binary, either directly provide the UID or run libdar from a dynamically linked executable"));
+                    throw Erange("tools_ownership2uid", dar_gettext("Cannot convert username to uid in statically linked binary, either directly provide the UID or run libdar from a dynamically linked executable"));
 #endif
-		}
-		catch(...)
-		{
-		    delete [] c_user;
-		    throw;
-		}
-		delete [] c_user;
-	    }
-	}
-	catch(...)
-	{
-	    NLS_SWAP_OUT;
-	    throw;
-	}
-	NLS_SWAP_OUT;
+                }
+                catch(...)
+                {
+                    delete [] c_user;
+                    throw;
+                }
+                delete [] c_user;
+            }
+        }
+        catch(...)
+        {
+            NLS_SWAP_OUT;
+            throw;
+        }
+        NLS_SWAP_OUT;
 
-	return ret;
+        return ret;
     }
 
 
     gid_t tools_ownership2gid(const string & group)
     {
-	gid_t ret = -1;
+        gid_t ret = -1;
 
-	NLS_SWAP_IN;
-	try
-	{
-	    bool direct_gid_set = false;
+        NLS_SWAP_IN;
+        try
+        {
+            bool direct_gid_set = false;
 
-	    if(group.empty())
-		throw Erange("tools_ownership2gid", gettext("An empty given as group name"));
+            if(group.empty())
+                throw Erange("tools_ownership2gid", gettext("An empty given as group name"));
 
-	    try
-	    {
-		ret = tools_str2int(group);
-		direct_gid_set = true;
-	    }
-	    catch(Erange & e)
-	    {
-		    // the given group is not an gid
-	    }
+            try
+            {
+                ret = tools_str2int(group);
+                direct_gid_set = true;
+            }
+            catch(Erange & e)
+            {
+                    // the given group is not an gid
+            }
 
-	    if(!direct_gid_set)
-	    {
-		char *c_group = tools_str2charptr(group);
-		try
-		{
+            if(!direct_gid_set)
+            {
+                char *c_group = tools_str2charptr(group);
+                try
+                {
 #ifdef __DYNAMIC__
-		    struct group *pgroup = getgrnam(c_group);
-		    if(pgroup == NULL)
-			throw Erange("tools_ownership2gid", tools_printf(gettext("Unknown group: %s"), c_group));
-		    else
-			ret = pgroup->gr_gid;
+                    struct group *pgroup = getgrnam(c_group);
+                    if(pgroup == NULL)
+                        throw Erange("tools_ownership2gid", tools_printf(gettext("Unknown group: %s"), c_group));
+                    else
+                        ret = pgroup->gr_gid;
 #else
-		    throw Erange("tools_ownership2gid", dar_gettext("Cannot convert username to uid in statically linked binary, either directly provide the UID or run libdar from a dynamically linked executable"));
+                    throw Erange("tools_ownership2gid", dar_gettext("Cannot convert username to uid in statically linked binary, either directly provide the UID or run libdar from a dynamically linked executable"));
 #endif
-		}
-		catch(...)
-		{
-		    delete [] c_group;
-		    throw;
-		}
-		delete [] c_group;
-	    }
-	}
-	catch(...)
-	{
-	    NLS_SWAP_OUT;
-	    throw;
-	}
-	NLS_SWAP_OUT;
+                }
+                catch(...)
+                {
+                    delete [] c_group;
+                    throw;
+                }
+                delete [] c_group;
+            }
+        }
+        catch(...)
+        {
+            NLS_SWAP_OUT;
+            throw;
+        }
+        NLS_SWAP_OUT;
 
-	return ret;
+        return ret;
     }
 
     void tools_set_ownership(int filedesc, const std::string & user, const std::string & group)
     {
-	uid_t uid = -1;
-	uid_t gid = -1;
+        uid_t uid = -1;
+        uid_t gid = -1;
 
-	if(user != "")
-	    uid = tools_ownership2uid(user);
-	if(group != "")
-	    gid = tools_ownership2gid(group);
+        if(user != "")
+            uid = tools_ownership2uid(user);
+        if(group != "")
+            gid = tools_ownership2gid(group);
 
-	if(uid != (uid_t)(-1) || gid != (gid_t)(-1))
-	{
-	    if(fchown(filedesc, uid, gid) < 0)
-	    {
-		string tmp = tools_strerror_r(errno);
-		throw Erange("tools_set_ownership", tools_printf(gettext("Error while setting file user ownership: %s"), tmp.c_str()));
-	    }
-	}
+        if(uid != (uid_t)(-1) || gid != (gid_t)(-1))
+        {
+            if(fchown(filedesc, uid, gid) < 0)
+            {
+                string tmp = tools_strerror_r(errno);
+                throw Erange("tools_set_ownership", tools_printf(gettext("Error while setting file user ownership: %s"), tmp.c_str()));
+            }
+        }
     }
 
     void tools_memxor(void *dest, const void *src, U_I n)
     {
-	unsigned char *d = (unsigned char *) dest;
-	const unsigned char *s = (const unsigned char *) src;
+        unsigned char *d = (unsigned char *) dest;
+        const unsigned char *s = (const unsigned char *) src;
 
-	for(U_I i = 0; i < n; i++)
-	    *d++ ^= *s++;
+        for(U_I i = 0; i < n; i++)
+            *d++ ^= *s++;
     }
 
     tlv_list tools_string2tlv_list(user_interaction & dialog, const U_16 & type, const vector<string> & data)
     {
-	vector<string>::const_iterator it = data.begin();
-	tlv tmp;
-	tlv_list ret;
+        vector<string>::const_iterator it = data.begin();
+        tlv tmp;
+        tlv_list ret;
 
-	tmp.set_type(type);
-	while(it != data.end())
-	{
-	    tmp.reset();
-	    tmp.write(it->c_str(), it->size());
-	    ret.add(tmp);
-	    it++;
-	}
-	return ret;
+        tmp.set_type(type);
+        while(it != data.end())
+        {
+            tmp.reset();
+            tmp.write(it->c_str(), it->size());
+            ret.add(tmp);
+            it++;
+        }
+        return ret;
     }
 
     U_I tools_pseudo_random(U_I max)
     {
-	return (U_I)(max*((float)(rand())/RAND_MAX));
+        return (U_I)(max*((float)(rand())/RAND_MAX));
     }
 
     void tools_read_from_pipe(user_interaction & dialog, S_I fd, tlv_list & result)
     {
-	tuyau tube = tuyau(dialog, fd);
-	result.read(tube);
+        tuyau tube = tuyau(dialog, fd);
+        result.read(tube);
     }
 
     string tools_unsigned_char_to_hexa(unsigned char x)
     {
-	string ret;
-	vector<U_I> digit = tools_number_base_decomposition_in_big_endian(x, (U_I)(16));
-	vector<U_I>::reverse_iterator itr = digit.rbegin();
+        string ret;
+        vector<U_I> digit = tools_number_base_decomposition_in_big_endian(x, (U_I)(16));
+        vector<U_I>::reverse_iterator itr = digit.rbegin();
 
-	switch(digit.size())
-	{
-	case 0:
-	    ret = "00";
-	    break;
-	case 1:
-	    ret = "0";
-	    break;
-	case 2:
-	    break;
-	default:
-	    throw SRC_BUG;
-	}
+        switch(digit.size())
+        {
+        case 0:
+            ret = "00";
+            break;
+        case 1:
+            ret = "0";
+            break;
+        case 2:
+            break;
+        default:
+            throw SRC_BUG;
+        }
 
-	while(itr != digit.rend())
-	{
-	    U_I t = *itr;
-	    if(t > 9)
-		ret += ('a' + (t - 10));
-	    else
-		ret += ('0' + t);
+        while(itr != digit.rend())
+        {
+            U_I t = *itr;
+            if(t > 9)
+                ret += ('a' + (t - 10));
+            else
+                ret += ('0' + t);
 
-	    ++itr;
-	}
+            ++itr;
+        }
 
-	return ret;
+        return ret;
     }
 
     string tools_string_to_hexa(const string & input)
     {
-	string::const_iterator it = input.begin();
-	string ret;
+        string::const_iterator it = input.begin();
+        string ret;
 
-	while(it != input.end())
-	{
-	    ret += tools_unsigned_char_to_hexa((unsigned char)(*it));
-	    ++it;
-	}
+        while(it != input.end())
+        {
+            ret += tools_unsigned_char_to_hexa((unsigned char)(*it));
+            ++it;
+        }
 
-	return ret;
+        return ret;
     }
 
     infinint tools_file_size_to_crc_size(const infinint & size)
     {
-	const infinint ratio = tools_get_extended_size("1G",1024);
-	infinint r;
-	infinint crc_size;
+        const infinint ratio = tools_get_extended_size("1G",1024);
+        infinint r;
+        infinint crc_size;
 
-	if(size != 0)
-	{
-	    euclide(size, ratio, crc_size, r);
-	    if(r > 0)
-		++crc_size;
-	    crc_size *= 4;   // smallest value is 4 bytes, 4 bytes more per each additional 1 Gbyte of data
-	}
-	else
-	    crc_size = 1; // minimal value for no data to protect by checksum
+        if(size != 0)
+        {
+            euclide(size, ratio, crc_size, r);
+            if(r > 0)
+                ++crc_size;
+            crc_size *= 4;   // smallest value is 4 bytes, 4 bytes more per each additional 1 Gbyte of data
+        }
+        else
+            crc_size = 1; // minimal value for no data to protect by checksum
 
-	return crc_size;
+        return crc_size;
     }
 
     string tools_get_euid()
     {
-	string ret;
-	uid_t uid = geteuid();
-	deci conv = infinint(uid);
+        string ret;
+        uid_t uid = geteuid();
+        deci conv = infinint(uid);
 
-	ret += tools_name_of_uid(uid) + "("+ conv.human() + ")";
+        ret += tools_name_of_uid(uid) + "("+ conv.human() + ")";
 
-	return ret;
+        return ret;
     }
 
     string tools_get_egid()
     {
-	string ret;
-	uid_t gid = getegid();
-	deci conv = infinint(gid);
+        string ret;
+        uid_t gid = getegid();
+        deci conv = infinint(gid);
 
-	ret += tools_name_of_gid(gid) + "("+ conv.human() + ")";
+        ret += tools_name_of_gid(gid) + "("+ conv.human() + ")";
 
-	return ret;
+        return ret;
     }
 
     string tools_get_hostname()
     {
-	string ret;
-	struct utsname uts;
+        string ret;
+        struct utsname uts;
 
-	if(uname(&uts) < 0)
-	    throw Erange("tools_get_hostname", string(dar_gettext("Error while fetching hostname: ")) + tools_strerror_r(errno));
+        if(uname(&uts) < 0)
+            throw Erange("tools_get_hostname", string(dar_gettext("Error while fetching hostname: ")) + tools_strerror_r(errno));
 
-	ret = string(uts.nodename);
+        ret = string(uts.nodename);
 
-	return ret;
+        return ret;
     }
 
     string tools_get_date_utc()
     {
-	string ret;
-	datetime now = datetime(::time(NULL), 0, datetime::tu_second);
+        string ret;
+        datetime now = datetime(::time(NULL), 0, datetime::tu_second);
 
-	ret = tools_display_date(now);
+        ret = tools_display_date(now);
 
-	return ret;
+        return ret;
     }
 
     string tools_get_compression_ratio(const infinint & storage_size, const infinint & file_size, bool compressed)
     {
-	if(storage_size == 0 || !compressed)
-	    return "     ";
-	else
-	    if(file_size >= storage_size)
-		return tools_addspacebefore(deci(((file_size - storage_size)*100)/file_size).human(), 4) +"%";
-	    // we can divide by file_size above, because it is never null in that case: file_size >= storage_size > 0
-	    else
-		return gettext("Worse");
+        if(storage_size == 0 || !compressed)
+            return "     ";
+        else
+            if(file_size >= storage_size)
+                return tools_addspacebefore(deci(((file_size - storage_size)*100)/file_size).human(), 4) +"%";
+            // we can divide by file_size above, because it is never null in that case: file_size >= storage_size > 0
+            else
+                return gettext("Worse");
     }
 
 #define MSGSIZE 200
 
     string tools_strerror_r(int errnum)
     {
-	char buffer[MSGSIZE];
-	string ret;
+        char buffer[MSGSIZE];
+        string ret;
 
 #if (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) && ! _GNU_SOURCE
-	    // we expect the XSI-compliant strerror_r
-	int val = strerror_r(errnum, buffer, MSGSIZE);
-	if(val != 0)
-	    strncpy(buffer, "Error code to message conversion failed", MSGSIZE);
+            // we expect the XSI-compliant strerror_r
+        int val = strerror_r(errnum, buffer, MSGSIZE);
+        if(val != 0)
+            strncpy(buffer, "Error code to message conversion failed", MSGSIZE);
 #else
-	char *val = strerror_r(errnum, buffer, MSGSIZE);
-	if(val != buffer)
-	    strncpy(buffer, val, MSGSIZE);
+        char *val = strerror_r(errnum, buffer, MSGSIZE);
+        if(val != buffer)
+            strncpy(buffer, val, MSGSIZE);
 #endif
-	buffer[MSGSIZE-1] = '\0';
-	ret = buffer;
+        buffer[MSGSIZE-1] = '\0';
+        ret = buffer;
 
-	return ret;
+        return ret;
     }
 
 #ifdef GPGME_SUPPORT
     string tools_gpgme_strerror_r(gpgme_error_t err)
     {
-	char buffer[MSGSIZE];
-	string ret;
+        char buffer[MSGSIZE];
+        string ret;
 
-	switch(gpgme_strerror_r(err, buffer, MSGSIZE))
-	{
-	case 0:
-	    break;
-	case ERANGE:
-	    strncpy(buffer, "Lack of memory to display gpgme error message", MSGSIZE);
-	    break;
-	default:
-	    throw SRC_BUG;
-	}
-	buffer[MSGSIZE-1] = '\0';
-	ret = buffer;
+        switch(gpgme_strerror_r(err, buffer, MSGSIZE))
+        {
+        case 0:
+            break;
+        case ERANGE:
+            strncpy(buffer, "Lack of memory to display gpgme error message", MSGSIZE);
+            break;
+        default:
+            throw SRC_BUG;
+        }
+        buffer[MSGSIZE-1] = '\0';
+        ret = buffer;
 
-	return ret;
+        return ret;
     }
 #endif
 
@@ -2771,82 +2760,120 @@ namespace libdar
 #if HAVE_WCHAR_H
     wstring tools_string_to_wstring(const string & val)
     {
-	wstring ret;
-	wchar_t *dst = new (nothrow) wchar_t[val.size() + 1];
+        wstring ret;
+        wchar_t *dst = new (nothrow) wchar_t[val.size() + 1];
 
-	if(dst == NULL)
-	    throw Ememory("tools_string_to_wcs");
-	try
-	{
-	    mbstate_t state_wc;
-	    const char *src = val.c_str();
-	    size_t len;
+        if(dst == NULL)
+            throw Ememory("tools_string_to_wcs");
+        try
+        {
+            mbstate_t state_wc;
+            const char *src = val.c_str();
+            size_t len;
 
-	    memset(&state_wc, '\0', sizeof(state_wc)); // initializing the shift structure
-	    len = mbsrtowcs(dst, &src, val.size(), &state_wc);
-	    if(len == (size_t)-1)
-		throw Erange("tools_string_to_wcs", string(gettext("Invalid wide-char found in string: ")) + strerror(errno));
-	    dst[len] = '\0';
+            memset(&state_wc, '\0', sizeof(state_wc)); // initializing the shift structure
+            len = mbsrtowcs(dst, &src, val.size(), &state_wc);
+            if(len == (size_t)-1)
+                throw Erange("tools_string_to_wcs", string(gettext("Invalid wide-char found in string: ")) + strerror(errno));
+            dst[len] = '\0';
 
-		// converting dst to wstring
+                // converting dst to wstring
 
-	    ret = dst;
-	}
-	catch(...)
-	{
-	    if(dst != NULL)
-		delete dst;
-	    throw;
-	}
-	if(dst != NULL)
-	    delete dst;
+            ret = dst;
+        }
+        catch(...)
+        {
+            if(dst != NULL)
+                delete dst;
+            throw;
+        }
+        if(dst != NULL)
+            delete dst;
 
-	return ret;
+        return ret;
     }
 
     string tools_wstring_to_string(const wstring & val)
     {
-	string ret;
-	const wchar_t *src = val.c_str();
-	mbstate_t state_wc;
-	size_t len;
+        string ret;
+        const wchar_t *src = val.c_str();
+        mbstate_t state_wc;
+        size_t len;
 
-	memset(&state_wc, '\0', sizeof(state_wc)); // initializing the shift structure
-	len = wcsrtombs(NULL, &src, 0, &state_wc);
-	if(len == (size_t)-1)
-	    throw SRC_BUG; // all components of wstring should be valid
+        memset(&state_wc, '\0', sizeof(state_wc)); // initializing the shift structure
+        len = wcsrtombs(NULL, &src, 0, &state_wc);
+        if(len == (size_t)-1)
+            throw SRC_BUG; // all components of wstring should be valid
 
-	char *dst = new (nothrow) char[len + 1];
-	if(dst == NULL)
-	    throw Ememory("tools_wstring_to_string");
-	try
-	{
-	    size_t len2;
-	    memset(&state_wc, '\0', sizeof(state_wc)); // initializing the shift structure
-	    src = val.c_str();
-	    len2 = wcsrtombs(dst, &src, len, &state_wc);
-	    if(len != len2)
-		throw SRC_BUG;
-	    if(len2 == (size_t)-1)
-		throw SRC_BUG; // problem should have already raised above
-	    dst[len2] = '\0';
+        char *dst = new (nothrow) char[len + 1];
+        if(dst == NULL)
+            throw Ememory("tools_wstring_to_string");
+        try
+        {
+            size_t len2;
+            memset(&state_wc, '\0', sizeof(state_wc)); // initializing the shift structure
+            src = val.c_str();
+            len2 = wcsrtombs(dst, &src, len, &state_wc);
+            if(len != len2)
+                throw SRC_BUG;
+            if(len2 == (size_t)-1)
+                throw SRC_BUG; // problem should have already raised above
+            dst[len2] = '\0';
 
-		// converting dst to string
+                // converting dst to string
 
-	    ret = dst;
-	}
-	catch(...)
-	{
-	    if(dst != NULL)
-		delete dst;
-	    throw;
-	}
-	if(dst != NULL)
-	    delete dst;
+            ret = dst;
+        }
+        catch(...)
+        {
+            if(dst != NULL)
+                delete dst;
+            throw;
+        }
+        if(dst != NULL)
+            delete dst;
 
-	return ret;
+        return ret;
     }
 #endif
+
+    void tools_merge_to_vector(vector<string> & a, const vector<string> & b)
+    {
+        vector<string>::const_iterator ptrb = b.begin();
+
+        while(ptrb != b.end())
+        {
+            vector<string>::const_iterator ptra = a.begin();
+
+            while(ptra != a.end() && *ptra != *ptrb)
+                ++ptra;
+
+            if(ptra == a.end())
+                a.push_back(*ptrb);
+
+            ++ptrb;
+        }
+    }
+
+    vector<string> tools_substract_from_vector(const vector<string> & a, const vector<string> & b)
+    {
+        vector<string> ret;
+        vector<string>::const_iterator ptra = a.begin();
+
+        while(ptra != a.end())
+        {
+            vector<string>::const_iterator ptrb = b.begin();
+
+            while(ptrb != b.end() && *ptra != *ptrb)
+                ++ptrb;
+
+            if(ptrb == b.end())
+                ret.push_back(*ptra);
+            ++ptra;
+        }
+
+        return ret;
+    }
 
 
 } // end of namespace

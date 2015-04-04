@@ -33,6 +33,33 @@ extern "C"
 
 using namespace libdar;
 
+config_file::config_file(const vector<string> & target, generic_file &f) : hide_file(f)
+{
+    vector<string>::const_iterator it = target.begin();
+
+    cibles.clear();
+    while(it != target.end())
+    {
+	cibles.push_back(t_cible(*it));
+	++it;
+    }
+}
+
+vector<string> config_file::get_read_targets() const
+{
+    vector<string> ret;
+    vector<t_cible>::const_iterator it = cibles.begin();
+
+    while(it != cibles.end())
+    {
+	if(it->seen)
+	    ret.push_back(it->target);
+	++it;
+    }
+
+    return ret;
+}
+
 void config_file::fill_morceau()
 {
     string read_target;
@@ -41,7 +68,7 @@ void config_file::fill_morceau()
     infinint first, last;
     enum { debut, fin } status = fin;
 
-        // we read any text put before the first condition
+	// we read any text put before the first condition
     tmp.debut = 0;
     tmp.offset = 0;
     morceau.clear();
@@ -52,39 +79,56 @@ void config_file::fill_morceau()
 
     while(find_next_target(*ref, first, read_target, last))
     {
-        switch(status)
-        {
-        case fin:
-            if(first < tmp.debut)
-                throw SRC_BUG; // first byte of the line where next target
-                // resides is before where we started looking for new target !
-            tmp.longueur = first - tmp.debut;
-            last_offset += tmp.longueur;
-            if(tmp.longueur > 0)
-                morceau.push_back(tmp);
-            status = debut;
-                // no break !
-        case debut:
-            if(tools_is_member(read_target, cibles))
-            {
-                tmp.debut = last;
-                tmp.offset = last_offset;
-                status = fin;
-            }
-            break;
-        default:
-            throw SRC_BUG;
-        }
+	switch(status)
+	{
+	case fin:
+	    if(first < tmp.debut)
+		throw SRC_BUG; // first byte of the line where next target
+		// resides is before where we started looking for new target !
+	    tmp.longueur = first - tmp.debut;
+	    last_offset += tmp.longueur;
+	    if(tmp.longueur > 0)
+		morceau.push_back(tmp);
+	    status = debut;
+		// no break !
+	case debut:
+	    if(is_a_target(read_target))
+	    {
+		tmp.debut = last;
+		tmp.offset = last_offset;
+		status = fin;
+	    }
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
     }
 
     if(status == fin)
     {
-        if(ref->get_position() < tmp.debut)
-            throw SRC_BUG;
-        tmp.longueur = ref->get_position() - tmp.debut;
-        if(tmp.longueur > 0)
-            morceau.push_back(tmp);
+	if(ref->get_position() < tmp.debut)
+	    throw SRC_BUG;
+	tmp.longueur = ref->get_position() - tmp.debut;
+	if(tmp.longueur > 0)
+	    morceau.push_back(tmp);
     }
+}
+
+
+bool config_file::is_a_target(const string & val)
+{
+    vector<t_cible>::iterator it = cibles.begin();
+
+    do
+    {
+	if(it->target == val)
+	    it->seen = true;
+	else
+	    ++it;
+    }
+    while(it != cibles.end() && !it->seen);
+
+    return it != cibles.end();
 }
 
 
@@ -98,34 +142,34 @@ bool config_file::find_next_target(generic_file &f, infinint & debut, string & n
 
     while(!found && f.read(&a, 1) == 1)
     {
-        switch(status)
-        {
-        case init:  // looking for next word beginning
-            switch(a)
-            {
-            case ' ':
-            case '\t':
-                break;
-            case '\n':
-                debut = f.get_position();
-                break;
-            default:
-                if(isalpha(a))
-                {
-                    nature = a;
-                    status = search;
-                }
-                else
-                    status = purge;
-            }
-            break;
-        case search: // reading the current word
-            if(isalnum(a) || a == '_' || a == '-')
-                nature += a;
-            else
-                if(a == ':')
-                    status = end;
-                else
+	switch(status)
+	{
+	case init:  // looking for next word beginning
+	    switch(a)
+	    {
+	    case ' ':
+	    case '\t':
+		break;
+	    case '\n':
+		debut = f.get_position();
+		break;
+	    default:
+		if(isalpha(a))
+		{
+		    nature = a;
+		    status = search;
+		}
+		else
+		    status = purge;
+	    }
+	    break;
+	case search: // reading the current word
+	    if(isalnum(a) || a == '_' || a == '-')
+		nature += a;
+	    else
+		if(a == ':')
+		    status = end;
+		else
 		    if(a == '\n')
 		    {
 			status = init;
@@ -133,32 +177,32 @@ bool config_file::find_next_target(generic_file &f, infinint & debut, string & n
 		    }
 		    else
 			status = purge;
-            break;
-        case end: // got a target word (= word + `:' )
-            switch(a)
-            {
-            case ' ':
-            case '\t':
-            case '\r':
-                break;
-            case '\n':
-                fin = f.get_position();
-                found = true;
-                break;
-            default:
-                status = purge;
-            }
-            break;
-        case purge: // just read word is not a target, resetting to the next line
-            if(a == '\n')
-            {
-                status = init;
-                debut = f.get_position();
-            }
-            break;
-        default:
-            throw SRC_BUG;
-        }
+	    break;
+	case end: // got a target word (= word + `:' )
+	    switch(a)
+	    {
+	    case ' ':
+	    case '\t':
+	    case '\r':
+		break;
+	    case '\n':
+		fin = f.get_position();
+		found = true;
+		break;
+	    default:
+		status = purge;
+	    }
+	    break;
+	case purge: // just read word is not a target, resetting to the next line
+	    if(a == '\n')
+	    {
+		status = init;
+		debut = f.get_position();
+	    }
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
     }
 
     return found;

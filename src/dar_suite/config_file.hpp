@@ -39,15 +39,29 @@ using namespace libdar;
 class config_file : public hide_file
 {
 public:
-    config_file(const vector<string> & target, generic_file &f) : hide_file(f) { cibles = target; };
+    config_file(const vector<string> & target, generic_file &f);
+
+
+    vector<string> get_read_targets() const;
 
 protected:
     void fill_morceau();
 
 private:
-    vector<string> cibles;
+    struct t_cible
+    {
+	string target;
+	bool seen;
 
+	t_cible(const string & val) { target = val; seen = false; };
+	t_cible() { target = ""; seen = false; };
+    };
+
+    vector<t_cible> cibles;
+
+    bool is_a_target(const string & val);
     bool find_next_target(generic_file &f, infinint & debut, string & nature, infinint & fin);
+
 };
 
     /// @}

@@ -66,6 +66,8 @@ from 2.4.x to 2.5.0
   on tape medium
 - libdar relies on libthreadar (if available) to split its work among
   several threads
+- dar aborts upon not found user target in included file instead of
+  ignoring it
 
 from 2.4.16 to 2.4.17
 - fixing issue when case insensitive comparison was requested and invalid
