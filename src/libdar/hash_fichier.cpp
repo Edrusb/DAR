@@ -41,6 +41,8 @@ namespace libdar
 	    return "md5";
 	case hash_sha1:
 	    return "sha1";
+	case hash_sha512:
+	    return "sha512";
 	default:
 	    throw SRC_BUG;
 	}
@@ -81,6 +83,9 @@ namespace libdar
 	    break;
 	case hash_sha1:
 	    hash_gcrypt = GCRY_MD_SHA1;
+	    break;
+	case hash_sha512:
+	    hash_gcrypt = GCRY_MD_SHA512;
 	    break;
 	default:
 	    throw SRC_BUG;

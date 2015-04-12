@@ -68,6 +68,7 @@ from 2.4.x to 2.5.0
   several threads
 - dar aborts upon not found user target in included file instead of
   ignoring it
+- added sha512 hashing algorithm beside already available md5 and sha1
 
 from 2.4.16 to 2.4.17
 - fixing issue when case insensitive comparison was requested and invalid

@@ -1605,7 +1605,10 @@ static bool get_args_recursive(recursive_param & rec,
                     if(strcasecmp(optarg, "sha1") == 0)
                         p.hash = hash_sha1;
                     else
-                        throw Erange("get_args", string(gettext("Unknown parameter given to --hash option: ")) + optarg);
+			if(strcasecmp(optarg, "sha512") == 0)
+			    p.hash = hash_sha512;
+			else
+			    throw Erange("get_args", string(gettext("Unknown parameter given to --hash option: ")) + optarg);
                 break;
             case '9':
                 if(optarg == NULL)

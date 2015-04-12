@@ -473,6 +473,8 @@ namespace libdar
 	void set_user_comment(const std::string & comment) { x_user_comment = comment; };
 
 	    /// specify whether to produce a hash file of the slice and which hash algo to use
+	    /// \note the libdar::hash_algo data type is defined in hash_fichier.hpp, valid values
+	    /// are for examle libdar::hash_none, libdar::hash_md5, libdar::hash_sha1, libdar::hash_sha512...
 	void set_hash_algo(hash_algo hash) { x_hash = hash; };
 
 	    /// defines the minimum digit a slice must have concerning its number, zeros will be prepended as much as necessary to respect this
