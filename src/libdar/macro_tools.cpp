@@ -225,7 +225,7 @@ namespace libdar
 	else
 	    stack.ignore_read_ahead(false);
 #else
-	tmp->ignore_read_ahead(true);
+	stack.ignore_read_ahead(true);
 #endif
 	sl.first_size = 0;
 	sl.other_size = 0; // we will change that only if sar object is used
