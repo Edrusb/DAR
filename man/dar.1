@@ -4,9 +4,9 @@
 dar \- create, test, list, extract, compare, merge, isolate dar archives
 .SH SYNOPSIS
 dar [-c | -t | -l | -x | -d | -+ | -C] [<path>/]<basename> [<options>] [<user targets>]
-.P
+.PP
 dar -h
-.P
+.PP
 dar -V
 .SH DESCRIPTION
 .B dar
@@ -175,8 +175,8 @@ makes the terminal ring when user action is required (like for example the creat
 In the file which name is given in argument to this option, You can put any option or argument as used on command line, that will be parsed as if they were in place of the "-B <filename>" option. This way you can overcome the command line size limitation. Commands in the file may be disposed on several lines, and -B option can also be used inside files, leading a file to include other files. But an error occurs in case of loop (a file that includes itself directly or not) and DAR aborts immediately. Comments are allowed, and must start by a hash `#' character on each line. Note that for a line to be considered as a comment the hash character must be the first character of the line (space or tab can still precede the hash). See
 .B Conditional Syntax
 below for a more rich syntax in this type of configuration files known as DCF file (Dar Configuration File). See also the environment variable DAR_DCF_PATH in the ENVIRONMENT section at the end of this document.
-.P
-Note that you can use quotes simple (\') double (") and back-quotes (`) inside such file, but they need to be balanced (have an ending one). To use such character without the meaning of a quote, for example as an apostrophe, you need to escape it using a back-slack ("That\\'s an example"). Of course to add a single back-slash as a normal character in the file you will have to double it ("c:\\\\windows" for example)
+.PP
+Note that you can use quotes simple (\'arg\') double ("arg") and back-quotes (`arg`) inside such file, but they need to be balanced (have an ending one). To use such character without the meaning of a quote, for example as an apostrophe, you need to escape it using a back-slack ("That\\'s an example"). Of course to add a single back-slash as a normal character in the file you will have to double it ("c:\\\\windows" for example)
 .TP 20
 -N, --noconf
 Do not try to read neither ~/.darrc nor /etc/darrc configuration files. See
@@ -232,7 +232,7 @@ During testing, diff or extraction, (-t, -d or -x options respectively), the tab
 -af, --alter=fixed-date
 Modify the -A option behavior, making it receiving a <date> as argument in place of the [<path>]/<basename> default argument. The <date> is used to define which file to save: file which modification is newer or equal to <date>, and which to consider unchanged: those older than <date>. This option has only a meaning when creating an archive (-c option) and must be placed before -A option to have an effect.
 .RS
-.P
+.PP
 <date> must be a date in the two following possible formats:
 .RS
 .TP 30
@@ -240,17 +240,17 @@ Modify the -A option behavior, making it receiving a <date> as argument in place
 .TP 30
 - a date in the following form [[[year/]month/]day-]hour:minute[:second]
 .RE
-.P
+.PP
 Here are some examples of date:
 .RS
 91836383927108078
-.P
+.PP
 2005/11/19-19:38:48 Which is 38 past 7 PM and 48 seconds, the 19th of November 2005
-.P
+.PP
 20:20 Which is 8 PM of the current day
-.P
+.PP
 2-00:08 Which is 8 past noon, the second day of the current month
-.P
+.PP
 2/2-14:59 Which is 1 to 3 PM, the 2nd of February in the current year
 .RE
 .RE
@@ -258,9 +258,9 @@ Here are some examples of date:
 -@, --aux [<path>]/<basename>, --on-fly-isolate [<path>]/<basename>
 specifies an auxiliary archive of reference (merging context) or the name of the on-fly isolated catalogue (creation context). This option is thus only available with -+ option (merging) and -c option (archive creation). Note that --aux and --on-fly-isolate are really aliases to the same option, this is the context of use (archive creation or merging) which lead it to behave a way or another.
 .RS
-.P
+.PP
 In a merging context, over -A option which is mandatory, you may give a second archive of reference thanks to the -@ option. This allows you to merge two archives into a single one. See also -$ option (encryption) -~ option (command execution) and -% (crypto block size) for other options concerning auxiliary archive of reference. They are the respective equivalent of -J, -F and -* options relative to archive given thanks to -A option.
-.P
+.PP
 In a backup context -@ option let the user specify the archive name for an on-fly isolation. With on-fly isolation, you can also use -$ option (to define encryption algorithm and passphrase), -~ option (to execute a command once the on-fly isolated catalogue is completed) and -% option (crypto block size). On-fly isolated catalogue is always bzip2 if possible else gzip else lzo compressed (using compression level 9) else not compressed, and it is also always a single sliced archive. Due to command-line exiguity, it is not possible to change compression algo nor slice size for the on-fly isolation. If you need a more complicated isolation, either look for a GUI over libdar, or do a normal (= not an on-fly) isolation operation (By the way it is possible to isolate an already isolated catalogue, this is equivalent to doing a copy, but you can change encryption, compression or slicing, for example), you can also use dar_xform on an isolated catalogue if you only want to change slices size (this is faster as no decompression/re-compression nor encryption/decryption is necessary). Using the merging operation on an isolated catalogue instead of isolating the isolated catalogue, leads the resulting archive to not be able to be used as a rescue for internal catalogue of the original archive. --aux-ref is a synonym to --aux.
 .RE
 .TP 20
@@ -288,11 +288,11 @@ Files listed in the listing file are included for the operation. No wildcard exp
 .TP 20
 -], --exclude-from-file <listing_file>
 Files listed in the listing file are excluded from the operation. If a directory is listed in the file all its contents is excluded. This option is the opposite of -[ and acts the same was as -P option does (in particular it is compared to the whole path+filename and applies to files and directories). As for -[ option, -] listing file can contain absolute paths, but wildcards are not expanded, neither.
-.P
+.PP
 .B File selection in brief:
-.P
+.PP
 As seen above, -I -X -P, -g, -[ and -] options are used to select the files to operate on. -I and -X only use the name of files and do not apply to directories, while -P, -g -[ and -] use the filename *and* the path, they *do* apply to directories.
-.P
+.PP
 since version 2.2.0 two modes of interpretation of these options exist. The normal original method and the ordered method:
 .RS
 .TP 5
@@ -306,40 +306,40 @@ The ordered method takes care of the order of presence between -X and -I in one 
 -X "*.mp?" -I "*.mp3" -I "toto*"
 Here dar will include all files except file of name "*.mp?" (those ending with "mpX" where X is any character), but it will however include those ending with ".mp3". It will also include files which name begin by "toto" whatever they end with. This way, "toto.mp2" will be saved (while it matches "*.mp?" it also begins by "toto") as well as "toto.txt" as well as "joe.mp3" (while it matches "*.mp?" it also ends by "mp3"). But will not be saved "joe.mp2" (because it does not begin by "toto", nor ends by "mp3", and match "*.mp?" mask). As we see the last option (-I or -X) overcomes the previous one. -P, -g, -[ and -] act together the same but as seen above they do not only act on filename, but on the whole path+filename. Note that (-g, -P, -[, -]) and (-X , -I) are independent concerning their relative order. You can mix -X -I -g -P -] -[ in any order, what will be important is the relative positions of -X options compared to -I options, and the relative positions of -g -[ -] and -P options between them.
 .RE
-.P
+.PP
 In logical terms, if <prev_mask> is the mask generated by all previous mask on the command line, -I <mask> generates the new following mask: <prev_mask> or <mask> . While -X <mask> generates the new following mask: <prev_mask> and not <mask>. This is recursive each time you add a -I or -X option. Things work the same with -P, -g, -[ and -] options.
 .RE
 .B This ends the file selection explication
 let's continue with other options.
-.P
+.PP
 .TP 20
 -u, --exclude-ea <mask>
 Do not consider the Extended Attributes (EA) that are matched by the given mask. By default, no EA are excluded, if the support for EA has been activated at compilation time. This option can be used multiple times.
 .TP 20
 -U, --include-ea <mask>
 Do only consider the EA that match the given mask. By default, all EA are included if no -u or -U option is present and if the support for EA has been activated at compilation time. This option can be used multiple times. See also the -am and -ae options, they also apply to -U and -u options and read below the Note concerning EA.
-.P
+.PP
 .B Note concerning Extended Attributes (EA)
-.P
+.PP
 .RS
 Support for EA must be activated at compilation time (the configure script tries to do so if your system has all the required support for that). Thus you can get two binaries of dar (of the same version), one supporting EA and another which does not (dar -V to see whether EA support is activated). The archives they produce are the same and can be read by each other. The only difference is that the binary without EA support is not able to save or restore EAs, but is still able to test them and list their presence.
-.P
+.PP
 In the following when we will speak about Extended Attribute (EA) or EA entry, we will only consider a particular Extended Attribute key and its value. By opposition, the set of all EA associated to a file will be designated by "EA set".
-.P
+.PP
 Since version 2.3.x the name of EA entries include the namespace for dar be able to consider any type of EA (not only "system" and "user" as previously). Thus the two previous options -u and -U have changed and now take an argument which is a mask applied to EA entry names written in the following form
 .I
 namespace.name
 where "namespace" is for example "user". Note that the mask may or may not include the dot (.) and may match arbitrary part of the EA namespace+name, just remind that masks will be applied to the "namespace.name" global string.
-.P
+.PP
 the -am flag here also enables the ordered method, for EA selection too. The ordered versus normal method have been explained above in the file selection note, with some examples using -X and -I. Here this is the same with -U and -u, (just replace -X by -u and -I by -U, the corresponding mask will apply to Extended Attribute selection in place of file selection).
 
 Another point, independently of the -am option the -ae option can be used at restoration time only. If set, when a file is about to be overwritten, all EA will be first erased before restoring those selected for restoration in the archive (according to the -U and -u options given). If not set, the EA of the existing file will be overwritten, those extra EA that are not in the archive or are not selected for restoration in regard to the -u and -U options will be preserved. If you have not used any -u/-U option at backup time and want to restore from a set of full/differential backups the EA exactly as they were, you have to use -ae for dar removes the EA before overwriting their set of EA as stored in the archive. Without -ae option dar will simply add EA to existing ones, thus get a different set of EA for a give file than those recorded at the time of the backup.
-.P
+.PP
 Last point the -acase and -an options alters the case sensitivity of the  -U and -u masks that follow them on the command-line/included files as they do for -I, -X, -P, -g, -[ and -] as well. Very last point ;-), if -ac option is used during backup dar set back the atime after having read each file (see -aa/-ac options), this has as side effect to modify the ctime date of each file. But ctime change is used by dar to detect EA changes. In brief, the next time you backup a file that had to be read (thus which contents changed), its EA will be saved even if they had not changed. To avoid this side effect, don't use the -ac option if not necessary.
 .RE
 .B This ends the Extended Attribute selection explication
 let's continue with other options.
-.P
+.PP
 .TP 20
 -4 --fsa-scope <family>[,<family>[, ...]
 Reduce the scope of Filesystem Specific Attribute (FSA) to be considered for the operation. FSA are grouped by family. Current available families are:
@@ -353,9 +353,9 @@ this family takes care of Mac OS X HFS+ birth date of files, in addition of comm
 .TP 5
 none
 "none" is not a FSA family but can be used alone to ignore all FSA families.
-.P
+.PP
 By default no restriction is done and FSA of all families are considered at restoration time, but if a family has not been activated at compilation time a warning is issued for each file that cannot have its FSA restored completely (unless this family is excluded from the scope thanks to the -4 option). At backup time, if an FSA family has not been activated at compilation time, no warning is issued and FSA of that family are ignored. Still at backup time, you can also ignore FSA that have compilation time support by excluding them from the operation thanks to this -4 option.
-.P
+.PP
 Example of use: --fsa-scope extX,HFS+
 .RE
 .TP 20
@@ -366,7 +366,7 @@ paragraph above for a detailed explanation of this option. It has also an incide
 .TP 20
 -an, --alter=no-case
 set the filters in case insensitive mode. This concerns only masks specified after this option (see also -acase option below). This changes the behavior of -I, -X, -g, -P, -Z, -Y, -u and -U options.
-.P
+.PP
 Warning: case insensitivity requires interpreting filenames which depends on the locale with which dar is run (defined by the LANG environment variable). For example if you create files with LANG set to fr_FR.UTF-8 and use non plain ASCII characters in filename, there is chances that these non ASCII characters will be stored over several bytes in that filename: so called "wide characters". If then you run dar with LANG set to another value like ru_RU.koi8r, there is much chances that these wide characters do not correspond to the same letter or worse, that they do not match any valid wide character for that locale. A filename is always a sequence of bytes and always saved as such, but using --alter=no-case implies interpreting that sequence in a way that depends on the given locale (as defined by the LANG environment variable). As such, dar cannot know if a given file has to be read with fr_FR.UTF-8 locale or with it_IT.iso88591 or ru_RU.koi8r and so on, because this information is not stored in filenames. In consequence, if different locales are used on your system and you are doing a system wide backup, using --alter=no-case option may lead dar to detect invalid wide character, in that case it falls back to a byte by byte case sensitivity comparison (ASCII characters), which may not be what you would expect at first sight: Most of the time, an upper case wide character (stored on several bytes) does not match the equivalent lower case wide character (several bytes too), when case sensitivity comparison is performed byte by byte.
 .TP 20
 -acase, --alter=case
@@ -403,7 +403,7 @@ only inode type and last modification date is considered as well as inode specif
 inode-type
 Only the inode type is considered. Ownership, permission and dates are ignored. Inode specific attributes are still considered (like file size for plain files). Thus comparison will ignore differences for ownership, permission, and dates and at restoration dar will not try to set the ownership, permission and dates.
 .RE
-.P
+.PP
 When no flag is provided to this option, -O option acts as if the "ignore-owner" flag was set, which is the behavior in older releases (< 2.3.0). Note also that for backward compatibility, --ignore-owner option still exists and since version 2.3.0 is just an alias to the --comparison-field=ignore-owner option. Of course if this option is not used, all fields are used for comparison or restoration.
 .TP 20
 -H[num], --hour[=num]
@@ -450,14 +450,14 @@ same as -E and -F but is applied between slices of the auxiliary archive (-@ opt
 .RS
 .B In the first syntax,
 encrypt/decrypt the archive using the <algo> cipher with the <string> as pass phrase. An encrypted archive can only be read if the same pass phrase is given (symmetric encryption). Available ciphers are "blowfish" (alias "bf"), "aes", "twofish", "serpent" and "camellia" for strong encryption and "scrambling" (alias "scram") for a very weak encryption. By default if no <algo> or no ':' is given, the blowfish cipher is assumed. If your password contains a column ':' you need to specify the cipher to use (or at least use the initial ':' which is equivalent to 'bf:'). If the <string> is empty the pass phrase will be asked at execution time. Thus, the smallest argument that -K can receive is ':' which means blowfish cipher with the pass phrase asked at execution time.
-.P
+.PP
 Note that giving the passphrase as argument to -K (or -J or '-$' see below) may let other users learn pass phrase (thanks to the ps, or top program for examples). It is thus wise to either use an empty pass which will make dar ask the pass phrase when needed, or use -K (or -J option) from a Dar Command File (see -B option), assuming it has the appropriated permission to avoid other users reading it. For those paranoids that are really concerned about security of their passwords, having a password read from a DCF is not that secure, because while the file gets parsed, dar makes use of "unsecured" memory (memory than can be swapped to disk under heavy memory load conditions). It is only when the passphrase has been identified that locked memory (aka secure memory) is used to store the parsed passphrase. So, the most secure way to transmit a passphrase to dar, then to libdar, then to libgcrypt, is having dar asking passphrase at execution time, dar then makes use of secured (locked) memory from the beginning.
-.P
+.PP
 since archive format 9 (archive generated by release 2.5.0 and following) at reading time, it is not necessary to provide the encryption algorithm used, just the passphrase is required, dar will figure out which encryption algorithm had been used at archive creation time. You can either ommit -K in which case dar will ask for the passphrase at execution time, or you can use -K <string> in a DCF file as explained above (avoid using -K directly on command-line).
-.P
+.PP
 .B The second syntax
 starts with the word "gnupg" followed by a column ':' . In that situation, the same set or symmetric encryption algorithms as described above is available after the column, but the passphrase is not given by the user but randomly chosen by libdar and encrypted using the public key of the target users which email is given in a comma separated list. This random key (see also --key-length below), once encrypted is placed at the beginning and at the end of the generated archive. At reading time only the listed user will be able to read that archive thanks to their respective private key. This feature implies that each user (the archive creator as well as the target users) have their GnuPG keyring set properly. In particular, the archive creator must have validated the public keys of the target users, and the target users must own the corresponding private key in their keyring. Example: using "--key gnupg::bob@nowhere.org,joe@somewhere.com" will generate a blowfish encrypted archive which passprhase randomly chosen by libdar will be encrypted with the public keys of bob@nowhere.org and joe@somewhere.com. To use AES in place of blowfish one could use "--key gnupg:aes:bob@nowhere.org,joe@somewhere.com". Note that no check is done about the trust you have set in GPG keyring that a particular public key is owned by the phyical person you expect. See also --sign option below.
-.P
+.PP
 Note that if you have set a passphrase on your private key, dar will ask it dynamically, which requires dar to be run from a terminal. No other way has been provided to transmit a private key's passphrase to libdar. In consequence if you want to use dar/libdar in scripts and make use of public key algorithm you should avoid setting a passphrase to the private key you want to use.
 .RE
 .TP 20
@@ -487,7 +487,7 @@ when using k M G T E Z Y prefixes to define a size, use the SI meaning: multiple
 .TP 20
 -abinary, --alter=binary[-unit[s]]
 when using k M G T E Z Y prefixes to define a size, use the historical computer science meaning: multiple of 2^10  (a Mega is 1,048,576).
-.P
+.PP
 The --alter=SI and --alter=binary options can be used several times on the command line. They affect all prefixes which follow, even those found in files included by the -B option, up to the next --alter=binary or --alter=SI occurrence. Note that if in a file included by the -B option, an --alter=binary or --alter=SI is encountered, it affects all the following prefixes, even those outside the included files. For example, when running with the parameters "-B some.dcf -s 1K", 1K may be equal to 1000 or 1024, depending on --alter=binary or --alter=SI being present in the some.dcf file. By default (before any --alter=SI/binary option is reached), binary interpretation of prefixes is done, for compatibility with older versions.
 .TP 20
 -ac, --alter=ctime
@@ -521,7 +521,7 @@ job to update atimes when files are accessed for reading. This is in
 accordance with what atimes and ctimes were meant to represent. This is Dar's default
 (since version 2.4.0), unless 'furtive read mode' (see below) is
 supported by your system and dar has been compiled with this support activated.
-.P
+.PP
 .B
 Furtive read mode
 is a mode in which neither atime nor ctime are modified while dar reads each file and directory. This provides
@@ -605,9 +605,9 @@ don't save contents of directories that use the Cache Directory Tagging Standard
 -/ , --overwriting-policy <policy>
 This option let the user define when or how file overwriting can occur at restoration or archive merging time. It does no apply to slice overwriting which are driven by the -n option, it does instead apply to file during extraction and files inside archives when merging two of them. When considering overwriting, a file is said to be 'in place' while an other is known as 'new' or 'to be added'. At restoration time, the 'in place' is the one that is present in filesystem while the 'to be added' is the one from the archive. At merging time, the 'in place' is the one of the '-A' archive of reference while the 'to be added' is the one from the auxiliary '-@' archive or reference.
 .RS
-.P
+.PP
 As soon as you use -/ option -n only applies only to slice overwriting and the -r, -k and -ae options are ignored (restoration options).
-.P
+.PP
 The given <policy> argument is composed of actions and eventually of conditional expressions. Actions do define how to solve overwriting conflict about file's data on one side and file's Attributes (Extended and Filesystem Specific) on the other side. An action is thus a couple of action for Data and for EA+FSA. Actions for Data are represented by uppercase letters, while action for EA+FSA are defined by lowercase letters. Both actions are independent of each other:
 .RE
 .RS
@@ -659,7 +659,7 @@ means 'Ask for user decision'. This uppercase letter concerns Data overwriting. 
 .TP 5
 a
 means 'Ask for user decision'. This lowercase letter is the equivalent for EA and FSA of the 'A' action. It is intended to be used in the same conditional statements described below.
-.P
+.PP
 An action is thus a couple of letters, the first being uppercase (for file's data) the second being lowercase (for file's EA and FSA). When -/ option is not given, the action is equivalent to '-/ Oo', making dar proceed to file, EA and FSA overwriting. This is to stay as close as possible to the former default action where neither -n nor -w where specified. Note that -w option stays untouched, in consequences, in this default condition for -/ option, a confirmation will be asked to the user before dar proceed to any overwriting. The former -n option (still used to handle slice overwriting) can be replaced by its equivalent '-/ Pp' for resolving file overwriting conflict (never overwrite). Here follows some examples of actions, all these are done for any entry found in conflict during archive merging or archive extraction, we will see further how to define conditional actions.
 .TP 5
 -/ Rr
@@ -670,26 +670,26 @@ will keep data of the 'in place' file and EA and FSA set from the 'to be added' 
 .TP 5
 -/ Ss
 Using this option when merging an archive with itself (used both as archive of reference (-A option) and auxiliary archive of reference (-@ option) ) will provide the same action as an archive isolation of the archive of reference, but using twice more memory (so keep using the isolation operation as before! Here this is just an illustration of the possibility)
-.P
+.PP
 As seem previously -u and -U options can be used to filter which EA entry to consider and which to ignore. The question here is to explain how this filtering mechanism interacts with the different policies we just presented above. For files that are not in conflict (found only as 'in place' or as 'to be added'), only the EA entries matching the EA filter are kept. For files in conflict, the overwriting policy is evaluated first, then the filtering mechanism is applied *after* it. Thus for example, using the following [ -/ "Po" -u "*test" ], when merging two archives, only EA ending with "test" will be retained, and when a conflict takes place, this "*test" ending EA will be taken from the 'to be added' file if it has some EA of that type, its other EA entry will be ignored as well as any EA entry of the 'in place' file even those ending by "test". At restoration in using the same options, file without conflict will get restored but only EA entry ending with "test" will be restored, and for file with conflict (already present in filesystem), EA set of file in filesystem will be removed and replaced the EA entries of the file in archive that ends by "test", if some exist.
-.P
+.PP
 the situation is similar with FSA family scope and overwriting policy. Only FSA of a family present in the scope will be retained, the overwriting policy acts first then the FSA scope is applied. Note however that any FSA present on filesystem and excluded from the FSA scope are not touched.
-.P
+.PP
 Well, now let's see how to bring some more fun using conditional statements in all these actions. The structure to use is the following:
 .TP 5
-{<condition>}[<action to follow if condition is true>]
+{<condition>}[<action if condition is true>]
 This syntax let you place an action (as the ones we saw just above) inside the brackets '[' and ']' (for example [Pp]) that will take effect only if the evaluation of the <condition> is true.
 Stated that a such statement is a new type of action, you may have guessed that you may use it recursively: {<condition1>}[{<condition2>}[<action>]).
 Well so far it seems useless. But instead of the "if <condition> then <action> else <action>" paradigm common to programming languages, due to the command line context it has been chosen to instead use and implicit "OR" operator between actions.
 Thus you can "stack" conditional statements this way: {<condition1>}[<action1>] {<condition2>}[<action2>] <action3>. In this example, if <condition1> is true then <action1> will be used, ELSE if <condition2> is true then <action2> will be used ELSE <action3> will be used.
 This leads to the same possibilities as what is available with programming languages, but with a slightly more simple syntax. Seen this, the recursion of conditional syntax is more interesting.
-For readability, you are allowed to add any space or tab in the overwriting policy, but the resulting overwriting policy must be given as a single argument to dar, thus the use of quotes (either simple ' or double ") is necessary.
-.P
+For readability, you are allowed to add any space or tab in the overwriting policy, but the resulting overwriting policy must be given as a single argument to dar, thus the use of quotes (either simple \'arg\' or double "arg") is necessary.
+.PP
 The last operator we will see is the 'chain' operator. Once an expression is evaluated, the resulting couple of action may contain an '*' (undefined action for EA or data). Further evaluation must be done. The chain operator which is represented by a semi-column ';' let one to separate several independent expressions that will be evaluated in turn up to the time the couple of action is fully defined. Once an action (for EA or for Data) is defined, it can be redefined by a subsequent evaluation in the chain, however if the action is defined it cannot be set back to undefined, thus '*' will never overwrite a previously defined action. If at the end of the policy the couple of action is not fully defined, the 'preserve' action is used ('P' or 'p' depending on which of EA or Data is left undefined). Here follow a example of syntax:
 .TP 5
 -/ "{<condition1>}[P*] O* ; {<condition2>[*p] *o} ; Rr"
 The first expression will evaluate to either P* or O*. At this step, as the action is not completely defined, the second part of the chain is evaluated, It will end with either *p or *o. In any case, we have after this second statement of the chain a fully defined action for both data and EA (either Pp, Po, Op or Oo). Thus the evaluation stops here and the "Rr" policy will never be evaluated.
-.P
+.PP
 We now have one last thing to see: the available conditions (what to place between braces '{' and '}'). Conditions are defined each by a letter, eventually followed by an argument between parenthesis. The usual logical operators are available: negation (!), conjunction (&) disjunction (|). These characters must be escaped or quoted to not be interpreted by the shell when used on command-line. In particular the '!' under most shell must be quoted and escaped (-/ '{\\!R}[..]..', The escape character '\\' is not necessary inside DCF files (those given to -B option) as no shell is used to interpret these files. To these usual operators has been added a new one: the "inversion" operator, noted '~'. Like the negation, it is an unary operator but unlike the negation, it inverses the roles of 'in place' and 'to be added' for the evaluation, which is slightly different from taking the negation of the result of the evaluation. All these operators follow the usual precedence: unary operators ('!' and '~') are evaluated first, then the conjunction '&' then the disjunction '|'. To override this, you can use parenthesis '(' and ')' inside the condition. Over these logical operators, the conditions are based on atomic operator that compare the 'in place' file to the 'to be added' file. Here they follow:
 .TP 5
 I
@@ -745,7 +745,7 @@ true if the 'in place' entry has bigger EA set or equal size EA set than the 'to
 .TP 5
 s
 true if the 'in place' entry is an inode (or a hard linked inode) and has its EA saved in the archive of reference, not only marked present but unchanged since last backup. This test does not take the 'to be added' entry into account.
-.P
+.PP
 Well, you've seen that uppercase letter are kept when comparison is based on the inode or data while lowercase letter is used for atomics based on EA. Now that we have completed our tour of this feature let's see some examples:
 .TP 5
 -/ Pp
@@ -775,7 +775,7 @@ A file is considered as changed when the last modification time has changed betw
 .PP
 Note: since release 2.5.0, in normal condition no byte is wasted when a file changed at the time it was read for backup, except when doing a backup to pipe (using '-c -' option), except if the beginning of the modified file is located in a previous slice and except if slice hashing or strong encryption is used.
 .RE
-.P
+.PP
 .TP 20
 -ad, --alter=decremental
 This flag is to be used only when merging two archives. Instead of the usual merging where each files of both archives are added to the resulting archive with eventually a tie using the overwriting policy (see -/ option), here the merging builds an archive which corresponds to the decremental backup done based on two full backups. the -A backup is expected to receive the older archive while the -@ is expected to point to the more recent one. If this option is used, the eventually overwriting policy is ignored and replaced internally by -/ "{T&R&~R&(A|!H)}[S*] P* ; {(e&~e&r&~r)|(!e&!~e)}[*s] *p". Additionally, files found int the newer archive that do not existed in the older are replaced by a 'detruit' entry, which marks them to be remove at restoration time. For more information about decremental backups read the usage_notes.html file in the documentation.
@@ -812,9 +812,9 @@ With this option set, when creating, isolating or merging an archive, beside eac
 -7, --sign email[,email[,...email]]
 When creating an archive with public key encryption (read -K option) it is also possible to sign it with one or more of your private key(s). At the difference of the hash feature above, only the randomly generated key used to cipher the archive, key that is dropped at the beginning and at the end of the archive, is signed. If the archive is modified at some place, that part will not be possible to decipher, but signature verification will stay quick and valid, unless the part that has been tempered is the key inside the archive in which case signature check will report a failure and archive will not be readable at all. If the signature is valid and the archive could be extracted without error, the whole archive could be assumed to be signed by the gnupg key owners, but read below the security note.
 .RS
-.P
+.PP
 A summay information about the signature information is displayed while listing an archive in summary mode "dar -l <archive> -q". For any operation involving a signed archive, a short message only shows if the archive is signed an one or more signature check failed, no message is displayed in case of successful signature check. This warning may be disabled using the --alter=blind-to-signatures command.
-.P
+.PP
 .B Security Note:
 This way of signing has some vulnerabilities: If a recipient's private key has been compromised, it is possible for the attacker to know the key used to cipher the archive: this randomly chosen key for symmetrical encryption is placed encrypted inside the archive using the asymetrical algorithm that the attacker can decypher using the compromised private key. Such attacker can then generate a completely different archive using the same key you have signed. To cope with that, it is advised to use the --hash option to generate md5 or sha1 files of each slices and to (also) sign those files that will be provided beside the archive slices.
 .RE
@@ -892,9 +892,9 @@ The --ref option can be used with an isolated catalogue to rescue an archive tha
 .TP 20
 -ado-not-compare-symlink-mtime, --alter=do-not-compare-symlink-mtime
 With this option set, when comparing a symlink, no message shows when symlink in archive and symlink on filesystem do only differ by their mtime. See also -O option.
-.P
+.PP
 No other specific option, but all general options are available except for example -w which is useless, as testing and comparing only read data. -A option is available as described in GENERAL OPTIONS to backup of internal catalogue of the archive (assuming you have a previously isolated catalogue available).
-.P
+.PP
 Doing a difference in sequential read mode is possible but hard linked inodes can only be compared to the filesystem the first time they are met, next hard links to this same inode cannot obtain the corresponding data because skipping backward in sequential read mode is forbidden. In that situation, the hard links are reported as skipped, meaning that data comparison could not be performed.
 .PP
 .B LISTING OPTIONS (to use with -l)
@@ -903,7 +903,7 @@ Doing a difference in sequential read mode is possible but hard linked inodes ca
 -T, --list-format=<normal | tree | xml | slicing>, --tree-format
 .RS
 By default, listing provides a tar-like output (the 'normal' output). You can however get a tree-like output, an XML structured output or a output focused on slice(s) where each file's data, EA and FSA is located in. Providing -T without argument gives the same as providing the 'tree' argument to it. The option --tree-format is an alias to --list-format=tree (backward compatibility). Note that the files doc/dar-catalog-*.dtd define the format of the XML output listing (This file is also installed under $PREFIX/share/doc)
-.P
+.PP
 the -Tslicing option can be used with isolated catalogue generated with dar 2.5.0 or above, as it contains a copy of the slicing layout of the archive of reference. However, if the archive of reference has been resliced (using dar_xform) after the isolated catalogue has been built, the slicing information will not be correct. For that corner case, you can use the -s and -S options with -Tslicing to specify what are the new slice sizes of the archive of reference.
 .RE
 .TP 20
@@ -915,7 +915,7 @@ list Extended Attributes name for each file that has some.
 .TP 20
 -I, -X, -P, -g, -[, -]
 can be used to filter file to list base on their name or path.
-.P
+.PP
 From the general options it seems only -vm and -b stay useful here. Note that -vm displays an archive summary first, where a detailed of information about the archive can be obtained. If you want to display only this summary use -q with -l option.
 .TP 10
 displayed
@@ -940,7 +940,7 @@ is the second character (H/h/-) representing HFS+ FSA family
 .TP 5
 "-"
 the third character is reserved for future FSA family and is always a dash for now.
-.P
+.PP
 Uppercase means the FSA set is saved, lowercase means the FSA is present in the archive of reference and has not changed since that time. Last a dash (-) means no FSA of that family has been saved for that file.
 .RE
 .TP 10
@@ -1004,7 +1004,7 @@ must be replaced by -k ignore
 .TP 20
 -5
 must be replaced by -5 user.libdar_no_backup
-.P
+.PP
 .B important !
 When using GNU getopt(), optional arguments are available by sticking the argument to the short option: "-z" for example is available as well as "-z9". But "-z 9" is wrong, it will be read as "-z" option and "9", a command line argument (not an argument to the -z option). In the other side, when using a non GNU getopt this time, "-z" becomes an option that always requires an argument, and thus "-z 9" is read as "-z" option with "9" as argument, while "-z9" will be rejected as a unknown option, and "-z" alone will generate an error as no argument is provided. In consequences, you
 .B need
@@ -1072,15 +1072,15 @@ This signal can be generated by the kill command
 SIGUSR2
 This signal can be generated by the kill command
 
-.P
+.PP
 For those previous signals, two behavior exit. For SIGHUP, SIGINT, SIGQUIT, SIGTERM and SIGUSR1, a
 .B delayed termination
 is done: the backup or isolation operation is stopped, the catalogue is appended to the archive and the archive is properly completed with the correct terminator string, this way the generated archive is usable, and can be used as reference for a differential backup at a later time. Note that if an on-fly isolation had been asked, it will *not* be performed, and no user command will be launched even if dar has been configured for (-E option). For SIGUSR2 instead a
 .B fast termination
 is done: in case of backup or isolation, the archive is not completed at all, only memory and mutex are released properly.
-.P
+.PP
 For both type of termination and other operations than backup or isolation, dar's behavior is the same: For restoration, all opened directories are closed and permissions are set back to their original values (if they had to be changed for restoration). For listing, comparison, testing, the program aborts immediately.
-.P
+.PP
 Another point, when using one of the previous signals, dar will return with the exist status
 .B 4
 meaning that the user has aborted the operation. Note that answering "no" to a question from dar may also lead dar to exit this way. last, If before the end of the program the same signal is received a second time, dar will abort immediately.
@@ -1134,25 +1134,25 @@ in any case
 .TP 20
 default:
 if no -c, -d, -x, -t, -C, -l  or -+ option has been used at this point of the parsing.
-.P
+.PP
 The condition stops when the next condition starts, or at End of File. The commands inserted before any condition are equivalent to those inserted after the "all:" condition. Remark : -c -d -x -t -C and -l are mutual exclusive, only one of them can be used while calling dar.
-.P
+.PP
 Here is an example of conditional syntax
 .RS
-.P
+.PP
 create:
   # upon creation exclude the
 .br
   # following files from compression
 .br
 -Z "*.mp3" -Z "*.mpg"
-.P
+.PP
 all:
 .br
 -b
 .br
 -p
-.P
+.PP
 default:
 .br
 # this will get read if not
@@ -1162,7 +1162,7 @@ default:
 -V
 .br
 # thus by default dar shows its version
-.P
+.PP
 all:
 .br
 -v
@@ -1171,21 +1171,21 @@ all:
 .br
 # this is added to the previous all: condition
 .RE
-.P
+.PP
 Last point, you may have several time the same condition (several
 .B all:
 ) for example. They will be concatenated together.
 
 .SH USER TARGETS
 User targets are arbitrary words found on command line, that do not start by a dash ('-'). On most system they should be placed after command and options. They are collected from command-line first, then comes the parsing of command and optional arguments. Their use is to extend conditional syntax described just above by having a set of options activated by the user just adding a single word on command-line. Of course user targets must not be equal to one of the reserved words of the conditional syntax (extract, create, ... all, default). A valid target is a word (thus without space) composed of lowercase or uppercase letters (case is sensitive) with eventually digits, dashes '-' or underscores '_' characters.
-.P
+.PP
 Let's see an example of use:
-.P
+.PP
 first a DCF file named 'example.dcf' that will be given on command line:
-.P
+.PP
 .RS
 # normal set of files considered for backup
-.P
+.PP
 create:
   -R /
   -P proc
@@ -1194,17 +1194,17 @@ create:
   -D
 
 # if the "home" user target is applied on command line the following command get added
-.P
+.PP
 home:
    -g home
 
 # if the "verbose" user target is used, we will have some more verbosity ...
-.P
+.PP
 verbose:
   -v
   -vs
 .RE
-.P
+.PP
 Then we could run dar in the following ways:
 .TP 20
 dar -c test -B example.dcf
@@ -1215,9 +1215,9 @@ here over the "create:" target the commands under the "verbose:" target (-v and 
 .TP 20
 dar -c test -B example.dcf verbose home
 last we use two user targets "verbose:" and "home:" in addition the the "create:" target of the usual conditional syntax.
-.P
+.PP
 Note that if the last option *may* receive an argument, the first user target that follows it will be assumed an argument to that option. To avoid this, either change the order of options on command line for the last option been an option that never or always uses an argument (for example -b never has an argument while -s always has one). Or separate the options from the user targets by the -- word. And of course you can also use the explicit argument of the last option (see EXPLICIT OPTIONAL ARGUMENT section, above).
-.P
+.PP
 Second point: It is allowed to have user targets inside a DCF file. Note however that targets are collected in a first phase, which leads some part of the file to be hidden (because the corresponding conditional syntax or user target is not present). Then, the remaining part of the file is then parsed and actions for each option found is taken. At that time, new user targets found are just recorded, but they do not modify the current DCF file layout, in particular, hidden part of the file stay hidden even if the corresponding user target is read in this same file. Next DCF parsing (which may be triggered by a second -B option on the command line, or by a -B option inside the current parsed DCF file) will thus be done with the additional targets found in that first DCF file, so in a way you may have user targets that activate other user targets, but they will be activated in starting the next -B file. Here follows an examples of two DCF files, first.dcf and second.dcf:
 .RS
 
