@@ -1008,6 +1008,7 @@ namespace libdar
 		ver.set_command_line(user_comment);
 		ver.set_sym_crypto_algo(crypto);
 		ver.set_tape_marks(add_marks_for_sequential_reading);
+		ver.set_signed(!gnupg_signatories.empty());
 
 		if(crypto != crypto_none || !gnupg_recipients.empty())
 		{
@@ -1329,15 +1330,15 @@ namespace libdar
 
 		try
 		{
-		    global_hash_to_sign = new (nothrow) generic_to_global_file(dialog, hash_to_sign);
-		    global_layers = new (nothrow) generic_to_global_file(dialog, layers.top());
+		    global_hash_to_sign = new (nothrow) generic_to_global_file(dialog, hash_to_sign, gf_write_only);
+		    global_layers = new (nothrow) generic_to_global_file(dialog, layers.top(), gf_write_only);
 
 		    if(global_hash_to_sign == NULL || global_layers == NULL)
 			throw Ememory("macro_tools_close_layers");
 
 		    hasher = new (nothrow) hash_fichier(dialog,
 							global_layers,
-							string(""),
+							string("x"),
 							global_hash_to_sign,
 							hash_sha512);
 		    if(hasher == NULL)
@@ -1377,6 +1378,7 @@ namespace libdar
 
 	    if(hasher != NULL)
 	    {
+		hasher->terminate(); // this drops the hash to hash_to_sign
 		if(layers.top() != hasher)
 		    throw SRC_BUG;
 		if(layers.pop() != hasher)
@@ -1395,7 +1397,7 @@ namespace libdar
 
 		    // ciphering and signing the hash of the catalogue //
 
-		if(hash_to_sign != NULL)
+		if(hash_to_sign == NULL)
 		    throw SRC_BUG;
 		if(signed_hash == NULL)
 		    throw SRC_BUG;

@@ -50,7 +50,7 @@ namespace libdar
 	    /// \param[in] dialog for user interaction
 	    /// \param[in] d pointer to the generic_file object to provide a fichier_global interface to.
 	    /// \note the pointed to generic_file object must survive the whole live of the generic_to_gloabl_file. This generic_file is not owned nor deleted by the generic_to_global_file object that points to it.
-	generic_to_global_file(const user_interaction & dialog, generic_file *d): fichier_global(dialog, d->get_mode()) { if(d == NULL) throw SRC_BUG; data = d; };
+	generic_to_global_file(const user_interaction & dialog, generic_file *d, gf_mode mode): fichier_global(dialog, mode) { if(d == NULL) throw SRC_BUG; if(d->get_mode() != gf_read_write && d->get_mode() != mode) throw SRC_BUG; data = d; };
 
 	    // virtual method inherited from generic_file
 	bool skippable(skippability direction, const infinint & amount) { return data->skippable(direction, amount); }
