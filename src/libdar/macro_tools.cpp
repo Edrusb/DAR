@@ -58,6 +58,7 @@ extern "C"
 #include "crypto_sym.hpp"
 #include "crypto_asym.hpp"
 #include "cat_all_entrees.hpp"
+#include "crc.hpp"
 
 #ifdef LIBTHREADAR_AVAILABLE
 #include "generic_thread.hpp"
@@ -89,6 +90,7 @@ namespace libdar
 					      bool info_details,
 					      infinint &cat_size,
 					      const infinint & second_terminateur_offset,
+					      list<signator> & signatories,
 					      bool lax_mode)
     {
 	return macro_tools_get_derivated_catalogue_from(dialog,
@@ -99,6 +101,7 @@ namespace libdar
 							info_details,
 							cat_size,
 							second_terminateur_offset,
+							signatories,
 							lax_mode);
     }
 
@@ -110,6 +113,7 @@ namespace libdar
 							bool info_details,
 							infinint &cat_size,
 							const infinint & second_terminateur_offset,
+							list<signator> & signatories,
 							bool lax_mode)
     {
         terminateur term;
@@ -120,6 +124,7 @@ namespace libdar
 	contextual *data_ctxt = NULL;
 	contextual *cata_ctxt = NULL;
 
+	signatories.clear();
 	data_stack.find_first_from_top(data_ctxt);
 	if(data_ctxt == NULL)
 	    throw SRC_BUG;
@@ -145,46 +150,141 @@ namespace libdar
 
         if(cata_stack.skip(term.get_catalogue_start()))
         {
+	    memory_file hash_to_compare;
+	    hash_fichier *hasher = NULL;
+
 	    if(term.get_catalogue_start() > term.get_terminateur_start())
 		throw SRC_BUG;
-            cat_size = term.get_terminateur_start() - term.get_catalogue_start();
+	    cat_size = term.get_terminateur_start() - term.get_catalogue_start();
 
-            try
-            {
-		label tmp;
-
-		tmp.clear(); // we do not want here to change the catalogue internal data name read from archive
-		cata_stack.read_ahead(cat_size);
-                ret = new (pool) catalogue(dialog, cata_pdesc, ver.get_edition(), ver.get_compression_algo(), lax_mode, tmp);
-		try
+	    try // release hasher in case of exception
+	    {
+		if(ver.is_signed())
 		{
-		    if(ret != NULL && &cata_stack != &data_stack)
-			ret->change_location(data_pdesc);
-		    data_ctxt->set_info_status(CONTEXT_OP);
-		    cata_ctxt->set_info_status(CONTEXT_OP);
+		    generic_to_global_file *global_hash_to_compare = NULL;
+		    generic_to_global_file *global_cata_top_stack = NULL;
+
+		    try
+		    {
+			global_hash_to_compare = new (nothrow) generic_to_global_file(dialog, &hash_to_compare, gf_write_only);
+			if(global_hash_to_compare == NULL)
+			    throw Ememory("macro_tools_get_derivated_catalogue_from");
+			global_cata_top_stack = new (nothrow) generic_to_global_file(dialog, cata_stack.top(), gf_read_only);
+			if(global_cata_top_stack == NULL)
+			    throw Ememory("macro_tools_get_derivated_catalogue_from");
+
+			hasher = new (nothrow) hash_fichier(dialog,
+							   global_cata_top_stack,
+							   "x",
+							   global_hash_to_compare,
+							   hash_sha512);
+			if(hasher == NULL)
+			    throw Ememory("macro_tools_get_derivated_catalogue_from");
+
+			    // at this stage, hasher is created
+			    // and manages the objects global_cata_stack and global_hash_to_compare
+		    }
+		    catch(...)
+		    {
+			if(global_hash_to_compare != NULL)
+			    delete global_hash_to_compare;
+			if(global_cata_top_stack != NULL)
+			    delete global_cata_top_stack;
+			throw;
+		    }
+
+		    cata_stack.push(hasher);
+		    cata_pdesc = pile_descriptor(&cata_stack);
 		}
-		catch(...)
+
+		try // trap cast and rethrow exceptions
 		{
-		    if(ret != NULL)
-			delete ret;
+		    label tmp;
+
+		    tmp.clear(); // we do not want here to change the catalogue internal data name read from archive
+		    cata_stack.read_ahead(cat_size);
+		    ret = new (pool) catalogue(dialog, cata_pdesc, ver.get_edition(), ver.get_compression_algo(), lax_mode, tmp);
+		    try
+		    {
+			if(ret != NULL && &cata_stack != &data_stack)
+			    ret->change_location(data_pdesc);
+			data_ctxt->set_info_status(CONTEXT_OP);
+			cata_ctxt->set_info_status(CONTEXT_OP);
+		    }
+		    catch(...)
+		    {
+			if(ret != NULL)
+			    delete ret;
+			throw;
+		    }
+
+		    if(hasher != NULL)
+		    {
+			hasher->terminate();
+			if(cata_stack.top() != hasher)
+			    throw SRC_BUG;
+			if(cata_stack.pop() != hasher)
+			    throw SRC_BUG;
+			cata_pdesc = pile_descriptor(&cata_stack);
+		    }
+
+		    if(ver.is_signed())
+		    {
+			tlv hash_to_decrypt(cata_stack); // read the encrypted hash following the catalogue
+			memory_file clear_read_hash;
+			crypto_asym engine(dialog);
+			crc *tmp = NULL;
+
+			hash_to_decrypt.skip(0);
+			engine.decrypt(hash_to_decrypt, clear_read_hash);
+			signatories = engine.verify();
+			if(clear_read_hash.diff(hash_to_compare, 0, 0, 1, tmp)) // difference!
+			{
+			    if(lax_mode)
+				dialog.warning(gettext("LAX MODE: catalogue computed hash does not match the signed hash of the archive, ignoring"));
+			    else
+				throw Edata(gettext("Catalogue computed hash does not match the signed hash of the archive, archive has been modified since it was signed!"));
+			}
+			else
+			{
+			    if(tmp != NULL)
+				delete tmp;
+			    // else no difference,
+			    // the caller has the signatories and will compare those with the list contained in the archive header
+			}
+		    }
+
+		}
+		catch(Ebug & e)
+		{
 		    throw;
 		}
-            }
-	    catch(Ebug & e)
+		catch(Ethread_cancel & e)
+		{
+		    throw;
+		}
+		catch(Egeneric & e)
+		{
+		    throw Erange("get_catalogue_from", string(gettext("Cannot open catalogue: ")) + e.get_message());
+		}
+	    }
+	    catch(...)
 	    {
+		if(cata_stack.top() == hasher)
+		{
+		    if(cata_stack.pop() != hasher)
+			throw SRC_BUG;
+		}
+		if(hasher != NULL)
+		    delete hasher;
 		throw;
 	    }
-	    catch(Ethread_cancel & e)
-	    {
-		throw;
-	    }
-            catch(Egeneric & e)
-            {
-                throw Erange("get_catalogue_from", string(gettext("Cannot open catalogue: ")) + e.get_message());
-            }
-        }
-        else
-            throw Erange("get_catalogue_from", gettext("Missing catalogue in file."));
+
+	    if(hasher != NULL)
+		delete hasher;
+	}
+	else
+	    throw Erange("get_catalogue_from", gettext("Missing catalogue in file."));
 
         if(ret == NULL)
             throw Ememory("get_catalogue_from");
@@ -211,7 +311,7 @@ namespace libdar
 				  bool lax,
 				  bool sequential_read,
 				  bool info_details,
-				  vector<signator> & gnupg_signed,
+				  list<signator> & gnupg_signed,
 				  slice_layout & sl,
 				  bool multi_threaded)
     {

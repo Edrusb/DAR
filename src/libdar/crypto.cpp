@@ -103,5 +103,19 @@ namespace libdar
 	}
     }
 
+    bool same_signatories(const std::list<signator> & a, const std::list<signator> & b)
+    {
+	list<signator>::const_iterator ita = a.begin();
+	list<signator>::const_iterator itb = b.begin();
+
+	while(ita != a.end() && itb != b.end() && *ita == *itb)
+	{
+	    ++ita;
+	    ++itb;
+	}
+
+	return (ita == a.end() && itb == b.end());
+    }
+
 
 } // end of namespace

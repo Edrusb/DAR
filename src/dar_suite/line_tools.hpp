@@ -148,7 +148,7 @@ extern void line_tools_crypto_split_algo_pass(const secu_string & all,
 					      std::vector<std::string> & recipients);
 
     /// display information about the signatories
-extern void line_tools_display_signatories(user_interaction & ui, const std::vector<signator> & gnupg_signed);
+extern void line_tools_display_signatories(user_interaction & ui, const std::list<signator> & gnupg_signed);
 
     /// @}
 

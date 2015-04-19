@@ -41,6 +41,8 @@ extern "C"
 #include "mem_ui.hpp"
 #include "crypto.hpp"
 
+#include <list>
+
 namespace libdar
 {
 	/// \ingroup Private
@@ -81,11 +83,12 @@ namespace libdar
 	void decrypt(generic_file & ciphered, generic_file & clear);
 
 	    /// after un-ciphering data retrieve the list of signature that were used beside encryption
-	const std::vector<signator> & verify() const { return signing_result; };
+	    /// return a sorted list of signatories
+	const std::list<signator> & verify() const { return signing_result; };
 
     private:
 	bool has_signatories;
-	std::vector<signator> signing_result;
+	std::list<signator> signing_result;
 #if GPGME_SUPPORT
 	gpgme_ctx_t context;                     //< GPGME context
 

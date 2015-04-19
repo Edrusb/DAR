@@ -118,7 +118,7 @@ namespace libdar
 					 bool lax,  // whether we skip&warn the usual verifications
 					 bool sequential_read, // whether to use the escape sequence (if present) to get archive contents and proceed to sequential reading
 					 bool info_details,    // be or not verbose about the archive openning
-					 std::vector<signator> & gnupg_signed, //< list of existing signature found for that archive (valid or not)
+					 std::list<signator> & gnupg_signed, //< list of existing signature found for that archive (valid or not)
 					 slice_layout & sl,    //< slicing layout of the archive
 					 bool multi_threaded); //< true if several thread shall be run concurrently by libdar
         // all allocated objects (ret1, ret2, scram), must be deleted when no more needed by the caller of this routine
@@ -131,6 +131,7 @@ namespace libdar
 							       bool info_details, // verbose display (throught user_interaction)
 							       infinint &cat_size, // return size of archive in file (not in memory !)
 							       const infinint & second_terminateur_offset, // location of the second terminateur (zero if none exist)
+							       std::list<signator> & signatories, // returns the list of signatories (empty if archive is was not signed)
 							       bool lax_mode);         // whether to do relaxed checkings
 
     extern catalogue *macro_tools_get_catalogue_from(user_interaction & dialog,
@@ -140,6 +141,7 @@ namespace libdar
                                                      bool info_details, // verbose display (throught user_interaction)
                                                      infinint &cat_size, // return size of archive in file (not in memory !)
 						     const infinint & second_terminateur_offset,
+						     std::list<signator> & signatories, // returns the list of signatories (empty if archive is was not signed)
 						     bool lax_mode);
 
     extern catalogue *macro_tools_lax_search_catalogue(user_interaction & dialog,

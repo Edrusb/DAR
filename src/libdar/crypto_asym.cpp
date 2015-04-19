@@ -384,6 +384,8 @@ namespace libdar
 	    res = res->next;
 	    signing_result.push_back(tmp);
 	}
+
+	signing_result.sort();
     }
 
     static gpgme_error_t read_passphrase(void *hook, const char *uid_hint, const char *passphrase_info, int prev_was_bad, int fd)

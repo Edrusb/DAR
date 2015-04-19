@@ -77,7 +77,7 @@ namespace libdar
 
 	    // inherited from fichier_global
 	U_I fichier_global_inherited_write(const char *a, U_I size) { data->write(a, size); return size; };
-	bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message) { return data->read(a, size); read = size; message = "THIS IS A BUG IN GENERIC_TO_GLOBAL_FILE, PLEASE REPORT TO THE MAINTAINER!"; return true; };
+	bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message) { read = data->read(a, size); message = "THIS IS A BUG IN GENERIC_TO_GLOBAL_FILE, PLEASE REPORT TO THE MAINTAINER!"; return true; };
 
     private:
 	generic_file *data;

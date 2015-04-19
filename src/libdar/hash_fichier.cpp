@@ -53,7 +53,7 @@ namespace libdar
 			       fichier_global *under,
 			       const std::string & under_filename,
 			       fichier_global *hash_file,
-			       hash_algo algo) : fichier_global(dialog, gf_write_only)
+			       hash_algo algo) : fichier_global(dialog, under->get_mode())
     {
 	if(under == NULL)
 	    throw SRC_BUG;
@@ -146,7 +146,8 @@ namespace libdar
 	    throw SRC_BUG;
 	read = ref->read(a, size);
 	message = "BUG! This should never show!";
-	gcry_md_write(hash_handle, (const void *)a, size);
+	if(read > 0)
+	    gcry_md_write(hash_handle, (const void *)a, read);
 	return true;
 #else
 	throw Ecompilation(gettext("Missing hashing algorithms support (which is part of strong encryption support, using libgcrypt)"));

@@ -777,7 +777,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 
 		if(param.quiet)
 		{
-		    const vector<signator> & gnupg_signed = arch->get_signatories();
+		    const list<signator> & gnupg_signed = arch->get_signatories();
 		    arch->summary(dialog);
 		    line_tools_display_signatories(dialog, gnupg_signed);
 		}
@@ -785,7 +785,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		{
 		    if(param.info_details)
 		    {
-			const vector<signator> & gnupg_signed = arch->get_signatories();
+			const list<signator> & gnupg_signed = arch->get_signatories();
 			arch->summary(dialog);
 			line_tools_display_signatories(dialog, gnupg_signed);
 			dialog.pause(gettext("Continue listing archive contents?"));

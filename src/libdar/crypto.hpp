@@ -36,6 +36,8 @@ extern "C"
 
 #include "datetime.hpp"
 
+#include <list>
+
 namespace libdar
 {
 
@@ -76,12 +78,17 @@ namespace libdar
 	std::string fingerprint; //< fingerprint of the key
 	datetime signing_date;   //< date of signature
 	datetime signature_expiration_date; //< date of expiration of this signature
+	bool operator < (const signator & ref) const { return fingerprint < ref.fingerprint; };
+	bool operator == (const signator & ref) const { return result == ref.result && key_validity == ref.key_validity && fingerprint == ref.fingerprint && signature_expiration_date == ref.signature_expiration_date; };
     };
+
 
     extern std::string crypto_algo_2_string(crypto_algo algo);
 
     extern char crypto_algo_2_char(crypto_algo a);
     extern crypto_algo char_2_crypto_algo(char a);
+
+    extern bool same_signatories(const std::list<signator> & a, const std::list<signator> & b);
 
 	/// @}
 

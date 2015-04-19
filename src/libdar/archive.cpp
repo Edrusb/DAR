@@ -89,6 +89,9 @@ namespace libdar
 		infinint ref_second_terminateur_offset = 0;
 		header_version ref_ver;
 		pile_descriptor pdesc;
+		list<signator> tmp1_signatories;
+		list<signator> tmp2_signatories;
+
 		lax_read_mode = options.get_lax();
 		sequential_read = options.get_sequential_read(); // updating the archive object's field
 		where->set_location(chem);
@@ -141,7 +144,6 @@ namespace libdar
 			    ref_where->set_location(options.get_ref_path());
 			    try
 			    {
-				vector<signator> tmp;
 				slice_layout ignored;
 
 				if(options.get_ref_basename() == "-")
@@ -168,9 +170,11 @@ namespace libdar
 							 options.get_lax(),
 							 false, // sequential_read is never used to retreive the isolated catalogue (well, that's possible and easy to add this feature), see later ...
 							 options.get_info_details(),
-							 tmp,
+							 tmp1_signatories,
 							 ignored,
 							 options.get_multi_threaded());
+				    // we do not comparing the signatories of the archive of reference with the current archive
+				    // for example the isolated catalogue might be unencrypted and thus not signed
 			    }
 			    catch(Euser_abort & e)
 			    {
@@ -213,7 +217,10 @@ namespace libdar
 								       options.get_info_details(),
 								       local_cat_size,
 								       ref_second_terminateur_offset,
+								       tmp2_signatories,
 								       false); // never relaxed checking for external catalogue
+			if(!same_signatories(tmp1_signatories, tmp2_signatories))
+			    dialog.pause(gettext("Archive of reference is not signed properly (no the same signatories for the archive and the internal catalogue, do we continue?"));
 			if(cat == NULL)
 			    throw SRC_BUG;
 
@@ -237,7 +244,16 @@ namespace libdar
 								     options.get_info_details(),
 								     local_cat_size,
 								     second_terminateur_offset,
+								     tmp1_signatories,
 								     options.get_lax());
+				if(!same_signatories(tmp1_signatories, gnupg_signed))
+				{
+				    string msg = gettext("Archive internal catalogue is not identically signed than the archive itself, this might be the sign the archive has been compromised");
+				    if(lax_read_mode)
+					dialog.pause(msg);
+				    else
+					throw Edata(msg);
+				}
 			    }
 			    else
 			    {
@@ -2256,7 +2272,7 @@ namespace libdar
 
     void archive::check_gnupg_signed(user_interaction & dialog) const
     {
-	vector<signator>::const_iterator it = gnupg_signed.begin();
+	list<signator>::const_iterator it = gnupg_signed.begin();
 
 	while(it != gnupg_signed.end() && it->result == signator::good)
 	    ++it;

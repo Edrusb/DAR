@@ -285,7 +285,7 @@ namespace libdar
 	const entree_stats get_stats() const { if(cat == NULL) throw SRC_BUG; return cat->get_stats(); };
 
 	    /// retrieving signature information about the archive
-	const std::vector<signator> & get_signatories() const { return gnupg_signed; };
+	const std::list<signator> & get_signatories() const { return gnupg_signed; };
 
 	    /// necessary to get the catalogue fully loaded in memory in any situation
 	    /// in particular in sequential reading mode
@@ -342,7 +342,7 @@ namespace libdar
 	bool lax_read_mode;      //< whether the archive has been openned in lax mode (unused for creation/merging/isolation)
 	bool sequential_read;    //< whether the archive is read in sequential mode
 	bool freed_and_checked;  //< whether free_and_check has been run
-	std::vector<signator> gnupg_signed; //< list of signature found in the archive (reading an existing archive)
+	std::list<signator> gnupg_signed; //< list of signature found in the archive (reading an existing archive)
 	slice_layout slices;     //< slice layout, archive is not sliced <=> first_size or other_size fields is set to zero (in practice both are set to zero, but one being set is enought to determine the archive is not sliced)
 
 	void free_except_memory_pool();

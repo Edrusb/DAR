@@ -830,9 +830,9 @@ void line_tools_crypto_split_algo_pass(const secu_string & all,
     }
 }
 
-void line_tools_display_signatories(user_interaction & ui, const vector<signator> & gnupg_signed)
+void line_tools_display_signatories(user_interaction & ui, const list<signator> & gnupg_signed)
 {
-    vector<signator>::const_iterator it = gnupg_signed.begin();
+    list<signator>::const_iterator it = gnupg_signed.begin();
     string tmp;
 
     if(gnupg_signed.empty())
