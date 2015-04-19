@@ -105,7 +105,7 @@ namespace libdar
 	    // inherited from generic_file
 	bool skippable(skippability direction, const infinint & amount) { return false; };
         bool skip(const infinint & pos) {if(ref == NULL || pos != ref->get_position()) throw SRC_BUG; else return true; };
-        bool skip_to_eof() { return true; }; // we are always at end of file
+        bool skip_to_eof() { if(get_mode() == gf_write_only) return true; else throw SRC_BUG; };
         bool skip_relative(S_I x) { if(x != 0) throw SRC_BUG; else return true; };
 	infinint get_position() { if(ref == NULL) throw SRC_BUG; return ref->get_position(); };
 
@@ -116,7 +116,7 @@ namespace libdar
 	    // inherited from fichier_global
 	void inherited_read_ahead(const infinint & amount) { ref->read_ahead(amount); };
 	U_I fichier_global_inherited_write(const char *a, U_I size);
-	bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message) { throw SRC_BUG; };
+ 	bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message);
 
 	    // inherited from generic_file
 	void inherited_sync_write() {};

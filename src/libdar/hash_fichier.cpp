@@ -59,7 +59,7 @@ namespace libdar
 	    throw SRC_BUG;
 	if(hash_file == NULL)
 	    throw SRC_BUG;
-	if(under->get_mode() != gf_write_only)
+	if(under->get_mode() == gf_read_write)
 	    throw SRC_BUG;
 	if(hash_file->get_mode() != gf_write_only)
 	    throw SRC_BUG;
@@ -134,6 +134,20 @@ namespace libdar
 	if(!only_hash)
 	    ref->write(a, size);
 	return size;
+#else
+	throw Ecompilation(gettext("Missing hashing algorithms support (which is part of strong encryption support, using libgcrypt)"));
+#endif
+    }
+
+    bool hash_fichier::fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message)
+    {
+#if CRYPTO_AVAILABLE
+	if(eof)
+	    throw SRC_BUG;
+	read = ref->read(a, size);
+	message = "BUG! This should never show!";
+	gcry_md_write(hash_handle, (const void *)a, size);
+	return true;
 #else
 	throw Ecompilation(gettext("Missing hashing algorithms support (which is part of strong encryption support, using libgcrypt)"));
 #endif
