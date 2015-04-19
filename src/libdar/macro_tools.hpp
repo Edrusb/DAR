@@ -257,6 +257,8 @@ namespace libdar
 	/// \param[in] cat the catalogue to dump in the layer before closing the archive
 	/// \param[in] info_details whether to display detailed information
 	/// \param[in] crypto cipher algorithm used in "layers"
+	/// \param[in] gnupg_recipients used sign the catalog, use an empty vector if there is no signatories (no nedd to sign the hash of the catalogue)
+	/// \param[in] gnupg_signatories used to sign the catalog, use an empty vector to disable signning
 	/// \param[in] algo compression algorithm used
 	/// \param[in] empty dry-run execution (null_file at bottom of the stack)
     void macro_tools_close_layers(user_interaction & dialog,
@@ -266,6 +268,8 @@ namespace libdar
 				  bool info_details,
 				  crypto_algo crypto,
 				  compression algo,
+				  const std::vector<std::string> & gnupg_recipients,
+				  const std::vector<std::string> & gnupg_signatories,
 				  bool empty);
 
 

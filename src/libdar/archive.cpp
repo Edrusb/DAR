@@ -1291,6 +1291,8 @@ namespace libdar
 					 options.get_info_details(),
 					 options.get_crypto_algo(),
 					 options.get_compression(),
+					 options.get_gnupg_recipients(),
+					 options.get_gnupg_signatories(),
 					 options.get_empty());
 	    }
 	    catch(...)
@@ -2164,6 +2166,8 @@ namespace libdar
 					 info_details,
 					 crypto,
 					 algo,
+					 gnupg_recipients,
+					 gnupg_signatories,
 					 empty);
 
 		thr_cancel.block_delayed_cancellation(false);

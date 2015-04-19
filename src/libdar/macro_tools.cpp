@@ -53,6 +53,8 @@ extern "C"
 #include "cache.hpp"
 #include "null_file.hpp"
 #include "secu_memory_file.hpp"
+#include "generic_to_global_file.hpp"
+#include "tlv.hpp"
 #include "crypto_sym.hpp"
 #include "crypto_asym.hpp"
 #include "cat_all_entrees.hpp"
@@ -1270,6 +1272,8 @@ namespace libdar
 				  bool info_details,
 				  crypto_algo crypto,
 				  compression algo,
+				  const vector<string> & gnupg_recipients,
+				  const vector<string> & gnupg_signatories,
 				  bool empty)
     {
 	terminateur coord;
@@ -1279,9 +1283,18 @@ namespace libdar
 #ifdef LIBTHREADAR_AVAILABLE
 	generic_thread *thread_ptr = NULL;
 #endif
+	memory_file *hash_to_sign = NULL;
+	tlv *signed_hash = NULL;
+	hash_fichier *hasher = NULL;
+
+	    // ***************** sanity check ************************************** //
+
+	if(!gnupg_signatories.empty() && gnupg_recipients.empty())
+	    throw SRC_BUG; // cannot sign without encryption in the current implementation
+
 	pdesc.check(false);
 
-	    // *********** writing down the catalogue of the archive *************** //
+	    // *********** flushing pending writes and reseting compressor  ******** //
 
 	if(pdesc.esc != NULL)
 	{
@@ -1293,12 +1306,151 @@ namespace libdar
 		// in order to be able to read compressed data starting at that position
 	    pdesc.compr->sync_write();
 
-	coord.set_catalogue_start(layers.get_position());
 
-	if(info_details)
-	    dialog.warning(gettext("Writing down archive contents..."));
-	cat.reset_dump();
-	cat.dump(pdesc);
+	    // ********* if archive is signed adding a hash layer to get a hash of  *//
+	    // *** the catalogue. This hash will then be signed and encrypted  and  *//
+	    // ** dropped as is just after the end of the catalogue                 */
+
+	try
+	{
+
+	    if(!gnupg_signatories.empty())
+	    {
+		generic_to_global_file *global_hash_to_sign = NULL;
+		generic_to_global_file *global_layers = NULL;
+
+		hash_to_sign = new (nothrow) memory_file();
+		if(hash_to_sign == NULL)
+		    throw Ememory("macro_tools_close_layers");
+
+		signed_hash = new (nothrow) tlv();
+		if(signed_hash == NULL)
+		    throw Ememory("macro_tools_close_layers");
+
+		try
+		{
+		    global_hash_to_sign = new (nothrow) generic_to_global_file(dialog, hash_to_sign);
+		    global_layers = new (nothrow) generic_to_global_file(dialog, layers.top());
+
+		    if(global_hash_to_sign == NULL || global_layers == NULL)
+			throw Ememory("macro_tools_close_layers");
+
+		    hasher = new (nothrow) hash_fichier(dialog,
+							global_layers,
+							string(""),
+							global_hash_to_sign,
+							hash_sha512);
+		    if(hasher == NULL)
+			throw Ememory("macro_tools_close_layers");
+
+			// at this stage, hasher has been built and now owns and
+			// will destroy when no more needed both global_hash_to_sign
+			// and global_layers
+
+		}
+		catch(...)
+		{
+		    if(global_hash_to_sign != NULL)
+			delete global_hash_to_sign;
+		    if(global_layers != NULL)
+			delete global_layers;
+		    throw;
+		}
+
+		layers.push(hasher);
+		pdesc = pile_descriptor(&layers);
+	    }
+
+
+		// *********** writing down the catalogue of the archive *************** //
+
+
+	    coord.set_catalogue_start(layers.get_position());
+
+	    if(info_details)
+		dialog.warning(gettext("Writing down archive contents..."));
+	    cat.reset_dump();
+	    cat.dump(pdesc);
+
+
+		// removing the hash from the top of the stack now that the catalogue has been dropped //
+
+	    if(hasher != NULL)
+	    {
+		if(layers.top() != hasher)
+		    throw SRC_BUG;
+		if(layers.pop() != hasher)
+		    throw SRC_BUG;
+		pdesc = pile_descriptor(&layers);
+	    }
+
+		// if signing is activated ... //
+
+	    if(!gnupg_signatories.empty())
+	    {
+		crypto_asym engine(dialog);
+
+		if(info_details)
+		    dialog.warning(gettext("Calculating the signature of the catalogue hash..."));
+
+		    // ciphering and signing the hash of the catalogue //
+
+		if(hash_to_sign != NULL)
+		    throw SRC_BUG;
+		if(signed_hash == NULL)
+		    throw SRC_BUG;
+		engine.set_signatories(gnupg_signatories);
+		engine.encrypt(gnupg_recipients, *hash_to_sign, *signed_hash);
+
+		    // writing down the size of the hash followed by the hash //
+
+		if(info_details)
+		    dialog.warning(gettext("Writing down the signed hash of the catalogue..."));
+
+		signed_hash->dump(layers);
+	    }
+	}
+	catch(...)
+	{
+	    if(hasher != NULL)
+	    {
+		if(layers.top() == hasher)
+		{
+		    if(layers.pop() != hasher)
+			throw SRC_BUG;
+		    pdesc = pile_descriptor(&layers);
+		}
+		delete hasher;
+		hasher = NULL;
+	    }
+	    if(signed_hash != NULL)
+	    {
+		delete signed_hash;
+		signed_hash = NULL;
+	    }
+	    if(hash_to_sign != NULL)
+	    {
+		delete hash_to_sign;
+		hash_to_sign = NULL;
+	    }
+	    throw;
+	}
+
+	if(hasher != NULL)
+	{
+	    delete hasher;
+	    hasher = NULL;
+	}
+	if(signed_hash != NULL)
+	{
+	    delete signed_hash;
+	    signed_hash = NULL;
+	}
+	if(hash_to_sign != NULL)
+	{
+	    delete hash_to_sign;
+	    hash_to_sign = NULL;
+	}
 
 	    // releasing the compression layer
 
