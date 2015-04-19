@@ -98,7 +98,7 @@ namespace libdar
 
 	    /// replaces generic_file::inherited_write() method, to allow the return of partial writings
 	    ///
-	    /// a parital writing is allowed when no space is available for writing
+	    /// a partial writing is allowed when no space is available for writing
 	    /// this let global_ficher interact with the user asking whether it can make place
 	    /// or if (s)he wants to abord
 	    /// \param[in] a points to the start of the area of data to write
