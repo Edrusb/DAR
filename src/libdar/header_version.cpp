@@ -48,13 +48,15 @@ namespace libdar
 	sym = crypto_none;
 	crypted_key = NULL;
 	ref_layout = NULL;
+	ciphered = false;
+	arch_signed = false;
     }
 
     void header_version::read(generic_file & f, user_interaction & dialog, bool lax_mode)
     {
 	crc *ctrl = NULL;
 	char tmp;
-        unsigned char flag;
+        U_I flag;
 
 	f.reset_crc(HEADER_CRC_SIZE);
 	try
@@ -132,12 +134,23 @@ namespace libdar
 
 	if(edition > 1)
 	{
-	    if(f.read((char *)&flag, 1) != 1)
+	    unsigned char tomp;
+	    if(f.read((char *)&tomp, 1) != 1)
 		throw Erange("header_version::read", gettext("Reached End of File while reading archive header_version data structure"));
 		// even in lax mode, because reading further is vain
+	    flag = tomp;
 	}
 	else
 	    flag = 0; // flag has been at edition 2
+	if((flag & FLAG_HAS_AN_EXTENDED_SIZE) != 0)
+	{
+	    unsigned char tomp;
+
+	    if(f.read((char *)&tomp, 1) != 1)
+		throw Erange("header_version::read", gettext("Reached End of File while reading archive header_version data structure"));
+	    flag <<= 8;
+	    flag += tomp;
+	}
 
 	if((flag & FLAG_INITIAL_OFFSET) != 0)
 	{
@@ -180,7 +193,6 @@ namespace libdar
 	}
 
 	has_tape_marks = (flag & FLAG_SEQUENCE_MARK) != 0;
-
 	if(edition < 8 && has_tape_marks)
 	{
 	    if(lax_mode)
@@ -230,6 +242,7 @@ namespace libdar
 	else
 	    clear_slice_layout();
 
+	arch_signed = (flag & FLAG_ARCHIVE_IS_SIGNED) != 0;
 
 	ctrl = f.get_crc();
 	if(ctrl == NULL)
@@ -296,29 +309,39 @@ namespace libdar
     {
 	crc *ctrl = NULL;
 	char tmp;
-        unsigned char flag = 0;
+        unsigned char flag[2];
 
 	    // preparing the data
 
+	flag[0] = 0;
+	flag[1] = 0;
+
 	if(initial_offset != 0)
-	    flag |= FLAG_INITIAL_OFFSET; // adding it to the flag
+	    flag[0] |= FLAG_INITIAL_OFFSET; // adding it to the flag
 
 	if(crypted_key != NULL)
-	    flag |= FLAG_HAS_CRYPTED_KEY;
+	    flag[0] |= FLAG_HAS_CRYPTED_KEY;
 
 	if(ref_layout != NULL)
-	    flag |= FLAG_HAS_REF_SLICING;
+	    flag[0] |= FLAG_HAS_REF_SLICING;
 
 	if(has_tape_marks)
-	    flag |= FLAG_SEQUENCE_MARK;
+	    flag[0] |= FLAG_SEQUENCE_MARK;
 
 	if(sym != crypto_none)
-	    flag |= FLAG_SCRAMBLED;
-	    // Note: we cannot set this flag (even if ciphered is true) if we do not know the crypt algo
+	    flag[0] |= FLAG_SCRAMBLED;
+	    // Note: we cannot set this flag (even if ciphered is true) if we do not know the crypto algo
 	    // as since version 9 the presence of this flag implies the existence
 	    // of the crypto algorithm in the header/trailer and we will always
 	    // write down a header/version of the latest known format (thus greater or
 	    // equal to 9).
+
+	if(arch_signed)
+	    flag[1] |= (FLAG_ARCHIVE_IS_SIGNED >> 8);
+
+	if(flag[1] > 0)
+	    flag[1] |= FLAG_HAS_AN_EXTENDED_SIZE;
+	    // and we will drop two bytes for the flag
 
 	    // writing down the data
 
@@ -327,7 +350,9 @@ namespace libdar
 	tmp = compression2char(algo_zip);
 	f.write(&tmp, sizeof(tmp));
 	tools_write_string(f, cmd_line);
-	f.write((char *)&flag, sizeof(flag));
+	if(flag[1] != 0)
+	    f.write((char *)&(flag[1]), sizeof(unsigned char));
+	f.write((char *)&(flag[0]), sizeof(unsigned char));
 	if(initial_offset != 0)
 	    initial_offset.dump(f);
 	if(sym != crypto_none)
@@ -394,6 +419,7 @@ namespace libdar
 	    ref_layout = NULL;
 	has_tape_marks = ref.has_tape_marks;
 	ciphered = ref.ciphered;
+	arch_signed = ref.arch_signed;
     }
 
 

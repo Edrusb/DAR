@@ -65,7 +65,7 @@ namespace libdar
 	void set_initial_offset(const infinint & offset) { initial_offset = offset; };
 	void set_sym_crypto_algo(const crypto_algo & algo) { sym = algo; };
 
-	    /// the object pointed to by key is passed under the responsibility of this header_version object
+	    /// the object pointed to by key passes to the responsibility of this header_version object
 	void set_crypted_key(memory_file *key) { if(key == NULL) throw SRC_BUG; clear_crypted_key(); crypted_key = key; };
 	void clear_crypted_key() { if(crypted_key != NULL) { delete crypted_key; crypted_key = NULL; } };
 
@@ -74,6 +74,7 @@ namespace libdar
 	void clear_slice_layout() { if(ref_layout != NULL) { delete ref_layout; ref_layout = NULL; } };
 
 	void set_tape_marks(bool presence) { has_tape_marks = presence; };
+	void set_signed(bool is_signed) { arch_signed = is_signed; };
 
 	    // gettings
 
@@ -83,6 +84,7 @@ namespace libdar
 	const infinint & get_initial_offset() const { return initial_offset; };
 
 	bool is_ciphered() const { return ciphered || sym != crypto_none; };
+	bool is_signed() const { return arch_signed; };
 	crypto_algo get_sym_crypto_algo() const { return sym; };
 	memory_file *get_crypted_key() const { return crypted_key; };
 	const slice_layout *get_slice_layout() const { return ref_layout; };
@@ -100,6 +102,7 @@ namespace libdar
 	bool has_tape_marks;     //< whether the archive contains tape marks aka escape marks aka sequence marks
 
 	bool ciphered;   // whether the archive is ciphered, even if we do not know its crypto algorithm (old archives)
+	bool arch_signed;     // whether the archive is signed
 
 	void copy_from(const header_version & ref);
 	void detruit();
@@ -113,7 +116,9 @@ namespace libdar
 	static const U_I FLAG_INITIAL_OFFSET = 0x08;     //< whether the header contains the initial offset (size of clear data before encrypted) NOTE : This value is set internally by header_version, no need to set flag with it! But that's OK to set it or not, it will be updated according to initial_offset's value.
 	static const U_I FLAG_HAS_CRYPTED_KEY = 0x04;    //< the header contains a symmetrical key encrypted with asymmetrical algorithm
 	static const U_I FLAG_HAS_REF_SLICING = 0x02;    //< the header contains the slicing information of the archive of reference (used for isolated catalogue)
-	static const U_I FLAG_HAS_AN_EXTENDED_SIZE = 0x01; //< reserved for future use
+	static const U_I FLAG_HAS_AN_EXTENDED_SIZE = 0x01; //< the flag is two bytes length
+	static const U_I FLAG_ARCHIVE_IS_SIGNED = 0x0200;  //< archive is signed
+	static const U_I FLAG_HAS_AN_SECOND_EXTENDED_SIZE = 0x0101; //< reserved for future use
     };
 
 } // end of namespace
