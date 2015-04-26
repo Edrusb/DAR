@@ -1499,6 +1499,8 @@ namespace libdar
 
 		if(hash_to_sign == NULL)
 		    throw SRC_BUG;
+		else
+		    hash_to_sign->skip(0);
 		if(signed_hash == NULL)
 		    throw SRC_BUG;
 		engine.set_signatories(gnupg_signatories);
