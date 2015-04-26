@@ -248,16 +248,16 @@ namespace libdar
 								     options.get_lax());
 				if(!same_signatories(tmp1_signatories, gnupg_signed))
 				{
-				    string msg = gettext("Archive internal catalogue is not identically signed than the archive itself, this might be the sign the archive has been compromised");
+				    string msg = gettext("Archive internal catalogue is not identically signed as the archive itself, this might be the sign the archive has been compromised");
 				    if(lax_read_mode)
 					dialog.pause(msg);
 				    else
 					throw Edata(msg);
 				}
 			    }
-			    else
+			    else // sequentially reading
 			    {
-				if(pdesc.esc != NULL)
+				if(pdesc.esc != NULL) // no escape layer is present
 				{
 				    if(pdesc.esc->skip_to_next_mark(escape::seqt_catalogue, false))
 				    {
@@ -271,23 +271,31 @@ namespace libdar
 					if(layer1 != NULL)
 					    lab = layer1->get_data_name();
 
-					cat = new (pool) catalogue(dialog,
-								   pdesc,
-								   ver.get_edition(),
-								   ver.get_compression_algo(),
-								   options.get_lax(),
-								   lab,
-								   false); // only detruit
+					cat = macro_tools_read_catalogue(dialog,
+									 pool,
+									 ver,
+									 pdesc,
+									 0, // cannot determine cat_size at this stage
+									 tmp1_signatories,
+									 options.get_lax());
+
+					if(!same_signatories(tmp1_signatories, gnupg_signed))
+					{
+					    string msg = gettext("Archive internal catalogue is not identically signed as the archive itself, this might be the sign the archive has been compromised");
+					    if(lax_read_mode)
+						dialog.pause(msg);
+					    else
+						throw Edata(msg);
+					}
 				    }
 				    else
 				    {
 					if(info_details)
 					    dialog.warning(gettext("The catalogue will be filled while sequentially reading the archive, preparing the data structure..."));
-
 					cat = new (pool) escape_catalogue(dialog,
 									  pdesc,
-									  ver.get_edition(),
-									  ver.get_compression_algo(),
+									  ver,
+									  gnupg_signed,
 									  options.get_lax());
 				    }
 				    if(cat == NULL)

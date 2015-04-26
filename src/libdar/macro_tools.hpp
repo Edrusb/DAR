@@ -123,6 +123,7 @@ namespace libdar
 					 bool multi_threaded); //< true if several thread shall be run concurrently by libdar
         // all allocated objects (ret1, ret2, scram), must be deleted when no more needed by the caller of this routine
 
+	/// uses terminator to skip to the position where to find the catalogue and read it, taking care of having this catalogue pointing to the real data (context of isolated catalogue --- cata_stack --- used to rescue an internal archive --- data_stack)
     extern catalogue *macro_tools_get_derivated_catalogue_from(user_interaction & dialog,
 							       memory_pool *pool,
 							       pile & data_stack,  // where to get the files and EA from
@@ -134,6 +135,7 @@ namespace libdar
 							       std::list<signator> & signatories, // returns the list of signatories (empty if archive is was not signed)
 							       bool lax_mode);         // whether to do relaxed checkings
 
+	/// uses terminator to skip to the position where to find the catalogue and read it
     extern catalogue *macro_tools_get_catalogue_from(user_interaction & dialog,
 						     memory_pool *pool,
 						     pile & stack,  // raw data access object
@@ -143,6 +145,15 @@ namespace libdar
 						     const infinint & second_terminateur_offset,
 						     std::list<signator> & signatories, // returns the list of signatories (empty if archive is was not signed)
 						     bool lax_mode);
+
+	/// read the catalogue from cata_stack assuming the cata_stack is positionned at the beginning of the area containing archive's dumped data
+    extern catalogue *macro_tools_read_catalogue(user_interaction & dialog,
+						 memory_pool *pool,
+						 const header_version & ver,
+						 const pile_descriptor & cata_pdesc,
+						 const infinint & cat_size,
+						 std::list<signator> & signatories,
+						 bool lax_mode);
 
     extern catalogue *macro_tools_lax_search_catalogue(user_interaction & dialog,
 						       memory_pool *pool,

@@ -36,8 +36,8 @@ namespace libdar
 				       const label & data_name) : catalogue(dialog, root_last_modif, data_name)
     {
 	set_esc_and_stack(x_pdesc);
-	x_reading_ver = macro_tools_supported_version;
-	x_default_algo = none;
+	x_ver.set_edition(macro_tools_supported_version);
+	x_ver.set_compression_algo(none);
 	x_lax = false;
 	corres.clear();
 	status = ec_completed; // yes, with that constructor, the catalogue contains all known object and entree do not miss any field
@@ -54,15 +54,15 @@ namespace libdar
 
     escape_catalogue::escape_catalogue(user_interaction & dialog,
 				       const pile_descriptor & x_pdesc,
-				       const archive_version & reading_ver,
-				       compression default_algo,
+				       const header_version & ver,
+				       const list<signator> & known_signatories,
 				       bool lax) : catalogue(dialog,
 							     datetime(0),
 							     label_zero)
     {
 	set_esc_and_stack(x_pdesc);
-	x_reading_ver = reading_ver;
-	x_default_algo = default_algo;
+	x_ver = ver;
+	known_sig = known_signatories;
 	x_lax = lax;
 	corres.clear();
 	status = ec_init; // with that constructor, the catalogue starts empty and get completed entry by entry each time a one asks for its contents (read() method)
@@ -392,10 +392,10 @@ namespace libdar
 			    ref = cat_entree::read(get_ui(),
 						   get_pool(),
 						   pdesc,
-						   x_reading_ver,
+						   x_ver.get_edition(),
 						   ceci->access_stats(),
 						   ceci->corres,
-						   ceci->x_default_algo,
+						   x_ver.get_compression_algo(),
 						   false, // lax mode
 						   false, // only_detruit
 						   true); // always a small read in that context
@@ -503,20 +503,29 @@ namespace libdar
 				// build the catalogue to get detruit objects
 			    if(pdesc.esc->skip_to_next_mark(escape::seqt_catalogue, true))
 			    {
+				list<signator> cat_signatories;
 				bool only_detruit = !is_empty(); // we read the whole catalogue if we could not find any entry before the catalogue mark
 				    // this situation is either an extracted catalogue, or a normal archive which only has detruit objects
 				    // in any case, it does not hurt considering the whole catalogue
 
- 				ceci->cat_det = new (get_pool()) catalogue(get_ui(),
+ 				ceci->cat_det = macro_tools_read_catalogue(get_ui(),
+									   get_pool(),
+									   x_ver,
 									   pdesc,
-									   x_reading_ver,
-									   x_default_algo,
-									   x_lax,  // lax
-									   tmp,    // we do not modify the catalogue data_name even in lax mode
-									   only_detruit);  // only_detruit
-
+									   0, // cat_size cannot be determined in sequential_read mode
+									   cat_signatories,
+									   x_lax);
 				if(ceci->cat_det == NULL)
 				    throw Ememory("escape_catalogue::read");
+
+				if(!same_signatories(known_sig, cat_signatories))
+				{
+				    string msg = gettext("Archive internal catalogue is not identically signed as the archive itself, this might be the sign the archive has been compromised");
+				    if(x_lax)
+					get_ui().pause(msg);
+				    else
+					throw Edata(msg);
+				}
 
 				cat_det->reset_read();
 				if(only_detruit)
@@ -613,8 +622,8 @@ namespace libdar
     void escape_catalogue::copy_from(const escape_catalogue & ref)
     {
 	pdesc = ref.pdesc;
-	x_reading_ver = ref.x_reading_ver;
-	x_default_algo = ref.x_default_algo;
+	x_ver = ref.x_ver;
+	known_sig = ref.known_sig;
 	x_lax = ref.x_lax;
 	corres = ref.corres;
 	status = ref.status;

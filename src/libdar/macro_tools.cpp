@@ -150,87 +150,122 @@ namespace libdar
 
         if(cata_stack.skip(term.get_catalogue_start()))
         {
-	    memory_file hash_to_compare;
-	    hash_fichier *hasher = NULL;
-
 	    if(term.get_catalogue_start() > term.get_terminateur_start())
 		throw SRC_BUG;
 	    cat_size = term.get_terminateur_start() - term.get_catalogue_start();
 
-	    try // release hasher in case of exception
+	    ret = macro_tools_read_catalogue(dialog,
+					     pool,
+					     ver,
+					     cata_pdesc,
+					     cat_size,
+					     signatories,
+					     lax_mode);
+
+	    if(ret == NULL)
+		throw Ememory("get_catalogue_from");
+
+	    try
 	    {
-		if(ver.is_signed())
+		data_ctxt->set_info_status(CONTEXT_OP);
+		cata_ctxt->set_info_status(CONTEXT_OP);
+
+		if(&cata_stack != &data_stack)
+		    ret->change_location(data_pdesc);
+	    }
+	    catch(...)
+	    {
+		if(ret != NULL)
+		    delete ret;
+		throw;
+	    }
+	}
+	else
+	    throw Erange("get_catalogue_from", gettext("Missing catalogue in file."));
+
+
+        return ret;
+    }
+
+    catalogue *macro_tools_read_catalogue(user_interaction & dialog,
+					  memory_pool *pool,
+					  const header_version & ver,
+					  const pile_descriptor & cata_pdesc,
+					  const infinint & cat_size,
+					  list<signator> & signatories,
+					  bool lax_mode)
+    {
+        catalogue *ret = NULL;
+	memory_file hash_to_compare;
+	hash_fichier *hasher = NULL;
+	signatories.clear();
+
+	cata_pdesc.check(false);
+
+	try // release hasher in case of exception
+	{
+	    if(ver.is_signed())
+	    {
+		generic_to_global_file *global_hash_to_compare = NULL;
+		generic_to_global_file *global_cata_top_stack = NULL;
+
+		try
 		{
-		    generic_to_global_file *global_hash_to_compare = NULL;
-		    generic_to_global_file *global_cata_top_stack = NULL;
+		    global_hash_to_compare = new (nothrow) generic_to_global_file(dialog, &hash_to_compare, gf_write_only);
+		    if(global_hash_to_compare == NULL)
+			throw Ememory("macro_tools_get_derivated_catalogue_from");
+		    global_cata_top_stack = new (nothrow) generic_to_global_file(dialog, cata_pdesc.stack->top(), gf_read_only);
+		    if(global_cata_top_stack == NULL)
+			throw Ememory("macro_tools_get_derivated_catalogue_from");
 
-		    try
-		    {
-			global_hash_to_compare = new (nothrow) generic_to_global_file(dialog, &hash_to_compare, gf_write_only);
-			if(global_hash_to_compare == NULL)
-			    throw Ememory("macro_tools_get_derivated_catalogue_from");
-			global_cata_top_stack = new (nothrow) generic_to_global_file(dialog, cata_stack.top(), gf_read_only);
-			if(global_cata_top_stack == NULL)
-			    throw Ememory("macro_tools_get_derivated_catalogue_from");
+		    hasher = new (nothrow) hash_fichier(dialog,
+							global_cata_top_stack,
+							"x",
+							global_hash_to_compare,
+							hash_sha512);
+		    if(hasher == NULL)
+			throw Ememory("macro_tools_get_derivated_catalogue_from");
 
-			hasher = new (nothrow) hash_fichier(dialog,
-							   global_cata_top_stack,
-							   "x",
-							   global_hash_to_compare,
-							   hash_sha512);
-			if(hasher == NULL)
-			    throw Ememory("macro_tools_get_derivated_catalogue_from");
-
-			    // at this stage, hasher is created
-			    // and manages the objects global_cata_stack and global_hash_to_compare
-		    }
-		    catch(...)
-		    {
-			if(global_hash_to_compare != NULL)
-			    delete global_hash_to_compare;
-			if(global_cata_top_stack != NULL)
-			    delete global_cata_top_stack;
-			throw;
-		    }
-
-		    cata_stack.push(hasher);
-		    cata_pdesc = pile_descriptor(&cata_stack);
+			// at this stage, hasher is created
+			// and manages the objects global_cata_stack and global_hash_to_compare
+		}
+		catch(...)
+		{
+		    if(global_hash_to_compare != NULL)
+			delete global_hash_to_compare;
+		    if(global_cata_top_stack != NULL)
+			delete global_cata_top_stack;
+		    throw;
 		}
 
-		try // trap cast and rethrow exceptions
-		{
-		    label tmp;
+		cata_pdesc.stack->push(hasher);
+	    }
 
-		    tmp.clear(); // we do not want here to change the catalogue internal data name read from archive
-		    cata_stack.read_ahead(cat_size);
-		    ret = new (pool) catalogue(dialog, cata_pdesc, ver.get_edition(), ver.get_compression_algo(), lax_mode, tmp);
-		    try
-		    {
-			if(ret != NULL && &cata_stack != &data_stack)
-			    ret->change_location(data_pdesc);
-			data_ctxt->set_info_status(CONTEXT_OP);
-			cata_ctxt->set_info_status(CONTEXT_OP);
-		    }
-		    catch(...)
-		    {
-			if(ret != NULL)
-			    delete ret;
-			throw;
-		    }
+	    try // trap cast and rethrow exceptions
+	    {
+		label tmp;
+
+		tmp.clear(); // we do not want here to change the catalogue internal data name read from archive
+		if(cat_size > 0)
+		    cata_pdesc.stack->read_ahead(cat_size);
+		ret = new (pool) catalogue(dialog, cata_pdesc, ver.get_edition(), ver.get_compression_algo(), lax_mode, tmp);
+		if(ret == NULL)
+		    throw Ememory("macro_tools_read_catalogue");
+		try
+		{
 
 		    if(hasher != NULL)
 		    {
 			hasher->terminate();
-			if(cata_stack.top() != hasher)
+			if(cata_pdesc.stack->top() != hasher)
 			    throw SRC_BUG;
-			if(cata_stack.pop() != hasher)
+			if(cata_pdesc.stack->pop() != hasher)
 			    throw SRC_BUG;
-			cata_pdesc = pile_descriptor(&cata_stack);
 		    }
 
 		    if(ver.is_signed())
 		    {
-			tlv hash_to_decrypt(cata_stack); // read the encrypted hash following the catalogue
+			tlv hash_to_decrypt(*cata_pdesc.stack); // read the encrypted hash following the catalogue
 			memory_file clear_read_hash;
 			crypto_asym engine(dialog);
 			crc *tmp = NULL;
@@ -249,47 +284,48 @@ namespace libdar
 			{
 			    if(tmp != NULL)
 				delete tmp;
-			    // else no difference,
-			    // the caller has the signatories and will compare those with the list contained in the archive header
+				// else no difference,
+				// the caller has the signatories and will compare those with the list contained in the archive header
 			}
 		    }
+		}
+		catch(...)
+		{
+		    if(ret != NULL)
+			delete ret;
+		    throw;
+		}
 
-		}
-		catch(Ebug & e)
-		{
-		    throw;
-		}
-		catch(Ethread_cancel & e)
-		{
-		    throw;
-		}
-		catch(Egeneric & e)
-		{
-		    throw Erange("get_catalogue_from", string(gettext("Cannot open catalogue: ")) + e.get_message());
-		}
 	    }
-	    catch(...)
+	    catch(Ebug & e)
 	    {
-		if(cata_stack.top() == hasher)
-		{
-		    if(cata_stack.pop() != hasher)
-			throw SRC_BUG;
-		}
-		if(hasher != NULL)
-		    delete hasher;
 		throw;
 	    }
-
+	    catch(Ethread_cancel & e)
+	    {
+		throw;
+	    }
+	    catch(Egeneric & e)
+	    {
+		throw Erange("get_catalogue_from", string(gettext("Cannot open catalogue: ")) + e.get_message());
+	    }
+	}
+	catch(...)
+	{
+	    if(cata_pdesc.stack->top() == hasher)
+	    {
+		if(cata_pdesc.stack->pop() != hasher)
+		    throw SRC_BUG;
+	    }
 	    if(hasher != NULL)
 		delete hasher;
+	    throw;
 	}
-	else
-	    throw Erange("get_catalogue_from", gettext("Missing catalogue in file."));
 
-        if(ret == NULL)
-            throw Ememory("get_catalogue_from");
+	if(hasher != NULL)
+	    delete hasher;
 
-        return ret;
+	return ret;
     }
 
 

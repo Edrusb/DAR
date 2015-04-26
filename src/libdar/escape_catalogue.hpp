@@ -58,9 +58,9 @@ namespace libdar
 
 	    /// constructor to setup a escape_catalogue that will be fed by sequentially reading the archive
         escape_catalogue(user_interaction & dialog,        //< user interaction
-			 const pile_descriptor & x_pdesc,    //< stack descriptor where to write to
-			 const archive_version & reading_ver,  //< archive format
-			 compression default_algo,         //< default compression algorithm
+			 const pile_descriptor & x_pdesc,  //< stack descriptor where to write to
+			 const header_version & ver,       //< archive header version read
+			 const std::list<signator> & known_signatories, //< signatories that signed the archive header, to be compared with internal catalogue when reaching the end of the archive
 			 bool lax = false);                //< whether to use lax mode
         escape_catalogue(const escape_catalogue & ref) : catalogue(ref) { copy_from(ref); };
         const escape_catalogue & operator = (const escape_catalogue &ref);
@@ -97,8 +97,8 @@ namespace libdar
 	};
 
 	pile_descriptor pdesc;
-	archive_version x_reading_ver;
-	compression x_default_algo;
+	header_version x_ver;
+	std::list<signator> known_sig;
 	bool x_lax;
 	std::map <infinint, cat_etoile *> corres;
         state status;
