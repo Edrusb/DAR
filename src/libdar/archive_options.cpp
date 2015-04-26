@@ -406,9 +406,9 @@ namespace libdar
     void archive_options_create::set_gnupg_key_size(U_I gnupg_key_size)
     {
 	if(gnupg_key_size == 0)
-	    x_gnupg_key_size = gnupg_key_size;
-	else
 	    x_gnupg_key_size = default_gnupg_key_size;
+	else
+	    x_gnupg_key_size = gnupg_key_size;
     }
 
 

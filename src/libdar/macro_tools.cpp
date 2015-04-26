@@ -1130,7 +1130,7 @@ namespace libdar
 			char variable_size;
 			dialog.warning(gettext("Generating random key for symmetric encryption..."));
 			gcry_randomize(&variable_size, 1, GCRY_STRONG_RANDOM);
-			gnupg_key_size += variable_size; // yes we do not use constant sized key but add from +0 to +255 bytes to its specified length
+			gnupg_key_size += (unsigned char)(variable_size); // yes we do not use constant sized key but add from +0 to +255 bytes to its specified length
 			secu_memory_file clear(gnupg_key_size, true);
 			dialog.warning(gettext("Key generated"));
 
