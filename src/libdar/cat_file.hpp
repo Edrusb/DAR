@@ -76,6 +76,8 @@ namespace libdar
 		 bool small);
         ~cat_file() { detruit(); };
 
+	bool operator == (const cat_entree & ref) const;
+
         bool has_changed_since(const cat_inode & ref, const infinint & hourshift, cat_inode::comparison_fields what_to_check) const;
         infinint get_size() const { return *size; };
 	void change_size(const infinint & s) const { *size = s; };

@@ -33,6 +33,18 @@ using namespace std;
 namespace libdar
 {
 
+
+    bool cat_ignored_dir::operator == (const cat_entree & ref) const
+    {
+	const cat_ignored_dir *ref_ignored_dir = dynamic_cast<const cat_ignored_dir *>(&ref);
+
+	if(ref_ignored_dir == NULL)
+	    return false;
+	else
+	    return cat_inode::operator == (ref);
+    }
+
+
     void cat_ignored_dir::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
 	cat_directory tmp = cat_directory(get_uid(), get_gid(), get_perm(), get_last_access(), get_last_modif(), get_last_change(), get_name(), 0);

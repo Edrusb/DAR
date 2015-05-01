@@ -43,6 +43,16 @@ namespace libdar
 	    tools_read_string(*pdesc.stack, xname);
     }
 
+    bool cat_nomme::operator == (const cat_entree & ref) const
+    {
+	const cat_nomme *ref_nomme = dynamic_cast<const cat_nomme *>(&ref);
+
+	if(ref_nomme == NULL)
+	    return false;
+	else
+	    return xname == ref_nomme->xname;
+    }
+
     void cat_nomme::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
         cat_entree::inherited_dump(pdesc, small);

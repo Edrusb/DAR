@@ -46,7 +46,7 @@ namespace libdar
     public:
         cat_nomme(const std::string & name) { xname = name; };
         cat_nomme(const pile_descriptor & pdesc, bool small);
-	virtual bool operator == (const cat_nomme & ref) const { return xname == ref.xname; };
+	bool operator == (const cat_entree & ref) const;
 	virtual bool operator < (const cat_nomme & ref) const { return xname < ref.xname; };
 
         const std::string & get_name() const { return xname; };

@@ -51,6 +51,8 @@ namespace libdar
 			const archive_version & reading_ver,
 			bool small) : cat_inode(dialog, pdesc, reading_ver, s_not_saved, small) { throw SRC_BUG; };
 
+	bool operator == (const cat_entree & ref) const;
+
         unsigned char signature() const { return 'j'; };
         cat_entree *clone() const { return new (get_pool()) cat_ignored_dir(*this); };
 

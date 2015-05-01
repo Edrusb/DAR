@@ -51,6 +51,8 @@ namespace libdar
         cat_detruit(const pile_descriptor & pdesc, const archive_version & reading_ver, bool small);
 	cat_detruit(const cat_nomme & ref) : cat_nomme(ref.get_name()), del_date(0) { signe = ref.signature(); };
 
+	bool operator == (const cat_entree & ref) const;
+
         unsigned char get_signature() const { return signe; };
         void set_signature(unsigned char x) { signe = x; };
 

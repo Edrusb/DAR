@@ -51,6 +51,18 @@ namespace libdar
 	    del_date = datetime(0);
     }
 
+    bool cat_detruit::operator == (const cat_entree & ref) const
+    {
+	const cat_detruit *ref_det = dynamic_cast<const cat_detruit *>(&ref);
+
+	if(ref_det == NULL)
+	    return false;
+	else
+	    return signe == ref_det->signe
+		&& del_date == ref_det->del_date
+		&& cat_nomme::operator == (ref);
+    }
+
     void cat_detruit::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
 	generic_file * ptr = NULL;

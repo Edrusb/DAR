@@ -99,6 +99,19 @@ namespace libdar
 	}
     }
 
+    bool cat_device::operator == (const cat_entree & ref) const
+    {
+	const cat_device *ref_dev = dynamic_cast<const cat_device *>(&ref);
+
+	if(ref_dev == NULL)
+	    return false;
+	else
+	    return xmajor == ref_dev->xmajor
+		&& xminor == ref_dev->xminor
+		&& cat_inode::operator == (ref);
+    }
+
+
     void cat_device::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
 	U_16 tmp;

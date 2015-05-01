@@ -124,6 +124,10 @@ namespace libdar
 	    /// destructor
         virtual ~cat_entree() {};
 
+	    /// returns true if the two object have the same content
+	virtual bool operator == (const cat_entree & ref) const { return true; };
+	bool operator != (const cat_entree & ref) const { return ! (*this == ref); };
+
 	    /// write down the object information to a stack
 	    ///
 	    /// \param[in,out] pdesc is the stack where to write the data to

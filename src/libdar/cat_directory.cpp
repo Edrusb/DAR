@@ -197,6 +197,16 @@ namespace libdar
 	clear();
     }
 
+    bool cat_directory::operator == (const cat_entree & ref) const
+    {
+	const cat_directory *ref_dir = dynamic_cast<const cat_directory *>(&ref);
+
+	if(ref_dir == NULL)
+	    return false;
+	else
+	    return cat_inode::operator == (ref);
+    }
+
     void cat_directory::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
 	list<cat_nomme *>::const_iterator x = ordered_fils.begin();

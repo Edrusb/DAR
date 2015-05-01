@@ -63,6 +63,8 @@ namespace libdar
 		    saved_status saved,
 		    bool small) : cat_device(dialog, pdesc, reading_ver, saved, small) {};
 
+	bool operator == (const cat_entree & ref) const;
+
             // using dump from cat_device class
             // using method is_more_recent_than() from cat_device class
             // using method has_changed_since() from cat_device class

@@ -72,6 +72,9 @@ namespace libdar
 		      bool small);
         ~cat_directory(); // detruit aussi tous les fils et se supprime de son 'parent'
 
+	    /// attention this compares only the directories themselves, not the list of their children
+	bool operator == (const cat_entree & ref) const;
+
         void add_children(cat_nomme *r); // when r is a cat_directory, 'parent' is set to 'this'
 	bool has_children() const { return !ordered_fils.empty(); };
         void reset_read_children() const;

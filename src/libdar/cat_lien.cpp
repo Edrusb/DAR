@@ -62,6 +62,17 @@ namespace libdar
 	    tools_read_string(*ptr, points_to);
     }
 
+    bool cat_lien::operator == (const cat_entree & ref) const
+    {
+	const cat_lien *ref_lien = dynamic_cast<const cat_lien *>(&ref);
+
+	if(ref_lien == NULL)
+	    return false;
+	else
+	    return points_to == ref_lien->points_to
+		&& cat_inode::operator == (ref);
+    }
+
     const string & cat_lien::get_target() const
     {
 	if(get_saved_status() != s_saved)

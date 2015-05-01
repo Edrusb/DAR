@@ -165,6 +165,13 @@ namespace libdar
 	    // inspected had not changed since the reference was done
 	    // aborting_last_etoile is the highest etoile reference withing "this" current object.
 
+
+	    /// check whether all inode existing in the "this" and ref have the same attributes
+	    ///
+	    /// \note stops at the first inode found in both catalogue that do not match for at least one attribute
+	    /// including CRC for DATA, EA or FSA if present, then return false.
+	bool is_subset_of(const catalogue & ref) const;
+
 	    /// before dumping the catalogue, need to set all hardlinked inode they have not been saved once
 	void reset_dump() const;
 

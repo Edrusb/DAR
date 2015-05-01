@@ -25,39 +25,20 @@ extern "C"
 {
 } // end extern "C"
 
-#include "cat_door.hpp"
-#include "null_file.hpp"
+#include "cat_tube.hpp"
 
 using namespace std;
 
 namespace libdar
 {
-
-    bool cat_door::operator == (const cat_entree & ref) const
+    bool cat_tube::operator == (const cat_entree & ref) const
     {
-	const cat_door *ref_door = dynamic_cast<const cat_door *>(&ref);
+	const cat_tube *ref_tube = dynamic_cast<const cat_tube *>(&ref);
 
-	if(ref_door == NULL)
+	if(ref_tube == NULL)
 	    return false;
 	else
-	    return cat_file::operator == (ref);
-    }
-
-    generic_file *cat_door::get_data(get_data_mode mode) const
-    {
-	generic_file *ret = NULL;
-
-	if(status == from_path)
-	{
-	    ret = new (get_pool()) null_file(gf_read_only);
-	    if(ret == NULL)
-		throw Ememory("cat_door::get_data");
-	}
-	else
-	    ret = cat_file::get_data(mode);
-
-	return ret;
+	    return cat_inode::operator == (ref);
     }
 
 } // end of namespace
-

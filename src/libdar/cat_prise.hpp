@@ -60,6 +60,8 @@ namespace libdar
 		  saved_status saved,
 		  bool small): cat_inode(dialog, pdesc, reading_ver, saved, small) {};
 
+	bool operator == (const cat_entree & ref) const;
+
             // using dump from cat_inode class
             // using method is_more_recent_than() from cat_inode class
             // using method has_changed_since() from cat_inode class

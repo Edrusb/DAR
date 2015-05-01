@@ -62,6 +62,8 @@ namespace libdar
 		 compression default_algo,
 		 bool small) : cat_file(dialog, pdesc, reading_ver, saved, default_algo, small) {};
 
+	bool operator == (const cat_entree & ref) const;
+
         unsigned char signature() const { return mk_signature('o', get_saved_status()); };
 
         generic_file *get_data(get_data_mode mode) const; // inherited from class cat_file

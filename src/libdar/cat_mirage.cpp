@@ -256,6 +256,28 @@ namespace libdar
             star_ref->get_inode()->post_constructor(pdesc);
     }
 
+    bool cat_mirage::operator == (const cat_entree & ref) const
+    {
+	const cat_mirage *ref_mirage = dynamic_cast<const cat_mirage *>(&ref);
+
+	if(ref_mirage == NULL)
+	    return false;
+	else
+	{
+	    cat_inode *me = get_inode();
+	    cat_inode *you = ref_mirage->get_inode();
+
+	    if(me == NULL || you == NULL)
+		throw SRC_BUG;
+	    me->change_name(get_name());
+	    you->change_name(get_name());
+
+	    return *me == *you
+		&& cat_nomme::operator == (ref);
+	}
+    }
+
+
     void cat_mirage::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
 	generic_file *ptr = NULL;

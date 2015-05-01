@@ -57,6 +57,8 @@ namespace libdar
 		 saved_status saved,
 		 bool small);
 
+	bool operator == (const cat_entree & ref) const;
+
         const std::string & get_target() const;
         void set_target(std::string x);
 

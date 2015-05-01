@@ -51,6 +51,8 @@ namespace libdar
         ea_attributs(generic_file & f, const archive_version & edit);
         ea_attributs(const ea_attributs & ref);
 
+	bool operator == (const ea_attributs & ref) const { return attr == ref.attr; };
+
         void dump(generic_file & f) const;
         void add(const std::string & key, const std::string & value) { attr[key] = value; };
         void reset_read() const;

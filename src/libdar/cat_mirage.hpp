@@ -75,6 +75,8 @@ namespace libdar
 	const cat_mirage & operator = (const cat_mirage & ref);
 	~cat_mirage() { star_ref->drop_ref(this); };
 
+	bool operator == (const cat_entree & ref) const;
+
 	unsigned char signature() const { return 'm'; };
 	cat_entree *clone() const { return new (get_pool()) cat_mirage(*this); };
 

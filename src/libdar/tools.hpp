@@ -824,6 +824,25 @@ namespace libdar
     extern std::vector<std::string> tools_substract_from_vector(const std::vector<std::string> & a, const std::vector<std::string> & b);
 
 
+	/// compares pointers if not NULL compares their values, true if equal, false if not (pointers or values different)
+    template <class T> bool tools_compare_pointers(const T *a, const T *b)
+    {
+	if(a != NULL && b != NULL)
+	{
+	    if(a != b)
+		return false;
+	    else
+		return true;
+	}
+	else
+	{
+	    if(a != NULL || b != NULL)
+		return false;
+	    else
+		return true;
+	}
+    }
+
 } /// end of namespace
 
 #endif

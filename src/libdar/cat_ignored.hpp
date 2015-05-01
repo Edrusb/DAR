@@ -47,6 +47,8 @@ namespace libdar
         cat_ignored(const std::string & name) : cat_nomme(name) {};
         cat_ignored(const pile_descriptor & pdesc, bool small) : cat_nomme(pdesc, small) { throw SRC_BUG; };
 
+	bool operator == (const cat_entree & ref) const;
+
         unsigned char signature() const { return 'i'; };
         cat_entree *clone() const { return new (get_pool()) cat_ignored(*this); };
 

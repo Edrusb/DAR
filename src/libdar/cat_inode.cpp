@@ -54,6 +54,7 @@ extern "C"
 
 #include "cat_inode.hpp"
 #include "cat_lien.hpp"
+#include "tools.hpp"
 
 #define INODE_FLAG_EA_MASK  0x07
 #define INODE_FLAG_EA_FULL  0x01
@@ -365,6 +366,73 @@ namespace libdar
     {
         return cat_nomme::same_as(ref) && compatible_signature(ref.signature(), signature());
     }
+
+    bool cat_inode::operator == (const cat_entree & ref) const
+    {
+	const cat_inode *ref_inode = dynamic_cast<const cat_inode *>(&ref);
+
+	if(ref_inode == NULL)
+	    return false;
+	else
+	{
+	    if(uid != ref_inode->uid)
+		return false;
+
+	    if(gid != ref_inode->gid)
+		return false;
+
+	    if(perm != ref_inode->perm)
+		return false;
+
+	    if(last_acc != ref_inode->last_acc)
+		return false;
+
+	    if(!tools_compare_pointers(last_cha, ref_inode->last_cha))
+		return false;
+
+	    if(xsaved != ref_inode->xsaved)
+		return false;
+
+	    if(ea_saved != ref_inode->ea_saved)
+		return false;
+
+	    if(fsa_saved != ref_inode->fsa_saved)
+		return false;
+
+	    if(!tools_compare_pointers(ea_offset, ref_inode->ea_offset))
+		return false;
+
+	    if(!tools_compare_pointers(ea, ref_inode->ea))
+		return false;
+
+	    if(!tools_compare_pointers(ea_size, ref_inode->ea_size))
+		return false;
+
+	    if(!tools_compare_pointers(ea_crc, ref_inode->ea_crc))
+		return false;
+
+	    if(!tools_compare_pointers(fsa_families, ref_inode->fsa_families))
+		return false;
+
+	    if(!tools_compare_pointers(fsa_offset, ref_inode->fsa_offset))
+		return false;
+
+	    if(!tools_compare_pointers(fsal, ref_inode->fsal))
+		return false;
+
+	    if(!tools_compare_pointers(fsa_size, ref_inode->fsa_size))
+		return false;
+
+	    if(!tools_compare_pointers(fsa_crc, ref_inode->fsa_crc))
+		return false;
+
+	    if(!tools_compare_pointers(fs_dev, ref_inode->fs_dev))
+		return false;
+
+	    return cat_nomme::operator == (ref);
+	}
+    }
+
 
     bool cat_inode::is_more_recent_than(const cat_inode & ref, const infinint & hourshift) const
     {

@@ -59,6 +59,8 @@ namespace libdar
 		   saved_status saved,
 		   bool small);
 
+	bool operator == (const cat_entree & ref) const;
+
         int get_major() const { if(get_saved_status() != s_saved) throw SRC_BUG; else return xmajor; };
         int get_minor() const { if(get_saved_status() != s_saved) throw SRC_BUG; else return xminor; };
         void set_major(int x) { xmajor = x; };

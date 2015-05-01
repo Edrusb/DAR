@@ -1524,6 +1524,47 @@ namespace libdar
 	get_ui().warning("-----");
     }
 
+    bool catalogue::is_subset_of(const catalogue & ref) const
+    {
+	bool ret = true;
+	const cat_entree *moi = NULL;
+	const cat_entree *toi = NULL;
+
+	reset_read();
+	ref.reset_compare();
+
+	try
+	{
+	    while(ret && !read(moi))
+	    {
+		if(moi == NULL)
+		    throw SRC_BUG;
+
+		if(!ref.compare(moi, toi))
+		    ret = false;
+		else
+		{
+		    if(toi == NULL)
+			throw SRC_BUG;
+		    if(*toi != *moi)
+			ret = false;
+		}
+	    }
+	}
+	catch(Edata & e)
+	{
+	    ret = false;
+		// no rethrow
+	}
+	catch(Erange & e)
+	{
+	    ret = false;
+		// no rethrow
+	}
+
+	return ret;
+    }
+
 
     void catalogue::reset_dump() const
     {
