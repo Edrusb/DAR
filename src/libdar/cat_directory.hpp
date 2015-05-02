@@ -83,8 +83,12 @@ namespace libdar
 	    // remove all entry not yet read by read_children
 	void tail_to_read_children();
 
-	void remove(const std::string & name); // remove the given entry from the catalogue
-	    // as side effect the reset_read_children() method must be called.
+
+	    /// remove the given entry from the catalogue
+	    ///
+	    /// \note read_children() is taken into account by this operation,
+	    /// to call no need to reset_read_children()
+	void remove(const std::string & name);
 
         cat_directory * get_parent() const { return parent; };
         bool search_children(const std::string &name, const cat_nomme *&ref) const;
@@ -147,7 +151,7 @@ namespace libdar
         std::map<std::string, cat_nomme *> fils; // used for fast lookup
 #endif
 	std::list<cat_nomme *> ordered_fils;
-        std::list<cat_nomme *>::iterator it;
+        std::list<cat_nomme *>::iterator it; //< next to entry to be returned by read_children
 	bool recursive_has_changed;
 
 	void clear();

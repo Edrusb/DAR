@@ -410,7 +410,7 @@ namespace libdar
     void cat_directory::remove(const string & name)
     {
 
-	    // localizing old object in ordered_fils
+	    // locating old object in ordered_fils
 	list<cat_nomme *>::iterator ot = ordered_fils.begin();
 
 	while(ot != ordered_fils.end() && *ot != NULL && (*ot)->get_name() != name)
@@ -437,15 +437,19 @@ namespace libdar
 	fils.erase(ut);
 #endif
 
-	    // recoding the address of the object to remove
+	    // recording the address of the object to remove
 	cat_nomme *obj = *ot;
 
 	    // removing its reference from ordered_fils
-	ordered_fils.erase(ot);
+	    // and having "it" pointing to the entry following the
+	    // removed one, if it would have been the next entry to be read
+	if(it == ot)
+	    it = ordered_fils.erase(ot);
+	else
+	    (void)ordered_fils.erase(ot);
 
 	    // destroying the object itself
 	delete obj;
-	reset_read_children();
 	recursive_flag_size_to_update();
     }
 
