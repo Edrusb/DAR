@@ -153,7 +153,9 @@ namespace libdar
 						 const pile_descriptor & cata_pdesc,
 						 const infinint & cat_size,
 						 std::list<signator> & signatories,
-						 bool lax_mode);
+						 bool lax_mode,
+						 const label & lax_layer1_data_name,
+						 bool only_detruits);
 
     extern catalogue *macro_tools_lax_search_catalogue(user_interaction & dialog,
 						       memory_pool *pool,

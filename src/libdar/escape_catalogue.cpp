@@ -367,6 +367,10 @@ namespace libdar
 	pdesc.stack->flush_read_above(pdesc.esc);
 	try
 	{
+	    list<signator> cat_signatories;
+	    bool only_detruit = false;
+	    bool compare_content = false;
+
 	    while(ref == NULL && !stop)
 	    {
 		switch(status)
@@ -500,43 +504,9 @@ namespace libdar
 				    pdesc.stack->flush_read_above(pdesc.compr);
 			    }
 
-				// build the catalogue to get detruit objects
 			    if(pdesc.esc->skip_to_next_mark(escape::seqt_catalogue, true))
 			    {
-				list<signator> cat_signatories;
-				bool only_detruit = !is_empty(); // we read the whole catalogue if we could not find any entry before the catalogue mark
-				    // this situation is either an extracted catalogue, or a normal archive which only has detruit objects
-				    // in any case, it does not hurt considering the whole catalogue
-
- 				ceci->cat_det = macro_tools_read_catalogue(get_ui(),
-									   get_pool(),
-									   x_ver,
-									   pdesc,
-									   0, // cat_size cannot be determined in sequential_read mode
-									   cat_signatories,
-									   x_lax);
-				if(ceci->cat_det == NULL)
-				    throw Ememory("escape_catalogue::read");
-
-				if(!same_signatories(known_sig, cat_signatories))
-				{
-				    string msg = gettext("Archive internal catalogue is not identically signed as the archive itself, this might be the sign the archive has been compromised");
-				    if(x_lax)
-					get_ui().pause(msg);
-				    else
-					throw Edata(msg);
-				}
-
-				cat_det->reset_read();
-				if(only_detruit)
-				    ceci->status = ec_detruits;
-				else
-				{
-				    ceci->status = ec_completed;
-				    ceci->swap_stuff(*(ceci->cat_det));
-				    delete ceci->cat_det;
-				    ceci->cat_det = NULL;
-				}
+				ceci->status = ec_signature;
 				stop = false;
 				ref = NULL;
 			    }
@@ -567,9 +537,100 @@ namespace libdar
 		    else
 			ceci->status = ec_marks;
 		    break;
+		case ec_signature:
+
+			// build the catalogue to get detruit objects
+			// but first checking the catalogue signature if any
+			// and comparing the internal catalogue to inline catalogue content
+
+		    only_detruit = !is_empty();
+		    compare_content = x_ver.is_signed() && only_detruit;
+
+			// if the archive is not signed and this is not a isolated catalogue
+			// (that's to say we have sequentially read some entries) we can filter
+			// out from the catalogue all non detruits objects.
+			// Else we need the whole catalogue, if it is an isolated catalogue
+			// We need it but temporarily full if the archive is signed to compare
+			// the inernal catalogue content and CRC (which is signed) with inline content
+			// and CRC used so far for sequential reading, then if OK, we must drop from it
+			// all the non detruits objects
+
+		    ceci->cat_det = macro_tools_read_catalogue(get_ui(),
+							       get_pool(),
+							       x_ver,
+							       pdesc,
+							       0, // cat_size cannot be determined in sequential_read mode
+							       cat_signatories,
+							       x_lax,
+							       label_zero,
+							       only_detruit && ! compare_content);
+		    if(ceci->cat_det == NULL)
+			throw Ememory("escape_catalogue::read");
+
+		    try
+		    {
+
+			if(!same_signatories(known_sig, cat_signatories))
+			{
+			    string msg = gettext("Archive internal catalogue is not identically signed as the archive itself, this might be the sign the archive has been compromised");
+			    if(x_lax)
+				get_ui().pause(msg);
+			    else
+				throw Edata(msg);
+			}
+
+			if(compare_content)
+			{
+				// checking that all entries read so far
+				// have an identical entry in the internal (signed)
+				// catalogue
+
+			    ceci->status = ec_completed; // necessary to compare the inline content
+			    if(!is_subset_of(*cat_det))
+			    {
+				string msg = gettext("Archive internal catalogue is properly signed but its content does not match the tape marks used so far for sequentially reading. Possible data corruption or archive compromission occurred! if data extracted in sequential read mode does not match the data extracted in direct access mode, consider the sequential data has been been modified after the archive has been generated");
+				if(x_lax)
+				    get_ui().pause(msg);
+				else
+				    throw Edata(msg);
+			    }
+
+				// filter out all except detruits and directories objects
+			    cat_det->drop_all_non_detruits();
+			}
+
+			cat_det->reset_read();
+			if(only_detruit)
+			{
+			    ceci->status = ec_detruits;
+			    stop = false;
+			    ref = NULL;
+			}
+			else
+			{
+			    ceci->status = ec_completed;
+			    ceci->swap_stuff(*(ceci->cat_det));
+			    delete ceci->cat_det;
+			    ceci->cat_det = NULL;
+			}
+		    }
+		    catch(...)
+		    {
+			if(ceci->cat_det != NULL)
+			{
+			    delete ceci->cat_det;
+			    ceci->cat_det = NULL;
+			}
+			throw;
+		    }
+		    break;
 		case ec_detruits:
 		    if(cat_det == NULL)
 			throw SRC_BUG;
+
+			// cat_det has been set to only read detruit() objects
+			// if it fails reading this means we have reached
+			// the end of the detruits
 		    if(!cat_det->read(ref))
 		    {
 			ceci->merge_cat_det();
@@ -577,7 +638,7 @@ namespace libdar
 			ref = NULL;
 			stop = true;
 		    }
-		    else
+		    else // we return the provided detruit object
 			if(ref == NULL)
 			    throw SRC_BUG;
 		    break;
@@ -673,6 +734,7 @@ namespace libdar
 	    merge_cat_det();
 	    status = ec_completed;
 	    break;
+	case ec_signature:
 	case ec_completed:
 	    break;
 	default:

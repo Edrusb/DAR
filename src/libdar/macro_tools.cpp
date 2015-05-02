@@ -160,7 +160,9 @@ namespace libdar
 					     cata_pdesc,
 					     cat_size,
 					     signatories,
-					     lax_mode);
+					     lax_mode,
+					     label_zero,
+					     false); // only_detruit
 
 	    if(ret == NULL)
 		throw Ememory("get_catalogue_from");
@@ -193,7 +195,9 @@ namespace libdar
 					  const pile_descriptor & cata_pdesc,
 					  const infinint & cat_size,
 					  list<signator> & signatories,
-					  bool lax_mode)
+					  bool lax_mode,
+					  const label & lax_layer1_data_name,
+					  bool only_detruits)
     {
         catalogue *ret = NULL;
 	memory_file hash_to_compare;
@@ -243,12 +247,15 @@ namespace libdar
 
 	    try // trap cast and rethrow exceptions
 	    {
-		label tmp;
-
-		tmp.clear(); // we do not want here to change the catalogue internal data name read from archive
 		if(cat_size > 0)
 		    cata_pdesc.stack->read_ahead(cat_size);
-		ret = new (pool) catalogue(dialog, cata_pdesc, ver.get_edition(), ver.get_compression_algo(), lax_mode, tmp);
+		ret = new (pool) catalogue(dialog,
+					   cata_pdesc,
+					   ver.get_edition(),
+					   ver.get_compression_algo(),
+					   lax_mode,
+					   lax_layer1_data_name,
+					   only_detruits);
 		if(ret == NULL)
 		    throw Ememory("macro_tools_read_catalogue");
 		try

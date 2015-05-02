@@ -277,7 +277,9 @@ namespace libdar
 									 pdesc,
 									 0, // cannot determine cat_size at this stage
 									 tmp1_signatories,
-									 options.get_lax());
+									 options.get_lax(),
+									 lab,
+									 false); // only_detruits
 
 					if(!same_signatories(tmp1_signatories, gnupg_signed))
 					{

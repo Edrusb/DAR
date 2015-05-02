@@ -92,6 +92,7 @@ namespace libdar
 	    ec_init,   //< state in which no one file has yet been searched in the archive
 	    ec_marks,  //< state in which we find the next file using escape sequence marks
 	    ec_eod,    //< state in which the archive is missing trailing EOD entries, due to user interruption, thus returning EOD in enough number to get back to the root directory
+	    ec_signature, //< state in which we compare inline and internal catalogues
 	    ec_detruits,  //< state in which which detruits objects are returned from the catalogue
 	    ec_completed  //< state in which the escape_catalogue object is completed and has all information in memory as a normal catalogue
 	};
