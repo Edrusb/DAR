@@ -814,9 +814,6 @@ When creating an archive with public key encryption (read -K option) it is also 
 .RS
 .PP
 A summay information about the signature information is displayed while listing an archive in summary mode "dar -l <archive> -q". For any operation involving a signed archive, a short message only shows if the archive is signed an one or more signature check failed, no message is displayed in case of successful signature check. This warning may be disabled using the --alter=blind-to-signatures command.
-.PP
-.B Security Note:
-This way of signing has some vulnerabilities: If a recipient's private key has been compromised, it is possible for the attacker to know the key used to cipher the archive: this randomly chosen key for symmetrical encryption is placed encrypted inside the archive using the asymetrical algorithm that the attacker can decypher using the compromised private key. Such attacker can then generate a completely different archive using the same key you have signed. To cope with that, it is advised to use the --hash option to generate md5 or sha1 files of each slices and to (also) sign those files that will be provided beside the archive slices.
 .RE
 .TP 20
 -ab, --alter=blind-to-signatures
