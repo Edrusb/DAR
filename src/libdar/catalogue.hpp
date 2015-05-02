@@ -157,14 +157,23 @@ namespace libdar
 
 	    // non interative methods
 
+
+	    /// add into "this" detruit object corresponding to object of ref absent in "this"
+	    ///
+	    ///\note ref must have the same directory tree "this", else the operation generates an exception
         infinint update_destroyed_with(const catalogue & ref);
-            // ref must have the same root, else the operation generates an exception
 
+
+	    /// copy from ref missing files in "this" and mark then as "not_saved" (no change since reference)
+	    ///
+	    /// in case of abortion, completes missing files as if what could not be
+	    /// inspected had not changed since the reference was done
+	    /// aborting_last_etoile is the highest etoile reference withing "this" current object.
 	void update_absent_with(const catalogue & ref, infinint aborting_next_etoile);
-	    // in case of abortion, completes missing files as if what could not be
-	    // inspected had not changed since the reference was done
-	    // aborting_last_etoile is the highest etoile reference withing "this" current object.
 
+
+	    /// remove/destroy from "this" all objects that are neither directory nor detruit objects
+	void drop_all_non_detruits();
 
 	    /// check whether all inode existing in the "this" and ref have the same attributes
 	    ///

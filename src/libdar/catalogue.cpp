@@ -1524,6 +1524,33 @@ namespace libdar
 	get_ui().warning("-----");
     }
 
+    void catalogue::drop_all_non_detruits()
+    {
+	cat_directory *ptr = contenu;
+	const cat_nomme *e = NULL;
+	const cat_directory *e_dir = NULL;
+	const cat_detruit *e_det = NULL;
+
+	ptr->reset_read_children();
+	while(ptr != NULL)
+	{
+	    if(ptr->read_children(e))
+	    {
+		e_dir = dynamic_cast<const cat_directory *>(e);
+		e_det = dynamic_cast<const cat_detruit *>(e);
+		if(e_dir != NULL)
+		{
+		    ptr = const_cast<cat_directory *>(e_dir);
+		    ptr->reset_read_children();
+		}
+		else if(e_det == NULL)
+		    ptr->remove(e->get_name());
+	    }
+	    else // finished reading the current directory
+		ptr = ptr->get_parent();
+	}
+    }
+
     bool catalogue::is_subset_of(const catalogue & ref) const
     {
 	bool ret = true;
