@@ -129,6 +129,9 @@ static const U_I min_compr_size_default = 100;
 static const U_I sparse_file_min_size_default = 15;
     // the default value for --sparse-file-min-size
 
+static const char * AUXILIARY_TARGET = "auxiliary";
+static const char * REFERENCE_TARGET = "reference";
+
     // return a newly allocated memory (to be deleted by the caller)
 static void show_license(shell_interaction & dialog);
 static void show_warranty(shell_interaction & dialog);
@@ -352,7 +355,7 @@ bool get_args(shell_interaction & dialog,
 
                 while(it != rec.non_options.end())
                 {
-                    if(*it != "auxiliary" && *it != "reference") // theses two targets are stored as "user targets" but are reserved targets not user's
+                    if(*it != AUXILIARY_TARGET && *it != REFERENCE_TARGET) // theses two targets are stored as "user targets" but are reserved targets not user's
                     {
                         if(!init_message_done)
                         {
@@ -372,6 +375,10 @@ bool get_args(shell_interaction & dialog,
             // some sanity checks
 
         vector<string> unseen = tools_substract_from_vector(rec.non_options, rec.read_targets);
+	vector<string> special_targets;
+	special_targets.push_back(AUXILIARY_TARGET);
+	special_targets.push_back(REFERENCE_TARGET);
+	unseen = tools_substract_from_vector(unseen, special_targets);
         if(!unseen.empty())
         {
             string not_seen;
