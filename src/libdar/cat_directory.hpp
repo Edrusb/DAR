@@ -87,7 +87,9 @@ namespace libdar
 	    /// remove the given entry from the catalogue
 	    ///
 	    /// \note read_children() is taken into account by this operation,
-	    /// to call no need to reset_read_children()
+	    /// no need to call reset_read_children(), if the argument removed was the
+	    /// one about to be read by read_children() the one following the removed entry
+	    /// will be returned the next time read_children() is invoked.
 	void remove(const std::string & name);
 
         cat_directory * get_parent() const { return parent; };

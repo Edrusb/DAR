@@ -1547,7 +1547,17 @@ namespace libdar
 		    ptr->remove(e->get_name());
 	    }
 	    else // finished reading the current directory
-		ptr = ptr->get_parent();
+	    {
+		cat_directory *parent = ptr->get_parent();
+
+		if(parent != NULL && !ptr->has_children())
+		{
+		    parent->remove(ptr->get_name());
+		    ptr = parent;
+		}
+		else
+		    ptr = parent;
+	    }
 	}
     }
 
