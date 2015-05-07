@@ -2700,7 +2700,7 @@ namespace libdar
 
     string tools_get_compression_ratio(const infinint & storage_size, const infinint & file_size, bool compressed)
     {
-        if(storage_size == 0 || !compressed)
+        if(!compressed)
             return "     ";
         else
             if(file_size >= storage_size)

@@ -267,11 +267,16 @@ namespace libdar
 		else if(f_file != NULL && f_file->get_saved_status() == s_saved)
 		{
 		    me->x_size += f_file->get_size();
-		    if(f_file->get_storage_size() == 0)
-			me->x_storage_size += f_file->get_size();
-			// in old archives storage_size was set to zero to mean "no compression used"
-		    else
+		    if(f_file->get_storage_size() != 0 || f_file->get_sparse_file_detection_read())
 			me->x_storage_size += f_file->get_storage_size();
+		    else
+			me->x_storage_size += f_file->get_size();
+			// in very first archive formats, storage_size was set to zero to
+			// indicate "no compression used"
+			// the only way to have zero as storage_size is either file size is
+			// zero or file is a sparse_file with only zeroed bytes. Sparse file
+			// were not taken into account in that old archive that set storage_size
+			// to zero to indicate the absence of compression
 		}
 
 		++it;

@@ -1297,7 +1297,7 @@ namespace libdar
 
 				unmk_signature(e_ino->signature(), sig, data_st, isolated);
 				data_st = isolated ? s_fake : e_ino->get_saved_status(); // the trusted source for cat_inode status is get_saved_status, not the signature (may change in future, who knows)
-				if(stored == "0")
+				if(stored == "0" && (reg == NULL || !reg->get_sparse_file_detection_read()))
 				    stored = size;
 
 				    // defining "data" string

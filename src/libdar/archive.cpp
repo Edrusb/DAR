@@ -932,20 +932,17 @@ namespace libdar
 
 	    infinint g_storage_size = get_cat().get_contenu()->get_storage_size();
 	    infinint g_size =  get_cat().get_contenu()->get_size();
-	    if(g_storage_size > 0)
+
+	    if(g_size < g_storage_size)
 	    {
-		if(g_size < g_storage_size)
-		{
-		    infinint delta = g_storage_size - g_size;
-		    dialog.printf(gettext("The overall archive size includes %i byte(s) wasted due to bad compression ratio"), &delta);
-		}
-		else
-		    dialog.warning(string(gettext("The global data compression ratio is: "))
-				   + tools_get_compression_ratio(g_storage_size,
-								 g_size,
-								 true));
+		infinint delta = g_storage_size - g_size;
+		dialog.printf(gettext("The overall archive size includes %i byte(s) wasted due to bad compression ratio"), &delta);
 	    }
-		// else we don't display anyting
+	    else
+		dialog.warning(string(gettext("The global data compression ratio is: "))
+			       + tools_get_compression_ratio(g_storage_size,
+							     g_size,
+							     true));
 
 	    if(only_contains_an_isolated_catalogue())
 		dialog.printf(gettext("\nWARNING! This archive only contains the contents of another archive, it can only be used as reference for differential backup or as rescue in case of corruption of the original archive's content. You cannot restore any data from this archive alone\n"));
