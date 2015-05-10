@@ -69,9 +69,7 @@ namespace libdar
 		ret = true;
 	    break;
 	case msg_type::unset:
-	case msg_type::data:
 	case msg_type::order_read:
-	case msg_type::answr_read_eof:
 	case msg_type::order_sync_write:
 	case msg_type::answr_sync_write_done:
 	case msg_type::order_skip_to_eof:
@@ -84,7 +82,14 @@ namespace libdar
 	case msg_type::order_end_of_xmit:
 	case msg_type::order_stop_readahead:
 	case msg_type::answr_readahead_stopped:
+	case msg_type::order_wakeup:
 	    ret = (arg1 == arg2);
+	    break;
+	case msg_type::data_partial:
+	case msg_type::data_completed:
+	    if(arg2 == msg_type::data_partial
+	       || arg2 == msg_type::data_completed)
+		ret = true;
 	    break;
 	default:
 	    throw SRC_BUG;
@@ -104,10 +109,8 @@ namespace libdar
 	case msg_type::answr_position_begin:
 	    return true;
 	case msg_type::unset:
-	case msg_type::data:
 	case msg_type::order_read_ahead:
 	case msg_type::order_read:
-	case msg_type::answr_read_eof:
 	case msg_type::order_sync_write:
 	case msg_type::answr_sync_write_done:
 	case msg_type::order_skip:
@@ -124,6 +127,9 @@ namespace libdar
 	case msg_type::order_end_of_xmit:
 	case msg_type::order_stop_readahead:
 	case msg_type::answr_readahead_stopped:
+	case msg_type::order_wakeup:
+	case msg_type::data_partial: // this is not an error
+	case msg_type::data_completed:
 	    return false;
 	default:
 	    throw SRC_BUG;
@@ -136,16 +142,12 @@ namespace libdar
 	{
 	case msg_type::unset:
 	    throw SRC_BUG;
-	case msg_type::data:
-	    return 'd';
 	case msg_type::order_read_ahead:
 	    return 'a';
 	case msg_type::order_read_ahead_begin:
 	    return 'A';
 	case msg_type::order_read:
 	    return 'r';
-	case msg_type::answr_read_eof:
-	    return 'e';
 	case msg_type::order_sync_write:
 	    return 'y';
 	case msg_type::answr_sync_write_done:
@@ -186,6 +188,12 @@ namespace libdar
 	    return 'W';
 	case msg_type::answr_readahead_stopped:
 	    return 'w';
+	case msg_type::order_wakeup:
+	    return 'h';
+	case msg_type::data_partial:
+	    return 'd';
+	case msg_type::data_completed:
+	    return 'D';
 	default:
 	    throw SRC_BUG;
 	}
@@ -195,16 +203,12 @@ namespace libdar
     {
 	switch(x)
 	{
-	case 'd':
-	    return msg_type::data;
 	case 'a':
 	    return msg_type::order_read_ahead;
 	case 'A':
 	    return msg_type::order_read_ahead_begin;
 	case 'r':
 	    return msg_type::order_read;
-	case 'e':
-	    return msg_type::answr_read_eof;
 	case 'y':
 	    return msg_type::order_sync_write;
 	case 'Y':
@@ -245,6 +249,12 @@ namespace libdar
 	    return msg_type::order_stop_readahead;
 	case 'w':
 	    return msg_type::answr_readahead_stopped;
+	case 'h':
+	    return msg_type::order_wakeup;
+	case 'd':
+	    return msg_type::data_partial;
+	case 'D':
+	    return msg_type::data_completed;
 	default:
 	    throw SRC_BUG;
 	}
@@ -266,13 +276,9 @@ namespace libdar
 	    throw SRC_BUG;
 	case msg_type::unset:
 	    throw SRC_BUG;
-	case msg_type::data:
-	    throw SRC_BUG;
 	case msg_type::order_read_ahead:
 	    return msg_type::order_read_ahead_begin;
 	case msg_type::order_read:
-	    throw SRC_BUG;
-	case msg_type::answr_read_eof:
 	    throw SRC_BUG;
 	case msg_type::order_sync_write:
 	    throw SRC_BUG;
@@ -306,6 +312,12 @@ namespace libdar
 	    throw SRC_BUG;
 	case msg_type::answr_readahead_stopped:
 	    throw SRC_BUG;
+	case msg_type::order_wakeup:
+	    throw SRC_BUG;
+	case msg_type::data_partial:
+	    return msg_type::data_partial;
+	case msg_type::data_completed:
+	    return msg_type::data_partial;
 	default:
 	    throw SRC_BUG;
 	}
@@ -331,7 +343,7 @@ namespace libdar
 		msgt = tmp;
 	}
 
-	if(msgt != msg_type::data)
+	if(msgt != msg_type::data_partial && msgt != msg_type::data_completed)
 	{
 	    buffer.skip_to_eof();
 	    buffer.write(x_input + 1, size - 1);

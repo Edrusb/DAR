@@ -43,11 +43,9 @@ namespace libdar
     enum class msg_type
     {
 	unset,                    //< no argument: message type is not set (error)
-	data,                     //< + data     : block is pure data (no message in it)
 	order_read_ahead,         //< + infinint : messge is an info that the given amount of data is about to be read
 	order_read_ahead_begin,   //< + infinint : message continues with the next block
 	order_read,               //< + U_I      : message is a read order (with expected size to be read ahead)
-	answr_read_eof,           //< + data     : message from slave meaning slave has finished reading and expects new order, does not mean eof
 	order_sync_write,         //< no argument: order to flush all pending writes
 	answr_sync_write_done,    //< no argument: answer from the slave that all data have been sync written
 	order_skip,               //< + infinint : message is an order to seek at given position
@@ -67,7 +65,10 @@ namespace libdar
 	answr_exception,          //< no argument: last operation generated an exception for at slave side, slave has probably died after that
 	order_end_of_xmit,        //< no argument: message is the last message and implies freedom of the slave
         order_stop_readahead,     //< no argument: order to stop possibly running read_ahead
-	answr_readahead_stopped   //< no argument: answer that the readahead has ended or no read ahead was running
+	answr_readahead_stopped,  //< no argument: answer that the readahead has ended or no read ahead was running
+	order_wakeup,             //< no argument: order to continue reading/writing loop (reading suspendend because of pipe full, writing because of pipe was empty)
+	data_partial,             //< + data     : beside data in input/output data pipes
+	data_completed            //< + data     : beside data in output data pipe when EOF has been reached
     };
 
     extern bool msg_equivalent(msg_type arg1, msg_type arg2);

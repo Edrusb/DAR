@@ -50,35 +50,48 @@ namespace libdar
 	    /// \note none of the given pointer will be deleted by slave_thread nor a copy
 	    /// of them will be done (which for some is forbidden anyway), these pointed to
 	    /// objects must thus exist during the whole live of the slave_thread
-	slave_thread(generic_file *x_data, libthreadar::tampon<char> *x_input, libthreadar::tampon<char> *x_output);
+	slave_thread(generic_file *x_data,
+		     libthreadar::tampon<char> *x_input_data,
+		     libthreadar::tampon<char> *x_output_data,
+		     libthreadar::tampon<char> *x_input_ctrl,
+		     libthreadar::tampon<char> *x_output_ctrl);
 	slave_thread(const slave_thread & ref) { throw SRC_BUG; };
 	const slave_thread & operator = (const slave_thread & ref) { throw SRC_BUG; };
+
+	    /// true if the thread has suspended waiting for a new order (no data to write, no read_ahead to perform)
+	bool wake_me_up() const { if(wake_me) { const_cast<slave_thread *>(this)->wake_me = false; return true; } else return false; };
 
     protected:
 	virtual void inherited_run();
 
     private:
 	generic_file *data;
-	libthreadar::tampon<char> *input;
-	libthreadar::tampon<char> *output;
+	libthreadar::tampon<char> *input_data;
+	libthreadar::tampon<char> *output_data;
+	libthreadar::tampon<char> *input_ctrl;
+	libthreadar::tampon<char> *output_ctrl;
 
 	messaging_encode answer;    //< used to communicate with master thread
 	messaging_decode order;     //< used to communicate with master thread
 	unsigned int num;           //< size of the read block or to be written block
 	char *ptr;                  //< address of the block to be written or to be read
-	char data_header;           //< the one byte message to prepend data with in all data blocks
-	char data_eof_header;       //< the one byte message to prepend data with when EOF is reached
+	char data_header;           //< the one byte message to prepend data with, when more data block follow to answer a given order
+	char data_header_completed; //< the one byte message to prepend data with, when end of order is reached
 	infinint read_ahead;        //< amount of data sent for reading and not yet asked for reading
 	bool endless_read_ahead;    //< whether an endeless read ahead request has been asked
 	infinint to_send_ahead;     //< remaining amount of data to send for the requested read_ahead
 	U_I immediate_read;         //< next action is to read this amount of data
 	bool stop;                  //< whether thread end has been asked
+	bool wake_me;               //< whether we ask the master awake us
 
-
-	void set_header_vars();
+	void init();
+	void set_header_vars(); //< set the value of data_header and data_header_completed fields
 	void read_order();      //< \note ptr must be released/recycled after this call
-	void send_answer();
-	bool pending_order() { return input->is_not_empty(); };
+	void send_answer();     //< send the answer to the last order received
+	bool pending_order() { return input_ctrl->is_not_empty(); };
+	bool pending_input_data() { return input_data->is_not_empty(); };
+	void treat_input_data(); //< empty input_data and write down the data
+	void ask_to_wake_me_up(); //< ask the master to wake the slave upon possible action
 
 	    /// send a block of data to the master thread
 	    ///

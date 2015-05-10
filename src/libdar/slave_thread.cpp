@@ -37,30 +37,54 @@ namespace libdar
 {
 
 
-    slave_thread::slave_thread(generic_file *x_data, libthreadar::tampon<char> *x_input, libthreadar::tampon<char> *x_output)
+    slave_thread::slave_thread(generic_file *x_data,
+			       libthreadar::tampon<char> *x_input_data,
+			       libthreadar::tampon<char> *x_output_data,
+			       libthreadar::tampon<char> *x_input_ctrl,
+			       libthreadar::tampon<char> *x_output_ctrl)
     {
+	if(x_data == NULL)
+	    throw SRC_BUG;
+	if(x_input_data == NULL)
+	    throw SRC_BUG;
+	if(x_output_data == NULL)
+	    throw SRC_BUG;
+	if(x_input_ctrl == NULL)
+	    throw SRC_BUG;
+	if(x_output_ctrl == NULL)
+	    throw SRC_BUG;
+
 	data = x_data;
-	input = x_input;
-	output = x_output;
+	input_data = x_input_data;
+	output_data = x_output_data;
+	input_ctrl = x_input_ctrl;
+	output_ctrl = x_output_ctrl;
 	ptr = NULL;
+	set_header_vars();
+	init();
+    }
+
+    void slave_thread::init()
+    {
+	num = 0;
+	ptr = NULL;
+	read_ahead = 0;
+	endless_read_ahead = false;
+	to_send_ahead = 0;
+	immediate_read = 0;
+	wake_me = false;
+	stop = false;
     }
 
     void slave_thread::inherited_run()
     {
 	try
 	{
-	    num = 0;
-	    ptr = NULL;
-	    set_header_vars();
-	    read_ahead = 0;
-	    endless_read_ahead = false;
-	    to_send_ahead = 0;
-	    immediate_read = 0;
-	    stop = false;
+	    init();
 
 	    do
 	    {
-		if((to_send_ahead > 0 || endless_read_ahead) && !output->is_quiet_full())
+		if((to_send_ahead > 0 || endless_read_ahead) && !output_data->is_full())
 		{
 		    U_I tmp = 0;
 		    bool eof;
@@ -86,35 +110,42 @@ namespace libdar
 		    }
 		}
 
-		if(pending_order() || (to_send_ahead == 0 && !endless_read_ahead && !output->is_quiet_full()))
+		if(pending_input_data())
+		    treat_input_data();
+		else
 		{
-		    bool need_answer;
-
-		    read_order();
-		    try
+		    if(pending_order() || output_data->is_full() || (to_send_ahead == 0 && !endless_read_ahead))
 		    {
-			need_answer = treat_order();
-		    }
-		    catch(...)
-		    {
-			input->fetch_recycle(ptr);
-			throw;
-		    }
-		    input->fetch_recycle(ptr);
+			bool need_answer;
 
-		    if(need_answer)
-		    {
-			    // sending the answer
-			send_answer();
-		    }
+			if(!pending_order())
+			    wake_me = true;
 
-		    if(immediate_read > 0)
-			go_read();
+			read_order();
+			wake_me = false;
+			try
+			{
+			    need_answer = treat_order();
+			}
+			catch(...)
+			{
+			    input_ctrl->fetch_recycle(ptr);
+			    throw;
+			}
+			input_ctrl->fetch_recycle(ptr);
+
+			if(need_answer)
+			{
+				// sending the answer
+			    send_answer();
+			}
+
+			if(immediate_read > 0)
+			    go_read();
+		    }
 		}
-
 	    }
 	    while(!stop);
-
 	}
 	catch(...)
 	{
@@ -128,13 +159,12 @@ namespace libdar
 	}
     }
 
-
     void slave_thread::set_header_vars()
     {
 	unsigned int tmp;
 
 	answer.clear();
-	answer.set_type(msg_type::data);
+	answer.set_type(msg_type::data_partial);
 	answer.reset_get_block();
 	tmp = 1;
 	if(!answer.get_block(&data_header, tmp))
@@ -143,14 +173,15 @@ namespace libdar
 	    throw SRC_BUG;
 
 	answer.clear();
-	answer.set_type(msg_type::answr_read_eof);
+	answer.set_type(msg_type::data_completed);
 	answer.reset_get_block();
 	tmp = 1;
-	if(!answer.get_block(&data_eof_header, tmp))
+	if(!answer.get_block(&data_header_completed, tmp))
 	    throw SRC_BUG;
 	if(tmp != 1)
 	    throw SRC_BUG;
     }
+
 
     void slave_thread::read_order()
     {
@@ -159,10 +190,10 @@ namespace libdar
 	order.clear();
 	do
 	{
-	    input->fetch(ptr, num);
+	    input_ctrl->fetch(ptr, num);
 	    completed = order.add_block(ptr, num);
 	    if(!completed)
-		input->fetch_recycle(ptr);
+		input_ctrl->fetch_recycle(ptr);
 	}
 	while(!completed);
 	    // note ptr and num are relative
@@ -177,9 +208,9 @@ namespace libdar
 	answer.reset_get_block();
 	do
 	{
-	    output->get_block_to_feed(ptr, num);
+	    output_ctrl->get_block_to_feed(ptr, num);
 	    completed = answer.get_block(ptr, num);
-	    output->feed(ptr, num);
+	    output_ctrl->feed(ptr, num);
 	}
 	while(!completed);
     }
@@ -187,41 +218,73 @@ namespace libdar
     U_I slave_thread::send_data_block(U_I size, bool & eof)
     {
 	U_I min;
+	char *local_ptr = NULL;
+	unsigned int local_num;
 
 	eof = false;
 
 	    // preparing the new answer
 
-	output->get_block_to_feed(ptr, num);
+	output_data->get_block_to_feed(local_ptr, local_num);
 
 	try
 	{
-	    if(num == 0)
+	    if(local_num == 0)
 		throw SRC_BUG;
-	    ptr[0] = data_header;
-	    --num;
+	    local_ptr[0] = data_header;
+	    --local_num;
 
 	    if(size == 0)
-		min = num; // filling the block with as much data as possible
+		min = local_num; // filling the block with as much data as possible
 	    else
-		min = size > num ? num : size;
+		min = size > local_num ? local_num : size; // returning the minimum of (size, num)
 
-	    size = data->read(ptr + 1, min);
+	    size = data->read(local_ptr + 1, min);
 	    if(size < min) // reached eof
 	    {
-		ptr[0] = data_eof_header;
+		local_ptr[0] = data_header_completed;
 		eof = true;
 	    }
+
 	}
 	catch(...)
 	{
-	    output->feed_cancel_get_block(ptr);
+	    output_data->feed_cancel_get_block(local_ptr);
 	    throw;
 	}
 
-	output->feed(ptr, size + 1);
+	output_data->feed(local_ptr, size + 1);
 
 	return size; // note that size has been modified by the effective number of byte read from *data
+    }
+
+    void slave_thread::treat_input_data()
+    {
+	char *local_ptr = NULL;
+	unsigned int local_num;
+
+	if(input_data->is_not_empty())
+	{
+	    if(to_send_ahead > 0 || endless_read_ahead)
+		throw SRC_BUG; // read_ahead asked but no read done, received data to write instead
+	    if(read_ahead > 0)
+		throw SRC_BUG; // read_ahead started but data not read, received data to write instead
+	}
+
+	while(input_data->is_not_empty())
+	{
+	    input_data->fetch(local_ptr, local_num);
+	    try
+	    {
+		data->write(local_ptr+1, local_num - 1);
+	    }
+	    catch(...)
+	    {
+		input_data->fetch_recycle(local_ptr);
+		throw;
+	    }
+	    input_data->fetch_recycle(local_ptr);
+	}
     }
 
     bool slave_thread::treat_order()
@@ -232,13 +295,6 @@ namespace libdar
 	answer.clear();
 	switch(order.get_type())
 	{
-	case msg_type::data:
-	    data->write(ptr + 1, num - 1);
-	    if(to_send_ahead > 0 || endless_read_ahead)
-		throw SRC_BUG; // read_ahead asked but no read done, received data to write instead
-	    if(read_ahead > 0)
-		throw SRC_BUG; // read_ahead started but data not read, received data to write instead
-	    break;
 	case msg_type::order_read_ahead:
 	    tmp = order.get_infinint();
 	    if(tmp == 0)
@@ -257,11 +313,14 @@ namespace libdar
 	    immediate_read = order.get_U_I();
 	    break;
 	case msg_type::order_sync_write:
-	    data->sync_write();
+	    treat_input_data();
+		// we do not propagate to below data, just the inter-thread
+		// exchanges have to be synced
 	    answer.set_type(msg_type::answr_sync_write_done);
 	    need_answer = true;
 	    break;
 	case msg_type::order_skip:
+	    treat_input_data();
 	    answer.set_type(msg_type::answr_skip_done);
 	    answer.set_bool(data->skip(order.get_infinint()));
 	    read_ahead = 0; // all in transit data will be dropped by the master
@@ -270,6 +329,7 @@ namespace libdar
 	    need_answer = true;
 	    break;
 	case msg_type::order_skip_to_eof:
+	    treat_input_data();
 	    answer.set_type(msg_type::answr_skip_done);
 	    answer.set_bool(data->skip_to_eof());
 	    read_ahead = 0; // all in transit data will be dropped by the master
@@ -278,6 +338,7 @@ namespace libdar
 	    need_answer = true;
 	    break;
 	case msg_type::order_skip_fwd:
+	    treat_input_data();
 	    answer.set_type(msg_type::answr_skip_done);
 	    answer.set_bool(data->skip_relative(order.get_U_I()));
 	    read_ahead = 0; // all in transit data will be dropped by the master
@@ -286,6 +347,7 @@ namespace libdar
 	    need_answer = true;
 	    break;
 	case msg_type::order_skip_bkd:
+	    treat_input_data();
 	    answer.set_type(msg_type::answr_skip_done);
 	    answer.set_bool(data->skip_relative(-order.get_U_I()));
 	    read_ahead = 0; // all in transit data will be dropped by the master
@@ -294,6 +356,7 @@ namespace libdar
 	    need_answer = true;
 	    break;
 	case msg_type::order_skippable_fwd:
+	    treat_input_data();
 	    if(read_ahead > 0)
 		throw SRC_BUG; // code is not adapted, it should take into consideration read_ahead data
 	    answer.set_type(msg_type::answr_skippable);
@@ -301,6 +364,7 @@ namespace libdar
 	    need_answer = true;
 	    break;
 	case msg_type::order_skippable_bkd:
+	    treat_input_data();
 	    if(read_ahead > 0)
 		throw SRC_BUG; // code is not adapted, it should take into consideration read_ahead data
 	    answer.set_type(msg_type::answr_skippable);
@@ -308,6 +372,7 @@ namespace libdar
 	    need_answer = true;
 	    break;
 	case msg_type::order_get_position:
+	    treat_input_data();
 	    answer.set_type(msg_type::answr_position);
 	    tmp = data->get_position();
 	    if(read_ahead > 0)
@@ -325,6 +390,7 @@ namespace libdar
 	    need_answer = true;
 	    break;
 	case msg_type::order_end_of_xmit:
+	    treat_input_data();
 	    stop = true;
 	    break;
 	case msg_type::order_stop_readahead:
@@ -333,6 +399,9 @@ namespace libdar
 	    to_send_ahead = 0;
 	    endless_read_ahead = false;
 	    need_answer = true;
+	    break;
+	case msg_type::order_wakeup:
+	    wake_me = false;
 	    break;
 	default:
 	    throw SRC_BUG;
@@ -346,6 +415,9 @@ namespace libdar
     {
 	U_I sent = 0;
 	bool eof = false;
+
+	if(input_data->is_not_empty())
+	    throw SRC_BUG;
 
 	if(read_ahead > 0)
 	{
