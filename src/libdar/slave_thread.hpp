@@ -51,10 +51,10 @@ namespace libdar
 	    /// of them will be done (which for some is forbidden anyway), these pointed to
 	    /// objects must thus exist during the whole live of the slave_thread
 	slave_thread(generic_file *x_data,
-		     libthreadar::tampon<char> *x_input_data,
-		     libthreadar::tampon<char> *x_output_data,
-		     libthreadar::tampon<char> *x_input_ctrl,
-		     libthreadar::tampon<char> *x_output_ctrl);
+		     libthreadar::fast_tampon<char> *x_input_data,
+		     libthreadar::fast_tampon<char> *x_output_data,
+		     libthreadar::fast_tampon<char> *x_input_ctrl,
+		     libthreadar::fast_tampon<char> *x_output_ctrl);
 	slave_thread(const slave_thread & ref) { throw SRC_BUG; };
 	const slave_thread & operator = (const slave_thread & ref) { throw SRC_BUG; };
 
@@ -66,10 +66,10 @@ namespace libdar
 
     private:
 	generic_file *data;
-	libthreadar::tampon<char> *input_data;
-	libthreadar::tampon<char> *output_data;
-	libthreadar::tampon<char> *input_ctrl;
-	libthreadar::tampon<char> *output_ctrl;
+	libthreadar::fast_tampon<char> *input_data;
+	libthreadar::fast_tampon<char> *output_data;
+	libthreadar::fast_tampon<char> *input_ctrl;
+	libthreadar::fast_tampon<char> *output_ctrl;
 
 	messaging_encode answer;    //< used to communicate with master thread
 	messaging_decode order;     //< used to communicate with master thread

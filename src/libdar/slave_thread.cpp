@@ -38,10 +38,10 @@ namespace libdar
 
 
     slave_thread::slave_thread(generic_file *x_data,
-			       libthreadar::tampon<char> *x_input_data,
-			       libthreadar::tampon<char> *x_output_data,
-			       libthreadar::tampon<char> *x_input_ctrl,
-			       libthreadar::tampon<char> *x_output_ctrl)
+			       libthreadar::fast_tampon<char> *x_input_data,
+			       libthreadar::fast_tampon<char> *x_output_data,
+			       libthreadar::fast_tampon<char> *x_input_ctrl,
+			       libthreadar::fast_tampon<char> *x_output_ctrl)
     {
 	if(x_data == NULL)
 	    throw SRC_BUG;

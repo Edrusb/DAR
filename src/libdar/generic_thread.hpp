@@ -88,10 +88,10 @@ namespace libdar
 
 
     private:
-	libthreadar::tampon<char> toslave_data;
-	libthreadar::tampon<char> tomaster_data;
-	libthreadar::tampon<char> toslave_ctrl;
-	libthreadar::tampon<char> tomaster_ctrl;
+	libthreadar::fast_tampon<char> toslave_data;
+	libthreadar::fast_tampon<char> tomaster_data;
+	libthreadar::fast_tampon<char> toslave_ctrl;
+	libthreadar::fast_tampon<char> tomaster_ctrl;
 	slave_thread *remote;
 	bool reached_eof;     //< whether we reached end of file
 	char data_header;     //< contains 1 byte header for data

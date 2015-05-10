@@ -501,7 +501,7 @@ namespace libdar
 
 	release_data_ptr();
 
-	while(!tomaster_data.is_empty())
+	while(tomaster_data.is_not_empty())
 	{
 	    tomaster_data.fetch(tmp, tmp_ui);
 	    tomaster_data.fetch_recycle(tmp);
