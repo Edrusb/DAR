@@ -277,6 +277,9 @@ namespace libdar
     {
 	U_I read = 0;
 	U_I min;
+	char *data_ptr = NULL;
+	unsigned int data_num;
+
 
 	    // rerun the thread if an exception has occured previously
 	my_run();
@@ -298,11 +301,8 @@ namespace libdar
 	    // now retreiving the data from the data_pipe
 	do
 	{
-	    if(data_ptr == NULL)
-	    {
-		tomaster_data.fetch(data_ptr, data_num);
-		--data_num; // the first byte contains the message type
-	    }
+	    tomaster_data.fetch(data_ptr, data_num);
+	    --data_num; // the first byte contains the message type
 
 	    min = size - read; // what's still need to be read
 	    if(data_num > min) // we retreived more data than necessary
@@ -311,16 +311,16 @@ namespace libdar
 
 		(void)memcpy(a + read, data_ptr + 1, min);
 		read += min;
-		(void)memmove(ptr + 1, ptr + 1 + min, kept);
-		data_num = kept;
+		(void)memmove(data_ptr + 1, data_ptr + 1 + min, kept);
+		tomaster_data.fetch_push_back(data_ptr, kept + 1);
 	    }
 	    else // the whole block will be read
 	    {
 		(void)memcpy(a + read, data_ptr + 1, data_num);
-		read += num;
+		read += data_num;
 		if(data_ptr[0] == data_header_eof)
 		    reached_eof = true;
-		release_data_ptr();
+		tomaster_data.fetch_recycle(data_ptr);
 	    }
 	}
 	while(!reached_eof && read < size);
@@ -485,21 +485,10 @@ namespace libdar
 	}
     }
 
-    void generic_thread::release_data_ptr()
-    {
-	if(data_ptr != NULL)
-	{
-	    tomaster_data.fetch_recycle(data_ptr);
-	    data_ptr = NULL;
-	}
-    }
-
     void generic_thread::purge_data_pipe()
     {
 	char *tmp;
 	unsigned int tmp_ui;
-
-	release_data_ptr();
 
 	while(tomaster_data.is_not_empty())
 	{
@@ -521,8 +510,6 @@ namespace libdar
 	    tomaster_data.reset();
 	    toslave_ctrl.reset();
 	    tomaster_ctrl.reset();
-	    data_ptr = NULL;
-	    data_num = 0;
 	    remote->run(); // launching the new thread
 	    if(remote->is_running(tid))
 	    {

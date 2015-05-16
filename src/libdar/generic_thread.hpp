@@ -98,9 +98,6 @@ namespace libdar
 	char data_header_eof; //< contains 1 byte header for data + eof
 	bool running;         //< whether a remote is expected to run, tid is then set
 	pthread_t tid;        //< thread id of remote
-	char *data_ptr;       //< points to the currently extracted data block for reading
-	unsigned int data_num;//< amount of data to be read in the buffer pointed to by data_ptr
-
 
 	    // the following variables are locally used in quite all methods
 	    // they do not contain valuable information outside each method call
