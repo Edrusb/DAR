@@ -1,9 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
-  <meta content="text/html; charset=us-ascii" http-equiv="content-type">
-  <title>DAR - Frequently Asked Questions</title>
 
-</head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
+
+  <meta content="text/html; charset=us-ascii" http-equiv="content-type"><title>DAR - Frequently Asked Questions</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 
 <div style="text-align: center;">
@@ -95,6 +94,7 @@ what does that mean!? </a><br>
       </span><a href="#fuse"><span style="font-weight: bold; font-style: italic;">Is there a dar </span><span style="font-weight: bold; font-style: italic;">fuse</span></a><span style="font-weight: bold; font-style: italic;"><a href="#fuse">
 filesystem?</a><br>
       <a href="#tar">how dar compares to tar?</a><br>
+      <a href="#diff">Why when comparing an archive with filesystem, dar does not report new files found on filesystem?</a><br>
       </span><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;"> </span>
       <h2><span style="font-weight: bold;"> </span></h2>
       <br>
@@ -3043,7 +3043,43 @@ an archive<br>
         </tbody>
       </table>
       <br>
+      <span style="font-weight: bold; font-style: italic;"><a name="diff"></a>Why when comparing an archive with filesystem, dar does not report new files found on filesystem?<br>
+      </span><br>
+Archive comparison (-d option) is to be seen as a step further than
+archive testing (-t option) where dar checks the archive internal
+structure and usability. The step further here is not only to check
+that each part of the archive is readable and has a correct associated
+CRC but also that it matches what is present on filesystem. So yes, if
+new files are present on filesystem, nothing has to be reported. If a
+file changed, dar reports that the file does not match what's in the
+archive, if a file is missing dar cannot compare it with filesystem
+and reports an error too.<br>
       <br>
+So you want to know what has changed on your filesystem? No problem, <span style="font-weight: bold;">do a differential backup!</span>
+OK, you don't want to have a new backup or do not have the space for
+that, just output the archive to /dev/null and request on-fly isolation
+as follows:<br>
+      <div style="margin-left: 40px;"><br>
+      <span style="font-family: monospace;">dar -c - -A &lt;ref archive&gt; -@ &lt;isolated&gt; ... other options ... &gt; /dev/null</span><br>
+&nbsp;&nbsp; <br>
+      </div>
+&lt;ref archive&gt; is the archive of reference or an isolated
+catalogue from it, &lt;isolated&gt; is the name of the isolated
+catalogue to produce. Once the operation has completed, you can list
+the isolated catalogue using the following command:<br>
+      <br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -l &lt;isolated&gt; -as</span><br>
+      </div>
+      <br>
+It will give you the exact difference between your current filesystem
+and the filesystem at the time the "&lt;ref archive&gt;" was done:
+modified files and new files are reported with <span style="font-weight: bold;">[inref]</span> for either data EA or both, while deleted files are reported by "<span style="font-weight: bold;">[ --- REMOVED ENTRY ----]</span>"
+information, followed by the estimated removal date and the type of the
+removed file ([-] for plain file, [d] for directory, and so on. More
+details in dar man page for listing command).<br>
+      <br>
+
+
       </td>
     </tr>
   </tbody>
@@ -3052,5 +3088,6 @@ an archive<br>
 </div>
 </div>
 </center>
+
 
 </body></html>

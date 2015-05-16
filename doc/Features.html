@@ -17,6 +17,8 @@
 
 
 
+
+
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR's FEATURES</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -52,6 +54,199 @@ information.</td>
 </div>
 <br>
 <br>
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">HARD
+LINK CONSIDERATION </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;"><br>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>
+hard links are properly saved in any case and properly restored if possible. For example, if restoring across
+a mounted file system, hard linking will fail, but dar will then
+duplicate the inode and file contents, issuing a warning. Hard link
+support includes the following inode types: plain files, char devices,
+block devices, symlinks (Yes, you can hard link symbolic links! Thanks to Wesley Leggette for the info ;-) )<br>
+ </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">SPARSE FILES<br>
+ </td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">--sparse-file-min-size, -ah
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>By default Dar takes care of sparse files, even if the underlying filesystem does
+not support sparse files(!). When a long sequence of zeroed bytes is
+met in a file during backup, those are not stored into the archive but
+the number of zeroed bytes is stored instead (structure known as a "hole"). When comes the time to
+restore that file, dar restores the normal data but when a hole is met
+in the archive dar directly skips at the position of the data following
+that hole which, if the underlying filesystem supports sparse files,
+will (re)create a hole in the restored file, making a sparse file.
+Sparse files can report to be several hundred gigabytes large while they
+need only a few bytes of disk space, being able to properly save and restore them
+avoids wasting disk space at restoration time and in archives.<br>
+ </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">EXTENDED
+ATTRIBUTES (EA)<br>
+      </td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">MacOS
+X FILE FORKS / ACL</span><br>
+      </td>
+      <td style="vertical-align: top;">keywords: -u -U -am -ae --alter=list-ea<br>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top;">
+      <div style="text-align: justify;"><span style="font-style: italic;"></span> Dar is able to
+save and restore EA, all or just those matching a given pattern.
+      </div>
+      <br>
+      <div style="text-align: justify;">File Forks (MacOS X) are implemented over
+EA as well as Linux's ACL, they are thus transparently saved, tested,
+compared and restored by <span style="font-style: italic;">dar</span>.
+Note that ACL under MacOS seem to not rely on EA, thus while they are
+marginally used they are ignored by <span style="font-style: italic;">dar</span>.<br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+
+
+  
+    
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+<tbody><tr>
+      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">FILESYSTEM SPECIFIC ATTRIBUTES (FSA)<br>
+      </td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">MacOSX/FreeBSD Birthdate, Linux FS attributes</span><br>
+      </td>
+      <td style="vertical-align: top;">keyword: --fsa-family<br>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top;">
+      <div style="text-align: justify;"><span style="font-style: italic;"></span>
+Since release 2.5.0 dar is able to take care of filesystem specific
+attributes. Those are grouped by family strongly linked to the
+filesystem they have been read from, but perpendicularly each FSA is
+designated also by a function. This way it is possible to translate FSA
+from a filesystem into another filesystem when there is a equivalency
+in role. </div>
+      <br>
+      <div style="text-align: justify;">currently two families are present:<br>
+      <ul><li><span style="font-weight: bold;">HFS+</span> family contains only one function : the <span style="font-weight: bold;">birthtime</span>.
+In addition to ctime, mtime and atime, dar can backup, compare and
+restore all four dates of a given inode (well, ctime is not possible to
+restore).<br>
+        </li><li><span style="font-weight: bold;">extX </span>family
+contains 12 functions (append_only, compressed, no_dump, immutable,
+journaling, secure_deletion, no_tail_merging, undeletable,
+noatime_update, synchronous_directory, synchronous_update,
+top_of_dir_hierarchy) found on ext2/3/4 and some other Linux
+filesystems. Dar can thus save and restore all of those for each file
+depending on the capabilities or permissions dar has at restoration
+time.<br>
+        </li></ul>
+</div></td></tr></tbody>
+</table>
+
+<br>
+
+<br>
+
+
+<table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold; width: 33%;">DIRTY FILES<br>
+</td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a> </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">keywords: --dirty-behavior , --retry-on-change<br>
+      </td>
+    </tr>
+    <tr align="justify">
+      <td colspan="2" rowspan="1" style="vertical-align: top;">At
+backup time, dar checks that each saved file had not changed at the
+time it was read. If a file has changed in that situation, dar retries
+saving it up to tree times (by default) and if it is still changing, is
+flagged as "dirty" in the archive, and handled differently from other
+files at restoration time. The dirty file handling is either to warn
+the user before restoring, to ignore and avoid restoring them, or to ignore
+the dirty flag and restore them normally.<br>
+      <br>
+Note that dar precision when readng/writing inode dates (atime, ctime, mtime, birthtime) is the <span style="font-weight: bold;">microsecond</span>. Thus a file is seen as having changed even if a very small modification occurres in it very frequently.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<br>
+<br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
@@ -62,22 +257,116 @@ information.</td>
     <tr>
       <td style="vertical-align: top;"><br>
       </td>
-      <td style="vertical-align: top;">keywords: -I -X -P -g -[ -] -am<br>
+      <td style="vertical-align: top;">keywords: -I -X -P -g -[ -] -am --exclude-by-ea<br>
       </td>
     </tr>
     <tr align="justify">
-      <td colspan="2" rowspan="1" style="vertical-align: top;"><span style="font-style: italic;">dar</span>
+      <td colspan="2" rowspan="1" style="vertical-align: top;"><span style="font-style: italic;">dar</span>&nbsp;
 is able to backup from a total file system to a single file, thanks to
 its filter mechanism. This one is dual headed: The first head let one
 decide which part of a directory tree to consider for the operation
 (backup, restoration, etc.) while the second head defines which type of
 file to consider (filter only based on filename, like for example the
-extension of the file).<br>
+extension of the file). <br>
+      <br>
+For backup operation, files and directories can also be filtered out if
+they have been set with a given user defined EA.<br>
       </td>
     </tr>
   </tbody>
 </table>
 <br>
+<br>
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">NODUMP
+FLAG </td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">keywords: --nodump</td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>Many filesystems, like ext2/3/4 filesystems provide for each inodes a set of flags, among which is the "<span style="font-weight: bold;">nodump</span>" flag. You can instruct dar to avoid saving files that have this flag set, as does the so-called
+      <span style="font-style: italic;">dump</span> backup program.  <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">ONE
+FILESYSTEM </td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">keywords: -M</td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;">By default <span style="font-style: italic;"></span>dar
+does not stop at filesystems boundaries unless the filtering mechanism
+described above exclude such directory that matches another mounted
+filesystem. But you can also ask dar to avoid changing of filesystem
+without the burden of finding and listing the directories to be
+excluded from the backup: dar will manage alone to only save files of
+the current filesystem.<br>
+ </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+<br>
+
+
+
+
+
+<table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold; width: 33%;">CACHE DIRECTORY TAGGING STANDARD<br>
+</td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a> </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">keywords: --cache-directory-tagging<br>
+      </td>
+    </tr>
+    <tr align="justify">
+      <td colspan="2" rowspan="1" style="vertical-align: top;">Many software use cache directories (<a href="http://www.mozilla.org/">mozilla web browser</a> for example), directories where is stored temporaneous data that is not interesting to backup. The <a href="http://www.brynosaurus.com/cachedir/">Cache Directory Tagging Standard</a>
+provides a standard way for software applications to identify this type
+of data, which let dar able to take into account and avoid saving them.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+
+
 <br>
 <br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -94,8 +383,8 @@ BACKUP </td>
     </tr>
     <tr>
       <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;">When making a backup
-with dar, you have the possibility to make a full backup or a
-differential backup. A full backup, as expected, makes backup of all
+with dar, you have the possibility to make a <span style="font-weight: bold;">full backup</span> or a
+      <span style="font-weight: bold;">differential backup</span>. A full backup, as expected, makes backup of all
 files as specified on the command line (with or without filters).
 Instead, a differential backup, (over filter mechanism), saves
 only files that have changed since a given reference backup.
@@ -104,13 +393,125 @@ no more exist at the time of the differential backup are recorded in
 the backup as "been removed". At recovery time, (unless you deactivate it), restoring a
 differential backup will update changed files and new files, but also
 remove files that have been recorded as "been removed". Note that the
-reference backup can be a full backup or another differential backup.
-This way you can make a first full backup, then many differential
-backup, each taking as reference the last backup made, for example. </td>
+reference backup can be a full backup or another differential backup (this second method is usually designed as <span style="font-weight: bold;">incremental backup</span>).
+This way you can make a first full backup, then many incremental
+backups, each taking as reference the last backup made, for example. </td>
     </tr>
   </tbody>
 </table>
 <br>
+<br>
+
+<table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold; width: 33%;">DECREMENTAL BACKUP</td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a> / <a href="usage_notes.html#Decremental_Backup">Decremental backup</a> </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">keywords: -+ -ad<br>
+      </td>
+    </tr>
+    <tr align="justify">
+      <td colspan="2" rowspan="1" style="vertical-align: top;">As
+opposed to <span style="font-weight: bold;">incremental backups</span>, where the older one is a full backup
+and each subsequent backup contains only the changes from the previous
+backup, <span style="font-weight: bold;">decremental backup</span> let the full backup be the more recent while
+the older ones only contain changes compared to the just more recent one. This
+has the advantage of providing a single archive to use to restore a whole
+system in its latest known state, while reducing the overall amount
+of data to retain older versions of files (same amount required as with
+differential backup). It has also the advantage to not have to keep
+several set of backup as you just need to delete the oldest backup when
+you need storage space. However it has the default to require at each
+new cycle the creation of a full backup, then the transformation of
+the previous full backup into a so-called decremental backup. Yes, everything has
+a cost!<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<br>
+<br>
+
+<br>
+
+
+<table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold; width: 33%;">PREVENTING ROOTKITS AND OTHER MALWARES<br>
+</td>
+      <td style="vertical-align: top;"><a href="usage_notes.html#Decremental_Backup">references: </a><a href="man/index.html">man dar</a> </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">keywords: -asecu
+      </td>
+    </tr>
+    <tr align="justify">
+      <td colspan="2" rowspan="1" style="vertical-align: top;">At backup time when a<span style="font-weight: bold;"> differential, incremental or decremental backup</span>is
+done, dar compares the status of inode on the filesystem to the
+status they had at the time of the last backup. If the ctime of a file
+has changed while no other inode field changed dar issues a warning
+considering that file as suspicious. This does not mean that your
+system has been compromised but you are strongly advised to check
+whether this concerned file has been recently updated (Some package
+manager may lead to that situation) or has its Extended Attributes
+changed since last backup was made. In normal situation this type of
+warning does not show often (false positive are rare but possible).
+However in case your system has been infected by a virus or compromised
+by a rootkit, dar will signal the problem if the intruder tried to hid
+its forfait.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+<br>
+
+<br>
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">DIRECTORY
+TREE SNAPSHOT </td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">keywords: -A +<br>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;">Dar can make a
+snapshot of a directory tree and files recording the inode status of
+files. This may be used to detect changes in filesystem, by "diffing" the
+resulting archive with the filesystem at a later time. The resulting
+archive can also be used as reference to save file that have changed
+since the snapshot has been done. A snapshot archive is very small
+compared to the corresponding full backup but it cannot be used to
+restore any data. </td>
+    </tr>
+  </tbody>
+</table>
+
 <br>
 <br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -136,17 +537,20 @@ whatever their size is. To restore from such a splitted archive, dar
 will directly fetch the requested data in the correct slice(s). Thus
 dar is able to save and restore using old floppy disk,
 CD-R, DVD-R, CD-RW, DVD-RW, Zip, Jazz, etc... However, Dar will not
-un/mounting a removable medium, instead it is independent of hardware.
+un/mount removable media because it is independent of hardware.
 Given the size, it will split the archive in several files (called
 SLICES), eventually pausing before creating the next one, allowing this
-way, the user to un/mount a medium, burn the file on CD-R, send it by
+way the user to un/mount a medium, burn the file on CD-R, send it by
 email (if your mail system does not allow huge file in emails, dar can
-help you here also). By default, (no size specified), dar will make one
+help you here also.. but OK, this is bad doing so :-)). By default, (no
+size specified), dar will make one
 slice whatever its size is. Additionally, the size of the first slice
 can be specified separately, if for example you want first to fulfill a
 partially filled disk before starting using empty ones. Last, at
 restoration time, dar will just pause and prompt the user asking a
-slice only if it is missing. Note that all these operation can be
+slice only if it is missing, so you can choose to have more than one
+slice per medium without penalty from dar. Note that all these
+operation can be
 automatized using the "user command between slices" feature (presented
 below), that let dar do all you want it to do once a slice is created
 or before reading a slice.<br>
@@ -154,36 +558,6 @@ or before reading a slice.<br>
     </tr>
   </tbody>
 </table>
-<br>
-<br>
-<br>
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">DIRECTORY
-TREE SNAPSHOT </td>
-      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;"><br>
-      </td>
-      <td style="vertical-align: top;">keywords: -A +<br>
-      </td>
-    </tr>
-    <tr>
-      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;">Dar can make a
-snapshot of a directory tree and files recording the inode status of
-files. This may be used to detect changes in filesystem, by "diffing" the
-resulting archive with the filesystem at a later time. The resulting
-archive can also be used as reference to save file that have changed
-since the snapshot has been done. A snapshot archive is very small
-compared to the corresponding full backup, but it cannot be used to
-restore any data. </td>
-    </tr>
-  </tbody>
-</table>
-<br>
 <br>
 <br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -201,17 +575,238 @@ restore any data. </td>
       </td>
     </tr>
     <tr>
-      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;">dar</span> can use compression. By default
-no compression is used. Actually gzip, bzip2 and lzo algorithms are
-implemented, and there is still some room available for any other compression
+      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;">dar</span>
+can use compression. By default
+no compression is used. Actually gzip, bzip2, lzo, xz/lzma algorithms
+are available, and there is still room available for any other
+compression
 algorithm. Note that, compression is made before slicing, which means
-that using compression together with slices, will not make slices smaller, but
+that using compression together with slices, will not make slices
+smaller, but
 will probably make less slices in the backup. </td>
     </tr>
   </tbody>
 </table>
 <br>
+<br style="font-weight: bold;">
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">SELECTIVE
+COMPRESSION </td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a>/<a href="samples/index.html">samples</a></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">keywords: -Y -Z -m -am<br>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>dar can be given a special
+filter that determines which files will be compressed or not. This way
+you can speed up the backup operation by not trying to compress *.mp3,
+*.mpg, *.zip, *.gz and other already compressed files, for example. Moreover another
+mechanism allow you to say that files under a given size (whatever their
+name is) will not be compressed. </td>
+    </tr>
+  </tbody>
+</table>
+
 <br>
+<br>
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">STRONG
+ENCRYPTION </td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">keywords: -K -J -# -* blowfish, twofish, aes256, serpent256, camellia256<br>
+</td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>Dar can use blowfish, twofish, aes256, serpent256 and camellia256 algorithms to encrypt the
+whole archive. Two "elastic buffers" are inserted and encrypted with
+the
+rest of the data, one at the beginning and one at the end of the
+archive to
+prevent a clear text attack or codebook attack. </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+<br>
+
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">PUBLIC KEY ENCRYPTION<br>
+ </td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">keywords: -K, --key-length<br>
+</td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>Encryption
+based on GPG public key is available. A given archive can be encrypted
+for a recipient (or several recipients without visible overhead) using
+its public key. Only the recipient(s) will be able to read such
+encrypted archive.<br>
+</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<br>
+
+<br>
+
+
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">PRIVATE KEY SIGNATURE<br>
+ </td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">keywords: --sign<br>
+</td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>When
+using encryption with public key it is possible in addition to sign an
+archive with your own private key(s). Your recipients can then be sure
+the archive has been generated by you, dar will check the signature
+validity against the corresponding public key(s) each time the archive
+is used (restoration, testing, etc.) and a
+warning is issued if signature does not match or key is missing to
+verify
+the signature. You can also have the list of signatories of the archive
+while listing the archive content.<br>
+</td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+<br>
+
+<br>
+
+<br>
+
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">SLICE HASHING<br>
+ </td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">--hash, md5, sha1, sha512<br>
+</td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>When
+creating an archive dar can compute an md5, sha1 or sha512 hash before the
+archive is written to disk and produce a small file compatible with
+md5sum, sha1sum or sha512sum that let verify that each slice of the archive is not
+corrupted.<br>
+</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<br>
+<br>
+
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">DATA
+PROTECTION </td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a>/<a href="usage_notes.html#Parchive"><span style="text-decoration: underline;">Parchive integration</span></a></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">keywords: -al<br>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>Dar is able to detect corruption in any part of a dar archive, but it cannot fix it.<br>
+      <br>
+Dar relies on the <a href="usage_notes.html#Parchive">Parchive</a>
+program for data
+protection against media errors. Thanks to dar's ability to run user
+command or script and thanks to the ad hoc provided scripts, dar can use Parchive
+as simply as adding a word (par2) on command-line. Depending on the
+context (archive creation, archive testing, ...), dar will by this mean
+create parity data for each slice, verify and if necessary repair the
+archive slices.<br>
+      <br>Without
+Parchive, dar can workaround a corruption by not restoring the
+concerned file. For some more vital part of the archive, like the
+"catalog" which is the table of contents, dar has the ability to use an
+isolated catalog as backup of the internal catalog of an archive. It
+can also make use of tape marks that are used inside the archive for
+sequential reading as a way to overcome catalog corruption. The other
+vital information is the slice layout which is
+replicated in
+each slice and let dar overcome data corruption of that part too. As
+a last resort, Dar also
+proposes a "<span style="font-weight: bold;">lax</span>" <span style="font-weight: bold;">mode</span> in
+which the user is asked questions (like the compression algorithm used,
+...) to help dar recover very corrupted archives and in which, many
+sanity checks are turned into warnings instead of aborting the
+operation. However this does not
+replace using Parchive. This "lax" mode has to be considered as the
+last resort
+option.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<br>
+
+
 <br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
@@ -271,154 +866,6 @@ huge archive.<br>
 </table>
 <br>
 <br>
-<br>
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">HARD
-LINK CONSIDERATION </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-    <tr>
-      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>
-hard links are properly saved in any case and properly restored if possible. For example, if restoring across
-a mounted file system, hard linking will fail, but dar will then
-duplicate the inode and file contents, issuing a warning. Hard link
-support includes the following inode types: plain files, char devices,
-block devices, symlinks (Yes, you can hard link symbolic links! Thanks to Wesley Leggette for the info ;-) )<br>
- </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-<br>
-<br>
-
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">SPARSE FILES<br>
- </td>
-      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;"><br>
-      </td>
-      <td style="vertical-align: top;">--sparse-file-min-size, -ah
-      </td>
-    </tr>
-    <tr>
-      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>By default Dar takes care of sparse files, even if the underlying filesystem does
-not support sparse files(!). When a long sequence of zeroed bytes is
-met in a file during backup, those are not stored into the archive but
-the number of zeroed bytes is stored instead (structure known as a "hole"). When comes the time to
-restore that file, dar restore the normal data but when a hole is met
-in the archive dar directly skips at the position of the data following
-that hole which, if the underlying filesystem supports sparse files,
-will (re)create a hole in the restored file, making a sparse file.
-Sparse files can report to be several hundred gigabytes large while they
-need only a few bytes of disk space, being able to properly save and restore them
-avoids wasting disk space at restoration time and in archives.<br>
- </td>
-    </tr>
-  </tbody>
-</table>
-
-<br>
-<br>
-<br>
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">EXTENDED
-ATTRIBUTES (EA)<br>
-      </td>
-      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;"><span style="font-weight: bold;">MacOS
-X FILE FORKS / ACL</span><br>
-      </td>
-      <td style="vertical-align: top;">keywords: -u -U -am -ae --alter=list-ea<br>
-      </td>
-    </tr>
-    <tr>
-      <td colspan="2" rowspan="1" style="vertical-align: top;">
-      <div style="text-align: justify;"><span style="font-style: italic;"></span> Dar is able to
-save and restore EA, all or just those matching a given pattern.
-      </div>
-      <br>
-      <div style="text-align: justify;">File Forks (MacOS X) are implemented over
-EA as well as Linux's ACL, they are thus transparently saved, tested,
-compared and restored by <span style="font-style: italic;">dar</span>.
-Note that ACL under MacOS seem to not rely on EA, thus while they are
-marginally used they are ignored by <span style="font-style: italic;">dar</span>.<br>
-      </div>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-<br>
-<br>
-
-
-  
-    
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-<tbody><tr>
-      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">FILESYSTEM SPECIFIC ATTRIBUTES (FSA)<br>
-      </td>
-      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;"><span style="font-weight: bold;">MacOSX/FreeBSD Birthdate, Linux FS attributes</span><br>
-      </td>
-      <td style="vertical-align: top;">keyword: --fsa-family<br>
-      </td>
-    </tr>
-    <tr>
-      <td colspan="2" rowspan="1" style="vertical-align: top;">
-      <div style="text-align: justify;"><span style="font-style: italic;"></span>
-Since release 2.5.0 dar is able to take care of filesystem specific
-attributes. Those are grouped by family strongly linked to the
-filesystem the have been read from, but perpendicularly each FSA has is
-designated also by a function. This way it is possible to translate FSA
-from a filesystem into another filesystem when there is a equivalency
-in role. </div>
-      <br>
-      <div style="text-align: justify;">currently two family are present:<br>
-      <ul>
-        <li><span style="font-weight: bold;">HFS+</span> family contains only one function : the <span style="font-weight: bold;">birthtime</span>.
-In addition to ctime, mtime and atime, dar can backup, compare and
-restore all four dates of a given inode (well ctime is not possible to
-restore).<br>
-        </li>
-        <li><span style="font-weight: bold;">extX </span>family
-contains 12 functions (append_only, compressed, no_dump, immutable,
-journaling, secure_deletion, no_tail_merging, undeletable,
-noatime_update, synchronous_directory, synchronous_update,
-top_of_dir_hierarchy) found on ext2/3/4 and some other Linux
-filesystems. Dar can thus save and restore all of those for each file
-depending on the capabilities or permissions dar has at restoration
-time.<br>
-        </li>
-      </ul>
-</div></td></tr></tbody>
-</table>
-<br>
-<br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
@@ -453,84 +900,6 @@ compression or encryption (or both) is used.</td>
 
   <tbody>
     <tr>
-      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">DATA
-PROTECTION </td>
-      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a>/<a href="usage_notes.html#Parchive"><span style="text-decoration: underline;">Parchive integration</span></a><a href="Notes.html#XV"></a></td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;"><br>
-      </td>
-      <td style="vertical-align: top;">keywords: -al<br>
-      </td>
-    </tr>
-    <tr>
-      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>dar relies on the <a href="usage_notes.html#Parchive">Parchive</a>
-program for data
-protection against media errors. Thanks to dar's ability to run user
-command or script and thanks to the ad hoc provided scripts, dar can use Parchive
-as simply as adding a word (par2) on command-line. Depending on the
-context (archive creation, archive testing, ...), dar will by this mean
-create parity data for each slice, verify and if necessary repair the
-archive slices.<br>
-      <br>However,
-even without Parchive, dar has the ability to be restored using an
-isolated catalogue as backup of the internal catalogue of an archive,
-which if corrupted could lead the whole archive to&nbsp; become
-unreadable. The other vital information (like the slice layout) is
-replicated in
-each slice, this let dar overcome data corruption of that part too, and
-restore more
-than nothing in case of major problem. As a last resort, Dar also
-proposes a "lax" mode in
-which the user is asked questions (like the compression algorithm used,
-...) to help dar recover very corrupted archives. However this does not
-replace using Parchive and has to be considered as the last resort
-option.<br>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-<br>
-
-<br>
-<br>
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">REMOTE
-OPERATIONS </td>
-      <td style="vertical-align: top;">references: <a href="usage_notes.html#dar_remote">command line usage notes</a>, <a href="man/index.html">man dar/dar_slave/dar_xform</a></td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top; font-weight: bold;">USING PIPES </td>
-      <td style="vertical-align: top;">keywords: -i -o -</td>
-    </tr>
-    <tr>
-      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>dar
-is able to produce an
-archive to its standard output or named pipe, it is also able to read
-an archive from its standard input or named pipe, which let one to make
-remote backup easily. <br>
-      <br>
-However this would requires to read the archive in sequential mode which leads to transfer a whole archive just to restore a
-single file. For that reason, dar is also able to read
-an archive through a pair of pipes using dar_slave at one side and dar
-at the other side. From the pair of pipe, one pipe let dar ask to
-dar_slave which portion of the archive to send through the other pipe.
-This makes a remote restoration much efficient and can still be
-protected, simply remotely running dar_slave through a ssh session
-for example will let all exchanges be encrypted.<br>
- </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-<br>
-<br>
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
       <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">ISOLATION
       </td>
       <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a> <br>
@@ -544,7 +913,7 @@ for example will let all exchanges be encrypted.<br>
     </tr>
     <tr>
       <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span> the <span style="font-style: italic;">catalogue</span> (i.e.: the contents of an
-archive), can be extracted (this operation is called <span style="font-style: italic;">isolation</span>) to a small file, that
+archive), can be copied (this operation is called <span style="font-style: italic;">isolation</span>) to a small file, that
 can in turn be used as reference for differential archive. There is then no
 more need to provide an archive to be able to create a differential
 backup based on it, just its <span style="font-style: italic;">catalogue</span>
@@ -554,37 +923,36 @@ can also be used to rescue the archive it has been isolated from in the case the
     </tr>
   </tbody>
 </table>
+
 <br>
+
 <br>
-<br>
+
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
   <tbody>
     <tr>
-      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">RE-SHAPE
-SLICES OF AN EXISTING ARCHIVE </td>
-      <td style="vertical-align: top;">references: <a href="man/index.html">man dar_xform</a></td>
+      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">FLAT
+RESTORATION </td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a></td>
     </tr>
     <tr>
-      <td style="vertical-align: top; font-weight: bold;"> <br>
-</td>
       <td style="vertical-align: top;"><br>
       </td>
+      <td style="vertical-align: top;">keywords: -f</td>
     </tr>
     <tr>
-      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;">the
-provided program
-named "dar_xform" is able to change the size of slices of a given
-archive. The resulting archive is totally identical to archives
-directly created by dar. Source archive can be taken from a set of
-slice, from standard input or even a named pipe. Note that dar_xform
-can work on encrypted and/or compressed data without having to
-decompress or even decrypt it.<br>
+      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>It is possible to restore any
+file without restoring the directories and subdirectories it was in at
+the time of the backup. If this option is activated, all files will be
+restored in the (-R) root directory whatever their real position is recorded inside the archive.<br>
  </td>
     </tr>
   </tbody>
 </table>
+
 <br>
-<br>
+
 <br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
@@ -635,7 +1003,7 @@ This is especially intended for saving live database backup. Before
 entering a directory dar will call the specified user command, then it
 will proceed to the backup of that directory. Once the whole directory
 has been saved, dar will call again the same user command (with
-slightly different arguments) and then continue the&nbsp; backup
+slightly different arguments) and then continue the backup
 process. Such user command may have for action to stop the database and
 to reactivate it afterward for example.<br>
 </td>
@@ -646,96 +1014,6 @@ to reactivate it afterward for example.<br>
 <br>
 
 <br>
-<br>
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">STRONG
-ENCRYPTION </td>
-      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a></td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;"><br>
-      </td>
-      <td style="vertical-align: top;">keywords: -K -J -# -* blowfish, twofish, aes256, serpent256, camellia256<br>
-</td>
-    </tr>
-    <tr>
-      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>Dar can use blowfish, twofish, aes256, serpent256 and camellia256 algorithms to encrypt the
-whole archive. Two "elastic buffers" are inserted and encrypted with
-the
-rest of the data, one at the beginning and one at the end of the
-archive to
-prevent a clear text attack or codebook attack. </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-<br>
-<br>
-
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">PUBLIC KEY ENCRYPTION<br>
- </td>
-      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a></td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;"><br>
-      </td>
-      <td style="vertical-align: top;">keywords: -K, --key-length, Gnupg, gpgme<br>
-</td>
-    </tr>
-    <tr>
-      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>When
-using strong encryption as seen above, to read an archive the user
-needs to give the passphrase that has been used at creation time.
-Another possibility is to let dar choose a random passphrase to encrypt
-the archive with the strong encryption algorithm listed above. Then dar
-encrypts this random passphrase with the public key of a list of
-recipients (assuming you have setup your GnuPG keyring accordingly) and
-drops that encrypted passphrase inside the archive. All of these
-recipients (assuming they own the corresponding private key) will be
-able to read the archive without having to know the passphrase used for
-strong encryption. <br>
-</td>
-    </tr>
-  </tbody>
-</table>
-
-<br>
-<br>
-<br>
-
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">SLICE HASHING<br>
- </td>
-      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a></td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;"><br>
-      </td>
-      <td style="vertical-align: top;">--hash, md5, sha1<br>
-</td>
-    </tr>
-    <tr>
-      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>When
-creating an archive dar can compute an md5 or sha1 hash before the
-archive is written to disk and produce a small file compatible with
-md5sum or sha1sum that let verify that each slice of the archive is not
-corrupted.<br>
-</td>
-    </tr>
-  </tbody>
-</table>
-
-<br>
-
 <br>
 <br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -768,39 +1046,52 @@ comments. <br>
       <br>
 Any configuration file can also receive conditional statements, which
 describe which options are to be used in different conditions.
-Conditions are: "restoration", "listing", "testing", "difference", "saving",
-"isolation", "any operation", "none yet defined" (which may be useful in case
-or recursive inclusion of files) ...<br>
+Conditions are: "extract", "listing", "test", "diff", "create",
+"isolate", "merge", "reference", "auxiliary", "all", "default" (which may be useful in case
+or recursive inclusion of files) ... more about their meaning and use cases in dar man page.<br>
  </td>
     </tr>
   </tbody>
 </table>
 <br style="font-weight: bold;">
-<br style="font-weight: bold;">
-<br style="font-weight: bold;">
+<br>
+
+<br>
+
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
   <tbody>
     <tr>
-      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">SELECTIVE
-COMPRESSION </td>
-      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a>/<a href="samples/index.html">samples</a></td>
+      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">REMOTE
+OPERATIONS </td>
+      <td style="vertical-align: top;">references: <a href="usage_notes.html#dar_remote">command line usage notes</a>, <a href="man/index.html">man dar/dar_slave/dar_xform</a></td>
     </tr>
     <tr>
-      <td style="vertical-align: top;"><br>
-      </td>
-      <td style="vertical-align: top;">keywords: -Y -Z -m -am<br>
-      </td>
+      <td style="vertical-align: top; font-weight: bold;">USING PIPES </td>
+      <td style="vertical-align: top;">keywords: -i -o -</td>
     </tr>
     <tr>
-      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>dar can be given a special
-filter that determines which files will be compressed or not. This way
-you can speed up the backup operation by not trying to compress *.mp3,
-*.mpg, *.zip, *.gz and other already compressed files, for example. Moreover another
-mechanism allow you to say that files under a given size (whatever their
-name is), will not be compressed. </td>
+      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>dar
+is able to produce an
+archive to its standard output or to a named pipe, and to read
+an archive from its standard input or from a named pipe, which let one to make
+remote backup easily. <br>
+      <br>Doing
+so leads dar to use a single pipe, this requires the reading of the
+whole archive which may be inefficient to just restore a
+single file. For that reason, dar is also able to read
+an archive through a <span style="text-decoration: underline;">pair of pipes</span> (or named pipes) using <span style="font-weight: bold;">dar_slave </span>at the other side of the
+pipes. From the pair of pipes, one pipe let dar asking to
+dar_slave which portion of the archive it has to send through the other pipe.
+This makes a remote restoration much more efficient and still allows these bidirectional exchanges
+to be encrypted over the network, simply running dar_slave through an ssh session.<br>
+ </td>
     </tr>
   </tbody>
 </table>
+
+<br>
+
 <br>
 <br>
 <br>
@@ -824,7 +1115,7 @@ backup is that it takes much less space to store and time to complete
 than always making full backup. But, in the other hand, while you can thus have a
 lot of them due to the reduces space requirement, if you want to restore a particular file, you can thus
 spend time to find in which backup is located the most recent version.
-This is solved using <span style="font-style: italic;">dar_manager</span>.
+This is solved using <span style="font-weight: bold;">dar_manager</span>.
 This command-line program,
 will gather contents information of all your backups. At restoration
 time, it will call dar for you to restore the asked file(s) from the
@@ -835,77 +1126,37 @@ proper backup.<br>
 </table>
 <br>
 <br>
-<br>
+
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
   <tbody>
     <tr>
-      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">FLAT
-RESTORATION </td>
-      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a></td>
+      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">RE-SHAPE
+SLICES OF AN EXISTING ARCHIVE </td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar_xform</a></td>
     </tr>
     <tr>
+      <td style="vertical-align: top; font-weight: bold;"> <br>
+</td>
       <td style="vertical-align: top;"><br>
       </td>
-      <td style="vertical-align: top;">keywords: -f</td>
     </tr>
     <tr>
-      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>It is possible to restore any
-file without restoring the directories and subdirectories it was in at
-the time of the backup. If this option is activated, all files will be
-restored in the (-R) root directory whatever their real position is recorded inside the archive.<br>
+      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;">the
+provided program
+named "<span style="font-weight: bold;">dar_xform</span>" is able to change the size of slices of a given
+archive. The resulting archive is totally identical to archives
+directly created by dar. Source archive can be taken from a set of
+slice, from standard input or even a named pipe. Note that dar_xform
+can work on encrypted and/or compressed data without having to
+decompress or even decrypt it.<br>
  </td>
     </tr>
   </tbody>
 </table>
+
 <br>
-<br>
-<br>
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">NODUMP
-FLAG </td>
-      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;"><br>
-      </td>
-      <td style="vertical-align: top;">keywords: --nodump</td>
-    </tr>
-    <tr>
-      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span> Linux ext2/3/4 filesystem, provide for each inodes a set of flags, among which is the "nodump" flag, which
-in substance says "don't save this file for backup". This is used by the so-called
-      <span style="font-style: italic;">dump</span> backup program. Dar can take care to not save those files that
-have this flag set. <br>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-<br>
-<br>
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">ONE
-FILESYSTEM </td>
-      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a></td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;"><br>
-      </td>
-      <td style="vertical-align: top;">keywords: -M</td>
-    </tr>
-    <tr>
-      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>dar can backup files of a given
-filesystem only, even if some subdirectory in the scope are mounting
-points for other filesystems, dar will not recurse in these
-directories. </td>
-    </tr>
-  </tbody>
-</table>
-<br>
+
 <br>
 <br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -939,7 +1190,7 @@ dates for example) of files that will stay in the resulting archive.<br>
       <br>
 Last, this merging feature give you also the opportunity to change the
 compression level or algorithm used as well as the encryption algorithm
-and pass. Of course, from a pair of source archive you can do all
+and passprhase. Of course, from a pair of source archive you can do all
 these sub features at the same time: filtering out files you do not
 want in the resulting archive, use a different compression level and
 algorithm or encryption password and algorithm than the source
@@ -982,43 +1233,6 @@ support available on your system.<br>
 <br>
 <br>
 <br>
-
-<table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; font-weight: bold; width: 33%;">DECREMENTAL BACKUP</td>
-      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a> / <a href="usage_notes.html#Decremental_Backup">Decremental backup</a> </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;"><br>
-      </td>
-      <td style="vertical-align: top;">keywords: -+ -ad<br>
-      </td>
-    </tr>
-    <tr align="justify">
-      <td colspan="2" rowspan="1" style="vertical-align: top;">As
-opposed to incremental backups, where the older one is a full backup
-and each subsequent backup contains only the changes from the previous
-backup, decremental backup let the full backup be the more recent while
-the older ones only contain changes compared to the just more recent one. This
-has the advantage of having a single archive to use to restore a whole
-system (dar_manager is not necessary) while reducing the overall amount
-of data to retain older versions of files (same amount required as with
-differential backup). It has also the advantage to not have to keep
-several set of backup as you just need to delete the oldest backup when
-you need storage space. However it has the default to require at each
-new backup the creation of a full backup, then the transformation of
-the previous full backup into a so-called decremental backup. Everything has
-a cost! ;-)<br>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-<br>
-<br>
-<br>
 <table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
@@ -1041,41 +1255,6 @@ report any problem but will not create, remove or modify any file.<br>
   </tbody>
 </table>
 <br>
-<br>
-<br>
-
-<table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; font-weight: bold; width: 33%;">DIRTY FILES<br>
-</td>
-      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a> </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;"><br>
-      </td>
-      <td style="vertical-align: top;">keywords: --dirty-behavior , --retry-on-change<br>
-      </td>
-    </tr>
-    <tr align="justify">
-      <td colspan="2" rowspan="1" style="vertical-align: top;">At
-backup time, dar checks that each saved file had not changed at the
-time it was read. If a file has changed in that situation, it is
-flagged as "dirty" in the archive, and handled differently from other
-files at restoration time. The dirty file handling is either to warn
-the user before restoring, to ignore and not restore them, or to ignore
-the dirty flag and restore them normally. Dar has room to retry saving
-a file when it has been found dirty, before effectively putting the
-"dirty" flag for that file in the archive. This retry option is limited
-by a maximum number of try per file, after which the file is
-definitively marked as dirty and the backup process continues with the
-next file.<br>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
 <br>
 <br>
 <br>
@@ -1157,27 +1336,46 @@ archive.002.dar, ... archive.010.dar.<br>
 
 
 
+
 <table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
 
 
 
 
   <tbody>
     <tr>
-      <td style="vertical-align: top; font-weight: bold; width: 33%;">CACHE DIRECTORY TAGGING STANDARD<br>
+      <td style="vertical-align: top; font-weight: bold; width: 33%;">MULTI SIZED MULTI VOLUME <br>
+TAPE ARCHIVES<br>
 </td>
-      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a> </td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar_split</a> </td>
     </tr>
     <tr>
       <td style="vertical-align: top;"><br>
       </td>
-      <td style="vertical-align: top;">keywords: --cache-directory-tagging<br>
+      <td style="vertical-align: top;">keywords: --sequential-read<br>
       </td>
     </tr>
     <tr align="justify">
-      <td colspan="2" rowspan="1" style="vertical-align: top;">Many software use cache directories (<a href="http://www.mozilla.org/">mozilla web browser</a> for example), directories where is stored temporaneous data that is not interesting to backup. The <a href="http://www.brynosaurus.com/cachedir/">Cache Directory Tagging Standard</a>
-provides a standard way for software applications to identify this type
-of data, which let dar able to take into account and avoid saving them.<br>
+      <td colspan="2" rowspan="1" style="vertical-align: top;">When
+writing an archive to tape, you either have to specify to the archive
+tool the size of the tape or stick to single volume archive. With <span style="font-weight: bold;">dar_split</span>,
+you can have variable sized tapes (for example the first used one has
+already some data in it) and keep using the following tapes with
+different sizes. Dar_split can be used with <span style="font-weight: bold;">dar</span> as well as with <span style="font-weight: bold;">tar</span>
+or other archive tool able to generate and read data to and from a
+pipe. It receive what normally goes to tape and upon reaching the end
+of the tape stops and asks you to change the tape. At
+reading/restoration time, it takes as input the tape devices and when
+again reaching the end of tape it stops and asks you to change the
+tape. On the other end it gather the collected data from different
+tapes into a single pipe suitable for reading by dar or tar. You simply
+have to feed it with the correct tapes rewinded at
+correct position in the same order they have been given at backup time.<br>
+      <br>
+Note that dar_split can work with dar but only when dar is used in
+sequential read mode. In normal read mode dar does not need dar_split
+and works far much faster in term of archive restoration while managing alone several volumes known as slices.<br>
       </td>
     </tr>
   </tbody>
@@ -1186,7 +1384,8 @@ of data, which let dar able to take into account and avoid saving them.<br>
 
 
 
-<br>
+
+
 </center>
 
 
