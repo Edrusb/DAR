@@ -119,16 +119,16 @@ bool config_file::is_a_target(const string & val)
 {
     vector<t_cible>::iterator it = cibles.begin();
 
-    do
-    {
-	if(it->target == val)
-	    it->seen = true;
-	else
-	    ++it;
-    }
-    while(it != cibles.end() && !it->seen);
+    while(it != cibles.end() && it->target != val)
+	++it;
 
-    return it != cibles.end();
+    if(it != cibles.end())
+    {
+	it->seen = true;
+	return true;
+    }
+    else
+	return false;
 }
 
 
