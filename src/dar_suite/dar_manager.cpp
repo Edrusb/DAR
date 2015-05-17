@@ -422,7 +422,6 @@ static bool command_line(shell_interaction & dialog,
 		    verbose = true;
 		    break;
 		case 'Q':
-		case 'j':
 		    break;  // ignore this option already parsed during initialization (dar_suite.cpp)
 		case 'w':
 		    if(optarg == NULL)

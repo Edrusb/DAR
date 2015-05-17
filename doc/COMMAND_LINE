@@ -17,7 +17,7 @@ f - do not restore directory structure  --flat
 g + recurse in this directory           --go-into
 h - help usage                          --help
 i + path of the input pipe              --input
-j - ask user to make room in virtual memory when it is exhausted --jog
+j - OBSOLETE was --jog, removed in 2.5.0
 k + do not deleted files drop between two backups --no-delete / --deleted { ignore | only }
 l + list archive contents               --list
 m + minimum size below which no compression will occur. --mincompr a default value is used. use -m 0 if you want to compress in any case.

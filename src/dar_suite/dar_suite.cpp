@@ -71,8 +71,6 @@ extern "C"
 
 using namespace libdar;
 
-static void jogger();
-
 static shell_interaction *ui = NULL;
 static void signals_abort(int l, bool now);
 static void signal_abort_delayed(int l);
@@ -130,21 +128,16 @@ int dar_suite_global(int argc,
     {
 	U_I min, med, maj;
 	bool silent;
-	bool jog;
-	line_tools_look_for_jQ(argc,
-			       argv,
-			       getopt_string,
+	line_tools_look_for_Q(argc,
+			      argv,
+			      getopt_string,
 #if HAVE_GETOPT_LONG
-			       long_options,
+			      long_options,
 #endif
-			       jog,
-			       silent);
+			      silent);
 	ui = new (nothrow) shell_interaction(&cerr, &cerr, silent);
 	if(ui == NULL)
 	    throw Ememory("dar_suite_global");
-
-	if(jog)
-	    std::set_new_handler(&jogger);
 
 	get_version(maj, med, min);
 	if(maj != LIBDAR_COMPILE_TIME_MAJOR || med < LIBDAR_COMPILE_TIME_MEDIUM)
@@ -278,13 +271,6 @@ int dar_suite_global(int argc,
     }
     memory_check_snapshot();
     return ret;
-}
-
-static void jogger()
-{
-    if(ui == NULL)
-	throw Ememory("jogger");
-    ui->pause(gettext("No more (virtual) memory available, you have the opportunity to stop un-necessary applications to free up some memory. Can we continue now ?"));
 }
 
 string dar_suite_command_line_features()

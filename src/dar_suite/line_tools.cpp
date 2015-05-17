@@ -616,20 +616,18 @@ void line_tools_look_for(const vector<char> & arguments,
     (void)line_tools_reset_getopt();
 }
 
-void line_tools_look_for_jQ(S_I argc,
-			    char *const argv[],
-			    const char *getopt_string,
+void line_tools_look_for_Q(S_I argc,
+			   char *const argv[],
+			   const char *getopt_string,
 #if HAVE_GETOPT_LONG
-			    const struct option *long_options,
+			   const struct option *long_options,
 #endif
-			    bool & j_is_present,
-			    bool & Q_is_present)
+			   bool & Q_is_present)
 {
     vector<char> arguments;
     vector<char> presence;
     vector<char>::const_iterator it;
 
-    j_is_present = false;
     Q_is_present = false;
 
     arguments.push_back('j');
@@ -642,10 +640,6 @@ void line_tools_look_for_jQ(S_I argc,
 			long_options,
 #endif
 			presence);
-
-    it = find(presence.begin(), presence.end(), 'j');
-    if(it != presence.end())
-	j_is_present = true;
 
     it = find(presence.begin(), presence.end(), 'Q');
     if(it != presence.end())

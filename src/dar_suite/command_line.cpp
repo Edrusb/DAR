@@ -90,7 +90,7 @@ extern "C"
 #include "criterium.hpp"
 #include "fichier_local.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:j#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:"
+#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c option"
@@ -1425,8 +1425,6 @@ static bool get_args_recursive(recursive_param & rec,
             case 'Q':
                 rec.no_inter = true;
                 break;
-            case 'j':
-                break;  // ignore this option already parsed during initialization (dar_suite.cpp)
             case 'G':
                 if(optarg != NULL)
                     throw Erange("command_line.cpp:get_arg_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
@@ -2258,7 +2256,6 @@ const struct option *get_long_opt()
         {"on-fly-isolate", required_argument, NULL, '@'},
         {"no-mount-points", no_argument, NULL, 'M'},
         {"go-into", required_argument, NULL, 'g'},
-        {"jog", no_argument, NULL, 'j'},
         {"crypto-block", required_argument, NULL, '#'},
         {"ref-crypto-block", required_argument, NULL, '*'},
         {"crypto-block-ref", required_argument, NULL, '*'},

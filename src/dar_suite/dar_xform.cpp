@@ -447,7 +447,6 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
 			throw Erange("command_line", string(gettext("Unknown parameter given to -a option: ")) + optarg);
 		break;
 	    case 'Q':
-	    case 'j':
 		break;  // ignore this option already parsed during initialization (dar_suite.cpp)
 	    case '^':
 		if(optarg == NULL)

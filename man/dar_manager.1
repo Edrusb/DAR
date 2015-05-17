@@ -4,37 +4,37 @@
 dar_manager \- compiles several archives contents in a database to ease file restoration
 .SH SYNOPSIS
 
-dar_manager [-v] [-j] -C [<path>/]<database>
+dar_manager [-v] -C [<path>/]<database>
 
-dar_manager [-v] [-j] -B [<path>/]<database> -A [<path>/]<basename> [-9 <min-digits>] [[<path>/]<archive_basename>]
+dar_manager [-v] -B [<path>/]<database> -A [<path>/]<basename> [-9 <min-digits>] [[<path>/]<archive_basename>]
 
-dar_manager [-v] [-j] -B [<path>/]<database> -l
+dar_manager [-v] -B [<path>/]<database> -l
 
-dar_manager [-v] [-j] -B [<path>/]<database> -D <number>[-<number>]
+dar_manager [-v] -B [<path>/]<database> -D <number>[-<number>]
 
-dar_manager [-v] [-j] -B [<path>/]<database> -b <number> <new_archive_basename>
+dar_manager [-v] -B [<path>/]<database> -b <number> <new_archive_basename>
 
-dar_manager [-v] [-j] -B [<path>/]<database> -p <number> <path>
+dar_manager [-v] -B [<path>/]<database> -p <number> <path>
 
-dar_manager [-v] [-j] -B [<path>/]<database> -o [list of options to pass to dar]
+dar_manager [-v] -B [<path>/]<database> -o [list of options to pass to dar]
 
-dar_manager [-v] [-j] -B [<path>/]<database> -d [<path to dar command>]
+dar_manager [-v] -B [<path>/]<database> -d [<path to dar command>]
 
-dar_manager [-v] [-j] -B [<path>/]<database> [-N] [-k] [-w <date>] [-e "<extra options to dar>"] -r [list of files to restore]
+dar_manager [-v] -B [<path>/]<database> [-N] [-k] [-w <date>] [-e "<extra options to dar>"] -r [list of files to restore]
 
-dar_manager [-v] [-j] -B [<path>/]<database> -u <number>
+dar_manager [-v] -B [<path>/]<database> -u <number>
 
-dar_manager [-v] [-j] -B [<path>/]<database> -f file
+dar_manager [-v] -B [<path>/]<database> -f file
 
-dar_manager [-v] [-j] -B [<path>/]<database> -s
+dar_manager [-v] -B [<path>/]<database> -s
 
-dar_manager [-v] [-j] -B [<path>/]<database> -m <number> <number>
+dar_manager [-v] -B [<path>/]<database> -m <number> <number>
 
-dar_manager [-v] [-j] -B [<path>/]<database> -c
+dar_manager [-v] -B [<path>/]<database> -c
 
-dar_manager [-v] [-j] -B [<path>/]<database> -i
+dar_manager [-v] -B [<path>/]<database> -i
 
-dar_manager [-v] [-j] -B [<path>/]<database> -@ { <filename> | "-" }
+dar_manager [-v] -B [<path>/]<database> -@ { <filename> | "-" }
 
 dar_manager -h
 
@@ -141,13 +141,10 @@ By default, dar_manager does not ask dar to restore file that have been removed 
 avoid dar_manager to issue a warning for each file not following a chronological order of modification date when the archive number in the database is growing.
 .TP 20
 -@, --batch <filename>
-allows you to do several operations on a given database. All operations are defined in the provided <filename> and refer to the same database as defined by the -B switch on command line. This batch file, must thus not contain neither -B, -C, -i, -j or -ai option (-j and -ai are global to the batch operation). The batch file expected layout is one command per line, thus several arguments (like -l -v for example) may take place on a given line of the file (-v can be found both on command line for verbose output about the batch operation steps, as well as inside the batch file for verbose output of a particular batched command). Arguments are separated by spaces or tabs, other characters are passed as-is. In consequence, you should only need to use quotes (using " or ') if you intend to use an argument containing space. Last, comments may be placed on any line beginning by a hash character (#).
+allows you to do several operations on a given database. All operations are defined in the provided <filename> and refer to the same database as defined by the -B switch on command line. This batch file, must thus not contain neither -B, -C, -i or -ai option (-ai are global to the batch operation). The batch file expected layout is one command per line, thus several arguments (like -l -v for example) may take place on a given line of the file (-v can be found both on command line for verbose output about the batch operation steps, as well as inside the batch file for verbose output of a particular batched command). Arguments are separated by spaces or tabs, other characters are passed as-is. In consequence, you should only need to use quotes (using " or ') if you intend to use an argument containing space. Last, comments may be placed on any line beginning by a hash character (#).
 .TP 20
 -Q
 Do not display any message on stderr when not launched from a terminal (for example when launched from an at job or crontab). Remains that any question to the user will be assumed a 'no' answer, which most of the time will abort the program.
-.TP 20
--j, --jog
-when virtual memory is exhausted, as user to make room before trying to continue. By default, when memory is exhausted dar aborts.
 .TP 20
 -v, --verbose
 displays additional information about what it is doing.
