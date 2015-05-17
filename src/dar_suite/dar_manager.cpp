@@ -65,7 +65,6 @@ extern "C"
 #include "tools.hpp"
 #include "thread_cancellation.hpp"
 #include "archive.hpp"
-#include "string_file.hpp"
 #include "cygwin_adapt.hpp"
 #include "no_comment.hpp"
 #include "line_tools.hpp"
@@ -758,8 +757,7 @@ static void op_dar(shell_interaction & dialog, database *dat, const string & arg
 static void op_restore(shell_interaction & dialog, database *dat, const vector<string> & rest, const infinint & date, const string & options_for_dar, bool info_details, bool early_release, bool ignore_dar_options_in_base, bool even_when_removed)
 {
     thread_cancellation thr;
-    string_file strfile = string_file(options_for_dar);
-    vector <string> options = tools_split_in_words(strfile);
+    vector <string> options = tools_split_in_words(options_for_dar);
 
     database_restore_options dat_opt;
 
@@ -1278,8 +1276,7 @@ static void op_batch(shell_interaction & dialog, database *dat, const string & f
 	    while(proper.read(&tmp,  1) == 1 && tmp != '\n')
 		line += tmp;
 
-	    string_file line_file = string_file(line);
-	    mots = tools_split_in_words(line_file);
+	    mots = tools_split_in_words(line);
 
 	    if(mots.size() == 0)
 		continue;

@@ -564,12 +564,21 @@ namespace libdar
 	/// \return the ctime of the given file
     extern datetime tools_get_ctime(const std::string & s);
 
-	/// read a file and split its contents in words
+	/// read a file and split its contents into words
 
 	/// \param[in,out] f is the file to read
 	/// \return the list of words found in this order in the file
 	/// \note The different quotes are taken into account
     extern std::vector<std::string> tools_split_in_words(generic_file & f);
+
+
+	/// read a std::string and split its contents into words
+
+	/// \param[in,out] arg is the string to read
+	/// \return the list of words found in this order in the file
+	/// \note The different quotes are taken into account
+    extern std::vector<std::string> tools_split_in_words(const std::string & arg);
+
 
 	/// look next char in string out of parenthesis
 

@@ -20,7 +20,7 @@ else
 endif
 
 
-noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_special_alloc test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_string_file test_escape test_hash_fichier moving_file make_sparse_file hashsum test_crypto_asym test_range $(LIBTHREADAR_TEST_MODULES)
+noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_special_alloc test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_escape test_hash_fichier moving_file make_sparse_file hashsum test_crypto_asym test_range $(LIBTHREADAR_TEST_MODULES)
 AM_LDFLAGS = -all-static @LTLIBINTL@
 LDADD = -L../libdar -l$(MYLIB) $(GPGME_LIBS)
 
@@ -98,9 +98,6 @@ test_blowfish_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
 test_mask_list_SOURCES = test_mask_list.cpp ../dar_suite/shell_interaction.cpp
 test_mask_list_DEPENDENCIES = ../libdar/lib$(MYLIB).la
-
-test_string_file_SOURCES = test_string_file.cpp ../dar_suite/shell_interaction.cpp testtools.cpp
-test_string_file_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
 test_escape_SOURCES = test_escape.cpp ../dar_suite/shell_interaction.cpp
 test_escape_DEPENDENCIES = ../libdar/lib$(MYLIB).la

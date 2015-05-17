@@ -145,6 +145,7 @@ extern "C"
 #include "user_group_bases.hpp"
 #endif
 #include "compile_time_features.hpp"
+#include "memory_file.hpp"
 
 #define YES_NO(x) (x ? gettext("YES") : gettext("NO"))
 
@@ -2005,6 +2006,16 @@ namespace libdar
             throw Erange("make_args_from_file", tools_printf(dar_gettext("Parse error: Unmatched `%c'"), quotes.back()));
 
         return mots;
+    }
+
+
+    std::vector<std::string> tools_split_in_words(const std::string & arg)
+    {
+	memory_file mem;
+
+	mem.write(arg.c_str(), arg.size());
+	mem.skip(0);
+	return tools_split_in_words(mem);
     }
 
 
