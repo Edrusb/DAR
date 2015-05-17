@@ -6,7 +6,7 @@ AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
 AC_DEFINE_UNQUOTED(DAR_VERSION, "AC_PACKAGE_VERSION", [dar and dar_suite version, definition in configure.ac])
 
-AM_INIT_AUTOMAKE([subdir-objects])
+AM_INIT_AUTOMAKE
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION
 XGETTEXT_EXTRA_OPTIONS='--keyword=dar_gettext'
