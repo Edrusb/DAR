@@ -249,6 +249,8 @@ namespace libdar
 
     void cat_mirage::post_constructor(const pile_descriptor & pdesc)
     {
+	cat_nomme::post_constructor(pdesc);
+
         if(star_ref == NULL)
             throw SRC_BUG;
 
