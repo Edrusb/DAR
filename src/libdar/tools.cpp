@@ -2700,12 +2700,16 @@ namespace libdar
 
     string tools_get_compression_ratio(const infinint & storage_size, const infinint & file_size, bool compressed)
     {
+	static const char * not_compressed = "     ";
+
         if(!compressed)
-            return "     ";
+            return not_compressed;
         else
             if(file_size >= storage_size)
-                return tools_addspacebefore(deci(((file_size - storage_size)*100)/file_size).human(), 4) +"%";
-            // we can divide by file_size above, because it is never null in that case: file_size >= storage_size > 0
+		if(file_size > 0)
+		    return tools_addspacebefore(deci(((file_size - storage_size)*100)/file_size).human(), 4) +"%";
+		else
+		    return not_compressed;
             else
                 return gettext("Worse");
     }
