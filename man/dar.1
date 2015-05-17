@@ -683,6 +683,7 @@ Well, now let's see how to bring some more fun using conditional statements in a
 {<condition>}[<action if condition is true>]
 This syntax let you place an action (as the ones we saw just above) inside the brackets '[' and ']' (for example [Pp]) that will take effect only if the evaluation of the <condition> is true.
 Stated that a such statement is a new type of action, you may have guessed that you may use it recursively: {<condition1>}[{<condition2>}[<action>]).
+.PP
 Well so far it seems useless. But instead of the "if <condition> then <action> else <action>" paradigm common to programming languages, due to the command line context it has been chosen to instead use and implicit "OR" operator between actions.
 Thus you can "stack" conditional statements this way: {<condition1>}[<action1>] {<condition2>}[<action2>] <action3>. In this example, if <condition1> is true then <action1> will be used, ELSE if <condition2> is true then <action2> will be used ELSE <action3> will be used.
 This leads to the same possibilities as what is available with programming languages, but with a slightly more simple syntax. Seen this, the recursion of conditional syntax is more interesting.
