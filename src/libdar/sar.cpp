@@ -1529,6 +1529,7 @@ namespace libdar
 
 	reference = NULL;
 	offset = 0;
+	cur_pos = 0;
 	end_of_slice = 0;
 	hook = execute;
 	base = base_name;
@@ -1637,6 +1638,7 @@ namespace libdar
 	label for_init;
 	reference = NULL;
 	offset = 0;
+	cur_pos = 0;
 	end_of_slice = 0;
 	hook = "";
 	base = "";
@@ -1682,6 +1684,7 @@ namespace libdar
 
 	reference = f;
 	offset = 0;
+	cur_pos = 0;
 	end_of_slice = 0;
 	hook = execute;
 	base = "";
@@ -1714,7 +1717,7 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	if(reference->get_position() == end_of_slice + offset + pos)
+	if(pos == cur_pos)
 	    return true;
 
 	return reference->skip(pos + offset);
@@ -1771,7 +1774,14 @@ namespace libdar
 	    throw SRC_BUG;
 
         if(x > 0)
-            return reference->skip_relative(x);
+	{
+	    bool ret = reference->skip_relative(x);
+            if(ret) // skip succeeded
+		cur_pos += x;
+	    else   // skip failed
+		where_am_i();
+	    return ret;
+	}
 	else
 	{
 	    U_I x_opposit = -x;
@@ -1779,18 +1789,23 @@ namespace libdar
 		return reference->skip_relative(x);
 	    else
 		return reference->skip(offset); // start of file
+
+	    if(cur_pos > x_opposit)
+	    {
+		bool ret = reference->skip_relative(x);
+		if(ret)
+		    cur_pos -= x_opposit;
+		else
+		    where_am_i();
+		return ret;
+	    }
+	    else
+	    {
+		bool ret = reference->skip(offset);
+		cur_pos = 0;
+		return ret;
+	    }
 	}
-    }
-
-    infinint trivial_sar::get_position()
-    {
-	if(is_terminated())
-	    throw SRC_BUG;
-
-        if(reference->get_position() >= offset + end_of_slice)
-            return reference->get_position() - offset - end_of_slice;
-        else
-            throw Erange("trivial_sar::get_position", gettext("Position out of range"));
     }
 
     void trivial_sar::init(const label & internal_name)
@@ -1807,6 +1822,7 @@ namespace libdar
 	    offset = reference->get_position();
 	    of_data_name = tete.get_set_data_name();
 	    old_sar = tete.is_old_header();
+	    cur_pos = 0;
 	    break;
 	case gf_write_only:
 	case gf_read_write:
@@ -1818,6 +1834,7 @@ namespace libdar
 		tete.set_format_07_compatibility();
 	    tete.write(get_ui(), *reference);
 	    offset = reference->get_position();
+	    cur_pos = 0;
 	    break;
 	default:
 	    throw SRC_BUG;
@@ -1847,7 +1864,37 @@ namespace libdar
 		// else assuming EOF has already been reached
 	}
 
+	cur_pos += ret;
+
 	return ret;
+    }
+
+    void trivial_sar::inherited_write(const char *a, U_I size)
+    {
+	cur_pos += size;
+
+	try
+	{
+	    reference->write(a, size);
+	}
+	catch(...)
+	{
+	    where_am_i();
+	    throw;
+	}
+    }
+
+    void trivial_sar::where_am_i()
+    {
+	cur_pos = reference->get_position();
+	if(cur_pos >= offset)
+	    cur_pos -= offset;
+	else // we are at an invalid offset (in the slice header)
+	{
+	    if(!reference->skip(offset))
+		throw Edata(string("trivial_sar: ")+ gettext("Cannot skip to a valid position in file"));
+	    cur_pos = 0;
+	}
     }
 
 } // end of namespace

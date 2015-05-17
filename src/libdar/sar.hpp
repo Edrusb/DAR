@@ -268,7 +268,7 @@ namespace libdar
         bool skip(const infinint & pos);
         bool skip_to_eof() { if(is_terminated()) throw SRC_BUG; return reference->skip_to_eof(); };
         bool skip_relative(S_I x);
-        infinint get_position();
+        infinint get_position() { return cur_pos; };
 
 	    // contextual inherited method
 	bool is_an_old_start_end_archive() const { return old_sar; };
@@ -277,7 +277,7 @@ namespace libdar
     protected:
 	void inherited_read_ahead(const infinint & amount) { reference->read_ahead(amount); };
         U_I inherited_read(char *a, U_I size);
-        void inherited_write(const char *a, U_I size) { reference->write(a, size); };
+        void inherited_write(const char *a, U_I size);
 	void inherited_sync_write() {};
 	void inherited_flush_read() {};
 	void inherited_terminate();
@@ -285,6 +285,7 @@ namespace libdar
     private:
         generic_file *reference;  //< points to the underlying data, owned by "this"
         infinint offset;          //< offset to apply to get the first byte of data out of SAR headers
+	infinint cur_pos;         //< current position as returned by get_position()
 	infinint end_of_slice;    //< when end of slice/archive is met, there is an offset by 1 compared to the offset of reference. end_of_slice is set to 1 in that situation, else it is always equal to zero
 	std::string hook;         //< command to execute after slice writing (not used in read-only mode)
 	std::string base;         //< basename of the archive (used for string susbstitution in hook)
@@ -295,6 +296,8 @@ namespace libdar
 	std::string hook_where;   //< what value to use for %p subsitution in hook
 
 	void init(const label & internal_name); //< write the slice header and set the offset field (write mode), or (read-mode),  reads the slice header an set offset field
+
+	void where_am_i();
     };
 
 
