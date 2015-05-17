@@ -31,7 +31,6 @@
 #include "command_line.hpp"
 #include "tools.hpp"
 #include "dar.hpp"
-#include "sar_tools.hpp"
 #include "dar_suite.hpp"
 #include "integers.hpp"
 #include "deci.hpp"

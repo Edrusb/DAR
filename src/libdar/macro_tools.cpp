@@ -42,7 +42,6 @@ extern "C"
 #include "user_interaction.hpp"
 #include "zapette.hpp"
 #include "sar.hpp"
-#include "sar_tools.hpp"
 #include "elastic.hpp"
 #include "tronc.hpp"
 #include "trontextual.hpp"
@@ -1057,14 +1056,14 @@ namespace libdar
 			    if(info_details)
 				dialog.warning(gettext("Creating low layer: Writing archive into standard output object..."));
 			    writing_to_pipe = true;
-			    tmp = sar_tools_open_archive_tuyau(dialog,
-							       pool,
-							       1,
-							       gf_write_only, // always write only
-							       internal_name,
-							       data_name,
-							       false,
-							       execute); //archive goes to stdout
+			    tmp = macro_tools_open_archive_tuyau(dialog,
+								 pool,
+								 1,
+								 gf_write_only, // always write only
+								 internal_name,
+								 data_name,
+								 false,
+								 execute); //archive goes to stdout
 			}
 			else
 			{
@@ -1788,6 +1787,44 @@ namespace libdar
 	return slices;
     }
 
+    trivial_sar *macro_tools_open_archive_tuyau(user_interaction & dialog,
+						memory_pool *pool,
+						S_I fd,
+						gf_mode mode,
+						const label & internal_name,
+						const label & data_name,
+						bool slice_header_format_07,
+						const std::string & execute)
+    {
+        generic_file *tmp = NULL;
+        trivial_sar *ret = NULL;
 
+        try
+        {
+            tmp = new (pool) tuyau(dialog, fd, mode);
+            if(tmp == NULL)
+                throw Ememory("macro_tools_open_archive_tuyau");
+            ret = new (pool) trivial_sar(dialog,
+					 tmp,
+					 internal_name,
+					 data_name,
+					 slice_header_format_07,
+					 execute);
+            if(ret == NULL)
+                throw Ememory("macro_tools_open_archive_tuyau");
+	    else
+		tmp = NULL;
+        }
+        catch(...)
+        {
+            if(ret != NULL)
+                delete ret;
+	    if(tmp != NULL)
+		delete tmp;
+            throw;
+        }
+
+        return ret;
+    }
 
 } // end of namespace

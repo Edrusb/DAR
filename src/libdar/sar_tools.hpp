@@ -34,20 +34,32 @@
 #include "generic_file.hpp"
 #include "header.hpp"
 #include "sar.hpp"
+#include "memory_pool.hpp"
+#include "label.hpp"
+
 
 namespace libdar
 {
 
-	/// \brief create an container to write a archive to a pipe
-	/// \ingroup Private
-    extern trivial_sar *sar_tools_open_archive_tuyau(user_interaction & dialog,
-						     memory_pool *pool,
-						     S_I fd,
-						     gf_mode mode,
-						     const label & internal_name,
-						     const label & data_name,
-						     bool slice_header_format_07,
-						     const std::string & execute);
+    extern std::string sar_tools_make_filename(const std::string & base_name,
+					       const infinint & num,
+					       const infinint & min_digits,
+					       const std::string & ext);
+
+
+    extern bool sar_tools_extract_num(const std::string & filename,
+				      const std::string & base_name,
+				      const infinint & min_digits,
+				      const std::string & ext,
+				      infinint & ret);
+
+    extern bool sar_tools_get_higher_number_in_dir(entrepot & entr,
+						   const std::string & base_name,
+						   const infinint & min_digits,
+						   const std::string & ext, infinint & ret);
+
+    extern std::string sar_tools_make_padded_number(const std::string & num,
+						    const infinint & min_digits);
 
 
 } // end of namespace

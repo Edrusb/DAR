@@ -73,51 +73,93 @@ extern "C"
 #include "tools.hpp"
 #include "tuyau.hpp"
 #include "cygwin_adapt.hpp"
+#include "deci.hpp"
 
 using namespace std;
 
 namespace libdar
 {
 
-    trivial_sar *sar_tools_open_archive_tuyau(user_interaction & dialog,
-					      memory_pool *pool,
-					      S_I fd,
-					      gf_mode mode,
-					      const label & internal_name,
-					      const label & data_name,
-					      bool slice_header_format_07,
-					      const std::string & execute)
+    string sar_tools_make_filename(const string & base_name,
+				   const infinint & num,
+				   const infinint & min_digits,
+				   const string & ext)
     {
-        generic_file *tmp = NULL;
-        trivial_sar *ret = NULL;
+        deci conv = num;
+	string digits = conv.human();
 
-        try
-        {
-            tmp = new (pool) tuyau(dialog, fd, mode);
-            if(tmp == NULL)
-                throw Ememory("sar_tools_open_archive_tuyau");
-            ret = new (pool) trivial_sar(dialog,
-					 tmp,
-					 internal_name,
-					 data_name,
-					 slice_header_format_07,
-					 execute);
-            if(ret == NULL)
-                throw Ememory("sar_tools_open_archive_tuyau");
-	    else
-		tmp = NULL;
-        }
-        catch(...)
-        {
-            if(ret != NULL)
-                delete ret;
-	    if(tmp != NULL)
-		delete tmp;
-            throw;
-        }
-
-        return ret;
+        return base_name + '.' + sar_tools_make_padded_number(digits, min_digits) + '.' + ext;
     }
 
+    bool sar_tools_extract_num(const string & filename,
+			       const string & base_name,
+			       const infinint & min_digits,
+			       const string & ext,
+			       infinint & ret)
+    {
+        try
+        {
+	    U_I min_size = base_name.size() + ext.size() + 2; // 2 for two dot characters
+	    if(filename.size() <= min_size)
+		return false; // filename is too short
+
+            if(infinint(filename.size() - min_size) < min_digits && min_digits != 0)
+                return false; // not enough room for all digits
+
+            if(filename.find(base_name) != 0) // checking that base_name is present at the beginning
+                return false;
+
+            if(filename.rfind(ext) != filename.size() - ext.size()) // checking that extension is at the end
+                return false;
+
+            deci conv = string(filename.begin()+base_name.size()+1, filename.begin() + (filename.size() - ext.size()-1));
+            ret = conv.computer();
+            return true;
+        }
+	catch(Ethread_cancel & e)
+	{
+	    throw;
+	}
+        catch(Egeneric &e)
+        {
+            return false;
+        }
+    }
+
+    bool sar_tools_get_higher_number_in_dir(entrepot & entr,
+					    const string & base_name,
+					    const infinint & min_digits,
+					    const string & ext,
+					    infinint & ret)
+    {
+        infinint cur;
+        bool somme = false;
+	string entry;
+
+	entr.read_dir_reset();
+
+	ret = 0;
+	somme = false;
+	while(entr.read_dir_next(entry))
+	    if(sar_tools_extract_num(entry, base_name, min_digits, ext, cur))
+	    {
+		if(cur > ret)
+		    ret = cur;
+		somme = true;
+	    }
+
+        return somme;
+    }
+
+    string sar_tools_make_padded_number(const string & num,
+					const infinint & min_digits)
+    {
+	string ret = num;
+
+	while(infinint(ret.size()) < min_digits)
+	    ret = string("0") + ret;
+
+	return ret;
+    }
 
 } // end of namespace

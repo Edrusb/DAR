@@ -49,6 +49,8 @@ extern "C"
 #include "tools.hpp"
 #include "range.hpp"
 #include "slice_layout.hpp"
+#include "trivial_sar.hpp"
+
 
     /// \addtogroup Private
     /// @{
@@ -72,6 +74,17 @@ namespace libdar
     extern const std::string LIBDAR_STACK_LABEL_CLEAR;
     extern const std::string LIBDAR_STACK_LABEL_UNCYPHERED;
     extern const std::string LIBDAR_STACK_LABEL_LEVEL1;
+
+	/// create an container to write an archive to a pipe
+    extern trivial_sar *macro_tools_open_archive_tuyau(user_interaction & dialog,
+						       memory_pool *pool,
+						       S_I fd,
+						       gf_mode mode,
+						       const label & internal_name,
+						       const label & data_name,
+						       bool slice_header_format_07,
+						       const std::string & execute);
+
 
 	/// setup the given pile object to contain a stack of generic_files suitable to read an archive
 	///

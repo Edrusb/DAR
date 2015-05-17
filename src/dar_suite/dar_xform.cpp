@@ -42,7 +42,7 @@ extern "C"
 #include <new>
 
 #include "sar.hpp"
-#include "sar_tools.hpp"
+#include "trivial_sar.hpp"
 #include "user_interaction.hpp"
 #include "tools.hpp"
 #include "tuyau.hpp"
@@ -54,6 +54,7 @@ extern "C"
 #include "header.hpp"
 #include "line_tools.hpp"
 #include "entrepot_local.hpp"
+#include "macro_tools.hpp"
 
 using namespace libdar;
 
@@ -182,14 +183,14 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 
 		if(size == 0)
 		    if(dst == "-")
-			dst_sar = sar_tools_open_archive_tuyau(dialog,
-							       NULL,
-							       1,
-							       gf_write_only,
-							       internal_name,
-							       data_name,
-						 	       format_07_compatible,
-							       execute_dst);
+			dst_sar = macro_tools_open_archive_tuyau(dialog,
+								 NULL,
+								 1,
+								 gf_write_only,
+								 internal_name,
+								 data_name,
+								 format_07_compatible,
+								 execute_dst);
 		    else
 		    {
 			if(dst_dir != NULL)
