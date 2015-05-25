@@ -21,11 +21,11 @@ endif
 
 dist_noinst_DATA = build_tree.sh main.sh modif_tree.sh routine.sh loop.sh
 noinst_PROGRAMS = all_features padder
-check_PROGRAMS = permission
+check_PROGRAMS = permission$(EXEEXT)
 LDADD = -L../libdar -l$(MYLIB) $(GPGME_LIBS)
 AM_LDFLAGS = @LTLIBINTL@
 
-permission:
+permission$(EXEEXT):
 	chmod a+x $(dist_noinst_DATA) loop.sh
 	./loop.sh
 

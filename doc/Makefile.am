@@ -16,7 +16,7 @@ Doxyfile.tmp:
 	if [ -d html/search ]; then chmod u+x html/search ; fi
 
 clean-local:
-	rm -rf html Doxyfile.tmp
+	rm -rf html Doxyfile.tmp doxygen_sqlite3.db
 
 install-data-hook:
 	./portable_cp html $(DESTDIR)$(pkgdatadir)
