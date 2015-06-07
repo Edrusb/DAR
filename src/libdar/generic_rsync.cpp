@@ -99,8 +99,8 @@ namespace libdar
     {
 	char *inbuf = NULL;
 	char *outbuf = NULL;
-	unsigned int lu = 0;
-	unsigned int out;
+	U_I lu = 0;
+	U_I out;
 	bool eof = false;
 
 	    // sanity checks
