@@ -1318,7 +1318,19 @@ namespace libdar
 					// thus the read_ahaead will be bounded by the escape
 					// layer up to the next tape mark, as expected
 				    dat->read_ahead(e_file->get_storage_size());
-				    dat->copy_to(black_hole, crc_size, check);
+				    try
+				    {
+					dat->copy_to(black_hole, crc_size, check);
+				    }
+				    catch(...)
+				    {
+					    // in sequential read mode we must
+					    // try to read the CRC for the object
+					    // be completed and not generating an
+					    // error due to absence of CRC later on
+					e_file->get_crc(original);
+					throw;
+				    }
 				    if(check == NULL)
 					throw SRC_BUG;
 
