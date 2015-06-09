@@ -545,6 +545,9 @@ By default slice number contained in filename do not have any padded zeros, whic
 --pipe-fd <num>
 will read further arguments from the file-descriptor <num>. The arguments read through this file-descriptor must follow a TLV (Type/Length/Value) list format. This option is not intended for human use, but for other programs launching dar like dar_manager. This feature has been added to overcome the command line length limit.
 .TP 20
+-al, --alter=lax
+When reading an archive, dar will try to workaround data corruption of slice header, archive header and catalogue. This option is to be used as last resort solution when facing media corruption. It is rather and still strongly encourage to test archives before relying on them as well as using Parchive to do parity data of each slice to be able to recover data corruption in a much more effective manner and with much more chance of success. Dar also has the possibility to backup a catalogue using an isolated catalogue, but this does not face slice header corruption or even saved file's data corruption (dar will detect but will not correct such event).
+.TP 20
 --single-thread, -G
 When libdar is compiled against libthreadar, it can make use of several threads. The number of thread is not parametrable but depends on the number of feature activated (compression, encryption, tape marks, sparse file, etc.) that require CPU intensive operations. The load-balancing type per thread used is called "pipeline". This is the most adapted multi threading model to dar's work which in brief is the construction of a single (eventually sliced) archive (backup operation). Other operations based on archive read (restoration, listing, testing,...) could make use of a tree-like paralellism but would stuck due to I/O performance of the disk (even with a RAID array). If you find that dar creates a too high load average on your production servers, use --single-thread option to have dar/libdar stay single threaded. This option has no effect when libdar is not compiled against libthreadar.
 .PP
@@ -878,9 +881,6 @@ At restoration time, if -D is not specified (default) any file and directory is 
 .TP 20
 -2, --dirty-behavior { ignore | no-warn }
 At restoration time, if a file in the archive is flagged as "dirty" (meaning that it had changed at the time it was saved), user is asked for confirmation before restoring it. Specifying "ignore" will skip those dirty files, while "no-warn" will restore them without user confirmation. This feature is incompatible with sequential reading mode, in this mode dar cannot know whether a file is dirty before having restored it. In consequences, in --sequential-read, once a file has been restored, if it is found to be dirty it will be removed unless dirty-behavior is set to "no-warn".
-.TP 20
--al, --alter=lax
-Dar will try to workaround data corruption of slice header, archive header and catalogue. This option is to be used as last resort solution when facing media corruption. It is rather and still strongly encourage to test archives before relying on them as well as using Parchive to do parity data of each slice to be able to recover data corruption in a much more effective manner and with much more chance of success. Dar also has the possibility to backup a catalogue using an isolated catalogue, but this does not face slice header corruption or even saved file's data corruption (dar will detect but will not correct such event).
 .TP 20
 -/, --overwriting-policy <policy>
 Overwriting policy can be used for archive restoration to define when and how file overwriting can occur. See above the description of this option.

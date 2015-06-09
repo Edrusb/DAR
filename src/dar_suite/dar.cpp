@@ -144,6 +144,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    read_options.set_output_pipe(param.output_pipe);
 		    read_options.set_execute(param.execute_ref);
 		    read_options.set_info_details(param.info_details);
+		    read_options.set_lax(param.lax);
 		    read_options.set_slice_min_digits(param.ref_num_digits);
 		    read_options.set_ignore_signature_check_failure(param.blind_signatures);
 		    read_options.set_multi_threaded(param.multi_threaded);
@@ -185,6 +186,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			read_options.set_crypto_size(param.aux_crypto_size);
 			read_options.set_execute(param.aux_execute);
 			read_options.set_info_details(param.info_details);
+			read_options.set_lax(param.lax);
 			read_options.set_slice_min_digits(param.aux_num_digits);
 			read_options.set_ignore_signature_check_failure(param.blind_signatures);
 			read_options.set_multi_threaded(param.multi_threaded);
@@ -434,6 +436,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_output_pipe(param.output_pipe);
 		read_options.set_execute(param.execute_ref);
 		read_options.set_info_details(param.info_details);
+		read_options.set_lax(param.lax);
 		read_options.set_sequential_read(param.sequential_read);
 		read_options.set_slice_min_digits(param.ref_num_digits);
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
