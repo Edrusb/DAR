@@ -359,6 +359,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		read_options.set_output_pipe(param.output_pipe);
 		read_options.set_execute(param.execute_ref);
 		read_options.set_info_details(param.info_details);
+		read_options.set_lax(param.lax);
 		read_options.set_sequential_read(param.sequential_read);
 		read_options.set_slice_min_digits(param.ref_num_digits);
 		arch = new (nothrow) archive(dialog, *param.ref_root, *param.ref_filename, EXTENSION,

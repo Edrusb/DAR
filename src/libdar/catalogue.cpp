@@ -1251,7 +1251,24 @@ namespace libdar
 			else
 			{
 			    if(!esc->skip_to_next_mark(escape::seqt_ea, false))
+			    {
+				try
+				{
+				    const crc *tmp;
+				    ea_get_crc(tmp);
+					// object status is ea_saved
+					// we must also fetch the CRC
+					// trying even in case of error
+					// will lead to the creation of
+					// a fake CRC and avoid NULL
+					// pointer toward ea_crc
+				}
+				catch(...)
+				{
+					// nothing to do
+				}
 				throw Erange("inode::get_ea", string("Error while fetching EA from archive: No escape mark found for that file"));
+			    }
 			    storage->skip(esc->get_position()); // required to eventually reset the compression engine
 			    if(ea_offset == NULL)
 				throw SRC_BUG;

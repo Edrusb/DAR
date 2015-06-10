@@ -1256,7 +1256,7 @@ namespace libdar
 		{
 		    if(cat == NULL)
 			throw SRC_BUG;
-		    filtre_sequentially_read_all_catalogue(*cat, dialog);
+		    filtre_sequentially_read_all_catalogue(*cat, dialog, lax_read_mode);
 		}
 	    }
 
