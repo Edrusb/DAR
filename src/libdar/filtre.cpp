@@ -2519,7 +2519,8 @@ namespace libdar
     }
 
     void filtre_sequentially_read_all_catalogue(catalogue & cat,
-						user_interaction & dialog)
+						user_interaction & dialog,
+						bool lax_read_mode)
     {
 	const cat_entree *e;
 	thread_cancellation thr_cancel;
@@ -2555,7 +2556,11 @@ namespace libdar
 		}
 		catch(Erange & e)
 		{
-		    dialog.warning(string(gettext("failed reading CRC from file: ")) + juillet.get_string());
+		    string msg = string(gettext("failed reading CRC from file: ")) + juillet.get_string();
+		    if(lax_read_mode)
+			dialog.warning(msg);
+		    else
+			throw Edata(msg);
 		}
 
 		if(e_mir != NULL && (e_ino != NULL || e_file != NULL))
@@ -2579,7 +2584,12 @@ namespace libdar
 		}
 		catch(Erange & e)
 		{
-		    dialog.warning(string(gettext("Failed reading CRC for EA: ")) + juillet.get_string());
+		    string msg = string(gettext("Failed reading CRC for EA: ")) + juillet.get_string();
+
+		    if(lax_read_mode)
+			dialog.warning(msg);
+		    else
+			throw Edata(msg);
 		}
 	    }
 	}

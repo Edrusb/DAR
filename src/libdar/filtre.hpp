@@ -160,7 +160,8 @@ namespace libdar
 			     const fsa_scope & scope);
 
     void filtre_sequentially_read_all_catalogue(catalogue & cat,
-						user_interaction & dialog);
+						user_interaction & dialog,
+						bool lax_read_mode);
 
 	/// @}
 
