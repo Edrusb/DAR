@@ -64,8 +64,8 @@ from 2.4.x to 2.5.0
   in conjunction with -Tslicing
 - added dar_split command to provide on-fly multi-volume archive support
   on tape medium
-- libdar relies on libthreadar (if available) to split its work among
-  several threads
+- experimental feature to have libdar using several threads (not activated
+  by default)
 - dar aborts upon not found user target in included file instead of
   ignoring it
 - added sha512 hashing algorithm beside already available md5 and sha1

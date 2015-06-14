@@ -1023,8 +1023,7 @@ AC_ARG_ENABLE( [dar-static],
 
 
 AC_ARG_ENABLE( [threadar],
-	       AC_HELP_STRING(--disable-threadar, [avoid linking with libthreadar even if available, libdar will not create threads]),
-	       [],
+	       AC_HELP_STRING(--enable-threadar, [EXPERIMENTAL! links with libthreadar if available in order to use several threads inside libdar]),
 	       [
 	       AC_CHECK_HEADERS(libthreadar/libthreadar.hpp, [], [], [])
 	       AC_CHECK_LIB(threadar, [for_autoconf], [], [])
@@ -1053,7 +1052,8 @@ AC_ARG_ENABLE( [threadar],
 			       ],
 			       [ AC_MSG_RESULT(missing) ]
 		             )
-	      ])
+	      ],
+              [])
 
 
 MEM_LDFLAGS=$LDFLAGS
@@ -1263,11 +1263,8 @@ else
     echo "NO"
 fi
 
-printf "   will uses multiple threads : "
 if [ "$local_threadar" = "yes" ] ; then
-    echo "YES"
-else
-    echo "NO"
+   echo "   will uses multiple threads : YES ( /!\ experimental feature /!\ )"
 fi
 
 printf "   Delta-compression support  : "
