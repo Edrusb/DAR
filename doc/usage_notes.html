@@ -1,8 +1,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>DAR's Usage Notes</title>
 
-
-  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR's Usage Notes</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
+  
+</head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
@@ -13,7 +16,7 @@
       <h1 style="text-align: center;"><br>
       </h1>
       <h1 style="text-align: center;">Command-line Usage Notes<br>
-</h1>
+      </h1>
       </td>
     </tr>
   </tbody>
@@ -29,11 +32,14 @@
       <td style="vertical-align: top;">
       <div style="text-align: justify;">
       <h2>Introduction</h2>
-      <div style="text-align: justify; margin-left: 40px;">You will find here a collection of example of use for several features of dar suite command-line tools.<br>
+      <div style="text-align: justify; margin-left: 40px;">You will
+find here a collection of example of use for several features of dar
+suite command-line tools.<br>
       </div>
       </div>
       <h2>Contents</h2>
-      <div style="margin-left: 40px;"><a href="#I"></a><a href="#dar_remote">Dar and remote backup server</a><br>
+      <div style="margin-left: 40px;"><a href="#dar_remote">Dar and
+remote backup server</a><br>
       <a href="#netcat_ssh">dar and ssh</a><br>
       <a href="#bytes_bits_kilo">Bytes, bits, kilo, mega etc.</a><br>
       <a href="#background">Running DAR in background</a><br>
@@ -47,7 +53,6 @@
       <a href="#Decremental_Backup">Decremental Backup</a><br>
       <a href="#door">Door inodes (Solaris)</a><br>
       <br>
-
       <br>
       </div>
       </td>
@@ -56,7 +61,6 @@
 </table>
 <br>
 <hr style="width: 100%; height: 2px;"><br>
-
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
@@ -114,7 +118,8 @@ backup_name.1.dar</code><br>
       </div>
       <div style="text-align: justify; margin-left: 40px;">It is also
 possible to redirect the output to dar_xform which can in turn on the
-remote host split the data flow in several files, pausing between them if necessary,
+remote host split the data flow in several files, pausing between them
+if necessary,
 exactly as dar is able to do: <br>
       </div>
       <div style="margin-left: 40px;"><br>
@@ -342,8 +347,10 @@ full_backup for -A option<br>
       </div>
       <div style="margin-left: 40px;">while dar_xform make slice of the
 output archive provided by dar<br>
-      <br>See below <a href="#netcat_ssh">an example with netcat and another using ssh</a>.<br>
-</div>
+      <br>
+See below <a href="#netcat_ssh">an example with netcat and another
+using ssh</a>.<br>
+      </div>
       </td>
     </tr>
   </tbody>
@@ -351,30 +358,26 @@ output archive provided by dar<br>
 <br>
 <hr style="width: 100%; height: 2px;"><br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-
   <tbody>
     <tr>
       <td style="vertical-align: top;">
       <h3><a name="netcat_ssh"></a><span style="text-decoration: underline;">dar and ssh</span><br>
-</h3>
-      <div style="text-align: justify; margin-left: 40px;">
-As reported "DrMcCoy" in the historical forum "Dar Technical
+      </h3>
+      <div style="text-align: justify; margin-left: 40px;">As reported
+"DrMcCoy" in the historical forum "Dar Technical
 Questions", the netcat program can be very helpful if you plane to
 backup over the network.<br>
       </div>
-
-
       <div style="margin-left: 40px;"><br>
       </div>
-
-      <div style="text-align: justify; margin-left: 40px;">
-The context in which will take place the following examples are a
+      <div style="text-align: justify; margin-left: 40px;">The context
+in which will take place the following examples are a
 "local" host named "flower" has to be backup or restored form/to a
 remote host called "honey" (OK, the name of the machines are silly...)<br>
       </div>
-
       <br>
-      <h4 style="margin-left: 40px;">Example of use with netcat. Note that netcat command name is
+      <h4 style="margin-left: 40px;">Example of use with netcat. Note
+that netcat command name is
 "nc"</h4>
       <h5 style="margin-left: 80px;">Creating a full backup of "flower"
 saved on "honey"</h5>
@@ -413,7 +416,8 @@ as dar does, thanks to the -E and -F options.<br>
       </div>
       <h5 style="margin-left: 80px;">Testing the archive</h5>
       <div style="margin-left: 120px;">testing the archive can be done
-on honey but you could also do it remotely even if it is not very interesting doing it that way !<br>
+on honey but you could also do it remotely even if it is not very
+interesting doing it that way !<br>
       <br>
 on honey:<br>
       </div>
@@ -472,12 +476,9 @@ on flower:<br>
       <code>nc -w 3 honey 5001 | dar -A - -o toslave -c - -R / -z | nc
 -w 3 honey 5002</code><br>
       </div>
-
       <div style="margin-left: 40px;"><br>
       <br>
       </div>
-
-
       <div style="text-align: justify; margin-left: 80px;">with netcat
 the
 data goes in clear over the network. You could use ssh instead if you
@@ -524,7 +525,8 @@ dar -d - -R / -i todar -o toslave</code><br>
       </div>
       <div style="margin-left: 80px;"><br>
       </div>
-      <div style="margin-left: 120px;">Important. Depending on the shell
+      <div style="margin-left: 120px;">Important. Depending on the
+shell
 you
 use, it may be necessary to invert the order in which "&gt; todar" and
 "&lt; toslave" are given on command line. The problem is that the shell
@@ -561,10 +563,8 @@ dar_slave -i toslave -o todar backup</code><br>
     </tr>
   </tbody>
 </table>
-
 <br>
 <hr style="width: 100%; height: 2px;">
-
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
@@ -594,7 +594,8 @@ zepto (z) = 0.000,000,000,000,000,000,001<br>
 yocto (y) = 0.000,000,000,000,000,000,000,001<br>
 deca (da) = 10<br>
 hecto (h) = 100<br>
-kilo&nbsp; (k) = 1,000&nbsp; (yes, this is a lower case letter, not an upper case!)<br>
+kilo&nbsp; (k) = 1,000&nbsp; (yes, this is a lower case letter, not an
+upper case!)<br>
 mega&nbsp; (M) = 1,000,000<br>
 giga&nbsp; (G) = 1,000,000,000<br>
 tera&nbsp; (T) = 1,000,000,000,000<br>
@@ -606,16 +607,19 @@ yotta (Y) = 1,000,000,000,000,000,000,000,000<br>
       <br>
       </div>
       <div style="text-align: justify; margin-left: 40px;">This way two
-milliseconds (noted "2 ms") are 0.002 second, and 5 kilometers (noted "5 km") are 5,000 meters. All
+milliseconds (noted "2 ms") are 0.002 second, and 5 kilometers (noted
+"5 km") are 5,000 meters. All
 was fine and nice up to the recent time when computer science appeared:
 In that discipline, the need to measure the size of information storage
 raised. The smallest size, is the bit (contraction of <span style="font-style: italic;"><span style="font-weight: bold;">bi</span>nary
 digi<span style="font-weight: bold;">t</span></span>), binary because
 it has two possible states: "0" and "1". Grouping bits by 8 computer
-scientists called it a <span style="font-style: italic;">byte</span> or an <span style="font-style: italic;">octet</span>.
+scientists called it a <span style="font-style: italic;">byte</span>
+or an <span style="font-style: italic;">octet</span>.
 A byte has 256 different states, (2 power 8). The ASCII (American
 Standard Code for Information Interchange) code arrived and assigned a
-letter or more generally a character to some well defined values of a byte, (A is
+letter or more generally a character to some well defined values of a
+byte, (A is
 assigned to 65, space to 32, etc). And as most text is composed of a
 set of character, they started to count size in byte. Time after time,
 following technology evolution, memory size approached 1000 bytes. <br>
@@ -625,8 +629,10 @@ following technology evolution, memory size approached 1000 bytes. <br>
       <div style="text-align: justify; margin-left: 40px;">But as
 memory is
 accessed through a bus which is a fixed number of cables (or integrated
-circuits), on which only two possible voltages are authorized (to mean 0
-or 1), the total amount of byte that a bus can address is always a power
+circuits), on which only two possible voltages are authorized (to mean
+0
+or 1), the total amount of byte that a bus can address is always a
+power
 of 2. With a two cable bus, you can have 4 values (00, 01, 10 and 11,
 where a digit is the state of a cable) so you can address 4 bytes.
 Giving a value to each cable defines an address to read or write in the
@@ -662,7 +668,8 @@ kbit/s ... not 2000 kbit/s <br>
       <div style="text-align: justify; margin-left: 40px;">Anyway, back
 to
 dar, you have to possibility to give the size in byte or using a single
-letter as suffix (k, M, T, P, E, Z, Y, the base unit being implicitely the byte) thus the possibility to
+letter as suffix (k, M, T, P, E, Z, Y, the base unit being implicitely
+the byte) thus the possibility to
 provide a size in kilo, mega, tera, peta, exa, zetta or yotta byte,
 with the computer science definition of these terms (power of 1024) by
 default.<br>
@@ -682,12 +689,13 @@ used by dar, using the following option.<br>
       <div style="margin-left: 80px;"><code>--alter=SI-units</code><br>
       </div>
       <div style="margin-left: 40px;"><br>
-      <div style="text-align: justify;">
-(which can be shorten to -aSI or -asi) It changes the meaning of the
-prefixes that follow on the command-line, to follow the metric system (or
-System International) way of counting, up to the end of the line or to a <br>
+      <div style="text-align: justify;">(which can be shorten to -aSI
+or -asi) It changes the meaning of the
+prefixes that follow on the command-line, to follow the metric system
+(or
+System International) way of counting, up to the end of the line or to
+a <br>
       </div>
-
       <br>
       </div>
       <div style="margin-left: 80px;"><code>--alter=binary-units</code><br>
@@ -701,14 +709,15 @@ science meaning of kilo, mega, etc. up to the end of the line or up to
 a next --alter=SI-units. Thus in place of -s 2000000 one could use:<br>
       </div>
       <div style="margin-left: 40px;"><code><br>
-
 &nbsp;&nbsp; -aSI -s 2M</code><br>
       <br>
       </div>
       <div style="text-align: justify; margin-left: 40px;">Yes, and to
 make
-things more confuse, marketing/sales arrived and made sellers count gigabits
-a third way: I remember some&nbsp; time ago, I bought a hard disk which was
+things more confuse, marketing/sales arrived and made sellers count
+gigabits
+a third way: I remember some&nbsp; time ago, I bought a hard disk which
+was
 described as "2.1 GB", (OK, that's now long ago!), but in
 fact it had only 2097152 bytes available. This is far from 2202009
 bytes (= 2.1 GiB for computer science meaning), and a bit more than
@@ -727,9 +736,12 @@ Pi<br>
 Ei<br>
 Zi<br>
 Yi<br>
-      <br>For example, we have 1 kiB for 1 kilobytes (= 1024 bytes), and 1 kibit for
-1 kilobits (= 1024 bits) and 1 kB (= 1000 Bytes) and 1 kbit (= 1000 bits), ...<br>
- </div>
+      <br>
+For example, we have 1 kiB for 1 kilobytes (= 1024 bytes), and 1 kibit
+for
+1 kilobits (= 1024 bits) and 1 kB (= 1000 Bytes) and 1 kbit (= 1000
+bits), ...<br>
+      </div>
       </div>
       </td>
     </tr>
@@ -741,14 +753,12 @@ Yi<br>
   <tbody>
     <tr>
       <td style="vertical-align: top;">
-      <h3 style="text-decoration: underline;"><a name="background"></a>Running DAR in background</h3>
+      <h3 style="text-decoration: underline;"><a name="background"></a>Running
+DAR in background</h3>
       <br>
-      <div style="margin-left: 40px;">
-DAR can be run in background:<br>
+      <div style="margin-left: 40px;">DAR can be run in background:<br>
       <br>
       </div>
-
-
       <div style="margin-left: 80px;"><code>dar [command-line
 arguments] &lt; /dev/null &amp;</code></div>
       </td>
@@ -757,116 +767,110 @@ arguments] &lt; /dev/null &amp;</code></div>
 </table>
 <br>
 <hr style="width: 100%; height: 2px;"><br>
-
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-
   <tbody>
     <tr>
       <td style="vertical-align: top;">
-      <h3 style="text-decoration: underline;"><a name="extensions_used"></a>Files' extension used</h3>
-      <div style="margin-left: 40px;">
-dar suite programs use several type of files:<br>
+      <h3 style="text-decoration: underline;"><a name="extensions_used"></a>Files'
+extension used</h3>
+      <div style="margin-left: 40px;">dar suite programs use several
+type of files:<br>
       </div>
-
-<ul style="margin-left: 40px;"><li>slices (dar, dar_xform, dar_slave, dar_manager)</li><li>configuration files (dar, dar_xform, dar_slave)</li><li>databases&nbsp; (dar_manager)</li><li><a href="usage_notes.html#DUC">user commands for slices</a> (dar, dar_xform,
-dar_slave, using -E, -F or -~ options)</li><li><a href="usage_notes.html#DBP">user commands for files</a> (dar only, during the backup process using -= option)<br>
-        </li><li>filter lists (dar's -[ and -] options)</li></ul>
-      <div style="margin-left: 40px;">
-If for slice the extension and even the filename format cannot be
+      <ul style="margin-left: 40px;">
+        <li>slices (dar, dar_xform, dar_slave, dar_manager)</li>
+        <li>configuration files (dar, dar_xform, dar_slave)</li>
+        <li>databases&nbsp; (dar_manager)</li>
+        <li><a href="usage_notes.html#DUC">user commands for slices</a>
+(dar, dar_xform,
+dar_slave, using -E, -F or -~ options)</li>
+        <li><a href="usage_notes.html#DBP">user commands for files</a>
+(dar only, during the backup process using -= option)<br>
+        </li>
+        <li>filter lists (dar's -[ and -] options)</li>
+      </ul>
+      <div style="margin-left: 40px;">If for slice the extension and
+even the filename format cannot be
 customized, (basename.slicenumber.dar) there is not mandatory rule for
 the other type of files.<br>
       <br>
-
-In the case you have no idea how to name these, here is the extensions I use:<br>
+In the case you have no idea how to name these, here is the extensions
+I use:<br>
       </div>
-
-
-      <div style="margin-left: 80px;">"<span style="font-weight: bold;">*.dcf</span>": Dar Configuration file, aka DCF files (used with dar's -B option)<br>
+      <div style="margin-left: 80px;">"<span style="font-weight: bold;">*.dcf</span>":
+Dar Configuration file, aka DCF files (used with dar's -B option)<br>
 "<span style="font-weight: bold;">*.dmd</span>": Dar Manager
 Database, aka DMD files (used with dar_manager's -B and -C options) <br>
 "*<span style="font-weight: bold;">.duc</span>": Dar User Command, aka <a href="#DUC">DUC files</a> (used with dar's -E, -F, -~ options)<br>
-"*<span style="font-weight: bold;">.dbp</span>": Dar Backup Preparation, aka <a href="#DBP">DBP files</a> (used with dar's -= option)<br>
-"*<span style="font-weight: bold;">.dfl</span>": Dar Filter List, aka DFL files (used with dar's -[ or -] options)<br>
+"*<span style="font-weight: bold;">.dbp</span>": Dar Backup
+Preparation, aka <a href="#DBP">DBP files</a> (used with dar's -=
+option)<br>
+"*<span style="font-weight: bold;">.dfl</span>": Dar Filter List, aka
+DFL files (used with dar's -[ or -] options)<br>
       </div>
-
-
       <div style="margin-left: 40px;"><br>
-
 but, you are totally free to use the filename you want !&nbsp;&nbsp; ;-)<br>
       </div>
-
       </td>
     </tr>
   </tbody>
 </table>
-
 <br>
 <hr style="width: 100%; height: 2px;">
 <br>
 <div style="text-align: left;">
 <br>
 </div>
-
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
       <h3><a name="command_from_dar"></a><span style="text-decoration: underline;">Running command or scripts from DAR</span></h3>
       <br>
-      <div style="margin-left: 40px;">You can run command from dar at two different places:<br>
+      <div style="margin-left: 40px;">You can run command from dar at
+two different places:<br>
       </div>
-
       <ul style="margin-left: 40px;">
         <li style="text-align: justify;">when
-dar has finished writing a slice only in backup, isolation or merging modes, or before dar
+dar has finished writing a slice only in backup, isolation or merging
+modes, or before dar
 needs a slice (DUC files), in reading mode (testing, diffing,
 extracting, ...) and when reading an archive of reference.<br>
         </li>
-        <li>before and after saving a given file during the backup process (DBP files)<br>
+        <li>before and after saving a given file during the backup
+process (DBP files)<br>
         </li>
       </ul>
-      <h4 style="margin-left: 40px;">A - <a name="DUC"></a>Between slices:</h4>
-
-      <div style="text-align: justify; margin-left: 80px;">This concerns -E,
+      <h4 style="margin-left: 40px;">A - <a name="DUC"></a>Between
+slices:</h4>
+      <div style="text-align: justify; margin-left: 80px;">This
+concerns -E,
 -F and -~ options. They all receive a string as
 argument. Thus, if the argument must be a command with its own
 arguments, you have to put these between quotes for they appear as a
 single string to the shell that interprets the dar command-line. For
 example if you want to call<br>
       </div>
-
       <div style="margin-left: 80px;"><br>
       </div>
-
       <div style="margin-left: 120px;"><code>df .</code><br>
       </div>
-
       <div style="margin-left: 80px;"><br>
-
 [<span style="font-style: italic;">This is two worlds: "df" (the
 command) and "." its argument</span>] then you have to use the
 following on DAR command-line:<br>
       <br>
       </div>
-
-
       <div style="margin-left: 120px;"><code>-E "df ."</code><br>
       </div>
-      <div style="margin-left: 80px;">
-or<br>
+      <div style="margin-left: 80px;">or<br>
       </div>
-
       <div style="margin-left: 120px;"><code>-E 'df .'</code><br>
       </div>
-
       <div style="margin-left: 80px;"><br>
       <br>
-
 DAR provides several substitution strings in that context:<br>
       </div>
-
-
-<ul style="margin-left: 80px;">
+      <ul style="margin-left: 80px;">
         <li style="text-align: justify;"><code>%%</code> is replaced by
 a single <code>%</code> Thus if you need a <code>%</code> in you
 command line you MUST replace it by <code>%</code><code>%</code> in
@@ -875,43 +879,44 @@ the argument string of -E, -F&nbsp; or -~<br>
         <li><code>%p </code>is replaced by the path to the slices</li>
         <li><code>%b </code>is replaced by the basename of the slices</li>
         <li><code>%n</code> is replaced by the number of the slice</li>
-        <li><code>%N</code> is replaced by the number of the slice with padded zeros (it may differ from <code>%n </code>only when --min-digits option is used)<br>
+        <li><code>%N</code> is replaced by the number of the slice with
+padded zeros (it may differ from <code>%n </code>only when
+--min-digits option is used)<br>
         </li>
-
         <li><code>%c</code> is replaced by the context replaced by
 "operation", "init" or "last_slice" depending on the context.<br>
         </li>
       </ul>
-      <div style="text-align: justify; margin-left: 80px;">The number of the slice (<code>%n</code>)
+      <div style="text-align: justify; margin-left: 80px;">The number
+of the slice (<code>%n</code>)
 is either the just written slice or the next slice to be read. For
-example if you create an new archive (either using -c, -C or -+), in -E option, the <code>%n</code> macro is the number of the last
+example if you create an new archive (either using -c, -C or -+), in -E
+option, the <code>%n</code> macro is the number of the last
 slice completed. Else (using -t, -d, -A (with -c or -C), -l or -x),
 this is the number of the slice that will be required very soon. While
 %c (the context) is substituted by "init", "operation" or "last_slice".
       <br>
       <br>
       <ul>
-        <li><span style="font-weight: bold;">init :</span> when the slice is asked before the catalogue is read</li>
-        <li><span style="font-weight: bold;">operation</span> : once the catalogue is read and/or data
+        <li><span style="font-weight: bold;">init :</span> when the
+slice is asked before the catalogue is read</li>
+        <li><span style="font-weight: bold;">operation</span> : once
+the catalogue is read and/or data
 treatment has begun.</li>
-        <li><span style="font-weight: bold;">last_slice</span> : when the last slice has been written (archive
+        <li><span style="font-weight: bold;">last_slice</span> : when
+the last slice has been written (archive
 creation only)<br>
         </li>
       </ul>
       </div>
-
       <div style="margin-left: 80px;"><br>
-
-What the use of this feature? For example you want to burn the brand-new
+What the use of this feature? For example you want to burn the
+brand-new
 slices on CD as soon as they are&nbsp; available.<br>
       <br>
-
 let's build a little script for that:<br>
       <br>
       </div>
-
-
-
       <div style="margin-left: 120px;"><code>%cat burner</code><br>
       <code></code></div>
       <div style="margin-left: 160px;"><code>#!/bin/bash</code><br>
@@ -927,56 +932,45 @@ let's build a little script for that:<br>
       <code>cdrecord dev=0,0 speed=8 -data /tmp/image.iso</code><br>
       <code>rm /tmp/image.iso<br>
 # Now assuming an automount will mount the just newly burnt CD:<br>
-</code>
-      <code>if diff /mnt/cdrom/$1 T/$1 ; then</code><br>
+      </code> <code>if diff /mnt/cdrom/$1 T/$1 ; then</code><br>
       <code>&nbsp; rm -rf T</code><br>
       <code>else</code><code><br>
 &nbsp; exit 2<br>
-</code>
-      <code>endif</code><br>
+      </code> <code>endif</code><br>
       <code></code></div>
       <div style="margin-left: 120px;"><code>%</code><br>
       </div>
-
       <div style="margin-left: 80px;"><br>
       </div>
-
-      <div style="text-align: justify; margin-left: 80px;">This little script, receive the
+      <div style="text-align: justify; margin-left: 80px;">This little
+script, receive the
 slice
 filename, and its number as argument, what it does is to burn a CD with
 it, and compare the resulting CD with the original slice. Upon failure,
 the script return 2 (or 1 if syntax is not correct on the
 command-line). Note that this script is only here for illustration,
 there are many more interesting user scripts made by several dar users.
-These are available in the <a href="doc/samples/index.html">examples</a> part of the documentation.<br>
+These are available in the <a href="doc/samples/index.html">examples</a>
+part of the documentation.<br>
       </div>
-
       <div style="margin-left: 80px;"><br>
-
 One could then use it this way:<br>
       <br>
       </div>
-
-
       <div style="margin-left: 120px;"><code>-E "./burner %p/%b.%n.dar
 %n"</code><br>
       </div>
-
       <div style="margin-left: 80px;"><br>
-
 which can lead to the following DAR command-line:<br>
       <br>
       </div>
-
-
       <div style="margin-left: 120px;"><code>dar -c ~/tmp/example -z -R
 / usr/local -s 650M -E "./burner %p/%b.%n.dar %n" -p</code><br>
       </div>
-
       <div style="margin-left: 80px;"><br>
       </div>
-
-      <div style="text-align: justify; margin-left: 80px;">First note that as our script
+      <div style="text-align: justify; margin-left: 80px;">First note
+that as our script
 does
 not change CD from the device, we need to pause between slices (-p
 option). The pause take place after the execution of the command (-E
@@ -985,44 +979,37 @@ play a music to inform us that the slice is burned. The advantage, here
 is that we don't have to come twice by slices, once the slice is
 ready, and once the slice is burnt.<br>
       </div>
-
       <div style="margin-left: 80px;"><br>
-
 Another example:<br>
       <br>
       </div>
-
-
-      <div style="text-align: justify; margin-left: 80px;">you want to send a huge file by
+      <div style="text-align: justify; margin-left: 80px;">you want to
+send a huge file by
 email. (OK that's better to use FTP,
 but sometimes, people think than the less you can do the more they
 control you, and thus they disable many services, either by fear of the
-unknown, either by stupidity). So let's suppose that you only have mail available to
+unknown, either by stupidity). So let's suppose that you only have mail
+available to
 transfer your data:<br>
       </div>
-
       <div style="margin-left: 80px;"><br>
       </div>
-
       <div style="margin-left: 120px;"><code>dar -c toto -s 2M
 my_huge_file -E
 "uuencode %b.%n.dar %b.%n.dar | mail -s 'slice %n' your@email.address ;
 rm %b.%n.dar ; sleep 300"</code><br>
       </div>
-
       <div style="margin-left: 80px;"><br>
       </div>
-
-      <div style="text-align: justify; margin-left: 80px;">Here we make an archive with
+      <div style="text-align: justify; margin-left: 80px;">Here we make
+an archive with
 slices of 2 Megabytes, because our mail
 system does not allow larger emails. We save only one file:
 "my_huge_file" (but we could even save the whole filesystem it would
 also work). The command we execute each time a slice is ready is:<br>
       </div>
-
       <div style="margin-left: 80px;"><br>
       </div>
-
       <ol style="margin-left: 80px;">
         <li>uuencode the file and send the output my email to our
 address.</li>
@@ -1032,21 +1019,21 @@ This is also</li>
         <li>useful, if you have a small mailbox, from which it takes
 time to retrieve mail.</li>
       </ol>
-      <div style="margin-left: 80px;">
-Note that we did not used the <code>%p</code> substitution string, as
+      <div style="margin-left: 80px;">Note that we did not used the <code>%p</code>
+substitution string, as
 the slices are saved in the current directory.<br>
       <br>
       </div>
-
-
-
       <div style="margin-left: 80px;">Last example, is while
 extracting: in
 the case the slices cannot all be present in the filesystem, you need a
 script or a command to fetch the next to be requested slice. It could
 be using ftp, lynx, ssh, etc. I let you do the script as an exercise.
-:-). Note, if you plan to <span style="text-decoration: underline;">share</span> your DUC files, thanks to use the <a href="#DUC_convention">convention fo DUC files</a>. </div>
-      <h4 style="margin-left: 40px;">B - <a name="DBP"></a>Before and after saving a file:</h4>
+:-). Note, if you plan to <span style="text-decoration: underline;">share</span>
+your DUC files, thanks to use the <a href="#DUC_convention">convention
+fo DUC files</a>. </div>
+      <h4 style="margin-left: 40px;">B - <a name="DBP"></a>Before and
+after saving a file:</h4>
       <div style="margin-left: 80px;">
       <div style="text-align: justify;">This concerns the -=, -&lt; and
 -&gt; options. The -&lt; (include) and -&gt; (exclude) options, let you
@@ -1054,19 +1041,19 @@ define which file will need a command to be run before and after their
 backup. While the -= option, let you define which command to run for
 those files.<br>
       </div>
-
       <br>
-      <div style="text-align: justify;">
-Let's suppose you have a very large file changing often that is located
-in /home/my/big/file, and several databases that each consist of several files
+      <div style="text-align: justify;">Let's suppose you have a very
+large file changing often that is located
+in /home/my/big/file, and several databases that each consist of
+several files
 under /home/*/database/data that need to have a coherent status and are
 also changing very often.<br>
       </div>
-
       <br>
       <div style="text-align: justify;">
       <div style="text-align: justify;">Saving them without precaution,
-will most probably make your big file flagged as "dirty" in dar's archive, which means that the saved
+will most probably make your big file flagged as "dirty" in dar's
+archive, which means that the saved
 status of the file may be a status that never existed for that file:
 when dar saves a file it reads the first byte, then the second, etc. up
 to the end of file. While dar is reading the middle of the file, an
@@ -1074,16 +1061,19 @@ application may change the very begin and then the very end of
 that file, but only modified ending of that file will be saved, leading
 the archive to contain a copy of the file in a state it never had.<br>
       </div>
-
       <br>
-For a database this is even worse, two or more files may need to have a coherent status. If dar
-saves one first file while another file is modified at the same time, this will not lead having the currently
+For a database this is even worse, two or more files may need to have a
+coherent status. If dar
+saves one first file while another file is modified at the same time,
+this will not lead having the currently
 saved files flagged as "dirty", but may lead the database to have
-its files saved in incoherent states between them, thus leading you to have saved the database in a corrupted state.<br>
+its files saved in incoherent states between them, thus leading you to
+have saved the database in a corrupted state.<br>
       <br>
 For that situation not to occur, we will use the following options:<br>
       <br>
-      <div style="margin-left: 40px;"><span style="font-family: monospace;">-R / "-&lt;" home/my/big/file&nbsp; "-&lt;" "home/*/database/data"<br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">-R / "-&lt;" home/my/big/file&nbsp;
+"-&lt;" "home/*/database/data"<br>
       <br>
       </span></div>
       </div>
@@ -1098,37 +1088,45 @@ for the files /home/my/big/file and for any "database/data" directory
 and after saving that directory of file. We need thus to define the
 command to run using the following option:<br>
       <br>
-      <div style="margin-left: 40px;"><span style="font-family: monospace;">-= "/root/scripts/before_after_backup.sh %f %p %c"<br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">-=
+"/root/scripts/before_after_backup.sh %f %p %c"<br>
       <br>
       </span></div>
       </div>
       <div style="margin-left: 40px;">
-      <div style="margin-left: 40px;">Well as you see, here too we may (and should) use substitutions macro:<br>
+      <div style="margin-left: 40px;">Well as you see, here too we may
+(and should) use substitutions macro:<br>
       </div>
-
       <ul style="margin-left: 40px;">
-<li style="text-align: justify;"><code>%%</code> is replaced by
+        <li style="text-align: justify;"><code>%%</code> is replaced by
 a litteral&nbsp; <code>%</code><br>
-        </li><li><code>%p </code>is replaced by the full path (including filename) of the file/directory to be saved<br>
-</li><li><code>%f </code>is replaced by the filename (without path) of the file/directory to be saved</li>
-        <li><span style="font-family: serif;"></span><code>%u</code> is the uid of the file's owner</li>
+        </li>
+        <li><code>%p </code>is replaced by the full path (including
+filename) of the file/directory to be saved<br>
+        </li>
+        <li><code>%f </code>is replaced by the filename (without path)
+of the file/directory to be saved</li>
+        <li><span style="font-family: serif;"></span><code>%u</code> is
+the uid of the file's owner</li>
         <li><code>%h</code> is the gid of the file's owner</li>
         <li><code>%c</code> is replaced by the context, which
-is either "start" or "end" depending on whether the file/directory is about to be
+is either "start" or "end" depending on whether the file/directory is
+about to be
 saved or has been completely saved.<br>
         </li>
       </ul>
       <br>
-      <div style="margin-left: 40px;">&nbsp;And our script here could look like this:<br>
+      <div style="margin-left: 40px;">&nbsp;And our script here could
+look like this:<br>
       <br>
       </div>
-
-
-      <div style="margin-left: 80px;"><span style="font-family: monospace;">cat /root/scripts/before_after_backup.sh<br>
+      <div style="margin-left: 80px;"><span style="font-family: monospace;">cat
+/root/scripts/before_after_backup.sh<br>
 #!/bin/sh</span><br style="font-family: monospace;">
       <span style="font-family: monospace;"></span><code><br>
 if [ "$1" == "" ]; then<br>
-&nbsp;&nbsp; echo "usage: $0 &lt;filename&gt; &lt;dir+filename&gt; &lt;context&gt;"<br>
+&nbsp;&nbsp; echo "usage: $0 &lt;filename&gt; &lt;dir+filename&gt;
+&lt;context&gt;"<br>
 &nbsp;&nbsp; exit 1<br>
 fi<br>
       <br>
@@ -1137,73 +1135,80 @@ filename="$1"<br>
 path_file="$2"<br>
 context="$3"<br>
       </code><br>
-      <span style="font-family: monospace;">if [ "$filename" = "data" ]; then </span><br style="font-family: monospace;">
-      <span style="font-family: monospace;">&nbsp;&nbsp; if ["$context" = "start" ]; then</span><br style="font-family: monospace;">
-      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # action to stop the database located in "$2"</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">if [ "$filename" = "data"
+]; then </span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp; if ["$context"
+= "start" ]; then</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+# action to stop the database located in "$2"</span><br style="font-family: monospace;">
       <span style="font-family: monospace;">&nbsp;&nbsp; else</span><br style="font-family: monospace;">
-      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # action to restart the database located in "$2"</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+# action to restart the database located in "$2"</span><br style="font-family: monospace;">
       <span style="font-family: monospace;">&nbsp;&nbsp; fi</span><br style="font-family: monospace;">
       <span style="font-family: monospace;">else</span><br style="font-family: monospace;">
-      <span style="font-family: monospace;">&nbsp;&nbsp; if ["$path_file" = "<span style="font-family: monospace;">/home/my/big/file"]; then</span></span><br style="font-family: monospace;">
-      <span style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp; if ["$context" = "start" ]; then</span></span><br style="font-family: monospace;">
-      <span style="font-family: monospace;"><span style="font-family: monospace;">&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; # suspend the application that writes to that file</span></span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp; if
+["$path_file" = "<span style="font-family: monospace;">/home/my/big/file"];
+then</span></span><br style="font-family: monospace;">
+      <span style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp; if
+["$context" = "start" ]; then</span></span><br style="font-family: monospace;">
+      <span style="font-family: monospace;"><span style="font-family: monospace;">&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; #
+suspend the application that writes to that file</span></span><br style="font-family: monospace;">
       <span style="font-family: monospace;"><span style="font-family: monospace;">&nbsp; &nbsp;&nbsp; else</span></span><br style="font-family: monospace;">
-      <span style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp; &nbsp; &nbsp; # resume the application that writes to that file</span></span><br style="font-family: monospace;">
+      <span style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp; &nbsp; &nbsp; # resume
+the application that writes to that file</span></span><br style="font-family: monospace;">
       <span style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp; fi</span></span><br style="font-family: monospace;">
       <span style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp; else</span></span><br style="font-family: monospace;">
-      <span style="font-family: monospace;"><span style="font-family: monospace;">&nbsp; &nbsp;&nbsp; # do nothing, or warn that no action is defined for that file</span></span><br style="font-family: monospace;">
+      <span style="font-family: monospace;"><span style="font-family: monospace;">&nbsp; &nbsp;&nbsp; # do nothing, or
+warn that no action is defined for that file</span></span><br style="font-family: monospace;">
       <span style="font-family: monospace;"><span style="font-family: monospace;">fi</span></span><br>
       <span style="font-family: monospace;"><span style="font-family: monospace;"></span></span></div>
-
       <div style="margin-left: 40px;"><span style="font-family: monospace;"><span style="font-family: monospace;"></span></span><br>
-      <span style="font-family: monospace;"><span style="font-family: monospace;">
-      </span></span><br style="font-family: serif;">
-      <span style="font-family: serif;">So now, if we run dar with all these command, dar will execute our script once before entering any <span style="font-family: monospace;">database/data</span>
+      <span style="font-family: monospace;"><span style="font-family: monospace;"> </span></span><br style="font-family: serif;">
+      <span style="font-family: serif;">So now, if we run dar with all
+these command, dar will execute our script once before entering any <span style="font-family: monospace;">database/data</span>
 directory located in a home directory of some user, and once all files
 of that directory will have been saved. It will run our script also
 before and after saving our </span><span style="font-family: monospace;">/home/my/big/file</span><span style="font-family: serif;"> file.</span><span style="font-family: monospace;"></span><br>
-      <span style="font-family: monospace;">
-      </span></div>
-
+      <span style="font-family: monospace;"> </span></div>
       </div>
       </div>
       <div style="margin-left: 80px;"><br>
       </div>
-      <div style="margin-left: 80px;">If you plan to share your DBP files, thanks to use the <a href="#DBP_convention">DBP convention</a>.<br>
+      <div style="margin-left: 80px;">If you plan to share your DBP
+files, thanks to use the <a href="#DBP_convention">DBP convention</a>.<br>
       </div>
-</td>
+      </td>
     </tr>
   </tbody>
 </table>
 <br>
 <hr style="width: 100%; height: 2px;"><br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-<tbody><tr><td style="vertical-align: top;">
-
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
       <div style="text-align: justify;">
       <h3><a name="DUC_convention"></a><span style="text-decoration: underline;">Convention for DUC files</span></h3>
       <div style="margin-left: 40px;">Since version 1.2.0 dar's user
 can have dar calling a command or scripts between slices, thanks to
-the -E,&nbsp; -F and -~ options, called DUC files. To be able to easily share your DUC commands or
+the -E,&nbsp; -F and -~ options, called DUC files. To be able to easily
+share your DUC commands or
 scripts, I propose you the following convention:<br>
       <br>
-
-- use the <a href="usage_notes.html#XI">".duc" extension</a> to show anyone the
+- use the <a href="usage_notes.html#XI">".duc" extension</a> to show
+anyone the
 script/command respect
 the following<br>
-
 - must be called from dar with the following arguments:<br>
       <br>
       </div>
-
-
-
       </div>
       <div style="margin-left: 80px; text-align: justify;"><code>example.duc
 %p %b %n %e %c [other optional arguments]</code><br>
       </div>
       <div style="text-align: justify; margin-left: 40px;"><br>
--  when called without argument, it must provide brief help on what it does and what are the expected
+- when called without argument, it must provide brief help on what it
+does and what are the expected
 arguments. This is the standard "usage:"
 convention.<br>
       <br>
@@ -1229,14 +1234,12 @@ or since version 2.1.0 with the following argument:<br>
       </div>
       <div style="text-align: justify;">
       <div style="margin-left: 40px;"><br>
-
 of course a script has not to use all its arguments, in the case of
 burn.duc for example, the %c (context) is probably useless, and not
 used inside the script, while it is still possible to give it all the
 "normal" arguments of a DUC file, extra not used argument are simply
 ignored. <br>
       <br>
-
 If you have interesting DUC scripts, you are welcome to contact me by
 email, for I add them on the web site and in the following releases.
 For now, check doc/samples directory for a few examples of DUC files.<br>
@@ -1247,55 +1250,36 @@ been returned, dar asks the user for decision (or aborts if no user has
 been identified, for example, dar is not ran under a controlling
 terminal).<br>
       </div>
-
-
       <br>
-</div>
-      </td></tr></tbody>
+      </div>
+      </td>
+    </tr>
+  </tbody>
 </table>
-
 <hr style="width: 100%; height: 2px;"><br>
-
-
-
-
-
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-
-
   <tbody>
     <tr>
       <td style="vertical-align: top;">
       <h3 style="text-align: left;"><a name="DBP_convention"></a><span style="text-decoration: underline;">Convention for DBP files</span></h3>
-      <div style="margin-left: 40px;">Same as above, the following convention is proposed to ease the sharing of Dar Backup Preparation files:<br>
+      <div style="margin-left: 40px;">Same as above, the following
+convention is proposed to ease the sharing of Dar Backup Preparation
+files:<br>
       <br>
       <br>
-
-
-- use the <a href="usage_notes.html#XI">".dbp" extension</a> to show anyone the
+- use the <a href="usage_notes.html#XI">".dbp" extension</a> to show
+anyone the
 script/command respect
 the following<br>
-
-
 - must be called from dar with the following arguments:<br>
       <br>
       </div>
-
-
-
-
-
-
-
-
       <div style="margin-left: 80px;"><code>example.duc
 %p %f %u %g %c [other optional arguments]</code><br>
       </div>
-
       <div style="margin-left: 40px;"><br>
-
-
-- when called without argument, it must provide brief help on what it does and what are the expected
+- when called without argument, it must provide brief help on what it
+does and what are the expected
 arguments. This is the standard "usage:"
 convention.<br>
       <br>
@@ -1304,28 +1288,19 @@ status of zero, else the backup process is suspended for the user to
 decide wether to retry, ignore the failure or abort the whole backup
 process.<br>
       </div>
-
       <br>
-
-</td>
+      </td>
     </tr>
   </tbody>
 </table>
-
-
 <br>
 <hr style="width: 100%; height: 2px;">
-
-
-
-
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-
   <tbody>
     <tr>
       <td style="vertical-align: top;">
-      <h3 style="text-decoration: underline;"><a name="user_targets"></a>User targets in DCF</h3>
-
+      <h3 style="text-decoration: underline;"><a name="user_targets"></a>User
+targets in DCF</h3>
       <div style="margin-left: 40px;">Since release 2.4.0, a DCF file
 (on given to -B option) can contain user targets. A user target is an
 extention of the conditional syntax. So we will first make a brief
@@ -1333,7 +1308,8 @@ review on conditional syntax.<br>
       <br>
 Conditional syntax in DCF files:<br>
       <br>
-The conditional syntax gives the possiblility to have options in a DCF file that are only active in a certain context:<br>
+The conditional syntax gives the possiblility to have options in a DCF
+file that are only active in a certain context:<br>
       </div>
       <ul style="margin-left: 40px;">
         <li>archive extraction <br>
@@ -1348,7 +1324,9 @@ The conditional syntax gives the possiblility to have options in a DCF file that
         <li>when a archive of reference is used</li>
         <li>when an auxilliary archive of reference is used</li>
       </ul>
-      <div style="margin-left: 40px;">These works with the following reserved keywords (see dar's man page for an exhaustive list). Let's take an example:<br>
+      <div style="margin-left: 40px;">These works with the following
+reserved keywords (see dar's man page for an exhaustive list). Let's
+take an example:<br>
       <br>
       </div>
       <div style="margin-left: 80px;"><span style="font-family: monospace;">cat sample.dcf<br>
@@ -1361,7 +1339,7 @@ extract:<br>
 -R /<br>
       <br>
 reference:<br>
--J aes:&nbsp;  <br>
+-J aes:&nbsp; <br>
       <br>
 auxilliary:<br>
 -~ aes:<br>
@@ -1383,11 +1361,9 @@ our DCF file:<br>
       <br>
       </div>
       <div style="margin-left: 80px;"><span style="font-family: monospace;">compress:</span><br>
-      <span style="font-family: monospace;">
-      </span><span style="font-family: monospace;">-z lzo:5</span><br>
+      <span style="font-family: monospace;"> </span><span style="font-family: monospace;">-z lzo:5</span><br>
       <br>
       </div>
-
       <div style="margin-left: 40px;">In the usual situation all that
 follows the target "compress" up to the next target or the end of the
 file will not be used to configure dar, unless you provide the
@@ -1397,7 +1373,8 @@ file will not be used to configure dar, unless you provide the
       <div style="margin-left: 80px;"><span style="font-family: monospace;">dar -c test -B sample.dcf compress<br>
       <br>
       </span></div>
-      <div style="text-align: left; margin-left: 40px;">Which will do exactly the same as if you have typed:<br>
+      <div style="text-align: left; margin-left: 40px;">Which will do
+exactly the same as if you have typed:<br>
       <span style="font-family: monospace;"></span></div>
       <div style="margin-left: 80px;"><span style="font-family: monospace;"><br>
 dar -c test -z lzo:5<br>
@@ -1413,32 +1390,30 @@ an example:<br>
       </div>
       <div style="margin-left: 80px;"><span style="font-family: monospace;">cat sample.dcf<br>
 # this is a comment<br>
-<br>
+      <br>
 all:<br>
-</span><span style="font-family: monospace;">-K aes:</span><br>
-<span style="font-family: monospace;"><br>
+      </span><span style="font-family: monospace;">-K aes:</span><br>
+      <span style="font-family: monospace;"><br>
 extract:<br>
 -R /<br>
-<br>
+      <br>
 reference:<br>
--J aes:&nbsp;  <br>
-<br>
+-J aes:&nbsp; <br>
+      <br>
 auxilliary:<br>
 -~ aes:<br>
-<br>
+      <br>
 create:<br>
 -ac<br>
 -Z "*.mp3"<br>
 -Z "*.avi"<br>
-<br>
+      <br>
 default:<br>
 -V<br>
       <br>
 # our first user target named "compress":<br>
-</span><span style="font-family: monospace;">compress:</span><br>
-
-      <span style="font-family: monospace;">
-      </span><span style="font-family: monospace;">-z lzo:5<br>
+      </span><span style="font-family: monospace;">compress:</span><br>
+      <span style="font-family: monospace;"> </span><span style="font-family: monospace;">-z lzo:5<br>
       <br>
 # a second user target named "verbose":<br>
 verbose:<br>
@@ -1452,12 +1427,13 @@ ring:<br>
 # a last user target named "hash":<br>
 --hash sha1<br>
       </span></div>
-
       <div style="margin-left: 40px;"><br>
-So now, you can use dar and ctivate a set of commands by simply adding the name of the target on command-line:<br>
+So now, you can use dar and ctivate a set of commands by simply adding
+the name of the target on command-line:<br>
       </div>
       <br>
-      <div style="margin-left: 80px;"><span style="font-family: monospace;">dar -c test -B sample.dcf compress ring verbose hash<br>
+      <div style="margin-left: 80px;"><span style="font-family: monospace;">dar -c test -B sample.dcf compress
+ring verbose hash<br>
       <br>
       </span></div>
       <div style="margin-left: 40px;">which is equivalent to:<span style="font-family: monospace;"></span><br>
@@ -1469,31 +1445,29 @@ dar -c test -K aes: </span><span style="font-family: monospace;">
 -ac -Z "*.mp3" -Z "*.avi" -z lzo:5 -v -vs -b --hash sha1<br>
       </span></div>
       <span style="font-family: monospace;"><br>
-</span>
+      </span>
       <div style="margin-left: 40px;">Last for those that like
 complicated things, you can recusively use DCF inside user targets,
 which may contain conditional syntax and the same or some other user
 targets of you own.<br>
       <br>
       </div>
-      <span style="font-family: monospace;">
-      </span><span style="font-family: monospace;"></span></div>
-
-</td>
+      <span style="font-family: monospace;"> </span><span style="font-family: monospace;"></span></div>
+      </td>
     </tr>
   </tbody>
 </table>
-
 <br>
 <hr style="width: 100%; height: 2px;"><br>
 <br>
-
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
-      <h3 style="text-decoration: underline;"><a name="Parchive">&nbsp;</a>Using data protection with DAR &amp; Parchive</h3>
-      <div style="text-align: justify; margin-left: 40px;">Parchive (PAR in the following)
+      <h3 style="text-decoration: underline;"><a name="Parchive">&nbsp;</a>Using
+data protection with DAR &amp; Parchive</h3>
+      <div style="text-align: justify; margin-left: 40px;">Parchive
+(PAR in the following)
 is a
 very nice program that makes possible to recover a file which has been
 corrupted. It creates redundancy data stored in a separated file (or
@@ -1503,18 +1477,16 @@ original file as well as the redundancy files, up to a certain point,
 of course. This point is defined by the percentage of redundancy you
 defined for a given file. But,... check the official PAR site here: <br>
       </div>
-
-
-      
       <div style="margin-left: 40px;"><br>
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="http://parchive.sourceforge.net/">http://parchive.sourceforge.net</a> (original site no more maintained today)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="https://github.com/BlackIkeEagle/par2cmdline">https://github.com/BlackIkeEagle/par2cmdline</a> (fork from the official site maintained since decembre 2013)<br>
-
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="http://parchive.sourceforge.net/">http://parchive.sourceforge.net</a>
+(original site no more maintained today)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="https://github.com/BlackIkeEagle/par2cmdline">https://github.com/BlackIkeEagle/par2cmdline</a>
+(fork from the official site maintained since decembre 2013)<br>
       <br>
       </div>
-
-      <div style="text-align: justify; margin-left: 40px;">Since version 2.4.0, dar is provided with a default /etc/darrc file. It contains a set of user
+      <div style="text-align: justify; margin-left: 40px;">Since
+version 2.4.0, dar is provided with a default /etc/darrc file. It
+contains a set of user
 targets among which is "par2". This user target invokes the dar_par.dcf
 file provided beside dar that automatically creates parity file for
 each slice during backup and verifies and if necessary repaires slices
@@ -1527,19 +1499,19 @@ activate Parchive with dar:<br>
       <br>
       </div>
       <div style="margin-left: 40px;">Simple no?</div>
-</td>
+      </td>
     </tr>
   </tbody>
 </table>
 <br>
 <hr style="width: 100%; height: 2px;"><br>
-
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
       <h3><a name="filtering"></a><span style="text-decoration: underline;">Examples of file filtering</span></h3>
-      <div style="text-align: justify; margin-left: 40px;">File filtering is what defines
+      <div style="text-align: justify; margin-left: 40px;">File
+filtering is what defines
 which
 files are saved, listed, restored, compared, tested, and so on. In
 brief, in the following we will say which file are elected for the
@@ -1624,12 +1596,9 @@ without excluding a particular directory for example you want to save
 all mp3 files and only MP3 files,<br>
       <br>
       </div>
-
       <div style="margin-left: 80px; text-align: justify;"><code>dar -c
 toto -R / -I "*.mp3" -I "*.MP3" home/ftp</code><br>
-
       </div>
-
       <div style="text-align: justify; margin-left: 40px;"><br>
 will save any mp3 or MP3 ending files under the /home/ftp directories
 and subdirectories. If instead -I (or -X) applied to directories, we
@@ -1637,7 +1606,8 @@ would only be able to recurse in subdirectories ending by ".mp3" or
 ".MP3". If you had a directory named "/home/ftp/Music" for example,
 full of mp3, you would not have been able to save it.<br>
       <br>
-Note that the glob expressions (where comes the shell-like wild-card '*' '?' and
+Note that the glob expressions (where comes the shell-like wild-card
+'*' '?' and
 so on), can do much more complicated things like "*.[mM][pP]3". You
 could thus replace the previous example by:<br>
       <br>
@@ -1655,9 +1625,9 @@ follows it. In shorter we could have:<br>
       <br>
       <div style="margin-left: 40px;"><code>dar -c toto -R / -an
 -I "*.mp3' home/ftp</code><br>
-
       </div>
-      <br>And, instead of using glob expression, you can
+      <br>
+And, instead of using glob expression, you can
 use regular expressions (regex) using the -aregex option. You can also
 use alternatively both of them using -aglob to return back to glob
 expressions. Each option -aregex / -aglob define the expected type of
@@ -1698,8 +1668,10 @@ least one of the -I option given.<br>
 path
 to the file matches at least one of the -g options.<br>
       <br>
-The algorithm we detailed above is the default one, which is historical and called the <span style="font-style: italic;">unordered</span> method, since version 2.2.x there is also an
-      <span style="font-style: italic;">ordered</span> method (activated adding -am option) which gives even more power to filters, the <a href="doc/man/index.html">dar man mage</a>
+The algorithm we detailed above is the default one, which is historical
+and called the <span style="font-style: italic;">unordered</span>
+method, since version 2.2.x there is also an <span style="font-style: italic;">ordered</span> method (activated adding
+-am option) which gives even more power to filters, the <a href="doc/man/index.html">dar man mage</a>
 will give you all the details.<br>
       <br>
 In parallel of file filtering, you will find Extended Attributes
@@ -1715,12 +1687,13 @@ expression (thanks to the <span style="font-style: italic;">-ag</span>
 /<span style="font-style: italic;"> -ar</span> options).<br>
       <br>
 Note in very last point, that the --backup-hook-include and
---backup-hook-exclude options act the same as -P and -g options but apply to
+--backup-hook-exclude options act the same as -P and -g options but
+apply to
 the files about to be saved and provides to the user the possibility to
 perform an action (--backup-hook-execute) before and after saving files
 matching the masks options. The dar man page will give you all the
 necessary details to use this new feature.<br>
-<br>
+      <br>
       </div>
       </td>
     </tr>
@@ -1728,33 +1701,32 @@ necessary details to use this new feature.<br>
 </table>
 <br>
 <hr style="width: 100%; height: 2px;"><br>
-
 </center>
 
-
-
 <table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-
 
   <tbody>
     <tr>
       <td style="vertical-align: top;">
       <h3><a name="Decremental_Backup"></a><span style="text-decoration: underline;">Decremental Backup</span></h3>
-
       <div style="margin-left: 40px;"><br>
       </div>
-
       <div style="text-align: justify; margin-left: 40px;">Well,
 you have already heard
-about "Full" backup, in which all files are completely saved in such a
+about "<span style="font-weight: bold;">Full</span>" backup, in which
+all files are completely saved in such a
 way that let you use this backup alone to completely restore your
 data. You
-have also probably heard about "differential" backup in which only the
-changes that occurred since an archive of reference was made are
-stored. There is also the "incremental" backup, which, in substance, is
+have also probably heard about "<span style="font-weight: bold;">differential</span>"
+backup in which is only stored the
+changes that occurred since an archive of reference was made. There is
+also the "<span style="font-weight: bold;">incremental</span>" backup,
+which in substance, is
 the same as "differential" ones. The difference resides in the nature
-of the archive of reference: "Differential" backup use only a "full" backup
-as reference, while "incremental" may use a "full" backup, a "differential"
+of the archive of reference: "Differential" backup use only a "full"
+backup
+as reference, while "incremental" may use a "full" backup, a
+"differential"
 backup or another "incremental" backup as reference (Well, in dar's
 documentation the term "differential" is commonly used in place of
 "incremental", since there is no conceptual difference from the point
@@ -1762,18 +1734,18 @@ of view of&nbsp; dar software).<br>
       </div>
       <div style="text-align: justify;">
       <div style="margin-left: 40px;"><br>
-
-Well, here we will describe what is meant by "decremental" backup. All
+Well, here we will describe what is meant by "<span style="font-weight: bold;">decremental</span>" backup. All
 started by a feature request from Yuraukar on dar-support mailing-list:<br>
       <br>
-
 In the full/differential backup scheme, for a given file, you have as
 many versions as changes that were detected from backup to backup.
 That's
 fair in terms of storage space required, as you do not store twice the
-same file in the same state as you would do if you were doing only full
+same file in the same state, which you would do if you were doing only
+full
 backups. But the drawback is that you do not know by advance in which
-backup to find the latest version of a given file. So, if you want to
+backup to find the latest version of a given file. Another drawback
+comes when you want to
 restore your entire system to the latest state available from your
 backup set, you need to restore the most
 ancient backup (the latest full backup), then the others one by one in
@@ -1783,113 +1755,98 @@ will
 restore N old revisions of a file that have changed often before
 restoring the last and more recent version.<br>
       <br>
-
 Yuraukar idea was to have all latest versions of files in the latest
 backup done. Thus the most recent archive would always stay a full
 backup. But, to still be able to restore a file in an older state than
 the most recent (in case of accidental suppression), we need a so
 called decremental backup. This
 backup's archive of reference is in the future (a more recent
-decremental backup or the latest backup done, which is a full backup in this scheme).
+decremental backup or the latest backup done, which is a full backup in
+this scheme).
 This so called "decremental" backup stores all the file differences
 from this archive of reference that let you get from the reference
 state to an older state. <br>
       <br>
-
 Assuming this is most probable to restore the latest version of a
 filesystem than any older state available, decremental backup seem an
 interesting alternative to incremental backups, as in that case you
 only have to use one archive (the latest) and each file get restored
-only once (old data do not get overwritten at each archive restoration as it is the case with incremental restoration).<br>
+only once (old data do not get overwritten at each archive restoration
+as it is the case with incremental restoration).<br>
       <br>
-
 Let's take an example: We have 4 files in the system named f1, f2, f3
 and f4. We make backups at four different times t1, t2, t3 and t4 in
 chronological order. We will also perform some changes in filesystem
 along this period: f1 has will be removed from the system between t3
-and t4, while f4 will only appear before t3 and t4. f2 will be modified between t2
+and t4, while f4 will only appear between t3 and t4. f2 will be
+modified between t2
 and t3 while f3 will be changed between t3 and t4.<br>
       <br>
-
-All this can be represented this way, where lines are the state at a given date while each column represents a given file.<br>
-
+All this can be represented this way, where lines are the state at a
+given date while each column represents a given file.<br>
 &nbsp;<br>
       <code>time</code><br>
       <code>&nbsp;&nbsp; ^</code><br>
       <code>&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<span style="font-weight: bold;">*</span> represents the version 1 of a file<br>
-</code>
-      <code>
-t4 +&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<span style="font-weight: bold;">*</span> represents the version
+1 of a file<br>
+      </code> <code>t4
++&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 #&nbsp;&nbsp;&nbsp; #&nbsp;&nbsp;&nbsp;
-*&nbsp;&nbsp; </code><code><span style="font-weight: bold;">#</span> represents the version 2</code><code> of a file</code><br>
-      <code>
-&nbsp;&nbsp; |</code><br>
-      <code>
-t3 +&nbsp;&nbsp;&nbsp; * &nbsp;&nbsp; # &nbsp;&nbsp; * &nbsp;  </code><br>
-      <code>
-&nbsp;&nbsp; |</code><br>
-      <code>
-t2 +&nbsp;&nbsp;&nbsp; *&nbsp;&nbsp;&nbsp; *&nbsp;&nbsp;&nbsp; *</code><br>
-      <code>
-&nbsp;&nbsp; |</code><br>
-      <code>
-t1 +&nbsp;&nbsp;&nbsp; *&nbsp;&nbsp;&nbsp; *&nbsp;&nbsp;&nbsp; *</code><br>
-      <code>
-&nbsp;&nbsp; |</code><br>
-      <code>
-&nbsp;&nbsp; +----+----+----+----+---</code><br>
-      <code>
-      </code>&nbsp;<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; f1 &nbsp; f2 &nbsp; f3 &nbsp; f4 &nbsp;  </code><br>
-      <code>
-      </code><br>
-      <code>
-      </code><br>
-
+*&nbsp;&nbsp; </code><code><span style="font-weight: bold;">#</span>
+represents the version 2</code><code> of a file</code><br>
+      <code>&nbsp;&nbsp; |</code><br>
+      <code>t3 +&nbsp;&nbsp;&nbsp; * &nbsp;&nbsp; # &nbsp;&nbsp; *
+&nbsp; </code><br>
+      <code>&nbsp;&nbsp; |</code><br>
+      <code>t2 +&nbsp;&nbsp;&nbsp; *&nbsp;&nbsp;&nbsp;
+*&nbsp;&nbsp;&nbsp; *</code><br>
+      <code>&nbsp;&nbsp; |</code><br>
+      <code>t1 +&nbsp;&nbsp;&nbsp; *&nbsp;&nbsp;&nbsp;
+*&nbsp;&nbsp;&nbsp; *</code><br>
+      <code>&nbsp;&nbsp; |</code><br>
+      <code>&nbsp;&nbsp; +----+----+----+----+---</code><br>
+      <code> </code>&nbsp;<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+f1 &nbsp; f2 &nbsp; f3 &nbsp; f4 &nbsp; </code><br>
+      <code> </code><br>
+      <code> </code><br>
 Now we will represent the contents of backups at these different
 times, first using only full backup, then using incremental backups and
 at last using decremental backups. We will use the symbol 'O' in place
 of data if a given file's data is not stored in the archive because it
 has not changed since the archive of reference was made. We will also
-use an 'x' to represent the information that a given file has been recorded
+use an 'x' to represent the information that a given file has been
+recorded
 in an archive as deleted since the archive of reference was made. This
 information is used at restoration time to remove a file from
 filesystem to be able to get the exact state of files seen at the date
 the backup was made.<br>
       <br>
-
 FULL BACKUPS<br>
       <br>
       <code>&nbsp;&nbsp; ^</code><br>
-      <code>
-&nbsp;&nbsp; | </code><br>
+      <code>&nbsp;&nbsp; | </code><br>
       <code>t4
 +&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #&nbsp;&nbsp;&nbsp;
 #&nbsp;&nbsp;&nbsp;
 *&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code><br>
-      <code>
-&nbsp;&nbsp; |</code><br>
-      <code>
-t3 +&nbsp;&nbsp;&nbsp; * &nbsp;&nbsp; # &nbsp;&nbsp; * &nbsp;  </code><br>
-      <code>
-&nbsp;&nbsp; |</code><br>
-      <code>
-t2 +&nbsp;&nbsp;&nbsp; *&nbsp;&nbsp;&nbsp; *&nbsp;&nbsp;&nbsp; *</code><br>
-      <code>
-&nbsp;&nbsp; |</code><br>
-      <code>
-t1 +&nbsp;&nbsp;&nbsp; *&nbsp;&nbsp;&nbsp; *&nbsp;&nbsp;&nbsp; *</code><br>
-      <code>
-&nbsp;&nbsp; |</code><br>
-      <code>
-&nbsp;&nbsp; +----+----+----+----+---</code><br>
-      <code>
-      </code>&nbsp;<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; f1 &nbsp; f2 &nbsp; f3 &nbsp; f4 &nbsp;  </code><br>
-      <code>
-      </code><br>
-      <code>
-      </code>Yes, this is easy, each backup contains all the files that
+      <code>&nbsp;&nbsp; |</code><br>
+      <code>t3 +&nbsp;&nbsp;&nbsp; * &nbsp;&nbsp; # &nbsp;&nbsp; *
+&nbsp; </code><br>
+      <code>&nbsp;&nbsp; |</code><br>
+      <code>t2 +&nbsp;&nbsp;&nbsp; *&nbsp;&nbsp;&nbsp;
+*&nbsp;&nbsp;&nbsp; *</code><br>
+      <code>&nbsp;&nbsp; |</code><br>
+      <code>t1 +&nbsp;&nbsp;&nbsp; *&nbsp;&nbsp;&nbsp;
+*&nbsp;&nbsp;&nbsp; *</code><br>
+      <code>&nbsp;&nbsp; |</code><br>
+      <code>&nbsp;&nbsp; +----+----+----+----+---</code><br>
+      <code> </code>&nbsp;<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+f1 &nbsp; f2 &nbsp; f3 &nbsp; f4 &nbsp; </code><br>
+      <code> </code><br>
+      <code> </code>Yes, this is easy, each backup contains all the
+files that
 existed at the time the backup was made. To restore in the state the
 system had at a given date, we only use one backup, which is the one
 that best corresponds to the date we want. The drawback is that we
@@ -1897,72 +1854,62 @@ saved three time the file f1 an f3 version 1, and twice f2 version 2,
 which correspond to a waste of storage space.<br>
       <br>
       <br>
-
 FULL/INCREMENTAL BACKUPS<br>
       <br>
       <br>
       <code>&nbsp;&nbsp; ^</code><br>
-      <code>
-&nbsp;&nbsp; | </code><br>
+      <code>&nbsp;&nbsp; | </code><br>
       <code>t4
 +&nbsp;&nbsp;&nbsp; x &nbsp;&nbsp; 0 &nbsp;&nbsp; #&nbsp;&nbsp;&nbsp;
-*&nbsp;&nbsp;&nbsp;&nbsp; </code><code><span style="font-weight: bold;">0</span> represents a file which only state is recorded</code><code></code><code></code><br>
+*&nbsp;&nbsp;&nbsp;&nbsp; </code><code><span style="font-weight: bold;">0</span>
+represents a file which only state is recorded</code><code></code><code></code><br>
       <code>&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 as such, no data is stored in the archive</code><br>
-      <code>
-t3 +&nbsp;&nbsp;&nbsp; 0 &nbsp;&nbsp; # &nbsp;&nbsp; 0
+      <code>t3 +&nbsp;&nbsp;&nbsp; 0 &nbsp;&nbsp; # &nbsp;&nbsp; 0
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; very little space is
-consummed by such entry</code><br>
-      <code>
-&nbsp;&nbsp; |</code><br>
-      <code>
-t2 +&nbsp;&nbsp;&nbsp; 0 &nbsp;&nbsp; 0 &nbsp;&nbsp; 0</code><br>
-      <code>
-&nbsp;&nbsp; |</code><br>
-      <code>
-t1 +&nbsp;&nbsp;&nbsp; *&nbsp;&nbsp;&nbsp; *&nbsp;&nbsp;&nbsp; *</code><br>
-      <code>
-&nbsp;&nbsp; |</code><br>
-      <code>
-&nbsp;&nbsp; +----+----+----+----+---</code><br>
-      <code>
-      </code>&nbsp;<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; f1 &nbsp; f2 &nbsp; f3 &nbsp; f4 &nbsp;  </code><br>
-      <code>
-      </code><br>
-
+consummed by such entry<br>
+      </code> <code>&nbsp;&nbsp; |</code><br>
+      <code>t2 +&nbsp;&nbsp;&nbsp; 0 &nbsp;&nbsp; 0 &nbsp;&nbsp;
+0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">x</span> represents an entry telling that
+the corresponding</code><br>
+      <code>&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+file has to be removed</code><br>
+      <code>t1 +&nbsp;&nbsp;&nbsp; *&nbsp;&nbsp;&nbsp;
+*&nbsp;&nbsp;&nbsp; *</code><br>
+      <code>&nbsp;&nbsp; |</code><br>
+      <code>&nbsp;&nbsp; +----+----+----+----+---</code><br>
+      <code> </code>&nbsp;<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+f1 &nbsp; f2 &nbsp; f3 &nbsp; f4 &nbsp; </code><br>
+      <code> </code><br>
 Now we see that archive done at date 't2' does not contain any data as
 no changed have been detected between t1 and t2. This backup is quite
 small and needs only little storage. Archive at t3 date only stores
 f2's new version, and at t4 the archive stores f4 new file and f3's new
 version. We also see that f1 is marked as removed from filesystem since
-date t3 as it no longer exists in filesystem but exists in the archive
+date t3 as it no longer existing in filesystem but existed in the
+archive
 of reference done at t3. <br>
       <br>
-
 As you see, restoring to the latest state is more complicated compared
 to only using full backups, it is neither simple to know in which
 backup to took for a given file's data at date t3 for example, but yes,
 we do not waste storage space anymore. The restoration process the user
 has to follow is to restore in turn:<br>
-
-- archive done at t1, which will put old version of files and restore f1 that have been removed at t4<br>
-
+- archive done at t1, which will put old version of files and restore
+f1 that have been removed at t4<br>
 - archive done at t2, that will do nothing at all<br>
-
 - archive done at t3, that will replace f2's old version by its new one<br>
-
-- archive done at t4, that will remove f1, add f4 and replace f3's old version to by its latest version.<br>
+- archive done at t4, that will remove f1, add f4 and replace f3's old
+version to by its latest version.<br>
       <br>
-
 The latest version of files is scattered over the two last archives
 here, but in common systems, much of the data does not change at all
 and can only be found in the first backup (the full backup).<br>
       <br>
-
 FULL/DECREMENTAL BACKUP<br>
       <br>
-
 Here is represented the contents of backups using decremental approach.
 The most recent (t4) backup is always a full backup. Older backups are
 decremental backups based on the just more recent one (t3 is a
@@ -1971,68 +1918,35 @@ of incremental backups, the reference of the archive is in the future
 not in the past.<br>
       <br>
       <code>&nbsp;&nbsp; ^</code><br>
-      <code>
-&nbsp;&nbsp; | </code><br>
+      <code>&nbsp;&nbsp; | </code><br>
       <code>t4
 +&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #&nbsp;&nbsp;&nbsp;
 #&nbsp;&nbsp;&nbsp;
 *&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code><br>
-      <code>
-&nbsp;&nbsp; |</code><br>
-      <code>
-t3 +&nbsp;&nbsp;&nbsp; * &nbsp;&nbsp; 0 &nbsp;&nbsp; * &nbsp;&nbsp;  x</code><br>
-      <code>
-&nbsp;&nbsp; |</code><br>
-      <code>
-t2 +&nbsp;&nbsp;&nbsp; 0 &nbsp;&nbsp; *&nbsp;&nbsp;&nbsp; 0</code><br>
-      <code>
-&nbsp;&nbsp; |</code><br>
-      <code>
-t1 +&nbsp;&nbsp;&nbsp; 0 &nbsp;&nbsp; 0 &nbsp;&nbsp; 0</code><br>
-      <code>
-&nbsp;&nbsp; |</code><br>
-      <code>
-&nbsp;&nbsp; +----+----+----+----+---</code><br>
-      <code>
-      </code>&nbsp;<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; f1 &nbsp; f2 &nbsp; f3 &nbsp; f4 &nbsp;  </code><br>
+      <code>&nbsp;&nbsp; |</code><br>
+      <code>t3 +&nbsp;&nbsp;&nbsp; * &nbsp;&nbsp; 0 &nbsp;&nbsp; *
+&nbsp;&nbsp; x</code><br>
+      <code>&nbsp;&nbsp; |</code><br>
+      <code>t2 +&nbsp;&nbsp;&nbsp; 0 &nbsp;&nbsp; *&nbsp;&nbsp;&nbsp; 0</code><br>
+      <code>&nbsp;&nbsp; |</code><br>
+      <code>t1 +&nbsp;&nbsp;&nbsp; 0 &nbsp;&nbsp; 0 &nbsp;&nbsp; 0</code><br>
+      <code>&nbsp;&nbsp; |</code><br>
+      <code>&nbsp;&nbsp; +----+----+----+----+---</code><br>
+      <code> </code>&nbsp;<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+f1 &nbsp; f2 &nbsp; f3 &nbsp; f4 &nbsp; </code><br>
       </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       <br>
-      <div style="margin-left: 40px;">
-Thus obtaining the latest version of the system is as easy as done
+      <div style="margin-left: 40px;">Thus obtaining the latest version
+of the system is as easy as done
 using only full backups. And you also see that the space required to
 store these decremental backup is equivalent to what is needed to
 store the incremental backups. However, still the problem exist to
 locate the archive in which to find a given's file data at a given
-date. But also, you may also see that backup done at time t1 can safely
+date. But also, you may see that backup done at time t1 can safely
 be removed as it became useless because it does not store any data, and
 loosing archive done at t1 and t2 is not a big problem, you just loose
 old state data. <br>
       <br>
-
 Now if we want to restore the filesystem in the state it has at time
 t3, we have to restore archive done at t4 then restore archive done at
 t3. This last step will have the consequences to create f1, replace
@@ -2042,58 +1956,56 @@ to go further in the past, we will restore the decremental backup t2
 which will only replace f2's new version by the older version 1. Last
 restoring t1 will have no effect as no changed were made between t1 and
 t2.<br>
-      <br><span style="text-decoration: underline; font-weight: bold;">
-
-This was for the theory</span><span style="font-weight: bold;">.</span> Now let's see the practice on how to build these decremental backups.<br>
       <br>
-
+What about dar_manager? Well, in nature, there is no difference
+between an incremental backup and a differential/incremental backup.
+The only difference resided in the way (the order) they have to be
+used. <br>
+      <br>
+So, even if you can add decremental backups in a dar_manager database,
+it is
+not designed to handle them correctly. It is thus better to keep
+dar_manager only for
+incremental/differential/full backups.<br>
+      <br>
+      <span style="text-decoration: underline; font-weight: bold;">But
+how to get buitd decremental backup as the reference is in the future
+and does not exist yet?</span><br>
+      <br>
 Assuming you have a full backup describing your system at date
 t1, can we have in one shot both the new full backup for time t2 and
-also transform the full backup of time t1 into a decremental backup relative
+also transform the full backup of time t1 into a decremental backup
+relative
 to time t2? In theory, yes. But there is a risk in case of failure
 (filesystem full, lack of electric power, bug, ...): you may loose both
 backups, the one which was under construction as well as the one we
-took as reference and which was under process of transformaton to decremental backup. <br>
-      <br>
-
-Another point is that you cannot shrink a given file: many (all?)
-operating systems provide hook to create/append/overwrite data to an
-existing file but not to remove data from it and get a smaller file as
-result. This operation when needed is usually emulated by the
-applications, creating a temporary file in which is added the part to
-retain from the original file, then once the copy is finished, the
-original file is deleted an the temporary file is renamed at the place
-of the original one.&nbsp; Thus here the process to transforming a full
-backup into a decremental backup will not simply remove data from the
-filesystem, but will copy (thus add) a portion of the data to a new
-file and then remove the old data. Thus whatever
-the method used to do a decremental backup, you will end at a time with
-two full
-archives, and will require disk space to store both of them.<br>
+took as reference and which was under process of transformaton to
+decremental backup. <br>
       <br>
       </div>
-
-
-
-
-
       </div>
-
       <div style="text-align: justify; margin-left: 40px;">Seen
-this, the dar
-implementation is to let the user do a normal full backup at each
-step [Doing just a
+this, the <span style="font-weight: bold;">libdar</span> <span style="font-weight: bold;">implementation</span> is to let
+the user <span style="text-decoration: underline;">do a normal full
+backup at each
+step</span> [Doing just a
 differential backup sounds better at first, but this would end in more
 archive manipulation, as we would have to generate both decremental and
 new full backup, and we would manipulate at least the same amount of
-data]. Then with the two full backups the user would have to use
+data]. Then <span style="text-decoration: underline;">with the two
+full backups</span> the user would have to use
 archive
-merging to create the decremental backup (using -ad option). Last, once the resulting
-(decremental) archive have been tested and that the user is sure this decremental
-backup is viable, he can remove the older
-full backup and store the new decremental backup beside older ones and
+      <span style="font-weight: bold;">merging</span> to <span style="text-decoration: underline;">create the
+decremental backup</span> <span style="font-weight: bold;">using</span> <span style="font-weight: bold;">-ad option</span>. Last, once the resulting
+(decremental) archive have been tested and that the user is sure this
+decremental
+backup is viable, he can <span style="text-decoration: underline;">remove
+the older
+full backup</span> and store the new decremental backup beside older
+ones and
 the new full backup.
-This at last only, will save you disk space and let you easily recover you system using
+This at last only, will save you disk space and let you easily recover
+you system using
 the latest (full) backup.<br>
       <br>
 Can one use an extracted catalogue instead of the old full backup to
@@ -2102,92 +2014,190 @@ The full backup to transform must have the whole data in it to be able
 to create a decremental back with data in it. Only the new full backup
 can be replaced by
 its extracted catalogue.<br>
+      <br>
+      <span style="font-style: italic;">This last part about
+decremental backup is extracted from a discussion with Dan Masson on
+dar-support mailing-list:</span><br>
+      </div>
+      
+      <div style="text-align: justify; margin-left: 40px;"><span style="font-weight: bold; text-decoration: underline;">Seriously, stop
+that long-winded considerations! Tell me what I need to do!</span><br>
+      <br>
+OK, OK, ... First start by a full backup to initiate the cycle:<br>
+      <div style="text-align: justify;"><span style="font-family: monospace;"><br>
+      </span>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c /mnt/backup/FULL-2015-04-10 -R
+/ -z -g /mnt/backup -D</span><br>
+      <span style="font-family: monospace;"></span></div>
+      <span style="font-family: monospace;"><br>
+      </span>Then at each new cycle:<br>
+      <div style="margin-left: 40px;">Do a new full backup<br>
+      <br style="font-family: monospace;">
+      <div style="margin-left: 40px;"><span style="font-family: monospace;"><span style="font-family: monospace;">dar
+-c /mnt/backup/FULL-2015-04-11 -R / -z -g /mnt/backup -D</span><br style="font-family: monospace;">
+      <br>
+      </span></div>
+To save space, build a decremental backup from the previous full one:<br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;"><br>
+dar <span style="font-weight: bold;">-+ </span>/mnt/backup/DECR-2015-04-10
+-A /mnt/backup/FULL-2015-04-10 -@ /mnt/backup/FULL-2015-04-11 <span style="font-weight: bold;">-ad</span> -ak<br>
+      <br>
+      </span></div>
+By precaution test that the decremental archive is viable<br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;"><br>
+dar -t /mnt/backup/DECR-2015-04-10<br>
+      <br>
+      </span></div>
+Then make space by removing the old full backup<br>
+      <span style="font-family: monospace;"><br>
+      </span>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">rm /mnt/backup/FULL-2015-04-10.*.dar</span><br>
+      </div>
+      </div>
+      <br>
+Assuming you run this cycle each day, you get the following at each<br>
+new step/day:<br>
+      <br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">The 2015-04-10 you have:<br>
+&nbsp;&nbsp;&nbsp; FULL-2015-04-10</span><br style="font-family: monospace;">
+      <br style="font-family: monospace;">
+      <span style="font-family: monospace;">The 2015-04-11 you have:<br>
+&nbsp;&nbsp;&nbsp; FULL-2015-04-11</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+DECR-2015-04-10</span><br style="font-family: monospace;">
+      <br style="font-family: monospace;">
+      <span style="font-family: monospace;">The 2015-04-12 you have:<br>
+&nbsp;&nbsp;&nbsp; FULL-2015-04-12</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+DECR-2015-04-11</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+DECR-2015-04-10</span><br style="font-family: monospace;">
+      <br style="font-family: monospace;">
+      <span style="font-family: monospace;">The 2015-04-13 you have:<br>
+&nbsp;&nbsp;&nbsp; FULL-2015-04-13</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+DECR-2015-04-12</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+DECR-2015-04-11</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+DECR-2015-04-10</span><br>
+      </div>
+      <br>
+and so on.<br>
+      <br>
+So yes, <span style="font-style: italic;">&lt;decremental backup t2&gt;</span>
+is different from<span style="font-style: italic;"> &lt;old full backup
+t2&gt;</span> The differences are:<br>
+      <ol>
+        <li><span style="font-style: italic;">&lt;old full backup2
+t2&gt;</span> (here FULL-2015-04-10 or FULL-2015-04-11 for example)
+contains all files of your system.</li>
+        <li><span style="font-style: italic;">&lt;decremental backup
+t2&gt; </span>contains only files that have changed between two
+consecutive full backups: DECR-2015-04-10 contains all files and only
+those that have changed between 2015-04-10 and 2015-04-11,
+DECR-2015-04-11 contains all files and only those that have changed
+between 2015-04-11 and 2015-04-12, and so on.<br>
+        </li>
+      </ol>
+      <span style="font-weight: bold; text-decoration: underline;">So,
+what?</span><br>
+      <br>
+      <span style="text-decoration: underline;">Scenario 1:</span>
+today 2015-04-17 you have lost your system, you want to restore it as
+it was at the time of the last backup =&gt; use the last backup it is a
+full one, it is the latest backup, nothing more.<br>
+      <span style="font-family: monospace;"><br>
+      </span>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -x /mnt/backup/FULL-2015-04-16 -R /</span><br>
+      </div>
+      <br>
+      <span style="text-decoration: underline;">Scenario 2:</span>
+today 2015-04-17 you have lost your system due to a virus or your
+system had been compromised and you know it started the 2015-04-12 so
+you want to restore your system at the time of 2015-04-11. First,
+restore the last full archive (FULL-2015-04-16) then in reverse order
+all the decremental ones: DECR-2015-04-15 then DECR-2015-04-14, then
+DECR-2015-04-13, then DECR-2015-04-12 then DECR-2015-04-11. The
+decremental backup are small, their restoration is usually quick
+(depending on how much files changed in the day). So here we get in the
+exact same situation you would have reach restoring only
+FULL-2015-04-11, but you did not not have to store all the full
+backups, just the latest.<br>
+      <br>
+You want the command-line for that? sure:<br>
+      <br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -x /mnt/backup/FULL-2015-04-16 -R /</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">dar -x
+/mnt/backup/DECR-2015-04-15 -R / -w</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">dar -x
+/mnt/backup/DECR-2015-04-14 -R / -w</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">dar -x
+/mnt/backup/DECR-2015-04-13 -R / -w</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">dar -x
+/mnt/backup/DECR-2015-04-12 -R / -w</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">dar -x
+/mnt/backup/DECR-2015-04-11 -R / -w</span><br>
+      </div>
+      <br><span style="font-weight: bold; text-decoration: underline;">
+Is that serious?</span> <br>
+      <br>
+      <div style="margin-left: 40px;">Yes! :)<span class="moz-smiley-s1" title=":-)"></span><br>
       </div>
 
-      <div style="margin-left: 40px;"><br>
       </div>
-
-      <div style="text-align: justify; margin-left: 40px;">Now,
-let's oversee the implementation used in dar to build a decremental
-backup: The operations that the merging must follow to transform a full
-backup into a decremental backup are the following:<br>
-we assuming the archive of reference is the old full backup (-A option)
-and the auxiliary archive of reference (-@) is the new full backup (the one to be transformed).<br>
-- if a file is found in both archives, if it has the same date of
-modification we just store it as "unchanged" since the archive of
-reference was done, else if dates differ, we keep the file from the old
-archive (-@ archive). Same thing with EA, if both are of the same date, we mark EA
-as "unchanged" else we keep the EA of the old archive.<br>
-- if a file is found only in the old archive, then we keep its data/EA in the old archive<br>
-- if a file is found only in the new archive, then we store an entry in
-the resulting archive to record that this file did not exist at the
-time of the old backup and that it must be destroyed from filesystem at
-restoration time of this decremental backup.<br>
-      <br>
-Well, the only thing that the pure merging operation cannot do is the last
-point. This point is out of the scope of the overwriting policy as
-there is no conflict of file found in both archives. however as this is
-very close to a merging operation and to avoid code duplication, it has
-been designed a special command-line switch <span style="font-weight: bold;">-ad</span> (or <span style="font-weight: bold;">--alter=decremental</span>)
-that modifies the merging operation to address this need. This switch
-also ignores any overwriting policy provided and uses its own that
-corresponds to what is needed for building a decremental backup.<br>
-<br>In brief, the operations to follow to build a set of decremental backups is the following:<br>
-      <br>
-      <div style="margin-left: 40px;"><code>dar -c &lt;new full backup t3&gt; -R /filesystem [...options]<br>
-dar <span style="font-weight: bold;">-+</span> &lt;decremental backup t2&gt; <span style="font-weight: bold;">-A</span> &lt;old full backup t2&gt; <span style="font-weight: bold;">-@</span> &lt;new full backup t3&gt; <span style="font-weight: bold;">-ad</span> [...options]<br>
-dar -t &lt;decremental backup t2&gt;&nbsp;&nbsp;&nbsp; (this is optionnal but strongly recommended).<br>
-rm &lt;old full backup t2&gt;</code><br>
+      <span style="font-family: monospace;"></span><br>
       </div>
-<br>
-      <br>
-What about dar_manager? Well, in nature, there is no difference
-between an incremental backup and a differential/incremental backup.
-The only difference resided in the way (the order) they have to be
-used. <br>
-      <br>
-So, even if you can add decremental backups in a dar_manager database, it is
-not designed to handle them correctly. It is thus better to keep dar_manager only for
-incremental/differential/full backups.<br>
-      <br>
-      <br>
-</div>
-      <div style="text-align: justify; text-decoration: underline;">
-      <h3 style="margin-left: 40px;">Door inodes (Solaris)<a name="door"></a></h3>
-      </div>
-      <div style="text-align: justify; margin-left: 40px;">
+      </td>
+    </tr>
+</tbody>
+</table>
 
- </div>
+    
+<div style="text-align: justify; text-decoration: underline;">
+    <hr style="width: 100%; height: 2px;"></div>
 
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+    <tbody><tr>
+      <td>
+      <h3>Door inodes (Solaris)<a name="door"></a></h3>
+      <div style="text-align: justify; margin-left: 40px;"> </div>
       <div style="margin-left: 40px;">
+      <div style="text-align: justify;">
+      </div>
       <div style="text-align: justify;">A door inode is a dynamic
 object that is created on top of an empty file, it does exist only when
 a process has a reference to it, it is thus not possible to restore it.
 But the empty file it is mounted on can be restored instead. As such,
 dar restores an door inode with an empty file having the same
 parameters as the door inode.<br>
+
       <br>
+
 If an door inode is hard linked several times in the file system dar
 will restore a plain file having as much hard links to the
 corresponding locations.<br>
+
       <br>
+
 Dar is also able to handle Extended Attributes associated to a door
 file, if any. Last, if you list an archive containing door inodes, you
 will see the 'D' letter as their type (by opposition to 'd' for
 directories), this is conform to what the 'ls' command displays for
 such entries.<br>
       </div>
+
+      
       <br>
       </div>
-</td>
+      </td>
     </tr>
   </tbody>
 </table>
 
-
-<br>
 <br>
 
-
+<br>
 
 </body></html>
