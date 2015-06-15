@@ -441,7 +441,7 @@ namespace libdar
 
     bool cat_inode::has_changed_since(const cat_inode & ref, const infinint & hourshift, comparison_fields what_to_check) const
     {
-        return (what_to_check != cf_inode_type && (hourshift > 0 ? ! tools_is_equal_with_hourshift(hourshift, ref.last_mod, last_mod) : ref.last_mod != last_mod))
+        return (what_to_check != cf_inode_type && (!hourshift.is_zero() ? !tools_is_equal_with_hourshift(hourshift, ref.last_mod, last_mod) : ref.last_mod != last_mod))
             || (what_to_check == cf_all && uid != ref.uid)
             || (what_to_check == cf_all && gid != ref.gid)
             || (what_to_check != cf_mtime && what_to_check != cf_inode_type && perm != ref.perm);
@@ -805,7 +805,7 @@ namespace libdar
 			    const_cast<cat_inode *>(this)->ea_set_offset(get_pile()->get_position());
 			}
 
-			if(ea_get_size() == 0)
+			if(ea_get_size().is_zero())
 			    get_pile()->reset_crc(crc::OLD_CRC_SIZE);
 			else
 			{

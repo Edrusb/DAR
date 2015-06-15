@@ -129,7 +129,7 @@ namespace libdar
 	    // signature has already been read
 	tools_read_string(f, filename);
 	infinint tmp = infinint(f); // number of entry in last_mod map
-	while(tmp > 0)
+	while(!tmp.is_zero())
 	{
 	    read_from_file(f, k);
 	    switch(db_version)
@@ -151,7 +151,7 @@ namespace libdar
 	}
 
 	tmp = infinint(f); // number of entry in last_change map
-	while(tmp > 0)
+	while(!tmp.is_zero())
 	{
 	    read_from_file(f, k);
 	    switch(db_version)
@@ -869,7 +869,7 @@ namespace libdar
 
 	try
 	{
-	    while(tmp > 0)
+	    while(!tmp.is_zero())
 	    {
 		entry = read_from_file(f, db_version, get_pool());
 		if(entry == NULL)

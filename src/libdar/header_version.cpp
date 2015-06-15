@@ -291,7 +291,7 @@ namespace libdar
 		if(coh != NULL)
 		    delete coh;
 	    }
-	    if(initial_offset == 0)
+	    if(initial_offset.is_zero())
 		initial_offset = f.get_position();
 	}
 	catch(...)
@@ -316,7 +316,7 @@ namespace libdar
 	flag[0] = 0;
 	flag[1] = 0;
 
-	if(initial_offset != 0)
+	if(!initial_offset.is_zero())
 	    flag[0] |= FLAG_INITIAL_OFFSET; // adding it to the flag
 
 	if(crypted_key != NULL)

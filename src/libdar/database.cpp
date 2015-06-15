@@ -99,7 +99,7 @@ namespace libdar
 		throw SRC_BUG; // we should not get there if the database is more recent than what that software can handle. this is necessary if we do not want to destroy the database or loose data.
 	    coordinate.clear();
 	    infinint tmp = infinint(f); // number of archive to read
-	    while(tmp > 0)
+	    while(!tmp.is_zero())
 	    {
 		tools_read_string(f, dat.chemin);
 		tools_read_string(f, dat.basename);
@@ -569,7 +569,7 @@ namespace libdar
 				command_line[num_data].push_back(anneau.front());
 			    }
 			    else // archive number is zero (not a valid archive number)
-				if(opt.get_date() != 0) // a date was specified
+				if(!opt.get_date().is_zero()) // a date was specified
 				{
 				    string fic = anneau.front();
 				    if(opt.get_info_details())

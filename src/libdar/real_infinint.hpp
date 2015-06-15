@@ -131,6 +131,8 @@ namespace libdar
 	unsigned char operator [] (const infinint & position) const;
 	    // return in big endian order the information byte storing the integer
 
+	bool is_zero() const;
+
         friend bool operator < (const infinint &, const infinint &);
         friend bool operator == (const infinint &, const infinint &);
         friend bool operator > (const infinint &, const infinint &);

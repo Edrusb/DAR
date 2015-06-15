@@ -39,7 +39,7 @@ namespace libdar
 
         euclide(size, BLOCK_SIZE, nbbit, reste);
 
-        if(reste != 0)
+        if(!reste.is_zero())
         {
                 // adding some non informational bytes to get a multiple of BLOCK_SIZE
             S_I bourrage = reste % BLOCK_SIZE;
@@ -72,7 +72,7 @@ namespace libdar
 
             // writing down all the other bytes of the terminator string
         a = 0xff;
-        while(nbbit > 0)
+        while(!nbbit.is_zero())
         {
             f.write((char *)&a, 1);
             --nbbit;
@@ -84,7 +84,7 @@ namespace libdar
         S_I offset = 0;
         unsigned char a;
 
-	if(where_from == 0)
+	if(where_from.is_zero())
 	    f.skip_to_eof();
 	else
 	    f.skip(where_from);

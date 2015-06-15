@@ -131,12 +131,12 @@ namespace libdar
             // TG is the width in TG, thus the number of bit that must have
             // the preamble
         euclide(width, TG, width, justification);
-        if(justification != 0)
+        if(!justification.is_zero())
                 // in case we need to add some bytes to have a width multiple of TG
             ++width;  // we need then one more group to have a width multiple of TG
 
         euclide(width, 8, width, pos);
-        if(pos == 0)
+        if(pos.is_zero())
         {
             --width; // division is exact, only last bit of the preambule is set
             last_width = 0x80 >> 7;
@@ -178,7 +178,7 @@ namespace libdar
 
             // we need now to write some justification byte to have an informational field multiple of TG
 
-        if(justification != 0)
+        if(!justification.is_zero())
         {
             U_16 tmp = 0;
             justification.unstack(tmp);
@@ -486,7 +486,7 @@ namespace libdar
         U_32 byte = bit/8;
         storage::iterator it = field->end();
 
-        if(*this == 0)
+        if(this->is_zero())
             return *this;
 
         bit %= 8;     // bit gives now the remaining translation after the "byte" translation
@@ -547,6 +547,16 @@ namespace libdar
     unsigned char infinint::operator [] (const infinint & position) const
     {
 	return (*field)[field->size() - (position + 1)];
+    }
+
+    bool infinint::is_zero() const
+    {
+	if(field == NULL)
+	    throw SRC_BUG;
+
+	storage::iterator it = field->begin();
+
+	return it != field->end() && *it == 0 && ++it == field->end();
     }
 
     S_I infinint::difference(const infinint & b) const
@@ -804,7 +814,7 @@ namespace libdar
 
     void euclide(infinint a, const infinint &b, infinint &q, infinint &r)
     {
-        if(b == 0)
+        if(b.is_zero())
             throw Einfinint("infinint.cpp : euclide", gettext("Division by zero")); // division by zero
 
         if(a < b)

@@ -332,7 +332,7 @@ namespace libdar
 	void set_slicing(const infinint & file_size, const infinint & first_file_size = 0)
 	{
 	    x_file_size = file_size;
-	    if(first_file_size == 0)
+	    if(first_file_size.is_zero())
 		x_first_file_size = file_size;
 	    else
 		x_first_file_size = first_file_size;
@@ -668,7 +668,7 @@ namespace libdar
 	void set_slicing(const infinint & file_size, const infinint & first_file_size = 0)
 	{
 	    x_file_size = file_size;
-	    if(first_file_size == 0)
+	    if(first_file_size.is_zero())
 		x_first_file_size = file_size;
 	    else
 		x_first_file_size = first_file_size;
@@ -864,7 +864,7 @@ namespace libdar
 	void set_slicing(const infinint & file_size, const infinint & first_file_size = 0)
 	{
 	    x_file_size = file_size;
-	    if(first_file_size == 0)
+	    if(first_file_size.is_zero())
 		x_first_file_size = file_size;
 	    else
 		x_first_file_size = first_file_size;

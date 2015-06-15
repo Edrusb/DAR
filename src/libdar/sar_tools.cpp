@@ -103,7 +103,7 @@ namespace libdar
 	    if(filename.size() <= min_size)
 		return false; // filename is too short
 
-            if(infinint(filename.size() - min_size) < min_digits && min_digits != 0)
+            if(infinint(filename.size() - min_size) < min_digits && !min_digits.is_zero())
                 return false; // not enough room for all digits
 
             if(filename.find(base_name) != 0) // checking that base_name is present at the beginning

@@ -261,7 +261,7 @@ namespace libdar
 		--sub_size;
 	    }
 	}
-	while(size > 0);
+	while(!size.is_zero());
 
 	update_familes();
 	sort_fsa();

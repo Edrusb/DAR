@@ -156,7 +156,7 @@ namespace libdar
 
 	    next = 0;
 	    tmp_next.unstack(next);
-	    if(tmp_next != 0)
+	    if(!tmp_next.is_zero())
 		throw SRC_BUG;
 	    return true;
 	}

@@ -207,7 +207,7 @@ namespace libdar
 
     crc_i::crc_i(const infinint & width) : size(width), cyclic(width)
     {
-	if(width == 0)
+	if(width.is_zero())
 	    throw Erange("crc::crc", gettext("Invalid size for CRC width"));
 	clear();
     }
@@ -482,7 +482,7 @@ namespace libdar
 	    {
 		U_I s = 0;
 		taille.unstack(s);
-		if(taille > 0)
+		if(!taille.is_zero())
 		    throw SRC_BUG;
 		ret = new (pool) crc_n(s, f);
 	    }
@@ -504,7 +504,7 @@ namespace libdar
 	{
 	    U_I s = 0;
 	    width.unstack(s);
-	    if(width > 0)
+	    if(!width.is_zero())
 		throw SRC_BUG;
 
 	    ret = new (pool) crc_n(s);

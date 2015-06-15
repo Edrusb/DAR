@@ -224,7 +224,7 @@ namespace libdar
 	} // else current position is before the buffer, ignoring data actually in the buffer
 
 
-	while(x_amount != 0)
+	while(!x_amount.is_zero())
 	{
 	    interim = 0;
 	    x_amount.unstack(interim);
@@ -437,7 +437,7 @@ namespace libdar
 
 	ret = 0;
 	tmp_ret.unstack(ret);
-	if(tmp_ret != 0)
+	if(!tmp_ret.is_zero())
 	    throw SRC_BUG; // result is modulo clear_block_size which is U_32, thus it should fit in U_32 (=ret)
 
 	return ret;
@@ -605,7 +605,7 @@ namespace libdar
 
 		clear_offset -= crypt_offset;
 		clear_offset.unstack(nouv_buf_data);
-		if(clear_offset > 0)
+		if(!clear_offset.is_zero())
 		    throw SRC_BUG; // cannot handle that integer as U_32 while this number should be less than encrypted_buf_size which is a U_32
 		if(nouv_buf_data <= encrypted_buf_data)
 		{

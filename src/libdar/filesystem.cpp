@@ -1803,7 +1803,7 @@ namespace libdar
 		    }
 		    catch(Egeneric & e)
 		    {
-			if(ea != NULL && ea->size() > 0)
+			if(ea != NULL && !ea->size().is_zero())
 			    get_ui().warning(tools_printf(gettext("Existing EA for %S could not be preserved : "), &spot) + e.get_message());
 		    }
 
@@ -1820,7 +1820,7 @@ namespace libdar
 		    }
 		    catch(Egeneric & e)
 		    {
-			if(ea != NULL && ea->size() > 0)
+			if(ea != NULL && !ea->size().is_zero())
 			    get_ui().warning(tools_printf(gettext("Existing FSA for %S could not be preserved : "), &spot) + e.get_message());
 		    }
 		}
@@ -2240,11 +2240,11 @@ namespace libdar
 		gid_t tmp_gid = 0;
 		infinint tmp = ref.get_uid();
 		tmp.unstack(tmp_uid);
-		if(tmp != 0)
+		if(!tmp.is_zero())
 		    throw Erange("make_owner_perm", gettext("uid value is too high for this system for libdar be able to restore it properly"));
 		tmp = ref.get_gid();
 		tmp.unstack(tmp_gid);
-		if(tmp != 0)
+		if(!tmp.is_zero())
 		    throw Erange("make_owner_perm", gettext("gid value is too high for this system for libdar be able to restore it properly"));
 
 #if HAVE_LCHOWN

@@ -156,7 +156,7 @@ namespace libdar
 	    infinint  r;
 	    euclide(frac, f, newval, r);
 		// frac = f*newval + r
-	    return r == 0;
+	    return r.is_zero();
 	}
     }
 
@@ -212,15 +212,15 @@ namespace libdar
 	second = 0;
 	tmp = sec;
 	tmp.unstack(second);
-	if(tmp != 0)
+	if(!tmp.is_zero())
 	    return false;
 
-	if(unit < tu_second && uni < tu_second && frac != 0)
+	if(unit < tu_second && uni < tu_second && !frac.is_zero())
 	{
 	    (void) is_subsecond_an_integer_value_of(unit, tmp);
 	    subsecond = 0;
 	    tmp.unstack(subsecond);
-	    return tmp == 0;
+	    return tmp.is_zero();
 	}
 	else
 	{

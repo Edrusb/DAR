@@ -609,11 +609,11 @@ namespace libdar
 
 	to_read_ahead = 0;
 
-        while(to_write > 0)
+        while(!to_write.is_zero())
         {
 	    max_at_once = of_current == 1 ? (slicing.first_size - file_offset) - trailer_size : (slicing.other_size - file_offset) - trailer_size;
             tmp_wrote = max_at_once > to_write ? to_write : max_at_once;
-            if(tmp_wrote > 0)
+            if(!tmp_wrote.is_zero())
             {
                 micro_wrote = 0;
                 tmp_wrote.unstack(micro_wrote);
@@ -779,12 +779,12 @@ namespace libdar
 		    get_ui().warning(tools_printf(gettext("LAX MODE: In spite of its name, %S does not appear to be a dar slice, assuming a data corruption took place and continuing"), &fic));
             }
 
-	    if(h.is_old_header() && slicing.first_slice_header == 0 && num != 1)
+	    if(h.is_old_header() && slicing.first_slice_header.is_zero() && num != 1)
 		throw Erange("sar::open_readonly", gettext("This is an old archive, it can only be opened starting by the first slice"));
 
                 // checking the ownership of the set of file (= slice of the same archive or not)
                 //
-            if(slicing.first_slice_header == 0) // this is the first time we open a slice for this archive, we don't even know the slices size
+            if(slicing.first_slice_header.is_zero()) // this is the first time we open a slice for this archive, we don't even know the slices size
             {
                 of_internal_name = h.get_set_internal_name();
 		of_data_name = h.get_set_data_name();
@@ -800,7 +800,7 @@ namespace libdar
 		    if(!h.get_first_slice_size(slicing.first_size))
 			slicing.first_size = slicing.other_size;
 
-		    if(slicing.first_size == 0 || slicing.other_size == 0) // only possible to reach this statment in lax mode
+		    if(slicing.first_size.is_zero() || slicing.other_size.is_zero()) // only possible to reach this statment in lax mode
 		    {
 			try
 			{
@@ -823,7 +823,7 @@ namespace libdar
 				    tmp_num = 0;
 				}
 			    }
-			    while(tmp_num == 0);
+			    while(tmp_num.is_zero());
 
 			    get_ui().printf(gettext("LAX MODE: opening slice %i to read its slice header"), &tmp_num);
 			    open_file(tmp_num);
@@ -972,7 +972,7 @@ namespace libdar
 	    if(lax)
 	    {
 		infinint tmp;
-		if(!h.get_slice_size(tmp) || tmp == 0)
+		if(!h.get_slice_size(tmp) || tmp.is_zero())
 		{
 			// a problem occured while reading slice header, however we know what is its expected size
 			// so we seek the next read to the end of the slice header
@@ -1169,7 +1169,7 @@ namespace libdar
 	    if(num == 1)
 	    {
 		slicing.first_slice_header = of_fd->get_position();
-		if(slicing.first_slice_header == 0)
+		if(slicing.first_slice_header.is_zero())
 		    throw SRC_BUG;
 		slicing.other_slice_header = slicing.first_slice_header; // same header in all slice since release 2.4.0
 		if(slicing.first_slice_header >= slicing.first_size)
@@ -1229,7 +1229,7 @@ namespace libdar
 
 			// launch the shell command after the slice has been written
 		    hook_execute(of_current);
-		    if(pause != 0 && ((num-1) % pause == 0))
+		    if(!pause.is_zero() && (((num-1) % pause).is_zero()))
 		    {
 			deci conv = of_current;
 			bool ready = false;
@@ -1262,7 +1262,7 @@ namespace libdar
 	    if(of_max_seen < num)
 		of_max_seen = num;
 	    file_offset = num == 1 ? slicing.first_slice_header : slicing.other_slice_header;
-	    if(num == of_current + 1 && to_read_ahead > 0)
+	    if(num == of_current + 1 && !to_read_ahead.is_zero())
 	    {
 		of_current = num;
 		inherited_read_ahead(to_read_ahead);

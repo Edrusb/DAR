@@ -246,7 +246,7 @@ namespace libdar
 
 	    try // trap cast and rethrow exceptions
 	    {
-		if(cat_size > 0)
+		if(!cat_size.is_zero())
 		    cata_pdesc.stack->read_ahead(cat_size);
 		ret = new (pool) catalogue(dialog,
 					   cata_pdesc,
@@ -473,7 +473,7 @@ namespace libdar
 
 	    if(sequential_read
 	       || tmp_ctxt->is_an_old_start_end_archive()
-	       || stack.get_position() == 0) //< sar layer failed openning the last slice and fallen back openning the first slice
+	       || stack.get_position().is_zero()) //< sar layer failed openning the last slice and fallen back openning the first slice
 		stack.skip(0);
 	    else
 	    {
@@ -494,13 +494,13 @@ namespace libdar
 
 	    ver.read(stack, dialog, lax);
 
-	    if(second_terminateur_offset == 0 && !sequential_read && ver.get_edition() > 7)
+	    if(second_terminateur_offset.is_zero() && !sequential_read && ver.get_edition() > 7)
 		dialog.pause(gettext("Found a correct archive header at the beginning of the archive, which does not stands to be an old archive, the end of the archive is thus corrupted. If you have an external catalog given as reference we can continue, OK ?"));
 
 
 		// *************  adding a tronc to hide last terminator and trailer_version ******* //
 
-	    if(second_terminateur_offset != 0)
+	    if(!second_terminateur_offset.is_zero())
 	    {
 		if(info_details)
 		    dialog.printf(gettext("Opening construction layer..."));
@@ -542,7 +542,7 @@ namespace libdar
 		infinint i_size = ver.get_crypted_key()->size();
 		U_I size = 0;
 		i_size.unstack(size);
-		if(i_size != 0)
+		if(!i_size.is_zero())
 		    throw SRC_BUG;
 
 		    // unciphering the encrypted key using GnuPG user's keyring, asking for passphrase if necessary
@@ -587,7 +587,7 @@ namespace libdar
 	    case crypto_camellia256:
 		if(info_details)
 		    dialog.warning(gettext("Opening cyphering layer..."));
-		if(second_terminateur_offset != 0
+		if(!second_terminateur_offset.is_zero()
 		   || tmp_ctxt->is_an_old_start_end_archive()) // we have openned the archive by the end
 		{
 		    crypto_sym *tmp_ptr = NULL;
@@ -706,7 +706,7 @@ namespace libdar
 		    tmp->ignore_read_ahead(true);
 		else
 		{
-		    if(second_terminateur_offset == 0) // archive read from the beginning (sequential read)
+		    if(second_terminateur_offset.is_zero()) // archive read from the beginning (sequential read)
 			tmp->ignore_read_ahead(true);  // we avoid transmitting read_ahead request to the below thread
 			// which has been configured with an endless read ahead, new read_ahead would abort configured
 			// endlessly read_ahead.
@@ -832,7 +832,7 @@ namespace libdar
 		dialog.printf(gettext("%S is not a valid number"), & answ);
 	    }
 	}
-	while(fraction > 100 || fraction == 0);
+	while(fraction > 100 || fraction.is_zero());
 
 	if(info_details)
 	    dialog.printf(gettext("LAX MODE: Beginning search of the catalogue (from the end toward the beginning of the archive, on %i %% of its length), this may take a while..."), &fraction);
@@ -848,10 +848,10 @@ namespace libdar
 	    max_offset = stack.get_position();
 	}
 
-	if(max_offset == 0)
+	if(max_offset.is_zero())
 	    throw Erange("macro_tools_lax_search_catalogue", gettext("LAX MODE: Failed to read the catalogue (no data to inspect)"));
 
-	if(fraction == 0)
+	if(fraction.is_zero())
     	    throw Erange("macro_tools_lax_search_catalogue", gettext("LAX MODE: Failed to read the catalogue (0 bytes of the archive length asked to look for the catalogue)"));
 
 
@@ -1050,7 +1050,7 @@ namespace libdar
 		    tmp = new (pool) null_file(open_mode);
 		}
 		else
-		    if(file_size == 0) // one SLICE
+		    if(file_size.is_zero()) // one SLICE
 			if(filename == "-") // output to stdout
 			{
 			    if(info_details)
@@ -1724,7 +1724,7 @@ namespace libdar
 
 	if(tmp_inode != NULL)
 	{
-	    if(sl.first_size > 0)
+	    if(!sl.first_size.is_zero())
 	    {
 		if(tmp_inode->ea_get_saved_status() == cat_inode::ea_full)
 		{

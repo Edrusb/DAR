@@ -349,7 +349,7 @@ namespace libdar
         switch(power)
         {
         case 0:
-            if(number > 0)
+            if(!number.is_zero())
                 ret += unit;
                 // not displaying unit for zero for clarity in particular when octets symbol is used
                 // which would give "0 o" that is somehow not very easy to read/understand
@@ -1031,7 +1031,7 @@ namespace libdar
         string elem;
 
         x.clear();
-        while(tmp > 0)
+        while(!tmp.is_zero())
         {
             tools_read_string(f, elem);
             x.push_back(elem);
@@ -1169,7 +1169,7 @@ namespace libdar
             // (this is euclidian division)
         euclide(delta, 3600, num, rest);
 
-        if(rest != 0)
+        if(!rest.is_zero())
             return false;
         else // rest == 0
             return num <= hourshift;
@@ -2652,10 +2652,10 @@ namespace libdar
         infinint r;
         infinint crc_size;
 
-        if(size != 0)
+        if(!size.is_zero())
         {
             euclide(size, ratio, crc_size, r);
-            if(r > 0)
+            if(!r.is_zero())
                 ++crc_size;
             crc_size *= 4;   // smallest value is 4 bytes, 4 bytes more per each additional 1 Gbyte of data
         }
@@ -2718,7 +2718,7 @@ namespace libdar
             return not_compressed;
         else
             if(file_size >= storage_size)
-		if(file_size > 0)
+		if(!file_size.is_zero())
 		    return tools_addspacebefore(deci(((file_size - storage_size)*100)/file_size).human(), 4) +"%";
 		else
 		    return not_compressed;

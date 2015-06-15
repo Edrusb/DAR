@@ -353,9 +353,9 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 
 		    // checking for onfly isolation
 
-		if(st.get_errored() > 0)
+		if(!st.get_errored().is_zero())
 		    ret = EXIT_DATA_ERROR;
-		if(st.get_tooold() != 0)
+		if(!st.get_tooold().is_zero())
 		    ret = EXIT_SAVED_MODIFIED;
 
 		if(param.op == create)
@@ -799,7 +799,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    listing_options.set_subtree(*param.subtree);
 		    listing_options.set_filter_unsaved(param.filter_unsaved);
 		    listing_options.set_display_ea(param.list_ea);
-		    if(param.file_size != 0 && param.list_mode == archive_options_listing::slicing)
+		    if(!param.file_size.is_zero() && param.list_mode == archive_options_listing::slicing)
 			listing_options.set_user_slicing(param.first_file_size, param.file_size);
 		    arch->op_listing(dialog, listing_options);
 		}

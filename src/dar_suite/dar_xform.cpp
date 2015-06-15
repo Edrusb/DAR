@@ -181,7 +181,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 			throw SRC_BUG;
 		}
 
-		if(size == 0)
+		if(size.is_zero())
 		    if(dst == "-")
 			dst_sar = macro_tools_open_archive_tuyau(dialog,
 								 NULL,
@@ -346,7 +346,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
             switch(lu)
             {
             case 's':
-                if(file_size != 0)
+                if(!file_size.is_zero())
                     throw Erange("command_line", gettext("Only one -s option is allowed"));
                 if(optarg == NULL)
                     throw Erange("command_line", gettext("Missing argument to -s"));
@@ -355,7 +355,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
                     try
                     {
                         file_size = tools_get_extended_size(optarg, suffix_base);
-                        if(first_file_size == 0)
+                        if(first_file_size.is_zero())
                             first_file_size = file_size;
                     }
                     catch(Edeci &e)
@@ -368,10 +368,10 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
             case 'S':
                 if(optarg == NULL)
                     throw Erange("command_line", gettext("Missing argument to -S"));
-                if(first_file_size == 0)
+                if(first_file_size.is_zero())
                     first_file_size = tools_get_extended_size(optarg, suffix_base);
                 else
-                    if(file_size == 0)
+                    if(file_size.is_zero())
                         throw Erange("command_line", gettext("Only one -S option is allowed"));
                     else
                         if(file_size == first_file_size)
@@ -513,7 +513,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
         }
 
             // sanity checks
-        if(dst == "-" && file_size != 0)
+        if(dst == "-" && !file_size.is_zero())
             throw Erange("dar_xform::command_line", gettext("Archive on stdout is not compatible with slicing (-s option)"));
     }
     catch(...)

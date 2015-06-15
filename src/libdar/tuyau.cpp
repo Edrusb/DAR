@@ -471,7 +471,7 @@ namespace libdar
 	}
 	while(u_step > 0 && !eof);
 
-	if(byte > 0)
+	if(!byte.is_zero())
 	    throw SRC_BUG;
 
 	return !eof;

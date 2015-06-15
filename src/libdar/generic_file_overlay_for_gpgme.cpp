@@ -103,7 +103,7 @@ namespace libdar
 
 	    ret = 0;
 	    tmp.unstack(ret);
-	    if(tmp > 0)
+	    if(!tmp.is_zero())
 		throw Erange("gpgme_data_seek_cb", gettext("File offset too large to be stored in off_t type"));
 	}
 

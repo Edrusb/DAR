@@ -104,7 +104,7 @@ namespace libdar
 	min_hole_size = hole_size;
 	UI_min_hole_size = 0;
 	min_hole_size.unstack(UI_min_hole_size);
-	if(min_hole_size > 0) // hole size is larger than maximum buffer
+	if(!min_hole_size.is_zero()) // hole size is larger than maximum buffer
 	    UI_min_hole_size = 0; // disabling hole lookup inside buffers (faster execution)
 	min_hole_size = hole_size; // setting back min_hole_size to its value
     }
@@ -144,7 +144,7 @@ namespace libdar
 	    switch(mode)
 	    {
 	    case hole:
-		if(zero_count == 0)  // start of a new hole
+		if(zero_count.is_zero())  // start of a new hole
 		{
 		    if(!next_to_read_is_mark(seqt_file))
 		    {
@@ -209,7 +209,7 @@ namespace libdar
 			}
 		    }
 
-		    if(zero_count == 0)
+		    if(zero_count.is_zero())
 			mode = normal;
 		}
 		break;
@@ -243,7 +243,7 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	if(crc_size > 0)
+	if(!crc_size.is_zero())
 	{
 	    value = create_crc_from_size(crc_size, get_pool());
 	    if(value == NULL)
@@ -262,7 +262,7 @@ namespace libdar
 
 		if(lu > 0)
 		{
-		    if(crc_size > 0)
+		    if(!crc_size.is_zero())
 			value->compute(offset, buffer, lu);
 		    ref.write(buffer, lu);
 		    offset += lu;
@@ -290,7 +290,7 @@ namespace libdar
 
 			    if(copy_to_no_skip)
 			    {
-				while(zero_count > 0)
+				while(!zero_count.is_zero())
 				{
 				    U_I to_write = 0;
 				    zero_count.unstack(to_write);
@@ -465,7 +465,7 @@ namespace libdar
 		    }
 		}
 	    }
-	    while(zero_count > 0);
+	    while(!zero_count.is_zero());
 	}
 	else // enough data to record a hole
 	{

@@ -78,7 +78,7 @@ namespace libdar
 
 	    // considering particular case of a non-sliced archive
 
-	if(first_size == 0 || other_size == 0)
+	if(first_size.is_zero() || other_size.is_zero())
 	{
 	    slice_num = 1;
 	    if(offset < first_slice_header)
@@ -94,9 +94,9 @@ namespace libdar
 	    throw SRC_BUG;
 	if(other_size < other_slice_header)
 	    throw SRC_BUG;
-	if(first_slice_header == 0)
+	if(first_slice_header.is_zero())
 	    throw SRC_BUG;
-	if(other_slice_header == 0)
+	if(other_slice_header.is_zero())
 	    throw SRC_BUG;
 
 	    // end of sanity checks

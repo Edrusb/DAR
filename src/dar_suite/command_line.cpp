@@ -391,7 +391,7 @@ bool get_args(shell_interaction & dialog,
 
         if(p.filename == "" || p.sauv_root == NULL || p.op == noop)
             throw Erange("get_args", tools_printf(gettext("Missing -c -x -d -t -l -C -+ option, see `%S -h' for help"), &cmd));
-        if(p.filename == "-" && p.file_size != 0)
+        if(p.filename == "-" && !p.file_size.is_zero())
             throw Erange("get_args", gettext("Slicing (-s option), is not compatible with archive on standard output (\"-\" as filename)"));
         if(p.filename != "-" && (p.op != create && p.op != isolate && p.op != merging))
             if(p.sauv_root == NULL)
@@ -435,7 +435,7 @@ bool get_args(shell_interaction & dialog,
 
         if(p.algo != none && p.op != create && p.op != isolate && p.op != merging)
             dialog.warning(gettext("-z or -y need only to be used with -c -C or -+ options"));
-        if(p.first_file_size != 0 && p.file_size == 0)
+        if(!p.first_file_size.is_zero() && p.file_size.is_zero())
             throw Erange("get_args", gettext("-S option requires the use of -s"));
         if(p.what_to_check != cat_inode::cf_all && (p.op == isolate || (p.op == create && p.ref_root == NULL) || p.op == test || p.op == listing || p.op == merging))
             dialog.warning(gettext("ignoring -O option, as it is useless in this situation"));
@@ -467,7 +467,7 @@ bool get_args(shell_interaction & dialog,
             dialog.warning(gettext("-f in only available with -x option, ignoring"));
         if(p.min_compr_size != min_compr_size_default && p.op != create && p.op != merging)
             dialog.warning(gettext("-m is only useful with -c"));
-        if(p.hourshift > 0)
+        if(!p.hourshift.is_zero())
         {
             if(p.op == create)
             {
@@ -541,7 +541,7 @@ bool get_args(shell_interaction & dialog,
         if(p.not_deleted && p.only_deleted)
             throw Erange("get_args", gettext("-konly and -kignore cannot be used at the same time"));
 
-        if(rec.no_inter && p.pause > 0)
+        if(rec.no_inter && !p.pause.is_zero())
             throw Erange("get_args", gettext("-p and -Q options are mutually exclusives"));
 
         if(p.display_finished && p.op != create)
@@ -803,7 +803,7 @@ static bool get_args_recursive(recursive_param & rec,
                 }
                 break;
             case 'A':
-                if(p.ref_filename != NULL || p.ref_root != NULL || p.snapshot || p.fixed_date != 0)
+                if(p.ref_filename != NULL || p.ref_root != NULL || p.snapshot || !p.fixed_date.is_zero())
                     throw Erange("get_args", gettext("Only one -A option is allowed"));
                 if(optarg == NULL)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
@@ -975,7 +975,7 @@ static bool get_args_recursive(recursive_param & rec,
                     throw Ememory("get_args");
                 break;
             case 's':
-                if(p.file_size != 0)
+                if(!p.file_size.is_zero())
                     throw Erange("get_args", gettext("Only one -s option is allowed"));
                 if(optarg == NULL)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
@@ -984,7 +984,7 @@ static bool get_args_recursive(recursive_param & rec,
                     try
                     {
                         p.file_size = tools_get_extended_size(optarg, rec.suffix_base);
-                        if(p.first_file_size == 0)
+                        if(p.first_file_size.is_zero())
                             p.first_file_size = p.file_size;
                     }
                     catch(Edeci &e)
@@ -997,10 +997,10 @@ static bool get_args_recursive(recursive_param & rec,
             case 'S':
                 if(optarg == NULL)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
-                if(p.first_file_size == 0)
+                if(p.first_file_size.is_zero())
                     p.first_file_size = tools_get_extended_size(optarg, rec.suffix_base);
                 else
-                    if(p.file_size == 0)
+                    if(p.file_size.is_zero())
                         throw Erange("get_args", gettext("Only one -S option is allowed"));
                     else
                         if(p.file_size == p.first_file_size)
@@ -1691,7 +1691,7 @@ static bool get_args_recursive(recursive_param & rec,
                     infinint ks = conv.computer();
                     p.gnupg_key_size = 0;
                     ks.unstack(p.gnupg_key_size);
-                    if(ks > 0)
+                    if(!ks.is_zero())
                         throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
                 }
                 else

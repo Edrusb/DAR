@@ -587,7 +587,7 @@ namespace libdar
 			throw Elibcall("op_merge", gettext("NULL argument given to \"extension\""));
 		    if(options.get_compression_level() > 9 || options.get_compression_level() < 1)
 			throw Elibcall("op_merge", gettext("Compression_level must be between 1 and 9 included"));
-		    if(options.get_slice_size() == 0 && options.get_first_slice_size() != 0)
+		    if(options.get_slice_size().is_zero() && !options.get_first_slice_size().is_zero())
 			throw Elibcall("op_merge", gettext("\"first_file_size\" cannot be different from zero if \"file_size\" is equal to zero"));
 		    if(options.get_crypto_size() < 10 && options.get_crypto_algo() != crypto_none)
 			throw Elibcall("op_merge", gettext("Crypto block size must be greater than 10 bytes"));
@@ -882,7 +882,7 @@ namespace libdar
 	    dialog.printf(gettext("Asymmetric key encryption used       : %S\n"), &asym);
 	    dialog.printf(gettext("Archive is signed                    : %S\n"), &is_signed);
 	    dialog.printf(gettext("Sequential reading marks             : %s\n"), (ver.get_tape_marks() ? gettext("present") : gettext("absent")));
-	    if(cat_size > 0)
+	    if(!cat_size.is_zero())
 		dialog.printf(gettext("Catalogue size in archive            : %i bytes\n"), &cat_size);
 	    else
 		dialog.printf(gettext("Catalogue size in archive            : N/A\n"));
@@ -911,7 +911,7 @@ namespace libdar
 		else // not reading from a sar
 		{
 		    infinint arch_size = get_level2_size();
-		    if(arch_size > 0)
+		    if(!arch_size.is_zero())
 		    {
 			dialog.printf(gettext("Archive size is: %i bytes\n"), &arch_size);
 			dialog.printf(gettext("Previous archive size does not include headers present in each slice\n"));
@@ -1732,7 +1732,7 @@ namespace libdar
 
         if(compression_level > 9 || compression_level < 1)
             throw Elibcall("op_create_in", gettext("Compression_level must be between 1 and 9 included"));
-        if(file_size == 0 && first_file_size != 0)
+        if(file_size.is_zero() && !first_file_size.is_zero())
             throw Elibcall("op_create_in", gettext("\"first_file_size\" cannot be different from zero if \"file_size\" is equal to zero"));
         if(crypto_size < 10 && crypto != crypto_none)
             throw Elibcall("op_create_in", gettext("Crypto block size must be greater than 10 bytes"));
@@ -1965,7 +1965,7 @@ namespace libdar
 	    {
 		    // pausing if saving in the same directory where is located the archive of reference
 
-		if(pause != 0 && initial_pause)
+		if(!pause.is_zero() && initial_pause)
 		    dialog.pause(gettext("Ready to start writing down the archive?"));
 
 		macro_tools_create_layers(dialog,

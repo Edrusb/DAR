@@ -148,6 +148,7 @@ namespace libdar
 	unsigned char operator [] (const limitint & position) const;
 	    // return in big endian order the information bytes storing the integer
 
+	bool is_zero() const { return field == 0; };
 
         bool operator < (const limitint &x) const { return field < x.field; };
         bool operator == (const limitint &x) const { return field == x.field; };

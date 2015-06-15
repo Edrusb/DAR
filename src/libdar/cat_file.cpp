@@ -154,7 +154,7 @@ namespace libdar
 			    algo_write= algo_read;
                         }
                         else
-                            if(*storage_size == 0) // in older archive storage_size was set to zero if data was not compressed
+                            if(storage_size->is_zero()) // in older archive storage_size was set to zero if data was not compressed
                             {
                                 *storage_size = *size;
                                 algo_read = none;
@@ -666,7 +666,7 @@ namespace libdar
 			    crc *tmp = NULL;
 
 				// first, recording storage_size (needed when isolating a catalogue in sequential read mode)
-			    if(*storage_size == 0)
+			    if(storage_size->is_zero())
 			    {
 				infinint pos = get_escape_layer()->get_position();
 				if(pos < *offset)

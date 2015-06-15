@@ -631,7 +631,7 @@ namespace libdar
 					throw SRC_BUG; // if not a known hard link, e_ino should still either point to a real cat_inode
 					// or to the hard linked new cat_inode.
 
-				    if(fixed_date == 0)
+				    if(fixed_date.is_zero())
 				    {
 					bool conflict = ref.compare(e, f);
 
@@ -712,9 +712,9 @@ namespace libdar
 					bool avoid_saving_inode =
 					    snapshot
 						// don't backup if doing a snapshot
-					    || (fixed_date > 0 && e_ino != NULL && e_ino->get_last_modif() < fixed_date)
+					    || (!fixed_date.is_zero() && e_ino != NULL && e_ino->get_last_modif() < fixed_date)
 						// don't backup if older than given date (if reference date given)
-					    || (fixed_date == 0 && e_ino != NULL && f_ino != NULL && !e_ino->has_changed_since(*f_ino, hourshift, what_to_check)
+					    || (fixed_date.is_zero() && e_ino != NULL && f_ino != NULL && !e_ino->has_changed_since(*f_ino, hourshift, what_to_check)
 						&& (f_file == NULL || !f_file->is_dirty()))
 						// don't backup if doing differential backup and entry is the same as the one in the archive of reference
 						// and if the reference is a plain file, it was not saved as dirty
@@ -723,25 +723,25 @@ namespace libdar
 					bool avoid_saving_ea =
 					    snapshot
 						// don't backup if doing a snapshot
-					    || (fixed_date > 0 && e_ino != NULL &&  e_ino->ea_get_saved_status() != cat_inode::ea_none && e_ino->get_last_change() < fixed_date)
+					    || (!fixed_date.is_zero() && e_ino != NULL &&  e_ino->ea_get_saved_status() != cat_inode::ea_none && e_ino->get_last_change() < fixed_date)
 						// don't backup if older than given date (if reference date given)
-					    || (fixed_date == 0 && e_ino != NULL && e_ino->ea_get_saved_status() == cat_inode::ea_full && f_ino != NULL && f_ino->ea_get_saved_status() != cat_inode::ea_none && e_ino->get_last_change() <= f_ino->get_last_change())
+					    || (fixed_date.is_zero() && e_ino != NULL && e_ino->ea_get_saved_status() == cat_inode::ea_full && f_ino != NULL && f_ino->ea_get_saved_status() != cat_inode::ea_none && e_ino->get_last_change() <= f_ino->get_last_change())
 						// don't backup if doing differential backup and entry is the same as the one in the archive of reference
 					    ;
 
 					bool avoid_saving_fsa =
 					    snapshot
 						// don't backup if doing a snapshot
-					    || (fixed_date > 0 && e_ino != NULL && e_ino->fsa_get_saved_status() != cat_inode::fsa_none && e_ino->get_last_change() < fixed_date)
+					    || (!fixed_date.is_zero() && e_ino != NULL && e_ino->fsa_get_saved_status() != cat_inode::fsa_none && e_ino->get_last_change() < fixed_date)
 						// don't backup if older than given date (if reference date given)
-					    || (fixed_date == 0 && e_ino != NULL && e_ino->fsa_get_saved_status() == cat_inode::fsa_full && f_ino != NULL && f_ino->fsa_get_saved_status() != cat_inode::fsa_none && e_ino->get_last_change() <= f_ino->get_last_change())
+					    || (fixed_date.is_zero() && e_ino != NULL && e_ino->fsa_get_saved_status() == cat_inode::fsa_full && f_ino != NULL && f_ino->fsa_get_saved_status() != cat_inode::fsa_none && e_ino->get_last_change() <= f_ino->get_last_change())
 						// don't backup if doing differential backup and entry is the same as the one in the archive of reference
 					    ;
 
 					bool sparse_file_detection =
 					    e_file != NULL
 					    && e_file->get_size() > sparse_file_min_size
-					    && sparse_file_min_size != 0;
+					    && !sparse_file_min_size.is_zero();
 
 					    // MODIFIYING INODE IF NECESSARY
 
@@ -850,7 +850,7 @@ namespace libdar
 				    }
 				    catch(...)
 				    {
-					if(dir != NULL && fixed_date == 0)
+					if(dir != NULL && fixed_date.is_zero())
 					    ref.compare(&tmp_eod, f);
 					throw;
 				    }
@@ -884,7 +884,7 @@ namespace libdar
 				    {
 					bool known;
 
-					if(fixed_date == 0)
+					if(fixed_date.is_zero())
 					    known = ref.compare(dir, f);
 					else
 					    known = false;
@@ -909,11 +909,11 @@ namespace libdar
 					}
 					catch(...)
 					{
-					    if(fixed_date == 0)
+					    if(fixed_date.is_zero())
 						ref.compare(&tmp_eod, f);
 					    throw;
 					}
-					if(fixed_date == 0)
+					if(fixed_date.is_zero())
 					    ref.compare(&tmp_eod, f);
 				    }
 				    fs.skip_read_to_parent_dir();
@@ -980,7 +980,7 @@ namespace libdar
 		    {
 			sem.raise(juillet.get_string(), e, true);
 			sem.lower();
-			if(fixed_date == 0)
+			if(fixed_date.is_zero())
 			    ref.compare(e, f); // makes the comparison in the reference catalogue go to parent directory
 			cat.pre_add(e); // adding a mark and dropping CAT_EOD entry in the archive if cat is an escape_catalogue object (else, does nothing)
 			if(display_finished)
@@ -990,7 +990,7 @@ namespace libdar
 			    string size = tools_display_integer_in_metric_system(cur.get_size(), "o", true);
 			    string ratio = gettext(", compression ratio ");
 
-			    if(cur.get_storage_size() > 0)
+			    if(!cur.get_storage_size().is_zero())
 				ratio += tools_get_compression_ratio(cur.get_storage_size(), cur.get_size(), true);
 			    else
 				ratio = "";
@@ -2415,7 +2415,7 @@ namespace libdar
 
 		    if(e_file != NULL)
 		    {
-			if(sparse_file_min_size > 0 && keep_mode != cat_file::keep_compressed) // sparse_file detection is activated
+			if(!sparse_file_min_size.is_zero() && keep_mode != cat_file::keep_compressed) // sparse_file detection is activated
 			{
 			    if(e_file->get_size() > sparse_file_min_size)
 			    {
@@ -2957,7 +2957,7 @@ namespace libdar
 						throw SRC_BUG;
 					}
 
-					if(repeat_byte == 0 || (current_wasted_bytes < repeat_byte))
+					if(repeat_byte.is_zero() || (current_wasted_bytes < repeat_byte))
 					{
 					    if(info_details)
 						dialog.warning(tools_printf(gettext("WARNING! File modified while reading it for backup. Performing retry %i of %i"), &current_repeat_count, &repeat_count));
@@ -3664,7 +3664,7 @@ namespace libdar
 
     static void clean_hard_link_base_from(const cat_mirage *mir, map<infinint, cat_etoile *> & hard_link_base)
     {
-	if(mir->get_etoile_ref_count() == 0)
+	if(mir->get_etoile_ref_count().is_zero())
 	    throw SRC_BUG; // count should be >= 1
 
 	if(mir->get_etoile_ref_count() == 1)

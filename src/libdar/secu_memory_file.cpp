@@ -43,7 +43,7 @@ namespace libdar
 	{
 	    position = 0;
 	    tmp.unstack(position);
-	    if(tmp > 0)
+	    if(!tmp.is_zero())
 		throw SRC_BUG; // pos < data.size(), which is typed U_I as well as position
 	    return true;
 	}

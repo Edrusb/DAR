@@ -115,10 +115,10 @@ namespace libdar
 	void read(generic_file &f, archive_version ver);
 
 	    /// return true if the datetime is exactly January 1st, 1970, 0 h 0 mn 0 s
-	bool is_null() const { return sec == 0 && frac == 0; };
+	bool is_null() const { return sec.is_zero() && frac.is_zero(); };
 
 	    /// return true if the datetime is an integer number of second (subsecond part is zero)
-	bool is_integer_second() const { return frac == 0; };
+	bool is_integer_second() const { return frac.is_zero(); };
 
 	    /// return the storage it would require to dump this object
 	infinint get_storage_size() const { return sec.get_storage_size() + frac.get_storage_size() + 1; };

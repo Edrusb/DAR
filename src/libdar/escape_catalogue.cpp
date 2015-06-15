@@ -422,7 +422,7 @@ namespace libdar
 			    ref_eod = dynamic_cast<const cat_eod *>(ref);
 			    if(ref_eod != NULL)
 			    {
-				if(depth > 0)
+				if(!depth.is_zero())
 				    --(ceci->depth);
 				else
 				    if(!x_lax)
@@ -458,7 +458,7 @@ namespace libdar
 			    cat_entree *ref_nc = const_cast<cat_entree *>(ref);
 
 			    ceci->add(ref_nc);
-			    if(wait_parent_depth > 0) // we must not return this object as it is member of a skipped dir
+			    if(!wait_parent_depth.is_zero()) // we must not return this object as it is member of a skipped dir
 			    {
 				if(depth < wait_parent_depth) // we are back out of the skipped directory
 				{
@@ -478,7 +478,7 @@ namespace libdar
 		    }
 		    else // no more file to read from in-sequence marks
 		    {
-			if(depth != 0)
+			if(!depth.is_zero())
 			{
 			    get_ui().warning(gettext("Uncompleted archive! Assuming it has been interrupted during the backup process. If an error has been reported just above, simply ignore it, this is about the file that was saved at the time of the interruption."));
 			    ceci->status = ec_eod;
@@ -527,7 +527,7 @@ namespace libdar
 		    }
 		    break;
 		case ec_eod:
-		    if(depth > 0)
+		    if(!depth.is_zero())
 		    {
 			ref = get_r_eod_address();
 			if(ref == NULL)

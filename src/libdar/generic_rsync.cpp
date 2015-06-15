@@ -27,6 +27,10 @@ extern "C"
 #include <stdio.h>
 #include <librsync.h>
 #endif
+
+#if HAVE_STRING_H
+#include <string.h>
+#endif
 } // end extern "C"
 
 #include "generic_rsync.hpp"

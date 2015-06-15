@@ -272,7 +272,7 @@ namespace libdar
 		tmp = ref_cp & mask;
 		sect[i] = 0;
 		tmp.unstack(sect[i]);
-		if(tmp != 0)
+		if(!tmp.is_zero())
 		    throw SRC_BUG;
 		ref_cp >>= 8;
 	    }

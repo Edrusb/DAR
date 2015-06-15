@@ -59,7 +59,7 @@ namespace libdar
 	number.read(f); // read from file the number of tlv stored
 
 	contents.clear(); // erase list contents
-	while(number > 0) // read each tlv from file
+	while(!number.is_zero()) // read each tlv from file
 	{
 	    contents.push_back(tlv(f));
 	    number--;

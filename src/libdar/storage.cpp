@@ -681,7 +681,7 @@ namespace libdar
         U_32 sz = 0;
 	begin = end = NULL;
 
-	if(size > 0)
+	if(!size.is_zero())
 	{
 	    size.unstack(sz);
 

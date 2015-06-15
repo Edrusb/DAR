@@ -84,7 +84,7 @@ namespace libdar
 
 	    do
 	    {
-		if((to_send_ahead > 0 || endless_read_ahead) && !output_data->is_full())
+		if((!to_send_ahead.is_zero() || endless_read_ahead) && !output_data->is_full())
 		{
 		    U_I tmp = 0;
 		    bool eof;
@@ -114,7 +114,7 @@ namespace libdar
 		    treat_input_data();
 		else
 		{
-		    if(pending_order() || output_data->is_full() || (to_send_ahead == 0 && !endless_read_ahead))
+		    if(pending_order() || output_data->is_full() || (to_send_ahead.is_zero() && !endless_read_ahead))
 		    {
 			bool need_answer;
 
@@ -265,9 +265,9 @@ namespace libdar
 
 	if(input_data->is_not_empty())
 	{
-	    if(to_send_ahead > 0 || endless_read_ahead)
+	    if(!to_send_ahead.is_zero() || endless_read_ahead)
 		throw SRC_BUG; // read_ahead asked but no read done, received data to write instead
-	    if(read_ahead > 0)
+	    if(!read_ahead.is_zero())
 		throw SRC_BUG; // read_ahead started but data not read, received data to write instead
 	}
 
@@ -297,7 +297,7 @@ namespace libdar
 	{
 	case msg_type::order_read_ahead:
 	    tmp = order.get_infinint();
-	    if(tmp == 0)
+	    if(tmp.is_zero())
 	    {
 		endless_read_ahead = true;
 		to_send_ahead = 0;
@@ -357,7 +357,7 @@ namespace libdar
 	    break;
 	case msg_type::order_skippable_fwd:
 	    treat_input_data();
-	    if(read_ahead > 0)
+	    if(!read_ahead.is_zero())
 		throw SRC_BUG; // code is not adapted, it should take into consideration read_ahead data
 	    answer.set_type(msg_type::answr_skippable);
 	    answer.set_bool(data->skippable(generic_file::skip_forward, order.get_infinint()));
@@ -365,7 +365,7 @@ namespace libdar
 	    break;
 	case msg_type::order_skippable_bkd:
 	    treat_input_data();
-	    if(read_ahead > 0)
+	    if(!read_ahead.is_zero())
 		throw SRC_BUG; // code is not adapted, it should take into consideration read_ahead data
 	    answer.set_type(msg_type::answr_skippable);
 	    answer.set_bool(data->skippable(generic_file::skip_backward, order.get_infinint()));
@@ -375,7 +375,7 @@ namespace libdar
 	    treat_input_data();
 	    answer.set_type(msg_type::answr_position);
 	    tmp = data->get_position();
-	    if(read_ahead > 0)
+	    if(!read_ahead.is_zero())
 	    {
 		    // we need to compensate the position of "data"
 		    // by the amount of bytes read ahead from it
@@ -419,7 +419,7 @@ namespace libdar
 	if(input_data->is_not_empty())
 	    throw SRC_BUG;
 
-	if(read_ahead > 0)
+	if(!read_ahead.is_zero())
 	{
 	    if(infinint(immediate_read) >= read_ahead)
 	    {
@@ -428,7 +428,7 @@ namespace libdar
 		    // counting out the already sent data thanks to a previous read_ahead
 
 		read_ahead.unstack(tmp);
-		if(read_ahead != 0)
+		if(!read_ahead.is_zero())
 		    throw SRC_BUG;
 		immediate_read -= tmp;
 	    }
@@ -457,7 +457,7 @@ namespace libdar
 
 	    // counting down from what remains to send due to pending read_ahead what we have just sent
 
-	if(to_send_ahead > 0)
+	if(!to_send_ahead.is_zero())
 	{
 	    if(infinint(sent) > to_send_ahead)
 		to_send_ahead = 0;

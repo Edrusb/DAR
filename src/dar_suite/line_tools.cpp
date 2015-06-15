@@ -253,7 +253,7 @@ void line_tools_tlv_list2argv(user_interaction & dialog, tlv_list & list, argc_a
 	size = list[i].size();
 	transfert = 0;
 	size.unstack(transfert);
-	if(size != 0)
+	if(!size.is_zero())
 	    throw Erange("line_tools_tlv_list2argv", "Too long argument found in TLV to be handled by standard library routine");
 	list[i].skip(0);
 	arg.set_arg(list[i], transfert, i);
