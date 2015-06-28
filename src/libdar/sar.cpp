@@ -601,28 +601,29 @@ namespace libdar
 
     void sar::inherited_write(const char *a, U_I sz)
     {
-        infinint to_write = sz;
+        U_I to_write = sz;
         infinint max_at_once;
-        infinint tmp_wrote;
-        U_I micro_wrote;
+        U_I tmp_wrote;
 	U_I trailer_size = slicing.older_sar_than_v8 ? 0 : 1;
 
 	to_read_ahead = 0;
 
-        while(!to_write.is_zero())
+        while(to_write > 0)
         {
 	    max_at_once = of_current == 1 ? (slicing.first_size - file_offset) - trailer_size : (slicing.other_size - file_offset) - trailer_size;
-            tmp_wrote = max_at_once > to_write ? to_write : max_at_once;
-            if(!tmp_wrote.is_zero())
+	    tmp_wrote = 0;
+	    max_at_once.unstack(tmp_wrote);
+	    if(tmp_wrote > to_write)
+		tmp_wrote = to_write;
+
+            if(tmp_wrote > 0)
             {
-                micro_wrote = 0;
-                tmp_wrote.unstack(micro_wrote);
 		try
 		{
-		    of_fd->write(a, micro_wrote);
-		    to_write -= micro_wrote;
-		    file_offset += micro_wrote;
-		    a += micro_wrote;
+		    of_fd->write(a, tmp_wrote);
+		    to_write -= tmp_wrote;
+		    file_offset += tmp_wrote;
+		    a += tmp_wrote;
 		}
 		catch(Euser_abort & e)
 		{
