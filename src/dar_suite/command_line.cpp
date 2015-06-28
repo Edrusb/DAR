@@ -1418,6 +1418,8 @@ static bool get_args_recursive(recursive_param & rec,
             case 'G':
                 if(optarg != NULL)
                     throw Erange("command_line.cpp:get_arg_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
+		if(compile_time::libthreadar() && !rec.no_inter)
+		    rec.dialog->pause(gettext("Warning: -G option is an experimental and unsupported feature, read man page about -G option for more information"));
                 p.multi_threaded = false;
                 break;
             case 'M':
