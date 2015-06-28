@@ -126,6 +126,14 @@ extern "C"
 #if HAVE_WCTYPE_H
 #include <wctype.h>
 #endif
+
+#if HAVE_STDDEF_H
+#include <stddef.h>
+#endif
+
+#if HAVE_DIRENT_H
+#include <dirent.h>
+#endif
 } // end extern "C"
 
 #include <iostream>
@@ -2790,7 +2798,7 @@ namespace libdar
             memset(&state_wc, '\0', sizeof(state_wc)); // initializing the shift structure
             len = mbsrtowcs(dst, &src, val.size(), &state_wc);
             if(len == (size_t)-1)
-                throw Erange("tools_string_to_wcs", string(gettext("Invalid wide-char found in string: ")) + strerror(errno));
+                throw Erange("tools_string_to_wcs", string(gettext("Invalid wide-char found in string: ")) + tools_strerror_r(errno));
             dst[len] = '\0';
 
                 // converting dst to wstring
@@ -2889,6 +2897,32 @@ namespace libdar
         }
 
         return ret;
+    }
+
+
+    struct dirent *tools_allocate_struct_dirent(const std::string & path_name, memory_pool *pool)
+    {
+	struct dirent *ret;
+	S_I name_max = pathconf(path_name.c_str(), _PC_NAME_MAX);
+	U_I len;
+
+	if(name_max == -1)
+	    name_max = 255;
+	len = offsetof(struct dirent, d_name) + name_max + 1;
+	if(pool == NULL)
+	    ret = (struct dirent *) new char[len];
+	else
+	    ret = (struct dirent *) new (pool) char[len];
+
+	if(ret == NULL)
+	    throw Ememory("tools_allocate_struc_dirent");
+	return ret;
+    }
+
+    void tools_release_struct_dirent(struct dirent *ptr)
+    {
+	if(ptr != NULL)
+	    delete [] ((char *)(ptr));
     }
 
 

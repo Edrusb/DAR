@@ -89,7 +89,7 @@ AC_HEADER_DIRENT
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 
-AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h libintl.h sys/capability.h linux/capability.h utimes.h sys/time.h wchar.h wctype.h])
+AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h libintl.h sys/capability.h linux/capability.h utimes.h sys/time.h wchar.h wctype.h stddef.h])
 
 AC_SYS_LARGEFILE
 
@@ -117,7 +117,7 @@ AC_TYPE_SIGNAL
 AC_FUNC_STAT
 AC_FUNC_UTIME_NULL
 AC_HEADER_TIME
-AC_CHECK_FUNCS([lchown mkdir regcomp rmdir strerror utime fdopendir])
+AC_CHECK_FUNCS([lchown mkdir regcomp rmdir strerror strerror_r utime fdopendir readdir_r])
 
 AC_MSG_CHECKING([for c++11 support])
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],

@@ -852,6 +852,24 @@ namespace libdar
 	}
     }
 
+	/// allocate a new dirent structure for use with readdir_r
+	///
+	/// \param[in] path_name is the path of to the directory (and its underlying filesystem)
+	/// where the resulting dirent will be used. Depending on fileystem, the size of the dirent
+	/// structure may vary it is necessary to know the directory where the corresponding files
+	/// resides
+	/// \param[in] pool whether to allocate the structure on a memory_pool or out of memory_pool
+	/// which succeeds when pool is set to NULL
+	/// \return a pointer to the newly allocated dirent structure
+    struct dirent *tools_allocate_struct_dirent(const std::string & path_name, memory_pool *pool = NULL);
+
+
+	/// release a dirent structure as allocated by tools_allocate_struct_dirent
+	///
+	/// \param[in] ptr is the address of the structure to release
+    void tools_release_struct_dirent(struct dirent *ptr);
+
+
 } /// end of namespace
 
 #endif

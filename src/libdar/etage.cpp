@@ -141,13 +141,36 @@ namespace libdar
 		throw Erange("etage::etage" , string(gettext("Error opening directory: ")) + dirname + " : " + tools_strerror_r(errno));
 
 	    fichier.clear();
-	    while(!is_cache_dir && (ret = readdir(tmp)) != NULL)
-		if(strcmp(ret->d_name, ".") != 0 && strcmp(ret->d_name, "..") != 0)
-		{
-		    if(cache_directory_tagging)
-			is_cache_dir = cache_directory_tagging_check(dirname, ret->d_name);
-		    fichier.push_back(string(ret->d_name));
-		}
+
+#if HAVE_READDIR_R
+	    ret = tools_allocate_struct_dirent(dirname);
+	    struct dirent *dbldrt = NULL;
+	    if(ret == NULL)
+		throw SRC_BUG;
+	    try
+	    {
+		while(!is_cache_dir && (readdir_r(tmp, ret, &dbldrt) == 0) && dbldrt != NULL)
+#else
+		while(!is_cache_dir && (ret = readdir(tmp)) != NULL)
+#endif
+
+		    if(strcmp(ret->d_name, ".") != 0 && strcmp(ret->d_name, "..") != 0)
+		    {
+			if(cache_directory_tagging)
+			    is_cache_dir = cache_directory_tagging_check(dirname, ret->d_name);
+			fichier.push_back(string(ret->d_name));
+		    }
+
+#if HAVE_READDIR_R
+	    }
+	    catch(...)
+	    {
+		if(ret != NULL)
+		    tools_release_struct_dirent(ret);
+		throw;
+	    }
+	    tools_release_struct_dirent(ret);
+#endif
 	    closedir(tmp);
 	    tmp = NULL;
 
