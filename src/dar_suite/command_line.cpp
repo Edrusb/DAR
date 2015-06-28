@@ -898,16 +898,6 @@ static bool get_args_recursive(recursive_param & rec,
                     else
                         throw Erange("get_args", gettext("Choose only one compression algorithm"));
                 break;
-            case 'y':
-                rec.dialog->warning(gettext("Note that -y option is deprecated it will be removed in future release, please use -z option instead (read man page for details)"));
-                if(p.algo == none)
-                    p.algo = bzip2;
-                else
-                    throw Erange("get_args", gettext("Choose either -z or -y not both"));
-                if(optarg != NULL)
-                    if(! tools_my_atoi(optarg, p.compression_level) || p.compression_level > 9 || p.compression_level < 1)
-                        throw Erange("get_args", gettext("Compression level must be between 1 and 9, included"));
-                break;
             case 'n':
                 p.allow_over = false;
                 if(!p.warn_over)
@@ -2219,7 +2209,6 @@ const struct option *get_long_opt()
         {"verbose", optional_argument, NULL, 'v'},
         {"no-warn", optional_argument, NULL, 'w'},
         {"extract", required_argument, NULL, 'x'},
-        {"bzip2", optional_argument, NULL, 'y'},  // backward compatibility
         {"gzip", optional_argument, NULL, 'z'},   // backward compatibility
         {"compression", required_argument, NULL, 'z'},
         {"ref", required_argument, NULL, 'A'},

@@ -32,7 +32,7 @@ u + exclude EA from operation (mask)    --exclude-ea
 v + verbose output                      --verbose   --verbose={skipped|treated|messages|dir|all}
 w * do not warn before overwriting      --no-warn
 x + extract archive                     --extract
-y * [DEPRECATED] bzip2 compression      --bzip2
+y !
 z * gzip compression                    --gzip --compress
 A + make a differential backup          --ref
 B + filename taken as command-line extension --config
