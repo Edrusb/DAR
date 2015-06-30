@@ -170,6 +170,7 @@ namespace libdar
 		throw;
 	    }
 	    tools_release_struct_dirent(ret);
+	    ret = NULL;
 #endif
 	    closedir(tmp);
 	    tmp = NULL;
