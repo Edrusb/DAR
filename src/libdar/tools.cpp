@@ -635,21 +635,41 @@ namespace libdar
     {
         time_t pas = 0;
         time_t frac = 0;
+	string ret;
 
         if(!date.get_value(pas, frac, datetime::tu_second)) // conversion to system type failed. Using a replacement string
             return deci(date.get_second_value()).human();
         else
         {
-            char *str = ctime(&pas);
-            if(str == NULL) // ctime() failed
-                return tools_int2str(pas);
-            else
-            {
-                string ret = str;
+	    char *val = NULL;
+#if HAVE_CTIME_R
+	    char *str = new (nothrow) char [50]; //< minimum required is 26 bytes
+	    if(str == NULL)
+		throw Ememory("tools_display_date");
+	    try
+	    {
+		val = ctime_r(&pas, str);
+#else
+		val = ctime(&pas);
+#endif
+		if(val == NULL) // ctime() failed
+		    ret = tools_int2str(pas);
+		else
+		    ret = val;
+#if HAVE_CTIME_R
+	    }
+	    catch(...)
+	    {
+		delete [] str;
+		throw;
+	    }
+	    delete [] str;
+#else
+	ret = val;
+#endif
+	}
 
-                return string(ret.begin(), ret.end() - 1); // -1 to remove the ending '\n'
-            }
-        }
+	return string(ret.begin(), ret.end() - 1); // -1 to remove the ending '\n'
     }
 
     infinint tools_convert_date(const string & repres)

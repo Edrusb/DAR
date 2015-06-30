@@ -39,7 +39,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],
                   [AC_MSG_ERROR([No C++ compiler found])])
 
 # Defining _XOPEN_SOURCE to get extra field in struct stat
-AC_DEFINE(_XOPEN_SOURCE, 700, [activates POSIX.1-2008 symbols in order to allow microsecond time setting])
+AC_DEFINE(_XOPEN_SOURCE, 700, [activates POSIX.1-2008 symbols in order to allow microsecond time setting, as well as ctime_r() call])
 
 ###########
 ## THE FOLLOWING "DEFINE" USED TO RE-ENABLE FULL LIBC FEATURES ON DIFFERENT OPERATING SYSTEMS
@@ -117,7 +117,7 @@ AC_TYPE_SIGNAL
 AC_FUNC_STAT
 AC_FUNC_UTIME_NULL
 AC_HEADER_TIME
-AC_CHECK_FUNCS([lchown mkdir regcomp rmdir strerror strerror_r utime fdopendir readdir_r])
+AC_CHECK_FUNCS([lchown mkdir regcomp rmdir strerror strerror_r utime fdopendir readdir_r ctime_r])
 
 AC_MSG_CHECKING([for c++11 support])
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],
