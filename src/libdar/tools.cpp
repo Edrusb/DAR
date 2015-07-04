@@ -2542,11 +2542,41 @@ namespace libdar
                 try
                 {
 #ifdef __DYNAMIC__
+#if HAVE_GETGRNAM_R
+		    struct group pgroup;
+		    struct group *result;
+		    U_I size = sysconf(_SC_GETGR_R_SIZE_MAX);
+		    char *buf = NULL;
+		    try
+		    {
+			buf = new char[size];
+			if(buf == NULL)
+			    throw Ememory("tools_ownsership2gid");
+
+			if(getgrnam_r(c_group,
+				      &pgroup,
+				      buf,
+				      size,
+				      &result) != 0
+			   || result == NULL)
+			    throw Erange("tools_ownership2gid", tools_printf(gettext("Unknown group: %s"), c_group));
+			ret = result->gr_gid;
+		    }
+		    catch(...)
+		    {
+			if(buf != NULL)
+			    delete buf;
+			throw;
+		    }
+		    if(buf != NULL)
+			delete buf;
+#else
                     struct group *pgroup = getgrnam(c_group);
                     if(pgroup == NULL)
                         throw Erange("tools_ownership2gid", tools_printf(gettext("Unknown group: %s"), c_group));
                     else
                         ret = pgroup->gr_gid;
+#endif
 #else
                     throw Erange("tools_ownership2gid", dar_gettext("Cannot convert username to uid in statically linked binary, either directly provide the UID or run libdar from a dynamically linked executable"));
 #endif
