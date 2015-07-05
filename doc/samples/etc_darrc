@@ -3,16 +3,15 @@
 #
 # This file provide a set of options referred each by a target
 # name. They are not applied unless you specify that target on
-# command line or included file. For example
-# dar [my options] par2
-# par2 will add all options following the line "par2:" below
-# up to the next target (compress-exclusion).
+# command line or included file. For example for par2:
+# dar <...list of options...> par2
 #
 # This options set are available automatically for dar unless
 # you define a .darrc in your home directory or use -N option
 # on command-line.
 # You can continue using this default file even if you use your
-# own .darrc file, by including the following in it:
+# own .darrc file, by including the following in it or explicitely
+# command-line:
 #
 #     -B /etc/darrc
 #
@@ -24,6 +23,7 @@
 # activates:
 #   - par2 file generation when creating an archive
 #   - par2 file verification and correction when testing an archive
+# usage: dar <options...>  par2
 
 par2:
   -B "SOMEPATH/dar_par.dcf"
@@ -33,6 +33,7 @@ par2:
 # avoid compressing types of file known to already be compressed
 # or to have very bad compression ratio
 #
+# usage: dar <options...> compress-exclusion
 
 compress-exclusion:
 # here we define some files that have not to be compressed.
@@ -79,6 +80,7 @@ compress-exclusion:
 -Z "*.zip"
 -Z "*.jar"
 -Z "*.rar"
+-Z "*.xz"
 
 # dar archives (may be compressed)
 -Z "*.dar"
@@ -91,9 +93,10 @@ compress-exclusion:
 #  target: verbose
 #  show both skipped files and files being processed
 #
+# usage: dar <options> verbose
 verbose:
--v
--vs
+-va
+
 
 ##############################################################
 # target: no-emacs-backup
