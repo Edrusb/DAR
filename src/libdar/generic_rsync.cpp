@@ -126,11 +126,11 @@ namespace libdar
 	if(working_buffer == nullptr)
 	    throw Ememory("generic_rsync::generic_rsync (sign)");
 
+#if LIBRSYNC_AVAILABLE
 	try
 	{
 		// loading signature into memory
 
-#if LIBRSYNC_AVAILABLE
 	    job = rs_loadsig_begin(&sumset);
 	    try
 	    {
@@ -363,14 +363,17 @@ namespace libdar
 	    throw SRC_BUG;
 	}
 
+#if LIBRSYNC_AVAILABLE
 	if(sumset != nullptr)
 	{
 	    rs_free_sumset(sumset);
 	    sumset = nullptr;
 	}
+#endif
 	free_job();
     }
 
+#if LIBRSYNC_AVAILABLE
     rs_result generic_rsync::patch_callback(void *opaque,
 					    rs_long_t pos,
 					    size_t *len,
@@ -400,7 +403,7 @@ namespace libdar
 
 	return ret;
     }
-
+#endif
 
     bool generic_rsync::step_forward(const char *buffer_in,
 				     U_I & avail_in,

@@ -77,7 +77,7 @@ namespace libdar
 
 	bool thread_safe()
 	{
-#if defined( MUTEX_WORKS ) || ! defined( LIBDAR_SPECIAL_ALLOC )
+#if defined( MUTEX_WORKS ) && !defined ( MISSING_REENTRANT_LIBCALL )
 	    return true;
 #else
 	    return false;
