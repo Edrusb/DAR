@@ -2579,56 +2579,64 @@ namespace libdar
 
             if(!direct_gid_set)
             {
-                char *c_group = tools_str2charptr(group);
-                try
-                {
 #ifdef __DYNAMIC__
+                const char *c_group = group.c_str();
 #if HAVE_GETGRNAM_R
-		    struct group pgroup;
-		    struct group *result;
-		    U_I size = sysconf(_SC_GETGR_R_SIZE_MAX);
-		    char *buf = nullptr;
-		    try
-		    {
-			buf = new char[size];
-			if(buf == nullptr)
-			    throw Ememory("tools_ownsership2gid");
+		struct group pgroup;
+		struct group *result;
+		U_I size = sysconf(_SC_GETGR_R_SIZE_MAX);
+		char *buf = nullptr;
+		try
+		{
+		    buf = new char[size];
+		    if(buf == nullptr)
+			throw Ememory("tools_ownsership2gid");
 
-			if(getgrnam_r(c_group,
-				      &pgroup,
-				      buf,
-				      size,
-				      &result) != 0
-			   || result == nullptr)
-			    throw Erange("tools_ownership2gid", tools_printf(gettext("Unknown group: %s"), c_group));
-			ret = result->gr_gid;
-		    }
-		    catch(...)
+		    S_I val = getgrnam_r(c_group,
+					 &pgroup,
+					 buf,
+					 size,
+					 &result);
+
+		    if(val != 0
+		       || result == nullptr)
 		    {
-			if(buf != nullptr)
-			    delete buf;
-			throw;
+			string err = (val == 0) ? gettext("Unknown group") : tools_strerror_r(errno);
+			throw Erange("tools_ownership2gid",
+				     tools_printf(gettext("Error found while looking fo GID of group %s: %S"),
+						  c_group,
+						  &err));
 		    }
+
+		    ret = result->gr_gid;
+
+		}
+		catch(...)
+		{
 		    if(buf != nullptr)
-			delete buf;
+			delete [] buf;
+		    throw;
+		}
+		if(buf != nullptr)
+		    delete [] buf;
 #else
-                    struct group *pgroup = getgrnam(c_group);
-                    if(pgroup == nullptr)
-                        throw Erange("tools_ownership2gid", tools_printf(gettext("Unknown group: %s"), c_group));
-                    else
-                        ret = pgroup->gr_gid;
+		errno = 0;
+		struct group *pgroup = getgrnam(c_group);
+		if(pgroup == nullptr)
+		{
+		    string err = (errno == 0) ? gettext("Unknown group") : tools_strerror_r(errno);
+		    throw Erange("tools_ownership2gid",
+				 tools_printf(gettext("Error found while looking fo GID of group %s: %S"),
+					      c_group,
+					      &err));
+		}
+
+		ret = pgroup->gr_gid;
 #endif
 #else
-                    throw Erange("tools_ownership2gid", dar_gettext("Cannot convert username to uid in statically linked binary, either directly provide the UID or run libdar from a dynamically linked executable"));
+		throw Erange("tools_ownership2gid", dar_gettext("Cannot convert username to uid in statically linked binary, either directly provide the UID or run libdar from a dynamically linked executable"));
 #endif
-                }
-                catch(...)
-                {
-                    delete [] c_group;
-                    throw;
-                }
-                delete [] c_group;
-            }
+	    }
         }
         catch(...)
         {
