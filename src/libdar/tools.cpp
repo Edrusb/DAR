@@ -176,6 +176,7 @@ namespace libdar
     static void abort_on_deadson(S_I sig);
     static bool is_a_slice_available(user_interaction & ui, const string & base, const string & extension, memory_pool *pool);
     static string retreive_basename(const string & base, const string & extension);
+    static void tools_localtime(const time_t & timep, struct tm *result);
 
     void tools_init()
     {
@@ -751,7 +752,9 @@ namespace libdar
 
             // then we define local variables
         time_t now = ::time(nullptr), when;
-        scan scanner = scan(*(localtime(&now)));
+	struct tm result;
+	tools_localtime(now, &result);
+        scan scanner = scan(result);
         U_I c, size = repres.size(), ret;
         struct tm tmp;
 
@@ -1609,6 +1612,29 @@ namespace libdar
         new_base = string(new_base.begin(), new_base.begin()+index);
 
         return new_base;
+    }
+
+    static void tools_localtime(const time_t & timep, struct tm *result)
+    {
+#if HAVE_LOCALTIME_R
+	struct tm *ret = localtime_r(&timep, result);
+	if(ret == nullptr)
+	{
+	    string err = tools_strerror_r(errno);
+	    throw Erange("tools_localtime",
+			 tools_printf(gettext("Error met while retrieving current time: %S"), &err));
+	}
+#else
+	struct tm *ret = localtime(&timep);
+	if(ret == nullptr)
+	{
+	    string err = tools_strerror_r(errno);
+	    throw Erange("tools_localtime",
+			 tools_printf(gettext("Error met while retrieving current time: %S"), &err));
+	}
+
+	*result = *ret;
+#endif
     }
 
     void tools_read_range(const string & s, S_I & min, U_I & max)
