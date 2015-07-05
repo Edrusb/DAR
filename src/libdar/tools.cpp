@@ -2486,11 +2486,52 @@ namespace libdar
                 try
                 {
 #ifdef __DYNAMIC__
+#if HAVE_GETPWNAM_R
+		    struct passwd puser;
+		    struct passwd *result;
+		    S_I size = sysconf(_SC_GETPW_R_SIZE_MAX);
+		    char *buf = nullptr;
+		    if(size == -1)
+			size = 16384;
+		    try
+		    {
+			buf = new char[size];
+			if(buf == nullptr)
+			    throw Ememory("tools_ownership2uid");
+
+			int val = getpwnam_r(c_user,
+					     &puser,
+					     buf,
+					     size,
+					     &result);
+
+			if(val != 0
+			   || result == nullptr)
+			{
+			    string err = val == 0 ? gettext("Unknown user") : tools_strerror_r(errno);
+			    throw Erange("tools_ownership2uid",
+					 tools_printf(gettext("Error found while looking for UID of user %s: %S"),
+						      c_user,
+						      &err));
+			}
+
+			ret = result->pw_uid;
+		    }
+		    catch(...)
+		    {
+			if(buf != nullptr)
+			    delete [] buf;
+			throw;
+		    }
+		    if(buf != nullptr)
+			delete [] buf;
+#else
                     struct passwd *puser = getpwnam(c_user);
                     if(puser == nullptr)
                         throw Erange("tools_ownership2uid", tools_printf(gettext("Unknown user: %s"), c_user));
                     else
                         ret = puser->pw_uid;
+#endif
 #else
                     throw Erange("tools_ownership2uid", dar_gettext("Cannot convert username to uid in statically linked binary, either directly provide the UID or run libdar from a dynamically linked executable"));
 #endif
