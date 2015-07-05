@@ -111,7 +111,7 @@ namespace libdar
 	void read_answer();   //< \note ptr must be released/recycled after this call
 	void check_answer(msg_type expected);
 	void wake_up_slave_if_asked(); //< check whether an order to wakeup the slave has been received, and send wake up the slave
-	void release_block_answer() { tomaster_ctrl.fetch_recycle(ptr); ptr = NULL; };
+	void release_block_answer() { tomaster_ctrl.fetch_recycle(ptr); ptr = nullptr; };
 	void release_data_ptr();
 	void purge_data_pipe(); //< drops all data in the toslave_data pipe
 	void my_run();

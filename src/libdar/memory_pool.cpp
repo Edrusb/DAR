@@ -36,12 +36,12 @@ namespace libdar
 
 	while(it != carte.end())
 	{
-	    if(it->second != NULL)
+	    if(it->second != nullptr)
 	    {
 		if(!it->second->is_empty())
 		    throw SRC_BUG;
 		delete it->second;
-		it->second = NULL;
+		it->second = nullptr;
 	    }
 	    ++it;
 	}
@@ -49,8 +49,8 @@ namespace libdar
 
     void *memory_pool::alloc(size_t size)
     {
-	alloc_ptr *ret = NULL;      //< address that will be returned
-	mem_allocator *ptr = NULL;  //< address of the object that has to be informed of memory release for the allocated block
+	alloc_ptr *ret = nullptr;      //< address that will be returned
+	mem_allocator *ptr = nullptr;  //< address of the object that has to be informed of memory release for the allocated block
 	size_t with_overhead = size + sizeof(alloc_ptr);
 	map<U_I, mem_sized *>::iterator it = carte.find(with_overhead);
 
@@ -68,7 +68,7 @@ namespace libdar
 	    // looking for a existing mem_sized object
 
 	if(it != carte.end())
-	    if(it->second == NULL)
+	    if(it->second == nullptr)
 		throw SRC_BUG;
 	    else  // found an existing mem_sized, requesting it a memory block
 		ret = (alloc_ptr *)it->second->alloc(ptr);
@@ -78,7 +78,7 @@ namespace libdar
 
 	    memory_check_special_new_sized(with_overhead);
 	    mem_sized *tmp = new (nothrow) mem_sized(with_overhead);
-	    if(tmp == NULL)
+	    if(tmp == nullptr)
 		throw SRC_BUG;
 
 		// we record the brand-new mem_sized
@@ -99,11 +99,11 @@ namespace libdar
 
 	    // filling the overhead structure before the memory block
 
-	if(ret != NULL)
+	if(ret != nullptr)
 	{
 	    try
 	    {
-		if(ptr == NULL)
+		if(ptr == nullptr)
 		    throw SRC_BUG;
 		ret->ptr = ptr;
 		++ret;
@@ -123,11 +123,11 @@ namespace libdar
     {
 	alloc_ptr *tmp = (alloc_ptr *)ptr;
 
-	if(tmp == NULL)
-	    throw SRC_BUG; // trying to release block at NULL
+	if(tmp == nullptr)
+	    throw SRC_BUG; // trying to release block at nullptr
 	--tmp;  // moving to the previous header
-	if(tmp->ptr == NULL)
-	    throw SRC_BUG; // NULL found for the mem_allocator of that block
+	if(tmp->ptr == nullptr)
+	    throw SRC_BUG; // nullptr found for the mem_allocator of that block
 	tmp->ptr->release((void *)tmp);
 	memory_check_special_report_delete(ptr);
     }
@@ -138,7 +138,7 @@ namespace libdar
 
 	while(it != carte.end())
 	{
-	    if(it->second == NULL)
+	    if(it->second == nullptr)
 		throw SRC_BUG;
 	    if(it->second->is_empty())
 	    {
@@ -165,7 +165,7 @@ namespace libdar
 	ret += "  SPECIAL ALLOCATION MODULE REPORTS UNRELEASED MEMORY ALLOCATIONS\n\n";
 	while(it != carte.end())
 	{
-	    if(it->second == NULL)
+	    if(it->second == nullptr)
 		ret += tools_printf("!?! NO corresponding mem_sized object for block size %d\n", it->first);
 	    else
 	    {
@@ -202,8 +202,8 @@ namespace libdar
 		freq = 0;
 	    else
 		freq = cit->second;
-	    if(it->second == NULL)
-		ret += tools_printf(" NULL reference associated to %d bytes blocks !?!?! (number of requests %d)\n",
+	    if(it->second == nullptr)
+		ret += tools_printf(" nullptr reference associated to %d bytes blocks !?!?! (number of requests %d)\n",
 				    it->first, freq);
 	    else
 		ret += tools_printf(" Usage for %d bytes blocks : %d %% (number of requests %d)\n",

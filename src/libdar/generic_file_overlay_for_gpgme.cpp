@@ -41,7 +41,7 @@ namespace libdar
 #ifdef GPGME_SUPPORT
 	gpgme_error_t err;
 
-	if(f == NULL)
+	if(f == nullptr)
 	    throw SRC_BUG;
 	below = f;
 	cbs.read = &gpgme_data_read_cb;

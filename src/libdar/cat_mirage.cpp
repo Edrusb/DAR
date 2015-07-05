@@ -98,12 +98,12 @@ namespace libdar
         infinint tmp_tiquette;
         char tmp_flag;
         map<infinint, cat_etoile *>::iterator etl;
-        cat_inode *ino_ptr = NULL;
-        cat_entree *entree_ptr = NULL;
+        cat_inode *ino_ptr = nullptr;
+        cat_entree *entree_ptr = nullptr;
         entree_stats fake_stats; // the call to cat_entree::read will increment counters with the inode we will read
             // but this inode will also be counted from the cat_entree::read we are called from.
             // thus we must not increment the real entree_stats structure here and we use a local variable
-	generic_file *ptr = NULL;
+	generic_file *ptr = nullptr;
 
 	pdesc.check(small);
 	if(small)
@@ -141,7 +141,7 @@ namespace libdar
                 throw Erange("cat_mirage::cat_mirage", gettext("Incoherent catalogue structure: hard linked inode's data not found"));
             else
             {
-                if(etl->second == NULL)
+                if(etl->second == nullptr)
                     throw SRC_BUG;
                 star_ref = etl->second;
                 star_ref->add_ref(this);
@@ -155,7 +155,7 @@ namespace libdar
             {
                 cat_nomme *tmp_ptr = new (get_pool()) cat_file(dialog, pdesc, reading_ver, saved, default_algo, small);
                 entree_ptr = tmp_ptr;
-                if(tmp_ptr != NULL)
+                if(tmp_ptr != nullptr)
                 {
                     change_name(tmp_ptr->get_name());
                     tmp_ptr->change_name("");
@@ -168,12 +168,12 @@ namespace libdar
                 entree_ptr = cat_entree::read(dialog, get_pool(), pdesc, reading_ver, fake_stats, corres, default_algo, lax, false, small);
 
             ino_ptr = dynamic_cast<cat_inode *>(entree_ptr);
-            if(ino_ptr == NULL || dynamic_cast<cat_directory *>(entree_ptr) != NULL)
+            if(ino_ptr == nullptr || dynamic_cast<cat_directory *>(entree_ptr) != nullptr)
             {
-                if(entree_ptr != NULL)
+                if(entree_ptr != nullptr)
                 {
                     delete entree_ptr;
-                    entree_ptr = NULL;
+                    entree_ptr = nullptr;
                 }
                 throw Erange("cat_mirage::cat_mirage", gettext("Incoherent catalogue structure: hard linked data is not an inode"));
             }
@@ -192,18 +192,18 @@ namespace libdar
                     star_ref = new (get_pool()) cat_etoile(ino_ptr, tmp_tiquette);
                     try
                     {
-                        if(star_ref == NULL)
+                        if(star_ref == nullptr)
                             throw Ememory("cat_mirage::cat_mirage");
-                        ino_ptr = NULL; // the object pointed to by ino_ptr is now managed by star_ref
+                        ino_ptr = nullptr; // the object pointed to by ino_ptr is now managed by star_ref
                         star_ref->add_ref(this);
                         corres[tmp_tiquette] = star_ref;
                     }
                     catch(...)
                     {
-                        if(star_ref != NULL)
+                        if(star_ref != nullptr)
                         {
                             delete star_ref;
-                            star_ref = NULL;
+                            star_ref = nullptr;
                         }
                         etl = corres.find(tmp_tiquette);
                         if(etl != corres.end())
@@ -216,10 +216,10 @@ namespace libdar
             }
             catch(...)
             {
-                if(ino_ptr != NULL)
+                if(ino_ptr != nullptr)
                 {
                     delete ino_ptr;
-                    ino_ptr = NULL;
+                    ino_ptr = nullptr;
                 }
                 throw;
             }
@@ -237,7 +237,7 @@ namespace libdar
         cat_nomme * this_nom = this;
         *this_nom = *ref_nom; // copying the cat_nomme part of these objects
 
-        if(ref.star_ref == NULL)
+        if(ref.star_ref == nullptr)
             throw SRC_BUG;
         tmp_ref = star_ref;
         star_ref = ref.star_ref;
@@ -251,7 +251,7 @@ namespace libdar
     {
 	cat_nomme::post_constructor(pdesc);
 
-        if(star_ref == NULL)
+        if(star_ref == nullptr)
             throw SRC_BUG;
 
         if(star_ref->get_ref_count() == 1) // first time this inode is seen
@@ -262,14 +262,14 @@ namespace libdar
     {
 	const cat_mirage *ref_mirage = dynamic_cast<const cat_mirage *>(&ref);
 
-	if(ref_mirage == NULL)
+	if(ref_mirage == nullptr)
 	    return false;
 	else
 	{
 	    cat_inode *me = get_inode();
 	    cat_inode *you = ref_mirage->get_inode();
 
-	    if(me == NULL || you == NULL)
+	    if(me == nullptr || you == nullptr)
 		throw SRC_BUG;
 	    me->change_name(get_name());
 	    you->change_name(get_name());
@@ -282,7 +282,7 @@ namespace libdar
 
     void cat_mirage::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
-	generic_file *ptr = NULL;
+	generic_file *ptr = nullptr;
 
 	pdesc.check(small);
 	if(small)

@@ -105,7 +105,7 @@ namespace libdar
 
     bool regular_mask::is_covered(const string & expression) const
     {
-        return regexec(&preg, expression.c_str(), 0, NULL, 0) != REG_NOMATCH;
+        return regexec(&preg, expression.c_str(), 0, nullptr, 0) != REG_NOMATCH;
     }
 
     void regular_mask::set_preg(const string & wilde_card_expression, bool x_case_sensit)
@@ -135,23 +135,23 @@ namespace libdar
     void not_mask::copy_from(const not_mask &m)
     {
         ref = m.ref->clone();
-        if(ref == NULL)
+        if(ref == nullptr)
             throw Ememory("not_mask::copy_from(not_mask)");
     }
 
     void not_mask::copy_from(const mask &m)
     {
         ref = m.clone();
-        if(ref == NULL)
+        if(ref == nullptr)
             throw Ememory("not_mask::copy_from(mask)");
     }
 
     void not_mask::detruit()
     {
-        if(ref != NULL)
+        if(ref != nullptr)
         {
             delete ref;
-            ref = NULL;
+            ref = nullptr;
         }
     }
 
@@ -168,7 +168,7 @@ namespace libdar
     void et_mask::add_mask(const mask& toadd)
     {
         mask *t = toadd.clone();
-        if(t != NULL)
+        if(t != nullptr)
             lst.push_back(t);
         else
             throw Ememory("et_mask::et_mask");
@@ -179,7 +179,7 @@ namespace libdar
         vector<mask *>::const_iterator it = m.lst.begin();
         mask *tmp;
 
-        while(it != m.lst.end() && (tmp = (*it)->clone()) != NULL)
+        while(it != m.lst.end() && (tmp = (*it)->clone()) != nullptr)
         {
             lst.push_back(tmp);
             ++it;
@@ -199,7 +199,7 @@ namespace libdar
         while(it != lst.end())
         {
             delete *it;
-	    *it = NULL;
+	    *it = nullptr;
             ++it;
         }
         lst.clear();

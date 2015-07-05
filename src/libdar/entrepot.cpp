@@ -82,7 +82,7 @@ namespace libdar
 				   bool erase,
 				   hash_algo algo) const
     {
-	fichier_global *ret = NULL;
+	fichier_global *ret = nullptr;
 
 	    // sanity check
 	if(algo != hash_none && (mode != gf_write_only || (!erase && !fail_if_exists)))
@@ -98,15 +98,15 @@ namespace libdar
 			     fail_if_exists,
 			     erase);
 
-	if(ret == NULL)
+	if(ret == nullptr)
 	    throw SRC_BUG;
 
 	try
 	{
 	    if(algo != hash_none)
 	    {
-		fichier_global *hash_file = NULL;
-		fichier_global *tmp = NULL;
+		fichier_global *hash_file = nullptr;
+		fichier_global *tmp = nullptr;
 
 		    // creating the file to write hash to
 
@@ -120,7 +120,7 @@ namespace libdar
 					       fail_if_exists,
 					       erase);
 
-		    if(hash_file == NULL)
+		    if(hash_file == nullptr)
 			throw SRC_BUG;
 
 		    try
@@ -130,17 +130,17 @@ namespace libdar
 							    filename,
 							    hash_file,
 							    algo);
-			if(tmp == NULL)
+			if(tmp == nullptr)
 			    throw Ememory("entrepot::entrepot");
 			else
 			{
 			    ret = tmp;
-			    hash_file = NULL;
+			    hash_file = nullptr;
 			}
 		    }
 		    catch(...)
 		    {
-			if(hash_file != NULL)
+			if(hash_file != nullptr)
 			    delete hash_file;
 			throw;
 		    }
@@ -155,10 +155,10 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    if(ret != NULL)
+	    if(ret != nullptr)
 	    {
 		delete ret;
-		ret = NULL;
+		ret = nullptr;
 	    }
 	    throw;
 	}

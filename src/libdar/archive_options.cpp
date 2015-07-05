@@ -55,16 +55,16 @@ namespace libdar
     {
 	archive_option_destroy_mask(ptr);
 	ptr = new (pool) bool_mask(all);
-	if(ptr == NULL)
+	if(ptr == nullptr)
 	    throw Ememory("archive_option_clean_mask");
     }
 
     inline void archive_option_destroy_mask(mask * & ptr)
     {
-	if(ptr != NULL)
+	if(ptr != nullptr)
 	{
 	    delete ptr;
-	    ptr = NULL;
+	    ptr = nullptr;
 	}
     }
 
@@ -72,16 +72,16 @@ namespace libdar
     {
 	archive_option_destroy_crit_action(ptr);
 	ptr = default_crit_action.clone();
-	if(ptr == NULL)
+	if(ptr == nullptr)
 	    throw Ememory("archive_options::archive_option_clean_crit_action");
     }
 
     inline void archive_option_destroy_crit_action(crit_action * & ptr)
     {
-	if(ptr != NULL)
+	if(ptr != nullptr)
 	{
 	    delete ptr;
-	    ptr = NULL;
+	    ptr = nullptr;
 	}
     }
 
@@ -92,8 +92,8 @@ namespace libdar
 
     archive_options_read::archive_options_read() : x_ref_chem(default_ref_chem)
     {
-	x_entrepot = NULL;
-	x_ref_entrepot = NULL;
+	x_entrepot = nullptr;
+	x_ref_entrepot = nullptr;
 	clear();
     }
 
@@ -115,7 +115,7 @@ namespace libdar
 	x_sequential_read = false;
 	x_slice_min_digits = 0;
 	x_entrepot = new (get_pool()) entrepot_local("", "", false); // never using furtive_mode to read slices
-	if(x_entrepot == NULL)
+	if(x_entrepot == nullptr)
 	    throw Ememory("archive_options_read::clear");
 	x_ignore_signature_check_failure = false;
 	x_multi_threaded = true;
@@ -130,7 +130,7 @@ namespace libdar
 	x_ref_execute = "";
 	x_ref_slice_min_digits = 0;
 	x_ref_entrepot = new (get_pool()) entrepot_local("", "", false); // never using furtive_mode to read slices
-	if(x_ref_entrepot == NULL)
+	if(x_ref_entrepot == nullptr)
 	    throw Ememory("archive_options_read::clear");
     }
 
@@ -196,10 +196,10 @@ namespace libdar
 	x_lax = ref.x_lax;
 	x_sequential_read = ref.x_sequential_read;
 	x_slice_min_digits = ref.x_slice_min_digits;
-	if(ref.x_entrepot == NULL)
+	if(ref.x_entrepot == nullptr)
 	    throw SRC_BUG;
 	x_entrepot = ref.x_entrepot->clone();
-	if(x_entrepot == NULL)
+	if(x_entrepot == nullptr)
 	    throw Ememory("archive_options_read::copy_from");
 	x_ignore_signature_check_failure = ref.x_ignore_signature_check_failure;
 	x_multi_threaded = ref.x_multi_threaded;
@@ -213,24 +213,24 @@ namespace libdar
 	x_ref_crypto_size = ref.x_ref_crypto_size;
 	x_ref_execute = ref.x_ref_execute;
 	x_ref_slice_min_digits = ref.x_ref_slice_min_digits;
-	if(ref.x_ref_entrepot == NULL)
+	if(ref.x_ref_entrepot == nullptr)
 	    throw SRC_BUG;
 	x_ref_entrepot = ref.x_ref_entrepot->clone();
-	if(x_ref_entrepot == NULL)
+	if(x_ref_entrepot == nullptr)
 	    throw Ememory("archive_options_read::copy_from");
     }
 
     void archive_options_read::detruit()
     {
-	if(x_entrepot != NULL)
+	if(x_entrepot != nullptr)
 	{
 	    delete x_entrepot;
-	    x_entrepot = NULL;
+	    x_entrepot = nullptr;
 	}
-	if(x_ref_entrepot != NULL)
+	if(x_ref_entrepot != nullptr)
 	{
 	    delete x_ref_entrepot;
-	    x_ref_entrepot = NULL;
+	    x_ref_entrepot = nullptr;
 	}
     }
 
@@ -243,8 +243,8 @@ namespace libdar
 
     archive_options_create::archive_options_create()
     {
-	x_selection = x_subtree = x_ea_mask = x_compr_mask = x_backup_hook_file_mask = NULL;
-	x_entrepot = NULL;
+	x_selection = x_subtree = x_ea_mask = x_compr_mask = x_backup_hook_file_mask = nullptr;
+	x_entrepot = nullptr;
 	try
 	{
 	    clear();
@@ -258,8 +258,8 @@ namespace libdar
 
     archive_options_create::archive_options_create(const archive_options_create & ref)
     {
-	x_selection = x_subtree = x_ea_mask = x_compr_mask = x_backup_hook_file_mask = NULL;
-	x_entrepot = NULL;
+	x_selection = x_subtree = x_ea_mask = x_compr_mask = x_backup_hook_file_mask = nullptr;
+	x_entrepot = nullptr;
 	try
 	{
 	    copy_from(ref);
@@ -284,7 +284,7 @@ namespace libdar
 	    archive_option_clean_mask(x_ea_mask, get_pool());
 	    archive_option_clean_mask(x_compr_mask, get_pool());
 	    archive_option_clean_mask(x_backup_hook_file_mask, get_pool(), false);
-	    x_ref_arch = NULL;
+	    x_ref_arch = nullptr;
 	    x_allow_over = true;
 	    x_warn_over = true;
 	    x_info_details = false;
@@ -336,7 +336,7 @@ namespace libdar
 	    x_backup_hook_file_execute = "";
 	    x_ignore_unknown = false;
 	    x_entrepot = new (get_pool()) entrepot_local( "", "", false); // never using furtive_mode to read slices
-	    if(x_entrepot == NULL)
+	    if(x_entrepot == nullptr)
 		throw Ememory("archive_options_create::clear");
 	    x_scope = all_fsa_families();
 	    x_multi_threaded = true;
@@ -356,7 +356,7 @@ namespace libdar
 	{
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
-	    if(x_selection == NULL)
+	    if(x_selection == nullptr)
 		throw Ememory("archive_options_create::set_selection");
 	}
 	catch(...)
@@ -374,7 +374,7 @@ namespace libdar
 	{
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
-	    if(x_subtree == NULL)
+	    if(x_subtree == nullptr)
 		throw Ememory("archive_options_create::set_subtree");
 	}
 	catch(...)
@@ -392,7 +392,7 @@ namespace libdar
 	{
 	    archive_option_destroy_mask(x_ea_mask);
 	    x_ea_mask = ea_mask.clone();
-	    if(x_ea_mask == NULL)
+	    if(x_ea_mask == nullptr)
 		throw Ememory("archive_options_create::set_ea_mask");
 	}
 	catch(...)
@@ -419,7 +419,7 @@ namespace libdar
 	{
 	    archive_option_destroy_mask(x_compr_mask);
 	    x_compr_mask = compr_mask.clone();
-	    if(x_compr_mask == NULL)
+	    if(x_compr_mask == nullptr)
 		throw Ememory("archive_options_create::set_compr_mask");
 	}
 	catch(...)
@@ -438,7 +438,7 @@ namespace libdar
 	{
 	    archive_option_destroy_mask(x_backup_hook_file_mask);
 	    x_backup_hook_file_mask = which_files.clone();
-	    if(x_backup_hook_file_mask == NULL)
+	    if(x_backup_hook_file_mask == nullptr)
 		throw Ememory("archive_options_create::set_backup_hook");
 
 	    x_backup_hook_file_execute = execute;
@@ -453,11 +453,11 @@ namespace libdar
 
     void archive_options_create::set_entrepot(const entrepot & entr)
     {
-	if(x_entrepot != NULL)
+	if(x_entrepot != nullptr)
 	    delete x_entrepot;
 
 	x_entrepot = entr.clone();
-	if(x_entrepot == NULL)
+	if(x_entrepot == nullptr)
 	    throw Ememory("archive_options_create::set_entrepot");
     }
 
@@ -471,10 +471,10 @@ namespace libdar
 	    archive_option_destroy_mask(x_ea_mask);
 	    archive_option_destroy_mask(x_compr_mask);
 	    archive_option_destroy_mask(x_backup_hook_file_mask);
-	    if(x_entrepot != NULL)
+	    if(x_entrepot != nullptr)
 	    {
 		delete x_entrepot;
-		x_entrepot = NULL;
+		x_entrepot = nullptr;
 	    }
 	}
 	catch(...)
@@ -487,22 +487,22 @@ namespace libdar
 
     void archive_options_create::copy_from(const archive_options_create & ref)
     {
-	x_selection = NULL;
-	x_subtree = NULL;
-	x_ea_mask = NULL;
-	x_compr_mask = NULL;
-	x_backup_hook_file_mask = NULL;
-	x_entrepot = NULL;
+	x_selection = nullptr;
+	x_subtree = nullptr;
+	x_ea_mask = nullptr;
+	x_compr_mask = nullptr;
+	x_backup_hook_file_mask = nullptr;
+	x_entrepot = nullptr;
 
-	if(ref.x_selection == NULL)
+	if(ref.x_selection == nullptr)
 	    throw SRC_BUG;
-	if(ref.x_subtree == NULL)
+	if(ref.x_subtree == nullptr)
 	    throw SRC_BUG;
-	if(ref.x_ea_mask == NULL)
+	if(ref.x_ea_mask == nullptr)
 	    throw SRC_BUG;
-	if(ref.x_compr_mask == NULL)
+	if(ref.x_compr_mask == nullptr)
 	    throw SRC_BUG;
-	if(ref.x_backup_hook_file_mask == NULL)
+	if(ref.x_backup_hook_file_mask == nullptr)
 	    throw SRC_BUG;
 	x_selection = ref.x_selection->clone();
 	x_subtree = ref.x_subtree->clone();
@@ -510,7 +510,7 @@ namespace libdar
 	x_compr_mask = ref.x_compr_mask->clone();
 	x_backup_hook_file_mask = ref.x_backup_hook_file_mask->clone();
 
-	if(x_selection == NULL || x_subtree == NULL || x_ea_mask == NULL || x_compr_mask == NULL || x_backup_hook_file_mask == NULL)
+	if(x_selection == nullptr || x_subtree == nullptr || x_ea_mask == nullptr || x_compr_mask == nullptr || x_backup_hook_file_mask == nullptr)
 	    throw Ememory("archive_options_create::copy_from");
 
 	x_ref_arch = ref.x_ref_arch;
@@ -559,10 +559,10 @@ namespace libdar
 	x_slice_min_digits = ref.x_slice_min_digits;
 	x_backup_hook_file_execute = ref.x_backup_hook_file_execute;
 	x_ignore_unknown = ref.x_ignore_unknown;
-	if(x_entrepot != NULL)
+	if(x_entrepot != nullptr)
 	    throw SRC_BUG;
 	x_entrepot = ref.x_entrepot->clone();
-	if(x_entrepot == NULL)
+	if(x_entrepot == nullptr)
 	    throw Ememory("archive_options_create::copy_from");
 	x_scope = ref.x_scope;
 	x_multi_threaded = ref.x_multi_threaded;
@@ -604,7 +604,7 @@ namespace libdar
 	    x_slice_min_digits = 0;
 	    x_sequential_marks = true;
 	    x_entrepot = new (get_pool()) entrepot_local("", "", false); // never using furtive_mode to read slices
-	    if(x_entrepot == NULL)
+	    if(x_entrepot == nullptr)
 		throw Ememory("archive_options_isolate::clear");
 	    x_multi_threaded = true;
 	}
@@ -626,20 +626,20 @@ namespace libdar
 
     void archive_options_isolate::set_entrepot(const entrepot & entr)
     {
-	if(x_entrepot != NULL)
+	if(x_entrepot != nullptr)
 	    delete x_entrepot;
 
 	x_entrepot = entr.clone();
-	if(x_entrepot == NULL)
+	if(x_entrepot == nullptr)
 	    throw Ememory("archive_options_isolate::set_entrepot");
     }
 
     void archive_options_isolate::destroy()
     {
-	if(x_entrepot != NULL)
+	if(x_entrepot != nullptr)
 	{
 	    delete x_entrepot;
-	    x_entrepot = NULL;
+	    x_entrepot = nullptr;
 	}
     }
 
@@ -668,10 +668,10 @@ namespace libdar
 	x_hash = ref.x_hash;
 	x_slice_min_digits = ref.x_slice_min_digits;
 	x_sequential_marks = ref.x_sequential_marks;
-	if(ref.x_entrepot == NULL)
+	if(ref.x_entrepot == nullptr)
 	    throw SRC_BUG;
 	x_entrepot = ref.x_entrepot->clone();
-	if(x_entrepot == NULL)
+	if(x_entrepot == nullptr)
 	    throw Ememory("archive_options_isolate::copy_from");
 	x_multi_threaded = ref.x_multi_threaded;
     }
@@ -694,7 +694,7 @@ namespace libdar
 	    archive_option_clean_mask(x_ea_mask, get_pool());
 	    archive_option_clean_mask(x_compr_mask, get_pool());
 	    archive_option_clean_crit_action(x_overwrite);
-	    x_ref = NULL;
+	    x_ref = nullptr;
 	    x_allow_over = true;
 	    x_warn_over = true;
 	    x_info_details = false;
@@ -727,7 +727,7 @@ namespace libdar
 	    x_hash = hash_none;
 	    x_slice_min_digits = 0;
 	    x_entrepot = new (get_pool()) entrepot_local("", "", false); // never using furtive_mode to read slices
-	    if(x_entrepot == NULL)
+	    if(x_entrepot == nullptr)
 		throw Ememory("archive_options_merge::clear");
 	    x_scope = all_fsa_families();
 	    x_multi_threaded = true;
@@ -747,7 +747,7 @@ namespace libdar
 	{
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
-	    if(x_selection == NULL)
+	    if(x_selection == nullptr)
 		throw Ememory("archive_options_merge::set_selection");
 	}
 	catch(...)
@@ -765,7 +765,7 @@ namespace libdar
 	{
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
-	    if(x_subtree == NULL)
+	    if(x_subtree == nullptr)
 		throw Ememory("archive_options_merge::set_subtree");
 	}
         catch(...)
@@ -783,7 +783,7 @@ namespace libdar
 	{
 	    archive_option_destroy_crit_action(x_overwrite);
 	    x_overwrite = overwrite.clone();
-	    if(x_overwrite == NULL)
+	    if(x_overwrite == nullptr)
 		throw Ememory("archive_options_merge::set_overwriting_rules");
 	}
         catch(...)
@@ -801,7 +801,7 @@ namespace libdar
 	{
 	    archive_option_destroy_mask(x_ea_mask);
 	    x_ea_mask = ea_mask.clone();
-	    if(x_ea_mask == NULL)
+	    if(x_ea_mask == nullptr)
 		throw Ememory("archive_options_merge::set_ea_mask");
 	}
 	catch(...)
@@ -827,7 +827,7 @@ namespace libdar
 	{
 	    archive_option_destroy_mask(x_compr_mask);
 	    x_compr_mask = compr_mask.clone();
-	    if(x_compr_mask == NULL)
+	    if(x_compr_mask == nullptr)
 		throw Ememory("archive_options_merge::set_compr_mask");
 	}
 	catch(...)
@@ -841,11 +841,11 @@ namespace libdar
 
     void archive_options_merge::set_entrepot(const entrepot & entr)
     {
-	if(x_entrepot != NULL)
+	if(x_entrepot != nullptr)
 	    delete x_entrepot;
 
 	x_entrepot = entr.clone();
-	if(x_entrepot == NULL)
+	if(x_entrepot == nullptr)
 	    throw Ememory("archive_options_merge::set_entrepot");
     }
 
@@ -860,10 +860,10 @@ namespace libdar
 	    archive_option_destroy_mask(x_ea_mask);
 	    archive_option_destroy_mask(x_compr_mask);
 	    archive_option_destroy_crit_action(x_overwrite);
-	    if(x_entrepot != NULL)
+	    if(x_entrepot != nullptr)
 	    {
 		delete x_entrepot;
-		x_entrepot = NULL;
+		x_entrepot = nullptr;
 	    }
 	}
 	catch(...)
@@ -876,26 +876,26 @@ namespace libdar
 
     void archive_options_merge::copy_from(const archive_options_merge & ref)
     {
-	x_selection = NULL;
-	x_subtree = NULL;
-	x_ea_mask = NULL;
-	x_compr_mask = NULL;
-	x_overwrite = NULL;
-	x_entrepot = NULL;
+	x_selection = nullptr;
+	x_subtree = nullptr;
+	x_ea_mask = nullptr;
+	x_compr_mask = nullptr;
+	x_overwrite = nullptr;
+	x_entrepot = nullptr;
 
 	try
 	{
-	    if(ref.x_selection == NULL)
+	    if(ref.x_selection == nullptr)
 		throw SRC_BUG;
-	    if(ref.x_subtree == NULL)
+	    if(ref.x_subtree == nullptr)
 		throw SRC_BUG;
-	    if(ref.x_ea_mask == NULL)
+	    if(ref.x_ea_mask == nullptr)
 		throw SRC_BUG;
-	    if(ref.x_compr_mask == NULL)
+	    if(ref.x_compr_mask == nullptr)
 		throw SRC_BUG;
-	    if(ref.x_overwrite == NULL)
+	    if(ref.x_overwrite == nullptr)
 		throw SRC_BUG;
-	    if(ref.x_entrepot == NULL)
+	    if(ref.x_entrepot == nullptr)
 		throw SRC_BUG;
 
 	    x_selection = ref.x_selection->clone();
@@ -905,7 +905,7 @@ namespace libdar
 	    x_overwrite = ref.x_overwrite->clone();
 	    x_entrepot = ref.x_entrepot->clone();
 
-	    if(x_selection == NULL || x_subtree == NULL || x_ea_mask == NULL || x_compr_mask == NULL || x_overwrite == NULL || x_entrepot == NULL)
+	    if(x_selection == nullptr || x_subtree == nullptr || x_ea_mask == nullptr || x_compr_mask == nullptr || x_overwrite == nullptr || x_entrepot == nullptr)
 		throw Ememory("archive_options_extract::copy_from");
 
 	    x_ref = ref.x_ref;
@@ -994,7 +994,7 @@ namespace libdar
 	{
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
-	    if(x_selection == NULL)
+	    if(x_selection == nullptr)
 		throw Ememory("archive_options_extract::set_selection");
 	}
 	catch(...)
@@ -1012,7 +1012,7 @@ namespace libdar
 	{
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
-	    if(x_subtree == NULL)
+	    if(x_subtree == nullptr)
 		throw Ememory("archive_options_extract::set_subtree");
 	}
 	catch(...)
@@ -1030,7 +1030,7 @@ namespace libdar
 	{
 	    archive_option_destroy_mask(x_ea_mask);
 	    x_ea_mask = ea_mask.clone();
-	    if(x_ea_mask == NULL)
+	    if(x_ea_mask == nullptr)
 		throw Ememory("archive_options_extract::set_ea_mask");
 	}
 	catch(...)
@@ -1048,7 +1048,7 @@ namespace libdar
 	{
 	    archive_option_destroy_crit_action(x_overwrite);
 	    x_overwrite = over.clone();
-	    if(x_overwrite == NULL)
+	    if(x_overwrite == nullptr)
 		throw Ememory("archive_options_extract::set_overwriting_rules");
 	}
 	catch(...)
@@ -1079,27 +1079,27 @@ namespace libdar
 
     void archive_options_extract::copy_from(const archive_options_extract & ref)
     {
-	x_selection = NULL;
-	x_subtree = NULL;
-	x_ea_mask = NULL;
-	x_overwrite = NULL;
+	x_selection = nullptr;
+	x_subtree = nullptr;
+	x_ea_mask = nullptr;
+	x_overwrite = nullptr;
 
 	try
 	{
-	    if(ref.x_selection == NULL)
+	    if(ref.x_selection == nullptr)
 		throw SRC_BUG;
-	    if(ref.x_subtree == NULL)
+	    if(ref.x_subtree == nullptr)
 		throw SRC_BUG;
-	    if(ref.x_ea_mask == NULL)
+	    if(ref.x_ea_mask == nullptr)
 		throw SRC_BUG;
-	    if(ref.x_overwrite == NULL)
+	    if(ref.x_overwrite == nullptr)
 		throw SRC_BUG;
 	    x_selection = ref.x_selection->clone();
 	    x_subtree = ref.x_subtree->clone();
 	    x_ea_mask = ref.x_ea_mask->clone();
 	    x_overwrite = ref.x_overwrite->clone();
 
-	    if(x_selection == NULL || x_subtree == NULL || x_ea_mask == NULL || x_overwrite == NULL)
+	    if(x_selection == nullptr || x_subtree == nullptr || x_ea_mask == nullptr || x_overwrite == nullptr)
 		throw Ememory("archive_options_extract::copy_from");
 
 	    x_warn_over = ref.x_warn_over;
@@ -1158,7 +1158,7 @@ namespace libdar
 	{
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
-	    if(x_selection == NULL)
+	    if(x_selection == nullptr)
 		throw Ememory("archive_options_listing::set_selection");
 	}
 	catch(...)
@@ -1176,7 +1176,7 @@ namespace libdar
 	{
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
-	    if(x_subtree == NULL)
+	    if(x_subtree == nullptr)
 		throw Ememory("archive_options_listing::set_subtree");
 	}
 	catch(...)
@@ -1189,19 +1189,19 @@ namespace libdar
 
     void archive_options_listing::set_user_slicing(const infinint & slicing_first, const infinint & slicing_others)
     {
-	if(x_slicing_first == NULL)
+	if(x_slicing_first == nullptr)
 	{
 	    x_slicing_first = new (get_pool()) infinint(slicing_first);
-	    if(x_slicing_first == NULL)
+	    if(x_slicing_first == nullptr)
 		throw Ememory("archive_options_listing::set_user_slicing");
 	}
 	else
 	    *x_slicing_first = slicing_first;
 
-	if(x_slicing_others == NULL)
+	if(x_slicing_others == nullptr)
 	{
 	    x_slicing_others = new (get_pool()) infinint(slicing_others);
-	    if(x_slicing_others == NULL)
+	    if(x_slicing_others == nullptr)
 		throw Ememory("archive_options_listing::set_user_slicing");
 	}
 	else
@@ -1210,21 +1210,21 @@ namespace libdar
 
     const mask & archive_options_listing::get_selection() const
     {
-	if(x_selection == NULL)
+	if(x_selection == nullptr)
 	    throw Erange("archive_option_listing", dar_gettext("No mask available"));
 	return *x_selection;
     }
 
     const mask & archive_options_listing::get_subtree() const
     {
-	if(x_subtree == NULL)
+	if(x_subtree == nullptr)
 	    throw Erange("archive_option_listing", dar_gettext("No mask available"));
 	return *x_subtree;
     }
 
     bool archive_options_listing::get_user_slicing(infinint & slicing_first, infinint & slicing_others) const
     {
-	if(x_slicing_first != NULL && x_slicing_others != NULL)
+	if(x_slicing_first != nullptr && x_slicing_others != nullptr)
 	{
 	    slicing_first = *x_slicing_first;
 	    slicing_others = *x_slicing_others;
@@ -1240,15 +1240,15 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    if(x_slicing_first != NULL)
+	    if(x_slicing_first != nullptr)
 	    {
 		delete x_slicing_first;
-		x_slicing_first = NULL;
+		x_slicing_first = nullptr;
 	    }
-	    if(x_slicing_others != NULL)
+	    if(x_slicing_others != nullptr)
 	    {
 		delete x_slicing_others;
-		x_slicing_others = NULL;
+		x_slicing_others = nullptr;
 	    }
 	    archive_option_destroy_mask(x_selection);
 	    archive_option_destroy_mask(x_subtree);
@@ -1263,29 +1263,29 @@ namespace libdar
 
     void archive_options_listing::copy_from(const archive_options_listing & ref)
     {
-	x_selection = NULL;
-	x_subtree = NULL;
-	x_slicing_first = NULL;
-	x_slicing_others = NULL;
+	x_selection = nullptr;
+	x_subtree = nullptr;
+	x_slicing_first = nullptr;
+	x_slicing_others = nullptr;
 
 	try
 	{
-	    if(ref.x_selection == NULL)
+	    if(ref.x_selection == nullptr)
 		throw SRC_BUG;
 	    x_selection = ref.x_selection->clone();
 	    x_subtree = ref.x_subtree->clone();
-	    if(x_selection == NULL || x_subtree == NULL)
+	    if(x_selection == nullptr || x_subtree == nullptr)
 		throw Ememory("archive_options_listing::copy_from");
-	    if(ref.x_slicing_first != NULL)
+	    if(ref.x_slicing_first != nullptr)
 	    {
 		x_slicing_first = new (get_pool()) infinint(*ref.x_slicing_first);
-		if(x_slicing_first == NULL)
+		if(x_slicing_first == nullptr)
 		    throw Ememory("archive_options_listing::copy_from");
 	    }
-	    if(ref.x_slicing_others != NULL)
+	    if(ref.x_slicing_others != nullptr)
 	    {
 		x_slicing_others = new (get_pool()) infinint(*ref.x_slicing_others);
-		if(x_slicing_others == NULL)
+		if(x_slicing_others == nullptr)
 		    throw Ememory("archive_options_listing::copy_from");
 	    }
 
@@ -1348,7 +1348,7 @@ namespace libdar
 	{
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
-	    if(x_selection == NULL)
+	    if(x_selection == nullptr)
 		throw Ememory("archive_options_diff::set_selection");
 	}
         catch(...)
@@ -1366,7 +1366,7 @@ namespace libdar
 	{
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
-	    if(x_subtree == NULL)
+	    if(x_subtree == nullptr)
 		throw Ememory("archive_options_diff::set_subtree");
 	}
         catch(...)
@@ -1384,7 +1384,7 @@ namespace libdar
 	{
 	    archive_option_destroy_mask(x_ea_mask);
 	    x_ea_mask = ea_mask.clone();
-	    if(x_ea_mask == NULL)
+	    if(x_ea_mask == nullptr)
 		throw Ememory("archive_options_dif::set_ea_mask");
 	}
         catch(...)
@@ -1443,24 +1443,24 @@ namespace libdar
 
     void archive_options_diff::copy_from(const archive_options_diff & ref)
     {
-	x_selection = NULL;
-	x_subtree = NULL;
-	x_ea_mask = NULL;
+	x_selection = nullptr;
+	x_subtree = nullptr;
+	x_ea_mask = nullptr;
 
 	try
 	{
-	    if(ref.x_selection == NULL)
+	    if(ref.x_selection == nullptr)
 		throw SRC_BUG;
-	    if(ref.x_subtree == NULL)
+	    if(ref.x_subtree == nullptr)
 		throw SRC_BUG;
-	    if(ref.x_ea_mask == NULL)
+	    if(ref.x_ea_mask == nullptr)
 		throw SRC_BUG;
 
 	    x_selection = ref.x_selection->clone();
 	    x_subtree = ref.x_subtree->clone();
 	    x_ea_mask = ref.x_ea_mask->clone();
 
-	    if(x_selection == NULL || x_subtree == NULL || x_ea_mask == NULL)
+	    if(x_selection == nullptr || x_subtree == nullptr || x_ea_mask == nullptr)
 		throw Ememory("archive_options_extract::copy_from");
 
 	    x_info_details = ref.x_info_details;
@@ -1519,7 +1519,7 @@ namespace libdar
 	{
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
-	    if(x_selection == NULL)
+	    if(x_selection == nullptr)
 		throw Ememory("archive_options_test::set_selection");
 	}
         catch(...)
@@ -1537,7 +1537,7 @@ namespace libdar
 	{
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
-	    if(x_subtree == NULL)
+	    if(x_subtree == nullptr)
 		throw Ememory("archive_option_test::set_subtree");
 	}
         catch(...)
@@ -1568,20 +1568,20 @@ namespace libdar
 
     void archive_options_test::copy_from(const archive_options_test & ref)
     {
-	x_selection = NULL;
-	x_subtree = NULL;
+	x_selection = nullptr;
+	x_subtree = nullptr;
 
 	try
 	{
-	    if(ref.x_selection == NULL)
+	    if(ref.x_selection == nullptr)
 		throw SRC_BUG;
-	    if(ref.x_subtree == NULL)
+	    if(ref.x_subtree == nullptr)
 		throw SRC_BUG;
 
 	    x_selection = ref.x_selection->clone();
 	    x_subtree = ref.x_subtree->clone();
 
-	    if(x_selection == NULL || x_subtree == NULL)
+	    if(x_selection == nullptr || x_subtree == nullptr)
 		throw Ememory("archive_options_extract::copy_from");
 
 	    x_info_details = ref.x_info_details;

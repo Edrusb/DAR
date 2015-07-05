@@ -80,7 +80,7 @@ namespace libdar
     escape::escape(generic_file *below, const set<sequence_type> & x_unjumpable) : generic_file(below->get_mode())
     {
 	x_below = below;
-	if(below == NULL)
+	if(below == nullptr)
 	    throw SRC_BUG;
 	write_buffer_size = 0;
 	read_buffer_size = 0;

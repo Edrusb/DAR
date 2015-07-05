@@ -40,7 +40,7 @@ namespace libdar
 	U_16 tmp;
 	tlv *me = const_cast<tlv *>(this);
 
-	if(me == NULL)
+	if(me == nullptr)
 	    throw SRC_BUG;
 	tmp = htons(type);
 	f.write((char *)&tmp, 2);

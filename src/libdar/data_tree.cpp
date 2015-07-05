@@ -628,22 +628,22 @@ namespace libdar
 		    else // not in the same archive
 			if(it->first < ut->first) // it only
 			{
-			    display_line(dialog, it->first, &(it->second.date), it->second.present, NULL, data_tree::et_removed);
+			    display_line(dialog, it->first, &(it->second.date), it->second.present, nullptr, data_tree::et_removed);
 			    ++it;
 			}
 			else // ut only
 			{
-			    display_line(dialog, ut->first, NULL, data_tree::et_removed, &(ut->second.date), ut->second.present);
+			    display_line(dialog, ut->first, nullptr, data_tree::et_removed, &(ut->second.date), ut->second.present);
 			    ++ut;
 			}
 		else // ut at end of list thus it != last_mod.end() (see while condition)
 		{
-		    display_line(dialog, it->first, &(it->second.date), it->second.present, NULL, data_tree::et_removed);
+		    display_line(dialog, it->first, &(it->second.date), it->second.present, nullptr, data_tree::et_removed);
 		    ++it;
 		}
 	    else // it at end of list, this ut != last_change.end() (see while condition)
 	    {
-		display_line(dialog, ut->first, NULL, data_tree::et_removed, &(ut->second.date), ut->second.present);
+		display_line(dialog, ut->first, nullptr, data_tree::et_removed, &(ut->second.date), ut->second.present);
 		++ut;
 	    }
 	}
@@ -864,7 +864,7 @@ namespace libdar
     data_dir::data_dir(generic_file &f, unsigned char db_version) : data_tree(f, db_version)
     {
 	infinint tmp = infinint(f); // number of children
-	data_tree *entry = NULL;
+	data_tree *entry = nullptr;
 	rejetons.clear();
 
 	try
@@ -872,10 +872,10 @@ namespace libdar
 	    while(!tmp.is_zero())
 	    {
 		entry = read_from_file(f, db_version, get_pool());
-		if(entry == NULL)
+		if(entry == nullptr)
 		    throw Erange("data_dir::data_dir", gettext("Unexpected end of file"));
 		rejetons.push_back(entry);
-		entry = NULL;
+		entry = nullptr;
 		--tmp;
 	    }
 	}
@@ -885,10 +885,10 @@ namespace libdar
 	    while(next != rejetons.end())
 	    {
 		delete *next;
-		*next = NULL;
+		*next = nullptr;
 		++next;
 	    }
-	    if(entry != NULL)
+	    if(entry != nullptr)
 		delete entry;
 	    throw;
 	}
@@ -910,7 +910,7 @@ namespace libdar
 	while(next != rejetons.end())
 	{
 	    delete *next;
-	    *next = NULL;
+	    *next = nullptr;
 	    ++next;
 	}
     }
@@ -924,7 +924,7 @@ namespace libdar
 	tmp.dump(f);
 	while(it != rejetons.end())
 	{
-	    if(*it == NULL)
+	    if(*it == nullptr)
 		throw SRC_BUG;
 	    (*it)->dump(f);
 	    ++it;
@@ -935,15 +935,15 @@ namespace libdar
     data_tree *data_dir::find_or_addition(const string & name, bool is_dir, const archive_num & archive)
     {
 	const data_tree *fils = read_child(name);
-	data_tree *ret = NULL;
+	data_tree *ret = nullptr;
 
-	if(fils == NULL) // brand-new data_tree to build
+	if(fils == nullptr) // brand-new data_tree to build
 	{
 	    if(is_dir)
 		ret = new (get_pool()) data_dir(name);
 	    else
 		ret = new (get_pool()) data_tree(name);
-	    if(ret == NULL)
+	    if(ret == nullptr)
 		throw Ememory("data_dir::find_or_addition");
 	    add_child(ret);
 	}
@@ -951,10 +951,10 @@ namespace libdar
 	{
 		// check if dir/file nature has changed
 	    const data_dir *fils_dir = dynamic_cast<const data_dir *>(fils);
-	    if(fils_dir == NULL && is_dir) // need to upgrade data_tree to data_dir
+	    if(fils_dir == nullptr && is_dir) // need to upgrade data_tree to data_dir
 	    {
 		ret = new (get_pool()) data_dir(*fils); // upgrade data_tree in an empty data_dir
-		if(ret == NULL)
+		if(ret == nullptr)
 		    throw Ememory("data_dir::find_or_addition");
 		try
 		{
@@ -977,7 +977,7 @@ namespace libdar
     void data_dir::add(const cat_inode *entry, const archive_num & archive)
     {
 	const cat_directory *entry_dir = dynamic_cast<const cat_directory *>(entry);
-	data_tree * tree = find_or_addition(entry->get_name(), entry_dir != NULL, archive);
+	data_tree * tree = find_or_addition(entry->get_name(), entry_dir != nullptr, archive);
 	archive_num last_archive;
 	lookup result;
 	datetime last_mod = entry->get_last_modif() > entry->get_last_change() ? entry->get_last_modif() : entry->get_last_change();
@@ -1035,13 +1035,13 @@ namespace libdar
     {
 	list<data_tree *>::const_iterator it = rejetons.begin();
 
-	while(it != rejetons.end() && *it != NULL && (*it)->get_name() != name)
+	while(it != rejetons.end() && *it != nullptr && (*it)->get_name() != name)
 	    ++it;
 
 	if(it == rejetons.end())
-	    return NULL;
+	    return nullptr;
 	else
-	    if(*it == NULL)
+	    if(*it == nullptr)
 		throw SRC_BUG;
 	    else
 		return *it;
@@ -1064,7 +1064,7 @@ namespace libdar
 
 	while(it != rejetons.end() && ret)
 	{
-	    if(*it == NULL)
+	    if(*it == nullptr)
 		throw SRC_BUG;
 	    ret = (*it)->check_order(dialog, subpath, initial_warn);
 	    ++it;
@@ -1108,7 +1108,7 @@ namespace libdar
 
 	while(it != rejetons.end())
 	{
-	    if(*it == NULL)
+	    if(*it == nullptr)
 		throw SRC_BUG;
 	    try
 	    {
@@ -1131,12 +1131,12 @@ namespace libdar
 
 	while(it != rejetons.end())
 	{
-	    if((*it) == NULL)
+	    if((*it) == nullptr)
 		throw SRC_BUG;
 	    if((*it)->remove_all_from(archive_to_remove, last_archive))
 	    {
 		delete *it; // release the memory used by the object
-		*it = NULL;
+		*it = nullptr;
 		rejetons.erase(it); // remove the entry from the list
 		it = rejetons.begin(); // does not seems "it" points to the next item after erase, so we restart from the beginning
 	    }
@@ -1157,7 +1157,7 @@ namespace libdar
 
 	while(it != rejetons.end())
 	{
-	    if(*it == NULL)
+	    if(*it == nullptr)
 		throw SRC_BUG;
 	    data_dir *dir = dynamic_cast<data_dir *>(*it);
 
@@ -1184,7 +1184,7 @@ namespace libdar
 		else
 		    dialog.printf("%S  %S%S\n", &etat, &marge, &name);
 	    }
-	    if(dir != NULL)
+	    if(dir != nullptr)
 		dir->show(dialog, num, marge+name+"/");
 	    ++it;
 	}
@@ -1230,7 +1230,7 @@ namespace libdar
 
     bool data_dir::fix_corruption()
     {
-	while(rejetons.begin() != rejetons.end() && *(rejetons.begin()) != NULL && (*(rejetons.begin()))->fix_corruption())
+	while(rejetons.begin() != rejetons.end() && *(rejetons.begin()) != nullptr && (*(rejetons.begin()))->fix_corruption())
 	{
 	    delete *(rejetons.begin());
 	    rejetons.erase(rejetons.begin());
@@ -1245,7 +1245,7 @@ namespace libdar
 
     void data_dir::add_child(data_tree *fils)
     {
-	if(fils == NULL)
+	if(fils == nullptr)
 	    throw SRC_BUG;
 	rejetons.push_back(fils);
     }
@@ -1254,12 +1254,12 @@ namespace libdar
     {
 	list<data_tree *>::iterator it = rejetons.begin();
 
-	while(it != rejetons.end() && *it != NULL && (*it)->get_name() != name)
+	while(it != rejetons.end() && *it != nullptr && (*it)->get_name() != name)
 	    ++it;
 
 	if(it != rejetons.end())
 	{
-	    if(*it == NULL)
+	    if(*it == nullptr)
 		throw SRC_BUG;
 	    else
 		rejetons.erase(it);
@@ -1274,7 +1274,7 @@ namespace libdar
 	data_tree *lu = read_from_file(f, db_version, pool);
 	data_dir *ret = dynamic_cast<data_dir *>(lu);
 
-	if(ret == NULL && lu != NULL)
+	if(ret == nullptr && lu != nullptr)
 	    delete lu;
 
 	return ret;
@@ -1297,20 +1297,20 @@ namespace libdar
 		loop = false;
 	    }
 	    ptr = current->read_child(filename);
-	    if(ptr == NULL)
+	    if(ptr == nullptr)
 		loop = false;
 	    if(loop)
 	    {
 		current = dynamic_cast<const data_dir *>(ptr);
-		if(current == NULL)
+		if(current == nullptr)
 		{
 		    loop = false;
-		    ptr = NULL;
+		    ptr = nullptr;
 		}
 	    }
 	}
 
-	return ptr != NULL;
+	return ptr != nullptr;
     }
 
     void data_tree_update_with(const cat_directory *dir, archive_num archive, data_dir *racine)
@@ -1325,14 +1325,14 @@ namespace libdar
 	    const cat_mirage *entry_mir = dynamic_cast<const cat_mirage *>(entry);
 	    const cat_detruit *entry_det = dynamic_cast<const cat_detruit *>(entry);
 
-	    if(entry_mir != NULL)
+	    if(entry_mir != nullptr)
 	    {
 		entry_ino = entry_mir->get_inode();
 		entry_mir->get_inode()->change_name(entry_mir->get_name());
 	    }
 
-	    if(entry_ino == NULL)
-		if(entry_det != NULL)
+	    if(entry_ino == nullptr)
+		if(entry_det != nullptr)
 		{
 		    if(!entry_det->get_date().is_null())
 			racine->add(entry_det, archive);
@@ -1343,14 +1343,14 @@ namespace libdar
 	    else
 		racine->add(entry_ino, archive);
 
-	    if(entry_dir != NULL) // going into recursion
+	    if(entry_dir != nullptr) // going into recursion
 	    {
 		data_tree *new_root = const_cast<data_tree *>(racine->read_child(entry->get_name()));
 		data_dir *new_root_dir = dynamic_cast<data_dir *>(new_root);
 
-		if(new_root == NULL)
+		if(new_root == nullptr)
 		    throw SRC_BUG; // the racine->add method did not add an item for "entry"
-		if(new_root_dir == NULL)
+		if(new_root_dir == nullptr)
 		    throw SRC_BUG; // the racine->add method did not add a data_dir item
 		data_tree_update_with(entry_dir, archive, new_root_dir);
 	    }
@@ -1391,7 +1391,7 @@ static data_tree *read_from_file(generic_file & f, unsigned char db_version, mem
     data_tree *ret;
 
     if(f.read(&sign, 1) != 1)
-        return NULL; // nothing more to read
+        return nullptr; // nothing more to read
 
     if(sign == data_tree::signature())
         ret = new (pool) data_tree(f, db_version);
@@ -1400,7 +1400,7 @@ static data_tree *read_from_file(generic_file & f, unsigned char db_version, mem
     else
         throw Erange("read_from_file", gettext("Unknown record type"));
 
-    if(ret == NULL)
+    if(ret == nullptr)
         throw Ememory("read_from_file");
 
     return ret;
@@ -1478,7 +1478,7 @@ static void display_line(user_interaction & dialog,
 	throw SRC_BUG;
     }
 
-    if(data == NULL)
+    if(data == nullptr)
     {
 	data_state = ABSENT;
 	data_date = NO_DATE;
@@ -1486,7 +1486,7 @@ static void display_line(user_interaction & dialog,
     else
 	data_date = tools_display_date(*data);
 
-    if(ea == NULL)
+    if(ea == nullptr)
     {
 	ea_state = ABSENT;
 	ea_date = NO_DATE;

@@ -80,7 +80,7 @@ namespace libdar
 	    /// \param[in] filename base name of the slices. If "-" is given the archive will be produced in standard output
 	    /// \param[in] extension slices extension ("dar")
 	    /// \param[in] options optional parameters to use for the operation
- 	    /// \param[out] progressive_report statistics about the operation, considering the treated files (NULL can be given if you don't want to use this feature)
+ 	    /// \param[out] progressive_report statistics about the operation, considering the treated files (nullptr can be given if you don't want to use this feature)
 	    /// \note the statistics fields used are:
 	    /// - .treated: the total number of files seen
 	    /// - .hard_link: the number of hard linked inodes
@@ -119,7 +119,7 @@ namespace libdar
 	    /// \param[in] filename base name of the slices. If "-" is given the archive will be produced in standard output
 	    /// \param[in] extension slices extension ("dar")
 	    /// \param[in] options optional parameters to be used for the operation
-	    /// \param[out] progressive_report statistics about the operation, considering the treated files (NULL can be given if you don't want to use this feature)
+	    /// \param[out] progressive_report statistics about the operation, considering the treated files (nullptr can be given if you don't want to use this feature)
 	    /// \note the statistics fields used are:
 	    /// - .treated: the total number of files seen
 	    /// - .hard_link: the number of hard linked inodes
@@ -157,7 +157,7 @@ namespace libdar
 	    /// \param[in] options optional parameter to be used for the operation
 	    /// \param[in,out] progressive_report points to an already existing statistics object that can be consulted at any time
 	    /// during the call (see the returned value to know the useful fields and their meining),
-	    /// NULL can be given in argument if you only need the result at the end of the operation through the returned value of this call
+	    /// nullptr can be given in argument if you only need the result at the end of the operation through the returned value of this call
 	    /// this should speed up the operation by a little amount.
 	    /// \return the statistics about the operation, considering the treated files
 	    /// \note the statistics fields used are:
@@ -201,7 +201,7 @@ namespace libdar
 	    /// \param[in] options optional parameters to be used with the operation
 	    /// \param[in,out] progressive_report points to an already existing statistics object that can be consulted at any time
 	    /// during the call (see the returned value to know the useful fields and their meining),
-	    /// NULL can be given in argument if you only need the result at the end of the operation through the returned value of this call
+	    /// nullptr can be given in argument if you only need the result at the end of the operation through the returned value of this call
 	    /// this should speed up the operation by a little amount.
 	    /// \return the statistics about the operation, considering the treated files
 	    /// \note the statistics fields used are:
@@ -221,7 +221,7 @@ namespace libdar
 	    /// \param[in] options optional parameter to use for the operation
 	    /// \param[in,out] progressive_report points to an already existing statistics object that can be consulted at any time
 	    /// during the call (see the returned value to know the useful fields and their meining),
-	    /// NULL can be given in argument if you only need the result at the end of the operation through the returned value of this call
+	    /// nullptr can be given in argument if you only need the result at the end of the operation through the returned value of this call
 	    /// this should speed up the operation by a little amount.
 	    /// \note op_test will generate an error message if used on an archive
 	    /// that has been created by the isolate or creation constructor
@@ -282,7 +282,7 @@ namespace libdar
 	bool has_subdirectory(const std::string & dir) const;
 
 	    /// retrieving statistics about archive contents
-	const entree_stats get_stats() const { if(cat == NULL) throw SRC_BUG; return cat->get_stats(); };
+	const entree_stats get_stats() const { if(cat == nullptr) throw SRC_BUG; return cat->get_stats(); };
 
 	    /// retrieving signature information about the archive
 	const std::list<signator> & get_signatories() const { return gnupg_signed; };
@@ -319,7 +319,7 @@ namespace libdar
 	void drop_all_filedescriptors(user_interaction & dialog);
 
 	    /// change all inode as unsaved (equal to differential backup with no change met)
-	void set_to_unsaved_data_and_FSA() { if(cat == NULL) throw SRC_BUG; cat->set_to_unsaved_data_and_FSA(); };
+	void set_to_unsaved_data_and_FSA() { if(cat == nullptr) throw SRC_BUG; cat->set_to_unsaved_data_and_FSA(); };
 
 	    /// check that the internal memory_pool has all its blocks properly freeed
 	    ///
@@ -335,7 +335,7 @@ namespace libdar
 
 	pile stack;              //< the different layer through which the archive contents is read or wrote
 	header_version ver;      //< information for the archive header
-	memory_pool *pool;       //< points to local_pool or inherited pool or to NULL if no memory_pool has to be used
+	memory_pool *pool;       //< points to local_pool or inherited pool or to nullptr if no memory_pool has to be used
 	catalogue *cat;          //< archive contents
 	infinint local_cat_size; //< size of the catalogue on disk
 	bool exploitable;        //< is false if only the catalogue is available (for reference backup or isolation).
@@ -350,12 +350,12 @@ namespace libdar
 	void init_pool();
 	void check_gnupg_signed(user_interaction & dialog) const;
 
-	const catalogue & get_cat() const { if(cat == NULL) throw SRC_BUG; else return *cat; };
+	const catalogue & get_cat() const { if(cat == nullptr) throw SRC_BUG; else return *cat; };
 	const header_version & get_header() const { return ver; };
 
 	bool get_sar_param(infinint & sub_file_size, infinint & first_file_size, infinint & last_file_size,
 			   infinint & total_file_number);
-	const entrepot *get_entrepot(); //< this method may return NULL if no entrepot is used (pipes used for archive building, etc.)
+	const entrepot *get_entrepot(); //< this method may return nullptr if no entrepot is used (pipes used for archive building, etc.)
 	infinint get_level2_size();
 	infinint get_cat_size() const { return local_cat_size; };
 
@@ -422,8 +422,8 @@ namespace libdar
 			      operation op,                     //< the filter operation to bind to
 			      const path & fs_root,             //< root of the filesystem to act on
 			      const entrepot & sauv_path_t,     //< where to create the archive
-			      const catalogue * ref_cat1,       //< catalogue of the archive of reference, (cannot be NULL if ref_cat2 is not NULL)
-			      const catalogue * ref_cat2,       //< secondary catalogue used for merging, can be NULL if not used
+			      const catalogue * ref_cat1,       //< catalogue of the archive of reference, (cannot be nullptr if ref_cat2 is not nullptr)
+			      const catalogue * ref_cat2,       //< secondary catalogue used for merging, can be nullptr if not used
 			      bool initial_pause,               //< whether we shall pause before starting the archive creation
 			      const mask & selection,           //< filter on filenames
 			      const mask & subtree,             //< filter on directory tree and filenames
@@ -480,7 +480,7 @@ namespace libdar
 			      bool ignore_unknown,                        //< whether to warn when an unknown inode type is met
 			      const fsa_scope & scope,                    //< FSA scope for the operation
 			      bool multi_threaded,              //< whether libdar is allowed to spawn several thread to possibily work faster on multicore CPU
-			      statistics * st_ptr);             //< statistics must not be NULL !
+			      statistics * st_ptr);             //< statistics must not be nullptr !
 
 	void disable_natural_destruction();
 	void enable_natural_destruction();

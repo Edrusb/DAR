@@ -32,7 +32,7 @@ namespace libdar
 
     user_interaction & mem_ui::get_ui() const
     {
-	if(ui == NULL)
+	if(ui == nullptr)
 	    throw SRC_BUG;
 
 	return *(const_cast<mem_ui *>(this)->ui);
@@ -40,17 +40,17 @@ namespace libdar
 
     void mem_ui::detruire()
     {
-	if(ui != NULL)
+	if(ui != nullptr)
 	{
 	    delete ui;
-	    ui = NULL;
+	    ui = nullptr;
 	}
     }
 
     void mem_ui::copy_from(const mem_ui & ref)
     {
-	if(ref.ui == NULL)
-	    ui = NULL;
+	if(ref.ui == nullptr)
+	    ui = nullptr;
 	else
 	    set_ui(*(ref.ui));
     }
@@ -58,7 +58,7 @@ namespace libdar
     void mem_ui::set_ui(user_interaction & dialog)
     {
 	ui = dialog.clone();
-	if(ui == NULL)
+	if(ui == nullptr)
 	    throw Ememory("mem_ui::set_ui");
     }
 

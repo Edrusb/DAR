@@ -38,9 +38,9 @@ namespace libdar
 
     cat_etoile::cat_etoile(cat_inode *host, const infinint & etiquette_number)
     {
-        if(host == NULL)
+        if(host == nullptr)
             throw SRC_BUG;
-        if(dynamic_cast<cat_directory *>(host) != NULL)
+        if(dynamic_cast<cat_directory *>(host) != nullptr)
             throw Erange("cat_etoile::cat_etoile", gettext("Hard links of directories are not supported"));
         hosted = host;
         etiquette = etiquette_number;

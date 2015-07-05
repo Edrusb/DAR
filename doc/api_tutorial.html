@@ -15,6 +15,7 @@
 
 
 
+
   <meta content="Denis Corbin" name="author">
   <meta content="Tutorial for using libdar library" name="description"></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
@@ -672,7 +673,7 @@ protected:<br>
 *my_interaction::clone() const<br>
 {<br>
 &nbsp;&nbsp;&nbsp; user_interaction *ret = new (std::nothow) my_interaction(*this);<br>
-&nbsp;&nbsp;&nbsp; if(ret == NULL)<br>
+&nbsp;&nbsp;&nbsp; if(ret == nullptr)<br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; throw
 Ememory("user_interaction_callback::clone");<br>
 &nbsp;&nbsp;&nbsp; else<br>
@@ -832,9 +833,9 @@ libdar::user_interaction_callback(ptr1, ptr2, ptr3);<br>
 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; "my_archive", // the basename of the slices<br>
 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; "dar",&nbsp; // the extension used for slices<br>
 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; archive_options_create(), // default options<br>
-&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; NULL);&nbsp; // we will see later this parameter <br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; nullptr);&nbsp; // we will see later this parameter <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // in the progressive_report section<br>
-&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; // for now let ignore it by using NULL</code></p>
+&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; // for now let ignore it by using nullptr</code></p>
 
 
 
@@ -866,7 +867,7 @@ std::string except_msg;</code><br>
 the basename of the slices <br>
 &nbsp;&nbsp;&nbsp; &nbsp;"dar", // dar's slice extensions<br>
 &nbsp;&nbsp;&nbsp;&nbsp; archive_options_create(), // default options</code></span><span class="el"><code></code><br>
-      </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp; NULL, </code></span><code>// see the progressive_report section below</code><span class="el"><code></code><br>
+      </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp; nullptr, </code></span><code>// see the progressive_report section below</code><span class="el"><code></code><br>
       </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp; exception,
 // this gives the status of the call<br>
 &nbsp;&nbsp;&nbsp;&nbsp; except_msg); // and in case of error the cause.<br>
@@ -1003,7 +1004,7 @@ options.set_compression_level(6); // default is 9</code></p>
 &nbsp;&nbsp;&nbsp;&nbsp; "my_archive", // the basename of the slices<br>
 &nbsp;&nbsp;&nbsp;&nbsp; "dar",&nbsp; // the extension used for slices<br>
 &nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">options</span>, // the object we modified above<br>
-&nbsp;&nbsp;&nbsp;&nbsp; NULL); <br>
+&nbsp;&nbsp;&nbsp;&nbsp; nullptr); <br>
       </code> </p>
 
       </td><td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code></code>
@@ -1034,7 +1035,7 @@ std::string except_msg;</code><br>
 the basename of the slices <br>
 &nbsp;&nbsp;&nbsp; &nbsp;"dar", // dar's slice extensions<br>
 &nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">options</span>, // the object we modified above</code></span><span class="el"><code></code><br>
-      </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp; NULL,&nbsp; </code></span><span class="el"><code></code><br>
+      </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp; nullptr,&nbsp; </code></span><span class="el"><code></code><br>
       </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp; exception,
 // this gives the status of the call<br>
 &nbsp;&nbsp;&nbsp;&nbsp; except_msg); // and in case of error the cause.<br>
@@ -1151,8 +1152,7 @@ options.set_info_details(true); // to have a verbose output<br>
 <br>
 ret = my_arch-&gt;<span class="el">op_test</span>(<span class="el"></span>dialog,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">options</span>; // the non default options set above</code><code><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-NULL);&nbsp; // we don't want a progressive report</code><code></code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; nullptr);&nbsp; // we don't want a progressive report</code><code></code><br>
       <br>
       </td>
       <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code><br>
@@ -1170,7 +1170,7 @@ options.set_info_details(true); // to have a verbose output</code><br>
 my_arch,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // the archive
 to test<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code></span><span class="el"><code><span style="font-weight: bold;">options</span>, // the non default options set above<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NULL,&nbsp; // we don't want a
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; nullptr,&nbsp; // we don't want a
 progressive report<br>
       </code> </span> <span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 exception,// this gives the status of the call<br>
@@ -1382,7 +1382,7 @@ of the <span style="font-style: italic;">class archive</span>. </td>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 archive_options_diff(), // default options</code><code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-NULL);&nbsp;&nbsp; // we don't use progessive report<br>
+nullptr);&nbsp;&nbsp; // we don't use progessive report<br>
       </code> <code> <br>
       <br>
       <br>
@@ -1404,7 +1404,7 @@ my_arch, // the archive to use<br>
 // contents to<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code><code>archive_options_diff(), // default options<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-NULL,&nbsp;&nbsp;&nbsp; // we don't use progressive report<br>
+nullptr,&nbsp;&nbsp;&nbsp; // we don't use progressive report<br>
       </code> <code>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 &nbsp;&nbsp; files</code><span class="el"><code>exception, // this
 gives the<br>
@@ -1466,8 +1466,7 @@ ret = my_arch-&gt;<span class="el">op_extract</span>(<span class="el"></span>dia
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 "/tmp",&nbsp;&nbsp; // where to restore files to<br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; archive_options_extract(), // default options</code><code><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-NULL);// no progressive report used<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; nullptr);// no progressive report used<br>
       </code> </td>
       <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>&nbsp;
       <br>
@@ -1532,8 +1531,7 @@ ret = my_arch-&gt;<span class="el">op_extract</span>(<span class="el"></span>dia
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 "/tmp",&nbsp;&nbsp; // where to restore files to<br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; options, // non default options set just above</code><code><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-NULL);// no progressive report used<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; nullptr);// no progressive report used<br>
       </code> </td>
       <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code>archive_options_extract options;<br>
 <br>
@@ -1550,7 +1548,7 @@ to test<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code></span><span class="el"><code>"/tmp",&nbsp;&nbsp;
 // where to restore files to<br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; </code></span><code>options, // non default options set just above<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NULL,</code><code>&nbsp;&nbsp;&nbsp; // no progressive report used</code><span class="el"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; nullptr,</code><code>&nbsp;&nbsp;&nbsp; // no progressive report used</code><span class="el"><br>
       </span><span class="el"><code></code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 exception,// this gives the status of the call<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; except_msg); // and in case of
@@ -1786,7 +1784,7 @@ libdar::archive *<span style="font-weight: bold;">my_other_arch</span> = <br>
 the basename of the slices <br>
 &nbsp;&nbsp;&nbsp; &nbsp;"dar", // dar's slice extensions<br>
 &nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">options</span>, // the optional parameter as defined above</code><code></code><br>
-      <code>&nbsp;&nbsp;&nbsp;&nbsp; NULL); // no progressive report</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp; nullptr); // no progressive report</code><br>
       </td>
       <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>archive_options_create options;<br>
 <br>
@@ -2185,9 +2183,9 @@ in dar man page (-&lt;, -&gt; and -= options).<br>
       <h2>14 - Progressive Report (Optional)<br>
       </h2>
       <br>
-Several method we saw previously of the class archive have an argument called<span style="font-weight: bold;"> progressive_report</span> of type <span style="font-style: italic;">libdar::statistics*</span> we have so far set to NULL. We will see here how to use this feature.<br>
+Several method we saw previously of the class archive have an argument called<span style="font-weight: bold;"> progressive_report</span> of type <span style="font-style: italic;">libdar::statistics*</span> we have so far set to nullptr. We will see here how to use this feature.<br>
       <br>
-      The <span style="font-style: italic;">libdar::statistics</span> pointed to object i(if progressive_report is not given NULL) is regularily modified by the
+      The <span style="font-style: italic;">libdar::statistics</span> pointed to object i(if progressive_report is not given nullptr) is regularily modified by the
       <span style="font-style: italic;">libdar::archive</span> object during an operation (archive creation, archive
 testing and so on) and can also be accessed by another thread at the same
 time so this other thread can display the current status of the libdar
@@ -2247,7 +2245,7 @@ value of an infinint variable:<br>
     <tr>
       <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>libdar::statistics report;<br>
       <br>
-&nbsp;&nbsp;&nbsp; // assuming we have given <span style="font-weight: bold;">&amp;report</span> in place of NULL to libdar::archive operation<br>
+&nbsp;&nbsp;&nbsp; // assuming we have given <span style="font-weight: bold;">&amp;report</span> in place of nullptr to libdar::archive operation<br>
 &nbsp;&nbsp;&nbsp; // which is now running in another thread<br>
       <br>
 &nbsp;std::string value = </code><code>libdar::deci(report.get_treated()).human();</code><br>

@@ -56,16 +56,16 @@ namespace libdar
 
     void entree_stats::add(const cat_entree *ref)
     {
-        if(dynamic_cast<const cat_eod *>(ref) == NULL // we ignore cat_eod
-           && dynamic_cast<const cat_ignored *>(ref) == NULL // as well we ignore "cat_ignored"
-           && dynamic_cast<const cat_ignored_dir *>(ref) == NULL) // and "cat_ignored_dir"
+        if(dynamic_cast<const cat_eod *>(ref) == nullptr // we ignore cat_eod
+           && dynamic_cast<const cat_ignored *>(ref) == nullptr // as well we ignore "cat_ignored"
+           && dynamic_cast<const cat_ignored_dir *>(ref) == nullptr) // and "cat_ignored_dir"
         {
             const cat_inode *ino = dynamic_cast<const cat_inode *>(ref);
             const cat_mirage *h = dynamic_cast<const cat_mirage *>(ref);
             const cat_detruit *x = dynamic_cast<const cat_detruit *>(ref);
 
 
-            if(h != NULL) // won't count twice the same inode if it is referenced with hard_link
+            if(h != nullptr) // won't count twice the same inode if it is referenced with hard_link
             {
                 ++num_hard_link_entries;
                 if(!h->is_inode_counted())
@@ -76,57 +76,57 @@ namespace libdar
                 }
             }
 
-            if(ino != NULL)
+            if(ino != nullptr)
             {
                 ++total;
                 if(ino->get_saved_status() == s_saved)
                     ++saved;
             }
 
-            if(x != NULL)
+            if(x != nullptr)
                 ++num_x;
             else
             {
                 const cat_directory *d = dynamic_cast<const cat_directory*>(ino);
-                if(d != NULL)
+                if(d != nullptr)
                     ++num_d;
                 else
                 {
                     const cat_chardev *c = dynamic_cast<const cat_chardev *>(ino);
-                    if(c != NULL)
+                    if(c != nullptr)
                         ++num_c;
                     else
                     {
                         const cat_blockdev *b = dynamic_cast<const cat_blockdev *>(ino);
-                        if(b != NULL)
+                        if(b != nullptr)
                             ++num_b;
                         else
                         {
                             const cat_tube *p = dynamic_cast<const cat_tube *>(ino);
-                            if(p != NULL)
+                            if(p != nullptr)
                                 ++num_p;
                             else
                             {
                                 const cat_prise *s = dynamic_cast<const cat_prise *>(ino);
-                                if(s != NULL)
+                                if(s != nullptr)
                                     ++num_s;
                                 else
                                 {
                                     const cat_lien *l = dynamic_cast<const cat_lien *>(ino);
-                                    if(l != NULL)
+                                    if(l != nullptr)
                                         ++num_l;
                                     else
                                     {
 					const cat_door *D = dynamic_cast<const cat_door *>(ino);
-					if(D != NULL)
+					if(D != nullptr)
 					    ++num_D;
 					else
 					{
 					    const cat_file *f = dynamic_cast<const cat_file *>(ino);
-					    if(f != NULL)
+					    if(f != nullptr)
 						++num_f;
 					    else
-						if(h == NULL)
+						if(h == nullptr)
 						    throw SRC_BUG; // unknown entry
 					}
                                     }
@@ -173,11 +173,11 @@ namespace libdar
     {
         char type;
         saved_status saved;
-        cat_entree *ret = NULL;
+        cat_entree *ret = nullptr;
         map <infinint, cat_etoile *>::iterator it;
         infinint tmp;
 	bool read_crc;
-	generic_file *ptr = NULL;
+	generic_file *ptr = nullptr;
 
 	pdesc.check(small);
 	if(small)
@@ -199,20 +199,20 @@ namespace libdar
             S_I lu = ptr->read(&type, 1);
 
             if(lu == 0)
-		type = ' '; // used to by-pass object construction and return NULL as value of this method
+		type = ' '; // used to by-pass object construction and return nullptr as value of this method
 
             if(!extract_base_and_status((unsigned char)type, (unsigned char &)type, saved))
             {
                 if(!lax)
                     throw Erange("cat_entree::read", gettext("corrupted file"));
                 else
-		    type = ' '; // used to by-pass object construction and return NULL as value of this method
+		    type = ' '; // used to by-pass object construction and return nullptr as value of this method
             }
 
             switch(type)
             {
 	    case ' ':
-		break; // returned value will be NULL
+		break; // returned value will be nullptr
             case 'f':
                 ret = new (pool) cat_file(dialog, pdesc, reading_ver, saved, default_algo, small);
                 break;
@@ -272,10 +272,10 @@ namespace libdar
                 else
                 {
                     dialog.warning(gettext("LAX MODE: found unknown catalogue entry, assuming data corruption occurred, cannot read further the catalogue as I do not know the length of this type of entry"));
-                    return ret;  // NULL
+                    return ret;  // nullptr
                 }
             }
-	    if(ret == NULL && type != ' ')
+	    if(ret == nullptr && type != ' ')
 		throw Ememory("cat_entree::read");
         }
         catch(...)
@@ -283,7 +283,7 @@ namespace libdar
             if(read_crc)
             {
 		crc * tmp = ptr->get_crc(); // keep pdesc in a coherent status
-		if(tmp != NULL)
+		if(tmp != nullptr)
 		    delete tmp;
             }
             throw;
@@ -293,19 +293,19 @@ namespace libdar
         {
             crc *crc_calc = ptr->get_crc();
 
-	    if(crc_calc == NULL)
+	    if(crc_calc == nullptr)
 		throw SRC_BUG;
 
 	    if(type == ' ') // corrupted data while in lax mode
 	    {
 		delete crc_calc;
-		return ret; // returning NULL
+		return ret; // returning nullptr
 	    }
 
 	    try
 	    {
 		crc *crc_read = create_crc_from_file(*ptr, pool);
-		if(crc_read == NULL)
+		if(crc_read == nullptr)
 		    throw SRC_BUG;
 
 		try
@@ -313,7 +313,7 @@ namespace libdar
 		    if(*crc_read != *crc_calc)
 		    {
 			cat_nomme * ret_nom = dynamic_cast<cat_nomme *>(ret);
-			string nom = ret_nom != NULL ? ret_nom->get_name() : "";
+			string nom = ret_nom != nullptr ? ret_nom->get_name() : "";
 
 			try
 			{
@@ -338,20 +338,20 @@ namespace libdar
 		}
 		catch(...)
 		{
-		    if(crc_read != NULL)
+		    if(crc_read != nullptr)
 			delete crc_read;
 		    throw;
 		}
-		if(crc_read != NULL)
+		if(crc_read != nullptr)
 		    delete crc_read;
 	    }
 	    catch(...)
 	    {
-		if(crc_calc != NULL)
+		if(crc_calc != nullptr)
 		    delete crc_calc;
 		throw;
 	    }
-	    if(crc_calc != NULL)
+	    if(crc_calc != nullptr)
 		delete crc_calc;
 	}
 
@@ -362,13 +362,13 @@ namespace libdar
 
     void cat_entree::change_location(const pile_descriptor & x_pdesc, bool small)
     {
-	if(x_pdesc.stack == NULL)
+	if(x_pdesc.stack == nullptr)
 	    throw SRC_BUG;
 
-	if(small && x_pdesc.esc == NULL)
+	if(small && x_pdesc.esc == nullptr)
 	    throw SRC_BUG;
 
-	if(x_pdesc.compr == NULL)
+	if(x_pdesc.compr == nullptr)
 	    throw SRC_BUG;
 
 	pdesc = x_pdesc;
@@ -379,7 +379,7 @@ namespace libdar
 	pdesc.check(small);
         if(small)
         {
-	    crc *tmp = NULL;
+	    crc *tmp = nullptr;
 
 	    try
 	    {
@@ -396,18 +396,18 @@ namespace libdar
 		}
 
 		tmp = pdesc.esc->get_crc();
-		if(tmp == NULL)
+		if(tmp == nullptr)
 		    throw SRC_BUG;
 
 		tmp->dump(*pdesc.esc);
 	    }
 	    catch(...)
 	    {
-		if(tmp != NULL)
+		if(tmp != nullptr)
 		    delete tmp;
 		throw;
 	    }
-	    if(tmp != NULL)
+	    if(tmp != nullptr)
 		delete tmp;
         }
         else
@@ -427,7 +427,7 @@ namespace libdar
 
     generic_file *cat_entree::get_read_cat_layer(bool small) const
     {
-	generic_file *ret = NULL;
+	generic_file *ret = nullptr;
 
 	pdesc.check(small);
 

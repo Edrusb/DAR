@@ -58,7 +58,7 @@ struct line_param
     path * sauv_root;             //< where is the archive to operate on (create, read, etc.)
     string filename;              //< basename of the archive to operate on
     path * ref_root;              //< where is the archive of reference
-    string * ref_filename;        //< basename of the archive of reference (NULL => no archive of reference)
+    string * ref_filename;        //< basename of the archive of reference (nullptr => no archive of reference)
     infinint file_size;           //< size of the slices to create (except the first)
     infinint first_file_size;     //< sice of the first slice to create
     mask * selection;             //< filter files for the operation based on filename only
@@ -104,7 +104,7 @@ struct line_param
     U_32 crypto_size_ref;         //< block size by which to uncypher data from the archive of reference
     archive_options_listing::listformat list_mode; //< type of listing to follow
     path * aux_root;              //< where is the auxiliary archive of reference [used for merging but also when creating an archive, for the on-fly isolation]
-    string * aux_filename;        //< basename of the auxiliary archive if reference (NULL => no auxiliary of reference)
+    string * aux_filename;        //< basename of the auxiliary archive if reference (nullptr => no auxiliary of reference)
     secu_string aux_pass;         //< crypto to use for the auxiliary archive
     string aux_execute;           //< command to be run between the slice of the auxiliary archive of reference
     U_32 aux_crypto_size;         //< block size by which to cypher/uncypher data to/from the auxiliary archive of reference
@@ -143,46 +143,46 @@ struct line_param
 	// constructor for line_param
     line_param()
     {
-	fs_root= NULL;
-	sauv_root = NULL;
-	ref_root = NULL;
-	selection = NULL;
-	subtree = NULL;
-	ref_filename = NULL;
-	ea_mask = NULL;
-	compress_mask = NULL;
-	aux_root = NULL;
-	aux_filename = NULL;
-	overwrite = NULL;
-	backup_hook_mask = NULL;
+	fs_root= nullptr;
+	sauv_root = nullptr;
+	ref_root = nullptr;
+	selection = nullptr;
+	subtree = nullptr;
+	ref_filename = nullptr;
+	ea_mask = nullptr;
+	compress_mask = nullptr;
+	aux_root = nullptr;
+	aux_filename = nullptr;
+	overwrite = nullptr;
+	backup_hook_mask = nullptr;
     };
 
 	// destructor for line_param
     ~line_param()
     {
-	if(fs_root != NULL)
+	if(fs_root != nullptr)
 	    delete fs_root;
-	if(sauv_root != NULL)
+	if(sauv_root != nullptr)
 	    delete sauv_root;
-	if(ref_root != NULL)
+	if(ref_root != nullptr)
 	    delete ref_root;
-	if(selection != NULL)
+	if(selection != nullptr)
 	    delete selection;
-	if(subtree != NULL)
+	if(subtree != nullptr)
 	    delete subtree;
-	if(ref_filename != NULL)
+	if(ref_filename != nullptr)
 	    delete ref_filename;
-	if(ea_mask != NULL)
+	if(ea_mask != nullptr)
 	    delete ea_mask;
-	if(compress_mask != NULL)
+	if(compress_mask != nullptr)
 	    delete compress_mask;
-	if(aux_root != NULL)
+	if(aux_root != nullptr)
 	    delete aux_root;
-	if(aux_filename != NULL)
+	if(aux_filename != nullptr)
 	    delete aux_filename;
-	if(overwrite != NULL)
+	if(overwrite != nullptr)
 	    delete overwrite;
-	if(backup_hook_mask != NULL)
+	if(backup_hook_mask != nullptr)
 	    delete backup_hook_mask;
     };
 };

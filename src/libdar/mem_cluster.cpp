@@ -37,8 +37,8 @@ namespace libdar
 	max_available_blocks = table_size_64 * 64;
 	available_blocks = max_available_blocks;
 	alloc_area_size = max_available_blocks * block_size;
-	alloc_table = NULL;
-	alloc_area = NULL;
+	alloc_table = nullptr;
+	alloc_area = nullptr;
 #ifdef LIBDAR_DEBUG_MEMORY
 	min_avail_reached = max_available_blocks;
 #endif
@@ -46,7 +46,7 @@ namespace libdar
 	try
 	{
 	    alloc_table = (U_64 *)new (nothrow) char[alloc_table_size*sizeof(U_64) + alloc_area_size];
-	    if(alloc_table == NULL)
+	    if(alloc_table == nullptr)
 		throw Ememory("mem_cluster::mem_cluster");
 	    alloc_area = (char *)(alloc_table + alloc_table_size);
 
@@ -55,7 +55,7 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    if(alloc_table != NULL)
+	    if(alloc_table != nullptr)
 		delete [] alloc_table;
 	    throw;
 	}
@@ -63,13 +63,13 @@ namespace libdar
 
     mem_cluster::~mem_cluster()
     {
-	if(alloc_table != NULL)
+	if(alloc_table != nullptr)
 	    delete [] alloc_table;
     }
 
     void *mem_cluster::alloc()
     {
-	void * ret = NULL;
+	void * ret = nullptr;
 
 	if(is_full())
 	    throw SRC_BUG;

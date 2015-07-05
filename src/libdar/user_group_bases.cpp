@@ -86,12 +86,12 @@ namespace libdar
 
 		// filling the user name base
 
-	    if(me == NULL)
+	    if(me == nullptr)
 		throw SRC_BUG;
 
 	    setpwent(); // reset password reading
 
-	    while((pwd = getpwent()) != NULL)
+	    while((pwd = getpwent()) != nullptr)
 		me->user_database[pwd->pw_uid] = pwd->pw_name;
 
 	    endpwent();
@@ -99,7 +99,7 @@ namespace libdar
 		// filling the group name base
 
 	    setgrent();
-	    while((grp = getgrent()) != NULL)
+	    while((grp = getgrent()) != nullptr)
 		me->group_database[grp->gr_gid] = grp->gr_name;
 
 	    endgrent();

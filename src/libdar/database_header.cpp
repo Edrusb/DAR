@@ -77,7 +77,7 @@ namespace libdar
 
     generic_file *database_header_create(user_interaction & dialog, memory_pool *pool, const string & filename, bool overwrite)
     {
-	generic_file *ret = NULL;
+	generic_file *ret = nullptr;
 
 	struct stat buf;
 	database_header h;
@@ -86,7 +86,7 @@ namespace libdar
 	if(stat(filename.c_str(), &buf) >= 0 && !overwrite)
 	    throw Erange("database_header_create", gettext("Cannot create database, file exists"));
 	ret = new (pool) fichier_local(dialog, filename, gf_write_only, 0666, true, true, false);
-	if(ret == NULL)
+	if(ret == nullptr)
 	    throw Ememory("database_header_create");
 
 	try
@@ -96,7 +96,7 @@ namespace libdar
 	    h.write(*ret);
 
 	    comp = new (pool) compressor(gzip, ret); // upon success, ret is owned by compr
-	    if(comp == NULL)
+	    if(comp == nullptr)
 		throw Ememory("database_header_create");
 	    else
 		ret = comp;
@@ -112,7 +112,7 @@ namespace libdar
 
     generic_file *database_header_open(user_interaction & dialog, memory_pool *pool, const string & filename, unsigned char & db_version)
     {
-	generic_file *ret = NULL;
+	generic_file *ret = nullptr;
 
 	try
 	{
@@ -127,7 +127,7 @@ namespace libdar
 	    {
 		throw Erange("database_header_open", tools_printf(gettext("Error reading database %S : "), &filename) + e.get_message());
 	    }
-	    if(ret == NULL)
+	    if(ret == nullptr)
 		throw Ememory("database_header_open");
 
 	    h.read(*ret);
@@ -138,14 +138,14 @@ namespace libdar
 		throw Erange("database_header_open", gettext("Unknown header option in database, aborting\n"));
 
 	    comp = new (pool) compressor(gzip, ret);
-	    if(comp == NULL)
+	    if(comp == nullptr)
 		throw Ememory("database_header_open");
 	    else
 		ret = comp;
 	}
 	catch(...)
 	{
-	    if(ret != NULL)
+	    if(ret != nullptr)
 		delete ret;
 	    throw;
 	}

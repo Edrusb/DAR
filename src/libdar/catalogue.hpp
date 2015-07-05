@@ -90,10 +90,10 @@ namespace libdar
             // pseudo-sequential read (reading a directory still
             // implies that following read are located in this subdirectory up to the next EOD) but
             // it returns false if no entry of this name are present in the current directory
-            // a call with NULL as first argument means to set the current dir the parent directory
+            // a call with nullptr as first argument means to set the current dir the parent directory
 	void remove_read_entry(std::string & name);
 	    // in the currently read directory, removes the entry which name is given in argument
-	const cat_directory & get_current_reading_dir() const { if(current_read == NULL) throw SRC_BUG; return *current_read; };
+	const cat_directory & get_current_reading_dir() const { if(current_read == nullptr) throw SRC_BUG; return *current_read; };
 	    // remove from the catalogue all the entries that have not yet been read
 	    // by read().
 	void tail_catalogue_to_current_read();
@@ -127,13 +127,13 @@ namespace libdar
 	virtual void pre_add_failed_mark() const {};
 	virtual void pre_add_fsa(const cat_entree *ref) const {};
 	virtual void pre_add_fsa_crc(const cat_entree *ref) const {};
-	virtual escape *get_escape_layer() const { return NULL; };
+	virtual escape *get_escape_layer() const { return nullptr; };
 
         void add(cat_entree *ref); // add at end of catalogue (sequential point of view)
 	void re_add_in(const std::string &subdirname); // return into an already existing subdirectory for further addition
 	void re_add_in_replace(const cat_directory &dir); // same as re_add_in but also set the properties of the existing directory to those of the given argument
         void add_in_current_read(cat_nomme *ref); // add in currently read directory
-	const cat_directory & get_current_add_dir() const { if(current_add == NULL) throw SRC_BUG; return *current_add; };
+	const cat_directory & get_current_add_dir() const { if(current_add == nullptr) throw SRC_BUG; return *current_add; };
 
 
 
@@ -213,7 +213,7 @@ namespace libdar
         entree_stats get_stats() const { return stats; };
 
 	    /// whether the catalogue is empty or not
-	bool is_empty() const { if(contenu == NULL) throw SRC_BUG; return contenu->is_empty(); };
+	bool is_empty() const { if(contenu == nullptr) throw SRC_BUG; return contenu->is_empty(); };
 
         const cat_directory *get_contenu() const { return contenu; }; // used by data_tree
 
@@ -228,7 +228,7 @@ namespace libdar
 	    /// reset all pointers to the root (a bit better than reset_add() + reset_read() + reset_compare() + reset_sub_read())
 	void reset_all();
 
-	void set_to_unsaved_data_and_FSA() { if(contenu == NULL) throw SRC_BUG; contenu->recursively_set_to_unsaved_data_and_FSA(); };
+	void set_to_unsaved_data_and_FSA() { if(contenu == nullptr) throw SRC_BUG; contenu->recursively_set_to_unsaved_data_and_FSA(); };
 
 	    /// change location where to find EA, FSA and DATA for all the objects of the catalogue
 	void change_location(const pile_descriptor & pdesc) { contenu->change_location(pdesc, false); };

@@ -48,7 +48,7 @@ using namespace libdar;
 #define FIC1 "test/dump.bin"
 #define FIC2 "test/dump2.bin"
 
-static user_interaction *ui = NULL;
+static user_interaction *ui = nullptr;
 
 void f1();
 void f2();
@@ -61,7 +61,7 @@ int main()
 
     get_version(maj, med, min);
     user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(ui == NULL)
+    if(ui == nullptr)
 	cout << "ERREUR !" << endl;
 
     try
@@ -76,7 +76,7 @@ int main()
         throw SRC_BUG;
     }
 
-    if(ui != NULL)
+    if(ui != nullptr)
 	delete ui;
     return 0;
 }
@@ -99,9 +99,9 @@ void f1()
 	std::map <infinint, cat_etoile *> corres;
 
 	stack.push(dump);
-	dump = NULL;
+	dump = nullptr;
 	stack.push(comp);
-	comp = NULL;
+	comp = nullptr;
 	pdesc = &stack;
 
         cat_eod *v_eod = new cat_eod();
@@ -116,13 +116,13 @@ void f1()
         cat_directory *v_sub_dir = new cat_directory(200,20, 0777, datetime(100), datetime(101), datetime(102), "sous-repertoire", 0);
 	cat_mirage *v_mir = new cat_mirage("Zorro mirage", new cat_etoile(dynamic_cast<cat_inode *>(v_prise->clone()), 10));
 
-        cat_entree *liste[] = { v_eod, v_file, v_lien, v_dir, v_char, v_block, v_tube, v_prise, v_detruit, v_sub_dir, v_mir, NULL };
+        cat_entree *liste[] = { v_eod, v_file, v_lien, v_dir, v_char, v_block, v_tube, v_prise, v_detruit, v_sub_dir, v_mir, nullptr };
 
-        for(S_I i = 0; liste[i] != NULL; ++i)
+        for(S_I i = 0; liste[i] != nullptr; ++i)
         {
             cat_inode *ino = dynamic_cast<cat_inode *>(liste[i]);
 
-            if(ino != NULL)
+            if(ino != nullptr)
                 ino->set_saved_status(s_saved);
             liste[i]->dump(pdesc, false);
         }
@@ -130,11 +130,11 @@ void f1()
         stack.skip(0);
         entree_stats stats;
         stats.clear();
-        cat_entree *ref = (cat_entree *)1; // != NULL
-        for(S_I i = 0; ref != NULL; ++i)
+        cat_entree *ref = (cat_entree *)1; // != nullptr
+        for(S_I i = 0; ref != nullptr; ++i)
         {
-            ref = cat_entree::read(*ui, NULL, pdesc, macro_tools_supported_version, stats, corres, none, false, false, false);
-            if(ref != NULL)
+            ref = cat_entree::read(*ui, nullptr, pdesc, macro_tools_supported_version, stats, corres, none, false, false, false);
+            if(ref != nullptr)
                 delete ref;
         }
 	stats.listing(*ui);
@@ -156,14 +156,14 @@ void f1()
         dump = new fichier_local(*ui, FIC1, gf_read_write, 0644, false, true, false);
 	comp = new compressor(none, *dump, 1);
 	stack.push(dump);
-	dump = NULL;
+	dump = nullptr;
 	stack.push(comp);
-	comp = NULL;
+	comp = nullptr;
 	pdesc = &stack;
 
         v_dir->dump(pdesc, false);
         stack.skip(0);
-        ref = cat_entree::read(*ui, NULL, pdesc, macro_tools_supported_version, stats, corres, none, false, false, false);
+        ref = cat_entree::read(*ui, nullptr, pdesc, macro_tools_supported_version, stats, corres, none, false, false, false);
         v_sub_dir = dynamic_cast<cat_directory *>(ref);
         delete ref;
 	stack.clear();
@@ -220,11 +220,11 @@ void f2()
             const cat_directory *d = dynamic_cast<const cat_directory *>(ref);
             string type = "file";
 
-            if(e != NULL)
+            if(e != nullptr)
                 cout << " EOF "<< endl;
-            if(d != NULL)
+            if(d != nullptr)
                 type = "directory";
-            if(n != NULL)
+            if(n != nullptr)
                 cout << type << " name = " << n->get_name() << endl;
         }
 
@@ -235,9 +235,9 @@ void f2()
 	pile_descriptor pdesc;
 
 	stack.push(f);
-	f = NULL;
+	f = nullptr;
 	stack.push(comp);
-	comp = NULL;
+	comp = nullptr;
 	pdesc = & stack;
 
         cat.dump(pdesc);
@@ -255,19 +255,19 @@ void f2()
             const cat_inode *i = dynamic_cast<const cat_inode *>(ref);
             const cat_entree *was;
 
-            if(e != NULL)
+            if(e != nullptr)
                 ok = cat.compare(e, was);
             else
-                if(d != NULL)
+                if(d != nullptr)
                     cout << "fichier detruit ["<< d->get_signature() << "] name = " << d->get_name() << endl;
                 else
-                    if(i != NULL)
+                    if(i != nullptr)
                     {
                         ok = cat.compare(i, was);
                         const cat_inode *w;
                         if(ok)
                             w = dynamic_cast<const cat_inode *>(was);
-                        if(ok && w != NULL)
+                        if(ok && w != nullptr)
 			{
                             if(i->same_as(*w))
                                 if(i->is_more_recent_than(*w, 0))

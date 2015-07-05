@@ -217,7 +217,7 @@ namespace libdar
 				   U_16 & exception,
 				   std::string & except_msg)
     {
-	archive *ret = NULL;
+	archive *ret = nullptr;
         NLS_SWAP_IN;
 	WRAPPER_IN
 	    ret = new archive(dialog, chem,  basename,  extension,
@@ -237,7 +237,7 @@ namespace libdar
 				     U_16 & exception,
 				     std::string & except_msg)
     {
-	archive *arch_ret = NULL;
+	archive *arch_ret = nullptr;
 	NLS_SWAP_IN;
 	WRAPPER_IN
 	    arch_ret = new archive(dialog,
@@ -264,8 +264,8 @@ namespace libdar
     {
 	NLS_SWAP_IN;
 	WRAPPER_IN
-	    if(ptr == NULL)
-		throw Elibcall("op_isolate_noexcept", gettext("Invald NULL argument given to 'ptr'"));
+	    if(ptr == nullptr)
+		throw Elibcall("op_isolate_noexcept", gettext("Invald nullptr argument given to 'ptr'"));
 	ptr->op_isolate(dialog,
 			sauv_path,
 			filename,
@@ -285,7 +285,7 @@ namespace libdar
 				    U_16 & exception,
 				    std::string & except_msg)
     {
-	archive *ret = NULL;
+	archive *ret = nullptr;
 	NLS_SWAP_IN;
 	WRAPPER_IN
 	    ret = new archive(dialog,
@@ -309,12 +309,12 @@ namespace libdar
     {
 	NLS_SWAP_IN;
 	WRAPPER_IN
-	    if(ptr == NULL)
-		throw Elibcall("close_archive_noexcept", gettext("Invalid NULL pointer given to close_archive"));
+	    if(ptr == nullptr)
+		throw Elibcall("close_archive_noexcept", gettext("Invalid nullptr pointer given to close_archive"));
 	    else
 	    {
 		delete ptr;
-		ptr = NULL;
+		ptr = nullptr;
 	    }
 	WRAPPER_OUT(exception, except_msg)
 	    NLS_SWAP_OUT;
@@ -322,7 +322,7 @@ namespace libdar
 
     char *libdar_str2charptr_noexcept(const std::string & x, U_16 & exception, std::string & except_msg)
     {
-        char *ret = NULL;
+        char *ret = nullptr;
         NLS_SWAP_IN;
         WRAPPER_IN
 	    ret = tools_str2charptr(x);
@@ -338,12 +338,12 @@ namespace libdar
 		// locale for gettext
 
 	    if(string(DAR_LOCALEDIR) != string(""))
-		if(bindtextdomain(PACKAGE, DAR_LOCALEDIR) == NULL)
+		if(bindtextdomain(PACKAGE, DAR_LOCALEDIR) == nullptr)
 		    throw Erange("", "Cannot open the translated messages directory, native language support will not work");
 
 		// pseudo random generator
 
-	    srand(::time(NULL)+getpid()+getppid());
+	    srand(::time(nullptr)+getpid()+getppid());
 
 		// initializing LIBLZO2
 
@@ -392,7 +392,7 @@ namespace libdar
 #endif
 
 #if GPGME_SUPPORT
-	    if(gpgme_check_version(GPGME_MIN_VERSION) == NULL)
+	    if(gpgme_check_version(GPGME_MIN_VERSION) == nullptr)
 	    {
 		string tmp = "GPGME_SUPPORT";
 		throw Erange("libdar_init_gpgme", tools_printf(gettext("gpgme version requirement is not satisfied, requires version > %s"), tmp.c_str()));
@@ -431,8 +431,8 @@ namespace libdar
 	statistics ret;
 	NLS_SWAP_IN;
 	WRAPPER_IN
-	    if(ptr == NULL)
-		throw Elibcall("op_extract_noexcept", gettext("Invalid NULL argument given to 'ptr'"));
+	    if(ptr == nullptr)
+		throw Elibcall("op_extract_noexcept", gettext("Invalid nullptr argument given to 'ptr'"));
 	ret = ptr->op_extract(dialog,
 			      fs_root,
 			      options,
@@ -451,8 +451,8 @@ namespace libdar
     {
 	NLS_SWAP_IN;
 	WRAPPER_IN
-	    if(ptr == NULL)
-		throw Elibcall("op_extract_noexcept", gettext("Invalid NULL argument given to 'ptr'"));
+	    if(ptr == nullptr)
+		throw Elibcall("op_extract_noexcept", gettext("Invalid nullptr argument given to 'ptr'"));
 	ptr->op_listing(dialog,
 			options);
 	WRAPPER_OUT(exception, except_msg)
@@ -470,8 +470,8 @@ namespace libdar
 	statistics ret;
 	NLS_SWAP_IN;
 	WRAPPER_IN
-	    if(ptr == NULL)
-		throw Elibcall("op_extract_noexcept", gettext("Invalid NULL argument given to 'ptr'"));
+	    if(ptr == nullptr)
+		throw Elibcall("op_extract_noexcept", gettext("Invalid nullptr argument given to 'ptr'"));
 	ret = ptr->op_diff(dialog,
 			   fs_root,
 			   options,
@@ -492,8 +492,8 @@ namespace libdar
 	statistics ret;
 	NLS_SWAP_IN;
 	WRAPPER_IN
-	    if(ptr == NULL)
-		throw Elibcall("op_extract_noexcept", gettext("Invalid NULL argument given to 'ptr'"));
+	    if(ptr == nullptr)
+		throw Elibcall("op_extract_noexcept", gettext("Invalid nullptr argument given to 'ptr'"));
 	ret = ptr->op_test(dialog,
 			   options,
 			   progressive_report);
@@ -512,8 +512,8 @@ namespace libdar
 	bool ret = false;
 	NLS_SWAP_IN;
 	WRAPPER_IN
-	    if(ptr == NULL)
-		throw Elibcall("op_extract_noexcept", gettext("Invalid NULL argument given to 'ptr'"));
+	    if(ptr == nullptr)
+		throw Elibcall("op_extract_noexcept", gettext("Invalid nullptr argument given to 'ptr'"));
 	ret = ptr->get_children_of(dialog,
 				   dir);
 	WRAPPER_OUT(exception, except_msg)

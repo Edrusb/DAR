@@ -34,7 +34,7 @@
 
 using namespace libdar;
 
-static user_interaction *ui = NULL;
+static user_interaction *ui = nullptr;
 
 static label data_name;
 static label internal_name;
@@ -49,7 +49,7 @@ int main()
     U_I major, medium, minor;
     get_version(major, medium, minor);
     user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(ui == NULL)
+    if(ui == nullptr)
 	cout << "ERREUR !" << endl;
     data_name.clear();
     internal_name.generate_internal_filename();
@@ -57,7 +57,7 @@ int main()
     f2();
     f3();
     f4();
-    if(ui != NULL)
+    if(ui != nullptr)
 	delete ui;
 }
 

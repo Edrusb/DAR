@@ -102,7 +102,7 @@ namespace libdar
     {
     public :
 	    /// main constructor
-        generic_file(gf_mode m) { rw = m; terminated = no_read_ahead = false; enable_crc(false); checksum = NULL; };
+        generic_file(gf_mode m) { rw = m; terminated = no_read_ahead = false; enable_crc(false); checksum = nullptr; };
 
 	    /// copy constructor
 	generic_file(const generic_file &ref) { copy_from(ref); };

@@ -91,9 +91,9 @@ namespace libdar
 
         void set_crc(const crc &c);
         bool get_crc(const crc * & c) const; //< the argument is set the an allocated crc object the owned by the "cat_file" object, its stay valid while this "cat_file" object exists and MUST NOT be deleted by the caller in any case
-	bool has_crc() const { return check != NULL; };
+	bool has_crc() const { return check != nullptr; };
 	bool get_crc_size(infinint & val) const; //< returns true if crc is know and puts its width in argument
-	void drop_crc() { if(check != NULL) { delete check; check = NULL; } };
+	void drop_crc() { if(check != nullptr) { delete check; check = nullptr; } };
 
 	    // whether the plain file has to detect sparse file
 	void set_sparse_file_detection_read(bool val) { if(status == from_cat) throw SRC_BUG; if(val) file_data_status_read |= FILE_DATA_WITH_HOLE; else file_data_status_read &= ~FILE_DATA_WITH_HOLE; };

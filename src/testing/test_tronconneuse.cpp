@@ -123,7 +123,7 @@ int main()
     {
 	cout << "unknown exception caught" << endl;
     }
-    if(dialog != NULL)
+    if(dialog != nullptr)
 	delete dialog;
 }
 
@@ -132,7 +132,7 @@ void f1(user_interaction *dialog)
     fichier_local fic = fichier_local(*dialog, "toto", gf_write_only, 0666, false, true, false);
 
     test *toto = new test(*dialog, 10, fic);
-    if(toto == NULL)
+    if(toto == nullptr)
 	throw Ememory("test");
 
 #define TEST_WRITE(x) toto->write(x, strlen(x))
@@ -154,7 +154,7 @@ void f2(user_interaction *dialog)
     fichier_local fic = fichier_local(*dialog, "toto", gf_read_only, 0666, false, false, false);
 
     test *toto = new test(*dialog, 10, fic);
-    if(toto == NULL)
+    if(toto == nullptr)
 	throw Ememory("test");
 
     const int taille = 100;

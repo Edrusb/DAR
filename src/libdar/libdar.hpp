@@ -361,7 +361,7 @@ namespace libdar
         /// \return the address of a newly allocated memory
         /// which must be released calling the "delete []"
         /// operator when no more needed.
-        /// \return NULL in case of error
+        /// \return nullptr in case of error
     extern char *libdar_str2charptr_noexcept(const std::string & x, U_16 & exception, std::string & except_msg);
 
 	///////////////////////////////////////////////

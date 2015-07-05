@@ -59,7 +59,7 @@ namespace libdar
     private:
         struct cellule
         {
-	    cellule() : next(NULL), prev(NULL), data(NULL), size(0) {};
+	    cellule() : next(nullptr), prev(nullptr), data(nullptr), size(0) {};
             struct cellule *next, *prev;
             unsigned char *data;
             U_32 size;
@@ -99,7 +99,7 @@ namespace libdar
         class iterator : public on_pool
         {
         public :
-            iterator() : ref(NULL), cell(NULL), offset(0) {};
+            iterator() : ref(nullptr), cell(nullptr), offset(0) {};
                 // default constructor by reference is OK
                 // default destructor is OK
                 // default operator = is OK
@@ -138,7 +138,7 @@ namespace libdar
 
             void relative_skip_to(S_32 val);
             bool points_on_data() const
-	    {  return ref != NULL && cell != NULL && offset < cell->size; };
+	    {  return ref != nullptr && cell != nullptr && offset < cell->size; };
 
             inline void skip_plus_one();
             inline void skip_less_one();
@@ -149,18 +149,18 @@ namespace libdar
             // public storage methode using iterator
 
         iterator begin() const
-	{ iterator ret; ret.cell = first; if(ret.cell != NULL) ret.offset = 0; else ret.offset = iterator::OFF_END; ret.ref = this; return ret; };
+	{ iterator ret; ret.cell = first; if(ret.cell != nullptr) ret.offset = 0; else ret.offset = iterator::OFF_END; ret.ref = this; return ret; };
         iterator end() const
-	{ iterator ret; ret.cell = NULL; ret.offset = iterator::OFF_END; ret.ref = this; return ret;  };
+	{ iterator ret; ret.cell = nullptr; ret.offset = iterator::OFF_END; ret.ref = this; return ret;  };
 
             // WARNING for the two following methods :
             // there is no "reverse_iterator" type, unlike the standart lib,
             // thus when going from rbegin() to rend(), you must use the -- operator
             // unlike the stdlib, that uses the ++ operator. this is the only difference in use with stdlib.
         iterator rbegin() const
-	{ iterator ret; ret.cell = last; ret.offset = last != NULL ? last->size-1 : 0; ret.ref = this; return ret; };
+	{ iterator ret; ret.cell = last; ret.offset = last != nullptr ? last->size-1 : 0; ret.ref = this; return ret; };
         iterator rend() const
-	{ iterator ret; ret.cell = NULL, ret.offset = iterator::OFF_BEGIN; ret.ref = this; return ret; };
+	{ iterator ret; ret.cell = nullptr, ret.offset = iterator::OFF_BEGIN; ret.ref = this; return ret; };
 
 	    /// write data to the storage at the location pointed to by it
 
@@ -205,11 +205,11 @@ namespace libdar
 
     inline void storage::iterator::skip_plus_one()
     {
-        if(cell != NULL)
+        if(cell != nullptr)
             if(++offset >= cell->size)
             {
                 cell = cell->next;
-                if(cell != NULL)
+                if(cell != nullptr)
                     offset = 0;
                 else
                     offset = OFF_END;
@@ -218,14 +218,14 @@ namespace libdar
 
     inline void storage::iterator::skip_less_one()
     {
-        if(cell != NULL)
+        if(cell != nullptr)
 	{
             if(offset > 0)
                 --offset;
             else
             {
                 cell = cell->prev;
-                if(cell != NULL)
+                if(cell != nullptr)
                     offset = cell->size - 1;
                 else
                     offset = OFF_BEGIN;

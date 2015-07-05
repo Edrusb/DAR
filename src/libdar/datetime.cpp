@@ -165,7 +165,7 @@ namespace libdar
 	infinint newval;
 	datetime *me = const_cast<datetime *>(this);
 
-	if(me == NULL)
+	if(me == nullptr)
 	    throw SRC_BUG;
 
 	switch(uni)

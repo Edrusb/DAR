@@ -34,7 +34,7 @@ namespace libdar
 
     pile_descriptor::pile_descriptor(pile *ptr)
     {
-	if(ptr == NULL)
+	if(ptr == nullptr)
 	    throw SRC_BUG;
 	stack = ptr;
 	ptr->find_first_from_top(compr);
@@ -43,11 +43,11 @@ namespace libdar
 
     void pile_descriptor::check(bool small) const
     {
-	if(stack == NULL)
+	if(stack == nullptr)
 	    throw SRC_BUG;
-	if(esc == NULL && small)
+	if(esc == nullptr && small)
 	    throw SRC_BUG;
-	if(compr == NULL)
+	if(compr == nullptr)
 	    throw SRC_BUG;
     }
 

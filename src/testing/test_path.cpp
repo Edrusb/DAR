@@ -105,10 +105,10 @@ void f2()
 			  "toto/titi/tutu/../../..", "/toto/titi/tutu/../../..",
 			  "././././toto/././././..", "/././././toto/././././..",
 			  "../../../titi/./tutu", "/../../../../toto/../../tutu",
-			  NULL };
+			  nullptr };
     path conv = "/";
 
-    for(S_I i = 0; src[i] != NULL; i++)
+    for(S_I i = 0; src[i] != nullptr; i++)
     {
         conv = path(src[i]);
         cout << string(src[i]) << " --> " << conv.display() << endl;

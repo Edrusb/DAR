@@ -46,20 +46,20 @@ namespace libdar
 
     void testing::free()
     {
-	if(x_input != NULL)
+	if(x_input != nullptr)
 	{
 	    delete x_input;
-	    x_input = NULL;
+	    x_input = nullptr;
 	}
-	if(x_go_true != NULL)
+	if(x_go_true != nullptr)
 	{
 	    delete x_go_true;
-	    x_go_true = NULL;
+	    x_go_true = nullptr;
 	}
-	if(x_go_false != NULL)
+	if(x_go_false != nullptr)
 	{
 	    delete x_go_false;
-	    x_go_false = NULL;
+	    x_go_false = nullptr;
 	}
     }
 
@@ -77,13 +77,13 @@ namespace libdar
 
     bool testing::check() const
     {
-	return x_input != NULL && x_go_true != NULL && x_go_false != NULL;
+	return x_input != nullptr && x_go_true != nullptr && x_go_false != nullptr;
     }
 
     void crit_chain::add(const crit_action & act)
     {
 	crit_action *tmp = act.clone();
-	if(tmp == NULL)
+	if(tmp == nullptr)
 	    throw Ememory("crit_chain::add");
 	sequence.push_back(tmp);
     }
@@ -96,7 +96,7 @@ namespace libdar
 	{
 	    while(it != to_be_voided.sequence.end())
 	    {
-		if(*it == NULL)
+		if(*it == nullptr)
 		    throw SRC_BUG;
 		sequence.push_back(*it);
 		++it;
@@ -109,10 +109,10 @@ namespace libdar
 		++it;
 	    while(it != to_be_voided.sequence.end())
 	    {
-		if(*it != NULL)
+		if(*it != nullptr)
 		{
 		    delete *it;
-		    *it = NULL;
+		    *it = nullptr;
 		}
 		++it;
 	    }
@@ -138,7 +138,7 @@ namespace libdar
 
 	    while(it != sequence.end() && (data == data_undefined || ea == EA_undefined))
 	    {
-		if(*it == NULL)
+		if(*it == nullptr)
 		    throw SRC_BUG;
 		(*it)->get_action(first, second, tmp_data, tmp_ea);
 		if(data == data_undefined || tmp_data != data_undefined)
@@ -162,10 +162,10 @@ namespace libdar
 
 	while(it != sequence.end())
 	{
-	    if(*it != NULL)
+	    if(*it != nullptr)
 	    {
 		delete *it;
-		*it = NULL;
+		*it = nullptr;
 	    }
 	    ++it;
 	}
@@ -176,27 +176,27 @@ namespace libdar
     void crit_chain::copy_from(const crit_chain & ref)
     {
 	vector<crit_action *>::const_iterator it = ref.sequence.begin();
-	crit_action * tmp = NULL;
+	crit_action * tmp = nullptr;
 	sequence.clear();
 
 	try
 	{
 	    while(it != ref.sequence.end())
 	    {
-		if(*it == NULL)
+		if(*it == nullptr)
 		    throw SRC_BUG;
 		tmp = (*it)->clone();
-		if(tmp == NULL)
+		if(tmp == nullptr)
 		    throw Ememory("crit_chain::copy_from");
 		sequence.push_back(tmp);
-		tmp = NULL;
+		tmp = nullptr;
 		++it;
 	    }
 	}
 	catch(...)
 	{
 	    destroy();
-	    if(tmp != NULL)
+	    if(tmp != nullptr)
 		delete tmp;
 	    throw;
 	}
@@ -212,7 +212,7 @@ namespace libdar
 	const cat_inode *ret;
 	const cat_mirage *arg_m = dynamic_cast<const cat_mirage *>(arg);
 
-	if(arg_m != NULL)
+	if(arg_m != nullptr)
 	    ret = const_cast<const cat_inode *>(arg_m->get_inode());
 	else
 	    ret = dynamic_cast<const cat_inode *>(arg);
@@ -222,44 +222,44 @@ namespace libdar
 
     bool crit_in_place_is_inode::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
-	return dynamic_cast<const cat_inode *>(&first) != NULL
-	    || dynamic_cast<const cat_mirage *>(&first) != NULL;
+	return dynamic_cast<const cat_inode *>(&first) != nullptr
+	    || dynamic_cast<const cat_mirage *>(&first) != nullptr;
     }
 
     bool crit_in_place_is_file::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const cat_inode *first_i = get_inode(&first);
 
-	return dynamic_cast<const cat_file *>(first_i) != NULL && dynamic_cast<const cat_door *>(first_i) == NULL;
+	return dynamic_cast<const cat_file *>(first_i) != nullptr && dynamic_cast<const cat_door *>(first_i) == nullptr;
     }
 
     bool crit_in_place_is_hardlinked_inode::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
-	return dynamic_cast<const cat_mirage *>(&first) != NULL;
+	return dynamic_cast<const cat_mirage *>(&first) != nullptr;
     }
 
     bool crit_in_place_is_new_hardlinked_inode::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const cat_mirage * tmp = dynamic_cast<const cat_mirage *>(&first);
-	return tmp != NULL && tmp->is_first_mirage();
+	return tmp != nullptr && tmp->is_first_mirage();
     }
 
     bool crit_in_place_data_more_recent::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const cat_inode *first_i = get_inode(&first);
 	const cat_inode *second_i = get_inode(&second);
-	datetime first_date = first_i != NULL ? first_i->get_last_modif() : datetime(0);
-	datetime second_date = second_i != NULL ? second_i->get_last_modif() : datetime(0);
+	datetime first_date = first_i != nullptr ? first_i->get_last_modif() : datetime(0);
+	datetime second_date = second_i != nullptr ? second_i->get_last_modif() : datetime(0);
 
-	return first_i == NULL || first_date >= second_date || tools_is_equal_with_hourshift(x_hourshift, first_date, second_date);
+	return first_i == nullptr || first_date >= second_date || tools_is_equal_with_hourshift(x_hourshift, first_date, second_date);
     }
 
     bool crit_in_place_data_more_recent_or_equal_to::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const cat_inode *first_i = get_inode(&first);
-	datetime first_date = first_i != NULL ? first_i->get_last_modif() : datetime(0);
+	datetime first_date = first_i != nullptr ? first_i->get_last_modif() : datetime(0);
 
-	return first_i == NULL || first_date >= x_date || tools_is_equal_with_hourshift(x_hourshift, first_date, x_date);
+	return first_i == nullptr || first_date >= x_date || tools_is_equal_with_hourshift(x_hourshift, first_date, x_date);
     }
 
     bool crit_in_place_data_bigger::evaluate(const cat_nomme &first, const cat_nomme &second) const
@@ -269,7 +269,7 @@ namespace libdar
 	const cat_file *first_f = dynamic_cast<const cat_file *>(first_i);
 	const cat_file *second_f = dynamic_cast<const cat_file *>(second_i);
 
-	if(first_f != NULL && second_f != NULL)
+	if(first_f != nullptr && second_f != nullptr)
 	    return first_f->get_size() >= second_f->get_size();
 	else
 	    return true;
@@ -279,7 +279,7 @@ namespace libdar
     {
 	const cat_inode *first_i = get_inode(&first);
 
-	if(first_i != NULL)
+	if(first_i != nullptr)
 	    return first_i->get_saved_status() == s_saved;
 	else
 	    return true;
@@ -290,7 +290,7 @@ namespace libdar
 	const cat_inode *first_i = get_inode(&first);
 	const cat_file *first_f = dynamic_cast<const cat_file *>(first_i);
 
-	if(first_f != NULL)
+	if(first_f != nullptr)
 	    return first_f->is_dirty();
 	else
 	    return false;
@@ -301,7 +301,7 @@ namespace libdar
 	const cat_inode *first_i = get_inode(&first);
 	const cat_file *first_f = dynamic_cast<const cat_file *>(first_i);
 
-	if(first_f != NULL)
+	if(first_f != nullptr)
 	    return first_f->get_sparse_file_detection_read();
 	else
 	    return false;
@@ -314,7 +314,7 @@ namespace libdar
 
 	datetime ctime_f, ctime_s;
 
-	if(first_i != NULL)
+	if(first_i != nullptr)
 	{
 	    switch(first_i->ea_get_saved_status())
 	    {
@@ -330,7 +330,7 @@ namespace libdar
 	    ctime_f = datetime(0);
 
 
-	if(second_i != NULL)
+	if(second_i != nullptr)
 	{
 	    switch(second_i->ea_get_saved_status())
 	    {
@@ -355,7 +355,7 @@ namespace libdar
 
 	datetime ctime_f;
 
-	if(first_i != NULL)
+	if(first_i != nullptr)
 	{
 	    switch(first_i->ea_get_saved_status())
 	    {
@@ -381,7 +381,7 @@ namespace libdar
 	const cat_inode *second_i = get_inode(&second);
 	infinint first_nEA, second_nEA;
 
-	if(first_i != NULL)
+	if(first_i != nullptr)
 	{
 	    switch(first_i->ea_get_saved_status())
 	    {
@@ -395,7 +395,7 @@ namespace libdar
 	else
 	    first_nEA = 0;
 
-	if(second_i != NULL)
+	if(second_i != nullptr)
 	{
 	    switch(second_i->ea_get_saved_status())
 	    {
@@ -418,7 +418,7 @@ namespace libdar
 	const cat_inode *second_i = get_inode(&second);
 	infinint first_EA_size, second_EA_size;
 
-	if(first_i != NULL)
+	if(first_i != nullptr)
 	{
 	    switch(first_i->ea_get_saved_status())
 	    {
@@ -432,7 +432,7 @@ namespace libdar
 	else
 	    first_EA_size = 0;
 
-	if(second_i != NULL)
+	if(second_i != nullptr)
 	{
 	    switch(second_i->ea_get_saved_status())
 	    {
@@ -453,7 +453,7 @@ namespace libdar
     {
 	const cat_inode *first_i = get_inode(&first);
 
-	return first_i != NULL && first_i->ea_get_saved_status() == cat_inode::ea_full;
+	return first_i != nullptr && first_i->ea_get_saved_status() == cat_inode::ea_full;
     }
 
     bool crit_same_type::evaluate(const cat_nomme &first, const cat_nomme &second) const
@@ -479,25 +479,25 @@ namespace libdar
 	const cat_prise * second_prise = dynamic_cast<const cat_prise *>(second_i);
 	const cat_detruit *second_detruit = dynamic_cast<const cat_detruit *>(&second); // second not second_i here !
 
-	return (first_file != NULL && second_file != NULL)
-	    || (first_lien != NULL && second_lien != NULL)
-	    || (first_dir != NULL && second_dir != NULL)
-	    || (first_char != NULL && second_char != NULL)
-	    || (first_block != NULL && second_block != NULL)
-	    || (first_tube != NULL && second_tube != NULL)
-	    || (first_prise != NULL && second_prise != NULL)
-	    || (first_detruit != NULL && second_detruit != NULL);
+	return (first_file != nullptr && second_file != nullptr)
+	    || (first_lien != nullptr && second_lien != nullptr)
+	    || (first_dir != nullptr && second_dir != nullptr)
+	    || (first_char != nullptr && second_char != nullptr)
+	    || (first_block != nullptr && second_block != nullptr)
+	    || (first_tube != nullptr && second_tube != nullptr)
+	    || (first_prise != nullptr && second_prise != nullptr)
+	    || (first_detruit != nullptr && second_detruit != nullptr);
     }
 
     void crit_not::copy_from(const crit_not & ref)
     {
-	if(ref.x_crit == NULL)
+	if(ref.x_crit == nullptr)
 	    throw SRC_BUG;
 
-	if(ref.x_crit == NULL)
+	if(ref.x_crit == nullptr)
 	    throw SRC_BUG;
 	x_crit = ref.x_crit->clone();
-	if(x_crit == NULL)
+	if(x_crit == nullptr)
 	    throw Ememory("crit_not::copy_from");
     }
 
@@ -505,7 +505,7 @@ namespace libdar
     {
 	criterium *cloned = ref.clone();
 
-	if(cloned == NULL)
+	if(cloned == nullptr)
 	    throw Ememory("crit_and::add_crit");
 
 	try
@@ -529,7 +529,7 @@ namespace libdar
 	{
 	    while(it != to_be_voided.operand.end())
 	    {
-		if(*it == NULL)
+		if(*it == nullptr)
 		    throw SRC_BUG;
 		operand.push_back(*it);
 		++it;
@@ -542,10 +542,10 @@ namespace libdar
 		++it;
 	    while(it != to_be_voided.operand.end())
 	    {
-		if(*it != NULL)
+		if(*it != nullptr)
 		{
 		    delete *it;
-		    *it = NULL;
+		    *it = nullptr;
 		}
 		++it;
 	    }
@@ -594,7 +594,7 @@ namespace libdar
 	    while(it != ref.operand.end())
 	    {
 		cloned = (*it)->clone();
-		if(cloned == NULL)
+		if(cloned == nullptr)
 		    throw Ememory("crit_add::copy_from");
 		operand.push_back(cloned);
 		++it;
@@ -613,10 +613,10 @@ namespace libdar
 
 	while(it != operand.end())
 	{
-	    if(*it != NULL)
+	    if(*it != nullptr)
 	    {
 		delete *it;
-		*it = NULL;
+		*it = nullptr;
 	    }
 	    ++it;
 	}
@@ -891,13 +891,13 @@ namespace libdar
 	    const cat_mirage * do_mirage = dynamic_cast<const cat_mirage *>(dolly);
 
 	    dialog.printf(gettext("Entry information:\t\"in place\"\t\"to be added\""));
-	    dialog.printf(gettext("Is inode         :\t  %S  \t\t  %S"), al_inode == NULL ? &no : &yes , do_inode == NULL ? &no : &yes);
-	    dialog.printf(gettext("Is directory     :\t  %S  \t\t  %S"), al_directory == NULL ? &no : &yes , do_directory == NULL ? &no : &yes);
-	    dialog.printf(gettext("Is plain file    :\t  %S  \t\t  %S"), al_file == NULL ? &no : &yes , do_file == NULL ? &no : &yes);
-	    dialog.printf(gettext("Is hard linked   :\t  %S  \t\t  %S"), al_mirage == NULL ? &no : &yes , do_mirage == NULL ? &no : &yes);
+	    dialog.printf(gettext("Is inode         :\t  %S  \t\t  %S"), al_inode == nullptr ? &no : &yes , do_inode == nullptr ? &no : &yes);
+	    dialog.printf(gettext("Is directory     :\t  %S  \t\t  %S"), al_directory == nullptr ? &no : &yes , do_directory == nullptr ? &no : &yes);
+	    dialog.printf(gettext("Is plain file    :\t  %S  \t\t  %S"), al_file == nullptr ? &no : &yes , do_file == nullptr ? &no : &yes);
+	    dialog.printf(gettext("Is hard linked   :\t  %S  \t\t  %S"), al_mirage == nullptr ? &no : &yes , do_mirage == nullptr ? &no : &yes);
 	    dialog.printf(gettext("Entry type       :\t  %s  \t  %s"), signature2string(already_here->signature()), signature2string(dolly->signature()));
 
-	    if(al_inode != NULL && do_inode != NULL)
+	    if(al_inode != nullptr && do_inode != nullptr)
 	    {
 		const string me = gettext("me");
 		const string notme = "";
@@ -909,7 +909,7 @@ namespace libdar
 		bool do_fsa_saved = do_inode->fsa_get_saved_status() == cat_inode::fsa_full;
 
 		dialog.printf(gettext("Data more recent :\t  %S  \t\t  %S"), in_place_data_recent ? &me : &notme , in_place_data_recent ? &notme : &me);
-		if(al_file != NULL && do_file != NULL)
+		if(al_file != nullptr && do_file != nullptr)
 		{
 		    infinint al_size = al_file->get_size();
 		    infinint do_size = do_file->get_size();

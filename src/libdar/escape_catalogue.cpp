@@ -41,7 +41,7 @@ namespace libdar
 	x_lax = false;
 	corres.clear();
 	status = ec_completed; // yes, with that constructor, the catalogue contains all known object and entree do not miss any field
-	cat_det = NULL;
+	cat_det = nullptr;
 	min_read_offset = 0;
 	depth = 0; // we start at the root... of course
 	wait_parent_depth = 0; // to disable this feature
@@ -66,7 +66,7 @@ namespace libdar
 	x_lax = lax;
 	corres.clear();
 	status = ec_init; // with that constructor, the catalogue starts empty and get completed entry by entry each time a one asks for its contents (read() method)
-	cat_det = NULL;
+	cat_det = nullptr;
 	min_read_offset = 0;
 	depth = 0; // we start at the root
 	wait_parent_depth = 0; // to disable this feature
@@ -99,11 +99,11 @@ namespace libdar
 		throw Erange("escape_catalogue::escape_catalogue", gettext("could not find the internal data set label escape sequence"));
 	    else
 	    {
-		contextual *cont_data = NULL;
+		contextual *cont_data = nullptr;
 		pdesc.stack->find_first_from_bottom(cont_data);
 
 		get_ui().warning("LAX MODE: Could not read the internal data set label, using a fake value, this will probably avoid using isolated catalogue");
-		if(cont_data == NULL)
+		if(cont_data == nullptr)
 		    set_data_name(label_zero);
 		else
 		    set_data_name(cont_data->get_data_name());
@@ -130,7 +130,7 @@ namespace libdar
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 
-	if(ceci->pdesc.esc == NULL)
+	if(ceci->pdesc.esc == nullptr)
 	    throw SRC_BUG;
 
 	ceci->pdesc.stack->sync_write_above(pdesc.esc);
@@ -144,14 +144,14 @@ namespace libdar
 	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
 	const cat_inode *ref_ino = dynamic_cast<const cat_inode *>(ref);
 
-	if(ref_mir != NULL)
+	if(ref_mir != nullptr)
 	    ref_ino = ref_mir->get_inode();
 
-	if(ref_ino != NULL)
+	if(ref_ino != nullptr)
 	{
 	    if(ref_ino->ea_get_saved_status() == cat_inode::ea_full)
 	    {
-		if(ceci->pdesc.esc == NULL)
+		if(ceci->pdesc.esc == nullptr)
 		    throw SRC_BUG;
 		else
 		{
@@ -170,18 +170,18 @@ namespace libdar
 	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
 	const cat_file *ref_file = dynamic_cast<const cat_file *>(ref);
 
-	if(ref_mir != NULL)
+	if(ref_mir != nullptr)
 	    ref_file = dynamic_cast<const cat_file *>(ref_mir->get_inode());
 
-	if(ref_file != NULL)
+	if(ref_file != nullptr)
 	{
 	    if(ref_file->get_saved_status() == s_saved)
 	    {
-		const crc * c = NULL;
+		const crc * c = nullptr;
 
 		if(ref_file->get_crc(c))
 		{
-		    if(ceci->pdesc.esc == NULL)
+		    if(ceci->pdesc.esc == nullptr)
 			throw SRC_BUG;
 
 		    ceci->pdesc.stack->sync_write_above(pdesc.esc);
@@ -198,7 +198,7 @@ namespace libdar
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 
-	if(ceci->pdesc.esc == NULL)
+	if(ceci->pdesc.esc == nullptr)
 	    throw SRC_BUG;
 	ceci->pdesc.stack->sync_write_above(pdesc.esc);
 	ceci->pdesc.esc->add_mark_at_current_position(escape::seqt_dirty);
@@ -211,18 +211,18 @@ namespace libdar
 	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
 	const cat_inode *ref_ino = dynamic_cast<const cat_inode *>(ref);
 
-	if(ref_mir != NULL)
+	if(ref_mir != nullptr)
 	    ref_ino = ref_mir->get_inode();
 
-	if(ref_ino != NULL)
+	if(ref_ino != nullptr)
 	{
 	    if(ref_ino->ea_get_saved_status() == cat_inode::ea_full)
 	    {
-		const crc * c = NULL;
+		const crc * c = nullptr;
 
 		ref_ino->ea_get_crc(c);
 
-		if(ceci->pdesc.esc == NULL)
+		if(ceci->pdesc.esc == nullptr)
 		    throw SRC_BUG;
 		ceci->pdesc.stack->sync_write_above(pdesc.esc);
 		ceci->pdesc.esc->add_mark_at_current_position(escape::seqt_ea_crc);
@@ -238,7 +238,7 @@ namespace libdar
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 
-	if(ceci->pdesc.esc == NULL)
+	if(ceci->pdesc.esc == nullptr)
 	    throw SRC_BUG;
 	ceci->pdesc.stack->sync_write_above(pdesc.esc);
 	ceci->pdesc.esc->add_mark_at_current_position(escape::seqt_changed);
@@ -248,7 +248,7 @@ namespace libdar
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 
-	if(ceci->pdesc.esc == NULL)
+	if(ceci->pdesc.esc == nullptr)
 	    throw SRC_BUG;
 	ceci->pdesc.stack->sync_write_above(pdesc.esc);
 	ceci->pdesc.esc->add_mark_at_current_position(escape::seqt_failed_backup);
@@ -260,14 +260,14 @@ namespace libdar
 	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
 	const cat_inode *ref_ino = dynamic_cast<const cat_inode *>(ref);
 
-	if(ref_mir != NULL)
+	if(ref_mir != nullptr)
 	    ref_ino = ref_mir->get_inode();
 
-	if(ref_ino != NULL)
+	if(ref_ino != nullptr)
 	{
 	    if(ref_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 	    {
-		if(ceci->pdesc.esc == NULL)
+		if(ceci->pdesc.esc == nullptr)
 		    throw SRC_BUG;
 		else
 		{
@@ -286,18 +286,18 @@ namespace libdar
 	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
 	const cat_inode *ref_ino = dynamic_cast<const cat_inode *>(ref);
 
-	if(ref_mir != NULL)
+	if(ref_mir != nullptr)
 	    ref_ino = ref_mir->get_inode();
 
-	if(ref_ino != NULL)
+	if(ref_ino != nullptr)
 	{
 	    if(ref_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 	    {
-		const crc * c = NULL;
+		const crc * c = nullptr;
 
 		ref_ino->fsa_get_crc(c);
 
-		if(ceci->pdesc.esc == NULL)
+		if(ceci->pdesc.esc == nullptr)
 		    throw SRC_BUG;
 		ceci->pdesc.stack->sync_write_above(pdesc.esc);
 		ceci->pdesc.esc->add_mark_at_current_position(escape::seqt_fsa_crc);
@@ -333,7 +333,7 @@ namespace libdar
 	case ec_init:
 	case ec_eod:
 	case ec_detruits:
-	    if(cat_det == NULL)
+	    if(cat_det == nullptr)
 		throw SRC_BUG;
 	    cat_det->skip_read_to_parent_dir();
 	    break;
@@ -351,13 +351,13 @@ namespace libdar
     bool escape_catalogue::read(const cat_entree * & ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
-	const cat_directory *ref_dir = NULL;
-	const cat_eod *ref_eod = NULL;
+	const cat_directory *ref_dir = nullptr;
+	const cat_eod *ref_eod = nullptr;
 	bool stop = false;
 
-	if(pdesc.esc == NULL)
+	if(pdesc.esc == nullptr)
 	    throw SRC_BUG;
-	ref = NULL;
+	ref = nullptr;
 
 	    // if we have already read the whole archive contents (included detruits object),
 	    // we do not need inspect the archive again, we instead use the data in memory
@@ -371,7 +371,7 @@ namespace libdar
 	    bool only_detruit = false;
 	    bool compare_content = false;
 
-	    while(ref == NULL && !stop)
+	    while(ref == nullptr && !stop)
 	    {
 		switch(status)
 		{
@@ -407,20 +407,20 @@ namespace libdar
 			    {
 				if(!pdesc.esc->skip_to_next_mark(escape::seqt_failed_backup, false))
 				    throw SRC_BUG;
-				if(ref != NULL)
+				if(ref != nullptr)
 				{
 				    delete ref;
-				    ref = NULL;
+				    ref = nullptr;
 				}
 				continue; // restarts the while loop
 			    }
 
 			    ref_dir = dynamic_cast<const cat_directory *>(ref);
-			    if(ref_dir != NULL)
+			    if(ref_dir != nullptr)
 				++(ceci->depth);
 
 			    ref_eod = dynamic_cast<const cat_eod *>(ref);
-			    if(ref_eod != NULL)
+			    if(ref_eod != nullptr)
 			    {
 				if(!depth.is_zero())
 				    --(ceci->depth);
@@ -430,10 +430,10 @@ namespace libdar
 				    else // lax mode
 				    {
 					get_ui().warning(gettext("LAX MODE: Archive directory structure is corrupted, it would lead to place some files out of the specified root directory. Restoring different directory contents at the root not out of it, which will put files of different directories in the specified root directory"));
-					if(ref == NULL)
+					if(ref == nullptr)
 					    throw SRC_BUG;
 					delete ref; // this is the CAT_EOD object
-					ref = NULL;
+					ref = nullptr;
 					continue; // restarts the while loop
 				    }
 			    }
@@ -445,16 +445,16 @@ namespace libdar
 			    else
 			    {
 				get_ui().warning(gettext("LAX MODE: found unknown catalogue entry, assuming data corruption occurred. Skipping to the next entry, this may lead to improper directory structure being restored, if the corrupted data was a directory"));
-				ref = NULL;
+				ref = nullptr;
 				continue; // restarts the while loop
 			    }
 			}
 
-			if(ref == NULL)
+			if(ref == nullptr)
 			    throw Erange("escape_catalogue::read", gettext("Corrupted entry following an escape mark in the archive"));
 			else
 			{
-			    bool is_eod = ref_eod != NULL;
+			    bool is_eod = ref_eod != nullptr;
 			    cat_entree *ref_nc = const_cast<cat_entree *>(ref);
 
 			    ceci->add(ref_nc);
@@ -468,7 +468,7 @@ namespace libdar
 					throw SRC_BUG; // we should get out of the directory reading a CAT_EOD !
 				}
 
-				ref = NULL; // must not release object except, they are now part of catalogue
+				ref = nullptr; // must not release object except, they are now part of catalogue
 				continue;   // ignore this entry and skip to the next one
 			    }
 
@@ -483,7 +483,7 @@ namespace libdar
 			    get_ui().warning(gettext("Uncompleted archive! Assuming it has been interrupted during the backup process. If an error has been reported just above, simply ignore it, this is about the file that was saved at the time of the interruption."));
 			    ceci->status = ec_eod;
 			    ref = get_r_eod_address();
-			    if(ref == NULL)
+			    if(ref == nullptr)
 				throw SRC_BUG;
 			    --(ceci->depth);
 			}
@@ -495,7 +495,7 @@ namespace libdar
 			    label tmp;
 			    tmp.clear();
 
-			    if(pdesc.compr == NULL)
+			    if(pdesc.compr == nullptr)
 				throw SRC_BUG;
 			    if(pdesc.compr->is_compression_suspended())
 			    {
@@ -508,7 +508,7 @@ namespace libdar
 			    {
 				ceci->status = ec_signature;
 				stop = false;
-				ref = NULL;
+				ref = nullptr;
 			    }
 			    else // no more file and no catalogue entry found (interrupted archive)
 			    {
@@ -519,7 +519,7 @@ namespace libdar
 				else
 				{
 				    get_ui().warning("LAX MODE: Cannot extract from the internal catalogue the list of files to remove, skipping this step");
-				    ref = NULL;
+				    ref = nullptr;
 				    stop = true;
 				}
 			    }
@@ -530,7 +530,7 @@ namespace libdar
 		    if(!depth.is_zero())
 		    {
 			ref = get_r_eod_address();
-			if(ref == NULL)
+			if(ref == nullptr)
 			    throw SRC_BUG;
 			--(ceci->depth);
 		    }
@@ -564,7 +564,7 @@ namespace libdar
 							       x_lax,
 							       label_zero,
 							       only_detruit && ! compare_content);
-		    if(ceci->cat_det == NULL)
+		    if(ceci->cat_det == nullptr)
 			throw Ememory("escape_catalogue::read");
 
 		    try
@@ -604,28 +604,28 @@ namespace libdar
 			{
 			    ceci->status = ec_detruits;
 			    stop = false;
-			    ref = NULL;
+			    ref = nullptr;
 			}
 			else
 			{
 			    ceci->status = ec_completed;
 			    ceci->swap_stuff(*(ceci->cat_det));
 			    delete ceci->cat_det;
-			    ceci->cat_det = NULL;
+			    ceci->cat_det = nullptr;
 			}
 		    }
 		    catch(...)
 		    {
-			if(ceci->cat_det != NULL)
+			if(ceci->cat_det != nullptr)
 			{
 			    delete ceci->cat_det;
-			    ceci->cat_det = NULL;
+			    ceci->cat_det = nullptr;
 			}
 			throw;
 		    }
 		    break;
 		case ec_detruits:
-		    if(cat_det == NULL)
+		    if(cat_det == nullptr)
 			throw SRC_BUG;
 
 			// cat_det has been set to only read detruit() objects
@@ -635,11 +635,11 @@ namespace libdar
 		    {
 			ceci->merge_cat_det();
 			ceci->status = ec_completed;
-			ref = NULL;
+			ref = nullptr;
 			stop = true;
 		    }
 		    else // we return the provided detruit object
-			if(ref == NULL)
+			if(ref == nullptr)
 			    throw SRC_BUG;
 		    break;
 		case ec_completed:
@@ -651,13 +651,13 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    if(ref != NULL && cat_det == NULL && ref != get_r_eod_address()) // we must not delete objects owned by cat_det
+	    if(ref != nullptr && cat_det == nullptr && ref != get_r_eod_address()) // we must not delete objects owned by cat_det
 		delete ref;
-	    ref = NULL;
+	    ref = nullptr;
 	    throw;
 	}
 
-	return ref != NULL;
+	return ref != nullptr;
     }
 
     bool escape_catalogue::read_if_present(std::string *name, const cat_nomme * & ref) const
@@ -688,11 +688,11 @@ namespace libdar
 	x_lax = ref.x_lax;
 	corres = ref.corres;
 	status = ref.status;
-	if(ref.cat_det == NULL)
-	    cat_det = NULL;
+	if(ref.cat_det == nullptr)
+	    cat_det = nullptr;
 	else
 	    cat_det = new (get_pool()) catalogue(*ref.cat_det);
-	if(cat_det == NULL)
+	if(cat_det == nullptr)
 	    throw Ememory("escape_catalogue::copy_from");
 	min_read_offset = ref.min_read_offset;
 	depth = ref.depth;
@@ -701,20 +701,20 @@ namespace libdar
 
     void escape_catalogue::destroy()
     {
-	if(cat_det != NULL)
+	if(cat_det != nullptr)
 	{
 	    delete cat_det;
-	    cat_det = NULL;
+	    cat_det = nullptr;
 	}
     }
 
     void escape_catalogue::merge_cat_det()
     {
-	if(cat_det != NULL)
+	if(cat_det != nullptr)
 	{
 	    copy_detruits_from(*cat_det);
 	    delete cat_det;
-	    cat_det = NULL;
+	    cat_det = nullptr;
 	}
     }
 

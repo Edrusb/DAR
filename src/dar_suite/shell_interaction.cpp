@@ -109,12 +109,12 @@ shell_interaction::shell_interaction(ostream *out, ostream *interact, bool silen
     beep = false;
 
 	// updating object fields
-    if(out != NULL)
+    if(out != nullptr)
         output = out;
     else
         throw SRC_BUG;
 
-    if(interact != NULL)
+    if(interact != nullptr)
         inter = interact;
     else
         throw SRC_BUG;
@@ -214,7 +214,7 @@ shell_interaction::~shell_interaction()
 
 void shell_interaction::change_non_interactive_output(ostream *out)
 {
-    if(out != NULL)
+    if(out != nullptr)
         output = out;
     else
         throw SRC_BUG;
@@ -238,7 +238,7 @@ void shell_interaction::read_char(char & a)
 
 void shell_interaction::set_term_mod(shell_interaction::mode m)
 {
-    termios *ptr = NULL;
+    termios *ptr = nullptr;
     switch(m)
     {
     case m_initial:
@@ -266,7 +266,7 @@ bool shell_interaction::interaction_pause(const string &message, void *context)
     char & b = buffer[1];
     bool ret;
 
-    if(obj == NULL)
+    if(obj == nullptr)
 	throw SRC_BUG;
 
     if(!obj->has_terminal)
@@ -337,10 +337,10 @@ void shell_interaction::interaction_warning(const string & message, void *contex
 {
     shell_interaction *obj = (shell_interaction *)(context);
 
-    if(obj == NULL)
+    if(obj == nullptr)
 	throw SRC_BUG;
 
-    if(obj->output == NULL)
+    if(obj->output == nullptr)
         throw SRC_BUG; // shell_interaction has not been properly initialized
     *(obj->output) << message;
 }
@@ -359,14 +359,14 @@ string shell_interaction::interaction_string(const string & message, bool echo, 
     bool fin = false;
     shell_interaction *obj = (shell_interaction *)(context);
 
-    if(obj == NULL)
+    if(obj == nullptr)
 	throw SRC_BUG;
 
 
     if(!echo)
 	obj->set_term_mod(shell_interaction::m_initial);
 
-    if(obj->output == NULL || obj->input < 0)
+    if(obj->output == nullptr || obj->input < 0)
 	throw SRC_BUG;  // shell_interaction has not been properly initialized
     *(obj->inter) << message;
     do
@@ -401,7 +401,7 @@ secu_string shell_interaction::interaction_secu_string(const string & message, b
     U_I last = 0, i = 0;
     shell_interaction *obj = (shell_interaction *)(context);
 
-    if(obj == NULL)
+    if(obj == nullptr)
 	throw SRC_BUG;
 
 
@@ -410,7 +410,7 @@ secu_string shell_interaction::interaction_secu_string(const string & message, b
 
     try
     {
-	if(obj->output == NULL || obj->input < 0)
+	if(obj->output == nullptr || obj->input < 0)
 	    throw SRC_BUG;  // shell_interaction has not been properly initialized
 	*(obj->inter) << message;
 	do

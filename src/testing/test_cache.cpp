@@ -68,7 +68,7 @@ using namespace std;
 void f1();
 void f2();
 
-static user_interaction *ui = NULL;
+static user_interaction *ui = nullptr;
 
 int main()
 {
@@ -76,7 +76,7 @@ int main()
 
     get_version(maj, med, min);
     ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(ui == NULL)
+    if(ui == nullptr)
 	cout << "ERREUR !" << endl;
     try
     {
@@ -91,7 +91,7 @@ int main()
     {
 	ui->warning(string("Aborting on exception: ") + e.get_message());
     }
-    if(ui != NULL)
+    if(ui != nullptr)
 	delete ui;
 }
 

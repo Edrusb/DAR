@@ -82,7 +82,7 @@ namespace libdar
 	U_I min = 0;
 	U_I max = table.size();
 
-	if(val == NULL)
+	if(val == nullptr)
 	    throw SRC_BUG;
 
 	if(max == 0) // empty table
@@ -91,7 +91,7 @@ namespace libdar
 	do
 	{
 	    index = (min + max)/2;
-	    if(table[index] == NULL)
+	    if(table[index] == nullptr)
 		throw SRC_BUG;
 	    if(*(table[index]) < *val)
 		min = index + 1;
@@ -133,7 +133,7 @@ namespace libdar
 
     static bool compare_for_sort(const filesystem_specific_attribute *a, const filesystem_specific_attribute *b)
     {
-	if(a == NULL || b == NULL)
+	if(a == nullptr || b == nullptr)
 	    throw SRC_BUG;
 	return *a < *b;
     }
@@ -145,10 +145,10 @@ namespace libdar
 
 	while(it != fsa.end())
 	{
-	    if(*it != NULL)
+	    if(*it != nullptr)
 	    {
 		delete *it;
-		*it = NULL;
+		*it = nullptr;
 	    }
 	    ++it;
 	}
@@ -170,9 +170,9 @@ namespace libdar
 		continue; // skip the rest of the while loop
 	    }
 
-	    if(*it == NULL)
+	    if(*it == nullptr)
 		throw SRC_BUG;
-	    if(*rt == NULL)
+	    if(*rt == nullptr)
 		throw SRC_BUG;
 
 	    if(scope.find((*it)->get_family()) == scope.end())
@@ -185,7 +185,7 @@ namespace libdar
 	    while(rt != ref.fsa.end() && *(*rt) < *(*it))
 	    {
 		++rt;
-		if(*rt == NULL)
+		if(*rt == nullptr)
 		    throw SRC_BUG;
 	    }
 
@@ -218,7 +218,7 @@ namespace libdar
 		char buffer[FAM_SIG_WIDTH + NAT_SIG_WIDTH + 1];
 		fsa_family fam;
 		fsa_nature nat;
-		filesystem_specific_attribute *ptr = NULL;
+		filesystem_specific_attribute *ptr = nullptr;
 
 		f.read(buffer, FAM_SIG_WIDTH);
 		buffer[FAM_SIG_WIDTH] = '\0';
@@ -253,10 +253,10 @@ namespace libdar
 		    throw SRC_BUG;
 		}
 
-		if(ptr == NULL)
+		if(ptr == nullptr)
 		    throw Ememory("filesystem_specific_attribute_list::read");
 		fsa.push_back(ptr);
-		ptr = NULL;
+		ptr = nullptr;
 
 		--sub_size;
 	    }
@@ -278,7 +278,7 @@ namespace libdar
 	{
 	    string tmp;
 
-	    if(*it == NULL)
+	    if(*it == nullptr)
 		throw SRC_BUG;
 
 	    tmp = family_to_signature((*it)->get_family());
@@ -329,7 +329,7 @@ namespace libdar
     {
 	if(arg >= fsa.size())
 	    throw SRC_BUG;
-	if(fsa[arg] == NULL)
+	if(fsa[arg] == nullptr)
 	    throw SRC_BUG;
 
 	return *(fsa[arg]);
@@ -344,7 +344,7 @@ namespace libdar
 
 	while(it != fsa.end())
 	{
-	    if(*it == NULL)
+	    if(*it == nullptr)
 		throw SRC_BUG;
 	    ret += (*it)->storage_size() + overhead;
 	    ++it;
@@ -360,7 +360,7 @@ namespace libdar
 
 	while(it != arg.fsa.end())
 	{
-	    if(*it == NULL)
+	    if(*it == nullptr)
 		throw SRC_BUG;
 	    ret.add(*(*it));
 	    ++it;
@@ -393,7 +393,7 @@ namespace libdar
 
 	while(it != ref.fsa.end())
 	{
-	    if(*it == NULL)
+	    if(*it == nullptr)
 		throw SRC_BUG;
 	    fsa.push_back((*it)->clone());
 	    ++it;
@@ -409,7 +409,7 @@ namespace libdar
 	familes.clear();
 	while(it != fsa.end())
 	{
-	    if(*it == NULL)
+	    if(*it == nullptr)
 		throw SRC_BUG;
 	    familes.insert((*it)->get_family());
 	    ++it;
@@ -422,12 +422,12 @@ namespace libdar
 
 	if(binary_search_in_sorted_list(fsa, &ref, index))
 	{
-	    if(fsa[index] == NULL)
+	    if(fsa[index] == nullptr)
 		throw SRC_BUG;
 	    else
 	    {
 		filesystem_specific_attribute *rep = ref.clone();
-		if(rep == NULL)
+		if(rep == nullptr)
 		    throw Ememory("filesystem_specific_attribute_list::add");
 		try
 		{
@@ -444,16 +444,16 @@ namespace libdar
 	else
 	{
 	    filesystem_specific_attribute *rep = ref.clone();
-	    if(rep == NULL)
+	    if(rep == nullptr)
 		throw Ememory("filesystem_specific_attribute_list::add");
 
 	    try
 	    {
-		fsa.resize(fsa.size()+1, NULL);
+		fsa.resize(fsa.size()+1, nullptr);
 		for(U_I i = fsa.size()-1 ; i > index ; --i)
 		{
 		    fsa[i] = fsa[i-1];
-		    fsa[i-1] = NULL;
+		    fsa[i-1] = nullptr;
 		}
 
 		fsa[index] = rep;
@@ -474,11 +474,11 @@ namespace libdar
 
     template <class T, class U> void create_or_throw(T *& ref, memory_pool *pool, fsa_family f, fsa_nature n, const U & val)
     {
-	if(ref != NULL)
+	if(ref != nullptr)
 	    throw SRC_BUG;
 
 	ref = new (pool) T(f, n, val);
-	if(ref == NULL)
+	if(ref == nullptr)
 	    throw Ememory("template create_or_throw");
     }
 
@@ -519,7 +519,7 @@ namespace libdar
 	    try
 	    {
 		S_I f = 0;
-		fsa_bool * ptr = NULL;
+		fsa_bool * ptr = nullptr;
 
 		if(ioctl(fd, EXT2_IOC_GETFLAGS, &f) < 0)
 		    return; // assuming there is no support for that FSA family
@@ -527,68 +527,68 @@ namespace libdar
 #ifdef EXT2_APPEND_FL
 		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_append_only, (f & EXT2_APPEND_FL) != 0);
 		fsa.push_back(ptr);
-		ptr = NULL;
+		ptr = nullptr;
 #endif
 #ifdef EXT2_COMPR_FL
 		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_compressed, (f & EXT2_COMPR_FL) != 0);
 		fsa.push_back(ptr);
-		ptr = NULL;
+		ptr = nullptr;
 #endif
 #ifdef EXT2_NODUMP_FL
 		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_no_dump, (f & EXT2_NODUMP_FL) != 0);
 		fsa.push_back(ptr);
-		ptr = NULL;
+		ptr = nullptr;
 #endif
 #ifdef EXT2_IMMUTABLE_FL
 		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_immutable, (f & EXT2_IMMUTABLE_FL) != 0);
 		fsa.push_back(ptr);
-		ptr = NULL;
+		ptr = nullptr;
 #endif
 #ifdef EXT3_JOURNAL_DATA_FL
 		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_data_journaling, (f & EXT3_JOURNAL_DATA_FL) != 0);
 		fsa.push_back(ptr);
-		ptr = NULL;
+		ptr = nullptr;
 #else
 #ifdef EXT2_JOURNAL_DATA_FL
 		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_data_journaling, (f & EXT2_JOURNAL_DATA_FL) != 0);
 		fsa.push_back(ptr);
-		ptr = NULL;
+		ptr = nullptr;
 #endif
 #endif
 #ifdef	EXT2_SECRM_FL
 		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_secure_deletion, (f & EXT2_SECRM_FL) != 0);
 		fsa.push_back(ptr);
-		ptr = NULL;
+		ptr = nullptr;
 #endif
 #ifdef EXT2_NOTAIL_FL
 		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_no_tail_merging, (f & EXT2_NOTAIL_FL) != 0);
 		fsa.push_back(ptr);
-		ptr = NULL;
+		ptr = nullptr;
 #endif
 #ifdef	EXT2_UNRM_FL
 		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_undeletable, (f & EXT2_UNRM_FL) != 0);
 		fsa.push_back(ptr);
-		ptr = NULL;
+		ptr = nullptr;
 #endif
 #ifdef EXT2_NOATIME_FL
 		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_noatime_update, (f & EXT2_NOATIME_FL) != 0);
 		fsa.push_back(ptr);
-		ptr = NULL;
+		ptr = nullptr;
 #endif
 #ifdef EXT2_DIRSYNC_FL
 		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_synchronous_directory, (f & EXT2_DIRSYNC_FL) != 0);
 		fsa.push_back(ptr);
-		ptr = NULL;
+		ptr = nullptr;
 #endif
 #ifdef EXT2_SYNC_FL
 		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_synchronous_update, (f & EXT2_SYNC_FL) != 0);
 		fsa.push_back(ptr);
-		ptr = NULL;
+		ptr = nullptr;
 #endif
 #ifdef EXT2_TOPDIR_FL
 		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_top_of_dir_hierarchy, (f & EXT2_TOPDIR_FL) != 0);
 		fsa.push_back(ptr);
-		ptr = NULL;
+		ptr = nullptr;
 #endif
 	    }
 	    catch(...)
@@ -614,7 +614,7 @@ namespace libdar
 	    return; // silently aborting assuming FSA family not supported for that file
 	else
 	{
-	    fsa_time * ptr = NULL;
+	    fsa_time * ptr = nullptr;
 #ifdef LIBDAR_MICROSECOND_READ_ACCURACY
 	    datetime birthtime = datetime(tmp.st_birthtim.tv_sec, tmp.st_birthtim.tv_nsec, datetime::tu_nanosecond);
 	    if(birthtime.is_null())
@@ -625,7 +625,7 @@ namespace libdar
 	    create_or_throw(ptr, get_pool(), fsaf_hfs_plus, fsan_creation_date, birthtime);
 
 	    fsa.push_back(ptr);
-	    ptr = NULL;
+	    ptr = nullptr;
 	}
 #endif
     }
@@ -638,7 +638,7 @@ namespace libdar
 
 	while(!has_extX_FSA && it != fsa.end())
 	{
-	    if(*it == NULL)
+	    if(*it == nullptr)
 		throw SRC_BUG;
 	    if((*it)->get_family() == fsaf_linux_extX)
 		has_extX_FSA = true;
@@ -669,7 +669,7 @@ namespace libdar
 	    {
 		S_I f = 0;      // will contain the desirable flag bits field
 		S_I f_orig = 0; // will contain the original flag bits field
-		const fsa_bool *it_bool = NULL;
+		const fsa_bool *it_bool = nullptr;
 
 		if(ioctl(fd, EXT2_IOC_GETFLAGS, &f_orig) < 0)
 		    throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed reading exiting extX family FSA: ")) + tools_strerror_r(errno));
@@ -677,7 +677,7 @@ namespace libdar
 
 		for(it = fsa.begin() ; it != fsa.end() ; ++it)
 		{
-		    if(*it == NULL)
+		    if(*it == nullptr)
 			throw SRC_BUG;
 
 		    it_bool = dynamic_cast<const fsa_bool *>(*it);
@@ -691,7 +691,7 @@ namespace libdar
 			case fsan_creation_date:
 			    throw SRC_BUG; // unknown nature for this family type
 			case fsan_append_only:
-			    if(it_bool == NULL)
+			    if(it_bool == nullptr)
 				throw SRC_BUG; // should be a boolean
 #ifdef EXT2_APPEND_FL
 			    if(it_bool->get_value())
@@ -982,7 +982,7 @@ namespace libdar
 
 	    // the birthtime is set with the different other dates of that inode, so
 	    // here we just check that this FSA list provides a birthtime info:
-	const filesystem_specific_attribute *tmp = NULL;
+	const filesystem_specific_attribute *tmp = nullptr;
 
 	ret = find(fsaf_hfs_plus, fsan_creation_date, tmp);
 #ifndef LIBDAR_BIRTHTIME
@@ -1164,7 +1164,7 @@ namespace libdar
     {
 	const fsa_bool *ptr = dynamic_cast<const fsa_bool *>(&ref);
 
-	if(ptr != NULL)
+	if(ptr != nullptr)
 	    return val == ptr->val;
 	else
 	    return false;
@@ -1187,7 +1187,7 @@ namespace libdar
     {
 	const fsa_infinint *ptr = dynamic_cast<const fsa_infinint *>(&ref);
 
-	if(ptr != NULL)
+	if(ptr != nullptr)
 	    return val == ptr->val;
 	else
 	    return false;
@@ -1210,7 +1210,7 @@ namespace libdar
     {
 	const fsa_time *ptr = dynamic_cast<const fsa_time *>(&ref);
 
-	if(ptr != NULL)
+	if(ptr != nullptr)
 	    return val == ptr->val;
 	else
 	    return false;

@@ -58,7 +58,7 @@ using namespace std;
 static void routine1();
 static void routine2();
 
-static user_interaction *ui = NULL;
+static user_interaction *ui = nullptr;
 
 int main()
 {
@@ -66,11 +66,11 @@ int main()
 
     get_version(maj, med, min);
     user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(ui == NULL)
+    if(ui == nullptr)
 	cout << "ERREUR !" << endl;
     routine1();
     routine2();
-    if(ui != NULL)
+    if(ui != nullptr)
 	delete ui;
 }
 
@@ -87,21 +87,21 @@ static void routine1()
     ui->warning(d1.human() + " " + d2.human() + " " + d3.human());
 
     fichier_local *fic = new (nothrow) fichier_local(*ui, "toto", gf_write_only, 0600, false, true, false);
-    if(fic == NULL)
+    if(fic == nullptr)
 	throw Ememory("routine1");
     f1.dump(*fic);
     delete fic;
-    fic = NULL;
+    fic = nullptr;
 
     fic = new (nothrow) fichier_local("toto", false);
-    if(fic == NULL)
+    if(fic == nullptr)
 	throw Ememory("routine1");
 
     f3 = infinint(*fic);
     d3 = libdar::deci(f3);
     ui->warning(d3.human());
     delete fic;
-    fic = NULL;
+    fic = nullptr;
 
     f1 += 3;
     d1 = libdar::deci(f1);

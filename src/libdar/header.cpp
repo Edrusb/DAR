@@ -85,8 +85,8 @@ namespace libdar
 	internal_name.clear();
 	data_name.clear();
         flag = '\0';
-	first_size = NULL;
-	slice_size = NULL;
+	first_size = nullptr;
+	slice_size = nullptr;
 	old_header = false;
     }
 
@@ -118,10 +118,10 @@ namespace libdar
         switch(extension)
         {
         case extension_none:
-	    if(f_fic != NULL)
+	    if(f_fic != nullptr)
 	    {
 		slice_size = new (get_pool()) infinint(f_fic->get_size());
-		if(slice_size == NULL)
+		if(slice_size == nullptr)
 		{
 		    if(!lax)
 			throw Ememory("header::read");
@@ -129,7 +129,7 @@ namespace libdar
 		    {
 			ui.warning(gettext("LAX MODE: slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
 			slice_size = new (get_pool()) infinint(0);
-			if(slice_size == NULL)
+			if(slice_size == nullptr)
 			    throw Ememory("header::read");
 		    }
 			// this extension was used in archives before release 2.4.0
@@ -143,7 +143,7 @@ namespace libdar
             break;
         case extension_size:
 	    slice_size = new (get_pool()) infinint(f);
-	    if(slice_size == NULL)
+	    if(slice_size == nullptr)
 	    {
 		if(!lax)
 		    throw Ememory("header::read");
@@ -151,14 +151,14 @@ namespace libdar
 		{
 		    ui.warning(gettext("LAX MODE: slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
 		    slice_size = new (get_pool()) infinint(0);
-		    if(slice_size == NULL)
+		    if(slice_size == nullptr)
 			throw Ememory("header::read");
 		}
 	    }
-	    if(f_fic != NULL)
+	    if(f_fic != nullptr)
 	    {
 		first_size = new (get_pool()) infinint(f_fic->get_size());
-		if(first_size == NULL)
+		if(first_size == nullptr)
 		{
 		    if(!lax)
 			throw Ememory("header::read");
@@ -166,7 +166,7 @@ namespace libdar
 		    {
 			ui.warning(gettext("LAX MODE: first slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
 			first_size = new (get_pool()) infinint(0);
-			if(first_size == NULL)
+			if(first_size == nullptr)
 			    throw Ememory("header::read");
 		    }
 			// note: the "extension_size" extension was used in archives before release 2.4.0
@@ -185,10 +185,10 @@ namespace libdar
 	case extension_tlv:
 	    tempo.read(f);        // read the list of TLV stored in the header
 	    fill_from(ui, tempo); // from the TLV list, set the different fields of the current header object
-	    if(slice_size == NULL && f_fic != NULL)
+	    if(slice_size == nullptr && f_fic != nullptr)
 	    {
 		slice_size = new (get_pool()) infinint(f_fic->get_size());
-		if(slice_size == NULL)
+		if(slice_size == nullptr)
 		    throw Ememory("header::read");
 	    }
 	    break;
@@ -199,7 +199,7 @@ namespace libdar
 	    {
 		ui.warning(gettext("LAX MODE: Unknown data in slice header, ignoring and continuing"));
 		slice_size = new (get_pool()) infinint(0);
-		if(slice_size == NULL)
+		if(slice_size == nullptr)
 		    throw Ememory("header::read");
 	    }
         }
@@ -218,7 +218,7 @@ namespace libdar
         f.write(&flag, 1);
 	if(old_header)
 	{
-	    if(first_size != NULL && slice_size != NULL && *first_size != *slice_size)
+	    if(first_size != nullptr && slice_size != nullptr && *first_size != *slice_size)
 	    {
 		tmp_ext[0] = extension_size;
 		f.write(tmp_ext, 1);
@@ -239,7 +239,7 @@ namespace libdar
 
     bool header::get_first_slice_size(infinint & size) const
     {
-	if(first_size != NULL)
+	if(first_size != nullptr)
 	{
 	    size = *first_size;
 	    return true;
@@ -250,10 +250,10 @@ namespace libdar
 
     void header::set_first_slice_size(const infinint & size)
     {
-	if(first_size == NULL)
+	if(first_size == nullptr)
 	{
 	    first_size = new (get_pool()) infinint();
-	    if(first_size == NULL)
+	    if(first_size == nullptr)
 		throw Ememory("header::set_first_file_size");
 	}
 	*first_size = size;
@@ -261,7 +261,7 @@ namespace libdar
 
     bool header::get_slice_size(infinint & size) const
     {
-	if(slice_size != NULL)
+	if(slice_size != nullptr)
 	{
 	    size = *slice_size;
 	    return true;
@@ -272,10 +272,10 @@ namespace libdar
 
     void header::set_slice_size(const infinint & size)
     {
-	if(slice_size == NULL)
+	if(slice_size == nullptr)
 	{
 	    slice_size = new (get_pool()) infinint();
-	    if(slice_size == NULL)
+	    if(slice_size == nullptr)
 		throw Ememory("header::set_slice_size");
 	}
 
@@ -289,23 +289,23 @@ namespace libdar
         internal_name = ref.internal_name;
  	data_name = ref.data_name;
         flag = ref.flag;
-	first_size = NULL;
-	slice_size = NULL;
+	first_size = nullptr;
+	slice_size = nullptr;
 
 	try
 	{
-	    if(ref.first_size != NULL)
+	    if(ref.first_size != nullptr)
 	    {
 		first_size = new (get_pool()) infinint();
-		if(first_size == NULL)
+		if(first_size == nullptr)
 		    throw Ememory("header::copy_from");
 		*first_size = *ref.first_size;
 	    }
 
-	    if(ref.slice_size != NULL)
+	    if(ref.slice_size != nullptr)
 	    {
 		slice_size = new (get_pool()) infinint();
-		if(slice_size == NULL)
+		if(slice_size == nullptr)
 		    throw Ememory("header::copy_from");
 		*slice_size = *ref.slice_size;
 	    }
@@ -321,16 +321,16 @@ namespace libdar
 
     void header::free_pointers()
     {
-	if(first_size != NULL)
+	if(first_size != nullptr)
 	{
 	    delete first_size;
-	    first_size = NULL;
+	    first_size = nullptr;
 	}
 
-	if(slice_size != NULL)
+	if(slice_size != nullptr)
 	{
 	    delete slice_size;
-	    slice_size = NULL;
+	    slice_size = nullptr;
 	}
     }
 
@@ -345,14 +345,14 @@ namespace libdar
 	    {
 	    case tlv_first_size:
 		first_size = new (get_pool()) infinint();
-		if(first_size == NULL)
+		if(first_size == nullptr)
 		    throw Ememory("header::fill_from");
 		extension[index].skip(0);
 		first_size->read(extension[index]);
 		break;
 	    case tlv_size:
 		slice_size = new (get_pool()) infinint();
-		if(slice_size == NULL)
+		if(slice_size == nullptr)
 		    throw Ememory("header::fill_from");
 		extension[index].skip(0);
 		slice_size->read(extension[index]);
@@ -379,7 +379,7 @@ namespace libdar
 	tlv_list ret;
 	tlv tmp;
 
-	if(first_size != NULL)
+	if(first_size != nullptr)
 	{
 	    tmp.reset();
 	    first_size->dump(tmp);
@@ -387,7 +387,7 @@ namespace libdar
 	    ret.add(tmp);
 	}
 
-	if(slice_size != NULL)
+	if(slice_size != nullptr)
 	{
 	    tmp.reset();
 	    slice_size->dump(tmp);

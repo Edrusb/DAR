@@ -61,15 +61,15 @@ namespace libdar
 
 	    // sanity checks
 
-	if(signature_storage == NULL)
+	if(signature_storage == nullptr)
 	    throw SRC_BUG;
-	if(below == NULL)
+	if(below == nullptr)
 	    throw SRC_BUG;
 
 	    // setting up the object
 
 	meta_new(working_buffer, BUFFER_SIZE);
-	if(working_buffer == NULL)
+	if(working_buffer == nullptr)
 	    throw Ememory("generic_rsync::generic_rsync (sign)");
 	try
 	{
@@ -77,9 +77,9 @@ namespace libdar
 	    status = sign;
 	    x_below = below;
 	    x_output = signature_storage;
-	    x_input = NULL;
-	    orig_crc = NULL;
-	    sumset = NULL;
+	    x_input = nullptr;
+	    orig_crc = nullptr;
+	    sumset = nullptr;
 	    initial = true;
 	    patching_completed = false; // not used in sign mode
 	    job = rs_sig_begin(RS_DEFAULT_BLOCK_LEN, RS_DEFAULT_STRONG_LEN);
@@ -101,19 +101,19 @@ namespace libdar
 				 generic_file *signature_storage,
 				 generic_file *below): generic_file(gf_write_only)
     {
-	char *inbuf = NULL;
-	char *outbuf = NULL;
+	char *inbuf = nullptr;
+	char *outbuf = nullptr;
 	U_I lu = 0;
 	U_I out;
 	bool eof = false;
 
 	    // sanity checks
 
-	if(base_signature == NULL)
+	if(base_signature == nullptr)
 	    throw SRC_BUG;
-	if(signature_storage == NULL)
+	if(signature_storage == nullptr)
 	    throw SRC_BUG;
-	if(below == NULL)
+	if(below == nullptr)
 	    throw SRC_BUG;
 
 	    // setting up the object
@@ -123,7 +123,7 @@ namespace libdar
 	initial = true;
 	patching_completed = false; // not used in delta mode
 	meta_new(working_buffer,BUFFER_SIZE);
-	if(working_buffer == NULL)
+	if(working_buffer == nullptr)
 	    throw Ememory("generic_rsync::generic_rsync (sign)");
 
 	try
@@ -136,7 +136,7 @@ namespace libdar
 	    {
 		meta_new(inbuf, BUFFER_SIZE);
 		meta_new(outbuf, SMALL_BUF); // nothing should be output
-		if(inbuf == NULL || outbuf == NULL)
+		if(inbuf == nullptr || outbuf == nullptr)
 		    throw Ememory("generic_rsync::generic_rsync (delta)");
 
 		base_signature->skip(0);
@@ -158,16 +158,16 @@ namespace libdar
 		while(!eof);
 
 		meta_delete(inbuf);
-		inbuf = NULL;
+		inbuf = nullptr;
 		meta_delete(outbuf);
-		outbuf = NULL;
+		outbuf = nullptr;
 		free_job();
 	    }
 	    catch(...)
 	    {
-		if(inbuf != NULL)
+		if(inbuf != nullptr)
 		    meta_delete(inbuf);
-		if(outbuf != NULL)
+		if(outbuf != nullptr)
 		    meta_delete(outbuf);
 		free_job();
 		rs_free_sumset(sumset);
@@ -178,9 +178,9 @@ namespace libdar
 
 	    job = rs_delta_begin(sumset);
 	    x_below = below;
-	    x_input = NULL;
+	    x_input = nullptr;
 	    x_output = signature_storage;
-	    orig_crc = NULL;
+	    orig_crc = nullptr;
 	}
 	catch(...)
 	{
@@ -202,18 +202,18 @@ namespace libdar
 
 	    // sanity checks
 
-	if(current_data == NULL)
+	if(current_data == nullptr)
 	    throw SRC_BUG;
-	if(delta == NULL)
+	if(delta == nullptr)
 	    throw SRC_BUG;
-	    // original_crc may be NULL
+	    // original_crc may be nullptr
 
 	    // calculating the CRC of the file to be patched
 
-	if(original_crc != NULL)
+	if(original_crc != nullptr)
 	{
 	    null_file tmp = null_file(gf_write_only);
-	    crc *real_crc = NULL;
+	    crc *real_crc = nullptr;
 
 	    try
 	    {
@@ -227,11 +227,11 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		if(real_crc != NULL)
+		if(real_crc != nullptr)
 		    delete real_crc;
 		throw;
 	    }
-	    if(real_crc != NULL)
+	    if(real_crc != nullptr)
 		delete real_crc;
 	}
 
@@ -240,16 +240,16 @@ namespace libdar
 	status = patch;
 	patching_completed = false;
 	x_input = current_data;
-	x_output = NULL;
+	x_output = nullptr;
 	x_below = delta;
-	sumset = NULL;
+	sumset = nullptr;
 	orig_crc = original_crc;
-	if(orig_crc == NULL)
+	if(orig_crc == nullptr)
 	    throw SRC_BUG;
 	initial = true;
 	working_size = 0;
 	meta_new(working_buffer,BUFFER_SIZE);
-	if(working_buffer == NULL)
+	if(working_buffer == nullptr)
 	    throw Ememory("generic_rsync::generic_rsync (sign)");
 	try
 	{
@@ -363,10 +363,10 @@ namespace libdar
 	    throw SRC_BUG;
 	}
 
-	if(sumset != NULL)
+	if(sumset != nullptr)
 	{
 	    rs_free_sumset(sumset);
-	    sumset = NULL;
+	    sumset = nullptr;
 	}
 	free_job();
     }
@@ -380,9 +380,9 @@ namespace libdar
 	generic_rsync *me = (generic_rsync *)(opaque);
 	U_I lu;
 
-	if(me == NULL)
+	if(me == nullptr)
 	    throw SRC_BUG;
-	if(me->x_input == NULL)
+	if(me->x_input == nullptr)
 	    throw SRC_BUG;
 
 	try
@@ -446,10 +446,10 @@ namespace libdar
     void generic_rsync::free_job()
     {
 #if LIBRSYNC_AVAILABLE
-    	if(job != NULL)
+    	if(job != nullptr)
 	{
 	    rs_result err = rs_job_free(job);
-	    job = NULL;
+	    job = nullptr;
 	    if(err != RS_DONE)
 		throw Erange("generic_rsync::inherited_terminate", string(gettext("Error releasing librsync job: ")) + string(rs_strerror(err)));
 	}

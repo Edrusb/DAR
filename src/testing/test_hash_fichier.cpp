@@ -42,7 +42,7 @@ void f1(const string & src_filename, const string & dst_filename, hash_algo algo
 void error(const string & argv0);
 libdar::hash_algo str2hash(const string & val);
 
-static user_interaction *ui = NULL;
+static user_interaction *ui = nullptr;
 
 int main(int argc, char *argv[])
 {
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 
     get_version(maj, med, min);
     ui = new (nothrow) shell_interaction(&cout, &cerr, true);
-    if(ui == NULL)
+    if(ui == nullptr)
 	cout << "ERREUR !" << endl;
 
     try
@@ -72,11 +72,11 @@ int main(int argc, char *argv[])
 	}
 	catch(...)
 	{
-	    if(ui != NULL)
+	    if(ui != nullptr)
 		delete ui;
 	    throw;
 	}
-	if(ui != NULL)
+	if(ui != nullptr)
 	    delete ui;
     }
     catch(Egeneric & e)
@@ -104,8 +104,8 @@ void f1(const string & src_filename, const string & dst_filename, hash_algo algo
 
     try
     {
-	if(dst_hash == NULL
-	   || dst_data == NULL)
+	if(dst_hash == nullptr
+	   || dst_data == nullptr)
 	    throw Ememory("f1");
 	else
 	{
@@ -114,8 +114,8 @@ void f1(const string & src_filename, const string & dst_filename, hash_algo algo
 					    src_filename,
 					    dst_hash,
 					    algo);
-	    dst_hash = NULL; // now owned by dst
-	    dst_data = NULL; // now owned by dst
+	    dst_hash = nullptr; // now owned by dst
+	    dst_data = nullptr; // now owned by dst
 	    fichier_local src = fichier_local(src_filename);
 
 	    dst.set_only_hash();
@@ -124,9 +124,9 @@ void f1(const string & src_filename, const string & dst_filename, hash_algo algo
     }
     catch(...)
     {
-	if(dst_hash != NULL)
+	if(dst_hash != nullptr)
 	    delete dst_hash;
-	if(dst_data != NULL)
+	if(dst_data != nullptr)
 	    delete dst_data;
 	throw;
     }

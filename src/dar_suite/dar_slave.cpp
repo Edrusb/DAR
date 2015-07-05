@@ -89,14 +89,14 @@ int main(S_I argc, char * const argv[], const char **env)
 			    env,
 			    OPT_STRING,
 #if HAVE_GETOPT_LONG
-			    NULL,
+			    nullptr,
 #endif
 			    &little_main);
 }
 
 static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[], const char **env)
 {
-    path *chemin = NULL;
+    path *chemin = nullptr;
     string filename;
     string input_pipe;
     string output_pipe;
@@ -105,26 +105,26 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 
     if(command_line(dialog, argc, argv, chemin, filename, input_pipe, output_pipe, execute, min_digits))
     {
-        tuyau *input = NULL;
-        tuyau *output = NULL;
-        sar *source = NULL;
+        tuyau *input = nullptr;
+        tuyau *output = nullptr;
+        sar *source = nullptr;
 	entrepot_local entrep = entrepot_local("", "", false);
 
-	if(chemin == NULL)
+	if(chemin == nullptr)
 	    throw SRC_BUG;
 
 	entrep.set_location(*chemin);
         try
         {
 	    source = new (nothrow) sar(dialog, filename, EXTENSION, entrep, true, min_digits, false, execute);
-            if(source == NULL)
+            if(source == nullptr)
                 throw Ememory("little_main");
 
             tools_open_pipes(dialog, input_pipe, output_pipe, input, output);
 
             slave_zapette zap = slave_zapette(input, output, source);
-            input = output = NULL; // now managed by zap;
-            source = NULL;  // now managed by zap;
+            input = output = nullptr; // now managed by zap;
+            source = nullptr;  // now managed by zap;
 
             try
             {
@@ -139,20 +139,20 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
         catch(...)
         {
             delete chemin;
-            if(input != NULL)
+            if(input != nullptr)
                 delete input;
-            if(output != NULL)
+            if(output != nullptr)
                 delete output;
-            if(source != NULL)
+            if(source != nullptr)
                 delete source;
             throw;
         }
         delete chemin;
-        if(input != NULL)
+        if(input != nullptr)
             delete input;
-        if(output != NULL)
+        if(output != nullptr)
             delete output;
-        if(source != NULL)
+        if(source != nullptr)
             delete source;
 
         return EXIT_OK;
@@ -180,7 +180,7 @@ static bool command_line(shell_interaction & dialog,
         switch(lu)
         {
         case 'i':
-            if(optarg == NULL)
+            if(optarg == nullptr)
                 throw Erange("command_line", gettext("Missing argument to -i option"));
             if(input_pipe == "")
                 input_pipe = optarg;
@@ -188,7 +188,7 @@ static bool command_line(shell_interaction & dialog,
                 dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
             break;
         case 'o':
-            if(optarg == NULL)
+            if(optarg == nullptr)
                 throw Erange("command_line", gettext("Missing argument to -o option"));
             if(output_pipe == "")
                 output_pipe = optarg;
@@ -202,7 +202,7 @@ static bool command_line(shell_interaction & dialog,
             show_version(dialog, argv[0]);
             return false;
         case 'E':
-            if(optarg == NULL)
+            if(optarg == nullptr)
                 throw Erange("command_line", gettext("Missing argument to -E option"));
             if(execute == "")
                 execute = optarg;
@@ -212,7 +212,7 @@ static bool command_line(shell_interaction & dialog,
 	case 'Q':
 	    break;  // ignore this option already parsed during initialization (dar_suite.cpp)
 	case '9':
-	    if(optarg == NULL)
+	    if(optarg == nullptr)
 		throw Erange("command_line", tools_printf(gettext("Missing argument to --min-digits"), char(lu)));
 	    else
 	    {

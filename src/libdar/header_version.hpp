@@ -66,12 +66,12 @@ namespace libdar
 	void set_sym_crypto_algo(const crypto_algo & algo) { sym = algo; };
 
 	    /// the object pointed to by key passes to the responsibility of this header_version object
-	void set_crypted_key(memory_file *key) { if(key == NULL) throw SRC_BUG; clear_crypted_key(); crypted_key = key; };
-	void clear_crypted_key() { if(crypted_key != NULL) { delete crypted_key; crypted_key = NULL; } };
+	void set_crypted_key(memory_file *key) { if(key == nullptr) throw SRC_BUG; clear_crypted_key(); crypted_key = key; };
+	void clear_crypted_key() { if(crypted_key != nullptr) { delete crypted_key; crypted_key = nullptr; } };
 
 	    /// the object pointed to by layout is passed under the responsibility of this header_version object
-	void set_slice_layout(slice_layout *layout) { if(layout == NULL) throw SRC_BUG; clear_slice_layout(); ref_layout = layout; };
-	void clear_slice_layout() { if(ref_layout != NULL) { delete ref_layout; ref_layout = NULL; } };
+	void set_slice_layout(slice_layout *layout) { if(layout == nullptr) throw SRC_BUG; clear_slice_layout(); ref_layout = layout; };
+	void clear_slice_layout() { if(ref_layout != nullptr) { delete ref_layout; ref_layout = nullptr; } };
 
 	void set_tape_marks(bool presence) { has_tape_marks = presence; };
 	void set_signed(bool is_signed) { arch_signed = is_signed; };

@@ -35,7 +35,7 @@ void no_comment::fill_morceau()
     bool last_block_is_comment = true;
 
     morceau.clear();
-    if(ref == NULL)
+    if(ref == nullptr)
         throw SRC_BUG;
     ref->skip(0);
     tmp.longueur = 0;

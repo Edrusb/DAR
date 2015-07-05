@@ -94,7 +94,7 @@ namespace libdar
 	virtual void fadvise(advise adv) const = 0;
 
     protected :
-	user_interaction & get_ui() { if(x_dialog == NULL) throw SRC_BUG; return *x_dialog; };
+	user_interaction & get_ui() { if(x_dialog == nullptr) throw SRC_BUG; return *x_dialog; };
 
 	    /// replaces generic_file::inherited_write() method, to allow the return of partial writings
 	    ///
@@ -131,7 +131,7 @@ namespace libdar
 
 	void copy_from(const fichier_global & ref);
 	void copy_parent_from(const fichier_global & ref);
-	void detruit() { if(x_dialog != NULL) { delete x_dialog; x_dialog = NULL; } };
+	void detruit() { if(x_dialog != nullptr) { delete x_dialog; x_dialog = nullptr; } };
     };
 
 

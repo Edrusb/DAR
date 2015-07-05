@@ -296,7 +296,7 @@ namespace libdar
         }
 
         field = new (std::nothrow) storage(size);
-        if(field != NULL)
+        if(field != nullptr)
         {
             storage::iterator it = field->begin();
 

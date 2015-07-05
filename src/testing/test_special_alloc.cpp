@@ -79,16 +79,16 @@ void f1()
 
     try
     {
-	if(ptr1 == NULL || ptr2 == NULL)
+	if(ptr1 == nullptr || ptr2 == nullptr)
 	    throw Ememory("f1");
 
 	cout << a.get_val() << endl;
 	cout << ptr1->get_val() << endl;
 	cout << ptr2->get_val() << endl;
 
-	if(a.my_get_pool() != NULL)
+	if(a.my_get_pool() != nullptr)
 	    cout << "Strange!" << endl;
-	if(ptr1->my_get_pool() != NULL)
+	if(ptr1->my_get_pool() != nullptr)
 	    cout << "Very strange!" << endl;
 	if(ptr2->my_get_pool() != &mem)
 	    cout << "Extremely strange!" << endl;
@@ -96,16 +96,16 @@ void f1()
 
     catch(...)
     {
-	if(ptr1 != NULL)
+	if(ptr1 != nullptr)
 	    delete ptr1;
-	if(ptr2 != NULL)
+	if(ptr2 != nullptr)
 	    delete ptr2;
 	throw;
     }
 
-    if(ptr1 != NULL)
+    if(ptr1 != nullptr)
 	delete ptr1;
-    if(ptr2 != NULL)
+    if(ptr2 != nullptr)
 	delete ptr2;
 
     if(! mem.is_empty())

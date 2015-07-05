@@ -47,7 +47,7 @@ static bool debug_mem_initialized = false; //< whether module has been initializ
 static debug_mem debug_mem_alloc[DEBUG_MEM_SIZE]; //< stores all current memory allocation requests
 static long long debug_mem_next = 0; //< pointer to the next most probable place to find an free slot
 static long long debug_mem_allocated = 0, debug_mem_max_allocated = 0, debug_mem_block = 0, debug_mem_max_block = 0;
-static FILE *debug_mem_output = NULL;
+static FILE *debug_mem_output = nullptr;
 
 #define ERROR(MSG)  debug_mem_error(__FILE__, __LINE__, MSG)
 
@@ -63,11 +63,11 @@ static void debug_mem_init()
 
     for(long long i = 0; i < DEBUG_MEM_SIZE; ++i)
     {
-	debug_mem_alloc[i].ptr = NULL;
+	debug_mem_alloc[i].ptr = nullptr;
 	debug_mem_alloc[i].size = 0;
     }
     debug_mem_output = fopen(DEBUG_MEM_OUTPUT_FILE, "w");
-    if(debug_mem_output == NULL)
+    if(debug_mem_output == nullptr)
 	ERROR("failed openning output file to log debug memory events");
     debug_mem_initialized = true;
 }
@@ -76,13 +76,13 @@ static long long debug_mem_find_free_slot()
 {
     long long ret = debug_mem_next;
 
-    while(ret < DEBUG_MEM_SIZE && debug_mem_alloc[ret].ptr != NULL)
+    while(ret < DEBUG_MEM_SIZE && debug_mem_alloc[ret].ptr != nullptr)
 	++ret;
 
     if(ret >= DEBUG_MEM_SIZE)
 	ret = 0;
 
-    while(ret < DEBUG_MEM_SIZE && debug_mem_alloc[ret].ptr != NULL)
+    while(ret < DEBUG_MEM_SIZE && debug_mem_alloc[ret].ptr != nullptr)
 	++ret;
 
     if(ret < DEBUG_MEM_SIZE)
@@ -124,7 +124,7 @@ static void *alloc(size_t size)
 {
     void *ret = malloc(size);
 
-    if(ret != NULL)
+    if(ret != nullptr)
     {
 	long long slot;
 
@@ -155,7 +155,7 @@ void desalloc(void *p)
 
     debug_mem_allocated -= debug_mem_alloc[slot].size;
     --debug_mem_block;
-    debug_mem_alloc[slot].ptr = NULL;
+    debug_mem_alloc[slot].ptr = nullptr;
     debug_mem_alloc[slot].size = 0;
     free(p);
     debug_mem_report(p, "DEL");
@@ -164,7 +164,7 @@ void desalloc(void *p)
 void * operator new (size_t size) throw (std::bad_alloc)
 {
     void *ret = alloc(size);
-    if(ret == NULL)
+    if(ret == nullptr)
 	throw std::bad_alloc();
     return ret;
 }
@@ -177,7 +177,7 @@ void * operator new (size_t size, const std::nothrow_t& nothrow_constant) throw 
 void * operator new[] (size_t size) throw (std::bad_alloc)
 {
     void *ret = alloc(size);
-    if(ret == NULL)
+    if(ret == nullptr)
 	throw std::bad_alloc();
     return ret;
 }
@@ -218,7 +218,7 @@ void memory_check_snapshot()
     fprintf(debug_mem_output, "DUMP START OF THE CURRENT ALLOCATED BLOCKS\n");
     while(curs < DEBUG_MEM_SIZE)
     {
-	if(debug_mem_alloc[curs].ptr != NULL)
+	if(debug_mem_alloc[curs].ptr != nullptr)
 	    fprintf(debug_mem_output, "address = %p   size = %ld\n",
 		    debug_mem_alloc[curs].ptr,
 		    debug_mem_alloc[curs].size);

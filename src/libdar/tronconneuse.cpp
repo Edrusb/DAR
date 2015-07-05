@@ -62,7 +62,7 @@ namespace libdar
 	buf_offset = 0;
 	buf_byte_data = 0;
 	buf_size = 0;
-	buf = NULL;  // cannot invoke pure virtual methods from constructor
+	buf = nullptr;  // cannot invoke pure virtual methods from constructor
 	clear_block_size = block_size;
 	current_position = 0;
 	if(no_initial_shift)
@@ -71,16 +71,16 @@ namespace libdar
 	    initial_shift = encrypted_side.get_position();
 	block_num = 0;
 	encrypted = & encrypted_side;
-	encrypted_buf = NULL; // cannot invoke pure virtual methods from constructor
+	encrypted_buf = nullptr; // cannot invoke pure virtual methods from constructor
 	encrypted_buf_data = 0;
 	encrypted_buf_size = 0;
 	extra_buf_size = 0;
 	extra_buf_data = 0;
-	extra_buf = NULL;
+	extra_buf = nullptr;
 	weof = false;
 	reof = false;
 	reading_ver = x_reading_ver;
-	trailing_clear_data = NULL;
+	trailing_clear_data = nullptr;
 
 	    // buffers cannot be initialized here as they need result from pure virtual methods
 	    // the inherited class constructor part has not yet been initialized
@@ -297,20 +297,20 @@ namespace libdar
 
     void tronconneuse::detruit()
     {
-	if(buf != NULL)
+	if(buf != nullptr)
 	{
 	    meta_delete(buf);
-	    buf = NULL;
+	    buf = nullptr;
 	}
-	if(encrypted_buf != NULL)
+	if(encrypted_buf != nullptr)
 	{
 	    meta_delete(encrypted_buf);
-	    encrypted_buf = NULL;
+	    encrypted_buf = nullptr;
 	}
-	if(extra_buf != NULL)
+	if(extra_buf != nullptr)
 	{
 	    meta_delete(extra_buf);
-	    extra_buf = NULL;
+	    extra_buf = nullptr;
 	}
 	buf_size = 0;
 	buf_byte_data = 0;
@@ -322,8 +322,8 @@ namespace libdar
 
     void tronconneuse::copy_from(const tronconneuse & ref)
     {
-	buf = NULL;
-	encrypted_buf = NULL;
+	buf = nullptr;
+	encrypted_buf = nullptr;
 
 	if(is_terminated())
 	    throw SRC_BUG;
@@ -335,7 +335,7 @@ namespace libdar
 	    buf_byte_data = ref.buf_byte_data;
 	    buf_size = ref.buf_size;
 	    meta_new(buf, buf_size);
-	    if(buf == NULL)
+	    if(buf == nullptr)
 		throw Ememory("tronconneuse::copy_from");
 	    (void)memcpy(buf, ref.buf, buf_byte_data);
 	    clear_block_size = ref.clear_block_size;
@@ -348,14 +348,14 @@ namespace libdar
 	    encrypted_buf_size = ref.encrypted_buf_size;
 	    encrypted_buf_data = ref.encrypted_buf_data;
 	    meta_new(encrypted_buf, encrypted_buf_size);
-	    if(encrypted_buf == NULL)
+	    if(encrypted_buf == nullptr)
 		throw Ememory("tronconneuse::copy_from");
 	    (void)memcpy(encrypted_buf, ref.encrypted_buf, encrypted_buf_data);
 
 	    extra_buf_size = ref.extra_buf_size;
 	    extra_buf_data = ref.extra_buf_data;
 	    meta_new(extra_buf, extra_buf_size);
-	    if(extra_buf == NULL)
+	    if(extra_buf == nullptr)
 		throw Ememory("tronconneuse::copy_from");
 	    (void)memcpy(extra_buf, ref.extra_buf, extra_buf_data);
 	    weof = ref.weof;
@@ -487,36 +487,36 @@ namespace libdar
 
     void tronconneuse::init_buf()
     {
-	if(encrypted_buf == NULL)
+	if(encrypted_buf == nullptr)
 	{
 	    encrypted_buf_data = 0;
 	    encrypted_buf_size = encrypted_block_size_for(clear_block_size);
 	    meta_new(encrypted_buf, encrypted_buf_size);
-	    if(encrypted_buf == NULL)
+	    if(encrypted_buf == nullptr)
 	    {
 		encrypted_buf_size = 0;
 		throw Ememory("tronconneuse::init_encrypte_buf_size");
 	    }
 	}
-	if(buf == NULL)
+	if(buf == nullptr)
 	{
 	    buf_byte_data = 0;
 	    buf_size = clear_block_allocated_size_for(clear_block_size);
 	    if(buf_size < clear_block_size)
 		throw SRC_BUG; // buf_size must be larger than or equal to clear_block_size
 	    meta_new(buf, buf_size);
-	    if(buf == NULL)
+	    if(buf == nullptr)
 	    {
 		buf_size = 0;
 		throw Ememory("tronconneuse::init_encrypte_buf_size");
 	    }
 	}
-	if(extra_buf == NULL)
+	if(extra_buf == nullptr)
 	{
 	    extra_buf_data = 0;
 	    extra_buf_size = encrypted_buf_size; // using same size as encrypted_buf
 	    meta_new(extra_buf, extra_buf_size);
-	    if(extra_buf == NULL)
+	    if(extra_buf == nullptr)
 	    {
 		extra_buf_size = 0;
 		throw Ememory("tronconneuse::init_encrypte_buf_size");
@@ -542,10 +542,10 @@ namespace libdar
 
     void tronconneuse::remove_trailing_clear_data_from_encrypted_buf(const infinint & crypt_offset)
     {
-	if(encrypted == NULL)
+	if(encrypted == nullptr)
 	    throw SRC_BUG;
 
-	if(trailing_clear_data != NULL)
+	if(trailing_clear_data != nullptr)
 	{
 	    infinint clear_offset = 0;
 	    bool notfound = false;

@@ -89,7 +89,7 @@ namespace libdar
 	    /// normal data and hole (number of zeroed bytes to skip to reach next normal data)
 	    /// leading to only restore the data not equal to zero (passed a certain
 	    /// amount of contiguous zeroed bytes).
-	void copy_to(generic_file & ref) { crc *tmp = NULL; copy_to(ref, 0, tmp); if(tmp != NULL) throw SRC_BUG; };
+	void copy_to(generic_file & ref) { crc *tmp = nullptr; copy_to(ref, 0, tmp); if(tmp != nullptr) throw SRC_BUG; };
 
 	    /// same as sparse_file::copy_to(generic_file) just above but here with crc, this also overwrite the corresponding class generic_file method, as we need a specific implementation here
 	void copy_to(generic_file & ref, const infinint & crc_size, crc * & value);

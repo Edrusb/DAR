@@ -45,9 +45,9 @@ int main(S_I argc, char * const argv[])
 {
     return dar_suite_global(argc,
 			    argv,
-			    NULL,
+			    nullptr,
 			    "",
-			    NULL,
+			    nullptr,
 			    &little_main);
 }
 
@@ -66,9 +66,9 @@ S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[], const
 
     src->copy_to(*scr);
 
-    delete scr; scr = NULL;
-    delete dst; dst = NULL;
-    delete src; src = NULL;
+    delete scr; scr = nullptr;
+    delete dst; dst = nullptr;
+    delete src; src = nullptr;
 
     src = new fichier_local(dialog, argv[2], gf_read_only, 0, false, false, false);
     scr = new scrambler(secu_string(pass.c_str(), pass.size()), *src);

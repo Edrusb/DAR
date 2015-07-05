@@ -116,20 +116,20 @@ namespace libdar
 							bool lax_mode)
     {
         terminateur term;
-        catalogue *ret = NULL;
+        catalogue *ret = nullptr;
 	pile_descriptor data_pdesc(&data_stack);
 	pile_descriptor cata_pdesc(&cata_stack);
 	generic_file *crypto = cata_stack.get_by_label(LIBDAR_STACK_LABEL_UNCYPHERED);
-	contextual *data_ctxt = NULL;
-	contextual *cata_ctxt = NULL;
+	contextual *data_ctxt = nullptr;
+	contextual *cata_ctxt = nullptr;
 
 	signatories.clear();
 	data_stack.find_first_from_top(data_ctxt);
-	if(data_ctxt == NULL)
+	if(data_ctxt == nullptr)
 	    throw SRC_BUG;
 
 	cata_stack.find_first_from_top(cata_ctxt);
-	if(cata_ctxt == NULL)
+	if(cata_ctxt == nullptr)
 	    throw SRC_BUG;
 
         if(info_details)
@@ -163,7 +163,7 @@ namespace libdar
 					     label_zero,
 					     false); // only_detruit
 
-	    if(ret == NULL)
+	    if(ret == nullptr)
 		throw Ememory("get_catalogue_from");
 
 	    try
@@ -176,7 +176,7 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		if(ret != NULL)
+		if(ret != nullptr)
 		    delete ret;
 		throw;
 	    }
@@ -198,9 +198,9 @@ namespace libdar
 					  const label & lax_layer1_data_name,
 					  bool only_detruits)
     {
-        catalogue *ret = NULL;
+        catalogue *ret = nullptr;
 	memory_file hash_to_compare;
-	hash_fichier *hasher = NULL;
+	hash_fichier *hasher = nullptr;
 	signatories.clear();
 
 	cata_pdesc.check(false);
@@ -209,16 +209,16 @@ namespace libdar
 	{
 	    if(ver.is_signed())
 	    {
-		generic_to_global_file *global_hash_to_compare = NULL;
-		generic_to_global_file *global_cata_top_stack = NULL;
+		generic_to_global_file *global_hash_to_compare = nullptr;
+		generic_to_global_file *global_cata_top_stack = nullptr;
 
 		try
 		{
 		    global_hash_to_compare = new (nothrow) generic_to_global_file(dialog, &hash_to_compare, gf_write_only);
-		    if(global_hash_to_compare == NULL)
+		    if(global_hash_to_compare == nullptr)
 			throw Ememory("macro_tools_get_derivated_catalogue_from");
 		    global_cata_top_stack = new (nothrow) generic_to_global_file(dialog, cata_pdesc.stack->top(), gf_read_only);
-		    if(global_cata_top_stack == NULL)
+		    if(global_cata_top_stack == nullptr)
 			throw Ememory("macro_tools_get_derivated_catalogue_from");
 
 		    hasher = new (nothrow) hash_fichier(dialog,
@@ -226,7 +226,7 @@ namespace libdar
 							"x",
 							global_hash_to_compare,
 							hash_sha512);
-		    if(hasher == NULL)
+		    if(hasher == nullptr)
 			throw Ememory("macro_tools_get_derivated_catalogue_from");
 
 			// at this stage, hasher is created
@@ -234,9 +234,9 @@ namespace libdar
 		}
 		catch(...)
 		{
-		    if(global_hash_to_compare != NULL)
+		    if(global_hash_to_compare != nullptr)
 			delete global_hash_to_compare;
-		    if(global_cata_top_stack != NULL)
+		    if(global_cata_top_stack != nullptr)
 			delete global_cata_top_stack;
 		    throw;
 		}
@@ -255,12 +255,12 @@ namespace libdar
 					   lax_mode,
 					   lax_layer1_data_name,
 					   only_detruits);
-		if(ret == NULL)
+		if(ret == nullptr)
 		    throw Ememory("macro_tools_read_catalogue");
 		try
 		{
 
-		    if(hasher != NULL)
+		    if(hasher != nullptr)
 		    {
 			hasher->terminate();
 			if(cata_pdesc.stack->top() != hasher)
@@ -274,7 +274,7 @@ namespace libdar
 			tlv hash_to_decrypt(*cata_pdesc.stack); // read the encrypted hash following the catalogue
 			memory_file clear_read_hash;
 			crypto_asym engine(dialog);
-			crc *tmp = NULL;
+			crc *tmp = nullptr;
 
 			hash_to_decrypt.skip(0);
 			engine.decrypt(hash_to_decrypt, clear_read_hash);
@@ -288,7 +288,7 @@ namespace libdar
 			}
 			else
 			{
-			    if(tmp != NULL)
+			    if(tmp != nullptr)
 				delete tmp;
 				// else no difference,
 				// the caller has the signatories and will compare those with the list contained in the archive header
@@ -297,7 +297,7 @@ namespace libdar
 		}
 		catch(...)
 		{
-		    if(ret != NULL)
+		    if(ret != nullptr)
 			delete ret;
 		    throw;
 		}
@@ -323,12 +323,12 @@ namespace libdar
 		if(cata_pdesc.stack->pop() != hasher)
 		    throw SRC_BUG;
 	    }
-	    if(hasher != NULL)
+	    if(hasher != nullptr)
 		delete hasher;
 	    throw;
 	}
 
-	if(hasher != NULL)
+	if(hasher != nullptr)
 	    delete hasher;
 
 	return ret;
@@ -358,9 +358,9 @@ namespace libdar
 				  bool multi_threaded)
     {
 	secu_string real_pass = pass;
-	generic_file *tmp = NULL;
-	contextual *tmp_ctxt = NULL;
-	cache *tmp_cache = NULL;
+	generic_file *tmp = nullptr;
+	contextual *tmp_ctxt = nullptr;
+	cache *tmp_cache = nullptr;
 
 	stack.clear();
 #ifdef LIBTHREADAR_AVAILABLE
@@ -402,32 +402,32 @@ namespace libdar
 		}
 		else
 		{
-		    tuyau *in = NULL;
-		    tuyau *out = NULL;
+		    tuyau *in = nullptr;
+		    tuyau *out = nullptr;
 
 		    try
 		    {
 			dialog.printf(gettext("Opening a pair of pipes to read the archive, expecting dar_slave at the other ends..."));
 			tools_open_pipes(dialog, input_pipe, output_pipe, in, out, pool);
 			tmp = new (pool) zapette(dialog, in, out, true);
-			if(tmp == NULL)
+			if(tmp == nullptr)
 			{
 			    delete in;
-			    in = NULL;
+			    in = nullptr;
 			    delete out;
-			    out = NULL;
+			    out = nullptr;
 			}
 			else
 			{
-			    in = out = NULL; // now managed by the zapette
+			    in = out = nullptr; // now managed by the zapette
 			    tmp->skip_to_eof(); // not sequential reading mode we must skip at eof
 			}
 		    }
 		    catch(...)
 		    {
-			if(in != NULL)
+			if(in != nullptr)
 			    delete in;
-			if(out != NULL)
+			if(out != nullptr)
 			    delete out;
 			throw;
 		    }
@@ -435,7 +435,7 @@ namespace libdar
 	    }
 	    else
 	    {
-		sar *tmp_sar = NULL;
+		sar *tmp_sar = nullptr;
 		if(info_details)
 		    dialog.warning(gettext("Opening the archive using the multi-slice abstraction layer..."));
 		tmp = tmp_sar = new (pool) sar(dialog,
@@ -446,18 +446,18 @@ namespace libdar
 					       min_digits,
 					       lax,
 					       execute);
-		if(tmp_sar != NULL)
+		if(tmp_sar != nullptr)
 		    sl = tmp_sar->get_slicing();
 	    }
 
-	    if(tmp == NULL)
+	    if(tmp == nullptr)
 		throw Ememory("open_archive");
 	    else
 	    {
 		// we always ignore read_ahead as no slave thread will exist for LEVEL1 layer
 		tmp->ignore_read_ahead(true);
 		stack.push(tmp, LIBDAR_STACK_LABEL_LEVEL1);
-		tmp = NULL;
+		tmp = nullptr;
 	    }
 
 
@@ -467,7 +467,7 @@ namespace libdar
 		dialog.warning(gettext("Reading the archive header..."));
 
 	    stack.find_first_from_top(tmp_ctxt);
-	    if(tmp_ctxt == NULL)
+	    if(tmp_ctxt == nullptr)
 		throw SRC_BUG;
 	    second_terminateur_offset = 0;
 
@@ -505,14 +505,14 @@ namespace libdar
 		if(info_details)
 		    dialog.printf(gettext("Opening construction layer..."));
 		tmp = new (pool) tronc(stack.top(), 0, second_terminateur_offset, false);
-		if(tmp == NULL)
+		if(tmp == nullptr)
 		    throw Ememory("macro_tools_open_archive");
 		else
 		{
 		    tmp->ignore_read_ahead(true); // no slave thread used below in the stack
 		    stack.clear_label(LIBDAR_STACK_LABEL_LEVEL1);
 		    stack.push(tmp, LIBDAR_STACK_LABEL_LEVEL1);
-		    tmp = NULL;
+		    tmp = nullptr;
 		}
 	    }
 
@@ -534,7 +534,7 @@ namespace libdar
 		    throw Erange("macro_tools_open_archive", tools_printf(gettext("The archive %S is encrypted and no encryption cipher has been given, cannot open archive."), &basename));
 	    }
 
-	    if(ver.get_crypted_key() != NULL) // we will find the passphrase from the header's encrypted key
+	    if(ver.get_crypted_key() != nullptr) // we will find the passphrase from the header's encrypted key
 	    {
 
 		    // detemining the size of the unencrypted key
@@ -576,7 +576,7 @@ namespace libdar
 			// adding the cache layer only if no escape layer will tape place
 			// over. escape layer act a bit like a cache, making caching here useless
 		    tmp = tmp_cache = new (pool) cache (*(stack.top()), false);
-		    if(tmp == NULL)
+		    if(tmp == nullptr)
 			dialog.warning(gettext("Failed opening the cache layer, lack of memory, archive read performances will not be optimized"));
 		}
 		break;
@@ -590,10 +590,10 @@ namespace libdar
 		if(!second_terminateur_offset.is_zero()
 		   || tmp_ctxt->is_an_old_start_end_archive()) // we have openned the archive by the end
 		{
-		    crypto_sym *tmp_ptr = NULL;
+		    crypto_sym *tmp_ptr = nullptr;
 
 		    tmp = tmp_ptr = new (pool) crypto_sym(crypto_size, real_pass, *(stack.top()), true, ver.get_edition(), crypto);
-		    if(tmp_ptr != NULL)
+		    if(tmp_ptr != nullptr)
 			tmp_ptr->set_initial_shift(ver.get_initial_offset());
 		}
 		else // archive openned by the beginning
@@ -601,7 +601,7 @@ namespace libdar
 		    crypto_sym *tmp_ptr;
 		    tmp = tmp_ptr = new (pool) crypto_sym(crypto_size, real_pass, *(stack.top()), false, ver.get_edition(), crypto);
 
-		    if(tmp_ptr != NULL)
+		    if(tmp_ptr != nullptr)
 		    {
 			tmp_ptr->set_callback_trailing_clear_data(&macro_tools_get_terminator_start);
 
@@ -622,7 +622,7 @@ namespace libdar
 		throw Erange("macro_tools_open_archive", gettext("Unknown encryption algorithm"));
 	    }
 
-	    if(tmp == NULL)
+	    if(tmp == nullptr)
 	    {
 		if(crypto != crypto_none || ver.get_tape_marks())
 		    throw Ememory("open_archive");
@@ -632,7 +632,7 @@ namespace libdar
 		    // we always ignore read ahead as encryption layer above sar/zapette/triial_sar has no slave thread below
 		tmp->ignore_read_ahead(true);
 		stack.push(tmp);
-		tmp = NULL;
+		tmp = nullptr;
 	    }
 
 #ifdef LIBTHREADAR_AVAILABLE
@@ -641,12 +641,12 @@ namespace libdar
 		if(info_details)
 		    dialog.warning(gettext("Creating a new thread to run the previously created layers..."));
 		tmp = new (pool) generic_thread(stack.top());
-		if(tmp == NULL)
+		if(tmp == nullptr)
 		    throw Ememory("op_create_in_sub");
 		if(sequential_read)
 		    tmp->read_ahead(0); // the generic_thread above encryption will read asynchronously as much data as possible
 		stack.push(tmp);
-		tmp = NULL;
+		tmp = nullptr;
 	    }
 #endif
 
@@ -699,7 +699,7 @@ namespace libdar
 
 		unjump.insert(escape::seqt_catalogue);
 		tmp = new (pool) escape(stack.top(), unjump);
-		if(tmp == NULL)
+		if(tmp == nullptr)
 		    throw Ememory("open_archive");
 #ifdef LIBTHREADAR_AVAILABLE
 		if(!multi_threaded)
@@ -715,7 +715,7 @@ namespace libdar
 		tmp->ignore_read_ahead(true);
 #endif
 		stack.push(tmp);
-		tmp = NULL;
+		tmp = nullptr;
 
 #ifdef LIBTHREADAR_AVAILABLE
 		if(multi_threaded)
@@ -723,10 +723,10 @@ namespace libdar
 		    if(info_details)
 			dialog.warning(gettext("Creating a new thread to run the escape layer..."));
 		    generic_thread *tmp = new (pool) generic_thread(stack.top());
-		    if(tmp == NULL)
+		    if(tmp == nullptr)
 			throw Ememory("op_create_in_sub");
 		    stack.push(tmp);
-		    tmp = NULL;
+		    tmp = nullptr;
 		}
 #endif
 	    }
@@ -748,7 +748,7 @@ namespace libdar
 
 	    tmp = new (pool) compressor(ver.get_compression_algo(), *(stack.top()));
 
-	    if(tmp == NULL)
+	    if(tmp == nullptr)
 		throw Ememory("open_archive");
 	    else
 	    {
@@ -759,7 +759,7 @@ namespace libdar
 		tmp->ignore_read_ahead(true);
 #endif
 		stack.push(tmp, LIBDAR_STACK_LABEL_UNCOMPRESSED);
-		tmp = NULL;
+		tmp = nullptr;
 
 #ifdef LIBTHREADAR_AVAILABLE
 		if(multi_threaded && ver.get_compression_algo() != none)
@@ -767,11 +767,11 @@ namespace libdar
 		    if(info_details)
 			dialog.warning(gettext("Creating a new thread to run the compression layer..."));
 		    tmp = new (pool) generic_thread(stack.top());
-		    if(tmp == NULL)
+		    if(tmp == nullptr)
 			throw Ememory("op_create_in_sub");
 		    stack.clear_label(LIBDAR_STACK_LABEL_UNCOMPRESSED);
 		    stack.push(tmp, LIBDAR_STACK_LABEL_UNCOMPRESSED);
-		    tmp = NULL;
+		    tmp = nullptr;
 		}
 #endif
 	    }
@@ -786,7 +786,7 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    if(tmp != NULL)
+	    if(tmp != nullptr)
 		delete tmp;
 	    stack.clear();
 	    throw;
@@ -802,7 +802,7 @@ namespace libdar
 						bool even_partial_catalogue,
 						const label & layer1_data_name)
     {
-	catalogue *ret = NULL;
+	catalogue *ret = nullptr;
 	thread_cancellation thr_cancel;
 	pile_descriptor pdesc(&stack);
 	bool ok = false;
@@ -861,7 +861,7 @@ namespace libdar
 	amplitude = max_offset - min_offset;
 
 
-	if(pdesc.esc != NULL)
+	if(pdesc.esc != nullptr)
 	{
 	    dialog.warning(gettext("LAX MODE: Escape sequence seems present in this archive. I have thus two different methods, either I look for the escape sequence indicating the start of the catalogue or I try each position in turn in the hope it will not be data that look like a catalogue"));
 	    try
@@ -912,7 +912,7 @@ namespace libdar
 	    try
 	    {
 		ret = new (pool) catalogue(dialog, pdesc, edition, compr_algo, even_partial_catalogue, layer1_data_name);
-		if(ret == NULL)
+		if(ret == nullptr)
 		    throw Ememory("macro_tools_lax_search_catalogue");
 		stats = ret->get_stats();
 		dialog.printf(gettext("Could read a catalogue data structure at offset %i, it contains the following:"), &offset);
@@ -950,7 +950,7 @@ namespace libdar
 		{
 		    if(info_details)
 			dialog.warning(gettext("LAX MODE: Reached the end of the area to scan, FAILED to find any catalogue"));
-		    ret = NULL;
+		    ret = nullptr;
 		    ok = true;
 		}
 		else
@@ -958,7 +958,7 @@ namespace libdar
 	    }
 	}
 
-	if(ret == NULL)
+	if(ret == nullptr)
 	    throw Erange("macro_tools_lax_search_catalogue", gettext("LAX MODE: Failed to read the catalogue"));
 	else
 	    return ret;
@@ -1015,8 +1015,8 @@ namespace libdar
     {
 	try
 	{
-	    generic_file *tmp = NULL;
-	    escape *esc = NULL;
+	    generic_file *tmp = nullptr;
+	    escape *esc = nullptr;
 	    bool force_permission = (slice_permission != "");
 	    U_I permission = force_permission ? tools_octal2int(slice_permission) : 0; // 0 or anything else, this does not matter
 	    gf_mode open_mode = gf_read_write; // by default first layer is read-write except in case of hashing or encryption
@@ -1087,7 +1087,7 @@ namespace libdar
 			}
 		    else
 		    {
-			sar *tmp_sar = NULL;
+			sar *tmp_sar = nullptr;
 			if(info_details)
 			    dialog.warning(gettext("Creating low layer: Writing archive into a sar object (Segmentation and Reassembly) for slicing..."));
 			tmp = tmp_sar = new (pool) sar(dialog,
@@ -1109,17 +1109,17 @@ namespace libdar
 						       false,
 						       execute);
 
-			if(tmp_sar != NULL)
+			if(tmp_sar != nullptr)
 			    slicing = tmp_sar->get_slicing();
 		    }
 
 
-		if(tmp == NULL)
+		if(tmp == nullptr)
 		    throw Ememory("op_create_in_sub");
 		else
 		{
 		    layers.push(tmp);
-		    tmp = NULL;
+		    tmp = nullptr;
 		}
 
 		    // ******** adding cache layer if writing to pipe in order to provide limited read/write mode ***** //
@@ -1130,7 +1130,7 @@ namespace libdar
 			dialog.warning(gettext("Adding cache layer over pipe to provide limited skippability..."));
 
 		    cache *c_tmp = new (pool) cache(*(layers.top()), true);
-		    if(c_tmp == NULL)
+		    if(c_tmp == nullptr)
 			throw Ememory("op_create_in_sub");
 		    else
 		    {
@@ -1138,7 +1138,7 @@ namespace libdar
 			if(open_mode == gf_read_write)
 			    c_tmp->change_to_read_write();
 			layers.push(c_tmp, LIBDAR_STACK_LABEL_CACHE_PIPE, true);
-			tmp = NULL;
+			tmp = nullptr;
 		    }
 		}
 
@@ -1162,7 +1162,7 @@ namespace libdar
 		{
 #if GPGME_SUPPORT
 		    memory_file *key = new (pool) memory_file();
-		    if(key == NULL)
+		    if(key == nullptr)
 			throw Ememory("macro_tools_create_layers");
 
 		    try
@@ -1189,11 +1189,11 @@ namespace libdar
 			    crypto = crypto_blowfish;
 
 			ver.set_crypted_key(key);
-			key = NULL; // now the pointed to object is under the responsibility of ver object
+			key = nullptr; // now the pointed to object is under the responsibility of ver object
 		    }
 		    catch(...)
 		    {
-			if(key != NULL)
+			if(key != nullptr)
 			    delete key;
 			throw;
 		    }
@@ -1214,19 +1214,19 @@ namespace libdar
 			throw Erange("op_create_in_sub", gettext("The two passwords are not identical. Aborting"));
 		}
 
-		if(ref_slicing != NULL)
+		if(ref_slicing != nullptr)
 		{
 		    slice_layout *tmp = new (pool) slice_layout(*ref_slicing);
-		    if(tmp == NULL)
+		    if(tmp == nullptr)
 			throw Ememory("macro_tools_create_layers");
 		    try
 		    {
 			ver.set_slice_layout(tmp);
-			tmp = NULL; // now tmp is managed by ver
+			tmp = nullptr; // now tmp is managed by ver
 		    }
 		    catch(...)
 		    {
-			if(tmp != NULL)
+			if(tmp != nullptr)
 			    delete tmp;
 			throw;
 		    }
@@ -1277,7 +1277,7 @@ namespace libdar
 			tmp = new (pool) cache(*(layers.top()), false);
 		    }
 		    else
-			tmp = NULL; // a cache is already present just below
+			tmp = nullptr; // a cache is already present just below
 		    break;
 		default:
 		    throw SRC_BUG; // cryto value should have been checked before
@@ -1285,12 +1285,12 @@ namespace libdar
 
 		if(!writing_to_pipe || crypto != crypto_none)
 		{
-		    if(tmp == NULL)
+		    if(tmp == nullptr)
 			throw Ememory("op_create_in_sub");
 		    else
 		    {
 			layers.push(tmp);
-			tmp = NULL;
+			tmp = nullptr;
 		    }
 #ifdef LIBTHREADAR_AVAILABLE
 
@@ -1302,16 +1302,16 @@ namespace libdar
 			if(info_details)
 			    dialog.warning(gettext("Creating a new thread to run the previously created layers..."));
 			tmp = new (pool) generic_thread(layers.top());
-			if(tmp == NULL)
+			if(tmp == nullptr)
 			    throw Ememory("op_create_in_sub");
 			layers.push(tmp);
-			tmp = NULL;
+			tmp = nullptr;
 		    }
 #endif
 		}
 		else
 		{
-		    if(tmp != NULL)
+		    if(tmp != nullptr)
 			throw SRC_BUG;
 		}
 
@@ -1333,12 +1333,12 @@ namespace libdar
 			dialog.warning(gettext("Adding a new layer on top: Escape layer to allow sequential reading..."));
 		    unjump.insert(escape::seqt_catalogue);
 		    tmp = esc = new (pool) escape(layers.top(), unjump);
-		    if(tmp == NULL)
+		    if(tmp == nullptr)
 			throw Ememory("op_create_in_sub");
 		    else
 		    {
 			layers.push(tmp);
-			tmp = NULL;
+			tmp = nullptr;
 #ifdef LIBTHREADAR_AVAILABLE
 
 			    // adding a generic_thread object in the stack for
@@ -1348,10 +1348,10 @@ namespace libdar
 			    if(info_details)
 				dialog.warning(gettext("Creating a new thread to run the escape layer..."));
 			    tmp = new (pool) generic_thread(layers.top());
-			    if(tmp == NULL)
+			    if(tmp == nullptr)
 				throw Ememory("op_create_in_sub");
 			    layers.push(tmp);
-			    tmp = NULL;
+			    tmp = nullptr;
 			}
 #endif
 		    }
@@ -1362,12 +1362,12 @@ namespace libdar
 		if(info_details && algo != none)
 		    dialog.warning(gettext("Adding a new layer on top: compression..."));
 		tmp = new (pool) compressor(algo, *(layers.top()), compression_level);
-		if(tmp == NULL)
+		if(tmp == nullptr)
 		    throw Ememory("op_create_in_sub");
 		else
 		{
 		    layers.push(tmp);
-		    tmp = NULL;
+		    tmp = nullptr;
 		}
 
 #ifdef LIBTHREADAR_AVAILABLE
@@ -1380,10 +1380,10 @@ namespace libdar
 		    if(info_details)
 			dialog.warning(gettext("Creating a new thread to run the compression layer..."));
 		    tmp = new (pool) generic_thread(layers.top());
-		    if(tmp == NULL)
+		    if(tmp == nullptr)
 			throw Ememory("op_create_in_sub");
 		    layers.push(tmp);
-		    tmp = NULL;
+		    tmp = nullptr;
 		}
 #endif
 
@@ -1392,10 +1392,10 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		if(tmp != NULL)
+		if(tmp != nullptr)
 		{
 		    delete tmp;
-		    tmp = NULL;
+		    tmp = nullptr;
 		}
 		throw;
 	    }
@@ -1421,14 +1421,14 @@ namespace libdar
     {
 	terminateur coord;
 	pile_descriptor pdesc(&layers);
-	tronconneuse *tronco_ptr = NULL;
-	scrambler *scram_ptr = NULL;
+	tronconneuse *tronco_ptr = nullptr;
+	scrambler *scram_ptr = nullptr;
 #ifdef LIBTHREADAR_AVAILABLE
-	generic_thread *thread_ptr = NULL;
+	generic_thread *thread_ptr = nullptr;
 #endif
-	memory_file *hash_to_sign = NULL;
-	tlv *signed_hash = NULL;
-	hash_fichier *hasher = NULL;
+	memory_file *hash_to_sign = nullptr;
+	tlv *signed_hash = nullptr;
+	hash_fichier *hasher = nullptr;
 
 	    // ***************** sanity check ************************************** //
 
@@ -1439,7 +1439,7 @@ namespace libdar
 
 	    // *********** flushing pending writes and reseting compressor  ******** //
 
-	if(pdesc.esc != NULL)
+	if(pdesc.esc != nullptr)
 	{
 	    layers.sync_write_above(pdesc.esc); // esc is now up to date
 	    pdesc.esc->add_mark_at_current_position(escape::seqt_catalogue);
@@ -1459,15 +1459,15 @@ namespace libdar
 
 	    if(!gnupg_signatories.empty())
 	    {
-		generic_to_global_file *global_hash_to_sign = NULL;
-		generic_to_global_file *global_layers = NULL;
+		generic_to_global_file *global_hash_to_sign = nullptr;
+		generic_to_global_file *global_layers = nullptr;
 
 		hash_to_sign = new (nothrow) memory_file();
-		if(hash_to_sign == NULL)
+		if(hash_to_sign == nullptr)
 		    throw Ememory("macro_tools_close_layers");
 
 		signed_hash = new (nothrow) tlv();
-		if(signed_hash == NULL)
+		if(signed_hash == nullptr)
 		    throw Ememory("macro_tools_close_layers");
 
 		try
@@ -1475,7 +1475,7 @@ namespace libdar
 		    global_hash_to_sign = new (nothrow) generic_to_global_file(dialog, hash_to_sign, gf_write_only);
 		    global_layers = new (nothrow) generic_to_global_file(dialog, layers.top(), gf_write_only);
 
-		    if(global_hash_to_sign == NULL || global_layers == NULL)
+		    if(global_hash_to_sign == nullptr || global_layers == nullptr)
 			throw Ememory("macro_tools_close_layers");
 
 		    hasher = new (nothrow) hash_fichier(dialog,
@@ -1483,7 +1483,7 @@ namespace libdar
 							string("x"),
 							global_hash_to_sign,
 							hash_sha512);
-		    if(hasher == NULL)
+		    if(hasher == nullptr)
 			throw Ememory("macro_tools_close_layers");
 
 			// at this stage, hasher has been built and now owns and
@@ -1493,9 +1493,9 @@ namespace libdar
 		}
 		catch(...)
 		{
-		    if(global_hash_to_sign != NULL)
+		    if(global_hash_to_sign != nullptr)
 			delete global_hash_to_sign;
-		    if(global_layers != NULL)
+		    if(global_layers != nullptr)
 			delete global_layers;
 		    throw;
 		}
@@ -1518,7 +1518,7 @@ namespace libdar
 
 		// removing the hash from the top of the stack now that the catalogue has been dropped //
 
-	    if(hasher != NULL)
+	    if(hasher != nullptr)
 	    {
 		hasher->terminate(); // this drops the hash to hash_to_sign
 		if(layers.top() != hasher)
@@ -1539,11 +1539,11 @@ namespace libdar
 
 		    // ciphering and signing the hash of the catalogue //
 
-		if(hash_to_sign == NULL)
+		if(hash_to_sign == nullptr)
 		    throw SRC_BUG;
 		else
 		    hash_to_sign->skip(0);
-		if(signed_hash == NULL)
+		if(signed_hash == nullptr)
 		    throw SRC_BUG;
 		engine.set_signatories(gnupg_signatories);
 		engine.encrypt(gnupg_recipients, *hash_to_sign, *signed_hash);
@@ -1558,7 +1558,7 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    if(hasher != NULL)
+	    if(hasher != nullptr)
 	    {
 		if(layers.top() == hasher)
 		{
@@ -1567,35 +1567,35 @@ namespace libdar
 		    pdesc = pile_descriptor(&layers);
 		}
 		delete hasher;
-		hasher = NULL;
+		hasher = nullptr;
 	    }
-	    if(signed_hash != NULL)
+	    if(signed_hash != nullptr)
 	    {
 		delete signed_hash;
-		signed_hash = NULL;
+		signed_hash = nullptr;
 	    }
-	    if(hash_to_sign != NULL)
+	    if(hash_to_sign != nullptr)
 	    {
 		delete hash_to_sign;
-		hash_to_sign = NULL;
+		hash_to_sign = nullptr;
 	    }
 	    throw;
 	}
 
-	if(hasher != NULL)
+	if(hasher != nullptr)
 	{
 	    delete hasher;
-	    hasher = NULL;
+	    hasher = nullptr;
 	}
-	if(signed_hash != NULL)
+	if(signed_hash != nullptr)
 	{
 	    delete signed_hash;
-	    signed_hash = NULL;
+	    signed_hash = nullptr;
 	}
-	if(hash_to_sign != NULL)
+	if(hash_to_sign != nullptr)
 	{
 	    delete hash_to_sign;
-	    hash_to_sign = NULL;
+	    hash_to_sign = nullptr;
 	}
 
 	    // releasing the compression layer
@@ -1609,11 +1609,11 @@ namespace libdar
 	if(!layers.pop_and_close_if_type_is(pdesc.compr))
 	    throw SRC_BUG;
 	else
-	    pdesc.compr = NULL;
+	    pdesc.compr = nullptr;
 
 	    // releasing the escape layer
 
-	if(pdesc.esc != NULL)
+	if(pdesc.esc != nullptr)
 	{
 	    if(info_details)
 		dialog.warning(gettext("Closing the escape layer..."));
@@ -1622,7 +1622,7 @@ namespace libdar
 #endif
 	    if(!layers.pop_and_close_if_type_is(pdesc.esc))
 		throw SRC_BUG;
-	    pdesc.esc = NULL;
+	    pdesc.esc = nullptr;
 	}
 
 	    // *********** writing down the first terminator at the end of the archive  *************** //
@@ -1654,22 +1654,22 @@ namespace libdar
 	tronco_ptr = dynamic_cast<tronconneuse *>(layers.top());
 	scram_ptr = dynamic_cast<scrambler *>(layers.top());
 
-	if(tronco_ptr != NULL || scram_ptr != NULL)
+	if(tronco_ptr != nullptr || scram_ptr != nullptr)
 	{
 	    if(info_details)
 		dialog.warning(gettext("Closing the encryption layer..."));
 	}
 
-	if(tronco_ptr != NULL)
+	if(tronco_ptr != nullptr)
 	    tronco_ptr->write_end_of_file();
 
-	if(tronco_ptr != NULL)
+	if(tronco_ptr != nullptr)
 	{
 	    if(!layers.pop_and_close_if_type_is(tronco_ptr))
 		throw SRC_BUG;
 	}
 
-	if(scram_ptr != NULL)
+	if(scram_ptr != nullptr)
 	{
 	    if(!layers.pop_and_close_if_type_is(scram_ptr))
 		throw SRC_BUG;
@@ -1713,16 +1713,16 @@ namespace libdar
 	const cat_file *tmp_file = dynamic_cast<const cat_file *>(obj);
 	const cat_mirage *tmp_mir = dynamic_cast<const cat_mirage *>(obj);
 
-	if(obj == NULL)
+	if(obj == nullptr)
 	    throw SRC_BUG;
 
-	if(tmp_mir != NULL)
+	if(tmp_mir != nullptr)
 	{
 	    tmp_inode = tmp_mir->get_inode();
 	    tmp_file = dynamic_cast<const cat_file *>(tmp_inode);
 	}
 
-	if(tmp_inode != NULL)
+	if(tmp_inode != nullptr)
 	{
 	    if(!sl.first_size.is_zero())
 	    {
@@ -1766,7 +1766,7 @@ namespace libdar
 	    }
 	}
 
-	if(tmp_file != NULL)
+	if(tmp_file != nullptr)
 	{
 	    if(tmp_file->get_saved_status() == s_saved)
 	    {
@@ -1796,13 +1796,13 @@ namespace libdar
 						bool slice_header_format_07,
 						const std::string & execute)
     {
-        generic_file *tmp = NULL;
-        trivial_sar *ret = NULL;
+        generic_file *tmp = nullptr;
+        trivial_sar *ret = nullptr;
 
         try
         {
             tmp = new (pool) tuyau(dialog, fd, mode);
-            if(tmp == NULL)
+            if(tmp == nullptr)
                 throw Ememory("macro_tools_open_archive_tuyau");
             ret = new (pool) trivial_sar(dialog,
 					 tmp,
@@ -1810,16 +1810,16 @@ namespace libdar
 					 data_name,
 					 slice_header_format_07,
 					 execute);
-            if(ret == NULL)
+            if(ret == nullptr)
                 throw Ememory("macro_tools_open_archive_tuyau");
 	    else
-		tmp = NULL;
+		tmp = nullptr;
         }
         catch(...)
         {
-            if(ret != NULL)
+            if(ret != nullptr)
                 delete ret;
-	    if(tmp != NULL)
+	    if(tmp != nullptr)
 		delete tmp;
             throw;
         }

@@ -76,7 +76,7 @@ int main(S_I argc, char * const argv[], const char **env)
 			    argv,
 			    env,
 			    "",
-			    NULL,
+			    nullptr,
 			    &little_main);
 }
 

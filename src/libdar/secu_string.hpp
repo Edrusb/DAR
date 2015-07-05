@@ -139,8 +139,8 @@ namespace libdar
 
 	    /// \return the address of the first byte of the string
 	    /// \note check the "size" method to know how much bytes can be read
-	    /// \note the string is NULL terminated
-	const char*c_str() const { return mem == NULL ? throw SRC_BUG : mem; };
+	    /// \note the string is nullptr terminated
+	const char*c_str() const { return mem == nullptr ? throw SRC_BUG : mem; };
 
 	    /// get the size of the string
 	U_I size() const { return *string_size; }; // returns the size of the string

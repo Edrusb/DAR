@@ -65,7 +65,7 @@ namespace libdar
 	: tronconneuse(block_size, encrypted_side, no_initial_shift, reading_ver)
     {
 #if CRYPTO_AVAILABLE
-	ivec = NULL;
+	ivec = nullptr;
 
 	if(reading_ver <= 5)
 	    throw Erange("crypto_sym::blowfish", gettext("Current implementation of blowfish encryption is not compatible with old (weak) implementation, use dar-2.3.x software (or other software based on libdar-4.4.x) to read this archive"));
@@ -97,19 +97,19 @@ namespace libdar
 	    }
 
 		// checking for algorithm availability
-	    err = gcry_cipher_algo_info(algo_id, GCRYCTL_TEST_ALGO, NULL, NULL);
+	    err = gcry_cipher_algo_info(algo_id, GCRYCTL_TEST_ALGO, nullptr, nullptr);
 	    if(err != GPG_ERR_NO_ERROR)
 		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Cyphering algorithm not available in libgcrypt: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
 		// obtaining the block length
-	    err = gcry_cipher_algo_info(algo_id, GCRYCTL_GET_BLKLEN, NULL, &algo_block_size);
+	    err = gcry_cipher_algo_info(algo_id, GCRYCTL_GET_BLKLEN, nullptr, &algo_block_size);
 	    if(err != GPG_ERR_NO_ERROR)
 		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Failed retrieving from libgcrypt the block size used by the cyphering algorithm: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 	    if(algo_block_size == 0)
 		throw SRC_BUG;
 
 		// obtaining the maximum key length
-	    err = gcry_cipher_algo_info(algo_id, GCRYCTL_GET_KEYLEN, NULL, &key_len);
+	    err = gcry_cipher_algo_info(algo_id, GCRYCTL_GET_KEYLEN, nullptr, &key_len);
 	    if(err != GPG_ERR_NO_ERROR)
 		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Failed retrieving from libgcrypt the key length to use: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
@@ -118,7 +118,7 @@ namespace libdar
 
 		// initializing ivec in secure memory
 	    ivec = (unsigned char *)gcry_malloc_secure(algo_block_size);
-	    if(ivec == NULL)
+	    if(ivec == nullptr)
 		throw Esecu_memory("crypto_sym::crypto_sym");
 
 	    try
@@ -158,7 +158,7 @@ namespace libdar
 #if CRYPTO_AVAILABLE
 	gcry_cipher_close(clef);
 	gcry_cipher_close(essiv_clef);
-	if(ivec != NULL)
+	if(ivec != nullptr)
 	{
 	    (void)memset(ivec, 0, algo_block_size);
 	    gcry_free(ivec);
@@ -252,14 +252,14 @@ namespace libdar
 	    // Stronger IV calculation: ESSIV.
 	    // ESSIV mode helps to provide (at least) IND-CPA security.
 
-	unsigned char *sect = NULL;
+	unsigned char *sect = nullptr;
 	infinint ref_cp = ref;
 	infinint mask = 0xFF;
 	infinint tmp;
 	gcry_error_t err;
 
 	sect = new (nothrow) unsigned char[size];
-	if(sect == NULL)
+	if(sect == nullptr)
 	    throw Ememory("crypto_sym::make_ivec");
 
 	try
@@ -343,16 +343,16 @@ namespace libdar
 	try
 	{
 	    U_I UjLen = gcry_md_get_algo_dlen(GCRY_MD_SHA1);
-	    char *Ti = NULL, *Uj = NULL;
+	    char *Ti = nullptr, *Uj = nullptr;
 
 	    retval.clear_and_resize(output_length);
 	    Ti = (char *)gcry_malloc_secure(gcry_md_get_algo_dlen(GCRY_MD_SHA1));
-	    if(Ti == NULL)
+	    if(Ti == nullptr)
 		throw Ememory("crypto_sym::pkcs5_pass2key");
 	    try
 	    {
 		Uj = (char *)gcry_malloc_secure(gcry_md_get_algo_dlen(GCRY_MD_SHA1));
-		if(Uj == NULL)
+		if(Uj == nullptr)
 		    throw Ememory("crypto_sym::pkcs5_pass2key");
 		try
 		{
@@ -361,7 +361,7 @@ namespace libdar
 			    // Ti = U_1 \xor U_2 \xor ... \xor U_c
 			    // U_1 = PRF(P, S || INT(i))
 			unsigned char ii[4];
-			unsigned char *tmp_md = NULL;
+			unsigned char *tmp_md = nullptr;
 
 			ii[0] = (i >> 24) & 0xff;
 			ii[1] = (i >> 16) & 0xff;
@@ -431,14 +431,14 @@ namespace libdar
 	    // Calculate the ESSIV salt.
 	    // Recall that ESSIV(sector) = E_salt(sector); salt = H(key).
 
-	void *digest = NULL;
+	void *digest = nullptr;
 	U_I digest_len = gcry_md_get_algo_dlen(GCRY_MD_SHA1);
 	gcry_error_t err;
 
 	if(digest_len == 0)
 	    throw SRC_BUG;
 	digest = gcry_malloc_secure(digest_len);
-	if(digest == NULL)
+	if(digest == nullptr)
 	    throw Ememory("crypto_sym::dar_set_essiv");
 
 	try

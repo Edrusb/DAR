@@ -63,11 +63,11 @@ namespace libdar
 	    case_s = case_sensit;              //< object's field
 	    including = include;               //< object's field
 	    fichier_local source = filename_list_st; //< where we read data from
-	    char *buffer = NULL;               //< hold the just read data
+	    char *buffer = nullptr;               //< hold the just read data
 	    static const U_I buf_size = 20480; //< size of buffer: we read at most this number of bytes at a time
 	    list <string> tmp;                 //< list of all raw lines read, without any prefix
 	    U_I lu = 0, curs;                  //< cursor used as cisors to split data in line
-	    char *beg = NULL;                  //< points to the beginning of the next line inside buffer, when more than one line can be found in buffer
+	    char *beg = nullptr;                  //< points to the beginning of the next line inside buffer, when more than one line can be found in buffer
 	    string str_beg;                    //< holds the std::string copy of beg, eventually uppercased
 	    string current_entry = "";         //< holds the current line converted to string between each read()
 	    path prefix = prefix_t;            //< the prefix to add to relative paths
@@ -91,7 +91,7 @@ namespace libdar
 		// building buffer that will be used to split read data line by line
 
 	    meta_new(buffer, buf_size+1); // one char more to be able to add a '\0' if necessary
-	    if(buffer == NULL)
+	    if(buffer == nullptr)
 		throw Erange("mask_list::mask_list", tools_printf(gettext("Cannot allocate memory for buffer while reading %S"), &filename_list_st));
 
 
@@ -160,7 +160,7 @@ namespace libdar
 		throw;
 	    }
 	    meta_delete(buffer);
-	    buffer = NULL;
+	    buffer = nullptr;
 
 
 		/////////////

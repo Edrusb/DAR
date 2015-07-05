@@ -187,7 +187,7 @@ namespace libdar
 	    //-- routines
 
 	void set_fixed_sequence_for(sequence_type t) { fixed_sequence[ESCAPE_SEQUENCE_LENGTH - 1] = type2char(t); };
-	void check_below() { if(x_below == NULL) throw SRC_BUG; };
+	void check_below() { if(x_below == nullptr) throw SRC_BUG; };
 	void clean_read();  //< drops all in-transit data
 	void flush_write(); //< write down to "below" all in-transit data
 	void flush_or_clean()

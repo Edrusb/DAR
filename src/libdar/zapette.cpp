@@ -100,7 +100,7 @@ namespace libdar
 
         if(f->read(&serial_num, 1) == 0)
             throw Erange("request::read", gettext("Partial request received, aborting\n"));
-	if(f == NULL)
+	if(f == nullptr)
 	    throw SRC_BUG;
         offset = infinint(*f);
         pas = 0;
@@ -123,7 +123,7 @@ namespace libdar
         {
         case ANSWER_TYPE_DATA:
             f->write((char *)&tmp, sizeof(tmp));
-            if(data != NULL)
+            if(data != nullptr)
                 f->write(data, size);
             else
                 if(size != 0)
@@ -166,7 +166,7 @@ namespace libdar
             arg = 0;
             break;
         case ANSWER_TYPE_INFININT:
-	    if(f == NULL)
+	    if(f == nullptr)
 		throw SRC_BUG;
             arg = infinint(*f);
             size = 0;
@@ -178,11 +178,11 @@ namespace libdar
 
     slave_zapette::slave_zapette(generic_file *input, generic_file *output, generic_file *data)
     {
-        if(input == NULL)
+        if(input == nullptr)
             throw SRC_BUG;
-        if(output == NULL)
+        if(output == nullptr)
             throw SRC_BUG;
-        if(data == NULL)
+        if(data == nullptr)
             throw SRC_BUG;
 
         if(input->get_mode() == gf_write_only)
@@ -195,17 +195,17 @@ namespace libdar
         out = output;
         src = data;
 	src_ctxt = dynamic_cast<contextual *>(data);
-	if(src_ctxt == NULL)
+	if(src_ctxt == nullptr)
 	    throw Erange("slave_zapette::slave_zapette", "Object given to data must inherit from contextual class");
     }
 
     slave_zapette::~slave_zapette()
     {
-        if(in != NULL)
+        if(in != nullptr)
             delete in;
-        if(out != NULL)
+        if(out != nullptr)
             delete out;
-        if(src != NULL)
+        if(src != nullptr)
             delete src;
     }
 
@@ -213,11 +213,11 @@ namespace libdar
     {
         request req;
         answer ans;
-        char *buffer = NULL;
+        char *buffer = nullptr;
         U_16 buf_size = 1024;
 
 	meta_new(buffer, buf_size);
-	if(buffer == NULL)
+	if(buffer == nullptr)
 	    throw Ememory("slave_zapette::action");
 
         try
@@ -235,11 +235,11 @@ namespace libdar
                             // enlarge buffer if necessary
                         if(req.size > buf_size)
                         {
-                            if(buffer != NULL)
+                            if(buffer != nullptr)
 				meta_delete(buffer);
 
 			    meta_new(buffer, req.size);
-                            if(buffer == NULL)
+                            if(buffer == nullptr)
                                 throw Ememory("slave_zapette::action");
                             else
                                 buf_size = req.size;
@@ -251,7 +251,7 @@ namespace libdar
                     else // bad position
                     {
                         ans.size = 0;
-                        ans.write(out, NULL);
+                        ans.write(out, nullptr);
                     }
                 }
                 else // special orders
@@ -260,7 +260,7 @@ namespace libdar
                     {
                         ans.type = ANSWER_TYPE_DATA;
                         ans.size = 0;
-                        ans.write(out, NULL);
+                        ans.write(out, nullptr);
                     }
                     else if(req.offset == REQUEST_OFFSET_GET_FILESIZE) // return file size
                     {
@@ -268,20 +268,20 @@ namespace libdar
                         if(!src->skip_to_eof())
                             throw Erange("slave_zapette::action", gettext("Cannot skip at end of file"));
                         ans.arg = src->get_position();
-                        ans.write(out, NULL);
+                        ans.write(out, nullptr);
                     }
 		    else if(req.offset == REQUEST_OFFSET_CHANGE_CONTEXT_STATUS) // contextual status change requested
 		    {
 			ans.type = ANSWER_TYPE_INFININT;
 			ans.arg = 1;
  			src_ctxt->set_info_status(req.info);
-			ans.write(out, NULL);
+			ans.write(out, nullptr);
 		    }
                     else if(req.offset == REQUEST_IS_OLD_START_END_ARCHIVE) // return whether the underlying archive has an old slice header or not
 		    {
 			ans.type = ANSWER_TYPE_INFININT;
 			ans.arg = src_ctxt->is_an_old_start_end_archive() ? 1 : 0;
-			ans.write(out, NULL);
+			ans.write(out, nullptr);
 		    }
 		    else if(req.offset == REQUEST_GET_DATA_NAME) // return the data_name of the underlying sar
 		    {
@@ -298,12 +298,12 @@ namespace libdar
         }
         catch(...)
         {
-            if(buffer != NULL)
+            if(buffer != nullptr)
 		meta_delete(buffer);
             throw;
         }
 
-        if(buffer != NULL)
+        if(buffer != nullptr)
 	    meta_delete(buffer);
     }
 
@@ -312,9 +312,9 @@ namespace libdar
 		     generic_file *output,
 		     bool by_the_end) : generic_file(gf_read_only), mem_ui(dialog)
     {
-	if(input == NULL)
+	if(input == nullptr)
 	    throw SRC_BUG;
-	if(output == NULL)
+	if(output == nullptr)
 	    throw SRC_BUG;
 	if(input->get_mode() == gf_write_only)
 	    throw Erange("zapette::zapette", gettext("Cannot read on input"));
@@ -331,7 +331,7 @@ namespace libdar
 	    // retreiving the file size
 	    //
 	S_I tmp = 0;
-	make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_GET_FILESIZE, NULL, "", tmp, file_size);
+	make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_GET_FILESIZE, nullptr, "", tmp, file_size);
 
 	    //////////////////////////////
 	    // positionning cursor for next read
@@ -380,7 +380,7 @@ namespace libdar
     void zapette::inherited_terminate()
     {
         S_I tmp = 0;
-        make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_END_TRANSMIT, NULL, "", tmp, file_size);
+        make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_END_TRANSMIT, nullptr, "", tmp, file_size);
     }
 
     bool zapette::skip(const infinint & pos)
@@ -437,7 +437,7 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_CHANGE_CONTEXT_STATUS, NULL, s, tmp, val);
+	make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_CHANGE_CONTEXT_STATUS, nullptr, s, tmp, val);
 	contextual::set_info_status(s);
     }
 
@@ -449,7 +449,7 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-  	make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_IS_OLD_START_END_ARCHIVE, NULL, "", tmp, val);
+  	make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_IS_OLD_START_END_ARCHIVE, nullptr, "", tmp, val);
 	return val == 1;
     }
 

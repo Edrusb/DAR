@@ -164,7 +164,7 @@ void f2()
 	ui.printf("exception creating archive: %S\n", &msg);
 	return;
     }
-    if(toto != NULL)
+    if(toto != nullptr)
     {
 	archive_options_listing options;
 

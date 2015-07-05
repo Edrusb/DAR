@@ -44,7 +44,7 @@ namespace libdar
 	gid = 0;
 	execute = backup_hook_file_execute;
 	match = backup_hook_file_mask.clone();
-	if(match == NULL)
+	if(match == nullptr)
 	    throw Ememory("semaphore::semaphore");
     }
 
@@ -56,14 +56,14 @@ namespace libdar
 	    throw SRC_BUG;
 	if(count > 1) // outer directory inder controlled backup (execute ran in "start" context)
 	{
-	    if(dynamic_cast<const cat_eod *>(object) != NULL)
+	    if(dynamic_cast<const cat_eod *>(object) != nullptr)
 		if(data_to_save)
 		    --count;
 		else
 		    throw SRC_BUG; // CAT_EOD should always have its data to be saved
 	    else
 	    {
-		if(dynamic_cast<const cat_directory *>(object) != NULL)
+		if(dynamic_cast<const cat_directory *>(object) != nullptr)
 		    ++count;
 	    }
 	}
@@ -71,7 +71,7 @@ namespace libdar
 	{
 	    const cat_nomme *o_nom = dynamic_cast<const cat_nomme *>(object);
 
-	    if(o_nom == NULL)
+	    if(o_nom == nullptr)
 		return; // CAT_EOD associated to an unsaved directory
 
 	    if(data_to_save && match->is_covered(x_chem))
@@ -79,15 +79,15 @@ namespace libdar
 		const cat_directory *o_dir = dynamic_cast<const cat_directory *>(object);
 		const cat_inode *o_ino = dynamic_cast<const cat_inode *>(object);
 
-		if(o_dir != NULL)
+		if(o_dir != nullptr)
 		    count = 2;
 		else
 		    count = 1;
 
 		chem = x_chem;
 		filename = o_nom->get_name();
-		uid = o_ino != NULL ? o_ino->get_uid() : 0;
-		gid = o_ino != NULL ? o_ino->get_gid() : 0;
+		uid = o_ino != nullptr ? o_ino->get_uid() : 0;
+		gid = o_ino != nullptr ? o_ino->get_gid() : 0;
 		tools_hook_execute(get_ui(), build_string("start"));
 	    }
 	}
@@ -135,19 +135,19 @@ namespace libdar
 	uid = ref.uid;
 	gid = ref.gid;
 	execute = ref.execute;
-	if(ref.match == NULL)
+	if(ref.match == nullptr)
 	    throw SRC_BUG;
 	match = ref.match->clone();
-	if(match == NULL)
+	if(match == nullptr)
 	    throw Ememory("semaphore::copy_from");
     }
 
     void semaphore::detruit()
     {
-	if(match != NULL)
+	if(match != nullptr)
 	{
 	    delete match;
-	    match = NULL;
+	    match = nullptr;
 	}
     }
 

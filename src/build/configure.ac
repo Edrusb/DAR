@@ -1080,7 +1080,7 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
 				  int size = backtrace(buffer, buf_size);
 				  char **symbols = backtrace_symbols(buffer, size);
 
-				  if(symbols != NULL)
+				  if(symbols != nullptr)
 				    free(symbols);
 			       #endif
 			       #if MUTEX_WORKS

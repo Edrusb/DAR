@@ -89,7 +89,7 @@ namespace libdar
 
 	bool need_flush_write() const { return first_to_write < last; };
 	void alloc_buffer(size_t x_size); //< allocate x_size byte in buffer field and set size accordingly
-	void release_buffer();            //< release memory set buffer to NULL and size to zero
+	void release_buffer();            //< release memory set buffer to nullptr and size to zero
 	void shift_by_half();
 	void clear_buffer();
 	void flush_write();

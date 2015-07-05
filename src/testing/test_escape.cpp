@@ -37,7 +37,7 @@ extern "C"
 using namespace libdar;
 using namespace std;
 
-static user_interaction *ui = NULL;
+static user_interaction *ui = nullptr;
 
 void f1();
 void f2();
@@ -48,7 +48,7 @@ int main()
 
     get_version(maj, med, min);
     ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(ui == NULL)
+    if(ui == nullptr)
 	cout << "ERREUR !" << endl;
 
     f1();

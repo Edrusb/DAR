@@ -57,7 +57,7 @@ namespace libdar
     {
 	NLS_SWAP_IN;
 
-	decimales = NULL;
+	decimales = nullptr;
 	try
 	{
 	    chiffre r;
@@ -68,7 +68,7 @@ namespace libdar
 	    unsigned char tmp = 0;
 
 	    decimales = new (p) storage(PAS);
-	    if(decimales == NULL)
+	    if(decimales == nullptr)
 		throw Ememory("template deci::decicoupe");
 
 	    decimales->clear(0xFF);
@@ -101,10 +101,10 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    if(decimales != NULL)
+	    if(decimales != nullptr)
 	    {
 		delete decimales;
-		decimales = NULL;
+		decimales = nullptr;
 	    }
 	    NLS_SWAP_OUT;
 	    throw;
@@ -116,7 +116,7 @@ namespace libdar
     {
 	NLS_SWAP_IN;
 
-	decimales = NULL;
+	decimales = nullptr;
 	try
 	{
 	    string::reverse_iterator it = s.rbegin();
@@ -132,7 +132,7 @@ namespace libdar
 		throw Erange("deci::deci(string s)", gettext("an empty string is an invalid argument"));
 
 	    decimales = new (get_pool()) storage(size);
-	    if(decimales == NULL)
+	    if(decimales == nullptr)
 		throw Ememory("deci::deci(string s)");
 	    decimales->clear(0xFF); // FF is not a valid couple of decimal digit
 
@@ -161,7 +161,7 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    if(decimales != NULL)
+	    if(decimales != nullptr)
 		delete decimales;
 	    NLS_SWAP_OUT;
 	    throw;
@@ -178,7 +178,7 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    if(decimales != NULL)
+	    if(decimales != nullptr)
 		delete decimales;
 	    throw;
 	}
@@ -186,20 +186,20 @@ namespace libdar
 
     void deci::copy_from(const deci & ref)
     {
-        if(decimales != NULL)
+        if(decimales != nullptr)
             throw SRC_BUG;
 
         decimales = new (get_pool()) storage(*ref.decimales);
-	if(decimales == NULL)
+	if(decimales == nullptr)
 	    throw SRC_BUG;
     }
 
     void deci::detruit()
     {
-        if(decimales != NULL)
+        if(decimales != nullptr)
         {
             delete decimales;
-            decimales = NULL;
+            decimales = nullptr;
         }
     }
 
@@ -210,7 +210,7 @@ namespace libdar
         chiffre tmp;
         infinint justif_size = 0;
 
-        if(decimales == NULL)
+        if(decimales == nullptr)
             throw SRC_BUG;
 
         storage::iterator it = decimales->begin();

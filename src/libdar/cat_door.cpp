@@ -37,7 +37,7 @@ namespace libdar
     {
 	const cat_door *ref_door = dynamic_cast<const cat_door *>(&ref);
 
-	if(ref_door == NULL)
+	if(ref_door == nullptr)
 	    return false;
 	else
 	    return cat_file::operator == (ref);
@@ -45,12 +45,12 @@ namespace libdar
 
     generic_file *cat_door::get_data(get_data_mode mode) const
     {
-	generic_file *ret = NULL;
+	generic_file *ret = nullptr;
 
 	if(status == from_path)
 	{
 	    ret = new (get_pool()) null_file(gf_read_only);
-	    if(ret == NULL)
+	    if(ret == nullptr)
 		throw Ememory("cat_door::get_data");
 	}
 	else

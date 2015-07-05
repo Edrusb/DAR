@@ -34,7 +34,7 @@ namespace libdar
 
     cat_detruit::cat_detruit(const pile_descriptor & pdesc, const archive_version & reading_ver, bool small) : cat_nomme(pdesc, small)
     {
-	generic_file *ptr = NULL;
+	generic_file *ptr = nullptr;
 
 	pdesc.check(small);
 	if(small)
@@ -55,7 +55,7 @@ namespace libdar
     {
 	const cat_detruit *ref_det = dynamic_cast<const cat_detruit *>(&ref);
 
-	if(ref_det == NULL)
+	if(ref_det == nullptr)
 	    return false;
 	else
 	    return signe == ref_det->signe
@@ -65,7 +65,7 @@ namespace libdar
 
     void cat_detruit::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
-	generic_file * ptr = NULL;
+	generic_file * ptr = nullptr;
 
 	cat_nomme::inherited_dump(pdesc, small);
 

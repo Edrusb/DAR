@@ -51,7 +51,7 @@ namespace libdar
 			    fmt_hard_link,        //< old dual format
 			    fmt_file_etiquette }; //< old dual format
 
-	cat_mirage(const std::string & name, cat_etoile *ref) : cat_nomme(name) { star_ref = ref; if(ref == NULL) throw SRC_BUG; star_ref->add_ref(this); };
+	cat_mirage(const std::string & name, cat_etoile *ref) : cat_nomme(name) { star_ref = ref; if(ref == nullptr) throw SRC_BUG; star_ref->add_ref(this); };
 	cat_mirage(user_interaction & dialog,
 		   const pile_descriptor & pdesc,
 		   const archive_version & reading_ver,
@@ -71,7 +71,7 @@ namespace libdar
 		   compression default_algo,
 		   bool lax,
 		   bool small);
-	cat_mirage(const cat_mirage & ref) : cat_nomme (ref) { star_ref = ref.star_ref; if(star_ref == NULL) throw SRC_BUG; star_ref->add_ref(this); };
+	cat_mirage(const cat_mirage & ref) : cat_nomme (ref) { star_ref = ref.star_ref; if(star_ref == nullptr) throw SRC_BUG; star_ref->add_ref(this); };
 	const cat_mirage & operator = (const cat_mirage & ref);
 	~cat_mirage() { star_ref->drop_ref(this); };
 
@@ -80,7 +80,7 @@ namespace libdar
 	unsigned char signature() const { return 'm'; };
 	cat_entree *clone() const { return new (get_pool()) cat_mirage(*this); };
 
-	cat_inode *get_inode() const { if(star_ref == NULL) throw SRC_BUG; return star_ref->get_inode(); };
+	cat_inode *get_inode() const { if(star_ref == nullptr) throw SRC_BUG; return star_ref->get_inode(); };
 	infinint get_etiquette() const { return star_ref->get_etiquette(); };
 	infinint get_etoile_ref_count() const { return star_ref->get_ref_count(); };
 	cat_etoile *get_etoile() const { return star_ref; };

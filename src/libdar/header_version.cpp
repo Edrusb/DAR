@@ -46,15 +46,15 @@ namespace libdar
 	cmd_line = "";
 	initial_offset = 0;
 	sym = crypto_none;
-	crypted_key = NULL;
-	ref_layout = NULL;
+	crypted_key = nullptr;
+	ref_layout = nullptr;
 	ciphered = false;
 	arch_signed = false;
     }
 
     void header_version::read(generic_file & f, user_interaction & dialog, bool lax_mode)
     {
-	crc *ctrl = NULL;
+	crc *ctrl = nullptr;
 	char tmp;
         U_I flag;
 
@@ -201,10 +201,10 @@ namespace libdar
 		throw Erange("header_version::read", gettext("Corruption met while reading header_version data structure"));
 	}
 
-	if(crypted_key != NULL)
+	if(crypted_key != nullptr)
 	{
 	    delete crypted_key;
-	    crypted_key = NULL;
+	    crypted_key = nullptr;
 	}
 
 	if((flag & FLAG_HAS_CRYPTED_KEY) != 0)
@@ -212,7 +212,7 @@ namespace libdar
 	    infinint key_size = f;
 
 	    crypted_key = new (get_pool()) memory_file();
-	    if(crypted_key == NULL)
+	    if(crypted_key == nullptr)
 		throw Ememory("header_version::read");
 	    if(f.copy_to(*crypted_key, key_size) != key_size)
 		throw Erange("header_version::read", gettext("Missing data for encrypted symmetrical key"));
@@ -222,9 +222,9 @@ namespace libdar
 	{
 	    try
 	    {
-		if(ref_layout == NULL)
+		if(ref_layout == nullptr)
 		    ref_layout = new (get_pool()) slice_layout();
-		if(ref_layout == NULL)
+		if(ref_layout == nullptr)
 		    throw Ememory("header_version::read");
 		ref_layout->read(f);
 	    }
@@ -245,7 +245,7 @@ namespace libdar
 	arch_signed = (flag & FLAG_ARCHIVE_IS_SIGNED) != 0;
 
 	ctrl = f.get_crc();
-	if(ctrl == NULL)
+	if(ctrl == nullptr)
 	    throw SRC_BUG;
 
 	try
@@ -262,7 +262,7 @@ namespace libdar
 	    {
 		crc *coh = create_crc_from_file(f, get_pool());
 
-		if(coh == NULL)
+		if(coh == nullptr)
 		    throw SRC_BUG;
 		try
 		{
@@ -284,11 +284,11 @@ namespace libdar
 		}
 		catch(...)
 		{
-		    if(coh != NULL)
+		    if(coh != nullptr)
 			delete coh;
 		    throw;
 		}
-		if(coh != NULL)
+		if(coh != nullptr)
 		    delete coh;
 	    }
 	    if(initial_offset.is_zero())
@@ -296,18 +296,18 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    if(ctrl != NULL)
+	    if(ctrl != nullptr)
 		delete ctrl;
 	    throw;
 	}
 
-	if(ctrl != NULL)
+	if(ctrl != nullptr)
 	    delete ctrl;
     }
 
     void header_version::write(generic_file &f) const
     {
-	crc *ctrl = NULL;
+	crc *ctrl = nullptr;
 	char tmp;
         unsigned char flag[2];
 
@@ -319,10 +319,10 @@ namespace libdar
 	if(!initial_offset.is_zero())
 	    flag[0] |= FLAG_INITIAL_OFFSET; // adding it to the flag
 
-	if(crypted_key != NULL)
+	if(crypted_key != nullptr)
 	    flag[0] |= FLAG_HAS_CRYPTED_KEY;
 
-	if(ref_layout != NULL)
+	if(ref_layout != nullptr)
 	    flag[0] |= FLAG_HAS_REF_SLICING;
 
 	if(has_tape_marks)
@@ -361,18 +361,18 @@ namespace libdar
 	    f.write(&tmp, sizeof(tmp));
 	}
 
-	if(crypted_key != NULL)
+	if(crypted_key != nullptr)
 	{
 	    crypted_key->size().dump(f);
 	    crypted_key->skip(0);
 	    crypted_key->copy_to(f);
 	}
 
-	if(ref_layout != NULL)
+	if(ref_layout != nullptr)
 	    ref_layout->write(f);
 
 	ctrl = f.get_crc();
-	if(ctrl == NULL)
+	if(ctrl == nullptr)
 	    throw SRC_BUG;
 	try
 	{
@@ -380,11 +380,11 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    if(ctrl != NULL)
+	    if(ctrl != nullptr)
 		delete ctrl;
 	    throw;
 	}
-	if(ctrl != NULL)
+	if(ctrl != nullptr)
 	    delete ctrl;
     }
 
@@ -401,22 +401,22 @@ namespace libdar
 	cmd_line = ref.cmd_line;
 	initial_offset = ref.initial_offset;
 	sym = ref.sym;
-	if(ref.crypted_key != NULL)
+	if(ref.crypted_key != nullptr)
 	{
 	    crypted_key = new (get_pool()) memory_file(*ref.crypted_key);
-	    if(crypted_key == NULL)
+	    if(crypted_key == nullptr)
 		throw Ememory("header_version::copy_from");
 	}
 	else
-	    crypted_key = NULL;
-	if(ref.ref_layout != NULL)
+	    crypted_key = nullptr;
+	if(ref.ref_layout != nullptr)
 	{
 	    ref_layout = new (get_pool()) slice_layout(*ref.ref_layout);
-	    if(ref_layout == NULL)
+	    if(ref_layout == nullptr)
 		throw Ememory("header_version::copy_from");
 	}
 	else
-	    ref_layout = NULL;
+	    ref_layout = nullptr;
 	has_tape_marks = ref.has_tape_marks;
 	ciphered = ref.ciphered;
 	arch_signed = ref.arch_signed;

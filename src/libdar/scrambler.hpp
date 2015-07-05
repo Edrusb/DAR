@@ -45,15 +45,15 @@ namespace libdar
     public:
         scrambler(const secu_string & pass, generic_file & hidden_side);
 	scrambler(const scrambler & ref) : generic_file(ref) { throw SRC_BUG; };
-        ~scrambler() { if(buffer != NULL) meta_delete(buffer); };
+        ~scrambler() { if(buffer != nullptr) meta_delete(buffer); };
 
 	const scrambler & operator = (const scrambler & ref) { throw SRC_BUG; };
 
 	bool skippable(skippability direction, const infinint & amount) { return ref->skippable(direction, amount); };
-        bool skip(const infinint & pos) { if(ref == NULL) throw SRC_BUG; return ref->skip(pos); };
-        bool skip_to_eof() { if(ref==NULL) throw SRC_BUG; return ref->skip_to_eof(); };
-        bool skip_relative(S_I x) { if(ref == NULL) throw SRC_BUG; return ref->skip_relative(x); };
-        infinint get_position() { if(ref == NULL) throw SRC_BUG; return ref->get_position(); };
+        bool skip(const infinint & pos) { if(ref == nullptr) throw SRC_BUG; return ref->skip(pos); };
+        bool skip_to_eof() { if(ref==nullptr) throw SRC_BUG; return ref->skip_to_eof(); };
+        bool skip_relative(S_I x) { if(ref == nullptr) throw SRC_BUG; return ref->skip_relative(x); };
+        infinint get_position() { if(ref == nullptr) throw SRC_BUG; return ref->get_position(); };
 
     protected:
 	void inherited_read_ahead(const infinint & amount) { ref->read_ahead(amount); };

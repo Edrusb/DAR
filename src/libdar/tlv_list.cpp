@@ -46,7 +46,7 @@ namespace libdar
 
 	if(item > contents.size())
 	    throw Erange("tlv_list::operator[]", "index out of range when accessing a tlv_list object");
-	if(me == NULL)
+	if(me == nullptr)
 	    throw SRC_BUG;
 
 	return me->contents[item];

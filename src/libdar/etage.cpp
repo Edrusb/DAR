@@ -97,7 +97,7 @@ namespace libdar
 		 bool furtive_read_mode)
     {
         struct dirent *ret;
-	DIR *tmp = NULL;
+	DIR *tmp = nullptr;
 #if FURTIVE_READ_MODE_AVAILABLE
 	int fddir = -1;
 
@@ -124,9 +124,9 @@ namespace libdar
 	    if(furtive_read_mode && fddir >= 0)
 	    {
 		tmp = fdopendir(fddir);
-		if(tmp == NULL)
+		if(tmp == nullptr)
 		    close(fddir);
-		    // else, tmp != NULL:
+		    // else, tmp != nullptr:
 		    // fddir is now under control of the system
 		    // we must not close it.
 	    }
@@ -137,21 +137,21 @@ namespace libdar
 #endif
 	    bool is_cache_dir = false;
 
-	    if(tmp == NULL)
+	    if(tmp == nullptr)
 		throw Erange("etage::etage" , string(gettext("Error opening directory: ")) + dirname + " : " + tools_strerror_r(errno));
 
 	    fichier.clear();
 
 #if HAVE_READDIR_R
 	    ret = tools_allocate_struct_dirent(dirname);
-	    struct dirent *dbldrt = NULL;
-	    if(ret == NULL)
+	    struct dirent *dbldrt = nullptr;
+	    if(ret == nullptr)
 		throw SRC_BUG;
 	    try
 	    {
-		while(!is_cache_dir && (readdir_r(tmp, ret, &dbldrt) == 0) && dbldrt != NULL)
+		while(!is_cache_dir && (readdir_r(tmp, ret, &dbldrt) == 0) && dbldrt != nullptr)
 #else
-		while(!is_cache_dir && (ret = readdir(tmp)) != NULL)
+		while(!is_cache_dir && (ret = readdir(tmp)) != nullptr)
 #endif
 
 		    if(strcmp(ret->d_name, ".") != 0 && strcmp(ret->d_name, "..") != 0)
@@ -165,15 +165,15 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		if(ret != NULL)
+		if(ret != nullptr)
 		    tools_release_struct_dirent(ret);
 		throw;
 	    }
 	    tools_release_struct_dirent(ret);
-	    ret = NULL;
+	    ret = nullptr;
 #endif
 	    closedir(tmp);
-	    tmp = NULL;
+	    tmp = nullptr;
 
 	    if(is_cache_dir)
 	    {
@@ -187,7 +187,7 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    if(tmp != NULL)
+	    if(tmp != nullptr)
 		closedir(tmp);
 	    throw;
 	}
@@ -226,7 +226,7 @@ namespace libdar
 		char *buffer = new (nothrow) char[len+1];
 		S_I lu;
 
-		if(buffer == NULL)
+		if(buffer == nullptr)
 		    throw Ememory("etage:cache_directory_tagging_check");
 		try
 		{

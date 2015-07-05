@@ -43,14 +43,14 @@ namespace libdar
         else // nothing to be removed
             init = false;
 
-        if(fin == NULL) // not cat_eod
+        if(fin == nullptr) // not cat_eod
 	{
-            if(nom == NULL) // not a cat_nomme
+            if(nom == nullptr) // not a cat_nomme
                 throw SRC_BUG; // neither cat_eod nor cat_nomme
             else // a cat_nomme
             {
                 chemin += nom->get_name();
-                if(dir != NULL)
+                if(dir != nullptr)
                     init = true;
             }
 	}

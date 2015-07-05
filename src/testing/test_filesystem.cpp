@@ -76,7 +76,7 @@ extern "C"
 #include "fichier_local.hpp"
 #include "tuyau.hpp"
 
-static user_interaction *ui = NULL;
+static user_interaction *ui = nullptr;
 
 static void build();
 static void test();
@@ -94,7 +94,7 @@ int main()
 
     get_version(maj, med, min);
     user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(ui == NULL)
+    if(ui == nullptr)
 	cout << "ERREUR !" << endl;
     cat = new catalogue(*ui, datetime(120), data_name);
     build();
@@ -104,7 +104,7 @@ int main()
         del();
     }
     delete cat;
-    if(ui != NULL)
+    if(ui != nullptr)
 	delete ui;
 }
 
@@ -162,18 +162,18 @@ static void test()
     {
         cat_file *f = dynamic_cast<cat_file *>(p);
         cat->add(p);
-        if(f != NULL)
+        if(f != nullptr)
         {
             generic_file *entree = f->get_data(cat_file::normal);
 
             try
             {
-                crc *val = NULL;
+                crc *val = nullptr;
 		infinint crc_size = 1;
 
                 tuyau sortie = tuyau(*ui, dup(1));
                 entree->copy_to(sortie, crc_size, val);
-		if(val == NULL)
+		if(val == nullptr)
 		    throw SRC_BUG;
 		try
 		{

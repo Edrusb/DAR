@@ -91,7 +91,7 @@ void line_tools_get_min_digits(std::string arg, infinint & num, infinint & ref_n
     /// \param[in] argv is the list of arguments on the command line
     /// \param[in] getopt_string is the parsing string to pass to getopt
 #if HAVE_GETOPT_LONG
-    /// \param[in] long_options is the optional list of long options  (an NULL pointer is acceptable for no long option)
+    /// \param[in] long_options is the optional list of long options  (an nullptr pointer is acceptable for no long option)
 #endif
     /// \param[out] presence is a subset of arguments containing the option found on command-line
 extern void line_tools_look_for(const std::vector<char> & arguments,
@@ -110,7 +110,7 @@ extern void line_tools_look_for(const std::vector<char> & arguments,
     /// \param[in] argv is the list of arguments on the command line
     /// \param[in] getopt_string is the parsing string to pass to getopt
 #if HAVE_GETOPT_LONG
-    /// \param[in] long_options is the optional list of long options (an NULL pointer is acceptable for no long option)
+    /// \param[in] long_options is the optional list of long options (an nullptr pointer is acceptable for no long option)
 #endif
     /// \param[out] Q_is_present is set to true if -Q option or its equivalent long option has been found on command-line
 extern void line_tools_look_for_Q(S_I argc,

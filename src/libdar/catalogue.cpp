@@ -88,22 +88,22 @@ namespace libdar
 
     catalogue::catalogue(user_interaction & dialog, const datetime & root_last_modif, const label & data_name) : mem_ui(dialog), out_compare("/")
     {
-	contenu = NULL;
+	contenu = nullptr;
 
 	try
 	{
 	    contenu = new (get_pool()) cat_directory(0,0,0,datetime(0),root_last_modif,datetime(0),"root",0);
-	    if(contenu == NULL)
+	    if(contenu == nullptr)
 		throw Ememory("catalogue::catalogue(path)");
 	    current_compare = contenu;
 	    current_add = contenu;
 	    current_read = contenu;
-	    sub_tree = NULL;
+	    sub_tree = nullptr;
 	    ref_data_name = data_name;
 	}
 	catch(...)
 	{
-	    if(contenu != NULL)
+	    if(contenu != nullptr)
 		delete contenu;
 	    throw;
 	}
@@ -124,9 +124,9 @@ namespace libdar
 	saved_status st;
 	unsigned char base;
 	map <infinint, cat_etoile *> corres;
-	crc *calc_crc = NULL;
-	crc *read_crc = NULL;
-	contenu = NULL;
+	crc *calc_crc = nullptr;
+	crc *read_crc = nullptr;
+	contenu = nullptr;
 
 	pdesc.check(false);
 
@@ -168,27 +168,27 @@ namespace libdar
 
 		stats.clear();
 		contenu = new (get_pool()) cat_directory(dialog, pdesc, reading_ver, st, stats, corres, default_algo, lax, only_detruit, false);
-		if(contenu == NULL)
+		if(contenu == nullptr)
 		    throw Ememory("catalogue::catalogue(path)");
 		if(only_detruit)
 		    contenu->remove_all_mirages_and_reduce_dirs();
 		current_compare = contenu;
 		current_add = contenu;
 		current_read = contenu;
-		sub_tree = NULL;
+		sub_tree = nullptr;
 	    }
 	    catch(...)
 	    {
 		calc_crc = pdesc.stack->get_crc(); // keeping "f" in coherent status
-		if(calc_crc != NULL)
+		if(calc_crc != nullptr)
 		{
 		    delete calc_crc;
-		    calc_crc = NULL;
+		    calc_crc = nullptr;
 		}
 		throw;
 	    }
 	    calc_crc = pdesc.stack->get_crc(); // keeping "f" incoherent status in any case
-	    if(calc_crc == NULL)
+	    if(calc_crc == nullptr)
 		throw SRC_BUG;
 
 	    if(reading_ver > 7)
@@ -204,7 +204,7 @@ namespace libdar
 		    force_crc_failure = true;
 		}
 
-		if(force_crc_failure || read_crc == NULL || calc_crc == NULL || read_crc->get_size() != calc_crc->get_size() || *read_crc != *calc_crc)
+		if(force_crc_failure || read_crc == nullptr || calc_crc == nullptr || read_crc->get_size() != calc_crc->get_size() || *read_crc != *calc_crc)
 		{
 		    if(!lax)
 			throw Erange("catalogue::catalogue(generic_file &)", gettext("CRC failed for table of contents (aka \"catalogue\")"));
@@ -215,18 +215,18 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    if(contenu != NULL)
+	    if(contenu != nullptr)
 		delete contenu;
-	    if(calc_crc != NULL)
+	    if(calc_crc != nullptr)
 		delete calc_crc;
-	    if(read_crc != NULL)
+	    if(read_crc != nullptr)
 		delete read_crc;
 	    throw;
 	}
 	    // "contenu" must not be destroyed under normal terminaison!
-	if(calc_crc != NULL)
+	if(calc_crc != nullptr)
 	    delete calc_crc;
-	if(read_crc != NULL)
+	if(read_crc != nullptr)
 	    delete read_crc;
     }
 
@@ -236,7 +236,7 @@ namespace libdar
 	const mem_ui & you = ref;
 
 	detruire();
-	if(me == NULL)
+	if(me == nullptr)
 	    throw SRC_BUG;
 	*me = you; // copying the mem_ui data
 
@@ -267,7 +267,7 @@ namespace libdar
 	catalogue *ceci = const_cast<catalogue *>(this);
 	cat_directory *tmp = ceci->current_read->get_parent();
 
-	if(tmp == NULL)
+	if(tmp == nullptr)
 	    throw Erange("catalogue::skip_read_to_parent_dir", gettext("root does not have a parent directory"));
 	ceci->current_read = tmp;
     }
@@ -280,7 +280,7 @@ namespace libdar
 	if(ceci->current_read->read_children(tmp))
 	{
 	    const cat_directory *dir = dynamic_cast<const cat_directory *>(tmp);
-	    if(dir != NULL)
+	    if(dir != nullptr)
 	    {
 		ceci->current_read = const_cast<cat_directory *>(dir);
 		dir->reset_read_children();
@@ -292,7 +292,7 @@ namespace libdar
 	{
 	    cat_directory *papa = ceci->current_read->get_parent();
 	    ref = &r_eod;
-	    if(papa == NULL)
+	    if(papa == nullptr)
 		return false; // we reached end of root, no cat_eod generation
 	    else
 	    {
@@ -307,22 +307,22 @@ namespace libdar
 	catalogue *ceci = const_cast<catalogue *>(this);
 	const cat_nomme *tmp;
 
-	if(current_read == NULL)
+	if(current_read == nullptr)
 	    throw Erange("catalogue::read_if_present", gettext("no current directory defined"));
-	if(name == NULL) // we have to go to parent directory
+	if(name == nullptr) // we have to go to parent directory
 	{
-	    if(current_read->get_parent() == NULL)
+	    if(current_read->get_parent() == nullptr)
 		throw Erange("catalogue::read_if_present", gettext("root directory has no parent directory"));
 	    else
 		ceci->current_read = current_read->get_parent();
-	    ref = NULL;
+	    ref = nullptr;
 	    return true;
 	}
 	else // looking for a real filename
 	    if(current_read->search_children(*name, tmp))
 	    {
 		cat_directory *d = dynamic_cast<cat_directory *>(const_cast<cat_nomme *>(tmp));
-		if(d != NULL) // this is a directory need to chdir to it
+		if(d != nullptr) // this is a directory need to chdir to it
 		    ceci->current_read = d;
 		ref = tmp;
 		return true;
@@ -333,14 +333,14 @@ namespace libdar
 
     void catalogue::remove_read_entry(std::string & name)
     {
-	if(current_read == NULL)
+	if(current_read == nullptr)
 	    throw Erange("catalogue::remove_read_entry", gettext("no current reading directory defined"));
 	current_read->remove(name);
     }
 
     void catalogue::tail_catalogue_to_current_read()
     {
-	while(current_read != NULL)
+	while(current_read != nullptr)
 	{
 	    current_read->tail_to_read_children();
 	    current_read = current_read->get_parent();
@@ -354,10 +354,10 @@ namespace libdar
 	if(! sub.is_relative())
 	    throw SRC_BUG;
 
-	if(sub_tree != NULL)
+	if(sub_tree != nullptr)
 	    delete sub_tree;
 	sub_tree = new (get_pool()) path(sub);
-	if(sub_tree == NULL)
+	if(sub_tree == nullptr)
 	    throw Ememory("catalogue::reset_sub_read");
 	sub_count = -1; // must provide the path to subtree;
 	reset_read();
@@ -367,7 +367,7 @@ namespace libdar
     {
 	string tmp;
 
-	if(sub_tree == NULL)
+	if(sub_tree == nullptr)
 	    throw SRC_BUG; // reset_sub_read
 
 	switch(sub_count)
@@ -380,9 +380,9 @@ namespace libdar
 	    }
 	    else
 	    {
-		ref = NULL;
+		ref = nullptr;
 		delete sub_tree;
-		sub_tree = NULL;
+		sub_tree = nullptr;
 		sub_count = -2;
 		return false;
 	    }
@@ -398,7 +398,7 @@ namespace libdar
 		    ref = xtmp;
 		    const cat_directory *dir = dynamic_cast<const cat_directory *>(xtmp);
 
-		    if(dir != NULL)
+		    if(dir != nullptr)
 		    {
 			current_read = const_cast<cat_directory *>(dir);
 			return true;
@@ -408,7 +408,7 @@ namespace libdar
 			{
 			    get_ui().warning(sub_tree->display() + gettext(" is not present in the archive"));
 			    delete sub_tree;
-			    sub_tree = NULL;
+			    sub_tree = nullptr;
 			    sub_count = -2;
 			    return false;
 			}
@@ -422,7 +422,7 @@ namespace libdar
 		{
 		    get_ui().warning(sub_tree->display() + gettext(" is not present in the archive"));
 		    delete sub_tree;
-		    sub_tree = NULL;
+		    sub_tree = nullptr;
 		    sub_count = -2;
 		    return false;
 		}
@@ -441,9 +441,9 @@ namespace libdar
 		const cat_directory *dir = dynamic_cast<const cat_directory *>(ref);
 		const cat_eod *fin = dynamic_cast<const cat_eod *>(ref);
 
-		if(dir != NULL)
+		if(dir != nullptr)
 		    sub_count++;
-		if(fin != NULL)
+		if(fin != nullptr)
 		    sub_count--;
 
 		return true;
@@ -460,27 +460,27 @@ namespace libdar
 
     void catalogue::add(cat_entree *ref)
     {
-	if(current_add == NULL)
+	if(current_add == nullptr)
 	    throw SRC_BUG;
 
 	cat_eod *f = dynamic_cast<cat_eod *>(ref);
 
-	if(f == NULL) // ref is not cat_eod
+	if(f == nullptr) // ref is not cat_eod
 	{
 	    cat_nomme *n = dynamic_cast<cat_nomme *>(ref);
 	    cat_directory *t = dynamic_cast<cat_directory *>(ref);
 
-	    if(n == NULL)
+	    if(n == nullptr)
 		throw SRC_BUG; // unknown type neither "cat_eod" nor "cat_nomme"
 	    current_add->add_children(n);
-	    if(t != NULL) // ref is a directory
+	    if(t != nullptr) // ref is a directory
 		current_add = t;
 	    stats.add(ref);
 	}
 	else // ref is an cat_eod
 	{
 	    cat_directory *parent = current_add->get_parent();
-	    if(parent == NULL)
+	    if(parent == nullptr)
 		throw SRC_BUG; // root has no parent directory, cannot change to it
 	    else
 		current_add = parent;
@@ -490,12 +490,12 @@ namespace libdar
 
     void catalogue::re_add_in(const string &subdirname)
     {
-	const cat_nomme *sub = NULL;
+	const cat_nomme *sub = nullptr;
 
 	if(const_cast<const cat_directory *>(current_add)->search_children(subdirname, sub))
 	{
 	    const cat_directory *subdir = dynamic_cast<const cat_directory *>(sub);
-	    if(subdir != NULL)
+	    if(subdir != nullptr)
 		current_add = const_cast<cat_directory *>(subdir);
 	    else
 		throw Erange("catalogue::re_add_in", gettext("Cannot recurs in a non directory entry"));
@@ -515,7 +515,7 @@ namespace libdar
 
     void catalogue::add_in_current_read(cat_nomme *ref)
     {
-	if(current_read == NULL)
+	if(current_read == nullptr)
 	    throw SRC_BUG; // current read directory does not exists
 	current_read->add_children(ref);
     }
@@ -523,7 +523,7 @@ namespace libdar
     void catalogue::reset_compare() const
     {
 	catalogue *me = const_cast<catalogue *>(this);
-	if(me == NULL)
+	if(me == nullptr)
 	    throw SRC_BUG;
 	me->current_compare = me->contenu;
 	me->out_compare = "/";
@@ -537,17 +537,17 @@ namespace libdar
 	const cat_eod *fin = dynamic_cast<const cat_eod *>(target);
 	const cat_nomme *nom = dynamic_cast<const cat_nomme *>(target);
 
-	if(me == NULL)
+	if(me == nullptr)
 	    throw SRC_BUG;
-	if(mir != NULL)
+	if(mir != nullptr)
 	    dir = dynamic_cast<const cat_directory *>(mir->get_inode());
 
 	if(out_compare.degre() > 1) // actually scanning a nonexisting directory
 	{
-	    if(dir != NULL)
+	    if(dir != nullptr)
 		me->out_compare += dir->get_name();
 	    else
-		if(fin != NULL)
+		if(fin != nullptr)
 		{
 		    string tmp_s;
 
@@ -566,17 +566,17 @@ namespace libdar
 	{
 	    const cat_nomme *found;
 
-	    if(fin != NULL)
+	    if(fin != nullptr)
 	    {
 		cat_directory *tmp = current_compare->get_parent();
-		if(tmp == NULL)
+		if(tmp == nullptr)
 		    throw Erange("catalogue::compare", gettext("root has no parent directory"));
 		me->current_compare = tmp;
 		extracted = target;
 		return true;
 	    }
 
-	    if(nom == NULL)
+	    if(nom == nullptr)
 		throw SRC_BUG; // ref, is neither a cat_eod nor a cat_nomme ! what's that ???
 
 	    if(current_compare->search_children(nom->get_name(), found))
@@ -589,24 +589,24 @@ namespace libdar
 		const cat_mirage *dst_mir = dynamic_cast<const cat_mirage *>(found);
 
 		    // extracting cat_inode from hard links
-		if(src_mir != NULL)
+		if(src_mir != nullptr)
 		    src_ino = src_mir->get_inode();
-		if(dst_mir != NULL)
+		if(dst_mir != nullptr)
 		    dst_ino = dst_mir->get_inode();
 
 		    // updating internal structure to follow directory tree :
-		if(dir != NULL)
+		if(dir != nullptr)
 		{
 		    const cat_directory *d_ext = dynamic_cast<const cat_directory *>(dst_ino);
-		    if(d_ext != NULL)
+		    if(d_ext != nullptr)
 			me->current_compare = const_cast<cat_directory *>(d_ext);
 		    else
 			me->out_compare += dir->get_name();
 		}
 
 		    // now comparing the objects :
-		if(src_ino != NULL)
-		    if(dst_ino != NULL)
+		if(src_ino != nullptr)
+		    if(dst_ino != nullptr)
 		    {
 			if(!src_ino->same_as(*dst_ino))
 			    return false;
@@ -614,8 +614,8 @@ namespace libdar
 		    else
 			return false;
 		else
-		    if(src_det != NULL)
-			if(dst_det != NULL)
+		    if(src_det != nullptr)
+			if(dst_det != nullptr)
 			{
 			    if(!dst_det->same_as(*dst_det))
 				return false;
@@ -623,9 +623,9 @@ namespace libdar
 			else
 			    return false;
 		    else
-			throw SRC_BUG; // src_det == NULL && src_ino == NULL, thus a cat_nomme which is neither cat_detruit nor cat_inode !
+			throw SRC_BUG; // src_det == nullptr && src_ino == nullptr, thus a cat_nomme which is neither cat_detruit nor cat_inode !
 
-		if(dst_mir != NULL)
+		if(dst_mir != nullptr)
 		    extracted = dst_mir->get_inode();
 		else
 		    extracted = found;
@@ -633,7 +633,7 @@ namespace libdar
 	    }
 	    else
 	    {
-		if(dir != NULL)
+		if(dir != nullptr)
 		    me->out_compare += dir->get_name();
 		return false;
 	    }
@@ -661,32 +661,32 @@ namespace libdar
 	    pro_nom = dynamic_cast<const cat_nomme *>(projo);
 	    pro_mir = dynamic_cast<const cat_mirage *>(projo);
 
-	    if(pro_eod != NULL)
+	    if(pro_eod != nullptr)
 	    {
 		cat_directory *tmp = current->get_parent();
-		if(tmp == NULL)
+		if(tmp == nullptr)
 		    throw SRC_BUG; // reached root for "contenu", and not yet for "ref";
 		current = tmp;
 		continue;
 	    }
 
-	    if(pro_det != NULL)
+	    if(pro_det != nullptr)
 		continue;
 
-	    if(pro_nom == NULL)
+	    if(pro_nom == nullptr)
 		throw SRC_BUG; // neither an cat_eod nor a cat_nomme ! what's that ?
 
 	    if(!current->search_children(pro_nom->get_name(), ici))
 	    {
 		unsigned char firm;
 
-		if(pro_mir != NULL)
+		if(pro_mir != nullptr)
 		    firm = pro_mir->get_inode()->signature();
 		else
 		    firm = pro_nom->signature();
 
 		cat_detruit *det_tmp = new (get_pool()) cat_detruit(pro_nom->get_name(), firm, current->get_last_modif());
-		if(det_tmp == NULL)
+		if(det_tmp == nullptr)
 		    throw Ememory("catalogue::update_destroyed_with");
 		try
 		{
@@ -699,15 +699,15 @@ namespace libdar
 		}
 
 		count++;
-		if(pro_dir != NULL)
+		if(pro_dir != nullptr)
 		    ref.skip_read_to_parent_dir();
 	    }
 	    else
-		if(pro_dir != NULL)
+		if(pro_dir != nullptr)
 		{
 		    const cat_directory *ici_dir = dynamic_cast<const cat_directory *>(ici);
 
-		    if(ici_dir != NULL)
+		    if(ici_dir != nullptr)
 			current = const_cast<cat_directory *>(ici_dir);
 		    else
 			ref.skip_read_to_parent_dir();
@@ -743,36 +743,36 @@ namespace libdar
 	    pro_ino = dynamic_cast<const cat_inode *>(projo);
 	    pro_mir = dynamic_cast<const cat_mirage *>(projo);
 
-	    if(pro_eod != NULL)
+	    if(pro_eod != nullptr)
 	    {
 		cat_directory *tmp = current->get_parent();
-		if(tmp == NULL)
+		if(tmp == nullptr)
 		    throw SRC_BUG; // reached root for "contenu", and not yet for "ref";
 		current = tmp;
 		continue;
 	    }
 
-	    if(pro_det != NULL)
+	    if(pro_det != nullptr)
 		continue;
 
-	    if(pro_nom == NULL)
+	    if(pro_nom == nullptr)
 		throw SRC_BUG; // neither an cat_eod nor a cat_nomme! what's that?
 
-	    if(pro_mir != NULL)
+	    if(pro_mir != nullptr)
 		pro_ino = pro_mir->get_inode();
 		// warning: the returned cat_inode's name is undefined
 		// one must use the mirage's own name
 
-	    if(pro_ino == NULL)
+	    if(pro_ino == nullptr)
 		throw SRC_BUG; // a nome that is not an cat_inode nor a cat_detruit!? What's that?
 
 	    if(!current->search_children(pro_nom->get_name(), ici))
 	    {
-		cat_entree *clo_ent = NULL;
-		cat_inode *clo_ino = NULL;
-		cat_directory *clo_dir = NULL;
-		cat_mirage *clo_mir = NULL;
-		cat_etoile *clo_eto = NULL;
+		cat_entree *clo_ent = nullptr;
+		cat_inode *clo_ino = nullptr;
+		cat_directory *clo_dir = nullptr;
+		cat_mirage *clo_mir = nullptr;
+		cat_etoile *clo_eto = nullptr;
 
 		try
 		{
@@ -782,10 +782,10 @@ namespace libdar
 
 			// sanity checks
 
-		    if(clo_ino == NULL)
+		    if(clo_ino == nullptr)
 			throw SRC_BUG; // clone of an cat_inode is not an cat_inode???
-		    if((clo_dir != NULL) ^ (pro_dir != NULL))
-			throw SRC_BUG; // both must be NULL or both must be non NULL
+		    if((clo_dir != nullptr) ^ (pro_dir != nullptr))
+			throw SRC_BUG; // both must be nullptr or both must be non nullptr
 
 			// converting cat_inode to unsaved entry
 
@@ -800,7 +800,7 @@ namespace libdar
 
 			// handling hard links
 
-		    if(pro_mir != NULL)
+		    if(pro_mir != nullptr)
 		    {
 			try
 			{
@@ -808,21 +808,21 @@ namespace libdar
 			    if(it == corres_clone.end())
 			    {
 				clo_eto = new (get_pool()) cat_etoile(clo_ino, aborting_next_etoile++);
-				if(clo_eto == NULL)
+				if(clo_eto == nullptr)
 				    throw Ememory("catalogue::update_absent_with");
 				else
-				    clo_ent = NULL; // object now managed by clo_eto
+				    clo_ent = nullptr; // object now managed by clo_eto
 
 				try
 				{
 				    corres_clone[pro_mir->get_etiquette()] = clo_eto;
 				    clo_mir = new (get_pool()) cat_mirage(pro_mir->get_name(), clo_eto);
-				    if(clo_mir == NULL)
+				    if(clo_mir == nullptr)
 					throw Ememory("catalogue::update_absent_with");
 				}
 				catch(...)
 				{
-				    if(clo_eto != NULL)
+				    if(clo_eto != nullptr)
 					delete clo_eto;
 				    throw;
 				}
@@ -832,11 +832,11 @@ namespace libdar
 				    // we have cloned the cat_inode but we do not need it as
 				    // an hard linked structure already exists
 				delete clo_ent;
-				clo_ent = NULL;
+				clo_ent = nullptr;
 
 				    // so we add a new reference to the existing hard linked structure
 				clo_mir = new (get_pool()) cat_mirage(pro_mir->get_name(), it->second);
-				if(clo_mir == NULL)
+				if(clo_mir == nullptr)
 				    throw Ememory("catalogue::update_absent_with");
 			    }
 
@@ -847,10 +847,10 @@ namespace libdar
 			}
 			catch(...)
 			{
-			    if(clo_mir != NULL)
+			    if(clo_mir != nullptr)
 			    {
 				delete clo_mir;
-				clo_mir = NULL;
+				clo_mir = nullptr;
 			    }
 			    throw;
 			}
@@ -860,12 +860,12 @@ namespace libdar
 			    // adding it to the catalogue
 
 			current->add_children(clo_ino);
-			clo_ent = NULL; // object now managed by the current catalogue
+			clo_ent = nullptr; // object now managed by the current catalogue
 		    }
 
 			// recusing in case of directory
 
-		    if(clo_dir != NULL)
+		    if(clo_dir != nullptr)
 		    {
 			if(current->search_children(pro_ino->get_name(), ici))
 			{
@@ -879,31 +879,31 @@ namespace libdar
 		}
 		catch(...)
 		{
-		    if(clo_ent != NULL)
+		    if(clo_ent != nullptr)
 		    {
 			delete clo_ent;
-			clo_ent = NULL;
+			clo_ent = nullptr;
 		    }
 		    throw;
 		}
 	    }
 	    else // entry found in the current catalogue
 	    {
-		if(pro_dir != NULL)
+		if(pro_dir != nullptr)
 		{
 		    const cat_directory *ici_dir = dynamic_cast<const cat_directory *>(ici);
 
-		    if(ici_dir != NULL)
+		    if(ici_dir != nullptr)
 			current = const_cast<cat_directory *>(ici_dir);
 		    else
 			ref.skip_read_to_parent_dir();
 		}
 
-		if(pro_mir != NULL)
+		if(pro_mir != nullptr)
 		{
 		    const cat_mirage *ici_mir = dynamic_cast<const cat_mirage *>(ici);
 
-		    if(ici_mir != NULL && corres_clone.find(pro_mir->get_etiquette()) == corres_clone.end())
+		    if(ici_mir != nullptr && corres_clone.find(pro_mir->get_etiquette()) == corres_clone.end())
 		    {
 			    // no correspondance found
 			    // so we add a one to the map
@@ -922,7 +922,7 @@ namespace libdar
 			    bool list_ea,
 			    string marge) const
     {
-	const cat_entree *e = NULL;
+	const cat_entree *e = nullptr;
 	thread_cancellation thr;
 	const string marge_plus = " |  ";
 	const U_I marge_plus_length = marge_plus.size();
@@ -947,7 +947,7 @@ namespace libdar
 	    thr.check_self_cancellation();
 	    juillet.enfile(e);
 
-	    if(e_eod != NULL)
+	    if(e_eod != nullptr)
 	    {
 		    // descendre la marge
 		U_I length = marge.size();
@@ -958,12 +958,12 @@ namespace libdar
 		get_ui().printf("%S +---\n", &marge);
 	    }
 	    else
-		if(e_nom == NULL)
+		if(e_nom == nullptr)
 		    throw SRC_BUG; // not an cat_eod nor a cat_nomme, what's that?
 		else
-		    if(subtree.is_covered(juillet.get_path()) && (e_dir != NULL || selection.is_covered(e_nom->get_name())))
+		    if(subtree.is_covered(juillet.get_path()) && (e_dir != nullptr || selection.is_covered(e_nom->get_name())))
 		    {
-			if(e_det != NULL)
+			if(e_det != nullptr)
 			{
 			    string tmp = e_nom->get_name();
 			    string tmp_date = !e_det->get_date().is_null() ? tools_display_date(e_det->get_date()) : "Unknown date";
@@ -978,26 +978,26 @@ namespace libdar
 			}
 			else
 			{
-			    if(e_hard != NULL)
+			    if(e_hard != nullptr)
 				e_ino = e_hard->get_inode();
 
-			    if(e_ino == NULL)
+			    if(e_ino == nullptr)
 				throw SRC_BUG;
 			    else
 				if(!filter_unsaved
 				   || e_ino->get_saved_status() != s_not_saved
 				   || (e_ino->ea_get_saved_status() == cat_inode::ea_full || e_ino->ea_get_saved_status() == cat_inode::ea_fake)
-				   || (e_dir != NULL && e_dir->get_recursive_has_changed()))
+				   || (e_dir != nullptr && e_dir->get_recursive_has_changed()))
 				{
 				    bool dirty_seq = local_check_dirty_seq(get_escape_layer());
-				    string a = local_perm(*e_ino, e_hard != NULL);
+				    string a = local_perm(*e_ino, e_hard != nullptr);
 				    string b = local_uid(*e_ino);
 				    string c = local_gid(*e_ino);
 				    string d = local_size(*e_ino);
 				    string e = local_date(*e_ino);
 				    string f = local_flag(*e_ino, isolated, dirty_seq);
 				    string g = e_nom->get_name();
-				    if(list_ea && e_hard != NULL)
+				    if(list_ea && e_hard != nullptr)
 				    {
 					infinint tiq = e_hard->get_etiquette();
 					g += tools_printf(" [%i] ", &tiq);
@@ -1007,12 +1007,12 @@ namespace libdar
 				    if(list_ea)
 					local_display_ea(get_ui(), e_ino, marge + gettext("      Extended Attribute: ["), "]");
 
-				    if(e_dir != NULL)
+				    if(e_dir != nullptr)
 					marge += marge_plus;
 				}
 				else // not saved, filtered out
 				{
-				    if(e_dir != NULL)
+				    if(e_dir != nullptr)
 				    {
 					skip_read_to_parent_dir();
 					juillet.enfile(&tmp_eod);
@@ -1021,7 +1021,7 @@ namespace libdar
 			}
 		    }
 		    else // filtered out
-			if(e_dir != NULL)
+			if(e_dir != nullptr)
 			{
 			    skip_read_to_parent_dir();
 			    juillet.enfile(&tmp_eod);
@@ -1037,7 +1037,7 @@ namespace libdar
 				bool list_ea,
 				string beginning) const
     {
-	const cat_entree *e = NULL;
+	const cat_entree *e = nullptr;
 	thread_cancellation thr;
 	defile juillet = FAKE_ROOT;
 	const cat_eod tmp_eod;
@@ -1064,7 +1064,7 @@ namespace libdar
 	    thr.check_self_cancellation();
 	    juillet.enfile(e);
 
-	    if(e_eod != NULL)
+	    if(e_eod != nullptr)
 	    {
 		string tmp;
 
@@ -1079,13 +1079,13 @@ namespace libdar
 			throw SRC_BUG;
 	    }
 	    else
-		if(e_nom == NULL)
+		if(e_nom == nullptr)
 		    throw SRC_BUG;
 		else
 		{
-		    if(subtree.is_covered(juillet.get_path()) && (e_dir != NULL || selection.is_covered(e_nom->get_name())))
+		    if(subtree.is_covered(juillet.get_path()) && (e_dir != nullptr || selection.is_covered(e_nom->get_name())))
 		    {
-			if(e_det != NULL)
+			if(e_det != nullptr)
 			{
 			    string tmp = e_nom->get_name();
 			    string tmp_date = ! e_det->get_date().is_null() ? tools_display_date(e_det->get_date()) : "Unknown date";
@@ -1105,10 +1105,10 @@ namespace libdar
 			}
 			else
 			{
-			    if(e_hard != NULL)
+			    if(e_hard != nullptr)
 				e_ino = e_hard->get_inode();
 
-			    if(e_ino == NULL)
+			    if(e_ino == nullptr)
 				throw SRC_BUG;
 			    else
 			    {
@@ -1117,35 +1117,35 @@ namespace libdar
 				if(!filter_unsaved
 				   || e_ino->get_saved_status() != s_not_saved
 				   || (e_ino->ea_get_saved_status() == cat_inode::ea_full || e_ino->ea_get_saved_status() == cat_inode::ea_fake)
-				   || (e_dir != NULL && e_dir->get_recursive_has_changed()))
+				   || (e_dir != nullptr && e_dir->get_recursive_has_changed()))
 				{
 				    bool dirty_seq = local_check_dirty_seq(get_escape_layer());
-				    string a = local_perm(*e_ino, e_hard != NULL);
+				    string a = local_perm(*e_ino, e_hard != nullptr);
 				    string b = local_uid(*e_ino);
 				    string c = local_gid(*e_ino);
 				    string d = local_size(*e_ino);
 				    string e = local_date(*e_ino);
 				    string f = local_flag(*e_ino, isolated, dirty_seq);
 
-				    if(list_ea && e_hard != NULL)
+				    if(list_ea && e_hard != nullptr)
 				    {
 					infinint tiq = e_hard->get_etiquette();
 					nom += tools_printf(" [%i] ", &tiq);
 				    }
 
 				    if(get_ui().get_use_listing())
-					get_ui().listing(f, a, b, c, d, e, beginning+sep+nom, e_dir != NULL, e_dir != NULL && e_dir->has_children());
+					get_ui().listing(f, a, b, c, d, e, beginning+sep+nom, e_dir != nullptr, e_dir != nullptr && e_dir->has_children());
 				    else
 					get_ui().printf("%S %S   %S\t%S\t%S\t%S\t%S%S%S\n", &f, &a, &b, &c, &d, &e, &beginning, &sep, &nom);
 				    if(list_ea)
 					local_display_ea(get_ui(), e_ino, gettext("      Extended Attribute: ["), "]");
 
-				    if(e_dir != NULL)
+				    if(e_dir != nullptr)
 					beginning += sep + nom;
 				}
 				else // not saved, filtered out
 				{
-				    if(e_dir != NULL)
+				    if(e_dir != nullptr)
 				    {
 					juillet.enfile(&tmp_eod);
 					skip_read_to_parent_dir();
@@ -1155,7 +1155,7 @@ namespace libdar
 			}
 		    }
 		    else // excluded, filtered out
-			if(e_dir != NULL)
+			if(e_dir != nullptr)
 			{
 			    juillet.enfile(&tmp_eod);
 			    skip_read_to_parent_dir();
@@ -1172,7 +1172,7 @@ namespace libdar
 				bool list_ea,
 				string beginning) const
     {
-	const cat_entree *e = NULL;
+	const cat_entree *e = nullptr;
 	thread_cancellation thr;
 	defile juillet = FAKE_ROOT;
 
@@ -1198,7 +1198,7 @@ namespace libdar
 	    thr.check_self_cancellation();
 	    juillet.enfile(e);
 
-	    if(e_eod != NULL)
+	    if(e_eod != nullptr)
 	    {
 		U_I length = beginning.size();
 
@@ -1209,15 +1209,15 @@ namespace libdar
 		get_ui().printf("%S</Directory>\n", &beginning);
 	    }
 	    else
-		if(e_nom == NULL)
+		if(e_nom == nullptr)
 		    throw SRC_BUG;
 		else
 		{
-		    if(subtree.is_covered(juillet.get_path()) && (e_dir != NULL || selection.is_covered(e_nom->get_name())))
+		    if(subtree.is_covered(juillet.get_path()) && (e_dir != nullptr || selection.is_covered(e_nom->get_name())))
 		    {
 			string name = tools_output2xml(e_nom->get_name());
 
-			if(e_det != NULL)
+			if(e_det != nullptr)
 			{
 			    unsigned char sig;
 			    saved_status state;
@@ -1270,20 +1270,20 @@ namespace libdar
 			}
 			else // other than cat_detruit object
 			{
-			    if(e_hard != NULL)
+			    if(e_hard != nullptr)
 			    {
 				e_ino = e_hard->get_inode();
 				e_sym = dynamic_cast<const cat_lien *>(e_ino);
 				e_dev = dynamic_cast<const cat_device *>(e_ino);
 			    }
 
-			    if(e_ino == NULL)
+			    if(e_ino == nullptr)
 				throw SRC_BUG; // this is a cat_nomme which is neither a cat_detruit nor an cat_inode
 
 			    if(!filter_unsaved
 			       || e_ino->get_saved_status() != s_not_saved
 			       || (e_ino->ea_get_saved_status() == cat_inode::ea_full || e_ino->ea_get_saved_status() == cat_inode::ea_fake)
-			       || (e_dir != NULL && e_dir->get_recursive_has_changed()))
+			       || (e_dir != nullptr && e_dir->get_recursive_has_changed()))
 			    {
 				string data, metadata, maj, min, chksum, target;
 				string dirty, sparse;
@@ -1297,7 +1297,7 @@ namespace libdar
 
 				unmk_signature(e_ino->signature(), sig, data_st, isolated);
 				data_st = isolated ? s_fake : e_ino->get_saved_status(); // the trusted source for cat_inode status is get_saved_status, not the signature (may change in future, who knows)
-				if(stored == "0" && (reg == NULL || !reg->get_sparse_file_detection_read()))
+				if(stored == "0" && (reg == nullptr || !reg->get_sparse_file_detection_read()))
 				    stored = size;
 
 				    // defining "data" string
@@ -1349,17 +1349,17 @@ namespace libdar
 				case 'f': // plain files
 				    if(data_st == s_saved)
 				    {
-					const crc *tmp = NULL;
+					const crc *tmp = nullptr;
 					const cat_file * f_ino = dynamic_cast<const cat_file *>(e_ino);
 
-					if(f_ino == NULL)
+					if(f_ino == nullptr)
 					    throw SRC_BUG;
 					dirty = yes_no(f_ino->is_dirty());
 					sparse= yes_no(f_ino->get_sparse_file_detection_read());
 
-					if(reg == NULL)
+					if(reg == nullptr)
 					    throw SRC_BUG; // f is signature for plain files
-					if(reg->get_crc(tmp) && tmp != NULL)
+					if(reg->get_crc(tmp) && tmp != nullptr)
 					    chksum = tmp->crc2str();
 					else
 					    chksum = "";
@@ -1430,7 +1430,7 @@ namespace libdar
 			    }
 			    else // not saved, filtered out
 			    {
-				if(e_dir != NULL)
+				if(e_dir != nullptr)
 				{
 				    skip_read_to_parent_dir();
 				    juillet.enfile(&tmp_eod);
@@ -1439,7 +1439,7 @@ namespace libdar
 			}
 		    }  // end of filter check
 		    else // filtered out
-			if(e_dir != NULL)
+			if(e_dir != nullptr)
 			{
 			    skip_read_to_parent_dir();
 			    juillet.enfile(&tmp_eod);
@@ -1456,7 +1456,7 @@ namespace libdar
 				  const mask & subtree,
 				  const slice_layout & slicing) const
     {
-	const cat_entree *e = NULL;
+	const cat_entree *e = nullptr;
 	thread_cancellation thr;
 	defile juillet = FAKE_ROOT;
 	const cat_eod tmp_eod;
@@ -1478,31 +1478,31 @@ namespace libdar
 	    thr.check_self_cancellation();
 	    juillet.enfile(e);
 
-	    if(e_eod != NULL)
+	    if(e_eod != nullptr)
 		continue;
 
-	    if(e_nom == NULL)
+	    if(e_nom == nullptr)
 		throw SRC_BUG;
 	    else
 	    {
-		if(subtree.is_covered(juillet.get_path()) && (e_dir != NULL || selection.is_covered(e_nom->get_name())))
+		if(subtree.is_covered(juillet.get_path()) && (e_dir != nullptr || selection.is_covered(e_nom->get_name())))
 		{
 		    file_slices = macro_tools_get_slices(e_nom, slicing);
 		    all_slices += file_slices;
 
-		    if(e_det != NULL)
+		    if(e_det != nullptr)
 			get_ui().printf("%s\t %s%s\n", file_slices.display().c_str(), REMOVE_TAG, juillet.get_string().c_str());
 		    else
 		    {
-			if(e_hard != NULL)
+			if(e_hard != nullptr)
 			    e_ino = e_hard->get_inode();
 
-			if(e_ino == NULL)
+			if(e_ino == nullptr)
 			    throw SRC_BUG;
 			else
 			{
 			    bool dirty_seq = local_check_dirty_seq(get_escape_layer());
-			    string a = local_perm(*e_ino, e_hard != NULL);
+			    string a = local_perm(*e_ino, e_hard != nullptr);
 			    string f = local_flag(*e_ino, isolated, dirty_seq);
 
 			    get_ui().printf("%s\t %S%S %s\n", file_slices.display().c_str(), &f, &a, juillet.get_string().c_str());
@@ -1510,7 +1510,7 @@ namespace libdar
 		    }
 		}
 		else // excluded, filtered out
-		    if(e_dir != NULL)
+		    if(e_dir != nullptr)
 		    {
 			juillet.enfile(&tmp_eod);
 			skip_read_to_parent_dir();
@@ -1527,30 +1527,30 @@ namespace libdar
     void catalogue::drop_all_non_detruits()
     {
 	cat_directory *ptr = contenu;
-	const cat_nomme *e = NULL;
-	const cat_directory *e_dir = NULL;
-	const cat_detruit *e_det = NULL;
+	const cat_nomme *e = nullptr;
+	const cat_directory *e_dir = nullptr;
+	const cat_detruit *e_det = nullptr;
 
 	ptr->reset_read_children();
-	while(ptr != NULL)
+	while(ptr != nullptr)
 	{
 	    if(ptr->read_children(e))
 	    {
 		e_dir = dynamic_cast<const cat_directory *>(e);
 		e_det = dynamic_cast<const cat_detruit *>(e);
-		if(e_dir != NULL)
+		if(e_dir != nullptr)
 		{
 		    ptr = const_cast<cat_directory *>(e_dir);
 		    ptr->reset_read_children();
 		}
-		else if(e_det == NULL)
+		else if(e_det == nullptr)
 		    ptr->remove(e->get_name());
 	    }
 	    else // finished reading the current directory
 	    {
 		cat_directory *parent = ptr->get_parent();
 
-		if(parent != NULL && !ptr->has_children())
+		if(parent != nullptr && !ptr->has_children())
 		{
 		    parent->remove(ptr->get_name());
 		    ptr = parent;
@@ -1564,8 +1564,8 @@ namespace libdar
     bool catalogue::is_subset_of(const catalogue & ref) const
     {
 	bool ret = true;
-	const cat_entree *moi = NULL;
-	const cat_entree *toi = NULL;
+	const cat_entree *moi = nullptr;
+	const cat_entree *toi = nullptr;
 
 	reset_read();
 	ref.reset_compare();
@@ -1574,14 +1574,14 @@ namespace libdar
 	{
 	    while(ret && !read(moi))
 	    {
-		if(moi == NULL)
+		if(moi == nullptr)
 		    throw SRC_BUG;
 
 		if(!ref.compare(moi, toi))
 		    ret = false;
 		else
 		{
-		    if(toi == NULL)
+		    if(toi == nullptr)
 			throw SRC_BUG;
 		    if(*toi != *moi)
 			ret = false;
@@ -1607,14 +1607,14 @@ namespace libdar
     {
 	cat_directory * d = const_cast<cat_directory *>(contenu);
 
-	if(d == NULL)
+	if(d == nullptr)
 	    throw SRC_BUG;
 	d->set_all_mirage_s_inode_dumped_field_to(false);
     }
 
     void catalogue::dump(const pile_descriptor & pdesc) const
     {
-	crc *tmp = NULL;
+	crc *tmp = nullptr;
 
 	pdesc.check(false);
 	if(pdesc.compr->is_compression_suspended())
@@ -1642,17 +1642,17 @@ namespace libdar
 		throw;
 	    }
 	    tmp = pdesc.stack->get_crc();
-	    if(tmp == NULL)
+	    if(tmp == nullptr)
 		throw SRC_BUG;
 	    tmp->dump(*pdesc.stack);
 	}
 	catch(...)
 	{
-	    if(tmp != NULL)
+	    if(tmp != nullptr)
 		delete tmp;
 	    throw;
 	}
-	if(tmp != NULL)
+	if(tmp != nullptr)
 	    delete tmp;
     }
 
@@ -1662,10 +1662,10 @@ namespace libdar
 	current_compare = contenu;
 	current_add = contenu;
 	current_read = contenu;
-	if(sub_tree != NULL)
+	if(sub_tree != nullptr)
 	{
 	    delete sub_tree;
-	    sub_tree = NULL;
+	    sub_tree = nullptr;
 	}
     }
 
@@ -1682,12 +1682,12 @@ namespace libdar
 	    const cat_directory *ent_dir = dynamic_cast<const cat_directory *>(ent);
 	    const cat_eod *ent_eod = dynamic_cast<const cat_eod *>(ent);
 
-	    if(ent_dir != NULL)
+	    if(ent_dir != nullptr)
 		re_add_in(ent_dir->get_name());
-	    if(ent_eod != NULL)
+	    if(ent_eod != nullptr)
 	    {
 		cat_eod *tmp = new (get_pool()) cat_eod();
-		if(tmp == NULL)
+		if(tmp == nullptr)
 		    throw Ememory("catalogue::copy_detruits_from");
 		try
 		{
@@ -1699,10 +1699,10 @@ namespace libdar
 		    throw;
 		}
 	    }
-	    if(ent_det != NULL)
+	    if(ent_det != nullptr)
 	    {
 		cat_detruit *cp = new (get_pool()) cat_detruit(*ent_det);
-		if(cp == NULL)
+		if(cp == nullptr)
 		    throw Ememory("catalogue::copy_detruits_from");
 		try
 		{
@@ -1723,7 +1723,7 @@ namespace libdar
 	cat_directory *tmp = contenu;
 	contenu = ref.contenu;
 	ref.contenu = tmp;
-	tmp = NULL;
+	tmp = nullptr;
 
 	    // swapping stats
 	entree_stats tmp_st = stats;
@@ -1743,41 +1743,41 @@ namespace libdar
 
     void catalogue::partial_copy_from(const catalogue & ref)
     {
-	contenu = NULL;
-	sub_tree = NULL;
+	contenu = nullptr;
+	sub_tree = nullptr;
 
 	try
 	{
-	    if(ref.contenu == NULL)
+	    if(ref.contenu == nullptr)
 		throw SRC_BUG;
 	    contenu = new (get_pool()) cat_directory(*ref.contenu);
-	    if(contenu == NULL)
+	    if(contenu == nullptr)
 		throw Ememory("catalogue::catalogue(const catalogue &)");
 	    current_compare = contenu;
 	    current_add = contenu;
 	    current_read = contenu;
-	    if(ref.sub_tree != NULL)
+	    if(ref.sub_tree != nullptr)
 	    {
 		sub_tree = new (get_pool()) path(*ref.sub_tree);
-		if(sub_tree == NULL)
+		if(sub_tree == nullptr)
 		    throw Ememory("catalogue::partial_copy_from");
 	    }
 	    else
-		sub_tree = NULL;
+		sub_tree = nullptr;
 	    sub_count = ref.sub_count;
 	    stats = ref.stats;
 	}
 	catch(...)
 	{
-	    if(contenu != NULL)
+	    if(contenu != nullptr)
 	    {
 		delete contenu;
-		contenu = NULL;
+		contenu = nullptr;
 	    }
-	    if(sub_tree != NULL)
+	    if(sub_tree != nullptr)
 	    {
 		delete sub_tree;
-		sub_tree = NULL;
+		sub_tree = nullptr;
 	    }
 	    throw;
 	}
@@ -1785,15 +1785,15 @@ namespace libdar
 
     void catalogue::detruire()
     {
-	if(contenu != NULL)
+	if(contenu != nullptr)
 	{
 	    delete contenu;
-	    contenu = NULL;
+	    contenu = nullptr;
 	}
-	if(sub_tree != NULL)
+	if(sub_tree != nullptr)
 	{
 	    delete sub_tree;
-	    sub_tree = NULL;
+	    sub_tree = nullptr;
 	}
     }
 
@@ -1820,13 +1820,13 @@ namespace libdar
     {
 	bool ret;
 
-	if(ptr != NULL)
+	if(ptr != nullptr)
 	{
 	    bool already_set = ptr->is_unjumpable_mark(escape::seqt_file);
 
 	    if(!already_set)
 		ptr->add_unjumpable_mark(escape::seqt_file);
-	    ret = ptr != NULL && ptr->skip_to_next_mark(escape::seqt_dirty, true);
+	    ret = ptr != nullptr && ptr->skip_to_next_mark(escape::seqt_dirty, true);
 	    if(!already_set)
 		ptr->remove_unjumpable_mark(escape::seqt_file);
 	}

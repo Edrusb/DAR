@@ -51,7 +51,7 @@ extern "C"
 using namespace libdar;
 using namespace std;
 
-static user_interaction *ui = NULL;
+static user_interaction *ui = nullptr;
 
 int main(S_I argc, char *argv[])
 {
@@ -59,7 +59,7 @@ int main(S_I argc, char *argv[])
 
     get_version(maj, med, min);
     ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(ui == NULL)
+    if(ui == nullptr)
 	cout << "ERREUR !" << endl;
 
     if(argc < 3)
@@ -82,11 +82,11 @@ int main(S_I argc, char *argv[])
     f1.copy_to(f2);
     crc *crc1 = f1.get_crc();
     crc *crc2 = f2.get_crc();
-    crc *crc3 = NULL;
+    crc *crc3 = nullptr;
 
     try
     {
-	if(crc1 == NULL || crc2 == NULL)
+	if(crc1 == nullptr || crc2 == nullptr)
 	    throw SRC_BUG;
 	if(*crc1 == *crc2)
 	    cout << "CRC OK" << endl;
@@ -95,30 +95,30 @@ int main(S_I argc, char *argv[])
 	f1.skip(0);
 	null_file f3 = null_file(gf_write_only);
 	f1.copy_to(f3, crc::OLD_CRC_SIZE, crc3);
-	if(crc3 == NULL)
+	if(crc3 == nullptr)
 	    throw SRC_BUG;
 	if(*crc1 == *crc3)
 	    cout << "CRC OK" << endl;
 	else
 	    cout << "CRC PROBLEM" << endl;
 
-	if(ui != NULL)
+	if(ui != nullptr)
 	    delete ui;
     }
     catch(...)
     {
-	if(crc1 != NULL)
+	if(crc1 != nullptr)
 	    delete crc1;
-	if(crc2 != NULL)
+	if(crc2 != nullptr)
 	    delete crc2;
-	if(crc3 != NULL)
+	if(crc3 != nullptr)
 	    delete crc3;
 	throw;
     }
-    if(crc1 != NULL)
+    if(crc1 != nullptr)
 	delete crc1;
-    if(crc2 != NULL)
+    if(crc2 != nullptr)
 	delete crc2;
-    if(crc3 != NULL)
+    if(crc3 != nullptr)
 	delete crc3;
 }

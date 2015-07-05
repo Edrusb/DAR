@@ -178,7 +178,7 @@ struct recursive_param
                     const vector<string> & x_dar_duc_path): dar_dcf_path(x_dar_dcf_path), dar_duc_path(x_dar_duc_path)
     {
         dialog = new (nothrow) shell_interaction(x_dialog);
-        if(dialog == NULL)
+        if(dialog == nullptr)
             throw Ememory("recursive_param::recursive_param");
         home = x_home;
 
@@ -203,7 +203,7 @@ struct recursive_param
 
     ~recursive_param()
     {
-        if(dialog != NULL)
+        if(dialog != nullptr)
             delete dialog;
     }
 };
@@ -323,7 +323,7 @@ bool get_args(shell_interaction & dialog,
     p.aux_num_digits = 0;
     p.only_deleted = false;
     p.not_deleted = false;
-    p.backup_hook_mask = NULL;
+    p.backup_hook_mask = nullptr;
     p.backup_hook_execute = "";
     p.list_ea = false;
     p.ignore_unknown_inode = false;
@@ -389,45 +389,45 @@ bool get_args(shell_interaction & dialog,
             throw Erange("get_args", tools_printf(gettext("Given user target(s) could not be found: %S"), &not_seen));
         }
 
-        if(p.filename == "" || p.sauv_root == NULL || p.op == noop)
+        if(p.filename == "" || p.sauv_root == nullptr || p.op == noop)
             throw Erange("get_args", tools_printf(gettext("Missing -c -x -d -t -l -C -+ option, see `%S -h' for help"), &cmd));
         if(p.filename == "-" && !p.file_size.is_zero())
             throw Erange("get_args", gettext("Slicing (-s option), is not compatible with archive on standard output (\"-\" as filename)"));
         if(p.filename != "-" && (p.op != create && p.op != isolate && p.op != merging))
-            if(p.sauv_root == NULL)
+            if(p.sauv_root == nullptr)
                 throw SRC_BUG;
         if(p.filename != "-")
             tools_check_basename(dialog, *p.sauv_root, p.filename, EXTENSION);
-        if((p.op == merging || p.op == create) && p.aux_filename != NULL)
+        if((p.op == merging || p.op == create) && p.aux_filename != nullptr)
         {
-            if(p.aux_root == NULL)
+            if(p.aux_root == nullptr)
                 throw SRC_BUG;
             else
                 tools_check_basename(dialog, *p.aux_root, *p.aux_filename, EXTENSION);
         }
 
-        if(p.fs_root == NULL)
+        if(p.fs_root == nullptr)
         {
             p.fs_root = new (nothrow) path(".");
-            if(p.fs_root == NULL)
+            if(p.fs_root == nullptr)
                 throw Ememory("get_args");
         }
         if(rec.fixed_date_mode && p.op != create)
             throw Erange("get_args", gettext("-af option is only available with -c"));
-        if(p.ref_filename != NULL && p.op == listing)
+        if(p.ref_filename != nullptr && p.op == listing)
             dialog.warning(gettext("-A option is not available with -l"));
-        if(p.op == isolate && p.ref_filename == NULL)
+        if(p.op == isolate && p.ref_filename == nullptr)
             throw Erange("get_args", gettext("with -C option, -A option is mandatory"));
-        if(p.op == merging && p.ref_filename == NULL)
+        if(p.op == merging && p.ref_filename == nullptr)
             throw Erange("get_args", gettext("with -+ option, -A option is mandatory"));
         if(p.op != extract && !p.warn_remove_no_match)
             dialog.warning(gettext("-wa is only useful with -x option"));
-        if(p.filename == "-" && p.ref_filename != NULL && *p.ref_filename == "-"
+        if(p.filename == "-" && p.ref_filename != nullptr && *p.ref_filename == "-"
            && p.output_pipe == "" && !p.sequential_read)
             throw Erange("get_args", gettext("-o is mandatory when using \"-A -\" with \"-c -\" \"-C -\" or \"-+ -\""));
-        if(p.ref_filename != NULL && *p.ref_filename != "-")
+        if(p.ref_filename != nullptr && *p.ref_filename != "-")
         {
-            if(p.ref_root == NULL)
+            if(p.ref_root == nullptr)
                 throw SRC_BUG;
             else
                 tools_check_basename(dialog, *p.ref_root, *p.ref_filename, EXTENSION);
@@ -437,7 +437,7 @@ bool get_args(shell_interaction & dialog,
             dialog.warning(gettext("-z or -y need only to be used with -c -C or -+ options"));
         if(!p.first_file_size.is_zero() && p.file_size.is_zero())
             throw Erange("get_args", gettext("-S option requires the use of -s"));
-        if(p.what_to_check != cat_inode::cf_all && (p.op == isolate || (p.op == create && p.ref_root == NULL) || p.op == test || p.op == listing || p.op == merging))
+        if(p.what_to_check != cat_inode::cf_all && (p.op == isolate || (p.op == create && p.ref_root == nullptr) || p.op == test || p.op == listing || p.op == merging))
             dialog.warning(gettext("ignoring -O option, as it is useless in this situation"));
         if(p.what_to_check == cat_inode::cf_all
            && p.op == extract
@@ -457,9 +457,9 @@ bool get_args(shell_interaction & dialog,
             p.furtive_read_mode = false;
         }
 
-        if(p.execute_ref != "" && p.ref_filename == NULL)
+        if(p.execute_ref != "" && p.ref_filename == nullptr)
             dialog.warning(gettext("-F is only useful with -A option, for the archive of reference"));
-        if(p.pass_ref != "" && p.ref_filename == NULL)
+        if(p.pass_ref != "" && p.ref_filename == nullptr)
         {
             dialog.warning(gettext("-J is only useful with -A option, for the archive of reference"));
         }
@@ -471,7 +471,7 @@ bool get_args(shell_interaction & dialog,
         {
             if(p.op == create)
             {
-                if(p.ref_filename == NULL)
+                if(p.ref_filename == nullptr)
                     dialog.warning(gettext("-H is only useful with -A option when making a backup"));
             }
             else
@@ -498,7 +498,7 @@ bool get_args(shell_interaction & dialog,
         if(p.cache_directory_tagging && p.op != create)
             dialog.warning(gettext("The Cache Directory Tagging Standard is only useful while performing a backup, ignoring it here"));
 
-        if((p.aux_root != NULL || p.aux_filename != NULL) && p.op != merging && p.op != create)
+        if((p.aux_root != nullptr || p.aux_filename != nullptr) && p.op != merging && p.op != create)
             throw Erange("get_args", gettext("-@ is only available with -+ and -c options"));
         if(p.aux_pass != "" && p.op != merging && p.op != create)
             throw Erange("get_args", gettext("-$ is only available with -+ option and -c options"));
@@ -507,11 +507,11 @@ bool get_args(shell_interaction & dialog,
         if(p.aux_crypto_size != DEFAULT_CRYPTO_SIZE && p.op != merging && p.op != create)
             throw Erange("get_args", tools_printf(gettext("-%% is only available with -+ option")));
 
-        if(p.aux_pass != "" && p.aux_filename == NULL)
+        if(p.aux_pass != "" && p.aux_filename == nullptr)
             dialog.warning(gettext("-$ is only useful with -@ option, for the auxiliary archive of reference"));
-        if(p.aux_crypto_size != DEFAULT_CRYPTO_SIZE && p.aux_filename == NULL)
+        if(p.aux_crypto_size != DEFAULT_CRYPTO_SIZE && p.aux_filename == nullptr)
             dialog.printf(gettext("-%% is only useful with -@ option, for the auxiliary archive of reference"));
-        if(p.aux_execute != "" && p.aux_filename == NULL)
+        if(p.aux_execute != "" && p.aux_filename == nullptr)
             dialog.warning(gettext("-~ is only useful with -@ option, for the auxiliary archive of reference"));
         if(p.keep_compressed && p.op != merging)
         {
@@ -606,7 +606,7 @@ bool get_args(shell_interaction & dialog,
         else
         {
             p.compress_mask = new (nothrow) bool_mask(true);
-            if(p.compress_mask == NULL)
+            if(p.compress_mask == nullptr)
                 throw Ememory("get_args");
         }
 
@@ -634,7 +634,7 @@ bool get_args(shell_interaction & dialog,
 
         if(rec.backup_hook_include_exclude.size() == 0)
         {
-            p.backup_hook_mask = NULL;
+            p.backup_hook_mask = nullptr;
             if(p.backup_hook_execute != "")
             {
                 p.backup_hook_execute = "";
@@ -648,7 +648,7 @@ bool get_args(shell_interaction & dialog,
             if(p.op != create)
             {
                 dialog.warning(gettext("backup hook feature (-<, -> or -= options) is only available when saving files, ignoring"));
-                p.backup_hook_mask = NULL;
+                p.backup_hook_mask = nullptr;
                 p.backup_hook_execute = "";
             }
             else
@@ -671,15 +671,15 @@ bool get_args(shell_interaction & dialog,
         switch(p.op)
         {
         case merging:
-            if(p.overwrite == NULL)
+            if(p.overwrite == nullptr)
             {
                 p.overwrite = new (nothrow) crit_constant_action(data_preserve, EA_merge_preserve);
-                if(p.overwrite == NULL)
+                if(p.overwrite == nullptr)
                     throw Ememory("get_args");
             }
             break;
         case extract:
-            if(p.overwrite == NULL)
+            if(p.overwrite == nullptr)
             {
                 line_tools_4_4_build_compatible_overwriting_policy(p.allow_over,
                                                                    rec.detruire,
@@ -687,15 +687,15 @@ bool get_args(shell_interaction & dialog,
                                                                    p.hourshift,
                                                                    rec.ea_erase,
                                                                    p.overwrite);
-                if(p.overwrite == NULL)
+                if(p.overwrite == nullptr)
                     throw Ememory("get_args");
             }
             break;
         default:
-            if(p.overwrite != NULL)
+            if(p.overwrite != nullptr)
             {
                 delete p.overwrite;
-                p.overwrite = NULL;
+                p.overwrite = nullptr;
                 dialog.warning(gettext("-/ option is only useful with -+ option, ignoring"));
             }
         }
@@ -744,7 +744,7 @@ static bool get_args_recursive(recursive_param & rec,
 {
     S_I lu;
     S_I rec_c;
-    char **rec_v = NULL;
+    char **rec_v = nullptr;
     pre_mask tmp_pre_mask;
     U_I tmp;
     string tmp_string, tmp_string2;
@@ -753,7 +753,7 @@ static bool get_args_recursive(recursive_param & rec,
     add_non_options(argc, argv, rec.non_options);
 
 #if HAVE_GETOPT_LONG
-    while((lu = getopt_long(argc, argv, OPT_STRING, get_long_opt(), NULL)) != EOF)
+    while((lu = getopt_long(argc, argv, OPT_STRING, get_long_opt(), nullptr)) != EOF)
 #else
         while((lu = getopt(argc, argv, OPT_STRING)) != EOF)
 #endif
@@ -767,9 +767,9 @@ static bool get_args_recursive(recursive_param & rec,
             case 'l':
             case 'C':
             case '+':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
-                if(p.filename != "" || p.sauv_root != NULL)
+                if(p.filename != "" || p.sauv_root != nullptr)
                     throw Erange("get_args", gettext(" Only one option of -c -d -t -l -C -x or -+ is allowed"));
                 if(string(optarg) != string(""))
                     tools_split_path_basename(optarg, p.sauv_root, p.filename);
@@ -803,9 +803,9 @@ static bool get_args_recursive(recursive_param & rec,
                 }
                 break;
             case 'A':
-                if(p.ref_filename != NULL || p.ref_root != NULL || p.snapshot || !p.fixed_date.is_zero())
+                if(p.ref_filename != nullptr || p.ref_root != nullptr || p.snapshot || !p.fixed_date.is_zero())
                     throw Erange("get_args", gettext("Only one -A option is allowed"));
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(strcmp("", optarg) == 0)
                     throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
@@ -840,7 +840,7 @@ static bool get_args_recursive(recursive_param & rec,
                     else
                     {
                         p.ref_filename = new (nothrow) string();
-                        if(p.ref_filename == NULL)
+                        if(p.ref_filename == nullptr)
                             throw Ememory("get_args");
                         try
                         {
@@ -850,13 +850,13 @@ static bool get_args_recursive(recursive_param & rec,
                         catch(...)
                         {
                             delete p.ref_filename;
-                            p.ref_filename = NULL;
+                            p.ref_filename = nullptr;
                             throw;
                         }
                     }
                 break;
             case 'v':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                 {
                     p.info_details = true;
                     p.display_treated = true;
@@ -890,7 +890,7 @@ static bool get_args_recursive(recursive_param & rec,
                         throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
                 break;
             case 'z':
-                if(optarg != NULL)
+                if(optarg != nullptr)
                     split_compression_algo(optarg, p.algo, p.compression_level);
                 else
                     if(p.algo == none)
@@ -908,7 +908,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'w':
                 p.warn_over = false;
-                if(optarg != NULL)
+                if(optarg != nullptr)
                 {
                     if(strcmp(optarg, "a") == 0 || strcmp(optarg, "all") == 0)
                         p.warn_remove_no_match = false;
@@ -919,7 +919,7 @@ static bool get_args_recursive(recursive_param & rec,
                 }
                 break;
             case 'p':
-                if(optarg != NULL)
+                if(optarg != nullptr)
                 {
                         // note that the namespace specification is necessary
                         // due to similar existing name in std namespace under
@@ -931,7 +931,7 @@ static bool get_args_recursive(recursive_param & rec,
                     p.pause = 1;
                 break;
             case 'k':
-                if(optarg == NULL) // -k without argument
+                if(optarg == nullptr) // -k without argument
                 {
                     if(p.only_deleted)
                         throw Erange("command_line.cpp:get_args_recursive", string(gettext("\"-k\" (or \"-kignore\") and \"-konly\" are not compatible")));
@@ -955,19 +955,19 @@ static bool get_args_recursive(recursive_param & rec,
                             throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -k : %s"), optarg));
                 break;
             case 'R':
-                if(p.fs_root != NULL)
+                if(p.fs_root != nullptr)
                     throw Erange("get_args", gettext("Only one -R option is allowed"));
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 else
                     p.fs_root = new (nothrow) path(optarg, true);
-                if(p.fs_root == NULL)
+                if(p.fs_root == nullptr)
                     throw Ememory("get_args");
                 break;
             case 's':
                 if(!p.file_size.is_zero())
                     throw Erange("get_args", gettext("Only one -s option is allowed"));
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 else
                 {
@@ -985,7 +985,7 @@ static bool get_args_recursive(recursive_param & rec,
                 }
                 break;
             case 'S':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(p.first_file_size.is_zero())
                     p.first_file_size = tools_get_extended_size(optarg, rec.suffix_base);
@@ -1012,7 +1012,7 @@ static bool get_args_recursive(recursive_param & rec,
                             throw Erange("get_args", gettext("Only one -S option is allowed"));
                 break;
             case 'X':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_pre_mask.file_listing = false;
                 tmp_pre_mask.case_sensit = rec.case_sensit;
@@ -1022,7 +1022,7 @@ static bool get_args_recursive(recursive_param & rec,
                 rec.name_include_exclude.push_back(tmp_pre_mask);
                 break;
             case 'I':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_pre_mask.file_listing = false;
                 tmp_pre_mask.case_sensit = rec.case_sensit;
@@ -1033,7 +1033,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'P':
             case ']':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_pre_mask.file_listing = lu == ']';
                 tmp_pre_mask.case_sensit = rec.case_sensit;
@@ -1044,7 +1044,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'g':
             case '[':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_pre_mask.file_listing = lu == '[';
                 tmp_pre_mask.case_sensit = rec.case_sensit;
@@ -1082,7 +1082,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'u':
             case 'U':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_pre_mask.file_listing = false;
                 tmp_pre_mask.case_sensit = rec.case_sensit;
@@ -1096,7 +1096,7 @@ static bool get_args_recursive(recursive_param & rec,
                 p.op = version_or_help;
                 return false;
             case 'i':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(p.input_pipe == "")
                     p.input_pipe = optarg;
@@ -1104,7 +1104,7 @@ static bool get_args_recursive(recursive_param & rec,
                     rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 break;
             case 'o':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(p.output_pipe == "")
                     p.output_pipe = optarg;
@@ -1115,7 +1115,7 @@ static bool get_args_recursive(recursive_param & rec,
                 if(p.what_to_check != cat_inode::cf_all)
                     rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
-                    if(optarg == NULL)
+                    if(optarg == nullptr)
                         p.what_to_check = cat_inode::cf_ignore_owner;
                     else
                         if(strcasecmp(optarg, "ignore-owner") == 0)
@@ -1131,7 +1131,7 @@ static bool get_args_recursive(recursive_param & rec,
 
                 break;
             case 'T':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     p.list_mode = archive_options_listing::tree;
                 else if(strcasecmp("normal", optarg) == 0)
                     p.list_mode = archive_options_listing::normal;
@@ -1145,7 +1145,7 @@ static bool get_args_recursive(recursive_param & rec,
                     throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
                 break;
             case 'E':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 line_tools_split_at_first_space(optarg, tmp_string, tmp_string2);
                 tmp_string = line_tools_get_full_path_from_PATH(rec.dar_duc_path, tmp_string.c_str()) + " " + tmp_string2;
@@ -1155,7 +1155,7 @@ static bool get_args_recursive(recursive_param & rec,
                     p.execute += string(" ; ") + tmp_string;
                 break;
             case 'F':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(p.execute_ref == "")
                     p.execute_ref = optarg;
@@ -1163,7 +1163,7 @@ static bool get_args_recursive(recursive_param & rec,
                     p.execute_ref += string(" ; ") + optarg;
                 break;
             case 'J':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(p.pass_ref == "")
                     p.pass_ref = secu_string(optarg, strlen(optarg));
@@ -1171,7 +1171,7 @@ static bool get_args_recursive(recursive_param & rec,
                     rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 break;
             case 'K':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(p.pass == "")
                     p.pass = secu_string(optarg, strlen(optarg));
@@ -1179,7 +1179,7 @@ static bool get_args_recursive(recursive_param & rec,
                     rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 break;
             case 'Y':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_pre_mask.file_listing = false;
                 tmp_pre_mask.case_sensit = rec.case_sensit;
@@ -1189,7 +1189,7 @@ static bool get_args_recursive(recursive_param & rec,
                 rec.compr_include_exclude.push_back(tmp_pre_mask);
                 break;
             case 'Z':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_pre_mask.file_listing = false;
                 tmp_pre_mask.case_sensit = rec.case_sensit;
@@ -1199,7 +1199,7 @@ static bool get_args_recursive(recursive_param & rec,
                 rec.compr_include_exclude.push_back(tmp_pre_mask);
                 break;
             case 'B':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_string = line_tools_get_full_path_from_PATH(rec.dar_dcf_path, optarg);
                 if(find(rec.inclusions.begin(), rec.inclusions.end(), tmp_string) != rec.inclusions.end())
@@ -1257,13 +1257,13 @@ static bool get_args_recursive(recursive_param & rec,
                     catch(...)
                     {
                         destroy(rec_c, rec_v);
-                        rec_v = NULL;
+                        rec_v = nullptr;
                         rec_c = 0;
                         skip_getopt(argc, argv, optind_mem);
                         throw;
                     }
                     destroy(rec_c, rec_v);
-                    rec_v = NULL;
+                    rec_v = nullptr;
                     rec_c = 0;
                     skip_getopt(argc, argv, optind_mem); // restores getopt after recursion
 
@@ -1282,7 +1282,7 @@ static bool get_args_recursive(recursive_param & rec,
                     rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                 {
-                    if(optarg == NULL)
+                    if(optarg == nullptr)
                         throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                     p.min_compr_size = tools_get_extended_size(optarg, rec.suffix_base);
                     if(p.min_compr_size == min_compr_size_default)
@@ -1306,7 +1306,7 @@ static bool get_args_recursive(recursive_param & rec,
                 throw Ecompilation(gettext("--nodump feature has not been activated at compilation time, it is thus not available"));
 #endif
             case 'H':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     p.hourshift = 1;
                 else
                 {
@@ -1324,7 +1324,7 @@ static bool get_args_recursive(recursive_param & rec,
                 }
                 break;
             case 'a':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("command_line.cpp:get_args_recursive", gettext("-a option requires an argument"));
                 if(strcasecmp("SI-unit", optarg) == 0 || strcasecmp("SI", optarg) == 0 || strcasecmp("SI-units", optarg) == 0)
                     rec.suffix_base = TOOLS_SI_SUFFIX;
@@ -1377,7 +1377,7 @@ static bool get_args_recursive(recursive_param & rec,
                 }
                 else if(strcasecmp("f", optarg) == 0 || strcasecmp("fixed-date", optarg) == 0)
                 {
-                    if(p.ref_filename != NULL || p.ref_root != NULL || p.snapshot)
+                    if(p.ref_filename != nullptr || p.ref_root != nullptr || p.snapshot)
                         throw Erange("get_args", gettext("-af must be present before -A option not after!"));
                     if(rec.fixed_date_mode)
                         rec.dialog->warning(gettext("-af option need not be specified more than once, ignoring extra -af options"));
@@ -1416,7 +1416,7 @@ static bool get_args_recursive(recursive_param & rec,
                 rec.no_inter = true;
                 break;
             case 'G':
-                if(optarg != NULL)
+                if(optarg != nullptr)
                     throw Erange("command_line.cpp:get_arg_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
 		if(compile_time::libthreadar() && !rec.no_inter)
 		    rec.dialog->pause(gettext("Warning: -G option is an experimental and unsupported feature, read man page about -G option for more information"));
@@ -1447,16 +1447,16 @@ static bool get_args_recursive(recursive_param & rec,
                     p.cache_directory_tagging = true;
                 break;
             case '@':
-                if(p.aux_filename != NULL || p.aux_root != NULL)
+                if(p.aux_filename != nullptr || p.aux_root != nullptr)
                     throw Erange("get_args", gettext("Only one -@ option is allowed"));
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(strcmp("", optarg) == 0)
                     throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
                 else
                 {
                     p.aux_filename = new (nothrow) string();
-                    if(p.aux_filename == NULL)
+                    if(p.aux_filename == nullptr)
                         throw Ememory("get_args");
                     try
                     {
@@ -1466,13 +1466,13 @@ static bool get_args_recursive(recursive_param & rec,
                     catch(...)
                     {
                         delete p.aux_filename;
-                        p.aux_filename = NULL;
+                        p.aux_filename = nullptr;
                         throw;
                     }
                 }
                 break;
             case '~':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(p.aux_execute == "")
                     p.aux_execute = optarg;
@@ -1480,7 +1480,7 @@ static bool get_args_recursive(recursive_param & rec,
                     p.aux_execute += string(" ; ") + optarg;
                 break;
             case '$':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(p.aux_pass == "")
                     p.aux_pass = secu_string(optarg, strlen(optarg));
@@ -1494,9 +1494,9 @@ static bool get_args_recursive(recursive_param & rec,
                     p.aux_crypto_size = (U_32)tmp;
                 break;
             case '/':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
-                if(p.overwrite == NULL)
+                if(p.overwrite == nullptr)
                 {
                     try
                     {
@@ -1511,17 +1511,17 @@ static bool get_args_recursive(recursive_param & rec,
                     rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 break;
             case '^':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 line_tools_slice_ownership(string(optarg), p.slice_perm, p.slice_user, p.slice_group);
                 break;
             case '_':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 line_tools_repeat_param(string(optarg), p.repeat_count, p.repeat_byte);
                 break;
             case '0':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     p.sequential_read = true;
                 else
                     throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
@@ -1531,7 +1531,7 @@ static bool get_args_recursive(recursive_param & rec,
                     rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                 {
-                    if(optarg == NULL)
+                    if(optarg == nullptr)
                         throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                     try
                     {
@@ -1550,7 +1550,7 @@ static bool get_args_recursive(recursive_param & rec,
                     rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                 {
-                    if(optarg == NULL)
+                    if(optarg == nullptr)
                         throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                     if(strcasecmp("ignore", optarg) == 0)
                         p.dirty = dirtyb_ignore;
@@ -1562,7 +1562,7 @@ static bool get_args_recursive(recursive_param & rec,
                 }
                 break;
             case '"':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 else
                 {
@@ -1587,14 +1587,14 @@ static bool get_args_recursive(recursive_param & rec,
                 p.quiet = true;
                 break;
             case '.':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(p.user_comment != "")
                     p.user_comment += " ";
                 p.user_comment += optarg;
                 break;
             case '3':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext("Missing argument to --hash"), char(lu)));
                 if(strcasecmp(optarg, "md5") == 0)
                     p.hash = hash_md5;
@@ -1608,7 +1608,7 @@ static bool get_args_recursive(recursive_param & rec,
 			    throw Erange("get_args", string(gettext("Unknown parameter given to --hash option: ")) + optarg);
                 break;
             case '9':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext("Missing argument to --min-digits"), char(lu)));
                 else
                 {
@@ -1623,7 +1623,7 @@ static bool get_args_recursive(recursive_param & rec,
                 }
                 break;
             case '=':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext("Missing argument to --backup-hook-execute"), char(lu)));
                 line_tools_split_at_first_space(optarg, tmp_string, tmp_string2);
                 tmp_string = line_tools_get_full_path_from_PATH(rec.dar_duc_path, tmp_string.c_str()) + " " + tmp_string2;
@@ -1633,7 +1633,7 @@ static bool get_args_recursive(recursive_param & rec,
                     p.backup_hook_execute += string(" ; ") + tmp_string;
                 break;
             case '>':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_pre_mask.file_listing = false;
                 tmp_pre_mask.case_sensit = rec.case_sensit;
@@ -1643,7 +1643,7 @@ static bool get_args_recursive(recursive_param & rec,
                 rec.backup_hook_include_exclude.push_back(tmp_pre_mask);
                 break;
             case '<':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_pre_mask.file_listing = false;
                 tmp_pre_mask.case_sensit = rec.case_sensit;
@@ -1653,7 +1653,7 @@ static bool get_args_recursive(recursive_param & rec,
                 rec.backup_hook_include_exclude.push_back(tmp_pre_mask);
                 break;
             case '4':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 p.scope = string_to_fsa(optarg);
                 if(p.info_details)
@@ -1671,13 +1671,13 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case '5':
                 p.exclude_by_ea = true;
-                if(optarg != NULL)
+                if(optarg != nullptr)
                     p.ea_name_for_exclusion = optarg;
                 else
                     p.ea_name_for_exclusion = "";
                 break;
             case '6':
-                if(optarg != NULL)
+                if(optarg != nullptr)
                 {
                     libdar::deci conv = string(optarg);
                     infinint ks = conv.computer();
@@ -1690,7 +1690,7 @@ static bool get_args_recursive(recursive_param & rec,
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 break;
             case '7':
-                if(optarg != NULL)
+                if(optarg != nullptr)
                 {
                     if(strlen(optarg) != 0)
                         p.signatories = line_tools_split(optarg, ',');
@@ -2193,92 +2193,92 @@ static void show_version(shell_interaction & dialog, const char *command_name)
 const struct option *get_long_opt()
 {
     static const struct option ret[] = {
-        {"beep", no_argument, NULL, 'b' },
-        {"create", required_argument, NULL, 'c'},
-        {"diff", required_argument, NULL, 'd'},
-        {"help", no_argument, NULL, 'h'},
-        {"input", required_argument, NULL, 'i'},
-        {"deleted", optional_argument, NULL, 'k'},
-        {"no-delete", no_argument, NULL, 'k'},     // backward compatiblity
-        {"list", required_argument, NULL, 'l'},
-        {"no-overwrite", no_argument, NULL, 'n'},
-        {"output", required_argument, NULL, 'o'},
-        {"pause", optional_argument, NULL, 'p'},
-        {"recent", no_argument, NULL, 'r'},
-        {"slice", required_argument, NULL, 's'},
-        {"test", required_argument, NULL, 't'},
-        {"exclude-ea", required_argument, NULL, 'u'},
-        {"verbose", optional_argument, NULL, 'v'},
-        {"no-warn", optional_argument, NULL, 'w'},
-        {"extract", required_argument, NULL, 'x'},
-        {"gzip", optional_argument, NULL, 'z'},   // backward compatibility
-        {"compression", required_argument, NULL, 'z'},
-        {"ref", required_argument, NULL, 'A'},
-        {"isolate", required_argument, NULL, 'C'},
-        {"empty-dir", no_argument, NULL, 'D'},
-        {"include", required_argument, NULL, 'I'},
-        {"prune", required_argument, NULL, 'P'},
-        {"fs-root", required_argument, NULL, 'R'},
-        {"first-slice", required_argument, NULL, 'S'},
-        {"include-ea", required_argument, NULL, 'U'},
-        {"version", no_argument, NULL, 'V'},
-        {"exclude", required_argument, NULL, 'X'},
-        {"ignore-owner", no_argument, NULL, 'O'},
-        {"comparison-field", optional_argument, NULL, 'O'},
-        {"tree-format", no_argument, NULL, 'T'},
-        {"list-format", required_argument, NULL, 'T'},
-        {"execute", required_argument, NULL, 'E'},
-        {"execute-ref",required_argument, NULL, 'F'},
-        {"ref-execute",required_argument, NULL, 'F'},
-        {"key", required_argument, NULL, 'K'},
-        {"key-ref", required_argument, NULL, 'J'},
-        {"ref-key", required_argument, NULL, 'J'},
-        {"include-compression", required_argument, NULL, 'Y'},
-        {"exclude-compression", required_argument, NULL, 'Z'},
-        {"batch", required_argument, NULL, 'B'},
-        {"flat", no_argument, NULL, 'f'},
-        {"mincompr", required_argument, NULL, 'm'},
-        {"noconf", no_argument, NULL, 'N'},
-        {"nodump", no_argument, NULL, ' '},
-        {"hour", optional_argument, NULL, 'H'},
-        {"alter", optional_argument, NULL, 'a'},
-        {"empty", no_argument, NULL, 'e'},
-        {"dry-run", no_argument, NULL, 'e'},
-        {"on-fly-isolate", required_argument, NULL, '@'},
-        {"no-mount-points", no_argument, NULL, 'M'},
-        {"go-into", required_argument, NULL, 'g'},
-        {"crypto-block", required_argument, NULL, '#'},
-        {"ref-crypto-block", required_argument, NULL, '*'},
-        {"crypto-block-ref", required_argument, NULL, '*'},
-        {"cache-directory-tagging", no_argument, NULL, ','},
-        {"include-from-file", required_argument, NULL, '['},
-        {"exclude-from-file", required_argument, NULL, ']'},
-        {"merge", required_argument, NULL, '+'},
-        {"aux", required_argument, NULL, '@'},
-        {"aux-ref", required_argument, NULL, '@'},
-        {"aux-key", required_argument, NULL, '$'},
-        {"aux-execute", required_argument, NULL, '~'},
-        {"aux-crypto-block", required_argument, NULL, '%'},
-        {"quiet", no_argument, NULL, 'q'},
-        {"overwriting-policy", required_argument, NULL, '/' },
-        {"slice-mode", required_argument, NULL, '^' },
-        {"retry-on-change", required_argument, NULL, '_' },
-        {"pipe-fd", required_argument, NULL, '"' },
-        {"sequential-read", no_argument, NULL, '0'},
-        {"sparse-file-min-size", required_argument, NULL, '1'},
-        {"dirty-behavior", required_argument, NULL, '2'},
-        {"user-comment", required_argument, NULL, '.'},
-        {"hash", required_argument, NULL, '3'},
-        {"min-digits", required_argument, NULL, '9'},
-        {"backup-hook-include", required_argument, NULL, '<'},
-        {"backup-hook-exclude", required_argument, NULL, '>'},
-        {"backup-hook-execute", required_argument, NULL, '='},
-        {"fsa-scope", required_argument, NULL, '4'},
-        {"exclude-by-ea", optional_argument, NULL, '5'},
-        {"key-length", required_argument, NULL, '6'},
-        {"sign", required_argument, NULL, '7'},
-        {"single-thread", no_argument, NULL, 'G'},
-        { NULL, 0, NULL, 0 }
+        {"beep", no_argument, nullptr, 'b' },
+        {"create", required_argument, nullptr, 'c'},
+        {"diff", required_argument, nullptr, 'd'},
+        {"help", no_argument, nullptr, 'h'},
+        {"input", required_argument, nullptr, 'i'},
+        {"deleted", optional_argument, nullptr, 'k'},
+        {"no-delete", no_argument, nullptr, 'k'},     // backward compatiblity
+        {"list", required_argument, nullptr, 'l'},
+        {"no-overwrite", no_argument, nullptr, 'n'},
+        {"output", required_argument, nullptr, 'o'},
+        {"pause", optional_argument, nullptr, 'p'},
+        {"recent", no_argument, nullptr, 'r'},
+        {"slice", required_argument, nullptr, 's'},
+        {"test", required_argument, nullptr, 't'},
+        {"exclude-ea", required_argument, nullptr, 'u'},
+        {"verbose", optional_argument, nullptr, 'v'},
+        {"no-warn", optional_argument, nullptr, 'w'},
+        {"extract", required_argument, nullptr, 'x'},
+        {"gzip", optional_argument, nullptr, 'z'},   // backward compatibility
+        {"compression", required_argument, nullptr, 'z'},
+        {"ref", required_argument, nullptr, 'A'},
+        {"isolate", required_argument, nullptr, 'C'},
+        {"empty-dir", no_argument, nullptr, 'D'},
+        {"include", required_argument, nullptr, 'I'},
+        {"prune", required_argument, nullptr, 'P'},
+        {"fs-root", required_argument, nullptr, 'R'},
+        {"first-slice", required_argument, nullptr, 'S'},
+        {"include-ea", required_argument, nullptr, 'U'},
+        {"version", no_argument, nullptr, 'V'},
+        {"exclude", required_argument, nullptr, 'X'},
+        {"ignore-owner", no_argument, nullptr, 'O'},
+        {"comparison-field", optional_argument, nullptr, 'O'},
+        {"tree-format", no_argument, nullptr, 'T'},
+        {"list-format", required_argument, nullptr, 'T'},
+        {"execute", required_argument, nullptr, 'E'},
+        {"execute-ref",required_argument, nullptr, 'F'},
+        {"ref-execute",required_argument, nullptr, 'F'},
+        {"key", required_argument, nullptr, 'K'},
+        {"key-ref", required_argument, nullptr, 'J'},
+        {"ref-key", required_argument, nullptr, 'J'},
+        {"include-compression", required_argument, nullptr, 'Y'},
+        {"exclude-compression", required_argument, nullptr, 'Z'},
+        {"batch", required_argument, nullptr, 'B'},
+        {"flat", no_argument, nullptr, 'f'},
+        {"mincompr", required_argument, nullptr, 'm'},
+        {"noconf", no_argument, nullptr, 'N'},
+        {"nodump", no_argument, nullptr, ' '},
+        {"hour", optional_argument, nullptr, 'H'},
+        {"alter", optional_argument, nullptr, 'a'},
+        {"empty", no_argument, nullptr, 'e'},
+        {"dry-run", no_argument, nullptr, 'e'},
+        {"on-fly-isolate", required_argument, nullptr, '@'},
+        {"no-mount-points", no_argument, nullptr, 'M'},
+        {"go-into", required_argument, nullptr, 'g'},
+        {"crypto-block", required_argument, nullptr, '#'},
+        {"ref-crypto-block", required_argument, nullptr, '*'},
+        {"crypto-block-ref", required_argument, nullptr, '*'},
+        {"cache-directory-tagging", no_argument, nullptr, ','},
+        {"include-from-file", required_argument, nullptr, '['},
+        {"exclude-from-file", required_argument, nullptr, ']'},
+        {"merge", required_argument, nullptr, '+'},
+        {"aux", required_argument, nullptr, '@'},
+        {"aux-ref", required_argument, nullptr, '@'},
+        {"aux-key", required_argument, nullptr, '$'},
+        {"aux-execute", required_argument, nullptr, '~'},
+        {"aux-crypto-block", required_argument, nullptr, '%'},
+        {"quiet", no_argument, nullptr, 'q'},
+        {"overwriting-policy", required_argument, nullptr, '/' },
+        {"slice-mode", required_argument, nullptr, '^' },
+        {"retry-on-change", required_argument, nullptr, '_' },
+        {"pipe-fd", required_argument, nullptr, '"' },
+        {"sequential-read", no_argument, nullptr, '0'},
+        {"sparse-file-min-size", required_argument, nullptr, '1'},
+        {"dirty-behavior", required_argument, nullptr, '2'},
+        {"user-comment", required_argument, nullptr, '.'},
+        {"hash", required_argument, nullptr, '3'},
+        {"min-digits", required_argument, nullptr, '9'},
+        {"backup-hook-include", required_argument, nullptr, '<'},
+        {"backup-hook-exclude", required_argument, nullptr, '>'},
+        {"backup-hook-execute", required_argument, nullptr, '='},
+        {"fsa-scope", required_argument, nullptr, '4'},
+        {"exclude-by-ea", optional_argument, nullptr, '5'},
+        {"key-length", required_argument, nullptr, '6'},
+        {"sign", required_argument, nullptr, '7'},
+        {"single-thread", no_argument, nullptr, 'G'},
+        { nullptr, 0, nullptr, 0 }
     };
 
     return ret;
@@ -2296,7 +2296,7 @@ static void make_args_from_file(user_interaction & dialog,
 {
     vector <string> cibles;
     vector <string> locally_unread_targets;
-    argv = NULL;
+    argv = nullptr;
     argc = 0;
 
     fichier_local conf = fichier_local(filename, false); // the object conf will close fd
@@ -2356,7 +2356,7 @@ static void make_args_from_file(user_interaction & dialog,
         //
 
     const char *command = "dar";
-    char *pseudo_command = NULL;
+    char *pseudo_command = nullptr;
 
     try
     {
@@ -2375,20 +2375,20 @@ static void make_args_from_file(user_interaction & dialog,
         if(argc < 0)
             throw SRC_BUG; // integer overflow occurred
         argv = new (nothrow) char *[argc];
-        if(argv == NULL)
+        if(argv == nullptr)
             throw Ememory("make_args_from_file");
         for(S_I i = 0; i < argc; ++i)
-            argv[i] = NULL;
+            argv[i] = nullptr;
 
             // adding a fake "dar" word as first argument (= argv[0])
             //
         char *pseudo_command = new (nothrow) char[strlen(command)+1];
-        if(pseudo_command == NULL)
+        if(pseudo_command == nullptr)
             throw Ememory("make_args_from_file");
         strncpy(pseudo_command, command, strlen(command));
         pseudo_command[strlen(command)] = '\0';
         argv[0] = pseudo_command;
-        pseudo_command = NULL;
+        pseudo_command = nullptr;
 
         if(info_details)
             dialog.printf(gettext("Arguments read from %S :"), &filename);
@@ -2403,19 +2403,19 @@ static void make_args_from_file(user_interaction & dialog,
     }
     catch(...)
     {
-        if(argv != NULL)
+        if(argv != nullptr)
         {
             for(S_I i = 0; i < argc; ++i)
-                if(argv[i] != NULL)
+                if(argv[i] != nullptr)
                     delete[] argv[i];
             delete[] argv;
-            argv = NULL;
+            argv = nullptr;
         }
         argc = 0;
-        if(pseudo_command != NULL)
+        if(pseudo_command != nullptr)
         {
             delete[] pseudo_command;
-            pseudo_command = NULL;
+            pseudo_command = nullptr;
         }
         throw;
     }
@@ -2436,7 +2436,7 @@ static void skip_getopt(S_I argc, char * const argv[], S_I next_to_read)
 {
     (void)line_tools_reset_getopt();
 #if HAVE_GETOPT_LONG
-    while(getopt_long(argc, argv, OPT_STRING, get_long_opt(), NULL) != EOF && optind < next_to_read)
+    while(getopt_long(argc, argv, OPT_STRING, get_long_opt(), nullptr) != EOF && optind < next_to_read)
         ;
 #else
     while(getopt(argc, argv, OPT_STRING) != EOF && optind < next_to_read)
@@ -2459,7 +2459,7 @@ static bool update_with_config_files(recursive_param & rec, line_param & p)
     string buffer;
     enum { syntax, ok, unknown } retour = unknown;
     S_I rec_c = 0;
-    char **rec_v = NULL;
+    char **rec_v = nullptr;
 
     (void)line_tools_reset_getopt();
 
@@ -2495,18 +2495,18 @@ static bool update_with_config_files(recursive_param & rec, line_param & p)
         }
         catch(...)
         {
-            if(rec_v != NULL)
+            if(rec_v != nullptr)
             {
                 destroy(rec_c, rec_v);
-                rec_v = NULL;
+                rec_v = nullptr;
                 rec_c = 0;
             }
             throw;
         }
-        if(rec_v != NULL)
+        if(rec_v != nullptr)
         {
             destroy(rec_c, rec_v);
-            rec_v = NULL;
+            rec_v = nullptr;
             rec_c = 0;
         }
     }
@@ -2533,7 +2533,7 @@ static bool update_with_config_files(recursive_param & rec, line_param & p)
     }
 
     rec_c = 0;
-    rec_v = NULL;
+    rec_v = nullptr;
 
     if(retour == unknown)
     {
@@ -2572,19 +2572,19 @@ static bool update_with_config_files(recursive_param & rec, line_param & p)
             }
             catch(...)
             {
-                if(rec_v != NULL)
+                if(rec_v != nullptr)
                 {
                     destroy(rec_c, rec_v);
-                    rec_v = NULL;
+                    rec_v = nullptr;
                     rec_c = 0;
                 }
                 throw;
             }
 
-            if(rec_v != NULL)
+            if(rec_v != nullptr)
             {
                 destroy(rec_c, rec_v);
-                rec_v = NULL;
+                rec_v = nullptr;
                 rec_c = 0;
             }
         }
@@ -2615,14 +2615,14 @@ static bool update_with_config_files(recursive_param & rec, line_param & p)
 
 static mask *make_include_exclude_name(const string & x, mask_opt opt)
 {
-    mask *ret = NULL;
+    mask *ret = nullptr;
 
     if(opt.glob_exp)
         ret = new (nothrow) simple_mask(x, opt.case_sensit);
     else
         ret = new (nothrow) regular_mask(x, opt.case_sensit);
 
-    if(ret == NULL)
+    if(ret == nullptr)
         throw Ememory("make_include_exclude_name");
     else
         return ret;
@@ -2630,11 +2630,11 @@ static mask *make_include_exclude_name(const string & x, mask_opt opt)
 
 static mask *make_exclude_path_ordered(const string & x, mask_opt opt)
 {
-    mask *ret = NULL;
+    mask *ret = nullptr;
     if(opt.file_listing)
     {
         ret = new (nothrow) mask_list(x, opt.case_sensit, opt.prefix, false);
-        if(ret == NULL)
+        if(ret == nullptr)
             throw Ememory("make_exclude_path");
     }
     else // not file listing mask
@@ -2643,7 +2643,7 @@ static mask *make_exclude_path_ordered(const string & x, mask_opt opt)
         {
             ou_mask *val = new (nothrow) ou_mask();
 
-            if(val == NULL)
+            if(val == nullptr)
                 throw Ememory("make_exclude_path");
 
             val->add_mask(simple_mask((opt.prefix + x).display(), opt.case_sensit));
@@ -2654,7 +2654,7 @@ static mask *make_exclude_path_ordered(const string & x, mask_opt opt)
         {
             ret = new (nothrow) regular_mask(tools_build_regex_for_exclude_mask(opt.prefix.display(), x), opt.case_sensit);
 
-            if(ret == NULL)
+            if(ret == nullptr)
                 throw Ememory("make_exclude_path");
         }
     }
@@ -2665,7 +2665,7 @@ static mask *make_exclude_path_ordered(const string & x, mask_opt opt)
 
 static mask *make_exclude_path_unordered(const string & x, mask_opt opt)
 {
-    mask *ret = NULL;
+    mask *ret = nullptr;
 
     if(opt.file_listing)
         ret = new (nothrow) mask_list(x, opt.case_sensit, opt.prefix, false);
@@ -2674,7 +2674,7 @@ static mask *make_exclude_path_unordered(const string & x, mask_opt opt)
             ret = new (nothrow) simple_mask((opt.prefix + x).display(), opt.case_sensit);
         else
             ret = new (nothrow) regular_mask(tools_build_regex_for_exclude_mask(opt.prefix.display(), x), opt.case_sensit);
-    if(ret == NULL)
+    if(ret == nullptr)
         throw Ememory("make_exclude_path");
 
     return ret;
@@ -2682,13 +2682,13 @@ static mask *make_exclude_path_unordered(const string & x, mask_opt opt)
 
 static mask *make_include_path(const string & x, mask_opt opt)
 {
-    mask *ret = NULL;
+    mask *ret = nullptr;
 
     if(opt.file_listing)
         ret = new (nothrow) mask_list(x, opt.case_sensit, opt.prefix, true);
     else
         ret = new (nothrow) simple_path_mask(opt.prefix +x, opt.case_sensit);
-    if(ret == NULL)
+    if(ret == nullptr)
         throw Ememory("make_include_path");
 
     return ret;
@@ -2696,10 +2696,10 @@ static mask *make_include_path(const string & x, mask_opt opt)
 
 static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_mask) (const string & x, mask_opt opt), mask *(*make_exclude_mask)(const string & x, mask_opt opt), const path & prefix)
 {
-    mask *ret_mask = NULL;
-    ou_mask *tmp_ou_mask = NULL;
-    et_mask *tmp_et_mask = NULL;
-    mask *tmp_mask = NULL;
+    mask *ret_mask = nullptr;
+    ou_mask *tmp_ou_mask = nullptr;
+    et_mask *tmp_et_mask = nullptr;
+    mask *tmp_mask = nullptr;
     mask_opt opt = prefix;
 
     try
@@ -2708,101 +2708,101 @@ static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_m
         {
             opt.read_from(listing.front());
             if(listing.front().included)
-                if(ret_mask == NULL) // first mask
+                if(ret_mask == nullptr) // first mask
                 {
                     ret_mask = (*make_include_mask)(listing.front().mask, opt);
-                    if(ret_mask == NULL)
+                    if(ret_mask == nullptr)
                         throw Ememory("make_ordered_mask");
                 }
-                else // ret_mask != NULL (need to chain to existing masks)
+                else // ret_mask != nullptr (need to chain to existing masks)
                 {
-                    if(tmp_ou_mask != NULL)
+                    if(tmp_ou_mask != nullptr)
                     {
                         tmp_mask = (*make_include_mask)(listing.front().mask, opt);
                         tmp_ou_mask->add_mask(*tmp_mask);
                         delete tmp_mask;
-                        tmp_mask = NULL;
+                        tmp_mask = nullptr;
                     }
                     else  // need to create ou_mask
                     {
                         tmp_mask = (*make_include_mask)(listing.front().mask, opt);
                         tmp_ou_mask = new (nothrow) ou_mask();
-                        if(tmp_ou_mask == NULL)
+                        if(tmp_ou_mask == nullptr)
                             throw Ememory("make_ordered_mask");
                         tmp_ou_mask->add_mask(*ret_mask);
                         tmp_ou_mask->add_mask(*tmp_mask);
                         delete tmp_mask;
-                        tmp_mask = NULL;
+                        tmp_mask = nullptr;
                         delete ret_mask;
                         ret_mask = tmp_ou_mask;
-                        tmp_et_mask = NULL;
+                        tmp_et_mask = nullptr;
                     }
                 }
             else // exclude mask
-                if(ret_mask == NULL)
+                if(ret_mask == nullptr)
                 {
                     tmp_mask = (*make_exclude_mask)(listing.front().mask, opt);
                     ret_mask = new (nothrow) not_mask(*tmp_mask);
-                    if(ret_mask == NULL)
+                    if(ret_mask == nullptr)
                         throw Ememory("make_ordered_mask");
                     delete tmp_mask;
-                    tmp_mask = NULL;
+                    tmp_mask = nullptr;
                 }
-                else // ret_mask != NULL
+                else // ret_mask != nullptr
                 {
-                    if(tmp_et_mask != NULL)
+                    if(tmp_et_mask != nullptr)
                     {
                         tmp_mask = (*make_exclude_mask)(listing.front().mask, opt);
                         tmp_et_mask->add_mask(not_mask(*tmp_mask));
                         delete tmp_mask;
-                        tmp_mask = NULL;
+                        tmp_mask = nullptr;
                     }
                     else // need to create et_mask
                     {
                         tmp_mask = (*make_exclude_mask)(listing.front().mask, opt);
                         tmp_et_mask = new (nothrow) et_mask();
-                        if(tmp_et_mask == NULL)
+                        if(tmp_et_mask == nullptr)
                             throw Ememory("make_ordered_mask");
                         tmp_et_mask->add_mask(*ret_mask);
                         tmp_et_mask->add_mask(not_mask(*tmp_mask));
                         delete tmp_mask;
-                        tmp_mask = NULL;
+                        tmp_mask = nullptr;
                         delete ret_mask;
                         ret_mask = tmp_et_mask;
-                        tmp_ou_mask = NULL;
+                        tmp_ou_mask = nullptr;
                     }
                 }
             listing.pop_front();
         }
 
-        if(ret_mask == NULL)
+        if(ret_mask == nullptr)
         {
             ret_mask = new (nothrow) bool_mask(true);
-            if(ret_mask == NULL)
+            if(ret_mask == nullptr)
                 throw Ememory("get_args");
         }
     }
     catch(...)
     {
-        if(ret_mask != NULL)
+        if(ret_mask != nullptr)
         {
             delete tmp_mask;
-            tmp_mask = NULL;
+            tmp_mask = nullptr;
         }
-        if(tmp_ou_mask != NULL && tmp_ou_mask != ret_mask)
+        if(tmp_ou_mask != nullptr && tmp_ou_mask != ret_mask)
         {
             delete tmp_ou_mask;
-            tmp_ou_mask = NULL;
+            tmp_ou_mask = nullptr;
         }
-        if(tmp_et_mask != NULL && tmp_et_mask != ret_mask)
+        if(tmp_et_mask != nullptr && tmp_et_mask != ret_mask)
         {
             delete tmp_et_mask;
-            tmp_et_mask = NULL;
+            tmp_et_mask = nullptr;
         }
-        if(tmp_mask != NULL)
+        if(tmp_mask != nullptr)
         {
             delete tmp_mask;
-            tmp_mask = NULL;
+            tmp_mask = nullptr;
         }
         throw;
     }
@@ -2814,10 +2814,10 @@ static mask *make_unordered_mask(deque<pre_mask> & listing, mask *(*make_include
 {
     et_mask *ret_mask = new (nothrow) et_mask();
     ou_mask tmp_include, tmp_exclude;
-    mask *tmp_mask = NULL;
+    mask *tmp_mask = nullptr;
     mask_opt opt = prefix;
 
-    if(ret_mask == NULL)
+    if(ret_mask == nullptr)
         throw Ememory("make_unordered_mask");
 
     try
@@ -2830,14 +2830,14 @@ static mask *make_unordered_mask(deque<pre_mask> & listing, mask *(*make_include
                 tmp_mask = (*make_include_mask)(listing.front().mask, opt);
                 tmp_include.add_mask(*tmp_mask);
                 delete tmp_mask;
-                tmp_mask = NULL;
+                tmp_mask = nullptr;
             }
             else // excluded mask
             {
                 tmp_mask = (*make_exclude_mask)(listing.front().mask, opt);
                 tmp_exclude.add_mask(*tmp_mask);
                 delete tmp_mask;
-                tmp_mask = NULL;
+                tmp_mask = nullptr;
             }
             listing.pop_front();
         }
@@ -2852,7 +2852,7 @@ static mask *make_unordered_mask(deque<pre_mask> & listing, mask *(*make_include
     catch(...)
     {
         delete ret_mask;
-        ret_mask = NULL;
+        ret_mask = nullptr;
         throw;
     }
 
@@ -2861,7 +2861,7 @@ static mask *make_unordered_mask(deque<pre_mask> & listing, mask *(*make_include
 
 static void split_compression_algo(const char *arg, compression & algo, U_I & level)
 {
-    if(arg == NULL)
+    if(arg == nullptr)
         throw SRC_BUG;
     else
     {
@@ -2943,7 +2943,7 @@ static void add_non_options(S_I argc, char * const argv[], vector<string> & non_
     (void)line_tools_reset_getopt();
 
 #if HAVE_GETOPT_LONG
-    while(getopt_long(argc, argv, OPT_STRING, get_long_opt(), NULL) != EOF)
+    while(getopt_long(argc, argv, OPT_STRING, get_long_opt(), nullptr) != EOF)
         ;
 #else
     while(getopt(argc, argv, OPT_STRING) != EOF)

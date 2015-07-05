@@ -175,7 +175,7 @@ S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[], const
     vector<string> rest;
     bool info_details;
     infinint date;
-    database *dat = NULL;
+    database *dat = nullptr;
     bool partial_read = false;
     bool partial_read_only = false;
     bool ignore_dat_options;
@@ -247,11 +247,11 @@ S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[], const
 	}
 	catch(...)
 	{
-	    if(dat != NULL)
+	    if(dat != nullptr)
 		delete dat;
 	    throw;
 	}
-	if(dat != NULL)
+	if(dat != nullptr)
 	    delete dat;
     }
 
@@ -293,7 +293,7 @@ static bool command_line(shell_interaction & dialog,
 
 	(void)line_tools_reset_getopt();
 #if HAVE_GETOPT_LONG
-	while((lu = getopt_long(argc, argv, OPT_STRING, get_long_opt(), NULL)) != EOF)
+	while((lu = getopt_long(argc, argv, OPT_STRING, get_long_opt(), nullptr)) != EOF)
 #else
 	    while((lu = getopt(argc, argv, OPT_STRING)) != EOF)
 #endif
@@ -304,7 +304,7 @@ static bool command_line(shell_interaction & dialog,
 		    if(op != none_op)
 			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = create;
-		    if(optarg == NULL)
+		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		    base = optarg;
 		    break;
@@ -313,7 +313,7 @@ static bool command_line(shell_interaction & dialog,
 			throw Erange("command_line", tools_printf(gettext("-B option cannot be given inside a batch file")));
 		    if(base != "")
 			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
-		    if(optarg == NULL)
+		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		    base = optarg;
 		    break;
@@ -321,7 +321,7 @@ static bool command_line(shell_interaction & dialog,
 		    if(op != none_op)
 			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = add;
-		    if(optarg == NULL)
+		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		    tools_split_path_basename(optarg, chem, filename);
 		    tools_check_basename(dialog, chem, filename, EXTENSION);
@@ -336,7 +336,7 @@ static bool command_line(shell_interaction & dialog,
 		    if(op != none_op)
 			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = del;
-		    if(optarg == NULL)
+		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		    try
 		    {
@@ -353,7 +353,7 @@ static bool command_line(shell_interaction & dialog,
 		    if(op != none_op)
 			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = chbase;
-		    if(optarg == NULL)
+		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		    num = tools_str2signed_int(optarg);
 		    break;
@@ -361,7 +361,7 @@ static bool command_line(shell_interaction & dialog,
 		    if(op != none_op)
 			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = where;
-		    if(optarg == NULL)
+		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		    num = tools_str2signed_int(optarg);
 		    break;
@@ -374,7 +374,7 @@ static bool command_line(shell_interaction & dialog,
 		    if(op != none_op)
 			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = dar;
-		    if(optarg == NULL)
+		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		    arg = optarg;
 		    break;
@@ -387,7 +387,7 @@ static bool command_line(shell_interaction & dialog,
 		    if(op != none_op)
 			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = used;
-		    if(optarg == NULL)
+		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		    num = tools_str2signed_int(optarg);
 		    break;
@@ -395,7 +395,7 @@ static bool command_line(shell_interaction & dialog,
 		    if(op != none_op)
 			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = files;
-		    if(optarg == NULL)
+		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		    arg = optarg;
 		    break;
@@ -408,7 +408,7 @@ static bool command_line(shell_interaction & dialog,
 		    if(op != none_op)
 			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = moving;
-		    if(optarg == NULL)
+		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		    num = tools_str2int(optarg);
 		    break;
@@ -424,7 +424,7 @@ static bool command_line(shell_interaction & dialog,
 		case 'Q':
 		    break;  // ignore this option already parsed during initialization (dar_suite.cpp)
 		case 'w':
-		    if(optarg == NULL)
+		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		    date = tools_convert_date(optarg);
 		    break;
@@ -441,7 +441,7 @@ static bool command_line(shell_interaction & dialog,
 		case 'e':
 		    if(extra != "")
 			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
-		    if(optarg == NULL)
+		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		    extra = optarg;
 		    break;
@@ -451,7 +451,7 @@ static bool command_line(shell_interaction & dialog,
 		    if(op != none_op)
 			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = batch;
-		    if(optarg == NULL)
+		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		    arg = optarg;
 		    break;
@@ -481,7 +481,7 @@ static bool command_line(shell_interaction & dialog,
 		    }
 		    break;
 		case 'a':
-		    if(optarg == NULL)
+		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		    if(strcasecmp("i", optarg) == 0 || strcasecmp("ignore-order", optarg) == 0)
 			check_order = false;
@@ -613,7 +613,7 @@ static void op_add(shell_interaction & dialog, database *dat, const string &arg,
     bool date_order_problem = false;
     archive_options_read read_options;
 
-    if(dat == NULL)
+    if(dat == nullptr)
 	throw SRC_BUG;
 
     thr.check_self_cancellation();
@@ -623,7 +623,7 @@ static void op_add(shell_interaction & dialog, database *dat, const string &arg,
     read_options.set_info_details(info_details);
     read_options.set_slice_min_digits(min_digits);
     archive *arch = new (nothrow) archive(dialog, path(arch_path), arch_base, EXTENSION, read_options);
-    if(arch == NULL)
+    if(arch == nullptr)
 	throw Ememory("dar_manager.cpp:op_add");
 
     try
@@ -646,7 +646,7 @@ static void op_add(shell_interaction & dialog, database *dat, const string &arg,
     }
     catch(...)
     {
-	if(arch != NULL)
+	if(arch != nullptr)
 	    delete arch;
 	throw;
     }
@@ -658,7 +658,7 @@ static void op_add(shell_interaction & dialog, database *dat, const string &arg,
 
 static void op_listing(shell_interaction & dialog, const database *dat, bool info_details)
 {
-    if(dat == NULL)
+    if(dat == nullptr)
 	throw SRC_BUG;
 
     dat->show_contents(dialog);
@@ -675,7 +675,7 @@ static void op_del(shell_interaction & dialog, database *dat, S_I min, archive_n
     opt.set_revert_archive_numbering(!sign_plus);
     if(!sign_plus)
 	max = rmin;
-    if(dat == NULL)
+    if(dat == nullptr)
 	throw SRC_BUG;
 
     thr.check_self_cancellation();
@@ -695,7 +695,7 @@ static void op_chbase(shell_interaction & dialog, database *dat, S_I num, const 
     signed_int_to_archive_num(num, rnum, sign_plus);
     opt.set_revert_archive_numbering(!sign_plus);
 
-    if(dat == NULL)
+    if(dat == nullptr)
 	throw SRC_BUG;
 
     thr.check_self_cancellation();
@@ -715,7 +715,7 @@ static void op_where(shell_interaction & dialog, database *dat, S_I num, const s
     signed_int_to_archive_num(num, rnum, sign_plus);
     opt.set_revert_archive_numbering(!sign_plus);
 
-    if(dat == NULL)
+    if(dat == nullptr)
 	throw SRC_BUG;
 
     thr.check_self_cancellation();
@@ -729,7 +729,7 @@ static void op_options(shell_interaction & dialog, database *dat, const vector<s
 {
     thread_cancellation thr;
 
-    if(dat == NULL)
+    if(dat == nullptr)
 	throw SRC_BUG;
 
     thr.check_self_cancellation();
@@ -743,7 +743,7 @@ static void op_dar(shell_interaction & dialog, database *dat, const string & arg
 {
     thread_cancellation thr;
 
-    if(dat == NULL)
+    if(dat == nullptr)
 	throw SRC_BUG;
 
     thr.check_self_cancellation();
@@ -760,7 +760,7 @@ static void op_restore(shell_interaction & dialog, database *dat, const vector<s
 
     database_restore_options dat_opt;
 
-    if(dat == NULL)
+    if(dat == nullptr)
 	throw SRC_BUG;
 
     thr.check_self_cancellation();
@@ -785,7 +785,7 @@ static void op_used(shell_interaction & dialog, const database *dat, S_I num, bo
     signed_int_to_archive_num(num, rnum, sign_plus);
     opt.set_revert_archive_numbering(!sign_plus);
 
-    if(dat == NULL)
+    if(dat == nullptr)
 	throw SRC_BUG;
 
     thr.check_self_cancellation();
@@ -796,7 +796,7 @@ static void op_files(shell_interaction & dialog, const database *dat, const stri
 {
     thread_cancellation thr;
 
-    if(dat == NULL)
+    if(dat == nullptr)
 	throw SRC_BUG;
 
     thr.check_self_cancellation();
@@ -807,7 +807,7 @@ static void op_stats(shell_interaction & dialog, const database *dat, bool info_
 {
     thread_cancellation thr;
 
-    if(dat == NULL)
+    if(dat == nullptr)
 	throw SRC_BUG;
 
     thr.check_self_cancellation();
@@ -824,7 +824,7 @@ static void op_move(shell_interaction & dialog, database *dat, S_I src, archive_
     if(src <= 0)
 	throw Erange("op_move", gettext("Negative number or zero not allowed when moving an archive inside a database"));
 
-    if(dat == NULL)
+    if(dat == nullptr)
 	throw SRC_BUG;
 
     thr.check_self_cancellation();
@@ -921,33 +921,33 @@ static void show_version(shell_interaction & dialog, const char *command_name)
 static const struct option *get_long_opt()
 {
     static const struct option ret[] = {
-        {"create", required_argument, NULL, 'C'},
-        {"base", required_argument, NULL, 'B'},
-        {"add", required_argument, NULL, 'A'},
-        {"list", no_argument, NULL, 'l'},
-        {"delete", required_argument, NULL, 'D'},
-        {"basename", required_argument, NULL, 'b'},
-        {"path", required_argument, NULL, 'p'},
-        {"options", no_argument, NULL, 'o'},
-        {"dar", no_argument, NULL, 'd'},
-        {"restore", no_argument, NULL, 'r'},
-        {"used", required_argument, NULL, 'u'},
-        {"file", required_argument, NULL, 'f'},
-        {"stats", no_argument, NULL, 's'},
-        {"help", no_argument, NULL, 'h'},
-        {"version", no_argument, NULL, 'V'},
-        {"verbose", no_argument, NULL, 'v'},
-	{"jog", no_argument, NULL, 'j'},
-	{"when", required_argument, NULL, 'w'},
-	{"interactive", no_argument, NULL, 'i'},
-	{"extra", required_argument, NULL, 'e'},
-	{"check", no_argument, NULL, 'c'},
- 	{"batch", required_argument, NULL, '@'},
-	{"ignore-options-in-base", no_argument, NULL, 'N'},
-	{"min-digits", required_argument, NULL, '9'},
-	{"ignore-when-removed", no_argument, NULL, 'k'},
-	{"alter", required_argument, NULL, 'a'},
-        { NULL, 0, NULL, 0 }
+        {"create", required_argument, nullptr, 'C'},
+        {"base", required_argument, nullptr, 'B'},
+        {"add", required_argument, nullptr, 'A'},
+        {"list", no_argument, nullptr, 'l'},
+        {"delete", required_argument, nullptr, 'D'},
+        {"basename", required_argument, nullptr, 'b'},
+        {"path", required_argument, nullptr, 'p'},
+        {"options", no_argument, nullptr, 'o'},
+        {"dar", no_argument, nullptr, 'd'},
+        {"restore", no_argument, nullptr, 'r'},
+        {"used", required_argument, nullptr, 'u'},
+        {"file", required_argument, nullptr, 'f'},
+        {"stats", no_argument, nullptr, 's'},
+        {"help", no_argument, nullptr, 'h'},
+        {"version", no_argument, nullptr, 'V'},
+        {"verbose", no_argument, nullptr, 'v'},
+	{"jog", no_argument, nullptr, 'j'},
+	{"when", required_argument, nullptr, 'w'},
+	{"interactive", no_argument, nullptr, 'i'},
+	{"extra", required_argument, nullptr, 'e'},
+	{"check", no_argument, nullptr, 'c'},
+ 	{"batch", required_argument, nullptr, '@'},
+	{"ignore-options-in-base", no_argument, nullptr, 'N'},
+	{"min-digits", required_argument, nullptr, '9'},
+	{"ignore-when-removed", no_argument, nullptr, 'k'},
+	{"alter", required_argument, nullptr, 'a'},
+        { nullptr, 0, nullptr, 0 }
     };
 
     return ret;
@@ -956,7 +956,7 @@ static const struct option *get_long_opt()
 
 static database *read_base(shell_interaction & dialog, const string & base, bool partial, bool partial_read_only, bool check_order)
 {
-    database *ret = NULL;
+    database *ret = nullptr;
 
     try
     {
@@ -965,7 +965,7 @@ static database *read_base(shell_interaction & dialog, const string & base, bool
 	dat_opt.set_partial(partial);
 	dat_opt.set_partial_read_only(partial_read_only);
         ret = new (nothrow) database(dialog, base, dat_opt);
-        if(ret == NULL)
+        if(ret == nullptr)
             throw Ememory("read_base");
     }
     catch(Erange & e)
@@ -998,7 +998,7 @@ static void op_interactive(shell_interaction & dialog, database *dat, string bas
     S_I tmp_si;
     bool tmp_sign;
     string input, input2;
-    archive *arch = NULL;
+    archive *arch = nullptr;
     vector <string> vectinput;
     U_I more = 25;
     database_change_basename_options opt_change_name;
@@ -1006,7 +1006,7 @@ static void op_interactive(shell_interaction & dialog, database *dat, string bas
     database_remove_options opt_remove;
     database_used_options opt_used;
 
-    if(dat == NULL)
+    if(dat == nullptr)
 	throw SRC_BUG;
 
     thr.check_self_cancellation();
@@ -1093,7 +1093,7 @@ static void op_interactive(shell_interaction & dialog, database *dat, string bas
 		read_options.clear();
 		read_options.set_info_details(true);
 		arch = new (nothrow) archive(dialog, path(input), input2, EXTENSION, read_options);
-		if(arch == NULL)
+		if(arch == nullptr)
 		    throw Ememory("dar_manager.cpp:op_interactive");
 		try
 		{
@@ -1106,11 +1106,11 @@ static void op_interactive(shell_interaction & dialog, database *dat, string bas
 		catch(...)
 		{
 		    delete arch;
-		    arch = NULL;
+		    arch = nullptr;
 		    throw;
 		}
 		delete arch;
-		arch = NULL;
+		arch = nullptr;
 		saved = false;
 		break;
 	    case 'D':
@@ -1212,7 +1212,7 @@ static void op_interactive(shell_interaction & dialog, database *dat, string bas
 	}
     }
     while(choice != 'q');
-    if(arch != NULL)
+    if(arch != nullptr)
 	throw SRC_BUG;
 }
 
@@ -1220,7 +1220,7 @@ static void op_check(shell_interaction & dialog, const database *dat, bool info_
 {
     thread_cancellation thr;
 
-    if(dat == NULL)
+    if(dat == nullptr)
 	throw SRC_BUG;
 
     if(info_details)
@@ -1251,7 +1251,7 @@ static void op_batch(shell_interaction & dialog, database *dat, const string & f
     bool even_when_removed;
     bool check_order; // not used here
 
-    if(dat == NULL)
+    if(dat == nullptr)
 	throw SRC_BUG;
 
 	// openning the batch file

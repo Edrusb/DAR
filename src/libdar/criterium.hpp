@@ -192,7 +192,7 @@ namespace libdar
 
 	void free();
 	void copy_from(const testing & ref);
-	bool check() const; //< returns false if an field is NULL
+	bool check() const; //< returns false if an field is nullptr
     };
 
 
@@ -247,7 +247,7 @@ namespace libdar
     class crit_in_place_is_dir : public criterium
     {
     public:
-	bool evaluate(const cat_nomme &first, const cat_nomme &second) const { return dynamic_cast<const cat_directory *>(&first) != NULL; };
+	bool evaluate(const cat_nomme &first, const cat_nomme &second) const { return dynamic_cast<const cat_directory *>(&first) != nullptr; };
 	criterium *clone() const { return new (get_pool()) crit_in_place_is_dir(*this); };
     };
 
@@ -371,7 +371,7 @@ namespace libdar
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const
 	{
 	    const cat_inode *tmp = dynamic_cast<const cat_inode *>(&first);
-	    return tmp != NULL && tmp->ea_get_saved_status() != cat_inode::ea_none && tmp->ea_get_saved_status() != cat_inode::ea_removed;
+	    return tmp != nullptr && tmp->ea_get_saved_status() != cat_inode::ea_none && tmp->ea_get_saved_status() != cat_inode::ea_removed;
 	};
 	criterium *clone() const { return new (get_pool()) crit_in_place_EA_present(*this); };
     };
@@ -471,7 +471,7 @@ namespace libdar
     class crit_not : public criterium
     {
     public:
-	crit_not(const criterium & crit) { x_crit = crit.clone(); if(x_crit == NULL) throw Ememory("crit_not::crit_not"); };
+	crit_not(const criterium & crit) { x_crit = crit.clone(); if(x_crit == nullptr) throw Ememory("crit_not::crit_not"); };
 	crit_not(const crit_not & ref) : criterium (ref) { copy_from(ref); };
 	const crit_not & operator = (const crit_not & ref) { destroy(); copy_from(ref); return *this; };
 	~crit_not() { destroy(); };
@@ -484,7 +484,7 @@ namespace libdar
 
     private:
 	void copy_from(const crit_not & ref);
-	void destroy() { if(x_crit != NULL) { delete x_crit; x_crit = NULL; } };
+	void destroy() { if(x_crit != nullptr) { delete x_crit; x_crit = nullptr; } };
     };
 
 	/// realises the *AND* operator

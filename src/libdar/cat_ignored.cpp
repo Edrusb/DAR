@@ -35,7 +35,7 @@ namespace libdar
     {
 	const cat_ignored *ref_ignored = dynamic_cast<const cat_ignored *>(&ref);
 
-	if(ref_ignored == NULL)
+	if(ref_ignored == nullptr)
 	    return false;
 	else
 	    return cat_nomme::operator == (ref);

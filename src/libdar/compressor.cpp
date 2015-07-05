@@ -115,15 +115,15 @@ namespace libdar
 	suspended = false;
 	current_level = compression_level;
 
-        if(compressed_side == NULL)
+        if(compressed_side == nullptr)
             throw SRC_BUG;
         if(compression_level > 9)
             throw SRC_BUG;
 
-        compr = decompr = NULL;
-	lzo_read_buffer = lzo_write_buffer = NULL;
-	lzo_compressed = NULL;
-	lzo_wrkmem = NULL;
+        compr = decompr = nullptr;
+	lzo_read_buffer = lzo_write_buffer = nullptr;
+	lzo_compressed = nullptr;
+	lzo_wrkmem = nullptr;
 
         switch(algo)
         {
@@ -143,13 +143,13 @@ namespace libdar
             read_ptr = &compressor::gzip_read;
             write_ptr = &compressor::gzip_write;
             compr = new (get_pool()) xfer(BUFFER_SIZE, wr_mode);
-            if(compr == NULL)
+            if(compr == nullptr)
                 throw Ememory("compressor::compressor");
             decompr = new (get_pool()) xfer(BUFFER_SIZE, wr_mode);
-            if(decompr == NULL)
+            if(decompr == nullptr)
             {
                 delete compr;
-		compr = NULL;
+		compr = nullptr;
                 throw Ememory("compressor::compressor");
             }
 
@@ -159,22 +159,22 @@ namespace libdar
                 break;
             case WR_MEM_ERROR:
                 delete compr;
-		compr = NULL;
+		compr = nullptr;
                 delete decompr;
-		decompr = NULL;
+		decompr = nullptr;
                 throw Ememory("compressor::compressor");
             case WR_VERSION_ERROR:
                 delete compr;
-		compr = NULL;
+		compr = nullptr;
                 delete decompr;
-		decompr = NULL;
+		decompr = nullptr;
                 throw Erange("compressor::compressor", gettext("incompatible compression library version or unsupported feature required from compression library"));
             case WR_STREAM_ERROR:
             default:
                 delete compr;
-		compr = NULL;
+		compr = nullptr;
                 delete decompr;
-		decompr = NULL;
+		decompr = nullptr;
                 throw SRC_BUG;
             }
 
@@ -186,24 +186,24 @@ namespace libdar
             case WR_MEM_ERROR:
                 compr->wrap.compressEnd();
                 delete compr;
-		compr = NULL;
+		compr = nullptr;
                 delete decompr;
-		decompr = NULL;
+		decompr = nullptr;
                 throw Ememory("compressor::compressor");
             case WR_VERSION_ERROR:
                 compr->wrap.compressEnd();
                 delete compr;
-		compr = NULL;
+		compr = nullptr;
                 delete decompr;
-		decompr = NULL;
+		decompr = nullptr;
                 throw Erange("compressor::compressor", gettext("incompatible compression library version or unsupported feature required from compression library"));
             case WR_STREAM_ERROR:
             default:
                 compr->wrap.compressEnd();
                 delete compr;
-		compr = NULL;
+		compr = nullptr;
                 delete decompr;
-		decompr = NULL;
+		decompr = nullptr;
                 throw SRC_BUG;
             }
             break;
@@ -221,30 +221,30 @@ namespace libdar
 		meta_new(lzo_write_buffer, LZO_CLEAR_BUFFER_SIZE);
 		meta_new(lzo_compressed, LZO_COMPRESSED_BUFFER_SIZE);
 		meta_new(lzo_wrkmem, LZO1X_999_MEM_COMPRESS);
-		if(lzo_read_buffer == NULL || lzo_write_buffer == NULL || lzo_compressed == NULL || lzo_wrkmem == NULL)
+		if(lzo_read_buffer == nullptr || lzo_write_buffer == nullptr || lzo_compressed == nullptr || lzo_wrkmem == nullptr)
 		    throw Ememory("compressor::init");
 	    }
 	    catch(...)
 	    {
-		if(lzo_read_buffer != NULL)
+		if(lzo_read_buffer != nullptr)
 		{
 		    meta_delete(lzo_read_buffer);
-		    lzo_read_buffer = NULL;
+		    lzo_read_buffer = nullptr;
 		}
-		if(lzo_write_buffer != NULL)
+		if(lzo_write_buffer != nullptr)
 		{
 		    meta_delete(lzo_write_buffer);
-		    lzo_write_buffer = NULL;
+		    lzo_write_buffer = nullptr;
 		}
-		if(lzo_compressed != NULL)
+		if(lzo_compressed != nullptr)
 		{
 		    meta_delete(lzo_compressed);
-		    lzo_compressed = NULL;
+		    lzo_compressed = nullptr;
 		}
-		if(lzo_wrkmem != NULL)
+		if(lzo_wrkmem != nullptr)
 		{
 		    meta_delete(lzo_wrkmem);
-		    lzo_wrkmem = NULL;
+		    lzo_wrkmem = nullptr;
 		}
 		throw;
 	    }
@@ -269,20 +269,20 @@ namespace libdar
 	{
 		// ignore all exceptions
 	}
-	if(compr != NULL)
+	if(compr != nullptr)
 	    delete compr;
-	if(decompr != NULL)
+	if(decompr != nullptr)
 	    delete decompr;
-	if(lzo_read_buffer != NULL)
+	if(lzo_read_buffer != nullptr)
 	    meta_delete(lzo_read_buffer);
-	if(lzo_write_buffer != NULL)
+	if(lzo_write_buffer != nullptr)
 	    meta_delete(lzo_write_buffer);
-	if(lzo_compressed != NULL)
+	if(lzo_compressed != nullptr)
 	    meta_delete(lzo_compressed);
-	if(lzo_wrkmem != NULL)
+	if(lzo_wrkmem != nullptr)
 	    meta_delete(lzo_wrkmem);
 	if(compressed_owner)
-	    if(compressed != NULL)
+	    if(compressed != nullptr)
 		delete compressed;
     }
 
@@ -307,7 +307,7 @@ namespace libdar
 
     void compressor::local_terminate()
     {
-        if(compr != NULL)
+        if(compr != nullptr)
         {
             S_I ret;
 
@@ -317,7 +317,7 @@ namespace libdar
 
             ret = compr->wrap.compressEnd();
             delete compr;
-	    compr = NULL;
+	    compr = nullptr;
 
             switch(ret)
             {
@@ -332,7 +332,7 @@ namespace libdar
             }
         }
 
-        if(decompr != NULL)
+        if(decompr != nullptr)
         {
                 // flushing data
             compr_flush_read();
@@ -340,7 +340,7 @@ namespace libdar
 
             S_I ret = decompr->wrap.decompressEnd();
             delete decompr;
-	    decompr = NULL;
+	    decompr = nullptr;
 
             switch(ret)
             {
@@ -351,32 +351,32 @@ namespace libdar
             }
         }
 
-	if(lzo_read_buffer != NULL)
+	if(lzo_read_buffer != nullptr)
 	{
 	    compr_flush_read();
 	    clean_read();
 	    meta_delete(lzo_read_buffer);
-	    lzo_read_buffer = NULL;
+	    lzo_read_buffer = nullptr;
 	}
 
-	if(lzo_write_buffer != NULL)
+	if(lzo_write_buffer != nullptr)
 	{
 	    compr_flush_write();
 	    clean_write();
 	    meta_delete(lzo_write_buffer);
-	    lzo_write_buffer = NULL;
+	    lzo_write_buffer = nullptr;
 	}
 
-	if(lzo_compressed != NULL)
+	if(lzo_compressed != nullptr)
 	{
 	    meta_delete(lzo_compressed);
-	    lzo_compressed = NULL;
+	    lzo_compressed = nullptr;
 	}
 
-	if(lzo_wrkmem != NULL)
+	if(lzo_wrkmem != nullptr)
 	{
 	    meta_delete(lzo_wrkmem);
-	    lzo_wrkmem = NULL;
+	    lzo_wrkmem = nullptr;
 	}
     }
 
@@ -398,7 +398,7 @@ namespace libdar
     compressor::xfer::xfer(U_I sz, wrapperlib_mode mode) : wrap(mode)
     {
         meta_new(buffer, sz);
-        if(buffer == NULL)
+        if(buffer == nullptr)
             throw Ememory("compressor::xfer::xfer");
         size = sz;
     }
@@ -489,7 +489,7 @@ namespace libdar
         compr->wrap.set_next_in(a);
         compr->wrap.set_avail_in(size);
 
-        if(a == NULL)
+        if(a == nullptr)
             throw SRC_BUG;
 
         while(compr->wrap.get_avail_in() > 0)
@@ -590,7 +590,7 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-        if(compr != NULL && compr->wrap.get_total_in() != 0)  // (z/bz)lib
+        if(compr != nullptr && compr->wrap.get_total_in() != 0)  // (z/bz)lib
         {
                 // no more input
             compr->wrap.set_avail_in(0);
@@ -623,14 +623,14 @@ namespace libdar
                 throw SRC_BUG;
         }
 
-	if(lzo_write_buffer != NULL && ! lzo_write_flushed) // lzo
+	if(lzo_write_buffer != nullptr && ! lzo_write_flushed) // lzo
 	{
 	    lzo_block_header lzo_bh;
 
 	    lzo_compress_buffer_and_write();
 	    lzo_bh.type = BLOCK_HEADER_EOF;
 	    lzo_bh.size = 0;
-	    if(compressed == NULL)
+	    if(compressed == nullptr)
 		throw SRC_BUG;
 	    lzo_bh.dump(*compressed);
 	    lzo_write_flushed = true;
@@ -642,7 +642,7 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-        if(decompr != NULL) // zlib
+        if(decompr != nullptr) // zlib
             if(decompr->wrap.decompressReset() != WR_OK)
                 throw SRC_BUG;
             // keep in the buffer the bytes already read, these are discarded in case of a call to skip
@@ -654,10 +654,10 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-        if(decompr != NULL)
+        if(decompr != nullptr)
             decompr->wrap.set_avail_in(0);
 
-	if(lzo_read_buffer != NULL) // lzo
+	if(lzo_read_buffer != nullptr) // lzo
 	{
 	    lzo_read_start = 0;
 	    lzo_read_size = 0;
@@ -669,7 +669,7 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-        if(compr != NULL)
+        if(compr != nullptr)
         {
             S_I ret;
 
@@ -684,7 +684,7 @@ namespace libdar
             while(ret == WR_OK);
         }
 
-	if(lzo_write_buffer != NULL) // lzo
+	if(lzo_write_buffer != nullptr) // lzo
 	    lzo_write_size = 0;
     }
 
@@ -698,7 +698,7 @@ namespace libdar
 
 	    //compressing data to lzo_compress buffer
 
-	status = lzo1x_999_compress_level((lzo_bytep)lzo_write_buffer, lzo_write_size, (lzo_bytep)lzo_compressed, &compr_size, lzo_wrkmem, NULL, 0, 0, current_level);
+	status = lzo1x_999_compress_level((lzo_bytep)lzo_write_buffer, lzo_write_size, (lzo_bytep)lzo_compressed, &compr_size, lzo_wrkmem, nullptr, 0, 0, current_level);
 
 	switch(status)
 	{
@@ -711,7 +711,7 @@ namespace libdar
 	    // writing down the TL(V) before the compressed data
 	lzo_bh.type = BLOCK_HEADER_LZO;
 	lzo_bh.size = compr_size;
-	if(compressed == NULL)
+	if(compressed == nullptr)
 	    throw SRC_BUG;
 
 	lzo_bh.dump(*compressed);
@@ -732,10 +732,10 @@ namespace libdar
 #if LZO1X_MEM_DECOMPRESS > 0
 	char wrkmem[LZO1X_MEM_DECOMPRESS];
 #else
-	char *wrkmem = NULL;
+	char *wrkmem = nullptr;
 #endif
 
-	if(compressed == NULL)
+	if(compressed == nullptr)
 	    throw SRC_BUG;
 
 	lzo_bh.set_from(*compressed);

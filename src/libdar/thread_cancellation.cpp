@@ -67,7 +67,7 @@ namespace libdar
 
 	CRITICAL_START;
 	ptr = info.begin();
-	while(ptr != info.end() && *ptr != NULL && (*ptr)->status.tid != status.tid)
+	while(ptr != info.end() && *ptr != nullptr && (*ptr)->status.tid != status.tid)
 	    ptr++;
 	if(ptr == info.end()) // first object in that thread
 	{
@@ -88,7 +88,7 @@ namespace libdar
 	    }
 	}
 	else  // an object already exist for that thread
-	    if(*ptr == NULL) // bug
+	    if(*ptr == nullptr) // bug
 		bug = true;
 	    else  // an object already exists for that thread
 		status = (*ptr)->status;
@@ -115,7 +115,7 @@ namespace libdar
 	if(ptr == info.end())
 	    bug = true;
 	else
-	    if(*ptr == NULL)
+	    if(*ptr == nullptr)
 		bug = true;
 	    else
 	    {
@@ -151,7 +151,7 @@ namespace libdar
 	ptr = info.begin();
 	while(ptr != info.end())
 	{
-	    if(*ptr == NULL)
+	    if(*ptr == nullptr)
 		throw SRC_BUG;
 	    if((*ptr)->status.tid == status.tid)
 		(*ptr)->status.block_delayed = mode;
@@ -205,7 +205,7 @@ namespace libdar
 
 	CRITICAL_START;
 	ptr = info.begin();
-	while(ptr != info.end() && (*ptr) != NULL && (*ptr)->status.tid != tid)
+	while(ptr != info.end() && (*ptr) != nullptr && (*ptr)->status.tid != tid)
 	    ptr++;
 	if(ptr == info.end())
 	{
@@ -219,7 +219,7 @@ namespace libdar
 		ret = it->cancellation;
 	}
 	else
-	    if(*ptr == NULL)
+	    if(*ptr == nullptr)
 		bug = true;
 	    else
 		ret = (*ptr)->status.cancellation;
@@ -319,7 +319,7 @@ namespace libdar
 	bug = false;
 	while(ptr != info.end() && !bug)
 	{
-	    if(*ptr == NULL)
+	    if(*ptr == nullptr)
 		bug = true;
 	    else
 		if((*ptr)->status.tid == tid)

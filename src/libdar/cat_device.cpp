@@ -80,7 +80,7 @@ namespace libdar
 			   bool small) : cat_inode(dialog, pdesc, reading_ver, saved, small)
     {
 	U_16 tmp;
-	generic_file *ptr = NULL;
+	generic_file *ptr = nullptr;
 
 	pdesc.check(small);
 	if(small)
@@ -103,7 +103,7 @@ namespace libdar
     {
 	const cat_device *ref_dev = dynamic_cast<const cat_device *>(&ref);
 
-	if(ref_dev == NULL)
+	if(ref_dev == nullptr)
 	    return false;
 	else
 	    return xmajor == ref_dev->xmajor
@@ -115,7 +115,7 @@ namespace libdar
     void cat_device::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
 	U_16 tmp;
-	generic_file *ptr = NULL;
+	generic_file *ptr = nullptr;
 
 	pdesc.check(small);
 	if(small)
@@ -137,7 +137,7 @@ namespace libdar
     void cat_device::sub_compare(const cat_inode & other, bool isolated_mode) const
     {
 	const cat_device *d_other = dynamic_cast<const cat_device *>(&other);
-	if(d_other == NULL)
+	if(d_other == nullptr)
 	    throw SRC_BUG; // bug in cat_inode::compare
 	if(get_saved_status() == s_saved && d_other->get_saved_status() == s_saved)
 	{

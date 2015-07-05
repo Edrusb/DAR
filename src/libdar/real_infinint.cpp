@@ -96,11 +96,11 @@ namespace libdar
                 }
                 catch(...)
                 {
-                    field = NULL;
+                    field = nullptr;
                     throw;
                 }
 
-                if(field != NULL)
+                if(field != nullptr)
                 {
                     it = field->begin();
                     fin = true;
@@ -551,7 +551,7 @@ namespace libdar
 
     bool infinint::is_zero() const
     {
-	if(field == NULL)
+	if(field == nullptr)
 	    throw SRC_BUG;
 
 	storage::iterator it = field->begin();
@@ -606,7 +606,7 @@ namespace libdar
 
     bool infinint::is_valid() const
     {
-        return field != NULL;
+        return field != nullptr;
     }
 
     void infinint::reduce()
@@ -651,7 +651,7 @@ namespace libdar
         if(ref.is_valid())
         {
             field = new (get_pool()) storage(*(ref.field));
-            if(field == NULL)
+            if(field == nullptr)
                 throw Ememory("infinint::copy_from");
         }
         else
@@ -660,10 +660,10 @@ namespace libdar
 
     void infinint::detruit()
     {
-        if(field != NULL)
+        if(field != nullptr)
         {
             delete field;
-            field = NULL;
+            field = nullptr;
         }
     }
 

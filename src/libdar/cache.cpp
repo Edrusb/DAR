@@ -69,7 +69,7 @@ namespace libdar
 	    throw Erange("cache::cache", gettext("wrong value given as initial_size argument while initializing cache"));
 
 	ref = & hidden;
-	buffer = NULL;
+	buffer = nullptr;
 	alloc_buffer(x_size);
 	next = 0;
 	last = 0;
@@ -322,29 +322,29 @@ namespace libdar
 
     void cache::alloc_buffer(size_t x_size)
     {
-	if(buffer != NULL)
+	if(buffer != nullptr)
 	    throw SRC_BUG;
 
-	if(get_pool() != NULL)
+	if(get_pool() != nullptr)
 	    buffer = (char *)get_pool()->alloc(x_size);
 	else
 	    buffer = new (nothrow) char[x_size];
 
-	if(buffer == NULL)
+	if(buffer == nullptr)
 	    throw Ememory("cache::alloc_buffer");
 	size = x_size;
     }
 
     void cache::release_buffer()
     {
-	if(buffer == NULL)
+	if(buffer == nullptr)
 	    throw SRC_BUG;
 
-	if(get_pool() != NULL)
+	if(get_pool() != nullptr)
 	    get_pool()->release(buffer);
 	else
 	    delete [] buffer;
-	buffer = NULL;
+	buffer = nullptr;
 	size = 0;
     }
 

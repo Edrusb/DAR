@@ -55,9 +55,9 @@ namespace libdar
 			       fichier_global *hash_file,
 			       hash_algo algo) : fichier_global(dialog, under->get_mode())
     {
-	if(under == NULL)
+	if(under == nullptr)
 	    throw SRC_BUG;
-	if(hash_file == NULL)
+	if(hash_file == nullptr)
 	    throw SRC_BUG;
 	if(under->get_mode() == gf_read_write)
 	    throw SRC_BUG;
@@ -113,15 +113,15 @@ namespace libdar
 	{
 		// ignore all errors
 	}
-	if(ref != NULL)
+	if(ref != nullptr)
 	{
 	    delete ref;
-	    ref = NULL;
+	    ref = nullptr;
 	}
-	if(hash_ref != NULL)
+	if(hash_ref != nullptr)
 	{
 	    delete hash_ref;
-	    hash_ref = NULL;
+	    hash_ref = nullptr;
 	}
     }
 
@@ -173,7 +173,7 @@ namespace libdar
 		{
 		    string hexa = tools_string_to_hexa(string((char *)digest, digest_size));
 
-		    if(hash_ref == NULL)
+		    if(hash_ref == nullptr)
 			throw SRC_BUG;
 		    hash_ref->write((const char *)hexa.c_str(), hexa.size());
 		    hash_ref->write("  ", 2); // two spaces sperator used by md5sum and sha1sum

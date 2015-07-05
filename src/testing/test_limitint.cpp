@@ -58,12 +58,12 @@ static void routine_real_infinint(user_interaction & dialog);
 
 using namespace libdar;
 
-user_interaction *ui = NULL;
+user_interaction *ui = nullptr;
 
 int main()
 {
     user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(ui == NULL)
+    if(ui == nullptr)
 	cout << "ERREUR !" << endl;
 
     try
@@ -75,7 +75,7 @@ int main()
     {
         routine_real_infinint(*ui);
     }
-    if(ui != NULL)
+    if(ui != nullptr)
 	delete ui;
 }
 

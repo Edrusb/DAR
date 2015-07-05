@@ -33,8 +33,8 @@ hide_file::hide_file(generic_file &f) : generic_file(gf_read_only)
         throw Erange("hide_file::hide_file", gettext("hide_file cannot be initialized with write-only file"));
 
     ref = &f;
-    if(ref == NULL)
-        throw SRC_BUG; // NULL argument given
+    if(ref == nullptr)
+        throw SRC_BUG; // nullptr argument given
     is_init = false;
     pos_index = 0;
     pos_relicat = 0;

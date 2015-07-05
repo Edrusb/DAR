@@ -72,15 +72,15 @@ int main(int argc, char * const argv[])
 {
     return dar_suite_global(argc,
 			    argv,
-			    NULL,
+			    nullptr,
 			    "",
-			    NULL,
+			    nullptr,
 			    &little_main);
 }
 
 static int little_main(shell_interaction & dialog, int argc, char * const argv[], const char **env)
 {
-    tuyau *in = NULL, *out = NULL;
+    tuyau *in = nullptr, *out = nullptr;
     U_32 duration;
 
     dialog.change_non_interactive_output(&cout);

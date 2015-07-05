@@ -165,7 +165,7 @@ namespace libdar
 #ifdef __DYNAMIC__
         // Yes, this is a static variable,
         // it contains the necessary mutex to keep libdar thread-safe
-    static const user_group_bases *user_group = NULL;
+    static const user_group_bases *user_group = nullptr;
 #endif
 
         // the following variable is static this breaks the threadsafe support
@@ -180,10 +180,10 @@ namespace libdar
     void tools_init()
     {
 #ifdef __DYNAMIC__
-        if(user_group == NULL)
+        if(user_group == nullptr)
         {
             user_group = new (nothrow) user_group_bases();
-            if(user_group == NULL)
+            if(user_group == nullptr)
                 throw Ememory("tools_init");
         }
 #endif
@@ -192,10 +192,10 @@ namespace libdar
     void tools_end()
     {
 #ifdef __DYNAMIC__
-        if(user_group != NULL)
+        if(user_group != nullptr)
         {
             delete user_group;
-            user_group = NULL;
+            user_group = nullptr;
         }
 #endif
     }
@@ -206,7 +206,7 @@ namespace libdar
         U_I size = x.size();
         char *ret = new (nothrow) char[size+1];
 
-        if(ret == NULL)
+        if(ret == nullptr)
             throw Ememory("tools_str2charptr");
         (void)memcpy(ret, x.c_str(), size);
         ret[size] = '\0';
@@ -429,7 +429,7 @@ namespace libdar
 
     void tools_split_path_basename(const char *all, path * &chemin, string & base, memory_pool *pool)
     {
-        chemin = NULL;
+        chemin = nullptr;
         string src = all;
         string::iterator it = tools_find_last_char_of(src, '/');
 
@@ -445,16 +445,16 @@ namespace libdar
             chemin = new (pool) path(".");
         }
 
-        if(chemin == NULL)
+        if(chemin == nullptr)
             throw Ememory("tools_split_path_basename");
     }
 
     void tools_split_path_basename(const string & all, string & chemin, string & base, memory_pool *pool)
     {
-        path *tmp = NULL;
+        path *tmp = nullptr;
 
         tools_split_path_basename(all.c_str(), tmp, base, pool);
-        if(tmp == NULL)
+        if(tmp == nullptr)
             throw SRC_BUG;
         chemin = tmp->display();
         delete tmp;
@@ -467,29 +467,29 @@ namespace libdar
                           tuyau *&out,
                           memory_pool *pool)
     {
-        in = out = NULL;
+        in = out = nullptr;
         try
         {
             if(input != "")
                 in = new (pool) tuyau(dialog, input, gf_read_only);
             else
                 in = new (pool) tuyau(dialog, 0, gf_read_only); // stdin by default
-            if(in == NULL)
+            if(in == nullptr)
                 throw Ememory("tools_open_pipes");
 
             if(output != "")
                 out = new (pool) tuyau(dialog, output, gf_write_only);
             else
                 out = new (pool) tuyau(dialog, 1, gf_write_only); // stdout by default
-            if(out == NULL)
+            if(out == nullptr)
                 throw Ememory("tools_open_pipes");
 
         }
         catch(...)
         {
-            if(in != NULL)
+            if(in != nullptr)
                 delete in;
-            if(out != NULL)
+            if(out != nullptr)
                 delete out;
             throw;
         }
@@ -514,7 +514,7 @@ namespace libdar
         string name = "";
 #else
         string name;
-        if(user_group != NULL)
+        if(user_group != nullptr)
             name = user_group->get_username(uid);
         else
             throw SRC_BUG;
@@ -535,7 +535,7 @@ namespace libdar
         string name = "";
 #else
         string name;
-        if(user_group != NULL)
+        if(user_group != nullptr)
             name = user_group->get_groupname(gid);
         else
             throw SRC_BUG;
@@ -641,10 +641,10 @@ namespace libdar
             return deci(date.get_second_value()).human();
         else
         {
-	    char *val = NULL;
+	    char *val = nullptr;
 #if HAVE_CTIME_R
 	    char *str = new (nothrow) char [50]; //< minimum required is 26 bytes
-	    if(str == NULL)
+	    if(str == nullptr)
 		throw Ememory("tools_display_date");
 	    try
 	    {
@@ -652,7 +652,7 @@ namespace libdar
 #else
 		val = ctime(&pas);
 #endif
-		if(val == NULL) // ctime() failed
+		if(val == nullptr) // ctime() failed
 		    ret = tools_int2str(pas);
 		else
 		    ret = val;
@@ -750,7 +750,7 @@ namespace libdar
         };
 
             // then we define local variables
-        time_t now = ::time(NULL), when;
+        time_t now = ::time(nullptr), when;
         scan scanner = scan(*(localtime(&now)));
         U_I c, size = repres.size(), ret;
         struct tm tmp;
@@ -863,7 +863,7 @@ namespace libdar
         char **argv = new (nothrow) char * [argvector.size()+1];
 
         for(U_I i = 0; i <= argvector.size(); i++)
-            argv[i] = NULL;
+            argv[i] = nullptr;
 
         try
         {
@@ -872,7 +872,7 @@ namespace libdar
 
             for(U_I i = 0; i < argvector.size(); i++)
                 argv[i] = tools_str2charptr(argvector[i]);
-            argv[argvector.size()] = NULL; // this is already done above but that does not hurt doing it twice :-)
+            argv[argvector.size()] = nullptr; // this is already done above but that does not hurt doing it twice :-)
 
             do
             {
@@ -929,14 +929,14 @@ namespace libdar
         catch(...)
         {
             for(U_I i = 0; i <= argvector.size(); i++)
-                if(argv[i] != NULL)
+                if(argv[i] != nullptr)
                     delete [] argv[i];
             delete argv;
             throw;
         }
 
         for(U_I i = 0; i <= argvector.size(); i++)
-            if(argv[i] != NULL)
+            if(argv[i] != nullptr)
                 delete [] argv[i];
         delete argv;
     }
@@ -946,17 +946,17 @@ namespace libdar
                                 const vector<string> & argvpipe,
                                 memory_pool *pool)
     {
-        const char *argv[] = { dar_cmd.c_str(), "--pipe-fd", NULL, NULL };
+        const char *argv[] = { dar_cmd.c_str(), "--pipe-fd", nullptr, nullptr };
         bool loop = false;
 
         do
         {
-            tuyau *tube = NULL;
+            tuyau *tube = nullptr;
 
             try
             {
                 tube = new (pool) tuyau(dialog);
-                if(tube == NULL)
+                if(tube == nullptr)
                     throw Ememory("tools_system_with_pipe");
 
                 const string read_fd = tools_int2str(tube->get_read_fd());
@@ -976,11 +976,11 @@ namespace libdar
                 case 0: // fork has succeeded, we are the child process
                     try
                     {
-                        if(tube != NULL)
+                        if(tube != nullptr)
                         {
                             tube->do_not_close_read_fd();
                             delete tube; // C++ object is destroyed but read filedescriptor has been kept open
-                            tube = NULL;
+                            tube = nullptr;
                             runson(dialog, const_cast<char * const*>(argv));
                             throw SRC_BUG;
                         }
@@ -998,7 +998,7 @@ namespace libdar
                     ignore_deadson(0); // now we can ignore SIGCHLD signals just before destroying the pipe filedescriptor, which will trigger and EOF while reading on pipe
                         // in the child process
                     delete tube;
-                    tube = NULL;
+                    tube = nullptr;
 
                     if(wait(&status) <= 0)
                         throw Erange("tools_system",
@@ -1032,11 +1032,11 @@ namespace libdar
             }
             catch(...)
             {
-                if(tube != NULL)
+                if(tube != nullptr)
                     delete tube;
                 throw;
             }
-            if(tube != NULL)
+            if(tube != nullptr)
                 delete tube;
         }
         while(loop);
@@ -1093,12 +1093,12 @@ namespace libdar
     const char *tools_get_from_env(const char **env, const char *clef)
     {
         unsigned int index = 0;
-        const char *ret = NULL;
+        const char *ret = nullptr;
 
-        if(env == NULL || clef == NULL)
-            return NULL;
+        if(env == nullptr || clef == nullptr)
+            return nullptr;
 
-        while(ret == NULL && env[index] != NULL)
+        while(ret == nullptr && env[index] != nullptr)
         {
             unsigned int letter = 0;
             while(clef[letter] != '\0'
@@ -1120,7 +1120,7 @@ namespace libdar
         NLS_SWAP_IN;
         try
         {
-            const char *endy = NULL;
+            const char *endy = nullptr;
             string time_accuracy = "";
 
             dialog.printf(gettext("   Libz compression (gzip)      : %s\n"), YES_NO(compile_time::libz()));
@@ -1249,40 +1249,40 @@ namespace libdar
     {
         const U_I step = 1024;
         U_I length = step;
-        char *buffer = NULL, *ret;
+        char *buffer = nullptr, *ret;
         string cwd;
         try
         {
             do
             {
                 buffer = new (nothrow) char[length];
-                if(buffer == NULL)
+                if(buffer == nullptr)
                     throw Ememory("tools_getcwd()");
                 ret = getcwd(buffer, length-1); // length-1 to keep a place for ending '\0'
-                if(ret == NULL) // could not get the CWD
+                if(ret == nullptr) // could not get the CWD
                 {
                     if(errno == ERANGE) // buffer too small
                     {
                         delete [] buffer;
-                        buffer = NULL;
+                        buffer = nullptr;
                         length += step;
                     }
                     else // other error
                         throw Erange("tools_getcwd", string(dar_gettext("Cannot get full path of current working directory: ")) + tools_strerror_r(errno));
                 }
             }
-            while(ret == NULL);
+            while(ret == nullptr);
 
             buffer[length - 1] = '\0';
             cwd = buffer;
         }
         catch(...)
         {
-            if(buffer != NULL)
+            if(buffer != nullptr)
                 delete [] buffer;
             throw;
         }
-        if(buffer != NULL)
+        if(buffer != nullptr)
             delete [] buffer;
         return cwd;
     }
@@ -1290,12 +1290,12 @@ namespace libdar
     string tools_readlink(const char *root)
     {
         U_I length = 10240;
-        char *buffer = NULL;
+        char *buffer = nullptr;
         S_I lu;
         string ret = "";
 
-        if(root == NULL)
-            throw Erange("tools_readlink", dar_gettext("NULL argument given to tools_readlink()"));
+        if(root == nullptr)
+            throw Erange("tools_readlink", dar_gettext("nullptr argument given to tools_readlink()"));
         if(strcmp(root, "") == 0)
             throw Erange("tools_readlink", dar_gettext("Empty string given as argument to tools_readlink()"));
 
@@ -1304,7 +1304,7 @@ namespace libdar
             do
             {
                 buffer = new (nothrow) char[length];
-                if(buffer == NULL)
+                if(buffer == nullptr)
                     throw Ememory("tools_readlink");
                 lu = readlink(root, buffer, length-1); // length-1 to have room to add '\0' at the end
 
@@ -1319,7 +1319,7 @@ namespace libdar
                         break;
                     case ENAMETOOLONG: // too small buffer
                         delete [] buffer;
-                        buffer = NULL;
+                        buffer = nullptr;
                         length *= 2;
                         break;
                     default: // other error
@@ -1337,7 +1337,7 @@ namespace libdar
                     {
                             // trying to workaround with a larger buffer
                         delete [] buffer;
-                        buffer = NULL;
+                        buffer = nullptr;
                         length *= 2;
                     }
             }
@@ -1345,11 +1345,11 @@ namespace libdar
         }
         catch(...)
         {
-            if(buffer != NULL)
+            if(buffer != nullptr)
                 delete [] buffer;
             throw;
         }
-        if(buffer != NULL)
+        if(buffer != nullptr)
             delete [] buffer;
         return ret;
     }
@@ -1562,7 +1562,7 @@ namespace libdar
 
     static bool is_a_slice_available(user_interaction & ui, const string & base, const string & extension, memory_pool *pool)
     {
-        path *chem = NULL;
+        path *chem = nullptr;
         bool ret = false;
 
         try
@@ -1586,11 +1586,11 @@ namespace libdar
         }
         catch(...)
         {
-            if(chem != NULL)
+            if(chem != nullptr)
                 delete chem;
             throw;
         }
-        if(chem != NULL)
+        if(chem != nullptr)
             delete chem;
 
         return ret;
@@ -1664,7 +1664,7 @@ namespace libdar
         U_I test;
 
         copie = new (nothrow) char[taille];
-        if(copie == NULL)
+        if(copie == nullptr)
             throw Ememory("tools_printf");
         try
         {
@@ -1801,7 +1801,7 @@ namespace libdar
         elastic tic = 1 + tools_pseudo_random(max_size); // range from 1 to max_size
         char *buffer = new (nothrow) char[max_size];
 
-        if(buffer == NULL)
+        if(buffer == nullptr)
             throw Ememory("tools_add_elastic_buffer");
         try
         {
@@ -1864,9 +1864,9 @@ namespace libdar
     void tools_set_back_blocked_signals(sigset_t old_mask)
     {
 #if HAVE_LIBPTHREAD
-        if(pthread_sigmask(SIG_SETMASK, &old_mask, NULL))
+        if(pthread_sigmask(SIG_SETMASK, &old_mask, nullptr))
 #else
-            if(sigprocmask(SIG_SETMASK, &old_mask, NULL))
+            if(sigprocmask(SIG_SETMASK, &old_mask, nullptr))
 #endif
                 throw Erange("tools_set_back_block_all_signals", string(dar_gettext("Cannot unblock signals: "))+tools_strerror_r(errno));
     }
@@ -2487,7 +2487,7 @@ namespace libdar
                 {
 #ifdef __DYNAMIC__
                     struct passwd *puser = getpwnam(c_user);
-                    if(puser == NULL)
+                    if(puser == nullptr)
                         throw Erange("tools_ownership2uid", tools_printf(gettext("Unknown user: %s"), c_user));
                     else
                         ret = puser->pw_uid;
@@ -2546,11 +2546,11 @@ namespace libdar
 		    struct group pgroup;
 		    struct group *result;
 		    U_I size = sysconf(_SC_GETGR_R_SIZE_MAX);
-		    char *buf = NULL;
+		    char *buf = nullptr;
 		    try
 		    {
 			buf = new char[size];
-			if(buf == NULL)
+			if(buf == nullptr)
 			    throw Ememory("tools_ownsership2gid");
 
 			if(getgrnam_r(c_group,
@@ -2558,21 +2558,21 @@ namespace libdar
 				      buf,
 				      size,
 				      &result) != 0
-			   || result == NULL)
+			   || result == nullptr)
 			    throw Erange("tools_ownership2gid", tools_printf(gettext("Unknown group: %s"), c_group));
 			ret = result->gr_gid;
 		    }
 		    catch(...)
 		    {
-			if(buf != NULL)
+			if(buf != nullptr)
 			    delete buf;
 			throw;
 		    }
-		    if(buf != NULL)
+		    if(buf != nullptr)
 			delete buf;
 #else
                     struct group *pgroup = getgrnam(c_group);
-                    if(pgroup == NULL)
+                    if(pgroup == nullptr)
                         throw Erange("tools_ownership2gid", tools_printf(gettext("Unknown group: %s"), c_group));
                     else
                         ret = pgroup->gr_gid;
@@ -2761,7 +2761,7 @@ namespace libdar
     string tools_get_date_utc()
     {
         string ret;
-        datetime now = datetime(::time(NULL), 0, datetime::tu_second);
+        datetime now = datetime(::time(nullptr), 0, datetime::tu_second);
 
         ret = tools_display_date(now);
 
@@ -2837,7 +2837,7 @@ namespace libdar
         wstring ret;
         wchar_t *dst = new (nothrow) wchar_t[val.size() + 1];
 
-        if(dst == NULL)
+        if(dst == nullptr)
             throw Ememory("tools_string_to_wcs");
         try
         {
@@ -2857,11 +2857,11 @@ namespace libdar
         }
         catch(...)
         {
-            if(dst != NULL)
+            if(dst != nullptr)
                 delete dst;
             throw;
         }
-        if(dst != NULL)
+        if(dst != nullptr)
             delete dst;
 
         return ret;
@@ -2875,12 +2875,12 @@ namespace libdar
         size_t len;
 
         memset(&state_wc, '\0', sizeof(state_wc)); // initializing the shift structure
-        len = wcsrtombs(NULL, &src, 0, &state_wc);
+        len = wcsrtombs(nullptr, &src, 0, &state_wc);
         if(len == (size_t)-1)
             throw SRC_BUG; // all components of wstring should be valid
 
         char *dst = new (nothrow) char[len + 1];
-        if(dst == NULL)
+        if(dst == nullptr)
             throw Ememory("tools_wstring_to_string");
         try
         {
@@ -2900,11 +2900,11 @@ namespace libdar
         }
         catch(...)
         {
-            if(dst != NULL)
+            if(dst != nullptr)
                 delete dst;
             throw;
         }
-        if(dst != NULL)
+        if(dst != nullptr)
             delete dst;
 
         return ret;
@@ -2959,19 +2959,19 @@ namespace libdar
 	if(name_max == -1)
 	    name_max = 255;
 	len = offsetof(struct dirent, d_name) + name_max + 1;
-	if(pool == NULL)
+	if(pool == nullptr)
 	    ret = (struct dirent *) new char[len];
 	else
 	    ret = (struct dirent *) new (pool) char[len];
 
-	if(ret == NULL)
+	if(ret == nullptr)
 	    throw Ememory("tools_allocate_struc_dirent");
 	return ret;
     }
 
     void tools_release_struct_dirent(struct dirent *ptr)
     {
-	if(ptr != NULL)
+	if(ptr != nullptr)
 	    delete [] ((char *)(ptr));
     }
 

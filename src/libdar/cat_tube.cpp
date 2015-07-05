@@ -35,7 +35,7 @@ namespace libdar
     {
 	const cat_tube *ref_tube = dynamic_cast<const cat_tube *>(&ref);
 
-	if(ref_tube == NULL)
+	if(ref_tube == nullptr)
 	    return false;
 	else
 	    return cat_inode::operator == (ref);

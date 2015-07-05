@@ -77,7 +77,7 @@ extern void dar_suite_reset_signal_handler();
     /// \param[in] env is the environment variables table obtained from main()
     /// \param[in] getopt_string is the parsing string to pass to getopt
 #if HAVE_GETOPT_LONG
-    /// \param[in] long_options is the optional list of long options (an NULL pointer is acceptable for no long option)
+    /// \param[in] long_options is the optional list of long options (an nullptr pointer is acceptable for no long option)
 #endif
     /// \param[in] call is a callback function to run once user interaction is initialized and to catch from the exceptions
     /// \return the application exist status to use

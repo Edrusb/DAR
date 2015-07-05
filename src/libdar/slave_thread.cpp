@@ -43,15 +43,15 @@ namespace libdar
 			       libthreadar::fast_tampon<char> *x_input_ctrl,
 			       libthreadar::fast_tampon<char> *x_output_ctrl)
     {
-	if(x_data == NULL)
+	if(x_data == nullptr)
 	    throw SRC_BUG;
-	if(x_input_data == NULL)
+	if(x_input_data == nullptr)
 	    throw SRC_BUG;
-	if(x_output_data == NULL)
+	if(x_output_data == nullptr)
 	    throw SRC_BUG;
-	if(x_input_ctrl == NULL)
+	if(x_input_ctrl == nullptr)
 	    throw SRC_BUG;
-	if(x_output_ctrl == NULL)
+	if(x_output_ctrl == nullptr)
 	    throw SRC_BUG;
 
 	data = x_data;
@@ -59,7 +59,7 @@ namespace libdar
 	output_data = x_output_data;
 	input_ctrl = x_input_ctrl;
 	output_ctrl = x_output_ctrl;
-	ptr = NULL;
+	ptr = nullptr;
 	set_header_vars();
 	init();
     }
@@ -67,7 +67,7 @@ namespace libdar
     void slave_thread::init()
     {
 	num = 0;
-	ptr = NULL;
+	ptr = nullptr;
 	read_ahead = 0;
 	endless_read_ahead = false;
 	to_send_ahead = 0;
@@ -218,7 +218,7 @@ namespace libdar
     U_I slave_thread::send_data_block(U_I size, bool & eof)
     {
 	U_I min;
-	char *local_ptr = NULL;
+	char *local_ptr = nullptr;
 	unsigned int local_num;
 
 	eof = false;
@@ -260,7 +260,7 @@ namespace libdar
 
     void slave_thread::treat_input_data()
     {
-	char *local_ptr = NULL;
+	char *local_ptr = nullptr;
 	unsigned int local_num;
 
 	if(input_data->is_not_empty())

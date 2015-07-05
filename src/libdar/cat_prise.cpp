@@ -35,7 +35,7 @@ namespace libdar
     {
 	const cat_prise *ref_prise = dynamic_cast<const cat_prise *>(&ref);
 
-	if(ref_prise == NULL)
+	if(ref_prise == nullptr)
 	    return false;
 	else
 	    return cat_inode::operator == (ref);

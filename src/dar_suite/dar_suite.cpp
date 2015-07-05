@@ -59,7 +59,7 @@ extern "C"
 #include <libthreadar/libthreadar.hpp>
 #endif
 
-#define GENERAL_REPORT(msg) 	if(ui != NULL)		\
+#define GENERAL_REPORT(msg) 	if(ui != nullptr)		\
     {							\
 	ui->change_non_interactive_output(&cerr);	\
 	ui->warning(msg);				\
@@ -71,7 +71,7 @@ extern "C"
 
 using namespace libdar;
 
-static shell_interaction *ui = NULL;
+static shell_interaction *ui = nullptr;
 static void signals_abort(int l, bool now);
 static void signal_abort_delayed(int l);
 static void signal_abort_now(int l);
@@ -111,11 +111,11 @@ int dar_suite_global(int argc,
     try
     {
 	if(string(DAR_LOCALEDIR) != string(""))
-	    if(bindtextdomain(PACKAGE, DAR_LOCALEDIR) == NULL)
+	    if(bindtextdomain(PACKAGE, DAR_LOCALEDIR) == nullptr)
 		throw Erange("", "Cannot open the translated messages directory, native language support will not work");
-	if(setlocale(LC_MESSAGES, "") == NULL || setlocale(LC_CTYPE, "") == NULL)
+	if(setlocale(LC_MESSAGES, "") == nullptr || setlocale(LC_CTYPE, "") == nullptr)
 	    throw Erange("", "Cannot set locale category, native language support will not work");
-	if(textdomain(PACKAGE) == NULL)
+	if(textdomain(PACKAGE) == nullptr)
 	    throw Erange("", "Cannot find dar's catalogue, native language support will not work");
     }
     catch(Erange & e)
@@ -136,7 +136,7 @@ int dar_suite_global(int argc,
 #endif
 			      silent);
 	ui = new (nothrow) shell_interaction(&cerr, &cerr, silent);
-	if(ui == NULL)
+	if(ui == nullptr)
 	    throw Ememory("dar_suite_global");
 
 	get_version(maj, med, min);
@@ -261,9 +261,9 @@ int dar_suite_global(int argc,
 	// restoring terminal settings
     try
     {
-	if(ui != NULL)
+	if(ui != nullptr)
 	    delete ui;
-	ui = NULL;
+	ui = nullptr;
     }
     catch(...)
     {

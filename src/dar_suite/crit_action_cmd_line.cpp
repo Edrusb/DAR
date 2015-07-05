@@ -57,7 +57,7 @@ const crit_action * crit_action_create_from_string(user_interaction & dialog,
 						   const infinint & hourshift)
 {
     string::const_iterator it;
-    const crit_action *ret = NULL;
+    const crit_action *ret = nullptr;
 
     if(argument.begin() == argument.end())
 	throw Erange("crit_action_create_from_string","Unexpected empty string in expression");
@@ -69,35 +69,35 @@ const crit_action * crit_action_create_from_string(user_interaction & dialog,
 	it = line_tools_find_first_char_out_of_parenth(argument, ';');
 	if(it != argument.end())
 	{
-	    const crit_action *tmp = NULL;
-	    const crit_chain *tmp_chain = NULL;
-	    crit_chain *ret_chain = NULL;
+	    const crit_action *tmp = nullptr;
+	    const crit_chain *tmp_chain = nullptr;
+	    crit_chain *ret_chain = nullptr;
 
 	    try
 	    {
 		if(*it != ';')
 		    throw SRC_BUG;
 		ret = ret_chain = new (nothrow) crit_chain();
-		if(ret == NULL)
+		if(ret == nullptr)
 		    throw Ememory("crit_action_create_from_string");
 		tmp = crit_action_create_from_string(dialog, string(argument.begin(), it), hourshift);
-		if(tmp == NULL)
+		if(tmp == nullptr)
 		    throw SRC_BUG;
 		ret_chain->add(*tmp);
 		delete tmp;
-		tmp = NULL;
+		tmp = nullptr;
 		tmp = crit_action_create_from_string(dialog, string(it+1, argument.end()), hourshift);
 		tmp_chain = dynamic_cast<const crit_chain *>(tmp);
-		if(tmp_chain != NULL)
+		if(tmp_chain != nullptr)
 		    ret_chain->gobe(*(const_cast<crit_chain *>(tmp_chain)));
 		else
 		    ret_chain->add(*tmp);
 		delete tmp;
-		tmp = NULL;
+		tmp = nullptr;
 	    }
 	    catch(...)
 	    {
-		if(tmp != NULL)
+		if(tmp != nullptr)
 		    delete tmp;
 		throw;
 	    }
@@ -108,8 +108,8 @@ const crit_action * crit_action_create_from_string(user_interaction & dialog,
 	if(*argument.begin() == '{')
 	{
 	    string::const_iterator fin;
-	    const criterium *crit = NULL;
-	    const crit_action *go_true = NULL, *go_false = NULL;
+	    const criterium *crit = nullptr;
+	    const crit_action *go_true = nullptr, *go_false = nullptr;
 
 	    it = line_tools_find_first_char_out_of_parenth(argument, '}');
 	    if(it == argument.end())
@@ -127,41 +127,41 @@ const crit_action * crit_action_create_from_string(user_interaction & dialog,
 	    try
 	    {
 		crit = criterium_create_from_string(dialog, string(argument.begin()+1, it), hourshift);
-		if(crit == NULL)
+		if(crit == nullptr)
 		    throw SRC_BUG;
 		go_true = crit_action_create_from_string(dialog, string(it + 2, fin), hourshift);
-		if(go_true == NULL)
+		if(go_true == nullptr)
 		    throw SRC_BUG;
 		if(fin + 1 == argument.end())
 		{
 		    go_false = new (nothrow) crit_constant_action(data_undefined, EA_undefined);
-		    if(go_false == NULL)
+		    if(go_false == nullptr)
 			throw Ememory("crit_action_create_from_string");
 		}
 		else
 		{
 		    go_false = crit_action_create_from_string(dialog, string(fin + 1, argument.end()), hourshift);
-		    if(go_false == NULL)
+		    if(go_false == nullptr)
 			throw SRC_BUG;
 		}
 
 		ret = new (nothrow) testing(*crit, *go_true, *go_false);
-		if(ret == NULL)
+		if(ret == nullptr)
 		    throw Ememory("crit_action_create_from_string");
 		delete crit;
-		crit = NULL;
+		crit = nullptr;
 		delete go_true;
-		go_true = NULL;
+		go_true = nullptr;
 		delete go_false;
-		go_false = NULL;
+		go_false = nullptr;
 	    }
 	    catch(...)
 	    {
-		if(crit != NULL)
+		if(crit != nullptr)
 		    delete crit;
-		if(go_true != NULL)
+		if(go_true != nullptr)
 		    delete go_true;
-		if(go_false != NULL)
+		if(go_false != nullptr)
 		    delete go_false;
 		throw;
 	    }
@@ -235,7 +235,7 @@ const crit_action * crit_action_create_from_string(user_interaction & dialog,
 	    }
 
 	    ret = new (nothrow) crit_constant_action(data, ea);
-	    if(ret == NULL)
+	    if(ret == nullptr)
 		throw Ememory("crit_action_create_from_string");
 	    else
 		return ret;
@@ -245,7 +245,7 @@ const crit_action * crit_action_create_from_string(user_interaction & dialog,
     }
     catch(...)
     {
-	if(ret != NULL)
+	if(ret != nullptr)
 	    delete ret;
 	throw;
     }
@@ -257,7 +257,7 @@ const crit_action * crit_action_create_from_string(user_interaction & dialog,
 static const criterium * criterium_create_from_string(user_interaction &dialog, const string & argument, const infinint & hourshift)
 {
     string::const_iterator it;
-    const criterium *ret = NULL;
+    const criterium *ret = nullptr;
 
     if(argument.begin() == argument.end())
 	throw Erange("criterium_create_from_string","Unexpected empty string in expression");
@@ -270,35 +270,35 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 	it = line_tools_find_first_char_out_of_parenth(argument, '|');
 	if(it != argument.end())
 	{
-	    const criterium * tmp = NULL;
-	    const crit_or *tmp_or = NULL;
-	    crit_or *ret_or = NULL;
+	    const criterium * tmp = nullptr;
+	    const crit_or *tmp_or = nullptr;
+	    crit_or *ret_or = nullptr;
 
 	    try
 	    {
 		if(*it != '|')
 		    throw SRC_BUG;
 		ret = ret_or = new (nothrow) crit_or();
-		if(ret == NULL)
+		if(ret == nullptr)
 		    throw Ememory("criterium_create_from_string");
 		tmp = criterium_create_from_string(dialog, string(argument.begin(), it), hourshift);
-		if(tmp == NULL)
+		if(tmp == nullptr)
 		    throw SRC_BUG;
 		ret_or->add_crit(*tmp);
 		delete tmp;
-		tmp = NULL;
+		tmp = nullptr;
 		tmp = criterium_create_from_string(dialog, string(it+1, argument.end()), hourshift);
 		tmp_or = dynamic_cast<const crit_or *>(tmp);
-		if(tmp_or != NULL)
+		if(tmp_or != nullptr)
 		    ret_or->gobe(*(const_cast<crit_or *>(tmp_or)));
 		else
 		    ret_or->add_crit(*tmp);
 		delete tmp;
-		tmp = NULL;
+		tmp = nullptr;
 	    }
 	    catch(...)
 	    {
-		if(tmp != NULL)
+		if(tmp != nullptr)
 		    delete tmp;
 		throw;
 	    }
@@ -311,35 +311,35 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 	it = line_tools_find_first_char_out_of_parenth(argument, '&');
 	if(it != argument.end())
 	{
-	    const criterium *tmp = NULL;
-	    const crit_and *tmp_and = NULL;
-	    crit_and *ret_and = NULL;
+	    const criterium *tmp = nullptr;
+	    const crit_and *tmp_and = nullptr;
+	    crit_and *ret_and = nullptr;
 
 	    try
 	    {
 		if(*it != '&')
 		    throw SRC_BUG;
 		ret = ret_and = new (nothrow) crit_and();
-		if(ret == NULL)
+		if(ret == nullptr)
 		    throw Ememory("criterium_create_from_string");
 		tmp = criterium_create_from_string(dialog, string(argument.begin(), it), hourshift);
-		if(tmp == NULL)
+		if(tmp == nullptr)
 		    throw SRC_BUG;
 		ret_and->add_crit(*tmp);
 		delete tmp;
-		tmp = NULL;
+		tmp = nullptr;
 		tmp = criterium_create_from_string(dialog, string(it+1, argument.end()), hourshift);
 		tmp_and = dynamic_cast<const crit_and *>(tmp);
-		if(tmp_and != NULL)
+		if(tmp_and != nullptr)
 		    ret_and->gobe(*(const_cast<crit_and *>(tmp_and)));
 		else
 		    ret_and->add_crit(*tmp);
 		delete tmp;
-		tmp = NULL;
+		tmp = nullptr;
 	    }
 	    catch(...)
 	    {
-		if(tmp != NULL)
+		if(tmp != nullptr)
 		    delete tmp;
 		throw;
 	    }
@@ -357,7 +357,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 
 		// else looking for unary operators
 
-	    const criterium *tmp = NULL;
+	    const criterium *tmp = nullptr;
 
 	    try
 	    {
@@ -365,29 +365,29 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 		{
 		case '!':
 		    tmp = criterium_create_from_string(dialog, string(argument.begin() + 1, argument.end()), hourshift);
-		    if(tmp == NULL)
+		    if(tmp == nullptr)
 			throw SRC_BUG;
 		    ret = new (nothrow) crit_not(*tmp);
 		    delete tmp;
-		    tmp = NULL;
-		    if(ret == NULL)
+		    tmp = nullptr;
+		    if(ret == nullptr)
 			throw Ememory("criterium_create_from_string");
 		    return ret;
 		case '~':
 		    tmp = criterium_create_from_string(dialog, string(argument.begin() + 1, argument.end()), hourshift);
-		    if(tmp == NULL)
+		    if(tmp == nullptr)
 			throw SRC_BUG;
 		    ret = new (nothrow) crit_invert(*tmp);
 		    delete tmp;
-		    tmp = NULL;
-		    if(ret == NULL)
+		    tmp = nullptr;
+		    if(ret == nullptr)
 			throw Ememory("criterium_create_from_string");
 		    return ret;
 		}
 	    }
 	    catch(...)
 	    {
-		if(tmp != NULL)
+		if(tmp != nullptr)
 		    delete tmp;
 		throw;
 	    }
@@ -441,7 +441,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 		    throw SRC_BUG;
 		}
 
-		if(ret == NULL)
+		if(ret == nullptr)
 		    throw Ememory("criterium_create_from_string");
 		else
 		    return ret;
@@ -506,7 +506,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 		throw Erange("criterium_create_from_string", string(gettext("Unknown character found while parsing conditional string: ")) + argument);
 	    }
 
-	    if(ret == NULL)
+	    if(ret == nullptr)
 		throw Ememory("criterium_create_from_string");
 	    else
 		return ret;
@@ -517,7 +517,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
     }
     catch(...)
     {
-	if(ret != NULL)
+	if(ret != nullptr)
 	    delete ret;
 	throw;
     }

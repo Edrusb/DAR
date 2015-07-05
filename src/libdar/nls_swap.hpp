@@ -40,9 +40,9 @@
 
 #define NLS_SWAP_IN                             \
     std::string nls_swap_tmp;			\
-    if(textdomain(NULL) != NULL)		\
+    if(textdomain(nullptr) != nullptr)		\
     {						\
-	nls_swap_tmp = textdomain(NULL);	\
+	nls_swap_tmp = textdomain(nullptr);	\
 	textdomain(PACKAGE);			\
     }						\
     else					\

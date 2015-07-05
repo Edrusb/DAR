@@ -70,7 +70,7 @@ namespace libdar
 
         try
         {
-            while(ptr != NULL)
+            while(ptr != nullptr)
             {
                 lu = 0;
 
@@ -89,8 +89,8 @@ namespace libdar
         catch(...)
         {
             detruit(first);
-	    first = NULL;
-	    last = NULL;
+	    first = nullptr;
+	    last = nullptr;
             throw;
         }
     }
@@ -106,7 +106,7 @@ namespace libdar
         struct cellule *ptr = first;
 
         do {
-            if(ptr == NULL)
+            if(ptr == nullptr)
                 throw Erange("storage::operator[]", gettext("Asking for an element out of array"));
             if(offset > ptr->size)
             {
@@ -125,7 +125,7 @@ namespace libdar
         infinint ret = 0;
         struct cellule *ptr = first;
 
-        while(ptr != NULL)
+        while(ptr != nullptr)
         {
             ret += ptr->size;
             ptr = ptr->next;
@@ -138,7 +138,7 @@ namespace libdar
     {
         struct cellule *cur = first;
 
-        while(cur != NULL)
+        while(cur != nullptr)
         {
 	    (void)memset(cur->data, val, cur->size);
             cur = cur->next;
@@ -149,7 +149,7 @@ namespace libdar
     {
         const struct cellule *ptr = first;
 
-        while(ptr != NULL)
+        while(ptr != nullptr)
         {
             f.write((const char *)(ptr->data), ptr->size);
             ptr = ptr->next;
@@ -180,7 +180,7 @@ namespace libdar
 		(void)memcpy(it.cell->data + it.offset, a + wrote, space);
 		wrote += space;
 		it.cell = it.cell->next;
-		if(it.cell != NULL)
+		if(it.cell != nullptr)
 		    it.offset = 0;
 		else
 		    it.offset = iterator::OFF_END;
@@ -214,7 +214,7 @@ namespace libdar
 		(void)memcpy(a + read, it.cell->data + it.offset, space);
 		read += space;
 		it.cell = it.cell->next;
-		if(it.cell != NULL)
+		if(it.cell != nullptr)
 		    it.offset = 0;
 		else
 		    it.offset = iterator::OFF_END;
@@ -247,7 +247,7 @@ namespace libdar
         const cellule *c_ref = ref.first;
         cellule *c_me = first;
 
-        while((c_ref != NULL || to_add > 0) && (c_me != NULL || to_add <= 0))
+        while((c_ref != nullptr || to_add > 0) && (c_me != nullptr || to_add <= 0))
         {
             if(to_add > 0)
             {
@@ -264,7 +264,7 @@ namespace libdar
         while(to_add > 0)
         {
             insert_const_bytes_at_iterator(it, value, to_add);
-            if(c_ref != NULL)
+            if(c_ref != nullptr)
             {
                 to_add = c_ref->size;
                 c_ref = c_ref->next;
@@ -276,7 +276,7 @@ namespace libdar
 
     void storage::remove_bytes_at_iterator(iterator it, U_I number)
     {
-        while(number > 0 && it.cell != NULL)
+        while(number > 0 && it.cell != nullptr)
         {
             U_I can_rem = it.cell->size - it.offset;
 
@@ -284,10 +284,10 @@ namespace libdar
             {
                 if(it.offset > 0)
                 {
-		    unsigned char *p = NULL;
+		    unsigned char *p = nullptr;
                     meta_new(p, it.offset);
 
-                    if(p != NULL)
+                    if(p != nullptr)
                     {
 			(void)memcpy(p, it.cell->data, it.offset);
                         meta_delete(it.cell->data);
@@ -305,29 +305,29 @@ namespace libdar
                 {
                     struct cellule *t = it.cell->next;
 
-                    if(t != NULL)
+                    if(t != nullptr)
                         it.cell->next->prev = it.cell->prev;
                     else
                         last = it.cell->prev;
 
-                    if(it.cell->prev != NULL)
+                    if(it.cell->prev != nullptr)
                         it.cell->prev->next = t;
                     else
                         first = t;
 
                     number -= it.cell->size;
-                    it.cell->next = NULL;
-                    it.cell->prev = NULL;
+                    it.cell->next = nullptr;
+                    it.cell->prev = nullptr;
                     detruit(it.cell);
                     it.cell = t;
                 }
             }
             else // can_rem >= number
             {
-		unsigned char *p = NULL;
+		unsigned char *p = nullptr;
                 meta_new(p, it.cell->size - number);
 
-                if(p != NULL)
+                if(p != nullptr)
                 {
 		    (void)memcpy(p, it.cell->data, it.offset);
 		    (void)memcpy(p + it.offset, it.cell->data + it.offset + number, it.cell->size - it.offset - number);
@@ -360,13 +360,13 @@ namespace libdar
     void storage::fusionne(struct cellule *a_first, struct cellule *a_last, struct cellule *b_first, struct cellule *b_last,
                            struct cellule *&res_first, struct cellule * & res_last)
     {
-        if((a_first == NULL) ^ (a_last == NULL))
+        if((a_first == nullptr) ^ (a_last == nullptr))
             throw SRC_BUG;
 
-        if((b_first == NULL) ^ (b_last == NULL))
+        if((b_first == nullptr) ^ (b_last == nullptr))
             throw SRC_BUG;
 
-        if(a_last != NULL && b_first != NULL)
+        if(a_last != nullptr && b_first != nullptr)
         {
             a_last->next = b_first;
             b_first->prev = a_last;
@@ -374,7 +374,7 @@ namespace libdar
             res_last = b_last;
         }
         else
-            if(a_first == NULL)
+            if(a_first == nullptr)
             {
                 res_first = b_first;
                 res_last = b_last;
@@ -390,13 +390,13 @@ namespace libdar
     {
         U_32 pas = 0, delta;
         struct cellule *ptr = ref.first;
-        first = last = NULL;
+        first = last = nullptr;
 
         try
         {
-            while(ptr != NULL || pas > 0)
+            while(ptr != nullptr || pas > 0)
             {
-                if(ptr != NULL)
+                if(ptr != nullptr)
                 {
                     delta = pas + ptr->size;
                     ptr = ptr->next;
@@ -417,7 +417,7 @@ namespace libdar
         catch(Ememory & e)
         {
             detruit(first);
-            first = last = NULL;
+            first = last = nullptr;
             throw;
         }
 
@@ -437,14 +437,14 @@ namespace libdar
         struct cellule *b = last, *a = ref.last;
         S_32 superior = 0;
 
-        while((a != NULL || superior <= 0) && (b != NULL || superior >= 0) && (a != NULL || b != NULL))
+        while((a != nullptr || superior <= 0) && (b != nullptr || superior >= 0) && (a != nullptr || b != nullptr))
         {
-            if(superior >= 0 && a != NULL)
+            if(superior >= 0 && a != nullptr)
             {
                 superior -= a->size;
                 a = a->next;
             }
-            if(superior <= 0 && b != NULL)
+            if(superior <= 0 && b != nullptr)
             {
                 superior += b->size;
                 b = b->next;
@@ -458,18 +458,18 @@ namespace libdar
         struct cellule *glisseur = first;
 	U_32 failed_alloc = ~0;
 
-        while(glisseur != NULL)
+        while(glisseur != nullptr)
         {
-            if(glisseur->next != NULL)
+            if(glisseur->next != nullptr)
             {
                 U_I somme = glisseur->next->size + glisseur->size;
 
                 if(somme < failed_alloc)
                 {
-		    unsigned char *p = NULL;
+		    unsigned char *p = nullptr;
                     meta_new(p, somme);
 
-                    if(p != NULL)
+                    if(p != nullptr)
                     {
                         struct cellule *tmp = glisseur->next;
 
@@ -481,12 +481,12 @@ namespace libdar
                         glisseur->size = somme;
 
                         glisseur->next = tmp->next;
-                        if(glisseur->next != NULL)
+                        if(glisseur->next != nullptr)
                             glisseur->next->prev = glisseur;
                         else
                             last = glisseur;
 
-                        tmp->next = tmp->prev = NULL;
+                        tmp->next = tmp->prev = nullptr;
                         detruit(tmp);
                     }
                     else // alloc failed
@@ -509,7 +509,7 @@ namespace libdar
 	    throw Erange("storage::insert_bytes_at_iterator_cmn", gettext("The iterator is not indexing the object it has been defined for"));
 
 
-        if(it.cell != NULL)
+        if(it.cell != nullptr)
         {
             storage temp = size+it.cell->size;
             struct cellule *before, *after;
@@ -524,37 +524,37 @@ namespace libdar
                 gliss += size;
             temp.write(gliss, it.cell->data+it.offset, it.cell->size-it.offset);
 
-            if(temp.first == NULL || temp.last == NULL)
+            if(temp.first == nullptr || temp.last == nullptr)
                 throw SRC_BUG;
 
 		// now we move the chain of cellule from the temp object into the current object (this)
 		// first we release the cellule that has been copied to "temp" object
             before = it.cell->prev;
             after = it.cell->next;
-            it.cell->prev = NULL;
-            it.cell->next = NULL;
+            it.cell->prev = nullptr;
+            it.cell->next = nullptr;
             detruit(it.cell);
-	    it.cell = NULL;
+	    it.cell = nullptr;
 
-            if(before != NULL)
+            if(before != nullptr)
                 before->next = temp.first;
             else
                 first = temp.first;
             temp.first->prev = before;
 
-            if(after != NULL)
+            if(after != nullptr)
                 after->prev = temp.last;
             else
                 last = temp.last;
             temp.last->next = after;
 
-	    temp.first = temp.last = NULL;
+	    temp.first = temp.last = nullptr;
 		// this way when "temp" object will be destroyed
 		// it will not affect the chain of cells which is now
 		// part of "this" (current object).
 
         }
-        else // it_cell == NULL
+        else // it_cell == nullptr
         {
             storage temp = size;
 
@@ -569,21 +569,21 @@ namespace libdar
             switch(it.offset)
             {
             case iterator::OFF_END :
-                if(last != NULL)
+                if(last != nullptr)
                     last->next = temp.first;
                 else
                     first = temp.first;
-                if(temp.first == NULL)
+                if(temp.first == nullptr)
                     throw SRC_BUG;
                 temp.first->prev = last;
                 last = temp.last;
                 break;
             case iterator::OFF_BEGIN :
-                if(first != NULL)
+                if(first != nullptr)
                     first->prev = temp.last;
                 else
                     last = temp.last;
-                if(temp.last == NULL)
+                if(temp.last == nullptr)
                     throw SRC_BUG;
                 temp.last->next = first;
                 first = temp.first;
@@ -592,7 +592,7 @@ namespace libdar
                 throw SRC_BUG;
             }
 
-            temp.last = temp.first = NULL;
+            temp.last = temp.first = nullptr;
         }
 
         reduce();
@@ -602,14 +602,14 @@ namespace libdar
     {
         struct cellule *t;
 
-        while(c != NULL)
+        while(c != nullptr)
         {
-            if(c->size == 0 && c->data != NULL)
+            if(c->size == 0 && c->data != nullptr)
                 throw SRC_BUG;
-            if(c->data != NULL)
+            if(c->data != nullptr)
 	    {
                 meta_delete(c->data);
-		c->data = NULL;
+		c->data = nullptr;
 	    }
             t = c->next;
             meta_delete(c);
@@ -620,21 +620,21 @@ namespace libdar
     void storage::make_alloc(U_32 size, struct cellule * & begin, struct cellule * & end)
     {
         struct cellule *newone;
-        struct cellule *previous = NULL;
+        struct cellule *previous = nullptr;
 	U_32 dsize = size;
 
-	begin = end = NULL;
+	begin = end = nullptr;
 
 	if(size > 0)
 	{
 	    do
 	    {
 		meta_new(newone, 1);
-		if(newone != NULL)
+		if(newone != nullptr)
 		{
 		    newone->prev = previous;
-		    newone->next = NULL;
-		    if(previous != NULL)
+		    newone->next = nullptr;
+		    if(previous != nullptr)
 			previous->next = newone;
 		    else
 			begin = newone;
@@ -642,14 +642,14 @@ namespace libdar
 		else
 		{
 		    detruit(begin);
-		    begin = NULL;
+		    begin = nullptr;
 		    throw Ememory("storage::make_alloc");
 		}
 
 		do
 		{
 		    meta_new(newone->data, dsize);
-		    if(newone->data != NULL)
+		    if(newone->data != nullptr)
 		    {
 			size -= dsize;
 			newone->size = dsize;
@@ -662,11 +662,11 @@ namespace libdar
 			{
 			    newone->size = 0;
 			    detruit(begin);
-			    begin = NULL;
+			    begin = nullptr;
 			    throw Ememory("storage::make_alloc");
 			}
 		}
-		while(dsize > 1 && newone->data == NULL);
+		while(dsize > 1 && newone->data == nullptr);
 	    }
 	    while (size > 0);
 
@@ -679,7 +679,7 @@ namespace libdar
         struct cellule *debut;
         struct cellule *fin;
         U_32 sz = 0;
-	begin = end = NULL;
+	begin = end = nullptr;
 
 	if(!size.is_zero())
 	{
@@ -690,14 +690,14 @@ namespace libdar
 		try
 		{
 		    make_alloc(sz, debut, fin);
-		    if(end != NULL)
+		    if(end != nullptr)
 		    {
 			end->next = debut;
 			debut->prev = end;
 			end = fin;
 		    }
 		    else
-			if(begin != NULL)
+			if(begin != nullptr)
 			    throw SRC_BUG;
 			else
 			{
@@ -707,11 +707,11 @@ namespace libdar
 		}
 		catch(Ememory & e)
 		{
-		    if(begin != NULL)
+		    if(begin != nullptr)
 		    {
 			detruit(begin);
-			begin = NULL;
-			end = NULL;
+			begin = nullptr;
+			end = nullptr;
 		    }
 
 		    throw;
@@ -782,7 +782,7 @@ namespace libdar
     {
         if(val >= 0)
         {
-            while(val > 0 && cell != NULL)
+            while(val > 0 && cell != nullptr)
             {
                 if(offset + val >= cell->size)
                 {
@@ -796,17 +796,17 @@ namespace libdar
                     val = 0;
                 }
             }
-            if(cell == NULL)
+            if(cell == nullptr)
                 offset = OFF_END;
         }
         else
-            while(val < 0 && cell != NULL)
+            while(val < 0 && cell != nullptr)
             {
                 val += offset;
                 if(val < 0)
                 {
                     cell = cell->prev;
-                    if(cell != NULL)
+                    if(cell != nullptr)
                         offset = cell->size;
                     else
                         offset = OFF_BEGIN;
@@ -818,22 +818,22 @@ namespace libdar
 
     infinint storage::iterator::get_position() const
     {
-        if(ref == NULL || ref->first == NULL)
+        if(ref == nullptr || ref->first == nullptr)
             throw Erange("storage::iterator::get_position", gettext("Reference storage of the iterator is empty or non existent"));
 
         struct cellule *p = ref->first;
         infinint ret = 0;
 
-        if(cell == NULL)
+        if(cell == nullptr)
             throw Erange("storage::iterator::get_position", gettext("Iterator does not point to data"));
 
-        while(p != NULL && p != cell)
+        while(p != nullptr && p != cell)
         {
             ret += p->size;
             p = p->next;
         }
 
-        if(p != NULL)
+        if(p != nullptr)
             ret += offset;
         else
             throw Erange("storage::iterator::get_position", gettext("The iterator position is not inside the storage of reference"));

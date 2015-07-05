@@ -47,7 +47,7 @@ namespace libdar
     {
 	const cat_nomme *ref_nomme = dynamic_cast<const cat_nomme *>(&ref);
 
-	if(ref_nomme == NULL)
+	if(ref_nomme == nullptr)
 	    return false;
 	else
 	    return xname == ref_nomme->xname;

@@ -29,21 +29,21 @@ using namespace std;
 namespace libdar
 {
 #ifdef LIBDAR_SPECIAL_ALLOC
-    thread_local on_pool *on_pool::alloc_not_constructed = NULL;
+    thread_local on_pool *on_pool::alloc_not_constructed = nullptr;
 #endif
 
     void *on_pool::alloc(size_t size, memory_pool *p)
     {
 #ifdef LIBDAR_SPECIAL_ALLOC
 
-	pool_ptr *tmp = NULL;
+	pool_ptr *tmp = nullptr;
 
 	size += sizeof(pool_ptr);
-	if(p != NULL)
+	if(p != nullptr)
 	    tmp = (pool_ptr *)p->alloc(size);
 	else
 	    tmp = (pool_ptr *)(::new (nothrow) char[size]);
-	if(tmp != NULL)
+	if(tmp != nullptr)
 	{
 	    tmp->reserve = p;
 	    ++tmp;
@@ -59,13 +59,13 @@ namespace libdar
     void on_pool::dealloc(void *ptr)
     {
 #ifdef LIBDAR_SPECIAL_ALLOC
-	if(ptr == NULL)
+	if(ptr == nullptr)
 	    throw SRC_BUG;
 	else
 	{
 	    pool_ptr *tmp = ((pool_ptr *)ptr) - 1;
 
-	    if(tmp->reserve == NULL)
+	    if(tmp->reserve == nullptr)
 		::delete[] tmp;
 	    else
 		tmp->reserve->release((void *)tmp);

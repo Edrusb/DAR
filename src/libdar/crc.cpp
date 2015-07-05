@@ -220,7 +220,7 @@ namespace libdar
     bool crc_i::operator == (const crc & ref) const
     {
 	const crc_i *ref_i = dynamic_cast<const crc_i *>(&ref);
-	if(ref_i == NULL)
+	if(ref_i == nullptr)
 	    throw SRC_BUG;
 
 	if(size != ref_i->size)
@@ -304,8 +304,8 @@ namespace libdar
 
     crc_n::crc_n(U_I width)
     {
-	pointer = NULL;
-	cyclic = NULL;
+	pointer = nullptr;
+	cyclic = nullptr;
 	try
 	{
 	    if(width == 0)
@@ -322,8 +322,8 @@ namespace libdar
 
     crc_n::crc_n(U_I width, generic_file & f)
     {
-	pointer = NULL;
-	cyclic = NULL;
+	pointer = nullptr;
+	cyclic = nullptr;
 	try
 	{
 	    alloc(width);
@@ -352,7 +352,7 @@ namespace libdar
     bool crc_n::operator == (const crc & ref) const
     {
 	const crc_n *ref_n = dynamic_cast<const crc_n *>(&ref);
-	if(ref_n == NULL)
+	if(ref_n == nullptr)
 	    throw SRC_BUG;
 
 	if(size != ref_n->size)
@@ -406,7 +406,7 @@ namespace libdar
     {
 	size = width;
 
-	if(get_pool() == NULL)
+	if(get_pool() == nullptr)
 	{
 		//////////////////////////////////////////////////////////////////////
 		// the following trick is to have cyclic aligned at its boundary size
@@ -432,7 +432,7 @@ namespace libdar
 	else
 	    cyclic = (unsigned char *)get_pool()->alloc(width); // pool should provide aligned data in any case
 
-	if(cyclic == NULL)
+	if(cyclic == nullptr)
 	    throw Ememory("crc::copy_from");
 	pointer = cyclic;
     }
@@ -453,16 +453,16 @@ namespace libdar
 
     void crc_n::destroy()
     {
-	if(cyclic != NULL)
+	if(cyclic != nullptr)
 	{
-	    if(get_pool() == NULL)
+	    if(get_pool() == nullptr)
 		delete [] cyclic;
 	    else
 		get_pool()->release(cyclic);
-	    cyclic = NULL;
+	    cyclic = nullptr;
 	}
 	size = 0;
-	pointer = NULL;
+	pointer = nullptr;
     }
 
 	/////////////////////////////////////////////
@@ -471,7 +471,7 @@ namespace libdar
 
     crc *create_crc_from_file(generic_file & f, memory_pool *pool, bool old)
     {
-	crc *ret = NULL;
+	crc *ret = nullptr;
 	if(old)
 	    ret = new (pool) crc_n(crc::OLD_CRC_SIZE, f);
 	else
@@ -490,7 +490,7 @@ namespace libdar
 		ret = new (pool) crc_i(taille, f);
 	}
 
-	if(ret == NULL)
+	if(ret == nullptr)
 	    throw Ememory("create_crc_from_file");
 
 	return ret;
@@ -498,7 +498,7 @@ namespace libdar
 
     crc *create_crc_from_size(infinint width, memory_pool *pool)
     {
-	crc *ret = NULL;
+	crc *ret = nullptr;
 
 	if(width < INFININT_MODE_START)
 	{
@@ -512,7 +512,7 @@ namespace libdar
 	else
 	    ret = new (pool) crc_i(width);
 
-	if(ret == NULL)
+	if(ret == nullptr)
 	    throw Ememory("create_crc_from_size");
 
 	return ret;

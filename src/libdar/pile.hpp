@@ -66,7 +66,7 @@ namespace libdar
 
 	    /// remove the top generic_file from the top
 	    ///
-	    /// \returns the address of the object that has been poped from the stack or NULL if the stack is empty
+	    /// \returns the address of the object that has been poped from the stack or nullptr if the stack is empty
 	    /// \note this is now the duty of the caller to release this object memory when the object is no more needed
 	generic_file *pop();
 
@@ -76,10 +76,10 @@ namespace libdar
 	template <class T> bool pop_and_close_if_type_is(T *ptr);
 
 	    /// returns the address of the top generic_file
-	generic_file *top() { if(stack.empty()) return NULL; else return stack.back().ptr; };
+	generic_file *top() { if(stack.empty()) return nullptr; else return stack.back().ptr; };
 
 	    /// returns the address of teh bottom generic_file
-	generic_file *bottom() { if(stack.empty()) return NULL; else return stack[0].ptr; };
+	generic_file *bottom() { if(stack.empty()) return nullptr; else return stack[0].ptr; };
 
 	    /// returns the number of objects in the stack
 	U_I size() const { return stack.size(); };
@@ -92,17 +92,17 @@ namespace libdar
 
 	    /// this template let the class user find out the higher object on the stack of the given type
 	    /// \param[in,out] ref gives the type of the object to look for, and gets the address of the first object found starting from the top
-	    /// \note if no object of that type could be found in the stack ref is set to NULL
+	    /// \note if no object of that type could be found in the stack ref is set to nullptr
 	template<class T> void find_first_from_top(T * & ref);
 
 	    /// this template is similar to the template "find_first_from_top" except that the search is started from the bottom of the stack
 	template<class T> void find_first_from_bottom(T * & ref);
 
 
-	    /// return the generic_file object just below the given object or NULL if the object is at the bottom of the stack or is not in the stack
+	    /// return the generic_file object just below the given object or nullptr if the object is at the bottom of the stack or is not in the stack
 	generic_file *get_below(const generic_file *ref);
 
-	    /// return the generic_file object just above the given object or NULL if the object is at the bottom of the stack or is not in the stack
+	    /// return the generic_file object just above the given object or nullptr if the object is at the bottom of the stack or is not in the stack
 	generic_file *get_above(const generic_file *ref);
 
 
@@ -177,13 +177,13 @@ namespace libdar
 
     template <class T> bool pile::pop_and_close_if_type_is(T *ptr)
     {
-	generic_file *top = NULL;
+	generic_file *top = nullptr;
 
 	if(!stack.empty())
 	{
 	    top = stack.back().ptr;
 	    ptr = dynamic_cast<T *>(top);
-	    if(ptr != NULL)
+	    if(ptr != nullptr)
 	    {
 		stack.pop_back();
 		delete top;
@@ -198,16 +198,16 @@ namespace libdar
 
     template <class T> void pile::find_first_from_top(T * & ref)
     {
-	ref = NULL;
-	for(std::vector<face>::reverse_iterator it = stack.rbegin(); it != stack.rend() && ref == NULL; ++it)
+	ref = nullptr;
+	for(std::vector<face>::reverse_iterator it = stack.rbegin(); it != stack.rend() && ref == nullptr; ++it)
 	    ref = dynamic_cast<T *>(it->ptr);
     }
 
 
     template <class T> void pile::find_first_from_bottom(T * & ref)
     {
-	ref = NULL;
-	for(std::vector<face>::iterator it = stack.begin(); it != stack.end() && ref == NULL; ++it)
+	ref = nullptr;
+	for(std::vector<face>::iterator it = stack.begin(); it != stack.end() && ref == nullptr; ++it)
 	    ref = dynamic_cast<T *>(it->ptr);
     }
 

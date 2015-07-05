@@ -54,7 +54,7 @@ namespace libdar
     entrepot_local::entrepot_local(const std::string & user, const std::string & group, bool x_furtive_mode)
     {
 	furtive_mode = x_furtive_mode;
-	contents = NULL;
+	contents = nullptr;
 	set_user_ownership(user);
 	set_group_ownership(group);
 	set_root(tools_getcwd());
@@ -79,18 +79,18 @@ namespace libdar
 	user_interaction_blind aveugle;
 
 	contents = new (get_pool()) etage(aveugle, get_location().display().c_str(), datetime(0), datetime(0), false, furtive_mode);
-	if(contents == NULL)
+	if(contents == nullptr)
 	    throw Ememory("entrepot_local::read_dir_reset");
     }
 
     bool entrepot_local::read_dir_next(string & filename)
     {
-	if(contents == NULL)
+	if(contents == nullptr)
 	    return false;
 	if(contents->fichier.empty())
 	{
 	    delete contents;
-	    contents = NULL;
+	    contents = nullptr;
 	    return false;
 	}
 	filename = contents->fichier.front();
@@ -106,7 +106,7 @@ namespace libdar
 						   bool fail_if_exists,
 						   bool erase) const
     {
-	fichier_global *ret = NULL;
+	fichier_global *ret = nullptr;
 	string fullname = (get_full_path() + path(filename)).display();
 	U_I perm = force_permission ? permission : 0666;
 
@@ -118,7 +118,7 @@ namespace libdar
 					     fail_if_exists,
 					     erase,
 					     false);
-	if(ret == NULL)
+	if(ret == nullptr)
 	    throw Ememory("entrepot_local::inherited_open");
 	try
 	{
@@ -145,7 +145,7 @@ namespace libdar
 	catch(...)
 	{
 	    delete ret;
-	    ret = NULL;
+	    ret = nullptr;
 	    throw;
 	}
 

@@ -155,19 +155,19 @@ namespace libdar
 
     void secu_string::init(U_I size)
     {
-	allocated_size = NULL;
-	mem = NULL;
-	string_size = NULL;
+	allocated_size = nullptr;
+	mem = nullptr;
+	string_size = nullptr;
 
 	try
 	{
 #if CRYPTO_AVAILABLE
 	    allocated_size = (U_I *)gcry_malloc_secure(sizeof(U_I));
-	    if(allocated_size == NULL)
+	    if(allocated_size == nullptr)
 		throw Esecu_memory("secu_string::secus_string");
 #else
 	    meta_new(allocated_size, 1);
-	    if(allocated_size == NULL)
+	    if(allocated_size == nullptr)
 		throw Ememory("secu_string::secus_string");
 #endif
 
@@ -175,21 +175,21 @@ namespace libdar
 
 #if CRYPTO_AVAILABLE
 	    mem = (char *)gcry_malloc_secure(*allocated_size);
-	    if(mem == NULL)
+	    if(mem == nullptr)
 		throw Esecu_memory("secu_string::secus_string");
 #else
 	    meta_new(mem, *allocated_size);
-	    if(mem == NULL)
+	    if(mem == nullptr)
 		throw Ememory("secu_string::secus_string");
 #endif
 
 #if CRYPTO_AVAILABLE
 	    string_size = (U_I *)gcry_malloc_secure(sizeof(U_I));
-	    if(string_size == NULL)
+	    if(string_size == nullptr)
 		throw Esecu_memory("secu_string::secus_string");
 #else
 	    meta_new(string_size, 1);
-	    if(string_size == NULL)
+	    if(string_size == nullptr)
 		throw Ememory("secu_string::secus_string");
 #endif
 	    *string_size = 0;
@@ -204,13 +204,13 @@ namespace libdar
 
     void secu_string::copy_from(const secu_string & ref)
     {
-	if(ref.allocated_size == NULL)
+	if(ref.allocated_size == nullptr)
 	    throw SRC_BUG;
 	if(*(ref.allocated_size) == 0)
 	    throw SRC_BUG;
-	if(ref.mem == NULL)
+	if(ref.mem == nullptr)
 	    throw SRC_BUG;
-	if(ref.string_size == NULL)
+	if(ref.string_size == nullptr)
 	    throw SRC_BUG;
 
 	init(*(ref.allocated_size) - 1);
@@ -228,7 +228,7 @@ namespace libdar
 
     void secu_string::clean_and_destroy()
     {
-	if(string_size != NULL)
+	if(string_size != nullptr)
 	{
 	    (void)memset(string_size, 0, sizeof(U_I));
 #if CRYPTO_AVAILABLE
@@ -236,11 +236,11 @@ namespace libdar
 #else
 	    meta_delete(string_size);
 #endif
-	    string_size = NULL;
+	    string_size = nullptr;
 	}
-	if(mem != NULL)
+	if(mem != nullptr)
 	{
-	    if(allocated_size == NULL)
+	    if(allocated_size == nullptr)
 		throw SRC_BUG;
 	    (void)memset(mem, 0, *allocated_size);
 #if CRYPTO_AVAILABLE
@@ -248,9 +248,9 @@ namespace libdar
 #else
 	    meta_delete(mem);
 #endif
-	    mem = NULL;
+	    mem = nullptr;
 	}
-	if(allocated_size != NULL)
+	if(allocated_size != nullptr)
 	{
 	    (void)memset(allocated_size, 0, sizeof(U_I));
 #if CRYPTO_AVAILABLE
@@ -258,7 +258,7 @@ namespace libdar
 #else
 	    meta_delete(allocated_size);
 #endif
-	    allocated_size = NULL;
+	    allocated_size = nullptr;
 
 	}
     }

@@ -50,7 +50,7 @@ namespace libdar
 	if(tmp < sizeof(char))
 	    throw SRC_BUG;
 
-	if(x_ptr == NULL)
+	if(x_ptr == nullptr)
 	    throw SRC_BUG;
 	set_mode(x_ptr->get_mode());
 	reached_eof = false;
@@ -72,7 +72,7 @@ namespace libdar
 					       &tomaster_data,
 					       &toslave_ctrl,
 					       &tomaster_ctrl);
-	if(remote == NULL)
+	if(remote == nullptr)
 	    throw Ememory("generic_thread::generic_thread");
 	try
 	{
@@ -80,7 +80,7 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    if(remote != NULL)
+	    if(remote != nullptr)
 		delete remote;
 	    throw;
 	}
@@ -99,12 +99,12 @@ namespace libdar
 
     generic_thread::~generic_thread()
     {
-	if(remote != NULL)
+	if(remote != nullptr)
 	{
 	    if(!is_terminated())
 		terminate();
 	    delete remote;
-	    remote = NULL;
+	    remote = nullptr;
 	}
     }
 
@@ -277,7 +277,7 @@ namespace libdar
     {
 	U_I read = 0;
 	U_I min;
-	char *data_ptr = NULL;
+	char *data_ptr = nullptr;
 	unsigned int data_num;
 
 
@@ -332,7 +332,7 @@ namespace libdar
     {
 	U_I wrote = 0;
 	unsigned int bksize;
-	char *tmptr = NULL;
+	char *tmptr = nullptr;
 	U_I min;
 
 	    // rerun the thread if an exception has occured previously
@@ -475,7 +475,7 @@ namespace libdar
 
     void generic_thread::wake_up_slave_if_asked()
     {
-	if(remote == NULL)
+	if(remote == nullptr)
 	    throw SRC_BUG;
 	if(remote->wake_me_up())
 	{
@@ -502,7 +502,7 @@ namespace libdar
 	if(!running)
 	{
 	    running = true;
-	    if(remote == NULL)
+	    if(remote == nullptr)
 		throw SRC_BUG;
 	    if(remote->is_running())
 		throw SRC_BUG;

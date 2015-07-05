@@ -97,17 +97,17 @@ namespace libdar
 	~hash_fichier();
 
 	    // inherited from fichier_global
-	void change_ownership(const std::string & user, const std::string & group) { if(ref == NULL || hash_ref == NULL) throw SRC_BUG; ref->change_ownership(user, group); hash_ref->change_ownership(user, group); };
-	void change_permission(U_I perm) { if(ref == NULL || hash_ref == NULL) throw SRC_BUG; ref->change_permission(perm); hash_ref->change_permission(perm); };
-	infinint get_size() const { if(ref == NULL) throw SRC_BUG; return ref->get_size(); };
-	void fadvise(advise adv) const { if(ref == NULL) throw SRC_BUG; ref->fadvise(adv); };
+	void change_ownership(const std::string & user, const std::string & group) { if(ref == nullptr || hash_ref == nullptr) throw SRC_BUG; ref->change_ownership(user, group); hash_ref->change_ownership(user, group); };
+	void change_permission(U_I perm) { if(ref == nullptr || hash_ref == nullptr) throw SRC_BUG; ref->change_permission(perm); hash_ref->change_permission(perm); };
+	infinint get_size() const { if(ref == nullptr) throw SRC_BUG; return ref->get_size(); };
+	void fadvise(advise adv) const { if(ref == nullptr) throw SRC_BUG; ref->fadvise(adv); };
 
 	    // inherited from generic_file
 	bool skippable(skippability direction, const infinint & amount) { return false; };
-        bool skip(const infinint & pos) {if(ref == NULL || pos != ref->get_position()) throw SRC_BUG; else return true; };
+        bool skip(const infinint & pos) {if(ref == nullptr || pos != ref->get_position()) throw SRC_BUG; else return true; };
         bool skip_to_eof() { if(get_mode() == gf_write_only) return true; else throw SRC_BUG; };
         bool skip_relative(S_I x) { if(x != 0) throw SRC_BUG; else return true; };
-	infinint get_position() { if(ref == NULL) throw SRC_BUG; return ref->get_position(); };
+	infinint get_position() { if(ref == nullptr) throw SRC_BUG; return ref->get_position(); };
 
 	    /// for debugging purposes only
 	void set_only_hash() { only_hash = true; };

@@ -142,7 +142,7 @@ namespace libdar
 
 
 	    /// defines the protocol to use to retrieve slices
-	void set_entrepot(const entrepot & entr) { if(x_entrepot != NULL) delete x_entrepot; x_entrepot = entr.clone(); if(x_entrepot == NULL) throw Ememory("archive_options_read::set_entrepot"); };
+	void set_entrepot(const entrepot & entr) { if(x_entrepot != nullptr) delete x_entrepot; x_entrepot = entr.clone(); if(x_entrepot == nullptr) throw Ememory("archive_options_read::set_entrepot"); };
 
 	    /// whether to warn (true) or ignore (false) signature failure (default is true)
 	void set_ignore_signature_check_failure(bool val) { x_ignore_signature_check_failure = val; };
@@ -184,7 +184,7 @@ namespace libdar
 	void set_ref_slice_min_digits(infinint val) { x_ref_slice_min_digits = val; };
 
 	    /// defines the protocol to use to retrieve slices of the reference archive (where the external catalogue resides)
-	void set_ref_entrepot(const entrepot & entr) { if(x_ref_entrepot != NULL) delete x_ref_entrepot; x_ref_entrepot = entr.clone(); if(x_ref_entrepot == NULL) throw Ememory("archive_options_read::set_entrepot"); };
+	void set_ref_entrepot(const entrepot & entr) { if(x_ref_entrepot != nullptr) delete x_ref_entrepot; x_ref_entrepot = entr.clone(); if(x_ref_entrepot == nullptr) throw Ememory("archive_options_read::set_entrepot"); };
 
 
 
@@ -203,7 +203,7 @@ namespace libdar
 	bool get_lax() const { return x_lax; };
 	bool get_sequential_read() const { return x_sequential_read; };
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
-	const entrepot & get_entrepot() const { if(x_entrepot == NULL) throw SRC_BUG; return *x_entrepot; };
+	const entrepot & get_entrepot() const { if(x_entrepot == nullptr) throw SRC_BUG; return *x_entrepot; };
 	bool get_ignore_signature_check_failure() const { return x_ignore_signature_check_failure; };
 	bool get_multi_threaded() const { return x_multi_threaded; };
 
@@ -216,7 +216,7 @@ namespace libdar
 	U_32 get_ref_crypto_size() const { return x_ref_crypto_size; };
 	const std::string & get_ref_execute() const { return x_ref_execute; };
 	infinint get_ref_slice_min_digits() const { return x_ref_slice_min_digits; };
-	const entrepot & get_ref_entrepot() const { if(x_ref_entrepot == NULL) throw SRC_BUG; return *x_ref_entrepot; };
+	const entrepot & get_ref_entrepot() const { if(x_ref_entrepot == nullptr) throw SRC_BUG; return *x_ref_entrepot; };
 
 
     private:
@@ -277,7 +277,7 @@ namespace libdar
 	    /////////////////////////////////////////////////////////////////////
 	    // setting methods
 
-	    /// set the archive to take as reference (NULL for a full backup)
+	    /// set the archive to take as reference (nullptr for a full backup)
 	void set_reference(archive *ref_arch) { x_ref_arch = ref_arch; };
 
 	    /// defines the filenames to only save (except directory) as those that match the given mask
@@ -500,8 +500,8 @@ namespace libdar
 	    // getting methods
 
 	archive *get_reference() const { return x_ref_arch; };
-	const mask & get_selection() const { if(x_selection == NULL) throw SRC_BUG; return *x_selection; };
-	const mask & get_subtree() const { if(x_subtree == NULL) throw SRC_BUG; return *x_subtree; };
+	const mask & get_selection() const { if(x_selection == nullptr) throw SRC_BUG; return *x_selection; };
+	const mask & get_subtree() const { if(x_subtree == nullptr) throw SRC_BUG; return *x_subtree; };
 	bool get_allow_over() const { return x_allow_over; };
 	bool get_warn_over() const { return x_warn_over; };
 	bool get_info_details() const { return x_info_details; };
@@ -515,7 +515,7 @@ namespace libdar
 	U_I get_compression_level() const { return x_compression_level; };
 	const infinint & get_slice_size() const { return x_file_size; };
 	const infinint & get_first_slice_size() const { return x_first_file_size; };
-	const mask & get_ea_mask() const { if(x_ea_mask == NULL) throw SRC_BUG; return *x_ea_mask; };
+	const mask & get_ea_mask() const { if(x_ea_mask == nullptr) throw SRC_BUG; return *x_ea_mask; };
 	const std::string & get_execute() const { return x_execute; };
 	crypto_algo get_crypto_algo() const { return x_crypto; };
 	const secu_string & get_crypto_pass() const { return x_pass; };
@@ -523,7 +523,7 @@ namespace libdar
 	const std::vector<std::string> & get_gnupg_recipients() const { return x_gnupg_recipients; };
 	U_I get_gnupg_key_size() const { return x_gnupg_key_size; };
 	const std::vector<std::string> & get_gnupg_signatories() const { return x_gnupg_signatories; };
-	const mask & get_compr_mask() const { if(x_compr_mask == NULL) throw SRC_BUG; return *x_compr_mask; };
+	const mask & get_compr_mask() const { if(x_compr_mask == nullptr) throw SRC_BUG; return *x_compr_mask; };
 	const infinint & get_min_compr_size() const { return x_min_compr_size; };
 	bool get_nodump() const { return x_nodump; };
 	const std::string & get_exclude_by_ea() const { return exclude_by_ea; };
@@ -550,7 +550,7 @@ namespace libdar
 	const std::string & get_backup_hook_file_execute() const { return x_backup_hook_file_execute; };
 	const mask & get_backup_hook_file_mask() const { return *x_backup_hook_file_mask; };
 	bool get_ignore_unknown_inode_type() const { return x_ignore_unknown; };
-	const entrepot & get_entrepot() const { if(x_entrepot == NULL) throw SRC_BUG; return *x_entrepot; };
+	const entrepot & get_entrepot() const { if(x_entrepot == nullptr) throw SRC_BUG; return *x_entrepot; };
 	const fsa_scope & get_fsa_scope() const { return x_scope; };
 	bool get_multi_threaded() const { return x_multi_threaded; };
 
@@ -631,8 +631,8 @@ namespace libdar
     class archive_options_isolate : public on_pool
     {
     public:
-	archive_options_isolate() { x_entrepot = NULL; clear(); };
-	archive_options_isolate(const archive_options_isolate & ref) { x_entrepot = NULL; copy_from(ref); };
+	archive_options_isolate() { x_entrepot = nullptr; clear(); };
+	archive_options_isolate(const archive_options_isolate & ref) { x_entrepot = nullptr; copy_from(ref); };
 	const archive_options_isolate & operator = (const archive_options_isolate & ref) { destroy(); copy_from(ref); return *this; };
 	~archive_options_isolate() { destroy(); };
 
@@ -754,7 +754,7 @@ namespace libdar
 	hash_algo get_hash_algo() const { return x_hash; };
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
 	bool get_sequential_marks() const { return x_sequential_marks; };
-	const entrepot & get_entrepot() const { if(x_entrepot == NULL) throw SRC_BUG; return *x_entrepot; };
+	const entrepot & get_entrepot() const { if(x_entrepot == nullptr) throw SRC_BUG; return *x_entrepot; };
 	bool get_multi_threaded() const { return x_multi_threaded; };
 
 
@@ -800,7 +800,7 @@ namespace libdar
     {
     public:
 
-	archive_options_merge() { x_selection = x_subtree = x_ea_mask = x_compr_mask = NULL; x_overwrite = NULL; x_entrepot = NULL; clear(); };
+	archive_options_merge() { x_selection = x_subtree = x_ea_mask = x_compr_mask = nullptr; x_overwrite = nullptr; x_entrepot = nullptr; clear(); };
 	archive_options_merge(const archive_options_merge & ref) { copy_from(ref); };
 	const archive_options_merge & operator = (const archive_options_merge & ref) { destroy(); copy_from(ref); return *this; };
 	~archive_options_merge() { destroy(); };
@@ -950,11 +950,11 @@ namespace libdar
 	    // getting methods
 
 	archive * get_auxilliary_ref() const { return x_ref; };
-	const mask & get_selection() const { if(x_selection == NULL) throw SRC_BUG; return *x_selection; };
-	const mask & get_subtree() const { if(x_subtree == NULL) throw SRC_BUG; return *x_subtree; };
+	const mask & get_selection() const { if(x_selection == nullptr) throw SRC_BUG; return *x_selection; };
+	const mask & get_subtree() const { if(x_subtree == nullptr) throw SRC_BUG; return *x_subtree; };
 	bool get_allow_over() const { return x_allow_over; };
 	bool get_warn_over() const { return x_warn_over; };
-	const crit_action & get_overwriting_rules() const { if(x_overwrite == NULL) throw SRC_BUG; return *x_overwrite; };
+	const crit_action & get_overwriting_rules() const { if(x_overwrite == nullptr) throw SRC_BUG; return *x_overwrite; };
 	bool get_info_details() const { return x_info_details; };
 	bool get_display_treated() const { return x_display_treated; };
 	bool get_display_treated_only_dir() const { return x_display_treated_only_dir; };
@@ -965,7 +965,7 @@ namespace libdar
 	U_I get_compression_level() const { return x_compression_level; };
 	const infinint & get_slice_size() const { return x_file_size; };
 	const infinint & get_first_slice_size() const { return x_first_file_size; };
-	const mask & get_ea_mask() const { if(x_ea_mask == NULL) throw SRC_BUG; return *x_ea_mask; };
+	const mask & get_ea_mask() const { if(x_ea_mask == nullptr) throw SRC_BUG; return *x_ea_mask; };
 	const std::string & get_execute() const { return x_execute; };
 	crypto_algo get_crypto_algo() const { return x_crypto; };
 	const secu_string & get_crypto_pass() const { return x_pass; };
@@ -973,7 +973,7 @@ namespace libdar
 	const std::vector<std::string> & get_gnupg_recipients() const { return x_gnupg_recipients; };
 	U_I get_gnupg_key_size() const { return x_gnupg_key_size; };
 	const std::vector<std::string> & get_gnupg_signatories() const { return x_gnupg_signatories; };
-	const mask & get_compr_mask() const { if(x_compr_mask == NULL) throw SRC_BUG; return *x_compr_mask; };
+	const mask & get_compr_mask() const { if(x_compr_mask == nullptr) throw SRC_BUG; return *x_compr_mask; };
 	const infinint & get_min_compr_size() const { return x_min_compr_size; };
 	bool get_empty() const { return x_empty; };
 	bool get_keep_compressed() const { return x_keep_compressed; };
@@ -986,7 +986,7 @@ namespace libdar
 	const std::string & get_user_comment() const { return x_user_comment; };
 	hash_algo get_hash_algo() const { return x_hash; };
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
-	const entrepot & get_entrepot() const { if(x_entrepot == NULL) throw SRC_BUG; return *x_entrepot; };
+	const entrepot & get_entrepot() const { if(x_entrepot == nullptr) throw SRC_BUG; return *x_entrepot; };
 	const fsa_scope & get_fsa_scope() const { return x_scope; };
 	bool get_multi_threaded() const { return x_multi_threaded; };
 
@@ -1047,7 +1047,7 @@ namespace libdar
     public:
 	enum t_dirty { dirty_ignore, dirty_warn, dirty_ok };
 
-	archive_options_extract() { x_selection = x_subtree = x_ea_mask = NULL; x_overwrite = NULL; clear(); };
+	archive_options_extract() { x_selection = x_subtree = x_ea_mask = nullptr; x_overwrite = nullptr; clear(); };
 	archive_options_extract(const archive_options_extract & ref) { copy_from(ref); };
 	const archive_options_extract & operator = (const archive_options_extract & ref) { destroy(); copy_from(ref); return *this; };
 	~archive_options_extract() { destroy(); };
@@ -1130,21 +1130,21 @@ namespace libdar
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
 
-	const mask & get_selection() const { if(x_selection == NULL) throw SRC_BUG; return *x_selection; };
-	const mask & get_subtree() const { if(x_subtree == NULL) throw SRC_BUG; return *x_subtree; };
+	const mask & get_selection() const { if(x_selection == nullptr) throw SRC_BUG; return *x_selection; };
+	const mask & get_subtree() const { if(x_subtree == nullptr) throw SRC_BUG; return *x_subtree; };
 	bool get_warn_over() const { return x_warn_over; };
 	bool get_info_details() const { return x_info_details; };
 	bool get_display_treated() const { return x_display_treated; };
 	bool get_display_treated_only_dir() const { return x_display_treated_only_dir; };
 	bool get_display_skipped() const { return x_display_skipped; };
-	const mask & get_ea_mask() const { if(x_ea_mask == NULL) throw SRC_BUG; return *x_ea_mask; };
+	const mask & get_ea_mask() const { if(x_ea_mask == nullptr) throw SRC_BUG; return *x_ea_mask; };
 	bool get_flat() const { return x_flat; };
 	cat_inode::comparison_fields get_what_to_check() const { return x_what_to_check; };
 	bool get_warn_remove_no_match() const { return x_warn_remove_no_match; };
 	bool get_empty() const { return x_empty; };
 	bool get_empty_dir() const { return x_empty_dir; };
 	t_dirty get_dirty_behavior() const { return x_dirty; }
-	const crit_action & get_overwriting_rules() const { if(x_overwrite == NULL) throw SRC_BUG; return *x_overwrite; };
+	const crit_action & get_overwriting_rules() const { if(x_overwrite == nullptr) throw SRC_BUG; return *x_overwrite; };
 	bool get_only_deleted() const { return x_only_deleted; };
 	bool get_ignore_deleted() const { return x_ignore_deleted; };
 	const fsa_scope & get_fsa_scope() const { return x_scope; };
@@ -1184,7 +1184,7 @@ namespace libdar
     class archive_options_listing : public on_pool
     {
     public:
-	archive_options_listing() { x_selection = x_subtree = NULL;  x_slicing_first = x_slicing_others = NULL; clear(); };
+	archive_options_listing() { x_selection = x_subtree = nullptr;  x_slicing_first = x_slicing_others = nullptr; clear(); };
 	archive_options_listing(const archive_options_listing & ref) { copy_from(ref); };
 	const archive_options_listing & operator = (const archive_options_listing & ref) { destroy(); copy_from(ref); return *this; };
 	~archive_options_listing() { destroy(); };
@@ -1246,7 +1246,7 @@ namespace libdar
     class archive_options_diff : public on_pool
     {
     public:
-	archive_options_diff() { x_selection = x_subtree = x_ea_mask = NULL; clear(); };
+	archive_options_diff() { x_selection = x_subtree = x_ea_mask = nullptr; clear(); };
 	archive_options_diff(const archive_options_diff & ref) { copy_from(ref); };
 	const archive_options_diff & operator = (const archive_options_diff & ref) { destroy(); copy_from(ref); return *this; };
 	~archive_options_diff() { destroy(); };
@@ -1312,13 +1312,13 @@ namespace libdar
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
 
-	const mask & get_selection() const { if(x_selection == NULL) throw SRC_BUG; return *x_selection; };
-	const mask & get_subtree() const { if(x_subtree == NULL) throw SRC_BUG; return *x_subtree; };
+	const mask & get_selection() const { if(x_selection == nullptr) throw SRC_BUG; return *x_selection; };
+	const mask & get_subtree() const { if(x_subtree == nullptr) throw SRC_BUG; return *x_subtree; };
 	bool get_info_details() const { return x_info_details; };
 	bool get_display_treated() const { return x_display_treated; };
 	bool get_display_treated_only_dir() const { return x_display_treated_only_dir; };
 	bool get_display_skipped() const { return x_display_skipped; };
-	const mask & get_ea_mask() const { if(x_ea_mask == NULL) throw SRC_BUG; return *x_ea_mask; };
+	const mask & get_ea_mask() const { if(x_ea_mask == nullptr) throw SRC_BUG; return *x_ea_mask; };
 	cat_inode::comparison_fields get_what_to_check() const { return x_what_to_check; };
 	bool get_alter_atime() const { return x_alter_atime; };
 	bool get_furtive_read_mode() const { return x_furtive_read; };
@@ -1357,7 +1357,7 @@ namespace libdar
     class archive_options_test : public on_pool
     {
     public:
-	archive_options_test() { x_selection = x_subtree = NULL; clear(); };
+	archive_options_test() { x_selection = x_subtree = nullptr; clear(); };
 	archive_options_test(const archive_options_test & ref) { copy_from(ref); };
 	const archive_options_test & operator = (const archive_options_test & ref) { destroy(); copy_from(ref); return *this; };
 	~archive_options_test() { destroy(); };
@@ -1396,8 +1396,8 @@ namespace libdar
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
 
-	const mask & get_selection() const { if(x_selection == NULL) throw SRC_BUG; return *x_selection; };
-	const mask & get_subtree() const { if(x_subtree == NULL) throw SRC_BUG; return *x_subtree; };
+	const mask & get_selection() const { if(x_selection == nullptr) throw SRC_BUG; return *x_selection; };
+	const mask & get_subtree() const { if(x_subtree == nullptr) throw SRC_BUG; return *x_subtree; };
 	bool get_info_details() const { return x_info_details; };
 	bool get_display_treated() const { return x_display_treated; };
 	bool get_display_treated_only_dir() const { return x_display_treated_only_dir; };

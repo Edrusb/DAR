@@ -101,11 +101,11 @@ namespace libdar
 
 	bool get_first_slice_size(infinint & size) const;
 	void set_first_slice_size(const infinint & size);
-	void unset_first_slice_size() { if(first_size != NULL) { delete first_size; first_size = NULL; } };
+	void unset_first_slice_size() { if(first_size != nullptr) { delete first_size; first_size = nullptr; } };
 
 	bool get_slice_size(infinint & size) const;
 	void set_slice_size(const infinint & size);
-	void unset_slice_size() { if(slice_size != NULL) { delete slice_size; slice_size = NULL; } };
+	void unset_slice_size() { if(slice_size != nullptr) { delete slice_size; slice_size = nullptr; } };
 
 	bool is_old_header() const { return old_header; };
 	void set_format_07_compatibility() { old_header = true; };

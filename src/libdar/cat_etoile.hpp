@@ -73,7 +73,7 @@ namespace libdar
 	void set_dumped(bool val) { tags.dumped = val ? 1 : 0; };
 
 	    // return the address of the first mirage that triggered the creation of this mirage
-	    // if this object is destroyed afterward this call returns NULL
+	    // if this object is destroyed afterward this call returns nullptr
 	const void *get_first_ref() const { if(refs.size() == 0) throw SRC_BUG; return refs.front(); };
 
 

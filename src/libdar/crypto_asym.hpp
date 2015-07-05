@@ -94,7 +94,7 @@ namespace libdar
 
 	void release_context() { gpgme_release(context); };
 	void build_key_list(const std::vector<std::string> & recipients_email,  //< list of email to find a key for
-			    gpgme_key_t * & ciphering_keys,                     //< resulting NULL terminated list of keys
+			    gpgme_key_t * & ciphering_keys,                     //< resulting nullptr terminated list of keys
 			    bool signatories);                                  //< false if email key need encryption capability, true for signing
 	void release_key_list(gpgme_key_t * & ciphering_keys);
 	void fill_signing_result();

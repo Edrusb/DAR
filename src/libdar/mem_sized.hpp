@@ -52,7 +52,7 @@ namespace libdar
 	    ///
 	    /// \param[out] ptr is set to the address of the mem_allocator that will have to be informed
 	    /// when the returned block will be released
-	    /// \return the address of the newly allocated block or NULL upon failure
+	    /// \return the address of the newly allocated block or nullptr upon failure
 	void *alloc(mem_allocator * & ptr);
 
 	    /// returns true if all memory block so far allocated have been released

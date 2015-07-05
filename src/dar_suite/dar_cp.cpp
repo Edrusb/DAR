@@ -84,7 +84,7 @@ int main(int argc, char * const argv[], const char **env)
 			    env,
 			    "h",
 #if HAVE_GETOPT_LONG
-			    NULL,
+			    nullptr,
 #endif
 			    &little_main);
 }
@@ -137,7 +137,7 @@ static void show_version(shell_interaction & dialog, char *argv0)
     {
 	string cmd;
 	tools_extract_basename(argv0, cmd);
-	    // never return a NULL pointer but
+	    // never return a nullptr pointer but
 	dialog.warning(tools_printf("\n %s version %s Copyright (C) 2002-2052 Denis Corbin\n\n\n", cmd.c_str(), DAR_CP_VERSION));
 	dialog.warning(tools_printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT,  __VERSION__));
 	dialog.warning(tools_printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), cmd.c_str(), PACKAGE_VERSION));
@@ -157,12 +157,12 @@ static int open_files(shell_interaction & dialog, char *src, char *dst, int *fds
 {
     struct stat buf;
     int val = stat(dst, &buf);
-    char *tmp = NULL;
+    char *tmp = nullptr;
 
     if(val == 0 && S_ISDIR(buf.st_mode))
     {
         tmp = (char *)malloc(strlen(src)+strlen(dst)+1+1);
-        if(tmp == NULL)
+        if(tmp == nullptr)
         {
             dialog.warning(tools_printf(gettext("Memory allocation failed : %s"), strerror(errno)));
             return 0;
@@ -181,13 +181,13 @@ static int open_files(shell_interaction & dialog, char *src, char *dst, int *fds
     if(*fds < 0)
     {
         dialog.warning(tools_printf(gettext("Cannot open source file : %s"), strerror(errno)));
-        if(tmp != NULL)
+        if(tmp != nullptr)
             free(tmp);
         return 0; // error
     }
 
     *fdd = ::open(dst, O_WRONLY|O_CREAT|O_EXCL|O_BINARY, 0666);
-    if(tmp != NULL)
+    if(tmp != nullptr)
         free(tmp);
     if(*fdd < 0)
     {

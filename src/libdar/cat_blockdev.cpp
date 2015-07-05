@@ -35,7 +35,7 @@ namespace libdar
     {
 	const cat_blockdev *ref_blockdev = dynamic_cast<const cat_blockdev *>(&ref);
 
-	if(ref_blockdev == NULL)
+	if(ref_blockdev == nullptr)
 	    return false;
 	else
 	    return cat_device::operator == (ref);

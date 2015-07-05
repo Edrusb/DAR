@@ -35,7 +35,7 @@ namespace libdar
 
     mem_sized::mem_sized(U_I block_size)
     {
-	mem_cluster * tmp = NULL;
+	mem_cluster * tmp = nullptr;
 
 	if(block_size > 0)
 	{
@@ -45,13 +45,13 @@ namespace libdar
 	}
 	else // for block_size == 0 we allocate only minimal sized mem_clusters
 	    table_size_64 = 1;
-	pending_release = NULL;
+	pending_release = nullptr;
 #ifdef LIBDAR_DEBUG_MEMORY
 	sum_percent = 0;
 	num_cluster = 0;
 #endif
 	tmp = new (nothrow) mem_cluster(block_size, table_size_64, this);
-	if(tmp == NULL)
+	if(tmp == nullptr)
 	    throw Ememory("mem_sized::mem_sized");
 	try
 	{
@@ -71,19 +71,19 @@ namespace libdar
 
 	while(it != clusters.end())
 	{
-	    if(*it != NULL)
+	    if(*it != nullptr)
 		delete *it;
 	    ++it;
 
 	}
 	clusters.clear();
-	pending_release = NULL;
+	pending_release = nullptr;
     }
 
     void *mem_sized::alloc(mem_allocator * & ptr)
     {
 	while(next_free_in_table != clusters.end()
-	      && (*next_free_in_table) != NULL
+	      && (*next_free_in_table) != nullptr
 	      && ( (*next_free_in_table) == pending_release || (*next_free_in_table)->is_full() )
 	    )
 	    ++next_free_in_table;
@@ -93,23 +93,23 @@ namespace libdar
 	    next_free_in_table = clusters.begin();
 
 	    while(next_free_in_table != clusters.end()
-		  && (*next_free_in_table) != NULL
+		  && (*next_free_in_table) != nullptr
 		  && ( (*next_free_in_table) == pending_release || (*next_free_in_table)->is_full() )
 		)
 		++next_free_in_table;
 
 	    if(next_free_in_table == clusters.end())
 	    {
-		if(pending_release == NULL)
+		if(pending_release == nullptr)
 		{
 			// all clusters are full, we must allocate a new one
 
 		    if(clusters.empty())
 			throw SRC_BUG; // at least one mem_cluster should always be present
-		    if((*clusters.begin()) == NULL)
+		    if((*clusters.begin()) == nullptr)
 			throw SRC_BUG; // all *mem_cluster should be valid objects
 		    mem_cluster *tmp = new (nothrow) mem_cluster((*clusters.begin())->get_block_size(), table_size_64, this);
-		    if(tmp == NULL)
+		    if(tmp == nullptr)
 			throw Ememory("mem_sized::alloc");
 		    try
 		    {
@@ -133,12 +133,12 @@ namespace libdar
 
 		    if(next_free_in_table == clusters.end())
 			throw SRC_BUG;
-		    pending_release = NULL; // we do not have anymore a cluster pending for release
+		    pending_release = nullptr; // we do not have anymore a cluster pending for release
 		}
 	    }
 	}
 
-	if(*next_free_in_table == NULL)
+	if(*next_free_in_table == nullptr)
 	    throw SRC_BUG;
 	else
 	    ptr = *next_free_in_table;
@@ -148,7 +148,7 @@ namespace libdar
 
     void mem_sized::push_to_release_list(mem_allocator *ref)
     {
-	if(pending_release != NULL)
+	if(pending_release != nullptr)
 	{
 	    list<mem_cluster *>::iterator it = clusters.begin();
 
@@ -166,7 +166,7 @@ namespace libdar
 	    if(!pending_release->is_empty())
 		throw SRC_BUG; // some blocks have been (re-)allocated from that cluster!
 	    delete pending_release;
-	    pending_release = NULL;
+	    pending_release = nullptr;
 	    clusters.erase(it);
 	    if(clusters.size() == 0)
 		throw SRC_BUG; // should always have at least one cluster
@@ -177,7 +177,7 @@ namespace libdar
 
     bool mem_sized::is_empty() const
     {
-	return clusters.size() == 1 && (*clusters.begin()) != NULL && (*clusters.begin())->is_empty();
+	return clusters.size() == 1 && (*clusters.begin()) != nullptr && (*clusters.begin())->is_empty();
     }
 
     string mem_sized::dump() const
@@ -189,8 +189,8 @@ namespace libdar
 
 	while(it != clusters.end())
 	{
-	    if(*it == NULL)
-		ret += "  !?! NULL pointer in cluster list !?!\n";
+	    if(*it == nullptr)
+		ret += "  !?! nullptr pointer in cluster list !?!\n";
 	    else
 	    {
 		if(!(*it)->is_empty())
@@ -208,7 +208,7 @@ namespace libdar
 	U_I tmp_sum = sum_percent;
 	U_I tmp_num = num_cluster;
 
-	if(pending_release != NULL)
+	if(pending_release != nullptr)
 	{
 	    tmp_sum += pending_release->max_percent_full();
 	    ++tmp_num;

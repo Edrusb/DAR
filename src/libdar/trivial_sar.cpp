@@ -140,7 +140,7 @@ namespace libdar
 
 	    // some local variables to be used
 
-	fichier_global *tmp = NULL;
+	fichier_global *tmp = nullptr;
 	const string filename = sar_tools_make_filename(base_name, 1, x_min_digits, extension);
 
 	    // sanity checks
@@ -149,7 +149,7 @@ namespace libdar
 
 	    // initializing object fields from constructor arguments
 
-	reference = NULL;
+	reference = nullptr;
 	offset = 0;
 	cur_pos = 0;
 	end_of_slice = 0;
@@ -181,7 +181,7 @@ namespace libdar
 		switch(e.get_code())
 		{
 		case Esystem::io_exist:
-		    if(tmp != NULL)
+		    if(tmp != nullptr)
 			throw SRC_BUG;
 
 		    if(!allow_over)
@@ -215,19 +215,19 @@ namespace libdar
 		    }
 		    break;
 		case Esystem::io_absent:
-		    if(tmp != NULL)
+		    if(tmp != nullptr)
 			throw SRC_BUG;
 		    else
 			throw SRC_BUG; // not for the same reason, must know that reporting the same error but on a different line
 		default:
-		    if(tmp != NULL)
+		    if(tmp != nullptr)
 			throw SRC_BUG;
 		    else
 			throw SRC_BUG; // not for the same reason, must know that reporting the same error but on a different line
 		}
 	    }
 
-	    if(tmp == NULL)
+	    if(tmp == nullptr)
 		throw SRC_BUG;
 
 		// telling the system to write data directly to disk not going through the cache
@@ -239,16 +239,16 @@ namespace libdar
 	    set_info_status(CONTEXT_LAST_SLICE);
 	    reference = tmp;
 	    init(internal_name);
-	    tmp = NULL; // setting it to null only now was necesary to be able to release the object in case of exception
+	    tmp = nullptr; // setting it to null only now was necesary to be able to release the object in case of exception
 	}
 	catch(...)
 	{
-	    if(tmp != NULL)
+	    if(tmp != nullptr)
 		delete tmp;
 	    throw;
 	}
 
-	if(tmp != NULL)
+	if(tmp != nullptr)
 	    throw SRC_BUG;
     }
 
@@ -258,7 +258,7 @@ namespace libdar
 			     bool lax) : generic_file(gf_read_only) , mem_ui(dialog)
     {
 	label for_init;
-	reference = NULL;
+	reference = nullptr;
 	offset = 0;
 	cur_pos = 0;
 	end_of_slice = 0;
@@ -277,7 +277,7 @@ namespace libdar
 	    else
 		reference = new (get_pool()) tuyau(dialog, pipename, gf_read_only);
 
-	    if(reference == NULL)
+	    if(reference == nullptr)
 		throw Ememory("trivial_sar::trivial_sar");
 
 	    for_init.clear();
@@ -285,10 +285,10 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    if(reference != NULL)
+	    if(reference != nullptr)
 	    {
 		delete reference;
-		reference = NULL;
+		reference = nullptr;
 	    }
 	    throw;
 	}
@@ -301,7 +301,7 @@ namespace libdar
 			     bool format_07_compatible,
 			     const std::string & execute) : generic_file(gf_write_only), mem_ui(dialog)
     {
-	if(f == NULL)
+	if(f == nullptr)
 	    throw SRC_BUG;
 
 	reference = f;
@@ -330,7 +330,7 @@ namespace libdar
 	{
 		/// ignore all exceptions
 	}
-	if(reference != NULL)
+	if(reference != nullptr)
 	    delete reference;
     }
 
@@ -347,7 +347,7 @@ namespace libdar
 
     void trivial_sar::inherited_terminate()
     {
-	if(reference != NULL)
+	if(reference != nullptr)
 	{
 	    char last = flag_type_terminal;
 
@@ -365,7 +365,7 @@ namespace libdar
 	    }
 
 	    delete reference; // this closes the slice so we can now eventually play with it:
-	    reference = NULL;
+	    reference = nullptr;
 	}
 	if(hook != "")
 	{
@@ -468,7 +468,7 @@ namespace libdar
 	U_I ret = reference->read(a, size);
 	tuyau *tmp = dynamic_cast<tuyau *>(reference);
 
-	if(tmp != NULL && !tmp->has_next_to_read())
+	if(tmp != nullptr && !tmp->has_next_to_read())
 	{
 	    if(ret > 0)
 	    {

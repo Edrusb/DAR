@@ -58,26 +58,26 @@ argc_argv::argc_argv(S_I size)
     if(x_argc > 0)
     {
 	x_argv = new (nothrow) char *[size];
-	if(x_argv == NULL)
+	if(x_argv == nullptr)
 	    throw Ememory("argc_argv::argc_argv");
 
 	for(S_I i = 0; i < x_argc; i++)
-	    x_argv[i] = NULL;
+	    x_argv[i] = nullptr;
     }
     else
-	x_argv = NULL;
+	x_argv = nullptr;
 }
 
 argc_argv::~argc_argv()
 {
-    if(x_argv == NULL && x_argc > 0)
+    if(x_argv == nullptr && x_argc > 0)
 	throw SRC_BUG;
 
     for(S_I i = 0; i < x_argc; i++)
-	if(x_argv[i] != NULL)
+	if(x_argv[i] != nullptr)
 	{
 	    delete [] x_argv[i];
-	    x_argv[i] = NULL;
+	    x_argv[i] = nullptr;
 	}
 
     if(x_argc > 0)
@@ -89,14 +89,14 @@ void argc_argv::set_arg(const string & arg, S_I index)
     if(index >= x_argc)
 	throw Erange("argc_argv::set_arg", gettext("Index out of range"));
 
-    if(x_argv[index] != NULL)
+    if(x_argv[index] != nullptr)
     {
 	delete [] x_argv[index];
-	x_argv[index] = NULL;
+	x_argv[index] = nullptr;
     }
 
     x_argv[index] = new (nothrow) char[arg.size() + 1];
-    if(x_argv[index] == NULL)
+    if(x_argv[index] == nullptr)
 	throw Ememory("argc_argv::set_arg");
     strncpy(x_argv[index], arg.c_str(), arg.size());
     x_argv[index][arg.size()] = '\0';
@@ -107,14 +107,14 @@ void argc_argv::set_arg(generic_file & f, U_I size, S_I index)
     if(index >= x_argc)
 	throw Erange("argc_argv::set_arg", gettext("Index out of range"));
 
-    if(x_argv[index] != NULL)
+    if(x_argv[index] != nullptr)
     {
 	delete [] x_argv[index];
-	x_argv[index] = NULL;
+	x_argv[index] = nullptr;
     }
 
     x_argv[index] = new (nothrow) char [size+1];
-    if(x_argv[index] == NULL)
+    if(x_argv[index] == nullptr)
 	throw Ememory("argc_argv::set_arg");
 
     x_argv[index][f.read(x_argv[index], size)] = '\0';
@@ -122,21 +122,21 @@ void argc_argv::set_arg(generic_file & f, U_I size, S_I index)
 
 void argc_argv::resize(S_I size)
 {
-    char **tmp = NULL;
+    char **tmp = nullptr;
 
     if(size == x_argc)
 	return;
 
     if(size < x_argc)
 	for(S_I i = size; i < x_argc; i++)
-	    if(x_argv[i] != NULL)
+	    if(x_argv[i] != nullptr)
 	    {
 		delete [] x_argv[i];
-		x_argv[i] = NULL;
+		x_argv[i] = nullptr;
 	    }
 
     tmp = new (nothrow) char*[size];
-    if(tmp == NULL)
+    if(tmp == nullptr)
 	throw Ememory("argc_argv::resize");
 
     try
@@ -147,17 +147,17 @@ void argc_argv::resize(S_I size)
 	    tmp[i] = x_argv[i];
 
 	for(S_I i = min; i < size; i++)
-	    tmp[i] = NULL;
+	    tmp[i] = nullptr;
 
 	if(x_argc > 0)
 	    delete [] x_argv;
 	x_argv = tmp;
-	tmp = NULL;
+	tmp = nullptr;
 	x_argc = size;
     }
     catch(...)
     {
-	if(tmp != NULL)
+	if(tmp != nullptr)
 	    delete [] tmp;
 	throw;
     }
@@ -410,7 +410,7 @@ vector<string> line_tools_explode_PATH(const char *the_path)
     const char *last = it;
 
     ret.clear();
-    if(it == NULL)
+    if(it == nullptr)
 	return ret;
 
     while(*it != '\0')
@@ -435,7 +435,7 @@ string line_tools_get_full_path_from_PATH(const vector<string> & the_path, const
     string ret;
     bool no_path = false;
 
-    if(filename == NULL)
+    if(filename == nullptr)
 	throw SRC_BUG;
     else
     {
@@ -494,7 +494,7 @@ void line_tools_split_at_first_space(const char *field, string & before_space, s
 {
     const char *ptr = field;
 
-    if(field == NULL)
+    if(field == nullptr)
 	throw SRC_BUG;
     while(*ptr != ' ' && *ptr != '\0')
 	++ptr;
@@ -599,11 +599,11 @@ void line_tools_look_for(const vector<char> & arguments,
     (void)line_tools_reset_getopt();
 #if HAVE_GETOPT_LONG
     const struct option *ptr_long_opt = long_options;
-    const struct option voided = { NULL, 0, NULL, 0 };
-    if(long_options == NULL)
+    const struct option voided = { nullptr, 0, nullptr, 0 };
+    if(long_options == nullptr)
 	ptr_long_opt = &voided;
 
-    while((lu = getopt_long(argc, argv, getopt_string, ptr_long_opt, NULL)) != EOF)
+    while((lu = getopt_long(argc, argv, getopt_string, ptr_long_opt, nullptr)) != EOF)
 #else
 	while((lu = getopt(argc, argv, getopt_string)) != EOF)
 #endif
@@ -678,9 +678,9 @@ void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
 							bool ea_erase,
 							const crit_action * & overwrite)
 {
-    crit_action *tmp1 = NULL;
-    crit_action *tmp2 = NULL; // tmp1 and tmp2 are used for construction of the overwriting policy
-    overwrite = NULL;
+    crit_action *tmp1 = nullptr;
+    crit_action *tmp2 = nullptr; // tmp1 and tmp2 are used for construction of the overwriting policy
+    overwrite = nullptr;
 
     try
     {
@@ -690,61 +690,61 @@ void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
 		overwrite = new crit_constant_action(data_overwrite, EA_overwrite);
 	    else
 		overwrite = new crit_constant_action(data_overwrite, EA_merge_overwrite);
-	    if(overwrite == NULL)
+	    if(overwrite == nullptr)
 		throw Ememory("tools_build_compatible_overwriting_policy");
 
 	    tmp1 = new crit_constant_action(data_preserve, EA_preserve);
-	    if(tmp1 == NULL)
+	    if(tmp1 == nullptr)
 		throw Ememory("tools_build_compatible_overwriting_policy");
 
 	    if(more_recent)
 	    {
 		tmp2 = new testing(crit_invert(crit_in_place_data_more_recent(hourshift)), *overwrite, *tmp1);
-		if(tmp2 == NULL)
+		if(tmp2 == nullptr)
 		    throw Ememory("tools_build_compatible_overwriting_policy");
 
 		delete overwrite;
 		overwrite = tmp2;
-		tmp2 = NULL;
+		tmp2 = nullptr;
 	    }
 
 	    if(!detruire)
 	    {
 		tmp2 = new testing(crit_invert(crit_in_place_is_inode()), *overwrite, *tmp1);
-		if(tmp2 == NULL)
+		if(tmp2 == nullptr)
 		    throw Ememory("tools_build_compatible_overwriting_policy");
 		delete overwrite;
 		overwrite = tmp2;
-		tmp2 = NULL;
+		tmp2 = nullptr;
 	    }
 
 	    delete tmp1;
-	    tmp1 = NULL;
+	    tmp1 = nullptr;
 	}
 	else
 	{
 	    overwrite = new crit_constant_action(data_preserve, EA_preserve);
-	    if(overwrite == NULL)
+	    if(overwrite == nullptr)
 		throw Ememory("tools_build_compatible_overwriting_policy");
 	}
 
-	if(overwrite == NULL)
+	if(overwrite == nullptr)
 	    throw SRC_BUG;
-	if(tmp1 != NULL)
+	if(tmp1 != nullptr)
 	    throw SRC_BUG;
-	if(tmp2 != NULL)
+	if(tmp2 != nullptr)
 	    throw SRC_BUG;
     }
     catch(...)
     {
-	if(tmp1 != NULL)
+	if(tmp1 != nullptr)
 	    delete tmp1;
-	if(tmp2 != NULL)
+	if(tmp2 != nullptr)
 	    delete tmp2;
-	if(overwrite != NULL)
+	if(overwrite != nullptr)
 	{
 	    delete overwrite;
-	    overwrite = NULL;
+	    overwrite = nullptr;
 	}
 	throw;
     }

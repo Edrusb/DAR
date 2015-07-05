@@ -105,7 +105,7 @@ namespace libdar
 	    wrote += fichier_global_inherited_write(a+wrote, size-wrote);
 	    if(wrote < size)
 	    {
-		if(x_dialog == NULL)
+		if(x_dialog == nullptr)
 		    throw SRC_BUG;
 		x_dialog->pause(gettext("No space left on device, you have the opportunity to make room now. When ready : can we continue ?"));
 	    }
@@ -121,7 +121,7 @@ namespace libdar
 	while(!fichier_global_inherited_read(a+ret, size-ret, read, message))
 	{
 	    ret += read;
-	    if(x_dialog == NULL)
+	    if(x_dialog == nullptr)
 		throw SRC_BUG;
 	    x_dialog->pause(message);
 	}
@@ -134,21 +134,21 @@ namespace libdar
     fichier_global::fichier_global(const user_interaction & dialog, gf_mode mode) : generic_file(mode)
     {
 	x_dialog = dialog.clone();
-	if(x_dialog == NULL)
+	if(x_dialog == nullptr)
 	    throw SRC_BUG;
     }
 
 
     void fichier_global::copy_from(const fichier_global & ref)
     {
-	if(ref.x_dialog != NULL)
+	if(ref.x_dialog != nullptr)
 	{
 	    x_dialog = ref.x_dialog->clone();
-	    if(x_dialog == NULL)
+	    if(x_dialog == nullptr)
 		throw Ememory("fichier_global::copy_from");
 	}
 	else
-	    x_dialog = NULL;
+	    x_dialog = nullptr;
     }
 
     void fichier_global::copy_parent_from(const fichier_global & ref)

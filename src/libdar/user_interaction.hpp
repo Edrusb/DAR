@@ -280,7 +280,7 @@ namespace libdar
 	    //! copy constructor and = operator may have to be overwritten too if necessary
 	    //! Warning !
 	    //! clone() must throw exception if necessary (Ememory), but never
-	    //! return a NULL pointer !
+	    //! return a nullptr pointer !
 	virtual user_interaction *clone() const = 0;
 
 	    /// make a pause each N line of output when calling the warning method
@@ -349,7 +349,7 @@ namespace libdar
 	    //! called from this object.
 	    //! \note The context argument of each callback is set with the context_value given
 	    //! in the user_interaction_callback object constructor. The value can
-	    //! can be any arbitrary value (NULL is valid), and can be used as you wish.
+	    //! can be any arbitrary value (nullptr is valid), and can be used as you wish.
 	    //! Note that the listing callback is not defined here, but thanks to a specific method
 	user_interaction_callback(void (*x_warning_callback)(const std::string &x, void *context),
 				  bool (*x_answer_callback)(const std::string &x, void *context),
@@ -518,7 +518,7 @@ namespace libdar
 	std::string get_string(const std::string & message, bool echo) { return "user_interaction_blind, is blindly answering no"; };
 	secu_string get_secu_string(const std::string & message, bool echo) { return secu_string(); };
 
-	user_interaction *clone() const { user_interaction *ret = new (get_pool()) user_interaction_blind(); if(ret == NULL) throw Ememory("user_interaction_blind::clone"); return ret; };
+	user_interaction *clone() const { user_interaction *ret = new (get_pool()) user_interaction_blind(); if(ret == nullptr) throw Ememory("user_interaction_blind::clone"); return ret; };
 
     protected:
 	void inherited_warning(const std::string & message) {}; // do not display any warning, this is "bind user_interaction" !

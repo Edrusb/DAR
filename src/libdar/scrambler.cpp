@@ -37,13 +37,13 @@ namespace libdar
 	    // this does not open any security breach...
         len = pass.size();
         ref = & hidden_side;
-        buffer = NULL;
+        buffer = nullptr;
         buf_size = 0;
     }
 
     U_I scrambler::inherited_read(char *a, U_I size)
     {
-        if(ref == NULL)
+        if(ref == nullptr)
             throw SRC_BUG;
 
         unsigned char *ptr = (unsigned char *)a;
@@ -61,19 +61,19 @@ namespace libdar
     void scrambler::inherited_write(const char *a, U_I size)
     {
         const unsigned char *ptr = (const unsigned char *)a;
-        if(ref == NULL)
+        if(ref == nullptr)
             throw SRC_BUG;
 
         U_32 index = ref->get_position() % len;
         if(size > buf_size)
         {
-            if(buffer != NULL)
+            if(buffer != nullptr)
             {
                 meta_delete(buffer);
-                buffer = NULL;
+                buffer = nullptr;
             }
             meta_new(buffer, size);
-            if(buffer != NULL)
+            if(buffer != nullptr)
                 buf_size = size;
             else
             {

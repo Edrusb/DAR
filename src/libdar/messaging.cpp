@@ -357,7 +357,7 @@ namespace libdar
 	infinint ret;
 
 	messaging_decode *me = const_cast<messaging_decode *>(this);
-	if(me == NULL)
+	if(me == nullptr)
 	    throw SRC_BUG;
 
 	me->buffer.skip(0);
@@ -372,7 +372,7 @@ namespace libdar
 	U_I ret;
 
 	messaging_decode *me = const_cast<messaging_decode *>(this);
-	if(me == NULL)
+	if(me == nullptr)
 	    throw SRC_BUG;
 
 	    // no ending conversion, we stay in the same process on the same host
@@ -392,7 +392,7 @@ namespace libdar
 	string ret;
 
 	messaging_decode *me = const_cast<messaging_decode *>(this);
-	if(me == NULL)
+	if(me == nullptr)
 	    throw SRC_BUG;
 
 	me->buffer.skip(0);
@@ -407,7 +407,7 @@ namespace libdar
 	U_I lu;
 
 	messaging_decode *me = const_cast<messaging_decode *>(this);
-	if(me == NULL)
+	if(me == nullptr)
 	    throw SRC_BUG;
 
 	    // no ending conversion, we stay in the same process on the same host
@@ -426,7 +426,7 @@ namespace libdar
 	label ret;
 
 	messaging_decode *me = const_cast<messaging_decode *>(this);
-	if(me == NULL)
+	if(me == nullptr)
 	    throw SRC_BUG;
 
 	me->buffer.skip(0);

@@ -55,7 +55,7 @@ namespace libdar
 
     const char *dar_gettext(const char *arg)
     {
-	const char *ret = NULL;
+	const char *ret = nullptr;
 
 	NLS_SWAP_IN;
 	try
@@ -144,11 +144,11 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    if(symbols != NULL)
+	    if(symbols != nullptr)
 		free(symbols);
 	    throw;
 	}
-	if(symbols != NULL)
+	if(symbols != nullptr)
 	    free(symbols);
 #else
 	Egeneric::stack("stack dump", "backtrace() call absent, cannot dump the stack information at the time the exception was thrown");

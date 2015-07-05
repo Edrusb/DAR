@@ -91,8 +91,8 @@ namespace libdar
 	bool furtive_mode;
 	etage *contents;
 
-	void copy_from(const entrepot_local & ref) { furtive_mode = ref.furtive_mode; contents = NULL; };
-	void detruit() { if(contents != NULL) { delete contents; contents = NULL; } };
+	void copy_from(const entrepot_local & ref) { furtive_mode = ref.furtive_mode; contents = nullptr; };
+	void detruit() { if(contents != nullptr) { delete contents; contents = nullptr; } };
     };
 
 	/// @}

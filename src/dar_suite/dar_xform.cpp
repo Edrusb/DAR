@@ -92,15 +92,15 @@ int main(S_I argc, char *const argv[], const char **env)
 			    env,
 			    OPT_STRING,
 #if HAVE_GETOPT_LONG
-			    NULL,
+			    nullptr,
 #endif
 			    &sub_main);
 }
 
 static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], const char **env)
 {
-    path *src_dir = NULL;
-    path *dst_dir = NULL;
+    path *src_dir = nullptr;
+    path *dst_dir = nullptr;
     string src, dst;
     infinint first, size;
     bool warn, allow, beep;
@@ -121,8 +121,8 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 			warn, allow, pause, beep, execute_src, execute_dst, slice_perm, slice_user, slice_group, hash,
 			src_min_digits, dst_min_digits))
 	{
-	    generic_file *dst_sar = NULL;
-	    generic_file *src_sar = NULL;
+	    generic_file *dst_sar = nullptr;
+	    generic_file *src_sar = nullptr;
 	    label data_name;
 	    label internal_name;
 	    entrepot_local entrep = entrepot_local(slice_user, slice_group, false);
@@ -151,31 +151,31 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 		if(src == "-")
 		{
 		    trivial_sar *tmp_sar = new (nothrow) trivial_sar(dialog, src, false);
-		    if(tmp_sar == NULL)
+		    if(tmp_sar == nullptr)
 			throw Ememory("sub_main");
 		    format_07_compatible = tmp_sar->is_an_old_start_end_archive();
 
 		    src_sar = tmp_sar;
-		    if(src_sar != NULL)
+		    if(src_sar != nullptr)
 			data_name = tmp_sar->get_data_name();
 		    else
 			throw SRC_BUG;
 		}
 		else 	// source not from a pipe
 		{
-		    if(src_dir != NULL)
+		    if(src_dir != nullptr)
 			entrep.set_location(*src_dir);
 		    else
 			throw SRC_BUG;
 
 		    sar *tmp_sar = new (nothrow) sar(dialog, src, EXTENSION, entrep, false, src_min_digits, false, execute_src);
-		    if(tmp_sar == NULL)
+		    if(tmp_sar == nullptr)
 			throw Ememory("main");
 		    else
 			tmp_sar->set_info_status(CONTEXT_OP);
 		    format_07_compatible = tmp_sar->is_an_old_start_end_archive();
 		    src_sar = tmp_sar;
-		    if(src_sar != NULL)
+		    if(src_sar != nullptr)
 			data_name = tmp_sar->get_data_name();
 		    else
 			throw SRC_BUG;
@@ -184,7 +184,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 		if(size.is_zero())
 		    if(dst == "-")
 			dst_sar = macro_tools_open_archive_tuyau(dialog,
-								 NULL,
+								 nullptr,
 								 1,
 								 gf_write_only,
 								 internal_name,
@@ -193,7 +193,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 								 execute_dst);
 		    else
 		    {
-			if(dst_dir != NULL)
+			if(dst_dir != nullptr)
 			    entrep.set_location(*dst_dir);
 			else
 			    throw SRC_BUG;
@@ -215,7 +215,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 		    }
 		else
 		{
-		    if(dst_dir != NULL)
+		    if(dst_dir != nullptr)
 			entrep.set_location(*dst_dir);
 		    else
 			throw SRC_BUG;
@@ -238,7 +238,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 						format_07_compatible,
 						execute_dst);
 		}
-		if(dst_sar == NULL)
+		if(dst_sar == nullptr)
 		    throw Ememory("main");
 
 		thr.check_self_cancellation();
@@ -271,15 +271,15 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 	    }
 	    catch(...)
 	    {
-		if(dst_sar != NULL)
+		if(dst_sar != nullptr)
 		    delete dst_sar;
-		if(src_sar != NULL)
+		if(src_sar != nullptr)
 		    delete src_sar;
 		throw;
 	    }
-	    if(src_sar != NULL)
+	    if(src_sar != nullptr)
 		delete src_sar;
-	    if(dst_sar != NULL)
+	    if(dst_sar != nullptr)
 		delete dst_sar;
 
 	    ret = EXIT_OK;
@@ -289,15 +289,15 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
     }
     catch(...)
     {
-	if(src_dir != NULL)
+	if(src_dir != nullptr)
 	    delete src_dir;
-	if(dst_dir != NULL)
+	if(dst_dir != nullptr)
 	    delete dst_dir;
 	throw;
     }
-    if(src_dir != NULL)
+    if(src_dir != nullptr)
 	delete src_dir;
-    if(dst_dir != NULL)
+    if(dst_dir != nullptr)
 	delete dst_dir;
     return ret;
 }
@@ -321,8 +321,8 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
 			 infinint & dst_min_digits)
 {
     S_I lu;
-    src_dir = NULL;
-    dst_dir = NULL;
+    src_dir = nullptr;
+    dst_dir = nullptr;
     warn = true;
     allow = true;
     pause = 0;
@@ -348,7 +348,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
             case 's':
                 if(!file_size.is_zero())
                     throw Erange("command_line", gettext("Only one -s option is allowed"));
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("command_line", gettext("Missing argument to -s"));
                 else
                 {
@@ -366,7 +366,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
                 }
                 break;
             case 'S':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("command_line", gettext("Missing argument to -S"));
                 if(first_file_size.is_zero())
                     first_file_size = tools_get_extended_size(optarg, suffix_base);
@@ -393,7 +393,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
                             throw Erange("command_line", gettext("Only one -S option is allowed"));
                 break;
             case 'p':
-		if(optarg != NULL)
+		if(optarg != nullptr)
 		{
 			// note that the namespace specification is necessary
 			// due to similar existing name in std namespace under
@@ -420,7 +420,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
                 show_version(dialog, argv[0]);
                 return false;
             case 'E':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("command_line", gettext("Missing argument to -E"));
                 if(execute_dst == "")
                     execute_dst = optarg;
@@ -428,7 +428,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
 		    execute_dst += string(" ; ") + optarg;
                 break;
             case 'F':
-                if(optarg == NULL)
+                if(optarg == nullptr)
                     throw Erange("command_line", gettext("Missing argument to -F"));
                 if(execute_src == "")
                     execute_src = optarg;
@@ -436,7 +436,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
 		    execute_src += string(" ; ") + optarg;
                 break;
 	    case 'a':
-		if(optarg == NULL)
+		if(optarg == nullptr)
 		    throw Erange("command_line", gettext("-a option requires an argument"));
 		if(strcasecmp("SI-unit", optarg) == 0 || strcasecmp("SI", optarg) == 0 || strcasecmp("SI-units", optarg) == 0)
 		    suffix_base = TOOLS_SI_SUFFIX;
@@ -449,12 +449,12 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
 	    case 'Q':
 		break;  // ignore this option already parsed during initialization (dar_suite.cpp)
 	    case '^':
-		if(optarg == NULL)
+		if(optarg == nullptr)
 		    throw Erange("command_line", tools_printf(gettext("Missing argument to -^"), char(lu)));
 		line_tools_slice_ownership(string(optarg), slice_perm, slice_user, slice_group);
 		break;
 	    case '3':
-		if(optarg == NULL)
+		if(optarg == nullptr)
 		    throw Erange("command_line", tools_printf(gettext("Missing argument to --hash"), char(lu)));
 		if(strcasecmp(optarg, "md5") == 0)
 		    hash = hash_md5;
@@ -465,7 +465,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
 			throw Erange("command_line", string(gettext("Unknown parameter given to --hash option: ")) + optarg);
 		break;
 	    case '9':
-		if(optarg == NULL)
+		if(optarg == nullptr)
 		    throw Erange("command_line", tools_printf(gettext("Missing argument to --min-digits"), char(lu)));
 		else
 		{
@@ -518,12 +518,12 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
     }
     catch(...)
     {
-        if(src_dir != NULL)
+        if(src_dir != nullptr)
             delete src_dir;
-	src_dir = NULL;
-        if(dst_dir != NULL)
+	src_dir = nullptr;
+        if(dst_dir != nullptr)
             delete dst_dir;
-	dst_dir = NULL;
+	dst_dir = nullptr;
         throw;
     }
     return true;

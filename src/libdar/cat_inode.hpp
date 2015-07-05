@@ -93,7 +93,7 @@ namespace libdar
         void set_last_modif(const datetime & x_time) { last_mod = x_time; };
         saved_status get_saved_status() const { return xsaved; };
         void set_saved_status(saved_status x) { xsaved = x; };
-	infinint get_device() const { if(fs_dev == NULL) throw SRC_BUG; return *fs_dev; };
+	infinint get_device() const { if(fs_dev == nullptr) throw SRC_BUG; return *fs_dev; };
 
         bool same_as(const cat_inode & ref) const;
         bool is_more_recent_than(const cat_inode & ref, const infinint & hourshift) const;
@@ -149,7 +149,7 @@ namespace libdar
             // IV : to know/record if EA and FSA have been modified # any EA status# and FSA status #
         datetime get_last_change() const;
         void set_last_change(const datetime & x_time);
-	bool has_last_change() const { return last_cha != NULL; };
+	bool has_last_change() const { return last_cha != nullptr; };
 	    // old format did provide last_change only when EA were present, since archive
 	    // format 8, this field is always present even in absence of EA. Thus it is
 	    // still necessary to check if the cat_inode has a last_change() before
@@ -171,7 +171,7 @@ namespace libdar
 	void fsa_set_saved_status(fsa_status status);
 	fsa_status fsa_get_saved_status() const { return fsa_saved; };
 	    /// gives the set of FSA family recorded for that inode
-	fsa_scope fsa_get_families() const { if(fsa_families == NULL) throw SRC_BUG; return infinint_to_fsa_scope(*fsa_families); };
+	fsa_scope fsa_get_families() const { if(fsa_families == nullptr) throw SRC_BUG; return infinint_to_fsa_scope(*fsa_families); };
 
 
 
@@ -216,7 +216,7 @@ namespace libdar
             // the following is used if ea_saved == full or ea_saved == partial or
         crc *ea_crc;             //< CRC computed on EA
 
-	infinint *fsa_families; //< list of FSA families present for that inode (set to NULL in fsa_none mode)
+	infinint *fsa_families; //< list of FSA families present for that inode (set to nullptr in fsa_none mode)
 	infinint *fsa_offset;    //< offset in archive where to find FSA  # always allocated (to be reviewed)
 	filesystem_specific_attribute_list *fsal; //< Filesystem Specific Attributes read or to be written down # only allocated if fsa_saved if set to FULL
 	infinint *fsa_size;      //< storage size required for FSA

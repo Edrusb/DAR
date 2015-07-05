@@ -213,17 +213,17 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    if(x_warning_callback == NULL || x_answer_callback == NULL)
-		throw Elibcall("user_interaction_callback::user_interaction_callback", dar_gettext("NULL given as argument of user_interaction_callback()"));
+	    if(x_warning_callback == nullptr || x_answer_callback == nullptr)
+		throw Elibcall("user_interaction_callback::user_interaction_callback", dar_gettext("nullptr given as argument of user_interaction_callback()"));
 	    warning_callback = x_warning_callback;
 	    answer_callback  = x_answer_callback;
 	    string_callback  = x_string_callback;
 	    secu_string_callback  = x_secu_string_callback;
-	    tar_listing_callback = NULL;
-	    dar_manager_show_files_callback = NULL;
-	    dar_manager_contents_callback = NULL;
-	    dar_manager_statistics_callback = NULL;
-	    dar_manager_show_version_callback = NULL;
+	    tar_listing_callback = nullptr;
+	    dar_manager_show_files_callback = nullptr;
+	    dar_manager_contents_callback = nullptr;
+	    dar_manager_statistics_callback = nullptr;
+	    dar_manager_show_version_callback = nullptr;
 	    context_val = context_value;
 	}
 	catch(...)
@@ -236,7 +236,7 @@ namespace libdar
 
     void user_interaction_callback::pause(const string & message)
     {
-        if(answer_callback == NULL)
+        if(answer_callback == nullptr)
 	    throw SRC_BUG;
         else
 	{
@@ -263,7 +263,7 @@ namespace libdar
 
     void user_interaction_callback::inherited_warning(const string & message)
     {
-        if(warning_callback == NULL)
+        if(warning_callback == nullptr)
 	    throw SRC_BUG;
         else
 	{
@@ -284,7 +284,7 @@ namespace libdar
 
     string user_interaction_callback::get_string(const string & message, bool echo)
     {
-	if(string_callback == NULL)
+	if(string_callback == nullptr)
 	    throw SRC_BUG;
 	else
 	{
@@ -305,7 +305,7 @@ namespace libdar
 
     secu_string user_interaction_callback::get_secu_string(const string & message, bool echo)
     {
-	if(string_callback == NULL)
+	if(string_callback == nullptr)
 	    throw SRC_BUG;
 	else
 	{
@@ -334,7 +334,7 @@ namespace libdar
 					    bool is_dir,
 					    bool has_children)
     {
-	if(tar_listing_callback != NULL)
+	if(tar_listing_callback != nullptr)
 	{
 	    try
 	    {
@@ -355,7 +355,7 @@ namespace libdar
 							   bool available_data,
 							   bool available_ea)
     {
-	if(dar_manager_show_files_callback != NULL)
+	if(dar_manager_show_files_callback != nullptr)
 	{
 	    try
 	    {
@@ -376,7 +376,7 @@ namespace libdar
 							 const std::string & chemin,
 							 const std::string & archive_name)
     {
-	if(dar_manager_contents_callback != NULL)
+	if(dar_manager_contents_callback != nullptr)
 	{
 	    try
 	    {
@@ -399,7 +399,7 @@ namespace libdar
 							   const infinint & ea_count,
 							   const infinint & total_ea)
     {
-	if(dar_manager_statistics_callback != NULL)
+	if(dar_manager_statistics_callback != nullptr)
 	{
 	    try
 	    {
@@ -422,7 +422,7 @@ namespace libdar
 							     const string & ea_date,
 							     const string & ea_presence)
     {
-	if(dar_manager_show_version_callback != NULL)
+	if(dar_manager_show_version_callback != nullptr)
 	{
 	    try
 	    {
@@ -443,7 +443,7 @@ namespace libdar
     user_interaction * user_interaction_callback::clone() const
     {
 	user_interaction *ret = new (get_pool()) user_interaction_callback(*this); // copy constructor
-	if(ret == NULL)
+	if(ret == nullptr)
 	    throw Ememory("user_interaction_callback::clone");
 	else
 	    return ret;

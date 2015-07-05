@@ -220,10 +220,10 @@ namespace libdar
 
     template <class T> T *cloner(const T *x, memory_pool *p)
     {
-	if(x == NULL)
+	if(x == nullptr)
 	    throw SRC_BUG;
 	T *ret = new (p) T(*x);
-	if(ret == NULL)
+	if(ret == nullptr)
 	    throw Ememory("cloner template");
 
 	return ret;

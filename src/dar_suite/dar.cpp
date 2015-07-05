@@ -73,7 +73,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
     vector<string> dar_dcf_path = line_tools_explode_PATH(tools_get_from_env(env, "DAR_DCF_PATH"));
     vector<string> dar_duc_path = line_tools_explode_PATH(tools_get_from_env(env, "DAR_DUC_PATH"));
 
-    if(home == NULL)
+    if(home == nullptr)
         home = "/";
     if(! get_args(dialog,
 		  home,
@@ -90,9 +90,9 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
     }
     else // get_args is OK, we've got a valid command line
     {
-	archive *arch = NULL;
-	archive *aux = NULL;
-	archive *cur = NULL;
+	archive *arch = nullptr;
+	archive *aux = nullptr;
+	archive *cur = nullptr;
         dialog.set_beep(param.beep);
 
         if(param.filename != "-"
@@ -121,14 +121,14 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
             {
             case create:
 	    case merging:
-		if(param.ref_filename != NULL && param.ref_root != NULL)
+		if(param.ref_filename != nullptr && param.ref_root != nullptr)
 		{
 		    line_tools_crypto_split_algo_pass(param.pass_ref,
 						      crypto,
 						      tmp_pass,
 						      no_cipher_given,
 						      recipients);
-		    if(param.op == merging && param.aux_root != NULL && param.info_details)
+		    if(param.op == merging && param.aux_root != nullptr && param.info_details)
 			dialog.warning(gettext("Considering the (first) archive of reference:"));
 		    read_options.clear();
 		    if(no_cipher_given)
@@ -157,11 +157,11 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    }
 		    arch = new (nothrow) archive(dialog, *param.ref_root, *param.ref_filename, EXTENSION,
 						 read_options);
-		    if(arch == NULL)
+		    if(arch == nullptr)
 			throw Ememory("little_main");
 		}
 
-		if(param.aux_root != NULL && param.aux_filename != NULL)
+		if(param.aux_root != nullptr && param.aux_filename != nullptr)
 		{
 		    if(param.op != merging && param.op != create)
 			throw SRC_BUG;
@@ -194,7 +194,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    throw Erange("little_main", gettext("Using sequential reading mode for archive source is not possible for merging operation"));
 			aux = new (nothrow) archive(dialog, *param.aux_root, *param.aux_filename, EXTENSION,
 						    read_options);
-			if(aux == NULL)
+			if(aux == nullptr)
 			    throw Ememory("little_main");
 		    }
 		}
@@ -209,7 +209,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		{
 		case create:
 		    create_options.clear();
-		    if(arch != NULL)
+		    if(arch != nullptr)
 		    {
 			arch->drop_all_filedescriptors(dialog);
 			create_options.set_reference(arch);
@@ -265,13 +265,13 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    create_options.set_fsa_scope(param.scope);
 		    create_options.set_multi_threaded(param.multi_threaded);
 
-		    if(param.backup_hook_mask != NULL)
+		    if(param.backup_hook_mask != nullptr)
 			create_options.set_backup_hook(param.backup_hook_execute, *param.backup_hook_mask);
 		    create_options.set_ignore_unknown_inode_type(param.ignore_unknown_inode);
 		    cur = new (nothrow) archive(dialog, *param.fs_root, *param.sauv_root, param.filename, EXTENSION,
 						create_options,
 						&st);
-		    if(cur == NULL)
+		    if(cur == nullptr)
 			throw Ememory("little_main");
 		    if(!param.quiet)
 			display_sauv_stat(dialog, st);
@@ -326,7 +326,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 						EXTENSION,         // const string &
 						merge_options,
 						&st);              // statistics*
-		    if(cur == NULL)
+		    if(cur == nullptr)
 			throw Ememory("little_main");
 		    if(!param.quiet)
 			display_merge_stat(dialog, st);
@@ -340,15 +340,15 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		if(param.info_details)
 		    dialog.warning(gettext("Making room in memory (releasing memory used by archive of reference)..."));
 
-		if(arch != NULL)
+		if(arch != nullptr)
 		{
 		    delete arch;
-		    arch = NULL;
+		    arch = nullptr;
 		}
-		if(aux != NULL)
+		if(aux != nullptr)
 		{
 		    delete aux;
-		    aux = NULL;
+		    aux = nullptr;
 		}
 
 		    // checking for onfly isolation
@@ -359,7 +359,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    ret = EXIT_SAVED_MODIFIED;
 
 		if(param.op == create)
-		    if(param.aux_root != NULL && param.aux_filename != NULL)
+		    if(param.aux_root != nullptr && param.aux_filename != nullptr)
 		    {
 			if(param.op != merging && param.op != create)
 			    throw SRC_BUG;
@@ -367,7 +367,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			{
 			    if(!param.quiet)
 				dialog.warning(gettext("Now performing on-fly isolation..."));
-			    if(cur == NULL)
+			    if(cur == nullptr)
 				throw SRC_BUG;
 			    line_tools_crypto_split_algo_pass(param.aux_pass,
 							      aux_crypto,
@@ -443,7 +443,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_multi_threaded(param.multi_threaded);
 		arch = new (nothrow) archive(dialog, *param.ref_root, *param.ref_filename, EXTENSION,
 					     read_options);
-		if(arch == NULL)
+		if(arch == nullptr)
 		    throw Ememory("little_main");
 		else
 		    arch->drop_all_filedescriptors(dialog);
@@ -512,7 +512,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
 		read_options.set_multi_threaded(param.multi_threaded);
 
-		if(param.ref_filename != NULL && param.ref_root != NULL)
+		if(param.ref_filename != nullptr && param.ref_root != nullptr)
 		{
 		    secu_string ref_tmp_pass;
 		    crypto_algo ref_crypto;
@@ -541,7 +541,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 					     param.filename,
 					     EXTENSION,
 					     read_options);
-		if(arch == NULL)
+		if(arch == nullptr)
 		    throw Ememory("little_main");
 
 		extract_options.clear();
@@ -586,7 +586,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
                 st = arch->op_extract(dialog,
 				      *param.fs_root,
 				      extract_options,
-				      NULL);
+				      nullptr);
 		if(!param.quiet)
 		    display_rest_stat(dialog, st);
                 if(st.get_errored() > 0)
@@ -618,7 +618,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
 		read_options.set_multi_threaded(param.multi_threaded);
 
-		if(param.ref_filename != NULL && param.ref_root != NULL)
+		if(param.ref_filename != nullptr && param.ref_root != nullptr)
 		{
 		    secu_string ref_tmp_pass;
 		    crypto_algo ref_crypto;
@@ -646,7 +646,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 					     param.filename,
 					     EXTENSION,
 					     read_options);
-		if(arch == NULL)
+		if(arch == nullptr)
 		    throw Ememory("little_main");
 
 		diff_options.clear();
@@ -665,7 +665,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		diff_options.set_fsa_scope(param.scope);
                 st = arch->op_diff(dialog, *param.fs_root,
 				   diff_options,
-				   NULL);
+				   nullptr);
 		if(!param.quiet)
 		    display_diff_stat(dialog, st);
                 if(st.get_errored() > 0 || st.get_deleted() > 0)
@@ -697,7 +697,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
 		read_options.set_multi_threaded(param.multi_threaded);
 
-		if(param.ref_filename != NULL && param.ref_root != NULL)
+		if(param.ref_filename != nullptr && param.ref_root != nullptr)
 		{
 		    secu_string ref_tmp_pass;
 		    crypto_algo ref_crypto;
@@ -725,7 +725,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 					     param.filename,
 					     EXTENSION,
 					     read_options);
-		if(arch == NULL)
+		if(arch == nullptr)
 		    throw Ememory("little_main");
 
 		test_options.clear();
@@ -736,7 +736,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 						 param.display_treated_only_dir);
 		test_options.set_display_skipped(param.display_skipped);
 		test_options.set_empty(param.empty);
-                st = arch->op_test(dialog, test_options, NULL);
+                st = arch->op_test(dialog, test_options, nullptr);
 		if(!param.quiet)
 		    display_test_stat(dialog, st);
                 if(st.get_errored() > 0)
@@ -774,7 +774,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 					     param.filename,
 					     EXTENSION,
 					     read_options);
-		if(arch == NULL)
+		if(arch == nullptr)
 		    throw Ememory("little_main");
 
 		if(param.quiet)
@@ -813,20 +813,20 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	    if(!param.quiet)
 		dialog.warning(gettext("Final memory cleanup..."));
 
-	    if(arch != NULL)
+	    if(arch != nullptr)
 	    {
 		delete arch;
-		arch = NULL;
+		arch = nullptr;
 	    }
-	    if(cur != NULL)
+	    if(cur != nullptr)
 	    {
 		delete cur;
-		cur = NULL;
+		cur = nullptr;
 	    }
-	    if(aux != NULL)
+	    if(aux != nullptr)
 	    {
 		delete aux;
-		aux = NULL;
+		aux = nullptr;
 	    }
 	    throw;
 	}
@@ -834,27 +834,27 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	if(param.info_details)
 	    dialog.warning(gettext("Final memory cleanup..."));
 
-	if(arch != NULL)
+	if(arch != nullptr)
 	    cerr << arch->free_and_check_memory() << endl;
-	if(aux != NULL)
+	if(aux != nullptr)
 	    cerr << aux->free_and_check_memory() << endl;
-	if(cur != NULL)
+	if(cur != nullptr)
 	    cerr << cur->free_and_check_memory() << endl;
 
-	if(arch != NULL)
+	if(arch != nullptr)
 	{
 	    delete arch;
-	    arch = NULL;
+	    arch = nullptr;
 	}
-	if(cur != NULL)
+	if(cur != nullptr)
 	{
 	    delete cur;
-	    cur = NULL;
+	    cur = nullptr;
 	}
-	if(aux != NULL)
+	if(aux != nullptr)
 	{
 	    delete aux;
-	    aux = NULL;
+	    aux = nullptr;
 	}
 
         return ret;

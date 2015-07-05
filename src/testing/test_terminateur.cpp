@@ -54,7 +54,7 @@ using namespace std;
 
 static void f1();
 
-static user_interaction *ui = NULL;
+static user_interaction *ui = nullptr;
 
 int main()
 {
@@ -62,10 +62,10 @@ int main()
 
     get_version(maj, med, min);
     user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(ui == NULL)
+    if(ui == nullptr)
 	cout << "ERREUR !" << endl;
     f1();
-    if(ui != NULL)
+    if(ui != nullptr)
 	delete ui;
 }
 

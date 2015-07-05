@@ -38,7 +38,7 @@ namespace libdar
     {
 	const cat_ignored_dir *ref_ignored_dir = dynamic_cast<const cat_ignored_dir *>(&ref);
 
-	if(ref_ignored_dir == NULL)
+	if(ref_ignored_dir == nullptr)
 	    return false;
 	else
 	    return cat_inode::operator == (ref);

@@ -158,7 +158,7 @@ namespace libdar
     {
 	const string display = name.empty() ? lieu.display() : (lieu + path(name)).display();
         const char *ptr_name = display.c_str();
-        cat_nomme *ref = NULL;
+        cat_nomme *ref = nullptr;
 	struct stat buf;
 	string tmp;
 
@@ -179,7 +179,7 @@ namespace libdar
 		    throw Erange("filesystem_hard_link_read::make_read_entree", string(gettext("Cannot read inode for ")) + ptr_name + " : " + tools_strerror_r(errno));
 		}
 
-		    // the current method returns NULL (= ref)  (meaning file does not exists)
+		    // the current method returns nullptr (= ref)  (meaning file does not exists)
 	    }
 	    else
 	    {
@@ -276,7 +276,7 @@ namespace libdar
 
 
 		cat_inode *ino = dynamic_cast<cat_inode *>(ref);
-		if(ino != NULL)
+		if(ino != nullptr)
 		{
 
 			//
@@ -315,7 +315,7 @@ namespace libdar
 			//
 
 		    filesystem_specific_attribute_list *fsal = new (get_pool()) filesystem_specific_attribute_list();
-		    if(fsal == NULL)
+		    if(fsal == nullptr)
 			throw Ememory("filesystem_hard_link_read::make_entree");
 		    try
 		    {
@@ -324,18 +324,18 @@ namespace libdar
 			{
 			    ino->fsa_set_saved_status(cat_inode::fsa_full);
 			    ino->fsa_attach(fsal);
-			    fsal = NULL; // now managed by *ino
+			    fsal = nullptr; // now managed by *ino
 			}
 			else
 			{
 			    ino->fsa_set_saved_status(cat_inode::fsa_none);
 			    delete fsal;
-			    fsal = NULL;
+			    fsal = nullptr;
 			}
 		    }
 		    catch(...)
 		    {
-			if(fsal != NULL)
+			if(fsal != nullptr)
 			    delete fsal;
 			throw;
 		    }
@@ -345,26 +345,26 @@ namespace libdar
 		    // hard link detection
 		    //
 
-		if(ref == NULL)
+		if(ref == nullptr)
 		    throw Ememory("filesystem_hard_link_read::make_read_entree");
 
-		if(buf.st_nlink > 1 && see_hard_link && dynamic_cast<cat_directory *>(ref) == NULL)
+		if(buf.st_nlink > 1 && see_hard_link && dynamic_cast<cat_directory *>(ref) == nullptr)
 		{
 		    map<node, couple>::iterator it = corres_read.find(node(buf.st_ino, buf.st_dev));
 
 		    if(it == corres_read.end()) // inode not yet seen, creating the cat_etoile object
 		    {
 			cat_inode *ino_ref = dynamic_cast<cat_inode *>(ref);
-			cat_etoile *tmp_et = NULL;
+			cat_etoile *tmp_et = nullptr;
 
-			if(ino_ref == NULL)
+			if(ino_ref == nullptr)
 			    throw SRC_BUG;
 			tmp_et = new (get_pool()) cat_etoile(ino_ref, etiquette_counter++);
-			if(tmp_et == NULL)
+			if(tmp_et == nullptr)
 			    throw Ememory("filesystem_hard_link_read::make_read_entree");
 			try
 			{
-			    ref = NULL; // the object pointed to by ref is now managed by tmp_et
+			    ref = nullptr; // the object pointed to by ref is now managed by tmp_et
 			    couple tmp = couple(tmp_et, buf.st_nlink - 1);
 			    pair <node, couple> p_tmp(node(buf.st_ino, buf.st_dev), tmp);
 			    corres_read.insert(p_tmp);
@@ -377,7 +377,7 @@ namespace libdar
 			}
 			catch(...)
 			{
-			    if(tmp_et != NULL)
+			    if(tmp_et != nullptr)
 				delete tmp_et;
 			    throw;
 			}
@@ -387,13 +387,13 @@ namespace libdar
 		    else // inode already seen creating a new cat_mirage on the given cat_etoile
 		    {
 			    // some sanity checks
-			if(it->second.obj == NULL)
+			if(it->second.obj == nullptr)
 			    throw SRC_BUG;
 
-			if(ref != NULL)
+			if(ref != nullptr)
 			    delete ref;  // we don't need this just created inode as it is already attached to the cat_etoile object
 			ref = new (get_pool()) cat_mirage(name, it->second.obj);
-			if(ref != NULL)
+			if(ref != nullptr)
 			{
 			    it->second.count--;
 			    if(it->second.count == 0)
@@ -403,16 +403,16 @@ namespace libdar
 		    }
 		}
 
-		if(ref == NULL)
+		if(ref == nullptr)
 		    throw Ememory("filesystem_hard_link_read::make_read_entree");
 	    }
 	}
 	catch(...)
 	{
-	    if(ref != NULL)
+	    if(ref != nullptr)
 	    {
 		delete ref;
-		ref = NULL;
+		ref = nullptr;
 	    }
 	    throw;
 	}
@@ -439,23 +439,23 @@ namespace libdar
 					 const fsa_scope & scope)
 	: mem_ui(dialog), filesystem_hard_link_read(dialog, x_furtive_read_mode, scope)
     {
-	fs_root = NULL;
-	current_dir = NULL;
-	ea_mask = NULL;
+	fs_root = nullptr;
+	current_dir = nullptr;
+	ea_mask = nullptr;
 	try
 	{
 	    fs_root = get_root_with_symlink(get_ui(), root, x_info_details, get_pool());
-	    if(fs_root == NULL)
+	    if(fs_root == nullptr)
 		throw Ememory("filesystem_backup::filesystem_backup");
 	    info_details = x_info_details;
 	    no_dump_check = check_no_dump_flag;
 	    alter_atime = x_alter_atime;
 	    furtive_read_mode = x_furtive_read_mode;
 	    cache_directory_tagging = x_cache_directory_tagging;
-	    current_dir = NULL;
+	    current_dir = nullptr;
 	    ignore_unknown = x_ignore_unknown;
 	    ea_mask = x_ea_mask.clone();
-	    if(ea_mask == NULL)
+	    if(ea_mask == nullptr)
 		throw Ememory("filesystem_backup::filesystem_backup");
 	    reset_read(root_fs_device);
 	}
@@ -468,20 +468,20 @@ namespace libdar
 
     void filesystem_backup::detruire()
     {
-        if(fs_root != NULL)
+        if(fs_root != nullptr)
         {
             delete fs_root;
-            fs_root = NULL;
+            fs_root = nullptr;
         }
-        if(current_dir != NULL)
+        if(current_dir != nullptr)
 	{
             delete current_dir;
-	    current_dir = NULL;
+	    current_dir = nullptr;
 	}
-	if(ea_mask != NULL)
+	if(ea_mask != nullptr)
 	{
 	    delete ea_mask;
-	    ea_mask = NULL;
+	    ea_mask = nullptr;
 	}
     }
 
@@ -491,31 +491,31 @@ namespace libdar
 	filesystem_hard_link_read *proto_me = this;
 	*proto_me = *proto_ref;  // invoke the copy from parent class
 
-	fs_root = NULL;
-	current_dir = NULL;
-	ea_mask = NULL;
+	fs_root = nullptr;
+	current_dir = nullptr;
+	ea_mask = nullptr;
 	try
 	{
-	    if(ref.fs_root != NULL)
+	    if(ref.fs_root != nullptr)
 	    {
 		fs_root = new (get_pool()) path(*ref.fs_root);
-		if(fs_root == NULL)
+		if(fs_root == nullptr)
 		    throw Ememory("filesystem_backup::copy_from");
 	    }
 	    else
-		fs_root = NULL;
+		fs_root = nullptr;
 
-	    if(ref.current_dir != NULL)
+	    if(ref.current_dir != nullptr)
 	    {
 		current_dir = new (get_pool()) path(*ref.current_dir);
-		if(current_dir == NULL)
+		if(current_dir == nullptr)
 		    throw Ememory("filesystem_backup::copy_from");
 	    }
 	    else
-		current_dir = NULL;
+		current_dir = nullptr;
 	    info_details = ref.info_details;
 	    ea_mask = ref.ea_mask->clone();
-	    if(ea_mask == NULL)
+	    if(ea_mask == nullptr)
 		throw Ememory("filesystem_backup::copy_from");
 	    no_dump_check = ref.no_dump_check;
 	    alter_atime = ref.alter_atime;
@@ -534,10 +534,10 @@ namespace libdar
     void filesystem_backup::reset_read(infinint & root_fs_device)
     {
         corres_reset();
-        if(current_dir != NULL)
+        if(current_dir != nullptr)
             delete current_dir;
         current_dir = new (get_pool()) path(*fs_root);
-        if(current_dir == NULL)
+        if(current_dir == nullptr)
             throw Ememory("filesystem_backup::reset_read");
         pile.clear();
 
@@ -548,13 +548,13 @@ namespace libdar
 
 	try
 	{
-	    if(ref_dir != NULL)
+	    if(ref_dir != nullptr)
 	    {
 		pile.push_back(etage(get_ui(), tmp, ref_dir->get_last_access(), ref_dir->get_last_modif(), cache_directory_tagging, furtive_read_mode));
 		root_fs_device = ref_dir->get_device();
 	    }
 	    else
-		if(ref == NULL)
+		if(ref == nullptr)
 		    throw Erange("filesystem_backup::reset_read", string(gettext("Non existent file: ")) + tmp);
 		else
 		    throw Erange("filesystem_backup::reset_read", string(gettext("File must be a directory: "))+ tmp);
@@ -562,11 +562,11 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    if(ref != NULL)
+	    if(ref != nullptr)
 		delete ref;
 	    throw;
 	}
-	if(ref != NULL)
+	if(ref != nullptr)
 	    delete ref;
     }
 
@@ -574,12 +574,12 @@ namespace libdar
     bool filesystem_backup::read(cat_entree * & ref, infinint & errors, infinint & skipped_dump)
     {
         bool once_again;
-        ref = NULL;
+        ref = nullptr;
 	errors = 0;
 	skipped_dump = 0;
 
 
-        if(current_dir == NULL)
+        if(current_dir == nullptr)
             throw SRC_BUG; // constructor not called or badly implemented.
 
         do
@@ -623,7 +623,7 @@ namespace libdar
 			    {
 				cat_directory *ref_dir = dynamic_cast<cat_directory *>(ref);
 
-				if(ref_dir != NULL)
+				if(ref_dir != nullptr)
 				{
 				    *current_dir += name;
 				    const string display = current_dir->display();
@@ -651,7 +651,7 @@ namespace libdar
 					catch(Egeneric & e)
 					{
 					    delete ref;
-					    ref = NULL; // we ignore this directory and skip to the next entry
+					    ref = nullptr; // we ignore this directory and skip to the next entry
 					    errors++;
 					    if(! current_dir->pop(tmp))
 						throw SRC_BUG;
@@ -659,7 +659,7 @@ namespace libdar
 				    }
 				}
 
-				if(ref == NULL)
+				if(ref == nullptr)
 				    once_again = true;
 				    // the file has been removed between the time
 				    // the directory has been openned, and the time
@@ -668,10 +668,10 @@ namespace libdar
 			    }
 			    catch(...)
 			    {
-				if(ref != NULL)
+				if(ref != nullptr)
 				{
 				    delete ref;
-				    ref = NULL;
+				    ref = nullptr;
 				}
 				throw;
 			    }
@@ -701,7 +701,7 @@ namespace libdar
         }
         while(once_again);
 
-        if(ref == NULL)
+        if(ref == nullptr)
             throw Ememory("filesystem_backup::read");
         else
             return true;
@@ -740,21 +740,21 @@ namespace libdar
 	mem_ui(dialog),
 	filesystem_hard_link_read(dialog, x_furtive_read_mode, scope)
     {
-	fs_root = NULL;
-	ea_mask = NULL;
-	current_dir = NULL;
+	fs_root = nullptr;
+	ea_mask = nullptr;
+	current_dir = nullptr;
 	try
 	{
 	    fs_root = get_root_with_symlink(get_ui(), root, x_info_details, get_pool());
-	    if(fs_root == NULL)
+	    if(fs_root == nullptr)
 		throw Ememory("filesystem_diff::filesystem_diff");
 	    info_details = x_info_details;
 	    ea_mask = x_ea_mask.clone();
-	    if(ea_mask == NULL)
+	    if(ea_mask == nullptr)
 		throw Ememory("filesystem_diff::filesystem_diff");
 	    alter_atime = x_alter_atime;
 	    furtive_read_mode = x_furtive_read_mode;
-	    current_dir = NULL;
+	    current_dir = nullptr;
 	    reset_read();
 	}
 	catch(...)
@@ -768,11 +768,11 @@ namespace libdar
     void filesystem_diff::reset_read()
     {
         corres_reset();
-        if(current_dir != NULL)
+        if(current_dir != nullptr)
             delete current_dir;
         current_dir = new (get_pool()) path(*fs_root);
         filename_pile.clear();
-        if(current_dir == NULL)
+        if(current_dir == nullptr)
             throw Ememory("filesystem_diff::reset_read");
 	const string display = current_dir->display();
 	const char* tmp = display.c_str();
@@ -781,7 +781,7 @@ namespace libdar
 	cat_directory *ref_dir = dynamic_cast<cat_directory *>(ref);
 	try
 	{
-	    if(ref_dir != NULL)
+	    if(ref_dir != nullptr)
 	    {
 		filename_struct rfst;
 
@@ -790,33 +790,33 @@ namespace libdar
 		filename_pile.push_back(rfst);
 	    }
 	    else
-		if(ref == NULL)
+		if(ref == nullptr)
 		    throw Erange("filesystem_diff::reset_read", string(gettext("Non existent file: ")) + tmp);
 		else
 		    throw Erange("filesystem_diff::reset_read", string(gettext("File must be a directory: ")) + tmp);
 	}
 	catch(...)
 	{
-	    if(ref != NULL)
+	    if(ref != nullptr)
 		delete ref;
 	    throw;
 	}
-	if(ref != NULL)
+	if(ref != nullptr)
 	    delete ref;
     }
 
     bool filesystem_diff::read_filename(const string & name, cat_nomme * &ref)
     {
-        cat_directory *ref_dir = NULL;
-        if(current_dir == NULL)
+        cat_directory *ref_dir = nullptr;
+        if(current_dir == nullptr)
             throw SRC_BUG;
         ref = make_read_entree(*current_dir, name, false, *ea_mask);
-        if(ref == NULL)
+        if(ref == nullptr)
             return false; // no file of that name
         else
         {
             ref_dir = dynamic_cast<cat_directory *>(ref);
-            if(ref_dir != NULL)
+            if(ref_dir != nullptr)
             {
                 filename_struct rfst;
 
@@ -843,52 +843,52 @@ namespace libdar
 
     void filesystem_diff::detruire()
     {
-        if(fs_root != NULL)
+        if(fs_root != nullptr)
 	{
             delete fs_root;
-	    fs_root = NULL;
+	    fs_root = nullptr;
 	}
-        if(current_dir != NULL)
+        if(current_dir != nullptr)
 	{
             delete current_dir;
-	    current_dir = NULL;
+	    current_dir = nullptr;
 	}
-	if(ea_mask != NULL)
+	if(ea_mask != nullptr)
 	{
 	    delete ea_mask;
-	    ea_mask = NULL;
+	    ea_mask = nullptr;
 	}
     }
 
     void filesystem_diff::copy_from(const filesystem_diff & ref)
     {
-	fs_root = NULL;
-	ea_mask = NULL;
-	current_dir = NULL;
+	fs_root = nullptr;
+	ea_mask = nullptr;
+	current_dir = nullptr;
 	try
 	{
 	    const filesystem_hard_link_read *proto_ref = &ref;
 	    filesystem_hard_link_read *proto_me = this;
 	    *proto_me = *proto_ref;
-	    if(ref.fs_root != NULL)
+	    if(ref.fs_root != nullptr)
 	    {
 		fs_root = new (get_pool()) path(*ref.fs_root);
-		if(fs_root == NULL)
+		if(fs_root == nullptr)
 		    throw Ememory("filesystem_diff::copy_from");
 	    }
 	    else
-		fs_root = NULL;
-	    if(ref.current_dir != NULL)
+		fs_root = nullptr;
+	    if(ref.current_dir != nullptr)
 	    {
 		current_dir = new (get_pool()) path(*ref.current_dir);
-		if(current_dir == NULL)
+		if(current_dir == nullptr)
 		    throw Ememory("filesystem_diff::copy_from");
 	    }
 	    else
-		current_dir = NULL;
+		current_dir = nullptr;
 	    info_details = ref.info_details;
 	    ea_mask = ref.ea_mask->clone();
-	    if(ea_mask == NULL)
+	    if(ea_mask == nullptr)
 		throw Ememory("filesystem_diff::copy_from");
 	    alter_atime = ref.alter_atime;
 	    furtive_read_mode = ref.furtive_read_mode;
@@ -919,12 +919,12 @@ namespace libdar
 
         try
         {
-            if(e == NULL)
+            if(e == nullptr)
                 throw SRC_BUG;
 
                 // checking that we have not already restored the EA of this
                 // inode through another hard link
-            if(e_mir != NULL)
+            if(e_mir != nullptr)
             {
                 map<infinint, corres_ino_ea>::iterator it;
 
@@ -966,12 +966,12 @@ namespace libdar
 
         try
         {
-            if(e == NULL)
+            if(e == nullptr)
                 throw SRC_BUG;
 
                 // checking that we have not already restored the EA of this
                 // inode through another hard link
-            if(e_mir != NULL)
+            if(e_mir != nullptr)
             {
                 map<infinint, corres_ino_ea>::iterator it;
 
@@ -1037,7 +1037,7 @@ namespace libdar
         const cat_mirage *ref_mir = dynamic_cast <const cat_mirage *>(ref);
         const cat_inode *ref_ino = dynamic_cast <const cat_inode *>(ref);
 
-        if(ref_ino == NULL && ref_mir == NULL)
+        if(ref_ino == nullptr && ref_mir == nullptr)
             throw SRC_BUG; // neither an cat_inode nor a hard link
 
 	const string display = (ou + ref->get_name()).display();
@@ -1050,7 +1050,7 @@ namespace libdar
 	{
 	    try
 	    {
-		if(ref_mir != NULL) // we potentially have to make a hard link
+		if(ref_mir != nullptr) // we potentially have to make a hard link
 		{
 		    bool create_file = false;
 
@@ -1121,14 +1121,14 @@ namespace libdar
 
 		    // build plain inode object (or initial inode for hard link --- if create_file was true above)
 
-		if(ref_dir != NULL)
+		if(ref_dir != nullptr)
 		{
 		    ret = mkdir(name, 0700); // as the directory has been created we are its owner and we will need only
 			// to create files under it so we need all rights for user, by security for now, no right are
 			// allowed for group and others, but this will be set properly at the end, when all files will
 			// be restored in that directory
 		}
-		else if(ref_fil != NULL)
+		else if(ref_fil != nullptr)
 		{
 		    generic_file *ou;
 		    infinint seek;
@@ -1142,8 +1142,8 @@ namespace libdar
 
 		    try
 		    {
-			const crc *crc_ori = NULL;
-			crc *crc_dyn = NULL;
+			const crc *crc_ori = nullptr;
+			crc *crc_dyn = nullptr;
 			infinint crc_size;
 
 			try
@@ -1156,12 +1156,12 @@ namespace libdar
 			    ou->read_ahead(ref_fil->get_storage_size());
 			    ou->copy_to(dest, crc_size, crc_dyn);
 
-			    if(crc_dyn == NULL)
+			    if(crc_dyn == nullptr)
 				throw SRC_BUG;
 
 			    if(ref_fil->get_crc(crc_ori))
 			    {
-				if(crc_ori == NULL)
+				if(crc_ori == nullptr)
 				    throw SRC_BUG;
 				if(typeid(*crc_dyn) != typeid(*crc_ori))
 				    throw SRC_BUG;
@@ -1173,31 +1173,31 @@ namespace libdar
 			}
 			catch(...)
 			{
-			    if(crc_dyn != NULL)
+			    if(crc_dyn != nullptr)
 				delete crc_dyn;
 			    throw;
 			}
-			if(crc_dyn != NULL)
+			if(crc_dyn != nullptr)
 			    delete crc_dyn;
 		    }
 		    catch(...)
 		    {
-			if(ou != NULL)
+			if(ou != nullptr)
 			    delete ou;
 			throw;
 		    }
 		    delete ou;
 		    ret = 0; // to report a successful operation at the end of the if/else if chain
 		}
-		else if(ref_lie != NULL)
+		else if(ref_lie != nullptr)
 		    ret = symlink(ref_lie->get_target().c_str(), name);
-		else if(ref_blo != NULL)
+		else if(ref_blo != nullptr)
 		    ret = mknod(name, S_IFBLK | 0700, makedev(ref_blo->get_major(), ref_blo->get_minor()));
-		else if(ref_cha != NULL)
+		else if(ref_cha != nullptr)
 		    ret = mknod(name, S_IFCHR | 0700, makedev(ref_cha->get_major(), ref_cha->get_minor()));
-		else if(ref_tub != NULL)
+		else if(ref_tub != nullptr)
 		    ret = mknod(name, S_IFIFO | 0700, 0);
-		else if(ref_pri != NULL)
+		else if(ref_pri != nullptr)
 		{
 		    ret = socket(PF_UNIX, SOCK_STREAM, 0);
 		    if(ret >= 0)
@@ -1224,7 +1224,7 @@ namespace libdar
 		    }
 		}
 		else
-		    if(ref_mir == NULL)
+		    if(ref_mir == nullptr)
 			throw SRC_BUG; // unknown inode type
 		    // else nothing do do cat_mirage have been handled far above
 
@@ -1236,7 +1236,7 @@ namespace libdar
 			get_ui().pause(string(gettext("Cannot create inode: ")) + tools_strerror_r(errno) + gettext(" Ready to continue ?"));
 		}
 		else // inode successfully created
-		    if(ref_mir != NULL)
+		    if(ref_mir != nullptr)
 		    {
 			map<infinint, corres_ino_ea>::iterator it = corres_write.find(ref_mir->get_etiquette());
 			if(it == corres_write.end()) // we just created the first hard linked to that inode, so we must record its intial link to build subsequent ones
@@ -1259,7 +1259,7 @@ namespace libdar
 	}
 	while(ret < 0 && errno == ENOSPC);
 
-	if(ref_ino != NULL && ret >= 0)
+	if(ref_ino != nullptr && ret >= 0)
 	    make_owner_perm(get_ui(), *ref_ino, display, dir_perm, what_to_check, scope);
     }
 
@@ -1292,22 +1292,22 @@ namespace libdar
 					   const fsa_scope & scope) :
 	mem_ui(dialog), filesystem_hard_link_write(dialog), filesystem_hard_link_read(dialog, true, scope)
     {
-	fs_root = NULL;
-	ea_mask = NULL;
-	current_dir = NULL;
-	overwrite = NULL;
+	fs_root = nullptr;
+	ea_mask = nullptr;
+	current_dir = nullptr;
+	overwrite = nullptr;
 	try
 	{
 	    fs_root = get_root_with_symlink(get_ui(), root, x_info_details, get_pool());
-	    if(fs_root == NULL)
+	    if(fs_root == nullptr)
 		throw Ememory("filesystem_write::filesystem_write");
 	    ea_mask = x_ea_mask.clone();
-	    if(ea_mask == NULL)
+	    if(ea_mask == nullptr)
 		throw Ememory("filesystem_restore::filesystem_restore");
-	    if(x_overwrite == NULL)
+	    if(x_overwrite == nullptr)
 		throw SRC_BUG;
 	    overwrite = x_overwrite->clone();
-	    if(overwrite == NULL)
+	    if(overwrite == nullptr)
 		throw Ememory("filesystem_restore::filesystem_restore");
 	}
 	catch(...)
@@ -1329,10 +1329,10 @@ namespace libdar
         filesystem_hard_link_write::corres_reset();
         filesystem_hard_link_read::corres_reset();
         stack_dir.clear();
-        if(current_dir != NULL)
+        if(current_dir != nullptr)
             delete current_dir;
         current_dir = new (get_pool()) path(*fs_root);
-        if(current_dir == NULL)
+        if(current_dir == nullptr)
             throw Ememory("filesystem_write::reset_write");
 	ignore_over_restricts = false;
     }
@@ -1350,16 +1350,16 @@ namespace libdar
 	ea_restored = false;
 	data_created = false;
 	fsa_restored = false;
-	hard_link = x_mir != NULL && known_etiquette(x_mir->get_etiquette());
+	hard_link = x_mir != nullptr && known_etiquette(x_mir->get_etiquette());
 
-	if(x_mir != NULL)
+	if(x_mir != nullptr)
 	{
 	    x_ino = x_mir->get_inode();
-	    if(x_ino == NULL)
+	    if(x_ino == nullptr)
 		throw SRC_BUG;
 	}
 
-	if(x_eod != NULL)
+	if(x_eod != nullptr)
 	{
 	    string tmp;
 	    current_dir->pop(tmp);
@@ -1379,17 +1379,17 @@ namespace libdar
 	    return;
 	}
 
-	if(x_nom == NULL)
+	if(x_nom == nullptr)
 	    throw SRC_BUG; // neither "cat_nomme" nor "cat_eod"
 	else // cat_nomme
 	{
-	    bool has_data_saved = (x_ino != NULL && x_ino->get_saved_status() == s_saved) || x_det != NULL;
-	    bool has_ea_saved = x_ino != NULL && (x_ino->ea_get_saved_status() == cat_inode::ea_full || x_ino->ea_get_saved_status() == cat_inode::ea_removed);
-	    bool has_fsa_saved = x_ino != NULL && x_ino->fsa_get_saved_status() == cat_inode::fsa_full;
+	    bool has_data_saved = (x_ino != nullptr && x_ino->get_saved_status() == s_saved) || x_det != nullptr;
+	    bool has_ea_saved = x_ino != nullptr && (x_ino->ea_get_saved_status() == cat_inode::ea_full || x_ino->ea_get_saved_status() == cat_inode::ea_removed);
+	    bool has_fsa_saved = x_ino != nullptr && x_ino->fsa_get_saved_status() == cat_inode::fsa_full;
 	    path spot = *current_dir + x_nom->get_name();
 	    string spot_display = spot.display();
 
-	    cat_nomme *exists = NULL;
+	    cat_nomme *exists = nullptr;
 
 	    if(ignore_over_restricts)
 		    // only used in sequential_read when a file has been saved several times due
@@ -1397,9 +1397,9 @@ namespace libdar
 		    // here when ignore_over_restricts is true it is asked to remove the previously restored copy of
 		    // that file because a better copy has been found in the archive.
 	    {
-		ignore_over_restricts = false; // just one shot state ; exists == NULL : we are ignoring existing entry
+		ignore_over_restricts = false; // just one shot state ; exists == nullptr : we are ignoring existing entry
 		supprime(get_ui(), spot_display);
-		if(x_det != NULL)
+		if(x_det != nullptr)
 		{
 		    data_restored = done_data_removed;
 		    data_created = false;
@@ -1419,18 +1419,18 @@ namespace libdar
 		cat_inode *exists_ino = dynamic_cast<cat_inode *>(exists);
 		cat_directory *exists_dir = dynamic_cast<cat_directory *>(exists);
 
-		if(exists_ino == NULL && exists != NULL)
+		if(exists_ino == nullptr && exists != nullptr)
 		    throw SRC_BUG; // an object from filesystem should always be an cat_inode !?!
 
-		if(exists == NULL)
+		if(exists == nullptr)
 		{
 
 			// no conflict: there is not an already existing file present in filesystem
 
-		    if(x_det != NULL)
+		    if(x_det != nullptr)
 			throw Erange("filesystem_restore::write", string(gettext("Cannot remove non-existent file from filesystem: ")) + spot_display);
 
-		    if((has_data_saved || hard_link || x_dir != NULL) && !only_overwrite)
+		    if((has_data_saved || hard_link || x_dir != nullptr) && !only_overwrite)
 		    {
 			if(info_details)
 			    get_ui().warning(string(gettext("Restoring file's data: ")) + spot_display);
@@ -1476,7 +1476,7 @@ namespace libdar
 			    if(!empty)
 			    {
 				const filesystem_specific_attribute_list * fsa = x_ino->get_fsa();
-				if(fsa == NULL)
+				if(fsa == nullptr)
 				    throw SRC_BUG;
 				try
 				{
@@ -1504,7 +1504,7 @@ namespace libdar
 			fsa_restored = false;
 		    }
 		}
-		else // exists != NULL
+		else // exists != nullptr
 		{
 		    over_action_data act_data = data_undefined;
 		    over_action_ea act_ea = EA_undefined;
@@ -1513,8 +1513,8 @@ namespace libdar
 
 		    overwrite->get_action(*exists, *x_nom, act_data, act_ea);
 
-		    if(x_ino == NULL)
-			if(x_det == NULL)
+		    if(x_ino == nullptr)
+			if(x_det == nullptr)
 			    throw SRC_BUG;
 			else
 			{
@@ -1545,7 +1545,7 @@ namespace libdar
 			else // no data saved in the object to restore
 			{
 			    data_restored = done_no_change_no_data;
-			    if(x_mir != NULL)
+			    if(x_mir != nullptr)
 				write_hard_linked_target_if_not_set(x_mir, spot_display);
 			}
 
@@ -1609,7 +1609,7 @@ namespace libdar
 		    }
 		}
 
-		if(x_dir != NULL && (exists == NULL || exists_dir != NULL || data_restored == done_data_restored))
+		if(x_dir != nullptr && (exists == nullptr || exists_dir != nullptr || data_restored == done_data_restored))
 		{
 		    *current_dir += x_dir->get_name();
 		    stack_dir.push_back(stack_dir_t(*x_dir, data_restored == done_data_restored));
@@ -1617,11 +1617,11 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		if(exists != NULL)
+		if(exists != nullptr)
 		    delete exists;
 		throw;
 	    }
-	    if(exists != NULL)
+	    if(exists != nullptr)
 		delete exists;
 	}
     }
@@ -1629,7 +1629,7 @@ namespace libdar
 
     void filesystem_restore::action_over_remove(const cat_inode *in_place, const cat_detruit *to_be_added, const string & spot, over_action_data action)
     {
-	if(in_place == NULL || to_be_added == NULL)
+	if(in_place == nullptr || to_be_added == nullptr)
 	    throw SRC_BUG;
 
 	if(action == data_ask)
@@ -1680,18 +1680,18 @@ namespace libdar
 					      action_done_for_data & data_done)
     {
 	const cat_mirage *tba_mir = dynamic_cast<const cat_mirage *>(to_be_added);
-	const cat_inode *tba_ino = tba_mir == NULL ? dynamic_cast<const cat_inode *>(to_be_added) : tba_mir->get_inode();
+	const cat_inode *tba_ino = tba_mir == nullptr ? dynamic_cast<const cat_inode *>(to_be_added) : tba_mir->get_inode();
 	const cat_directory *tba_dir = dynamic_cast<const cat_directory *>(to_be_added);
 	const cat_detruit *tba_det = dynamic_cast<const cat_detruit *>(to_be_added);
 	const cat_lien *in_place_symlink = dynamic_cast<const cat_lien *>(in_place);
 
-	if(tba_ino == NULL)
+	if(tba_ino == nullptr)
 	    throw SRC_BUG;
 
-	if(in_place == NULL)
+	if(in_place == nullptr)
 	    throw SRC_BUG;
 
-	if(tba_det != NULL)
+	if(tba_det != nullptr)
 	    throw SRC_BUG; // must be either a cat_mirage or an inode, not any other cat_nomme object
 
 	if(action == data_ask)
@@ -1701,7 +1701,7 @@ namespace libdar
 	{
 	case data_preserve:
 	case data_preserve_mark_already_saved:
-	    if(tba_dir != NULL && !tba_ino->same_as(*in_place))
+	    if(tba_dir != nullptr && !tba_ino->same_as(*in_place))
 		throw Erange("filesystem_write::write", tools_printf(gettext("Directory %S cannot be restored: overwriting not allowed and a non-directory inode of that name already exists, all files in that directory will be skipped for restoration:"), &spot));
 	    data_done = done_no_change_policy;
 	    break;
@@ -1715,7 +1715,7 @@ namespace libdar
 		}
 		catch(Euser_abort & e)
 		{
-		    if(tba_dir != NULL && tba_ino->same_as(*in_place))
+		    if(tba_dir != nullptr && tba_ino->same_as(*in_place))
 		    {
 			data_done = done_no_change_policy;
 			return; // if we throw exception here, we will not recurse in this directory, while we could as a directory exists on filesystem
@@ -1728,7 +1728,7 @@ namespace libdar
 	    if(info_details)
 		get_ui().warning(string(gettext("Restoring file's data: ")) + spot);
 
-	    if(tba_dir != NULL && tba_ino->same_as(*in_place))
+	    if(tba_dir != nullptr && tba_ino->same_as(*in_place))
 	    {
 		if(!empty)
 		    make_owner_perm(get_ui(), *tba_ino, spot, false, what_to_check, get_fsa_scope());
@@ -1736,7 +1736,7 @@ namespace libdar
 	    }
 	    else // not both in_place and to_be_added are directories
 	    {
-		ea_attributs *ea = NULL; // saving original EA of existing inode
+		ea_attributs *ea = nullptr; // saving original EA of existing inode
 		filesystem_specific_attribute_list fsa; // saving original FSA of existing inode
 		bool got_ea = true;
 		bool got_fsa = true;
@@ -1766,7 +1766,7 @@ namespace libdar
 		    {
 			fsa.get_fsa_from_filesystem_for(spot,
 							all_fsa_families(),
-							in_place_symlink != NULL);
+							in_place_symlink != nullptr);
 		    }
 		    catch(Ethread_cancel & e)
 		    {
@@ -1792,7 +1792,7 @@ namespace libdar
 		    try // if possible and available restoring original EA
 		    {
 			if(got_ea && !empty)
-			    if(ea != NULL) // if ea is NULL no EA is present in the original file, thus nothing has to be restored
+			    if(ea != nullptr) // if ea is nullptr no EA is present in the original file, thus nothing has to be restored
 				(void)ea_filesystem_write_ea(spot, *ea, bool_mask(true));
 			    // we don't care about the return value, here, errors are returned through exceptions
 			    // the returned value is informative only and does not determine any subsequent actions
@@ -1803,7 +1803,7 @@ namespace libdar
 		    }
 		    catch(Egeneric & e)
 		    {
-			if(ea != NULL && !ea->size().is_zero())
+			if(ea != nullptr && !ea->size().is_zero())
 			    get_ui().warning(tools_printf(gettext("Existing EA for %S could not be preserved : "), &spot) + e.get_message());
 		    }
 
@@ -1820,17 +1820,17 @@ namespace libdar
 		    }
 		    catch(Egeneric & e)
 		    {
-			if(ea != NULL && !ea->size().is_zero())
+			if(ea != nullptr && !ea->size().is_zero())
 			    get_ui().warning(tools_printf(gettext("Existing FSA for %S could not be preserved : "), &spot) + e.get_message());
 		    }
 		}
 		catch(...)
 		{
-		    if(ea != NULL)
+		    if(ea != nullptr)
 			delete ea;
 		    throw;
 		}
-		if(ea != NULL)
+		if(ea != nullptr)
 		    delete ea;
 	    }
 	    break;
@@ -1858,13 +1858,13 @@ namespace libdar
 	const cat_inode *tba_ino = dynamic_cast<const cat_inode *>(to_be_added);
 	const cat_mirage *tba_mir = dynamic_cast<const cat_mirage *>(to_be_added);
 
-	if(tba_mir != NULL)
+	if(tba_mir != nullptr)
 	    tba_ino = tba_mir->get_inode();
 
-	if(tba_ino == NULL)
+	if(tba_ino == nullptr)
 	    throw SRC_BUG;
 
-	if(in_place == NULL || to_be_added == NULL)
+	if(in_place == nullptr || to_be_added == nullptr)
 	    throw SRC_BUG;
 
 	if(action == EA_ask)
@@ -1905,7 +1905,7 @@ namespace libdar
 		catch(Euser_abort & e)
 		{
 		    const cat_directory *tba_dir = dynamic_cast<const cat_directory *>(to_be_added);
-		    if(tba_dir != NULL && tba_ino->same_as(*in_place))
+		    if(tba_dir != nullptr && tba_ino->same_as(*in_place))
 			return false;
 		    else
 			throw;
@@ -2007,13 +2007,13 @@ namespace libdar
 	const cat_inode *tba_ino = dynamic_cast<const cat_inode *>(to_be_added);
 	const cat_mirage *tba_mir = dynamic_cast<const cat_mirage *>(to_be_added);
 
-	if(tba_mir != NULL)
+	if(tba_mir != nullptr)
 	    tba_ino = tba_mir->get_inode();
 
-	if(tba_ino == NULL)
+	if(tba_ino == nullptr)
 	    throw SRC_BUG;
 
-	if(in_place == NULL || to_be_added == NULL)
+	if(in_place == nullptr || to_be_added == nullptr)
 	    throw SRC_BUG;
 
 	if(action == EA_ask)
@@ -2048,14 +2048,14 @@ namespace libdar
 		catch(Euser_abort & e)
 		{
 		    const cat_directory *tba_dir = dynamic_cast<const cat_directory *>(to_be_added);
-		    if(tba_dir != NULL && tba_ino->same_as(*in_place))
+		    if(tba_dir != nullptr && tba_ino->same_as(*in_place))
 			return false;
 		    else
 			throw;
 		}
 	    }
 
-	    if(tba_mir != NULL && known_etiquette(tba_mir->get_etiquette()))
+	    if(tba_mir != nullptr && known_etiquette(tba_mir->get_etiquette()))
 	    {
 		if(info_details)
 		    get_ui().printf(gettext("FSA for %S have not been overwritten because this file is a hard link pointing to an already restored inode"), &spot);
@@ -2069,7 +2069,7 @@ namespace libdar
 		if(!empty)
 		{
 		    const filesystem_specific_attribute_list * fsa = tba_ino->get_fsa();
-		    if(fsa == NULL)
+		    if(fsa == nullptr)
 			throw SRC_BUG;
 
 		    ret = fsa->set_fsa_to_filesystem_for(spot, get_fsa_scope(), get_ui());
@@ -2127,25 +2127,25 @@ namespace libdar
 
     void filesystem_restore::detruire()
     {
-        if(fs_root != NULL)
+        if(fs_root != nullptr)
 	{
             delete fs_root;
-	    fs_root = NULL;
+	    fs_root = nullptr;
 	}
-        if(current_dir != NULL)
+        if(current_dir != nullptr)
 	{
             delete current_dir;
-	    current_dir = NULL;
+	    current_dir = nullptr;
 	}
-	if(ea_mask != NULL)
+	if(ea_mask != nullptr)
 	{
 	    delete ea_mask;
-	    ea_mask = NULL;
+	    ea_mask = nullptr;
 	}
-	if(overwrite != NULL)
+	if(overwrite != nullptr)
 	{
 	    delete overwrite;
-	    overwrite = NULL;
+	    overwrite = nullptr;
 	}
     }
 
@@ -2215,7 +2215,7 @@ namespace libdar
 	    // owner of the directory, so we will try to restore as much as our permission
 	    // allows it (maybe "group" or "other" write bits are set for us).
 
-	if(dynamic_cast<const cat_directory *>(&ref) != NULL && !dir_perm && geteuid() != 0)
+	if(dynamic_cast<const cat_directory *>(&ref) != nullptr && !dir_perm && geteuid() != 0)
 	{
 	    mode_t tmp;
 	    try
@@ -2251,7 +2251,7 @@ namespace libdar
 		if(lchown(name, tmp_uid, tmp_gid) < 0)
 		    dialog.warning(chem + string(gettext("Could not restore original file ownership: ")) + tools_strerror_r(errno));
 #else
-		if(dynamic_cast<const cat_lien *>(&ref) == NULL) // not a symbolic link
+		if(dynamic_cast<const cat_lien *>(&ref) == nullptr) // not a symbolic link
 		    if(chown(name, tmp_uid, tmp_gid) < 0)
 			dialog.warning(chem + string(gettext("Could not restore original file ownership: ")) + tools_strerror_r(errno));
 		    //
@@ -2263,7 +2263,7 @@ namespace libdar
 	try
 	{
 	    if(what_to_check == cat_inode::cf_all || what_to_check == cat_inode::cf_ignore_owner)
-		if(ref_lie == NULL) // not restoring permission for symbolic links, it would modify the target not the symlink itself
+		if(ref_lie == nullptr) // not restoring permission for symbolic links, it would modify the target not the symlink itself
 		    if(chmod(name, permission) < 0)
 		    {
 			string tmp = tools_strerror_r(errno);
@@ -2272,7 +2272,7 @@ namespace libdar
 	}
 	catch(Egeneric &e)
 	{
-	    if(ref_lie == NULL)
+	    if(ref_lie == nullptr)
 		throw;
 		// else (the inode is a symlink), we simply ignore this error
 	}
@@ -2293,48 +2293,48 @@ namespace libdar
 	    if(ref.fsa_get_saved_status() == cat_inode::fsa_full && it != scope.end())
 	    {
 		const filesystem_specific_attribute_list * fsa = ref.get_fsa();
-		const filesystem_specific_attribute *ptr = NULL;
+		const filesystem_specific_attribute *ptr = nullptr;
 
-		if(fsa == NULL)
+		if(fsa == nullptr)
 		    throw SRC_BUG;
 		if(fsa->find(fsaf_hfs_plus, fsan_creation_date, ptr))
 		{
 		    const fsa_time *ptr_time = dynamic_cast<const fsa_time *>(ptr);
-		    if(ptr_time != NULL)
+		    if(ptr_time != nullptr)
 			birthtime = ptr_time->get_value();
 		}
 	    }
 
-	    tools_make_date(chem, ref_lie != NULL, ref.get_last_access(), ref.get_last_modif(), birthtime);
+	    tools_make_date(chem, ref_lie != nullptr, ref.get_last_access(), ref.get_last_modif(), birthtime);
 	}
     }
 
     static void attach_ea(const string &chemin, cat_inode *ino, const mask & ea_mask, memory_pool *pool)
     {
-        ea_attributs *eat = NULL;
+        ea_attributs *eat = nullptr;
         try
         {
-            if(ino == NULL)
+            if(ino == nullptr)
                 throw SRC_BUG;
             eat = ea_filesystem_read_ea(chemin, ea_mask, pool);
-            if(eat != NULL)
+            if(eat != nullptr)
             {
 		if(eat->size() <= 0)
 		    throw SRC_BUG;
                 ino->ea_set_saved_status(cat_inode::ea_full);
                 ino->ea_attach(eat);
-                eat = NULL; // allocated memory now managed by the cat_inode object
+                eat = nullptr; // allocated memory now managed by the cat_inode object
             }
             else
                 ino->ea_set_saved_status(cat_inode::ea_none);
         }
         catch(...)
         {
-            if(eat != NULL)
+            if(eat != nullptr)
                 delete eat;
             throw;
         }
-        if(eat != NULL)
+        if(eat != nullptr)
             throw SRC_BUG;
     }
 
@@ -2392,7 +2392,7 @@ namespace libdar
 				       bool info_details,
 				       memory_pool *pool)
     {
-	path *ret = NULL;
+	path *ret = nullptr;
 	const string display = root.display();
 	const char *ptr = display.c_str();
 
@@ -2406,13 +2406,13 @@ namespace libdar
 	if(S_ISDIR(buf.st_mode))
 	{
 	    ret = new (pool) path(root);
-	    if(ret == NULL)
+	    if(ret == nullptr)
 		throw  Ememory("get_root_with_symlink");
 	}
 	else if(S_ISLNK(buf.st_mode))
 	{
 	    ret = new (pool) path(tools_readlink(ptr));
-	    if(ret == NULL)
+	    if(ret == nullptr)
 		throw Ememory("get_root_with_symlink");
 	    if(ret->is_relative())
 	    {
@@ -2434,7 +2434,7 @@ namespace libdar
 	else // not a directory given as argument
 	    throw Erange("filesystem:get_root_with_symlink", tools_printf(gettext("The given path %s must be a directory (or symbolic link to an existing directory)"), ptr));
 
-	if(ret == NULL)
+	if(ret == nullptr)
 	    throw SRC_BUG; // exit without exception, but ret not allocated !
 
 	return ret;

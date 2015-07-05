@@ -140,7 +140,7 @@ void f2()
 void f3()
 {
     user_interaction *dialog = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(dialog == NULL)
+    if(dialog == nullptr)
 	cout << "ERREUR !" << endl;
 
     try
@@ -217,6 +217,6 @@ void f3()
 	cout << "unknown exception caught" << endl;
     }
 
-    if(dialog != NULL)
+    if(dialog != nullptr)
 	delete dialog;
 }

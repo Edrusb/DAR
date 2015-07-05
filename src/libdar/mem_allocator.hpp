@@ -45,7 +45,7 @@ namespace libdar
     class mem_allocator
     {
     public:
-	mem_allocator(mem_manager *ptr) { if(ptr == NULL) throw SRC_BUG; manager = ptr; };
+	mem_allocator(mem_manager *ptr) { if(ptr == nullptr) throw SRC_BUG; manager = ptr; };
 	mem_allocator(const mem_allocator & ref) { throw SRC_BUG; };
 	const mem_allocator & operator = (const mem_allocator & ref) { throw SRC_BUG; };
 	virtual ~mem_allocator() {};

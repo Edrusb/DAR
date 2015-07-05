@@ -142,7 +142,7 @@ namespace libdar
 	hash = hash_none;
 	lax = x_lax;
 	min_digits = x_min_digits;
-	entr = NULL;
+	entr = nullptr;
 	force_perm = false;
 	to_read_ahead = 0;
 
@@ -150,7 +150,7 @@ namespace libdar
 	try
 	{
 	    entr = where.clone();
-	    if(entr == NULL)
+	    if(entr == nullptr)
 		throw Ememory("sar::sar");
 
 	    if(by_the_end)
@@ -177,13 +177,13 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		if(of_fd != NULL)
+		if(of_fd != nullptr)
 		{
 		    delete of_fd;
-		    of_fd = NULL;
+		    of_fd = nullptr;
 		}
 	    }
-	    if(entr != NULL)
+	    if(entr != nullptr)
 		delete entr;
 	    throw;
 	}
@@ -237,16 +237,16 @@ namespace libdar
 	of_data_name = data_name;
 	force_perm = force_permission;
 	perm = permission;
-	of_fd = NULL;
+	of_fd = nullptr;
 	of_flag = '\0';
 	slicing.older_sar_than_v8 = format_07_compatible;
-	entr = NULL;
+	entr = nullptr;
 	to_read_ahead = 0;
 
 	try
 	{
 	    entr = where.clone();
-	    if(entr == NULL)
+	    if(entr == nullptr)
 		throw Ememory("sar::sar");
 
 	    open_file_init();
@@ -260,13 +260,13 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		if(of_fd != NULL)
+		if(of_fd != nullptr)
 		{
 		    delete of_fd;
-		    of_fd = NULL;
+		    of_fd = nullptr;
 		}
 	    }
-	    if(entr != NULL)
+	    if(entr != nullptr)
 		delete entr;
 	    throw;
 	}
@@ -292,7 +292,7 @@ namespace libdar
 	{
 		// ignore all exception
 	}
-	if(entr != NULL)
+	if(entr != nullptr)
 	    delete entr;
     }
 
@@ -377,7 +377,7 @@ namespace libdar
 	    throw SRC_BUG;
 
         open_last_file();
-	if(of_fd == NULL)
+	if(of_fd == nullptr)
 	    throw SRC_BUG;
 	to_read_ahead = 0;
         ret = of_fd->skip_to_eof();
@@ -530,13 +530,13 @@ namespace libdar
 
 	if(avail_in_slice > amount)
 	{
-	    if(of_fd != NULL)
+	    if(of_fd != nullptr)
 		of_fd->read_ahead(amount);
 	    to_read_ahead = 0;
 	}
 	else
 	{
-	    if(of_fd != NULL)
+	    if(of_fd != nullptr)
 		of_fd->read_ahead(avail_in_slice + (slicing.older_sar_than_v8 ? 0 : 1));
 	    to_read_ahead = amount - avail_in_slice;
 	}
@@ -550,7 +550,7 @@ namespace libdar
         while(lu < sz && loop)
         {
 	    U_I tmp;
-	    if(of_fd != NULL)
+	    if(of_fd != nullptr)
 	    {
 		try
 		{
@@ -644,7 +644,7 @@ namespace libdar
     {
 	bool bug = false;
 
-        if(of_fd != NULL)
+        if(of_fd != nullptr)
         {
 	    char flag = terminal ? flag_type_terminal : flag_type_non_terminal;
 	    if(get_mode() == gf_read_write || get_mode() == gf_write_only)
@@ -667,7 +667,7 @@ namespace libdar
 	    of_fd->terminate();
 
             delete of_fd;
-            of_fd = NULL;
+            of_fd = nullptr;
         }
 
 	if(bug)
@@ -678,7 +678,7 @@ namespace libdar
     {
         header h;
 
-        while(of_fd == NULL)
+        while(of_fd == nullptr)
         {
                 // launching user command if any
             hook_execute(num);
@@ -695,7 +695,7 @@ namespace libdar
 				   false, //<  fail if exists
 				   false, //<  erase
 				   hash_none);
-		if(of_fd == NULL)
+		if(of_fd == nullptr)
 		    throw SRC_BUG;
 		of_fd->fadvise(fichier_global::advise_normal);
 		    // we have no advise to give to the system when reading a slice
@@ -1032,7 +1032,7 @@ namespace libdar
 					   false,  //< erase
 					   hash_none);
 
-			if(of_fd == NULL)
+			if(of_fd == nullptr)
 			    throw SRC_BUG;
 
 			try
@@ -1052,14 +1052,14 @@ namespace libdar
 			    if(h.get_set_internal_name() != of_internal_name)
 				do_erase = true; // this is not a slice of the current archive
 			    delete of_fd;
-			    of_fd = NULL;
+			    of_fd = nullptr;
 			}
 			catch(...)
 			{
-			    if(of_fd != NULL)
+			    if(of_fd != nullptr)
 			    {
 				delete of_fd;
-				of_fd = NULL;
+				of_fd = nullptr;
 			    }
 			    throw;
 			}
@@ -1151,7 +1151,7 @@ namespace libdar
 	    }
 	}
 
-	if(of_fd == NULL)
+	if(of_fd == nullptr)
 	    throw SRC_BUG;
 
 	try
@@ -1183,10 +1183,10 @@ namespace libdar
 	{
 	    if(unlink_on_error)
 		entr->unlink(fic);
-	    if(of_fd != NULL)
+	    if(of_fd != nullptr)
 	    {
 		delete of_fd;
-		of_fd = NULL;
+		of_fd = nullptr;
 	    }
 	    throw;
 	}
@@ -1196,7 +1196,7 @@ namespace libdar
     {
         of_max_seen = 0;
         of_last_file_known = false;
-        of_fd = NULL;
+        of_fd = nullptr;
 	of_flag = '\0';
         slicing.first_slice_header = 0; // means that the sizes have to be determined from file or wrote to file
 	slicing.other_slice_header = 0;
@@ -1205,7 +1205,7 @@ namespace libdar
 
     void sar::open_file(infinint num)
     {
-        if(of_fd == NULL || of_current != num)
+        if(of_fd == nullptr || of_current != num)
         {
 	    const string display = sar_tools_make_filename(base, num, min_digits, ext);
 
@@ -1222,7 +1222,7 @@ namespace libdar
 		    throw Erange("sar::open_file", "Skipping backward would imply accessing/modifying previous slice");
 
 		    // adding the trailing flag
-		if(of_fd != NULL)
+		if(of_fd != nullptr)
 		    close_file(false);
 
 		if(!initial)
@@ -1275,7 +1275,7 @@ namespace libdar
 
     void sar::set_offset(infinint offset)
     {
-        if(of_fd == NULL)
+        if(of_fd == nullptr)
             throw Erange("sar::set_offset", gettext("file not open"));
         else
             of_fd->skip(offset);
@@ -1294,7 +1294,7 @@ namespace libdar
 	    {
 		bool ask_user = false;
 
-		while(of_fd == NULL || of_flag != flag_type_terminal)
+		while(of_fd == nullptr || of_flag != flag_type_terminal)
 		{
 		    if(sar_tools_get_higher_number_in_dir(*entr, base, min_digits, ext, num))
 		    {

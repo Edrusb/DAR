@@ -57,7 +57,7 @@ namespace libdar
     void crypto_asym::set_signatories(const std::vector<std::string> & signatories)
     {
 #if GPGME_SUPPORT
-	gpgme_key_t *signatories_key = NULL;
+	gpgme_key_t *signatories_key = nullptr;
 
 	if(signatories.empty())
 	{
@@ -73,9 +73,9 @@ namespace libdar
 		gpgme_key_t *ptr = signatories_key;
 		gpgme_error_t err;
 
-		if(ptr == NULL)
+		if(ptr == nullptr)
 		    throw SRC_BUG;  // build_key_list failed
-		while(*ptr != NULL)
+		while(*ptr != nullptr)
 		{
 		    err = gpgme_signers_add(context, *ptr);
 		    switch(gpgme_err_code(err))
@@ -106,7 +106,7 @@ namespace libdar
     void crypto_asym::encrypt(const vector<string> & recipients_email, generic_file & clear, generic_file & ciphered)
     {
 #if GPGME_SUPPORT
-	gpgme_key_t *ciphering_keys = NULL;
+	gpgme_key_t *ciphering_keys = nullptr;
 
 	build_key_list(recipients_email, ciphering_keys, false);
 	try
@@ -201,18 +201,18 @@ namespace libdar
 	U_I size = recipients_email.size() + 1;
 
 	ciphering_keys = new (nothrow) gpgme_key_t[size];
-	if(ciphering_keys == NULL)
+	if(ciphering_keys == nullptr)
 	    throw Ememory("crypto_asym::build_key_list");
 
 	    // clearing all fields in order to be able to know which
 	    // index has been allocated and need to be restored in case of error
 	for(U_I i = 0; i < size ; ++i)
-	    ciphering_keys[i] = NULL;
+	    ciphering_keys[i] = nullptr;
 
 	try
 	{
 	    gpgme_error_t err = GPG_ERR_NO_ERROR;
-	    gpgme_user_id_t id = NULL;
+	    gpgme_user_id_t id = nullptr;
 	    bool found = false;
 	    bool eof = false;
 	    bool loop = false;
@@ -222,7 +222,7 @@ namespace libdar
 
 	    for(U_I i = 0; i < recipients_email.size(); ++i)
 	    {
-		err = gpgme_op_keylist_start(context, NULL, 0);
+		err = gpgme_op_keylist_start(context, nullptr, 0);
 		switch(gpgme_err_code(err))
 		{
 		case GPG_ERR_NO_ERROR:
@@ -273,7 +273,7 @@ namespace libdar
 				}
 			    }
 
-			    if(!found && id->next != NULL)
+			    if(!found && id->next != nullptr)
 				id = id->next;
 			    else
 				loop = false;
@@ -285,7 +285,7 @@ namespace libdar
 			if(!found)
 			{
 			    gpgme_key_unref(ciphering_keys[i - offset]);
-			    ciphering_keys[i - offset] = NULL;
+			    ciphering_keys[i - offset] = nullptr;
 			}
 			break;
 		    default:
@@ -321,9 +321,9 @@ namespace libdar
 		    throw Erange("crypto_asym::build_key_list", gettext("No recipient remain with a valid key, encryption is impossible, aborting"));
 	    }
 
-		// the key list must end wth a NULL entry
+		// the key list must end wth a nullptr entry
 
-	    if(ciphering_keys[size - 1 - offset] != NULL)
+	    if(ciphering_keys[size - 1 - offset] != nullptr)
 		throw SRC_BUG;
 	}
 	catch(...)
@@ -335,30 +335,30 @@ namespace libdar
 
     void crypto_asym::release_key_list(gpgme_key_t * & ciphering_keys)
     {
-	if(ciphering_keys != NULL)
+	if(ciphering_keys != nullptr)
 	{
-	    for(U_I i = 0; ciphering_keys[i] != NULL; ++i)
+	    for(U_I i = 0; ciphering_keys[i] != nullptr; ++i)
 		gpgme_key_unref(ciphering_keys[i]);
 
 	    delete [] ciphering_keys;
-	    ciphering_keys = NULL;
+	    ciphering_keys = nullptr;
 	}
     }
 
     void crypto_asym::fill_signing_result()
     {
 	gpgme_verify_result_t inter = gpgme_op_verify_result(context);
-	gpgme_signature_t res = NULL;
+	gpgme_signature_t res = nullptr;
 	signator tmp;
 
 	signing_result.clear();
 
-	if(inter != NULL)
+	if(inter != nullptr)
 	    res = inter->signatures;
 	else
-	    res = NULL;
+	    res = nullptr;
 
-	while(res != NULL)
+	while(res != nullptr)
 	{
 	    if(res->summary & (GPGME_SIGSUM_VALID|GPGME_SIGSUM_GREEN))
 		tmp.result = signator::good;
@@ -398,14 +398,14 @@ namespace libdar
 	gpgme_error_t ret = GPG_ERR_NO_ERROR;
 	thread_cancellation th;
 
-	if(obj == NULL)
+	if(obj == nullptr)
 	    throw SRC_BUG;
 
-	if(uid_hint != NULL)
+	if(uid_hint != nullptr)
 	    message = tools_printf(precision, uid_hint);
 	else
 	{
-	    if(passphrase_info != NULL)
+	    if(passphrase_info != nullptr)
 		message = tools_printf(precision, passphrase_info);
 	    else
 		message = tools_printf(precision, "");

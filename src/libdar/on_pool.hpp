@@ -46,7 +46,7 @@ namespace libdar
 	/// class on_pool is the ancestors of all class that are able to be allocated on a memory pool
 	///
 	/// \note: new and new[] operators using memory pool never throw an exception upon allocation failure
-	/// but rather return NULL pointer. This is the way it was working before g++03 and g++11
+	/// but rather return nullptr pointer. This is the way it was working before g++03 and g++11
 
     class on_pool
     {
@@ -56,7 +56,7 @@ namespace libdar
 	    /// constructor
 	    ///
 	    /// \note If an object has been created by new (not new[], temporary, or local variable)
-	    /// the get_pool() method can return the pool used for allocation, else it returns NULL.
+	    /// the get_pool() method can return the pool used for allocation, else it returns nullptr.
 	    /// The consequence is that objects dynamically created within an array (new []) cannot know
 	    /// the whether they have been allocated using a memory pool or not
 	on_pool() { dynamic_init(); };
@@ -80,25 +80,25 @@ namespace libdar
 	    /// the usual new operator is wrapped to allow proper delete operation later on (throws std::bad_alloc upon allocation failure)
 	    ///
 	    /// \note memory allocation done this way does not use the default C++ new[] operator, which may be slower than using memory pool
-	void *operator new(size_t n_byte) { void *ret = alloc(n_byte, NULL); if(ret == NULL) throw std::bad_alloc(); return ret; };
+	void *operator new(size_t n_byte) { void *ret = alloc(n_byte, nullptr); if(ret == nullptr) throw std::bad_alloc(); return ret; };
 
 
 	    /// the usual new operator is wrapped to allow proper delete operation later on (does not throw exception upon allocation failure)
 	    ///
 	    /// \note memory allocation done this way does not use the default C++ new[] operator, which may be slower than using memory pool
-	void *operator new(size_t n_byte, const std::nothrow_t & nothrow_value) { return alloc(n_byte, NULL); };
+	void *operator new(size_t n_byte, const std::nothrow_t & nothrow_value) { return alloc(n_byte, nullptr); };
 
 
 	    /// the usual new[] operator is wrapped to allow proper delete[] operation later on (throws std::bad_alloc upon allocation failure)
 	    ///
 	    /// \note memory allocation done this way does not use the default C++ new[] operator, which may be slower than using memory pool
-	void *operator new[](size_t n_byte) { void *ret = alloc(n_byte, NULL); if(ret == NULL) throw std::bad_alloc(); return ret; };
+	void *operator new[](size_t n_byte) { void *ret = alloc(n_byte, nullptr); if(ret == nullptr) throw std::bad_alloc(); return ret; };
 
 
 	    /// the usual new[] operator is wrapped to allow proper delete[] operation later on (does not throw exception upon allocation failure)
 	    ///
 	    /// \note memory allocation done this way does not use the default C++ new[] operator, which may be slower than using memory pool
-	void *operator new[](size_t n_byte, const std::nothrow_t & nothrow_value) { return alloc(n_byte, NULL); };
+	void *operator new[](size_t n_byte, const std::nothrow_t & nothrow_value) { return alloc(n_byte, nullptr); };
 
 	    /// this operator allocates a single object on a memory pool
 	    ///
@@ -133,14 +133,14 @@ namespace libdar
 	    /// get the pool used to allocate "this"
 	    ///
 	    /// \return the address of the memory pool that has been used to allocate the object
-	    /// \note if the object has not been allocated using a memory pool NULL is returned
+	    /// \note if the object has not been allocated using a memory pool nullptr is returned
 	    /// \note if the object has not been dynamically allocated, that's to say is a local variable
 	    /// or a temporary object, get_pool() must not be called as it will return unpredictable
 	    /// result and could most probably crash the application if the returned data is used
 #ifdef LIBDAR_SPECIAL_ALLOC
-	memory_pool *get_pool() const { return dynamic ? (((pool_ptr *)this) - 1)->reserve : NULL; };
+	memory_pool *get_pool() const { return dynamic ? (((pool_ptr *)this) - 1)->reserve : nullptr; };
 #else
-	memory_pool *get_pool() const { return NULL; };
+	memory_pool *get_pool() const { return nullptr; };
 #endif
 
 	template <class T> void meta_new(T * & ptr, size_t num)
@@ -148,7 +148,7 @@ namespace libdar
 #ifdef LIBDAR_SPECIAL_ALLOC
 	    size_t byte = num * sizeof(T);
 
-	    if(get_pool() != NULL)
+	    if(get_pool() != nullptr)
 		ptr = (T *)get_pool()->alloc(byte);
 	    else
 		ptr = (T *)new (std::nothrow) char [byte];
@@ -162,7 +162,7 @@ namespace libdar
 	template <class T> void meta_delete(T * ptr)
 	{
 #ifdef LIBDAR_SPECIAL_ALLOC
-	    if(get_pool() != NULL)
+	    if(get_pool() != nullptr)
 		get_pool()->release(ptr);
 	    else
 		delete [] (char *)(ptr);
@@ -191,20 +191,20 @@ namespace libdar
 	bool dynamic;
 
 	    /// used from constructors to setup field "dynamic"
-	void dynamic_init() const { const_cast<on_pool *>(this)->dynamic = (alloc_not_constructed == this); alloc_not_constructed = NULL; };
+	void dynamic_init() const { const_cast<on_pool *>(this)->dynamic = (alloc_not_constructed == this); alloc_not_constructed = nullptr; };
 #endif
 
 	    /// does the whole magic of memory allocation with and without memory_pool
 	    ///
 	    /// \param[in] size is the size of the requested block of memory to allocate
-	    /// \param[in] is the address of the pool to request the memory block to, NULL if default memory allocation shall be used
-	    /// \return the address of the allocated memory block is returned, NULL is returned upon memory allocation failure
+	    /// \param[in] is the address of the pool to request the memory block to, nullptr if default memory allocation shall be used
+	    /// \return the address of the allocated memory block is returned, nullptr is returned upon memory allocation failure
 	static void *alloc(size_t size, memory_pool *p);
 
 	    /// does the whole magic of memory release with and without memory_pool
 	    ///
 	    /// \param[in] ptr is the address of the memory block to release
-	    /// \note may throw exceptions if the given address has never been allocated or is NULL
+	    /// \note may throw exceptions if the given address has never been allocated or is nullptr
 	static void dealloc(void *ptr);
 
 #ifdef LIBDAR_SPECIAL_ALLOC

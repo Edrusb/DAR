@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    if(dialog == NULL)
+    if(dialog == nullptr)
 	cout << "ERREUR !" << endl;
 
     try
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 	cout << "unknown exception caught" << endl;
     }
 
-    if(dialog != NULL)
+    if(dialog != nullptr)
 	delete dialog;
 }
 

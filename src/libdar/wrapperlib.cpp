@@ -24,9 +24,9 @@
 #include "wrapperlib.hpp"
 #include "erreurs.hpp"
 
-#define CHECK_Z if(z_ptr == NULL) throw SRC_BUG
-#define CHECK_BZ if(bz_ptr == NULL) throw SRC_BUG
-#define CHECK_LZMA if(lzma_ptr == NULL) throw SRC_BUG;
+#define CHECK_Z if(z_ptr == nullptr) throw SRC_BUG
+#define CHECK_BZ if(bz_ptr == nullptr) throw SRC_BUG
+#define CHECK_LZMA if(lzma_ptr == nullptr) throw SRC_BUG;
 
 using namespace std;
 
@@ -53,17 +53,17 @@ namespace libdar
         case zlib_mode:
 #if LIBZ_AVAILABLE
 	    meta_new(z_ptr, 1);
-            if(z_ptr == NULL)
+            if(z_ptr == nullptr)
                 throw Ememory("wrapperlib::wrapperlib");
 #if LIBBZ2_AVAILABLE
-            bz_ptr = NULL;
+            bz_ptr = nullptr;
 #endif
 #if LIBLZMA_AVAILABLE
-	    lzma_ptr = NULL;
+	    lzma_ptr = nullptr;
 #endif
-            z_ptr->zalloc = NULL;
-            z_ptr->zfree = NULL;
-            z_ptr->opaque = NULL;
+            z_ptr->zalloc = nullptr;
+            z_ptr->zfree = nullptr;
+            z_ptr->opaque = nullptr;
             x_compressInit = & wrapperlib::z_compressInit;
             x_decompressInit = & wrapperlib::z_decompressInit;
             x_compressEnd = & wrapperlib::z_compressEnd;
@@ -86,17 +86,17 @@ namespace libdar
         case bzlib_mode:
 #if LIBBZ2_AVAILABLE
 	    meta_new(bz_ptr, 1);
-            if(bz_ptr == NULL)
+            if(bz_ptr == nullptr)
                 throw Ememory("wrapperlib::wrapperlib");
 #if LIBZ_AVAILABLE
-            z_ptr = NULL;
+            z_ptr = nullptr;
 #endif
 #if LIBLZMA_AVAILABLE
-	    lzma_ptr = NULL;
+	    lzma_ptr = nullptr;
 #endif
-            bz_ptr->bzalloc = NULL;
-            bz_ptr->bzfree = NULL;
-            bz_ptr->opaque = NULL;
+            bz_ptr->bzalloc = nullptr;
+            bz_ptr->bzfree = nullptr;
+            bz_ptr->opaque = nullptr;
             x_compressInit = & wrapperlib::bz_compressInit;
             x_decompressInit = & wrapperlib::bz_decompressInit;
             x_compressEnd = & wrapperlib::bz_compressEnd;
@@ -118,14 +118,14 @@ namespace libdar
 #endif
 	case xz_mode:
 #if LIBZ_AVAILABLE
-            z_ptr = NULL;
+            z_ptr = nullptr;
 #endif
 #if LIBBZ2_AVAILABLE
-            bz_ptr = NULL;
+            bz_ptr = nullptr;
 #endif
 #if LIBLZMA_AVAILABLE
 	    meta_new(lzma_ptr, 1);
-	    if(lzma_ptr == NULL)
+	    if(lzma_ptr == nullptr)
 		throw Ememory("wrapperlib::wrapperlib");
 	    *lzma_ptr = LZMA_STREAM_INIT;
             x_compressInit = & wrapperlib::lzma_compressInit;
@@ -164,15 +164,15 @@ namespace libdar
     wrapperlib::~wrapperlib()
     {
 #if LIBZ_AVAILABLE
-        if(z_ptr != NULL)
+        if(z_ptr != nullptr)
 	    meta_delete(z_ptr);
 #endif
 #if LIBBZ2_AVAILABLE
-        if(bz_ptr != NULL)
+        if(bz_ptr != nullptr)
 	    meta_delete(bz_ptr);
 #endif
 #if LIBLZMA_AVAILABLE
-	if(lzma_ptr != NULL)
+	if(lzma_ptr != nullptr)
 	{
 	    ::lzma_end(lzma_ptr);
 	    meta_delete(lzma_ptr);

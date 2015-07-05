@@ -98,7 +98,7 @@ namespace libdar
 	reset();
 	copy_to_no_skip = false;
 
-	if(below == NULL)
+	if(below == nullptr)
 	    throw SRC_BUG;
 
 	min_hole_size = hole_size;
@@ -246,11 +246,11 @@ namespace libdar
 	if(!crc_size.is_zero())
 	{
 	    value = create_crc_from_size(crc_size, get_pool());
-	    if(value == NULL)
+	    if(value == nullptr)
 		throw SRC_BUG;
 	}
 	else
-	    value = NULL;
+	    value = nullptr;
 
 	try
 	{
@@ -338,10 +338,10 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    if(value != NULL)
+	    if(value != nullptr)
 	    {
 		delete value;
-		value = NULL;
+		value = nullptr;
 	    }
 	    throw;
 	}

@@ -43,7 +43,7 @@ namespace libdar
 	/// @}
 
     extern void filtre_restore(user_interaction & dialog, //< for user interaction
-			       memory_pool *pool,         //< set to NULL or point to the memory pool to use for memory allocation
+			       memory_pool *pool,         //< set to nullptr or point to the memory pool to use for memory allocation
 			       const mask &filtre,        //< which filename to restore
                                const mask & subtree,      //< which directory and paths to restore
                                const catalogue & cat,     //< table of content to extract information from

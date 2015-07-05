@@ -83,7 +83,7 @@ namespace libdar
 
 	/// \param[in] x is the string to convert
 	/// \return the address of newly allocated memory containing the equivalent string as the argument
-	/// \exception Ememory is thrown if the memory allocation failed, this call never return NULL
+	/// \exception Ememory is thrown if the memory allocation failed, this call never return nullptr
 	/// \note Do not use this function, use std::string::c_str(). The allocated memory must be released by the caller thanks to the "delete []" operator
     extern char *tools_str2charptr(const std::string &x);
 
@@ -127,7 +127,7 @@ namespace libdar
 
 	/// convert an integer to its decimal representation with the highest unit of metric system
 	/// \param[in] number is the integer to convert
-	/// \param[in] unit unit symbol (o for octet, m for meter, etc.) to apply metric system to, this may be NULL
+	/// \param[in] unit unit symbol (o for octet, m for meter, etc.) to apply metric system to, this may be nullptr
 	/// \param[in] binary if set to true using the ki, Gi, Mi ... scale instead of the traditional k, G, M, ... prefixes
 	/// \return the string representing the number in metric system (ex: "1 ko", "200 Mio", ...)
     extern std::string tools_display_integer_in_metric_system(infinint number, const std::string & unit, bool binary);
@@ -163,18 +163,18 @@ namespace libdar
 	/// \param[in] all is the path to split
 	/// \param[out] chemin is the resulting path part, it points to a newly allocated path object
 	/// \param[out] base is the resulting basename
-	/// \param[in] pool memory pool to use for allocation or NULL for default memory allocation
+	/// \param[in] pool memory pool to use for allocation or nullptr for default memory allocation
 	/// \note chemin argument must be release by the caller thanks to the "delete" operator.
-    extern void tools_split_path_basename(const char *all, path * &chemin, std::string & base, memory_pool *pool = NULL);
+    extern void tools_split_path_basename(const char *all, path * &chemin, std::string & base, memory_pool *pool = nullptr);
 
 	/// split a given full path in path part and basename part
 
 	/// \param[in] all is the path to split
 	/// \param[out] chemin is the resulting path part, it points to a newly allocated path object
 	/// \param[out] base is the resulting basename
-	/// \param[in] pool memory pool to use for allocation or NULL for default memory allocation
+	/// \param[in] pool memory pool to use for allocation or nullptr for default memory allocation
 	/// \note chemin argument must be release by the caller thanks to the "delete" operator.
-    extern void tools_split_path_basename(const std::string &all, std::string & chemin, std::string & base, memory_pool *pool = NULL);
+    extern void tools_split_path_basename(const std::string &all, std::string & chemin, std::string & base, memory_pool *pool = nullptr);
 
 	/// open a pair of tuyau objects encapsulating two named pipes.
 
@@ -183,14 +183,14 @@ namespace libdar
 	/// \param[in] output path to the output named pipe
 	/// \param[out] in resulting tuyau object for input
 	/// \param[out] out resulting tuyau object for output
-	/// \param[in] pool memory pool to use for allocation or NULL for default memory allocation
+	/// \param[in] pool memory pool to use for allocation or nullptr for default memory allocation
 	/// \note in and out parameters must be released by the caller thanks to the "delete" operator
     extern void tools_open_pipes(user_interaction & dialog,
 				 const std::string &input,
 				 const std::string & output,
                                  tuyau *&in,
 				 tuyau *&out,
-				 memory_pool *pool = NULL);
+				 memory_pool *pool = nullptr);
 
 	/// set blocking/not blocking mode for reading on a file descriptor
 
@@ -275,13 +275,13 @@ namespace libdar
 	/// \param[in,out] dialog for user interaction
 	/// \param[in] dar_cmd the path to the executable to run
 	/// \param[in] argvpipe the list of arguments to pass through anonymous pipe
-	/// \param[in] pool memory pool to use or NULL for default memory allocation
+	/// \param[in] pool memory pool to use or nullptr for default memory allocation
 	/// \note the command to execute must understand the --pipe-fd option that
 	/// gives the filedescriptor to read from the command-line options
     extern void tools_system_with_pipe(user_interaction & dialog,
 				       const std::string & dar_cmd,
 				       const std::vector<std::string> & argvpipe,
-				       memory_pool *pool = NULL);
+				       memory_pool *pool = nullptr);
 
 	/// write a list of string to file
 
@@ -340,7 +340,7 @@ namespace libdar
 
 	/// \param[in] env the environment vector as retreived from the third argument of the main() function
 	/// \param[in] clef the key or variable name too look for
-	/// \return NULL if the key could not be find or a pointer to the env data giving the value of the requested key
+	/// \return nullptr if the key could not be find or a pointer to the env data giving the value of the requested key
 	/// \note the returned value must not be released by any mean as it is just a pointer to an system allocated memory (the env vector).
     extern const char *tools_get_from_env(const char **env, const char *clef);
 
@@ -350,13 +350,13 @@ namespace libdar
 	/// \param[in] loc the path where resides the slice
 	/// \param[in,out] base the basename of the slice
 	/// \param[in] extension the extension of dar's slices
-	/// \param[in] pool memory pool to use of NULL for default memory allocation
+	/// \param[in] pool memory pool to use of nullptr for default memory allocation
 	/// \note if user accepted the change of slice name proposed by libdar through dialog the base argument is changed
     extern void tools_check_basename(user_interaction & dialog,
                                      const path & loc,
 				     std::string & base,
 				     const std::string & extension,
-				     memory_pool *pool = NULL);
+				     memory_pool *pool = nullptr);
 
 	/// get current working directory
 
@@ -366,7 +366,7 @@ namespace libdar
 
 	/// \param root the path to the file to read
 	/// \return the file pointed to by the symlink or the value given in argument if it is not a symlink
-	/// \note an exception can occur if lack of memory or invalid argument given (NULL or empty string), system call error...
+	/// \note an exception can occur if lack of memory or invalid argument given (nullptr or empty string), system call error...
     extern std::string tools_readlink(const char *root);
 
 	/// test the presence of an argument
@@ -833,10 +833,10 @@ namespace libdar
     extern std::vector<std::string> tools_substract_from_vector(const std::vector<std::string> & a, const std::vector<std::string> & b);
 
 
-	/// compares pointers if not NULL compares their values, true if equal, false if not (pointers or values different)
+	/// compares pointers if not nullptr compares their values, true if equal, false if not (pointers or values different)
     template <class T> bool tools_compare_pointers(const T *a, const T *b)
     {
-	if(a != NULL && b != NULL)
+	if(a != nullptr && b != nullptr)
 	{
 	    if(a != b)
 		return false;
@@ -845,7 +845,7 @@ namespace libdar
 	}
 	else
 	{
-	    if(a != NULL || b != NULL)
+	    if(a != nullptr || b != nullptr)
 		return false;
 	    else
 		return true;
@@ -859,9 +859,9 @@ namespace libdar
 	/// structure may vary it is necessary to know the directory where the corresponding files
 	/// resides
 	/// \param[in] pool whether to allocate the structure on a memory_pool or out of memory_pool
-	/// which succeeds when pool is set to NULL
+	/// which succeeds when pool is set to nullptr
 	/// \return a pointer to the newly allocated dirent structure
-    struct dirent *tools_allocate_struct_dirent(const std::string & path_name, memory_pool *pool = NULL);
+    struct dirent *tools_allocate_struct_dirent(const std::string & path_name, memory_pool *pool = nullptr);
 
 
 	/// release a dirent structure as allocated by tools_allocate_struct_dirent

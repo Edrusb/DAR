@@ -73,7 +73,7 @@ void config_file::fill_morceau()
     tmp.offset = 0;
     morceau.clear();
 
-    if(ref == NULL)
+    if(ref == nullptr)
         throw SRC_BUG;
     ref->skip(0);
 

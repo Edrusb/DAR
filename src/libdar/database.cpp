@@ -62,9 +62,9 @@ namespace libdar
 	options_to_dar.clear();
 	dar_path = "";
 	files = new (get_pool()) data_dir("."); // "." or whaterver else (this name is not used)
-	if(files == NULL)
+	if(files == nullptr)
 	    throw Ememory("database::database");
-	data_files = NULL;
+	data_files = nullptr;
 	check_order_asked = true;
     }
 
@@ -73,7 +73,7 @@ namespace libdar
 	unsigned char db_version;
 	generic_file *f = database_header_open(dialog, get_pool(), base, db_version);
 
-	if(f == NULL)
+	if(f == nullptr)
 	    throw Ememory("database::database");
 	try
 	{
@@ -120,23 +120,23 @@ namespace libdar
 	    if(!partial)
 	    {
 		files = data_tree_read(f, db_version, get_pool());
-		if(files == NULL)
+		if(files == nullptr)
 		    throw Ememory("database::database");
 		if(files->get_name() != ".")
 		    files->set_name(".");
-		data_files = NULL;
+		data_files = nullptr;
 	    }
 	    else
 	    {
 		if(!read_only)
 		{
-		    files = NULL;
+		    files = nullptr;
 		    data_files = file2storage(f, get_pool());
 		}
 		else
 		{
-		    files = NULL;
-		    data_files = NULL;
+		    files = nullptr;
+		    data_files = nullptr;
 		}
 	    }
 	}
@@ -150,19 +150,19 @@ namespace libdar
 
     database::~database()
     {
-	if(files != NULL)
+	if(files != nullptr)
 	    delete files;
-	if(data_files != NULL)
+	if(data_files != nullptr)
 	    delete data_files;
     }
 
     void database::dump(user_interaction & dialog, const std::string & filename, const database_dump_options & opt) const
     {
-	if(files == NULL && data_files == NULL)
+	if(files == nullptr && data_files == nullptr)
 	    throw Erange("database::dump", gettext("Cannot write down a read-only database"));
 
 	generic_file *f = database_header_create(dialog, get_pool(), filename, opt.get_overwrite());
-	if(f == NULL)
+	if(f == nullptr)
 	    throw Ememory("database::dump");
 
 	try
@@ -178,21 +178,21 @@ namespace libdar
 	    }
 	    tools_write_vector(*f, options_to_dar);
 	    tools_write_string(*f, dar_path);
-	    if(files != NULL)
+	    if(files != nullptr)
 		files->dump(*f);
 	    else
-		if(data_files != NULL)
+		if(data_files != nullptr)
 		    memory2file(*data_files, *f);
 		else
 		    throw SRC_BUG;
 	}
 	catch(...)
 	{
-	    if(f != NULL)
+	    if(f != nullptr)
 		delete f;
 	    throw;
 	}
-	if(f != NULL)
+	if(f != nullptr)
 	    delete f;
     }
 
@@ -204,7 +204,7 @@ namespace libdar
 	    struct archive_data dat;
 	    archive_num number = coordinate.size();
 
-	    if(files == NULL)
+	    if(files == nullptr)
 		throw SRC_BUG;
 	    if(basename == "")
 		throw Erange("database::add_archive", gettext("Empty string is an invalid archive basename"));
@@ -240,7 +240,7 @@ namespace libdar
 		throw Erange("database::remove_archive", gettext("Incorrect archive range in database"));
 	    for(U_I i = max ; i >= min ; --i)
 	    {
-		if(files == NULL)
+		if(files == nullptr)
 		    throw SRC_BUG;
 		files->remove_all_from(i, coordinate.size() - 1);
 		files->skip_out(i);
@@ -300,7 +300,7 @@ namespace libdar
 	{
 	    struct archive_data moved;
 
-	    if(files == NULL)
+	    if(files == nullptr)
 		throw SRC_BUG;
 	    if(src >= coordinate.size() || src <= 0)
 		throw Erange("database::set_permutation", string(gettext("Invalid archive number: ")) + tools_int2str(src));
@@ -392,7 +392,7 @@ namespace libdar
 	{
 	    if(num != 0)
 		num = get_real_archive_num(num, opt.get_revert_archive_numbering());
-	    if(files == NULL)
+	    if(files == nullptr)
 		throw SRC_BUG;
 
 	    if(num < coordinate.size())
@@ -414,29 +414,29 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    const data_tree *ptr = NULL;
+	    const data_tree *ptr = nullptr;
 	    const data_dir *ptr_dir = files;
 	    string tmp;
 
-	    if(files == NULL)
+	    if(files == nullptr)
 		throw SRC_BUG;
 
 	    if(!chemin.is_relative())
 		throw Erange("database::show_version", gettext("Invalid path, path must be relative"));
 
-	    while(chemin.pop_front(tmp) && ptr_dir != NULL)
+	    while(chemin.pop_front(tmp) && ptr_dir != nullptr)
 	    {
 		ptr = ptr_dir->read_child(tmp);
-		if(ptr == NULL)
+		if(ptr == nullptr)
 		    throw Erange("database::show_version", gettext("Non existent file in database"));
 		ptr_dir = dynamic_cast<const data_dir *>(ptr);
 	    }
 
-	    if(ptr_dir == NULL)
+	    if(ptr_dir == nullptr)
 		throw Erange("database::show_version", gettext("Non existent file in database"));
 
 	    ptr = ptr_dir->read_child(chemin.display());
-	    if(ptr == NULL)
+	    if(ptr == nullptr)
 		throw Erange("database::show_version", gettext("Non existent file in database"));
 	    else
 		ptr->listing(dialog);
@@ -458,7 +458,7 @@ namespace libdar
 	    vector<infinint> stats_ea(coordinate.size(), 0);
 	    vector<infinint> total_data(coordinate.size(), 0);
 	    vector<infinint> total_ea(coordinate.size(), 0);
-	    if(files == NULL)
+	    if(files == nullptr)
 		throw SRC_BUG;
 	    files->compute_most_recent_stats(stats_data, stats_ea, total_data, total_ea);
 
@@ -494,7 +494,7 @@ namespace libdar
 	    const data_tree *ptr;
 
 	    anneau.assign(filename.begin(), filename.end());
-	    if(files == NULL)
+	    if(files == nullptr)
 		throw SRC_BUG;
 
 	    if(opt.get_info_details())
@@ -600,7 +600,7 @@ namespace libdar
 			}
 		    }
 
-		    if(ptr_dir != NULL)
+		    if(ptr_dir != nullptr)
 		    {  // adding current directory children in the list of files
 			vector<string> fils;
 			vector<string>::iterator fit;
@@ -624,10 +624,10 @@ namespace libdar
 
 	    if(opt.get_early_release())
 	    {
-		if(files != NULL)
+		if(files != nullptr)
 		{
 		    delete files;
-		    files = NULL;
+		    files = nullptr;
 		}
 	    }
 
@@ -724,7 +724,7 @@ static storage *file2storage(generic_file &f, memory_pool *pool)
     unsigned char buffer[taille];
     S_I lu;
 
-    if(st == NULL)
+    if(st == nullptr)
         throw Ememory("dar_manager:file2storage");
 
     do

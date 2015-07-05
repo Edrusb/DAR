@@ -35,7 +35,7 @@ namespace libdar
     {
 	const cat_chardev *ref_chardev = dynamic_cast<const cat_chardev *>(&ref);
 
-	if(ref_chardev == NULL)
+	if(ref_chardev == nullptr)
 	    return false;
 	else
 	    return cat_device::operator == (ref);

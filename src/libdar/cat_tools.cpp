@@ -68,9 +68,9 @@ namespace libdar
 
 	const cat_file *fic = dynamic_cast<const cat_file *>(&ref);
 	const cat_directory *dir = dynamic_cast<const cat_directory *>(&ref);
-	if(fic != NULL)
+	if(fic != nullptr)
 	    ret = tools_display_integer_in_metric_system(fic->get_size(), "o", true);
-	else if(dir != NULL)
+	else if(dir != nullptr)
 	    ret = tools_display_integer_in_metric_system(dir->get_size(), "o", true);
 	else
 	    ret = "0";
@@ -83,7 +83,7 @@ namespace libdar
 	string ret;
 
 	const cat_file *fic = dynamic_cast<const cat_file*>(&ref);
-	if(fic != NULL)
+	if(fic != nullptr)
 	{
 	    deci d = fic->get_storage_size();
 	    ret = d.human();
@@ -103,7 +103,7 @@ namespace libdar
     {
 	string ret;
 	const cat_file *ref_f = dynamic_cast<const cat_file *>(&ref);
-	bool dirty = dirty_seq || (ref_f != NULL ? ref_f->is_dirty() : false);
+	bool dirty = dirty_seq || (ref_f != nullptr ? ref_f->is_dirty() : false);
 	saved_status st = ref.get_saved_status();
 	cat_inode::ea_status ea_st = ref.ea_get_saved_status();
 
@@ -156,14 +156,14 @@ namespace libdar
 	ret += "[" + local_fsa_fam_to_string(ref) + "]";
 	const cat_file *fic = dynamic_cast<const cat_file *>(&ref);
 	const cat_directory *dir = dynamic_cast<const cat_directory *>(&ref);
-	if(fic != NULL && fic->get_saved_status() == s_saved)
+	if(fic != nullptr && fic->get_saved_status() == s_saved)
 	    ret += string("[")
 		+ tools_get_compression_ratio(fic->get_storage_size(),
 					      fic->get_size(),
 					      fic->get_compression_algo_read() != none || fic->get_sparse_file_detection_read())
 		+ "]";
 
-	else if(dir != NULL)
+	else if(dir != nullptr)
 	    ret += string("[")
 		+ tools_get_compression_ratio(dir->get_storage_size(),
 					      dir->get_size(),
@@ -172,7 +172,7 @@ namespace libdar
 	else
 	    ret += "[-----]";
 
-	if(fic != NULL && fic->get_sparse_file_detection_read())
+	if(fic != nullptr && fic->get_sparse_file_detection_read())
 	    ret += "[X]";
 	else
 	    ret += "[ ]";
@@ -196,14 +196,14 @@ namespace libdar
 	const cat_inode *e_ino = dynamic_cast<const cat_inode *>(obj);
 	const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(obj);
 
-	if(e_hard != NULL)
+	if(e_hard != nullptr)
 	    e_ino = e_hard->get_inode();
 
-	if(e_ino != NULL)
+	if(e_ino != nullptr)
 	{
 	    user = local_uid(*e_ino);
 	    group = local_gid(*e_ino);
-	    permissions = local_perm(*e_ino, e_hard != NULL);
+	    permissions = local_perm(*e_ino, e_hard != nullptr);
 	    atime = deci(e_ino->get_last_access().get_second_value()).human();
 	    mtime = deci(e_ino->get_last_modif().get_second_value()).human();
 	    if(e_ino->has_last_change())
@@ -227,7 +227,7 @@ namespace libdar
 
 	dialog.printf("%S<Attributes data=\"%S\" metadata=\"%S\" user=\"%S\" group=\"%S\" permissions=\"%S\" atime=\"%S\" mtime=\"%S\" ctime=\"%S\" />\n",
 		      &beginning, &data, &metadata, &user, &group, &permissions, &atime, &mtime, &ctime);
-	if(list_ea && e_ino != NULL && e_ino->ea_get_saved_status() == cat_inode::ea_full)
+	if(list_ea && e_ino != nullptr && e_ino->ea_get_saved_status() == cat_inode::ea_full)
 	{
 	    string new_begin = beginning + "\t";
 	    local_display_ea(dialog, e_ino, new_begin + "<EA_entry> ea_name=\"", "\">", true);
@@ -265,7 +265,7 @@ namespace libdar
 			  const string &suffix,
 			  bool xml_output)
     {
-	if(ino == NULL)
+	if(ino == nullptr)
 	    return;
 
 	if(ino->ea_get_saved_status() == cat_inode::ea_full)
@@ -273,7 +273,7 @@ namespace libdar
 	    const ea_attributs *owned = ino->get_ea();
 	    string key, val;
 
-	    if(owned == NULL)
+	    if(owned == nullptr)
 		throw SRC_BUG;
 
 	    owned->reset_read();

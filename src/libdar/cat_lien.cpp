@@ -50,7 +50,7 @@ namespace libdar
 		       saved_status saved,
 		       bool small) : cat_inode(dialog, pdesc, reading_ver, saved, small)
     {
-	generic_file *ptr = NULL;
+	generic_file *ptr = nullptr;
 
 	pdesc.check(small);
 	if(small)
@@ -66,7 +66,7 @@ namespace libdar
     {
 	const cat_lien *ref_lien = dynamic_cast<const cat_lien *>(&ref);
 
-	if(ref_lien == NULL)
+	if(ref_lien == nullptr)
 	    return false;
 	else
 	    return points_to == ref_lien->points_to
@@ -89,7 +89,7 @@ namespace libdar
     void cat_lien::sub_compare(const cat_inode & other, bool isolated_mode) const
     {
 	const cat_lien *l_other = dynamic_cast<const cat_lien *>(&other);
-	if(l_other == NULL)
+	if(l_other == nullptr)
 	    throw SRC_BUG; // bad argument cat_inode::compare has a bug
 
 	if(get_saved_status() == s_saved && l_other->get_saved_status() == s_saved)
@@ -100,7 +100,7 @@ namespace libdar
 
     void cat_lien::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
-	generic_file *ptr = NULL;
+	generic_file *ptr = nullptr;
 
 	pdesc.check(small);
 	if(small)

@@ -38,7 +38,7 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	if(f == NULL)
+	if(f == nullptr)
 	    throw SRC_BUG;
 	if(look_for_label(label) != stack.end())
 	    throw Erange("pile::push", "Label already used while pushing a generic_file on a stack");
@@ -65,9 +65,9 @@ namespace libdar
 	    stack.pop_back();
 	}
 	else
-	    ret.ptr = NULL;
+	    ret.ptr = nullptr;
 
-	return ret.ptr; // NULL is returned if the stack is empty
+	return ret.ptr; // nullptr is returned if the stack is empty
     }
 
     generic_file *pile::get_below(const generic_file *ref)
@@ -83,10 +83,10 @@ namespace libdar
 	    if(it != stack.rend())
 		return it->ptr;
 	    else
-		return NULL;
+		return nullptr;
 	}
 	else
-	    return NULL;
+	    return nullptr;
     }
 
     generic_file *pile::get_above(const generic_file *ref)
@@ -102,10 +102,10 @@ namespace libdar
 	    if(it != stack.end())
 		return it->ptr;
 	    else
-		return NULL;
+		return nullptr;
 	}
 	else
-	    return NULL;
+	    return nullptr;
     }
 
 
@@ -120,7 +120,7 @@ namespace libdar
 	    if(it == stack.end())
 		throw Erange("pile::get_by_label", "Label requested in generic_file stack is unknown");
 
-	    if(it->ptr == NULL)
+	    if(it->ptr == nullptr)
 		throw SRC_BUG;
 
 	    return it->ptr;
@@ -163,7 +163,7 @@ namespace libdar
 
 	if(stack.size() > 0)
 	{
-	    if(stack.back().ptr == NULL)
+	    if(stack.back().ptr == nullptr)
 		throw SRC_BUG;
 	    return stack.back().ptr->skippable(direction, amount);
 	}
@@ -178,7 +178,7 @@ namespace libdar
 
 	if(stack.size() > 0)
 	{
-	    if(stack.back().ptr == NULL)
+	    if(stack.back().ptr == nullptr)
 		throw SRC_BUG;
 	    return stack.back().ptr->skip(pos);
 	}
@@ -193,7 +193,7 @@ namespace libdar
 
 	if(stack.size() > 0)
 	{
-	    if(stack.back().ptr == NULL)
+	    if(stack.back().ptr == nullptr)
 		throw SRC_BUG;
 	    return stack.back().ptr->skip_to_eof();
 	}
@@ -208,7 +208,7 @@ namespace libdar
 
 	if(stack.size() > 0)
 	{
-	    if(stack.back().ptr == NULL)
+	    if(stack.back().ptr == nullptr)
 		throw SRC_BUG;
 	    return stack.back().ptr->skip_relative(x);
 	}
@@ -223,7 +223,7 @@ namespace libdar
 
 	if(stack.size() > 0)
 	{
-	    if(stack.back().ptr == NULL)
+	    if(stack.back().ptr == nullptr)
 		throw SRC_BUG;
 	    return stack.back().ptr->get_position();
 	}
@@ -238,7 +238,7 @@ namespace libdar
 
 	if(stack.size() > 0)
 	{
-	    if(stack.back().ptr == NULL)
+	    if(stack.back().ptr == nullptr)
 		throw SRC_BUG;
 	    stack.back().ptr->copy_to(ref);
 	}
@@ -253,7 +253,7 @@ namespace libdar
 
 	if(stack.size() > 0)
 	{
-	    if(stack.back().ptr == NULL)
+	    if(stack.back().ptr == nullptr)
 		throw SRC_BUG;
 	    stack.back().ptr->copy_to(ref, crc_size, value);
 	}
@@ -268,7 +268,7 @@ namespace libdar
 
 	if(stack.size() > 0)
 	{
-	    if(stack.back().ptr == NULL)
+	    if(stack.back().ptr == nullptr)
 		throw SRC_BUG;
 	    return stack.back().ptr->read_ahead(amount);
 	}
@@ -279,7 +279,7 @@ namespace libdar
     {
 	if(stack.size() > 0)
 	{
-	    if(stack.back().ptr == NULL)
+	    if(stack.back().ptr == nullptr)
 		throw SRC_BUG;
 	    return stack.back().ptr->read(a, size);
 	}
@@ -291,7 +291,7 @@ namespace libdar
     {
 	if(stack.size() > 0)
 	{
-	    if(stack.back().ptr == NULL)
+	    if(stack.back().ptr == nullptr)
 		throw SRC_BUG;
 	    stack.back().ptr->write(a, size);
 	}
@@ -331,7 +331,7 @@ namespace libdar
     void pile::inherited_sync_write()
     {
 	for(vector<face>::reverse_iterator it = stack.rbegin() ; it != stack.rend() ; ++it)
-	    if(it->ptr != NULL)
+	    if(it->ptr != nullptr)
 		it->ptr->sync_write();
 	    else
 		throw SRC_BUG;
@@ -340,7 +340,7 @@ namespace libdar
     void pile::inherited_flush_read()
     {
 	for(vector<face>::iterator it = stack.begin() ; it != stack.end() ; ++it)
-	    if(it->ptr != NULL)
+	    if(it->ptr != nullptr)
 		it->ptr->flush_read();
 	    else
 		throw SRC_BUG;
@@ -350,7 +350,7 @@ namespace libdar
     void pile::inherited_terminate()
     {
 	for(vector<face>::reverse_iterator it = stack.rbegin() ; it != stack.rend() ; ++it)
-	    if(it->ptr != NULL)
+	    if(it->ptr != nullptr)
 		it->ptr->terminate();
 	    else
 		throw SRC_BUG;
@@ -361,7 +361,7 @@ namespace libdar
     {
 	for(vector<face>::reverse_iterator it = stack.rbegin() ; it != stack.rend() ; ++it)
 	{
-	    if(it->ptr != NULL)
+	    if(it->ptr != nullptr)
 	    {
 		try
 		{
@@ -371,7 +371,7 @@ namespace libdar
 		{
 			// ignore all exceptions
 		}
-		it->ptr = NULL;
+		it->ptr = nullptr;
 	    }
 	}
 	stack.clear();

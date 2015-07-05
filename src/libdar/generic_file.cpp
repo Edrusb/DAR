@@ -317,7 +317,7 @@ namespace libdar
 	read_ahead(me_read_ahead);
 	f.read_ahead(you_read_ahead);
 	value = create_crc_from_size(crc_size, get_pool());
-	if(value == NULL)
+	if(value == nullptr)
 	    throw SRC_BUG;
 	try
 	{
@@ -354,7 +354,7 @@ namespace libdar
 	catch(...)
 	{
 	    delete value;
-	    value = NULL;
+	    value = nullptr;
 	    throw;
 	}
 
@@ -368,7 +368,7 @@ namespace libdar
 
         if(active_read == &generic_file::read_crc)
             throw SRC_BUG; // crc still active, previous CRC value never read
-	if(checksum != NULL)
+	if(checksum != nullptr)
 	    throw SRC_BUG; // checksum is only created when crc mode is activated
 	checksum = create_crc_from_size(width, get_pool());
         enable_crc(true);
@@ -376,14 +376,14 @@ namespace libdar
 
     crc *generic_file::get_crc()
     {
-	crc *ret = NULL;
+	crc *ret = nullptr;
 
-	if(checksum == NULL)
+	if(checksum == nullptr)
 	    throw SRC_BUG;
 	else
 	{
 	    ret = checksum;
-	    checksum = NULL; // the CRC object is now under the responsibility of the caller
+	    checksum = nullptr; // the CRC object is now under the responsibility of the caller
 	}
 	enable_crc(false);
 
@@ -419,7 +419,7 @@ namespace libdar
 
         if(mode) // routines with crc features
         {
-	    if(checksum == NULL)
+	    if(checksum == nullptr)
 		throw SRC_BUG;
             active_read = &generic_file::read_crc;
             active_write = &generic_file::write_crc;
@@ -438,7 +438,7 @@ namespace libdar
 	else
 	{
 	    S_I ret = inherited_read(a, size);
-	    if(checksum == NULL)
+	    if(checksum == nullptr)
 		throw SRC_BUG;
 	    checksum->compute(a, ret);
 	    return ret;
@@ -451,27 +451,27 @@ namespace libdar
 	    throw SRC_BUG;
 
         inherited_write(a, size);
-	if(checksum == NULL)
+	if(checksum == nullptr)
 	    throw SRC_BUG;
 	checksum->compute(a, size);
     }
 
     void generic_file::destroy()
     {
-	if(checksum != NULL)
+	if(checksum != nullptr)
 	{
 	    delete checksum;
-	    checksum = NULL;
+	    checksum = nullptr;
 	}
     }
 
     void generic_file::copy_from(const generic_file & ref)
     {
 	rw = ref.rw;
-	if(ref.checksum != NULL)
+	if(ref.checksum != nullptr)
 	    checksum = ref.checksum->clone();
 	else
-	    checksum = NULL;
+	    checksum = nullptr;
 	terminated = ref.terminated;
 	no_read_ahead = ref.no_read_ahead;
 	active_read = ref.active_read;
@@ -480,7 +480,7 @@ namespace libdar
 
     const char * generic_file_get_name(gf_mode mode)
     {
-	const char *ret = NULL;
+	const char *ret = nullptr;
 
         switch(mode)
 	{

@@ -87,7 +87,7 @@ namespace libdar
 	    /// read and create an object of inherited class of class cat_entree
 	    ///
 	    /// \param[in] dialog for user interaction
-	    /// \param[in] pool for memory allocation (NULL if special_alloc not activated)
+	    /// \param[in] pool for memory allocation (nullptr if special_alloc not activated)
 	    /// \param[in] f where from to read data in order to create the object
 	    /// \param[in] reading_ver archive version format to use for reading
 	    /// \param[in,out] stats updated statistical fields
@@ -168,7 +168,7 @@ namespace libdar
 	virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const;
 
 
-	    /// stack used to read object from (NULL is returned for object created from filesystem)
+	    /// stack used to read object from (nullptr is returned for object created from filesystem)
 	pile *get_pile() const { return pdesc.stack; };
 
 	    /// compressor generic_file relative methods
