@@ -117,7 +117,7 @@ AC_TYPE_SIGNAL
 AC_FUNC_STAT
 AC_FUNC_UTIME_NULL
 AC_HEADER_TIME
-AC_CHECK_FUNCS([lchown mkdir regcomp rmdir strerr-or strerror_r utime fdopendir readdir_r ctime_r getgrnam_r])
+AC_CHECK_FUNCS([lchown mkdir regcomp rmdir strerr-or strerror_r utime fdopendir readdir_r ctime_r getgrnam_r getpwnam_r])
 
 AC_MSG_CHECKING([for c++11 support])
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],
