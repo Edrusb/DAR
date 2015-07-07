@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ "$1" = "" ] ; then
-  echo "usage $0  <multi-thread> <hash> <crypto> <zip> <slice> <Slice> <tape mark[y|n]> <sequential read[y|n]> <min-digit> <sparse-size> <keepcompressed[y|n]> <recheck-hole[y|n]> "
+  echo "usage $0  <multi-thread> <hash> <crypto> <zip> <slice> <Slice> <tape mark[y|n]> <sequential read[y|n]> <min-digit> <sparse-size> <keepcompressed[y|n]> <recheck-hole[y|n]> <asym[y|n]>"
   exit 1
 fi
 
@@ -17,6 +17,7 @@ digit="$9"
 sparse="${10}"
 keep_compr="${11}"
 re_hole="${12}"
+asym="${13}"
 
 #echo "crypto = $crypto"
 #echo "zip = $zip"
@@ -36,13 +37,28 @@ ALL_TESTS="A1 B1 B2 B3 B4 C1 C2 C3 C4 D1 E1 E2 E3 F1 F2 F3 G1 G2 G3 H1"
 export OPT=tmp.file
 
 if [ "$crypto" != "none" ]; then
-  crypto_K="-K $crypto:toto"
-  crypto_J="-J $crypto:toto"
-  crypto_A="'-$' $crypto:toto"
+  if [ "$asym" != "y" ]; then
+    crypto_K="-K $crypto:toto"
+    crypto_J="-J $crypto:toto"
+    crypto_A="'-$' $crypto:toto"
+    sign=""
+  else
+    crypto_K="-K gnupg:$crypto:$DAR_KEY"
+    crypto_J=""
+    crypto_A="'-$' gnupg:$crypto:$DAR_KEY"
+    sign="$DAR_KEY"
+  fi
 else
-  crypto_K=""
-  crypto_J=""
-  crypto_A=""
+  if [ "$asym" != "y" ]; then
+    crypto_K=""
+    crypto_J=""
+    crypto_A=""
+    sign=""
+  else
+    ALL_TESTS="A0"
+    # do no test (A0 does not exist) as same test done
+    # when asym != y
+  fi
 fi
 
 if [ "$zip" != "none" ]; then
@@ -139,7 +155,7 @@ isolate:
  $slicing
  $tape
  $hash
-
+ --sign $sign
 
 merge:
  $zip
@@ -155,6 +171,7 @@ create:
  $tape
  $hash
  $sparse
+ --sign $sign
 
 listing:
 
@@ -165,8 +182,8 @@ diffing:
 EOF
 echo "----------------------------------------------------------------"
 echo "----------------------------------------------------------------"
-echo "TESTS PARAMETERS NATURE: thread\thash\t\tcrypto\tzip\tslice\tSlice\ttape-mark\tseqread\tdigit\tsparse\tkeepcpr\tre-hole"
-echo "TESTS PARAMETERS VALUE : $multi_thread\t$hash\t$crypto\t$zip\t$slice\t$Slice\t$tape_mark\t\t$seq_read\t$digit\t$sparse\t$keep_compr\t$re_hole"
+echo "TESTS PARAMETERS NATURE: thread\thash\t\tcrypto\tzip\tslice\tSlice\ttape-mark\tseqread\tdigit\tsparse\tkeepcpr\tre-hole\tasym"
+echo "TESTS PARAMETERS VALUE : $multi_thread\t$hash\t$crypto\t$zip\t$slice\t$Slice\t$tape_mark\t\t$seq_read\t$digit\t$sparse\t$keep_compr\t$re_hole\t$asym"
 echo "TEST SET: $ALL_TESTS"
 echo "----------------------------------------------------------------"
 exec ./routine.sh $ALL_TESTS

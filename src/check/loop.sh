@@ -1,5 +1,6 @@
 #!/bin/sh
 
+
 if [ ! -x ../dar_suite/dar ] ; then
   echo "********************************************"
   echo ""
@@ -51,6 +52,24 @@ if [ `id -u` -ne 0 ]; then
   exit 3
 fi
 
+if [ -z "$DAR_KEY" ] ; then
+  echo "You need to set the environmental varialble"
+  echo "DAR_KEY to an email for which you have public"
+  echo "and private key available for encryption and"
+  echo "signature."
+  echo "You can use the GNUPGHOME variable to"
+  echo "point to another keyring than ~root/.gnupg"
+  echo ""
+  echo "Example of use with bash:"
+  echo "export DAR_KEY=your.email@your.domain"
+  echo "export GNUPGHOME=~me/.gnupg"
+  echo ""
+  echo "Example of use with tcsh:"
+  echo "setenv DAR_KEY your.email@your.domain"
+  echo "setenv GNUPGHOME ~me/.gnupg"
+  exit 3
+fi
+
 if ./all_features ; then
   echo "OK, all required features are available for testing"
 else
@@ -68,7 +87,9 @@ for multi_thread in n y ; do
                   for sparse_size in 100 0 ; do
                     for keep_compr in y n ; do
                       for recheck_hole in y n ; do
-                         ./main.sh "$multi_thread" "$hash" "$crypto" "$zip" "$slice" "$Slice" "$tape" "$seq_read" "$digit" "$sparse_size" "$keep_compr" "$recheck_hole"  || exit 1
+			for asym in y n ; do
+                         ./main.sh "$multi_thread" "$hash" "$crypto" "$zip" "$slice" "$Slice" "$tape" "$seq_read" "$digit" "$sparse_size" "$keep_compr" "$recheck_hole" "$asym" || exit 1
+                        done
 		      done
                     done
                   done
