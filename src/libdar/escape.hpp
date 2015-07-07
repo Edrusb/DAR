@@ -136,7 +136,7 @@ namespace libdar
 	bool skip(const infinint & pos);
 	bool skip_to_eof();
 	bool skip_relative(S_I x);
-	infinint get_position();
+	infinint get_position() const;
 
     protected:
 	void inherited_read_ahead(const infinint & amount);
@@ -187,7 +187,7 @@ namespace libdar
 	    //-- routines
 
 	void set_fixed_sequence_for(sequence_type t) { fixed_sequence[ESCAPE_SEQUENCE_LENGTH - 1] = type2char(t); };
-	void check_below() { if(x_below == nullptr) throw SRC_BUG; };
+	void check_below() const { if(x_below == nullptr) throw SRC_BUG; };
 	void clean_read();  //< drops all in-transit data
 	void flush_write(); //< write down to "below" all in-transit data
 	void flush_or_clean()

@@ -98,7 +98,7 @@ namespace libdar
         bool skip(const infinint & pos);
         bool skip_to_eof() { if(is_terminated()) throw SRC_BUG; return reference->skip_to_eof(); };
         bool skip_relative(S_I x);
-        infinint get_position() { return cur_pos; };
+        infinint get_position() const { return cur_pos; };
 
 	    // contextual inherited method
 	bool is_an_old_start_end_archive() const { return old_sar; };

@@ -57,7 +57,7 @@ namespace libdar
 	bool skip(const infinint & pos) { return data->skip(pos); };
 	bool skip_to_eof() { return data->skip_to_eof(); };
 	bool skip_relative(S_I x) { return data->skip_relative(x); };
-	infinint get_position() { return data->get_position(); };
+	infinint get_position() const { return data->get_position(); };
 
 
 	    // virtual method inherited from fichier_global

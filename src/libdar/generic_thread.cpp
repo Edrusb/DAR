@@ -233,7 +233,7 @@ namespace libdar
 	return ret;
     }
 
-    infinint generic_thread::get_position()
+    infinint generic_thread::get_position() const
     {
 	infinint ret;
 

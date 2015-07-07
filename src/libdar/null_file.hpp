@@ -55,7 +55,7 @@ namespace libdar
         bool skip(const infinint &pos) { return true; };
         bool skip_to_eof() { return true; };
         bool skip_relative(signed int x) { return false; };
-        infinint get_position() { return 0; };
+        infinint get_position() const { return 0; };
 
     protected :
 	void inherited_read_ahead(const infinint & amount) {};

@@ -142,7 +142,7 @@ namespace libdar
 	bool skip(const infinint & pos);
 	bool skip_to_eof();
 	bool skip_relative(S_I x);
-	infinint get_position();
+	infinint get_position() const;
 
 	void copy_to(generic_file & ref);
 	void copy_to(generic_file & ref, const infinint & crc_size, crc * & value);

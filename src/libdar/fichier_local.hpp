@@ -94,7 +94,7 @@ namespace libdar
         bool skip(const infinint & pos);
         bool skip_to_eof();
         bool skip_relative(S_I x);
-        infinint get_position();
+        infinint get_position() const;
 
 	    /// provide the low level filedescriptor to the call and terminate()
 	    ///

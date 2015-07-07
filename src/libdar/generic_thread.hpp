@@ -70,7 +70,7 @@ namespace libdar
 	virtual bool skip(const infinint & pos);
 	virtual bool skip_to_eof();
 	virtual bool skip_relative(S_I x);
-	virtual infinint get_position();
+	virtual infinint get_position() const;
 
     protected:
 	    // inherited from generic_file

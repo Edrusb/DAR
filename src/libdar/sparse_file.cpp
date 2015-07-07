@@ -109,7 +109,7 @@ namespace libdar
 	min_hole_size = hole_size; // setting back min_hole_size to its value
     }
 
-    infinint sparse_file::get_position()
+    infinint sparse_file::get_position() const
     {
 	if(is_terminated())
 	    throw SRC_BUG;

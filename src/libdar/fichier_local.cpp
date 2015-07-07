@@ -250,7 +250,7 @@ namespace libdar
         return true;
     }
 
-    infinint fichier_local::get_position()
+    infinint fichier_local::get_position() const
     {
 	if(is_terminated())
 	    throw SRC_BUG;

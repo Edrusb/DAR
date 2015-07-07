@@ -216,7 +216,7 @@ namespace libdar
 	    throw Erange("pile::skip_relative", "Error: skip_relative() on empty stack");
     }
 
-    infinint pile::get_position()
+    infinint pile::get_position() const
     {
 	if(is_terminated())
 	    throw SRC_BUG;

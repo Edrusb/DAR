@@ -80,7 +80,7 @@ namespace libdar
 	    /// inherited from generic_file
         bool skip_relative(S_I x);
 	    /// inherited from generic_file
-        infinint get_position() { return current; };
+        infinint get_position() const { return current; };
 
 	    /// when a tronc is used over a compressor, it becomes necessary to disable position check
 	    ///

@@ -504,7 +504,7 @@ namespace libdar
         return true; // when x == 0
     }
 
-    infinint sar::get_position()
+    infinint sar::get_position() const
     {
 	infinint delta = slicing.older_sar_than_v8 ? 0 : 1; // one byte less per slice with archive format >= 8
 

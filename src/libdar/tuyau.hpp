@@ -77,7 +77,7 @@ namespace libdar
         bool skip(const infinint & pos);
         bool skip_to_eof();
         bool skip_relative(signed int x);
-        infinint get_position() { return position; };
+        infinint get_position() const { return position; };
 
 	bool has_next_to_read();
 

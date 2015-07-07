@@ -88,7 +88,7 @@ namespace libdar
 	    /// inherited from generic_file
 	bool skip_relative(S_I x);
 	    /// inherited from generic_file
-	infinint get_position() { if(is_terminated()) throw SRC_BUG; return current_position; };
+	infinint get_position() const { if(is_terminated()) throw SRC_BUG; return current_position; };
 
 	    /// in write_only mode indicate that end of file is reached
 

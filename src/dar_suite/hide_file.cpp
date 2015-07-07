@@ -123,7 +123,7 @@ bool hide_file::skip_relative(S_I x)
     return true;
 }
 
-infinint hide_file::get_position()
+infinint hide_file::get_position() const
 {
     CHECK_INIT;
     if(is_terminated())
@@ -177,8 +177,12 @@ void hide_file::inherited_write(const char *a, size_t size)
     throw SRC_BUG; // hide_file alsways is read-only !
 }
 
-void hide_file::init()
+void hide_file::init() const
 {
-    fill_morceau();
-    is_init = true;
+    hide_file *me = const_cast<hide_file *>(this);
+
+    if(me == nullptr)
+	throw SRC_BUG;
+    me->fill_morceau();
+    me->is_init = true;
 }

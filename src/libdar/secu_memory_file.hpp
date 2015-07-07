@@ -54,7 +54,7 @@ namespace libdar
 	bool skip(const infinint & pos);
 	bool skip_to_eof();
 	bool skip_relative(S_I x);
-	infinint get_position() { if(is_terminated()) throw SRC_BUG; return position; };
+	infinint get_position() const { if(is_terminated()) throw SRC_BUG; return position; };
 
 	const secu_string & get_contents() const { return data; };
 

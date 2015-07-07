@@ -99,7 +99,7 @@ namespace libdar
 	bool skip(const infinint & pos) { if(pos != offset) throw Efeature("skip in sparse_file"); else return true; };
 	bool skip_to_eof() { throw Efeature("skip in sparse_file"); };
 	bool skip_relative(S_I x)  { if(x != 0) throw Efeature("skip in sparse_file"); return true; };
-	infinint get_position();
+	infinint get_position() const;
 
     protected:
 

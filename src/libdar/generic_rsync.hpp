@@ -96,7 +96,7 @@ namespace libdar
 	bool skip(const infinint & pos) {if(pos != 0 || !initial) throw SRC_BUG; else return true; };
 	bool skip_to_eof() { throw SRC_BUG; };
 	bool skip_relative(S_I x) { if(x != 0) throw SRC_BUG; else return true; };
-	infinint get_position() { return x_below->get_position(); };
+	infinint get_position() const { return x_below->get_position(); };
 
     protected:
 	void inherited_read_ahead(const infinint & amount) {};

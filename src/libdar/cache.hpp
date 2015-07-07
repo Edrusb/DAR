@@ -66,7 +66,7 @@ namespace libdar
 	bool skip(const infinint & pos);
 	bool skip_to_eof();
 	bool skip_relative(S_I x);
-	infinint get_position() { return buffer_offset + next; };
+	infinint get_position() const { return buffer_offset + next; };
 
     protected:
 	    // inherited from generic_file

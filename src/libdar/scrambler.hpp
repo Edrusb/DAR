@@ -53,7 +53,7 @@ namespace libdar
         bool skip(const infinint & pos) { if(ref == nullptr) throw SRC_BUG; return ref->skip(pos); };
         bool skip_to_eof() { if(ref==nullptr) throw SRC_BUG; return ref->skip_to_eof(); };
         bool skip_relative(S_I x) { if(ref == nullptr) throw SRC_BUG; return ref->skip_relative(x); };
-        infinint get_position() { if(ref == nullptr) throw SRC_BUG; return ref->get_position(); };
+        infinint get_position() const { if(ref == nullptr) throw SRC_BUG; return ref->get_position(); };
 
     protected:
 	void inherited_read_ahead(const infinint & amount) { ref->read_ahead(amount); };

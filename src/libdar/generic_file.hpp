@@ -182,7 +182,7 @@ namespace libdar
         virtual bool skip_relative(S_I x) = 0;
 
 	    /// get the current read/write position
-        virtual infinint get_position() = 0;
+        virtual infinint get_position() const = 0;
 
 	    /// copy all data from current position to the object in argument
         virtual void copy_to(generic_file &ref);

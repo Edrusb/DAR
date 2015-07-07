@@ -107,7 +107,7 @@ namespace libdar
         bool skip(const infinint & pos) {if(ref == nullptr || pos != ref->get_position()) throw SRC_BUG; else return true; };
         bool skip_to_eof() { if(get_mode() == gf_write_only) return true; else throw SRC_BUG; };
         bool skip_relative(S_I x) { if(x != 0) throw SRC_BUG; else return true; };
-	infinint get_position() { if(ref == nullptr) throw SRC_BUG; return ref->get_position(); };
+	infinint get_position() const { if(ref == nullptr) throw SRC_BUG; return ref->get_position(); };
 
 	    /// for debugging purposes only
 	void set_only_hash() { only_hash = true; };

@@ -46,7 +46,7 @@ public:
     bool skip(const infinint & pos);
     bool skip_to_eof();
     bool skip_relative(S_I x);
-    infinint get_position();
+    infinint get_position() const;
 
 protected:
     struct partie
@@ -75,7 +75,7 @@ private:
     infinint pos_relicat;
     bool is_init;
 
-    void init();
+    void init() const;
 };
 
     /// @}

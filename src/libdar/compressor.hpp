@@ -81,7 +81,7 @@ namespace libdar
         bool skip(const infinint & pos) { compr_flush_write(); compr_flush_read(); clean_read(); return compressed->skip(pos); };
         bool skip_to_eof()  { compr_flush_write(); compr_flush_read(); clean_read(); return compressed->skip_to_eof(); };
         bool skip_relative(S_I x) { compr_flush_write(); compr_flush_read(); clean_read(); return compressed->skip_relative(x); };
-        infinint get_position() { return compressed->get_position(); };
+        infinint get_position() const { return compressed->get_position(); };
 
     protected :
 	void inherited_read_ahead(const infinint & amount) { compressed->read_ahead(amount); };

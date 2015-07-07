@@ -457,7 +457,7 @@ namespace libdar
 	return ret;
     }
 
-    infinint escape::get_position()
+    infinint escape::get_position() const
     {
 	if(is_terminated())
 	    throw SRC_BUG;
