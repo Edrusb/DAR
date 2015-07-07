@@ -55,7 +55,7 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-    class fichier_global : public generic_file, public thread_cancellation
+    class fichier_global : public generic_file, public thread_cancellation, public mem_ui
     {
     public :
 	enum advise
@@ -72,14 +72,11 @@ namespace libdar
 	    ///
 	    /// \note some well defined error case must generate an Esystem exception, other by Erange or more appropriated Egeneric exceptions
 	    /// to known what type of error must be handled by Esystem object, see the Esystem::io_error enum
-        fichier_global(const user_interaction & dialog, gf_mode mode);
-	fichier_global(const fichier_global & ref) : generic_file(ref) { copy_from(ref); };
+        fichier_global(const user_interaction & dialog, gf_mode mode): generic_file(mode), mem_ui(dialog) {};
+	fichier_global(const fichier_global & ref) : generic_file(ref), thread_cancellation(ref), mem_ui(ref) {};
 
-	    // assignment operator
-	const fichier_global & operator = (const fichier_global & ref) { detruit(); copy_parent_from(ref); copy_from(ref); return *this; };
-
-	    // destructor
-	~fichier_global() { detruit(); };
+	    // default assignment operator is fine here
+	    // default destructor is fine too here
 
 	    /// set the ownership of the file
 	virtual void change_ownership(const std::string & user, const std::string & group) = 0;
@@ -94,8 +91,6 @@ namespace libdar
 	virtual void fadvise(advise adv) const = 0;
 
     protected :
-	user_interaction & get_ui() { if(x_dialog == nullptr) throw SRC_BUG; return *x_dialog; };
-
 	    /// replaces generic_file::inherited_write() method, to allow the return of partial writings
 	    ///
 	    /// a partial writing is allowed when no space is available for writing
@@ -122,16 +117,10 @@ namespace libdar
 	virtual bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message) = 0;
 
     private:
-	user_interaction *x_dialog;
 
 	    // inherited from generic_file class and relocated as private methods
 	void inherited_write(const char *a, U_I size);
 	U_I inherited_read(char *a, U_I size);
-	    //
-
-	void copy_from(const fichier_global & ref);
-	void copy_parent_from(const fichier_global & ref);
-	void detruit() { if(x_dialog != nullptr) { delete x_dialog; x_dialog = nullptr; } };
     };
 
 
