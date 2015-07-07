@@ -62,10 +62,10 @@ namespace libdar
     class catalogue : protected mem_ui, public on_pool
     {
     public :
-        catalogue(user_interaction & dialog,
+        catalogue(const user_interaction & dialog,
 		  const datetime & root_last_modif,
 		  const label & data_name);
-        catalogue(user_interaction & dialog,
+        catalogue(const user_interaction & dialog,
 		  const pile_descriptor & pdesc,
 		  const archive_version & reading_ver,
 		  compression default_algo,

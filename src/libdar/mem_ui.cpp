@@ -55,7 +55,7 @@ namespace libdar
 	    set_ui(*(ref.ui));
     }
 
-    void mem_ui::set_ui(user_interaction & dialog)
+    void mem_ui::set_ui(const user_interaction & dialog)
     {
 	ui = dialog.clone();
 	if(ui == nullptr)

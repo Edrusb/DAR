@@ -121,7 +121,7 @@ namespace libdar
 {
 
 
-    sar::sar(user_interaction & dialog,
+    sar::sar(const user_interaction & dialog,
 	     const string & base_name,
 	     const string & extension,
 	     const entrepot & where,
@@ -162,7 +162,7 @@ namespace libdar
 		catch(Erange & e)
 		{
 		    string tmp = e.get_message();
- 		    dialog.printf(gettext("Error met while opening the last slice: %S. Trying to open the archive using the first slice..."), &tmp);
+ 		    get_ui().printf(gettext("Error met while opening the last slice: %S. Trying to open the archive using the first slice..."), &tmp);
 		    open_file(1);
 		}
 	    }
@@ -189,7 +189,7 @@ namespace libdar
 	}
     }
 
-    sar::sar(user_interaction & dialog,
+    sar::sar(const user_interaction & dialog,
 	     gf_mode open_mode,
 	     const string & base_name,
 	     const string & extension,

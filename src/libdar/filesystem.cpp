@@ -426,7 +426,7 @@ namespace libdar
 ///////////////////////////////////////////////////////////////////
 
 
-    filesystem_backup::filesystem_backup(user_interaction & dialog,
+    filesystem_backup::filesystem_backup(const user_interaction & dialog,
 					 const path &root,
 					 bool x_info_details,
 					 const mask & x_ea_mask,
@@ -730,7 +730,7 @@ namespace libdar
 ///////////////////////////////////////////////////////////////////
 
 
-    filesystem_diff::filesystem_diff(user_interaction & dialog,
+    filesystem_diff::filesystem_diff(const user_interaction & dialog,
 				     const path &root,
 				     bool x_info_details,
 				     const mask & x_ea_mask,
@@ -1279,7 +1279,7 @@ namespace libdar
 ///////////////////////////////////////////////////////////////////
 
 
-    filesystem_restore::filesystem_restore(user_interaction & dialog,
+    filesystem_restore::filesystem_restore(const user_interaction & dialog,
 					   const path &root,
 					   bool x_warn_overwrite,
                                            bool x_info_details,

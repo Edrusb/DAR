@@ -75,7 +75,7 @@ namespace libdar
 	    /// which is either "start" or "end".
 	    /// \param[in] backup_hook_file_mask defines the path+filename of entry that need to have
 	    /// the hook executed before and after their backup
-	semaphore(user_interaction & dialog,
+	semaphore(const user_interaction & dialog,
 		  const std::string & backup_hook_file_execute,
 		  const mask & backup_hook_file_mask);
 

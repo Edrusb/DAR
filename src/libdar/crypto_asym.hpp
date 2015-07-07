@@ -35,7 +35,6 @@ extern "C"
 
 #include "../my_config.h"
 #include "generic_file.hpp"
-#include "user_interaction.hpp"
 #include "generic_file_overlay_for_gpgme.hpp"
 #include "erreurs.hpp"
 #include "mem_ui.hpp"
@@ -53,7 +52,7 @@ namespace libdar
     public:
 
 	    /// general use constructor
-	crypto_asym(user_interaction & ui) : mem_ui(ui) { build_context(); has_signatories = false; };
+	crypto_asym(const user_interaction & ui) : mem_ui(ui) { build_context(); has_signatories = false; };
 
 	    /// the destructor
 	~crypto_asym() { release_context(); };

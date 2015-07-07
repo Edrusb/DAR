@@ -86,7 +86,9 @@ namespace libdar
 
     static inline string yes_no(bool val) { return (val ? "yes" : "no"); }
 
-    catalogue::catalogue(user_interaction & dialog, const datetime & root_last_modif, const label & data_name) : mem_ui(dialog), out_compare("/")
+    catalogue::catalogue(const user_interaction & dialog,
+			 const datetime & root_last_modif,
+			 const label & data_name) : mem_ui(dialog), out_compare("/")
     {
 	contenu = nullptr;
 
@@ -111,7 +113,7 @@ namespace libdar
 	stats.clear();
     }
 
-    catalogue::catalogue(user_interaction & dialog,
+    catalogue::catalogue(const user_interaction & dialog,
 			 const pile_descriptor &pdesc,
 			 const archive_version & reading_ver,
 			 compression default_algo,
@@ -155,7 +157,7 @@ namespace libdar
 		{
 		    if(ref_data_name != lax_layer1_data_name && !lax_layer1_data_name.is_cleared())
 		    {
-			dialog.warning(gettext("LAX MODE: catalogue label does not match archive label, as if it was an extracted catalogue, assuming data corruption occurred and fixing the catalogue to be considered an a plain internal catalogue"));
+			get_ui().warning(gettext("LAX MODE: catalogue label does not match archive label, as if it was an extracted catalogue, assuming data corruption occurred and fixing the catalogue to be considered an a plain internal catalogue"));
 			ref_data_name = lax_layer1_data_name;
 		    }
 		}
@@ -167,7 +169,7 @@ namespace libdar
 		    throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
 
 		stats.clear();
-		contenu = new (get_pool()) cat_directory(dialog, pdesc, reading_ver, st, stats, corres, default_algo, lax, only_detruit, false);
+		contenu = new (get_pool()) cat_directory(get_ui(), pdesc, reading_ver, st, stats, corres, default_algo, lax, only_detruit, false);
 		if(contenu == nullptr)
 		    throw Ememory("catalogue::catalogue(path)");
 		if(only_detruit)
@@ -209,7 +211,7 @@ namespace libdar
 		    if(!lax)
 			throw Erange("catalogue::catalogue(generic_file &)", gettext("CRC failed for table of contents (aka \"catalogue\")"));
 		    else
-			dialog.pause(gettext("LAX MODE: CRC failed for catalogue, the archive contents is corrupted. This may even lead dar to see files in the archive that never existed, but this will most probably lead to other failures in restoring files. Shall we proceed anyway?"));
+			get_ui().pause(gettext("LAX MODE: CRC failed for catalogue, the archive contents is corrupted. This may even lead dar to see files in the archive that never existed, but this will most probably lead to other failures in restoring files. Shall we proceed anyway?"));
 		}
 	    }
 	}

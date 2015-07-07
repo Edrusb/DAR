@@ -121,7 +121,7 @@ using namespace std;
 namespace libdar
 {
 
-    trivial_sar::trivial_sar(user_interaction & dialog,
+    trivial_sar::trivial_sar(const user_interaction & dialog,
 			     gf_mode open_mode,
 			     const std::string & base_name,
 			     const std::string & extension,
@@ -167,7 +167,7 @@ namespace libdar
 	{
 	    try
 	    {
-		tmp = where.open(dialog,
+		tmp = where.open(get_ui(),
 				 filename,
 				 open_mode,
 				 force_permission,
@@ -187,11 +187,11 @@ namespace libdar
 		    if(!allow_over)
 			throw Erange("trivial_sar::trivial_sar", tools_printf(gettext("%S already exists, and overwritten is forbidden, aborting"), &filename));
 		    if(warn_over)
-			dialog.pause(tools_printf(gettext("%S is about to be overwritten, continue ?"), &filename));
+			get_ui().pause(tools_printf(gettext("%S is about to be overwritten, continue ?"), &filename));
 
 		    try
 		    {
-			tmp = where.open(dialog,
+			tmp = where.open(get_ui(),
 					 filename,
 					 open_mode,
 					 force_permission,
@@ -253,7 +253,7 @@ namespace libdar
     }
 
 
-    trivial_sar::trivial_sar(user_interaction & dialog,
+    trivial_sar::trivial_sar(const user_interaction & dialog,
 			     const std::string & pipename,
 			     bool lax) : generic_file(gf_read_only) , mem_ui(dialog)
     {
@@ -273,9 +273,9 @@ namespace libdar
 	try
 	{
 	    if(pipename == "-")
-		reference = new (get_pool()) tuyau(dialog, 0, gf_read_only);
+		reference = new (get_pool()) tuyau(get_ui(), 0, gf_read_only);
 	    else
-		reference = new (get_pool()) tuyau(dialog, pipename, gf_read_only);
+		reference = new (get_pool()) tuyau(get_ui(), pipename, gf_read_only);
 
 	    if(reference == nullptr)
 		throw Ememory("trivial_sar::trivial_sar");
@@ -294,7 +294,7 @@ namespace libdar
 	}
     }
 
-    trivial_sar::trivial_sar(user_interaction & dialog,
+    trivial_sar::trivial_sar(const user_interaction & dialog,
 			     generic_file *f,
 			     const label & internal_name,
 			     const label & data_name,

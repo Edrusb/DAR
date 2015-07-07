@@ -68,7 +68,7 @@ namespace libdar
             // it only provides some routine for the inherited classes
 
     public:
-	filesystem_hard_link_read(user_interaction & dialog,
+	filesystem_hard_link_read(const user_interaction & dialog,
 				  bool x_furtive_read_mode,
 				  const fsa_scope & scope) : mem_ui(dialog) { furtive_read_mode = x_furtive_read_mode; sc = scope; };
 
@@ -138,7 +138,7 @@ namespace libdar
     class filesystem_backup : public filesystem_hard_link_read
     {
     public:
-        filesystem_backup(user_interaction & dialog,
+        filesystem_backup(const user_interaction & dialog,
 			  const path &root,
 			  bool x_info_details,
 			  const mask & x_ea_mask,
@@ -181,7 +181,7 @@ namespace libdar
     class filesystem_diff : public filesystem_hard_link_read
     {
     public:
-        filesystem_diff(user_interaction & dialog,
+        filesystem_diff(const user_interaction & dialog,
 			const path &root,
 			bool x_info_details,
 			const mask & x_ea_mask,
@@ -227,7 +227,7 @@ namespace libdar
             // it only provides routines to its inherited classes
 
     public:
-	filesystem_hard_link_write(user_interaction & dialog) : mem_ui(dialog) { corres_write.clear(); };
+	filesystem_hard_link_write(const user_interaction & dialog) : mem_ui(dialog) { corres_write.clear(); };
 	filesystem_hard_link_write(const filesystem_hard_link_write & ref) : mem_ui(ref) { throw SRC_BUG; };
 	const filesystem_hard_link_write & operator = (const filesystem_hard_link_write & ref) { throw SRC_BUG; };
 
@@ -295,7 +295,7 @@ namespace libdar
     {
     public:
 	    /// constructor
-        filesystem_restore(user_interaction & dialog,
+        filesystem_restore(const user_interaction & dialog,
 			   const path & root,
 			   bool x_warn_overwrite,
 			   bool x_info_details,

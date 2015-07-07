@@ -92,7 +92,7 @@ namespace libdar
 
     static gf_mode generic_file_get_mode(S_I fd);
 
-    tuyau::tuyau(user_interaction & dialog, S_I fd) : generic_file(generic_file_get_mode(fd)), mem_ui(dialog)
+    tuyau::tuyau(const user_interaction & dialog, S_I fd) : generic_file(generic_file_get_mode(fd)), mem_ui(dialog)
     {
 	gf_mode tmp;
 
@@ -108,7 +108,7 @@ namespace libdar
 	has_one_to_read = false;
     }
 
-    tuyau::tuyau(user_interaction & dialog, S_I fd, gf_mode mode) : generic_file(mode), mem_ui(dialog)
+    tuyau::tuyau(const user_interaction & dialog, S_I fd, gf_mode mode) : generic_file(mode), mem_ui(dialog)
     {
         gf_mode tmp;
 
@@ -126,7 +126,7 @@ namespace libdar
 	has_one_to_read = false;
     }
 
-    tuyau::tuyau(user_interaction & dialog, const string & filename, gf_mode mode) : generic_file(mode), mem_ui(dialog)
+    tuyau::tuyau(const user_interaction & dialog, const string & filename, gf_mode mode) : generic_file(mode), mem_ui(dialog)
     {
 	pipe_mode = pipe_path;
         chemin = filename;
@@ -135,7 +135,7 @@ namespace libdar
 	has_one_to_read = false;
     }
 
-    tuyau::tuyau(user_interaction & dialog) : generic_file(gf_write_only), mem_ui(dialog)
+    tuyau::tuyau(const user_interaction & dialog) : generic_file(gf_write_only), mem_ui(dialog)
     {
 	int tube[2];
 

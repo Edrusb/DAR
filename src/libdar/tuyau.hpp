@@ -47,15 +47,15 @@ namespace libdar
     class tuyau : public generic_file, public thread_cancellation, protected mem_ui
     {
     public:
-        tuyau(user_interaction & dialog,    //< for user interaction
-	      int fd);                      //< fd is the filedescriptor of a pipe extremity already openned
-        tuyau(user_interaction & dialog,
-	      int fd,                       //< fd is the filedescriptor of a pipe extremity already openned
-	      gf_mode mode);                //< forces the mode if possible
-        tuyau(user_interaction & dialog,    //< for user interaction
-	      const std::string &filename,  //< named pipe to open
-	      gf_mode mode);                //< forces the mode if possible
-	tuyau(user_interaction & dialog);   //< creates a anonymous pipe and bind itself to the writing end. The reading end can be obtained by get_read_side() method
+        tuyau(const user_interaction & dialog, //< for user interaction
+	      int fd);                         //< fd is the filedescriptor of a pipe extremity already openned
+        tuyau(const user_interaction & dialog, //< for user interaction
+	      int fd,                          //< fd is the filedescriptor of a pipe extremity already openned
+	      gf_mode mode);                   //< forces the mode if possible
+        tuyau(const user_interaction & dialog, //< for user interaction
+	      const std::string &filename,     //< named pipe to open
+	      gf_mode mode);                   //< forces the mode if possible
+	tuyau(const user_interaction & dialog);//< creates a anonymous pipe and bind itself to the writing end. The reading end can be obtained by get_read_side() method
         ~tuyau();
 
 	    // provides the reading end of the anonymous pipe when the current object has created it (no filedesc, no path given to constructor).

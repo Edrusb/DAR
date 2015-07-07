@@ -61,7 +61,7 @@ namespace libdar
 	    /// \param[in] input is the pipe (see class tuyau) from which is received the information or data
 	    /// \param[in] output is used to send orders to slave_zapette
 	    /// \param[in] by_the_end if true dar will try to open the archive starting from the end else it will try starting from the first bytes
-        zapette(user_interaction & dialog, generic_file *input, generic_file *output, bool by_the_end);
+        zapette(const user_interaction & dialog, generic_file *input, generic_file *output, bool by_the_end);
         ~zapette();
 
             // inherited methods from generic_file

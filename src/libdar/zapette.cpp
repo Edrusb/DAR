@@ -307,7 +307,7 @@ namespace libdar
 	    meta_delete(buffer);
     }
 
-    zapette::zapette(user_interaction & dialog,
+    zapette::zapette(const user_interaction & dialog,
 		     generic_file *input,
 		     generic_file *output,
 		     bool by_the_end) : generic_file(gf_read_only), mem_ui(dialog)
@@ -349,7 +349,7 @@ namespace libdar
 		catch(Erange & e)
 		{
 		    string tmp = e.get_message();
-		    dialog.printf(gettext("Failed driving dar_slave to the end of archive: %S. Trying to open the archive from the first bytes"), &tmp);
+		    get_ui().printf(gettext("Failed driving dar_slave to the end of archive: %S. Trying to open the archive from the first bytes"), &tmp);
 		    skip(0);
 		}
 	    }
