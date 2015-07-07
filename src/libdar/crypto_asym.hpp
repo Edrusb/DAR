@@ -86,6 +86,9 @@ namespace libdar
 	    /// return a sorted list of signatories
 	const std::list<signator> & verify() const { return signing_result; };
 
+	    /// exposing to public visibility the protected method of mem_ui
+	user_interaction & get_ui() const { return mem_ui::get_ui(); };
+
     private:
 	bool has_signatories;
 	std::list<signator> signing_result;

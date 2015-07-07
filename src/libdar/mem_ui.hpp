@@ -79,7 +79,7 @@ namespace libdar
 	    /// if the inherited class explicitely defines its own one.
 	const mem_ui & operator = (const mem_ui & ref) { detruire(); copy_from(ref); return *this; };
 
-
+    protected:
 	    /// get access to the user_interaction cloned object
 
 	    /// \return a reference to the clone object. This reference stays valid during all
