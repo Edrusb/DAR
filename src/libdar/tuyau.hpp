@@ -35,6 +35,7 @@
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "thread_cancellation.hpp"
+#include "mem_ui.hpp"
 
 namespace libdar
 {

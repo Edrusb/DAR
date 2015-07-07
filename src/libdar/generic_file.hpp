@@ -63,7 +63,6 @@ extern "C"
 #include "label.hpp"
 #include "crc.hpp"
 #include "user_interaction.hpp"
-#include "mem_ui.hpp"
 #include "on_pool.hpp"
 
 #include <string>
