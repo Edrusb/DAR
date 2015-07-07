@@ -552,7 +552,7 @@ namespace libdar
 			    if(data->is_empty())
 			    {
 				tronc *tronc_tmp;
-				generic_file *tmp = tronc_tmp = new tronc(get_pile(), *offset, gf_read_only);
+				generic_file *tmp = tronc_tmp = new (get_pool()) tronc(get_pile(), *offset, gf_read_only);
 				if(tmp == nullptr)
 				    throw Ememory("cat_file::get_data");
 				if(tronc_tmp == nullptr)

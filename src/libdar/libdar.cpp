@@ -220,10 +220,12 @@ namespace libdar
 	archive *ret = nullptr;
         NLS_SWAP_IN;
 	WRAPPER_IN
-	    ret = new archive(dialog, chem,  basename,  extension,
-			      options);
+	    ret = new (nothrow) archive(dialog, chem,  basename,  extension,
+					options);
+  	    if(ret == NULL)
+		throw Ememory("open_archive_noexcept");
 	WRAPPER_OUT(exception, except_msg)
-	    NLS_SWAP_OUT;
+	NLS_SWAP_OUT;
 	return ret;
     }
 
@@ -240,15 +242,17 @@ namespace libdar
 	archive *arch_ret = nullptr;
 	NLS_SWAP_IN;
 	WRAPPER_IN
-	    arch_ret = new archive(dialog,
-				   fs_root,
-				   sauv_path,
-				   filename,
-				   extension,
-				   options,
-				   progressive_report);
+	    arch_ret = new (nothrow) archive(dialog,
+					     fs_root,
+					     sauv_path,
+					     filename,
+					     extension,
+					     options,
+					     progressive_report);
+  	    if(arch_ret == NULL)
+		throw Ememory("open_archive_noexcept");
 	WRAPPER_OUT(exception, except_msg)
-	    NLS_SWAP_OUT;
+        NLS_SWAP_OUT;
 	return arch_ret;
     }
 
@@ -288,13 +292,15 @@ namespace libdar
 	archive *ret = nullptr;
 	NLS_SWAP_IN;
 	WRAPPER_IN
-	    ret = new archive(dialog,
-			      sauv_path,
-			      ref_arch1,
-			      filename,
-			      extension,
-			      options,
-			      progressive_report);
+	    ret = new (nothrow) archive(dialog,
+					sauv_path,
+					ref_arch1,
+					filename,
+					extension,
+					options,
+					progressive_report);
+  	    if(ret == NULL)
+		throw Ememory("open_archive_noexcept");
 	WRAPPER_OUT(exception, except_msg)
 	    NLS_SWAP_OUT;
 	return ret;

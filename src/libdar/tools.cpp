@@ -2519,7 +2519,7 @@ namespace libdar
 		    size = 16384;
 		try
 		{
-		    buf = new char[size];
+		    buf = new (nothrow) char[size];
 		    if(buf == nullptr)
 			throw Ememory("tools_ownership2uid");
 
@@ -2612,7 +2612,7 @@ namespace libdar
 		char *buf = nullptr;
 		try
 		{
-		    buf = new char[size];
+		    buf = new (nothrow) char[size];
 		    if(buf == nullptr)
 			throw Ememory("tools_ownsership2gid");
 
@@ -3033,7 +3033,7 @@ namespace libdar
 	    name_max = 255;
 	len = offsetof(struct dirent, d_name) + name_max + 1;
 	if(pool == nullptr)
-	    ret = (struct dirent *) new char[len];
+	    ret = (struct dirent *) new (nothrow) char[len];
 	else
 	    ret = (struct dirent *) new (pool) char[len];
 
