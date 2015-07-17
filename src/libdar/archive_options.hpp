@@ -64,8 +64,8 @@ namespace libdar
 
 	    /// the copy constructor, assignment operator and destructor
 	archive_options_read(const archive_options_read & ref) : x_ref_chem(ref.x_ref_chem) { copy_from(ref); };
-	const archive_options_read & operator = (const archive_options_read & ref) { detruit(); copy_from(ref); return *this; };
-	~archive_options_read() { detruit(); };
+	const archive_options_read & operator = (const archive_options_read & ref) { destroy(); copy_from(ref); return *this; };
+	~archive_options_read() { destroy(); };
 
 
 	    /////////////////////////////////////////////////////////////////////
@@ -247,7 +247,7 @@ namespace libdar
 	entrepot *x_ref_entrepot;
 
 	void copy_from(const archive_options_read & ref);
-	void detruit();
+	void destroy();
     };
 
 

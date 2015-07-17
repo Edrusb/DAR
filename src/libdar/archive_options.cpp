@@ -102,7 +102,7 @@ namespace libdar
 
 	    // setting the default values for all options
 
-	detruit();
+	destroy();
 
 	x_crypto = crypto_none;
 	x_pass.clear();
@@ -220,7 +220,7 @@ namespace libdar
 	    throw Ememory("archive_options_read::copy_from");
     }
 
-    void archive_options_read::detruit()
+    void archive_options_read::destroy()
     {
 	if(x_entrepot != nullptr)
 	{
