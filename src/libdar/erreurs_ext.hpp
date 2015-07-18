@@ -41,12 +41,24 @@ namespace libdar
     class Ethread_cancel_with_attr : public Ethread_cancel
     {
     public :
-	Ethread_cancel_with_attr(bool now, U_64 x_flag, const infinint & attr) : Ethread_cancel(now, x_flag), x_attr(attr) {};
+	Ethread_cancel_with_attr(bool now, U_64 x_flag, const infinint & attr);
+	Ethread_cancel_with_attr(const Ethread_cancel_with_attr & ref): Ethread_cancel(ref) { copy_from(ref); };
+	const Ethread_cancel_with_attr & operator = (const Ethread_cancel_with_attr & ref) { detruit(); copy_from(ref); return *this; };
+	~Ethread_cancel_with_attr() { detruit(); };
 
-	const infinint get_attr() const { return x_attr; };
+	const infinint get_attr() const { return *x_attr; };
 
     private :
-	infinint x_attr;
+	    // infinint may throw Ebug exception from destructor
+	    // having a field of type infinint lead this class
+	    // to have a default destructor throwing Ebug too
+	    // which implies Egeneric to have the same which
+	    // makes circular dependency as Ebug cannot be defined
+	    // before Egeneric. Here is the reason why we use a infinint* here
+	infinint *x_attr;
+
+	void detruit();
+	void copy_from(const Ethread_cancel_with_attr & ref);
     };
 
 	/// @}

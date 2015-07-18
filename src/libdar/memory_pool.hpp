@@ -31,6 +31,7 @@
 #include "../my_config.h"
 #include <map>
 #include "mem_sized.hpp"
+#include "erreurs.hpp"
 
 
 namespace libdar
@@ -48,7 +49,7 @@ namespace libdar
 #endif
 	memory_pool(const memory_pool & ref) { throw SRC_BUG ; };
 	const memory_pool & operator = (const memory_pool & ref) { throw SRC_BUG; };
-	~memory_pool();
+	~memory_pool() throw(Ebug);
 
 
 	    /// allocate a memory block of requested size

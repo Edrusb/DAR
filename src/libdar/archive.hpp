@@ -147,7 +147,7 @@ namespace libdar
 	archive & operator = (const archive & ref) { throw Efeature(dar_gettext("Archive assignment operator is not implemented")); };
 
 	    /// the destructor
-	~archive() { free_all(); };
+	~archive() throw(Ebug) { free_all(); };
 
 
 	    /// extraction of data from an archive

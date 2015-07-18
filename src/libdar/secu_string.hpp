@@ -88,7 +88,7 @@ namespace libdar
 	bool operator == (const secu_string &ref) const { return compare_with(ref.mem, *(ref.string_size)); };
 
 	    /// the destructor (set memory to zero before releasing it)
-	~secu_string() { clean_and_destroy(); };
+	~secu_string() throw(Ebug) { clean_and_destroy(); };
 
 	    /// fill the object with data
 	    ///

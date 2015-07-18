@@ -31,6 +31,7 @@
 #include <string>
 #include <list>
 #include "integers.hpp"
+#include "erreurs.hpp"
 
 namespace libdar
 {

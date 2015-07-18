@@ -192,7 +192,7 @@ namespace libdar
 	}
     }
 
-    cat_directory::~cat_directory()
+    cat_directory::~cat_directory() throw(Ebug)
     {
 	clear();
     }

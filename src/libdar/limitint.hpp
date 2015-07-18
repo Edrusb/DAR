@@ -109,6 +109,9 @@ namespace libdar
 	    // read an limitint from a file
 	limitint(generic_file & x);
 
+	    // for coherent footprint with real infinint
+	~limitint() throw(Ebug) {};
+
         void dump(generic_file &x) const; // write byte sequence to file
         void read(generic_file &f) { build_from_file(f); };
 
@@ -156,7 +159,6 @@ namespace libdar
         bool operator <= (const limitint &x) const { return field <= x.field; };
         bool operator != (const limitint &x) const { return field != x.field; };
         bool operator >= (const limitint &x) const { return field >= x.field; };
-
 	static bool is_system_big_endian();
 
         B debug_get_max() const { return max_value; };

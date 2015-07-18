@@ -122,7 +122,7 @@ namespace libdar
 	cat_entree() {};
 
 	    /// destructor
-        virtual ~cat_entree() {};
+        virtual ~cat_entree() throw(Ebug) {};
 
 	    /// returns true if the two object have the same content
 	virtual bool operator == (const cat_entree & ref) const { return true; };

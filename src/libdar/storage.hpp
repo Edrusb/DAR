@@ -72,7 +72,7 @@ namespace libdar
         storage(const storage & ref)
 	{ copy_from(ref); };
         storage(generic_file & f, const infinint &size);
-        ~storage()
+        ~storage() throw(Ebug)
 	{  detruit(first); };
 
         const storage & operator = (const storage & val)

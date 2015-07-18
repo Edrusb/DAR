@@ -74,7 +74,7 @@ namespace libdar
 	const on_pool & operator = (const on_pool & ref) { return *this; };
 
 	    /// virtual destructor as this class will have inherited classes
-	virtual ~on_pool() {};
+	virtual ~on_pool() throw(Ebug) {};
 #endif
 
 	    /// the usual new operator is wrapped to allow proper delete operation later on (throws std::bad_alloc upon allocation failure)

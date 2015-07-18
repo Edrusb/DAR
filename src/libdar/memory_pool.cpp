@@ -30,7 +30,7 @@ using namespace std;
 namespace libdar
 {
 
-    memory_pool::~memory_pool()
+    memory_pool::~memory_pool() throw(Ebug)
     {
 	map<U_I, mem_sized *>::iterator it = carte.begin();
 

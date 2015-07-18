@@ -70,7 +70,7 @@ namespace libdar
 		      bool lax,
 		      bool only_detruit, // objects of other class than detruit and cat_directory are not built in memory
 		      bool small);
-        ~cat_directory(); // detruit aussi tous les fils et se supprime de son 'parent'
+        ~cat_directory() throw(Ebug); // detruit aussi tous les fils et se supprime de son 'parent'
 
 	    /// attention this compares only the directories themselves, not the list of their children
 	bool operator == (const cat_entree & ref) const;

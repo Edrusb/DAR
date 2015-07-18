@@ -70,7 +70,7 @@ namespace libdar
 
 	    /// it is declared as virtual, for precaution, as it may not be very frequent to
 	    /// release an object having just a mem_ui pointer on it.
-	virtual ~mem_ui() { detruire(); };
+	virtual ~mem_ui() throw(Ebug) { detruire(); };
 
 
 	    /// assignement operator

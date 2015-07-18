@@ -80,7 +80,7 @@ namespace libdar
 		  bool small);
         cat_inode(const cat_inode & ref);
 	const cat_inode & operator = (const cat_inode & ref);
-        ~cat_inode();
+        ~cat_inode() throw(Ebug);
 
 	bool operator == (const cat_entree & ref) const;
 
