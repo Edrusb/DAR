@@ -2235,6 +2235,7 @@ namespace libdar
 	stack.clear();
 	gnupg_signed.clear();
 	slices.clear();
+	ver.clear_crypted_key();
 	if(cat != nullptr)
 	{
 	    delete cat;
