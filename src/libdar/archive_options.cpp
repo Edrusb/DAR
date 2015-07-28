@@ -619,9 +619,9 @@ namespace libdar
     void archive_options_isolate::set_gnupg_key_size(U_I gnupg_key_size)
     {
 	if(gnupg_key_size == 0)
-	    x_gnupg_key_size = gnupg_key_size;
-	else
 	    x_gnupg_key_size = default_gnupg_key_size;
+	else
+	    x_gnupg_key_size = gnupg_key_size;
     }
 
     void archive_options_isolate::set_entrepot(const entrepot & entr)
@@ -815,9 +815,9 @@ namespace libdar
     void archive_options_merge::set_gnupg_key_size(U_I gnupg_key_size)
     {
 	if(gnupg_key_size == 0)
-	    x_gnupg_key_size = gnupg_key_size;
-	else
 	    x_gnupg_key_size = default_gnupg_key_size;
+	else
+	    x_gnupg_key_size = gnupg_key_size;
     }
 
     void archive_options_merge::set_compr_mask(const mask & compr_mask)
