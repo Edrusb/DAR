@@ -1170,11 +1170,17 @@ namespace libdar
 			    // generating random key for symmetric encryption
 
 			char variable_size;
-			dialog.warning(gettext("Generating random key for symmetric encryption..."));
+			if(info_details)
+			    dialog.warning(gettext("Generating random key for symmetric encryption..."));
 			gcry_randomize(&variable_size, 1, GCRY_STRONG_RANDOM);
+			if(gnupg_key_size == 0)
+			    throw SRC_BUG;
 			gnupg_key_size += (unsigned char)(variable_size); // yes we do not use constant sized key but add from +0 to +255 bytes to its specified length
+			if(gnupg_key_size == 0)
+			    throw SRC_BUG;
 			secu_memory_file clear(gnupg_key_size, true);
-			dialog.warning(gettext("Key generated"));
+			if(info_details)
+			    dialog.warning(gettext("Key generated"));
 
 			    // encrypting the symmetric key with asymetric algorithm
 
@@ -1183,8 +1189,13 @@ namespace libdar
 			    engine.set_signatories(gnupg_signatories);
 			clear.skip(0);
 			key->skip(0);
+			if(clear.size().is_zero())
+			    throw SRC_BUG;
 			engine.encrypt(gnupg_recipients, clear, *key);
 			real_pass = clear.get_contents();
+			if(real_pass.size() == 0)
+			    throw SRC_BUG;
+
 			if(crypto == crypto_none)
 			    crypto = crypto_blowfish;
 
