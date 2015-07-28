@@ -53,8 +53,8 @@ public:
 	/// \param[in] out defines where are sent non interactive messages (informative messages)
 	/// \param[in] interact defines where are sent interactive messages (those requiring an answer or confirmation) from the user
 	/// \param[in] silent whether to send a warning message if the process is not attached to a terminal
-	/// \note out and interact must exist during the whole life of the shell_interaction object, its remains the duty
-	/// of the caller to releases theses ostream objects if necessary.
+	/// \note out and interact must exist during the whole life of the shell_interaction object, it's the duty
+	/// of the caller to releases these ostream objects if necessary.
     shell_interaction(ostream *out, ostream *interact, bool silent);
 
 	/// copy constructor
