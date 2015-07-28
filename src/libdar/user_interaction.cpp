@@ -313,6 +313,10 @@ namespace libdar
 	    {
 		return (*secu_string_callback)(message, echo, context_val);
 	    }
+	    catch(Ebug & e)
+	    {
+		throw;
+	    }
 	    catch(Egeneric & e)
 	    {
 		throw Elibcall("user_interaction_callback::get_secu_string", string(dar_gettext("No exception allowed from libdar callbacks")) + ": " + e.get_message());

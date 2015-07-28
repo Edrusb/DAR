@@ -404,6 +404,8 @@ secu_string shell_interaction::interaction_secu_string(const string & message, b
     if(obj == nullptr)
 	throw SRC_BUG;
 
+    if(!obj->has_terminal)
+	throw Erange("shell_interaction::interaction_secu_string", gettext("Secured string can only be read from a terminal"));
 
     if(!echo)
 	obj->set_term_mod(shell_interaction::m_noecho);
