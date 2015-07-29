@@ -556,7 +556,10 @@ namespace libdar
 
 	storage::iterator it = field->begin();
 
-	return it != field->end() && *it == 0 && ++it == field->end();
+	while(it != field->end() && *it == 0)
+	    ++it;
+
+	return it == field->end();
     }
 
     S_I infinint::difference(const infinint & b) const
