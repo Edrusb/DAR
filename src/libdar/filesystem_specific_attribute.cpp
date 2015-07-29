@@ -672,7 +672,7 @@ namespace libdar
 		const fsa_bool *it_bool = nullptr;
 
 		if(ioctl(fd, EXT2_IOC_GETFLAGS, &f_orig) < 0)
-		    throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed reading exiting extX family FSA: ")) + tools_strerror_r(errno));
+		    throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed reading existing extX family FSA: ")) + tools_strerror_r(errno));
 		f = f_orig;
 
 		for(it = fsa.begin() ; it != fsa.end() ; ++it)
@@ -949,7 +949,7 @@ namespace libdar
 			}
 			break;
 		    case capa_clear:
-			ui.printf(gettext("Not setting FSA extX SYSTEME RESOURCE flags for %s due to of lack of capability"), target.c_str());
+			ui.printf(gettext("Not setting FSA extX SYSTEM RESOURCE flags for %s due to of lack of capability"), target.c_str());
 			break;
 		    default:
 			throw SRC_BUG;

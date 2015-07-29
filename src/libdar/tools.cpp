@@ -2494,7 +2494,7 @@ namespace libdar
             bool direct_uid_set = false;
 
             if(user.empty())
-                throw Erange("tools_ownership2uid", gettext("An empty given as user name"));
+                throw Erange("tools_ownership2uid", gettext("An empty string is not a valid user name"));
 
             try
             {
@@ -2589,7 +2589,7 @@ namespace libdar
             bool direct_gid_set = false;
 
             if(group.empty())
-                throw Erange("tools_ownership2gid", gettext("An empty given as group name"));
+                throw Erange("tools_ownership2gid", gettext("An empty string is not a valid group name"));
 
             try
             {
@@ -2650,7 +2650,7 @@ namespace libdar
 		{
 		    string err = (errno == 0) ? gettext("Unknown group") : tools_strerror_r(errno);
 		    throw Erange("tools_ownership2gid",
-				 tools_printf(gettext("Error found while looking fo GID of group %s: %S"),
+				 tools_printf(gettext("Error found while looking for GID of group %s: %S"),
 					      c_group,
 					      &err));
 		}

@@ -1155,7 +1155,7 @@ namespace libdar
 		if(crypto != crypto_none || !gnupg_recipients.empty())
 		{
 		    if(!secu_string::is_string_secured())
-			dialog.warning(gettext("WARNING: support for secure memory was not available at compilation time, in case of heavy memory load, this may lead the password/passphrase you may be about to provide to be wrote to disk (swap space) in clear. You have been warned!"));
+			dialog.warning(gettext("WARNING: support for secure memory was not available at compilation time, in case of heavy memory load, this may lead the password/passphrase provided to be wrote to disk (swap space) in clear. You have been warned!"));
 		}
 
 		if(!gnupg_recipients.empty())

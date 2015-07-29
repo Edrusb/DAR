@@ -832,9 +832,9 @@ void line_tools_display_signatories(user_interaction & ui, const list<signator> 
     if(gnupg_signed.empty())
 	return;
 
-    ui.printf(gettext("+-----------------+----------------+----------------------------------------+-------------------------+"));
+    ui.printf(        "+-----------------+----------------+----------------------------------------+-------------------------+");
     ui.printf(gettext("| Signature Status|  Key Status    |  Finger Print                          | Signature Date          |"));
-    ui.printf(gettext("+-----------------+----------------+----------------------------------------+-------------------------+"));
+    ui.printf(        "+-----------------+----------------+----------------------------------------+-------------------------+");
     while(it != gnupg_signed.end())
     {
 	tmp = "";
@@ -882,7 +882,7 @@ void line_tools_display_signatories(user_interaction & ui, const list<signator> 
 
 	++it;
     }
-    ui.printf(gettext("------------------+----------------+----------------------------------------+-------------------------+"));
+    ui.printf("------------------+----------------+----------------------------------------+-------------------------+");
     ui.printf(" For more information about a key, use the command: gpg --list-key <fingeprint>");
 }
 

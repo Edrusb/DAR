@@ -79,7 +79,7 @@ namespace libdar
 	case fsan_synchronous_update:
 	    return gettext("synchronous update");
 	case fsan_top_of_dir_hierarchy:
-	    return gettext("to of directory hierarchy");
+	    return gettext("top of directory hierarchy");
 	default:
 	    throw SRC_BUG;
 	}

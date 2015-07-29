@@ -409,7 +409,7 @@ namespace libdar
 	if(rw == gf_read_only || rw == gf_read_write)
 	    inherited_flush_read();
 	else
-	    throw Erange("genercic_file::flush_read", gettext("Cannot flush read on a write-only generic_file"));
+	    throw Erange("genercic_file::flush_read", gettext("Cannot flush read a write-only generic_file"));
     }
 
     void generic_file::enable_crc(bool mode)

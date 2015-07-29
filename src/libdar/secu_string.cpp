@@ -116,7 +116,7 @@ namespace libdar
     void secu_string::append_at(U_I offset, int fd, U_I size)
     {
 	if(offset > *string_size)
-	    throw Erange("secu_string::append", gettext("appending data over secure_memory its end"));
+	    throw Erange("secu_string::append", gettext("appending data after the end of a secure_memory"));
 
 	if(size + offset >= *allocated_size)
 	    throw Erange("secu_string::append", gettext("Cannot receive that much data in regard to the allocated memory"));

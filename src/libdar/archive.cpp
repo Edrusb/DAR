@@ -221,7 +221,7 @@ namespace libdar
 								       tmp2_signatories,
 								       false); // never relaxed checking for external catalogue
 			if(!same_signatories(tmp1_signatories, tmp2_signatories))
-			    dialog.pause(gettext("Archive of reference is not signed properly (no the same signatories for the archive and the internal catalogue, do we continue?"));
+			    dialog.pause(gettext("Archive of reference is not signed properly (no the same signatories for the archive and the internal catalogue), do we continue?"));
 			if(cat == nullptr)
 			    throw SRC_BUG;
 
@@ -1002,10 +1002,10 @@ namespace libdar
 			    if(options.get_user_slicing(used_layout.first_size, used_layout.other_size))
 			    {
 				if(options.get_info_details())
-				    dialog.printf(gettext("Using user provided modified slicing (first size = %i bytes, other slices = %i bytes)"), &used_layout.first_size, &used_layout.other_size);
+				    dialog.printf(gettext("Using user provided modified slicing (first slice = %i bytes, other slices = %i bytes)"), &used_layout.first_size, &used_layout.other_size);
 			    }
 			    else
-				dialog.warning(gettext("Using the slice layout of the archive of reference recorded at the time this isolated catalogue was done\n Note: if this reference has been resliced this isolated catalogue has been created, the resulting slicing information given here will be wrong"));
+				dialog.warning(gettext("Using the slice layout of the archive of reference recorded at the time this isolated catalogue was done\n Note: if this reference has been resliced this isolated catalogue has been created, the resulting slicing information given here will be wrong and will probably lead to an error. Check documentation to know hos to manually specify the slicing to use"));
 			}
 			else // no slicing of the archive of reference stored in this isolated catalogue's header/trailer
 			{
@@ -1015,7 +1015,7 @@ namespace libdar
 				// older than version 9.
 
 			    if(options.get_user_slicing(used_layout.first_size, used_layout.other_size))
-				dialog.warning(gettext("Warning: No slice layout of the archive of reference has been recorded in this isolated catalogue, The user provided slicing can only lead to an approximation of the slice localization for each file (localization error is less than 20 bytes multiplied by the slice number), because some other parameters are not possible to guess, like the slice header used in the archive of reference"));
+				dialog.warning(gettext("Warning: No slice layout of the archive of reference has been recorded in this isolated catalogue. The additional slicing information you provided may still lead the operation to fail because the archive has an _unsupported_ (too old) format for this feature"));
 			    else
 				throw Erange("archive::op_listing", gettext("No slice layout of the archive of reference for the current isolated catalogue is available, cannot provide slicing information, aborting"));
 			}

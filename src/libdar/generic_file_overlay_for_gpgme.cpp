@@ -52,7 +52,7 @@ namespace libdar
 	err = gpgme_data_new_from_cbs(&handle, &cbs, this);
 	if(gpgme_err_code(err) != GPG_ERR_NO_ERROR)
 	{
-	    throw Erange("generic_file_overlay_for_gpgme::generi_file_overlay_for_gpgme", tools_printf(gettext("Error creating data buffer overlay for gpgme: %s"), tools_gpgme_strerror_r(err).c_str()));
+	    throw Erange("generic_file_overlay_for_gpgme::generi_file_overlay_for_gpgme", tools_printf(gettext("Error creating data buffer overlay for GPGME: %s"), tools_gpgme_strerror_r(err).c_str()));
 	}
 #else
 	throw Efeature("Asymetric Strong encryption algorithms using GPGME");

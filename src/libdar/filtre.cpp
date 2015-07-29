@@ -2874,7 +2874,7 @@ namespace libdar
 				infinint current_pos_tmp = pdesc.stack->get_position();
 
 				if(current_pos_tmp <= rewinder)
-				    throw SRC_BUG; // we are positionned before the stard of the current inode dump!
+				    throw SRC_BUG; // we are positionned before the start of the current inode dump!
 				if(pdesc.stack->skippable(generic_file::skip_backward, current_pos_tmp - rewinder))
 				{
 				    try
@@ -2905,7 +2905,7 @@ namespace libdar
 				else
 				{
 				    if(info_details)
-					dialog.warning(info_quoi  + gettext(" : Resaving uncompressed the inode data is not possible keeping data compressed"));
+					dialog.warning(info_quoi  + gettext(" : Resaving uncompressed the inode data to gain space is not possible, keeping data compressed"));
 				}
 			    }
 			    else

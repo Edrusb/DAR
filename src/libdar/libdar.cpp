@@ -401,11 +401,11 @@ namespace libdar
 	    if(gpgme_check_version(GPGME_MIN_VERSION) == nullptr)
 	    {
 		string tmp = "GPGME_SUPPORT";
-		throw Erange("libdar_init_gpgme", tools_printf(gettext("gpgme version requirement is not satisfied, requires version > %s"), tmp.c_str()));
+		throw Erange("libdar_init_gpgme", tools_printf(gettext("GPGME version requirement is not satisfied, requires version > %s"), tmp.c_str()));
 	    }
 
 	    if(gpgme_err_code(gpgme_engine_check_version(GPGME_PROTOCOL_OpenPGP)) != GPG_ERR_NO_ERROR)
-		throw Erange("libdar_init_gpgme", tools_printf(gettext("gpgme engine not available: %s"), gpgme_get_protocol_name(GPGME_PROTOCOL_OpenPGP)));
+		throw Erange("libdar_init_gpgme", tools_printf(gettext("GPGME engine not available: %s"), gpgme_get_protocol_name(GPGME_PROTOCOL_OpenPGP)));
 #endif
 	    tools_init();
 

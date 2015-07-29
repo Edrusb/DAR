@@ -932,7 +932,7 @@ namespace libdar
 	const cat_eod tmp_eod;
 
 	get_ui().printf(gettext("Access mode    | User | Group | Size  |          Date                 | [Data ][ EA  ][FSA][Compr][S]|   Filename\n"));
-	get_ui().printf(gettext("---------------+------+-------+-------+-------------------------------+------------------------------+-----------\n"));
+	get_ui().printf("---------------+------+-------+-------+-------------------------------+------------------------------+-----------\n");
 	if(filter_unsaved)
 	    contenu->recursive_has_changed_update();
 
@@ -1047,7 +1047,7 @@ namespace libdar
 	if(!get_ui().get_use_listing())
 	{
 	    get_ui().printf(gettext("[Data ][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size  |          Date                 |    filename\n"));
-	    get_ui().printf(gettext("-----------------------------+------------+-------+-------+-------+-------------------------------+------------\n"));
+	    get_ui().printf("-----------------------------+------------+-------+-------+-------+-------------------------------+------------\n");
 	}
 	if(filter_unsaved)
 	    contenu->recursive_has_changed_update();

@@ -144,7 +144,7 @@ namespace libdar
 	    if(get_major() != d_other->get_major())
 		throw Erange("cat_device::sub_compare", tools_printf(gettext("devices have not the same major number: %d <--> %d"), get_major(), d_other->get_major()));
 	    if(get_minor() != d_other->get_minor())
-		throw Erange("cat_device::sub_compare", tools_printf(gettext("device<s have not the same minor number: %d <--> %d"), get_minor(), d_other->get_minor()));
+		throw Erange("cat_device::sub_compare", tools_printf(gettext("devices have not the same minor number: %d <--> %d"), get_minor(), d_other->get_minor()));
 	}
     }
 

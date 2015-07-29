@@ -1,3 +1,6 @@
 # Set of available languages.
-fr sv de
+fr
+
+# these have not been updated for a while, which might lead to bug when C formated strings (%s, %u,...) have change or have been updated
+# sv de
 

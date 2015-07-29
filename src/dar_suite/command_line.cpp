@@ -1780,7 +1780,7 @@ static void usage(shell_interaction & dialog, const char *command_name)
     dialog.printf(gettext("   -$ <string>\t   encryption key for auxiliary archive\n"));
     dialog.printf(gettext("   -~ <string>\t   command between slices of the auxiliary archive\n"));
     dialog.printf(gettext("   -z [[algo:]level]\t compress data in archive. -z = -z9 = -zgzip:9\n"));
-    dialog.printf(gettext("      Available algo: gzip,bzip2,lzo. Exemples: -zlzo -zbzip2:5 -z1 -z\n"));
+    dialog.printf(gettext("      Available algo: gzip,bzip2,lzo,xz. Exemples: -zlzo -zxz:5 -z1 -z\n"));
     dialog.printf(gettext("   -s <integer>    split the archive in several files of size <integer>\n"));
     dialog.printf(gettext("   -S <integer>    first file size (if different from following ones)\n"));
     dialog.printf(gettext("   -aSI \t   slice size suffixes k, M, T, G, etc. are power of 10\n"));
