@@ -434,7 +434,7 @@ bool get_args(shell_interaction & dialog,
         }
 
         if(p.algo != none && p.op != create && p.op != isolate && p.op != merging)
-            dialog.warning(gettext("-z or -y need only to be used with -c -C or -+ options"));
+            dialog.warning(gettext("-z option needs only to be used with -c -C or -+ options"));
         if(!p.first_file_size.is_zero() && p.file_size.is_zero())
             throw Erange("get_args", gettext("-S option requires the use of -s"));
         if(p.what_to_check != cat_inode::cf_all && (p.op == isolate || (p.op == create && p.ref_root == nullptr) || p.op == test || p.op == listing || p.op == merging))
@@ -520,7 +520,7 @@ bool get_args(shell_interaction & dialog,
         }
 
         if(p.algo != none && p.op == merging && p.keep_compressed)
-            dialog.warning(gettext("Compression option (-z or -y) is useless and ignored when using -ak option"));
+            dialog.warning(gettext("Compression option (-z option) is useless and ignored when using -ak option"));
 
             // sparse files handling
 
@@ -587,9 +587,9 @@ bool get_args(shell_interaction & dialog,
         if(p.algo == none)
         {
             if(!rec.compr_include_exclude.empty())
-                dialog.warning(gettext("-Y and -Z are only useful with compression (-z or -y option for example), ignoring any -Y and -Z option"));
+                dialog.warning(gettext("-Y and -Z are only useful with compression (-z option), ignoring any -Y and -Z option"));
             if(p.min_compr_size != min_compr_size_default)
-                dialog.warning(gettext("-m is only useful with compression (-z or -y option for example), ignoring -m"));
+                dialog.warning(gettext("-m is only useful with compression (-z option), ignoring -m"));
         }
 
         if(p.algo != none)
@@ -1772,7 +1772,6 @@ static void usage(shell_interaction & dialog, const char *command_name)
     dialog.printf(gettext("   -acase\t   the masks that follow are now case sensitive\n"));
     dialog.printf(gettext("   -ar\t\t   set the following masks to be regex expressions\n"));
     dialog.printf(gettext("   -ag\t\t   set the following masks to be glob expressions\n"));
-    dialog.printf(gettext("   -j\t\t   ask user what to do when memory is exhausted\n"));
     dialog.printf(gettext("\n"));
     dialog.printf(gettext("Saving / Isolation / merging options (to use with -c, -C or -+):\n"));
     dialog.printf(gettext("   -A [path/]<basename> archive to take as reference\n"));

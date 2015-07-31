@@ -73,7 +73,7 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_MANAGER_VERSION "1.7.8"
+#define DAR_MANAGER_VERSION "1.7.9"
 
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
@@ -888,7 +888,6 @@ static void show_usage(shell_interaction & dialog, const char *command)
     dialog.printf(gettext("\n"));
     dialog.printf(gettext("Options:\n"));
     dialog.printf(gettext("   -v\t\t   display more information about what is going on\n"));
-    dialog.printf(gettext("   -j\t\t   ask user what to do when memory is exhausted\n"));
     dialog.printf(gettext("\n"));
     dialog.printf(gettext("See man page for more options.\n"));
 }

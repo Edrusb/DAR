@@ -58,7 +58,7 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_XFORM_VERSION "1.5.6"
+#define DAR_XFORM_VERSION "1.5.7"
 
 #define OPT_STRING  "s:S:p::wnhbVE:F:a::Qj^:3:9:"
 
@@ -556,7 +556,6 @@ static void show_usage(shell_interaction & dialog, const char *command_name)
     dialog.printf(gettext("   -F <string>\t   command to execute between slice of source archive\n"));
     dialog.printf(gettext("   -aSI \t   slice size suffixes k, M, T, G, etc. are power of 10\n"));
     dialog.printf(gettext("   -abinary\t   slice size suffixes k, M, T, G, etc. are power of 2\n"));
-    dialog.printf(gettext("   -j\t\t   ask user what to do when memory is exhausted\n"));
     dialog.printf(gettext("   -^ <string>\t   permission[:user[:group]] of created slices\n"));
     dialog.printf(gettext("\n"));
     dialog.printf(gettext("See man page for more options.\n"));

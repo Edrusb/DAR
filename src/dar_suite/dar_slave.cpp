@@ -72,7 +72,7 @@ extern "C"
 using namespace libdar;
 using namespace std;
 
-#define DAR_SLAVE_VERSION "1.4.6"
+#define DAR_SLAVE_VERSION "1.4.7"
 
 static bool command_line(shell_interaction & dialog,
 			 S_I argc, char * const argv[], path * &chemin, string & filename,
@@ -263,7 +263,6 @@ static void show_usage(shell_interaction & dialog, const char *command)
     dialog.printf(gettext("   -i <named pipe> pipe to use instead of std input to read orders from dar\n"));
     dialog.printf(gettext("   -o <named pipe> pipe to use instead of std output to write data to dar\n"));
     dialog.printf(gettext("   -E <string>\t   command line to execute between slices of the archive\n"));
-    dialog.printf(gettext("   -j\t\t   ask user what to do when memory is exhausted\n"));
     dialog.printf(gettext("\n"));
     dialog.printf(gettext("See man page for more options.\n"));
 }
