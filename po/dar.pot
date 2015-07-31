@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: dar 2.5.0_dev\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2015-07-29 15:16+0200\n"
+"POT-Creation-Date: 2015-07-31 16:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1503,6 +1503,10 @@ msgstr ""
 
 #: src/libdar/secu_string.cpp:140
 msgid "Cannot reduce the string to a size that is larger than its current size"
+msgstr ""
+
+#: src/libdar/secu_string.cpp:161
+msgid "Out of range index requested for a secu_string"
 msgstr ""
 
 #: src/libdar/fichier_local.cpp:151
@@ -3016,23 +3020,23 @@ msgstr ""
 msgid "writing down the final elastic buffer through the encryption layer..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1663 src/libdar/macro_tools.cpp:1671
+#: src/libdar/macro_tools.cpp:1668
 msgid "Closing the encryption layer..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1693
+#: src/libdar/macro_tools.cpp:1690
 msgid "Writing down archive trailer..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1698
+#: src/libdar/macro_tools.cpp:1695
 msgid "Writing down the second archive terminator..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1709
+#: src/libdar/macro_tools.cpp:1706
 msgid "Closing archive low layer..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1714
+#: src/libdar/macro_tools.cpp:1711
 msgid "Archive is closed."
 msgstr ""
 
@@ -3787,11 +3791,11 @@ msgstr ""
 msgid "First file size too small"
 msgstr ""
 
-#: src/libdar/sar.cpp:708
+#: src/libdar/sar.cpp:707
 msgid "LAX MODE: Caught exception: "
 msgstr ""
 
-#: src/libdar/sar.cpp:709
+#: src/libdar/sar.cpp:708
 #, c-format
 msgid ""
 "LAX MODE: %S is missing, You have the possibility to create a zero byte "
@@ -3801,48 +3805,48 @@ msgid ""
 "now?"
 msgstr ""
 
-#: src/libdar/sar.cpp:721
+#: src/libdar/sar.cpp:720
 #, c-format
 msgid "%S is required for further operation, please provide the file."
 msgstr ""
 
-#: src/libdar/sar.cpp:723
+#: src/libdar/sar.cpp:722
 #, c-format
 msgid ""
 "%S is required for further operation, please provide the file if you have it."
 msgstr ""
 
-#: src/libdar/sar.cpp:762
+#: src/libdar/sar.cpp:761
 #, c-format
 msgid "%S has a bad or corrupted header, please provide the correct file."
 msgstr ""
 
-#: src/libdar/sar.cpp:766
+#: src/libdar/sar.cpp:765
 #, c-format
 msgid ""
 "LAX MODE: %S has a bad or corrupted header, trying to guess original values "
 "and continuing if possible"
 msgstr ""
 
-#: src/libdar/sar.cpp:776
+#: src/libdar/sar.cpp:775
 #, c-format
 msgid ""
 "%S is not a valid file (wrong magic number), please provide the good file."
 msgstr ""
 
-#: src/libdar/sar.cpp:780
+#: src/libdar/sar.cpp:779
 #, c-format
 msgid ""
 "LAX MODE: In spite of its name, %S does not appear to be a dar slice, "
 "assuming a data corruption took place and continuing"
 msgstr ""
 
-#: src/libdar/sar.cpp:784
+#: src/libdar/sar.cpp:783
 msgid ""
 "This is an old archive, it can only be opened starting by the first slice"
 msgstr ""
 
-#: src/libdar/sar.cpp:811
+#: src/libdar/sar.cpp:810
 msgid ""
 "LAX MODE: Due to probable data corruption, dar could not determine the "
 "correct size of slices in this archive. For recent archive, this information "
@@ -3850,85 +3854,85 @@ msgid ""
 "this value if present?"
 msgstr ""
 
-#: src/libdar/sar.cpp:815
+#: src/libdar/sar.cpp:814
 msgid "LAX MODE: Please provide the slice number to read: "
 msgstr ""
 
-#: src/libdar/sar.cpp:823
+#: src/libdar/sar.cpp:822
 msgid "LAX MODE: Please provide an strictly positive integer number"
 msgstr ""
 
-#: src/libdar/sar.cpp:829
+#: src/libdar/sar.cpp:828
 #, c-format
 msgid "LAX MODE: opening slice %i to read its slice header"
 msgstr ""
 
-#: src/libdar/sar.cpp:831
+#: src/libdar/sar.cpp:830
 #, c-format
 msgid "LAX MODE: closing slice %i, header properly fetched"
 msgstr ""
 
-#: src/libdar/sar.cpp:837
+#: src/libdar/sar.cpp:836
 msgid ""
 "LAX MODE: In spite of a the absence of a known slice size, continuing anyway"
 msgstr ""
 
-#: src/libdar/sar.cpp:844
+#: src/libdar/sar.cpp:843
 msgid "Incoherent slice header: First slice size too small"
 msgstr ""
 
-#: src/libdar/sar.cpp:846
+#: src/libdar/sar.cpp:845
 msgid "incoherent slice header: Slice size too small"
 msgstr ""
 
-#: src/libdar/sar.cpp:852
+#: src/libdar/sar.cpp:851
 #, c-format
 msgid "Error opening %S : "
 msgstr ""
 
-#: src/libdar/sar.cpp:852
+#: src/libdar/sar.cpp:851
 msgid " . Retry ?"
 msgstr ""
 
-#: src/libdar/sar.cpp:863
+#: src/libdar/sar.cpp:862
 msgid " is a slice from another backup, please provide the correct slice."
 msgstr ""
 
-#: src/libdar/sar.cpp:868
+#: src/libdar/sar.cpp:867
 msgid ""
 "LAX MODE: internal name of the slice leads dar to consider it is not member "
 "of the same archive. Assuming data corruption occurred and relying on the "
 "filename of this slice as proof of its membership to the archive"
 msgstr ""
 
-#: src/libdar/sar.cpp:893
+#: src/libdar/sar.cpp:892
 msgid ""
 "Data corruption met at end of slice, forbidden flag found at this position"
 msgstr ""
 
-#: src/libdar/sar.cpp:899
+#: src/libdar/sar.cpp:898
 msgid "Data corruption met at end of slice, unknown flag found"
 msgstr ""
 
-#: src/libdar/sar.cpp:914
+#: src/libdar/sar.cpp:913
 #, c-format
 msgid ""
 "Two different slices (%i and %i) are marked as the last slice of the backup!"
 msgstr ""
 
-#: src/libdar/sar.cpp:917
+#: src/libdar/sar.cpp:916
 #, c-format
 msgid ""
 "LAX MODE: slices %i and %i are both recorded as last slice of the archive, "
 "keeping the higher number as the real last slice"
 msgstr ""
 
-#: src/libdar/sar.cpp:940
+#: src/libdar/sar.cpp:939
 #, c-format
 msgid "Slice %S has an unknown flag (neither terminal nor non_terminal file)."
 msgstr ""
 
-#: src/libdar/sar.cpp:950
+#: src/libdar/sar.cpp:949
 #, c-format
 msgid ""
 "Due to data corruption, it is not possible to know if slice %S is the last "
@@ -3938,74 +3942,74 @@ msgid ""
 "with \"abort\" to abort the program immediately): "
 msgstr ""
 
-#: src/libdar/sar.cpp:952 src/libdar/sar.cpp:956
+#: src/libdar/sar.cpp:951 src/libdar/sar.cpp:955
 msgid "last"
 msgstr ""
 
-#: src/libdar/sar.cpp:952
+#: src/libdar/sar.cpp:951
 msgid "notlast"
 msgstr ""
 
-#: src/libdar/sar.cpp:952 src/libdar/sar.cpp:954
+#: src/libdar/sar.cpp:951 src/libdar/sar.cpp:953
 msgid "abort"
 msgstr ""
 
-#: src/libdar/sar.cpp:968
+#: src/libdar/sar.cpp:967
 msgid ""
 "LAX MODE: Slice flag corrupted, but a slice of higher number has been seen, "
 "thus the header flag was surely not indicating this slice as the last of the "
 "archive. Continuing"
 msgstr ""
 
-#: src/libdar/sar.cpp:1011
+#: src/libdar/sar.cpp:1010
 #, c-format
 msgid "failed openning slice %S: %S. Will try to erase it first, if allowed"
 msgstr ""
 
-#: src/libdar/sar.cpp:1094
+#: src/libdar/sar.cpp:1093
 msgid "file exists, and DONT_ERASE option is set."
 msgstr ""
 
-#: src/libdar/sar.cpp:1099
+#: src/libdar/sar.cpp:1098
 msgid " is about to be overwritten."
 msgstr ""
 
-#: src/libdar/sar.cpp:1177
+#: src/libdar/sar.cpp:1176
 msgid ""
 "First slice size is too small to even just be able to drop the slice header"
 msgstr ""
 
-#: src/libdar/sar.cpp:1179
+#: src/libdar/sar.cpp:1178
 msgid "Slice size is too small to even just be able to drop the slice header"
 msgstr ""
 
-#: src/libdar/sar.cpp:1242
+#: src/libdar/sar.cpp:1241
 msgid "Finished writing to file "
 msgstr ""
 
-#: src/libdar/sar.cpp:1242
+#: src/libdar/sar.cpp:1241
 msgid ", ready to continue ? "
 msgstr ""
 
-#: src/libdar/sar.cpp:1247
+#: src/libdar/sar.cpp:1246
 msgid ""
 "If you really want to abort the archive creation hit CTRL-C, then press "
 "enter."
 msgstr ""
 
-#: src/libdar/sar.cpp:1279
+#: src/libdar/sar.cpp:1278
 msgid "file not open"
 msgstr ""
 
-#: src/libdar/sar.cpp:1313
+#: src/libdar/sar.cpp:1312
 msgid "The last file of the set is not present in "
 msgstr ""
 
-#: src/libdar/sar.cpp:1313
+#: src/libdar/sar.cpp:1312
 msgid " , please provide it."
 msgstr ""
 
-#: src/libdar/sar.cpp:1327
+#: src/libdar/sar.cpp:1326
 #, c-format
 msgid ""
 "No backup file is present in %S for archive %S, please provide the last file "
