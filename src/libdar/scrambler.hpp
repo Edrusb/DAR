@@ -64,8 +64,8 @@ namespace libdar
 	void inherited_terminate() {};  // nothing to do
 
     private:
-        std::string key;
-        U_32 len;
+        secu_string key;
+        U_I len;
         generic_file *ref;
         unsigned char *buffer;
         U_I buf_size;

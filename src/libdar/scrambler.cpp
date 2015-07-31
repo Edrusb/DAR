@@ -32,10 +32,8 @@ namespace libdar
     {
         if(pass.size() == 0)
             throw Erange("scrambler::scrambler", gettext("Key cannot be an empty string"));
-        key = pass.c_str();
-	    // here aboce we've convert a secured data to unsecured data, but due to the weakness of the scrambling algo,
-	    // this does not open any security breach...
-        len = pass.size();
+        key = pass;
+        len = key.size();
         ref = & hidden_side;
         buffer = nullptr;
         buf_size = 0;

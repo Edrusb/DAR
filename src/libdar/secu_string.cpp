@@ -153,6 +153,14 @@ namespace libdar
 #endif
     }
 
+    char & secu_string::operator[] (U_I index)
+    {
+	if(index < size())
+	    return mem[index];
+	else
+	    throw Erange("secu_string::operator[]", gettext("Out of range index requested for a secu_string"));
+    }
+
     void secu_string::init(U_I size)
     {
 	allocated_size = nullptr;
