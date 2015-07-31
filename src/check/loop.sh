@@ -75,7 +75,7 @@ if ./all_features ; then
 else
   exit 3
 fi
-for multi_thread in n y ; do
+# for multi_thread in n y ; do
   for hash in  md5 none sha1 ; do
     for crypto in bf none scram aes twofish serpent camellia ; do
       for zip in xz gzip none bzip2 lzo; do
@@ -101,7 +101,7 @@ for multi_thread in n y ; do
       done
     done
   done
-done
+# done
 
 echo "+-------------------------------+"
 echo "| ALL TESTS PASSED SUCCESSFULLY |"

@@ -96,14 +96,26 @@ int main()
 
 	if(!compile_time::liblzo())
 	{
-	    cerr << "MISSING LZO COMPRESSION SUPPORT TO BE ABLE TO PERFORM ALL TESTS, ABORTING5D" << endl;
+	    cerr << "MISSING LZO COMPRESSION SUPPORT TO BE ABLE TO PERFORM ALL TESTS, ABORTING" << endl;
 	    throw Efeature("lzo2");
+	}
+
+	if(!compile_time::libxz())
+	{
+	    cerr << "MISSING LZMA/XZ COMPRESSION SUPPORT TO BE ABLE TO PERFORM ALL TESTS, ABORTING" << endl;
+	    throw Efeature("libxz");
 	}
 
 	if(!compile_time::libgcrypt())
 	{
 	    cerr << "MISSING STRONG ENCRYPTION SUPPORT TO BE ABLE TO PERFORM ALL TESTS, ABORTING" << endl;
 	    throw Efeature("libz2");
+	}
+
+	if(!compile_time::public_key_cipher())
+	{
+	    cerr << "MISSING STRONG ENCRYPTION SUPPORT TO BE ABLE TO PERFORM ALL TESTS, ABORTING" << endl;
+	    throw Efeature("public key encryption");
 	}
     }
     catch(...)
