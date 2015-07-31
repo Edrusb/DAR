@@ -1659,9 +1659,6 @@ namespace libdar
 	(void)layers.pop_and_close_if_type_is(thread_ptr);
 #endif
 
-	if(info_details)
-	    dialog.warning(gettext("Closing the encryption layer..."));
-
 	tronco_ptr = dynamic_cast<tronconneuse *>(layers.top());
 	scram_ptr = dynamic_cast<scrambler *>(layers.top());
 
