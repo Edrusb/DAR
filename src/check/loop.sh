@@ -76,6 +76,7 @@ else
   exit 3
 fi
 # for multi_thread in n y ; do
+multi_thread="n"
   for hash in  md5 none sha1 ; do
     for crypto in bf none scram aes twofish serpent camellia ; do
       for zip in xz gzip none bzip2 lzo; do
