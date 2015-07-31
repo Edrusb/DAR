@@ -599,9 +599,8 @@ namespace libdar
         return lu;
     }
 
-    void sar::inherited_write(const char *a, U_I sz)
+    void sar::inherited_write(const char *a, U_I to_write)
     {
-        U_I to_write = sz;
         infinint max_at_once;
         U_I tmp_wrote;
 	U_I trailer_size = slicing.older_sar_than_v8 ? 0 : 1;

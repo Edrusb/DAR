@@ -1825,13 +1825,13 @@ namespace libdar
     void tools_add_elastic_buffer(generic_file & f, U_32 max_size)
     {
         elastic tic = 1 + tools_pseudo_random(max_size); // range from 1 to max_size
-        char *buffer = new (nothrow) char[max_size];
+        char *buffer = new (nothrow) char[tic.get_size()];
 
         if(buffer == nullptr)
             throw Ememory("tools_add_elastic_buffer");
         try
         {
-            tic.dump((unsigned char *)buffer, max_size);
+            tic.dump((unsigned char *)buffer, tic.get_size());
             f.write(buffer, tic.get_size());
         }
         catch(...)
