@@ -46,7 +46,7 @@ if [ "$crypto" != "none" ]; then
     crypto_K="-K gnupg:$crypto:$DAR_KEY"
     crypto_J=""
     crypto_A="'-$' gnupg:$crypto:$DAR_KEY"
-    sign="$DAR_KEY"
+    sign="--sign $DAR_KEY"
   fi
 else
   if [ "$asym" != "y" ]; then
@@ -155,7 +155,7 @@ isolate:
  $slicing
  $tape
  $hash
- --sign $sign
+ $sign
 
 merge:
  $zip
@@ -171,7 +171,7 @@ create:
  $tape
  $hash
  $sparse
- --sign $sign
+ $sign
 
 listing:
 
