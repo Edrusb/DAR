@@ -80,23 +80,34 @@ namespace libdar
 
     void secu_string::set(int fd, U_I size)
     {
+	U_I offset = 0;
+	S_I lu;
+
 	if(size < get_allocated_size())
 	{
 	    clean_and_destroy();
 	    init(size);
 	}
-
-	S_I lu = ::read(fd, mem, *allocated_size - 1);
-	if(lu < 0)
-	{
-	    *string_size = 0;
-	    mem[0] = '\0';
-	    throw Erange("secu_string::read", string(gettext("Error while reading data for a secure memory:" )) + tools_strerror_r(errno));
-	}
 	else
-	    *string_size = lu;
+	    clear();
 
-	if(*string_size > *allocated_size - 1)
+	do
+	{
+	    lu = ::read(fd, mem + offset, *allocated_size - 1 - offset);
+
+	    if(lu < 0)
+	    {
+		*string_size = offset;
+		mem[offset] = '\0';
+		throw Erange("secu_string::read", string(gettext("Error while reading data for a secure memory:" )) + tools_strerror_r(errno));
+	    }
+	    else
+		offset += lu;
+	}
+	while(lu > 0 && offset < size);
+
+	*string_size = offset;
+	if(*string_size >= *allocated_size)
 	    throw SRC_BUG;
 	else
 	    mem[*string_size] = '\0';
@@ -236,7 +247,12 @@ namespace libdar
 	if(size != *string_size)
 	    return false;
 	else
-	    return strncmp(mem, ptr, size) == 0;
+	{
+	    U_I cur = 0;
+	    while(cur < size && ptr[cur] == mem[cur])
+		++cur;
+	    return cur == size;
+	}
     }
 
     void secu_string::clean_and_destroy()

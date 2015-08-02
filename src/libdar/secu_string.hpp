@@ -162,7 +162,7 @@ namespace libdar
 
 	void init(U_I size);   //< to be used at creation time or after clean_and_destroy() only
 	void copy_from(const secu_string & ref); //< to be used at creation time or after clean_and_destroy() only
-	bool compare_with(const char *ptr, U_I size) const;
+	bool compare_with(const char *ptr, U_I size) const; // return true if given sequence is the same as the one stored in "this"
 	void clean_and_destroy();
     };
 
