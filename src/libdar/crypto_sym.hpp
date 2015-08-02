@@ -107,10 +107,13 @@ namespace libdar
 				   U_I output_length);                   //< length of the string to return
 	void dar_set_essiv(const secu_string & key);                     //< assign essiv from the given (hash) string
 	void make_ivec(const infinint & ref, unsigned char *ivec, U_I size);
-	void self_test(void);
 	void detruit();
 
 	static U_I get_algo_id(crypto_algo algo);
+
+#ifdef LIBDAR_NO_OPTIMIZATION
+	void self_test(void);
+#endif
     };
 
 	/// @}

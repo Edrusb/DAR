@@ -120,7 +120,9 @@ namespace libdar
 		throw;
 	    };
 
-		// self_test();
+#ifdef LIBDAR_NO_OPTIMIZATION
+	    self_test();
+#endif
 	}
 #else
 	throw Ecompilation(gettext("Missing strong encryption support (libgcrypt)"));
@@ -503,6 +505,7 @@ namespace libdar
 #endif
     }
 
+#ifdef LIBDAR_NO_OPTIMIZATION
     void crypto_sym::self_test(void)
     {
 	    //
@@ -510,7 +513,8 @@ namespace libdar
 	    //
 	secu_string result;
 	string p1 = "password";
-	string p2 = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+	string p2 = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"; // 64 characters
+	string p4 = p2 + "X"; // 65 characters
 	secu_string pass = secu_string(100);
 
 	pass.append(p1.c_str(), (U_I)p1.size());
@@ -533,6 +537,8 @@ namespace libdar
 			     "\xc5\xec\x59\xf1\xa4\x52\xf5\xcc\x9a\xd9\x40\xfe\xa0\x59\x8e\xd1", 32))
 	    throw Erange("crypto_sym::self_test", gettext("Library used for blowfish encryption does not respect RFC 3962"));
 
+	pass.resize((U_I)p4.size());
+	pass.append(p4.c_str(), (U_I)p4.size());
 	result = pkcs5_pass2key(pass,
 				"pass phrase exceeds block size", 1200, 32);
 	if (result != string("\x9c\xca\xd6\xd4\x68\x77\x0c\xd5\x1b\x10\xe6\xa6\x87\x21\xbe\x61"
@@ -570,6 +576,7 @@ namespace libdar
 		throw Erange("crypto_sym::self_test", gettext("Library used for blowfish encryption does not respect RFC 3962"));
 	}
     }
+#endif
 
     U_I crypto_sym::get_algo_id(crypto_algo algo)
     {
