@@ -872,8 +872,8 @@ namespace libdar
 	/// display the content of a secu_string, this function is only for trouble shooting!
     extern void tools_secu_string_show(user_interaction & dialog, const std::string & msg, const secu_string & key);
 
-    template <class T> T tools_max(T a, T b) { a > b ? a : b; }
-    template <class T> T tools_min(T a, T b) { a > b ? b : a; }
+    template <class T> T tools_max(T a, T b) { return a > b ? a : b; }
+    template <class T> T tools_min(T a, T b) { return a > b ? b : a; }
 
 
 } /// end of namespace
