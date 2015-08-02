@@ -130,8 +130,10 @@ namespace libdar
 
 		err = gcry_cipher_open(&clef, algo_id, GCRY_CIPHER_MODE_CBC, GCRY_CIPHER_SECURE);
 		if(err != GPG_ERR_NO_ERROR)
-		    throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Error while opening libgcrypt key handle: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-		err = gcry_cipher_setkey(clef, (const void *)hashed_password.c_str(), hashed_password.size());
+		    throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Error while opening libgcrypt key handle: %s/%s"),
+								       gcry_strsource(err),
+								       gcry_strerror(err)));
+		err = gcry_cipher_setkey(clef, (const void *)hashed_password.c_str(), hashed_password.get_size());
 		if(err != GPG_ERR_NO_ERROR)
 		    throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Error while assigning key to libgcrypt key handle: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
@@ -334,7 +336,7 @@ namespace libdar
 
 	    // setting the HMAC key
 
-	err = gcry_md_setkey(hmac, password.c_str(), password.size());
+	err = gcry_md_setkey(hmac, password.c_str(), password.get_size());
 	if(err != GPG_ERR_NO_ERROR)
 	    throw Erange("crypto_sym::pkcs5_pass2key",tools_printf(gettext("Error while derivating key from password (HMAC set key): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
@@ -345,7 +347,7 @@ namespace libdar
 	    U_I UjLen = gcry_md_get_algo_dlen(GCRY_MD_SHA1);
 	    char *Ti = nullptr, *Uj = nullptr;
 
-	    retval.clear_and_resize(output_length);
+	    retval.resize(output_length);
 	    Ti = (char *)gcry_malloc_secure(gcry_md_get_algo_dlen(GCRY_MD_SHA1));
 	    if(Ti == nullptr)
 		throw Ememory("crypto_sym::pkcs5_pass2key");
@@ -443,7 +445,7 @@ namespace libdar
 
 	try
 	{
-	    gcry_md_hash_buffer(GCRY_MD_SHA1, digest, (const void *)key.c_str(), key.size());
+	    gcry_md_hash_buffer(GCRY_MD_SHA1, digest, (const void *)key.c_str(), key.get_size());
 	    err = gcry_cipher_open(&essiv_clef, GCRY_CIPHER_BLOWFISH, GCRY_CIPHER_MODE_ECB, GCRY_CIPHER_SECURE); // we always use BLOWFISH to generate pseudo-random IV as result of encryption of the block number, whatever is the algorithm used for encryption
 	    if(err != GPG_ERR_NO_ERROR)
 		throw Erange("crypto_sym::dar_set_essiv",tools_printf(gettext("Error while creating ESSIV handle: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
@@ -486,7 +488,7 @@ namespace libdar
 	    )
 	    throw Erange("crypto_sym::self_test", gettext("Library used for blowfish encryption does not respect RFC 3962"));
 
-	pass.clear_and_not_resize();
+	pass.clear();
 	pass.append(p2.c_str(), (U_I)p2.size());
 
 	result = pkcs5_pass2key(pass,
@@ -518,7 +520,7 @@ namespace libdar
 	char ivec[8];
 	int i;
 	string p3 = string("\0\0\0\0", 4);
-	pass.clear_and_not_resize();
+	pass.clear();
 	pass.append(p3.c_str(), (U_I)p3.size());
 	dar_set_essiv(pass);
 

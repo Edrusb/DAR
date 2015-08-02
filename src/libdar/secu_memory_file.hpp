@@ -40,13 +40,13 @@ namespace libdar
     public:
 
 	    /// Constructors & Destructor
-	secu_memory_file(U_I size, bool randomize) : generic_file(gf_read_write), data(size) { position = 0; if(randomize) data.clear_and_randomize(size); };
+	secu_memory_file(U_I size, bool randomize) : generic_file(gf_read_write), data(size) { position = 0; if(randomize) data.randomize(size); };
 
 
 	    // memory_storage specific methods
 
-	void reset(U_I size) { if(is_terminated()) throw SRC_BUG; position = 0; data.clear_and_resize(size); };
-	infinint size() const { return data.size(); };
+	void reset(U_I size) { if(is_terminated()) throw SRC_BUG; position = 0; data.resize(size); };
+	infinint size() const { return data.get_size(); };
 
 
 	    // virtual method inherited from generic_file

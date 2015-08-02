@@ -80,8 +80,12 @@ namespace libdar
 
     void secu_string::set(int fd, U_I size)
     {
-	clean_and_destroy();
-	init(size);
+	if(size < get_allocated_size())
+	{
+	    clean_and_destroy();
+	    init(size);
+	}
+
 	S_I lu = ::read(fd, mem, *allocated_size - 1);
 	if(lu < 0)
 	{
@@ -143,19 +147,21 @@ namespace libdar
 	mem[*string_size] = '\0';
     }
 
-    void secu_string::clear_and_randomize(U_I size)
+    void secu_string::randomize(U_I size)
     {
-	clean_and_destroy();
-	init(size);
-	*string_size = size;
 #if CRYPTO_AVAILABLE
-	gcry_randomize(mem, size, GCRY_STRONG_RANDOM);
+	if(size > get_allocated_size())
+	    throw Erange("secu_string::randomize", gettext("secu_string randomization requested exceeds storage capacity"));
+	*string_size = size;
+	gcry_randomize(mem, *string_size, GCRY_STRONG_RANDOM);
+#else
+	throw Efeature("string randomization lacks libgcrypt");
 #endif
     }
 
     char & secu_string::operator[] (U_I index)
     {
-	if(index < size())
+	if(index < get_size())
 	    return mem[index];
 	else
 	    throw Erange("secu_string::operator[]", gettext("Out of range index requested for a secu_string"));

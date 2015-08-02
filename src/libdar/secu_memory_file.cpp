@@ -34,9 +34,9 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	if(tmp >= data.size())
+	if(tmp >= data.get_size())
 	{
-	    position = data.size();
+	    position = data.get_size();
 	    return false;
 	}
 	else
@@ -54,7 +54,7 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	position = data.size();
+	position = data.get_size();
 	return true;
     }
 
@@ -82,9 +82,9 @@ namespace libdar
 	else
 	{
 	    position += x;
-	    if(position > data.size())
+	    if(position > data.get_size())
 	    {
-		position = data.size();
+		position = data.get_size();
 		ret = false;
 	    }
 	    else
@@ -99,7 +99,7 @@ namespace libdar
 	U_I lu = 0;
 	const char *deb = data.c_str() + position;
 
-	while(lu < size && position + lu < data.size())
+	while(lu < size && position + lu < data.get_size())
 	{
 	    *a = *deb;
 	    ++lu;

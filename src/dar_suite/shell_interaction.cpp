@@ -417,11 +417,11 @@ secu_string shell_interaction::interaction_secu_string(const string & message, b
 	*(obj->inter) << message;
 	do
 	{
-	    ret.append(obj->input, taille - ret.size());
+	    ret.append(obj->input, taille - ret.get_size());
 	    i = last;
-	    while(i < ret.size() && ret.c_str()[i] != '\n')
+	    while(i < ret.get_size() && ret.c_str()[i] != '\n')
 		++i;
-	    if(i < ret.size()) // '\n' found so we stop here but remove this last char
+	    if(i < ret.get_size()) // '\n' found so we stop here but remove this last char
 	    {
 		fin = true;
 		ret.reduce_string_size_to(i);
@@ -429,7 +429,7 @@ secu_string shell_interaction::interaction_secu_string(const string & message, b
 	    else
 		last = i;
 
-	    if(ret.size() == taille && !fin)
+	    if(ret.get_size() == taille && !fin)
 		throw Erange("interaction_secu_string", gettext("provided password is too long for the allocated memory"));
 	}
 	while(!fin);

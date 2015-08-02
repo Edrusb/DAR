@@ -1193,7 +1193,7 @@ namespace libdar
 			    throw SRC_BUG;
 			engine.encrypt(gnupg_recipients, clear, *key);
 			real_pass = clear.get_contents();
-			if(real_pass.size() == 0)
+			if(real_pass.get_size() == 0)
 			    throw SRC_BUG;
 
 			if(crypto == crypto_none)
@@ -1215,7 +1215,7 @@ namespace libdar
 
 		    // optaining a password on-fly if necessary
 
-		if(crypto != crypto_none && real_pass.size() == 0)
+		if(crypto != crypto_none && real_pass.get_size() == 0)
 		{
 		    secu_string t1 = dialog.get_secu_string(tools_printf(gettext("Archive %S requires a password: "), &filename), false);
 		    secu_string t2 = dialog.get_secu_string(gettext("Please confirm your password: "), false);

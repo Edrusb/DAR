@@ -30,10 +30,10 @@ namespace libdar
 
     scrambler::scrambler(const secu_string & pass, generic_file & hidden_side) : generic_file(hidden_side.get_mode())
     {
-        if(pass.size() == 0)
+        if(pass.get_size() == 0)
             throw Erange("scrambler::scrambler", gettext("Key cannot be an empty string"));
         key = pass;
-        len = key.size();
+        len = key.get_size();
         ref = & hidden_side;
         buffer = nullptr;
         buf_size = 0;

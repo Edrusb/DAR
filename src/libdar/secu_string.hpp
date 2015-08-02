@@ -69,7 +69,7 @@ namespace libdar
 	    ///
 	    /// create the allocated string in secure memory
 	    /// \param[in] size is the amount of secured memory to obtain when creating the object
-	secu_string(U_I size = 0) { init(size); };
+	secu_string(U_I storage_size = 0) { init(storage_size); };
 
 	    /// constructor 2
 	    ///
@@ -95,7 +95,8 @@ namespace libdar
 	    /// set at most size bytes of data directly from the filedescriptor,
 	    /// \param[in] fd the filedescriptor to read data from
 	    /// \param[in] size is the maximum number of byte read
-	    /// \note each call to set clears and reset the string, as well as the allocation size
+	    /// \note if current storage size is not larg enough to hold size bytes,
+	    /// allocated secure memory is released and larger allocation of secure memory is done.
 	void set(int fd, U_I size);
 
 	    /// append some data to the string at a given offset
@@ -105,7 +106,7 @@ namespace libdar
 	    /// \param[in] size is the number of byte to append
 	    /// \note this call does not change the allocation size, (unlike read()), it adds the data pointed by the arguments
 	    /// to the object while there is enough place to do so.
-	    /// clear_and_resize() must be used first to define enough secure memory to append the expected amount of data
+	    /// resize() must be used first to define enough secure memory to append the expected amount of data
 	    /// in one or several call to append.
 	void append_at(U_I offset, const char *ptr, U_I size);
 
@@ -117,23 +118,24 @@ namespace libdar
 
 	    /// append some data at the end of the string
 	void append(int fd, U_I size) { append_at(*string_size, fd, size); };
+
 	    /// shorten the string (do not change the allocated size)
+	    ///
 	    /// \param[in] pos is the length of the string to set, it must be smaller or equal to the current size
 	void reduce_string_size_to(U_I pos);
 
-	    /// clear the string (set its allocated string to zero)
-	void clear() { clean_and_destroy(); init(0); };
+	    /// clear the string (set to an empty string)
+	void clear() { *string_size = 0; };
 
 	    /// clear and resize the string to the defined allocated size
 	    ///
 	    /// \param[in] size is the amount of secure memory to allocated
-	void clear_and_resize(U_I size) { clean_and_destroy(); init(size); };
+	void resize(U_I size) { clean_and_destroy(); init(size); };
 
-	    /// clear and keep same storage space
-	void clear_and_not_resize() {  string_size = 0; };
-
-	    /// clear and allocate a given size area filled with random numbers
-	void clear_and_randomize(U_I size);
+	    /// set the string to randomize string of given size
+	    ///
+	    /// \note the given size must be less than allocated size
+	void randomize(U_I size);
 
 	    /// get access to the secure string
 
@@ -141,16 +143,17 @@ namespace libdar
 	    /// \note check the "size" method to know how much bytes can be read
 	const char*c_str() const { return mem == nullptr ? throw SRC_BUG : mem; };
 
-	    /// get access to the scure string by index
+	    /// get access to the secure string by index
 	    ///
 	    /// \note index must be in the range [ 0 - size() [ to avoid throwing an exception
 	char & operator[] (U_I index);
+	char operator[](U_I index) const { return (const_cast<secu_string *>(this))->operator[](index); };
 
 	    /// get the size of the string
-	U_I size() const { return *string_size; }; // returns the size of the string
+	U_I get_size() const { if(string_size == nullptr) throw SRC_BUG; return *string_size; }; // returns the size of the string
 
 	    /// get the size of the allocated secure space
-	U_I max_size() const { return *allocated_size; };
+	U_I get_allocated_size() const { return *allocated_size - 1; };
 
     private:
 	U_I *allocated_size;

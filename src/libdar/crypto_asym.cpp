@@ -416,8 +416,8 @@ namespace libdar
 	pass = obj->get_ui().get_secu_string(message, false);
 	th.check_self_cancellation();
 
-	wrote = write(fd, pass.c_str(), pass.size());
-	if(wrote < 0 || (U_I)(wrote) != pass.size())
+	wrote = write(fd, pass.c_str(), pass.get_size());
+	if(wrote < 0 || (U_I)(wrote) != pass.get_size())
 	{
 	    if(wrote == -1)
 		obj->get_ui().warning(string(gettext("Error, while sending the passphrase to GPGME:")) + tools_strerror_r(errno));

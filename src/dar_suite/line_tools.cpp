@@ -759,11 +759,11 @@ void line_tools_crypto_split_algo_pass(const secu_string & all,
 	// split from "algo:pass" "algo" "pass" "algo:" ":pass" syntaxes
 
     const char *it = all.c_str();
-    const char *fin = all.c_str() + all.size(); // points past the last byte of the secu_string "all"
+    const char *fin = all.c_str() + all.get_size(); // points past the last byte of the secu_string "all"
     secu_string tmp;
     recipients.clear();
 
-    if(all.size() == 0)
+    if(all.get_size() == 0)
     {
 	algo = crypto_none;
 	pass.clear();
