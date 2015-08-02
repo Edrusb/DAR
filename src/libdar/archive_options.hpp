@@ -363,8 +363,11 @@ namespace libdar
 	    /// \note if crypto_algo is not set while a list of recipient is given, the crypto algo will default to blowfish
 	void set_gnupg_recipients(const std::vector<std::string> & gnupg_recipients) { x_gnupg_recipients = gnupg_recipients; };
 
-	    /// change the size of the randomly generated key encrypted using gnupg, the size is in bytes (i.e.: octets)
-	    /// \note if set to zero, will use the default key length
+	    /// change the size of the randomly generated key for used with gnupg, the size is in bytes (i.e.: octets)
+	    /// \note this method only concerns crypto algorithms that use arbitrarily large encryption, (only scrambling algorithm
+	    /// is concerned for today with libdar). For other algorithms the randomly generated key used with gnupg has the
+	    /// maximum possible length available for the algorithm.
+	    /// \note setting this value to zero lead libdar to use a default length with is 4096 bits (512 octets).
 	void set_gnupg_key_size(U_I gnupg_key_size);
 
 	    /// the private keys matching the email of the provided list are used to sign the archive random key

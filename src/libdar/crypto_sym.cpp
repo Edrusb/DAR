@@ -61,7 +61,8 @@ namespace libdar
 			   generic_file & encrypted_side,
 			   bool no_initial_shift,
 			   const archive_version & reading_ver,
-			   crypto_algo algo)
+			   crypto_algo algo,
+			   bool use_pkcs5)
 	: tronconneuse(block_size, encrypted_side, no_initial_shift, reading_ver)
     {
 #if CRYPTO_AVAILABLE
@@ -73,28 +74,8 @@ namespace libdar
 	{
 	    secu_string hashed_password;
 	    gcry_error_t err;
-	    size_t key_len;
 
-	    switch(algo)
-	    {
-	    case crypto_blowfish:
-		algo_id = GCRY_CIPHER_BLOWFISH;
-		break;
-	    case crypto_aes256:
-		algo_id = GCRY_CIPHER_AES256;
-		break;
-	    case crypto_twofish256:
-		algo_id = GCRY_CIPHER_TWOFISH;
-		break;
-	    case crypto_serpent256:
-		algo_id = GCRY_CIPHER_SERPENT256;
-		break;
-	    case crypto_camellia256:
-		algo_id = GCRY_CIPHER_CAMELLIA256;
-		break;
-	    default:
-		throw SRC_BUG;
-	    }
+	    algo_id = get_algo_id(algo);
 
 		// checking for algorithm availability
 	    err = gcry_cipher_algo_info(algo_id, GCRYCTL_TEST_ALGO, nullptr, nullptr);
@@ -108,14 +89,6 @@ namespace libdar
 	    if(algo_block_size == 0)
 		throw SRC_BUG;
 
-		// obtaining the maximum key length
-	    err = gcry_cipher_algo_info(algo_id, GCRYCTL_GET_KEYLEN, nullptr, &key_len);
-	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Failed retrieving from libgcrypt the key length to use: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-
-	    if(algo == crypto_blowfish)
-		key_len = 56; // for historical reasons
-
 		// initializing ivec in secure memory
 	    ivec = (unsigned char *)gcry_malloc_secure(algo_block_size);
 	    if(ivec == nullptr)
@@ -123,7 +96,7 @@ namespace libdar
 
 	    try
 	    {
-		hashed_password = pkcs5_pass2key(password, "", 2000, key_len);
+		hashed_password = use_pkcs5 ? pkcs5_pass2key(password, "", 2000, max_key_len_libdar(algo)) : password;
 		reading_version = reading_ver;
 
 		    // key handle initialization
@@ -152,6 +125,69 @@ namespace libdar
 #else
 	throw Ecompilation(gettext("Missing strong encryption support (libgcrypt)"));
 #endif
+    }
+
+    size_t crypto_sym::max_key_len(crypto_algo algo)
+    {
+	size_t key_len;
+	U_I algo_id = get_algo_id(algo);
+	gcry_error_t err;
+
+	    // checking for algorithm availability
+	err = gcry_cipher_algo_info(algo_id, GCRYCTL_TEST_ALGO, nullptr, nullptr);
+	if(err != GPG_ERR_NO_ERROR)
+	    throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Cyphering algorithm not available in libgcrypt: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+
+	    // obtaining the maximum key length
+	key_len = gcry_cipher_get_algo_keylen(algo_id);
+	if(key_len == 0)
+	    throw Erange("crypto_sym::crypto_sym",gettext("Failed retrieving from libgcrypt the maximum key length"));
+
+	return key_len;
+    }
+
+    size_t crypto_sym::max_key_len_libdar(crypto_algo algo)
+    {
+	size_t key_len = max_key_len(algo);
+
+	if(algo == crypto_blowfish)
+	    key_len = 56; // for historical reasons
+
+	return key_len;
+    }
+
+    bool crypto_sym::is_a_strong_password(crypto_algo algo, const secu_string & password)
+    {
+	bool ret = true;
+	gcry_error_t err;
+	gcry_cipher_hd_t clef;
+	U_I algo_id = get_algo_id(algo);
+
+	err = gcry_cipher_open(&clef, algo_id, GCRY_CIPHER_MODE_CBC, GCRY_CIPHER_SECURE);
+	if(err != GPG_ERR_NO_ERROR)
+	    throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Error while opening libgcrypt key handle to check password strength: %s/%s"),
+							       gcry_strsource(err),
+							       gcry_strerror(err)));
+
+	try
+	{
+	    err = gcry_cipher_setkey(clef, (const void *)password.c_str(), password.get_size());
+	    if(err != GPG_ERR_NO_ERROR)
+	    {
+		if(gcry_err_code(err) == GPG_ERR_WEAK_KEY)
+		    ret = false;
+		else
+		    throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Error while assigning key to libgcrypt key handle to check password strength: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	    }
+	}
+	catch(...)
+	{
+	    gcry_cipher_close(clef);
+	    throw;
+	}
+	gcry_cipher_close(clef);
+
+	return ret;
     }
 
 
@@ -534,5 +570,34 @@ namespace libdar
 		throw Erange("crypto_sym::self_test", gettext("Library used for blowfish encryption does not respect RFC 3962"));
 	}
     }
+
+    U_I crypto_sym::get_algo_id(crypto_algo algo)
+    {
+	U_I algo_id;
+
+	switch(algo)
+	{
+	case crypto_blowfish:
+	    algo_id = GCRY_CIPHER_BLOWFISH;
+	    break;
+	case crypto_aes256:
+	    algo_id = GCRY_CIPHER_AES256;
+	    break;
+	case crypto_twofish256:
+	    algo_id = GCRY_CIPHER_TWOFISH;
+	    break;
+	case crypto_serpent256:
+	    algo_id = GCRY_CIPHER_SERPENT256;
+	    break;
+	case crypto_camellia256:
+	    algo_id = GCRY_CIPHER_CAMELLIA256;
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
+
+	return algo_id;
+    }
+
 
 } // end of namespace

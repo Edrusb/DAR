@@ -587,19 +587,34 @@ namespace libdar
 	    case crypto_camellia256:
 		if(info_details)
 		    dialog.warning(gettext("Opening cyphering layer..."));
+#ifdef LIBDAR_NO_OPTIMIZATION
+		    tools_secu_string_show(dialog, string("Used clear key: "), real_pass);
+#endif
 		if(!second_terminateur_offset.is_zero()
 		   || tmp_ctxt->is_an_old_start_end_archive()) // we have openned the archive by the end
 		{
 		    crypto_sym *tmp_ptr = nullptr;
 
-		    tmp = tmp_ptr = new (pool) crypto_sym(crypto_size, real_pass, *(stack.top()), true, ver.get_edition(), crypto);
+		    tmp = tmp_ptr = new (pool) crypto_sym(crypto_size,
+							  real_pass,
+							  *(stack.top()),
+							  true,
+							  ver.get_edition(),
+							  crypto,
+							  ver.get_crypted_key() != nullptr);
 		    if(tmp_ptr != nullptr)
 			tmp_ptr->set_initial_shift(ver.get_initial_offset());
 		}
 		else // archive openned by the beginning
 		{
 		    crypto_sym *tmp_ptr;
-		    tmp = tmp_ptr = new (pool) crypto_sym(crypto_size, real_pass, *(stack.top()), false, ver.get_edition(), crypto);
+		    tmp = tmp_ptr = new (pool) crypto_sym(crypto_size,
+							  real_pass,
+							  *(stack.top()),
+							  false,
+							  ver.get_edition(),
+							  crypto,
+							  ver.get_crypted_key() != nullptr);
 
 		    if(tmp_ptr != nullptr)
 		    {
@@ -1173,16 +1188,69 @@ namespace libdar
 			    // generating random key for symmetric encryption
 
 			char variable_size;
+
 			if(info_details)
 			    dialog.warning(gettext("Generating random key for symmetric encryption..."));
-			gcry_randomize(&variable_size, 1, GCRY_STRONG_RANDOM);
+
+			switch(crypto)
+			{
+			case crypto_none:
+			    throw SRC_BUG;
+			case crypto_scrambling:
+			    gcry_randomize(&variable_size, 1, GCRY_STRONG_RANDOM);
+			    if(gnupg_key_size == 0)
+				throw SRC_BUG;
+			    gnupg_key_size += (unsigned char)(variable_size);
+				// yes we do not use constant sized key but add from +0 to +255 bytes to its specified length
+			    break;
+			case crypto_blowfish:
+			case crypto_aes256:
+			case crypto_twofish256:
+			case crypto_serpent256:
+			case crypto_camellia256:
+				// we ignore gnupg_key_size provides and
+				// set it to the maximum allowed value
+			    gnupg_key_size = tools_max(crypto_sym::max_key_len(crypto),
+						       crypto_sym::max_key_len_libdar(crypto));
+			    break;
+			default:
+			    throw SRC_BUG;
+			}
+
 			if(gnupg_key_size == 0)
 			    throw SRC_BUG;
-			gnupg_key_size += (unsigned char)(variable_size); // yes we do not use constant sized key but add from +0 to +255 bytes to its specified length
-			if(gnupg_key_size == 0)
-			    throw SRC_BUG;
+
 			secu_memory_file clear(gnupg_key_size);
 			clear.randomize(gnupg_key_size);
+			U_I iter = 0;
+			U_I next = 10;
+
+			    // checking the strength of the random key
+
+			switch(crypto)
+			{
+			case crypto_none:
+			    throw SRC_BUG;
+			case crypto_scrambling:
+			    break;
+			case crypto_blowfish:
+			case crypto_aes256:
+			case crypto_twofish256:
+			case crypto_serpent256:
+			case crypto_camellia256:
+			    while(!crypto_sym::is_a_strong_password(crypto, clear.get_contents()))
+			    {
+				clear.randomize(gnupg_key_size);
+				++iter;
+				if(iter % next == 0)
+				    dialog.warning(tools_printf(gettext("For your information, this is the iteration %d for which the randomly generated key is reported to be weak by libgcrypt, continuing generating another random key... patience"), iter));
+				next *= 10;
+			    }
+			    break;
+			default:
+			    throw SRC_BUG;
+			}
+
 			if(info_details)
 			    dialog.warning(gettext("Key generated"));
 
@@ -1294,7 +1362,8 @@ namespace libdar
 						*(layers.top()),
 						false,
 						macro_tools_supported_version,
-						crypto);
+						crypto,
+						gnupg_recipients.empty());
 
 #ifdef LIBDAR_NO_OPTIMIZATION
 		    tools_secu_string_show(dialog, string("real_pass used: "), real_pass);
