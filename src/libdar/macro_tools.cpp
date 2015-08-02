@@ -463,8 +463,13 @@ namespace libdar
 
 		// ****** Reading the header version ************** //
 
-	    if(sequential_read && info_details)
-		dialog.warning(gettext("Reading the archive header..."));
+	    if(info_details)
+	    {
+		if(sequential_read)
+		    dialog.warning(gettext("Reading the archive header..."));
+		else
+		    dialog.warning(gettext("Reading the archive trailer..."));
+	    }
 
 	    stack.find_first_from_top(tmp_ctxt);
 	    if(tmp_ctxt == nullptr)
@@ -601,7 +606,7 @@ namespace libdar
 							  true,
 							  ver.get_edition(),
 							  crypto,
-							  ver.get_crypted_key() != nullptr);
+							  ver.get_crypted_key() == nullptr);
 		    if(tmp_ptr != nullptr)
 			tmp_ptr->set_initial_shift(ver.get_initial_offset());
 		}
