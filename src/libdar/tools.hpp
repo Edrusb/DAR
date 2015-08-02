@@ -867,7 +867,13 @@ namespace libdar
 	/// release a dirent structure as allocated by tools_allocate_struct_dirent
 	///
 	/// \param[in] ptr is the address of the structure to release
-    void tools_release_struct_dirent(struct dirent *ptr);
+    extern void tools_release_struct_dirent(struct dirent *ptr);
+
+	/// display the content of a secu_string, this function is only for trouble shooting!
+    extern void tools_secu_string_show(user_interaction & dialog, const std::string & msg, const secu_string & key);
+
+    template <class T> T tools_max(T a, T b) { a > b ? a : b; }
+    template <class T> T tools_min(T a, T b) { a > b ? b : a; }
 
 
 } /// end of namespace

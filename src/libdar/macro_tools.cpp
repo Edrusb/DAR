@@ -616,6 +616,9 @@ namespace libdar
 	    case crypto_scrambling:
 		if(info_details)
 		    dialog.warning(gettext("Opening cyphering layer..."));
+#ifdef LIBDAR_NO_OPTIMIZATION
+		tools_secu_string_show(dialog, string("Used clear key: "), real_pass);
+#endif
 		tmp = new (pool) scrambler(real_pass, *(stack.top()));
 		break;
 	    default:
@@ -1182,6 +1185,10 @@ namespace libdar
 			if(info_details)
 			    dialog.warning(gettext("Key generated"));
 
+#ifdef LIBDAR_NO_OPTIMIZATION
+			tools_secu_string_show(dialog, string("Generated key: "), clear.get_contents());
+#endif
+
 			    // encrypting the symmetric key with asymetric algorithm
 
 			crypto_asym engine(dialog);
@@ -1270,6 +1277,9 @@ namespace libdar
 		    if(info_details)
 			dialog.warning(gettext("Adding a new layer on top: scrambler object..."));
 		    tmp = new (pool) scrambler(real_pass, *(layers.top()));
+#ifdef LIBDAR_NO_OPTIMIZATION
+		    tools_secu_string_show(dialog, string("real_pass used: "), real_pass);
+#endif
 		    break;
 		case crypto_blowfish:
 		case crypto_aes256:
@@ -1278,7 +1288,16 @@ namespace libdar
 		case crypto_camellia256:
 		    if(info_details)
 			dialog.warning(gettext("Adding a new layer on top: Strong encryption object..."));
-		    tmp = new (pool) crypto_sym(crypto_size, real_pass, *(layers.top()), false, macro_tools_supported_version, crypto);
+		    tmp = new (pool) crypto_sym(crypto_size,
+						real_pass,
+						*(layers.top()),
+						false,
+						macro_tools_supported_version,
+						crypto);
+
+#ifdef LIBDAR_NO_OPTIMIZATION
+		    tools_secu_string_show(dialog, string("real_pass used: "), real_pass);
+#endif
 		    break;
 		case crypto_none:
 		    if(!writing_to_pipe)

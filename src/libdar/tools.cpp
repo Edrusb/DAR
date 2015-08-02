@@ -3048,5 +3048,16 @@ namespace libdar
 	    delete [] ((char *)(ptr));
     }
 
+    void tools_secu_string_show(user_interaction & dialog, const string & msg, const secu_string & key)
+    {
+	string res = msg + tools_printf(" (size=%d) [", key.get_size());
+	U_I max = key.get_size() - 1;
+
+	for(U_I index = 0; index < max; ++index)
+	    res += tools_printf(" %d |", key[index]);
+
+	res += tools_printf(" %d ]", key[max]);
+	dialog.warning(res);
+    }
 
 } // end of namespace
