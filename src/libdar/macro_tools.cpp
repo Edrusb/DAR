@@ -547,7 +547,7 @@ namespace libdar
 
 		    // unciphering the encrypted key using GnuPG user's keyring, asking for passphrase if necessary
 
-		secu_memory_file clear_key = secu_memory_file(size, false);
+		secu_memory_file clear_key = secu_memory_file(size);
 		crypto_asym engine(dialog);
 		ver.get_crypted_key()->skip(0);
 		clear_key.skip(0);
@@ -1181,7 +1181,8 @@ namespace libdar
 			gnupg_key_size += (unsigned char)(variable_size); // yes we do not use constant sized key but add from +0 to +255 bytes to its specified length
 			if(gnupg_key_size == 0)
 			    throw SRC_BUG;
-			secu_memory_file clear(gnupg_key_size, true);
+			secu_memory_file clear(gnupg_key_size);
+			clear.randomize(gnupg_key_size);
 			if(info_details)
 			    dialog.warning(gettext("Key generated"));
 
@@ -1196,7 +1197,7 @@ namespace libdar
 			    engine.set_signatories(gnupg_signatories);
 			clear.skip(0);
 			key->skip(0);
-			if(clear.size().is_zero())
+			if(clear.get_size().is_zero())
 			    throw SRC_BUG;
 			engine.encrypt(gnupg_recipients, clear, *key);
 			real_pass = clear.get_contents();
