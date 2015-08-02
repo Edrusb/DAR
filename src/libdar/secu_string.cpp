@@ -112,8 +112,7 @@ namespace libdar
 
 	(void)memcpy(mem + offset, ptr, size);
 	offset += size;
-	if(*string_size < offset)
-	    *string_size = offset;
+	*string_size = offset;
 	mem[*string_size] = '\0';
     }
 
