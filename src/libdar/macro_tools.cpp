@@ -619,7 +619,7 @@ namespace libdar
 							  false,
 							  ver.get_edition(),
 							  crypto,
-							  ver.get_crypted_key() != nullptr);
+							  ver.get_crypted_key() == nullptr);
 
 		    if(tmp_ptr != nullptr)
 		    {
