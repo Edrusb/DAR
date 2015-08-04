@@ -414,10 +414,17 @@ namespace libdar
 		{
 		    if(!reof)
 		    {
-			remove_trailing_clear_data_from_encrypted_buf(crypt_offset);
+			try
+			{
+			    remove_trailing_clear_data_from_encrypted_buf(crypt_offset);
 
-			    // retrying but without trailing cleared data
-			buf_byte_data = decrypt_data(block_num, encrypted_buf, encrypted_buf_data, buf, clear_block_size);
+				// retrying but without trailing cleared data
+			    buf_byte_data = decrypt_data(block_num, encrypted_buf, encrypted_buf_data, buf, clear_block_size);
+			}
+			catch(Egeneric & f)
+			{
+			    throw e;
+			}
 		    }
 		    else // already tried to remove clear data at end of encrypted buffer
 			throw;
