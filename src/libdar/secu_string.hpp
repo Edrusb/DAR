@@ -68,7 +68,7 @@ namespace libdar
 	    /// constructor 1
 	    ///
 	    /// create the allocated string in secure memory
-	    /// \param[in] size is the amount of secured memory to obtain when creating the object
+	    /// \param[in] storage_size is the amount of secured memory to obtain when creating the object
 	secu_string(U_I storage_size = 0) { init(storage_size); };
 
 	    /// constructor 2
