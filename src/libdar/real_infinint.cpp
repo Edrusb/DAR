@@ -546,7 +546,25 @@ namespace libdar
 
     unsigned char infinint::operator [] (const infinint & position) const
     {
-	return (*field)[field->size() - (position + 1)];
+	if(field == NULL)
+	    throw SRC_BUG;
+
+	if(position.is_zero())
+	{
+	    infinint::iterator it = field->rbegin();
+
+	    if(it != field.rend())
+		return *it;
+	    else
+		return 0x00;
+	}
+	else
+	{
+	    if(position < field->size())
+		return (*field)[field->size() - (position + 1)];
+	    else
+		return 0x00;
+	}
     }
 
     bool infinint::is_zero() const
