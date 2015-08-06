@@ -309,11 +309,7 @@ namespace libdar
 	    while(i > 0)
 	    {
 		--i;
-		tmp = ref_cp & mask;
-		sect[i] = 0;
-		tmp.unstack(sect[i]);
-		if(!tmp.is_zero())
-		    throw SRC_BUG;
+		sect[i] = ref_cp[0];
 		ref_cp >>= 8;
 	    }
 
