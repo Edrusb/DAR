@@ -1251,6 +1251,8 @@ namespace libdar
 				    dialog.warning(tools_printf(gettext("For your information, this is the iteration %d for which the randomly generated key is reported to be weak by libgcrypt, continuing generating another random key... patience"), iter));
 				next *= 10;
 			    }
+			    if(iter > 1)
+				dialog.warning(tools_printf(gettext("... A strong randomly generated key could be found after %d iteration(s)"), iter));
 			    break;
 			default:
 			    throw SRC_BUG;
