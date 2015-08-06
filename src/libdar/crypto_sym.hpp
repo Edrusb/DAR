@@ -101,18 +101,38 @@ namespace libdar
 	U_I algo_id;                    //< algo ID in libgcrypt
 	archive_version reading_version;
 
-	secu_string pkcs5_pass2key(const secu_string & password,         //< human provided password
-				   const std::string & salt,             //< salt string
-				   U_I iteration_count,                  //< number of time to shake the melange
-				   U_I output_length);                   //< length of the string to return
-	void dar_set_essiv(const secu_string & key);                     //< assign essiv from the given (hash) string
-	void make_ivec(const infinint & ref, unsigned char *ivec, U_I size);
 	void detruit();
 
+	    /// creates a blowfish key using as key a SHA1 of the given string (no IV assigned)
+	    ///
+	    /// \note such key is intended to be used to generate IV for the main key
+
+	static void dar_set_essiv(const secu_string & key,
+				  gcry_cipher_hd_t & IVkey);                    //< assign essiv from the given (hash) string
+
+	    /// Fills up a new initial vector based on a reference and and a encryption key
+	    ///
+	    /// \param[in] ref is the reference to base the IV on
+	    /// \param[in] ivec is the address where to drop down the new IV
+	    /// \param[in] size is the amount of data allocated at ivec address
+	    /// \param[in] IVkey is the key used to generate the IV data
+	    /// \note the IV is created by encrypting a hash of ref with IVkey
+	static void make_ivec(const infinint & ref,
+			      unsigned char *ivec,
+			      U_I size,
+			      const gcry_cipher_hd_t & IVkey);
+
+	    /// Create a hash string of requested length from a given password and interation cout
+	static secu_string pkcs5_pass2key(const secu_string & password,         //< human provided password
+					  const std::string & salt,             //< salt string
+					  U_I iteration_count,                  //< number of time to shake the melange
+					  U_I output_length);                   //< length of the string to return
+
+	    /// converts libdar crypto algo designation to index used by libgcrypt
 	static U_I get_algo_id(crypto_algo algo);
 
 #ifdef LIBDAR_NO_OPTIMIZATION
-	void self_test(void);
+	static void self_test(void);
 #endif
     };
 

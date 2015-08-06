@@ -112,7 +112,7 @@ namespace libdar
 
 		    // essiv initialization
 
-		dar_set_essiv(hashed_password);
+		dar_set_essiv(hashed_password, essiv_clef);
 	    }
 	    catch(...)
 	    {
@@ -245,7 +245,7 @@ namespace libdar
 	    err = gcry_cipher_reset(clef);
 	    if(err != GPG_ERR_NO_ERROR)
 		throw Erange("crypto_sym::crypto_encrypt_data",tools_printf(gettext("Error while resetting encryption key for a new block: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-	    make_ivec(block_num, ivec, algo_block_size);
+	    make_ivec(block_num, ivec, algo_block_size, essiv_clef);
 	    err = gcry_cipher_setiv(clef, (const void *)ivec, algo_block_size);
 	    if(err != GPG_ERR_NO_ERROR)
 		throw Erange("crypto_sym::crypto_encrypt_data",tools_printf(gettext("Error while setting IV for current block: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
@@ -269,7 +269,7 @@ namespace libdar
 	if(crypt_size == 0)
 	    return 0; // nothing to decipher
 
-	make_ivec(block_num, ivec, algo_block_size);
+	make_ivec(block_num, ivec, algo_block_size, essiv_clef);
 	err = gcry_cipher_setiv(clef, (const void *)ivec, algo_block_size);
 	if(err != GPG_ERR_NO_ERROR)
 	    throw Erange("crypto_sym::crypto_encrypt_data",tools_printf(gettext("Error while setting IV for current block: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
@@ -285,7 +285,7 @@ namespace libdar
 #endif
     }
 
-    void crypto_sym::make_ivec(const infinint & ref, unsigned char *ivec, U_I size)
+    void crypto_sym::make_ivec(const infinint & ref, unsigned char *ivec, U_I size, const gcry_cipher_hd_t & IVkey)
     {
 #if CRYPTO_AVAILABLE
 
@@ -318,7 +318,7 @@ namespace libdar
 	    }
 
 		// IV(sector) = E_salt(sector)
-	    err = gcry_cipher_encrypt(essiv_clef, (unsigned char *)ivec, size, (const unsigned char *)sect, size);
+	    err = gcry_cipher_encrypt(IVkey, (unsigned char *)ivec, size, (const unsigned char *)sect, size);
 	    if(err != GPG_ERR_NO_ERROR)
 		throw Erange("crypto_sym::crypto_encrypt_data",tools_printf(gettext("Error while generating IV: %s/%s"), gcry_strsource(err), gcry_strerror(err)));
 	}
@@ -464,7 +464,8 @@ namespace libdar
 #endif
     }
 
-    void crypto_sym::dar_set_essiv(const secu_string & key)
+    void crypto_sym::dar_set_essiv(const secu_string & key,
+				   gcry_cipher_hd_t & IVkey)
     {
 #if CRYPTO_AVAILABLE
 
@@ -484,11 +485,11 @@ namespace libdar
 	try
 	{
 	    gcry_md_hash_buffer(GCRY_MD_SHA1, digest, (const void *)key.c_str(), key.get_size());
-	    err = gcry_cipher_open(&essiv_clef, GCRY_CIPHER_BLOWFISH, GCRY_CIPHER_MODE_ECB, GCRY_CIPHER_SECURE); // we always use BLOWFISH to generate pseudo-random IV as result of encryption of the block number, whatever is the algorithm used for encryption
+	    err = gcry_cipher_open(&IVkey, GCRY_CIPHER_BLOWFISH, GCRY_CIPHER_MODE_ECB, GCRY_CIPHER_SECURE); // we always use BLOWFISH to generate pseudo-random IV as result of encryption of the block number, whatever is the algorithm used for encryption
 	    if(err != GPG_ERR_NO_ERROR)
 		throw Erange("crypto_sym::dar_set_essiv",tools_printf(gettext("Error while creating ESSIV handle: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
-	    err = gcry_cipher_setkey(essiv_clef, digest, digest_len);
+	    err = gcry_cipher_setkey(IVkey, digest, digest_len);
 	    if(err != GPG_ERR_NO_ERROR)
 		throw Erange("crypto_sym::dar_set_essiv",tools_printf(gettext("Error while assigning key to libgcrypt key handle (essiv): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 	}
@@ -516,6 +517,7 @@ namespace libdar
 	string p2 = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"; // 64 characters
 	string p4 = p2 + "X"; // 65 characters
 	secu_string pass = secu_string(100);
+	gcry_cipher_hd_t esivkey;
 
 	pass.append(p1.c_str(), (U_I)p1.size());
 	result = pkcs5_pass2key(pass, "ATHENA.MIT.EDUraeburn", 1, 16);
@@ -564,17 +566,27 @@ namespace libdar
 	string p3 = string("\0\0\0\0", 4);
 	pass.clear();
 	pass.append(p3.c_str(), (U_I)p3.size());
-	dar_set_essiv(pass);
+	dar_set_essiv(pass, esivkey);
 
-	for (i = 0; tests[i].sector != 0xdeadbeef; ++i)
+	try
 	{
-	    make_ivec(tests[i].sector, (unsigned char *) ivec, 8);
-	    if (memcmp(ivec, tests[i].iv, 8) != 0)
-		    //cerr << "sector = " << tests[i].sector << endl;
-		    //cerr << "ivec = @@" << string(ivec, 8) << "@@" << endl;
-		    //cerr << "should be @@" << string(tests[i].iv, 8) << "@@" << endl;
-		throw Erange("crypto_sym::self_test", gettext("Library used for blowfish encryption does not respect RFC 3962"));
+
+	    for (i = 0; tests[i].sector != 0xdeadbeef; ++i)
+	    {
+		make_ivec(tests[i].sector, (unsigned char *) ivec, 8, esivkey);
+		if (memcmp(ivec, tests[i].iv, 8) != 0)
+			//cerr << "sector = " << tests[i].sector << endl;
+			//cerr << "ivec = @@" << string(ivec, 8) << "@@" << endl;
+			//cerr << "should be @@" << string(tests[i].iv, 8) << "@@" << endl;
+		    throw Erange("crypto_sym::self_test", gettext("Library used for blowfish encryption does not respect RFC 3962"));
+	    }
 	}
+	catch(...)
+	{
+	    gcry_cipher_close(esivkey);
+	    throw;
+	}
+	gcry_cipher_close(esivkey);
     }
 #endif
 
