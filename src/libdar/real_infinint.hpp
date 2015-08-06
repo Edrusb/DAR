@@ -129,7 +129,7 @@ namespace libdar
 	    // it returns number of byte of information necessary to store the integer
 
 	unsigned char operator [] (const infinint & position) const;
-	    // return in big endian order the information byte storing the integer
+	    // return in little endian order the information byte storing the integer
 
 	bool is_zero() const;
 
