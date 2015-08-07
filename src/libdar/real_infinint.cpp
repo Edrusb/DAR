@@ -551,9 +551,9 @@ namespace libdar
 
 	if(position.is_zero())
 	{
-	    infinint::iterator it = field->rbegin();
+	    storage::iterator it = field->rbegin();
 
-	    if(it != field.rend())
+	    if(it != field->rend())
 		return *it;
 	    else
 		return 0x00;
