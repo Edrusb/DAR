@@ -3440,7 +3440,8 @@ msgstr ""
 #, c-format
 msgid ""
 "... A strong randomly generated key could be found after %d iteration(s)"
-msgstr "Une clef forte générée aléatoirement a pu être trouvée après %d iteration(s)"
+msgstr ""
+"Une clef forte générée aléatoirement a pu être trouvée après %d iteration(s)"
 
 #: src/libdar/macro_tools.cpp:1262
 msgid "Key generated"
