@@ -2864,15 +2864,18 @@ namespace libdar
         char buffer[MSGSIZE];
         string ret;
 
-#if (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) && ! _GNU_SOURCE
-            // we expect the XSI-compliant strerror_r
-        int val = strerror_r(errnum, buffer, MSGSIZE);
-        if(val != 0)
-            strncpy(buffer, "Error code to message conversion failed", MSGSIZE);
-#else
+#ifdef HAVE_STRERROR_R_CHAR_PTR
         char *val = strerror_r(errnum, buffer, MSGSIZE);
         if(val != buffer)
             strncpy(buffer, val, MSGSIZE);
+#else
+            // we expect the XSI-compliant strerror_r
+        int val = strerror_r(errnum, buffer, MSGSIZE);
+        if(val != 0)
+	{
+	    string tmp = tools_printf(gettext("Error code %d to message conversion failed"), errnum);
+            strncpy(buffer, tmp.c_str(), tools_min((size_t)(tmp.size()+1), (size_t)(MSGSIZE)));
+	}
 #endif
         buffer[MSGSIZE-1] = '\0';
         ret = buffer;
