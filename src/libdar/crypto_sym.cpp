@@ -131,6 +131,7 @@ namespace libdar
 
     size_t crypto_sym::max_key_len(crypto_algo algo)
     {
+#if CRYPTO_AVAILABLE
 	size_t key_len;
 	U_I algo_id = get_algo_id(algo);
 	gcry_error_t err;
@@ -146,20 +147,29 @@ namespace libdar
 	    throw Erange("crypto_sym::crypto_sym",gettext("Failed retrieving from libgcrypt the maximum key length"));
 
 	return key_len;
+#else
+	throw Ecompilation("Strong encryption");
+#endif
+
     }
 
     size_t crypto_sym::max_key_len_libdar(crypto_algo algo)
     {
+#if CRYPTO_AVAILABLE
 	size_t key_len = max_key_len(algo);
 
 	if(algo == crypto_blowfish)
 	    key_len = 56; // for historical reasons
 
 	return key_len;
+#else
+	throw Ecompilation("Strong encryption");
+#endif
     }
 
     bool crypto_sym::is_a_strong_password(crypto_algo algo, const secu_string & password)
     {
+#if CRYPTO_AVAILABLE
 	bool ret = true;
 	gcry_error_t err;
 	gcry_cipher_hd_t clef;
@@ -190,6 +200,9 @@ namespace libdar
 	gcry_cipher_close(clef);
 
 	return ret;
+#else
+	throw Ecompilation("Strong encryption");
+#endif
     }
 
 
@@ -285,9 +298,9 @@ namespace libdar
 #endif
     }
 
+#if CRYPTO_AVAILABLE
     void crypto_sym::make_ivec(const infinint & ref, unsigned char *ivec, U_I size, const gcry_cipher_hd_t & IVkey)
     {
-#if CRYPTO_AVAILABLE
 
 	    // Stronger IV calculation: ESSIV.
 	    // ESSIV mode helps to provide (at least) IND-CPA security.
@@ -324,18 +337,15 @@ namespace libdar
 	    throw;
 	}
 	delete [] sect;
-#else
-	throw Ecompilation(gettext("blowfish strong encryption support"));
-#endif
     }
+#endif
 
-
+#if CRYPTO_AVAILABLE
     secu_string crypto_sym::pkcs5_pass2key(const secu_string & password,
 					   const string & salt,
 					   U_I iteration_count,
 					   U_I output_length)
     {
-#if CRYPTO_AVAILABLE
 	    // Password-based key derivation function (PBKDF2) from PKCS#5 v2.0
 	    // Using HMAC-SHA1 as the underlying pseudorandom function.
 
@@ -455,17 +465,14 @@ namespace libdar
 	gcry_md_close(hmac);
 
 	return retval;
-#else
-	throw Ecompilation(gettext("Strong encryption support"));
-#endif
     }
+#endif
 
+#if CRYPTO_AVAILABLE
     void crypto_sym::dar_set_essiv(const secu_string & key,
 				   gcry_cipher_hd_t & IVkey,
 				   const archive_version & ver)
     {
-#if CRYPTO_AVAILABLE
-
 	    // Calculate the ESSIV salt.
 	    // Recall that ESSIV(sector) = E_salt(sector); salt = H(key).
 
@@ -516,14 +523,14 @@ namespace libdar
 	}
 	(void)memset(digest, 0, digest_len); // attempt to scrub memory
 	gcry_free(digest);
-#else
-	throw Ecompilation(gettext("Strong encryption support"));
-#endif
     }
+#endif
+
 
 #ifdef LIBDAR_NO_OPTIMIZATION
     void crypto_sym::self_test(void)
     {
+#if CRYPTO_AVAILABLE
 	    //
 	    // Test PBKDF2 (test vectors are from RFC 3962.)
 	    //
@@ -602,9 +609,11 @@ namespace libdar
 	    throw;
 	}
 	gcry_cipher_close(esivkey);
+#endif
     }
 #endif
 
+#if CRYPTO_AVAILABLE
     U_I crypto_sym::get_algo_id(crypto_algo algo)
     {
 	U_I algo_id;
@@ -632,6 +641,6 @@ namespace libdar
 
 	return algo_id;
     }
-
+#endif
 
 } // end of namespace

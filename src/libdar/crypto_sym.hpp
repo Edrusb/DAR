@@ -107,6 +107,7 @@ namespace libdar
 	    ///
 	    /// \note such key is intended to be used to generate IV for the main key
 
+#if CRYPTO_AVAILABLE
 	static void dar_set_essiv(const secu_string & key,
 				  gcry_cipher_hd_t & IVkey,                    //< assign essiv from the given (hash) string
 				  const archive_version & ver);
@@ -130,6 +131,7 @@ namespace libdar
 
 	    /// converts libdar crypto algo designation to index used by libgcrypt
 	static U_I get_algo_id(crypto_algo algo);
+#endif
 
 #ifdef LIBDAR_NO_OPTIMIZATION
 	static void self_test(void);
