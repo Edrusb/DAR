@@ -72,6 +72,8 @@ from 2.4.x to 2.5.0
 - removed useless --jog option for memory management
 - removed previously deprecated -y/--bzip2 command, bzip2 compression remains
   available using -z option (-zbzip2 or --compression=bzip2)
+- replaced SHA1 by SHA224 to generate IV for encryption blocks, this
+  slightly improves randomness of IV.
 
 from 2.4.16 to 2.4.17
 - fixing issue when case insensitive comparison was requested and invalid

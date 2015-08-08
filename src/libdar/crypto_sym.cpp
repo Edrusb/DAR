@@ -94,10 +94,10 @@ namespace libdar
 	    if(ivec == nullptr)
 		throw Esecu_memory("crypto_sym::crypto_sym");
 
+	    reading_version = reading_ver;
 	    try
 	    {
 		hashed_password = use_pkcs5 ? pkcs5_pass2key(password, "", 2000, max_key_len_libdar(algo)) : password;
-		reading_version = reading_ver;
 
 		    // key handle initialization
 
@@ -112,7 +112,7 @@ namespace libdar
 
 		    // essiv initialization
 
-		dar_set_essiv(hashed_password, essiv_clef);
+		dar_set_essiv(hashed_password, essiv_clef, reading_version);
 	    }
 	    catch(...)
 	    {
@@ -461,15 +461,25 @@ namespace libdar
     }
 
     void crypto_sym::dar_set_essiv(const secu_string & key,
-				   gcry_cipher_hd_t & IVkey)
+				   gcry_cipher_hd_t & IVkey,
+				   const archive_version & ver)
     {
 #if CRYPTO_AVAILABLE
 
 	    // Calculate the ESSIV salt.
 	    // Recall that ESSIV(sector) = E_salt(sector); salt = H(key).
 
+	    // SHA1 is 20 bytes, SHA224 is 32 bytes
+	    // the hash is used as key starting release 2.5.x / API 5.7.x
+	    // we replace SHA1 which starts having weakness by SHA224
+	    // SHA256 is much too large for blowfish which it the libgcrypt
+	    // accept 16 bytes as maximum key length.
+	    // Note that the point here is to generate pseudo-random IV
+	    // not to encrypt data.
+	int hash_algo = ver < 9 ? GCRY_MD_SHA1 : GCRY_MD_SHA224;
+	crypto_algo cipher = crypto_blowfish;
 	void *digest = nullptr;
-	U_I digest_len = gcry_md_get_algo_dlen(GCRY_MD_SHA1);
+	U_I digest_len = gcry_md_get_algo_dlen(hash_algo);
 	gcry_error_t err;
 
 	if(digest_len == 0)
@@ -480,12 +490,21 @@ namespace libdar
 
 	try
 	{
-	    gcry_md_hash_buffer(GCRY_MD_SHA1, digest, (const void *)key.c_str(), key.get_size());
-	    err = gcry_cipher_open(&IVkey, GCRY_CIPHER_BLOWFISH, GCRY_CIPHER_MODE_ECB, GCRY_CIPHER_SECURE); // we always use BLOWFISH to generate pseudo-random IV as result of encryption of the block number, whatever is the algorithm used for encryption
+		// making a hash of the provided password into the digest variable
+	    gcry_md_hash_buffer(hash_algo, digest, (const void *)key.c_str(), key.get_size());
+
+		// creating a handle for a new handke with algo equal to "cipher"
+	    err = gcry_cipher_open(&IVkey,
+				   get_algo_id(cipher),
+				   GCRY_CIPHER_MODE_ECB,
+				   GCRY_CIPHER_SECURE);
 	    if(err != GPG_ERR_NO_ERROR)
 		throw Erange("crypto_sym::dar_set_essiv",tools_printf(gettext("Error while creating ESSIV handle: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
-	    err = gcry_cipher_setkey(IVkey, digest, digest_len);
+		// assiging the digest as key for the new handle
+	    err = gcry_cipher_setkey(IVkey,
+				     digest,
+				     digest_len);
 	    if(err != GPG_ERR_NO_ERROR)
 		throw Erange("crypto_sym::dar_set_essiv",tools_printf(gettext("Error while assigning key to libgcrypt key handle (essiv): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 	}
@@ -562,7 +581,7 @@ namespace libdar
 	string p3 = string("\0\0\0\0", 4);
 	pass.clear();
 	pass.append(p3.c_str(), (U_I)p3.size());
-	dar_set_essiv(pass, esivkey);
+	dar_set_essiv(pass, esivkey, 1);
 
 	try
 	{

@@ -108,8 +108,8 @@ namespace libdar
 	    /// \note such key is intended to be used to generate IV for the main key
 
 	static void dar_set_essiv(const secu_string & key,
-				  gcry_cipher_hd_t & IVkey);                    //< assign essiv from the given (hash) string
-
+				  gcry_cipher_hd_t & IVkey,                    //< assign essiv from the given (hash) string
+				  const archive_version & ver);
 	    /// Fills up a new initial vector based on a reference and and a encryption key
 	    ///
 	    /// \param[in] ref is the reference to base the IV on
