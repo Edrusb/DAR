@@ -1228,7 +1228,7 @@ namespace libdar
 			secu_memory_file clear(gnupg_key_size);
 			clear.randomize(gnupg_key_size);
 			U_I iter = 0;
-			U_I next = 10;
+			U_I next = 1;
 
 			    // checking the strength of the random key
 
