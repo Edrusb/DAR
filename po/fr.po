@@ -6,11 +6,10 @@
 #: src/check/all_features.cpp:54
 msgid ""
 msgstr ""
-"Project-Id-Version: DAR 2.4.0\n"
-"Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
-"group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2015-08-06 20:04+0200\n"
-"PO-Revision-Date: 2015-08-06 20:05+0200\n"
+"Project-Id-Version: DAR 2.5.0\n"
+"Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
+"POT-Creation-Date: 2015-08-09 00:45+0200\n"
+"PO-Revision-Date: 2015-08-09 01:13+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "Language: fr\n"
@@ -1616,7 +1615,12 @@ msgstr "Erreur lors de recherche du nom d'hôte (hostname) : "
 msgid "Worse"
 msgstr "Pire "
 
-#: src/libdar/tools.cpp:2924
+#: src/libdar/tools.cpp:2876
+#, c-format
+msgid "Error code %d to message conversion failed"
+msgstr "Erreur lors de la conversion du code %d en message"
+
+#: src/libdar/tools.cpp:2927
 msgid "Invalid wide-char found in string: "
 msgstr "Caractère large invalide dans la chaîne : "
 
@@ -1870,7 +1874,7 @@ msgstr "Échec de la vérification de cohérence pour l'en-tête de l'archive"
 msgid "%d is not a valid block size"
 msgstr "%d n'est pas une taille valide"
 
-#: src/libdar/tronconneuse.cpp:436 src/libdar/crypto_sym.cpp:281
+#: src/libdar/tronconneuse.cpp:436 src/libdar/crypto_sym.cpp:294
 msgid "Data corruption may have occurred, cannot decrypt data"
 msgstr ""
 "Une corruption de données semble avoir eu lieu, impossible de déchiffrer les "
@@ -2874,6 +2878,10 @@ msgid ""
 msgstr ""
 "[Data ][ EA  ][FSA][compr][S]| accès       |proprio |groupe |taille "
 "|          date                 | nom de fichier\n"
+
+#: src/libdar/datetime.cpp:304
+msgid "Unknown time unit"
+msgstr "Unité de temps inconnue"
 
 #: src/libdar/libdar.cpp:155
 msgid "Caught an unknown Egeneric exception: "
@@ -4031,7 +4039,7 @@ msgstr ""
 "l'ancienne implémentation (boguée), utiliser dar-2.3.x (ou autre logiciel "
 "basé sur libdar-4.4.x) pour lire cette archive"
 
-#: src/libdar/crypto_sym.cpp:83 src/libdar/crypto_sym.cpp:141
+#: src/libdar/crypto_sym.cpp:83 src/libdar/crypto_sym.cpp:142
 #, c-format
 msgid "Cyphering algorithm not available in libgcrypt: %s/%s"
 msgstr "Algorithme de chiffrement non disponible dans libgcrypt : %s/%s"
@@ -4061,11 +4069,11 @@ msgstr ""
 msgid "Missing strong encryption support (libgcrypt)"
 msgstr "Absence de support pour le chiffrement fort (libgcrypt)"
 
-#: src/libdar/crypto_sym.cpp:146
+#: src/libdar/crypto_sym.cpp:147
 msgid "Failed retrieving from libgcrypt the maximum key length"
 msgstr "Échec de la récupération de la longueur maximum possible des clefs"
 
-#: src/libdar/crypto_sym.cpp:170
+#: src/libdar/crypto_sym.cpp:180
 #, c-format
 msgid ""
 "Error while opening libgcrypt key handle to check password strength: %s/%s"
@@ -4073,7 +4081,7 @@ msgstr ""
 "Erreur lors de la création d'un manipulateur de clef lors de la vérification "
 "de la force du mot de passe : %s/%s"
 
-#: src/libdar/crypto_sym.cpp:182
+#: src/libdar/crypto_sym.cpp:192
 #, c-format
 msgid ""
 "Error while assigning key to libgcrypt key handle to check password "
@@ -4082,78 +4090,73 @@ msgstr ""
 "Erreur lors de l'assignation d'une clef à un manipulateur de clef lors de la "
 "vérification de la force du mot de passe : %s/%s"
 
-#: src/libdar/crypto_sym.cpp:247
+#: src/libdar/crypto_sym.cpp:260
 #, c-format
 msgid "Error while resetting encryption key for a new block: %s/%s"
 msgstr ""
 "Erreur lors de la réinitialisation de la clef de chiffrement pour un nouveau "
 "bloc : %s/%s"
 
-#: src/libdar/crypto_sym.cpp:251 src/libdar/crypto_sym.cpp:275
+#: src/libdar/crypto_sym.cpp:264 src/libdar/crypto_sym.cpp:288
 #, c-format
 msgid "Error while setting IV for current block: %s/%s"
 msgstr ""
 "Erreur lors de la détermination du vecteur initial (IV) pour le bloc "
 "courant : %s/%s"
 
-#: src/libdar/crypto_sym.cpp:254
+#: src/libdar/crypto_sym.cpp:267
 #, c-format
 msgid "Error while cyphering data: %s/%s"
 msgstr "Erreur lors du chiffrement des données : %s/%s"
 
-#: src/libdar/crypto_sym.cpp:260 src/libdar/crypto_sym.cpp:284
-#: src/libdar/crypto_sym.cpp:328
+#: src/libdar/crypto_sym.cpp:273 src/libdar/crypto_sym.cpp:297
 msgid "blowfish strong encryption support"
 msgstr "Support pour le chiffrement avec l'algorithme blowfish"
 
-#: src/libdar/crypto_sym.cpp:278
+#: src/libdar/crypto_sym.cpp:291
 #, c-format
 msgid "Error while decyphering data: %s/%s"
 msgstr "Erreur lors du déchiffrement des données : %s/%s"
 
-#: src/libdar/crypto_sym.cpp:319
+#: src/libdar/crypto_sym.cpp:332
 #, c-format
 msgid "Error while generating IV: %s/%s"
 msgstr "Erreur lors de la génération du vecteur initial (IV) : %s/%s"
 
-#: src/libdar/crypto_sym.cpp:363
+#: src/libdar/crypto_sym.cpp:373
 #, c-format
 msgid "Error! SHA1 not available in libgcrypt: %s/%s"
 msgstr "Erreur ! SHA1 n'est pas disponible dans libgcrypt : %s/%s"
 
-#: src/libdar/crypto_sym.cpp:369
+#: src/libdar/crypto_sym.cpp:379
 #, c-format
 msgid "Error while derivating key from password (HMAC open): %s/%s"
 msgstr ""
 "Erreur lors de la création de la clef à partir du mot de passe (ouverture "
 "HMAC) : %s/%s"
 
-#: src/libdar/crypto_sym.cpp:375
+#: src/libdar/crypto_sym.cpp:385
 #, c-format
 msgid "Error while derivating key from password (HMAC set key): %s/%s"
 msgstr ""
 "Erreur lors du calcul de la clef à partir du mot de passe (HMAC set key) : "
 "%s/%s"
 
-#: src/libdar/crypto_sym.cpp:459 src/libdar/crypto_sym.cpp:501
-msgid "Strong encryption support"
-msgstr "Support pour le chiffrement fort"
-
-#: src/libdar/crypto_sym.cpp:486
+#: src/libdar/crypto_sym.cpp:509
 #, c-format
 msgid "Error while creating ESSIV handle: %s/%s"
 msgstr "Erreur lors de la création d'une référence ESSIV : %s/%s"
 
-#: src/libdar/crypto_sym.cpp:490
+#: src/libdar/crypto_sym.cpp:516
 #, c-format
 msgid "Error while assigning key to libgcrypt key handle (essiv): %s/%s"
 msgstr ""
 "Erreur lors de l'assignation d'une clef à une référence de clef de libgcrypt "
 "(essiv) : %s/%s"
 
-#: src/libdar/crypto_sym.cpp:521 src/libdar/crypto_sym.cpp:527
-#: src/libdar/crypto_sym.cpp:536 src/libdar/crypto_sym.cpp:544
-#: src/libdar/crypto_sym.cpp:577
+#: src/libdar/crypto_sym.cpp:547 src/libdar/crypto_sym.cpp:553
+#: src/libdar/crypto_sym.cpp:562 src/libdar/crypto_sym.cpp:570
+#: src/libdar/crypto_sym.cpp:603
 msgid "Library used for blowfish encryption does not respect RFC 3962"
 msgstr ""
 "La bibliothèque de chiffrement pour l'algorithme blowfish ne respecte pas la "
@@ -7491,6 +7494,9 @@ msgid ""
 msgstr ""
 "La cible utilisateur \"%s\" n'est pas autorisée (cible réservé pour la "
 "syntaxe conditionnelle)"
+
+#~ msgid "Strong encryption support"
+#~ msgstr "Support pour le chiffrement fort"
 
 #~ msgid "   -j\t\t   ask user what to do when memory is exhausted\n"
 #~ msgstr ""
