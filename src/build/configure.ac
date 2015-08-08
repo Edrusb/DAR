@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.69)
-AC_INIT([DAR], [2.5.0_pre1], [[http://sourceforge.net/tracker/?group_id=65612&atid=511612]])
+AC_INIT([DAR], [2.5.0_pre2], [[http://sourceforge.net/tracker/?group_id=65612&atid=511612]])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -372,6 +372,24 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 		  [ AC_MSG_RESULT([not available])]
                 )
 
+AC_MSG_CHECKING([for strerror_r flavor])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C"
+			             {
+ 				     #if HAVE_STRING_H
+			             #include <string.h>
+				     #endif
+				     } // externe "C"
+				   ]],
+				   [[
+				   	char *ptr = strerror_r(0, nullptr, 0);
+				   ]])
+	          ],
+		  [ AC_DEFINE(HAVE_STRERROR_R_CHAR_PTR, 1, [strerror_r() returns a char *])
+		    AC_MSG_RESULT([GNU specific])
+		  ],
+		  [
+		    AC_MSG_RESULT([XSI compliant])
+		  ])
 
 
 # DAR's features
@@ -573,7 +591,7 @@ AC_ARG_ENABLE( [libgcrypt-linking],
 				  else
  				    AC_MSG_RESULT([failed: libgcrypt is unusable, cannot even call gcry_check_version(). Disabling strong encryption support])
 				  fi
-				  local_crypto="yes"
+				  local_crypto="no"
 				])
              else
                 AC_MSG_WARN([strong encryption support not available])
@@ -1031,7 +1049,7 @@ AC_ARG_ENABLE(  [gpgme-linking],
 				[]
 			       )
                  else
-		    AC_MSG_ERROR([Public key support (GPGME linking) requires libgcrypt (strong encryption support)])
+		    AC_MSG_WARN([Public key support (GPGME linking) requires libgcrypt (strong encryption support)])
                  fi
 		]
 	     )
