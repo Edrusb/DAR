@@ -490,7 +490,7 @@ AC_ARG_ENABLE( [liblzo2-linking],
              fi
            ])
 
-AC_ARG_ENABLE( [liblxz-linking],
+AC_ARG_ENABLE( [libxz-linking],
                AC_HELP_STRING(--disable-libxz-linking, [disable linking with libxz/liblzma and disable libxz compression support]),
              [
               AC_MSG_WARN([libxz compression support has been disabled by user])
