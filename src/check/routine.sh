@@ -258,6 +258,7 @@ GO "B1-1" 0 $ROUTINE_DEBUG $DAR -N -l $catf -B $OPT
 GO "B1-2" 0 $ROUTINE_DEBUG $DAR -N -t $catf -B $OPT
 GO "B1-3" 0 $ROUTINE_DEBUG $DAR -N -C $double_catf -A $catf -B $OPT
 GO "B1-4" 0 $ROUTINE_DEBUG check_hash $hash $double_catf.*.dar
+GO "B1-5" 0 $ROUTINE_DEBUG $DAR -N -t $double_catf -B $OPT
 fi
 
 #
@@ -268,6 +269,7 @@ GO "B2-1" 0 $ROUTINE_DEBUG $DAR -N -l $catf_fly -B $OPT
 GO "B2-2" 0 $ROUTINE_DEBUG $DAR -N -t $catf_fly -B $OPT
 GO "B2-3" 0 $ROUTINE_DEBUG $DAR -N -C $double_catf_fly -A $catf_fly  -B $OPT
 GO "B2-4" 0 $ROUTINE_DEBUG check_hash $hash $double_catf_fly.*.dar
+GO "B2-5" 0 $ROUTINE_DEBUG $DAR -N -l $double_catf_fly -B $OPT
 fi
 
 #
