@@ -47,11 +47,11 @@ namespace libdar
     public:
 	    /// constructor for "signature" operation
 	    ///
-	    /// in this mode the generic_rsync object is write only, all data
-	    /// written to it is passed unchanged to "below" while the signature is
+	    /// in this mode the generic_rsync object is read only, all data
+	    /// read from it is fetched unchanged from "below" while the signature is
 	    /// computed. The file signature is output to signature_storage
 	    /// \param[in] signature_storage is write only mode generic_file
-	    /// \param[in] below is write only to pass data to
+	    /// \param[in] below is read only to fetch data from
 	generic_rsync(generic_file *signature_storage,
 		      generic_file *below);
 
@@ -131,12 +131,16 @@ namespace libdar
 
 	    /// feed librsync using rs_job_iter
 	    /// \param[in] buffer_in bytes of data give to librsync
-	    /// \param[in,out] avail_in is the amount of byte available, and after the call the amount of not yet read bytes remaining at the beginning of the buffer_in buffer
+	    /// \param[in,out] avail_in is the amount of byte available, and after the call the amount of not yet read bytes
+	    /// remaining at the beginning of the buffer_in buffer (when shift_input is set to true) or at the end if shift is set
+	    /// to false.
 	    /// \param[out] buffer_out where to drop the data from librsync
-	    /// \param[in,out] avail_out is the size of the allocated memory pointed to by buffer_out and after the call the amount of byte that has been dropped to the buffer_out buffer.
-	    /// \return true if librsync returned RS_DONE else false is returned
+	    /// \param[in,out] avail_out is the size of the allocated memory pointed to by buffer_out and after the call the amount
+	    /// of byte that has been dropped to the buffer_out buffer.
+	    /// \return true if librsync returned RS_DONE else false is return if RS_BLOCKED is returned. For any other errors an exception is thrown
 	bool step_forward(const char *buffer_in,
 			  U_I & avail_in,
+			  bool shift_input,
 			  char *buffer_out,
 			  U_I & avail_out);
 	void free_job();
