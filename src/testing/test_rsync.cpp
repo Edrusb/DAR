@@ -111,10 +111,16 @@ void go_sig(const string & src_file,
 				      false,
 				      true,
 				      false);
-    null_file below = null_file(gf_read_write);
     generic_rsync go = generic_rsync(&res,
-				     &below);
-    src.copy_to(go);
+				     &src);
+    fichier_local control = fichier_local(ui,
+					  src_file + ".bak",
+					  gf_write_only,
+					  0777,
+					  false,
+					  true,
+					  false);
+    go.copy_to(control);
 }
 
 void go_delta(const string & sig_file,
