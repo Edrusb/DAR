@@ -579,12 +579,6 @@ namespace libdar
 			// sanity checks as much as possible to avoid libdar crashing due to bad arguments
 			// useless arguments are not reported.
 
-		    if(&sauv_path == nullptr)
-			throw Elibcall("op_merge", gettext("nullptr argument given to \"sauv_path\""));
-		    if(&filename == nullptr)
-			throw Elibcall("op_merge", gettext("nullptr argument given to \"filename\""));
-		    if(&extension == nullptr)
-			throw Elibcall("op_merge", gettext("nullptr argument given to \"extension\""));
 		    if(options.get_compression_level() > 9 || options.get_compression_level() < 1)
 			throw Elibcall("op_merge", gettext("Compression_level must be between 1 and 9 included"));
 		    if(options.get_slice_size().is_zero() && !options.get_first_slice_size().is_zero())
