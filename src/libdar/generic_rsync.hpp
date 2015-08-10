@@ -88,7 +88,7 @@ namespace libdar
 	generic_rsync(const generic_rsync & ref): generic_file(ref) { throw SRC_BUG; };
 	const generic_rsync & operator = (const generic_rsync & ref) { throw SRC_BUG; };
 
-	~generic_rsync();
+	~generic_rsync() throw(Ebug);
 
 	    // inherited from generic_file
 
