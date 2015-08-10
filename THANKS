@@ -1,3 +1,8 @@
+version delta_diff
+--------------
+Many Thanks Gulikoza who helped troubleshooting around the poorly
+documented librsync library.
+
 version 2.5.0
 --------------
 Thanks to Gour for help in testing dar_split with multi-volume dar archive

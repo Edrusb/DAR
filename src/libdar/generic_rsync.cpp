@@ -106,6 +106,7 @@ namespace libdar
 	U_I lu = 0;
 	U_I out;
 	bool eof = false;
+	rs_result err;
 
 	    // sanity checks
 
@@ -176,6 +177,9 @@ namespace libdar
 
 		// creating the delta job
 
+	    err = rs_build_hash_table(sumset);
+	    if(err != RS_DONE)
+		throw Erange("generic_rsync::generic_rsync", string(gettext("Error met building the rsync hash table: ")) + string(rs_strerror(err)));
 	    job = rs_delta_begin(sumset);
 	    x_below = below;
 	    x_input = nullptr;
@@ -267,7 +271,7 @@ namespace libdar
     }
 
 
-    generic_rsync::~generic_rsync()
+    generic_rsync::~generic_rsync() throw(Ebug)
     {
 	terminate();
 	meta_delete(working_buffer);
