@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.69)
-AC_INIT([DAR], [2.5.0_pre3], [[http://sourceforge.net/tracker/?group_id=65612&atid=511612]])
+AC_INIT([DAR], [2.5.0_deltadiff], [[http://sourceforge.net/tracker/?group_id=65612&atid=511612]])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -722,39 +722,39 @@ AC_ARG_ENABLE(  [gnugetopt],
                 AC_CHECK_LIB(gnugetopt, [getopt_long], [], [])
              )
 
-# AC_ARG_ENABLE( [librsync-linking],
-#                AC_HELP_STRING(--disable-librsync-linking, [disable linking with librsync and disable delta compression support]),
-#              [
-#               AC_MSG_WARN([librsync delta-compression support has been disabled by user])
-#               local_librsync="no"
-#              ],
-#              [
-# 	       AC_CHECK_LIB(rsync, [rs_strerror], [], [AC_MSG_WARN([library librsync not found])])
-#                AC_CHECK_HEADER(librsync.h, [local_librsync="yes"
-# 				       	AC_DEFINE(HAVE_LIBRSYNC_H, 1, [librsync.h header file is available])
-# 				       ],
-#  			               [AC_MSG_WARN([Cannot find librsync.h header file])
-#                                         local_librsync="no"
-#                                        ])
-#                if test "$local_librsync" = "yes" ; then
-#                AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
-#                                                            #if HAVE_LIBRSYNC_H
-# 							   #include <stdio.h>
-#                                                            #include <librsync.h>
-#                                                            #endif
-#                                               }]],
-#                                               [[
-# 							   rs_result err = RS_DONE;
-# 							   (void) rs_strerror(err);
-#                                               ]])
-#     			      ],
-#                               [ AC_DEFINE(LIBRSYNC_AVAILABLE, 1, [header and linking is available to have librsync functions])],
-#                               [ local_librsync="no" ])
-#                else
-#                  AC_MSG_WARN([librsync compression support not available])
-#                fi
-#              ]
-#              )
+AC_ARG_ENABLE( [librsync-linking],
+                AC_HELP_STRING(--disable-librsync-linking, [disable linking with librsync and disable delta compression support]),
+              [
+               AC_MSG_WARN([librsync delta-compression support has been disabled by user])
+               local_librsync="no"
+              ],
+              [
+ 	       AC_CHECK_LIB(rsync, [rs_strerror], [], [AC_MSG_WARN([library librsync not found])])
+                AC_CHECK_HEADER(librsync.h, [local_librsync="yes"
+ 				       	AC_DEFINE(HAVE_LIBRSYNC_H, 1, [librsync.h header file is available])
+ 				       ],
+  			               [AC_MSG_WARN([Cannot find librsync.h header file])
+                                         local_librsync="no"
+                                        ])
+                if test "$local_librsync" = "yes" ; then
+                AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
+                                                            #if HAVE_LIBRSYNC_H
+ 							   #include <stdio.h>
+                                                            #include <librsync.h>
+                                                            #endif
+                                               }]],
+                                               [[
+ 							   rs_result err = RS_DONE;
+ 							   (void) rs_strerror(err);
+                                               ]])
+     			      ],
+                               [ AC_DEFINE(LIBRSYNC_AVAILABLE, 1, [header and linking is available to have librsync functions])],
+                               [ local_librsync="no" ])
+                else
+                  AC_MSG_WARN([librsync compression support not available])
+                fi
+              ]
+              )
 
 
 AC_MSG_CHECKING([for getopt() availability]);
@@ -1341,12 +1341,12 @@ if [ "$local_threadar" = "yes" ] ; then
    echo "   will uses multiple threads : YES ( /!\ experimental feature /!\ )"
 fi
 
-# printf "   Delta-compression support  : "
-# if [ "$local_librsync" = "yes" ] ; then
-#     echo "YES"
-# else
-#     echo "NO"
-# fi
+printf "   Delta-compression support  : "
+if [ "$local_librsync" = "yes" ] ; then
+  echo "YES"
+else
+  echo "NO"
+fi
 
 echo ""
 echo "  DAR SUITE command line programs:"
