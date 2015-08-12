@@ -485,12 +485,25 @@ namespace libdar
     void crypto_sym::dar_set_essiv(const secu_string & key)
     {
 #if CRYPTO_AVAILABLE
+	unsigned int IV_cipher;
+	unsigned int IV_hashing;
+
+	if(reading_version >= archive_version(8,1))
+	{
+	    IV_cipher = GCRY_CIPHER_AES256; // to have an algorithm available when ligcrypt is used in FIPS mode
+	    IV_hashing = GCRY_MD_SHA256; // SHA224 was also ok but as time passes, it would get sooner unsave
+	}
+	else
+	{
+	    IV_cipher = GCRY_CIPHER_BLOWFISH;
+	    IV_hashing = GCRY_MD_SHA1;
+	}
 
 	    // Calculate the ESSIV salt.
 	    // Recall that ESSIV(sector) = E_salt(sector); salt = H(key).
 
 	void *digest = NULL;
-	U_I digest_len = gcry_md_get_algo_dlen(GCRY_MD_SHA1);
+	U_I digest_len = gcry_md_get_algo_dlen(IV_hashing);
 	gcry_error_t err;
 
 	if(digest_len == 0)
@@ -501,8 +514,8 @@ namespace libdar
 
 	try
 	{
-	    gcry_md_hash_buffer(GCRY_MD_SHA1, digest, (const void *)key.c_str(), key.size());
-	    err = gcry_cipher_open(&essiv_clef, GCRY_CIPHER_BLOWFISH, GCRY_CIPHER_MODE_ECB, GCRY_CIPHER_SECURE); // we always use BLOWFISH to generate pseudo-random IV as result of encryption of the block number, whatever is the algorithm used for encryption
+	    gcry_md_hash_buffer(IV_hashing, digest, (const void *)key.c_str(), key.size());
+	    err = gcry_cipher_open(&essiv_clef, IV_cipher, GCRY_CIPHER_MODE_ECB, GCRY_CIPHER_SECURE); // we always use BLOWFISH to generate pseudo-random IV as result of encryption of the block number, whatever is the algorithm used for encryption
 	    if(err != GPG_ERR_NO_ERROR)
 		throw Erange("crypto_sym::dar_set_essiv",tools_printf(gettext("Error while creating ESSIV handle: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 

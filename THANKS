@@ -1,3 +1,8 @@
+version 2.4.18
+--------------
+Thanks to Scott DeRousse for feedback and patch to have libdar working when
+libgcrypt is used in FIPS mode.
+
 version 2.4.17
 --------------
 
