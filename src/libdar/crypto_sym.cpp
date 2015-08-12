@@ -476,17 +476,22 @@ namespace libdar
 	    // Calculate the ESSIV salt.
 	    // Recall that ESSIV(sector) = E_salt(sector); salt = H(key).
 
-	    // SHA1 is 20 bytes, SHA224 is 32 bytes
-	    // the hash is used as key starting release 2.5.x / API 5.7.x
-	    // we replace SHA1 which starts having weakness by SHA224
-	    // SHA256 is much too large for blowfish which it the libgcrypt
-	    // accept 16 bytes as maximum key length.
-	    // Note that the point here is to generate pseudo-random IV
-	    // not to encrypt data.
-	int hash_algo = ver < 9 ? GCRY_MD_SHA1 : GCRY_MD_SHA224;
-	crypto_algo cipher = crypto_blowfish;
+	unsigned int IV_cipher;
+	unsigned int IV_hashing;
+
+	if(ver >= archive_version(8,1))
+	{
+	    IV_cipher = GCRY_CIPHER_AES256; // to have an algorithm available when ligcrypt is used in FIPS mode
+	    IV_hashing = GCRY_MD_SHA256; // SHA224 was also ok but as time passes, it would get sooner unsave
+	}
+	else
+	{
+	    IV_cipher = GCRY_CIPHER_BLOWFISH;
+	    IV_hashing = GCRY_MD_SHA1;
+	}
+
 	void *digest = nullptr;
-	U_I digest_len = gcry_md_get_algo_dlen(hash_algo);
+	U_I digest_len = gcry_md_get_algo_dlen(IV_hashing);
 	gcry_error_t err;
 
 	if(digest_len == 0)
@@ -498,11 +503,11 @@ namespace libdar
 	try
 	{
 		// making a hash of the provided password into the digest variable
-	    gcry_md_hash_buffer(hash_algo, digest, (const void *)key.c_str(), key.get_size());
+	    gcry_md_hash_buffer(IV_hashing, digest, (const void *)key.c_str(), key.get_size());
 
-		// creating a handle for a new handke with algo equal to "cipher"
+		// creating a handle for a new handle with algo equal to "IV_cipher"
 	    err = gcry_cipher_open(&IVkey,
-				   get_algo_id(cipher),
+				   IV_cipher,
 				   GCRY_CIPHER_MODE_ECB,
 				   GCRY_CIPHER_SECURE);
 	    if(err != GPG_ERR_NO_ERROR)

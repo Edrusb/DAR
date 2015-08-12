@@ -75,6 +75,14 @@ from 2.4.x to 2.5.0
 - replaced SHA1 by SHA224 to generate IV for encryption blocks, this
   slightly improves randomness of IV.
 
+from 2.4.17 to 2.4.18
+- Initial Vector used for strong encryption was set with pseudo-random
+  value using SHA1 message digest and blowfish cipher, which are not
+  available when ligcrypt is running in FIPS mode. Since 2.4.18 we use
+  SHA256 and AES256 for IV assignment in order to have libdar compatible
+  with FIPS mode. For data encryption nothing changes the cipher specified
+  (-K, -J, -$ options on CLI) are used as before.
+
 from 2.4.16 to 2.4.17
 - fixing issue when case insensitive comparison was requested and invalid
   wide char for the current local was met in a filename. In such situation
