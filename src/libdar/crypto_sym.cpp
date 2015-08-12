@@ -518,7 +518,11 @@ namespace libdar
 				     digest,
 				     digest_len);
 	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("crypto_sym::dar_set_essiv",tools_printf(gettext("Error while assigning key to libgcrypt key handle (essiv): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	    {
+		    // tolerating WEAK key here, we use that key to fill the IV of the real strong key
+		if(gpg_err_code(err) != GPG_ERR_WEAK_KEY)
+		    throw Erange("crypto_sym::dar_set_essiv",tools_printf(gettext("Error while assigning key to libgcrypt key handle (essiv): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	    }
 	}
 	catch(...)
 	{
