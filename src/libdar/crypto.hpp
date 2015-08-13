@@ -106,7 +106,7 @@ namespace libdar
 	gcry_cipher_hd_t clef;       //< used to encrypt/decrypt the data
 	gcry_cipher_hd_t essiv_clef; //< used to build the Initialization Vector
 #endif
-	size_t algo_block_size;         //< the block size of the algorithm
+	size_t algo_block_size;         //< the block size of the algorithm (main key)
 	unsigned char *ivec;            //< algo_block_size allocated in secure memory to be used as Initial Vector
 	U_I algo_id;                    //< algo ID in libgcrypt
 	archive_version reading_version;
@@ -115,7 +115,8 @@ namespace libdar
 				   const std::string & salt,             //< salt string
 				   U_I iteration_count,                  //< number of time to shake the melange
 				   U_I output_length);                   //< length of the string to return
-	void dar_set_essiv(const secu_string & key);                     //< assign essiv from the given (hash) string
+	void dar_set_essiv(const secu_string & key,                      //< assign essiv from the given (hash) string
+			   crypto_algo main_cipher);                     //< the choice of the algo for essiv depends on the cipher used for the main key
 	void make_ivec(const infinint & ref, unsigned char *ivec, U_I size);
 	void self_test(void);
 	void detruit();
