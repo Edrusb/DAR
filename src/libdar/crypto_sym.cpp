@@ -67,6 +67,8 @@ namespace libdar
     {
 #if CRYPTO_AVAILABLE
 	ivec = nullptr;
+	clef = NULL;
+	essiv_clef = NULL;
 
 	if(reading_ver <= 5)
 	    throw Erange("crypto_sym::blowfish", gettext("Current implementation of blowfish encryption is not compatible with old (weak) implementation, use dar-2.3.x software (or other software based on libdar-4.4.x) to read this archive"));
@@ -83,6 +85,7 @@ namespace libdar
 		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Cyphering algorithm not available in libgcrypt: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
 		// obtaining the block length
+
 	    err = gcry_cipher_algo_info(algo_id, GCRYCTL_GET_BLKLEN, nullptr, &algo_block_size);
 	    if(err != GPG_ERR_NO_ERROR)
 		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Failed retrieving from libgcrypt the block size used by the cyphering algorithm: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
@@ -106,13 +109,16 @@ namespace libdar
 		    throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Error while opening libgcrypt key handle: %s/%s"),
 								       gcry_strsource(err),
 								       gcry_strerror(err)));
+
+		    // assigning key to the handle
+
 		err = gcry_cipher_setkey(clef, (const void *)hashed_password.c_str(), hashed_password.get_size());
 		if(err != GPG_ERR_NO_ERROR)
 		    throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Error while assigning key to libgcrypt key handle: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
 		    // essiv initialization
 
-		dar_set_essiv(hashed_password, essiv_clef, reading_version);
+		dar_set_essiv(hashed_password, essiv_clef, reading_version, algo);
 	    }
 	    catch(...)
 	    {
@@ -209,8 +215,10 @@ namespace libdar
     void crypto_sym::detruit()
     {
 #if CRYPTO_AVAILABLE
-	gcry_cipher_close(clef);
-	gcry_cipher_close(essiv_clef);
+	if(clef != nullptr)
+	    gcry_cipher_close(clef);
+	if(essiv_clef != nullptr)
+	    gcry_cipher_close(essiv_clef);
 	if(ivec != nullptr)
 	{
 	    (void)memset(ivec, 0, algo_block_size);
@@ -471,7 +479,8 @@ namespace libdar
 #if CRYPTO_AVAILABLE
     void crypto_sym::dar_set_essiv(const secu_string & key,
 				   gcry_cipher_hd_t & IVkey,
-				   const archive_version & ver)
+				   const archive_version & ver,
+				   crypto_algo main_cipher)
     {
 	    // Calculate the ESSIV salt.
 	    // Recall that ESSIV(sector) = E_salt(sector); salt = H(key).
@@ -479,13 +488,24 @@ namespace libdar
 	unsigned int IV_cipher;
 	unsigned int IV_hashing;
 
-	if(ver >= archive_version(8,1))
+	if(ver >= archive_version(8,1)
+	    && main_cipher != crypto_blowfish)
 	{
 	    IV_cipher = GCRY_CIPHER_AES256; // to have an algorithm available when ligcrypt is used in FIPS mode
 	    IV_hashing = GCRY_MD_SHA256; // SHA224 was also ok but as time passes, it would get sooner unsave
 	}
 	else
 	{
+	    // due to 8 bytes block_size we keep using
+	    // blowfish for the essiv key: other cipher have 16 bytes block size
+	    // and generating an IV of eight bytes would require doubling the size
+	    // of the data to encrypt and skinking the encrypted data afterward to
+	    // the 8 requested bytes of the IV for the main key...
+	    //
+	    // in the other side, the replacement of blowfish by aes256 starting format 8.1
+	    // was requested to have libdar working when libgcrypt is in FIPS mode, which
+	    // forbids the use of blowfish... we stay here compatible with FIPS mode.
+
 	    IV_cipher = GCRY_CIPHER_BLOWFISH;
 	    IV_hashing = GCRY_MD_SHA1;
 	}
@@ -503,6 +523,7 @@ namespace libdar
 	try
 	{
 		// making a hash of the provided password into the digest variable
+
 	    gcry_md_hash_buffer(IV_hashing, digest, (const void *)key.c_str(), key.get_size());
 
 		// creating a handle for a new handle with algo equal to "IV_cipher"
@@ -513,7 +534,26 @@ namespace libdar
 	    if(err != GPG_ERR_NO_ERROR)
 		throw Erange("crypto_sym::dar_set_essiv",tools_printf(gettext("Error while creating ESSIV handle: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
+
+		// obtaining key len for IV_cipher
+
+	    size_t essiv_key_len;
+	    err = gcry_cipher_algo_info(IV_cipher, GCRYCTL_GET_KEYLEN, NULL, &essiv_key_len);
+	    if(err != GPG_ERR_NO_ERROR)
+		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Failed retrieving from libgcrypt the key length to use (essiv key): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+
+		// failing if the digest size is larger than key size for IV_cipher
+
+	    if(digest_len > essiv_key_len
+	       && IV_cipher != GCRY_CIPHER_BLOWFISH)
+		throw SRC_BUG;
+		// IV_cipher and IV_hashing must be chosen in coherence!
+		// we do not complain for older format archive... its done now and worked so far.
+		// This bug report is rather to signal possible problem when time will come
+		// to update the cipher and digest algorithms
+
 		// assiging the digest as key for the new handle
+
 	    err = gcry_cipher_setkey(IVkey,
 				     digest,
 				     digest_len);
@@ -523,6 +563,38 @@ namespace libdar
 		if(gpg_err_code(err) != GPG_ERR_WEAK_KEY)
 		    throw Erange("crypto_sym::dar_set_essiv",tools_printf(gettext("Error while assigning key to libgcrypt key handle (essiv): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 	    }
+
+		// obtaining the block size of the essiv cipher
+
+	    size_t algo_block_size_essiv;
+
+	    err = gcry_cipher_algo_info(IV_cipher, GCRYCTL_GET_BLKLEN, nullptr, &algo_block_size_essiv);
+	    if(err != GPG_ERR_NO_ERROR)
+		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Failed retrieving from libgcrypt the block size used by the cyphering algorithm (essiv): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	    if(algo_block_size_essiv == 0)
+		throw SRC_BUG;
+
+		// obtaining the block size of the main cipher
+
+	    size_t local_algo_block_size;
+
+	    err = gcry_cipher_algo_info(get_algo_id(main_cipher), GCRYCTL_GET_BLKLEN, nullptr, &local_algo_block_size);
+	    if(err != GPG_ERR_NO_ERROR)
+		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Failed retrieving from libgcrypt the block size used by the cyphering algorithm: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	    if(local_algo_block_size == 0)
+		throw SRC_BUG;
+
+		// testing the coherence of block size between main cipher key
+		// and cipher key used to generate IV for the main cipher key
+
+	    if(local_algo_block_size < algo_block_size_essiv)
+		throw SRC_BUG; // cannot cipher less data (IV for main key) than block size of IV key
+	    else
+		if(local_algo_block_size % algo_block_size_essiv != 0)
+		    throw SRC_BUG;
+		// in ECB mode we should encrypt an integer number of blocks according
+		// to IV key block size
+
 	}
 	catch(...)
 	{
@@ -597,7 +669,7 @@ namespace libdar
 	string p3 = string("\0\0\0\0", 4);
 	pass.clear();
 	pass.append(p3.c_str(), (U_I)p3.size());
-	dar_set_essiv(pass, esivkey, 1);
+	dar_set_essiv(pass, esivkey, 1, crypto_blowfish);
 
 	try
 	{

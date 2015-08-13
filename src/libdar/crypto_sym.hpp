@@ -96,7 +96,7 @@ namespace libdar
 	gcry_cipher_hd_t clef;       //< used to encrypt/decrypt the data
 	gcry_cipher_hd_t essiv_clef; //< used to build the Initialization Vector
 #endif
-	size_t algo_block_size;         //< the block size of the algorithm
+	size_t algo_block_size;         //< the block size of the algorithm (main key)
 	unsigned char *ivec;            //< algo_block_size allocated in secure memory to be used as Initial Vector
 	U_I algo_id;                    //< algo ID in libgcrypt
 	archive_version reading_version;
@@ -108,9 +108,10 @@ namespace libdar
 	    /// \note such key is intended to be used to generate IV for the main key
 
 #if CRYPTO_AVAILABLE
-	static void dar_set_essiv(const secu_string & key,
-				  gcry_cipher_hd_t & IVkey,                    //< assign essiv from the given (hash) string
-				  const archive_version & ver);
+	static void dar_set_essiv(const secu_string & key,       //< the key to base the essiv on
+				  gcry_cipher_hd_t & IVkey,      //< assign essiv from the given (hash) string
+				  const archive_version & ver,   //< archive format we read or write
+				  crypto_algo main_cipher);      //< the choice of the algo for essiv depends on the cipher used for the main key
 	    /// Fills up a new initial vector based on a reference and and a encryption key
 	    ///
 	    /// \param[in] ref is the reference to base the IV on
