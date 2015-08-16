@@ -32,6 +32,7 @@ extern "C"
 #include "compressor.hpp"
 #include "sparse_file.hpp"
 #include "null_file.hpp"
+#include "generic_rsync.hpp"
 
 using namespace std;
 
@@ -63,6 +64,10 @@ namespace libdar
         file_data_status_write = 0;
         check = nullptr;
         dirty = false;
+	delta_sig_offset = 0;
+	delta_sig_size = 0;
+	delta_sig_crc = nullptr;
+	will_have_delta_sig = false;
 
         try
         {
@@ -112,6 +117,11 @@ namespace libdar
         file_data_status_read = 0;
         file_data_status_write = 0; // may be changed later using set_sparse_file_detection_write()
         dirty = false;
+	delta_sig_offset = 0;
+	delta_sig_size = 0;
+	delta_sig_crc = nullptr;
+	will_have_delta_sig = false;
+
 	generic_file *ptr = nullptr;
 
 	pdesc.check(small);
@@ -146,7 +156,7 @@ namespace libdar
                             if((file_data_status_read & FILE_DATA_IS_DIRTY) != 0)
                             {
                                 dirty = true;
-                                file_data_status_read &= ~FILE_DATA_IS_DIRTY; // removing the flag DIRTY flag
+                                file_data_status_read &= ~FILE_DATA_IS_DIRTY; // removing the flag DIRTY
                             }
                             file_data_status_write = file_data_status_read;
                             ptr->read(&tmp, sizeof(tmp));
@@ -188,11 +198,33 @@ namespace libdar
                 }
                 else // not saved
                 {
+			// since format 9 the flag is present in any case
+		    if(reading_ver >= 9)
+			ptr->read(&file_data_status_read, sizeof(file_data_status_read));
+
                     offset = new (get_pool()) infinint(0);
                     storage_size = new (get_pool()) infinint(0);
                     if(offset == nullptr || storage_size == nullptr)
                         throw Ememory("cat_file::cat_file(generic_file)");
                 }
+
+		if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
+		{
+		    will_have_delta_sig = true;
+		    delta_sig_offset.read(*ptr);
+		    delta_sig_size.read(*ptr);
+		    delta_sig_crc = create_crc_from_file(*ptr, get_pool());
+		    if(delta_sig_crc == nullptr)
+			throw Ememory("cat_file::cat_file(generic_file)");
+		    file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG; // removing the flag DELTA_SIG
+		    file_data_status_write &= ~FILE_DATA_HAS_DELTA_SIG; // removing the flag DELTA_SIG
+		}
+		else
+		{
+		    delta_sig_offset = 0;
+		    delta_sig_crc = nullptr;
+		    delta_sig_size = 0;
+		}
 
                 if(reading_ver >= 2)
                 {
@@ -219,11 +251,30 @@ namespace libdar
                     char tmp;
 
                     ptr->read(&file_data_status_read, sizeof(file_data_status_read));
+		    if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
+		    {
+			file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
+			will_have_delta_sig = true;
+		    }
                     file_data_status_write = file_data_status_read;
                     ptr->read(&tmp, sizeof(tmp));
                     algo_read = char2compression(tmp);
 		    algo_write = algo_read;
                 }
+		else // not saved
+		{
+			// since format 9 the flag is present in any case
+		    if(reading_ver >= 9)
+		    {
+			ptr->read(&file_data_status_read, sizeof(file_data_status_read));
+			if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
+			{
+			    file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
+			    will_have_delta_sig = true;
+			}
+			file_data_status_write = file_data_status_read;
+		    }
+		}
 
                     // Now that all data has been read, setting default value for the undumped ones:
 
@@ -274,6 +325,7 @@ namespace libdar
         furtive_read_mode = ref.furtive_read_mode;
         file_data_status_read = ref.file_data_status_read;
         file_data_status_write = ref.file_data_status_write;
+	delta_sig_crc = nullptr;
 
         try
         {
@@ -297,6 +349,21 @@ namespace libdar
             storage_size = new (get_pool()) infinint(*ref.storage_size);
             if(offset == nullptr || size == nullptr || storage_size == nullptr)
                 throw Ememory("cat_file::cat_file(cat_file)");
+
+	    delta_sig_offset = ref.delta_sig_offset;
+	    delta_sig_size = ref.delta_sig_size;
+
+	    if(ref.delta_sig_crc != nullptr)
+	    {
+		delta_sig_crc = ref.delta_sig_crc->clone();
+		if(delta_sig_crc == nullptr)
+		    throw Ememory("cat_file::cat_file(cat_file)");
+	    }
+	    else
+		delta_sig_crc = nullptr;
+
+	    will_have_delta_sig = ref.will_have_delta_sig;
+
         }
         catch(...)
         {
@@ -305,33 +372,13 @@ namespace libdar
         }
     }
 
-    void cat_file::detruit()
-    {
-        if(offset != nullptr)
-        {
-            delete offset;
-            offset = nullptr;
-        }
-        if(size != nullptr)
-        {
-            delete size;
-            size = nullptr;
-        }
-        if(storage_size != nullptr)
-        {
-            delete storage_size;
-            storage_size = nullptr;
-        }
-        if(check != nullptr)
-        {
-            delete check;
-            check = nullptr;
-        }
-    }
 
     void cat_file::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
 	generic_file *ptr = nullptr;
+	char flags = has_delta_signature() ? FILE_DATA_HAS_DELTA_SIG : 0;
+
+	    // setting ptr
 
 	pdesc.check(small);
 	if(small)
@@ -339,7 +386,17 @@ namespace libdar
 	else
 	    ptr = pdesc.stack;
 
+	    // setting flag
+
+	flags |= file_data_status_write;
+	if(dirty)
+	    flags |= FILE_DATA_IS_DIRTY;
+
+	    // dumping the cat_inode part of the object
+
         cat_inode::inherited_dump(pdesc, small);
+
+	    // dumping th cat_file part of the inode
 
         size->dump(*ptr);
         if(!small)
@@ -347,12 +404,9 @@ namespace libdar
             if(get_saved_status() == s_saved)
             {
                 char tmp = compression2char(algo_write);
-                char flags = file_data_status_write;
 
                 offset->dump(*ptr);
                 storage_size->dump(*ptr);
-                if(dirty)
-                    flags |= FILE_DATA_IS_DIRTY;
                 ptr->write(&flags, sizeof(flags));
                 ptr->write(&tmp, sizeof(tmp));
 
@@ -362,6 +416,17 @@ namespace libdar
                 else
                     check->dump(*ptr);
             }
+	    else // since format 9 flag is present in any case to know whether object has delta signature
+                ptr->write(&flags, sizeof(flags));
+
+	    if(has_delta_signature())
+	    {
+		delta_sig_offset.dump(*ptr);
+		delta_sig_size.dump(*ptr);
+		if(delta_sig_crc == nullptr)
+		    throw SRC_BUG;
+		delta_sig_crc->dump(*ptr);
+	    }
         }
         else // we only know whether the file will be compressed or using sparse_file data structure
         {
@@ -369,9 +434,14 @@ namespace libdar
             {
                 char tmp = compression2char(algo_write);
 
-                (void)ptr->write(&file_data_status_write, sizeof(file_data_status_write));
+                (void)ptr->write(&flags, sizeof(flags));
                 (void)ptr->write(&tmp, sizeof(tmp));
             }
+	    else
+	    {
+		    // since format 9 the flag is present in any case
+		(void)ptr->write(&flags, sizeof(flags));
+	    }
         }
     }
 
@@ -384,17 +454,43 @@ namespace libdar
             throw SRC_BUG;
     }
 
-    generic_file *cat_file::get_data(get_data_mode mode) const
+    generic_file *cat_file::get_data(get_data_mode mode, memory_file *delta_sig) const
     {
         generic_file *ret = nullptr;
 
 	try
 	{
+		// sanity checks
+
 	    if(get_saved_status() != s_saved)
 		throw Erange("cat_file::get_data", gettext("cannot provide data from a \"not saved\" file object"));
 
 	    if(status == empty)
 		throw Erange("cat_file::get_data", gettext("data has been cleaned, object is now empty"));
+
+	    if(delta_sig != nullptr)
+	    {
+		if(delta_sig->get_mode() == gf_read_only)
+		    throw SRC_BUG;
+		switch(mode)
+		{
+		case keep_compressed:
+		    throw SRC_BUG;
+		case keep_hole:
+		    throw SRC_BUG;
+		case normal:
+		case plain:
+		    break;
+		default:
+		    throw SRC_BUG;
+		}
+		if(get_sparse_file_detection_read())
+		    throw SRC_BUG; // sparse_file detection is not compatible with detla signature calculation
+		    // for merging operation, this is the object where we write to that can perform hole detection
+		    // while the object from we read is able to perform delta signature calculation
+	    }
+
+		//
 
 	    if(status == from_path)
 	    {
@@ -405,6 +501,36 @@ namespace libdar
 		if(tmp != nullptr)
 			// telling *tmp to flush the data from the cache as soon as possible
 		    tmp->fadvise(fichier_global::advise_dontneed);
+
+		if(delta_sig != nullptr)
+		{
+		    pile *data = new (get_pool()) pile();
+		    if(data == nullptr)
+			throw Ememory("cat_file::get_data");
+		    try
+		    {
+			data->push(tmp);
+		    }
+		    catch(...)
+		    {
+			delete data;
+			throw;
+		    }
+		    ret = data;
+
+		    generic_rsync *delta = new (get_pool()) generic_rsync(delta_sig, data->top());
+		    if(delta == nullptr)
+			throw Ememory("cat_file::get_data");
+		    try
+		    {
+			data->push(delta);
+		    }
+		    catch(...)
+		    {
+			delete delta;
+			throw;
+		    }
+		}
 	    }
 	    else // inode from archive
 		if(get_pile() == nullptr)
@@ -469,7 +595,7 @@ namespace libdar
 				    get_pile()->skip(*offset);
 			    }
 
-				// determining on which layer to rely on for possible the next to come sparse file
+				// determining on which layer to rely on for the next to come sparse file
 
 			    generic_file *parent = data->is_empty() ? get_pile() : data->top();
 
@@ -477,7 +603,7 @@ namespace libdar
 				// adding a sparse_file object in top of the local stack
 				//
 				// if a sparse_file object is to be used, it must be placed on top of the
-				// returned stack, in order to benefit of the sparse_file::copy_to() specific methods
+				// returned stack, in order to benefit from the sparse_file::copy_to() specific methods
 				// that can restore holes
 
 			    if(get_sparse_file_detection_read() && mode != keep_compressed && mode != keep_hole)
@@ -507,6 +633,26 @@ namespace libdar
 				    break;
 				default:
 				    throw SRC_BUG;
+				}
+			    }
+
+				// normally having both delta_sig and sparse_file is excluded by sanity checks
+				// so we do not add delta_sig above sparse_file which would deserve sparse file
+				// detection
+
+			    if(delta_sig != nullptr)
+			    {
+				generic_rsync *delta = new (get_pool()) generic_rsync(delta_sig, data->top());
+				if(delta == nullptr)
+				    throw Ememory("cat_file::get_data");
+				try
+				{
+				    data->push(delta);
+				}
+				catch(...)
+				{
+				    delete delta;
+				    throw;
 				}
 			    }
 
@@ -552,7 +698,6 @@ namespace libdar
 	{
 	    if(ret != nullptr)
 		delete ret;
-	    ret = nullptr;
 	    throw;
 	}
 
@@ -694,6 +839,123 @@ namespace libdar
 	    return false;
     }
 
+    void cat_file::dump_delta_signature(memory_file &sig, generic_file & where)
+    {
+	infinint crc_size;
+
+	delta_sig_size = sig.size();
+	crc_size = tools_file_size_to_crc_size(delta_sig_size);
+
+	if(delta_sig_crc != nullptr)
+	{
+	    delete delta_sig_crc;
+	    delta_sig_crc = nullptr;
+	}
+
+	delta_sig_size.dump(where);
+	delta_sig_offset = where.get_position();
+	sig.skip(0);
+	sig.copy_to(where, crc_size, delta_sig_crc);
+	if(delta_sig_crc == nullptr)
+	    throw SRC_BUG;
+	else
+	    delta_sig_crc->dump(where);
+    }
+
+    void cat_file::read_delta_signature(memory_file & sig) const
+    {
+	crc *calculated = nullptr;
+	infinint crc_size;
+	generic_file *from = nullptr;
+	escape *esc = nullptr;
+	bool small = get_small_read();
+	cat_file *me = const_cast<cat_file *>(this);
+
+	try
+	{
+
+	    if(me == nullptr)
+		throw SRC_BUG;
+
+	    switch(status)
+	    {
+	    case empty:
+		throw SRC_BUG;
+	    case from_path:
+		throw SRC_BUG; // signature is caluculated while reading the data (get_data()) and kept by the caller
+	    case from_cat:
+		from = get_compressor_layer();
+		if(from == nullptr)
+		    throw SRC_BUG;
+		esc = get_escape_layer();
+		if(small && esc == nullptr)
+		    throw SRC_BUG;
+		break;
+	    default:
+		throw SRC_BUG;
+	    }
+
+	    if(small)
+	    {
+		if(!esc->skip_to_next_mark(escape::seqt_delta_sig, false))
+		    throw Erange("cat_file::read_delta_signature", gettext("can't find mark for delta signature"));
+		me->delta_sig_size.read(*from);
+		me->delta_sig_offset = from->get_position();
+
+		if(delta_sig_crc != nullptr)
+		{
+		    delete delta_sig_crc;
+		    me->delta_sig_crc = nullptr;
+		}
+		crc_size = tools_file_size_to_crc_size(delta_sig_size);
+	    }
+	    else // direct access mode
+	    {
+		if(delta_sig_crc == nullptr)
+		    throw SRC_BUG;
+		    // we should know the CRC of the delta signature
+
+		crc_size = delta_sig_crc->get_size();
+	    }
+
+	    sig.reset(); // makes a brand-new empty memory_file object
+	    try
+	    {
+		tronc bounded = tronc(from, delta_sig_offset, delta_sig_size, false);
+
+		bounded.skip(0);
+		bounded.copy_to(sig, crc_size, calculated);
+		if(calculated == nullptr)
+		    throw SRC_BUG;
+
+		if(small)
+		{
+		    me->delta_sig_crc = create_crc_from_file(*from, get_pool());
+		    if(delta_sig_crc == nullptr)
+			throw SRC_BUG;
+		}
+
+		if(*delta_sig_crc != *calculated)
+		    throw Erange("cat_file::read_delta_signature", gettext("CRC error: data corruption."));
+	    }
+	    catch(...)
+	    {
+		if(calculated != nullptr)
+		    delete calculated;
+		throw;
+	    }
+	    if(calculated != nullptr)
+		delete calculated;
+
+	    sig.skip(0);
+	}
+	catch(Egeneric & e)
+	{
+	    e.prepend_message(gettext("Error while retrieving delta signature from the archive: "));
+	    throw;
+	}
+    }
+
     void cat_file::sub_compare(const cat_inode & other, bool isolated_mode) const
     {
 	const cat_file *f_other = dynamic_cast<const cat_file *>(&other);
@@ -711,12 +973,12 @@ namespace libdar
 	{
 	    if(!isolated_mode)
 	    {
-		generic_file *me = get_data(normal);
+		generic_file *me = get_data(normal, nullptr);
 		if(me == nullptr)
 		    throw SRC_BUG;
 		try
 		{
-		    generic_file *you = f_other->get_data(normal);
+		    generic_file *you = f_other->get_data(normal, nullptr);
 		    if(you == nullptr)
 			throw SRC_BUG;
 			// requesting read_ahead for the peer object
@@ -797,7 +1059,7 @@ namespace libdar
 		if(check == nullptr)
 		    throw SRC_BUG;
 
-		generic_file *you = f_other->get_data(normal);
+		generic_file *you = f_other->get_data(normal, nullptr);
 		if(you == nullptr)
 		    throw SRC_BUG;
 
@@ -831,6 +1093,35 @@ namespace libdar
 		}
 		delete you;
 	    }
+	}
+    }
+
+    void cat_file::detruit()
+    {
+        if(offset != nullptr)
+        {
+            delete offset;
+            offset = nullptr;
+        }
+        if(size != nullptr)
+        {
+            delete size;
+            size = nullptr;
+        }
+        if(storage_size != nullptr)
+        {
+            delete storage_size;
+            storage_size = nullptr;
+        }
+        if(check != nullptr)
+        {
+            delete check;
+            check = nullptr;
+        }
+	if(delta_sig_crc != nullptr)
+	{
+	    delete delta_sig_crc;
+	    delta_sig_crc = nullptr;
 	}
     }
 

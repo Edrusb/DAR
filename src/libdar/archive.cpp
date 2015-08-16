@@ -480,6 +480,7 @@ namespace libdar
 				       options.get_ignore_unknown_inode_type(),
 				       options.get_fsa_scope(),
 				       options.get_multi_threaded(),
+				       options.get_delta_signature(),
 				       progressive_report);
 		    exploitable = false;
 		    stack.terminate();
@@ -724,6 +725,7 @@ namespace libdar
 				     false,
 				     options.get_fsa_scope(),
 				     options.get_multi_threaded(),
+				     false, // delta signatures
 				     st_ptr);
 		    exploitable = false;
 		    stack.terminate();
@@ -1444,6 +1446,7 @@ namespace libdar
 		    ent.set_is_sparse_file(tmp_file->get_sparse_file_detection_read());
 		    ent.set_compression_algo(tmp_file->get_compression_algo_read());
 		    ent.set_dirtiness(tmp_file->is_dirty());
+		    ent.set_delta_sig(tmp_file->has_delta_signature());
 		}
 
 		if(tmp_lien != nullptr && tmp_lien->get_saved_status() == s_saved)
@@ -1716,6 +1719,7 @@ namespace libdar
 				     bool ignore_unknown,
 				     const fsa_scope & scope,
 				     bool multi_threaded,
+				     bool delta_signature,
 				     statistics * progressive_report)
     {
         statistics st = false;  // false => no lock for this internal object
@@ -1866,6 +1870,7 @@ namespace libdar
 			 ignore_unknown,
 			 scope,
 			 multi_threaded,
+			 delta_signature,
 			 st_ptr);
 
 	return *st_ptr;
@@ -1933,6 +1938,7 @@ namespace libdar
 				   bool ignore_unknown,
 				   const fsa_scope & scope,
 				   bool multi_threaded,
+				   bool delta_signature,
 				   statistics * st_ptr)
     {
 	try
@@ -2096,7 +2102,8 @@ namespace libdar
 					      backup_hook_file_mask,
 					      ignore_unknown,
 					      scope,
-					      exclude_by_ea);
+					      exclude_by_ea,
+					      delta_signature);
 			}
 			catch(...)
 			{

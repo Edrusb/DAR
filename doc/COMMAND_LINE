@@ -87,7 +87,7 @@ _ + retry on change                      --retry-on-change <count[:max byte]>
 5 + exclude file having a given EA set   --exclude-by-ea [<ea name>]
 6 + define internal key lengh with gnupg --key-length <length in bytes>
 7 + define keys used to sign the archive --sign <comma separated list of emails>
-8 !
+8 + delta binary diff                    --delta sig, --delta diff
 9 + min_digits                           --min-digits archive[,ref[,aux]];
 " + anonymous pipe descriptor to read conf from. --pipe-fd
 . + user comment                         --user-comment

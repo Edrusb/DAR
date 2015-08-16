@@ -76,6 +76,7 @@ namespace libdar
 	void pre_add_failed_mark() const;
 	void pre_add_fsa(const cat_entree *ref) const;
 	void pre_add_fsa_crc(const cat_entree *ref) const;
+	void pre_add_delta_sig() const;
 	escape *get_escape_layer() const { return pdesc.esc; };
 
 	void reset_read() const;

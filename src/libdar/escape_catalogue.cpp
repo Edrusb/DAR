@@ -308,6 +308,16 @@ namespace libdar
 	    // else, nothing to do.
     }
 
+    void escape_catalogue::pre_add_delta_sig() const
+    {
+	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
+
+	if(ceci->pdesc.esc == nullptr)
+	    throw SRC_BUG;
+	ceci->pdesc.stack->sync_write_above(pdesc.esc);
+	ceci->pdesc.esc->add_mark_at_current_position(escape::seqt_delta_sig);
+    }
+
     void escape_catalogue::reset_read() const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
