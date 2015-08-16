@@ -127,6 +127,7 @@ namespace libdar
 	virtual void pre_add_failed_mark() const {};
 	virtual void pre_add_fsa(const cat_entree *ref) const {};
 	virtual void pre_add_fsa_crc(const cat_entree *ref) const {};
+	virtual void pre_add_delta_sig() const {};
 	virtual escape *get_escape_layer() const { return nullptr; };
 
         void add(cat_entree *ref); // add at end of catalogue (sequential point of view)

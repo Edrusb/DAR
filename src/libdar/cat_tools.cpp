@@ -131,6 +131,15 @@ namespace libdar
 	    throw SRC_BUG;
 	}
 
+	if(ref_f == nullptr)
+	    ret += "[-]";
+	else
+	{
+	    if(ref_f->has_delta_signature())
+		ret +="[D]";
+	    else
+		ret +="[ ]";
+	}
 
 	switch(ea_st)
 	{

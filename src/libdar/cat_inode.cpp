@@ -789,6 +789,9 @@ namespace libdar
 			    if(get_escape_layer() == nullptr)
 				throw SRC_BUG;
 
+				// passing over the delta signature mark if any
+			    (void)get_escape_layer()->skip_to_next_mark(escape::seqt_delta_sig, false);
+
 				// warning this section calls *esc directly while it may be managed by another thread
 				// we are reading from the stack the possible thread is not in read_ahead operation
 				// so it is pending for read request or other orders
@@ -1157,6 +1160,9 @@ namespace libdar
 			{
 			    if(get_escape_layer() == nullptr)
 				throw SRC_BUG;
+
+				// passing over the delta signature mark if any
+			    (void)get_escape_layer()->skip_to_next_mark(escape::seqt_delta_sig, false);
 
 				// warning this section calls *get_escape_layer() directly while it may be managed by another thread
 				// we are reading from the get_pile() the possible thread is not in read_ahead operation

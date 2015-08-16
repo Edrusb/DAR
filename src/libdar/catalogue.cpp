@@ -931,8 +931,8 @@ namespace libdar
 	defile juillet = FAKE_ROOT;
 	const cat_eod tmp_eod;
 
-	get_ui().printf(gettext("Access mode    | User | Group | Size  |          Date                 | [Data ][ EA  ][FSA][Compr][S]|   Filename\n"));
-	get_ui().printf("---------------+------+-------+-------+-------------------------------+------------------------------+-----------\n");
+	get_ui().printf(gettext("Access mode    | User | Group | Size  |          Date                 | [Data ][D][ EA  ][FSA][Compr][S]|   Filename\n"));
+	get_ui().printf("---------------+------+-------+-------+-------------------------------+---------------------------------+-----------\n");
 	if(filter_unsaved)
 	    contenu->recursive_has_changed_update();
 
@@ -1046,8 +1046,8 @@ namespace libdar
 
 	if(!get_ui().get_use_listing())
 	{
-	    get_ui().printf(gettext("[Data ][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size  |          Date                 |    filename\n"));
-	    get_ui().printf("-----------------------------+------------+-------+-------+-------+-------------------------------+------------\n");
+	    get_ui().printf(gettext("[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size  |          Date                 |    filename\n"));
+	    get_ui().printf("--------------------------------+------------+-------+-------+-------+-------------------------------+------------\n");
 	}
 	if(filter_unsaved)
 	    contenu->recursive_has_changed_update();
@@ -1465,8 +1465,8 @@ namespace libdar
 	range all_slices;
 	range file_slices;
 
-	get_ui().warning("Slice(s)|[Data ][ EA  ][FSA][Compr][S]|Permission| Filemane");
-	get_ui().warning("--------+-----------------------------+----------+-----------------------------");
+	get_ui().warning("Slice(s)|[Data ][D][ EA  ][FSA][Compr][S]|Permission| Filemane");
+	get_ui().warning("--------+--------------------------------+----------+-----------------------------");
 	reset_read();
 	while(read(e))
 	{

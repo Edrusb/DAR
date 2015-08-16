@@ -114,6 +114,7 @@ namespace libdar
 	std::string get_major() const { return tools_int2str(major); };
 	std::string get_minor() const { return tools_int2str(minor); };
 	const range & get_slices() const { return slices; };
+	bool has_delta_signature() const { return delta_sig; };
 
 
 	    // methods for libdar to setup the object
@@ -139,6 +140,7 @@ namespace libdar
 	void set_major(int val) { major = val; };
 	void set_minor(int val) { minor = val; };
 	void set_slices(const range & sl) { slices = sl; };
+	void set_delta_sig(bool val) { delta_sig = val; };
 
     private:
 	std::string my_name;
@@ -162,6 +164,7 @@ namespace libdar
 	int major;
 	int minor;
 	range slices;
+	bool delta_sig;
 
 	static time_t datetime2time_t(const datetime & val);
     };
