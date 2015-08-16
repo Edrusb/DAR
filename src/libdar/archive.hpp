@@ -416,6 +416,7 @@ namespace libdar
 				bool ignore_unknown,
 				const fsa_scope & scope,
 				bool multi_threaded,
+				bool delta_signature,
 				statistics * progressive_report);
 
 	void op_create_in_sub(user_interaction & dialog,        //< interaction with user
@@ -480,6 +481,7 @@ namespace libdar
 			      bool ignore_unknown,                        //< whether to warn when an unknown inode type is met
 			      const fsa_scope & scope,                    //< FSA scope for the operation
 			      bool multi_threaded,              //< whether libdar is allowed to spawn several thread to possibily work faster on multicore CPU
+			      bool delta_signature,             //< whether to calculate and store binary delta signature for each saved file
 			      statistics * st_ptr);             //< statistics must not be nullptr !
 
 	void disable_natural_destruction();

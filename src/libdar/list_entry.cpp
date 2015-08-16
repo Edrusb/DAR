@@ -46,6 +46,7 @@ namespace libdar
 	target = "";
 	major = 0;
 	minor = 0;
+	delta_sig = false;
     }
 
     time_t list_entry::datetime2time_t(const datetime & val)
