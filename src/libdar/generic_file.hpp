@@ -116,6 +116,12 @@ namespace libdar
 	    /// assignment operator
 	const generic_file & operator = (const generic_file & ref) { destroy(); copy_from(ref); return *this; };
 
+	    /// compaire the object content (implies skipping and reading)
+	    ///
+	    /// \note this is a more simple method than diff()
+	bool operator == (generic_file & ref);
+	bool operator != (generic_file & ref) { return ! (*this == ref); };
+
 	    /// retreive the openning mode for this object
         gf_mode get_mode() const { return rw; };
 
@@ -212,6 +218,7 @@ namespace libdar
 	    /// has to be set to the expected width by the caller.
 	    /// \return true if arg differ from "this"
 	    /// \note value has to be deleted by the caller when no more needed
+	    /// \note the more simple operator == method may be prefered to diff() when no crc calculation is required
         bool diff(generic_file & f,
 		  const infinint & me_read_ahead,
 		  const infinint & you_read_ahead,
@@ -229,6 +236,7 @@ namespace libdar
 	    /// has to be set to the expected width by the caller.
 	    /// \return true if arg differ from "this", else false is returned and err_offset is set
 	    /// \note value has to be deleted by the caller when no more needed
+	    /// \note the more simple operator == method may be prefered to diff() when no crc calculation is required
 	bool diff(generic_file & f,
 		  const infinint & me_read_ahead,
 		  const infinint & you_read_ahead,
