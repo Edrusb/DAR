@@ -112,7 +112,7 @@ namespace libdar
 	    /// \param[in] pdesc points to an existing stack that will be read from to setup fields of inherited classes,
 	    /// this pointed to pile object must survive the whole life of the cat_entree object
 	    /// \param[in] small whether a small or a whole read is to be read, (inode has been dump() with small set to true)
-	cat_entree(const pile_descriptor & pdesc, bool small) { change_location(pdesc, small); };
+	cat_entree(const pile_descriptor & pdesc, bool small);
 
 	    // copy constructor is fine as we only copy the address of pointers
 
@@ -160,7 +160,7 @@ namespace libdar
 	    /// \note this is also used when opening a catalogue if an isolated catalogue in place of the internal catalogue of an archive
 	    /// \note this method is virtual for cat_directory to overwrite it and propagate the change to all entries of the directory tree
 	    /// as well for mirage to propagate the change to the hard linked inode
-	virtual void change_location(const pile_descriptor & pdesc, bool small);
+	virtual void change_location(const pile_descriptor & pdesc);
 
 
     protected:

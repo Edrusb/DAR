@@ -503,17 +503,17 @@ namespace libdar
 	}
     }
 
-    void cat_directory::change_location(const pile_descriptor & pdesc, bool small)
+    void cat_directory::change_location(const pile_descriptor & pdesc)
     {
 	list<cat_nomme *>::iterator tmp_it = ordered_fils.begin();
 
-	cat_nomme::change_location(pdesc, small);
+	cat_nomme::change_location(pdesc);
 	while(tmp_it != ordered_fils.end())
 	{
 	    if(*tmp_it == nullptr)
 		throw SRC_BUG;
 
-	    (*tmp_it)->change_location(pdesc, small);
+	    (*tmp_it)->change_location(pdesc);
 	    ++tmp_it;
 	}
     }

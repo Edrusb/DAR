@@ -137,7 +137,7 @@ namespace libdar
 	void recursively_set_to_unsaved_data_and_FSA();
 
 	    /// overwrite virtual method of cat_entree to propagate the action to all entries of the directory tree
-	void change_location(const pile_descriptor & pdesc, bool small);
+	void change_location(const pile_descriptor & pdesc);
 
     protected:
         void inherited_dump(const pile_descriptor & pdesc, bool small) const;

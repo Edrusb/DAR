@@ -359,13 +359,17 @@ namespace libdar
         return ret;
     }
 
-
-    void cat_entree::change_location(const pile_descriptor & x_pdesc, bool small)
+    cat_entree::cat_entree(const pile_descriptor & x_pdesc, bool small)
     {
-	if(x_pdesc.stack == nullptr)
+	if(small && x_pdesc.esc == nullptr)
 	    throw SRC_BUG;
 
-	if(small && x_pdesc.esc == nullptr)
+	change_location(x_pdesc);
+    }
+
+    void cat_entree::change_location(const pile_descriptor & x_pdesc)
+    {
+	if(x_pdesc.stack == nullptr)
 	    throw SRC_BUG;
 
 	if(x_pdesc.compr == nullptr)
