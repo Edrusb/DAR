@@ -131,7 +131,7 @@ namespace libdar
 
 	    /// for small dump to have the delta_sig set
 	    ///
-	    /// \at the time of the small dump the delta_signature is not even calculated so we
+	    /// \note at the time of the small dump the delta_signature is not even calculated so we
 	    /// cannot use dump_delta_signature() to set this flag
 	void will_have_delta_signature() { will_have_delta_sig = true; };
 
