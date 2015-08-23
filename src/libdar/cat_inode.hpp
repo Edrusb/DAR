@@ -82,8 +82,6 @@ namespace libdar
 	const cat_inode & operator = (const cat_inode & ref);
         ~cat_inode() throw(Ebug);
 
-	bool operator == (const cat_entree & ref) const;
-
         const infinint & get_uid() const { return uid; };
         const infinint & get_gid() const { return gid; };
         U_16 get_perm() const { return perm; };

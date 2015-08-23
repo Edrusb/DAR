@@ -832,26 +832,6 @@ namespace libdar
 	/// remove from 'a' elements found in 'b' and return the resulting vector
     extern std::vector<std::string> tools_substract_from_vector(const std::vector<std::string> & a, const std::vector<std::string> & b);
 
-
-	/// compares pointers if not nullptr compares their values, true if equal, false if not (pointers or values different)
-    template <class T> bool tools_compare_pointers(const T *a, const T *b)
-    {
-	if(a != nullptr && b != nullptr)
-	{
-	    if(a != b)
-		return false;
-	    else
-		return true;
-	}
-	else
-	{
-	    if(a != nullptr || b != nullptr)
-		return false;
-	    else
-		return true;
-	}
-    }
-
 	/// allocate a new dirent structure for use with readdir_r
 	///
 	/// \param[in] path_name is the path of to the directory (and its underlying filesystem)
