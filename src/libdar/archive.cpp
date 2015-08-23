@@ -1071,7 +1071,7 @@ namespace libdar
 	    }
 	    catch(Erange & e)
 	    {
-		dialog.warning("This archive contains an isolated catalogue, only meta data can be used for comparison, CRC will be used to compare data, but using CRC to compare EA or FSA could return false difference as for both, the CRC is global to the set of attributes and the resulting CRC is sensible to the order the operating system provides these attributes");
+		dialog.warning("This archive contains an isolated catalogue, only meta data can be used for comparison, CRC will be used to compare data of delta signature if present. Warning: Succeeding this comparison does not mean there is no difference as two different files may have the same CRC or the same delta signature");
 		isolated_mode = true;
 	    }
                 // end of sanity checks
