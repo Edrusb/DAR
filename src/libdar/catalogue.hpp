@@ -234,6 +234,15 @@ namespace libdar
 	    /// change location where to find EA, FSA and DATA for all the objects of the catalogue
 	void change_location(const pile_descriptor & pdesc) { contenu->change_location(pdesc); };
 
+	    /// copy delta signatures to the given stack and update the cat_file objects accordingly
+	    ///
+	    /// \note this method relies on reset_read() and read()
+	void transfer_delta_signatures(const pile_descriptor & destination);
+
+	    /// drop delta signatures from the catalogue
+	    /// \note this method relies on reset_read() and read()
+	void drop_delta_signatures();
+
     protected:
 	entree_stats & access_stats() { return stats; };
 	void set_data_name(const label & val) { ref_data_name = val; };

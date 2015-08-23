@@ -3067,7 +3067,7 @@ namespace libdar
 				pdesc.compr->suspend_compression();
 
 				    // dropping the data to the archive and recording its location in the cat_file object
-				fic->dump_delta_signature(*delta_sig, *(pdesc.compr));
+				fic->dump_delta_signature(*delta_sig, *(pdesc.compr), pdesc.esc != nullptr);
 			    }
 
 			}
@@ -3824,7 +3824,7 @@ namespace libdar
 
 	    cat.pre_add_delta_sig();
 	    pdesc.compr->suspend_compression();
-	    e_file->dump_delta_signature(sig, *(pdesc.compr));
+	    e_file->dump_delta_signature(sig, *(pdesc.compr), pdesc.esc != nullptr);
 	}
     }
 

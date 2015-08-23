@@ -139,7 +139,8 @@ namespace libdar
 	    ///
 	    /// \param[in] sig is the signature to dump
 	    /// \param[in] where is the location where to write down the signature
-	void dump_delta_signature(memory_file & sig, generic_file & where);
+	    /// \param[in] small if set to true drop down additional information to allow sequential reading mode
+	void dump_delta_signature(memory_file & sig, generic_file & where, bool small);
 
 	    /// fetch the delta signature from the archive
 	    ///
@@ -149,6 +150,8 @@ namespace libdar
 	    /// return true if ref and "this" have both equal delta signatures
 	bool has_same_delta_signature(const cat_file & ref) const;
 
+	    /// remove any information about delta signature
+	void clear_delta_signature();
 
     protected:
         void sub_compare(const cat_inode & other, bool isolated_mode) const;

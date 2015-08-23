@@ -518,6 +518,9 @@ namespace libdar
 	    {
 		if(delta_sig->get_mode() == gf_read_only)
 		    throw SRC_BUG;
+		else
+		    delta_sig->reset();
+
 		switch(mode)
 		{
 		case keep_compressed:
@@ -525,15 +528,16 @@ namespace libdar
 		case keep_hole:
 		    throw SRC_BUG;
 		case normal:
+		    if(get_sparse_file_detection_read())
+			throw SRC_BUG; // sparse_file detection is not compatible with delta signature calculation
+			// for merging operation, this is the object where we write to that can perform hole detection
+			// while the object from we read is able to perform delta signature calculation
+		    break;
 		case plain:
 		    break;
 		default:
 		    throw SRC_BUG;
 		}
-		if(get_sparse_file_detection_read())
-		    throw SRC_BUG; // sparse_file detection is not compatible with detla signature calculation
-		    // for merging operation, this is the object where we write to that can perform hole detection
-		    // while the object from we read is able to perform delta signature calculation
 	    }
 
 		//
@@ -688,7 +692,7 @@ namespace libdar
 
 			    if(delta_sig != nullptr)
 			    {
-				generic_rsync *delta = new (get_pool()) generic_rsync(delta_sig, data->top());
+				generic_rsync *delta = new (get_pool()) generic_rsync(delta_sig, parent);
 				if(delta == nullptr)
 				    throw Ememory("cat_file::get_data");
 				try
@@ -885,7 +889,7 @@ namespace libdar
 	    return false;
     }
 
-    void cat_file::dump_delta_signature(memory_file &sig, generic_file & where)
+    void cat_file::dump_delta_signature(memory_file &sig, generic_file & where, bool small)
     {
 	infinint crc_size;
 
@@ -898,14 +902,19 @@ namespace libdar
 	    delta_sig_crc = nullptr;
 	}
 
-	delta_sig_size.dump(where);
+	if(small)
+	    delta_sig_size.dump(where);
 	delta_sig_offset = where.get_position();
 	sig.skip(0);
 	sig.copy_to(where, crc_size, delta_sig_crc);
 	if(delta_sig_crc == nullptr)
 	    throw SRC_BUG;
 	else
-	    delta_sig_crc->dump(where);
+	{
+	    if(small)
+		delta_sig_crc->dump(where);
+	}
+	will_have_delta_sig = true;
     }
 
     void cat_file::read_delta_signature(memory_file & sig) const
@@ -1019,6 +1028,21 @@ namespace libdar
 	    return false;
 	else
 	    return sig_me == sig_you;
+    }
+
+    void cat_file::clear_delta_signature()
+    {
+	if(will_have_delta_sig)
+	{
+	    if(delta_sig_crc != nullptr)
+	    {
+		delete delta_sig_crc;
+		delta_sig_crc = nullptr;
+	    }
+	    will_have_delta_sig = false;
+	    delta_sig_offset = 0; // just for precaution and memory footprint reduction
+	    delta_sig_size = 0; // just for precaution and memory footprint reduction
+	}
     }
 
     void cat_file::sub_compare(const cat_inode & other, bool isolated_mode) const
