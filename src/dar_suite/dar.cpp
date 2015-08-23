@@ -415,6 +415,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    isolate_options.set_user_comment(param.user_comment);
 			    isolate_options.set_sequential_marks(param.use_sequential_marks);
 			    isolate_options.set_multi_threaded(param.multi_threaded);
+			    isolate_options.set_delta_signature(param.delta_sig);
 
 			    cur->op_isolate(dialog,
 					    *param.aux_root,
@@ -490,6 +491,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		isolate_options.set_slice_min_digits(param.num_digits);
 		isolate_options.set_sequential_marks(param.use_sequential_marks);
 		isolate_options.set_multi_threaded(param.multi_threaded);
+		isolate_options.set_delta_signature(param.delta_sig);
 
                 arch->op_isolate(dialog,
 				 *param.sauv_root,

@@ -158,7 +158,7 @@ namespace libdar
 	    /// \note this is used when cloning an object from a catalogue to provide a merged archive. Such cloned object must point
 	    /// the stack of the archive under construction, so we use this call for that need,
 	    /// \note this is also used when opening a catalogue if an isolated catalogue in place of the internal catalogue of an archive
-	    /// \note this method is virtual for cat_directory to overwrite it and propagate the change to all entries of the directory tree
+	    /// \note this method is virtual in order for cat_directory to overwrite it and propagate the change to all entries of the directory tree
 	    /// as well for mirage to propagate the change to the hard linked inode
 	virtual void change_location(const pile_descriptor & pdesc);
 
@@ -191,7 +191,7 @@ namespace libdar
     private:
 	static const U_I ENTREE_CRC_SIZE;
 
-	pile_descriptor pdesc;
+	pile_descriptor pdesc; //< used when the object is read from an archive, to know where to read from data, EA, FSA, ...
     };
 
     extern bool compatible_signature(unsigned char a, unsigned char b);

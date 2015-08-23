@@ -1300,6 +1300,14 @@ namespace libdar
 		if(cat == nullptr)
 		    throw SRC_BUG;
 
+		if(options.get_delta_signature())
+		{
+		    pile_descriptor pdesc = & layers;
+		    cat->transfer_delta_signatures(pdesc);
+		}
+		else
+		    cat->drop_delta_signatures();
+
 		if(isol_data_name == cat->get_data_name())
 		    throw SRC_BUG;
 		    // data_name generated just above by slice layer

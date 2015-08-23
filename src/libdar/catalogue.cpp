@@ -1671,6 +1671,85 @@ namespace libdar
 	}
     }
 
+    void catalogue::transfer_delta_signatures(const pile_descriptor & destination)
+    {
+	const cat_entree *ent = nullptr;
+	const cat_file *ent_file = nullptr;
+	memory_file mem;
+
+	if(destination.compr == nullptr || destination.stack == nullptr)
+	    throw SRC_BUG;
+	else
+	{
+	    destination.stack->sync_write_above(destination.compr);
+	    destination.compr->sync_write();
+	    destination.compr->suspend_compression();
+	}
+
+	reset_read();
+	while(read(ent))
+	{
+	    ent_file = dynamic_cast<const cat_file *>(ent);
+	    if(ent_file != nullptr)
+	    {
+		cat_file *e_file = const_cast<cat_file *>(ent_file);
+		if(e_file == nullptr)
+		    throw SRC_BUG;
+
+		if(ent_file->has_delta_signature())
+		{
+
+		    e_file->read_delta_signature(mem);
+		    e_file->dump_delta_signature(mem, *(destination.compr), false);
+		}
+		else // no delta signature found
+		{
+		    if(e_file->get_saved_status() == s_saved)
+		    {
+			null_file trash = gf_write_only;
+			generic_file *data = e_file->get_data(cat_file::plain, &mem);
+
+			if(data == nullptr)
+			    throw SRC_BUG;
+
+			try
+			{
+			    data->copy_to(trash);
+			}
+			catch(...)
+			{
+			    delete data;
+			    throw;
+			}
+			delete data;
+
+			e_file->dump_delta_signature(mem, *(destination.compr), false);
+		    }
+		}
+	    }
+	}
+    }
+
+    void catalogue::drop_delta_signatures()
+    {
+	const cat_entree *ent = nullptr;
+	const cat_file *ent_file = nullptr;
+
+	reset_read();
+	while(read(ent))
+	{
+	    ent_file = dynamic_cast<const cat_file *>(ent);
+	    if(ent_file != nullptr)
+	    {
+		if(ent_file->has_delta_signature())
+		{
+		    cat_file *e_file = const_cast<cat_file *>(ent_file);
+		    e_file->clear_delta_signature();
+		}
+	    }
+	}
+    }
+
     void catalogue::copy_detruits_from(const catalogue & ref)
     {
 	const cat_entree *ent;
