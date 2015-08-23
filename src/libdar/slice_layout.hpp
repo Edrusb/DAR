@@ -19,9 +19,9 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \file list_entry.hpp
-    /// \brief class of objects describing an entry in the archive, used by archive::get_children_in_table
-    /// \ingroup API
+    /// \file slice_layout.hpp
+    /// \brief object describing the slicing of an archive
+    /// \ingroup Private
 
 
 #ifndef SLICE_LAYOUT_HPP
