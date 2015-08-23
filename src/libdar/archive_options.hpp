@@ -740,6 +740,9 @@ namespace libdar
 	    /// whether libdar is allowed to created several thread to work possibily faster on multicore CPU (require libthreadar)
 	void set_multi_threaded(bool val) { x_multi_threaded = val; };
 
+	    /// whether signature to base binary delta on the future has to be calculated and stored beside saved files
+	void set_delta_signature(bool val) { x_delta_signature = val; };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -769,6 +772,7 @@ namespace libdar
 	bool get_sequential_marks() const { return x_sequential_marks; };
 	const entrepot & get_entrepot() const { if(x_entrepot == nullptr) throw SRC_BUG; return *x_entrepot; };
 	bool get_multi_threaded() const { return x_multi_threaded; };
+	bool get_delta_signature() const { return x_delta_signature; };
 
 
     private:
@@ -797,6 +801,7 @@ namespace libdar
 	bool x_sequential_marks;
 	entrepot *x_entrepot;
 	bool x_multi_threaded;
+	bool x_delta_signature;
 
 	void copy_from(const archive_options_isolate & ref);
 	void destroy();
