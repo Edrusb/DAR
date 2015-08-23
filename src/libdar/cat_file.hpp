@@ -146,6 +146,9 @@ namespace libdar
 	    /// \param[in] sig is the object where to copy to the delta signature
 	void read_delta_signature(memory_file & sig) const;
 
+	    /// return true if ref and "this" have both equal delta signatures
+	bool has_same_delta_signature(const cat_file & ref) const;
+
 
     protected:
         void sub_compare(const cat_inode & other, bool isolated_mode) const;

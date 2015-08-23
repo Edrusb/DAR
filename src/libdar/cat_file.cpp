@@ -33,6 +33,7 @@ extern "C"
 #include "sparse_file.hpp"
 #include "null_file.hpp"
 #include "generic_rsync.hpp"
+#include "compile_time_features.hpp"
 
 using namespace std;
 
@@ -911,7 +912,7 @@ namespace libdar
     {
 	crc *calculated = nullptr;
 	infinint crc_size;
-	generic_file *from = nullptr;
+	compressor *from = nullptr;
 	escape *esc = nullptr;
 	bool small = get_small_read();
 	cat_file *me = const_cast<cat_file *>(this);
@@ -932,6 +933,8 @@ namespace libdar
 		from = get_compressor_layer();
 		if(from == nullptr)
 		    throw SRC_BUG;
+		else
+		    from->suspend_compression();
 		esc = get_escape_layer();
 		if(small && esc == nullptr)
 		    throw SRC_BUG;
@@ -1001,6 +1004,23 @@ namespace libdar
 	}
     }
 
+    bool cat_file::has_same_delta_signature(const cat_file & ref) const
+    {
+	memory_file sig_me;
+	memory_file sig_you;
+
+	read_delta_signature(sig_me);
+	ref.read_delta_signature(sig_you);
+
+	infinint size_me = sig_me.size();
+	infinint size_you = sig_you.size();
+
+	if(sig_me.size() != sig_you.size())
+	    return false;
+	else
+	    return sig_me == sig_you;
+    }
+
     void cat_file::sub_compare(const cat_inode & other, bool isolated_mode) const
     {
 	const cat_file *f_other = dynamic_cast<const cat_file *>(&other);
@@ -1014,122 +1034,79 @@ namespace libdar
 	    throw Erange("cat_file::sub_compare", tools_printf(gettext("not same size: %i <--> %i"), &s1, &s2));
 	}
 
-	if(get_saved_status() == s_saved && f_other->get_saved_status() == s_saved)
+	if(f_other->get_saved_status() != s_saved)
+	    throw SRC_BUG; // we should compare with a plain object provided by a filesystem object
+
+	if(get_saved_status() == s_saved && ! isolated_mode)
 	{
-	    if(!isolated_mode)
+		// compare file content with CRC
+
+	    generic_file *me = get_data(normal, nullptr);
+	    if(me == nullptr)
+		throw SRC_BUG;
+	    try
 	    {
-		generic_file *me = get_data(normal, nullptr);
-		if(me == nullptr)
-		    throw SRC_BUG;
-		try
-		{
-		    generic_file *you = f_other->get_data(normal, nullptr);
-		    if(you == nullptr)
-			throw SRC_BUG;
-			// requesting read_ahead for the peer object
-			// if the object is found on filesystem its
-			// storage_size is zero, which lead a endless
-			// read_ahead request, suitable for the current
-			// context:
-		    try
-		    {
-			crc *value = nullptr;
-			const crc *original = nullptr;
-			infinint crc_size;
-
-			if(has_crc())
-			{
-			    if(get_crc(original))
-			    {
-				if(original == nullptr)
-				    throw SRC_BUG;
-				crc_size = original->get_size();
-			    }
-			    else
-				throw SRC_BUG; // has a crc but cannot get it?!?
-			}
-			else // we must not fetch the crc yet, especially when perfoming a sequential read
-			    crc_size = tools_file_size_to_crc_size(f_other->get_size());
-
-			try
-			{
-			    infinint err_offset;
-			    if(me->diff(*you,
-					get_storage_size(),
-					f_other->get_storage_size(),
-					crc_size,
-					value,
-					err_offset))
-				throw Erange("cat_file::sub_compare", tools_printf(gettext("different file data, offset of first difference is: %i"), &err_offset));
-				// data is the same, comparing the CRC values
-
-			    if(get_crc(original))
-			    {
-				if(value == nullptr)
-				    throw SRC_BUG;
-				if(original->get_size() != value->get_size())
-				    throw Erange("cat_file::sub_compare", gettext("Same data but CRC value could not be verified because we did not guessed properly its width (sequential read restriction)"));
-				if(*original != *value)
-				    throw Erange("cat_file::sub_compare", gettext("Same data but stored CRC does not match the data!?!"));
-			    }
-
-				// else old archive without CRC
-
-			}
-			catch(...)
-			{
-			    if(value != nullptr)
-				delete value;
-			    throw;
-			}
-			if(value != nullptr)
-			    delete value;
-		    }
-		    catch(...)
-		    {
-			delete you;
-			throw;
-		    }
-		    delete you;
-		}
-		catch(...)
-		{
-		    delete me;
-		    throw;
-		}
-		delete me;
-	    }
-	    else // isolated mode
-	    {
-		if(check == nullptr)
-		    throw SRC_BUG;
-
 		generic_file *you = f_other->get_data(normal, nullptr);
 		if(you == nullptr)
 		    throw SRC_BUG;
-
+		    // requesting read_ahead for the peer object
+		    // if the object is found on filesystem its
+		    // storage_size is zero, which lead a endless
+		    // read_ahead request, suitable for the current
+		    // context:
 		try
 		{
-		    crc *other_crc = create_crc_from_size(check->get_size(), get_pool());
-		    if(other_crc == nullptr)
-			throw SRC_BUG;
+		    crc *value = nullptr;
+		    const crc *original = nullptr;
+		    infinint crc_size;
+
+		    if(has_crc())
+		    {
+			if(get_crc(original))
+			{
+			    if(original == nullptr)
+				throw SRC_BUG;
+			    crc_size = original->get_size();
+			}
+			else
+			    throw SRC_BUG; // has a crc but cannot get it?!?
+		    }
+		    else // we must not fetch the crc yet, especially when perfoming a sequential read
+			crc_size = tools_file_size_to_crc_size(f_other->get_size());
 
 		    try
 		    {
-			null_file ignore = gf_write_only;
+			infinint err_offset;
+			if(me->diff(*you,
+				    get_storage_size(),
+				    f_other->get_storage_size(),
+				    crc_size,
+				    value,
+				    err_offset))
+			    throw Erange("cat_file::sub_compare", tools_printf(gettext("different file data, offset of first difference is: %i"), &err_offset));
+			    // data is the same, comparing the CRC values
 
-			you->copy_to(ignore, check->get_size(), other_crc);
+			if(get_crc(original))
+			{
+			    if(value == nullptr)
+				throw SRC_BUG;
+			    if(original->get_size() != value->get_size())
+				throw Erange("cat_file::sub_compare", gettext("Same data but CRC value could not be verified because we did not guessed properly its width (sequential read restriction)"));
+			    if(*original != *value)
+				throw Erange("cat_file::sub_compare", gettext("Same data but stored CRC does not match the data!?!"));
+			}
 
-			if(check->get_size() != other_crc->get_size()
-			   || *check != *other_crc)
-			    throw Erange("cat_file::compare", tools_printf(gettext("CRC difference concerning file's data (comparing with an isolated catalogue)")));
+			    // else old archive without CRC
+
 		    }
 		    catch(...)
 		    {
-			delete other_crc;
+			if(value != nullptr)
+			    delete value;
 			throw;
 		    }
-		    delete other_crc;
+		    if(value != nullptr)
+			delete value;
 		}
 		catch(...)
 		{
@@ -1138,6 +1115,100 @@ namespace libdar
 		}
 		delete you;
 	    }
+	    catch(...)
+	    {
+		delete me;
+		throw;
+	    }
+	    delete me;
+
+	}
+	else if(has_delta_signature()
+		&& (compile_time::librsync() || f_other->has_delta_signature()))
+	{
+		// calculate delta signature of file and comparing them
+
+	    if(f_other->has_delta_signature())
+		    // this should never be the case, but well it does not hurt taking this case into account
+	    {
+		    // both only have delta signature
+
+		if(!has_same_delta_signature(*f_other))
+		    throw Erange("cat_file::sub_compare", gettext("Delta signature do not match"));
+	    }
+	    else
+	    {
+		    // we only have signature and you only have data
+
+		memory_file sig_me;
+		memory_file sig_you;
+		null_file trash = gf_write_only;
+		generic_file *data = f_other->get_data(normal, &sig_you);
+
+		if(data == nullptr)
+		    throw SRC_BUG;
+
+		try
+		{
+		    data->copy_to(trash);
+		}
+		catch(...)
+		{
+		    delete data;
+		    throw;
+		}
+		delete data;
+		data = nullptr;
+
+		read_delta_signature(sig_me);
+
+		infinint size_me = sig_me.size();
+		infinint size_you = sig_you.size();
+
+		if(sig_me.size() != sig_you.size())
+		    throw Erange("cat_file::sub_compare", tools_printf(gettext("Delta signature do not have the same size: %i <--> %i"), &size_me, &size_you));
+		if(sig_me != sig_you) // comparing file's content
+		    throw Erange("cat_file::sub_compare", gettext("Delta signature have the same size but do not match"));
+	    }
+	}
+	else if(check != nullptr) // we have a CRC available for data
+	{
+
+		// just compare CRC (as for isolated_mode)
+
+	    generic_file *you = f_other->get_data(normal, nullptr);
+	    if(you == nullptr)
+		throw SRC_BUG;
+
+	    try
+	    {
+		crc *other_crc = nullptr;
+
+		try
+		{
+		    null_file ignore = gf_write_only;
+
+		    you->copy_to(ignore, check->get_size(), other_crc);
+
+		    if(check->get_size() != other_crc->get_size()
+		       || *check != *other_crc)
+			throw Erange("cat_file::compare", tools_printf(gettext("CRC difference concerning file's data (comparing with an isolated catalogue)")));
+		}
+		catch(...)
+		{
+		    if(other_crc != nullptr)
+			delete other_crc;
+		    throw;
+		}
+		if(other_crc != nullptr)
+		    delete other_crc;
+	    }
+	    catch(...)
+	    {
+		delete you;
+		throw;
+	    }
+	    delete you;
 	}
     }
 
