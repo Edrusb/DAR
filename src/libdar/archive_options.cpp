@@ -611,6 +611,7 @@ namespace libdar
 	    if(x_entrepot == nullptr)
 		throw Ememory("archive_options_isolate::clear");
 	    x_multi_threaded = true;
+	    x_delta_signature = false;
 	}
 	catch(...)
 	{
@@ -678,6 +679,7 @@ namespace libdar
 	if(x_entrepot == nullptr)
 	    throw Ememory("archive_options_isolate::copy_from");
 	x_multi_threaded = ref.x_multi_threaded;
+	x_delta_signature = ref.x_delta_signature;
     }
 
 
