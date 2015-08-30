@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: de\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2015-01-31 16:04+0100\n"
+"POT-Creation-Date: 2015-08-30 10:49+0200\n"
 "PO-Revision-Date: 2011-07-21 16:13+0200\n"
 "Last-Translator: Markus Kamp <mk_cactus@gmx.de>\n"
 "Language-Team: Deutsch\n"
@@ -387,58 +387,58 @@ msgstr ""
 msgid "Adding Hard link to archive: "
 msgstr "Füge Datei zum Archiv hinzu: "
 
-#: src/libdar/filtre.cpp:2412
+#: src/libdar/filtre.cpp:2413
 #, fuzzy
 msgid "failed reading CRC from file: "
 msgstr "Fehler beim Lesen der Datei: "
 
-#: src/libdar/filtre.cpp:2428
+#: src/libdar/filtre.cpp:2433
 msgid "Failed reading CRC for EA: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:2434
+#: src/libdar/filtre.cpp:2444
 #, fuzzy
 msgid "Error met while reading next entry: "
 msgstr "Fehler bei der Wiederherstellung: "
 
-#: src/libdar/filtre.cpp:2474
+#: src/libdar/filtre.cpp:2484
 msgid "Adding file to archive: "
 msgstr "Füge Datei zum Archiv hinzu: "
 
-#: src/libdar/filtre.cpp:2575
+#: src/libdar/filtre.cpp:2585
 msgid "Copied data does not match CRC"
 msgstr ""
 
-#: src/libdar/filtre.cpp:2659
+#: src/libdar/filtre.cpp:2669
 #, c-format
 msgid ""
 "File has disappeared while we were reading it, cannot check whether it has "
 "changed during its backup: %S"
 msgstr ""
 
-#: src/libdar/filtre.cpp:2672
+#: src/libdar/filtre.cpp:2682
 #, c-format
 msgid ""
 "WARNING! File modified while reading it for backup. Performing retry %i of %i"
 msgstr ""
 
-#: src/libdar/filtre.cpp:2685
+#: src/libdar/filtre.cpp:2695
 msgid ""
 "WARNING! File modified while reading it for backup. No more retry for that "
 "file to not exceed the wasted byte limit. File is "
 msgstr ""
 
-#: src/libdar/filtre.cpp:2692
+#: src/libdar/filtre.cpp:2702
 msgid ""
 "WARNING! File modified while reading it for backup, but no more retry "
 "allowed: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:2745
+#: src/libdar/filtre.cpp:2755
 msgid "Saving Extended Attributes for "
 msgstr "Speichere erweiterte Attribute von"
 
-#: src/libdar/filtre.cpp:2801
+#: src/libdar/filtre.cpp:2811
 #, fuzzy
 msgid "Error saving Extended Attributes for "
 msgstr "Fehler beim speichern der erweiterten Attribute von"
@@ -1192,7 +1192,7 @@ msgstr "Fehler beim Lesen der Benutzereingabe vom Terminal"
 msgid "Error while fetching hostname: "
 msgstr "Fehler beim Auflisten des Archivinhalts: "
 
-#: src/libdar/tools.cpp:2414 src/libdar/catalogue.cpp:4925
+#: src/libdar/tools.cpp:2414 src/libdar/catalogue.cpp:4942
 msgid "[Worse]"
 msgstr "[Schlechter]"
 
@@ -1331,7 +1331,7 @@ msgstr ""
 msgid "%d is not a valid block size"
 msgstr "%d ist eine ungültige Blockgrö0e"
 
-#: src/libdar/tronconneuse.cpp:380 src/libdar/crypto.cpp:299
+#: src/libdar/tronconneuse.cpp:380 src/libdar/crypto.cpp:307
 msgid "Data corruption may have occurred, cannot decrypt data"
 msgstr ""
 
@@ -1339,108 +1339,121 @@ msgstr ""
 msgid "unknown cryptographic algorithm: "
 msgstr "Unbekannte Verschlüsselungsmethode: "
 
-#: src/libdar/crypto.cpp:129
+#: src/libdar/crypto.cpp:131
 msgid ""
 "Current implementation of blowfish encryption is not compatible with old "
 "(weak) implementation, use dar-2.3.x software (or other software based on "
 "libdar-4.4.x) to read this archive"
 msgstr ""
 
-#: src/libdar/crypto.cpp:160
+#: src/libdar/crypto.cpp:162
 #, c-format
 msgid "Cyphering algorithm not available in libgcrypt: %s/%s"
 msgstr ""
 
-#: src/libdar/crypto.cpp:165
+#: src/libdar/crypto.cpp:167
 #, c-format
 msgid ""
 "Failed retrieving from libgcrypt the block size used by the cyphering "
 "algorithm: %s/%s"
 msgstr ""
 
-#: src/libdar/crypto.cpp:172
+#: src/libdar/crypto.cpp:174
 #, c-format
 msgid "Failed retrieving from libgcrypt the key length to use: %s/%s"
 msgstr ""
 
-#: src/libdar/crypto.cpp:191
+#: src/libdar/crypto.cpp:193
 #, fuzzy, c-format
 msgid "Error while opening libgcrypt key handle: %s/%s"
 msgstr "Fehler beim Lesen der Benutzereingabe vom Terminal"
 
-#: src/libdar/crypto.cpp:194
+#: src/libdar/crypto.cpp:199
 #, c-format
 msgid "Error while assigning key to libgcrypt key handle: %s/%s"
 msgstr ""
 
-#: src/libdar/crypto.cpp:209
+#: src/libdar/crypto.cpp:215
 #, fuzzy
 msgid "Missing strong encryption support (libgcrypt)"
 msgstr "Unterstützung füe Blowfish Verschlüsselung"
 
-#: src/libdar/crypto.cpp:265
+#: src/libdar/crypto.cpp:273
 #, fuzzy, c-format
 msgid "Error while resetting encryption key for a new block: %s/%s"
 msgstr "Fehler beim Lesen der Benutzereingabe vom Terminal"
 
-#: src/libdar/crypto.cpp:269 src/libdar/crypto.cpp:293
+#: src/libdar/crypto.cpp:277 src/libdar/crypto.cpp:301
 #, fuzzy, c-format
 msgid "Error while setting IV for current block: %s/%s"
 msgstr "Fehler beim Lesen der Benutzereingabe vom Terminal"
 
-#: src/libdar/crypto.cpp:272
+#: src/libdar/crypto.cpp:280
 #, fuzzy, c-format
 msgid "Error while cyphering data: %s/%s"
 msgstr "Fehler bei der Wiederherstellung: "
 
-#: src/libdar/crypto.cpp:278 src/libdar/crypto.cpp:302
-#: src/libdar/crypto.cpp:350
+#: src/libdar/crypto.cpp:286 src/libdar/crypto.cpp:310
+#: src/libdar/crypto.cpp:359
 msgid "blowfish strong encryption support"
 msgstr "Unterstützung füe Blowfish Verschlüsselung"
 
-#: src/libdar/crypto.cpp:296
+#: src/libdar/crypto.cpp:304
 #, fuzzy, c-format
 msgid "Error while decyphering data: %s/%s"
 msgstr "Fehler bei der Wiederherstellung: "
 
-#: src/libdar/crypto.cpp:341
+#: src/libdar/crypto.cpp:350
 #, fuzzy, c-format
 msgid "Error while generating IV: %s/%s"
 msgstr "Fehler bei der Wiederherstellung: "
 
-#: src/libdar/crypto.cpp:385
+#: src/libdar/crypto.cpp:394
 #, fuzzy, c-format
 msgid "Error! SHA1 not available in libgcrypt: %s/%s"
 msgstr "Fehler beim Lesen der Benutzereingabe vom Terminal"
 
-#: src/libdar/crypto.cpp:391
+#: src/libdar/crypto.cpp:400
 #, fuzzy, c-format
 msgid "Error while derivating key from password (HMAC open): %s/%s"
 msgstr "Fehler beim Lesen von Pipe: "
 
-#: src/libdar/crypto.cpp:397
+#: src/libdar/crypto.cpp:406
 #, c-format
 msgid "Error while derivating key from password (HMAC set key): %s/%s"
 msgstr ""
 
-#: src/libdar/crypto.cpp:481 src/libdar/crypto.cpp:522
+#: src/libdar/crypto.cpp:490 src/libdar/crypto.cpp:601
 #, fuzzy
 msgid "Strong encryption support"
 msgstr "Unterstützung füe Blowfish Verschlüsselung"
 
-#: src/libdar/crypto.cpp:507
+#: src/libdar/crypto.cpp:547
+#, fuzzy, c-format
+msgid ""
+"Failed retrieving from libgcrypt the key length to use (essiv key): %s/%s"
+msgstr "Fehler beim Lesen der Benutzereingabe vom Terminal"
+
+#: src/libdar/crypto.cpp:563
 #, fuzzy, c-format
 msgid "Error while creating ESSIV handle: %s/%s"
 msgstr "Fehler beim Lesen der Datei: "
 
-#: src/libdar/crypto.cpp:511
+#: src/libdar/crypto.cpp:569
 #, fuzzy, c-format
 msgid "Error while assigning key to libgcrypt key handle (essiv): %s/%s"
 msgstr "Fehler beim Lesen der Benutzereingabe vom Terminal"
 
-#: src/libdar/crypto.cpp:539 src/libdar/crypto.cpp:545
-#: src/libdar/crypto.cpp:554 src/libdar/crypto.cpp:560
-#: src/libdar/crypto.cpp:590
+#: src/libdar/crypto.cpp:577
+#, c-format
+msgid ""
+"Failed retrieving from libgcrypt the block size used by the cyphering "
+"algorithm (essiv): %s/%s"
+msgstr ""
+
+#: src/libdar/crypto.cpp:618 src/libdar/crypto.cpp:624
+#: src/libdar/crypto.cpp:633 src/libdar/crypto.cpp:639
+#: src/libdar/crypto.cpp:669
 msgid "Library used for blowfish encryption does not respect RFC 3962"
 msgstr ""
 
@@ -1917,7 +1930,7 @@ msgstr "Fehler beim schreiben in Pipe : "
 msgid "Error opening pipe: "
 msgstr "Fehler beim öffnen des Pipes : "
 
-#: src/libdar/libdar_4_4.cpp:481 src/dar_suite/dar.cpp:609
+#: src/libdar/libdar_4_4.cpp:481 src/dar_suite/dar.cpp:610
 msgid "Continue listing archive contents?"
 msgstr "Auflistung des Archivinhalts fortsetzen?"
 
@@ -2143,139 +2156,139 @@ msgstr ""
 msgid "no Extended Attributes to compare with"
 msgstr "keine erweiterten Attribute zum Vergleich"
 
-#: src/libdar/catalogue.cpp:1307
+#: src/libdar/catalogue.cpp:1324
 msgid "CRC error detected while reading EA"
 msgstr "CRC-Fehler beim Lesen eines erweiterten Attributes"
 
-#: src/libdar/catalogue.cpp:1416
+#: src/libdar/catalogue.cpp:1433
 msgid ""
 "Error while reading CRC for EA from the archive: No escape mark found for "
 "that file"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:1458
+#: src/libdar/catalogue.cpp:1475
 msgid "Hard links of directories are not supported"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:1586
+#: src/libdar/catalogue.cpp:1603
 #, fuzzy
 msgid "Incoherent catalogue structure: hard linked inode's data not found"
 msgstr "Inkoherente Katalogstruktur"
 
-#: src/libdar/catalogue.cpp:1623
+#: src/libdar/catalogue.cpp:1640
 #, fuzzy
 msgid "Incoherent catalogue structure: hard linked data is not an inode"
 msgstr "Inkoherente Katalogstruktur"
 
-#: src/libdar/catalogue.cpp:1660
+#: src/libdar/catalogue.cpp:1677
 msgid "Incoherent catalogue structure: duplicated hard linked inode's data"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:1674
+#: src/libdar/catalogue.cpp:1691
 msgid ""
 "Incoherent catalogue structure: unknown status flag for hard linked inode"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2064
+#: src/libdar/catalogue.cpp:2081
 msgid "cannot provide data from a \"not saved\" file object"
 msgstr ""
 "Kann keine Daten aus einem \"nicht gespeicherten\" Dateiobjekt zur Verfügung "
 "stellen"
 
-#: src/libdar/catalogue.cpp:2067
+#: src/libdar/catalogue.cpp:2084
 msgid "data has been cleaned, object is now empty"
 msgstr "Daten wurden bereinigt, das Objekt ist jetzt leer"
 
-#: src/libdar/catalogue.cpp:2270
+#: src/libdar/catalogue.cpp:2287
 msgid "can't read data CRC: No escape mark found for that file"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2318
+#: src/libdar/catalogue.cpp:2335
 #, fuzzy, c-format
 msgid "not same size: %i <--> %i"
 msgstr "Grüße nicht identisch"
 
-#: src/libdar/catalogue.cpp:2355
+#: src/libdar/catalogue.cpp:2372
 #, c-format
 msgid "different file data, offset of first difference is: %i"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2364
+#: src/libdar/catalogue.cpp:2381
 msgid ""
 "Same data but CRC value could not be verified because we did not guessed "
 "properly its width (sequential read restriction)"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2366
+#: src/libdar/catalogue.cpp:2383
 msgid "Same data but stored CRC does not match the data!?!"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2455
+#: src/libdar/catalogue.cpp:2472
 #, fuzzy
 msgid "symbolic link does not point to the same target: "
 msgstr "Symbolischer Link zeigt auf ein anderes Ziel"
 
-#: src/libdar/catalogue.cpp:2556
+#: src/libdar/catalogue.cpp:2573
 msgid ""
 "LAX MODE: Error met building a catalogue entry, skipping this entry and "
 "continuing. Skipped error is: "
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2599
+#: src/libdar/catalogue.cpp:2616
 msgid "missing data to build a directory"
 msgstr "Fehlende Daten,um einen Ordner zu erstellen"
 
-#: src/libdar/catalogue.cpp:2776
+#: src/libdar/catalogue.cpp:2793
 #, fuzzy, c-format
 msgid "Cannot remove nonexistent entry %S from catalogue"
 msgstr ""
 "Kann Datei %S nicht wiederherstellen: 'Nicht vorhandene Datei in der "
 "Datenbank"
 
-#: src/libdar/catalogue.cpp:2871
+#: src/libdar/catalogue.cpp:2888
 msgid "listing() method must be given"
 msgstr "listing()-Methode muss angegeben werden"
 
-#: src/libdar/catalogue.cpp:2878
+#: src/libdar/catalogue.cpp:2895
 msgid "argument must be a relative path"
 msgstr "Argument muss ein relativer Pfad sein"
 
-#: src/libdar/catalogue.cpp:3145 src/libdar/catalogue.cpp:3148
+#: src/libdar/catalogue.cpp:3162 src/libdar/catalogue.cpp:3165
 msgid "missing data to build a special device"
 msgstr "Fehlende Daten um ein spezielles Gerät(device) anzusprechen"
 
-#: src/libdar/catalogue.cpp:3175
+#: src/libdar/catalogue.cpp:3192
 #, fuzzy, c-format
 msgid "devices have not the same major number: %d <--> %d"
 msgstr "Geräte haben nicht die gleiche höhere Nummer"
 
-#: src/libdar/catalogue.cpp:3177
+#: src/libdar/catalogue.cpp:3194
 #, fuzzy, c-format
 msgid "devices have not the same minor number: %d <--> %d"
 msgstr "Geräte haben nicht die gleiche niedrigere Nummer"
 
-#: src/libdar/catalogue.cpp:3184
+#: src/libdar/catalogue.cpp:3201
 #, fuzzy
 msgid "missing data to build"
 msgstr "Fehlende Daten zur Erstellung von"
 
-#: src/libdar/catalogue.cpp:3264 src/libdar/catalogue.cpp:3282
-#: src/libdar/catalogue.cpp:3284
+#: src/libdar/catalogue.cpp:3281 src/libdar/catalogue.cpp:3299
+#: src/libdar/catalogue.cpp:3301
 msgid "incoherent catalogue structure"
 msgstr "Inkoherente Katalogstruktur"
 
-#: src/libdar/catalogue.cpp:3275
+#: src/libdar/catalogue.cpp:3292
 msgid ""
 "LAX MODE: catalogue label does not match archive label, as if it was an "
 "extracted catalogue, assuming data corruption occurred and fixing the "
 "catalogue to be considered an a plain internal catalogue"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3327
+#: src/libdar/catalogue.cpp:3344
 msgid "CRC failed for table of contents (aka \"catalogue\")"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3329
+#: src/libdar/catalogue.cpp:3346
 msgid ""
 "LAX MODE: CRC failed for catalogue, the archive contents is corrupted. This "
 "may even lead dar to see files in the archive that never existed, but this "
@@ -2283,43 +2296,43 @@ msgid ""
 "proceed anyway?"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3388
+#: src/libdar/catalogue.cpp:3405
 msgid "root does not have a parent directory"
 msgstr "root hat keinen übergeordneten Ordner"
 
-#: src/libdar/catalogue.cpp:3428
+#: src/libdar/catalogue.cpp:3445
 msgid "no current directory defined"
 msgstr "Kein aktueller Ordner definiert"
 
-#: src/libdar/catalogue.cpp:3432
+#: src/libdar/catalogue.cpp:3449
 msgid "root directory has no parent directory"
 msgstr "Das Stammverzeichnis hat keinen übergeordneten Ordner"
 
-#: src/libdar/catalogue.cpp:3454
+#: src/libdar/catalogue.cpp:3471
 #, fuzzy
 msgid "no current reading directory defined"
 msgstr "Kein aktueller Ordner definiert"
 
-#: src/libdar/catalogue.cpp:3526 src/libdar/catalogue.cpp:3540
+#: src/libdar/catalogue.cpp:3543 src/libdar/catalogue.cpp:3557
 msgid " is not present in the archive"
 msgstr "Der root-Ordner hat keinen übergeordneten Ordner"
 
-#: src/libdar/catalogue.cpp:3618
+#: src/libdar/catalogue.cpp:3635
 #, fuzzy
 msgid "Cannot recurs in a non directory entry"
 msgstr "Der Ordner kann nicht entfernt werden"
 
-#: src/libdar/catalogue.cpp:3621
+#: src/libdar/catalogue.cpp:3638
 msgid ""
 "The entry to recurs in does not exist, cannot add further entry to that "
 "absent subdirectory"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3684
+#: src/libdar/catalogue.cpp:3701
 msgid "root has no parent directory"
 msgstr "root hat keinen übergeordneten Ordner"
 
-#: src/libdar/catalogue.cpp:4043
+#: src/libdar/catalogue.cpp:4060
 #, fuzzy, c-format
 msgid ""
 "access mode    | user | group | size  |          date                 | "
@@ -2328,17 +2341,17 @@ msgstr ""
 "Zugriffsmodus  | User | Gruppe| Größe |          Datum                | "
 "[Daten][ EA ][Kompr] |  Dateiname\n"
 
-#: src/libdar/catalogue.cpp:4088
+#: src/libdar/catalogue.cpp:4105
 #, fuzzy, c-format
 msgid "%S [%c] [ REMOVED ENTRY ] (%S)  %S\n"
 msgstr "%S[ ENTFERNT ]    %S\n"
 
-#: src/libdar/catalogue.cpp:4119 src/libdar/catalogue.cpp:4252
+#: src/libdar/catalogue.cpp:4136 src/libdar/catalogue.cpp:4269
 #, fuzzy
 msgid "      Extended Attribute: ["
 msgstr "   Unterstützung erweit. Attr.: %s\n"
 
-#: src/libdar/catalogue.cpp:4158
+#: src/libdar/catalogue.cpp:4175
 #, fuzzy, c-format
 msgid ""
 "[data ][ EA  ][compr][S]| permission | user  | group | size  |          "
@@ -2347,15 +2360,15 @@ msgstr ""
 "[Daten][ EA  ][Kompr] | Rechte     | User  | Gruppe| Größe |          "
 "Datum                |    Dateiname\n"
 
-#: src/libdar/catalogue.cpp:4881
+#: src/libdar/catalogue.cpp:4898
 msgid "[DIRTY]"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:4883 src/libdar/catalogue.cpp:4899
+#: src/libdar/catalogue.cpp:4900 src/libdar/catalogue.cpp:4916
 msgid "[Saved]"
 msgstr "[Gespeichert]"
 
-#: src/libdar/catalogue.cpp:4886 src/libdar/catalogue.cpp:4902
+#: src/libdar/catalogue.cpp:4903 src/libdar/catalogue.cpp:4919
 msgid "[InRef]"
 msgstr "[In Referenz] "
 
@@ -5052,15 +5065,15 @@ msgstr ""
 msgid "Now performing on-fly isolation..."
 msgstr "Führe Sofort-Isolierung des Archiv-Katalogs durch"
 
-#: src/dar_suite/dar.cpp:476
+#: src/dar_suite/dar.cpp:477
 msgid "All files asked could not be restored"
 msgstr "Angeforderte Dateien konnten nicht wiederhergestellt werden"
 
-#: src/dar_suite/dar.cpp:530
+#: src/dar_suite/dar.cpp:531
 msgid "Some file comparisons failed"
 msgstr "Einige Dateivergleiche sind fehlgeschlagen"
 
-#: src/dar_suite/dar.cpp:577
+#: src/dar_suite/dar.cpp:578
 msgid ""
 "Some files are corrupted in the archive and it will not be possible to "
 "restore them"
@@ -5068,138 +5081,138 @@ msgstr ""
 "Einige Dateien im Archiv sind beschädigt und es wird unmöglich sein, sie "
 "wiederherzustellen "
 
-#: src/dar_suite/dar.cpp:628 src/dar_suite/dar.cpp:649
+#: src/dar_suite/dar.cpp:629 src/dar_suite/dar.cpp:650
 msgid "Final memory cleanup..."
 msgstr ""
 
-#: src/dar_suite/dar.cpp:684
+#: src/dar_suite/dar.cpp:685
 #, c-format
 msgid " %i inode(s) saved\n"
 msgstr " %i Indexeiträge gespeichet\n"
 
-#: src/dar_suite/dar.cpp:685
+#: src/dar_suite/dar.cpp:686
 #, fuzzy, c-format
 msgid "   including %i hard link(s) treated\n"
 msgstr " mit %i hard links aufgezeichnet\n"
 
-#: src/dar_suite/dar.cpp:686
+#: src/dar_suite/dar.cpp:687
 #, fuzzy, c-format
 msgid ""
 " %i inode(s) changed at the moment of the backup and could not be saved "
 "properly\n"
 msgstr "%i Datei(en) als gelöscht aus dem Referenzarchiv aufgezeichnet\n"
 
-#: src/dar_suite/dar.cpp:687
+#: src/dar_suite/dar.cpp:688
 #, c-format
 msgid " %i byte(s) have been wasted in the archive to resave changing files"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:688
+#: src/dar_suite/dar.cpp:689
 #, fuzzy, c-format
 msgid " %i inode(s) not saved (no inode/file change)\n"
 msgstr " %i Indexeiträge nicht gespeichert (keine Dateiänderung)\n"
 
-#: src/dar_suite/dar.cpp:689
+#: src/dar_suite/dar.cpp:690
 #, fuzzy, c-format
 msgid " %i inode(s) failed to be saved (filesystem error)\n"
 msgstr ""
 " %i Indexeinträge (Inodes) konnten nicht gespeichert werden (Dateisystem-"
 "Fehler)\n"
 
-#: src/dar_suite/dar.cpp:690 src/dar_suite/dar.cpp:718
-#: src/dar_suite/dar.cpp:776
+#: src/dar_suite/dar.cpp:691 src/dar_suite/dar.cpp:719
+#: src/dar_suite/dar.cpp:777
 #, fuzzy, c-format
 msgid " %i inode(s) ignored (excluded by filters)\n"
 msgstr " %i Datei(en) ignoriert (ausgeschlossen durch Filter)\n"
 
-#: src/dar_suite/dar.cpp:691
+#: src/dar_suite/dar.cpp:692
 #, fuzzy, c-format
 msgid " %i inode(s) recorded as deleted from reference backup\n"
 msgstr "%i Datei(en) als gelöscht aus dem Referenzarchiv aufgezeichnet\n"
 
-#: src/dar_suite/dar.cpp:693 src/dar_suite/dar.cpp:722
-#: src/dar_suite/dar.cpp:783
+#: src/dar_suite/dar.cpp:694 src/dar_suite/dar.cpp:723
+#: src/dar_suite/dar.cpp:784
 #, fuzzy, c-format
 msgid " Total number of inode(s) considered: %i\n"
 msgstr "Gesamtzahl der behandelten Dateien: %i\n"
 
-#: src/dar_suite/dar.cpp:696 src/dar_suite/dar.cpp:780
+#: src/dar_suite/dar.cpp:697 src/dar_suite/dar.cpp:781
 #, fuzzy, c-format
 msgid " EA saved for %i inode(s)\n"
 msgstr "Erweiterte Attribute für %i Datei(en)\n"
 
-#: src/dar_suite/dar.cpp:714
+#: src/dar_suite/dar.cpp:715
 #, fuzzy, c-format
 msgid " %i inode(s) restored\n"
 msgstr " %i Datei(en) wiederhergestellt\n"
 
-#: src/dar_suite/dar.cpp:715
+#: src/dar_suite/dar.cpp:716
 #, fuzzy, c-format
 msgid "    including %i hard link(s)\n"
 msgstr " mit %i hard links aufgezeichnet\n"
 
-#: src/dar_suite/dar.cpp:716
+#: src/dar_suite/dar.cpp:717
 #, fuzzy, c-format
 msgid " %i inode(s) not restored (not saved in archive)\n"
 msgstr "%i Datei(en) nicht wiederhergestellt (nicht im Archiv gespeichert)\n"
 
-#: src/dar_suite/dar.cpp:717
+#: src/dar_suite/dar.cpp:718
 #, fuzzy, c-format
 msgid " %i inode(s) not restored (overwriting policy decision)\n"
 msgstr "%i Datei(en) nicht wiederhergestellt (nicht im Archiv gespeichert)\n"
 
-#: src/dar_suite/dar.cpp:719
+#: src/dar_suite/dar.cpp:720
 #, fuzzy, c-format
 msgid " %i inode(s) failed to restore (filesystem error)\n"
 msgstr ""
 " %i Dateien konnten nicht wiederhergestellt werden (Dateisystem-Fehler)\n"
 
-#: src/dar_suite/dar.cpp:720
+#: src/dar_suite/dar.cpp:721
 #, fuzzy, c-format
 msgid " %i inode(s) deleted\n"
 msgstr " %i Datei(en) gelöscht\n"
 
-#: src/dar_suite/dar.cpp:725
+#: src/dar_suite/dar.cpp:726
 #, fuzzy, c-format
 msgid " EA restored for %i inode(s)\n"
 msgstr "Erweiterte Attribute für %i Datei(en) wiederhergestellt\n"
 
-#: src/dar_suite/dar.cpp:738 src/dar_suite/dar.cpp:755
+#: src/dar_suite/dar.cpp:739 src/dar_suite/dar.cpp:756
 #, fuzzy, c-format
 msgid " %i item(s) treated\n"
 msgstr " %i Dateien bearbeitet\n"
 
-#: src/dar_suite/dar.cpp:739
+#: src/dar_suite/dar.cpp:740
 #, fuzzy, c-format
 msgid " %i item(s) do not match those on filesystem\n"
 msgstr " %i Dateien sind nicht identisch mit denen im Dateisystem\n"
 
-#: src/dar_suite/dar.cpp:740 src/dar_suite/dar.cpp:757
+#: src/dar_suite/dar.cpp:741 src/dar_suite/dar.cpp:758
 #, fuzzy, c-format
 msgid " %i item(s) ignored (excluded by filters)\n"
 msgstr " %i Datei(en) ignoriert (ausgeschlossen durch Filter)\n"
 
-#: src/dar_suite/dar.cpp:742 src/dar_suite/dar.cpp:759
+#: src/dar_suite/dar.cpp:743 src/dar_suite/dar.cpp:760
 #, fuzzy, c-format
 msgid " Total number of items considered: %i\n"
 msgstr "Gesamtzahl der behandelten Dateien: %i\n"
 
-#: src/dar_suite/dar.cpp:756
+#: src/dar_suite/dar.cpp:757
 #, fuzzy, c-format
 msgid " %i item(s) with error\n"
 msgstr " %i Dateien mit Fehler\n"
 
-#: src/dar_suite/dar.cpp:774
+#: src/dar_suite/dar.cpp:775
 #, fuzzy, c-format
 msgid " %i inode(s) added to archive\n"
 msgstr " %i Datei(en) wiederhergestellt\n"
 
-#: src/dar_suite/dar.cpp:775
+#: src/dar_suite/dar.cpp:776
 #, c-format
 msgid " with %i hard link(s) recorded\n"
 msgstr " mit %i hard links aufgezeichnet\n"
 
-#: src/dar_suite/dar.cpp:777
+#: src/dar_suite/dar.cpp:778
 #, fuzzy, c-format
 msgid " %i inode(s) recorded as deleted\n"
 msgstr " %i Datei(en) gelöscht\n"
