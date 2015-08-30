@@ -446,51 +446,6 @@ namespace libdar
         }
     }
 
-    bool cat_file::operator == (const cat_entree & ref) const
-    {
-	const cat_file *ref_file = dynamic_cast<const cat_file *>(&ref);
-
-	if(ref_file == nullptr)
-	    return false;
-	else
-	{
-	    if(chemin != ref_file->chemin)
-		return false;
-
-	    if(!tools_compare_pointers(offset, ref_file->offset))
-		return false;
-
-	    if(!tools_compare_pointers(size, ref_file->size))
-		return false;
-
-	    if(!tools_compare_pointers(storage_size, ref_file->storage_size))
-		return false;
-
-	    if(!tools_compare_pointers(check, ref_file->check))
-		return false;
-
-	    if(dirty != ref_file->dirty)
-		return false;
-
-	    if(will_have_delta_sig != ref_file->will_have_delta_sig)
-		return true;
-	    else
-	    {
-		if(delta_sig_offset != ref_file->delta_sig_offset)
-		    return false;
-
-		if(delta_sig_size != ref_file->delta_sig_size)
-		    return false;
-
-		if(tools_compare_pointers(delta_sig_crc, ref_file->delta_sig_crc))
-		    return false;
-	    }
-
-	    return cat_inode::operator == (ref);
-	}
-    }
-
-
     bool cat_file::has_changed_since(const cat_inode & ref, const infinint & hourshift, cat_inode::comparison_fields what_to_check) const
     {
         const cat_file *tmp = dynamic_cast<const cat_file *>(&ref);
