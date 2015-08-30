@@ -1,10 +1,14 @@
 from 2.4.17 to 2.4.18
-- Initial Vector used for strong encryption was set with pseudo-random
-  value using SHA1 message digest and blowfish cipher, which are not
-  available when ligcrypt is running in FIPS mode. Since 2.4.18 we use
+- Initial Vector used for strong encryption was set with pseudo-random data
+  generated using SHA1 message digest and blowfish cipher, which are not
+  available when ligcrypt is running in FIPS mode. Since 2.4.18 we now use
   SHA256 and AES256 for IV assignment in order to have libdar compatible
-  with FIPS mode. For data encryption nothing changes the cipher specified
+  with FIPS mode. For data encryption nothing changes: the cipher specified
   (-K, -J, -$ options on CLI) are used as before.
+- fixing bug met when performing archive isolation in sequential-read mode,
+  If an archive corruption or truncated archive leads an inode to not have
+  its CRC readable, dar aborts and issues a BUG report.
+- updating list of project relying on dar/libdar
 
 from 2.4.16 to 2.4.17
 - fixing issue when case insensitive comparison was requested and invalid
