@@ -1153,6 +1153,7 @@ bool data_tree::fix_corruption()
 	bool data, ea;
 	string etat, name;
 	lookup lo_data, lo_ea;
+	bool even_when_removed = (num != 0);
 
 	while(it != rejetons.end())
 	{
@@ -1160,8 +1161,8 @@ bool data_tree::fix_corruption()
 		throw SRC_BUG;
 	    data_dir *dir = dynamic_cast<data_dir *>(*it);
 
-	    lo_data = (*it)->get_data(ou_data, 0, false);
-	    lo_ea = (*it)->get_EA(ou_ea, 0, false);
+	    lo_data = (*it)->get_data(ou_data, 0, even_when_removed);
+	    lo_ea = (*it)->get_EA(ou_ea, 0, even_when_removed);
 	    data = lo_data == found_present && (ou_data == num || num == 0);
 	    ea = lo_ea == found_present && (ou_ea == num || num == 0);
 	    name = (*it)->get_name();
