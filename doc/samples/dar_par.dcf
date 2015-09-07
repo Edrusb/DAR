@@ -1,19 +1,20 @@
 # configuration file for dar to have Parchive integrated
 # with DAR
-# to be passed to dar as argument of -B option
-# either directly on command line or throw $HOME/.darrc or /etc/darrc
-# files
+# to be passed to dar as argument of -B option (-B dar_par.dcf)
+# either directly on command line or through $HOME/.darrc or /etc/darrc
+# file
 
 create:
-        -E "SOMEPATH/dar_par_create.duc '%p' '%b' %N %e %c 2"
+        -E 'SOMEPATH/dar_par_create.duc "%p" "%b" %N %e %c 2'
 # 2 stands for 2% of redundancy
 # adjust it to your needs
 
 test:
-        -E "SOMEPATH/dar_par_test.duc '%p' '%b' %N %e %c"
+        -E 'SOMEPATH/dar_par_test.duc "%p" "%b" %N %e %c'
 
-# note, that you may need to set the path to dar_par_test.duc
-# and dar_par_create.duc
+# note that you may need to set the path to dar_par_test.duc
+# and dar_par_create.duc, at dar/libdar installation, SOMEPATH
+# is substitued by the path where these are installed to
 
 # fix from Sergey Feo
 default:
