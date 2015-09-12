@@ -116,7 +116,7 @@ namespace libdar
 
 	    /// \param[in] t type of mark to skip to
 	    /// \param[in] jump if set to false, do not jump over *any* mark, even those not set as unjumpable mark,
-	    /// set it to true, to allow jumping on mark except those defined as unjumpable marks
+	    /// set it to true, to allow jumping over marks except those defined as unjumpable marks
 	    /// \return true if could skip to mark of type t
 	bool skip_to_next_mark(sequence_type t, bool jump);
 	bool next_to_read_is_mark(sequence_type t);
