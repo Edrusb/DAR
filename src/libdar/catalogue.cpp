@@ -1671,11 +1671,13 @@ namespace libdar
 	}
     }
 
-    void catalogue::transfer_delta_signatures(const pile_descriptor & destination)
+    void catalogue::transfer_delta_signatures(const pile_descriptor & destination, bool sequential_read, bool build)
     {
 	const cat_entree *ent = nullptr;
 	const cat_file *ent_file = nullptr;
+	const cat_inode *ent_inode = nullptr;
 	memory_file mem;
+	const crc *my_crc = nullptr;
 
 	if(destination.compr == nullptr || destination.stack == nullptr)
 	    throw SRC_BUG;
@@ -1690,21 +1692,40 @@ namespace libdar
 	while(read(ent))
 	{
 	    ent_file = dynamic_cast<const cat_file *>(ent);
+	    ent_inode = dynamic_cast<const cat_inode *>(ent);
+
 	    if(ent_file != nullptr)
 	    {
 		cat_file *e_file = const_cast<cat_file *>(ent_file);
 		if(e_file == nullptr)
 		    throw SRC_BUG;
 
+		if(sequential_read && (ent_file->has_delta_signature() || !build))
+		{
+			// here we through data to trash just to grab data CRC
+			// but we need calculate signature if it is not already calculated so we must
+			// not waste data in that case
+
+		    if(e_file->get_saved_status() == s_saved)
+		    {
+			generic_file *dat = e_file->get_data(cat_file::normal, nullptr);
+			if(dat == nullptr)
+			    throw Erange("transfer_delta_signatures", gettext("Can't read saved data."));
+			else
+			    delete dat;
+
+			e_file->get_crc(my_crc);
+		    }
+		}
+
 		if(ent_file->has_delta_signature())
 		{
-
 		    e_file->read_delta_signature(mem);
 		    e_file->dump_delta_signature(mem, *(destination.compr), false);
 		}
-		else // no delta signature found
+		else // no delta signature found we must calculate them
 		{
-		    if(e_file->get_saved_status() == s_saved)
+		    if(e_file->get_saved_status() == s_saved && build)
 		    {
 			null_file trash = gf_write_only;
 			generic_file *data = e_file->get_data(cat_file::plain, &mem);
@@ -1724,7 +1745,29 @@ namespace libdar
 			delete data;
 
 			e_file->dump_delta_signature(mem, *(destination.compr), false);
+
+			if(sequential_read)
+			    e_file->get_crc(my_crc);
 		    }
+		}
+	    }
+
+	    if(ent_inode != nullptr && sequential_read)
+	    {
+		    // EA
+
+		if(ent_inode->ea_get_saved_status() == cat_inode::ea_full)
+		{
+		    (void)ent_inode->get_ea();
+		    ent_inode->ea_detach();
+		}
+
+		    // FSA
+
+		if(ent_inode->fsa_get_saved_status() == cat_inode::fsa_full)
+		{
+		    (void)ent_inode->get_fsa();
+		    ent_inode->fsa_detach();
 		}
 	    }
 	}

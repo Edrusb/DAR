@@ -909,7 +909,7 @@ namespace libdar
 
 	    if(small)
 	    {
-		if(!esc->skip_to_next_mark(escape::seqt_delta_sig, false))
+		if(!esc->skip_to_next_mark(escape::seqt_delta_sig, true))
 		    throw Erange("cat_file::read_delta_signature", gettext("can't find mark for delta signature"));
 		me->delta_sig_size.read(*from);
 		me->delta_sig_offset = from->get_position();

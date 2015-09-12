@@ -236,11 +236,15 @@ namespace libdar
 
 	    /// copy delta signatures to the given stack and update the cat_file objects accordingly
 	    ///
+	    /// \param[in] destination where to drop delta signatures
+	    /// \param[in] sequential_read whether we read the archive in sequential mode
+	    /// \param[in] build if set and delta signature is not present but data is available for a file, calculate the delta sig
 	    /// \note this method relies on reset_read() and read()
-	void transfer_delta_signatures(const pile_descriptor & destination);
+	void transfer_delta_signatures(const pile_descriptor & destination,
+				       bool sequential_read,
+				       bool build);
 
-	    /// drop delta signatures from the catalogue
-	    /// \note this method relies on reset_read() and read()
+	    /// remove delta signature from the catalogue object as if they had never been calculated
 	void drop_delta_signatures();
 
     protected:
