@@ -17,7 +17,7 @@ f - do not restore directory structure  --flat
 g + recurse in this directory           --go-into
 h - help usage                          --help
 i + path of the input pipe              --input
-j - OBSOLETE was --jog, removed in 2.5.0
+j !   OBSOLETE was --jog, removed in 2.5.0
 k + do not deleted files drop between two backups --no-delete / --deleted { ignore | only }
 l + list archive contents               --list
 m + minimum size below which no compression will occur. --mincompr a default value is used. use -m 0 if you want to compress in any case.
@@ -32,8 +32,8 @@ u + exclude EA from operation (mask)    --exclude-ea
 v + verbose output                      --verbose   --verbose={skipped|treated|messages|dir|all}
 w * do not warn before overwriting      --no-warn
 x + extract archive                     --extract
-y !
-z * gzip compression                    --gzip --compress
+y !  OBSOLETE was --bzip2, removed in 2.5.0
+z * compression                         --gzip --compress
 A + make a differential backup          --ref
 B + filename taken as command-line extension --config
 C + extract catalogue in separated file --isolate
@@ -85,7 +85,7 @@ _ + retry on change                      --retry-on-change <count[:max byte]>
 3 + create a hash algorithm (+algo)      --hash <algo>
 4 + filesystem specific attr. family     --fsa-scope <fam1,fam2,fam3,...>
 5 + exclude file having a given EA set   --exclude-by-ea [<ea name>]
-6 + define internal key lengh with gnupg --key-length <length in bytes>
+6 !
 7 + define keys used to sign the archive --sign <comma separated list of emails>
 8 !
 9 + min_digits                           --min-digits archive[,ref[,aux]];

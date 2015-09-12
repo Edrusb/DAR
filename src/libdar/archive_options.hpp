@@ -363,12 +363,6 @@ namespace libdar
 	    /// \note if crypto_algo is not set while a list of recipient is given, the crypto algo will default to blowfish
 	void set_gnupg_recipients(const std::vector<std::string> & gnupg_recipients) { x_gnupg_recipients = gnupg_recipients; };
 
-	    /// change the size of the randomly generated key for used with gnupg, the size is in bytes (i.e.: octets)
-	    /// \note this method only concerns crypto algorithms that use arbitrarily large encryption, (only scrambling algorithm
-	    /// is concerned for today with libdar). For other algorithms the randomly generated key used with gnupg has the
-	    /// maximum possible length available for the algorithm.
-	    /// \note setting this value to zero lead libdar to use a default length with is 4096 bits (512 octets).
-	void set_gnupg_key_size(U_I gnupg_key_size);
 
 	    /// the private keys matching the email of the provided list are used to sign the archive random key
 	void set_gnupg_signatories(const std::vector<std::string> & gnupg_signatories) { x_gnupg_signatories = gnupg_signatories; };
@@ -524,7 +518,6 @@ namespace libdar
 	const secu_string & get_crypto_pass() const { return x_pass; };
 	U_32 get_crypto_size() const { return x_crypto_size; };
 	const std::vector<std::string> & get_gnupg_recipients() const { return x_gnupg_recipients; };
-	U_I get_gnupg_key_size() const { return x_gnupg_key_size; };
 	const std::vector<std::string> & get_gnupg_signatories() const { return x_gnupg_signatories; };
 	const mask & get_compr_mask() const { if(x_compr_mask == nullptr) throw SRC_BUG; return *x_compr_mask; };
 	const infinint & get_min_compr_size() const { return x_min_compr_size; };
@@ -580,7 +573,6 @@ namespace libdar
 	secu_string x_pass;
 	U_32 x_crypto_size;
 	std::vector<std::string> x_gnupg_recipients;
-	U_I x_gnupg_key_size;
 	std::vector<std::string> x_gnupg_signatories;
 	mask * x_compr_mask; //< points to a local copy of mask (must be allocated / releases by the archive_option_create objects)
 	infinint x_min_compr_size;
@@ -693,10 +685,6 @@ namespace libdar
 	    /// \note more details for the same option of archive_options_create
 	void set_gnupg_recipients(const std::vector<std::string> & gnupg_recipients) { x_gnupg_recipients = gnupg_recipients; };
 
-	    /// change the size of the randomly generated key encrypted using gnupg, the size is in bytes (i.e.: octets)
-	    /// \note if set to zero, will use the default key length
-	void set_gnupg_key_size(U_I gnupg_key_size);
-
 	    /// the private keys matching the email of the provided list are used to sign the archive random key
 	void set_gnupg_signatories(const std::vector<std::string> & gnupg_signatories) { x_gnupg_signatories = gnupg_signatories; };
 
@@ -747,7 +735,6 @@ namespace libdar
 	const secu_string & get_crypto_pass() const { return x_pass; };
 	U_32 get_crypto_size() const { return x_crypto_size; };
 	const std::vector<std::string> & get_gnupg_recipients() const { return x_gnupg_recipients; };
-	U_I get_gnupg_key_size() const { return x_gnupg_key_size; };
 	const std::vector<std::string> & get_gnupg_signatories() const { return x_gnupg_signatories; };
 	bool get_empty() const { return x_empty; };
 	const std::string & get_slice_permission() const { return x_slice_permission; };
@@ -775,7 +762,6 @@ namespace libdar
 	secu_string x_pass;
 	U_32 x_crypto_size;
 	std::vector<std::string> x_gnupg_recipients;
-	U_I x_gnupg_key_size;
 	std::vector<std::string> x_gnupg_signatories;
 	bool x_empty;
 	std::string x_slice_permission;
@@ -893,10 +879,6 @@ namespace libdar
 	    /// \note more details for the same option of archive_options_create
 	void set_gnupg_recipients(const std::vector<std::string> & gnupg_recipients) { x_gnupg_recipients = gnupg_recipients; };
 
-	    /// change the size of the randomly generated key encrypted using gnupg, the size is in bytes (i.e.: octets)
-	    /// \note if set to zero, will use the default key length
-	void set_gnupg_key_size(U_I gnupg_key_size);
-
 	    /// the private keys matching the email of the provided list are used to sign the archive random key
 	void set_gnupg_signatories(const std::vector<std::string> & gnupg_signatories) { x_gnupg_signatories = gnupg_signatories; };
 
@@ -974,7 +956,6 @@ namespace libdar
 	const secu_string & get_crypto_pass() const { return x_pass; };
 	U_32 get_crypto_size() const { return x_crypto_size; };
 	const std::vector<std::string> & get_gnupg_recipients() const { return x_gnupg_recipients; };
-	U_I get_gnupg_key_size() const { return x_gnupg_key_size; };
 	const std::vector<std::string> & get_gnupg_signatories() const { return x_gnupg_signatories; };
 	const mask & get_compr_mask() const { if(x_compr_mask == nullptr) throw SRC_BUG; return *x_compr_mask; };
 	const infinint & get_min_compr_size() const { return x_min_compr_size; };
@@ -1016,7 +997,6 @@ namespace libdar
 	secu_string x_pass;
 	U_32 x_crypto_size;
 	std::vector<std::string> x_gnupg_recipients;
-	U_I x_gnupg_key_size;
 	std::vector<std::string> x_gnupg_signatories;
 	mask * x_compr_mask;
 	infinint x_min_compr_size;

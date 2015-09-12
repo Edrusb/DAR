@@ -234,7 +234,6 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    create_options.set_crypto_pass(tmp_pass);
 		    create_options.set_crypto_size(param.crypto_size);
 		    create_options.set_gnupg_recipients(recipients);
-		    create_options.set_gnupg_key_size(param.gnupg_key_size);
 		    if(recipients.empty() && !param.signatories.empty())
 			throw Erange("little_main", gettext("Archive signature is only possible with gnupg encryption"));
 		    create_options.set_gnupg_signatories(param.signatories);
@@ -299,7 +298,6 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    merge_options.set_crypto_pass(tmp_pass);
 		    merge_options.set_crypto_size(param.crypto_size);
 		    merge_options.set_gnupg_recipients(recipients);
-		    merge_options.set_gnupg_key_size(param.gnupg_key_size);
 		    if(recipients.empty() && !param.signatories.empty())
 			throw Erange("little_main", gettext("Archive signature is only possible with gnupg encryption"));
 		    merge_options.set_gnupg_signatories(param.signatories);
@@ -394,7 +392,6 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    isolate_options.set_crypto_pass(tmp_pass);
 			    isolate_options.set_crypto_size(param.aux_crypto_size);
 			    isolate_options.set_gnupg_recipients(recipients);
-			    isolate_options.set_gnupg_key_size(param.gnupg_key_size);
 			    if(recipients.empty() && !param.signatories.empty())
 				throw Erange("little_main", gettext("Archive signature is only possible with gnupg encryption"));
 			    isolate_options.set_gnupg_signatories(param.signatories);
@@ -466,7 +463,6 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		isolate_options.set_crypto_pass(tmp_pass);
 		isolate_options.set_crypto_size(param.crypto_size);
 		isolate_options.set_gnupg_recipients(recipients);
-		isolate_options.set_gnupg_key_size(param.gnupg_key_size);
 		if(recipients.empty() && !param.signatories.empty())
 		    throw Erange("little_main", gettext("Archive signature is only possible with gnupg encryption"));
 		isolate_options.set_gnupg_signatories(param.signatories);

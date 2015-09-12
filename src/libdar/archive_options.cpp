@@ -36,7 +36,6 @@ namespace libdar
     static const cat_inode::comparison_fields default_comparison_fields = cat_inode::cf_all;
     static const crit_constant_action default_crit_action = crit_constant_action(data_preserve, EA_preserve);
     static const string default_user_comment = "N/A";
-    static const U_I default_gnupg_key_size = 512; // = 4096 bits
 
 	// some local helper functions
 
@@ -303,7 +302,6 @@ namespace libdar
 	    x_pass.clear();
 	    x_crypto_size = default_crypto_size;
 	    x_gnupg_recipients.clear();
-	    x_gnupg_key_size = default_gnupg_key_size;
 	    x_gnupg_signatories.clear();
 	    x_min_compr_size = default_min_compr_size;
 	    x_nodump = false;
@@ -402,15 +400,6 @@ namespace libdar
 	}
 	NLS_SWAP_OUT;
     }
-
-    void archive_options_create::set_gnupg_key_size(U_I gnupg_key_size)
-    {
-	if(gnupg_key_size == 0)
-	    x_gnupg_key_size = default_gnupg_key_size;
-	else
-	    x_gnupg_key_size = gnupg_key_size;
-    }
-
 
     void archive_options_create::set_compr_mask(const mask & compr_mask)
     {
@@ -532,7 +521,6 @@ namespace libdar
 	x_pass = ref.x_pass;
 	x_crypto_size = ref.x_crypto_size;
 	x_gnupg_recipients = ref.x_gnupg_recipients;
-	x_gnupg_key_size = ref.x_gnupg_key_size;
 	x_gnupg_signatories = ref.x_gnupg_signatories;
 	x_min_compr_size = ref.x_min_compr_size;
 	x_nodump = ref.x_nodump;
@@ -593,7 +581,6 @@ namespace libdar
 	    x_pass.clear();
 	    x_crypto_size = default_crypto_size;
 	    x_gnupg_recipients.clear();
-	    x_gnupg_key_size = default_gnupg_key_size;
 	    x_gnupg_signatories.clear();
 	    x_empty = false;
 	    x_slice_permission = "";
@@ -614,14 +601,6 @@ namespace libdar
 	    throw;
 	}
 	NLS_SWAP_OUT;
-    }
-
-    void archive_options_isolate::set_gnupg_key_size(U_I gnupg_key_size)
-    {
-	if(gnupg_key_size == 0)
-	    x_gnupg_key_size = default_gnupg_key_size;
-	else
-	    x_gnupg_key_size = gnupg_key_size;
     }
 
     void archive_options_isolate::set_entrepot(const entrepot & entr)
@@ -658,7 +637,6 @@ namespace libdar
 	x_pass = ref.x_pass;
 	x_crypto_size = ref.x_crypto_size;
 	x_gnupg_recipients = ref.x_gnupg_recipients;
-	x_gnupg_key_size = ref.x_gnupg_key_size;
 	x_gnupg_signatories = ref.x_gnupg_signatories;
 	x_empty = ref.x_empty;
 	x_slice_permission = ref.x_slice_permission;
@@ -712,7 +690,6 @@ namespace libdar
 	    x_pass.clear();
 	    x_crypto_size = default_crypto_size;
 	    x_gnupg_recipients.clear();
-	    x_gnupg_key_size = default_gnupg_key_size;
 	    x_gnupg_signatories.clear();
 	    x_min_compr_size = default_min_compr_size;
 	    x_empty = false;
@@ -810,14 +787,6 @@ namespace libdar
 	    throw;
 	}
 	NLS_SWAP_OUT;
-    }
-
-    void archive_options_merge::set_gnupg_key_size(U_I gnupg_key_size)
-    {
-	if(gnupg_key_size == 0)
-	    x_gnupg_key_size = default_gnupg_key_size;
-	else
-	    x_gnupg_key_size = gnupg_key_size;
     }
 
     void archive_options_merge::set_compr_mask(const mask & compr_mask)
@@ -926,7 +895,6 @@ namespace libdar
 	    x_pass = ref.x_pass;
 	    x_crypto_size = ref.x_crypto_size;
 	    x_gnupg_recipients = ref.x_gnupg_recipients;
-	    x_gnupg_key_size = ref.x_gnupg_key_size;
 	    x_gnupg_signatories = ref.x_gnupg_signatories;
 	    x_min_compr_size = ref.x_min_compr_size;
 	    x_empty = ref.x_empty;

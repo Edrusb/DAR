@@ -1024,7 +1024,6 @@ namespace libdar
 				   const secu_string & pass,
 				   U_32 crypto_size,
 				   const vector<string> & gnupg_recipients,
-				   U_I gnupg_key_size,
 				   const vector<string> & gnupg_signatories,
 				   bool empty,
 				   const string & slice_permission,
@@ -1036,6 +1035,8 @@ namespace libdar
 				   const label & data_name,
 				   bool multi_threaded)
     {
+	U_I gnupg_key_size;
+
 	try
 	{
 	    generic_file *tmp = nullptr;
@@ -1202,19 +1203,14 @@ namespace libdar
 			case crypto_none:
 			    throw SRC_BUG;
 			case crypto_scrambling:
-			    gcry_randomize(&variable_size, 1, GCRY_STRONG_RANDOM);
-			    if(gnupg_key_size == 0)
-				throw SRC_BUG;
-			    gnupg_key_size += (unsigned char)(variable_size);
-				// yes we do not use constant sized key but add from +0 to +255 bytes to its specified length
+			    throw Erange("macro_tools_create_layers",
+					 gettext("Scrambling is a very weak encryption algorithm, this is a non-sens to use with asymmetric encryption"));
 			    break;
 			case crypto_blowfish:
 			case crypto_aes256:
 			case crypto_twofish256:
 			case crypto_serpent256:
 			case crypto_camellia256:
-				// we ignore gnupg_key_size provides and
-				// set it to the maximum allowed value
 			    gnupg_key_size = tools_max(crypto_sym::max_key_len(crypto),
 						       crypto_sym::max_key_len_libdar(crypto));
 			    break;

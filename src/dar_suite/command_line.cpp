@@ -90,7 +90,7 @@ extern "C"
 #include "criterium.hpp"
 #include "fichier_local.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:"
+#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::7:"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c option"
@@ -273,7 +273,6 @@ bool get_args(shell_interaction & dialog,
     p.execute = "";
     p.execute_ref = "";
     p.pass.clear();
-    p.gnupg_key_size = 0;
     p.signatories.clear();
     p.blind_signatures = false;
     p.pass_ref.clear();
@@ -1676,19 +1675,6 @@ static bool get_args_recursive(recursive_param & rec,
                 else
                     p.ea_name_for_exclusion = "";
                 break;
-            case '6':
-                if(optarg != nullptr)
-                {
-                    libdar::deci conv = string(optarg);
-                    infinint ks = conv.computer();
-                    p.gnupg_key_size = 0;
-                    ks.unstack(p.gnupg_key_size);
-                    if(!ks.is_zero())
-                        throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
-                }
-                else
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
-                break;
             case '7':
                 if(optarg != nullptr)
                 {
@@ -2274,7 +2260,6 @@ const struct option *get_long_opt()
         {"backup-hook-execute", required_argument, nullptr, '='},
         {"fsa-scope", required_argument, nullptr, '4'},
         {"exclude-by-ea", optional_argument, nullptr, '5'},
-        {"key-length", required_argument, nullptr, '6'},
         {"sign", required_argument, nullptr, '7'},
         {"single-thread", no_argument, nullptr, 'G'},
         { nullptr, 0, nullptr, 0 }

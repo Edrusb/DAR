@@ -265,7 +265,6 @@ namespace libdar
 					  const secu_string & pass,
 					  U_32 crypto_size,
 					  const std::vector<std::string> & gnupg_recipients,
-					  U_I gnupg_key_size,
 					  const std::vector<std::string> & gnupg_signatories,
 					  bool empty,
 					  const std::string & slice_permission,

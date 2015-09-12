@@ -82,7 +82,6 @@ struct line_param
     string execute;               //< if not an empty string, the command to execute between slices
     string execute_ref;           //< if not an empty string, the command to execute between slices of the archive of reference
     secu_string pass;             //< if not an empty string, encrypt the archive with the given algo:pass string
-    U_I gnupg_key_size;           //< length in byte of the automatic key used for encryption and encrypted using gnupg inside the archive
     vector<string> signatories;   //< list of email's key to use to sign the archive
     bool blind_signatures;        //< whether to ignore signature check failures
     secu_string pass_ref;         //< if not an empty string, use the provided encryption scheme to read the archive of reference
