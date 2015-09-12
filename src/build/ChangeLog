@@ -3,6 +3,9 @@ from 2.4.18 to 2.4.19
 - fixed bug in dar_manager -u option, not displaying most recent files of
   an archive when they have been marked as removed in a more recent archive
   of the same dar_manager database.
+- fixed bug met while restoring in sequential read mode a file having
+  several copies (was modified at the time it was saved and retry-on-change
+  was set).
 
 from 2.4.17 to 2.4.18
 - Initial Vector used for strong encryption was set with pseudo-random data

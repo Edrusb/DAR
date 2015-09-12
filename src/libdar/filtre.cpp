@@ -243,6 +243,7 @@ namespace libdar
 					    throw SRC_BUG;
 
 					me_file->drop_crc();
+					me_file->set_storage_size(0);
 					if(cat.get_escape_layer() == NULL)
 					    throw SRC_BUG;
 					me_file->set_offset(cat.get_escape_layer()->get_position());
