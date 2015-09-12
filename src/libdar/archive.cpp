@@ -176,6 +176,7 @@ namespace libdar
 							 options.get_multi_threaded());
 				    // we do not comparing the signatories of the archive of reference with the current archive
 				    // for example the isolated catalogue might be unencrypted and thus not signed
+
 			    }
 			    catch(Euser_abort & e)
 			    {
@@ -229,6 +230,13 @@ namespace libdar
 
 			if(get_layer1_data_name() != get_catalogue_data_name())
 			    throw Erange("archive::archive", gettext("The archive and the isolated catalogue do not correspond to the same data, they are thus incompatible between them"));
+
+			    // we drop delta signature as they refer to the isolated catalogue container/archive
+			    // to avoid having to fetch them at wrong offset from the original archive we created
+			    // this isolated catalogue from. Anyway we do not need them to read an archive, we
+			    // only need delta signatures for archive differential backup, in which case we use the
+			    // original archive *or* the isolated catalogue *alone*
+			cat->drop_delta_signatures();
 		    }
 		    else // no isolated archive to fetch the catalogue from
 		    {
