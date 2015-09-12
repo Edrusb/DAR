@@ -1301,69 +1301,91 @@ namespace libdar
 			    perimeter = gettext("Data");
 			    if(!empty)
 			    {
-				generic_file *dat = e_file->get_data(cat_file::normal);
-				if(dat == nullptr)
-				    throw Erange("filtre_test", gettext("Can't read saved data."));
-				try
+				bool dirty_file;
+
+				do
 				{
-				    infinint crc_size;
-				    crc *check = nullptr;
-				    const crc *original = nullptr;
+				    generic_file *dat = e_file->get_data(cat_file::normal);
+				    if(dat == nullptr)
+					throw Erange("filtre_test", gettext("Can't read saved data."));
 
-				    if(!e_file->get_crc_size(crc_size))
-					crc_size = tools_file_size_to_crc_size(e_file->get_size());
-
-				    dat->skip(0);
-					// in sequential read mode, storage_size is zero
-					// which leads to ask an endless read_ahead (up to eof)
-					// thus the read_ahaead will be bounded by the escape
-					// layer up to the next tape mark, as expected
-				    dat->read_ahead(e_file->get_storage_size());
-				    try
-				    {
-					dat->copy_to(black_hole, crc_size, check);
-				    }
-				    catch(...)
-				    {
-					    // in sequential read mode we must
-					    // try to read the CRC for the object
-					    // be completed and not generating an
-					    // error due to absence of CRC later on
-					e_file->get_crc(original);
-					throw;
-				    }
-				    if(check == nullptr)
-					throw SRC_BUG;
+				    dirty_file = false;
 
 				    try
 				    {
-					    // due to possible sequential reading mode, the CRC
-					    // must not be fetched before the data has been copied
-					if(e_file->get_crc(original))
+					infinint crc_size;
+					crc *check = nullptr;
+					const crc *original = nullptr;
+
+					if(!e_file->get_crc_size(crc_size))
+					    crc_size = tools_file_size_to_crc_size(e_file->get_size());
+
+					dat->skip(0);
+					    // in sequential read mode, storage_size is zero
+					    // which leads to ask an endless read_ahead (up to eof)
+					    // thus the read_ahaead will be bounded by the escape
+					    // layer up to the next tape mark, as expected
+					dat->read_ahead(e_file->get_storage_size());
+					try
 					{
-					    if(original == nullptr)
-						throw SRC_BUG;
-					    if(typeid(*check) != typeid(*original))
-						throw SRC_BUG;
-					    if(*check != *original)
-						throw Erange("fitre_test", gettext("CRC error: data corruption."));
+					    dat->copy_to(black_hole, crc_size, check);
 					}
+					catch(...)
+					{
+						// in sequential read mode we must
+						// try to read the CRC for the object
+						// be completed and not generating an
+						// error due to absence of CRC later on
+					    e_file->get_crc(original);
+					    throw;
+					}
+					if(check == nullptr)
+					    throw SRC_BUG;
+
+					try
+					{
+						// due to possible sequential reading mode, the CRC
+						// must not be fetched before the data has been copied
+					    if(e_file->get_crc(original))
+					    {
+						if(original == nullptr)
+						    throw SRC_BUG;
+						if(typeid(*check) != typeid(*original))
+						    throw SRC_BUG;
+						if(*check != *original)
+						    throw Erange("fitre_test", gettext("CRC error: data corruption."));
+					    }
+					}
+					catch(...)
+					{
+					    delete check;
+					    throw;
+					}
+					delete check;
 				    }
 				    catch(...)
 				    {
-					delete check;
+					delete dat;
 					throw;
 				    }
-				    delete check;
-				}
-				catch(...)
-				{
 				    delete dat;
-				    throw;
+
+				    if(cat.get_escape_layer() != nullptr
+				       && cat.get_escape_layer()->skip_to_next_mark(escape::seqt_changed, false))
+				    {
+					dirty_file = true;
+					cat_file *modif_e_file = const_cast<cat_file *>(e_file);
+					if(modif_e_file == nullptr)
+					    throw SRC_BUG;
+					modif_e_file->drop_crc();
+					modif_e_file->set_storage_size(0);
+					modif_e_file->set_offset(cat.get_escape_layer()->get_position());
+				    }
 				}
-				delete dat;
+				while(dirty_file);
 			    }
                         }
+
                             // checking inode EA if any
                         if(e_ino != nullptr && e_ino->ea_get_saved_status() == cat_inode::ea_full)
                         {
