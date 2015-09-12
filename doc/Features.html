@@ -19,6 +19,7 @@
 
 
 
+
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR's FEATURES</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -44,7 +45,7 @@
     <tr>
       <td style="vertical-align: top;" align="justify">Here follow the
 main
-features of dar/libdar tools. For each feature an overview is presented with
+features of dar/libdar tool. For each feature an overview is presented with
 some pointers you are welcome to follow for a more detailed
 information.</td>
     </tr>
@@ -110,8 +111,8 @@ met in a file during backup, those are not stored into the archive but
 the number of zeroed bytes is stored instead (structure known as a "hole"). When comes the time to
 restore that file, dar restores the normal data but when a hole is met
 in the archive dar directly skips at the position of the data following
-that hole which, if the underlying filesystem supports sparse files,
-will (re)create a hole in the restored file, making a sparse file.
+that hole. If the underlying filesystem supports sparse files,
+this will (re)create a hole in the restored file, making a sparse file.
 Sparse files can report to be several hundred gigabytes large while they
 need only a few bytes of disk space, being able to properly save and restore them
 avoids wasting disk space at restoration time and in archives.<br>
@@ -460,7 +461,7 @@ a cost!<br>
       </td>
     </tr>
     <tr align="justify">
-      <td colspan="2" rowspan="1" style="vertical-align: top;">At backup time when a<span style="font-weight: bold;"> differential, incremental or decremental backup</span>is
+      <td colspan="2" rowspan="1" style="vertical-align: top;">At backup time when a<span style="font-weight: bold;"> differential, incremental or decremental backup</span> is
 done, dar compares the status of inode on the filesystem to the
 status they had at the time of the last backup. If the ctime of a file
 has changed while no other inode field changed dar issues a warning
@@ -741,8 +742,8 @@ while listing the archive content.<br>
       <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>When
 creating an archive dar can compute an md5, sha1 or sha512 hash before the
 archive is written to disk and produce a small file compatible with
-md5sum, sha1sum or sha512sum that let verify that each slice of the archive is not
-corrupted.<br>
+md5sum, sha1sum or sha512sum that let verify that the medium has not
+corrupted the archive slices.<br>
 </td>
     </tr>
   </tbody>
@@ -866,6 +867,36 @@ huge archive.<br>
 </table>
 <br>
 <br>
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">MULTI-VOLUME TAPES<br>
+</td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar_split</a>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">keywords: --sequential-read
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>The independant <span style="font-weight: bold;">dar_split </span>program
+provides a mean to output dar but also tar archives to several tapes.
+If takes care of splitting the archive when writing to tapes and gather
+pieces of archive from several tapes for dar/tar to work as if it was a
+single pieced archive.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+<br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
@@ -883,9 +914,10 @@ Backup Practice</a><br>
       </td>
     </tr>
     <tr>
-      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;">thanks to CRC
-(cyclic redundancy checks), dar is able to detect data corruption in
-the archive. Only the file where data corruption occurred will not be
+      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;">thanks
+to CRC
+(cyclic redundancy checks), dar is able to detect data corruption in an
+archive. Only the file where data corruption occurred will not be
 possible to restore, but dar will restore the others even when
 compression or encryption (or both) is used.</td>
     </tr>
@@ -913,11 +945,12 @@ compression or encryption (or both) is used.</td>
     </tr>
     <tr>
       <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span> the <span style="font-style: italic;">catalogue</span> (i.e.: the contents of an
-archive), can be copied (this operation is called <span style="font-style: italic;">isolation</span>) to a small file, that
-can in turn be used as reference for differential archive. There is then no
-more need to provide an archive to be able to create a differential
+archive), can be copied (this operation is called <span style="font-style: italic;">isolation</span>)
+to a small file, that
+can in turn be used as reference for differential archive. There is
+then no need to provide an archive to be able to create a differential
 backup based on it, just its <span style="font-style: italic;">catalogue</span>
-is necessary. Such an isolated <span style="font-style: italic;">catalogue</span>
+is can be used instead. Such an isolated <span style="font-style: italic;">catalogue</span>
 can also be used to rescue the archive it has been isolated from in the case the archive's internal <span style="font-style: italic;">catalogue</span> has been corrupted<span style="font-style: italic;"></span>. Such isolated catalogue can be created at the same time as the archive (operation called <span style="font-style: italic;">on-fly isolation</span>) or as a separate operation (called <span style="font-style: italic;">isolation</span>).<br>
       </td>
     </tr>
@@ -1112,12 +1145,10 @@ dar_manager</a></td>
     <tr>
       <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span> The advantage of differential
 backup is that it takes much less space to store and time to complete
-than always making full backup. But, in the other hand, while you can thus have a
-lot of them due to the reduces space requirement, if you want to restore a particular file, you can thus
-spend time to find in which backup is located the most recent version.
-This is solved using <span style="font-weight: bold;">dar_manager</span>.
-This command-line program,
-will gather contents information of all your backups. At restoration
+than always making full backup. But, in the other hand, it may lead you having a
+lot of them due to the reduces space requirements. Then if you want to restore a particular file, you may
+spend time to figure out in which backup is located the most recent version.
+To solved this, <span style="font-weight: bold;">dar_manager</span> gathers contents information of all your backups. At restoration
 time, it will call dar for you to restore the asked file(s) from the
 proper backup.<br>
       </td>
@@ -1190,7 +1221,7 @@ dates for example) of files that will stay in the resulting archive.<br>
       <br>
 Last, this merging feature give you also the opportunity to change the
 compression level or algorithm used as well as the encryption algorithm
-and passprhase. Of course, from a pair of source archive you can do all
+and passphrase. Of course, from a pair of source archive you can do all
 these sub features at the same time: filtering out files you do not
 want in the resulting archive, use a different compression level and
 algorithm or encryption password and algorithm than the source
@@ -1329,63 +1360,6 @@ archive.002.dar, ... archive.010.dar.<br>
 
 
 <br>
-<br>
-
-<br>
-
-
-
-
-
-<table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-
-
-
-
-
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; font-weight: bold; width: 33%;">MULTI SIZED MULTI VOLUME <br>
-TAPE ARCHIVES<br>
-</td>
-      <td style="vertical-align: top;">references: <a href="man/index.html">man dar_split</a> </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;"><br>
-      </td>
-      <td style="vertical-align: top;">keywords: --sequential-read<br>
-      </td>
-    </tr>
-    <tr align="justify">
-      <td colspan="2" rowspan="1" style="vertical-align: top;">When
-writing an archive to tape, you either have to specify to the archive
-tool the size of the tape or stick to single volume archive. With <span style="font-weight: bold;">dar_split</span>,
-you can have variable sized tapes (for example the first used one has
-already some data in it) and keep using the following tapes with
-different sizes. Dar_split can be used with <span style="font-weight: bold;">dar</span> as well as with <span style="font-weight: bold;">tar</span>
-or other archive tool able to generate and read data to and from a
-pipe. It receive what normally goes to tape and upon reaching the end
-of the tape stops and asks you to change the tape. At
-reading/restoration time, it takes as input the tape devices and when
-again reaching the end of tape it stops and asks you to change the
-tape. On the other end it gather the collected data from different
-tapes into a single pipe suitable for reading by dar or tar. You simply
-have to feed it with the correct tapes rewinded at
-correct position in the same order they have been given at backup time.<br>
-      <br>
-Note that dar_split can work with dar but only when dar is used in
-sequential read mode. In normal read mode dar does not need dar_split
-and works far much faster in term of archive restoration while managing alone several volumes known as slices.<br>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-
-
-
-
-
 </center>
 
 

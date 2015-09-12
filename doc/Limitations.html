@@ -2,6 +2,7 @@
 <html><head>
 
 
+
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR's Limitations</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -200,14 +201,11 @@ to change the ctime. So Dar is not able to restore the ctime date of
 files.<br>
       </div><br>
       <h3>Symlinks</h3>
-      <div style="margin-left: 40px; text-align: justify;">On system that provide the lutimes() system call, the dates of a symlink can be restored. Other Unix systems
-do not provide a way to modify the last modification date (aka mtime)
-of an existing symlink. Worse If you modify the mtime of an existing
+      <div style="margin-left: 40px; text-align: justify;">On system that provide the lutimes() system call, the dates of a symlink can be restored. On systems
+that do not provide that system call, if you modify the mtime of an existing
 symlink, you end modifying the mtime of the file targeted by that
 symlink, keeping untouched the mtime of the symlink itself! For that
-reason, without lutimes() support, odar is not able to restore mtime of symlink, it does not even
-try to do this, to not mess the mtime of inodes that could be pointed
-by a symlink.<br>
+reason, without lutimes() support, dar is avoids restoring mtime of symlink.<br>
       </div>
       <br>
 

@@ -464,9 +464,6 @@ Note that if you have set a passphrase on your private key, dar will ask it dyna
 To read a gnupg encrypted archive, you need your private key (not only the passphrase to activate it, if set). Thus if you plan to make backup of your system and encrypt the backup using gnupg, you should have a copy of this private key available out of the archive (usb key, floppy, ...) in order to be able to restore you backup!
 .RE
 .TP 20
--6, --key-length <number>
-defines the minimum length in octets of the automatically generated key encrypted with gnupg inside the archive. Key length is not fixed, but is randomly added up to 255 bytes (255 octets). By default the key minimum length is 512 bytes (thus the key length range from 4096 to 6136 bits). For example "--key-length 1000", will lead libdar to generate a random key which length is also randomly chosen from 1000 to 1255 bytes (8000 to 10040 bits). "--key-length 0" set back the key length to the default value. The last occurence of this option met on command line or included files takes precedence.
-.TP 20
 -J, --ref-key [[<algo>]:]<string>
 same meaning/use as -K option's first syntax, but the given key is used to decrypt the archive of reference (given with -A option). --key-ref is a synonym. Note that for archives generated using dar release 2.5.0 and above this option is no more necessary, unless you want to give the passphrase on command-line (not recommended) or in DCF file (which file would be set with restricted access permissions and/or ACL).
 .TP 20
