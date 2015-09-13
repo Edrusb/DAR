@@ -127,6 +127,7 @@ namespace libdar
 	virtual void pre_add_failed_mark() const {};
 	virtual void pre_add_fsa(const cat_entree *ref) const {};
 	virtual void pre_add_fsa_crc(const cat_entree *ref) const {};
+	virtual void pre_add_delta_sig() const {};
 	virtual escape *get_escape_layer() const { return nullptr; };
 
         void add(cat_entree *ref); // add at end of catalogue (sequential point of view)
@@ -232,6 +233,19 @@ namespace libdar
 
 	    /// change location where to find EA, FSA and DATA for all the objects of the catalogue
 	void change_location(const pile_descriptor & pdesc) { contenu->change_location(pdesc); };
+
+	    /// copy delta signatures to the given stack and update the cat_file objects accordingly
+	    ///
+	    /// \param[in] destination where to drop delta signatures
+	    /// \param[in] sequential_read whether we read the archive in sequential mode
+	    /// \param[in] build if set and delta signature is not present but data is available for a file, calculate the delta sig
+	    /// \note this method relies on reset_read() and read()
+	void transfer_delta_signatures(const pile_descriptor & destination,
+				       bool sequential_read,
+				       bool build);
+
+	    /// remove delta signature from the catalogue object as if they had never been calculated
+	void drop_delta_signatures();
 
     protected:
 	entree_stats & access_stats() { return stats; };

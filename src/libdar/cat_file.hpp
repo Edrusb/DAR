@@ -33,6 +33,7 @@ extern "C"
 } // end extern "C"
 
 #include "cat_inode.hpp"
+#include "memory_file.hpp"
 
 namespace libdar
 {
@@ -55,6 +56,7 @@ namespace libdar
 
 	static const U_8 FILE_DATA_WITH_HOLE = 0x01; //< file's data contains hole datastructure
 	static const U_8 FILE_DATA_IS_DIRTY = 0x02;  //< data modified while being saved
+	static const U_8 FILE_DATA_HAS_DELTA_SIG = 0x04; //< delta signature is present
 
         cat_file(const infinint & xuid,
 		 const infinint & xgid,
@@ -81,7 +83,14 @@ namespace libdar
 	void change_size(const infinint & s) const { *size = s; };
         infinint get_storage_size() const { return *storage_size; };
         void set_storage_size(const infinint & s) { *storage_size = s; };
-        virtual generic_file *get_data(get_data_mode mode) const; // returns a newly allocated object in read_only mode
+
+	    /// returns a newly allocated object in read_only mode
+	    ///
+	    /// \param[in] mode whether to return compressed, with hole or plain file
+	    /// \param[in,out] delta_sig if not nullptr, write to that file the delta signature of the file
+	    /// \note the object pointed to by delta_sig must exist during the whole life of the returned
+	    /// object.
+        virtual generic_file *get_data(get_data_mode mode, memory_file *delta_sig) const;
         void clean_data(); // partially free memory (but get_data() becomes disabled)
         void set_offset(const infinint & r);
 	const infinint & get_offset() const;
@@ -116,6 +125,34 @@ namespace libdar
 	bool is_dirty() const { return dirty; };
 	void set_dirty(bool value) { dirty = value; };
 
+
+	    /// return whether the object has an associated delta signature
+	bool has_delta_signature() const { return will_have_delta_sig; };
+
+	    /// for small dump to have the delta_sig set
+	    ///
+	    /// \note at the time of the small dump the delta_signature is not even calculated so we
+	    /// cannot use dump_delta_signature() to set this flag
+	void will_have_delta_signature() { will_have_delta_sig = true; };
+
+	    /// write down to archive the given delta signature
+	    ///
+	    /// \param[in] sig is the signature to dump
+	    /// \param[in] where is the location where to write down the signature
+	    /// \param[in] small if set to true drop down additional information to allow sequential reading mode
+	void dump_delta_signature(memory_file & sig, generic_file & where, bool small);
+
+	    /// fetch the delta signature from the archive
+	    ///
+	    /// \param[in] sig is the object where to copy to the delta signature
+	void read_delta_signature(memory_file & sig) const;
+
+	    /// return true if ref and "this" have both equal delta signatures
+	bool has_same_delta_signature(const cat_file & ref) const;
+
+	    /// remove any information about delta signature
+	void clear_delta_signature();
+
     protected:
         void sub_compare(const cat_inode & other, bool isolated_mode) const;
         void inherited_dump(const pile_descriptor & pdesc, bool small) const;
@@ -130,12 +167,15 @@ namespace libdar
         infinint *storage_size; //< how much data used in archive (after compression)
         crc *check;
 	bool dirty;             //< true when a file has been modified at the time it was saved
-
         compression algo_read;  //< which compression algorithm to use to read the file's data
 	compression algo_write; //< which compression algorithm to use to write down (merging) the file's data
-	bool furtive_read_mode; // used only when status equals "from_path"
-	char file_data_status_read; // defines the datastructure to use when reading the data
-	char file_data_status_write; // defines the datastructure to apply when writing down the data
+	bool furtive_read_mode; //< used only when status equals "from_path"
+	char file_data_status_read;  //< defines the datastructure to use when reading the data
+	char file_data_status_write; //< defines the datastructure to apply when writing down the data
+	infinint delta_sig_offset;   //< if not nullptr, is the offset where to find the delta signature of the file
+	infinint delta_sig_size;     //< storage size of the delta signature
+	crc *delta_sig_crc;          //< delta_signature CRC
+	bool will_have_delta_sig;    //< delta_signature will be calculated for this inode or is already present
 
         void detruit();
     };

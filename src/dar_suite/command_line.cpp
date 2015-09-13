@@ -90,7 +90,7 @@ extern "C"
 #include "criterium.hpp"
 #include "fichier_local.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::7:"
+#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::7:8:"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c option"
@@ -329,6 +329,8 @@ bool get_args(shell_interaction & dialog,
     p.no_compare_symlink_date = true;
     p.scope = all_fsa_families();
     p.multi_threaded = true;
+    p.delta_sig = false;
+    p.delta_diff = false;
 
     try
     {
@@ -1686,6 +1688,16 @@ static bool get_args_recursive(recursive_param & rec,
                 else
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 break;
+	    case '8':
+		if(optarg == nullptr)
+                    throw Erange("get_args", tools_printf(gettext("Missing argument to --delta"), char(lu)));
+		if(strcasecmp(optarg, "sig") == 0)
+		    p.delta_sig = true;
+		else if(strcasecmp(optarg, "diff") == 0)
+		    p.delta_diff = true;
+		else
+		    throw Erange("get_args", string(gettext("Unknown parameter given to --delta option: ")) + optarg);
+		break;
             case ':':
                 throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(optopt)));
             case '?':
@@ -2262,6 +2274,7 @@ const struct option *get_long_opt()
         {"exclude-by-ea", optional_argument, nullptr, '5'},
         {"sign", required_argument, nullptr, '7'},
         {"single-thread", no_argument, nullptr, 'G'},
+	{"delta", required_argument, nullptr, '8'},
         { nullptr, 0, nullptr, 0 }
     };
 

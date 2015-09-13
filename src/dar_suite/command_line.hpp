@@ -138,6 +138,8 @@ struct line_param
     bool no_compare_symlink_date; //< whether to report difference in dates of symlinks while diffing an archive with filesystem
     fsa_scope scope;              //< FSA scope to consider for the operation
     bool multi_threaded;          //< allows libdar to use multiple threads (requires libthreadar)
+    bool delta_sig;               //< whether to calculate rsync signature of files
+    bool delta_diff;              //< whether to save binary diff or whole file's data during a differential backup
 
 	// constructor for line_param
     line_param()

@@ -55,7 +55,7 @@ namespace libdar
 	// signature creation
 
     generic_rsync::generic_rsync(generic_file *signature_storage,
-				 generic_file *below): generic_file(gf_write_only)
+				 generic_file *below): generic_file(gf_read_only)
     {
 #if LIBRSYNC_AVAILABLE
 
@@ -106,6 +106,7 @@ namespace libdar
 	U_I lu = 0;
 	U_I out;
 	bool eof = false;
+	rs_result err;
 
 	    // sanity checks
 
@@ -148,6 +149,7 @@ namespace libdar
 			eof = true;
 		    out = SMALL_BUF;
 		    if(!step_forward(inbuf, lu,
+				     true,
 				     outbuf, out)
 		       && eof)
 			throw SRC_BUG;
@@ -176,6 +178,9 @@ namespace libdar
 
 		// creating the delta job
 
+	    err = rs_build_hash_table(sumset);
+	    if(err != RS_DONE)
+		throw Erange("generic_rsync::generic_rsync", string(gettext("Error met building the rsync hash table: ")) + string(rs_strerror(err)));
 	    job = rs_delta_begin(sumset);
 	    x_below = below;
 	    x_input = nullptr;
@@ -267,7 +272,7 @@ namespace libdar
     }
 
 
-    generic_rsync::~generic_rsync()
+    generic_rsync::~generic_rsync() throw(Ebug)
     {
 	terminate();
 	meta_delete(working_buffer);
@@ -286,22 +291,43 @@ namespace libdar
 	switch(status)
 	{
 	case sign:
+	    lu = x_below->read(a, size);
+	    remain = lu;
+	    do
+	    {
+		working_size = BUFFER_SIZE;
+		(void)step_forward(a + lu - remain, remain,
+				   false,
+				   working_buffer, working_size);
+
+		if(working_size > 0)
+		    x_output->write(working_buffer, working_size);
+	    }
+	    while(remain > 0);
+	    break;
 	case delta:
 	    throw SRC_BUG;
 	case patch:
 	    do
 	    {
-		working_size += x_below->read(working_buffer + working_size,
-					      BUFFER_SIZE - working_size);
-		if(working_size == 0)
-		    eof = true;
+		if(!eof)
+		{
+		    working_size += x_below->read(working_buffer + working_size,
+						  BUFFER_SIZE - working_size);
+		    if(working_size == 0)
+			eof = true;
+		}
+		else
+		    working_size = 0;
+
 		remain = size - lu;
 		if(step_forward(working_buffer,
-				 working_size,
-				 a + lu,
+				working_size,
+				true,
+				a + lu,
 				remain))
 		{
-		    if(working_size > 0)
+		    if(working_size > 0 && remain == 0)
 			throw Edata("While patching file, librsync tells it has finished processing data while we still have pending data to send to it");
 		    patching_completed = true;
 		}
@@ -324,23 +350,23 @@ namespace libdar
     void generic_rsync::inherited_write(const char *a, U_I size)
     {
 	initial = false;
+	bool blocked;
 
 	switch(status)
 	{
 	case sign:
-	    x_below->write(a, size);
-		/* no break ! */
+	    throw SRC_BUG;
 	case delta:
 	    do
 	    {
 		working_size = BUFFER_SIZE;
-		if(step_forward(a, size,
-				working_buffer, working_size))
-		    throw SRC_BUG;
+		blocked = !step_forward(a, size,
+					true,
+					working_buffer, working_size);
 		if(working_size > 0)
 		    x_output->write(working_buffer, working_size);
 	    }
-	    while(size > 0);
+	    while(size > 0 && blocked);
 	    break;
 	case patch:
 	    throw SRC_BUG;
@@ -407,6 +433,7 @@ namespace libdar
 
     bool generic_rsync::step_forward(const char *buffer_in,
 				     U_I & avail_in,
+				     bool shift_input,
 				     char *buffer_out,
 				     U_I  & avail_out)
     {
@@ -437,7 +464,7 @@ namespace libdar
 	    throw Erange("generic_rsync::step_forward", string(gettext("Error met while feeding data to librsync: ")) + rs_strerror(res));
 	}
 
-	if(buf.avail_in > 0)
+	if(buf.avail_in > 0 && shift_input)
 	    (void)memmove(const_cast<char *>(buffer_in), buf.next_in, buf.avail_in);
 	avail_in = buf.avail_in;
 	avail_out = buf.next_out - buffer_out;
@@ -470,6 +497,7 @@ namespace libdar
 	    working_size = BUFFER_SIZE;
 
 	    finished = step_forward(working_buffer, tmp, // as tmp is set to zero we can use working_buffer in input too
+				    true,
 				    working_buffer, working_size);
 	    if(working_size > 0)
 		x_output->write(working_buffer, working_size);

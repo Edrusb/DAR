@@ -248,6 +248,10 @@ namespace libdar
 	    /// \param[in] filename base name of the slices ("-" for standard output)
 	    /// \param[in] extension slices extension ("dar")
 	    /// \param[in] options optional parameters to use for the operation
+	    /// \note that if the archive contains delta sig and isolation options specify not
+	    /// to keep them in the resulting isolated catalogue the current archive object (but
+	    /// not the archive file) is modified (forget delta signature) --- this is not a
+	    /// const method.
 	void op_isolate(user_interaction & dialog,
 			const path &sauv_path,
 			const std::string & filename,
@@ -415,6 +419,7 @@ namespace libdar
 				bool ignore_unknown,
 				const fsa_scope & scope,
 				bool multi_threaded,
+				bool delta_signature,
 				statistics * progressive_report);
 
 	void op_create_in_sub(user_interaction & dialog,        //< interaction with user
@@ -478,6 +483,7 @@ namespace libdar
 			      bool ignore_unknown,                        //< whether to warn when an unknown inode type is met
 			      const fsa_scope & scope,                    //< FSA scope for the operation
 			      bool multi_threaded,              //< whether libdar is allowed to spawn several thread to possibily work faster on multicore CPU
+			      bool delta_signature,             //< whether to calculate and store binary delta signature for each saved file
 			      statistics * st_ptr);             //< statistics must not be nullptr !
 
 	void disable_natural_destruction();

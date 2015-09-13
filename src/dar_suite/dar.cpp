@@ -211,7 +211,13 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    create_options.clear();
 		    if(arch != nullptr)
 		    {
-			arch->drop_all_filedescriptors(dialog);
+			if(!param.delta_sig)
+				// we may need to copy delta_sig
+				// from the archive of reference
+				// to the resulting archive so we
+				// cannot drop fd when delta_sig
+				// is requested
+			    arch->drop_all_filedescriptors(dialog);
 			create_options.set_reference(arch);
 		    }
 		    create_options.set_selection(*param.selection);
@@ -263,6 +269,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    create_options.set_slice_min_digits(param.num_digits);
 		    create_options.set_fsa_scope(param.scope);
 		    create_options.set_multi_threaded(param.multi_threaded);
+		    create_options.set_delta_signature(param.delta_sig);
+		    create_options.set_delta_diff(param.delta_diff);
 
 		    if(param.backup_hook_mask != nullptr)
 			create_options.set_backup_hook(param.backup_hook_execute, *param.backup_hook_mask);
@@ -404,6 +412,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    isolate_options.set_user_comment(param.user_comment);
 			    isolate_options.set_sequential_marks(param.use_sequential_marks);
 			    isolate_options.set_multi_threaded(param.multi_threaded);
+			    isolate_options.set_delta_signature(param.delta_sig);
 
 			    cur->op_isolate(dialog,
 					    *param.aux_root,
@@ -443,7 +452,10 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		if(arch == nullptr)
 		    throw Ememory("little_main");
 		else
-		    arch->drop_all_filedescriptors(dialog);
+		{
+		    if(!param.delta_sig)
+			arch->drop_all_filedescriptors(dialog);
+		}
 
 		line_tools_crypto_split_algo_pass(param.pass,
 						  crypto,
@@ -475,6 +487,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		isolate_options.set_slice_min_digits(param.num_digits);
 		isolate_options.set_sequential_marks(param.use_sequential_marks);
 		isolate_options.set_multi_threaded(param.multi_threaded);
+		isolate_options.set_delta_signature(param.delta_sig);
 
                 arch->op_isolate(dialog,
 				 *param.sauv_root,

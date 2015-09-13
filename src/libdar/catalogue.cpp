@@ -931,8 +931,8 @@ namespace libdar
 	defile juillet = FAKE_ROOT;
 	const cat_eod tmp_eod;
 
-	get_ui().printf(gettext("Access mode    | User | Group | Size  |          Date                 | [Data ][ EA  ][FSA][Compr][S]|   Filename\n"));
-	get_ui().printf("---------------+------+-------+-------+-------------------------------+------------------------------+-----------\n");
+	get_ui().printf(gettext("Access mode    | User | Group | Size  |          Date                 | [Data ][D][ EA  ][FSA][Compr][S]|   Filename\n"));
+	get_ui().printf("---------------+------+-------+-------+-------------------------------+---------------------------------+-----------\n");
 	if(filter_unsaved)
 	    contenu->recursive_has_changed_update();
 
@@ -1046,8 +1046,8 @@ namespace libdar
 
 	if(!get_ui().get_use_listing())
 	{
-	    get_ui().printf(gettext("[Data ][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size  |          Date                 |    filename\n"));
-	    get_ui().printf("-----------------------------+------------+-------+-------+-------+-------------------------------+------------\n");
+	    get_ui().printf(gettext("[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size  |          Date                 |    filename\n"));
+	    get_ui().printf("--------------------------------+------------+-------+-------+-------+-------------------------------+------------\n");
 	}
 	if(filter_unsaved)
 	    contenu->recursive_has_changed_update();
@@ -1465,8 +1465,8 @@ namespace libdar
 	range all_slices;
 	range file_slices;
 
-	get_ui().warning("Slice(s)|[Data ][ EA  ][FSA][Compr][S]|Permission| Filemane");
-	get_ui().warning("--------+-----------------------------+----------+-----------------------------");
+	get_ui().warning("Slice(s)|[Data ][D][ EA  ][FSA][Compr][S]|Permission| Filemane");
+	get_ui().warning("--------+--------------------------------+----------+-----------------------------");
 	reset_read();
 	while(read(e))
 	{
@@ -1668,6 +1668,128 @@ namespace libdar
 	{
 	    delete sub_tree;
 	    sub_tree = nullptr;
+	}
+    }
+
+    void catalogue::transfer_delta_signatures(const pile_descriptor & destination, bool sequential_read, bool build)
+    {
+	const cat_entree *ent = nullptr;
+	const cat_file *ent_file = nullptr;
+	const cat_inode *ent_inode = nullptr;
+	memory_file mem;
+	const crc *my_crc = nullptr;
+
+	if(destination.compr == nullptr || destination.stack == nullptr)
+	    throw SRC_BUG;
+	else
+	{
+	    destination.stack->sync_write_above(destination.compr);
+	    destination.compr->sync_write();
+	    destination.compr->suspend_compression();
+	}
+
+	reset_read();
+	while(read(ent))
+	{
+	    ent_file = dynamic_cast<const cat_file *>(ent);
+	    ent_inode = dynamic_cast<const cat_inode *>(ent);
+
+	    if(ent_file != nullptr)
+	    {
+		cat_file *e_file = const_cast<cat_file *>(ent_file);
+		if(e_file == nullptr)
+		    throw SRC_BUG;
+
+		if(sequential_read && (ent_file->has_delta_signature() || !build))
+		{
+			// here we through data to trash just to grab data CRC
+			// but we need calculate signature if it is not already calculated so we must
+			// not waste data in that case
+
+		    if(e_file->get_saved_status() == s_saved)
+		    {
+			generic_file *dat = e_file->get_data(cat_file::normal, nullptr);
+			if(dat == nullptr)
+			    throw Erange("transfer_delta_signatures", gettext("Can't read saved data."));
+			else
+			    delete dat;
+
+			e_file->get_crc(my_crc);
+		    }
+		}
+
+		if(ent_file->has_delta_signature())
+		{
+		    e_file->read_delta_signature(mem);
+		    e_file->dump_delta_signature(mem, *(destination.compr), false);
+		}
+		else // no delta signature found we must calculate them
+		{
+		    if(e_file->get_saved_status() == s_saved && build)
+		    {
+			null_file trash = gf_write_only;
+			generic_file *data = e_file->get_data(cat_file::plain, &mem);
+
+			if(data == nullptr)
+			    throw SRC_BUG;
+
+			try
+			{
+			    data->copy_to(trash);
+			}
+			catch(...)
+			{
+			    delete data;
+			    throw;
+			}
+			delete data;
+
+			e_file->dump_delta_signature(mem, *(destination.compr), false);
+
+			if(sequential_read)
+			    e_file->get_crc(my_crc);
+		    }
+		}
+	    }
+
+	    if(ent_inode != nullptr && sequential_read)
+	    {
+		    // EA
+
+		if(ent_inode->ea_get_saved_status() == cat_inode::ea_full)
+		{
+		    (void)ent_inode->get_ea();
+		    ent_inode->ea_detach();
+		}
+
+		    // FSA
+
+		if(ent_inode->fsa_get_saved_status() == cat_inode::fsa_full)
+		{
+		    (void)ent_inode->get_fsa();
+		    ent_inode->fsa_detach();
+		}
+	    }
+	}
+    }
+
+    void catalogue::drop_delta_signatures()
+    {
+	const cat_entree *ent = nullptr;
+	const cat_file *ent_file = nullptr;
+
+	reset_read();
+	while(read(ent))
+	{
+	    ent_file = dynamic_cast<const cat_file *>(ent);
+	    if(ent_file != nullptr)
+	    {
+		if(ent_file->has_delta_signature())
+		{
+		    cat_file *e_file = const_cast<cat_file *>(ent_file);
+		    e_file->clear_delta_signature();
+		}
+	    }
 	}
     }
 

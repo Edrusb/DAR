@@ -176,6 +176,7 @@ namespace libdar
 							 options.get_multi_threaded());
 				    // we do not comparing the signatories of the archive of reference with the current archive
 				    // for example the isolated catalogue might be unencrypted and thus not signed
+
 			    }
 			    catch(Euser_abort & e)
 			    {
@@ -229,6 +230,13 @@ namespace libdar
 
 			if(get_layer1_data_name() != get_catalogue_data_name())
 			    throw Erange("archive::archive", gettext("The archive and the isolated catalogue do not correspond to the same data, they are thus incompatible between them"));
+
+			    // we drop delta signature as they refer to the isolated catalogue container/archive
+			    // to avoid having to fetch them at wrong offset from the original archive we created
+			    // this isolated catalogue from. Anyway we do not need them to read an archive, we
+			    // only need delta signatures for archive differential backup, in which case we use the
+			    // original archive *or* the isolated catalogue *alone*
+			cat->drop_delta_signatures();
 		    }
 		    else // no isolated archive to fetch the catalogue from
 		    {
@@ -479,6 +487,7 @@ namespace libdar
 				       options.get_ignore_unknown_inode_type(),
 				       options.get_fsa_scope(),
 				       options.get_multi_threaded(),
+				       options.get_delta_signature(),
 				       progressive_report);
 		    exploitable = false;
 		    stack.terminate();
@@ -722,6 +731,7 @@ namespace libdar
 				     false,
 				     options.get_fsa_scope(),
 				     options.get_multi_threaded(),
+				     false, // delta signatures
 				     st_ptr);
 		    exploitable = false;
 		    stack.terminate();
@@ -1067,7 +1077,7 @@ namespace libdar
 	    }
 	    catch(Erange & e)
 	    {
-		dialog.warning("This archive contains an isolated catalogue, only meta data can be used for comparison, CRC will be used to compare data, but using CRC to compare EA or FSA could return false difference as for both, the CRC is global to the set of attributes and the resulting CRC is sensible to the order the operating system provides these attributes");
+		dialog.warning("This archive contains an isolated catalogue, only meta data can be used for comparison, CRC will be used to compare data of delta signature if present. Warning: Succeeding this comparison does not mean there is no difference as two different files may have the same CRC or the same delta signature");
 		isolated_mode = true;
 	    }
                 // end of sanity checks
@@ -1295,6 +1305,14 @@ namespace libdar
 		if(cat == nullptr)
 		    throw SRC_BUG;
 
+		if(options.get_delta_signature())
+		{
+		    pile_descriptor pdesc = & layers;
+		    cat->transfer_delta_signatures(pdesc, sequential_read, false);
+		}
+		else
+		    cat->drop_delta_signatures();
+
 		if(isol_data_name == cat->get_data_name())
 		    throw SRC_BUG;
 		    // data_name generated just above by slice layer
@@ -1441,6 +1459,7 @@ namespace libdar
 		    ent.set_is_sparse_file(tmp_file->get_sparse_file_detection_read());
 		    ent.set_compression_algo(tmp_file->get_compression_algo_read());
 		    ent.set_dirtiness(tmp_file->is_dirty());
+		    ent.set_delta_sig(tmp_file->has_delta_signature());
 		}
 
 		if(tmp_lien != nullptr && tmp_lien->get_saved_status() == s_saved)
@@ -1712,6 +1731,7 @@ namespace libdar
 				     bool ignore_unknown,
 				     const fsa_scope & scope,
 				     bool multi_threaded,
+				     bool delta_signature,
 				     statistics * progressive_report)
     {
         statistics st = false;  // false => no lock for this internal object
@@ -1861,6 +1881,7 @@ namespace libdar
 			 ignore_unknown,
 			 scope,
 			 multi_threaded,
+			 delta_signature,
 			 st_ptr);
 
 	return *st_ptr;
@@ -1927,6 +1948,7 @@ namespace libdar
 				   bool ignore_unknown,
 				   const fsa_scope & scope,
 				   bool multi_threaded,
+				   bool delta_signature,
 				   statistics * st_ptr)
     {
 	try
@@ -2089,7 +2111,8 @@ namespace libdar
 					      backup_hook_file_mask,
 					      ignore_unknown,
 					      scope,
-					      exclude_by_ea);
+					      exclude_by_ea,
+					      delta_signature);
 			}
 			catch(...)
 			{

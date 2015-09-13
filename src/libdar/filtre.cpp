@@ -42,6 +42,7 @@ extern "C"
 #include "semaphore.hpp"
 #include "deci.hpp"
 #include "cat_all_entrees.hpp"
+#include "null_file.hpp"
 
 using namespace std;
 
@@ -70,6 +71,7 @@ namespace libdar
 			   const infinint & repeat_byte, //< how much byte remains to waste for saving again a changing file
 			   const infinint & hole_size,   //< the threshold for hole detection, set to zero completely disable the sparse file detection mechanism
 			   semaphore * sem,
+			   bool delta_signature,
 			   infinint & new_wasted_bytes); //< new amount of wasted bytes to return to the caller.
 
     static bool save_ea(user_interaction & dialog,
@@ -134,6 +136,16 @@ namespace libdar
 
 	/// overwriting policy when only restoring detruit objects
     static const crit_action *make_overwriting_for_only_deleted(memory_pool *pool);
+
+	/// write down delta signature for unsaved files taking it from entry of reference or computing from filesystem
+    static void save_delta_signature(user_interaction & dialog,
+				     const string & info_quoi,
+				     cat_file * e_file,
+				     const cat_file * ref_file,
+				     const pile_descriptor & pdesc,
+				     bool info_details,
+				     bool display_treated,
+				     const catalogue & cat);
 
     void filtre_restore(user_interaction & dialog,
 			memory_pool *pool,
@@ -518,7 +530,8 @@ namespace libdar
 			   const mask & backup_hook_file_mask,
 			   bool ignore_unknown,
 			   const fsa_scope & scope,
-			   const string & exclude_by_ea)
+			   const string & exclude_by_ea,
+			   bool delta_signature)
     {
         cat_entree *e = nullptr;
         const cat_entree *f = nullptr;
@@ -785,6 +798,10 @@ namespace libdar
 						e_file->change_compression_algo_write(none);
 					}
 
+					if(e_file != nullptr && delta_signature)
+					    e_file->will_have_delta_signature();
+					    // during small inode dump for that file, the flag telling a delta_sig is present will be set
+
 
 					    // PERFORMING ACTION FOR ENTRY (cat_entree dump, eventually data dump)
 
@@ -804,14 +821,29 @@ namespace libdar
 						       repeat_byte,
 						       sparse_file_min_size,
 						       &sem,
+						       delta_signature,
 						       wasted_bytes))
 					    st.incr_tooold(); // counting a new dirty file in archive
-
 
 					st.set_byte_amount(wasted_bytes);
 
 					if(!avoid_saving_inode)
 					    st.incr_treated();
+
+
+					    // PERFORMING ACTION FOR DELTA SIGNATURE (save_inode treats s_saved objects only)
+
+					if(e_file != nullptr
+					   && e_file->has_delta_signature()
+					   && e_file->get_saved_status() != s_saved)
+					    save_delta_signature(dialog,
+								 juillet.get_string(),
+								 e_file,
+								 f_file,
+								 pdesc,
+								 info_details,
+								 display_treated,
+								 cat);
 
 					    // PERFORMING ACTION FOR EA
 
@@ -1251,6 +1283,7 @@ namespace libdar
         const cat_eod tmp_eod;
 	thread_cancellation thr_cancel;
 	string perimeter;
+	memory_file delta_sig;
 
 	if(display_treated_only_dir && display_treated)
 	    display_treated = false;
@@ -1296,6 +1329,7 @@ namespace libdar
                     if(subtree.is_covered(juillet.get_path()) && (e_dir != nullptr || filtre.is_covered(e_nom->get_name())))
                     {
                             // checking data file if any
+
                         if(e_file != nullptr && e_file->get_saved_status() == s_saved)
                         {
 			    perimeter = gettext("Data");
@@ -1305,7 +1339,7 @@ namespace libdar
 
 				do
 				{
-				    generic_file *dat = e_file->get_data(cat_file::normal);
+				    generic_file *dat = e_file->get_data(cat_file::normal, nullptr);
 				    if(dat == nullptr)
 					throw Erange("filtre_test", gettext("Can't read saved data."));
 
@@ -1386,7 +1420,20 @@ namespace libdar
 			    }
                         }
 
+			    // checking delta signature if any
+
+			if(e_file != nullptr && e_file->has_delta_signature())
+			{
+			    e_file->read_delta_signature(delta_sig);
+			    delta_sig.reset();
+			    if(perimeter == "")
+				perimeter = "Delta sig";
+			    else
+				perimeter += " + Delta sig";
+			}
+
                             // checking inode EA if any
+
                         if(e_ino != nullptr && e_ino->ea_get_saved_status() == cat_inode::ea_full)
                         {
 			    if(perimeter == "")
@@ -2476,6 +2523,7 @@ namespace libdar
 				   0,     // repeat_byte
 				   sparse_file_min_size,
 				   nullptr,  // semaphore
+				   false, // delta_signature
 				   fake_repeat))
 			throw SRC_BUG;
 		    else // succeeded saving
@@ -2640,6 +2688,7 @@ namespace libdar
 			   const infinint & repeat_byte,
 			   const infinint & hole_size,
 			   semaphore *sem,
+			   bool delta_signature,
 			   infinint & current_wasted_bytes)
     {
 	bool ret = true;
@@ -2674,8 +2723,9 @@ namespace libdar
 	    {
 		if(sem != nullptr)
 		    sem->raise(info_quoi, ino, false);
-		return ret;
+		return ret;  // <<<<< we exit at this point for inode that have no data to save
 	    }
+
 	    if(compute_crc && (keep_mode != cat_file::normal && keep_mode != cat_file::plain))
 		throw SRC_BUG; // cannot compute crc if data is compressed or hole datastructure not interpreted
 
@@ -2693,6 +2743,8 @@ namespace libdar
 
 	    if(fic != nullptr)
 	    {
+		memory_file *delta_sig = nullptr;
+
 		if(sem != nullptr)
 		    sem->raise(info_quoi, ino, true);
 
@@ -2714,16 +2766,23 @@ namespace libdar
 			    case cat_file::keep_compressed:
 				if(fic->get_compression_algo_read() != fic->get_compression_algo_write())
 				    keep_mode = cat_file::keep_hole;
-				source = fic->get_data(keep_mode);
+				source = fic->get_data(keep_mode, nullptr);
 				break;
 			    case cat_file::keep_hole:
-				source = fic->get_data(keep_mode);
+				source = fic->get_data(keep_mode, nullptr);
 				break;
 			    case cat_file::normal:
+				if(delta_signature)
+				{
+				    delta_sig = new (pool) memory_file();
+				    if(delta_sig == nullptr)
+					throw Ememory("save_inode");
+				}
+
 				if(fic->get_sparse_file_detection_read()) // source file already holds a sparse_file structure
-				    source = fic->get_data(cat_file::plain); // we must hide the holes for it can be redetected
+				    source = fic->get_data(cat_file::plain, delta_sig); // we must hide the holes for it can be redetected
 				else
-				    source = fic->get_data(cat_file::normal);
+				    source = fic->get_data(cat_file::normal, delta_sig);
 				break;
 			    case cat_file::plain:
 				throw SRC_BUG; // save_inode must never be called with this value
@@ -3017,6 +3076,22 @@ namespace libdar
 			    if(!alter_atime)
 				tools_noexcept_make_date(info_quoi, false, ino->get_last_access(), ino->get_last_modif(), ino->get_last_modif());
 
+				//////////////////////////////
+				// dropping delta signature if present
+
+			    if(delta_sig != nullptr && !loop)
+			    {
+				if(display_treated)
+				    dialog.warning(string(gettext("Calculating delta signature for saved file: ")) + info_quoi);
+
+				    // adding a tape mark when in sequential read mode
+				cat.pre_add_delta_sig();
+				pdesc.compr->suspend_compression();
+
+				    // dropping the data to the archive and recording its location in the cat_file object
+				fic->dump_delta_signature(*delta_sig, *(pdesc.compr), pdesc.esc != nullptr);
+			    }
+
 			}
 			else
 			    throw SRC_BUG; // saved_status == s_saved, but no data available, and no exception raised;
@@ -3027,10 +3102,14 @@ namespace libdar
 		{
 		    if(sem != nullptr)
 			sem->lower();
+		    if(delta_sig != nullptr)
+			delete delta_sig;
 		    throw;
 		}
 		if(sem != nullptr)
 		    sem->lower();
+		if(delta_sig != nullptr)
+		    delete delta_sig;
 	    }
 	    else // fic == nullptr
 		if(sem != nullptr)
@@ -3709,6 +3788,66 @@ namespace libdar
 	    throw Ememory("make_overwriting_fir_only_deleted");
 
 	return ret;
+    }
+
+    static void save_delta_signature(user_interaction & dialog,
+				     const string & info_quoi,
+				     cat_file * e_file,
+				     const cat_file * ref_file,
+				     const pile_descriptor & pdesc,
+				     bool info_details,
+				     bool display_treated,
+				     const catalogue & cat)
+    {
+	if(e_file != nullptr
+	   && e_file->has_delta_signature()
+	   && e_file->get_saved_status() != s_saved)
+	{
+	    memory_file sig;
+
+		// save_inode could not calculate and add delta sig we must do
+		// it here either copying from the archive of reference
+	    if(ref_file != nullptr
+	       && ref_file->has_delta_signature())
+	    {
+		if(display_treated)
+		    dialog.warning(string(gettext("Copying delta signature from the archive of reference: ")) + info_quoi);
+		ref_file->read_delta_signature(sig);
+	    }
+	    else // or calculating from filesystem
+	    {
+		null_file trou_noir(gf_write_only);
+		generic_file *data = nullptr;
+		saved_status tmp = e_file->get_saved_status();
+
+		if(display_treated)
+		    dialog.warning(string(gettext("Calculating delta signature from filesystem: "))
+				   + info_quoi);
+
+		e_file->set_saved_status(s_saved); // temporarily to have get_data() operationnal
+		try
+		{
+		    data = e_file->get_data(cat_file::normal, &sig);
+		    if(data == nullptr)
+			throw Ememory("filtre_sauvegarde");
+		    data->copy_to(trou_noir);
+		}
+		catch(...)
+		{
+		    if(data != nullptr)
+			delete data;
+		    e_file->set_saved_status(tmp);
+		    throw;
+		}
+		if(data != nullptr)
+		    delete data;
+		e_file->set_saved_status(tmp);
+	    }
+
+	    cat.pre_add_delta_sig();
+	    pdesc.compr->suspend_compression();
+	    e_file->dump_delta_signature(sig, *(pdesc.compr), pdesc.esc != nullptr);
+	}
     }
 
 } // end of namespace

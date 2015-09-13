@@ -338,6 +338,8 @@ namespace libdar
 		throw Ememory("archive_options_create::clear");
 	    x_scope = all_fsa_families();
 	    x_multi_threaded = true;
+	    x_delta_diff = false;
+	    x_delta_signature = false;
 	}
 	catch(...)
 	{
@@ -554,6 +556,8 @@ namespace libdar
 	    throw Ememory("archive_options_create::copy_from");
 	x_scope = ref.x_scope;
 	x_multi_threaded = ref.x_multi_threaded;
+	x_delta_diff = ref.x_delta_diff;
+	x_delta_signature = ref.x_delta_signature;
     }
 
 
@@ -594,6 +598,7 @@ namespace libdar
 	    if(x_entrepot == nullptr)
 		throw Ememory("archive_options_isolate::clear");
 	    x_multi_threaded = true;
+	    x_delta_signature = false;
 	}
 	catch(...)
 	{
@@ -652,6 +657,7 @@ namespace libdar
 	if(x_entrepot == nullptr)
 	    throw Ememory("archive_options_isolate::copy_from");
 	x_multi_threaded = ref.x_multi_threaded;
+	x_delta_signature = ref.x_delta_signature;
     }
 
 

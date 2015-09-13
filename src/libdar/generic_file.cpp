@@ -110,6 +110,32 @@ namespace libdar
 	ceci->terminated = true;
     }
 
+    bool generic_file::operator == (generic_file & ref)
+    {
+	bool ret = true;
+	char buffer_me[BUFFER_SIZE];
+	char buffer_ref[BUFFER_SIZE];
+	U_I lu_me;
+	U_I lu_ref;
+
+	skip(0);
+	ref.skip(0);
+
+	do
+	{
+	    lu_me = read(buffer_me, BUFFER_SIZE);
+	    lu_ref = ref.read(buffer_ref, BUFFER_SIZE);
+	    if(lu_me != lu_ref)
+		ret = false;
+	    else
+		for(U_I i = 0; i < lu_me && ret; ++i)
+		    ret = buffer_me[i] == buffer_ref[i];
+	}
+	while(lu_me != 0 && ret);
+
+	return ret;
+    }
+
     void generic_file::read_ahead(const infinint & amount)
     {
 	if(terminated)

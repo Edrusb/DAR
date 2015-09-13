@@ -86,7 +86,8 @@ namespace libdar
 	    seqt_dirty,           //< placed after data CRC if file is dirty
 	    seqt_failed_backup,   //< placed after inode information if the file could not be openned at backup time
 	    seqt_fsa,             //< placed before FSA data
-	    seqt_fsa_crc          //< place before the CRC of file's FSA
+	    seqt_fsa_crc,         //< place before the CRC of file's FSA
+	    seqt_delta_sig        //< place before the delta signature of a file
 	};
 
 	    // the archive layout of marks is for each entry:
@@ -115,8 +116,8 @@ namespace libdar
 
 	    /// \param[in] t type of mark to skip to
 	    /// \param[in] jump if set to false, do not jump over *any* mark, even those not set as unjumpable mark,
-	    /// set it to true, to allow jumping on mark except those defined as unjumpable marks
-	    /// \return true of could skip to mark of type t
+	    /// set it to true, to allow jumping over marks except those defined as unjumpable marks
+	    /// \return true if could skip to mark of type t
 	bool skip_to_next_mark(sequence_type t, bool jump);
 	bool next_to_read_is_mark(sequence_type t);
 	bool next_to_read_is_which_mark(sequence_type & t);
