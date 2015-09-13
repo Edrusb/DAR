@@ -1193,8 +1193,6 @@ namespace libdar
 		    {
 			    // generating random key for symmetric encryption
 
-			char variable_size;
-
 			if(info_details)
 			    dialog.warning(gettext("Generating random key for symmetric encryption..."));
 
