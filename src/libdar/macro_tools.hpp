@@ -206,7 +206,6 @@ namespace libdar
 	/// \param[in]  pass password/passphrase to use for encryption
 	/// \param[in]  crypto_size size of crypto blocks
 	/// \param[in]  gnupg_recipients list of email recipients'public keys to encrypt a randomly chosen key with
-	/// \param[in]  gnupg_key_size size of the randomly chosen key that will be encrypted using gnupg inside the archive
 	/// \param[in]  gnupg_signatories list of email which associated signature has to be used to sign the archive
 	/// \param[in]  empty dry-run execution (null_file at bottom of the stack)
 	/// \param[in]  slice_permission permission to set the slices to
