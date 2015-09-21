@@ -327,6 +327,9 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    merge_options.set_slice_min_digits(param.num_digits);
 		    merge_options.set_fsa_scope(param.scope);
 		    merge_options.set_multi_threaded(param.multi_threaded);
+		    merge_options.set_delta_signature(param.delta_sig);
+		    if(param.delta_mask != nullptr)
+			merge_options.set_delta_mask(*param.delta_mask);
 
 		    cur = new (nothrow) archive(dialog,  // user_interaction &
 						*param.sauv_root,  //const path &
