@@ -43,9 +43,14 @@ namespace libdar
 	    return cat_file::operator == (ref);
     }
 
-    generic_file *cat_door::get_data(get_data_mode mode) const
+    generic_file *cat_door::get_data(get_data_mode mode,
+	memory_file *delta_sig) const
     {
 	generic_file *ret = nullptr;
+
+	    // we never calculate delta signature for door inode
+	if(delta_sig != nullptr)
+	    delta_sig->reset();
 
 	if(status == from_path)
 	{
