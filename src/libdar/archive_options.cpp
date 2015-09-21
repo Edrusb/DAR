@@ -242,7 +242,7 @@ namespace libdar
 
     archive_options_create::archive_options_create()
     {
-	x_selection = x_subtree = x_ea_mask = x_compr_mask = x_backup_hook_file_mask = nullptr;
+	x_selection = x_subtree = x_ea_mask = x_compr_mask = x_backup_hook_file_mask = x_delta_mask = nullptr;
 	x_entrepot = nullptr;
 	try
 	{
@@ -257,7 +257,7 @@ namespace libdar
 
     archive_options_create::archive_options_create(const archive_options_create & ref)
     {
-	x_selection = x_subtree = x_ea_mask = x_compr_mask = x_backup_hook_file_mask = nullptr;
+	x_selection = x_subtree = x_ea_mask = x_compr_mask = x_backup_hook_file_mask = x_delta_mask = nullptr;
 	x_entrepot = nullptr;
 	try
 	{
@@ -283,6 +283,7 @@ namespace libdar
 	    archive_option_clean_mask(x_ea_mask, get_pool());
 	    archive_option_clean_mask(x_compr_mask, get_pool());
 	    archive_option_clean_mask(x_backup_hook_file_mask, get_pool(), false);
+	    archive_option_clean_mask(x_delta_mask, get_pool());
 	    x_ref_arch = nullptr;
 	    x_allow_over = true;
 	    x_warn_over = true;
@@ -340,6 +341,7 @@ namespace libdar
 	    x_multi_threaded = true;
 	    x_delta_diff = false;
 	    x_delta_signature = false;
+	    has_delta_mask_been_set = false;
 	}
 	catch(...)
 	{
@@ -452,6 +454,25 @@ namespace libdar
 	    throw Ememory("archive_options_create::set_entrepot");
     }
 
+    void archive_options_create::set_delta_mask(const mask & delta_mask)
+    {
+	NLS_SWAP_IN;
+	try
+	{
+	    archive_option_destroy_mask(x_delta_mask);
+	    x_delta_mask = delta_mask.clone();
+	    if(x_delta_mask == nullptr)
+		throw Ememory("archive_options_create::set_delta_mask");
+	    has_delta_mask_been_set = true;
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }
+
     void archive_options_create::destroy()
     {
 	NLS_SWAP_IN;
@@ -462,6 +483,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_ea_mask);
 	    archive_option_destroy_mask(x_compr_mask);
 	    archive_option_destroy_mask(x_backup_hook_file_mask);
+	    archive_option_destroy_mask(x_delta_mask);
 	    if(x_entrepot != nullptr)
 	    {
 		delete x_entrepot;
@@ -484,6 +506,7 @@ namespace libdar
 	x_compr_mask = nullptr;
 	x_backup_hook_file_mask = nullptr;
 	x_entrepot = nullptr;
+	x_delta_mask = nullptr;
 
 	if(ref.x_selection == nullptr)
 	    throw SRC_BUG;
@@ -558,12 +581,44 @@ namespace libdar
 	x_multi_threaded = ref.x_multi_threaded;
 	x_delta_diff = ref.x_delta_diff;
 	x_delta_signature = ref.x_delta_signature;
+	x_delta_mask = ref.x_delta_mask->clone();
+	has_delta_mask_been_set = ref.has_delta_mask_been_set;
     }
 
 
 	/////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////
+
+    archive_options_isolate::archive_options_isolate()
+    {
+	x_entrepot = nullptr;
+	x_delta_mask = nullptr;
+	try
+	{
+	    clear();
+	}
+	catch(...)
+	{
+	    destroy();
+	    throw;
+	}
+    }
+
+    archive_options_isolate::archive_options_isolate(const archive_options_isolate & ref)
+    {
+	x_entrepot = nullptr;
+	x_delta_mask = nullptr;
+	try
+	{
+	    copy_from(ref);
+	}
+	catch(...)
+	{
+	    destroy();
+	    throw;
+	}
+    };
 
     void archive_options_isolate::clear()
     {
@@ -599,6 +654,8 @@ namespace libdar
 		throw Ememory("archive_options_isolate::clear");
 	    x_multi_threaded = true;
 	    x_delta_signature = false;
+	    archive_option_clean_mask(x_delta_mask, get_pool());
+	    has_delta_mask_been_set = false;
 	}
 	catch(...)
 	{
@@ -618,8 +675,28 @@ namespace libdar
 	    throw Ememory("archive_options_isolate::set_entrepot");
     }
 
+    void archive_options_isolate::set_delta_mask(const mask & delta_mask)
+    {
+	NLS_SWAP_IN;
+	try
+	{
+	    archive_option_destroy_mask(x_delta_mask);
+	    x_delta_mask = delta_mask.clone();
+	    if(x_delta_mask == nullptr)
+		throw Ememory("archive_options_create::set_delta_mask");
+	    has_delta_mask_been_set = true;
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }
+
     void archive_options_isolate::destroy()
     {
+	archive_option_destroy_mask(x_delta_mask);
 	if(x_entrepot != nullptr)
 	{
 	    delete x_entrepot;
@@ -658,6 +735,8 @@ namespace libdar
 	    throw Ememory("archive_options_isolate::copy_from");
 	x_multi_threaded = ref.x_multi_threaded;
 	x_delta_signature = ref.x_delta_signature;
+	x_delta_mask = ref.x_delta_mask->clone();
+	has_delta_mask_been_set = ref.has_delta_mask_been_set;
     }
 
 

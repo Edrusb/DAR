@@ -77,8 +77,8 @@ $ + key for auxilliary refence archive   --aux-key
 / + policy to solve overwriting conflict --overwriting-policy
 ^ + ownership and permission of generated slices --slice-mode
 _ + retry on change                      --retry-on-change <count[:max byte]>
-{ !
-} !
+{ + include files for delta signature	 --include-delta-sig
+} + exclude files for delta signature    --exclude-delta-sig
 0 * sequential read of the archive       --sequential-read
 1 + sparse-file detection tunning        --sparse-file-min-size <int>
 2 + dirty file behavior                  --dirty-behavior {ignore|no-warn}
