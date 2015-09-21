@@ -1671,13 +1671,17 @@ namespace libdar
 	}
     }
 
-    void catalogue::transfer_delta_signatures(const pile_descriptor & destination, bool sequential_read, bool build)
+    void catalogue::transfer_delta_signatures(const pile_descriptor & destination,
+					      bool sequential_read,
+					      bool build,
+					      const mask & delta_mask)
     {
 	const cat_entree *ent = nullptr;
 	const cat_file *ent_file = nullptr;
 	const cat_inode *ent_inode = nullptr;
 	memory_file mem;
 	const crc *my_crc = nullptr;
+	defile juillet = FAKE_ROOT;
 
 	if(destination.compr == nullptr || destination.stack == nullptr)
 	    throw SRC_BUG;
@@ -1694,17 +1698,20 @@ namespace libdar
 	    ent_file = dynamic_cast<const cat_file *>(ent);
 	    ent_inode = dynamic_cast<const cat_inode *>(ent);
 
+	    juillet.enfile(ent);
+
 	    if(ent_file != nullptr)
 	    {
 		cat_file *e_file = const_cast<cat_file *>(ent_file);
 		if(e_file == nullptr)
 		    throw SRC_BUG;
 
-		if(sequential_read && (ent_file->has_delta_signature() || !build))
+		if(sequential_read
+		   && (ent_file->has_delta_signature() || !build || !delta_mask.is_covered(juillet.get_string())))
 		{
-			// here we through data to trash just to grab data CRC
-			// but we need calculate signature if it is not already calculated so we must
-			// not waste data in that case
+			// here we throw data to trash just to grab data CRC
+			// except when we need calculate signature when is not
+			// already calculated and we have to calculate it
 
 		    if(e_file->get_saved_status() == s_saved)
 		    {
@@ -1720,34 +1727,42 @@ namespace libdar
 
 		if(ent_file->has_delta_signature())
 		{
-		    e_file->read_delta_signature(mem);
-		    e_file->dump_delta_signature(mem, *(destination.compr), false);
+		    if(!build || delta_mask.is_covered(juillet.get_string()))
+		    {
+			e_file->read_delta_signature(mem);
+			e_file->dump_delta_signature(mem, *(destination.compr), false);
+		    }
+		    else
+			e_file->clear_delta_signature();
 		}
 		else // no delta signature found we must calculate them
 		{
-		    if(e_file->get_saved_status() == s_saved && build)
+		    if(build && delta_mask.is_covered(juillet.get_string()))
 		    {
-			null_file trash = gf_write_only;
-			generic_file *data = e_file->get_data(cat_file::plain, &mem);
-
-			if(data == nullptr)
-			    throw SRC_BUG;
-
-			try
+			if(e_file->get_saved_status() == s_saved)
 			{
-			    data->copy_to(trash);
-			}
-			catch(...)
-			{
+			    null_file trash = gf_write_only;
+			    generic_file *data = e_file->get_data(cat_file::plain, &mem);
+
+			    if(data == nullptr)
+				throw SRC_BUG;
+
+			    try
+			    {
+				data->copy_to(trash);
+			    }
+			    catch(...)
+			    {
+				delete data;
+				throw;
+			    }
 			    delete data;
-			    throw;
+
+			    e_file->dump_delta_signature(mem, *(destination.compr), false);
+
+			    if(sequential_read)
+				e_file->get_crc(my_crc);
 			}
-			delete data;
-
-			e_file->dump_delta_signature(mem, *(destination.compr), false);
-
-			if(sequential_read)
-			    e_file->get_crc(my_crc);
 		    }
 		}
 	    }

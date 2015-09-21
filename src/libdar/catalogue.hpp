@@ -239,10 +239,12 @@ namespace libdar
 	    /// \param[in] destination where to drop delta signatures
 	    /// \param[in] sequential_read whether we read the archive in sequential mode
 	    /// \param[in] build if set and delta signature is not present but data is available for a file, calculate the delta sig
+	    /// \param[in] delta_mask defines what files to calculate delta signature for when build is set to true
 	    /// \note this method relies on reset_read() and read()
 	void transfer_delta_signatures(const pile_descriptor & destination,
 				       bool sequential_read,
-				       bool build);
+				       bool build,
+				       const mask & delta_mask);
 
 	    /// remove delta signature from the catalogue object as if they had never been calculated
 	void drop_delta_signatures();

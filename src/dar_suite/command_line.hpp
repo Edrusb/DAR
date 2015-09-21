@@ -139,6 +139,7 @@ struct line_param
     fsa_scope scope;              //< FSA scope to consider for the operation
     bool multi_threaded;          //< allows libdar to use multiple threads (requires libthreadar)
     bool delta_sig;               //< whether to calculate rsync signature of files
+    mask *delta_mask;             //< which file to calculate delta sig when not using the default mask
     bool delta_diff;              //< whether to save binary diff or whole file's data during a differential backup
 
 	// constructor for line_param

@@ -560,7 +560,7 @@ namespace libdar
 	bool get_multi_threaded() const { return x_multi_threaded; };
 	bool get_delta_diff() const { return x_delta_diff; };
 	bool get_delta_signature() const { return x_delta_signature; };
-	bool get_delta_mask() const { return x_delta_mask; }
+	const mask & get_delta_mask() const { return *x_delta_mask; }
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
 
     private:
@@ -770,7 +770,7 @@ namespace libdar
 	const entrepot & get_entrepot() const { if(x_entrepot == nullptr) throw SRC_BUG; return *x_entrepot; };
 	bool get_multi_threaded() const { return x_multi_threaded; };
 	bool get_delta_signature() const { return x_delta_signature; };
-	bool get_delta_mask() const { return x_delta_mask; }
+	const mask & get_delta_mask() const { return *x_delta_mask; }
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
 
     private:

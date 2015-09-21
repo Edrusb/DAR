@@ -1308,7 +1308,9 @@ namespace libdar
 		if(options.get_delta_signature())
 		{
 		    pile_descriptor pdesc = & layers;
-		    cat->transfer_delta_signatures(pdesc, sequential_read, false);
+		    cat->transfer_delta_signatures(pdesc, sequential_read,
+						   options.get_has_delta_mask_been_set(),
+						   options.get_delta_mask());
 		}
 		else
 		    cat->drop_delta_signatures();

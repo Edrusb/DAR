@@ -275,6 +275,9 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    if(param.backup_hook_mask != nullptr)
 			create_options.set_backup_hook(param.backup_hook_execute, *param.backup_hook_mask);
 		    create_options.set_ignore_unknown_inode_type(param.ignore_unknown_inode);
+		    if(param.delta_mask != nullptr)
+			create_options.set_delta_mask(*param.delta_mask);
+
 		    cur = new (nothrow) archive(dialog, *param.fs_root, *param.sauv_root, param.filename, EXTENSION,
 						create_options,
 						&st);
@@ -413,6 +416,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    isolate_options.set_sequential_marks(param.use_sequential_marks);
 			    isolate_options.set_multi_threaded(param.multi_threaded);
 			    isolate_options.set_delta_signature(param.delta_sig);
+			    if(param.delta_mask != nullptr)
+				isolate_options.set_delta_mask(*param.delta_mask);
 
 			    cur->op_isolate(dialog,
 					    *param.aux_root,
@@ -488,6 +493,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		isolate_options.set_sequential_marks(param.use_sequential_marks);
 		isolate_options.set_multi_threaded(param.multi_threaded);
 		isolate_options.set_delta_signature(param.delta_sig);
+		if(param.delta_mask != nullptr)
+		    isolate_options.set_delta_mask(*param.delta_mask);
 
                 arch->op_isolate(dialog,
 				 *param.sauv_root,

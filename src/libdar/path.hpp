@@ -34,7 +34,9 @@
 #include "erreurs.hpp"
 #include "on_pool.hpp"
 
-#define FAKE_ROOT path(string("<ROOT>"), true)
+const std::string PSEUDO_ROOT = "<ROOT>";
+
+#define FAKE_ROOT path(PSEUDO_ROOT, true)
 
 namespace libdar
 {

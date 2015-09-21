@@ -90,7 +90,7 @@ extern "C"
 #include "criterium.hpp"
 #include "fichier_local.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::7:8:"
+#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::7:8:{:}:"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c option"
@@ -132,7 +132,6 @@ static const U_I sparse_file_min_size_default = 15;
 static const char * AUXILIARY_TARGET = "auxiliary";
 static const char * REFERENCE_TARGET = "reference";
 
-    // return a newly allocated memory (to be deleted by the caller)
 static void show_license(shell_interaction & dialog);
 static void show_warranty(shell_interaction & dialog);
 static void show_version(shell_interaction & dialog, const char *command_name);
@@ -171,6 +170,7 @@ struct recursive_param
     bool detruire;
     bool no_inter;
     vector<string> read_targets; // list of not found uset targets so far
+    deque<pre_mask> path_delta_include_exclude;
 
     recursive_param(shell_interaction & x_dialog,
                     const char *x_home,
@@ -330,6 +330,7 @@ bool get_args(shell_interaction & dialog,
     p.scope = all_fsa_families();
     p.multi_threaded = true;
     p.delta_sig = false;
+    p.delta_mask = nullptr;
     p.delta_diff = false;
 
     try
@@ -573,12 +574,12 @@ bool get_args(shell_interaction & dialog,
             p.subtree = make_ordered_mask(rec.path_include_exclude,
                                           &make_include_path,
                                           &make_exclude_path_ordered,
-                                          p.op != test && p.op != merging && p.op != listing ? tools_relative2absolute_path(*p.fs_root, tools_getcwd()) : "<ROOT>");
+                                          p.op != test && p.op != merging && p.op != listing ? tools_relative2absolute_path(*p.fs_root, tools_getcwd()) : PSEUDO_ROOT);
         else // unordered filters
             p.subtree = make_unordered_mask(rec.path_include_exclude,
                                             &make_include_path,
                                             &make_exclude_path_unordered,
-                                            p.op != test && p.op != merging && p.op != listing ? tools_relative2absolute_path(*p.fs_root, tools_getcwd()) : "<ROOT>");
+                                            p.op != test && p.op != merging && p.op != listing ? tools_relative2absolute_path(*p.fs_root, tools_getcwd()) : PSEUDO_ROOT);
 
 
             ////////////////////////////////
@@ -664,6 +665,25 @@ bool get_args(shell_interaction & dialog,
                                                              &make_exclude_path_unordered,
                                                              tools_relative2absolute_path(*p.fs_root, tools_getcwd()));
 
+
+	    ////////////////////////////////
+            // generating mask for
+            // delta signatures
+            //
+
+	if(rec.path_delta_include_exclude.size() > 0)
+	{
+	    if(rec.ordered_filters)
+		p.delta_mask = make_ordered_mask(rec.path_delta_include_exclude,
+						 &make_exclude_path_unordered, // no mistake here about *exclude*, nor *unordered*
+						 &make_exclude_path_unordered, // no mistake here about *exclude*, nor *unordered*
+						 p.op != test && p.op != merging && p.op != listing ? tools_relative2absolute_path(*p.fs_root, tools_getcwd()) : PSEUDO_ROOT);
+	    else // unordered filters
+		p.delta_mask = make_unordered_mask(rec.path_delta_include_exclude,
+						   &make_exclude_path_unordered, // no mistake here about *exclude*
+						   &make_exclude_path_unordered, // no mistake here about *exclude*
+						   p.op != test && p.op != merging && p.op != listing ? tools_relative2absolute_path(*p.fs_root, tools_getcwd()) : PSEUDO_ROOT);
+	}
 
             ////////////////////////////////
             // overwriting policy
@@ -1698,6 +1718,26 @@ static bool get_args_recursive(recursive_param & rec,
 		else
 		    throw Erange("get_args", string(gettext("Unknown parameter given to --delta option: ")) + optarg);
 		break;
+	    case '{':
+		if(optarg == nullptr)
+		    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                tmp_pre_mask.file_listing = false;
+                tmp_pre_mask.case_sensit = rec.case_sensit;
+                tmp_pre_mask.included = true;
+                tmp_pre_mask.mask = string(optarg);
+                tmp_pre_mask.glob_exp = rec.glob_mode;
+                rec.path_delta_include_exclude.push_back(tmp_pre_mask);
+                break;
+	    case '}':
+		if(optarg == nullptr)
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                tmp_pre_mask.file_listing = false;
+                tmp_pre_mask.case_sensit = rec.case_sensit;
+                tmp_pre_mask.included = false;
+                tmp_pre_mask.mask = string(optarg);
+                tmp_pre_mask.glob_exp = rec.glob_mode;
+                rec.path_delta_include_exclude.push_back(tmp_pre_mask);
+                break;
             case ':':
                 throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(optopt)));
             case '?':
@@ -2275,6 +2315,8 @@ const struct option *get_long_opt()
         {"sign", required_argument, nullptr, '7'},
         {"single-thread", no_argument, nullptr, 'G'},
 	{"delta", required_argument, nullptr, '8'},
+	{"include-delta-sig", required_argument, nullptr, '{'},
+	{"exclude-delta-sig", required_argument, nullptr, '}'},
         { nullptr, 0, nullptr, 0 }
     };
 
