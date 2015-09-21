@@ -102,7 +102,8 @@ namespace libdar
 				  bool ignore_unknown,
 				  const fsa_scope & scope,
 				  const std::string & exclude_by_ea,
-				  bool delta_signature);
+				  bool delta_signature,
+				  const mask & delta_mask);
 
     extern void filtre_difference(user_interaction & dialog,
 				  memory_pool *pool,

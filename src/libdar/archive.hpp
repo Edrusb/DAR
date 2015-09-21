@@ -420,6 +420,7 @@ namespace libdar
 				const fsa_scope & scope,
 				bool multi_threaded,
 				bool delta_signature,
+				const mask & delta_mask,
 				statistics * progressive_report);
 
 	void op_create_in_sub(user_interaction & dialog,        //< interaction with user
@@ -484,6 +485,7 @@ namespace libdar
 			      const fsa_scope & scope,                    //< FSA scope for the operation
 			      bool multi_threaded,              //< whether libdar is allowed to spawn several thread to possibily work faster on multicore CPU
 			      bool delta_signature,             //< whether to calculate and store binary delta signature for each saved file
+			      const mask & delta_mask,          //< which files to consider delta signature for
 			      statistics * st_ptr);             //< statistics must not be nullptr !
 
 	void disable_natural_destruction();

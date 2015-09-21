@@ -488,6 +488,7 @@ namespace libdar
 				       options.get_fsa_scope(),
 				       options.get_multi_threaded(),
 				       options.get_delta_signature(),
+				       options.get_delta_mask(),
 				       progressive_report);
 		    exploitable = false;
 		    stack.terminate();
@@ -732,6 +733,7 @@ namespace libdar
 				     options.get_fsa_scope(),
 				     options.get_multi_threaded(),
 				     false, // delta signatures
+				     bool_mask(true), // delta_mask
 				     st_ptr);
 		    exploitable = false;
 		    stack.terminate();
@@ -1734,6 +1736,7 @@ namespace libdar
 				     const fsa_scope & scope,
 				     bool multi_threaded,
 				     bool delta_signature,
+				     const mask & delta_mask,
 				     statistics * progressive_report)
     {
         statistics st = false;  // false => no lock for this internal object
@@ -1884,6 +1887,7 @@ namespace libdar
 			 scope,
 			 multi_threaded,
 			 delta_signature,
+			 delta_mask,
 			 st_ptr);
 
 	return *st_ptr;
@@ -1951,6 +1955,7 @@ namespace libdar
 				   const fsa_scope & scope,
 				   bool multi_threaded,
 				   bool delta_signature,
+				   const mask & delta_mask,
 				   statistics * st_ptr)
     {
 	try
@@ -2114,7 +2119,8 @@ namespace libdar
 					      ignore_unknown,
 					      scope,
 					      exclude_by_ea,
-					      delta_signature);
+					      delta_signature,
+					      delta_mask);
 			}
 			catch(...)
 			{

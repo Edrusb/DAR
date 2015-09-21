@@ -531,7 +531,8 @@ namespace libdar
 			   bool ignore_unknown,
 			   const fsa_scope & scope,
 			   const string & exclude_by_ea,
-			   bool delta_signature)
+			   bool delta_signature,
+			   const mask & delta_mask)
     {
         cat_entree *e = nullptr;
         const cat_entree *f = nullptr;
@@ -798,7 +799,7 @@ namespace libdar
 						e_file->change_compression_algo_write(none);
 					}
 
-					if(e_file != nullptr && delta_signature)
+					if(e_file != nullptr && delta_signature && delta_mask.is_covered(juillet.get_string()))
 					    e_file->will_have_delta_signature();
 					    // during small inode dump for that file, the flag telling a delta_sig is present will be set
 
@@ -821,7 +822,7 @@ namespace libdar
 						       repeat_byte,
 						       sparse_file_min_size,
 						       &sem,
-						       delta_signature,
+						       e_file == nullptr ? false : e_file->has_delta_signature(),
 						       wasted_bytes))
 					    st.incr_tooold(); // counting a new dirty file in archive
 
