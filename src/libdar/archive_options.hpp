@@ -817,7 +817,7 @@ namespace libdar
     {
     public:
 
-	archive_options_merge() { x_selection = x_subtree = x_ea_mask = x_compr_mask = nullptr; x_overwrite = nullptr; x_entrepot = nullptr; clear(); };
+	archive_options_merge() { x_selection = x_subtree = x_ea_mask = x_compr_mask = x_delta_mask = nullptr; x_overwrite = nullptr; x_entrepot = nullptr; clear(); };
 	archive_options_merge(const archive_options_merge & ref) { copy_from(ref); };
 	const archive_options_merge & operator = (const archive_options_merge & ref) { destroy(); copy_from(ref); return *this; };
 	~archive_options_merge() { destroy(); };
@@ -958,6 +958,12 @@ namespace libdar
 	    /// whether libdar is allowed to spawn several threads to possibily work faster on multicore CPU (requires libthreadar)
 	void set_multi_threaded(bool val) { x_multi_threaded = val; };
 
+	    /// whether signature to base binary delta on the future has to be calculated and stored beside saved files
+	void set_delta_signature(bool val) { x_delta_signature = val; };
+
+	    /// whether to derogate to defaut delta file consideration while calculation delta signatures
+	void set_delta_mask(const mask & delta_mask);
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -1001,6 +1007,9 @@ namespace libdar
 	const entrepot & get_entrepot() const { if(x_entrepot == nullptr) throw SRC_BUG; return *x_entrepot; };
 	const fsa_scope & get_fsa_scope() const { return x_scope; };
 	bool get_multi_threaded() const { return x_multi_threaded; };
+	bool get_delta_signature() const { return x_delta_signature; };
+	const mask & get_delta_mask() const { return *x_delta_mask; }
+	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
 
     private:
 	archive * x_ref;    //< points to an external existing object, must never be deleted by "this"
@@ -1042,6 +1051,9 @@ namespace libdar
 	entrepot *x_entrepot;
 	fsa_scope x_scope;
 	bool x_multi_threaded;
+	bool x_delta_signature;
+	mask *x_delta_mask;
+	bool has_delta_mask_been_set;
 
 	void destroy();
 	void copy_from(const archive_options_merge & ref);
