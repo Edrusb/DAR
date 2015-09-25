@@ -2458,8 +2458,6 @@ namespace libdar
 
 			// saving inode's data
 
-		    cat.pre_add(e);
-
 		    if(!save_inode(dialog,
 				   pool,
 				   juillet.get_string(),
