@@ -71,7 +71,7 @@ namespace libdar
 			   const infinint & repeat_byte, //< how much byte remains to waste for saving again a changing file
 			   const infinint & hole_size,   //< the threshold for hole detection, set to zero completely disable the sparse file detection mechanism
 			   semaphore * sem,
-			   bool delta_signature,
+			   bool delta_signature,  //< if set, lead to delta signature to be computed, if false and delta signature already exists it is saved (which in case of merging leads to transfering it in the resulting archive)
 			   infinint & new_wasted_bytes); //< new amount of wasted bytes to return to the caller.
 
     static bool save_ea(user_interaction & dialog,
@@ -1538,7 +1538,10 @@ namespace libdar
 		      bool warn_overwrite,
 		      bool decremental_mode,
 		      const infinint & sparse_file_min_size,
-		      const fsa_scope & scope)
+		      const fsa_scope & scope,
+		      bool delta_signature,
+		      bool build_delta_sig,
+		      const mask & delta_mask)
     {
 	compression stock_algo;
 
@@ -2413,7 +2416,7 @@ namespace libdar
 
 	    // STEP 2:
 	    // 'cat' is now completed
-	    // we must copy the file's data, EA and FSA to the archive
+	    // we must copy the file's data, delta sig, EA and FSA to the archive
 
 
 	if(info_details)
@@ -2504,6 +2507,40 @@ namespace libdar
 			    e_file->set_sparse_file_detection_write(e_file->get_sparse_file_detection_read());
 		    }
 
+			// deciding whether we calculate (not just transfer) delta signature
+
+		    bool calculate_delta_signature = false;
+
+		    if(e_file != nullptr)
+		    {
+			if(!delta_signature)
+			{
+			    if(e_file->has_delta_signature())
+				e_file->clear_delta_signature();
+			}
+			else
+			{
+			    if(build_delta_sig
+			       && (keep_mode == cat_file::normal || !e_file->get_sparse_file_detection_read()))
+			    {
+				if(delta_mask.is_covered(juillet.get_string()))
+				{
+				    if(!e_file->has_delta_signature())
+				    {
+					e_file->will_have_delta_signature();
+					calculate_delta_signature = true;
+				    }
+				}
+				else
+				{
+				    if(e_file->has_delta_signature())
+					e_file->clear_delta_signature();
+				}
+			    }
+				// else nothing to do, save_inode will transfer the delta signature if present
+			}
+		    }
+
 			// saving inode's data
 
 		    cat.pre_add(e);
@@ -2524,7 +2561,7 @@ namespace libdar
 				   0,     // repeat_byte
 				   sparse_file_min_size,
 				   nullptr,  // semaphore
-				   false, // delta_signature
+				   calculate_delta_signature,
 				   fake_repeat))
 			throw SRC_BUG;
 		    else // succeeded saving
@@ -3078,12 +3115,23 @@ namespace libdar
 				tools_noexcept_make_date(info_quoi, false, ino->get_last_access(), ino->get_last_modif(), ino->get_last_modif());
 
 				//////////////////////////////
-				// dropping delta signature if present
+				// dropping delta signature if present or just calculated
 
-			    if(delta_sig != nullptr && !loop)
+			    if(fic->has_delta_signature() && !loop)
 			    {
 				if(display_treated)
-				    dialog.warning(string(gettext("Calculating delta signature for saved file: ")) + info_quoi);
+				    dialog.warning(string(gettext("Dropping delta signature of saved file: ")) + info_quoi);
+
+				if(delta_sig == nullptr)
+				{
+					// merging context, signature not calculated here but already existing: we need to transfer it
+
+				    delta_sig = new (pool) memory_file();
+				    if(delta_sig == nullptr)
+					throw Ememory("saved_inode");
+
+				    fic->read_delta_signature(*delta_sig);
+				}
 
 				    // adding a tape mark when in sequential read mode
 				cat.pre_add_delta_sig();

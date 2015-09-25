@@ -159,7 +159,10 @@ namespace libdar
 			     bool warn_overwrite,
 			     bool decremental_mode,
 			     const infinint & sparse_file_min_size,
-			     const fsa_scope & scope);
+			     const fsa_scope & scope,
+			     bool delta_signature,
+			     bool build_delta_sig,
+			     const mask & delta_mask);
 
     void filtre_sequentially_read_all_catalogue(catalogue & cat,
 						user_interaction & dialog,

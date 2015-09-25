@@ -860,13 +860,16 @@ When dar meets an inode type it is not aware about (some times ago, it was the c
 This option can be used for archive backup, isolation and merging. Called during a backup operation it leads dar to create rsync signature for each file: If the file is new, a signature is computed and stored beside the file's data, so it may increase the archive size. If the file is not new (differential backup context) but has not changed and an rsync signature is found in the archive of reference, this signature is copied to the resulting archive, (but not the file's data, in that case too, without
 .B
 --delta sig
-the signature would not be copied). If the reference archive does not hold rsync signature to grab, a new rsync signature is computed and stored in the resulting archive. Last, if a file has changed, an new rsync signature is computed and stored beside the updated file's data. For isolation and merging operation the behavior is sligthly different: by default dar does not compute signatures for all files but transfers existing delta signatures from the original archive to the isolated one but does not compute delta signatures for files that do not have one, unless one of the
+the signature would not be copied). If the reference archive does not hold rsync signature to grab, a new rsync signature is computed and stored in the resulting archive. Last, if a file has changed, an new rsync signature is computed and stored beside the updated file's data. For isolation and merging operation the behavior is sligthly different:
+.B
+--delta sig
+option let dar transfers existing delta signatures from the original archive to the isolated/merged one but does not lead dar to compute delta signatures for files that do not have one, unless one of the
 .B
 --include-delta-sig
 or
 .B
 --exclude-delta-sig
-option is specified; in that case the delta signatures are transfered or calculated accordingly to these options.
+option is specified; in that case the delta signatures are transfered and if not present calculated accordingly to these options. However note that it is not possible to calculate delta signature for unsaved file (unchanged since archive of reference was done) as well as for fully saved files when merging is performed keeping files compressed (see -ak option). Another restriction while merging concernes sparse files, it is not possible to calculate binary signature for file stored as sparse files, but if sparse file detection mechanism is activated for merging delta signature can be calculated for sparse files if they are missing in the reference archive. In short: if you want recalculation of delta signature while merging, do not keep file compressed (do not use -ak option) and if you want to avoid having sparse files excluded from the delta signature recalcutation activate sparse file detection (use -1 option with an argument).
 .TP 20
 -{, --include-delta-sig <mask>
 By default when --delta sig is provided, delta signatures are computed for all files enrolled in the backup operation. For merging or isolation operation, by default no delta signature is computed only existing ones are transfered an only when --delta sig is provided else they are not transferred. Specifying --include-delta-sig <mask> reduces the delta signature computation to only the files matching the give mask, unless it also matches a mask provided thanks to a --exclude-delta-sig option. This option can be used several times on command-line. See also -am, -ag and -ar options.

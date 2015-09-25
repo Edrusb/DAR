@@ -488,6 +488,7 @@ namespace libdar
 				       options.get_fsa_scope(),
 				       options.get_multi_threaded(),
 				       options.get_delta_signature(),
+				       options.get_has_delta_mask_been_set(),
 				       options.get_delta_mask(),
 				       progressive_report);
 		    exploitable = false;
@@ -732,8 +733,9 @@ namespace libdar
 				     false,
 				     options.get_fsa_scope(),
 				     options.get_multi_threaded(),
-				     false, // delta signatures
-				     bool_mask(true), // delta_mask
+				     options.get_delta_signature(), // delta signatures
+				     options.get_has_delta_mask_been_set(), // build delta sig
+				     options.get_delta_mask(), // delta_mask
 				     st_ptr);
 		    exploitable = false;
 		    stack.terminate();
@@ -1736,6 +1738,7 @@ namespace libdar
 				     const fsa_scope & scope,
 				     bool multi_threaded,
 				     bool delta_signature,
+				     bool build_delta_sig,
 				     const mask & delta_mask,
 				     statistics * progressive_report)
     {
@@ -1887,6 +1890,7 @@ namespace libdar
 			 scope,
 			 multi_threaded,
 			 delta_signature,
+			 build_delta_sig,
 			 delta_mask,
 			 st_ptr);
 
@@ -1955,6 +1959,7 @@ namespace libdar
 				   const fsa_scope & scope,
 				   bool multi_threaded,
 				   bool delta_signature,
+				   bool build_delta_sig,
 				   const mask & delta_mask,
 				   statistics * st_ptr)
     {
@@ -2121,6 +2126,7 @@ namespace libdar
 					      exclude_by_ea,
 					      delta_signature,
 					      delta_mask);
+				// build_delta_sig is not used for archive creation it is always implied when delta_signature is set
 			}
 			catch(...)
 			{
@@ -2163,7 +2169,10 @@ namespace libdar
 				     warn_over,
 				     decremental,
 				     sparse_file_min_size,
-				     scope);
+				     scope,
+				     delta_signature,
+				     build_delta_sig,
+				     delta_mask);
 			break;
 		    default:
 			throw SRC_BUG;
