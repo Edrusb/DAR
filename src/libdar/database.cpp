@@ -502,7 +502,7 @@ namespace libdar
 		dialog.warning(gettext("Checking chronological ordering of files between the archives..."));
 	    check_order(dialog);
 
-		// determination of the archive to restore and files to restore for each selected archive
+		// determination of the archive to restore and files to restore for each selected file
 	    while(!anneau.empty())
 	    {
 		if(data_tree_find(anneau.front(), *files, ptr))
