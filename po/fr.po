@@ -3,14 +3,13 @@
 # This file is distributed under the same license as the DAR package.
 # Denis Corbin <dar.linux@free.fr>, 2011.
 #
-#: src/check/all_features.cpp:54
 msgid ""
 msgstr ""
 "Project-Id-Version: DAR 2.5.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2015-09-13 11:12+0200\n"
-"PO-Revision-Date: 2015-09-13 12:27+0200\n"
+"POT-Creation-Date: 2015-10-04 15:18+0200\n"
+"PO-Revision-Date: 2015-10-04 15:23+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "Language: fr\n"
@@ -443,39 +442,39 @@ msgstr ""
 "La sélection des fichiers a été interrompue. Construction de l'archive "
 "résultante avec les fichiers déjà sélectionnés"
 
-#: src/libdar/filtre.cpp:2511
+#: src/libdar/filtre.cpp:2509
 msgid "Adding Hard link to archive: "
 msgstr "Ajout de lien dur à l'archive : "
 
-#: src/libdar/filtre.cpp:2582
+#: src/libdar/filtre.cpp:2580
 msgid "failed reading CRC from file: "
 msgstr "Echec de lecture du CRC depuis le fichier : "
 
-#: src/libdar/filtre.cpp:2610
+#: src/libdar/filtre.cpp:2608
 msgid "Failed reading CRC for EA: "
 msgstr "Echec de lecture du CRC pour les Attributs Etendus : "
 
-#: src/libdar/filtre.cpp:2621
+#: src/libdar/filtre.cpp:2619
 msgid "Error met while reading next entry: "
 msgstr "Erreur lors de la lecture de l'entrée suivante : "
 
-#: src/libdar/filtre.cpp:2687
+#: src/libdar/filtre.cpp:2685
 msgid "Resaving file without compression: "
 msgstr "Sauve à nouveau mais sans compression: "
 
-#: src/libdar/filtre.cpp:2689
+#: src/libdar/filtre.cpp:2687
 msgid "Adding file to archive: "
 msgstr "Ajout du fichier à l'archive : "
 
-#: src/libdar/filtre.cpp:2808
+#: src/libdar/filtre.cpp:2806
 msgid "Copied data does not match CRC"
 msgstr "Les données copiées ne correspondent pas au CRC"
 
-#: src/libdar/filtre.cpp:2921
+#: src/libdar/filtre.cpp:2919
 msgid " : Failed resaving uncompressed the inode data"
 msgstr " : Echec de la sauvegarde sans compression des données de l'inode"
 
-#: src/libdar/filtre.cpp:2931
+#: src/libdar/filtre.cpp:2929
 msgid ""
 " : Resaving uncompressed the inode data to gain space is not possible, "
 "keeping data compressed"
@@ -483,7 +482,7 @@ msgstr ""
 "Resauver sans compression les données de l'inode pour gagner de la place "
 "n'est pas possible, on conserve les données compressées"
 
-#: src/libdar/filtre.cpp:2951
+#: src/libdar/filtre.cpp:2949
 #, c-format
 msgid ""
 "File has disappeared while we were reading it, cannot check whether it has "
@@ -492,13 +491,13 @@ msgstr ""
 "Le fichier a disparu alors que nous étions en train de le lire, impossible "
 "de vérifier s'il a changé lors de sa sauvegarde : %S"
 
-#: src/libdar/filtre.cpp:2986
+#: src/libdar/filtre.cpp:2984
 #, c-format
 msgid ""
 "WARNING! File modified while reading it for backup. Performing retry %i of %i"
 msgstr "ATTENTION ! Fichier modifié pendant sa sauvegarde. Tentative %i sur %i"
 
-#: src/libdar/filtre.cpp:2999
+#: src/libdar/filtre.cpp:2997
 msgid ""
 "WARNING! File modified while reading it for backup. No more retry for that "
 "file to not exceed the wasted byte limit. File is "
@@ -507,27 +506,27 @@ msgstr ""
 "nouvelle tentative pour ce fichier afin de de pas dépasser la taille "
 "maximale de gaspillage autorisée. Le fichier est "
 
-#: src/libdar/filtre.cpp:3006
+#: src/libdar/filtre.cpp:3004
 msgid ""
 "WARNING! File modified while reading it for backup, but no more retry "
 "allowed: "
 msgstr ""
 "ATTENTION ! Fichier modifié pendant sa sauvegarde, plus de nouvelle tentative"
 
-#: src/libdar/filtre.cpp:3066
+#: src/libdar/filtre.cpp:3064
 msgid "Saving Extended Attributes for "
 msgstr "Sauvegarde des Attributs Étendus de "
 
-#: src/libdar/filtre.cpp:3133
+#: src/libdar/filtre.cpp:3131
 msgid "Error saving Extended Attributes for "
 msgstr "Erreur lors de la sauvegarde des Attributs Étendus de "
 
-#: src/libdar/filtre.cpp:3165
+#: src/libdar/filtre.cpp:3163
 msgid "Saving Filesystem Specific Attributes for "
 msgstr ""
 "Sauvegarde des attributs spécifiques au système de fichier Étendus pour "
 
-#: src/libdar/filtre.cpp:3223
+#: src/libdar/filtre.cpp:3221
 msgid "Error saving Filesystem Specific Attributes for "
 msgstr "Erreur lors de la sauvegarde des FSA de "
 
@@ -3120,7 +3119,7 @@ msgstr ""
 "passe sur le point d'être fourni peut être écrit sur disque en clair "
 "(fichier d'échange). Vous avez été prévenu !"
 
-#: src/libdar/macro_tools.cpp:571 src/libdar/macro_tools.cpp:1299
+#: src/libdar/macro_tools.cpp:571 src/libdar/macro_tools.cpp:1297
 #, c-format
 msgid "Archive %S requires a password: "
 msgstr "L'archive %S nécessite un mot de passe : "
@@ -3147,7 +3146,7 @@ msgstr "Ouverture d'une couche de chiffrement ..."
 msgid "Unknown encryption algorithm"
 msgstr "Algorithme de chiffrement inconnu"
 
-#: src/libdar/macro_tools.cpp:665 src/libdar/macro_tools.cpp:1406
+#: src/libdar/macro_tools.cpp:665 src/libdar/macro_tools.cpp:1404
 msgid "Creating a new thread to run the previously created layers..."
 msgstr ""
 "Création d'une nouvelle file pour exécuter les couches précédemment "
@@ -3214,7 +3213,7 @@ msgstr ""
 "l'archive. Voulez-vous continuer comme le suggère l'en-tête de l'archive, "
 "c'est-à-dire sans couche de gestion des séquences d'échappement ?"
 
-#: src/libdar/macro_tools.cpp:747 src/libdar/macro_tools.cpp:1452
+#: src/libdar/macro_tools.cpp:747 src/libdar/macro_tools.cpp:1450
 msgid "Creating a new thread to run the escape layer..."
 msgstr "Création d'une nouvelle file pour exécuter la couche d'échappement ..."
 
@@ -3230,12 +3229,12 @@ msgstr ""
 msgid "Opening the compression layer..."
 msgstr "Ouverture de la couche de d'abstraction gérant la compression ..."
 
-#: src/libdar/macro_tools.cpp:791 src/libdar/macro_tools.cpp:1484
+#: src/libdar/macro_tools.cpp:791 src/libdar/macro_tools.cpp:1482
 msgid "Creating a new thread to run the compression layer..."
 msgstr ""
 "Création d'une nouvelle file d'exécution pour le couche de compression..."
 
-#: src/libdar/macro_tools.cpp:805 src/libdar/macro_tools.cpp:1494
+#: src/libdar/macro_tools.cpp:805 src/libdar/macro_tools.cpp:1492
 msgid "All layers have been created successfully"
 msgstr "Toutes les couches d'abstraction ont été crées avec succès"
 
@@ -3416,19 +3415,21 @@ msgstr ""
 "de passe peuvent être écrit sur disque en clair (fichier d'échange). Vous "
 "avez été prévenus !"
 
-#: src/libdar/macro_tools.cpp:1199
+#: src/libdar/macro_tools.cpp:1197
 msgid "Generating random key for symmetric encryption..."
 msgstr ""
 "Génération d'une clef de chiffrement aléatoire pour le chiffrement "
 "symmétrique ..."
 
-#: src/libdar/macro_tools.cpp:1207
+#: src/libdar/macro_tools.cpp:1205
 msgid ""
 "Scrambling is a very weak encryption algorithm, this is a non-sens to use "
 "with asymmetric encryption"
-msgstr "Le chiffrement \"scramble\" est très faible. C'est un non-sens de l'utiliser avec le chiffrement asymétrique"
+msgstr ""
+"Le chiffrement \"scramble\" est très faible. C'est un non-sens de l'utiliser "
+"avec le chiffrement asymétrique"
 
-#: src/libdar/macro_tools.cpp:1247
+#: src/libdar/macro_tools.cpp:1245
 #, c-format
 msgid ""
 "For your information, this is the iteration %d for which the randomly "
@@ -3439,105 +3440,105 @@ msgstr ""
 "générée est considérée comme faible par libgcrypt. La rechercher d'une "
 "nouvelle clef aléatoire continue ... patience"
 
-#: src/libdar/macro_tools.cpp:1251
+#: src/libdar/macro_tools.cpp:1249
 #, c-format
 msgid ""
 "... A strong randomly generated key could be found after %d iteration(s)"
 msgstr ""
 "Une clef forte générée aléatoirement a pu être trouvée après %d iteration(s)"
 
-#: src/libdar/macro_tools.cpp:1258
+#: src/libdar/macro_tools.cpp:1256
 msgid "Key generated"
 msgstr "Clef générée"
 
-#: src/libdar/macro_tools.cpp:1300
+#: src/libdar/macro_tools.cpp:1298
 msgid "Please confirm your password: "
 msgstr "Merci de confirmer le mot de passe : "
 
-#: src/libdar/macro_tools.cpp:1304
+#: src/libdar/macro_tools.cpp:1302
 msgid "The two passwords are not identical. Aborting"
 msgstr "Les deux mots de passes ne sont pas identiques. Abandon"
 
-#: src/libdar/macro_tools.cpp:1334
+#: src/libdar/macro_tools.cpp:1332
 msgid "Writing down the archive header..."
 msgstr "Ecriture de l'en-tête de l'archive ..."
 
-#: src/libdar/macro_tools.cpp:1350
+#: src/libdar/macro_tools.cpp:1348
 msgid "Adding a new layer on top: scrambler object..."
 msgstr "Ajout d'une nouvelle couche : Chiffrement faible ..."
 
-#: src/libdar/macro_tools.cpp:1362
+#: src/libdar/macro_tools.cpp:1360
 msgid "Adding a new layer on top: Strong encryption object..."
 msgstr "Ajout d'une nouvelle couche : Chiffrement fort ..."
 
-#: src/libdar/macro_tools.cpp:1379
+#: src/libdar/macro_tools.cpp:1377
 msgid "Adding a new layer on top: Caching layer for better performances..."
 msgstr ""
 "Ajout d'une nouvelle couche : Cache pour de meilleures performances ..."
 
-#: src/libdar/macro_tools.cpp:1424
+#: src/libdar/macro_tools.cpp:1422
 msgid "Writing down the initial elastic buffer through the encryption layer..."
 msgstr "Ecriture du tampon élastique initial via la couche de chiffrement ..."
 
-#: src/libdar/macro_tools.cpp:1436
+#: src/libdar/macro_tools.cpp:1434
 msgid "Adding a new layer on top: Escape layer to allow sequential reading..."
 msgstr ""
 "Ajout d'une nouvelle couche : Couche d'échappement pour permettre la lecture "
 "séquentielle ..."
 
-#: src/libdar/macro_tools.cpp:1466
+#: src/libdar/macro_tools.cpp:1464
 msgid "Adding a new layer on top: compression..."
 msgstr "Ajout d'une nouvelle couche : Compression ..."
 
-#: src/libdar/macro_tools.cpp:1508
+#: src/libdar/macro_tools.cpp:1506
 msgid "Error creating archive layers: "
 msgstr "Erreur pendant la création des couches pour l'archive : "
 
-#: src/libdar/macro_tools.cpp:1617
+#: src/libdar/macro_tools.cpp:1615
 msgid "Writing down archive contents..."
 msgstr "Ecriture du contenu de l'archive ..."
 
-#: src/libdar/macro_tools.cpp:1641
+#: src/libdar/macro_tools.cpp:1639
 msgid "Calculating the signature of the catalogue hash..."
 msgstr "Calcul de la signature du hashage du catalogue ..."
 
-#: src/libdar/macro_tools.cpp:1657
+#: src/libdar/macro_tools.cpp:1655
 msgid "Writing down the signed hash of the catalogue..."
 msgstr "Ecriture de la signature du catalogue..."
 
-#: src/libdar/macro_tools.cpp:1707
+#: src/libdar/macro_tools.cpp:1705
 msgid "Closing the compression layer..."
 msgstr "Fermeture de la couche de compression ..."
 
-#: src/libdar/macro_tools.cpp:1722
+#: src/libdar/macro_tools.cpp:1720
 msgid "Closing the escape layer..."
 msgstr "Fermeture de la couche d'échappement..."
 
-#: src/libdar/macro_tools.cpp:1734
+#: src/libdar/macro_tools.cpp:1732
 msgid "Writing down the first archive terminator..."
 msgstr "Ecriture du premier terminateur d'archive..."
 
-#: src/libdar/macro_tools.cpp:1740
+#: src/libdar/macro_tools.cpp:1738
 msgid "writing down the final elastic buffer through the encryption layer..."
 msgstr "Ecriture du tampon élastique terminal via la couche de chiffrement ..."
 
-#: src/libdar/macro_tools.cpp:1760
+#: src/libdar/macro_tools.cpp:1758
 msgid "Closing the encryption layer..."
 msgstr "Fermeture de la couche de chiffrement ..."
 
-#: src/libdar/macro_tools.cpp:1782
+#: src/libdar/macro_tools.cpp:1780
 msgid "Writing down archive trailer..."
 msgstr "Ecriture de la fin d'archive ..."
 
-#: src/libdar/macro_tools.cpp:1787
+#: src/libdar/macro_tools.cpp:1785
 msgid "Writing down the second archive terminator..."
 msgstr "Ecriture du second terminateur d'archive ..."
 
-#: src/libdar/macro_tools.cpp:1798
+#: src/libdar/macro_tools.cpp:1796
 msgid "Closing archive low layer..."
 msgstr "Fermeture de la couche de base ..."
 
-#: src/libdar/macro_tools.cpp:1803
+#: src/libdar/macro_tools.cpp:1801
 msgid "Archive is closed."
 msgstr "L'archive est fermée."
 
@@ -4160,7 +4161,9 @@ msgstr ""
 msgid ""
 "Failed retrieving from libgcrypt the block size used by the cyphering "
 "algorithm (essiv): %s/%s"
-msgstr "Impossible de connaître la taille de bloc utilisée par l'algorithme de chiffrement : %s/%s"
+msgstr ""
+"Impossible de connaître la taille de bloc utilisée par l'algorithme de "
+"chiffrement : %s/%s"
 
 #: src/libdar/crypto_sym.cpp:628 src/libdar/crypto_sym.cpp:634
 #: src/libdar/crypto_sym.cpp:643 src/libdar/crypto_sym.cpp:651
@@ -7502,6 +7505,10 @@ msgid ""
 msgstr ""
 "La cible utilisateur \"%s\" n'est pas autorisée (cible réservé pour la "
 "syntaxe conditionnelle)"
+
+#: src/check/all_features.cpp:54
+msgid "-"
+msgstr "-"
 
 #~ msgid "nullptr argument given to \"sauv_path\""
 #~ msgstr "Valeur nullptr donnée à \"filename\""
