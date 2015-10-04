@@ -51,7 +51,7 @@ void strange()
 {
     bindtextdomain("", "");
     textdomain("");
-    string tmp = gettext("");
+    string tmp = gettext("-");
 }
     // end of the strange trick!
 //////////////
