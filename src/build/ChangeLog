@@ -76,8 +76,8 @@ from 2.4.x to 2.5.0
   slightly improves randomness of IV.
 
 from 2.4.18 to 2.4.19
-- fixed missing quote in dar_par.dcf invoked by the par2 keyword
-- fixed bug in dar_manager -u option, not displaying most recent files of
+- fixed missing quote in dar_par.dcf which is called by the par2 directive
+- fixed bug in dar_manager's -u option, not displaying most recent files of
   an archive when they have been marked as removed in a more recent archive
   of the same dar_manager database.
 - fixed bug met while restoring in sequential read mode a file having
