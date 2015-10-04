@@ -546,7 +546,7 @@ namespace libdar
 
     unsigned char infinint::operator [] (const infinint & position) const
     {
-	if(field == NULL)
+	if(field == nullptr)
 	    throw SRC_BUG;
 
 	if(position.is_zero())

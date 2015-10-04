@@ -67,8 +67,8 @@ namespace libdar
     {
 #if CRYPTO_AVAILABLE
 	ivec = nullptr;
-	clef = NULL;
-	essiv_clef = NULL;
+	clef = nullptr;
+	essiv_clef = nullptr;
 
 	if(reading_ver <= 5)
 	    throw Erange("crypto_sym::blowfish", gettext("Current implementation of blowfish encryption is not compatible with old (weak) implementation, use dar-2.3.x software (or other software based on libdar-4.4.x) to read this archive"));
@@ -538,7 +538,7 @@ namespace libdar
 		// obtaining key len for IV_cipher
 
 	    size_t essiv_key_len;
-	    err = gcry_cipher_algo_info(IV_cipher, GCRYCTL_GET_KEYLEN, NULL, &essiv_key_len);
+	    err = gcry_cipher_algo_info(IV_cipher, GCRYCTL_GET_KEYLEN, nullptr, &essiv_key_len);
 	    if(err != GPG_ERR_NO_ERROR)
 		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Failed retrieving from libgcrypt the key length to use (essiv key): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 

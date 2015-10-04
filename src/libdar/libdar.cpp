@@ -222,7 +222,7 @@ namespace libdar
 	WRAPPER_IN
 	    ret = new (nothrow) archive(dialog, chem,  basename,  extension,
 					options);
-  	    if(ret == NULL)
+  	    if(ret == nullptr)
 		throw Ememory("open_archive_noexcept");
 	WRAPPER_OUT(exception, except_msg)
 	NLS_SWAP_OUT;
@@ -249,7 +249,7 @@ namespace libdar
 					     extension,
 					     options,
 					     progressive_report);
-  	    if(arch_ret == NULL)
+  	    if(arch_ret == nullptr)
 		throw Ememory("open_archive_noexcept");
 	WRAPPER_OUT(exception, except_msg)
         NLS_SWAP_OUT;
@@ -299,7 +299,7 @@ namespace libdar
 					extension,
 					options,
 					progressive_report);
-  	    if(ret == NULL)
+  	    if(ret == nullptr)
 		throw Ememory("open_archive_noexcept");
 	WRAPPER_OUT(exception, except_msg)
 	    NLS_SWAP_OUT;
