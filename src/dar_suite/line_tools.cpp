@@ -589,6 +589,7 @@ void line_tools_look_for(const vector<char> & arguments,
 #if HAVE_GETOPT_LONG
 			 const struct option *long_options,
 #endif
+			 char stop_scan,
 			 vector<char> & presence)
 {
     S_I lu;
@@ -601,9 +602,9 @@ void line_tools_look_for(const vector<char> & arguments,
     if(long_options == NULL)
 	ptr_long_opt = &voided;
 
-    while((lu = getopt_long(argc, argv, getopt_string, ptr_long_opt, NULL)) != EOF)
+    while((lu = getopt_long(argc, argv, getopt_string, ptr_long_opt, NULL)) != EOF && stop_scan != lu)
 #else
-	while((lu = getopt(argc, argv, getopt_string)) != EOF)
+	while((lu = getopt(argc, argv, getopt_string)) != EOF && stop_scan != lu)
 #endif
 	{
 	    vector<char>::const_iterator it = find(arguments.begin(), arguments.end(), (char)lu);
@@ -620,6 +621,7 @@ void line_tools_look_for_jQ(S_I argc,
 #if HAVE_GETOPT_LONG
 			    const struct option *long_options,
 #endif
+			    char stop_scan,
 			    bool & j_is_present,
 			    bool & Q_is_present)
 {
@@ -639,6 +641,7 @@ void line_tools_look_for_jQ(S_I argc,
 #if HAVE_GETOPT_LONG
 			long_options,
 #endif
+			stop_scan,
 			presence);
 
     it = find(presence.begin(), presence.end(), 'j');

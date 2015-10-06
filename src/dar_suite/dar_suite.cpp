@@ -96,6 +96,7 @@ int dar_suite_global(int argc,
 #if HAVE_GETOPT_LONG
 		     const struct option *long_options,
 #endif
+		     char stop_scan,
 		     int (*call)(user_interaction & dialog, int, char * const [], const char **env))
 {
     int ret = EXIT_OK;
@@ -127,13 +128,14 @@ int dar_suite_global(int argc,
 	bool silent;
 	bool jog;
 	line_tools_look_for_jQ(argc,
-			      argv,
-			      getopt_string,
+			       argv,
+			       getopt_string,
 #if HAVE_GETOPT_LONG
-			      long_options,
+			       long_options,
 #endif
-			      jog,
-			      silent);
+			       stop_scan,
+			       jog,
+			       silent);
 	ui = shell_interaction_init(&cerr, &cerr, silent);
 
 	if(jog)

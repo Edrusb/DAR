@@ -91,6 +91,7 @@ void line_tools_get_min_digits(std::string arg, infinint & num, infinint & ref_n
 #if HAVE_GETOPT_LONG
     /// \param[in] long_options is the optional list of long options  (an NULL pointer is acceptable for no long option)
 #endif
+    /// \param[in] stop_scan if this (char) option is met, stop scanning for wanted options
     /// \param[out] presence is a subset of arguments containing the option found on command-line
 extern void line_tools_look_for(const std::vector<char> & arguments,
 				S_I argc,
@@ -99,6 +100,7 @@ extern void line_tools_look_for(const std::vector<char> & arguments,
 #if HAVE_GETOPT_LONG
 				const struct option *long_options,
 #endif
+				char stop_scan,
 				std::vector<char> & presence);
 
 
@@ -110,6 +112,7 @@ extern void line_tools_look_for(const std::vector<char> & arguments,
 #if HAVE_GETOPT_LONG
     /// \param[in] long_options is the optional list of long options (an NULL pointer is acceptable for no long option)
 #endif
+    /// \param[in] stop_scan if this (char) option is met, stop scanning for -j and -Q options
     /// \param[out] j_is_present is set to true if -j option or its equivalent long option has been found on command-line
     /// \param[out] Q_is_present is set to true if -Q option or its equivalent long option has been found on command-line
 extern void line_tools_look_for_jQ(S_I argc,
@@ -118,6 +121,7 @@ extern void line_tools_look_for_jQ(S_I argc,
 #if HAVE_GETOPT_LONG
 				   const struct option *long_options,
 #endif
+				   char stop_scan,
 				   bool & j_is_present,
 				   bool & Q_is_present);
 

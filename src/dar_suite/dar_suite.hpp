@@ -79,6 +79,7 @@ extern void dar_suite_reset_signal_handler();
 #if HAVE_GETOPT_LONG
     /// \param[in] long_options is the optional list of long options (an NULL pointer is acceptable for no long option)
 #endif
+    /// \param[in] stop_scan while looking early for -j and -Q option will ignore all that follows stop_scan option if met
     /// \param[in] call is a callback function to run once user interaction is initialized and to catch from the exceptions
     /// \return the application exist status to use
 extern int dar_suite_global(int argc,
@@ -88,6 +89,7 @@ extern int dar_suite_global(int argc,
 #if HAVE_GETOPT_LONG
 			    const struct option *long_options,
 #endif
+			    char stop_scan,
 			    int (*call)(user_interaction & dialog, int, char *const [], const char **env));
 
 extern std::string dar_suite_command_line_features();
