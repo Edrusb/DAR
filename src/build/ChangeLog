@@ -1,6 +1,8 @@
 from 2.5.0 to 2.5.1
 - fixed display bug in dar_manager met when using -o option and adding
   options for dar that does not exist for dar_manager (like -R option)
+- fixed bug that forbade dar_manager to write down modified database
+  when only database header was modified (-o, -b, -p switches).
 
 from 2.4.x to 2.5.0
 - added support for posix_fadvise()
