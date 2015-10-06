@@ -3,6 +3,10 @@ version 2.5.0
 Thanks to Gour for help in testing dar_split with multi-volume dar archive
 on tapes.
 
+version 2.4.20
+--------------
+Thanks to Mike P for bug report
+
 version 2.4.19
 --------------
 Thanks to Ivan Krylov for bug analysis and Gour for feedback. Thanks to Dave

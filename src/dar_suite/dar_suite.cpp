@@ -99,6 +99,7 @@ int dar_suite_global(int argc,
 #if HAVE_GETOPT_LONG
 		     const struct option *long_options,
 #endif
+		     char stop_scan,
 		     int (*call)(shell_interaction & dialog, int, char * const [], const char **env))
 {
     int ret = EXIT_OK;
@@ -132,8 +133,9 @@ int dar_suite_global(int argc,
 			      argv,
 			      getopt_string,
 #if HAVE_GETOPT_LONG
-			      long_options,
+			       long_options,
 #endif
+			      stop_scan,
 			      silent);
 	ui = new (nothrow) shell_interaction(&cerr, &cerr, silent);
 	if(ui == nullptr)

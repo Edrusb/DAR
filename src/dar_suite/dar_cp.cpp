@@ -86,6 +86,7 @@ int main(int argc, char * const argv[], const char **env)
 #if HAVE_GETOPT_LONG
 			    nullptr,
 #endif
+			    '\0', // should never be met as option, thus early read the whole command-line for -j and -Q options
 			    &little_main);
 }
 

@@ -162,6 +162,7 @@ int main(S_I argc, char *const argv[], const char **env)
 #if HAVE_GETOPT_LONG
 			    get_long_opt(),
 #endif
+			    'o',  // stop looking for -j and -Q once -o option is met on command-line
 			    &little_main);
 }
 
