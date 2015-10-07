@@ -4,6 +4,7 @@ from 2.5.0 to 2.5.1
 - fixed bug that forbade dar_manager to write down modified database
   when only database header was modified (-o, -b, -p switches).
 - adding dar_manager database format version information with -l option
+- fixed libdar unability to read dar_manager's database format version 4
 
 from 2.4.x to 2.5.0
 - added support for posix_fadvise()

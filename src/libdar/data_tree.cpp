@@ -141,6 +141,7 @@ namespace libdar
 		break;
 	    case 2:
 	    case 3:
+	    case 4:
 		sta.read(f, db_version);
 		last_mod[k] = sta;
 		break;
@@ -163,6 +164,7 @@ namespace libdar
 		break;
 	    case 2:
 	    case 3:
+	    case 4:
 		sta.read(f, db_version);
 		last_change[k] = sta;
 		break;
