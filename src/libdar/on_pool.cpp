@@ -29,7 +29,11 @@ using namespace std;
 namespace libdar
 {
 #ifdef LIBDAR_SPECIAL_ALLOC
+#ifdef CYGWIN_BUILD
+    on_pool *on_pool::alloc_not_constructed = nullptr;
+#else
     thread_local on_pool *on_pool::alloc_not_constructed = nullptr;
+#endif
 #endif
 
     void *on_pool::alloc(size_t size, memory_pool *p)

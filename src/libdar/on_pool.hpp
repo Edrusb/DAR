@@ -34,6 +34,7 @@
 #include "integers.hpp"
 #include "memory_pool.hpp"
 #include "mem_allocator.hpp"
+#include "cygwin_adapt.hpp"
 
 
 namespace libdar
@@ -186,7 +187,7 @@ namespace libdar
 	    U_64 alignment_64; //< to properly align the allocated memory block that follows
 	};
 
-	    // this field is necessary to make distinction between object on the head that have a pool_ptr header from those
+	    // this field is necessary to make distinction between object on the heap that have a pool_ptr header from those
 	    // created as local or temporary variable (on the stack).
 	bool dynamic;
 
@@ -208,7 +209,16 @@ namespace libdar
 	static void dealloc(void *ptr);
 
 #ifdef LIBDAR_SPECIAL_ALLOC
+#ifdef CYGWIN_BUILD
+	static on_pool *alloc_not_constructed;
+	    // under cygwin the thread_local directive does not work but
+	    // as we build only command-line tools that are single threaded
+	    // program, it does not hurt using global static field here
+	    // well, as soon as another application than dar/dar_xform/...
+	    // relies on a cygwin build of libdar, this trick should be changed
+#else
 	thread_local static on_pool * alloc_not_constructed;
+#endif
 #endif
     };
 

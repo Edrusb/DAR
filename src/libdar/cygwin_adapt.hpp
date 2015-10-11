@@ -48,6 +48,9 @@ extern "C"
 #ifndef O_BINARY
 // zero is neutral in ORed expression where it is expected to be used
 #define O_BINARY 0
+#else
+#define CYGWIN_BUILD 1
+// if O_BINARY is defined we are compiling on or for a cygwin plateform
 #endif
 
     ///    @}
