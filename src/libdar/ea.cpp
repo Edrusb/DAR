@@ -24,6 +24,7 @@
 #include "ea.hpp"
 #include "tools.hpp"
 #include "integers.hpp"
+#include "infinint.hpp"
 
 // these MACRO are used only when dumping in file (obsolete since archive format "05")
 #define EA_ROOT 0x80
