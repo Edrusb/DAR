@@ -465,6 +465,9 @@ namespace libdar
 	virtual user_interaction *clone() const;
 
     protected:
+	    /// change the context value of the object that will be given to callback functions
+	void change_context_value(void *new_value) { context_val = new_value; };
+
 	    /// overwritting method from parent class.
 	void inherited_warning(const std::string & message);
 

@@ -1,16 +1,17 @@
-1from 2.5.0 to 2.5.1
+from 2.5.0 to 2.5.1
 - fixed display bug in dar_manager met when using -o option and adding
   options for dar that does not exist for dar_manager (like -R option)
-- reactivating disabled (by mistake) optimizations for some read-only dar
+- reactivating disabled (by mistake) optimization for some read-only dar
   manager database operations
 - fixing compilation issue with dar against gcc 4.9.2
 - fixing syntax error in dar_manager message
 - fixed bug that forbade dar_manager to write down modified database
   when only database header was modified (-o, -b, -p switches).
 - adding dar_manager database format version information with -l option
-- fixed libdar unability to read dar_manager's database format version 4
+- fixed libdar inability to read dar_manager's database format version 4
 - adapting code to build under cygwin environment, where thread_local seems
   broken
+- fixed output to stderr in place of stdout for Licensing information
 
 from 2.4.x to 2.5.0
 - added support for posix_fadvise()
