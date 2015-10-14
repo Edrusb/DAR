@@ -3113,12 +3113,12 @@ namespace libdar
 				tools_noexcept_make_date(info_quoi, false, ino->get_last_access(), ino->get_last_modif(), ino->get_last_modif());
 
 				//////////////////////////////
-				// dropping delta signature if present or just calculated
+				// dumping delta signature if present or just calculated
 
 			    if(fic->has_delta_signature() && !loop)
 			    {
 				if(display_treated)
-				    dialog.warning(string(gettext("Dropping delta signature of saved file: ")) + info_quoi);
+				    dialog.warning(string(gettext("Dumping delta signature of saved file: ")) + info_quoi);
 
 				if(delta_sig == nullptr)
 				{
