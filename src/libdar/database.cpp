@@ -66,19 +66,19 @@ namespace libdar
 	    throw Ememory("database::database");
 	data_files = nullptr;
 	check_order_asked = true;
+	cur_db_version = database_header_get_supported_version();
     }
 
     database::database(user_interaction & dialog, const string & base, const database_open_options & opt)
     {
-	unsigned char db_version;
-	generic_file *f = database_header_open(dialog, get_pool(), base, db_version);
+	generic_file *f = database_header_open(dialog, get_pool(), base, cur_db_version);
 
 	if(f == nullptr)
 	    throw Ememory("database::database");
 	try
 	{
 	    check_order_asked = opt.get_warn_order();
-	    build(dialog, *f, opt.get_partial(), opt.get_partial_read_only(), db_version);
+	    build(dialog, *f, opt.get_partial(), opt.get_partial_read_only(), cur_db_version);
 	}
 	catch(...)
 	{
@@ -359,9 +359,11 @@ namespace libdar
 
 	    if(!dialog.get_use_dar_manager_contents())
 	    {
-		dialog.printf(gettext("\ndar path    : %S\n"), &dar_path);
-		dialog.printf(gettext("dar options : %S\n\n"), &opt);
-
+		dialog.warning("\n");
+		dialog.printf(gettext("dar path        : %S\n"), &dar_path);
+		dialog.printf(gettext("dar options     : %S\n"), &opt);
+		dialog.printf(gettext("database version: %d\n"), cur_db_version);
+		dialog.warning("\n");
 		dialog.printf(gettext("archive #   |    path      |    basename\n"));
 		dialog.printf("------------+--------------+---------------\n");
 	    }
@@ -501,7 +503,7 @@ namespace libdar
 		dialog.warning(gettext("Checking chronological ordering of files between the archives..."));
 	    check_order(dialog);
 
-		// determination of the archive to restore and files to restore for each selected archive
+		// determination of the archive to restore and files to restore for each selected file
 	    while(!anneau.empty())
 	    {
 		if(data_tree_find(anneau.front(), *files, ptr))

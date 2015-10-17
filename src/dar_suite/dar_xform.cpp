@@ -58,7 +58,7 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_XFORM_VERSION "1.5.7"
+#define DAR_XFORM_VERSION "1.5.8"
 
 #define OPT_STRING  "s:S:p::wnhbVE:F:a::Qj^:3:9:"
 
@@ -94,6 +94,7 @@ int main(S_I argc, char *const argv[], const char **env)
 #if HAVE_GETOPT_LONG
 			    nullptr,
 #endif
+			    '\0', // should never be met as option, thus early read the whole command-line for -j and -Q options
 			    &sub_main);
 }
 

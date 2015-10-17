@@ -1,7 +1,7 @@
-.TH DAR 1 "July 18th, 2015"
+.TH DAR 1 "October 4th, 2015"
 .UC 8
 .SH NAME
-dar \- create, test, list, extract, compare, merge, isolate dar archives
+dar \- creates, tests, lists, extracts, compares, merges, isolates dar archives
 .SH SYNOPSIS
 dar [-c | -t | -l | -x | -d | -+ | -C] [<path>/]<basename> [<options>] [<user targets>]
 .PP
@@ -17,7 +17,9 @@ is a full featured backup tool, aimed for disks (floppy, CD-R(W), DVD-R(W), zip,
 can store a backup in several files (called "slices" in the following) of a given size, eventually pausing or running a user command/script before starting the next slice. This can allow for example, the burning of the last generated slice on a DVD-R(W), Blue-ray Disk, or changing of usb key before continuing on the next one.
 Like its grand-brother, the great "tar" command,
 .B dar
-may also use compression, at the difference that compression is used inside the archive to be able to have compressed slices of the defined size. But the most important feature of
+may also use compression, at the difference that compression is used inside the archive to be able to have compressed slices of the defined size.
+.PP
+But the most important feature of
 .B dar
 is its ability to make differential and decremental backups. In other words, backups that contain only new files or files that have changed from a backup of reference.
 Moreover with differential backup,
@@ -33,19 +35,23 @@ command,
 .B dar
 has not to read a whole archive nor to stick together the different parts (the slices) to get its contents: dar archive contains a table of contents (aka "catalogue") located at the end of the archive, so it seeks into the archive forth and backward to extract only the required files, which is much faster than what tar is used to do. The "catalogue" can be copied out of the archive (operation called isolation) to be used as reference for further backup and as backup of the internal catalogue in case of archive corruption.
 .PP
-Dar can also use a sequential reading mode, in which dar acts like tar, just reading byte by byte the whole archive to know its contents and eventually extracting file at each step. In other words, the archive contents is located at both locations, all along the archive used for tar-like behavior suitable for sequential access media (tapes) and at the end for faster access, suitable for random access media (disks).  However note that tar archive and dar archive are not compatible. Dar does not known anything about tar archive structure, neither tar known anything about dar archive structure. So keep using tar if you are used to it or find no advantage in using dar. Note also that the sequential reading mode let you extract data from a partially written archive (those that failed to complete due to a lack of disk space for example).
+Dar can also use a sequential reading mode, in which dar acts like tar, just reading byte by byte the whole archive to know its contents and eventually extracting file at each step. In other words, the archive contents is located at both locations, all along the archive used for tar-like behavior suitable for sequential access media (tapes) and at the end for faster access, suitable for random access media (disks).  However note that tar archive and dar archive are not compatible. Dar does not know anything about tar archive structure, neither tar knows anything about dar archive structure. So keep using tar if you are used to it or find no advantage in using dar. Note also that the sequential reading mode let you extract data from a partially written archive (those that failed to complete due to a lack of disk space for example).
 .PP
-If you want to use dar (or tar) to span an archive over several tapes see dar_split(1) command
-.PP
-A "relax" reading mode is available which let dar to either ignore some incoherence in archive structure, or use internal redundant information to overcome data corruption or in last resort asking the user on what to do when some archive structure information is missing (-al option). This relax mode can be used with both sequential and direct access read modes. Note however that you should rather use Parchive to protect your data rather than just relying on the "relax" mode, which has to be seen as a the last chance solution, as this mode cannot repair the archive, but may only lead to partial archive extraction upon strong archive corruption. For immediate Parchive integration with dar, use the "par2" user target defined in /etc/darrc.
+Dar format is quite robust against corruption: Only the file where the corruption took place in the archive will not be possible to restore. To have the possibility to repair a corrupted archive dar can work with par2 seamlessly just specifying "par2" on command-line (see /etc/darrc). Last a "relax" reading mode is available which let dar to either ignore some incoherence in archive structure, use internal redundant information to overcome data corruption or in last resort asking the user on what to do when some archive structure information is missing (-al option). This relax mode can be used with both sequential and direct access read modes. Note that you should rather use Parchive to protect your data rather than just relying on the "relax" mode, which has to be seen as a the last chance solution.
 .PP
 .B dar
 takes care of POSIX Extended Attributes (EA in short) that are used in particular under Linux to carry File Access Control List (FACL) as well as security attributes for SELinux, and also under MacOS X EA they are used to store file forks. EA also have room for user to add any key / value paire to any file, this is known as user EA. These attributes are not specific to any particular filesystem, they exist the same way under ext3/4, HFS+ and any other filesystem.
 .PP
 .B dar
-also takes care of Filesystem Specific Attributes (FSA in short) which are, as you can guess, specific to one or several filesystem(s). For example the Birth date of a file exists for HFS+ and NTFS but not for ext2/3/4 filesystem. The immutable attribute exists for ext2/3/4 but not for NTFS while the nodump files does not exists for NTFS but exists for HFS+, ext2/3/4 and many other Unix filesystems. For
+also takes care of Filesystem Specific Attributes (FSA in short) which are, as you can guess, specific to one or several filesystem(s). For example the Birth date of a file exists for HFS+ and NTFS but not for ext2/3/4 filesystem. The immutable attribute exists for ext2/3/4 but not for NTFS while the nodump files does not exists for NTFS but exists for HFS+, ext2/3/4 and many other Unix filesystems.
+.PP
+Sparse files (files with holes that system reports using several hundred gigabytes while they effectively use a few kilobytes on disk) are also well managed by
+.B
+dar:
+they are detected, stored and restored to filesystem properly.
+.PP
 .B dar
-an inode (file, symlink, named pipe, socket, device, door, directory, ...)  is thus not only a piece of data to backup and restore but also a set of common attributes (permission, ownership, atime, mtime, ctime, ...) eventually followed by its EA set and/or FSA. FSA are grouped by family each more or less corresponding to a given filesystem supported. For example extX family carries FSA of ext2, ext3 and ext4 filesystems. HFS+ those of MacOS X HFS+ filesystem. Some family may be disabled at compilation time if the uderlying system used to compile dar/libdar has not enough support for it. In that case dar is not able to save or restore attributes of such family, but archive merging is not affected and FSA are taken into consideration normally. For more details on how to act on FSA families see option --fsa-scope.
+is also able to properly save and restore hard-links
 .PP
 A few words about slice before going deeper in detail: a slice is just a simple file which name is composed of a "basename" followed by a dot, then a number, again a dot and the extension (dar) to form the filename of that slice. On the command line you will never have to give the full file name of a slice, just the basename. The number between the dots is the slice number, which starts from 1 and may be arbitrary large (as large as your system can support the corresponding filename).
 .TP 20
@@ -461,7 +467,7 @@ starts with the word "gnupg" followed by a column ':' . In that situation, the s
 Note that if you have set a passphrase on your private key, dar will ask it dynamically, which requires dar to be run from a terminal. No other way has been provided to transmit a private key's passphrase to libdar. In consequence if you want to use dar/libdar in scripts and make use of public key algorithm you should avoid setting a passphrase to the private key you want to use. See also GNUPGHOME in the ENVIRONMENT section at the end of this document.
 .PP
 .B Obvious but important!
-To read a gnupg encrypted archive, you need your private key (not only the passphrase to activate it, if set). Thus if you plan to make backup of your system and encrypt the backup using gnupg, you should have a copy of this private key available out of the archive (usb key, floppy, ...) in order to be able to restore you backup!
+To read a gnupg encrypted archive, you need your private key (not only the passphrase to activate it, if set). Thus if you plan to make backup of your system and encrypt the backup using gnupg, you should have a copy of this private key available out of the archive (usb key, floppy, CD/DVD, ...) in order to be able to restore your backup!
 .RE
 .TP 20
 -J, --ref-key [[<algo>]:]<string>
@@ -933,9 +939,9 @@ Doing a difference in sequential read mode is possible but hard linked inodes ca
 .TP 20
 -T, --list-format=<normal | tree | xml | slicing>, --tree-format
 .RS
-By default, listing provides a tar-like output (the 'normal' output). You can however get a tree-like output, an XML structured output or a output focused on slice(s) where each file's data, EA and FSA is located in. Providing -T without argument gives the same as providing the 'tree' argument to it. The option --tree-format is an alias to --list-format=tree (backward compatibility). Note that the files doc/dar-catalog-*.dtd define the format of the XML output listing (This file is also installed under $PREFIX/share/doc)
+By default, listing provides a tar-like output (the 'normal' output). You can however get a tree-like output, an XML structured output or a output focusing on slice(s) where each file's data, EA and FSA is located in. Providing -T without argument gives the same as providing the 'tree' argument to it. The option --tree-format is an alias to --list-format=tree (backward compatibility). Note that the files doc/dar-catalog-*.dtd define the format of the XML output listing (This file is also installed under $PREFIX/share/doc)
 .PP
-the -Tslicing option can be used with isolated catalogue generated with dar 2.5.0 or above, as it contains a copy of the slicing layout of the archive of reference. However, if the archive of reference has been resliced (using dar_xform) after the isolated catalogue has been built, the slicing information will not be correct. For that corner case, you can use the -s and -S options with -Tslicing to specify what are the new slice sizes of the archive of reference.
+the -Tslicing option can also be used with isolated catalogue generated with dar 2.5.0 or above, as isolated catalogues now contain a copy of the slicing layout of the archive of reference. However, if the archive of reference has been resliced (using dar_xform) after the isolated catalogue has been built, the slicing information would not be correct. For that corner case, you can use the -s and -S options with -Tslicing to specify what are the new slice sizes of the archive of reference.
 .RE
 .TP 20
 -as, --alter=saved

@@ -60,8 +60,9 @@ namespace libdar
 
 	    /// \param[in] value when set, the database is in partial mode *and* in read-only. It cannot be dumped or modified.
 	    /// \note if value is set to true, all restriction found for partial mode apply, and in addition, the database cannot be dumped (written back to file)
-
-	void set_partial_read_only(bool value) { x_partial_read_only = x_partial = value; };
+	    /// \note partial_read_only implies partial, but partial does not imply partial_readonly (it can be dumped but modification
+	    /// can only take place in the archive header)
+	void set_partial_read_only(bool value) { x_partial_read_only = value; if(value) x_partial = value; };
 
 
 	    /// warning about file ordering in database

@@ -23,6 +23,12 @@
     /// \brief main module for dar command-line tool
     /// \ingroup CMDLINE
 
+    /// \defgroup CMDLINE Command-line
+    /// \brief command-line interface
+    ///
+    /// this module contains all the command-line specific routines, classes and datastructures. The intention of
+    /// documenting that part is for illustration and example of libdar usage.
+
 
 #ifndef DAR_HPP
 #define DAR_HPP

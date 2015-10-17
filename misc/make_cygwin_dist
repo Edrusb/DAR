@@ -20,12 +20,13 @@ if( -e $build_dir) then
 endif
 mkdir $build_dir
 make clean distclean || echo "ignoring error, tree already clean"
-setenv CXXFLAGS -O
-./configure --prefix=$build_dir $3 $4 $5 $6 $7 $8 $9
+# setenv CXXFLAGS -O
+./configure --prefix=$build_dir --disable-gpgme-linking $3 $4 $5 $6 $7 $8 $9
 make
 make install-strip
 mv $build_dir/bin/* $build_dir/lib/*.so.*.*.* $build_dir
-cp /bin/cygwin1.dll /bin/cygz.dll /bin/cygbz2-1.dll /bin/cygiconv-2.dll /usr/bin/cygintl-8.dll /bin/cyggcc_s-seh-1.dll /bin/cygstdc++-6.dll /bin/cyggcrypt-11.dll /bin/cyggpg-error-0.dll /bin/cyglzo2-2.dll $build_dir
+cp /bin/cygwin1.dll /bin/cygz.dll /bin/cygbz2-1.dll /bin/cygiconv-2.dll /usr/bin/cygintl-8.dll /bin/cyggcc_s-seh-1.dll /bin/cygstdc++-6.dll /bin/cyggpg-error-0.dll /bin/cyglzo2-2.dll /usr/bin/cyggcrypt-20.dll /usr/bin/cyggpgme-11.dll /usr/bin/cyglzma-5.dll $build_dir
+# /usr/bin/gpg /usr/bin/cygreadline7.dll /usr/bin/cygncursesw-10.dll /usr/bin/cygusb0.dll
 cp -R doc $build_dir
 foreach fichier (README TODO INSTALL ChangeLog THANKS COPYING)
    cp $fichier "$build_dir/`basename $fichier`.txt"

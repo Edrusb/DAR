@@ -67,6 +67,7 @@ namespace libdar
 	    /// \param[in] dialog for user interaction
 	    /// \param[in] filename name of file to save database to
 	    /// \param[in] opt extendable list of options to use for this operation
+	    /// \note this method is not available with partially extracted databases.
 	void dump(user_interaction & dialog, const std::string & filename, const database_dump_options & opt) const;
 
 	    // SETTINGS
@@ -102,6 +103,7 @@ namespace libdar
 	    /// \param[in] num is the archive index to rename
 	    /// \param[in] basename is the new basename to give to that archive
 	    /// \param[in] opt optional parameters for this operation
+	    /// \note this method *is* available with partially extracted databases, but with partial_read_only ones
 	void change_name(archive_num num, const std::string & basename, const database_change_basename_options &opt);
 
 	    /// change one's archive path recorded in the database
@@ -109,6 +111,7 @@ namespace libdar
 	    /// \param[in] num is the archive index who's path to change
 	    /// \param[in] chemin is the new path to give to that archive
 	    /// \param[in] opt optional parameters for this operation
+	    /// \note this method *is* available with partially extracted databases, but with partial_read_only ones
 	void set_path(archive_num num, const std::string & chemin, const database_change_path_options & opt);
 
 	    /// change the default options given to dar when performing restoration
@@ -117,12 +120,14 @@ namespace libdar
 	    /// \note Each element of the vector must match a single argument of the command line
 	    /// like for example "-R". Any leading or trailing space will make a different argument
 	    /// than the one without spaces (" -R" is different than "-R" for example).
+	    /// \note this method *is* available with partially extracted databases, but with partial_read_only ones
     	void set_options(const std::vector<std::string> &opt) { options_to_dar = opt; };
 
 	    /// change the path to dar command
 
 	    /// \param[in] chemin is the full path to dar (including dar filename) to use for restoration
 	    /// \note if set to an empty string the dar command found from the PATH will be used (if any)
+	    /// \note this method *is* available with partially extracted databases, but with partial_read_only ones
 	void set_dar_path(const std::string & chemin) { dar_path = chemin; };
 
 
@@ -131,7 +136,6 @@ namespace libdar
 	    /// show the list of archive used to build the database
 
 	    /// \param[in,out] dialog is the user_interaction to use to report the listing
-	    ///
 	void show_contents(user_interaction & dialog) const; // displays all archive information
 
 	    /// return the options used with dar for restoration
@@ -172,6 +176,7 @@ namespace libdar
 	    /// \param[in,out] dialog where to have user interaction
 	    /// \param[in] filename list of filename to restore
 	    /// \param[in] opt extendable list of options to use for this operation
+	    /// \note this method is not available with partially extracted databases.
 	void restore(user_interaction & dialog,
 		     const std::vector<std::string> & filename,
 		     const database_restore_options & opt);
@@ -180,7 +185,7 @@ namespace libdar
 
 	    /// \param[in,out] dialog for user interaction
 	    /// \return true if check succeeded, false if warning have been issued
-
+	    /// \note this method is not available with partially extracted databases.
 	bool check_order(user_interaction & dialog) const
 	{
 	    bool initial_warn = true;
@@ -210,6 +215,7 @@ namespace libdar
 	data_dir *files;                             //< structure containing files and their status in the set of archive used for that database (is set to nullptr in partial mode)
 	storage *data_files;                         //< when reading archive in partial mode, this is where is located the "not readed" part of the archive (is set to nullptr in partial-read-only mode)
 	bool check_order_asked;                      //< whether order check has been asked
+	unsigned char cur_db_version;                //< current db version (for informational purposes)
 
 	void build(user_interaction & dialog, generic_file & f, bool partial, bool read_only, unsigned char db_version);  //< used by constructors
 	archive_num get_real_archive_num(archive_num num, bool revert) const;

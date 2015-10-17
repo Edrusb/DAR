@@ -48,6 +48,7 @@ int main(S_I argc, char * const argv[])
 			    nullptr,
 			    "",
 			    nullptr,
+			    '\0',
 			    &little_main);
 }
 

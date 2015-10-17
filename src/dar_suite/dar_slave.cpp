@@ -72,7 +72,7 @@ extern "C"
 using namespace libdar;
 using namespace std;
 
-#define DAR_SLAVE_VERSION "1.4.7"
+#define DAR_SLAVE_VERSION "1.4.8"
 
 static bool command_line(shell_interaction & dialog,
 			 S_I argc, char * const argv[], path * &chemin, string & filename,
@@ -91,6 +91,7 @@ int main(S_I argc, char * const argv[], const char **env)
 #if HAVE_GETOPT_LONG
 			    nullptr,
 #endif
+			    '\0', // should never be met as option, thus early read the whole command-line for -j and -Q options
 			    &little_main);
 }
 

@@ -85,7 +85,7 @@ namespace libdar
 
 	if(stat(filename.c_str(), &buf) >= 0 && !overwrite)
 	    throw Erange("database_header_create", gettext("Cannot create database, file exists"));
-	ret = new (pool) fichier_local(dialog, filename, gf_write_only, 0666, true, true, false);
+	ret = new (pool) fichier_local(dialog, filename, gf_write_only, 0666, !overwrite, overwrite, false);
 	if(ret == nullptr)
 	    throw Ememory("database_header_create");
 

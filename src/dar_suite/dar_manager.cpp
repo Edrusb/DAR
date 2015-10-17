@@ -73,7 +73,7 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_MANAGER_VERSION "1.7.9"
+#define DAR_MANAGER_VERSION "1.7.10"
 
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
@@ -162,6 +162,7 @@ int main(S_I argc, char *const argv[], const char **env)
 #if HAVE_GETOPT_LONG
 			    get_long_opt(),
 #endif
+			    'o',  // stop looking for -j and -Q once -o option is met on command-line
 			    &little_main);
 }
 
@@ -639,7 +640,7 @@ static void op_add(shell_interaction & dialog, database *dat, const string &arg,
 	dat->add_archive(*arch, chemin, b, database_add_options());
 	thr.check_self_cancellation();
 	if(info_details)
-	    dialog.warning(gettext("Checking date ordering of files between archive..."));
+	    dialog.warning(gettext("Checking date ordering of files between archives..."));
 	date_order_problem = dat->check_order(dialog);
 	thr.check_self_cancellation();
 
@@ -833,7 +834,7 @@ static void op_move(shell_interaction & dialog, database *dat, S_I src, archive_
     dat->set_permutation(src, dst);
     thr.check_self_cancellation();
     if(info_details)
-	dialog.warning(gettext("Checking date ordering of files between archive..."));
+	dialog.warning(gettext("Checking date ordering of files between archives..."));
     date_order_problem = dat->check_order(dialog);
     thr.check_self_cancellation();
     if(date_order_problem)
@@ -1099,7 +1100,7 @@ static void op_interactive(shell_interaction & dialog, database *dat, string bas
 		    dialog.warning(gettext("Updating database with catalogue..."));
 		    dat->add_archive(*arch, input, input2, database_add_options());
 		    thr.check_self_cancellation();
-		    dialog.warning(gettext("Checking date ordering of files between archive..."));
+		    dialog.warning(gettext("Checking date ordering of files between archives..."));
 		    (void)dat->check_order(dialog);
 		}
 		catch(...)
@@ -1129,7 +1130,7 @@ static void op_interactive(shell_interaction & dialog, database *dat, string bas
 		num2 = tools_str2int(input);
 		dat->set_permutation(num, num2);
 		thr.check_self_cancellation();
-		dialog.warning(gettext("Checking date ordering of files between archive..."));
+		dialog.warning(gettext("Checking date ordering of files between archives..."));
 		dat->check_order(dialog);
 		saved = false;
 		break;
@@ -1223,7 +1224,7 @@ static void op_check(shell_interaction & dialog, const database *dat, bool info_
 	throw SRC_BUG;
 
     if(info_details)
-	dialog.warning(gettext("Checking date ordering of files between archive..."));
+	dialog.warning(gettext("Checking date ordering of files between archives..."));
     if(!dat->check_order(dialog))
 	throw Edata(gettext("Some files do not follow chronological order when archive index increases withing the database, this can lead dar_manager to restored a wrong version of these files"));
     else

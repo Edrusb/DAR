@@ -181,6 +181,7 @@ shell_interaction::shell_interaction(ostream *out, ostream *interact, bool silen
     /// copy constructor
 shell_interaction::shell_interaction(const shell_interaction & ref) : user_interaction_callback(ref)
 {
+    change_context_value((void *)this);
     if(ref.input >= 0)
     {
 	input = dup(ref.input);

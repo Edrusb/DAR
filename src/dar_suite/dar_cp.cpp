@@ -60,7 +60,7 @@ extern "C"
 #include "dar_suite.hpp"
 #include "thread_cancellation.hpp"
 
-#define DAR_CP_VERSION "1.2.9"
+#define DAR_CP_VERSION "1.2.10"
 
 using namespace libdar;
 using namespace std;
@@ -86,6 +86,7 @@ int main(int argc, char * const argv[], const char **env)
 #if HAVE_GETOPT_LONG
 			    nullptr,
 #endif
+			    '\0', // should never be met as option, thus early read the whole command-line for -j and -Q options
 			    &little_main);
 }
 

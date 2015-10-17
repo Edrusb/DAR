@@ -24,12 +24,11 @@
     /// \mainpage
     /// You will find here the reference documentation for the dar and libdar source code, split in several "modules".
     /// - API module: contains all information for using libdar within your program
-    /// - OLD_API_4_4 module: contains the backward compatible API to version 4.4.x
     /// - Tools module: contains some routines you may like to have a look at (but using them with caution)
     /// - Private module: contains all libdar internal documentation, it is not necessary to read it to be able to use libdar
     /// - CMDLINE module: contains the documentation for command-line tools, you might want to have a look for illustration of library usage.
     /// .
-    /// CMDLINE module is out of any namespace as it is not inteded to be used by external application, OLD_API_4_4 module is in the libdar_4_4 namespace. All other modules, are in the libdar namespace.
+    /// CMDLINE module is out of any namespace as it is not inteded to be used by external application. All other symbols are part of the libdar namespace.
     ///
     /// Please not that an API tutorial is also available for a higher view of this library.
 
@@ -37,7 +36,7 @@
     /// \defgroup API API
     /// \brief APlication Interface
     ///
-    /// This gather all symbols that may be accessed from an external
+    /// This gathers all symbols that may be accessed from an external
     /// program. Other symbols are not as much documented, and
     /// may change or be removed without any warning or backward
     /// compatibility support. So only use the function, macro, types,
@@ -141,7 +140,7 @@ namespace libdar
 	///  libdar Medium version defined at compilation time
     const U_I LIBDAR_COMPILE_TIME_MEDIUM = 7;
 	///  libdar Minor version defined at compilation time
-    const U_I LIBDAR_COMPILE_TIME_MINOR = 0;
+    const U_I LIBDAR_COMPILE_TIME_MINOR = 1;
 
 	////////////////////////////////////////////////////////////////////////
 	// LIBDAR INITIALIZATION METHODS                                      //
