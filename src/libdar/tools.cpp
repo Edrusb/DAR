@@ -367,7 +367,8 @@ namespace libdar
 
 	if(it != src.end()) // path separator found (pointed to by "it")
 	{
-	    base = string(it + 1, src.end());
+	    it += 1;
+	    base = string(it, src.end());
 	    chemin = new (nothrow) path(string(src.begin(), it), true);
 	}
 	else

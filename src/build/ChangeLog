@@ -5,6 +5,7 @@ from 2.4.19 to 2.4.20
   manager database operations
 - fixing compilation issue with dar against gcc 4.9.2
 - fixing syntax error in dar_manager message
+- fixing bug that avoided creating an archive at the root of the filesystem
 
 from 2.4.18 to 2.4.19
 - fixed missing quote in dar_par.dcf which is called by the par2 directive
