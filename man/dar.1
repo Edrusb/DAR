@@ -879,6 +879,7 @@ option is specified; in that case the delta signatures are transfered and if not
 .TP 20
 -{, --include-delta-sig <mask>
 By default when --delta sig is provided, delta signatures are computed for all files enrolled in the backup operation. For merging or isolation operation, by default no delta signature is computed only existing ones are transfered an only when --delta sig is provided else they are not transferred. Specifying --include-delta-sig <mask> reduces the delta signature computation to only the files matching the give mask, unless it also matches a mask provided thanks to a --exclude-delta-sig option. This option can be used several times on command-line. See also -am, -ag and -ar options.
+.TP 20
 -}, --exclude-delta-sig <mask>
 Files matching the given mask will never have their delta signatures calculated, may --delta sig option be specified or not. See also --include-delta-sig option above.
 .TP 20

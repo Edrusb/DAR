@@ -2518,17 +2518,36 @@ namespace libdar
 			    if(e_file->has_delta_signature())
 				e_file->clear_delta_signature();
 			}
-			else
+			else // delta signature asked for transfer or calculation
 			{
-			    if(build_delta_sig
-			       && (keep_mode == cat_file::normal || !e_file->get_sparse_file_detection_read()))
+			    if(build_delta_sig) // delta signature need to be recalculated if absent
 			    {
 				if(delta_mask.is_covered(juillet.get_string()))
 				{
 				    if(!e_file->has_delta_signature())
 				    {
-					e_file->will_have_delta_signature();
-					calculate_delta_signature = true;
+					switch(keep_mode)
+					{
+					case cat_file::keep_compressed:
+						// reading a compressed file and keep compressed mode asked,
+						// situation that should be filtered out by sanity checks
+					    throw SRC_BUG;
+					case cat_file::keep_hole:
+					    if(e_file->get_sparse_file_detection_read())
+					    {
+						string tmp = juillet.get_string();
+
+						dialog.warning(tools_printf(gettext("Need to activate sparse file detection in order to calculate delta signature for sparse file %S"), &tmp));
+					    }
+					    break;
+					case cat_file::normal:
+					case cat_file::plain:
+					    e_file->will_have_delta_signature();
+					    calculate_delta_signature = true;
+					    break;
+					default:
+					    throw SRC_BUG;
+					}
 				    }
 				}
 				else
@@ -2537,7 +2556,8 @@ namespace libdar
 					e_file->clear_delta_signature();
 				}
 			    }
-				// else nothing to do, save_inode will transfer the delta signature if present
+
+				// else nothing to do, save_inode will transfer existing delta signatures
 			}
 		    }
 

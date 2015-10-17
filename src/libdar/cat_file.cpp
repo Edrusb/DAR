@@ -643,7 +643,11 @@ namespace libdar
 
 				// normally having both delta_sig and sparse_file is excluded by sanity checks
 				// so we do not add delta_sig above sparse_file which would deserve sparse file
-				// detection
+				// detection (archive reading, restoration, testing, diffing, ...),
+				// but while merging we may have both sparse_file to provide plain file without hole
+				// and generic_rsync to compute the delta signature of the plain file
+
+			    parent = data->is_empty() ? get_pile() : data->top();
 
 			    if(delta_sig != nullptr)
 			    {

@@ -668,8 +668,17 @@ namespace libdar
 				algo_kept = ref_arch2->ver.get_compression_algo();
 			}
 		    }
+
 		    if(ref_cat1 == nullptr)
 			throw SRC_BUG;
+
+		    if(options.get_delta_signature())
+		    {
+			if(options.get_keep_compressed() && options.get_has_delta_mask_been_set())
+			    throw Elibcall("op_merge", gettext("Cannot calculate delta signature when merging if keep compressed is asked"));
+			if(options.get_sparse_file_min_size().is_zero() && options.get_has_delta_mask_been_set())
+			    dialog.warning(gettext("To calculate delta signatures of files saved as sparse files, you need to activate sparse file detection mechanism with merging operation"));
+		    }
 
 			// then we call op_create_in_sub which will call filter_merge operation to build the archive described by the catalogue
 		    op_create_in_sub(dialog,
