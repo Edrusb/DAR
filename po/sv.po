@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2015-10-17 11:45+0200\n"
+"POT-Creation-Date: 2015-10-17 15:01+0200\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -1097,12 +1097,12 @@ msgid "Key cannot be an empty string"
 msgstr "Nyckel kan ej vara en tom sträng"
 
 #: src/libdar/tools.cpp:158 src/libdar/criterium.cpp:880
-#: src/dar_suite/dar_suite.cpp:281
+#: src/dar_suite/dar_suite.cpp:287
 msgid "YES"
 msgstr "JA"
 
 #: src/libdar/tools.cpp:158 src/libdar/criterium.cpp:881
-#: src/dar_suite/dar_suite.cpp:283
+#: src/dar_suite/dar_suite.cpp:289
 msgid "NO"
 msgstr "NEJ"
 
@@ -1681,11 +1681,11 @@ msgstr ""
 "Inget utrymme kvar för inod, du har möjlighet att skapa en del plats nu. När "
 "det är gjort : kan vi fortsätta ?"
 
-#: src/libdar/fichier_local.cpp:435
+#: src/libdar/fichier_local.cpp:437
 msgid "Cannot open file : "
 msgstr "Kan ej öppna fil : "
 
-#: src/libdar/fichier_local.cpp:458
+#: src/libdar/fichier_local.cpp:460
 #, fuzzy, c-format
 msgid "Cannot dup() filedescriptor while copying \"fichier_local\" object: %s"
 msgstr "Kan ej dup() filbeskrivning vid kopiering av \"fichier\"-objekt: %s"
@@ -2589,11 +2589,17 @@ msgstr "%S finns redan och överskrivning är ej tillåten, avbryter"
 msgid "%S is about to be overwritten, continue ?"
 msgstr "%S skall till att skrivas över, fortsätta ?"
 
-#: src/libdar/trivial_sar.cpp:442
+#: src/libdar/trivial_sar.cpp:213 src/libdar/trivial_sar.cpp:226
+#: src/libdar/sar.cpp:1079 src/libdar/sar.cpp:1149 src/libdar/sar.cpp:1159
+#, fuzzy, c-format
+msgid "Failed creating slice %S: "
+msgstr "Misslyckades med att notera hash: "
+
+#: src/libdar/trivial_sar.cpp:448
 msgid "This archive has slices and is not possible to read from a pipe"
 msgstr "Detta arkiv har delar och har ej möjlighet att bli lästa från ett rör"
 
-#: src/libdar/trivial_sar.cpp:479
+#: src/libdar/trivial_sar.cpp:485
 msgid ""
 "This archive is not single sliced, more data exists in the next slices but "
 "cannot be read from the current pipe, aborting"
@@ -2601,7 +2607,7 @@ msgstr ""
 "Detta arkiv har delar och men det är ej möjlighet att läsa följand del från "
 "ett rör, avbryter"
 
-#: src/libdar/trivial_sar.cpp:517
+#: src/libdar/trivial_sar.cpp:523
 #, fuzzy
 msgid "Cannot skip to a valid position in file"
 msgstr "Kan ej hoppa till aktuell position i \"tronc\""
@@ -4302,12 +4308,17 @@ msgid ""
 "%S is required for further operation, please provide the file if you have it."
 msgstr "%s krävs för ytterligare åtgärd, vänligen förse med filen."
 
-#: src/libdar/sar.cpp:761
+#: src/libdar/sar.cpp:727
+#, fuzzy, c-format
+msgid "Failed reading slice %S: "
+msgstr "Fel vid läsning från fil: "
+
+#: src/libdar/sar.cpp:764
 #, fuzzy, c-format
 msgid "%S has a bad or corrupted header, please provide the correct file."
 msgstr "%s har ett felaktigt huvud, ge den korrekta filen."
 
-#: src/libdar/sar.cpp:765
+#: src/libdar/sar.cpp:768
 #, fuzzy, c-format
 msgid ""
 "LAX MODE: %S has a bad or corrupted header, trying to guess original values "
@@ -4316,14 +4327,14 @@ msgstr ""
 "LAX MODE: %s har felaktigt eller förstört huvud, försöker att gissa "
 "ursprungliga värden och fortsätter om möjligt"
 
-#: src/libdar/sar.cpp:775
+#: src/libdar/sar.cpp:778
 #, fuzzy, c-format
 msgid ""
 "%S is not a valid file (wrong magic number), please provide the good file."
 msgstr ""
 "%s är inte en giltig fil (felaktigt magiskt tal), förse med den rätta filen."
 
-#: src/libdar/sar.cpp:779
+#: src/libdar/sar.cpp:782
 #, fuzzy, c-format
 msgid ""
 "LAX MODE: In spite of its name, %S does not appear to be a dar slice, "
@@ -4332,14 +4343,14 @@ msgstr ""
 "LAX MODE: Trots sitt namn, så verkar inte %s vara en dar-delsäkerhetskopia, "
 "antar data förstört och fortsätter"
 
-#: src/libdar/sar.cpp:783
+#: src/libdar/sar.cpp:786
 msgid ""
 "This is an old archive, it can only be opened starting by the first slice"
 msgstr ""
 "Detta är ett gammalt arkiv, det kan bara öppnas genom att börja med den "
 "första delsäkerhetskopian"
 
-#: src/libdar/sar.cpp:810
+#: src/libdar/sar.cpp:813
 msgid ""
 "LAX MODE: Due to probable data corruption, dar could not determine the "
 "correct size of slices in this archive. For recent archive, this information "
@@ -4351,56 +4362,56 @@ msgstr ""
 "denna information dubblerad i varje delsäkerhetskopia, vill du försöka att "
 "öppna en annan delsäkerhetskopia för att få tag på detta värde om det finns?"
 
-#: src/libdar/sar.cpp:814
+#: src/libdar/sar.cpp:817
 msgid "LAX MODE: Please provide the slice number to read: "
 msgstr "LAX MODE: Skriv in numret på den delsäkerhetskopia som skall läsas: "
 
-#: src/libdar/sar.cpp:822
+#: src/libdar/sar.cpp:825
 msgid "LAX MODE: Please provide an strictly positive integer number"
 msgstr "LAX MODE: Skriv in ett positivt heltal"
 
-#: src/libdar/sar.cpp:828
+#: src/libdar/sar.cpp:831
 #, c-format
 msgid "LAX MODE: opening slice %i to read its slice header"
 msgstr ""
 "LAX MODE: öppnar delsäkerhetskopia %i för att läsa dess "
 "delsäkerhetskopiehuvud"
 
-#: src/libdar/sar.cpp:830
+#: src/libdar/sar.cpp:833
 #, c-format
 msgid "LAX MODE: closing slice %i, header properly fetched"
 msgstr "LAX MODE: stänger delsäkerhetskopia %i, huvud hämtat korrekt"
 
-#: src/libdar/sar.cpp:836
+#: src/libdar/sar.cpp:839
 msgid ""
 "LAX MODE: In spite of a the absence of a known slice size, continuing anyway"
 msgstr ""
 "LAX MODE: Trots frånvaron av en känd delsäkerhetskopiestorlek, fortsätter "
 "hur som helst"
 
-#: src/libdar/sar.cpp:843
+#: src/libdar/sar.cpp:846
 msgid "Incoherent slice header: First slice size too small"
 msgstr ""
 "Felaktig delsäkerhetskopiehuvud: första delsäkerhetskopiestorlek för liten"
 
-#: src/libdar/sar.cpp:845
+#: src/libdar/sar.cpp:848
 msgid "incoherent slice header: Slice size too small"
 msgstr "Felaktig delsäkerhetskopiehuvud: delsäkerhetskopiestorlek för liten"
 
-#: src/libdar/sar.cpp:851
+#: src/libdar/sar.cpp:854
 #, fuzzy, c-format
 msgid "Error opening %S : "
 msgstr "Fel vid öppning av %s : "
 
-#: src/libdar/sar.cpp:851
+#: src/libdar/sar.cpp:854
 msgid " . Retry ?"
 msgstr " : Försöka igen ?"
 
-#: src/libdar/sar.cpp:862
+#: src/libdar/sar.cpp:865
 msgid " is a slice from another backup, please provide the correct slice."
 msgstr " är en del från en annan säkerhetskopia, hämta den rätta delen."
 
-#: src/libdar/sar.cpp:867
+#: src/libdar/sar.cpp:870
 msgid ""
 "LAX MODE: internal name of the slice leads dar to consider it is not member "
 "of the same archive. Assuming data corruption occurred and relying on the "
@@ -4411,19 +4422,19 @@ msgstr ""
 "på filnamnet på denna delsäkerhetskopia som bevis på dess medlemskap i "
 "arkivet"
 
-#: src/libdar/sar.cpp:892
+#: src/libdar/sar.cpp:895
 msgid ""
 "Data corruption met at end of slice, forbidden flag found at this position"
 msgstr ""
 "Data förstört vid slutet på delsäkerhetskopian, förbjuden flagga hittad i "
 "denna position"
 
-#: src/libdar/sar.cpp:898
+#: src/libdar/sar.cpp:901
 msgid "Data corruption met at end of slice, unknown flag found"
 msgstr ""
 "Data förstört vid slutet på delsäkerhetskopian, förbjuden flagga hittad"
 
-#: src/libdar/sar.cpp:913
+#: src/libdar/sar.cpp:916
 #, c-format
 msgid ""
 "Two different slices (%i and %i) are marked as the last slice of the backup!"
@@ -4431,7 +4442,7 @@ msgstr ""
 "Två olika delsäkerhetskopior (%i och %i) är markerade som den sista "
 "delsäkerhetskopian i denna säkerhetskopia!"
 
-#: src/libdar/sar.cpp:916
+#: src/libdar/sar.cpp:919
 #, c-format
 msgid ""
 "LAX MODE: slices %i and %i are both recorded as last slice of the archive, "
@@ -4441,14 +4452,14 @@ msgstr ""
 "delsäkerhetskopian, behåller det högre talet som den verkligt sista "
 "delsäkerhetskopian"
 
-#: src/libdar/sar.cpp:939
+#: src/libdar/sar.cpp:942
 #, fuzzy, c-format
 msgid "Slice %S has an unknown flag (neither terminal nor non_terminal file)."
 msgstr ""
 "Delsäkerhetskopia %s har en okänd flagga (varken terminal eller icke-"
 "terminal fil)."
 
-#: src/libdar/sar.cpp:949
+#: src/libdar/sar.cpp:952
 #, fuzzy, c-format
 msgid ""
 "Due to data corruption, it is not possible to know if slice %S is the last "
@@ -4463,19 +4474,19 @@ msgstr ""
 "enligt egenskapen för denna delsäkerhetskopia. Du kan även svara \"abort\" "
 "för att avsluta programmet direkt: "
 
-#: src/libdar/sar.cpp:951 src/libdar/sar.cpp:955
+#: src/libdar/sar.cpp:954 src/libdar/sar.cpp:958
 msgid "last"
 msgstr "sista"
 
-#: src/libdar/sar.cpp:951
+#: src/libdar/sar.cpp:954
 msgid "notlast"
 msgstr "ej sista"
 
-#: src/libdar/sar.cpp:951 src/libdar/sar.cpp:953
+#: src/libdar/sar.cpp:954 src/libdar/sar.cpp:956
 msgid "abort"
 msgstr "avbryt"
 
-#: src/libdar/sar.cpp:967
+#: src/libdar/sar.cpp:970
 msgid ""
 "LAX MODE: Slice flag corrupted, but a slice of higher number has been seen, "
 "thus the header flag was surely not indicating this slice as the last of the "
@@ -4485,59 +4496,59 @@ msgstr ""
 "högre nummer har setts, sålunda indikerade denna delsäkerhetskopieflagga "
 "inte denna delsäkerhetskopia som den sista i arkivet. Fortsätter"
 
-#: src/libdar/sar.cpp:1010
+#: src/libdar/sar.cpp:1014
 #, c-format
 msgid "failed openning slice %S: %S. Will try to erase it first, if allowed"
 msgstr ""
 
-#: src/libdar/sar.cpp:1093
+#: src/libdar/sar.cpp:1100
 msgid "file exists, and DONT_ERASE option is set."
 msgstr "fil finns, och 'DONT_ERASE'-alternativ är inställt."
 
-#: src/libdar/sar.cpp:1098
+#: src/libdar/sar.cpp:1105
 msgid " is about to be overwritten."
 msgstr " skall till att skrivas över."
 
-#: src/libdar/sar.cpp:1176
+#: src/libdar/sar.cpp:1189
 msgid ""
 "First slice size is too small to even just be able to drop the slice header"
 msgstr ""
 "Första delsäkerhetskopiestorlek är för liten för att till och med kunna på "
 "plats med delsäkerhetskopiehuvudet"
 
-#: src/libdar/sar.cpp:1178
+#: src/libdar/sar.cpp:1191
 msgid "Slice size is too small to even just be able to drop the slice header"
 msgstr ""
 "Delsäkerhetskopiestorlek är för liten för att till och med kunna på plats "
 "med delsäkerhetskopiehuvudet"
 
-#: src/libdar/sar.cpp:1241
+#: src/libdar/sar.cpp:1254
 msgid "Finished writing to file "
 msgstr "Klar med skrivning till fil "
 
-#: src/libdar/sar.cpp:1241
+#: src/libdar/sar.cpp:1254
 msgid ", ready to continue ? "
 msgstr ", beredd att fortsätta ? "
 
-#: src/libdar/sar.cpp:1246
+#: src/libdar/sar.cpp:1259
 msgid ""
 "If you really want to abort the archive creation hit CTRL-C, then press "
 "enter."
 msgstr "Om du verkligen vill stoppa dar, tryck CTLR-C och sedan vagnretur "
 
-#: src/libdar/sar.cpp:1278
+#: src/libdar/sar.cpp:1291
 msgid "file not open"
 msgstr "fil ej öppen"
 
-#: src/libdar/sar.cpp:1312
+#: src/libdar/sar.cpp:1325
 msgid "The last file of the set is not present in "
 msgstr "Den sista filen i omgången finns inte i "
 
-#: src/libdar/sar.cpp:1312
+#: src/libdar/sar.cpp:1325
 msgid " , please provide it."
 msgstr " . hämta den."
 
-#: src/libdar/sar.cpp:1326
+#: src/libdar/sar.cpp:1339
 #, c-format
 msgid ""
 "No backup file is present in %S for archive %S, please provide the last file "
@@ -5156,7 +5167,7 @@ msgstr "Brist på SÄKERT minne för att utföra åtgärden, avbryter densamma"
 msgid "Lack of memory to achieve the operation, aborting operation"
 msgstr "Minnesbrist för att utföra åtgärden, avbryter densamma"
 
-#: src/dar_suite/dar_suite.cpp:186
+#: src/dar_suite/dar_suite.cpp:186 src/dar_suite/dar_suite.cpp:232
 msgid "FATAL error, aborting operation"
 msgstr "FATALT fel, avbryter åtgärd"
 
@@ -5189,15 +5200,15 @@ msgstr ""
 "Avbryter program. Den begärda åtgärden behöver funktioner, som har "
 "avaktiverats vid kompileringstillfället: "
 
-#: src/dar_suite/dar_suite.cpp:233 src/dar_suite/dar_suite.cpp:253
+#: src/dar_suite/dar_suite.cpp:239 src/dar_suite/dar_suite.cpp:259
 msgid "INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER"
 msgstr "INTERNT FEL, RAPPORTERA FÖREGÅENDE UTDATA TILL PROGRAMUNDERHÅLLAREN"
 
-#: src/dar_suite/dar_suite.cpp:252
+#: src/dar_suite/dar_suite.cpp:258
 msgid "CAUGHT A NON (LIB)DAR EXCEPTION"
 msgstr "FÅNGADE ETT ICKE- (LIB)DAR-AVBROTT"
 
-#: src/dar_suite/dar_suite.cpp:260
+#: src/dar_suite/dar_suite.cpp:266
 msgid ""
 "SANITY CHECK: AT LEAST ONE THREAD_CANCELLATION OBJECT HAS NOT BEEN DESTROYED "
 "AND REMAINS IN MEMORY WHILE THE PROGRAM REACHED ITS END"
@@ -5205,30 +5216,30 @@ msgstr ""
 "SUNDHETSKONTROLL: ÅTMINSTONE ETT TRÅDAT AVBROTTSOBJEKT HAR INTE FÖRSTÖRTS "
 "OCH FINNS KVAR I MINNE MEDAN PROGRAMMET NÅDDE SITT SLUT"
 
-#: src/dar_suite/dar_suite.cpp:286
+#: src/dar_suite/dar_suite.cpp:292
 #, c-format
 msgid "Long options support       : %s\n"
 msgstr "Stöd för långa alternativ  : %s\n"
 
-#: src/dar_suite/dar_suite.cpp:302
+#: src/dar_suite/dar_suite.cpp:308
 #, c-format
 msgid "Received signal: %s"
 msgstr "Mottagen signal: %s"
 
-#: src/dar_suite/dar_suite.cpp:304
+#: src/dar_suite/dar_suite.cpp:310
 #, c-format
 msgid "Received signal: %d"
 msgstr "Mottagen signal: %d"
 
-#: src/dar_suite/dar_suite.cpp:310
+#: src/dar_suite/dar_suite.cpp:316
 msgid "Archive fast termination engaged"
 msgstr "Snabb avslutning på arkiv inkopplat"
 
-#: src/dar_suite/dar_suite.cpp:314
+#: src/dar_suite/dar_suite.cpp:320
 msgid "Archive delayed termination engaged"
 msgstr "Fördröjd avslutning på arkiv inkopplat"
 
-#: src/dar_suite/dar_suite.cpp:318
+#: src/dar_suite/dar_suite.cpp:324
 #, fuzzy
 msgid ""
 "Disabling signal handler, the next time this signal is received the program "
@@ -5237,7 +5248,7 @@ msgstr ""
 "Kopplar bort signalhanterare, nästa gång denna signal mottages kommer "
 "programmet att avslutas omedelbart"
 
-#: src/dar_suite/dar_suite.cpp:322
+#: src/dar_suite/dar_suite.cpp:328
 msgid ""
 "Cannot cleanly abort the operation, thread-safe support is missing, will "
 "thus abruptly stop the program, generated archive may be unusable"
