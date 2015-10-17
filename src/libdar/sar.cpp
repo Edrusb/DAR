@@ -723,6 +723,9 @@ namespace libdar
 		    break;
 		case Esystem::io_exist:
 		    throw SRC_BUG;
+		case Esystem::io_access:
+		    e.prepend_message(tools_printf(gettext("Failed reading slice %S: "), &fic));
+		    throw; // propagate the exception
 		default:
 		    throw SRC_BUG;
 		}
@@ -997,7 +1000,8 @@ namespace libdar
 	    {
 		of_fd = entr->open(get_ui(),
 				   fic,
-				   hash == hash_none ? gf_read_write : gf_write_only, // yes, no more writeonly as stated in the name of this method
+				   hash == hash_none ? gf_read_write : gf_write_only,
+				       // yes, no anymore always writeonly as stated in the name of this method
 				   force_perm,
 				   perm,
 				   true,   //< fail_if_exists
@@ -1020,7 +1024,7 @@ namespace libdar
 		{
 		    try
 		    {
-			    // the file does not exist, re-trying opening it without fail_if_exists
+			    // the file exists, re-trying opening it without fail_if_exists
 
 			of_fd = entr->open(get_ui(),
 					   fic,
@@ -1071,6 +1075,9 @@ namespace libdar
 			    throw SRC_BUG;
 			case Esystem::io_absent:
 			    throw SRC_BUG;
+			case Esystem::io_access:
+			    e.prepend_message(tools_printf(gettext("Failed creating slice %S: "), &fic));
+			    throw;
 			default:
 			    throw SRC_BUG;
 			}
@@ -1138,6 +1145,9 @@ namespace libdar
 			throw SRC_BUG; // not called with fail_if_exists set
 		    case Esystem::io_absent:
 			throw SRC_BUG; // not called in read mode
+		    case Esystem::io_access:
+			e.prepend_message(tools_printf(gettext("Failed creating slice %S: "), &fic));
+			throw; // propagate the exception
 		    default:
 			throw SRC_BUG;
 		    }
@@ -1145,6 +1155,9 @@ namespace libdar
 		break;
 	    case Esystem::io_absent:
 		throw SRC_BUG;
+	    case Esystem::io_access:
+		e.prepend_message(tools_printf(gettext("Failed creating slice %S: "), &fic));
+		throw; // propagate the exception
 	    default:
 		throw SRC_BUG;
 	    }

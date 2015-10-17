@@ -209,6 +209,9 @@ namespace libdar
 			    throw SRC_BUG;
 			case Esystem::io_absent:
 			    throw SRC_BUG;
+			case Esystem::io_access:
+			    e.prepend_message(tools_printf(gettext("Failed creating slice %S: "), &filename));
+			    throw; // propagate the exception
 			default:
 			    throw SRC_BUG;
 			}
@@ -219,6 +222,9 @@ namespace libdar
 			throw SRC_BUG;
 		    else
 			throw SRC_BUG; // not for the same reason, must know that reporting the same error but on a different line
+		case Esystem::io_access:
+		    e.prepend_message(tools_printf(gettext("Failed creating slice %S: "), &filename));
+		    throw; // propagate the exception
 		default:
 		    if(tmp != nullptr)
 			throw SRC_BUG;

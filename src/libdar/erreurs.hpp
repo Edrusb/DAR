@@ -317,8 +317,9 @@ namespace libdar
     public:
 	enum io_error
 	{
-	    io_exist, //< file already exists (write mode)
-	    io_absent //< file does not exist (read mode)
+	    io_exist,  //< file already exists (write mode)
+	    io_absent, //< file does not exist (read mode)
+	    io_access  //< permission denied (any mode)
 	};
 
 	Esystem(const std::string & source, const std::string & message, io_error code);
