@@ -227,6 +227,12 @@ int dar_suite_global(int argc,
 	GENERAL_REPORT(string(gettext("Aborting program. The requested operation needs a feature that has been disabled at compilation time: ")) + e.get_message());
 	ret = EXIT_COMPILATION;
     }
+    catch(Esystem & e)
+    {
+	GENERAL_REPORT(string(gettext("FATAL error, aborting operation")));
+	GENERAL_REPORT(e.get_message());
+	ret = EXIT_ERROR;
+    }
     catch(Egeneric & e)
     {
 	cerr << e.dump_str();

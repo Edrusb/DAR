@@ -431,6 +431,8 @@ namespace libdar
 			throw Esystem("fichier_local::open", tools_strerror_r(errno), Esystem::io_exist);
 		    case ENOENT:
 			throw Esystem("fichier_local::open", tools_strerror_r(errno), Esystem::io_absent);
+		    case EACCES:
+			throw Esystem("fichier_local::open", tools_strerror_r(errno), Esystem::io_access);
 		    default:
 			throw Erange("fichier_local::open", string(gettext("Cannot open file : ")) + tools_strerror_r(errno));
 		    }

@@ -434,10 +434,10 @@ namespace libdar
         string src = all;
         string::iterator it = tools_find_last_char_of(src, '/');
 
-
         if(it != src.end()) // path separator found (pointed to by "it")
         {
-            base = string(it + 1, src.end());
+	    it += 1;
+            base = string(it, src.end());
             chemin = new (pool) path(string(src.begin(), it), true);
         }
         else
