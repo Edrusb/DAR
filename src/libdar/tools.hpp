@@ -507,355 +507,374 @@ namespace libdar
 
 	/// \param[in,out] f file to append elastic buffer to
 	/// \param[in] max_size size of the elastic buffer to add
-    extern void tools_add_elastic_buffer(generic_file & f, U_32 max_size);
+	/// \param[in] modulo defines the size to choose (see note)
+	/// \param[in] offset defines the offset to apply (see note)
+	/// \note the size of the elastic buffer should not exceed max_size but
+	/// should be chosen in order to reach a size which is zero modulo "modulo"
+	/// assuming the offset we add the elastic buffer at is "offset". If modulo is zero
+	/// this the elastic buffer is randomly chosen from 1 to max_size without any
+	/// concern about being congruent to a given modulo.
+	/// \example if module is 5 and offset is 2, the elastic buffer possible size
+	/// can be 3 (2+3 is congruent to 0 modulo 5), 8 (2+8 is congruent to modulo 5), 12, etc.
+	/// but not exceed max_size+modulo-1
+	/// \note this is to accomodate the case when encrypted data is followed by clear data
+	/// at the end of an archive. There is no way to known when we read clear data, but we
+	/// know the clear data size is very inferior to crypted block size, thus when reading
+	/// a uncompleted block of data we can be sure we have reached and of file and that
+	/// the data is clear without any encrypted part because else we would have read an entire
+	/// block of data.
+     extern void tools_add_elastic_buffer(generic_file & f,
+					  U_32 max_size,
+					  U_32 modulo,
+					  U_32 offset);
 
 
-	/// tells whether two files are on the same mounted filesystem
+	 /// tells whether two files are on the same mounted filesystem
 
-	/// \param[in] file1 first file
-	/// \param[in] file2 second file
-	/// \return true if the two file are located under the same mounting point
-	/// \note if one of the file is not present or if the filesystem information
-	///   is not possible to be read an exception is throw (Erange)
-    extern bool tools_are_on_same_filesystem(const std::string & file1, const std::string & file2);
+	 /// \param[in] file1 first file
+	 /// \param[in] file2 second file
+	 /// \return true if the two file are located under the same mounting point
+	 /// \note if one of the file is not present or if the filesystem information
+	 ///   is not possible to be read an exception is throw (Erange)
+     extern bool tools_are_on_same_filesystem(const std::string & file1, const std::string & file2);
+
+
+	 /// transform a relative path to an absolute one given the current directory value
+
+	 /// \param[in] src the relative path to transform
+	 /// \param[in] cwd the value to take for the current directory
+	 /// \return the corresponding absolute path
+     extern path tools_relative2absolute_path(const path & src, const path & cwd);
 
+	 /// block all signals (based on POSIX sigprocmask)
 
-	/// transform a relative path to an absolute one given the current directory value
+	 /// \param[out] old_mask is set to the old mask value (for later unmasking signals)
+	 /// \exception Erange is thrown if system call failed for some reason
+     extern void tools_block_all_signals(sigset_t &old_mask);
 
-	/// \param[in] src the relative path to transform
-	/// \param[in] cwd the value to take for the current directory
-	/// \return the corresponding absolute path
-    extern path tools_relative2absolute_path(const path & src, const path & cwd);
+	 /// unblock signals according to given mask
 
-	/// block all signals (based on POSIX sigprocmask)
+	 /// \param[in] old_mask value to set to blocked signal mask
+	 /// \exception Erange is thrown if system call failed for some reason
+     extern void tools_set_back_blocked_signals(sigset_t old_mask);
 
-	/// \param[out] old_mask is set to the old mask value (for later unmasking signals)
-	/// \exception Erange is thrown if system call failed for some reason
-    extern void tools_block_all_signals(sigset_t &old_mask);
+	 /// counts the number of a given char in a given string
 
-	/// unblock signals according to given mask
+	 /// \param[in] s string to look inside of
+	 /// \param[in] a char to look for
+	 /// \return the number of char found
+     extern U_I tools_count_in_string(const std::string & s, const char a);
+
+	 /// returns the last modification date of the given file
+
+	 /// \param[in] s path of the file to get the last mtime
+	 /// \return the mtime of the given file
+     extern datetime tools_get_mtime(const std::string & s);
+
+	 /// returns the size of the given plain file
+
+	 /// \param[in] s path of the file to get the size
+	 /// \return the size if the file in byte
+     extern infinint tools_get_size(const std::string & s);
+
+	 /// returns the last change date of the given file
+
+	 /// \param[in] s path of the file to get the last ctime
+	 /// \return the ctime of the given file
+     extern datetime tools_get_ctime(const std::string & s);
+
+	 /// read a file and split its contents into words
+
+	 /// \param[in,out] f is the file to read
+	 /// \return the list of words found in this order in the file
+	 /// \note The different quotes are taken into account
+     extern std::vector<std::string> tools_split_in_words(generic_file & f);
 
-	/// \param[in] old_mask value to set to blocked signal mask
-	/// \exception Erange is thrown if system call failed for some reason
-    extern void tools_set_back_blocked_signals(sigset_t old_mask);
 
-	/// counts the number of a given char in a given string
+	 /// read a std::string and split its contents into words
 
-	/// \param[in] s string to look inside of
-	/// \param[in] a char to look for
-	/// \return the number of char found
-    extern U_I tools_count_in_string(const std::string & s, const char a);
+	 /// \param[in,out] arg is the string to read
+	 /// \return the list of words found in this order in the file
+	 /// \note The different quotes are taken into account
+     extern std::vector<std::string> tools_split_in_words(const std::string & arg);
 
-	/// returns the last modification date of the given file
 
-	/// \param[in] s path of the file to get the last mtime
-	/// \return the mtime of the given file
-    extern datetime tools_get_mtime(const std::string & s);
+	 /// look next char in string out of parenthesis
 
-	/// returns the size of the given plain file
+	 /// \param[in] data is the string to look into
+	 /// \param[in] what is the char to look for
+	 /// \param[in] start is the index in string to start from, assuming at given position we are out of parenthesis
+	 /// \param[out] found the position of the next char equal to what
+	 /// \return true if a char equal to 'what' has been found and set the 'found' argument to its position or returns false if
+	 /// no such character has been found out of parenthesis
+	 /// \note the 'found' argument is assigned only if the call returns true, its value is not to be used when false is returned from the call
+	 /// \note second point, the start data should point to a character that is out of any parenthesis, behavior is undefined else.
+     extern bool tools_find_next_char_out_of_parenthesis(const std::string & data, const char what,  U_32 start, U_32 & found);
 
-	/// \param[in] s path of the file to get the size
-	/// \return the size if the file in byte
-    extern infinint tools_get_size(const std::string & s);
 
-	/// returns the last change date of the given file
+	 /// produce the string resulting from the substition of % macro defined in the map
 
-	/// \param[in] s path of the file to get the last ctime
-	/// \return the ctime of the given file
-    extern datetime tools_get_ctime(const std::string & s);
+	 /// \param[in] hook is the user's expression in which to proceed to substitution
+	 /// \param[in] corres is a map telling which char following a % sign to replace by which string
+	 /// \return the resulting string of the substitution
+     extern std::string tools_substitute(const std::string & hook,
+					 const std::map<char, std::string> & corres);
 
-	/// read a file and split its contents into words
 
-	/// \param[in,out] f is the file to read
-	/// \return the list of words found in this order in the file
-	/// \note The different quotes are taken into account
-    extern std::vector<std::string> tools_split_in_words(generic_file & f);
+	 /// produces the string resulting from the substitution of %... macro
 
+	 /// \param[in] hook the string in which to substitute
+	 /// \param[in] path is by what %p will be replaced
+	 /// \param[in] basename is by what %b will be replaced
+	 /// \param[in] num is by what %n will be replaced
+	 /// \param[in] padded_num is by what %N will be replaced
+	 /// \param[in] ext is by what %e will be replaced
+	 /// \param[in] context is by what %c will be replaced
+	 /// \return the substitued resulting string
+	 /// \note it now relies on tools_substitue
+     extern std::string tools_hook_substitute(const std::string & hook,
+					      const std::string & path,
+					      const std::string & basename,
+					      const std::string & num,
+					      const std::string & padded_num,
+					      const std::string & ext,
+					      const std::string & context);
 
-	/// read a std::string and split its contents into words
 
-	/// \param[in,out] arg is the string to read
-	/// \return the list of words found in this order in the file
-	/// \note The different quotes are taken into account
-    extern std::vector<std::string> tools_split_in_words(const std::string & arg);
+	 /// execute and retries at user will a given command line
 
+	 /// \param[in] ui which way to ask the user whether to continue upon command line error
+	 /// \param[in] cmd_line the command line to execute
+     extern void tools_hook_execute(user_interaction & ui,
+				    const std::string & cmd_line);
 
-	/// look next char in string out of parenthesis
 
-	/// \param[in] data is the string to look into
-	/// \param[in] what is the char to look for
-	/// \param[in] start is the index in string to start from, assuming at given position we are out of parenthesis
-	/// \param[out] found the position of the next char equal to what
-	/// \return true if a char equal to 'what' has been found and set the 'found' argument to its position or returns false if
-	/// no such character has been found out of parenthesis
-	/// \note the 'found' argument is assigned only if the call returns true, its value is not to be used when false is returned from the call
-	/// \note second point, the start data should point to a character that is out of any parenthesis, behavior is undefined else.
-    extern bool tools_find_next_char_out_of_parenthesis(const std::string & data, const char what,  U_32 start, U_32 & found);
+	 /// subsititue and execute command line
 
+	 /// \param[in,out] ui this is the way to contact the user
+	 /// \param[in] hook the string in which to substitute
+	 /// \param[in] path is by what %p will be replaced
+	 /// \param[in] basename is by what %b will be replaced
+	 /// \param[in] num is by what %n will be replaced
+	 /// \param[in] padded_num is by what %N will be replaced
+	 /// \param[in] ext is by what %e will be replaced
+	 /// \param[in] context is by what %c will be replaced
+     extern void tools_hook_substitute_and_execute(user_interaction & ui,
+						   const std::string & hook,
+						   const std::string & path,
+						   const std::string & basename,
+						   const std::string & num,
+						   const std::string & padded_num,
+						   const std::string & ext,
+						   const std::string & context);
 
-	/// produce the string resulting from the substition of % macro defined in the map
+	 /// builds a regex from root directory and user provided regex to be applied to the relative path
 
-	/// \param[in] hook is the user's expression in which to proceed to substitution
-	/// \param[in] corres is a map telling which char following a % sign to replace by which string
-	/// \return the resulting string of the substitution
-    extern std::string tools_substitute(const std::string & hook,
-					const std::map<char, std::string> & corres);
 
+	 /// \param[in] prefix is the root portion of the path
+	 /// \param[in] relative_part is the user provided regex to be applied to the relative path
+	 /// \return the corresponding regex to be applied to full absolute path
+     extern std::string tools_build_regex_for_exclude_mask(const std::string & prefix,
+							   const std::string & relative_part);
 
-	/// produces the string resulting from the substitution of %... macro
+	 /// convert string for xml output
 
-	/// \param[in] hook the string in which to substitute
-	/// \param[in] path is by what %p will be replaced
-	/// \param[in] basename is by what %b will be replaced
-	/// \param[in] num is by what %n will be replaced
-	/// \param[in] padded_num is by what %N will be replaced
-	/// \param[in] ext is by what %e will be replaced
-	/// \param[in] context is by what %c will be replaced
-	/// \return the substitued resulting string
-	/// \note it now relies on tools_substitue
-    extern std::string tools_hook_substitute(const std::string & hook,
-					     const std::string & path,
-					     const std::string & basename,
-					     const std::string & num,
-					     const std::string & padded_num,
-					     const std::string & ext,
-					     const std::string & context);
+	 /// \note any < > & quote and double quote are replaced by adequate sequence for unicode
+	 /// \note second point, nothing is done here to replace system native strings to unicode
+     extern std::string tools_output2xml(const std::string & src);
 
+	 /// convert octal string to integer
 
-	/// execute and retries at user will a given command line
+	 /// \param perm is a string representing a number in octal (string must have a leading zero)
+	 /// \return the corresponding value as an integer
+     extern U_I tools_octal2int(const std::string & perm);
 
-	/// \param[in] ui which way to ask the user whether to continue upon command line error
-	/// \param[in] cmd_line the command line to execute
-    extern void tools_hook_execute(user_interaction & ui,
-				   const std::string & cmd_line);
 
+	 /// convert a number to a string corresponding to its octal representation
 
-	/// subsititue and execute command line
+	 /// \param perm is the octal number
+	 /// \return the corresponding octal string
+     extern std::string tools_int2octal(const U_I & perm);
 
-	/// \param[in,out] ui this is the way to contact the user
-	/// \param[in] hook the string in which to substitute
-	/// \param[in] path is by what %p will be replaced
-	/// \param[in] basename is by what %b will be replaced
-	/// \param[in] num is by what %n will be replaced
-	/// \param[in] padded_num is by what %N will be replaced
-	/// \param[in] ext is by what %e will be replaced
-	/// \param[in] context is by what %c will be replaced
-    extern void tools_hook_substitute_and_execute(user_interaction & ui,
-						  const std::string & hook,
-						  const std::string & path,
-						  const std::string & basename,
-						  const std::string & num,
-						  const std::string & padded_num,
-						  const std::string & ext,
-						  const std::string & context);
+	 /// convert a permission number into its string representation (rwxrwxrwx)
 
-	/// builds a regex from root directory and user provided regex to be applied to the relative path
+     extern std::string tools_get_permission_string(char type, U_32 perm, bool hard);
 
+	 /// change the permission of the file which descriptor is given
 
-	/// \param[in] prefix is the root portion of the path
-	/// \param[in] relative_part is the user provided regex to be applied to the relative path
-	/// \return the corresponding regex to be applied to full absolute path
-    extern std::string tools_build_regex_for_exclude_mask(const std::string & prefix,
-							  const std::string & relative_part);
+	 /// \param[in] fd file's descriptor
+	 /// \param[in] perm file permission to set the file to
+     extern void tools_set_permission(S_I fd, U_I perm);
 
-	/// convert string for xml output
+	 /// obtain the permission of the file which descriptor is given
 
-	/// \note any < > & quote and double quote are replaced by adequate sequence for unicode
-	/// \note second point, nothing is done here to replace system native strings to unicode
-    extern std::string tools_output2xml(const std::string & src);
+	 /// \param[in] fd file's descriptor
+	 /// \return permission of the given file
+	 /// \note in case of error exception may be thrown
+     extern U_I tools_get_permission(S_I fd);
 
-	/// convert octal string to integer
+	 /// change ownership of the file which descriptor is given
 
-	/// \param perm is a string representing a number in octal (string must have a leading zero)
-	/// \return the corresponding value as an integer
-    extern U_I tools_octal2int(const std::string & perm);
+	 /// convert string user name or uid to numeric uid value
 
+	 /// \param[in] user string username
+	 /// \return uid value
+     extern uid_t tools_ownership2uid(const std::string & user);
 
-	/// convert a number to a string corresponding to its octal representation
+	 /// convert string group name or gid to numeric gid value
 
-	/// \param perm is the octal number
-	/// \return the corresponding octal string
-    extern std::string tools_int2octal(const U_I & perm);
+	 /// \param[in] group string username
+	 /// \return uid value
+     extern uid_t tools_ownership2gid(const std::string & group);
 
-	/// convert a permission number into its string representation (rwxrwxrwx)
+	 /// change ownership of the file which descriptor is given
 
-    extern std::string tools_get_permission_string(char type, U_32 perm, bool hard);
+	 /// \param[in] filedesc file's descriptor
+	 /// \param[in] slice_user the user to set the file to. For empty string, no attempts to change the user ownership is done
+	 /// \param[in] slice_group the group to set the file to. For empty string, no attempts to change the group ownership is done
+	 /// \note this call may throw Erange exception upon system error
+     extern void tools_set_ownership(S_I filedesc, const std::string & slice_user, const std::string & slice_group);
 
-	/// change the permission of the file which descriptor is given
+	 /// Produces in "dest" the XORed value of "dest" and "src"
 
-	/// \param[in] fd file's descriptor
-	/// \param[in] perm file permission to set the file to
-    extern void tools_set_permission(S_I fd, U_I perm);
+	 /// \param[in,out] dest is the area where to write down the result
+	 /// \param[in] src points to vector or array of values to convert
+	 /// \param[in] n is the number of byte to convert from src to dest
+	 /// \note dest *must* be a valid pointer to an allocated memory area of at least n bytes
+     extern void tools_memxor(void *dest, const void *src, U_I n);
 
-	/// obtain the permission of the file which descriptor is given
+	 /// Produces a list of TLV from a constant type and a list of string
 
-	/// \param[in] fd file's descriptor
-	/// \return permission of the given file
-	/// \note in case of error exception may be thrown
-    extern U_I tools_get_permission(S_I fd);
+	 /// \param[in,out] dialog for user interaction
+	 /// \param[in] type is the type each TLV will have
+	 /// \param[in] data is the list of string to convert into a list of TLV
+	 /// \return a tlv_list object. Each TLV in the list correspond to a string in the given list
+     extern tlv_list tools_string2tlv_list(user_interaction & dialog, const U_16 & type, const std::vector<std::string> & data);
 
-	/// change ownership of the file which descriptor is given
 
-	/// convert string user name or uid to numeric uid value
 
-	/// \param[in] user string username
-	/// \return uid value
-    extern uid_t tools_ownership2uid(const std::string & user);
+	 /// Extract from anonymous pipe a tlv_list
 
-	/// convert string group name or gid to numeric gid value
+	 /// \param[in,out] dialog for user interaction
+	 /// \param[in] fd the filedescriptor for the anonymous pipe's read extremity
+	 /// \param[out] result the resulting tlv_list
+     extern void tools_read_from_pipe(user_interaction & dialog, S_I fd, tlv_list & result);
 
-	/// \param[in] group string username
-	/// \return uid value
-    extern uid_t tools_ownership2gid(const std::string & group);
 
-	/// change ownership of the file which descriptor is given
 
-	/// \param[in] filedesc file's descriptor
-	/// \param[in] slice_user the user to set the file to. For empty string, no attempts to change the user ownership is done
-	/// \param[in] slice_group the group to set the file to. For empty string, no attempts to change the group ownership is done
-	/// \note this call may throw Erange exception upon system error
-    extern void tools_set_ownership(S_I filedesc, const std::string & slice_user, const std::string & slice_group);
+	 /// Produces a pseudo random number x, where 0 <= x < max
 
-	/// Produces in "dest" the XORed value of "dest" and "src"
+	 /// \param[in] max defines the range of the random number to return
+	 /// \return the returned value ranges from 0 (zero) to max - 1. max
+	 /// is never retured, max - 1 can be returned.
+     extern U_I tools_pseudo_random(U_I max);
 
-	/// \param[in,out] dest is the area where to write down the result
-	/// \param[in] src points to vector or array of values to convert
-	/// \param[in] n is the number of byte to convert from src to dest
-	/// \note dest *must* be a valid pointer to an allocated memory area of at least n bytes
-    extern void tools_memxor(void *dest, const void *src, U_I n);
 
-	/// Produces a list of TLV from a constant type and a list of string
+	 /// Template for the decomposition of any number in any base (decimal, octal, hexa, etc.)
 
-	/// \param[in,out] dialog for user interaction
-	/// \param[in] type is the type each TLV will have
-	/// \param[in] data is the list of string to convert into a list of TLV
-	/// \return a tlv_list object. Each TLV in the list correspond to a string in the given list
-    extern tlv_list tools_string2tlv_list(user_interaction & dialog, const U_16 & type, const std::vector<std::string> & data);
+	 /// \param[in] number is the number to decompose
+	 /// \param[in] base is the base to decompose the number into
+	 /// \return a vector of 'digit' int the specified base, the first beeing the less significative
+	 /// \note this template does not take care of the possibily existing optimized euclide division to speed up the operation
+	 /// like what exists for infinint. A specific overriden fonction for this type would be better.
+	 /// \note, the name "big_endian" is erroneous, it gives a little endian vector
 
+     template <class N, class B> std::vector<B> tools_number_base_decomposition_in_big_endian(N number, const B & base)
+     {
+	 std::vector<B> ret;
 
+	 if(base <= 0)
+	     throw Erange("tools_number_decoupe_in_big_endian", "base must be strictly positive");
 
-	/// Extract from anonymous pipe a tlv_list
+	 while(number != 0)
+	 {
+	     ret.push_back(number % base);
+	     number /= base;
+	 }
 
-	/// \param[in,out] dialog for user interaction
-	/// \param[in] fd the filedescriptor for the anonymous pipe's read extremity
-	/// \param[out] result the resulting tlv_list
-    extern void tools_read_from_pipe(user_interaction & dialog, S_I fd, tlv_list & result);
+	 return ret;
+     }
 
+	 /// convert a unsigned char into its hexa decima representation
 
+	 /// \param[in] x is the byte to convert
+	 /// \return the string representing the value of x written in hexadecimal
+     std::string tools_unsigned_char_to_hexa(unsigned char x);
 
-	/// Produces a pseudo random number x, where 0 <= x < max
+	 /// convert a string into its hexadecima representation
 
-	/// \param[in] max defines the range of the random number to return
-	/// \return the returned value ranges from 0 (zero) to max - 1. max
-	/// is never retured, max - 1 can be returned.
-    extern U_I tools_pseudo_random(U_I max);
+	 /// \param[in] input input string to convert
+	 /// \return a string containing an hexadecimal number corresponding to the bytes of the input string
 
+     std::string tools_string_to_hexa(const std::string & input);
 
-	/// Template for the decomposition of any number in any base (decimal, octal, hexa, etc.)
+	 /// Defines the CRC size to use for a given filesize
 
-	/// \param[in] number is the number to decompose
-	/// \param[in] base is the base to decompose the number into
-	/// \return a vector of 'digit' int the specified base, the first beeing the less significative
-	/// \note this template does not take care of the possibily existing optimized euclide division to speed up the operation
-	/// like what exists for infinint. A specific overriden fonction for this type would be better.
-	/// \note, the name "big_endian" is erroneous, it gives a little endian vector
+	 /// \param[in] size is the size of the file to protect by CRC
+	 /// \return crc_size is the size of the crc to use
+     extern infinint tools_file_size_to_crc_size(const infinint & size);
 
-    template <class N, class B> std::vector<B> tools_number_base_decomposition_in_big_endian(N number, const B & base)
-    {
-	std::vector<B> ret;
+	 /// return a string containing the Effective UID
+     extern std::string tools_get_euid();
 
-	if(base <= 0)
-	    throw Erange("tools_number_decoupe_in_big_endian", "base must be strictly positive");
+	 /// return a string containing the Effective UID
+     extern std::string tools_get_egid();
 
-	while(number != 0)
-	{
-	    ret.push_back(number % base);
-	    number /= base;
-	}
+	 /// return a string containing the hostname of the current host
+     extern std::string tools_get_hostname();
 
-	return ret;
-    }
+	 /// return a string containing the current time (UTC)
+     extern std::string tools_get_date_utc();
 
-	/// convert a unsigned char into its hexa decima representation
+	 /// return the string about compression ratio
+     extern std::string tools_get_compression_ratio(const infinint & storage_size, const infinint & file_size, bool compressed);
 
-	/// \param[in] x is the byte to convert
-	/// \return the string representing the value of x written in hexadecimal
-    std::string tools_unsigned_char_to_hexa(unsigned char x);
+	 /// wrapper routine to strerror_r
+     extern std::string tools_strerror_r(int errnum);
 
-	/// convert a string into its hexadecima representation
+ #ifdef GPGME_SUPPORT
+	 /// wrapper routint to gpgme_strerror_r
+     extern std::string tools_gpgme_strerror_r(gpgme_error_t err);
+ #endif
 
-	/// \param[in] input input string to convert
-	/// \return a string containing an hexadecimal number corresponding to the bytes of the input string
+ #if HAVE_WCHAR_H
+	 /// convert a std::string to std::wstring (wide-string, aka string of wchar_t)
+     extern std::wstring tools_string_to_wstring(const std::string & val);
 
-    std::string tools_string_to_hexa(const std::string & input);
+	 /// convert a std::wstring to std::string
+     extern std::string tools_wstring_to_string(const std::wstring & val);
+ #endif
 
-	/// Defines the CRC size to use for a given filesize
+	 /// add in 'a', element of 'b' not already found in 'a'
+     extern void tools_merge_to_vector(std::vector<std::string> & a, const  std::vector<std::string> & b);
 
-	/// \param[in] size is the size of the file to protect by CRC
-	/// \return crc_size is the size of the crc to use
-    extern infinint tools_file_size_to_crc_size(const infinint & size);
+	 /// remove from 'a' elements found in 'b' and return the resulting vector
+     extern std::vector<std::string> tools_substract_from_vector(const std::vector<std::string> & a, const std::vector<std::string> & b);
 
-	/// return a string containing the Effective UID
-    extern std::string tools_get_euid();
+	 /// allocate a new dirent structure for use with readdir_r
+	 ///
+	 /// \param[in] path_name is the path of to the directory (and its underlying filesystem)
+	 /// where the resulting dirent will be used. Depending on fileystem, the size of the dirent
+	 /// structure may vary it is necessary to know the directory where the corresponding files
+	 /// resides
+	 /// \param[in] pool whether to allocate the structure on a memory_pool or out of memory_pool
+	 /// which succeeds when pool is set to nullptr
+	 /// \return a pointer to the newly allocated dirent structure
+     struct dirent *tools_allocate_struct_dirent(const std::string & path_name, memory_pool *pool = nullptr);
 
-	/// return a string containing the Effective UID
-    extern std::string tools_get_egid();
 
-	/// return a string containing the hostname of the current host
-    extern std::string tools_get_hostname();
+	 /// release a dirent structure as allocated by tools_allocate_struct_dirent
+	 ///
+	 /// \param[in] ptr is the address of the structure to release
+     extern void tools_release_struct_dirent(struct dirent *ptr);
 
-	/// return a string containing the current time (UTC)
-    extern std::string tools_get_date_utc();
+	 /// display the content of a secu_string, this function is only for trouble shooting!
+     extern void tools_secu_string_show(user_interaction & dialog, const std::string & msg, const secu_string & key);
 
-	/// return the string about compression ratio
-    extern std::string tools_get_compression_ratio(const infinint & storage_size, const infinint & file_size, bool compressed);
+     template <class T> T tools_max(T a, T b) { return a > b ? a : b; }
+     template <class T> T tools_min(T a, T b) { return a > b ? b : a; }
 
-	/// wrapper routine to strerror_r
-    extern std::string tools_strerror_r(int errnum);
 
-#ifdef GPGME_SUPPORT
-	/// wrapper routint to gpgme_strerror_r
-    extern std::string tools_gpgme_strerror_r(gpgme_error_t err);
-#endif
+ } /// end of namespace
 
-#if HAVE_WCHAR_H
-	/// convert a std::string to std::wstring (wide-string, aka string of wchar_t)
-    extern std::wstring tools_string_to_wstring(const std::string & val);
-
-	/// convert a std::wstring to std::string
-    extern std::string tools_wstring_to_string(const std::wstring & val);
-#endif
-
-	/// add in 'a', element of 'b' not already found in 'a'
-    extern void tools_merge_to_vector(std::vector<std::string> & a, const  std::vector<std::string> & b);
-
-	/// remove from 'a' elements found in 'b' and return the resulting vector
-    extern std::vector<std::string> tools_substract_from_vector(const std::vector<std::string> & a, const std::vector<std::string> & b);
-
-	/// allocate a new dirent structure for use with readdir_r
-	///
-	/// \param[in] path_name is the path of to the directory (and its underlying filesystem)
-	/// where the resulting dirent will be used. Depending on fileystem, the size of the dirent
-	/// structure may vary it is necessary to know the directory where the corresponding files
-	/// resides
-	/// \param[in] pool whether to allocate the structure on a memory_pool or out of memory_pool
-	/// which succeeds when pool is set to nullptr
-	/// \return a pointer to the newly allocated dirent structure
-    struct dirent *tools_allocate_struct_dirent(const std::string & path_name, memory_pool *pool = nullptr);
-
-
-	/// release a dirent structure as allocated by tools_allocate_struct_dirent
-	///
-	/// \param[in] ptr is the address of the structure to release
-    extern void tools_release_struct_dirent(struct dirent *ptr);
-
-	/// display the content of a secu_string, this function is only for trouble shooting!
-    extern void tools_secu_string_show(user_interaction & dialog, const std::string & msg, const secu_string & key);
-
-    template <class T> T tools_max(T a, T b) { return a > b ? a : b; }
-    template <class T> T tools_min(T a, T b) { return a > b ? b : a; }
-
-
-} /// end of namespace
-
-#endif
+ #endif

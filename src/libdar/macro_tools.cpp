@@ -1420,7 +1420,7 @@ namespace libdar
 		{
 		    if(info_details)
 			dialog.warning(gettext("Writing down the initial elastic buffer through the encryption layer..."));
-		    tools_add_elastic_buffer(layers, GLOBAL_ELASTIC_BUFFER_SIZE);
+		    tools_add_elastic_buffer(layers, GLOBAL_ELASTIC_BUFFER_SIZE, 0, 0);
 		}
 
 
@@ -1728,6 +1728,14 @@ namespace libdar
 
 	    // *********** writing down the first terminator at the end of the archive  *************** //
 
+#ifdef LIBTHREADAR_AVAILABLE
+	    // a generic_thread is only added over scrambler and crypto_sym, not when no crypto is used
+	(void)layers.pop_and_close_if_type_is(thread_ptr);
+#endif
+
+	tronco_ptr = dynamic_cast<tronconneuse *>(layers.top());
+	scram_ptr = dynamic_cast<scrambler *>(layers.top());
+
 	if(info_details)
 	    dialog.warning(gettext("Writing down the first archive terminator..."));
 	coord.dump(layers); // since format "04" the terminateur is encrypted
@@ -1736,21 +1744,40 @@ namespace libdar
 	{
 	    if(info_details)
 		dialog.warning(gettext("writing down the final elastic buffer through the encryption layer..."));
-	    tools_add_elastic_buffer(layers, GLOBAL_ELASTIC_BUFFER_SIZE);
+
+		// obtaining the crypto block size (for clear data)
+
+	    U_32 block_size = 0;
+
+	    if(tronco_ptr != nullptr)
+		block_size = tronco_ptr->get_clear_block_size();
+	    if(tronco_ptr == nullptr && scram_ptr == nullptr)
+		throw SRC_BUG;
+
+		// calculating the current offset modulo block_size
+
+	    U_32 offset = 0;
+
+	    if(block_size > 0)
+	    {
+		infinint times = 0;
+		infinint reste = 0;
+
+		euclide(layers.get_position(), infinint(block_size), times, reste);
+		reste.unstack(offset);
+		if(!reste.is_zero())
+		    throw SRC_BUG;
+	    }
+
+	    tools_add_elastic_buffer(layers,
+				     GLOBAL_ELASTIC_BUFFER_SIZE,
+				     block_size,
+				     offset);
 		// terminal elastic buffer (after terminateur to protect against
 		// plain text attack on the terminator string)
 	}
 
 	    // releasing memory by calling destructors and releases file descriptors
-
-
-#ifdef LIBTHREADAR_AVAILABLE
-	    // a generic_thread is only added over scrambler and crypto_sym, not when no crypto is used
-	(void)layers.pop_and_close_if_type_is(thread_ptr);
-#endif
-
-	tronco_ptr = dynamic_cast<tronconneuse *>(layers.top());
-	scram_ptr = dynamic_cast<scrambler *>(layers.top());
 
 	if(tronco_ptr != nullptr || scram_ptr != nullptr)
 	{

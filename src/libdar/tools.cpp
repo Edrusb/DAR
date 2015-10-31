@@ -1822,9 +1822,26 @@ namespace libdar
         }
     }
 
-    void tools_add_elastic_buffer(generic_file & f, U_32 max_size)
+    void tools_add_elastic_buffer(generic_file & f,
+				  U_32 max_size,
+				  U_32 modulo,
+				  U_32 offset)
     {
-        elastic tic = 1 + tools_pseudo_random(max_size); // range from 1 to max_size
+	U_32 size = tools_pseudo_random(max_size); // range from 1 to max_size;
+
+	if(modulo > 0)
+	{
+	    size = size + offset;
+	    U_32 roundup = size % modulo == 0 ? 0 : 1;
+	    size = (size/modulo + roundup)*modulo - offset;
+
+	    if(size == 0)
+		throw SRC_BUG;
+	    if(size > max_size + modulo)
+		throw SRC_BUG;
+	}
+
+        elastic tic = size;
         char *buffer = new (nothrow) char[tic.get_size()];
 
         if(buffer == nullptr)
