@@ -181,6 +181,9 @@ namespace libdar
 				  const char *crypt_buf, const U_32 crypt_size,
 				  char *clear_buf, U_32 clear_size) = 0;
 
+    protected:
+	const archive_version & get_reading_version() const { return reading_ver; };
+
 
     private:
 	infinint initial_shift;    //< the initial_shift first bytes of the underlying file are not encrypted

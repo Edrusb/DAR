@@ -97,7 +97,6 @@ namespace libdar
 	    if(ivec == nullptr)
 		throw Esecu_memory("crypto_sym::crypto_sym");
 
-	    reading_version = reading_ver;
 	    try
 	    {
 		hashed_password = use_pkcs5 ? pkcs5_pass2key(password, "", 2000, max_key_len_libdar(algo)) : password;
@@ -118,7 +117,7 @@ namespace libdar
 
 		    // essiv initialization
 
-		dar_set_essiv(hashed_password, essiv_clef, reading_version, algo);
+		dar_set_essiv(hashed_password, essiv_clef, get_reading_version(), algo);
 	    }
 	    catch(...)
 	    {
@@ -297,7 +296,7 @@ namespace libdar
 	err = gcry_cipher_decrypt(clef, (unsigned char *)clear_buf, crypt_size, (const unsigned char *)crypt_buf, crypt_size);
 	if(err != GPG_ERR_NO_ERROR)
 	    throw Erange("crypto_sym::crypto_encrypt_data",tools_printf(gettext("Error while decyphering data: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-	elastic stoc = elastic((unsigned char *)clear_buf, crypt_size, elastic_backward, reading_version);
+	elastic stoc = elastic((unsigned char *)clear_buf, crypt_size, elastic_backward, get_reading_version());
 	if(stoc.get_size() > crypt_size)
 	    throw Erange("crypto_sym::crypto_encrypt_data",gettext("Data corruption may have occurred, cannot decrypt data"));
 	return crypt_size - stoc.get_size();

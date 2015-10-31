@@ -3,6 +3,8 @@ from 2.5.1 to 2.5.2
   an archive encrypted using gnupg encryption. In that situation libdar
   may fail reading the archive (but succeeds in normal read mode) issuing
   an obscure message (message has also been fixed).
+- code simplification, removing field reading_verion from class crypto_sym
+  as its parent class tronconneuse already have such information
 
 from 2.5.0 to 2.5.1
 - fixed display bug in dar_manager met when using -o option and adding
