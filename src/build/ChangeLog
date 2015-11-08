@@ -6,6 +6,9 @@ from 2.5.1 to 2.5.2
 - code simplification, removing field reading_verion from class crypto_sym
   as its parent class tronconneuse already have such information
 - removed extra newline displayed by dar at end of execution
+- fixed bug avoiding dar to properly read an entry (reporting CRC error)
+  when specific sequence of character (start of escape sequence) fall at
+  end of the read buffer of the escape layer.
 
 from 2.5.0 to 2.5.1
 - fixed display bug in dar_manager met when using -o option and adding

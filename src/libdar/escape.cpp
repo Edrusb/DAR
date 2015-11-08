@@ -912,11 +912,13 @@ namespace libdar
 		U_I delta; // will receive the amount of byte to reduce the buffer (one byte for each data mark found)
 		U_I delta_size; // will holds the size of the data to unescape
 		U_I offset_in_buffer;
+		U_I short_read;
 
 		    // adding some data at the end of the buffer
 
-		read_buffer_size += x_below->read(read_buffer + read_buffer_size, ESCAPE_SEQUENCE_LENGTH - avail);
-		below_position += read_buffer_size;
+		short_read = x_below->read(read_buffer + read_buffer_size, ESCAPE_SEQUENCE_LENGTH - avail);
+		read_buffer_size += short_read;
+		below_position += short_read;
 		avail = read_buffer_size - already_read;
 
 		    // we can continue unescaping the new data
