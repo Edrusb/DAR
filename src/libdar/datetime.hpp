@@ -157,7 +157,7 @@ namespace libdar
 	    ///
 	    /// \note "from" must be larger than "to" (from >= to), else an exception is thrown
 	    /// \return the factor f, which makes the following to be true: from = f*to
-	static infinint get_scaling_factor(time_unit source, time_unit dest);
+	static const infinint & get_scaling_factor(time_unit source, time_unit dest);
 
 	    /// return the max subsecond value that makes exactly one second for the given unit
 	static infinint how_much_to_make_1_second(time_unit unit);

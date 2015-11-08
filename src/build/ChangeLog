@@ -9,6 +9,7 @@ from 2.5.1 to 2.5.2
 - fixed bug avoiding dar to properly read an entry (reporting CRC error)
   when specific sequence of character (start of escape sequence) fall at
   end of the read buffer of the escape layer.
+- speed optimization for datetime class
 
 from 2.5.0 to 2.5.1
 - fixed display bug in dar_manager met when using -o option and adding

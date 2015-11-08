@@ -29,6 +29,7 @@ using namespace std;
 namespace libdar
 {
 
+    static const infinint one_unit = 1;
     static const infinint one_thousand = 1000;
     static const infinint one_million = one_thousand*one_thousand;
     static const infinint one_billion = one_million*one_thousand;
@@ -151,7 +152,7 @@ namespace libdar
 	}
 	else
 	{
-	    infinint f = get_scaling_factor(target, uni);
+	    const infinint & f = get_scaling_factor(target, uni);
 		// target = f*uni
 	    infinint  r;
 	    euclide(frac, f, newval, r);
@@ -233,7 +234,7 @@ namespace libdar
     {
 	char tmp;
 
-	reduce_to_largest_unit();
+//	reduce_to_largest_unit();
 	tmp = time_unit_to_char(uni);
 	x.write(&tmp, 1);
 	sec.dump(x);
@@ -305,10 +306,8 @@ namespace libdar
 	}
     }
 
-    infinint datetime::get_scaling_factor(time_unit source, time_unit dest)
+    const infinint & datetime::get_scaling_factor(time_unit source, time_unit dest)
     {
-	infinint factor = 1;
-
 	if(dest > source)
 	    throw SRC_BUG;
 
@@ -316,24 +315,28 @@ namespace libdar
 	{
 	case tu_second:
 	    if(dest == tu_second)
-		break;
+		return one_unit;
+	    else if(dest == tu_microsecond)
+		return one_million;
+	    else if(dest == tu_nanosecond)
+		return one_billion;
 	    else
-		factor *= one_million; // to reach microsecond
-		/* no break ! */
+		throw SRC_BUG; // unknown dest unit!
 	case tu_microsecond:
 	    if(dest == tu_microsecond)
-		break;
-	    factor *= one_thousand; // to reach nanosecond
-		/* no break ! */
+		return one_unit;
+	    else if(dest == tu_nanosecond)
+		return one_thousand;
+	    else
+		throw SRC_BUG; // unknown dest unit!
 	case tu_nanosecond:
 	    if(dest == tu_nanosecond)
-		break;
-	    throw SRC_BUG; // unknown dest unit!
+		return one_unit;
+	    else
+		throw SRC_BUG; // unknown dest unit!
 	default:
 	    throw SRC_BUG;
 	}
-
-	return factor;
     }
 
     infinint datetime::how_much_to_make_1_second(time_unit unit)
