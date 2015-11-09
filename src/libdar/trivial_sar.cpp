@@ -347,6 +347,8 @@ namespace libdar
 
 	if(pos == cur_pos)
 	    return true;
+	else
+	    cur_pos = pos;
 
 	return reference->skip(pos + offset);
     }

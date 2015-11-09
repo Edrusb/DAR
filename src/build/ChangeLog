@@ -10,6 +10,8 @@ from 2.5.1 to 2.5.2
   when specific sequence of character (start of escape sequence) fall at
   end of the read buffer of the escape layer.
 - speed optimization for datetime class
+- fixed bug that avoided dar reading archives in sequential read mode
+  while reading from a pipe
 
 from 2.5.0 to 2.5.1
 - fixed display bug in dar_manager met when using -o option and adding
