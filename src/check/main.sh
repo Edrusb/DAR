@@ -43,7 +43,7 @@ if [ "$crypto" != "none" ]; then
     crypto_A="'-$' $crypto:toto"
     sign=""
   else
-      if [ "crypto" != "scram" ] ; then
+      if [ "$crypto" != "scram" ] ; then
 	  crypto_K="-K gnupg:$crypto:$DAR_KEY"
 	  crypto_J=""
 	  crypto_A="'-$' gnupg:$crypto:$DAR_KEY"
@@ -63,7 +63,7 @@ else
   else
     ALL_TESTS="A0"
     # do no test (A0 does not exist) as same test done
-    # when asym != y
+    # when asym = y
   fi
 fi
 
