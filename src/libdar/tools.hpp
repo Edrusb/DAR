@@ -765,8 +765,7 @@ namespace libdar
 	 /// Produces a pseudo random number x, where 0 <= x < max
 
 	 /// \param[in] max defines the range of the random number to return
-	 /// \return the returned value ranges from 0 (zero) to max - 1. max
-	 /// is never retured, max - 1 can be returned.
+	 /// \return the returned value ranges from 0 (zero) up to max (= including max)
      extern U_I tools_pseudo_random(U_I max);
 
 

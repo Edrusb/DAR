@@ -1827,18 +1827,12 @@ namespace libdar
 				  U_32 modulo,
 				  U_32 offset)
     {
-	U_32 size = tools_pseudo_random(max_size); // range from 1 to max_size;
+	U_32 size = tools_pseudo_random(max_size-1) + 1; // range from 1 to max_size;
 
 	if(modulo > 0)
 	{
-	    size = size + offset;
-	    U_32 roundup = size % modulo == 0 ? 0 : 1;
-	    size = (size/modulo + roundup)*modulo - offset;
-
-	    if(size == 0)
-		throw SRC_BUG;
-	    if(size > max_size + modulo)
-		throw SRC_BUG;
+	    U_32 shift = modulo - (offset % modulo);
+	    size = (size/modulo)*modulo + shift;
 	}
 
         elastic tic = size;
@@ -2737,7 +2731,7 @@ namespace libdar
 
     U_I tools_pseudo_random(U_I max)
     {
-        return (U_I)(max*((float)(rand())/RAND_MAX));
+	return (U_I)(max*((float)(rand())/RAND_MAX));
     }
 
     void tools_read_from_pipe(user_interaction & dialog, S_I fd, tlv_list & result)

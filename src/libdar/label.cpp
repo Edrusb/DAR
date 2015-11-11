@@ -114,7 +114,7 @@ namespace libdar
 	}
 
 	for(s1 = s1 + sizeof(src3); s1 < LABEL_SIZE; ++s1)
-	    dest[s1] = (U_I)tools_pseudo_random(256);
+	    dest[s1] = (U_I)tools_pseudo_random(255);
     }
 
     void label::read(generic_file & f)
