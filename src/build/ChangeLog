@@ -13,6 +13,9 @@ from 2.5.1 to 2.5.2
 - fixed bug that avoided dar reading archives in sequential read mode
   while reading from a pipe
 - fixed bug in non regression test routine provided beside dar/libdar
+- fixing display message showing not alsways in the correct context
+- fixing case inversion leading the cache layer not to be used when
+  necessary and used when useless while reading an archive
 
 from 2.5.0 to 2.5.1
 - fixed display bug in dar_manager met when using -o option and adding
