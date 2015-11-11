@@ -427,7 +427,9 @@ namespace libdar
 	    return false;
     }
 
-    void data_tree::finalize(const archive_num & archive, const datetime & deleted_date, const archive_num & ignore_archives_greater_or_equal)
+    void data_tree::finalize(const archive_num & archive,
+			     const datetime & deleted_date,
+			     const archive_num & ignore_archives_greater_or_equal)
     {
 	map<archive_num, status>::iterator it = last_mod.begin();
 	bool presence_max = false;
@@ -478,9 +480,18 @@ namespace libdar
 		    // archive we currently add.
 
 		if(deleted_date > last_mtime)
-		    set_data(archive, deleted_date, et_absent); // add an entry telling that this file does no more exist in the current archive
+		    set_data(archive, deleted_date, et_absent);
+		    // add an entry telling that this file does no more exist in the current archive
 		else
-		    set_data(archive, last_mtime + datetime(1), et_absent);
+		    set_data(archive, last_mtime, et_absent);
+		    // add an entry telling thatthis file does no more exists, using the last known date
+		    // as deleted data. This situation may appear when one makes a first backup
+		    // then a second one but excluding from the backup that particular file. This file
+		    // may reappear later with if is backup included in the backup possibily with the same
+		    // date. In 2.4.x we added 1 second to the last known date to create the deleted date
+		    // which lead out of order warning to show for the database. Since 2.5.x date resolution
+		    // may be one microsecond (no more 1 second) thus we now keep the last known date as
+		    // delete date
 	    }
 	    else // the entry has been seen previously but as removed in the latest state,
 		    // if we already have an et_absent entry (which is possible during a reordering archive operation within a database), we can (and must) suppress it.
