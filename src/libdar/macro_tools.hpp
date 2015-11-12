@@ -64,7 +64,7 @@ extern "C"
 #endif
 #endif
 
-#define GLOBAL_ELASTIC_BUFFER_SIZE 10240
+#define GLOBAL_ELASTIC_BUFFER_SIZE 51200
 
 namespace libdar
 {

@@ -99,7 +99,6 @@ namespace libdar
 	size_t algo_block_size;         //< the block size of the algorithm (main key)
 	unsigned char *ivec;            //< algo_block_size allocated in secure memory to be used as Initial Vector
 	U_I algo_id;                    //< algo ID in libgcrypt
-	archive_version reading_version;
 
 	void detruit();
 

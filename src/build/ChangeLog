@@ -1,3 +1,24 @@
+from 2.5.1 to 2.5.2
+- fixing bug met in rare situation while reading in sequential-read mode
+  an archive encrypted using gnupg encryption. In that situation libdar
+  may fail reading the archive (but succeeds in normal read mode) issuing
+  an obscure message (message has also been fixed).
+- code simplification, removing field reading_verion from class crypto_sym
+  as its parent class tronconneuse already have such information
+- removed extra newline displayed by dar at end of execution
+- fixed bug avoiding dar to properly read an entry (reporting CRC error)
+  when specific sequence of character (start of escape sequence) fall at
+  end of the read buffer of the escape layer.
+- speed optimization for datetime class
+- fixed bug that avoided dar reading archives in sequential read mode
+  while reading from a pipe
+- fixed bug in non regression test routine provided beside dar/libdar
+- fixing display message showing not alsways in the correct context
+- fixing case inversion leading the cache layer not to be used when
+  necessary and used when useless while reading an archive
+- improved heuristic in dar_manager to determin the date a file has been
+  deleted.
+
 from 2.5.0 to 2.5.1
 - fixed display bug in dar_manager met when using -o option and adding
   options for dar that does not exist for dar_manager (like -R option)

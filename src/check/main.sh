@@ -43,10 +43,16 @@ if [ "$crypto" != "none" ]; then
     crypto_A="'-$' $crypto:toto"
     sign=""
   else
-    crypto_K="-K gnupg:$crypto:$DAR_KEY"
-    crypto_J=""
-    crypto_A="'-$' gnupg:$crypto:$DAR_KEY"
-    sign="--sign $DAR_KEY"
+      if [ "$crypto" != "scram" ] ; then
+	  crypto_K="-K gnupg:$crypto:$DAR_KEY"
+	  crypto_J=""
+	  crypto_A="'-$' gnupg:$crypto:$DAR_KEY"
+	  sign="--sign $DAR_KEY"
+      else
+	  ALL_TESTS="A0"
+	  # scrambling with public key is useless
+	  # and not accepted by dar
+      fi
   fi
 else
   if [ "$asym" != "y" ]; then
@@ -57,7 +63,7 @@ else
   else
     ALL_TESTS="A0"
     # do no test (A0 does not exist) as same test done
-    # when asym != y
+    # when asym = y
   fi
 fi
 

@@ -163,6 +163,7 @@ namespace libdar
 
         B debug_get_max() const { return max_value; };
         B debug_get_bytesize() const { return bytesize; };
+	B debug_get_field() const { return field; };
 
     private :
         static const int TG = 4;

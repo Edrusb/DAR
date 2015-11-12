@@ -96,7 +96,7 @@ namespace libdar
 	}
 	else // skip to expected mark failed
 	    if(!lax)
-		throw Erange("escape_catalogue::escape_catalogue", gettext("could not find the internal data set label escape sequence"));
+		throw Erange("escape_catalogue::escape_catalogue", gettext("Could not find tape mark for the internal catalogue"));
 	    else
 	    {
 		contextual *cont_data = nullptr;

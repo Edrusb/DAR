@@ -103,11 +103,13 @@ namespace libdar
 
 	void set_initial_shift(const infinint & x) { initial_shift = x; };
 
-
 	    /// let the caller give a callback function that given a generic_file with cyphered data, is able
 	    /// to return the offset of the first clear byte located *after* all the cyphered data, this
 	    /// callback function is used (if defined by the following method), when reaching End of File.
 	void set_callback_trailing_clear_data(infinint (*call_back)(generic_file & below, const archive_version & reading_ver)) { trailing_clear_data = call_back; };
+
+	    /// returns the block size give to constructor
+	U_32 get_clear_block_size() const { return clear_block_size; };
 
     private:
 
@@ -178,6 +180,9 @@ namespace libdar
 	virtual U_32 decrypt_data(const infinint & block_num,
 				  const char *crypt_buf, const U_32 crypt_size,
 				  char *clear_buf, U_32 clear_size) = 0;
+
+    protected:
+	const archive_version & get_reading_version() const { return reading_ver; };
 
 
     private:

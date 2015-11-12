@@ -574,15 +574,21 @@ namespace libdar
 	    switch(crypto)
 	    {
 	    case crypto_none:
-		if(info_details)
-		    dialog.warning(gettext("No cyphering layer opened, adding cache layer for better performance"));
-		if(ver.get_tape_marks())
+		if(!ver.get_tape_marks())
 		{
+		    if(info_details)
+			dialog.warning(gettext("No cyphering layer opened, adding cache layer for better performance"));
+
 			// adding the cache layer only if no escape layer will tape place
 			// over. escape layer act a bit like a cache, making caching here useless
 		    tmp = tmp_cache = new (pool) cache (*(stack.top()), false);
 		    if(tmp == nullptr)
 			dialog.warning(gettext("Failed opening the cache layer, lack of memory, archive read performances will not be optimized"));
+		}
+		else
+		{
+		    if(info_details)
+			dialog.warning(gettext("No cyphering layer opened"));
 		}
 		break;
 	    case crypto_blowfish:
@@ -647,7 +653,7 @@ namespace libdar
 
 	    if(tmp == nullptr)
 	    {
-		if(crypto != crypto_none || ver.get_tape_marks())
+		if(crypto != crypto_none || !ver.get_tape_marks())
 		    throw Ememory("open_archive");
 	    }
 	    else
@@ -1420,7 +1426,7 @@ namespace libdar
 		{
 		    if(info_details)
 			dialog.warning(gettext("Writing down the initial elastic buffer through the encryption layer..."));
-		    tools_add_elastic_buffer(layers, GLOBAL_ELASTIC_BUFFER_SIZE);
+		    tools_add_elastic_buffer(layers, GLOBAL_ELASTIC_BUFFER_SIZE, 0, 0);
 		}
 
 
@@ -1728,6 +1734,14 @@ namespace libdar
 
 	    // *********** writing down the first terminator at the end of the archive  *************** //
 
+#ifdef LIBTHREADAR_AVAILABLE
+	    // a generic_thread is only added over scrambler and crypto_sym, not when no crypto is used
+	(void)layers.pop_and_close_if_type_is(thread_ptr);
+#endif
+
+	tronco_ptr = dynamic_cast<tronconneuse *>(layers.top());
+	scram_ptr = dynamic_cast<scrambler *>(layers.top());
+
 	if(info_details)
 	    dialog.warning(gettext("Writing down the first archive terminator..."));
 	coord.dump(layers); // since format "04" the terminateur is encrypted
@@ -1736,21 +1750,40 @@ namespace libdar
 	{
 	    if(info_details)
 		dialog.warning(gettext("writing down the final elastic buffer through the encryption layer..."));
-	    tools_add_elastic_buffer(layers, GLOBAL_ELASTIC_BUFFER_SIZE);
+
+		// obtaining the crypto block size (for clear data)
+
+	    U_32 block_size = 0;
+
+	    if(tronco_ptr != nullptr)
+		block_size = tronco_ptr->get_clear_block_size();
+	    if(tronco_ptr == nullptr && scram_ptr == nullptr)
+		throw SRC_BUG;
+
+		// calculating the current offset modulo block_size
+
+	    U_32 offset = 0;
+
+	    if(block_size > 0)
+	    {
+		infinint times = 0;
+		infinint reste = 0;
+
+		euclide(layers.get_position(), infinint(block_size), times, reste);
+		reste.unstack(offset);
+		if(!reste.is_zero())
+		    throw SRC_BUG;
+	    }
+
+	    tools_add_elastic_buffer(layers,
+				     GLOBAL_ELASTIC_BUFFER_SIZE,
+				     block_size,
+				     offset);
 		// terminal elastic buffer (after terminateur to protect against
 		// plain text attack on the terminator string)
 	}
 
 	    // releasing memory by calling destructors and releases file descriptors
-
-
-#ifdef LIBTHREADAR_AVAILABLE
-	    // a generic_thread is only added over scrambler and crypto_sym, not when no crypto is used
-	(void)layers.pop_and_close_if_type_is(thread_ptr);
-#endif
-
-	tronco_ptr = dynamic_cast<tronconneuse *>(layers.top());
-	scram_ptr = dynamic_cast<scrambler *>(layers.top());
 
 	if(tronco_ptr != nullptr || scram_ptr != nullptr)
 	{
