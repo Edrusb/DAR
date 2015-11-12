@@ -618,7 +618,7 @@ namespace libdar
 	    destroy();
 	    throw;
 	}
-    };
+    }
 
     void archive_options_isolate::clear()
     {

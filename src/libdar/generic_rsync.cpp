@@ -36,6 +36,7 @@ extern "C"
 #include "generic_rsync.hpp"
 #include "memory_file.hpp"
 #include "null_file.hpp"
+#include "erreurs.hpp"
 
 #define BUFFER_SIZE 102400
 #ifdef SSIZE_MAX
@@ -101,6 +102,7 @@ namespace libdar
 				 generic_file *signature_storage,
 				 generic_file *below): generic_file(gf_write_only)
     {
+#if LIBRSYNC_AVAILABLE
 	char *inbuf = nullptr;
 	char *outbuf = nullptr;
 	U_I lu = 0;
@@ -127,7 +129,6 @@ namespace libdar
 	if(working_buffer == nullptr)
 	    throw Ememory("generic_rsync::generic_rsync (sign)");
 
-#if LIBRSYNC_AVAILABLE
 	try
 	{
 		// loading signature into memory
@@ -470,6 +471,8 @@ namespace libdar
 	avail_out = buf.next_out - buffer_out;
 
 	return ret;
+#else
+	return false;
 #endif
     }
 
