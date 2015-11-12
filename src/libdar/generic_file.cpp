@@ -77,6 +77,7 @@ extern "C"
 #include "tools.hpp"
 #include "cygwin_adapt.hpp"
 #include "int_tools.hpp"
+#include "crc.hpp"
 
 #include <iostream>
 #include <sstream>
