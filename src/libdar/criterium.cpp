@@ -307,6 +307,17 @@ namespace libdar
 	    return false;
     }
 
+    bool crit_in_place_has_delta_sig::evaluate(const cat_nomme & first, const cat_nomme &second) const
+    {
+	const cat_inode *first_i = get_inode(&first);
+	const cat_file *first_f = dynamic_cast<const cat_file *>(first_i);
+
+	if(first_f != nullptr)
+	    return first_f->has_delta_signature();
+	else
+	    return false;
+    }
+
     bool crit_in_place_EA_more_recent::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const cat_inode *first_i = get_inode(&first);

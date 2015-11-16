@@ -738,6 +738,9 @@ true only if the 'in place' data is a sparse file
 T
 true only if the 'in place' and 'to be added' entries are of same type (plain file, Unix socket, named pipe, block device, char device, symlink, directory, 'detruit' (which stands for file deleted since the archive of reference was done), and so on). Note that the number of links to inode (i.e. whether this is a hard links or not) is not taken into account.
 .TP 5
+L
+true only if the 'in place' entry has delta signature associated with it.
+.TP 5
 e
 true if the 'in place' entry has EA (may they be saved or just recorded as existing).
 .TP 5

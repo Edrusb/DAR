@@ -484,6 +484,9 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 	    case 'X':
 		ret = new (nothrow) crit_in_place_data_sparse();
 		break;
+	    case 'L':
+		ret = new (nothrow) crit_in_place_has_delta_sig();
+		break;
 	    case 'e':
 		ret = new (nothrow) crit_in_place_EA_present();
 		break;

@@ -362,6 +362,16 @@ namespace libdar
     };
 
 
+    	/// return true if the entry has delta signatur
+
+    class crit_in_place_has_delta_sig : public criterium
+    {
+    public:
+	bool evaluate(const cat_nomme &first, const cat_nomme &second) const;
+	criterium *clone() const { return new (get_pool()) crit_in_place_has_delta_sig(*this); };
+    };
+
+
 	/// returns true if the first entry is first an inode, and has some EA (EA may be saved
 	/// or just recorded as existing).
 
