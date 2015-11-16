@@ -794,7 +794,7 @@ namespace libdar
 		throw Ememory("archive_options_merge::clear");
 	    x_scope = all_fsa_families();
 	    x_multi_threaded = true;
-	    x_delta_signature = false;
+	    x_delta_signature = true;
 	    has_delta_mask_been_set = false;
 	}
 	catch(...)

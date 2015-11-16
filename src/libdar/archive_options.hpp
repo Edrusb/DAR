@@ -959,6 +959,10 @@ namespace libdar
 	void set_multi_threaded(bool val) { x_multi_threaded = val; };
 
 	    /// whether signature to base binary delta on the future has to be calculated and stored beside saved files
+	    /// \note the default is true, which lead to preserve delta signature over merging, but not to calculate new ones
+	    /// unless a mask is given to set_delta_mask() in which case signature are dropped / preserved / added in regard to
+	    /// this mask. If set_delta_signature() is false, providing a mask has no effect, no signature will be transfered nor
+	    /// calculated in the resulting merged archive.
 	void set_delta_signature(bool val) { x_delta_signature = val; };
 
 	    /// whether to derogate to defaut delta file consideration while calculation delta signatures
