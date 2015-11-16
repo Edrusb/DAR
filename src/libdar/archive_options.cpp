@@ -36,6 +36,7 @@ namespace libdar
     static const cat_inode::comparison_fields default_comparison_fields = cat_inode::cf_all;
     static const crit_constant_action default_crit_action = crit_constant_action(data_preserve, EA_preserve);
     static const string default_user_comment = "N/A";
+    static const U_32 default_delta_sig_min_size = 10240;
 
 	// some local helper functions
 
@@ -342,6 +343,7 @@ namespace libdar
 	    x_delta_diff = false;
 	    x_delta_signature = false;
 	    has_delta_mask_been_set = false;
+	    x_delta_sig_min_size = default_delta_sig_min_size;
 	}
 	catch(...)
 	{
@@ -583,6 +585,7 @@ namespace libdar
 	x_delta_signature = ref.x_delta_signature;
 	x_delta_mask = ref.x_delta_mask->clone();
 	has_delta_mask_been_set = ref.has_delta_mask_been_set;
+	x_delta_sig_min_size = ref.x_delta_sig_min_size;
     }
 
 
