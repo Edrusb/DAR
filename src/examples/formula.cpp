@@ -48,6 +48,7 @@ int main(S_I argc, char * const argv[], const char **env)
 			    env,
 			    "",
 			    NULL,
+			    '\0',
 			    &little_main);
 }
 

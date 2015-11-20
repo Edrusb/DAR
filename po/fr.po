@@ -3,13 +3,12 @@
 # This file is distributed under the same license as the DAR package.
 # Denis Corbin <dar.linux@free.fr>, 2011.
 #
-#: src/check/all_features.cpp:54
 msgid ""
 msgstr ""
 "Project-Id-Version: DAR 2.4.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2015-10-04 12:08+0200\n"
+"POT-Creation-Date: 2015-11-20 20:37+0100\n"
 "PO-Revision-Date: 2015-08-30 11:22+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -871,12 +870,12 @@ msgid "Key cannot be an empty string"
 msgstr "Une clef ne peut être une chaîne vide"
 
 #: src/libdar/tools.cpp:146 src/libdar/criterium.cpp:795
-#: src/dar_suite/dar_suite.cpp:277
+#: src/dar_suite/dar_suite.cpp:279
 msgid "YES"
 msgstr "OUI"
 
 #: src/libdar/tools.cpp:146 src/libdar/criterium.cpp:796
-#: src/dar_suite/dar_suite.cpp:279
+#: src/dar_suite/dar_suite.cpp:281
 msgid "NO"
 msgstr "NON"
 
@@ -895,160 +894,160 @@ msgstr "Imposible de connaître la taille du fichier : %s"
 msgid "Unknown suffix [%c] in string %S"
 msgstr "Suffixe inconnu [%c] dans la chaîne %S"
 
-#: src/libdar/tools.cpp:428
+#: src/libdar/tools.cpp:429
 msgid "Cannot read \"fcntl\" file's flags : "
 msgstr "Impossible de lire les drapeaux \"fcntl\" du fichier : "
 
-#: src/libdar/tools.cpp:434
+#: src/libdar/tools.cpp:435
 msgid "Cannot set \"fcntl\" file's flags : "
 msgstr "Impossible de modifier les drapeaux \"fcntl\" du fichier : "
 
-#: src/libdar/tools.cpp:505 src/libdar/tools.cpp:510 src/libdar/tools.cpp:522
-#: src/libdar/tools.cpp:527
+#: src/libdar/tools.cpp:506 src/libdar/tools.cpp:511 src/libdar/tools.cpp:523
+#: src/libdar/tools.cpp:528
 msgid "Invalid number: "
 msgstr "Numéro invalide : "
 
-#: src/libdar/tools.cpp:602
+#: src/libdar/tools.cpp:603
 msgid "date before 1970 is not allowed"
 msgstr "les dates antérieurs à l'an 1970 ne sont pas permises"
 
-#: src/libdar/tools.cpp:607
+#: src/libdar/tools.cpp:608
 msgid "Incorrect month"
 msgstr "Mois incorrect"
 
-#: src/libdar/tools.cpp:612
+#: src/libdar/tools.cpp:613
 msgid "Incorrect day of month"
 msgstr "Quantième inconnu"
 
-#: src/libdar/tools.cpp:617
+#: src/libdar/tools.cpp:618
 msgid "Incorrect hour"
 msgstr "Heure incorrecte"
 
-#: src/libdar/tools.cpp:622
+#: src/libdar/tools.cpp:623
 msgid "Incorrect minute"
 msgstr "Minute incorrecte"
 
-#: src/libdar/tools.cpp:627
+#: src/libdar/tools.cpp:628
 msgid "Incorrect second"
 msgstr "Seconde incorrecte"
 
-#: src/libdar/tools.cpp:631
+#: src/libdar/tools.cpp:632
 msgid "Bad formatted date expression"
 msgstr "Mauvais format de date"
 
-#: src/libdar/tools.cpp:744
+#: src/libdar/tools.cpp:745
 msgid "Given date must be in the past"
 msgstr "la date fournie doit être dans le passée"
 
-#: src/libdar/tools.cpp:779 src/libdar/tools.cpp:865
+#: src/libdar/tools.cpp:780 src/libdar/tools.cpp:866
 msgid "Error while calling fork() to launch dar: "
 msgstr "Erreur lors de l'appel à fork() pour lancer dar : "
 
-#: src/libdar/tools.cpp:793 src/libdar/tools.cpp:895
+#: src/libdar/tools.cpp:794 src/libdar/tools.cpp:896
 msgid "Unexpected error while waiting for dar to terminate: "
 msgstr ""
 "Erreur inattendue reçue lors de l'attente de la fin d'execution de dar : "
 
-#: src/libdar/tools.cpp:799 src/libdar/tools.cpp:901
+#: src/libdar/tools.cpp:800 src/libdar/tools.cpp:902
 msgid "DAR terminated upon signal reception: "
 msgstr "Arrêt de DAR suite à la reception du signal : "
 
-#: src/libdar/tools.cpp:805 src/libdar/tools.cpp:907
+#: src/libdar/tools.cpp:806 src/libdar/tools.cpp:908
 msgid " . Retry to launch dar as previously ?"
 msgstr " . Doit-on relancer dar comme précédemment ?"
 
-#: src/libdar/tools.cpp:810 src/libdar/tools.cpp:817 src/libdar/tools.cpp:912
-#: src/libdar/tools.cpp:919
+#: src/libdar/tools.cpp:811 src/libdar/tools.cpp:818 src/libdar/tools.cpp:913
+#: src/libdar/tools.cpp:920
 msgid " Continue anyway ?"
 msgstr " Doit-on continuer malgré tout ?"
 
-#: src/libdar/tools.cpp:815 src/libdar/tools.cpp:917
+#: src/libdar/tools.cpp:816 src/libdar/tools.cpp:918
 msgid "DAR sub-process has terminated with exit code "
 msgstr "Le sous-processus DAR a terminé avec le code de sortie "
 
-#: src/libdar/tools.cpp:1027
+#: src/libdar/tools.cpp:1028
 #, c-format
 msgid "   Libz compression (gzip)    : %s\n"
 msgstr "   Compression libz (gzip)    : %s\n"
 
-#: src/libdar/tools.cpp:1028
+#: src/libdar/tools.cpp:1029
 #, c-format
 msgid "   Libbz2 compression (bzip2) : %s\n"
 msgstr "   Compression libbz2 (bzip2) : %s\n"
 
-#: src/libdar/tools.cpp:1029
+#: src/libdar/tools.cpp:1030
 #, c-format
 msgid "   Liblzo2 compression (lzo)  : %s\n"
 msgstr "   Compression liblzo2 (lzo)  : %s\n"
 
-#: src/libdar/tools.cpp:1030
+#: src/libdar/tools.cpp:1031
 #, c-format
 msgid "   Strong encryption          : %s\n"
 msgstr "   Chiffrement                : %s\n"
 
-#: src/libdar/tools.cpp:1031
+#: src/libdar/tools.cpp:1032
 #, c-format
 msgid "   Extended Attributes support: %s\n"
 msgstr "   Support Attributs Étendus  : %s\n"
 
-#: src/libdar/tools.cpp:1032
+#: src/libdar/tools.cpp:1033
 #, c-format
 msgid "   Large files support (> 2GB): %s\n"
 msgstr "   Support fichiers géants    : %s\n"
 
-#: src/libdar/tools.cpp:1033
+#: src/libdar/tools.cpp:1034
 #, c-format
 msgid "   ext2fs NODUMP flag support : %s\n"
 msgstr "   Support drapeau NODUMP     : %s\n"
 
-#: src/libdar/tools.cpp:1034
+#: src/libdar/tools.cpp:1035
 #, c-format
 msgid "   Special allocation scheme  : %s\n"
 msgstr "   Allocation mém. optimisée  : %s\n"
 
-#: src/libdar/tools.cpp:1036
+#: src/libdar/tools.cpp:1037
 #, c-format
 msgid "   Integer size used          : unlimited\n"
 msgstr "   Entiers utilisés           : sans limites\n"
 
-#: src/libdar/tools.cpp:1038
+#: src/libdar/tools.cpp:1039
 #, c-format
 msgid "   Integer size used          : %d bits\n"
 msgstr "   Entiers utilisés           : %d bits\n"
 
-#: src/libdar/tools.cpp:1039
+#: src/libdar/tools.cpp:1040
 #, c-format
 msgid "   Thread safe support        : %s\n"
 msgstr "   Support multi-tâches       : %s\n"
 
-#: src/libdar/tools.cpp:1041
+#: src/libdar/tools.cpp:1042
 #, c-format
 msgid "   Furtive read mode support  : %s\n"
 msgstr "   Lecture furtive supportée  : %s\n"
 
-#: src/libdar/tools.cpp:1070
+#: src/libdar/tools.cpp:1071
 msgid "big"
 msgstr "gros"
 
-#: src/libdar/tools.cpp:1073
+#: src/libdar/tools.cpp:1074
 msgid "little"
 msgstr "petit"
 
-#: src/libdar/tools.cpp:1076
+#: src/libdar/tools.cpp:1077
 msgid "error!"
 msgstr "Erreur !"
 
-#: src/libdar/tools.cpp:1081
+#: src/libdar/tools.cpp:1082
 #, c-format
 msgid "   Detected system/CPU endian : %s"
 msgstr "   Boutisme du système/CPU    : %s"
 
-#: src/libdar/tools.cpp:1082
+#: src/libdar/tools.cpp:1083
 #, c-format
 msgid "   Large dir. speed optimi.   : %s"
 msgstr "   Optim. grands répertoires  : %s"
 
-#: src/libdar/tools.cpp:1126
+#: src/libdar/tools.cpp:1127
 #, c-format
 msgid ""
 "Warning, %S seems more to be a slice name than a base name. Do you want to "
@@ -1057,58 +1056,58 @@ msgstr ""
 "Attention, %S semble être un nom de fichier plutôt qu'un nom de base. "
 "Souhaitez-vous le remplacer par %S ?"
 
-#: src/libdar/tools.cpp:1131
+#: src/libdar/tools.cpp:1132
 #, c-format
 msgid "OK, keeping %S as basename"
 msgstr "OK, on garde %S comme nom de base"
 
-#: src/libdar/tools.cpp:1166
+#: src/libdar/tools.cpp:1167
 msgid "Cannot get full path of current working directory: "
 msgstr "Impossible d'obtenir le chemin complet du répertoire courant : "
 
-#: src/libdar/tools.cpp:1193
+#: src/libdar/tools.cpp:1194
 msgid "NULL argument given to tools_readlink()"
 msgstr "Valeur NULL donnée à tools_readlink()"
 
-#: src/libdar/tools.cpp:1195
+#: src/libdar/tools.cpp:1196
 msgid "Empty string given as argument to tools_readlink()"
 msgstr "Valeur NULL donnée à en argument de tools_readlink()"
 
-#: src/libdar/tools.cpp:1219
+#: src/libdar/tools.cpp:1220
 #, c-format
 msgid "Cannot read file information for %s : %s"
 msgstr "Impossible d'obtenir d'information sur %s : %s"
 
-#: src/libdar/tools.cpp:1272
+#: src/libdar/tools.cpp:1273
 msgid "Cannot set last access and last modification time: "
 msgstr ""
 "Impossible de positionner les dates de dernier accès et de dernière "
 "modification : "
 
-#: src/libdar/tools.cpp:1356
+#: src/libdar/tools.cpp:1357
 msgid "Aborting program: child process died unexpectedly"
 msgstr "Arrêt du programme : le processus fils est mort de façon inattendue"
 
-#: src/libdar/tools.cpp:1362
+#: src/libdar/tools.cpp:1363
 #, c-format
 msgid "Error trying to run %s: %s"
 msgstr "Erreur lors de l'execution de  %s : %s"
 
-#: src/libdar/tools.cpp:1364
+#: src/libdar/tools.cpp:1365
 msgid "execvp() failed but did not returned error code"
 msgstr "execvp() a échoué mais n'a pas retourné de code d'erreur"
 
-#: src/libdar/tools.cpp:1561
+#: src/libdar/tools.cpp:1562
 #, c-format
 msgid "Removing file %s"
 msgstr "Suppression du fichier %s"
 
-#: src/libdar/tools.cpp:1563
+#: src/libdar/tools.cpp:1564
 #, c-format
 msgid "Error removing file %s: %s"
 msgstr "Erreur lors de la suppression du fichier %s : %s"
 
-#: src/libdar/tools.cpp:1588
+#: src/libdar/tools.cpp:1589
 #, c-format
 msgid ""
 "Overwriting not allowed while a slice of a previous archive with the same "
@@ -1117,7 +1116,7 @@ msgstr ""
 "Écrasement interdit alors qu'une tranche de même nom de base a été trouvée "
 "dans le répertoire %s. Opération avortée"
 
-#: src/libdar/tools.cpp:1594
+#: src/libdar/tools.cpp:1595
 #, c-format
 msgid ""
 "At least one slice of an old archive with the same name remains in the "
@@ -1129,48 +1128,48 @@ msgstr ""
 "tranches avant de créer une archive de même nom. Peut-on supprimer les "
 "anciennes tranches ?"
 
-#: src/libdar/tools.cpp:1632 src/libdar/tools.cpp:1636
+#: src/libdar/tools.cpp:1633 src/libdar/tools.cpp:1637
 #, c-format
 msgid "Cannot get inode information for %s: %s"
 msgstr "Impossible d'obtenir des informations sur l'inode %s : %s"
 
-#: src/libdar/tools.cpp:1645
+#: src/libdar/tools.cpp:1646
 msgid "Current Working Directory cannot be a relative path"
 msgstr "Le répetoire courant ne peut pas être un chemin relatif"
 
-#: src/libdar/tools.cpp:1662
+#: src/libdar/tools.cpp:1663
 msgid "Cannot block signals: "
 msgstr "Impossible de bloquer les signaux : "
 
-#: src/libdar/tools.cpp:1672
+#: src/libdar/tools.cpp:1673
 msgid "Cannot unblock signals: "
 msgstr "Impossible de débloquer les signaux : "
 
-#: src/libdar/tools.cpp:1690 src/libdar/tools.cpp:1700
+#: src/libdar/tools.cpp:1691 src/libdar/tools.cpp:1701
 #, c-format
 msgid "Cannot get last modification date: %s"
 msgstr "Impossible d'obtenir la date de dernière modification : %s"
 
-#: src/libdar/tools.cpp:1703
+#: src/libdar/tools.cpp:1704
 #, c-format
 msgid "Cannot get size of %S: not a plain file"
 msgstr "Impossible de connaître la taill de %S: ce n'est pas un fichier plein"
 
-#: src/libdar/tools.cpp:1714
+#: src/libdar/tools.cpp:1715
 #, c-format
 msgid "Cannot get mtime: %s"
 msgstr "Impossible d'obtenir la date de dernière modification : %s"
 
-#: src/libdar/tools.cpp:1812
+#: src/libdar/tools.cpp:1813
 #, c-format
 msgid "Parse error: Unmatched `%c'"
 msgstr "Erreur de syntaxe : `%c' sans correspondance"
 
-#: src/libdar/tools.cpp:1855
+#: src/libdar/tools.cpp:1856
 msgid "Unknown substitution string: %"
 msgstr "Chaîne de substitution inconnue : %"
 
-#: src/libdar/tools.cpp:1862
+#: src/libdar/tools.cpp:1863
 msgid ""
 "last char of user command-line to execute is '%', (use '%%' instead to avoid "
 "this message)"
@@ -1178,58 +1177,58 @@ msgstr ""
 "Le dernier caractère de la ligne de commande utilisateur à exécuter est '%', "
 "(utiliser '%%' à la place pour éviter ce message)"
 
-#: src/libdar/tools.cpp:1916
+#: src/libdar/tools.cpp:1917
 msgid "execve() failed. (process table is full ?)"
 msgstr "execve() a échoué. (table de processus pleine ?)"
 
-#: src/libdar/tools.cpp:1918
+#: src/libdar/tools.cpp:1919
 msgid "system() call failed: "
 msgstr "system() a échoué : "
 
-#: src/libdar/tools.cpp:1920
+#: src/libdar/tools.cpp:1921
 #, c-format
 msgid "execution of [ %S ] returned error code: %d"
 msgstr "l'exécution de [ %S ] a retourné un code d'erreur : %d"
 
-#: src/libdar/tools.cpp:1927
+#: src/libdar/tools.cpp:1928
 msgid "Error during user command line execution: "
 msgstr "Erreur pendant l'exécution de la ligne de commande utilisateur : "
 
-#: src/libdar/tools.cpp:1927
+#: src/libdar/tools.cpp:1928
 msgid " . Retry command-line ?"
 msgstr " . Essayer à nouveau la ligne de commande ?"
 
-#: src/libdar/tools.cpp:1932
+#: src/libdar/tools.cpp:1933
 msgid "Ignore previous error on user command line and continue ?"
 msgstr ""
 "Ignorer l'erreur précédente concernant la ligne de commande utilisateur et "
 "continuer ?"
 
-#: src/libdar/tools.cpp:1972
+#: src/libdar/tools.cpp:1973
 msgid "Fatal error on user command line: "
 msgstr "Erreur fatale sur la ligne de commande utilisateur : "
 
-#: src/libdar/tools.cpp:2098 src/libdar/tools.cpp:2104
+#: src/libdar/tools.cpp:2099 src/libdar/tools.cpp:2105
 msgid "Badly formated octal number"
 msgstr "Nombre octal malformée"
 
-#: src/libdar/tools.cpp:2131
+#: src/libdar/tools.cpp:2132
 #, c-format
 msgid "Error while setting file permission: %s"
 msgstr "Erreur lors de la configuration des droits d'accès : %s"
 
-#: src/libdar/tools.cpp:2141
+#: src/libdar/tools.cpp:2142
 msgid "Cannot get effective permission given a file descriptor: "
 msgstr ""
 "Impossible d'obtenir les droits d'accès à partir d'un description de "
 "fichier : "
 
-#: src/libdar/tools.cpp:2201
+#: src/libdar/tools.cpp:2202
 #, c-format
 msgid "Unknown user: %S"
 msgstr "Utilisateur inconnu : %S"
 
-#: src/libdar/tools.cpp:2205
+#: src/libdar/tools.cpp:2206
 msgid ""
 "Cannot convert username to uid in statically linked binary, either directly "
 "provide the UID or run libdar from a dynamically linked executable"
@@ -1238,12 +1237,12 @@ msgstr ""
 "executable lié statiquement. Fournir soit directement l'UID soit utiliser un "
 "exécutable lié dynamiquement"
 
-#: src/libdar/tools.cpp:2217
+#: src/libdar/tools.cpp:2218
 #, c-format
 msgid "Unknown group: %S"
 msgstr "Groupe inconnu : %S"
 
-#: src/libdar/tools.cpp:2221
+#: src/libdar/tools.cpp:2222
 msgid ""
 "Cannot convert group to gid in statically linked binary, either directly "
 "provide the GID or run libdar from a dynamically linked executable"
@@ -1252,20 +1251,20 @@ msgstr ""
 "lié statiquement. Fournir soit directement le GID soit utiliser un "
 "exécutable lié dynamiquement"
 
-#: src/libdar/tools.cpp:2228
+#: src/libdar/tools.cpp:2229
 #, c-format
 msgid "Error while setting file user ownership: %s"
 msgstr "Erreur lors de la changement de propriétaire : %s"
 
-#: src/libdar/tools.cpp:2388
+#: src/libdar/tools.cpp:2389
 msgid "Error while fetching hostname: "
 msgstr "Erreur lors de recherche du nom d'hôte (hostname) : "
 
-#: src/libdar/tools.cpp:2414 src/libdar/catalogue.cpp:4942
+#: src/libdar/tools.cpp:2415 src/libdar/catalogue.cpp:4942
 msgid "[Worse]"
 msgstr "[Pire ]"
 
-#: src/libdar/tools.cpp:2436
+#: src/libdar/tools.cpp:2437
 msgid "Invalid wide-char found in string: "
 msgstr "Caractère large invalide dans la chaîne : "
 
@@ -2075,7 +2074,7 @@ msgstr "Erreur lors de l'écriture sur un tube : "
 msgid "Error opening pipe: "
 msgstr "Erreur lors de l'ouverture du tube : "
 
-#: src/libdar/libdar_4_4.cpp:481 src/dar_suite/dar.cpp:610
+#: src/libdar/libdar_4_4.cpp:481 src/dar_suite/dar.cpp:611
 msgid "Continue listing archive contents?"
 msgstr "Continuer avec le contenu de l'archive ?"
 
@@ -4350,39 +4349,39 @@ msgid "hide_file cannot be initialized with write-only file"
 msgstr ""
 "\"hide_file\" ne peut pas être initialisé avec un fichier en écriture seule"
 
-#: src/dar_suite/dar_cp.cpp:131
+#: src/dar_suite/dar_cp.cpp:132
 #, c-format
 msgid "usage : %s <source> <destination>\n"
 msgstr "usage : %s <source> <destination>\n"
 
-#: src/dar_suite/dar_cp.cpp:143 src/dar_suite/dar_slave.cpp:276
-#: src/dar_suite/dar_xform.cpp:508 src/dar_suite/dar_manager.cpp:883
+#: src/dar_suite/dar_cp.cpp:144 src/dar_suite/dar_slave.cpp:277
+#: src/dar_suite/dar_xform.cpp:509 src/dar_suite/dar_manager.cpp:884
 #: src/dar_suite/command_line.cpp:1975
 #, c-format
 msgid " compiled the %s with %s version %s\n"
 msgstr "compilé le %s avec %s version %s\n"
 
-#: src/dar_suite/dar_cp.cpp:144 src/dar_suite/dar_slave.cpp:277
-#: src/dar_suite/dar_xform.cpp:509 src/dar_suite/dar_manager.cpp:884
+#: src/dar_suite/dar_cp.cpp:145 src/dar_suite/dar_slave.cpp:278
+#: src/dar_suite/dar_xform.cpp:510 src/dar_suite/dar_manager.cpp:885
 #: src/dar_suite/command_line.cpp:1976
 #, c-format
 msgid " %s is part of the Disk ARchive suite (Release %s)\n"
 msgstr " %s fait partie de la suite Disk ARchive (Release %s)\n"
 
-#: src/dar_suite/dar_cp.cpp:145
+#: src/dar_suite/dar_cp.cpp:146
 #, c-format
 msgid " %s comes with ABSOLUTELY NO WARRANTY; for details type `dar -W'."
 msgstr ""
 " %s est fourni SANS AUCUNE GARANTIE; pour les détails\n"
 " taper `dar -W'."
 
-#: src/dar_suite/dar_cp.cpp:146
+#: src/dar_suite/dar_cp.cpp:147
 msgid " This is free software, and you are welcome to redistribute it under"
 msgstr ""
 " Ceci est un logiciel libre, vous pouvez\n"
 " le redistribuer sous certaines conditions ;"
 
-#: src/dar_suite/dar_cp.cpp:147
+#: src/dar_suite/dar_cp.cpp:148
 msgid ""
 " certain conditions; type `dar -L | more' for details.\n"
 "\n"
@@ -4391,31 +4390,31 @@ msgstr ""
 " pour les détails.\n"
 "\n"
 
-#: src/dar_suite/dar_cp.cpp:151
+#: src/dar_suite/dar_cp.cpp:152
 msgid "Unexpected exception from libdar"
 msgstr "Exception non attendue levée par libdar"
 
-#: src/dar_suite/dar_cp.cpp:168
+#: src/dar_suite/dar_cp.cpp:169
 #, c-format
 msgid "Memory allocation failed : %s"
 msgstr "Échec de l'allocation mémoire : %s"
 
-#: src/dar_suite/dar_cp.cpp:184
+#: src/dar_suite/dar_cp.cpp:185
 #, c-format
 msgid "Cannot open source file : %s"
 msgstr "Fichier source impossible à ouvrir : %s"
 
-#: src/dar_suite/dar_cp.cpp:195
+#: src/dar_suite/dar_cp.cpp:196
 #, c-format
 msgid "Cannot open destination file : %s"
 msgstr "Fichier destination impossible à ouvrir : %s"
 
-#: src/dar_suite/dar_cp.cpp:220
+#: src/dar_suite/dar_cp.cpp:221
 #, c-format
 msgid "Starting the copy of %u byte(s)"
 msgstr "Début de la copie de %u octet(s)"
 
-#: src/dar_suite/dar_cp.cpp:230
+#: src/dar_suite/dar_cp.cpp:231
 #, c-format
 msgid ""
 "Error reading source file (we are at %.2f %% of data copied), trying to read "
@@ -4424,7 +4423,7 @@ msgstr ""
 "Erreur lors de la lecture du fichier source (%.2f %% des données a été "
 "copiée), on essaie de lire plus loin : %s\n"
 
-#: src/dar_suite/dar_cp.cpp:234
+#: src/dar_suite/dar_cp.cpp:235
 #, c-format
 msgid ""
 "Skipping done (missing %.0f byte(s)), found correct data to read, continuing "
@@ -4433,37 +4432,37 @@ msgstr ""
 "Saut effectué (manque %.0f octet(s)), données correctes trouvées, on "
 "continue la copie...\n"
 
-#: src/dar_suite/dar_cp.cpp:240
+#: src/dar_suite/dar_cp.cpp:241
 msgid ""
 "Reached End of File, no correct data could be found after the last error\n"
 msgstr ""
 "Fin de fichier atteinte, aucune donnée correcte n'a pu être trouvée après la "
 "dernière erreur\n"
 
-#: src/dar_suite/dar_cp.cpp:248
+#: src/dar_suite/dar_cp.cpp:249
 #, c-format
 msgid "Copy finished. Missing %.0f byte(s) of data\n"
 msgstr "Copie terminée. Il manque %.0f octet(s) de données\n"
 
-#: src/dar_suite/dar_cp.cpp:249
+#: src/dar_suite/dar_cp.cpp:250
 #, c-format
 msgid "Which is  %.2f %% of the total amount of data\n"
 msgstr "Ce qui correspond à %.2f %% de la quantité totale de donnés\n"
 
-#: src/dar_suite/dar_cp.cpp:258
+#: src/dar_suite/dar_cp.cpp:259
 msgid "Cannot seek back one char"
 msgstr "Ne peut pas lire un caractère en arrière"
 
-#: src/dar_suite/dar_cp.cpp:269 src/dar_suite/dar_cp.cpp:354
+#: src/dar_suite/dar_cp.cpp:270 src/dar_suite/dar_cp.cpp:355
 msgid "Cannot write to destination, aborting"
 msgstr ""
 "Impossible d'écrire dans le fichier destination, abandon de l'opération"
 
-#: src/dar_suite/dar_cp.cpp:313
+#: src/dar_suite/dar_cp.cpp:314
 msgid "Cannot seek in file"
 msgstr "Ne peut pas déplacer la lecture dans le fichier"
 
-#: src/dar_suite/dar_cp.cpp:357
+#: src/dar_suite/dar_cp.cpp:358
 #, c-format
 msgid "Non fatal error while writing to destination file, retrying\n"
 msgstr ""
@@ -4969,7 +4968,7 @@ msgstr ""
 "Taper \"man dar\" pour plus de détail et pour connaître les autres options "
 "disponibles.\n"
 
-#: src/dar_suite/dar_suite.cpp:145
+#: src/dar_suite/dar_suite.cpp:147
 #, c-format
 msgid ""
 "We have linked with an incompatible version of libdar. Expecting version %d."
@@ -4978,57 +4977,57 @@ msgstr ""
 "Nous utilisons une version incompatible de libdar. La version attendue est "
 "%d.%d.x alors que la version actuellement utilisée est %d.%d.%d"
 
-#: src/dar_suite/dar_suite.cpp:157
+#: src/dar_suite/dar_suite.cpp:159
 msgid "NOT YET IMPLEMENTED FEATURE has been used: "
 msgstr "une FONCTIONNALITÉ NON ENCORE IMPLÉMENTÉE a été sollicitée :"
 
-#: src/dar_suite/dar_suite.cpp:158
+#: src/dar_suite/dar_suite.cpp:160
 msgid "Please check documentation or upgrade your software if available"
 msgstr "Merci de vérifier la documentation et/ou de mettre à jour ce logiciel"
 
-#: src/dar_suite/dar_suite.cpp:163
+#: src/dar_suite/dar_suite.cpp:165
 msgid "SEEMS TO BE A HARDWARE PROBLEM: "
 msgstr "IL SEMBLE QU'IL Y AIT UN PROBLÈME MATÉRIEL :"
 
-#: src/dar_suite/dar_suite.cpp:164
+#: src/dar_suite/dar_suite.cpp:166
 msgid "Please check your hardware"
 msgstr "Merci de vérifier votre matériel"
 
-#: src/dar_suite/dar_suite.cpp:169
+#: src/dar_suite/dar_suite.cpp:171
 msgid "Lack of SECURED memory to achieve the operation, aborting operation"
 msgstr "Pas assez de mémoire SÉCURISÉE pour terminer l'opération, abandon"
 
-#: src/dar_suite/dar_suite.cpp:174 src/dar_suite/dar_suite.cpp:179
+#: src/dar_suite/dar_suite.cpp:176 src/dar_suite/dar_suite.cpp:181
 msgid "Lack of memory to achieve the operation, aborting operation"
 msgstr "Pas assez de mémoire pour terminer l'opération, abandon"
 
-#: src/dar_suite/dar_suite.cpp:184
+#: src/dar_suite/dar_suite.cpp:186
 msgid "FATAL error, aborting operation"
 msgstr "Erreur FATALE, abandon"
 
-#: src/dar_suite/dar_suite.cpp:190
+#: src/dar_suite/dar_suite.cpp:192
 msgid "Aborting program. User refused to continue while asking: "
 msgstr "Abandon. L'utilisateur a refusé de continuer lors de la question : "
 
-#: src/dar_suite/dar_suite.cpp:195
+#: src/dar_suite/dar_suite.cpp:197
 msgid "Program has been aborted for the following reason: "
 msgstr "Le programme a été arrêté pour la raison suivante : "
 
-#: src/dar_suite/dar_suite.cpp:205
+#: src/dar_suite/dar_suite.cpp:207
 msgid "Aborting program. An error occurred concerning user command execution: "
 msgstr ""
 "Abandon. une erreur est survenue lors de l'exécution d'une commande "
 "utilisateur : "
 
-#: src/dar_suite/dar_suite.cpp:210
+#: src/dar_suite/dar_suite.cpp:212
 msgid "Aborting program. An error occurred while calling libdar: "
 msgstr "Abandon. Une erreur est survenue lors d'un appel à libdar : "
 
-#: src/dar_suite/dar_suite.cpp:215 src/dar_suite/dar_suite.cpp:220
+#: src/dar_suite/dar_suite.cpp:217 src/dar_suite/dar_suite.cpp:222
 msgid "Aborting program. "
 msgstr "Arrêt du programme. "
 
-#: src/dar_suite/dar_suite.cpp:225
+#: src/dar_suite/dar_suite.cpp:227
 msgid ""
 "Aborting program. The requested operation needs a feature that has been "
 "disabled at compilation time: "
@@ -5036,17 +5035,17 @@ msgstr ""
 "Abandon. L'opération demandée nécessite une fonctionnalité qui n'a pas été "
 "activée à la compilation : "
 
-#: src/dar_suite/dar_suite.cpp:231 src/dar_suite/dar_suite.cpp:239
+#: src/dar_suite/dar_suite.cpp:233 src/dar_suite/dar_suite.cpp:241
 msgid "INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER"
 msgstr ""
 "ERREUR INTERNE, MERCI DE RAPPORTER L'AFFICHAGE PRÉCÉDENT AU MAINTENEUR DU "
 "PROGRAMME"
 
-#: src/dar_suite/dar_suite.cpp:238
+#: src/dar_suite/dar_suite.cpp:240
 msgid "CAUGHT A NON (LIB)DAR EXCEPTION"
 msgstr "EXCEPTION NON (LIB)DAR ATTRAPÉE"
 
-#: src/dar_suite/dar_suite.cpp:246
+#: src/dar_suite/dar_suite.cpp:248
 msgid ""
 "SANITY CHECK: AT LEAST ONE THREAD_CANCELLATION OBJECT HAS NOT BEEN DESTROYED "
 "AND REMAINS IN MEMORY WHILE THE PROGRAM REACHED ITS END"
@@ -5054,7 +5053,7 @@ msgstr ""
 "AUTO-CONTROL : AU MOINS UNE FILE D'EXÉCUTION N'A PAS ÉTÉ DÉTRUITE ET RESTE "
 "EN MÉMOIRE ALORS QUE LE PROGRAMME TOUCHE À SA FIN"
 
-#: src/dar_suite/dar_suite.cpp:271
+#: src/dar_suite/dar_suite.cpp:273
 msgid ""
 "No more (virtual) memory available, you have the opportunity to stop un-"
 "necessary applications to free up some memory. Can we continue now ?"
@@ -5062,30 +5061,30 @@ msgstr ""
 "Plus de mémoire (virtuelle) disponible, vous avez la possibilité d'arrêter "
 "certaines applications pour faire de la place. On continue maintenant ?"
 
-#: src/dar_suite/dar_suite.cpp:282
+#: src/dar_suite/dar_suite.cpp:284
 #, c-format
 msgid "Long options support       : %s\n"
 msgstr "Options longues supportées : %s\n"
 
-#: src/dar_suite/dar_suite.cpp:298
+#: src/dar_suite/dar_suite.cpp:300
 #, c-format
 msgid "Received signal: %s"
 msgstr "Signal %s reçu"
 
-#: src/dar_suite/dar_suite.cpp:300
+#: src/dar_suite/dar_suite.cpp:302
 #, c-format
 msgid "Received signal: %d"
 msgstr "Signal reçu : %d"
 
-#: src/dar_suite/dar_suite.cpp:306
+#: src/dar_suite/dar_suite.cpp:308
 msgid "Archive fast termination engaged"
 msgstr "Mise en route de la procédure de terminaison rapide de l'archive"
 
-#: src/dar_suite/dar_suite.cpp:310
+#: src/dar_suite/dar_suite.cpp:312
 msgid "Archive delayed termination engaged"
 msgstr "Mise en route de la procédure de terminaison de l'archive"
 
-#: src/dar_suite/dar_suite.cpp:314
+#: src/dar_suite/dar_suite.cpp:316
 msgid ""
 "Disabling signal handler, the next time this signal is received the program "
 "will abort immediately"
@@ -5093,7 +5092,7 @@ msgstr ""
 "Désactivation du gestionnaire de signal. La prochaine réception de ce signal "
 "arrêtera immédiatement le programme"
 
-#: src/dar_suite/dar_suite.cpp:318
+#: src/dar_suite/dar_suite.cpp:320
 msgid ""
 "Cannot cleanly abort the operation, thread-safe support is missing, will "
 "thus abruptly stop the program, generated archive may be unusable"
@@ -5102,67 +5101,67 @@ msgstr ""
 "environnement multi-tâches arrêtera abruptement le programme, en conséquence "
 "l'archive générée risque fortement d'être inutilisable."
 
-#: src/dar_suite/dar_slave.cpp:170
+#: src/dar_suite/dar_slave.cpp:171
 msgid "Cannot read arguments on command line, aborting"
 msgstr "Impossible de lire les arguments en ligne de commande, abandon"
 
-#: src/dar_suite/dar_slave.cpp:180
+#: src/dar_suite/dar_slave.cpp:181
 msgid "Missing argument to -i option"
 msgstr "Pas d'argument à l'option -i"
 
-#: src/dar_suite/dar_slave.cpp:188
+#: src/dar_suite/dar_slave.cpp:189
 msgid "Missing argument to -o option"
 msgstr "Pas d'argument à l'option -o"
 
-#: src/dar_suite/dar_slave.cpp:202
+#: src/dar_suite/dar_slave.cpp:203
 msgid "Missing argument to -E option"
 msgstr "Pas d'argument à l'option -E"
 
-#: src/dar_suite/dar_slave.cpp:213 src/dar_suite/dar_xform.cpp:417
+#: src/dar_suite/dar_slave.cpp:214 src/dar_suite/dar_xform.cpp:418
 #: src/dar_suite/command_line.cpp:1540
 msgid "Missing argument to --min-digits"
 msgstr "Il manque un argument à --min-digits"
 
-#: src/dar_suite/dar_slave.cpp:221 src/dar_suite/dar_xform.cpp:425
+#: src/dar_suite/dar_slave.cpp:222 src/dar_suite/dar_xform.cpp:426
 #, c-format
 msgid "Missing parameter to option -%c"
 msgstr "Pas d'argument à l'option -%c"
 
-#: src/dar_suite/dar_slave.cpp:223 src/dar_suite/dar_slave.cpp:226
-#: src/dar_suite/dar_xform.cpp:427 src/dar_suite/dar_manager.cpp:492
-#: src/dar_suite/dar_manager.cpp:495 src/dar_suite/command_line.cpp:1586
+#: src/dar_suite/dar_slave.cpp:224 src/dar_suite/dar_slave.cpp:227
+#: src/dar_suite/dar_xform.cpp:428 src/dar_suite/dar_manager.cpp:493
+#: src/dar_suite/dar_manager.cpp:496 src/dar_suite/command_line.cpp:1586
 #: src/dar_suite/command_line.cpp:1589
 #, c-format
 msgid "Ignoring unknown option -%c"
 msgstr "Option inconnue -%c ignorée"
 
-#: src/dar_suite/dar_slave.cpp:232
+#: src/dar_suite/dar_slave.cpp:233
 msgid "Missing archive basename, see -h option for help"
 msgstr "Il manque le nom de base de l'archive, voir l'option -h pour l'aide"
 
-#: src/dar_suite/dar_slave.cpp:238 src/dar_suite/dar_xform.cpp:442
+#: src/dar_suite/dar_slave.cpp:239 src/dar_suite/dar_xform.cpp:443
 msgid "Too many argument on command line, see -h option for help"
 msgstr ""
 "Trop d'arguments sur la ligne de commande, voir l'option -h pour l'aide"
 
-#: src/dar_suite/dar_slave.cpp:271 src/dar_suite/dar_xform.cpp:503
-#: src/dar_suite/dar_manager.cpp:878
+#: src/dar_suite/dar_slave.cpp:272 src/dar_suite/dar_xform.cpp:504
+#: src/dar_suite/dar_manager.cpp:879
 #, c-format
 msgid " Using libdar %u.%u.%u built with compilation time options:\n"
 msgstr " Libdar %u.%u.%u utilisée, compilé avec les options :\n"
 
-#: src/dar_suite/dar_slave.cpp:273 src/dar_suite/dar_xform.cpp:505
-#: src/dar_suite/dar_manager.cpp:880
+#: src/dar_suite/dar_slave.cpp:274 src/dar_suite/dar_xform.cpp:506
+#: src/dar_suite/dar_manager.cpp:881
 #, c-format
 msgid " Using libdar %u.%u built with compilation time options:\n"
 msgstr " Libdar %u%u utilisé, compilé avec les options :\n"
 
-#: src/dar_suite/dar_slave.cpp:278
+#: src/dar_suite/dar_slave.cpp:279
 #, c-format
 msgid " %s comes with ABSOLUTELY NO WARRANTY;"
 msgstr " %s est fourni sans AUCUNE GARANTIE ; "
 
-#: src/dar_suite/dar_slave.cpp:279
+#: src/dar_suite/dar_slave.cpp:280
 msgid ""
 " for details\n"
 " type `dar -W'."
@@ -5170,8 +5169,8 @@ msgstr ""
 "Pour les détails\n"
 "taper `dar -W'."
 
-#: src/dar_suite/dar_slave.cpp:280 src/dar_suite/dar_xform.cpp:511
-#: src/dar_suite/dar_manager.cpp:886 src/dar_suite/command_line.cpp:1978
+#: src/dar_suite/dar_slave.cpp:281 src/dar_suite/dar_xform.cpp:512
+#: src/dar_suite/dar_manager.cpp:887 src/dar_suite/command_line.cpp:1978
 msgid ""
 " This is free software, and you are welcome\n"
 " to redistribute it under certain conditions;"
@@ -5179,7 +5178,7 @@ msgstr ""
 " Ceci est un logiciel libre, vous pouvez\n"
 " le redistribuer sous certaines conditions ;"
 
-#: src/dar_suite/dar_slave.cpp:281
+#: src/dar_suite/dar_slave.cpp:282
 msgid ""
 " type `dar -L | more'\n"
 " for details.\n"
@@ -5281,90 +5280,90 @@ msgstr ""
 "Expression inconnue trouvée lors de l'analyse de la chaîne conditionnelle "
 "suivante : "
 
-#: src/dar_suite/dar_xform.cpp:214
+#: src/dar_suite/dar_xform.cpp:215
 msgid "Error transforming the archive :"
 msgstr "Erreur lors de la transformation de l'archive : "
 
-#: src/dar_suite/dar_xform.cpp:297 src/dar_suite/command_line.cpp:916
+#: src/dar_suite/dar_xform.cpp:298 src/dar_suite/command_line.cpp:916
 msgid "Only one -s option is allowed"
 msgstr "Une seule option -s est permise"
 
-#: src/dar_suite/dar_xform.cpp:299
+#: src/dar_suite/dar_xform.cpp:300
 msgid "Missing argument to -s"
 msgstr "Il manque un argument à -s"
 
-#: src/dar_suite/dar_xform.cpp:310
+#: src/dar_suite/dar_xform.cpp:311
 msgid "Invalid size for option -s"
 msgstr "Taille invalide donnée via l'option -s"
 
-#: src/dar_suite/dar_xform.cpp:317
+#: src/dar_suite/dar_xform.cpp:318
 msgid "Missing argument to -S"
 msgstr "Il manque un argument à l'option -S"
 
-#: src/dar_suite/dar_xform.cpp:322 src/dar_suite/dar_xform.cpp:340
+#: src/dar_suite/dar_xform.cpp:323 src/dar_suite/dar_xform.cpp:341
 #: src/dar_suite/command_line.cpp:941 src/dar_suite/command_line.cpp:959
 msgid "Only one -S option is allowed"
 msgstr "Une seule option -S est permise"
 
-#: src/dar_suite/dar_xform.cpp:330
+#: src/dar_suite/dar_xform.cpp:331
 msgid "Giving -S option the same value as the one given to -s is useless"
 msgstr ""
 "Donner à l'option -S la même valeur que celle donnée à l'option -s est "
 "inutile"
 
-#: src/dar_suite/dar_xform.cpp:334
+#: src/dar_suite/dar_xform.cpp:335
 msgid "Invalid size for option -S"
 msgstr "Taille invalide donnée via l'option -S"
 
-#: src/dar_suite/dar_xform.cpp:371
+#: src/dar_suite/dar_xform.cpp:372
 msgid "Missing argument to -E"
 msgstr "Il manque un argument à l'option -E"
 
-#: src/dar_suite/dar_xform.cpp:379
+#: src/dar_suite/dar_xform.cpp:380
 msgid "Missing argument to -F"
 msgstr "Il manque un argument à l'option -F"
 
-#: src/dar_suite/dar_xform.cpp:387 src/dar_suite/command_line.cpp:1264
+#: src/dar_suite/dar_xform.cpp:388 src/dar_suite/command_line.cpp:1264
 msgid "-a option requires an argument"
 msgstr "Il manque un argument à l'option -a"
 
-#: src/dar_suite/dar_xform.cpp:394
+#: src/dar_suite/dar_xform.cpp:395
 msgid "Unknown parameter given to -a option: "
 msgstr "Paramètre inconnu donné à l'option -a : "
 
-#: src/dar_suite/dar_xform.cpp:401
+#: src/dar_suite/dar_xform.cpp:402
 msgid "Missing argument to -^"
 msgstr "Il manque un argument à -^"
 
-#: src/dar_suite/dar_xform.cpp:406 src/dar_suite/command_line.cpp:1529
+#: src/dar_suite/dar_xform.cpp:407 src/dar_suite/command_line.cpp:1529
 msgid "Missing argument to --hash"
 msgstr "Il manque un argument à --hash"
 
-#: src/dar_suite/dar_xform.cpp:413 src/dar_suite/command_line.cpp:1536
+#: src/dar_suite/dar_xform.cpp:414 src/dar_suite/command_line.cpp:1536
 msgid "Unknown parameter given to --hash option: "
 msgstr "Paramètre inconnu donné à l'option --hash : "
 
-#: src/dar_suite/dar_xform.cpp:437
+#: src/dar_suite/dar_xform.cpp:438
 msgid ""
 "Missing source or destination argument on command line, see -h option for "
 "help"
 msgstr "Il manque la source ou la destination, voir l'option -h pour l'aide"
 
-#: src/dar_suite/dar_xform.cpp:452
+#: src/dar_suite/dar_xform.cpp:453
 msgid "Invalid argument as source archive"
 msgstr "Argument invalide donné comme archive source"
 
-#: src/dar_suite/dar_xform.cpp:459
+#: src/dar_suite/dar_xform.cpp:460
 msgid "Invalid argument as destination archive"
 msgstr "Argument invalide donné comme archive destination"
 
-#: src/dar_suite/dar_xform.cpp:465
+#: src/dar_suite/dar_xform.cpp:466
 msgid "Archive on stdout is not compatible with slicing (-s option)"
 msgstr ""
 "La production d'archive sur stdout n'est pas compatible avec plusieurs "
 "tranches (option -s)"
 
-#: src/dar_suite/dar_xform.cpp:510 src/dar_suite/dar_manager.cpp:885
+#: src/dar_suite/dar_xform.cpp:511 src/dar_suite/dar_manager.cpp:886
 #: src/dar_suite/command_line.cpp:1977
 #, c-format
 msgid ""
@@ -5374,7 +5373,7 @@ msgstr ""
 " %s est fourni SANS AUCUNE GARANTIE ; pour les détails\n"
 " taper '%s -W'."
 
-#: src/dar_suite/dar_xform.cpp:512 src/dar_suite/dar_manager.cpp:887
+#: src/dar_suite/dar_xform.cpp:513 src/dar_suite/dar_manager.cpp:888
 #: src/dar_suite/command_line.cpp:1979
 #, c-format
 msgid ""
@@ -5386,43 +5385,43 @@ msgstr ""
 "pour les détails.\n"
 "\n"
 
-#: src/dar_suite/dar.cpp:126
+#: src/dar_suite/dar.cpp:127
 msgid "Considering the (first) archive of reference:"
 msgstr "Traitement de la (première) archive de référence :"
 
-#: src/dar_suite/dar.cpp:139 src/dar_suite/dar.cpp:166
+#: src/dar_suite/dar.cpp:140 src/dar_suite/dar.cpp:167
 msgid ""
 "Using sequential reading mode for archive source is not possible for merging "
 "operation"
 msgstr ""
 "le mode de lecture séquentiel n'est pas possible lors de la fusion d'archive"
 
-#: src/dar_suite/dar.cpp:156
+#: src/dar_suite/dar.cpp:157
 msgid "Considering the (second alias auxiliary) archive of reference:"
 msgstr ""
 "L'option -$ n'est utile qu'avec l'option -@, pour l'archive de référence "
 "auxiliaire"
 
-#: src/dar_suite/dar.cpp:286
+#: src/dar_suite/dar.cpp:287
 msgid ""
 "Making room in memory (releasing memory used by archive of reference)..."
 msgstr ""
 "Nettoyage mémoire (libération de la mémoire utilisée par l'archive de "
 "référence) ..."
 
-#: src/dar_suite/dar.cpp:314
+#: src/dar_suite/dar.cpp:315
 msgid "Now performing on-fly isolation..."
 msgstr "Réalisation de l'isolation à la volée ..."
 
-#: src/dar_suite/dar.cpp:477
+#: src/dar_suite/dar.cpp:478
 msgid "All files asked could not be restored"
 msgstr "Tous les fichiers demandés n'ont pu être restaurés"
 
-#: src/dar_suite/dar.cpp:531
+#: src/dar_suite/dar.cpp:532
 msgid "Some file comparisons failed"
 msgstr "Des comparaisons de fichier ont échoué"
 
-#: src/dar_suite/dar.cpp:578
+#: src/dar_suite/dar.cpp:579
 msgid ""
 "Some files are corrupted in the archive and it will not be possible to "
 "restore them"
@@ -5430,21 +5429,21 @@ msgstr ""
 "Certains fichiers sont corrompus dans l'archive et ne pourront pas être "
 "restaurés"
 
-#: src/dar_suite/dar.cpp:629 src/dar_suite/dar.cpp:650
+#: src/dar_suite/dar.cpp:630 src/dar_suite/dar.cpp:651
 msgid "Final memory cleanup..."
 msgstr "Finalisation du nettoyage de la mémoire ..."
 
-#: src/dar_suite/dar.cpp:685
+#: src/dar_suite/dar.cpp:686
 #, c-format
 msgid " %i inode(s) saved\n"
 msgstr " %i inode(s) sauvées\n"
 
-#: src/dar_suite/dar.cpp:686
+#: src/dar_suite/dar.cpp:687
 #, c-format
 msgid "   including %i hard link(s) treated\n"
 msgstr "   avec %i lien(s) physique(s) enregistré(s)\n"
 
-#: src/dar_suite/dar.cpp:687
+#: src/dar_suite/dar.cpp:688
 #, c-format
 msgid ""
 " %i inode(s) changed at the moment of the backup and could not be saved "
@@ -5453,220 +5452,221 @@ msgstr ""
 " %i inode(s) modifiée(s) au moment de sa (leurs) sauvegarde n'a (n'ont) pas "
 "pu être sauvée correctement\n"
 
-#: src/dar_suite/dar.cpp:688
+#: src/dar_suite/dar.cpp:689
 #, c-format
 msgid " %i byte(s) have been wasted in the archive to resave changing files"
 msgstr ""
 "%i octet(s) ont été gaspillé(s) dans l'archive lors de re-tentatives de "
 "sauvegarde de fichiers ayant changés"
 
-#: src/dar_suite/dar.cpp:689
+#: src/dar_suite/dar.cpp:690
 #, c-format
 msgid " %i inode(s) not saved (no inode/file change)\n"
 msgstr " %i inode(s) non sauvées (pas de changement)\n"
 
-#: src/dar_suite/dar.cpp:690
+#: src/dar_suite/dar.cpp:691
 #, c-format
 msgid " %i inode(s) failed to be saved (filesystem error)\n"
 msgstr ""
 " %i sauvegarde(s) d'inode(s) échouée(s) (erreur du système de fichiers)\n"
 
-#: src/dar_suite/dar.cpp:691 src/dar_suite/dar.cpp:719
-#: src/dar_suite/dar.cpp:777
+#: src/dar_suite/dar.cpp:692 src/dar_suite/dar.cpp:720
+#: src/dar_suite/dar.cpp:778
 #, c-format
 msgid " %i inode(s) ignored (excluded by filters)\n"
 msgstr " %i inode(s) ignoré(s) (exclus par les filtres)\n"
 
-#: src/dar_suite/dar.cpp:692
+#: src/dar_suite/dar.cpp:693
 #, c-format
 msgid " %i inode(s) recorded as deleted from reference backup\n"
 msgstr ""
 " %i fichier(s) enregistré(s) comme supprimé(s) depuis l'archive de "
 "référence\n"
 
-#: src/dar_suite/dar.cpp:694 src/dar_suite/dar.cpp:723
-#: src/dar_suite/dar.cpp:784
+#: src/dar_suite/dar.cpp:695 src/dar_suite/dar.cpp:724
+#: src/dar_suite/dar.cpp:785
 #, c-format
 msgid " Total number of inode(s) considered: %i\n"
 msgstr " Nombre total d'inode(s) considérée(s) : %i\n"
 
-#: src/dar_suite/dar.cpp:697 src/dar_suite/dar.cpp:781
+#: src/dar_suite/dar.cpp:698 src/dar_suite/dar.cpp:782
 #, c-format
 msgid " EA saved for %i inode(s)\n"
 msgstr " Attributs Étendus sauvés pour %i inode(s)\n"
 
-#: src/dar_suite/dar.cpp:715
+#: src/dar_suite/dar.cpp:716
 #, c-format
 msgid " %i inode(s) restored\n"
 msgstr " %i inode(s) restauré(s)\n"
 
-#: src/dar_suite/dar.cpp:716
+#: src/dar_suite/dar.cpp:717
 #, c-format
 msgid "    including %i hard link(s)\n"
 msgstr "    avec %i lien(s) physique(s)\n"
 
-#: src/dar_suite/dar.cpp:717
+#: src/dar_suite/dar.cpp:718
 #, c-format
 msgid " %i inode(s) not restored (not saved in archive)\n"
 msgstr " %i inode(s) non restaurée(s) (non sauvée(s) dans l'archive)\n"
 
-#: src/dar_suite/dar.cpp:718
+#: src/dar_suite/dar.cpp:719
 #, c-format
 msgid " %i inode(s) not restored (overwriting policy decision)\n"
 msgstr ""
 " %i inode(s) non restaurée(s) (décision de la politique d'écrasement)\n"
 
-#: src/dar_suite/dar.cpp:720
+#: src/dar_suite/dar.cpp:721
 #, c-format
 msgid " %i inode(s) failed to restore (filesystem error)\n"
 msgstr " %i inode(s) n'ayant pu être restaurée(s) (erreur système)\n"
 
-#: src/dar_suite/dar.cpp:721
+#: src/dar_suite/dar.cpp:722
 #, c-format
 msgid " %i inode(s) deleted\n"
 msgstr " %i inode(s) supprimée(s)\n"
 
-#: src/dar_suite/dar.cpp:726
+#: src/dar_suite/dar.cpp:727
 #, c-format
 msgid " EA restored for %i inode(s)\n"
 msgstr " Attributs Étendus restaurés pour %i inode(s)\n"
 
-#: src/dar_suite/dar.cpp:739 src/dar_suite/dar.cpp:756
+#: src/dar_suite/dar.cpp:740 src/dar_suite/dar.cpp:757
 #, c-format
 msgid " %i item(s) treated\n"
 msgstr " %i entrée(s) traitée(s)\n"
 
-#: src/dar_suite/dar.cpp:740
+#: src/dar_suite/dar.cpp:741
 #, c-format
 msgid " %i item(s) do not match those on filesystem\n"
 msgstr ""
 " %i entrée(s) ne correspond(ent) pas à ce qui est sur le système de "
 "fichiers\n"
 
-#: src/dar_suite/dar.cpp:741 src/dar_suite/dar.cpp:758
+#: src/dar_suite/dar.cpp:742 src/dar_suite/dar.cpp:759
 #, c-format
 msgid " %i item(s) ignored (excluded by filters)\n"
 msgstr " %i entrée(s) ignorée(s) (exclus par les filtres)\n"
 
-#: src/dar_suite/dar.cpp:743 src/dar_suite/dar.cpp:760
+#: src/dar_suite/dar.cpp:744 src/dar_suite/dar.cpp:761
 #, c-format
 msgid " Total number of items considered: %i\n"
 msgstr " Nombre total d'entrée(s) considérée(s) : %i\n"
 
-#: src/dar_suite/dar.cpp:757
+#: src/dar_suite/dar.cpp:758
 #, c-format
 msgid " %i item(s) with error\n"
 msgstr " %i entrée(s) avec erreur\n"
 
-#: src/dar_suite/dar.cpp:775
+#: src/dar_suite/dar.cpp:776
 #, c-format
 msgid " %i inode(s) added to archive\n"
 msgstr " %i inode(s) ajoutée(s) à l'archive\n"
 
-#: src/dar_suite/dar.cpp:776
+#: src/dar_suite/dar.cpp:777
 #, c-format
 msgid " with %i hard link(s) recorded\n"
 msgstr " avec %i lien(s) physique(s) enregistré(s)\n"
 
-#: src/dar_suite/dar.cpp:778
+#: src/dar_suite/dar.cpp:779
 #, c-format
 msgid " %i inode(s) recorded as deleted\n"
 msgstr " %i inode(s) enregistrée(s) comme supprimée(s)\n"
 
-#: src/dar_suite/dar_manager.cpp:226
+#: src/dar_suite/dar_manager.cpp:227
 msgid "Decompressing and loading database header to memory..."
 msgstr ""
 "Décompression et chargement de l'en-tête de la base de donnée en mémoire..."
 
-#: src/dar_suite/dar_manager.cpp:228
+#: src/dar_suite/dar_manager.cpp:229
 msgid "Decompressing and loading database to memory..."
 msgstr "Décompression et chargement de la base de données en mémoire ..."
 
-#: src/dar_suite/dar_manager.cpp:240
+#: src/dar_suite/dar_manager.cpp:241
 msgid "Error met while processing operation: "
 msgstr "Erreur lors du traitement de l'opération : "
 
-#: src/dar_suite/dar_manager.cpp:310
+#: src/dar_suite/dar_manager.cpp:311
 msgid "-B option cannot be given inside a batch file"
 msgstr ""
 "l'option -B ne peut pas être utilisée à l'intérieur d'un fichier de "
 "traitement par lot"
 
-#: src/dar_suite/dar_manager.cpp:448
+#: src/dar_suite/dar_manager.cpp:449
 msgid "Running batch file from a batch file is not allowed"
 msgstr ""
 "Lancer un fichier de traitement par lot à partir d'un autre fichier de "
 "traitement par lot n'est pas autorisée"
 
-#: src/dar_suite/dar_manager.cpp:464
+#: src/dar_suite/dar_manager.cpp:465
 msgid "-9 option is only valid after -A option, ignoring it"
 msgstr ""
 "l'option -9 n'est valide uniquement qu'après l'option -A et sera ignorée ici"
 
-#: src/dar_suite/dar_manager.cpp:477
+#: src/dar_suite/dar_manager.cpp:478
 #, c-format
 msgid "invalid number give to -; option: %s"
 msgstr "L'argument fourni à l'option -; est un nombre invalide : %s"
 
-#: src/dar_suite/dar_manager.cpp:520
+#: src/dar_suite/dar_manager.cpp:521
 msgid "-e option is only available when using -r option, aborting"
 msgstr ""
 "-e n'est disponible qu'avec l'option -r, abandon de l'opération en cours"
 
-#: src/dar_suite/dar_manager.cpp:527
+#: src/dar_suite/dar_manager.cpp:528
 msgid "No action specified, aborting"
 msgstr "Aucune action spécifiée, abandon"
 
-#: src/dar_suite/dar_manager.cpp:539 src/dar_suite/dar_manager.cpp:543
+#: src/dar_suite/dar_manager.cpp:540 src/dar_suite/dar_manager.cpp:544
 msgid "Ignoring extra arguments on command line"
 msgstr "Les arguments supplémentaires sur la ligne de commande sont ignorés"
 
-#: src/dar_suite/dar_manager.cpp:549 src/dar_suite/dar_manager.cpp:566
+#: src/dar_suite/dar_manager.cpp:550 src/dar_suite/dar_manager.cpp:567
 msgid "Missing argument to command line, aborting"
 msgstr "Pas assez d'arguments sur la ligne de commande, abandon"
 
-#: src/dar_suite/dar_manager.cpp:558
+#: src/dar_suite/dar_manager.cpp:559
 msgid "Arguments to -r must be relative path (never begin by '/')"
 msgstr ""
 "L'argument donnée à l'option -r doit être un chemin relatif (jamais "
 "commencer par '/')"
 
-#: src/dar_suite/dar_manager.cpp:580
+#: src/dar_suite/dar_manager.cpp:581
 msgid "No database specified, aborting"
 msgstr "Pas de base de donnée spécifiée, abandon"
 
-#: src/dar_suite/dar_manager.cpp:586
+#: src/dar_suite/dar_manager.cpp:587
 msgid "Parse error on command line (or included files): "
 msgstr "Erreur de syntaxe en ligne de commande (ou dans un fichier inclus) : "
 
-#: src/dar_suite/dar_manager.cpp:599
+#: src/dar_suite/dar_manager.cpp:600
 msgid "Creating file..."
 msgstr "Création de fichier ..."
 
-#: src/dar_suite/dar_manager.cpp:600
+#: src/dar_suite/dar_manager.cpp:601
 msgid "Formatting file as an empty database..."
 msgstr "Mise en forme du fichier en base de donnée vide ..."
 
-#: src/dar_suite/dar_manager.cpp:604
+#: src/dar_suite/dar_manager.cpp:605
 msgid "Database has been successfully created empty."
 msgstr "La base de donnée a été initialisée avec succès."
 
-#: src/dar_suite/dar_manager.cpp:619 src/dar_suite/dar_manager.cpp:1062
+#: src/dar_suite/dar_manager.cpp:620 src/dar_suite/dar_manager.cpp:1063
 msgid "Reading catalogue of the archive to add..."
 msgstr "Lecture du catalogue de l'archive à ajouter ..."
 
-#: src/dar_suite/dar_manager.cpp:633 src/dar_suite/dar_manager.cpp:1071
+#: src/dar_suite/dar_manager.cpp:634 src/dar_suite/dar_manager.cpp:1072
 msgid "Updating database with catalogue..."
 msgstr "Ajout des informations issues du catalogue à la base de donnée..."
 
-#: src/dar_suite/dar_manager.cpp:640 src/dar_suite/dar_manager.cpp:835
-#: src/dar_suite/dar_manager.cpp:1074 src/dar_suite/dar_manager.cpp:1104
-#: src/dar_suite/dar_manager.cpp:1198
-msgid "Checking date ordering of files between archive..."
+#: src/dar_suite/dar_manager.cpp:641 src/dar_suite/dar_manager.cpp:836
+#: src/dar_suite/dar_manager.cpp:1075 src/dar_suite/dar_manager.cpp:1105
+#: src/dar_suite/dar_manager.cpp:1199
+#, fuzzy
+msgid "Checking date ordering of files between archives..."
 msgstr "Vérification de l'ordonnancement des dates entre les archives ..."
 
-#: src/dar_suite/dar_manager.cpp:654 src/dar_suite/dar_manager.cpp:839
-#: src/dar_suite/dar_manager.cpp:1200
+#: src/dar_suite/dar_manager.cpp:655 src/dar_suite/dar_manager.cpp:840
+#: src/dar_suite/dar_manager.cpp:1201
 msgid ""
 "Some files do not follow chronological order when archive index increases "
 "withing the database, this can lead dar_manager to restored a wrong version "
@@ -5676,16 +5676,16 @@ msgstr ""
 "indices croissants d'archive au sein de la base de donnée, ceci peut amener "
 "dar_manager à ne pas restaurer la bonne version d'un de ces fichiers"
 
-#: src/dar_suite/dar_manager.cpp:681 src/dar_suite/dar_manager.cpp:1093
+#: src/dar_suite/dar_manager.cpp:682 src/dar_suite/dar_manager.cpp:1094
 msgid "Removing information from the database..."
 msgstr "Suppression des informations de la base ..."
 
-#: src/dar_suite/dar_manager.cpp:701 src/dar_suite/dar_manager.cpp:721
-#: src/dar_suite/dar_manager.cpp:735 src/dar_suite/dar_manager.cpp:749
+#: src/dar_suite/dar_manager.cpp:702 src/dar_suite/dar_manager.cpp:722
+#: src/dar_suite/dar_manager.cpp:736 src/dar_suite/dar_manager.cpp:750
 msgid "Changing database header information..."
 msgstr "Mise à jour des en-têtes de la base de données ..."
 
-#: src/dar_suite/dar_manager.cpp:767
+#: src/dar_suite/dar_manager.cpp:768
 msgid ""
 "Looking in archives for requested files, classifying files archive by "
 "archive..."
@@ -5693,26 +5693,26 @@ msgstr ""
 "Recherche des archives contenant les versions les plus récentes des fichiers "
 "et tri des fichiers par archive à utiliser pour la restauration ..."
 
-#: src/dar_suite/dar_manager.cpp:814 src/dar_suite/dar_manager.cpp:1123
+#: src/dar_suite/dar_manager.cpp:815 src/dar_suite/dar_manager.cpp:1124
 msgid "Computing statistics..."
 msgstr "Calcul des statistiques ..."
 
-#: src/dar_suite/dar_manager.cpp:824
+#: src/dar_suite/dar_manager.cpp:825
 msgid ""
 "Negative number or zero not allowed when moving an archive inside a database"
 msgstr ""
 "Nombre négatif ou nul non autorisé pour le déplacement d'une archive au sein "
 "de la base"
 
-#: src/dar_suite/dar_manager.cpp:831
+#: src/dar_suite/dar_manager.cpp:832
 msgid "Changing database information..."
 msgstr "Mise à jour des informations de la base de données ..."
 
-#: src/dar_suite/dar_manager.cpp:944
+#: src/dar_suite/dar_manager.cpp:945
 msgid "Corrupted database :"
 msgstr "Base de données corrompue : "
 
-#: src/dar_suite/dar_manager.cpp:993
+#: src/dar_suite/dar_manager.cpp:994
 #, c-format
 msgid ""
 "\n"
@@ -5723,15 +5723,15 @@ msgstr ""
 "\n"
 "\t Base de donnée utilisée [%s] : %S\n"
 
-#: src/dar_suite/dar_manager.cpp:993
+#: src/dar_suite/dar_manager.cpp:994
 msgid "Saved"
 msgstr "Sauvé"
 
-#: src/dar_suite/dar_manager.cpp:993
+#: src/dar_suite/dar_manager.cpp:994
 msgid "Not Saved"
 msgstr "Non Sauvé"
 
-#: src/dar_suite/dar_manager.cpp:995
+#: src/dar_suite/dar_manager.cpp:996
 #, c-format
 msgid ""
 "\t Pause each %d line of output\n"
@@ -5740,7 +5740,7 @@ msgstr ""
 "\t Pause toutes les %d lignes d'affichage\n"
 "\n"
 
-#: src/dar_suite/dar_manager.cpp:997
+#: src/dar_suite/dar_manager.cpp:998
 #, c-format
 msgid ""
 "\t No pause in output\n"
@@ -5749,40 +5749,40 @@ msgstr ""
 "\t Pas de pause lors de l'affichage\n"
 "\n"
 
-#: src/dar_suite/dar_manager.cpp:998
+#: src/dar_suite/dar_manager.cpp:999
 #, c-format
 msgid " l : list database contents  \t A : Add an archive\n"
 msgstr " l : contenu de la base \t\tA : Ajout d'une archive\n"
 
-#: src/dar_suite/dar_manager.cpp:999
+#: src/dar_suite/dar_manager.cpp:1000
 #, c-format
 msgid " u : list archive contents   \t D : Remove an archive\n"
 msgstr " u : contenu d'une archive \t\tD : Suppression d'une archive\n"
 
-#: src/dar_suite/dar_manager.cpp:1000
+#: src/dar_suite/dar_manager.cpp:1001
 #, c-format
 msgid " f : give file localization  \t m : modify archive order\n"
 msgstr " f : localisation d'un fichier \t\tm : change l'ordre des archives\n"
 
-#: src/dar_suite/dar_manager.cpp:1001
+#: src/dar_suite/dar_manager.cpp:1002
 #, c-format
 msgid " p : modify path of archives \t b : modify basename of archives\n"
 msgstr ""
 " p : modifie le chemin d'un archive \tb : modifie le nom de base d'une "
 "archive\n"
 
-#: src/dar_suite/dar_manager.cpp:1002
+#: src/dar_suite/dar_manager.cpp:1003
 #, c-format
 msgid " d : path to dar             \t o : options to dar\n"
 msgstr " d : chemin de dar                \to : option passées à dar\n"
 
-#: src/dar_suite/dar_manager.cpp:1003
+#: src/dar_suite/dar_manager.cpp:1004
 #, c-format
 msgid " w : write changes to file   \t s : database statistics\n"
 msgstr ""
 " w : enregistre les changements   \ts : statistiques de la base de données\n"
 
-#: src/dar_suite/dar_manager.cpp:1004
+#: src/dar_suite/dar_manager.cpp:1005
 #, c-format
 msgid ""
 " a : Save as                 \t n : pause each 'n' line (zero for no pause)\n"
@@ -5790,14 +5790,14 @@ msgstr ""
 " a : Sauver sous\n"
 " n : pause chaque 'n' ligne d'affichage (zéro pour aucune pause)\n"
 
-#: src/dar_suite/dar_manager.cpp:1005
+#: src/dar_suite/dar_manager.cpp:1006
 #, c-format
 msgid ""
 " c : check date order\n"
 "\n"
 msgstr " c : vérification de l'ordre des dates\n"
 
-#: src/dar_suite/dar_manager.cpp:1006
+#: src/dar_suite/dar_manager.cpp:1007
 #, c-format
 msgid ""
 " q : quit\n"
@@ -5806,118 +5806,118 @@ msgstr ""
 " q : Sortir\n"
 "\n"
 
-#: src/dar_suite/dar_manager.cpp:1007
+#: src/dar_suite/dar_manager.cpp:1008
 #, c-format
 msgid " Choice: "
 msgstr " Choix : "
 
-#: src/dar_suite/dar_manager.cpp:1024
+#: src/dar_suite/dar_manager.cpp:1025
 msgid "Archive number: "
 msgstr "Numéro d'archive : "
 
-#: src/dar_suite/dar_manager.cpp:1031
+#: src/dar_suite/dar_manager.cpp:1032
 msgid "File to look for: "
 msgstr "Fichier à chercher : "
 
-#: src/dar_suite/dar_manager.cpp:1035
+#: src/dar_suite/dar_manager.cpp:1036
 msgid "Archive number to modify: "
 msgstr "Numéro d'archive à modifier : "
 
-#: src/dar_suite/dar_manager.cpp:1039
+#: src/dar_suite/dar_manager.cpp:1040
 #, c-format
 msgid "New basename for archive number %d: "
 msgstr "Nouveau numéro pour l'archive %d : "
 
-#: src/dar_suite/dar_manager.cpp:1044
+#: src/dar_suite/dar_manager.cpp:1045
 msgid "Path to dar (empty string to use the default from PATH variable): "
 msgstr "Chemin de dar (chemin vide pour l'utilisation de la variable PATH) :  "
 
-#: src/dar_suite/dar_manager.cpp:1049 src/dar_suite/dar_manager.cpp:1055
-#: src/dar_suite/dar_manager.cpp:1332
+#: src/dar_suite/dar_manager.cpp:1050 src/dar_suite/dar_manager.cpp:1056
+#: src/dar_suite/dar_manager.cpp:1333
 msgid "Compressing and writing back database to file..."
 msgstr "Compression et enregistrement de la base de donnée dans le fichier..."
 
-#: src/dar_suite/dar_manager.cpp:1054
+#: src/dar_suite/dar_manager.cpp:1055
 msgid "New database name: "
 msgstr "Nouveau nom pour la base de données : "
 
-#: src/dar_suite/dar_manager.cpp:1061
+#: src/dar_suite/dar_manager.cpp:1062
 msgid "Archive basename (or extracted catalogue basename) to add: "
 msgstr "Nom de base de l'archive à ajouter : "
 
-#: src/dar_suite/dar_manager.cpp:1088
+#: src/dar_suite/dar_manager.cpp:1089
 msgid "Archive number to remove: "
 msgstr "Numéro d'archive à supprimer : "
 
-#: src/dar_suite/dar_manager.cpp:1092
+#: src/dar_suite/dar_manager.cpp:1093
 #, c-format
 msgid "Are you sure to remove archive number %d ?"
 msgstr "Étes vous sûr de vouloir supprimer l'archive numéro %d ?"
 
-#: src/dar_suite/dar_manager.cpp:1098
+#: src/dar_suite/dar_manager.cpp:1099
 msgid "Archive number to move: "
 msgstr "Numéro de l'archive à déplacer : "
 
-#: src/dar_suite/dar_manager.cpp:1100
+#: src/dar_suite/dar_manager.cpp:1101
 msgid "In which position to insert this archive: "
 msgstr "Position à laquelle insérer l'archive : "
 
-#: src/dar_suite/dar_manager.cpp:1109
+#: src/dar_suite/dar_manager.cpp:1110
 msgid "Archive number who's path to modify: "
 msgstr "Numéro de l'archive dont le chemin doit être modifié : "
 
-#: src/dar_suite/dar_manager.cpp:1113
+#: src/dar_suite/dar_manager.cpp:1114
 #, c-format
 msgid "New path to give to archive number %d: "
 msgstr "Nouveau chemin de l'archive %d : "
 
-#: src/dar_suite/dar_manager.cpp:1127
+#: src/dar_suite/dar_manager.cpp:1128
 msgid "How much line to display at once: "
 msgstr "Nombre de ligne à afficher à chaque fois : "
 
-#: src/dar_suite/dar_manager.cpp:1131
+#: src/dar_suite/dar_manager.cpp:1132
 msgid "Checking file's dates ordering..."
 msgstr "Vérification de l'ordonnancement des dates de fichiers ..."
 
-#: src/dar_suite/dar_manager.cpp:1139 src/dar_suite/dar_manager.cpp:1160
+#: src/dar_suite/dar_manager.cpp:1140 src/dar_suite/dar_manager.cpp:1161
 msgid "Database not saved, Do you really want to quit ?"
 msgstr "Base de données non sauvegardée, voulez-vous vraiment sortir ?"
 
-#: src/dar_suite/dar_manager.cpp:1140 src/dar_suite/dar_manager.cpp:1161
+#: src/dar_suite/dar_manager.cpp:1141 src/dar_suite/dar_manager.cpp:1162
 #, c-format
 msgid "Continuing the action under process which is to exit... so we exit!"
 msgstr "On continue l'action en cours qui est de sorti ... donc on sort !"
 
-#: src/dar_suite/dar_manager.cpp:1149
+#: src/dar_suite/dar_manager.cpp:1150
 #, c-format
 msgid "Unknown choice\n"
 msgstr "Choix inconnu\n"
 
-#: src/dar_suite/dar_manager.cpp:1175
+#: src/dar_suite/dar_manager.cpp:1176
 #, c-format
 msgid "re-enabling all signal handlers and continuing\n"
 msgstr ""
 "réactivation des gestionnaires de signaux et poursuite des opérations\n"
 
-#: src/dar_suite/dar_manager.cpp:1182
+#: src/dar_suite/dar_manager.cpp:1183
 #, c-format
 msgid "Error performing the requested action: %S"
 msgstr "Erreur pendant l'exécution de l'action demandée : %S "
 
-#: src/dar_suite/dar_manager.cpp:1202
+#: src/dar_suite/dar_manager.cpp:1203
 msgid "No problem found"
 msgstr "Aucun problème rencontré"
 
-#: src/dar_suite/dar_manager.cpp:1231
+#: src/dar_suite/dar_manager.cpp:1232
 msgid "Opening and reading the batch file..."
 msgstr "Ouverture et lecture du fichier de traitement par lot..."
 
-#: src/dar_suite/dar_manager.cpp:1236 src/dar_suite/command_line.cpp:2083
+#: src/dar_suite/dar_manager.cpp:1237 src/dar_suite/command_line.cpp:2083
 #, c-format
 msgid "Cannot open file %S : %s"
 msgstr "Le fichier %S ne peut pas être ouvert : %s"
 
-#: src/dar_suite/dar_manager.cpp:1262
+#: src/dar_suite/dar_manager.cpp:1263
 #, c-format
 msgid ""
 "\n"
@@ -5928,39 +5928,39 @@ msgstr ""
 "\tExécution de la ligne : %S\n"
 " "
 
-#: src/dar_suite/dar_manager.cpp:1271
+#: src/dar_suite/dar_manager.cpp:1272
 #, c-format
 msgid "Syntax error in batch file: %S"
 msgstr "Erreur de syntaxe dans le fichier de traitement par lot : %S"
 
-#: src/dar_suite/dar_manager.cpp:1274
+#: src/dar_suite/dar_manager.cpp:1275
 msgid "Syntax error in batch file: -C option not allowed"
 msgstr ""
 "Erreur de syntaxe dans le fichier de traitement par lot : option -C non "
 "autorisée"
 
-#: src/dar_suite/dar_manager.cpp:1277
+#: src/dar_suite/dar_manager.cpp:1278
 msgid "Syntax error in batch file: -i option not allowed"
 msgstr ""
 "Erreur de syntaxe dans le fichier de traitement par lot : option -i non "
 "autorisée"
 
-#: src/dar_suite/dar_manager.cpp:1285
+#: src/dar_suite/dar_manager.cpp:1286
 msgid "Aborting batch operation: "
 msgstr "Abandon du traitement par lot :"
 
-#: src/dar_suite/dar_manager.cpp:1296
+#: src/dar_suite/dar_manager.cpp:1297
 #, c-format
 msgid "Enter each argument line by line, press return at the end\n"
 msgstr ""
 "Entrer chaque argument ligne par ligne puis appuyer sur entrée à la fin\n"
 
-#: src/dar_suite/dar_manager.cpp:1297
+#: src/dar_suite/dar_manager.cpp:1298
 #, c-format
 msgid "To terminate enter an empty line\n"
 msgstr "Pour terminer entrer une ligne vide\n"
 
-#: src/dar_suite/dar_manager.cpp:1424
+#: src/dar_suite/dar_manager.cpp:1425
 #, c-format
 msgid "Absolute value too high for an archive number: %d"
 msgstr "Valeur absolue trop élevée pour un numéro d'archive : %d"
@@ -6644,6 +6644,10 @@ msgid ""
 msgstr ""
 "   -E <chaîne>\t ligne de commande à exécuter entre les tranches d'une "
 "archive\n"
+
+#: src/check/all_features.cpp:54
+msgid "-"
+msgstr ""
 
 #~ msgid "NULL given as argument"
 #~ msgstr "NULL fourni comme argument"

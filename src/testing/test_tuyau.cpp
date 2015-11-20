@@ -75,6 +75,7 @@ int main(int argc, char * const argv[])
 			    NULL,
 			    "",
 			    NULL,
+			    '\0',
 			    &little_main);
 }
 
