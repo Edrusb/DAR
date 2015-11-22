@@ -422,6 +422,7 @@ namespace libdar
 				bool delta_signature,
 				bool build_delta_sig,
 				const mask & delta_mask,
+				const infinint & delta_sig_min_size,
 				statistics * progressive_report);
 
 	void op_create_in_sub(user_interaction & dialog,        //< interaction with user
@@ -488,6 +489,7 @@ namespace libdar
 			      bool delta_signature,             //< whether to calculate and store binary delta signature for each saved file
 			      bool build_delta_sig,             //< whether to rebuild delta sig accordingly to delta_mask
 			      const mask & delta_mask,          //< which files to consider delta signature for
+			      const infinint & delta_sig_min_size, //< minimum file size for which to calculate delta signature
 			      statistics * st_ptr);             //< statistics must not be nullptr !
 
 	void disable_natural_destruction();

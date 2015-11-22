@@ -1674,7 +1674,8 @@ namespace libdar
     void catalogue::transfer_delta_signatures(const pile_descriptor & destination,
 					      bool sequential_read,
 					      bool build,
-					      const mask & delta_mask)
+					      const mask & delta_mask,
+					      const infinint & delta_sig_min_size)
     {
 	const cat_entree *ent = nullptr;
 	const cat_file *ent_file = nullptr;
@@ -1707,11 +1708,20 @@ namespace libdar
 		    throw SRC_BUG;
 
 		if(sequential_read
-		   && (ent_file->has_delta_signature() || !build || !delta_mask.is_covered(juillet.get_string())))
+		   && (ent_file->has_delta_signature()
+		       || !build
+		       || !delta_mask.is_covered(juillet.get_string())
+		       || e_file->get_size() < delta_sig_min_size
+		       )
+		    )
 		{
 			// here we throw data to trash just to grab data CRC
-			// except when we need calculate signature when is not
-			// already calculated and we have to calculate it
+			// except when
+			//   - we need calculate signature
+			// and
+			//   - it not already calculated
+			// and
+			//   - we have to calculate it in regard to mask or file size
 
 		    if(e_file->get_saved_status() == s_saved)
 		    {
@@ -1727,7 +1737,11 @@ namespace libdar
 
 		if(ent_file->has_delta_signature())
 		{
-		    if(!build || delta_mask.is_covered(juillet.get_string()))
+		    if(!build
+		       ||
+		       (delta_mask.is_covered(juillet.get_string())
+			&& e_file->get_size() >= delta_sig_min_size)
+			)
 		    {
 			e_file->read_delta_signature(mem);
 			e_file->dump_delta_signature(mem, *(destination.compr), false);
@@ -1737,7 +1751,9 @@ namespace libdar
 		}
 		else // no delta signature found we must calculate them
 		{
-		    if(build && delta_mask.is_covered(juillet.get_string()))
+		    if(build
+		       && delta_mask.is_covered(juillet.get_string())
+		       && e_file->get_size() >= delta_sig_min_size)
 		    {
 			if(e_file->get_saved_status() == s_saved)
 			{

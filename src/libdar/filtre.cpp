@@ -532,6 +532,7 @@ namespace libdar
 			   const fsa_scope & scope,
 			   const string & exclude_by_ea,
 			   bool delta_signature,
+			   const infinint & delta_sig_min_size,
 			   const mask & delta_mask)
     {
         cat_entree *e = nullptr;
@@ -799,7 +800,10 @@ namespace libdar
 						e_file->change_compression_algo_write(none);
 					}
 
-					if(e_file != nullptr && delta_signature && delta_mask.is_covered(juillet.get_string()))
+					if(e_file != nullptr
+					   && delta_signature
+					   && delta_mask.is_covered(juillet.get_string())
+					   && e_file->get_size() >= delta_sig_min_size)
 					    e_file->will_have_delta_signature();
 					    // during small inode dump for that file, the flag telling a delta_sig is present will be set
 
@@ -1541,6 +1545,7 @@ namespace libdar
 		      const fsa_scope & scope,
 		      bool delta_signature,
 		      bool build_delta_sig,
+		      const infinint & delta_sig_min_size,
 		      const mask & delta_mask)
     {
 	compression stock_algo;
@@ -2522,7 +2527,8 @@ namespace libdar
 			{
 			    if(build_delta_sig) // delta signature need to be recalculated if absent
 			    {
-				if(delta_mask.is_covered(juillet.get_string()))
+				if(delta_mask.is_covered(juillet.get_string())
+				   && e_file->get_size() >= delta_sig_min_size)
 				{
 				    if(!e_file->has_delta_signature())
 				    {

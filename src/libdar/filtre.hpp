@@ -103,6 +103,7 @@ namespace libdar
 				  const fsa_scope & scope,
 				  const std::string & exclude_by_ea,
 				  bool delta_signature,
+				  const infinint & delta_sig_min_size,
 				  const mask & delta_mask);
 
     extern void filtre_difference(user_interaction & dialog,
@@ -162,6 +163,7 @@ namespace libdar
 			     const fsa_scope & scope,
 			     bool delta_signature,
 			     bool build_delta_sig,
+			     const infinint & delta_sig_min_size,
 			     const mask & delta_mask);
 
     void filtre_sequentially_read_all_catalogue(catalogue & cat,

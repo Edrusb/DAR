@@ -490,6 +490,7 @@ namespace libdar
 				       options.get_delta_signature(),
 				       options.get_has_delta_mask_been_set(),
 				       options.get_delta_mask(),
+				       options.get_delta_sig_min_size(),
 				       progressive_report);
 		    exploitable = false;
 		    stack.terminate();
@@ -745,6 +746,7 @@ namespace libdar
 				     options.get_delta_signature(), // delta signatures
 				     options.get_has_delta_mask_been_set(), // build delta sig
 				     options.get_delta_mask(), // delta_mask
+				     options.get_delta_sig_min_size(),
 				     st_ptr);
 		    exploitable = false;
 		    stack.terminate();
@@ -1323,7 +1325,8 @@ namespace libdar
 		    pile_descriptor pdesc = & layers;
 		    cat->transfer_delta_signatures(pdesc, sequential_read,
 						   options.get_has_delta_mask_been_set(),
-						   options.get_delta_mask());
+						   options.get_delta_mask(),
+						   options.get_delta_sig_min_size());
 		}
 		else
 		    cat->drop_delta_signatures();
@@ -1749,6 +1752,7 @@ namespace libdar
 				     bool delta_signature,
 				     bool build_delta_sig,
 				     const mask & delta_mask,
+				     const infinint & delta_sig_min_size,
 				     statistics * progressive_report)
     {
         statistics st = false;  // false => no lock for this internal object
@@ -1901,6 +1905,7 @@ namespace libdar
 			 delta_signature,
 			 build_delta_sig,
 			 delta_mask,
+			 delta_sig_min_size,
 			 st_ptr);
 
 	return *st_ptr;
@@ -1970,6 +1975,7 @@ namespace libdar
 				   bool delta_signature,
 				   bool build_delta_sig,
 				   const mask & delta_mask,
+				   const infinint & delta_sig_min_size,
 				   statistics * st_ptr)
     {
 	try
@@ -2134,6 +2140,7 @@ namespace libdar
 					      scope,
 					      exclude_by_ea,
 					      delta_signature,
+					      delta_sig_min_size,
 					      delta_mask);
 				// build_delta_sig is not used for archive creation it is always implied when delta_signature is set
 			}
@@ -2181,6 +2188,7 @@ namespace libdar
 				     scope,
 				     delta_signature,
 				     build_delta_sig,
+				     delta_sig_min_size,
 				     delta_mask);
 			break;
 		    default:

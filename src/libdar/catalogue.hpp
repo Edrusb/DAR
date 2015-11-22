@@ -244,7 +244,8 @@ namespace libdar
 	void transfer_delta_signatures(const pile_descriptor & destination,
 				       bool sequential_read,
 				       bool build,
-				       const mask & delta_mask);
+				       const mask & delta_mask,
+				       const infinint & delta_sig_min_size);
 
 	    /// remove delta signature from the catalogue object as if they had never been calculated
 	void drop_delta_signatures();
