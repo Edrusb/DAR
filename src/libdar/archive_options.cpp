@@ -801,6 +801,7 @@ namespace libdar
 	    x_multi_threaded = true;
 	    x_delta_signature = true;
 	    has_delta_mask_been_set = false;
+	    x_delta_sig_min_size = default_delta_sig_min_size;
 	}
 	catch(...)
 	{
@@ -1035,6 +1036,7 @@ namespace libdar
 	    x_multi_threaded = ref.x_multi_threaded;
 	    x_delta_signature = ref.x_delta_signature;
 	    has_delta_mask_been_set = ref.has_delta_mask_been_set;
+	    x_delta_sig_min_size = ref.x_delta_sig_min_size;
 	}
 	catch(...)
 	{
