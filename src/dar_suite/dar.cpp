@@ -271,6 +271,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    create_options.set_fsa_scope(param.scope);
 		    create_options.set_multi_threaded(param.multi_threaded);
 		    create_options.set_delta_signature(param.delta_sig);
+		    if(param.delta_sig_min_size > 0)
+			create_options.set_delta_sig_min_size(param.delta_sig_min_size);
 		    create_options.set_delta_diff(param.delta_diff);
 
 		    if(param.backup_hook_mask != nullptr)
@@ -331,6 +333,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    merge_options.set_delta_signature(param.delta_sig);
 		    if(param.delta_mask != nullptr)
 			merge_options.set_delta_mask(*param.delta_mask);
+		    if(param.delta_sig_min_size > 0)
+			merge_options.set_delta_sig_min_size(param.delta_sig_min_size);
 
 		    cur = new (nothrow) archive(dialog,  // user_interaction &
 						*param.sauv_root,  //const path &
@@ -420,8 +424,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    isolate_options.set_sequential_marks(param.use_sequential_marks);
 			    isolate_options.set_multi_threaded(param.multi_threaded);
 			    isolate_options.set_delta_signature(param.delta_sig);
-			    if(param.delta_mask != nullptr)
-				isolate_options.set_delta_mask(*param.delta_mask);
+				// we do not use include/exclude delta sig nor delta_sig_min_size
+				// for on-fly isolation
 
 			    cur->op_isolate(dialog,
 					    *param.aux_root,
@@ -499,6 +503,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		isolate_options.set_delta_signature(param.delta_sig);
 		if(param.delta_mask != nullptr)
 		    isolate_options.set_delta_mask(*param.delta_mask);
+		if(param.delta_sig_min_size > 0)
+		    isolate_options.set_delta_sig_min_size(param.delta_sig_min_size);
 
                 arch->op_isolate(dialog,
 				 *param.sauv_root,

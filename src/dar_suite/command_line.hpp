@@ -141,6 +141,7 @@ struct line_param
     bool delta_sig;               //< whether to calculate rsync signature of files
     mask *delta_mask;             //< which file to calculate delta sig when not using the default mask
     bool delta_diff;              //< whether to save binary diff or whole file's data during a differential backup
+    infinint delta_sig_min_size;  //< size below which to never calculate delta signatures
 
 	// constructor for line_param
     line_param()
