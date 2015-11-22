@@ -533,9 +533,9 @@ namespace libdar
 
 	 /// \param[in] file1 first file
 	 /// \param[in] file2 second file
-	 /// \return return true if the two files are located under the same mounting point
+	 /// \return returns true if the two files are located under the same mounting point
 	 /// \note if one of the file is not present or if the filesystem information
-	 ///   is not possible to be read an exception is throw (Erange)
+	 /// is not possible to be read an exception is throw (Erange)
      extern bool tools_are_on_same_filesystem(const std::string & file1, const std::string & file2);
 
 

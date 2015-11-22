@@ -569,7 +569,6 @@ namespace libdar
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
 
-
     private:
 	archive *x_ref_arch; //< just contains the address of an existing object, no local copy of object is done here
 	mask * x_selection;  //< points to a local copy of mask (must be allocated / releases by the archive_option_create object)
@@ -749,6 +748,11 @@ namespace libdar
 		    /// whether to derogate to defaut delta file consideration while calculation delta signatures
 	void set_delta_mask(const mask & delta_mask);
 
+	    /// whether to never calculate delta signature for files which size is smaller or equal to the given argument
+	    ///
+	    /// \note by default a min size of 10 kiB is used
+	void set_delta_sig_min_size(const infinint & val) { x_delta_sig_min_size = val; };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -780,6 +784,7 @@ namespace libdar
 	bool get_delta_signature() const { return x_delta_signature; };
 	const mask & get_delta_mask() const { return *x_delta_mask; }
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
+	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
 
     private:
 	bool x_allow_over;
@@ -809,6 +814,7 @@ namespace libdar
 	bool x_delta_signature;
 	mask *x_delta_mask;
 	bool has_delta_mask_been_set;
+	infinint x_delta_sig_min_size;
 
 	void copy_from(const archive_options_isolate & ref);
 	void destroy();

@@ -659,6 +659,7 @@ namespace libdar
 	    x_delta_signature = false;
 	    archive_option_clean_mask(x_delta_mask, get_pool());
 	    has_delta_mask_been_set = false;
+	    x_delta_sig_min_size = default_delta_sig_min_size;
 	}
 	catch(...)
 	{
@@ -740,6 +741,7 @@ namespace libdar
 	x_delta_signature = ref.x_delta_signature;
 	x_delta_mask = ref.x_delta_mask->clone();
 	has_delta_mask_been_set = ref.has_delta_mask_been_set;
+	x_delta_sig_min_size = ref.x_delta_sig_min_size;
     }
 
 
