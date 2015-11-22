@@ -1175,6 +1175,7 @@ namespace libdar
             dialog.printf(gettext("   Restores dates of symlinks   : %s\n"), YES_NO(compile_time::symlink_restore_dates()));
 	    if(compile_time::libthreadar())
 		dialog.printf(gettext("   Can uses multiple threads    : %s\n"), YES_NO(compile_time::libthreadar()));
+	    dialog.printf(gettext("   Delta compression support    : %s\n"), YES_NO(compile_time::librsync()));
         }
         catch(...)
         {
