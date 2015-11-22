@@ -800,6 +800,8 @@ namespace libdar
 						e_file->change_compression_algo_write(none);
 					}
 
+					    // DECIDING WHETHER DELTA SIGNATURE WILL BE CALCULATES
+
 					if(e_file != nullptr
 					   && delta_signature
 					   && delta_mask.is_covered(juillet.get_string())
@@ -2545,6 +2547,11 @@ namespace libdar
 
 						dialog.warning(tools_printf(gettext("Need to activate sparse file detection in order to calculate delta signature for sparse file %S"), &tmp));
 					    }
+					    else
+					    {
+						e_file->will_have_delta_signature();
+						calculate_delta_signature = true;
+					    }
 					    break;
 					case cat_file::normal:
 					case cat_file::plain:
@@ -2831,7 +2838,15 @@ namespace libdar
 				source = fic->get_data(keep_mode, nullptr);
 				break;
 			    case cat_file::keep_hole:
-				source = fic->get_data(keep_mode, nullptr);
+				if(delta_signature && !fic->get_sparse_file_detection_read())
+				{
+				    delta_sig = new (pool) memory_file();
+				    if(delta_sig == nullptr)
+					throw Ememory("saved_inode");
+				    source = fic->get_data(cat_file::normal, delta_sig);
+				}
+				else
+				    source = fic->get_data(keep_mode, nullptr);
 				break;
 			    case cat_file::normal:
 				if(delta_signature)

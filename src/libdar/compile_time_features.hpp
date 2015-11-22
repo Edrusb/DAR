@@ -124,7 +124,7 @@ namespace libdar
 	    /// returns whether libthreadar linking will be done, allowing libdar to span several threads
 	bool libthreadar();
 
-	    /// returns whether librsync is available
+	    /// returns whether librsync is available and delta diff stuff with it
 	bool librsync();
 
     }

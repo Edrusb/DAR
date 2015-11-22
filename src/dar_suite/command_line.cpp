@@ -678,12 +678,12 @@ bool get_args(shell_interaction & dialog,
 		p.delta_mask = make_ordered_mask(rec.path_delta_include_exclude,
 						 &make_exclude_path_unordered, // no mistake here about *exclude*, nor *unordered*
 						 &make_exclude_path_unordered, // no mistake here about *exclude*, nor *unordered*
-						 p.op != test && p.op != merging && p.op != listing ? tools_relative2absolute_path(*p.fs_root, tools_getcwd()) : PSEUDO_ROOT);
+						 p.op != test && p.op != merging && p.op != listing && p.op != isolate ? tools_relative2absolute_path(*p.fs_root, tools_getcwd()) : PSEUDO_ROOT);
 	    else // unordered filters
 		p.delta_mask = make_unordered_mask(rec.path_delta_include_exclude,
 						   &make_exclude_path_unordered, // no mistake here about *exclude*
 						   &make_exclude_path_unordered, // no mistake here about *exclude*
-						   p.op != test && p.op != merging && p.op != listing ? tools_relative2absolute_path(*p.fs_root, tools_getcwd()) : PSEUDO_ROOT);
+						   p.op != test && p.op != merging && p.op != listing && p.op != isolate ? tools_relative2absolute_path(*p.fs_root, tools_getcwd()) : PSEUDO_ROOT);
 	}
 
             ////////////////////////////////

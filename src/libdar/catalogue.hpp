@@ -240,6 +240,7 @@ namespace libdar
 	    /// \param[in] sequential_read whether we read the archive in sequential mode
 	    /// \param[in] build if set and delta signature is not present but data is available for a file, calculate the delta sig
 	    /// \param[in] delta_mask defines what files to calculate delta signature for when build is set to true
+	    /// \param[in] delta_sig_min_size minimum size below which to never calculate delta signatures
 	    /// \note this method relies on reset_read() and read()
 	void transfer_delta_signatures(const pile_descriptor & destination,
 				       bool sequential_read,
