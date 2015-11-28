@@ -127,6 +127,9 @@ namespace libdar
 	case s_not_saved:
 	    ret = "[     ]";
 	    break;
+	case s_delta:
+	    ret = "[Delta]";
+	    break;
 	default:
 	    throw SRC_BUG;
 	}
@@ -165,7 +168,8 @@ namespace libdar
 	ret += "[" + local_fsa_fam_to_string(ref) + "]";
 	const cat_file *fic = dynamic_cast<const cat_file *>(&ref);
 	const cat_directory *dir = dynamic_cast<const cat_directory *>(&ref);
-	if(fic != nullptr && fic->get_saved_status() == s_saved)
+	if(fic != nullptr &&
+	   (fic->get_saved_status() == s_saved ||fic->get_saved_status() == s_delta))
 	    ret += string("[")
 		+ tools_get_compression_ratio(fic->get_storage_size(),
 					      fic->get_size(),
@@ -243,30 +247,6 @@ namespace libdar
 	    dialog.printf("%S</Attributes>", &beginning);
 	}
     }
-
-
-    bool extract_base_and_status(unsigned char signature, unsigned char & base, saved_status & saved)
-    {
-	bool fake = (signature & SAVED_FAKE_BIT) != 0;
-
-	signature &= ~SAVED_FAKE_BIT;
-	if(!isalpha(signature))
-	    return false;
-	base = tolower(signature);
-
-	if(fake)
-	    if(base == signature)
-		saved = s_fake;
-	    else
-		return false;
-	else
-	    if(signature == base)
-		saved = s_saved;
-	    else
-		saved = s_not_saved;
-	return true;
-    }
-
 
     void local_display_ea(user_interaction & dialog,
 			  const cat_inode * ino,

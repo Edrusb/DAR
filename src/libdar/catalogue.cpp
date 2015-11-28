@@ -81,7 +81,6 @@ using namespace std;
 namespace libdar
 {
 
-    static void unmk_signature(unsigned char sig, unsigned char & base, saved_status & state, bool isolated);
     static bool local_check_dirty_seq(escape *ptr);
 
     static inline string yes_no(bool val) { return (val ? "yes" : "no"); }
@@ -1226,7 +1225,8 @@ namespace libdar
 			    string data = "deleted";
 			    string metadata = "absent";
 
-			    unmk_signature(e_det->get_signature(), sig, state, isolated);
+			    if(!extract_base_and_status_isolated(e_det->get_signature(), sig, state, isolated))
+				throw Erange("catalogue::xml_listing", gettext("Invalid signature found"));
 			    switch(sig)
 			    {
 			    case 'd':
@@ -1297,7 +1297,8 @@ namespace libdar
 				cat_inode::ea_status ea_st = isolated ? cat_inode::ea_fake : e_ino->ea_get_saved_status();
 				unsigned char sig;
 
-				unmk_signature(e_ino->signature(), sig, data_st, isolated);
+				if(!extract_base_and_status_isolated(e_ino->signature(), sig, data_st, isolated))
+				    throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
 				data_st = isolated ? s_fake : e_ino->get_saved_status(); // the trusted source for cat_inode status is get_saved_status, not the signature (may change in future, who knows)
 				if(stored == "0" && (reg == nullptr || !reg->get_sparse_file_detection_read()))
 				    stored = size;
@@ -1955,21 +1956,6 @@ namespace libdar
 
     const cat_eod catalogue::r_eod;
     const U_I catalogue::CAT_CRC_SIZE = 4;
-
-
-    static void unmk_signature(unsigned char sig, unsigned char & base, saved_status & state, bool isolated)
-    {
-        if((sig & SAVED_FAKE_BIT) == 0 && !isolated)
-            if(islower(sig))
-                state = s_saved;
-            else
-                state = s_not_saved;
-        else
-            state = s_fake;
-
-        base = tolower(sig & ~SAVED_FAKE_BIT);
-    }
-
 
     static bool local_check_dirty_seq(escape *ptr)
     {

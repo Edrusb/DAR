@@ -330,7 +330,9 @@ namespace libdar
 
         try
         {
-            if(ref.check != nullptr || (ref.get_escape_layer() != nullptr && ref.get_saved_status() == s_saved))
+            if(ref.check != nullptr || (ref.get_escape_layer() != nullptr
+					&& (ref.get_saved_status() == s_saved
+					    || ref.get_saved_status() == s_delta)))
             {
 		if(ref.check == nullptr)
 		{
@@ -402,7 +404,8 @@ namespace libdar
         size->dump(*ptr);
         if(!small)
         {
-            if(get_saved_status() == s_saved)
+            if(get_saved_status() == s_saved
+	       || get_saved_status() == s_delta)
             {
                 char tmp = compression2char(algo_write);
 
@@ -431,7 +434,8 @@ namespace libdar
         }
         else // we only know whether the file will be compressed or using sparse_file data structure
         {
-            if(get_saved_status() == s_saved)
+            if(get_saved_status() == s_saved
+	       || get_saved_status() == s_delta)
             {
                 char tmp = compression2char(algo_write);
 
@@ -463,7 +467,8 @@ namespace libdar
 	{
 		// sanity checks
 
-	    if(get_saved_status() != s_saved)
+	    if(get_saved_status() != s_saved
+	       && get_saved_status() != s_delta)
 		throw Erange("cat_file::get_data", gettext("cannot provide data from a \"not saved\" file object"));
 
 	    if(status == empty)
@@ -502,6 +507,8 @@ namespace libdar
 		fichier_local *tmp = nullptr;
 		if(mode != normal && mode != plain)
 		    throw SRC_BUG; // keep compressed/keep_hole is not possible on an inode take from a filesystem
+		if(get_saved_status() == s_delta)
+		    throw SRC_BUG;
 		ret = tmp = new (get_pool()) fichier_local(chemin, furtive_read_mode);
 		if(tmp != nullptr)
 			// telling *tmp to flush the data from the cache as soon as possible
@@ -740,13 +747,13 @@ namespace libdar
     {
 	if(status == empty)
 	    throw SRC_BUG;
-	set_saved_status(s_saved);
 	*offset = r;
     }
 
     const infinint & cat_file::get_offset() const
     {
-	if(get_saved_status() != s_saved)
+	if(get_saved_status() != s_saved
+	   || get_saved_status() != s_delta)
 	    throw SRC_BUG;
 	if(offset == nullptr)
 	    throw SRC_BUG;

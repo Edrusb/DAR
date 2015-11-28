@@ -53,7 +53,8 @@ namespace libdar
     {
 	s_saved,      //< inode is saved in the archive
 	s_fake,       //< inode is not saved in the archive but is in the archive of reference (isolation context) s_fake is no more used in archive format "08" and above: isolated catalogue do keep the data pointers and s_saved stays a valid status in isolated catalogues.
-	s_not_saved   //< inode is not saved in the archive
+	s_not_saved,  //< inode is not saved in the archive
+	s_delta       //< inode is saved but as delta binary from the content of found in the archive of reference
     };
 
 	/// holds the statistics contents of a catalogue
@@ -195,8 +196,10 @@ namespace libdar
     };
 
     extern bool compatible_signature(unsigned char a, unsigned char b);
-    extern unsigned char mk_signature(unsigned char base, saved_status state);
     extern unsigned char get_base_signature(unsigned char a);
+    extern bool extract_base_and_status(unsigned char signature, unsigned char & base, saved_status & state);
+    extern bool extract_base_and_status_isolated(unsigned char sig, unsigned char & base, saved_status & state, bool isolated);
+    extern unsigned char mk_signature(unsigned char base, saved_status state);
 
 	/// @}
 

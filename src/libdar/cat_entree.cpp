@@ -31,28 +31,22 @@ extern "C"
 
 using namespace std;
 
+
 namespace libdar
 {
-
-    unsigned char mk_signature(unsigned char base, saved_status state)
-    {
-        if(! islower(base))
-            throw SRC_BUG;
-        switch(state)
-        {
-        case s_saved:
-            return base;
-        case s_fake:
-            return base | SAVED_FAKE_BIT;
-        case s_not_saved:
-            return toupper(base);
-        default:
-            throw SRC_BUG;
-        }
-    }
-
-
     const U_I cat_entree::ENTREE_CRC_SIZE = 2;
+
+    const U_8 SAVED_FAKE_BIT = 0x80;
+    const U_8 SAVED_NON_DELTA_BIT = 0x40;
+    // in ASCII lower case letter have binary values 11xxxxx and higher case
+    // have binary values 10xxxxx The the 7th byte is always set to 1. We can
+    // thus play with it to store the delta diff flag:
+    // - when set to 1, this is a non delta binary file (backward compatibility)
+    //   and the signature byte is a letter (lower or higher case to tell whether
+    //   the inode is saved or not
+    // - when set to 0, this is a delta saved file, setting it back to 1 should
+    //   give a lower case letter corresponding to the inode type.
+
 
     void entree_stats::add(const cat_entree *ref)
     {
@@ -79,7 +73,8 @@ namespace libdar
             if(ino != nullptr)
             {
                 ++total;
-                if(ino->get_saved_status() == s_saved)
+                if(ino->get_saved_status() == s_saved
+		   || ino->get_saved_status() == s_delta)
                     ++saved;
             }
 
@@ -448,24 +443,88 @@ namespace libdar
 
     bool compatible_signature(unsigned char a, unsigned char b)
     {
-        a = tolower(a & ~SAVED_FAKE_BIT);
-        b = tolower(b & ~SAVED_FAKE_BIT);
+        a = get_base_signature(a);
+        b = get_base_signature(b);
 
-        switch(a)
-        {
-        case 'e':
-        case 'f':
-            return b == 'e' || b == 'f';
-        default:
-            return b == a;
-        }
+	return b == a;
     }
 
     unsigned char get_base_signature(unsigned char a)
     {
-	unsigned char ret = tolower(a & ~SAVED_FAKE_BIT);
+	unsigned char ret = tolower((a & ~SAVED_FAKE_BIT) | SAVED_NON_DELTA_BIT);
 	if(ret == 'e')
 	    ret = 'f';
+	return ret;
+    }
+
+    bool extract_base_and_status(unsigned char signature, unsigned char & base, saved_status & saved)
+    {
+	bool fake = (signature & SAVED_FAKE_BIT) != 0;
+	bool non_delta = (signature & SAVED_NON_DELTA_BIT) != 0;
+
+	signature &= ~SAVED_FAKE_BIT;
+	signature |= SAVED_NON_DELTA_BIT;
+	if(!isalpha(signature))
+	    return false;
+	base = tolower(signature);
+
+	if(fake)
+	    if(base == signature)
+		if(non_delta)
+		    saved = s_fake;
+		else
+		    return false; // cannot be s_fake and s_delta at the same time
+	    else
+		return false;
+	else
+	    if(signature == base)
+		if(non_delta)
+		    saved = s_saved;
+		else
+		    saved = s_delta;
+	    else
+		if(non_delta)
+		    saved = s_not_saved;
+		else
+		    return false; // cannot be s_not_saved and s_delta at the same time
+	return true;
+    }
+
+    bool extract_base_and_status_isolated(unsigned char sig, unsigned char & base, saved_status & state, bool isolated)
+    {
+	bool ret = extract_base_and_status(sig, base, state);
+
+	if(isolated)
+	    state = s_fake;
+
+	return ret;
+    }
+
+    unsigned char mk_signature(unsigned char base, saved_status state)
+    {
+	unsigned char ret = 0;
+
+	if(!islower(base))
+	    throw SRC_BUG;
+
+	switch(state)
+	{
+	case s_saved:
+	    ret = base;
+	    break;
+	case s_fake:
+	    ret = base | SAVED_FAKE_BIT;
+	    break;
+	case s_not_saved:
+	    ret = toupper(base);
+	    break;
+	case s_delta:
+	    ret = base & ~SAVED_NON_DELTA_BIT;
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
+
 	return ret;
     }
 

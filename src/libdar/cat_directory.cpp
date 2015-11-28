@@ -264,7 +264,7 @@ namespace libdar
 		    me->x_size += f_dir->get_size();
 		    me->x_storage_size += f_dir->get_storage_size();
 		}
-		else if(f_file != nullptr && f_file->get_saved_status() == s_saved)
+		else if(f_file != nullptr && (f_file->get_saved_status() == s_saved || f_file->get_saved_status() == s_delta))
 		{
 		    me->x_size += f_file->get_size();
 		    if(!f_file->get_storage_size().is_zero() || f_file->get_sparse_file_detection_read())
