@@ -491,6 +491,7 @@ namespace libdar
 				       options.get_has_delta_mask_been_set(),
 				       options.get_delta_mask(),
 				       options.get_delta_sig_min_size(),
+				       options.get_delta_diff(),
 				       progressive_report);
 		    exploitable = false;
 		    stack.terminate();
@@ -747,6 +748,7 @@ namespace libdar
 				     options.get_has_delta_mask_been_set(), // build delta sig
 				     options.get_delta_mask(), // delta_mask
 				     options.get_delta_sig_min_size(),
+				     false,                    // delta diff
 				     st_ptr);
 		    exploitable = false;
 		    stack.terminate();
@@ -1753,6 +1755,7 @@ namespace libdar
 				     bool build_delta_sig,
 				     const mask & delta_mask,
 				     const infinint & delta_sig_min_size,
+				     bool delta_diff,
 				     statistics * progressive_report)
     {
         statistics st = false;  // false => no lock for this internal object
@@ -1906,6 +1909,7 @@ namespace libdar
 			 build_delta_sig,
 			 delta_mask,
 			 delta_sig_min_size,
+			 delta_diff,
 			 st_ptr);
 
 	return *st_ptr;
@@ -1976,6 +1980,7 @@ namespace libdar
 				   bool build_delta_sig,
 				   const mask & delta_mask,
 				   const infinint & delta_sig_min_size,
+				   bool delta_diff,
 				   statistics * st_ptr)
     {
 	try
@@ -2141,7 +2146,8 @@ namespace libdar
 					      exclude_by_ea,
 					      delta_signature,
 					      delta_sig_min_size,
-					      delta_mask);
+					      delta_mask,
+					      delta_diff);
 				// build_delta_sig is not used for archive creation it is always implied when delta_signature is set
 			}
 			catch(...)

@@ -533,7 +533,8 @@ namespace libdar
 			   const string & exclude_by_ea,
 			   bool delta_signature,
 			   const infinint & delta_sig_min_size,
-			   const mask & delta_mask)
+			   const mask & delta_mask,
+			   bool delta_diff)
     {
         cat_entree *e = nullptr;
         const cat_entree *f = nullptr;

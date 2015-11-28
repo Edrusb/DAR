@@ -102,9 +102,10 @@ namespace libdar
 				  bool ignore_unknown,
 				  const fsa_scope & scope,
 				  const std::string & exclude_by_ea,
-				  bool delta_signature,
-				  const infinint & delta_sig_min_size,
-				  const mask & delta_mask);
+				  bool delta_signature,     //< whether to compute delta sig file on the saved file
+				  const infinint & delta_sig_min_size, //< size below which to never calculate delta sig
+				  const mask & delta_mask,  //< mask defining for which file to calculate delta sig
+				  bool delta_diff);         //< whether to perform delta diff backup when delta sig is present
 
     extern void filtre_difference(user_interaction & dialog,
 				  memory_pool *pool,
