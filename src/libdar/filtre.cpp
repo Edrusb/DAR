@@ -58,7 +58,8 @@ namespace libdar
     static bool save_inode(user_interaction & dialog,//< how to report to user
 			   memory_pool *pool,        //< set to nullptr or points to the memory_pool to use
 			   const string &info_quoi,  //< full path name of the file to save (including its name)
-			   cat_entree * & e,             //< cat_entree to save to archive
+			   cat_entree * & e,         //< cat_entree to save into the archive
+			   const cat_entree * ref,   //< reference object if it exists (to grab CRC and delta signature from if present and necessary)
 			   const pile_descriptor & pdesc,//< where to write to
 			   bool info_details,        //< verbose output to user
 			   bool display_treated,     //< add an information line before treating a file
@@ -72,6 +73,7 @@ namespace libdar
 			   const infinint & hole_size,   //< the threshold for hole detection, set to zero completely disable the sparse file detection mechanism
 			   semaphore * sem,
 			   bool delta_signature,  //< if set, lead to delta signature to be computed, if false and delta signature already exists it is saved (which in case of merging leads to transfering it in the resulting archive)
+			   bool make_delta_diff,         //< whether delta diff is allowed
 			   infinint & new_wasted_bytes); //< new amount of wasted bytes to return to the caller.
 
     static bool save_ea(user_interaction & dialog,
@@ -631,14 +633,16 @@ namespace libdar
 				    st.incr_treated();
 				    if(e_mir != nullptr)
 				    {
-					if(e_mir->get_inode()->get_saved_status() == s_saved || e_mir->get_inode()->ea_get_saved_status() == cat_inode::ea_full)
+					if(e_mir->get_inode()->get_saved_status() == s_saved
+					   || e_mir->get_inode()->get_saved_status() == s_delta
+					   || e_mir->get_inode()->ea_get_saved_status() == cat_inode::ea_full)
 					    if(display_treated)
 						dialog.warning(string(gettext("Recording hard link into the archive: "))+juillet.get_string());
 				    }
 				    else
 					throw SRC_BUG; // known_hard_link is true and e_mir == nullptr !???
 				}
-				else // not a hard link or known hard linked inode
+				else // not a hard link nor a known hard linked inode
 				{
 				    const cat_inode *f_ino = nullptr;
 				    const cat_file *f_file = nullptr;
@@ -737,6 +741,12 @@ namespace libdar
 						// and if the reference is a plain file, it was not saved as dirty
 					    ;
 
+					bool make_delta_diff =
+					    !avoid_saving_inode
+					    && delta_diff
+					    && e_file != nullptr
+					    && f_file != nullptr && f_file->has_delta_signature();
+
 					bool avoid_saving_ea =
 					    snapshot
 						// don't backup if doing a snapshot
@@ -771,6 +781,9 @@ namespace libdar
 					    st.incr_skipped();
 					}
 
+					if(make_delta_diff)
+					    e_ino->set_saved_status(s_delta);
+
 					if(avoid_saving_ea)
 					{
 					    if(e_ino->ea_get_saved_status() == cat_inode::ea_full)
@@ -801,7 +814,7 @@ namespace libdar
 						e_file->change_compression_algo_write(none);
 					}
 
-					    // DECIDING WHETHER DELTA SIGNATURE WILL BE CALCULATES
+					    // DECIDING WHETHER DELTA SIGNATURE WILL BE CALCULATED
 
 					if(e_file != nullptr
 					   && delta_signature
@@ -817,6 +830,7 @@ namespace libdar
 						       pool,
 						       juillet.get_string(),
 						       e,
+						       f,
 						       pdesc,
 						       info_details,
 						       display_treated,
@@ -830,6 +844,7 @@ namespace libdar
 						       sparse_file_min_size,
 						       &sem,
 						       e_file == nullptr ? false : e_file->has_delta_signature(),
+						       make_delta_diff,
 						       wasted_bytes))
 					    st.incr_tooold(); // counting a new dirty file in archive
 
@@ -838,20 +853,6 @@ namespace libdar
 					if(!avoid_saving_inode)
 					    st.incr_treated();
 
-
-					    // PERFORMING ACTION FOR DELTA SIGNATURE (save_inode treats s_saved objects only)
-
-					if(e_file != nullptr
-					   && e_file->has_delta_signature()
-					   && e_file->get_saved_status() != s_saved)
-					    save_delta_signature(dialog,
-								 juillet.get_string(),
-								 e_file,
-								 f_file,
-								 pdesc,
-								 info_details,
-								 display_treated,
-								 cat);
 
 					    // PERFORMING ACTION FOR EA
 
@@ -1432,6 +1433,16 @@ namespace libdar
 
 			if(e_file != nullptr && e_file->has_delta_signature())
 			{
+				// reading the CRC (read above only in s_saved status)
+
+			    if(e_file->get_saved_status() != s_saved)
+			    {
+				const crc *crc_tmp = nullptr;
+				e_file->get_crc(crc_tmp);
+			    }
+
+				// reading the delta signature
+
 			    e_file->read_delta_signature(delta_sig);
 			    delta_sig.reset();
 			    if(perimeter == "")
@@ -2581,6 +2592,7 @@ namespace libdar
 				   pool,
 				   juillet.get_string(),
 				   e_var,
+				   nullptr,
 				   pdesc,
 				   info_details,
 				   display_treated,
@@ -2594,6 +2606,7 @@ namespace libdar
 				   sparse_file_min_size,
 				   nullptr,  // semaphore
 				   calculate_delta_signature,
+				   false,    // delta_diff
 				   fake_repeat))
 			throw SRC_BUG;
 		    else // succeeded saving
@@ -2746,6 +2759,7 @@ namespace libdar
 			   memory_pool *pool,
 			   const string & info_quoi,
 			   cat_entree * & e,
+			   const cat_entree * ref,
 			   const pile_descriptor & pdesc,
 			   bool info_details,
 			   bool display_treated,
@@ -2759,6 +2773,7 @@ namespace libdar
 			   const infinint & hole_size,
 			   semaphore *sem,
 			   bool delta_signature,
+			   bool delta_diff,
 			   infinint & current_wasted_bytes)
     {
 	bool ret = true;
@@ -2767,8 +2782,13 @@ namespace libdar
 	bool loop;
 	cat_mirage *mir = dynamic_cast<cat_mirage *>(e);
 	cat_inode *ino = dynamic_cast<cat_inode *>(e);
+	cat_file *fic = dynamic_cast<cat_file *>(ino);
+	const cat_file *ref_fic = dynamic_cast<const cat_file *>(ref);
 	bool resave_uncompressed = false;
 	infinint rewinder = pdesc.stack->get_position(); // we skip back here if data must be saved uncompressed
+
+	if(pdesc.compr == nullptr)
+	    throw SRC_BUG;
 
 	if(mir != nullptr)
 	{
@@ -2783,12 +2803,29 @@ namespace libdar
 
 	    cat.pre_add(e);
 
-		// TREATING SPECIAL CASES
+		// EXITING FOR NON INODE ENTRIES
 
 	    if(ino == nullptr)
 		return true;
-	    if(pdesc.compr == nullptr)
-		throw SRC_BUG;
+
+		// WRITING DOWN DELTA SIG FOR NO SAVED FILES
+
+	    if(fic != nullptr
+	       && fic->has_delta_signature()
+	       && fic->get_saved_status() != s_saved)
+	    {
+		save_delta_signature(dialog,
+				     info_quoi,
+				     fic,
+				     ref_fic,
+				     pdesc,
+				     info_details,
+				     display_treated,
+				     cat);
+	    }
+
+		// EXITING FOR INODE ENTRY WITHOUT DATA TO SAVE
+
 	    if(ino->get_saved_status() != s_saved)
 	    {
 		if(sem != nullptr)
@@ -2808,8 +2845,6 @@ namespace libdar
 		else
 		    dialog.warning(string(gettext("Adding file to archive: ")) + info_quoi);
 	    }
-
-	    cat_file *fic = dynamic_cast<cat_file *>(ino);
 
 	    if(fic != nullptr)
 	    {
@@ -3896,6 +3931,34 @@ namespace libdar
 
 		// save_inode could not calculate and add delta sig we must do
 		// it here either copying from the archive of reference
+
+
+		// first, making sure e_file knowns its CRC
+
+	    if(!e_file->has_crc())
+	    {
+		const crc *tmp;
+
+		if(!e_file->get_crc(tmp))
+		{
+		    if(ref_file != nullptr)
+		    {
+			if(ref_file->get_crc(tmp))
+			    e_file->set_crc(*tmp);
+			else
+			    throw SRC_BUG;
+		    }
+		    else
+			throw SRC_BUG;
+		}
+	    }
+
+		// second, dropping the data CRC with its tape mark
+
+	    cat.pre_add_crc(e_file);
+
+		// then the delta signature
+
 	    if(ref_file != nullptr
 	       && ref_file->has_delta_signature())
 	    {

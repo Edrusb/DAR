@@ -139,7 +139,8 @@ namespace libdar
 
             if(!small) // inode not partially dumped
             {
-                if(saved == s_saved)
+                if(saved == s_saved
+		    || saved == s_delta)
                 {
                     offset = new (get_pool()) infinint(*ptr);
                     if(offset == nullptr)
@@ -159,10 +160,15 @@ namespace libdar
                                 dirty = true;
                                 file_data_status_read &= ~FILE_DATA_IS_DIRTY; // removing the flag DIRTY
                             }
+
+			    will_have_delta_sig = (file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0;
+			    file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
+
                             file_data_status_write = file_data_status_read;
+
                             ptr->read(&tmp, sizeof(tmp));
                             algo_read = char2compression(tmp);
-			    algo_write= algo_read;
+			    algo_write = algo_read;
                         }
                         else
                             if(storage_size->is_zero()) // in older archive storage_size was set to zero if data was not compressed
@@ -189,36 +195,46 @@ namespace libdar
                             // and takes more place than no compression)
                     }
 
-                    if(reading_ver >= 8)
+                    if(reading_ver >= 8 || will_have_delta_sig)
                     {
 			check = create_crc_from_file(*ptr, get_pool());
                         if(check == nullptr)
                             throw Ememory("cat_file::cat_file");
                     }
                         // before version 8, crc was dump in any case, not only when data was saved
+			// general case treated below
                 }
                 else // not saved
                 {
 			// since format 9 the flag is present in any case
 		    if(reading_ver >= 9)
+		    {
 			ptr->read(&file_data_status_read, sizeof(file_data_status_read));
+
+			will_have_delta_sig = (file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0;
+			file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
+		    }
 
                     offset = new (get_pool()) infinint(0);
                     storage_size = new (get_pool()) infinint(0);
                     if(offset == nullptr || storage_size == nullptr)
                         throw Ememory("cat_file::cat_file(generic_file)");
+
+		    if(will_have_delta_sig)
+		    {
+			check = create_crc_from_file(*ptr, get_pool());
+			if(check == nullptr)
+                            throw Ememory("cat_file::cat_file");
+		    }
                 }
 
-		if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
+		if(will_have_delta_sig)
 		{
-		    will_have_delta_sig = true;
 		    delta_sig_offset.read(*ptr);
 		    delta_sig_size.read(*ptr);
 		    delta_sig_crc = create_crc_from_file(*ptr, get_pool());
 		    if(delta_sig_crc == nullptr)
 			throw Ememory("cat_file::cat_file(generic_file)");
-		    file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG; // removing the flag DELTA_SIG
-		    file_data_status_write &= ~FILE_DATA_HAS_DELTA_SIG; // removing the flag DELTA_SIG
 		}
 		else
 		{
@@ -226,6 +242,9 @@ namespace libdar
 		    delta_sig_crc = nullptr;
 		    delta_sig_size = 0;
 		}
+
+		    // treating case of version below 8 where CRC
+		    // was saved in any case (s_saved, s_not_saved,...)
 
                 if(reading_ver >= 2)
                 {
@@ -240,14 +259,15 @@ namespace libdar
                         if(check == nullptr)
                             throw Ememory("cat_file::cat_file");
                     }
-                        // archive version >= 8, crc only present if  saved == s_saved (seen above)
+                        // archive version >= 8, crc only present if  saved == s_saved/s_delta or when delta_sig (treated above)
                 }
                 else // no CRC in version "1"
                     check = nullptr;
             }
             else // partial dump has been done
             {
-                if(saved == s_saved)
+                if(saved == s_saved
+		   || saved == s_delta)
                 {
                     char tmp;
 
@@ -279,10 +299,7 @@ namespace libdar
 
                     // Now that all data has been read, setting default value for the undumped ones:
 
-                if(saved == s_saved)
-                    offset = new (get_pool()) infinint(0); // can only be set from post_constructor
-                else
-                    offset = new (get_pool()) infinint(0);
+		offset = new (get_pool()) infinint(0); // can only be set from post_constructor
                 if(offset == nullptr)
                     throw Ememory("cat_file::cat_file(generic_file)");
 
@@ -291,6 +308,10 @@ namespace libdar
                     throw Ememory("cat_file::cat_file(generic_file)");
 
                 check = nullptr;
+
+		delta_sig_offset = 0;
+		delta_sig_crc = nullptr;
+		delta_sig_size = 0;
             }
         }
         catch(...)
@@ -413,15 +434,22 @@ namespace libdar
                 storage_size->dump(*ptr);
                 ptr->write(&flags, sizeof(flags));
                 ptr->write(&tmp, sizeof(tmp));
+            }
+	    else // since format 9 flag is present in any case to know whether object has delta signature
+                ptr->write(&flags, sizeof(flags));
 
+	    if(get_saved_status() == s_saved
+	       || get_saved_status() == s_delta
+	       || has_delta_signature())
+	    {
                     // since archive version 8, crc is only present for saved inode
+		    // since archive version 10, crc is also present when delta signature is present
+		    // even for unsaved files
                 if(check == nullptr)
                     throw SRC_BUG; // no CRC to dump!
                 else
                     check->dump(*ptr);
-            }
-	    else // since format 9 flag is present in any case to know whether object has delta signature
-                ptr->write(&flags, sizeof(flags));
+	    }
 
 	    if(has_delta_signature())
 	    {
@@ -1029,7 +1057,7 @@ namespace libdar
 
 	if(get_saved_status() == s_saved && ! isolated_mode)
 	{
-		// compare file content with CRC
+		// compare file content and CRC
 
 	    generic_file *me = get_data(normal, nullptr);
 	    if(me == nullptr)
@@ -1161,44 +1189,51 @@ namespace libdar
 		    throw Erange("cat_file::sub_compare", gettext("Delta signature have the same size but do not match"));
 	    }
 	}
-	else if(check != nullptr) // we have a CRC available for data
+	else
 	{
+	    const crc *my_crc = nullptr;
 
-		// just compare CRC (as for isolated_mode)
-
-	    generic_file *you = f_other->get_data(normal, nullptr);
-	    if(you == nullptr)
-		throw SRC_BUG;
-
-	    try
+	    if(get_crc(my_crc)) // we have a CRC available for data
 	    {
-		crc *other_crc = nullptr;
+		    // just compare CRC (as for isolated_mode)
+
+		if(my_crc == nullptr)
+		    throw SRC_BUG;
+
+		generic_file *you = f_other->get_data(normal, nullptr);
+		if(you == nullptr)
+		    throw SRC_BUG;
 
 		try
 		{
-		    null_file ignore = gf_write_only;
+		    crc *other_crc = nullptr;
 
-		    you->copy_to(ignore, check->get_size(), other_crc);
+		    try
+		    {
+			null_file ignore = gf_write_only;
 
-		    if(check->get_size() != other_crc->get_size()
-		       || *check != *other_crc)
-			throw Erange("cat_file::compare", tools_printf(gettext("CRC difference concerning file's data (comparing with an isolated catalogue)")));
+			you->copy_to(ignore, my_crc->get_size(), other_crc);
+
+			if(my_crc->get_size() != other_crc->get_size()
+			   || *my_crc != *other_crc)
+			    throw Erange("cat_file::compare", tools_printf(gettext("CRC difference concerning file's data (comparing with an isolated catalogue)")));
+		    }
+		    catch(...)
+		    {
+			if(other_crc != nullptr)
+			    delete other_crc;
+			throw;
+		    }
+		    if(other_crc != nullptr)
+			delete other_crc;
 		}
 		catch(...)
 		{
-		    if(other_crc != nullptr)
-			delete other_crc;
+		    delete you;
 		    throw;
 		}
-		if(other_crc != nullptr)
-		    delete other_crc;
-	    }
-	    catch(...)
-	    {
 		delete you;
-		throw;
 	    }
-	    delete you;
 	}
     }
 

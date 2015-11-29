@@ -195,14 +195,16 @@ namespace libdar
 
             if(lu == 0)
 		type = ' '; // used to by-pass object construction and return nullptr as value of this method
-
-            if(!extract_base_and_status((unsigned char)type, (unsigned char &)type, saved))
-            {
-                if(!lax)
-                    throw Erange("cat_entree::read", gettext("corrupted file"));
-                else
-		    type = ' '; // used to by-pass object construction and return nullptr as value of this method
-            }
+	    else
+	    {
+		if(!extract_base_and_status((unsigned char)type, (unsigned char &)type, saved))
+		{
+		    if(!lax)
+			throw Erange("cat_entree::read", gettext("corrupted file"));
+		    else
+			type = ' '; // used to by-pass object construction and return nullptr as value of this method
+		}
+	    }
 
             switch(type)
             {
