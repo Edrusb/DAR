@@ -116,8 +116,6 @@ namespace libdar
 	    throw SRC_BUG;
 	if(signature_storage == nullptr)
 	    throw SRC_BUG;
-	if(below == nullptr)
-	    throw SRC_BUG;
 
 	    // setting up the object
 
