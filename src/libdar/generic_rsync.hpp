@@ -62,7 +62,7 @@ namespace libdar
 	    /// produce a delta signature. Nothing is passed to below, but below
 	    /// argument is kept for coherence with the previous constructor
 	    /// \param[in] base_signature is read only
-	    /// \param[in] signature_storage is write only and receives the delta signature
+	    /// \param[in] signature_storage is write only and receives the delta diff
 	    /// \param[in] below is not used in this mode but must be provided.
 	generic_rsync(generic_file *base_signature,
 		      generic_file *signature_storage,
