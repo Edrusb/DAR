@@ -1138,7 +1138,7 @@ namespace libdar
 		    dest.fadvise(fichier_global::advise_dontneed);
 			// the implicit destruction of dest (exiting the block)
 			// will close the 'ret' file descriptor (see ~fichier_local())
-		    ou = ref_fil->get_data(cat_file::normal, nullptr);
+		    ou = ref_fil->get_data(cat_file::normal, nullptr, nullptr);
 
 		    try
 		    {

@@ -1726,7 +1726,7 @@ namespace libdar
 
 		    if(e_file->get_saved_status() == s_saved)
 		    {
-			generic_file *dat = e_file->get_data(cat_file::normal, nullptr);
+			generic_file *dat = e_file->get_data(cat_file::normal, nullptr, nullptr);
 			if(dat == nullptr)
 			    throw Erange("transfer_delta_signatures", gettext("Can't read saved data."));
 			else
@@ -1759,7 +1759,7 @@ namespace libdar
 			if(e_file->get_saved_status() == s_saved)
 			{
 			    null_file trash = gf_write_only;
-			    generic_file *data = e_file->get_data(cat_file::plain, &mem);
+			    generic_file *data = e_file->get_data(cat_file::plain, &mem, nullptr);
 
 			    if(data == nullptr)
 				throw SRC_BUG;

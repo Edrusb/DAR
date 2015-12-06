@@ -43,6 +43,7 @@ extern "C"
 #include "deci.hpp"
 #include "cat_all_entrees.hpp"
 #include "null_file.hpp"
+#include "generic_rsync.hpp"
 
 using namespace std;
 
@@ -1339,7 +1340,9 @@ namespace libdar
                     {
                             // checking data file if any
 
-                        if(e_file != nullptr && e_file->get_saved_status() == s_saved)
+                        if(e_file != nullptr &&
+			   (e_file->get_saved_status() == s_saved
+			    || e_file->get_saved_status() == s_delta))
                         {
 			    perimeter = gettext("Data");
 			    if(!empty)
@@ -1348,7 +1351,7 @@ namespace libdar
 
 				do
 				{
-				    generic_file *dat = e_file->get_data(cat_file::normal, nullptr);
+				    generic_file *dat = e_file->get_data(cat_file::normal, nullptr, nullptr);
 				    if(dat == nullptr)
 					throw Erange("filtre_test", gettext("Can't read saved data."));
 
@@ -2786,6 +2789,7 @@ namespace libdar
 	const cat_file *ref_fic = dynamic_cast<const cat_file *>(ref);
 	bool resave_uncompressed = false;
 	infinint rewinder = pdesc.stack->get_position(); // we skip back here if data must be saved uncompressed
+	memory_file *delta_sig_ref = nullptr;
 
 	if(pdesc.compr == nullptr)
 	    throw SRC_BUG;
@@ -2797,452 +2801,507 @@ namespace libdar
 		throw SRC_BUG;
 	}
 
-	do // loop if resave_uncompressed is set, this is the OUTER LOOP
+	try // protecting delta_sig_ref
 	{
-		// PRE RECORDING THE INODE (for sequential reading)
 
-	    cat.pre_add(e);
-
-		// EXITING FOR NON INODE ENTRIES
-
-	    if(ino == nullptr)
-		return true;
-
-		// WRITING DOWN DELTA SIG FOR NO SAVED FILES
-
-	    if(fic != nullptr
-	       && fic->has_delta_signature()
-	       && fic->get_saved_status() != s_saved)
+	    if(fic != nullptr && fic->get_saved_status() == s_delta)
 	    {
-		save_delta_signature(dialog,
-				     info_quoi,
-				     fic,
-				     ref_fic,
-				     pdesc,
-				     info_details,
-				     display_treated,
-				     cat);
-	    }
+		const crc *delta_sig_ref_crc = nullptr;
 
-		// EXITING FOR INODE ENTRY WITHOUT DATA TO SAVE
+		if(!delta_diff || ref_fic == nullptr || !ref_fic->has_delta_signature())
+		    throw SRC_BUG;
 
-	    if(ino->get_saved_status() != s_saved)
-	    {
-		if(sem != nullptr)
-		    sem->raise(info_quoi, ino, false);
-		return ret;  // <<<<< we exit at this point for inode that have no data to save
-	    }
+		delta_sig_ref = new (pool) memory_file();
+		if(delta_sig_ref == nullptr)
+		    throw Ememory("save_inode");
+		ref_fic->read_delta_signature(*delta_sig_ref);
 
-	    if(compute_crc && (keep_mode != cat_file::normal && keep_mode != cat_file::plain))
-		throw SRC_BUG; // cannot compute crc if data is compressed or hole datastructure not interpreted
-
-		// TREATNG INODE THAT NEED DATA SAVING
-
-	    if(display_treated)
-	    {
-		if(resave_uncompressed)
-		    dialog.warning(string(gettext("Resaving file without compression: ")) + info_quoi);
+		ref_fic->get_crc(delta_sig_ref_crc);
+		if(delta_sig_ref_crc == nullptr)
+		    throw SRC_BUG;
 		else
-		    dialog.warning(string(gettext("Adding file to archive: ")) + info_quoi);
+		    fic->set_ref_crc(*delta_sig_ref_crc);
 	    }
 
-	    if(fic != nullptr)
+	    do // loop if resave_uncompressed is set, this is the OUTER LOOP
 	    {
-		memory_file *delta_sig = nullptr;
+		    // PRE RECORDING THE INODE (for sequential reading)
 
-		if(sem != nullptr)
-		    sem->raise(info_quoi, ino, true);
+		cat.pre_add(e);
 
-		try
+		    // EXITING FOR NON INODE ENTRIES
+
+		if(ino == nullptr)
+		    return true;
+
+		    // WRITING DOWN DELTA SIG FOR NO SAVED FILES
+
+		if(fic != nullptr
+		   && fic->has_delta_signature()
+		   && fic->get_saved_status() != s_saved
+		   && fic->get_saved_status() != s_delta)
 		{
-		    do // while "loop" is true, this is the INNER LOOP
+		    save_delta_signature(dialog,
+					 info_quoi,
+					 fic,
+					 ref_fic,
+					 pdesc,
+					 info_details,
+					 display_treated,
+					 cat);
+		}
+
+		    // EXITING FOR INODE ENTRY WITHOUT DATA TO SAVE
+
+		if(ino->get_saved_status() != s_saved
+		   && ino->get_saved_status() != s_delta)
+		{
+		    if(sem != nullptr)
+			sem->raise(info_quoi, ino, false);
+		    return ret;  // <<<<< we exit at this point for inode that have no data to save
+		}
+
+		if(compute_crc && (keep_mode != cat_file::normal && keep_mode != cat_file::plain))
+		    throw SRC_BUG; // cannot compute crc if data is compressed or hole datastructure not interpreted
+
+		    // TREATNG INODE THAT NEED DATA SAVING
+
+		if(display_treated)
+		{
+		    if(resave_uncompressed)
+			dialog.warning(string(gettext("Resaving file without compression: ")) + info_quoi);
+		    else
+			if(delta_sig_ref != nullptr)
+			    dialog.warning(string(gettext("Delta saving file to archive: ")) + info_quoi);
+			else
+			    dialog.warning(string(gettext("Saving file to archive: ")) + info_quoi);
+		}
+
+		if(fic != nullptr)
+		{
+		    memory_file *delta_sig = nullptr;
+
+		    if(sem != nullptr)
+			sem->raise(info_quoi, ino, true);
+
+		    try
 		    {
-			loop = false;
-			infinint start;
-			generic_file *source = nullptr;
-
-			    //////////////////////////////
-			    // preparing the source
-
-			try
+			do // while "loop" is true, this is the INNER LOOP
 			{
-			    switch(keep_mode)
-			    {
-			    case cat_file::keep_compressed:
-				if(fic->get_compression_algo_read() != fic->get_compression_algo_write())
-				    keep_mode = cat_file::keep_hole;
-				source = fic->get_data(keep_mode, nullptr);
-				break;
-			    case cat_file::keep_hole:
-				if(delta_signature && !fic->get_sparse_file_detection_read())
-				{
-				    delta_sig = new (pool) memory_file();
-				    if(delta_sig == nullptr)
-					throw Ememory("saved_inode");
-				    source = fic->get_data(cat_file::normal, delta_sig);
-				}
-				else
-				    source = fic->get_data(keep_mode, nullptr);
-				break;
-			    case cat_file::normal:
-				if(delta_signature)
-				{
-				    delta_sig = new (pool) memory_file();
-				    if(delta_sig == nullptr)
-					throw Ememory("save_inode");
-				}
+			    loop = false;
+			    infinint start;
+			    generic_file *source = nullptr;
 
-				if(fic->get_sparse_file_detection_read()) // source file already holds a sparse_file structure
-				    source = fic->get_data(cat_file::plain, delta_sig); // we must hide the holes for it can be redetected
-				else
-				    source = fic->get_data(cat_file::normal, delta_sig);
-				break;
-			    case cat_file::plain:
-				throw SRC_BUG; // save_inode must never be called with this value
-			    default:
-				throw SRC_BUG; // unknown value for keep_mode
-			    }
-			}
-			catch(...)
-			{
-			    cat.pre_add_failed_mark();
-			    throw;
-			}
+				//////////////////////////////
+				// preparing the source
 
-
-
-			    //////////////////////////////
-			    // preparing the destination
-
-
-			if(source != nullptr)
-			{
 			    try
 			    {
-				sparse_file *dst_hole = nullptr;
-				infinint crc_size = tools_file_size_to_crc_size(fic->get_size());
-				crc * val = nullptr;
-				const crc * original = nullptr;
-				bool crc_available = false;
+				switch(keep_mode)
+				{
+				case cat_file::keep_compressed:
+				    if(fic->get_compression_algo_read() != fic->get_compression_algo_write())
+					keep_mode = cat_file::keep_hole;
+				    source = fic->get_data(keep_mode, nullptr, nullptr);
+				    break;
+				case cat_file::keep_hole:
+				    if(delta_signature && !fic->get_sparse_file_detection_read())
+				    {
+					delta_sig = new (pool) memory_file();
+					if(delta_sig == nullptr)
+					    throw Ememory("saved_inode");
+					source = fic->get_data(cat_file::normal, delta_sig, nullptr);
+				    }
+				    else
+					source = fic->get_data(keep_mode, nullptr, nullptr);
+				    break;
+				case cat_file::normal:
+				    if(delta_signature)
+				    {
+					delta_sig = new (pool) memory_file();
+					if(delta_sig == nullptr)
+					    throw Ememory("save_inode");
+				    }
 
-				source->skip(0);
-				source->read_ahead(0);
+				    if(fic->get_sparse_file_detection_read()) // source file already holds a sparse_file structure
+					source = fic->get_data(cat_file::plain, delta_sig, delta_sig_ref);
+					// we must hide the holes for it can be redetected
+				    else
+					source = fic->get_data(cat_file::normal, delta_sig, delta_sig_ref);
+				    break;
+				case cat_file::plain:
+				    throw SRC_BUG; // save_inode must never be called with this value
+				default:
+				    throw SRC_BUG; // unknown value for keep_mode
+				}
+			    }
+			    catch(...)
+			    {
+				cat.pre_add_failed_mark();
+				throw;
+			    }
 
-				pdesc.stack->sync_write_above(pdesc.compr);
-				pdesc.compr->sync_write(); // necessary in any case to reset the compression engine to be able at later time to decompress starting at that position
-				if(keep_mode == cat_file::keep_compressed || fic->get_compression_algo_write() == none)
-				    pdesc.compr->suspend_compression();
-				else
-				    pdesc.compr->resume_compression();
 
-				    // now that compression has reset we can fetch the location where the data will be dropped:
-				start = pdesc.stack->get_position();
-				fic->set_offset(start);
 
+				//////////////////////////////
+				// preparing the destination
+
+
+			    if(source != nullptr)
+			    {
 				try
 				{
-				    if(fic->get_sparse_file_detection_write() && keep_mode != cat_file::keep_compressed && keep_mode != cat_file::keep_hole)
-				    {
-					    // creating the sparse_file to copy data to destination
+				    sparse_file *dst_hole = nullptr;
+				    generic_rsync *dst_rsync = nullptr;
+				    infinint crc_size = tools_file_size_to_crc_size(fic->get_size());
+				    crc * val = nullptr;
+				    const crc * original = nullptr;
+				    bool crc_available = false;
 
-					dst_hole = new (pool) sparse_file(pdesc.stack->top(), hole_size);
-					if(dst_hole == nullptr)
-					    throw Ememory("save_inode");
-					pdesc.stack->push(dst_hole);
-				    }
+				    source->skip(0);
+				    source->read_ahead(0);
 
-					//////////////////////////////
-					// proceeding to file's data backup
-
-				    if(!compute_crc)
-					crc_available = fic->get_crc(original);
+				    pdesc.stack->sync_write_above(pdesc.compr);
+				    pdesc.compr->sync_write(); // necessary in any case to reset the compression engine to be able at later time to decompress starting at that position
+				    if(keep_mode == cat_file::keep_compressed || fic->get_compression_algo_write() == none)
+					pdesc.compr->suspend_compression();
 				    else
-					crc_available = false;
+					pdesc.compr->resume_compression();
 
-				    source->copy_to(*pdesc.stack, crc_size, val);
-				    if(val == nullptr)
-					throw SRC_BUG;
+					// now that compression has reset we can fetch the location where the data will be dropped:
+				    start = pdesc.stack->get_position();
+				    fic->set_offset(start);
 
-					//////////////////////////////
-					// checking crc value and storing it in catalogue
-
-				    if(compute_crc)
-					fic->set_crc(*val);
-				    else
+				    try
 				    {
-					if(keep_mode == cat_file::normal && crc_available)
+					if(fic->get_sparse_file_detection_write() && keep_mode != cat_file::keep_compressed && keep_mode != cat_file::keep_hole)
 					{
-					    if(original == nullptr)
-						throw SRC_BUG;
-					    if(typeid(*original) != typeid(*val))
-						throw SRC_BUG;
-					    if(*original != *val)
-						throw Erange("save_inode", gettext("Copied data does not match CRC"));
+						// creating the sparse_file to copy data to destination
+
+					    dst_hole = new (pool) sparse_file(pdesc.stack->top(), hole_size);
+					    if(dst_hole == nullptr)
+						throw Ememory("save_inode");
+					    pdesc.stack->push(dst_hole);
 					}
+
+					    //////////////////////////////
+					    // proceeding to file's data backup
+
+					if(!compute_crc)
+					    crc_available = fic->get_crc(original);
+					else
+					    crc_available = false;
+
+					source->copy_to(*pdesc.stack, crc_size, val);
+					if(val == nullptr)
+					    throw SRC_BUG;
+
+					    //////////////////////////////
+					    // checking crc value and storing it in catalogue
+
+					if(compute_crc)
+					    fic->set_crc(*val);
+					else
+					{
+					    if(keep_mode == cat_file::normal && crc_available)
+					    {
+						if(original == nullptr)
+						    throw SRC_BUG;
+						if(typeid(*original) != typeid(*val))
+						    throw SRC_BUG;
+						if(*original != *val)
+						    throw Erange("save_inode", gettext("Copied data does not match CRC"));
+					    }
+					}
+
+					    //////////////////////////////
+					    // checking whether saved files used sparse_file datastructure
+
+					if(dst_hole != nullptr)
+					{
+					    pdesc.stack->sync_write_above(dst_hole);
+					    dst_hole->sync_write();
+					    if(!dst_hole->has_seen_hole() && !dst_hole->has_escaped_data())
+						fic->set_sparse_file_detection_write(false);
+						// here we drop the sparse_file datastructure as no hole
+						// could be read. This will speed up extraction when used
+						// normally (not with sequential reading, as the inode info
+						// is already written to file and cannot be changed.
+						// Reading as sparse_file datastructure a plain normal data
+						// is possible while there is no data to escape, this is just
+						// a bit more slower.).
+					}
+					source->terminate();
 				    }
-
-					//////////////////////////////
-					// checking whether saved files used sparse_file datastructure
-
-				    if(dst_hole != nullptr)
+				    catch(...)
 				    {
-					pdesc.stack->sync_write_above(dst_hole);
-					dst_hole->sync_write();
-					if(!dst_hole->has_seen_hole() && !dst_hole->has_escaped_data())
-					    fic->set_sparse_file_detection_write(false);
-					    // here we drop the sparse_file datastructure as no hole
-					    // could be read. This will speed up extraction when used
-					    // normally (not with sequential reading, as the inode info
-					    // is already written to file and cannot be changed.
-					    // Reading as sparse_file datastructure a plain normal data
-					    // is possible while there is no data to escape, this is just
-					    // a bit more slower.).
+					if(val != nullptr)
+					{
+					    delete val;
+					    val = nullptr;
+					}
+
+					if(dst_rsync != nullptr)
+					{
+					    if(pdesc.stack->pop() != dst_rsync)
+						throw SRC_BUG;
+					    delete dst_rsync;
+					    dst_rsync = nullptr;
+					}
+
+					if(dst_hole != nullptr)
+					{
+					    if(pdesc.stack->pop() != dst_hole)
+						throw SRC_BUG;
+					    delete dst_hole;
+					    dst_hole = nullptr;
+					}
+
+					throw;
 				    }
-				    source->terminate();
-				}
-				catch(...)
-				{
+
 				    if(val != nullptr)
 				    {
 					delete val;
 					val = nullptr;
 				    }
 
+				    if(dst_rsync != nullptr)
+				    {
+					if(pdesc.stack->pop() != dst_rsync)
+					    throw SRC_BUG;
+					delete dst_rsync;
+					dst_rsync = nullptr;
+				    }
+
 				    if(dst_hole != nullptr)
 				    {
+					dst_hole->terminate();
 					if(pdesc.stack->pop() != dst_hole)
 					    throw SRC_BUG;
 					delete dst_hole;
 					dst_hole = nullptr;
 				    }
+
+				    if(pdesc.stack->get_position() >= start)
+				    {
+					storage_size = pdesc.stack->get_position() - start;
+					fic->set_storage_size(storage_size);
+				    }
+				    else
+					throw SRC_BUG;
+				}
+				catch(...)
+				{
+				    delete source;
+				    source = nullptr;
+
+					// restore atime of source
+				    if(!alter_atime)
+					tools_noexcept_make_date(info_quoi, false, ino->get_last_access(), ino->get_last_modif(), ino->get_last_modif());
 				    throw;
 				}
-
-				if(val != nullptr)
-				{
-				    delete val;
-				    val = nullptr;
-				}
-
-				if(dst_hole != nullptr)
-				{
-				    dst_hole->terminate();
-				    if(pdesc.stack->pop() != dst_hole)
-					throw SRC_BUG;
-				    delete dst_hole;
-				    dst_hole = nullptr;
-				}
-
-				if(pdesc.stack->get_position() >= start)
-				{
-				    storage_size = pdesc.stack->get_position() - start;
-				    fic->set_storage_size(storage_size);
-				}
-				else
-				    throw SRC_BUG;
-			    }
-			    catch(...)
-			    {
 				delete source;
 				source = nullptr;
 
-				    // restore atime of source
-				if(!alter_atime)
-				    tools_noexcept_make_date(info_quoi, false, ino->get_last_access(), ino->get_last_modif(), ino->get_last_modif());
-				throw;
-			    }
-			    delete source;
-			    source = nullptr;
+				    //////////////////////////////
+				    // adding the data CRC if escape marks are used
 
-				//////////////////////////////
-				// adding the data CRC if escape marks are used
+				cat.pre_add_crc(ino);
 
-			    cat.pre_add_crc(ino);
+				    //////////////////////////////
+				    // checking if compressed data is smaller than uncompressed one
 
-				//////////////////////////////
-				// checking if compressed data is smaller than uncompressed one
-
-			    if(fic->get_size() <= storage_size
-			       && keep_mode != cat_file::keep_compressed
-			       && fic->get_compression_algo_write() != none)
-			    {
-				infinint current_pos_tmp = pdesc.stack->get_position();
-
-				if(current_pos_tmp <= rewinder)
-				    throw SRC_BUG; // we are positionned before the start of the current inode dump!
-				if(pdesc.stack->skippable(generic_file::skip_backward, current_pos_tmp - rewinder))
+				if(fic->get_size() <= storage_size
+				   && keep_mode != cat_file::keep_compressed
+				   && fic->get_compression_algo_write() != none)
 				{
-				    try
+				    infinint current_pos_tmp = pdesc.stack->get_position();
+
+				    if(current_pos_tmp <= rewinder)
+					throw SRC_BUG; // we are positionned before the start of the current inode dump!
+				    if(pdesc.stack->skippable(generic_file::skip_backward, current_pos_tmp - rewinder))
 				    {
-					if(!pdesc.stack->skip(rewinder))
-					    throw SRC_BUG;
-					if(!resave_uncompressed)
-					    resave_uncompressed = true;
-					else
-					    throw SRC_BUG; // should only be tried once per inode
-					fic->change_compression_algo_write(none);
-					break; // stop the inner loop
-				    }
-				    catch(Ebug & e)
-				    {
-					throw;
-				    }
-				    catch(...)
-				    {
-					if(info_details)
-					    dialog.warning(info_quoi + gettext(" : Failed resaving uncompressed the inode data"));
-					    // ignoring the error and continuing
-					resave_uncompressed = false;
-					if(pdesc.stack->get_position() != current_pos_tmp)
-					    throw SRC_BUG;
-				    }
-				}
-				else
-				{
-				    if(info_details)
-					dialog.warning(info_quoi  + gettext(" : Resaving uncompressed the inode data to gain space is not possible, keeping data compressed"));
-				}
-			    }
-			    else
-				resave_uncompressed = false;
-
-
-				//////////////////////////////
-				// checking for last_modification date change
-
-			    if(check_change)
-			    {
-				bool changed = false;
-
-				try
-				{
-				    changed = fic->get_last_modif() != tools_get_mtime(info_quoi);
-				}
-				catch(Erange & e)
-				{
-				    dialog.warning(tools_printf(gettext("File has disappeared while we were reading it, cannot check whether it has changed during its backup: %S"), &info_quoi));
-				    changed = false;
-				}
-
-				if(changed)
-				{
-				    if(current_repeat_count < repeat_count)
-				    {
-					current_repeat_count++;
-					infinint current_pos_tmp = pdesc.stack->get_position();
-
 					try
 					{
-					    if(pdesc.stack->skippable(generic_file::skip_backward, storage_size))
-					    {
-						if(!pdesc.stack->skip(start))
-						{
-						    if(!pdesc.stack->skip(current_repeat_count))
-							throw SRC_BUG;
-						    throw Erange("",""); // used locally
-						}
-					    }
+					    if(!pdesc.stack->skip(rewinder))
+						throw SRC_BUG;
+					    if(!resave_uncompressed)
+						resave_uncompressed = true;
 					    else
-						throw Erange("",""); // used locally, not propagated over this try / catch block
+						throw SRC_BUG; // should only be tried once per inode
+					    fic->change_compression_algo_write(none);
+					    break; // stop the inner loop
+					}
+					catch(Ebug & e)
+					{
+					    throw;
 					}
 					catch(...)
 					{
-					    current_wasted_bytes += current_pos_tmp - start;
+					    if(info_details)
+						dialog.warning(info_quoi + gettext(" : Failed resaving uncompressed the inode data"));
+						// ignoring the error and continuing
+					    resave_uncompressed = false;
 					    if(pdesc.stack->get_position() != current_pos_tmp)
 						throw SRC_BUG;
-					}
-
-					if(repeat_byte.is_zero() || (current_wasted_bytes < repeat_byte))
-					{
-					    if(info_details)
-						dialog.warning(tools_printf(gettext("WARNING! File modified while reading it for backup. Performing retry %i of %i"), &current_repeat_count, &repeat_count));
-					    if(pdesc.stack->get_position() != start)
-						cat.pre_add_waste_mark();
-					    loop = true;
-
-						// updating the last modification date of file
-					    fic->set_last_modif(tools_get_mtime(info_quoi));
-
-						// updating the size of the file
-					    fic->change_size(tools_get_size(info_quoi));
-					}
-					else
-					{
-					    dialog.warning(string(gettext("WARNING! File modified while reading it for backup. No more retry for that file to not exceed the wasted byte limit. File is ")) + info_quoi);
-					    fic->set_dirty(true);
-					    ret = false;
 					}
 				    }
 				    else
 				    {
-					dialog.warning(string(gettext("WARNING! File modified while reading it for backup, but no more retry allowed: ")) + info_quoi);
-					fic->set_dirty(true);
-					cat.pre_add_dirty(); // when in sequential reading
-					ret = false;
+					if(info_details)
+					    dialog.warning(info_quoi  + gettext(" : Resaving uncompressed the inode data to gain space is not possible, keeping data compressed"));
 				    }
 				}
-			    }
+				else
+				    resave_uncompressed = false;
 
-				//////////////////////////////
-				// restore atime of source
 
-			    if(!alter_atime)
-				tools_noexcept_make_date(info_quoi, false, ino->get_last_access(), ino->get_last_modif(), ino->get_last_modif());
+				    //////////////////////////////
+				    // checking for last_modification date change
 
-				//////////////////////////////
-				// dumping delta signature if present or just calculated
-
-			    if(fic->has_delta_signature() && !loop)
-			    {
-				if(display_treated)
-				    dialog.warning(string(gettext("Dumping delta signature of saved file: ")) + info_quoi);
-
-				if(delta_sig == nullptr)
+				if(check_change)
 				{
-					// merging context, signature not calculated here but already existing: we need to transfer it
+				    bool changed = false;
 
-				    delta_sig = new (pool) memory_file();
-				    if(delta_sig == nullptr)
-					throw Ememory("saved_inode");
+				    try
+				    {
+					changed = fic->get_last_modif() != tools_get_mtime(info_quoi);
+				    }
+				    catch(Erange & e)
+				    {
+					dialog.warning(tools_printf(gettext("File has disappeared while we were reading it, cannot check whether it has changed during its backup: %S"), &info_quoi));
+					changed = false;
+				    }
 
-				    fic->read_delta_signature(*delta_sig);
+				    if(changed)
+				    {
+					if(current_repeat_count < repeat_count)
+					{
+					    current_repeat_count++;
+					    infinint current_pos_tmp = pdesc.stack->get_position();
+
+					    try
+					    {
+						if(pdesc.stack->skippable(generic_file::skip_backward, storage_size))
+						{
+						    if(!pdesc.stack->skip(start))
+						    {
+							if(!pdesc.stack->skip(current_repeat_count))
+							    throw SRC_BUG;
+							throw Erange("",""); // used locally
+						    }
+						}
+						else
+						    throw Erange("",""); // used locally, not propagated over this try / catch block
+					    }
+					    catch(...)
+					    {
+						current_wasted_bytes += current_pos_tmp - start;
+						if(pdesc.stack->get_position() != current_pos_tmp)
+						    throw SRC_BUG;
+					    }
+
+					    if(repeat_byte.is_zero() || (current_wasted_bytes < repeat_byte))
+					    {
+						if(info_details)
+						    dialog.warning(tools_printf(gettext("WARNING! File modified while reading it for backup. Performing retry %i of %i"), &current_repeat_count, &repeat_count));
+						if(pdesc.stack->get_position() != start)
+						    cat.pre_add_waste_mark();
+						loop = true;
+
+						    // updating the last modification date of file
+						fic->set_last_modif(tools_get_mtime(info_quoi));
+
+						    // updating the size of the file
+						fic->change_size(tools_get_size(info_quoi));
+					    }
+					    else
+					    {
+						dialog.warning(string(gettext("WARNING! File modified while reading it for backup. No more retry for that file to not exceed the wasted byte limit. File is ")) + info_quoi);
+						fic->set_dirty(true);
+						ret = false;
+					    }
+					}
+					else
+					{
+					    dialog.warning(string(gettext("WARNING! File modified while reading it for backup, but no more retry allowed: ")) + info_quoi);
+					    fic->set_dirty(true);
+					    cat.pre_add_dirty(); // when in sequential reading
+					    ret = false;
+					}
+				    }
 				}
 
-				    // adding a tape mark when in sequential read mode
-				cat.pre_add_delta_sig();
-				pdesc.compr->suspend_compression();
+				    //////////////////////////////
+				    // restore atime of source
 
-				    // dropping the data to the archive and recording its location in the cat_file object
-				fic->dump_delta_signature(*delta_sig, *(pdesc.compr), pdesc.esc != nullptr);
+				if(!alter_atime)
+				    tools_noexcept_make_date(info_quoi, false, ino->get_last_access(), ino->get_last_modif(), ino->get_last_modif());
+
+				    //////////////////////////////
+				    // dumping delta signature if present or just calculated
+
+				if(fic->has_delta_signature() && !loop)
+				{
+				    if(display_treated)
+					dialog.warning(string(gettext("Dumping delta signature of saved file: ")) + info_quoi);
+
+				    if(delta_sig == nullptr)
+				    {
+					    // merging context, signature not calculated here but already existing: we need to transfer it
+
+					delta_sig = new (pool) memory_file();
+					if(delta_sig == nullptr)
+					    throw Ememory("saved_inode");
+
+					fic->read_delta_signature(*delta_sig);
+				    }
+
+					// adding a tape mark when in sequential read mode
+				    cat.pre_add_delta_sig();
+				    pdesc.compr->suspend_compression();
+
+					// dropping the data to the archive and recording its location in the cat_file object
+				    fic->dump_delta_signature(*delta_sig, *(pdesc.compr), pdesc.esc != nullptr);
+				}
+
 			    }
-
+			    else
+				throw SRC_BUG; // saved_status == s_saved, but no data available, and no exception raised;
 			}
-			else
-			    throw SRC_BUG; // saved_status == s_saved, but no data available, and no exception raised;
+			while(loop); // INNER LOOP
 		    }
-		    while(loop); // INNER LOOP
-		}
-		catch(...)
-		{
+		    catch(...)
+		    {
+			if(sem != nullptr)
+			    sem->lower();
+			if(delta_sig != nullptr)
+			    delete delta_sig;
+			throw;
+		    }
 		    if(sem != nullptr)
 			sem->lower();
 		    if(delta_sig != nullptr)
 			delete delta_sig;
-		    throw;
 		}
-		if(sem != nullptr)
-		    sem->lower();
-		if(delta_sig != nullptr)
-		    delete delta_sig;
+		else // fic == nullptr
+		    if(sem != nullptr)
+		    {
+			sem->raise(info_quoi, ino, true);
+			sem->lower();
+		    }
 	    }
-	    else // fic == nullptr
-		if(sem != nullptr)
-		{
-		    sem->raise(info_quoi, ino, true);
-		    sem->lower();
-		}
+	    while(resave_uncompressed); // OUTER LOOP
 	}
-	while(resave_uncompressed); // OUTER LOOP
+	catch(...)
+	{
+	    if(delta_sig_ref != nullptr)
+		delete delta_sig_ref;
+	    throw;
+	}
+	if(delta_sig_ref != nullptr)
+	    delete delta_sig_ref;
 
 	return ret;
     }
@@ -3979,7 +4038,7 @@ namespace libdar
 		e_file->set_saved_status(s_saved); // temporarily to have get_data() operationnal
 		try
 		{
-		    data = e_file->get_data(cat_file::normal, &sig);
+		    data = e_file->get_data(cat_file::normal, &sig, nullptr);
 		    if(data == nullptr)
 			throw Ememory("filtre_sauvegarde");
 		    data->copy_to(trou_noir);

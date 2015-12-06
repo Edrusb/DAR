@@ -212,12 +212,14 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    create_options.clear();
 		    if(arch != nullptr)
 		    {
-			if(!param.delta_sig)
+			if(!param.delta_sig && !param.delta_diff)
 				// we may need to copy delta_sig
 				// from the archive of reference
 				// to the resulting archive so we
 				// cannot drop fd when delta_sig
 				// is requested
+				// We may also need to read delta_sig
+				// to perform the delta difference
 			    arch->drop_all_filedescriptors(dialog);
 			create_options.set_reference(arch);
 		    }

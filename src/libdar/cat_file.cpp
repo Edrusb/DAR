@@ -515,7 +515,9 @@ namespace libdar
             throw SRC_BUG;
     }
 
-    generic_file *cat_file::get_data(get_data_mode mode, memory_file *delta_sig) const
+    generic_file *cat_file::get_data(get_data_mode mode,
+				     memory_file *delta_sig,
+				     generic_file *delta_ref) const
     {
         generic_file *ret = nullptr;
 
@@ -526,6 +528,14 @@ namespace libdar
 	    if(get_saved_status() != s_saved
 	       && get_saved_status() != s_delta)
 		throw Erange("cat_file::get_data", gettext("cannot provide data from a \"not saved\" file object"));
+
+	    if(delta_ref != nullptr
+	       && get_saved_status() != s_delta)
+		throw SRC_BUG;
+
+	    if(delta_ref != nullptr
+	       && status != from_path)
+		throw Efeature("building an binary difference (rsync) for a file located in an archive");
 
 	    if(status == empty)
 		throw Erange("cat_file::get_data", gettext("data has been cleaned, object is now empty"));
@@ -556,6 +566,25 @@ namespace libdar
 		}
 	    }
 
+	    if(delta_ref != nullptr)
+	    {
+		switch(mode)
+		{
+		case keep_compressed:
+		    throw SRC_BUG;
+		case keep_hole:
+		    throw SRC_BUG;
+		case normal:
+		    if(get_sparse_file_detection_read())
+			throw SRC_BUG;
+		    break;
+		case plain:
+		    break;
+		default:
+		    throw SRC_BUG;
+		}
+	    }
+
 		//
 
 	    if(status == from_path)
@@ -568,7 +597,7 @@ namespace libdar
 			// telling *tmp to flush the data from the cache as soon as possible
 		    tmp->fadvise(fichier_global::advise_dontneed);
 
-		if(delta_sig != nullptr)
+		if(delta_sig != nullptr || delta_ref != nullptr)
 		{
 		    pile *data = new (get_pool()) pile();
 		    if(data == nullptr)
@@ -584,17 +613,38 @@ namespace libdar
 		    }
 		    ret = data;
 
-		    generic_rsync *delta = new (get_pool()) generic_rsync(delta_sig, data->top());
-		    if(delta == nullptr)
-			throw Ememory("cat_file::get_data");
-		    try
+		    if(delta_sig != nullptr)
 		    {
-			data->push(delta);
+			generic_rsync *delta = new (get_pool()) generic_rsync(delta_sig, data->top());
+			if(delta == nullptr)
+			    throw Ememory("cat_file::get_data");
+			try
+			{
+			    data->push(delta);
+			}
+			catch(...)
+			{
+			    delete delta;
+			    throw;
+			}
 		    }
-		    catch(...)
+
+		    if(delta_ref != nullptr)
 		    {
-			delete delta;
-			throw;
+			generic_rsync *diff = new (get_pool()) generic_rsync(delta_ref,
+									     data->top(),
+									     true);
+			if(diff == nullptr)
+			    throw Ememory("cat_file::get_data");
+			try
+			{
+			    data->push(diff);
+			}
+			catch(...)
+			{
+			    delete diff;
+			    throw;
+			}
 		    }
 		}
 	    }
@@ -1116,12 +1166,12 @@ namespace libdar
 	{
 		// compare file content and CRC
 
-	    generic_file *me = get_data(normal, nullptr);
+	    generic_file *me = get_data(normal, nullptr, nullptr);
 	    if(me == nullptr)
 		throw SRC_BUG;
 	    try
 	    {
-		generic_file *you = f_other->get_data(normal, nullptr);
+		generic_file *you = f_other->get_data(normal, nullptr, nullptr);
 		if(you == nullptr)
 		    throw SRC_BUG;
 		    // requesting read_ahead for the peer object
@@ -1218,7 +1268,7 @@ namespace libdar
 		memory_file sig_me;
 		memory_file sig_you;
 		null_file trash = gf_write_only;
-		generic_file *data = f_other->get_data(normal, &sig_you);
+		generic_file *data = f_other->get_data(normal, &sig_you, nullptr);
 
 		if(data == nullptr)
 		    throw SRC_BUG;
@@ -1257,7 +1307,7 @@ namespace libdar
 		if(my_crc == nullptr)
 		    throw SRC_BUG;
 
-		generic_file *you = f_other->get_data(normal, nullptr);
+		generic_file *you = f_other->get_data(normal, nullptr, nullptr);
 		if(you == nullptr)
 		    throw SRC_BUG;
 

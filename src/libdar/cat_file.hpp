@@ -88,9 +88,14 @@ namespace libdar
 	    ///
 	    /// \param[in] mode whether to return compressed, with hole or plain file
 	    /// \param[in,out] delta_sig if not nullptr, write to that file the delta signature of the file
+	    /// \param[in] delta_ref if not nullptr, use the provided signature to generate a delta binary
 	    /// \note the object pointed to by delta_sig must exist during the whole life of the returned
-	    /// object.
-        virtual generic_file *get_data(get_data_mode mode, memory_file *delta_sig) const;
+	    /// object, as well as the object pointed to by delta_ref if provided.
+	    /// \note when both delta_sig and delta_ref are provided, the delta signature is computed on the
+	    /// file data, then the delta binary is computed.
+        virtual generic_file *get_data(get_data_mode mode,
+				       memory_file *delta_sig,
+				       generic_file *delta_ref) const;
         void clean_data(); // partially free memory (but get_data() becomes disabled)
         void set_offset(const infinint & r);
 	const infinint & get_offset() const;
