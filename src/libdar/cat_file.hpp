@@ -129,6 +129,16 @@ namespace libdar
 	    /// return whether the object has an associated delta signature
 	bool has_delta_signature() const { return will_have_delta_sig; };
 
+
+	    /// returns whether the object has CRC of reference (s_delta status objects)
+	bool has_ref_crc() const { return ref_check != nullptr; };
+
+	    /// returns the reference CRC for s_delta objects
+	bool get_ref_crc(const crc * & c) const;
+
+	    /// set the reference CRC for s_detla objects
+	void set_ref_crc(const crc & c);
+
 	    /// for small dump to have the delta_sig set
 	    ///
 	    /// \note at the time of the small dump the delta_signature is not even calculated so we
@@ -165,7 +175,8 @@ namespace libdar
         infinint *offset;       //< start location of the data in 'loc'
         infinint *size;         //< size of the data (uncompressed)
         infinint *storage_size; //< how much data used in archive (after compression)
-        crc *check;
+        crc *check;             //< crc computed on the data
+	crc *ref_check;         //< stored crc of the file the delta diff has been based on
 	bool dirty;             //< true when a file has been modified at the time it was saved
         compression algo_read;  //< which compression algorithm to use to read the file's data
 	compression algo_write; //< which compression algorithm to use to write down (merging) the file's data

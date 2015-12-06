@@ -64,6 +64,7 @@ namespace libdar
         file_data_status_read = 0;
         file_data_status_write = 0;
         check = nullptr;
+	ref_check = nullptr;
         dirty = false;
 	delta_sig_offset = 0;
 	delta_sig_size = 0;
@@ -112,6 +113,7 @@ namespace libdar
         offset = nullptr;
         storage_size = nullptr;
         check = nullptr;
+	ref_check = nullptr;
         algo_read = default_algo;  // only used for archive format "03" and older
         algo_write = default_algo; // may be changed later using change_compression_algo_write()
         furtive_read_mode = false; // no used in that "status" mode
@@ -313,6 +315,17 @@ namespace libdar
 		delta_sig_crc = nullptr;
 		delta_sig_size = 0;
             }
+
+	    if(get_saved_status() == s_delta)
+	    {
+		    // this state type only appeared after format 9 but does not conflicts
+		    // with any previous format so there is no need to check the format version
+
+		ref_check = create_crc_from_file(*ptr, get_pool());
+		if(ref_check == nullptr)
+		    throw Ememory("cat_file::cat_file");
+	    }
+
         }
         catch(...)
         {
@@ -341,6 +354,7 @@ namespace libdar
         size = nullptr;
         storage_size = nullptr;
         check = nullptr;
+	ref_check = nullptr;
         dirty = ref.dirty;
         algo_read = ref.algo_read;
         algo_write = ref.algo_write;
@@ -368,6 +382,12 @@ namespace libdar
             }
             else
                 check = nullptr;
+	    if(ref.ref_check != nullptr)
+	    {
+		ref_check = ref.ref_check->clone();
+		if(ref_check == nullptr)
+                    throw Ememory("cat_file::cat_file(cat_file)");
+	    }
             offset = new (get_pool()) infinint(*ref.offset);
             size = new (get_pool()) infinint(*ref.size);
             storage_size = new (get_pool()) infinint(*ref.storage_size);
@@ -476,6 +496,14 @@ namespace libdar
 		(void)ptr->write(&flags, sizeof(flags));
 	    }
         }
+
+	if(get_saved_status() == s_delta) // in both normal and small modes
+	{
+	    if(ref_check == nullptr)
+		throw SRC_BUG;
+	    else
+		ref_check->dump(*ptr);
+	}
     }
 
     bool cat_file::has_changed_since(const cat_inode & ref, const infinint & hourshift, cat_inode::comparison_fields what_to_check) const
@@ -535,8 +563,6 @@ namespace libdar
 		fichier_local *tmp = nullptr;
 		if(mode != normal && mode != plain)
 		    throw SRC_BUG; // keep compressed/keep_hole is not possible on an inode take from a filesystem
-		if(get_saved_status() == s_delta)
-		    throw SRC_BUG;
 		ret = tmp = new (get_pool()) fichier_local(chemin, furtive_read_mode);
 		if(tmp != nullptr)
 			// telling *tmp to flush the data from the cache as soon as possible
@@ -812,7 +838,8 @@ namespace libdar
 		return false;
 	else
 	{
-	    if(get_saved_status() == s_saved)
+	    if(get_saved_status() == s_saved
+	       || get_saved_status() == s_delta)
 	    {
 		if(check == nullptr)
 		{
@@ -882,6 +909,36 @@ namespace libdar
 	else
 	    return false;
     }
+
+    bool cat_file::get_ref_crc(const crc * & c) const
+    {
+	if(get_saved_status() != s_delta)
+	    throw SRC_BUG;
+
+	if(ref_check != nullptr)
+	{
+	    c = ref_check;
+	    return true;
+	}
+	else
+	    return false;
+    }
+
+    void cat_file::set_ref_crc(const crc & c)
+    {
+	if(get_saved_status() != s_delta)
+	    throw SRC_BUG;
+
+	if(ref_check != nullptr)
+	{
+	    delete ref_check;
+	    ref_check = nullptr;
+	}
+	ref_check = c.clone();
+	if(ref_check == nullptr)
+	    throw Ememory("cat_file::set_crc");
+    }
+
 
     void cat_file::dump_delta_signature(memory_file &sig, generic_file & where, bool small)
     {
