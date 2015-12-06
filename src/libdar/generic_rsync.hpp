@@ -57,16 +57,19 @@ namespace libdar
 
 	    /// constructor for "delta" operation
 	    ///
-	    /// in this mode the generic_rsync object is write only, all data
-	    /// written to it is computed against the given base_signature to
+	    /// in this mode the generic_rsync object is also read only, all data
+	    /// read from it is the resulting delta of the data read from "below" based
+	    /// the given base_signature.
 	    /// produce a delta signature. Nothing is passed to below, but below
 	    /// argument is kept for coherence with the previous constructor
 	    /// \param[in] base_signature is read only
-	    /// \param[in] signature_storage is write only and receives the delta diff
-	    /// \param[in] below is not used in this mode but must be provided.
+	    /// \param[in] below is the plain file to read from and for which to compute the
+	    /// delta based on base_signature
+	    /// \param[in] notused takes any value and is only here to provide a different
+	    /// constructor than the "signature" one above
 	generic_rsync(generic_file *base_signature,
-		      generic_file *signature_storage,
-		      generic_file *below);
+		      generic_file *below,
+		      bool notused);
 
 
 	    /// constructor for "patch" operation
@@ -109,7 +112,7 @@ namespace libdar
     private:
 	enum { sign, delta, patch } status;
 
-	generic_file *x_below;
+	generic_file *x_below;    //< underlying layer to read from / write to
 	generic_file *x_input;
 	generic_file *x_output;
 	const crc *orig_crc;
@@ -134,6 +137,7 @@ namespace libdar
 	    /// \param[in,out] avail_in is the amount of byte available, and after the call the amount of not yet read bytes
 	    /// remaining at the beginning of the buffer_in buffer (when shift_input is set to true) or at the end if shift is set
 	    /// to false.
+	    /// \param[in] shift_input
 	    /// \param[out] buffer_out where to drop the data from librsync
 	    /// \param[in,out] avail_out is the size of the allocated memory pointed to by buffer_out and after the call the amount
 	    /// of byte that has been dropped to the buffer_out buffer.

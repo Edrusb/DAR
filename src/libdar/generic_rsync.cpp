@@ -99,8 +99,8 @@ namespace libdar
 	// delta creation
 
     generic_rsync::generic_rsync(generic_file *base_signature,
-				 generic_file *signature_storage,
-				 generic_file *below): generic_file(gf_write_only)
+				 generic_file *below,
+				 bool notused): generic_file(gf_read_only)
     {
 #if LIBRSYNC_AVAILABLE
 	char *inbuf = nullptr;
@@ -114,7 +114,7 @@ namespace libdar
 
 	if(base_signature == nullptr)
 	    throw SRC_BUG;
-	if(signature_storage == nullptr)
+	if(below == nullptr)
 	    throw SRC_BUG;
 
 	    // setting up the object
@@ -123,7 +123,7 @@ namespace libdar
 	status = delta;
 	initial = true;
 	patching_completed = false; // not used in delta mode
-	meta_new(working_buffer,BUFFER_SIZE);
+	meta_new(working_buffer, BUFFER_SIZE);
 	if(working_buffer == nullptr)
 	    throw Ememory("generic_rsync::generic_rsync (sign)");
 
@@ -183,7 +183,7 @@ namespace libdar
 	    job = rs_delta_begin(sumset);
 	    x_below = below;
 	    x_input = nullptr;
-	    x_output = signature_storage;
+	    x_output = nullptr;
 	    orig_crc = nullptr;
 	}
 	catch(...)
@@ -279,10 +279,11 @@ namespace libdar
 
     U_I generic_rsync::inherited_read(char *a, U_I size)
     {
-	initial = false;
 	U_I lu = 0;
 	U_I remain;
 	bool eof = false;
+
+	initial = false;
 
 	if(patching_completed)
 	    return 0;
@@ -305,7 +306,26 @@ namespace libdar
 	    while(remain > 0);
 	    break;
 	case delta:
-	    throw SRC_BUG;
+	    do
+	    {
+		if(!eof)
+		{
+		    working_size += x_below->read(working_buffer + working_size,
+						  BUFFER_SIZE - working_size);
+		    if(working_size == 0)
+			eof = true;
+		}
+		else
+		    working_size = 0;
+
+		remain = size - lu;
+		(void)step_forward(working_buffer, working_size,
+				   true,
+				   a + lu, remain);
+		lu += remain;
+	    }
+	    while(lu < size && (!eof || remain != 0));
+	    break;
 	case patch:
 	    do
 	    {
@@ -349,24 +369,13 @@ namespace libdar
     void generic_rsync::inherited_write(const char *a, U_I size)
     {
 	initial = false;
-	bool blocked;
 
 	switch(status)
 	{
 	case sign:
 	    throw SRC_BUG;
 	case delta:
-	    do
-	    {
-		working_size = BUFFER_SIZE;
-		blocked = !step_forward(a, size,
-					true,
-					working_buffer, working_size);
-		if(working_size > 0)
-		    x_output->write(working_buffer, working_size);
-	    }
-	    while(size > 0 && blocked);
-	    break;
+	    throw SRC_BUG;
 	case patch:
 	    throw SRC_BUG;
 	default:

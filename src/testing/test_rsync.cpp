@@ -136,11 +136,10 @@ void go_delta(const string & sig_file,
 				      false,
 				      true,
 				      false);
-    null_file below = null_file(gf_read_write);
     generic_rsync go = generic_rsync(&sig,
-				     &res,
-				     &below);
-    src.copy_to(go);
+				     &src,
+				     true);
+    go.copy_to(res);
 }
 
 void go_patch(const string & base_file,
