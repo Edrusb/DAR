@@ -1,6 +1,8 @@
 from 2.5.2 to 2.5.3
 - fixing a 2.5.x build issue met when a 2.4.x libdar library is already
   installed in an FreeBSD system.
+- improving message and behavior of libdar in lax mod when reading a truncated
+  archive
 
 from 2.5.1 to 2.5.2
 - fixed bug met when permission is denied while reading or writing slices
