@@ -454,7 +454,7 @@ namespace libdar
     void fichier_local::copy_from(const fichier_local & ref)
     {
 	filedesc = dup(ref.filedesc);
-	if(filedesc <0)
+	if(filedesc < 0)
 	{
 	    string tmp = tools_strerror_r(errno);
 	    throw Erange("fichier_local::copy_from", tools_printf(gettext("Cannot dup() filedescriptor while copying \"fichier_local\" object: %s"), tmp.c_str()));

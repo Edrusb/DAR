@@ -3,6 +3,8 @@ from 2.5.2 to 2.5.3
   installed in an FreeBSD system.
 - improving message and behavior of libdar in lax mod when reading a truncated
   archive
+- fixed unclosed filedescriptors problem met when saving a filesystem that has
+  not ExtX FSA available
 
 from 2.5.1 to 2.5.2
 - fixed bug met when permission is denied while reading or writing slices

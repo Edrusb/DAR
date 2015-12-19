@@ -522,7 +522,10 @@ namespace libdar
 		fsa_bool * ptr = nullptr;
 
 		if(ioctl(fd, EXT2_IOC_GETFLAGS, &f) < 0)
+		{
+		    close(fd);
 		    return; // assuming there is no support for that FSA family
+		}
 
 #ifdef EXT2_APPEND_FL
 		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_append_only, (f & EXT2_APPEND_FL) != 0);
