@@ -1048,7 +1048,9 @@ namespace libdar
 				   const label & data_name,
 				   bool multi_threaded)
     {
+#if GPGME_SUPPORT
 	U_I gnupg_key_size;
+#endif
 
 	try
 	{
