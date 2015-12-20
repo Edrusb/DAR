@@ -2,7 +2,9 @@ from 2.5.2 to 2.5.3
 - fixing a 2.5.x build issue met when a 2.4.x libdar library is already
   installed in an FreeBSD system.
 - improving message and behavior of libdar in lax mod when reading a truncated
-  archive
+  archive is read
+- fixing self reported bug at "tronconneuse.cpp line 561" met while reading
+  truncated/corrupted archive
 - fixed unclosed filedescriptors problem met when saving a filesystem that has
   not ExtX FSA available
 - fixing configure script to be more robust in front of system where gpgme.h is
