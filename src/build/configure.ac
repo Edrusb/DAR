@@ -1042,12 +1042,12 @@ AC_ARG_ENABLE(  [gpgme-linking],
 		    AC_DEFINE_UNQUOTED(GPGME_MIN_VERSION, "$gpgme_min_version", [minimum version expected of GPGME])
 		    AM_PATH_GPGME($gpgme_min_version,
 		      		[
-				  AC_CHECK_HEADERS([gpgme.h])
-				  AC_MSG_CHECKING([for libgpgme usability])
 				  CPPFLAGS___cache="$CPPFLAGS"
 				  CPPFLAGS="$GPGME_CFLAGS $CPPFLAGS"
 				  LDFLAGS___cache="$LDFLAGS"
 				  LDFLAGS="$GPGME_LIBS $LFDLAGS"
+				  AC_CHECK_HEADERS([gpgme.h])
+				  AC_MSG_CHECKING([for libgpgme usability])
 				  AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 								    #if HAVE_GPGME_H
 								    #include <gpgme.h>
