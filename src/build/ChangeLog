@@ -8,6 +8,7 @@ from 2.5.2 to 2.5.3
 - fixing configure script to be more robust in front of system where gpgme.h is
   installed in non standard path and user did not provide coherent CPPFLAGS,
   LDFLAGS before calling ./configure
+- displaying CRC values when listing isolated catalogue using the XML format
 
 from 2.5.1 to 2.5.2
 - fixed bug met when permission is denied while reading or writing slices
