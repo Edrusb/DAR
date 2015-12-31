@@ -174,6 +174,14 @@ namespace libdar
 		    get_ui().warning(tools_printf(gettext("Error reading inode of file %s : %s"), ptr_name, tmp.c_str()));
 		    break;
 		case ENOENT:
+		    if(display.size() >= PATH_MAX
+		       || name.size() >= NAME_MAX)
+			get_ui().warning(tools_printf(gettext("Failed reading inode information for %s: "), ptr_name) + tools_strerror_r(errno));
+			// Cygwin may return shorter name than expected using readdir (see class etage) which
+			// leads the file to be truncated, and thus when we here fetch inode information
+			// we get file non existent error. In that situation this is not the case of a
+			// file that has been removed between the time we read the directory content and the
+			// time here we read inode details, so we issue a warning in that situation
 		    break;
 		default:
 		    throw Erange("filesystem_hard_link_read::make_read_entree", string(gettext("Cannot read inode for ")) + ptr_name + " : " + tools_strerror_r(errno));
