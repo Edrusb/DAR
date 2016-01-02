@@ -1292,6 +1292,7 @@ namespace libdar
 				string size = local_size(*e_ino);
 				string stored = local_storage_size(*e_ino);
 				const cat_file *reg = dynamic_cast<const cat_file *>(e_ino); // ino is no more it->second (if it->second was a cat_mirage)
+				const crc *crc_tmp = nullptr;
 
 				saved_status data_st;
 				cat_inode::ea_status ea_st = isolated ? cat_inode::ea_fake : e_ino->ea_get_saved_status();
@@ -1352,28 +1353,27 @@ namespace libdar
 				case 'f': // plain files
 				    if(data_st == s_saved)
 				    {
-					const crc *tmp = nullptr;
 					const cat_file * f_ino = dynamic_cast<const cat_file *>(e_ino);
 
 					if(f_ino == nullptr)
 					    throw SRC_BUG;
 					dirty = yes_no(f_ino->is_dirty());
 					sparse= yes_no(f_ino->get_sparse_file_detection_read());
-
-					if(reg == nullptr)
-					    throw SRC_BUG; // f is signature for plain files
-					if(reg->get_crc(tmp) && tmp != nullptr)
-					    chksum = tmp->crc2str();
-					else
-					    chksum = "";
 				    }
 				    else
 				    {
 					stored = "";
-					chksum = "";
 					dirty = "";
 					sparse = "";
 				    }
+
+				    if(reg == nullptr)
+					throw SRC_BUG; // f is signature for plain files
+				    if(reg->get_crc(crc_tmp) && crc_tmp != nullptr)
+					chksum = crc_tmp->crc2str();
+				    else
+					chksum = "";
+
 				    get_ui().printf("%S<File name=\"%S\" size=\"%S\" stored=\"%S\" crc=\"%S\" dirty=\"%S\" sparse=\"%S\">\n",
 						    &beginning, &name, &size, &stored, &chksum, &dirty, &sparse);
 				    xml_listing_attributes(get_ui(), beginning, data, metadata, e, list_ea);

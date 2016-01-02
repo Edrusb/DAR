@@ -121,6 +121,7 @@ namespace libdar
 					     options.get_execute(),
 					     second_terminateur_offset,
 					     options.get_lax(),
+					     options.is_external_catalogue_set(),
 					     options.get_sequential_read(),
 					     options.get_info_details(),
 					     gnupg_signed,
@@ -169,6 +170,7 @@ namespace libdar
 							 options.get_ref_execute(),
 							 ref_second_terminateur_offset,
 							 options.get_lax(),
+							 false, // has an external catalogue
 							 false, // sequential_read is never used to retreive the isolated catalogue (well, that's possible and easy to add this feature), see later ...
 							 options.get_info_details(),
 							 tmp1_signatories,

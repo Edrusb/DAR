@@ -1040,11 +1040,39 @@ AC_ARG_ENABLE(  [gpgme-linking],
 		  if test $local_crypto != no ; then
   		    gpgme_min_version="1.2.0"
 		    AC_DEFINE_UNQUOTED(GPGME_MIN_VERSION, "$gpgme_min_version", [minimum version expected of GPGME])
-		    AC_CHECK_HEADERS([gpgme.h])
 		    AM_PATH_GPGME($gpgme_min_version,
 		      		[
-				  local_gpgme="yes"
-				  AC_DEFINE(GPGME_SUPPORT, 1, [GPGME is available to support public key based ciphering])
+				  CPPFLAGS___cache="$CPPFLAGS"
+				  CPPFLAGS="$GPGME_CFLAGS $CPPFLAGS"
+				  LDFLAGS___cache="$LDFLAGS"
+				  LDFLAGS="$GPGME_LIBS $LFDLAGS"
+				  AC_CHECK_HEADERS([gpgme.h])
+				  AC_MSG_CHECKING([for libgpgme usability])
+				  AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+								    #if HAVE_GPGME_H
+								    #include <gpgme.h>
+								    #endif
+								 ]],
+								 [[
+								    gpgme_ctx_t context;
+								    gpgme_error_t err = gpgme_new(&context);
+								    gpgme_release(context);
+								    return err;
+								 ]])
+						 ],
+						 [
+						   local_gpgme="yes"
+						   AC_DEFINE(GPGME_SUPPORT, 1, [GPGME is available to support public key based ciphering])
+						   AC_MSG_RESULT(ok)
+						 ],
+						 [
+						   local_gpgme="no"
+						   AC_MSG_RESULT([not usable! See config.log for details])
+						 ])
+				  CPPFLAGS="$CPPFLAGS___cache"
+				  unset CPPFLAGS___cache
+				  LDFLAGS="$LDFLAGS___cache"
+				  unset LDFLAGS___cache
 				],
 				[]
 			       )

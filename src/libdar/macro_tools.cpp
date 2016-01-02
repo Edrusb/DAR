@@ -351,6 +351,7 @@ namespace libdar
                                   const string & execute,
 				  infinint & second_terminateur_offset,
 				  bool lax,
+				  bool has_external_cat,
 				  bool sequential_read,
 				  bool info_details,
 				  list<signator> & gnupg_signed,
@@ -500,7 +501,13 @@ namespace libdar
 	    ver.read(stack, dialog, lax);
 
 	    if(second_terminateur_offset.is_zero() && !sequential_read && ver.get_edition() > 7)
-		dialog.pause(gettext("Found a correct archive header at the beginning of the archive, which does not stands to be an old archive, the end of the archive is thus corrupted. If you have an external catalog given as reference we can continue, OK ?"));
+		if(!has_external_cat)
+		{
+		    if(!lax)
+			throw Erange("macro_tools_open_archive",gettext("Found a correct archive header at the beginning of the archive, which does not stands to be an old archive, the end of the archive is corrupted and thus the catalogue is not readable, aborting. Either retry providing in addition an isolated catalogue of that archive to perform the operation, or try reading the archive in sequential mode or try in lax mode or, last chance, try both lax and sequential read mode at the same time"));
+		    else
+			dialog.pause(gettext("Found a correct archive header at the beginning of the archive, which does not stands to be an old archive, the end of the archive is thus corrupted. Without external catalogue provided and as we do not read the archive in sequential mode, there is very little chance to retreive something from this corrupted archive. Do we continue anyway ?"));
+		}
 
 
 		// *************  adding a tronc to hide last terminator and trailer_version ******* //
@@ -946,7 +953,7 @@ namespace libdar
 		stats = ret->get_stats();
 		dialog.printf(gettext("Could read a catalogue data structure at offset %i, it contains the following:"), &offset);
 		stats.listing(dialog);
-		dialog.pause(gettext("Do you want to use it for restoration?"));
+		dialog.pause(gettext("Do you want to use it for the operation?"));
 		ok = true;
 	    }
 	    catch(Ebug & e)
@@ -1041,7 +1048,9 @@ namespace libdar
 				   const label & data_name,
 				   bool multi_threaded)
     {
+#if GPGME_SUPPORT
 	U_I gnupg_key_size;
+#endif
 
 	try
 	{

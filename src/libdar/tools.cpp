@@ -3045,7 +3045,9 @@ namespace libdar
 	U_I len;
 
 	if(name_max == -1)
-	    name_max = 255;
+	    name_max = NAME_MAX;
+	if(name_max < NAME_MAX)
+	    name_max = NAME_MAX;
 	len = offsetof(struct dirent, d_name) + name_max + 1;
 	if(pool == nullptr)
 	    ret = (struct dirent *) new (nothrow) char[len];

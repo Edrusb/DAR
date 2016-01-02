@@ -390,8 +390,11 @@ namespace libdar
 		    encrypted_buf_data = extra_buf_data;
 		    extra_buf_data = 0;
 		}
-		else // else we drop empty encrypted_buf
+		else // else we empty encrypted_buf and extra_buf
+		{
+		    extra_buf_data = 0;
 		    encrypted_buf_data = 0;
+		}
 
 		    // we skip at the beginning of the crypted block plus the already read bytes from extra_buf
 		if(!encrypted->skip(crypt_offset + initial_shift + encrypted_buf_data))

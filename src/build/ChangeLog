@@ -1,3 +1,17 @@
+from 2.5.2 to 2.5.3
+- fixing a 2.5.x build issue met when a 2.4.x libdar library is already
+  installed in an FreeBSD system.
+- improving message and behavior of libdar in lax mod when reading a truncated
+  archive is read
+- fixing self reported bug at "tronconneuse.cpp line 561" met while reading
+  truncated/corrupted archive
+- fixed unclosed filedescriptors problem met when saving a filesystem that has
+  not ExtX FSA available
+- fixing configure script to be more robust in front of system where gpgme.h is
+  installed in non standard path and user did not provide coherent CPPFLAGS,
+  LDFLAGS before calling ./configure
+- displaying CRC values when listing isolated catalogue using the XML format
+
 from 2.5.1 to 2.5.2
 - fixed bug met when permission is denied while reading or writing slices
 - fixing bug that avoided creating an archive at the root of the filesystem

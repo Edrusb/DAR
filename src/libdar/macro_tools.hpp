@@ -129,6 +129,7 @@ namespace libdar
                                          const std::string & execute,          //< command to execute between slices
 					 infinint & second_terminateur_offset, //< where to start looking for the second terminateur (set to zero if there is only one terminateur).
 					 bool lax,  // whether we skip&warn the usual verifications
+					 bool has_external_cat,    //< true if the catalogue will not be read from the current archive (flag used in lax mode only)
 					 bool sequential_read, // whether to use the escape sequence (if present) to get archive contents and proceed to sequential reading
 					 bool info_details,    // be or not verbose about the archive openning
 					 std::list<signator> & gnupg_signed, //< list of existing signature found for that archive (valid or not)
