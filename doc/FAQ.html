@@ -1,11 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
-  
-  <meta content="text/html; charset=us-ascii" http-equiv="content-type">
-  <title>DAR - Frequently Asked Questions</title>
+
 
   
-</head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
+  <meta content="text/html; charset=us-ascii" http-equiv="content-type"><title>DAR - Frequently Asked Questions</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -81,8 +79,9 @@ cannot dar use the full power of my multi-processor computer?</a><br>
 mean it is?</a><br>
       <a style="font-weight: bold; font-style: italic;" href="#How_to_solve_configure:_error:_Cannot">How to solve "configure:
 error: Cannot find size_t type"?</a><br>
-      </span><a href="#slow"><span style="font-weight: bold; font-style: italic;">Why dar became much
-slower since release 2.4.0 ?</span></a><br>
+      </span><a href="#slow_2_4_0"><span style="font-weight: bold; font-style: italic;">Why dar became much
+slower since release 2.4.0?</span></a><br>
+      <span style="font-style: italic; font-weight: bold;"><a href="#slow_2_5_0">Why dar became yet slower since release 2.5.0?</a></span><br>
       <span style="font-weight: bold; font-style: italic;"><a style="font-weight: bold; font-style: italic;" href="#search_for_questions">How to search for questions (and their
 answers) about <span style="font-weight: bold; font-style: italic;">known</span>
 problems similar to mines?</a><br>
@@ -2347,8 +2346,8 @@ are using gcc binary from a distro, double check you have installed the
 C++ support for gcc.<br>
       <br>
       </div>
-      <a name="slow"></a><span style="font-style: italic; font-weight: bold;">Why dar became much
-slower since release 2.4.0 ?</span><br>
+      <a name="slow_2_4_0"></a><span style="font-style: italic; font-weight: bold;">Why dar became much
+slower since release 2.4.0?</span><br>
       <div style="margin-left: 40px;"> <br>
 This is the drawback of new features!<br>
       <ul>
@@ -2359,7 +2358,7 @@ for example when a new file starts. This way dar can skip to the next
 mark upon archive corruption or if the given file has not to be
 restored. However, if such a sequence of byte is found into a file's
 data, it must be modified not to collide with real escape sequences.
-This implies to dar to inspect all data added to an archive for
+This leads dar to inspect all data added to an archive for
 such sequence of byte, instead of just copying the data to the archive
 (eventually compressing and cyphering it).</li>
         <li>The other feature that brings an important overhead is the
@@ -2375,7 +2374,36 @@ option, which completely disables the sparse file detection. The
 execution time becomes back the same as the one of dar 2.3.x releases.<br>
       <br>
       </div>
-      <span style="font-style: italic; font-weight: bold;"><a name="search_for_questions"></a>How to search for questions (and their
+      <span style="font-style: italic; font-weight: bold;"><br>
+      <a name="slow_2_5_0"></a>Why dar became yet slower since release 2.5.0?<br>
+      </span>
+      <div style="margin-left: 40px;"> <br>
+This is again the drawback of new features!<br>
+      <ul><li>The
+first feature that drain time is <span style="font-weight: bold;">Filesystem Specific Attributes (FSA)</span>,
+as it requires new system calls for each new files to save. This has
+little impact when saving a lot of big files but become visible when
+saving a lot a tiny files or directories.<br>
+</li><li>The second feature is the use of <span style="font-weight: bold;">fadvise()</span>
+system call that preserves
+cache usage. In other words dar tells the system it does not need
+anymore a file when it has been read (backup) or written (restoration)
+this has the advantage to reduce cache presure from dar to the benefit
+of other running process needs. The idea here is to preserves as much
+as possible a live operating system from being affected by a running
+backup relying on dar. The consequence is that if running dar a second
+time on the same set of file, with dar 2.4.x and below the data to save
+was most of the time in the cache which could lead to very fast
+execution, while with dar 2.5.x the data to save may have been flushed
+out of the cache by more important data for another application. This
+second time dar is run, the data has to be read again from disk which
+does not bring the same very fast execution as reading from cache.<br>
+</li></ul>
+You can disable both of these features. The first can be disabled <span style="text-decoration: underline;">at compilation time</span> giving <span style="font-weight: bold;">--disable-fadvise</span> to the <span style="font-weight: bold;">./configure</span> script. The second option can be disabled at any time by adding the <span style="font-weight: bold;">--fsa-scope=none</span> option to <span style="font-weight: bold;">dar</span>. The execution time becomes back then the same as the one of dar 2.4.x releases.<br>
+      </div>
+
+      <span style="font-style: italic; font-weight: bold;"></span><span style="font-style: italic; font-weight: bold;"><br>
+<a name="search_for_questions"></a>How to search for questions (and their
 answers) about known problems similar to mines?</span><br>
       <div style="margin-left: 40px;"><br>
 Before
