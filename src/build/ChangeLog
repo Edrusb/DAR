@@ -13,6 +13,8 @@ from 2.5.2 to 2.5.3
 - displaying CRC values when listing isolated catalogue using the XML format
 - fixing compilation issue when system does not provide strerror_r() call
 - avoiding warning message about FSA absence when fsa-scope is set to "none"
+- adding --disable-fadvise option to configure script for those that want
+  back full pressure from dar on the system cache (same behavior as 2.4.x)
 
 from 2.5.1 to 2.5.2
 - fixed bug met when permission is denied while reading or writing slices

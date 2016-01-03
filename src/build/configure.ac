@@ -225,20 +225,6 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 		  ],
 		  [AC_MSG_RESULT([not available])])
 
-AC_MSG_CHECKING([for posix_fadvise support])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
-			          #if HAVE_FCNTL_H
-				  #include <fcntl.h>
-				  #endif
-				  }]],
-				  [ (void)posix_fadvise(0,0,1,POSIX_FADV_NORMAL); ])
-                  ],
-		  [
-		     AC_DEFINE(HAVE_POSIX_FADVISE, 1, [whether the system has support for posix_fadvise()])
-		     local_posix_fadvise="yes"
-		     AC_MSG_RESULT(available)
-                  ],
-		  [  AC_MSG_RESULT([not available]) ])
 
 
 AC_MSG_CHECKING([for POSIX.1e capabilities support])
@@ -721,6 +707,29 @@ AC_ARG_ENABLE(  [gnugetopt],
                 [],
                 AC_CHECK_LIB(gnugetopt, [getopt_long], [], [])
              )
+
+AC_ARG_ENABLE(  [fadvise],
+		AC_HELP_STRING(--disable-fadvise, [avoid using fadvise(2) system call]),
+		[],
+		[
+                  AC_MSG_CHECKING([for posix_fadvise support])
+                  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
+		  	                               #if HAVE_FCNTL_H
+						       #include <fcntl.h>
+				  		       #endif
+				  		       }]],
+				  		       [ (void)posix_fadvise(0,0,1,POSIX_FADV_NORMAL); ])
+                		    ],
+		  		    [
+				      AC_DEFINE(HAVE_POSIX_FADVISE, 1, [whether the system has support for posix_fadvise()])
+		     		      local_posix_fadvise="yes"
+		     		      AC_MSG_RESULT(available)
+                  		    ],
+				    [ AC_MSG_RESULT([not available]) ]
+				   )
+	        ]
+              )
+
 
 # AC_ARG_ENABLE( [librsync-linking],
 #                AC_HELP_STRING(--disable-librsync-linking, [disable linking with librsync and disable delta compression support]),
