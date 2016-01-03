@@ -2875,6 +2875,7 @@ namespace libdar
         char buffer[MSGSIZE];
         string ret;
 
+#ifdef HAVE_STRERROR_R
 #ifdef HAVE_STRERROR_R_CHAR_PTR
         char *val = strerror_r(errnum, buffer, MSGSIZE);
         if(val != buffer)
@@ -2887,6 +2888,10 @@ namespace libdar
 	    string tmp = tools_printf(gettext("Error code %d to message conversion failed"), errnum);
             strncpy(buffer, tmp.c_str(), tools_min((size_t)(tmp.size()+1), (size_t)(MSGSIZE)));
 	}
+#endif
+#else
+	char *tmp = strerror(errnum);
+	(void)strncpy(buffer, tmp, MSGSIZE);
 #endif
         buffer[MSGSIZE-1] = '\0';
         ret = buffer;
