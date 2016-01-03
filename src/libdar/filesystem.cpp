@@ -434,7 +434,7 @@ namespace libdar
 ///////////////////////////////////////////////////////////////////
 
 
-    filesystem_backup::filesystem_backup(const user_interaction & dialog,
+    filesystem_backup::filesystem_backup(user_interaction & dialog,
 					 const path &root,
 					 bool x_info_details,
 					 const mask & x_ea_mask,
@@ -445,7 +445,7 @@ namespace libdar
 					 infinint & root_fs_device,
 					 bool x_ignore_unknown,
 					 const fsa_scope & scope)
-	: mem_ui(dialog), filesystem_hard_link_read(dialog, x_furtive_read_mode, scope)
+	: mem_ui(&dialog), filesystem_hard_link_read(dialog, x_furtive_read_mode, scope)
     {
 	fs_root = nullptr;
 	current_dir = nullptr;
@@ -738,14 +738,14 @@ namespace libdar
 ///////////////////////////////////////////////////////////////////
 
 
-    filesystem_diff::filesystem_diff(const user_interaction & dialog,
+    filesystem_diff::filesystem_diff(user_interaction & dialog,
 				     const path &root,
 				     bool x_info_details,
 				     const mask & x_ea_mask,
 				     bool x_alter_atime,
 				     bool x_furtive_read_mode,
 				     const fsa_scope & scope) :
-	mem_ui(dialog),
+	mem_ui(&dialog),
 	filesystem_hard_link_read(dialog, x_furtive_read_mode, scope)
     {
 	fs_root = nullptr;
@@ -1290,7 +1290,7 @@ namespace libdar
 ///////////////////////////////////////////////////////////////////
 
 
-    filesystem_restore::filesystem_restore(const user_interaction & dialog,
+    filesystem_restore::filesystem_restore(user_interaction & dialog,
 					   const path &root,
 					   bool x_warn_overwrite,
                                            bool x_info_details,
@@ -1301,7 +1301,7 @@ namespace libdar
 					   const crit_action *x_overwrite,
 					   bool x_only_overwrite,
 					   const fsa_scope & scope) :
-	mem_ui(dialog), filesystem_hard_link_write(dialog), filesystem_hard_link_read(dialog, true, scope)
+	mem_ui(&dialog), filesystem_hard_link_write(dialog), filesystem_hard_link_read(dialog, true, scope)
     {
 	fs_root = nullptr;
 	ea_mask = nullptr;

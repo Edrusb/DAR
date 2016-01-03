@@ -68,15 +68,15 @@ namespace libdar
             // it only provides some routine for the inherited classes
 
     public:
-	filesystem_hard_link_read(const user_interaction & dialog,
+	filesystem_hard_link_read(user_interaction & dialog,
 				  bool x_furtive_read_mode,
-				  const fsa_scope & scope) : mem_ui(dialog) { furtive_read_mode = x_furtive_read_mode; sc = scope; };
+				  const fsa_scope & scope) : mem_ui(&dialog) { furtive_read_mode = x_furtive_read_mode; sc = scope; };
 
 	    // the copy of the current object would make copy of addresses in
 	    // corres_read that could be released twice ... thus, copy constructor and
 	    // assignement are forbidden for this class:
 
-	filesystem_hard_link_read(const filesystem_hard_link_read & ref) : mem_ui(ref.get_ui()) { throw SRC_BUG; };
+	filesystem_hard_link_read(const filesystem_hard_link_read & ref) : mem_ui(ref) { throw SRC_BUG; };
 	const filesystem_hard_link_read & operator = (const filesystem_hard_link_read & ref) { throw SRC_BUG; };
 
 	    // get the last assigned number for a hard linked inode
@@ -138,7 +138,7 @@ namespace libdar
     class filesystem_backup : public filesystem_hard_link_read
     {
     public:
-        filesystem_backup(const user_interaction & dialog,
+        filesystem_backup(user_interaction & dialog,
 			  const path &root,
 			  bool x_info_details,
 			  const mask & x_ea_mask,
@@ -149,7 +149,7 @@ namespace libdar
 			  infinint & root_fs_device,
 			  bool x_ignore_unknown,
 			  const fsa_scope & scope);
-        filesystem_backup(const filesystem_backup & ref) : mem_ui(ref.get_ui()), filesystem_hard_link_read(ref.get_ui(), ref.furtive_read_mode, get_fsa_scope()) { copy_from(ref); };
+        filesystem_backup(const filesystem_backup & ref) : mem_ui(ref), filesystem_hard_link_read(ref.get_ui(), ref.furtive_read_mode, get_fsa_scope()) { copy_from(ref); };
         const filesystem_backup & operator = (const filesystem_backup & ref) { detruire(); copy_from(ref); return *this; };
         ~filesystem_backup() { detruire(); };
 
@@ -181,14 +181,14 @@ namespace libdar
     class filesystem_diff : public filesystem_hard_link_read
     {
     public:
-        filesystem_diff(const user_interaction & dialog,
+        filesystem_diff(user_interaction & dialog,
 			const path &root,
 			bool x_info_details,
 			const mask & x_ea_mask,
 			bool alter_atime,
 			bool furtive_read_mode,
 			const fsa_scope & scope);
-        filesystem_diff(const filesystem_diff & ref) : mem_ui(ref.get_ui()), filesystem_hard_link_read(ref.get_ui(), ref.furtive_read_mode, get_fsa_scope()) { copy_from(ref); };
+        filesystem_diff(const filesystem_diff & ref) : mem_ui(ref), filesystem_hard_link_read(ref.get_ui(), ref.furtive_read_mode, get_fsa_scope()) { copy_from(ref); };
         const filesystem_diff & operator = (const filesystem_diff & ref) { detruire(); copy_from(ref); return *this; };
         ~filesystem_diff() { detruire(); };
 
@@ -227,7 +227,7 @@ namespace libdar
             // it only provides routines to its inherited classes
 
     public:
-	filesystem_hard_link_write(const user_interaction & dialog) : mem_ui(dialog) { corres_write.clear(); };
+	filesystem_hard_link_write(user_interaction & dialog) : mem_ui(& dialog) { corres_write.clear(); };
 	filesystem_hard_link_write(const filesystem_hard_link_write & ref) : mem_ui(ref) { throw SRC_BUG; };
 	const filesystem_hard_link_write & operator = (const filesystem_hard_link_write & ref) { throw SRC_BUG; };
 
@@ -295,7 +295,7 @@ namespace libdar
     {
     public:
 	    /// constructor
-        filesystem_restore(const user_interaction & dialog,
+        filesystem_restore(user_interaction & dialog,
 			   const path & root,
 			   bool x_warn_overwrite,
 			   bool x_info_details,
