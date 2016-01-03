@@ -1142,8 +1142,6 @@ namespace libdar
 		    infinint seek;
 
 		    fichier_local dest = fichier_local(get_ui(), display, gf_write_only, 0700, false, true, false);
-			// telling to 'dest' to flush data from the cache as soon as possible
-		    dest.fadvise(fichier_global::advise_dontneed);
 			// the implicit destruction of dest (exiting the block)
 			// will close the 'ret' file descriptor (see ~fichier_local())
 		    ou = ref_fil->get_data(cat_file::normal);
@@ -1187,6 +1185,11 @@ namespace libdar
 			}
 			if(crc_dyn != nullptr)
 			    delete crc_dyn;
+
+			    // nop we do not sync before, so maybe some pages
+			    // will be kept in cache for Linux, maybe not for
+			    // other systems that support fadvise(2)
+			dest.fadvise(fichier_global::advise_dontneed);
 		    }
 		    catch(...)
 		    {

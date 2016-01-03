@@ -2824,6 +2824,10 @@ namespace libdar
 					    // is possible while there is no data to escape, this is just
 					    // a bit more slower.).
 				    }
+
+				    fichier_global *s_fic = dynamic_cast<fichier_global *>(source);
+				    if(s_fic != nullptr)
+					s_fic->fadvise(fichier_global::advise_dontneed);
 				    source->terminate();
 				}
 				catch(...)

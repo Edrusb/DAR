@@ -402,9 +402,6 @@ namespace libdar
 		if(mode != normal && mode != plain)
 		    throw SRC_BUG; // keep compressed/keep_hole is not possible on an inode take from a filesystem
 		ret = tmp = new (get_pool()) fichier_local(chemin, furtive_read_mode);
-		if(tmp != nullptr)
-			// telling *tmp to flush the data from the cache as soon as possible
-		    tmp->fadvise(fichier_global::advise_dontneed);
 	    }
 	    else // inode from archive
 		if(get_pile() == nullptr)
