@@ -491,7 +491,10 @@ namespace libdar
 		}
 	    }
 	    else
-		throw Erange("cat_inode::compare", gettext("No Filesystem Specific Attribute to compare with"));
+	    {
+		if(scope.size() > 0)
+		    throw Erange("cat_inode::compare", gettext("No Filesystem Specific Attribute to compare with"));
+	    }
 	    break;
 	case fsa_partial:
 	    if(other.fsa_get_saved_status() != fsa_none)

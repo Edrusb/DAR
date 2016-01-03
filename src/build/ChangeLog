@@ -12,6 +12,7 @@ from 2.5.2 to 2.5.3
   LDFLAGS before calling ./configure
 - displaying CRC values when listing isolated catalogue using the XML format
 - fixing compilation issue when system does not provide strerror_r() call
+- avoiding warning message about FSA absence when fsa-scope is set to "none"
 
 from 2.5.1 to 2.5.2
 - fixed bug met when permission is denied while reading or writing slices
