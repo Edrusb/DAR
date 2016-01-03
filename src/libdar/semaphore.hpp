@@ -75,12 +75,12 @@ namespace libdar
 	    /// which is either "start" or "end".
 	    /// \param[in] backup_hook_file_mask defines the path+filename of entry that need to have
 	    /// the hook executed before and after their backup
-	semaphore(const user_interaction & dialog,
+	semaphore(user_interaction & dialog,
 		  const std::string & backup_hook_file_execute,
 		  const mask & backup_hook_file_mask);
 
 	    /// copy constructor
-	semaphore(const semaphore & ref) : mem_ui(ref.get_ui()) { copy_from(ref); };
+	semaphore(const semaphore & ref) : mem_ui(ref) { copy_from(ref); };
 
 	    /// assignment operator
 	semaphore & operator = (const semaphore & ref) { detruit(); copy_from(ref); return *this; };
