@@ -1,24 +1,25 @@
 from 2.5.2 to 2.5.3
 - Fixing a 2.5.x build issue met when a 2.4.x libdar library is already
   installed in an FreeBSD system.
-- Improving message and behavior of libdar in lax mod when reading a truncated
+- Improving message and behavior of libdar in lax mod when a truncated
   archive is read
-- Fixing self reported bug at "tronconneuse.cpp line 561" met while reading
-  truncated/corrupted archive
-- Fixed unclosed filedescriptors problem met when saving a filesystem that has
+- Fixing self reported bug at "tronconneuse.cpp line 561" met while
+  reading truncated/corrupted archive
+- Fixed not closed filedescriptors, met when saving a filesystem that has
   not ExtX FSA available
-- Fixing configure script to be more robust in front of system where gpgme.h is
-  installed in non standard path and user did not provide coherent CPPFLAGS,
-  LDFLAGS before calling ./configure
-- Displaying CRC values when listing isolated catalogue using the XML format
+- Fixing configure script to be more robust in front of system where
+  gpgme.h is installed in a non standard path and user did not provide
+  coherent CPPFLAGS, LDFLAGS before calling ./configure
+- Displaying CRC values when listing isolated catalog as XML output
 - Fixing compilation issue when system does not provide strerror_r() call
-- Avoiding warning message about FSA absence when fsa-scope is set to "none"
+- Avoiding warning about FSA absence when fsa-scope is set to "none"
 - Adding --disable-fadvise option to configure script for those that want
   back full pressure from dar on the system cache (same behavior as 2.4.x)
-- Fixing bug, fadvise() called a wrong time making having no effect.
-- updating FAQ
-- improvement: print file type on verbose output
-- new feature: added %t macro reflecting the inode type to dar's
+- Fixing bug, fadvise() called a wrong time making it having no effect
+- updating FAQ about comparative performance from 2.4.x to 2.5.x
+- optimization: reduced the number of call to dup() at libdar startup
+- improvement: printing file type on verbose output
+- new feature: added %t macro reflecting the inode type in dar's
   --backup-hook-execute option
 
 from 2.5.1 to 2.5.2
