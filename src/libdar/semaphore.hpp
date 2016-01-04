@@ -111,6 +111,7 @@ namespace libdar
 	std::string filename; //< filename of that same file
 	infinint uid;         //< UID of that same file
 	infinint gid;         //< GID of that same file
+	unsigned char sig;    //< object type
 	std::string execute;  //< command to execute
 	const mask *match;    //< for which file to run the execute command
 

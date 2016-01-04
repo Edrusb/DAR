@@ -18,6 +18,8 @@ from 2.5.2 to 2.5.3
 - Fixing bug, fadvise() called a wrong time making having no effect.
 - updating FAQ
 - improvement: print file type on verbose output
+- new feature: added %t macro reflecting the inode type to dar's
+  --backup-hook-execute option
 
 from 2.5.1 to 2.5.2
 - fixed bug met when permission is denied while reading or writing slices

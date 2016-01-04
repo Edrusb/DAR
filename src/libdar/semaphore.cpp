@@ -42,6 +42,7 @@ namespace libdar
 	filename = "";
 	uid = 0;
 	gid = 0;
+	sig = '\0';
 	execute = backup_hook_file_execute;
 	match = backup_hook_file_mask.clone();
 	if(match == nullptr)
@@ -54,7 +55,7 @@ namespace libdar
     {
 	if(count == 1)
 	    throw SRC_BUG;
-	if(count > 1) // outer directory inder controlled backup (execute ran in "start" context)
+	if(count > 1) // outer directory under controlled backup (hook_execute() ran in "start" context)
 	{
 	    if(dynamic_cast<const cat_eod *>(object) != nullptr)
 		if(data_to_save)
@@ -88,6 +89,7 @@ namespace libdar
 		filename = o_nom->get_name();
 		uid = o_ino != nullptr ? o_ino->get_uid() : 0;
 		gid = o_ino != nullptr ? o_ino->get_gid() : 0;
+		sig = get_base_signature(object->signature());
 		tools_hook_execute(get_ui(), build_string("start"));
 	    }
 	}
@@ -110,6 +112,7 @@ namespace libdar
 	corres['p'] = chem;
 	corres['f'] = filename;
 	corres['c'] = context;
+	corres['t'] = tools_printf("%c", sig);
 
 	try
 	{
@@ -134,6 +137,7 @@ namespace libdar
 	filename = ref.filename;
 	uid = ref.uid;
 	gid = ref.gid;
+	sig = ref.sig;
 	execute = ref.execute;
 	if(ref.match == nullptr)
 	    throw SRC_BUG;
