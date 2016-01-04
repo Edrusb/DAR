@@ -2871,10 +2871,15 @@ namespace libdar
 		    if(resave_uncompressed)
 			dialog.warning(string(gettext("Resaving file without compression: ")) + info_quoi);
 		    else
+		    {
 			if(delta_sig_ref != nullptr)
 			    dialog.warning(string(gettext("Delta saving file to archive: ")) + info_quoi);
 			else
-			    dialog.warning(string(gettext("Saving file to archive: ")) + info_quoi);
+			{
+			    string i_type = entree_to_string(ino);
+			    dialog.warning(tools_printf(gettext("Adding %S to archive: %S"), &i_type, &info_quoi));
+			}
+		    }
 		}
 
 		if(fic != nullptr)
@@ -3031,6 +3036,9 @@ namespace libdar
 						// is possible while there is no data to escape, this is just
 						// a bit more slower.).
 					}
+					fichier_global *s_fic = dynamic_cast<fichier_global *>(source);
+					if(s_fic != nullptr)
+					    s_fic->fadvise(fichier_global::advise_dontneed);
 					source->terminate();
 				    }
 				    catch(...)

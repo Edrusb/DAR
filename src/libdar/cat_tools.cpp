@@ -33,6 +33,17 @@ using namespace std;
 
 namespace libdar
 {
+    const U_8 SAVED_FAKE_BIT = 0x80;
+    const U_8 SAVED_NON_DELTA_BIT = 0x40;
+    // in ASCII lower case letter have binary values 11xxxxx and higher case
+    // have binary values 10xxxxx The the 7th byte is always set to 1. We can
+    // thus play with it to store the delta diff flag:
+    // - when set to 1, this is a non delta binary file (backward compatibility)
+    //   and the signature byte is a letter (lower or higher case to tell whether
+    //   the inode is saved or not
+    // - when set to 0, this is a delta saved file, setting it back to 1 should
+    //   give a lower case letter corresponding to the inode type.
+
 
 	// local sub routines
 
@@ -248,6 +259,38 @@ namespace libdar
 	}
     }
 
+    bool extract_base_and_status(unsigned char signature, unsigned char & base, saved_status & saved)
+    {
+        bool fake = (signature & SAVED_FAKE_BIT) != 0;
+
+        signature &= ~SAVED_FAKE_BIT;
+        if(!isalpha(signature))
+            return false;
+        base = tolower(signature);
+
+        if(fake)
+            if(base == signature)
+                saved = s_fake;
+            else
+                return false;
+        else
+            if(signature == base)
+                saved = s_saved;
+            else
+                saved = s_not_saved;
+        return true;
+    }
+
+    bool extract_base_and_status_isolated(unsigned char sig, unsigned char & base, saved_status & state, bool isolated)
+    {
+	bool ret = extract_base_and_status(sig, base, state);
+
+	if(isolated)
+	    state = s_fake;
+
+	return ret;
+    }
+
     void local_display_ea(user_interaction & dialog,
 			  const cat_inode * ino,
 			  const string &prefix,
@@ -275,6 +318,116 @@ namespace libdar
 	}
     }
 
+    unsigned char mk_signature(unsigned char base, saved_status state)
+    {
+        if(! islower(base))
+            throw SRC_BUG;
+        switch(state)
+        {
+        case s_saved:
+            return base;
+        case s_fake:
+            return base | SAVED_FAKE_BIT;
+        case s_not_saved:
+            return toupper(base);
+        default:
+            throw SRC_BUG;
+        }
+    }
+
+    void unmk_signature(unsigned char sig, unsigned char & base, saved_status & state, bool isolated)
+    {
+        if((sig & SAVED_FAKE_BIT) == 0 && !isolated)
+            if(islower(sig))
+                state = s_saved;
+            else
+                state = s_not_saved;
+        else
+            state = s_fake;
+
+        base = tolower(sig & ~SAVED_FAKE_BIT);
+    }
+
+    bool compatible_signature(unsigned char a, unsigned char b)
+    {
+        a = tolower(a & ~SAVED_FAKE_BIT);
+        b = tolower(b & ~SAVED_FAKE_BIT);
+
+        switch(a)
+        {
+        case 'e':
+        case 'f':
+            return b == 'e' || b == 'f';
+        default:
+            return b == a;
+        }
+    }
+
+    unsigned char get_base_signature(unsigned char a)
+    {
+	unsigned char ret;
+	saved_status st;
+	unmk_signature(a, ret, st, false);
+	if(ret == 'e')
+	    ret = 'f';
+
+	return ret;
+    }
+
+    string entree_to_string(const cat_entree *obj)
+    {
+	string ret;
+	if(obj == nullptr)
+	    throw SRC_BUG;
+
+	switch(get_base_signature(obj->signature()))
+	{
+	case 'j':
+	    ret = gettext("ignored directory");
+	    break;
+	case 'd':
+	    ret = gettext("folder");
+	    break;
+	case 'x':
+	    ret = gettext("deleted file");
+	    break;
+	case 'o':
+	    ret = gettext("door");
+	    break;
+	case 'f':
+	    ret = gettext("file");
+	    break;
+	case 'l':
+	    ret = gettext("symlink");
+	    break;
+	case 'c':
+	    ret = gettext("char device");
+	    break;
+	case 'b':
+	    ret = gettext("block device");
+	    break;
+	case 'p':
+	    ret = gettext("pipe");
+	    break;
+	case 's':
+	    ret = gettext("socket");
+	    break;
+	case 'i':
+	    ret = gettext("ignored entry");
+	    break;
+	case 'm':
+	    ret = gettext("hard linked inode");
+	    break;
+	case 'z':
+	    ret = gettext("end of directory");
+	    break;
+	default:
+	    throw SRC_BUG; // missing inode type
+	}
+
+	return ret;
+    }
+
 	// local routine implementation
 
     static string local_fsa_fam_to_string(const cat_inode & ref)
@@ -294,8 +447,6 @@ namespace libdar
 
 	return ret;
     }
-
-
 
 } // end of namespace
 

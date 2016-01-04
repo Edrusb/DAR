@@ -236,12 +236,6 @@ namespace libdar
 	    if(tmp == nullptr)
 		throw SRC_BUG;
 
-		// telling the system to write data directly to disk not going through the cache
-	    tmp->fadvise(fichier_global::advise_dontneed);
-		// useless under Linux, because the corresponding implementation does not avoid the
-		// generated data to pass out of the cache. Maybe some other system can prevent the data
-		// from filling the cache ... so we keep it here in respect to the posix semantic
-
 	    set_info_status(CONTEXT_LAST_SLICE);
 	    reference = tmp;
 	    init(internal_name);
@@ -371,6 +365,11 @@ namespace libdar
 	    default:
 		throw SRC_BUG;
 	    }
+
+		// telling the system to free this file from the cache, when relying on a plain file
+	    fichier_global *ref_fic = dynamic_cast<fichier_global *>(reference);
+	    if(ref_fic != nullptr)
+		ref_fic->fadvise(fichier_global::advise_dontneed);
 
 	    delete reference; // this closes the slice so we can now eventually play with it:
 	    reference = nullptr;

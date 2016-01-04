@@ -42,8 +42,13 @@ namespace libdar
     {
 	if(ui != nullptr)
 	{
-	    delete ui;
-	    ui = nullptr;
+	    if(cloned)
+	    {
+		delete ui;
+		ui = nullptr;
+	    }
+	    else
+		ui = nullptr;
 	}
     }
 
@@ -52,7 +57,18 @@ namespace libdar
 	if(ref.ui == nullptr)
 	    ui = nullptr;
 	else
-	    set_ui(*(ref.ui));
+	{
+	    if(ref.cloned)
+	    {
+		set_ui(*(ref.ui));
+		cloned = true;
+	    }
+	    else
+	    {
+		ui = ref.ui;
+		cloned = false;
+	    }
+	}
     }
 
     void mem_ui::set_ui(const user_interaction & dialog)
@@ -60,6 +76,7 @@ namespace libdar
 	ui = dialog.clone();
 	if(ui == nullptr)
 	    throw Ememory("mem_ui::set_ui");
+	cloned = true;
     }
 
 } // end of namespace

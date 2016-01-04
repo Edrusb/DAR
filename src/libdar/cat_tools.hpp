@@ -60,8 +60,18 @@ namespace libdar
 				       const std::string & metadata,   //< ("saved" | "referenced" | "absent")
 				       const cat_entree * obj = nullptr, //< the object to display cat_inode information about
 				       bool list_ea = false);     //< whether to list Extended Attributes
+    extern bool extract_base_and_status(unsigned char signature, unsigned char & base, saved_status & saved);
+    extern bool extract_base_and_status_isolated(unsigned char sig, unsigned char & base, saved_status & state, bool isolated);
     extern void local_display_ea(user_interaction & dialog, const cat_inode * ino, const std::string &prefix, const std::string &suffix, bool xml_output = false);
+    extern unsigned char mk_signature(unsigned char base, saved_status state);
+    extern void unmk_signature(unsigned char sig, unsigned char & base, saved_status & state, bool isolated);
+    extern bool compatible_signature(unsigned char a, unsigned char b);
+    extern unsigned char get_base_signature(unsigned char a);
 
+	/// returns a string describing the object type
+	///
+	/// \note argument must point to a valid object
+    extern std::string entree_to_string(const cat_entree *obj);
 
 	/// @}
 

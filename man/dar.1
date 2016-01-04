@@ -857,6 +857,9 @@ will be replaced by the UID of the file
 %g
 will be replaced by the GID of the file
 .TP 10
+%t
+will be replaced by a letter corresponding to the type of inode: 'f' for plain file, 'l' for symlink, 'd' for directory, 'c' for char devices, 'b' for block devices, 's' for sockets, 'p' for pipes, 'o' for doors.
+.TP 10
 %c
 and most interesting, %c (c for context), will be replaced by "start" or by "end" when the command is executed before or after the backup respectively.
 .RE

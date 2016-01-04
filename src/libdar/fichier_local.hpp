@@ -103,7 +103,7 @@ namespace libdar
 
     protected :
 	    // inherited from generic_file grand-parent class
-	void inherited_read_ahead(const infinint & amount) { fadvise(fichier_global::advise_sequential); };
+	void inherited_read_ahead(const infinint & amount) {}; // nothing done, calling readahead(2) could be added in the future
 	void inherited_sync_write() { fsync(); };
 	void inherited_flush_read() {}; // nothing stored in transit in this object
 	void inherited_terminate() { if(adv == advise_dontneed) fadvise(adv); };

@@ -33,6 +33,7 @@ extern "C"
 } // end extern "C"
 
 #include "cat_device.hpp"
+#include "cat_tools.hpp"
 
 namespace libdar
 {

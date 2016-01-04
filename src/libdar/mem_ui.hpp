@@ -61,6 +61,11 @@ namespace libdar
 	    /// for you later be able to call get_ui() at any time from the inherited class
 	mem_ui(const user_interaction & dialog) { set_ui(dialog); };
 
+	    /// \param[in] dialog pointer to a user_interaction object that will be *referred* to
+	    /// and which must stay alive during the whole life of "this" object. This object is not
+	    /// destroyed nor cloned by mem_ui.
+	mem_ui(user_interaction *dialog) { ui = dialog; cloned = false; };
+
 	    /// the copy constructor
 
 	    /// need to be called from the copy constructor of any inherited class that explicitely define one
@@ -88,6 +93,7 @@ namespace libdar
 
     private:
 	user_interaction *ui;
+	bool cloned;
 
 	void detruire();
 	void copy_from(const mem_ui & ref);
