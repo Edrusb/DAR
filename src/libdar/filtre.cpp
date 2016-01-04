@@ -2684,7 +2684,10 @@ namespace libdar
 		if(resave_uncompressed)
 		    dialog.warning(string(gettext("Resaving file without compression: ")) + info_quoi);
 		else
-		    dialog.warning(string(gettext("Adding file to archive: ")) + info_quoi);
+		{
+		    string i_type = entree_to_string(ino);
+		    dialog.warning(tools_printf(gettext("Adding %S to archive: %S"), &i_type, &info_quoi));
+		}
 	    }
 
 	    cat_file *fic = dynamic_cast<cat_file *>(ino);

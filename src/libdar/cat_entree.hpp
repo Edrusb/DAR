@@ -194,10 +194,6 @@ namespace libdar
 	pile_descriptor pdesc;
     };
 
-    extern bool compatible_signature(unsigned char a, unsigned char b);
-    extern unsigned char mk_signature(unsigned char base, saved_status state);
-    extern unsigned char get_base_signature(unsigned char a);
-
 	/// @}
 
 } // end of namespace

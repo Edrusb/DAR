@@ -17,6 +17,7 @@ from 2.5.2 to 2.5.3
   back full pressure from dar on the system cache (same behavior as 2.4.x)
 - Fixing bug, fadvise() called a wrong time making having no effect.
 - updating FAQ
+- improvement: print file type on verbose output
 
 from 2.5.1 to 2.5.2
 - fixed bug met when permission is denied while reading or writing slices

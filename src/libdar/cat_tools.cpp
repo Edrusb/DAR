@@ -286,6 +286,116 @@ namespace libdar
 	}
     }
 
+    unsigned char mk_signature(unsigned char base, saved_status state)
+    {
+        if(! islower(base))
+            throw SRC_BUG;
+        switch(state)
+        {
+        case s_saved:
+            return base;
+        case s_fake:
+            return base | SAVED_FAKE_BIT;
+        case s_not_saved:
+            return toupper(base);
+        default:
+            throw SRC_BUG;
+        }
+    }
+
+    void unmk_signature(unsigned char sig, unsigned char & base, saved_status & state, bool isolated)
+    {
+        if((sig & SAVED_FAKE_BIT) == 0 && !isolated)
+            if(islower(sig))
+                state = s_saved;
+            else
+                state = s_not_saved;
+        else
+            state = s_fake;
+
+        base = tolower(sig & ~SAVED_FAKE_BIT);
+    }
+
+    bool compatible_signature(unsigned char a, unsigned char b)
+    {
+        a = tolower(a & ~SAVED_FAKE_BIT);
+        b = tolower(b & ~SAVED_FAKE_BIT);
+
+        switch(a)
+        {
+        case 'e':
+        case 'f':
+            return b == 'e' || b == 'f';
+        default:
+            return b == a;
+        }
+    }
+
+    unsigned char get_base_signature(unsigned char a)
+    {
+	unsigned char ret;
+	saved_status st;
+	unmk_signature(a, ret, st, false);
+	if(ret == 'e')
+	    ret = 'f';
+
+	return ret;
+    }
+
+    string entree_to_string(const cat_entree *obj)
+    {
+	string ret;
+	if(obj == nullptr)
+	    throw SRC_BUG;
+
+	switch(get_base_signature(obj->signature()))
+	{
+	case 'j':
+	    ret = gettext("ignored directory");
+	    break;
+	case 'd':
+	    ret = gettext("folder");
+	    break;
+	case 'x':
+	    ret = gettext("deleted file");
+	    break;
+	case 'o':
+	    ret = gettext("door");
+	    break;
+	case 'f':
+	    ret = gettext("file");
+	    break;
+	case 'l':
+	    ret = gettext("symlink");
+	    break;
+	case 'c':
+	    ret = gettext("char device");
+	    break;
+	case 'b':
+	    ret = gettext("block device");
+	    break;
+	case 'p':
+	    ret = gettext("pipe");
+	    break;
+	case 's':
+	    ret = gettext("socket");
+	    break;
+	case 'i':
+	    ret = gettext("ignored entry");
+	    break;
+	case 'm':
+	    ret = gettext("hard linked inode");
+	    break;
+	case 'z':
+	    ret = gettext("end of directory");
+	    break;
+	default:
+	    throw SRC_BUG; // missing inode type
+	}
+
+	return ret;
+    }
+
 	// local routine implementation
 
     static string local_fsa_fam_to_string(const cat_inode & ref)
@@ -305,8 +415,6 @@ namespace libdar
 
 	return ret;
     }
-
-
 
 } // end of namespace
 

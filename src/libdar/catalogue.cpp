@@ -81,7 +81,6 @@ using namespace std;
 namespace libdar
 {
 
-    static void unmk_signature(unsigned char sig, unsigned char & base, saved_status & state, bool isolated);
     static bool local_check_dirty_seq(escape *ptr);
 
     static inline string yes_no(bool val) { return (val ? "yes" : "no"); }
@@ -1802,20 +1801,6 @@ namespace libdar
 
     const cat_eod catalogue::r_eod;
     const U_I catalogue::CAT_CRC_SIZE = 4;
-
-
-    static void unmk_signature(unsigned char sig, unsigned char & base, saved_status & state, bool isolated)
-    {
-        if((sig & SAVED_FAKE_BIT) == 0 && !isolated)
-            if(islower(sig))
-                state = s_saved;
-            else
-                state = s_not_saved;
-        else
-            state = s_fake;
-
-        base = tolower(sig & ~SAVED_FAKE_BIT);
-    }
 
 
     static bool local_check_dirty_seq(escape *ptr)

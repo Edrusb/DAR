@@ -34,24 +34,6 @@ using namespace std;
 namespace libdar
 {
 
-    unsigned char mk_signature(unsigned char base, saved_status state)
-    {
-        if(! islower(base))
-            throw SRC_BUG;
-        switch(state)
-        {
-        case s_saved:
-            return base;
-        case s_fake:
-            return base | SAVED_FAKE_BIT;
-        case s_not_saved:
-            return toupper(base);
-        default:
-            throw SRC_BUG;
-        }
-    }
-
-
     const U_I cat_entree::ENTREE_CRC_SIZE = 2;
 
     void entree_stats::add(const cat_entree *ref)
@@ -445,29 +427,5 @@ namespace libdar
 
 	return ret;
     }
-
-    bool compatible_signature(unsigned char a, unsigned char b)
-    {
-        a = tolower(a & ~SAVED_FAKE_BIT);
-        b = tolower(b & ~SAVED_FAKE_BIT);
-
-        switch(a)
-        {
-        case 'e':
-        case 'f':
-            return b == 'e' || b == 'f';
-        default:
-            return b == a;
-        }
-    }
-
-    unsigned char get_base_signature(unsigned char a)
-    {
-	unsigned char ret = tolower(a & ~SAVED_FAKE_BIT);
-	if(ret == 'e')
-	    ret = 'f';
-	return ret;
-    }
-
 
 } // end of namespace
