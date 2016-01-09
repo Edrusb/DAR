@@ -1,3 +1,6 @@
+from 2.5.3 to 2.5.4
+- fixing missing included files for libdar API
+
 from 2.5.2 to 2.5.3
 - Fixing a 2.5.x build issue met when a 2.4.x libdar library is already
   installed in an FreeBSD system.
