@@ -1300,7 +1300,7 @@ namespace libdar
 	{
 	    const crc *my_crc = nullptr;
 
-	    if(get_crc(my_crc)) // we have a CRC available for data
+	    if(get_crc(my_crc) && get_saved_status() != s_delta) // we have a CRC available for data
 	    {
 		    // just compare CRC (as for isolated_mode)
 
