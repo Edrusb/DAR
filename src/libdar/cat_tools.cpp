@@ -262,22 +262,33 @@ namespace libdar
     bool extract_base_and_status(unsigned char signature, unsigned char & base, saved_status & saved)
     {
         bool fake = (signature & SAVED_FAKE_BIT) != 0;
+	bool non_delta = (signature & SAVED_NON_DELTA_BIT) != 0;
 
         signature &= ~SAVED_FAKE_BIT;
+	signature |= SAVED_NON_DELTA_BIT;
         if(!isalpha(signature))
             return false;
         base = tolower(signature);
 
         if(fake)
             if(base == signature)
-                saved = s_fake;
-            else
-                return false;
+		if(non_delta)
+		    saved = s_fake;
+		else
+		    return false; // cannot be s_fake and s_delta at the same time
+	    else
+		return false;
         else
             if(signature == base)
-                saved = s_saved;
+		if(non_delta)
+		    saved = s_saved;
+		else
+		    saved = s_delta;
             else
-                saved = s_not_saved;
+		if(non_delta)
+		    saved = s_not_saved;
+		else
+		    return false; // cannot be s_not_saved and s_delta at the same time
         return true;
     }
 
@@ -330,6 +341,8 @@ namespace libdar
             return base | SAVED_FAKE_BIT;
         case s_not_saved:
             return toupper(base);
+	case s_delta:
+	    return base & ~SAVED_NON_DELTA_BIT;
         default:
             throw SRC_BUG;
         }
@@ -337,21 +350,13 @@ namespace libdar
 
     void unmk_signature(unsigned char sig, unsigned char & base, saved_status & state, bool isolated)
     {
-        if((sig & SAVED_FAKE_BIT) == 0 && !isolated)
-            if(islower(sig))
-                state = s_saved;
-            else
-                state = s_not_saved;
-        else
-            state = s_fake;
-
-        base = tolower(sig & ~SAVED_FAKE_BIT);
+	extract_base_and_status_isolated(sig, base, state, isolated);
     }
 
     bool compatible_signature(unsigned char a, unsigned char b)
     {
-        a = tolower(a & ~SAVED_FAKE_BIT);
-        b = tolower(b & ~SAVED_FAKE_BIT);
+        a = get_base_signature(a);
+        b = get_base_signature(b);
 
         switch(a)
         {

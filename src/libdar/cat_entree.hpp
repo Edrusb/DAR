@@ -54,7 +54,7 @@ namespace libdar
 	s_saved,      //< inode is saved in the archive
 	s_fake,       //< inode is not saved in the archive but is in the archive of reference (isolation context) s_fake is no more used in archive format "08" and above: isolated catalogue do keep the data pointers and s_saved stays a valid status in isolated catalogues.
 	s_not_saved,  //< inode is not saved in the archive
-	s_delta       //< inode is saved but as delta binary from the content of found in the archive of reference
+	s_delta       //< inode is saved but as delta binary from the content (delta signature) of what was found in the archive of reference
     };
 
 	/// holds the statistics contents of a catalogue
