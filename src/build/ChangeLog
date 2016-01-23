@@ -1,5 +1,7 @@
 from 2.5.3 to 2.5.4
 - fixing missing included files for libdar API
+- removed extra try/catch block introduced by commit
+  72da5cad5e52f959414b3163a2e2a320c2bc721e
 
 from 2.5.2 to 2.5.3
 - Fixing a 2.5.x build issue met when a 2.4.x libdar library is already

@@ -1544,14 +1544,7 @@ namespace libdar
 		    {
 			if(has_data_saved)
 			{
-			    try
-			    {
-				action_over_data(exists_ino, x_nom, spot_display, act_data, data_restored);
-			    }
-			    catch(Egeneric & e)
-			    {
-
-			    }
+			    action_over_data(exists_ino, x_nom, spot_display, act_data, data_restored);
 			}
 			else // no data saved in the object to restore
 			{
