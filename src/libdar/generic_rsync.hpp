@@ -76,11 +76,11 @@ namespace libdar
 	    ///
 	    /// in this mode the generic_rsync object is read only, the data read from
 	    /// it is built from the current file's data and the delta signature
-	    /// at the time of object termination, the on fly computed CRC of the current_file's
-	    /// read data is compared to the original CRC given in argument. If they do
-	    /// not match, an exception Edata is thrown.
+	    /// as a first step the on current data CRC is computed CRC and compared
+	    /// to the original CRC given in argument. If they do not match, an exception
+	    /// Edata is thrown and nothing is modified on filesystem.
 	    /// \param[in] current_data is a read_only object that contains the data to be used
-	    /// as base for the patched (this data is not modified)
+	    /// as base for the patch (this data is not modified)
 	    /// \param[in] base_signature is read only and contains the patch to apply
 	    /// \param[in] original_crc is the CRC of the original file that the patch
 	    /// should be applied to. If nullptr is given, to CRC check is performed

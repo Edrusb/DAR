@@ -115,6 +115,7 @@ extern "C"
 #include "ea_filesystem.hpp"
 #include "cygwin_adapt.hpp"
 #include "fichier_local.hpp"
+#include "generic_rsync.hpp"
 
 #ifndef UNIX_PATH_MAX
 #define UNIX_PATH_MAX 104
@@ -149,6 +150,25 @@ namespace libdar
 				       bool info_details,
 				       memory_pool *pool);
     static mode_t get_file_permission(const string & path);
+
+    static void make_delta_patch(user_interaction & dialog,
+				 const cat_file & existing,
+				 const string & existing_pathname,
+				 const cat_file & patcher,
+				 const path & directory);
+
+	/// create in dirname a brand-new filename which name derives from filename
+	///
+	/// \return a read-write object the caller has the duty to destroy, exception thrown
+	/// if no filename could be created
+    static fichier_local *create_non_existing_file_based_on(user_interaction & dialog,
+							    string filename,
+							    path where,
+							    string & new_filename);
+
+    static void copy_content_from_to(user_interaction & dialog,
+				     const string & source_path,
+				     const string & destination_path);
 
 ///////////////////////////////////////////////////////////////////
 ///////////////// filesystem_hard_link_read methods ///////////////
@@ -1356,6 +1376,7 @@ namespace libdar
 	const cat_detruit *x_det = dynamic_cast<const cat_detruit *>(x);
 	const cat_inode *x_ino = dynamic_cast<const cat_inode *>(x);
 	const cat_mirage *x_mir = dynamic_cast<const cat_mirage *>(x);
+	const cat_file *x_fil = dynamic_cast<const cat_file *>(x);
 
 	data_restored = done_no_change_no_data;
 	ea_restored = false;
@@ -1368,6 +1389,7 @@ namespace libdar
 	    x_ino = x_mir->get_inode();
 	    if(x_ino == nullptr)
 		throw SRC_BUG;
+	    x_fil = dynamic_cast<const cat_file *>(x_ino);
 	}
 
 	if(x_eod != nullptr)
@@ -1395,6 +1417,7 @@ namespace libdar
 	else // cat_nomme
 	{
 	    bool has_data_saved = (x_ino != nullptr && x_ino->get_saved_status() == s_saved) || x_det != nullptr;
+	    bool has_patch = x_ino != nullptr && x_ino->get_saved_status() == s_delta;
 	    bool has_ea_saved = x_ino != nullptr && (x_ino->ea_get_saved_status() == cat_inode::ea_full || x_ino->ea_get_saved_status() == cat_inode::ea_removed);
 	    bool has_fsa_saved = x_ino != nullptr && x_ino->fsa_get_saved_status() == cat_inode::fsa_full;
 	    path spot = *current_dir + x_nom->get_name();
@@ -1425,21 +1448,29 @@ namespace libdar
 	    else
 		exists = make_read_entree(*current_dir, x_nom->get_name(), false, *ea_mask);
 
+	    if(has_patch)
+	    {
+		if(exists == nullptr)
+		    throw Erange("filesystem_restore::write", tools_printf(gettext("Cannot restore a delta binary patch without a file to patch on filesystem: %S"), &spot_display));
+		if(x_fil == nullptr)
+		    throw SRC_BUG;
+	    }
+
 	    try
 	    {
 		cat_inode *exists_ino = dynamic_cast<cat_inode *>(exists);
 		cat_directory *exists_dir = dynamic_cast<cat_directory *>(exists);
+		cat_file *exists_file = dynamic_cast<cat_file *>(exists);
 
 		if(exists_ino == nullptr && exists != nullptr)
 		    throw SRC_BUG; // an object from filesystem should always be an cat_inode !?!
 
 		if(exists == nullptr)
 		{
-
 			// no conflict: there is not an already existing file present in filesystem
 
 		    if(x_det != nullptr)
-			throw Erange("filesystem_restore::write", string(gettext("Cannot remove non-existent file from filesystem: ")) + spot_display);
+			throw Erange("filesystem_restore::write", tools_printf(gettext("Cannot remove non-existent file from filesystem: %S"),& spot_display));
 
 		    if((has_data_saved || hard_link || x_dir != nullptr) && !only_overwrite)
 		    {
@@ -1517,10 +1548,11 @@ namespace libdar
 		}
 		else // exists != nullptr
 		{
-		    over_action_data act_data = data_undefined;
-		    over_action_ea act_ea = EA_undefined;
 
 			// conflict: an entry of that name is already present in filesystem
+
+		    over_action_data act_data = data_undefined;
+		    over_action_ea act_ea = EA_undefined;
 
 		    overwrite->get_action(*exists, *x_nom, act_data, act_ea);
 
@@ -1545,6 +1577,32 @@ namespace libdar
 			if(has_data_saved)
 			{
 			    action_over_data(exists_ino, x_nom, spot_display, act_data, data_restored);
+			}
+			else if(has_patch)
+			{
+
+			    if(exists_file != nullptr)
+			    {
+				    // we do not take care of overwriting data here as it is the
+				    // expected behavior for delta binary patching
+				make_delta_patch(get_ui(),
+						 *exists_file,
+						 spot_display,
+						 *x_fil,
+						 *current_dir);
+				make_owner_perm(get_ui(),
+						*x_fil,
+						spot_display,
+						true,
+						what_to_check,
+						get_fsa_scope());
+				data_restored = done_data_restored;
+			    }
+			    else
+			    {
+				    // cannot overwrite the existing inode as we do not have the base data to use for patching
+				get_ui().warning(tools_printf(gettext("Cannot restore delta diff for %S as exsiting inode is not a plain file"), &spot_display));
+			    }
 			}
 			else // no data saved in the object to restore
 			{
@@ -1604,6 +1662,7 @@ namespace libdar
 
 			}
 
+
 			if(act_data == data_remove)
 			{
 				// recording that we must set back the mtime of the parent directory
@@ -1612,6 +1671,7 @@ namespace libdar
 			}
 		    }
 		}
+
 
 		if(x_dir != nullptr && (exists == nullptr || exists_dir != nullptr || data_restored == done_data_restored))
 		{
@@ -2195,8 +2255,7 @@ namespace libdar
 		throw Erange("supprime (dir)", string(gettext("Cannot remove directory ")) + s + " : " + tools_strerror_r(errno));
 	}
 	else
-	    if(unlink(s) < 0)
-		throw Erange("supprime (file)", string(gettext("Cannot remove file ")) + s + " : " + tools_strerror_r(errno));
+	    tools_unlink(s);
     }
 
     static void make_owner_perm(user_interaction & dialog,
@@ -2455,6 +2514,186 @@ namespace libdar
 	}
 
 	return buf.st_mode;
+    }
+
+    static void make_delta_patch(user_interaction & dialog,
+				 const cat_file & existing,
+				 const string & existing_pathname,
+				 const cat_file & patcher,
+				 const path & cur_directory)
+    {
+	const crc * original_crc = nullptr;
+	string temporary_pathname;
+	fichier_local *resulting = nullptr;
+	generic_file *current = nullptr;
+	generic_file *delta = nullptr;
+	generic_rsync *rdiffer = nullptr;
+
+	    // sanity checks
+
+	if(existing.get_saved_status() != s_saved)
+	    throw SRC_BUG;
+	if(patcher.get_saved_status() != s_delta)
+	    throw SRC_BUG;
+
+	    //
+
+	try
+	{
+	    try
+	    {
+		    // creating a temporary file to write to the result of the patch
+
+		resulting = create_non_existing_file_based_on(dialog,
+							      existing.get_name(),
+							      cur_directory,
+							      temporary_pathname);
+		if(resulting == nullptr)
+		    throw SRC_BUG;
+
+
+		    // obtaining current file
+
+		current = existing.get_data(cat_file::plain, nullptr, nullptr);
+		if(current == nullptr)
+		    throw SRC_BUG;
+
+
+		    // obtaining patch
+
+		delta = patcher.get_data(cat_file::plain, nullptr, nullptr);
+		if(delta == nullptr)
+		    throw SRC_BUG;
+
+
+		    // obtaining the expected CRC of the file to patch
+
+		if(!patcher.has_ref_crc())
+		    throw SRC_BUG; // s_delta should have a ref CRC
+		if(!patcher.get_ref_crc(original_crc))
+		    throw SRC_BUG; // has CRC true but fetching CRC failed!
+
+
+		    // creating the patcher object (read-only object)
+
+		rdiffer = new (nothrow) generic_rsync(current,
+						      delta,
+						      original_crc);
+		if(rdiffer == nullptr)
+		    throw Ememory("filesystem_restore::make_delta_patch");
+
+		    // patching the existing file to the resulting (new file)
+		rdiffer->copy_to(*resulting);
+		rdiffer->terminate();
+	    }
+	    catch(...)
+	    {
+		if(rdiffer != nullptr)
+		    delete rdiffer;
+		if(delta != nullptr)
+		    delete delta;
+		if(current != nullptr)
+		    delete current;
+		if(resulting != nullptr)
+		    delete resulting;
+		throw;
+	    }
+
+	    if(rdiffer != nullptr)
+		delete rdiffer;
+	    if(delta != nullptr)
+		delete delta;
+	    if(current != nullptr)
+		delete current;
+	    if(resulting != nullptr)
+		delete resulting;
+
+		// replacing the original source file by the resulting patched file.
+		// doing that way to avoid loosing hard links toward that inode instead
+		// of unlinking the old inode and rename the tempory to the name of the
+		// original file
+	    copy_content_from_to(dialog,
+				 temporary_pathname,
+				 existing_pathname);
+	}
+	catch(...)
+	{
+	    try
+	    {
+		tools_unlink(temporary_pathname);
+	    }
+	    catch(...)
+	    {
+		    // do nothing
+	    }
+	    throw; // propagate the original exception
+	}
+	tools_unlink(temporary_pathname);
+    }
+
+
+    static fichier_local *create_non_existing_file_based_on(user_interaction & dialog,
+							    string filename,
+							    path where,
+							    string & new_filename)
+    {
+	const char *extra = "~#-%.+="; // a set of char that should be accepted in all filesystems
+	fichier_local *ret = nullptr;
+	U_I index = 0;
+
+	do
+	{
+	    new_filename = filename + extra[++index];
+	    where += new_filename;
+	    new_filename = where.display();
+
+	    try
+	    {
+		ret = new (nothrow) fichier_local(dialog,
+						  new_filename,
+						  gf_read_write,
+						  0600,
+						  true, // fail_if_exists
+						  false,
+						  false);
+	    }
+	    catch(Esystem & e)
+	    {
+		if(e.get_code() == Esystem::io_exist)
+		{
+		    where.pop(new_filename);
+		    if(extra[index] == '\0')
+		    {
+			index = 0;
+			filename += string(extra, extra);
+		    }
+		    else
+			++index;
+		}
+		else
+		    throw;
+	    }
+	}
+	while(ret == nullptr);
+
+	return ret;
+    }
+
+    static void copy_content_from_to(user_interaction & dialog,
+				     const string & source_path,
+				     const string & destination_path)
+    {
+	fichier_local src = fichier_local(source_path);
+	fichier_local dst = fichier_local(dialog,
+					  destination_path,
+					  gf_write_only,
+					  0600,
+					  false,
+					  true, // erase
+					  false);
+	src.copy_to(dst);
+	src.terminate();
+	dst.terminate();
     }
 
 } // end of namespace

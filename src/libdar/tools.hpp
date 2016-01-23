@@ -873,6 +873,8 @@ namespace libdar
      template <class T> T tools_max(T a, T b) { return a > b ? a : b; }
      template <class T> T tools_min(T a, T b) { return a > b ? b : a; }
 
+	/// remove from filesystem the file which path is given
+    void tools_unlink(const std::string & filename);
 
  } /// end of namespace
 

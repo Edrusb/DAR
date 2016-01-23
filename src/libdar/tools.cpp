@@ -3082,4 +3082,16 @@ namespace libdar
 	dialog.warning(res);
     }
 
+    void tools_unlink(const std::string & filename)
+    {
+	U_I ret = unlink(filename.c_str());
+
+	if(ret != 0)
+	{
+	    string err = tools_strerror_r(errno);
+
+	    throw Erange("tools_unlink", tools_printf(gettext("Error unlinking %S: %s"), &filename, &err));
+	}
+    }
+
 } // end of namespace
