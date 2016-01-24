@@ -2,6 +2,7 @@
 <html><head>
 
 
+
   
   <meta content="text/html; charset=us-ascii" http-equiv="content-type"><title>DAR - Frequently Asked Questions</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
@@ -97,6 +98,7 @@ filesystem?</a><br>
       <a href="#tar">how dar compares to tar?</a><br>
       <a href="#diff">Why when comparing an archive with filesystem,
 dar does not report new files found on filesystem?</a><br>
+      <a href="#delta">Why dar does not automatically perform delta difference (aka rsync increment)? </a><br>
       </span><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;"> </span>
       <h2><span style="font-weight: bold;"> </span></h2>
       <br>
@@ -3152,6 +3154,19 @@ while deleted files are reported by "<span style="font-weight: bold;">[
 information, followed by the estimated removal date and the type of the
 removed file ([-] for plain file, [d] for directory, and so on. More
 details in dar man page for listing command).<br>
+      <br>
+      <br>
+      <span style="font-weight: bold; font-style: italic;"><a name="delta"></a>Why dar does not automatically perform delta difference (aka rsync increment)?<br>
+      <br>
+      </span> Because delta difference provided by librsync to support
+this feature is subject in theory to checksum collision (but it is very
+unprobable though), which could lead a new version of a file being seen
+the same as an older one while some changes took place in it. A second
+reason is to take care of users preference, that&nbsp; do not want
+having this feature activated by default. Well, now, activating delta
+difference with dar is quite simple and flexible, see <a href="usage_notes.html#delta">note</a>.<br>
+      <span style="font-weight: bold; font-style: italic;"><span style="font-style: italic;"><span style="font-weight: bold;"></span></span><br>
+      </span>
       <br>
       </td>
     </tr>

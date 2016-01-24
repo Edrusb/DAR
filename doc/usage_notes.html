@@ -1,6 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 
+
+
   
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR's Usage Notes</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
@@ -48,7 +50,8 @@ remote backup server</a><br>
       <a href="#Parchive">Using data protection with DAR &amp; Parchive</a><br>
       <a href="#filtering">Examples of file filtering</a><br>
       <a href="#Decremental_Backup">Decremental Backup</a><br>
-      <a href="#door">Door inodes (Solaris)</a><br>
+      <a href="#door">Door inodes (Solaris)</a><br><a href="#delta">
+How to use "delta compression", "binary diff" or "rsync like increment" with dar</a><br>
       <br>
       <br>
       </div>
@@ -2159,9 +2162,11 @@ Is that serious?</span> <br>
       <td>
       <h3>Door inodes (Solaris)<a name="door"></a></h3>
       <div style="text-align: justify; margin-left: 40px;"> </div>
+      
       <div style="margin-left: 40px;">
       <div style="text-align: justify;">
       </div>
+      
       <div style="text-align: justify;">A door inode is a dynamic
 object that is created on top of an empty file, it does exist only when
 a process has a reference to it, it is thus not possible to restore it.
@@ -2184,10 +2189,269 @@ directories), this is conform to what the 'ls' command displays for
 such entries.<br>
       </div>
 
+
       
+      </div>
+      <br>
+      <br>
+      <h3><a name="delta"></a>How to use "delta compression", "binary diff" or "rsync like increment" with dar</h3>
+      <div style="margin-left: 40px;">
+      <h4 style="text-decoration: underline;">Terminology</h4>
+      <div style="text-align: justify;">"delta compression", "binary
+diff" or "rsync increment" all points to the same feature: a way to
+avoid resaving a whole file during a differential/incremental backup
+but only save the modified part of it. This solution is of course
+interesting for large files that change often but only for little parts
+of them (Microsoft exchange mailboxes, for example). Dar implements
+this feature relying on <span style="font-weight: bold;">librsync library</span>, feature which we will call <span style="font-style: italic; font-weight: bold;">binary difference</span><span style="font-weight: bold;"> </span>in
+the following (Delta compression is not adapted as the behavior is
+different from data compression, and rsync is, as you know,&nbsp;a network tool implementing that feature between two hosts). <br>
+      </div>
+      <br>
+      <h4 style="text-decoration: underline;">Librsync specific concepts</h4>
+Before looking at the way to use dar, several concepts from librsync have to be known:<br>
+      <br>
+      <div style="text-align: justify;">In order to make a delta
+compression of a file "foo" which at time t1 contained data F1 and at
+time t2 containted data F2, librsync requires first that a "<span style="font-weight: bold;">signature</span>" be made against F1. Then using that signature and data F2, librsync is able to build a <span style="font-weight: bold;">patch</span> P1 that, if applied to F1 will provide content F2:<br>
+      </div>
+      <br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; backing up file "foo"</span><br>
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</span><br>
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;"></span><span style="font-family: monospace;">time t1&nbsp; content = F1 &nbsp;&nbsp; ---------&gt; <span style="font-weight: bold;">delta signature</span> of F1</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; |&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
++-------------&gt;&nbsp; )&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span style="font-family: monospace;">building <span style="font-weight: bold;">delta patch</span> "P1" </span><br>
+      <span style="font-family: monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp;
+V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+)----&gt;&nbsp; </span><span style="font-family: monospace;"></span><span style="font-family: monospace;">containing</span><span style="font-family: monospace;"> the difference</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;"></span><span style="font-family: monospace;">time
+t2&nbsp; content = F2&nbsp;&nbsp;&nbsp;
+----------------------------------&gt;&nbsp;
+)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="font-family: monospace;"></span><span style="font-family: monospace;">from </span><span style="font-family: monospace;">F1 to F2</span><br>
+      </div>
+      <br>
+      <div style="text-align: justify;">At restoration time dar has
+then first to restore F1, from a full backup or from a previous
+differential backup, then using librsync applying the patch "P1" to
+modify F1 into F2.<br>
+      </div>
+      <br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; restoring file "foo"</span><br>
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</span><br>
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;"></span><span style="font-family: monospace;">time t3&nbsp; content = F1 &nbsp;&nbsp; &lt;---&nbsp; from a previous backup</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; +------&gt;---------------&gt;---</span><span style="font-family: monospace;">-------------+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+V <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
++ &lt;----- <span style="font-weight: bold;">applying patch</span> "P1"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
++-----&lt;---------------&lt;-------------&lt;---+<br style="font-family: monospace;">
+      </span><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">time t4&nbsp; content = F2</span><br style="font-family: monospace;">
+      </div>
+
+
+
+
+
+
+
+
+      <h4 style="text-decoration: underline;">Usage with dar</h4>
+      <div style="text-align: justify;">First, delta signature is not activated by default, you have to tell dar when you want to generate delta signature (<span style="font-family: monospace; font-weight: bold;">--delta sig</span>) and/or delta patch (<span style="font-family: monospace; font-weight: bold;">--delta patch</span>). But better an example than a long explanation:<br>
+      </div>
+      <br>
+Case of a <span style="font-weight: bold;">differential backup </span>scheme:<br>
+      <br>
+      <div style="text-align: justify; margin-left: 40px;">First, doing a full backup, we add the <span style="font-weight: bold;">--delta sig</span>
+option for the resulting archive to contain the necessary signatures to
+be provided to librsync later on in order to setup delta patches. This
+has the drawback of additional space requirement but the advantage of
+space economy at incremental backup:<br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      <div style="margin-left: 40px;">&nbsp;<span style="font-family: monospace;">dar -c full -R / -z <span style="font-weight: bold;">--delta sig</span></span><br>
+      </div>
+&nbsp; <br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">Now doing
+differential backup: Here we only ask dar not resave the whole files
+when they have changed but to build a patch from the signature found in
+the full backup and the current file status found on filesystem. The
+archive will thus only contain delta patches of files that changed
+since the full backup, plus full content of new files and references to
+files that have been removed since full backup was made:<br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c diff1 -A full -R / -z <span style="font-weight: bold;">--delta patch</span></span><br>
+      </div>
+      <br>
+      <div style="text-align: justify;">The next differential backups will be done the same, based on the full backup and using --delta patch:<br>
+      </div>
+      <br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c diff<span style="font-weight: bold;">2</span> -A full -R / -z <span style="font-weight: bold;">--delta patch</span></span><br>
+      </div>
+      </div>
+      <br>
+Case of <span style="font-weight: bold;">incremental backup</span> scheme:<br>
+      <br>
+      <div style="margin-left: 40px;">The first backup is a full one and is done the same as above for differential backup:<br>
+      <br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c full -R / -z <span style="font-weight: bold;">--delta sig</span></span><br>
+      </div>
+      <br>
+      <div style="text-align: justify;">At the opposit of differential
+backups, incremental backups are also used as reference for the next
+backup. Thus if you want to continue doing binary difference, delta
+signatures must be present beside the delta patch in the resulting
+archives:<br>
+      </div>
+      <br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c incr1 -A full -R / -z <span style="font-weight: bold;">--delta sig</span> <span style="font-weight: bold;">--delta patch</span></span><br>
+      </div>
+      <br>
+      <div style="text-align: justify;">Here the <span style="font-weight: bold;">--delta sig</span>
+switch leads dar to copy from the full backup into the new backup all
+the delta signatures of unchanged files and to recompute new delta
+signature of files that have changed. While the <span style="font-weight: bold;">--delta patch</span>
+switch avoids resaving the whole file when a change is found, but
+rather stores a delta patch in place (and beside the delta signature of
+this new version of the file).<br>
+      </div>
+      </div>
+      <br>
+Case of <span style="font-weight: bold;">catalogue isolation</span>:<br>
+      <br>
+      <div style="margin-left: 40px;">
+      <div style="text-align: justify;">If you do not want having the
+previous differential, incremental or full backup around in order to
+make a new backup, you can still use isolated catalogues to do so. The
+point to take care about here is the way to build this isolated
+catalogue: If you want to perform a binary difference, the signature of
+reference files must be present in the isolated catalogue:&nbsp;&nbsp; <br>
+      </div>
+      <br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar <span style="font-weight: bold;">-C </span>CAT_full -A full -z <span style="font-weight: bold;">--delta sig</span></span><br>
+      </div>
+      <br>
+      <div style="text-align: justify;">Yes, this is as simple as adding <span style="font-weight: bold;">--delta sig</span>
+to what you were used to do before. The resulting isolated catalogue
+will be much larger than without delta signatures but still much
+smaller than the full backup itself. The incremental or differential
+backup can then be done the same as before but using CAT_full in place
+of full:<br>
+      </div>
+      <br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c diff1 -A <span style="font-weight: bold;">CAT_</span>full -R / -z <span style="font-weight: bold;">--delta patch</span></span><br>
+      <br>
+      <span style="font-family: monospace;">dar -c incr1 -A <span style="font-weight: bold;">CAT_</span>full -R / -z <span style="font-weight: bold;">--delta sig</span> <span style="font-weight: bold;">--delta patch<br>
+</span></span></div>
+      </div>
+      <br>
+Case of <span style="font-weight: bold;">archive merging</span>:<br>
+      <br>
+      <div style="margin-left: 40px;">
+      <div style="text-align: justify;">You may need to merge two
+archive or make a subset of a single archive or even a mix of these two
+operations, which is available using the --merge operation for a long
+time now. Here too if you want to keep the delta signatures that could
+be present in the source archives you will have to use <span style="font-weight: bold;">--delta sig</span> option:<br>
+      </div>
+      <br style="font-family: monospace;">
+      </div>
+      <div style="margin-left: 80px;"><span style="font-family: monospace;">dar <span style="font-weight: bold;">--merge</span> merged_backup -A archive1 -@archive2 -z </span><span style="font-weight: bold; font-family: monospace;">--delta sig</span><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <br>
+Case of <span style="font-weight: bold;">restoration</span>:<br>
+      <br>
+      <div style="text-align: justify; margin-left: 40px;">No special option has to be provided at restoration time. Dar will figure out by itself whether the data for a file is a <span style="font-weight: bold;">plain data</span> and can replace the whole current data if overwriting is allowed <span style="font-weight: bold;">or</span> is a <span style="font-weight: bold;">delta patch</span>
+that has to be applied to the existing file lying on filesystem. Before
+patching the file dar will calculate and check its CRC. if the CRC is
+the expected one, the file will be patched else a warning will be
+issued and the file will not be modified at all.<br>
+      <br>
+The point with restoration is to *always* restore all previous backups
+in order from the full backup to the latest incremental one (or the
+full backup and the latest differential one), for dar be able to apply
+stored patches. Else restoration can fail for some or all files. <span style="font-weight: bold;">Dar_manager</span>
+can be of great help here as it will know which archive to skip and
+which not to skip in order to restore a particular set of files.<br>
+      </div>
+      <br>
+Performing <span style="font-weight: bold;">binary difference only for some files</span> and normal backup for others:<br>
+      <br>
+      <div style="margin-left: 40px;">
+      <div style="text-align: justify;">The <span style="font-weight: bold;">--delta patch </span>option<span style="font-weight: bold;"> </span>builds
+binary patches if an only if a delta signature is present for a given
+file. You can thus exclude files from delta difference operation by
+avoiding creating a delta signature for them in the archive of
+reference, using&nbsp; the option <span style="font-weight: bold;">--exclude-delta-sig</span>. You can also include only some files for delta signatures by use of <span style="font-weight: bold;">--include-delta-sig</span>
+option. Of course as with other masks-related options like -I, -X, -U,
+-u, -Z, -Y, ... it is possible to combine them to have an even greater
+and more accurate definition of files for which you want to have delta
+signature being built or not.<br>
+      </div>
+      <br>
+      <span style="font-family: monospace;">dar -c full -R / -z --delta sig --include-delta-sig "*.opt" --include-delta-sig "*.pst" --exclude-delta-sig "home/joe/*" </span><br>
+      <br>
+      <div style="text-align: justify;">Independently of this filtering
+mechanism based on path+filename, delta signature is never calculated
+for files smaller than 10 kio ("10KiB" if you prefer, but that's not
+the correct writing) because it does not
+worse performing delta difference for them. You can change that
+behavior using the option <span style="font-weight: bold;">--delta-sig-min-size</span> &lt;size in byte&gt;<br>
+      </div>
+      <br>
+      <span style="font-family: monospace;">dar -c full -R / -z --delta sig --delta-sig-min-size 20k</span><br>
       <br>
       </div>
-      </td>
+      <br>
+Archive <span style="font-weight: bold;">listing</span>:<br>
+      <br>
+      <div style="margin-left: 40px; text-align: justify;">Archive
+listing received adhoc addition to show which file have delta signature
+and which one have been saved as delta patch. The <span style="font-family: monospace; font-weight: bold;">[Data ]</span><span style="font-weight: bold;"> </span>column shows <span style="font-family: monospace; font-weight: bold;">[Delta] </span>in place of <span style="font-weight: bold; font-family: monospace;">[Saved]</span> when a delta patch is used, and a new column entitled<span style="font-family: monospace;">[D]</span> shows <span style="font-weight: bold; font-family: monospace;">[D]</span> when a delta signature is present for that file.<br>
+      </div>
+      <br>
+      <div style="text-align: justify;">See man page about --delta option for even more details.<br>
+      </div>
+      </div>
+</td>
     </tr>
   </tbody>
 </table>

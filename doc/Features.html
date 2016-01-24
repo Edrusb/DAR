@@ -20,6 +20,7 @@
 
 
 
+
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR's FEATURES</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -588,6 +589,35 @@ will probably make less slices in the backup. </td>
     </tr>
   </tbody>
 </table>
+<br>
+<br>
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">BINARY DIFFERENCE
+      </td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a> <br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">keywords: --delta sig, --delta patch, --include-delta-sig, --exclude-delta-sig, --delta-sig-min-size
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;">dar</span> can store changes from previous backup as <span style="font-weight: bold;">rsync</span>
+patch in the context of differential and incremental backup in order to
+provide very space efficient backup scheme. The drawback is the
+obligation at restoration time to restore files from the previous
+backups in order to be able to apply the stored rsync patch on it. <br>
+ </td>
+    </tr>
+  </tbody>
+</table>
+
 <br>
 <br style="font-weight: bold;">
 
