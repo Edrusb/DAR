@@ -1801,6 +1801,9 @@ namespace libdar
 						warn_over,
 						empty);
 
+	if(ref_arch != nullptr && ref_arch->sequential_read && (delta_signature || delta_diff))
+	    throw Erange("archive::op_create_in", gettext("Cannot sequentially read an archive of reference when delta signature or delta patch is requested"));
+
 	local_cat_size = 0; // unknown catalogue size (need to re-open the archive, once creation has completed) [object member variable]
 
 	sauv_path_abs.explode_undisclosed();
