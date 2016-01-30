@@ -2811,10 +2811,14 @@ namespace libdar
 		if(!delta_diff || ref_fic == nullptr || !ref_fic->has_delta_signature())
 		    throw SRC_BUG;
 
+		    // fetching the delta signature to base the patch on
+
 		delta_sig_ref = new (pool) memory_file();
 		if(delta_sig_ref == nullptr)
 		    throw Ememory("save_inode");
 		ref_fic->read_delta_signature(*delta_sig_ref);
+
+		    // fetching the CRC of the file of reference to base the patch on
 
 		ref_fic->get_crc(delta_sig_ref_crc);
 		if(delta_sig_ref_crc == nullptr)

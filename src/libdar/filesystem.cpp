@@ -2522,7 +2522,10 @@ namespace libdar
 				 const cat_file & patcher,
 				 const path & cur_directory)
     {
-	const crc * original_crc = nullptr;
+	const crc * original_crc = nullptr; //< expected CRC of the base file to be patched
+	crc * calculated_crc = nullptr;     //< calculated CRC of the read patch data
+	const crc *patch_crc = nullptr;     //< expected CRC of the patch data
+	infinint crc_size = tools_file_size_to_crc_size(patcher.get_size());
 	string temporary_pathname;
 	fichier_local *resulting = nullptr;
 	generic_file *current = nullptr;
@@ -2564,6 +2567,8 @@ namespace libdar
 		delta = patcher.get_data(cat_file::plain, nullptr, nullptr);
 		if(delta == nullptr)
 		    throw SRC_BUG;
+		else
+		    delta->reset_crc(crc_size);
 
 
 		    // obtaining the expected CRC of the file to patch
@@ -2582,9 +2587,21 @@ namespace libdar
 		if(rdiffer == nullptr)
 		    throw Ememory("filesystem_restore::make_delta_patch");
 
-		    // patching the existing file to the resulting (new file)
+		    // patching the existing file to the resulting inode (which is a new file)
 		rdiffer->copy_to(*resulting);
-		rdiffer->terminate();
+		calculated_crc = delta->get_crc();
+		if(calculated_crc == nullptr)
+		    throw SRC_BUG;
+
+		if(patcher.get_crc(patch_crc))
+		{
+		    if(patch_crc == nullptr)
+			throw SRC_BUG;
+		    if(*patch_crc != *calculated_crc)
+			throw Erange("filesystem.cpp::make_delta_patch", gettext("Patch data does not match its CRC, archive corruption took place"));
+		}
+		else
+		    throw SRC_BUG; // at the archive format that support delta patch CRC is always present
 	    }
 	    catch(...)
 	    {
@@ -2596,6 +2613,8 @@ namespace libdar
 		    delete current;
 		if(resulting != nullptr)
 		    delete resulting;
+		if(calculated_crc != nullptr)
+		    delete calculated_crc;
 		throw;
 	    }
 
@@ -2607,6 +2626,8 @@ namespace libdar
 		delete current;
 	    if(resulting != nullptr)
 		delete resulting;
+	    if(calculated_crc != nullptr)
+		delete calculated_crc;
 
 		// replacing the original source file by the resulting patched file.
 		// doing that way to avoid loosing hard links toward that inode instead
