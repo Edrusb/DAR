@@ -1,6 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 
+
 <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR/LIBDAR Internals - Notes</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -205,9 +206,13 @@ to be written, and if the current slice is not the last
 slice (all data to write could not fit in it), the flag field is
 changed indicating that another slice follows. The header is also the
 first part
-to be read. Since archive format 8, the flag is set to a specific value
-indicating that the information telling whether the slice is the last
-is placed in a slice trailer.<br>
+to be read. <br>
+      <br>
+Since archive format 8, the flag is set to a specific value
+indicating that the information telling whether the slice is the last or not has been moved to the <span style="text-decoration: underline;">slice trailer</span>.
+This way, dar does no more need to seek back in file to modify the flag
+which allow writing an archive in sequence even when it has multiple
+slices. This change was required to support on-fly slice hashing.<br>
 </div>
       <br>
 The TLV list may contain several fields:<br>
@@ -233,7 +238,7 @@ A TLV list is of course a list of TLV:<br>
       </code></div>
 </div>
       <div style="text-align: justify;">
-      <div style="margin-left: 40px;">Each TLV item is, as commonly, defined as set of three fields:<br>
+      <div style="margin-left: 40px;">Each TLV item is, as commonly, defined by the set of three fields:<br>
       <br>
       <div style="margin-left: 40px;"><code>+---------+-------------------------+-------------------------+</code><br>
       <code>| Type&nbsp;&nbsp;&nbsp; |
@@ -261,41 +266,31 @@ format for the type field.<br>
       </div>
       <div style="margin-left: 40px; text-align: justify;">To know in
 which slice and at which position to find a particular data, dar needs
-to know each file's size. This is the reason why each slice contains
-the slice size information, in particular the last slice. In older
+to know each slice's size. This is the reason why each slice contains
+the slice size information, in particular the first slice size which is allowed to be different from following ones. In older
 version, dar had to read the first slice first to get this slicing
 information. Then it could read the archive contents at the end of the
-last slice. Today, reading the last slice, dar can fetch the slicing
-scheme from the slice header (what we just detailed) and fetch the
-archive contents at the end of this same last slice.<br>
+last slice. <br>
       </div>
 <div style="text-align: justify; margin-left: 40px;"><br>
-      <span style="font-weight: bold; text-decoration: underline;">The trailer</span>
-(which is one byte length) is new since archive format version 8
+      <span style="font-weight: bold; text-decoration: underline;">The trailer</span> is one byte length and is new since archive format version 8
 (released 2.4.0). It contains the value that was located in the header flag field in older archive format, telling
 whether the slice is the last of the archive or not. When writting down
 a single sliced archive (no -s option provided), both the header and
 the trailer tell that the slice is the last of the archive (duplicated
 information). However, when doing multi-sliced archive, it is not
-possible to known whether a slice is the last before reaching the
+possible to known whether a slice will be the last before reaching the
 requested amount of data per slice (which depends on the amount of byte
 to save, compression ratio, encryption overhead, etc.). Thus the header
 flag contains a value telling that to know whether the slice is the
 last or not, one must read the trailer.<br>
-      <br>In
-older format, it was necessary to seek back to update the header
-with the correct information when a new slice had to be created. But,
-keeping this behavior, it would not have been possible to make a digest
-"on the fly" (see --hash
-option). The addition of the trailer was required for that feature: to
-compute a md5 or sha1 hash of each slice. But, this costs one byte per
-slice, yes.<br>
+      <br>
 </div>
 
 
 
       <h4>Data Name</h4>
-      <div style="margin-left: 40px;">As seen above in the header fields, we have among others the three following identifiers:<br>
+      <div style="margin-left: 40px;">As seen above in the header fields, we have among other things the three following identifiers:<br>
       <ul>
         <li>magic number</li>
         <li>internal name</li>
@@ -316,16 +311,16 @@ field is also present in the archive catalogue (the table of content)
 of each archive. It may be the same value as the one in the slice
 headers (normal archives) or another value if the archive results from
 a catalogue isolation process.<br>
-      <br>
-Why this field? A new feature
+      <br>Why
+this field? A new feature
 with release 2.4.0 is the ability to use an extracted catalogue to
 backup a internal catalogue of a given archive. Comparing the data_name
 value of the catalogue resulting from the isolation operation to the
-data_name value present int the slices of an archive to rescue, dar can
+data_name value present in the slices of an archive to rescue, let dar
 be (almost) sure that the extracted catalogue matches the data present
-in the archive the user is trying to use it with.<br>
+in the archive the user is trying to rescue.<br>
       <br>
-In brief:<br>
+In brief, A, B, C and D below are four different values of data_name:<br>
       </div>
       </div>
       <br>
@@ -387,7 +382,7 @@ resliced with dar_xform</span><br>
       <div style="margin-left: 40px;">
       <div style="text-align: justify;">The
 archive level describes the
-structure of the slice's data field (removing header and trailer of
+structure of the slice's <span style="text-decoration: underline;">data</span><span style="text-decoration: underline;"> field</span> (removing header and trailer of
 each slice), when they are all sticked together from slice to slice:<br>
       </div>
 
@@ -404,16 +399,22 @@ version |&nbsp;&nbsp; Data&nbsp; &nbsp;
       <code>+---------+----------------------------+-----------+--------+---------+--------+</code><br>
       </div>
       <div style="margin-left: 80px;"><code></code></div>
-      <div style="margin-left: 40px;"><br>The <span style="text-decoration: underline; font-weight: bold;">version header</span>
+      <div style="margin-left: 40px;"><br>
+      <div style="text-align: justify;">The <span style="text-decoration: underline; font-weight: bold;">version header</span>
 is a short version of the trailer version. It is used when reading an
 archive in sequential mode, to be able to prepare the proper
-compression layer, and known whether escape sequence mark are present
+compression layer, cipher algorithm used if any and know whether escape sequence mark (aka tape marks) are present
 in the archive.<br>
-      <br>
-the <span style="font-weight: bold; text-decoration: underline;">version trailer</span> (which may still be called "version header" in some
-part of the documentation because it was only located at the
-beginning of the archive in previous archive format) is composed of:<br>
       </div>
+
+      <br>
+      <div style="text-align: justify;">
+the <span style="font-weight: bold; text-decoration: underline;">version trailer</span> which may still be called "version header" in some
+part of the documentation because it was only located at the
+beginning of the archive in previous archive format,&nbsp; is the complete version of this data structure, composed of:<br>
+
+      </div>
+</div>
 
       <ul style="margin-left: 40px;">
 
@@ -423,7 +424,7 @@ beginning of the archive in previous archive format) is composed of:<br>
 </li>
         <li>flag, telling:</li>
         <ul>
-          <li>&nbsp;whether the archive is encrypted, <br>
+          <li>whether the archive is encrypted, <br>
           </li>
           <li>whether it has escape sequence marks, <br>
           </li>
@@ -463,30 +464,76 @@ been inserted in the archive to un-escape data that could else be taken as an es
       </div>
 
       <br>
-      <span style="text-decoration: underline; font-weight: bold;">The data</span>
-is a suite of file contents, with EA if present. When tape mark is
-used, a copy of the CRC is placed after's file Data and file's EA, to
-be used when reading the archive in sequential mode. This CRC is also
-dropped into the catalogue which takes place at the end of the archive
-to be used when reading the archive in direct access mode (the default).<br>
+      
+      <div style="text-align: justify;"><span style="text-decoration: underline; font-weight: bold;">The data</span>&nbsp;
+is a suite of file contents, with associated EA, FSA and delta
+signatures, if present. When tape marks are
+used, inode information is prepended before the file's data and a copy
+of the data CRC is placed after's file data same thing with CRC for EA,
+FSA and delta signature if any. This is to
+be used when reading the archive in sequential mode. These additional
+fields come from the catalogue which is placed at the end of the
+archive and is used instead when reading the archive in direct access
+mode (the default).<br>
+      </div>
+
       <br>
       </div>
-      <div style="margin-left: 80px;"><code>&nbsp; ....</code><code>--+---------------------+----+------------+-----------+----+---....</code><br>
-      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; file
-data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | EA | file
-data&nbsp; | file data | EA |</code><br>
+      <div style="margin-left: 80px;"><code>Without tape marks<br>
+&nbsp; ....</code><code>--+---------------------+--------+----+----+------------------+-----------+----+---....</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+| data for file 1 (F1)| delta&nbsp; | EA |FSA | data for file 2&nbsp; |
+data for&nbsp; | EA |</code><br>
       <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | (may be
-compressed) |&nbsp;&nbsp;&nbsp; | (no EA)&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp; |</code><br>
+compressed) | sig(F1)|(F1)|(F1)| (no EA, FSA, sig)| file 3 &nbsp;&nbsp;
+|(F3)|</code><br>
       <code>&nbsp;
-....--+---------------------+----+------------+-----------+----+---....</code><br>
+....--+---------------------+--------+----+----+------------------+-----------+----+---....<br>
+      <br>
+      <br>
+With tape marks<br>
+</code><code>&nbsp; ....--+</code><code>--+-----+---------------------+--+----+--+--------+--------+---------+--+----+--+----+--+-----+------------------+--+----+-....</code><br>
+
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |TM|inode| </code><code>data for file 1 (F1)</code><code>|TM|Data|TM|delta &nbsp; | delta&nbsp; | delta&nbsp;&nbsp; |TM| EA |TM|FSA |TM|inode| data for file 2&nbsp; |TM|Data|</code><br>
+
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |#I|data |(may be
+compressed)&nbsp; |#R|CRC |#S|sig size| sig(F1)| sig crc |#E|(F1)|#F|(F1)|#I|data | (no EA, FSA, sig)|#R|CRC |</code><br>
+
+      <code>&nbsp;
+....--+--+-----+---------------------+--+----+--+--------+--------+---------+--+----+--+----+--+-----+------------------+--+----+--....<br>
+      <br>
+      <br>
+      <br>
+      </code>
       <code></code></div>
-      <div style="margin-left: 40px;"><br>
+      <div style="margin-left: 40px;">
+      <div style="text-align: justify;">
+      <div style="text-align: justify;">the TM#.. fields represent tape marks. The
+additional fields seen beside tape marks contain duplicated information
+from the catalogue. Tape marks are specific sequence of characters that
+delimit the start of a new field like file data, file data CRC, delta
+signature, EA and EA CRC (not represented above), FSA and FSA CRC (not
+represented above), etc. These are used in sequential read mode to skip
+to the next file or to the next field if one has not to be read or
+restored.<br>
+      <br>
+      </div>
+      <div style="text-align: justify;">To avoid file data, EA or FSA
+to contain a sequence of character that would look like a tape mark,
+their data is modified (escaped) to avoid that situation using a
+specific tape mark (named "not_a_sequence"). At reading time when such
+"not_a_sequence" mark is found, the data is modified back (unescaped)
+to retreive the original data.<code></code><br>
+      </div>
+      <code></code></div>
+      <code><br>
+      <br>
+      </code>
       </div>
       <div style="text-align: justify; margin-left: 40px;"><span style="text-decoration: underline; font-weight: bold;">the
-catalogue</span>,
-contains all inode, directory structure and hard_links information as well as data and EA CRC. The
+catalogue</span>&nbsp;
+contains all inode's metadata and directory structure as well as
+hard_links information CRC for data, EA, FSA and delta signature. The
 directory structure is stored in a simple way: the inode of a directory
 comes, then the inode of the files it contains, then a special entry
 named "EOD" for End of Directory. Considering the following tree:<br>
@@ -540,7 +587,7 @@ example of how data can be structured in a four slice archive:<br>
       </div>
       <div style="text-align: justify; margin-left: 80px;"><code>+--------+--------+------------------------+--+</code><br>
       <code>| slice&nbsp; | version|&nbsp; file data +
-EA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |Tr|</code><br>
+EA + FSA&nbsp; |Tr|</code><br>
       <code>|
 header | header
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -556,7 +603,7 @@ the first slice (just above) has been defined smaller using the -S option<br>
 slice&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; file data
 +
-EA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+EA + FSA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
 |Tr|</code><br>
@@ -575,7 +622,7 @@ header
 slice&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; file data
 +
-EA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+EA + FSA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 &nbsp; &nbsp;
 |Tr|</code><br>
@@ -629,7 +676,7 @@ Class fichier [=file] also inherit from generic_file class, and is a
 wrapper
 for the plain file system calls. Some new classes have been added with
 format 8, in particular the escape class, which inserts escape sequence
-mark at requested position, and modifies data wrote for it never looks
+marks at requested position, and modifies data wrote for it never looks
 like an escape sequence mark. To reduce the level of context switch
 when reading the catalogue (which makes a ton of small read), a cache
 class is also present, it gather small writes made to it into larger
@@ -815,8 +862,8 @@ slice 4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; slice 5</code><br>
 are here to prevent plain text attack, where one knows which data is
 expected at a given place, an trying to guess the cipher comparing the
 expected data and the encrypted one. As dar generates structured
-archives, there would have some possibility that one use this attack to
-crack an archive encryption. To overcome this problem, elastic buffers
+archives, there would have some possibility that one uses this attack to
+crack an encrypted archive. To overcome this problem, elastic buffers
 have been added at the beginning and at the end of encrypted data. This
 way it is not possible to know where is located a given archive
 structure within the encrypted data. The elastic buffers are random
@@ -3092,4 +3139,5 @@ archive length.<br>
 </table>
 <br>
 <br>
+
 </body></html>
