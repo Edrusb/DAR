@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <!ELEMENT Catalog (File|Symlink|Device|Pipe|Socket|Directory)*>
-<!ATTLIST Catalog format CDATA #FIXED "1.1">
+<!ATTLIST Catalog format CDATA #FIXED "1.2">
 
         <!-- describes single Extended Attribute -->
 <!ELEMENT EA_entry EMPTY>
@@ -41,7 +41,8 @@
 <!ATTLIST File name CDATA #REQUIRED>             <!-- string, entry name             -->
 <!ATTLIST File size CDATA #REQUIRED>             <!-- decimal, file size in bytes    -->
 <!ATTLIST File stored CDATA "" >                 <!-- decimal, stored size in bytes  -->
-<!ATTLIST File crc CDATA "" >                    <!-- hexidecimal, crc sum of file   -->
+<!ATTLIST File crc CDATA "" >                    <!-- hexadecimal, crc sum of file   -->
+<!ATTLIST File ref_crc CDATA "">                 <!-- hexadecimal, crc sum of the delta patch reference -->
 <!ATTLIST File dirty CDATA #REQUIRED>            <!-- string, whether file changed during backup -->
 <!ATTLIST File sparse CDATA #REQUIRED>	         <!-- string, whether file is sparse -->
 

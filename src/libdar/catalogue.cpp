@@ -1287,12 +1287,13 @@ namespace libdar
 			       || (e_ino->ea_get_saved_status() == cat_inode::ea_full || e_ino->ea_get_saved_status() == cat_inode::ea_fake)
 			       || (e_dir != nullptr && e_dir->get_recursive_has_changed()))
 			    {
-				string data, metadata, maj, min, chksum, target;
+				string data, metadata, maj, min, chksum, chkrefsum, target;
 				string dirty, sparse;
 				string size = local_size(*e_ino);
 				string stored = local_storage_size(*e_ino);
 				const cat_file *reg = dynamic_cast<const cat_file *>(e_ino); // ino is no more it->second (if it->second was a cat_mirage)
 				const crc *crc_tmp = nullptr;
+				const crc *crc_ref_tmp = nullptr;
 
 				saved_status data_st;
 				cat_inode::ea_status ea_st = isolated ? cat_inode::ea_fake : e_ino->ea_get_saved_status();
@@ -1314,6 +1315,9 @@ namespace libdar
 				case s_fake:
 				case s_not_saved:
 				    data = "referenced";
+				    break;
+				case s_delta:
+				    data = "patch";
 				    break;
 				default:
 				    throw SRC_BUG;
@@ -1374,8 +1378,13 @@ namespace libdar
 				    else
 					chksum = "";
 
-				    get_ui().printf("%S<File name=\"%S\" size=\"%S\" stored=\"%S\" crc=\"%S\" dirty=\"%S\" sparse=\"%S\">\n",
-						    &beginning, &name, &size, &stored, &chksum, &dirty, &sparse);
+				    if(reg->has_ref_crc() && reg->get_ref_crc(crc_ref_tmp) && crc_ref_tmp != nullptr)
+					chkrefsum = crc_ref_tmp->crc2str();
+				    else
+					chkrefsum = "";
+
+				    get_ui().printf("%S<File name=\"%S\" size=\"%S\" stored=\"%S\" crc=\"%S\" ref_crc=\"%S\" dirty=\"%S\" sparse=\"%S\">\n",
+						    &beginning, &name, &size, &stored, &chksum, &chkrefsum, &dirty, &sparse);
 				    xml_listing_attributes(get_ui(), beginning, data, metadata, e, list_ea);
 				    get_ui().printf("%S</File>\n", &beginning);
 				    break;
