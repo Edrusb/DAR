@@ -889,7 +889,8 @@ namespace libdar
 	else
 	{
 	    if(get_saved_status() == s_saved
-	       || get_saved_status() == s_delta)
+	       || get_saved_status() == s_delta
+	       || has_delta_signature())
 	    {
 		if(check == nullptr)
 		{

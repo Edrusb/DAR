@@ -503,13 +503,14 @@ namespace libdar
 		dialog.warning(gettext("Checking chronological ordering of files between the archives..."));
 	    check_order(dialog);
 
-		// determination of the archive to restore and files to restore for each selected file
+		// determination of the archives to restore and files to restore for each selected file
 	    while(!anneau.empty())
 	    {
 		if(data_tree_find(anneau.front(), *files, ptr))
 		{
 		    const data_dir *ptr_dir = dynamic_cast<const data_dir *>(ptr);
-		    archive_num num_data = 0;
+		    set<archive_num> num_data;
+		    archive_num max_data = 0;
 		    archive_num num_ea = 0;
 		    data_tree::lookup look_ea, look_data;
 
@@ -521,16 +522,16 @@ namespace libdar
 		    case data_tree::found_present:
 			break;
 		    case data_tree::found_removed:
-			num_data = 0; // we do not restore it
+			num_data.clear(); // we do not restore any data
 			if(opt.get_info_details())
 			    dialog.warning(string(gettext("File recorded as removed at this date in database: ")) + anneau.front());
 			break;
 		    case data_tree::not_found:
-			num_data = 0;
+			num_data.clear();
 			dialog.warning(string(gettext("File not found in database: ")) + anneau.front());
 			break;
 		    case data_tree::not_restorable:
-			num_data = 0;
+			num_data.clear();
 			dialog.warning(string(gettext("File found in database but impossible to restore (only found \"unchanged\" in differential backups): ")) + anneau.front());
 			break;
 		    default:
@@ -540,66 +541,60 @@ namespace libdar
 		    switch(look_ea)
 		    {
 		    case data_tree::found_present:
-			if(opt.get_even_when_removed()
-			   && look_data == data_tree::found_present
-			   && num_data > num_ea)
-			    num_ea = num_data;
+			num_ea = 0; // we cannot restore it
 			break;
 		    case data_tree::found_removed:
-			num_ea = 0; // we do not restore it
+			num_ea = 0; // we cannot restore it
 			break;
 		    case data_tree::not_found:
-			num_ea = 0;
+			num_ea = 0; // we cannot restore it
 			break;
 		    case data_tree::not_restorable:
-			num_ea = 0;
-			dialog.warning(string(gettext("Extended Attribute of file found in database but impossible to restore (only found \"unchanged\" in differential backups): ")) + anneau.front());
+			num_ea = 0; // we cannot restore it
+			dialog.warning(string(gettext("Extended Attribute of file found in database but impossible to restore (only found \"unchanged\" in differential backups, or delta patch without reference to base it on in any previous archive of the base): ")) + anneau.front());
 			break;
 		    default:
 			throw SRC_BUG;
 		    }
 
-			// if there is something to restore for that file
-
-		    if(look_ea == data_tree::found_present || look_data == data_tree::found_present)
+			// if no data nor EA could be found
+		    if(num_ea == 0 && num_data.empty())
 		    {
-			if(num_data == num_ea) // both EA and data are located in the same archive
+			if(!opt.get_date().is_zero()) // a date was specified
 			{
-			    if(num_data != 0) // archive is not zero (so it is a real archive)
-			    {
-				command_line[num_data].push_back("-g");
-				command_line[num_data].push_back(anneau.front());
-			    }
-			    else // archive number is zero (not a valid archive number)
-				if(!opt.get_date().is_zero()) // a date was specified
-				{
-				    string fic = anneau.front();
-				    if(opt.get_info_details())
-					dialog.printf(gettext("%S did not exist before specified date and cannot be restored"), &fic);
-				}
-				else
-				    throw SRC_BUG; // no date limitation, the file's data should have been found
+			    string fic = anneau.front();
+			    if(opt.get_info_details())
+				dialog.printf(gettext("%S did not exist before specified date and cannot be restored"), &fic);
 			}
-			else // num_data != num_ea
+		    }
+		    else // there is something to restore for that file
+		    {
+
+			    // if latest EA are not to be found in a archive where
+			    // data has also to be restored from, adding a specific command-line for EA
+			if(num_ea != 0 && num_data.find(num_ea) != num_data.end())
 			{
-			    if(num_data != 0)
-			    {
-				command_line[num_data].push_back("-g");
-				command_line[num_data].push_back(anneau.front());
-			    }
-			    if(num_ea != 0)
-			    {
-				command_line[num_ea].push_back("-g");
-				command_line[num_ea].push_back(anneau.front());
-			    }
-			    if(num_data != 0 && num_ea != 0)
-				if(num_data > num_ea) // will restore "EA only" then "data + old EA"
-				{
-				    string fic = anneau.front();
-				    if(!opt.get_even_when_removed())
-					dialog.printf(gettext("Either archives in database are not properly tidied, or file last modification date has been artificially set to an more ancient date. This may lead improper Extended Attribute restoration for inode %S"), &fic);
-				}
+			    command_line[num_ea].push_back("-g");
+			    command_line[num_ea].push_back(anneau.front());
 			}
+
+			    // adding command-line for archives where to find data (and possibly EA)
+			for(set<archive_num>::iterator it = num_data.begin(); it != num_data.end(); ++it)
+			{
+			    command_line[*it].push_back("-g");
+			    command_line[*it].push_back(anneau.front());
+			    if(*it > max_data)
+				max_data = *it;
+			}
+
+			    // warning if latest EA is not found with the same archive as the most recent Data
+			if(max_data != 0 && num_ea != 0)
+			    if(max_data > num_ea) // will restore "EA only" then "data + old EA"
+			    {
+				string fic = anneau.front();
+				if(!opt.get_even_when_removed())
+				    dialog.printf(gettext("Either archives in database are not properly tidied, or file last modification date has been artificially set to an more ancient date. This may lead improper Extended Attribute restoration for inode %S"), &fic);
+			    }
 		    }
 
 		    if(ptr_dir != nullptr)

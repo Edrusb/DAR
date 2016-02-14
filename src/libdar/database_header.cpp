@@ -62,7 +62,7 @@ using namespace std;
 namespace libdar
 {
 
-    static const unsigned char database_version = 4;
+    static const unsigned char database_version = 5;
 
 #define HEADER_OPTION_NONE 0x00
 

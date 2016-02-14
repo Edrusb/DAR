@@ -32,6 +32,7 @@
 #include <map>
 #include <string>
 #include <list>
+#include <set>
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "infinint.hpp"
@@ -59,37 +60,62 @@ namespace libdar
     class data_tree : public on_pool
     {
     public:
-	enum lookup { found_present, found_removed, not_found, not_restorable };
+	enum lookup         //< the available status of a lookup
+	{
+	    found_present,  //< file data/EA has been found completely usable
+	    found_removed,  //< file data/EA has been found as removed at that date
+	    not_found,      //< no such file has been found in any archive of the base
+	    not_restorable  //< file data/EA has been found existing at that date but not possible to restore (lack of data, missing archive in base, etc.)
+	};
+
 	enum etat
 	{
-	    et_saved,    //< data/EA present in the archive
-	    et_present,  //< file/EA present in the archive but data not saved (differential backup)
-	    et_removed,  //< file/EA stored as deleted since archive of reference of file/EA not present in the archive
-	    et_absent    //< file not even mentionned in the archive, This entry is equivalent to et_removed, but is required to be able to properly re-order the archive when user asks to do so. The dates associated to this state are computed from neighbor archives in the database
+	    et_saved,       //< data/EA present in the archive
+	    et_patch,       //< data present as patch from the previous version
+	    et_patch_unusable, //< data present as patch but base version not found in archive set
+	    et_present,     //< file/EA present in the archive but data not saved (differential backup)
+	    et_removed,     //< file/EA stored as deleted since archive of reference of file/EA not present in the archive
+	    et_absent       //< file not even mentionned in the archive, This entry is equivalent to et_removed, but is required to be able to properly re-order the archive when user asks to do so. The dates associated to this state are computed from neighbor archives in the database
 	};
 
 	data_tree(const std::string &name);
-	data_tree(generic_file &f, unsigned char db_version);
+	data_tree(generic_file & f, unsigned char db_version);
 	virtual ~data_tree() {};
 
 	virtual void dump(generic_file & f) const;
 	std::string get_name() const { return filename; };
 	void set_name(const std::string & name) { filename = name; };
 
-	    /// return the archive where to find the data that was defined just before or at the given date
-	lookup get_data(archive_num & archive, const datetime & date, bool even_when_removed) const;
+	    /// returns the archives to restore in order to obtain the data that was defined just before (or at) the given date
+	    ///
+	    /// \param[out] archive is the set of archive to restore in sequence to obtain the requested data
+	    /// \param[in] date date above which to ignore data found in the database
+	    /// \param[in] even_when_removed is true when user requested to restore the file in its latest state even if it has been removed afterward
+	    /// \return the success of failure status of the requested lookup
+	lookup get_data(std::set<archive_num> & archive, const datetime & date, bool even_when_removed) const;
 
 	    /// if EA has been saved alone later, returns in which version for the state of the file at the given date.
 	lookup get_EA(archive_num & archive, const datetime & date, bool even_when_removed) const;
 
 	    /// return the date of file's last modification date within the give archive and whether the file has been saved or deleted
-	bool read_data(archive_num num, datetime & val, etat & present) const;
+	bool read_data(archive_num num,
+		       datetime & val,
+		       etat & present) const;
 
 	    /// return the date of last inode change and whether the EA has been saved or deleted
 	bool read_EA(archive_num num, datetime & val, etat & present) const;
 
-	void set_data(const archive_num & archive, const datetime & date, etat present) { status sta = { date, present }; last_mod[archive] = sta; };
-	void set_EA(const archive_num & archive, const datetime & date, etat present) { status sta = { date, present }; last_change[archive] = sta; };
+	void set_data(const archive_num & archive,
+		      const datetime & date,
+		      etat present) { set_data(archive, date, present, nullptr, nullptr); };
+
+	void set_data(const archive_num & archive,
+		      const datetime & date,
+		      etat present,
+		      const crc *me,
+		      const crc *ref) { last_mod[archive] = status_plus(date, present, me, ref); (void) check_delta_validity(); };
+
+	void set_EA(const archive_num & archive, const datetime & date, etat present) { status sta(date, present); last_change[archive] = sta; };
 
 	    /// check date order between archives withing the database ; throw Erange if problem found with date order
 	virtual bool check_order(user_interaction & dialog, const path & current_path, bool & initial_warn) const { return check_map_order(dialog, last_mod, current_path, "data", initial_warn) && check_map_order(dialog, last_change, current_path, "EA", initial_warn); };
@@ -128,29 +154,59 @@ namespace libdar
 	virtual bool fix_corruption(); // return true whether corruption could be fixed (meaning this entry can be safely removed from base)
 
     private:
-	struct status
+	class status
 	{
-	    datetime date;                     //< date of the event
-	    etat present;                      //< file's status in the archive
+	public:
+	    status(): date(0) { present = et_absent; };
+	    status(const datetime & d, etat p) { date = d; present = p; };
+	    virtual ~status() {};
+	    datetime date;                             //< date of the event
+	    etat present;                              //< file's status in the archive
+
+	    virtual void dump(generic_file & f) const; //< write the struct to file
+	    virtual void read(generic_file &f,         //< set the struct from file
+			      unsigned char db_version);
+	};
+
+	class status_plus : public status, public on_pool
+	{
+	public:
+	    status_plus() { me = ref = nullptr; };
+	    status_plus(const datetime & d, etat p, const crc *xme, const crc *xref);
+	    status_plus(const status_plus & ref): status(ref) { copy_from(ref); };
+	    ~status_plus() { detruit(); };
+
+	    const status_plus & operator = (const status_plus & ref) { detruit(); copy_from(ref); return *this; };
+
+	    crc *me;
+	    crc *ref;
+
 	    void dump(generic_file & f) const; //< write the struct to file
 	    void read(generic_file &f,         //< set the struct from file
 		      unsigned char db_version);
+
+	private:
+	    void copy_from(const status_plus & ref);
+	    void detruit();
 	};
 
 
+
 	std::string filename;
-	std::map<archive_num, status> last_mod;    //< key is archive number ; value is last_mod time
-	std::map<archive_num, status> last_change; //< key is archive number ; value is last_change time
+	std::map<archive_num, status_plus> last_mod; //< key is archive number ; value is last_mod time
+	std::map<archive_num, status> last_change;   //< key is archive number ; value is last_change time
 
 
 	    // when false is returned, this means that the user wants to ignore subsequent error of the same type
 	    // else either no error yet met or user want to continue receiving the same type of error for other files
 	    // in that later case initial_warn is set to false (first warning has been shown).
-	bool check_map_order(user_interaction & dialog,
-			     const std::map<archive_num, status> the_map,
-			     const path & current_path,
-			     const std::string & field_nature,
-			     bool & initial_warn) const;
+	template <class T> bool check_map_order(user_interaction & dialog,
+						const std::map<archive_num, T> the_map,
+						const path & current_path,
+						const std::string & field_nature,
+						bool & initial_warn) const;
+
+	bool check_delta_validity(); // return true if no error has been met about delta patch (no delta is broken, missing its reference)
     };
 
 	/// the data_dir class inherits from data_tree and holds the directory tree's parent relationship
@@ -203,7 +259,7 @@ namespace libdar
 
     extern data_dir *data_tree_read(generic_file & f, unsigned char db_version, memory_pool *pool);
 
-	/// lookup routine to find a pointer to the dat_dir object corresponding to the given path
+	/// lookup routine to find a pointer to the dat_tree object corresponding to the given path
 
 	/// \param[in] chemin is the path to look for
 	/// \param[in] racine is the database to look into

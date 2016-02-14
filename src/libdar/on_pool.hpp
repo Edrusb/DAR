@@ -59,12 +59,12 @@ namespace libdar
 	    /// \note If an object has been created by new (not new[], temporary, or local variable)
 	    /// the get_pool() method can return the pool used for allocation, else it returns nullptr.
 	    /// The consequence is that objects dynamically created within an array (new []) cannot know
-	    /// the whether they have been allocated using a memory pool or not
+	    /// whether they have been allocated using a memory pool or not
 	on_pool() { dynamic_init(); };
 
 	    /// copy constructor
 	    ///
-	    /// \note the default copy constructor is not adequate as it would copy the value of dynamic
+	    /// \note the default copy constructor is not adequate as it would copy the value of "dynamic"
 	    /// of the source object whatever is the way the new object is created (dynamically allocated or not)
 	on_pool(const on_pool & ref) { dynamic_init(); };
 
