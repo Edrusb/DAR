@@ -2789,7 +2789,7 @@ namespace libdar
 	const cat_file *ref_fic = dynamic_cast<const cat_file *>(ref);
 	bool resave_uncompressed = false;
 	infinint rewinder = pdesc.stack->get_position(); // we skip back here if data must be saved uncompressed
-	memory_file *delta_sig_ref = nullptr;
+	memory_file *delta_sig_ref = nullptr; // holds the delta_signature that will be used as reference for delta patch
 
 	if(pdesc.compr == nullptr)
 	    throw SRC_BUG;
@@ -2808,23 +2808,26 @@ namespace libdar
 	    {
 		const crc *delta_sig_ref_crc = nullptr;
 
-		if(!delta_diff || ref_fic == nullptr || !ref_fic->has_delta_signature())
-		    throw SRC_BUG;
+		if(delta_diff) // else this is a merging operation
+		{
+		    if(ref_fic == nullptr || !ref_fic->has_delta_signature())
+			throw SRC_BUG;
 
-		    // fetching the delta signature to base the patch on
+			// fetching the delta signature to base the patch on
 
-		delta_sig_ref = new (pool) memory_file();
-		if(delta_sig_ref == nullptr)
-		    throw Ememory("save_inode");
-		ref_fic->read_delta_signature(*delta_sig_ref);
+		    delta_sig_ref = new (pool) memory_file();
+		    if(delta_sig_ref == nullptr)
+			throw Ememory("save_inode");
+		    ref_fic->read_delta_signature(*delta_sig_ref);
 
-		    // fetching the CRC of the file of reference to base the patch on
+			// fetching the CRC of the file of reference to base the patch on
 
-		ref_fic->get_crc(delta_sig_ref_crc);
-		if(delta_sig_ref_crc == nullptr)
-		    throw SRC_BUG;
-		else
-		    fic->set_ref_crc(*delta_sig_ref_crc);
+		    ref_fic->get_crc(delta_sig_ref_crc);
+		    if(delta_sig_ref_crc == nullptr)
+			throw SRC_BUG;
+		    else
+			fic->set_ref_crc(*delta_sig_ref_crc);
+		}
 	    }
 
 	    do // loop if resave_uncompressed is set, this is the OUTER LOOP
