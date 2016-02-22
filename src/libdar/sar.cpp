@@ -554,8 +554,6 @@ namespace libdar
 
     void sar::close_file(bool terminal)
     {
-	bool bug = false;
-
         if(of_fd != NULL)
         {
 	    char flag = terminal ? flag_type_terminal : flag_type_non_terminal;
@@ -568,21 +566,13 @@ namespace libdar
 		    h.write(get_ui(), *of_fd);
 		}
 		else
-		{
-		    if(of_fd->get_position() != of_fd->get_size())
-			bug = true; // we should be at the end of the file
-		    else
-			of_fd->write(&flag, 1);
-		}
+		    of_fd->write(&flag, 1);
 	    }
 	    of_fd->terminate();
 
             delete of_fd;
             of_fd = NULL;
         }
-
-	if(bug)
-	    throw SRC_BUG;
     }
 
     void sar::open_readonly(const char *fic, const infinint &num)
