@@ -2573,9 +2573,9 @@ namespace libdar
 
 		    // obtaining the expected CRC of the file to patch
 
-		if(!patcher.has_ref_crc())
+		if(!patcher.has_patch_base_crc())
 		    throw SRC_BUG; // s_delta should have a ref CRC
-		if(!patcher.get_ref_crc(original_crc))
+		if(!patcher.get_patch_base_crc(original_crc))
 		    throw SRC_BUG; // has CRC true but fetching CRC failed!
 
 

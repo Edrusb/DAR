@@ -1378,12 +1378,12 @@ namespace libdar
 				    else
 					chksum = "";
 
-				    if(reg->has_ref_crc() && reg->get_ref_crc(crc_ref_tmp) && crc_ref_tmp != nullptr)
+				    if(reg->has_patch_base_crc() && reg->get_patch_base_crc(crc_ref_tmp) && crc_ref_tmp != nullptr)
 					chkrefsum = crc_ref_tmp->crc2str();
 				    else
 					chkrefsum = "";
 
-				    get_ui().printf("%S<File name=\"%S\" size=\"%S\" stored=\"%S\" crc=\"%S\" ref_crc=\"%S\" dirty=\"%S\" sparse=\"%S\">\n",
+				    get_ui().printf("%S<File name=\"%S\" size=\"%S\" stored=\"%S\" crc=\"%S\" patch_base_crc=\"%S\" dirty=\"%S\" sparse=\"%S\">\n",
 						    &beginning, &name, &size, &stored, &chksum, &chkrefsum, &dirty, &sparse);
 				    xml_listing_attributes(get_ui(), beginning, data, metadata, e, list_ea);
 				    get_ui().printf("%S</File>\n", &beginning);

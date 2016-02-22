@@ -1229,7 +1229,7 @@ namespace libdar
 		throw SRC_BUG;
 	    if(!entry_file->get_crc(me))
 		me = nullptr;
-	    if(!entry_file->get_ref_crc(ref))
+	    if(!entry_file->get_patch_base_crc(ref))
 		ref = nullptr;
 	    tree->set_data(archive, last_mod, et_patch, me, ref);
 	    break;

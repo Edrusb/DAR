@@ -2826,7 +2826,7 @@ namespace libdar
 		    if(delta_sig_ref_crc == nullptr)
 			throw SRC_BUG;
 		    else
-			fic->set_ref_crc(*delta_sig_ref_crc);
+			fic->set_patch_base_crc(*delta_sig_ref_crc);
 		}
 	    }
 
