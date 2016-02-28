@@ -520,7 +520,8 @@ namespace libdar
 
     generic_file *cat_file::get_data(get_data_mode mode,
 				     memory_file *delta_sig,
-				     generic_file *delta_ref) const
+				     generic_file *delta_ref,
+				     const crc **checksum) const
     {
         generic_file *ret = nullptr;
 
@@ -528,8 +529,7 @@ namespace libdar
 	{
 		// sanity checks
 
-	    if(get_saved_status() != s_saved
-	       && get_saved_status() != s_delta)
+	    if(!can_get_data())
 		throw Erange("cat_file::get_data", gettext("cannot provide data from a \"not saved\" file object"));
 
 	    if(delta_ref != nullptr
@@ -636,7 +636,8 @@ namespace libdar
 		    {
 			generic_rsync *diff = new (get_pool()) generic_rsync(delta_ref,
 									     data->top(),
-									     true);
+									     get_size(),
+									     checksum);
 			if(diff == nullptr)
 			    throw Ememory("cat_file::get_data");
 			try

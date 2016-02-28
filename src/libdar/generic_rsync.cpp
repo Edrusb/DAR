@@ -79,10 +79,10 @@ namespace libdar
 	    x_below = below;
 	    x_output = signature_storage;
 	    x_input = nullptr;
-	    orig_crc = nullptr;
 	    sumset = nullptr;
 	    initial = true;
 	    patching_completed = false; // not used in sign mode
+	    data_crc = nullptr;
 	    job = rs_sig_begin(RS_DEFAULT_BLOCK_LEN, RS_DEFAULT_STRONG_LEN);
 	}
 	catch(...)
@@ -100,7 +100,8 @@ namespace libdar
 
     generic_rsync::generic_rsync(generic_file *base_signature,
 				 generic_file *below,
-				 bool notused): generic_file(gf_read_only)
+				 const infinint & crc_size,
+				 const crc **checksum): generic_file(gf_read_only)
     {
 #if LIBRSYNC_AVAILABLE
 	char *inbuf = nullptr;
@@ -123,6 +124,7 @@ namespace libdar
 	status = delta;
 	initial = true;
 	patching_completed = false; // not used in delta mode
+	data_crc = nullptr;
 	meta_new(working_buffer, BUFFER_SIZE);
 	if(working_buffer == nullptr)
 	    throw Ememory("generic_rsync::generic_rsync (sign)");
@@ -177,14 +179,30 @@ namespace libdar
 
 		// creating the delta job
 
-	    err = rs_build_hash_table(sumset);
-	    if(err != RS_DONE)
-		throw Erange("generic_rsync::generic_rsync", string(gettext("Error met building the rsync hash table: ")) + string(rs_strerror(err)));
-	    job = rs_delta_begin(sumset);
-	    x_below = below;
-	    x_input = nullptr;
-	    x_output = nullptr;
-	    orig_crc = nullptr;
+	    if(checksum != nullptr)
+		data_crc = create_crc_from_size(crc_size, get_pool());
+	    if(data_crc == nullptr)
+		throw Ememory("generic_rsync::generic_rsync");
+
+	    try
+	    {
+		err = rs_build_hash_table(sumset);
+		if(err != RS_DONE)
+		    throw Erange("generic_rsync::generic_rsync", string(gettext("Error met building the rsync hash table: ")) + string(rs_strerror(err)));
+		job = rs_delta_begin(sumset);
+		x_below = below;
+		x_input = nullptr;
+		x_output = nullptr;
+	    }
+	    catch(...)
+	    {
+	 	if(data_crc != nullptr)
+		    delete data_crc;
+		throw;
+	    }
+
+	    if(data_crc != nullptr)
+		*checksum = data_crc;
 	}
 	catch(...)
 	{
@@ -247,11 +265,9 @@ namespace libdar
 	x_output = nullptr;
 	x_below = delta;
 	sumset = nullptr;
-	orig_crc = original_crc;
-	if(orig_crc == nullptr)
-	    throw SRC_BUG;
 	initial = true;
 	working_size = 0;
+	data_crc = nullptr;
 	meta_new(working_buffer,BUFFER_SIZE);
 	if(working_buffer == nullptr)
 	    throw Ememory("generic_rsync::generic_rsync (sign)");
@@ -310,8 +326,15 @@ namespace libdar
 	    {
 		if(!eof)
 		{
-		    working_size += x_below->read(working_buffer + working_size,
-						  BUFFER_SIZE - working_size);
+		    U_I tmp = x_below->read(working_buffer + working_size,
+					    BUFFER_SIZE - working_size);
+		    if(tmp > 0)
+		    {
+			if(data_crc != nullptr)
+			    data_crc->compute(working_buffer + working_size, tmp);
+			working_size += lu;
+		    }
+
 		    if(working_size == 0)
 			eof = true;
 		}

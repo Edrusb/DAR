@@ -60,17 +60,18 @@ namespace libdar
 	    /// in this mode the generic_rsync object is also read only, all data
 	    /// read from it is the resulting delta of the data read from "below" based
 	    /// the given base_signature.
-	    /// produce a delta signature. Nothing is passed to below, but below
-	    /// argument is kept for coherence with the previous constructor
 	    /// \param[in] base_signature is read only
 	    /// \param[in] below is the plain file to read from and for which to compute the
 	    /// delta based on base_signature
-	    /// \param[in] notused takes any value and is only here to provide a different
-	    /// constructor than the "signature" one above
+	    /// \param[in] crc_size is the size of the crc to create if checksum is not nullptr
+	    /// \param[in] checksum if not null, the *checksum will be set to the address of a newly
+	    /// allocated crc that will receive the calculated crc of the below object, this
+	    /// CRC is calcuated for the data of "below". Caller has the duty to release this object
+	    /// when no more needed but never before this generic_rsync object has been destroyed.
 	generic_rsync(generic_file *base_signature,
 		      generic_file *below,
-		      bool notused);
-
+		      const infinint & crc_size,
+		      const crc **checksum);
 
 	    /// constructor for "patch" operation
 	    ///
@@ -115,11 +116,11 @@ namespace libdar
 	generic_file *x_below;    //< underlying layer to read from / write to
 	generic_file *x_input;
 	generic_file *x_output;
-	const crc *orig_crc;
 	bool initial;
 	char *working_buffer;
 	U_I working_size;
 	bool patching_completed;
+	crc *data_crc;
 
 #if LIBRSYNC_AVAILABLE
 	rs_job_t *job;
