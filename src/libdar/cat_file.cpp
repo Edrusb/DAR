@@ -1051,6 +1051,13 @@ namespace libdar
 	}
 
 	if(small)
+	{
+	    if(patch_base_check == nullptr)
+		throw SRC_BUG;
+	    patch_base_check->dump(where);
+	}
+
+	if(small)
 	    delta_sig_size.dump(where);
 	delta_sig_offset = where.get_position();
 	sig.skip(0);
@@ -1062,6 +1069,14 @@ namespace libdar
 	    if(small)
 		delta_sig_crc->dump(where);
 	}
+
+	if(small)
+	{
+	    if(patch_result_check == nullptr)
+		throw SRC_BUG;
+	    patch_result_check->dump(where);
+	}
+
 	will_have_delta_sig = true;
     }
 
@@ -1085,7 +1100,7 @@ namespace libdar
 	    case empty:
 		throw SRC_BUG;
 	    case from_path:
-		throw SRC_BUG; // signature is caluculated while reading the data (get_data()) and kept by the caller
+		throw SRC_BUG; // signature is calculated while reading the data (get_data()) and kept by the caller
 	    case from_cat:
 		from = get_compressor_layer();
 		if(from == nullptr)
@@ -1104,6 +1119,13 @@ namespace libdar
 	    {
 		if(!esc->skip_to_next_mark(escape::seqt_delta_sig, true))
 		    throw Erange("cat_file::read_delta_signature", gettext("can't find mark for delta signature"));
+
+		if(patch_base_check != nullptr)
+		{
+		    delete patch_base_check;
+		    me->patch_base_check = nullptr;
+		}
+		me->patch_base_check = create_crc_from_file(*from, get_pool());
 		me->delta_sig_size.read(*from);
 		me->delta_sig_offset = from->get_position();
 
@@ -1142,6 +1164,16 @@ namespace libdar
 
 		if(*delta_sig_crc != *calculated)
 		    throw Erange("cat_file::read_delta_signature", gettext("CRC error: data corruption."));
+
+		if(small)
+		{
+		    if(patch_result_check != nullptr)
+		    {
+			delete patch_result_check;
+			me->patch_result_check = nullptr;
+		    }
+		    me->patch_result_check = create_crc_from_file(*from, get_pool());
+		}
 	    }
 	    catch(...)
 	    {

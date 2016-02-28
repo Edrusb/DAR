@@ -142,6 +142,7 @@ namespace libdar
 
 	/// write down delta signature for unsaved files taking it from entry of reference or computing from filesystem
     static void save_delta_signature(user_interaction & dialog,
+				     memory_pool *pool,
 				     const string & info_quoi,
 				     cat_file * e_file,
 				     const cat_file * ref_file,
@@ -2789,7 +2790,8 @@ namespace libdar
 	const cat_file *ref_fic = dynamic_cast<const cat_file *>(ref);
 	bool resave_uncompressed = false;
 	infinint rewinder = pdesc.stack->get_position(); // we skip back here if data must be saved uncompressed
-	memory_file *delta_sig_ref = nullptr; // holds the delta_signature that will be used as reference for delta patch
+	memory_file *delta_sig_ref = nullptr; // holds the delta_signature that will be used as reference for delta patch later on
+	const crc *result_crc = nullptr;
 
 	if(pdesc.compr == nullptr)
 	    throw SRC_BUG;
@@ -2806,9 +2808,7 @@ namespace libdar
 
 	    if(fic != nullptr && fic->get_saved_status() == s_delta)
 	    {
-		const crc *delta_sig_ref_crc = nullptr;
-
-		if(delta_diff) // else this is a merging operation
+		if(delta_diff) // not a merging operation
 		{
 		    if(ref_fic == nullptr || !ref_fic->has_delta_signature())
 			throw SRC_BUG;
@@ -2819,15 +2819,8 @@ namespace libdar
 		    if(delta_sig_ref == nullptr)
 			throw Ememory("save_inode");
 		    ref_fic->read_delta_signature(*delta_sig_ref);
-
-			// fetching the CRC of the file of reference to base the patch on
-
-		    ref_fic->get_crc(delta_sig_ref_crc);
-		    if(delta_sig_ref_crc == nullptr)
-			throw SRC_BUG;
-		    else
-			fic->set_patch_base_crc(*delta_sig_ref_crc);
 		}
+		    // else, merging operation, no delta operation performed, we will eventually just copy the delta signature later
 	    }
 
 	    do // loop if resave_uncompressed is set, this is the OUTER LOOP
@@ -2849,6 +2842,7 @@ namespace libdar
 		   && fic->get_saved_status() != s_delta)
 		{
 		    save_delta_signature(dialog,
+					 pool,
 					 info_quoi,
 					 fic,
 					 ref_fic,
@@ -2936,10 +2930,10 @@ namespace libdar
 				    }
 
 				    if(fic->get_sparse_file_detection_read()) // source file already holds a sparse_file structure
-					source = fic->get_data(cat_file::plain, delta_sig, delta_sig_ref);
+					source = fic->get_data(cat_file::plain, delta_sig, delta_sig_ref, & result_crc);
 					// we must hide the holes for it can be redetected
 				    else
-					source = fic->get_data(cat_file::normal, delta_sig, delta_sig_ref);
+					source = fic->get_data(cat_file::normal, delta_sig, delta_sig_ref, & result_crc);
 				    break;
 				case cat_file::plain:
 				    throw SRC_BUG; // save_inode must never be called with this value
@@ -3271,6 +3265,67 @@ namespace libdar
 					    throw Ememory("saved_inode");
 
 					fic->read_delta_signature(*delta_sig);
+				    }
+
+				    if(!fic->has_patch_base_crc())
+				    {
+					const crc *tmp = nullptr;
+
+					switch(fic->get_saved_status())
+					{
+					case s_saved:
+				 	    fic->get_crc(tmp);
+					    break;
+					case s_fake:
+					    throw SRC_BUG;
+					case s_not_saved:
+					    throw SRC_BUG;
+						// we should not reach this statement with this status
+					case s_delta:
+					    if(ref_fic->has_patch_result_crc())
+						ref_fic->get_patch_result_crc(tmp);
+					    else
+						throw SRC_BUG;
+					    break;
+					default:
+					    throw SRC_BUG;
+					}
+
+					if(tmp == nullptr)
+					    throw SRC_BUG;
+					fic->set_patch_base_crc(*tmp);
+				    }
+
+				    if(!fic->has_patch_result_crc())
+				    {
+					const crc *tmp = nullptr;
+
+					switch(fic->get_saved_status())
+					{
+					case s_saved:
+					    fic->get_crc(tmp);
+					    break;
+					case s_fake:
+					    throw SRC_BUG;
+					case s_not_saved:
+					    if(ref_fic == nullptr)
+						throw SRC_BUG;
+					    if(!ref_fic->has_patch_result_crc())
+						throw SRC_BUG;
+					    ref_fic->get_patch_result_crc(tmp);
+					    break;
+					case s_delta:
+					    if(result_crc == nullptr)
+						throw SRC_BUG;
+					    tmp = result_crc;
+					    break;
+					default:
+					    throw SRC_BUG;
+					}
+
+					if(tmp == nullptr)
+					    throw SRC_BUG;
+					fic->set_patch_result_crc(*tmp);
 				    }
 
 					// adding a tape mark when in sequential read mode
@@ -3989,6 +4044,7 @@ namespace libdar
     }
 
     static void save_delta_signature(user_interaction & dialog,
+				     memory_pool *pool,
 				     const string & info_quoi,
 				     cat_file * e_file,
 				     const cat_file * ref_file,
@@ -3998,40 +4054,9 @@ namespace libdar
 				     const catalogue & cat)
     {
 	if(e_file != nullptr
-	   && e_file->has_delta_signature()
-	   && e_file->get_saved_status() != s_saved)
+	   && e_file->has_delta_signature())
 	{
 	    memory_file sig;
-
-		// save_inode could not calculate and add delta sig we must do
-		// it here either copying from the archive of reference
-
-
-		// first, making sure e_file knowns its CRC
-
-	    if(!e_file->has_crc())
-	    {
-		const crc *tmp;
-
-		if(!e_file->get_crc(tmp))
-		{
-		    if(ref_file != nullptr)
-		    {
-			if(ref_file->get_crc(tmp))
-			    e_file->set_crc(*tmp);
-			else
-			    throw SRC_BUG;
-		    }
-		    else
-			throw SRC_BUG;
-		}
-	    }
-
-		// second, dropping the data CRC with its tape mark
-
-	    cat.pre_add_crc(e_file);
-
-		// then the delta signature
 
 	    if(ref_file != nullptr
 	       && ref_file->has_delta_signature())
@@ -4039,35 +4064,56 @@ namespace libdar
 		if(display_treated)
 		    dialog.warning(string(gettext("Copying delta signature from the archive of reference: ")) + info_quoi);
 		ref_file->read_delta_signature(sig);
+
+		if(ref_file->has_patch_base_crc())
+		{
+		    const crc *tmp;
+		    ref_file->get_patch_base_crc(tmp);
+		    e_file->set_patch_base_crc(*tmp);
+		}
+		else
+		    throw SRC_BUG;
+
+		if(ref_file->has_patch_result_crc())
+		{
+		    const crc *tmp;
+		    ref_file->get_patch_result_crc(tmp);
+		    e_file->set_patch_result_crc(*tmp);
+		}
+		else
+		    throw SRC_BUG;
+
 	    }
-	    else // or calculating from filesystem
+	    else if(e_file->can_get_data()) // or calculating from filesystem when possible (not the case when performing a merge operation)
 	    {
 		null_file trou_noir(gf_write_only);
 		generic_file *data = nullptr;
-		saved_status tmp = e_file->get_saved_status();
 
 		if(display_treated)
 		    dialog.warning(string(gettext("Calculating delta signature from filesystem: "))
 				   + info_quoi);
-
-		e_file->set_saved_status(s_saved); // temporarily to have get_data() operationnal
 		try
 		{
+		    infinint crc_size = e_file->get_size();
+		    crc *patch_sig_crc = nullptr;
+
 		    data = e_file->get_data(cat_file::normal, &sig, nullptr);
 		    if(data == nullptr)
 			throw Ememory("filtre_sauvegarde");
-		    data->copy_to(trou_noir);
+		    data->copy_to(trou_noir, crc_size, patch_sig_crc);
+		    if(patch_sig_crc == nullptr)
+			throw SRC_BUG;
+		    e_file->set_patch_base_crc(*patch_sig_crc);
+		    e_file->set_patch_result_crc(*patch_sig_crc);
 		}
 		catch(...)
 		{
 		    if(data != nullptr)
 			delete data;
-		    e_file->set_saved_status(tmp);
 		    throw;
 		}
 		if(data != nullptr)
 		    delete data;
-		e_file->set_saved_status(tmp);
 	    }
 
 	    cat.pre_add_delta_sig();
