@@ -108,11 +108,8 @@ namespace libdar
 
     const memory_file & delta_signature::get_sig() const
     {
-	if(sig == nullptr && read_from != nullptr)
-	{
-	    delta_signature *me = const_cast<delta_signature *>(this);
-	    me->fetch_signature_data(*read_from);
-	}
+	if(sig == nullptr)
+	    throw SRC_BUG;
 
 	return *sig;
     }
@@ -124,6 +121,17 @@ namespace libdar
 	    delete sig;
 	    sig = nullptr;
 	}
+    }
+
+    bool delta_signature::is_sig_attached() const
+    {
+	if(sig == nullptr && read_from != nullptr)
+	{
+	    delta_signature *me = const_cast<delta_signature *>(this);
+	    me->fetch_signature_data(*read_from);
+	}
+
+	return sig != nullptr;
     }
 
     bool delta_signature::get_patch_base_crc(const crc * & c) const

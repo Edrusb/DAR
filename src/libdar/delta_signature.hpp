@@ -101,7 +101,7 @@ namespace libdar
 	void detach_sig();
 
 	    /// tells whether an memory file is attached to this object. if not get_sig() will throw an exception
-	bool is_sig_attached() const { return sig != nullptr; };
+	bool is_sig_attached() const;
 
 	    /// returns whether the object has a base patch CRC (s_delta status objects)
 	bool has_patch_base_crc() const { return patch_base_check != nullptr; };
