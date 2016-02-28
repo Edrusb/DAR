@@ -136,14 +136,25 @@ namespace libdar
 	bool has_delta_signature() const { return will_have_delta_sig; };
 
 
-	    /// returns whether the object has CRC of reference (s_delta status objects)
+	    /// returns whether the object has a base patch CRC (s_delta status objects)
 	bool has_patch_base_crc() const { return patch_base_check != nullptr; };
 
-	    /// returns the reference CRC for s_delta objects
+	    /// returns the CRC of the file to base the patch on, for s_delta objects
 	bool get_patch_base_crc(const crc * & c) const;
 
-	    /// set the reference CRC for s_detla objects
+	    /// set the reference CRC of the file to base the patch on, for s_detla objects
 	void set_patch_base_crc(const crc & c);
+
+
+
+	    /// returns whether the object has a CRC corresponding to data (for s_saved, s_delta, and when delta signature is present)
+	bool has_patch_result_crc() const { return patch_result_check != nullptr || (get_saved_status() == s_saved && check != nullptr); };
+
+	    /// returns the CRC the file will have once restored or patched (for s_saved, s_delta, and when delta signature is present)
+	bool get_patch_result_crc(const crc * & c) const;
+
+	    /// set the CRC the file will have once restored or patched (for s_saved, s_delta, and when delta signature is present)
+	void set_patch_result_crc(const crc & c);
 
 	    /// for small dump to have the delta_sig set
 	    ///
@@ -182,7 +193,8 @@ namespace libdar
         infinint *size;         //< size of the data (uncompressed)
         infinint *storage_size; //< how much data used in archive (after compression)
         crc *check;             //< crc computed on the data
-	crc *patch_base_check;  //< stored crc of the file the delta diff has been based on
+	crc *patch_base_check;  //< stored crc of the file the delta diff has been based on (used for restoration)
+	crc *patch_result_check;//< stored crc of the file once the patch has been successfully applied (used for incremental delta patch backup)
 	bool dirty;             //< true when a file has been modified at the time it was saved
         compression algo_read;  //< which compression algorithm to use to read the file's data
 	compression algo_write; //< which compression algorithm to use to write down (merging) the file's data

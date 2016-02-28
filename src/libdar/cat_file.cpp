@@ -65,6 +65,7 @@ namespace libdar
         file_data_status_write = 0;
         check = nullptr;
 	patch_base_check = nullptr;
+	patch_result_check = nullptr;
         dirty = false;
 	delta_sig_offset = 0;
 	delta_sig_size = 0;
@@ -114,6 +115,7 @@ namespace libdar
         storage_size = nullptr;
         check = nullptr;
 	patch_base_check = nullptr;
+	patch_result_check = nullptr;
         algo_read = default_algo;  // only used for archive format "03" and older
         algo_write = default_algo; // may be changed later using change_compression_algo_write()
         furtive_read_mode = false; // no used in that "status" mode
@@ -197,7 +199,7 @@ namespace libdar
                             // and takes more place than no compression)
                     }
 
-                    if(reading_ver >= 8 || will_have_delta_sig)
+                    if(reading_ver >= 8)
                     {
 			check = create_crc_from_file(*ptr, get_pool());
                         if(check == nullptr)
@@ -355,6 +357,7 @@ namespace libdar
         storage_size = nullptr;
         check = nullptr;
 	patch_base_check = nullptr;
+	patch_result_check = nullptr;
         dirty = ref.dirty;
         algo_read = ref.algo_read;
         algo_write = ref.algo_write;
@@ -990,6 +993,48 @@ namespace libdar
 	    throw Ememory("cat_file::set_crc");
     }
 
+    bool cat_file::get_patch_result_crc(const crc * & c) const
+    {
+	if(patch_result_check != nullptr)
+	{
+	    c = patch_result_check;
+	    return true;
+	}
+	else if(check != nullptr && get_saved_status() == s_saved)
+	{
+	    c = check;
+	    return true;
+	}
+	else
+	    return false;
+    }
+
+    void cat_file::set_patch_result_crc(const crc & c)
+    {
+	if(!has_delta_signature())
+	    throw SRC_BUG; // the patch_result_crc is only
+	    // here to record the real CRC a file has once
+	    // restored. When a file is a delta patch, the "check"
+	    // field is only the checksum of the patch, not of
+	    // the resulting patched file.
+	    // If we want to do a new delta patch
+	    // on that file, we will need the real CRC not the CRC
+	    // of the current patch at restoration time to check
+	    // this second patch is applied to the correct file.
+	    //
+	    // This field is thus used only when delta_signature
+	    // is present and when the file's data is already a
+	    // patch (s_delta) or the s_not_saved status
+
+	if(patch_result_check != nullptr)
+	{
+	    delete patch_result_check;
+	    patch_result_check = nullptr;
+	}
+	patch_result_check = c.clone();
+	if(patch_result_check == nullptr)
+	    throw Ememory("cat_file::set_crc");
+    }
 
     void cat_file::dump_delta_signature(memory_file &sig, generic_file & where, bool small)
     {
