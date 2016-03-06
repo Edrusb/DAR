@@ -156,7 +156,7 @@ namespace libdar
                             }
 
 			    if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
-				will_have_delta_signature();
+				will_have_delta_signature_structure();
 			    file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
 
                             file_data_status_write = file_data_status_read;
@@ -207,7 +207,7 @@ namespace libdar
 			ptr->read(&file_data_status_read, sizeof(file_data_status_read));
 
 			if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
-			    will_have_delta_signature();
+			    will_have_delta_signature_structure();
 			file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
 		    }
 
@@ -252,7 +252,7 @@ namespace libdar
 		    if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
 		    {
 			file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
-			will_have_delta_signature();
+			will_have_delta_signature_structure();
 		    }
                     file_data_status_write = file_data_status_read;
                     ptr->read(&tmp, sizeof(tmp));
@@ -268,7 +268,7 @@ namespace libdar
 			if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
 			{
 			    file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
-			    will_have_delta_signature();
+			    will_have_delta_signature_structure();
 			}
 			file_data_status_write = file_data_status_read;
 		    }
@@ -365,7 +365,7 @@ namespace libdar
     void cat_file::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
 	generic_file *ptr = nullptr;
-	char flags = has_delta_signature() ? FILE_DATA_HAS_DELTA_SIG : 0;
+	char flags = has_delta_signature_structure() ? FILE_DATA_HAS_DELTA_SIG : 0;
 
 	    // setting ptr
 
@@ -413,7 +413,7 @@ namespace libdar
                     check->dump(*ptr);
 	    }
 
-	    if(has_delta_signature())
+	    if(has_delta_signature_structure())
 		delta_sig->dump_metadata(*ptr);
         }
         else // we only know whether the file will be compressed or using sparse_file data structure
@@ -818,8 +818,7 @@ namespace libdar
 	else
 	{
 	    if(get_saved_status() == s_saved
-	       || get_saved_status() == s_delta
-	       || has_delta_signature())
+	       || get_saved_status() == s_delta)
 	    {
 		if(check == nullptr)
 		{
@@ -941,7 +940,7 @@ namespace libdar
 
     void cat_file::set_patch_result_crc(const crc & c)
     {
-	if(!has_delta_signature())
+	if(!has_delta_signature_structure())
 	    throw SRC_BUG; // the patch_result_crc is only
 	    // here to record the real CRC a file has once
 	    // restored. When a file is a delta patch, the "check"
@@ -960,7 +959,7 @@ namespace libdar
 	delta_sig->set_patch_result_crc(c);
     }
 
-    void cat_file::will_have_delta_signature()
+    void cat_file::will_have_delta_signature_structure()
     {
 	if(delta_sig == nullptr)
 	{
@@ -968,6 +967,15 @@ namespace libdar
 	    if(delta_sig == nullptr)
 		throw Ememory("cat_file::will_have_delta_signature()");
 	}
+    }
+
+    void cat_file::will_have_delta_signature_available()
+    {
+	will_have_delta_signature_structure();
+	if(delta_sig == nullptr)
+	    throw SRC_BUG;
+
+	delta_sig->will_have_signature();
     }
 
     void cat_file::dump_delta_signature(memory_file &sig, generic_file & where, bool small)
@@ -981,13 +989,25 @@ namespace libdar
 	delta_sig->dump_data(where, small);
     }
 
-    memory_file *cat_file::read_delta_signature() const
+    void cat_file::dump_delta_signature(generic_file & where, bool small)
     {
-	memory_file *ret = nullptr;
+	infinint crc_size;
+
+	if(delta_sig == nullptr)
+	    throw SRC_BUG;
+
+	delta_sig->set_sig_ref();
+	delta_sig->dump_data(where, small);
+    }
+
+    void cat_file::read_delta_signature(memory_file * delta_sig_ret) const
+    {
 	compressor *from = nullptr;
 	escape *esc = nullptr;
 	bool small = get_small_read();
 	cat_file *me = const_cast<cat_file *>(this);
+
+	delta_sig_ret = nullptr;
 
 	if(delta_sig == nullptr)
 	    throw SRC_BUG;
@@ -1025,15 +1045,16 @@ namespace libdar
 	    }
 	    me->delta_sig->read_data(*from);
 
-	    ret = me->delta_sig->obtain_sig();
+	    if(delta_sig->can_obtain_sig())
+		delta_sig_ret = me->delta_sig->obtain_sig();
+	    else
+		delta_sig_ret = nullptr;
 	}
 	catch(Egeneric & e)
 	{
 	    e.prepend_message(gettext("Error while retrieving delta signature from the archive: "));
 	    throw;
 	}
-
-	return ret;
     }
 
     bool cat_file::has_same_delta_signature(const cat_file & ref) const
@@ -1043,8 +1064,8 @@ namespace libdar
 
 	try
 	{
-	    sig_me = read_delta_signature();
-	    sig_you = ref.read_delta_signature();
+	    read_delta_signature(sig_me);
+	    ref.read_delta_signature(sig_you);
 
 	    if(sig_me == nullptr)
 		throw SRC_BUG;
@@ -1073,7 +1094,18 @@ namespace libdar
 	    delete sig_you;
     }
 
-    void cat_file::clear_delta_signature()
+    void cat_file::clear_delta_signature_only()
+    {
+	if(delta_sig != nullptr)
+	{
+	    if(get_saved_status() == s_delta)
+		delta_sig->set_sig_ref();
+	    else
+		clear_delta_signature_structure();
+	}
+    }
+
+    void cat_file::clear_delta_signature_structure()
     {
 	if(delta_sig != nullptr)
 	{
@@ -1184,12 +1216,12 @@ namespace libdar
 	    delete me;
 
 	}
-	else if(has_delta_signature()
-		&& (compile_time::librsync() || f_other->has_delta_signature()))
+	else if(has_delta_signature_available()
+		&& (compile_time::librsync() || f_other->has_delta_signature_available()))
 	{
 		// calculate delta signature of file and comparing them
 
-	    if(f_other->has_delta_signature())
+	    if(f_other->has_delta_signature_available())
 		    // this should never be the case, but well it does not hurt taking this case into account
 	    {
 		    // both only have delta signature
@@ -1223,7 +1255,7 @@ namespace libdar
 
 		try
 		{
-		    sig_me = read_delta_signature();
+		    read_delta_signature(sig_me);
 		    if(sig_me == nullptr)
 			throw SRC_BUG;
 

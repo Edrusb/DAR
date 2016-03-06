@@ -141,8 +141,11 @@ namespace libdar
 	void set_dirty(bool value) { dirty = value; };
 
 
-	    /// return whether the object has an associated delta signature
-	bool has_delta_signature() const { return delta_sig != nullptr; };
+	    /// return whether the object has an associated delta signature structure
+	bool has_delta_signature_structure() const { return delta_sig != nullptr; };
+
+	    /// return whether the object has an associated delta signature structure including a delta signature data (not just CRC)
+	bool has_delta_signature_available() const { return delta_sig != nullptr && delta_sig->can_obtain_sig(); };
 
 
 	    /// returns whether the object has a base patch CRC (s_delta status objects)
@@ -165,8 +168,11 @@ namespace libdar
 	    /// set the CRC the file will have once restored or patched (for s_saved, s_delta, and when delta signature is present)
 	void set_patch_result_crc(const crc & c);
 
-	    /// prepare the object to receive a delta signature or only the delta diff associated CRC, later one
-	void will_have_delta_signature();
+	    /// prepare the object to receive a delta signature structure
+	void will_have_delta_signature_structure();
+
+	    /// prepare the object to receive a delta signature structure including delta signature
+	void will_have_delta_signature_available();
 
 	    /// write down to archive the given delta signature
 	    ///
@@ -175,16 +181,24 @@ namespace libdar
 	    /// \param[in] small if set to true drop down additional information to allow sequential reading mode
 	void dump_delta_signature(memory_file & sig, generic_file & where, bool small);
 
+	    /// variant of dump_delta_signature when just CRC have to be dumped
+	void dump_delta_signature(generic_file & where, bool small);
+
 	    /// fetch the delta signature from the archive
 	    ///
-	    /// \return a newly allocated memory_file containing the delta signature. The caller has the duty to destroy this object after use
-	memory_file *read_delta_signature() const;
+	    /// \param[in] delta_sig is either nullptr or points to a newly allocated memory_file
+	    /// containing the delta signature. The caller has the duty to destroy this object after use
+	    /// \note nullptr is returned if the delta_signature only contains CRCs
+	void read_delta_signature(memory_file *delta_sig) const;
 
 	    /// return true if ref and "this" have both equal delta signatures
 	bool has_same_delta_signature(const cat_file & ref) const;
 
+	    /// remove information about delta signature also associated CRCs if status is not s_delta
+	void clear_delta_signature_only();
+
 	    /// remove any information about delta signature
-	void clear_delta_signature();
+	void clear_delta_signature_structure();
 
     protected:
         void sub_compare(const cat_inode & other, bool isolated_mode) const;
