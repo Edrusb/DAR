@@ -313,7 +313,7 @@ namespace libdar
 	const cat_file *first_f = dynamic_cast<const cat_file *>(first_i);
 
 	if(first_f != nullptr)
-	    return first_f->has_delta_signature();
+	    return first_f->has_delta_signature_available();
 	else
 	    return false;
     }

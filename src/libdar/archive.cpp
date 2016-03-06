@@ -1481,7 +1481,7 @@ namespace libdar
 		    ent.set_is_sparse_file(tmp_file->get_sparse_file_detection_read());
 		    ent.set_compression_algo(tmp_file->get_compression_algo_read());
 		    ent.set_dirtiness(tmp_file->is_dirty());
-		    ent.set_delta_sig(tmp_file->has_delta_signature());
+		    ent.set_delta_sig(tmp_file->has_delta_signature_available());
 		}
 
 		if(tmp_lien != nullptr && tmp_lien->get_saved_status() == s_saved)

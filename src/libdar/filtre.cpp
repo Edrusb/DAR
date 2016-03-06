@@ -747,7 +747,8 @@ namespace libdar
 					    !avoid_saving_inode
 					    && delta_diff
 					    && e_file != nullptr
-					    && f_file != nullptr && f_file->has_delta_signature();
+					    && f_file != nullptr
+					    && f_file->has_delta_signature_available();
 
 					bool avoid_saving_ea =
 					    snapshot
@@ -784,7 +785,16 @@ namespace libdar
 					}
 
 					if(make_delta_diff)
+					{
 					    e_ino->set_saved_status(s_delta);
+					    if(e_file != nullptr)
+						e_file->will_have_delta_signature_structure();
+						// this structure is necessary to store base and result CRC
+						// even if no delta_signature will be computed
+						// base CRC is used before patching to check we apply the patch to the good patch
+						// result CRC is used for the next delta diff (if a delta_signature is used)
+						// and also to check after patching that the result of the patch is the expected file
+					}
 
 					if(avoid_saving_ea)
 					{
@@ -822,7 +832,7 @@ namespace libdar
 					   && delta_signature
 					   && delta_mask.is_covered(juillet.get_string())
 					   && e_file->get_size() >= delta_sig_min_size)
-					    e_file->will_have_delta_signature();
+					    e_file->will_have_delta_signature_available();
 					    // during small inode dump for that file, the flag telling a delta_sig is present will be set
 
 
@@ -845,7 +855,7 @@ namespace libdar
 						       repeat_byte,
 						       sparse_file_min_size,
 						       &sem,
-						       e_file == nullptr ? false : e_file->has_delta_signature(),
+						       e_file == nullptr ? false : e_file->has_delta_signature_available(),
 						       make_delta_diff,
 						       wasted_bytes))
 					    st.incr_tooold(); // counting a new dirty file in archive
@@ -1294,7 +1304,7 @@ namespace libdar
         const cat_eod tmp_eod;
 	thread_cancellation thr_cancel;
 	string perimeter;
-	memory_file delta_sig;
+	memory_file *delta_sig = nullptr;
 
 	if(display_treated_only_dir && display_treated)
 	    display_treated = false;
@@ -1435,20 +1445,17 @@ namespace libdar
 
 			    // checking delta signature if any
 
-			if(e_file != nullptr && e_file->has_delta_signature())
+			if(e_file != nullptr && e_file->has_delta_signature_structure())
 			{
-				// reading the CRC (read above only in s_saved status)
-
-			    if(e_file->get_saved_status() != s_saved)
-			    {
-				const crc *crc_tmp = nullptr;
-				e_file->get_crc(crc_tmp);
-			    }
 
 				// reading the delta signature
 
 			    e_file->read_delta_signature(delta_sig);
-			    delta_sig.reset();
+			    if(delta_sig != nullptr)
+			    {
+				delete delta_sig;
+				delta_sig = nullptr;
+			    }
 			    if(perimeter == "")
 				perimeter = "Delta sig";
 			    else
@@ -2538,8 +2545,8 @@ namespace libdar
 		    {
 			if(!delta_signature)
 			{
-			    if(e_file->has_delta_signature())
-				e_file->clear_delta_signature();
+			    if(e_file->has_delta_signature_available())
+				e_file->clear_delta_signature_only();
 			}
 			else // delta signature asked for transfer or calculation
 			{
@@ -2548,7 +2555,7 @@ namespace libdar
 				if(delta_mask.is_covered(juillet.get_string())
 				   && e_file->get_size() >= delta_sig_min_size)
 				{
-				    if(!e_file->has_delta_signature())
+				    if(!e_file->has_delta_signature_available())
 				    {
 					switch(keep_mode)
 					{
@@ -2565,13 +2572,13 @@ namespace libdar
 					    }
 					    else
 					    {
-						e_file->will_have_delta_signature();
+						e_file->will_have_delta_signature_available();
 						calculate_delta_signature = true;
 					    }
 					    break;
 					case cat_file::normal:
 					case cat_file::plain:
-					    e_file->will_have_delta_signature();
+					    e_file->will_have_delta_signature_available();
 					    calculate_delta_signature = true;
 					    break;
 					default:
@@ -2581,8 +2588,8 @@ namespace libdar
 				}
 				else
 				{
-				    if(e_file->has_delta_signature())
-					e_file->clear_delta_signature();
+				    if(e_file->has_delta_signature_available())
+					e_file->clear_delta_signature_only();
 				}
 			    }
 
@@ -2810,15 +2817,17 @@ namespace libdar
 	    {
 		if(delta_diff) // not a merging operation
 		{
-		    if(ref_fic == nullptr || !ref_fic->has_delta_signature())
+		    if(ref_fic == nullptr || !ref_fic->has_delta_signature_available())
 			throw SRC_BUG;
 
 			// fetching the delta signature to base the patch on
 
-		    delta_sig_ref = new (pool) memory_file();
+		    ref_fic->read_delta_signature(delta_sig_ref);
 		    if(delta_sig_ref == nullptr)
 			throw Ememory("save_inode");
-		    ref_fic->read_delta_signature(*delta_sig_ref);
+
+			// need to store at least the base CRC and result CRC even if not delta signature is computed:
+		    fic->will_have_delta_signature_structure();
 		}
 		    // else, merging operation, no delta operation performed, we will eventually just copy the delta signature later
 	    }
@@ -2837,7 +2846,7 @@ namespace libdar
 		    // WRITING DOWN DELTA SIG FOR NO SAVED FILES
 
 		if(fic != nullptr
-		   && fic->has_delta_signature()
+		   && fic->has_delta_signature_structure()
 		   && fic->get_saved_status() != s_saved
 		   && fic->get_saved_status() != s_delta)
 		{
@@ -3251,20 +3260,21 @@ namespace libdar
 				    //////////////////////////////
 				    // dumping delta signature if present or just calculated
 
-				if(fic->has_delta_signature() && !loop)
+				if(fic->has_delta_signature_structure() && !loop)
 				{
 				    if(display_treated)
-					dialog.warning(string(gettext("Dumping delta signature of saved file: ")) + info_quoi);
+					dialog.warning(string(gettext("Dumping delta signature structure for saved file: ")) + info_quoi);
 
 				    if(delta_sig == nullptr)
 				    {
-					    // merging context, signature not calculated here but already existing: we need to transfer it
-
-					delta_sig = new (pool) memory_file();
-					if(delta_sig == nullptr)
-					    throw Ememory("saved_inode");
-
-					fic->read_delta_signature(*delta_sig);
+					if(!delta_diff)
+					{
+						// merging context, signature not calculated here but already existing: we need to transfer it
+					    if(fic->has_delta_signature_available())
+						fic->read_delta_signature(delta_sig);
+					}
+					    // else delta diff without delta signature, storing en empty zero length signature
+					    // delta_sig stays equal to nullptr
 				    }
 
 				    if(!fic->has_patch_base_crc())
@@ -3333,9 +3343,11 @@ namespace libdar
 				    pdesc.compr->suspend_compression();
 
 					// dropping the data to the archive and recording its location in the cat_file object
-				    fic->dump_delta_signature(*delta_sig, *(pdesc.compr), pdesc.esc != nullptr);
+				    if(delta_sig != nullptr)
+					fic->dump_delta_signature(*delta_sig, *(pdesc.compr), pdesc.esc != nullptr);
+				    else
+					fic->dump_delta_signature(*(pdesc.compr), pdesc.esc != nullptr);
 				}
-
 			    }
 			    else
 				throw SRC_BUG; // saved_status == s_saved, but no data available, and no exception raised;
@@ -4054,71 +4066,100 @@ namespace libdar
 				     const catalogue & cat)
     {
 	if(e_file != nullptr
-	   && e_file->has_delta_signature())
+	   && e_file->has_delta_signature_structure())
 	{
-	    memory_file sig;
+	    memory_file * sig = nullptr;
 
-	    if(ref_file != nullptr
-	       && ref_file->has_delta_signature())
+	    try
 	    {
-		if(display_treated)
-		    dialog.warning(string(gettext("Copying delta signature from the archive of reference: ")) + info_quoi);
-		ref_file->read_delta_signature(sig);
-
-		if(ref_file->has_patch_base_crc())
+		if(ref_file != nullptr
+		   && ref_file->has_delta_signature_structure())
 		{
-		    const crc *tmp;
-		    ref_file->get_patch_base_crc(tmp);
-		    e_file->set_patch_base_crc(*tmp);
-		}
-		else
-		    throw SRC_BUG;
+		    if(display_treated)
+			dialog.warning(string(gettext("Copying delta signature structure from the archive of reference: ")) + info_quoi);
 
-		if(ref_file->has_patch_result_crc())
-		{
-		    const crc *tmp;
-		    ref_file->get_patch_result_crc(tmp);
-		    e_file->set_patch_result_crc(*tmp);
-		}
-		else
-		    throw SRC_BUG;
+		    if(ref_file->has_delta_signature_available())
+		    {
+			ref_file->read_delta_signature(sig);
+			if(sig == nullptr)
+			    throw SRC_BUG;
+		    }
 
-	    }
-	    else if(e_file->can_get_data()) // or calculating from filesystem when possible (not the case when performing a merge operation)
-	    {
-		null_file trou_noir(gf_write_only);
-		generic_file *data = nullptr;
-
-		if(display_treated)
-		    dialog.warning(string(gettext("Calculating delta signature from filesystem: "))
-				   + info_quoi);
-		try
-		{
-		    infinint crc_size = e_file->get_size();
-		    crc *patch_sig_crc = nullptr;
-
-		    data = e_file->get_data(cat_file::normal, &sig, nullptr);
-		    if(data == nullptr)
-			throw Ememory("filtre_sauvegarde");
-		    data->copy_to(trou_noir, crc_size, patch_sig_crc);
-		    if(patch_sig_crc == nullptr)
+		    if(ref_file->has_patch_base_crc())
+		    {
+			const crc *tmp;
+			ref_file->get_patch_base_crc(tmp);
+			e_file->set_patch_base_crc(*tmp);
+		    }
+		    else
 			throw SRC_BUG;
-		    e_file->set_patch_base_crc(*patch_sig_crc);
-		    e_file->set_patch_result_crc(*patch_sig_crc);
-		}
-		catch(...)
-		{
-		    if(data != nullptr)
-			delete data;
-		    throw;
-		}
-		if(data != nullptr)
-		    delete data;
-	    }
 
-	    cat.pre_add_delta_sig();
-	    pdesc.compr->suspend_compression();
-	    e_file->dump_delta_signature(sig, *(pdesc.compr), pdesc.esc != nullptr);
+		    if(ref_file->has_patch_result_crc())
+		    {
+			const crc *tmp;
+			ref_file->get_patch_result_crc(tmp);
+			e_file->set_patch_result_crc(*tmp);
+		    }
+		    else
+			throw SRC_BUG;
+
+		}
+		else // no ref_file inode, trying to calculate the delta signature from data
+		{
+		    if(e_file->can_get_data()
+		       && e_file->get_saved_status() != s_delta)
+		    {
+			null_file trou_noir(gf_write_only);
+			generic_file *data = nullptr;
+
+			if(display_treated)
+			    dialog.warning(string(gettext("Calculating delta signature from filesystem: "))
+					   + info_quoi);
+			try
+			{
+			    infinint crc_size = e_file->get_size();
+			    crc *patch_sig_crc = nullptr;
+			    sig = new (pool) memory_file();
+			    if(sig == nullptr)
+				throw Ememory("filtre_sauvegarde");
+
+			    data = e_file->get_data(cat_file::normal, sig, nullptr);
+			    if(data == nullptr)
+				throw Ememory("filtre_sauvegarde");
+			    data->copy_to(trou_noir, crc_size, patch_sig_crc);
+			    if(patch_sig_crc == nullptr)
+				throw SRC_BUG;
+			    e_file->set_patch_base_crc(*patch_sig_crc);
+			    e_file->set_patch_result_crc(*patch_sig_crc);
+			}
+			catch(...)
+			{
+			    if(data != nullptr)
+				delete data;
+			    throw;
+			}
+			if(data != nullptr)
+			    delete data;
+		    }
+		    else
+			throw SRC_BUG;
+		}
+
+		cat.pre_add_delta_sig();
+		pdesc.compr->suspend_compression();
+		if(sig != nullptr)
+		    e_file->dump_delta_signature(*sig, *(pdesc.compr), pdesc.esc != nullptr);
+		else
+		    e_file->dump_delta_signature(*(pdesc.compr), pdesc.esc != nullptr);
+	    }
+	    catch(...)
+	    {
+		if(sig != nullptr)
+		    delete sig;
+		throw;
+	    }
+	    if(sig != nullptr)
+		delete sig;
 	}
     }
 

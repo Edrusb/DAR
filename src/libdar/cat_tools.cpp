@@ -149,7 +149,7 @@ namespace libdar
 	    ret += "[-]";
 	else
 	{
-	    if(ref_f->has_delta_signature())
+	    if(ref_f->has_delta_signature_available())
 		ret +="[D]";
 	    else
 		ret +="[ ]";

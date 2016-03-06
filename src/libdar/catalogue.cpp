@@ -1718,7 +1718,7 @@ namespace libdar
 		    throw SRC_BUG;
 
 		if(sequential_read
-		   && (ent_file->has_delta_signature()
+		   && (ent_file->has_delta_signature_structure()
 		       || !build
 		       || !delta_mask.is_covered(juillet.get_string())
 		       || e_file->get_size() < delta_sig_min_size
@@ -1745,19 +1745,49 @@ namespace libdar
 		    }
 		}
 
-		if(ent_file->has_delta_signature())
+		if(ent_file->has_delta_signature_structure())
 		{
 		    if(!build
 		       ||
 		       (delta_mask.is_covered(juillet.get_string())
-			&& e_file->get_size() >= delta_sig_min_size)
-			)
+			&& e_file->get_size() >= delta_sig_min_size))
 		    {
-			e_file->read_delta_signature(mem);
-			e_file->dump_delta_signature(mem, *(destination.compr), false);
+			memory_file *sig_ptr = nullptr;
+
+			if(e_file->get_saved_status() == s_delta)
+			    e_file->clear_delta_signature_only();
+
+			try
+			{
+			    e_file->read_delta_signature(sig_ptr);
+			    if(sig_ptr != nullptr)
+				e_file->dump_delta_signature(*sig_ptr, *(destination.compr), false);
+			    else
+				e_file->dump_delta_signature(*(destination.compr), false);
+			}
+			catch(...)
+			{
+			    if(sig_ptr != nullptr)
+				delete sig_ptr;
+			    throw;
+			}
+			if(sig_ptr != nullptr)
+			    delete sig_ptr;
 		    }
 		    else
-			e_file->clear_delta_signature();
+			if(e_file->get_saved_status() == s_delta)
+			{
+			    memory_file *sig_ptr = nullptr;
+
+			    e_file->clear_delta_signature_only();
+			    e_file->read_delta_signature(sig_ptr);
+			    if(sig_ptr != nullptr)
+				throw SRC_BUG;
+			    else
+				e_file->dump_delta_signature(*(destination.compr), false);
+			}
+			else
+			    e_file->clear_delta_signature_structure();
 		}
 		else // no delta signature found we must calculate them
 		{
@@ -1825,10 +1855,10 @@ namespace libdar
 	    ent_file = dynamic_cast<const cat_file *>(ent);
 	    if(ent_file != nullptr)
 	    {
-		if(ent_file->has_delta_signature())
+		if(ent_file->has_delta_signature_available())
 		{
 		    cat_file *e_file = const_cast<cat_file *>(ent_file);
-		    e_file->clear_delta_signature();
+		    e_file->clear_delta_signature_only();
 		}
 	    }
 	}
