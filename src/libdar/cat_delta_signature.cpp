@@ -46,8 +46,11 @@ namespace libdar
 	patch_base_check = create_crc_from_file(f, get_pool());
 	delta_sig_size.read(f);
 
-	if(delta_sig_size > 0)
+	if(delta_sig_size.is_zero())
+	    just_crc = true;
+	else
 	{
+	    just_crc = false;
 	    if(sequential_read)
 	    {
 		delta_sig_offset = f.get_position();
@@ -62,10 +65,13 @@ namespace libdar
 
     void cat_delta_signature::read_data(generic_file & f)
     {
-	if(delta_sig_size > 0 && delta_sig_offset == 0)
+	if(!delta_sig_size.is_zero() && delta_sig_offset.is_zero())
 	    throw SRC_BUG;
 
-	if(sig == nullptr && delta_sig_size > 0)
+	if(!delta_sig_size.is_zero() && just_crc)
+	    throw SRC_BUG;
+
+	if(sig == nullptr && !delta_sig_size.is_zero())
 	{
 	    crc *calculated = nullptr;
 	    crc *delta_sig_crc = nullptr;
@@ -109,8 +115,10 @@ namespace libdar
 
     memory_file *cat_delta_signature::obtain_sig()
     {
-
 	memory_file *ret = sig;
+
+	if(just_crc)
+	    throw SRC_BUG;
 
 	if(sig == nullptr)
 	    throw SRC_BUG;
@@ -136,6 +144,7 @@ namespace libdar
 
 	sig_is_ours = false;
 	sig = ptr;
+	just_crc = false;
 	delta_sig_size = ptr->size();
     }
 
@@ -149,7 +158,7 @@ namespace libdar
 	    delta_sig_size.dump(f);
 	}
 
-	if(delta_sig_size > 0)
+	if(!delta_sig_size.is_zero())
 	{
 	    infinint crc_size = tools_file_size_to_crc_size(delta_sig_size);
 	    crc *calculated = nullptr;
@@ -196,7 +205,7 @@ namespace libdar
 	    throw SRC_BUG;
 	patch_base_check->dump(f);
 	delta_sig_size.dump(f);
-	if(delta_sig_size > 0)
+	if(!delta_sig_size.is_zero())
 	    delta_sig_offset.dump(f);
 	if(!has_patch_result_crc())
 	    throw SRC_BUG;
@@ -257,6 +266,7 @@ namespace libdar
 	sig_is_ours = false;
 	patch_base_check = nullptr;
 	patch_result_check = nullptr;
+	just_crc = true;
     }
 
     void cat_delta_signature::copy_from(const cat_delta_signature & ref)
@@ -291,9 +301,10 @@ namespace libdar
 	}
 	else
 	    patch_result_check = nullptr;
+	just_crc = ref.just_crc;
     }
 
-    void cat_delta_signature::destroy()
+    void cat_delta_signature::clear_sig()
     {
 	if(sig != nullptr)
 	{
@@ -301,6 +312,11 @@ namespace libdar
 		delete sig;
 	    sig = nullptr;
 	}
+    }
+
+    void cat_delta_signature::destroy()
+    {
+	clear_sig();
 	if(patch_base_check != nullptr)
 	{
 	    delete patch_base_check;

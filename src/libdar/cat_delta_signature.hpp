@@ -119,6 +119,9 @@ namespace libdar
 	    /// \note may be called several times if necessary to obtain_sig() another time
 	void read_data(generic_file & f);
 
+	    /// the cat_delta_signature structure can only hold CRC without delta_signature, this call gives the situation about that point
+	bool can_obtain_sig() { return !just_crc; };
+
 	    /// provide a memory_file object which the caller has the duty to destroy after use
 	    ///
 	    /// \note to obtain the sig data a second time, one must call read_data() again, then obtain_sig() should succeed
@@ -129,7 +132,14 @@ namespace libdar
 	    /// give the object where to fetch from the delta signature, object must exist up to the next call to dump_data
 	    ///
 	    /// \note seg_sig_ref() must be called each time before invoking dump_data(), normally it is done once...
+
+	    /// for can_obtain_sig() to return true before the signature is provided
+	void will_have_signature() { just_crc = false; clear_sig(); };
+
 	void set_sig_ref(memory_file *ptr);
+
+	    /// variante used when the delta_signature object will only contain CRCs (no delta signature)
+	void set_sig_ref() { just_crc = true; };
 
 	    /// write down the data only (only for archive without sequential read mode support)
 	void dump_data(generic_file & f, bool sequential_mode) const;
@@ -169,13 +179,12 @@ namespace libdar
 	bool sig_is_ours;           //< whether sig has been created on our behalf or given as reference by another class
 	crc *patch_base_check;      //< associated CRC for the file this signature has been computed on
 	crc *patch_result_check;    //< associated CRC
+	bool just_crc;              //< whether a delta signature is present or just checksum are stored
 
 	void init();
 	void copy_from(const cat_delta_signature & ref);
+	void clear_sig();
 	void destroy();
-	bool is_metadata_completed(bool sequential_mode) const;
-	void create_our_sig();
-	void fetch_signature_data(generic_file &fic); //< read the delta_sig from the archive (using the metadata provided in direct access mode)
     };
 
 	/// @}
