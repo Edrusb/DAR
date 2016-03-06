@@ -19,12 +19,12 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \file delta_signature.hpp
-    /// \brief class used to manage binary delta signature
+    /// \file cat_delta_signature.hpp
+    /// \brief class used to manage binary delta signature in catalogue and archive
     /// \ingroup Private
 
-#ifndef DELTA_SIGNATURE_HPP
-#define DELTA_SIGNATURE_HPP
+#ifndef CAT_DELTA_SIGNATURE_HPP
+#define CAT_DELTA_SIGNATURE_HPP
 
 #include "../my_config.h"
 
@@ -43,21 +43,29 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-	// Datastructure in archive
+	// Datastructure in archive (DATA+METADATA)
 	//
-	//    SEQUENTIAL MODE (all along the archive)
+	//    SEQUENTIAL MODE - in the core of the archive
 	// +------+------+---------------+----------+--------+
 	// | base | sig  | sig data      | data CRC | result |
 	// | CRC  | size | (if size > 0) |    if    |  CRC   |
 	// |      |      |               | size > 0 |        |
 	// +------+------+---------------+----------+--------+
 	//
-	//    DIRECT MODE (in catalogue at end of archive)
+	//    DIRECT MODE - in catalogue at end of archive (METADATA)
 	// +------+------+---------------+--------+
 	// | base | sig  | sig offset    | result |
 	// | CRC  | size | (if size > 0) |  CRC   |
 	// |      |      |               |        |
 	// +------+------+---------------+--------+
+	//
+	//    DIRECT MODE - in the core of the archive (DATA)
+	// +---------------+----------+
+	// | sig data      | data CRC |
+	// | (if size > 0) |    if    |
+	// |               | size > 0 |
+	// +---------------+----------+
+	//
 	//
 	// this structure is used for all cat_file inode that have
 	// either a delta signature or contain a delta patch (s_delta status)
@@ -66,42 +74,72 @@ namespace libdar
 	// result_crc is also used once a patch has been applied to verify the correctness of the patch result
 
 
-	/// the plain file class
-    class delta_signature : public on_pool
+	/// the cat_delta_signature file class
+	///
+	/// this class works in to implicit modes
+	/// - read mode
+	/// read the metadata from an archive the caller having knowing where to find it
+	/// read the data and fill the provided memory_file (get_sig()) by the delta signature
+	/// provide access to the associated CRC
+	/// - write mode
+	/// stores the associated CRC
+	/// write down the given delta signature (with metadata in sequential mode)
+	/// write down the metadata
+	/// the signature is not stored
+    class cat_delta_signature : public on_pool
     {
     public:
-	    /// constructor reading the object from an archive
+	    /// constructor reading the object METADATA (and also its DATA when in sequential mode) from an archive
 	    ///
 	    /// \param[in] f where to read the data from
-	    /// \param[in] sequential_read if true read the whole data as it was dropped in sequential read mode, else only read the metadata
-	delta_signature(generic_file & f, bool sequential_read);
+	    /// \param[in] sequential_read if true read the whole metadata+data as it was dropped in sequential read mode, else only read the metadata (found in a catalogue)
+	cat_delta_signature(generic_file & f, bool sequential_read);
 
-	    /// constructor creating a brand new object
-	delta_signature() { init(); };
+	    /// constructor creating a brand new empty object
+	cat_delta_signature() { init(); };
+
+	    /// copy constructor
+	cat_delta_signature(const cat_delta_signature & ref) { init(); copy_from(ref); };
+
+	    /// assignement operator
+	const cat_delta_signature & operator = (const cat_delta_signature & ref) { destroy(); init(); copy_from(ref); return *this; };
 
 	    /// destructor
-	~delta_signature() { destroy(); };
+	~cat_delta_signature() { destroy(); };
+
+	    /////////// method for read mode ///////////
 
 	    /// same action as the first constructor but on an existing object
-	void read(generic_file & f, bool sequential_read);
+	    ///
+	    /// \note in sequential_read mode the data is also read
+	void read_metadata(generic_file & f, bool sequential_read);
 
-	    /// write down the data either in sequential_read mode (data+metadata) or in
+	    /// fetch data assuming the object has already read the metadata
+	    ///
+	    /// \note may be called several times if necessary to obtain_sig() another time
+	void read_data(generic_file & f);
+
+	    /// provide a memory_file object which the caller has the duty to destroy after use
+	    ///
+	    /// \note to obtain the sig data a second time, one must call read_data() again, then obtain_sig() should succeed
+	memory_file *obtain_sig();
+
+	    /////////// method for write mode ///////////
+
+	    /// give the object where to fetch from the delta signature, object must exist up to the next call to dump_data
+	    ///
+	    /// \note seg_sig_ref() must be called each time before invoking dump_data(), normally it is done once...
+	void set_sig_ref(memory_file *ptr);
+
+	    /// write down the data only (only for archive without sequential read mode support)
+	void dump_data(generic_file & f, bool sequential_mode) const;
+
+	    /// write down the METADATA either in sequential_read mode (data+metadata) or in
 	    /// direct access mode (metadata only)
-	void dump(generic_file & f, bool sequential_read) const;
+	void dump_metadata(generic_file & f) const;
 
-	    /// the provided memory_file passes under the responsibility of this object it contains
-	    /// the delta signature
-	void attach_sig(memory_file *delta_sig);
 
-	    /// provide read access to the delta signature stored by this object
-	const memory_file & get_sig() const;
-
-	    /// drop the attached memory file to save place. Once dropped the memory file cannot
-	    /// be re-read from archive when in sequential_read mode
-	void detach_sig();
-
-	    /// tells whether an memory file is attached to this object. if not get_sig() will throw an exception
-	bool is_sig_attached() const;
+	    /////////// method for both read and write modes ///////////
 
 	    /// returns whether the object has a base patch CRC (s_delta status objects)
 	bool has_patch_base_crc() const { return patch_base_check != nullptr; };
@@ -121,22 +159,23 @@ namespace libdar
 	    /// set the CRC the file will have once restored or patched (for s_saved, s_delta, and when delta signature is present)
 	void set_patch_result_crc(const crc & c);
 
+	    /// reset the object
+	void clear() { destroy(); init(); };
+
     private:
-	generic_file *read_from;    //< where to read data from in direct access mode
 	infinint delta_sig_offset;  //< where to read data from to setup "sig" (set to zero when read in sequential mode, sig is setup on-fly)
 	infinint delta_sig_size;    //< size of the data to setup "sig" (set to zero when reading in sequential mode, sig is then setup on-fly)
 	memory_file *sig;           //< the signature data, if set nullptr it will be fetched from f in direct access mode only
+	bool sig_is_ours;           //< whether sig has been created on our behalf or given as reference by another class
 	crc *patch_base_check;      //< associated CRC for the file this signature has been computed on
 	crc *patch_result_check;    //< associated CRC
 
-	    // invalidating copy constructor and assignment operator
-	delta_signature(const delta_signature & ref) { throw SRC_BUG; };
-	const delta_signature & operator = (const delta_signature & ref) { throw SRC_BUG; };
-
 	void init();
+	void copy_from(const cat_delta_signature & ref);
 	void destroy();
-	bool is_completed(bool sequential_mode) const;
-	void fetch_signature_data(generic_file &fic);
+	bool is_metadata_completed(bool sequential_mode) const;
+	void create_our_sig();
+	void fetch_signature_data(generic_file &fic); //< read the delta_sig from the archive (using the metadata provided in direct access mode)
     };
 
 	/// @}
