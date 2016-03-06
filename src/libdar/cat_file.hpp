@@ -35,6 +35,7 @@ extern "C"
 #include "cat_inode.hpp"
 #include "memory_file.hpp"
 #include "cat_tools.hpp"
+#include "cat_delta_signature.hpp"
 
 namespace libdar
 {
@@ -141,11 +142,11 @@ namespace libdar
 
 
 	    /// return whether the object has an associated delta signature
-	bool has_delta_signature() const { return will_have_delta_sig; };
+	bool has_delta_signature() const { return delta_sig != nullptr; };
 
 
 	    /// returns whether the object has a base patch CRC (s_delta status objects)
-	bool has_patch_base_crc() const { return patch_base_check != nullptr; };
+	bool has_patch_base_crc() const { return delta_sig != nullptr && delta_sig->has_patch_base_crc(); };
 
 	    /// returns the CRC of the file to base the patch on, for s_delta objects
 	bool get_patch_base_crc(const crc * & c) const;
@@ -156,7 +157,7 @@ namespace libdar
 
 
 	    /// returns whether the object has a CRC corresponding to data (for s_saved, s_delta, and when delta signature is present)
-	bool has_patch_result_crc() const { return patch_result_check != nullptr || (get_saved_status() == s_saved && check != nullptr); };
+	bool has_patch_result_crc() const { return (delta_sig != nullptr && delta_sig->has_patch_result_crc()) || (get_saved_status() == s_saved && check != nullptr); };
 
 	    /// returns the CRC the file will have once restored or patched (for s_saved, s_delta, and when delta signature is present)
 	bool get_patch_result_crc(const crc * & c) const;
@@ -164,11 +165,8 @@ namespace libdar
 	    /// set the CRC the file will have once restored or patched (for s_saved, s_delta, and when delta signature is present)
 	void set_patch_result_crc(const crc & c);
 
-	    /// for small dump to have the delta_sig set
-	    ///
-	    /// \note at the time of the small dump the delta_signature is not even calculated so we
-	    /// cannot use dump_delta_signature() to set this flag
-	void will_have_delta_signature() { will_have_delta_sig = true; };
+	    /// prepare the object to receive a delta signature or only the delta diff associated CRC, later one
+	void will_have_delta_signature();
 
 	    /// write down to archive the given delta signature
 	    ///
@@ -179,8 +177,8 @@ namespace libdar
 
 	    /// fetch the delta signature from the archive
 	    ///
-	    /// \param[in] sig is the object where to copy to the delta signature
-	void read_delta_signature(memory_file & sig) const;
+	    /// \return a newly allocated memory_file containing the delta signature. The caller has the duty to destroy this object after use
+	memory_file *read_delta_signature() const;
 
 	    /// return true if ref and "this" have both equal delta signatures
 	bool has_same_delta_signature(const cat_file & ref) const;
@@ -201,18 +199,13 @@ namespace libdar
         infinint *size;         //< size of the data (uncompressed)
         infinint *storage_size; //< how much data used in archive (after compression)
         crc *check;             //< crc computed on the data
-	crc *patch_base_check;  //< stored crc of the file the delta diff has been based on (used for restoration)
-	crc *patch_result_check;//< stored crc of the file once the patch has been successfully applied (used for incremental delta patch backup)
 	bool dirty;             //< true when a file has been modified at the time it was saved
         compression algo_read;  //< which compression algorithm to use to read the file's data
 	compression algo_write; //< which compression algorithm to use to write down (merging) the file's data
 	bool furtive_read_mode; //< used only when status equals "from_path"
 	char file_data_status_read;  //< defines the datastructure to use when reading the data
 	char file_data_status_write; //< defines the datastructure to apply when writing down the data
-	infinint delta_sig_offset;   //< if not nullptr, is the offset where to find the delta signature of the file
-	infinint delta_sig_size;     //< storage size of the delta signature
-	crc *delta_sig_crc;          //< delta_signature CRC
-	bool will_have_delta_sig;    //< delta_signature will be calculated for this inode or is already present
+	cat_delta_signature *delta_sig; //< delta signature and associated CRC
 
         void detruit();
     };
