@@ -2,6 +2,8 @@ from 2.5.3 to 2.5.4
 - fixing missing included files for libdar API
 - removed extra try/catch block introduced by commit
   72da5cad5e52f959414b3163a2e2a320c2bc721e
+- removed sanity check that caused problem when writing an archive to a
+  FUSE based filesystem.
 
 from 2.5.2 to 2.5.3
 - Fixing a 2.5.x build issue met when a 2.4.x libdar library is already
@@ -147,6 +149,10 @@ from 2.4.x to 2.5.0
 - replaced SHA1 by SHA224 to generate IV for encryption blocks, this
   slightly improves randomness of IV and stay available when libgcrypt is
   run in FIPS mode
+
+from 2 4.21 to 2.4.20
+- removed sanity check that caused problem when writing an archive to a
+  FUSE based filesystem.
 
 from 2.4.19 to 2.4.20
 - fixed display bug in dar_manager met when using -o option and adding
