@@ -1178,8 +1178,8 @@ namespace libdar
 	defile juillet = FAKE_ROOT;
 
 	get_ui().warning("<?xml version=\"1.0\" ?>");
-	get_ui().warning("<!DOCTYPE Catalog SYSTEM \"dar-catalog-1.0.dtd\">\n");
-	get_ui().warning("<Catalog format=\"1.1\">");
+	get_ui().warning("<!DOCTYPE Catalog SYSTEM \"dar-catalog.dtd\">\n");
+	get_ui().warning("<Catalog format=\"1.2\">");
 	if(filter_unsaved)
 	    contenu->recursive_has_changed_update();
 
@@ -1287,7 +1287,7 @@ namespace libdar
 			       || (e_ino->ea_get_saved_status() == cat_inode::ea_full || e_ino->ea_get_saved_status() == cat_inode::ea_fake)
 			       || (e_dir != nullptr && e_dir->get_recursive_has_changed()))
 			    {
-				string data, metadata, maj, min, chksum, chkbasesum, chkresultsum, target;
+				string data, metadata, maj, min, chksum, chkbasesum, chkresultsum, target, delta_sig;
 				string dirty, sparse;
 				string size = local_size(*e_ino);
 				string stored = local_storage_size(*e_ino);
@@ -1379,6 +1379,8 @@ namespace libdar
 				    else
 					chksum = "";
 
+				    delta_sig = yes_no(reg->has_delta_signature_available());
+
 				    if(reg->has_patch_base_crc() && reg->get_patch_base_crc(crc_patch_base) && crc_patch_base != nullptr)
 					chkbasesum = crc_patch_base->crc2str();
 				    else
@@ -1389,8 +1391,8 @@ namespace libdar
 				    else
 					chkresultsum = "";
 
-				    get_ui().printf("%S<File name=\"%S\" size=\"%S\" stored=\"%S\" crc=\"%S\" patch_base_crc=\"%S\" patch_result_crc=\"%S\" dirty=\"%S\" sparse=\"%S\">\n",
-						    &beginning, &name, &size, &stored, &chksum, &chkbasesum, &chkresultsum, &dirty, &sparse);
+				    get_ui().printf("%S<File name=\"%S\" size=\"%S\" stored=\"%S\" crc=\"%S\" dirty=\"%S\" sparse=\"%S\" delta_sig=\"%S\" patch_base_crc=\"%S\" patch_result_crc=\"%S\">\n",
+						    &beginning, &name, &size, &stored, &chksum, &dirty, &sparse, &delta_sig, &chkbasesum, &chkresultsum);
 				    xml_listing_attributes(get_ui(), beginning, data, metadata, e, list_ea);
 				    get_ui().printf("%S</File>\n", &beginning);
 				    break;
