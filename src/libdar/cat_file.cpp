@@ -908,9 +908,6 @@ namespace libdar
 
     void cat_file::set_patch_base_crc(const crc & c)
     {
-	if(get_saved_status() != s_delta)
-	    throw SRC_BUG;
-
 	if(delta_sig == nullptr)
 	    throw SRC_BUG;
 
