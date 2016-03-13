@@ -332,7 +332,7 @@ namespace libdar
 		    {
 			if(data_crc != nullptr)
 			    data_crc->compute(working_buffer + working_size, tmp);
-			working_size += lu;
+			working_size += tmp;
 		    }
 
 		    if(working_size == 0)

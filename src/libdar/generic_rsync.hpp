@@ -134,9 +134,9 @@ namespace libdar
 #endif
 
 	    /// feed librsync using rs_job_iter
-	    /// \param[in] buffer_in bytes of data give to librsync
+	    /// \param[in] buffer_in bytes of data to give to librsync
 	    /// \param[in,out] avail_in is the amount of byte available, and after the call the amount of not yet read bytes
-	    /// remaining at the beginning of the buffer_in buffer (when shift_input is set to true) or at the end if shift is set
+	    /// remaining at the beginning of the buffer_in buffer (when shift_input is set to true) or at the end of buffer_in if shift is set
 	    /// to false.
 	    /// \param[in] shift_input
 	    /// \param[out] buffer_out where to drop the data from librsync

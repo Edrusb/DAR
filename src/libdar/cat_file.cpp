@@ -561,7 +561,7 @@ namespace libdar
 		    {
 			generic_rsync *diff = new (get_pool()) generic_rsync(delta_ref,
 									     data->top(),
-									     get_size(),
+									     tools_file_size_to_crc_size(get_size()),
 									     checksum);
 			if(diff == nullptr)
 			    throw Ememory("cat_file::get_data");
