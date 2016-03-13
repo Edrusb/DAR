@@ -1585,6 +1585,8 @@ namespace libdar
 			    {
 				    // we do not take care of overwriting data here as it is the
 				    // expected behavior for delta binary patching
+				if(info_details)
+				    get_ui().warning(string(gettext("Restoring file's data using a delta patching: ")) + spot_display);
 				make_delta_patch(get_ui(),
 						 *exists_file,
 						 spot_display,
