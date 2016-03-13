@@ -997,7 +997,7 @@ namespace libdar
 	delta_sig->dump_data(where, small);
     }
 
-    void cat_file::read_delta_signature(memory_file * delta_sig_ret) const
+    void cat_file::read_delta_signature(memory_file * & delta_sig_ret) const
     {
 	compressor *from = nullptr;
 	escape *esc = nullptr;

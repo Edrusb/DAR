@@ -1443,6 +1443,7 @@ namespace libdar
 			    }
                         }
 
+
 			    // checking delta signature if any
 
 			if(e_file != nullptr && e_file->has_delta_signature_structure())
@@ -1462,10 +1463,11 @@ namespace libdar
 				perimeter += " + Delta sig";
 			}
 
-                            // checking inode EA if any
 
-                        if(e_ino != nullptr && e_ino->ea_get_saved_status() == cat_inode::ea_full)
-                        {
+			    // checking inode EA if any
+
+			if(e_ino != nullptr && e_ino->ea_get_saved_status() == cat_inode::ea_full)
+			{
 			    if(perimeter == "")
 				perimeter = "EA";
 			    else
@@ -1476,7 +1478,7 @@ namespace libdar
 				perimeter += "(" + deci(tmp.size()).human() +")";
 				e_ino->ea_detach();
 			    }
-                        }
+			}
 
 			    // checking FSA if any
 			if(e_ino != nullptr && e_ino->fsa_get_saved_status() == cat_inode::fsa_full)
@@ -1501,10 +1503,10 @@ namespace libdar
 			if(e_mir != nullptr)
 			    e_mir->set_inode_wrote(true);
 
-                            // still no exception raised, this all is fine
-                        if(display_treated)
-                            dialog.warning(string(gettext("OK  ")) + juillet.get_string() + "  " + perimeter);
-                    }
+			    // still no exception raised, this all is fine
+			if(display_treated)
+			    dialog.warning(string(gettext("OK  ")) + juillet.get_string() + "  " + perimeter);
+		    }
                     else // excluded by filter
                     {
 			if(display_skipped)

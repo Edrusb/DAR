@@ -160,7 +160,7 @@ namespace libdar
 
 
 	    /// returns whether the object has a CRC corresponding to data (for s_saved, s_delta, and when delta signature is present)
-	bool has_patch_result_crc() const { return (delta_sig != nullptr && delta_sig->has_patch_result_crc()) || (get_saved_status() == s_saved && check != nullptr); };
+	bool has_patch_result_crc() const { return delta_sig != nullptr && delta_sig->has_patch_result_crc(); };
 
 	    /// returns the CRC the file will have once restored or patched (for s_saved, s_delta, and when delta signature is present)
 	bool get_patch_result_crc(const crc * & c) const;
@@ -189,7 +189,7 @@ namespace libdar
 	    /// \param[in] delta_sig is either nullptr or points to a newly allocated memory_file
 	    /// containing the delta signature. The caller has the duty to destroy this object after use
 	    /// \note nullptr is returned if the delta_signature only contains CRCs
-	void read_delta_signature(memory_file *delta_sig) const;
+	void read_delta_signature(memory_file * & delta_sig) const;
 
 	    /// return true if ref and "this" have both equal delta signatures
 	bool has_same_delta_signature(const cat_file & ref) const;
