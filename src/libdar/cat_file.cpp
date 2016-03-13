@@ -1259,10 +1259,10 @@ namespace libdar
 		    infinint size_me = sig_me->size();
 		    infinint size_you = sig_you.size();
 
-		if(size_me != size_you)
-		    throw Erange("cat_file::sub_compare", tools_printf(gettext("Delta signature do not have the same size: %i <--> %i"), &size_me, &size_you));
-		if(*sig_me != sig_you) // comparing file's content
-		    throw Erange("cat_file::sub_compare", gettext("Delta signature have the same size but do not match"));
+		    if(size_me != size_you)
+			throw Erange("cat_file::sub_compare", tools_printf(gettext("Delta signature do not have the same size: %i <--> %i"), &size_me, &size_you));
+		    if(*sig_me != sig_you) // comparing file's content
+			throw Erange("cat_file::sub_compare", gettext("Delta signature have the same size but do not match"));
 		}
 		catch(...)
 		{
