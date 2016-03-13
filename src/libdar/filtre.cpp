@@ -2991,7 +2991,10 @@ namespace libdar
 
 				    try
 				    {
-					if(fic->get_sparse_file_detection_write() && keep_mode != cat_file::keep_compressed && keep_mode != cat_file::keep_hole)
+					if(fic->get_sparse_file_detection_write()
+					   && keep_mode != cat_file::keep_compressed
+					   && keep_mode != cat_file::keep_hole
+					   && !delta_diff)
 					{
 						// creating the sparse_file to copy data to destination
 
