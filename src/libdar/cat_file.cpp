@@ -891,9 +891,6 @@ namespace libdar
 
     bool cat_file::get_patch_base_crc(const crc * & c) const
     {
-	if(get_saved_status() != s_delta)
-	    throw SRC_BUG;
-
 	if(delta_sig == nullptr)
 	    throw SRC_BUG;
 
@@ -1278,7 +1275,13 @@ namespace libdar
 	{
 	    const crc *my_crc = nullptr;
 
-	    if(get_crc(my_crc) && get_saved_status() != s_delta) // we have a CRC available for data
+	    if(get_saved_status() == s_delta && !has_patch_result_crc())
+		throw SRC_BUG;
+
+		// if we have a CRC available for data
+	    if((get_saved_status() != s_delta && get_crc(my_crc))
+	       ||
+	       (get_saved_status() == s_delta && get_patch_result_crc(my_crc)))
 	    {
 		    // just compare CRC (as for isolated_mode)
 
@@ -1301,7 +1304,7 @@ namespace libdar
 
 			if(my_crc->get_size() != other_crc->get_size()
 			   || *my_crc != *other_crc)
-			    throw Erange("cat_file::compare", tools_printf(gettext("CRC difference concerning file's data (comparing with an isolated catalogue)")));
+			    throw Erange("cat_file::compare", tools_printf(gettext("CRC difference concerning file's data")));
 		    }
 		    catch(...)
 		    {
