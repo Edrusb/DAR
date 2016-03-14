@@ -4,6 +4,8 @@ from 2.5.3 to 2.5.4
   72da5cad5e52f959414b3163a2e2a320c2bc721e
 - removed sanity check that caused problem when writing an archive to a
   FUSE based filesystem.
+- fixing non call of the -E script/command after last slice creation,
+  when encryption or slice hashing was used
 
 from 2.5.2 to 2.5.3
 - Fixing a 2.5.x build issue met when a 2.4.x libdar library is already
