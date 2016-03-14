@@ -275,7 +275,7 @@ namespace libdar
     void sar::inherited_terminate()
     {
         close_file(true);
-        if(get_mode() == gf_read_write && natural_destruction)
+        if(get_mode() != gf_read_only && natural_destruction)
 	{
 	    set_info_status(CONTEXT_LAST_SLICE);
             hook_execute(of_current);
