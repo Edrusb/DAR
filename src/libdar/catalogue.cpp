@@ -1803,29 +1803,71 @@ namespace libdar
 		       && delta_mask.is_covered(juillet.get_string())
 		       && e_file->get_size() >= delta_sig_min_size)
 		    {
-			if(e_file->get_saved_status() == s_saved)
+			const crc **checksum = nullptr;
+
+			if(!e_file->has_crc())
 			{
-			    null_file trash = gf_write_only;
-			    generic_file *data = e_file->get_data(cat_file::plain, &mem, nullptr);
+			    checksum = new (get_pool())(const crc *);
+			    if(checksum == nullptr)
+				throw Ememory("catalogue::transfer_delta_signatures");
+			    *checksum = nullptr;
+			}
 
-			    if(data == nullptr)
-				throw SRC_BUG;
+			try
+			{
+			    if(e_file->get_saved_status() == s_saved)
+			    {
+				null_file trash = gf_write_only;
+				generic_file *data = e_file->get_data(cat_file::plain, &mem, nullptr, checksum);
 
-			    try
-			    {
-				data->copy_to(trash);
-			    }
-			    catch(...)
-			    {
+				if(data == nullptr)
+				    throw SRC_BUG;
+
+				try
+				{
+				    data->copy_to(trash);
+				}
+				catch(...)
+				{
+				    delete data;
+				    throw;
+				}
 				delete data;
-				throw;
+
+				if(checksum != nullptr)
+				{
+				    if(*checksum != nullptr)
+					e_file->set_crc(**checksum);
+				    else
+					throw SRC_BUG;
+				}
+
+				const crc *my_crc = nullptr;
+				if(!e_file->get_crc(my_crc))
+				    throw SRC_BUG;
+				if(my_crc == nullptr)
+				    throw SRC_BUG;
+				e_file->will_have_delta_signature_available();
+				e_file->set_patch_base_crc(*my_crc);
+				e_file->set_patch_result_crc(*my_crc);
+				e_file->dump_delta_signature(mem, *(destination.compr), false);
 			    }
-			    delete data;
-
-			    e_file->dump_delta_signature(mem, *(destination.compr), false);
-
-			    if(sequential_read)
-				e_file->get_crc(my_crc);
+			}
+			catch(...)
+			{
+			    if(checksum != nullptr)
+			    {
+				if(*checksum != nullptr)
+				    delete *checksum;
+				delete checksum;
+			    }
+			    throw;
+			}
+			if(checksum != nullptr)
+			{
+			    if(*checksum != nullptr)
+				delete *checksum;
+			    delete checksum;
 			}
 		    }
 		}

@@ -1324,16 +1324,26 @@ namespace libdar
 		if(cat == nullptr)
 		    throw SRC_BUG;
 
+		    // note:
+		    // an isolated catalogue keep the data, EA and FSA pointers of the archive they come from
+		    // but if they have delta signature their offset is those of the isolated catalogue archive
+		    // not/no more those of the archive the catalogue has been isolated from.
+		    // Using an isolated catalogue as backup of the internal catalogue stays possible but not
+		    // for the delta_signature that are ignored by libdar in that situation. However delta_signature
+		    // are only used at archive creation, thus reading an other archive as reference, either the
+		    // original archive with all its contents, or an isolated catalogue with metadata and eventually
+		    // delta_signatures.
+
 		if(options.get_delta_signature())
 		{
 		    pile_descriptor pdesc = & layers;
-		    cat->transfer_delta_signatures(pdesc, sequential_read,
+		    cat->transfer_delta_signatures(pdesc,
+						   sequential_read,
 						   options.get_has_delta_mask_been_set(),
 						   options.get_delta_mask(),
 						   options.get_delta_sig_min_size());
 		}
-		else
-		    cat->drop_delta_signatures();
+		    // else we keep the delta_signature pointers by coherence to the archive of reference
 
 		if(isol_data_name == cat->get_data_name())
 		    throw SRC_BUG;

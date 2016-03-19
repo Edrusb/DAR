@@ -745,7 +745,7 @@ namespace libdar
 	    /// whether signature to base binary delta on the future has to be calculated and stored beside saved files
 	void set_delta_signature(bool val) { x_delta_signature = val; };
 
-		    /// whether to derogate to defaut delta file consideration while calculation delta signatures
+	    /// whether to derogate to defaut delta file consideration while calculation delta signatures
 	void set_delta_mask(const mask & delta_mask);
 
 	    /// whether to never calculate delta signature for files which size is smaller or equal to the given argument
