@@ -139,7 +139,7 @@ namespace libdar
 	void set_sig_ref(memory_file *ptr);
 
 	    /// variante used when the delta_signature object will only contain CRCs (no delta signature)
-	void set_sig_ref() { just_crc = true; };
+	void set_sig_ref() { just_crc = true; delta_sig_size = 0; };
 
 	    /// write down the data only (only for archive without sequential read mode support)
 	void dump_data(generic_file & f, bool sequential_mode) const;
