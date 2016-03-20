@@ -273,7 +273,8 @@ namespace libdar
 	    throw Ememory("generic_rsync::generic_rsync (sign)");
 	try
 	{
-	    x_input->reset_crc(original_crc->get_size());
+	    if(original_crc != nullptr)
+		x_input->reset_crc(original_crc->get_size());
 	    job = rs_patch_begin(generic_rsync::patch_callback, this);
 	}
 	catch(...)
