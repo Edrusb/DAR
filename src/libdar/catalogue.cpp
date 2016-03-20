@@ -1701,6 +1701,8 @@ namespace libdar
 	memory_file mem;
 	const crc *my_crc = nullptr;
 	defile juillet = FAKE_ROOT;
+	null_file trash = gf_write_only;
+	generic_file *data = nullptr;
 
 	if(destination.compr == nullptr || destination.stack == nullptr)
 	    throw SRC_BUG;
@@ -1725,49 +1727,22 @@ namespace libdar
 		if(e_file == nullptr)
 		    throw SRC_BUG;
 
-		if(sequential_read
-		   && (ent_file->has_delta_signature_structure()
-		       || !build
-		       || !delta_mask.is_covered(juillet.get_string())
-		       || e_file->get_size() < delta_sig_min_size
-		       )
-		    )
-		{
-			// here we throw data to trash just to grab data CRC
-			// except when
-			//   - we need calculate signature
-			// and
-			//   - it not already calculated
-			// and
-			//   - we have to calculate it in regard to mask or file size
-
-		    if(e_file->get_saved_status() == s_saved)
-		    {
-			generic_file *dat = e_file->get_data(cat_file::normal, nullptr, nullptr);
-			if(dat == nullptr)
-			    throw Erange("transfer_delta_signatures", gettext("Can't read saved data."));
-			else
-			    delete dat;
-
-			e_file->get_crc(my_crc);
-		    }
-		}
-
 		if(ent_file->has_delta_signature_structure())
 		{
-		    if(!build
+			// delta signature field found, we may have to either:
+			// - drop the global delta_signature structure
+			// - keep the global delta_signature structure but drop the delta_signature data
+			// - keep the global detla_signature structure and keep the delta_signature data, dumping it to the target archive
+		    if(!build  // we keep existing delta_signature as is
 		       ||
-		       (delta_mask.is_covered(juillet.get_string())
+		       (delta_mask.is_covered(juillet.get_string()) // or we have to build/transfer delta sig if they match size and mask criteria
 			&& e_file->get_size() >= delta_sig_min_size))
 		    {
 			memory_file *sig_ptr = nullptr;
 
-			if(e_file->get_saved_status() == s_delta)
-			    e_file->clear_delta_signature_only();
-
 			try
 			{
-			    e_file->read_delta_signature(sig_ptr);
+			    ent_file->read_delta_signature(sig_ptr);
 			    if(sig_ptr != nullptr)
 				e_file->dump_delta_signature(*sig_ptr, *(destination.compr), false);
 			    else
@@ -1782,22 +1757,26 @@ namespace libdar
 			if(sig_ptr != nullptr)
 			    delete sig_ptr;
 		    }
-		    else
+		    else // we need to remove the delta signature, but not the delta signature structure when status is s_delta
 			if(e_file->get_saved_status() == s_delta)
 			{
 			    memory_file *sig_ptr = nullptr;
 
-			    e_file->clear_delta_signature_only();
 			    e_file->read_delta_signature(sig_ptr);
 			    if(sig_ptr != nullptr)
-				throw SRC_BUG;
-			    else
-				e_file->dump_delta_signature(*(destination.compr), false);
+			    {
+				delete sig_ptr;
+				sig_ptr = nullptr;
+				e_file->clear_delta_signature_only();
+			    }
+				// no need to drop the signature_structure structure outside the catalogue
+				// only the delta_signature_data will stay outside the catalogue not the associated CRC
+				// they will only be kept inside the (isolated) catalogue
 			}
 			else
 			    e_file->clear_delta_signature_structure();
 		}
-		else // no delta signature found we must calculate them
+		else // no delta signature found we may have to calculate them
 		{
 		    if(build
 		       && delta_mask.is_covered(juillet.get_string())
@@ -1805,8 +1784,10 @@ namespace libdar
 		    {
 			const crc **checksum = nullptr;
 
-			if(!e_file->has_crc())
+			if(!e_file->has_crc() && !sequential_read)
 			{
+				// this is an old archive, we will add a data crc on-fly
+
 			    checksum = new (get_pool())(const crc *);
 			    if(checksum == nullptr)
 				throw Ememory("catalogue::transfer_delta_signatures");
@@ -1815,10 +1796,10 @@ namespace libdar
 
 			try
 			{
-			    if(e_file->get_saved_status() == s_saved)
+			    switch(e_file->get_saved_status())
 			    {
-				null_file trash = gf_write_only;
-				generic_file *data = e_file->get_data(cat_file::plain, &mem, nullptr, checksum);
+			    case s_saved:
+				data = e_file->get_data(cat_file::plain, &mem, nullptr, checksum);
 
 				if(data == nullptr)
 				    throw SRC_BUG;
@@ -1842,7 +1823,6 @@ namespace libdar
 					throw SRC_BUG;
 				}
 
-				const crc *my_crc = nullptr;
 				if(!e_file->get_crc(my_crc))
 				    throw SRC_BUG;
 				if(my_crc == nullptr)
@@ -1851,6 +1831,17 @@ namespace libdar
 				e_file->set_patch_base_crc(*my_crc);
 				e_file->set_patch_result_crc(*my_crc);
 				e_file->dump_delta_signature(mem, *(destination.compr), false);
+				break;
+			    case s_fake:
+			    case s_not_saved:
+				break;
+			    case s_delta:
+				    // reading the crc from the archive in sequential read mode
+				if(sequential_read)
+				    e_file->get_crc(my_crc);
+				break;
+			    default:
+				throw SRC_BUG;
 			    }
 			}
 			catch(...)
@@ -1870,6 +1861,7 @@ namespace libdar
 			    delete checksum;
 			}
 		    }
+			// else nothing to do, no signature and no need to add some for that entry
 		}
 	    }
 

@@ -168,7 +168,8 @@ namespace libdar
 
     static void copy_content_from_to(user_interaction & dialog,
 				     const string & source_path,
-				     const string & destination_path);
+				     const string & destination_path,
+				     const crc *expected_crc);
 
 ///////////////////////////////////////////////////////////////////
 ///////////////// filesystem_hard_link_read methods ///////////////
@@ -2524,10 +2525,14 @@ namespace libdar
 				 const cat_file & patcher,
 				 const path & cur_directory)
     {
-	const crc * original_crc = nullptr; //< expected CRC of the base file to be patched
-	crc * calculated_crc = nullptr;     //< calculated CRC of the read patch data
-	const crc *patch_crc = nullptr;     //< expected CRC of the patch data
-	infinint crc_size = tools_file_size_to_crc_size(patcher.get_size());
+	infinint patch_crc_size = tools_file_size_to_crc_size(patcher.get_size());
+	infinint base_crc_size = tools_file_size_to_crc_size(existing.get_size());
+	crc * calculated_patch_crc = nullptr;      //< calculated CRC of the read patch data
+	crc * calculated_base_crc = nullptr;       //< calculated CRC of the base file to be patched
+	crc * calculated_result_crc = nullptr;     //< calculated CRC of the resulting patched file
+	const crc *expected_patch_crc = nullptr;   //< expected CRC of the patched data
+	const crc *expected_base_crc = nullptr;    //< expected CRC of the base file to be patched
+	const crc *expected_result_crc = nullptr;  //< expected CRC of the resulting patched file
 	string temporary_pathname;
 	fichier_local *resulting = nullptr;
 	generic_file *current = nullptr;
@@ -2547,7 +2552,8 @@ namespace libdar
 	{
 	    try
 	    {
-		    // creating a temporary file to write to the result of the patch
+
+		    // creating a temporary file to write the result of the patch to
 
 		resulting = create_non_existing_file_based_on(dialog,
 							      existing.get_name(),
@@ -2556,12 +2562,13 @@ namespace libdar
 		if(resulting == nullptr)
 		    throw SRC_BUG;
 
-
 		    // obtaining current file
 
 		current = existing.get_data(cat_file::plain, nullptr, nullptr);
 		if(current == nullptr)
 		    throw SRC_BUG;
+		else
+		    current->reset_crc(base_crc_size);
 
 
 		    // obtaining patch
@@ -2570,40 +2577,99 @@ namespace libdar
 		if(delta == nullptr)
 		    throw SRC_BUG;
 		else
-		    delta->reset_crc(crc_size);
-
-
-		    // obtaining the expected CRC of the file to patch
-
-		if(!patcher.has_patch_base_crc())
-		    throw SRC_BUG; // s_delta should have a ref CRC
-		if(!patcher.get_patch_base_crc(original_crc))
-		    throw SRC_BUG; // has CRC true but fetching CRC failed!
+		    delta->reset_crc(patch_crc_size);
 
 
 		    // creating the patcher object (read-only object)
+		    // and checking the current data matches the expected_base_crc (done by generic_rsync)
 
+		const crc *original_crc = nullptr;
 		rdiffer = new (nothrow) generic_rsync(current,
 						      delta,
 						      original_crc);
 		if(rdiffer == nullptr)
 		    throw Ememory("filesystem_restore::make_delta_patch");
 
+
 		    // patching the existing file to the resulting inode (which is a new file)
+
 		rdiffer->copy_to(*resulting);
-		calculated_crc = delta->get_crc();
-		if(calculated_crc == nullptr)
+		rdiffer->terminate();
+		resulting->terminate();
+
+		    // obtaining the expected CRC of the file to patch
+
+		if(!patcher.has_patch_base_crc())
+		    throw SRC_BUG; // s_delta should have a ref CRC
+		if(!patcher.get_patch_base_crc(expected_base_crc))
+		    throw SRC_BUG; // has CRC true but fetching CRC failed!
+		if(expected_base_crc == nullptr)
 		    throw SRC_BUG;
 
-		if(patcher.get_crc(patch_crc))
+
+		    // reading the calculated CRC of the patch data
+
+		calculated_patch_crc = delta->get_crc();
+		if(calculated_patch_crc == nullptr)
+		    throw SRC_BUG;
+
+
+		    // checking the calculated CRC match the expected CRC for patch data
+
+		if(patcher.get_crc(expected_patch_crc))
 		{
-		    if(patch_crc == nullptr)
+		    if(expected_patch_crc == nullptr)
 			throw SRC_BUG;
-		    if(*patch_crc != *calculated_crc)
+		    if(*expected_patch_crc != *calculated_patch_crc)
 			throw Erange("filesystem.cpp::make_delta_patch", gettext("Patch data does not match its CRC, archive corruption took place"));
 		}
 		else
 		    throw SRC_BUG; // at the archive format that support delta patch CRC is always present
+
+		    // reading the calculated base file's CRC
+		calculated_base_crc = current->get_crc();
+		if(calculated_base_crc == nullptr)
+		    throw SRC_BUG;
+
+		    // checking the calculated CRC of the base patched file matches the expected one
+
+		if(!patcher.has_patch_base_crc())
+		    throw SRC_BUG;
+		if(!patcher.get_patch_base_crc(expected_base_crc))
+		    throw SRC_BUG;
+		if(expected_base_crc == nullptr)
+		    throw SRC_BUG;
+
+		if(*calculated_base_crc != *expected_base_crc)
+		    throw Erange("filesystem.cpp::make_delta_patch", gettext("File the patch is about to be applied to is not the expected one, aborting the patch operation"));
+
+
+		    // reading the expected CRC of the resulting patched file
+
+		if(!patcher.has_patch_result_crc())
+		    throw SRC_BUG;
+		if(!patcher.get_patch_result_crc(expected_result_crc))
+		    throw SRC_BUG;
+		if(expected_result_crc == nullptr)
+		    throw SRC_BUG;
+
+
+		    // replacing the original source file by the resulting patched file.
+		    // doing that way to avoid loosing hard links toward that inode instead
+		    // of unlinking the old inode and rename the tempory to the name of the
+		    // original file
+		try
+		{
+		    copy_content_from_to(dialog,
+					 temporary_pathname,
+					 existing_pathname,
+					 expected_result_crc);
+		}
+		catch(Erange & e)
+		{
+		    e.prepend_message(gettext("Error met while checking the resulting patched file: "));
+		    throw;
+		}
 	    }
 	    catch(...)
 	    {
@@ -2615,8 +2681,12 @@ namespace libdar
 		    delete current;
 		if(resulting != nullptr)
 		    delete resulting;
-		if(calculated_crc != nullptr)
-		    delete calculated_crc;
+		if(calculated_patch_crc != nullptr)
+		    delete calculated_patch_crc;
+		if(calculated_base_crc != nullptr)
+		    delete calculated_base_crc;
+		if(calculated_result_crc != nullptr)
+		    delete calculated_result_crc;
 		throw;
 	    }
 
@@ -2628,16 +2698,13 @@ namespace libdar
 		delete current;
 	    if(resulting != nullptr)
 		delete resulting;
-	    if(calculated_crc != nullptr)
-		delete calculated_crc;
+	    if(calculated_patch_crc != nullptr)
+		delete calculated_patch_crc;
+	    if(calculated_base_crc != nullptr)
+		delete calculated_base_crc;
+	    if(calculated_result_crc != nullptr)
+		delete calculated_result_crc;
 
-		// replacing the original source file by the resulting patched file.
-		// doing that way to avoid loosing hard links toward that inode instead
-		// of unlinking the old inode and rename the tempory to the name of the
-		// original file
-	    copy_content_from_to(dialog,
-				 temporary_pathname,
-				 existing_pathname);
 	}
 	catch(...)
 	{
@@ -2704,7 +2771,8 @@ namespace libdar
 
     static void copy_content_from_to(user_interaction & dialog,
 				     const string & source_path,
-				     const string & destination_path)
+				     const string & destination_path,
+				     const crc *expected_crc)
     {
 	fichier_local src = fichier_local(source_path);
 	fichier_local dst = fichier_local(dialog,
@@ -2714,9 +2782,30 @@ namespace libdar
 					  false,
 					  true, // erase
 					  false);
+	if(expected_crc != nullptr)
+	    src.reset_crc(expected_crc->get_size());
 	src.copy_to(dst);
 	src.terminate();
 	dst.terminate();
+	if(expected_crc != nullptr)
+	{
+	    crc * calculated_crc = src.get_crc();
+	    if(calculated_crc == nullptr)
+		throw SRC_BUG;
+	    try
+	    {
+		if(*calculated_crc != *expected_crc)
+		    throw Erange("filesystem.cpp:copy_content_from_to", gettext("Copied data does not match expected CRC"));
+	    }
+	    catch(...)
+	    {
+		if(calculated_crc != nullptr)
+		    delete calculated_crc;
+		throw;
+	    }
+	    if(calculated_crc != nullptr)
+		delete calculated_crc;
+	}
     }
 
 } // end of namespace

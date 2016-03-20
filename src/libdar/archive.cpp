@@ -1343,7 +1343,15 @@ namespace libdar
 						   options.get_delta_mask(),
 						   options.get_delta_sig_min_size());
 		}
-		    // else we keep the delta_signature pointers by coherence to the archive of reference
+		else
+			// we drop the delta signature as they will never be used
+			// because none will be in the isolated catalogue
+			// and that an isolated catalogue as backup of an internal
+			// catalogue cannot rescue the delta signature (they have
+			// to be in the isolated catalogue)
+		    cat->drop_delta_signatures();
+
+
 
 		if(isol_data_name == cat->get_data_name())
 		    throw SRC_BUG;
