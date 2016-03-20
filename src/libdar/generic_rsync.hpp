@@ -84,7 +84,7 @@ namespace libdar
 	    /// as base for the patch (this data is not modified)
 	    /// \param[in] base_signature is read only and contains the patch to apply
 	    /// \param[in] original_crc is the CRC of the original file that the patch
-	    /// should be applied to. If nullptr is given, to CRC check is performed
+	    /// should be applied to. If nullptr is given, no CRC check is performed
 	generic_rsync(generic_file *current_data,
 		      generic_file *delta,
 		      const crc *original_crc);
