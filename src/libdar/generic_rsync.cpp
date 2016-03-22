@@ -218,7 +218,7 @@ namespace libdar
 
     generic_rsync::generic_rsync(generic_file *current_data,
 				 generic_file *delta,
-				 const crc *original_crc): generic_file(gf_read_only)
+				 bool not_used): generic_file(gf_read_only)
     {
 #if LIBRSYNC_AVAILABLE
 
@@ -228,34 +228,6 @@ namespace libdar
 	    throw SRC_BUG;
 	if(delta == nullptr)
 	    throw SRC_BUG;
-	    // original_crc may be nullptr
-
-	    // calculating the CRC of the file to be patched
-
-	if(original_crc != nullptr)
-	{
-	    null_file tmp = null_file(gf_write_only);
-	    crc *real_crc = nullptr;
-
-	    try
-	    {
-		current_data->skip(0);
-		current_data->reset_crc(original_crc->get_size());
-		current_data->copy_to(tmp);
-		real_crc = current_data->get_crc();
-		if(*real_crc != *original_crc)
-		    throw Edata(gettext("CRC of file to apply binary diff to does not match the expected CRC value"));
-		current_data->skip(0);
-	    }
-	    catch(...)
-	    {
-		if(real_crc != nullptr)
-		    delete real_crc;
-		throw;
-	    }
-	    if(real_crc != nullptr)
-		delete real_crc;
-	}
 
 	    // setting up the object
 
@@ -273,8 +245,6 @@ namespace libdar
 	    throw Ememory("generic_rsync::generic_rsync (sign)");
 	try
 	{
-	    if(original_crc != nullptr)
-		x_input->reset_crc(original_crc->get_size());
 	    job = rs_patch_begin(generic_rsync::patch_callback, this);
 	}
 	catch(...)

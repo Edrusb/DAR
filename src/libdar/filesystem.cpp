@@ -116,6 +116,7 @@ extern "C"
 #include "cygwin_adapt.hpp"
 #include "fichier_local.hpp"
 #include "generic_rsync.hpp"
+#include "null_file.hpp"
 
 #ifndef UNIX_PATH_MAX
 #define UNIX_PATH_MAX 104
@@ -2529,7 +2530,6 @@ namespace libdar
 	infinint base_crc_size = tools_file_size_to_crc_size(existing.get_size());
 	crc * calculated_patch_crc = nullptr;      //< calculated CRC of the read patch data
 	crc * calculated_base_crc = nullptr;       //< calculated CRC of the base file to be patched
-	crc * calculated_result_crc = nullptr;     //< calculated CRC of the resulting patched file
 	const crc *expected_patch_crc = nullptr;   //< expected CRC of the patched data
 	const crc *expected_base_crc = nullptr;    //< expected CRC of the base file to be patched
 	const crc *expected_result_crc = nullptr;  //< expected CRC of the resulting patched file
@@ -2538,6 +2538,7 @@ namespace libdar
 	generic_file *current = nullptr;
 	generic_file *delta = nullptr;
 	generic_rsync *rdiffer = nullptr;
+	null_file black_hole = gf_write_only;
 
 	    // sanity checks
 
@@ -2561,6 +2562,10 @@ namespace libdar
 							      temporary_pathname);
 		if(resulting == nullptr)
 		    throw SRC_BUG;
+		    // we do not activate CRC at that time because
+		    // we have no clue of the resulting file size, thus
+		    // of the crc size to use
+
 
 		    // obtaining current file
 
@@ -2568,8 +2573,20 @@ namespace libdar
 		if(current == nullptr)
 		    throw SRC_BUG;
 		else
-		    current->reset_crc(base_crc_size);
+		{
+			// calculating the crc of base file
 
+			// note: this file will be read with a mix of skip()
+			// by the generic_rsync object below, thus is is not
+			// possible to calculate its CRC at tha time, so we
+			// do it now for that reason
+		    current->reset_crc(base_crc_size);
+		    current->copy_to(black_hole);
+		    calculated_base_crc = current->get_crc();
+		    if(calculated_base_crc == nullptr)
+			throw SRC_BUG;
+		    current->skip(0);
+		}
 
 		    // obtaining patch
 
@@ -2583,10 +2600,9 @@ namespace libdar
 		    // creating the patcher object (read-only object)
 		    // and checking the current data matches the expected_base_crc (done by generic_rsync)
 
-		const crc *original_crc = nullptr;
 		rdiffer = new (nothrow) generic_rsync(current,
 						      delta,
-						      original_crc);
+						      true);
 		if(rdiffer == nullptr)
 		    throw Ememory("filesystem_restore::make_delta_patch");
 
@@ -2597,7 +2613,7 @@ namespace libdar
 		rdiffer->terminate();
 		resulting->terminate();
 
-		    // obtaining the expected CRC of the file to patch
+		    // obtaining the expected CRC of the base file to patch
 
 		if(!patcher.has_patch_base_crc())
 		    throw SRC_BUG; // s_delta should have a ref CRC
@@ -2605,6 +2621,11 @@ namespace libdar
 		    throw SRC_BUG; // has CRC true but fetching CRC failed!
 		if(expected_base_crc == nullptr)
 		    throw SRC_BUG;
+
+		    // comparing the expected base crc with the calculated one
+
+		if(*calculated_base_crc != *expected_base_crc)
+		    throw Erange("filesystem.cpp::make_delta_patch", gettext("File the patch is about to be applied to is not the expected one, aborting the patch operation"));
 
 
 		    // reading the calculated CRC of the patch data
@@ -2626,25 +2647,10 @@ namespace libdar
 		else
 		    throw SRC_BUG; // at the archive format that support delta patch CRC is always present
 
-		    // reading the calculated base file's CRC
-		calculated_base_crc = current->get_crc();
-		if(calculated_base_crc == nullptr)
-		    throw SRC_BUG;
-
-		    // checking the calculated CRC of the base patched file matches the expected one
-
-		if(!patcher.has_patch_base_crc())
-		    throw SRC_BUG;
-		if(!patcher.get_patch_base_crc(expected_base_crc))
-		    throw SRC_BUG;
-		if(expected_base_crc == nullptr)
-		    throw SRC_BUG;
-
-		if(*calculated_base_crc != *expected_base_crc)
-		    throw Erange("filesystem.cpp::make_delta_patch", gettext("File the patch is about to be applied to is not the expected one, aborting the patch operation"));
-
 
 		    // reading the expected CRC of the resulting patched file
+		    // it will be provided for comparision with resulting data
+		    // when copying content from temporary file to destination file
 
 		if(!patcher.has_patch_result_crc())
 		    throw SRC_BUG;
@@ -2685,8 +2691,6 @@ namespace libdar
 		    delete calculated_patch_crc;
 		if(calculated_base_crc != nullptr)
 		    delete calculated_base_crc;
-		if(calculated_result_crc != nullptr)
-		    delete calculated_result_crc;
 		throw;
 	    }
 
@@ -2702,9 +2706,6 @@ namespace libdar
 		delete calculated_patch_crc;
 	    if(calculated_base_crc != nullptr)
 		delete calculated_base_crc;
-	    if(calculated_result_crc != nullptr)
-		delete calculated_result_crc;
-
 	}
 	catch(...)
 	{
@@ -2755,7 +2756,7 @@ namespace libdar
 		    if(extra[index] == '\0')
 		    {
 			index = 0;
-			filename += string(extra, extra);
+			filename += string(extra, extra+1);
 		    }
 		    else
 			++index;
@@ -2785,8 +2786,6 @@ namespace libdar
 	if(expected_crc != nullptr)
 	    src.reset_crc(expected_crc->get_size());
 	src.copy_to(dst);
-	src.terminate();
-	dst.terminate();
 	if(expected_crc != nullptr)
 	{
 	    crc * calculated_crc = src.get_crc();

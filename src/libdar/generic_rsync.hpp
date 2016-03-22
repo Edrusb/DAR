@@ -83,11 +83,11 @@ namespace libdar
 	    /// \param[in] current_data is a read_only object that contains the data to be used
 	    /// as base for the patch (this data is not modified)
 	    /// \param[in] base_signature is read only and contains the patch to apply
-	    /// \param[in] original_crc is the CRC of the original file that the patch
-	    /// should be applied to. If nullptr is given, no CRC check is performed
+	    /// \param[in] not_used is not used but present to make a distinction between this
+	    /// constructor and the constructor used to generate delta signature
 	generic_rsync(generic_file *current_data,
 		      generic_file *delta,
-		      const crc *original_crc);
+		      bool not_used);
 
 	generic_rsync(const generic_rsync & ref): generic_file(ref) { throw SRC_BUG; };
 	const generic_rsync & operator = (const generic_rsync & ref) { throw SRC_BUG; };
