@@ -493,6 +493,8 @@ namespace libdar
 	void set_multi_threaded(bool val) { x_multi_threaded = val; };
 
 	    /// whether binary delta has to be computed for differential/incremental backup
+	    ///
+	    /// \note this requires delta signature to be present in the archive of reference
 	void set_delta_diff(bool val) { x_delta_diff = val; };
 
 	    /// whether signature to base binary delta on the future has to be calculated and stored beside saved files

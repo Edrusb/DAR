@@ -331,7 +331,7 @@ bool get_args(shell_interaction & dialog,
     p.multi_threaded = true;
     p.delta_sig = false;
     p.delta_mask = nullptr;
-    p.delta_diff = false;
+    p.delta_diff = true;
     p.delta_sig_min_size = 0; //< if zero is not modified, we will used the default value from libdar
 
     try
@@ -1720,8 +1720,8 @@ static bool get_args_recursive(recursive_param & rec,
                     throw Erange("get_args", tools_printf(gettext("Missing argument to --delta"), char(lu)));
 		if(strcasecmp(optarg, "sig") == 0)
 		    p.delta_sig = true;
-		else if(strcasecmp(optarg, "patch") == 0)
-		    p.delta_diff = true;
+		else if(strcasecmp(optarg, "no-patch") == 0)
+		    p.delta_diff = false;
 		else
 		    throw Erange("get_args", string(gettext("Unknown parameter given to --delta option: ")) + optarg);
 		break;

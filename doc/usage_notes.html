@@ -1,9 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
-
-
-
-  
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR's Usage Notes</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -2198,22 +2194,24 @@ such entries.<br>
       <div style="margin-left: 40px;">
       <h4 style="text-decoration: underline;">Terminology</h4>
       <div style="text-align: justify;">"delta compression", "binary
-diff" or "rsync increment" all points to the same feature: a way to
+diff" or "rsync increment" all point to the same feature: a way to
 avoid resaving a whole file during a differential/incremental backup
-but only save the modified part of it. This solution is of course
+and only save the modified part of it instead. This solution is of course
 interesting for large files that change often but only for little parts
 of them (Microsoft exchange mailboxes, for example). Dar implements
-this feature relying on <span style="font-weight: bold;">librsync library</span>, feature which we will call <span style="font-style: italic; font-weight: bold;">binary difference</span><span style="font-weight: bold;"> </span>in
-the following (Delta compression is not adapted as the behavior is
-different from data compression, and rsync is, as you know,&nbsp;a network tool implementing that feature between two hosts). <br>
+this feature relying on <span style="font-weight: bold;">librsync library</span>, feature which we will call
+ <span style="font-style: italic; font-weight: bold;">binary delta</span><span style="font-weight: bold;"> </span> in
+the following<br>
       </div>
       <br>
       <h4 style="text-decoration: underline;">Librsync specific concepts</h4>
 Before looking at the way to use dar, several concepts from librsync have to be known:<br>
       <br>
-      <div style="text-align: justify;">In order to make a delta
-compression of a file "foo" which at time t1 contained data F1 and at
-time t2 containted data F2, librsync requires first that a "<span style="font-weight: bold;">signature</span>" be made against F1. Then using that signature and data F2, librsync is able to build a <span style="font-weight: bold;">patch</span> P1 that, if applied to F1 will provide content F2:<br>
+      <div style="text-align: justify;">In order to make a binary delta
+ of a file "foo" which at time t1 contained data F1 and at
+time t2 containted data F2, librsync requires first that a "<span style="font-weight: bold;">delta signature</span>" be made against F1. 
+Then using that signature and data F2, librsync is able to build a <span style="font-weight: bold;">delta patch</span> P1 that, if applied to F1 will provide 
+content F2:<br>
       </div>
       <br>
       <div style="margin-left: 40px;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; backing up file "foo"</span><br>
@@ -2291,7 +2289,10 @@ V <br>
 
 
       <h4 style="text-decoration: underline;">Usage with dar</h4>
-      <div style="text-align: justify;">First, delta signature is not activated by default, you have to tell dar when you want to generate delta signature (<span style="font-family: monospace; font-weight: bold;">--delta sig</span>) and/or delta patch (<span style="font-family: monospace; font-weight: bold;">--delta patch</span>). But better an example than a long explanation:<br>
+      <div style="text-align: justify;">First, delta signature is not activated by default, you have to tell dar you want to generate delta signature using the
+      <b>--delta sig</b> option at archive creation/isolation/merging time. Then as soon as 
+      a file has a delta signature in the archive of reference, dar will perform a delta binary if such file has changed since the archive of reference was done.
+      But better an example than a long explanation:<br>
       </div>
       <br>
 Case of a <span style="font-weight: bold;">differential backup </span>scheme:<br>
@@ -2300,56 +2301,67 @@ Case of a <span style="font-weight: bold;">differential backup </span>scheme:<br
 option for the resulting archive to contain the necessary signatures to
 be provided to librsync later on in order to setup delta patches. This
 has the drawback of additional space requirement but the advantage of
-space economy at incremental backup:<br>
+space economy at incremental/differential backups:<br>
       </div>
       <div style="margin-left: 40px;"><br>
-      <div style="margin-left: 40px;">&nbsp;<span style="font-family: monospace;">dar -c full -R / -z <span style="font-weight: bold;">--delta sig</span></span><br>
+      <div style="margin-left: 40px;">&nbsp;<span style="font-family: monospace;">dar -c full -R / -z <span style="font-weight: bold;">--delta sig</span>
+      </span><br>
       </div>
 &nbsp; <br>
       </div>
-      <div style="text-align: justify; margin-left: 40px;">Now doing
-differential backup: Here we only ask dar not resave the whole files
-when they have changed but to build a patch from the signature found in
-the full backup and the current file status found on filesystem. The
-archive will thus only contain delta patches of files that changed
-since the full backup, plus full content of new files and references to
-files that have been removed since full backup was made:<br>
+      <div style="text-align: justify; margin-left: 40px;">Then there is nothing more specific to delta signature, this is the same
+      way as you were used to do with previous releases of dar:
+      you just need to rely on a archive of reference containing delta signatures for dar activating delta binary. Here below, diff1 archive
+      will eventually contain delta patches of modified files since full archive was created, but will not
+      contain any delta signature. 
+      <br>
       </div>
       <div style="margin-left: 40px;"><br>
-      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c diff1 -A full -R / -z <span style="font-weight: bold;">--delta patch</span></span><br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c diff1 -A full -R / -z 
+      <br>
       </div>
       <br>
-      <div style="text-align: justify;">The next differential backups will be done the same, based on the full backup and using --delta patch:<br>
+      <div style="text-align: justify;">The next differential backups will be done the same, based on the full backup:<br>
       </div>
       <br>
-      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c diff<span style="font-weight: bold;">2</span> -A full -R / -z <span style="font-weight: bold;">--delta patch</span></span><br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c diff<span style="font-weight: bold;">2</span> -A full -R / -z 
+      <br>
+      </div>
+      <br>
+      Looking at archive content, you will see the "[Delta]" flag in place of the "[Saved]" flag for files that have been saved as a delta patch rather than
+      having their whole data saved in the backup: <br><br>
+      <div style="margin-left: 40px;">
+      <span style="font-family: monospace;">
+      
+      [Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size  |          Date                 |    filename<br>
+      --------------------------------+------------+-------+-------+-------+-------------------------------+------------<br>
+      <b>[Delta]</b>[ ]       [-L-][  99%][X]  -rwxr-xr-x   1000     1000    919 kio Tue Mar 22 20:22:34 2016        bash<br>
+      </span>
       </div>
       </div>
       <br>
 Case of <span style="font-weight: bold;">incremental backup</span> scheme:<br>
       <br>
-      <div style="margin-left: 40px;">The first backup is a full one and is done the same as above for differential backup:<br>
+      <div style="margin-left: 40px;">Doing incremental backups, the first one is always a full backup and is done the same as above for differential backup:<br>
       <br>
       <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c full -R / -z <span style="font-weight: bold;">--delta sig</span></span><br>
       </div>
       <br>
       <div style="text-align: justify;">At the opposit of differential
 backups, incremental backups are also used as reference for the next
-backup. Thus if you want to continue doing binary difference, delta
+backup. Thus if you want to continue doing binary delta, delta
 signatures must be present beside the delta patch in the resulting
 archives:<br>
       </div>
       <br>
-      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c incr1 -A full -R / -z <span style="font-weight: bold;">--delta sig</span> <span style="font-weight: bold;">--delta patch</span></span><br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c incr1 -A full -R / -z <span style="font-weight: bold;">--delta sig</span> 
+      <br>
       </div>
       <br>
       <div style="text-align: justify;">Here the <span style="font-weight: bold;">--delta sig</span>
 switch leads dar to copy from the full backup into the new backup all
 the delta signatures of unchanged files and to recompute new delta
-signature of files that have changed. While the <span style="font-weight: bold;">--delta patch</span>
-switch avoids resaving the whole file when a change is found, but
-rather stores a delta patch in place (and beside the delta signature of
-this new version of the file).<br>
+signature of files that have changed.<br>
       </div>
       </div>
       <br>
@@ -2364,9 +2376,18 @@ catalogue: If you want to perform a binary difference, the signature of
 reference files must be present in the isolated catalogue:&nbsp;&nbsp; <br>
       </div>
       <br>
-      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar <span style="font-weight: bold;">-C </span>CAT_full -A full -z <span style="font-weight: bold;">--delta sig</span></span><br>
+      <div style="margin-left: 40px;">
+      <span style="font-family: monospace;">dar <span style="font-weight: bold;">-C </span>CAT_full -A full -z <span style="font-weight: bold;">--delta sig</span></span><br>
       </div>
       <br>
+      <div style="text-align: justify;">
+      Note that if the archive of reference does not hold any delta signature, the previous command will lead dar to compute on-fly delta signature of saved files
+      while performing catalogue isolation. You can thus chose not to include delta signature inside full backup while still 
+      being able to let dar use binary delta. However as dar cannot compute delta signature without data, file that have been recorded as unchanged since
+      the archive of reference was made cannot have their delta signature computed at isolation time. Same point if a file is stored as a delta patch without
+      delta signature associated with it, dar will not be able to add a delta signature at isolation time for that file.    
+      </div>
+      <p>
       <div style="text-align: justify;">Yes, this is as simple as adding <span style="font-weight: bold;">--delta sig</span>
 to what you were used to do before. The resulting isolated catalogue
 will be much larger than without delta signatures but still much
@@ -2375,10 +2396,12 @@ backup can then be done the same as before but using CAT_full in place
 of full:<br>
       </div>
       <br>
-      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c diff1 -A <span style="font-weight: bold;">CAT_</span>full -R / -z <span style="font-weight: bold;">--delta patch</span></span><br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c diff1 -A <span style="font-weight: bold;">CAT_</span>full -R / -z 
+      </span><br>
       <br>
-      <span style="font-family: monospace;">dar -c incr1 -A <span style="font-weight: bold;">CAT_</span>full -R / -z <span style="font-weight: bold;">--delta sig</span> <span style="font-weight: bold;">--delta patch<br>
-</span></span></div>
+      <span style="font-family: monospace;">dar -c incr1 -A <span style="font-weight: bold;">CAT_</span>full -R / -z <span style="font-weight: bold;">--delta sig</span>
+      <br>
+		</span></div>
       </div>
       <br>
 Case of <span style="font-weight: bold;">archive merging</span>:<br>
@@ -2399,7 +2422,9 @@ be present in the source archives you will have to use <span style="font-weight:
       <br>
 Case of <span style="font-weight: bold;">restoration</span>:<br>
       <br>
-      <div style="text-align: justify; margin-left: 40px;">No special option has to be provided at restoration time. Dar will figure out by itself whether the data for a file is a <span style="font-weight: bold;">plain data</span> and can replace the whole current data if overwriting is allowed <span style="font-weight: bold;">or</span> is a <span style="font-weight: bold;">delta patch</span>
+      <div style="text-align: justify; margin-left: 40px;">No special option has to be provided at restoration time. Dar will figure out by itself 
+      whether the data for a file is a <span style="font-weight: bold;">plain data</span> and can replace the whole current data when overwriting
+       is allowed <span style="font-weight: bold;">or</span> is a <span style="font-weight: bold;">delta patch</span>
 that has to be applied to the existing file lying on filesystem. Before
 patching the file dar will calculate and check its CRC. if the CRC is
 the expected one, the file will be patched else a warning will be
@@ -2416,23 +2441,20 @@ which not to skip in order to restore a particular set of files.<br>
 Performing <span style="font-weight: bold;">binary difference only for some files</span> and normal backup for others:<br>
       <br>
       <div style="margin-left: 40px;">
-      <div style="text-align: justify;">The <span style="font-weight: bold;">--delta patch </span>option<span style="font-weight: bold;"> </span>builds
-binary patches if an only if a delta signature is present for a given
-file. You can thus exclude files from delta difference operation by
+      <div style="text-align: justify;"> You can exclude files from delta difference operation by
 avoiding creating a delta signature for them in the archive of
 reference, using&nbsp; the option <span style="font-weight: bold;">--exclude-delta-sig</span>. You can also include only some files for delta signatures by use of <span style="font-weight: bold;">--include-delta-sig</span>
 option. Of course as with other masks-related options like -I, -X, -U,
 -u, -Z, -Y, ... it is possible to combine them to have an even greater
 and more accurate definition of files for which you want to have delta
-signature being built or not.<br>
+signature being built for.<br>
       </div>
       <br>
       <span style="font-family: monospace;">dar -c full -R / -z --delta sig --include-delta-sig "*.opt" --include-delta-sig "*.pst" --exclude-delta-sig "home/joe/*" </span><br>
       <br>
       <div style="text-align: justify;">Independently of this filtering
 mechanism based on path+filename, delta signature is never calculated
-for files smaller than 10 kio ("10KiB" if you prefer, but that's not
-the correct writing) because it does not
+for files smaller than 10 kio because it does not
 worse performing delta difference for them. You can change that
 behavior using the option <span style="font-weight: bold;">--delta-sig-min-size</span> &lt;size in byte&gt;<br>
       </div>
@@ -2448,7 +2470,7 @@ listing received adhoc addition to show which file have delta signature
 and which one have been saved as delta patch. The <span style="font-family: monospace; font-weight: bold;">[Data ]</span><span style="font-weight: bold;"> </span>column shows <span style="font-family: monospace; font-weight: bold;">[Delta] </span>in place of <span style="font-weight: bold; font-family: monospace;">[Saved]</span> when a delta patch is used, and a new column entitled<span style="font-family: monospace;">[D]</span> shows <span style="font-weight: bold; font-family: monospace;">[D]</span> when a delta signature is present for that file.<br>
       </div>
       <br>
-      <div style="text-align: justify;">See man page about --delta option for even more details.<br>
+      <div style="text-align: justify;">See man page about --delta related options for even more details.<br>
       </div>
       </div>
 </td>

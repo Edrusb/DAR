@@ -872,11 +872,11 @@ When dar meets an inode type it is not aware about (some times ago, it was the c
 This option can be used for archive backup, isolation and merging.
 .RS
 .P
-Called during a backup operation it leads dar to create delta signature for each file: If the file is new or has changed, a signature is computed and stored beside the file's data, which increases the archive size. If the file is not new and has not changed (differential backup context) if an delta signature is found in the archive of reference (or isolated catalogue), this signature is copied to the resulting archive, but not the file's data. If the reference archive does not hold delta signature to grab, a new delta signature is computed and stored in the resulting archive.
+Called during a backup operation it leads dar to create delta signature for each file: If the file is new or has changed, a signature is computed and stored beside the file's data, which increases the archive size. If the file is not new and has not changed (differential backup context) if an delta signature is found in the archive of reference (or isolated catalogue), this signature is copied to the resulting archive, but not the file's data. If the reference archive does not hold delta signature, a new delta signature is computed based on the current data found on filesystem for that file and then stored in the resulting archive.
 But in any case, without
 .B
 --delta sig
-the resulting archive will not hold any delta signature.
+the resulting archive will hold no delta signature.
 .P
 For isolation and merging operations the behavior is sligthly different:
 .B
@@ -887,43 +887,67 @@ option let dar transfer existing delta signatures from the original archive to t
 or
 .B
 --exclude-delta-sig
-option is specified; in that case the delta signatures are transfered/dropped and if not present calculated accordingly to these options. However note that it is not possible to calculate delta signature for unsaved files in the archive of reference (because the archive of reference does not hold their data) as well as for fully saved files when merging is performed keeping files compressed (see -ak option). Another restriction while merging concernes sparse files, it is not possible to calculate binary signature for file stored as sparse files, but if sparse file detection mechanism is activated at merging time, delta signature can be calculated for sparse files too even if it is missing in the reference archive. In short: if you want recalculation of delta signature while merging, do not keep file compressed (do not use -ak option) and if you want to avoid having sparse files excluded from the delta signature recalcutation, activate sparse file detection (use -ah option).
+option is specified; in that case the delta signatures are transfered/dropped and if not present calculated accordingly to these mask options. However note that it is not possible to calculate delta signature for unsaved files in the archive of reference (because the archive of reference does not hold their data) as well as for fully saved files when merging is performed keeping files compressed (see -ak option). Another restriction while merging concernes sparse files, it is not possible to calculate binary signature for file stored as sparse files, but if sparse file detection mechanism is activated at merging time, delta signature can be calculated for sparse files too even if it is missing in the reference archive. In short: if you want recalculation of delta signature while merging, do not keep file compressed (do not use -ak option) and if you want to avoid having sparse files excluded from the delta signature recalcutation, activate sparse file detection (use -ah option).
 .RE
 .TP 20
 -{, --include-delta-sig <mask>
 .RS
-By default when --delta sig is provided, delta signatures are computed for all files enrolled in the backup operation (see also --delta-sig-min-size option). This option and --exclude-delta-sig allow restricting the files for which delta signature have to be calculated when
+By default when
 .B
 --delta sig
-is also used. The mask applies to the whole path, the same way as -P/-g options do.
+is provided, delta signatures are computed for all files enrolled in the backup operation (see also
+.B --delta-sig-min-size
+option). This option and --exclude-delta-sig allow restricting the files for which delta signature have to be calculated in that situation. The mask applies to the whole path, the same way as -P/-g options do.
 .P
 For merging or isolation operations, when
 .B
 --delta sig
-is used no delta signature is computed only existing ones are transfered as is without restriction. To change that behavior and thus either drop or add delta signature to files that did not have one in the archive of reference, specify an combination of --include-delta-sig or --exclude-delta-sig with --delta sig.
+is used no delta signature is computed only existing ones are transfered as is without restriction. To change that behavior and thus either drop or add delta signature to files that did not have one in the archive of reference, specify an combination of
+.B
+--include-delta-sig
+or
+.B
+--exclude-delta-sig
+with
+.B
+--delta sig.
 This option as well as --exclude-delta-sig can be used several times on command-line but are useless/ignored without --delta sig. See also -am, -ag and -ar options.
 .RE
 .TP 20
 -}, --exclude-delta-sig <mask>
-Files matching the given mask will never have their delta signatures calculated, may --delta sig option be specified or not. See also --include-delta-sig option above and --delta-sig-min-size below.
+Files matching the given mask will never have their delta signatures calculated, may
+.B
+--delta sig
+option be specified or not. See also --include-delta-sig option above and --delta-sig-min-size below.
 .TP 20
 -6, --delta-sig-min-size <number>
-For archive merging, isolation and creation, when dar has to (re-)calculate delta signatures, this option modifies the minimum file size (in bytes) below which dar never calculates delta signatures. This option acts independently from --include-delta-sig and --exclude-delta-sig, however it cannot re-activate delta signature recalculation by itself while merging/isolating an archive, it requires either --exclude-delta-sig or --include-delta-sig option to be active in that situation. For archive backup instead, it does not require --exclude-delta-sig nor --include-delta-sig to act, but only need --delta sig option to be set. By default, this minimum size is 10 Kio. The same option suffixes as the ones available with --slice option can be used here too. Using zero as argument gives the same result as not specifying this option at all (default size).
+For archive merging, isolation and creation, when dar has to (re-)calculate delta signatures, this option modifies the minimum file size (in bytes) below which dar never calculates delta signatures. This option acts independently from
+.B
+--include-delta-sig
+and
+.B
+--exclude-delta-sig
+, however it cannot re-activate delta signature recalculation by itself while merging/isolating an archive, it requires either --exclude-delta-sig or --include-delta-sig option to be active in that situation. For archive backup instead, it does not require --exclude-delta-sig nor --include-delta-sig to act, but only need
+.B
+--delta sig
+option to be set. By default, this minimum size is 10 kio. The same option suffixes (k for kilo, M for mega, G for giga, T, ...) as the ones available with --slice option can be used here too. Using zero as argument gives the same result as not specifying this option at all (default size).
 .TP 20
--8, --delta patch
-In the context of differential backup, when a file has changed since the archive of reference and that archive contains a delta signature (either alone or beside the corresponding plain file data), adding this option avoids saving the whole file in its new version but rather stores a binary diff based on the signature found in the archive of reference. If
-.B
- --delta sig
-is provided at the same time, an updated delta signature of the file is stored beside the binary diff.
+-8, --delta no-patch
+In the context of differential backup, this option leads dar to never consider files for delta binary even if delta signatures are present. By default delta binary (rsync-like) operation is performed when a file has changed since the archive of reference was made *and* if a delta signature could be found in the archive of reference for that file (or in the isolated catalogue used as reference for the incremental/differential backup). If no delta signature could be found or if --delta no-patch is used, the normal behavoir is done, which consist of saving that whole file in the archive.
 .P
-Binary delta option usage:
+Binary delta options usage and best practices:
 .RS
-If you always make differential backup based on a full backup you can save CPU cycles during differential backup by only mentionning --delta patch, without --delta sig.
+Once a full backup has been done using --delta sig, any differential backup made based on this archive will use binary diff for file having a delta signature present in the full backup. If you always make differential (not incremental) backups based on such full backup you have nothing more specific to do in regard to binary delta, dar will handle it transparently. In particular you do not need to invoke --delta sig at subsequent backup, this saves space in differential archives as well as CPU cycles.
 .P
-When doing a full backup you can save space by not computing delta signature for the full backup but only for the isolated catalogue. This can be achieved by performing the full backup without any --delta option, but adding
-.B
---delta sig --include-delta-sig "*"
-to the isolation operation, like for example: dar -C cat_full -A full -z --delta sig --include-delta-sig "*"
+However, When doing incremental (not differential) backups this time, if you want to have dar using binary delta at each subsequent incremental backup, delta signatures must be present in the successive incremental backups. This is done by using --delta sig option for each new incremental backup created.
+.P
+If you were used to use isolated catalogues before release 2.6.0 you can add --delta sig option while isolating a catalogue from an archive containing delta signatures. Such isolated catalogue will be much larger than what it can be without this option but it can be used as reference for a new differential/incremental backup letting dar relying on binary delta. Isolated catalogue generated without --delta sig do not contain delta signature and cannot lead to binary delta operation when used as reference for an incremental or decremental backup.
+.P
+You can also create incremental/differential backup without --delta sig option, and only add delta signatures at archive isolation time using
+.B --delta sig --include-delta-sig """*"""
+options. Binary delta will be performed when using such isolated catalogue as reference while the real archive by itself does not contain the delta signature overhead.
+.P
+Isolated catalogue using the --delta sig option, can still be used as backup of the internal catalogue they have been isolated from. However, as they hold their own delta signatures, such isolated catalogue can only have access to its own ones, not to those of the archive of reference. In particular when testing an archive (-t option), using -A option to rescue the archive internal catalogue using an isolated catalogue containing delta signatures, dar will not be able to check that there is no corruption in the delta signatures fields of the archive under test. For that type of testing either use the internal catalogue of the archive or rescue it using an isolated catalogue built without --delta sig option.
 .RE
 .PP
 .PP

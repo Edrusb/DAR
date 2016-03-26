@@ -340,7 +340,7 @@ namespace libdar
 		throw Ememory("archive_options_create::clear");
 	    x_scope = all_fsa_families();
 	    x_multi_threaded = true;
-	    x_delta_diff = false;
+	    x_delta_diff = true;
 	    x_delta_signature = false;
 	    has_delta_mask_been_set = false;
 	    x_delta_sig_min_size = default_delta_sig_min_size;
