@@ -742,7 +742,7 @@ namespace libdar
 				     options.get_hash_algo(),
 				     options.get_slice_min_digits(),
 				     "",      // backup_hook_file_execute
-				     bool_mask(false), //backup_hook_file_mask
+				     bool_mask(false), // backup_hook_file_mask
 				     false,
 				     options.get_fsa_scope(),
 				     options.get_multi_threaded(),
