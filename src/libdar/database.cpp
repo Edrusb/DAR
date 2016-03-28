@@ -532,7 +532,7 @@ namespace libdar
 			break;
 		    case data_tree::not_restorable:
 			num_data.clear();
-			dialog.warning(string(gettext("File found in database but impossible to restore (only found \"unchanged\" in differential backups): ")) + anneau.front());
+			dialog.warning(string(gettext("File found in database but impossible to restore (only found \"unchanged\" in differential backups, or delta patch without reference to base it on in any previous archive of the base): ")) + anneau.front());
 			break;
 		    default:
 			throw SRC_BUG;
@@ -551,7 +551,7 @@ namespace libdar
 			break;
 		    case data_tree::not_restorable:
 			num_ea = 0; // we cannot restore it
-			dialog.warning(string(gettext("Extended Attribute of file found in database but impossible to restore (only found \"unchanged\" in differential backups, or delta patch without reference to base it on in any previous archive of the base): ")) + anneau.front());
+			dialog.warning(string(gettext("Extended Attribute of file found in database but impossible to restore (only found \"unchanged\" in differential backups): ")) + anneau.front());
 			break;
 		    default:
 			throw SRC_BUG;

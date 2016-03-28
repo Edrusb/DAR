@@ -361,6 +361,7 @@ namespace libdar
 	set<archive_num> last_archive_even_when_removed; //< last archive number in which a valid entry with data available has been found
 	bool presence_seen = false; //< whether the last found valid entry indicates file was present or removed
 	bool presence_real = false; //< whether the last found valid entry not being an "et_present" state was present or removed
+	bool broken_patch = false;  //< record whether there is a broken patch the avoid restoring data
 	lookup ret;
 
 	archive.clear(); // empty set will be used if no archive found
@@ -373,18 +374,25 @@ namespace libdar
 	       && (date.is_null() || it->second.date <= date))
 	    {
 		max_seen_date = it->second.date;
-		last_archive_seen = it->first;
 		switch(it->second.present)
 		{
 		case et_saved:
+		    broken_patch = false;
+			// no break !
 		case et_present:
 		case et_patch:
 		    presence_seen = true;
+		    last_archive_seen = it->first;
+		    break;
+		case et_patch_unusable:
+		    broken_patch = true;
+		    presence_seen = false;
+			// we do not record this archive number as last_seen
 		    break;
 		case et_removed:
 		case et_absent:
-		case et_patch_unusable:
 		    presence_seen = false;
+		    last_archive_seen = it->first;
 		    break;
 		default:
 		    throw SRC_BUG;
@@ -396,7 +404,7 @@ namespace libdar
 		   // and we must be able to see a value of 0 (initially max = 0) which is valid.
 	       && (date.is_null() || it->second.date <= date))
 	    {
-		if(it->second.present != et_present)
+		if(it->second.present != et_present && !broken_patch)
 		{
 		    max_real_date = it->second.date;
 		    switch(it->second.present)
@@ -412,12 +420,13 @@ namespace libdar
 			break;
 		    case et_removed:
 		    case et_absent:
-		    case et_patch_unusable:
 			archive.clear();
 			archive.insert(it->first);
 			presence_real = false;
 			break;
 		    case et_present:
+			throw SRC_BUG;
+		    case et_patch_unusable:
 			throw SRC_BUG;
 		    default:
 			throw SRC_BUG;
@@ -434,35 +443,44 @@ namespace libdar
 	    presence_seen = presence_real = true;
 	}
 
-	if(archive.empty())
-	    if(last_archive_seen != 0) // last acceptable entry is a file present but not saved, but no full backup is present in a previous archive
-	    {
-		archive.clear();
-		archive.insert(last_archive_seen);
-		ret = not_restorable;
-	    }
-	    else
-		ret = not_found;
+	if(broken_patch)
+	{
+	    archive.clear();
+	    archive.insert(last_archive_seen);
+	    ret = not_restorable;
+	}
 	else
-	    if(last_archive_seen != 0)
-		if(presence_seen && !presence_real)
-			// last acceptable entry is a file present but not saved,
-			// but no full backup is present in a previous archive
+	{
+	    if(archive.empty())
+		if(last_archive_seen != 0) // last acceptable entry is a file present but not saved, but no full backup is present in a previous archive
 		{
 		    archive.clear();
 		    archive.insert(last_archive_seen);
 		    ret = not_restorable;
 		}
 		else
-		    if(presence_seen != presence_real)
-			throw SRC_BUG;
-		    else  // archive > 0 && presence_seen == present_real
-			if(presence_real)
-			    ret = found_present;
-			else
-			    ret = found_removed;
-	    else // archive != 0 but last_archive_seen == 0
-		throw SRC_BUG;
+		    ret = not_found;
+	    else
+		if(last_archive_seen != 0)
+		    if(presence_seen && !presence_real)
+			    // last acceptable entry is a file present but not saved,
+			    // but no full backup is present in a previous archive
+		    {
+			archive.clear();
+			archive.insert(last_archive_seen);
+			ret = not_restorable;
+		    }
+		    else
+			if(presence_seen != presence_real)
+			    throw SRC_BUG;
+			else  // archive > 0 && presence_seen == present_real
+			    if(presence_real)
+				ret = found_present;
+			    else
+				ret = found_removed;
+		else // archive != 0 but last_archive_seen == 0
+		    throw SRC_BUG;
+	}
 
 	return ret;
     }
