@@ -11,6 +11,7 @@ from 2.5.3 to 2.5.4
 - fixed invertion of the condition triggering a warning about archive
   date order in a dar_manager database while moving an archive within a
   database
+- fixed typos in documentation
 
 from 2.5.2 to 2.5.3
 - Fixing a 2.5.x build issue met when a 2.4.x libdar library is already
