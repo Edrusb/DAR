@@ -136,33 +136,33 @@ namespace libdar
 
     data_tree::status_plus::status_plus(const datetime & d,
 					etat p,
-					const crc *xme,
-					const crc *xref): status(d, p)
+					const crc *xbase,
+					const crc *xresult): status(d, p)
     {
-	me = ref = nullptr;
+	base = result = nullptr;
 
 	try
 	{
-	    if(xme != nullptr)
+	    if(xbase != nullptr)
 	    {
-		me = xme->clone();
-		if(me == nullptr)
+		base = xbase->clone();
+		if(base == nullptr)
 		    throw Ememory("data_tree::status_plus::status_plus");
 	    }
 
-	    if(xref != nullptr)
+	    if(xresult != nullptr)
 	    {
-		ref = xref->clone();
-		if(ref == nullptr)
+		result = xresult->clone();
+		if(result == nullptr)
 		    throw Ememory("data_tree::status_plus::status_plus");
 	    }
 	}
 	catch(...)
 	{
-	    if(me != nullptr)
-		delete me;
-	    if(ref != nullptr)
-		delete ref;
+	    if(base != nullptr)
+		delete base;
+	    if(result != nullptr)
+		delete result;
 	    throw;
 	}
     }
@@ -170,17 +170,17 @@ namespace libdar
     void data_tree::status_plus::dump(generic_file & f) const
     {
 	unsigned char flag = 0;
-	if(me != nullptr)
+	if(base != nullptr)
 	    flag |= STATUS_PLUS_FLAG_ME;
-	if(ref != nullptr)
+	if(result != nullptr)
 	    flag |= STATUS_PLUS_FLAG_REF;
 
 	status::dump(f);
 	f.write((char *)&flag, 1);
-	if(me != nullptr)
-	    me->dump(f);
-	if(ref != nullptr)
-	    ref->dump(f);
+	if(base != nullptr)
+	    base->dump(f);
+	if(result != nullptr)
+	    result->dump(f);
     }
 
     void data_tree::status_plus::read(generic_file &f,
@@ -203,9 +203,9 @@ namespace libdar
 	case 5:
 	    f.read((char *)&flag, 1);
 	    if((flag & STATUS_PLUS_FLAG_ME) != 0)
-		me = create_crc_from_file(f, get_pool(), false);
+		base = create_crc_from_file(f, get_pool(), false);
 	    if((flag & STATUS_PLUS_FLAG_REF) != 0)
-		ref = create_crc_from_file(f, get_pool(), false);
+		result = create_crc_from_file(f, get_pool(), false);
 	    break;
 	default:
 	    throw SRC_BUG;
@@ -219,36 +219,36 @@ namespace libdar
 
 	*moi = *toi;
 
-	if(xref.me != nullptr)
+	if(xref.base != nullptr)
 	{
-	    me = xref.me->clone();
-	    if(me == nullptr)
+	    base = xref.base->clone();
+	    if(base == nullptr)
 		throw Ememory("data_tree::status_plus::copy_from");
 	}
 	else
-	    me = nullptr;
+	    base = nullptr;
 
-	if(xref.ref != nullptr)
+	if(xref.result != nullptr)
 	{
-	    ref = xref.ref->clone();
-	    if(ref == nullptr)
+	    result = xref.result->clone();
+	    if(result == nullptr)
 		throw Ememory("data_tree::status_plus::copy_from");
 	}
 	else
-	    ref = nullptr;
+	    result = nullptr;
     }
 
     void data_tree::status_plus::detruit()
     {
-	if(me != nullptr)
+	if(base != nullptr)
 	{
-	    delete me;
-	    me = nullptr;
+	    delete base;
+	    base = nullptr;
 	}
-	if(ref != nullptr)
+	if(result != nullptr)
 	{
-	    delete ref;
-	    ref = nullptr;
+	    delete result;
+	    result = nullptr;
 	}
     }
 
@@ -559,7 +559,8 @@ namespace libdar
 	return ret;
     }
 
-    bool data_tree::read_data(archive_num num, datetime & val,
+    bool data_tree::read_data(archive_num num,
+			      datetime & val,
 			      etat & present) const
     {
 	map<archive_num, status_plus>::const_iterator it = last_mod.find(num);
@@ -574,7 +575,9 @@ namespace libdar
 	    return false;
     }
 
-    bool data_tree::read_EA(archive_num num, datetime & val, etat & present) const
+    bool data_tree::read_EA(archive_num num,
+			    datetime & val,
+			    etat & present) const
     {
 	map<archive_num, status>::const_iterator it = last_change.find(num);
 
@@ -1049,22 +1052,23 @@ namespace libdar
 	    switch(it->second.present)
 	    {
 	    case et_saved:
-		prev = it->second.me;
+		prev = it->second.result;
 		break;
 	    case et_patch:
 	    case et_patch_unusable:
-		if(it->second.ref == nullptr)
+		if(it->second.base == nullptr)
 		    throw SRC_BUG;
-		if(prev != nullptr && *prev == *(it->second.ref))
+		if(prev != nullptr && *prev == *(it->second.base))
 		    it->second.present = et_patch;
 		else
 		{
 		    it->second.present = et_patch_unusable;
 		    ret = false;
 		}
-		prev = it->second.me;
+		prev = it->second.result;
 		break;
 	    case et_present:
+		prev = it->second.result;
 		break;
 	    case et_removed:
 	    case et_absent:
@@ -1207,8 +1211,8 @@ namespace libdar
 	archive_num last_archive;
 	lookup result;
 	datetime last_mod = entry->get_last_modif() > entry->get_last_change() ? entry->get_last_modif() : entry->get_last_change();
-	const crc *me;
-	const crc *ref;
+	const crc *base = nullptr;
+	const crc *res = nullptr;
 
 	switch(entry->get_saved_status())
 	{
@@ -1216,33 +1220,30 @@ namespace libdar
 	case s_fake:
 	    if(entry_file != nullptr)
 	    {
-		if(!entry_file->get_crc(me))
-		    me = nullptr;
+		if(!entry_file->get_crc(res))
+		    res = nullptr;
 	    }
-	    else
-		me = nullptr;
-	    ref = nullptr;
-	    tree->set_data(archive, last_mod, et_saved, me, ref);
+	    tree->set_data(archive, last_mod, et_saved, base, res);
 	    break;
 	case s_delta:
 	    if(entry_file == nullptr)
 		throw SRC_BUG;
-	    if(!entry_file->get_crc(me))
-		me = nullptr;
-	    if(!entry_file->get_patch_base_crc(ref))
-		ref = nullptr;
-	    tree->set_data(archive, last_mod, et_patch, me, ref);
+	    if(!entry_file->get_patch_base_crc(base))
+		base = nullptr;
+	    if(!entry_file->get_patch_result_crc(res))
+		res = nullptr;
+	    tree->set_data(archive, last_mod, et_patch, base, res);
 	    break;
 	case s_not_saved:
 	    if(entry_file != nullptr)
 	    {
-		if(!entry_file->get_crc(me))
-		    me = nullptr;
+		if(!entry_file->get_crc(res))
+		    if(!entry_file->get_patch_result_crc(res))
+			res = nullptr;
+		if(!entry_file->get_patch_base_crc(base))
+		    base = nullptr;
 	    }
-	    else
-		me = nullptr;
-	    ref = nullptr;
-	    tree->set_data(archive, last_mod, et_present, me, ref);
+	    tree->set_data(archive, last_mod, et_present, base, res);
 	    break;
 	default:
 	    throw SRC_BUG;

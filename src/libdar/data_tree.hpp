@@ -112,8 +112,8 @@ namespace libdar
 	void set_data(const archive_num & archive,
 		      const datetime & date,
 		      etat present,
-		      const crc *me,
-		      const crc *ref) { last_mod[archive] = status_plus(date, present, me, ref); (void) check_delta_validity(); };
+		      const crc *base,
+		      const crc *result) { last_mod[archive] = status_plus(date, present, base, result); (void) check_delta_validity(); };
 
 	void set_EA(const archive_num & archive, const datetime & date, etat present) { status sta(date, present); last_change[archive] = sta; };
 
@@ -154,6 +154,7 @@ namespace libdar
 	virtual bool fix_corruption(); // return true whether corruption could be fixed (meaning this entry can be safely removed from base)
 
     private:
+
 	class status
 	{
 	public:
@@ -168,18 +169,19 @@ namespace libdar
 			      unsigned char db_version);
 	};
 
+
 	class status_plus : public status, public on_pool
 	{
 	public:
-	    status_plus() { me = ref = nullptr; };
-	    status_plus(const datetime & d, etat p, const crc *xme, const crc *xref);
+	    status_plus() { base = result = nullptr; };
+	    status_plus(const datetime & d, etat p, const crc *xbase, const crc *xresult);
 	    status_plus(const status_plus & ref): status(ref) { copy_from(ref); };
 	    ~status_plus() { detruit(); };
 
 	    const status_plus & operator = (const status_plus & ref) { detruit(); copy_from(ref); return *this; };
 
-	    crc *me;
-	    crc *ref;
+	    crc *base; //< only present for s_delta status, to have a link with the file to apply the patch to
+	    crc *result; //< present for s_delta, s_saved, s_not_saved this is the crc of the data (or crc of the data resulting from the patch)
 
 	    void dump(generic_file & f) const; //< write the struct to file
 	    void read(generic_file &f,         //< set the struct from file
@@ -189,7 +191,6 @@ namespace libdar
 	    void copy_from(const status_plus & ref);
 	    void detruit();
 	};
-
 
 
 	std::string filename;
