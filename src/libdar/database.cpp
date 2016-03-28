@@ -322,13 +322,16 @@ namespace libdar
 	    {
 		re_finalize.insert(src);
 		re_finalize.insert(dst);
-		re_finalize.insert(dst+1);
+		if(dst+1 < (archive_num)coordinate.size())
+		    re_finalize.insert(dst+1);
 	    }
 	    else // src >= dst
 	    {
-		re_finalize.insert(src+1);
+		if(src+1 < (archive_num)coordinate.size())
+		    re_finalize.insert(src+1);
 		re_finalize.insert(dst);
-		re_finalize.insert(dst+1);
+		if(dst+1 < (archive_num)coordinate.size())
+		    re_finalize.insert(dst+1);
 
 		    // if src == dst the set still contains on entry (src or dst).
 		    // this is intended to let the user have the possibility
