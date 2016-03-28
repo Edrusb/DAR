@@ -639,9 +639,8 @@ static void op_add(user_interaction & dialog, database *dat, const string &arg, 
 	thr.check_self_cancellation();
 	if(info_details)
 	    dialog.warning(gettext("Checking date ordering of files between archives..."));
-	date_order_problem = dat->check_order(dialog);
+	date_order_problem = !dat->check_order(dialog);
 	thr.check_self_cancellation();
-
     }
     catch(...)
     {
@@ -651,7 +650,7 @@ static void op_add(user_interaction & dialog, database *dat, const string &arg, 
     }
     delete arch;
 
-    if(!date_order_problem)
+    if(date_order_problem)
 	throw Edata(gettext("Some files do not follow chronological order when archive index increases withing the database, this can lead dar_manager to restored a wrong version of these files"));
 }
 
@@ -834,7 +833,7 @@ static void op_move(user_interaction & dialog, database *dat, S_I src, archive_n
     thr.check_self_cancellation();
     if(info_details)
 	dialog.warning(gettext("Checking date ordering of files between archives..."));
-    date_order_problem = dat->check_order(dialog);
+    date_order_problem = !dat->check_order(dialog);
     thr.check_self_cancellation();
     if(date_order_problem)
 	throw Edata(gettext("Some files do not follow chronological order when archive index increases withing the database, this can lead dar_manager to restored a wrong version of these files"));

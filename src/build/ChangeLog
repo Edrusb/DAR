@@ -3,6 +3,9 @@ from 2 4.21 to 2.4.20
   FUSE based filesystem.
 - fixed bug in dar_manager: archive permutation in database lead libdar
   to check an archive number of range under certain circumstances
+- fixed invertion of the condition triggering a warning about archive
+  date order in a dar_manager database while moving an archive within a
+  database
 
 from 2.4.19 to 2.4.20
 - fixed display bug in dar_manager met when using -o option and adding
