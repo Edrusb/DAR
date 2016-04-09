@@ -70,7 +70,7 @@ namespace libdar
 		 bool x_furtive_read_mode);
         cat_file(const cat_file & ref);
         cat_file(user_interaction & dialog,
-		 const pile_descriptor & pdesc,
+		 const smart_pointer<pile_descriptor> & pdesc,
 		 const archive_version & reading_ver,
 		 saved_status saved,
 		 compression default_algo,

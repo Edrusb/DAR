@@ -35,6 +35,7 @@ extern "C"
 #include "pile.hpp"
 #include "escape.hpp"
 #include "compressor.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -42,7 +43,7 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-    struct pile_descriptor
+    struct pile_descriptor: public on_pool
     {
 	pile *stack;       //< the stack to read from or write to (should never be equal to nullptr)
 	escape *esc;       //< an escape layer in stack (may be nullptr)

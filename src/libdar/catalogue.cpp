@@ -168,7 +168,10 @@ namespace libdar
 		    throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
 
 		stats.clear();
-		contenu = new (get_pool()) cat_directory(get_ui(), pdesc, reading_ver, st, stats, corres, default_algo, lax, only_detruit, false);
+		smart_pointer<pile_descriptor> spdesc(new (get_pool()) pile_descriptor(pdesc));
+		if(spdesc.is_null())
+		    throw Ememory("catalogue::catalogue");
+		contenu = new (get_pool()) cat_directory(get_ui(), spdesc, reading_ver, st, stats, corres, default_algo, lax, only_detruit, false);
 		if(contenu == nullptr)
 		    throw Ememory("catalogue::catalogue(path)");
 		if(only_detruit)
@@ -1668,6 +1671,14 @@ namespace libdar
 	    delete sub_tree;
 	    sub_tree = nullptr;
 	}
+    }
+
+    void catalogue::change_location(const pile_descriptor & pdesc)
+    {
+	smart_pointer<pile_descriptor> tmp(new (get_pool()) pile_descriptor(pdesc));
+	if(tmp.is_null())
+	    throw Ememory("catalogue::change_location");
+	contenu->change_location(tmp);
     }
 
     void catalogue::copy_detruits_from(const catalogue & ref)

@@ -95,14 +95,16 @@ void f1()
         fichier_local *dump = new fichier_local(*ui, FIC1, gf_read_write, 0644, false, false, false);
 	compressor *comp = new compressor(none, *dump, 1);
 	pile stack;
-	pile_descriptor pdesc;
+	smart_pointer<pile_descriptor> pdesc(new pile_descriptor());
 	std::map <infinint, cat_etoile *> corres;
 
+	if(pdesc.is_null())
+	    throw Ememory("f1");
 	stack.push(dump);
 	dump = nullptr;
 	stack.push(comp);
 	comp = nullptr;
-	pdesc = &stack;
+	*pdesc = &stack;
 
         cat_eod *v_eod = new cat_eod();
         cat_file *v_file = new cat_file(1024, 102, 0644, datetime(1), datetime(2), datetime(3), "fichier", "." , 1024, 0, false);
@@ -124,7 +126,7 @@ void f1()
 
             if(ino != nullptr)
                 ino->set_saved_status(s_saved);
-            liste[i]->dump(pdesc, false);
+            liste[i]->dump(*pdesc, false);
         }
 
         stack.skip(0);
@@ -159,9 +161,9 @@ void f1()
 	dump = nullptr;
 	stack.push(comp);
 	comp = nullptr;
-	pdesc = &stack;
+	*pdesc = &stack;
 
-        v_dir->dump(pdesc, false);
+        v_dir->dump(*pdesc, false);
         stack.skip(0);
         ref = cat_entree::read(*ui, nullptr, pdesc, macro_tools_supported_version, stats, corres, none, false, false, false);
         v_sub_dir = dynamic_cast<cat_directory *>(ref);

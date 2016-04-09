@@ -34,13 +34,13 @@ using namespace std;
 namespace libdar
 {
 
-    cat_nomme::cat_nomme(const pile_descriptor & pdesc, bool small) : cat_entree(pdesc, small)
+    cat_nomme::cat_nomme(const smart_pointer<pile_descriptor> & pdesc, bool small) : cat_entree(pdesc, small)
     {
-	pdesc.check(small);
+	pdesc->check(small);
 	if(small)
-	    tools_read_string(*pdesc.esc, xname);
+	    tools_read_string(*(pdesc->esc), xname);
 	else
-	    tools_read_string(*pdesc.stack, xname);
+	    tools_read_string(*(pdesc->stack), xname);
     }
 
     bool cat_nomme::operator == (const cat_entree & ref) const

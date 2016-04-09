@@ -54,7 +54,7 @@ namespace libdar
 		   U_16 minor,
 		   const infinint & fs_device);
         cat_device(user_interaction & dialog,
-		   const pile_descriptor & pdesc,
+		   const smart_pointer<pile_descriptor> & pdesc,
 		   const archive_version & reading_ver,
 		   saved_status saved,
 		   bool small);

@@ -40,7 +40,7 @@ namespace libdar
 {
 
     cat_mirage::cat_mirage(user_interaction & dialog,
-			   const pile_descriptor & pdesc,
+			   const smart_pointer<pile_descriptor> & pdesc,
 			   const archive_version & reading_ver,
 			   saved_status saved,
 			   entree_stats & stats,
@@ -63,7 +63,7 @@ namespace libdar
     }
 
     cat_mirage::cat_mirage(user_interaction & dialog,
-			   const pile_descriptor & pdesc,
+			   const smart_pointer<pile_descriptor> & pdesc,
 			   const archive_version & reading_ver,
 			   saved_status saved,
 			   entree_stats & stats,
@@ -85,7 +85,7 @@ namespace libdar
     }
 
     void cat_mirage::init(user_interaction & dialog,
-			  const pile_descriptor & pdesc,
+			  const smart_pointer<pile_descriptor> & pdesc,
 			  const archive_version & reading_ver,
 			  saved_status saved,
 			  entree_stats & stats,
@@ -105,11 +105,11 @@ namespace libdar
             // thus we must not increment the real entree_stats structure here and we use a local variable
 	generic_file *ptr = nullptr;
 
-	pdesc.check(small);
+	pdesc->check(small);
 	if(small)
-	    ptr = pdesc.esc;
+	    ptr = pdesc->esc;
 	else
-	    ptr = pdesc.stack;
+	    ptr = pdesc->stack;
 
 
         if(fmt != fmt_file_etiquette)
