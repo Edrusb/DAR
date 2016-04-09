@@ -170,21 +170,21 @@ namespace libdar
 
 
 	    /// stack used to read object from (nullptr is returned for object created from filesystem)
-	pile *get_pile() const { return pdesc->stack; };
+	pile *get_pile() const { return pdesc.is_null() ? nullptr : pdesc->stack; };
 
 	    /// compressor generic_file relative methods
 	    ///
 	    /// \note CAUTION: the pointer to object is member of the get_pile() stack and may be managed by another thread
 	    /// all precaution like get_pile()->flush_read_above(get_compressor_layer() shall be take to avoid
 	    /// concurrent access to the compressor object by the current thread and the thread managing this object
-	compressor *get_compressor_layer() const { return pdesc->compr; };
+	compressor *get_compressor_layer() const { return pdesc.is_null() ? nullptr : pdesc->compr; };
 
 	    /// escape generic_file relative methods
 	    ///
 	    /// \note CAUTION: the pointer to object is member of the get_pile() stack and may be managed by another thread
 	    /// all precaution like get_pile()->flush_read_above(get_escape_layer() shall be take to avoid
 	    /// concurrent access to the compressor object by the current thread and the thread managing this object
-	escape *get_escape_layer() const { return pdesc->esc; };
+	escape *get_escape_layer() const { return pdesc.is_null() ? nullptr : pdesc->esc; };
 
 	    /// return the adhoc layer in the stack to read from the catalogue objects (except the EA, FSA or Data part)
 	generic_file *get_read_cat_layer(bool small) const;
