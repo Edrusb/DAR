@@ -32,15 +32,15 @@ using namespace std;
 namespace libdar
 {
 
-    cat_detruit::cat_detruit(const pile_descriptor & pdesc, const archive_version & reading_ver, bool small) : cat_nomme(pdesc, small)
+    cat_detruit::cat_detruit(const smart_pointer<pile_descriptor> & pdesc, const archive_version & reading_ver, bool small) : cat_nomme(pdesc, small)
     {
 	generic_file *ptr = nullptr;
 
-	pdesc.check(small);
+	pdesc->check(small);
 	if(small)
-	    ptr = pdesc.esc;
+	    ptr = pdesc->esc;
 	else
-	    ptr = pdesc.stack;
+	    ptr = pdesc->stack;
 
 	if(ptr->read((char *)&signe, 1) != 1)
 	    throw Erange("cat_detruit::cat_detruit", gettext("missing data to build"));

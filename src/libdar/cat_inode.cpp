@@ -111,7 +111,7 @@ namespace libdar
     }
 
     cat_inode::cat_inode(user_interaction & dialog,
-			 const pile_descriptor & pdesc,
+			 const smart_pointer<pile_descriptor> & pdesc,
 			 const archive_version & reading_ver,
 			 saved_status saved,
 			 bool small) : cat_nomme(pdesc, small)
@@ -120,11 +120,11 @@ namespace libdar
         unsigned char flag;
 	generic_file *ptr = nullptr;
 
-	pdesc.check(small);
+	pdesc->check(small);
 	if(small)
-	    ptr = pdesc.esc;
+	    ptr = pdesc->esc;
 	else
-	    ptr = pdesc.stack;
+	    ptr = pdesc->stack;
 
 	nullifyptr();
 	try

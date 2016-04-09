@@ -46,7 +46,7 @@ namespace libdar
     {
     public :
         cat_eod() {};
-        cat_eod(const pile_descriptor & pdesc, bool small): cat_entree(pdesc, small) {};
+        cat_eod(const smart_pointer<pile_descriptor> & pdesc, bool small): cat_entree(pdesc, small) {};
             // dump defined by cat_entree
 	virtual bool operator == (const cat_entree & ref) const { return true; };
         unsigned char signature() const { return 'z'; };

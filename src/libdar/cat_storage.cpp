@@ -23,45 +23,57 @@
 
 extern "C"
 {
-
 } // end extern "C"
 
-#include "cat_nomme.hpp"
-#include "tools.hpp"
+#include "cat_storage.hpp"
 
 using namespace std;
 
 namespace libdar
 {
 
-    cat_nomme::cat_nomme(const smart_pointer<pile_descriptor> & pdesc, bool small) : cat_entree(pdesc, small)
+    cat_storage::cat_storage(const smart_pointer<pile_descriptor> & pdesc, bool small)
     {
+	if(pdesc.is_null())
+	    throw SRC_BUG;
+	if(small && pdesc->esc == nullptr)
+	    throw SRC_BUG;
+
+	change_location(pdesc);
+    }
+
+    void cat_storage::change_location(const smart_pointer<pile_descriptor> & x_pdesc)
+    {
+	if(x_pdesc.is_null())
+	    throw SRC_BUG;
+
+	if(x_pdesc->stack == nullptr)
+	    throw SRC_BUG;
+
+	if(x_pdesc->compr == nullptr)
+	    throw SRC_BUG;
+
+	pdesc = x_pdesc;
+    }
+
+    generic_file *cat_storage::get_read_cat_layer(bool small) const
+    {
+	generic_file *ret = nullptr;
+
+	if(pdesc.is_null())
+	    throw SRC_BUG;
+
 	pdesc->check(small);
+
 	if(small)
-	    tools_read_string(*(pdesc->esc), xname);
+	{
+	    pdesc->stack->flush_read_above(pdesc->esc);
+	    ret = pdesc->esc;
+	}
 	else
-	    tools_read_string(*(pdesc->stack), xname);
-    }
+	    ret = pdesc->stack;
 
-    bool cat_nomme::operator == (const cat_entree & ref) const
-    {
-	const cat_nomme *ref_nomme = dynamic_cast<const cat_nomme *>(&ref);
-
-	if(ref_nomme == nullptr)
-	    return false;
-	else
-	    return xname == ref_nomme->xname;
-    }
-
-    void cat_nomme::inherited_dump(const pile_descriptor & pdesc, bool small) const
-    {
-        cat_entree::inherited_dump(pdesc, small);
-
-	pdesc.check(small);
-	if(small)
-	    tools_write_string(*pdesc.esc, xname);
-	else
-	    tools_write_string(*pdesc.stack, xname);
+	return ret;
     }
 
 } // end of namespace

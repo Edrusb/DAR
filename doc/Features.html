@@ -234,7 +234,7 @@ time.<br>
       <td colspan="2" rowspan="1" style="vertical-align: top;">At
 backup time, dar checks that each saved file had not changed at the
 time it was read. If a file has changed in that situation, dar retries
-saving it up to tree times (by default) and if it is still changing, is
+saving it up to three times (by default) and if it is still changing, is
 flagged as "dirty" in the archive, and handled differently from other
 files at restoration time. The dirty file handling is either to warn
 the user before restoring, to ignore and avoid restoring them, or to ignore

@@ -39,6 +39,7 @@
 #include "catalogue.hpp"
 #include "escape.hpp"
 #include "pile.hpp"
+#include "smart_pointer.hpp"
 
 namespace libdar
 {
@@ -77,7 +78,7 @@ namespace libdar
 	void pre_add_fsa(const cat_entree *ref) const;
 	void pre_add_fsa_crc(const cat_entree *ref) const;
 	void pre_add_delta_sig() const;
-	escape *get_escape_layer() const { return pdesc.esc; };
+	escape *get_escape_layer() const { return pdesc->esc; };
 
 	void reset_read() const;
 	void end_read() const;
@@ -98,7 +99,7 @@ namespace libdar
 	    ec_completed  //< state in which the escape_catalogue object is completed and has all information in memory as a normal catalogue
 	};
 
-	pile_descriptor pdesc;
+	smart_pointer<pile_descriptor> pdesc;
 	header_version x_ver;
 	std::list<signator> known_sig;
 	bool x_lax;

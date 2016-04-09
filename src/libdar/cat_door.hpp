@@ -57,7 +57,7 @@ namespace libdar
 		 const infinint & fs_device) : cat_file(xuid, xgid, xperm, last_access, last_modif,
 							last_change, src, che, 0, fs_device, false) {};
         cat_door(user_interaction & dialog,
-		 const pile_descriptor & pdesc,
+		 const smart_pointer<pile_descriptor> & pdesc,
 		 const archive_version & reading_ver,
 		 saved_status saved,
 		 compression default_algo,

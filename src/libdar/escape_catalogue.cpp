@@ -47,9 +47,9 @@ namespace libdar
 	wait_parent_depth = 0; // to disable this feature
 
 	    // dropping the data_name in the archive
-	pdesc.stack->sync_write_above(pdesc.esc); // esc is now up to date
-	pdesc.esc->add_mark_at_current_position(escape::seqt_data_name);
-	data_name.dump(*pdesc.esc);
+	pdesc->stack->sync_write_above(pdesc->esc); // esc is now up to date
+	pdesc->esc->add_mark_at_current_position(escape::seqt_data_name);
+	data_name.dump(*(pdesc->esc));
     }
 
     escape_catalogue::escape_catalogue(user_interaction & dialog,
@@ -72,15 +72,15 @@ namespace libdar
 	wait_parent_depth = 0; // to disable this feature
 
 	    // fetching the value of ref_data_name
-	pdesc.stack->flush_read_above(pdesc.esc);
-	if(pdesc.esc->skip_to_next_mark(escape::seqt_data_name, false))
+	pdesc->stack->flush_read_above(pdesc->esc);
+	if(pdesc->esc->skip_to_next_mark(escape::seqt_data_name, false))
 	{
 		// we are at least at revision "08" of archive format, or this is a collision with data of an old archive or of an archive without escape marks
 	    label tmp;
 
 	    try
 	    {
-		tmp.read(*pdesc.esc);
+		tmp.read(*(pdesc->esc));
 		set_data_name(tmp);
 	    }
 	    catch(...)
@@ -100,7 +100,7 @@ namespace libdar
 	    else
 	    {
 		contextual *cont_data = nullptr;
-		pdesc.stack->find_first_from_bottom(cont_data);
+		pdesc->stack->find_first_from_bottom(cont_data);
 
 		get_ui().warning("LAX MODE: Could not read the internal data set label, using a fake value, this will probably avoid using isolated catalogue");
 		if(cont_data == nullptr)
@@ -130,12 +130,12 @@ namespace libdar
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 
-	if(ceci->pdesc.esc == nullptr)
+	if(ceci->pdesc->esc == nullptr)
 	    throw SRC_BUG;
 
-	ceci->pdesc.stack->sync_write_above(pdesc.esc);
-	ceci->pdesc.esc->add_mark_at_current_position(escape::seqt_file);
-	ref->dump(pdesc, true);
+	ceci->pdesc->stack->sync_write_above(pdesc->esc);
+	ceci->pdesc->esc->add_mark_at_current_position(escape::seqt_file);
+	ref->dump(*pdesc, true);
     }
 
     void escape_catalogue::pre_add_ea(const cat_entree *ref) const
@@ -151,12 +151,12 @@ namespace libdar
 	{
 	    if(ref_ino->ea_get_saved_status() == cat_inode::ea_full)
 	    {
-		if(ceci->pdesc.esc == nullptr)
+		if(ceci->pdesc->esc == nullptr)
 		    throw SRC_BUG;
 		else
 		{
-		    ceci->pdesc.stack->sync_write_above(pdesc.esc);
-		    ceci->pdesc.esc->add_mark_at_current_position(escape::seqt_ea);
+		    ceci->pdesc->stack->sync_write_above(pdesc->esc);
+		    ceci->pdesc->esc->add_mark_at_current_position(escape::seqt_ea);
 		}
 	    }
 		// else, nothing to do.
@@ -181,12 +181,12 @@ namespace libdar
 
 		if(ref_file->get_crc(c))
 		{
-		    if(ceci->pdesc.esc == nullptr)
+		    if(ceci->pdesc->esc == nullptr)
 			throw SRC_BUG;
 
-		    ceci->pdesc.stack->sync_write_above(pdesc.esc);
-		    ceci->pdesc.esc->add_mark_at_current_position(escape::seqt_file_crc);
-		    c->dump(*(ceci->pdesc.esc));
+		    ceci->pdesc->stack->sync_write_above(pdesc->esc);
+		    ceci->pdesc->esc->add_mark_at_current_position(escape::seqt_file_crc);
+		    c->dump(*(ceci->pdesc->esc));
 		}
 		    // else, the data may come from an old archive format
 	    }
@@ -198,10 +198,10 @@ namespace libdar
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 
-	if(ceci->pdesc.esc == nullptr)
+	if(ceci->pdesc->esc == nullptr)
 	    throw SRC_BUG;
-	ceci->pdesc.stack->sync_write_above(pdesc.esc);
-	ceci->pdesc.esc->add_mark_at_current_position(escape::seqt_dirty);
+	ceci->pdesc->stack->sync_write_above(pdesc->esc);
+	ceci->pdesc->esc->add_mark_at_current_position(escape::seqt_dirty);
     }
 
 
@@ -222,11 +222,11 @@ namespace libdar
 
 		ref_ino->ea_get_crc(c);
 
-		if(ceci->pdesc.esc == nullptr)
+		if(ceci->pdesc->esc == nullptr)
 		    throw SRC_BUG;
-		ceci->pdesc.stack->sync_write_above(pdesc.esc);
-		ceci->pdesc.esc->add_mark_at_current_position(escape::seqt_ea_crc);
-		c->dump(*(ceci->pdesc.esc));
+		ceci->pdesc->stack->sync_write_above(pdesc->esc);
+		ceci->pdesc->esc->add_mark_at_current_position(escape::seqt_ea_crc);
+		c->dump(*(ceci->pdesc->esc));
 	    }
 		// else, nothing to do.
 	}
@@ -238,20 +238,20 @@ namespace libdar
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 
-	if(ceci->pdesc.esc == nullptr)
+	if(ceci->pdesc->esc == nullptr)
 	    throw SRC_BUG;
-	ceci->pdesc.stack->sync_write_above(pdesc.esc);
-	ceci->pdesc.esc->add_mark_at_current_position(escape::seqt_changed);
+	ceci->pdesc->stack->sync_write_above(pdesc->esc);
+	ceci->pdesc->esc->add_mark_at_current_position(escape::seqt_changed);
     }
 
     void escape_catalogue::pre_add_failed_mark() const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 
-	if(ceci->pdesc.esc == nullptr)
+	if(ceci->pdesc->esc == nullptr)
 	    throw SRC_BUG;
-	ceci->pdesc.stack->sync_write_above(pdesc.esc);
-	ceci->pdesc.esc->add_mark_at_current_position(escape::seqt_failed_backup);
+	ceci->pdesc->stack->sync_write_above(pdesc->esc);
+	ceci->pdesc->esc->add_mark_at_current_position(escape::seqt_failed_backup);
     }
 
     void escape_catalogue::pre_add_fsa(const cat_entree *ref) const
@@ -267,12 +267,12 @@ namespace libdar
 	{
 	    if(ref_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 	    {
-		if(ceci->pdesc.esc == nullptr)
+		if(ceci->pdesc->esc == nullptr)
 		    throw SRC_BUG;
 		else
 		{
-		    ceci->pdesc.stack->sync_write_above(pdesc.esc);
-		    ceci->pdesc.esc->add_mark_at_current_position(escape::seqt_fsa);
+		    ceci->pdesc->stack->sync_write_above(pdesc->esc);
+		    ceci->pdesc->esc->add_mark_at_current_position(escape::seqt_fsa);
 		}
 	    }
 		// else, nothing to do.
@@ -297,11 +297,11 @@ namespace libdar
 
 		ref_ino->fsa_get_crc(c);
 
-		if(ceci->pdesc.esc == nullptr)
+		if(ceci->pdesc->esc == nullptr)
 		    throw SRC_BUG;
-		ceci->pdesc.stack->sync_write_above(pdesc.esc);
-		ceci->pdesc.esc->add_mark_at_current_position(escape::seqt_fsa_crc);
-		c->dump(*(ceci->pdesc.esc));
+		ceci->pdesc->stack->sync_write_above(pdesc->esc);
+		ceci->pdesc->esc->add_mark_at_current_position(escape::seqt_fsa_crc);
+		c->dump(*(ceci->pdesc->esc));
 	    }
 		// else, nothing to do.
 	}
@@ -312,10 +312,10 @@ namespace libdar
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 
-	if(ceci->pdesc.esc == nullptr)
+	if(ceci->pdesc->esc == nullptr)
 	    throw SRC_BUG;
-	ceci->pdesc.stack->sync_write_above(pdesc.esc);
-	ceci->pdesc.esc->add_mark_at_current_position(escape::seqt_delta_sig);
+	ceci->pdesc->stack->sync_write_above(pdesc->esc);
+	ceci->pdesc->esc->add_mark_at_current_position(escape::seqt_delta_sig);
     }
 
     void escape_catalogue::reset_read() const
@@ -365,7 +365,7 @@ namespace libdar
 	const cat_eod *ref_eod = nullptr;
 	bool stop = false;
 
-	if(pdesc.esc == nullptr)
+	if(pdesc->esc == nullptr)
 	    throw SRC_BUG;
 	ref = nullptr;
 
@@ -374,7 +374,7 @@ namespace libdar
 	if(status == ec_completed)
 	    return catalogue::read(ref);
 
-	pdesc.stack->flush_read_above(pdesc.esc);
+	pdesc->stack->flush_read_above(pdesc->esc);
 	try
 	{
 	    list<signator> cat_signatories;
@@ -389,18 +389,18 @@ namespace libdar
 		    ceci->status = ec_marks;
 			// no break;
 		case ec_marks:
-		    if(min_read_offset > pdesc.esc->get_position())
+		    if(min_read_offset > pdesc->esc->get_position())
 		    {
 			    // for some reason, like datacorruption, bad CRC or missing CRC in hard linked inode
 			    // we skipped back to the hard linked inode information (it failed to be restored the first time)
 			    // We must not read again and again the same data, so we skip forward to min_read_offset
 
-			ceci->pdesc.esc->skip(min_read_offset);
+			ceci->pdesc->esc->skip(min_read_offset);
 		    }
 
-		    if(pdesc.esc->skip_to_next_mark(escape::seqt_file, true))
+		    if(pdesc->esc->skip_to_next_mark(escape::seqt_file, true))
 		    {
-			ceci->min_read_offset = pdesc.esc->get_position();
+			ceci->min_read_offset = pdesc->esc->get_position();
 			try
 			{
 			    ref = cat_entree::read(get_ui(),
@@ -413,9 +413,9 @@ namespace libdar
 						   false, // lax mode
 						   false, // only_detruit
 						   true); // always a small read in that context
-			    if(pdesc.esc->next_to_read_is_mark(escape::seqt_failed_backup))
+			    if(pdesc->esc->next_to_read_is_mark(escape::seqt_failed_backup))
 			    {
-				if(!pdesc.esc->skip_to_next_mark(escape::seqt_failed_backup, false))
+				if(!pdesc->esc->skip_to_next_mark(escape::seqt_failed_backup, false))
 				    throw SRC_BUG;
 				if(ref != nullptr)
 				{
@@ -505,16 +505,16 @@ namespace libdar
 			    label tmp;
 			    tmp.clear();
 
-			    if(pdesc.compr == nullptr)
+			    if(pdesc->compr == nullptr)
 				throw SRC_BUG;
-			    if(pdesc.compr->is_compression_suspended())
+			    if(pdesc->compr->is_compression_suspended())
 			    {
-				pdesc.compr->resume_compression();
-				if(pdesc.compr->get_algo() != none)
-				    pdesc.stack->flush_read_above(pdesc.compr);
+				pdesc->compr->resume_compression();
+				if(pdesc->compr->get_algo() != none)
+				    pdesc->stack->flush_read_above(pdesc->compr);
 			    }
 
-			    if(pdesc.esc->skip_to_next_mark(escape::seqt_catalogue, true))
+			    if(pdesc->esc->skip_to_next_mark(escape::seqt_catalogue, true))
 			    {
 				ceci->status = ec_signature;
 				stop = false;
@@ -568,7 +568,7 @@ namespace libdar
 		    ceci->cat_det = macro_tools_read_catalogue(get_ui(),
 							       get_pool(),
 							       x_ver,
-							       pdesc,
+							       *pdesc,
 							       0, // cat_size cannot be determined in sequential_read mode
 							       cat_signatories,
 							       x_lax,
@@ -687,7 +687,9 @@ namespace libdar
     void escape_catalogue::set_esc_and_stack(const pile_descriptor & x_pdesc)
     {
 	x_pdesc.check(true); // always expecting an escape layer
-	pdesc = x_pdesc;
+	pdesc.assign(new (get_pool()) pile_descriptor(x_pdesc));
+	if(pdesc.is_null())
+	    throw Ememory("escape_catalogue::set_esc_and_stack");
     }
 
     void escape_catalogue::copy_from(const escape_catalogue & ref)

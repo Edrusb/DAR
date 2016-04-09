@@ -56,7 +56,7 @@ namespace libdar
 							      last_modif, last_change, name,
 							      major, minor, fs_device) {};
         cat_blockdev(user_interaction & dialog,
-		     const pile_descriptor & pdesc,
+		     const smart_pointer<pile_descriptor> & pdesc,
 		     const archive_version & reading_ver,
 		     saved_status saved,
 		     bool small) : cat_device(dialog, pdesc, reading_ver, saved, small) {};

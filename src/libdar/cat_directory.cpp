@@ -82,7 +82,7 @@ namespace libdar
 
 
     cat_directory::cat_directory(user_interaction & dialog,
-				 const pile_descriptor & pdesc,
+				 const smart_pointer<pile_descriptor> & pdesc,
 				 const archive_version & reading_ver,
 				 saved_status saved,
 				 entree_stats & stats,
@@ -503,7 +503,7 @@ namespace libdar
 	}
     }
 
-    void cat_directory::change_location(const pile_descriptor & pdesc)
+    void cat_directory::change_location(const smart_pointer<pile_descriptor> & pdesc)
     {
 	list<cat_nomme *>::iterator tmp_it = ordered_fils.begin();
 

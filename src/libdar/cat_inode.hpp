@@ -74,7 +74,7 @@ namespace libdar
 		  const std::string & xname,
 		  const infinint & device);
         cat_inode(user_interaction & dialog,
-		  const pile_descriptor & pdesc,
+		  const smart_pointer<pile_descriptor> & pdesc,
 		  const archive_version & reading_ver,
 		  saved_status saved,
 		  bool small);

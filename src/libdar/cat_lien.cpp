@@ -45,18 +45,18 @@ namespace libdar
     }
 
     cat_lien::cat_lien(user_interaction & dialog,
-		       const pile_descriptor & pdesc,
+		       const smart_pointer<pile_descriptor> & pdesc,
 		       const archive_version & reading_ver,
 		       saved_status saved,
 		       bool small) : cat_inode(dialog, pdesc, reading_ver, saved, small)
     {
 	generic_file *ptr = nullptr;
 
-	pdesc.check(small);
+	pdesc->check(small);
 	if(small)
-	    ptr = pdesc.esc;
+	    ptr = pdesc->esc;
 	else
-	    ptr = pdesc.stack;
+	    ptr = pdesc->stack;
 
 	if(saved == s_saved)
 	    tools_read_string(*ptr, points_to);

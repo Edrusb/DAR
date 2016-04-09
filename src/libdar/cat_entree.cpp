@@ -146,7 +146,7 @@ namespace libdar
 
     cat_entree *cat_entree::read(user_interaction & dialog,
 				 memory_pool *pool,
-				 const pile_descriptor & pdesc,
+				 const smart_pointer<pile_descriptor> & pdesc,
 				 const archive_version & reading_ver,
 				 entree_stats & stats,
 				 std::map <infinint, cat_etoile *> & corres,
@@ -163,14 +163,14 @@ namespace libdar
 	bool read_crc;
 	generic_file *ptr = nullptr;
 
-	pdesc.check(small);
+	pdesc->check(small);
 	if(small)
 	{
-	    ptr = pdesc.esc;
-	    pdesc.stack->flush_read_above(pdesc.esc);
+	    ptr = pdesc->esc;
+	    pdesc->stack->flush_read_above(pdesc->esc);
 	}
 	else
-	    ptr = pdesc.stack;
+	    ptr = pdesc->stack;
 
         read_crc = small && !ptr->crc_status();
 	    // crc may be activated when reading a hard link (mirage read, now reading the inode)
@@ -320,7 +320,7 @@ namespace libdar
 				throw Erange("cat_entree::read", gettext(gettext("Entry information CRC failure")));
 			}
 		    }
-		    ret->post_constructor(pdesc);
+		    ret->post_constructor(*pdesc);
 		}
 		catch(...)
 		{
@@ -345,20 +345,20 @@ namespace libdar
         return ret;
     }
 
-    cat_entree::cat_entree(const pile_descriptor & x_pdesc, bool small)
+    cat_entree::cat_entree(const smart_pointer<pile_descriptor> & x_pdesc, bool small)
     {
-	if(small && x_pdesc.esc == nullptr)
+	if(small && x_pdesc->esc == nullptr)
 	    throw SRC_BUG;
 
 	change_location(x_pdesc);
     }
 
-    void cat_entree::change_location(const pile_descriptor & x_pdesc)
+    void cat_entree::change_location(const smart_pointer<pile_descriptor> & x_pdesc)
     {
-	if(x_pdesc.stack == nullptr)
+	if(x_pdesc->stack == nullptr)
 	    throw SRC_BUG;
 
-	if(x_pdesc.compr == nullptr)
+	if(x_pdesc->compr == nullptr)
 	    throw SRC_BUG;
 
 	pdesc = x_pdesc;
@@ -419,15 +419,15 @@ namespace libdar
     {
 	generic_file *ret = nullptr;
 
-	pdesc.check(small);
+	pdesc->check(small);
 
 	if(small)
 	{
-	    pdesc.stack->flush_read_above(pdesc.esc);
-	    ret = pdesc.esc;
+	    pdesc->stack->flush_read_above(pdesc->esc);
+	    ret = pdesc->esc;
 	}
 	else
-	    ret = pdesc.stack;
+	    ret = pdesc->stack;
 
 	return ret;
     }

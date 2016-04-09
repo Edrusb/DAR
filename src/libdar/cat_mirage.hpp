@@ -53,7 +53,7 @@ namespace libdar
 
 	cat_mirage(const std::string & name, cat_etoile *ref) : cat_nomme(name) { star_ref = ref; if(ref == nullptr) throw SRC_BUG; star_ref->add_ref(this); };
 	cat_mirage(user_interaction & dialog,
-		   const pile_descriptor & pdesc,
+		   const smart_pointer<pile_descriptor> & pdesc,
 		   const archive_version & reading_ver,
 		   saved_status saved,
 		   entree_stats & stats,
@@ -63,7 +63,7 @@ namespace libdar
 		   bool lax,
 		   bool small);
 	cat_mirage(user_interaction & dialog,
-		   const pile_descriptor & pdesc,
+		   const smart_pointer<pile_descriptor> & pdesc,
 		   const archive_version & reading_ver,
 		   saved_status saved,
 		   entree_stats & stats,
@@ -98,7 +98,7 @@ namespace libdar
 	bool is_first_mirage() const { return star_ref->get_first_ref() == this; };
 
 	    // overwriting virtual method from cat_entree
-	virtual void change_location(const pile_descriptor & pdesc) { get_inode()->change_location(pdesc); };
+	virtual void change_location(const smart_pointer<pile_descriptor> & pdesc) { get_inode()->change_location(pdesc); };
 
     protected:
 	void inherited_dump(const pile_descriptor & pdesc, bool small) const;
@@ -107,7 +107,7 @@ namespace libdar
 	cat_etoile *star_ref;
 
 	void init(user_interaction & dialog,
-		  const pile_descriptor & pdesc,
+		  const smart_pointer<pile_descriptor> & pdesc,
 		  const archive_version & reading_ver,
 		  saved_status saved,
 		  entree_stats & stats,

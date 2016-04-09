@@ -40,6 +40,7 @@ extern "C"
 #include "archive_version.hpp"
 #include "compressor.hpp"
 #include "pile_descriptor.hpp"
+#include "smart_pointer.hpp"
 
 namespace libdar
 {
@@ -99,7 +100,7 @@ namespace libdar
 	    /// \param[in] small whether the dump() to read has been done with the small argument set
         static cat_entree *read(user_interaction & dialog,
 				memory_pool *pool,
-				const pile_descriptor & f,
+				const smart_pointer<pile_descriptor> & f,
 				const archive_version & reading_ver,
 				entree_stats & stats,
 				std::map <infinint, cat_etoile *> & corres,
@@ -113,7 +114,7 @@ namespace libdar
 	    /// \param[in] pdesc points to an existing stack that will be read from to setup fields of inherited classes,
 	    /// this pointed to pile object must survive the whole life of the cat_entree object
 	    /// \param[in] small whether a small or a whole read is to be read, (inode has been dump() with small set to true)
-	cat_entree(const pile_descriptor & pdesc, bool small);
+	cat_entree(const smart_pointer<pile_descriptor> & pdesc, bool small);
 
 	    // copy constructor is fine as we only copy the address of pointers
 
@@ -161,7 +162,7 @@ namespace libdar
 	    /// \note this is also used when opening a catalogue if an isolated catalogue in place of the internal catalogue of an archive
 	    /// \note this method is virtual in order for cat_directory to overwrite it and propagate the change to all entries of the directory tree
 	    /// as well for mirage to propagate the change to the hard linked inode
-	virtual void change_location(const pile_descriptor & pdesc);
+	virtual void change_location(const smart_pointer<pile_descriptor> & pdesc);
 
 
     protected:
@@ -170,21 +171,21 @@ namespace libdar
 
 
 	    /// stack used to read object from (nullptr is returned for object created from filesystem)
-	pile *get_pile() const { return pdesc.stack; };
+	pile *get_pile() const { return pdesc.is_null() ? nullptr : pdesc->stack; };
 
 	    /// compressor generic_file relative methods
 	    ///
 	    /// \note CAUTION: the pointer to object is member of the get_pile() stack and may be managed by another thread
 	    /// all precaution like get_pile()->flush_read_above(get_compressor_layer() shall be take to avoid
 	    /// concurrent access to the compressor object by the current thread and the thread managing this object
-	compressor *get_compressor_layer() const { return pdesc.compr; };
+	compressor *get_compressor_layer() const { return pdesc.is_null() ? nullptr : pdesc->compr; };
 
 	    /// escape generic_file relative methods
 	    ///
 	    /// \note CAUTION: the pointer to object is member of the get_pile() stack and may be managed by another thread
 	    /// all precaution like get_pile()->flush_read_above(get_escape_layer() shall be take to avoid
 	    /// concurrent access to the compressor object by the current thread and the thread managing this object
-	escape *get_escape_layer() const { return pdesc.esc; };
+	escape *get_escape_layer() const { return pdesc.is_null() ? nullptr : pdesc->esc; };
 
 	    /// return the adhoc layer in the stack to read from the catalogue objects (except the EA, FSA or Data part)
 	generic_file *get_read_cat_layer(bool small) const;
@@ -192,7 +193,7 @@ namespace libdar
     private:
 	static const U_I ENTREE_CRC_SIZE;
 
-	pile_descriptor pdesc; //< used when the object is read from an archive, to know where to read from data, EA, FSA, ...
+	smart_pointer<pile_descriptor> pdesc;
     };
 
 	/// @}

@@ -232,7 +232,7 @@ namespace libdar
 	void set_to_unsaved_data_and_FSA() { if(contenu == nullptr) throw SRC_BUG; contenu->recursively_set_to_unsaved_data_and_FSA(); };
 
 	    /// change location where to find EA, FSA and DATA for all the objects of the catalogue
-	void change_location(const pile_descriptor & pdesc) { contenu->change_location(pdesc); };
+	void change_location(const pile_descriptor & pdesc);
 
 	    /// copy delta signatures to the given stack and update the cat_file objects accordingly
 	    ///

@@ -6,6 +6,12 @@ from 2.5.3 to 2.5.4
   FUSE based filesystem.
 - fixing non call of the -E script/command after last slice creation,
   when encryption or slice hashing was used
+- fixed bug in dar_manager: archive permutation in database lead libdar
+  to check an archive number of range under certain circumstances
+- fixed invertion of the condition triggering a warning about archive
+  date order in a dar_manager database while moving an archive within a
+  database
+- fixed typos in documentation
 
 from 2.5.2 to 2.5.3
 - Fixing a 2.5.x build issue met when a 2.4.x libdar library is already
@@ -155,6 +161,11 @@ from 2.4.x to 2.5.0
 from 2 4.21 to 2.4.20
 - removed sanity check that caused problem when writing an archive to a
   FUSE based filesystem.
+- fixed bug in dar_manager: archive permutation in database lead libdar
+  to check an archive number of range under certain circumstances
+- fixed invertion of the condition triggering a warning about archive
+  date order in a dar_manager database while moving an archive within a
+  database
 
 from 2.4.19 to 2.4.20
 - fixed display bug in dar_manager met when using -o option and adding
