@@ -273,6 +273,7 @@ static bool command_line(user_interaction & dialog,
 {
     S_I lu, min;
     U_I max;
+    enum { date_not_set, date_set_by_w, date_set_by_9 } date_set = date_not_set;
 
     base = arg = "";
     num = num2 = 0;
@@ -426,6 +427,7 @@ static bool command_line(user_interaction & dialog,
 		    if(optarg == NULL)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		    date = tools_convert_date(optarg);
+		    date_set = date_set_by_w;
 		    break;
 		case 'i':
 		    if(op != none_op)
@@ -461,22 +463,18 @@ static bool command_line(user_interaction & dialog,
 		    even_when_removed = true;
 		    break;
 		case '9':
-		    if(op != add)
-			dialog.warning(gettext("-9 option is only valid after -A option, ignoring it"));
-		    else
+		    try
 		    {
-			try
-			{
-				// note that the namespace specification is necessary
-				// due to similar existing name in std namespace under
-				// certain OS (FreeBSD 10.0)
-			    libdar::deci tmp = string(optarg);
-			    date = tmp.computer();
-			}
-			catch(Edeci & e)
-			{
-			    throw Erange("command_line", tools_printf(gettext("invalid number give to -; option: %s"), optarg));
-			}
+			    // note that the namespace specification is necessary
+			    // due to similar existing name in std namespace under
+			    // certain OS (FreeBSD 10.0)
+			libdar::deci tmp = string(optarg);
+			date = tmp.computer();
+			date_set = date_set_by_9;
+		    }
+		    catch(Edeci & e)
+		    {
+			throw Erange("command_line", tools_printf(gettext("invalid number give to -9 option: %s"), optarg));
 		    }
 		    break;
 		case 'a':
@@ -520,6 +518,28 @@ static bool command_line(user_interaction & dialog,
 	{
 	    dialog.warning(gettext("-e option is only available when using -r option, aborting"));
 	    return false;
+	}
+
+	switch(date_set)
+	{
+	case date_not_set:
+	    break;
+	case date_set_by_w:
+	    if(op != restore)
+	    {
+		dialog.warning(gettext("-w option is only valid with -r option, ignoring it"));
+		date = 0;
+	    }
+	    break;
+	case date_set_by_9:
+	    if(op != add)
+	    {
+		dialog.warning(gettext("-9 option is only valid with -A option, ignoring it"));
+		date = 0;
+	    }
+	    break;
+	default:
+	    throw SRC_BUG;
 	}
 
 	switch(op)
