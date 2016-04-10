@@ -1053,8 +1053,8 @@ AC_ARG_ENABLE(  [gpgme-linking],
 		      		[
 				  CPPFLAGS___cache="$CPPFLAGS"
 				  CPPFLAGS="$GPGME_CFLAGS $CPPFLAGS"
-				  LDFLAGS___cache="$LDFLAGS"
-				  LDFLAGS="$GPGME_LIBS $LFDLAGS"
+				  LIBS___cache="$LIBS"
+				  LIBS="$GPGME_LIBS $LIBS"
 				  AC_CHECK_HEADERS([gpgme.h])
 				  AC_MSG_CHECKING([for libgpgme usability])
 				  AC_LINK_IFELSE([AC_LANG_PROGRAM([[
@@ -1080,8 +1080,8 @@ AC_ARG_ENABLE(  [gpgme-linking],
 						 ])
 				  CPPFLAGS="$CPPFLAGS___cache"
 				  unset CPPFLAGS___cache
-				  LDFLAGS="$LDFLAGS___cache"
-				  unset LDFLAGS___cache
+				  LIBS="$LIBS___cache"
+				  unset LIBS___cache
 				],
 				[]
 			       )
