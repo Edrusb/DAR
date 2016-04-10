@@ -19,7 +19,7 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \smart_pointer.hpp
+    /// \file smart_pointer.hpp
     /// \brief template class implementing memory efficient smart pointer
     /// \ingroup Private
 
