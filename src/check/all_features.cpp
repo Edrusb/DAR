@@ -117,6 +117,12 @@ int main()
 	    cerr << "MISSING STRONG ENCRYPTION SUPPORT TO BE ABLE TO PERFORM ALL TESTS, ABORTING" << endl;
 	    throw Efeature("public key encryption");
 	}
+
+	if(!compile_time::librsync())
+	{
+	    cerr << "MISSING LIBRSYNC SUPPORT TO BE ABLE TO PERFORM ALL TESTS, ABORTING" << endl;
+	    throw Efeature("public key encryption");
+	}
     }
     catch(...)
     {

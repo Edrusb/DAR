@@ -32,7 +32,7 @@ asym="${13}"
 #echo "hash = [$hash]"
 #echo "multi-thread = [$multi_thread]"
 
-ALL_TESTS="A1 B1 B2 B3 B4 C1 C2 C3 C4 D1 E1 E2 E3 F1 F2 F3 G1 G2 G3 H1"
+ALL_TESTS="A1 A2 A3 B1 B2 B3 B4 C1 C2 C3 C4 D1 D2 D3 E1 E2 E3 F1 F2 F3 G1 G2 G3 H1"
 
 export OPT=tmp.file
 
