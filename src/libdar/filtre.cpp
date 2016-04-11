@@ -2810,6 +2810,7 @@ namespace libdar
 	    ino = mir->get_inode();
 	    if(ino == nullptr)
 		throw SRC_BUG;
+	    fic = dynamic_cast<cat_file *>(ino);
 	}
 
 	try // protecting delta_sig_ref
