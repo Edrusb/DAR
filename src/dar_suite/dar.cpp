@@ -131,6 +131,10 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 						      recipients);
 		    if(param.op == merging && param.aux_root != nullptr && param.info_details)
 			dialog.warning(gettext("Considering the (first) archive of reference:"));
+		    if(param.use_sequential_marks)
+			param.delta_diff = false;
+			// libdar would complain and avoid the operation if differential backup is asked
+
 		    read_options.clear();
 		    if(no_cipher_given)
 			    // since archive format 9 crypto algo used

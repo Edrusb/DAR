@@ -876,7 +876,7 @@ Called during a backup operation it leads dar to create delta signature for each
 But in any case, without
 .B
 --delta sig
-the resulting archive will hold no delta signature.
+the resulting archive will hold no delta signature. Note that delta signature transfer is not possible when the archive of reference is read in sequential mode, thus delta signature is disabled when the archive of reference is read in sequential mode.
 .P
 For isolation and merging operations the behavior is sligthly different:
 .B
@@ -896,7 +896,8 @@ By default when
 .B
 --delta sig
 is provided, delta signatures are computed for all files enrolled in the backup operation (see also
-.B --delta-sig-min-size
+.B
+--delta-sig-min-size
 option). This option and --exclude-delta-sig allow restricting the files for which delta signature have to be calculated in that situation. The mask applies to the whole path, the same way as -P/-g options do.
 .P
 For merging or isolation operations, when
@@ -933,7 +934,10 @@ and
 option to be set. By default, this minimum size is 10 kio. The same option suffixes (k for kilo, M for mega, G for giga, T, ...) as the ones available with --slice option can be used here too. Using zero as argument gives the same result as not specifying this option at all (default size).
 .TP 20
 -8, --delta no-patch
-In the context of differential backup, this option leads dar to never consider files for delta binary even if delta signatures are present. By default delta binary (rsync-like) operation is performed when a file has changed since the archive of reference was made *and* if a delta signature could be found in the archive of reference for that file (or in the isolated catalogue used as reference for the incremental/differential backup). If no delta signature could be found or if --delta no-patch is used, the normal behavoir is done, which consist of saving that whole file in the archive.
+In the context of differential backup, this option leads dar to never consider files for delta binary even if delta signatures are present. By default delta binary (rsync-like) operation is performed when a file has changed since the archive of reference was made *and* if a delta signature could be found in the archive of reference for that file (or in the isolated catalogue used as reference for the incremental/differential backup). If no delta signature could be found or if --delta no-patch is used, the normal behavoir is done, which consist of saving that whole file in the archive. Note that if the archive of reference is read in sequential mode, the
+.B
+--delta no patch
+is implicitely used as reading in sequential mode an archive does not let skipping backward to fetch the delta signature necessary to setup a delta patch.
 .P
 Binary delta options usage and best practices:
 .RS

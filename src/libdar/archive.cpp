@@ -1604,7 +1604,7 @@ namespace libdar
 	    if(freed_and_checked)
 		throw Erange("catalogue::get_catalogue", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
 	    if(exploitable && sequential_read)
-		throw Elibcall("archive::get_catalogue", "Reading the catalogue of an archive open in sequential read mode while it has not yet been read need passing a \"user_interaction\" object to the argument of archive::get_catalogue or call init_catalogue() first ");
+		throw Elibcall("archive::get_catalogue", "Reading the first time the catalogue of an archive open in sequential read mode needs passing a \"user_interaction\" object to the argument of archive::get_catalogue or call init_catalogue() first ");
 
 	    if(cat == nullptr)
 		throw SRC_BUG;
@@ -1864,7 +1864,7 @@ namespace libdar
 	    const entrepot *ref_where = ref_arch->get_entrepot();
 	    if(ref_where != nullptr)
 		initial_pause = (*ref_where == sauv_path_t);
-	    ref_cat = & ref_arch->get_catalogue();
+	    ref_cat = & ref_arch->get_catalogue(dialog);
 	}
 
 	op_create_in_sub(dialog,
