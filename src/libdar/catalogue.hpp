@@ -699,22 +699,28 @@ namespace libdar
 	    // update the recursive_has_changed field
 	void recursive_has_changed_update() const;
 
-	    // get then number of "nomme" entry contained in this directory and subdirectories (recursive call)
+	    /// get then number of "nomme" entry contained in this directory and subdirectories (recursive call)
 	infinint get_tree_size() const;
-	    // get the number of entry having some EA set in the directory tree (recursive call)
+
+	    /// get the number of entry having some EA set in the directory tree (recursive call)
 	infinint get_tree_ea_num() const;
-	    // get the number of entry that are hard linked inode (aka mirage in dar implementation) (recursive call)
+
+	    /// get the number of entry that are hard linked inode (aka mirage in dar implementation) (recursive call)
 	infinint get_tree_mirage_num() const;
+
 	    // for each mirage found (hard link implementation) in the directory tree, add its etiquette to the returned
 	    // list with the number of reference that has been found in the tree. (map[etiquette] = number of occurence)
 	    // from outside of class directory, the given argument is expected to be an empty map.
 	void get_etiquettes_found_in_tree(std::map<infinint, infinint> & already_found) const;
 
-	    // whether this directory is empty or not
+	    /// whether this directory is empty or not
 	bool is_empty() const { return ordered_fils.empty(); };
 
-	    // recursively remove all mirage entries
+	    /// recursively remove all mirage entries
 	void remove_all_mirages_and_reduce_dirs();
+
+	    /// recursively set all mirage inode_wrote flag
+	void recursive_set_mirage_inode_wrote(bool val);
 
         entree *clone() const { return new (std::nothrow) directory(*this); };
 
@@ -1108,6 +1114,9 @@ namespace libdar
 
 	    /// recursive evaluation of directories that have changed (make the directory::get_recurisve_has_changed() method of entry in this catalogue meaningful)
 	void launch_recursive_has_changed_update() const { contenu->recursive_has_changed_update(); };
+
+	    /// recursive setting of mirage inode_wrote flag
+	void recursive_set_mirage_inode_wrote(bool val) { contenu->recursive_set_mirage_inode_wrote(val); };
 
 	infinint get_root_mtime() const { return contenu->get_last_modif(); };
 

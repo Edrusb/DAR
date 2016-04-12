@@ -1725,8 +1725,8 @@ namespace libdar
             char buffer[] = { MIRAGE_ALONE, MIRAGE_WITH_INODE };
             nomme::inherited_dump(f, small);
             star_ref->get_etiquette().dump(f);
-            if((small && !is_inode_wrote())
-               || (!small && !is_inode_dumped()))
+            if((small && !is_inode_wrote())       // inside the archive in sequential mode
+               || (!small && !is_inode_dumped())) // in the catalogue at the end of archive
             {
                 f.write(buffer+1, 1); // writing one char MIRAGE_WITH_INODE
                 star_ref->get_inode()->specific_dump(f, small);
@@ -3131,6 +3131,27 @@ namespace libdar
             else
                 ++curs;
         }
+    }
+
+    void directory::recursive_set_mirage_inode_wrote(bool val)
+    {
+	list <nomme *>::iterator curs = ordered_fils.begin();
+	mirage *mir = NULL;
+	directory *dir = NULL;
+
+
+	while(curs != ordered_fils.end())
+	{
+	    mir = dynamic_cast<mirage *>(*curs);
+	    dir = dynamic_cast<directory *>(*curs);
+
+	    if(mir != NULL)
+		mir->set_inode_wrote(val);
+	    if(dir != NULL)
+		dir->recursive_set_mirage_inode_wrote(val);
+
+	    ++curs;
+	}
     }
 
     device::device(const infinint & uid, const infinint & gid, U_16 perm,

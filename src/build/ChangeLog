@@ -8,6 +8,12 @@ from 2.4.21 to 2.4.20
   database
 - removed order dependency between -A and -9 options of dar_manager: -9
   can now be specified before or after -A option.
+- resetting to "false" the "inode_wrote" flag of hard link datastructure
+  before testing and merging. Merging a previously tested archive or
+  testing a second time would not include hard linked inode in the
+  operation. This situation does not occurs with dar but could succeed
+  with some external tools that keep the catalogue in memory to perform
+  different operations on it.
 
 from 2.4.19 to 2.4.20
 - fixed display bug in dar_manager met when using -o option and adding

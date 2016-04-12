@@ -1115,6 +1115,7 @@ namespace libdar
 	thread_cancellation thr_cancel;
 
         st.clear();
+	cat.recursive_set_mirage_inode_wrote(false);
         cat.reset_read();
         while(cat.read(e))
         {
@@ -2230,6 +2231,7 @@ namespace libdar
 	if(info_details)
 	    dialog.warning("Copying filtered files to the resulting archive...");
 
+	cat.recursive_set_mirage_inode_wrote(false);
 	cat.reset_read();
 	juillet = FAKE_ROOT;
 
