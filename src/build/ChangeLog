@@ -17,6 +17,12 @@ from 2.5.3 to 2.5.4
   check for gpgme availability
 - removed order dependency between -A and -9 options of dar_manager: -9
   can now be specified before or after -A option.
+- resetting to "false" the "inode_wrote" flag of hard link datastructure
+  before testing and merging. Merging a previously tested archive or
+  testing a second time would not include hard linked inode in the
+  operation. This situation does not occurs with dar but could succeed
+  with some external tools that keep the catalogue in memory to perform
+  different operations on it.
 
 from 2.5.2 to 2.5.3
 - Fixing a 2.5.x build issue met when a 2.4.x libdar library is already
