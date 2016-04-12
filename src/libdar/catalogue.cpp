@@ -1717,6 +1717,7 @@ namespace libdar
 	    destination.compr->suspend_compression();
 	}
 
+	set_all_mirage_s_inode_wrote_field_to(false);
 	reset_read();
 	while(read(ent))
 	{
