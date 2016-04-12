@@ -833,6 +833,27 @@ namespace libdar
 	recursive_flag_size_to_update();
     }
 
+    void cat_directory::set_all_mirage_s_inode_wrote_field_to(bool val)
+    {
+	list <cat_nomme *>::iterator curs = ordered_fils.begin();
+	cat_mirage *mir = nullptr;
+	cat_directory *dir = nullptr;
+
+
+	while(curs != ordered_fils.end())
+	{
+	    mir = dynamic_cast<cat_mirage *>(*curs);
+	    dir = dynamic_cast<cat_directory *>(*curs);
+
+	    if(mir != nullptr)
+		mir->set_inode_wrote(val);
+	    if(dir != nullptr)
+		dir->set_all_mirage_s_inode_wrote_field_to(val);
+
+	    ++curs;
+	}
+    }
+
     void cat_directory::set_all_mirage_s_inode_dumped_field_to(bool val)
     {
 	list<cat_nomme *>::iterator curs = ordered_fils.begin();

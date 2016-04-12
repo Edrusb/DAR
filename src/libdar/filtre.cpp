@@ -1262,6 +1262,7 @@ namespace libdar
 
 
         st.clear();
+	cat.set_all_mirage_s_inode_wrote_field_to(false);
         cat.reset_read();
         while(cat.read(e))
         {
@@ -2371,6 +2372,7 @@ namespace libdar
 	if(info_details)
 	    dialog.warning("Copying filtered files to the resulting archive...");
 
+	cat.set_all_mirage_s_inode_wrote_field_to(false);
 	cat.reset_read();
 	juillet = FAKE_ROOT;
 
@@ -2547,6 +2549,7 @@ namespace libdar
 	thread_cancellation thr_cancel;
 	defile juillet = FAKE_ROOT;
 
+	cat.set_all_mirage_s_inode_wrote_field_to(false);
 	cat.reset_read();
 
 	try
@@ -2563,7 +2566,7 @@ namespace libdar
 		thr_cancel.check_self_cancellation();
 		if(e_mir != nullptr)
 		{
-		    if(!e_mir->is_inode_dumped())
+		    if(!e_mir->is_inode_wrote())
 		    {
 			e_file = dynamic_cast<const cat_file *>(e_mir->get_inode());
 			e_ino = e_mir->get_inode();
@@ -2585,7 +2588,7 @@ namespace libdar
 		}
 
 		if(e_mir != nullptr && (e_ino != nullptr || e_file != nullptr))
-		    e_mir->set_inode_dumped(true);
+		    e_mir->set_inode_wrote(true);
 
 		try
 		{

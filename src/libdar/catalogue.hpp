@@ -223,6 +223,9 @@ namespace libdar
 	    /// recursive evaluation of directories that have changed (make the cat_directory::get_recurisve_has_changed() method of entry in this catalogue meaningful)
 	void launch_recursive_has_changed_update() const { contenu->recursive_has_changed_update(); };
 
+	    /// recursive setting of mirage inode_wrote flag
+	void set_all_mirage_s_inode_wrote_field_to(bool val) const { const_cast<cat_directory *>(contenu)->set_all_mirage_s_inode_wrote_field_to(val); };
+
 	datetime get_root_mtime() const { return contenu->get_last_modif(); };
 
 	    /// reset all pointers to the root (a bit better than reset_add() + reset_read() + reset_compare() + reset_sub_read())
