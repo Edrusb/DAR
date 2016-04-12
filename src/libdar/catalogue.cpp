@@ -1726,16 +1726,15 @@ namespace libdar
 
 	    juillet.enfile(ent);
 
-/*	    if(ent_mir != nullptr)
+	    if(ent_mir != nullptr)
 	    {
 		if(!ent_mir->is_inode_wrote())
 		{
 		    ent_inode = ent_mir->get_inode();
-		    ent_file = dynamic_cast<cat_file *>(ent_inode);
+		    ent_file = dynamic_cast<const cat_file *>(ent_inode);
 		    ent_mir->set_inode_wrote(true);
 		}
 	    }
-*/
 
 	    if(ent_file != nullptr)
 	    {
