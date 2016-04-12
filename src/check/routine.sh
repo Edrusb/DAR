@@ -347,7 +347,7 @@ GO "C1-7" 0 $ROUTINE_DEBUG $DAR -N -t $full_delta -A $cat_full_delta -B $OPT
 GO "C1-8" 0 $ROUTINE_DEBUG $DAR -N -d $full_delta -A $cat_full_delta -R $src -B $OPT
 mkdir $dst2
 GO "C1-9" 0 $ROUTINE_DEBUG $DAR -N -x $full_delta -A $cat_full_delta -R $dst2 -B $OPT
-GI "C1-A" 0 $ROUTINE_DEBUG my_diff $src $dst2
+GO "C1-A" 0 $ROUTINE_DEBUG my_diff $src $dst2
 rm -rf $dst2
 fi
 
