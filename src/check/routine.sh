@@ -271,7 +271,7 @@ GO "A2-4" 0 $ROUTINE_DEBUG $DAR -N -d $full_delta -R $src -B $OPT
 GO "A2-5" 0 $ROUTINE_DEBUG $DAR -N -C $cat_full_delta -A $full_delta -B $OPT --delta sig
 GO "A2-6" 0 $ROUTINE_DEBUG check_hash $hash $cat_full_delta.*.dar
 mkdir $dst2
-GO "A2-6" 0 $ROUTINE_DEBUG $DAR -N -x $full_delta -R $dst2 -B $OPT
+GO "A2-7" 0 $ROUTINE_DEBUG $DAR -N -x $full_delta -R $dst2 -B $OPT
 GO "A2-8" 0 $ROUTINE_DEBUG my_diff $src $dst2
 GO "A2-9" 0 $ROUTINE_DEBUG $DAR -N -d $full_delta -R $dst2 -B $OPT
 rm -rf $dst2
@@ -282,7 +282,7 @@ fi
 #
 
 if echo $* | grep "A3" > /dev/null ; then
-GO "A3-1" 0 $ROUTINE_DEBUG $DAR -N -C $catf_detla -A $full -B $OPT --delta sig --include-delta-sig "*" --delta-sig-min-size 1
+GO "A3-1" 0 $ROUTINE_DEBUG $DAR -N -C $catf_delta -A $full -B $OPT --delta sig --include-delta-sig '"*"' --delta-sig-min-size 1
 GO "A3-2" 0 $ROUTINE_DEBUG $DAR -N -t $catf_delta -B $OPT
 GO "A3-3" 0 $ROUTINE_DEBUG $DAR -N -t $full -A $catf_delta -B $OPT
 fi
