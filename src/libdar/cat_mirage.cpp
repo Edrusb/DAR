@@ -295,8 +295,8 @@ namespace libdar
             char buffer[] = { MIRAGE_ALONE, MIRAGE_WITH_INODE };
             cat_nomme::inherited_dump(pdesc, small);
             star_ref->get_etiquette().dump(*ptr);
-            if((small && !is_inode_wrote())
-               || (!small && !is_inode_dumped()))
+            if((small && !is_inode_wrote())        // inside the archive in sequential mode
+               || (!small && !is_inode_dumped()))  // in the catalogue at the end of archive
             {
                 ptr->write(buffer+1, 1); // writing one char MIRAGE_WITH_INODE
                 star_ref->get_inode()->specific_dump(pdesc, small);
