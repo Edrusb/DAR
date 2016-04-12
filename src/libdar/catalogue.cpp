@@ -1912,11 +1912,17 @@ namespace libdar
     {
 	const cat_entree *ent = nullptr;
 	const cat_file *ent_file = nullptr;
+	const cat_mirage *ent_mir = nullptr;
 
 	reset_read();
 	while(read(ent))
 	{
 	    ent_file = dynamic_cast<const cat_file *>(ent);
+	    ent_mir = dynamic_cast<const cat_mirage *>(ent);
+
+	    if(ent_mir != nullptr)
+		ent_file = dynamic_cast<const cat_file *>(ent_mir->get_inode());
+
 	    if(ent_file != nullptr)
 	    {
 		if(ent_file->has_delta_signature_available())
