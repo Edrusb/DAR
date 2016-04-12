@@ -1701,6 +1701,7 @@ namespace libdar
 	const cat_entree *ent = nullptr;
 	const cat_file *ent_file = nullptr;
 	const cat_inode *ent_inode = nullptr;
+	const cat_mirage *ent_mir = nullptr;
 	memory_file mem;
 	const crc *my_crc = nullptr;
 	defile juillet = FAKE_ROOT;
@@ -1721,14 +1722,32 @@ namespace libdar
 	{
 	    ent_file = dynamic_cast<const cat_file *>(ent);
 	    ent_inode = dynamic_cast<const cat_inode *>(ent);
+	    ent_mir = dynamic_cast<const cat_mirage *>(ent);
 
 	    juillet.enfile(ent);
+
+/*	    if(ent_mir != nullptr)
+	    {
+		if(!ent_mir->is_inode_wrote())
+		{
+		    ent_inode = ent_mir->get_inode();
+		    ent_file = dynamic_cast<cat_file *>(ent_inode);
+		    ent_mir->set_inode_wrote(true);
+		}
+	    }
+*/
 
 	    if(ent_file != nullptr)
 	    {
 		cat_file *e_file = const_cast<cat_file *>(ent_file);
 		if(e_file == nullptr)
 		    throw SRC_BUG;
+
+		if(sequential_read)
+		{
+		    const crc * tmp = nullptr;
+		    (void)e_file->get_crc(tmp);
+		}
 
 		if(ent_file->has_delta_signature_structure())
 		{
@@ -1864,7 +1883,7 @@ namespace libdar
 			    delete checksum;
 			}
 		    }
-			// else nothing to do, no signature and no need to add some for that entry
+		     // no signature and no need to add some for that entry
 		}
 	    }
 
