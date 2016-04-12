@@ -43,6 +43,7 @@ double_catf=double_catf
 double_catf_fly=double_catf_fly
 diff=diff
 diff_delta=diff_delta
+diff_delta2=diff_delta2
 catd=catd
 catd_fly=catd_fly
 double_catd=double_catd
@@ -52,6 +53,7 @@ diff_double=diff_double
 diff_double_fly=diff_double_fly
 merge_full=merge_full
 merge_diff=merge_diff
+merge_delta=merge_delta
 full2=full2
 diff2=diff2
 full3=full3
@@ -205,7 +207,7 @@ function check_hash {
 
 function clean {
 local verbose=""
-rm -rf $verbose $src $dst $src2
+rm -rf $verbose $src $dst $src2 $dst2
 rm -f $verbose *.md5 *.sha1
 rm -f $verbose $full*.dar
 rm -f $verbose $catf*.dar
@@ -217,6 +219,7 @@ rm -f $verbose $double_catf*.dar
 rm -f $verbose $double_catf_fly*.dar
 rm -f $verbose $diff*.dar
 rm -f $verbose $diff_delta*.dar
+rm -f $verbose $diff_delta2*.dar
 rm -f $verbose $catd*.dar
 rm -f $verbose $catd_fly*.dar
 rm -f $verbose $double_catd*.dar
@@ -226,6 +229,7 @@ rm -f $verbose $diff_double*.dar
 rm -f $verbose $diff_double_fly*.dar
 rm -f $verbose $merge_full*.dar
 rm -f $verbose $merge_diff*.dar
+rm -f $verbose $merge_delta*.dar
 rm -f $verbose $full2*.dar
 rm -f $verbose $diff2*.dar
 rm -f $verbose $full3*.dar
@@ -411,13 +415,13 @@ fi
 #
 if echo $* | grep "D2" > /dev/null ; then
 GO "D2-1" 0 $ROUTINE_DEBUG $DAR -N -c $diff_delta -R $src -A $full_delta -B $OPT
-GO "D2-2" 0 $ROUTINE_DEBUG chech_hash $hash $diff_delta.*.dar
+GO "D2-2" 0 $ROUTINE_DEBUG check_hash $hash $diff_delta.*.dar
 GO "D2-3" 0 $ROUTINE_DEBUG $DAR -N -l $diff_delta -B $OPT
 GO "D2-4" 0 $ROUTINE_DEBUG $DAR -N -t $diff_delta -B $OPT
 GO "D2-5" 0 $ROUTINE_DEBUG $DAR -N -d $diff_delta -R $src -B $OPT
 mkdir $dst2
 GO "D2-6" 0 $ROUTINE_DEBUG $DAR -N -x $full_delta -R $dst2 -B $OPT
-GO "D2-7" 0 $ROUTINE_DEBUG $DAR -N -x $diff_delta -R $dst2 -B $OPT
+GO "D2-7" 0 $ROUTINE_DEBUG $DAR -N -x $diff_delta -R $dst2 -w -B $OPT
 GO "D2-8" 0 $ROUTINE_DEBUG my_diff $src $dst2
 rm -rf $dst2
 fi
@@ -427,16 +431,15 @@ fi
 #
 
 if echo $* | grep "D3" > /dev/null ; then
-GO "D3-1" 0 $ROUTINE_DEBUG $DAR -N -c $diff_delta2 -R $src -A $catf_delta -B $OPT --delta sig
-GO "D3-2" 0 $ROUTINE_DEBUG $DAR -N -c $diff_delta2 -R $src -A $full_delta -B $OPT
-GO "D3-3" 0 $ROUTINE_DEBUG chech_hash $hash $diff_delta2.*.dar
-GO "D3-4" 0 $ROUTINE_DEBUG $DAR -N -l $diff_delta2 -B $OPT
-GO "D3-5" 0 $ROUTINE_DEBUG $DAR -N -t $diff_delta2 -B $OPT
-GO "D3-6" 0 $ROUTINE_DEBUG $DAR -N -d $diff_delta2 -R $src -B $OPT
+GO "D3-1" 0 $ROUTINE_DEBUG $DAR -N -c $diff_delta2 -R $src -A $catf_delta -B $OPT --delta sig --delta-sig-min-size 1
+GO "D3-2" 0 $ROUTINE_DEBUG check_hash $hash $diff_delta2.*.dar
+GO "D3-3" 0 $ROUTINE_DEBUG $DAR -N -l $diff_delta2 -B $OPT
+GO "D3-4" 0 $ROUTINE_DEBUG $DAR -N -t $diff_delta2 -B $OPT
+GO "D3-5" 0 $ROUTINE_DEBUG $DAR -N -d $diff_delta2 -R $src -B $OPT
 mkdir $dst2
-GO "D3-7" 0 $ROUTINE_DEBUG $DAR -N -x $full -R $dst2 -B $OPT
-GO "D3-8" 0 $ROUTINE_DEBUG $DAR -N -x $diff_delta2 -R $dst2 -B $OPT
-GO "D3-9" 0 $ROUTINE_DEBUG my_diff $src $dst2
+GO "D3-6" 0 $ROUTINE_DEBUG $DAR -N -x $full -R $dst2 -B $OPT
+GO "D3-7" 0 $ROUTINE_DEBUG $DAR -N -x $diff_delta2 -R $dst2 -w -B $OPT
+GO "D3-8" 0 $ROUTINE_DEBUG my_diff $src $dst2
 rm -rf $dst2
 
 fi
@@ -474,9 +477,9 @@ fi
 #
 if echo $* | grep "F1" > /dev/null ; then
 ./build_tree.sh $src2 "V"
-GO "F1-1" 0 $ROUTINE_DEBUG $DAR -N -c $full2 -R $src2  -B $OPT --delta sig --delta-sig-min-size 1
+GO "F1-1" 0 $ROUTINE_DEBUG $DAR -N -c $full2 -R $src2  -B $OPT
 GO "F1-2" 0 $ROUTINE_DEBUG check_hash $hash $full2.*.dar
-GO "F1-3" 0 $ROUTINE_DEBUG $DAR -N -+ $merge_full -A $full "-@" $full2 -B $OPT --delta sig
+GO "F1-3" 0 $ROUTINE_DEBUG $DAR -N -+ $merge_full -A $full "-@" $full2 -B $OPT
 GO "F1-4" 0 $ROUTINE_DEBUG check_hash $hash $merge_full.*.dar
 GO "F1-5" 0 $ROUTINE_DEBUG $DAR -N -t $merge_full  -B $OPT
 mkdir $dst
@@ -494,7 +497,7 @@ fi
 #
 if echo $* | grep "F2" > /dev/null ; then
 ./modif_tree.sh $src2 "V"
-GO "F2-1" 0 $ROUTINE_DEBUG $DAR -N -c $diff2 -R $src2 -A $full2 -B $OPT --delta sig --delta-sig-min-size 1
+GO "F2-1" 0 $ROUTINE_DEBUG $DAR -N -c $diff2 -R $src2 -A $full2 -B $OPT
 GO "F2-2" 0 $ROUTINE_DEBUG check_hash $hash $diff2.*.dar
 GO "F2-3" 0 $ROUTINE_DEBUG $DAR -N -+ $merge_diff -A $diff "-@" $diff2 -B $OPT
 GO "F2-4" 0 $ROUTINE_DEBUG check_hash $hash $merge_diff.*.dar
@@ -532,6 +535,22 @@ GO "F3-7" 0 $ROUTINE_DEBUG $DAR -N -x $decr -R $dst -B $OPT -w
 GO "F3-8" 0 $ROUTINE_DEBUG my_diff $src $dst
 rm -rf $src $dst
 fi
+
+#
+# F4 - merging with delta signature aucun recalcul de signature
+#
+if echo $* | grep "F4" > /dev/null ; then
+GO "F4-1" 0 $ROUTINE_DEBUG $DAR -+ merge_delta -A full_delta -B $OPT --delta sig
+fi
+
+#
+# F5 - merging with delta signature + recalcul de signature
+#
+if echo $* | grep "F4" > /dev/null ; then
+rm $merge_delta*.*
+GO "F5-1" 0 $ROUTINE_DEBUG $DAR -+ merge_delta -A full -B $OPT --delta sig --include-delta-sig "'*'" --delta-sig-min-size 1
+fi
+
 
 #
 # G1 - using pipe to output the archive
@@ -583,7 +602,7 @@ GO "H1-6" 0 $ROUTINE_DEBUG check_hash $hash $xformed2.*.dar
 GO "H1-7" 0 $ROUTINE_DEBUG $DAR -N -t $xformed2 -A $catf_fly -B $OPT
 if [ ! -z "$slicing" ] ; then
 GO "H1-8" 0 $ROUTINE_DEBUG $DAR_XFORM $hash_xform $slicing $xform_digits $xformed2 $xformed3
-GO "H1-9" 0 $ROUTINE_DEBUG chech_hash $hash $xformed3.*.dar
+GO "H1-9" 0 $ROUTINE_DEBUG check_hash $hash $xformed3.*.dar
 GO "H1-A" 0 $ROUTINE_DEBUG $DAR -N -t $xformed3 -A $catf_fly -B $OPT
 GO "H1-B" 0 $ROUTINE_DEBUG $DAR -N -t $xformed3 -B $OPT
 fi
