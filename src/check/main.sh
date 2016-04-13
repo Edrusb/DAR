@@ -97,7 +97,7 @@ fi
 
 if [ "$seq_read" = "y" ]; then
   sequential="--sequential-read"
-  ALL_TESTS=`echo $ALL_TESTS | sed -r -e 's/(D3|F1|F2|F3)//g'`
+  ALL_TESTS=`echo $ALL_TESTS | sed -r -e 's/(D3|F1|F2|F3|F4|F5)//g'`
   if [ "$tape_mark" != "y" ] ; then
     ALL_TESTS="none"
   fi
