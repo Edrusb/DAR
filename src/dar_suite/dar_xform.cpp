@@ -139,7 +139,9 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 		{
 		    dialog.change_non_interactive_output(&cout);
 		    tools_avoid_slice_overwriting_regex(dialog,
-							dst_dir->display(), string("^")+dst+"\\.[0-9]+\\."+EXTENSION+"(\\.(md5|sha1))?$",
+							dst_dir->display(),
+							dst,
+							EXTENSION,
 							false,
 							allow,
 							warn,

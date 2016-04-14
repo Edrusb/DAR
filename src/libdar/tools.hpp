@@ -489,7 +489,8 @@ namespace libdar
 
 	/// \param[in,out] dialog for user interaction
 	/// \param[in] chemin where slice is about to be created
-	/// \param[in] x_file_mask mask corresponding to slices that will be generated (regex)
+	/// \param[in] basename is the archive basename
+	/// \param[in] extension is the archive filename extension
 	/// \param[in] info_details whether user must be displayed details of the operation
 	/// \param[in] allow_overwriting whether overwriting is allowed by the user
 	/// \param[in] warn_overwriting whether a warning must be issued before overwriting (if allowed)
@@ -497,7 +498,8 @@ namespace libdar
 	/// \note may thow exceptions.
     extern void tools_avoid_slice_overwriting_regex(user_interaction & dialog,
 						    const path & chemin,
-						    const std::string & x_file_mask,
+						    const std::string & basename,
+						    const std::string & extension,
 						    bool info_details,
 						    bool allow_overwriting,
 						    bool warn_overwriting,
@@ -874,6 +876,9 @@ namespace libdar
 
 	/// remove from filesystem the file which path is given
     void tools_unlink(const std::string & filename);
+
+	/// escape with a anti-slash character a set of chars found in the given string
+    extern std::string tools_escape_chars_in_string(const std::string & val, const char *to_escape);
 
 } /// end of namespace
 

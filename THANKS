@@ -31,6 +31,7 @@ version 2.4.21
 Thanks to Alexandre DENIS and Peter Schillinger for helping figuring out
 the problem met with dar and FUSE filesystems. Thanks for J. Roeleveld for
 feedback. Thanks to orogor and bulwersator at sourceforge for feedback.
+Thanks to Chan Wilson for bug report.
 
 version 2.4.20
 --------------
