@@ -1798,9 +1798,17 @@ namespace libdar
         return ret;
     }
 
-    void tools_avoid_slice_overwriting_regex(user_interaction & dialog, const path & chemin, const string & file_mask, bool info_details, bool allow_overwriting, bool warn_overwriting, bool dry_run)
+    void tools_avoid_slice_overwriting_regex(user_interaction & dialog,
+					     const path & chemin,
+					     const string & basename,
+					     const string & extension,
+					     bool info_details,
+					     bool allow_overwriting,
+					     bool warn_overwriting,
+					     bool dry_run)
     {
         const string c_chemin = chemin.display();
+	const string file_mask = string("^") + tools_escape_chars_in_string(basename, "[].+|!*?{}()^$-,\\") + "\\.[0-9]+\\." + extension + "(\\.(md5|sha1|sha512))?$";
         if(tools_do_some_files_match_mask_regex(dialog, c_chemin, file_mask))
         {
             if(!allow_overwriting)
@@ -3079,6 +3087,25 @@ namespace libdar
 
 	res += tools_printf(" %d ]", key[max]);
 	dialog.warning(res);
+    }
+
+    extern string tools_escape_chars_in_string(const string & val, const char *to_escape)
+    {
+	string ret;
+	string::const_iterator it = val.begin();
+
+	while(it != val.end())
+	{
+	    U_I curs = 0;
+	    while(to_escape[curs] != '\0' && to_escape[curs] != *it)
+		++curs;
+	    if(to_escape[curs] != '\0')
+		ret += "\\";
+	    ret += *it;
+	    ++it;
+	}
+
+	return ret;
     }
 
 } // end of namespace
