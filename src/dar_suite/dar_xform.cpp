@@ -127,7 +127,14 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
 		if(dst != "-")
 		{
 		    shell_interaction_change_non_interactive_output(&cout);
-		    tools_avoid_slice_overwriting_regex(dialog,  dst_dir->display(), string("^")+dst+"\\.[0-9]+\\."+EXTENSION+"(\\.(md5|sha1))?$", false, allow, warn, false);
+		    tools_avoid_slice_overwriting_regex(dialog,
+							dst_dir->display(),
+							dst,
+							EXTENSION,
+							false,
+							allow,
+							warn,
+							false);
 		}
 
 		thr.check_self_cancellation();

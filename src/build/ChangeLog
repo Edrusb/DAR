@@ -14,6 +14,9 @@ from 2.4.21 to 2.4.20
   operation. This situation does not occurs with dar but could succeed
   with some external tools that keep the catalogue in memory to perform
   different operations on it.
+- fixed bug in the routine that detects existing slices to warn the user
+  and/or avoid overwriting, bug that lead dar to "bark" when an archive
+  base name started by a + character.
 
 from 2.4.19 to 2.4.20
 - fixed display bug in dar_manager met when using -o option and adding

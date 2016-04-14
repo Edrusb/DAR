@@ -499,7 +499,8 @@ namespace libdar
 		if(!options.get_empty())
 		    tools_avoid_slice_overwriting_regex(dialog,
 							sauv_path,
-							string("^")+filename+"\\.[0-9]+\\."+extension+"(\\.(md5|sha1))?$",
+							filename,
+							extension,
 							options.get_info_details(),
 							options.get_allow_over(),
 							options.get_warn_over(),
@@ -1354,7 +1355,8 @@ namespace libdar
 
 	tools_avoid_slice_overwriting_regex(dialog,
 					    sauv_path,
-					    string("^")+filename+"\\.[0-9]+\\."+extension+"(\\.(md5|sha1))?$",
+					    filename,
+					    extension,
 					    info_details,
 					    allow_over,
 					    warn_over,
