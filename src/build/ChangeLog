@@ -26,7 +26,8 @@ from 2.5.3 to 2.5.4
 - fixed bug in the routine that detects existing slices to warn the user
   and/or avoid overwriting, bug that lead dar to "bark" when an archive
   base name started by a + character.
-
+- avoiding to use AM_PATH_GPGME in configure script when gpgme.m4 is not
+  available
 
 from 2.5.2 to 2.5.3
 - Fixing a 2.5.x build issue met when a 2.4.x libdar library is already

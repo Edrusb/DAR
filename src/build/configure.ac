@@ -1049,7 +1049,8 @@ AC_ARG_ENABLE(  [gpgme-linking],
 		  if test $local_crypto != no ; then
   		    gpgme_min_version="1.2.0"
 		    AC_DEFINE_UNQUOTED(GPGME_MIN_VERSION, "$gpgme_min_version", [minimum version expected of GPGME])
-		    AM_PATH_GPGME($gpgme_min_version,
+		    m4_ifdef([AM_PATH_GPGME],
+		        [ AM_PATH_GPGME($gpgme_min_version,
 		      		[
 				  CPPFLAGS___cache="$CPPFLAGS"
 				  CPPFLAGS="$GPGME_CFLAGS $CPPFLAGS"
@@ -1085,6 +1086,7 @@ AC_ARG_ENABLE(  [gpgme-linking],
 				],
 				[]
 			       )
+  			])
                  else
 		    AC_MSG_WARN([Public key support (GPGME linking) requires libgcrypt (strong encryption support)])
                  fi
