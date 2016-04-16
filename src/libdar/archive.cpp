@@ -1438,8 +1438,9 @@ namespace libdar
 		    {
 			infinint tmp;
 
-			if(tmp_inode->ea_get_offset(tmp));
-			   ent.set_archive_offset_for_EA(tmp);
+			if(tmp_inode->ea_get_offset(tmp))
+			    ent.set_archive_offset_for_EA(tmp);
+			ent.set_storage_size_for_EA(tmp_inode->ea_get_size());
 		    }
 		    ent.set_fsa_status(tmp_inode->fsa_get_saved_status());
 		    if(tmp_inode->fsa_get_saved_status() == cat_inode::fsa_full)
@@ -1448,6 +1449,7 @@ namespace libdar
 
 			if(tmp_inode->fsa_get_offset(tmp))
 			    ent.set_archive_offset_for_FSA(tmp);
+			ent.set_storage_size_for_FSA(tmp_inode->fsa_get_size());
 		    }
 		}
 
