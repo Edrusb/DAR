@@ -1434,7 +1434,21 @@ namespace libdar
 		    ent.set_ea_status(tmp_inode->ea_get_saved_status());
 		    if(tmp_inode->has_last_change())
 			ent.set_last_change(tmp_inode->get_last_change());
+		    if(tmp_inode->ea_get_saved_status() == cat_inode::ea_full)
+		    {
+			infinint tmp;
+
+			if(tmp_inode->ea_get_offset(tmp));
+			   ent.set_archive_offset_for_EA(tmp);
+		    }
 		    ent.set_fsa_status(tmp_inode->fsa_get_saved_status());
+		    if(tmp_inode->fsa_get_saved_status() == cat_inode::fsa_full)
+		    {
+			infinint tmp;
+
+			if(tmp_inode->fsa_get_offset(tmp))
+			    ent.set_archive_offset_for_FSA(tmp);
+		    }
 		}
 
 		if(tmp_file != nullptr)
@@ -1444,6 +1458,11 @@ namespace libdar
 		    ent.set_is_sparse_file(tmp_file->get_sparse_file_detection_read());
 		    ent.set_compression_algo(tmp_file->get_compression_algo_read());
 		    ent.set_dirtiness(tmp_file->is_dirty());
+		    if(tmp_file->get_saved_status() == s_saved)
+		    {
+			ent.set_archive_offset_for_data(tmp_file->get_offset());
+			ent.set_storage_size_for_data(tmp_file->get_storage_size());
+		    }
 		}
 
 		if(tmp_lien != nullptr && tmp_lien->get_saved_status() == s_saved)

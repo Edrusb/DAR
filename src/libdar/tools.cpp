@@ -3089,7 +3089,7 @@ namespace libdar
 	dialog.warning(res);
     }
 
-    extern string tools_escape_chars_in_string(const string & val, const char *to_escape)
+    string tools_escape_chars_in_string(const string & val, const char *to_escape)
     {
 	string ret;
 	string::const_iterator it = val.begin();
@@ -3106,6 +3106,13 @@ namespace libdar
 	}
 
 	return ret;
+    }
+
+    bool tools_infinint2U_64(infinint val, U_64 & res)
+    {
+	res = 0;
+	val.unstack(res);
+	return val.is_zero();
     }
 
 } // end of namespace

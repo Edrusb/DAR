@@ -116,6 +116,66 @@ namespace libdar
 	const range & get_slices() const { return slices; };
 
 
+	    /// offset in byte where to find first byte of data
+	    ///
+	    /// \note: return false if no data is present, else set the argument
+	    /// \note: offset is counted whatever is the number of slice as if there was only one slice, this is an archive internal offset,
+	    /// which, compared to the offset inside the archive is shifted by the slice header which is around 20 bytes depending on the archive version
+	    /// and slice size if any.
+	bool get_archive_offset_for_data(infinint & val) const { val = offset_for_data; return !val.is_zero(); };
+
+	    /// offset in byte where to find the first byte of data
+	    ///
+	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the infinint of std::string version of this method
+	bool get_archive_offset_for_data(U_64 & val) const { return tools_infinint2U_64(offset_for_data, val) && !offset_for_data.is_zero(); };
+
+	    /// offset in byte where to find the first byte of data
+	std::string get_archive_offset_for_data() const { return offset_for_data.is_zero() ? "" : deci(offset_for_data).human(); };
+
+	    /// amount of byte used to store the file's data
+	bool get_storage_size_for_data(infinint & val) const { val = storage_size_for_data; return !val.is_zero(); };
+
+	    /// amount of byte used to store the file's data
+	    ///
+	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the infinint of std::string version of this method
+	bool get_storage_size_for_data(U_64 & val) const { return tools_infinint2U_64(storage_size_for_data, val) && !storage_size_for_data.is_zero(); };
+
+	    /// amount of byte used to store the file's data
+	std::string get_storage_size_for_data() const { return storage_size_for_data.is_zero() ? "" : deci(storage_size_for_data).human(); };
+
+	    /// offset in byte whert to find the first byte of Extended Attributes
+	    ///
+	    /// \note see note for get_archive_offset_for_data(infinint)
+	bool get_archive_offset_for_EA(infinint & val) const { val = offset_for_EA; return !val.is_zero(); };
+
+	    /// offset in byte whert to find the first byte of Extended Attributes
+	    ///
+	    /// \note see note for get_archive_offset_for_data(infinint)
+	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the infinint of std::string version of this method
+	bool get_archive_offset_for_EA(U_64 & val) const { return tools_infinint2U_64(offset_for_EA, val) && !offset_for_EA.is_zero(); };
+
+	    /// offset in byte whert to find the first byte of Extended Attributes
+	    ///
+	    /// \note see note for get_archive_offset_for_data(infinint)
+	std::string get_archive_offset_for_EA() const { return offset_for_EA.is_zero() ? "" : deci(offset_for_EA).human(); };
+
+	    /// offset in byte whert to find the first byte of Filesystem Specific Attributes
+	    ///
+	    /// \note see note for get_archive_offset_for_data(infinint)
+	bool get_archive_offset_for_FSA(infinint & val) const { val = offset_for_FSA; return !val.is_zero(); };
+
+	    /// offset in byte whert to find the first byte of Filesystem Specific Attributes
+	    ///
+	    /// \note see note for get_archive_offset_for_data(infinint)
+	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the infinint of std::string version of this method
+	bool get_archive_offset_for_FSA(U_64 & val) const { return tools_infinint2U_64(offset_for_FSA, val) && !offset_for_FSA.is_zero(); };
+
+	    /// offset in byte whert to find the first byte of Filesystem Specific Attributes
+	    ///
+	    /// \note see note for get_archive_offset_for_data(infinint)
+	std::string get_archive_offset_for_FSA() const { return offset_for_FSA.is_zero() ? "" : deci(offset_for_FSA).human(); };
+
+
 	    // methods for libdar to setup the object
 
 	void set_name(const std::string & val) { my_name = val; };
@@ -139,6 +199,10 @@ namespace libdar
 	void set_major(int val) { major = val; };
 	void set_minor(int val) { minor = val; };
 	void set_slices(const range & sl) { slices = sl; };
+	void set_archive_offset_for_data(const infinint & val) { offset_for_data = val; };
+	void set_storage_size_for_data(const infinint & val) { storage_size_for_data = val; };
+	void set_archive_offset_for_EA(const infinint & val) { offset_for_EA = val; };
+	void set_archive_offset_for_FSA(const infinint & val) { offset_for_FSA = val; };
 
     private:
 	std::string my_name;
@@ -162,6 +226,10 @@ namespace libdar
 	int major;
 	int minor;
 	range slices;
+	infinint offset_for_data;
+	infinint storage_size_for_data;
+	infinint offset_for_EA;
+	infinint offset_for_FSA;
 
 	static time_t datetime2time_t(const datetime & val);
     };
