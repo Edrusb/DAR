@@ -12,7 +12,9 @@ from 2.5.3 to 2.5.4
   date order in a dar_manager database while moving an archive within a
   database
 - fixed typos in documentation
-- catalogue memory optimization
+- catalogue memory optimization, with the drawback to limit the number of
+  entry in an archive to the max integer supported by the libdar flavor
+  (32 bits/64 bits/infinint).
 - fix configure script to temporarily rely on LIBS rather LDFLAGS to
   check for gpgme availability
 - removed order dependency between -A and -9 options of dar_manager: -9
