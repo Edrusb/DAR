@@ -546,7 +546,7 @@ fi
 #
 # F5 - merging with delta signature + recalcul de signature
 #
-if echo $* | grep "F4" > /dev/null ; then
+if echo $* | grep "F5" > /dev/null ; then
 rm $merge_delta*.*
 GO "F5-1" 0 $ROUTINE_DEBUG $DAR -+ merge_delta -A full -B $OPT --delta sig --include-delta-sig "'*'" --delta-sig-min-size 1
 fi

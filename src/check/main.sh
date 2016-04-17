@@ -105,6 +105,10 @@ else
   sequential=""
 fi
 
+if [ "$keep_compr" = "y" ] ; then
+   ALL_TESTS=`echo $ALL_TESTS | sed -r -e 's/F5//g'`
+fi
+
 if [ "$digit" != "none" ]; then
   min_digits="--min-digit $digit,$digit,$digit"
   export xform_digits="-9 $digit,$digit"
