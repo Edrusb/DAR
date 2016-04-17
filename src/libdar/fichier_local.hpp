@@ -54,6 +54,8 @@ namespace libdar
 	/// @{
 
 
+	/// filesystem local files
+
     class fichier_local : public fichier_global
     {
     public :

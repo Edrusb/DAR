@@ -55,6 +55,8 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
+	/// abstraction of filesystem files for entrepot
+
     class fichier_global : public generic_file, public thread_cancellation, public mem_ui
     {
     public :
