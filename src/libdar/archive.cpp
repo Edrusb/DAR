@@ -53,6 +53,7 @@ extern "C"
 #include "entrepot_local.hpp"
 #include "crypto_sym.hpp"
 #include "cat_all_entrees.hpp"
+#include "zapette.hpp"
 
 #define ARCHIVE_NOT_EXPLOITABLE "Archive of reference given is not exploitable"
 
@@ -1675,6 +1676,57 @@ namespace libdar
 
 	return ret;
     }
+
+    U_64 archive::get_first_slice_header_size() const
+    {
+	U_64 ret;
+	infinint pre_ret;
+	archive *me = const_cast<archive *>(this);
+	const generic_file *bottom = me->stack.bottom();
+	const trivial_sar *b_triv = dynamic_cast<const trivial_sar *>(bottom);
+	const sar *b_sar = dynamic_cast<const sar *>(bottom);
+	const zapette *b_zap = dynamic_cast<const zapette *>(bottom);
+
+	if(b_triv != nullptr)
+	    pre_ret = b_triv->get_slice_header_size();
+	else if(b_sar != nullptr)
+	    pre_ret = b_sar->get_first_slice_header_size();
+	else if(b_zap != nullptr)
+	    pre_ret = b_zap->get_first_slice_header_size();
+	else
+	    pre_ret = 0; // unknown size
+
+	if(!tools_infinint2U_64(pre_ret, ret))
+	    ret = 0;
+
+	return ret;
+    }
+
+    U_64 archive::get_non_first_slice_header_size() const
+    {
+	U_64 ret;
+	infinint pre_ret;
+	archive *me = const_cast<archive *>(this);
+	const generic_file *bottom = me->stack.bottom();
+	const trivial_sar *b_triv = dynamic_cast<const trivial_sar *>(bottom);
+	const sar *b_sar = dynamic_cast<const sar *>(bottom);
+	const zapette *b_zap = dynamic_cast<const zapette *>(bottom);
+
+	if(b_triv != nullptr)
+	    pre_ret = b_triv->get_slice_header_size();
+	else if(b_sar != nullptr)
+	    pre_ret = b_sar->get_non_first_slice_header_size();
+	else if(b_zap != nullptr)
+	    pre_ret = b_zap->get_non_first_slice_header_size();
+	else
+	    pre_ret = 0; // unknown size
+
+	if(!tools_infinint2U_64(pre_ret, ret))
+	    ret = 0;
+
+	return ret;
+    }
+
 
 	////////////////////
 	// PRIVATE METHODS FOLLOW

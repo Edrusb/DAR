@@ -329,6 +329,22 @@ namespace libdar
 	    /// be done only once
 	std::string free_and_check_memory() const;
 
+	    /// get the first slice header
+	    ///
+	    /// get_first_slice_header_size() and get_non_first_slice_header_size() can be used to translate
+	    /// from archive offset as reported by the list_entry::get_archive_offset_*() methods to file
+	    /// offset. This can be done by adding the first_slice_header_size to the archive offset, if the
+	    /// resulting number is larger than the first slice size, substract the it and add the non_first_slice
+	    /// header_size, and so on. This way you can determin the slice number to look into and the file offset
+	    /// in that file. Unit for all value is the byte (= octet).
+	    /// \note may return 0 if the slice header is not known
+	U_64 get_first_slice_header_size() const;
+
+	    /// get the non first slice header
+	    ///
+	    /// \note may return 0 if the slice header is not known
+	U_64 get_non_first_slice_header_size() const;
+
 
     private:
 	enum operation { oper_create, oper_isolate, oper_merge };

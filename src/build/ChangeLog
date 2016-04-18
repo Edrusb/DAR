@@ -31,7 +31,9 @@ from 2.5.3 to 2.5.4
 - avoiding to use AM_PATH_GPGME in configure script when gpgme.m4 is not
   available
 - adding new methods in libdar API to obtain the archive offset and
-  storage size of saved files
+  storage size of saved files (class list_entry)
+- adding new method in libdar API to translate archive offset to file
+  offset (class archive)
 
 from 2.5.2 to 2.5.3
 - Fixing a 2.5.x build issue met when a 2.4.x libdar library is already

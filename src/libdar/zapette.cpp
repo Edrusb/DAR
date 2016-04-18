@@ -44,6 +44,8 @@ extern "C"
 #include "zapette.hpp"
 #include "infinint.hpp"
 #include "tools.hpp"
+#include "trivial_sar.hpp"
+#include "sar.hpp"
 
 #define ANSWER_TYPE_DATA 'D'
 #define ANSWER_TYPE_INFININT 'I'
@@ -54,6 +56,8 @@ extern "C"
 #define REQUEST_OFFSET_CHANGE_CONTEXT_STATUS 2
 #define REQUEST_IS_OLD_START_END_ARCHIVE 3
 #define REQUEST_GET_DATA_NAME 4
+#define REQUEST_FIRST_SLICE_HEADER_SIZE 5
+#define REQUEST_OTHER_SLICE_HEADER_SIZE 6
 
 using namespace std;
 
@@ -290,6 +294,34 @@ namespace libdar
 			ans.size = src_ctxt->get_data_name().size();
 			ans.write(out, (char *)(src_ctxt->get_data_name().data()));
 		    }
+		    else if(req.offset == REQUEST_FIRST_SLICE_HEADER_SIZE)
+		    {
+			trivial_sar *src_triv = dynamic_cast<trivial_sar *>(src);
+			sar *src_sar = dynamic_cast<sar *>(src);
+
+			ans.type = ANSWER_TYPE_INFININT;
+			if(src_triv != nullptr)
+			    ans.arg = src_triv->get_slice_header_size();
+			else if(src_sar != nullptr)
+			    ans.arg = src_sar->get_first_slice_header_size();
+			else
+			    ans.arg = 0; // means unknown
+			ans.write(out, nullptr);
+		    }
+		    else if(req.offset == REQUEST_OTHER_SLICE_HEADER_SIZE)
+		    {
+			trivial_sar *src_triv = dynamic_cast<trivial_sar *>(src);
+			sar *src_sar = dynamic_cast<sar *>(src);
+
+			ans.type = ANSWER_TYPE_INFININT;
+			if(src_triv != nullptr)
+			    ans.arg = src_triv->get_slice_header_size();
+			else if(src_sar != nullptr)
+			    ans.arg = src_sar->get_non_first_slice_header_size();
+			else
+			    ans.arg = 0; // means unknown
+			ans.write(out, nullptr);
+		    }
 		    else
                         throw Erange("zapette::action", gettext("Received unknown special order"));
                 }
@@ -470,6 +502,33 @@ namespace libdar
 	return data_name;
     }
 
+    infinint zapette::get_first_slice_header_size() const
+    {
+	infinint ret;
+	S_I tmp;
+
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_FIRST_SLICE_HEADER_SIZE, nullptr, "", tmp, ret);
+
+	return ret;
+    }
+
+    infinint zapette::get_non_first_slice_header_size() const
+    {
+	infinint ret;
+	S_I tmp = 0;
+
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OTHER_SLICE_HEADER_SIZE, nullptr, "", tmp, ret);
+
+	return ret;
+    }
+
+
     U_I zapette::inherited_read(char *a, U_I size)
     {
         static const U_16 max_short = ~0;
@@ -568,6 +627,16 @@ namespace libdar
 	    {
 		if(ans.type != ANSWER_TYPE_DATA && lu != (S_I)(label::common_size()))
 		    throw Erange("zapetee::make_transfert", gettext("Unexpected answer from slave, communication problem or bug may hang the operation"));
+	    }
+	    else if(req.offset == REQUEST_FIRST_SLICE_HEADER_SIZE)
+	    {
+		if(ans.size != 0 && ans.type != ANSWER_TYPE_INFININT)
+                    throw Erange("zapette::make_transfert", gettext("Incoherent answer from peer"));
+	    }
+	    else if(req.offset == REQUEST_OTHER_SLICE_HEADER_SIZE)
+	    {
+		if(ans.size != 0 && ans.type != ANSWER_TYPE_INFININT)
+                    throw Erange("zapette::make_transfert", gettext("Incoherent answer from peer"));
 	    }
 	    else
                 throw Erange("zapette::make_transfert", gettext("Corrupted data read from pipe"));

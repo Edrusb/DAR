@@ -156,6 +156,12 @@ namespace libdar
 
 	const entrepot *get_entrepot() const { return entr; };
 
+	    /// get the first slice header
+	const infinint & get_first_slice_header_size() const { return slicing.first_slice_header; };
+
+	    /// get the non first slice header
+	const infinint & get_non_first_slice_header_size() const { return slicing.other_slice_header; };
+
     protected :
 	void inherited_read_ahead(const infinint & amount);
         U_I inherited_read(char *a, U_I size);

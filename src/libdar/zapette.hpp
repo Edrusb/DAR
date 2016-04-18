@@ -76,6 +76,16 @@ namespace libdar
 	bool is_an_old_start_end_archive() const;
 	const label & get_data_name() const;
 
+	    /// get the first slice header
+	    ///
+	    /// \note may return 0 if the slice header is not known
+	infinint get_first_slice_header_size() const;
+
+	    /// get the non first slice header
+	    ///
+	    /// \note may return 0 if the slice header is not known
+	infinint get_non_first_slice_header_size() const;
+
     protected:
 	void inherited_read_ahead(const infinint & amount) {}; // optimization will be done when zapette will use the messaging_encode/decode exchange format
         U_I inherited_read(char *a, U_I size);

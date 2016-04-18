@@ -104,6 +104,9 @@ namespace libdar
 	bool is_an_old_start_end_archive() const { return old_sar; };
 	const label & get_data_name() const { return of_data_name; };
 
+	    /// size of the slice header
+	const infinint & get_slice_header_size() const { return offset; };
+
     protected:
 	void inherited_read_ahead(const infinint & amount) { reference->read_ahead(amount); };
         U_I inherited_read(char *a, U_I size);
