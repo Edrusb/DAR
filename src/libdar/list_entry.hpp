@@ -122,7 +122,9 @@ namespace libdar
 	    /// \note: offset is counted whatever is the number of slice as if there all slice were sticked toghether. But
 	    /// the first bytes of each slice do not count as they hold the slice header. This one is variable
 	    /// but can be known using the archive::get_first_slice_header_size() and archive::get_non_first_slice_header_size()
-	    /// methods from the current archive class.
+	    /// methods from the current archive class. If encryption is used it is not possible to translate precisely from
+	    /// archive offset to slice offset, the encryption layer depending on the algorithm used may introduce an additional
+	    /// shift between clear data offset an corresponding ciphered data offset.
 	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the infinint of std::string
 	    /// version of this method
 	bool get_archive_offset_for_data(infinint & val) const { val = offset_for_data; return !val.is_zero(); };
