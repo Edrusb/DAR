@@ -554,16 +554,18 @@ bool get_args(shell_interaction & dialog,
             // generating masks
             // for filenames
             //
+	string cwd = tools_getcwd();
+
         if(rec.ordered_filters)
             p.selection = make_ordered_mask(rec.name_include_exclude,
                                             &make_include_exclude_name,
                                             &make_include_exclude_name,
-                                            tools_relative2absolute_path(*p.fs_root, tools_getcwd()));
+                                            tools_relative2absolute_path(*p.fs_root, cwd));
         else // unordered filters
             p.selection = make_unordered_mask(rec.name_include_exclude,
                                               &make_include_exclude_name,
                                               &make_include_exclude_name,
-                                              tools_relative2absolute_path(*p.fs_root, tools_getcwd()));
+                                              tools_relative2absolute_path(*p.fs_root, cwd));
 
 
             /////////////////////////
@@ -575,12 +577,12 @@ bool get_args(shell_interaction & dialog,
             p.subtree = make_ordered_mask(rec.path_include_exclude,
                                           &make_include_path,
                                           &make_exclude_path_ordered,
-                                          p.op != test && p.op != merging && p.op != listing ? tools_relative2absolute_path(*p.fs_root, tools_getcwd()) : PSEUDO_ROOT);
+                                          p.op != test && p.op != merging && p.op != listing ? tools_relative2absolute_path(*p.fs_root, cwd) : PSEUDO_ROOT);
         else // unordered filters
             p.subtree = make_unordered_mask(rec.path_include_exclude,
                                             &make_include_path,
                                             &make_exclude_path_unordered,
-                                            p.op != test && p.op != merging && p.op != listing ? tools_relative2absolute_path(*p.fs_root, tools_getcwd()) : PSEUDO_ROOT);
+                                            p.op != test && p.op != merging && p.op != listing ? tools_relative2absolute_path(*p.fs_root, cwd) : PSEUDO_ROOT);
 
 
             ////////////////////////////////
@@ -600,12 +602,12 @@ bool get_args(shell_interaction & dialog,
                 p.compress_mask = make_ordered_mask(rec.compr_include_exclude,
                                                     &make_include_exclude_name,
                                                     &make_include_exclude_name,
-                                                    tools_relative2absolute_path(*p.fs_root, tools_getcwd()));
+                                                    tools_relative2absolute_path(*p.fs_root, cwd));
             else
                 p.compress_mask = make_unordered_mask(rec.compr_include_exclude,
                                                       &make_include_exclude_name,
                                                       &make_include_exclude_name,
-                                                      tools_relative2absolute_path(*p.fs_root, tools_getcwd()));
+                                                      tools_relative2absolute_path(*p.fs_root, cwd));
         else
         {
             p.compress_mask = new (nothrow) bool_mask(true);
@@ -622,12 +624,12 @@ bool get_args(shell_interaction & dialog,
             p.ea_mask = make_ordered_mask(rec.ea_include_exclude,
                                           &make_include_exclude_name,
                                           &make_include_exclude_name,
-                                          tools_relative2absolute_path(*p.fs_root, tools_getcwd()));
+                                          tools_relative2absolute_path(*p.fs_root, cwd));
         else // unordered filters
             p.ea_mask = make_unordered_mask(rec.ea_include_exclude,
                                             &make_include_exclude_name,
                                             &make_include_exclude_name,
-                                            tools_relative2absolute_path(*p.fs_root, tools_getcwd()));
+                                            tools_relative2absolute_path(*p.fs_root, cwd));
 
 
             ////////////////////////////////
@@ -659,12 +661,12 @@ bool get_args(shell_interaction & dialog,
                     p.backup_hook_mask = make_ordered_mask(rec.backup_hook_include_exclude,
                                                            &make_exclude_path_unordered, // no mistake here about *exclude*, nor *unordered*
                                                            &make_exclude_path_unordered, // no mistake here about *exclude*, nor *unordered*
-                                                           tools_relative2absolute_path(*p.fs_root, tools_getcwd()));
+                                                           tools_relative2absolute_path(*p.fs_root, cwd));
                 else
                     p.backup_hook_mask = make_unordered_mask(rec.backup_hook_include_exclude,
                                                              &make_exclude_path_unordered,// no mistake here about *exclude*
                                                              &make_exclude_path_unordered,
-                                                             tools_relative2absolute_path(*p.fs_root, tools_getcwd()));
+                                                             tools_relative2absolute_path(*p.fs_root, cwd));
 
 
 	    ////////////////////////////////

@@ -12,7 +12,9 @@ from 2.5.3 to 2.5.4
   date order in a dar_manager database while moving an archive within a
   database
 - fixed typos in documentation
-- catalogue memory optimization
+- catalogue memory optimization, with the drawback to limit the number of
+  entry in an archive to the max integer supported by the libdar flavor
+  (32 bits/64 bits/infinint).
 - fix configure script to temporarily rely on LIBS rather LDFLAGS to
   check for gpgme availability
 - removed order dependency between -A and -9 options of dar_manager: -9
@@ -26,7 +28,12 @@ from 2.5.3 to 2.5.4
 - fixed bug in the routine that detects existing slices to warn the user
   and/or avoid overwriting, bug that lead dar to "bark" when an archive
   base name started by a + character.
-
+- avoiding to use AM_PATH_GPGME in configure script when gpgme.m4 is not
+  available
+- adding new methods in libdar API to obtain the archive offset and
+  storage size of saved files (class list_entry)
+- adding new method in libdar API to translate archive offset to file
+  offset (class archive)
 
 from 2.5.2 to 2.5.3
 - Fixing a 2.5.x build issue met when a 2.4.x libdar library is already

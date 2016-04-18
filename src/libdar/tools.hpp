@@ -880,6 +880,11 @@ namespace libdar
 	/// escape with a anti-slash character a set of chars found in the given string
     extern std::string tools_escape_chars_in_string(const std::string & val, const char *to_escape);
 
+	/// convert an infinint to U_64 (aka "uint64_t" or yet "unsigned long long")
+	///
+	/// \note: if the infinint is too large to fit in an U_64 it returns false
+    extern bool tools_infinint2U_64(infinint val, U_64 & res);
+
 } /// end of namespace
 
 #endif

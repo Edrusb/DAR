@@ -117,6 +117,58 @@ namespace libdar
 	bool has_delta_signature() const { return delta_sig; };
 
 
+	    /// offset in byte where to find first byte of data
+	    ///
+	    /// \note: return false if no data is present, else set the argument
+	    /// \note: offset is counted whatever is the number of slice as if there all slice were sticked toghether. But
+	    /// the first bytes of each slice do not count as they hold the slice header. This one is variable
+	    /// but can be known using the archive::get_first_slice_header_size() and archive::get_non_first_slice_header_size()
+	    /// methods from the current archive class. If encryption is used it is not possible to translate precisely from
+	    /// archive offset to slice offset, the encryption layer depending on the algorithm used may introduce an additional
+	    /// shift between clear data offset an corresponding ciphered data offset.
+	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the infinint of std::string
+	    /// version of this method
+	bool get_archive_offset_for_data(infinint & val) const { val = offset_for_data; return !val.is_zero(); };
+	bool get_archive_offset_for_data(U_64 & val) const { return tools_infinint2U_64(offset_for_data, val) && !offset_for_data.is_zero(); };
+	std::string get_archive_offset_for_data() const { return offset_for_data.is_zero() ? "" : deci(offset_for_data).human(); };
+
+	    /// amount of byte used to store the file's data
+	    ///
+	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the
+	    /// infinint of std::string version of this method
+	bool get_storage_size_for_data(infinint & val) const { val = storage_size_for_data; return !val.is_zero(); };
+	bool get_storage_size_for_data(U_64 & val) const { return tools_infinint2U_64(storage_size_for_data, val) && !storage_size_for_data.is_zero(); };
+	std::string get_storage_size_for_data() const { return storage_size_for_data.is_zero() ? "" : deci(storage_size_for_data).human(); };
+
+	    /// offset in byte whert to find the first byte of Extended Attributes
+	    ///
+	    /// \note see note for get_archive_offset_for_data(infinint)
+	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the infinint of
+	    /// std::string version of this method
+	bool get_archive_offset_for_EA(infinint & val) const { val = offset_for_EA; return !val.is_zero(); };
+	bool get_archive_offset_for_EA(U_64 & val) const { return tools_infinint2U_64(offset_for_EA, val) && !offset_for_EA.is_zero(); };
+	std::string get_archive_offset_for_EA() const { return offset_for_EA.is_zero() ? "" : deci(offset_for_EA).human(); };
+
+	    /// amount of byte used to store the file's EA
+	bool get_storage_size_for_EA(infinint & val) const { val = storage_size_for_EA; return !val.is_zero(); };
+	bool get_storage_size_for_EA(U_64 & val) const { return tools_infinint2U_64(storage_size_for_EA, val) && !storage_size_for_EA.is_zero(); };
+	std::string get_storage_size_for_EA() const { return storage_size_for_EA.is_zero() ? "" : deci(storage_size_for_EA).human(); };
+
+	    /// offset in byte where to find the first byte of Filesystem Specific Attributes
+	    ///
+	    /// \note see note for get_archive_offset_for_data(infinint)
+	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the
+	    /// infinint of std::string version of this method
+	bool get_archive_offset_for_FSA(infinint & val) const { val = offset_for_FSA; return !val.is_zero(); };
+	bool get_archive_offset_for_FSA(U_64 & val) const { return tools_infinint2U_64(offset_for_FSA, val) && !offset_for_FSA.is_zero(); };
+	std::string get_archive_offset_for_FSA() const { return offset_for_FSA.is_zero() ? "" : deci(offset_for_FSA).human(); };
+
+	    /// amount of byte used to store the file's FSA
+	bool get_storage_size_for_FSA(infinint & val) const { val = storage_size_for_FSA; return !val.is_zero(); };
+	bool get_storage_size_for_FSA(U_64 & val) const { return tools_infinint2U_64(storage_size_for_FSA, val) && !storage_size_for_FSA.is_zero(); };
+	std::string get_storage_size_for_FSA() const { return storage_size_for_FSA.is_zero() ? "" : deci(storage_size_for_FSA).human(); };
+
+
 	    // methods for libdar to setup the object
 
 	void set_name(const std::string & val) { my_name = val; };
@@ -141,6 +193,12 @@ namespace libdar
 	void set_minor(int val) { minor = val; };
 	void set_slices(const range & sl) { slices = sl; };
 	void set_delta_sig(bool val) { delta_sig = val; };
+	void set_archive_offset_for_data(const infinint & val) { offset_for_data = val; };
+	void set_storage_size_for_data(const infinint & val) { storage_size_for_data = val; };
+	void set_archive_offset_for_EA(const infinint & val) { offset_for_EA = val; };
+	void set_storage_size_for_EA(const infinint & val) { storage_size_for_EA = val; };
+	void set_archive_offset_for_FSA(const infinint & val) { offset_for_FSA = val; };
+	void set_storage_size_for_FSA(const infinint & val) { storage_size_for_FSA = val; };
 
     private:
 	std::string my_name;
@@ -165,6 +223,12 @@ namespace libdar
 	int minor;
 	range slices;
 	bool delta_sig;
+	infinint offset_for_data;
+	infinint storage_size_for_data;
+	infinint offset_for_EA;
+	infinint storage_size_for_EA;
+	infinint offset_for_FSA;
+	infinint storage_size_for_FSA;
 
 	static time_t datetime2time_t(const datetime & val);
     };

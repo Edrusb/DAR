@@ -53,6 +53,7 @@ extern "C"
 #include "entrepot_local.hpp"
 #include "crypto_sym.hpp"
 #include "cat_all_entrees.hpp"
+#include "zapette.hpp"
 
 #define ARCHIVE_NOT_EXPLOITABLE "Archive of reference given is not exploitable"
 
@@ -1490,7 +1491,23 @@ namespace libdar
 		    ent.set_ea_status(tmp_inode->ea_get_saved_status());
 		    if(tmp_inode->has_last_change())
 			ent.set_last_change(tmp_inode->get_last_change());
+		    if(tmp_inode->ea_get_saved_status() == cat_inode::ea_full)
+		    {
+			infinint tmp;
+
+			if(tmp_inode->ea_get_offset(tmp))
+			    ent.set_archive_offset_for_EA(tmp);
+			ent.set_storage_size_for_EA(tmp_inode->ea_get_size());
+		    }
 		    ent.set_fsa_status(tmp_inode->fsa_get_saved_status());
+		    if(tmp_inode->fsa_get_saved_status() == cat_inode::fsa_full)
+		    {
+			infinint tmp;
+
+			if(tmp_inode->fsa_get_offset(tmp))
+			    ent.set_archive_offset_for_FSA(tmp);
+			ent.set_storage_size_for_FSA(tmp_inode->fsa_get_size());
+		    }
 		}
 
 		if(tmp_file != nullptr)
@@ -1501,6 +1518,11 @@ namespace libdar
 		    ent.set_compression_algo(tmp_file->get_compression_algo_read());
 		    ent.set_dirtiness(tmp_file->is_dirty());
 		    ent.set_delta_sig(tmp_file->has_delta_signature_available());
+		    if(tmp_file->get_saved_status() == s_saved)
+		    {
+			ent.set_archive_offset_for_data(tmp_file->get_offset());
+			ent.set_storage_size_for_data(tmp_file->get_storage_size());
+		    }
 		}
 
 		if(tmp_lien != nullptr && tmp_lien->get_saved_status() == s_saved)
@@ -1711,6 +1733,57 @@ namespace libdar
 
 	return ret;
     }
+
+    U_64 archive::get_first_slice_header_size() const
+    {
+	U_64 ret;
+	infinint pre_ret;
+	archive *me = const_cast<archive *>(this);
+	const generic_file *bottom = me->stack.bottom();
+	const trivial_sar *b_triv = dynamic_cast<const trivial_sar *>(bottom);
+	const sar *b_sar = dynamic_cast<const sar *>(bottom);
+	const zapette *b_zap = dynamic_cast<const zapette *>(bottom);
+
+	if(b_triv != nullptr)
+	    pre_ret = b_triv->get_slice_header_size();
+	else if(b_sar != nullptr)
+	    pre_ret = b_sar->get_first_slice_header_size();
+	else if(b_zap != nullptr)
+	    pre_ret = b_zap->get_first_slice_header_size();
+	else
+	    pre_ret = 0; // unknown size
+
+	if(!tools_infinint2U_64(pre_ret, ret))
+	    ret = 0;
+
+	return ret;
+    }
+
+    U_64 archive::get_non_first_slice_header_size() const
+    {
+	U_64 ret;
+	infinint pre_ret;
+	archive *me = const_cast<archive *>(this);
+	const generic_file *bottom = me->stack.bottom();
+	const trivial_sar *b_triv = dynamic_cast<const trivial_sar *>(bottom);
+	const sar *b_sar = dynamic_cast<const sar *>(bottom);
+	const zapette *b_zap = dynamic_cast<const zapette *>(bottom);
+
+	if(b_triv != nullptr)
+	    pre_ret = b_triv->get_slice_header_size();
+	else if(b_sar != nullptr)
+	    pre_ret = b_sar->get_non_first_slice_header_size();
+	else if(b_zap != nullptr)
+	    pre_ret = b_zap->get_non_first_slice_header_size();
+	else
+	    pre_ret = 0; // unknown size
+
+	if(!tools_infinint2U_64(pre_ret, ret))
+	    ret = 0;
+
+	return ret;
+    }
+
 
 	////////////////////
 	// PRIVATE METHODS FOLLOW
