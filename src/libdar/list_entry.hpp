@@ -119,17 +119,20 @@ namespace libdar
 	    /// offset in byte where to find first byte of data
 	    ///
 	    /// \note: return false if no data is present, else set the argument
-	    /// \note: offset is counted whatever is the number of slice as if there was only one slice, this is an archive internal offset,
-	    /// which, compared to the offset inside the archive is shifted by the slice header which is around 20 bytes depending on the archive version
-	    /// and slice size if any.
-	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the infinint of std::string version of this method
+	    /// \note: offset is counted whatever is the number of slice as if there all slice were sticked toghether. But
+	    /// the first bytes of each slice do not count as they hold the slice header. This one is variable
+	    /// but can be known using the archive::get_first_slice_header_size() and archive::get_non_first_slice_header_size()
+	    /// methods from the current archive class.
+	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the infinint of std::string
+	    /// version of this method
 	bool get_archive_offset_for_data(infinint & val) const { val = offset_for_data; return !val.is_zero(); };
 	bool get_archive_offset_for_data(U_64 & val) const { return tools_infinint2U_64(offset_for_data, val) && !offset_for_data.is_zero(); };
 	std::string get_archive_offset_for_data() const { return offset_for_data.is_zero() ? "" : deci(offset_for_data).human(); };
 
 	    /// amount of byte used to store the file's data
 	    ///
-	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the infinint of std::string version of this method
+	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the
+	    /// infinint of std::string version of this method
 	bool get_storage_size_for_data(infinint & val) const { val = storage_size_for_data; return !val.is_zero(); };
 	bool get_storage_size_for_data(U_64 & val) const { return tools_infinint2U_64(storage_size_for_data, val) && !storage_size_for_data.is_zero(); };
 	std::string get_storage_size_for_data() const { return storage_size_for_data.is_zero() ? "" : deci(storage_size_for_data).human(); };
@@ -137,7 +140,8 @@ namespace libdar
 	    /// offset in byte whert to find the first byte of Extended Attributes
 	    ///
 	    /// \note see note for get_archive_offset_for_data(infinint)
-	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the infinint of std::string version of this method
+	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the infinint of
+	    /// std::string version of this method
 	bool get_archive_offset_for_EA(infinint & val) const { val = offset_for_EA; return !val.is_zero(); };
 	bool get_archive_offset_for_EA(U_64 & val) const { return tools_infinint2U_64(offset_for_EA, val) && !offset_for_EA.is_zero(); };
 	std::string get_archive_offset_for_EA() const { return offset_for_EA.is_zero() ? "" : deci(offset_for_EA).human(); };
@@ -150,7 +154,8 @@ namespace libdar
 	    /// offset in byte where to find the first byte of Filesystem Specific Attributes
 	    ///
 	    /// \note see note for get_archive_offset_for_data(infinint)
-	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the infinint of std::string version of this method
+	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the
+	    /// infinint of std::string version of this method
 	bool get_archive_offset_for_FSA(infinint & val) const { val = offset_for_FSA; return !val.is_zero(); };
 	bool get_archive_offset_for_FSA(U_64 & val) const { return tools_infinint2U_64(offset_for_FSA, val) && !offset_for_FSA.is_zero(); };
 	std::string get_archive_offset_for_FSA() const { return offset_for_FSA.is_zero() ? "" : deci(offset_for_FSA).human(); };
