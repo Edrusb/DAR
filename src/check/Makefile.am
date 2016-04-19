@@ -24,7 +24,7 @@ noinst_PROGRAMS = all_features padder
 LDADD = -L../libdar ../libdar/$(MYLIB).la $(GPGME_LIBS)
 AM_LDFLAGS = @LTLIBINTL@
 
-check_local:
+check-local:
 	chmod a+x $(dist_noinst_DATA) loop.sh
 	./loop.sh
 
