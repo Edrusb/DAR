@@ -88,6 +88,14 @@ extern "C"
 #include "cygwin_adapt.hpp"
 #include "tools.hpp"
 
+#ifndef L_ctermid
+// cygwin does not always define L_ctermid in stdio.h
+#define L_ctermid 10240
+// this value should be large enough for most cases
+// if it is smaller than system expects, ctermid() may lead
+// to program crash
+#endif
+
 using namespace std;
 using namespace libdar;
 
