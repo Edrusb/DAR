@@ -21,17 +21,15 @@ endif
 
 dist_noinst_DATA = build_tree.sh main.sh modif_tree.sh routine.sh loop.sh
 noinst_PROGRAMS = all_features
-check_PROGRAMS = permission
 LDADD = -L../libdar -l$(MYLIB)
 AM_LDFLAGS = @LTLIBINTL@
 
-permission:
+check_local:
 	chmod a+x $(dist_noinst_DATA) loop.sh
 	./loop.sh
 
 all_features_SOURCES = all_features.cpp
 all_features_DEPENDENCIES = ../libdar/lib$(MYLIB).la
-permission_SOURCES =
 
 clean-local:
 	chmod u+x $(dist_noinst_DATA)

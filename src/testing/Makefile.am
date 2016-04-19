@@ -1,14 +1,14 @@
 localedir = @localedir@
 
 if BUILD_MODE32
-MYLIB=dar32
+MYLIB=libdar32
 AM_CPPFLAGS=-DLIBDAR_MODE=32 -I../libdar -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\"
 else
 if BUILD_MODE64
-MYLIB=dar64
+MYLIB=libdar64
 AM_CPPFLAGS=-DLIBDAR_MODE=64 -I../libdar -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\"
 else
-MYLIB=dar
+MYLIB=libdar
 AM_CPPFLAGS=-I../libdar -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\"
 endif
 endif
@@ -18,90 +18,111 @@ AM_LDFLAGS = -all-static @LTLIBINTL@
 LDADD = -L../libdar -l$(MYLIB)
 noinst_HEADERS = testtools.hpp
 
-test_hide_file_SOURCES = test_hide_file.cpp ../dar_suite/no_comment.cpp ../dar_suite/hide_file.cpp ../dar_suite/config_file.cpp ../dar_suite/shell_interaction.cpp
-test_hide_file_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_hide_file_SOURCES = test_hide_file.cpp
+test_hide_file_LDADD = ../dar_suite/no_comment.o ../dar_suite/hide_file.o ../dar_suite/config_file.o ../dar_suite/shell_interaction.o
+test_hide_file_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-test_terminateur_SOURCES = test_terminateur.cpp ../dar_suite/shell_interaction.cpp
-test_terminateur_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_terminateur_SOURCES = test_terminateur.cpp
+test_terminateur_LDADD = ../dar_suite/shell_interaction.o
+test_terminateur_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-test_catalogue_SOURCES = test_catalogue.cpp ../dar_suite/shell_interaction.cpp
-test_catalogue_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_catalogue_SOURCES = test_catalogue.cpp
+test_catalogue_LDADD = ../dar_suite/shell_interaction.o
+test_catalogue_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-test_infinint_SOURCES = test_infinint.cpp ../dar_suite/shell_interaction.cpp
-test_infinint_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_infinint_SOURCES = test_infinint.cpp
+test_infinint_LDADD = ../dar_suite/shell_interaction.o
+test_infinint_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-test_tronc_SOURCES = test_tronc.cpp  ../dar_suite/shell_interaction.cpp testtools.cpp
-test_tronc_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_tronc_SOURCES = test_tronc.cpp testtools.cpp
+test_tronc_LDADD = ../dar_suite/shell_interaction.o
+test_tronc_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-test_compressor_SOURCES = test_compressor.cpp ../dar_suite/shell_interaction.cpp
-test_compressor_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_compressor_SOURCES = test_compressor.cpp
+test_compressor_LDADD = ../dar_suite/shell_interaction.o
+test_compressor_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 test_mask_SOURCES = test_mask.cpp
-test_mask_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_mask_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-test_tuyau_SOURCES = test_tuyau.cpp ../dar_suite/shell_interaction.cpp ../dar_suite/dar_suite.cpp ../dar_suite/line_tools.cpp
-test_tuyau_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_tuyau_SOURCES = test_tuyau.cpp
+test_tuyau_LDADD = ../dar_suite/shell_interaction.o ../dar_suite/dar_suite.o ../dar_suite/line_tools.o
+test_tuyau_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 test_deci_SOURCES = test_deci.cpp
-test_deci_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_deci_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 test_path_SOURCES = test_path.cpp
-test_path_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_path_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 test_erreurs_SOURCES = test_erreurs.cpp
-test_erreurs_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_erreurs_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-test_sar_SOURCES = test_sar.cpp  ../dar_suite/shell_interaction.cpp testtools.cpp
-test_sar_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_sar_SOURCES = test_sar.cpp testtools.cpp
+test_sar_LDADD = ../dar_suite/shell_interaction.o
+test_sar_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-test_filesystem_SOURCES = test_filesystem.cpp ../dar_suite/shell_interaction.cpp
-test_filesystem_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_filesystem_SOURCES = test_filesystem.cpp
+test_filesystem_LDADD = ../dar_suite/shell_interaction.o
+test_filesystem_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-test_scrambler_SOURCES = test_scrambler.cpp  ../dar_suite/dar_suite.cpp ../dar_suite/shell_interaction.cpp ../dar_suite/line_tools.cpp
-test_scrambler_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_scrambler_SOURCES = test_scrambler.cpp
+test_scrambler_LDADD = ../dar_suite/dar_suite.o ../dar_suite/shell_interaction.o ../dar_suite/line_tools.o
+test_scrambler_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-test_generic_file_SOURCES = test_generic_file.cpp ../dar_suite/shell_interaction.cpp
-test_generic_file_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_generic_file_SOURCES = test_generic_file.cpp
+test_generic_file_LDADD = ../dar_suite/shell_interaction.o
+test_generic_file_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 test_storage_SOURCES = test_storage.cpp
-test_storage_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_storage_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 test_special_alloc_SOURCES = test_special_alloc.cpp
-test_special_alloc_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_special_alloc_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-test_limitint_SOURCES = test_limitint.cpp ../dar_suite/shell_interaction.cpp
-test_limitint_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_limitint_SOURCES = test_limitint.cpp
+test_limitint_LDADD = ../dar_suite/shell_interaction.o
+test_limitint_DEPENDENCIES = ../libdar/$(MYLIB).la
 test_limitint_CXXFLAGS = -Wno-long-long
 
-test_libdar_SOURCES = test_libdar.cpp ../dar_suite/shell_interaction.cpp
-test_libdar_DEPENDENCIES = ../libdar/lib$(MYLIB).la ../libdar/libdar.hpp ../libdar/tools.hpp
+test_libdar_SOURCES = test_libdar.cpp
+test_libdar_LDADD = ../dar_suite/shell_interaction.o
+test_libdar_DEPENDENCIES = ../libdar/$(MYLIB).la ../libdar/libdar.hpp ../libdar/tools.hpp
 
-test_cache_SOURCES = test_cache.cpp ../dar_suite/shell_interaction.cpp
-test_cache_DEPENDENCIES = ../libdar/lib$(MYLIB).la ../libdar/libdar.hpp ../libdar/tools.hpp
+test_cache_SOURCES = test_cache.cpp
+test_cache_LDADD = ../dar_suite/shell_interaction.o
+test_cache_DEPENDENCIES = ../libdar/$(MYLIB).la ../libdar/libdar.hpp ../libdar/tools.hpp
 
-test_tronconneuse_SOURCES = test_tronconneuse.cpp ../dar_suite/shell_interaction.cpp
-test_tronconneuse_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_tronconneuse_SOURCES = test_tronconneuse.cpp
+test_tronconneuse_LDADD = ../dar_suite/shell_interaction.o
+test_tronconneuse_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-test_elastic_SOURCES = test_elastic.cpp ../dar_suite/shell_interaction.cpp
-test_elastic_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_elastic_SOURCES = test_elastic.cpp
+test_elastic_LDADD = ../dar_suite/shell_interaction.o
+test_elastic_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-test_blowfish_SOURCES = test_blowfish.cpp ../dar_suite/shell_interaction.cpp
-test_blowfish_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_blowfish_SOURCES = test_blowfish.cpp
+test_blowfish_LDADD = ../dar_suite/shell_interaction.o
+test_blowfish_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-test_mask_list_SOURCES = test_mask_list.cpp ../dar_suite/shell_interaction.cpp
-test_mask_list_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_mask_list_SOURCES = test_mask_list.cpp
+test_mask_list_LDADD = ../dar_suite/shell_interaction.o
+test_mask_list_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-test_string_file_SOURCES = test_string_file.cpp ../dar_suite/shell_interaction.cpp testtools.cpp
-test_string_file_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_string_file_SOURCES = test_string_file.cpp testtools.cpp
+test_string_file_LDADD = ../dar_suite/shell_interaction.o
+test_string_file_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-test_escape_SOURCES = test_escape.cpp ../dar_suite/shell_interaction.cpp
-test_escape_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_escape_SOURCES = test_escape.cpp
+test_escape_LDADD = ../dar_suite/shell_interaction.o
+test_escape_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-test_hash_fichier_SOURCES = test_hash_fichier.cpp ../dar_suite/shell_interaction.cpp
-test_hash_fichier_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_hash_fichier_SOURCES = test_hash_fichier.cpp
+test_hash_fichier_LDADD = ../dar_suite/shell_interaction.o
+test_hash_fichier_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 test_old_api_SOURCES = test_old_api.cpp
-test_old_api_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_old_api_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 make_sparse_file_SOURCES = make_sparse_file.c
 
