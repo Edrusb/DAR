@@ -61,12 +61,12 @@ static void display_line(user_interaction & dialog,
 			 const datetime *ea,
 			 data_tree::etat ea_presence);
 
-const char * const ETAT_SAVED = "S";
-const char * const ETAT_PATCH = "O";
-const char * const ETAT_PATCH_UNUSABLE = "U";
-const char * const ETAT_PRESENT = "P";
-const char * const ETAT_REMOVED = "R";
-const char * const ETAT_ABSENT = "A";
+constexpr const char * const ETAT_SAVED = "S";
+constexpr const char * const ETAT_PATCH = "O";
+constexpr const char * const ETAT_PATCH_UNUSABLE = "U";
+constexpr const char * const ETAT_PRESENT = "P";
+constexpr const char * const ETAT_REMOVED = "R";
+constexpr const char * const ETAT_ABSENT = "A";
 
 const unsigned char STATUS_PLUS_FLAG_ME = 0x01;
 const unsigned char STATUS_PLUS_FLAG_REF = 0x02;
