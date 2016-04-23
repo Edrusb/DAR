@@ -3069,7 +3069,7 @@ namespace libdar
 	if(ret == nullptr)
 	    throw Ememory("tools_allocate_struc_dirent");
 	memset(ret, '\0', len);
-#if _DIRENT_HAVE_D_RECLEN
+#ifdef _DIRENT_HAVE_D_RECLEN
 	ret->d_reclen = (len / sizeof(long))*sizeof(long);
 #endif
 	max_name_length = name_max;
