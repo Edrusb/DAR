@@ -858,9 +858,10 @@ namespace libdar
 	/// structure may vary it is necessary to know the directory where the corresponding files
 	/// resides
 	/// \param[in] pool whether to allocate the structure on a memory_pool or out of memory_pool
+	/// \param[ou] max_name_length is the maximum filename length allocated in the returned structure
 	/// which succeeds when pool is set to nullptr
 	/// \return a pointer to the newly allocated dirent structure
-    struct dirent *tools_allocate_struct_dirent(const std::string & path_name, memory_pool *pool = nullptr);
+    struct dirent *tools_allocate_struct_dirent(const std::string & path_name, U_64 & max_name_length, memory_pool *pool = nullptr);
 
 
 	/// release a dirent structure as allocated by tools_allocate_struct_dirent

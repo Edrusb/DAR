@@ -143,13 +143,22 @@ namespace libdar
 	    fichier.clear();
 
 #if HAVE_READDIR_R
-	    ret = tools_allocate_struct_dirent(dirname);
+    	    U_64 max_alloc_filename;
 	    struct dirent *dbldrt = nullptr;
+
+	    ret = tools_allocate_struct_dirent(dirname, max_alloc_filename);
 	    if(ret == nullptr)
 		throw SRC_BUG;
 	    try
 	    {
 		while(!is_cache_dir && (readdir_r(tmp, ret, &dbldrt) == 0) && dbldrt != nullptr)
+		{
+		    ret->d_name[max_alloc_filename] = '\0'; // yes, one byte is allocated for the terminal zero
+		    if(strlen(ret->d_name) >= max_alloc_filename)
+		    {
+			ui.warning(tools_printf(gettext("Filename provided by the operating system seems truncated in directory %s ignoring it: %s"), dirname, ret->d_name));
+			continue;
+		    }
 #else
 		while(!is_cache_dir && (ret = readdir(tmp)) != nullptr)
 #endif
@@ -162,6 +171,7 @@ namespace libdar
 		    }
 
 #if HAVE_READDIR_R
+		}
 	    }
 	    catch(...)
 	    {
