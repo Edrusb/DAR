@@ -25,7 +25,7 @@ setenv CXXFLAGS -O
 make
 make install-strip
 mv $build_dir/bin/* $build_dir/lib/*.so.*.*.* $build_dir
-cp /bin/cygwin1.dll /bin/cygz.dll /bin/cygbz2-1.dll /bin/cygiconv-2.dll /usr/bin/cygintl-8.dll /bin/cyggcc_s-seh-1.dll /bin/cygstdc++-6.dll /bin/cyggcrypt-11.dll /bin/cyggpg-error-0.dll /bin/cyglzo2-2.dll $build_dir
+cp /bin/cygwin1.dll /bin/cygz.dll /bin/cygbz2-1.dll /bin/cygiconv-2.dll /usr/bin/cygintl-8.dll /bin/cyggcc_s-seh-1.dll /bin/cygstdc++-6.dll /bin/cyggcrypt-11.dll /bin/cyggpg-error-0.dll /bin/cyglzo2-2.dll /bin/cyggcrypt-20.dll $build_dir
 cp -R doc $build_dir
 foreach fichier (README TODO INSTALL ChangeLog THANKS COPYING)
    cp $fichier "$build_dir/`basename $fichier`.txt"

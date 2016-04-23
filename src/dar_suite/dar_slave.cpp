@@ -71,7 +71,7 @@ char *strchr (), *strrchr ();
 using namespace libdar;
 using namespace std;
 
-#define DAR_SLAVE_VERSION "1.4.8"
+#define DAR_SLAVE_VERSION "1.4.9"
 
 static bool command_line(user_interaction & dialog,
 			 S_I argc, char * const argv[], path * &chemin, string & filename,
