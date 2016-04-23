@@ -8,7 +8,7 @@ from 2.5.3 to 2.5.4
   when encryption or slice hashing was used
 - fixed bug in dar_manager: archive permutation in database lead libdar
   to check an archive number of range under certain circumstances
-- fixed invertion of the condition triggering a warning about archive
+- fixed inversion of the condition triggering a warning about archive
   date order in a dar_manager database while moving an archive within a
   database
 - fixed typos in documentation
@@ -19,7 +19,7 @@ from 2.5.3 to 2.5.4
   check for gpgme availability
 - removed order dependency between -A and -9 options of dar_manager: -9
   can now be specified before or after -A option.
-- resetting to "false" the "inode_wrote" flag of hard link datastructure
+- resetting to "false" the "inode_wrote" flag of hard link data-structure
   before testing and merging. Merging a previously tested archive or
   testing a second time would not include hard linked inode in the
   operation. This situation does not occurs with dar but could succeed
@@ -34,6 +34,9 @@ from 2.5.3 to 2.5.4
   storage size of saved files (class list_entry)
 - adding new method in libdar API to translate archive offset to file
   offset (class archive)
+- reporting a specific error message when filename returned by the system
+  has the maximum length supported by the system itself, assuming
+  filename has been truncated
 
 from 2.5.2 to 2.5.3
 - Fixing a 2.5.x build issue met when a 2.4.x libdar library is already
@@ -184,8 +187,8 @@ from 2.4.21 to 2.4.20
 - removed sanity check that caused problem when writing an archive to a
   FUSE based filesystem.
 - fixed bug in dar_manager: archive permutation in database lead libdar
-  to check an archive number of range under certain circumstances
-- fixed invertion of the condition triggering a warning about archive
+  to check an archive number out of range under certain circumstances
+- fixed inversion of the condition triggering a warning about archive
   date order in a dar_manager database while moving an archive within a
   database
 - removed order dependency between -A and -9 options of dar_manager: -9

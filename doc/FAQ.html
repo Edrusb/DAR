@@ -1,9 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 
-
-
-  
   <meta content="text/html; charset=us-ascii" http-equiv="content-type"><title>DAR - Frequently Asked Questions</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
@@ -99,6 +96,7 @@ filesystem?</a><br>
       <a href="#diff">Why when comparing an archive with filesystem,
 dar does not report new files found on filesystem?</a><br>
       <a href="#delta">Why dar does not automatically perform delta difference (aka rsync increment)? </a><br>
+      <a href="#cyrillic">Why do dar reports truncated filenames under Windows, especially with cyrillic filenames?</a><br>
       </span><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;"> </span>
       <h2><span style="font-weight: bold;"> </span></h2>
       <br>
@@ -3119,6 +3117,7 @@ an archive<br>
       <span style="font-weight: bold; font-style: italic;"><a name="diff"></a>Why when comparing an archive with filesystem, dar
 does not report new files found on filesystem?<br>
       </span><br>
+      <div style="margin-left: 40px;">
 Archive comparison (-d option) is to be seen as a step further than
 archive testing (-t option) where dar checks the archive internal
 structure and usability. The step further here is not only to check
@@ -3129,23 +3128,36 @@ file changed, dar reports that the file does not match what's in the
 archive, if a file is missing dar cannot compare it with filesystem
 and reports an error too.<br>
       <br>
+
 So you want to know what has changed on your filesystem? No problem, <span style="font-weight: bold;">do a differential backup!</span>
 OK, you don't want to have a new backup or do not have the space for
 that, just output the archive to /dev/null and request on-fly isolation
 as follows:<br>
+      </div>
+
+
       <div style="margin-left: 40px;"><br>
-      <span style="font-family: monospace;">dar -c - -A &lt;ref
+
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c - -A &lt;ref
 archive&gt; -@ &lt;isolated&gt; ... other options ... &gt; /dev/null</span><br>
+      </div>
+
 &nbsp;&nbsp; <br>
       </div>
+      <div style="margin-left: 40px;">
 &lt;ref archive&gt; is the archive of reference or an isolated
 catalogue from it, &lt;isolated&gt; is the name of the isolated
 catalogue to produce. Once the operation has completed, you can list
 the isolated catalogue using the following command:<br>
       <br>
-      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -l &lt;isolated&gt; -as</span><br>
       </div>
-      <br>
+
+
+      <div style="margin-left: 80px;"><span style="font-family: monospace;">dar -l &lt;isolated&gt; -as</span><br>
+      </div>
+
+      <div style="margin-left: 40px;"><br>
+
 It will give you the exact difference between your current filesystem
 and the filesystem at the time the "&lt;ref archive&gt;" was done:
 modified files and new files are reported with <span style="font-weight: bold;">[inref]</span> for either data EA or both,
@@ -3154,20 +3166,57 @@ while deleted files are reported by "<span style="font-weight: bold;">[
 information, followed by the estimated removal date and the type of the
 removed file ([-] for plain file, [d] for directory, and so on. More
 details in dar man page for listing command).<br>
+      </div>
+
       <br>
       <br>
       <span style="font-weight: bold; font-style: italic;"><a name="delta"></a>Why dar does not automatically perform delta difference (aka rsync increment)?<br>
       <br>
-      </span> Because delta difference provided by librsync to support
+      </span>
+      <div style="margin-left: 40px;"> Because delta difference provided by librsync to support
 this feature is subject in theory to checksum collision (but it is very
 unprobable though), which could lead a new version of a file being seen
 the same as an older one while some changes took place in it. A second
 reason is to take care of users preference, that&nbsp; do not want
 having this feature activated by default. Well, now, activating delta
 difference with dar is quite simple and flexible, see <a href="usage_notes.html#delta">note</a>.<br>
+      </div>
+
       <span style="font-weight: bold; font-style: italic;"><span style="font-style: italic;"><span style="font-weight: bold;"></span></span><br>
       </span>
       <br>
+      <span style="font-weight: bold; font-style: italic;"><a name="cyrillic"></a>Why do dar reports truncated filenames under Windows, especially with cyrillic filenames?<br>
+<br>
+      </span>
+      <div style="margin-left: 40px;">Dar/libdar has been first
+developer for Linux. It has been later ported to many other operating
+systems. For Unix-like system (FreeBSD, Solaris, ...), it can run as a
+native program by just recompiled it for the target OS and processor.
+For Windows system, it cannot because Unix and Windows systems do not
+provide the same system calls at all. The easiest way to have dar
+running under Windows was to rely on Cygwin, which translates the Unix
+system calls to Windows system calls. However Cygwin brings some
+limitations. One of them is that it cannot provide filenames longer
+than 256 bytes, while today's Windows can have much longer filenames.<br>
+      <br>
+What the point with cyrillic filenames? Cyrillic characters unlike most
+latin ones are not stored as a single byte, they usually use several
+bytes per character, thus this maximum file size is reached much
+quicker than with latin filenames, but the problem also exists with
+them.<br>
+      <br>
+The consequence is that when dar reads a directory that contains a
+large filename, the Cygwin layer is not able to provide it entierly:
+the filename is truncated. When dar wants to read information about
+that filename most of the time such truncated filename does not exists
+and dar reports the message from the system that this file does not
+exists (which might sound strange from user point of view). Since
+release 2.5.4 dar reports instead that filename has been truncated and
+that it will be ignored.<br>
+      <br>
+      </div>
+      <span style="font-weight: bold; font-style: italic;"><br>
+      </span>
       </td>
     </tr>
   </tbody>
@@ -3176,5 +3225,7 @@ difference with dar is quite simple and flexible, see <a href="usage_notes.html#
 </div>
 </div>
 </center>
+
+
 
 </body></html>

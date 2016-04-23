@@ -31,7 +31,6 @@ check-local:
 all_features_SOURCES = all_features.cpp
 all_features_LDADD = $(LDADD)
 all_features_DEPENDENCIES = ../libdar/$(MYLIB).la
-permission_SOURCES =
 
 padder_SOURCES = padder.cpp
 

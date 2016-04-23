@@ -3051,10 +3051,10 @@ namespace libdar
     }
 
 
-    struct dirent *tools_allocate_struct_dirent(const std::string & path_name, memory_pool *pool)
+    struct dirent *tools_allocate_struct_dirent(const std::string & path_name, U_64 & max_name_length, memory_pool *pool)
     {
 	struct dirent *ret;
-	S_I name_max = pathconf(path_name.c_str(), _PC_NAME_MAX);
+	S_64 name_max = pathconf(path_name.c_str(), _PC_NAME_MAX);
 	U_I len;
 
 	if(name_max == -1)
@@ -3069,6 +3069,12 @@ namespace libdar
 
 	if(ret == nullptr)
 	    throw Ememory("tools_allocate_struc_dirent");
+	memset(ret, '\0', len);
+#ifdef _DIRENT_HAVE_D_RECLEN
+	ret->d_reclen = (len / sizeof(long))*sizeof(long);
+#endif
+	max_name_length = name_max;
+
 	return ret;
     }
 

@@ -73,7 +73,7 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_MANAGER_VERSION "1.7.10"
+#define DAR_MANAGER_VERSION "1.7.11"
 
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
@@ -476,7 +476,7 @@ static bool command_line(shell_interaction & dialog,
 		    }
 		    catch(Edeci & e)
 		    {
-			throw Erange("command_line", tools_printf(gettext("invalid number give to -9 option: %s"), optarg));
+			throw Erange("command_line", tools_printf(gettext("invalid number given to -9 option: %s"), optarg));
 		    }
 		    break;
 		case 'a':
