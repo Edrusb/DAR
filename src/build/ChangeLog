@@ -8,7 +8,7 @@ from 2.5.3 to 2.5.4
   when encryption or slice hashing was used
 - fixed bug in dar_manager: archive permutation in database lead libdar
   to check an archive number of range under certain circumstances
-- fixed invertion of the condition triggering a warning about archive
+- fixed inversion of the condition triggering a warning about archive
   date order in a dar_manager database while moving an archive within a
   database
 - fixed typos in documentation
@@ -187,8 +187,8 @@ from 2.4.21 to 2.4.20
 - removed sanity check that caused problem when writing an archive to a
   FUSE based filesystem.
 - fixed bug in dar_manager: archive permutation in database lead libdar
-  to check an archive number of range under certain circumstances
-- fixed invertion of the condition triggering a warning about archive
+  to check an archive number out of range under certain circumstances
+- fixed inversion of the condition triggering a warning about archive
   date order in a dar_manager database while moving an archive within a
   database
 - removed order dependency between -A and -9 options of dar_manager: -9
