@@ -2102,7 +2102,9 @@ msgstr "Erreur lors de l'ouverture du répertoire : "
 msgid ""
 "Filename provided by the operating system seems truncated in directory %s "
 "ignoring it: %s"
-msgstr "Le nom de fichier fourni par le système d'exploitation semble tronqué dans le répertoire %s et sera ignoré: %s"
+msgstr ""
+"Le nom de fichier fourni par le système d'exploitation semble tronqué dans "
+"le répertoire %s et sera ignoré: %s"
 
 #: src/libdar/etage.cpp:191
 #, c-format
