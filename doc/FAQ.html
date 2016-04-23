@@ -1,6 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 
+
   
   <meta content="text/html; charset=us-ascii" http-equiv="content-type"><title>DAR - Frequently Asked Questions</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
@@ -93,6 +94,7 @@ what does that mean!? </a><br>
       </span><a href="#fuse"><span style="font-weight: bold; font-style: italic;">Is there a dar </span><span style="font-weight: bold; font-style: italic;">fuse</span></a><span style="font-weight: bold; font-style: italic;"><a href="#fuse">
 filesystem?</a><br>
       <a href="#tar">how dar compares to tar?</a><br>
+      <a href="#cyrillic">Why do dar reports truncated filenames under Windows, especially with cyrillic filenames?</a><br>
       </span><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;"> </span>
       <h2><span style="font-weight: bold;"> </span></h2>
       <br>
@@ -3042,6 +3044,37 @@ an archive<br>
       </table>
       <br>
       <br>
+      <span style="font-weight: bold; font-style: italic;"><a name="cyrillic"></a>Why do dar reports truncated filenames under Windows, especially with cyrillic filenames?<br>
+      </span>
+      <div style="margin-left: 40px;">Dar/libdar has been first
+developer for Linux. It has been later ported to many other operating
+systems. For Unix-like system (FreeBSD, Solaris, ...), it can run as a
+native program by just recompiled it for the target OS and processor.
+For Windows system, it cannot because Unix and Windows systems do not
+provide the same system calls at all. The easiest way to have dar
+running under Windows was to rely on Cygwin, which translates the Unix
+system calls to Windows system calls. However Cygwin brings some
+limitations. One of them is that it cannot provide filenames longer
+than 256 bytes, while today's Windows can have much longer filenames.<br>
+      <br>
+What the point with cyrillic filenames? Cyrillic characters unlike most
+latin ones are not stored as a single byte, they usually use several
+bytes per character, thus this maximum file size is reached much
+quicker than with latin filenames, but the problem also exists with
+them.<br>
+      <br>
+The consequence is that when dar reads a directory that contains a
+large filename, the Cygwin layer is not able to provide it entierly:
+the filename is truncated. When dar wants to read information about
+that filename most of the time such truncated filename does not exists
+and dar reports the message from the system that this file does not
+exists (which might sound strange from user point of view). Since
+release 2.5.4 dar reports instead that filename has been truncated and
+that it will be ignored.<br>
+      <br>
+      </div>
+      <span style="font-weight: bold; font-style: italic;"><br>
+      </span>
       </td>
     </tr>
   </tbody>
