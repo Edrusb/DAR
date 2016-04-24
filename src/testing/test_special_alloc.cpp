@@ -108,6 +108,8 @@ void f1()
     if(ptr2 != nullptr)
 	delete ptr2;
 
+    mem.garbage_collect();
+
     if(! mem.is_empty())
 	cout << mem.dump() << endl;
     else
