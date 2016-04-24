@@ -21,6 +21,7 @@
 
 
 
+
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR's FEATURES</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -440,6 +441,41 @@ a cost!<br>
 
 
 <br>
+<br>
+
+
+<table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold; width: 33%;">DELTA BINARY<br>
+</td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a> </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">keywords: --delta sig, --include-delta-sig, --exclude-delta-sig, --delta-sig-min-size, --delta no-patch<br>
+      </td>
+    </tr>
+    <tr align="justify">
+      <td colspan="2" rowspan="1" style="vertical-align: top;">Since
+release 2.6.0, for incremental and decremental backups, instead of
+saving an entire whole file when it has changed, dar/libdar provides
+the ability to save only the part that has changed in it. This feature
+called binary delta relies on librsync library. It is not activated by
+default considering the non null probability of collision between two
+different versions of a file. This is also the choice of the dar user
+community.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
 <br>
 
 <br>
