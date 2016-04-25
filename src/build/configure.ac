@@ -934,11 +934,11 @@ AC_ARG_ENABLE( [build-html],
              )
 
 AC_ARG_ENABLE(  [special-alloc],
-                AC_HELP_STRING(--disable-special-alloc, [special memory allcation scheme makes dar using less memory and run a bit faster, in particular in conjunction with --enable-mode=32 or 64, you can disable it if you like]),
-                [],
+                AC_HELP_STRING(--enable-special-alloc, [special memory allcation scheme makes dar using less memory and run a bit faster, in particular in conjunction with --enable-mode=32 or 64, deprecated since release 2.5.5 you can re-enable it if you like]),
                 [AC_DEFINE(LIBDAR_SPECIAL_ALLOC, [], [if set activates specific new and delete operator which do better allocation for a lot of small items])
                 local_special_alloc="yes"
-             ])
+                ],
+                [])
 
 AC_ARG_ENABLE( [upx],
                 AC_HELP_STRING(--disable-upx, [by default configure looks for UPX and if available make executables compressed at installation time, you can disable this feature]),
