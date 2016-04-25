@@ -1,3 +1,6 @@
+from 2.5.5 to 2.5.4
+- fixed the displayed message when reading old archives
+
 from 2.5.3 to 2.5.4
 - fixing missing included files for libdar API
 - removed extra try/catch block introduced by commit

@@ -464,18 +464,18 @@ namespace libdar
 
 		// ****** Reading the header version ************** //
 
-	    if(info_details)
-	    {
-		if(sequential_read)
-		    dialog.warning(gettext("Reading the archive header..."));
-		else
-		    dialog.warning(gettext("Reading the archive trailer..."));
-	    }
-
 	    stack.find_first_from_top(tmp_ctxt);
 	    if(tmp_ctxt == nullptr)
 		throw SRC_BUG;
 	    second_terminateur_offset = 0;
+
+	    if(info_details)
+	    {
+		if(sequential_read || (tmp_ctxt != nullptr && tmp_ctxt->is_an_old_start_end_archive()))
+		    dialog.warning(gettext("Reading the archive header..."));
+		else
+		    dialog.warning(gettext("Reading the archive trailer..."));
+	    }
 
 	    if(sequential_read
 	       || tmp_ctxt->is_an_old_start_end_archive()
