@@ -75,6 +75,15 @@ if ./all_features ; then
 else
   exit 3
 fi
+
+for archive in Old_format/* ; do
+  basename=`echo "$archive" | sed -r -e "s/\.[0-9]+\.dar//"`
+  if ! ../dar_suite/dar -q -Q -t "$basename" ; then
+     echo "FAILED TESTING OLD ARCHIVE FORMAT: $basename"
+     exit 1
+  fi
+done
+
 # for multi_thread in n y ; do
 multi_thread="n"
   for hash in  md5 none sha1 ; do
