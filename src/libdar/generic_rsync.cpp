@@ -83,7 +83,13 @@ namespace libdar
 	    initial = true;
 	    patching_completed = false; // not used in sign mode
 	    data_crc = nullptr;
+#ifdef RS_DEFAULT_STRONG_LEN
 	    job = rs_sig_begin(RS_DEFAULT_BLOCK_LEN, RS_DEFAULT_STRONG_LEN);
+#else
+		// should use RS_BLAKE2_SIG_MAGIC in place of RS_MD4_SIG_MAGIC
+		// but not compatible with librsync < 1.0
+	    job = rs_sig_begin(RS_DEFAULT_BLOCK_LEN, 0, RS_MD4_SIG_MAGIC);
+#endif
 	}
 	catch(...)
 	{
