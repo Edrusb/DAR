@@ -123,6 +123,9 @@ namespace libdar
 	    /// return the storage it would require to dump this object
 	infinint get_storage_size() const { return sec.get_storage_size() + frac.get_storage_size() + 1; };
 
+	    /// set to null (zero)
+	void nullify() { sec = 0; frac = 0; uni = tu_second ; };
+
     private:
 	    // the date must not be stored as a single integer
 	    // to avoid reducing the possible addressable dates

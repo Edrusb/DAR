@@ -145,9 +145,9 @@ namespace libdar
 	bool ea_get_crc_size(infinint & val) const; //< returns true if crc is know and puts its width in argument
 
             // IV : to know/record if EA and FSA have been modified # any EA status# and FSA status #
-        datetime get_last_change() const;
-        void set_last_change(const datetime & x_time);
-	bool has_last_change() const { return last_cha != nullptr; };
+        datetime get_last_change() const { return last_cha; };
+        void set_last_change(const datetime & x_time) { last_cha = x_time; };
+	bool has_last_change() const { return !last_cha.is_null(); };
 	    // old format did provide last_change only when EA were present, since archive
 	    // format 8, this field is always present even in absence of EA. Thus it is
 	    // still necessary to check if the cat_inode has a last_change() before
@@ -200,7 +200,7 @@ namespace libdar
         U_16 perm;               //< inode's permission
         datetime last_acc;       //< last access time (atime)
 	datetime last_mod;       //< last modification time (mtime)
-        datetime *last_cha;      //< last inode meta data change (ctime)
+        datetime last_cha;       //< last inode meta data change (ctime)
         saved_status xsaved;     //< inode data status
         ea_status ea_saved;      //< inode Extended Attribute status
 	fsa_status fsa_saved;    //< inode Filesystem Specific Attribute status
