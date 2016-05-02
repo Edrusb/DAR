@@ -34,136 +34,133 @@ namespace libdar
     static const infinint one_million = one_thousand*one_thousand;
     static const infinint one_billion = one_million*one_thousand;
 
+    datetime::datetime(time_t second, time_t subsec, time_unit unit)
+    {
+	build(infinint(second), infinint(subsec), unit);
+    }
+
     bool datetime::operator < (const datetime & ref) const
     {
-	if(sec < ref.sec)
+	if(uni <= ref.uni && val < ref.val)
 	    return true;
-	if(sec > ref.sec)
-	    return false;
 
-	    // sec == ref.sec
+	if(uni < ref.uni)
+	    return val < get_scaling_factor(ref.uni, uni)*ref.val;
+
 	if(uni == ref.uni)
-	    return frac < ref.frac;
-	else
-	{
-		// using the unit having the less precision to perform the comparison
-	    time_unit c = max(uni, ref.uni);
-	    return get_subsecond_value(c) < ref.get_subsecond_value(c);
-	}
+	    return val < ref.val;
+
+	    // uni > ref.uni
+	return val*get_scaling_factor(uni, ref.uni) < ref.val;
     }
 
     bool datetime::operator == (const datetime & ref) const
     {
-	if(sec != ref.sec)
-	    return false;
-	else
-	{
-		// using the unit having the less precision to perform the comparison
-	    time_unit c = max(uni, ref.uni);
-	    return get_subsecond_value(c) == ref.get_subsecond_value(c);
-	}
+	return uni == ref.uni && val == ref.val;
+	    // fields are always reduced to the larger possible unit
     }
 
     datetime datetime::operator - (const datetime & ref) const
     {
-	datetime val = *this;
+	datetime ret = *this;
 
-	if(*this < ref)
-	    throw SRC_BUG; // negative date would result of the operation
-
-	val.sec -= ref.sec;
-
-	    // using the most precised unit to avoid loosing accuracy
-	val.uni = min(uni, ref.uni);
-	infinint me_frac = get_subsecond_value(val.uni);
-	infinint ref_frac = ref.get_subsecond_value(val.uni);
-
-	if(me_frac >= ref_frac)
-	    val.frac = me_frac - ref_frac;
-	else
+	if(ref.uni < ret.uni)
 	{
-	    --val.sec; // removing 1 second
-	    val.frac = me_frac + how_much_to_make_1_second(val.uni);
-	    val.frac -= ref_frac;
+	    ret.uni = ref.uni;
+	    ret.val *= get_scaling_factor(ret.uni, ref.uni);
 	}
 
-	return val;
+	if(ref.uni == ret.uni)
+	{
+	    if(ret.val < ref.val)
+		throw SRC_BUG;
+	    ret.val -= ref.val;
+	}
+	else // ref.uni > ret.uni
+	{
+	    infinint tmp = ref.val * get_scaling_factor(ref.uni, ret.uni);
+	    if(tmp > ret.val)
+		throw SRC_BUG;
+	    ret.val -= tmp;
+	}
+
+	reduce_to_largest_unit();
+
+	return ret;
     }
 
     datetime datetime::operator + (const datetime & ref) const
     {
-	datetime val = *this;
+	datetime ret = *this;
 
-	val.sec += ref.sec;
-
-	    // using the most precised unit to avoid loosing accuracy
-	val.uni = min(uni, ref.uni);
-	infinint me_frac = get_subsecond_value(val.uni);
-	infinint ref_frac = ref.get_subsecond_value(val.uni);
-
-	val.frac = me_frac + ref_frac;
-	if(val.frac >= how_much_to_make_1_second(val.uni))
+	if(ref.uni < ret.uni)
 	{
-	    ++val.sec;
-	    val.frac -= how_much_to_make_1_second(val.uni);
+	    ret.uni = ref.uni;
+	    ret.val *= get_scaling_factor(ret.uni, ref.uni);
 	}
 
-	return val;
+	if(ref.uni == ret.uni)
+	    ret.val += ref.val;
+	else // ref.uni > ret.uni
+	{
+	    infinint tmp = ref.val * get_scaling_factor(ref.uni, ret.uni);
+	    ret.val += tmp;
+	}
+
+	reduce_to_largest_unit();
+
+	return ret;
     }
 
     datetime datetime::loose_diff(const datetime & ref) const
     {
-	datetime val = *this;
-	time_unit max_capa = tu_second;
-
-	if(*this < ref)
-	    throw SRC_BUG; // negative date would result of the operation
-
-	val.sec -= ref.sec;
+#if LIBDAR_MICROSECOND_READ_ACCURACY && LIBDAR_MICROSECOND_WRITE_ACCURACY
+	static const time_unit max_capa = tu_microsecond;
+#else
+	static const time_unit max_capa = tu_second;
+#endif
+	datetime ret;
+	infinint aux;
 
 	    // using the less precised unit to avoid loosing accuracy
-	val.uni = max(uni, ref.uni);
-#if LIBDAR_MICROSECOND_READ_ACCURACY && LIBDAR_MICROSECOND_WRITE_ACCURACY
-	max_capa = tu_microsecond;
-#endif
-	if(val.uni < max_capa)
-	    val.uni = max_capa;
-	infinint me_frac = get_subsecond_value(val.uni);
-	infinint ref_frac = ref.get_subsecond_value(val.uni);
+	ret.uni = max(uni, ref.uni);
 
-	if(me_frac >= ref_frac)
-	    val.frac = me_frac - ref_frac;
+	if(ret.uni < max_capa)
+	    ret.uni = max_capa;
+
+	if(uni < ret.uni)
+	    ret.val = val / get_scaling_factor(ret.uni, uni);
 	else
-	{
-	    --val.sec; // removing 1 second
-	    val.frac = me_frac + how_much_to_make_1_second(val.uni);
-	    val.frac -= ref_frac;
-	}
+	    ret.val = val;
 
-	return val;
+	if(ref.uni < ret.uni)
+	    aux = ref.val / get_scaling_factor(ret.uni, ref.uni);
+	else
+	    aux = ref.val;
+
+	if(ret.val < aux)
+	    throw SRC_BUG; // negative date would result of the operation
+	ret.val -= aux;
+	ret.reduce_to_largest_unit();
+
+	return ret;
     }
 
-    bool datetime::is_subsecond_an_integer_value_of(time_unit target, infinint & newval) const
+    infinint datetime::get_storage_size() const
     {
-	if(target <= uni)
-	{
-	    newval = frac * get_scaling_factor(uni, target);
-	    return true;
-	}
-	else
-	{
-	    const infinint & f = get_scaling_factor(target, uni);
-		// target = f*uni
-	    infinint  r;
-	    euclide(frac, f, newval, r);
-		// frac = f*newval + r
-	    return r.is_zero();
-	}
+	infinint sec, sub, size;
+	get_value(sec, sub, uni);
+
+	size = sec.get_storage_size();
+	if(uni < tu_second)
+	    size += sub.get_storage_size() + 1;
+
+	return size;
     }
 
     void datetime::reduce_to_largest_unit() const
     {
-	infinint newval;
+	infinint newval, reste;
 	datetime *me = const_cast<datetime *>(this);
 
 	if(me == nullptr)
@@ -172,20 +169,22 @@ namespace libdar
 	switch(uni)
 	{
 	case tu_nanosecond:
-	    if(!is_subsecond_an_integer_value_of(tu_microsecond, newval))
+	    euclide(val, get_scaling_factor(tu_microsecond, uni), newval, reste);
+	    if(!reste.is_zero())
 		break; // cannot reduce the unit further
 	    else
 	    {
-		me->frac = newval;
+		me->val = newval;
 		me->uni = tu_microsecond;
 	    }
 		/* no break ! */
 	case tu_microsecond:
-	    if(!is_subsecond_an_integer_value_of(tu_second, newval))
+	    euclide(val, get_scaling_factor(tu_second, uni), newval, reste);
+	    if(!reste.is_zero())
 		break; // cannot reduce the unit further
 	    else
 	    {
-		me->frac = newval;
+		me->val = newval;
 		me->uni = tu_second;
 	    }
 		/* no break ! */
@@ -199,51 +198,103 @@ namespace libdar
 	}
     }
 
+    void datetime::get_value(infinint & sec, infinint & sub, time_unit unit) const
+    {
+	euclide(val, get_scaling_factor(tu_second, uni), sec, sub);
+	if(unit < uni)
+	    sub *= get_scaling_factor(uni, unit);
+	if(unit > uni)
+	    sub /= get_scaling_factor(unit, uni);
+    }
+
+    void datetime::build(const infinint & sec, const infinint & sub, time_unit unit)
+    {
+	bool loop = false;
+	infinint subsec = sub;
+
+	do
+	{
+	    try
+	    {
+		val = sec*get_scaling_factor(tu_second, unit) + subsec;
+		uni = unit;
+		loop = false;
+	    }
+	    catch(Elimitint& e)
+	    {
+		switch(unit)
+		{
+		case tu_nanosecond:
+		    unit = tu_microsecond;
+		    subsec = subsec/1000;
+		    break;
+		case tu_microsecond:
+		    unit = tu_second;
+		    subsec = subsec/1000;
+		    break;
+		case tu_second:
+		    throw;
+		default:
+		    throw SRC_BUG;
+		}
+		loop = true;
+	    }
+	}
+	while(loop);
+	reduce_to_largest_unit();
+    }
+
+
     infinint datetime::get_subsecond_value(time_unit unit) const
     {
-	infinint ret;
-	(void) is_subsecond_an_integer_value_of(unit, ret);
+	infinint ret, tmp;
+
+	get_value(tmp, ret, unit);
+
 	return ret;
     }
 
     bool datetime::get_value(time_t & second, time_t & subsecond, time_unit unit) const
     {
-	infinint tmp;
+	infinint sub, sec;
+
+	get_value(sub, sec, unit);
 
 	second = 0;
-	tmp = sec;
-	tmp.unstack(second);
-	if(!tmp.is_zero())
+	sec.unstack(second);
+	if(!sec.is_zero())
 	    return false;
 
-	if(unit < tu_second && uni < tu_second && !frac.is_zero())
-	{
-	    (void) is_subsecond_an_integer_value_of(unit, tmp);
-	    subsecond = 0;
-	    tmp.unstack(subsecond);
-	    return tmp.is_zero();
-	}
-	else
-	{
-	    subsecond = 0;
-	    return true;
-	}
+	subsecond = 0;
+	sub.unstack(subsecond);
+	if(!sub.is_zero())
+	    return false;
+
+	return true;
     }
 
     void datetime::dump(generic_file &x) const
     {
 	char tmp;
+	infinint sec, sub;
 
-//	reduce_to_largest_unit();
+	get_value(sec, sub, uni);
 	tmp = time_unit_to_char(uni);
+
+	    // we keep storing:
+	    // - a first flag telling the unit
+	    // - an infinint telling the amount of seconds
+	    // - an other infinint telling the amount of subsecond additional time expressed in the unit of the flag
 	x.write(&tmp, 1);
 	sec.dump(x);
 	if(uni < tu_second)
-	    frac.dump(x);
+	    sub.dump(x);
     }
 
     void datetime::read(generic_file &f, archive_version ver)
     {
+	infinint sec, sub;
+
 	if(ver < 9)
 	    uni = tu_second;
 	else
@@ -255,9 +306,10 @@ namespace libdar
 
 	sec.read(f);
 	if(uni < tu_second)
-	    frac.read(f);
+	    sub.read(f);
 	else
-	    frac = 0;
+	    sub = 0;
+	build(sec, sub, uni);
     }
 
     datetime::time_unit datetime::min(time_unit a, time_unit b)
@@ -334,21 +386,6 @@ namespace libdar
 		return one_unit;
 	    else
 		throw SRC_BUG; // unknown dest unit!
-	default:
-	    throw SRC_BUG;
-	}
-    }
-
-    infinint datetime::how_much_to_make_1_second(time_unit unit)
-    {
-	switch(unit)
-	{
-	case tu_nanosecond:
-	    return one_billion;
-	case tu_microsecond:
-	    return one_million;
-	case tu_second:
-	    return 1;
 	default:
 	    throw SRC_BUG;
 	}
