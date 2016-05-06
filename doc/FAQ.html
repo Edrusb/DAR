@@ -4,6 +4,7 @@
 
 
 
+
   <meta content="text/html; charset=us-ascii" http-equiv="content-type"><title>DAR - Frequently Asked Questions</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
@@ -2483,15 +2484,18 @@ anytime you write to the file's data (this is the last<span style="font-weight: 
 time)<br>
         </li>
         <li><span style="font-weight: bold;">ctime</span> is changed
-anythime ou modify the file's attributs (the is the last <span style="text-decoration: underline; font-weight: bold;">c</span>hange
+anythime ou modify the file's attributes (the is the last <span style="text-decoration: underline; font-weight: bold;">c</span>hange
 time)<br>
         </li>
       </ol>
 In other words:<br>
       <ul>
-        <li>if you only read the data of file, only its <span style="font-weight: bold;">atime</span> will be updated</li>
-        <li>if you write some data to a file, its <span style="font-weight: bold;">atime</span> and <span style="font-weight: bold;">mtime</span> will change, ctime will stay
+        <li>if you only read the data of file, only its <span style="font-weight: bold;">atime</span> will be updated<sup>1</sup> <br>
+</li>
+        
+        <li>if you write some data to a file, its <span style="font-weight: bold;">ctime</span> and <span style="font-weight: bold;">mtime</span> will change, atime will stay
 unchanged</li>
+
         <li>if you change ownership, permission, extended attributes,
 etc, only <span style="font-weight: bold;">ctime</span> will change</li>
         <li>if you write to a file and modify its atime or mtime to let
@@ -2574,6 +2578,8 @@ Last point, if you can explain the cause of the alarm and are annoyed
 by it (you have hundred of files concerned for example ) <span style="font-weight: bold;">you can
 disable this feature</span> adding the "<span style="font-weight: bold;">-asecu</span>" switch to the command-line.<br>
       <br>
+      <br>
+      <sup>1</sup> atime may also not be updated at all if filesystem is mounted with relatime or noatime option.
       </div>
       <br>
       <span style="font-weight: bold;"><span style="font-style: italic;"><a name="copy"></a> Can dar help copy a large directory tree?</span><span style="font-style: italic; font-weight: bold;"> </span><br>
