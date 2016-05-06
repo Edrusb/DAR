@@ -1365,7 +1365,7 @@ namespace libdar
 
     void sar::hook_execute(const infinint &num)
     {
-        if(hook != "")
+        if(hook != "" && natural_destruction)
         {
 	    try
 	    {
