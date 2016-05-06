@@ -2002,7 +2002,19 @@ namespace libdar
 
 		    // *********** closing the archive ******************** //
 
-		stack.clear(); // closing all generic_files remaining in the stack
+		    // closing all generic_files remaining in the stack
+		try
+		{
+		    stack.terminate();
+			// this way we can propagate exceptions
+			// and clear() the stack at the same time
+		}
+		catch(...)
+		{
+		    stack.clear();
+		    throw;
+		}
+		stack.clear();
 
 		thr_cancel.block_delayed_cancellation(false);
 		    // release pending delayed cancellation (if any)
