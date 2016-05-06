@@ -1837,7 +1837,19 @@ namespace libdar
 	if(info_details)
 	    dialog.warning(gettext("Closing archive low layer..."));
 
-	layers.clear(); // closing all generic_files remaining in the layers
+	    // closing all generic_files remaining in the layers
+	try
+	{
+	    layers.terminate();
+		// this way we can propagate exceptions
+		// and clear() the layers at the same time
+	}
+	catch(...)
+	{
+	    layers.clear();
+	    throw;
+	}
+	layers.clear();
 
 	if(info_details)
 	    dialog.warning(gettext("Archive is closed."));

@@ -98,9 +98,9 @@ namespace libdar
         {
             last_acc = last_access;
             last_mod = last_modif;
-            last_cha = new (get_pool()) datetime(last_change);
+	    last_cha = last_change;
             fs_dev = new (get_pool()) infinint(fs_device);
-            if(last_cha == nullptr || fs_dev == nullptr)
+            if(fs_dev == nullptr)
                 throw Ememory("cat_inode::cat_inode");
         }
         catch(...)
@@ -187,9 +187,7 @@ namespace libdar
 
 	    if(reading_ver >= 8)
 	    {
-		last_cha = new (get_pool()) datetime(*ptr, reading_ver);
-		if(last_cha == nullptr)
-		    throw Ememory("cat_inode::cat_inode(file)");
+		last_cha.read(*ptr, reading_ver);
 
 		if(ea_saved == ea_full)
 		{
@@ -201,6 +199,7 @@ namespace libdar
 	    else // archive format <= 7
 	    {
 		    // ea_size stays nullptr meaning EA size unknown (old format)
+		last_cha.nullify();
 	    }
 
 	    if(!small) // reading a full entry from catalogue
@@ -218,9 +217,7 @@ namespace libdar
 			if(ea_crc == nullptr)
 			    throw SRC_BUG;
 
-			last_cha = new (get_pool()) datetime(*ptr, reading_ver);
-			if(last_cha == nullptr)
-			    throw Ememory("cat_inode::cat_inode(file)");
+			last_cha.read(*ptr, reading_ver);
 		    }
 		    else // archive format >= 8
 		    {
@@ -233,18 +230,14 @@ namespace libdar
 		case ea_fake:
 		    if(reading_ver <= 7)
 		    {
-			last_cha = new (get_pool()) datetime(*ptr, reading_ver);
-			if(last_cha == nullptr)
-			    throw Ememory("cat_inode::cat_inode(file)");
+			last_cha.read(*ptr, reading_ver);
 		    }
 		    break;
 		case ea_none:
 		case ea_removed:
 		    if(reading_ver <= 7)
 		    {
-			last_cha = new (get_pool()) datetime();
-			if(last_cha == nullptr)
-			    throw Ememory("cat_inode::cat_inode(file)");
+			last_cha.nullify();
 		    }
 		    break;
 		default:
@@ -576,9 +569,7 @@ namespace libdar
         ptr->write((char *)&tmp, sizeof(tmp));
         last_acc.dump(*ptr);
         last_mod.dump(*ptr);
-        if(last_cha == nullptr)
-            throw SRC_BUG;
-        last_cha->dump(*ptr);
+        last_cha.dump(*ptr);
 
 	    // EA part
 
@@ -958,22 +949,6 @@ namespace libdar
             return false;
     }
 
-    datetime cat_inode::get_last_change() const
-    {
-        if(last_cha == nullptr)
-            throw SRC_BUG;
-        else
-            return *last_cha;
-    }
-
-    void cat_inode::set_last_change(const datetime & x_time)
-    {
-        if(last_cha == nullptr)
-            throw SRC_BUG;
-        else
-            *last_cha = x_time;
-    }
-
     void cat_inode::fsa_set_saved_status(fsa_status status)
     {
 	if(status == fsa_saved)
@@ -1316,7 +1291,6 @@ namespace libdar
 
     void cat_inode::nullifyptr()
     {
-        last_cha = nullptr;
         ea_offset = nullptr;
 	ea = nullptr;
 	ea_size = nullptr;
@@ -1331,11 +1305,6 @@ namespace libdar
 
     void cat_inode::destroy()
     {
-        if(last_cha != nullptr)
-        {
-            delete last_cha;
-            last_cha = nullptr;
-        }
         if(ea_offset != nullptr)
         {
             delete ea_offset;
@@ -1409,7 +1378,7 @@ namespace libdar
 	    perm = ref.perm;
 	    last_acc = ref.last_acc;
 	    last_mod = ref.last_mod;
-	    copy_ptr(ref.last_cha, last_cha, get_pool());
+	    last_cha = ref.last_cha;
 	    xsaved = ref.xsaved;
 	    ea_saved = ref.ea_saved;
 	    fsa_saved = ref.fsa_saved;

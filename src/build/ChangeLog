@@ -1,8 +1,13 @@
-from 2.5.5 to 2.5.4
+from 2.5.4 to 2.5.5
 - fixed the displayed message when reading old archives
 - fixed bug that avoided dar-2.5.x code to read old archive format when
   special allocation was set (by defaut) at compilation time
 - disabling special-alloc by default
+- fixed error in FAQ about the way ctime/atime/mtime are modified during
+  normal operating system life.
+- exiting with error code 6 when DUC command failed to execute (due to
+  system error) or exit with an error code, when the created archive
+  does not use slicing
 
 from 2.5.3 to 2.5.4
 - fixing missing included files for libdar API
@@ -189,7 +194,12 @@ from 2.4.x to 2.5.0
   slightly improves randomness of IV and stay available when libgcrypt is
   run in FIPS mode
 
-from 2.4.21 to 2.4.20
+from 2.4.21 to 2.4.22
+- exiting with error code 6 when DUC command failed to execute (due to
+  system error) or exit with an error code, when the created archive
+  does not use slicing
+
+from 2.4.20 to 2.4.21
 - removed sanity check that caused problem when writing an archive to a
   FUSE based filesystem.
 - fixed bug in dar_manager: archive permutation in database lead libdar
