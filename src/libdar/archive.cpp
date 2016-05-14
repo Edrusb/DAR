@@ -1282,6 +1282,9 @@ namespace libdar
 		label internal_name;
 		slice_layout isol_slices;
 
+		if(!exploitable && options.get_delta_signature())
+		    throw Erange("archive::op_isolate", gettext("Isolation with delta signature is not possible on a just created archive (on-fly isolation)"));
+
 		do
 		{
 		    isol_data_name.generate_internal_filename();
