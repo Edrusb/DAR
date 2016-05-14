@@ -39,6 +39,7 @@
 #include "entrepot.hpp"
 #include "fsa_family.hpp"
 #include "on_pool.hpp"
+#include "compile_time_features.hpp"
 
 #include <string>
 
@@ -495,7 +496,7 @@ namespace libdar
 	    /// whether binary delta has to be computed for differential/incremental backup
 	    ///
 	    /// \note this requires delta signature to be present in the archive of reference
-	void set_delta_diff(bool val) { x_delta_diff = val; };
+	void set_delta_diff(bool val) { if(val && !compile_time::librsync()) throw Ecompilation("librsync"); x_delta_diff = val; };
 
 	    /// whether signature to base binary delta on the future has to be calculated and stored beside saved files
 	void set_delta_signature(bool val) { x_delta_signature = val; };
