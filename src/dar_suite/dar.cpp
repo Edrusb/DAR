@@ -429,9 +429,11 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    isolate_options.set_user_comment(param.user_comment);
 			    isolate_options.set_sequential_marks(param.use_sequential_marks);
 			    isolate_options.set_multi_threaded(param.multi_threaded);
-			    isolate_options.set_delta_signature(param.delta_sig);
-				// we do not use include/exclude delta sig nor delta_sig_min_size
-				// for on-fly isolation
+
+				// copying delta sig is not possible in on-fly isolation,
+				// archive must be closed and re-open in read mode to be able
+				// to fetch delta signatures
+			    isolate_options.set_delta_signature(false);
 
 			    cur->op_isolate(dialog,
 					    *param.aux_root,
