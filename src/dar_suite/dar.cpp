@@ -131,9 +131,9 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 						      recipients);
 		    if(param.op == merging && param.aux_root != nullptr && param.info_details)
 			dialog.warning(gettext("Considering the (first) archive of reference:"));
-		    if(param.use_sequential_marks)
-			param.delta_diff = false;
-			// libdar would complain and avoid the operation if differential backup is asked
+		    if(param.sequential_read && param.delta_diff)
+			throw Erange("little_main",gettext("Sequential reading of the archive of reference is not possible when delta difference is requested, you need to read the archive of reference in direct access mode (default mode)"));
+
 
 		    read_options.clear();
 		    if(no_cipher_given)
