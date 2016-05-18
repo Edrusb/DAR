@@ -1323,7 +1323,7 @@ namespace libdar
 					   const crit_action *x_overwrite,
 					   bool x_only_overwrite,
 					   const fsa_scope & scope) :
-	mem_ui(&dialog), filesystem_hard_link_write(dialog), filesystem_hard_link_read(dialog, true, scope)
+	mem_ui(&dialog), filesystem_hard_link_write(dialog), filesystem_hard_link_read(dialog, compile_time::furtive_read(), scope)
     {
 	fs_root = nullptr;
 	ea_mask = nullptr;

@@ -54,6 +54,7 @@ extern "C"
 #include "fsa_family.hpp"
 #include "on_pool.hpp"
 #include "cat_all_entrees.hpp"
+#include "compile_time_features.hpp"
 
 namespace libdar
 {
@@ -307,7 +308,7 @@ namespace libdar
 			   bool x_only_overwrite,
 			   const fsa_scope & scope);
 	    /// copy constructor is forbidden (throws an exception)
-        filesystem_restore(const filesystem_restore & ref) : mem_ui(ref), filesystem_hard_link_write(ref), filesystem_hard_link_read(get_ui(), true, get_fsa_scope()) { throw SRC_BUG; };
+        filesystem_restore(const filesystem_restore & ref) : mem_ui(ref), filesystem_hard_link_write(ref), filesystem_hard_link_read(get_ui(), compile_time::furtive_read(), get_fsa_scope()) { throw SRC_BUG; };
 	    /// assignment operator is forbidden (throws an exception)
         const filesystem_restore & operator = (const filesystem_restore  & ref) { throw SRC_BUG; };
 	    /// destructor
