@@ -8,6 +8,12 @@ from 2.5.4 to 2.5.5
 - exiting with error code 6 when DUC command failed to execute (due to
   system error) or exit with an error code, when the created archive
   does not use slicing
+- new implementation of class datetime with better memory footprint
+  but at the cost of slightly additionnal CPU cycle
+- avoding storing sub-microsecond part of date to preserve limitint
+  ability to store large dates
+- moving field cat_inode::last_cha from pointed to field to plain field
+  of the class, this slightly reduce catalogue memory footprint.
 
 from 2.5.3 to 2.5.4
 - fixing missing included files for libdar API

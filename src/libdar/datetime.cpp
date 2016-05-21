@@ -45,13 +45,22 @@ namespace libdar
 	    return true;
 
 	if(uni < ref.uni)
-	    return val < get_scaling_factor(ref.uni, uni)*ref.val;
+	{
+	    infinint newval, reste;
+	    euclide(val, get_scaling_factor(ref.uni, uni), newval, reste);
+	    return newval < ref.val;
+	}
 
 	if(uni == ref.uni)
 	    return val < ref.val;
-
-	    // uni > ref.uni
-	return val*get_scaling_factor(uni, ref.uni) < ref.val;
+	else
+	{
+		// uni > ref.uni
+	    infinint newval, reste;
+	    euclide(ref.val, get_scaling_factor(uni, ref.uni), newval, reste);
+	    return (val == newval && !reste.is_zero())
+		|| val < newval;
+	}
     }
 
     bool datetime::operator == (const datetime & ref) const
@@ -60,56 +69,48 @@ namespace libdar
 	    // fields are always reduced to the larger possible unit
     }
 
-    datetime datetime::operator - (const datetime & ref) const
+    void datetime::operator -= (const datetime & ref)
     {
-	datetime ret = *this;
-
-	if(ref.uni < ret.uni)
+	if(ref.uni < uni)
 	{
-	    ret.uni = ref.uni;
-	    ret.val *= get_scaling_factor(ret.uni, ref.uni);
+	    val *= get_scaling_factor(uni, ref.uni);
+	    uni = ref.uni;
 	}
 
-	if(ref.uni == ret.uni)
+	if(ref.uni == uni)
 	{
-	    if(ret.val < ref.val)
+	    if(val < ref.val)
 		throw SRC_BUG;
-	    ret.val -= ref.val;
+	    val -= ref.val;
 	}
-	else // ref.uni > ret.uni
+	else // ref.uni > uni
 	{
-	    infinint tmp = ref.val * get_scaling_factor(ref.uni, ret.uni);
-	    if(tmp > ret.val)
+	    infinint tmp = ref.val * get_scaling_factor(ref.uni, uni);
+	    if(tmp > val)
 		throw SRC_BUG;
-	    ret.val -= tmp;
+	    val -= tmp;
 	}
 
 	reduce_to_largest_unit();
-
-	return ret;
     }
 
-    datetime datetime::operator + (const datetime & ref) const
+    void datetime::operator += (const datetime & ref)
     {
-	datetime ret = *this;
-
-	if(ref.uni < ret.uni)
+	if(ref.uni < uni)
 	{
-	    ret.uni = ref.uni;
-	    ret.val *= get_scaling_factor(ret.uni, ref.uni);
+	    val *= get_scaling_factor(uni, ref.uni);
+	    uni = ref.uni;
 	}
 
-	if(ref.uni == ret.uni)
-	    ret.val += ref.val;
-	else // ref.uni > ret.uni
+	if(ref.uni == uni)
+	    val += ref.val;
+	else // ref.uni > uni
 	{
-	    infinint tmp = ref.val * get_scaling_factor(ref.uni, ret.uni);
-	    ret.val += tmp;
+	    infinint tmp = ref.val * get_scaling_factor(ref.uni, uni);
+	    val += tmp;
 	}
 
 	reduce_to_largest_unit();
-
-	return ret;
     }
 
     datetime datetime::loose_diff(const datetime & ref) const
@@ -166,35 +167,43 @@ namespace libdar
 	if(me == nullptr)
 	    throw SRC_BUG;
 
-	switch(uni)
+	if(val.is_zero())
 	{
-	case tu_nanosecond:
-	    euclide(val, get_scaling_factor(tu_microsecond, uni), newval, reste);
-	    if(!reste.is_zero())
-		break; // cannot reduce the unit further
-	    else
-	    {
-		me->val = newval;
-		me->uni = tu_microsecond;
-	    }
-		/* no break ! */
-	case tu_microsecond:
-	    euclide(val, get_scaling_factor(tu_second, uni), newval, reste);
-	    if(!reste.is_zero())
-		break; // cannot reduce the unit further
-	    else
-	    {
-		me->val = newval;
+	    if(uni != tu_second)
 		me->uni = tu_second;
+	}
+	else
+	{
+	    switch(uni)
+	    {
+	    case tu_nanosecond:
+		euclide(val, get_scaling_factor(tu_microsecond, uni), newval, reste);
+		if(!reste.is_zero())
+		    break; // cannot reduce the unit further
+		else
+		{
+		    me->val = newval;
+		    me->uni = tu_microsecond;
+		}
+		    /* no break ! */
+	    case tu_microsecond:
+		euclide(val, get_scaling_factor(tu_second, uni), newval, reste);
+		if(!reste.is_zero())
+		    break; // cannot reduce the unit further
+		else
+		{
+		    me->val = newval;
+		    me->uni = tu_second;
+		}
+		    /* no break ! */
+	    case tu_second:
+		    // cannot reduce further as
+		    // this is the largest known time unit
+		    // so we break here
+		break;
+	    default:
+		throw SRC_BUG;
 	    }
-		/* no break ! */
-	case tu_second:
-		// cannot reduce further as
-		// this is the largest known time unit
-		// so we break here
-	    break;
-	default:
-	    throw SRC_BUG;
 	}
     }
 
@@ -258,7 +267,7 @@ namespace libdar
     {
 	infinint sub, sec;
 
-	get_value(sub, sec, unit);
+	get_value(sec, sub, unit);
 
 	second = 0;
 	sec.unstack(second);
