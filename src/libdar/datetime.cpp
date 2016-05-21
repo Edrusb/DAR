@@ -45,13 +45,22 @@ namespace libdar
 	    return true;
 
 	if(uni < ref.uni)
-	    return val < get_scaling_factor(ref.uni, uni)*ref.val;
+	{
+	    infinint newval, reste;
+	    euclide(val, get_scaling_factor(ref.uni, uni), newval, reste);
+	    return newval < ref.val;
+	}
 
 	if(uni == ref.uni)
 	    return val < ref.val;
-
-	    // uni > ref.uni
-	return val*get_scaling_factor(uni, ref.uni) < ref.val;
+	else
+	{
+		// uni > ref.uni
+	    infinint newval, reste;
+	    euclide(ref.val, get_scaling_factor(uni, ref.uni), newval, reste);
+	    return (val == newval && !reste.is_zero())
+		|| val < newval;
+	}
     }
 
     bool datetime::operator == (const datetime & ref) const
