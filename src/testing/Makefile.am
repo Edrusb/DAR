@@ -20,7 +20,7 @@ else
 endif
 
 
-noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_special_alloc test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_escape test_hash_fichier moving_file make_sparse_file hashsum test_crypto_asym test_range $(LIBTHREADAR_TEST_MODULES) test_smart_pointer
+noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_special_alloc test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_escape test_hash_fichier moving_file make_sparse_file hashsum test_crypto_asym test_range $(LIBTHREADAR_TEST_MODULES) test_smart_pointer test_datetime
 #test_rsync has been removed from noinst_PROGRAMS due to a bug in librsync... feature postponed to branch 2.6.x
 
 AM_LDFLAGS = -all-static @LTLIBINTL@
@@ -148,3 +148,7 @@ test_generic_thread_DEPENDENCIES = ../libdar/$(MYLIB).la
 test_smart_pointer_SOURCES = test_smart_pointer.cpp
 test_smart_pointer_LDADD = ../dar_suite/shell_interaction.o $(LDADD)
 test_smart_pointer_DEPENDENCIES = ../libdar/$(MYLIB).la
+
+test_datetime_SOURCES = test_datetime.cpp
+test_datetime_LDADD = ../dar_suite/shell_interaction.o $(LDADD)
+test_datetime_DEPENDENCIES = ../libdar/$(MYLIB).la
