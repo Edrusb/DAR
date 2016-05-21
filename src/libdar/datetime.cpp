@@ -158,35 +158,43 @@ namespace libdar
 	if(me == nullptr)
 	    throw SRC_BUG;
 
-	switch(uni)
+	if(val.is_zero())
 	{
-	case tu_nanosecond:
-	    euclide(val, get_scaling_factor(tu_microsecond, uni), newval, reste);
-	    if(!reste.is_zero())
-		break; // cannot reduce the unit further
-	    else
-	    {
-		me->val = newval;
-		me->uni = tu_microsecond;
-	    }
-		/* no break ! */
-	case tu_microsecond:
-	    euclide(val, get_scaling_factor(tu_second, uni), newval, reste);
-	    if(!reste.is_zero())
-		break; // cannot reduce the unit further
-	    else
-	    {
-		me->val = newval;
+	    if(uni != tu_second)
 		me->uni = tu_second;
+	}
+	else
+	{
+	    switch(uni)
+	    {
+	    case tu_nanosecond:
+		euclide(val, get_scaling_factor(tu_microsecond, uni), newval, reste);
+		if(!reste.is_zero())
+		    break; // cannot reduce the unit further
+		else
+		{
+		    me->val = newval;
+		    me->uni = tu_microsecond;
+		}
+		    /* no break ! */
+	    case tu_microsecond:
+		euclide(val, get_scaling_factor(tu_second, uni), newval, reste);
+		if(!reste.is_zero())
+		    break; // cannot reduce the unit further
+		else
+		{
+		    me->val = newval;
+		    me->uni = tu_second;
+		}
+		    /* no break ! */
+	    case tu_second:
+		    // cannot reduce further as
+		    // this is the largest known time unit
+		    // so we break here
+		break;
+	    default:
+		throw SRC_BUG;
 	    }
-		/* no break ! */
-	case tu_second:
-		// cannot reduce further as
-		// this is the largest known time unit
-		// so we break here
-	    break;
-	default:
-	    throw SRC_BUG;
 	}
     }
 
