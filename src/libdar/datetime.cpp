@@ -60,56 +60,48 @@ namespace libdar
 	    // fields are always reduced to the larger possible unit
     }
 
-    datetime datetime::operator - (const datetime & ref) const
+    void datetime::operator -= (const datetime & ref)
     {
-	datetime ret = *this;
-
-	if(ref.uni < ret.uni)
+	if(ref.uni < uni)
 	{
-	    ret.uni = ref.uni;
-	    ret.val *= get_scaling_factor(ret.uni, ref.uni);
+	    val *= get_scaling_factor(uni, ref.uni);
+	    uni = ref.uni;
 	}
 
-	if(ref.uni == ret.uni)
+	if(ref.uni == uni)
 	{
-	    if(ret.val < ref.val)
+	    if(val < ref.val)
 		throw SRC_BUG;
-	    ret.val -= ref.val;
+	    val -= ref.val;
 	}
-	else // ref.uni > ret.uni
+	else // ref.uni > uni
 	{
-	    infinint tmp = ref.val * get_scaling_factor(ref.uni, ret.uni);
-	    if(tmp > ret.val)
+	    infinint tmp = ref.val * get_scaling_factor(ref.uni, uni);
+	    if(tmp > val)
 		throw SRC_BUG;
-	    ret.val -= tmp;
+	    val -= tmp;
 	}
 
 	reduce_to_largest_unit();
-
-	return ret;
     }
 
-    datetime datetime::operator + (const datetime & ref) const
+    void datetime::operator += (const datetime & ref)
     {
-	datetime ret = *this;
-
-	if(ref.uni < ret.uni)
+	if(ref.uni < uni)
 	{
-	    ret.uni = ref.uni;
-	    ret.val *= get_scaling_factor(ret.uni, ref.uni);
+	    val *= get_scaling_factor(uni, ref.uni);
+	    uni = ref.uni;
 	}
 
-	if(ref.uni == ret.uni)
-	    ret.val += ref.val;
-	else // ref.uni > ret.uni
+	if(ref.uni == uni)
+	    val += ref.val;
+	else // ref.uni > uni
 	{
-	    infinint tmp = ref.val * get_scaling_factor(ref.uni, ret.uni);
-	    ret.val += tmp;
+	    infinint tmp = ref.val * get_scaling_factor(ref.uni, uni);
+	    val += tmp;
 	}
 
 	reduce_to_largest_unit();
-
-	return ret;
     }
 
     datetime datetime::loose_diff(const datetime & ref) const
