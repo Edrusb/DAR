@@ -619,8 +619,8 @@ namespace libdar
 	{
 	    fsa_time * ptr = nullptr;
 #ifdef LIBDAR_MICROSECOND_READ_ACCURACY
-	    datetime birthtime = datetime(tmp.st_birthtim.tv_sec, tmp.st_birthtim.tv_nsec, datetime::tu_nanosecond);
-	    if(birthtime.is_null())
+	    datetime birthtime = datetime(tmp.st_birthtim.tv_sec, tmp.st_birthtim.tv_nsec/1000, datetime::tu_microsecond);
+	    if(birthtime.is_null()) // assuming an error avoids getting time that way
 		birthtime = datetime(tmp.st_birthtime, 0, datetime::tu_second);
 #else
 	    datetime birthtime = datetime(tmp.st_birthtime, 0, datetime::tu_second);
