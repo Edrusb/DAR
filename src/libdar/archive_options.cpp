@@ -684,11 +684,16 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_destroy_mask(x_delta_mask);
-	    x_delta_mask = delta_mask.clone();
-	    if(x_delta_mask == nullptr)
-		throw Ememory("archive_options_create::set_delta_mask");
-	    has_delta_mask_been_set = true;
+	    if(!compile_time::librsync())
+		throw Ecompilation("librsync");
+	    else
+	    {
+		archive_option_destroy_mask(x_delta_mask);
+		x_delta_mask = delta_mask.clone();
+		if(x_delta_mask == nullptr)
+		    throw Ememory("archive_options_create::set_delta_mask");
+		has_delta_mask_been_set = true;
+	    }
 	}
 	catch(...)
 	{
@@ -907,11 +912,16 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_destroy_mask(x_delta_mask);
-	    x_delta_mask = delta_mask.clone();
-	    if(x_delta_mask == nullptr)
-		throw Ememory("archive_options_create::set_delta_mask");
-	    has_delta_mask_been_set = true;
+	    if(!compile_time::librsync())
+		throw Ecompilation("librsync");
+	    else
+	    {
+		archive_option_destroy_mask(x_delta_mask);
+		x_delta_mask = delta_mask.clone();
+		if(x_delta_mask == nullptr)
+		    throw Ememory("archive_options_create::set_delta_mask");
+		has_delta_mask_been_set = true;
+	    }
 	}
 	catch(...)
 	{

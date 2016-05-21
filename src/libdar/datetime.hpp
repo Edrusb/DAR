@@ -82,8 +82,10 @@ namespace libdar
 	bool operator <= (const datetime & ref) const { return ref >= *this; };
 
 	    // arithmetic on time
-	datetime operator - (const datetime & ref) const;
-	datetime operator + (const datetime & ref) const;
+	void operator -= (const datetime & ref);
+	void operator += (const datetime & ref);
+	datetime operator - (const datetime & ref) const { datetime tmp(*this); tmp -= ref; return tmp; };
+	datetime operator + (const datetime & ref) const { datetime tmp(*this); tmp += ref; return tmp; };
 
 	    /// at the difference of operator - provides the difference using the less precise unit used between the two elements
 	datetime loose_diff(const datetime & ref) const;

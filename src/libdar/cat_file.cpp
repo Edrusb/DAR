@@ -892,15 +892,15 @@ namespace libdar
     bool cat_file::get_patch_base_crc(const crc * & c) const
     {
 	if(delta_sig == nullptr)
-	    throw SRC_BUG;
-
-	if(delta_sig->has_patch_base_crc())
-	{
-	    delta_sig->get_patch_base_crc(c);
-	    return true;
-	}
-	else
 	    return false;
+	else
+	    if(delta_sig->has_patch_base_crc())
+	    {
+		delta_sig->get_patch_base_crc(c);
+		return true;
+	    }
+	    else
+		return false;
     }
 
     void cat_file::set_patch_base_crc(const crc & c)

@@ -146,7 +146,7 @@ struct line_param
 	// constructor for line_param
     line_param()
     {
-	fs_root= nullptr;
+	fs_root = nullptr;
 	sauv_root = nullptr;
 	ref_root = nullptr;
 	selection = nullptr;

@@ -1938,7 +1938,7 @@ namespace libdar
         }
 
 #ifdef LIBDAR_MICROSECOND_READ_ACCURACY
-        datetime val = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec, datetime::tu_nanosecond);
+        datetime val = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec/1000, datetime::tu_microsecond);
         if(val.is_null()) // assuming an error avoids getting time that way
             val = datetime(buf.st_mtime, 0, datetime::tu_second);
 #else
@@ -1976,7 +1976,7 @@ namespace libdar
         }
 
 #ifdef LIBDAR_MICROSECOND_READ_ACCURACY
-        datetime ret = datetime(buf.st_ctim.tv_sec, buf.st_ctim.tv_nsec, datetime::tu_nanosecond);
+        datetime ret = datetime(buf.st_ctim.tv_sec, buf.st_ctim.tv_nsec/1000, datetime::tu_microsecond);
         if(ret.is_null()) // assuming an error avoids getting time that way
             ret = datetime(buf.st_ctime, 0, datetime::tu_second);
 #else

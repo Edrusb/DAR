@@ -878,7 +878,7 @@ But in any case, without
 --delta sig
 the resulting archive will hold no delta signature. Note that delta signature transfer is not possible when the archive of reference is read in sequential mode, thus delta signature is disabled when the archive of reference is read in sequential mode.
 .P
-For isolation and merging operations the behavior is sligthly different:
+For isolation and merging operations, the behavior is sligthly different:
 .B
 --delta sig
 option let dar transfer existing delta signatures from the original archive to the isolated/merged one but does not lead dar to compute delta signatures for files that do not have one, unless one of the
@@ -887,7 +887,7 @@ option let dar transfer existing delta signatures from the original archive to t
 or
 .B
 --exclude-delta-sig
-option is specified; in that case the delta signatures are transfered/dropped and if not present calculated accordingly to these mask options. However note that it is not possible to calculate delta signature for unsaved files in the archive of reference (because the archive of reference does not hold their data) as well as for fully saved files when merging is performed keeping files compressed (see -ak option). Another restriction while merging concernes sparse files, it is not possible to calculate binary signature for file stored as sparse files, but if sparse file detection mechanism is activated at merging time, delta signature can be calculated for sparse files too even if it is missing in the reference archive. In short: if you want recalculation of delta signature while merging, do not keep file compressed (do not use -ak option) and if you want to avoid having sparse files excluded from the delta signature recalcutation, activate sparse file detection (use -ah option).
+option is specified; in that case the delta signatures are transfered/dropped and if not present calculated accordingly to these mask options. However note that it is not possible to calculate delta signature for unsaved files in the archive of reference (because the archive of reference does not hold their data) as well as for fully saved files when merging is performed keeping files compressed (see -ak option). Another restriction while merging concernes sparse files, it is not possible to calculate binary signature for file stored as sparse files, but if sparse file detection mechanism is activated at merging time, delta signature can be calculated for sparse files too even if it is missing in the reference archive. In short: if you want recalculation of delta signature while merging, do not keep file compressed (do not use -ak option) and if you want to avoid having sparse files excluded from the delta signature recalcutation, activate sparse file detection (use -ah option). Delta signature transfer is not possible for on-fly isolation, you need to do normal atchive isolation to obtain an isolated catalogue with delta signatures.
 .RE
 .TP 20
 -{, --include-delta-sig <mask>

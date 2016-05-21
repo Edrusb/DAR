@@ -131,9 +131,9 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 						      recipients);
 		    if(param.op == merging && param.aux_root != nullptr && param.info_details)
 			dialog.warning(gettext("Considering the (first) archive of reference:"));
-		    if(param.use_sequential_marks)
-			param.delta_diff = false;
-			// libdar would complain and avoid the operation if differential backup is asked
+		    if(param.sequential_read && param.delta_diff)
+			throw Erange("little_main",gettext("Sequential reading of the archive of reference is not possible when delta difference is requested, you need to read the archive of reference in direct access mode (default mode)"));
+
 
 		    read_options.clear();
 		    if(no_cipher_given)
@@ -429,9 +429,11 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    isolate_options.set_user_comment(param.user_comment);
 			    isolate_options.set_sequential_marks(param.use_sequential_marks);
 			    isolate_options.set_multi_threaded(param.multi_threaded);
-			    isolate_options.set_delta_signature(param.delta_sig);
-				// we do not use include/exclude delta sig nor delta_sig_min_size
-				// for on-fly isolation
+
+				// copying delta sig is not possible in on-fly isolation,
+				// archive must be closed and re-open in read mode to be able
+				// to fetch delta signatures
+			    isolate_options.set_delta_signature(false);
 
 			    cur->op_isolate(dialog,
 					    *param.aux_root,

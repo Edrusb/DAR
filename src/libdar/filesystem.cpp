@@ -214,15 +214,15 @@ namespace libdar
 	    else
 	    {
 #ifdef LIBDAR_MICROSECOND_READ_ACCURACY
-		datetime atime = datetime(buf.st_atim.tv_sec, buf.st_atim.tv_nsec, datetime::tu_nanosecond);
-		datetime mtime = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec, datetime::tu_nanosecond);
-		datetime ctime = datetime(buf.st_ctim.tv_sec, buf.st_ctim.tv_nsec, datetime::tu_nanosecond);
+		datetime atime = datetime(buf.st_atim.tv_sec, buf.st_atim.tv_nsec/1000, datetime::tu_microsecond);
+		datetime mtime = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec/1000, datetime::tu_microsecond);
+		datetime ctime = datetime(buf.st_ctim.tv_sec, buf.st_ctim.tv_nsec/1000, datetime::tu_microsecond);
 
-		if(atime.is_null())
+		if(atime.is_null()) // assuming an error avoids getting time that way
 		    atime = datetime(buf.st_atime, 0, datetime::tu_second);
-		if(mtime.is_null())
+		if(mtime.is_null()) // assuming an error avoids getting time that way
 		    mtime = datetime(buf.st_mtime, 0, datetime::tu_second);
-		if(ctime.is_null())
+		if(ctime.is_null()) // assuming an error avoids getting time that way
 		    ctime = datetime(buf.st_ctime, 0, datetime::tu_second);
 #else
 		datetime atime = datetime(buf.st_atime, 0, datetime::tu_second);
@@ -1323,7 +1323,7 @@ namespace libdar
 					   const crit_action *x_overwrite,
 					   bool x_only_overwrite,
 					   const fsa_scope & scope) :
-	mem_ui(&dialog), filesystem_hard_link_write(dialog), filesystem_hard_link_read(dialog, true, scope)
+	mem_ui(&dialog), filesystem_hard_link_write(dialog), filesystem_hard_link_read(dialog, compile_time::furtive_read(), scope)
     {
 	fs_root = nullptr;
 	ea_mask = nullptr;
