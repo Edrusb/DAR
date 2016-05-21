@@ -258,7 +258,7 @@ namespace libdar
     {
 	infinint sub, sec;
 
-	get_value(sub, sec, unit);
+	get_value(sec, sub, unit);
 
 	second = 0;
 	sec.unstack(second);
