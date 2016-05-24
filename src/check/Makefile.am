@@ -19,13 +19,15 @@ else
 endif
 endif
 
-dist_noinst_DATA = build_tree.sh main.sh modif_tree.sh routine.sh loop.sh
+helpers = build_tree.sh main.sh modif_tree.sh routine.sh loop.sh
+
+dist_noinst_DATA = $(helpers) Old_format/archive_03.1.dar Old_format/archive_04.1.dar Old_format/archive_05.1.dar Old_format/archive_06.1.dar Old_format/archive_07.1.dar Old_format/archive_08.1.dar Old_format/archive_08-1.1.dar Old_format/archive_09.1.dar
 noinst_PROGRAMS = all_features padder
 LDADD = -L../libdar ../libdar/$(MYLIB).la $(GPGME_LIBS)
 AM_LDFLAGS = @LTLIBINTL@
 
 check-local:
-	chmod a+x $(dist_noinst_DATA) loop.sh
+	chmod a+x $(helpers)
 	./loop.sh
 
 all_features_SOURCES = all_features.cpp
@@ -35,6 +37,6 @@ all_features_DEPENDENCIES = ../libdar/$(MYLIB).la
 padder_SOURCES = padder.cpp
 
 clean-local:
-	chmod u+x $(dist_noinst_DATA)
+	chmod u+x $(helpers)
 	if [ -x /bin/bash ] ; then OPT=tmp.file DAR=none ./routine.sh NONE ; fi
 	rm -f tmp.file
