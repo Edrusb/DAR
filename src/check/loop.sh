@@ -1,5 +1,6 @@
 #!/bin/sh
 
+CWD=`pwd`
 
 if [ ! -x ../dar_suite/dar ] ; then
   echo "********************************************"
@@ -9,7 +10,7 @@ if [ ! -x ../dar_suite/dar ] ; then
   echo "********************************************"
   exit 2
 else
-  export DAR=../dar_suite/dar
+  export DAR=$CWD/../dar_suite/dar
 fi
 
 if [ ! -x ../dar_suite/dar_slave ] ; then
@@ -20,7 +21,7 @@ if [ ! -x ../dar_suite/dar_slave ] ; then
   echo "********************************************"
   exit 2
 else
-  export DAR_SLAVE=../dar_suite/dar_slave
+  export DAR_SLAVE=$CWD/../dar_suite/dar_slave
 fi
 
 if [ ! -x ../dar_suite/dar_xform ] ; then
@@ -31,7 +32,7 @@ if [ ! -x ../dar_suite/dar_xform ] ; then
   echo "********************************************"
   exit 2
 else
-  export DAR_XFORM=../dar_suite/dar_xform
+  export DAR_XFORM=$CWD/../dar_suite/dar_xform
 fi
 
 if [ ! -x ./all_features ] ; then

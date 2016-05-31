@@ -235,7 +235,7 @@ clean
 #   A1 -  operations on a single archive
 #
 if echo $* | grep "A1" > /dev/null ; then
-./build_tree.sh $src "U"
+../build_tree.sh $src "U"
 GO "A1-1" 0 $ROUTINE_DEBUG $DAR -N -c $full -R $src "-@" $catf_fly -B $OPT
 GO "A1-2" 0 $ROUTINE_DEBUG check_hash $hash $full.*.dar
 GO "A1-3" 0 $ROUTINE_DEBUG $DAR -N -l $full -B $OPT
@@ -340,7 +340,7 @@ fi
 #  D1 -    operation with differential backup
 #
 if echo $* | grep "D1" > /dev/null ; then
-./modif_tree.sh "$src" "U"
+../modif_tree.sh "$src" "U"
 GO "D1-1" 0 $ROUTINE_DEBUG $DAR -N -c $diff -R $src -A $full "-@" $catd_fly  -B $OPT
 GO "D1-2" 0 $ROUTINE_DEBUG check_hash $hash $diff.*.dar
 GO "D1-3" 0 $ROUTINE_DEBUG $DAR -N -l $diff -B $OPT
@@ -388,7 +388,7 @@ fi
 # F1 - merging full archives
 #
 if echo $* | grep "F1" > /dev/null ; then
-./build_tree.sh $src2 "V"
+../build_tree.sh $src2 "V"
 GO "F1-1" 0 $ROUTINE_DEBUG $DAR -N -c $full2 -R $src2  -B $OPT
 GO "F1-2" 0 $ROUTINE_DEBUG check_hash $hash $full2.*.dar
 GO "F1-3" 0 $ROUTINE_DEBUG $DAR -N -+ $merge_full -A $full "-@" $full2 -B $OPT
@@ -408,7 +408,7 @@ fi
 # F2 - merging diff archives
 #
 if echo $* | grep "F2" > /dev/null ; then
-./modif_tree.sh $src2 "V"
+../modif_tree.sh $src2 "V"
 GO "F2-1" 0 $ROUTINE_DEBUG $DAR -N -c $diff2 -R $src2 -A $full2 -B $OPT
 GO "F2-2" 0 $ROUTINE_DEBUG check_hash $hash $diff2.*.dar
 GO "F2-3" 0 $ROUTINE_DEBUG $DAR -N -+ $merge_diff -A $diff "-@" $diff2 -B $OPT
@@ -452,7 +452,7 @@ fi
 # G1 - using pipe to output the archive
 #
 rm -rf $src
-./build_tree.sh $src "W"
+../build_tree.sh $src "W"
 if echo $* | grep "G1" > /dev/null ; then
 printf "G1-1 = "
 GO "G1-1" 0 piped $DAR -N -c - -R $src "-@" $piped_fly -B $OPT > $piped.$padded_one.dar

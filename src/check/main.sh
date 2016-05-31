@@ -19,6 +19,8 @@ keep_compr="${11}"
 re_hole="${12}"
 asym="${13}"
 
+prefix="prefix_$$"
+
 #echo "crypto = $crypto"
 #echo "zip = $zip"
 #echo "slice = $slice"
@@ -33,6 +35,9 @@ asym="${13}"
 #echo "multi-thread = [$multi_thread]"
 
 ALL_TESTS="A1 B1 B2 B3 B4 C1 C2 C3 C4 D1 E1 E2 E3 F1 F2 F3 G1 G2 G3 H1"
+
+mkdir "$prefix"
+cd "$prefix"
 
 export OPT=tmp.file
 
@@ -109,7 +114,7 @@ if [ "$digit" != "none" ]; then
   min_digits="--min-digit $digit,$digit,$digit"
   export xform_digits="-9 $digit,$digit"
   export slave_digits="-9 $digit"
-  export padded_one=`./padder $digit 1`
+  export padded_one=`../padder $digit 1`
 else
   min_digits=""
   export xform_digits=""
@@ -192,4 +197,10 @@ echo "TESTS PARAMETERS NATURE: thread\thash\t\tcrypto\tzip\tslice\tSlice\ttape-m
 echo "TESTS PARAMETERS VALUE : $multi_thread\t$hash\t$crypto\t$zip\t$slice\t$Slice\t$tape_mark\t\t$seq_read\t$digit\t$sparse\t$keep_compr\t$re_hole\t$asym"
 echo "TEST SET: $ALL_TESTS"
 echo "----------------------------------------------------------------"
-exec ./routine.sh $ALL_TESTS
+
+if ../routine.sh $ALL_TESTS ; then
+  cd ..
+  rm -rf "$prefix"
+else
+  exit 1
+fi
