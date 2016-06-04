@@ -1,19 +1,18 @@
 from 2.5.4 to 2.5.5
-- fixed the displayed message when reading old archives
+- fixed message displayed when reading old archives
 - fixed bug that avoided dar-2.5.x code to read old archive format when
   special allocation was set (by defaut) at compilation time
-- disabling special-alloc by default
+- disabling special-alloc by default reducing memory footprint
 - fixed error in FAQ about the way ctime/atime/mtime are modified during
   normal operating system life.
-- exiting with error code 6 when DUC command failed to execute (due to
-  system error) or exit with an error code, when the created archive
-  does not use slicing
 - new implementation of class datetime with better memory footprint
-  but at the cost of slightly additionnal CPU cycle
 - avoding storing sub-microsecond part of date to preserve limitint
   ability to store large dates
-- moving field cat_inode::last_cha from pointed to field to plain field
+- moving field cat_inode::last_cha from pointer-to-field to plain field
   of the class, this slightly reduce catalogue memory footprint.
+- fixing bug in the returned exit status when dar failed executing DUC
+  command due to system error (now returning the expected code 6 in that
+  case too)
 
 from 2.5.3 to 2.5.4
 - fixing missing included files for libdar API

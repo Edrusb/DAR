@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2016-04-23 22:02+0200\n"
+"POT-Creation-Date: 2016-06-04 23:09+0200\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -998,81 +998,81 @@ msgstr "dåligt strukturerad inod: okänd inodflagga"
 msgid "missing data to build an inode"
 msgstr "data saknas för att bygga en inod"
 
-#: src/libdar/cat_inode.cpp:280
+#: src/libdar/cat_inode.cpp:273
 #, fuzzy
 msgid "badly structured inode: unknown inode flag for FSA"
 msgstr "dåligt strukturerad inod: okänd inodflagga"
 
-#: src/libdar/cat_inode.cpp:394
+#: src/libdar/cat_inode.cpp:387
 msgid "different file type"
 msgstr "annan filtyp"
 
-#: src/libdar/cat_inode.cpp:399
+#: src/libdar/cat_inode.cpp:392
 #, c-format
 msgid "different owner (uid): %i <--> %i"
 msgstr "annan ägare (uid): %i <--> %i"
 
-#: src/libdar/cat_inode.cpp:405
+#: src/libdar/cat_inode.cpp:398
 #, c-format
 msgid "different owner group (gid): %i <--> %i"
 msgstr "annan ägargrupp (gid): %i <--> %i"
 
-#: src/libdar/cat_inode.cpp:411
+#: src/libdar/cat_inode.cpp:404
 #, c-format
 msgid "different permission: %S <--> %S"
 msgstr "andra behörigheter: %S <--> %S"
 
-#: src/libdar/cat_inode.cpp:419
+#: src/libdar/cat_inode.cpp:412
 #, c-format
 msgid "difference of last modification date: %S <--> %S"
 msgstr "skillnad mot senaste ändringsdatum: %S <--> %S"
 
-#: src/libdar/cat_inode.cpp:434
+#: src/libdar/cat_inode.cpp:427
 msgid "different Extended Attributes"
 msgstr "andra Utvidgade Attribut"
 
-#: src/libdar/cat_inode.cpp:440
+#: src/libdar/cat_inode.cpp:433
 msgid "no Extended Attribute to compare with"
 msgstr "inga Utvidgade Attribut att jämföra me "
 
-#: src/libdar/cat_inode.cpp:442 src/libdar/cat_inode.cpp:463
+#: src/libdar/cat_inode.cpp:435 src/libdar/cat_inode.cpp:456
 msgid ""
 "Cannot compare EA: EA support has not been activated at compilation time"
 msgstr ""
 "Kan ej jämföra EA: EA-stöd har inte aktiverats vid kompileringstillfället"
 
-#: src/libdar/cat_inode.cpp:456
+#: src/libdar/cat_inode.cpp:449
 msgid "inode last change date (ctime) greater, EA might be different"
 msgstr "inods senaste ändringsdatum (ctime) är större, EA kan vara annat"
 
-#: src/libdar/cat_inode.cpp:461
+#: src/libdar/cat_inode.cpp:454
 msgid "no Extended Attributes to compare with"
 msgstr "inga Utvidgade Attribut att jämföra me "
 
-#: src/libdar/cat_inode.cpp:490
+#: src/libdar/cat_inode.cpp:483
 #, fuzzy
 msgid "different Filesystem Specific Attributes"
 msgstr "andra Utvidgade Attribut"
 
-#: src/libdar/cat_inode.cpp:496
+#: src/libdar/cat_inode.cpp:489
 #, fuzzy
 msgid "No Filesystem Specific Attribute to compare with"
 msgstr "inga Utvidgade Attribut att jämföra me "
 
-#: src/libdar/cat_inode.cpp:504
+#: src/libdar/cat_inode.cpp:497
 #, fuzzy
 msgid "inode last change date (ctime) greater, FSA might be different"
 msgstr "inods senaste ändringsdatum (ctime) är större, EA kan vara annat"
 
-#: src/libdar/cat_inode.cpp:507
+#: src/libdar/cat_inode.cpp:500
 msgid "Filesystem Specific Attribute are missing"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:793
+#: src/libdar/cat_inode.cpp:784
 msgid "CRC error detected while reading EA"
 msgstr "CRC-fel upptäckt vid läsning av EA"
 
-#: src/libdar/cat_inode.cpp:937
+#: src/libdar/cat_inode.cpp:928
 msgid ""
 "Error while reading CRC for EA from the archive: No escape mark found for "
 "that file"
@@ -1080,12 +1080,12 @@ msgstr ""
 "Fel vid läsning CRC för EA från arkiv: Inget escape-märke funnet för denna "
 "fil"
 
-#: src/libdar/cat_inode.cpp:1166
+#: src/libdar/cat_inode.cpp:1141
 #, fuzzy
 msgid "CRC error detected while reading FSA"
 msgstr "CRC-fel upptäckt vid läsning av EA"
 
-#: src/libdar/cat_inode.cpp:1290
+#: src/libdar/cat_inode.cpp:1265
 #, fuzzy
 msgid ""
 "Error while reading CRC for FSA from the archive: No escape mark found for "
@@ -2834,7 +2834,7 @@ msgstr ""
 "[data ][ EA  ][kompr][S] | behörighet  | anvd |  grupp | storl |           "
 "datum               |    filnamn\n"
 
-#: src/libdar/datetime.cpp:305
+#: src/libdar/datetime.cpp:366
 #, fuzzy
 msgid "Unknown time unit"
 msgstr "Okänt val: "
@@ -3004,11 +3004,11 @@ msgstr ""
 msgid "Opening the archive using the multi-slice abstraction layer..."
 msgstr "Öppnar arkivet genom att använda abstraktionsnivå med 'multi-slice'..."
 
-#: src/libdar/macro_tools.cpp:470
+#: src/libdar/macro_tools.cpp:475
 msgid "Reading the archive header..."
 msgstr "Läser arkivhuvud..."
 
-#: src/libdar/macro_tools.cpp:472
+#: src/libdar/macro_tools.cpp:477
 #, fuzzy
 msgid "Reading the archive trailer..."
 msgstr "Läser arkivhuvud..."
@@ -3498,7 +3498,7 @@ msgstr "Skriver arkivinnehåll..."
 msgid "Closing archive low layer..."
 msgstr "Funderar på chiffreringsnivå..."
 
-#: src/libdar/macro_tools.cpp:1843
+#: src/libdar/macro_tools.cpp:1855
 #, fuzzy
 msgid "Archive is closed."
 msgstr "Arkivet består av %i fil(er)\n"

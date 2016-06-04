@@ -6,10 +6,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: dar 2.5.4\n"
+"Project-Id-Version: dar 2.5.5\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2016-04-23 22:02+0200\n"
+"POT-Creation-Date: 2016-06-04 23:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -892,86 +892,86 @@ msgstr ""
 msgid "missing data to build an inode"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:280
+#: src/libdar/cat_inode.cpp:273
 msgid "badly structured inode: unknown inode flag for FSA"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:394
+#: src/libdar/cat_inode.cpp:387
 msgid "different file type"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:399
+#: src/libdar/cat_inode.cpp:392
 #, c-format
 msgid "different owner (uid): %i <--> %i"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:405
+#: src/libdar/cat_inode.cpp:398
 #, c-format
 msgid "different owner group (gid): %i <--> %i"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:411
+#: src/libdar/cat_inode.cpp:404
 #, c-format
 msgid "different permission: %S <--> %S"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:419
+#: src/libdar/cat_inode.cpp:412
 #, c-format
 msgid "difference of last modification date: %S <--> %S"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:434
+#: src/libdar/cat_inode.cpp:427
 msgid "different Extended Attributes"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:440
+#: src/libdar/cat_inode.cpp:433
 msgid "no Extended Attribute to compare with"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:442 src/libdar/cat_inode.cpp:463
+#: src/libdar/cat_inode.cpp:435 src/libdar/cat_inode.cpp:456
 msgid ""
 "Cannot compare EA: EA support has not been activated at compilation time"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:456
+#: src/libdar/cat_inode.cpp:449
 msgid "inode last change date (ctime) greater, EA might be different"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:461
+#: src/libdar/cat_inode.cpp:454
 msgid "no Extended Attributes to compare with"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:490
+#: src/libdar/cat_inode.cpp:483
 msgid "different Filesystem Specific Attributes"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:496
+#: src/libdar/cat_inode.cpp:489
 msgid "No Filesystem Specific Attribute to compare with"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:504
+#: src/libdar/cat_inode.cpp:497
 msgid "inode last change date (ctime) greater, FSA might be different"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:507
+#: src/libdar/cat_inode.cpp:500
 msgid "Filesystem Specific Attribute are missing"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:793
+#: src/libdar/cat_inode.cpp:784
 msgid "CRC error detected while reading EA"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:937
+#: src/libdar/cat_inode.cpp:928
 msgid ""
 "Error while reading CRC for EA from the archive: No escape mark found for "
 "that file"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:1166
+#: src/libdar/cat_inode.cpp:1141
 msgid "CRC error detected while reading FSA"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:1290
+#: src/libdar/cat_inode.cpp:1265
 msgid ""
 "Error while reading CRC for FSA from the archive: No escape mark found for "
 "that file"
@@ -2568,7 +2568,7 @@ msgid ""
 "Date                 |    filename\n"
 msgstr ""
 
-#: src/libdar/datetime.cpp:305
+#: src/libdar/datetime.cpp:366
 msgid "Unknown time unit"
 msgstr ""
 
@@ -2728,11 +2728,11 @@ msgstr ""
 msgid "Opening the archive using the multi-slice abstraction layer..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:470
+#: src/libdar/macro_tools.cpp:475
 msgid "Reading the archive header..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:472
+#: src/libdar/macro_tools.cpp:477
 msgid "Reading the archive trailer..."
 msgstr ""
 
@@ -3131,7 +3131,7 @@ msgstr ""
 msgid "Closing archive low layer..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1843
+#: src/libdar/macro_tools.cpp:1855
 msgid "Archive is closed."
 msgstr ""
 
