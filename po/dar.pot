@@ -6,10 +6,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: dar 2.4.21\n"
+"Project-Id-Version: dar 2.4.22\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2016-04-23 20:27+0200\n"
+"POT-Creation-Date: 2016-06-04 19:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -698,43 +698,43 @@ msgstr ""
 msgid "Writing archive contents..."
 msgstr ""
 
-#: src/libdar/archive.cpp:2035
+#: src/libdar/archive.cpp:2047
 msgid "Error while saving data: "
 msgstr ""
 
-#: src/libdar/archive.cpp:2081
+#: src/libdar/archive.cpp:2093
 msgid ""
 "Cannot get data name of the archive, this archive is not completely "
 "initialized"
 msgstr ""
 
-#: src/libdar/archive.cpp:2106
+#: src/libdar/archive.cpp:2118
 msgid ""
 "This archive contains an isolated catalogue, it cannot be used for this "
 "operation. It can only be used as reference for a incremental/differential "
 "backup or as backup of the original archive's catalogue"
 msgstr ""
 
-#: src/libdar/archive.cpp:2113
+#: src/libdar/archive.cpp:2125
 msgid ""
 "LAX MODE: Archive seems to be only an isolated catalogue (no data in it), "
 "Can I assume data corruption occurred and consider the archive as being a "
 "real archive?"
 msgstr ""
 
-#: src/libdar/archive.cpp:2118
+#: src/libdar/archive.cpp:2130
 msgid "Error while fetching archive properties: "
 msgstr ""
 
-#: src/libdar/archive.cpp:2133
+#: src/libdar/archive.cpp:2145
 msgid "Not supported flag or archive corruption"
 msgstr ""
 
-#: src/libdar/archive.cpp:2150
+#: src/libdar/archive.cpp:2162
 msgid "Sorry, file size is unknown at this step of the program.\n"
 msgstr ""
 
-#: src/libdar/archive.cpp:2216
+#: src/libdar/archive.cpp:2228
 #, c-format
 msgid ""
 "libgcrypt version < %s. Ligcrypt used has a bug that leads md5 and sha1 hash "

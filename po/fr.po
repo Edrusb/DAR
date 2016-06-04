@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: DAR 2.4.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2016-04-23 20:27+0200\n"
+"POT-Creation-Date: 2016-06-04 19:34+0200\n"
 "PO-Revision-Date: 2016-04-23 20:28+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -808,11 +808,11 @@ msgstr ""
 msgid "Writing archive contents..."
 msgstr "Enregistrement du contenu de l'archive ..."
 
-#: src/libdar/archive.cpp:2035
+#: src/libdar/archive.cpp:2047
 msgid "Error while saving data: "
 msgstr "Erreur lors de la sauvegarde des données : "
 
-#: src/libdar/archive.cpp:2081
+#: src/libdar/archive.cpp:2093
 msgid ""
 "Cannot get data name of the archive, this archive is not completely "
 "initialized"
@@ -820,7 +820,7 @@ msgstr ""
 "Impossible d'obtenir le nom de données de cette archive ; cette archive "
 "n'est pas complètement initialisée"
 
-#: src/libdar/archive.cpp:2106
+#: src/libdar/archive.cpp:2118
 msgid ""
 "This archive contains an isolated catalogue, it cannot be used for this "
 "operation. It can only be used as reference for a incremental/differential "
@@ -831,7 +831,7 @@ msgstr ""
 "sauvegarde incrémentale/décrémentale ou comme secours du catalogue de "
 "l'archive d'origine"
 
-#: src/libdar/archive.cpp:2113
+#: src/libdar/archive.cpp:2125
 msgid ""
 "LAX MODE: Archive seems to be only an isolated catalogue (no data in it), "
 "Can I assume data corruption occurred and consider the archive as being a "
@@ -841,19 +841,19 @@ msgstr ""
 "présente), Doit-on considérer qu'il s'agit plutôt d'une corruption et peut-"
 "on considérer que l'archive est une vraie archive ?"
 
-#: src/libdar/archive.cpp:2118
+#: src/libdar/archive.cpp:2130
 msgid "Error while fetching archive properties: "
 msgstr "Erreur lors de la recherche des propriétés de l'archive : "
 
-#: src/libdar/archive.cpp:2133
+#: src/libdar/archive.cpp:2145
 msgid "Not supported flag or archive corruption"
 msgstr "Drapeau non supporté ou archive corrompue"
 
-#: src/libdar/archive.cpp:2150
+#: src/libdar/archive.cpp:2162
 msgid "Sorry, file size is unknown at this step of the program.\n"
 msgstr "Désolé, la taille du fichier est inconnue à cette étape du programme\n"
 
-#: src/libdar/archive.cpp:2216
+#: src/libdar/archive.cpp:2228
 #, c-format
 msgid ""
 "libgcrypt version < %s. Ligcrypt used has a bug that leads md5 and sha1 hash "
