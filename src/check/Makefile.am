@@ -19,16 +19,25 @@ else
 endif
 endif
 
-helpers = build_tree.sh main.sh modif_tree.sh routine.sh loop.sh
+helpers = build_tree.sh main.sh modif_tree.sh routine.sh loop.sh make_env.sh
 
 dist_noinst_DATA = $(helpers) Old_format/archive_03.1.dar Old_format/archive_04.1.dar Old_format/archive_05.1.dar Old_format/archive_06.1.dar Old_format/archive_07.1.dar Old_format/archive_08.1.dar Old_format/archive_08-1.1.dar Old_format/archive_09.1.dar
 noinst_PROGRAMS = all_features padder
 LDADD = -L../libdar ../libdar/$(MYLIB).la $(GPGME_LIBS)
 AM_LDFLAGS = @LTLIBINTL@
+MY_MAKEFILE=my_makefile
+MY_ENV=my_env
 
-check-local:
-	chmod a+x $(helpers)
-	./loop.sh
+$(MY_ENV): ./make_env.sh
+	@ chmod a+x $(helpers)
+	@ ./make_env.sh $(MY_ENV)
+
+$(MY_MAKEFILE): $(MY_ENV) ./loop.sh
+	@ ./loop.sh
+
+check-local: $(MY_MAKEFILE)
+	$(MAKE) -f $(MY_MAKEFILE) all
+	@ ./final.sh
 
 all_features_SOURCES = all_features.cpp
 all_features_LDADD = $(LDADD)
@@ -37,6 +46,6 @@ all_features_DEPENDENCIES = ../libdar/$(MYLIB).la
 padder_SOURCES = padder.cpp
 
 clean-local:
-	chmod u+x $(helpers)
-	if [ -x /bin/bash ] ; then OPT=tmp.file DAR=none ./routine.sh NONE ; fi
-	rm -f tmp.file
+	rm -rf prefix_*
+	rm -f $(MY_MAKEFILE) $(MY_ENV)
+

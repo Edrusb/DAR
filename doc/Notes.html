@@ -2,9 +2,7 @@
 <html><head>
 
 
-
-
-<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR/LIBDAR Internals - Notes</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR/LIBDAR Internals - Notes</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
@@ -15,7 +13,7 @@
       <h1 style="text-align: center;"><br>
       </h1>
       <h1 style="text-align: center;">Dar/Libdar Internals - Notes<br>
-</h1>
+      </h1>
       </td>
     </tr>
   </tbody>
@@ -61,9 +59,10 @@ Language Support / gettext / libintl</a><br>
       <a href="#Dar_version_naming">Dar's
 Versions</a><br>
       <a href="#sym">How symmetric encryption is performed in dar/libdar</a><br>
-      <a href="#asym">How asymmetric encryption is performed in dar/libdar</a><br>
+      <a href="#asym">How asymmetric encryption is performed in
+dar/libdar</a><br>
       <br>
-</div>
+      </div>
       </td>
     </tr>
   </tbody>
@@ -96,7 +95,8 @@ exist). A symbolic link has its own inode. OK, now let's talk about EA:
       <br>
       </div>
       <div style="text-align: justify; margin-left: 40px;">Extended
-attributes is a recent feature of Unix file system (at the time of the writing, year 2002). They extend
+attributes is a recent feature of Unix file system (at the time of the
+writing, year 2002). They extend
 attributes provided by the inode and associated to a data. They are not
 part of the inode, nor part of the data, nor part of a given directory.
 They are stored beside the inode and are a set of pair of key and
@@ -164,7 +164,8 @@ to restore any EA but just more recent data, you can use the following
       <h3>Archive structure in brief</h3>
       <br>
       <h4>The Slice Level</h4>
-      <div style="margin-left: 40px;">A slice is composed of a header, data and trailer (the trailer appeared with archive format version 8)<br>
+      <div style="margin-left: 40px;">A slice is composed of a header,
+data and trailer (the trailer appeared with archive format version 8)<br>
       </div>
       <br>
       <div style="text-align: justify; margin-left: 80px;"><code>+--------+-------------------------------------------+-------+</code><br>
@@ -182,11 +183,14 @@ the<span style="font-weight: bold;"> </span><span style="text-decoration: underl
       </div>
       <ul style="text-align: justify; margin-left: 40px;">
         <li>a magic number that tells this is a dar slice</li>
-        <li>a internal_name which is unique to a given archive and shared by all slices<br>
-</li>
-        <li>a flag that tells whether the slice is the last of the archive or whether a trailer is present that contains this info.<br>
-</li>
-        <li>a extension flag, that was used in older archive but which now always set to 'T' telling that a TLV list follows</li>
+        <li>a internal_name which is unique to a given archive and
+shared by all slices<br>
+        </li>
+        <li>a flag that tells whether the slice is the last of the
+archive or whether a trailer is present that contains this info.<br>
+        </li>
+        <li>a extension flag, that was used in older archive but which
+now always set to 'T' telling that a TLV list follows</li>
         <li>A
 TLV (Type Length Value) list of item, it contains the slice size, first
 slice size. The TLV list will receive any future new field related to
@@ -195,52 +199,50 @@ slice header.<br>
       </ul>
       <div style="text-align: justify; margin-left: 80px;"><code>+-------+----------+------+-----------+-------+</code><br>
       <code>| Magic | internal | flag | extension | TLV&nbsp;&nbsp; |<br>
-</code>
-      <code>| Num.&nbsp; | name&nbsp;&nbsp;&nbsp;&nbsp; | byte |
+      </code> <code>| Num.&nbsp; | name&nbsp;&nbsp;&nbsp;&nbsp; | byte
+|
 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | list&nbsp; |</code><br>
       <code>+-------+----------+------+-----------+-------+</code><br>
       </div>
       <div style="text-align: justify; margin-left: 40px;"><br>
-
       <div style="text-align: justify;">The
 header is the first thing
 to be written, and if the current slice is not the last
 slice (all data to write could not fit in it), the flag field is
 changed indicating that another slice follows. The header is also the
 first part
-to be read. <br>
-      <br>
-Since archive format 8, the flag is set to a specific value
-indicating that the information telling whether the slice is the last or not has been moved to the <span style="text-decoration: underline;">slice trailer</span>.
-This way, dar does no more need to seek back in file to modify the flag
-which allow writing an archive in sequence even when it has multiple
-slices. This change was required to support on-fly slice hashing.<br>
-</div>
+to be read. Since archive format 8, the flag is set to a specific value
+indicating that the information telling whether the slice is the last
+is placed in a slice trailer.<br>
+      </div>
       <br>
 The TLV list may contain several fields:<br>
       <ul>
         <li>First slice size [type 1]<br>
         </li>
-        <li>Other slice size / all slice size if no first slice size is present [type 2]<br>
+        <li>Other slice size / all slice size if no first slice size is
+present [type 2]<br>
         </li>
         <li>data_name [type 3] . This field is detailed below.<br>
         </li>
       </ul>
 A TLV list is of course a list of TLV:<br>
       <br>
-      <div style="margin-left: 40px;"><code>+-------+----------+------+-----------+- ...-----+-------+</code><br>
-      <code>| Number| TLV 1 &nbsp;&nbsp; | TLV 2| TLV 3 &nbsp; &nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | TLV n |</code><br>
-      <code>
-      </code><code>| of TLV| &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+      <div style="margin-left: 40px;"><code>+-------+----------+------+-----------+-
+...-----+-------+</code><br>
+      <code>| Number| TLV 1 &nbsp;&nbsp; | TLV 2| TLV 3 &nbsp; &nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | TLV n |</code><br>
+      <code> </code><code>| of TLV| &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;
 &nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
       <code>+-------+----------+------+-----------+--...-----+-------+<br>
       <br>
       </code></div>
-</div>
+      </div>
       <div style="text-align: justify;">
-      <div style="margin-left: 40px;">Each TLV item is, as commonly, defined by the set of three fields:<br>
+      <div style="margin-left: 40px;">Each TLV item is, as commonly,
+defined as set of three fields:<br>
       <br>
       <div style="margin-left: 40px;"><code>+---------+-------------------------+-------------------------+</code><br>
       <code>| Type&nbsp;&nbsp;&nbsp; |
@@ -250,15 +252,9 @@ Value&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb
 |<br>
 |(2 bytes)| (arbitrary large value) | (arbitrary large data)&nbsp; |</code><br>
       <code>+---------+-------------------------+-------------------------+</code></div>
-
-
-
       </div>
       </div>
-      <div style="text-align: justify; margin-left: 40px;">
-
-
-      <br>
+      <div style="text-align: justify; margin-left: 40px;"> <br>
       <div style="text-align: justify;">The 2 bytes type is large
 enough for today's need (65535 different types while only three used),
 however TLV 65535 is reserved for future use and will signal a new
@@ -268,31 +264,42 @@ format for the type field.<br>
       </div>
       <div style="margin-left: 40px; text-align: justify;">To know in
 which slice and at which position to find a particular data, dar needs
-to know each slice's size. This is the reason why each slice contains
-the slice size information, in particular the first slice size which is allowed to be different from following ones. In older
+to know each file's size. This is the reason why each slice contains
+the slice size information, in particular the last slice. In older
 version, dar had to read the first slice first to get this slicing
 information. Then it could read the archive contents at the end of the
-last slice. <br>
+last slice. Today, reading the last slice, dar can fetch the slicing
+scheme from the slice header (what we just detailed) and fetch the
+archive contents at the end of this same last slice.<br>
       </div>
-<div style="text-align: justify; margin-left: 40px;"><br>
-      <span style="font-weight: bold; text-decoration: underline;">The trailer</span> is one byte length and is new since archive format version 8
-(released 2.4.0). It contains the value that was located in the header flag field in older archive format, telling
+      <div style="text-align: justify; margin-left: 40px;"><br>
+      <span style="font-weight: bold; text-decoration: underline;">The
+trailer</span>
+(which is one byte length) is new since archive format version 8
+(released 2.4.0). It contains the value that was located in the header
+flag field in older archive format, telling
 whether the slice is the last of the archive or not. When writting down
 a single sliced archive (no -s option provided), both the header and
 the trailer tell that the slice is the last of the archive (duplicated
 information). However, when doing multi-sliced archive, it is not
-possible to known whether a slice will be the last before reaching the
+possible to known whether a slice is the last before reaching the
 requested amount of data per slice (which depends on the amount of byte
 to save, compression ratio, encryption overhead, etc.). Thus the header
 flag contains a value telling that to know whether the slice is the
 last or not, one must read the trailer.<br>
       <br>
-</div>
-
-
-
+In
+older format, it was necessary to seek back to update the header
+with the correct information when a new slice had to be created. But,
+keeping this behavior, it would not have been possible to make a digest
+"on the fly" (see --hash
+option). The addition of the trailer was required for that feature: to
+compute a md5 or sha1 hash of each slice. But, this costs one byte per
+slice, yes.<br>
+      </div>
       <h4>Data Name</h4>
-      <div style="margin-left: 40px;">As seen above in the header fields, we have among other things the three following identifiers:<br>
+      <div style="margin-left: 40px;">As seen above in the header
+fields, we have among others the three following identifiers:<br>
       <ul>
         <li>magic number</li>
         <li>internal name</li>
@@ -313,16 +320,16 @@ field is also present in the archive catalogue (the table of content)
 of each archive. It may be the same value as the one in the slice
 headers (normal archives) or another value if the archive results from
 a catalogue isolation process.<br>
-      <br>Why
-this field? A new feature
+      <br>
+Why this field? A new feature
 with release 2.4.0 is the ability to use an extracted catalogue to
 backup a internal catalogue of a given archive. Comparing the data_name
 value of the catalogue resulting from the isolation operation to the
-data_name value present in the slices of an archive to rescue, let dar
+data_name value present int the slices of an archive to rescue, dar can
 be (almost) sure that the extracted catalogue matches the data present
-in the archive the user is trying to rescue.<br>
+in the archive the user is trying to use it with.<br>
       <br>
-In brief, A, B, C and D below are four different values of data_name:<br>
+In brief:<br>
       </div>
       </div>
       <br>
@@ -330,18 +337,22 @@ In brief, A, B, C and D below are four different values of data_name:<br>
         <tbody>
           <tr>
             <td style="vertical-align: top; font-weight: bold; text-align: center; width: 20%;">Fields</td>
-            <td style="vertical-align: top; width: 20%; font-weight: bold; text-align: center;">Normal Archive<br>
+            <td style="vertical-align: top; width: 20%; font-weight: bold; text-align: center;">Normal
+Archive<br>
             </td>
-            <td style="vertical-align: top; width: 20%; font-weight: bold; text-align: center;">Resliced Using dar_xform<br>
+            <td style="vertical-align: top; width: 20%; font-weight: bold; text-align: center;">Resliced
+Using dar_xform<br>
             </td>
-            <td style="vertical-align: top; width: 20%; font-weight: bold; text-align: center;">Resulting From Isolation<br>
+            <td style="vertical-align: top; width: 20%; font-weight: bold; text-align: center;">Resulting
+From Isolation<br>
             </td>
             <td style="vertical-align: top; text-align: center; width: 20%;">&nbsp;<span style="font-weight: bold;">isolated archive <br>
 resliced with dar_xform</span><br>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top; font-weight: bold;">internal_name (slice header)<br>
+            <td style="vertical-align: top; font-weight: bold;">internal_name
+(slice header)<br>
             </td>
             <td style="vertical-align: top; text-align: center;">A<br>
             </td>
@@ -353,7 +364,8 @@ resliced with dar_xform</span><br>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top; font-weight: bold;">data_name (slice header)<br>
+            <td style="vertical-align: top; font-weight: bold;">data_name
+(slice header)<br>
             </td>
             <td style="vertical-align: top; text-align: center;">A<br>
             </td>
@@ -365,7 +377,8 @@ resliced with dar_xform</span><br>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top; font-weight: bold;">data_name (archive catalogue)<br>
+            <td style="vertical-align: top; font-weight: bold;">data_name
+(archive catalogue)<br>
             </td>
             <td style="vertical-align: top; text-align: center;">A<br>
             </td>
@@ -378,22 +391,22 @@ resliced with dar_xform</span><br>
           </tr>
         </tbody>
       </table>
-<br>
-
+      <br>
       <h4>Archive Level</h4>
       <div style="margin-left: 40px;">
       <div style="text-align: justify;">The
 archive level describes the
-structure of the slice's <span style="text-decoration: underline;">data</span><span style="text-decoration: underline;"> field</span> (removing header and trailer of
+structure of the slice's data field (removing header and trailer of
 each slice), when they are all sticked together from slice to slice:<br>
       </div>
-
       <br>
       </div>
-      <div style="margin-left: 80px;"><code>+---------+----------------------------+-----------+--------+---------+--------+</code><br><code>|
+      <div style="margin-left: 80px;"><code>+---------+----------------------------+-----------+--------+---------+--------+</code><br>
+      <code>|
 version |&nbsp;&nbsp; Data&nbsp; &nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-| catalogue | term 1 | version | term 2 |<br>| header&nbsp; </code><code>|
+| catalogue | term 1 | version | term 2 |<br>
+| header&nbsp; </code><code>|
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | trailer
@@ -402,232 +415,93 @@ version |&nbsp;&nbsp; Data&nbsp; &nbsp;
       </div>
       <div style="margin-left: 80px;"><code></code></div>
       <div style="margin-left: 40px;"><br>
-      <div style="text-align: justify;">The <span style="text-decoration: underline; font-weight: bold;">version header</span>
+The <span style="text-decoration: underline; font-weight: bold;">version
+header</span>
 is a short version of the trailer version. It is used when reading an
 archive in sequential mode, to be able to prepare the proper
-compression layer, cipher algorithm used if any and know whether escape sequence mark (aka tape marks) are present
+compression layer, and known whether escape sequence mark are present
 in the archive.<br>
-      </div>
-
       <br>
-      <div style="text-align: justify;">
-the <span style="font-weight: bold; text-decoration: underline;">version trailer</span> which may still be called "version header" in some
+the <span style="font-weight: bold; text-decoration: underline;">version
+trailer</span> (which may still be called "version header" in some
 part of the documentation because it was only located at the
-beginning of the archive in previous archive format,&nbsp; is the complete version of this data structure, composed of:<br>
-
+beginning of the archive in previous archive format) is composed of:<br>
       </div>
-</div>
-
       <ul style="margin-left: 40px;">
-
         <li>edition version of the archive</li>
         <li>compression algorithm used</li>
-        <li>command line used for creating the archive, now known as "user comment"<br>
-</li>
+        <li>command line used for creating the archive, now known as
+"user comment"<br>
+        </li>
         <li>flag, telling:</li>
         <ul>
-          <li>whether the archive is encrypted, <br>
+          <li>&nbsp;whether the archive is encrypted, <br>
           </li>
           <li>whether it has escape sequence marks, <br>
           </li>
           <li>whether the header/trailier contains an encrypted key</li>
-          <li>whether the header/trailer contains the initial offset field<br>
+          <li>whether the header/trailer contains the initial offset
+field<br>
           </li>
         </ul>
-
-        <li>initial offset (telling where starts the data in the archive, is only present in the trailer)</li>
-        <li>crypto algorithm used (present only if flag tells that the archive is encrypted)</li>
-        <li>size of the crypted key that follows (present only if the flag tells an encrypted key is present)</li>
-        <li>encrypted key (encrypted by mean of GPG asymetric algorithm, present only if flag says so)<br>
+        <li>initial offset (telling where starts the data in the
+archive, is only present in the trailer)</li>
+        <li>crypto algorithm used (present only if flag tells that the
+archive is encrypted)</li>
+        <li>size of the crypted key that follows (present only if the
+flag tells an encrypted key is present)</li>
+        <li>encrypted key (encrypted by mean of GPG asymetric
+algorithm, present only if flag says so)<br>
         </li>
-
-        <li>CRC (Cyclic Redundancy Check) computed on the whole version header or trailer<br>
+        <li>CRC (Cyclic Redundancy Check) computed on the whole version
+header or trailer<br>
         </li>
-
-
       </ul>
-
       <div style="margin-left: 80px;"><code>+---------+------+---------------+------+--------+--------+</code><br>
-      <code>| edition | algo | command line&nbsp; | flag | initial|&nbsp; CRC&nbsp;&nbsp; |<br>
-</code><code>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <code>| edition | algo | command line&nbsp; | flag |
+initial|&nbsp; CRC&nbsp;&nbsp; |<br>
+      </code><code>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | offset |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | offset
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
       <code>+---------+------+---------------+------+--------+--------+<br>
-</code></div>
-      <div style="margin-left: 80px;">
-      </div>
-
+      </code></div>
+      <div style="margin-left: 80px;"> </div>
       <div style="margin-left: 40px;"><br>
-      <div style="text-align: justify;">
-The trailer is used when reading an archive in direct access mode, to build
+      <div style="text-align: justify;">The trailer is used when
+reading an archive in direct access mode, to build
 the proper compression layer, escape layer (it is needed if mark have
-been inserted in the archive to un-escape data that could else be taken as an escape sequence mark) and encryption layer.<br>
+been inserted in the archive to un-escape data that could else be taken
+as an escape sequence mark) and encryption layer.<br>
       </div>
-
       <br>
-      
-      <div style="text-align: justify;"><span style="text-decoration: underline; font-weight: bold;">The data</span>&nbsp;
-is a suite of file contents, with associated EA, FSA and delta
-signatures, if present. When tape marks are
-used, inode information is prepended before the file's data and a copy
-of the data CRC is placed after's file data same thing with CRC for EA,
-FSA and delta signature if any. This is to
-be used when reading the archive in sequential mode. These additional
-fields come from the catalogue which is placed at the end of the
-archive and is used instead when reading the archive in direct access
-mode (the default).<br>
-      </div>
-
+      <span style="text-decoration: underline; font-weight: bold;">The
+data</span>
+is a suite of file contents, with EA if present. When tape mark is
+used, a copy of the CRC is placed after's file Data and file's EA, to
+be used when reading the archive in sequential mode. This CRC is also
+dropped into the catalogue which takes place at the end of the archive
+to be used when reading the archive in direct access mode (the default).<br>
       <br>
       </div>
-      <div style="margin-left: 80px;"><code>Without tape marks<br>
-&nbsp; ....</code><code>--+---------------------+--------+----+----++------------------++-----------+----+---....</code><br>
-      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-| data for file 1(=F1)| delta&nbsp; | EA |FSA || data for file 2&nbsp; ||
-data for&nbsp; | EA |</code><br>
+      <div style="margin-left: 80px;"><code>&nbsp; ....</code><code>--+---------------------+----+------------+-----------+----+---....</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; file
+data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | EA | file
+data&nbsp; | file data | EA |</code><br>
       <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | (may be
-compressed) | sig(F1)|(F1)|(F1)|| (no EA, FSA, sig)|| file 3 &nbsp;&nbsp;
-|(F3)|</code><br>
+compressed) |&nbsp;&nbsp;&nbsp; | (no EA)&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp; |</code><br>
       <code>&nbsp;
-....--+---------------------+--------+----+----++------------------++-----------+----+---....<br>
-      <br>
-      <br>
-With tape marks<br>
-</code><code>&nbsp; ....--+</code><code>--+-----+---------------------+--+----+--+--------+--+----+--+----++--+-----+------------------+--+----+-....</code><br>
-
-      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |TM|inode| </code><code>data for file 1(=F1)</code><code>|TM|Data|TM| delta&nbsp; |TM| EA |TM|FSA ||TM|inode| data for file 2&nbsp; |TM|Data|</code><br>
-
-      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |#I|data |(may be
-compressed)&nbsp; |#R|CRC |#S| sig(F1)|#E|(F1)|#F|(F1)||#I|data | (no EA, FSA, sig)|#R|CRC |</code><br>
-
-      <code>&nbsp;
-....--+--+-----+---------------------+--+----+--+--------+--+----+--+----++--+-----+------------------+--+----+--....<br>
-      <br>
-      <br>
-      <br>
-      </code>
+....--+---------------------+----+------------+-----------+----+---....</code><br>
       <code></code></div>
-      <div style="margin-left: 40px;">
-      <div style="text-align: justify;">
-      <div style="text-align: justify;">the TM#.. fields represent tape marks. The
-additional fields seen beside tape marks contain duplicated information
-from the catalogue. Tape marks are specific sequence of characters that
-delimit the start of a new field like file data, file data CRC, delta
-signature, EA and EA CRC (not represented above), FSA and FSA CRC (not
-represented above), etc. These are used in sequential read mode to skip
-to the next file or to the next field if one has not to be read or
-restored.<br>
-      <br>
-      </div>
-      <div style="text-align: justify;">To avoid file data, EA or FSA
-to contain a sequence of character that would look like a tape mark,
-their data is modified (escaped) to avoid that situation using a
-specific tape mark (named "not_a_sequence"). At reading time when such
-"not_a_sequence" mark is found, the data is modified back (unescaped)
-to retreive the original data.<br>
-      <br>
-The delta sig optional field (see class <span style="font-style: italic;">cat_delta_signature</span>
-in source code) is present when a delta signature has been stored for
-the file or when the file's data is a delta patch. This field is
-composed of the following sub-fields, some of which are only present in
-the catalogue at the end of the archive when tape marks are not used
-for that archive:<code></code><br>
-      </div>
-      <code></code></div>
-      <code><br>
-Delta_sig field when tape marks are used<br>
-&nbsp;+------+------+---------------+----------+--------+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<br>&nbsp;| base | sig&nbsp; | sig
-data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-data CRC | result
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<br>&nbsp;| CRC&nbsp; | size | (if size &gt; 0)
-|&nbsp;&nbsp;&nbsp;
-if&nbsp;&nbsp;&nbsp; |&nbsp; CRC&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<br>&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-| size &gt; 0 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<br>
-&nbsp;+------+------+---------------+----------+--------+ <br>
-      <br>
-Delta_sig field when no tape mark is used<br>&nbsp;+---------------+----------+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<br>&nbsp;| sig data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | data CRC
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<br>&nbsp;| (if size &gt; 0) |&nbsp;&nbsp;&nbsp;
-if&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<br>&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-| size &gt; 0
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<br>
-&nbsp;+---------------+----------+ <br>
-      <br>
-In any case the catalogue contains the following information to locate
-the delta signature when the archive is read in direct mode:<br>&nbsp;+------+------+---------------+--------+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<br>&nbsp;| base | sig&nbsp; | sig offset&nbsp;&nbsp;&nbsp; |
-result
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<br>&nbsp;| CRC&nbsp; | size | (if size &gt; 0) |&nbsp;
-CRC&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<br>&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<br>
-&nbsp;+------+------+---------------+--------+ <br>
-      <br>
-</code>
-      <div style="text-align: justify;">What are these subfields used for:<br>
-      </div>
-      <ul style="text-align: justify;">
-        <li><span style="font-weight: bold;">base_crc</span> is the
-checksum of the file which delta signature has been computed on. This
-checksum is used at restoration time to prevent applying the delta
-patch to the wrong file and loosing this file's content</li>
-        <li><span style="font-weight: bold;">sig_size</span> is the size in byte of the following subfield<br>
-        </li>
-        <li><span style="font-weight: bold;">sig_data </span>is present if sig_size is not null and contains the delta signature of the file<br>
-        </li>
-        <li><span style="font-weight: bold;">sig_data_crc </span>is
-present if sig_size is not null and contains the checksum of the
-sig_data field. It is used to detect archive corruption that could take
-place in the sig_data field.</li>
-        <li><span style="font-weight: bold;">result_crc</span> is the
-checksum of the file once patched. It is used to provide a base_crc for
-the next delta patch (incremental delta backup) and at restoration time
-to verify that resulting patched file is the expected one.<br>
-        </li>
-      </ul>
-      <div style="text-align: justify;">A plain file may thus have up to three CRC:<br>
-      </div>
-      <ul style="text-align: justify;">
-        <li>One CRC after its data, which permits to detect corrution&nbsp; in this part of the archive</li>
-        <li>Two CRCs in the delta_sig field (<span style="font-style: italic;">base_crc</span> and <span style="font-style: italic;">result_crc</span> subfields)</li>
-      </ul>
-      <div style="text-align: justify;">The first is only present if
-the file is fully saved (s_saved status) or if it is a delta patch
-(s_delta status). This checksum "protects" the data or the patch
-against data corruption. The two others are present for any plain file
-may they be saved or not (s_saved/s_not_saved/s_delta status) as soon
-as they have a delta signature associated with them. These checsum are
-also always present for delta patch (s_delta status) even if no delta
-signature is present (sig_size is then null).<br>
-      </div>
-      <br>
-      <br>
-      <code><br>
-      </code>
+      <div style="margin-left: 40px;"><br>
       </div>
       <div style="text-align: justify; margin-left: 40px;"><span style="text-decoration: underline; font-weight: bold;">the
-catalogue</span>&nbsp;
-contains all inode's metadata and directory structure as well as
-hard_links information CRC for data, EA, FSA and delta signature. The
+catalogue</span>,
+contains all inode, directory structure and hard_links information as
+well as data and EA CRC. The
 directory structure is stored in a simple way: the inode of a directory
 comes, then the inode of the files it contains, then a special entry
 named "EOD" for End of Directory. Considering the following tree:<br>
@@ -662,15 +536,18 @@ coucou | EOD |</code><br>
       <div style="margin-left: 40px; text-align: justify;"><br>
 EOD takes on byte, and this way no need to store the full path of each
 file, just the filename is recorded.<br>
-      <br><span style="text-decoration: underline; font-weight: bold;">
-the terminator</span>
+      <br>
+      <span style="text-decoration: underline; font-weight: bold;">the
+terminator</span>
 stores the position of the beginning of the catalogue,
 it is the last thing to be written. Thus dar first reads the
-terminator, then the catalogue. Well, there is now two terminators, both
+terminator, then the catalogue. Well, there is now two terminators,
+both
 are meant to be read backward. The second terminator points to the
 beginning of the "trailer version" which is read first in direct access
 mode. The first terminator points to the start of the catalogue, which
-is read once the adhoc compression and encryption layers has been built based on the
+is read once the adhoc compression and encryption layers has been built
+based on the
 information found on the "trailer version"<br>
       </div>
       <br>
@@ -681,15 +558,16 @@ example of how data can be structured in a four slice archive:<br>
       </div>
       <div style="text-align: justify; margin-left: 80px;"><code>+--------+--------+------------------------+--+</code><br>
       <code>| slice&nbsp; | version|&nbsp; file data +
-EA + FSA&nbsp; |Tr|</code><br>
+EA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |Tr|</code><br>
       <code>|
 header | header
-|&nbsp;&nbsp;&nbsp;&nbsp; + delta sig&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp; |</code><br>
       <code>+--------+--------+------------------------+--+</code><br>
       </div>
       <div style="text-align: justify; margin-left: 40px;"><br>
-the first slice (just above) has been defined smaller using the -S option<br>
+the first slice (just above) has been defined smaller using the -S
+option<br>
       <br>
       </div>
       <div style="text-align: justify; margin-left: 80px;"><code>+--------+-----------------------------------------------------------------+--+</code><br>
@@ -697,7 +575,8 @@ the first slice (just above) has been defined smaller using the -S option<br>
 slice&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; file data
 +
-EA + FSA + delta signature &nbsp; &nbsp; &nbsp; &nbsp;
+EA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
 |Tr|</code><br>
       <code>|
@@ -715,7 +594,8 @@ header
 slice&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; file data
 +
-EA + FSA + delta signature&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+EA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 &nbsp; &nbsp;
 |Tr|</code><br>
       <code>|
@@ -726,13 +606,15 @@ header
 |&nbsp; |</code><br>
       <code>+--------+-----------------------------------------------------------------+--+</code><br>
       <code></code><br>
-      <code>+--------+---------------------+-----------+------ +---------+--------+--+</code><br>
+      <code>+--------+---------------------+-----------+------
++---------+--------+--+</code><br>
       <code>| slice&nbsp; |&nbsp;&nbsp; file data +
 EA&nbsp;&nbsp;&nbsp; | catalogue | term 1| version | term 2 |Tr|</code><br>
       <code>| header
-|&nbsp;&nbsp; + FSA + delta sig
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | trailer |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; |</code><br>
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | trailer
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; |</code><br>
       <code>+--------+---------------------+-----------+-------+---------+--------+--+<br>
       <br>
       </code></div>
@@ -740,7 +622,8 @@ EA&nbsp;&nbsp;&nbsp; | catalogue | term 1| version | term 2 |Tr|</code><br>
 slice is smaller because there was not enough data to make it full.<br>
       <br>
 The archive is written sequentially this way.<br>
-      <br></div>
+      <br>
+      </div>
       <br>
       <h4>Other Levels</h4>
       <div style="text-align: justify; margin-left: 40px;">Things get a
@@ -768,7 +651,7 @@ Class fichier [=file] also inherit from generic_file class, and is a
 wrapper
 for the plain file system calls. Some new classes have been added with
 format 8, in particular the escape class, which inserts escape sequence
-marks at requested position, and modifies data wrote for it never looks
+mark at requested position, and modifies data wrote for it never looks
 like an escape sequence mark. To reduce the level of context switch
 when reading the catalogue (which makes a ton of small read), a cache
 class is also present, it gather small writes made to it into larger
@@ -790,27 +673,35 @@ Here are now all currently possible layers together:<br>
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
       <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 +----+--+----+-...........+---------+</code><br>
-      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-+-----+ | +-------+ |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
++-----+ | +-------+
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|<br>
 sparse&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |spars| | |sparse |
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 | <br>
 file&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |file | |
-|file&nbsp;&nbsp; | |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
-detection&nbsp;&nbsp; |detec| | |detect.| |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+|file&nbsp;&nbsp; |
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|<br>
+detection&nbsp;&nbsp; |detec| | |detect.|
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|<br>
 layer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-----+ | +-------+
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |<br>
-</code>
-      <code>(optional)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
+      </code> <code>(optional)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp; |&nbsp; &nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |</code><br>
-      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V &nbsp;
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+V &nbsp;
 V&nbsp;&nbsp;&nbsp; V &nbsp; &nbsp;&nbsp;
 V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 V</code><br>
@@ -826,17 +717,21 @@ data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
 |<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 V
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 V<br>
-</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-----------------------------------+</code><br>
-      <code>escape layer&nbsp; |&nbsp;&nbsp; escaped data / escape sequences |<br>
-      </code><code>(optional)&nbsp;&nbsp;&nbsp; +-----------------------------------+</code><br>
-
+      </code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
++-----------------------------------+</code><br>
+      <code>escape layer&nbsp; |&nbsp;&nbsp; escaped data / escape
+sequences |<br>
+      </code><code>(optional)&nbsp;&nbsp;&nbsp;
++-----------------------------------+</code><br>
       <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; / First Terminateur</code><br>
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; / First
+Terminateur</code><br>
       <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
@@ -868,7 +763,8 @@ V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Terminator</code><br>
 |</code><br>
       <code>cipher&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (encrypted)
-data / cache if no encryption |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+data / cache if no encryption
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |</code><br>
       <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 +--------------------------------------------------+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -886,8 +782,8 @@ V</code><br>
 header|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</code><code>+---------+----+<br>
-+-------+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</code><code>+---------+----+<br>+-------+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp; &nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -896,50 +792,57 @@ header|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 &nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
-      </code>
-      <code>&nbsp;&nbsp;&nbsp;
+      </code> <code>&nbsp;&nbsp;&nbsp;
 V
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 V &nbsp;&nbsp;&nbsp;&nbsp; v<br>
-</code><code>+-----------------------------------------------------------------------------+</code><br>
+      </code><code>+-----------------------------------------------------------------------------+</code><br>
       <code>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|</code><br><span style="font-family: monospace;">+</span><code>-----------------------------------------------------------------------------+</code><br>
+|</code><br>
+      <span style="font-family: monospace;">+</span><code>-----------------------------------------------------------------------------+</code><br>
       <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; |&nbsp;&nbsp;&nbsp; |&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; |&nbsp;&nbsp;&nbsp;
+|&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
       <code>slice&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; |&nbsp;&nbsp;&nbsp; |&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; |&nbsp;&nbsp;&nbsp;
+|&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
       <code>headers |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; |&nbsp;&nbsp;&nbsp; |&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; |&nbsp;&nbsp;&nbsp;
+|&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
       <code>&nbsp;|&nbsp; |&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; |&nbsp;&nbsp;&nbsp; |&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; |&nbsp;&nbsp;&nbsp;
+|&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
       <code>&nbsp;|&nbsp; +---|------\&nbsp; |&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; |&nbsp;&nbsp;&nbsp; |&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; |&nbsp;&nbsp;&nbsp;
+|&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
       <code>&nbsp;V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V&nbsp; V&nbsp;
 V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V&nbsp;&nbsp;
 V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V&nbsp;&nbsp;
-V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V&nbsp; V&nbsp;&nbsp;&nbsp; V&nbsp; V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V</code><br>
+V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V&nbsp; V&nbsp;&nbsp;&nbsp;
+V&nbsp; V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V</code><br>
       <code>+---------+&nbsp; +---------+&nbsp; +---------+&nbsp;
 +---------+&nbsp; +-------+&nbsp; </code><code>+-------+&nbsp; </code><code>+----+</code><br>
       <code>|HH| data |&nbsp; |HH| data |&nbsp; |HH| data |&nbsp; |HH|
-data |&nbsp; |HH|data|&nbsp; </code><code>|HH|data|&nbsp; </code><code>|HH| |</code><br>
+data |&nbsp; |HH|data|&nbsp; </code><code>|HH|data|&nbsp; </code><code>|HH|
+|</code><br>
       <code>+---------+&nbsp; +---------+&nbsp; +---------+&nbsp;
 +---------+&nbsp; +-------+&nbsp; </code><code>+-------+&nbsp; </code><code>+----+</code><br>
       <code>&nbsp; slice 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; slice
@@ -954,14 +857,15 @@ slice 4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; slice 5</code><br>
 are here to prevent plain text attack, where one knows which data is
 expected at a given place, an trying to guess the cipher comparing the
 expected data and the encrypted one. As dar generates structured
-archives, there would have some possibility that one uses this attack to
-crack an encrypted archive. To overcome this problem, elastic buffers
+archives, there would have some possibility that one use this attack to
+crack an archive encryption. To overcome this problem, elastic buffers
 have been added at the beginning and at the end of encrypted data. This
 way it is not possible to know where is located a given archive
 structure within the encrypted data. The elastic buffers are random
 data that contain at a random place a pattern that tells the overall
 size of the buffer (which size is randomly chosen during archive
-creation). The pattern is of the form "&gt;###&lt;" where the hash field
+creation). The pattern is of the form "&gt;###&lt;" where the hash
+field
 (###) contains the elastic buffer size in binary. Small elastic buffer
 can be "&gt;&lt;" for two bytes or "X" for one byte, but as it is
 encrypted beside archive data, it is not possible to determine its size
@@ -993,7 +897,7 @@ beginning of the catalogue).<br>
       </div>
       <br>
       <br>
-</td>
+      </td>
     </tr>
   </tbody>
 </table>
@@ -1005,14 +909,12 @@ beginning of the catalogue).<br>
       <td style="vertical-align: top;">
       <h3>Scrambling</h3>
       <br>
-
       <div style="text-align: justify;">Before strong encryption was
 implemented, dar had only a very simple and weak encryption mechanism.
 It remains available in current release under the "scram" algorithm
 name. It mains advantage is that is does not rely on any external
 library, it is completely part of libdar.<br>
       </div>
-
       <br>
 How does it works?<br>
       <br>
@@ -1026,7 +928,8 @@ principle is to add byte by byte the pass phrase to the data, modulo
 example: <br>
       </div>
       <br>
-the pass phrase is "he\220lo" (where \220 is the character which decimal value
+the pass phrase is "he\220lo" (where \220 is the character which
+decimal value
 is 220). the data is "example"<br>
       <br>
 taken from ASCII standard:<br>
@@ -1089,7 +992,8 @@ any
 portion without knowing the rest of the data. It does not consume much
 resources to compute, but it is terribly weak and easy to crack. Of
 course, the data is more difficult to retrieve without the key when the
-key is long. Today dar can also use strong encryption (blowfish and few others) and thanks to a encryption block can still avoid
+key is long. Today dar can also use strong encryption (blowfish and few
+others) and thanks to a encryption block can still avoid
 reading the whole archive to restore any single file.</div>
       </td>
     </tr>
@@ -1108,7 +1012,8 @@ reading the whole archive to restore any single file.</div>
 (GPG made Easy) to provide strong asymmetrical encryption and signature
 of an archive. Asymmetrical encryption is what you do when you use a
 public key to cypher data (=encrypt data) and a private key to uncypher
-it (=decrypt it). However, <span style="font-weight: bold;">dar does <span style="text-decoration: underline;">not </span>encrypt <span style="text-decoration: underline;">the whole archive</span> that way</span>, not it signs it that way, neither.<br>
+it (=decrypt it). However, <span style="font-weight: bold;">dar does <span style="text-decoration: underline;">not </span>encrypt <span style="text-decoration: underline;">the whole archive</span> that way</span>,
+not it signs it that way, neither.<br>
       <br>
 Instead, dar relies on the symmetrical strong encryption algorithm it
 is aware of for some time (blowfish, twofish, camellia, aes, etc.) to
@@ -1124,15 +1029,19 @@ this size. Then the key value itself is chosen randomly. The random
 generator used here is the one provided by libgcrypt using the
 GCRY_STRONG_RANDOM entropy level.<br>
       <br>
-Why doing that way and not using the asymmetrical algorithm to cypher the whole archive? <br>
+Why doing that way and not using the asymmetrical algorithm to cypher
+the whole archive? <br>
       <ul>
         <li>Because it would no more be possible to extract a single
 file from the archive or to read the archive's contents whithout
 reading the whole archive.</li>
-        <li>Because it would not be possible the quickly verify archive signatures (well, see below)<br>
+        <li>Because it would not be possible the quickly verify archive
+signatures (well, see below)<br>
         </li>
-        <li>Because it would avoid recovering an corrupted archive after the point of corruption</li>
-        <li>Because it would cost much disk space to encrypt an archive for it be readable by more than one recipients<br>
+        <li>Because it would avoid recovering an corrupted archive
+after the point of corruption</li>
+        <li>Because it would cost much disk space to encrypt an archive
+for it be readable by more than one recipients<br>
         </li>
       </ul>
 Yes, you can provide several recipients from your GPG keyring giving
@@ -1157,7 +1066,6 @@ sign these small files to be provided beside the archive slices.<br>
     </tr>
   </tbody>
 </table>
-
 <hr style="width: 100%; height: 2px;"><a name="overflow"></a><br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
@@ -1405,14 +1313,16 @@ modification of the file) to the archive number where the file has been
 found in that state. <br>
       <br>
 There is thus no way to record "detruit" entries in a dar_manager
-database, as no date is associated with this type of object. Yes, in a dar archive, we
+database, as no date is associated with this type of object. Yes, in a
+dar archive, we
 can only notice a file has been destroyed because it is not present in
 the filesystem but is present in the catalogue of the archive of
 reference. Thus we know the file has been destroyed between the date
 the archive of reference has been done and the date the current archive
 is actually done. Unfortunately, no date is recorded in dar archives
 telling it has been done at which time.<br>
-      <br>Thus, from dar_manager, inspecting a catalogue, there is no way to give
+      <br>
+Thus, from dar_manager, inspecting a catalogue, there is no way to give
 a significant date to a "detruit" entry. In consequences, for a given
 file which has been removed, then recreated, then removed again along a
 series of differential backups, it is not possible to order the times
@@ -1461,7 +1371,8 @@ which was not know in archives already present in the database, we must
 consider this file was deleted in each of these previous archives, but
 then we must record the dates of creation for all these previous
 archive to be able to put this information properly in the database.
-But, in that case we would not be able to make dar removing a file, as no
+But, in that case we would not be able to make dar removing a file, as
+no
 "detruit" object exist (all archive are full backups), and dar_manager
 should remove itself the entry from the filesystem. Beside the fact
 that it is not the role to dar_manager to directly interact with the
@@ -1559,8 +1470,8 @@ directory. </div>
 </table>
 <br>
 <hr style="width: 100%; height: 2px;"><br>
-
 </center>
+
 <table style="width: 90%; margin-right: auto; margin-left: auto; text-align: left;" border="0" cellpadding="2" cellspacing="2">
 
   <tbody>
@@ -1671,7 +1582,8 @@ structure of the archive. To be able to know the format used in the
 archive, a field is present in each archive that defines this format.
 Each dar binary can thus read all archive format, well of course a
 particular version cannot guess the format of archive that have been
-defined *after* that dar binary version has been released. If you try to open
+defined *after* that dar binary version has been released. If you try
+to open
 a recent archive with an old dar binary, you will have a warning about
 the fact that dar is probably not able to read the archive, dar will
 then ask you if you want to proceed anyway. Of course, you can try to
@@ -1681,7 +1593,8 @@ upgrade the archive format), you may succeed reading a recent archive
 with an old dar binary and get neither error nor warning, but this
 does not mean that dar did all that was necessary to restore the files
 properly, so it is advised to avoid using an archive with a version of
-dar that is tool old to handle the archive format properly (and rather reserve this
+dar that is tool old to handle the archive format properly (and rather
+reserve this
 possibility only in case of necessity).<br>
       </div>
       <h4>Cross reference matrix</h4>
@@ -1703,7 +1616,8 @@ application developer.<br>
     <tr>
       <td style="vertical-align: top; width: 15%; font-weight: bold; text-align: center;">Date<br>
       </td>
-      <td style="vertical-align: top; width: 10%; text-align: center; font-weight: bold;">release and<br>
+      <td style="vertical-align: top; width: 10%; text-align: center; font-weight: bold;">release
+and<br>
 (dar version)<br>
       </td>
       <td style="vertical-align: top; text-align: center; width: 10px;"><span style="font-weight: bold;">Archive format</span><br>
@@ -1711,7 +1625,7 @@ application developer.<br>
       <td style="vertical-align: top; text-align: center; width: 10px;"><span style="font-weight: bold;">Database</span><br style="font-weight: bold;">
       <span style="font-weight: bold;">Format</span><br>
       </td>
-<td style="vertical-align: top; width: 10%; font-weight: bold; text-align: center;">libdar
+      <td style="vertical-align: top; width: 10%; font-weight: bold; text-align: center;">libdar
 version<br>
       </td>
       <td style="vertical-align: top; width: 10%; font-weight: bold; text-align: center;">dar_xform<br>
@@ -1721,8 +1635,8 @@ version<br>
       <td style="vertical-align: top; width: 10%; font-weight: bold; text-align: center;">dar_manager<br>
       </td>
       <td style="vertical-align: top; width: 10%; font-weight: bold; text-align: center;">dar_cp<br>
-      </td><td style="vertical-align: top; font-weight: bold; width: 10%; text-align: center;">dar_split</td>
-
+      </td>
+      <td style="vertical-align: top; font-weight: bold; width: 10%; text-align: center;">dar_split</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">April 2nd,
@@ -1732,14 +1646,13 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">01<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">-----
-      </td>
-<td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">----- </td>
       <td style="vertical-align: top; text-align: center;">-----</td>
       <td style="vertical-align: top; text-align: center;">-----</td>
       <td style="vertical-align: top; text-align: center;">-----</td>
-      <td style="vertical-align: top; text-align: center;">-----</td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">April 24th,
@@ -1749,14 +1662,13 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">01<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">-----
-      </td>
-<td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">----- </td>
       <td style="vertical-align: top; text-align: center;">-----</td>
       <td style="vertical-align: top; text-align: center;">-----</td>
       <td style="vertical-align: top; text-align: center;">-----</td>
-      <td style="vertical-align: top; text-align: center;">-----</td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">May 8th, 2002<br>
@@ -1765,14 +1677,13 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">01<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">-----
-      </td>
-<td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">----- </td>
       <td style="vertical-align: top; text-align: center;">-----</td>
       <td style="vertical-align: top; text-align: center;">-----</td>
       <td style="vertical-align: top; text-align: center;">-----</td>
-      <td style="vertical-align: top; text-align: center;">-----</td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">May 27th, 2002<br>
@@ -1781,14 +1692,13 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">01<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">-----
-      </td>
-<td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">----- </td>
       <td style="vertical-align: top; text-align: center;">-----</td>
       <td style="vertical-align: top; text-align: center;">-----</td>
       <td style="vertical-align: top; text-align: center;">-----</td>
-      <td style="vertical-align: top; text-align: center;">-----</td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">June 26th,
@@ -1798,16 +1708,15 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">02<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">-----
-      </td>
-<td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">----- </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">-----</td>
-      <td style="vertical-align: top; text-align: center;">-----</td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Nov. 4th, 2002<br>
@@ -1816,17 +1725,16 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
       <td style="vertical-align: top; text-align: center;">1.1.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.1.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">-----</td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Jan. 10th,
@@ -1836,15 +1744,14 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
       <td style="vertical-align: top; text-align: center;">1.1.0</td>
       <td style="vertical-align: top; text-align: center;">1.1.0</td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">-----</td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">May 19th, 2003<br>
@@ -1853,17 +1760,16 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
       <td style="vertical-align: top; text-align: center;">1.1.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.1.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.1.0<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">-----</td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Nov. 2nd, 2003<br>
@@ -1872,9 +1778,8 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">1.0.0<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">1.0.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.1.0<br>
       </td>
@@ -1883,8 +1788,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Nov. 21th,
@@ -1894,9 +1799,8 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">1.0.1<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">1.0.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.1.0<br>
       </td>
@@ -1905,8 +1809,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Dec. 7th, 2003<br>
@@ -1915,9 +1819,8 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">1.0.2<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">1.0.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.1.0<br>
       </td>
@@ -1926,8 +1829,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Dec. 14th,
@@ -1937,9 +1840,8 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">1.0.2<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">1.0.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.1.0<br>
       </td>
@@ -1948,8 +1850,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Jan. 3rd, 2004<br>
@@ -1958,9 +1860,8 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">1.0.2<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">1.0.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.1.0<br>
       </td>
@@ -1969,8 +1870,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Feb. 8th, 2004<br>
@@ -1979,9 +1880,8 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">2.0.0<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">2.0.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.0<br>
       </td>
@@ -1990,8 +1890,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">March 5th,
@@ -2001,9 +1901,8 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">2.0.1<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">2.0.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.1<br>
       </td>
@@ -2012,8 +1911,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">March 12th,
@@ -2023,9 +1922,8 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">2.0.2<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">2.0.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.1<br>
       </td>
@@ -2034,8 +1932,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">May 6th, 2004<br>
@@ -2044,9 +1942,8 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">2.0.3<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">2.0.3<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.1<br>
       </td>
@@ -2055,8 +1952,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.1<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">July 13th,
@@ -2066,9 +1963,8 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">2.0.4<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">2.0.4<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.1<br>
       </td>
@@ -2077,8 +1973,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.1<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Sept. 12th,
@@ -2088,9 +1984,8 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">2.0.5<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">2.0.5<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.1<br>
       </td>
@@ -2099,19 +1994,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.1<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
-      <td style="vertical-align: top; text-align: right;">Jan. 29th, 2005<br>
+      <td style="vertical-align: top; text-align: right;">Jan. 29th,
+2005<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.1.6<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">2.0.5<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">2.0.5<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.1<br>
       </td>
@@ -2120,19 +2015,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.1<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
-      <td style="vertical-align: top; text-align: right;">Jan. 30th, 2005<br>
+      <td style="vertical-align: top; text-align: right;">Jan. 30th,
+2005<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.2.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">04<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">3.0.0<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">3.0.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.3.0<br>
       </td>
@@ -2141,8 +2036,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.3.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.1<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Feb. 20th,
@@ -2152,9 +2047,8 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">04<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">3.0.1<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">3.0.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
@@ -2163,8 +2057,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.1<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">May 12th, 2005<br>
@@ -2173,9 +2067,8 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">04<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">3.0.2<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">3.0.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
@@ -2184,8 +2077,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.2<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Sept. 13th,
@@ -2195,9 +2088,8 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">04<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">3.1.0<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">3.1.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
@@ -2206,8 +2098,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.2<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Nov. 5th, 2005<br>
@@ -2216,9 +2108,8 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">04<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">3.1.1<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">3.1.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
@@ -2227,8 +2118,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.2<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Dec. 6th, 2005<br>
@@ -2237,9 +2128,8 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">04<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">3.1.2<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">3.1.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
@@ -2248,7 +2138,8 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.2<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">Jan.
@@ -2258,9 +2149,8 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">04<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">3.1.3<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">3.1.3<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
@@ -2269,19 +2159,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.3<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
-      <td style="vertical-align: top; text-align: right;">Feb. 24th, 2006<br>
+      <td style="vertical-align: top; text-align: right;">Feb. 24th,
+2006<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.2.7<br>
       </td>
       <td style="vertical-align: top; text-align: center;">04<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">3.1.4<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">3.1.4<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
@@ -2290,19 +2180,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.3.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.3<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
-      <td style="vertical-align: top; text-align: right;">Feb. 24th, 2006<br>
+      <td style="vertical-align: top; text-align: right;">Feb. 24th,
+2006<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.3.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">05<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">4.0.0<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">4.0.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.4.0<br>
       </td>
@@ -2311,19 +2201,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.1.0<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
-      <td style="vertical-align: top; text-align: right;">June 26th, 2006<br>
+      <td style="vertical-align: top; text-align: right;">June 26th,
+2006<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.3.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">05<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">4.0.1<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">4.0.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.4.0<br>
       </td>
@@ -2332,36 +2222,36 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.1.0<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
-      <td style="vertical-align: top; text-align: right;">Oct. 30th, 2006<br>
+      <td style="vertical-align: top; text-align: right;">Oct. 30th,
+2006<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.3.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">05<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">4.0.2<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">4.0.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.4.0</td>
       <td style="vertical-align: top; text-align: center;">1.3.2</td>
       <td style="vertical-align: top; text-align: center;">1.4.0</td>
-      <td style="vertical-align: top; text-align: center;">1.1.0</td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      <td style="vertical-align: top; text-align: center;">1.1.0</td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
     <tr>
-      <td style="vertical-align: top; text-align: right;">Feb. 24th, 2007<br>
+      <td style="vertical-align: top; text-align: right;">Feb. 24th,
+2007<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.3.3<br>
       </td>
       <td style="vertical-align: top; text-align: center;">05<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">4.1.0<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">4.1.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.4.0<br>
       </td>
@@ -2370,18 +2260,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.0<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">June 30th, 2007<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">June 30th,
+2007<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.3.4<br>
       </td>
       <td style="vertical-align: top; text-align: center;">06<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">4.3.0<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">4.3.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.4.0<br>
       </td>
@@ -2390,18 +2281,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.0<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">Aug. 28th, 2007<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">Aug. 28th,
+2007<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.3.5<br>
       </td>
       <td style="vertical-align: top; text-align: center;">06<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">4.4.0<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">4.4.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.4.1<br>
       </td>
@@ -2410,18 +2302,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.1<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">Sept. 29th, 2007<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">Sept. 29th,
+2007<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.3.6<br>
       </td>
       <td style="vertical-align: top; text-align: center;">06<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">4.4.1<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">4.4.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.4.1<br>
       </td>
@@ -2430,18 +2323,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.1<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">Feb. 10th, 2008<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">Feb. 10th,
+2008<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.3.7<br>
       </td>
       <td style="vertical-align: top; text-align: center;">06<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">4.4.2<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">4.4.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.4.2<br>
       </td>
@@ -2450,11 +2344,11 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.3<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
       <td style="vertical-align: top;">
-
       <div style="text-align: right;">June 20th, 2008<br>
       </div>
       </td>
@@ -2462,9 +2356,8 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">07<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">4.4.3<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">4.4.3<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.4.2<br>
       </td>
@@ -2473,18 +2366,18 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.3<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
       <td style="vertical-align: top; text-align: right;">May 22nd, 2009<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.3.9<br>
       </td>
       <td style="vertical-align: top; text-align: center;">07<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">4.4.4<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">4.4.4<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.4.2<br>
       </td>
@@ -2493,18 +2386,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.3<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">April 9th, 2010<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">April 9th,
+2010<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.3.10<br>
       </td>
       <td style="vertical-align: top; text-align: center;">07<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">4.4.5<br>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">4.4.5<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.4.2<br>
       </td>
@@ -2513,52 +2407,46 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.4.3<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
       <td style="vertical-align: top;">
-      <div style="margin-left: 40px; text-align: right;">March 13th, 2011<br>
+      <div style="margin-left: 40px; text-align: right;">March 13th,
+2011<br>
       </div>
-
       </td>
-      <td style="vertical-align: top; text-align: center;">2.3.11
-      </td>
-      <td style="vertical-align: top; text-align: center;">07
-      </td>
-      <td style="vertical-align: top; text-align: center;">01
-      </td>
-<td style="vertical-align: top; text-align: center;">4.5.0
-      </td>
-      <td style="vertical-align: top; text-align: center;">1.4.3
-      </td>
-      <td style="vertical-align: top; text-align: center;">1.3.4
-      </td>
-      <td style="vertical-align: top; text-align: center;">1.4.3
-      </td>
-      <td style="vertical-align: top; text-align: center;">1.2.2
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">February 25th, 2012</td>
+      <td style="vertical-align: top; text-align: center;">2.3.11 </td>
+      <td style="vertical-align: top; text-align: center;">07 </td>
+      <td style="vertical-align: top; text-align: center;">01 </td>
+      <td style="vertical-align: top; text-align: center;">4.5.0 </td>
+      <td style="vertical-align: top; text-align: center;">1.4.3 </td>
+      <td style="vertical-align: top; text-align: center;">1.3.4 </td>
+      <td style="vertical-align: top; text-align: center;">1.4.3 </td>
+      <td style="vertical-align: top; text-align: center;">1.2.2 </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">February
+25th, 2012</td>
       <td style="vertical-align: top; text-align: center;">2.3.12</td>
       <td style="vertical-align: top; text-align: center;">07</td>
       <td style="vertical-align: top; text-align: center;">01<br>
       </td>
-<td style="vertical-align: top; text-align: center;">4.5.1</td>
+      <td style="vertical-align: top; text-align: center;">4.5.1</td>
       <td style="vertical-align: top; text-align: center;">1.4.3</td>
       <td style="vertical-align: top; text-align: center;">1.3.4</td>
       <td style="vertical-align: top; text-align: center;">1.4.3</td>
-      <td style="vertical-align: top; text-align: center;">1.2.2</td><td style="vertical-align: top; text-align: center;">-----</td>
-
+      <td style="vertical-align: top; text-align: center;">1.2.2</td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
     </tr>
-<tr>
+    <tr>
       <td style="vertical-align: top; text-align: right;">June 2nd, 2011<br>
-
       </td>
       <td style="vertical-align: top; text-align: center;">2.4.0</td>
       <td style="vertical-align: top; text-align: center;">08</td>
       <td style="vertical-align: top; text-align: center;">02</td>
-<td style="vertical-align: top; text-align: center;">5.0.0</td>
+      <td style="vertical-align: top; text-align: center;">5.0.0</td>
       <td style="vertical-align: top; text-align: center;">1.5.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.4.0<br>
@@ -2566,17 +2454,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.5.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.3<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">July 21st, 2011<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">July 21st,
+2011<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.4.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">08<br>
       </td>
       <td style="vertical-align: top; text-align: center;">02</td>
-<td style="vertical-align: top; text-align: center;">5.1.0<br>
+      <td style="vertical-align: top; text-align: center;">5.1.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.5.0<br>
       </td>
@@ -2585,17 +2475,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.6.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.3<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">Sept. 5th, 2011<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">Sept. 5th,
+2011<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.4.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">08<br>
       </td>
       <td style="vertical-align: top; text-align: center;">02</td>
-<td style="vertical-align: top; text-align: center;">5.1.1<br>
+      <td style="vertical-align: top; text-align: center;">5.1.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.5.0<br>
       </td>
@@ -2604,34 +2496,38 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.6.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.3<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">February 25th, 2012<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">February
+25th, 2012<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.4.3<br>
       </td>
       <td style="vertical-align: top; text-align: center;">08<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03</td>
-<td style="vertical-align: top; text-align: center;">5.2.0<br>
+      <td style="vertical-align: top; text-align: center;">5.2.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.5.0</td>
       <td style="vertical-align: top; text-align: center;">1.4.0</td>
       <td style="vertical-align: top; text-align: center;">1.7.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.3<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">March 17th, 2012<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">March 17th,
+2012<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.4.4<br>
       </td>
       <td style="vertical-align: top; text-align: center;">08<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03</td>
-<td style="vertical-align: top; text-align: center;">5.2.1<br>
+      <td style="vertical-align: top; text-align: center;">5.2.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.5.0<br>
       </td>
@@ -2640,17 +2536,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.3<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">April 15th, 2012<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">April 15th,
+2012<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.4.5<br>
       </td>
       <td style="vertical-align: top; text-align: center;">08<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03</td>
-<td style="vertical-align: top; text-align: center;">5.2.2<br>
+      <td style="vertical-align: top; text-align: center;">5.2.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.5.1<br>
       </td>
@@ -2659,17 +2557,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.4<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">June 24th, 2012<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">June 24th,
+2012<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.4.6<br>
       </td>
       <td style="vertical-align: top; text-align: center;">08<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03</td>
-<td style="vertical-align: top; text-align: center;">5.2.3<br>
+      <td style="vertical-align: top; text-align: center;">5.2.3<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.5.2<br>
       </td>
@@ -2678,9 +2578,10 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.3<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.5<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
       <td style="vertical-align: top; text-align: right;">July 5th, 2012<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.4.7<br>
@@ -2688,7 +2589,7 @@ version<br>
       <td style="vertical-align: top; text-align: center;">08<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03</td>
-<td style="vertical-align: top; text-align: center;">5.2.4<br>
+      <td style="vertical-align: top; text-align: center;">5.2.4<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.5.2<br>
       </td>
@@ -2697,17 +2598,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.3<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.5<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">September 9th, 2012<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">September
+9th, 2012<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.4.8<br>
       </td>
       <td style="vertical-align: top; text-align: center;">08<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03</td>
-<td style="vertical-align: top; text-align: center;">5.3.0<br>
+      <td style="vertical-align: top; text-align: center;">5.3.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.5.3<br>
       </td>
@@ -2716,17 +2619,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.4<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.6<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">January 6th, 2013<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">January 6th,
+2013<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.4.9<br>
       </td>
       <td style="vertical-align: top; text-align: center;">08<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03</td>
-<td style="vertical-align: top; text-align: center;">5.3.1<br>
+      <td style="vertical-align: top; text-align: center;">5.3.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.5.3<br>
       </td>
@@ -2735,17 +2640,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.4<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.7<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">March 9th, 2013<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">March 9th,
+2013<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.4.10<br>
       </td>
       <td style="vertical-align: top; text-align: center;">08<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03</td>
-<td style="vertical-align: top; text-align: center;">5.3.2<br>
+      <td style="vertical-align: top; text-align: center;">5.3.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.5.3<br>
       </td>
@@ -2754,17 +2661,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.4<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.7<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">Aug. 26th, 2013<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">Aug. 26th,
+2013<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.4.11<br>
       </td>
       <td style="vertical-align: top; text-align: center;">08<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03</td>
-<td style="vertical-align: top; text-align: center;">5.4.0<br>
+      <td style="vertical-align: top; text-align: center;">5.4.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.5.4<br>
       </td>
@@ -2773,17 +2682,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.5<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.8<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">January 19th, 2014<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">January 19th,
+2014<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.4.12<br>
       </td>
       <td style="vertical-align: top; text-align: center;">08<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03</td>
-<td style="vertical-align: top; text-align: center;">5.5.0<br>
+      <td style="vertical-align: top; text-align: center;">5.5.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.5.4<br>
       </td>
@@ -2792,17 +2703,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.6<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.8<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">April 21st, 2014<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">April 21st,
+2014<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.4.13<br>
       </td>
       <td style="vertical-align: top; text-align: center;">08<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03</td>
-<td style="vertical-align: top; text-align: center;">5.6.0<br>
+      <td style="vertical-align: top; text-align: center;">5.6.0<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.5.5<br>
       </td>
@@ -2811,17 +2724,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.7<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.8<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">June 15th, 2014<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">June 15th,
+2014<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.4.14<br>
       </td>
       <td style="vertical-align: top; text-align: center;">08<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03</td>
-<td style="vertical-align: top; text-align: center;">5.6.1<br>
+      <td style="vertical-align: top; text-align: center;">5.6.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.5.5<br>
       </td>
@@ -2830,17 +2745,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.7<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.8<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">September 6th, 2014<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">September
+6th, 2014<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.4.15<br>
       </td>
       <td style="vertical-align: top; text-align: center;">08<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03</td>
-<td style="vertical-align: top; text-align: center;">5.6.2<br>
+      <td style="vertical-align: top; text-align: center;">5.6.2<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.5.6<br>
       </td>
@@ -2849,17 +2766,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.8<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.8<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">January 18th, 2015<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">January 18th,
+2015<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.4.16<br>
       </td>
       <td style="vertical-align: top; text-align: center;">08<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03</td>
-<td style="vertical-align: top; text-align: center;">5.6.3<br>
+      <td style="vertical-align: top; text-align: center;">5.6.3<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.5.6<br>
       </td>
@@ -2868,17 +2787,19 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.8<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.8<br>
-      </td><td style="vertical-align: top; text-align: center;">-----</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">January 31th, 2015<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">January 31th,
+2015<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.4.17<br>
       </td>
       <td style="vertical-align: top; text-align: center;">08<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03</td>
-<td style="vertical-align: top; text-align: center;">5.6.4<br>
+      <td style="vertical-align: top; text-align: center;">5.6.4<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.5.6<br>
       </td>
@@ -2887,38 +2808,33 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.7.8<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.8<br>
-      </td><td style="vertical-align: top; text-align: center;"><br>
-</td>
-
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">August 30th, 2015
       </td>
-      <td style="vertical-align: top; text-align: center;">2.4.18
-      </td>
-      <td style="vertical-align: top; text-align: center;">08.1
-      </td>
-      <td style="vertical-align: top; text-align: center;">03</td>
-<td style="vertical-align: top; text-align: center;">5.6.5
-      </td>
-      <td style="vertical-align: top; text-align: center;">1.5.6
-      </td>
-      <td style="vertical-align: top; text-align: center;">1.4.6
-      </td>
-      <td style="vertical-align: top; text-align: center;">1.7.8</td>
-      <td style="vertical-align: top; text-align: center;">1.2.8
-      </td>
-      <td style="vertical-align: top; text-align: center;">-----
+      <td style="vertical-align: top; text-align: center;"><br>
       </td>
     </tr>
     <tr>
-      <td style="vertical-align: top; text-align: right;">October 4th, 2015<br>
+      <td style="vertical-align: top; text-align: right;">August 30th,
+2015 </td>
+      <td style="vertical-align: top; text-align: center;">2.4.18 </td>
+      <td style="vertical-align: top; text-align: center;">08.1 </td>
+      <td style="vertical-align: top; text-align: center;">03</td>
+      <td style="vertical-align: top; text-align: center;">5.6.5 </td>
+      <td style="vertical-align: top; text-align: center;">1.5.6 </td>
+      <td style="vertical-align: top; text-align: center;">1.4.6 </td>
+      <td style="vertical-align: top; text-align: center;">1.7.8</td>
+      <td style="vertical-align: top; text-align: center;">1.2.8 </td>
+      <td style="vertical-align: top; text-align: center;">----- </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">October 4th,
+2015<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.4.19<br>
       </td>
       <td style="vertical-align: top; text-align: center;">08.1<br>
       </td>
       <td style="vertical-align: top; text-align: center;">03</td>
-<td style="vertical-align: top; text-align: center;">5.6.6<br>
+      <td style="vertical-align: top; text-align: center;">5.6.6<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.5.6<br>
       </td>
@@ -2928,26 +2844,38 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.8<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">-----
-      </td>
+      <td style="vertical-align: top; text-align: center;">----- </td>
     </tr>
     <tr>
-<td style="vertical-align: top; text-align: right;">November 21th, 2015<br>
-      </td><td style="vertical-align: top; text-align: center;">2.4.20<br>
-      </td><td style="vertical-align: top; text-align: center;">08.1<br>
-      </td><td style="vertical-align: top; text-align: center;">03<br>
-      </td><td style="vertical-align: top; text-align: center;">5.6.7<br>
-      </td><td style="vertical-align: top; text-align: center;">1.5.8<br>
-      </td><td style="vertical-align: top; text-align: center;">1.4.8<br>
-      </td><td style="vertical-align: top; text-align: center;">1.7.10<br>
-      </td><td style="vertical-align: top; text-align: center;">1.2.10<br>
-      </td><td style="vertical-align: top; text-align: center;">-----
-      </td></tr>
+      <td style="vertical-align: top; text-align: right;">November
+21th, 2015<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">2.4.20<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">08.1<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">03<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">5.6.7<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.5.8<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.4.8<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.7.10<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.2.10<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">----- </td>
+    </tr>
     <tr>
       <td style="vertical-align: top; text-align: right;">April 24th,
-2016</td>
-      <td style="vertical-align: top; text-align: center;">2.4.21</td>
-      <td style="vertical-align: top; text-align: center;">08.1</td>
+2016<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">2.4.21<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">08.1<br>
+      </td>
       <td style="vertical-align: top; text-align: center;">03
       </td>
       <td style="vertical-align: top; text-align: center;">5.6.8
@@ -2958,16 +2886,39 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.7.11
       </td>
-      <td style="vertical-align: top; text-align: center;">1.2.10</td>
-      <td style="vertical-align: top; text-align: center;">-----</td>
+      <td style="text-align: center;">1.2.10</td>
+      <td style="text-align: center;">-----</td>
     </tr>
-<tr>
-      <td style="vertical-align: top; text-align: right;">October 4th, 2015<br></td>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">June 5th, 2016<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">2.4.22<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">08.1<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">03
+      </td>
+      <td style="vertical-align: top; text-align: center;">5.6.9<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.5.9<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.4.9<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.7.11<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.2.10<br>
+      </td>
+      <td style="text-align: center;">-----</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">October 4th,
+2015<br>
+      </td>
       <td style="vertical-align: top; text-align: center;">2.5.0</td>
       <td style="vertical-align: top; text-align: center;">09</td>
       <td style="vertical-align: top; text-align: center;">04<br>
       </td>
-<td style="vertical-align: top; text-align: center;">5.7.0</td>
+      <td style="vertical-align: top; text-align: center;">5.7.0</td>
       <td style="vertical-align: top; text-align: center;">1.5.7</td>
       <td style="vertical-align: top; text-align: center;">1.4.7</td>
       <td style="vertical-align: top; text-align: center;">1.7.9</td>
@@ -2975,19 +2926,23 @@ version<br>
       <td style="vertical-align: top; text-align: center;">1.0.0</td>
     </tr>
     <tr>
-      <td style="vertical-align: top; text-align: right;">October 17th, 2015<br></td>
+      <td style="vertical-align: top; text-align: right;">October 17th,
+2015<br>
+      </td>
       <td style="vertical-align: top; text-align: center;">2.5.1</td>
       <td style="vertical-align: top; text-align: center;">09</td>
       <td style="vertical-align: top; text-align: center;">04<br>
       </td>
-<td style="vertical-align: top; text-align: center;">5.7.1</td>
+      <td style="vertical-align: top; text-align: center;">5.7.1</td>
       <td style="vertical-align: top; text-align: center;">1.5.8</td>
       <td style="vertical-align: top; text-align: center;">1.4.8</td>
       <td style="vertical-align: top; text-align: center;">1.7.10</td>
       <td style="vertical-align: top; text-align: center;">1.2.10</td>
       <td style="vertical-align: top; text-align: center;">1.0.0</td>
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">November 21st, 2015<br>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">November
+21st, 2015<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.5.2<br>
       </td>
@@ -3007,8 +2962,10 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
       </td>
-    </tr><tr>
-      <td style="vertical-align: top; text-align: right;">January 4th, 2016<br>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">January 4th,
+2016<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2.5.3<br>
       </td>
@@ -3028,34 +2985,66 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.0.0<br>
       </td>
-    </tr><tr>
+    </tr>
+    <tr>
       <td style="vertical-align: top; text-align: right;">April 24th,
-2016</td>
-      <td style="vertical-align: top; text-align: center;">2.5.4</td>
+2016<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">2.5.4<br>
+      </td>
       <td style="vertical-align: top; text-align: center;">09
       </td>
       <td style="vertical-align: top; text-align: center;">04
       </td>
       <td style="vertical-align: top; text-align: center;">5.8.0
       </td>
-      <td style="vertical-align: top; text-align: center;">1.5.9</td>
-      <td style="vertical-align: top; text-align: center;">1.4.9</td>
-      <td style="vertical-align: top; text-align: center;">1.7.11</td>
-      <td style="vertical-align: top; text-align: center;">1.2.10</td>
-      <td style="vertical-align: top; text-align: center;">1.0.0
+      <td style="vertical-align: top; text-align: center;">1.5.9
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.4.9
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.7.11
+      </td>
+      <td style="text-align: center;">1.2.10</td>
+      <td style="vertical-align: top; text-align: center;">1.0.0<br>
+
+      </td>
+    </tr><tr>
+      <td style="vertical-align: top; text-align: right;">June 5th, 2016<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">2.5.5<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">09<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">04<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">5.8.1<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.5.9<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.4.9<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.7.11<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.2.10<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.0.0<br>
       </td>
     </tr>
 
-
   </tbody>
 </table>
+
 <br>
+
 <hr style="width: 100%; height: 2px;"><br>
+
 <table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
   <tbody>
     <tr>
       <td style="vertical-align: top;">
-      <h3><a name="sym"></a>How symmetric encryption is performed in dar/libdar<br>
+      <h3><a name="sym"></a>How symmetric encryption is performed in
+dar/libdar<br>
       </h3>
 Symmetric encryption are those that use a same key/password/passphrase
 to cipher data and to uncipher it, like for example blofish, AES,
@@ -3089,7 +3078,8 @@ Thanks to the encyrption per block, dar is able to uncipher data at
 random place without having to uncipher the whole archive: only the
 block containing the need data is unciphered.<br>
       <br>
-Here follows a diagram of the way key, block number, cipher algorithm, Initial Vector are defined:<br>
+Here follows a diagram of the way key, block number, cipher algorithm,
+Initial Vector are defined:<br>
       <code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 +------------------- [ algo in CBC mode ]
@@ -3170,37 +3160,43 @@ handle&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp; Initialization<br>
-. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .|. . . . . . . . . . . . . . . | . . . . . . . . . .<br>
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .|. . . . . .
+. . . . . . . . . | . . . . . . . . . .<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |<br>
-block_number_in_archive ----------------------------&gt; [ encrypt ] ------&gt; IV -----+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+block_number_in_archive ----------------------------&gt; [ encrypt ]
+------&gt; IV -----+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; v<br>
-data ------------------------------------------------------------------------&gt; [ encrypt/decrypt ] -----&gt; data<br>
+data
+------------------------------------------------------------------------&gt;
+[ encrypt/decrypt ] -----&gt; data<br>
 sliced by block<br>
 of given size</code><br>
       <br>
       </div>
       <br>
       </td>
-      
     </tr>
-    
   </tbody>
 </table>
+
 <br>
+
 <hr style="width: 100%; height: 2px;"><br>
+
 <table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
   <tbody>
     <tr>
       <td style="vertical-align: top;">
-      <h3><a name="asym"></a>
-How asymmetric encryption is performed in dar/libdar<br>
+      <h3><a name="asym"></a>How asymmetric encryption is performed in
+dar/libdar<br>
       </h3>
       <div style="text-align: justify;">Dar does not encrypt the whole
 archive with a recipient's public key, but rather randomly chooses a
@@ -3240,12 +3236,14 @@ lot of the possibilities of change as there is also a constraint on the
 archive length.<br>
       </div>
       <br>
-
       </td>
     </tr>
   </tbody>
 </table>
+
 <br>
+
 <br>
+
 
 </body></html>
