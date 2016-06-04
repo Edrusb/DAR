@@ -59,7 +59,9 @@ xformed1=xformed1
 xformed2=xformed2
 xformed3=xformed3
 
-hash="`sed -r -n -e 's/--hash (.*)/\1/p' tmp.file | tail -n 1`"
+if [ "$1" != "NONE" ] ; then
+  hash="`sed -r -n -e 's/--hash (.*)/\1/p' tmp.file | tail -n 1`"
+fi
 hash_xform="-3 $hash"
 if [ "$hash" = "" ] ; then
    hash="none"

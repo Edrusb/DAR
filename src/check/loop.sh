@@ -1,89 +1,20 @@
 #!/bin/sh
 
-CWD=`pwd`
-
-if [ ! -x ../dar_suite/dar ] ; then
-  echo "********************************************"
-  echo ""
-  echo "Dar is not built, aborting"
-  echo ""
-  echo "********************************************"
-  exit 2
-else
-  export DAR=$CWD/../dar_suite/dar
-fi
-
-if [ ! -x ../dar_suite/dar_slave ] ; then
-  echo "********************************************"
-  echo ""
-  echo "Dar_slave is not built, aborting"
-  echo ""
-  echo "********************************************"
-  exit 2
-else
-  export DAR_SLAVE=$CWD/../dar_suite/dar_slave
-fi
-
-if [ ! -x ../dar_suite/dar_xform ] ; then
-  echo "********************************************"
-  echo ""
-  echo "Dar_xform is not built, aborting"
-  echo ""
-  echo "********************************************"
-  exit 2
-else
-  export DAR_XFORM=$CWD/../dar_suite/dar_xform
-fi
-
-if [ ! -x ./all_features ] ; then
-  echo "********************************************"
-  echo ""
-  echo "all_features program not built, aborting"
-  echo ""
-  echo "********************************************"
-  exit 2
-fi
-
-if [ `id -u` -ne 0 ]; then
-  echo "********************************************"
-  echo ""
-  echo "need to be run as root"
-  echo ""
-  echo "********************************************"
-  exit 3
-fi
-
-if [ -z "$DAR_KEY" ] ; then
-  echo "You need to set the environmental varialble"
-  echo "DAR_KEY to an email for which you have public"
-  echo "and private key available for encryption and"
-  echo "signature."
-  echo "You can use the GNUPGHOME variable to"
-  echo "point to another keyring than ~root/.gnupg"
-  echo ""
-  echo "Example of use with bash:"
-  echo "export DAR_KEY=your.email@your.domain"
-  echo "export GNUPGHOME=~me/.gnupg"
-  echo ""
-  echo "Example of use with tcsh:"
-  echo "setenv DAR_KEY your.email@your.domain"
-  echo "setenv GNUPGHOME ~me/.gnupg"
-  exit 3
-fi
-
-if ./all_features ; then
-  echo "OK, all required features are available for testing"
-else
-  exit 3
-fi
-
 for archive in Old_format/* ; do
   basename=`echo "$archive" | sed -r -e "s/\.[0-9]+\.dar//"`
+  echo "Testing ascendant compatibility with $basename"
   if ! ../dar_suite/dar -q -Q -t "$basename" ; then
      echo "FAILED TESTING OLD ARCHIVE FORMAT: $basename"
      exit 1
   fi
 done
+
+TMP_FILE=my_tmpfile
+MY_MAKEFILE=my_makefile
+
+rm -f $TMP_FILE $MY_MAKEFILE
+
+printf "Building the Makefile... "
 
 # for multi_thread in n y ; do
 multi_thread="n"
@@ -99,7 +30,15 @@ multi_thread="n"
                     for keep_compr in y n ; do
                       for recheck_hole in y n ; do
 			for asym in y n ; do
-                         ./main.sh "$multi_thread" "$hash" "$crypto" "$zip" "$slice" "$Slice" "$tape" "$seq_read" "$digit" "$sparse_size" "$keep_compr" "$recheck_hole" "$asym" || exit 1
+TARGET=target_$multi_thread$hash$crypto$zip$slice$Slice$tape$seq_read$digit$sparse_size$keep_compr$recheck_hole$asym
+cat >> $MY_MAKEFILE <<EOF
+$TARGET:
+	./main.sh "$multi_thread" "$hash" "$crypto" "$zip" "$slice" "$Slice" "$tape" "$seq_read" "$digit" "$sparse_size" "$keep_compr" "$recheck_hole" "$asym"
+
+EOF
+cat >> $TMP_FILE <<EOF
+ $TARGET
+EOF
                         done
 		      done
                     done
@@ -114,10 +53,7 @@ multi_thread="n"
   done
 # done
 
-echo "+-------------------------------+"
-echo "| ALL TESTS PASSED SUCCESSFULLY |"
-echo "+-------------------------------+"
-
-if [ -x ~denis/Scripts/send_sms ] ; then
-    ~denis/Scripts/send_sms "make check successful !"
-fi
+printf "all:" >> $MY_MAKEFILE
+echo `cat $TMP_FILE` >> $MY_MAKEFILE
+rm $TMP_FILE
+echo "Done"

@@ -1,8 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ "$1" = "" ] ; then
   echo "usage $0  <multi-thread> <hash> <crypto> <zip> <slice> <Slice> <tape mark[y|n]> <sequential read[y|n]> <min-digit> <sparse-size> <keepcompressed[y|n]> <recheck-hole[y|n]> <asym[y|n]>"
   exit 1
+fi
+
+if [ -f my_env ] ; then
+    source my_env
 fi
 
 multi_thread="$1"
@@ -38,6 +42,13 @@ ALL_TESTS="A1 B1 B2 B3 B4 C1 C2 C3 C4 D1 E1 E2 E3 F1 F2 F3 G1 G2 G3 H1"
 
 mkdir "$prefix"
 cd "$prefix"
+
+LOG=log.out
+printf " ----------------------------------------------------------------\n" > "$LOG"
+printf "TESTS PARAMETERS NATURE: thread\thash\t\tcrypto\tzip\tslice\tSlice\ttape-mark\tseqread\tdigit\tsparse\tkeepcpr\tre-hole\tasy\n" >> "$LOG"
+printf "TESTS PARAMETERS VALUE : $multi_thread\t$hash\t$crypto\t$zip\t$slice\t$Slice\t$tape_mark\t\t$seq_read\t$digit\t$sparse\t$keep_compr\t$re_hole\t$asym\n" >> "$LOG"
+printf "TEST SET: $ALL_TESTS\n" >> "$LOG"
+printf " ----------------------------------------------------------------\n" >> "$LOG"
 
 export OPT=tmp.file
 
@@ -191,14 +202,8 @@ testing:
 diffing:
 
 EOF
-echo "----------------------------------------------------------------"
-echo "----------------------------------------------------------------"
-echo "TESTS PARAMETERS NATURE: thread\thash\t\tcrypto\tzip\tslice\tSlice\ttape-mark\tseqread\tdigit\tsparse\tkeepcpr\tre-hole\tasym"
-echo "TESTS PARAMETERS VALUE : $multi_thread\t$hash\t$crypto\t$zip\t$slice\t$Slice\t$tape_mark\t\t$seq_read\t$digit\t$sparse\t$keep_compr\t$re_hole\t$asym"
-echo "TEST SET: $ALL_TESTS"
-echo "----------------------------------------------------------------"
 
-if ../routine.sh $ALL_TESTS ; then
+if ../routine.sh $ALL_TESTS 1>> "$LOG" 2> log.err ; then
   cd ..
   rm -rf "$prefix"
 else
