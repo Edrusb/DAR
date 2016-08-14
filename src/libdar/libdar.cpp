@@ -403,6 +403,8 @@ namespace libdar
 		    throw Erange("libdar_init_libgcrypt", tools_printf(gettext("Too old version for libgcrypt, minimum required version is %s\n"), MIN_VERSION_GCRYPT));
 #endif
 
+	    // initializing gpgme
+
 #if GPGME_SUPPORT
 	    if(gpgme_check_version(GPGME_MIN_VERSION) == nullptr)
 	    {
