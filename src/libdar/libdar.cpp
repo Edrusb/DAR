@@ -48,6 +48,12 @@ extern "C"
 #include <gcrypt.h>
 #endif
 
+#if LIBCURL_AVAILABLE
+#ifdef HAVE_CURL_CURL_H
+#include <curl/curl.h>
+#endif
+#endif
+
 #if HAVE_TIME_H
 #include <time.h>
 #endif
@@ -407,6 +413,17 @@ namespace libdar
 	    if(gpgme_err_code(gpgme_engine_check_version(GPGME_PROTOCOL_OpenPGP)) != GPG_ERR_NO_ERROR)
 		throw Erange("libdar_init_gpgme", tools_printf(gettext("GPGME engine not available: %s"), gpgme_get_protocol_name(GPGME_PROTOCOL_OpenPGP)));
 #endif
+	    // initializing libcurl
+
+#if LIBCURL_AVAILABLE
+	    CURLcode curlret = curl_global_init(CURL_GLOBAL_ALL);
+	    if(curlret != 0)
+	    {
+		const char *msg = curl_easy_strerror(curlret);
+		throw Erange("libdar_init_libcurl", tools_printf(gettext("libcurl initialization failed: %s"), msg));
+	    }
+#endif
+
 	    tools_init();
 
 		// so now libdar is ready for use!
