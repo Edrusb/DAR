@@ -743,6 +743,38 @@ AC_ARG_ENABLE( [librsync-linking],
               ]
               )
 
+AC_ARG_ENABLE( [libcurl-linking],
+	       AC_HELP_STRING(--disable-libcurl-linking, [ignore libcurl and avoid linking against it]),
+	       [ local_libcurl="no" ],
+	       [
+	          AC_CHECK_LIB(curl, [curl_global_init], [], [AC_MSG_WARN([libcurl library not found])])
+	          AC_CHECK_HEADER(curl/curl.h,
+				  [
+					local_libcurl="yes"
+				        AC_DEFINE(HAVE_CURL_CURL_H, 1, [libcurl.h header file is available])
+				  ],
+				  [
+					AC_MSG_WARN([Cannot find libcurl.h header file])
+				 	local_libcurl="no"
+				  ])
+		 if test "$local_libcurl" = "yes" ; then
+		    	AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
+							   	  #if HAVE_CURL_CURL_H
+								  #include <curl/curl.h>
+								  #endif
+							   }
+							]],
+							[[
+							    (void) curl_global_init(CURL_GLOBAL_ALL);
+							]])
+					],
+					[AC_DEFINE(LIBCURL_AVAILABLE, 1, [libcurl is usable])],
+					[ local_libcurl="no" ])
+		 else
+			AC_MSG_WARN([remote repository support not available])
+		 fi
+		])
+
 AC_ARG_ENABLE(  [fadvise],
 		AC_HELP_STRING(--disable-fadvise, [avoid using fadvise(2) system call]),
 		[],
@@ -1381,6 +1413,13 @@ fi
 
 printf "   Delta-compression support  : "
 if [ "$local_librsync" = "yes" ] ; then
+  echo "YES"
+else
+  echo "NO"
+fi
+
+printf "   Remote repository support  : "
+if [ "$local_libcurl" = "yes" ] ; then
   echo "YES"
 else
   echo "NO"
