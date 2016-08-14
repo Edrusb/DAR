@@ -716,8 +716,8 @@ AC_ARG_ENABLE( [librsync-linking],
                local_librsync="no"
               ],
               [
- 	       AC_CHECK_LIB(rsync, [rs_strerror], [], [AC_MSG_WARN([library librsync not found])])
-                AC_CHECK_HEADER(librsync.h, [local_librsync="yes"
+ 	       AC_CHECK_LIB(rsync, [rs_strerror], [], [AC_MSG_WARN([librsync library not found])])
+               AC_CHECK_HEADER(librsync.h, [local_librsync="yes"
  				       	AC_DEFINE(HAVE_LIBRSYNC_H, 1, [librsync.h header file is available])
  				       ],
   			               [AC_MSG_WARN([Cannot find librsync.h header file])
@@ -735,7 +735,7 @@ AC_ARG_ENABLE( [librsync-linking],
  							   (void) rs_strerror(err);
                                                ]])
      			      ],
-                               [ AC_DEFINE(LIBRSYNC_AVAILABLE, 1, [header and linking is available to have librsync functions])],
+                               [ AC_DEFINE(LIBRSYNC_AVAILABLE, 1, [librsync is usable])],
                                [ local_librsync="no" ])
                 else
                   AC_MSG_WARN([librsync compression support not available])
