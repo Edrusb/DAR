@@ -18,7 +18,7 @@ AC_SUBST(pkgconfigdir, [${libdir}/pkgconfig])
 AC_ARG_WITH([pkgconfigdir],
 	    AC_HELP_STRING(--with-pkgconfigdir=DIR, [defines an alternative directory to install pkconfig files, default is '${libdir}/pkgconfig']),
 	    [
-	       if [ ! -z "$withval" ] ; then
+		if [ ! -z "$withval" ] ; then
   	         AC_SUBST(pkgconfigdir, $withval)
                fi
 	    ],
