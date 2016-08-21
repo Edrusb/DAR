@@ -1731,6 +1731,10 @@ namespace libdar
                         test = va_arg(ap, U_I);
                         output += tools_string_to_hexa(deci(test).human());
                         break;
+		    case 'o':
+			test = va_arg(ap, U_I);
+			output += tools_int2octal(test);
+			break;
                     case 's':
                         output += va_arg(ap, char *);
                         break;

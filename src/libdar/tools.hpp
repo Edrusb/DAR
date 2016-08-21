@@ -447,7 +447,7 @@ namespace libdar
 	/// \param[in] ... list of argument to use against the format string
 	/// \return the resulting string
 	/// \note the supported masks for the format are:
-	/// - \%s \%c \%d \%\%  (usual behavior)
+	/// - \%s \%c \%d \%o \%\%  (usual behavior)
 	/// - \%x display an integer under hexadecimal notation
 	/// - \%i (matches infinint *)
 	/// - \%S (matches std::string *)
