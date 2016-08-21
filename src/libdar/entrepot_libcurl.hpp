@@ -1,0 +1,122 @@
+/*********************************************************************/
+// dar - disk archive - a backup/restoration program
+// Copyright (C) 2002-2052 Denis Corbin
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//
+// to contact the author : http://dar.linux.free.fr/email.html
+/*********************************************************************/
+// $Id: entrepot.hpp,v 1.1 2012/04/27 11:24:30 edrusb Exp $
+//
+/*********************************************************************/
+
+
+    /// \file entrepot_libcurl.hpp
+    /// \brief defines the implementation for remote filesystem entrepot using libcurl
+
+    /// \ingroup Private
+
+#ifndef ENTREPOT_LIBCURL_HPP
+#define ENTREPOT_LIBCURL_HPP
+
+#include "../my_config.h"
+
+extern "C"
+{
+#if LIBCURL_AVAILABLE
+#if HAVE_CURL_CURL_H
+#include <curl/curl.h>
+#endif
+#endif
+}
+
+#include <string>
+#include "entrepot.hpp"
+#include "secu_string.hpp"
+
+namespace libdar
+{
+
+#if LIBCURL_AVAILABLE
+
+	/// \addtogroup Private
+	/// @{
+
+	/// implementation for entrepot to access to local filesystem
+	///
+	/// entrepot_local generates objects of class "fichier_local" inherited class of fichier_global
+
+    class entrepot_libcurl : public entrepot
+    {
+    public:
+	enum curl_protocol { proto_ftp, proto_http, proto_https, proto_scp, proto_sftp };
+
+	entrepot_libcurl(curl_protocol proto,
+			 const std::string & login,
+			 const secu_string & password,
+			 const std::string & host,
+			 const std::string & port,
+			 const std::string & user_ownership,
+			 const std::string & group_ownership);
+	entrepot_libcurl(const entrepot_libcurl & ref) { copy_from(ref); };
+	const entrepot_libcurl & operator = (const entrepot_libcurl & ref) { detruit(); copy_from(ref); return *this; };
+	~entrepot_libcurl() { detruit(); };
+
+	    // inherited from class entrepot
+
+	std::string get_url() const { return base_URL + get_full_path().display(); };
+	void read_dir_reset();
+	bool read_dir_next(std::string & filename);
+	entrepot *clone() const { return new (get_pool()) entrepot_libcurl(*this); };
+
+    protected:
+
+	    // inherited from class entrepot
+
+	fichier_global *inherited_open(user_interaction & dialog,
+				       const std::string & filename,
+				       gf_mode mode,
+				       bool force_permission,
+				       U_I permission,
+				       bool fail_if_exists,
+				       bool erase) const;
+
+	void inherited_unlink(const std::string & filename) const;
+	void read_dir_flush();
+
+    private:
+	curl_protocol x_proto;
+	std::string base_URL; //< URL of the repository with only minimum path (login/password is given outside the URL)
+	secu_string auth;
+	CURL *easyhandle;
+	std::list<std::string> current_dir;
+	std::string reading_dir_tmp;
+
+	void handle_reset();
+	void copy_from(const entrepot_libcurl & ref);
+	void detruit();
+
+	static std::string curl_protocol2string(curl_protocol proto);
+	static std::string build_url_from(curl_protocol proto, const std::string & host, const std::string & port);
+	static size_t get_ftp_listing_callback(void *buffer, size_t size, size_t nmemb, void *userp);
+    };
+
+	/// @}
+
+#endif
+
+} // end of namespace
+
+#endif
