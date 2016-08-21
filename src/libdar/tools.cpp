@@ -3138,4 +3138,16 @@ namespace libdar
 	return val.is_zero();
     }
 
+    infinint tools_double2infinint(double arg)
+    {
+	if(arg < 0)
+	    throw Erange("tools_double2infinint", gettext("Cannot convert negative floating point value to unsigned (positive) integer"));
+
+	U_I tmp = (U_I)arg;
+	if(arg - (double)tmp > 0.5)
+	    ++tmp;
+
+	return infinint(tmp);
+    }
+
 } // end of namespace

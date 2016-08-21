@@ -886,6 +886,10 @@ namespace libdar
 	/// \note: if the infinint is too large to fit in an U_64 it returns false
     extern bool tools_infinint2U_64(infinint val, U_64 & res);
 
+
+	/// convert a double (float) to infinint (integer) taking care of rounding it to the closest value
+    extern infinint tools_double2infinint(double arg);
+
 } /// end of namespace
 
 #endif
