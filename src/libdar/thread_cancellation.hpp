@@ -48,6 +48,7 @@ extern "C"
 #include <list>
 #include <map>
 #include "integers.hpp"
+#include "erreurs.hpp"
 
 namespace libdar
 {
