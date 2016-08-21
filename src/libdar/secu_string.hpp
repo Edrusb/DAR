@@ -152,6 +152,9 @@ namespace libdar
 	    /// get the size of the string
 	U_I get_size() const { if(string_size == nullptr) throw SRC_BUG; return *string_size; }; // returns the size of the string
 
+	    /// tell whether string is empty
+	bool empty() const { if(string_size == nullptr) throw SRC_BUG; return *string_size == 0; };
+
 	    /// get the size of the allocated secure space
 	U_I get_allocated_size() const { return *allocated_size - 1; };
 
