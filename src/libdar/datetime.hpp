@@ -151,8 +151,8 @@ namespace libdar
 
 	    /// return the factor between two units
 	    ///
-	    /// \note "from" must be larger than "to" (from >= to), else an exception is thrown
-	    /// \return the factor f, which makes the following to be true: from = f*to
+	    /// \note "source" must be larger than "dest" (source >= dest), else an exception is thrown
+	    /// \return the factor f, which makes the following to be true: source = f*dest
 	static const infinint & get_scaling_factor(time_unit source, time_unit dest);
 
     };
