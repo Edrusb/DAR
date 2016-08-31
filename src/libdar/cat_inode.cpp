@@ -367,7 +367,7 @@ namespace libdar
 
     bool cat_inode::has_changed_since(const cat_inode & ref, const infinint & hourshift, comparison_fields what_to_check) const
     {
-        return (what_to_check != cf_inode_type && (!hourshift.is_zero() ? !tools_is_equal_with_hourshift(hourshift, ref.last_mod, last_mod) : ref.last_mod != last_mod))
+        return (what_to_check != cf_inode_type && (!hourshift.is_zero() ? !tools_is_equal_with_hourshift(hourshift, ref.last_mod, last_mod) : !ref.last_mod.loose_equal(last_mod)))
             || (what_to_check == cf_all && uid != ref.uid)
             || (what_to_check == cf_all && gid != ref.gid)
             || (what_to_check != cf_mtime && what_to_check != cf_inode_type && perm != ref.perm);

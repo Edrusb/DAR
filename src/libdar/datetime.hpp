@@ -87,6 +87,9 @@ namespace libdar
 	datetime operator - (const datetime & ref) const { datetime tmp(*this); tmp -= ref; return tmp; };
 	datetime operator + (const datetime & ref) const { datetime tmp(*this); tmp += ref; return tmp; };
 
+	    /// equivalent to operator == but if compared object use different time unit, do the comparison rounding up the values to the largest unit
+	bool loose_equal(const datetime & ref) const;
+
 	    /// at the difference of operator - provides the difference using the less precise unit used between the two elements
 	datetime loose_diff(const datetime & ref) const;
 

@@ -672,7 +672,7 @@ namespace libdar
 							if(f_ino->get_uid() == e_ino->get_uid()
 							   && f_ino->get_gid() == e_ino->get_gid()
 							   && f_ino->get_perm() == e_ino->get_perm()
-							   && f_ino->get_last_modif() == e_ino->get_last_modif())
+							   && f_ino->get_last_modif() == e_ino->get_last_modif()) // no datetime::loose_equal() here!
 							{
 								// same inode information
 
@@ -680,7 +680,7 @@ namespace libdar
 							    {
 								    // both inode ctime has been recorded
 
-								if(f_ino->get_last_change() != e_ino->get_last_change())
+								if(!f_ino->get_last_change().loose_equal(e_ino->get_last_change()))
 								{
 								    string tmp = juillet.get_string();
 
