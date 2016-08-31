@@ -1190,8 +1190,11 @@ namespace libdar
         datetime t_delta = date1 > date2 ? date1.loose_diff(date2) : date2.loose_diff(date1);
         infinint delta;
 
+	if(t_delta.is_null())
+	    return true; // both args are equal without any hourshift consideration
+
         if(!t_delta.is_integer_second())
-            return false;
+            return false; // difference is not an integer number of second
         else
             delta = t_delta.get_second_value();
 
@@ -1201,7 +1204,7 @@ namespace libdar
         euclide(delta, 3600, num, rest);
 
         if(!rest.is_zero())
-            return false;
+            return false;  // difference is not a integer number of hour
         else // rest == 0
             return num <= hourshift;
     }
