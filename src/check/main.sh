@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$1" = "" ] ; then
-  echo "usage $0  <multi-thread> <hash> <crypto> <zip> <slice> <Slice> <tape mark[y|n]> <sequential read[y|n]> <min-digit> <sparse-size> <keepcompressed[y|n]> <recheck-hole[y|n]> <asym[y|n]>"
+  echo "usage $0 <prefix> <multi-thread> <hash> <crypto> <zip> <slice> <Slice> <tape mark[y|n]> <sequential read[y|n]> <min-digit> <sparse-size> <keepcompressed[y|n]> <recheck-hole[y|n]> <asym[y|n]>"
   exit 1
 fi
 
@@ -9,21 +9,20 @@ if [ -f my_env ] ; then
     source my_env
 fi
 
-multi_thread="$1"
-hash="$2"
-crypto="$3"
-zip="$4"
-slice="$5"
-Slice="$6"
-tape_mark="$7"
-seq_read="$8"
-digit="$9"
-sparse="${10}"
-keep_compr="${11}"
-re_hole="${12}"
-asym="${13}"
-
-prefix="prefix_$$"
+prefix="$1"
+multi_thread="$2"
+hash="$3"
+crypto="$4"
+zip="$5"
+slice="$6"
+Slice="$7"
+tape_mark="$8"
+seq_read="$9"
+digit="${10}"
+sparse="${11}"
+keep_compr="${12}"
+re_hole="${13}"
+asym="${14}"
 
 #echo "crypto = $crypto"
 #echo "zip = $zip"
@@ -40,8 +39,13 @@ prefix="prefix_$$"
 
 ALL_TESTS="A1 B1 B2 B3 B4 C1 C2 C3 C4 D1 E1 E2 E3 F1 F2 F3 G1 G2 G3 H1"
 
-mkdir "$prefix"
-cd "$prefix"
+prefix_dir="$prefix.dir"
+
+if [ -e "$prefix_dir" ] ; then
+    rm -rf "$prefix_dir"
+fi
+mkdir "$prefix_dir"
+cd "$prefix_dir"
 
 LOG=log.out
 printf " ----------------------------------------------------------------\n" > "$LOG"
@@ -205,7 +209,25 @@ EOF
 
 if ../routine.sh $ALL_TESTS 1>> "$LOG" 2> log.err ; then
   cd ..
-  rm -rf "$prefix"
+  rm -rf "$prefix_dir"
+  touch "$prefix"
 else
+  echo "================================"
+  echo "Failure of test $prefix"
+  echo "--------------------------------"
+  echo "multi_thread = $multi_thread"
+  echo "hash         = $hash"
+  echo "crypto       = $crypto"
+  echo "zip          = $zip"
+  echo "slice        = $slice"
+  echo "Slice        = $Slice"
+  echo "tape_mark    = $tape_mark"
+  echo "seq_read     = $seq_read"
+  echo "digit        = $digit"
+  echo "sparse       = $sparse"
+  echo "keep_compr   = $keep_compr"
+  echo "re_hole      = $re_hole"
+  echo "asym         = $asym"
+  echo "================================"
   exit 1
 fi

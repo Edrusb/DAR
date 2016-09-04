@@ -46,6 +46,6 @@ all_features_DEPENDENCIES = ../libdar/$(MYLIB).la
 padder_SOURCES = padder.cpp
 
 clean-local:
-	rm -rf prefix_*
+	rm -rf target_*
 	rm -f $(MY_MAKEFILE) $(MY_ENV)
 
