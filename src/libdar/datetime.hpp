@@ -87,6 +87,9 @@ namespace libdar
 	datetime operator - (const datetime & ref) const { datetime tmp(*this); tmp -= ref; return tmp; };
 	datetime operator + (const datetime & ref) const { datetime tmp(*this); tmp += ref; return tmp; };
 
+	    /// equivalent to operator == but if compared object use different time unit, do the comparison rounding up the values to the largest unit
+	bool loose_equal(const datetime & ref) const;
+
 	    /// at the difference of operator - provides the difference using the less precise unit used between the two elements
 	datetime loose_diff(const datetime & ref) const;
 
@@ -148,8 +151,8 @@ namespace libdar
 
 	    /// return the factor between two units
 	    ///
-	    /// \note "from" must be larger than "to" (from >= to), else an exception is thrown
-	    /// \return the factor f, which makes the following to be true: from = f*to
+	    /// \note "source" must be larger than "dest" (source >= dest), else an exception is thrown
+	    /// \return the factor f, which makes the following to be true: source = f*dest
 	static const infinint & get_scaling_factor(time_unit source, time_unit dest);
 
     };

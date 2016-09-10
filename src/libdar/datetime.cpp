@@ -113,6 +113,29 @@ namespace libdar
 	reduce_to_largest_unit();
     }
 
+    bool datetime::loose_equal(const datetime & ref) const
+    {
+	if(uni == ref.uni)
+	    return val == ref.val;
+	else
+	{
+	    time_unit tu = max(uni, ref.uni);
+	    infinint val1, val2;
+
+	    if(uni < tu)
+		val1 = val / get_scaling_factor(tu, uni);
+	    else
+		val1 = val;
+
+	    if(ref.uni < tu)
+		val2 = ref.val / get_scaling_factor(tu, ref.uni);
+	    else
+		val2 = ref.val;
+
+	    return val1 == val2;
+	}
+    }
+
     datetime datetime::loose_diff(const datetime & ref) const
     {
 #if LIBDAR_MICROSECOND_READ_ACCURACY && LIBDAR_MICROSECOND_WRITE_ACCURACY
