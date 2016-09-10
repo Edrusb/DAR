@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2016-06-04 23:09+0200\n"
+"POT-Creation-Date: 2016-09-10 11:45+0200\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -1323,7 +1323,7 @@ msgstr ""
 msgid "   Can uses multiple threads    : %s\n"
 msgstr ""
 
-#: src/libdar/tools.cpp:1234
+#: src/libdar/tools.cpp:1237
 #, c-format
 msgid ""
 "Warning, %S seems more to be a slice name than a base name. Do you want to "
@@ -1332,69 +1332,69 @@ msgstr ""
 "Varning, %S verkar mer vara namn på en del och inte ett basnamn. Vill du "
 "byta det mot %S ?"
 
-#: src/libdar/tools.cpp:1239
+#: src/libdar/tools.cpp:1242
 #, c-format
 msgid "OK, keeping %S as basename"
 msgstr "OK, behåller %S som basnamn"
 
-#: src/libdar/tools.cpp:1274
+#: src/libdar/tools.cpp:1277
 msgid "Cannot get full path of current working directory: "
 msgstr "Kan ej få komplett sökväg till gällande arbetsmapp: "
 
-#: src/libdar/tools.cpp:1301
+#: src/libdar/tools.cpp:1304
 #, fuzzy
 msgid "nullptr argument given to tools_readlink()"
 msgstr "Tomt argument givet till 'tools_readlink'"
 
-#: src/libdar/tools.cpp:1303
+#: src/libdar/tools.cpp:1306
 #, fuzzy
 msgid "Empty string given as argument to tools_readlink()"
 msgstr "Tom sträng givet som argument till 'tools_readlink'"
 
-#: src/libdar/tools.cpp:1330
+#: src/libdar/tools.cpp:1333
 #, c-format
 msgid "Cannot read file information for %s : %s"
 msgstr "Kan ej läsa filinformation för %s : %s"
 
-#: src/libdar/tools.cpp:1428
+#: src/libdar/tools.cpp:1431
 #, fuzzy
 msgid "Cannot set birth time: "
 msgstr "Kan inte hämta mtime: %s"
 
-#: src/libdar/tools.cpp:1458
+#: src/libdar/tools.cpp:1461
 msgid "Cannot set last access and last modification time: "
 msgstr "Kan ej sätta senaste tillgångtid och senaste modifieringstid: "
 
-#: src/libdar/tools.cpp:1542
+#: src/libdar/tools.cpp:1545
 msgid "Aborting program: child process died unexpectedly"
 msgstr ""
 
-#: src/libdar/tools.cpp:1550
+#: src/libdar/tools.cpp:1553
 #, fuzzy, c-format
 msgid "Error trying to run %s: %s"
 msgstr "Fel vid räddning av EA-lista för %s : %s"
 
-#: src/libdar/tools.cpp:1553
+#: src/libdar/tools.cpp:1556
 #, fuzzy
 msgid "execvp() failed but did not returned error code"
 msgstr "execvp misslyckades, men gav ingen felkod"
 
-#: src/libdar/tools.cpp:1625 src/libdar/tools.cpp:1633
+#: src/libdar/tools.cpp:1628 src/libdar/tools.cpp:1636
 #, fuzzy, c-format
 msgid "Error met while retrieving current time: %S"
 msgstr "Fel uppstått vid bearbetande av åtgärd: "
 
-#: src/libdar/tools.cpp:1777
+#: src/libdar/tools.cpp:1780
 #, c-format
 msgid "Removing file %s"
 msgstr "Tar bort fil %s"
 
-#: src/libdar/tools.cpp:1781
+#: src/libdar/tools.cpp:1784
 #, fuzzy, c-format
 msgid "Error removing file %s: %s"
 msgstr "Fel vid filöppning %s : %s"
 
-#: src/libdar/tools.cpp:1815
+#: src/libdar/tools.cpp:1818
 #, c-format
 msgid ""
 "Overwriting not allowed while a slice of a previous archive with the same "
@@ -1403,7 +1403,7 @@ msgstr ""
 "Överskrivning ej tillåten då en del av ett tidigare arkiv med samma basnamn "
 "har hittats i %s-mappen. Åtgärden avbruten"
 
-#: src/libdar/tools.cpp:1821
+#: src/libdar/tools.cpp:1824
 #, fuzzy, c-format
 msgid ""
 "At least one slice of an old archive with the same name remains in the "
@@ -1416,48 +1416,48 @@ msgstr ""
 "kan bli gömd bland delarna i detta gamla arkiv. Skall vi ta bort det gamla "
 "arkivets delar först ?"
 
-#: src/libdar/tools.cpp:1872 src/libdar/tools.cpp:1879
+#: src/libdar/tools.cpp:1875 src/libdar/tools.cpp:1882
 #, fuzzy, c-format
 msgid "Cannot get inode information for %s: %s"
 msgstr "Kan ej få inodinformation för %s : %s"
 
-#: src/libdar/tools.cpp:1889
+#: src/libdar/tools.cpp:1892
 msgid "Current Working Directory cannot be a relative path"
 msgstr "Aktuell arbetsmapp kan ej  vara en relativ sökväg"
 
-#: src/libdar/tools.cpp:1906
+#: src/libdar/tools.cpp:1909
 msgid "Cannot block signals: "
 msgstr "Kan ej blockera signal: "
 
-#: src/libdar/tools.cpp:1916
+#: src/libdar/tools.cpp:1919
 msgid "Cannot unblock signals: "
 msgstr "Kan ej frisläppa signal: "
 
-#: src/libdar/tools.cpp:1936 src/libdar/tools.cpp:1957
+#: src/libdar/tools.cpp:1939 src/libdar/tools.cpp:1960
 #, fuzzy, c-format
 msgid "Cannot get last modification date: %s"
 msgstr "Kan ej sätta senaste tillgångtid och senaste modifieringstid: "
 
-#: src/libdar/tools.cpp:1961
+#: src/libdar/tools.cpp:1964
 #, c-format
 msgid "Cannot get size of %S: not a plain file"
 msgstr ""
 
-#: src/libdar/tools.cpp:1974
+#: src/libdar/tools.cpp:1977
 #, c-format
 msgid "Cannot get mtime: %s"
 msgstr "Kan inte hämta mtime: %s"
 
-#: src/libdar/tools.cpp:2080
+#: src/libdar/tools.cpp:2083
 #, fuzzy, c-format
 msgid "Parse error: Unmatched `%c'"
 msgstr "Analysfel: "
 
-#: src/libdar/tools.cpp:2133
+#: src/libdar/tools.cpp:2136
 msgid "Unknown substitution string: %"
 msgstr "Okänd utbytessträng :%"
 
-#: src/libdar/tools.cpp:2140
+#: src/libdar/tools.cpp:2143
 #, fuzzy
 msgid ""
 "last char of user command-line to execute is '%', (use '%%' instead to avoid "
@@ -1466,112 +1466,112 @@ msgstr ""
 "sista tecknet i användarkommandoraden är '%', (använd '%%' i stället så "
 "undviks detta meddelande). Ignorera det och fortsätta ?"
 
-#: src/libdar/tools.cpp:2194
+#: src/libdar/tools.cpp:2197
 msgid "execve() failed. (process table is full ?)"
 msgstr "execve() misslyckades. (full processtabell ?)"
 
-#: src/libdar/tools.cpp:2196
+#: src/libdar/tools.cpp:2199
 msgid "system() call failed: "
 msgstr "system()-anrop misslyckades: "
 
-#: src/libdar/tools.cpp:2198
+#: src/libdar/tools.cpp:2201
 #, c-format
 msgid "execution of [ %S ] returned error code: %d"
 msgstr "utförande av [ %S ] resulterade i felkod: %d"
 
-#: src/libdar/tools.cpp:2205
+#: src/libdar/tools.cpp:2208
 msgid "Error during user command line execution: "
 msgstr "Fel vid utförande av användarkommandoradsexekvering: "
 
-#: src/libdar/tools.cpp:2205
+#: src/libdar/tools.cpp:2208
 msgid " . Retry command-line ?"
 msgstr " . Försöka med kommandoraden igen ?"
 
-#: src/libdar/tools.cpp:2210
+#: src/libdar/tools.cpp:2213
 msgid "Ignore previous error on user command line and continue ?"
 msgstr "Ignorera föregående fel från användarkommandorad och fortsätta ?"
 
-#: src/libdar/tools.cpp:2250
+#: src/libdar/tools.cpp:2253
 msgid "Fatal error on user command line: "
 msgstr "Ödesdigert fel i användarkommandorad: "
 
-#: src/libdar/tools.cpp:2376 src/libdar/tools.cpp:2382
+#: src/libdar/tools.cpp:2379 src/libdar/tools.cpp:2385
 #, fuzzy
 msgid "Badly formated octal number"
 msgstr "Dåligt formaterad databas"
 
-#: src/libdar/tools.cpp:2479
+#: src/libdar/tools.cpp:2482
 #, fuzzy
 msgid "Cannot get effective permission given a file descriptor: "
 msgstr "Kan ej återställe behörigheter för %s : %s"
 
-#: src/libdar/tools.cpp:2495
+#: src/libdar/tools.cpp:2498
 #, c-format
 msgid "Error while setting file permission: %s"
 msgstr "Fel vid tilldelning av en fils egenskaper:%s"
 
-#: src/libdar/tools.cpp:2516
+#: src/libdar/tools.cpp:2519
 #, fuzzy
 msgid "An empty string is not a valid user name"
 msgstr "En tom sträng är ej en giltig sökväg"
 
-#: src/libdar/tools.cpp:2554 src/libdar/tools.cpp:2576
+#: src/libdar/tools.cpp:2557 src/libdar/tools.cpp:2579
 #, fuzzy
 msgid "Unknown user"
 msgstr "Okänd användare: %S"
 
-#: src/libdar/tools.cpp:2556 src/libdar/tools.cpp:2578
+#: src/libdar/tools.cpp:2559 src/libdar/tools.cpp:2581
 #, fuzzy, c-format
 msgid "Error found while looking for UID of user %s: %S"
 msgstr "Fel vid anrop av fork() för att starta dar: "
 
-#: src/libdar/tools.cpp:2586 src/libdar/tools.cpp:2680
+#: src/libdar/tools.cpp:2589 src/libdar/tools.cpp:2683
 msgid ""
 "Cannot convert username to uid in statically linked binary, either directly "
 "provide the UID or run libdar from a dynamically linked executable"
 msgstr ""
 
-#: src/libdar/tools.cpp:2611
+#: src/libdar/tools.cpp:2614
 #, fuzzy
 msgid "An empty string is not a valid group name"
 msgstr "En tom sträng är ej en giltig sökväg"
 
-#: src/libdar/tools.cpp:2647 src/libdar/tools.cpp:2670
+#: src/libdar/tools.cpp:2650 src/libdar/tools.cpp:2673
 #, fuzzy
 msgid "Unknown group"
 msgstr "Okänd användare: %S"
 
-#: src/libdar/tools.cpp:2649
+#: src/libdar/tools.cpp:2652
 #, c-format
 msgid "Error found while looking fo GID of group %s: %S"
 msgstr ""
 
-#: src/libdar/tools.cpp:2672
+#: src/libdar/tools.cpp:2675
 #, fuzzy, c-format
 msgid "Error found while looking for GID of group %s: %S"
 msgstr "Fel vid anrop av fork() för att starta dar: "
 
-#: src/libdar/tools.cpp:2709
+#: src/libdar/tools.cpp:2712
 #, c-format
 msgid "Error while setting file user ownership: %s"
 msgstr "Fel vid inställning av ägare till fil: %s"
 
-#: src/libdar/tools.cpp:2846
+#: src/libdar/tools.cpp:2849
 #, fuzzy
 msgid "Error while fetching hostname: "
 msgstr "Fel vid listning av arkivinnehåll: "
 
-#: src/libdar/tools.cpp:2876
+#: src/libdar/tools.cpp:2879
 #, fuzzy
 msgid "Worse"
 msgstr "[Värre]"
 
-#: src/libdar/tools.cpp:2896
+#: src/libdar/tools.cpp:2899
 #, c-format
 msgid "Error code %d to message conversion failed"
 msgstr ""
 
-#: src/libdar/tools.cpp:2951
+#: src/libdar/tools.cpp:2954
 #, fuzzy
 msgid "Invalid wide-char found in string: "
 msgstr "Ogiltigt tal i sträng: %S"
@@ -2834,7 +2834,7 @@ msgstr ""
 "[data ][ EA  ][kompr][S] | behörighet  | anvd |  grupp | storl |           "
 "datum               |    filnamn\n"
 
-#: src/libdar/datetime.cpp:366
+#: src/libdar/datetime.cpp:389
 #, fuzzy
 msgid "Unknown time unit"
 msgstr "Okänt val: "
