@@ -516,7 +516,7 @@ namespace libdar
 	/// assuming the offset we add the elastic buffer at is "offset". If modulo is zero
 	/// this the elastic buffer is randomly chosen from 1 to max_size without any
 	/// concern about being congruent to a given modulo.
-	/// \example if module is 5 and offset is 2, the elastic buffer possible size
+	/// Example if module is 5 and offset is 2, the elastic buffer possible size
 	/// can be 3 (2+3 is congruent to 0 modulo 5), 8 (2+8 is congruent to modulo 5), 12, etc.
 	/// but not exceed max_size+modulo-1
 	/// \note this is to accomodate the case when encrypted data is followed by clear data
