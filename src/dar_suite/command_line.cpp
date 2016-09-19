@@ -796,7 +796,34 @@ static bool get_args_recursive(recursive_param & rec,
                 if(p.filename != "" || p.sauv_root != nullptr)
                     throw Erange("get_args", gettext(" Only one option of -c -d -t -l -C -x or -+ is allowed"));
                 if(string(optarg) != string(""))
-                    tools_split_path_basename(optarg, p.sauv_root, p.filename);
+		{
+		    string path_basename;
+
+		    if(tools_split_entrepot_path(optarg,
+						 p.ent_proto,
+						 p.ent_login,
+						 p.ent_pass,
+						 p.ent_host,
+						 p.ent_port,
+						 path_basename))
+		    {
+			tools_split_path_basename(path_basename.c_str(), p.sauv_root, p.filename);
+			if(p.ent_pass.get_size() == 0)
+			    p.ent_pass = rec.dialog->get_secu_string(tools_printf(gettext("Please provide the file for login %S at host %S"),
+									   &p.ent_login,
+									   &p.ent_host),
+							      false);
+		    }
+		    else
+		    {
+			p.ent_proto.clear();
+			p.ent_login.clear();
+			p.ent_pass.clear();
+			p.ent_host.clear();
+			p.ent_port.clear();
+			tools_split_path_basename(optarg, p.sauv_root, p.filename);
+		    }
+		}
                 else
                     throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
                 switch(lu)

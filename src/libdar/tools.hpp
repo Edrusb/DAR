@@ -176,6 +176,23 @@ namespace libdar
 	/// \note chemin argument must be release by the caller thanks to the "delete" operator.
     extern void tools_split_path_basename(const std::string &all, std::string & chemin, std::string & base, memory_pool *pool = nullptr);
 
+	/// split a given full remote reposityr path in parts
+	/// \param[in] all is the argument to split in parts
+	/// \param[out] proto is the protocol field
+	/// \param[out] login is the login field (empty string is returned if not provided)
+	/// \param[out] password is the password field (empty string if not provided)
+	/// \param[out] hostname is the hostname field
+	/// \param[out] port is the port field (empty string if not provided)
+	/// \param[out] path_basename is the path+basename remaing field
+	/// \return false if the all argument does not follow the remote repository syntax
+    extern bool tools_split_entrepot_path(const std::string &all,
+					  std::string & proto,
+					  std::string & login,
+					  secu_string & password,
+					  std::string & hostname,
+					  std::string & port,
+					  std::string & path_basename);
+
 	/// open a pair of tuyau objects encapsulating two named pipes.
 
 	/// \param[in,out] dialog for user interaction

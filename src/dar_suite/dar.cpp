@@ -94,6 +94,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	archive *arch = nullptr;
 	archive *aux = nullptr;
 	archive *cur = nullptr;
+	entrepot_libcurl *repo = nullptr;
+
         dialog.set_beep(param.beep);
 
         if(param.filename != "-"
@@ -117,6 +119,17 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	    archive_options_test test_options;
 	    bool no_cipher_given;
 	    vector<string> recipients;
+
+	    if(param.ent_host.size() != 0)
+	    {
+		repo = new (nothrow) entrepot_libcurl(entrepot_libcurl::string_to_curlprotocol(param.ent_proto),
+						      param.ent_login,
+						      param.ent_pass,
+						      param.ent_host,
+						      param.ent_port);
+		if(repo == nullptr)
+		    throw Ememory("little_main");
+	    }
 
             switch(param.op)
             {
@@ -280,12 +293,13 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    if(param.delta_sig_min_size > 0)
 			create_options.set_delta_sig_min_size(param.delta_sig_min_size);
 		    create_options.set_delta_diff(param.delta_diff);
-
 		    if(param.backup_hook_mask != nullptr)
 			create_options.set_backup_hook(param.backup_hook_execute, *param.backup_hook_mask);
 		    create_options.set_ignore_unknown_inode_type(param.ignore_unknown_inode);
 		    if(param.delta_mask != nullptr)
 			create_options.set_delta_mask(*param.delta_mask);
+		    if(repo != nullptr)
+			create_options.set_entrepot(*repo);
 
 		    cur = new (nothrow) archive(dialog, *param.fs_root, *param.sauv_root, param.filename, EXTENSION,
 						create_options,
@@ -341,6 +355,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			merge_options.set_delta_mask(*param.delta_mask);
 		    if(param.delta_sig_min_size > 0)
 			merge_options.set_delta_sig_min_size(param.delta_sig_min_size);
+		    if(repo != nullptr)
+			merge_options.set_entrepot(*repo);
 
 		    cur = new (nothrow) archive(dialog,  // user_interaction &
 						*param.sauv_root,  //const path &
@@ -468,7 +484,13 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_slice_min_digits(param.ref_num_digits);
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
 		read_options.set_multi_threaded(param.multi_threaded);
-		arch = new (nothrow) archive(dialog, *param.ref_root, *param.ref_filename, EXTENSION,
+		if(repo != nullptr)
+		    read_options.set_entrepot(*repo);
+
+		arch = new (nothrow) archive(dialog,
+					     *param.ref_root,
+					     *param.ref_filename,
+					     EXTENSION,
 					     read_options);
 		if(arch == nullptr)
 		    throw Ememory("little_main");
@@ -545,6 +567,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_slice_min_digits(param.num_digits);
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
 		read_options.set_multi_threaded(param.multi_threaded);
+		if(repo != nullptr)
+		    read_options.set_entrepot(*repo);
 
 		if(param.ref_filename != nullptr && param.ref_root != nullptr)
 		{
@@ -651,6 +675,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_slice_min_digits(param.num_digits);
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
 		read_options.set_multi_threaded(param.multi_threaded);
+		if(repo != nullptr)
+		    read_options.set_entrepot(*repo);
 
 		if(param.ref_filename != nullptr && param.ref_root != nullptr)
 		{
@@ -730,6 +756,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_slice_min_digits(param.num_digits);
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
 		read_options.set_multi_threaded(param.multi_threaded);
+		if(repo != nullptr)
+		    read_options.set_entrepot(*repo);
 
 		if(param.ref_filename != nullptr && param.ref_root != nullptr)
 		{
@@ -802,6 +830,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_slice_min_digits(param.num_digits);
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
 		read_options.set_multi_threaded(param.multi_threaded);
+		if(repo != nullptr)
+		    read_options.set_entrepot(*repo);
 
 		arch = new (nothrow) archive(dialog,
 					     *param.sauv_root,
@@ -862,6 +892,11 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		delete aux;
 		aux = nullptr;
 	    }
+	    if(repo != nullptr)
+	    {
+		delete repo;
+		repo = nullptr;
+	    }
 	    throw;
 	}
 
@@ -903,6 +938,11 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	{
 	    delete aux;
 	    aux = nullptr;
+	}
+	if(repo != nullptr)
+	{
+	    delete repo;
+	    repo = nullptr;
 	}
 
         return ret;

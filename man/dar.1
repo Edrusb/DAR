@@ -118,13 +118,19 @@ Not all system actually support long options (Solaris, FreeBSD, ...). For exampl
 
 .TP 20
 -c, --create [<path>/]<basename>
-creates a backup with the name based on <basename>. All the slices will be created in the directory <path> if specified, else in the current directory. If the destination filesystem is too small to contain all the slices of the backup, the -p option (pausing before starting new slices) might be of interest. Else, in the case the filesystem is full, dar will suspend the operation, asking for the user to make free space, then continue its operation. To make free space, the only thing you cannot do is to touch the slice being written. If the filename is "-" *and* no slicing is asked for (no -s option) the archive is produced on the standard output allowing the user to send the resulting archive through a pipe (or into a tape device directly or using the dar_split command).
+creates a backup with the name based on <basename>. All the slices will be created in the directory <path> if specified (see also
+.B Remote repository syntax for <path>
+below), else in the current directory. If the destination filesystem is too small to contain all the slices of the backup, the -p option (pausing before starting new slices) might be of interest. Else, in the case the filesystem is full, dar will suspend the operation, asking for the user to make free space, then continue its operation. To make free space, the only thing you cannot do is to touch the slice being written. If the filename is "-" *and* no slicing is asked for (no -s option) the archive is produced on the standard output allowing the user to send the resulting archive through a pipe (or into a tape device directly or using the dar_split command).
 .TP 20
 -x, --extract [<path>/]<basename>
-extracts files from the given backup. Slices are expected to be in the current directory or in the directory given by <path>. It is also possible to use symbolic links to gather slices that are not in the same directory. Path may also point to a removable device (floppy, CD, USB key, etc.), in this case, to be able to mount/unmount the device, you must not launch dar from that directory. In other words, the current directory must not on the removable media you plan to unmount (see tutorial for details). The basename may be set to "-", in direct access mode (the default historical mode), you will then need dar_slave to work with dar (see -i and -o options, as well as dar_slave man page). However in sequential read mode (--sequential-mode is used on command-line), dar will read the archive from standard input (see also -i option), this can eventually be used in combination with dar_split.
+extracts files from the given backup. Slices are expected to be in the current directory or in the directory given by <path> (see also
+.B Remote repository syntax for <path>
+below). It is also possible to use symbolic links to gather slices that are not in the same directory. Path may also point to a removable device (floppy, CD, USB key, etc.), in this case, to be able to mount/unmount the device, you must not launch dar from that directory. In other words, the current directory must not on the removable media you plan to unmount (see tutorial for details). The basename may be set to "-", in direct access mode (the default historical mode), you will then need dar_slave to work with dar (see -i and -o options, as well as dar_slave man page). However in sequential read mode (--sequential-mode is used on command-line), dar will read the archive from standard input (see also -i option), this can eventually be used in combination with dar_split.
 .TP 20
 -l, --list [<path>/]<basename>
-lists the contents of the given backup.
+lists the contents of the given backup (see also
+.B Remote repository syntax for <path>
+below)
 .B dar
 will only require the last slice of the archive in direct access mode. If however sequential mode is used, dar will read the overall archive, from the first slice to the last one. "-" can be used as basename, the behavior is the same as with -x option (read just above).
 .TP 20
@@ -145,6 +151,42 @@ displays help usage.
 .TP 20
 -V, --version
 displays version information.
+.PP
+.B Remote repository syntax for <path>
+.PP
+.RS
+for all commands described above as well as some options detailes below (-A and -@ options), the <path> optional argument can be a Unix path like /var/tmp when the archive is located on the host dar runs on, or a more rich argument following the below syntax when the archive is to be read or written to a remote host:
+.PP
+.RS
+.B
+proto://[login[:password]@]hostname[:port]/path
+.RE
+.PP
+.TP 3
+proto
+is either
+.B ftp
+or
+.B sftp
+.TP 3
+login
+is optional, if not provided it default to
+.B anonymous
+.TP 3
+password
+if login is provided, the associated password may be given after a column (:) but this exposes the secret password to other
+users of the current system having access the table of process (using top, ps, /proc or other ways). If the login is given without
+password, the password will be asked interactively by dar at run time, which is must more secure.
+.TP 3
+hostname
+is the name or IP address of the host to connect to
+.TP 3
+port
+if not provided, dar will use the default/standard port in regard to the protocol specified in the "proto" field
+.TP 3
+path
+a unix path where resides the archive to read from the remote repository or where to write the archive to in that remote repository
+.RE
 .PP
 .B GENERAL OPTIONS:
 .TP 20

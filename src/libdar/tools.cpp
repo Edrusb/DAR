@@ -461,6 +461,187 @@ namespace libdar
         delete tmp;
     }
 
+    bool tools_split_entrepot_path(const string &all,
+				   string & proto,
+				   string & login,
+				   secu_string & password,
+				   string & hostname,
+				   string & port,
+				   string & path_basename)
+    {
+	bool ret = true;
+	const char *ch = all.c_str();
+	U_I cursor = 0;
+	U_I ref_cur = 0;
+	U_I tmp;
+	U_I max = all.size();
+
+	proto.clear();
+	login.clear();
+	password.clear();
+	hostname.clear();
+	port.clear();
+	path_basename.clear();
+
+	enum { s_proto, s_login, s_pass, s_host, s_port, s_path, s_end } state = s_proto;
+
+	while(state != s_end && cursor < max)
+	{
+	    switch(state)
+	    {
+	    case s_proto:
+		switch(ch[cursor])
+		{
+		case ':':
+		    ++cursor;
+		    if(ch[cursor] != '/')
+		    {
+			state = s_end;
+			ret = false;
+		    }
+		    else
+		    {
+			++cursor;
+			if(ch[cursor] != '/')
+			{
+			    state = s_end;
+			    ret = false;
+			}
+			else
+			{
+			    ++cursor;
+			    state = s_login;
+			}
+		    }
+		    break;
+		case '/':
+		case '@':
+		    state = s_end;
+		    ret = false;
+		    break;
+		default:
+		    proto += ch[cursor];
+		    ++cursor;
+		}
+		break;
+	    case s_login:
+		switch(ch[cursor])
+		{
+		case '@':
+		    state = s_host;
+		    ++cursor;
+		    break;
+		case ':':
+		    state = s_pass;
+		    ++cursor;
+		    ref_cur = cursor;
+		    break;
+		case '/':
+		    hostname = login;
+		    login.clear();
+		    state = s_path;
+		    ++cursor;
+		default:
+		    login += ch[cursor];
+		    ++cursor;
+		}
+		break;
+	    case s_pass:
+		switch(ch[cursor])
+		{
+		case '@':
+		    state = s_host;
+		    if(ref_cur > cursor)
+			throw SRC_BUG;
+		    tmp = cursor - ref_cur;
+		    password.resize(tmp);
+		    password.append(ch + ref_cur, tmp);
+		    ++cursor;
+		    break;
+		case '/':
+		    hostname = login;
+		    port = string(ch+ref_cur, ch+cursor);
+		    login.clear();
+		    password.clear();
+		    state = s_path;
+		    ++cursor;
+		    break;
+		case ':':
+		    state = s_end;
+		    ret = false;
+		    break;
+		default:
+		    ++cursor;
+		}
+		break;
+	    case s_host:
+		switch(ch[cursor])
+		{
+		case '@':
+		    state = s_end;
+		    ret = false;
+		    break;
+		case '/':
+		    state = s_path;
+		    ++cursor;
+		    break;
+		case ':':
+		    state = s_port;
+		    ++cursor;
+		    break;
+		default:
+		    hostname += ch[cursor];
+		    ++cursor;
+		}
+		break;
+	    case s_port:
+		switch(ch[cursor])
+		{
+		case '@':
+		case ':':
+		    state = s_end;
+		    ret = false;
+		    break;
+		case '/':
+		    state = s_path;
+		    ++cursor;
+		    break;
+		default:
+		    port += ch[cursor];
+		    ++cursor;
+		}
+		break;
+	    case s_path:
+		path_basename += ch[cursor];
+		++cursor;
+		break;
+	    case s_end:
+		throw SRC_BUG; // while loop should end with that status
+	    default:
+		throw SRC_BUG; // unknown status
+	    }
+	}
+
+	    // sanity checks
+
+	if(ret)
+	{
+	    if(state != s_path)
+		ret = false;
+	    if(hostname.size() == 0)
+		ret = false;
+	    if(path_basename.size() == 0)
+	    {
+		if(max > 0 && ch[max-1] != '/')
+		    ret = false;
+		else
+		    path_basename = '/';
+	    }
+	}
+
+	return ret;
+    }
+
     void tools_open_pipes(user_interaction & dialog,
                           const string &input,
                           const string & output,

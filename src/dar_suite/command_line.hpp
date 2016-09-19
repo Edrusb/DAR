@@ -142,6 +142,11 @@ struct line_param
     mask *delta_mask;             //< which file to calculate delta sig when not using the default mask
     bool delta_diff;              //< whether to save binary diff or whole file's data during a differential backup
     infinint delta_sig_min_size;  //< size below which to never calculate delta signatures
+    string ent_proto;             //< entrepot protocol
+    string ent_login;             //< entrepot login
+    secu_string ent_pass;         //< entrepot password
+    string ent_host;              //< entrepot hostname
+    string ent_port;              //< entrepot port
 
 	// constructor for line_param
     line_param()

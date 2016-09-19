@@ -33,6 +33,26 @@ using namespace std;
 namespace libdar
 {
 
+    entrepot_libcurl::curl_protocol entrepot_libcurl::string_to_curlprotocol(const std::string & arg)
+    {
+	curl_protocol ret;
+
+	if(strcasecmp(arg.c_str(), "ftp") == 0)
+	    ret = proto_ftp;
+	else if(strcasecmp(arg.c_str(), "sftp") == 0)
+	    ret = proto_sftp;
+	else if(strcasecmp(arg.c_str(), "scp") == 0)
+	    ret = proto_scp;
+	else if(strcasecmp(arg.c_str(), "http") == 0)
+	    ret = proto_http;
+	else if(strcasecmp(arg.c_str(), "https") == 0)
+	    ret = proto_https;
+	else
+	    throw Erange("entrepot_libcurl::string_to_curlprotocol", tools_printf(gettext("Unknown protocol: %S"), &arg));
+
+	return ret;
+    }
+
     entrepot_libcurl::entrepot_libcurl(curl_protocol proto,
 				       const string & login,
 				       const secu_string & password,

@@ -62,6 +62,7 @@ namespace libdar
     {
     public:
 	enum curl_protocol { proto_ftp, proto_http, proto_https, proto_scp, proto_sftp };
+	static curl_protocol string_to_curlprotocol(const std::string & arg);
 
 	entrepot_libcurl(curl_protocol proto,                  //< protocol to use for communication with the remote repository
 			 const std::string & login,            //< login to use

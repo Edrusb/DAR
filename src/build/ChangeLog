@@ -1,3 +1,11 @@
+from 2.5.x to 2.6.0
+- new feature: support for binary delta in incremental backup
+- new feature: support ftp/sftp/scp to read an archive from a cloud storage
+  only for the needed part to proceed to the operation (restoration, listing,
+  and so on)
+- new featute: support ftp/sftp/scp to write an archive eventually with hash
+  files to a remote cloud storage
+
 from 2.5.5 to 2.5.6
 - added speed optimization when comparing dates with hourshift flexibility
   (-H option)
