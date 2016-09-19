@@ -33,7 +33,7 @@ multi_thread="n"
 TARGET=target_$multi_thread$hash$crypto$zip$slice$Slice$tape$seq_read$digit$sparse_size$keep_compr$recheck_hole$asym
 cat >> $MY_MAKEFILE <<EOF
 $TARGET:
-	./main.sh "$multi_thread" "$hash" "$crypto" "$zip" "$slice" "$Slice" "$tape" "$seq_read" "$digit" "$sparse_size" "$keep_compr" "$recheck_hole" "$asym"
+	./main.sh "$TARGET" "$multi_thread" "$hash" "$crypto" "$zip" "$slice" "$Slice" "$tape" "$seq_read" "$digit" "$sparse_size" "$keep_compr" "$recheck_hole" "$asym"
 
 EOF
 cat >> $TMP_FILE <<EOF
