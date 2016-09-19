@@ -66,57 +66,103 @@ namespace libdar
 	easyhandle = curl_easy_init();
 	if(easyhandle == nullptr)
 	    throw Erange("entrepot_libcurl::entrepot_libcurl", string(gettext("Error met while creating a libcurl handle")));
+	set_libcurl_URL();
+	set_libcurl_authentication();
     }
 
     void entrepot_libcurl::read_dir_reset()
     {
 	CURLcode err;
+	long listonly;
 
 	current_dir.clear();
 	reading_dir_tmp = "";
-	handle_reset();
+	set_libcurl_URL();
+
+	try
+	{
+	    switch(x_proto)
+	    {
+	    case proto_ftp:
+	    case proto_sftp:
+		try
+		{
+		    listonly = 1;
+		    err = curl_easy_setopt(easyhandle, CURLOPT_DIRLISTONLY, listonly);
+		    if(err != CURLE_OK)
+			throw Erange("","");
+		    err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, get_ftp_listing_callback);
+		    if(err != CURLE_OK)
+			throw Erange("","");
+		    err = curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, this);
+		    if(err != CURLE_OK)
+			throw Erange("","");
+		}
+		catch(Erange & e)
+		{
+		    throw Erange("entrepot_libcurl::inherited_unlink",
+				 tools_printf(gettext("Error met while preparing directory listing: %s"),
+					      curl_easy_strerror(err)));
+		}
+
+		err = curl_easy_perform(easyhandle);
+		if(err != CURLE_OK)
+		    throw Erange("entrepot_libcurl::inherited_unlink",
+				 tools_printf(gettext("Error met while listing FTP directory %s: %s"),
+					      get_url().c_str(),
+					      curl_easy_strerror(err)));
+		if(!reading_dir_tmp.empty())
+		{
+		    current_dir.push_back(reading_dir_tmp);
+		    reading_dir_tmp.clear();
+		}
+		break;
+	    case proto_http:
+	    case proto_https:
+	    case proto_scp:
+		throw Efeature("unlink http, https, scp");
+	    default:
+		throw SRC_BUG;
+	    }
+	}
+	catch(...)
+	{
+		// putting back handle in its default state
+
+	    switch(x_proto)
+	    {
+	    case proto_ftp:
+	    case proto_sftp:
+		listonly = 0;
+		(void)curl_easy_setopt(easyhandle, CURLOPT_DIRLISTONLY, listonly);
+		(void)curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, null_callback);
+		break;
+	    case proto_http:
+	    case proto_https:
+	    case proto_scp:
+		throw Efeature("unlink http, https, scp");
+	    default:
+		break; // exception thrown in the try block
+	    }
+
+	    throw;
+	}
+
+	    // putting back handle in its default state
 
 	switch(x_proto)
 	{
 	case proto_ftp:
 	case proto_sftp:
-	    try
-	    {
-		long listonly = 1;
-		err = curl_easy_setopt(easyhandle, CURLOPT_DIRLISTONLY, listonly);
-		if(err != CURLE_OK)
-		    throw Erange("","");
-		err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, get_ftp_listing_callback);
-		if(err != CURLE_OK)
-		    throw Erange("","");
-		err = curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, this);
-		if(err != CURLE_OK)
-		    throw Erange("","");
-	    }
-	    catch(Erange & e)
-	    {
-		throw Erange("entrepot_libcurl::inherited_unlink",
-			     tools_printf(gettext("Error met while preparing directory listing: %s"),
-					  curl_easy_strerror(err)));
-	    }
-
-	    err = curl_easy_perform(easyhandle);
-	    if(err != CURLE_OK)
-		throw Erange("entrepot_libcurl::inherited_unlink",
-			     tools_printf(gettext("Error met while listing FTP directory %s: %s"),
-					  get_url().c_str(),
-					  curl_easy_strerror(err)));
-	    if(!reading_dir_tmp.empty())
-	    {
-		current_dir.push_back(reading_dir_tmp);
-		reading_dir_tmp.clear();
-	    }
+	    listonly = 0;
+	    (void)curl_easy_setopt(easyhandle, CURLOPT_DIRLISTONLY, listonly);
+	    (void)curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, null_callback);
 	    break;
 	case proto_http:
 	case proto_https:
 	case proto_scp:
 	    throw Efeature("unlink http, https, scp");
-	default:
+		default:
 	    throw SRC_BUG;
 	}
     }
@@ -142,7 +188,6 @@ namespace libdar
 						     bool erase) const
     {
 	fichier_libcurl *ret = nullptr;
-	CURL *ref_handle = nullptr;
 	entrepot_libcurl *me = const_cast<entrepot_libcurl *>(this);
 
 	if(me == nullptr)
@@ -158,31 +203,20 @@ namespace libdar
 		    throw Esystem("entrepot_libcurl::inherited_open", "File exists on remote repository" , Esystem::io_exist);
 	}
 
-	try
-	{
-	    me->handle_reset();
-	    ref_handle = curl_easy_duphandle(easyhandle);
-	    string chemin = (path(get_url(), true) + filename).display();
+	string chemin = (path(get_url(), true) + filename).display();
 
-	    ret = new (get_pool()) fichier_libcurl(dialog,
-						   chemin,
-						   ref_handle,
-						   mode,
-						   force_permission,
-						   permission,
-						   erase);
-	    if(ret == nullptr)
-		throw Ememory("entrepot_libcurl::inherited_open");
-	}
-	catch(...)
-	{
-	    curl_easy_cleanup(ref_handle);
-	    throw;
-	}
+	ret = new (get_pool()) fichier_libcurl(dialog,
+					       chemin,
+					       easyhandle,
+					       mode,
+					       force_permission,
+					       permission,
+					       erase);
+	if(ret == nullptr)
+	    throw Ememory("entrepot_libcurl::inherited_open");
 
 	return ret;
     }
-
 
     void entrepot_libcurl::inherited_unlink(const string & filename) const
     {
@@ -193,8 +227,8 @@ namespace libdar
 
 	if(me == nullptr)
 	    throw SRC_BUG;
+	me->set_libcurl_URL();
 
-	me->handle_reset();
 	try
 	{
 	    switch(x_proto)
@@ -229,10 +263,42 @@ namespace libdar
 	}
 	catch(...)
 	{
+	    switch(x_proto)
+	    {
+	    case proto_ftp:
+	    case proto_sftp:
+		(void)curl_easy_setopt(easyhandle, CURLOPT_QUOTE, nullptr);
+		(void)curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 0);
+		break;
+	    case proto_http:
+	    case proto_https:
+	    case proto_scp:
+		throw Efeature("unlink http, https, scp");
+	    default:
+    		break;
+	    }
+
 	    if(headers != nullptr)
 		curl_slist_free_all(headers);
+
 	    throw;
 	}
+
+	switch(x_proto)
+	{
+	case proto_ftp:
+	case proto_sftp:
+	    (void)curl_easy_setopt(easyhandle, CURLOPT_QUOTE, nullptr);
+	    (void)curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 0);
+	    break;
+	case proto_http:
+	case proto_https:
+	case proto_scp:
+	    throw Efeature("unlink http, https, scp");
+	default:
+	    break;
+	}
+
 	if(headers != nullptr)
 	    curl_slist_free_all(headers);
     }
@@ -242,37 +308,31 @@ namespace libdar
 	current_dir.clear();
     }
 
-    void entrepot_libcurl::handle_reset()
+    void entrepot_libcurl::set_libcurl_URL()
+    {
+	CURLcode err;
+	string target = get_url();
+
+	if(target.size() == 0)
+	    throw SRC_BUG;
+	else
+	    if(target[target.size() - 1] != '/')
+		target += "/";
+
+	err = curl_easy_setopt(easyhandle, CURLOPT_URL, target.c_str());
+	if(err != CURLE_OK)
+	    throw Erange("entrepot_libcurl::set_libcurl_URL",tools_printf(gettext("Failed assigning URL to libcurl: %s"),
+									  curl_easy_strerror(err)));
+    }
+
+    void entrepot_libcurl::set_libcurl_authentication()
     {
 	CURLcode err;
 
-	curl_easy_reset(easyhandle);
-
-	try
-	{
-	    string target = get_url();
-
-	    if(target.size() == 0)
-		throw SRC_BUG;
-	    else
-		if(target[target.size() - 1] != '/')
-		    target += "/";
-
-	    err = curl_easy_setopt(easyhandle, CURLOPT_URL, target.c_str());
-	    if(err != CURLE_OK)
-		throw Erange("","");
-
-	    if(!auth.empty())
-	    {
-		err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, auth.c_str());
-		if(err != CURLE_OK)
-		    throw Erange("", "");
-	    }
-	}
-	catch(Erange & e)
-	{
-	    throw Erange("entrepot_libcurl::handle_reset", string(gettext("Error met while resetting libcurl handle")));
-	}
+	err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, auth.c_str());
+	if(err != CURLE_OK)
+	    throw Erange("entrepot_libcurl::handle_reset", tools_printf(gettext("Error met while setting libcurl authentication: %s"),
+									curl_easy_strerror(err)));
     }
 
     void entrepot_libcurl::copy_from(const entrepot_libcurl & ref)

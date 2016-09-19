@@ -440,6 +440,9 @@ namespace libdar
 	if(libdar_initialized_gcrypt)
 	    gcry_control(GCRYCTL_TERM_SECMEM, 0); // by precaution if not already done by libgcrypt itself
 #endif
+#if LIBCURL_AVAILABLE
+	curl_global_cleanup();
+#endif
 	tools_end();
     }
 

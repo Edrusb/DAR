@@ -108,24 +108,32 @@ namespace libdar
         bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message);
 
     private:
-	CURL *x_ref_handle;               //< unchanged handle (contains all authentication infos) used to reset "easyhandle"
+	static const U_I tampon_size = CURL_MAX_WRITE_SIZE;
+
 	CURL *easyhandle;                 //< easy handle that we modify when necessary
+	CURLM *multihandle;               //< multi handle to which is added the easyhandle for step by step libcurl interaction
+	bool multimode;                   //< wether easyhandle has been added to multihandle
 	infinint current_offset;          //< current offset we are reading / writing at
 	bool has_maxpos;                  //< true if maxpos is set
 	infinint maxpos;                  //< in read mode this is the filesize, in write mode this the offset where to append data (not ovewriting)
-	char tampon[CURL_MAX_WRITE_SIZE]; //< data in transit to / from libcurl
+	char tampon[tampon_size];         //< data in transit to / from libcurl
 	U_I inbuf;                        //< amount of byte available in "tampon"
 	bool eof;                         //< whether we have reached end of file (read mode)
+	bool append_write;                //< whether we should append to data (and not replace) when uploading
+	char easy_tampon[tampon_size];    //< trash in transit data used to carry header of non data exchanges (get_size(), ...)
+	U_I easy_inbuf;                   //< amount of byte available in "easy_tampon"
+	char *ptr_tampon;                 //< points to tampon or easy_tampon depending on the multimode context
+	U_I *ptr_inbuf;                   //< points to inbuf or easy_in_buf depending on the multimode context
 
-	void reset_handle();
+	void switch_to_multi(bool mode);  //< set to false to modify the easyhandle, set to true to use multi handle with the easyhandle
 	void copy_from(const fichier_libcurl & ref);
 	void copy_parent_from(const fichier_libcurl & ref);
-	void clean();
+	void check_info_after_multi_perform();
 	void detruit();
 
 	static size_t write_data_callback(char *buffer, size_t size, size_t nmemb, void *userp);
 	static size_t read_data_callback(char *bufptr, size_t size, size_t nitems, void *userp);
-
+	static size_t null_callback(char *bufptr, size_t size, size_t nmemb, void *userp) { return size*nmemb; };
     };
 
 	/// @}

@@ -104,13 +104,15 @@ namespace libdar
 	std::list<std::string> current_dir;
 	std::string reading_dir_tmp;
 
-	void handle_reset();
+	void set_libcurl_URL();
+	void set_libcurl_authentication();
 	void copy_from(const entrepot_libcurl & ref);
 	void detruit();
 
 	static std::string curl_protocol2string(curl_protocol proto);
 	static std::string build_url_from(curl_protocol proto, const std::string & host, const std::string & port);
 	static size_t get_ftp_listing_callback(void *buffer, size_t size, size_t nmemb, void *userp);
+	static size_t null_callback(void *buffer, size_t size, size_t nmemb, void *userp) { return size*nmemb; };
     };
 
 	/// @}

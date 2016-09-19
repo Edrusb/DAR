@@ -35,6 +35,7 @@ extern "C"
 #include "shell_interaction.hpp"
 #include "user_interaction.hpp"
 #include "entrepot_libcurl.hpp"
+#include "fichier_local.hpp"
 
 using namespace libdar;
 
@@ -58,6 +59,7 @@ int main()
 
 void f1()
 {
+    shell_interaction ui(&cout, &cerr, true);
     secu_string pass("themenac", 8);
     entrepot_libcurl reposito(entrepot_libcurl::proto_ftp,
 			      "denis",
@@ -66,11 +68,26 @@ void f1()
 			      "",
 			      "",
 			      "");
+    fichier_local readme("/etc/fstab");
+    fichier_local writetome(ui,
+			    "/tmp/test.tmp",
+			    gf_write_only,
+			    0644,
+			    false,
+			    true,
+			    false);
+    fichier_local writetomepart(ui,
+				"/tmp/test-part.tmp",
+				gf_write_only,
+				0644,
+				false,
+				true,
+				false);
+
     string tmp;
-    shell_interaction ui(&cout, &cerr, true);
 
     reposito.set_location("/tmp");
-    cout << "Listing:" << reposito.get_url() << endl;
+    cout << "Listing: " << reposito.get_url() << endl;
     reposito.read_dir_reset();
     while(reposito.read_dir_next(tmp))
 	cout << " -> " << tmp << endl;
@@ -88,14 +105,61 @@ void f1()
 	ui.warning(e.get_message());
     }
 
-    cout << "Listing:" << reposito.get_url() << endl;
+    cout << "Listing: " << reposito.get_url() << endl;
     reposito.read_dir_reset();
     while(reposito.read_dir_next(tmp))
 	cout << " -> " << tmp << endl;
     cout << endl;
 
+    fichier_global *remotew = reposito.open(ui,
+					    "cuicui",
+					    gf_write_only,
+					    false,
+					    0644,
+					    true,
+					    true,
+					    hash_none);
+    if(remotew == nullptr)
+	throw SRC_BUG;
+    try
+    {
+	readme.copy_to(*remotew);
+    }
+    catch(...)
+    {
+	delete remotew;
+	throw;
+    }
+    delete remotew;
+
     fichier_global *fic = reposito.open(ui,
-					"coucou",
+					"cuicui",
+					gf_read_only,
+					false,
+					0,
+					false,
+					false,
+					hash_none);
+    if(fic == nullptr)
+	throw SRC_BUG;
+
+    try
+    {
+
+	infinint file_size = fic->get_size();
+	ui.printf("size = %i", &file_size);
+
+	fic->copy_to(writetome);
+    }
+    catch(...)
+    {
+	delete fic;
+	throw;
+    }
+    delete fic;
+
+    fichier_global *foc = reposito.open(ui,
+					"cuicui",
 					gf_read_only,
 					false,
 					0,
@@ -103,19 +167,89 @@ void f1()
 					false,
 					hash_none);
 
-    infinint file_size = fic->get_size();
-    ui.printf("size = %i", &file_size);
+    if(foc == nullptr)
+	throw SRC_BUG;
 
-    const U_I bufsize = 10000;
-    char buffer[bufsize+1];
-    U_I read;
-    do
+    try
     {
-	read = fic->read(buffer, bufsize);
-	buffer[read] = '\0';
-	ui.printf(buffer);
+
+	foc->skip(20);
+	foc->copy_to(writetomepart);
     }
-    while(read == bufsize);
+    catch(...)
+    {
+	delete foc;
+	throw;
+    }
+    delete foc;
 
+    fichier_global *fac = reposito.open(ui,
+					"cuicui",
+					gf_read_only,
+					false,
+					0,
+					false,
+					false,
+					hash_none);
+    const U_I BUFSIZE = 1000;
+    char buf[BUFSIZE];
+    infinint tamp;
+    U_I utamp;
+    U_I step = 600;
+
+    if(fac == nullptr)
+	throw SRC_BUG;
+
+    try
+    {
+	fac->skip(10);
+
+	tamp = fac->read(buf, step);
+	utamp = 0;
+	tamp.unstack(utamp);
+	buf[utamp] = '\0';
+	cout << "reading " << step << " first chars: " << buf << endl;
+	tamp = fac->get_position();
+	ui.printf("position = %i", &tamp);
+	tamp = fac->get_size();
+	ui.printf("file size = %i", &tamp);
+
+	tamp = fac->read(buf, step);
+	utamp = 0;
+	tamp.unstack(utamp);
+	buf[utamp] = '\0';
+	cout << "reading " << step << " next chars:  " << buf << endl;
+	tamp = fac->get_position();
+	ui.printf("position = %i", &tamp);
+    }
+    catch(...)
+    {
+	delete foc;
+	throw;
+    }
+    delete foc;
+
+
+    fichier_global *fec = reposito.open(ui,
+					"cuicui",
+					gf_write_only,
+					false,
+					0644,
+					false,
+					true,
+					hash_none);
+    if(fec == nullptr)
+	throw SRC_BUG;
+    try
+    {
+	fec->skip_to_eof();
+	readme.skip(0);
+	readme.copy_to(*fec);
+    }
+    catch(...)
+    {
+	delete fec;
+	throw;
+    }
+    delete fec;
 }
-
