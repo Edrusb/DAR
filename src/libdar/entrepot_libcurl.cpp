@@ -37,11 +37,8 @@ namespace libdar
 				       const string & login,
 				       const secu_string & password,
 				       const string & host,
-				       const string & port,
-				       const string & user_ownership,
-				       const string & group_ownership)
-	: x_proto(proto),
-	  base_URL(build_url_from(proto, host, port))
+				       const string & port): x_proto(proto),
+							     base_URL(build_url_from(proto, host, port))
     {
 	current_dir.clear();
 	reading_dir_tmp.clear();
@@ -60,8 +57,8 @@ namespace libdar
 
 	set_root("/");
 	set_location("/");
-	set_user_ownership(user_ownership);
-	set_group_ownership(group_ownership);
+	set_user_ownership(""); // not used for this type of entrepot
+	set_group_ownership(""); // not used for this type of entrepot
 
 	easyhandle = curl_easy_init();
 	if(easyhandle == nullptr)

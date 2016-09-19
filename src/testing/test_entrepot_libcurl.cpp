@@ -65,8 +65,6 @@ void f1()
 			      "denis",
 			      pass,
 			      "localhost",
-			      "",
-			      "",
 			      "");
     fichier_local readme("/etc/fstab");
     fichier_local writetome(ui,

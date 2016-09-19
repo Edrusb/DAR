@@ -26,7 +26,7 @@
     /// \file entrepot_libcurl.hpp
     /// \brief defines the implementation for remote filesystem entrepot using libcurl
 
-    /// \ingroup Private
+    /// \ingroup API
 
 #ifndef ENTREPOT_LIBCURL_HPP
 #define ENTREPOT_LIBCURL_HPP
@@ -63,13 +63,11 @@ namespace libdar
     public:
 	enum curl_protocol { proto_ftp, proto_http, proto_https, proto_scp, proto_sftp };
 
-	entrepot_libcurl(curl_protocol proto,
-			 const std::string & login,
-			 const secu_string & password,
-			 const std::string & host,
-			 const std::string & port,
-			 const std::string & user_ownership,
-			 const std::string & group_ownership);
+	entrepot_libcurl(curl_protocol proto,                  //< protocol to use for communication with the remote repository
+			 const std::string & login,            //< login to use
+			 const secu_string & password,         //< password to authenticate
+			 const std::string & host,             //< hostname or IP of the remote repositiry
+			 const std::string & port);            //< empty string to use default port in regard to protocol used
 	entrepot_libcurl(const entrepot_libcurl & ref) { copy_from(ref); };
 	const entrepot_libcurl & operator = (const entrepot_libcurl & ref) { detruit(); copy_from(ref); return *this; };
 	~entrepot_libcurl() { detruit(); };
