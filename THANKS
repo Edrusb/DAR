@@ -1,3 +1,7 @@
+version 2.5.7
+--------------
+Thanks to Jim Avera for bug report with clear scenario to reproduce it
+
 version 2.5.6
 --------------
 Thanks to Johan de Jong for bug report.

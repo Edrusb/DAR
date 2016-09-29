@@ -1,3 +1,8 @@
+from 2.5.6 to 2.5.7
+- fixed bug leading dar to not include directories given with -g option
+  nor to exclude directories given to -P option when the directory given
+  to -R option starts by a dot ("-R ./here" in place of "-R here")
+
 from 2.5.5 to 2.5.6
 - added speed optimization when comparing dates with hourshift flexibility
   (-H option)

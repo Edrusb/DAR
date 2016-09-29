@@ -961,7 +961,24 @@ static bool get_args_recursive(recursive_param & rec,
                 if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 else
-                    p.fs_root = new (nothrow) path(optarg, true);
+		{
+		    try
+		    {
+			    // first, trying to read the path as if it was a UNIX path
+			    // this is necessary to take care of dot (.) and double dot (..)
+			    // part inside the path and eventually reduce them to be able
+			    // to apply filters on it in a consistent manner
+			p.fs_root = new (nothrow) path(optarg, false);
+		    }
+		    catch(Erange & e)
+		    {
+			    // well, it is not a UNIX path, using undisclosed object creation mode
+			    // for example argument may contain // or \\ this tolerance has been
+			    // added at release 2.4.0, but has drawback when using Unix path beginning
+			    // with a dot ./restore (bug reported by Jim Avera against release 2.5.6)
+			p.fs_root = new (nothrow) path(optarg, true);
+		    }
+		}
                 if(p.fs_root == nullptr)
                     throw Ememory("get_args");
                 break;
