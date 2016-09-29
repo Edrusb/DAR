@@ -211,6 +211,11 @@ from 2.4.x to 2.5.0
   slightly improves randomness of IV and stay available when libgcrypt is
   run in FIPS mode
 
+from 2.4.22 to 2.4.23
+- fixed bug leading dar to not include directories given with -g option
+  nor to exclude directories given to -P option when the directory given
+  to -R option starts by a dot ("-R ./here" in place of "-R here")
+
 from 2.4.21 to 2.4.22
 - fixing bug in the returned exit status when dar failed executing DUC
   command due to system error (now returning the expected code 6 in that
