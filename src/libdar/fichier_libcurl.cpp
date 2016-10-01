@@ -231,19 +231,24 @@ namespace libdar
 
     bool fichier_libcurl::skippable(skippability direction, const infinint & amount)
     {
-	switch(direction)
+	if(get_mode() == gf_read_only)
 	{
-	case skip_backward:
-	    return amount <= current_offset;
-	case skip_forward:
-	    if(!has_maxpos)
-		(void)get_size();
-	    if(!has_maxpos)
+	    switch(direction)
+	    {
+	    case skip_backward:
+		return amount <= current_offset;
+	    case skip_forward:
+		if(!has_maxpos)
+		    (void)get_size();
+		if(!has_maxpos)
+		    throw SRC_BUG;
+		return current_offset + amount < maxpos;
+	    default:
 		throw SRC_BUG;
-	    return current_offset + amount < maxpos;
-	default:
-	    throw SRC_BUG;
+	    }
 	}
+	else
+	    return false;
     }
 
     bool fichier_libcurl::skip(const infinint & pos)
