@@ -70,12 +70,14 @@ namespace libdar
 	    advise_dontneed    //< application will not read the data in near future
 	};
 
-	    /// constructors
+	    /// constructor
 	    ///
 	    /// \note some well defined error case must generate an Esystem exception, other by Erange or
 	    /// more appropriated Egeneric exceptions to known what type of error must be handled
 	    /// by Esystem object, see the Esystem::io_error enum
         fichier_global(const user_interaction & dialog, gf_mode mode): generic_file(mode), mem_ui(dialog) {};
+
+	    /// copy constructor
 	fichier_global(const fichier_global & ref) : generic_file(ref), thread_cancellation(ref), mem_ui(ref) {};
 
 	    // default assignment operator is fine here
