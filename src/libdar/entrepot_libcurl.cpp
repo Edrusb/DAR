@@ -27,6 +27,7 @@
 #include "tools.hpp"
 #include "entrepot_libcurl.hpp"
 #include "fichier_libcurl.hpp"
+#include "cache_global.hpp"
 
 using namespace std;
 
@@ -204,8 +205,10 @@ namespace libdar
 						     bool fail_if_exists,
 						     bool erase) const
     {
-	fichier_libcurl *ret = nullptr;
+	fichier_global *ret = nullptr;
+	cache_global *rw = nullptr;
 	entrepot_libcurl *me = const_cast<entrepot_libcurl *>(this);
+	gf_mode hidden_mode = mode;
 
 	if(me == nullptr)
 	    throw SRC_BUG;
@@ -222,15 +225,46 @@ namespace libdar
 
 	string chemin = (path(get_url(), true) + filename).display();
 
-	ret = new (get_pool()) fichier_libcurl(dialog,
-					       chemin,
-					       easyhandle,
-					       mode,
-					       force_permission,
-					       permission,
-					       erase);
-	if(ret == nullptr)
-	    throw Ememory("entrepot_libcurl::inherited_open");
+	if(hidden_mode == gf_read_write)
+	    hidden_mode = gf_write_only;
+
+	try
+	{
+
+	    ret = new (get_pool()) fichier_libcurl(dialog,
+						   chemin,
+						   easyhandle,
+						   hidden_mode,
+						   force_permission,
+						   permission,
+						   erase);
+	    if(ret == nullptr)
+		throw Ememory("entrepot_libcurl::inherited_open");
+
+	    if(mode == gf_read_write)
+	    {
+		rw = new (nothrow) cache_global(dialog, ret, true);
+		if(rw != nullptr)
+		{
+		    ret = nullptr; // the former object pointed to by ret is now managed by rw
+		    rw->change_to_read_write();
+		    ret = rw;      // only now because if change_to_read_write() generate an exception
+			// we must not delete twice the same object that would be pointed to once by ret and once again by rw
+		    rw = nullptr;
+		}
+		else
+		    throw Ememory("entrpot_libcurl::inherited_open");
+
+	    }
+	}
+	catch(...)
+	{
+	    if(ret != nullptr)
+		delete ret;
+	    if(rw != nullptr)
+		delete rw;
+	    throw;
+	}
 
 	return ret;
     }
