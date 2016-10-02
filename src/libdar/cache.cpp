@@ -229,6 +229,16 @@ namespace libdar
 	}
     }
 
+    void cache::inherited_read_ahead(const infinint & amount)
+    {
+	infinint tmp = available_in_cache(generic_file::skip_forward);
+
+	if(amount > tmp)
+	    ref->read_ahead(amount - tmp);
+	    // else requested data is already in cache
+    }
+
+
     U_I cache::inherited_read(char *a, U_I x_size)
     {
 	U_I ret = 0;
