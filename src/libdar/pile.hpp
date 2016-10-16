@@ -71,7 +71,8 @@ namespace libdar
 	generic_file *pop();
 
 	    /// remove the top generic_file and destroy it
-	    /// \param[in] ptr is the type of the object that must be found on the top of the stack. It may be the type of an parent class.
+	    /// \param[in] ptr is the type of the object that must be found on the top of the stack,
+	    /// It may also be the type of a parent class. Note that the value of the pointer is ignored.
 	    /// \return true if and only if the object on the top of the stack could be matched to the given type, this object is then poped from the stack and destroyed.
 	template <class T> bool pop_and_close_if_type_is(T *ptr);
 
