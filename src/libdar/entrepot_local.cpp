@@ -73,28 +73,36 @@ namespace libdar
 	return *this;
     }
 
-    void entrepot_local::read_dir_reset()
+    void entrepot_local::read_dir_reset() const
     {
-	detruit();
+	entrepot_local *me = const_cast<entrepot_local *>(this);
 	user_interaction_blind aveugle;
 
-	contents = new (get_pool()) etage(aveugle, get_location().display().c_str(), datetime(0), datetime(0), false, furtive_mode);
+	if(me == nullptr)
+	    throw SRC_BUG;
+
+	me->detruit();
+	me->contents = new (get_pool()) etage(aveugle, get_location().display().c_str(), datetime(0), datetime(0), false, furtive_mode);
 	if(contents == nullptr)
 	    throw Ememory("entrepot_local::read_dir_reset");
     }
 
-    bool entrepot_local::read_dir_next(string & filename)
+    bool entrepot_local::read_dir_next(string & filename) const
     {
+	entrepot_local *me = const_cast<entrepot_local *>(this);
+
+	if(me == nullptr)
+	    throw SRC_BUG;
 	if(contents == nullptr)
 	    return false;
 	if(contents->fichier.empty())
 	{
 	    delete contents;
-	    contents = nullptr;
+	    me->contents = nullptr;
 	    return false;
 	}
 	filename = contents->fichier.front();
-	contents->fichier.pop_front();
+	me->contents->fichier.pop_front();
 	return true;
     }
 

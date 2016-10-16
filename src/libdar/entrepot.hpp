@@ -111,8 +111,8 @@ namespace libdar
 			     hash_algo algo) const;
 
 	    /// routines to read existing files in the current directory (see set_location() / set_root() methods)
-	virtual void read_dir_reset() = 0;
-	virtual bool read_dir_next(std::string & filename) = 0;
+	virtual void read_dir_reset() const = 0;
+	virtual bool read_dir_next(std::string & filename) const = 0;
 
 	void unlink(const std::string & filename) const { inherited_unlink(filename); }; //< done this way for homogeneity with open/inherited_open
 

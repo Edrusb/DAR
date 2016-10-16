@@ -70,8 +70,8 @@ namespace libdar
 
 	std::string get_url() const { return std::string("file://") + get_full_path().display(); };
 
-	void read_dir_reset();
-	bool read_dir_next(std::string & filename);
+	void read_dir_reset() const;
+	bool read_dir_next(std::string & filename) const;
 
 	entrepot *clone() const { return new (get_pool()) entrepot_local(*this); };
 

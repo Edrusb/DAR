@@ -88,14 +88,18 @@ namespace libdar
 	set_libcurl_authentication();
     }
 
-    void entrepot_libcurl::read_dir_reset()
+    void entrepot_libcurl::read_dir_reset() const
     {
 	CURLcode err;
 	long listonly;
+	entrepot_libcurl *me = const_cast<entrepot_libcurl *>(this);
 
-	current_dir.clear();
-	reading_dir_tmp = "";
-	set_libcurl_URL();
+	if(me == nullptr)
+	    throw SRC_BUG;
+
+	me->current_dir.clear();
+	me->reading_dir_tmp = "";
+	me->set_libcurl_URL();
 
 	try
 	{
@@ -131,8 +135,8 @@ namespace libdar
 					      curl_easy_strerror(err)));
 		if(!reading_dir_tmp.empty())
 		{
-		    current_dir.push_back(reading_dir_tmp);
-		    reading_dir_tmp.clear();
+		    me->current_dir.push_back(reading_dir_tmp);
+		    me->reading_dir_tmp.clear();
 		}
 		break;
 	    case proto_http:
@@ -185,14 +189,19 @@ namespace libdar
 	}
     }
 
-    bool entrepot_libcurl::read_dir_next(string & filename)
+    bool entrepot_libcurl::read_dir_next(string & filename) const
     {
+	entrepot_libcurl *me = const_cast<entrepot_libcurl *>(this);
+
+	if(me == nullptr)
+	    throw SRC_BUG;
+
 	if(current_dir.empty())
 	    return false;
 	else
 	{
 	    filename = current_dir.front();
-	    current_dir.pop_front();
+	    me->current_dir.pop_front();
 	    return true;
 	}
     }

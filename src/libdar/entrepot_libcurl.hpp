@@ -76,8 +76,8 @@ namespace libdar
 	    // inherited from class entrepot
 
 	std::string get_url() const { return base_URL + get_full_path().display(); };
-	void read_dir_reset();
-	bool read_dir_next(std::string & filename);
+	void read_dir_reset() const;
+	bool read_dir_next(std::string & filename) const;
 	entrepot *clone() const { return new (get_pool()) entrepot_libcurl(*this); };
 
     protected:
