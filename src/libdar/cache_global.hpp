@@ -41,6 +41,8 @@ namespace libdar
     class cache_global: public fichier_global
     {
     public:
+	static const U_I default_cache_size = 102400;
+
 	    /// constructor
 	    //
 	    /// \param[in] dialog for user interaction requested by fichier_global
@@ -49,7 +51,7 @@ namespace libdar
 	    /// \param[in] size cache size
 	    /// \note the object pointed to by x_ptr passed under the responsibility of the cache_global object,
 	    /// it will be automatically deleted when no more needed
-	cache_global(user_interaction & dialog, fichier_global *x_ptr, bool shift_mode, U_I size = 102400);
+	cache_global(user_interaction & dialog, fichier_global *x_ptr, bool shift_mode, U_I size = default_cache_size);
 
 	    /// copy constructor
 	cache_global(cache_global & ref): fichier_global(ref) { throw SRC_BUG; };
