@@ -618,7 +618,7 @@ namespace libdar
 
 		    if(!options.get_empty() && sauv_path_t_local != nullptr)
 			tools_avoid_slice_overwriting_regex(dialog,
-							    sauv_path,
+							    *sauv_path_t,
 							    filename,
 							    extension,
 							    options.get_info_details(),
@@ -1887,15 +1887,14 @@ namespace libdar
 	if(sauv_path_abs.is_relative())
 	    sauv_path_abs = sauv_path_t.get_root() + sauv_path_abs;
 
-	if(!empty && sauv_path_t_local != nullptr)
-	    tools_avoid_slice_overwriting_regex(dialog,
-						sauv_path_abs,
-						filename,
-						extension,
-						info_details,
-						allow_over,
-						warn_over,
-						empty);
+	tools_avoid_slice_overwriting_regex(dialog,
+					    sauv_path_t,
+					    filename,
+					    extension,
+					    info_details,
+					    allow_over,
+					    warn_over,
+					    empty);
 
 	if(ref_arch != nullptr && ref_arch->sequential_read && (delta_signature || delta_diff))
 	    throw Erange("archive::op_create_in", gettext("Cannot sequentially read an archive of reference when delta signature or delta patch is requested"));

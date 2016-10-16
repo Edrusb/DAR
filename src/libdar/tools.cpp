@@ -1950,21 +1950,36 @@ namespace libdar
         return output;
     }
 
-    void tools_unlink_file_mask_regex(user_interaction & dialog, const string & c_chemin, const string & file_mask, bool info_details)
+    void tools_unlink_file_mask_regex(user_interaction & dialog,
+				      const entrepot & ent,
+				      const string & file_mask,
+				      bool info_details)
     {
         regular_mask my_mask = regular_mask(file_mask, true);
-
-        etage dir = etage(dialog, c_chemin.c_str(), datetime(0), datetime(0), false, false);
-        path chemin = path(c_chemin);
+        path chemin = path(ent.get_url(), true);
         string entry;
 
-        while(dir.read(entry))
+	ent.read_dir_reset();
+        while(ent.read_dir_next(entry))
             if(my_mask.is_covered(entry))
             {
-                const string c_entry = (chemin + entry).display();
+		const string c_entry = (chemin + entry).display();
                 if(info_details)
                     dialog.warning(tools_printf(dar_gettext("Removing file %s"), c_entry.c_str()));
-                if(unlink(c_entry.c_str()) != 0)
+
+		try
+		{
+		    ent.unlink(entry);
+		}
+		catch(Euser_abort & e)
+		{
+		    throw;
+		}
+		catch(Ebug & e)
+		{
+		    throw;
+		}
+		catch(Egeneric & e)
                 {
                     string tmp = tools_strerror_r(errno);
                     dialog.warning(tools_printf(dar_gettext("Error removing file %s: %s"), c_entry.c_str(), tmp.c_str()));
@@ -1972,15 +1987,15 @@ namespace libdar
             }
     }
 
-    bool tools_do_some_files_match_mask_regex(user_interaction & ui, const string & c_chemin, const string & file_mask)
+    bool tools_do_some_files_match_mask_regex(const entrepot & ent,
+					      const string & file_mask)
     {
-        regular_mask my_mask = regular_mask(file_mask, true);
-
-        etage dir = etage(ui, c_chemin.c_str(), datetime(0), datetime(0), false, false);
-        string entry;
         bool ret = false;
+        regular_mask my_mask = regular_mask(file_mask, true);
+        string entry;
 
-        while(!ret && dir.read(entry))
+	ent.read_dir_reset();
+        while(!ret && ent.read_dir_next(entry))
             if(my_mask.is_covered(entry))
                 ret = true;
 
@@ -1988,7 +2003,7 @@ namespace libdar
     }
 
     void tools_avoid_slice_overwriting_regex(user_interaction & dialog,
-					     const path & chemin,
+					     const entrepot & ent,
 					     const string & basename,
 					     const string & extension,
 					     bool info_details,
@@ -1996,9 +2011,9 @@ namespace libdar
 					     bool warn_overwriting,
 					     bool dry_run)
     {
-        const string c_chemin = chemin.display();
+        const string c_chemin = ent.get_url();
 	const string file_mask = string("^") + tools_escape_chars_in_string(basename, "[].+|!*?{}()^$-,\\") + "\\.[0-9]+\\." + extension + "(\\.(md5|sha1|sha512))?$";
-        if(tools_do_some_files_match_mask_regex(dialog, c_chemin, file_mask))
+        if(tools_do_some_files_match_mask_regex(ent, file_mask))
         {
             if(!allow_overwriting)
                 throw Erange("tools_avoid_slice_overwriting", tools_printf(dar_gettext("Overwriting not allowed while a slice of a previous archive with the same basename has been found in the %s directory, Operation aborted"), c_chemin.c_str()));
@@ -2009,7 +2024,7 @@ namespace libdar
                     if(warn_overwriting)
                         dialog.pause(tools_printf(dar_gettext("At least one slice of an old archive with the same name remains in the directory %s. It is advised to remove all the old archive's slices before creating an archive of same name. Can I remove these old slices?"), c_chemin.c_str()));
                     if(!dry_run)
-                        tools_unlink_file_mask_regex(dialog, c_chemin, file_mask, info_details);
+                        tools_unlink_file_mask_regex(dialog, ent, file_mask, info_details);
                 }
                 catch(Euser_abort & e)
                 {

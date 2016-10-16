@@ -63,6 +63,7 @@ extern "C"
 #include "tlv_list.hpp"
 #include "memory_pool.hpp"
 #include "datetime.hpp"
+#include "entrepot.hpp"
 
 #define TOOLS_SI_SUFFIX 1000
 #define TOOLS_BIN_SUFFIX 1024
@@ -485,27 +486,30 @@ namespace libdar
 
 	/// test the presence of files corresponding to a given mask in a directory (regex mask)
 
-	/// \param[in,out] ui for user interaction
-	/// \param[in] c_chemin directory where file have to be looked for
+	/// \param[in] ent entrepot where to read filesystem from
 	/// \param[in] file_mask regex expression which designates the files to look for
 	/// \return true if some files have found matching the file_mask
-    extern bool tools_do_some_files_match_mask_regex(user_interaction & ui, const std::string & c_chemin, const std::string & file_mask);
+    extern bool tools_do_some_files_match_mask_regex(const entrepot & ent,
+						     const std::string & file_mask);
 
 
 	/// remove files from a given directory
 
 	/// \param[in,out] dialog for user interaction
-	/// \param[in] c_chemin directory where files have to be removed
+	/// \param[in] ent entrepot where to remove files from
 	/// \param[in] file_mask regex expression which designates the files to remove
 	/// \param[in] info_details whether user must be displayed details of the operation
 	/// \note This is equivalent to the 'rm' command with regex expression in place of glob one
-    extern void tools_unlink_file_mask_regex(user_interaction & dialog, const std::string & c_chemin, const std::string & file_mask, bool info_details);
+    extern void tools_unlink_file_mask_regex(user_interaction & dialog,
+					     const entrepot & ent,
+					     const std::string & file_mask,
+					     bool info_details);
 
 
 	/// prevents slice overwriting: check the presence of slice and if necessary ask the user if they can be removed
 
 	/// \param[in,out] dialog for user interaction
-	/// \param[in] chemin where slice is about to be created
+	/// \param[in] ent entrepot where to check for slice overwriting
 	/// \param[in] basename is the archive basename
 	/// \param[in] extension is the archive filename extension
 	/// \param[in] info_details whether user must be displayed details of the operation
@@ -514,7 +518,7 @@ namespace libdar
 	/// \param[in] dry_run do a dry-run exection (no filesystem modification is performed)
 	/// \note may thow exceptions.
     extern void tools_avoid_slice_overwriting_regex(user_interaction & dialog,
-						    const path & chemin,
+						    const entrepot & ent,
 						    const std::string & basename,
 						    const std::string & extension,
 						    bool info_details,

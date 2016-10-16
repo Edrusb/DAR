@@ -131,6 +131,10 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 	    bool force_perm = slice_perm != "";
 	    U_I perm = force_perm ? tools_octal2int(slice_perm) : 0;
 
+	    if(dst_dir == nullptr)
+		throw SRC_BUG;
+	    entrep.set_location(*dst_dir);
+
 	    data_name.clear();
 	    internal_name.generate_internal_filename();
 	    try
@@ -139,7 +143,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 		{
 		    dialog.change_non_interactive_output(&cout);
 		    tools_avoid_slice_overwriting_regex(dialog,
-							dst_dir->display(),
+							entrep,
 							dst,
 							EXTENSION,
 							false,
