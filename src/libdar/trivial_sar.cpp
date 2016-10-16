@@ -371,6 +371,7 @@ namespace libdar
 	    if(ref_fic != nullptr)
 		ref_fic->fadvise(fichier_global::advise_dontneed);
 
+	    reference->terminate();
 	    delete reference; // this closes the slice so we can now eventually play with it:
 	    reference = nullptr;
 	}
