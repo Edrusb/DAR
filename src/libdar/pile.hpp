@@ -186,8 +186,9 @@ namespace libdar
 	    ptr = dynamic_cast<T *>(top);
 	    if(ptr != nullptr)
 	    {
+		ptr->terminate();
 		stack.pop_back();
-		delete top;
+		delete ptr;
 		return true;
 	    }
 	    else
