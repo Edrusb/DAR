@@ -397,6 +397,7 @@ namespace libdar
 
     void entrepot_libcurl::copy_from(const entrepot_libcurl & ref)
     {
+	x_proto = ref.x_proto;
 	base_URL = ref.base_URL;
 	auth = ref.auth;
 	current_dir = ref.current_dir;
