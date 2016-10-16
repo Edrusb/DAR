@@ -343,6 +343,7 @@ namespace libdar
 	if(buffer == nullptr)
 	    throw Ememory("cache::alloc_buffer");
 	size = x_size;
+	half = size / 2;
     }
 
     void cache::release_buffer()
@@ -356,28 +357,29 @@ namespace libdar
 	    delete [] buffer;
 	buffer = nullptr;
 	size = 0;
+	half = 0;
     }
 
     void cache::shift_by_half()
     {
-	U_I half = last / 2;
-	U_I reste = last % 2;
+	U_I shift;
 
-	if(next < half)
-	    return; // current position would be out of the buffer so we don't shift
-	if(first_to_write < half)
+	if(last <= half)
+	    return; // not enough data to keep the cache filled by half
+	else
+	    shift = last - half;
+
+	if(next < shift)
+	    shift = next; // current position cannot be out of the buffer so we don't shift more than "next"
+
+	if(first_to_write < shift)
 	    throw SRC_BUG;
-	if(last > 1)
-	{
-	    (void)memmove(buffer, buffer + half, half + reste);
-	    if(need_flush_write())
-		first_to_write -= half;
-	    else
-		first_to_write = size;
-	    next -= half;
-	    last -= half;
-	}
-	buffer_offset += half;
+
+	(void)memmove(buffer, buffer + shift, last - shift);
+	first_to_write -= shift;
+	next -= shift;
+	last -= shift;
+	buffer_offset += shift;
     }
 
     void cache::clear_buffer()
@@ -400,7 +402,7 @@ namespace libdar
 	    ref->skip(buffer_offset + first_to_write);
 	    ref->write(buffer + first_to_write, last - first_to_write);
 	}
-	first_to_write = size;
+	first_to_write = last;
 
 	if(shifted_mode)
 	    shift_by_half();

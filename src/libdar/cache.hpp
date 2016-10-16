@@ -81,6 +81,7 @@ namespace libdar
 	generic_file *ref;                //< underlying file, (not owned by "this', not to be delete by "this")
 	char *buffer;                     //< data in transit
 	U_I size;                         //< allocated size
+	U_I half;                         //< precalculated half = size / 2
 	U_I next;                         //< next to read or next place to write to
 	U_I last;                         //< last valid data in the cache. we have: next <= last < size
 	U_I first_to_write;               //< position of the first byte that need to be written. if greater than last, no byte need writing
