@@ -69,7 +69,7 @@ namespace libdar
 			 const secu_string & password,         //< password to authenticate
 			 const std::string & host,             //< hostname or IP of the remote repositiry
 			 const std::string & port);            //< empty string to use default port in regard to protocol used
-	entrepot_libcurl(const entrepot_libcurl & ref) { copy_from(ref); };
+	entrepot_libcurl(const entrepot_libcurl & ref) : entrepot(ref) { copy_from(ref); };
 	const entrepot_libcurl & operator = (const entrepot_libcurl & ref) { detruit(); copy_from(ref); return *this; };
 	~entrepot_libcurl() { detruit(); };
 
