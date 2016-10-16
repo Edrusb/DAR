@@ -56,7 +56,7 @@ namespace libdar
 						  maxpos(0),
 						  inbuf(0),
 						  eof(false),
-						  append_write(false),
+						  append_write(!erase),
 						  easy_inbuf(0),
 						  ptr_tampon(nullptr),
 						  ptr_inbuf(nullptr)
@@ -277,15 +277,7 @@ namespace libdar
 	    break;
 	case gf_write_only:
 	    if(pos != current_offset)
-	    {
-		append_write = true;
-		(void)get_size();
-		    // get_size() calls switch_to_multi(true) which sets the CURLOPT_ option to append when append_write is set
-		if(!has_maxpos)
-		    throw SRC_BUG;
-		if(pos != maxpos)
-		    throw Erange("fichier_libcurl::skip", string(gettext("libcurl does not allow skipping in write mode, except to end of file (append mode)")));
-	    }
+		throw Erange("fichier_libcurl::skip", string(gettext("libcurl does not allow skipping in write mode")));
 	    break;
 	case gf_read_write:
 	    throw SRC_BUG;
@@ -407,6 +399,9 @@ namespace libdar
 	if(wrote < size)
 	    throw SRC_BUG; // curl has finished transfer but data remain in pipe
 	current_offset += wrote;
+	if(current_offset > 0)
+	    append_write = true; // we can now ignore the request to erase data
+	    // and we now need to swap in write append mode
 
 	return wrote;
     }
@@ -494,34 +489,30 @@ namespace libdar
 	    infinint resume;
 	    infinint iinbuf = inbuf;
 	    curl_off_t cur_pos = 0;
-	    bool action = false;
 
 	    switch(get_mode())
 	    {
 	    case gf_read_only:
 		resume = current_offset + iinbuf;
-		action = true;
-		break;
-	    case gf_write_only:
-		resume = maxpos;
-		action = append_write;
-		break;
-	    case gf_read_write:
-		throw SRC_BUG;
-	    default:
-		throw SRC_BUG;
-	    }
-
-	    if(action)
-	    {
 		resume.unstack(cur_pos);
 		if(!resume.is_zero())
 		    throw Erange("fichier_libcurl::switch_to_multi",
 				 gettext("Integer too large for libcurl, cannot skip at the requested offset in the remote repository"));
 		erre = curl_easy_setopt(easyhandle, CURLOPT_RESUME_FROM_LARGE, cur_pos);
 		if(erre != CURLE_OK)
-		    throw Erange("fichier_libcurl::fichier_global_inherited_write",
+		    throw Erange("fichier_libcurl::switch_to_multi",
 				 tools_printf(gettext("Error while seeking in file on remote repository: %s"), curl_easy_strerror(erre)));
+		break;
+	    case gf_write_only:
+		erre = curl_easy_setopt(easyhandle, CURLOPT_APPEND, append_write ? 1 : 0);
+		if(erre != CURLE_OK)
+		    throw Erange("fichier_libcur::switch_to_multi",
+				 tools_printf(gettext("Error while setting write append mode for libcurl: %s"), curl_easy_strerror(erre)));
+		break;
+	    case gf_read_write:
+		throw SRC_BUG;
+	    default:
+		throw SRC_BUG;
 	    }
 
 		// now moving to multi mode
@@ -622,10 +613,7 @@ namespace libdar
     void fichier_libcurl::detruit()
     {
 	if(get_mode() == gf_write_only)
-	{
-	    eof = true;
-	    sync_write();
-	}
+	   terminate();
 	switch_to_multi(false);
 	if(easyhandle != nullptr)
 	{
