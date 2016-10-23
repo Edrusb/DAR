@@ -451,6 +451,10 @@ namespace libdar
 	if(!port.empty())
 	    ret += ":" + port;
 
+	ret += "/";
+	    // to have any path added in the future to refer to the root
+	    // of the remote repository and not relative to the landing directory
+
 	return ret;
     }
 
