@@ -84,7 +84,6 @@ namespace libdar
 	easyhandle = curl_easy_init();
 	if(easyhandle == nullptr)
 	    throw Erange("entrepot_libcurl::entrepot_libcurl", string(gettext("Error met while creating a libcurl handle")));
-	set_libcurl_URL();
 	set_libcurl_authentication();
     }
 
