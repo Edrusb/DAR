@@ -400,6 +400,7 @@ namespace libdar
 	base_URL = ref.base_URL;
 	auth = ref.auth;
 	current_dir = ref.current_dir;
+	reading_dir_tmp = ref.reading_dir_tmp;
 	if(ref.easyhandle != nullptr)
 	{
 	    easyhandle = curl_easy_duphandle(ref.easyhandle);
