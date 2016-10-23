@@ -424,6 +424,11 @@ namespace libdar
 		const char *msg = curl_easy_strerror(curlret);
 		throw Erange("libdar_init_libcurl", tools_printf(gettext("libcurl initialization failed: %s"), msg));
 	    }
+	    const curl_version_info_data *cvers = curl_version_info(CURLVERSION_FOURTH);
+	    if(cvers->age < CURLVERSION_FOURTH)
+		throw Erange(gettext("libcurl initialization failed: %s"), "libcurl version not available");
+	    if(cvers->version_num < 0x072600)
+		throw Erange(gettext("libcurl initialization failed: %s"), "libcurl version is too old");
 #endif
 
 	    tools_init();
