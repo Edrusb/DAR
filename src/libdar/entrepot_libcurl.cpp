@@ -64,16 +64,6 @@ namespace libdar
 	current_dir.clear();
 	reading_dir_tmp.clear();
 
-	if(!login.empty())
-	{
-	    auth.resize(login.size() + 1 + password.get_size() + 1);
-	    auth.append(login.c_str(), login.size());
-	    auth.append(":", 1);
-	    auth.append(password.c_str(), password.get_size());
-	}
-	else
-	    auth.clear();
-
 	    // initializing the fields from parent class entrepot
 
 	set_root("/");
@@ -84,7 +74,7 @@ namespace libdar
 	easyhandle = curl_easy_init();
 	if(easyhandle == nullptr)
 	    throw Erange("entrepot_libcurl::entrepot_libcurl", string(gettext("Error met while creating a libcurl handle")));
-	set_libcurl_authentication();
+	set_libcurl_authentication(login, password);
     }
 
     void entrepot_libcurl::read_dir_reset() const
@@ -384,9 +374,19 @@ namespace libdar
 									  curl_easy_strerror(err)));
     }
 
-    void entrepot_libcurl::set_libcurl_authentication()
+    void entrepot_libcurl::set_libcurl_authentication(const string & login, const secu_string & password)
     {
 	CURLcode err;
+	secu_string auth(login.size() + 1 + password.get_size() + 1);
+
+	if(!login.empty())
+	{
+	    auth.append(login.c_str(), login.size());
+	    auth.append(":", 1);
+	    auth.append(password.c_str(), password.get_size());
+	}
+	else
+	    auth.clear();
 
 	err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, auth.c_str());
 	if(err != CURLE_OK)
@@ -398,7 +398,6 @@ namespace libdar
     {
 	x_proto = ref.x_proto;
 	base_URL = ref.base_URL;
-	auth = ref.auth;
 	current_dir = ref.current_dir;
 	reading_dir_tmp = ref.reading_dir_tmp;
 	if(ref.easyhandle != nullptr)

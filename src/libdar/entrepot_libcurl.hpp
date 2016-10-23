@@ -98,13 +98,12 @@ namespace libdar
     private:
 	curl_protocol x_proto;
 	std::string base_URL; //< URL of the repository with only minimum path (login/password is given outside the URL)
-	secu_string auth;
 	CURL *easyhandle;
 	std::list<std::string> current_dir;
 	std::string reading_dir_tmp;
 
 	void set_libcurl_URL();
-	void set_libcurl_authentication();
+	void set_libcurl_authentication(const std::string & login, const secu_string & password);
 	void copy_from(const entrepot_libcurl & ref);
 	void detruit();
 
