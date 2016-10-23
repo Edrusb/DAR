@@ -89,7 +89,7 @@ namespace libdar
 	    throw SRC_BUG; // if hashing is asked, we cannot accept to open an existing file without erasing its contents
 
 
-	    // creating the file to write data to
+	    // creating the file to read from or write to data
 	ret = inherited_open(dialog,
 			     filename,
 			     mode,
