@@ -46,9 +46,9 @@ int main()
 {
     U_I maj, med, min;
 
-    get_version(maj, med, min);
     try
     {
+	get_version(maj, med, min);
 	f1();
     }
     catch(Egeneric & e)
@@ -67,22 +67,26 @@ void f1()
 			      "localhost",
 			      "");
     fichier_local readme("/etc/fstab");
-    fichier_local writetome(ui,
-			    "/tmp/test.tmp",
-			    gf_write_only,
-			    0644,
-			    false,
-			    true,
-			    false);
-    fichier_local writetomepart(ui,
-				"/tmp/test-part.tmp",
-				gf_write_only,
-				0644,
-				false,
-				true,
-				false);
+    fichier_local *writetome = new fichier_local(ui,
+						 "/tmp/test.tmp",
+						 gf_write_only,
+						 0644,
+						 false,
+						 true,
+						 false);
+    fichier_local *writetomepart = new fichier_local(ui,
+						     "/tmp/test-part.tmp",
+						     gf_write_only,
+						     0644,
+						     false,
+						     true,
+						     false);
+    try
+    {
+	string tmp;
 
-    string tmp;
+	if(writetome == nullptr || writetomepart == nullptr)
+	    throw Ememory("f1");
 
     reposito.set_location("/tmp");
     cout << "Listing: " << reposito.get_url() << endl;
@@ -143,11 +147,10 @@ void f1()
 
     try
     {
-
 	infinint file_size = fic->get_size();
 	ui.printf("size = %i", &file_size);
 
-	fic->copy_to(writetome);
+	fic->copy_to(*writetome);
     }
     catch(...)
     {
@@ -155,6 +158,9 @@ void f1()
 	throw;
     }
     delete fic;
+    fic = nullptr;
+    delete writetome;
+    writetome = nullptr;
 
     fichier_global *foc = reposito.open(ui,
 					"cuicui",
@@ -170,9 +176,8 @@ void f1()
 
     try
     {
-
 	foc->skip(20);
-	foc->copy_to(writetomepart);
+	foc->copy_to(*writetomepart);
     }
     catch(...)
     {
@@ -180,6 +185,9 @@ void f1()
 	throw;
     }
     delete foc;
+    foc = nullptr;
+    delete writetomepart;
+    writetomepart = nullptr;
 
     fichier_global *fac = reposito.open(ui,
 					"cuicui",
@@ -250,4 +258,19 @@ void f1()
 	throw;
     }
     delete fec;
+
+    }
+    catch(...)
+    {
+	if(writetome != nullptr)
+	    delete writetome;
+	if(writetomepart != nullptr)
+	    delete writetomepart;
+	throw;
+    }
+
+    if(writetome != nullptr)
+	delete writetome;
+    if(writetomepart != nullptr)
+	delete writetomepart;
 }
