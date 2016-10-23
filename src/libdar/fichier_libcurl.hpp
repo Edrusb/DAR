@@ -112,7 +112,8 @@ namespace libdar
 
 	CURL *easyhandle;                 //< easy handle that we modify when necessary
 	CURLM *multihandle;               //< multi handle to which is added the easyhandle for step by step libcurl interaction
-	bool multimode;                   //< wether easyhandle has been added to multihandle
+	bool easy_in_multi;               //< whether easyhandle is added to multihandle
+	bool metadatamode;                //< wether we are acting on metadata rather than file's data
 	infinint current_offset;          //< current offset we are reading / writing at
 	bool has_maxpos;                  //< true if maxpos is set
 	infinint maxpos;                  //< in read mode this is the filesize, in write mode this the offset where to append data (not ovewriting)
@@ -120,15 +121,19 @@ namespace libdar
 	U_I inbuf;                        //< amount of byte available in "tampon"
 	bool eof;                         //< whether we have reached end of file (read mode)
 	bool append_write;                //< whether we should append to data (and not replace) when uploading
-	char easy_tampon[tampon_size];    //< trash in transit data used to carry header of non data exchanges (get_size(), ...)
-	U_I easy_inbuf;                   //< amount of byte available in "easy_tampon"
-	char *ptr_tampon;                 //< points to tampon or easy_tampon depending on the multimode context
-	U_I *ptr_inbuf;                   //< points to inbuf or easy_in_buf depending on the multimode context
+	char meta_tampon[tampon_size];    //< trash in transit data used to carry metadata
+	U_I meta_inbuf;                   //< amount of byte available in "meta_tampon"
+	char *ptr_tampon;                 //< points to tampon or meta_tampon depending on the metadata mode
+	U_I *ptr_inbuf;                   //< points to inbuf or meta_in_buf depending on the metadata mod
 
-	void switch_to_multi(bool mode);  //< set to false to modify the easyhandle, set to true to use multi handle with the easyhandle
+
+	void add_easy_to_multi();
+	void remove_easy_from_multi();
+	void switch_to_metadata(bool mode);//< set to true to get or set file's metadata, false to read/write file's data
+	void run_multi() const;           //< blindly run multihandle up to the end of transfer
 	void copy_from(const fichier_libcurl & ref);
 	void copy_parent_from(const fichier_libcurl & ref);
-	void check_info_after_multi_perform();
+	void check_info_after_multi_perform() const;
 	void detruit();
 
 	static size_t write_data_callback(char *buffer, size_t size, size_t nmemb, void *userp);
