@@ -1326,6 +1326,7 @@ namespace libdar
 			}
 		}
 	    }
+	    break;
 	case gf_read_write:
 	case gf_write_only:
 	    open_file(of_max_seen);
