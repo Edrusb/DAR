@@ -7,11 +7,15 @@ if(! -f configure) then
 endif
 
 if( "$1" == "") then
-  echo "usage : $0 <version> <name extension> <options to configure ...>"
-  exit
+  echo "usage : $0 <version> <win-flavor> <name extension> <options to configure ...>"
+exit
 endif
 
-set dir_name="dar$2-$1-i386-windows"
+set version=$1
+set winflavor=$2
+set darflavor=$3
+
+set dir_name="dar$darflavor-$version-$winflavor"
 set build_dir=`pwd`/$dir_name
 echo "install directory is $build_dir"
 if( -e $build_dir) then
@@ -21,7 +25,7 @@ endif
 mkdir $build_dir
 make clean distclean || echo "ignoring error, tree already clean"
 # setenv CXXFLAGS -O
-./configure --prefix=$build_dir --disable-gpgme-linking $3 $4 $5 $6 $7 $8 $9
+./configure --prefix=$build_dir --disable-gpgme-linking $4 $5 $6 $7 $8 $9 ${10} ${11}
 make
 make install-strip
 mv $build_dir/bin/* $build_dir/lib/*.so.*.*.* $build_dir

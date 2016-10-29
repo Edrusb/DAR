@@ -1,7 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 
-  <meta content="text/html; charset=us-ascii" http-equiv="content-type"><title>DAR - Frequently Asked Questions</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
+  <meta content="text/html; charset=us-ascii" http-equiv="content-type">
+  <title>DAR - Frequently Asked Questions</title>
+
+</head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -98,8 +101,11 @@ dar does not report new files found on filesystem?</a><br>
       <a href="#delta">Why dar does not automatically perform delta difference (aka rsync increment)? </a><br>
       <a href="#cyrillic">Why do dar reports truncated filenames under Windows, especially with cyrillic filenames?</a><br>
       </span><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;"> </span>
+      <a href="#cyrillic">Why do dar reports truncated filenames under Windows, especially with cyrillic filenames?</a><br>
+      </span>
+      <a href="#win32"><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;">I have a 32 bits windows system, which binary </span><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;">package </span></span><span style="font-weight: bold; font-style: italic;">can I to use?</span></span></a><br>
+<span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;"></span>
       <h2><span style="font-weight: bold;"> </span></h2>
-      <br>
       <br>
       <h2><span style="text-decoration: underline;">Answers:</span></h2>
       <h1><span style="font-weight: bold; font-style: italic;"> </span></h1>
@@ -422,8 +428,6 @@ Follow for each command the available options (those marked OK):<br>
 <br>
 <br>
 <div style="text-align: justify;">
-<div style="text-align: center;">
-</div>
 <table style="width: 80%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
@@ -2375,16 +2379,20 @@ execution time becomes back the same as the one of dar 2.3.x releases.<br>
       <br>
       </div>
       <span style="font-style: italic; font-weight: bold;"><br>
-      <a name="slow_2_5_0"></a>Why dar became yet slower since release 2.5.0?<br>
+      <a name="slow_2_5_0"></a>Why dar became yet slower since release
+2.5.0?<br>
       </span>
       <div style="margin-left: 40px;"> <br>
 This is again the drawback of new features!<br>
-      <ul><li>The
-first feature that drain time is <span style="font-weight: bold;">Filesystem Specific Attributes (FSA)</span>,
+      <ul>
+        <li>The
+first feature that drain time is <span style="font-weight: bold;">Filesystem
+Specific Attributes (FSA)</span>,
 as it requires new system calls for each new files to save. This has
 little impact when saving a lot of big files but become visible when
 saving a lot a tiny files or directories.<br>
-</li><li>The second feature is the use of <span style="font-weight: bold;">fadvise()</span>
+        </li>
+        <li>The second feature is the use of <span style="font-weight: bold;">fadvise()</span>
 system call that preserves
 cache usage. In other words dar tells the system it does not need
 anymore a file when it has been read (backup) or written (restoration)
@@ -2398,12 +2406,15 @@ execution, while with dar 2.5.x the data to save may have been flushed
 out of the cache by more important data for another application. This
 second time dar is run, the data has to be read again from disk which
 does not bring the same very fast execution as reading from cache.<br>
-</li></ul>
-You can disable both of these features. The first can be disabled <span style="text-decoration: underline;">at compilation time</span> giving <span style="font-weight: bold;">--disable-fadvise</span> to the <span style="font-weight: bold;">./configure</span> script. The second option can be disabled at any time by adding the <span style="font-weight: bold;">--fsa-scope=none</span> option to <span style="font-weight: bold;">dar</span>. The execution time becomes back then the same as the one of dar 2.4.x releases.<br>
+        </li>
+      </ul>
+You can disable both of these features. The first can be disabled <span style="text-decoration: underline;">at compilation time</span> giving <span style="font-weight: bold;">--disable-fadvise</span> to the <span style="font-weight: bold;">./configure</span> script. The second
+option can be disabled at any time by adding the <span style="font-weight: bold;">--fsa-scope=none</span> option to <span style="font-weight: bold;">dar</span>. The execution time becomes back
+then the same as the one of dar 2.4.x releases.<br>
       </div>
-
       <span style="font-style: italic; font-weight: bold;"></span><span style="font-style: italic; font-weight: bold;"><br>
-<a name="search_for_questions"></a>How to search for questions (and their
+      <a name="search_for_questions"></a>How to search for questions
+(and their
 answers) about known problems similar to mines?</span><br>
       <div style="margin-left: 40px;"><br>
 Before
@@ -2489,10 +2500,8 @@ In other words:<br>
       <ul>
         <li>if you only read the data of file, only its <span style="font-weight: bold;">atime</span> will be updated<sup>1</sup> <br>
 </li>
-
-        <li>if you write some data to a file, its <span style="font-weight: bold;">ctime</span> and <span style="font-weight: bold;">mtime</span> will change, atime will stay
+       <li>if you write some data to a file, its <span style="font-weight: bold;">ctime</span> and <span style="font-weight: bold;">mtime</span> will change, atime will stay
 unchanged</li>
-
         <li>if you change ownership, permission, extended attributes,
 etc, only <span style="font-weight: bold;">ctime</span> will change</li>
         <li>if you write to a file and modify its atime or mtime to let
@@ -2531,9 +2540,9 @@ been restored from a backup (was removed by accident for example)?<br>
         </li>
         <li>have you just moved from a dar version older than release
 2.4.0 to dar version 2.4.0 or more recent?</li>
-        <li>have you upgraded the package this file is part of since last backup?<br>
+        <li>have you upgraded the package this file is part of since
+last backup?<br>
         </li>
-
       </ul>
 How to know atime/mtime/ctime of a file?<br>
       <ul>
@@ -2573,11 +2582,12 @@ and others...<br>
       <br>
 Last point, if you can explain the cause of the alarm and are annoyed
 by it (you have hundred of files concerned for example ) <span style="font-weight: bold;">you can
-disable this feature</span> adding the "<span style="font-weight: bold;">-asecu</span>" switch to the command-line.<br>
+disable this feature</span> adding the "<span style="font-weight: bold;">-asecu</span>"
+switch to the command-line.<br>
       <br>
       <br>
-      <sup>1</sup> atime may also not be updated at all if filesystem is mounted with relatime or noatime option.
-      </div>
+      <sup>1</sup> atime may also not be updated at all if filesystem
+is mounted with relatime or noatime option. </div>
       <br>
       <span style="font-weight: bold;"><span style="font-style: italic;"><a name="copy"></a> Can dar help copy a large directory tree?</span><span style="font-style: italic; font-weight: bold;"> </span><br>
       </span><br>
@@ -2670,7 +2680,7 @@ I other words, the compression engine is reset for each new file added
 into the archive.&nbsp; When a corruption occurs&nbsp; in a&nbsp;
 file&nbsp; like a compressed <span style="font-style: italic;">tar</span>
 archive, it is&nbsp; not possible to&nbsp; decompress the data passed
-that corruption, with tar you loose all file stored after such data
+that corruption, with tar you loose all files stored after such data
 corruption.&nbsp; Having compression per file has instead the <span style="text-decoration: underline;">advantage</span>
 to only impact one file inside the archive and all files that are
 stored before or after such data corruption can still be restored from
@@ -3122,8 +3132,8 @@ an archive<br>
       <span style="font-weight: bold; font-style: italic;"><a name="diff"></a>Why when comparing an archive with filesystem, dar
 does not report new files found on filesystem?<br>
       </span><br>
-      <div style="margin-left: 40px;">
-Archive comparison (-d option) is to be seen as a step further than
+      <div style="margin-left: 40px;">Archive comparison (-d option) is
+to be seen as a step further than
 archive testing (-t option) where dar checks the archive internal
 structure and usability. The step further here is not only to check
 that each part of the archive is readable and has a correct associated
@@ -3133,36 +3143,27 @@ file changed, dar reports that the file does not match what's in the
 archive, if a file is missing dar cannot compare it with filesystem
 and reports an error too.<br>
       <br>
-
 So you want to know what has changed on your filesystem? No problem, <span style="font-weight: bold;">do a differential backup!</span>
 OK, you don't want to have a new backup or do not have the space for
 that, just output the archive to /dev/null and request on-fly isolation
 as follows:<br>
       </div>
-
-
       <div style="margin-left: 40px;"><br>
-
       <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c - -A &lt;ref
 archive&gt; -@ &lt;isolated&gt; ... other options ... &gt; /dev/null</span><br>
       </div>
-
 &nbsp;&nbsp; <br>
       </div>
-      <div style="margin-left: 40px;">
-&lt;ref archive&gt; is the archive of reference or an isolated
+      <div style="margin-left: 40px;">&lt;ref archive&gt; is the
+archive of reference or an isolated
 catalogue from it, &lt;isolated&gt; is the name of the isolated
 catalogue to produce. Once the operation has completed, you can list
 the isolated catalogue using the following command:<br>
       <br>
       </div>
-
-
       <div style="margin-left: 80px;"><span style="font-family: monospace;">dar -l &lt;isolated&gt; -as</span><br>
       </div>
-
       <div style="margin-left: 40px;"><br>
-
 It will give you the exact difference between your current filesystem
 and the filesystem at the time the "&lt;ref archive&gt;" was done:
 modified files and new files are reported with <span style="font-weight: bold;">[inref]</span> for either data EA or both,
@@ -3172,7 +3173,6 @@ information, followed by the estimated removal date and the type of the
 removed file ([-] for plain file, [d] for directory, and so on. More
 details in dar man page for listing command).<br>
       </div>
-
       <br>
       <br>
       <span style="font-weight: bold; font-style: italic;"><a name="delta"></a>Why dar does not automatically perform delta difference (aka rsync increment)?<br>
@@ -3220,9 +3220,76 @@ release 2.5.4 dar reports instead that filename has been truncated and
 that it will be ignored.<br>
       <br>
       </div>
-      <span style="font-weight: bold; font-style: italic;"><br>
-      </span>
-      </td>
+      <span style="font-weight: bold; font-style: italic;">
+      <p><span style="font-weight: bold; font-style: italic;"><a name="win32"></a>I have a 32 bits windows system, which binary </span><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;">package </span></span><span style="font-weight: bold; font-style: italic;">can I to use?</span></p></span>
+      <div style="margin-left: 40px;">Up to release 2.4.15 (including)
+the dar/libdar binaries for windows were built on a 32 bits windows
+(XP) system. After that release, binaries for windows have been built
+using a 64 bits windows system (7, now 8 and probably 10 soon).
+Unfortunately, the filename of the binary packages for windows do not
+reflect that change and have still been labeled "i386" while included
+binaries do no more supporting i386 CPU family (which are 32 bits CPU).
+This is an oversight that has been unseen until Adrian Buciuman's
+remark in dar-support mailing-list September 23d, 2016. In consequence
+after that date binary packages for windows will receive an additional
+field corresponding to the windows flavor they have been built against.<br>
+      <br>
+Some may still need 32 bits windows binaries of dar, unfortunately I
+have no more access to such system, but if you have such windows ISO
+image and valid license to give me, I could install it into a virtual
+machine and provide binary packages for 32 bits too.<br>
+      <br>
+Until then, you can build yourself the binary for windows. Here follows the recipe:<br>
+      <br>
+install <a href="https://www.cygwin.com/">Cygwin</a> on windows including at least the following packages:<br>
+      <ul>
+        <li>clang C/C++ compiler</li>
+        <li>cygwin devel</li>
+        <li>doxygen</li>
+        <li>gettext-devel</li>
+        <li>liblzo2-devel</li>
+        <li>libzzip-devel</li>
+        <li>libgpgme-devel</li>
+        <li>librsync-devel (starting future release 2.6.0)</li>
+        <li>make</li>
+        <li>tcsh</li>
+        <li>zip<br>
+        </li>
+        <li>upx</li>
+      </ul>
+Then get the dar source code and extract its content (either using windows native tools or using tar under cygwin) <br>
+For clarity let's assuming you have extracted dar source package for version x.y.z into <span style="font-family: monospace;">C:\Temp</span> directory, thus you now have the directory <span style="font-family: monospace;">C:\Temp\dar-x.y.z</span> <br>
+      <br>
+Run a cygwin terminal and "cd" into that directory:<br>
+      <br>
+&nbsp;&nbsp;&nbsp;<span style="font-family: monospace; font-weight: bold;"> cd /cygdrive/c/Temp/dar-x.y.z</span><br>
+      <br>
+In the previous command, note that from within a cygwin shell, the path
+use slashes not windows backslashes ; note also the 'c' is lowercase
+while windows shows upper case letter for drives...<br>
+      <br>
+But don't worry, we are almost finished, run the following script:<br>
+      <br>
+&nbsp;&nbsp;&nbsp; <span style="font-family: monospace; font-weight: bold;">misc/batch_cygwin x.y.z</span><br>
+      <br>
+starting release 2.5.7 the syntax will change / has changed<br>
+      <br>
+&nbsp;&nbsp;<span style="font-family: monospace;">&nbsp;<span style="font-weight: bold;"> misc/batch_cygwin x.y.z win32</span></span><br>
+      <br>
+the new "win32" or "win64" field will be used to label the zip package
+containing the dar/libdar binary for windows, that's up to you to
+choose the value corresponding to your OS 32/64 bits flavor.<br>
+      <br>
+At the end of the process you will get a dar zip file for windows in <span style="font-family: monospace;">C:\Temp\dar-x.y.z</span> directory.<br>
+      <br>
+Feel free to ask for support on <a href="https://lists.sourceforge.net/lists/listinfo/dar-support">dar-support mailing-list</a> if you enconter any problem building dar binary for windows, this FAQ will be updated accordingly.<br>
+      <br>
+      </div>
+      <span style="font-weight: bold; font-style: italic;">
+      <p><span style="font-weight: bold; font-style: italic;"><br>
+      </span>  </p>
+
+      </span> </td>
     </tr>
   </tbody>
 </table>
@@ -3230,7 +3297,4 @@ that it will be ignored.<br>
 </div>
 </div>
 </center>
-
-
-
 </body></html>

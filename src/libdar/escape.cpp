@@ -312,13 +312,38 @@ namespace libdar
 	switch(get_mode())
 	{
 	case gf_read_only:
-	    read_eof = false;
-	    flush_or_clean();
-	    ret = x_below->skip(pos);
-	    if(ret)
-		below_position = pos;
+	    if(pos >= below_position - read_buffer_size
+	       &&
+	       pos < below_position)
+	    {
+		    // requested position is in read_buffer
+
+		infinint delta = below_position - pos;
+		already_read = 0;
+		delta.unstack(already_read);
+		if(!delta.is_zero())
+		    throw SRC_BUG;
+		already_read = read_buffer_size - already_read;
+		    // this leads to the following:
+		    // alread_read = read_buffer_size - (below_position - pos);
+
+		escape_seq_offset_in_buffer = already_read + trouve_amorce(read_buffer + already_read, read_buffer_size - already_read, fixed_sequence);
+		escaped_data_count_since_last_skip = 0;
+		read_eof = false;
+	    }
 	    else
-		below_position = x_below->get_position();
+	    {
+
+		    // requested position is out of read_buffer
+
+		read_eof = false;
+		flush_or_clean();
+		ret = x_below->skip(pos);
+		if(ret)
+		    below_position = pos;
+		else
+		    below_position = x_below->get_position();
+	    }
 	    break;
 	case gf_write_only:
 	    if(get_position() != pos)

@@ -1,4 +1,4 @@
-.TH DAR_XFORM 1 "May 17th, 2015"
+.TH DAR_XFORM 1 "Sept 29th, 2016"
 .UC 8
 .SH NAME
 dar_xform \- disk archive "re-slicer"
@@ -66,7 +66,7 @@ defines the permission and ownership to use for created slices.
 Beside each created slice is generated an on-fly hash file using the specified algorithm. Available algorithm are "md5" and "sha1", by default no hash file is generated. This option description is more detailed in dar man page (where it has the same designation as here).
 .TP 20
 -9 <src_num>[,<dst_num>]
-Defines the minimum number of digit to use for the source archive and for the destination archive. If you the source has not been defined with a minimum number of digit and you want to define a value for the destination archive, use zero (or one) as value for src. See the same option in dar man page for more details.
+Defines the minimum number of digit to use for the source archive and eventually for the destination archive. If the source has not been defined with a minimum number of digits and you want to specify a number of digits for the destination archive, use zero (or one) as value for src_num. If dst_num is not provided, it defaults to 1. See the same option in dar man page for more details.
 .SH NOTES
 Dar_xform is not concerned by encryption or compression. It does not need to be aware of it to be able to change the slice scheme. Thus, it is not able to uncompress or uncipher an archive.
 
