@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2016-06-04 19:34+0200\n"
+"POT-Creation-Date: 2016-10-29 10:56+0200\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -4198,14 +4198,14 @@ msgstr "användning ; %s <källa> <mål>\n"
 
 #: src/dar_suite/dar_cp.cpp:144 src/dar_suite/dar_slave.cpp:277
 #: src/dar_suite/dar_xform.cpp:516 src/dar_suite/dar_manager.cpp:903
-#: src/dar_suite/command_line.cpp:1975
+#: src/dar_suite/command_line.cpp:1992
 #, c-format
 msgid " compiled the %s with %s version %s\n"
 msgstr " kompilerad den %s med %s version %s\n"
 
 #: src/dar_suite/dar_cp.cpp:145 src/dar_suite/dar_slave.cpp:278
 #: src/dar_suite/dar_xform.cpp:517 src/dar_suite/dar_manager.cpp:904
-#: src/dar_suite/command_line.cpp:1976
+#: src/dar_suite/command_line.cpp:1993
 #, c-format
 msgid " %s is part of the Disk ARchive suite (Release %s)\n"
 msgstr " %s är en del av Disk ARchieve sviten (Utgåva %s)\n"
@@ -4924,7 +4924,7 @@ msgid "Missing argument to -E option"
 msgstr "Saknar argument till -E alternativ"
 
 #: src/dar_suite/dar_slave.cpp:214 src/dar_suite/dar_xform.cpp:425
-#: src/dar_suite/command_line.cpp:1540
+#: src/dar_suite/command_line.cpp:1557
 msgid "Missing argument to --min-digits"
 msgstr "Saknar argument till --min-digits"
 
@@ -4935,8 +4935,8 @@ msgstr "Saknar parameter till alternativ -%c"
 
 #: src/dar_suite/dar_slave.cpp:224 src/dar_suite/dar_slave.cpp:227
 #: src/dar_suite/dar_xform.cpp:435 src/dar_suite/dar_manager.cpp:491
-#: src/dar_suite/dar_manager.cpp:494 src/dar_suite/command_line.cpp:1586
-#: src/dar_suite/command_line.cpp:1589
+#: src/dar_suite/dar_manager.cpp:494 src/dar_suite/command_line.cpp:1603
+#: src/dar_suite/command_line.cpp:1606
 #, c-format
 msgid "Ignoring unknown option -%c"
 msgstr "Ignorerar okänt alternativ -%c"
@@ -4977,7 +4977,7 @@ msgstr ""
 " skriv 'dar -W'."
 
 #: src/dar_suite/dar_slave.cpp:281 src/dar_suite/dar_xform.cpp:519
-#: src/dar_suite/dar_manager.cpp:906 src/dar_suite/command_line.cpp:1978
+#: src/dar_suite/dar_manager.cpp:906 src/dar_suite/command_line.cpp:1995
 msgid ""
 " This is free software, and you are welcome\n"
 " to redistribute it under certain conditions;"
@@ -5083,7 +5083,7 @@ msgstr "Okänt uttryck hittat under kontroll av villkorssträng: "
 msgid "Error transforming the archive :"
 msgstr "Fel vid omvandling av arkivet :"
 
-#: src/dar_suite/dar_xform.cpp:305 src/dar_suite/command_line.cpp:916
+#: src/dar_suite/dar_xform.cpp:305 src/dar_suite/command_line.cpp:933
 msgid "Only one -s option is allowed"
 msgstr "Endast ett -s alternativ är tillåtet"
 
@@ -5100,7 +5100,7 @@ msgid "Missing argument to -S"
 msgstr "Saknar argument till -S"
 
 #: src/dar_suite/dar_xform.cpp:330 src/dar_suite/dar_xform.cpp:348
-#: src/dar_suite/command_line.cpp:941 src/dar_suite/command_line.cpp:959
+#: src/dar_suite/command_line.cpp:958 src/dar_suite/command_line.cpp:976
 msgid "Only one -S option is allowed"
 msgstr "Endast ett -S alternativ är tillåtet"
 
@@ -5121,7 +5121,7 @@ msgstr "Saknar argument till -E"
 msgid "Missing argument to -F"
 msgstr "Saknar argument till -F"
 
-#: src/dar_suite/dar_xform.cpp:395 src/dar_suite/command_line.cpp:1264
+#: src/dar_suite/dar_xform.cpp:395 src/dar_suite/command_line.cpp:1281
 msgid "-a option requires an argument"
 msgstr "-a alternativ kräver ett argument"
 
@@ -5133,11 +5133,11 @@ msgstr "Okänd parameter givet till -a alternativ: "
 msgid "Missing argument to -^"
 msgstr "Saknar argument till -^"
 
-#: src/dar_suite/dar_xform.cpp:414 src/dar_suite/command_line.cpp:1529
+#: src/dar_suite/dar_xform.cpp:414 src/dar_suite/command_line.cpp:1546
 msgid "Missing argument to --hash"
 msgstr "Saknar argument till --hash"
 
-#: src/dar_suite/dar_xform.cpp:421 src/dar_suite/command_line.cpp:1536
+#: src/dar_suite/dar_xform.cpp:421 src/dar_suite/command_line.cpp:1553
 msgid "Unknown parameter given to --hash option: "
 msgstr "Okänd parameter givet till --hash alternativ: "
 
@@ -5161,7 +5161,7 @@ msgid "Archive on stdout is not compatible with slicing (-s option)"
 msgstr "Arkiv på 'std output' är inte kompatibelt med delning (-s alternativ)"
 
 #: src/dar_suite/dar_xform.cpp:518 src/dar_suite/dar_manager.cpp:905
-#: src/dar_suite/command_line.cpp:1977
+#: src/dar_suite/command_line.cpp:1994
 #, c-format
 msgid ""
 " %s comes with ABSOLUTELY NO WARRANTY; for details\n"
@@ -5171,7 +5171,7 @@ msgstr ""
 " skriv '%s -W'."
 
 #: src/dar_suite/dar_xform.cpp:520 src/dar_suite/dar_manager.cpp:907
-#: src/dar_suite/command_line.cpp:1979
+#: src/dar_suite/command_line.cpp:1996
 #, c-format
 msgid ""
 " type `%s -L | more'\n"
@@ -5696,7 +5696,7 @@ msgstr "Inga problem hittade"
 msgid "Opening and reading the batch file..."
 msgstr "Öppnar och läser batch-fil..."
 
-#: src/dar_suite/dar_manager.cpp:1256 src/dar_suite/command_line.cpp:2083
+#: src/dar_suite/dar_manager.cpp:1256 src/dar_suite/command_line.cpp:2100
 #, c-format
 msgid "Cannot open file %S : %s"
 msgstr "Kan ej öppna fil %S : %s"
@@ -6211,7 +6211,7 @@ msgstr ""
 msgid "Choose either -z or -y not both"
 msgstr "Välj antingen -z eller -y ej bägge"
 
-#: src/dar_suite/command_line.cpp:846 src/dar_suite/command_line.cpp:2651
+#: src/dar_suite/command_line.cpp:846 src/dar_suite/command_line.cpp:2668
 msgid "Compression level must be between 1 and 9, included"
 msgstr "Komprimeringsnivån måste ligga mellan 1 och 9 inklusive"
 
@@ -6237,18 +6237,18 @@ msgstr "Okänt argument givet till -k : %s"
 msgid "Only one -R option is allowed"
 msgstr "Endast ett -R alternativ är tillåtet"
 
-#: src/dar_suite/command_line.cpp:949
+#: src/dar_suite/command_line.cpp:966
 msgid ""
 "Giving to -S option the same value as the one given to -s option is useless"
 msgstr ""
 "Om man ger till -S alternativet samma värde, som det som man ger till -s "
 "alternativet, är det oanvändbart"
 
-#: src/dar_suite/command_line.cpp:1024
+#: src/dar_suite/command_line.cpp:1041
 msgid "-r is useless with -n"
 msgstr "-r är oanvändbart med -n"
 
-#: src/dar_suite/command_line.cpp:1154
+#: src/dar_suite/command_line.cpp:1171
 #, c-format
 msgid ""
 "File inclusion loop detected. The file %s includes itself directly or "
@@ -6257,18 +6257,18 @@ msgstr ""
 "Slinga i filinkludering har upptäckts. Filen %s inkluderar sig själv direkt "
 "eller genom andra filer (-B alternativ)"
 
-#: src/dar_suite/command_line.cpp:1164
+#: src/dar_suite/command_line.cpp:1181
 #, fuzzy, c-format
 msgid "Error in included file (%s): "
 msgstr "I ingående filer %S: "
 
-#: src/dar_suite/command_line.cpp:1182 src/dar_suite/command_line.cpp:2266
-#: src/dar_suite/command_line.cpp:2325
+#: src/dar_suite/command_line.cpp:1199 src/dar_suite/command_line.cpp:2283
+#: src/dar_suite/command_line.cpp:2342
 #, c-format
 msgid "In included file %S: "
 msgstr "I ingående filer %S: "
 
-#: src/dar_suite/command_line.cpp:1225
+#: src/dar_suite/command_line.cpp:1242
 #, c-format
 msgid ""
 "%d is the default value for -m, no need to specify it on command line, "
@@ -6277,7 +6277,7 @@ msgstr ""
 "%d är standardvärdet för -m, inget behov att specificera det på "
 "kommandoraden, ignorerar"
 
-#: src/dar_suite/command_line.cpp:1242
+#: src/dar_suite/command_line.cpp:1259
 msgid ""
 "--nodump feature has not been activated at compilation time, it is thus not "
 "available"
@@ -6285,48 +6285,48 @@ msgstr ""
 "--nodump-funktionen har ej aktiverats vid kompileringstillfället, sålunda är "
 "den ej tillgängligt"
 
-#: src/dar_suite/command_line.cpp:1258
+#: src/dar_suite/command_line.cpp:1275
 msgid "Argument given to -H is not a positive integer number"
 msgstr "Det argument, som ges till -H, är inte ett positivt heltal"
 
-#: src/dar_suite/command_line.cpp:1311
+#: src/dar_suite/command_line.cpp:1328
 msgid ""
 "-ak option need not be specified more than once, ignoring extra -ak options"
 msgstr ""
 "-ak alternativ behöver inte specificeras mer än en gång, ignorer extra ak "
 "alternativ"
 
-#: src/dar_suite/command_line.cpp:1317
+#: src/dar_suite/command_line.cpp:1334
 msgid "-af must be present before -A option not after!"
 msgstr "-af måste finnas före -A alternativ inte efter!"
 
-#: src/dar_suite/command_line.cpp:1319
+#: src/dar_suite/command_line.cpp:1336
 msgid ""
 "-af option need not be specified more than once, ignoring extra -af options"
 msgstr ""
 "-af alternativ behöver inte specificeras mer än en gång, ignorer extra af "
 "alternativ"
 
-#: src/dar_suite/command_line.cpp:1341
+#: src/dar_suite/command_line.cpp:1358
 #, c-format
 msgid "Unknown argument given to -a : %s"
 msgstr "Okänt argument givet till -a : %s"
 
-#: src/dar_suite/command_line.cpp:1355
+#: src/dar_suite/command_line.cpp:1372
 msgid "-G option is obsolete, use -@ option instead, see man page for details"
 msgstr ""
 "-G alternativet är utgånget, använd -@ alternativet i stället, se man page "
 "för detaljer"
 
-#: src/dar_suite/command_line.cpp:1382
+#: src/dar_suite/command_line.cpp:1399
 msgid "Only one -@ option is allowed"
 msgstr "Endast ett -@ alternativ är tillåtet"
 
-#: src/dar_suite/command_line.cpp:1438
+#: src/dar_suite/command_line.cpp:1455
 msgid "Syntax error in overwriting policy: "
 msgstr "Syntaxfel i överskrivningspolicy: "
 
-#: src/dar_suite/command_line.cpp:1471
+#: src/dar_suite/command_line.cpp:1488
 #, c-format
 msgid ""
 "%d is the default value for --sparse-file-min-size, no need to specify it on "
@@ -6335,20 +6335,20 @@ msgstr ""
 "%d är standardvärdet för --sparse-file-min-size, inget behov att specificera "
 "det på kommandoraden, ignorerar"
 
-#: src/dar_suite/command_line.cpp:1492
+#: src/dar_suite/command_line.cpp:1509
 #, c-format
 msgid "Unknown argument given to -2 : %s"
 msgstr "Okänt argument givet till -2 : %s"
 
-#: src/dar_suite/command_line.cpp:1549
+#: src/dar_suite/command_line.cpp:1566
 msgid "Error while parsing --min-digits option: "
 msgstr "Fel vid analys av --min-digits alternativ: "
 
-#: src/dar_suite/command_line.cpp:1555
+#: src/dar_suite/command_line.cpp:1572
 msgid "Missing argument to --backup-hook-execute"
 msgstr "Saknar argument till --backup-hook-execute"
 
-#: src/dar_suite/command_line.cpp:1602
+#: src/dar_suite/command_line.cpp:1619
 #, c-format
 msgid ""
 "usage: %s [ -c | -x | -d | -t | -l | -C | -+ ] [<path>/]<basename> "
@@ -6357,24 +6357,24 @@ msgstr ""
 "Användning: %s [ -c | -x | -d | -t | -l | -C | -+ ] [<sökväg>/]<basnamn> "
 "[alternativ...]\n"
 
-#: src/dar_suite/command_line.cpp:1971
+#: src/dar_suite/command_line.cpp:1988
 #, c-format
 msgid " Using libdar %u.%u.%u built with compilation time options:"
 msgstr ""
 " Använder libdar med %u.%u.%u byggt med kompileringstillfällets alternativ:"
 
-#: src/dar_suite/command_line.cpp:1972
+#: src/dar_suite/command_line.cpp:1989
 #, c-format
 msgid " Using libdar %u.%u built with compilation time options:"
 msgstr ""
 " Använder libdar med %u.%u byggt med kompileringstillfällets alternativ:"
 
-#: src/dar_suite/command_line.cpp:2177
+#: src/dar_suite/command_line.cpp:2194
 #, c-format
 msgid "Arguments read from %S :"
 msgstr "Argument läses från %S :"
 
-#: src/dar_suite/command_line.cpp:2632
+#: src/dar_suite/command_line.cpp:2649
 #, c-format
 msgid ""
 "%s does not name a compression \"[algorithm][:][level]\" , like for examples "
@@ -6385,7 +6385,7 @@ msgstr ""
 "\", \"lzo\", \"bzip2\", \"lzo:3\", \"gzip:2\", \"8\" eller \"1\". Titta på "
 "man page om -z alternativ"
 
-#: src/dar_suite/command_line.cpp:2684
+#: src/dar_suite/command_line.cpp:2701
 #, c-format
 msgid ""
 "User target named \"%s\" is not allowed (reserved word for conditional "
