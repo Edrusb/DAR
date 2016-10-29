@@ -61,6 +61,7 @@ namespace libdar
 				       const string & port): x_proto(proto),
 							     base_URL(build_url_from(proto, host, port))
     {
+#if LIBCURL_AVAILABLE
 	current_dir.clear();
 	reading_dir_tmp.clear();
 
@@ -75,10 +76,14 @@ namespace libdar
 	if(easyhandle == nullptr)
 	    throw Erange("entrepot_libcurl::entrepot_libcurl", string(gettext("Error met while creating a libcurl handle")));
 	set_libcurl_authentication(login, password);
+#else
+    throw Efeature("libcurl");
+#endif
     }
 
     void entrepot_libcurl::read_dir_reset() const
     {
+#if LIBCURL_AVAILABLE
 	CURLcode err;
 	long listonly;
 	entrepot_libcurl *me = const_cast<entrepot_libcurl *>(this);
@@ -176,10 +181,14 @@ namespace libdar
 		default:
 	    throw SRC_BUG;
 	}
+#else
+    throw Efeature("libcurl");
+#endif
     }
 
     bool entrepot_libcurl::read_dir_next(string & filename) const
     {
+#if LIBCURL_AVAILABLE
 	entrepot_libcurl *me = const_cast<entrepot_libcurl *>(this);
 
 	if(me == nullptr)
@@ -193,6 +202,9 @@ namespace libdar
 	    me->current_dir.pop_front();
 	    return true;
 	}
+#else
+    throw Efeature("libcurl");
+#endif
     }
 
     fichier_global *entrepot_libcurl::inherited_open(user_interaction & dialog,
@@ -203,6 +215,7 @@ namespace libdar
 						     bool fail_if_exists,
 						     bool erase) const
     {
+#if LIBCURL_AVAILABLE
 	fichier_global *ret = nullptr;
 	cache_global *rw = nullptr;
 	entrepot_libcurl *me = const_cast<entrepot_libcurl *>(this);
@@ -265,10 +278,14 @@ namespace libdar
 	}
 
 	return ret;
+#else
+    throw Efeature("libcurl");
+#endif
     }
 
     void entrepot_libcurl::inherited_unlink(const string & filename) const
     {
+#if LIBCURL_AVAILABLE
 	struct curl_slist *headers = nullptr;
 	string order;
 	CURLcode err;
@@ -350,6 +367,9 @@ namespace libdar
 
 	if(headers != nullptr)
 	    curl_slist_free_all(headers);
+#else
+    throw Efeature("libcurl");
+#endif
     }
 
     void entrepot_libcurl::read_dir_flush()
@@ -359,6 +379,7 @@ namespace libdar
 
     void entrepot_libcurl::set_libcurl_URL()
     {
+#if LIBCURL_AVAILABLE
 	CURLcode err;
 	string target = get_url();
 
@@ -372,10 +393,14 @@ namespace libdar
 	if(err != CURLE_OK)
 	    throw Erange("entrepot_libcurl::set_libcurl_URL",tools_printf(gettext("Failed assigning URL to libcurl: %s"),
 									  curl_easy_strerror(err)));
+#else
+    throw Efeature("libcurl");
+#endif
     }
 
     void entrepot_libcurl::set_libcurl_authentication(const string & login, const secu_string & password)
     {
+#if LIBCURL_AVAILABLE
 	CURLcode err;
 	secu_string auth(login.size() + 1 + password.get_size() + 1);
 
@@ -392,10 +417,14 @@ namespace libdar
 	if(err != CURLE_OK)
 	    throw Erange("entrepot_libcurl::handle_reset", tools_printf(gettext("Error met while setting libcurl authentication: %s"),
 									curl_easy_strerror(err)));
+#else
+    throw Efeature("libcurl");
+#endif
     }
 
     void entrepot_libcurl::copy_from(const entrepot_libcurl & ref)
     {
+#if LIBCURL_AVAILABLE
 	x_proto = ref.x_proto;
 	base_URL = ref.base_URL;
 	current_dir = ref.current_dir;
@@ -408,11 +437,16 @@ namespace libdar
 	}
 	else
 	    easyhandle = nullptr;
+#else
+	throw Efeature("libcurl");
+#endif
     }
 
     void entrepot_libcurl::detruit()
     {
+#if LIBCURL_AVAILABLE
 	curl_easy_cleanup(easyhandle);
+#endif
     }
 
     string entrepot_libcurl::curl_protocol2string(curl_protocol proto)

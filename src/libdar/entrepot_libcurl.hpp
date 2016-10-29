@@ -49,8 +49,6 @@ extern "C"
 namespace libdar
 {
 
-#if LIBCURL_AVAILABLE
-
 	/// \addtogroup Private
 	/// @{
 
@@ -98,7 +96,9 @@ namespace libdar
     private:
 	curl_protocol x_proto;
 	std::string base_URL; //< URL of the repository with only minimum path (login/password is given outside the URL)
+#if LIBCURL_AVAILABLE
 	CURL *easyhandle;
+#endif
 	std::list<std::string> current_dir;
 	std::string reading_dir_tmp;
 
@@ -114,8 +114,6 @@ namespace libdar
     };
 
 	/// @}
-
-#endif
 
 } // end of namespace
 

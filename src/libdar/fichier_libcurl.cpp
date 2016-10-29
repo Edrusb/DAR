@@ -41,6 +41,8 @@ using namespace std;
 namespace libdar
 {
 
+#if LIBCURL_AVAILABLE
+
     fichier_libcurl::fichier_libcurl(user_interaction & dialog,
 				     const std::string & chemin,
 				     CURL *ref_handle,
@@ -725,5 +727,7 @@ namespace libdar
 
 	return ret;
     }
+
+#endif
 
 } // end of namespace

@@ -53,8 +53,9 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
+#if LIBCURL_AVAILABLE
 
-	/// filesystem local files
+	/// libcurl remote files
 
     class fichier_libcurl : public fichier_global
     {
@@ -140,7 +141,7 @@ namespace libdar
 	static size_t read_data_callback(char *bufptr, size_t size, size_t nitems, void *userp);
 	static size_t null_callback(char *bufptr, size_t size, size_t nmemb, void *userp) { return size*nmemb; };
     };
-
+#endif
 	/// @}
 
 } // end of namespace
