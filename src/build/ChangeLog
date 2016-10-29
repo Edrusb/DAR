@@ -1,3 +1,13 @@
+from 2.5.6 to 2.5.7
+- fixed bug leading dar to not include directories given to -g option nor
+  to exclude directories given to -P option when at the same time the
+  directory given to -R option starts by a dot ("-R ./here" in place of
+  "-R here")
+- bug fix and speed improvement: under certain circumstances dar was
+  reading several times the data at slice boundary, leading dar to ask for
+  slice N then N-1 then again N, this caused sub-optimal performance and
+  was triggering user script unnecessarily
+
 from 2.5.5 to 2.5.6
 - added speed optimization when comparing dates with hourshift flexibility
   (-H option)
@@ -205,6 +215,12 @@ from 2.4.x to 2.5.0
 - replaced SHA1 by SHA224 to generate IV for encryption blocks, this
   slightly improves randomness of IV and stay available when libgcrypt is
   run in FIPS mode
+
+from 2.4.22 to 2.4.23
+- fixed bug leading dar to not include directories given to -g option nor
+  to exclude directories given to -P option when at the same time the
+  directory given to -R option starts by a dot ("-R ./here" in place of
+  "-R here")
 
 from 2.4.21 to 2.4.22
 - fixing bug in the returned exit status when dar failed executing DUC

@@ -7,10 +7,15 @@ if(! -f configure) then
 endif
 
 if("$1" == "") then
-   echo "usage: $0 <version>"
+   echo "usage: $0 <version> {win32|win64}"
+   exit
+endif
+
+if("$2" != "win32" && "$2" != "win64") then
+   echo "unknown windows flavor"
    exit
 endif
 
 # misc/make_cygwin_dist $1 ""
-# misc/make_cygwin_dist $1 "32" --enable-mode=32
-misc/make_cygwin_dist $1 "64" --enable-mode=64
+# misc/make_cygwin_dist $1 $2 "32" --enable-mode=32
+misc/make_cygwin_dist $1 $2 "64" --enable-mode=64
