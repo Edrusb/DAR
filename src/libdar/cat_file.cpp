@@ -628,13 +628,13 @@ namespace libdar
 				    try
 				    {
 					data->push(tmp);
-					data->skip(0);
 				    }
 				    catch(...)
 				    {
 					delete tmp;
 					throw;
 				    }
+				    data->skip(0);
 				}
 				else
 				    get_pile()->skip(*offset);
