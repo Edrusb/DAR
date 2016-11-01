@@ -127,6 +127,9 @@ namespace libdar
 	    /// returns whether librsync is available and delta diff stuff with it
 	bool librsync();
 
+	    /// returns whether libcurl is available and remote repository feature is available
+	bool libcurl();
+
     }
 
 } // end of namespace

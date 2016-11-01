@@ -1357,6 +1357,7 @@ namespace libdar
 	    if(compile_time::libthreadar())
 		dialog.printf(gettext("   Can uses multiple threads    : %s\n"), YES_NO(compile_time::libthreadar()));
 	    dialog.printf(gettext("   Delta compression support    : %s\n"), YES_NO(compile_time::librsync()));
+	    dialog.printf(gettext("   Remote repository support    : %s\n"), YES_NO(compile_time::libcurl()));
         }
         catch(...)
         {

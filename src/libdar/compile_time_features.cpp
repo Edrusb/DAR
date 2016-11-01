@@ -250,5 +250,14 @@ namespace libdar
 #endif
 	}
 
+	bool libcurl()
+	{
+#if LIBCURL_AVAILABLE
+	    return true;
+#else
+	    return false;
+#endif
+	}
+
     } // end of compile_time nested namespace
 } // end of libdar namespace
