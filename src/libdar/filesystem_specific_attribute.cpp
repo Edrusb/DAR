@@ -205,6 +205,7 @@ namespace libdar
     {
 	infinint size = infinint(f);
 	U_I sub_size;
+	U_I tmp;
 
 	do
 	{
@@ -220,11 +221,15 @@ namespace libdar
 		fsa_nature nat;
 		filesystem_specific_attribute *ptr = nullptr;
 
-		f.read(buffer, FAM_SIG_WIDTH);
+		tmp = f.read(buffer, FAM_SIG_WIDTH);
+		if(tmp < FAM_SIG_WIDTH)
+		    throw Erange("filesystem_specific_attribute_list::read", gettext("invalid length for FSA family flag"));
 		buffer[FAM_SIG_WIDTH] = '\0';
 		fam = signature_to_family(buffer);
 
-		f.read(buffer, NAT_SIG_WIDTH);
+		tmp = f.read(buffer, NAT_SIG_WIDTH);
+		if(tmp < NAT_SIG_WIDTH)
+		    throw Erange("filesystem_specific_attribute_list::read", gettext("invalid length for FSA nature flag"));
 		buffer[NAT_SIG_WIDTH] = '\0';
 		nat = signature_to_nature(buffer);
 
@@ -1088,14 +1093,14 @@ namespace libdar
     fsa_family filesystem_specific_attribute_list::signature_to_family(const string & sig)
     {
 	if(sig.size() != FAM_SIG_WIDTH)
-	    throw SRC_BUG;
+	    throw Erange("filesystem_specific_attribute_list::signature_to_family", gettext("invalid length for FSA family flag"));
 	if(sig == "h")
 	    return fsaf_hfs_plus;
 	if(sig == "l")
 	    return fsaf_linux_extX;
-	if(sig == "X")
-	    throw SRC_BUG;  // resevered for field extension if necessary in the future
-	throw SRC_BUG;
+	if(sig == "X") // resevered for field extension if necessary in the future
+	    throw Erange("filesysttem_specific_attribute_list::signature_to_family", gettext("invalid FSA family flag"));
+	throw Erange("filesysttem_specific_attribute_list::signature_to_family", gettext("invalid FSA family flag"));
     }
 
     fsa_nature filesystem_specific_attribute_list::signature_to_nature(const string & sig)
@@ -1128,10 +1133,10 @@ namespace libdar
 	    return fsan_synchronous_update;
 	if(sig == "bl")
 	    return fsan_top_of_dir_hierarchy;
+	if(sig == "XX") // resevered for field extension if necessary in the future
+	    throw Erange("filesystem_specific_attribute_list::signature_to_nature", gettext("invalid FSA nature flag"));
 
-	if(sig == "XX")
-	    throw SRC_BUG;  // resevered for field extension if necessary in the future
-	throw SRC_BUG;
+	throw Erange("filesystem_specific_attribute_list::signature_to_nature", gettext("invalid FSA nature flag"));
     }
 
 
