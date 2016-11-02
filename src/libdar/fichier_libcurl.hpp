@@ -66,6 +66,7 @@ namespace libdar
 			const std::string & chemin, //< full path of the file to open
 			CURL *ref_handle,           //< the handle passes to the responsibility of the fichier_libcurl object once fully constructed
 			gf_mode m,                  //< open mode
+			U_I waiting,                //< retry timeout in case of network error
 			bool force_permission,      //< whether file permission should be modified
 			U_I permission,             //< file permission to enforce if force_permission is set
 			bool erase);                //< whether to erase the file before writing to it
@@ -126,6 +127,7 @@ namespace libdar
 	U_I meta_inbuf;                   //< amount of byte available in "meta_tampon"
 	char *ptr_tampon;                 //< points to tampon or meta_tampon depending on the metadata mode
 	U_I *ptr_inbuf;                   //< points to inbuf or meta_in_buf depending on the metadata mod
+	U_I wait_delay;                   //< time in second to wait before retrying in case of network error
 
 
 	void add_easy_to_multi();

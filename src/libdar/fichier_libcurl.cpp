@@ -23,7 +23,9 @@
 
 extern "C"
 {
-
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 } // end extern "C"
 
 #include "tools.hpp"
@@ -47,6 +49,7 @@ namespace libdar
 				     const std::string & chemin,
 				     CURL *ref_handle,
 				     gf_mode m,
+				     U_I waiting,
 				     bool force_permission,
 				     U_I permission,
 				     bool erase): fichier_global(dialog, m),
@@ -62,7 +65,8 @@ namespace libdar
 						  append_write(!erase),
 						  meta_inbuf(0),
 						  ptr_tampon(nullptr),
-						  ptr_inbuf(nullptr)
+						  ptr_inbuf(nullptr),
+						  wait_delay(waiting)
     {
 	CURLcode err;
 
@@ -593,6 +597,7 @@ namespace libdar
 	eof = ref.eof;
 	append_write = ref.append_write;
 	meta_inbuf = 0; // don't care data in meta_tampon
+	wait_delay = ref.wait_delay;
 
 	if(ref.easyhandle == nullptr)
 	    easyhandle = nullptr;

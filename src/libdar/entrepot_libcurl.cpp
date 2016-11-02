@@ -58,8 +58,10 @@ namespace libdar
 				       const string & login,
 				       const secu_string & password,
 				       const string & host,
-				       const string & port): x_proto(proto),
-							     base_URL(build_url_from(proto, host, port))
+				       const string & port,
+				       U_I waiting_time): x_proto(proto),
+							  base_URL(build_url_from(proto, host, port)),
+							  wait_delay(waiting_time)
     {
 #if LIBCURL_AVAILABLE
 	current_dir.clear();
@@ -246,6 +248,7 @@ namespace libdar
 						   chemin,
 						   easyhandle,
 						   hidden_mode,
+						   wait_delay,
 						   force_permission,
 						   permission,
 						   erase);
@@ -429,6 +432,7 @@ namespace libdar
 	base_URL = ref.base_URL;
 	current_dir = ref.current_dir;
 	reading_dir_tmp = ref.reading_dir_tmp;
+	wait_delay = ref.wait_delay;
 	if(ref.easyhandle != nullptr)
 	{
 	    easyhandle = curl_easy_duphandle(ref.easyhandle);
