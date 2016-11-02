@@ -381,7 +381,6 @@ namespace libdar
     U_I fichier_libcurl::fichier_global_inherited_write(const char *a, U_I size)
     {
 	U_I wrote = 0;
-	CURLMcode errm = CURLM_OK;
 	int running = 1;
 
 	if(metadatamode)
@@ -390,7 +389,6 @@ namespace libdar
 	    throw SRC_BUG;
 
 	while((wrote < size || inbuf > 0 || eof)
-	      && (errm == CURLM_OK || errm == CURLM_CALL_MULTI_PERFORM)
 	      && running > 0)
 	{
 	    if(wrote < size)
@@ -402,18 +400,8 @@ namespace libdar
 		wrote += xfer;
 		inbuf += xfer;
 	    }
-	    errm = curl_multi_perform(multihandle, &running);
-	    switch(errm)
-	    {
-	    case CURLM_OK:
-		check_info_after_multi_perform();
-		break;
-	    default:
-		check_info_after_multi_perform();
-		throw Erange("fichier_libcurl::fichier_global_inherited_read",
-			     tools_printf(gettext("Error while writing data to remote repository: %s"),
-					  curl_multi_strerror(errm)));
-	    }
+
+	    my_multi_perform(running);
 	}
 
 	if(wrote < size)
@@ -428,7 +416,6 @@ namespace libdar
 
     bool fichier_libcurl::fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message)
     {
-	CURLMcode errm = CURLM_OK;
 	int running = 1;
 
 	if(metadatamode)
@@ -438,8 +425,7 @@ namespace libdar
 
 	read = 0;
 	while(read < size
-	      && (!eof || inbuf > 0)
-	      && (errm == CURLM_OK || errm == CURLM_CALL_MULTI_PERFORM))
+	      && (!eof || inbuf > 0))
 	{
 	    if(inbuf > 0)
 	    {
@@ -457,21 +443,9 @@ namespace libdar
 	    }
 	    else // inbuf == 0
 	    {
-		errm = curl_multi_perform(multihandle, &running);
-		switch(errm)
-		{
-		case CURLM_OK:
-		case CURLM_CALL_MULTI_PERFORM:
-		    check_info_after_multi_perform();
-		    if(running == 0)
-			eof = true;
-		    break;
-		default:
-		    check_info_after_multi_perform();
-		    throw Erange("fichier_libcurl::fichier_global_inherited_read",
-				 tools_printf(gettext("Error while reading data from repote repository: %s"),
-					      curl_multi_strerror(errm)));
-		}
+		my_multi_perform(running);
+		if(running == 0)
+		    eof = true;
 	    }
 	}
 
@@ -561,28 +535,20 @@ namespace libdar
 
     void fichier_libcurl::run_multi() const
     {
-	CURLMcode errm = CURLM_OK;
 	int running;
+	fichier_libcurl *me = const_cast<fichier_libcurl *>(this);
+	if(me == nullptr)
+	    throw SRC_BUG;
+
 
 	if(!easy_in_multi)
 	    throw SRC_BUG;
 
 	do
 	{
-	    errm = curl_multi_perform(multihandle, &running);
-	    switch(errm)
-	    {
-	    case CURLM_OK:
-		check_info_after_multi_perform();
-		break;
-	    default:
-		check_info_after_multi_perform();
-		throw Erange("fichier_libcurl::fichier_global_inherited_read",
-			     tools_printf(gettext("Error while running multihandle: %s"),
-					  curl_multi_strerror(errm)));
-	    }
+	    me->my_multi_perform(running);
 	}
-	while(running); // no mistake here: when "running" is null, boolean evaluation of "running" false as expected
+	while(running); // no mistake here: when "running" is null, boolean evaluation of "running" is false as expected
     }
 
     void fichier_libcurl::copy_from(const fichier_libcurl & ref)
@@ -638,9 +604,37 @@ namespace libdar
 	*me = *you;
     }
 
-    void fichier_libcurl::check_info_after_multi_perform() const
+    void fichier_libcurl::my_multi_perform(int & running)
     {
-	string msg;
+	CURLMcode errm = CURLM_OK;
+	bool err = false;
+	string errmsg;
+
+	do
+	{
+	    errm = curl_multi_perform(multihandle, &running);
+	    switch(errm)
+	    {
+	    case CURLM_OK:
+		err = check_info_after_multi_perform(errmsg);
+		break;
+	    default:
+		err = check_info_after_multi_perform(errmsg);
+		errmsg = string(curl_multi_strerror(errm)) + ": " + errmsg;
+	    }
+	    if(err)
+	    {
+		get_ui().warning(tools_printf(gettext("network write error: %S, retrying in %d second(s)"), &errmsg, wait_delay));
+		sleep(wait_delay);
+		remove_easy_from_multi();
+		add_easy_to_multi();
+	    }
+	}
+	while(err);
+    }
+
+    bool fichier_libcurl::check_info_after_multi_perform(string & msg) const
+    {
 	int msgs_in_queue;
 	CURLMsg *ptr = nullptr;
 	bool err = false;
@@ -661,8 +655,7 @@ namespace libdar
 	    }
 	}
 
-	if(err)
-	    throw Erange("fichier_libcurl::check_info_after_multi_perform", tools_printf(gettext("Error met at the end of file transfer: %S"), &msg));
+	return err;
     }
 
     void fichier_libcurl::detruit()

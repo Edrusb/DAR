@@ -136,7 +136,8 @@ namespace libdar
 	void run_multi() const;           //< blindly run multihandle up to the end of transfer
 	void copy_from(const fichier_libcurl & ref);
 	void copy_parent_from(const fichier_libcurl & ref);
-	void check_info_after_multi_perform() const;
+	void my_multi_perform(int & running); //< robust wrapper to curl_multi_perform to face temporary network error conditions
+	bool check_info_after_multi_perform(std::string & msg) const; //< return true if an error occured and provide error message in argument
 	void detruit();
 
 	static size_t write_data_callback(char *buffer, size_t size, size_t nmemb, void *userp);
