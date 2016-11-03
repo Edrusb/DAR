@@ -3,7 +3,7 @@
 .SH NAME
 dar \- creates, tests, lists, extracts, compares, merges, isolates dar archives
 .SH SYNOPSIS
-dar [-c | -t | -l | -x | -d | -+ | -C] [<path>/]<basename> [<options>] [<user targets>]
+dar [-c | -t | -l | -x | -d | -+ | -C] [[<URL>]<path>/]<basename> [<options>] [<user targets>]
 .PP
 dar -h
 .PP
@@ -117,33 +117,34 @@ Once defined, a large set of options can be used to modify the way the command i
 Not all system actually support long options (Solaris, FreeBSD, ...). For example --create will not be available on these systems, and you will have to use -c instead. In the same way, not all system do support optional arguments (FreeBSD without GNU getopt for example), you then need to explicitly give the argument, for example in place of "-z" you will need to give "-z 9", see "EXPLICIT OPTIONAL ARGUMENTS" paragraph near the end of this document for details on that point.
 
 .TP 20
--c, --create [<path>/]<basename>
-creates a backup with the name based on <basename>. All the slices will be created in the directory <path> if specified (see also
-.B Remote repository syntax for <path>
-below), else in the current directory. If the destination filesystem is too small to contain all the slices of the backup, the -p option (pausing before starting new slices) might be of interest. Else, in the case the filesystem is full, dar will suspend the operation, asking for the user to make free space, then continue its operation. To make free space, the only thing you cannot do is to touch the slice being written. If the filename is "-" *and* no slicing is asked for (no -s option) the archive is produced on the standard output allowing the user to send the resulting archive through a pipe (or into a tape device directly or using the dar_split command).
+-c, --create [[<URL>]<path>/]<basename>
+creates a backup with the name based on <basename>. All the slices will be created in the directory <path> if specified, details about the <URL> syntaxe is explained below at
+.B Remote repository syntax
+paragraph.
+Without <path> nor <URL> the current directory is used. If the destination filesystem is too small to contain all the slices of the backup, the -p option (pausing before starting new slices) might be of interest. Else, in the case the filesystem is full, dar will suspend the operation, asking for the user to make free space, then continue its operation. To make free space, the only thing you cannot do is to touch the slice being written. If the filename is "-" *and* no slicing is asked for (no -s option) the archive is produced on the standard output allowing the user to send the resulting archive through a pipe (or into a tape device directly or using the dar_split command).
 .TP 20
--x, --extract [<path>/]<basename>
+-x, --extract [[<URL>]<path>/]<basename>
 extracts files from the given backup. Slices are expected to be in the current directory or in the directory given by <path> (see also
-.B Remote repository syntax for <path>
+.B Remote repository syntax
 below). It is also possible to use symbolic links to gather slices that are not in the same directory. Path may also point to a removable device (floppy, CD, USB key, etc.), in this case, to be able to mount/unmount the device, you must not launch dar from that directory. In other words, the current directory must not on the removable media you plan to unmount (see tutorial for details). The basename may be set to "-", in direct access mode (the default historical mode), you will then need dar_slave to work with dar (see -i and -o options, as well as dar_slave man page). However in sequential read mode (--sequential-mode is used on command-line), dar will read the archive from standard input (see also -i option), this can eventually be used in combination with dar_split.
 .TP 20
--l, --list [<path>/]<basename>
+-l, --list [[<URL>]<path>/]<basename>
 lists the contents of the given backup (see also
-.B Remote repository syntax for <path>
+.B Remote repository syntax
 below)
 .B dar
 will only require the last slice of the archive in direct access mode. If however sequential mode is used, dar will read the overall archive, from the first slice to the last one. "-" can be used as basename, the behavior is the same as with -x option (read just above).
 .TP 20
--t, --test [<path>/]<basename>
+-t, --test [[<URL>]<path>/]<basename>
 checks the backup integrity. Even without compression, dar is able to detect at least one error per file in the archive, thanks to a variable length CRC recorded per file data, file EA and file FSA in the catalogue. Archive structure (slice header, archive header, catalogue) is also protected by CRC to be able to detect any kind of archive corruption. Same remark here, "-" may be used as basename (see -x option above for details).
 .TP 20
--d, --diff [<path>/]<basename>
+-d, --diff [[<URL>]<path>/]<basename>
 compares saved files in the backup with those on the filesystem. <basename> may also be "-" (see -x option above for details). Note that the target for this operation is to be seen as a step further than archive testing, where in addition to archive coherence, the archive contents is verified to be the same as what is found on the filesystem. But if new files are present on the filesystem, dar ignores them. If you want to check for changes since a archive has been made, better use dry-run differential backup.
 .TP 20
--C, --isolate [<path>/]<basename>
+-C, --isolate [[<URL>]<path>/]<basename>
 isolate a catalogue from its archive (that's to say make a copy of the internal catalogue to its own archive container). The argument is the basename of the file to create which will contain the catalogue's copy. The -A option is mandatory here to give the name of the archive to copy the catalogue from, this archive is not modified at all. Slicing is available (-s -S -p -b etc.). If the filename is "-" *and* no slice is asked (no -s option) the isolated catalogue is produced on the standard output, allowing the user to send the resulting archive through a pipe. Note that there is quite no difference in concept between an isolated catalogue and an archive. Thus you can do all operations on an isolated catalogue, in particular take it in place of the original backup as reference for a differential archive, archive testing, archive comparison. Note however that for comparison (-d option) as data is not present in the isolated catalogue, dar relies on embedded CRC rather than comparing data byte by byte  (what is done with a plain archive), and no comparison can be performed concerning EA or FSA even if each of them have their own CRC in the catalogue because different ordering as provided by the OS of the items composing EA and FSA may lead the CRC to be different while the EA or FSA are exactly the same, so CRC here is used only to dectect archive corruption. Since release 2.4.0 you can use an isolated catalogue to rescue a corrupted internal catalogue of the archive it has been based on (see -A option).
 .TP 20
--+, --merge [<path>/]<basename>
+-+, --merge [[<URL>]<path>/]<basename>
 create a subset archive from one or two existing archives (the resulting archive name is the argument to this command). The dar file selection mechanism (see GENERAL OPTIONS) let the user decide which files will be present in the resulting archive and which one will be ignored. This option thus let the user merge two archives in a single one (with a filtering mechanism that accepts all files), as well as this option let the user create a smaller archive which data is taken from one or two archives of reference. Note that at no time the contents of the archives of reference is extracted to real files and directories: this is an archive to archive transfer, thus you may lack support for Extended Attribute while you will be able to fully manipulate files with their Extended Attributes from one archive to the resulting one. If the basename is "-" *and* no slice is asked (no -s option), the archive is produced on standard output allowing the user to send the resulting archive through a pipe. The first mandatory archive of reference is provided thanks to the -A option, while the second "auxiliary" (and optional) archive of reference is provided thanks to the -@ option. When a tie contention occurs (same file names from both archive have to be merged), the overwriting policy (-/ option) is used to define the one to keep in the resulting archive. By default, archive data selected for merging is uncompressed, and re-compressed. Thus the merging operation can be used to change compression algorithm of given archive as well as change its encryption. But, for better performance it is also possible thanks to the -ak option (see below the -ak option for usage restrictions) to merge files keeping them compressed, thus no decompression/re-compression is performed at all, which make the operation faster. Last it is not possible to merge two isolated catalogues.
 .TP 20
 -h, --help
@@ -152,10 +153,10 @@ displays help usage.
 -V, --version
 displays version information.
 .PP
-.B Remote repository syntax for <path>
+.B Remote repository syntax for [<URL>]<path>
 .PP
 .RS
-for all commands described above as well as some options detailes below (-A and -@ options), the <path> optional argument can be a Unix path like /var/tmp when the archive is located on the host dar runs on, or a more rich argument following the below syntax when the archive is to be read or written to a remote host:
+for all commands described above as well as some options detailes below (-A and -@ options), the <path> optional argument can be a Unix path like /var/tmp when the archive is located on the host dar runs on. But it can also make use of <URL> to define the remote host the archive is to be read or written to. "<URL><path>" follows the usual syntax:
 .PP
 .RS
 .B
@@ -185,7 +186,7 @@ port
 if not provided, dar will use the default/standard port in regard to the protocol specified in the "proto" field
 .TP 3
 path
-a unix path where resides the archive to read from the remote repository or where to write the archive to in that remote repository
+a unix path where resides the archive to read from the remote repository or where to write the archive to in that remote repository. The given path is absolute, in regard to the remote root filesystem available for the given account though the requested protocol.
 .RE
 .PP
 .B GENERAL OPTIONS:
@@ -222,7 +223,7 @@ makes the terminal ring when user action is required (like for example the creat
 -B, --batch <filename>
 In the file which name is given in argument to this option, You can put any option or argument as used on command line, that will be parsed as if they were in place of the "-B <filename>" option. This way you can overcome the command line size limitation. Commands in the file may be disposed on several lines, and -B option can also be used inside files, leading a file to include other files. But an error occurs in case of loop (a file that includes itself directly or not) and DAR aborts immediately. Comments are allowed, and must start by a hash `#' character on each line. Note that for a line to be considered as a comment the hash character must be the first character of the line (space or tab can still precede the hash). See
 .B Conditional Syntax
-below for a more rich syntax in this type of configuration files known as DCF file (Dar Configuration File). See also the environment variable DAR_DCF_PATH in the ENVIRONMENT section at the end of this document.
+below for a richer syntax in this type of configuration files known as DCF file (Dar Configuration File). See also the environment variable DAR_DCF_PATH in the ENVIRONMENT section at the end of this document.
 .PP
 Note that you can use quotes simple (\'arg\') double ("arg") and back-quotes (`arg`) inside such file, but they need to be balanced (have an ending one). To use such character without the meaning of a quote, for example as an apostrophe, you need to escape it using a back-slack ("That\\'s an example"). Of course to add a single back-slash as a normal character in the file you will have to double it ("c:\\\\windows" for example)
 .TP 20
@@ -252,7 +253,7 @@ Do not warn before overwriting (applied for slice overwriting and for overwritin
 -wa, --no-warn=all
 This implies the -w option, and means that over avoiding warning for file overwriting, DAR also avoids signaling a file about to be removed when its type is not the expected one. File are removed when they have been recorded as deleted since the archive of reference. At restoration of the differential archive, if a file of the given name exists, it is remove, but if the type does not match the file that was present at the time of the archive of reference (directory, plain file, fifo, socket, char or block device, etc.), a warning is normally issued to prevent the accidental removal of data that was not saved in the backup of reference. (See also -k option)
 .TP 20
--A, --ref [<path>]/<basename>
+-A, --ref [[<URL>]<path>]/<basename>
 Depending on the context, it specifies the archive to use as reference, which is mandatory for archive isolation (-C option) and merging operation (-+ option). Else it specifies the rescue catalogue to use when restoring (-x command), testing (-t command) or comparing (-d command) an archive. All slices of the reference backup are expected to be on the same directory given by <path> or the current directory by default. Usually only the last slice is required to extract the catalogue of reference. If necessary the use of symbolic links is also possible here to gather slices that do not reside in the same directory. You can also point <path> to a USB key, DVD-R(W) or any other mounted directory, because
 .B dar
 will pause and ask the user for required slices if they are not present. The argument to -A may be of four types:
@@ -303,7 +304,7 @@ Here are some examples of date:
 .RE
 .RE
 .TP 20
--@, --aux [<path>]/<basename>, --on-fly-isolate [<path>]/<basename>
+-@, --aux [[<URL>]<path>]/<basename>, --on-fly-isolate [<path>]/<basename>
 specifies an auxiliary archive of reference (merging context) or the name of the on-fly isolated catalogue (creation context). This option is thus only available with -+ option (merging) and -c option (archive creation). Note that --aux and --on-fly-isolate are really aliases to the same option, this is the context of use (archive creation or merging) which lead it to behave a way or another.
 .RS
 .PP
@@ -1024,7 +1025,7 @@ At restoration time, if a file in the archive is flagged as "dirty" (meaning tha
 -/, --overwriting-policy <policy>
 Overwriting policy can be used for archive restoration to define when and how file overwriting can occur. See above the description of this option.
 .TP 20
--A, --ref [<path>]/<basename>
+-A, --ref [[<URL>]<path>]/<basename>
 The --ref option can be used with an isolated catalogue to rescue an archive that has a corruption in the catalogue part, see GENERAL OPTIONS above for more details.
 .PP
 .B TESTING AND DIFFERENCE SPECIFIC OPTIONS (to use with -t or -d)
