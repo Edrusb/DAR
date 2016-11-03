@@ -268,7 +268,8 @@ namespace libdar
 
     bool fichier_libcurl::skip(const infinint & pos)
     {
-	if(get_mode() != gf_read_only)
+	if(get_mode() != gf_read_only
+	   && inbuf > 0)
 	    sync_write();
 
 	switch(get_mode())
