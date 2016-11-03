@@ -24,6 +24,10 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
+}
+
 #include "tools.hpp"
 #include "entrepot_libcurl.hpp"
 #include "fichier_libcurl.hpp"
@@ -80,6 +84,15 @@ namespace libdar
 	if(easyhandle == nullptr)
 	    throw Erange("entrepot_libcurl::entrepot_libcurl", string(gettext("Error met while creating a libcurl handle")));
 	set_libcurl_authentication(login, password);
+
+#ifdef LIBDAR_NO_OPTIMIZATION
+	CURLcode err = curl_easy_setopt(easyhandle, CURLOPT_VERBOSE, 1);
+	if(err != CURLE_OK)
+	    throw Erange("entrepot_libcurl::entrepot_libcurl",
+			 tools_printf(gettext("Error met while setting verbosity on handle: %s"),
+				      curl_easy_strerror(err)));
+#endif
+
 #else
     throw Efeature("libcurl");
 #endif
