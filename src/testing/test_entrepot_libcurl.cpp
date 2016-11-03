@@ -39,17 +39,28 @@ extern "C"
 
 using namespace libdar;
 
-void f1();
-void f2();
+void usage(int argc,
+	   char *argv[]);
 
-int main()
+void get_args(int argc,
+	      char *argv[],
+	      entrepot_libcurl::curl_protocol & proto,
+	      string & login,
+	      secu_string & pass,
+	      string & host,
+	      string & chemin,
+	      string & port);
+
+void f1(int argc, char *argv[]);
+
+int main(int argc, char *argv[])
 {
     U_I maj, med, min;
 
     try
     {
 	get_version(maj, med, min);
-	f1();
+	f1(argc, argv);
     }
     catch(Egeneric & e)
     {
@@ -57,15 +68,68 @@ int main()
     }
 }
 
-void f1()
+void usage(int argc,
+	   char *argv[])
 {
+    cout << "usage: { ftp | sftp } <login> <pass> <host> [ <chemin> <port> ]" << endl;
+}
+
+void get_args(int argc,
+	      char *argv[],
+	      entrepot_libcurl::curl_protocol & proto,
+	      string & login,
+	      secu_string & pass,
+	      string & host,
+	      string & chemin,
+	      string & port)
+{
+    string tmp;
+
+    if(argc < 5 && argc > 7)
+    {
+	usage(argc, argv);
+	exit(1);
+    }
+
+    proto = entrepot_libcurl::string_to_curlprotocol(argv[1]);
+    login = argv[2];
+    tmp = argv[3];
+    pass = secu_string(tmp.c_str(), tmp.size());
+    host = argv[4];
+    if(argc > 5)
+	chemin = argv[5];
+    else
+	chemin = "";
+    if(argc > 6)
+	port = argv[6];
+    else
+	port = "";
+}
+
+void f1(int argc, char *argv[])
+{
+    entrepot_libcurl::curl_protocol proto;
+    string login;
+    secu_string pass;
+    string host;
+    string port;
+    string chemin;
+    get_args(argc,
+	     argv,
+	     proto,
+	     login,
+	     pass,
+	     host,
+	     chemin,
+	     port);
+
     shell_interaction ui(&cout, &cerr, true);
-    secu_string pass("themenac", 8);
-    entrepot_libcurl reposito(entrepot_libcurl::proto_ftp,
-			      "denis",
+    entrepot_libcurl reposito(ui,
+			      proto,
+			      login,
 			      pass,
-			      "localhost",
-			      "");
+			      host,
+			      port);
     fichier_local readme("/etc/fstab");
     fichier_local *writetome = new fichier_local(ui,
 						 "/tmp/test.tmp",
@@ -84,16 +148,22 @@ void f1()
     try
     {
 	string tmp;
+	U_I fast_retry = 30;
 
 	if(writetome == nullptr || writetomepart == nullptr)
 	    throw Ememory("f1");
 
-	reposito.set_location("/tmp");
-	cout << "Listing: " << reposito.get_url() << endl;
-	reposito.read_dir_reset();
-	while(reposito.read_dir_next(tmp))
-	    cout << " -> " << tmp << endl;
-	cout << endl;
+
+	while(--fast_retry > 0)
+	{
+	    if(chemin != "")
+		reposito.set_location(chemin);
+	    cout << "Listing: " << reposito.get_url() << endl;
+	    reposito.read_dir_reset();
+	    while(reposito.read_dir_next(tmp))
+		cout << " -> " << tmp << endl;
+	    cout << endl;
+	}
 
 	try
 	{
@@ -192,10 +262,10 @@ void f1()
 	fichier_global *fac = reposito.open(ui,
 					    "cuicui",
 					    gf_read_only,
-					    false,
-					    0,
-					    false,
-					    false,
+					    false, // force permission
+					    0,     // permission
+					    false, // fail if exist
+					    false, // erase
 					    hash_none);
 	const U_I BUFSIZE = 1000;
 	char buf[BUFSIZE];
@@ -230,19 +300,19 @@ void f1()
 	}
 	catch(...)
 	{
-	    delete foc;
+	    delete fac;
 	    throw;
 	}
-	delete foc;
+	delete fac;
 
 
 	fichier_global *fec = reposito.open(ui,
 					    "cuicui",
 					    gf_write_only,
-					    false,
-					    0644,
-					    false,
-					    true,
+					    false, // force permission
+					    0644,  // permission
+					    false, // fail if exist
+					    false,  // erase
 					    hash_none);
 	if(fec == nullptr)
 	    throw SRC_BUG;
