@@ -729,12 +729,43 @@ namespace libdar
 	{
 	case CURLE_OK:
 	    break;
-	case CURLE_LOGIN_DENIED:
 	case CURLE_REMOTE_ACCESS_DENIED:
+	case CURLE_FTP_ACCEPT_FAILED:
+	case CURLE_UNSUPPORTED_PROTOCOL:
+	case CURLE_FAILED_INIT:
+	case CURLE_URL_MALFORMAT:
+	case CURLE_NOT_BUILT_IN:
+	case CURLE_WRITE_ERROR:
+	case CURLE_READ_ERROR:
+	case CURLE_OUT_OF_MEMORY:
+	case CURLE_RANGE_ERROR:
+	case CURLE_BAD_DOWNLOAD_RESUME:
+	case CURLE_FILE_COULDNT_READ_FILE:
+	case CURLE_FUNCTION_NOT_FOUND:
+	case CURLE_ABORTED_BY_CALLBACK:
+	case CURLE_BAD_FUNCTION_ARGUMENT:
+	case CURLE_TOO_MANY_REDIRECTS:
+	case CURLE_UNKNOWN_OPTION:
+	case CURLE_FILESIZE_EXCEEDED:
+	case CURLE_LOGIN_DENIED:
+	case CURLE_REMOTE_DISK_FULL:
+	case CURLE_REMOTE_FILE_EXISTS:
+	case CURLE_REMOTE_FILE_NOT_FOUND:
+	case CURLE_PARTIAL_FILE:
+	case CURLE_UPLOAD_FAILED:
 	    throw Erange("entrepot_libcurl::check_wait_or_throw",
 			 tools_printf(gettext("%S: %s, aborting"),
 				      &err_context,
 				      curl_easy_strerror(err)));
+	case CURLE_COULDNT_RESOLVE_PROXY:
+	case CURLE_COULDNT_RESOLVE_HOST:
+	case CURLE_COULDNT_CONNECT:
+	case CURLE_FTP_ACCEPT_TIMEOUT:
+	case CURLE_FTP_CANT_GET_HOST:
+	case CURLE_OPERATION_TIMEDOUT:
+	case CURLE_SEND_ERROR:
+	case CURLE_RECV_ERROR:
+	case CURLE_AGAIN:
 	default:
 	    dialog.printf(gettext("%S: %s, retrying in %d seconds"),
 			  &err_context,
