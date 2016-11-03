@@ -127,7 +127,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 						      param.ent_login,
 						      param.ent_pass,
 						      param.ent_host,
-						      param.ent_port);
+						      param.ent_port,
+						      param.network_retry);
 		if(repo == nullptr)
 		    throw Ememory("little_main");
 	    }

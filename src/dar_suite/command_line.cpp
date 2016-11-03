@@ -333,6 +333,12 @@ bool get_args(shell_interaction & dialog,
     p.delta_mask = nullptr;
     p.delta_diff = true;
     p.delta_sig_min_size = 0; //< if zero is not modified, we will used the default value from libdar
+    p.ent_proto = "";
+    p.ent_login = "";
+    p.ent_pass.clear();
+    p.ent_host = "";
+    p.ent_port = "";
+    p.network_retry = 3;
 
     try
     {
@@ -1791,6 +1797,14 @@ static bool get_args_recursive(recursive_param & rec,
                 tmp_pre_mask.glob_exp = rec.glob_mode;
                 rec.path_delta_include_exclude.push_back(tmp_pre_mask);
                 break;
+	    case 'j':
+		if(optarg == nullptr)
+		    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+		if(!tools_my_atoi(optarg, tmp) || tmp < 1)
+		    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+		else
+		    p.network_retry = tmp;
+		break;
             case ':':
                 throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(optopt)));
             case '?':
@@ -2371,6 +2385,7 @@ const struct option *get_long_opt()
 	{"include-delta-sig", required_argument, nullptr, '{'},
 	{"exclude-delta-sig", required_argument, nullptr, '}'},
 	{"delta-sig-min-size", required_argument, nullptr, '6'},
+	{"network-retry-delay", required_argument, nullptr, 'j'},
         { nullptr, 0, nullptr, 0 }
     };
 

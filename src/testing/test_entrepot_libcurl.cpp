@@ -129,7 +129,8 @@ void f1(int argc, char *argv[])
 			      login,
 			      pass,
 			      host,
-			      port);
+			      port,
+			      3);
     fichier_local readme("/etc/fstab");
     fichier_local *writetome = new fichier_local(ui,
 						 "/tmp/test.tmp",

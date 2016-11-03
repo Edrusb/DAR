@@ -147,6 +147,7 @@ struct line_param
     secu_string ent_pass;         //< entrepot password
     string ent_host;              //< entrepot hostname
     string ent_port;              //< entrepot port
+    U_I network_retry;            //< libcurl entrepot network retry time
 
 	// constructor for line_param
     line_param()
