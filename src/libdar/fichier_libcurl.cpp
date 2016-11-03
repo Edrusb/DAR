@@ -684,6 +684,9 @@ namespace libdar
 	size_t amount = size * nmemb;
 	fichier_libcurl *me = (fichier_libcurl *)(userp);
 
+	if(me == nullptr)
+	    throw SRC_BUG;
+
 	if(amount + *(me->ptr_inbuf) > tampon_size)
 	    if(me->ptr_inbuf == 0)
 		throw SRC_BUG; // buffer is too short to receive this data
@@ -704,8 +707,12 @@ namespace libdar
 	size_t ret;
 	size_t room = size * nitems;
 	fichier_libcurl *me = (fichier_libcurl *)(userp);
-	size_t xfer = room > *(me->ptr_inbuf) ? *(me->ptr_inbuf) : room;
+	size_t xfer;
 
+	if(me == nullptr)
+	    throw SRC_BUG;
+
+	xfer = room > *(me->ptr_inbuf) ? *(me->ptr_inbuf) : room;
 	if(xfer > 0)
 	{
 	    memcpy(bufptr, me->ptr_tampon, xfer);
