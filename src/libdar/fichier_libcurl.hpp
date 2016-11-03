@@ -133,11 +133,11 @@ namespace libdar
 	void add_easy_to_multi();
 	void remove_easy_from_multi();
 	void switch_to_metadata(bool mode);//< set to true to get or set file's metadata, false to read/write file's data
-	void run_multi() const;           //< blindly run multihandle up to the end of transfer
+	void run_multi(const std::string & context_msg) const;           //< blindly run multihandle up to the end of transfer
 	void copy_from(const fichier_libcurl & ref);
 	void copy_parent_from(const fichier_libcurl & ref);
-	void my_multi_perform(int & running); //< robust wrapper to curl_multi_perform to face temporary network error conditions
-	bool check_info_after_multi_perform(std::string & msg) const; //< return true if an error occured and provide error message in argument
+	void my_multi_perform(int & running, const std::string & context_msg); //< robust wrapper to curl_multi_perform to face temporary network error conditions
+	bool check_info_after_multi_perform(const std::string & context_msg) const; //< depending on error type, wait and retry or throw an exception, return false if no error was met
 	void detruit();
 
 	static size_t write_data_callback(char *buffer, size_t size, size_t nmemb, void *userp);

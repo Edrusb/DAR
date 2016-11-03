@@ -172,7 +172,7 @@ namespace libdar
 	    add_easy_to_multi();
 	    try
 	    {
-		run_multi();
+		run_multi(gettext("Error met while setting remote file permission"));
 	    }
 	    catch(Erange & e)
 	    {
@@ -219,7 +219,7 @@ namespace libdar
 		if(err != CURLE_OK)
 		    throw Erange("","");
 		me->add_easy_to_multi();
-		run_multi();
+		run_multi(gettext("Error met while fetching remote file size"));
 		err = curl_easy_getinfo(easyhandle, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &filesize);
 		if(err != CURLE_OK)
 		    throw Erange("","");
@@ -341,7 +341,7 @@ namespace libdar
 	if(metadatamode)
 	    throw SRC_BUG;
 
-	run_multi();
+	run_multi(gettext("Error met while syncing written data to remote file"));
 
 	if(inbuf > 0)
 	    throw SRC_BUG; // multi has finished but data remain in transit
@@ -392,7 +392,7 @@ namespace libdar
 		inbuf += xfer;
 	    }
 
-	    my_multi_perform(running);
+	    my_multi_perform(running, gettext("Error met while writing data to remote file"));
 	}
 
 	if(wrote < size)
@@ -434,7 +434,7 @@ namespace libdar
 	    }
 	    else // inbuf == 0
 	    {
-		my_multi_perform(running);
+		my_multi_perform(running, gettext("Error met while reading data from remote file"));
 		if(running == 0)
 		    eof = true;
 	    }
@@ -524,7 +524,7 @@ namespace libdar
     }
 
 
-    void fichier_libcurl::run_multi() const
+    void fichier_libcurl::run_multi(const string & context_msg) const
     {
 	int running;
 	fichier_libcurl *me = const_cast<fichier_libcurl *>(this);
@@ -536,7 +536,7 @@ namespace libdar
 
 	do
 	{
-	    me->my_multi_perform(running);
+	    me->my_multi_perform(running, context_msg);
 	}
 	while(running); // no mistake here: when "running" is null, boolean evaluation of "running" is false as expected
     }
@@ -594,11 +594,10 @@ namespace libdar
 	*me = *you;
     }
 
-    void fichier_libcurl::my_multi_perform(int & running)
+    void fichier_libcurl::my_multi_perform(int & running, const string & context_msg)
     {
 	CURLMcode errm = CURLM_OK;
 	bool err = false;
-	string errmsg;
 
 	do
 	{
@@ -606,16 +605,13 @@ namespace libdar
 	    switch(errm)
 	    {
 	    case CURLM_OK:
-		err = check_info_after_multi_perform(errmsg);
+		err = check_info_after_multi_perform(context_msg);
 		break;
 	    default:
-		err = check_info_after_multi_perform(errmsg);
-		errmsg = string(curl_multi_strerror(errm)) + ": " + errmsg;
+		err = check_info_after_multi_perform(context_msg + string(": ") + string(curl_multi_strerror(errm)));
 	    }
 	    if(err)
 	    {
-		get_ui().warning(tools_printf(gettext("network write error: %S, retrying in %d second(s)"), &errmsg, wait_delay));
-		sleep(wait_delay);
 		remove_easy_from_multi();
 		add_easy_to_multi();
 	    }
@@ -623,7 +619,7 @@ namespace libdar
 	while(err);
     }
 
-    bool fichier_libcurl::check_info_after_multi_perform(string & msg) const
+    bool fichier_libcurl::check_info_after_multi_perform(const string & context_msg) const
     {
 	int msgs_in_queue;
 	CURLMsg *ptr = nullptr;
@@ -638,10 +634,10 @@ namespace libdar
 	    if(ptr->data.result != CURLE_OK)
 	    {
 		err = true;
-		if(msg.size() == 0)
-		    msg = curl_easy_strerror(ptr->data.result);
-		else
-		    msg += string(" ; ") + curl_easy_strerror(ptr->data.result);
+		fichier_libcurl_check_wait_or_throw(get_ui(),
+						    ptr->data.result,
+						    wait_delay,
+						    context_msg);
 	    }
 	}
 
