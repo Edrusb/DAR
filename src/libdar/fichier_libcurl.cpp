@@ -85,11 +85,13 @@ namespace libdar
 			     tools_printf(gettext("Error met while resetting URL to handle: %s"),
 					  curl_easy_strerror(err)));
 
+#ifdef LIBDAR_NO_OPTIMIZATION
 	    err = curl_easy_setopt(easyhandle, CURLOPT_VERBOSE, CURLDEBUG);
 	    if(err != CURLE_OK)
 		throw Erange("entrepot_libcurl::entrepot_libcurl",
 			     tools_printf(gettext("Error met while setting verbosity on handle: %s"),
 					  curl_easy_strerror(err)));
+#endif
 
 	    switch(get_mode())
 	    {
@@ -539,7 +541,6 @@ namespace libdar
 	fichier_libcurl *me = const_cast<fichier_libcurl *>(this);
 	if(me == nullptr)
 	    throw SRC_BUG;
-
 
 	if(!easy_in_multi)
 	    throw SRC_BUG;
