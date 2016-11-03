@@ -51,8 +51,8 @@ namespace libdar
 	/// and access to it under with a char* pointer.
 	/// if more constructor are needed (espetially toward API), tell me, but
 	/// this is a non-sens to build a secure string from another data structure which is
-	/// not yet secured, where from the read() method that fetches data directly from a
-	/// filedescriptor (read() low-level system call) which might be a tty for example
+	/// not yet secured, where from the set() method that fetches data directly from a
+	/// filedescriptor (set() low-level system call) which might be a tty for example
 
     class secu_string : public on_pool
     {
@@ -104,7 +104,7 @@ namespace libdar
 	    /// \param[in] offset defines at which offset in the secu_string will be placed the string to append
 	    /// \param[in] ptr is the address of the string to append
 	    /// \param[in] size is the number of byte to append
-	    /// \note this call does not change the allocation size, (unlike read()), it adds the data pointed by the arguments
+	    /// \note this call does not change the allocation size, (unlike set()), it adds the data pointed by the arguments
 	    /// to the object while there is enough place to do so.
 	    /// resize() must be used first to define enough secure memory to append the expected amount of data
 	    /// in one or several call to append.
