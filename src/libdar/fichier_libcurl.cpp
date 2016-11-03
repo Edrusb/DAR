@@ -132,7 +132,7 @@ namespace libdar
 		throw Erange("entrepot_libcur::handle_reset", string(gettext("multihandle initialization failed")));
 	    switch_to_metadata(false);
 	    add_easy_to_multi();
-	    if(append_write)
+	    if(append_write && m != gf_read_only)
 		current_offset = get_size();
 	}
 	catch(...)
