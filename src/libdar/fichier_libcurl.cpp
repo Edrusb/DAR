@@ -734,6 +734,32 @@ namespace libdar
 	return ret;
     }
 
+
+    void fichier_libcurl_check_wait_or_throw(user_interaction & dialog,
+					     CURLcode err,
+					     U_I wait_seconds,
+					     const string & err_context)
+    {
+	switch(err)
+	{
+	case CURLE_OK:
+	    break;
+	case CURLE_LOGIN_DENIED:
+	case CURLE_REMOTE_ACCESS_DENIED:
+	    throw Erange("entrepot_libcurl::check_wait_or_throw",
+			 tools_printf(gettext("%S: %s, aborting"),
+				      &err_context,
+				      curl_easy_strerror(err)));
+	default:
+	    dialog.printf(gettext("%S: %s, retrying in %d seconds"),
+			  &err_context,
+			  curl_easy_strerror(err),
+			  wait_seconds);
+	    sleep(wait_seconds);
+	    break;
+	}
+    }
+
 #endif
 
 } // end of namespace

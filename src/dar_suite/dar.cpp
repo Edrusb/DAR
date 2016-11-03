@@ -122,7 +122,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 
 	    if(param.ent_host.size() != 0)
 	    {
-		repo = new (nothrow) entrepot_libcurl(entrepot_libcurl::string_to_curlprotocol(param.ent_proto),
+		repo = new (nothrow) entrepot_libcurl(dialog,
+						      entrepot_libcurl::string_to_curlprotocol(param.ent_proto),
 						      param.ent_login,
 						      param.ent_pass,
 						      param.ent_host,

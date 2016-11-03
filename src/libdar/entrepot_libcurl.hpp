@@ -45,6 +45,7 @@ extern "C"
 #include <string>
 #include "entrepot.hpp"
 #include "secu_string.hpp"
+#include "mem_ui.hpp"
 
 namespace libdar
 {
@@ -56,21 +57,22 @@ namespace libdar
 	///
 	/// entrepot_local generates objects of class "fichier_local" inherited class of fichier_global
 
-    class entrepot_libcurl : public entrepot
+    class entrepot_libcurl : public entrepot, public mem_ui
     {
     public:
 	enum curl_protocol { proto_ftp, proto_http, proto_https, proto_scp, proto_sftp };
 	static curl_protocol string_to_curlprotocol(const std::string & arg);
 
-	entrepot_libcurl(curl_protocol proto,                  //< protocol to use for communication with the remote repository
+	entrepot_libcurl(user_interaction & dialog,            //< used to report temporary network failure to the user
+			 curl_protocol proto,                  //< protocol to use for communication with the remote repository
 			 const std::string & login,            //< login to use
 			 const secu_string & password,         //< password to authenticate
 			 const std::string & host,             //< hostname or IP of the remote repositiry
 			 const std::string & port,             //< empty string to use default port in regard to protocol used
 			 U_I waiting_time = 3);                //< seconds to wait before retrying in case of network erorr
-	entrepot_libcurl(const entrepot_libcurl & ref) : entrepot(ref) { copy_from(ref); };
+	entrepot_libcurl(const entrepot_libcurl & ref) : entrepot(ref), mem_ui(ref) { copy_from(ref); };
 	const entrepot_libcurl & operator = (const entrepot_libcurl & ref) { detruit(); copy_from(ref); return *this; };
-	~entrepot_libcurl() { detruit(); };
+	~entrepot_libcurl() throw() { detruit(); };
 
 	    // inherited from class entrepot
 

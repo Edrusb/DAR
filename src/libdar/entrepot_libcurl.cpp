@@ -54,12 +54,14 @@ namespace libdar
 	return ret;
     }
 
-    entrepot_libcurl::entrepot_libcurl(curl_protocol proto,
+    entrepot_libcurl::entrepot_libcurl(user_interaction & dialog,
+				       curl_protocol proto,
 				       const string & login,
 				       const secu_string & password,
 				       const string & host,
 				       const string & port,
-				       U_I waiting_time): x_proto(proto),
+				       U_I waiting_time): mem_ui(dialog),
+							  x_proto(proto),
 							  base_URL(build_url_from(proto, host, port)),
 							  wait_delay(waiting_time)
     {
@@ -123,12 +125,17 @@ namespace libdar
 					      curl_easy_strerror(err)));
 		}
 
-		err = curl_easy_perform(easyhandle);
-		if(err != CURLE_OK)
-		    throw Erange("entrepot_libcurl::inherited_unlink",
-				 tools_printf(gettext("Error met while listing FTP directory %s: %s"),
-					      get_url().c_str(),
-					      curl_easy_strerror(err)));
+		do
+		{
+		    err = curl_easy_perform(easyhandle);
+		    fichier_libcurl_check_wait_or_throw(get_ui(),
+							err,
+							wait_delay,
+							tools_printf(gettext("Error met while listing FTP directory %s"),
+								     get_url().c_str()));
+		}
+		while(err != CURLE_OK);
+
 		if(!reading_dir_tmp.empty())
 		{
 		    me->current_dir.push_back(reading_dir_tmp);
@@ -316,7 +323,17 @@ namespace libdar
 		    throw Erange("entrepot_libcurl::inherited_unlink",
 				 tools_printf(gettext("Error met while setting up connection for file %S removal: %s"),
 					      &filename, curl_easy_strerror(err)));
-		err = curl_easy_perform(easyhandle);
+		do
+		{
+		    err = curl_easy_perform(easyhandle);
+		    fichier_libcurl_check_wait_or_throw(get_ui(),
+							err,
+							wait_delay,
+							tools_printf(gettext("Error met while removing file %S"),
+								     &filename));
+		}
+		while(err != CURLE_OK);
+
 		if(err != CURLE_OK)
 		    throw Erange("entrepot_libcurl::inherited_unlink",
 				 tools_printf(gettext("Error met while removing file %S: %s"),
@@ -428,6 +445,14 @@ namespace libdar
     void entrepot_libcurl::copy_from(const entrepot_libcurl & ref)
     {
 #if LIBCURL_AVAILABLE
+	entrepot *ent_me = this;
+	const entrepot *ent_ref = &ref;
+	*ent_me = *ent_ref;
+
+	mem_ui *mem_me = this;
+	const mem_ui *mem_ref = &ref;
+	*mem_me = *mem_ref;
+
 	x_proto = ref.x_proto;
 	base_URL = ref.base_URL;
 	current_dir = ref.current_dir;
