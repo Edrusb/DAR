@@ -75,7 +75,7 @@ namespace libdar
 
 	    err = curl_easy_setopt(easyhandle, CURLOPT_URL, chemin.c_str());
 	    if(err != CURLE_OK)
-		throw Erange("entrepot_libcurl::entreport_libcurl",
+		throw Erange("fichier_libcurl::fichier_libcurl",
 			     tools_printf(gettext("Error met while resetting URL to handle: %s"),
 					  curl_easy_strerror(err)));
 
