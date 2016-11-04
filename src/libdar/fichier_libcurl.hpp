@@ -127,6 +127,7 @@ namespace libdar
 	U_I meta_inbuf;                   //< amount of byte available in "meta_tampon"
 	char *ptr_tampon;                 //< points to tampon or meta_tampon depending on the metadata mode
 	U_I *ptr_inbuf;                   //< points to inbuf or meta_in_buf depending on the metadata mod
+	U_I ptr_tampon_size;              //< the allocated size in bytes of buffer pointed to by ptr_tampon
 	U_I wait_delay;                   //< time in second to wait before retrying in case of network error
 
 

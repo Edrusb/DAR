@@ -60,6 +60,7 @@ namespace libdar
 						  meta_inbuf(0),
 						  ptr_tampon(nullptr),
 						  ptr_inbuf(nullptr),
+						  ptr_tampon_size(0),
 						  wait_delay(waiting)
     {
 	CURLcode err;
@@ -506,12 +507,14 @@ namespace libdar
 
 	    ptr_tampon = tampon;
 	    ptr_inbuf = &inbuf;
+	    ptr_tampon_size = tampon_size;
 	}
 	else // metadata mode
 	{
 	    meta_inbuf = 0; // we don't care existing metadata remaining in transfer
 	    ptr_tampon = meta_tampon;
 	    ptr_inbuf = &meta_inbuf;
+	    ptr_tampon_size = tampon_size;
 	}
 	metadatamode = mode;
     }
@@ -547,6 +550,7 @@ namespace libdar
 	append_write = ref.append_write;
 	meta_inbuf = 0; // don't care data in meta_tampon
 	wait_delay = ref.wait_delay;
+	ptr_tampon_size = ref.ptr_tampon_size;
 
 	if(ref.easyhandle == nullptr)
 	    easyhandle = nullptr;
@@ -668,7 +672,7 @@ namespace libdar
 	if(me == nullptr)
 	    throw SRC_BUG;
 
-	if(amount + *(me->ptr_inbuf) > tampon_size)
+	if(amount + *(me->ptr_inbuf) > me->ptr_tampon_size)
 	    if(me->ptr_inbuf == 0)
 		throw SRC_BUG; // buffer is too short to receive this data
 	    else
