@@ -50,7 +50,7 @@ namespace libdar
 						  easyhandle(nullptr),
 						  multihandle(nullptr),
 						  easy_in_multi(false),
-						  metadatamode(true),
+						  metadatamode(false),
 						  current_offset(0),
 						  has_maxpos(false),
 						  maxpos(0),
@@ -130,8 +130,7 @@ namespace libdar
 	    multihandle = curl_multi_init();
 	    if(multihandle == nullptr)
 		throw Erange("entrepot_libcur::handle_reset", string(gettext("multihandle initialization failed")));
-	    switch_to_metadata(false);
-	    add_easy_to_multi();
+	    switch_to_metadata(true);
 	    if(append_write && m != gf_read_only)
 		current_offset = get_size();
 	}
@@ -149,10 +148,10 @@ namespace libdar
 	struct curl_slist *headers = NULL;
 	string order = tools_printf("site CHMOD %o", perm);
 
+	remove_easy_from_multi();
+	switch_to_metadata(true);
 	try
 	{
-	    remove_easy_from_multi();
-	    switch_to_metadata(true);
 	    try
 	    {
 		headers = curl_slist_append(headers, order.c_str());
@@ -187,8 +186,6 @@ namespace libdar
 	    (void)curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 0);
 	    if(headers != nullptr)
 		curl_slist_free_all(headers);
-	    switch_to_metadata(false);
-	    add_easy_to_multi();
 	    throw;
 	}
 	remove_easy_from_multi();
@@ -196,8 +193,6 @@ namespace libdar
 	(void)curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 0);
 	if(headers != nullptr)
 	    curl_slist_free_all(headers);
-	switch_to_metadata(false);
-	add_easy_to_multi();
     }
 
     infinint fichier_libcurl::get_size() const
@@ -211,10 +206,10 @@ namespace libdar
 
 	if(!has_maxpos || get_mode() != gf_read_only)
 	{
+	    me->remove_easy_from_multi();
+	    me->switch_to_metadata(true);
 	    try
 	    {
-		me->remove_easy_from_multi();
-		me->switch_to_metadata(true);
 		err = curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 1);
 		if(err != CURLE_OK)
 		    throw Erange("","");
@@ -230,15 +225,11 @@ namespace libdar
 	    {
 		me->remove_easy_from_multi();
 		(void)curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 0);
-		me->switch_to_metadata(false);
-		me->add_easy_to_multi();
 		e.prepend_message("Error met while fetching file size: ");
 		throw;
 	    }
 	    me->remove_easy_from_multi();
 	    (void)curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 0);
-	    me->switch_to_metadata(false);
-	    me->add_easy_to_multi();
 	}
 
 	return maxpos;
@@ -276,14 +267,20 @@ namespace libdar
 	{
 	case gf_read_only:
 	    remove_easy_from_multi();
-	    switch_to_metadata(true); // necessary to have current_offset taken into account
+	    switch_to_metadata(true); // necessary to have current_offset taken into account ->> A VIRER car RANGE maintenant
 	    current_offset = pos;
-	    if(get_mode() == gf_write_only && has_maxpos && maxpos < pos)
-		maxpos = pos;
+	    if(get_mode() == gf_write_only)
+	    {
+		if(has_maxpos)
+		{
+		    if(maxpos < pos)
+			maxpos = pos;
+		}
+		else
+		    maxpos = pos;
+	    }
 	    if(get_mode() != gf_write_only)
-		flush_read(); // this set libcurl option with the new offset value
-	    switch_to_metadata(false);
-	    add_easy_to_multi();
+		flush_read();
 	    break;
 	case gf_write_only:
 	    if(pos != current_offset)
@@ -338,8 +335,8 @@ namespace libdar
 
     void fichier_libcurl::inherited_sync_write()
     {
-	if(metadatamode)
-	    throw SRC_BUG;
+	switch_to_metadata(false);
+	add_easy_to_multi();
 
 	run_multi(gettext("Error met while syncing written data to remote file"));
 
@@ -374,10 +371,8 @@ namespace libdar
 	U_I wrote = 0;
 	int running = 1;
 
-	if(metadatamode)
-	    throw SRC_BUG;
-	if(!easy_in_multi)
-	    throw SRC_BUG;
+	switch_to_metadata(false);
+	add_easy_to_multi();
 
 	while((wrote < size || inbuf > 0 || eof)
 	      && running > 0)
@@ -409,10 +404,8 @@ namespace libdar
     {
 	int running = 1;
 
-	if(metadatamode)
-	    throw SRC_BUG;
-	if(!easy_in_multi)
-	    throw SRC_BUG;
+	switch_to_metadata(false);
+	add_easy_to_multi();
 
 	read = 0;
 	while(read < size
@@ -598,6 +591,9 @@ namespace libdar
     {
 	CURLMcode errm = CURLM_OK;
 	bool err = false;
+
+	if(!easy_in_multi)
+	    throw SRC_BUG;
 
 	do
 	{
