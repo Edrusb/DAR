@@ -120,15 +120,15 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	    bool no_cipher_given;
 	    vector<string> recipients;
 
-	    if(param.ent_host.size() != 0)
+	    if(param.remote.ent_host.size() != 0)
 	    {
 		repo = new (nothrow) entrepot_libcurl(dialog,
-						      entrepot_libcurl::string_to_curlprotocol(param.ent_proto),
-						      param.ent_login,
-						      param.ent_pass,
-						      param.ent_host,
-						      param.ent_port,
-						      param.network_retry);
+						      entrepot_libcurl::string_to_curlprotocol(param.remote.ent_proto),
+						      param.remote.ent_login,
+						      param.remote.ent_pass,
+						      param.remote.ent_host,
+						      param.remote.ent_port,
+						      param.remote.network_retry);
 		if(repo == nullptr)
 		    throw Ememory("little_main");
 	    }

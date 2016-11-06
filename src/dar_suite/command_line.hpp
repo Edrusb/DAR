@@ -50,6 +50,20 @@ enum operation { noop, extract, create, diff, test, listing, isolate, merging, v
 
 enum dirty_behavior { dirtyb_ignore, dirtyb_warn, dirtyb_ok };
 
+struct ent_params
+{
+    string ent_proto;             //< entrepot protocol
+    string ent_login;             //< entrepot login
+    secu_string ent_pass;         //< entrepot password
+    string ent_host;              //< entrepot hostname
+    string ent_port;              //< entrepot port
+    U_I network_retry;            //< libcurl entrepot network retry time
+
+    void clear()
+    {   ent_proto.clear(); ent_login.clear(); ent_pass.clear();
+	ent_host.clear(); ent_port.clear(); network_retry = 3; };
+};
+
     // all parameters retreived from command-line
 struct line_param
 {
@@ -142,12 +156,7 @@ struct line_param
     mask *delta_mask;             //< which file to calculate delta sig when not using the default mask
     bool delta_diff;              //< whether to save binary diff or whole file's data during a differential backup
     infinint delta_sig_min_size;  //< size below which to never calculate delta signatures
-    string ent_proto;             //< entrepot protocol
-    string ent_login;             //< entrepot login
-    secu_string ent_pass;         //< entrepot password
-    string ent_host;              //< entrepot hostname
-    string ent_port;              //< entrepot port
-    U_I network_retry;            //< libcurl entrepot network retry time
+    ent_params remote;            //< remote entrepot coordinates
 
 	// constructor for line_param
     line_param()

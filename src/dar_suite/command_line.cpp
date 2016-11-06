@@ -333,12 +333,7 @@ bool get_args(shell_interaction & dialog,
     p.delta_mask = nullptr;
     p.delta_diff = true;
     p.delta_sig_min_size = 0; //< if zero is not modified, we will used the default value from libdar
-    p.ent_proto = "";
-    p.ent_login = "";
-    p.ent_pass.clear();
-    p.ent_host = "";
-    p.ent_port = "";
-    p.network_retry = 3;
+    p.remote.clear();
 
     try
     {
@@ -806,27 +801,23 @@ static bool get_args_recursive(recursive_param & rec,
 		    string path_basename;
 
 		    if(tools_split_entrepot_path(optarg,
-						 p.ent_proto,
-						 p.ent_login,
-						 p.ent_pass,
-						 p.ent_host,
-						 p.ent_port,
+						 p.remote.ent_proto,
+						 p.remote.ent_login,
+						 p.remote.ent_pass,
+						 p.remote.ent_host,
+						 p.remote.ent_port,
 						 path_basename))
 		    {
 			tools_split_path_basename(path_basename.c_str(), p.sauv_root, p.filename);
-			if(p.ent_pass.get_size() == 0)
-			    p.ent_pass = rec.dialog->get_secu_string(tools_printf(gettext("Please provide the file for login %S at host %S"),
-									   &p.ent_login,
-									   &p.ent_host),
+			if(p.remote.ent_pass.get_size() == 0)
+			    p.remote.ent_pass = rec.dialog->get_secu_string(tools_printf(gettext("Please provide the file for login %S at host %S"),
+											 &p.remote.ent_login,
+											 &p.remote.ent_host),
 							      false);
 		    }
 		    else
 		    {
-			p.ent_proto.clear();
-			p.ent_login.clear();
-			p.ent_pass.clear();
-			p.ent_host.clear();
-			p.ent_port.clear();
+			p.remote.clear();
 			tools_split_path_basename(optarg, p.sauv_root, p.filename);
 		    }
 		}
@@ -1803,7 +1794,7 @@ static bool get_args_recursive(recursive_param & rec,
 		if(!tools_my_atoi(optarg, tmp) || tmp < 1)
 		    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
 		else
-		    p.network_retry = tmp;
+		    p.remote.network_retry = tmp;
 		break;
             case ':':
                 throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(optopt)));
