@@ -90,7 +90,7 @@ extern "C"
 #include "criterium.hpp"
 #include "fichier_local.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:8:{:}:"
+#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:8:{:}:j:"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c option"
