@@ -146,7 +146,7 @@ namespace libdar
     {
 	const char * errmsg = "Error while changing file permission on remote repository";
 	CURLcode err;
-	struct curl_slist *headers = NULL;
+	struct curl_slist *headers = nullptr;
 	string order = tools_printf("site CHMOD %o", perm);
 
 	remove_easy_from_multi();
