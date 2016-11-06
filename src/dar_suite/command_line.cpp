@@ -1791,7 +1791,7 @@ static bool get_args_recursive(recursive_param & rec,
 	    case 'j':
 		if(optarg == nullptr)
 		    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
-		if(!tools_my_atoi(optarg, tmp) || tmp < 1)
+		if(!tools_my_atoi(optarg, tmp))
 		    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
 		else
 		    p.remote.network_retry = tmp;

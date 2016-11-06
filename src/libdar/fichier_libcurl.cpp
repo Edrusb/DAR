@@ -767,11 +767,18 @@ namespace libdar
 	case CURLE_RECV_ERROR:
 	case CURLE_AGAIN:
 	default:
-	    dialog.printf(gettext("%S: %s, retrying in %d seconds"),
-			  &err_context,
-			  curl_easy_strerror(err),
-			  wait_seconds);
-	    sleep(wait_seconds);
+	    if(wait_seconds > 0)
+	    {
+		dialog.printf(gettext("%S: %s, retrying in %d seconds"),
+			      &err_context,
+			      curl_easy_strerror(err),
+			      wait_seconds);
+		sleep(wait_seconds);
+	    }
+	    else
+		dialog.pause(tools_printf(gettext("%S: %s, do we retry network operation?"),
+					  &err_context,
+					  curl_easy_strerror(err)));
 	    break;
 	}
     }
