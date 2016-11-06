@@ -217,6 +217,8 @@ namespace libdar
 		me->add_easy_to_multi();
 		run_multi(gettext("Error met while fetching remote file size"));
 		err = curl_easy_getinfo(easyhandle, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &filesize);
+		if(filesize == -1) // file does not exist
+		    filesize = 0;
 		if(err != CURLE_OK)
 		    throw Erange("","");
 		me->maxpos = tools_double2infinint(filesize);
