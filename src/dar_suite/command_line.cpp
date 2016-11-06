@@ -812,7 +812,7 @@ static bool get_args_recursive(recursive_param & rec,
 		    {
 			tools_split_path_basename(path_basename.c_str(), p.sauv_root, p.filename);
 			if(p.remote.ent_pass.get_size() == 0)
-			    p.remote.ent_pass = rec.dialog->get_secu_string(tools_printf(gettext("Please provide the file for login %S at host %S"),
+			    p.remote.ent_pass = rec.dialog->get_secu_string(tools_printf(gettext("Please provide the password for login %S at host %S"),
 											 &p.remote.ent_login,
 											 &p.remote.ent_host),
 							      false);
