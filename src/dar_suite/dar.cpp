@@ -95,6 +95,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	archive *aux = nullptr;
 	archive *cur = nullptr;
 	entrepot_libcurl *repo = nullptr;
+	entrepot_libcurl *ref_repo = nullptr;
+	entrepot_libcurl *aux_repo = nullptr;
 
         dialog.set_beep(param.beep);
 
@@ -130,6 +132,32 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 						      param.remote.ent_port,
 						      param.remote.network_retry);
 		if(repo == nullptr)
+		    throw Ememory("little_main");
+	    }
+
+	    if(param.ref_remote.ent_host.size() != 0)
+	    {
+		ref_repo = new (nothrow) entrepot_libcurl(dialog,
+							  entrepot_libcurl::string_to_curlprotocol(param.ref_remote.ent_proto),
+							  param.ref_remote.ent_login,
+							  param.ref_remote.ent_pass,
+							  param.ref_remote.ent_host,
+							  param.ref_remote.ent_port,
+							  param.ref_remote.network_retry);
+		if(ref_repo == nullptr)
+		    throw Ememory("little_main");
+	    }
+
+	    if(param.aux_remote.ent_host.size() != 0)
+	    {
+		aux_repo = new (nothrow) entrepot_libcurl(dialog,
+							  entrepot_libcurl::string_to_curlprotocol(param.aux_remote.ent_proto),
+							  param.aux_remote.ent_login,
+							  param.aux_remote.ent_pass,
+							  param.aux_remote.ent_host,
+							  param.aux_remote.ent_port,
+							  param.aux_remote.network_retry);
+		if(aux_repo == nullptr)
 		    throw Ememory("little_main");
 	    }
 
@@ -175,6 +203,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			else
 			    read_options.set_sequential_read(true);
 		    }
+		    if(ref_repo != nullptr)
+			read_options.set_entrepot(*ref_repo);
 		    arch = new (nothrow) archive(dialog, *param.ref_root, *param.ref_filename, EXTENSION,
 						 read_options);
 		    if(arch == nullptr)
@@ -212,6 +242,9 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			read_options.set_multi_threaded(param.multi_threaded);
 			if(param.sequential_read)
 			    throw Erange("little_main", gettext("Using sequential reading mode for archive source is not possible for merging operation"));
+			if(aux_repo != nullptr)
+			    read_options.set_entrepot(*aux_repo);
+
 			aux = new (nothrow) archive(dialog, *param.aux_root, *param.aux_filename, EXTENSION,
 						    read_options);
 			if(aux == nullptr)
@@ -452,6 +485,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 				// archive must be closed and re-open in read mode to be able
 				// to fetch delta signatures
 			    isolate_options.set_delta_signature(false);
+			    if(aux_repo != nullptr)
+				isolate_options.set_entrepot(*aux_repo);
 
 			    cur->op_isolate(dialog,
 					    *param.aux_root,
@@ -486,8 +521,10 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_slice_min_digits(param.ref_num_digits);
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
 		read_options.set_multi_threaded(param.multi_threaded);
-		if(repo != nullptr)
-		    read_options.set_entrepot(*repo);
+		if(ref_repo != nullptr)
+		    read_options.set_entrepot(*ref_repo);
+		    // yes this is "ref_repo" where is located the -A-pointed-to archive
+		    // -C-pointed-to archive is located in the "repo" entrepot
 
 		arch = new (nothrow) archive(dialog,
 					     *param.ref_root,
@@ -537,6 +574,10 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    isolate_options.set_delta_mask(*param.delta_mask);
 		if(param.delta_sig_min_size > 0)
 		    isolate_options.set_delta_sig_min_size(param.delta_sig_min_size);
+		if(repo != nullptr)
+		    isolate_options.set_entrepot(*repo);
+		    // yes this is "ref_repo" where is located the -A-pointed-to archive
+		    // -C-pointed-to archive is located in the "repo" entrepot
 
                 arch->op_isolate(dialog,
 				 *param.sauv_root,
@@ -594,6 +635,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    read_options.set_ref_crypto_size(param.crypto_size_ref);
 		    read_options.set_ref_execute(param.execute_ref);
 		    read_options.set_ref_slice_min_digits(param.ref_num_digits);
+		    if(ref_repo != nullptr)
+			read_options.set_ref_entrepot(*ref_repo);
 		}
 
 		arch = new (nothrow) archive(dialog,
@@ -702,6 +745,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    read_options.set_ref_crypto_size(param.crypto_size_ref);
 		    read_options.set_ref_execute(param.execute_ref);
 		    read_options.set_ref_slice_min_digits(param.ref_num_digits);
+		    if(ref_repo != nullptr)
+			read_options.set_ref_entrepot(*ref_repo);
 		}
 		arch = new (nothrow) archive(dialog,
 					     *param.sauv_root,
@@ -783,6 +828,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    read_options.set_ref_crypto_size(param.crypto_size_ref);
 		    read_options.set_ref_execute(param.execute_ref);
 		    read_options.set_ref_slice_min_digits(param.ref_num_digits);
+		    if(ref_repo != nullptr)
+			read_options.set_ref_entrepot(*ref_repo);
 		}
 		arch = new (nothrow) archive(dialog,
 					     *param.sauv_root,
@@ -899,6 +946,16 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		delete repo;
 		repo = nullptr;
 	    }
+	    if(ref_repo != nullptr)
+	    {
+		delete ref_repo;
+		ref_repo = nullptr;
+	    }
+	    if(aux_repo != nullptr)
+	    {
+		delete aux_repo;
+		aux_repo = nullptr;
+	    }
 	    throw;
 	}
 
@@ -945,6 +1002,16 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	{
 	    delete repo;
 	    repo = nullptr;
+	}
+	if(ref_repo != nullptr)
+	{
+	    delete ref_repo;
+	    ref_repo = nullptr;
+	}
+	if(aux_repo != nullptr)
+	{
+	    delete aux_repo;
+	    aux_repo = nullptr;
 	}
 
         return ret;

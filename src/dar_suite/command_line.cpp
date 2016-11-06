@@ -334,6 +334,8 @@ bool get_args(shell_interaction & dialog,
     p.delta_diff = true;
     p.delta_sig_min_size = 0; //< if zero is not modified, we will used the default value from libdar
     p.remote.clear();
+    p.ref_remote.clear();
+    p.aux_remote.clear();
 
     try
     {
@@ -892,8 +894,29 @@ static bool get_args_recursive(recursive_param & rec,
                             throw Ememory("get_args");
                         try
                         {
-                            tools_split_path_basename(optarg, p.ref_root, *p.ref_filename);
-                            rec.non_options.push_back("reference");
+			    string path_basename;
+
+			    if(tools_split_entrepot_path(optarg,
+							 p.ref_remote.ent_proto,
+							 p.ref_remote.ent_login,
+							 p.ref_remote.ent_pass,
+							 p.ref_remote.ent_host,
+							 p.ref_remote.ent_port,
+							 path_basename))
+			    {
+				tools_split_path_basename(path_basename.c_str(), p.ref_root, *p.ref_filename);
+				if(p.ref_remote.ent_pass.get_size() == 0)
+				    p.ref_remote.ent_pass = rec.dialog->get_secu_string(tools_printf(gettext("Please provide the password for login %S at host %S (archive of reference)"),
+												     &p.ref_remote.ent_login,
+												     &p.ref_remote.ent_host),
+											false);
+			    }
+			    else
+			    {
+				p.ref_remote.clear();
+				tools_split_path_basename(optarg, p.ref_root, *p.ref_filename);
+				rec.non_options.push_back("reference");
+			    }
                         }
                         catch(...)
                         {
@@ -1525,8 +1548,29 @@ static bool get_args_recursive(recursive_param & rec,
                         throw Ememory("get_args");
                     try
                     {
-                        tools_split_path_basename(optarg, p.aux_root, *p.aux_filename);
-                        rec.non_options.push_back("auxiliary");
+			string path_basename;
+
+			if(tools_split_entrepot_path(optarg,
+						     p.aux_remote.ent_proto,
+						     p.aux_remote.ent_login,
+						     p.aux_remote.ent_pass,
+						     p.aux_remote.ent_host,
+						     p.aux_remote.ent_port,
+						     path_basename))
+			{
+			    tools_split_path_basename(path_basename.c_str(), p.aux_root, *p.aux_filename);
+			    if(p.aux_remote.ent_pass.get_size() == 0)
+				p.aux_remote.ent_pass = rec.dialog->get_secu_string(tools_printf(gettext("Please provide the password for login %S at host %S (auxiliary archive of reference)"),
+												 &p.aux_remote.ent_login,
+												 &p.aux_remote.ent_host),
+										    false);
+			}
+			else
+			{
+			    p.aux_remote.clear();
+			    tools_split_path_basename(optarg, p.aux_root, *p.aux_filename);
+			    rec.non_options.push_back("auxiliary");
+			}
                     }
                     catch(...)
                     {
@@ -1794,7 +1838,11 @@ static bool get_args_recursive(recursive_param & rec,
 		if(!tools_my_atoi(optarg, tmp))
 		    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
 		else
+		{
 		    p.remote.network_retry = tmp;
+		    p.ref_remote.network_retry = tmp;
+		    p.aux_remote.network_retry = tmp;
+		}
 		break;
             case ':':
                 throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(optopt)));

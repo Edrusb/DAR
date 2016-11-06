@@ -157,6 +157,8 @@ struct line_param
     bool delta_diff;              //< whether to save binary diff or whole file's data during a differential backup
     infinint delta_sig_min_size;  //< size below which to never calculate delta signatures
     ent_params remote;            //< remote entrepot coordinates
+    ent_params ref_remote;        //< remote entrepot coordinates for archive of reference
+    ent_params aux_remote;        //< remote entrepot coordinates for the auxiliary archive
 
 	// constructor for line_param
     line_param()
