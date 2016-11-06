@@ -376,7 +376,8 @@ namespace libdar
 	    throw SRC_BUG;
 
 	(void)memmove(buffer, buffer + shift, last - shift);
-	first_to_write -= shift;
+	if(first_to_write < size)
+	    first_to_write -= shift;
 	next -= shift;
 	last -= shift;
 	buffer_offset += shift;
@@ -402,7 +403,7 @@ namespace libdar
 	    ref->skip(buffer_offset + first_to_write);
 	    ref->write(buffer + first_to_write, last - first_to_write);
 	}
-	first_to_write = last;
+	first_to_write = size;
 
 	if(shifted_mode)
 	    shift_by_half();
