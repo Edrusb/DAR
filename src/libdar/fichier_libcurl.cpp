@@ -338,10 +338,12 @@ namespace libdar
 
     void fichier_libcurl::inherited_sync_write()
     {
+	int running = 1;
 	switch_to_metadata(false);
 	add_easy_to_multi();
 
-	run_multi(gettext("Error met while syncing written data to remote file"));
+	while(inbuf > 0 && running)
+	    my_multi_perform(running, gettext("Error met while syncing written data to remote file"));
 
 	if(inbuf > 0)
 	    throw SRC_BUG; // multi has finished but data remain in transit
@@ -720,7 +722,6 @@ namespace libdar
 
 	return ret;
     }
-
 
     void fichier_libcurl_check_wait_or_throw(user_interaction & dialog,
 					     CURLcode err,
