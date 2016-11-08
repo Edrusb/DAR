@@ -2342,7 +2342,7 @@ namespace libdar
                 }
                 else // reached end of "hook" string
                 {
-                    throw Escript("tools_hook_substitute", dar_gettext("last char of user command-line to execute is '%', (use '%%' instead to avoid this message)"));
+                    throw Escript("tools_substitute", dar_gettext("last char of user command-line to execute is '%', (use '%%' instead to avoid this message)"));
                 }
             }
             else
@@ -2361,7 +2361,8 @@ namespace libdar
                                  const string & num,
                                  const string & padded_num,
                                  const string & ext,
-                                 const string & context)
+                                 const string & context,
+				 const string & base_url)
     {
         map<char, string> corres;
 
@@ -2372,6 +2373,7 @@ namespace libdar
         corres['N'] = padded_num;
         corres['e'] = ext;
         corres['c'] = context;
+	corres['u'] = base_url;
 
         return tools_substitute(hook, corres);
     }
@@ -2434,7 +2436,8 @@ namespace libdar
                                                   const string & num,
                                                   const string & padded_num,
                                                   const string & ext,
-                                                  const string & context)
+                                                  const string & context,
+						  const string & base_url)
     {
         string cmd_line;
 
@@ -2444,7 +2447,8 @@ namespace libdar
                                          num,
                                          padded_num,
                                          ext,
-                                         context);
+                                         context,
+					 base_url);
 
         try
         {

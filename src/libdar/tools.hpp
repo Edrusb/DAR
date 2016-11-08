@@ -652,6 +652,7 @@ namespace libdar
 	/// \param[in] padded_num is by what %N will be replaced
 	/// \param[in] ext is by what %e will be replaced
 	/// \param[in] context is by what %c will be replaced
+	/// \param[in] base_url remote repository base URL
 	/// \return the substitued resulting string
 	/// \note it now relies on tools_substitue
     extern std::string tools_hook_substitute(const std::string & hook,
@@ -660,7 +661,8 @@ namespace libdar
 					     const std::string & num,
 					     const std::string & padded_num,
 					     const std::string & ext,
-					     const std::string & context);
+					     const std::string & context,
+					     const std::string & base_url);
 
 
 	/// execute and retries at user will a given command line
@@ -681,6 +683,7 @@ namespace libdar
 	/// \param[in] padded_num is by what %N will be replaced
 	/// \param[in] ext is by what %e will be replaced
 	/// \param[in] context is by what %c will be replaced
+    	/// \param[in] base_url remote repository base URL
     extern void tools_hook_substitute_and_execute(user_interaction & ui,
 						  const std::string & hook,
 						  const std::string & path,
@@ -688,7 +691,8 @@ namespace libdar
 						  const std::string & num,
 						  const std::string & padded_num,
 						  const std::string & ext,
-						  const std::string & context);
+						  const std::string & context,
+						  const std::string & base_url);
 
 	/// builds a regex from root directory and user provided regex to be applied to the relative path
 

@@ -484,6 +484,10 @@ will be replaced by the slice extension (always substituted by "dar")
 .TP 10
 %c
 will be replaced by the context. Actually three possible values exist: "init", "operation" and "last_slice". When reading an archive for (testing, extraction, diff, listing, or while reading the archive of reference, see below the -F option), the "init" context takes place from the beginning up to the time the catalogue is retrieved. On a multiple slice archive this correspond to the last slice request. After, that point comes the "operation" context.  While creating an archive, the context is always "operation" except when the last slice has been created, in which case the context is set to "last_slice".
+.TP 10
+%u
+will be replaced by the full URL of path where the slice is stored
+.P
 .RE
 Several -E option can be given, given commands will then be called in the order they appear on the command line and -B included files. Such file given to -E option are known as DUC files (Dar User Command). See also the environment variable DAR_DUC_PATH in the ENVIRONMENT section at the end of this document.
 .TP 20

@@ -76,6 +76,8 @@ namespace libdar
 
 	    // inherited from class entrepot
 
+	    /// \note this is expected to have a double slash after the host:port
+	    /// like ftp://www.some.where:8021//tmp/sub/dir
 	std::string get_url() const { return base_URL + get_full_path().display(); };
 	void read_dir_reset() const;
 	bool read_dir_next(std::string & filename) const;

@@ -157,10 +157,10 @@ namespace libdar
 	base = base_name;
 	ext = extension;
 	of_data_name = data_name;
-	old_sar = false;
+	old_sar = format_07_compatible;
 	min_digits = x_min_digits;
 	hook_where = where.get_full_path().display();
-	old_sar = format_07_compatible;
+	base_url = where.get_url();
 
 	    // creating the slice if it does not exist else failing
 	try
@@ -268,6 +268,7 @@ namespace libdar
 	old_sar = false;
 	min_digits = 0;
 	hook_where = "";
+	base_url = "";
 
 	set_info_status(CONTEXT_INIT);
 	try
@@ -315,6 +316,7 @@ namespace libdar
 	old_sar = format_07_compatible;
 	min_digits = 0;
 	hook_where = "";
+	base_url = "";
 
 	set_info_status(CONTEXT_LAST_SLICE);
 	init(internal_name);
@@ -390,7 +392,8 @@ namespace libdar
 						  "1",
 						  sar_tools_make_padded_number("1", min_digits),
 						  ext,
-						  get_info_status());
+						  get_info_status(),
+						  base_url);
 		break;
 	    default:
 		throw SRC_BUG;

@@ -1373,6 +1373,9 @@ namespace libdar
 		deci conv = num;
 		string num_str = conv.human();
 
+		if(entr == nullptr)
+		    throw SRC_BUG;
+
 		tools_hook_substitute_and_execute(get_ui(),
 						  hook,
 						  entr->get_full_path().display(),
@@ -1380,7 +1383,8 @@ namespace libdar
 						  num_str,
 						  sar_tools_make_padded_number(num_str, min_digits),
 						  ext,
-						  get_info_status());
+						  get_info_status(),
+						  entr->get_url());
 	    }
 	    catch(Escript & g)
 	    {

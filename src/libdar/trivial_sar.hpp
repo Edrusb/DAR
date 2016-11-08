@@ -126,7 +126,8 @@ namespace libdar
 	label of_data_name;       //< archive's data name
 	bool old_sar;             //< true if the read sar has an old header (format <= "07") or the to be written is must keep a version 07 format.
 	infinint min_digits;      //< minimum number of digits in slice name
-	std::string hook_where;   //< what value to use for %p subsitution in hook
+	std::string hook_where;   //< what value to use for %p substitution in hook
+	std::string base_url;     //< what value to use for %u substitution in hook
 
 	void init(const label & internal_name); //< write the slice header and set the offset field (write mode), or (read-mode),  reads the slice header an set offset field
 
