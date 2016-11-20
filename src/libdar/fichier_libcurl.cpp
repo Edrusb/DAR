@@ -650,9 +650,24 @@ namespace libdar
 
     void fichier_libcurl::detruit()
     {
-	if(get_mode() == gf_write_only)
-	   terminate();
-	remove_easy_from_multi();
+	try
+	{
+	    if(get_mode() == gf_write_only)
+		terminate();
+	}
+	catch(...)
+	{
+		// ignore all errors
+	}
+
+	try
+	{
+	    remove_easy_from_multi();
+	}
+	catch(...)
+	{
+		// ignore all errors
+	}
 
 	if(easyhandle != nullptr)
 	{
