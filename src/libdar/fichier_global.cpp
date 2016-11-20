@@ -100,11 +100,21 @@ namespace libdar
     {
 	U_I wrote = 0;
 
-	while(wrote < size)
+	while(wrote < size && !disk_full)
 	{
 	    wrote += fichier_global_inherited_write(a+wrote, size-wrote);
 	    if(wrote < size)
-		get_ui().pause(gettext("No space left on device, you have the opportunity to make room now. When ready : can we continue ?"));
+	    {
+		try
+		{
+		    get_ui().pause(gettext("No space left on device, you have the opportunity to make room now. When ready : can we continue ?"));
+		}
+		catch(Euser_abort & e)
+		{
+		    disk_full = true;
+		    throw;
+		}
+	    }
 	}
     }
 

@@ -75,10 +75,15 @@ namespace libdar
 	    /// \note some well defined error case must generate an Esystem exception, other by Erange or
 	    /// more appropriated Egeneric exceptions to known what type of error must be handled
 	    /// by Esystem object, see the Esystem::io_error enum
-        fichier_global(const user_interaction & dialog, gf_mode mode): generic_file(mode), mem_ui(dialog) {};
+        fichier_global(const user_interaction & dialog, gf_mode mode): generic_file(mode),
+								       mem_ui(dialog),
+								       disk_full(false) {};
 
 	    /// copy constructor
-	fichier_global(const fichier_global & ref) : generic_file(ref), thread_cancellation(ref), mem_ui(ref) {};
+	fichier_global(const fichier_global & ref) : generic_file(ref),
+						     thread_cancellation(ref),
+						     mem_ui(ref),
+						     disk_full(ref.disk_full) {};
 
 	    // default assignment operator is fine here
 	    // default destructor is fine too here
@@ -122,6 +127,7 @@ namespace libdar
 	virtual bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message) = 0;
 
     private:
+	bool disk_full; //< whether user refused to continue due to disk being full
 
 	    // inherited from generic_file class and relocated as private methods
 	void inherited_write(const char *a, U_I size);
