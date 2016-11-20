@@ -375,12 +375,14 @@ namespace libdar
     {
 	U_I wrote = 0;
 	int running = 1;
+	bool full = false;
 
 	switch_to_metadata(false);
 	add_easy_to_multi();
 
 	while((wrote < size || inbuf > 0 || eof)
-	      && running > 0)
+	      && running > 0
+	      && !full)
 	{
 	    if(wrote < size)
 	    {
@@ -392,11 +394,17 @@ namespace libdar
 		inbuf += xfer;
 	    }
 
-	    my_multi_perform(running, gettext("Error met while writing data to remote file"));
+	    try
+	    {
+		my_multi_perform(running, gettext("Error met while writing data to remote file"));
+	    }
+	    catch(Edata & e)
+	    {
+		    // remote disk is full
+		full = true;
+	    }
 	}
 
-	if(wrote < size)
-	    throw SRC_BUG; // curl has finished transfer but data remain in pipe
 	current_offset += wrote;
 	if(current_offset > 0)
 	    append_write = true; // we can now ignore the request to erase data
@@ -747,6 +755,9 @@ namespace libdar
 	{
 	case CURLE_OK:
 	    break;
+	case CURLE_REMOTE_DISK_FULL:
+	case CURLE_UPLOAD_FAILED:
+	    throw Edata(curl_easy_strerror(err));
 	case CURLE_REMOTE_ACCESS_DENIED:
 	case CURLE_FTP_ACCEPT_FAILED:
 	case CURLE_UNSUPPORTED_PROTOCOL:
@@ -766,11 +777,9 @@ namespace libdar
 	case CURLE_UNKNOWN_OPTION:
 	case CURLE_FILESIZE_EXCEEDED:
 	case CURLE_LOGIN_DENIED:
-	case CURLE_REMOTE_DISK_FULL:
 	case CURLE_REMOTE_FILE_EXISTS:
 	case CURLE_REMOTE_FILE_NOT_FOUND:
 	case CURLE_PARTIAL_FILE:
-	case CURLE_UPLOAD_FAILED:
 	    throw Erange("entrepot_libcurl::check_wait_or_throw",
 			 tools_printf(gettext("%S: %s, aborting"),
 				      &err_context,
