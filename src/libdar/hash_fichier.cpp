@@ -113,11 +113,13 @@ namespace libdar
 	{
 		// ignore all errors
 	}
+
 	if(ref != nullptr)
 	{
 	    delete ref;
 	    ref = nullptr;
 	}
+
 	if(hash_ref != nullptr)
 	{
 	    delete hash_ref;
