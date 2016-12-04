@@ -1175,10 +1175,12 @@ static bool get_args_recursive(recursive_param & rec,
             case 'F':
                 if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+		line_tools_split_at_first_space(optarg, tmp_string, tmp_string2);
+		tmp_string = line_tools_get_full_path_from_PATH(rec.dar_duc_path, tmp_string.c_str()) + " " + tmp_string2;
                 if(p.execute_ref == "")
-                    p.execute_ref = optarg;
+                    p.execute_ref = tmp_string;
                 else
-                    p.execute_ref += string(" ; ") + optarg;
+                    p.execute_ref += string(" ; ") + tmp_string;
                 break;
             case 'J':
                 if(optarg == nullptr)
@@ -1492,10 +1494,12 @@ static bool get_args_recursive(recursive_param & rec,
             case '~':
                 if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+		line_tools_split_at_first_space(optarg, tmp_string, tmp_string2);
+                tmp_string = line_tools_get_full_path_from_PATH(rec.dar_duc_path, tmp_string.c_str()) + " " + tmp_string2;
                 if(p.aux_execute == "")
-                    p.aux_execute = optarg;
+                    p.aux_execute = tmp_string;
                 else
-                    p.aux_execute += string(" ; ") + optarg;
+                    p.aux_execute += string(" ; ") + tmp_string;
                 break;
             case '$':
                 if(optarg == nullptr)
