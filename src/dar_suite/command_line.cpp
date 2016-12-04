@@ -171,6 +171,7 @@ struct recursive_param
     bool detruire;
     bool no_inter;
     vector<string> read_targets; // list of not found uset targets so far
+    bool duc_and;
 
     recursive_param(shell_interaction & x_dialog,
                     const char *x_home,
@@ -194,6 +195,7 @@ struct recursive_param
         only_more_recent = false;
         detruire = true;
         no_inter = false;
+	duc_and = false;
     };
 
     recursive_param(const recursive_param & ref): dar_dcf_path(ref.dar_dcf_path), dar_duc_path(ref.dar_duc_path)
@@ -1170,17 +1172,29 @@ static bool get_args_recursive(recursive_param & rec,
                 if(p.execute == "")
                     p.execute = tmp_string;
                 else
-                    p.execute += string(" ; ") + tmp_string;
+		{
+		    if(rec.duc_and)
+			p.execute += string(" && ");
+		    else
+			p.execute += string(" , ");
+                    p.execute += tmp_string;
+		}
                 break;
             case 'F':
                 if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
 		line_tools_split_at_first_space(optarg, tmp_string, tmp_string2);
-		tmp_string = line_tools_get_full_path_from_PATH(rec.dar_duc_path, tmp_string.c_str()) + " " + tmp_string2;
+                tmp_string = line_tools_get_full_path_from_PATH(rec.dar_duc_path, tmp_string.c_str()) + " " + tmp_string2;
                 if(p.execute_ref == "")
                     p.execute_ref = tmp_string;
                 else
-                    p.execute_ref += string(" ; ") + tmp_string;
+		{
+		    if(rec.duc_and)
+			p.execute_ref += string(" && ");
+		    else
+			p.execute_ref += string(" , ");
+                    p.execute_ref += tmp_string;
+		}
                 break;
             case 'J':
                 if(optarg == nullptr)
@@ -1423,6 +1437,8 @@ static bool get_args_recursive(recursive_param & rec,
                     throw SRC_BUG; // testing the way a internal error is reported
                 else if(strcasecmp("b", optarg) == 0 || strcasecmp("blind-to-signatures", optarg) == 0)
                     p.blind_signatures = true;
+		else if(strcasecmp("duc", optarg) == 0)
+		    rec.duc_and = true;
                 else
                     throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
                 break;
@@ -1499,7 +1515,13 @@ static bool get_args_recursive(recursive_param & rec,
                 if(p.aux_execute == "")
                     p.aux_execute = tmp_string;
                 else
-                    p.aux_execute += string(" ; ") + tmp_string;
+		{
+		    if(rec.duc_and)
+			p.aux_execute += string(" && ");
+		    else
+			p.aux_execute += string(" , ");
+                    p.aux_execute += tmp_string;
+		}
                 break;
             case '$':
                 if(optarg == nullptr)

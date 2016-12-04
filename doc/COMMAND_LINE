@@ -8,7 +8,7 @@ Status flags:
 ---------------
 letters usage:
 ---------------
-a * alteration of operation             --alter   argument: s[aved] | SI[-unit[s]] | binary[-unit[s]] | a[time] | c[time] | m[ask] | n[o-case] | case | r[egex] | g[lob] | e[rase_ea] | k[eep-compressed] | f[ixed-date] | d[ecremental] | l[axist] | t[ape-marks] | h[oles-recheck] | secu | list-ea | i[gnore-unknown-inode-type] | do-not-compare-symlink-mtime | test-self-reported-bug | b[lind-to-signatures]
+a * alteration of operation             --alter   argument: s[aved] | SI[-unit[s]] | binary[-unit[s]] | a[time] | c[time] | m[ask] | n[o-case] | case | r[egex] | g[lob] | e[rase_ea] | k[eep-compressed] | f[ixed-date] | d[ecremental] | l[axist] | t[ape-marks] | h[oles-recheck] | secu | list-ea | i[gnore-unknown-inode-type] | do-not-compare-symlink-mtime | test-self-reported-bug | b[lind-to-signatures] | duc
 b - terminal bell                       --bell
 c + create archive                      --create
 d + difference with filesystem          --diff
