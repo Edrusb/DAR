@@ -1176,7 +1176,7 @@ static bool get_args_recursive(recursive_param & rec,
 		    if(rec.duc_and)
 			p.execute += string(" && ");
 		    else
-			p.execute += string(" , ");
+			p.execute += string(" ; ");
                     p.execute += tmp_string;
 		}
                 break;
@@ -1192,7 +1192,7 @@ static bool get_args_recursive(recursive_param & rec,
 		    if(rec.duc_and)
 			p.execute_ref += string(" && ");
 		    else
-			p.execute_ref += string(" , ");
+			p.execute_ref += string(" ; ");
                     p.execute_ref += tmp_string;
 		}
                 break;
@@ -1519,7 +1519,7 @@ static bool get_args_recursive(recursive_param & rec,
 		    if(rec.duc_and)
 			p.aux_execute += string(" && ");
 		    else
-			p.aux_execute += string(" , ");
+			p.aux_execute += string(" ; ");
                     p.aux_execute += tmp_string;
 		}
                 break;
