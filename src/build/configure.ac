@@ -918,10 +918,10 @@ AC_ARG_ENABLE( [furtive-read],
 AC_ARG_ENABLE( [debug],
                 AC_HELP_STRING(--enable-debug, [build targets with debugging option and no optimization]),
                 [
-		# yes we modify user variable here to remove any optimization
-                        CXXFLAGS="$CXXSTDFLAGS -ggdb -Wall"
-                        CFLAGS="-ggdb -Wall"
-			LDFLAGS="-ggdb -Wall"
+		# yes we modify user variable here
+                        CXXFLAGS="$CXXFLAGS $CXXSTDFLAGS -ggdb -Wall"
+                        CFLAGS="$CFLAGS -ggdb -Wall"
+			LDFLAGS="$LDFLAGS -ggdb -Wall"
                         debug_static="yes"
 			AC_DEFINE(LIBDAR_NO_OPTIMIZATION, 1, [if defined, informs the code that no optimization has been used for compilation])
                 ],
