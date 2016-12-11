@@ -236,22 +236,26 @@ namespace libdar
     infinint generic_thread::get_position() const
     {
 	infinint ret;
+	generic_thread *me = const_cast<generic_thread *>(this);
+
+	if(me == nullptr)
+	    throw SRC_BUG;
 
 	    // rerun the thread if an exception has occured previously
-	my_run();
+	me->my_run();
 
 	    // preparing the order message
 
-	order.clear();
-	order.set_type(msg_type::order_get_position);
+	me->order.clear();
+	me->order.set_type(msg_type::order_get_position);
 
 	    // order completed
 
-	send_order();
-	read_answer();
-	check_answer(msg_type::answr_position);
+	me->send_order();
+	me->read_answer();
+	me->check_answer(msg_type::answr_position);
 	ret = answer.get_infinint();
-	release_block_answer();
+	me->release_block_answer();
 
 	return ret;
     }
