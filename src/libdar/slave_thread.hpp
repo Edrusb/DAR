@@ -20,7 +20,7 @@
 /*********************************************************************/
 
     /// \file slave_thread.hpp
-    /// \brief class slave_thread is runs a I/O operations on a given genercif_file in a separated thread
+    /// \brief class slave_thread is runs a I/O operations on a given generic_file in a separated thread
     /// \ingroup Private
     ///
 
@@ -56,6 +56,7 @@ namespace libdar
 		     libthreadar::fast_tampon<char> *x_input_ctrl,
 		     libthreadar::fast_tampon<char> *x_output_ctrl);
 	slave_thread(const slave_thread & ref) { throw SRC_BUG; };
+	~slave_thread() noexcept {};
 	const slave_thread & operator = (const slave_thread & ref) { throw SRC_BUG; };
 
 	    /// true if the thread has suspended waiting for a new order (no data to write, no read_ahead to perform)
