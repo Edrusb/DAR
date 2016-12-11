@@ -328,7 +328,7 @@ bool get_args(shell_interaction & dialog,
     p.ignore_unknown_inode = false;
     p.no_compare_symlink_date = true;
     p.scope = all_fsa_families();
-    p.multi_threaded = true;
+    p.multi_threaded = false;
     p.delta_sig = false;
     p.delta_mask = nullptr;
     p.delta_diff = true;
@@ -751,6 +751,15 @@ bool get_args(shell_interaction & dialog,
 
         if(!p.alter_atime)
             p.security_check = false;
+
+	    ////////////////////////////////
+            // multi threading
+            //
+            //
+
+	if(p.multi_threaded && !rec.no_inter)
+	    rec.dialog->pause(gettext("Warning: libdar multi-threading is an experimental and unsupported feature, read man page about -G option for more information"));
+
     }
     catch(Erange & e)
     {
@@ -1506,9 +1515,10 @@ static bool get_args_recursive(recursive_param & rec,
             case 'G':
                 if(optarg != nullptr)
                     throw Erange("command_line.cpp:get_arg_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
-		if(compile_time::libthreadar() && !rec.no_inter)
-		    rec.dialog->pause(gettext("Warning: -G option is an experimental and unsupported feature, read man page about -G option for more information"));
-                p.multi_threaded = false;
+		if(compile_time::libthreadar())
+		    p.multi_threaded = true;
+		else
+		    throw Ecompilation(gettext("libthreadar required for multithreaded execution"));
                 break;
             case 'M':
                 if(p.same_fs)
@@ -2419,7 +2429,7 @@ const struct option *get_long_opt()
         {"fsa-scope", required_argument, nullptr, '4'},
         {"exclude-by-ea", optional_argument, nullptr, '5'},
         {"sign", required_argument, nullptr, '7'},
-        {"single-thread", no_argument, nullptr, 'G'},
+        {"multi-thread", no_argument, nullptr, 'G'},
 	{"delta", required_argument, nullptr, '8'},
 	{"include-delta-sig", required_argument, nullptr, '{'},
 	{"exclude-delta-sig", required_argument, nullptr, '}'},
