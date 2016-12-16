@@ -3323,6 +3323,7 @@ namespace libdar
 		break;
 	    case cat_inode::fsa_partial:
 		place_ino->fsa_set_saved_status(cat_inode::fsa_partial);
+		place_ino->fsa_partial_attach(add_ino->fsa_get_families());
 		break;
 	    case cat_inode::fsa_full:
 		tmp_fsa = new (pool) filesystem_specific_attribute_list(*add_ino->get_fsa()); // we clone the FSA of add_ino
