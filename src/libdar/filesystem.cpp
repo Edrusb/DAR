@@ -1453,7 +1453,7 @@ namespace libdar
 	    if(has_patch)
 	    {
 		if(exists == nullptr)
-		    throw Erange("filesystem_restore::write", tools_printf(gettext("Cannot restore a delta binary patch without a file to patch on filesystem: %S"), &spot_display));
+		    throw Erange("filesystem_restore::write", string(gettext("Cannot restore a delta binary patch without a file to patch on filesystem")));
 		if(x_fil == nullptr)
 		    throw SRC_BUG;
 	    }
