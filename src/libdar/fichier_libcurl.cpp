@@ -47,21 +47,16 @@ namespace libdar
 				     bool force_permission,
 				     U_I permission,
 				     bool erase): fichier_global(dialog, m),
+						  end_data_mode(false),
 						  easyhandle(nullptr),
-						  multihandle(nullptr),
-						  easy_in_multi(false),
 						  metadatamode(false),
 						  current_offset(0),
 						  has_maxpos(false),
 						  maxpos(0),
-						  inbuf(0),
-						  eof(false),
 						  append_write(!erase),
 						  meta_inbuf(0),
-						  ptr_tampon(nullptr),
-						  ptr_inbuf(nullptr),
-						  ptr_tampon_size(0),
-						  wait_delay(waiting)
+						  wait_delay(waiting),
+						  interthread(10, tampon_size)
     {
 	CURLcode err;
 
@@ -83,54 +78,30 @@ namespace libdar
 	    switch(get_mode())
 	    {
 	    case gf_read_only:
-		try
-		{
-			// yes, reading data from libcurl means for libcurl to write data to the application
-
-		    err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, write_data_callback);
-		    if(err != CURLE_OK)
-			throw Erange("","");
-		    err = curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, this);
-		    if(err != CURLE_OK)
-			throw Erange("","");
-		}
-		catch(Erange & e)
-		{
-		    throw Erange("entrepot_libcurl::handle_reset",
+		err = curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, this);
+		if(err != CURLE_OK)
+		    throw Erange("fichier_libcurl::fichier_libcurl",
 				 tools_printf(gettext("Error met while setting libcurl for reading data file: %s"),
 					      curl_easy_strerror(err)));
-		}
 		break;
 	    case gf_write_only:
-		try
-		{
-		    err = curl_easy_setopt(easyhandle, CURLOPT_READFUNCTION, read_data_callback);
-		    if(err != CURLE_OK)
-			throw Erange("","");
-		    err = curl_easy_setopt(easyhandle, CURLOPT_READDATA, this);
-		    if(err != CURLE_OK)
-			throw Erange("","");
-		    err = curl_easy_setopt(easyhandle, CURLOPT_UPLOAD, 1L);
-		    if(err != CURLE_OK)
-			throw Erange("","");
-			// should the CURLOPT_INFILESIZE_LARGE option but file size is not known at this time
-		}
-		catch(Erange & e)
-		{
-		    throw Erange("entrepot_libcurl::handle_reset",
+		err = curl_easy_setopt(easyhandle, CURLOPT_READDATA, this);
+		if(err != CURLE_OK)
+		    throw Erange("fichier_libcurl::fichier_libcurl",
 				 tools_printf(gettext("Error met while setting libcurl for writing data file: %s"),
 					      curl_easy_strerror(err)));
-		}
+		err = curl_easy_setopt(easyhandle, CURLOPT_UPLOAD, 1L);
+		if(err != CURLE_OK)
+		    throw Erange("fichier_libcurl::fichier_libcurl",
+				 tools_printf(gettext("Error met while setting libcurl for writing data file: %s"),
+					      curl_easy_strerror(err)));
 		break;
 	    case gf_read_write:
-		throw Efeature("libcurl does not support read/write mode, either read-only or write-only");
+		throw Efeature("read-write mode for fichier libcurl");
 	    default:
 		throw SRC_BUG;
 	    }
 
-	    multihandle = curl_multi_init();
-	    if(multihandle == nullptr)
-		throw Erange("entrepot_libcur::handle_reset", string(gettext("multihandle initialization failed")));
 	    switch_to_metadata(true);
 	    if(append_write && m != gf_read_only)
 		current_offset = get_size();
@@ -149,7 +120,6 @@ namespace libdar
 	struct curl_slist *headers = nullptr;
 	string order = tools_printf("site CHMOD %o", perm);
 
-	remove_easy_from_multi();
 	switch_to_metadata(true);
 	try
 	{
@@ -169,27 +139,19 @@ namespace libdar
 			     tools_printf(gettext("%s: %s"), errmsg, curl_easy_strerror(err)));
 	    }
 
-	    add_easy_to_multi();
-	    try
-	    {
-		run_multi(gettext("Error met while setting remote file permission"));
-	    }
-	    catch(Erange & e)
-	    {
-		e.prepend_message(gettext(errmsg));
-		throw;
-	    }
+	    err = curl_easy_perform(easyhandle);
+	    if(err != CURLE_OK)
+		throw Erange("fichier_libcurl::change_permission",
+			     tools_printf(gettext("%s: %s"), errmsg, curl_easy_strerror(err)));
 	}
 	catch(...)
 	{
-	    remove_easy_from_multi();
 	    (void)curl_easy_setopt(easyhandle, CURLOPT_QUOTE, nullptr);
 	    (void)curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 0);
 	    if(headers != nullptr)
 		curl_slist_free_all(headers);
 	    throw;
 	}
-	remove_easy_from_multi();
 	(void)curl_easy_setopt(easyhandle, CURLOPT_QUOTE, nullptr);
 	(void)curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 0);
 	if(headers != nullptr)
@@ -207,15 +169,15 @@ namespace libdar
 
 	if(!has_maxpos || get_mode() != gf_read_only)
 	{
-	    me->remove_easy_from_multi();
 	    me->switch_to_metadata(true);
 	    try
 	    {
 		err = curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 1);
 		if(err != CURLE_OK)
 		    throw Erange("","");
-		me->add_easy_to_multi();
-		run_multi(gettext("Error met while fetching remote file size"));
+		err = curl_easy_perform(easyhandle);
+		if(err != CURLE_OK)
+		    throw Erange("","");
 		err = curl_easy_getinfo(easyhandle, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &filesize);
 		if(filesize == -1) // file does not exist
 		    filesize = 0;
@@ -226,12 +188,10 @@ namespace libdar
 	    }
 	    catch(Erange & e)
 	    {
-		me->remove_easy_from_multi();
 		(void)curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 0);
 		e.prepend_message("Error met while fetching file size: ");
 		throw;
 	    }
-	    me->remove_easy_from_multi();
 	    (void)curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 0);
 	}
 
@@ -262,15 +222,10 @@ namespace libdar
 
     bool fichier_libcurl::skip(const infinint & pos)
     {
-	if(get_mode() != gf_read_only
-	   && inbuf > 0)
-	    sync_write();
-
 	switch(get_mode())
 	{
 	case gf_read_only:
-	    remove_easy_from_multi();
-	    switch_to_metadata(true); // necessary to have current_offset taken into account ->> A VIRER car RANGE maintenant
+	    switch_to_metadata(true); // necessary to stop current subthread and change easy_handle offset
 	    current_offset = pos;
 	    if(get_mode() == gf_write_only)
 	    {
@@ -338,31 +293,26 @@ namespace libdar
 
     void fichier_libcurl::inherited_sync_write()
     {
-	int running = 1;
-	switch_to_metadata(false);
-	add_easy_to_multi();
-
-	while(inbuf > 0 && running)
-	    my_multi_perform(running, gettext("Error met while syncing written data to remote file"));
-
-	if(inbuf > 0)
-	    throw SRC_BUG; // multi has finished but data remain in transit
+	    // nothing to do because there is no data in transit
+	    // except in interthread but it cannot be flushed faster
+	    // than the normal multi-thread process does
     }
 
-    void fichier_libcurl::inherited_flush_read() { inbuf = 0; }
+    void fichier_libcurl::inherited_flush_read()
+    {
+	switch_to_metadata(true);
+	interthread.reset();
+    }
 
     void fichier_libcurl::inherited_terminate()
     {
-	char tmp;
-
 	switch(get_mode())
 	{
 	case gf_write_only:
-	    eof = true;
-	    fichier_global_inherited_write(&tmp, 0);
-	    sync_write();
+	    switch_to_metadata(true);
 	    break;
 	case gf_read_only:
+	    switch_to_metadata(true);
 	    break;
 	case gf_read_write:
 	    throw SRC_BUG;
@@ -374,34 +324,50 @@ namespace libdar
     U_I fichier_libcurl::fichier_global_inherited_write(const char *a, U_I size)
     {
 	U_I wrote = 0;
-	int running = 1;
 	bool full = false;
+	char *ptr;
+	unsigned int ptr_size;
 
 	switch_to_metadata(false);
-	add_easy_to_multi();
 
-	while((wrote < size || inbuf > 0 || eof)
-	      && running > 0
-	      && !full)
+	while(wrote < size && !full)
 	{
-	    if(wrote < size)
-	    {
-		U_I room = tampon_size - inbuf;
-		U_I toadd = size - wrote;
-		U_I xfer = toadd > room ? room : toadd;
-		memcpy(tampon + inbuf, a + wrote, xfer);
-		wrote += xfer;
-		inbuf += xfer;
-	    }
-
 	    try
 	    {
-		my_multi_perform(running, gettext("Error met while writing data to remote file"));
+		if(!is_running())
+		{
+		    join();
+		    throw SRC_BUG;
+		    // inherited_run() should throw an exception
+		    // as this is not a normal condition:
+		    // we have not yet finished writing
+		    // data and child thread has already ended
+		}
 	    }
 	    catch(Edata & e)
 	    {
 		    // remote disk is full
 		full = true;
+	    }
+
+	    if(!full)
+	    {
+		U_I toadd = size - wrote;
+
+		interthread.get_block_to_feed(ptr, ptr_size);
+
+		if(toadd <= ptr_size)
+		{
+		    memcpy(ptr, a + wrote, toadd);
+		    interthread.feed(ptr, toadd);
+		    wrote = size;
+		}
+		else
+		{
+		    memcpy(ptr, a + wrote, ptr_size);
+		    interthread.feed(ptr, ptr_size);
+		    wrote += ptr_size;
+		}
 	    }
 	}
 
@@ -415,262 +381,152 @@ namespace libdar
 
     bool fichier_libcurl::fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message)
     {
-	int running = 1;
-
-	switch_to_metadata(false);
-	add_easy_to_multi();
+	char *ptr;
+	unsigned int ptr_size;
+	U_I room;
+	U_I delta;
 
 	read = 0;
-	while(read < size
-	      && (!eof || inbuf > 0))
+	do
 	{
-	    if(inbuf > 0)
+	    delta = 0;
+	    while(read + delta < size && (is_running() || interthread.is_not_empty()))
 	    {
-		U_I room = size - read;
-		U_I xfer = room > inbuf ? inbuf : room;
-		(void)memcpy(a + read, tampon, xfer);
-		read += xfer;
-		if(inbuf > xfer)
+		interthread.fetch(ptr, ptr_size);
+
+		room = size - read - delta;
+		if(room >= ptr_size)
 		{
-		    inbuf -= xfer; // xfer is not greater than inbuf by construction
-		    memmove(tampon, tampon + xfer, inbuf);
+		    memcpy(a + read + delta, ptr, ptr_size);
+		    interthread.fetch_recycle(ptr);
+		    delta += ptr_size;
 		}
 		else
-		    inbuf = 0;
+		{
+		    memcpy(a + read + delta, ptr, room);
+		    delta += room;
+		    ptr_size -= room;
+		    memmove(ptr, ptr + room, ptr_size);
+		    interthread.fetch_push_back(ptr, ptr_size);
+		}
 	    }
-	    else // inbuf == 0
-	    {
-		my_multi_perform(running, gettext("Error met while reading data from remote file"));
-		if(running == 0)
-		    eof = true;
-	    }
-	}
+	    current_offset += delta;
+	    read += delta;
 
-	if(read < size && !eof)
-	    throw SRC_BUG; // we should not return before having provided the requested data amount
-	current_offset += read;
+		// if interthread is empty and thread has not been launched at least once
+		// we can only now switch to data mode because current_offset is now correct.
+		// This will (re-)launch the thread that should fill interthread pipe with data
+	    if(metadatamode && !is_running() && interthread.is_empty())
+		switch_to_metadata(false);
+	}
+	while(read < size && (is_running() || interthread.is_not_empty()));
 
 	return true;
     }
 
-    void fichier_libcurl::add_easy_to_multi()
+    void fichier_libcurl::inherited_run()
     {
-	if(!easy_in_multi)
-	{
-	    CURLMcode errm = curl_multi_add_handle(multihandle, easyhandle);
-	    if(errm != CURLM_OK)
-		throw SRC_BUG;
-	    easy_in_multi = true;
-	}
-    }
+	CURLcode err;
 
-    void fichier_libcurl::remove_easy_from_multi()
-    {
-	if(easy_in_multi)
-	{
-	    CURLMcode errm = curl_multi_remove_handle(multihandle, easyhandle);
-	    if(errm != CURLM_OK)
-		throw SRC_BUG;
-	    easy_in_multi = false;
-	}
+	synchronize.unlock(); // release calling thread as we as child thread do now exist
+	err = curl_easy_perform(easyhandle);
+	if(err != CURLE_OK && !end_data_mode)
+	    throw Erange("fichier_libcurl::inherited_run",
+			 tools_printf(gettext("Error met in fichier_libcurl thread: %s"), curl_easy_strerror(err)));
     }
 
     void fichier_libcurl::switch_to_metadata(bool mode)
     {
+	CURLcode err;
+
 	if(mode == metadatamode)
 	    return;
 
 	if(!mode) // data mode
 	{
-
-		// setting the offset of the next byte to read / write
-
-	    CURLcode erre;
 	    infinint resume;
-	    infinint iinbuf = inbuf;
 	    curl_off_t cur_pos = 0;
 
 	    switch(get_mode())
 	    {
 	    case gf_read_only:
-		if(easy_in_multi)
-		    throw SRC_BUG;
-		resume = current_offset + iinbuf;
+		err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, write_data_callback);
+		if(err != CURLE_OK)
+		    throw Erange("fichier_libcurl::switch_to_metadata",
+				 tools_printf(gettext("Error met while setting libcurl for reading data file: %s"),
+					      curl_easy_strerror(err)));
+
+				// setting the offset of the next byte to read / write
+
+		resume = current_offset;
 		resume.unstack(cur_pos);
 		if(!resume.is_zero())
 		    throw Erange("fichier_libcurl::switch_to_metadata",
 				 gettext("Integer too large for libcurl, cannot skip at the requested offset in the remote repository"));
-		erre = curl_easy_setopt(easyhandle, CURLOPT_RESUME_FROM_LARGE, cur_pos);
-		if(erre != CURLE_OK)
+		err = curl_easy_setopt(easyhandle, CURLOPT_RESUME_FROM_LARGE, cur_pos);
+		if(err != CURLE_OK)
 		    throw Erange("fichier_libcurl::switch_to_metadata",
-				 tools_printf(gettext("Error while seeking in file on remote repository: %s"), curl_easy_strerror(erre)));
+				 tools_printf(gettext("Error while seeking in file on remote repository: %s"), curl_easy_strerror(err)));
+
 		break;
 	    case gf_write_only:
-		erre = curl_easy_setopt(easyhandle, CURLOPT_APPEND, append_write ? 1 : 0);
-		if(erre != CURLE_OK)
+		err = curl_easy_setopt(easyhandle, CURLOPT_READFUNCTION, read_data_callback);
+		if(err != CURLE_OK)
+		    throw Erange("fichier_libcurl::switch_to_metadata",
+				 tools_printf(gettext("Error met while setting libcurl for writing data file: %s"),
+					      curl_easy_strerror(err)));
+
+		    // setting the offset of the next byte to read / write
+
+		err = curl_easy_setopt(easyhandle, CURLOPT_APPEND, append_write ? 1 : 0);
+		if(err != CURLE_OK)
 		    throw Erange("fichier_libcur::switch_to_metadata",
-				 tools_printf(gettext("Error while setting write append mode for libcurl: %s"), curl_easy_strerror(erre)));
+				 tools_printf(gettext("Error while setting write append mode for libcurl: %s"), curl_easy_strerror(err)));
+
+		    // should also set the CURLOPT_INFILESIZE_LARGE option but file size is not known at this time
 		break;
 	    case gf_read_write:
 		throw SRC_BUG;
 	    default:
 		throw SRC_BUG;
 	    }
-
-	    ptr_tampon = tampon;
-	    ptr_inbuf = &inbuf;
-	    ptr_tampon_size = tampon_size;
+	    run_thread();
 	}
 	else // metadata mode
 	{
+	    stop_thread();
 	    meta_inbuf = 0; // we don't care existing metadata remaining in transfer
-	    ptr_tampon = meta_tampon;
-	    ptr_inbuf = &meta_inbuf;
-	    ptr_tampon_size = tampon_size;
+
+	    switch(get_mode())
+	    {
+	    case gf_read_only:
+		err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, write_meta_callback);
+		if(err != CURLE_OK)
+		    throw Erange("fichier_libcurl::switch_to_metadata",
+				 tools_printf(gettext("Error met while setting libcurl for reading data file: %s"),
+					      curl_easy_strerror(err)));
+		break;
+	    case gf_write_only:
+		err = curl_easy_setopt(easyhandle, CURLOPT_READFUNCTION, read_meta_callback);
+		if(err != CURLE_OK)
+		    throw Erange("fichier_libcurl::switch_to_metadata",
+				 tools_printf(gettext("Error met while setting libcurl for writing data file: %s"),
+					      curl_easy_strerror(err)));
+		break;
+	    case gf_read_write:
+		throw SRC_BUG;
+	    default:
+		throw SRC_BUG;
+	    }
 	}
 	metadatamode = mode;
-    }
-
-
-    void fichier_libcurl::run_multi(const string & context_msg) const
-    {
-	int running;
-	fichier_libcurl *me = const_cast<fichier_libcurl *>(this);
-	if(me == nullptr)
-	    throw SRC_BUG;
-
-	if(!easy_in_multi)
-	    throw SRC_BUG;
-
-	do
-	{
-	    me->my_multi_perform(running, context_msg);
-	}
-	while(running); // no mistake here: when "running" is null, boolean evaluation of "running" is false as expected
-    }
-
-    void fichier_libcurl::copy_from(const fichier_libcurl & ref)
-    {
-	easy_in_multi = ref.easy_in_multi;
-	metadatamode = !ref.metadatamode; // we will use switch_to_metadata to put pointers and metadatamode right at the same time
-	current_offset = ref.current_offset;
-	has_maxpos = ref.has_maxpos;
-	maxpos = ref.maxpos;
-	memcpy(tampon, ref.tampon, ref.inbuf);
-	inbuf = ref.inbuf;
-	eof = ref.eof;
-	append_write = ref.append_write;
-	meta_inbuf = 0; // don't care data in meta_tampon
-	wait_delay = ref.wait_delay;
-	ptr_tampon_size = ref.ptr_tampon_size;
-
-	if(ref.easyhandle == nullptr)
-	    easyhandle = nullptr;
-	else
-	    easyhandle = curl_easy_duphandle(ref.easyhandle);
-
-	if(ref.multihandle != nullptr)
-	{
-	    multihandle = curl_multi_init();
-	    if(multihandle == nullptr)
-		throw Erange("entrepot_libcur::handle_reset", string(gettext("multhandle initialization failed")));
-	    switch_to_metadata(ref.metadatamode);
-	    if(easy_in_multi)
-	    {
-		if(easyhandle == nullptr)
-		    throw SRC_BUG;
-		else
-		{
-		    easy_in_multi = !easy_in_multi;
-		    add_easy_to_multi();
-		}
-	    }
-	}
-	else
-	{
-	    multihandle = nullptr;
-	    ptr_tampon = nullptr;
-	    ptr_inbuf = nullptr;
-	    if(easy_in_multi)
-		throw SRC_BUG;
-	}
-    }
-
-    void fichier_libcurl::copy_parent_from(const fichier_libcurl & ref)
-    {
-	fichier_global *me = this;
-	const fichier_global *you = &ref;
-	*me = *you;
-    }
-
-    void fichier_libcurl::my_multi_perform(int & running, const string & context_msg)
-    {
-	CURLMcode errm = CURLM_OK;
-	bool err = false;
-
-	if(!easy_in_multi)
-	    throw SRC_BUG;
-
-	do
-	{
-	    errm = curl_multi_perform(multihandle, &running);
-	    switch(errm)
-	    {
-	    case CURLM_OK:
-		err = check_info_after_multi_perform(context_msg);
-		break;
-	    default:
-		err = check_info_after_multi_perform(context_msg + string(": ") + string(curl_multi_strerror(errm)));
-	    }
-	    if(err)
-	    {
-		remove_easy_from_multi();
-		add_easy_to_multi();
-	    }
-	}
-	while(err);
-    }
-
-    bool fichier_libcurl::check_info_after_multi_perform(const string & context_msg) const
-    {
-	int msgs_in_queue;
-	CURLMsg *ptr = nullptr;
-	bool err = false;
-
-	while((ptr = curl_multi_info_read(multihandle, &msgs_in_queue)) != nullptr)
-	{
-	    if(ptr->easy_handle != easyhandle)
-		throw SRC_BUG;
-	    if(ptr->msg != CURLMSG_DONE)
-		throw SRC_BUG;
-	    if(ptr->data.result != CURLE_OK)
-	    {
-		err = true;
-		fichier_libcurl_check_wait_or_throw(get_ui(),
-						    ptr->data.result,
-						    wait_delay,
-						    context_msg);
-	    }
-	}
-
-	return err;
     }
 
     void fichier_libcurl::detruit()
     {
 	try
 	{
-	    if(get_mode() == gf_write_only)
-		terminate();
-	}
-	catch(...)
-	{
-		// ignore all errors
-	}
-
-	try
-	{
-	    remove_easy_from_multi();
+	    terminate();
 	}
 	catch(...)
 	{
@@ -682,36 +538,73 @@ namespace libdar
 	    curl_easy_cleanup(easyhandle);
 	    easyhandle = nullptr;
 	}
+    }
 
-	if(multihandle != nullptr)
+    void fichier_libcurl::run_thread()
+    {
+	if(interthread.is_not_empty())
+	    throw SRC_BUG;
+	    // interthread should have been purged when
+	    // previous thread had ended
+
+	end_data_mode = false;
+	if(is_running())
+	    throw SRC_BUG;
+	run();
+	synchronize.lock(); // waiting for child thread to unlock mutex to signal it has been spawned
+    }
+
+    void fichier_libcurl::stop_thread()
+    {
+	if(is_running())
 	{
-	    curl_multi_cleanup(multihandle);
-	    multihandle = nullptr;
+	    end_data_mode = true;
+	    if(get_mode() == gf_write_only)
+	    {
+		char *ptr;
+		unsigned int ptr_size;
+		interthread.get_block_to_feed(ptr, ptr_size);
+		interthread.feed(ptr, 0); // trigger the thread if it was waiting for data from interthread
+	    }
 	}
+	join();
     }
 
     size_t fichier_libcurl::write_data_callback(char *buffer, size_t size, size_t nmemb, void *userp)
     {
-	size_t ret;
-	size_t amount = size * nmemb;
+	size_t remain = size * nmemb;
+	size_t lu = 0;
 	fichier_libcurl *me = (fichier_libcurl *)(userp);
+	char *ptr;
+	unsigned int ptr_size;
 
 	if(me == nullptr)
 	    throw SRC_BUG;
 
-	if(amount + *(me->ptr_inbuf) > me->ptr_tampon_size)
-	    if(me->ptr_inbuf == 0)
-		throw SRC_BUG; // buffer is too short to receive this data
-	    else
-		ret = CURL_WRITEFUNC_PAUSE;
-	else // enough room to store data in tampon
+	while(!me->end_data_mode && remain > 0)
 	{
-	    (void)memcpy(me->ptr_tampon + *(me->ptr_inbuf), buffer, amount);
-	    ret = amount;
-	    *(me->ptr_inbuf) += amount;
+	    me->interthread.get_block_to_feed(ptr, ptr_size);
+
+	    if(remain <= ptr_size)
+	    {
+		memcpy(ptr, buffer + lu, remain);
+		me->interthread.feed(ptr, remain);
+		lu += remain;
+		remain = 0;
+	    }
+	    else
+	    {
+		memcpy(ptr, buffer + lu, ptr_size);
+		me->interthread.feed(ptr, ptr_size);
+		remain -= ptr_size;
+		lu += ptr_size;
+	    }
 	}
 
-	return ret;
+	if(me->end_data_mode)
+	    lu = 0; // to force easy_perform() that called us, to return
+
+	return lu;
     }
 
     size_t fichier_libcurl::read_data_callback(char *bufptr, size_t size, size_t nitems, void *userp)
@@ -719,31 +612,40 @@ namespace libdar
 	size_t ret;
 	size_t room = size * nitems;
 	fichier_libcurl *me = (fichier_libcurl *)(userp);
-	size_t xfer;
+	char *ptr;
+	unsigned int ptr_size;
 
 	if(me == nullptr)
 	    throw SRC_BUG;
 
-	xfer = room > *(me->ptr_inbuf) ? *(me->ptr_inbuf) : room;
-	if(xfer > 0)
+	me->interthread.fetch(ptr, ptr_size);
+
+	if(ptr_size <= room)
 	{
-	    memcpy(bufptr, me->ptr_tampon, xfer);
-	    if(*(me->ptr_inbuf) > xfer)
-	    {
-		*(me->ptr_inbuf) -= xfer;
-		memmove(me->ptr_tampon, me->ptr_tampon + xfer, *(me->ptr_inbuf));
-	    }
-	    else
-		*(me->ptr_inbuf) = 0;
-	    ret = xfer;
+	    memcpy(bufptr, ptr, ptr_size);
+	    me->interthread.fetch_recycle(ptr);
+	    ret = ptr_size;
 	}
 	else
-	    if(me->eof)
-		ret = 0;
-	    else
-		ret = CURL_READFUNC_PAUSE;
+	{
+	    memcpy(bufptr, ptr, room);
+	    ptr_size -= room;
+	    memmove(ptr, ptr + room, ptr_size);
+	    me->interthread.fetch_push_back(ptr, ptr_size);
+	    ret = room;
+	}
 
 	return ret;
+    }
+
+    size_t fichier_libcurl::write_meta_callback(char *buffer, size_t size, size_t nmemb, void *userp)
+    {
+	return size * nmemb;
+    }
+
+    size_t fichier_libcurl::read_meta_callback(char *bufptr, size_t size, size_t nitems, void *userp)
+    {
+	return 0;
     }
 
     void fichier_libcurl_check_wait_or_throw(user_interaction & dialog,

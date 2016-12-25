@@ -40,6 +40,7 @@ extern "C"
 } // end extern "C"
 
 #include <string>
+#include <libthreadar/libthreadar.hpp>
 
 #include "integers.hpp"
 #include "thread_cancellation.hpp"
@@ -57,7 +58,7 @@ namespace libdar
 
 	/// libcurl remote files
 
-    class fichier_libcurl : public fichier_global
+    class fichier_libcurl : public fichier_global, protected libthreadar::thread
     {
     public:
 
@@ -71,13 +72,14 @@ namespace libdar
 			U_I permission,             //< file permission to enforce if force_permission is set
 			bool erase);                //< whether to erase the file before writing to it
 
-	fichier_libcurl(const fichier_libcurl & ref) : fichier_global(ref) { copy_from(ref); };
+	    // no copy constructor available
+	    // because we inherit from libthreadar::thread that has not copy constructor
 
-	    /// assignment operator
-	const fichier_libcurl & operator = (const fichier_libcurl & ref) { detruit(); copy_parent_from(ref); copy_from(ref); return *this; };
+	    // no assignment operator
+	    // because we inherit from libthreadar::thread that has not copy constructor
 
 	    /// destructor
-	~fichier_libcurl() { detruit(); };
+	~fichier_libcurl() noexcept { detruit(); };
 
 	    /// change the permission of the file
 	virtual void change_permission(U_I perm);
@@ -109,41 +111,37 @@ namespace libdar
 	U_I fichier_global_inherited_write(const char *a, U_I size);
         bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message);
 
+	    // inherited from thread
+	void inherited_run();
+
     private:
 	static const U_I tampon_size = CURL_MAX_WRITE_SIZE;
 
+	    // internal thread managed the data transfers between libcurl and object's buffer using callbacks
+	    // object run in caller thread and fetches/drops data to object's buffers for data transfers but
+	    // also suspend internal thread to proceed to control calling directly libcurl (metadata mode)
+	bool end_data_mode;               //< true if subthread has been requested to end
 	CURL *easyhandle;                 //< easy handle that we modify when necessary
-	CURLM *multihandle;               //< multi handle to which is added the easyhandle for step by step libcurl interaction
-	bool easy_in_multi;               //< whether easyhandle is added to multihandle
 	bool metadatamode;                //< wether we are acting on metadata rather than file's data
 	infinint current_offset;          //< current offset we are reading / writing at
 	bool has_maxpos;                  //< true if maxpos is set
 	infinint maxpos;                  //< in read mode this is the filesize, in write mode this the offset where to append data (not ovewriting)
-	char tampon[tampon_size];         //< data in transit to / from libcurl
-	U_I inbuf;                        //< amount of byte available in "tampon"
-	bool eof;                         //< whether we have reached end of file (read mode)
 	bool append_write;                //< whether we should append to data (and not replace) when uploading
 	char meta_tampon[tampon_size];    //< trash in transit data used to carry metadata
 	U_I meta_inbuf;                   //< amount of byte available in "meta_tampon"
-	char *ptr_tampon;                 //< points to tampon or meta_tampon depending on the metadata mode
-	U_I *ptr_inbuf;                   //< points to inbuf or meta_in_buf depending on the metadata mod
-	U_I ptr_tampon_size;              //< the allocated size in bytes of buffer pointed to by ptr_tampon
 	U_I wait_delay;                   //< time in second to wait before retrying in case of network error
+	libthreadar::fast_tampon<char> interthread; //< data channel for reading or writing with subthread
+	libthreadar::mutex synchronize;   //< used to be sure subthread has been launched
 
-
-	void add_easy_to_multi();
-	void remove_easy_from_multi();
 	void switch_to_metadata(bool mode);//< set to true to get or set file's metadata, false to read/write file's data
-	void run_multi(const std::string & context_msg) const;           //< blindly run multihandle up to the end of transfer
-	void copy_from(const fichier_libcurl & ref);
-	void copy_parent_from(const fichier_libcurl & ref);
-	void my_multi_perform(int & running, const std::string & context_msg); //< robust wrapper to curl_multi_perform to face temporary network error conditions
-	bool check_info_after_multi_perform(const std::string & context_msg) const; //< depending on error type, wait and retry or throw an exception, return false if no error was met
 	void detruit();
+	void run_thread();
+	void stop_thread();
 
 	static size_t write_data_callback(char *buffer, size_t size, size_t nmemb, void *userp);
 	static size_t read_data_callback(char *bufptr, size_t size, size_t nitems, void *userp);
-	static size_t null_callback(char *bufptr, size_t size, size_t nmemb, void *userp) { return size*nmemb; };
+       	static size_t write_meta_callback(char *buffer, size_t size, size_t nmemb, void *userp);
+	static size_t read_meta_callback(char *bufptr, size_t size, size_t nitems, void *userp);
     };
 
 	/// helper function to handle libcurl error code
