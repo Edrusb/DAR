@@ -223,6 +223,9 @@ namespace libdar
 
     bool fichier_libcurl::skip(const infinint & pos)
     {
+	if(pos == current_offset)
+	    return true;
+
 	switch(get_mode())
 	{
 	case gf_read_only:
@@ -242,9 +245,7 @@ namespace libdar
 		flush_read();
 	    break;
 	case gf_write_only:
-	    if(pos != current_offset)
-		throw Erange("fichier_libcurl::skip", string(gettext("libcurl does not allow skipping in write mode")));
-	    break;
+	    throw Erange("fichier_libcurl::skip", string(gettext("libcurl does not allow skipping in write mode")));
 	case gf_read_write:
 	    throw SRC_BUG;
 	default:
