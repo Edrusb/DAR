@@ -286,8 +286,9 @@ namespace libdar
 	    if(ret == nullptr)
 		throw Ememory("entrepot_libcurl::inherited_open");
 
-	    if(mode == gf_read_write)
+	    switch(mode)
 	    {
+	    case gf_read_write:
 		rw = new (nothrow) cache_global(dialog, ret, true);
 		if(rw != nullptr)
 		{
@@ -299,7 +300,20 @@ namespace libdar
 		}
 		else
 		    throw Ememory("entrpot_libcurl::inherited_open");
-
+		break;
+	    case gf_read_only:
+		rw = new (nothrow) cache_global(dialog, ret, false);
+		if(rw != nullptr)
+		{
+		    ret = nullptr;  // the former object pointed to by ret is now managed by rw
+		    ret = rw;
+		    rw = nullptr;
+		}
+		break;
+	    case gf_write_only:
+		break; // no cache in write only mode
+	    default:
+		throw SRC_BUG;
 	    }
 	}
 	catch(...)
