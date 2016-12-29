@@ -94,7 +94,15 @@ namespace libdar
 #endif
 
 #else
-    throw Efeature("libcurl");
+
+#if ! defined ( LIBCURL_AVAILABLE )
+	throw Efeature("libcurl");
+#elif ! defined ( LIBTHREADAR_AVAILABLE )
+	throw Efeature("libthreadar");
+#else
+	throw SRC_BUG;
+#endif
+
 #endif
     }
 
