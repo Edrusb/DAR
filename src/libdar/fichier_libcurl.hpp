@@ -122,6 +122,7 @@ namespace libdar
 	    // object run in caller thread and fetches/drops data to object's buffers for data transfers but
 	    // also suspend internal thread to proceed to control calling directly libcurl (metadata mode)
 	bool end_data_mode;               //< true if subthread has been requested to end
+	bool sub_is_dying;                //< is set by subthread when about to end
 	CURL *easyhandle;                 //< easy handle that we modify when necessary
 	bool metadatamode;                //< wether we are acting on metadata rather than file's data
 	infinint current_offset;          //< current offset we are reading / writing at

@@ -48,6 +48,7 @@ namespace libdar
 				     U_I permission,
 				     bool erase): fichier_global(dialog, m),
 						  end_data_mode(false),
+						  sub_is_dying(false),
 						  easyhandle(nullptr),
 						  metadatamode(false),
 						  current_offset(0),
@@ -334,7 +335,7 @@ namespace libdar
 	{
 	    try
 	    {
-		if(!is_running())
+		if(!is_running() || sub_is_dying)
 		{
 		    join();
 		    throw SRC_BUG;
@@ -386,11 +387,13 @@ namespace libdar
 	U_I room;
 	U_I delta;
 
+	switch_to_metadata(false);
+
 	read = 0;
 	do
 	{
 	    delta = 0;
-	    while(read + delta < size && (is_running() || interthread.is_not_empty()))
+	    while(read + delta < size && (!sub_is_dying || interthread.is_not_empty()))
 	    {
 		interthread.fetch(ptr, ptr_size);
 
@@ -428,8 +431,35 @@ namespace libdar
     {
 	CURLcode err;
 
-	synchronize.unlock(); // release calling thread as we as child thread do now exist
+	sub_is_dying = false;
+	synchronize.unlock(); // release calling thread as we, as child thread, do now exist
 	err = curl_easy_perform(easyhandle);
+	sub_is_dying = true;
+	if(!end_data_mode) // natural death, main thread has not required our death
+	{
+	    char *ptr;
+	    unsigned int ptr_size;
+
+	    switch(get_mode())
+	    {
+	    case gf_write_only:
+		    // making room in the pile to toggle main thread if
+		    // it was suspended waiting for a block to feed
+		interthread.fetch(ptr, ptr_size);
+		interthread.fetch_recycle(ptr);
+		break;
+	    case gf_read_only:
+		    // sending a zero length block to toggle main thread
+		    // if it was suspended waiting for a block to fetch
+		interthread.get_block_to_feed(ptr, ptr_size);
+		interthread.feed(ptr, 0); // means eof to main thread
+		break;
+	    case gf_read_write:
+		throw SRC_BUG;
+	    default:
+		throw SRC_BUG;
+	    }
+	}
 	if(err != CURLE_OK && !end_data_mode)
 	    throw Erange("fichier_libcurl::inherited_run",
 			 tools_printf(gettext("Error met in fichier_libcurl thread: %s"), curl_easy_strerror(err)));
@@ -558,13 +588,24 @@ namespace libdar
     {
 	if(is_running())
 	{
+	    char *ptr;
+	    unsigned int ptr_size;
+
 	    end_data_mode = true;
-	    if(get_mode() == gf_write_only)
+	    switch(get_mode())
 	    {
-		char *ptr;
-		unsigned int ptr_size;
+	    case gf_write_only:
 		interthread.get_block_to_feed(ptr, ptr_size);
 		interthread.feed(ptr, 0); // trigger the thread if it was waiting for data from interthread
+		break;
+	    case gf_read_only:
+		interthread.fetch(ptr, ptr_size);
+		interthread.fetch_recycle(ptr); // trigger the thread if it was waiting for a free block to fill
+		break;
+	    case gf_read_write:
+		throw SRC_BUG;
+	    default:
+		throw SRC_BUG;
 	    }
 	}
 	join();
