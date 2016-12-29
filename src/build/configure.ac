@@ -1419,7 +1419,7 @@ else
 fi
 
 printf "   Remote repository support  : "
-if [ "$local_libcurl" = "yes" ] ; then
+if [ "$local_libcurl" = "yes" -a "$local_threadar" = "yes" ] ; then
   echo "YES"
 else
   echo "NO"

@@ -40,8 +40,9 @@ extern "C"
 } // end extern "C"
 
 #include <string>
+#ifdef LIBTHREADAR_AVAILABLE
 #include <libthreadar/libthreadar.hpp>
-
+#endif
 #include "integers.hpp"
 #include "thread_cancellation.hpp"
 #include "label.hpp"
@@ -54,7 +55,7 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-#if LIBCURL_AVAILABLE
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 
 	/// libcurl remote files
 
@@ -144,6 +145,9 @@ namespace libdar
 	static size_t read_meta_callback(char *bufptr, size_t size, size_t nitems, void *userp);
     };
 
+#endif
+
+#ifdef LIBTHREADAR_AVAILABLE
 	/// helper function to handle libcurl error code
 	/// wait or throw an exception depending on error condition
 	///
@@ -155,7 +159,14 @@ namespace libdar
 						    CURLcode err,
 						    U_I wait_seconds,
 						    const std::string & err_context);
-
+#else
+#if LIBCURL_AVAILABLE
+    inline void fichier_libcurl_check_wait_or_throw(user_interaction & dialog,
+						    CURLcode err,
+						    U_I wait_seconds,
+						    const std::string & err_context)
+    { throw SRC_BUG; }
+#endif
 #endif
 	/// @}
 

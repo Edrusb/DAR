@@ -69,7 +69,7 @@ namespace libdar
 							  base_URL(build_url_from(proto, host, port)),
 							  wait_delay(waiting_time)
     {
-#if LIBCURL_AVAILABLE
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	current_dir.clear();
 	reading_dir_tmp.clear();
 
@@ -263,7 +263,7 @@ namespace libdar
 
 	try
 	{
-
+#ifdef LIBTHREADAR_AVAILABLE
 	    ret = new (get_pool()) fichier_libcurl(dialog,
 						   chemin,
 						   easyhandle,
@@ -272,6 +272,9 @@ namespace libdar
 						   force_permission,
 						   permission,
 						   erase);
+#else
+	    throw Efeature("libthreadar");
+#endif
 	    if(ret == nullptr)
 		throw Ememory("entrepot_libcurl::inherited_open");
 
