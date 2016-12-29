@@ -250,9 +250,9 @@ namespace libdar
 #endif
 	}
 
-	bool libcurl()
+	bool remote_repository()
 	{
-#if LIBCURL_AVAILABLE
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	    return true;
 #else
 	    return false;

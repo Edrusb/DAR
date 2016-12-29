@@ -124,11 +124,11 @@ namespace libdar
 	    /// returns whether libthreadar linking will be done, allowing libdar to span several threads
 	bool libthreadar();
 
-	    /// returns whether librsync is available and delta diff stuff with it
+	    /// returns whether delta compression is available and delta diff stuff with it
 	bool librsync();
 
-	    /// returns whether libcurl is available and remote repository feature is available
-	bool libcurl();
+	    /// returns whether remote repository feature is available
+	bool remote_repository();
 
     }
 
