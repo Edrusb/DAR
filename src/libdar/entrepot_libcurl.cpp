@@ -109,7 +109,7 @@ namespace libdar
     void entrepot_libcurl::read_dir_reset() const
     {
 #if LIBCURL_AVAILABLE
-	CURLcode err;
+	CURLcode err = CURLE_OK;
 	long listonly;
 	entrepot_libcurl *me = const_cast<entrepot_libcurl *>(this);
 
