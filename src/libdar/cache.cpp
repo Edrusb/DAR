@@ -177,15 +177,40 @@ namespace libdar
     bool cache::skip_to_eof()
     {
 	bool ret;
+	infinint max;
 
 	if(is_terminated())
 	    throw SRC_BUG;
 
 	if(need_flush_write())
 	    flush_write();
-	next = last = 0;
+
 	ret = ref->skip_to_eof();
-	buffer_offset = ref->get_position();
+	max = ref->get_position();
+	if(ret && ref->get_mode() != gf_write_only)
+	{
+	    infinint size_int = infinint(size);
+	    infinint begin_buffer = max > size_int ? max - size_int : 0;
+
+	    if(buffer_offset < begin_buffer)
+	    {
+		skip(begin_buffer);
+		fulfill_read();
+		if(ref->get_position() != max)
+		    throw SRC_BUG;
+	    }
+		// else we are already set
+
+	    next = last; // eof in the cache too
+
+	    if(get_position() != max)
+		throw SRC_BUG;
+	}
+	else
+	{
+	    next = last = 0;
+	    buffer_offset = max;
+	}
 
 	return ret;
     }
