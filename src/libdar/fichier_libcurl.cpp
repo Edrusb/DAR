@@ -388,7 +388,14 @@ namespace libdar
 	U_I room;
 	U_I delta;
 
-	switch_to_metadata(false);
+	if(interthread.is_empty())
+	{
+		// cannot switch to data mode if some data are
+		// in transit because current_offset would be
+		// wrongly positionned in the requested to libcurl
+	    if(metadatamode)
+		switch_to_metadata(false);
+	}
 
 	read = 0;
 	do
@@ -417,11 +424,15 @@ namespace libdar
 	    current_offset += delta;
 	    read += delta;
 
-		// if interthread is empty and thread has not been launched at least once
-		// we can only now switch to data mode because current_offset is now correct.
-		// This will (re-)launch the thread that should fill interthread pipe with data
-	    if(metadatamode && !is_running() && interthread.is_empty())
-		switch_to_metadata(false);
+	    if(interthread.is_empty())
+	    {
+
+		    // if interthread is empty and thread has not been launched at least once
+		    // we can only now switch to data mode because current_offset is now correct.
+		    // This will (re-)launch the thread that should fill interthread pipe with data
+		if(metadatamode)
+		    switch_to_metadata(false);
+	    }
 	}
 	while(read < size && (is_running() || interthread.is_not_empty()));
 
@@ -724,6 +735,7 @@ namespace libdar
 	case CURLE_REMOTE_FILE_EXISTS:
 	case CURLE_REMOTE_FILE_NOT_FOUND:
 	case CURLE_PARTIAL_FILE:
+	case CURLE_QUOTE_ERROR:
 	    throw Erange("entrepot_libcurl::check_wait_or_throw",
 			 tools_printf(gettext("%S: %s, aborting"),
 				      &err_context,

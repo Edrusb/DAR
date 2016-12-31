@@ -85,7 +85,7 @@ void get_args(int argc,
 {
     string tmp;
 
-    if(argc < 5 && argc > 7)
+    if(argc < 5 || argc > 7)
     {
 	usage(argc, argv);
 	exit(1);
