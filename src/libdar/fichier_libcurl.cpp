@@ -106,6 +106,7 @@ namespace libdar
 	    switch_to_metadata(true);
 	    if(append_write && m != gf_read_only)
 		current_offset = get_size();
+	    synchronize.lock(); // next call to lock() will suspend the caller
 	}
 	catch(...)
 	{
@@ -140,10 +141,17 @@ namespace libdar
 			     tools_printf(gettext("%s: %s"), errmsg, curl_easy_strerror(err)));
 	    }
 
-	    err = curl_easy_perform(easyhandle);
-	    if(err != CURLE_OK)
-		throw Erange("fichier_libcurl::change_permission",
-			     tools_printf(gettext("%s: %s"), errmsg, curl_easy_strerror(err)));
+	    do
+	    {
+		err = curl_easy_perform(easyhandle);
+		fichier_libcurl_check_wait_or_throw(get_ui(),
+						    err,
+						    wait_delay,
+						    tools_printf(gettext("%s: %s"),
+								 errmsg,
+								 curl_easy_strerror(err)));
+	    }
+	    while(err != CURLE_OK);
 	}
 	catch(...)
 	{
@@ -171,28 +179,33 @@ namespace libdar
 	if(!has_maxpos || get_mode() != gf_read_only)
 	{
 	    me->switch_to_metadata(true);
-	    try
+
+	    err = curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 1);
+	    if(err != CURLE_OK)
+		throw Erange("fichier_libcurl::get_size()",
+			     tools_printf(gettext("Error met while fetching file size: %s"),
+					  curl_easy_strerror(err)));
+	    do
 	    {
-		err = curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 1);
-		if(err != CURLE_OK)
-		    throw Erange("","");
 		err = curl_easy_perform(easyhandle);
-		if(err != CURLE_OK)
-		    throw Erange("","");
-		err = curl_easy_getinfo(easyhandle, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &filesize);
-		if(filesize == -1) // file does not exist
-		    filesize = 0;
-		if(err != CURLE_OK)
-		    throw Erange("","");
-		me->maxpos = tools_double2infinint(filesize);
-		me->has_maxpos = true;
+		fichier_libcurl_check_wait_or_throw(get_ui(),
+						    err,
+						    wait_delay,
+						    tools_printf(gettext("Error met while fetching file size: %s"),
+								 curl_easy_strerror(err)));
 	    }
-	    catch(Erange & e)
-	    {
-		(void)curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 0);
-		e.prepend_message("Error met while fetching file size: ");
-		throw;
-	    }
+	    while(err != CURLE_OK);
+
+	    err = curl_easy_getinfo(easyhandle, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &filesize);
+	    if(filesize == -1) // file does not exist
+		filesize = 0;
+
+	    if(err != CURLE_OK)
+		throw Erange("fichier_libcurl::get_size()",
+			     tools_printf(gettext("Error met while fetching file size: %s"),
+					  curl_easy_strerror(err)));
+	    me->maxpos = tools_double2infinint(filesize);
+	    me->has_maxpos = true;
 	    (void)curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 0);
 	}
 
