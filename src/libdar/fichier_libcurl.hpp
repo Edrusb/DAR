@@ -101,6 +101,20 @@ namespace libdar
         bool skip_relative(S_I x);
         infinint get_position() const { return current_offset; };
 
+	    /// define the network side behavior
+	    ///
+	    /// \param[in] size is the byte size to be read at once, set to zero to avoid reading by block
+	    /// \note by default libdar instruct libcurl to read as much possible data and extract it from
+	    /// buffer when needed. This gives the maximum performance except that when libdar needs to skip
+	    /// data and read further or before it leads libcurl to end the FTP control session, and thus
+	    /// reconnect with a new FTP session. Some FTP server might not like the many FTP control sessions
+	    /// generated while only one is needed (controling many data sessions). Reading by block let the
+	    /// FTP order to end and avoid having libdar asking libcurl to interrupt the transfer which preserve
+	    /// the control session. The drawback is that it implies network latency between each read block
+	    /// and leads to the creation/destruction of many thread inside libdar.
+	void read_limited_size_at_once(U_I size) { if(!metadatamode) throw SRC_BUG; network_block = size; };
+	void read_limited_size_at_once() { read_limited_size_at_once(tampon_size); };
+
     protected:
 	    // inherited from generic_file grand-parent class
 	void inherited_read_ahead(const infinint & amount);
@@ -132,13 +146,19 @@ namespace libdar
 	char meta_tampon[tampon_size];    //< trash in transit data used to carry metadata
 	U_I meta_inbuf;                   //< amount of byte available in "meta_tampon"
 	U_I wait_delay;                   //< time in second to wait before retrying in case of network error
+	U_I network_block;                //< maximum amount of data read at once from the network
+	infinint network_offset;          //< updated by sub thread in network block mode to give amount of bytes pushed to interthread
 	libthreadar::fast_tampon<char> interthread; //< data channel for reading or writing with subthread
 	libthreadar::mutex synchronize;   //< used to be sure subthread has been launched
 
+	void set_range(const infinint & begin);
+	void unset_range();
 	void switch_to_metadata(bool mode);//< set to true to get or set file's metadata, false to read/write file's data
 	void detruit();
 	void run_thread();
 	void stop_thread();
+	void initialize_subthread();
+	void finalize_subthread();
 
 	static size_t write_data_callback(char *buffer, size_t size, size_t nmemb, void *userp);
 	static size_t read_data_callback(char *bufptr, size_t size, size_t nitems, void *userp);

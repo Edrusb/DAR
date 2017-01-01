@@ -57,6 +57,7 @@ namespace libdar
 						  append_write(!erase),
 						  meta_inbuf(0),
 						  wait_delay(waiting),
+						  network_block(0),
 						  interthread(10, tampon_size)
     {
 	CURLcode err;
@@ -454,11 +455,92 @@ namespace libdar
 
     void fichier_libcurl::inherited_run()
     {
-	CURLcode err;
 
+	try
+	{
+		// parent thread is still suspended
+
+	    CURLcode err;
+	    infinint local_offset = current_offset;
+	    user_interaction *thread_ui = nullptr;
+
+	    try
+	    {
+		thread_ui = get_ui().clone();
+	    }
+	    catch(...)
+	    {
+		initialize_subthread();
+		throw;
+	    }
+
+		// after next call, the parent thread will be running
+
+	    initialize_subthread();
+
+	    try
+	    {
+		if(network_block == 0 || get_mode() != gf_read_only)
+		{
+		    do
+		    {
+			err = curl_easy_perform(easyhandle);
+			if(!end_data_mode)
+			    fichier_libcurl_check_wait_or_throw(*thread_ui,
+								err,
+								wait_delay,
+								tools_printf(gettext("Error met during network transfer: %s"),
+									     curl_easy_strerror(err)));
+		    }
+		    while(err != CURLE_OK && !end_data_mode);
+		}
+		else // reading by block to avoid having interrupting libcurl
+		{
+		    do
+		    {
+			network_offset = 0;
+			set_range(local_offset);
+			do
+			{
+			    err = curl_easy_perform(easyhandle);
+			    fichier_libcurl_check_wait_or_throw(*thread_ui,
+								err,
+								wait_delay,
+								tools_printf(gettext("Error met while reading a block of data: %s"),
+									     curl_easy_strerror(err)));
+			}
+			while(err != CURLE_OK);
+			local_offset += network_offset;
+		    }
+		    while(err == CURLE_OK && network_offset > 0 && !end_data_mode);
+		    unset_range();
+		}
+	    }
+	    catch(...)
+	    {
+		delete thread_ui;
+		thread_ui = nullptr;
+		throw;
+	    }
+	    delete thread_ui;
+	    thread_ui = nullptr;
+	}
+	catch(...)
+	{
+	    finalize_subthread();
+	    throw;
+	}
+	finalize_subthread();
+    }
+
+    void fichier_libcurl::initialize_subthread()
+    {
 	sub_is_dying = false;
 	synchronize.unlock(); // release calling thread as we, as child thread, do now exist
-	err = curl_easy_perform(easyhandle);
+    }
+
+    void fichier_libcurl::finalize_subthread()
+    {
 	sub_is_dying = true;
 	if(!end_data_mode) // natural death, main thread has not required our death
 	{
@@ -485,9 +567,27 @@ namespace libdar
 		throw SRC_BUG;
 	    }
 	}
-	if(err != CURLE_OK && !end_data_mode)
-	    throw Erange("fichier_libcurl::inherited_run",
-			 tools_printf(gettext("Error met in fichier_libcurl thread: %s"), curl_easy_strerror(err)));
+    }
+
+    void fichier_libcurl::set_range(const infinint & begin)
+    {
+	infinint end_range = begin + infinint(network_block - 1);
+	string range = tools_printf("%i-%i", &begin, &end_range);
+
+	    // setting the block size if necessary
+
+	CURLcode err = curl_easy_setopt(easyhandle, CURLOPT_RANGE, range.c_str());
+	if(err != CURLE_OK)
+	    throw Erange("fichier_libcurl::set_range",
+			 tools_printf(gettext("Error while seeking in file on remote repository: %s"), curl_easy_strerror(err)));
+    }
+
+    void fichier_libcurl::unset_range()
+    {
+	CURLcode err = curl_easy_setopt(easyhandle, CURLOPT_RANGE, nullptr);
+	if(err != CURLE_OK)
+	    throw Erange("fichier_libcurl::unset_range",
+			 tools_printf(gettext("Error while seeking in file on remote repository: %s"), curl_easy_strerror(err)));
     }
 
     void fichier_libcurl::switch_to_metadata(bool mode)
@@ -511,17 +611,22 @@ namespace libdar
 				 tools_printf(gettext("Error met while setting libcurl for reading data file: %s"),
 					      curl_easy_strerror(err)));
 
-				// setting the offset of the next byte to read / write
+		if(network_block == 0)
+		{
 
-		resume = current_offset;
-		resume.unstack(cur_pos);
-		if(!resume.is_zero())
-		    throw Erange("fichier_libcurl::switch_to_metadata",
-				 gettext("Integer too large for libcurl, cannot skip at the requested offset in the remote repository"));
-		err = curl_easy_setopt(easyhandle, CURLOPT_RESUME_FROM_LARGE, cur_pos);
-		if(err != CURLE_OK)
-		    throw Erange("fichier_libcurl::switch_to_metadata",
-				 tools_printf(gettext("Error while seeking in file on remote repository: %s"), curl_easy_strerror(err)));
+			// setting the offset of the next byte to read / write
+
+		    resume = current_offset;
+		    resume.unstack(cur_pos);
+		    if(!resume.is_zero())
+			throw Erange("fichier_libcurl::switch_to_metadata",
+				     gettext("Integer too large for libcurl, cannot skip at the requested offset in the remote repository"));
+		    err = curl_easy_setopt(easyhandle, CURLOPT_RESUME_FROM_LARGE, cur_pos);
+		    if(err != CURLE_OK)
+			throw Erange("fichier_libcurl::switch_to_metadata",
+				     tools_printf(gettext("Error while seeking in file on remote repository: %s"), curl_easy_strerror(err)));
+		}
+		    // else setup is done from within sub-thread
 
 		break;
 	    case gf_write_only:
@@ -667,8 +772,16 @@ namespace libdar
 	    }
 	}
 
+	if(me->network_block > 0)
+	    me->network_offset += lu;
+
 	if(me->end_data_mode)
-	    lu = 0; // to force easy_perform() that called us, to return
+	{
+	    if(me->network_block == 0)
+		lu = 0; // to force easy_perform() that called us, to return
+	    else
+		lu += remain; // drop all data provided from libcurl and return normally
+	}
 
 	return lu;
     }
