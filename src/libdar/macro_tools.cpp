@@ -21,7 +21,7 @@
 
 #include "../my_config.h"
 
-#define LIBDAR_URL_VERSION "http://dar.linux.free.fr/pre-release/doc/Notes.html#Dar_version_naming"
+#define LIBDAR_URL_VERSION "http://dar.linux.free.fr/doc/Notes.html#Dar_version_naming"
 
 extern "C"
 {
