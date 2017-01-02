@@ -981,6 +981,17 @@ namespace libdar
 	fsa_saved = status;
     }
 
+    void cat_inode::fsa_partial_attach(const fsa_scope & val)
+    {
+	if(fsa_saved != fsa_partial)
+	    throw SRC_BUG;
+
+	if(fsa_families == nullptr)
+	    fsa_families = new(get_pool()) infinint(fsa_scope_to_infinint(val));
+	else
+	    *fsa_families = fsa_scope_to_infinint(val);
+    }
+
     void cat_inode::fsa_attach(filesystem_specific_attribute_list *ref)
     {
         if(fsa_saved != fsa_full)
