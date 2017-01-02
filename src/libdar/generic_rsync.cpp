@@ -426,8 +426,11 @@ namespace libdar
 	{
 	    me->x_input->skip(pos);
 	    lu = me->x_input->read((char *)*buf, *len);
+	    if(*len > 0 && lu == 0)
+		ret = RS_INPUT_ENDED;
+	    else
+		ret = RS_DONE;
 	    *len = lu;
-	    ret = RS_DONE;
 	}
 	catch(...)
 	{

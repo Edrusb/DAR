@@ -1,4 +1,4 @@
-.TH DAR 1 "January 4th, 2016"
+.TH DAR 1 "January 2nd, 2017"
 .UC 8
 .SH NAME
 dar \- creates, tests, lists, extracts, compares, merges, isolates dar archives
@@ -489,7 +489,20 @@ will be replaced by the context. Actually three possible values exist: "init", "
 will be replaced by the full URL of path where the slice is stored
 .P
 .RE
-Several -E option can be given, given commands will then be called in the order they appear on the command line and -B included files. Such file given to -E option are known as DUC files (Dar User Command). See also the environment variable DAR_DUC_PATH in the ENVIRONMENT section at the end of this document.
+Several -E option can be given, given commands will then be called in the order they appear on the command line and -B included files. Note that having '-E script1 -E script2' is totally equivalent to '-E "script1 ; script2"'. In other words if script1 fails, script2 fill still be executed and dar will only be notified of the exit status of the last -E option. Exit status of previous -E given commands wll be ignored. If this does not match your need, consider using a single -aduc option (see below). More generally you can use any shell construction in the argument to -E, including parenthesis, || and &&. Such files given to -E option are known as DUC files (Dar User Command). See also the environment variable DAR_DUC_PATH in the ENVIRONMENT section at the end of this document.
+.TP 20
+-aduc, --alter=duc
+As described above for -E option, several -E/-F/-~ options (aka DUC commands) are combined using the shell ";" operator, which ignores the exit status of the first commands and only reports to dar the exit status of the last command, leading all command to always being executed. --aduc option combines the different DUC commands using the shell "&&" operator, which execute the next command if and only if the previous command succeeded. In other words, dar get notified of an error in any given DUC command but due to an error not all DUC command may be executed.
+.P
+--aduc modifies the way the next DUC file is sticked to the previous command, in other words:
+.RS
+.TP 5
+dar --aduc -E script1 -E script2 ...
+leads libdar to call a shell with the following line "script1 && script2"
+.TP 5
+dar -E script1 -script2 --aduc -E script3 ...
+leads libdar to call a shell with the following line "script1 ; script2 && script3". In other words if you want to avoid the ";" use --aduc before any -E/-F/-~ option.
+.RE
 .TP 20
 -F, --ref-execute <string>
 same as -E but is applied between slices of the reference archive (-A option). --execute-ref is a synonym.

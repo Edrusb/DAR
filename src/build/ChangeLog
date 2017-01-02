@@ -7,8 +7,17 @@ from 2.5.x to 2.6.0
   files to a remote cloud storage
 
 from 2.5.7 to 2.5.8
-- fixed double memory release occuring in a particular case of read error
+- fixed double memory release occurring in a particular case of read error
 - improving robustness of FSA code against data corruption
+- fixed bug: DAR_DUC_PATH was not used with -F and -~ options
+- new feature: added -aduc option to combine several -E options using the
+  shell '&&' operator rather than the shell ';' operator. The consequence
+  is that with -aduc option a non zero exist status of any script (and not
+  only of the script given to the last -E option) will lead dar to report
+  the error.
+- man page updated about combination of several -E options
+- fixed bug: merging partial FSA led to self reported bug in cat_inode.cpp
+  at line 615
 
 from 2.5.6 to 2.5.7
 - fixed bug leading dar to not include directories given to -g option nor

@@ -175,6 +175,7 @@ namespace libdar
 
 	    // II : add or drop FSA list to the cat_inode
 	void fsa_attach(filesystem_specific_attribute_list *ref);
+	void fsa_partial_attach(const fsa_scope & val);            // #<-- FSA_PARTIAL only
 	const filesystem_specific_attribute_list *get_fsa() const; // #<-- FSA_FULL only
 	void fsa_detach() const; // discard any future call to get_fsa() !
 	infinint fsa_get_size() const; // returns the size of FSA (still valid if fsal has been detached) / mainly used to define CRC size
