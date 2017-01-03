@@ -333,6 +333,17 @@ namespace libdar
 	io_error x_code;
     };
 
+	/// exception used to report authentication error
+
+    class Enet_auth : public Egeneric
+    {
+    public:
+	Enet_auth(const std::string & message): Egeneric("on the network", message) {};
+
+    protected:
+	std::string exceptionID() const { return "NETWORK AUTHENTICATION ERROR"; };
+    };
+
 
 	/// @}
 

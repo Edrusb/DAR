@@ -233,6 +233,12 @@ int dar_suite_global(int argc,
 	GENERAL_REPORT(e.get_message());
 	ret = EXIT_ERROR;
     }
+    catch(Enet_auth & e)
+    {
+	GENERAL_REPORT(string(gettext("FATAL error, aborting operation")));
+	GENERAL_REPORT(e.get_message());
+	ret = EXIT_ERROR;
+    }
     catch(Egeneric & e)
     {
 	cerr << e.dump_str();

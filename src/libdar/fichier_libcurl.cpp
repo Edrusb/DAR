@@ -857,7 +857,6 @@ namespace libdar
 	case CURLE_TOO_MANY_REDIRECTS:
 	case CURLE_UNKNOWN_OPTION:
 	case CURLE_FILESIZE_EXCEEDED:
-	case CURLE_LOGIN_DENIED:
 	case CURLE_REMOTE_FILE_EXISTS:
 	case CURLE_REMOTE_FILE_NOT_FOUND:
 	case CURLE_PARTIAL_FILE:
@@ -866,6 +865,10 @@ namespace libdar
 			 tools_printf(gettext("%S: %s, aborting"),
 				      &err_context,
 				      curl_easy_strerror(err)));
+	case CURLE_LOGIN_DENIED:
+	    throw Enet_auth(tools_printf(gettext("%S: %s, aborting"),
+					 &err_context,
+					 curl_easy_strerror(err)));
 	case CURLE_COULDNT_RESOLVE_PROXY:
 	case CURLE_COULDNT_RESOLVE_HOST:
 	case CURLE_COULDNT_CONNECT:
