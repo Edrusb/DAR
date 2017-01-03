@@ -58,10 +58,12 @@ struct ent_params
     string ent_host;              //< entrepot hostname
     string ent_port;              //< entrepot port
     U_I network_retry;            //< libcurl entrepot network retry time
+    bool auth_from_file;          //< whether ~/.netrc and ~/.ssh files should be considered for credentials
 
     void clear()
     {   ent_proto.clear(); ent_login.clear(); ent_pass.clear();
-	ent_host.clear(); ent_port.clear(); network_retry = 3; };
+	ent_host.clear(); ent_port.clear(); network_retry = 3;
+	auth_from_file = false; };
 };
 
     // all parameters retreived from command-line

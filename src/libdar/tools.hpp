@@ -177,7 +177,7 @@ namespace libdar
 	/// \note chemin argument must be release by the caller thanks to the "delete" operator.
     extern void tools_split_path_basename(const std::string &all, std::string & chemin, std::string & base, memory_pool *pool = nullptr);
 
-	/// split a given full remote reposityr path in parts
+	/// split a given full remote repository path in parts
 	/// \param[in] all is the argument to split in parts
 	/// \param[out] proto is the protocol field
 	/// \param[out] login is the login field (empty string is returned if not provided)

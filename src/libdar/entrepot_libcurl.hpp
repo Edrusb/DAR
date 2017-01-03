@@ -69,6 +69,7 @@ namespace libdar
 			 const secu_string & password,         //< password to authenticate
 			 const std::string & host,             //< hostname or IP of the remote repositiry
 			 const std::string & port,             //< empty string to use default port in regard to protocol used
+			 bool auth_from_file,                  //< whether ~/.netrc or ~/.ssh/... usual files should be used for authentication in place of using the given password
 			 U_I waiting_time);                    //< seconds to wait before retrying in case of network erorr
 	entrepot_libcurl(const entrepot_libcurl & ref) : entrepot(ref), mem_ui(ref) { copy_from(ref); };
 	const entrepot_libcurl & operator = (const entrepot_libcurl & ref) { detruit(); copy_from(ref); return *this; };
@@ -109,7 +110,10 @@ namespace libdar
 	U_I wait_delay;
 
 	void set_libcurl_URL();
-	void set_libcurl_authentication(const std::string & login, const secu_string & password);
+	void set_libcurl_authentication(const std::string & location,
+					const std::string & login,
+					const secu_string & password,
+					bool auth_from_file);
 	void copy_from(const entrepot_libcurl & ref);
 	void detruit();
 

@@ -820,14 +820,7 @@ static bool get_args_recursive(recursive_param & rec,
 						 p.remote.ent_host,
 						 p.remote.ent_port,
 						 path_basename))
-		    {
 			tools_split_path_basename(path_basename.c_str(), p.sauv_root, p.filename);
-			if(p.remote.ent_pass.get_size() == 0)
-			    p.remote.ent_pass = rec.dialog->get_secu_string(tools_printf(gettext("Please provide the password for login %S at host %S"),
-											 &p.remote.ent_login,
-											 &p.remote.ent_host),
-							      false);
-		    }
 		    else
 		    {
 			p.remote.clear();
@@ -914,14 +907,7 @@ static bool get_args_recursive(recursive_param & rec,
 							 p.ref_remote.ent_host,
 							 p.ref_remote.ent_port,
 							 path_basename))
-			    {
 				tools_split_path_basename(path_basename.c_str(), p.ref_root, *p.ref_filename);
-				if(p.ref_remote.ent_pass.get_size() == 0)
-				    p.ref_remote.ent_pass = rec.dialog->get_secu_string(tools_printf(gettext("Please provide the password for login %S at host %S (archive of reference)"),
-												     &p.ref_remote.ent_login,
-												     &p.ref_remote.ent_host),
-											false);
-			    }
 			    else
 			    {
 				p.ref_remote.clear();
@@ -1518,7 +1504,13 @@ static bool get_args_recursive(recursive_param & rec,
                     p.blind_signatures = true;
 		else if(strcasecmp("duc", optarg) == 0)
 		    rec.duc_and = true;
-                else
+                else if(strcasecmp("file-auth", optarg) == 0 || strcasecmp("file-authentication", optarg) == 0)
+		{
+		    p.remote.auth_from_file = true;
+		    p.ref_remote.auth_from_file = true;
+		    p.aux_remote.auth_from_file = true;
+		}
+		else
                     throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
                 break;
             case 'e':
@@ -1585,14 +1577,7 @@ static bool get_args_recursive(recursive_param & rec,
 						     p.aux_remote.ent_host,
 						     p.aux_remote.ent_port,
 						     path_basename))
-			{
 			    tools_split_path_basename(path_basename.c_str(), p.aux_root, *p.aux_filename);
-			    if(p.aux_remote.ent_pass.get_size() == 0)
-				p.aux_remote.ent_pass = rec.dialog->get_secu_string(tools_printf(gettext("Please provide the password for login %S at host %S (auxiliary archive of reference)"),
-												 &p.aux_remote.ent_login,
-												 &p.aux_remote.ent_host),
-										    false);
-			}
 			else
 			{
 			    p.aux_remote.clear();

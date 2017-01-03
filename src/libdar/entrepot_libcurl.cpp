@@ -64,6 +64,7 @@ namespace libdar
 				       const secu_string & password,
 				       const string & host,
 				       const string & port,
+				       bool auth_from_file,
 				       U_I waiting_time): mem_ui(dialog),
 							  x_proto(proto),
 							  base_URL(build_url_from(proto, host, port)),
@@ -83,7 +84,7 @@ namespace libdar
 	easyhandle = curl_easy_init();
 	if(easyhandle == nullptr)
 	    throw Erange("entrepot_libcurl::entrepot_libcurl", string(gettext("Error met while creating a libcurl handle")));
-	set_libcurl_authentication(login, password);
+	set_libcurl_authentication(host, login, password, auth_from_file);
 
 #ifdef LIBDAR_NO_OPTIMIZATION
 	CURLcode err = curl_easy_setopt(easyhandle, CURLOPT_VERBOSE, 1);
@@ -461,25 +462,69 @@ namespace libdar
 #endif
     }
 
-    void entrepot_libcurl::set_libcurl_authentication(const string & login, const secu_string & password)
+    void entrepot_libcurl::set_libcurl_authentication(const string & location,
+						      const string & login,
+						      const secu_string & password,
+						      bool auth_from_file)
     {
 #if LIBCURL_AVAILABLE
 	CURLcode err;
-	secu_string auth(login.size() + 1 + password.get_size() + 1);
+	secu_string real_pass = password;
+	string real_login = login;
 
-	if(!login.empty())
+	if(login.empty())
+	    real_login = "anonymous";
+
+	if(auth_from_file)
 	{
-	    auth.append(login.c_str(), login.size());
-	    auth.append(":", 1);
-	    auth.append(password.c_str(), password.get_size());
+	    switch(x_proto)
+	    {
+	    case proto_ftp:  // using ~/.netrc for authentication
+		err = curl_easy_setopt(easyhandle, CURLOPT_NETRC, CURL_NETRC_OPTIONAL);
+		if(err != CURLE_OK)
+		    throw Erange("entrepot_libcurl::set_libcurl_authentication",
+				 tools_printf(gettext("Error met while asking libcurl to consider ~/.netrc for authentication: %s"),
+					      curl_easy_strerror(err)));
+		err = curl_easy_setopt(easyhandle, CURLOPT_USERNAME, real_login.c_str());
+		if(err != CURLE_OK)
+		    throw Erange("entrepot_libcurl::set_libcurl_authentication",
+				 tools_printf(gettext("Error met while passing username to libcurl: %s"),
+					      curl_easy_strerror(err)));
+		break;
+	    case proto_http:
+		throw Efeature(gettext("authentication from file with HTTP protocol"));
+	    case proto_https:
+		throw Efeature(gettext("authentication from file with HTTPS protocol"));
+	    case proto_scp:
+	    case proto_sftp:
+		throw Efeature(gettext("authentication from file with SFTP/SCP protocol"));
+		break;
+	    default:
+		throw SRC_BUG;
+	    }
 	}
-	else
-	    auth.clear();
+	else // login + password authentication
+	{
+	    if(password.empty())
+	    {
+		real_pass = get_ui().get_secu_string(tools_printf(gettext("Please provide the password for login %S at host %S: "),
+								  &real_login,
+								  &location),
+						     false);
+	    }
 
-	err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, auth.c_str());
-	if(err != CURLE_OK)
-	    throw Erange("entrepot_libcurl::handle_reset", tools_printf(gettext("Error met while setting libcurl authentication: %s"),
-									curl_easy_strerror(err)));
+	    secu_string auth(real_login.size() + 1 + real_pass.get_size() + 1);
+
+	    auth.append(real_login.c_str(), real_login.size());
+	    auth.append(":", 1);
+	    auth.append(real_pass.c_str(), real_pass.get_size());
+
+	    err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, auth.c_str());
+	    if(err != CURLE_OK)
+		throw Erange("entrepot_libcurl::set_libcurl_authentication",
+			     tools_printf(gettext("Error met while setting libcurl authentication: %s"),
+					  curl_easy_strerror(err)));
+	}
 #else
     throw Efeature("libcurl");
 #endif

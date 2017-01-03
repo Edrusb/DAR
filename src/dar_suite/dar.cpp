@@ -130,6 +130,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 						      param.remote.ent_pass,
 						      param.remote.ent_host,
 						      param.remote.ent_port,
+						      param.remote.auth_from_file,
 						      param.remote.network_retry);
 		if(repo == nullptr)
 		    throw Ememory("little_main");
@@ -143,6 +144,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 							  param.ref_remote.ent_pass,
 							  param.ref_remote.ent_host,
 							  param.ref_remote.ent_port,
+							  param.ref_remote.auth_from_file,
 							  param.ref_remote.network_retry);
 		if(ref_repo == nullptr)
 		    throw Ememory("little_main");
@@ -156,6 +158,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 							  param.aux_remote.ent_pass,
 							  param.aux_remote.ent_host,
 							  param.aux_remote.ent_port,
+							  param.aux_remote.auth_from_file,
 							  param.aux_remote.network_retry);
 		if(aux_repo == nullptr)
 		    throw Ememory("little_main");
