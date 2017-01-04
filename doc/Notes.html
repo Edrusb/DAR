@@ -1,6 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 
+
 <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR/LIBDAR Internals - Notes</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -3143,18 +3144,21 @@ data avoid having for a given key thus here for two different blocks
 the same encryption result (totally or just starting by the same
 sequence) when clear data is identical or starts by the same sequence.<br>
       <br>
-To prevent clear text attach, when&nbsp; the attacher has an indea of
-the clear data, each archive starts and ends by an elastic buffer,
-which is a pseudo random generated data of variable size. This way the
-predicatble archive structure is shifted at some random place inside
-the archive.<br>
+To prevent clear text attack (which is when the attacker has an idea of
+the clear data), each archive starts and ends by an elastic buffer,
+which is pseudo random generated data of variable size, both elastic
+buffers are encrypted with the rest of the real data. This way the
+predictable archive structure is shifted at some random place inside
+the archive, which avoid the possibility of a clear text attack (or at
+least make it much more difficult to achieve).<br>
       <br>
 Thanks to the encyrption per block, dar is able to uncipher data at
 random place without having to uncipher the whole archive: only the
-block containing the need data is unciphered.<br>
+block containing the need data is unciphered. This is necessary to face
+both data corruption and fast restoration of a subset of the archive.<br>
       <br>
-Here follows a diagram of the way key, block number, cipher algorithm,
-Initial Vector are defined:<br>
+Here follows a diagram of the way key, block number, cipher algorithm and
+Initial Vector (IV) are defined:<br>
       <code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 +------------------- [ algo in CBC mode ]
@@ -3318,6 +3322,7 @@ archive length.<br>
 <br>
 
 <br>
+
 
 
 
