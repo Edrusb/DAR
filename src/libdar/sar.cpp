@@ -552,19 +552,10 @@ namespace libdar
 	    U_I tmp;
 	    if(of_fd != nullptr)
 	    {
-		try
-		{
-		    tmp = of_fd->read(a+lu, sz-lu);
-		    if(!slicing.older_sar_than_v8 && of_fd->get_position() == size_of_current)
-			if(tmp > 0)
-			    --tmp; // we do not "read" the terminal flag
-		}
-		catch(Euser_abort & e)
-		{
-		    natural_destruction = false;
-			// avoid the execution of "between slice" user commands
-		    throw;
-		}
+		tmp = of_fd->read(a+lu, sz-lu);
+		if(!slicing.older_sar_than_v8 && of_fd->get_position() == size_of_current)
+		    if(tmp > 0)
+			--tmp; // we do not "read" the terminal flag
 	    }
 	    else
 		tmp = 0; // simulating an end of slice
@@ -617,19 +608,10 @@ namespace libdar
 
             if(tmp_wrote > 0)
             {
-		try
-		{
-		    of_fd->write(a, tmp_wrote);
-		    to_write -= tmp_wrote;
-		    file_offset += tmp_wrote;
-		    a += tmp_wrote;
-		}
-		catch(Euser_abort & e)
-		{
-		    natural_destruction = false;
-			// avoid the execution of "between slice" user commands
-		    throw;
-		}
+		of_fd->write(a, tmp_wrote);
+		to_write -= tmp_wrote;
+		file_offset += tmp_wrote;
+		a += tmp_wrote;
             }
             else
             {
