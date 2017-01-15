@@ -268,26 +268,55 @@ namespace libdar
     {
 	U_I ret = 0;
 	bool eof = false;
+	infinint fallback_offset = get_position();
 
 	do
 	{
 	    if(next >= last) // no more data to read from cache
 	    {
-		if(need_flush_write())
-		    flush_write();
-		if(x_size - ret < size)
+		try
 		{
-		    fulfill_read(); // may fail if underlying is write_only (exception thrown)
-		    if(next >= last) // could not read anymore data
-			eof = true;
+		    if(need_flush_write())
+			flush_write();
 		}
-		else // reading the remaining directly from lower layer
+		catch(...)
 		{
-		    ret += ref->read(a + ret, x_size - ret); // may fail if underlying is write_only
-		    if(ret < x_size)
-			eof = true;
-		    clear_buffer();   // force clearing whatever is shifted_mode
-		    buffer_offset = ref->get_position();
+		    if(next < ret)
+			throw SRC_BUG;
+			// flushing failed thus cache
+			// should contains at least ret bytes
+		    next -= ret;
+			// this way we don't loose what has to be
+			// written for long, while dropping the
+			// bytes put in the cache by the current
+			// inherited_read routine. The caller may
+			// considering that no byte has been read
+			// due to the exception next call will
+			// provide the expected data
+		    throw;
+		}
+
+		try
+		{
+		    if(x_size - ret < size)
+		    {
+			fulfill_read(); // may fail if underlying is write_only (exception thrown)
+			if(next >= last) // could not read anymore data
+			    eof = true;
+		    }
+		    else // reading the remaining directly from lower layer
+		    {
+			ret += ref->read(a + ret, x_size - ret); // may fail if underlying is write_only
+			if(ret < x_size)
+			    eof = true;
+			clear_buffer();   // force clearing whatever is shifted_mode
+			buffer_offset = ref->get_position();
+		    }
+		}
+		catch(...)
+		{
+		    skip(fallback_offset);
+		    throw;
 		}
 	    }
 
@@ -484,7 +513,7 @@ namespace libdar
 	    ///////
 
 	ref->skip(buffer_offset + last);
-	lu = ref->read(buffer + last, size - last); // may fail if underlying is write_only
+	lu = ref->read(buffer + last, size - last); // may fail if underlying is write_only or user aborted
 	last += lu;
     }
 
