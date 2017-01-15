@@ -3,6 +3,11 @@ version 2.6.0
 Many Thanks Gulikoza who helped troubleshooting around the poorly
 documented librsync library.
 
+version 2.5.9
+--------------
+Thanks to Gabor (aka HawajRambo2) for bug report and script to reproduce it,
+and once again, thanks to Johan de Jong for bug report
+
 version 2.5.8
 --------------
 Thanks to James F. for feedback and bug report. Thanks to hawajrambo2 for

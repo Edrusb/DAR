@@ -6,6 +6,15 @@ from 2.5.x to 2.6.0
 - new featute: support ftp/sftp/scp to write an archive eventually with hash
   files to a remote cloud storage
 
+from 2.5.8 to 2.5.9
+- fixed typo in documentation about dar internal use of symmetric
+  encryption
+- fixed bug: merging operation could wrongly melt different unrelated hard
+  linked inode when merging archives resulting from a previous merging
+  operation.
+- fixed bug: aborting an archive was someting leading to an unreadable
+  archive in direct mode (was readable only in --sequential-read mode
+
 from 2.5.7 to 2.5.8
 - fixed double memory release occurring in a particular case of read error
 - improving robustness of FSA code against data corruption
@@ -236,6 +245,11 @@ from 2.4.x to 2.5.0
 - replaced SHA1 by SHA224 to generate IV for encryption blocks, this
   slightly improves randomness of IV and stay available when libgcrypt is
   run in FIPS mode
+
+from 2.4.23 to 2.4.24
+- fixed bug: merging operation could wrongly melt different unrelated hard
+  linked inode when merging archives resulting from a previous merging
+  operation.
 
 from 2.4.22 to 2.4.23
 - fixed bug leading dar to not include directories given to -g option nor

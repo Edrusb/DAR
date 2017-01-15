@@ -120,6 +120,8 @@ namespace libdar
     static void clean_hard_link_base_from(const cat_mirage *mir, map<infinint, cat_etoile *> & hard_link_base);
 
 
+	/// modify the hard_link_base to avoid hole in the numbering of etiquettes (map size == highest etiquette number)
+    static void normalize_link_base(map<infinint, cat_etoile *> & hard_link_base);
 
 	/// transfer EA from one cat_inode to another as defined by the given action
 
@@ -2417,6 +2419,7 @@ namespace libdar
 			    }
 			}
 		    }
+		    normalize_link_base(corres_copy);
 		    index++;  // next archive
 		    etiquette_offset = corres_copy.size();
 		}
@@ -4053,6 +4056,51 @@ namespace libdar
 	    if(it == hard_link_base.end())
 		throw SRC_BUG; // the cat_etoile object pointed to by dolly_mir should be known by corres_copy
 	    hard_link_base.erase(it);
+	}
+    }
+
+    static void normalize_link_base(map<infinint, cat_etoile *> & hard_link_base)
+    {
+	infinint max_val = 0;
+	map<infinint, cat_etoile *>::iterator it, ut;
+	infinint num_etoile = hard_link_base.size();
+	infinint search = 0;
+
+	    // first pass, looking highest etiquette number
+
+	for(it = hard_link_base.begin(); it != hard_link_base.end(); ++it)
+	{
+	    if(it->first > max_val)
+		max_val = it->first;
+	}
+
+	    // second pass, looking for holes and moving highest value to fill the gap in
+
+	while(search < num_etoile)
+	{
+	    it = hard_link_base.find(search);
+	    if(it == hard_link_base.end())
+	    {
+		    // unused etiquette value, looking for the higest value
+		do
+		{
+		    if(max_val <= search)
+			throw SRC_BUG; // num_etoile > 0, but we cannot find a cat_etoile to move into the hole
+		    ut = hard_link_base.find(max_val);
+		    --max_val;
+		}
+		while(ut == hard_link_base.end());
+
+		    // we can now renumber cat_etoile tmp from max_val to search
+
+		cat_etoile *tmp = ut->second;
+		if(tmp == nullptr)
+		    throw SRC_BUG;
+		tmp->change_etiquette(search);
+		hard_link_base.erase(ut);
+		hard_link_base[search] = tmp;
+	    }
+	    ++search;
 	}
     }
 

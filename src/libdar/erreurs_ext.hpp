@@ -49,8 +49,8 @@ namespace libdar
 	const infinint get_attr() const { return *x_attr; };
 
     private :
-	    // infinint may throw Ebug exception from destructor
-	    // having a field of type infinint lead this class
+	    // infinint may throw Ebug exception from destructor.
+	    // Having a field of type infinint lead this class
 	    // to have a default destructor throwing Ebug too
 	    // which implies Egeneric to have the same which
 	    // makes circular dependency as Ebug cannot be defined
