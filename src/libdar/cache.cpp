@@ -288,9 +288,22 @@ namespace libdar
 	    avail = size - next;
 	    if(avail == 0) // we need to flush the cache
 	    {
-		if(need_flush_write())
-		    flush_write();    // may fail if underlying is read_only
-		avail = size - next;
+		try
+		{
+		    if(need_flush_write())
+			flush_write();    // may fail if underlying is read_only
+		    avail = size - next;
+		}
+		catch(...)
+		{
+			// ignoring the bytes written so far from
+			// the given argument to inherited_write in
+			// order to stay coherent with the view of the caller
+		    if(next < wrote)
+			throw SRC_BUG;
+		    next -= wrote;
+		    throw;
+		}
 	    }
 
 	    remaining = x_size - wrote;
@@ -301,8 +314,23 @@ namespace libdar
 
 		buffer_offset += next;
 		next = last = 0;
-		ref->skip(buffer_offset);
-		ref->write(a + wrote, remaining); // may fail if underlying is read_only
+		try
+		{
+		    ref->skip(buffer_offset);
+		    ref->write(a + wrote, remaining); // may fail if underlying is read_only or user interruption
+		}
+		catch(...)
+		{
+		    infinint wrote_i = wrote;
+			// ignoring the bytes written so far from
+			// the given argument to inherited_write in
+			// order to stay coherent with the view of the caller
+		    if(buffer_offset < wrote_i)
+			throw SRC_BUG;
+		    buffer_offset -= wrote_i;
+		    ref->skip(buffer_offset);
+		    throw;
+		}
 		wrote = x_size;
 		buffer_offset += remaining;
 	    }
