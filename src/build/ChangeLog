@@ -4,6 +4,9 @@ from 2.5.8 to 2.5.9
 - fixed bug: merging operation could wrongly melt different unrelated hard
   linked inode when merging archives resulting from a previous merging
   operation.
+- fixed bug: aborting an archive was someting leading to an unreadable
+  archive in direct mode (was readable only in --sequential-read mode
+
 
 from 2.5.7 to 2.5.8
 - fixed double memory release occurring in a particular case of read error
