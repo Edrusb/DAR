@@ -2443,19 +2443,33 @@ namespace libdar
     void archive::disable_natural_destruction()
     {
         sar *tmp = nullptr;
+	trivial_sar *triv_tmp = nullptr;
 
 	stack.find_first_from_bottom(tmp);
 	if(tmp != nullptr)
             tmp->disable_natural_destruction();
+	else
+	{
+	    stack.find_first_from_bottom(triv_tmp);
+	    if(triv_tmp != nullptr)
+		triv_tmp->disable_natural_destruction();
+	}
     }
 
     void archive::enable_natural_destruction()
     {
         sar *tmp = nullptr;
+	trivial_sar *triv_tmp = nullptr;
 
 	stack.find_first_from_bottom(tmp);
         if(tmp != nullptr)
             tmp->enable_natural_destruction();
+	else
+	{
+	    stack.find_first_from_bottom(triv_tmp);
+	    if(triv_tmp != nullptr)
+		triv_tmp->disable_natural_destruction();
+	}
     }
 
     const label & archive::get_layer1_data_name() const

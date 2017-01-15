@@ -107,6 +107,12 @@ namespace libdar
 	    /// size of the slice header
 	const infinint & get_slice_header_size() const { return offset; };
 
+		    // disable execution of user command when destroying the current object
+	void disable_natural_destruction() { natural_destruction = false; };
+
+	    // enable back execution of user command when destroying the current object
+	void enable_natural_destruction() { natural_destruction = true; };
+
     protected:
 	void inherited_read_ahead(const infinint & amount) { reference->read_ahead(amount); };
         U_I inherited_read(char *a, U_I size);
@@ -128,6 +134,7 @@ namespace libdar
 	infinint min_digits;      //< minimum number of digits in slice name
 	std::string hook_where;   //< what value to use for %p substitution in hook
 	std::string base_url;     //< what value to use for %u substitution in hook
+	bool natural_destruction; //< whether user command is executed once the single sliced archive is completed (disable upon user interaction)
 
 	void init(const label & internal_name); //< write the slice header and set the offset field (write mode), or (read-mode),  reads the slice header an set offset field
 

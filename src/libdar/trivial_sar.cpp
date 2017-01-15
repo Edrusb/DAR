@@ -161,6 +161,7 @@ namespace libdar
 	min_digits = x_min_digits;
 	hook_where = where.get_full_path().display();
 	base_url = where.get_url();
+	natural_destruction = true;
 
 	    // creating the slice if it does not exist else failing
 	try
@@ -269,6 +270,7 @@ namespace libdar
 	min_digits = 0;
 	hook_where = "";
 	base_url = "";
+	natural_destruction = true;
 
 	set_info_status(CONTEXT_INIT);
 	try
@@ -317,6 +319,7 @@ namespace libdar
 	min_digits = 0;
 	hook_where = "";
 	base_url = "";
+	natural_destruction = true;
 
 	set_info_status(CONTEXT_LAST_SLICE);
 	init(internal_name);
@@ -377,7 +380,7 @@ namespace libdar
 	    delete reference; // this closes the slice so we can now eventually play with it:
 	    reference = nullptr;
 	}
-	if(hook != "")
+	if(hook != "" && natural_destruction)
 	{
 	    switch(get_mode())
 	    {
