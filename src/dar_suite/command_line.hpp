@@ -138,6 +138,7 @@ struct line_param
     bool no_compare_symlink_date; //< whether to report difference in dates of symlinks while diffing an archive with filesystem
     fsa_scope scope;              //< FSA scope to consider for the operation
     bool multi_threaded;          //< allows libdar to use multiple threads (requires libthreadar)
+    bool sizes_in_bytes;          //< whether to display sizes in bytes of to the larges unit (Mo, Go, To,...)
 
 	// constructor for line_param
     line_param()

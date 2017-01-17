@@ -1194,6 +1194,7 @@ namespace libdar
 	void set_filter_unsaved(bool filter_unsaved) { x_filter_unsaved = filter_unsaved; };
 	void set_display_ea(bool display_ea) { x_display_ea = display_ea; };
 	void set_user_slicing(const infinint & slicing_first, const infinint & slicing_others);
+	void set_sizes_in_bytes(bool arg) { x_sizes_in_bytes = arg; };
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -1205,6 +1206,7 @@ namespace libdar
 	bool get_filter_unsaved() const { return x_filter_unsaved; };
 	bool get_display_ea() const { return x_display_ea; };
 	bool get_user_slicing(infinint & slicing_first, infinint & slicing_others) const;
+	bool get_sizes_in_bytes() const { return x_sizes_in_bytes; };
 
     private:
 	bool x_info_details;
@@ -1215,6 +1217,7 @@ namespace libdar
 	bool x_display_ea;
 	infinint *x_slicing_first;
 	infinint *x_slicing_others;
+	bool x_sizes_in_bytes;
 
 	void destroy();
 	void copy_from(const archive_options_listing & ref);

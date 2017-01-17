@@ -924,6 +924,7 @@ namespace libdar
 			    const mask &subtree,
 			    bool filter_unsaved,
 			    bool list_ea,
+			    bool sizes_in_bytes,
 			    string marge) const
     {
 	const cat_entree *e = nullptr;
@@ -997,7 +998,7 @@ namespace libdar
 				    string a = local_perm(*e_ino, e_hard != nullptr);
 				    string b = local_uid(*e_ino);
 				    string c = local_gid(*e_ino);
-				    string d = local_size(*e_ino);
+				    string d = local_size(*e_ino, sizes_in_bytes);
 				    string e = local_date(*e_ino);
 				    string f = local_flag(*e_ino, isolated, dirty_seq);
 				    string g = e_nom->get_name();
@@ -1039,6 +1040,7 @@ namespace libdar
 				const mask &subtree,
 				bool filter_unsaved,
 				bool list_ea,
+				bool sizes_in_bytes,
 				string beginning) const
     {
 	const cat_entree *e = nullptr;
@@ -1127,7 +1129,7 @@ namespace libdar
 				    string a = local_perm(*e_ino, e_hard != nullptr);
 				    string b = local_uid(*e_ino);
 				    string c = local_gid(*e_ino);
-				    string d = local_size(*e_ino);
+				    string d = local_size(*e_ino, sizes_in_bytes);
 				    string e = local_date(*e_ino);
 				    string f = local_flag(*e_ino, isolated, dirty_seq);
 
@@ -1174,6 +1176,7 @@ namespace libdar
 				const mask &subtree,
 				bool filter_unsaved,
 				bool list_ea,
+				bool sizes_in_bytes,
 				string beginning) const
     {
 	const cat_entree *e = nullptr;
@@ -1291,7 +1294,7 @@ namespace libdar
 			    {
 				string data, metadata, maj, min, chksum, target;
 				string dirty, sparse;
-				string size = local_size(*e_ino);
+				string size = local_size(*e_ino, sizes_in_bytes);
 				string stored = local_storage_size(*e_ino);
 				const cat_file *reg = dynamic_cast<const cat_file *>(e_ino); // ino is no more it->second (if it->second was a cat_mirage)
 				const crc *crc_tmp = nullptr;

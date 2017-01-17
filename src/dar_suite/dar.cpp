@@ -798,6 +798,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    listing_options.set_display_ea(param.list_ea);
 		    if(!param.file_size.is_zero() && param.list_mode == archive_options_listing::slicing)
 			listing_options.set_user_slicing(param.first_file_size, param.file_size);
+		    listing_options.set_sizes_in_bytes(param.sizes_in_bytes);
 		    arch->op_listing(dialog, listing_options);
 		}
                 break;

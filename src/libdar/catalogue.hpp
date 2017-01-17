@@ -192,18 +192,21 @@ namespace libdar
 		     const mask & subtree,
 		     bool filter_unsaved,
 		     bool list_ea,
+		     bool sizes_in_bytes,
 		     std::string marge) const;
         void tar_listing(bool isolated,
 			 const mask & selection,
 			 const mask & subtree,
 			 bool filter_unsaved,
 			 bool list_ea,
+			 bool sizes_in_bytes,
 			 std::string beginning) const;
         void xml_listing(bool isolated,
 			 const mask & selection,
 			 const mask & subtree,
 			 bool filter_unsaved,
 			 bool list_ea,
+			 bool sizes_in_bytes,
 			 std::string beginning) const;
 	void slice_listing(bool isolated,
 			   const mask & selection,

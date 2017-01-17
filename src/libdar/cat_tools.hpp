@@ -51,7 +51,7 @@ namespace libdar
     extern std::string local_perm(const cat_inode & ref, bool hard);
     extern std::string local_uid(const cat_inode & ref);
     extern std::string local_gid(const cat_inode & ref);
-    extern std::string local_size(const cat_inode & ref);
+    extern std::string local_size(const cat_inode & ref, bool sizes_in_bytes);
     extern std::string local_storage_size(const cat_inode & ref);
     extern std::string local_date(const cat_inode & ref);
     extern std::string local_flag(const cat_inode & ref, bool isolated, bool dirty_seq);

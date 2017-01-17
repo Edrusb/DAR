@@ -191,7 +191,7 @@ void f2()
 	label lax_label;
 
 	lax_label.clear();
-        cat.listing(false, tmp, tmp, false, false, "");
+        cat.listing(false, tmp, tmp, false, false, false, "");
 
         cat.reset_add();
         try
@@ -212,7 +212,7 @@ void f2()
         cat.add(new cat_prise(1030, 108, 0650, datetime(19), datetime(20), datetime(21),  "prise", 0));
         cat.add(new cat_detruit("ancien fichier", 'f', datetime(102)));
 
-        cat.listing(false, tmp, tmp, false, false, "");
+        cat.listing(false, tmp, tmp, false, false, false, "");
 
         cat.reset_read();
         while(cat.read(ref))
@@ -245,7 +245,7 @@ void f2()
         cat.dump(pdesc);
         stack.skip(0);
         catalogue lst = catalogue(*ui, pdesc, macro_tools_supported_version, none, false, lax_label);
-        lst.listing(false, tmp, tmp, false, false, "");
+        lst.listing(false, tmp, tmp, false, false, false, "");
         bool ok;
 
         lst.reset_read();
@@ -322,8 +322,8 @@ void f3()
 
     dif.update_destroyed_with(cat);
 
-    cat.listing(false, tmp, tmp, false, false, "");
-    dif.listing(false, tmp, tmp, false, false, "");
+    cat.listing(false, tmp, tmp, false, false, false, "");
+    dif.listing(false, tmp, tmp, false, false, false, "");
 }
 
 

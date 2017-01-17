@@ -331,6 +331,7 @@ bool get_args(shell_interaction & dialog,
     p.no_compare_symlink_date = true;
     p.scope = all_fsa_families();
     p.multi_threaded = true;
+    p.sizes_in_bytes = false;
 
     try
     {
@@ -1439,7 +1440,9 @@ static bool get_args_recursive(recursive_param & rec,
                     p.blind_signatures = true;
 		else if(strcasecmp("duc", optarg) == 0)
 		    rec.duc_and = true;
-                else
+                else if(strcasecmp("y", optarg) == 0 || strcasecmp("byte", optarg) == 0 || strcasecmp("bytes", optarg) == 0)
+		    p.sizes_in_bytes = true;
+		else
                     throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
                 break;
             case 'e':
