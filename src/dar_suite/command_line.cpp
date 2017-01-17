@@ -338,6 +338,7 @@ bool get_args(shell_interaction & dialog,
     p.remote.clear();
     p.ref_remote.clear();
     p.aux_remote.clear();
+    p.sizes_in_bytes = false;
 
     try
     {
@@ -1510,6 +1511,8 @@ static bool get_args_recursive(recursive_param & rec,
 		    p.ref_remote.auth_from_file = true;
 		    p.aux_remote.auth_from_file = true;
 		}
+                else if(strcasecmp("y", optarg) == 0 || strcasecmp("byte", optarg) == 0 || strcasecmp("bytes", optarg) == 0)
+		    p.sizes_in_bytes = true;
 		else
                     throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
                 break;

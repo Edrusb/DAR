@@ -1088,6 +1088,7 @@ AC_ARG_ENABLE(  [gpgme-linking],
 				  LIBS___cache="$LIBS"
 				  LIBS="$GPGME_LIBS $LIBS"
 				  AC_CHECK_HEADERS([gpgme.h])
+				  AC_CHECK_LIB(gpgme, [gpgme_signers_add], [], [])
 				  AC_MSG_CHECKING([for libgpgme usability])
 				  AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 								    #if HAVE_GPGME_H
@@ -1201,8 +1202,11 @@ AC_ARG_ENABLE( [threadar],
 
 
 MEM_LDFLAGS=$LDFLAGS
-LDFLAGS="-static"
-AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
+MEM_CXXFLAGS=$CXXFLAGS
+LDFLAGS="-static $MEM_LDFLAGS $GPGME_LIBS"
+CXXFLAGS="$CXXFLAGS $GPGME_CFLAGS"
+AC_MSG_CHECKING([static linking])
+AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
 				    	        #if HAVE_STDIO_H
                                                 #include <stdio.h>
 						#endif
@@ -1229,16 +1233,28 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
 			       #endif
 			       #if MUTEX_WORKS
 			         pthread_mutex_t test;
-				 pthread_mutex_lock(&test);
-				 pthread_mutex_unlock(&test);
+				 if(pthread_mutex_init(&test, NULL) == 0)
+				 {
+				    if(pthread_mutex_lock(&test) == 0)
+				       pthread_mutex_unlock(&test);
+				 }
+				 pthread_mutex_destroy(&test);
 			       #endif
 
                                   printf("Hello World!");
+				  return 0;
                                ]])
 	       ],
-               [static_pb="no"],
-               [static_pb="yes"])
+               [
+	         AC_MSG_RESULT([yes, perfect!])
+		 static_pb="no"
+	       ],
+               [
+	         AC_MSG_RESULT([failed])
+	         static_pb="yes"
+	       ])
 LDFLAGS=$MEM_LDFLAGS
+CXXFLAGS=$MEM_CXXFLAGS
 
 AM_CONDITIONAL([MAKE_ALL_DIR], [test $examples = "yes"])
 AM_CONDITIONAL([BUILD_DAR_STATIC], [test $build_static = "yes" -a $static_pb = "no"])

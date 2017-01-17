@@ -1246,6 +1246,7 @@ namespace libdar
 	    archive_option_clean_mask(x_subtree, get_pool());
 	    x_filter_unsaved = false;
 	    x_display_ea = false;
+	    x_sizes_in_bytes = false;
 	}
 	catch(...)
 	{
@@ -1398,6 +1399,7 @@ namespace libdar
 	    x_list_mode = ref.x_list_mode;
 	    x_filter_unsaved = ref.x_filter_unsaved;
 	    x_display_ea = ref.x_display_ea;
+	    x_sizes_in_bytes = ref.x_sizes_in_bytes;
 	}
 	catch(...)
 	{

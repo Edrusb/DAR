@@ -8,6 +8,7 @@ Status flags:
 ---------------
 letters usage:
 ---------------
+
 a * alteration of operation		--alter	  argument:
 							    a[time]
 							    binary[-unit[s]]
@@ -34,6 +35,7 @@ a * alteration of operation		--alter	  argument:
 							    SI[-unit[s]]
 							    t[ape-marks]
 							    test-self-reported-bug
+							    y abyte[s]
 b - terminal bell                       --bell
 c + create archive                      --create
 d + difference with filesystem          --diff
