@@ -1008,13 +1008,31 @@ namespace libdar
                 switch(options.get_list_mode())
 		{
 		case archive_options_listing::normal:
-		    get_cat().tar_listing(only_contains_an_isolated_catalogue(), options.get_selection(), options.get_subtree(), options.get_filter_unsaved(), options.get_display_ea(), "");
+		    get_cat().tar_listing(only_contains_an_isolated_catalogue(),
+					  options.get_selection(),
+					  options.get_subtree(),
+					  options.get_filter_unsaved(),
+					  options.get_display_ea(),
+					  options.get_sizes_in_bytes(),
+					  "");
 		    break;
 		case archive_options_listing::tree:
-		    get_cat().listing(only_contains_an_isolated_catalogue(), options.get_selection(), options.get_subtree(), options.get_filter_unsaved(), options.get_display_ea(), "");
+		    get_cat().listing(only_contains_an_isolated_catalogue(),
+				      options.get_selection(),
+				      options.get_subtree(),
+				      options.get_filter_unsaved(),
+				      options.get_display_ea(),
+				      options.get_sizes_in_bytes(),
+				      "");
 		    break;
 		case archive_options_listing::xml:
-		    get_cat().xml_listing(only_contains_an_isolated_catalogue(), options.get_selection(), options.get_subtree(), options.get_filter_unsaved(), options.get_display_ea(), "");
+		    get_cat().xml_listing(only_contains_an_isolated_catalogue(),
+					  options.get_selection(),
+					  options.get_subtree(),
+					  options.get_filter_unsaved(),
+					  options.get_display_ea(),
+					  options.get_sizes_in_bytes(),
+					  "");
 		    break;
 		case archive_options_listing::slicing:
 		    if(only_contains_an_isolated_catalogue())

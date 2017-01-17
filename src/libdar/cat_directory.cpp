@@ -648,7 +648,7 @@ namespace libdar
 		string a = local_perm(*next_ino, next_mir != nullptr);
 		string b = local_uid(*next_ino);
 		string c = local_gid(*next_ino);
-		string d = local_size(*next_ino);
+		string d = local_size(*next_ino, false);
 		string e = local_date(*next_ino);
 		string f = local_flag(*next_ino, isolated, false);
 		string g = next_ino->get_name();

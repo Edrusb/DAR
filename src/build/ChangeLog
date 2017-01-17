@@ -6,7 +6,13 @@ from 2.5.8 to 2.5.9
   operation.
 - fixed bug: aborting an archive was someting leading to an unreadable
   archive in direct mode (was readable only in --sequential-read mode
-
+- fixed bug: libgpgme was only present at linking time of final binaries
+  (dar, dar_slave, dar_xform, dar_manager, dar_cp, dar_split), not at
+  linking time of libdar, which caused problem under Linux Rosa distro
+  where the "no-undefined" flag is passed to the linker.
+- minor new feature: -ay option has been added to display sizes in bytes
+  instead of the default which uses the largest possible unit (Kio, Mio,
+  and so on.)
 
 from 2.5.7 to 2.5.8
 - fixed double memory release occurring in a particular case of read error

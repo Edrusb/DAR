@@ -73,18 +73,25 @@ namespace libdar
 	return tools_name_of_gid(ref.get_gid());
     }
 
-    string local_size(const cat_inode & ref)
+    string local_size(const cat_inode & ref, bool sizes_in_bytes)
     {
 	string ret;
 
 	const cat_file *fic = dynamic_cast<const cat_file *>(&ref);
 	const cat_directory *dir = dynamic_cast<const cat_directory *>(&ref);
 	if(fic != nullptr)
-	    ret = tools_display_integer_in_metric_system(fic->get_size(), "o", true);
-	else if(dir != nullptr)
-	    ret = tools_display_integer_in_metric_system(dir->get_size(), "o", true);
+	    if(sizes_in_bytes)
+		ret = deci(fic->get_size()).human();
+	    else
+		ret = tools_display_integer_in_metric_system(fic->get_size(), "o", true);
 	else
-	    ret = "0";
+	    if(dir != nullptr)
+		if(sizes_in_bytes)
+		    ret = deci(dir->get_size()).human();
+		else
+		    ret = tools_display_integer_in_metric_system(dir->get_size(), "o", true);
+	    else
+		ret = "0";
 
 	return ret;
     }
