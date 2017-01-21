@@ -1,11 +1,11 @@
 from 2.5.8 to 2.5.9
-- fixed typo in documentation about dar internal use of symmetric
+- fixed typos in documentation about dar internal use of symmetric
   encryption
 - fixed bug: merging operation could wrongly melt different unrelated hard
-  linked inode when merging archives resulting from a previous merging
-  operation.
-- fixed bug: aborting an archive was someting leading to an unreadable
-  archive in direct mode (was readable only in --sequential-read mode
+  linked inodes when merging using an archive which results from a previous
+  merging operation.
+- fixed bug: aborting an archive was sometimes leading to an unreadable
+  archive in direct mode (was readable only in --sequential-read mode)
 - fixed bug: libgpgme was only present at linking time of final binaries
   (dar, dar_slave, dar_xform, dar_manager, dar_cp, dar_split), not at
   linking time of libdar, which caused problem under Linux Rosa distro
@@ -247,8 +247,8 @@ from 2.4.x to 2.5.0
 
 from 2.4.23 to 2.4.24
 - fixed bug: merging operation could wrongly melt different unrelated hard
-  linked inode when merging archives resulting from a previous merging
-  operation.
+  linked inodes when merging using an archive which results from a previous
+  merging operation.
 
 from 2.4.22 to 2.4.23
 - fixed bug leading dar to not include directories given to -g option nor
