@@ -139,9 +139,9 @@ namespace libdar
 	///  libdar Major version defined at compilation time
     const U_I LIBDAR_COMPILE_TIME_MAJOR = 5;
 	///  libdar Medium version defined at compilation time
-    const U_I LIBDAR_COMPILE_TIME_MEDIUM = 8;
+    const U_I LIBDAR_COMPILE_TIME_MEDIUM = 9;
 	///  libdar Minor version defined at compilation time
-    const U_I LIBDAR_COMPILE_TIME_MINOR = 4;
+    const U_I LIBDAR_COMPILE_TIME_MINOR = 0;
 
 	////////////////////////////////////////////////////////////////////////
 	// LIBDAR INITIALIZATION METHODS                                      //
