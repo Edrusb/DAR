@@ -1,7 +1,7 @@
 from 2.4.23 to 2.4.24
 - fixed bug: merging operation could wrongly melt different unrelated hard
-  linked inode when merging archives resulting from a previous merging
-  operation.
+  linked inodes when merging using an archive which results from a previous
+  merging operation.
 
 from 2.4.22 to 2.4.23
 - fixed bug leading dar to not include directories given to -g option nor
