@@ -731,7 +731,7 @@ A
 same as H but the current 'in place' entry is the first link we meet pointing to that hard linked inode.
 .TP 5
 R
-true if the 'in place' entry is more recent than or of same date as the 'to be added' entry. The last modification date [aka mtime] is used for this comparison. If the 'to be added' entry is not an inode (and thus has no mtime), the 'in place' is considered to be more recent than the 'to be added' entry. Same thing if the 'in place' entry is not an inode (ad has no mtime available for comparison), it is here too assumed to be more recent.
+true if the 'in place' entry is more recent than or of same date as the 'to be added' entry. The last modification date [aka mtime] is used for this comparison. If the 'to be added' entry is not an inode (and thus has no mtime), the 'in place' is considered to be more recent than the 'to be added' entry. Same thing if the 'in place' entry is not an inode (and has no mtime available for comparison), it is here too assumed to be more recent.
 .TP 5
 R(<date>)
 true if the 'in place' entry is more recent than or of the same date as the fixed <date> given in argument. No consideration is done toward the 'to be added' element. The <date> format is the same as the one used with -af option. If an entry has no mtime (it is not an inode for example) it is assumed an virtual mtime of zero.
