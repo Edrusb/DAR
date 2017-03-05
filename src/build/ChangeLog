@@ -2,6 +2,7 @@ from 2.5.9 to 2.5.10
 - fixed bug: -r option (only more recent overwriting policy) was
   considering a file to be more recent when it had the exact same date as
   the file in place.
+- updating documentation about requirements for compiling dar from sources
 
 from 2.5.8 to 2.5.9
 - fixed typos in documentation about dar internal use of symmetric
