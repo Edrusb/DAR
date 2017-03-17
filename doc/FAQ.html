@@ -1,12 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
-  
-  <meta content="text/html; charset=us-ascii" http-equiv="content-type">
-  <title>DAR - Frequently Asked Questions</title>
-
 
   
-</head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
+  <meta content="text/html; charset=us-ascii" http-equiv="content-type"><title>DAR - Frequently Asked Questions</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -103,9 +99,10 @@ dar does not report new files found on filesystem?</a><br>
       <a href="#cyrillic">Why do dar reports truncated filenames under
 Windows, especially with cyrillic filenames?</a><br>
 </span><a href="#win32"><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;">I have a 32 bits windows system, which binary </span><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;">package </span></span><span style="font-weight: bold; font-style: italic;">can I to use?</span></span></a><br>
-<span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;"></span>
-      <h2><span style="font-weight: bold;"> </span></h2>
-      <br>
+      <a style="font-style: italic; font-weight: bold;" href="#lzop_vs_dar">lzo compression is slower with dar than with lzop, why?</a><br>
+<span style="font-weight: bold; font-style: italic;"><br>
+<h2><span style="font-weight: bold;"> </span></h2>
+      
       <h2><span style="text-decoration: underline;">Answers:</span></h2>
       <h1><span style="font-weight: bold; font-style: italic;"> </span></h1>
       <h2> </h2>
@@ -3270,8 +3267,35 @@ Feel free to ask for support on <a href="https://lists.sourceforge.net/lists/lis
       <br>
       </div>
       <span style="font-weight: bold; font-style: italic;">
-      <p><span style="font-weight: bold; font-style: italic;"><br>
-      </span>  </p>
+      <p><a name="lzop_vs_dar"></a>lzo compression is slower with dar than with lzop, why?</p></span>
+      <div style="margin-left: 40px;">dar/libdar always uses the lzo
+compression algorithm"lzo1x_999" with the compression level requested
+(from 1 to 9) as argument. Dar thus provides 9 different
+compression/speed levels with lzo.<br>
+      <br>
+On the other size as of today (2017) lzop uses a very degradated lzo
+algorithm for level 1 (lzo1x_1_15) and the exact same algorithm for
+levels from 2 to 6 (lzo1x_1) this reduces memory requirement and
+improves compression speed at the cost of the resulting compression
+ratio. Lzop compression levels 7 to 9 use the same algorithm as what
+dar/libdar uses (lzo1x_999). In total lzop only provides 5 different
+compression levels/algorithms.<br>
+      <br>
+So now you know why dar is slower than lzop when using lzo compression at level 1 to 6.<br>
+      <br>
+If you need less fond of memory and faster compression algorithm than
+what lzo1x_999 can provide with a compression level of 1, using dar you
+can use instead the gzip, bzip2 or
+xz algorithm as replacement to lzo. Each time you have 9 different
+compression levels you can choose among to match the
+speed/compression-ratio/memory requirement you need.<br>
+      </div>
+      <span style="font-weight: bold; font-style: italic;">
+      <p><br>
+      </p>
+      <p><br>
+  </p>
+
 
       </span> </td>
     </tr>

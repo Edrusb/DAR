@@ -8,6 +8,8 @@ from 2.5.9 to 2.5.10
   differential/incremental backup. The fix consists of the removal of the
   immutable flag from filesystem before restoring the new version of the
   file's data, then setting back the immutable flag afterward.
+- updating FAQ with description of the way dar uses lzo compression
+  compared to the lzop program
 
 from 2.5.8 to 2.5.9
 - fixed typos in documentation about dar internal use of symmetric
