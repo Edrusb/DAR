@@ -10,6 +10,8 @@ from 2.5.9 to 2.5.10
   file's data, then setting back the immutable flag afterward.
 - updating FAQ with description of the way dar uses lzo compression
   compared to the lzop program
+- fixed bug: aborting an archive was leading to an unreadable archive in
+  direct mode most of the time when strong encryption was used
 
 from 2.5.8 to 2.5.9
 - fixed typos in documentation about dar internal use of symmetric

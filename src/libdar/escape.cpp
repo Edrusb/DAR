@@ -671,132 +671,141 @@ namespace libdar
 	if(size == 0)
 	    return; // nothing to do
 
-	if(write_buffer_size > 0) // some data are pending in transit
+	try
 	{
-	    U_I initial_buffer_size = write_buffer_size;
 
-	    if(write_buffer_size >= ESCAPE_SEQUENCE_LENGTH - 1)
-		throw SRC_BUG;
-
-		// filling the buffer
-
-	    U_I delta = WRITE_BUFFER_SIZE - write_buffer_size; // available room in write_buffer
-	    delta = delta > size ? size : delta;
-	    (void)memcpy(write_buffer + write_buffer_size, a, delta);
-	    write_buffer_size += delta;
-	    written += delta;
-
-		// checking for escape sequence in write_buffer
-
-	    trouve = trouve_amorce(write_buffer, write_buffer_size, fixed_sequence);
-	    if(trouve == write_buffer_size) // no escape sequence found
+	    if(write_buffer_size > 0) // some data are pending in transit
 	    {
-		x_below->write(write_buffer, write_buffer_size);
-		below_position += write_buffer_size;
-		write_buffer_size = 0;
-	    }
-	    else // start of escape sequence found
-	    {
-		if(trouve + ESCAPE_SEQUENCE_LENGTH - 1 <= write_buffer_size) // no doubt, we have a full escape sequence in data, we need to protect this data
+		U_I initial_buffer_size = write_buffer_size;
+
+		if(write_buffer_size >= ESCAPE_SEQUENCE_LENGTH - 1)
+		    throw SRC_BUG;
+
+		    // filling the buffer
+
+		U_I delta = WRITE_BUFFER_SIZE - write_buffer_size; // available room in write_buffer
+		delta = delta > size ? size : delta;
+		(void)memcpy(write_buffer + write_buffer_size, a, delta);
+		write_buffer_size += delta;
+		written += delta;
+
+		    // checking for escape sequence in write_buffer
+
+		trouve = trouve_amorce(write_buffer, write_buffer_size, fixed_sequence);
+		if(trouve == write_buffer_size) // no escape sequence found
 		{
-		    x_below->write(write_buffer, trouve);
-		    below_position += trouve;
-		    set_fixed_sequence_for(seqt_not_a_sequence);
-		    x_below->write((const char *)fixed_sequence, ESCAPE_SEQUENCE_LENGTH);
-		    below_position += ESCAPE_SEQUENCE_LENGTH;
-			// still remains valid data not yet written in write_buffer at offset 'trouve + ESCAPE_SEQUENCE_LENGTH - 1'
-			// however this data is also in the input write_buffer (a, size)
-		    written = (trouve + ESCAPE_SEQUENCE_LENGTH - 1) - initial_buffer_size;
-			// this way, we do not have to copy back to "a" the not yet written data
-		    ++escaped_data_count_since_last_skip;
-		    write_buffer_size = 0; // dropping all supplementary data added
-			// it will be treated from the "a" buffer where they had been copied from
+		    x_below->write(write_buffer, write_buffer_size);
+		    below_position += write_buffer_size;
+		    write_buffer_size = 0;
 		}
-		else // the escape sequence found is not complete
+		else // start of escape sequence found
 		{
-		    U_I yet_in_a = size - written;
-		    U_I missing_for_sequence = trouve + (ESCAPE_SEQUENCE_LENGTH - 1) - write_buffer_size;
-
-		    if(write_buffer_size < WRITE_BUFFER_SIZE && yet_in_a > 0)
-			throw SRC_BUG; // write_buffer_size not filled while remains available data in "a" !
-
-			// either the escape sequence is entirely in "a" (and partially copied in write_buffer)
-			// or there is not enough data in "a" to determin whether this start of sequence is complete or not
-
-			// first, we can at least write down the data up to offset "trouve - 1" (that's "trouve" bytes).
-
-		    x_below->write(write_buffer, trouve);
-		    below_position += trouve;
-
-		    if(yet_in_a >= missing_for_sequence) // sequence entirely available with remaining data in "a"
+		    if(trouve + ESCAPE_SEQUENCE_LENGTH - 1 <= write_buffer_size) // no doubt, we have a full escape sequence in data, we need to protect this data
 		    {
-			if(trouve < initial_buffer_size)
-			    throw SRC_BUG; // some original data of write_buffer are part of the escape sequence !!!
-			written = trouve - initial_buffer_size;
-			write_buffer_size = 0;
+			x_below->write(write_buffer, trouve);
+			below_position += trouve;
+			set_fixed_sequence_for(seqt_not_a_sequence);
+			x_below->write((const char *)fixed_sequence, ESCAPE_SEQUENCE_LENGTH);
+			below_position += ESCAPE_SEQUENCE_LENGTH;
+			    // still remains valid data not yet written in write_buffer at offset 'trouve + ESCAPE_SEQUENCE_LENGTH - 1'
+			    // however this data is also in the input write_buffer (a, size)
+			written = (trouve + ESCAPE_SEQUENCE_LENGTH - 1) - initial_buffer_size;
+			    // this way, we do not have to copy back to "a" the not yet written data
+			++escaped_data_count_since_last_skip;
+			write_buffer_size = 0; // dropping all supplementary data added
+			    // it will be treated from the "a" buffer where they had been copied from
 		    }
-		    else // missing data to determine the nature of the sequence
+		    else // the escape sequence found is not complete
 		    {
-			(void)memmove(write_buffer, write_buffer + trouve, write_buffer_size - trouve);
-			write_buffer_size -= trouve;
-			if(write_buffer_size >= ESCAPE_SEQUENCE_LENGTH - 1)
-			    throw SRC_BUG; // should never seen this if() condition
-			if(write_buffer_size + yet_in_a > WRITE_BUFFER_SIZE)
-			    throw SRC_BUG; // not possible to reach normally, because yet_in_a < missing_for_sequence < SEQUENCE_LENGTH
-			(void)memcpy(write_buffer + write_buffer_size, a+written, yet_in_a);
+			U_I yet_in_a = size - written;
+			U_I missing_for_sequence = trouve + (ESCAPE_SEQUENCE_LENGTH - 1) - write_buffer_size;
+
+			if(write_buffer_size < WRITE_BUFFER_SIZE && yet_in_a > 0)
+			    throw SRC_BUG; // write_buffer_size not filled while remains available data in "a" !
+
+			    // either the escape sequence is entirely in "a" (and partially copied in write_buffer)
+			    // or there is not enough data in "a" to determin whether this start of sequence is complete or not
+
+			    // first, we can at least write down the data up to offset "trouve - 1" (that's "trouve" bytes).
+
+			x_below->write(write_buffer, trouve);
+			below_position += trouve;
+
+			if(yet_in_a >= missing_for_sequence) // sequence entirely available with remaining data in "a"
+			{
+			    if(trouve < initial_buffer_size)
+				throw SRC_BUG; // some original data of write_buffer are part of the escape sequence !!!
+			    written = trouve - initial_buffer_size;
+			    write_buffer_size = 0;
+			}
+			else // missing data to determine the nature of the sequence
+			{
+			    (void)memmove(write_buffer, write_buffer + trouve, write_buffer_size - trouve);
+			    write_buffer_size -= trouve;
+			    if(write_buffer_size >= ESCAPE_SEQUENCE_LENGTH - 1)
+				throw SRC_BUG; // should never seen this if() condition
+			    if(write_buffer_size + yet_in_a > WRITE_BUFFER_SIZE)
+				throw SRC_BUG; // not possible to reach normally, because yet_in_a < missing_for_sequence < SEQUENCE_LENGTH
+			    (void)memcpy(write_buffer + write_buffer_size, a+written, yet_in_a);
+			    written = size;
+			    write_buffer_size += yet_in_a;
+			}
+		    }
+		}
+	    }
+
+		// now that we have eventually treated the write_buffer, we get two possibilities
+		// either no escape sequence is pending in the write_buffer [write_buffer_size == 0] (escape sequence in "a" or non escape sequence found at all)
+		// or an potential escape sequence is pending in the write_buffer, which only occurs if "a" does not contain any more
+		// data to detemine the exact nature of this sequence [ written == size ]
+
+	    if(written != size && write_buffer_size > 0)
+		throw SRC_BUG; // anormal situation, seen the previous comment.
+
+	    while(written < size)
+	    {
+		U_I remains = size - written;
+
+		trouve = trouve_amorce(a + written, remains, fixed_sequence);
+		if(trouve == remains)
+		{
+		    x_below->write(a + written, remains);
+		    below_position += remains;
+		    written = size;
+		}
+		else
+		{
+		    if(trouve > 0)
+		    {
+			x_below->write(a + written, trouve);
+			below_position += trouve;
+			written += trouve;
+		    }
+
+		    if(trouve + ESCAPE_SEQUENCE_LENGTH - 1 <= remains) // full escape sequence
+		    {
+			set_fixed_sequence_for(seqt_not_a_sequence);
+			x_below->write((const char *)fixed_sequence, ESCAPE_SEQUENCE_LENGTH);
+			below_position += ESCAPE_SEQUENCE_LENGTH;
+			written += ESCAPE_SEQUENCE_LENGTH - 1;
+			++escaped_data_count_since_last_skip;
+		    }
+		    else // not completed sequence
+		    {
+			remains = size - written;
+			if(remains >= ESCAPE_SEQUENCE_LENGTH - 1)
+			    throw SRC_BUG; // how possible is to not be able to fully determine the sequence ???
+			(void)memcpy(write_buffer, a + written, remains);
+			write_buffer_size = remains;
 			written = size;
-			write_buffer_size += yet_in_a;
 		    }
 		}
 	    }
 	}
-
-	    // now that we have eventually treated the write_buffer, we get two possibilities
-	    // either no escape sequence is pending in the write_buffer [write_buffer_size == 0] (escape sequence in "a" or non escape sequence found at all)
-	    // or an potential escape sequence is pending in the write_buffer, which only occurs if "a" does not contain any more
-	    // data to detemine the exact nature of this sequence [ written == size ]
-
-	if(written != size && write_buffer_size > 0)
-	    throw SRC_BUG; // anormal situation, seen the previous comment.
-
-	while(written < size)
+	catch(Ethread_cancel & e)
 	{
-	    U_I remains = size - written;
-
-	    trouve = trouve_amorce(a + written, remains, fixed_sequence);
-	    if(trouve == remains)
-	    {
-		x_below->write(a + written, remains);
-		below_position += remains;
-		written = size;
-	    }
-	    else
-	    {
-		if(trouve > 0)
-		{
-		    x_below->write(a + written, trouve);
-		    below_position += trouve;
-		    written += trouve;
-		}
-
-		if(trouve + ESCAPE_SEQUENCE_LENGTH - 1 <= remains) // full escape sequence
-		{
-		    set_fixed_sequence_for(seqt_not_a_sequence);
-		    x_below->write((const char *)fixed_sequence, ESCAPE_SEQUENCE_LENGTH);
-		    below_position += ESCAPE_SEQUENCE_LENGTH;
-		    written += ESCAPE_SEQUENCE_LENGTH - 1;
-		    ++escaped_data_count_since_last_skip;
-		}
-		else // not completed sequence
-		{
-		    remains = size - written;
-		    if(remains >= ESCAPE_SEQUENCE_LENGTH - 1)
-			throw SRC_BUG; // how possible is to not be able to fully determine the sequence ???
-		    (void)memcpy(write_buffer, a + written, remains);
-		    write_buffer_size = remains;
-		    written = size;
-		}
-	    }
+	    below_position = x_below->get_position();
+	    throw;
 	}
     }
 
