@@ -1186,6 +1186,8 @@ namespace libdar
 
 		ver.set_edition(macro_tools_supported_version);
 		ver.set_compression_algo(algo);
+		if(algo == lzo1x_1_15 || algo == lzo1x_1)
+		    ver.set_compression_algo(lzo);
 		ver.set_command_line(user_comment);
 		ver.set_sym_crypto_algo(crypto);
 		ver.set_tape_marks(add_marks_for_sequential_reading);

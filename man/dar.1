@@ -572,6 +572,10 @@ When libdar is compiled against libthreadar, it can make use of several threads.
 .TP 20
 -z[[algo:]level], --compression[=[algo][:][level]]
 add compression within slices using gzip, bzip2, lzo or xz algorithm (if -z is not specified, no compression is performed). The compression level (an integer from 1 to 9) is optional, and is 9 by default. Be careful when using xz algorithm better specify a compression ratio less than or equal to 6 to avoid important memory requirements. A ratio of 1 means less compression and faster processing, while at the opposite a ratio of 9 gives the best compression but longest procesing time. "Algo" is optional, it specifies the compression algorithm to use and can take the following values "gzip", "bzip2", "lzo" or "xz". "gzip" algorithm is used by default (for historical reasons see --gzip below). If both algorithm and compression are given, a ':' must be placed between them. Valid usage of -z option is for example: -z, -z9, -zlzo, -zgzip, -zbzip2, -zlzo:6, -zbzip2:2, -zgzip:1, -zxz:6 and so on. Usage for long option is the same: --compression, --compression=9, --compression=lzo, --compression=gzip, --compression=bzip2, --compression=lzo:6, --compression=bzip2:2, --compression=gzip:1 --compression=xz:9 and so on.
+.PP
+.RS
+About lzo compression, the compression levels of dar and lzop program do not match. If you want to get the behavior of compression level 1 of lzop, use the lzop-1 algorithm in place of lzo with dar/libdar. If you want to get the behavior of lzop compression level 3, use the lzop-3 algorithm in place of the lzo algorithm. Lzop compression levels 2, 4, 5 and 6 are the same as level 3. last, there is no difference about compression level 7, 8 and 9 between dar and lzop. The lzop-1 and lzop-3 algorithms do not make use of any compression level (compression level is ignored with these algorithms).
+.RE
 .TP 20
 --gzip[=level]
 Same as -z (see just above). This option is deprecated, please use --compression or -z.
