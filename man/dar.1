@@ -926,7 +926,7 @@ Doing a difference in sequential read mode is possible but hard linked inodes ca
 .TP 20
 -T, --list-format=<normal | tree | xml | slicing>, --tree-format
 .RS
-By default, listing provides a tar-like output (the 'normal' output). You can however get a tree-like output, an XML structured output or a output focusing on slice(s) where each file's data, EA and FSA is located in. Providing -T without argument gives the same as providing the 'tree' argument to it. The option --tree-format is an alias to --list-format=tree (backward compatibility). Note that the files doc/dar-catalog-*.dtd define the format of the XML output listing (This file is also installed under $PREFIX/share/doc)
+By default, listing provides a tar-like output (the 'normal' output). You can however get a tree-like output, an XML structured output or an output focusing on slice(s) where each file's data, EA and FSA is located in. Providing -T without argument gives the same as providing the 'tree' argument to it. The option --tree-format is an alias to --list-format=tree (backward compatibility). Note that the files doc/dar-catalog-*.dtd define the format of the XML output listing (This file is also installed under $PREFIX/share/doc)
 .PP
 the -Tslicing option can also be used with isolated catalogue generated with dar 2.5.0 or above, as isolated catalogues now contain a copy of the slicing layout of the archive of reference. However, if the archive of reference has been resliced (using dar_xform) after the isolated catalogue has been built, the slicing information would not be correct. For that corner case, you can use the -s and -S options with -Tslicing to specify what are the new slice sizes of the archive of reference.
 .RE
