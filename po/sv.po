@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2017-01-21 12:05+0100\n"
+"POT-Creation-Date: 2017-03-26 16:14+0200\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -2140,88 +2140,88 @@ msgstr ""
 msgid "top of directory hierarchy"
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:226
-#: src/libdar/filesystem_specific_attribute.cpp:1096
+#: src/libdar/filesystem_specific_attribute.cpp:232
+#: src/libdar/filesystem_specific_attribute.cpp:1102
 msgid "invalid length for FSA family flag"
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:232
+#: src/libdar/filesystem_specific_attribute.cpp:238
 msgid "invalid length for FSA nature flag"
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:670
+#: src/libdar/filesystem_specific_attribute.cpp:676
 msgid "Failed setting (opening) extX family FSA: "
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:683
+#: src/libdar/filesystem_specific_attribute.cpp:689
 #, fuzzy
 msgid "Failed reading existing extX family FSA: "
 msgstr "Fel vid läsning från fil: "
 
-#: src/libdar/filesystem_specific_attribute.cpp:710
-#: src/libdar/filesystem_specific_attribute.cpp:723
-#: src/libdar/filesystem_specific_attribute.cpp:736
-#: src/libdar/filesystem_specific_attribute.cpp:749
-#: src/libdar/filesystem_specific_attribute.cpp:768
-#: src/libdar/filesystem_specific_attribute.cpp:782
-#: src/libdar/filesystem_specific_attribute.cpp:795
-#: src/libdar/filesystem_specific_attribute.cpp:808
-#: src/libdar/filesystem_specific_attribute.cpp:821
-#: src/libdar/filesystem_specific_attribute.cpp:834
-#: src/libdar/filesystem_specific_attribute.cpp:847
-#: src/libdar/filesystem_specific_attribute.cpp:860
+#: src/libdar/filesystem_specific_attribute.cpp:716
+#: src/libdar/filesystem_specific_attribute.cpp:729
+#: src/libdar/filesystem_specific_attribute.cpp:742
+#: src/libdar/filesystem_specific_attribute.cpp:755
+#: src/libdar/filesystem_specific_attribute.cpp:774
+#: src/libdar/filesystem_specific_attribute.cpp:788
+#: src/libdar/filesystem_specific_attribute.cpp:801
+#: src/libdar/filesystem_specific_attribute.cpp:814
+#: src/libdar/filesystem_specific_attribute.cpp:827
+#: src/libdar/filesystem_specific_attribute.cpp:840
+#: src/libdar/filesystem_specific_attribute.cpp:853
+#: src/libdar/filesystem_specific_attribute.cpp:866
 #, c-format
 msgid ""
 "Warning: FSA %s/%s support has not been found at compilation time, cannot "
 "restore it for inode %s"
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:905
+#: src/libdar/filesystem_specific_attribute.cpp:911
 msgid "Failed set extX family FSA: "
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:932
+#: src/libdar/filesystem_specific_attribute.cpp:938
 #, c-format
 msgid ""
 "Not setting FSA extX IMMUTABLE flags for %s due to of lack of capability"
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:960
+#: src/libdar/filesystem_specific_attribute.cpp:966
 #, c-format
 msgid ""
 "Not setting FSA extX SYSTEM RESOURCE flags for %s due to of lack of "
 "capability"
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:978
+#: src/libdar/filesystem_specific_attribute.cpp:984
 #, c-format
 msgid ""
 "Warning! %s Filesystem Specific Attribute support have not been activated at "
 "compilation time and could not be restored for %s"
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:998
+#: src/libdar/filesystem_specific_attribute.cpp:1004
 #, c-format
 msgid ""
 "Birth Time attribute cannot be restored for %s because no FSA familly able "
 "to carry that attribute could be activated at compilation time."
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:1102
-#: src/libdar/filesystem_specific_attribute.cpp:1103
+#: src/libdar/filesystem_specific_attribute.cpp:1108
+#: src/libdar/filesystem_specific_attribute.cpp:1109
 msgid "invalid FSA family flag"
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:1137
-#: src/libdar/filesystem_specific_attribute.cpp:1139
+#: src/libdar/filesystem_specific_attribute.cpp:1143
+#: src/libdar/filesystem_specific_attribute.cpp:1145
 msgid "invalid FSA nature flag"
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:1163
+#: src/libdar/filesystem_specific_attribute.cpp:1169
 msgid "Unexepected value for boolean FSA, data corruption may have occurred"
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:1167
+#: src/libdar/filesystem_specific_attribute.cpp:1173
 #, fuzzy
 msgid "Error while reading FSA: "
 msgstr "Fel vid läsning från fil: "
@@ -2751,7 +2751,7 @@ msgstr ""
 "Lägga till en tydlig escape-sekvens av typen 'seqt_not_a_sequence' är "
 "förbjudet"
 
-#: src/libdar/escape.cpp:865
+#: src/libdar/escape.cpp:874
 msgid "Unknown escape sequence type"
 msgstr "Okänd escape-sekvenstyp"
 
@@ -2923,38 +2923,38 @@ msgid ""
 "from compression library"
 msgstr ""
 
-#: src/libdar/compressor.cpp:329
+#: src/libdar/compressor.cpp:344
 msgid "compressed data is corrupted"
 msgstr "komprimerade data är förstörda"
 
-#: src/libdar/compressor.cpp:465
+#: src/libdar/compressor.cpp:480
 msgid "compressed data CRC error"
 msgstr "CRC-fel hos komprimerade data"
 
-#: src/libdar/compressor.cpp:552 src/libdar/compressor.cpp:582
-#: src/libdar/compressor.cpp:722 src/libdar/compressor.cpp:787
+#: src/libdar/compressor.cpp:567 src/libdar/compressor.cpp:597
+#: src/libdar/compressor.cpp:749 src/libdar/compressor.cpp:814
 msgid "lzo compression"
 msgstr "lzo-komprimering"
 
-#: src/libdar/compressor.cpp:708
+#: src/libdar/compressor.cpp:735
 #, c-format
 msgid "Probable bug in liblzo2: lzo1x_*_compress returned unexpected code %d"
 msgstr "Möjligt fel i liblso2:  lzo1x_*_compress lämnade oväntad kod %d"
 
-#: src/libdar/compressor.cpp:743
+#: src/libdar/compressor.cpp:770
 msgid "data corruption detected: Incoherence in LZO compressed data"
 msgstr "förstörda data hittade: oegentligheter i LZO-komprimerade data"
 
-#: src/libdar/compressor.cpp:747 src/libdar/compressor.cpp:769
-#: src/libdar/compressor.cpp:783
+#: src/libdar/compressor.cpp:774 src/libdar/compressor.cpp:796
+#: src/libdar/compressor.cpp:810
 msgid "compressed data corruption detected"
 msgstr "förstörda komprimerade data hittade"
 
-#: src/libdar/compressor.cpp:757
+#: src/libdar/compressor.cpp:784
 msgid "data corruption detected: Too large block of compressed data"
 msgstr "förstörda data hittade: För stort block med komprimerade data"
 
-#: src/libdar/compressor.cpp:759
+#: src/libdar/compressor.cpp:786
 msgid ""
 "Too large block of compressed data: Either due to data corruption or current "
 "system limitation where SSIZE_MAX value implied smaller buffers than required"
@@ -2963,12 +2963,12 @@ msgstr ""
 "eller begränsningar i aktuellt system där SSIZE_MAX-värdet indikerar mindre "
 "buffertar än begärda"
 
-#: src/libdar/compressor.cpp:818 src/libdar/compressor.cpp:837
-#: src/libdar/compressor.cpp:856
+#: src/libdar/compressor.cpp:849 src/libdar/compressor.cpp:872
+#: src/libdar/compressor.cpp:895
 msgid "unknown compression"
 msgstr "okänd komprimering"
 
-#: src/libdar/compressor.cpp:874
+#: src/libdar/compressor.cpp:919
 #, c-format
 msgid "unknown compression algorithm: %S"
 msgstr "okänd komprimeringsalgoritm: %S"
@@ -3112,7 +3112,7 @@ msgstr ""
 "det lösenord du skall till och lämna kan skrivas till disk (växlingsutrymme) "
 "i klartext. Du har härmed varnats!"
 
-#: src/libdar/macro_tools.cpp:578 src/libdar/macro_tools.cpp:1312
+#: src/libdar/macro_tools.cpp:578 src/libdar/macro_tools.cpp:1314
 #, c-format
 msgid "Archive %S requires a password: "
 msgstr "Arkiv %S kräver ett lösenord: "
@@ -3142,7 +3142,7 @@ msgstr "Öppnar chiffreringslager..."
 msgid "Unknown encryption algorithm"
 msgstr "Okänd krypteringsalgoritm"
 
-#: src/libdar/macro_tools.cpp:678 src/libdar/macro_tools.cpp:1419
+#: src/libdar/macro_tools.cpp:678 src/libdar/macro_tools.cpp:1421
 msgid "Creating a new thread to run the previously created layers..."
 msgstr ""
 
@@ -3201,7 +3201,7 @@ msgstr ""
 "till en escape-sekvens-nivå trots arkivflaggan. Vill du fortsätta som "
 "förslagits av arkivflaggan, sålunda utan escape-sekvens-nivå?"
 
-#: src/libdar/macro_tools.cpp:760 src/libdar/macro_tools.cpp:1465
+#: src/libdar/macro_tools.cpp:760 src/libdar/macro_tools.cpp:1467
 msgid "Creating a new thread to run the escape layer..."
 msgstr ""
 
@@ -3217,12 +3217,12 @@ msgstr ""
 msgid "Opening the compression layer..."
 msgstr "Öppnar kompressionslagret..."
 
-#: src/libdar/macro_tools.cpp:804 src/libdar/macro_tools.cpp:1497
+#: src/libdar/macro_tools.cpp:804 src/libdar/macro_tools.cpp:1499
 #, fuzzy
 msgid "Creating a new thread to run the compression layer..."
 msgstr "Öppnar kompressionslagret..."
 
-#: src/libdar/macro_tools.cpp:818 src/libdar/macro_tools.cpp:1507
+#: src/libdar/macro_tools.cpp:818 src/libdar/macro_tools.cpp:1509
 msgid "All layers have been created successfully"
 msgstr "Alla lager har skapats korrekt"
 
@@ -3381,7 +3381,7 @@ msgstr ""
 msgid "Adding cache layer over pipe to provide limited skippability..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1197
+#: src/libdar/macro_tools.cpp:1199
 #, fuzzy
 msgid ""
 "WARNING: support for secure memory was not available at compilation time, in "
@@ -3393,17 +3393,17 @@ msgstr ""
 "det lösenord du skall till och lämna kan skrivas till disk (växlingsutrymme) "
 "i klartext. Du har härmed varnats!"
 
-#: src/libdar/macro_tools.cpp:1212
+#: src/libdar/macro_tools.cpp:1214
 msgid "Generating random key for symmetric encryption..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1220
+#: src/libdar/macro_tools.cpp:1222
 msgid ""
 "Scrambling is a very weak encryption algorithm, this is a non-sens to use "
 "with asymmetric encryption"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1260
+#: src/libdar/macro_tools.cpp:1262
 #, c-format
 msgid ""
 "For your information, this is the iteration %d for which the randomly "
@@ -3411,113 +3411,113 @@ msgid ""
 "another random key... patience"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1264
+#: src/libdar/macro_tools.cpp:1266
 #, c-format
 msgid ""
 "... A strong randomly generated key could be found after %d iteration(s)"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1271
+#: src/libdar/macro_tools.cpp:1273
 msgid "Key generated"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1313
+#: src/libdar/macro_tools.cpp:1315
 msgid "Please confirm your password: "
 msgstr "Bekräfta lösenordet: "
 
-#: src/libdar/macro_tools.cpp:1317
+#: src/libdar/macro_tools.cpp:1319
 msgid "The two passwords are not identical. Aborting"
 msgstr "De två lösenorden är olika. Avbryter"
 
-#: src/libdar/macro_tools.cpp:1347
+#: src/libdar/macro_tools.cpp:1349
 #, fuzzy
 msgid "Writing down the archive header..."
 msgstr "Läser arkivhuvud..."
 
-#: src/libdar/macro_tools.cpp:1363
+#: src/libdar/macro_tools.cpp:1365
 msgid "Adding a new layer on top: scrambler object..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1375
+#: src/libdar/macro_tools.cpp:1377
 msgid "Adding a new layer on top: Strong encryption object..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1392
+#: src/libdar/macro_tools.cpp:1394
 #, fuzzy
 msgid "Adding a new layer on top: Caching layer for better performances..."
 msgstr "Öppnar \"cache\"-nivån för bättre prestanda..."
 
-#: src/libdar/macro_tools.cpp:1437
+#: src/libdar/macro_tools.cpp:1439
 msgid "Writing down the initial elastic buffer through the encryption layer..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1449
+#: src/libdar/macro_tools.cpp:1451
 msgid "Adding a new layer on top: Escape layer to allow sequential reading..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1479
+#: src/libdar/macro_tools.cpp:1481
 msgid "Adding a new layer on top: compression..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1521
+#: src/libdar/macro_tools.cpp:1523
 #, fuzzy
 msgid "Error creating archive layers: "
 msgstr "Fel vid läsning av tecken: "
 
-#: src/libdar/macro_tools.cpp:1630
+#: src/libdar/macro_tools.cpp:1632
 #, fuzzy
 msgid "Writing down archive contents..."
 msgstr "Skriver arkivinnehåll..."
 
-#: src/libdar/macro_tools.cpp:1654
+#: src/libdar/macro_tools.cpp:1656
 msgid "Calculating the signature of the catalogue hash..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1670
+#: src/libdar/macro_tools.cpp:1672
 #, fuzzy
 msgid "Writing down the signed hash of the catalogue..."
 msgstr "Uppdaterar databas med katalog..."
 
-#: src/libdar/macro_tools.cpp:1720
+#: src/libdar/macro_tools.cpp:1722
 #, fuzzy
 msgid "Closing the compression layer..."
 msgstr "Öppnar kompressionslagret..."
 
-#: src/libdar/macro_tools.cpp:1735
+#: src/libdar/macro_tools.cpp:1737
 #, fuzzy
 msgid "Closing the escape layer..."
 msgstr "Öppnar kompressionslagret..."
 
-#: src/libdar/macro_tools.cpp:1755
+#: src/libdar/macro_tools.cpp:1757
 #, fuzzy
 msgid "Writing down the first archive terminator..."
 msgstr "Skriver arkivinnehåll..."
 
-#: src/libdar/macro_tools.cpp:1761
+#: src/libdar/macro_tools.cpp:1763
 msgid "writing down the final elastic buffer through the encryption layer..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1800
+#: src/libdar/macro_tools.cpp:1802
 #, fuzzy
 msgid "Closing the encryption layer..."
 msgstr "Öppnar kompressionslagret..."
 
-#: src/libdar/macro_tools.cpp:1822
+#: src/libdar/macro_tools.cpp:1824
 #, fuzzy
 msgid "Writing down archive trailer..."
 msgstr "Skriver arkivinnehåll..."
 
-#: src/libdar/macro_tools.cpp:1827
+#: src/libdar/macro_tools.cpp:1829
 #, fuzzy
 msgid "Writing down the second archive terminator..."
 msgstr "Skriver arkivinnehåll..."
 
-#: src/libdar/macro_tools.cpp:1838
+#: src/libdar/macro_tools.cpp:1840
 #, fuzzy
 msgid "Closing archive low layer..."
 msgstr "Funderar på chiffreringsnivå..."
 
-#: src/libdar/macro_tools.cpp:1855
+#: src/libdar/macro_tools.cpp:1857
 #, fuzzy
 msgid "Archive is closed."
 msgstr "Arkivet består av %i fil(er)\n"
@@ -3532,54 +3532,54 @@ msgstr "Fel vid skapande av hash handle: %s/%s"
 msgid "Missing data to initiate a TLV object"
 msgstr "data saknas till att bygga en mapp"
 
-#: src/libdar/filesystem.cpp:174
+#: src/libdar/filesystem.cpp:176
 #, c-format
 msgid "Error reading inode of file %s : %s"
 msgstr "Fel vid läsning av inod för fil %s : %s"
 
-#: src/libdar/filesystem.cpp:179
+#: src/libdar/filesystem.cpp:181
 #, fuzzy, c-format
 msgid "Failed reading inode information for %s: "
 msgstr "Fel vid inhämtning av innodinformation för %s : %s"
 
-#: src/libdar/filesystem.cpp:187
+#: src/libdar/filesystem.cpp:189
 msgid "Cannot read inode for "
 msgstr "Kan ej läsa inod för "
 
-#: src/libdar/filesystem.cpp:283
+#: src/libdar/filesystem.cpp:285
 msgid "Unknown file type! file name is: "
 msgstr "Okänd filtyp! filnamnet är: "
 
-#: src/libdar/filesystem.cpp:316
+#: src/libdar/filesystem.cpp:318
 msgid "Error reading EA for "
 msgstr "Fel vid läsning av EA för "
 
-#: src/libdar/filesystem.cpp:566 src/libdar/filesystem.cpp:802
+#: src/libdar/filesystem.cpp:568 src/libdar/filesystem.cpp:804
 msgid "Non existent file: "
 msgstr "Icke-existerande fil: "
 
-#: src/libdar/filesystem.cpp:568 src/libdar/filesystem.cpp:804
+#: src/libdar/filesystem.cpp:570 src/libdar/filesystem.cpp:806
 msgid "File must be a directory: "
 msgstr "Fil måste vara en mapp: "
 
-#: src/libdar/filesystem.cpp:653
+#: src/libdar/filesystem.cpp:655
 #, c-format
 msgid "Cannot read directory contents: %s : "
 msgstr "Kan ej läsa mappinnehållet: %s : "
 
-#: src/libdar/filesystem.cpp:690
+#: src/libdar/filesystem.cpp:692
 msgid "Ignoring file with NODUMP flag set: "
 msgstr "Ignorerar fil med NODUMP-flagga satt: "
 
-#: src/libdar/filesystem.cpp:698 src/libdar/filesystem.cpp:703
+#: src/libdar/filesystem.cpp:700 src/libdar/filesystem.cpp:705
 msgid "Error reading directory contents: "
 msgstr "Fel vid läsning av mappinnehåll: "
 
-#: src/libdar/filesystem.cpp:698 src/libdar/filesystem.cpp:703
+#: src/libdar/filesystem.cpp:700 src/libdar/filesystem.cpp:705
 msgid " . Ignoring file or directory"
 msgstr " . Ignorerar fil eller mapp"
 
-#: src/libdar/filesystem.cpp:1082
+#: src/libdar/filesystem.cpp:1084
 #, c-format
 msgid ""
 "Error creating hard link %s : %s\n"
@@ -3588,7 +3588,7 @@ msgstr ""
 "Fel vid skapande av hård länk %s : %s\n"
 " Försöker att duplicera inoden"
 
-#: src/libdar/filesystem.cpp:1096
+#: src/libdar/filesystem.cpp:1098
 #, c-format
 msgid ""
 "Error creating hard link : %s , the inode to link with [ %s ] has "
@@ -3597,7 +3597,7 @@ msgstr ""
 "Fel vid skapande av hård länk %s , inoden till länk med [ %s ] har "
 "försvunnit, återskapar den"
 
-#: src/libdar/filesystem.cpp:1103
+#: src/libdar/filesystem.cpp:1105
 #, c-format
 msgid ""
 "Error creating hard link : %s , the inode to link with [ %s ] is not "
@@ -3606,70 +3606,70 @@ msgstr ""
 "Fel vid skapande av hård länk %s , inoden till länk med [ %s ] finns inte, "
 "kan ej återställa denna hårda länk"
 
-#: src/libdar/filesystem.cpp:1175
+#: src/libdar/filesystem.cpp:1177
 msgid "Bad CRC, data corruption occurred"
 msgstr "Fel i CRC, data förstört"
 
-#: src/libdar/filesystem.cpp:1225
+#: src/libdar/filesystem.cpp:1227
 msgid "Error creating Unix socket file: "
 msgstr "Fel vid skapande av UNIX sockelfil: "
 
-#: src/libdar/filesystem.cpp:1245
+#: src/libdar/filesystem.cpp:1247
 msgid "Could not create inode: "
 msgstr "Kunde ej skapa inod: "
 
-#: src/libdar/filesystem.cpp:1247
+#: src/libdar/filesystem.cpp:1249
 msgid "Cannot create inode: "
 msgstr "Kan ej skapa inod: "
 
-#: src/libdar/filesystem.cpp:1247
+#: src/libdar/filesystem.cpp:1249
 msgid " Ready to continue ?"
 msgstr " Klar att fortsätta ?"
 
-#: src/libdar/filesystem.cpp:1442
+#: src/libdar/filesystem.cpp:1444
 msgid "Cannot remove non-existent file from filesystem: "
 msgstr "Kan ej ta bort icke befintlig fil från filsystemet: "
 
-#: src/libdar/filesystem.cpp:1447 src/libdar/filesystem.cpp:1733
+#: src/libdar/filesystem.cpp:1449 src/libdar/filesystem.cpp:1735
 msgid "Restoring file's data: "
 msgstr "Återställer fils data: "
 
-#: src/libdar/filesystem.cpp:1464 src/libdar/filesystem.cpp:1928
+#: src/libdar/filesystem.cpp:1466 src/libdar/filesystem.cpp:1941
 msgid "Restoring file's EA: "
 msgstr "Återställer fils EA: "
 
-#: src/libdar/filesystem.cpp:1475 src/libdar/filesystem.cpp:1571
+#: src/libdar/filesystem.cpp:1477 src/libdar/filesystem.cpp:1573
 #, fuzzy, c-format
 msgid "Restoration of EA for %S aborted: "
 msgstr "Återställer EA för "
 
-#: src/libdar/filesystem.cpp:1485 src/libdar/filesystem.cpp:2071
+#: src/libdar/filesystem.cpp:1487 src/libdar/filesystem.cpp:2084
 #, fuzzy
 msgid "Restoring file's FSA: "
 msgstr "Återställer fils EA: "
 
-#: src/libdar/filesystem.cpp:1498 src/libdar/filesystem.cpp:1583
+#: src/libdar/filesystem.cpp:1500 src/libdar/filesystem.cpp:1585
 #, c-format
 msgid "Restoration of FSA for %S aborted: "
 msgstr ""
 
-#: src/libdar/filesystem.cpp:1652
+#: src/libdar/filesystem.cpp:1654
 #, c-format
 msgid "%S is about to be removed from filesystem, continue?"
 msgstr "%S skall till att tas bort från filsystemet, fortsätta ? "
 
-#: src/libdar/filesystem.cpp:1657 src/libdar/filesystem.cpp:1666
+#: src/libdar/filesystem.cpp:1659 src/libdar/filesystem.cpp:1668
 #, c-format
 msgid "Removing file (reason is file recorded as removed in archive): %S"
 msgstr "Tar bort fil (orsaken är att fil är noterad som bortagen i arkiv): %S"
 
-#: src/libdar/filesystem.cpp:1664
+#: src/libdar/filesystem.cpp:1666
 #, c-format
 msgid ""
 "%S must be removed, but does not match expected type, remove it anyway ?"
 msgstr "%S måste tas bort, men matchar inte förvänta typ, ta bort ändå ?"
 
-#: src/libdar/filesystem.cpp:1672
+#: src/libdar/filesystem.cpp:1674
 #, c-format
 msgid ""
 "%S: Overwriting policy (Data) is undefined for that file, do not know "
@@ -3678,7 +3678,7 @@ msgstr ""
 "%S: Överskrivningspolicy (Data) är odefinierat för denna fil, vet ej "
 "huruvida bortagande är tillåtet eller ej!"
 
-#: src/libdar/filesystem.cpp:1709
+#: src/libdar/filesystem.cpp:1711
 #, c-format
 msgid ""
 "Directory %S cannot be restored: overwriting not allowed and a non-directory "
@@ -3689,44 +3689,49 @@ msgstr ""
 "inod med det namnet finns redan, alla filer i den mappen kommer att hoppas "
 "över vid återhämtning:"
 
-#: src/libdar/filesystem.cpp:1718
+#: src/libdar/filesystem.cpp:1720
 #, c-format
 msgid "%S is about to be overwritten, OK?"
 msgstr "%S skall till att överskrivas, OK?"
 
-#: src/libdar/filesystem.cpp:1764
+#: src/libdar/filesystem.cpp:1766
 #, c-format
 msgid "Existing EA for %S could not be read and preserved: "
 msgstr "Befintlig EA för %S kunde inte läsas och bevaras: "
 
-#: src/libdar/filesystem.cpp:1782
+#: src/libdar/filesystem.cpp:1784
 #, fuzzy, c-format
 msgid "Existing FSA for %S could not be read and preserved: "
 msgstr "Befintlig EA för %S kunde inte läsas och bevaras: "
 
-#: src/libdar/filesystem.cpp:1811
+#: src/libdar/filesystem.cpp:1798
+#, c-format
+msgid "Removing existing immutable flag in order to restore data for %S"
+msgstr ""
+
+#: src/libdar/filesystem.cpp:1824
 #, c-format
 msgid "Existing EA for %S could not be preserved : "
 msgstr "Befintlig EA för %S kunde inte bevaras : "
 
-#: src/libdar/filesystem.cpp:1828
+#: src/libdar/filesystem.cpp:1841
 #, fuzzy, c-format
 msgid "Existing FSA for %S could not be preserved : "
 msgstr "Befintlig EA för %S kunde inte bevaras : "
 
-#: src/libdar/filesystem.cpp:1843
+#: src/libdar/filesystem.cpp:1856
 #, c-format
 msgid ""
 "%S is about to be deleted (required by overwriting policy), do you agree?"
 msgstr ""
 "%S skall till at tas bort (krav från överskrivningspolicy), är du överens?"
 
-#: src/libdar/filesystem.cpp:1845
+#: src/libdar/filesystem.cpp:1858
 #, c-format
 msgid "Removing file (reason is overwriting policy): %S"
 msgstr "Tar bort fil (orsak är överskrivningspolicy): %S"
 
-#: src/libdar/filesystem.cpp:1851
+#: src/libdar/filesystem.cpp:1864
 #, c-format
 msgid ""
 "%S: Overwriting policy (Data) is undefined for that file, do not know "
@@ -3735,12 +3740,12 @@ msgstr ""
 "%S: Överskrivningspolicy är obestämd för denna fil, vet ej huruvida "
 "överskrivning tillåts eller ej!"
 
-#: src/libdar/filesystem.cpp:1907
+#: src/libdar/filesystem.cpp:1920
 #, c-format
 msgid "EA for %S are about to be overwritten, OK?"
 msgstr "Några EA för %S skall till att skrivas över, OK?"
 
-#: src/libdar/filesystem.cpp:1922
+#: src/libdar/filesystem.cpp:1935
 #, c-format
 msgid ""
 "EA for %S have not been overwritten because this file is a hard link "
@@ -3749,12 +3754,12 @@ msgstr ""
 "EA för %S har ej skrivits över eftersom denna fil är en hård länk pekande på "
 "en redan återskapad inode."
 
-#: src/libdar/filesystem.cpp:1942
+#: src/libdar/filesystem.cpp:1955
 #, c-format
 msgid "EA for %S are about to be removed, OK?"
 msgstr "EA för %S skall till att tas bort, OK?"
 
-#: src/libdar/filesystem.cpp:1953
+#: src/libdar/filesystem.cpp:1966
 #, c-format
 msgid ""
 "EA for %S have not been cleared as requested by the overwriting policy "
@@ -3763,16 +3768,16 @@ msgstr ""
 "EA for %S har ej nollställt enligt begäran från överskrivnngspolicyn "
 "eftersom denna fil är en hård länk pekande på en redan återställd inod"
 
-#: src/libdar/filesystem.cpp:1959
+#: src/libdar/filesystem.cpp:1972
 msgid "Clearing file's EA (requested by overwriting policy): "
 msgstr "Nollställning av fils EA (begärd av överskrivninsgpolicy): "
 
-#: src/libdar/filesystem.cpp:1972
+#: src/libdar/filesystem.cpp:1985
 #, c-format
 msgid "EA for %S are about to be merged, OK?"
 msgstr "EA för %S skall till att slås ihop, OK?"
 
-#: src/libdar/filesystem.cpp:1998
+#: src/libdar/filesystem.cpp:2011
 #, c-format
 msgid ""
 "%S: Overwriting policy (EA) is undefined for that file, do not know whether "
@@ -3781,12 +3786,12 @@ msgstr ""
 "%S: Överskrivningspolicyn (EA) är obestämd för denna fil, vet ej huruvida "
 "överskrivning är tillåten eller ej!"
 
-#: src/libdar/filesystem.cpp:2050 src/libdar/filesystem.cpp:2096
+#: src/libdar/filesystem.cpp:2063 src/libdar/filesystem.cpp:2109
 #, fuzzy, c-format
 msgid "FSA for %S are about to be overwritten, OK?"
 msgstr "Några EA för %S skall till att skrivas över, OK?"
 
-#: src/libdar/filesystem.cpp:2065
+#: src/libdar/filesystem.cpp:2078
 #, fuzzy, c-format
 msgid ""
 "FSA for %S have not been overwritten because this file is a hard link "
@@ -3795,7 +3800,7 @@ msgstr ""
 "EA för %S har ej skrivits över eftersom denna fil är en hård länk pekande på "
 "en redan återskapad inode."
 
-#: src/libdar/filesystem.cpp:2122
+#: src/libdar/filesystem.cpp:2135
 #, fuzzy, c-format
 msgid ""
 "%S: Overwriting policy (FSA) is undefined for that file, do not know whether "
@@ -3804,19 +3809,19 @@ msgstr ""
 "%S: Överskrivningspolicyn (EA) är obestämd för denna fil, vet ej huruvida "
 "överskrivning är tillåten eller ej!"
 
-#: src/libdar/filesystem.cpp:2182
+#: src/libdar/filesystem.cpp:2228
 msgid "Cannot get inode information about file to remove "
 msgstr "Kan ej får inodsinformation om den fil som skall tas bort "
 
-#: src/libdar/filesystem.cpp:2195
+#: src/libdar/filesystem.cpp:2241
 msgid "Cannot remove directory "
 msgstr "Kan ej ta bort mapp "
 
-#: src/libdar/filesystem.cpp:2199
+#: src/libdar/filesystem.cpp:2245
 msgid "Cannot remove file "
 msgstr "Kan ej ta bort fil "
 
-#: src/libdar/filesystem.cpp:2248
+#: src/libdar/filesystem.cpp:2294
 msgid ""
 "uid value is too high for this system for libdar be able to restore it "
 "properly"
@@ -3824,7 +3829,7 @@ msgstr ""
 "uid-värde för högt för detta system för 'libdar' att kunna återställa den "
 "säkert"
 
-#: src/libdar/filesystem.cpp:2252
+#: src/libdar/filesystem.cpp:2298
 msgid ""
 "gid value is too high for this system for libdar be able to restore it "
 "properly"
@@ -3832,31 +3837,31 @@ msgstr ""
 "gid-värde för högt för detta system för 'libdar' att kunna återställa den "
 "säkert"
 
-#: src/libdar/filesystem.cpp:2256 src/libdar/filesystem.cpp:2260
+#: src/libdar/filesystem.cpp:2302 src/libdar/filesystem.cpp:2306
 msgid "Could not restore original file ownership: "
 msgstr "Kunde inte återställa ursprunglig ägare till fil: "
 
-#: src/libdar/filesystem.cpp:2274
+#: src/libdar/filesystem.cpp:2320
 #, c-format
 msgid "Cannot restore permissions of %s : %s"
 msgstr "Kan ej återställe behörigheter för %s : %s"
 
-#: src/libdar/filesystem.cpp:2360
+#: src/libdar/filesystem.cpp:2406
 #, c-format
 msgid "Failed to open %S while checking for nodump flag: %s"
 msgstr "Misslyckades att öppna %S medan kontroll av nodump-flagga gjordes: %s"
 
-#: src/libdar/filesystem.cpp:2374
+#: src/libdar/filesystem.cpp:2420
 #, c-format
 msgid "Cannot get ext2 attributes (and nodump flag value) for %S : %s"
 msgstr "Kan ej få ext2-attribut (och nodump-flaggvärde) för %S : %s"
 
-#: src/libdar/filesystem.cpp:2407
+#: src/libdar/filesystem.cpp:2453
 #, c-format
 msgid "Cannot get inode information for %s : %s"
 msgstr "Kan ej få inodinformation för %s : %s"
 
-#: src/libdar/filesystem.cpp:2436
+#: src/libdar/filesystem.cpp:2482
 #, c-format
 msgid ""
 "Replacing %s in the -R option by the directory pointed to by this symbolic "
@@ -3865,7 +3870,7 @@ msgstr ""
 "Återställer %s i -R alternativet genom den mapp, pekad på från denna "
 "symboliska länk: "
 
-#: src/libdar/filesystem.cpp:2439
+#: src/libdar/filesystem.cpp:2485
 #, c-format
 msgid ""
 "The given path %s must be a directory (or symbolic link to an existing "
@@ -4806,11 +4811,11 @@ msgstr "osammanhängande endian mellan U_16 och U_64"
 msgid "incoherent endian between U_16 and U_I"
 msgstr "osammanhängande endian mellan U_16 och U_I"
 
-#: src/libdar/filesystem_specific_attribute.hpp:243
+#: src/libdar/filesystem_specific_attribute.hpp:246
 msgid "true"
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.hpp:243
+#: src/libdar/filesystem_specific_attribute.hpp:246
 msgid "false"
 msgstr ""
 

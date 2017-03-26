@@ -3,7 +3,7 @@ from 2.5.9 to 2.5.10
   considering a file to be more recent when it had the exact same date as
   the file in place.
 - updating documentation about requirements for compiling dar from sources
-- fixed bug: bug met when restorating of a file that has the immutable
+- fixed bug: bug met when restoring of a file that has the immutable
   flag set. Dar/libdar failed restoring such file in the context of
   differential/incremental backup. The fix consists of the removal of the
   immutable flag from filesystem before restoring the new version of the
