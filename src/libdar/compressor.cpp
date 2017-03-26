@@ -208,6 +208,8 @@ namespace libdar
             }
             break;
 	case lzo:
+	case lzo1x_1_15:
+	case lzo1x_1:
 #if LIBLZO2_AVAILABLE
 	    read_ptr = &compressor::lzo_read;
 	    write_ptr = &compressor::lzo_write;
@@ -220,7 +222,20 @@ namespace libdar
 		meta_new(lzo_read_buffer, LZO_CLEAR_BUFFER_SIZE);
 		meta_new(lzo_write_buffer, LZO_CLEAR_BUFFER_SIZE);
 		meta_new(lzo_compressed, LZO_COMPRESSED_BUFFER_SIZE);
-		meta_new(lzo_wrkmem, LZO1X_999_MEM_COMPRESS);
+		switch(algo)
+		{
+		case lzo:
+		    meta_new(lzo_wrkmem, LZO1X_999_MEM_COMPRESS);
+		    break;
+		case lzo1x_1_15:
+		    meta_new(lzo_wrkmem, LZO1X_1_15_MEM_COMPRESS);
+		    break;
+		case lzo1x_1:
+		    meta_new(lzo_wrkmem, LZO1X_1_MEM_COMPRESS);
+		    break;
+		default:
+		    throw SRC_BUG;
+		}
 		if(lzo_read_buffer == nullptr || lzo_write_buffer == nullptr || lzo_compressed == nullptr || lzo_wrkmem == nullptr)
 		    throw Ememory("compressor::init");
 	    }
@@ -697,8 +712,20 @@ namespace libdar
 	S_I status;
 
 	    //compressing data to lzo_compress buffer
-
-	status = lzo1x_999_compress_level((lzo_bytep)lzo_write_buffer, lzo_write_size, (lzo_bytep)lzo_compressed, &compr_size, lzo_wrkmem, nullptr, 0, 0, current_level);
+	switch(current_algo)
+	{
+	case lzo:
+	    status = lzo1x_999_compress_level((lzo_bytep)lzo_write_buffer, lzo_write_size, (lzo_bytep)lzo_compressed, &compr_size, lzo_wrkmem, nullptr, 0, 0, current_level);
+	    break;
+	case lzo1x_1_15:
+	    status = lzo1x_1_15_compress((lzo_bytep)lzo_write_buffer, lzo_write_size, (lzo_bytep)lzo_compressed, &compr_size, lzo_wrkmem);
+	    break;
+	case lzo1x_1:
+	    status = lzo1x_1_compress((lzo_bytep)lzo_write_buffer, lzo_write_size, (lzo_bytep)lzo_compressed, &compr_size, lzo_wrkmem);
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
 
 	switch(status)
 	{
@@ -810,6 +837,10 @@ namespace libdar
             return gzip;
         case 'y':
             return bzip2;
+	case 'j':
+	    return lzo1x_1_15;
+	case 'k':
+	    return lzo1x_1;
 	case 'l':
 	    return lzo;
 	case 'x':
@@ -833,6 +864,10 @@ namespace libdar
 	    return 'l';
 	case xz:
 	    return 'x';
+	case lzo1x_1_15:
+	    return 'j';
+	case lzo1x_1:
+	    return 'k';
         default:
             throw Erange("compression2char", gettext("unknown compression"));
         }
@@ -852,6 +887,10 @@ namespace libdar
 	    return "lzo";
 	case xz:
 	    return "xz";
+	case lzo1x_1_15:
+	    return "lzop-1";
+	case lzo1x_1:
+	    return "lzop-3";
         default:
             throw Erange("compresion2string", gettext("unknown compression"));
         }
@@ -867,6 +906,12 @@ namespace libdar
 
 	if(a == "lzo" || a == "lz" || a == "l")
 	    return lzo;
+
+	if(a == "lzop-1" || a == "lzop1")
+	    return lzo1x_1_15;
+
+	if(a == "lzop-3" || a == "lzop3")
+	    return lzo1x_1;
 
 	if(a == "xz" || a == "lzma")
 	    return xz;
