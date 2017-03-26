@@ -1,6 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
-
   <meta content="text/html; charset=us-ascii" http-equiv="content-type">
   <title>DAR - Frequently Asked Questions</title>
 
@@ -99,14 +98,12 @@ filesystem?</a><br>
       <a href="#diff">Why when comparing an archive with filesystem,
 dar does not report new files found on filesystem?</a><br>
       <a href="#delta">Why dar does not automatically perform delta difference (aka rsync increment)? </a><br>
-      <a href="#cyrillic">Why do dar reports truncated filenames under Windows, especially with cyrillic filenames?</a><br>
-      </span><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;"> </span>
-      <a href="#cyrillic">Why do dar reports truncated filenames under Windows, especially with cyrillic filenames?</a><br>
-      </span>
-      <a href="#win32"><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;">I have a 32 bits windows system, which binary </span><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;">package </span></span><span style="font-weight: bold; font-style: italic;">can I to use?</span></span></a><br>
-<span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;"></span>
-      <h2><span style="font-weight: bold;"> </span></h2>
-      <br>
+      <a href="#cyrillic">Why do dar reports truncated filenames under
+Windows, especially with cyrillic filenames?</a><br>
+</span><a href="#win32"><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;">I have a 32 bits windows system, which binary </span><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;">package </span></span><span style="font-weight: bold; font-style: italic;">can I to use?</span></span></a><br>
+      <a style="font-style: italic; font-weight: bold;" href="#lzop_vs_dar">lzo compression is slower with dar than with lzop, why?</a><br>
+<span style="font-weight: bold; font-style: italic;"><br>
+<h2><span style="font-weight: bold;"> </span></h2>
       <h2><span style="text-decoration: underline;">Answers:</span></h2>
       <h1><span style="font-weight: bold; font-style: italic;"> </span></h1>
       <h2> </h2>
@@ -2671,7 +2668,7 @@ this documentation!<br>
 file or the whole archive?</span><br>
       <br>
       <div style="margin-left: 40px;"><br>
-Dar uses compression (<span style="font-weight: bold;">gzip</span>, <span style="font-weight: bold;">lzo</span>, <span style="font-weight: bold;">bzip2</span>) with different level of
+Dar uses compression (<span style="font-weight: bold;">gzip</span>, <span style="font-weight: bold;">lzo</span>, <span style="font-weight: bold;">bzip2</span>, <span style="font-weight: bold;">xz</span>, ...) with different level of
 compression (<span style="font-weight: bold;">1</span> for quick but
 low compression <span style="font-weight: bold;">up to 9</span> best
 compression but slower) on <span style="font-weight: bold;">a file by
@@ -3286,8 +3283,185 @@ Feel free to ask for support on <a href="https://lists.sourceforge.net/lists/lis
       <br>
       </div>
       <span style="font-weight: bold; font-style: italic;">
-      <p><span style="font-weight: bold; font-style: italic;"><br>
-      </span>  </p>
+      <p><a name="lzop_vs_dar"></a>lzo compression is slower with dar than with lzop, why?</p></span>
+      <div style="margin-left: 40px;">when using the "lzo" compression algorithm, <span style="font-weight: bold;">dar/libdar</span> always uses the algorithm"lzo1x_999" with the compression level requested
+(from 1 to 9) as argument. Dar thus provides 9 different
+compression/speed levels with lzo.<br>
+      <br>
+On the other size as of today (2017) <span style="font-weight: bold;">lzop</span> uses a very degradated lzo
+algorithm for level 1 (lzo1x_1_15) and the exact same algorithm for
+levels from 2 to 6 (lzo1x_1) this reduces memory requirement and
+improves compression speed at the cost of the resulting compression
+ratio. Lzop compression levels 7 to 9 use the same algorithm as what
+dar/libdar uses (lzo1x_999). In total lzop only provides 5 different
+compression levels/algorithms.<br>
+      <br>
+So now you know why dar is slower than lzop when using lzo compression at level 1 to 6.<br>
+      <br>beside lzo algorithm, dar/libdar provides two additional lzo-based compression algorithms: <span style="font-weight: bold;">lzop-1</span> and <span style="font-weight: bold;">lzop-3</span>.As
+you guess, lzop-1 uses the lzo1x_1_15 algorithm as lzop does for
+compression level 1, and lzop-3 uses the lzo1x_1 algorithm as lzop does
+for its compression level 2 to 6. For lzop-1 and lzop-3 compression
+level is not used so you can keep the default or change its value this
+will not change dar behavior<br>
+      <br>
+      <table style="text-align: left; width: 60%; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
+        <tbody>
+          <tr>
+            <td style="vertical-align: top; width: 25%; text-align: center; font-weight: bold;">compression level<br>
+for lzop<br>
+            </td>
+            <td style="vertical-align: top; width: 25%; text-align: center; font-weight: bold;">algorithm <br>
+for dar<br>
+            </td>
+            <td style="vertical-align: top; width: 25px; text-align: center; font-weight: bold;">compression level<br>
+&nbsp;for dar<br>
+            </td>
+            <td style="vertical-align: top; width: 25%; text-align: center; font-weight: bold;">lzo algorith<br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; text-align: center;">1</td>
+            <td style="vertical-align: top; text-align: center;">lzop-1<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">-<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo1x_1_15<br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; text-align: center;">2<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzop-3<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">-<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo1x_1<br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; text-align: center;">3<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzop-3</td>
+            <td style="vertical-align: top; text-align: center;">-<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo1x_1</td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; text-align: center;">4<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzop-3</td>
+            <td style="vertical-align: top; text-align: center;">-<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo1x_1</td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; text-align: center;">5<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzop-3</td>
+            <td style="vertical-align: top; text-align: center;">-<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo1x_1</td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; text-align: center;">6<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzop-3</td>
+            <td style="vertical-align: top; text-align: center;">-<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo1x_1</td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; text-align: center;">-<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">1<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo1x_999</td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; text-align: center;">-<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">2<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo1x_999</td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; text-align: center;">-<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">3<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo1x_999</td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; text-align: center;">-<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">4<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo1x_999</td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; text-align: center;">-<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">5<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo1x_999</td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; text-align: center;">-<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">6<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo1x_999</td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; text-align: center;">7<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">7<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo1x_999</td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; text-align: center;">8<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">8<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo1x_999</td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; text-align: center;">9<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">9<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">lzo1x_999</td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+<br>
+      </div>
+      <span style="font-weight: bold; font-style: italic;">
+      <p><br>
+      </p>
+      <p><br>
+  </p>
+
 
       </span> </td>
     </tr>

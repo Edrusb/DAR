@@ -1,3 +1,20 @@
+from 2.5.9 to 2.5.10
+- fixed bug: -r option (only more recent overwriting policy) was
+  considering a file to be more recent when it had the exact same date as
+  the file in place.
+- updating documentation about requirements for compiling dar from sources
+- fixed bug: bug met when restoring of a file that has the immutable
+  flag set. Dar/libdar failed restoring such file in the context of
+  differential/incremental backup. The fix consists of the removal of the
+  immutable flag from filesystem before restoring the new version of the
+  file's data, then setting back the immutable flag afterward.
+- updating FAQ with description of the way dar uses lzo compression
+  compared to the lzop program
+- fixed bug: aborting an archive was leading to an unreadable archive in
+  direct mode most of the time when strong encryption was used
+- minor new feature: added two flavors of lzo algorithm: lzop-1 and lzop-3
+  in order to match compression levels 1 and 3 of the lzop command
+
 from 2.5.8 to 2.5.9
 - fixed typos in documentation about dar internal use of symmetric
   encryption

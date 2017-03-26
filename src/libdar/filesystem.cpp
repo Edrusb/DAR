@@ -127,6 +127,8 @@ using namespace std;
 namespace libdar
 {
 
+    static bool has_immutable(const cat_inode & arg);
+    static void set_immutable(const string & target, bool val, user_interaction &ui);
     static void supprime(user_interaction & ui, const string & ref);
     static void make_owner_perm(user_interaction & dialog,
 				const cat_inode & ref,
@@ -1850,6 +1852,17 @@ namespace libdar
 
 		    if(!empty)
 		    {
+			if(has_immutable(*in_place)
+			   && has_immutable(*tba_ino)
+			   && in_place->same_as(*tba_ino))
+			{
+				// considering this situation is the restoration of a differential backup of the same file,
+				// we must first remove the immutable flag in order to restore the new inode data
+			    if(info_details)
+				get_ui().printf(gettext("Removing existing immutable flag in order to restore data for %S"), &spot);
+			    set_immutable(spot, false, get_ui());
+			}
+
 			supprime(get_ui(), spot); // this destroyes EA, (removes inode, or hard link to inode)
 			make_file(to_be_added, *current_dir, false, what_to_check, get_fsa_scope());
 			data_done = done_data_restored;
@@ -2236,6 +2249,39 @@ namespace libdar
 ///////////////////////////////////////////////////////////////////
 ////////////////// static functions ///////////////////////////////
 ///////////////////////////////////////////////////////////////////
+
+    static bool has_immutable(const cat_inode & arg)
+    {
+	if(arg.fsa_get_saved_status() == cat_inode::fsa_full)
+	{
+	    const filesystem_specific_attribute_list *fsal = arg.get_fsa();
+	    const filesystem_specific_attribute *fsa = nullptr;
+
+	    if(fsal == nullptr)
+		throw SRC_BUG;
+
+	    if(fsal->find(fsaf_linux_extX, fsan_immutable, fsa))
+	    {
+		const fsa_bool *fsab = dynamic_cast<const fsa_bool *>(fsa);
+		if(fsab == nullptr)
+		    throw SRC_BUG;
+		return fsab->get_value();
+	    }
+	    else
+		return false;
+	}
+	else
+	    return false;
+    }
+
+    static void set_immutable(const string & target, bool val, user_interaction &ui)
+    {
+	fsa_bool fsa(fsaf_linux_extX, fsan_immutable, val);
+	filesystem_specific_attribute_list fsal;
+
+	fsal.add(fsa);
+	(void)fsal.set_fsa_to_filesystem_for(target, all_fsa_families(), ui);
+    }
 
     static void supprime(user_interaction & ui, const string & ref)
     {

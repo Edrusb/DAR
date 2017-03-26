@@ -702,7 +702,7 @@ void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
 
 	    if(more_recent)
 	    {
-		tmp2 = new testing(crit_invert(crit_in_place_data_more_recent(hourshift)), *overwrite, *tmp1);
+		tmp2 = new testing(crit_in_place_data_more_recent(hourshift), *tmp1, *overwrite);
 		if(tmp2 == nullptr)
 		    throw Ememory("tools_build_compatible_overwriting_policy");
 

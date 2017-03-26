@@ -155,6 +155,12 @@ namespace libdar
 	fsa.clear();
     }
 
+    void filesystem_specific_attribute_list::add(const filesystem_specific_attribute & fsa)
+    {
+	priv_add(fsa);
+	update_familes();
+	sort_fsa();
+    }
 
     bool filesystem_specific_attribute_list::is_included_in(const filesystem_specific_attribute_list & ref, const fsa_scope & scope) const
     {
@@ -367,7 +373,7 @@ namespace libdar
 	{
 	    if(*it == nullptr)
 		throw SRC_BUG;
-	    ret.add(*(*it));
+	    ret.priv_add(*(*it));
 	    ++it;
 	}
 
@@ -421,7 +427,7 @@ namespace libdar
 	}
     }
 
-    void filesystem_specific_attribute_list::add(const filesystem_specific_attribute & ref)
+    void filesystem_specific_attribute_list::priv_add(const filesystem_specific_attribute & ref)
     {
 	U_I index = 0;
 

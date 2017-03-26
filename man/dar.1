@@ -1,4 +1,4 @@
-.TH DAR 1 "January 21st, 2017"
+.TH DAR 1 "March 26th, 2017"
 .UC 8
 .SH NAME
 dar \- creates, tests, lists, extracts, compares, merges, isolates dar archives
@@ -572,6 +572,10 @@ When libdar is compiled against libthreadar, it can make use of several threads.
 .TP 20
 -z[[algo:]level], --compression[=[algo][:][level]]
 add compression within slices using gzip, bzip2, lzo or xz algorithm (if -z is not specified, no compression is performed). The compression level (an integer from 1 to 9) is optional, and is 9 by default. Be careful when using xz algorithm better specify a compression ratio less than or equal to 6 to avoid important memory requirements. A ratio of 1 means less compression and faster processing, while at the opposite a ratio of 9 gives the best compression but longest procesing time. "Algo" is optional, it specifies the compression algorithm to use and can take the following values "gzip", "bzip2", "lzo" or "xz". "gzip" algorithm is used by default (for historical reasons see --gzip below). If both algorithm and compression are given, a ':' must be placed between them. Valid usage of -z option is for example: -z, -z9, -zlzo, -zgzip, -zbzip2, -zlzo:6, -zbzip2:2, -zgzip:1, -zxz:6 and so on. Usage for long option is the same: --compression, --compression=9, --compression=lzo, --compression=gzip, --compression=bzip2, --compression=lzo:6, --compression=bzip2:2, --compression=gzip:1 --compression=xz:9 and so on.
+.PP
+.RS
+About lzo compression, the compression levels of dar and lzop program do not match. If you want to get the behavior of compression level 1 of lzop, use the lzop-1 algorithm in place of lzo with dar/libdar. If you want to get the behavior of lzop compression level 3, use the lzop-3 algorithm in place of the lzo algorithm. Lzop compression levels 2, 4, 5 and 6 are the same as level 3. last, there is no difference about compression level 7, 8 and 9 between dar and lzop. The lzop-1 and lzop-3 algorithms do not make use of any compression level (compression level is ignored with these algorithms).
+.RE
 .TP 20
 --gzip[=level]
 Same as -z (see just above). This option is deprecated, please use --compression or -z.
@@ -731,7 +735,7 @@ A
 same as H but the current 'in place' entry is the first link we meet pointing to that hard linked inode.
 .TP 5
 R
-true if the 'in place' entry is more recent than or of same date as the 'to be added' entry. The last modification date [aka mtime] is used for this comparison. If the 'to be added' entry is not an inode (and thus has no mtime), the 'in place' is considered to be more recent than the 'to be added' entry. Same thing if the 'in place' entry is not an inode (ad has no mtime available for comparison), it is here too assumed to be more recent.
+true if the 'in place' entry is more recent than or of same date as the 'to be added' entry. The last modification date [aka mtime] is used for this comparison. If the 'to be added' entry is not an inode (and thus has no mtime), the 'in place' is considered to be more recent than the 'to be added' entry. Same thing if the 'in place' entry is not an inode (and has no mtime available for comparison), it is here too assumed to be more recent.
 .TP 5
 R(<date>)
 true if the 'in place' entry is more recent than or of the same date as the fixed <date> given in argument. No consideration is done toward the 'to be added' element. The <date> format is the same as the one used with -af option. If an entry has no mtime (it is not an inode for example) it is assumed an virtual mtime of zero.
@@ -1013,7 +1017,7 @@ Doing a difference in sequential read mode is possible but hard linked inodes ca
 .TP 20
 -T, --list-format=<normal | tree | xml | slicing>, --tree-format
 .RS
-By default, listing provides a tar-like output (the 'normal' output). You can however get a tree-like output, an XML structured output or a output focusing on slice(s) where each file's data, EA and FSA is located in. Providing -T without argument gives the same as providing the 'tree' argument to it. The option --tree-format is an alias to --list-format=tree (backward compatibility). Note that the files doc/dar-catalog-*.dtd define the format of the XML output listing (This file is also installed under $PREFIX/share/doc)
+By default, listing provides a tar-like output (the 'normal' output). You can however get a tree-like output, an XML structured output or an output focusing on slice(s) where each file's data, EA and FSA is located in. Providing -T without argument gives the same as providing the 'tree' argument to it. The option --tree-format is an alias to --list-format=tree (backward compatibility). Note that the files doc/dar-catalog-*.dtd define the format of the XML output listing (This file is also installed under $PREFIX/share/doc)
 .PP
 the -Tslicing option can also be used with isolated catalogue generated with dar 2.5.0 or above, as isolated catalogues now contain a copy of the slicing layout of the archive of reference. However, if the archive of reference has been resliced (using dar_xform) after the isolated catalogue has been built, the slicing information would not be correct. For that corner case, you can use the -s and -S options with -Tslicing to specify what are the new slice sizes of the archive of reference.
 .RE

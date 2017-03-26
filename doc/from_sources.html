@@ -8,6 +8,8 @@
 
 
 
+
+
 <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Dar's Documentation - Compiling From Source</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
@@ -88,8 +90,10 @@ for generation of source code documentation</li>
         <li><a href="http://upx.sourceforge.net/">upx</a> to generate
 dar_suite upx compressed binaries</li>
         <li><a href="http://www.gnu.org/software/groff/groff.html">groff</a>
-to generate html version of man pages <br>
-</li>
+to generate html version of man pages</li>
+        <li><a href="http://e2fsprogs.sourceforge.net">ext2/ext3/ext4 file system libraries</a> for Linux Filesystem Specific Attributes and nodump flag support<br>
+        </li>
+
         <li><a href="http://libthreadar.sourceforge.net/">libthreadar</a> for libdar using several threads (experimental feature, poor performance gain, avoid using it)<br>
         </li>
 
@@ -126,6 +130,9 @@ after calling <span style="font-style: italic;">make install-strip</span></li>
         <li><span style="font-style: italic;"><span style="font-style: italic;"><span style="font-style: italic;"></span></span></span>If
 you lack <span style="font-weight: bold;">groff</span> dar will not
 generate man pages in html format</li>
+        <li>If you lack <span style="font-weight: bold;">extX file system libraries</span> you will not be able to save and restore Linux FSA, nor to avoid saving files having their nodump flag set<br>
+        </li>
+
         <li>if you lack <span style="font-weight: bold;">libthreadar</span> libdar will execute each action in a single thread<br>
         </li>
 

@@ -138,6 +138,9 @@ namespace libdar
 	    /// clear all attributes
 	void clear();
 
+	    /// add an fsa to the list
+	void add(const filesystem_specific_attribute & fsa);
+
 	    /// gives the set of FSA family present in the list
 	fsa_scope get_fsa_families() const { return familes; };
 
@@ -198,7 +201,7 @@ namespace libdar
 
 	void copy_from(const filesystem_specific_attribute_list & ref);
 	void update_familes();
-	void add(const filesystem_specific_attribute & ref); // add an entry without updating the "familes" field
+	void priv_add(const filesystem_specific_attribute & ref); // add an entry without updating the "familes" field
 	void sort_fsa();
 
 	void fill_extX_FSA_with(const std::string & target, mode_t itype);
