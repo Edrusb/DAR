@@ -504,7 +504,12 @@ namespace libdar
 		throw Efeature(gettext("authentication from file with HTTPS protocol"));
 	    case proto_scp:
 	    case proto_sftp:
-		throw Efeature(gettext("authentication from file with SFTP/SCP protocol"));
+		err = curl_easy_setopt(easyhandle, CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PUBLICKEY);
+		if(err != CURLE_OK)
+		    throw Erange("entrepot_libcurl::set_libcurl_authentication",
+				 tools_printf(gettext("Error met while instructing libcurl to use public key authentication: %s"),
+					      curl_easy_strerror(err)));
+
 		break;
 	    default:
 		throw SRC_BUG;
