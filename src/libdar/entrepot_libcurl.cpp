@@ -81,6 +81,13 @@ namespace libdar
 	set_user_ownership(""); // not used for this type of entrepot
 	set_group_ownership(""); // not used for this type of entrepot
 
+	if(!curl_is_protocol_available(proto))
+	{
+	    string named_proto = curl_protocol2string(proto);
+	    throw Erange("entrepot_libcurl::entrepot_libcurl",
+			 tools_printf(gettext("protocol %S is not supported by libcurl, aborting"), & named_proto));
+	}
+
 	easyhandle = curl_easy_init();
 	if(easyhandle == nullptr)
 	    throw Erange("entrepot_libcurl::entrepot_libcurl", string(gettext("Error met while creating a libcurl handle")));
@@ -634,6 +641,25 @@ namespace libdar
 		++ptr;
 	    }
 	return size*nmemb;
+    }
+
+    bool entrepot_libcurl::curl_is_protocol_available(curl_protocol proto)
+    {
+	curl_version_info_data *data = curl_version_info(CURLVERSION_NOW);
+	const char **ptr = nullptr;
+	string named_proto = curl_protocol2string(proto);
+
+	if(data == nullptr)
+	    throw SRC_BUG;
+
+	ptr = const_cast<const char **>(data->protocols);
+	if(ptr == nullptr)
+	    throw SRC_BUG;
+
+	while(*ptr != nullptr && strcmp(*ptr, named_proto.c_str()) != 0)
+	    ++ptr;
+
+	return *ptr != nullptr;
     }
 
 } // end of namespace

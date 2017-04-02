@@ -121,6 +121,7 @@ namespace libdar
 	static std::string build_url_from(curl_protocol proto, const std::string & host, const std::string & port);
 	static size_t get_ftp_listing_callback(void *buffer, size_t size, size_t nmemb, void *userp);
 	static size_t null_callback(void *buffer, size_t size, size_t nmemb, void *userp) { return size*nmemb; };
+	static bool curl_is_protocol_available(curl_protocol proto);
     };
 
 	/// @}
