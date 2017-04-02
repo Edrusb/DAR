@@ -22,7 +22,7 @@ from 2.5.9 to 2.5.10
 - updating FAQ with description of the way dar uses lzo compression
   compared to the lzop program
 - fixed bug: aborting an archive was leading to an unreadable archive in
-  direct mode most of the time when strong encryption was used
+  direct mode, most of the time when strong encryption was used
 - minor new feature: added two flavors of lzo algorithm: lzop-1 and lzop-3
   in order to match compression levels 1 and 3 of the lzop command
 
