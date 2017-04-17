@@ -1168,7 +1168,8 @@ AC_ARG_ENABLE( [dar-static],
 
 
 AC_ARG_ENABLE( [threadar],
-	       AC_HELP_STRING(--enable-threadar, [EXPERIMENTAL! links with libthreadar if available in order to use several threads inside libdar]),
+	       AC_HELP_STRING(--disable-threadar, [avoid linking with libthreadar if available to prevent the use several threads inside libdar]),
+	       [],
 	       [
 	       AC_CHECK_HEADERS(libthreadar/libthreadar.hpp, [], [], [])
 	       AC_CHECK_LIB(threadar, [for_autoconf], [], [])
@@ -1197,8 +1198,7 @@ AC_ARG_ENABLE( [threadar],
 			       ],
 			       [ AC_MSG_RESULT(missing) ]
 		             )
-	      ],
-              [])
+	      ])
 
 
 MEM_LDFLAGS=$LDFLAGS
