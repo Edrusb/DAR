@@ -585,19 +585,19 @@ namespace libdar
 	switch(proto)
 	{
 	case proto_ftp:
-	    ret = "ftp://";
+	    ret = "ftp";
 	    break;
 	case proto_http:
-	    ret = "http://";
+	    ret = "http";
 	    break;
 	case proto_https:
-	    ret = "https://";
+	    ret = "https";
 	    break;
 	case proto_scp:
-	    ret = "scp://";
+	    ret = "scp";
 	    break;
 	case proto_sftp:
-	    ret = "sftp://";
+	    ret = "sftp";
 	    break;
 	default:
 	    throw SRC_BUG;
@@ -608,7 +608,7 @@ namespace libdar
 
     string entrepot_libcurl::build_url_from(curl_protocol proto, const string & host, const string & port)
     {
-	string ret = curl_protocol2string(proto) + host;
+	string ret = curl_protocol2string(proto) + "://" + host;
 
 	if(!port.empty())
 	    ret += ":" + port;
