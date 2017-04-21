@@ -541,6 +541,7 @@ namespace libdar
 		    login.clear();
 		    state = s_path;
 		    ++cursor;
+		    break;
 		default:
 		    login += ch[cursor];
 		    ++cursor;
