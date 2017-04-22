@@ -149,7 +149,7 @@ namespace libdar
 	U_I network_block;                //< maximum amount of data read at once from the network
 	infinint network_offset;          //< updated by sub thread in network block mode to give amount of bytes pushed to interthread
 	libthreadar::fast_tampon<char> interthread; //< data channel for reading or writing with subthread
-	libthreadar::mutex synchronize;   //< used to be sure subthread has been launched
+	libthreadar::barrier synchronize; //< used to be sure subthread has been launched
 
 	void set_range(const infinint & begin);
 	void unset_range();

@@ -58,7 +58,8 @@ namespace libdar
 						  meta_inbuf(0),
 						  wait_delay(waiting),
 						  network_block(0),
-						  interthread(10, tampon_size)
+						  interthread(10, tampon_size),
+						  synchronize(2)
     {
 	CURLcode err;
 
@@ -107,7 +108,6 @@ namespace libdar
 	    switch_to_metadata(true);
 	    if(append_write && m != gf_read_only)
 		current_offset = get_size();
-	    synchronize.lock(); // next call to lock() will suspend the caller
 	}
 	catch(...)
 	{
@@ -536,7 +536,7 @@ namespace libdar
     void fichier_libcurl::initialize_subthread()
     {
 	sub_is_dying = false;
-	synchronize.unlock(); // release calling thread as we, as child thread, do now exist
+	synchronize.wait(); // release calling thread as we, as child thread, do now exist
     }
 
     void fichier_libcurl::finalize_subthread()
@@ -711,7 +711,7 @@ namespace libdar
 	if(is_running())
 	    throw SRC_BUG;
 	run();
-	synchronize.lock(); // waiting for child thread to unlock mutex to signal it has been spawned
+	synchronize.wait(); // waiting for child thread to be ready
     }
 
     void fichier_libcurl::stop_thread()
