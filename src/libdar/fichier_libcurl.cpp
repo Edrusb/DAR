@@ -729,8 +729,11 @@ namespace libdar
 		interthread.feed(ptr, 0); // trigger the thread if it was waiting for data from interthread
 		break;
 	    case gf_read_only:
-		interthread.fetch(ptr, ptr_size);
-		interthread.fetch_recycle(ptr); // trigger the thread if it was waiting for a free block to fill
+		if(interthread.is_full())
+		{
+		    interthread.fetch(ptr, ptr_size);
+		    interthread.fetch_recycle(ptr); // trigger the thread if it was waiting for a free block to fill
+		}
 		break;
 	    case gf_read_write:
 		throw SRC_BUG;
