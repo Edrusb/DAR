@@ -503,6 +503,8 @@ namespace libdar
 			do
 			{
 			    err = curl_easy_perform(easyhandle);
+			    if(err == CURLE_BAD_DOWNLOAD_RESUME)
+				err = CURLE_OK;
 			    fichier_libcurl_check_wait_or_throw(*thread_ui,
 								err,
 								wait_delay,
@@ -838,6 +840,7 @@ namespace libdar
 	switch(err)
 	{
 	case CURLE_OK:
+	case CURLE_BAD_DOWNLOAD_RESUME:
 	    break;
 	case CURLE_REMOTE_DISK_FULL:
 	case CURLE_UPLOAD_FAILED:
@@ -852,7 +855,6 @@ namespace libdar
 	case CURLE_READ_ERROR:
 	case CURLE_OUT_OF_MEMORY:
 	case CURLE_RANGE_ERROR:
-	case CURLE_BAD_DOWNLOAD_RESUME:
 	case CURLE_FILE_COULDNT_READ_FILE:
 	case CURLE_FUNCTION_NOT_FOUND:
 	case CURLE_ABORTED_BY_CALLBACK:
