@@ -484,6 +484,12 @@ namespace libdar
 
 	if(auth_from_file)
 	{
+	    err = curl_easy_setopt(easyhandle, CURLOPT_USERNAME, real_login.c_str());
+	    if(err != CURLE_OK)
+		throw Erange("entrepot_libcurl::set_libcurl_authentication",
+			     tools_printf(gettext("Error met while passing username to libcurl: %s"),
+					  curl_easy_strerror(err)));
+
 	    switch(x_proto)
 	    {
 	    case proto_ftp:  // using ~/.netrc for authentication
@@ -492,11 +498,6 @@ namespace libdar
 		    throw Erange("entrepot_libcurl::set_libcurl_authentication",
 				 tools_printf(gettext("Error met while asking libcurl to consider ~/.netrc for authentication: %s"),
 					      curl_easy_strerror(err)));
-		err = curl_easy_setopt(easyhandle, CURLOPT_USERNAME, real_login.c_str());
-		if(err != CURLE_OK)
-		    throw Erange("entrepot_libcurl::set_libcurl_authentication",
-				 tools_printf(gettext("Error met while passing username to libcurl: %s"),
-					      curl_easy_strerror(err)));
 		break;
 	    case proto_http:
 		throw Efeature(gettext("authentication from file with HTTP protocol"));
@@ -504,11 +505,21 @@ namespace libdar
 		throw Efeature(gettext("authentication from file with HTTPS protocol"));
 	    case proto_scp:
 	    case proto_sftp:
+		throw Efeature(gettext("Public key authentication for ssh/sftp"));
+		    /*
 		err = curl_easy_setopt(easyhandle, CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PUBLICKEY);
 		if(err != CURLE_OK)
 		    throw Erange("entrepot_libcurl::set_libcurl_authentication",
 				 tools_printf(gettext("Error met while instructing libcurl to use public key authentication: %s"),
 					      curl_easy_strerror(err)));
+
+
+		err = curl_easy_setopt(easyhandle, CURLOPT_SSH_PUBLIC_KEYFILE, "/home/.../.ssh/id_rsa.pub");
+
+		err = curl_easy_setopt(easyhandle, CURLOPT_SSH_PRIVATE_KEYFILE, "/home/.../.ssh/id_rsa");
+
+		curl_easy_setopt(easyhandle, CURLOPT_SSH_KNOWNHOSTS, "/home/.../.ssh/known_hosts");
+		    */
 
 		break;
 	    default:
