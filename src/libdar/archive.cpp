@@ -129,6 +129,13 @@ namespace libdar
 					     slices,
 					     options.get_multi_threaded());
 
+		    if(options.get_header_only())
+		    {
+			ver.display(dialog);
+			throw Erange("archive::achive",
+				     gettext("header only mode asked"));
+		    }
+
 		    pdesc = pile_descriptor(&stack);
 
 		    if(options.is_external_catalogue_set())
@@ -865,24 +872,13 @@ namespace libdar
 	    infinint sub_file_size;
 	    infinint first_file_size;
 	    infinint last_file_size, file_number;
-	    string algo = compression2string(get_header().get_compression_algo());
-	    string sym = ver.get_edition() >= 9 ? crypto_algo_2_string(ver.get_sym_crypto_algo()) : (ver.is_ciphered() ? gettext("yes") : gettext("no"));
-	    string asym = ver.get_edition() >= 9 && (ver.get_crypted_key() != nullptr) ? "gnupg" : gettext("none");
-	    string is_signed = ver.is_signed() ? gettext("yes") : gettext("no");
 	    infinint cat_size = get_cat_size();
-	    const header_version ver = get_header();
-
-	    dialog.printf(gettext("Archive version format               : %s\n"), ver.get_edition().display().c_str());
-	    dialog.printf(gettext("Compression algorithm used           : %S\n"), &algo);
-	    dialog.printf(gettext("Symmetric key encryption used        : %S\n"), &sym);
-	    dialog.printf(gettext("Asymmetric key encryption used       : %S\n"), &asym);
-	    dialog.printf(gettext("Archive is signed                    : %S\n"), &is_signed);
-	    dialog.printf(gettext("Sequential reading marks             : %s\n"), (ver.get_tape_marks() ? gettext("present") : gettext("absent")));
+	    get_header().display(dialog);
 	    if(!cat_size.is_zero())
 		dialog.printf(gettext("Catalogue size in archive            : %i bytes\n"), &cat_size);
 	    else
 		dialog.printf(gettext("Catalogue size in archive            : N/A\n"));
-	    dialog.printf(gettext("User comment                         : %S\n\n"), &(get_header().get_command_line()));
+	    dialog.printf("\n");
 
 	    try
 	    {

@@ -139,6 +139,7 @@ struct line_param
     fsa_scope scope;              //< FSA scope to consider for the operation
     bool multi_threaded;          //< allows libdar to use multiple threads (requires libthreadar)
     bool sizes_in_bytes;          //< whether to display sizes in bytes of to the larges unit (Mo, Go, To,...)
+    bool header_only;             //< whether we just display the header of archives to be read
 
 	// constructor for line_param
     line_param()

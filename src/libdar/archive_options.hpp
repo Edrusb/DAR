@@ -186,6 +186,8 @@ namespace libdar
 	    /// defines the protocol to use to retrieve slices of the reference archive (where the external catalogue resides)
 	void set_ref_entrepot(const entrepot & entr) { if(x_ref_entrepot != nullptr) delete x_ref_entrepot; x_ref_entrepot = entr.clone(); if(x_ref_entrepot == nullptr) throw Ememory("archive_options_read::set_entrepot"); };
 
+	    /// whether we only read the archive header and exit
+	void set_header_only(bool val) { x_header_only = val; };
 
 
 
@@ -217,6 +219,7 @@ namespace libdar
 	const std::string & get_ref_execute() const { return x_ref_execute; };
 	infinint get_ref_slice_min_digits() const { return x_ref_slice_min_digits; };
 	const entrepot & get_ref_entrepot() const { if(x_ref_entrepot == nullptr) throw SRC_BUG; return *x_ref_entrepot; };
+	bool get_header_only() const { return x_header_only; };
 
 
     private:
@@ -245,6 +248,7 @@ namespace libdar
 	std::string x_ref_execute;
 	infinint x_ref_slice_min_digits;
 	entrepot *x_ref_entrepot;
+	bool x_header_only;
 
 	void copy_from(const archive_options_read & ref);
 	void destroy();

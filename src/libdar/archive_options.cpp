@@ -131,6 +131,7 @@ namespace libdar
 	x_ref_entrepot = new (get_pool()) entrepot_local("", "", false); // never using furtive_mode to read slices
 	if(x_ref_entrepot == nullptr)
 	    throw Ememory("archive_options_read::clear");
+	x_header_only = false;
     }
 
     void archive_options_read::set_default_crypto_size()
@@ -217,6 +218,7 @@ namespace libdar
 	x_ref_entrepot = ref.x_ref_entrepot->clone();
 	if(x_ref_entrepot == nullptr)
 	    throw Ememory("archive_options_read::copy_from");
+	x_header_only = ref.x_header_only;
     }
 
     void archive_options_read::destroy()

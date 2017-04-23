@@ -332,6 +332,7 @@ bool get_args(shell_interaction & dialog,
     p.scope = all_fsa_families();
     p.multi_threaded = true;
     p.sizes_in_bytes = false;
+    p.header_only = false;
 
     try
     {
@@ -1442,6 +1443,8 @@ static bool get_args_recursive(recursive_param & rec,
 		    rec.duc_and = true;
                 else if(strcasecmp("y", optarg) == 0 || strcasecmp("byte", optarg) == 0 || strcasecmp("bytes", optarg) == 0)
 		    p.sizes_in_bytes = true;
+		else if(strcasecmp("header", optarg) == 0)
+		    p.header_only = true;
 		else
                     throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
                 break;

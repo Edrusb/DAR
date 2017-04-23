@@ -90,6 +90,10 @@ namespace libdar
 	const slice_layout *get_slice_layout() const { return ref_layout; };
 	bool get_tape_marks() const { return has_tape_marks; };
 
+	    // display
+
+	void display(user_interaction & dialg) const;
+
     private:
         archive_version edition; //< archive format
         compression algo_zip;    //< compression algorithm used
