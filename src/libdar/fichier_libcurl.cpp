@@ -274,7 +274,10 @@ namespace libdar
 	(void)get_size();
 	if(!has_maxpos)
 	    throw SRC_BUG; // get_size() sould either throw an exception or set maxpos
-	return skip(maxpos);
+	if(get_mode() == gf_write_only)
+	    return true;
+	else
+	    return skip(maxpos);
     }
 
     bool fichier_libcurl::skip_relative(S_I x)
