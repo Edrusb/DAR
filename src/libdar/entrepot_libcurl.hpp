@@ -60,11 +60,11 @@ namespace libdar
     class entrepot_libcurl : public entrepot, public mem_ui
     {
     public:
-	enum curl_protocol { proto_ftp, proto_http, proto_https, proto_scp, proto_sftp };
-	static curl_protocol string_to_curlprotocol(const std::string & arg);
+	enum mycurl_protocol { proto_ftp, proto_http, proto_https, proto_scp, proto_sftp };
+	static mycurl_protocol string_to_mycurlprotocol(const std::string & arg);
 
 	entrepot_libcurl(user_interaction & dialog,            //< used to report temporary network failure to the user
-			 curl_protocol proto,                  //< protocol to use for communication with the remote repository
+			 mycurl_protocol proto,                //< protocol to use for communication with the remote repository
 			 const std::string & login,            //< login to use
 			 const secu_string & password,         //< password to authenticate
 			 const std::string & host,             //< hostname or IP of the remote repositiry
@@ -100,7 +100,7 @@ namespace libdar
 	void read_dir_flush();
 
     private:
-	curl_protocol x_proto;
+	mycurl_protocol x_proto;
 	std::string base_URL; //< URL of the repository with only minimum path (login/password is given outside the URL)
 #if LIBCURL_AVAILABLE
 	CURL *easyhandle;
@@ -117,11 +117,11 @@ namespace libdar
 	void copy_from(const entrepot_libcurl & ref);
 	void detruit();
 
-	static std::string curl_protocol2string(curl_protocol proto);
-	static std::string build_url_from(curl_protocol proto, const std::string & host, const std::string & port);
+	static std::string mycurl_protocol2string(mycurl_protocol proto);
+	static std::string build_url_from(mycurl_protocol proto, const std::string & host, const std::string & port);
 	static size_t get_ftp_listing_callback(void *buffer, size_t size, size_t nmemb, void *userp);
 	static size_t null_callback(void *buffer, size_t size, size_t nmemb, void *userp) { return size*nmemb; };
-	static bool curl_is_protocol_available(curl_protocol proto);
+	static bool mycurl_is_protocol_available(mycurl_protocol proto);
     };
 
 	/// @}

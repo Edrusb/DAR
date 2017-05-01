@@ -38,9 +38,9 @@ using namespace std;
 namespace libdar
 {
 
-    entrepot_libcurl::curl_protocol entrepot_libcurl::string_to_curlprotocol(const std::string & arg)
+    entrepot_libcurl::mycurl_protocol entrepot_libcurl::string_to_mycurlprotocol(const std::string & arg)
     {
-	curl_protocol ret;
+	mycurl_protocol ret;
 
 	if(strcasecmp(arg.c_str(), "ftp") == 0)
 	    ret = proto_ftp;
@@ -59,7 +59,7 @@ namespace libdar
     }
 
     entrepot_libcurl::entrepot_libcurl(user_interaction & dialog,
-				       curl_protocol proto,
+				       mycurl_protocol proto,
 				       const string & login,
 				       const secu_string & password,
 				       const string & host,
@@ -81,9 +81,9 @@ namespace libdar
 	set_user_ownership(""); // not used for this type of entrepot
 	set_group_ownership(""); // not used for this type of entrepot
 
-	if(!curl_is_protocol_available(proto))
+	if(!mycurl_is_protocol_available(proto))
 	{
-	    string named_proto = curl_protocol2string(proto);
+	    string named_proto = mycurl_protocol2string(proto);
 	    throw Erange("entrepot_libcurl::entrepot_libcurl",
 			 tools_printf(gettext("protocol %S is not supported by libcurl, aborting"), & named_proto));
 	}
@@ -589,7 +589,7 @@ namespace libdar
 #endif
     }
 
-    string entrepot_libcurl::curl_protocol2string(curl_protocol proto)
+    string entrepot_libcurl::mycurl_protocol2string(mycurl_protocol proto)
     {
 	string ret;
 
@@ -617,9 +617,9 @@ namespace libdar
 	return ret;
     }
 
-    string entrepot_libcurl::build_url_from(curl_protocol proto, const string & host, const string & port)
+    string entrepot_libcurl::build_url_from(mycurl_protocol proto, const string & host, const string & port)
     {
-	string ret = curl_protocol2string(proto) + "://" + host;
+	string ret = mycurl_protocol2string(proto) + "://" + host;
 
 	if(!port.empty())
 	    ret += ":" + port;
@@ -659,11 +659,11 @@ namespace libdar
 	return size*nmemb;
     }
 
-    bool entrepot_libcurl::curl_is_protocol_available(curl_protocol proto)
+    bool entrepot_libcurl::mycurl_is_protocol_available(mycurl_protocol proto)
     {
 	curl_version_info_data *data = curl_version_info(CURLVERSION_NOW);
 	const char **ptr = nullptr;
-	string named_proto = curl_protocol2string(proto);
+	string named_proto = mycurl_protocol2string(proto);
 
 	if(data == nullptr)
 	    throw SRC_BUG;
