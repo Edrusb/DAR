@@ -46,6 +46,7 @@ extern "C"
 #include "entrepot.hpp"
 #include "secu_string.hpp"
 #include "mem_ui.hpp"
+#include "mycurl_easyhandle_sharing.hpp"
 
 namespace libdar
 {
@@ -71,9 +72,10 @@ namespace libdar
 			 const std::string & port,             //< empty string to use default port in regard to protocol used
 			 bool auth_from_file,                  //< whether ~/.netrc or ~/.ssh/... usual files should be used for authentication in place of using the given password
 			 U_I waiting_time);                    //< seconds to wait before retrying in case of network erorr
-	entrepot_libcurl(const entrepot_libcurl & ref) : entrepot(ref), mem_ui(ref) { copy_from(ref); };
-	const entrepot_libcurl & operator = (const entrepot_libcurl & ref) { detruit(); copy_from(ref); return *this; };
-	~entrepot_libcurl() throw() { detruit(); };
+	    // default copy constructor is OK
+	    // default assignment operator is OK
+	~entrepot_libcurl() throw () {};
+
 
 	    // inherited from class entrepot
 
@@ -103,7 +105,7 @@ namespace libdar
 	mycurl_protocol x_proto;
 	std::string base_URL; //< URL of the repository with only minimum path (login/password is given outside the URL)
 #if LIBCURL_AVAILABLE
-	CURL *easyhandle;
+	mycurl_easyhandle_sharing easyh;
 #endif
 	std::list<std::string> current_dir;
 	std::string reading_dir_tmp;
@@ -114,7 +116,6 @@ namespace libdar
 					const std::string & login,
 					const secu_string & password,
 					bool auth_from_file);
-	void copy_from(const entrepot_libcurl & ref);
 	void detruit();
 
 	static std::string mycurl_protocol2string(mycurl_protocol proto);

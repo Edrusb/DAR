@@ -41,7 +41,7 @@ namespace libdar
 
     fichier_libcurl::fichier_libcurl(user_interaction & dialog,
 				     const std::string & chemin,
-				     CURL *ref_handle,
+				     const shared_handle & handle,
 				     gf_mode m,
 				     U_I waiting,
 				     bool force_permission,
@@ -49,7 +49,7 @@ namespace libdar
 				     bool erase): fichier_global(dialog, m),
 						  end_data_mode(false),
 						  sub_is_dying(false),
-						  easyhandle(nullptr),
+						  ehandle(handle),
 						  metadatamode(false),
 						  current_offset(0),
 						  has_maxpos(false),
@@ -68,11 +68,7 @@ namespace libdar
 
 		// setting x_ref_handle to carry all options that will always be present for this object
 
-	    easyhandle = curl_easy_duphandle(ref_handle);
-	    if(easyhandle == nullptr)
-		throw Erange("fichier_libcurl::fichier_libcurl", string(gettext("libcurl_easy_duphandle() failed")));
-
-	    err = curl_easy_setopt(easyhandle, CURLOPT_URL, chemin.c_str());
+	    err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_URL, chemin.c_str());
 	    if(err != CURLE_OK)
 		throw Erange("fichier_libcurl::fichier_libcurl",
 			     tools_printf(gettext("Error met while resetting URL to handle: %s"),
@@ -81,19 +77,19 @@ namespace libdar
 	    switch(get_mode())
 	    {
 	    case gf_read_only:
-		err = curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, this);
+		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_WRITEDATA, this);
 		if(err != CURLE_OK)
 		    throw Erange("fichier_libcurl::fichier_libcurl",
 				 tools_printf(gettext("Error met while setting libcurl for reading data file: %s"),
 					      curl_easy_strerror(err)));
 		break;
 	    case gf_write_only:
-		err = curl_easy_setopt(easyhandle, CURLOPT_READDATA, this);
+		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_READDATA, this);
 		if(err != CURLE_OK)
 		    throw Erange("fichier_libcurl::fichier_libcurl",
 				 tools_printf(gettext("Error met while setting libcurl for writing data file: %s"),
 					      curl_easy_strerror(err)));
-		err = curl_easy_setopt(easyhandle, CURLOPT_UPLOAD, 1L);
+		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_UPLOAD, 1L);
 		if(err != CURLE_OK)
 		    throw Erange("fichier_libcurl::fichier_libcurl",
 				 tools_printf(gettext("Error met while setting libcurl for writing data file: %s"),
@@ -129,10 +125,10 @@ namespace libdar
 	    try
 	    {
 		headers = curl_slist_append(headers, order.c_str());
-		err = curl_easy_setopt(easyhandle, CURLOPT_QUOTE, headers);
+		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_QUOTE, headers);
 		if(err != CURLE_OK)
 		    throw Erange("","");
-		err = curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 1);
+		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_NOBODY, 1);
 		if(err != CURLE_OK)
 		    throw Erange("","");
 	    }
@@ -144,7 +140,7 @@ namespace libdar
 
 	    do
 	    {
-		err = curl_easy_perform(easyhandle);
+		err = curl_easy_perform(ehandle.get_handle());
 		fichier_libcurl_check_wait_or_throw(get_ui(),
 						    err,
 						    wait_delay,
@@ -156,14 +152,14 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    (void)curl_easy_setopt(easyhandle, CURLOPT_QUOTE, nullptr);
-	    (void)curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 0);
+	    (void)curl_easy_setopt(ehandle.get_handle(), CURLOPT_QUOTE, nullptr);
+	    (void)curl_easy_setopt(ehandle.get_handle(), CURLOPT_NOBODY, 0);
 	    if(headers != nullptr)
 		curl_slist_free_all(headers);
 	    throw;
 	}
-	(void)curl_easy_setopt(easyhandle, CURLOPT_QUOTE, nullptr);
-	(void)curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 0);
+	(void)curl_easy_setopt(ehandle.get_handle(), CURLOPT_QUOTE, nullptr);
+	(void)curl_easy_setopt(ehandle.get_handle(), CURLOPT_NOBODY, 0);
 	if(headers != nullptr)
 	    curl_slist_free_all(headers);
     }
@@ -181,14 +177,14 @@ namespace libdar
 	{
 	    me->switch_to_metadata(true);
 
-	    err = curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 1);
+	    err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_NOBODY, 1);
 	    if(err != CURLE_OK)
 		throw Erange("fichier_libcurl::get_size()",
 			     tools_printf(gettext("Error met while fetching file size: %s"),
 					  curl_easy_strerror(err)));
 	    do
 	    {
-		err = curl_easy_perform(easyhandle);
+		err = curl_easy_perform(ehandle.get_handle());
 		fichier_libcurl_check_wait_or_throw(get_ui(),
 						    err,
 						    wait_delay,
@@ -197,7 +193,7 @@ namespace libdar
 	    }
 	    while(err != CURLE_OK);
 
-	    err = curl_easy_getinfo(easyhandle, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &filesize);
+	    err = curl_easy_getinfo(ehandle.get_handle(), CURLINFO_CONTENT_LENGTH_DOWNLOAD, &filesize);
 	    if(filesize == -1) // file does not exist
 		filesize = 0;
 
@@ -207,7 +203,7 @@ namespace libdar
 					  curl_easy_strerror(err)));
 	    me->maxpos = tools_double2infinint(filesize);
 	    me->has_maxpos = true;
-	    (void)curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 0);
+	    (void)curl_easy_setopt(ehandle.get_handle(), CURLOPT_NOBODY, 0);
 	}
 
 	return maxpos;
@@ -487,7 +483,7 @@ namespace libdar
 		{
 		    do
 		    {
-			err = curl_easy_perform(easyhandle);
+			err = curl_easy_perform(ehandle.get_handle());
 			if(!end_data_mode)
 			    fichier_libcurl_check_wait_or_throw(*thread_ui,
 								err,
@@ -505,7 +501,7 @@ namespace libdar
 			set_range(local_offset);
 			do
 			{
-			    err = curl_easy_perform(easyhandle);
+			    err = curl_easy_perform(ehandle.get_handle());
 			    if(err == CURLE_BAD_DOWNLOAD_RESUME)
 				err = CURLE_OK;
 			    fichier_libcurl_check_wait_or_throw(*thread_ui,
@@ -581,7 +577,7 @@ namespace libdar
 
 	    // setting the block size if necessary
 
-	CURLcode err = curl_easy_setopt(easyhandle, CURLOPT_RANGE, range.c_str());
+	CURLcode err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_RANGE, range.c_str());
 	if(err != CURLE_OK)
 	    throw Erange("fichier_libcurl::set_range",
 			 tools_printf(gettext("Error while seeking in file on remote repository: %s"), curl_easy_strerror(err)));
@@ -589,7 +585,7 @@ namespace libdar
 
     void fichier_libcurl::unset_range()
     {
-	CURLcode err = curl_easy_setopt(easyhandle, CURLOPT_RANGE, nullptr);
+	CURLcode err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_RANGE, nullptr);
 	if(err != CURLE_OK)
 	    throw Erange("fichier_libcurl::unset_range",
 			 tools_printf(gettext("Error while seeking in file on remote repository: %s"), curl_easy_strerror(err)));
@@ -610,7 +606,7 @@ namespace libdar
 	    switch(get_mode())
 	    {
 	    case gf_read_only:
-		err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, write_data_callback);
+		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_WRITEFUNCTION, write_data_callback);
 		if(err != CURLE_OK)
 		    throw Erange("fichier_libcurl::switch_to_metadata",
 				 tools_printf(gettext("Error met while setting libcurl for reading data file: %s"),
@@ -626,7 +622,7 @@ namespace libdar
 		    if(!resume.is_zero())
 			throw Erange("fichier_libcurl::switch_to_metadata",
 				     gettext("Integer too large for libcurl, cannot skip at the requested offset in the remote repository"));
-		    err = curl_easy_setopt(easyhandle, CURLOPT_RESUME_FROM_LARGE, cur_pos);
+		    err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_RESUME_FROM_LARGE, cur_pos);
 		    if(err != CURLE_OK)
 			throw Erange("fichier_libcurl::switch_to_metadata",
 				     tools_printf(gettext("Error while seeking in file on remote repository: %s"), curl_easy_strerror(err)));
@@ -635,7 +631,7 @@ namespace libdar
 
 		break;
 	    case gf_write_only:
-		err = curl_easy_setopt(easyhandle, CURLOPT_READFUNCTION, read_data_callback);
+		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_READFUNCTION, read_data_callback);
 		if(err != CURLE_OK)
 		    throw Erange("fichier_libcurl::switch_to_metadata",
 				 tools_printf(gettext("Error met while setting libcurl for writing data file: %s"),
@@ -643,7 +639,7 @@ namespace libdar
 
 		    // setting the offset of the next byte to read / write
 
-		err = curl_easy_setopt(easyhandle, CURLOPT_APPEND, append_write ? 1 : 0);
+		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_APPEND, append_write ? 1 : 0);
 		if(err != CURLE_OK)
 		    throw Erange("fichier_libcur::switch_to_metadata",
 				 tools_printf(gettext("Error while setting write append mode for libcurl: %s"), curl_easy_strerror(err)));
@@ -665,14 +661,14 @@ namespace libdar
 	    switch(get_mode())
 	    {
 	    case gf_read_only:
-		err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, write_meta_callback);
+		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_WRITEFUNCTION, write_meta_callback);
 		if(err != CURLE_OK)
 		    throw Erange("fichier_libcurl::switch_to_metadata",
 				 tools_printf(gettext("Error met while setting libcurl for reading data file: %s"),
 					      curl_easy_strerror(err)));
 		break;
 	    case gf_write_only:
-		err = curl_easy_setopt(easyhandle, CURLOPT_READFUNCTION, read_meta_callback);
+		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_READFUNCTION, read_meta_callback);
 		if(err != CURLE_OK)
 		    throw Erange("fichier_libcurl::switch_to_metadata",
 				 tools_printf(gettext("Error met while setting libcurl for writing data file: %s"),
@@ -696,12 +692,6 @@ namespace libdar
 	catch(...)
 	{
 		// ignore all errors
-	}
-
-	if(easyhandle != nullptr)
-	{
-	    curl_easy_cleanup(easyhandle);
-	    easyhandle = nullptr;
 	}
     }
 

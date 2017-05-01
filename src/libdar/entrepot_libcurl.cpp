@@ -88,13 +88,10 @@ namespace libdar
 			 tools_printf(gettext("protocol %S is not supported by libcurl, aborting"), & named_proto));
 	}
 
-	easyhandle = curl_easy_init();
-	if(easyhandle == nullptr)
-	    throw Erange("entrepot_libcurl::entrepot_libcurl", string(gettext("Error met while creating a libcurl handle")));
 	set_libcurl_authentication(host, login, password, auth_from_file);
 
 #ifdef LIBDAR_NO_OPTIMIZATION
-	CURLcode err = curl_easy_setopt(easyhandle, CURLOPT_VERBOSE, 1);
+	CURLcode err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_VERBOSE, 1);
 	if(err != CURLE_OK)
 	    throw Erange("entrepot_libcurl::entrepot_libcurl",
 			 tools_printf(gettext("Error met while setting verbosity on handle: %s"),
@@ -137,13 +134,13 @@ namespace libdar
 		try
 		{
 		    listonly = 1;
-		    err = curl_easy_setopt(easyhandle, CURLOPT_DIRLISTONLY, listonly);
+		    err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_DIRLISTONLY, listonly);
 		    if(err != CURLE_OK)
 			throw Erange("","");
-		    err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, get_ftp_listing_callback);
+		    err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_WRITEFUNCTION, get_ftp_listing_callback);
 		    if(err != CURLE_OK)
 			throw Erange("","");
-		    err = curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, this);
+		    err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_WRITEDATA, this);
 		    if(err != CURLE_OK)
 			throw Erange("","");
 		}
@@ -156,7 +153,7 @@ namespace libdar
 
 		do
 		{
-		    err = curl_easy_perform(easyhandle);
+		    err = curl_easy_perform(easyh.get_root_handle());
 		    fichier_libcurl_check_wait_or_throw(get_ui(),
 							err,
 							wait_delay,
@@ -188,8 +185,8 @@ namespace libdar
 	    case proto_ftp:
 	    case proto_sftp:
 		listonly = 0;
-		(void)curl_easy_setopt(easyhandle, CURLOPT_DIRLISTONLY, listonly);
-		(void)curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, null_callback);
+		(void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_DIRLISTONLY, listonly);
+		(void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_WRITEFUNCTION, null_callback);
 		break;
 	    case proto_http:
 	    case proto_https:
@@ -209,8 +206,8 @@ namespace libdar
 	case proto_ftp:
 	case proto_sftp:
 	    listonly = 0;
-	    (void)curl_easy_setopt(easyhandle, CURLOPT_DIRLISTONLY, listonly);
-	    (void)curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, null_callback);
+	    (void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_DIRLISTONLY, listonly);
+	    (void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_WRITEFUNCTION, null_callback);
 	    break;
 	case proto_http:
 	case proto_https:
@@ -282,7 +279,7 @@ namespace libdar
 #ifdef LIBTHREADAR_AVAILABLE
 	    fichier_libcurl *ret_libcurl = new (get_pool()) fichier_libcurl(dialog,
 									    chemin,
-									    easyhandle,
+									    easyh.alloc_instance(),
 									    hidden_mode,
 									    wait_delay,
 									    force_permission,
@@ -364,19 +361,19 @@ namespace libdar
 	    case proto_sftp:
 		order = "DELE " + filename;
 		headers = curl_slist_append(headers, order.c_str());
-		err = curl_easy_setopt(easyhandle, CURLOPT_QUOTE, headers);
+		err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_QUOTE, headers);
 		if(err != CURLE_OK)
 		    throw Erange("entrepot_libcurl::inherited_unlink",
 				 tools_printf(gettext("Error met while setting up connection for file %S removal: %s"),
 					      &filename, curl_easy_strerror(err)));
-		err = curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 1);
+		err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_NOBODY, 1);
 		if(err != CURLE_OK)
 		    throw Erange("entrepot_libcurl::inherited_unlink",
 				 tools_printf(gettext("Error met while setting up connection for file %S removal: %s"),
 					      &filename, curl_easy_strerror(err)));
 		do
 		{
-		    err = curl_easy_perform(easyhandle);
+		    err = curl_easy_perform(easyh.get_root_handle());
 		    fichier_libcurl_check_wait_or_throw(get_ui(),
 							err,
 							wait_delay,
@@ -404,8 +401,8 @@ namespace libdar
 	    {
 	    case proto_ftp:
 	    case proto_sftp:
-		(void)curl_easy_setopt(easyhandle, CURLOPT_QUOTE, nullptr);
-		(void)curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 0);
+		(void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_QUOTE, nullptr);
+		(void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_NOBODY, 0);
 		break;
 	    case proto_http:
 	    case proto_https:
@@ -425,8 +422,8 @@ namespace libdar
 	{
 	case proto_ftp:
 	case proto_sftp:
-	    (void)curl_easy_setopt(easyhandle, CURLOPT_QUOTE, nullptr);
-	    (void)curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 0);
+	    (void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_QUOTE, nullptr);
+	    (void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_NOBODY, 0);
 	    break;
 	case proto_http:
 	case proto_https:
@@ -460,7 +457,7 @@ namespace libdar
 	    if(target[target.size() - 1] != '/')
 		target += "/";
 
-	err = curl_easy_setopt(easyhandle, CURLOPT_URL, target.c_str());
+	err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_URL, target.c_str());
 	if(err != CURLE_OK)
 	    throw Erange("entrepot_libcurl::set_libcurl_URL",tools_printf(gettext("Failed assigning URL to libcurl: %s"),
 									  curl_easy_strerror(err)));
@@ -484,7 +481,7 @@ namespace libdar
 
 	if(auth_from_file)
 	{
-	    err = curl_easy_setopt(easyhandle, CURLOPT_USERNAME, real_login.c_str());
+	    err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_USERNAME, real_login.c_str());
 	    if(err != CURLE_OK)
 		throw Erange("entrepot_libcurl::set_libcurl_authentication",
 			     tools_printf(gettext("Error met while passing username to libcurl: %s"),
@@ -493,7 +490,7 @@ namespace libdar
 	    switch(x_proto)
 	    {
 	    case proto_ftp:  // using ~/.netrc for authentication
-		err = curl_easy_setopt(easyhandle, CURLOPT_NETRC, CURL_NETRC_OPTIONAL);
+		err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_NETRC, CURL_NETRC_OPTIONAL);
 		if(err != CURLE_OK)
 		    throw Erange("entrepot_libcurl::set_libcurl_authentication",
 				 tools_printf(gettext("Error met while asking libcurl to consider ~/.netrc for authentication: %s"),
@@ -507,18 +504,18 @@ namespace libdar
 	    case proto_sftp:
 		throw Efeature(gettext("Public key authentication for ssh/sftp"));
 		    /*
-		err = curl_easy_setopt(easyhandle, CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PUBLICKEY);
+		err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PUBLICKEY);
 		if(err != CURLE_OK)
 		    throw Erange("entrepot_libcurl::set_libcurl_authentication",
 				 tools_printf(gettext("Error met while instructing libcurl to use public key authentication: %s"),
 					      curl_easy_strerror(err)));
 
 
-		err = curl_easy_setopt(easyhandle, CURLOPT_SSH_PUBLIC_KEYFILE, "/home/.../.ssh/id_rsa.pub");
+		err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_SSH_PUBLIC_KEYFILE, "/home/.../.ssh/id_rsa.pub");
 
-		err = curl_easy_setopt(easyhandle, CURLOPT_SSH_PRIVATE_KEYFILE, "/home/.../.ssh/id_rsa");
+		err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_SSH_PRIVATE_KEYFILE, "/home/.../.ssh/id_rsa");
 
-		curl_easy_setopt(easyhandle, CURLOPT_SSH_KNOWNHOSTS, "/home/.../.ssh/known_hosts");
+		curl_easy_setopt(easyh.get_root_handle(), CURLOPT_SSH_KNOWNHOSTS, "/home/.../.ssh/known_hosts");
 		    */
 
 		break;
@@ -542,7 +539,7 @@ namespace libdar
 	    auth.append(":", 1);
 	    auth.append(real_pass.c_str(), real_pass.get_size());
 
-	    err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, auth.c_str());
+	    err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_USERPWD, auth.c_str());
 	    if(err != CURLE_OK)
 		throw Erange("entrepot_libcurl::set_libcurl_authentication",
 			     tools_printf(gettext("Error met while setting libcurl authentication: %s"),
@@ -550,42 +547,6 @@ namespace libdar
 	}
 #else
     throw Efeature("libcurl");
-#endif
-    }
-
-    void entrepot_libcurl::copy_from(const entrepot_libcurl & ref)
-    {
-#if LIBCURL_AVAILABLE
-	entrepot *ent_me = this;
-	const entrepot *ent_ref = &ref;
-	*ent_me = *ent_ref;
-
-	mem_ui *mem_me = this;
-	const mem_ui *mem_ref = &ref;
-	*mem_me = *mem_ref;
-
-	x_proto = ref.x_proto;
-	base_URL = ref.base_URL;
-	current_dir = ref.current_dir;
-	reading_dir_tmp = ref.reading_dir_tmp;
-	wait_delay = ref.wait_delay;
-	if(ref.easyhandle != nullptr)
-	{
-	    easyhandle = curl_easy_duphandle(ref.easyhandle);
-	    if(easyhandle == nullptr)
-		throw Erange("entrepot_libcurl::copy_from", string(gettext("Error met while duplicating libcurl handle")));
-	}
-	else
-	    easyhandle = nullptr;
-#else
-	throw Efeature("libcurl");
-#endif
-    }
-
-    void entrepot_libcurl::detruit()
-    {
-#if LIBCURL_AVAILABLE
-	curl_easy_cleanup(easyhandle);
 #endif
     }
 
