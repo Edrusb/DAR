@@ -203,15 +203,19 @@ namespace libdar
 	bool lax;                    //< whether to try to go further reading problems
 	infinint to_read_ahead;      //< amount of data to read ahead for next slices
 
-        bool skip_forward(U_I x);                                  //< skip forward in sar global contents
-        bool skip_backward(U_I x);                                 //< skip backward in sar global contents
-        void close_file(bool terminal);                            //< close current openned file, adding (in write mode only) a terminal mark (last slice) or not
-        void open_readonly(const std::string & fic, const infinint &num);  //< open file of name "filename" for read only "num" is the slice number
-        void open_writeonly(const std::string & fic, const infinint &num); //< open file of name "filename" for write only "num" is the slice number
-        void open_file_init();            //< initialize some of_* fields
-        void open_file(infinint num);     //< close current slice and open the slice 'num'
-        void set_offset(infinint offset); //< skip to current slice relative offset
-        void open_last_file();            //< open the last slice, ask the user, test, until last slice available
+        bool skip_forward(U_I x);                    //< skip forward in sar global contents
+        bool skip_backward(U_I x);                   //< skip backward in sar global contents
+        void close_file(bool terminal);              //< close current openned file, adding (in write mode only) a terminal mark (last slice) or not
+        void open_readonly(const std::string & fic,  //< open file of name "fic" for read only
+			   const infinint &num,      //< "num" is the slice number
+			   bool bytheend);           //< whether to position the read cursor at the beginning or the end of the file
+        void open_writeonly(const std::string & fic, //< open file of name "filename" for write only
+			    const infinint &num,     //< "num" is the slice number
+			    bool bytheend);          //< whether to overwrite or to append data to be written to the file
+        void open_file_init();                       //< initialize some of_* fields
+        void open_file(infinint num, bool bytheend); //< close current slice and open the slice 'num'
+        void set_offset(infinint offset);            //< skip to current slice relative offset
+        void open_last_file(bool bytheend);          //< open the last slice, ask the user, test, until last slice available
 	bool is_current_eof_a_normal_end_of_slice() const;  //< return true if current reading position is at end of slice
 	infinint bytes_still_to_read_in_slice() const;  //< returns the number of bytes expected before the end of slice
         header make_write_header(const infinint &num, char flag);

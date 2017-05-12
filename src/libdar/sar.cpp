@@ -163,11 +163,11 @@ namespace libdar
 		{
 		    string tmp = e.get_message();
  		    get_ui().printf(gettext("Error met while opening the last slice: %S. Trying to open the archive using the first slice..."), &tmp);
-		    open_file(1);
+		    open_file(1, false);
 		}
 	    }
 	    else
-		open_file(1);
+		open_file(1, false);
 	}
 	catch(...)
 	{
@@ -250,7 +250,7 @@ namespace libdar
 		throw Ememory("sar::sar");
 
 	    open_file_init();
-	    open_file(1);
+	    open_file(1, false);
 	}
 	catch(...)
 	{
@@ -348,7 +348,7 @@ namespace libdar
         if(of_last_file_known && dest_file > of_last_file_num)
         {
                 // going to EOF
-            open_file(of_last_file_num);
+            open_file(of_last_file_num, true);
             of_fd->skip_to_eof();
             file_offset = of_fd->get_position();
             return false;
@@ -357,7 +357,7 @@ namespace libdar
         {
             try
             {
-                open_file(dest_file);
+                open_file(dest_file, false);
                 set_offset(offset);
                 file_offset = offset;
                 return true;
@@ -376,7 +376,7 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-        open_last_file();
+        open_last_file(true);
 	if(of_fd == nullptr)
 	    throw SRC_BUG;
 	to_read_ahead = 0;
@@ -446,7 +446,7 @@ namespace libdar
 
         if(number == 1 ? offset+delta < slicing.first_size : offset+delta < slicing.other_size)
         {
-            open_file(number);
+            open_file(number, false);
             file_offset = offset;
             set_offset(file_offset);
             return true;
@@ -477,14 +477,14 @@ namespace libdar
 
         if((number > 1 ? offset_neg + slicing.other_slice_header : offset_neg + slicing.first_slice_header) <= offset)
         {
-            open_file(number);
+            open_file(number, true);
             file_offset = offset - offset_neg;
             set_offset(file_offset);
             return true;
         }
         else
         {   // seek to beginning of file
-            open_file(1);
+            open_file(1, false);
             set_offset(slicing.first_slice_header);
             return false;
         }
@@ -565,7 +565,7 @@ namespace libdar
 		    loop = false;
 		else
 		    if(is_current_eof_a_normal_end_of_slice())
-			open_file(of_current + 1);
+			open_file(of_current + 1, false);
 		    else // filling zeroed bytes in place of the missing part of the slice
 		    {
 			infinint avail = bytes_still_to_read_in_slice();
@@ -615,7 +615,7 @@ namespace libdar
             }
             else
             {
-                open_file(of_current + 1);
+                open_file(of_current + 1, false);
                 continue;
             }
         }
@@ -647,7 +647,7 @@ namespace libdar
         }
     }
 
-    void sar::open_readonly(const string & fic, const infinint &num)
+    void sar::open_readonly(const string & fic, const infinint &num, bool bytheend)
     {
         header h;
 
@@ -803,7 +803,7 @@ namespace libdar
 			    while(tmp_num.is_zero());
 
 			    get_ui().printf(gettext("LAX MODE: opening slice %i to read its slice header"), &tmp_num);
-			    open_file(tmp_num);
+			    open_file(tmp_num, false);
 			    get_ui().printf(gettext("LAX MODE: closing slice %i, header properly fetched"), &tmp_num);
 			    close_file(false);
 			    continue;
@@ -856,7 +856,10 @@ namespace libdar
 		of_fd->skip_to_eof();
 		of_fd->skip_relative(-1);
 		of_fd->read(&end_flag, 1); // reading the last char of the slice
-		of_fd->skip(current_pos);
+		if(bytheend)
+		    of_fd->skip_relative(-1);
+		else
+		    of_fd->skip(current_pos);
 
 		switch(end_flag)
 		{
@@ -877,6 +880,11 @@ namespace libdar
 			h.get_set_flag() = end_flag;
 		    break;
 		}
+	    }
+	    else // old slice without flag at end of slice
+	    {
+		if(bytheend)
+		    of_fd->skip_to_eof();
 	    }
 
             switch(h.get_set_flag())
@@ -962,7 +970,7 @@ namespace libdar
         }
     }
 
-    void sar::open_writeonly(const string & fic, const infinint &num)
+    void sar::open_writeonly(const string & fic, const infinint &num, bool bytheend)
     {
 	bool unlink_on_error = false;
 	bool do_erase = false;
@@ -1170,6 +1178,9 @@ namespace libdar
 	    }
 	    throw;
 	}
+
+	if(bytheend)
+	    of_fd->skip_to_eof();
     }
 
     void sar::open_file_init()
@@ -1183,7 +1194,7 @@ namespace libdar
 	size_of_current = 0; // not used in write mode
     }
 
-    void sar::open_file(infinint num)
+    void sar::open_file(infinint num, bool bytheend)
     {
         if(of_fd == nullptr || of_current != num)
         {
@@ -1193,8 +1204,7 @@ namespace libdar
 	    {
 	    case gf_read_only:
 		close_file(false);
-		    // launch the shell command before reading a slice
-		open_readonly(display, num);
+		open_readonly(display, num, bytheend);
 		break;
 	    case gf_write_only:
 	    case gf_read_write:
@@ -1233,7 +1243,7 @@ namespace libdar
 		else
 		    initial = false;
 
-		open_writeonly(display, num);
+		open_writeonly(display, num, bytheend);
 		break;
 	    default :
 		close_file(false);
@@ -1261,7 +1271,7 @@ namespace libdar
             of_fd->skip(offset);
     }
 
-    void sar::open_last_file()
+    void sar::open_last_file(bool bytheend)
     {
         infinint num;
 
@@ -1269,7 +1279,7 @@ namespace libdar
 	{
 	case gf_read_only:
 	    if(of_last_file_known)
-		open_file(of_last_file_num);
+		open_file(of_last_file_num, bytheend);
 	    else // last slice number is not known
 	    {
 		bool ask_user = false;
@@ -1278,7 +1288,7 @@ namespace libdar
 		{
 		    if(sar_tools_get_higher_number_in_dir(*entr, base, min_digits, ext, num))
 		    {
-			open_file(num);
+			open_file(num, bytheend);
 			if(of_flag != flag_type_terminal)
 			{
 			    if(!ask_user)
@@ -1311,7 +1321,7 @@ namespace libdar
 	    break;
 	case gf_read_write:
 	case gf_write_only:
-	    open_file(of_max_seen);
+	    open_file(of_max_seen, bytheend);
 	    break;
 	default:
 	    throw SRC_BUG;
