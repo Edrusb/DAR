@@ -152,7 +152,7 @@ namespace libdar
 	libthreadar::fast_tampon<char> interthread; //< data channel for reading or writing with subthread
 	libthreadar::barrier synchronize; //< used to be sure subthread has been launched
 
-	void set_range(const infinint & begin);
+	void set_range(const infinint & begin, const infinint & range_size);
 	void unset_range();
 	void switch_to_metadata(bool mode);//< set to true to get or set file's metadata, false to read/write file's data
 	void detruit();

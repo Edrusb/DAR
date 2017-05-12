@@ -460,7 +460,6 @@ namespace libdar
 		// parent thread is still suspended
 
 	    CURLcode err;
-	    infinint local_offset = current_offset;
 	    user_interaction *thread_ui = nullptr;
 
 	    try
@@ -479,7 +478,7 @@ namespace libdar
 
 	    try
 	    {
-		if(network_block == 0 || get_mode() != gf_read_only)
+		if(network_block == 0) // network_block may be non null only in read-only mode
 		{
 		    do
 		    {
@@ -495,10 +494,13 @@ namespace libdar
 		}
 		else // reading by block to avoid having interrupting libcurl
 		{
+		    infinint local_offset = current_offset;
+		    infinint local_network_block = network_block;
+
 		    do
 		    {
-			network_offset = 0;
-			set_range(local_offset);
+			network_offset = 0; // keeps trace of the amount of bytes sent to main thread by callback
+			set_range(local_offset, network_block); // DEBUG TEST : should be local_network_block instead of network_block
 			do
 			{
 			    err = curl_easy_perform(ehandle.get_handle());
@@ -512,8 +514,9 @@ namespace libdar
 			}
 			while(err != CURLE_OK);
 			local_offset += network_offset;
+//	DEBUG		local_network_block -= network_offset;
 		    }
-		    while(err == CURLE_OK && network_offset > 0 && !end_data_mode);
+		    while(!network_offset.is_zero() && !end_data_mode); // DEBUG  && !local_network_block.is_zero())
 		    unset_range();
 		}
 	    }
@@ -570,9 +573,9 @@ namespace libdar
 	}
     }
 
-    void fichier_libcurl::set_range(const infinint & begin)
+    void fichier_libcurl::set_range(const infinint & begin, const infinint & range_size)
     {
-	infinint end_range = begin + infinint(network_block - 1);
+	infinint end_range = begin + range_size - 1;
 	string range = tools_printf("%i-%i", &begin, &end_range);
 
 	    // setting the block size if necessary
