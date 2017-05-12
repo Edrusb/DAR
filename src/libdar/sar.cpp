@@ -730,6 +730,10 @@ namespace libdar
 	    {
 		throw;
 	    }
+	    catch(Ebug & e)
+	    {
+		throw;
+	    }
             catch(Egeneric & e)
             {
 		if(!lax)
