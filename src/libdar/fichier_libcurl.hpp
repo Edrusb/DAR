@@ -157,15 +157,16 @@ namespace libdar
 	libthreadar::fast_tampon<char> interthread; //< data channel for reading or writing with subthread
 	libthreadar::barrier synchronize; //< used to be sure subthread has been launched
 
-	void set_range(const infinint & begin, const infinint & range_size);
-	void unset_range();
+	void set_range(const infinint & begin, const infinint & range_size); //< set range in easyhandle
+	void unset_range();  //< unset range in easyhandler
 	void switch_to_metadata(bool mode);//< set to true to get or set file's metadata, false to read/write file's data
-	void detruit();
-	void run_thread();
-	void stop_thread();
-	void relaunch_thread(const infinint & block_size);
-	void initialize_subthread();
-	void finalize_subthread();
+	void detruit();     //< get ready for object destruction
+	void run_thread();  //< run subthread with the previously defined parameters
+	void stop_thread(); //< ask subthread to stop and wait for its end
+	void relaunch_thread(const infinint & block_size); //< re-run the subthread if not running
+	void initialize_subthread(); //< subthread routine to init itself
+	void finalize_subthread();   //< subthread routine to end itself
+	void set_subthread(U_I & needed_bytes); //< set parameters and run subthtread if necessary
 
 	static size_t write_data_callback(char *buffer, size_t size, size_t nmemb, void *userp);
 	static size_t read_data_callback(char *bufptr, size_t size, size_t nitems, void *userp);

@@ -401,35 +401,7 @@ namespace libdar
 	U_I delta;
 	bool maybe_eof = false;
 
-	if(interthread.is_empty())
-	{
-		// cannot switch to data mode if some data are
-		// in transit because current_offset would be
-		// wrongly positionned in the requested to libcurl
-	    if(metadatamode)
-	    {
-		if(has_maxpos && maxpos <= current_offset + size)
-		{
-		    infinint tmp = maxpos - current_offset;
-
-			// this sets size the value of tmp:
-		    size = 0;
-		    tmp.unstack(size);
-		    if(!tmp.is_zero())
-			throw SRC_BUG;
-
-		    network_block = 0;
-		}
-		else
-		    network_block = size;
-		switch_to_metadata(false);
-	    }
-	    else
-	    {
-		if(sub_is_dying)
-		    relaunch_thread(size);
-	    }
-	}
+	set_subthread(size);
 
 	read = 0;
 	do
@@ -464,33 +436,13 @@ namespace libdar
 	       && !maybe_eof)                   // avoid looping endelessly
 	    {
 		maybe_eof = (delta == 0);
+		U_I remaining = size - read;
 
 		    // if interthread is empty and thread has not been launched at least once
 		    // we can only now switch to data mode because current_offset is now correct.
 		    // This will (re-)launch the thread that should fill interthread pipe with data
-		if(metadatamode)
-		{
-		    if(has_maxpos && maxpos <= current_offset + (size - read))
-		    {
-			infinint tmp = maxpos - current_offset + read;
-
-			    // this means size is set to the value of tmp;
-			size = 0;
-			tmp.unstack(size);
-			if(!tmp.is_zero())
-			    throw SRC_BUG;
-
-			network_block = 0;
-		    }
-		    else
-			network_block = infinint(size - read);
-		    switch_to_metadata(false);
-		}
-		else
-		{
-		    if(sub_is_dying)
-			relaunch_thread(size - read);
-		}
+		set_subthread(remaining);
+		size = read + remaining;
 	    }
 	}
 	while(read < size && (is_running() || interthread.is_not_empty()));
@@ -991,6 +943,39 @@ namespace libdar
 					  &err_context,
 					  curl_easy_strerror(err)));
 	    break;
+	}
+    }
+
+    void fichier_libcurl::set_subthread(U_I & needed_bytes)
+    {
+	if(interthread.is_empty())
+	{
+		// cannot switch to data mode if some data are
+		// in transit because current_offset would be
+		// wrongly positionned in the requested to libcurl
+	    if(metadatamode)
+	    {
+		if(has_maxpos && maxpos <= current_offset + needed_bytes)
+		{
+		    infinint tmp = maxpos - current_offset;
+
+			// this sets size the value of tmp:
+		    needed_bytes = 0;
+		    tmp.unstack(needed_bytes);
+		    if(!tmp.is_zero())
+			throw SRC_BUG;
+
+		    network_block = 0;
+		}
+		else
+		    network_block = needed_bytes;
+		switch_to_metadata(false);
+	    }
+	    else
+	    {
+		if(sub_is_dying)
+		    relaunch_thread(needed_bytes);
+	    }
 	}
     }
 
