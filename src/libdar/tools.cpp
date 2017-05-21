@@ -934,14 +934,14 @@ namespace libdar
             for(U_I i = 0; i <= argvector.size(); i++)
                 if(argv[i] != nullptr)
                     delete [] argv[i];
-            delete argv;
+            delete [] argv;
             throw;
         }
 
         for(U_I i = 0; i <= argvector.size(); i++)
             if(argv[i] != nullptr)
                 delete [] argv[i];
-        delete argv;
+        delete [] argv;
     }
 
     void tools_system_with_pipe(user_interaction & dialog,
@@ -2961,11 +2961,11 @@ namespace libdar
         catch(...)
         {
             if(dst != nullptr)
-                delete dst;
+                delete [] dst;
             throw;
         }
         if(dst != nullptr)
-            delete dst;
+            delete [] dst;
 
         return ret;
     }
@@ -3004,11 +3004,11 @@ namespace libdar
         catch(...)
         {
             if(dst != nullptr)
-                delete dst;
+                delete [] dst;
             throw;
         }
         if(dst != nullptr)
-            delete dst;
+            delete [] dst;
 
         return ret;
     }

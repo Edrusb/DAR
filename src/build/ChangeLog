@@ -3,6 +3,8 @@ from 2.5.10 to 2.5.11
   aborts. This is feature is achieved while listing archive content thanks
   to the -aheader option
 - adding date format info for -w option in "dar_manager -h" usage help
+- fixed several mistakes in tools.cpp leading compilation to fail under
+  certain environments
 
 from 2.5.9 to 2.5.10
 - fixed bug: -r option (only more recent overwriting policy) was
