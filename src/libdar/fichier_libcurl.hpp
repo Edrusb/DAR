@@ -102,20 +102,6 @@ namespace libdar
         bool skip_relative(S_I x);
         infinint get_position() const { return current_offset; };
 
-	    /// define the network side behavior
-	    ///
-	    /// \param[in] size is the byte size to be read at once, set to zero to avoid reading by block
-	    /// \note by default libdar instruct libcurl to read as much possible data and extract it from
-	    /// buffer when needed. This gives the maximum performance except that when libdar needs to skip
-	    /// data and read further or before it leads libcurl to end the FTP control session, and thus
-	    /// reconnect with a new FTP session. Some FTP server might not like the many FTP control sessions
-	    /// generated while only one is needed (controling many data sessions). Reading by block let the
-	    /// FTP order to end and avoid having libdar asking libcurl to interrupt the transfer which preserve
-	    /// the control session. The drawback is that it implies network latency between each read block
-	    /// and leads to the creation/destruction of many thread inside libdar.
-	void read_limited_size_at_once(U_I size) { if(!metadatamode) throw SRC_BUG; network_block = size; };
-	void read_limited_size_at_once() { read_limited_size_at_once(tampon_size); };
-
     protected:
 	    // inherited from generic_file grand-parent class
 	void inherited_read_ahead(const infinint & amount);
@@ -133,9 +119,27 @@ namespace libdar
     private:
 	static const U_I tampon_size = CURL_MAX_WRITE_SIZE;
 
-	    // internal thread managed the data transfers between libcurl and object's buffer using callbacks
-	    // object run in caller thread and fetches/drops data to object's buffers for data transfers but
-	    // also suspend internal thread to proceed to control calling directly libcurl (metadata mode)
+	    //////////////////////////////
+	    //
+	    // implementation internals
+	    //
+	    //////////////////////////////
+	    // the object has two modes:
+	    // - meta data mode (skip, get_position() and other non read/write operations)
+	    // - data mode (read or write operations)
+	    //
+	    // in metadata mode each method is a simple code execution (no subthread, no callback)
+	    //
+	    // in data mode, a subthread is used to interact with libcurl. It sends or receives
+	    // data through the interthread pipe. A callback is occasionally run bu libcurl in this
+	    // subthread.
+	    // in read mode, the subthread is run only if the interthread is empty. the subthread may
+	    // survive the inherited_read call and may suspend on writing data to interthread being full
+	    // - "network_offset" is updated by the callback and read by the subthread when libcurl has returned
+	    //   it keeps trace of the amount of data sent to interthread.
+	    // - "network_block" is set by the main thread to define the amount of data to be fetched it
+	    //   it used to setup libcurl and is read by the subthread for control/validation purposes
+
 	bool end_data_mode;               //< true if subthread has been requested to end
 	bool sub_is_dying;                //< is set by subthread when about to end
 	shared_handle ehandle;            //< easy handle (wrapped in C++ object) that we modify when necessary
@@ -147,8 +151,7 @@ namespace libdar
 	char meta_tampon[tampon_size];    //< trash in transit data used to carry metadata
 	U_I meta_inbuf;                   //< amount of byte available in "meta_tampon"
 	U_I wait_delay;                   //< time in second to wait before retrying in case of network error
-	U_I network_block;                //< maximum amount of data read at once from the network
-	infinint network_offset;          //< updated by sub thread in network block mode to give amount of bytes pushed to interthread
+	infinint network_block;           //< maximum amount of data read at once from the network (only read by subthread)
 	infinint subthread_net_offset;    //< updated by sub thread in network block mode to give amount of bytes pushed to interthread
 	infinint subthread_cur_offset;    //< subthread copy of current_offset
 	libthreadar::fast_tampon<char> interthread; //< data channel for reading or writing with subthread
@@ -160,6 +163,7 @@ namespace libdar
 	void detruit();
 	void run_thread();
 	void stop_thread();
+	void relaunch_thread(const infinint & block_size);
 	void initialize_subthread();
 	void finalize_subthread();
 

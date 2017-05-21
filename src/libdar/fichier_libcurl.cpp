@@ -57,7 +57,6 @@ namespace libdar
 						  append_write(!erase),
 						  meta_inbuf(0),
 						  wait_delay(waiting),
-						  network_block(0),
 						  interthread(10, tampon_size),
 						  synchronize(2)
     {
@@ -400,6 +399,7 @@ namespace libdar
 	unsigned int ptr_size;
 	U_I room;
 	U_I delta;
+	bool maybe_eof = false;
 
 	if(interthread.is_empty())
 	{
@@ -407,14 +407,35 @@ namespace libdar
 		// in transit because current_offset would be
 		// wrongly positionned in the requested to libcurl
 	    if(metadatamode)
+	    {
+		if(has_maxpos && maxpos <= current_offset + size)
+		{
+		    infinint tmp = maxpos - current_offset;
+
+			// this sets size the value of tmp:
+		    size = 0;
+		    tmp.unstack(size);
+		    if(!tmp.is_zero())
+			throw SRC_BUG;
+
+		    network_block = 0;
+		}
+		else
+		    network_block = size;
 		switch_to_metadata(false);
+	    }
+	    else
+	    {
+		if(sub_is_dying)
+		    relaunch_thread(size);
+	    }
 	}
 
 	read = 0;
 	do
 	{
 	    delta = 0;
-	    while(read + delta < size && (!sub_is_dying || interthread.is_not_empty()))
+ 	    while(read + delta < size && (!sub_is_dying || interthread.is_not_empty()))
 	    {
 		interthread.fetch(ptr, ptr_size);
 
@@ -437,14 +458,39 @@ namespace libdar
 	    current_offset += delta;
 	    read += delta;
 
-	    if(interthread.is_empty())
+	    if(read < size                      // we requested more data than what we got so far
+	       && (!has_maxpos                  // we don't know where is EOF
+		   || current_offset < maxpos)  // or we have not yet reached EOF
+	       && !maybe_eof)                   // avoid looping endelessly
 	    {
+		maybe_eof = (delta == 0);
 
 		    // if interthread is empty and thread has not been launched at least once
 		    // we can only now switch to data mode because current_offset is now correct.
 		    // This will (re-)launch the thread that should fill interthread pipe with data
 		if(metadatamode)
+		{
+		    if(has_maxpos && maxpos <= current_offset + (size - read))
+		    {
+			infinint tmp = maxpos - current_offset + read;
+
+			    // this means size is set to the value of tmp;
+			size = 0;
+			tmp.unstack(size);
+			if(!tmp.is_zero())
+			    throw SRC_BUG;
+
+			network_block = 0;
+		    }
+		    else
+			network_block = infinint(size - read);
 		    switch_to_metadata(false);
+		}
+		else
+		{
+		    if(sub_is_dying)
+			relaunch_thread(size - read);
+		}
 	    }
 	}
 	while(read < size && (is_running() || interthread.is_not_empty()));
@@ -748,6 +794,26 @@ namespace libdar
 	    }
 	}
 	join();
+
+    void fichier_libcurl::relaunch_thread(const infinint & block_size)
+    {
+	if(metadatamode)
+	{
+	    network_block = block_size;
+	    switch_to_metadata(false);
+	}
+	else
+	{
+	    if(sub_is_dying)
+	    {
+		stop_thread();
+		network_block = block_size;
+		run_thread();
+	    }
+
+		// else thread is still running so
+		// we cannot change the network_block size
+	}
     }
 
     size_t fichier_libcurl::write_data_callback(char *buffer, size_t size, size_t nmemb, void *userp)
