@@ -668,7 +668,7 @@ namespace libdar
 				 tools_printf(gettext("Error met while setting libcurl for reading data file: %s"),
 					      curl_easy_strerror(err)));
 
-		if(network_block == 0)
+		if(network_block.is_zero())
 		{
 
 			// setting the offset of the next byte to read / write
