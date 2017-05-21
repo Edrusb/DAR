@@ -47,6 +47,7 @@ extern "C"
 #include "secu_string.hpp"
 #include "mem_ui.hpp"
 #include "mycurl_easyhandle_sharing.hpp"
+#include "mycurl_protocol.hpp"
 
 namespace libdar
 {
@@ -61,9 +62,6 @@ namespace libdar
     class entrepot_libcurl : public entrepot, public mem_ui
     {
     public:
-	enum mycurl_protocol { proto_ftp, proto_http, proto_https, proto_scp, proto_sftp };
-	static mycurl_protocol string_to_mycurlprotocol(const std::string & arg);
-
 	entrepot_libcurl(user_interaction & dialog,            //< used to report temporary network failure to the user
 			 mycurl_protocol proto,                //< protocol to use for communication with the remote repository
 			 const std::string & login,            //< login to use

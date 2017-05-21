@@ -125,7 +125,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	    if(param.remote.ent_host.size() != 0)
 	    {
 		repo = new (nothrow) entrepot_libcurl(dialog,
-						      entrepot_libcurl::string_to_mycurlprotocol(param.remote.ent_proto),
+						      string_to_mycurl_protocol(param.remote.ent_proto),
 						      param.remote.ent_login,
 						      param.remote.ent_pass,
 						      param.remote.ent_host,
@@ -139,7 +139,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	    if(param.ref_remote.ent_host.size() != 0)
 	    {
 		ref_repo = new (nothrow) entrepot_libcurl(dialog,
-							  entrepot_libcurl::string_to_mycurlprotocol(param.ref_remote.ent_proto),
+							  string_to_mycurl_protocol(param.ref_remote.ent_proto),
 							  param.ref_remote.ent_login,
 							  param.ref_remote.ent_pass,
 							  param.ref_remote.ent_host,
@@ -153,7 +153,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	    if(param.aux_remote.ent_host.size() != 0)
 	    {
 		aux_repo = new (nothrow) entrepot_libcurl(dialog,
-							  entrepot_libcurl::string_to_mycurlprotocol(param.aux_remote.ent_proto),
+							  string_to_mycurl_protocol(param.aux_remote.ent_proto),
 							  param.aux_remote.ent_login,
 							  param.aux_remote.ent_pass,
 							  param.aux_remote.ent_host,
