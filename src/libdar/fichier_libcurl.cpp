@@ -41,6 +41,7 @@ namespace libdar
 
     fichier_libcurl::fichier_libcurl(user_interaction & dialog,
 				     const std::string & chemin,
+				     mycurl_protocol proto,
 				     const shared_handle & handle,
 				     gf_mode m,
 				     U_I waiting,
@@ -58,7 +59,8 @@ namespace libdar
 						  meta_inbuf(0),
 						  wait_delay(waiting),
 						  interthread(10, tampon_size),
-						  synchronize(2)
+						  synchronize(2),
+						  x_proto(proto)
     {
 	CURLcode err;
 
@@ -767,7 +769,10 @@ namespace libdar
     {
 	if(metadatamode)
 	{
-	    network_block = block_size;
+	    if(x_proto == proto_ftp)
+		network_block = 0;
+	    else
+		network_block = block_size;
 	    switch_to_metadata(false);
 	}
 	else
@@ -775,7 +780,10 @@ namespace libdar
 	    if(sub_is_dying)
 	    {
 		stop_thread();
-		network_block = block_size;
+		if(x_proto == proto_ftp)
+		    network_block = 0;
+		else
+		    network_block = block_size;
 		run_thread();
 	    }
 
@@ -955,20 +963,28 @@ namespace libdar
 		// wrongly positionned in the requested to libcurl
 	    if(metadatamode)
 	    {
-		if(has_maxpos && maxpos <= current_offset + needed_bytes)
-		{
-		    infinint tmp = maxpos - current_offset;
-
-			// this sets size the value of tmp:
-		    needed_bytes = 0;
-		    tmp.unstack(needed_bytes);
-		    if(!tmp.is_zero())
-			throw SRC_BUG;
-
+		if(x_proto == proto_ftp)
 		    network_block = 0;
-		}
+		    // because reading by block lead control session to
+		    // be reset when ftp is used, leading a huge amount
+		    // of connection a FTP server might see as DoS atempt
 		else
-		    network_block = needed_bytes;
+		{
+		    if(has_maxpos && maxpos <= current_offset + needed_bytes)
+		    {
+			infinint tmp = maxpos - current_offset;
+
+			    // this sets size the value of tmp:
+			needed_bytes = 0;
+			tmp.unstack(needed_bytes);
+			if(!tmp.is_zero())
+			    throw SRC_BUG;
+
+			network_block = 0;
+		    }
+		    else
+			network_block = needed_bytes;
+		}
 		switch_to_metadata(false);
 	    }
 	    else

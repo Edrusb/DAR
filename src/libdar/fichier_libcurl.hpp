@@ -49,6 +49,7 @@ extern "C"
 #include "user_interaction.hpp"
 #include "fichier_global.hpp"
 #include "mycurl_easyhandle_sharing.hpp"
+#include "mycurl_protocol.hpp"
 
 namespace libdar
 {
@@ -67,6 +68,7 @@ namespace libdar
 	    /// constructor
 	fichier_libcurl(user_interaction & dialog,    //< for user interaction requested by fichier_global
 			const std::string & chemin,   //< full path of the file to open
+			mycurl_protocol proto,        //< to workaround some libcurl strange behavior for some protocols
 			const shared_handle & handle, //< the easy handle wrapper object
 			gf_mode m,                    //< open mode
 			U_I waiting,                  //< retry timeout in case of network error
@@ -156,6 +158,7 @@ namespace libdar
 	infinint subthread_cur_offset;    //< subthread copy of current_offset
 	libthreadar::fast_tampon<char> interthread; //< data channel for reading or writing with subthread
 	libthreadar::barrier synchronize; //< used to be sure subthread has been launched
+	mycurl_protocol x_proto;          //< used to workaround some libcurl strange behavoir for some protocols
 
 	void set_range(const infinint & begin, const infinint & range_size); //< set range in easyhandle
 	void unset_range();  //< unset range in easyhandler

@@ -259,6 +259,7 @@ namespace libdar
 #ifdef LIBTHREADAR_AVAILABLE
 	    fichier_libcurl *ret_libcurl = new (get_pool()) fichier_libcurl(dialog,
 									    chemin,
+									    x_proto,
 									    easyh.alloc_instance(),
 									    hidden_mode,
 									    wait_delay,
@@ -270,8 +271,6 @@ namespace libdar
 	    if(ret == nullptr)
 		throw Ememory("entrepot_libcurl::inherited_open");
 
-	    if(x_proto != proto_ftp)
-		ret_libcurl->read_limited_size_at_once();
 #else
 	    throw Efeature("libthreadar");
 #endif
