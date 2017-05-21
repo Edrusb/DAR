@@ -678,13 +678,14 @@ namespace libdar
 		    if(!resume.is_zero())
 			throw Erange("fichier_libcurl::switch_to_metadata",
 				     gettext("Integer too large for libcurl, cannot skip at the requested offset in the remote repository"));
-		}
-		    // else we keep cur_pos set to zero to disable a previously set CURLOPT_RESUME_FROM_LARGE
 
-		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_RESUME_FROM_LARGE, cur_pos);
-		if(err != CURLE_OK)
-		    throw Erange("fichier_libcurl::switch_to_metadata",
-				 tools_printf(gettext("Error while seeking in file on remote repository: %s"), curl_easy_strerror(err)));
+		    err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_RESUME_FROM_LARGE, cur_pos);
+		    if(err != CURLE_OK)
+			throw Erange("fichier_libcurl::switch_to_metadata",
+				     tools_printf(gettext("Error while seeking in file on remote repository: %s"), curl_easy_strerror(err)));
+		}
+		    // else (network_block != 0) the subthread will make use of range
+		    // this parameter is set back to its default in stop_thread()
 
 		break;
 	    case gf_write_only:
@@ -794,6 +795,14 @@ namespace libdar
 	    }
 	}
 	join();
+
+	CURLcode err;
+	curl_off_t cur_pos = 0;
+	err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_RESUME_FROM_LARGE, cur_pos);
+	if(err != CURLE_OK)
+	    throw Erange("fichier_libcurl::switch_to_metadata",
+			 tools_printf(gettext("Error while seeking in file on remote repository: %s"), curl_easy_strerror(err)));
+    }
 
     void fichier_libcurl::relaunch_thread(const infinint & block_size)
     {
