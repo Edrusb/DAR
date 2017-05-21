@@ -461,10 +461,12 @@ namespace libdar
 
 	    CURLcode err;
 	    user_interaction *thread_ui = nullptr;
+	    infinint local_network_block = network_block; // set before unlocking parent thread
 
 	    try
 	    {
 		thread_ui = get_ui().clone();
+		subthread_cur_offset = current_offset;
 	    }
 	    catch(...)
 	    {
@@ -478,7 +480,7 @@ namespace libdar
 
 	    try
 	    {
-		if(network_block == 0) // network_block may be non null only in read-only mode
+		if(local_network_block.is_zero()) // network_block may be non null only in read-only mode
 		{
 		    do
 		    {
@@ -493,15 +495,16 @@ namespace libdar
 		}
 		else // reading by block to avoid having interrupting libcurl
 		{
-		    infinint local_offset = current_offset;
-		    infinint local_network_block = network_block;
+		    infinint cycle_subthread_net_offset;
 
 		    do
 		    {
-			network_offset = 0; // keeps trace of the amount of bytes sent to main thread by callback
-			set_range(local_offset, network_block); // DEBUG TEST : should be local_network_block instead of network_block
+			cycle_subthread_net_offset = 0; // how many bytes have will we read in the next do/while loop
 			do
 			{
+			    subthread_net_offset = 0; // keeps trace of the amount of bytes sent to main thread by callback
+			    set_range(subthread_cur_offset, local_network_block);
+
 			    err = curl_easy_perform(ehandle.get_handle());
 			    if(err == CURLE_BAD_DOWNLOAD_RESUME)
 				err = CURLE_OK;
@@ -510,12 +513,17 @@ namespace libdar
 								wait_delay,
 								tools_printf(gettext("Error met while reading a block of data: %s"),
 									     curl_easy_strerror(err)));
+			    subthread_cur_offset += subthread_net_offset;
+			    if(local_network_block < subthread_net_offset)
+				throw SRC_BUG; // we acquired more data from libcurl than expected!
+			    local_network_block -= subthread_net_offset;
+			    cycle_subthread_net_offset += subthread_net_offset;
 			}
-			while(err != CURLE_OK);
-			local_offset += network_offset;
-//	DEBUG		local_network_block -= network_offset;
+			while(err != CURLE_OK && !end_data_mode);
 		    }
-		    while(!network_offset.is_zero() && !end_data_mode); // DEBUG  && !local_network_block.is_zero())
+		    while(!cycle_subthread_net_offset.is_zero()     // we just grabbed some data in this ending cycle (not reached eof)
+			  && !end_data_mode                   // the current thread has not been asked to stop
+			  && !local_network_block.is_zero()); // whe still not have gathered all the requested data
 		    unset_range();
 		}
 	    }
@@ -774,14 +782,22 @@ namespace libdar
 	}
 
 	if(me->network_block > 0)
-	    me->network_offset += lu;
+	    me->subthread_net_offset += lu;
 
 	if(me->end_data_mode)
 	{
 	    if(me->network_block == 0)
-		lu = 0; // to force easy_perform() that called us, to return
+	    {
+		if(remain > 0) // not all data could be sent to main thread
+		    lu = 0; // to force easy_perform() that called us, to return
+	    }
 	    else
-		lu += remain; // drop all data provided from libcurl and return normally
+	    {
+		if(remain > 0)
+		    throw SRC_BUG;
+		    // main thread should not ask us to stop
+		    // until we have provided all the requested data
+	    }
 	}
 
 	return lu;

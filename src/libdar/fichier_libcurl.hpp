@@ -149,6 +149,8 @@ namespace libdar
 	U_I wait_delay;                   //< time in second to wait before retrying in case of network error
 	U_I network_block;                //< maximum amount of data read at once from the network
 	infinint network_offset;          //< updated by sub thread in network block mode to give amount of bytes pushed to interthread
+	infinint subthread_net_offset;    //< updated by sub thread in network block mode to give amount of bytes pushed to interthread
+	infinint subthread_cur_offset;    //< subthread copy of current_offset
 	libthreadar::fast_tampon<char> interthread; //< data channel for reading or writing with subthread
 	libthreadar::barrier synchronize; //< used to be sure subthread has been launched
 
