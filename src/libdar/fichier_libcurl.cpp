@@ -487,8 +487,7 @@ namespace libdar
 			    fichier_libcurl_check_wait_or_throw(*thread_ui,
 								err,
 								wait_delay,
-								tools_printf(gettext("Error met during network transfer: %s"),
-									     curl_easy_strerror(err)));
+								gettext("Error met during network transfer: "));
 		    }
 		    while(err != CURLE_OK && !end_data_mode);
 		}
