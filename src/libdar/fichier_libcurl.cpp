@@ -302,7 +302,7 @@ namespace libdar
 
     void fichier_libcurl::inherited_read_ahead(const infinint & amount)
     {
-	throw Efeature("fichier_libcurl::inherited_read_ahead");
+	relaunch_thread(amount);
     }
 
     void fichier_libcurl::inherited_sync_write()
