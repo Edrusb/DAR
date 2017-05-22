@@ -895,6 +895,7 @@ static void show_usage(shell_interaction & dialog, const char *command)
     dialog.printf(gettext("   -d <dar's path> specify the path to dar\n"));
     dialog.printf(gettext("   -r <files>\t   restores the given files\n"));
     dialog.printf(gettext("   -w <date>\t   only with -r, restores in state just before the given date\n"));
+    dialog.printf(gettext("            \t   date format: [[[year/]month]/day-]hour:minute[:second]\n"));
     dialog.printf(gettext("   -u <number>\t   list the most recent files contained in the given archive\n"));
     dialog.printf(gettext("   -f <file>\t   list the archives where the given file is present\n"));
     dialog.printf(gettext("   -s\t\t   shows the number of most recent file by archive\n"));

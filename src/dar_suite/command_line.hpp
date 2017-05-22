@@ -143,6 +143,7 @@ struct line_param
     bool delta_diff;              //< whether to save binary diff or whole file's data during a differential backup
     infinint delta_sig_min_size;  //< size below which to never calculate delta signatures
     bool sizes_in_bytes;          //< whether to display sizes in bytes of to the larges unit (Mo, Go, To,...)
+    bool header_only;             //< whether we just display the header of archives to be read
 
 	// constructor for line_param
     line_param()

@@ -1033,6 +1033,9 @@ by default files size is displayed to occupy the shortest number of characters b
 .TP 20
 -I, -X, -P, -g, -[, -]
 can be used to filter file to list base on their name or path.
+.TP 20
+-aheader
+displays the header (when --sequential-read is used) or the trailer of the archive and then stops. This archive header/trailer is always in clear text even when the archive is ciphered. This option is here to let you access to these fields without providing the encryption key.
 .PP
 From the general options it seems only -vm and -b stay useful here. Note that -vm displays an archive summary first, where a detailed of information about the archive can be obtained. If you want to display only this summary use -q with -l option.
 .TP 10

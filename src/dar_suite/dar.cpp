@@ -802,6 +802,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_slice_min_digits(param.num_digits);
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
 		read_options.set_multi_threaded(param.multi_threaded);
+		read_options.set_header_only(param.header_only);
 
 		arch = new (nothrow) archive(dialog,
 					     *param.sauv_root,
