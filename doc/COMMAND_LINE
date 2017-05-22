@@ -36,6 +36,7 @@ a * alteration of operation		--alter	  argument:
 							    t[ape-marks]
 							    test-self-reported-bug
 							    y abyte[s]
+							    header
 b - terminal bell                       --bell
 c + create archive                      --create
 d + difference with filesystem          --diff

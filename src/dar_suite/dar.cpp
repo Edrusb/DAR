@@ -884,6 +884,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_multi_threaded(param.multi_threaded);
 		if(repo != nullptr)
 		    read_options.set_entrepot(*repo);
+		read_options.set_header_only(param.header_only);
 
 		arch = new (nothrow) archive(dialog,
 					     *param.sauv_root,

@@ -36,6 +36,7 @@ extern "C"
 #include "user_interaction.hpp"
 #include "entrepot_libcurl.hpp"
 #include "fichier_local.hpp"
+#include "mycurl_protocol.hpp"
 
 using namespace libdar;
 
@@ -44,7 +45,7 @@ void usage(int argc,
 
 void get_args(int argc,
 	      char *argv[],
-	      entrepot_libcurl::curl_protocol & proto,
+	      mycurl_protocol & proto,
 	      string & login,
 	      secu_string & pass,
 	      string & host,
@@ -76,7 +77,7 @@ void usage(int argc,
 
 void get_args(int argc,
 	      char *argv[],
-	      entrepot_libcurl::curl_protocol & proto,
+	      mycurl_protocol & proto,
 	      string & login,
 	      secu_string & pass,
 	      string & host,
@@ -91,7 +92,7 @@ void get_args(int argc,
 	exit(1);
     }
 
-    proto = entrepot_libcurl::string_to_curlprotocol(argv[1]);
+    proto = string_to_mycurl_protocol(argv[1]);
     login = argv[2];
     tmp = argv[3];
     pass = secu_string(tmp.c_str(), tmp.size());
@@ -108,7 +109,7 @@ void get_args(int argc,
 
 void f1(int argc, char *argv[])
 {
-    entrepot_libcurl::curl_protocol proto;
+    mycurl_protocol proto;
     string login;
     secu_string pass;
     string host;
