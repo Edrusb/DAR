@@ -185,32 +185,12 @@ namespace libdar
 	if(need_flush_write())
 	    flush_write();
 
-	ret = ref->skip_to_eof();
-	max = ref->get_position();
-	if(ret && ref->get_mode() != gf_write_only)
+	if(eof_offset.is_zero())
 	{
-	    infinint size_int = infinint(size);
-	    infinint begin_buffer = max > size_int ? max - size_int : 0;
-
-	    if(buffer_offset < begin_buffer)
-	    {
-		skip(begin_buffer);
-		fulfill_read();
-		if(ref->get_position() != max)
-		    throw SRC_BUG;
-	    }
-		// else we are already set
-
-	    next = last; // eof in the cache too
-
-	    if(get_position() != max)
-		throw SRC_BUG;
+	    ret = ref->skip_to_eof();
+	    eof_offset = ref->get_position();
 	}
-	else
-	{
-	    next = last = 0;
-	    buffer_offset = max;
-	}
+	skip(eof_offset);
 
 	return ret;
     }
@@ -300,7 +280,9 @@ namespace libdar
 		{
 		    if(x_size - ret < size)
 		    {
-			fulfill_read(); // may fail if underlying is write_only (exception thrown)
+			if(eof_offset.is_zero()                    // we know the offset for eof
+			   || buffer_offset + last < eof_offset)   // we have not all data up to eof
+			    fulfill_read(); // may fail if underlying is write_only (exception thrown)
 			if(next >= last) // could not read anymore data
 			    eof = true;
 		    }
@@ -496,6 +478,7 @@ namespace libdar
     void cache::fulfill_read()
     {
 	U_I lu;
+	bool skipping = (last == 0);
 
 	if(get_mode() == gf_write_only)
 	    return; // nothing to fill
@@ -512,7 +495,58 @@ namespace libdar
 	    // this occurres when a shift by half of the buffer has been done just before
 	    ///////
 
-	ref->skip(buffer_offset + last);
+	if(!eof_offset.is_zero()                       // eof position is known
+	   && buffer_offset + last + size > eof_offset // we would read up to the eof
+	   && next == last                             // cache is currently empty
+	   && skipping)                                // we got there due to a call to skip()
+	{
+	    infinint tmp_next;
+
+		// we will read the last block size of the fill
+		// and put it into the cache. This way backward
+		// reading does not bring any performance penalty
+		// when it occurs at end of file
+
+	    if(eof_offset > size)
+	    {
+		    // setting the value for "next"
+		tmp_next = (buffer_offset + size) - eof_offset;
+		    // parenthesis are required to avoid substracting before addition and obtaining an
+		    // negative infinint as temporary object
+		next = 0;
+		tmp_next.unstack(next);
+		if(!tmp_next.is_zero())
+		    throw SRC_BUG;
+
+		    // setting the value for "buffer_offset"
+		buffer_offset = eof_offset - size;
+
+		if(!ref->skip(buffer_offset))
+		    throw SRC_BUG;
+	    }
+	    else // file is shorter than the cache size!
+	    {
+		    // setting the value for "next"
+		tmp_next = buffer_offset;
+		next = 0;
+		tmp_next.unstack(next);
+		if(!tmp_next.is_zero())
+		    throw SRC_BUG;
+
+		    // setting the value for "buffer_offset"
+		buffer_offset = 0;
+
+		if(!ref->skip(0))
+		    throw SRC_BUG;
+	    }
+	}
+	else
+	{
+		// "next" and "buffer_offset" do not change
+
+	    if(!ref->skip(buffer_offset + last))
+		throw SRC_BUG;
+	}
 	lu = ref->read(buffer + last, size - last); // may fail if underlying is write_only or user aborted
 	last += lu;
     }
