@@ -133,7 +133,7 @@ namespace libdar
 	    /// content-of operator
 	T & operator *() const { if(ptr == nullptr) throw SRC_BUG; return ptr->get_val(); };
 
-	    /// content-of filed operator (when the pointed to object is a struct or class
+	    /// content-of field operator (when the pointed to object is a struct or class
 	T* operator ->() const { if(ptr == nullptr) throw SRC_BUG; return &(ptr->get_val()); };
 
 	    /// return whether the smart_pointer is pointing to nullptr
