@@ -1,9 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
-  <meta content="text/html; charset=us-ascii" http-equiv="content-type">
-  <title>DAR - Frequently Asked Questions</title>
 
-</head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
+  <meta content="text/html; charset=us-ascii" http-equiv="content-type"><title>DAR - Frequently Asked Questions</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -102,6 +100,7 @@ dar does not report new files found on filesystem?</a><br>
 Windows, especially with cyrillic filenames?</a><br>
 </span><a href="#win32"><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;">I have a 32 bits windows system, which binary </span><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;">package </span></span><span style="font-weight: bold; font-style: italic;">can I to use?</span></span></a><br>
       <a style="font-style: italic; font-weight: bold;" href="#lzop_vs_dar">lzo compression is slower with dar than with lzop, why?</a><br>
+      <a style="font-weight: bold;" href="#libthreadar"><span style="font-style: italic;">what is libthreadar and why libdar relies on it?</span></a><br>
 <span style="font-weight: bold; font-style: italic;"><br>
 <h2><span style="font-weight: bold;"> </span></h2>
       <h2><span style="text-decoration: underline;">Answers:</span></h2>
@@ -3457,8 +3456,59 @@ for dar<br>
 <br>
       </div>
       <span style="font-weight: bold; font-style: italic;">
-      <p><br>
-      </p>
+      <p><span style="font-style: italic;"><a name="libthreadar"></a>what is libthreadar and why libdar relies on it?</span></p></span>
+      <div style="margin-left: 40px;">libthreadar is a wrapping library of the Posix C threads. It was originally part of <a href="https://sourceforge.net/projects/webdar/">webdar</a>
+a libdar based web server project, but as this code became necessary
+also inside libdar, all this thread relative classes have been put into
+a separated library called libthreadar, that today both webdar and
+libdar rely upon.<br>
+      <br>
+dar/libdar rely on libthreadar to manage several threads inside libdar,
+which is necessary to efficiently implement the remote repository
+feature based on libcurl (available starting release 2.6.0). <br>
+      <br>
+Why not using boost library or the thread suppport brought by C++11?<br>
+      <br>
+Because first no complier implemented C++11 at the time webdar was
+started and second boost thread was not found to be adapted to the need
+for the following reasons:<br>
+      <ul>
+        <li>I wanted a more object oriented approach than passing a
+function to be ran into a separated thread as provided by boost/C++11
+interface, where from the pure virtual class libthreadar::thread that
+let you create inherited class from.<br>
+        </li>
+        <li>I wanted to avoid functions/methods with multiple
+parameters, as it has shown in the past with libdar to be a source of
+problem when it comes to backward compatibily while adding new
+features. Instead the inherited class can provide as many different
+methods to setup individual parameters before the thread is run()</li>
+        <li>As a consequence, another need was to be able to set an
+object before the thread is effectively run, the C++ object existence
+need not to match the thread existence, in other words the object shall
+be created first and the thread run() afterward. Of course the
+destruction of a thread object would kill the thread it is wrapping.
+The other advantage doing that way was the possibility to re-run() a
+thread from the same object once a first thread had completed
+eventually modifying some parameters through the method provided by the
+inherited class from libthreadar::thread</li>
+        <li>Last but not least, I wanted to have an exception thrown
+from within a thread and not caught up to the global thread function
+(thus leading the thread to end), to be kept over the thread existance
+and relaunched into the thread calling the join() method for that
+object. Thus avoiding having a coherent treatment of errors using C++
+exception when thread were used.</li>
+      </ul>
+libthreadar does all this and is a completely independant piece of
+software from both webdar and dar/libdar. So you can use it freely
+(LGPLv3&nbsp; licensing) if you want. As all project I've been
+published, it is documented as much as possible, feedback is always
+welcome of something is not clear, wrong or missing.<br>
+      <br>
+libthreadar source code can be found <a href="https://sourceforge.net/projects/libthreadar/">here</a><br>
+documentation is available in source package as well as online <a href="http://libthreadar.sourceforge.net/">here</a> <br>
+      </div>
+      <span style="font-weight: bold; font-style: italic;">
       <p><br>
   </p>
 
@@ -3471,4 +3521,5 @@ for dar<br>
 </div>
 </div>
 </center>
+
 </body></html>
