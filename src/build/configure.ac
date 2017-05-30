@@ -1423,8 +1423,11 @@ else
     echo "NO"
 fi
 
+printf "   can uses multiple threads  : "
 if [ "$local_threadar" = "yes" ] ; then
-   echo "   will uses multiple threads : YES ( /!\ experimental feature /!\ )"
+   echo "YES"
+else
+   echo "NO"
 fi
 
 printf "   Delta-compression support  : "

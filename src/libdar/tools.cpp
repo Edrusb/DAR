@@ -1355,8 +1355,7 @@ namespace libdar
                 time_accuracy = "1 s";
             dialog.printf(gettext("   Timestamp write accuracy     : %S\n"), &time_accuracy);
             dialog.printf(gettext("   Restores dates of symlinks   : %s\n"), YES_NO(compile_time::symlink_restore_dates()));
-	    if(compile_time::libthreadar())
-		dialog.printf(gettext("   Can uses multiple threads    : %s\n"), YES_NO(compile_time::libthreadar()));
+	    dialog.printf(gettext("   Can uses multiple threads    : %s\n"), YES_NO(compile_time::libthreadar()));
 	    dialog.printf(gettext("   Delta compression support    : %s\n"), YES_NO(compile_time::librsync()));
 	    dialog.printf(gettext("   Remote repository support    : %s\n"), YES_NO(compile_time::remote_repository()));
         }
