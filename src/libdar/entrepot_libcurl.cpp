@@ -81,9 +81,9 @@ namespace libdar
 #else
 
 #if ! defined ( LIBCURL_AVAILABLE )
-	throw Efeature("libcurl");
+	throw Ecompilation("libcurl linking");
 #elif ! defined ( LIBTHREADAR_AVAILABLE )
-	throw Efeature("libthreadar");
+	throw Ecompilation("libthreadar linking");
 #else
 	throw SRC_BUG;
 #endif
@@ -151,7 +151,7 @@ namespace libdar
 	    case proto_http:
 	    case proto_https:
 	    case proto_scp:
-		throw Efeature("unlink http, https, scp");
+		throw Efeature("read_dir_reset for scp, http and https");
 	    default:
 		throw SRC_BUG;
 	    }
@@ -171,7 +171,7 @@ namespace libdar
 	    case proto_http:
 	    case proto_https:
 	    case proto_scp:
-		throw Efeature("unlink http, https, scp");
+		throw Efeature("read_dir_reset for http and https");
 	    default:
 		break; // exception thrown in the try block
 	    }
@@ -192,12 +192,12 @@ namespace libdar
 	case proto_http:
 	case proto_https:
 	case proto_scp:
-	    throw Efeature("unlink http, https, scp");
+	    throw Efeature("read_dir_reset for http and https");
 		default:
 	    throw SRC_BUG;
 	}
 #else
-    throw Efeature("libcurl");
+    throw Ecompilation("libcurl linking");
 #endif
     }
 
@@ -218,7 +218,7 @@ namespace libdar
 	    return true;
 	}
 #else
-    throw Efeature("libcurl");
+    throw Ecompilation("libcurl linking");
 #endif
     }
 
@@ -272,7 +272,7 @@ namespace libdar
 		throw Ememory("entrepot_libcurl::inherited_open");
 
 #else
-	    throw Efeature("libthreadar");
+	    throw Ecompilation("libthreadar linking");
 #endif
 
 	    switch(mode)
@@ -316,7 +316,7 @@ namespace libdar
 
 	return ret;
 #else
-    throw Efeature("libcurl");
+    throw Ecompilation("libcurl linking");
 #endif
     }
 
@@ -415,7 +415,7 @@ namespace libdar
 	if(headers != nullptr)
 	    curl_slist_free_all(headers);
 #else
-    throw Efeature("libcurl");
+    throw Ecompilation("libcurl linking");
 #endif
     }
 
@@ -441,7 +441,7 @@ namespace libdar
 	    throw Erange("entrepot_libcurl::set_libcurl_URL",tools_printf(gettext("Failed assigning URL to libcurl: %s"),
 									  curl_easy_strerror(err)));
 #else
-    throw Efeature("libcurl");
+    throw Ecompilation("libcurl linking");
 #endif
     }
 
@@ -526,7 +526,7 @@ namespace libdar
 					  curl_easy_strerror(err)));
 	}
 #else
-    throw Efeature("libcurl");
+    throw Ecompilation("libcurl linking");
 #endif
     }
 
