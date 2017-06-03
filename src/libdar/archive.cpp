@@ -127,7 +127,8 @@ namespace libdar
 					     options.get_info_details(),
 					     gnupg_signed,
 					     slices,
-					     options.get_multi_threaded());
+					     options.get_multi_threaded(),
+					     options.get_header_only());
 
 		    if(options.get_header_only())
 		    {
@@ -183,7 +184,8 @@ namespace libdar
 							 options.get_info_details(),
 							 tmp1_signatories,
 							 ignored,
-							 options.get_multi_threaded());
+							 options.get_multi_threaded(),
+							 false);
 				    // we do not comparing the signatories of the archive of reference with the current archive
 				    // for example the isolated catalogue might be unencrypted and thus not signed
 			    }
