@@ -58,6 +58,7 @@ extern "C"
 #include "crypto_asym.hpp"
 #include "cat_all_entrees.hpp"
 #include "crc.hpp"
+#include "entrepot_libcurl.hpp"
 
 #ifdef LIBTHREADAR_AVAILABLE
 #include "generic_thread.hpp"
@@ -362,10 +363,15 @@ namespace libdar
 	generic_file *tmp = nullptr;
 	contextual *tmp_ctxt = nullptr;
 	cache *tmp_cache = nullptr;
+#ifdef LIBCURL_AVAILABLE
+	bool libcurl_repo = dynamic_cast<const entrepot_libcurl *>(&where) != nullptr;
+#else
+	bool libcurl_repo = false;
+#endif
 
 	stack.clear();
 #ifdef LIBTHREADAR_AVAILABLE
-	if(!multi_threaded)
+	if(!multi_threaded && !libcurl_repo)
 	    stack.ignore_read_ahead(true);
 	else
 	    stack.ignore_read_ahead(false);
@@ -455,8 +461,8 @@ namespace libdar
 		throw Ememory("open_archive");
 	    else
 	    {
-		// we always ignore read_ahead as no slave thread will exist for LEVEL1 layer
-		tmp->ignore_read_ahead(true);
+		    // we always ignore read_ahead as no slave thread will exist for LEVEL1 layer
+		tmp->ignore_read_ahead(!libcurl_repo);
 		stack.push(tmp, LIBDAR_STACK_LABEL_LEVEL1);
 		tmp = nullptr;
 	    }
@@ -521,7 +527,8 @@ namespace libdar
 		    throw Ememory("macro_tools_open_archive");
 		else
 		{
-		    tmp->ignore_read_ahead(true); // no slave thread used below in the stack
+		    tmp->ignore_read_ahead(!libcurl_repo);
+			// no slave thread used below in the stack
 		    stack.clear_label(LIBDAR_STACK_LABEL_LEVEL1);
 		    stack.push(tmp, LIBDAR_STACK_LABEL_LEVEL1);
 		    tmp = nullptr;
@@ -666,7 +673,7 @@ namespace libdar
 	    else
 	    {
 		    // we always ignore read ahead as encryption layer above sar/zapette/triial_sar has no slave thread below
-		tmp->ignore_read_ahead(true);
+		tmp->ignore_read_ahead(!libcurl_repo);
 		stack.push(tmp);
 		tmp = nullptr;
 	    }
@@ -739,16 +746,16 @@ namespace libdar
 		    throw Ememory("open_archive");
 #ifdef LIBTHREADAR_AVAILABLE
 		if(!multi_threaded)
-		    tmp->ignore_read_ahead(true);
+		    tmp->ignore_read_ahead(!libcurl_repo);
 		else
 		{
 		    if(second_terminateur_offset.is_zero()) // archive read from the beginning (sequential read)
-			tmp->ignore_read_ahead(true);  // we avoid transmitting read_ahead request to the below thread
+			tmp->ignore_read_ahead(!libcurl_repo);  // we avoid transmitting read_ahead request to the below thread
 			// which has been configured with an endless read ahead, new read_ahead would abort configured
 			// endlessly read_ahead.
 		}
 #else
-		tmp->ignore_read_ahead(true);
+		tmp->ignore_read_ahead(!libcurl_repo);
 #endif
 		stack.push(tmp);
 		tmp = nullptr;
@@ -790,9 +797,9 @@ namespace libdar
 	    {
 #ifdef LIBTHREADAR_AVAILABLE
 		if(!multi_threaded)
-		    tmp->ignore_read_ahead(true);
+		    tmp->ignore_read_ahead(!libcurl_repo);
 #else
-		tmp->ignore_read_ahead(true);
+		tmp->ignore_read_ahead(!libcurl_repo);
 #endif
 		stack.push(tmp, LIBDAR_STACK_LABEL_UNCOMPRESSED);
 		tmp = nullptr;

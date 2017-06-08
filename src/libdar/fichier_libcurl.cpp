@@ -717,9 +717,30 @@ namespace libdar
     void fichier_libcurl::run_thread()
     {
 	if(interthread.is_not_empty())
-	    throw SRC_BUG;
-	    // interthread should have been purged when
-	    // previous thread had ended
+	{
+	    char *ptr;
+	    unsigned int ptr_size;
+	    bool bug = false;
+
+		// the interthread may keep
+		// a single empty block pending
+		// to be fetched.
+	    interthread.fetch(ptr, ptr_size);
+	    if(ptr_size != 0)
+		bug = true;
+	    interthread.fetch_recycle(ptr);
+	    if(bug)
+		throw SRC_BUG;
+
+		// now interthread should be empty
+	    if(interthread.is_not_empty())
+		bug = true;
+	    if(bug)
+		throw SRC_BUG;
+		// interthread should have been purged when
+		// previous thread had ended
+
+	}
 
 	end_data_mode = false;
 	if(is_running())
