@@ -22,6 +22,7 @@
 
 
 
+
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR's FEATURES</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -1166,17 +1167,22 @@ OPERATIONS </td>
       <td style="vertical-align: top;">references: <a href="usage_notes.html#dar_remote">command line usage notes</a>, <a href="man/index.html">man dar/dar_slave/dar_xform</a></td>
     </tr>
     <tr>
-      <td style="vertical-align: top; font-weight: bold;">USING PIPES </td>
-      <td style="vertical-align: top;">keywords: -i -o -</td>
+      <td style="vertical-align: top; font-weight: bold;"> <br>
+</td>
+      <td style="vertical-align: top;">keywords: -i -o - -afile-auth<br>
+</td>
     </tr>
     <tr>
-      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>dar
+      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>dar is able to read and write an archive to a remote server in three different ways:<br>
+      <br>
+1 - dar
 is able to produce an
-archive to its standard output or to a named pipe, and to read
-an archive from its standard input or from a named pipe, which let one to make
-remote backup easily. <br>
-      <br>Doing
-so leads dar to use a single pipe, this requires the reading of the
+archive to its standard output or to a named pipe and is able to read
+an archive from its standard input or from a named pipe<br>
+<br>2 - if the previous approach is fine to write down an archive over
+the network (through an ssh session for example), reading an archive
+from a remote sever that way (using a single pipe) requires dar to read
+the
 whole archive which may be inefficient to just restore a
 single file. For that reason, dar is also able to read
 an archive through a <span style="text-decoration: underline;">pair of pipes</span> (or named pipes) using <span style="font-weight: bold;">dar_slave </span>at the other side of the
@@ -1184,6 +1190,13 @@ pipes. From the pair of pipes, one pipe let dar asking to
 dar_slave which portion of the archive it has to send through the other pipe.
 This makes a remote restoration much more efficient and still allows these bidirectional exchanges
 to be encrypted over the network, simply running dar_slave through an ssh session.<br>
+      <br>
+3 - last, since release 2.6.0 dar can make use FTP or SFTP protocols to
+read or write an archive from or to a remote server. This method does
+not rely on anonymous or named pipes, is as efficient as option 2 for
+reading a remote archive and is compatible with slicing and slice
+hashing. however this option is restricted to these two network
+protocols: FTP (low CPU usage but insecure) SFTP (secure)<br>
  </td>
     </tr>
   </tbody>

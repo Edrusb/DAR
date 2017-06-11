@@ -1,5 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
+
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR's Usage Notes</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -62,27 +63,42 @@ How to use "delta compression", "binary diff" or "rsync like increment" with dar
     <tr>
       <td style="vertical-align: top;">
       <h3><a name="dar_remote"></a><span style="text-decoration: underline;">Dar and remote backup server</span></h3>
-      <div style="text-align: justify; margin-left: 40px;">The
+      
+      
+      <div style="text-align: justify; margin-left: 40px;">In
+the following you will find the three different available ways to have
+dar working with remote repositories (or remote server if you prefer):<br>
+      <ol>
+        <li>single pipe</li>
+        <li>dual pipes</li>
+        <li>native support for FTP and SFTP since release 2.6.0<br>
+        </li>
+      </ol>
+      <br>
+The
 situation is
 the following : you have a host (called local in the following), on
-which resides an operational system, which you want to backup
-regularly, without perturbing users. For security reasons you want to
-store the backup on another host (called remote host in the following),
-only used for backup. Of course you have not much space on local host
-to store the archive.<br>
-      </div>
-      <div style="margin-left: 40px;"><br>
-      </div>
-      <div style="text-align: justify; margin-left: 40px;">Between
+which resides an operational system which you want to backup
+regularly, without perturbing users. To face hard disk failure or local
+disaster, you want to
+store the backup on another host (called remote host in the following).
+Of course you have not much space on local host
+to store the archive, else you could do the backup first and then copy
+the resulting slices afterward. For restoration you would first need to
+download the archive then proceed to restoration, that's of course
+possible but still requires enough local storage space.<br>
+      <br>
+Between
 these two
-hosts, you could use NFS and nothing more would be necessary
+hosts, you could also use NFS and nothing more would be necessary
 to use dar as usually. but if for security reasons you don't want to
-use NFS (insecure network, local user must not have access to backups),
-but prefer to communicate through an encrypted session, (using ssh for
-example) then you need to use dar features brought by version 1.1.0: <br>
+use NFS (insecure network, backup over Internet, ...), but prefer to communicate through an encrypted session (using ssh for
+example), then you need to use dar features brought by version 1.1.0: <br>
       </div>
       <div style="margin-left: 40px;"><br>
-dar can output its archive to stdout instead of a given file. To
+      <span style="font-weight: bold;">1 - Single pipe</span><br>
+<br>
+dar can output its archive to its standard output instead of a given file. To
 activate it, use "-" as basename. Here is an example :<br>
       <br>
       </div>
@@ -142,7 +158,9 @@ On the remote backup server you would type: <br>
 CAT_backup_name -z</code><br>
       </div>
       <div style="margin-left: 40px;"><br>
-if the catalogue is too big to fit on a floppy, you can split it as
+Note that without -z option no compression is used as by default with dar for any operation, use -z option: <span style="font-weight: bold;">it worse compressing an isolated catalogue</span>.<br>
+<br>
+if the isolated catalogue is too big to fit on a floppy [<span style="font-style: italic;">yes, this was written long ago :-)</span>], you can split it as
 usually using dar:<br>
       <br>
       </div>
@@ -157,9 +175,10 @@ archive (CAT_backup_name.1.dar, and so on), only contains the
 catalogue, but can still be used as reference for a new backup (or
 backup of the internal catalogue of the archive, using -x and -A at the
 same time). You
-just need to transfer it back to the local host, either using floppies,
-or through a secured socket session, or even directly isolating the
-catalogue to a pipe&nbsp; that goes from the remote host to the local
+just need to transfer it back to the local host, either using floppies
+or USB key,&nbsp; through a secured socket session, or even directly
+isolating the
+catalogue to a pipe that goes from the remote host to the local
 host: <br>
       </div>
       <div style="margin-left: 40px;"><br>
@@ -194,26 +213,40 @@ backup_diff -z -R /</code><br>
       </div>
       <div style="margin-left: 40px;"><br>
       </div>
-      <div style="text-align: justify; margin-left: 40px;">For
+      <div style="text-align: justify; margin-left: 40px;">To read an archive from a remote host using a single pile, you will need to run dar with the <span style="font-weight: bold;">--sequential-read</span> option. In that so called <span style="font-style: italic;">sequential read mode</span>, dar sequentially reads the archive contents from the beginning up to the end. This has some <span style="font-weight: bold;">huge drawback</span>
+when it comes to extract few files from a large archive especially when
+such large archive has to be sent over the network. For that reason
+let's see another method:<br>
+      <br>
+      <span style="font-weight: bold;">2 - Dual pipes</span><br>
+      <br>
+We have previously seen how to use a single pipe to generate an archive
+over the network, how to fetch an archive with a single pipe either to
+restore some files or to make a differential backup (but that way is
+very inefficient) and how to make differential backup by use of an
+isolated catalogue.<br>
+      <br>
+For
 differential
 backups instead of isolating the catalogue, it is also possible to read
-an archive or its extracted catalogue through pipes. Yes, two pipes are
-required for dar to be able to read an archive. The first goes from dar
-to the external program "dar_slave" and carries orders (asking some
-portions of the archive), and the other pipe, goes from "dar_slave"
-back to "dar" and carries the asked data for reading.<br>
-      <br>
-By default, if you specify "-" as basename for -l, -t, -d, -x, or to -A
+an archive or its extracted catalogue through pipes. Yes, <span style="font-weight: bold;">two pipes are
+required</span> for dar to be able to read an archive efficiently. The first goes from dar
+to the external program "<span style="font-weight: bold;">dar_slave</span>" and carries orders (asking some
+portions of the archive) while the other pipe goes from "dar_slave"
+back to "dar" and carries the requested data for reading.<br>
+      <br>By
+default, if you specify "-" as basename for -l, -t, -d, -x, or to -A
 (used with -C or -c), dar and dar_slave will use their standard input
 and output to communicate. Thus you need additional program to make the
 input of the first going to the output to the second, and vice versa.
 Warning: you cannot use named pipe that way, because dar and dar_slave
 would get blocked upon opening of the first named pipe, waiting for the
 peer to open it also, even before they have started (dead lock at shell
-level). For named pipes, there is -i and -o options that helps, they
-receive a filename as argument, which may be a named pipe. The -i
-argument is used instead of stdin and -o instead of stdout. Note that
-for dar -i and -o are only available if "-" is used as basename. Let's
+level). For named pipes, there is -i and -o options that help, they
+receive a filename as argument, which may be a named pipe. The argument
+provided to -i is used instead of stdin and the one&nbsp; provided to
+-o is used instead of stdout. Note that -i and -o options are only
+available if "-" is used as basename. Let's
 take an example:<br>
       <br>
 You now want to restore an archive from your remote backup server. Thus
@@ -244,25 +277,25 @@ and on the local host you have to run dar this way:<br>
       </div>
       <div style="margin-left: 40px;"><br>
       </div>
-      <div style="text-align: justify; margin-left: 40px;">there is no
-order
-to run dar or dar_slave first, and dar can use -i and/or -o, while
-dar_slave does not. What is important here is to connect in a way or in
-an other their input and output, it does not matter how. The only
-restriction is that communication support must be perfect: no data
+      <div style="text-align: justify; margin-left: 40px;">The
+order is not important: you can run dar or dar_slave first. What is
+important instead is to connect dar and dar_slave in a way that the
+output of the first goes to the input of the second and viceversa. An
+important point to note is also that communication support must be
+perfect: no data
 loss, no duplication, no order change, thus communication over TCP
 should be fine.<br>
       </div>
       <div style="margin-left: 40px;"><br>
       </div>
       <div style="text-align: justify; margin-left: 40px;">Of course,
-you can
+you can not only extract files (-x command as above) but
 also isolate a catalogue through pipes, test an archive, make
-difference, use a reference catalogue this way etc, and even then,
-output the resulting archive to pipe ! If using -C or -c with "-" while
+difference, use as catalogue of reference and even then,
+output the resulting archive to pipe! If using -C or -c with "-" while
 using -A also with "-", it is then mandatory to use -o: The output
-catalogue will generated on standard output, thus to send order to
-dar_slave you must use another channel with -o: <br>
+catalogue will be generated on standard output, thus to send order to
+dar_slave you must use another channel thanks to -o option: <br>
       </div>
       <div style="margin-left: 40px;"><br>
 &nbsp;&nbsp;&nbsp;&nbsp;<code>&nbsp;&nbsp;
@@ -334,31 +367,131 @@ on the remote host :<br>
       <div style="margin-left: 80px;"><code>dar_slave -i
 /tmp/pipe_toslave -o /tmp/pipe_todar full_backup</code><br>
       </div>
-      <div style="margin-left: 40px;">dar_slave provides the
-full_backup for -A option<br>
+      <div style="margin-left: 40px;"><br>
+dar_slave provides the
+full_backup for dar's -A option...<br>
       <br>
       </div>
       <div style="margin-left: 80px;"><code>some_other_prog | dar_xform
 - diff -s 140M -p ...</code><br>
       </div>
-      <div style="margin-left: 40px;">while dar_xform make slice of the
+      <div style="margin-left: 40px;"><br>
+...while dar_xform make slices of the
 output archive provided by dar<br>
       <br>
-See below <a href="#netcat_ssh">an example with netcat and another
-using ssh</a>.<br>
+      <span style="font-weight: bold;">3 - Native SFTP and FTP support</span><br>
+      <br>
+Since release 2.6.0, you can use an URL-like archive basename. Assuming
+you have slices test.1.dar, test.2.dar ... available in the directory
+Archive of an FTP server you could read, extract, list, test, ... that
+archive using the following syntax:<br>
+      <br>
+</div>
+      <div style="text-align: left; margin-left: 80px;"><code>dar -t ftp://login@ftp.server.some.where/Archive/test ... &lt;other options&gt;</code><br>
       </div>
+      <div style="margin-left: 40px;"><br>
+Same thing with -l, -x, -A and -@ options. Note that you still need to provide the <span style="text-decoration: underline;">archive base name</span> not a slice name. This option is also compatible with slicing and slice hashing, they will be generated on remote server:<br>
+      <br>
+      <div style="margin-left: 40px;"><code>dar -c
+sftp://login:password@secured.server.some.where/Archive/day2/incremental
+-A ftp://login@ftp.server.some.where/Archive/CAT_test --hash sha512 -@
+sftp://login2:password2@secured.server.some.where/Archive/day2/CAT_incremental
+&lt;other options&gt;</code><br>
+      </div>
+
+      <br>
+By default if no password is given, dar asks the user interactively. If
+no login is used, dar assumes the login to be "anonymous". When you add
+the -afile-auth option, in absence of password on command-line, dar
+checks for a password in the file ~/.netrc for both FTP and SFTP
+protocols to avoid exposing password on command-line while still have
+non interactive backup. See <span style="font-weight: bold;">man netrc</span> for this common file's syntax.<br>
+<br>&nbsp;In the next paragraph you will find <a href="#netcat_ssh">examples of use with netcat and ssh</a>
+relying on the two first options for remote operation, but just before
+find a summary table of the pro and cons of the different remote server
+access methods:
+      </div>
+
       </td>
     </tr>
   </tbody>
 </table>
+<br>
+<table style="text-align: left; width: 90%;" border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold; width: 20%; text-align: center;">Mode<br>
+      </td>
+      <td style="vertical-align: top; font-weight: bold; width: 10%; text-align: center;">network protocol<br>
+supported<br>
+      </td>
+      <td style="vertical-align: top; font-weight: bold; width: 30%; text-align: center;">slicing<br>
+      </td>
+      <td style="vertical-align: top; font-weight: bold; width: 10%; text-align: center;">slice hashing<br>
+      </td>
+      <td style="vertical-align: top; font-weight: bold; width: 10%; text-align: center;">efficient archive reading<br>
+      </td>
+      <td style="vertical-align: top; font-weight: bold; width: 20%; text-align: center;">Note <br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">single pipe<br>
+      </td>
+      <td style="vertical-align: top;">any reliable one (*)<br>
+      </td>
+      <td style="vertical-align: top;">using dar_xform for both reading and writing<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">NO<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">NO<br>
+      </td>
+      <td style="vertical-align: top;">only efficient for archive creation<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">dual pipes<br>
+      </td>
+      <td style="vertical-align: top;">any reliable one (*)<br>
+      </td>
+      <td style="vertical-align: top;">using dar_xform for writing <br>
+and dar_slave for reading<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">NO<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">YES<br>
+      </td>
+      <td style="vertical-align: top;">efficient for archive reading and using archive as reference<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold;">dar native support<br>
+      </td>
+      <td style="vertical-align: top;">FTP and SFTP only<br>
+      </td>
+      <td style="vertical-align: top;">-s and -S options<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">YES<br>
+(--hash option)<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">YES<br>
+      </td>
+      <td style="vertical-align: top;">FTP is insecure but less CPU resources<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+(*) any protocol that is lossless, keep byte order and do not duplicate data<br>
 <br>
 <hr style="width: 100%; height: 2px;"><br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
+      
       <h3><a name="netcat_ssh"></a><span style="text-decoration: underline;">dar and ssh</span><br>
       </h3>
+
       <div style="text-align: justify; margin-left: 40px;">As reported
 "DrMcCoy" in the historical forum "Dar Technical
 Questions", the netcat program can be very helpful if you plane to
@@ -2290,9 +2423,11 @@ V <br>
 
       <h4 style="text-decoration: underline;">Usage with dar</h4>
       <div style="text-align: justify;">First, delta signature is not activated by default, you have to tell dar you want to generate delta signature using the
-      <b>--delta sig</b> option at archive creation/isolation/merging time. Then as soon as 
-      a file has a delta signature in the archive of reference, dar will perform a delta binary if such file has changed since the archive of reference was done.
-      But better an example than a long explanation:<br>
+      <b>--delta sig</b>
+option at archive creation/isolation/merging time. Then as soon as a
+file has a delta signature in the archive of reference, dar will
+perform a delta binary if such file has changed since the archive of
+reference was done. But better an example than a long explanation:<br>
       </div>
       <br>
 Case of a <span style="font-weight: bold;">differential backup </span>scheme:<br>
@@ -2309,27 +2444,29 @@ space economy at incremental/differential backups:<br>
       </div>
 &nbsp; <br>
       </div>
-      <div style="text-align: justify; margin-left: 40px;">Then there is nothing more specific to delta signature, this is the same
-      way as you were used to do with previous releases of dar:
-      you just need to rely on a archive of reference containing delta signatures for dar activating delta binary. Here below, diff1 archive
-      will eventually contain delta patches of modified files since full archive was created, but will not
-      contain any delta signature. 
-      <br>
+      <div style="text-align: justify; margin-left: 40px;">Then
+there is nothing more specific to delta signature, this is the same way
+as you were used to do with previous releases of dar: you just need to
+rely on a archive of reference containing delta signatures for dar
+activating delta binary. Here below, diff1 archive will eventually
+contain delta patches of modified files since full archive was created,
+but will not contain any delta signature. <br>
       </div>
       <div style="margin-left: 40px;"><br>
       <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c diff1 -A full -R / -z 
       <br>
-      </div>
+      </span></div>
       <br>
       <div style="text-align: justify;">The next differential backups will be done the same, based on the full backup:<br>
       </div>
       <br>
       <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c diff<span style="font-weight: bold;">2</span> -A full -R / -z 
       <br>
-      </div>
+      </span></div>
       <br>
-      Looking at archive content, you will see the "[Delta]" flag in place of the "[Saved]" flag for files that have been saved as a delta patch rather than
-      having their whole data saved in the backup: <br><br>
+Looking at archive content, you will see the "[Delta]" flag in place of
+the "[Saved]" flag for files that have been saved as a delta patch
+rather than having their whole data saved in the backup: <br><br>
       <div style="margin-left: 40px;">
       <span style="font-family: monospace;">
       
@@ -2356,7 +2493,7 @@ archives:<br>
       <br>
       <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c incr1 -A full -R / -z <span style="font-weight: bold;">--delta sig</span> 
       <br>
-      </div>
+      </span></div>
       <br>
       <div style="text-align: justify;">Here the <span style="font-weight: bold;">--delta sig</span>
 switch leads dar to copy from the full backup into the new backup all
@@ -2381,14 +2518,19 @@ reference files must be present in the isolated catalogue:&nbsp;&nbsp; <br>
       </div>
       <br>
       <div style="text-align: justify;">
-      Note that if the archive of reference does not hold any delta signature, the previous command will lead dar to compute on-fly delta signature of saved files
-      while performing catalogue isolation. You can thus chose not to include delta signature inside full backup while still 
-      being able to let dar use binary delta. However as dar cannot compute delta signature without data, file that have been recorded as unchanged since
-      the archive of reference was made cannot have their delta signature computed at isolation time. Same point if a file is stored as a delta patch without
-      delta signature associated with it, dar will not be able to add a delta signature at isolation time for that file.    
-      </div>
+Note that if the archive of reference does not hold any delta
+signature, the previous command will lead dar to compute on-fly delta
+signature of saved files while performing catalogue isolation. You can
+thus chose not to include delta signature inside full backup while
+still being able to let dar use binary delta. However as dar cannot
+compute delta signature without data, file that have been recorded as
+unchanged since the archive of reference was made cannot have their
+delta signature computed at isolation time. Same point if a file is
+stored as a delta patch without delta signature associated with it, dar
+will not be able to add a delta signature at isolation time for that
+file. </div>
       <p>
-      <div style="text-align: justify;">Yes, this is as simple as adding <span style="font-weight: bold;">--delta sig</span>
+      </p><div style="text-align: justify;">Yes, this is as simple as adding <span style="font-weight: bold;">--delta sig</span>
 to what you were used to do before. The resulting isolated catalogue
 will be much larger than without delta signatures but still much
 smaller than the full backup itself. The incremental or differential

@@ -177,7 +177,7 @@ is optional, if not provided it defaults to
 password
 if login is provided, the associated password may be given after a column (:) but this exposes the secret password to other
 users of the current system having access the table of process (using top, ps, /proc or other ways). If the login is given without
-password, the password will be asked interactively by dar at run time, which is must more secure. An alternative is to rely on ~/.netrc for FTP and SFTP transfert which is done using the --alter=file-authentication option (see below).
+password, the password will be asked interactively by dar at run time, which is must more secure. An alternative is to rely on ~/.netrc for FTP and also SFTP (!) transfers, for that you need to use the --alter=file-authentication option (see below).
 .TP 3
 hostname
 is the name or IP address of the host to connect to
@@ -618,7 +618,7 @@ When libdar is compiled against libthreadar, it can make use of several threads.
 When a temporary network error occurs (lack of connectivity, server unavailable, and so on), dar does not give up, it waits some time then retries the failed operation. This option is available to change the default retry time which is 3 seconds. If set to zero, libdar will not wait but rather ask the user whether to retry or abort in case of network error.
 .TP 20
 -afile-auth, --alter=file-authentication
-With this option, When reading or writing an archive to a remote repository, authentication is done using credentials found in ~/.netrc when relying on FTP protocol but also for SFTP (libcurl allows that which is unusual but somehow useful).
+With this option, When reading or writing an archive to a remote repository, if no password is provided, dar will check the ~/.netrc file for credentials when relying on FTP protocol and also for SFTP protocol (libcurl allows that, which is unusual but somehow useful).
 .PP
 .B SAVING, ISOLATION AND MERGING SPECIFIC OPTIONS (to use with -c, -C or -+)
 .PP
