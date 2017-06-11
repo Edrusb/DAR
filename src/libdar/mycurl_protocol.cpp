@@ -39,12 +39,6 @@ namespace libdar
 	    ret = proto_ftp;
 	else if(strcasecmp(arg.c_str(), "sftp") == 0)
 	    ret = proto_sftp;
-	else if(strcasecmp(arg.c_str(), "scp") == 0)
-	    ret = proto_scp;
-	else if(strcasecmp(arg.c_str(), "http") == 0)
-	    ret = proto_http;
-	else if(strcasecmp(arg.c_str(), "https") == 0)
-	    ret = proto_https;
 	else
 	    throw Erange("entrepot_libcurl::string_to_curlprotocol", tools_printf(gettext("Unknown protocol: %S"), &arg));
 

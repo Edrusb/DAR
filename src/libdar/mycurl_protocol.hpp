@@ -36,7 +36,12 @@ namespace libdar
 
 	/// libcurl protocols supported by libdar
 
-    enum mycurl_protocol { proto_ftp, proto_http, proto_https, proto_scp, proto_sftp };
+    enum mycurl_protocol { proto_ftp, proto_sftp };
+	/// dar needs to list a directory content to find
+	/// the last slice available in a directory, which
+	/// feature is not always available with http and https protocols
+	/// and never available with scp protocol
+	/// Thus dar only supports ftp and sftp
 
 	/// extract mycurl_protocol from a given URL
     extern mycurl_protocol string_to_mycurl_protocol(const std::string & arg);

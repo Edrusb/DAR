@@ -148,10 +148,6 @@ namespace libdar
 		    me->reading_dir_tmp.clear();
 		}
 		break;
-	    case proto_http:
-	    case proto_https:
-	    case proto_scp:
-		throw Efeature("read_dir_reset for scp, http and https");
 	    default:
 		throw SRC_BUG;
 	    }
@@ -168,10 +164,6 @@ namespace libdar
 		(void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_DIRLISTONLY, listonly);
 		(void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_WRITEFUNCTION, null_callback);
 		break;
-	    case proto_http:
-	    case proto_https:
-	    case proto_scp:
-		throw Efeature("read_dir_reset for http and https");
 	    default:
 		break; // exception thrown in the try block
 	    }
@@ -189,11 +181,7 @@ namespace libdar
 	    (void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_DIRLISTONLY, listonly);
 	    (void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_WRITEFUNCTION, null_callback);
 	    break;
-	case proto_http:
-	case proto_https:
-	case proto_scp:
-	    throw Efeature("read_dir_reset for http and https");
-		default:
+	default:
 	    throw SRC_BUG;
 	}
 #else
@@ -366,10 +354,6 @@ namespace libdar
 				 tools_printf(gettext("Error met while removing file %S: %s"),
 					      &filename, curl_easy_strerror(err)));
 		break;
-	    case proto_http:
-	    case proto_https:
-	    case proto_scp:
-		throw Efeature("unlink http, https, scp");
 	    default:
 		throw SRC_BUG;
 	    }
@@ -383,10 +367,6 @@ namespace libdar
 		(void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_QUOTE, nullptr);
 		(void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_NOBODY, 0);
 		break;
-	    case proto_http:
-	    case proto_https:
-	    case proto_scp:
-		throw Efeature("unlink http, https, scp");
 	    default:
     		break;
 	    }
@@ -404,10 +384,6 @@ namespace libdar
 	    (void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_QUOTE, nullptr);
 	    (void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_NOBODY, 0);
 	    break;
-	case proto_http:
-	case proto_https:
-	case proto_scp:
-	    throw Efeature("unlink http, https, scp");
 	default:
 	    break;
 	}
@@ -474,16 +450,8 @@ namespace libdar
 	    /*
 	    switch(x_proto)
 	    {
-	    case proto_ftp:  // using ~/.netrc for authentication
-	    case proto_scp:
-	    case proto_sftp:
-		break;
-	    case proto_http:
-		throw Efeature(gettext("authentication from file with HTTP protocol"));
-	    case proto_https:
-		throw Efeature(gettext("authentication from file with HTTPS protocol"));
-
-	    case proto_scp:
+	    case proto_ftp:
+	        break;
 	    case proto_sftp:
 		err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PUBLICKEY);
 		if(err != CURLE_OK)
@@ -538,15 +506,6 @@ namespace libdar
 	{
 	case proto_ftp:
 	    ret = "ftp";
-	    break;
-	case proto_http:
-	    ret = "http";
-	    break;
-	case proto_https:
-	    ret = "https";
-	    break;
-	case proto_scp:
-	    ret = "scp";
 	    break;
 	case proto_sftp:
 	    ret = "sftp";
