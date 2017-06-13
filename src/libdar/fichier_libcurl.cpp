@@ -946,6 +946,7 @@ namespace libdar
 				      &err_context,
 				      curl_easy_strerror(err)));
 	case CURLE_LOGIN_DENIED:
+	case CURLE_PEER_FAILED_VERIFICATION:
 	    throw Enet_auth(tools_printf(gettext("%S: %s, aborting"),
 					 &err_context,
 					 curl_easy_strerror(err)));

@@ -73,9 +73,14 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
     const char *home = tools_get_from_env(env, "HOME");
     vector<string> dar_dcf_path = line_tools_explode_PATH(tools_get_from_env(env, "DAR_DCF_PATH"));
     vector<string> dar_duc_path = line_tools_explode_PATH(tools_get_from_env(env, "DAR_DUC_PATH"));
+    string known_host = string(home) + "/.ssh/known_hosts";
+    const char *env_knownhosts = tools_get_from_env(env, "DAR_SFTP_KNOWNHOSTS_FILE");
 
     if(home == nullptr)
         home = "/";
+    if(env_knownhosts != nullptr)
+	known_host = string(env_knownhosts);
+
     if(! get_args(dialog,
 		  home,
 		  dar_dcf_path,
@@ -131,6 +136,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 						      param.remote.ent_host,
 						      param.remote.ent_port,
 						      param.remote.auth_from_file,
+						      known_host,
 						      param.remote.network_retry);
 		if(repo == nullptr)
 		    throw Ememory("little_main");
@@ -145,6 +151,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 							  param.ref_remote.ent_host,
 							  param.ref_remote.ent_port,
 							  param.ref_remote.auth_from_file,
+							  known_host,
 							  param.ref_remote.network_retry);
 		if(ref_repo == nullptr)
 		    throw Ememory("little_main");
@@ -159,6 +166,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 							  param.aux_remote.ent_host,
 							  param.aux_remote.ent_port,
 							  param.aux_remote.auth_from_file,
+							  known_host,
 							  param.aux_remote.network_retry);
 		if(aux_repo == nullptr)
 		    throw Ememory("little_main");

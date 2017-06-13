@@ -45,6 +45,7 @@ namespace libdar
 				       const string & host,
 				       const string & port,
 				       bool auth_from_file,
+				       const string & known_host,
 				       U_I waiting_time): mem_ui(dialog),
 							  x_proto(proto),
 							  base_URL(build_url_from(proto, host, port)),
@@ -68,7 +69,7 @@ namespace libdar
 			 tools_printf(gettext("protocol %S is not supported by libcurl, aborting"), & named_proto));
 	}
 
-	set_libcurl_authentication(host, login, password, auth_from_file);
+	set_libcurl_authentication(dialog, host, login, password, auth_from_file, known_host);
 
 #ifdef LIBDAR_NO_OPTIMIZATION
 	CURLcode err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_VERBOSE, 1);
@@ -421,15 +422,42 @@ namespace libdar
 #endif
     }
 
-    void entrepot_libcurl::set_libcurl_authentication(const string & location,
+    void entrepot_libcurl::set_libcurl_authentication(user_interaction & dialog,
+						      const string & location,
 						      const string & login,
 						      const secu_string & password,
-						      bool auth_from_file)
+						      bool auth_from_file,
+						      const string & known_hosts)
     {
 #if LIBCURL_AVAILABLE
 	CURLcode err;
 	secu_string real_pass = password;
 	string real_login = login;
+
+
+	    // checking server authentication
+
+	switch(x_proto)
+	{
+	case proto_ftp:
+	    break;
+	case proto_sftp:
+	    if(!known_hosts.empty())
+	    {
+		err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_SSH_KNOWNHOSTS, known_hosts.c_str());
+		if(err != CURLE_OK)
+		    throw Erange("entrepot_libcurl::set_libcurl_authentication",
+				 tools_printf(gettext("Error met while setting known_host file: %s"),
+					      curl_easy_strerror(err)));
+	    }
+	    else
+		dialog.warning("Warning: known_hosts file check has been disabled, connecting to remote host is subjet to man-in-the-middle attack and login/password credential for remote sftp server to be stolen");
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
+
+	    // checking for user credentials
 
 	if(login.empty())
 	    real_login = "anonymous";
@@ -447,12 +475,8 @@ namespace libdar
 		throw Erange("entrepot_libcurl::set_libcurl_authentication",
 			     tools_printf(gettext("Error met while asking libcurl to consider ~/.netrc for authentication: %s"),
 					  curl_easy_strerror(err)));
-	    /*
-	    switch(x_proto)
-	    {
-	    case proto_ftp:
-	        break;
-	    case proto_sftp:
+
+		/*
 		err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PUBLICKEY);
 		if(err != CURLE_OK)
 		    throw Erange("entrepot_libcurl::set_libcurl_authentication",
@@ -463,13 +487,7 @@ namespace libdar
 		err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_SSH_PUBLIC_KEYFILE, "/home/.../.ssh/id_rsa.pub");
 
 		err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_SSH_PRIVATE_KEYFILE, "/home/.../.ssh/id_rsa");
-
-		curl_easy_setopt(easyh.get_root_handle(), CURLOPT_SSH_KNOWNHOSTS, "/home/.../.ssh/known_hosts");
-		break;
-	    default:
-		throw SRC_BUG;
-	    }
-	    */
+		*/
 	}
 	else // login + password authentication
 	{
@@ -493,6 +511,7 @@ namespace libdar
 			     tools_printf(gettext("Error met while setting libcurl authentication: %s"),
 					  curl_easy_strerror(err)));
 	}
+
 #else
     throw Ecompilation("libcurl linking");
 #endif

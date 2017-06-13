@@ -69,6 +69,7 @@ namespace libdar
 			 const std::string & host,             //< hostname or IP of the remote repositiry
 			 const std::string & port,             //< empty string to use default port in regard to protocol used
 			 bool auth_from_file,                  //< whether ~/.netrc or ~/.ssh/... usual files should be used for authentication in place of using the given password
+			 const std::string & known_hosts,      //< for sftp if not an empty string will check host server authentication
 			 U_I waiting_time);                    //< seconds to wait before retrying in case of network erorr
 	    // default copy constructor is OK
 	    // default assignment operator is OK
@@ -110,10 +111,12 @@ namespace libdar
 	U_I wait_delay;
 
 	void set_libcurl_URL();
-	void set_libcurl_authentication(const std::string & location,
+	void set_libcurl_authentication(user_interaction & dialog,
+					const std::string & location,
 					const std::string & login,
 					const secu_string & password,
-					bool auth_from_file);
+					bool auth_from_file,
+					const std::string & known_host);
 	void detruit();
 
 	static std::string mycurl_protocol2string(mycurl_protocol proto);
