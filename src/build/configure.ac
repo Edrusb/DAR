@@ -41,6 +41,9 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],
 # Defining _XOPEN_SOURCE to get extra field in struct stat
 AC_DEFINE(_XOPEN_SOURCE, 700, [activates POSIX.1-2008 symbols in order to allow microsecond time setting, as well as ctime_r() call])
 
+# Define _BSD_SOURCE in order to be able to call makedev(), minor() and major() under OpenBSD when _XOPEN_SOURCE is set
+AC_DEFINE(_BSD_SOURCE, 1, [activate makedev(), major() and minor() when _XOPEN_SOURCE is set])
+
 ###########
 ## THE FOLLOWING "DEFINE" USED TO RE-ENABLE FULL LIBC FEATURES ON DIFFERENT OPERATING SYSTEMS
 ## HAVE BEEN BORROWED FROM PYTHON's configure.in
