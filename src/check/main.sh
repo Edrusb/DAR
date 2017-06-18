@@ -162,9 +162,9 @@ else
 fi
 
 if [ "$multi_thread" != "y" ]; then
-  multi_thread="-G"
-else
   multi_thread=""
+else
+  multi_thread="-G"
 fi
 
 if [ ! -z "$keepcompressed" -a ! -z "$recheck_hole" ] ; then
