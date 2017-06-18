@@ -580,6 +580,7 @@ namespace libdar
 
     bool entrepot_libcurl::mycurl_is_protocol_available(mycurl_protocol proto)
     {
+#if LIBCURL_AVAILABLE
 	curl_version_info_data *data = curl_version_info(CURLVERSION_NOW);
 	const char **ptr = nullptr;
 	string named_proto = mycurl_protocol2string(proto);
@@ -595,6 +596,9 @@ namespace libdar
 	    ++ptr;
 
 	return *ptr != nullptr;
+#else
+	return false;
+#endif
     }
 
 } // end of namespace
