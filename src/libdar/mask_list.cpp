@@ -253,6 +253,23 @@ namespace libdar
         return ret;
     }
 
+    string mask_list::dump(const string & prefix) const
+    {
+	vector<string>::const_iterator it = contenu.begin();
+	string rec_pref = prefix + "  | ";
+
+	string ret = prefix + "If matches one of the following line(s):\n";
+	while(it != contenu.end())
+	{
+	    ret += rec_pref + *it + "\n";
+	    ++it;
+	}
+	ret += prefix + "  +--";
+
+	return ret;
+    }
+
+
     static bool modified_lexicalorder_a_lessthan_b(const string & a, const string & b)
     {
 	string::const_iterator at = a.begin();

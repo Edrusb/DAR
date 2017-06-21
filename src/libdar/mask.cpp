@@ -38,6 +38,8 @@ using namespace std;
 namespace libdar
 {
 
+    static string bool2_sentivity(bool case_s);
+
     simple_mask::simple_mask(const string & wilde_card_expression,
 			     bool case_sensit) : case_s(case_sensit)
     {
@@ -132,6 +134,12 @@ namespace libdar
 	return *this;
     }
 
+    string not_mask::dump(const string & prefix) const
+    {
+	string ref_dump = ref->dump();
+	return prefix + tools_printf(gettext("not(%S)"), &ref_dump);
+    }
+
     void not_mask::copy_from(const not_mask &m)
     {
         ref = m.ref->clone();
@@ -174,6 +182,24 @@ namespace libdar
             throw Ememory("et_mask::et_mask");
     }
 
+    string et_mask::dump_logical(const string & prefix, const string & boolop) const
+    {
+	vector<mask *>::const_iterator it = lst.begin();
+	string recursive_prefix = prefix + "  | ";
+
+	string ret = prefix + boolop + "\n";
+	while(it != lst.end())
+	{
+	    if(*it == nullptr)
+		throw SRC_BUG;
+	    ret += (*it)->dump(recursive_prefix) + "\n";
+	    ++it;
+	}
+	ret += prefix + "  +--";
+
+	return ret;
+    }
+
     void et_mask::copy_from(const et_mask &m)
     {
         vector<mask *>::const_iterator it = m.lst.begin();
@@ -210,6 +236,13 @@ namespace libdar
         return ch.is_subdir_of(chemin, case_s) || chemin.is_subdir_of(ch, case_s);
     }
 
+    string simple_path_mask::dump(const string & prefix) const
+    {
+	string chem = chemin.display();
+	string sensit = bool2_sentivity(case_s);
+
+	return prefix + tools_printf(gettext("Is subdir of: %S [%S]"), &chem, &sensit);
+    }
 
     bool same_path_mask::is_covered(const std::string &ch) const
     {
@@ -218,5 +251,28 @@ namespace libdar
 	else
 	    return tools_is_case_insensitive_equal(ch, chemin);
     }
+
+
+    string same_path_mask::dump(const std::string &prefix) const
+    {
+	string sensit = bool2_sentivity(case_s);
+
+	return prefix + tools_printf(gettext("Path is: %S [%S]"), &chemin, &sensit);
+    }
+
+    string exclude_dir_mask::dump(const std::string &prefix) const
+    {
+	string sensit = bool2_sentivity(case_s);
+
+	return prefix + tools_printf(gettext("Path leeds to: %S [%S]"), &chemin, &sensit);
+    }
+
+
+
+    static string bool2_sentivity(bool case_s)
+    {
+    	return case_s ? gettext("case sensitive") : gettext("case in-sensitive");
+    }
+
 
 } // end of namespace
