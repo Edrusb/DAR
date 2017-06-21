@@ -9,6 +9,10 @@ from 2.5.10 to 2.5.11
   certain environments
 - fixed a typo in filesystem.cpp and portability issue that lead
   compilation to fail under openbsd 6.0
+- fixed bug in the filtering mecanism relying on file listing (-[ and
+  -] options) that could not find an entry in the listing upon certain
+  condition leading a file not being excluded as requested or not
+  included as requested
 
 from 2.5.9 to 2.5.10
 - fixed bug: -r option (only more recent overwriting policy) was
