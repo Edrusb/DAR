@@ -234,7 +234,7 @@ namespace libdar
         while(max - min > 1)
         {
             tmp = (min + max)/2;
-            if(contenu[tmp] < target)
+            if(modified_lexicalorder_a_lessthan_b(contenu[tmp], target))
                 min = tmp;
             else
                 if(contenu[tmp] == target)
