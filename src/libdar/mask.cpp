@@ -38,7 +38,7 @@ using namespace std;
 namespace libdar
 {
 
-    static string bool2_sentivity(bool case_s);
+    static string bool2_sensitivity(bool case_s);
 
     simple_mask::simple_mask(const string & wilde_card_expression,
 			     bool case_sensit) : case_s(case_sensit)
@@ -69,6 +69,16 @@ namespace libdar
 	}
 	else
 	    return fnmatch(the_mask.c_str(), expression.c_str(), FNM_PERIOD) == 0;
+    }
+
+    string simple_mask::dump(const string & prefix) const
+    {
+	string sensit = bool2_sensitivity(case_s);
+
+	return tools_printf(gettext("%Sglob expression: %S [%S]"),
+			    &prefix,
+			    &the_mask,
+			    &sensit);
     }
 
     void simple_mask::copy_from(const simple_mask & m)
@@ -110,6 +120,17 @@ namespace libdar
         return regexec(&preg, expression.c_str(), 0, nullptr, 0) != REG_NOMATCH;
     }
 
+    string regular_mask::dump(const string & prefix) const
+    {
+	string sensit = bool2_sensitivity(case_sensit);
+
+	return tools_printf(gettext("%Sregular expression: %S [%S]"),
+			    &prefix,
+			    &mask_exp,
+			    &sensit);
+    }
+
+
     void regular_mask::set_preg(const string & wilde_card_expression, bool x_case_sensit)
     {
 	S_I ret;
@@ -136,8 +157,12 @@ namespace libdar
 
     string not_mask::dump(const string & prefix) const
     {
-	string ref_dump = ref->dump();
-	return prefix + tools_printf(gettext("not(%S)"), &ref_dump);
+	string ref_dump = ref->dump(prefix + "    ");
+
+	return tools_printf(gettext("%Snot(\n%S\n%S)"),
+			    &prefix,
+			    &ref_dump,
+			    &prefix);
     }
 
     void not_mask::copy_from(const not_mask &m)
@@ -239,9 +264,12 @@ namespace libdar
     string simple_path_mask::dump(const string & prefix) const
     {
 	string chem = chemin.display();
-	string sensit = bool2_sentivity(case_s);
+	string sensit = bool2_sensitivity(case_s);
 
-	return prefix + tools_printf(gettext("Is subdir of: %S [%S]"), &chem, &sensit);
+	return tools_printf(gettext("%SIs subdir of: %S [%S]"),
+			    &prefix,
+			    &chem,
+			    &sensit);
     }
 
     bool same_path_mask::is_covered(const std::string &ch) const
@@ -252,24 +280,27 @@ namespace libdar
 	    return tools_is_case_insensitive_equal(ch, chemin);
     }
 
-
-    string same_path_mask::dump(const std::string &prefix) const
+    string same_path_mask::dump(const std::string & prefix) const
     {
-	string sensit = bool2_sentivity(case_s);
+	string sensit = bool2_sensitivity(case_s);
 
-	return prefix + tools_printf(gettext("Path is: %S [%S]"), &chemin, &sensit);
+	return tools_printf(gettext("%SPath is: %S [%S]"),
+			    &prefix,
+			    &chemin,
+			    &sensit);
     }
 
-    string exclude_dir_mask::dump(const std::string &prefix) const
+    string exclude_dir_mask::dump(const std::string & prefix) const
     {
-	string sensit = bool2_sentivity(case_s);
+	string sensit = bool2_sensitivity(case_s);
 
-	return prefix + tools_printf(gettext("Path leeds to: %S [%S]"), &chemin, &sensit);
+	return tools_printf(gettext("%SPath leeds to: %S [%S]"),
+			    &prefix,
+			    &chemin,
+			    &sensit);
     }
 
-
-
-    static string bool2_sentivity(bool case_s)
+    static string bool2_sensitivity(bool case_s)
     {
     	return case_s ? gettext("case sensitive") : gettext("case in-sensitive");
     }

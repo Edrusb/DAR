@@ -106,7 +106,7 @@ namespace libdar
 	    /// inherited from the mask class
         bool is_covered(const std::string & expression) const { return val; };
         bool is_covered(const path & chemin) const { return val; };
-	std::string dump(const std::string & prefix) const { return prefix + (val ? gettext("TRUE") : gettext ("FALSE")); };
+	std::string dump(const std::string & prefix) const { return prefix + (val ? gettext("TRUE") : gettext("FALSE")); };
 
 	    /// inherited from the mask class
         mask *clone() const { return new (get_pool()) bool_mask(val); };
@@ -134,8 +134,9 @@ namespace libdar
 
 	    /// inherited from the mask class
         bool is_covered(const std::string &expression) const;
-	std::string dump(const std::string & prefix) const { return prefix + tools_printf(gettext("glob expression: %S"), &the_mask); };
 
+	    /// inherited from the mask class
+	std::string dump(const std::string & prefix) const;
 
 	    /// inherited from the mask class
         mask *clone() const { return new (get_pool()) simple_mask(*this); };
@@ -170,8 +171,9 @@ namespace libdar
 
 	    /// inherited from the mask class
         bool is_covered(const std::string & expression) const;
-	std::string dump(const std::string & prefix) const { return prefix + tools_printf(gettext("regular expression: %S"), &mask_exp); };
 
+	    /// inherited from the mask class
+	std::string dump(const std::string & prefix) const;
 
 	    /// inherited from the mask class
         mask *clone() const { return new (get_pool()) regular_mask(*this); };
