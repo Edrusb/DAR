@@ -105,6 +105,53 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 
         dialog.set_beep(param.beep);
 
+#ifdef LIBDAR_NO_OPTIMIZATION
+
+	    // code added before release 2.5.11 for debugging
+	    // purposes. This will lead to new feature un 2.6.0
+
+	if(param.info_details
+	   && param.display_treated
+	   && param.display_skipped
+	   && param.display_finished)
+	{
+	    if(param.subtree != nullptr)
+	    {
+		string res = param.subtree->dump("    ");
+		dialog.warning("directory tree filter:");
+		dialog.warning(res);
+	    }
+
+	    if(param.selection != nullptr)
+	    {
+		string res = param.selection->dump("    ");
+		dialog.warning("filename filter:");
+		dialog.warning(res);
+	    }
+
+	    if(param.ea_mask != nullptr)
+	    {
+		string res = param.ea_mask->dump("    ");
+		dialog.warning("EA filter:");
+		dialog.warning(res);
+	    }
+
+	    if(param.compress_mask != nullptr)
+	    {
+		string res = param.compress_mask->dump("    ");
+		dialog.warning("Compression filter:");
+		dialog.warning(res);
+	    }
+
+	    if(param.backup_hook_mask != nullptr)
+	    {
+		string res = param.backup_hook_mask->dump("    ");
+		dialog.warning("backup hook filter:");
+		dialog.warning(res);
+	    }
+	}
+#endif
+
         if(param.filename != "-"
 	   || (param.output_pipe != "" && param.op != create && param.op != isolate && param.op != merging))
             dialog.change_non_interactive_output(&cout);

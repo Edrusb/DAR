@@ -57,7 +57,7 @@ extern "C"
 #include <fcntl.h>
 #endif
 
-#if HAVE_SYS_TYPE_H
+#if HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
 

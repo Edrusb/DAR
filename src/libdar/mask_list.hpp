@@ -70,6 +70,9 @@ namespace libdar
             /// routing only necessary for doing some testing
         U_I size() const { return contenu.size(); };
 
+	    /// output the listing content
+	std::string dump(const std::string & prefix) const;
+
     private:
 
         std::vector <std::string> contenu;

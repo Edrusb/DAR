@@ -47,6 +47,7 @@ extern "C"
 
 #include "path.hpp"
 #include "on_pool.hpp"
+#include "tools.hpp"
 
 namespace libdar
 {
@@ -78,6 +79,11 @@ namespace libdar
 	    /// \note this is an optional method to the previous one, it can be overwritten
 	virtual bool is_covered(const path & chemin) const { return is_covered(chemin.display()); };
 
+	    /// dump in human readable form the nature of the mask
+
+	    /// \param[in] prefix used for indentation withing the output string
+	virtual std::string dump(const std::string & prefix = "") const = 0;
+
 	    /// this is to be able to copy a mask without knowing its
 	    /// exact class and without loosing its specialized data
         virtual mask *clone() const = 0;
@@ -100,6 +106,7 @@ namespace libdar
 	    /// inherited from the mask class
         bool is_covered(const std::string & expression) const { return val; };
         bool is_covered(const path & chemin) const { return val; };
+	std::string dump(const std::string & prefix) const { return prefix + (val ? gettext("TRUE") : gettext("FALSE")); };
 
 	    /// inherited from the mask class
         mask *clone() const { return new (get_pool()) bool_mask(val); };
@@ -127,6 +134,9 @@ namespace libdar
 
 	    /// inherited from the mask class
         bool is_covered(const std::string &expression) const;
+
+	    /// inherited from the mask class
+	std::string dump(const std::string & prefix) const;
 
 	    /// inherited from the mask class
         mask *clone() const { return new (get_pool()) simple_mask(*this); };
@@ -161,6 +171,9 @@ namespace libdar
 
 	    /// inherited from the mask class
         bool is_covered(const std::string & expression) const;
+
+	    /// inherited from the mask class
+	std::string dump(const std::string & prefix) const;
 
 	    /// inherited from the mask class
         mask *clone() const { return new (get_pool()) regular_mask(*this); };
@@ -198,6 +211,7 @@ namespace libdar
 	    /// inherited from the mask class
         bool is_covered(const std::string &expression) const { return !ref->is_covered(expression); };
         bool is_covered(const path & chemin) const { return !ref->is_covered(chemin); };
+	std::string dump(const std::string & prefix) const;
 
 	    /// inherited from the mask class
         mask *clone() const { return new (get_pool()) not_mask(*this); };
@@ -241,6 +255,7 @@ namespace libdar
 	    /// inherited from the mask class
         bool is_covered(const std::string & expression) const { return t_is_covered(expression); };
         bool is_covered(const path & chemin) const { return t_is_covered(chemin); };
+	std::string dump(const std::string & prefix) const { return dump_logical(prefix, gettext("AND")); };
 
 	    /// inherited from the mask class
         mask *clone() const { return new (get_pool()) et_mask(*this); };
@@ -260,6 +275,8 @@ namespace libdar
 
     protected :
         std::vector<mask *> lst;
+
+	std::string dump_logical(const std::string & prefix, const std::string & boolop) const;
 
     private :
         void copy_from(const et_mask & m);
@@ -292,8 +309,8 @@ namespace libdar
     public:
 	    /// inherited from the mask class
         bool is_covered(const std::string & expression) const { return t_is_covered(expression); };
-        bool is_covered(const path & chemin) const { return t_is_covered(chemin); }
-	;
+        bool is_covered(const path & chemin) const { return t_is_covered(chemin); };
+	std::string dump(const std::string & prefix) const { return dump_logical(prefix, gettext("OR")); };
 	    /// inherited from the mask class
         mask *clone() const { return new (get_pool()) ou_mask(*this); };
 
@@ -329,6 +346,7 @@ namespace libdar
 	    /// inherited from the mask class
         bool is_covered(const std::string & expression) const { throw SRC_BUG; };
         bool is_covered(const path & chemin) const;
+	std::string dump(const std::string & prefix) const;
 
 	    /// inherited from the mask class
         mask *clone() const { return new (get_pool()) simple_path_mask(*this); };
@@ -354,6 +372,9 @@ namespace libdar
         bool is_covered(const std::string &chemin) const;
 
 	    /// inherited from the mask class
+	std::string dump(const std::string & prefix) const;
+
+	    /// inherited from the mask class
         mask *clone() const { return new (get_pool()) same_path_mask(*this); };
 
     private :
@@ -376,6 +397,7 @@ namespace libdar
 	    /// inherited from the mask class
 	bool is_covered(const std::string &expression) const { throw SRC_BUG; }
 	bool is_covered(const path &chemin) const { return chemin.is_subdir_of(chemin, case_s); };
+	std::string dump(const std::string & prefix) const;
 
 	    /// inherited from the mask class
 	mask *clone() const { return new (get_pool()) exclude_dir_mask(*this); };
