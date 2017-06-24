@@ -356,7 +356,8 @@ namespace libdar
 				  bool info_details,
 				  list<signator> & gnupg_signed,
 				  slice_layout & sl,
-				  bool multi_threaded)
+				  bool multi_threaded,
+				  bool header_only)
     {
 	secu_string real_pass = pass;
 	generic_file *tmp = nullptr;
@@ -509,6 +510,8 @@ namespace libdar
 			dialog.pause(gettext("Found a correct archive header at the beginning of the archive, which does not stands to be an old archive, the end of the archive is thus corrupted. Without external catalogue provided and as we do not read the archive in sequential mode, there is very little chance to retreive something from this corrupted archive. Do we continue anyway ?"));
 		}
 
+	    if(header_only)
+		return;
 
 		// *************  adding a tronc to hide last terminator and trailer_version ******* //
 

@@ -1700,7 +1700,7 @@ namespace libdar
         {
             char *ptr = copie, *start = copie;
 
-            strcpy(copie, format);
+            strncpy(copie, format, taille);
             copie[taille-1] = '\0';
 
             do

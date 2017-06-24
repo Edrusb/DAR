@@ -55,7 +55,7 @@ int main(int argc,char *argv[])
             write(1,sortie,lu+d);
         }
         close(1);close(0);
-        sprintf(buffer,"rm %s ; mv %s %s",file,TMP,file);
+        snprintf(buffer,MAX,"rm %s ; mv %s %s",file,TMP,file);
         system(buffer);
     }
     return 0;
