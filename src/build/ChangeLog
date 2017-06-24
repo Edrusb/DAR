@@ -5,9 +5,10 @@ from 2.5.x to 2.6.0
   part to proceed to the operation (restoration, listing, and so on)
 - new featute: support ftp/sftp/scp to write an archive eventually with hash
   files to a remote cloud storage
-- modified behavior: While creating a single sliced archive DUC file is
+- modified behavior: While creating a single sliced archive, DUC file is
   executed unless user interrupted dar/libdar. This to stay coherent with
   multi sliced archive behavior
+- new feature: display filters nature (-vmasks option)
 
 from 2.5.10 to 2.5.11
 - minor feature: displays the archive header which is never ciphered and

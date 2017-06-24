@@ -264,6 +264,7 @@ bool get_args(shell_interaction & dialog,
     p.display_treated_only_dir = false;
     p.display_skipped = false;
     p.display_finished = false;
+    p.display_masks = false;
     p.algo = none;
     p.compression_level = 9;
     p.pause = 0;
@@ -956,7 +957,9 @@ static bool get_args_recursive(recursive_param & rec,
                         p.display_treated = true;
                         p.display_treated_only_dir = false;
                     }
-                    else
+                    else if(strcasecmp("masks", optarg) == 0)
+			p.display_masks = true;
+		    else
                         throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
                 break;
             case 'z':
