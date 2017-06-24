@@ -47,7 +47,7 @@ namespace libdar
         /// \addtogroup Private
 	/// @{
 
-#if LIBCURL_AVAILABLE && LIBTHREADAR_AVAILABLE
+#if LIBCURL_AVAILABLE
 
 
 	/// structure managing libcurl CURL* easy_handle

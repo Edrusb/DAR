@@ -30,7 +30,7 @@ using namespace std;
 
 namespace libdar
 {
-#if LIBCURL_AVAILABLE && LIBTHREADAR_AVAILABLE
+#if LIBCURL_AVAILABLE
 
 	/////////////////////////////////////////////////////////
 	/// MYCURL_EASYHANDLE_NODE //////////////////////////////
