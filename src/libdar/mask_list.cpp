@@ -309,10 +309,10 @@ namespace libdar
 	}
 
 	if(at == a.end())
-	    return true; // even if bt == b.end() too, we assume a < b
+	    return true; // even if bt == b.end(), we have a <= b
 
 	if(bt == b.end())
-	    return false;
+	    return false; // because at != a.end(), we thus have neither a == b nor a < b
 	else
 	    throw SRC_BUG; // at != a.end() and bt != b.end() how did we escaped the while loop?
     }
