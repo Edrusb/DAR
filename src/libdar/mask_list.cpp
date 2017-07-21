@@ -236,11 +236,8 @@ namespace libdar
             tmp = (min + max)/2;
             if(modified_lexicalorder_a_lessthan_b(contenu[tmp], target))
                 min = tmp;
-            else
-                if(contenu[tmp] == target)
-                    max = min = tmp;
-                else
-                    max = tmp;
+	    else
+		max = tmp; // we could set max to tmp-1 but we need to get  min < target < max , if target is absent from the list
         }
 
         ret = contenu[max] == target || contenu[min] == target;
