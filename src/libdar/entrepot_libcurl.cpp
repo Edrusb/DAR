@@ -38,14 +38,16 @@ using namespace std;
 namespace libdar
 {
 
-    entrepot_libcurl::entrepot_libcurl(user_interaction & dialog,
-				       mycurl_protocol proto,
-				       const string & login,
-				       const secu_string & password,
-				       const string & host,
-				       const string & port,
-				       bool auth_from_file,
-				       const string & known_host,
+    entrepot_libcurl::entrepot_libcurl(user_interaction & dialog,         //< for user interaction
+				       mycurl_protocol proto,             //< network protocol to use
+				       const string & login,              //< user login on remote host
+				       const secu_string & password,      //< user password on remote host (empty for file auth or user interaction)
+				       const string & host,               //< the remote server to connect to
+				       const string & port,               //< TCP/UDP port to connec to (empty string for default)
+				       bool auth_from_file,               //< whether to check $HOME/.netrc for password
+				       const string & sftp_pub_keyfile,   //< where to fetch the public key (sftp only)
+				       const string & sftp_prv_keyfile,   //< where to fetch the private key (sftp only)
+				       const string & sftp_known_hosts,   //< location of the known_hosts file (empty string to disable this security check)
 				       U_I waiting_time): mem_ui(dialog),
 							  x_proto(proto),
 							  base_URL(build_url_from(proto, host, port)),
@@ -69,7 +71,14 @@ namespace libdar
 			 tools_printf(gettext("protocol %S is not supported by libcurl, aborting"), & named_proto));
 	}
 
-	set_libcurl_authentication(dialog, host, login, password, auth_from_file, known_host);
+	set_libcurl_authentication(dialog,
+				   host,
+				   login,
+				   password,
+				   auth_from_file,
+				   sftp_pub_keyfile,
+				   sftp_prv_keyfile,
+				   sftp_known_hosts);
 
 #ifdef LIBDAR_NO_OPTIMIZATION
 	CURLcode err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_VERBOSE, 1);
@@ -427,7 +436,9 @@ namespace libdar
 						      const string & login,
 						      const secu_string & password,
 						      bool auth_from_file,
-						      const string & known_hosts)
+						      const string & sftp_pub_keyfile,
+						      const string & sftp_prv_keyfile,
+						      const string & sftp_known_hosts)
     {
 #if LIBCURL_AVAILABLE
 	CURLcode err;
@@ -442,16 +453,40 @@ namespace libdar
 	case proto_ftp:
 	    break;
 	case proto_sftp:
-	    if(!known_hosts.empty())
+	    if(!sftp_known_hosts.empty())
 	    {
-		err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_SSH_KNOWNHOSTS, known_hosts.c_str());
+		err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_SSH_KNOWNHOSTS, sftp_known_hosts.c_str());
 		if(err != CURLE_OK)
 		    throw Erange("entrepot_libcurl::set_libcurl_authentication",
-				 tools_printf(gettext("Error met while setting known_host file: %s"),
+				 tools_printf(gettext("Error met while setting known_hosts file: %s"),
 					      curl_easy_strerror(err)));
 	    }
 	    else
 		dialog.warning("Warning: known_hosts file check has been disabled, connecting to remote host is subjet to man-in-the-middle attack and login/password credential for remote sftp server to be stolen");
+
+	    err = curl_easy_setopt(easyh.get_root_handle(),
+				   CURLOPT_SSH_PUBLIC_KEYFILE,
+				   sftp_pub_keyfile.c_str());
+	    if(err != CURLE_OK)
+		throw Erange("entrepot_libcurl::set_libcurl_authentication",
+			     tools_printf(gettext("Error met while assigning public key fike: %s"),
+					  curl_easy_strerror(err)));
+
+	    err = curl_easy_setopt(easyh.get_root_handle(),
+				   CURLOPT_SSH_PRIVATE_KEYFILE,
+				   sftp_prv_keyfile.c_str());
+	    if(err != CURLE_OK)
+		throw Erange("entrepot_libcurl::set_libcurl_authentication",
+			     tools_printf(gettext("Error met while assigning private key fike: %s"),
+					  curl_easy_strerror(err)));
+
+	    err = curl_easy_setopt(easyh.get_root_handle(),
+				   CURLOPT_SSH_AUTH_TYPES,
+				   CURLSSH_AUTH_PUBLICKEY|CURLSSH_AUTH_PASSWORD);
+	    if(err != CURLE_OK)
+		throw Erange("entrepot_libcurl::set_libcurl_authentication",
+			     tools_printf(gettext("Error met while assigning sftp authentication methods: %s"),
+					  curl_easy_strerror(err)));
 	    break;
 	default:
 	    throw SRC_BUG;
@@ -475,19 +510,6 @@ namespace libdar
 		throw Erange("entrepot_libcurl::set_libcurl_authentication",
 			     tools_printf(gettext("Error met while asking libcurl to consider ~/.netrc for authentication: %s"),
 					  curl_easy_strerror(err)));
-
-		/*
-		err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PUBLICKEY);
-		if(err != CURLE_OK)
-		    throw Erange("entrepot_libcurl::set_libcurl_authentication",
-				 tools_printf(gettext("Error met while instructing libcurl to use public key authentication: %s"),
-					      curl_easy_strerror(err)));
-
-
-		err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_SSH_PUBLIC_KEYFILE, "/home/.../.ssh/id_rsa.pub");
-
-		err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_SSH_PRIVATE_KEYFILE, "/home/.../.ssh/id_rsa");
-		*/
 	}
 	else // login + password authentication
 	{

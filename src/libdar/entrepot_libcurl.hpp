@@ -62,15 +62,17 @@ namespace libdar
     class entrepot_libcurl : public entrepot, public mem_ui
     {
     public:
-	entrepot_libcurl(user_interaction & dialog,            //< used to report temporary network failure to the user
-			 mycurl_protocol proto,                //< protocol to use for communication with the remote repository
-			 const std::string & login,            //< login to use
-			 const secu_string & password,         //< password to authenticate
-			 const std::string & host,             //< hostname or IP of the remote repositiry
-			 const std::string & port,             //< empty string to use default port in regard to protocol used
-			 bool auth_from_file,                  //< whether ~/.netrc or ~/.ssh/... usual files should be used for authentication in place of using the given password
-			 const std::string & known_hosts,      //< for sftp if not an empty string will check host server authentication
-			 U_I waiting_time);                    //< seconds to wait before retrying in case of network erorr
+	entrepot_libcurl(user_interaction & dialog,         //< for user interaction
+			 mycurl_protocol proto,             //< network protocol to use
+			 const std::string & login,              //< user login on remote host
+			 const secu_string & password,      //< user password on remote host (empty for file auth or user interaction)
+			 const std::string & host,               //< the remote server to connect to
+			 const std::string & port,               //< TCP/UDP port to connec to (empty string for default)
+			 bool auth_from_file,               //< whether to check $HOME/.netrc for password
+			 const std::string & sftp_pub_keyfile,   //< where to fetch the public key (sftp only)
+			 const std::string & sftp_prv_keyfile,   //< where to fetch the private key (sftp only)
+			 const std::string & sftp_known_hosts,   //< location of the known_hosts file (empty string to disable this security check)
+			 U_I waiting_time);
 	    // default copy constructor is OK
 	    // default assignment operator is OK
 	~entrepot_libcurl() throw () {};
@@ -111,12 +113,14 @@ namespace libdar
 	U_I wait_delay;
 
 	void set_libcurl_URL();
-	void set_libcurl_authentication(user_interaction & dialog,
-					const std::string & location,
-					const std::string & login,
-					const secu_string & password,
-					bool auth_from_file,
-					const std::string & known_host);
+	void set_libcurl_authentication(user_interaction & dialog,         //< for user interaction
+					const std::string & location,      //< server to authenticate with
+					const std::string & login,         //< login to use
+					const secu_string & password,      //< password (emtpy for interaction or file auth)
+					bool auth_from_file,               //< if set, check for $HOME/.netrc for password
+					const std::string & sftp_pub_keyfile,  //< where to fetch the public key (sftp only)
+					const std::string & sftp_prv_keyfile,  //< where to fetch the private key (sftp only)
+					const std::string & sftp_known_hosts); //< where to fetch the .known_hosts file (sftp only)
 	void detruit();
 
 	static std::string mycurl_protocol2string(mycurl_protocol proto);

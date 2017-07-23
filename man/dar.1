@@ -1433,7 +1433,13 @@ DAR_DUC_PATH
 if set, dar looks for Dar User Command (DUC files, see -E, -F, -~, -= options) that do not have a fully qualified path in the directories listed in DAR_DUC_PATH. This variable receives a column (:) separated list of paths and looks in each of them in turn, up to the first file found under the requested name.
 .TP 10
 DAR_SFTP_KNOWNHOSTS_FILE
-if set, dar will not use the ~/.ssh/known_hosts file to check sftp remote server authenticity but the file given as value for this environment variable. Note that setting this variable to an empty string completely disable host validation, which is not recommended. Dar the command line interface program for dar archive relies on libdar for archive format management which relies on libcurl for network transfer which in turn relies on libssh2 for all that concerns sftp protocol. In the known_hosts file, libssh2 does not support recent lines like those with "ecdsa-sha2-nistp256" in second argument but only supports "ssh-rsa" lines. Check libssh2 documentations and litterature for more details about that limitation.
+if set, dar will not use the $HOME/.ssh/known_hosts file to check sftp remote server authenticity but the file given as value for this environment variable. Note that setting this variable to an empty string completely disable host validation, which is not recommended. Dar the command line interface program for dar archive relies on libdar for archive format management which relies on libcurl for network transfer which in turn relies on libssh2 for all that concerns sftp protocol. In the known_hosts file, libssh2 does not support recent lines like those with "ecdsa-sha2-nistp256" in second argument but only supports "ssh-rsa" lines. Check libssh2 documentations and litterature for more details about that limitation.
+.TP 10
+DAR_SFTP_PUBLIC_KEYFILE
+by default dar will fetch the public key file in $HOME/.ssh/id_rsa.pub file. If you use the former id_dsa.pub or more recent key types you need to set this environment variable to point to the appropriated filename
+.TP 10
+DAR_SFTP_PRIVATE_KEYFILE
+by default dar will fetch the public key file in $HOME/.ssh/id_rsa file. If you use the former id_dsa.pub or more recent key types you need to set this environment variable to point to the appropriated filename
 .TP 10
 GNUPGHOME
 for asymetric encryption and signature, the keyring used is $HOME/.gnupg by default. You can change this default by setting GNUPGHOME to the directory containing the keyring. For example, if you are running dar as root and want to use your unprivileged account keyring use the following:

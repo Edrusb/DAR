@@ -74,12 +74,20 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
     vector<string> dar_dcf_path = line_tools_explode_PATH(tools_get_from_env(env, "DAR_DCF_PATH"));
     vector<string> dar_duc_path = line_tools_explode_PATH(tools_get_from_env(env, "DAR_DUC_PATH"));
     string known_host = string(home) + "/.ssh/known_hosts";
+    string sftp_pub_filekey = string(home) + "/.ssh/id_rsa.pub";
+    string sftp_prv_filekey = string(home) + "/.ssh/id_rsa";
     const char *env_knownhosts = tools_get_from_env(env, "DAR_SFTP_KNOWNHOSTS_FILE");
+    const char *env_pub_filekey = tools_get_from_env(env, "DAR_SFTP_PUBLIC_KEYFILE");
+    const char *env_prv_filekey = tools_get_from_env(env, "DAR_SFTP_PRIVATE_KEYFILE");
 
     if(home == nullptr)
         home = "/";
     if(env_knownhosts != nullptr)
 	known_host = string(env_knownhosts);
+    if(env_pub_filekey != nullptr)
+	sftp_pub_filekey = string(env_pub_filekey);
+    if(env_prv_filekey != nullptr)
+	sftp_prv_filekey = string(env_prv_filekey);
 
     if(! get_args(dialog,
 		  home,
@@ -180,6 +188,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 						      param.remote.ent_host,
 						      param.remote.ent_port,
 						      param.remote.auth_from_file,
+						      sftp_pub_filekey,
+						      sftp_prv_filekey,
 						      known_host,
 						      param.remote.network_retry);
 		if(repo == nullptr)
@@ -195,6 +205,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 							  param.ref_remote.ent_host,
 							  param.ref_remote.ent_port,
 							  param.ref_remote.auth_from_file,
+							  sftp_pub_filekey,
+							  sftp_prv_filekey,
 							  known_host,
 							  param.ref_remote.network_retry);
 		if(ref_repo == nullptr)
@@ -210,6 +222,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 							  param.aux_remote.ent_host,
 							  param.aux_remote.ent_port,
 							  param.aux_remote.auth_from_file,
+							  sftp_pub_filekey,
+							  sftp_prv_filekey,
 							  known_host,
 							  param.aux_remote.network_retry);
 		if(aux_repo == nullptr)
