@@ -2,6 +2,7 @@
 <html><head>
 
 
+
   <meta content="text/html; charset=us-ascii" http-equiv="content-type"><title>DAR - Frequently Asked Questions</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
@@ -102,7 +103,7 @@ Windows, especially with cyrillic filenames?</a><br>
 </span><a href="#win32"><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;">I have a 32 bits windows system, which binary </span><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;">package </span></span><span style="font-weight: bold; font-style: italic;">can I to use?</span></span></a><br>
       <a style="font-style: italic; font-weight: bold;" href="#lzop_vs_dar">lzo compression is slower with dar than with lzop, why?</a><br>
       <a style="font-weight: bold;" href="#libthreadar"><span style="font-style: italic;">what is libthreadar and why libdar relies on it?</span></a><br>
-      <a href="#libssh2"><span style="font-weight: bold; font-style: italic;">Using sftp://host/path/archive fails with <span style="font-weight: bold; font-style: italic;">the message : </span>"SSL peer certificate or SSH remote key was not OK, aborting"</span></a><br>
+      <a href="#libssh2"><span style="font-weight: bold; font-style: italic;"></span><span style="font-weight: bold; font-style: italic;">I Cannot get dar to connect to remote server using SFTP</span></a><br>
       <br>
 <span style="font-weight: bold; font-style: italic;"><h2><span style="font-weight: bold;"> </span></h2>
       <h2><span style="text-decoration: underline;">Answers:</span></h2>
@@ -3511,29 +3512,72 @@ libthreadar source code can be found <a href="https://sourceforge.net/projects/l
 documentation is available in source package as well as online <a href="http://libthreadar.sourceforge.net/">here</a> <br>
       </div>
       <span style="font-weight: bold; font-style: italic;">
-      <p><a name="libssh2"></a>Using sftp://host/path/archive fails with <span style="font-weight: bold; font-style: italic;">the message : </span>"SSL peer certificate or SSH remote key was not OK, aborting" <br>
+      <p><a name="libssh2"></a>I Cannot get dar to connect to remote server using SFTP<br>
 </p></span>
-      <div style="margin-left: 40px;">The problem comes from the
-known_hosts file which libssh2 is not able to read. Libssh2 is used by
+      <div style="margin-left: 40px;">This may be due to several well known reasons:<br>
+      <ul>
+        <li>dar/libdar cannot find the known_hosts file</li>
+        <li>if using key authentifcation instead of password, dar/libdar cannot find the private key file</li>
+        <li>if using key authentifcation instead of password, dar/libdar cannot find the public key file</li>
+        <li>libssh2 cannot read the known_hosts (libssh2 is used by
 libcurl which is used in turn by libdar to handle network
-communications. <br>
+communications).</li>
+      </ul>
+For the<span style="font-weight: bold;"> three first cases</span>,&nbsp; you can make use of environment variable to change the default behavior:<br>
+      <div style="margin-left: 40px;"><span style="font-weight: bold;">DAR_SFTP_KNOWNHOSTS_FILE</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">DAR_SFTP_PUBLIC_KEYFILE</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">DAR_SFTP_PRIVATE_KEYFILE</span><br>
+      </div>
       <br>
-If you don't already know what the known_hosts file is used for: <br>
+They respectively default to <br>
+      <div style="margin-left: 40px;">$HOME/.ssh/known_hosts<br>
+$HOME/.ssh/id_rsa.pub<br>
+$HOME/.ssh/id_rsa<br>
+      </div>
+      <br>
+Changing them accordingly to your need is done before running dar from the shell, for example<br>
+if you use sh or bash:<br>
+
+      <br>
+
+      
+      <div style="margin-left: 40px;"><code>export DAR_SFTP_KNOWNHOSTS_FILE=~/.ssh/known_hosts_alternative<br>
+# then use dar as expected<br>
+dar -c sftp://....<br>
+dar -t sftp://...<br>
+      </code></div>
+
+      <br>
+
+if you use csh or tcsh:<br>
+
+      
+      <div style="margin-left: 40px;"><code>setenv DAR_SFTP_KNOWNHOSTS_FILE ~/.ssh/known_hosts_alternative<br>
+# then use dar as expected<br>
+dar -c sftp://...<br>
+dar -t sftp://...<br>
+...<br>
+      </code></div>
+
+      <br>
+
+      For the <span style="font-weight: bold;">last case</span>, the thing is more tricky:<br>
+      <br>First if you don't already know what the known_hosts file is used for: <br>
       </div>
       <div style="margin-left: 80px;">It is used by ssh/sftp to
 validate that the host you connect to is not a pirate host trying to
 put itself between you and the real sftp/ssh server you intend to
 connect to. Usually the first time you connect to an sftp/ssh server
-you need to validate the fingerprint of the key sent by the server
+you need to validate the fingerprint of the key received from the server
 (checking by another mean like phone call to the server's admin, https
 web browsing to the server page, and so on). When you validate the host
-key the first time, this add a new line in known_hosts file in order
+key the first time, this adds a new line in known_hosts file in order
 for ssh/sftp client to automatically check the next time you connect
 that the host is still the correct one.<br>
       </div>
       <div style="margin-left: 40px;"><br>
-The known_host file is usually located your home directory at
-~/.ssh/known_host and looks like this:<br>
+The known_hosts file is usually located in your home directory at
+~/.ssh/known_hosts and looks like this:<br>
       <br>
       </div>
       <div style="margin-left: 80px;"><code>asteroide.lan <span style="font-weight: bold;">ecdsa-sha2-nistp256</span> AAAAE2V...</code><br>
@@ -3546,10 +3590,12 @@ type&gt; &lt;key&gt;. We will focus on the second field.<br>
       <br>
 As of July 2017 libssh2 only supports <span style="font-weight: bold;">ssh-rsa </span>and <span style="font-weight: bold;">ssh-dss</span>
 host key types, the&nbsp; ecdsa-sha2-nistp256 key found in the first
-line will lead libssh2 to fail reading the whole known_host file, which
-in turns will lead dar to abort for security reasons. Even if you want
-to have dar using sftp with 192.168.6.253 which has a ssh-rsa supported
-host key type, the presence of the first line will lead libssh2 to fail.<br>
+line of the sample above will lead libssh2 to fail reading the whole
+known_hosts file, which
+in turns will lead dar to abort for security reasons. Even if you
+intend dar to connect to 192.168.6.253 which has a ssh-rsa supported
+host key type, the presence of the first line will lead libssh2 to fail
+anyway.<br>
       <br>
 Several options are available to workaround that limitation:<br>
       <ol>
@@ -3562,7 +3608,7 @@ variable DAR_SFTP_KNOWNHOSTS_FILE to an empty string. Libdar will then
 not ask libcurl/libssh2 to check for known hosts validity, <span style="font-weight: bold;">BUT</span> <span style="font-weight: bold;">I do not recommend this option!</span> Because it opens the door to man-in-the-middle attacks.<br>
         </li>
         <li>copy the known_host file to ~/.ssh/known_host_for_libssh2
-and remove from it all the lines corresponding to host keys that are
+and remove from this copy all the lines corresponding to host keys that are
 not supported by libssh2, then set the DAR_SFTP_KNOWNHOSTS_FILE
 variable to that new file. This workaround is OK only if the non
 supported host key are not the one you intend to have dar communcating
@@ -3570,27 +3616,9 @@ with...</li>
         <li>replace the the host key of the ssh/sftp server by an
 ssh-rsa one, OK, this will most probably imply you to have root
 permission on the remote ssh/sftp server... which is not possible when
-using public cloud service over Internet...&nbsp;<br>
+using public cloud service over Internet.<br>
         </li>
       </ol>
-How to set DAR_SFTP_KNOWNHOSTS_FILE?<br>
-if you use sh or bash:<br>
-      <br>
-      <div style="margin-left: 40px;"><code>export DAR_SFTP_KNOWNHOSTS_FILE=~/.ssh/known_host_for_libssh2<br>
-# then use dar as expected<br>
-dar -c sftp://....<br>
-dar -t sftp://...<br>
-      </code></div>
-      <br>
-if you use csh or tcsh:<br>
-      <div style="margin-left: 40px;"><code>setenv DAR_SFTP_KNOWNHOSTS_FILE ~/.ssh/known_host_for_libssh2<br>
-# then use dar as expected<br>
-dar -c sftp://...<br>
-dar -t sftp://...<br>
-...<br>
-      </code></div>
-      <br>
-      <br>
       </div>
       <br>
       <span style="font-weight: bold; font-style: italic;"></span></td>
