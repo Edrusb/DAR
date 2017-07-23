@@ -176,11 +176,10 @@ is optional, if not provided it defaults to
 .TP 3
 password
 if login is provided, the associated password may be given after a column (:) but this exposes the secret password to other
-users of the current system having access the table of process (using top, ps, /proc or other ways). If the login is given without
-password, the password will be asked interactively by dar at run time, which is must more secure. An alternative is to rely on ~/.netrc for FTP and also SFTP (!) transfers, for that you need to use the --alter=file-authentication option (see below).
+users of the current system having access the table of process (using top, ps, /proc or other ways). If the login is given without password, the password will be asked interactively by dar at run time, which is much more secure. Alternatives are either to rely on ~/.netrc for FTP and also SFTP (!) transfers for that you need to use the --alter=file-authentication option (see below), or for SFTP only on public key authentication (you can also use --alter=file-authentication in that case to avoid a password being asked interactively). Note that passphrase support for sftp key is not (yet) supported.
 .TP 3
 hostname
-is the name or IP address of the host to connect to. For sftp the server's public key is checked against the ~/.ssh/known_host file (or the file pointed to by then environment variable DAR_SFTP_KNOWNHOST_FILE, see more details about that variable at the bottom of this man page), the host must be known and the public key received from the network must matching the one in that file, else dar aborts. If thus you want to operate with a new sftp server, first use ssh of sftp commands to do the usual fingerprint verifications and update the known_hosts file accordingly then you can run dar/libdar toward this sftp server.
+is the name or IP address of the host to connect to. For sftp the server's public key is checked against the ~/.ssh/known_host file (or the file pointed to by then environment variable DAR_SFTP_KNOWNHOST_FILE, see more details about that variable at the bottom of this man page), the host must be known and the public key received from the network must match the one in that file, else dar aborts. If thus you want to operate with a new sftp server, first use ssh of sftp commands to do the usual fingerprint verifications which updates the known_hosts file accordingly, then run dar/libdar toward this sftp server.
 .TP 3
 port
 if not provided, dar will use the default/standard port in regard to the protocol specified in the "proto" field
@@ -621,7 +620,7 @@ When libdar is compiled against libthreadar, it can make use of several threads.
 When a temporary network error occurs (lack of connectivity, server unavailable, and so on), dar does not give up, it waits some time then retries the failed operation. This option is available to change the default retry time which is 3 seconds. If set to zero, libdar will not wait but rather ask the user whether to retry or abort in case of network error.
 .TP 20
 -afile-auth, --alter=file-authentication
-With this option, When reading or writing an archive to a remote repository, if no password is provided, dar will check the ~/.netrc file for credentials when relying on FTP protocol and also for SFTP protocol (libcurl allows that, which is unusual but somehow useful).
+With this option, When reading or writing an archive to a remote repository when no password is provided, instead of interactively asking for a password dar will first check the ~/.netrc file for credentials when relying on FTP protocol and also for SFTP protocol (libcurl allows that, which is unusual but somehow useful). If no password could be found in ~/.netrc, in second time and for SFTP only, dar will try to connect using public key authentication. Public key authentication is tried without this option, but it is useful here to avoid having password requested interactively.
 .PP
 .B SAVING, ISOLATION AND MERGING SPECIFIC OPTIONS (to use with -c, -C or -+)
 .PP
