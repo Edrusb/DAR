@@ -73,7 +73,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
     const char *home = tools_get_from_env(env, "HOME");
     vector<string> dar_dcf_path = line_tools_explode_PATH(tools_get_from_env(env, "DAR_DCF_PATH"));
     vector<string> dar_duc_path = line_tools_explode_PATH(tools_get_from_env(env, "DAR_DUC_PATH"));
-    string known_host = string(home) + "/.ssh/known_hosts";
+    string sftp_known_hosts = string(home) + "/.ssh/known_hosts";
     string sftp_pub_filekey = string(home) + "/.ssh/id_rsa.pub";
     string sftp_prv_filekey = string(home) + "/.ssh/id_rsa";
     const char *env_knownhosts = tools_get_from_env(env, "DAR_SFTP_KNOWNHOSTS_FILE");
@@ -83,7 +83,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
     if(home == nullptr)
         home = "/";
     if(env_knownhosts != nullptr)
-	known_host = string(env_knownhosts);
+	sftp_known_hosts = string(env_knownhosts);
     if(env_pub_filekey != nullptr)
 	sftp_pub_filekey = string(env_pub_filekey);
     if(env_prv_filekey != nullptr)
@@ -190,7 +190,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 						      param.remote.auth_from_file,
 						      sftp_pub_filekey,
 						      sftp_prv_filekey,
-						      known_host,
+						      sftp_known_hosts,
 						      param.remote.network_retry);
 		if(repo == nullptr)
 		    throw Ememory("little_main");
@@ -207,7 +207,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 							  param.ref_remote.auth_from_file,
 							  sftp_pub_filekey,
 							  sftp_prv_filekey,
-							  known_host,
+							  sftp_known_hosts,
 							  param.ref_remote.network_retry);
 		if(ref_repo == nullptr)
 		    throw Ememory("little_main");
@@ -224,7 +224,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 							  param.aux_remote.auth_from_file,
 							  sftp_pub_filekey,
 							  sftp_prv_filekey,
-							  known_host,
+							  sftp_known_hosts,
 							  param.aux_remote.network_retry);
 		if(aux_repo == nullptr)
 		    throw Ememory("little_main");
