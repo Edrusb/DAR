@@ -502,7 +502,12 @@ namespace libdar
 
 	check_below();
 	if(!read_eof)
-	    x_below->read_ahead(amount);
+	{
+	    U_I avail = read_buffer_size - already_read;
+	    infinint i_avail = avail;
+	    if(i_avail < amount)
+		x_below->read_ahead(amount - i_avail);
+	}
     }
 
 
