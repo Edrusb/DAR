@@ -459,7 +459,7 @@ namespace libdar
 
 	    // checking for user credentials
 
-	if(login.empty())
+	if(real_login.empty())
 	    real_login = "anonymous";
 
 	if(auth_from_file)
