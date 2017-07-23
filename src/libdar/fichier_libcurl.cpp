@@ -116,7 +116,7 @@ namespace libdar
     void fichier_libcurl::change_permission(U_I perm)
     {
 	const char * errmsg = "Error while changing file permission on remote repository";
-	CURLcode err;
+	CURLcode err = CURLE_OK;
 	struct curl_slist *headers = nullptr;
 	string order = tools_printf("site CHMOD %o", perm);
 
