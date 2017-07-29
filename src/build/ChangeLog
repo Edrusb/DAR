@@ -7,6 +7,8 @@ from 2.5.11 to 2.5.12
   missing for it provides the missing filename in the error message
 - improved error message issued when a line of a file listing exceeds
   20479 characters for it display the start of that line
+- fixed bug in file listing (-[ option) leading some directories and their
+  content to be excluded in a somehow rare condition
 
 from 2.5.10 to 2.5.11
 - minor feature: displays the archive header which is never ciphered and

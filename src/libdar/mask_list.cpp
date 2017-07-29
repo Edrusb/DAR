@@ -259,6 +259,8 @@ namespace libdar
                 else
                     max = tmp;
         }
+	if(min == 0 && modified_lexicalorder_a_lessthan_b(target, contenu[min]))
+	    max = min;
 
         ret = contenu[max] == target || contenu[min] == target;
         if(including && !ret) // if including files, we must also include directories leading to a listed file
