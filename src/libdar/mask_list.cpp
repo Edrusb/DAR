@@ -138,9 +138,9 @@ namespace libdar
 				    else
 					throw SRC_BUG;
 				}
-				else // reached end of buffer without having found an end of string
+				else // reached end of buffer
 				{
-				    if(lu == buf_size)
+				    if(lu == buf_size && beg == buffer)
 				    {
 					buffer[buf_size - 1] = '\0';
 					throw Erange("mask_list::mask_list",
