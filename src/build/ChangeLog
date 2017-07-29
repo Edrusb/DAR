@@ -3,6 +3,8 @@ from 2.5.11 to 2.5.12
   the maximum line length that could be used in a listing file. This
   limitation was only described in doc/Limitations.html
 - dar now aborts if a line exceeding 20479 bytes is met in a listing file
+- improved error message issued when a file listing (-[ or -] option) is
+  missing for it provides the missing filename in the error message
 
 from 2.5.10 to 2.5.11
 - minor feature: displays the archive header which is never ciphered and
