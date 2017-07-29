@@ -141,10 +141,14 @@ namespace libdar
 				else // reached end of buffer without having found an end of string
 				{
 				    if(lu == buf_size)
+				    {
+					buffer[buf_size - 1] = '\0';
 					throw Erange("mask_list::mask_list",
-						     tools_printf(gettext("line exceeding the maximum of %d characters in listing file %S, aborting"),
+						     tools_printf(gettext("line exceeding the maximum of %d characters in listing file %S, aborting. Concerned line starts with: %s"),
 								  buf_size - 1,
-								  &filename_list_st));
+								  &filename_list_st,
+								  buffer));
+				    }
 				    buffer[lu] = '\0';
 				    if(!case_s)
 					tools_to_upper(beg, str_beg);
