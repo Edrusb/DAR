@@ -19,8 +19,8 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-#ifndef MYCURL_EASYHANDLE_SHARING_HPP
-#define MYCURL_EASYHANDLE_SHARING_HPP
+#ifndef MYCURL_EASYHANDLE_NODE_HPP
+#define MYCURL_EASYHANDLE_NODE_HPP
 
 #include "../my_config.h"
 
@@ -35,7 +35,6 @@ extern "C"
 
 #include <string>
 #include "erreurs.hpp"
-#include "mycurl_shared_handle.hpp"
 
 namespace libdar
 {
@@ -44,33 +43,35 @@ namespace libdar
 
 #if LIBCURL_AVAILABLE
 
-	/// manage libcurl easy_handle and its duplications
 
-    class mycurl_easyhandle_sharing
+	/// structure managing libcurl CURL* easy_handle
+
+    class mycurl_easyhandle_node
     {
     public:
-	mycurl_easyhandle_sharing() {};
-	mycurl_easyhandle_sharing(const mycurl_easyhandle_sharing & ref): root(ref.root) { clone_table.clear(); };
-	    // assignement operator made privater and forbidden
-	    // default destructor OK
+	    /// create a new easyhandle
+	mycurl_easyhandle_node();
 
-	CURL *get_root_handle() const { return root.get_handle(); };
+	    /// copy constructor
+	mycurl_easyhandle_node(const mycurl_easyhandle_node & ref);
 
-	mycurl_shared_handle alloc_instance() const;
+	    /// move constructor
+	mycurl_easyhandle_node(mycurl_easyhandle_node && ref);
+
+	    /// assignment operator (no move assigment operator)
+	const mycurl_easyhandle_node & operator = (const mycurl_easyhandle_node & ref) = delete;
+
+	    /// destructor
+	~mycurl_easyhandle_node() { if(handle != nullptr) curl_easy_cleanup(handle); };
+
+	void set_used_mode(bool mode) { used = mode; };
+	bool get_used_mode() const { return used; };
+
+	CURL *get_handle() const { return handle; };
 
     private:
-	mycurl_easyhandle_node root;
-	std::list<smart_pointer<mycurl_easyhandle_node> > clone_table;
-
-	const mycurl_easyhandle_sharing & operator = (const mycurl_easyhandle_sharing & ref) { throw SRC_BUG; };
-    };
-
-#else
-
-    class mycurl_easyhandle_sharing
-    {
-    public:
-	mycurl_easyhandle_sharing() { throw Ecompilation("remote repository"); };
+	CURL *handle;
+	bool used;
     };
 
 #endif

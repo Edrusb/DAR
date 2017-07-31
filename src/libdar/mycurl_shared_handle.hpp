@@ -19,23 +19,19 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-#ifndef MYCURL_EASYHANDLE_SHARING_HPP
-#define MYCURL_EASYHANDLE_SHARING_HPP
+#ifndef MYCURL_SHARED_HANDLE_HPP
+#define MYCURL_SHARED_HANDLE_HPP
 
 #include "../my_config.h"
 
 extern "C"
 {
-#if LIBCURL_AVAILABLE
-#if HAVE_CURL_CURL_H
-#include <curl/curl.h>
-#endif
-#endif
 } // end extern "C"
 
 #include <string>
 #include "erreurs.hpp"
-#include "mycurl_shared_handle.hpp"
+#include "smart_pointer.hpp"
+#include "mycurl_easyhandle_node.hpp"
 
 namespace libdar
 {
@@ -44,33 +40,40 @@ namespace libdar
 
 #if LIBCURL_AVAILABLE
 
-	/// manage libcurl easy_handle and its duplications
 
-    class mycurl_easyhandle_sharing
+	/// structure returned to fichier_libcurl by entrepot_libcurl for libcurl easyhandle access
+	///
+	/// structure used to share an easyhandle between a fichier_libcurl and entrepot_libcurl
+	/// in order to recycle it instead of duphandle it at new fichier_libcurl creation
+	/// \note once created a mycurl_shared_handle can only be moved, never copied nor duplicated
+
+    class mycurl_shared_handle
     {
     public:
-	mycurl_easyhandle_sharing() {};
-	mycurl_easyhandle_sharing(const mycurl_easyhandle_sharing & ref): root(ref.root) { clone_table.clear(); };
-	    // assignement operator made privater and forbidden
-	    // default destructor OK
+	    // constructor
+	mycurl_shared_handle(const smart_pointer<mycurl_easyhandle_node> & node);
 
-	CURL *get_root_handle() const { return root.get_handle(); };
+	    // no copy constructor
+	mycurl_shared_handle(const mycurl_shared_handle & ref) = delete;
 
-	mycurl_shared_handle alloc_instance() const;
+	    // only a move constructor
+	mycurl_shared_handle(mycurl_shared_handle && arg);
+
+	    // no assignment operator
+	const mycurl_shared_handle & operator = (const mycurl_shared_handle & ref) = delete;
+
+	    // only move assignment one
+	const mycurl_shared_handle & operator = (mycurl_shared_handle && arg);
+
+	    // destructor
+	~mycurl_shared_handle() { if(!ref.is_null()) ref->set_used_mode(false); };
+
+	    // get access to the managed CURL easy handle
+	CURL *get_handle() const { return ref->get_handle(); };
 
     private:
-	mycurl_easyhandle_node root;
-	std::list<smart_pointer<mycurl_easyhandle_node> > clone_table;
+	smart_pointer<mycurl_easyhandle_node> ref;
 
-	const mycurl_easyhandle_sharing & operator = (const mycurl_easyhandle_sharing & ref) { throw SRC_BUG; };
-    };
-
-#else
-
-    class mycurl_easyhandle_sharing
-    {
-    public:
-	mycurl_easyhandle_sharing() { throw Ecompilation("remote repository"); };
     };
 
 #endif

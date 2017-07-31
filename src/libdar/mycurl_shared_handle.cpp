@@ -24,7 +24,7 @@
 
 #include "../my_config.h"
 
-#include "mycurl_easyhandle_sharing.hpp"
+#include "mycurl_shared_handle.hpp"
 
 using namespace std;
 
@@ -32,23 +32,28 @@ namespace libdar
 {
 #if LIBCURL_AVAILABLE
 
-    mycurl_shared_handle mycurl_easyhandle_sharing::alloc_instance() const
+    mycurl_shared_handle::mycurl_shared_handle(const smart_pointer<mycurl_easyhandle_node> & node) : ref(node)
     {
-	std::list<smart_pointer<mycurl_easyhandle_node> >::const_iterator it = clone_table.begin();
+	if(node.is_null())
+	    throw SRC_BUG;
+	if(node->get_used_mode())
+	    throw SRC_BUG;
+	ref->set_used_mode(true);
+    }
 
-	while(it != clone_table.end() && (*it)->get_used_mode())
-	    ++it;
+    mycurl_shared_handle::mycurl_shared_handle(mycurl_shared_handle && arg)
+    {
+	ref = std::move(arg.ref);
+	if(!arg.ref.is_null())
+	    throw SRC_BUG;
+    }
 
-	if(it != clone_table.end())
-	    return mycurl_shared_handle(*it);
-	else // need to create a new clone in the clone_table
-	{
-	    smart_pointer<mycurl_easyhandle_node> ptr = new (nothrow) mycurl_easyhandle_node(root);
-	    if(ptr.is_null())
-		throw Ememory("mycurl_easyhandle_sharing::alloc_instance");
-	    const_cast<mycurl_easyhandle_sharing *>(this)->clone_table.push_back(ptr);
-	    return mycurl_shared_handle(ptr);
-	}
+    const mycurl_shared_handle & mycurl_shared_handle::operator = (mycurl_shared_handle && arg)
+    {
+	ref = std::move(arg.ref);
+	if(!arg.ref.is_null())
+	    throw SRC_BUG;
+	return *this;
     }
 
 #endif

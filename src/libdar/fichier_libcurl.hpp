@@ -66,15 +66,15 @@ namespace libdar
     public:
 
 	    /// constructor
-	fichier_libcurl(user_interaction & dialog,    //< for user interaction requested by fichier_global
-			const std::string & chemin,   //< full path of the file to open
-			mycurl_protocol proto,        //< to workaround some libcurl strange behavior for some protocols
-			shared_handle && handle,      //< the easy handle wrapper object
-			gf_mode m,                    //< open mode
-			U_I waiting,                  //< retry timeout in case of network error
-			bool force_permission,        //< whether file permission should be modified
-			U_I permission,               //< file permission to enforce if force_permission is set
-			bool erase);                  //< whether to erase the file before writing to it
+	fichier_libcurl(user_interaction & dialog,      //< for user interaction requested by fichier_global
+			const std::string & chemin,     //< full path of the file to open
+			mycurl_protocol proto,          //< to workaround some libcurl strange behavior for some protocols
+			mycurl_shared_handle && handle, //< the easy handle wrapper object
+			gf_mode m,                      //< open mode
+			U_I waiting,                    //< retry timeout in case of network error
+			bool force_permission,          //< whether file permission should be modified
+			U_I permission,                 //< file permission to enforce if force_permission is set
+			bool erase);                    //< whether to erase the file before writing to it
 
 	    // no copy constructor available
 	    // because we inherit from libthreadar::thread that has not copy constructor
@@ -144,7 +144,7 @@ namespace libdar
 
 	bool end_data_mode;               //< true if subthread has been requested to end
 	bool sub_is_dying;                //< is set by subthread when about to end
-	shared_handle ehandle;            //< easy handle (wrapped in C++ object) that we modify when necessary
+	mycurl_shared_handle ehandle;     //< easy handle (wrapped in C++ object) that we modify when necessary
 	bool metadatamode;                //< wether we are acting on metadata rather than file's data
 	infinint current_offset;          //< current offset we are reading / writing at
 	bool has_maxpos;                  //< true if maxpos is set

@@ -24,7 +24,7 @@
 
 #include "../my_config.h"
 
-#include "mycurl_easyhandle_sharing.hpp"
+#include "mycurl_easyhandle_node.hpp"
 
 using namespace std;
 
@@ -32,23 +32,34 @@ namespace libdar
 {
 #if LIBCURL_AVAILABLE
 
-    mycurl_shared_handle mycurl_easyhandle_sharing::alloc_instance() const
+
+    mycurl_easyhandle_node::mycurl_easyhandle_node()
     {
-	std::list<smart_pointer<mycurl_easyhandle_node> >::const_iterator it = clone_table.begin();
+	handle = curl_easy_init();
+	if(handle == nullptr)
+	    throw Erange("mycurl_easyhandle_node::mycurl_easyhandle_node",
+			 gettext("Error met while creating a libcurl handle"));
+	used = false;
+    }
 
-	while(it != clone_table.end() && (*it)->get_used_mode())
-	    ++it;
+    mycurl_easyhandle_node::mycurl_easyhandle_node(const mycurl_easyhandle_node & ref)
+    {
+	if(ref.handle == nullptr)
+	    throw SRC_BUG;
 
-	if(it != clone_table.end())
-	    return mycurl_shared_handle(*it);
-	else // need to create a new clone in the clone_table
-	{
-	    smart_pointer<mycurl_easyhandle_node> ptr = new (nothrow) mycurl_easyhandle_node(root);
-	    if(ptr.is_null())
-		throw Ememory("mycurl_easyhandle_sharing::alloc_instance");
-	    const_cast<mycurl_easyhandle_sharing *>(this)->clone_table.push_back(ptr);
-	    return mycurl_shared_handle(ptr);
-	}
+	handle = curl_easy_duphandle(ref.handle);
+	if(handle == nullptr)
+	    throw Erange("mycurl_easyhandle_node::mycurl_easyhandle_node",
+			 gettext("Error met while duplicating libcurl handle"));
+	used = false;
+    }
+
+    mycurl_easyhandle_node::mycurl_easyhandle_node(mycurl_easyhandle_node && ref)
+    {
+	handle = ref.handle;
+	used = ref.used;
+	ref.handle = nullptr;
+	ref.used = false;
     }
 
 #endif

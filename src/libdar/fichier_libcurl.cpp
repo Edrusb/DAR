@@ -42,7 +42,7 @@ namespace libdar
     fichier_libcurl::fichier_libcurl(user_interaction & dialog,
 				     const std::string & chemin,
 				     mycurl_protocol proto,
-				     shared_handle && handle,
+				     mycurl_shared_handle && handle,
 				     gf_mode m,
 				     U_I waiting,
 				     bool force_permission,
