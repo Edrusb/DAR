@@ -44,6 +44,8 @@ namespace libdar
     public:
 	    /// \note the given pointed to object passes under the responsibility of the smart_node
 	smart_node(T *arg): ptr(arg), count_ref(0) { if(arg == nullptr) throw SRC_BUG; };
+	smart_node(const smart_node & ref) = delete;
+	const smart_node & operator = (const smart_node & ref) = delete;
 	~smart_node() { if(ptr != nullptr) delete ptr; if(!count_ref.is_zero()) throw SRC_BUG; };
 
 	void add_ref() { ++count_ref; };
@@ -54,8 +56,6 @@ namespace libdar
 	T *ptr;
 	infinint count_ref;
 
-	smart_node(const smart_node & ref) { throw SRC_BUG; };
-	const smart_node & operator = (const smart_node & ref) { throw SRC_BUG; };
     };
 
 
@@ -95,6 +95,9 @@ namespace libdar
 	    /// copy constructor
 	smart_pointer(const smart_pointer & ref) { ptr = ref.ptr; if(ptr != nullptr) ptr->add_ref(); };
 
+	    /// move constructor
+	smart_pointer(smart_pointer && ref) { ptr = ref.ptr; ref.ptr = nullptr; };
+
 	    /// destructor
 	~smart_pointer() { if(ptr != nullptr) ptr->del_ref(); };
 
@@ -116,6 +119,18 @@ namespace libdar
 		    ptr = nullptr;
 		}
 	    }
+	    return *this;
+	};
+
+	    /// move assignment operator
+	const smart_pointer & operator = (smart_pointer && ref)
+	{
+	    if(ptr != nullptr)
+		ptr->del_ref();
+
+	    ptr = ref.ptr;
+	    ref.ptr = nullptr;
+
 	    return *this;
 	};
 
