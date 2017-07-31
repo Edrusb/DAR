@@ -610,6 +610,24 @@ GO "H1-B" 0 $ROUTINE_DEBUG $DAR -N -t $xformed3 -B $OPT
 fi
 fi
 
+#
+# G1 - SFTP repository
+#
+GO "G1-1" 0 $ROUTINE_DEBUG $DAR -N -c $DAR_SFTP_REPO/$full -R $src "-@" $catf_fly -B $OPT
+scp $DAR_SFTP_REPO/$full.*.dar* .
+GO "G1-2" 0 $ROUTINE_DEBUG check_hash $hash $full.*.dar
+GO "G1-3" 0 $ROUTINE_DEBUG $DAR -N -l $DAR_SFTP_REPO$full -B $OPT
+GO "G1-4" 0 $ROUTINE_DEBUG $DAR -N -t $DAR_SFTP_REPO$full -B $OPT
+
+#
+# G2 - FTP repository
+#
+
+GO "G1-1" 0 $ROUTINE_DEBUG $DAR -N -c $DAR_FTP_REPO/$full -R $src "-@" $catf_fly -B $OPT
+wget $DAR_SFTP_REPO/$full.*.dar*
+GO "G1-2" 0 $ROUTINE_DEBUG check_hash $hash $full.*.dar
+GO "G1-3" 0 $ROUTINE_DEBUG $DAR -N -l $DAR_FTP_REPO$full -B $OPT
+GO "G1-4" 0 $ROUTINE_DEBUG $DAR -N -t $DAR_FTP_REPO$full -B $OPT
 
 ###
 # final cleanup

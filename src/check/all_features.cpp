@@ -26,7 +26,7 @@
 using namespace libdar;
 using namespace std;
 
-///////////////
+    ///////////////
     // strange() is an unused function that invokes three symbols defined in <libintl.h>
     // without this trick for some reason I still cannot understand, the linking fails on Cygwin
     // having libdar missing _libintl_bindtextdomain symbols to link with.
@@ -121,7 +121,13 @@ int main()
 	if(!compile_time::librsync())
 	{
 	    cerr << "MISSING LIBRSYNC SUPPORT TO BE ABLE TO PERFORM ALL TESTS, ABORTING" << endl;
-	    throw Efeature("public key encryption");
+	    throw Efeature("librsync");
+	}
+
+	if(!compile_time::remote_repository())
+	{
+	    cerr << "MISSING LIBCURL SUPPORT TO BE ABLE TO PERFORM ALL TESTS, ABORTING" << endl;
+	    throw Efeature("libcurl");
 	}
     }
     catch(...)

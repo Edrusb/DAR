@@ -59,21 +59,30 @@ if [ `id -u` -ne 0 ]; then
 fi
 
 if [ -z "$DAR_KEY" ] ; then
-  echo "You need to set the environmental varialble"
-  echo "DAR_KEY to an email for which you have public"
-  echo "and private key available for encryption and"
-  echo "signature."
-  echo "You can use the GNUPGHOME variable to"
-  echo "point to another keyring than ~root/.gnupg"
-  echo ""
-  echo "Example of use with bash:"
-  echo "export DAR_KEY=your.email@your.domain"
-  echo "export GNUPGHOME=~me/.gnupg"
-  echo ""
-  echo "Example of use with tcsh:"
-  echo "setenv DAR_KEY your.email@your.domain"
-  echo "setenv GNUPGHOME ~me/.gnupg"
+    echo "You need to set the environmental variable"
+    echo "DAR_KEY to an email for which you have public"
+    echo "and private key available for encryption and"
+    echo "signature."
+    echo "You can use the GNUPGHOME variable to"
+    echo "point to another keyring than ~root/.gnupg"
+    echo ""
+    echo "Example of use with bash:"
+    echo "export DAR_KEY=your.email@your.domain"
+    echo "export GNUPGHOME=~me/.gnupg"
+    echo ""
+    echo "Example of use with tcsh:"
+    echo "setenv DAR_KEY your.email@your.domain"
+    echo "setenv GNUPGHOME ~me/.gnupg"
   exit 3
+fi
+
+if [ -z "$DAR_SFTP_REPO" -o -z "$DAR_FTP_REPO" ] ; then
+    echo "You need to set the environment variables"
+    echo "DAR_SFTP_REPO and DAR_FTP_REPO with an URL where"
+    echo "to upload and download file using SFTP and FTP"
+    echo "respectively, for example sftp://login:pass@host/some/path"
+    echo "and ftp://login:pass@host/some/path respectively"
+    exit 3
 fi
 
 if ./all_features ; then
@@ -88,4 +97,6 @@ cat > "$1" <<EOF
 export DAR="$DAR"
 export DAR_SLAVE="$DAR_SLAVE"
 export DAR_XFORM="$DAR_XFORM"
+export DAR_SFTP_REPO="$DAR_SFTP_REPO"
+export DAR_FTP_REPO="$DAR_FTP_REPO"
 EOF
