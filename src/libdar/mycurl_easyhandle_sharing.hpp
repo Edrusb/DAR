@@ -88,15 +88,17 @@ namespace libdar
 		throw SRC_BUG;
 	    ref->set_used_mode(true);
 	}
-	    // default copy constructor is allowed
-	~shared_handle() { ref->set_used_mode(false); };
+	shared_handle(const shared_handle & ref) = delete;
+	shared_handle(shared_handle && arg) { ref = arg.ref; arg.ref = nullptr; };
+	const shared_handle & operator = (const shared_handle & ref) = delete;
+	const shared_handle & operator = (shared_handle && arg) { ref = arg.ref; arg.ref = nullptr; return *this; };
+	~shared_handle() { if(!ref.is_null()) ref->set_used_mode(false); };
 
 	CURL *get_handle() const { return ref->get_handle(); };
 
     private:
 	smart_pointer<mycurl_easyhandle_node> ref;
 
-	const shared_handle & operator = (const shared_handle & re) { throw SRC_BUG; };
     };
 
 
