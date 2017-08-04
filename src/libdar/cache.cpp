@@ -190,7 +190,8 @@ namespace libdar
 	    ret = ref->skip_to_eof();
 	    eof_offset = ref->get_position();
 	}
-	skip(eof_offset);
+	else
+	    ret = skip(eof_offset);
 
 	return ret;
     }
