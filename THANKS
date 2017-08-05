@@ -3,6 +3,12 @@ version 2.6.0
 Many Thanks Gulikoza who helped troubleshooting around the poorly
 documented librsync library.
 
+version 2.5.12
+--------------
+Thanks once again to Andrew Loftus for help sovling a complex bug and
+difficult to reproduce. Thanks to Ron Lockwood-Childs for investigations,
+feedback and suggestion about dar behavior with negative dates.
+
 version 2.5.11
 --------------
 Thanks to dcb314 at sourceforge for bug report. Thanks to Jer Fort for bug

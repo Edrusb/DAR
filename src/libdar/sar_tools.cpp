@@ -136,7 +136,14 @@ namespace libdar
         bool somme = false;
 	string entry;
 
-	entr.read_dir_reset();
+	try
+	{
+	    entr.read_dir_reset();
+	}
+	catch(Erange & e)
+	{
+	    return false;
+	}
 
 	ret = 0;
 	somme = false;
