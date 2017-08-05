@@ -11,6 +11,11 @@ from 2.5.11 to 2.5.12
   content to be excluded in a somehow rare condition
 - improved behavior when dar reads a negative date. Instead of aborting
   it now asks the user if it can substitue such value by zero
+- improved behavior when dar is asked to read an archive located in a
+  directory that does not exist. DUC file passed to -E option is now
+  properly run in that case too and has the possibility for example to
+  create that directory and download requested file
+
 
 from 2.5.10 to 2.5.11
 - minor feature: displays the archive header which is never ciphered and
