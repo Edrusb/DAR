@@ -1,3 +1,22 @@
+from 2.5.11 to 2.5.12
+- documenting in man page the limitation of -[ and -] options concerning
+  the maximum line length that could be used in a listing file. This
+  limitation was only described in doc/Limitations.html
+- dar now aborts if a line exceeding 20479 bytes is met in a listing file
+- improved error message issued when a file listing (-[ or -] option) is
+  missing for it provides the missing filename in the error message
+- improved error message issued when a line of a file listing exceeds
+  20479 characters for it display the start of that line
+- fixed bug in file listing (-[ option) leading some directories and their
+  content to be excluded in a somehow rare condition
+- improved behavior when dar reads a negative date. Instead of aborting
+  it now asks the user if it can substitue such value by zero
+- improved behavior when dar is asked to read an archive located in a
+  directory that does not exist. DUC file passed to -E option is now
+  properly run in that case too and has the possibility for example to
+  create that directory and download requested file
+
+
 from 2.5.10 to 2.5.11
 - minor feature: displays the archive header which is never ciphered and
   aborts. This feature is activated while listing archive content and
