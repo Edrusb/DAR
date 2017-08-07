@@ -193,6 +193,18 @@ namespace libdar
 	else
 	    ret = skip(eof_offset);
 
+	if(buffer_offset + last < eof_offset)
+	{
+	    buffer_offset = eof_offset;
+	    clear_buffer();
+	}
+	else
+	{
+	    next = last;
+	    if(buffer_offset + last > eof_offset)
+		throw SRC_BUG;
+	}
+
 	return ret;
     }
 
