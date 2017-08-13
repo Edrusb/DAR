@@ -13,6 +13,11 @@ if [ "$OPT" = "" ]; then
    exit 2
 fi
 
+if [ -z "$OPT_NOSEQ" ] ; then
+    echo '$OPT_NOSEQ not set'
+    exit 2
+fi
+
 if [ "$DAR" = "" ]; then
    echo '$DAR not set'
    exit 2
@@ -132,6 +137,7 @@ function GO {
     else
 	if [ "$piped" != "yes" ] ; then
 	    echo "--- debug -----"
+	    echo $*
 	    $*
 	else
 	    $* 2> /dev/null
@@ -398,7 +404,7 @@ fi
 #
 if echo $* | grep "D1" > /dev/null ; then
 ../modif_tree.sh "$src" "U"
-GO "D1-1" 0 $ROUTINE_DEBUG $DAR -N -c $diff -R $src -A $full "-@" $catd_fly  -B $OPT
+GO "D1-1" 0 $ROUTINE_DEBUG $DAR -N -c $diff -R $src -A $full "-@" $catd_fly  -B $OPT_NOSEQ
 GO "D1-2" 0 $ROUTINE_DEBUG check_hash $hash $diff.*.dar
 GO "D1-3" 0 $ROUTINE_DEBUG $DAR -N -l $diff -B $OPT
 GO "D1-4" 0 $ROUTINE_DEBUG $DAR -N -t $diff -B $OPT
@@ -416,7 +422,7 @@ fi
 #  D2 -    operation with differential backup using delta signature
 #
 if echo $* | grep "D2" > /dev/null ; then
-GO "D2-1" 0 $ROUTINE_DEBUG $DAR -N -c $diff_delta -R $src -A $full_delta -B $OPT
+GO "D2-1" 0 $ROUTINE_DEBUG $DAR -N -c $diff_delta -R $src -A $full_delta -B $OPT_NOSEQ
 GO "D2-2" 0 $ROUTINE_DEBUG check_hash $hash $diff_delta.*.dar
 GO "D2-3" 0 $ROUTINE_DEBUG $DAR -N -l $diff_delta -B $OPT
 GO "D2-4" 0 $ROUTINE_DEBUG $DAR -N -t $diff_delta -B $OPT
@@ -433,7 +439,7 @@ fi
 #
 
 if echo $* | grep "D3" > /dev/null ; then
-GO "D3-1" 0 $ROUTINE_DEBUG $DAR -N -c $diff_delta2 -R $src -A $catf_delta -B $OPT --delta sig --delta-sig-min-size 1
+GO "D3-1" 0 $ROUTINE_DEBUG $DAR -N -c $diff_delta2 -R $src -A $catf_delta -B $OPT_NOSEQ --delta sig --delta-sig-min-size 1
 GO "D3-2" 0 $ROUTINE_DEBUG check_hash $hash $diff_delta2.*.dar
 GO "D3-3" 0 $ROUTINE_DEBUG $DAR -N -l $diff_delta2 -B $OPT
 GO "D3-4" 0 $ROUTINE_DEBUG $DAR -N -t $diff_delta2 -B $OPT
@@ -611,23 +617,21 @@ fi
 fi
 
 #
-# G1 - SFTP repository
+# I1 - SFTP repository
 #
-GO "G1-1" 0 $ROUTINE_DEBUG $DAR -N -c $DAR_SFTP_REPO/$full -R $src "-@" $catf_fly -B $OPT
-scp $DAR_SFTP_REPO/$full.*.dar* .
-GO "G1-2" 0 $ROUTINE_DEBUG check_hash $hash $full.*.dar
-GO "G1-3" 0 $ROUTINE_DEBUG $DAR -N -l $DAR_SFTP_REPO$full -B $OPT
-GO "G1-4" 0 $ROUTINE_DEBUG $DAR -N -t $DAR_SFTP_REPO$full -B $OPT
+GO "I1-1" 0 $ROUTINE_DEBUG $DAR -N -w -c $DAR_SFTP_REPO/$prefix$full -R $src "-@" $prefix$catf_fly -B $OPT
+GO "I1-2" 0 $ROUTINE_DEBUG $DAR -N -l $DAR_SFTP_REPO/$prefix$full -B $OPT
+GO "I1-3" 0 $ROUTINE_DEBUG $DAR -N -t $DAR_SFTP_REPO/$prefix$full -B $OPT
+../sftp_mdelete "$DAR_SFTP_REPO" "$prefix*" &
 
 #
-# G2 - FTP repository
+# I2 - FTP repository
 #
 
-GO "G1-1" 0 $ROUTINE_DEBUG $DAR -N -c $DAR_FTP_REPO/$full -R $src "-@" $catf_fly -B $OPT
-wget $DAR_SFTP_REPO/$full.*.dar*
-GO "G1-2" 0 $ROUTINE_DEBUG check_hash $hash $full.*.dar
-GO "G1-3" 0 $ROUTINE_DEBUG $DAR -N -l $DAR_FTP_REPO$full -B $OPT
-GO "G1-4" 0 $ROUTINE_DEBUG $DAR -N -t $DAR_FTP_REPO$full -B $OPT
+GO "I2-1" 0 $ROUTINE_DEBUG $DAR -N -w -c $DAR_FTP_REPO/$prefix$full -R $src "-@" $prefix$catf_fly -B $OPT
+GO "I2-2" 0 $ROUTINE_DEBUG $DAR -N -l $DAR_FTP_REPO/$prefix$full -B $OPT
+GO "I2-3" 0 $ROUTINE_DEBUG $DAR -N -t $DAR_FTP_REPO/$prefix$full -B $OPT
+../ftp_mdelete "$DAR_FTP_REPO" "$prefix*" &
 
 ###
 # final cleanup

@@ -9,6 +9,8 @@ for archive in Old_format/* ; do
   fi
 done
 
+echo "exit" | expect || exit 1
+
 TMP_FILE=my_tmpfile
 MY_MAKEFILE=my_makefile
 

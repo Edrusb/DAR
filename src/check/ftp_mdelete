@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ -z "$1" -o -z "$2" ] ; then
+  echo "usage: $0 <FTP URL> <pattern>"
+  echo "will remove pattern in the directory pointed to by the URL"
+  exit 1
+fi
+
+script="_$2"
+echo "script = $script"
+
+echo "$1" | sed -r -n -e 's#^ftp://([^:@/]+):([^:@/]+)@([^:@/]+)(.*)$#ftp -n<<EOF\nopen \3\nuser \1 \2\npassive\nprompt\ncd \4\n#p' > "$script"
+
+echo "mdelete $2" >> "$script"
+echo "EOF" >> "$script"
+
+source "$script"
+rm "$script"
+

@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [ -z "$1" -o -z "$2" ] ; then
+  echo "usage: $0 <SFTP URL> <pattern>"
+  echo "will remove pattern in the directory pointed to by the URL"
+  exit 1
+fi
+
+script="=$2"
+echo "script = $script"
+
+echo "$1" | sed -r -n -e 's#^sftp://([^:@/]+):([^:@/]+)@([^:@/]+)(.*)$#spawn sftp \1@\3\nexpect "*password:"\nsend "\2\\n"\nexpect "sftp>"\nsend \"cd \4\\n"#p' > "$script"
+echo "expect 'sftp>'" >> "$script"
+echo "send \"rm $2\\n\"" >> "$script"
+echo "expect 'sftp>'" >> "$script"
+echo "send \"exit\\n\"" >> "$script"
+cat "$script"
+
+expect -f "$script"
+rm "$script"
+

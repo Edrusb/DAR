@@ -39,6 +39,7 @@ asym="${14}"
 
 ALL_TESTS="A1 A2 A3 B1 B2 B3 B4 C1 C2 C3 C4 D1 D2 D3 E1 E2 E3 F1 F2 F3 F4 F5 G1 G2 G3 H1"
 
+export prefix
 prefix_dir="$prefix.dir"
 
 if [ -e "$prefix_dir" ] ; then
@@ -55,6 +56,34 @@ printf "TEST SET: $ALL_TESTS\n" >> "$LOG"
 printf " ----------------------------------------------------------------\n" >> "$LOG"
 
 export OPT=tmp.file
+export OPT_NOSEQ=tmp_noseq.file
+
+if [ -z "$DAR_KEY" ] ; then
+    echo "*****************"
+    echo ""
+    echo "DAR_KEY not set"
+    echo ""
+    echo "*****************"
+    exit 1
+fi
+
+if [ -z "$DAR_FTP_REPO" ] ; then
+    echo "*****************"
+    echo ""
+    echo "DAR_FTP_REPO not set"
+    echo ""
+    echo "*****************"
+    exit 1
+fi
+
+if [ -z "$DAR_SFTP_REPO" ] ; then
+    echo "*****************"
+    echo ""
+    echo "DAR_SFTP_REPO not set"
+    echo ""
+    echo "*****************"
+    exit 1
+fi
 
 if [ "$crypto" != "none" ]; then
   if [ "$asym" != "y" ]; then
@@ -214,6 +243,8 @@ testing:
 diffing:
 
 EOF
+
+grep -v -- "--sequential-read" $OPT > $OPT_NOSEQ
 
 if ../routine.sh $ALL_TESTS 1>> "$LOG" 2> log.err ; then
   cd ..

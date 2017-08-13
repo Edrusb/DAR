@@ -82,6 +82,11 @@ if [ -z "$DAR_SFTP_REPO" -o -z "$DAR_FTP_REPO" ] ; then
     echo "to upload and download file using SFTP and FTP"
     echo "respectively, for example sftp://login:pass@host/some/path"
     echo "and ftp://login:pass@host/some/path respectively"
+    echo ""
+    echo "Dar will need a properly set known_hosts file, you"
+    echo "can make dar using a different file than ~/.ssh/known_hosts"
+    echo "by setting the environment variable DAR_SFTP_KNOWNHOSTS_FILE"
+    echo ""
     exit 3
 fi
 

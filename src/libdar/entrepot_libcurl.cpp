@@ -147,7 +147,7 @@ namespace libdar
 		    fichier_libcurl_check_wait_or_throw(get_ui(),
 							err,
 							wait_delay,
-							tools_printf(gettext("Error met while listing FTP directory %s"),
+							tools_printf(gettext("Error met while listing FTP/SFTP directory %s"),
 								     get_url().c_str()));
 		}
 		while(err != CURLE_OK);
