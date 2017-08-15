@@ -619,20 +619,22 @@ fi
 #
 # I1 - SFTP repository
 #
+if echo $* | grep "I1" > /dev/null ; then
 GO "I1-1" 0 $ROUTINE_DEBUG $DAR -N -w -c $DAR_SFTP_REPO/$prefix$full -R $src "-@" $prefix$catf_fly -B $OPT
 GO "I1-2" 0 $ROUTINE_DEBUG $DAR -N -l $DAR_SFTP_REPO/$prefix$full -B $OPT
 GO "I1-3" 0 $ROUTINE_DEBUG $DAR -N -t $DAR_SFTP_REPO/$prefix$full -B $OPT
-../sftp_mdelete "$DAR_SFTP_REPO" "$prefix*" &
+../sftp_mdelete "$DAR_SFTP_REPO" "$prefix*"
+fi
 
 #
 # I2 - FTP repository
 #
-
+if echo $* | grep "I1" > /dev/null ; then
 GO "I2-1" 0 $ROUTINE_DEBUG $DAR -N -w -c $DAR_FTP_REPO/$prefix$full -R $src "-@" $prefix$catf_fly -B $OPT
 GO "I2-2" 0 $ROUTINE_DEBUG $DAR -N -l $DAR_FTP_REPO/$prefix$full -B $OPT
 GO "I2-3" 0 $ROUTINE_DEBUG $DAR -N -t $DAR_FTP_REPO/$prefix$full -B $OPT
-../ftp_mdelete "$DAR_FTP_REPO" "$prefix*" &
-
+../ftp_mdelete "$DAR_FTP_REPO" "$prefix*"
+fi
 ###
 # final cleanup
 #
