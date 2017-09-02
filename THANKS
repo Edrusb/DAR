@@ -5,7 +5,7 @@ documented librsync library.
 
 version 2.5.12
 --------------
-Thanks once again to Andrew Loftus for help sovling a complex bug and
+Thanks once again to Andrew Loftus for help solving a bug, complex and
 difficult to reproduce. Thanks to Ron Lockwood-Childs for investigations,
 feedback and suggestion about dar behavior with negative dates.
 
