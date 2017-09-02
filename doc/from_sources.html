@@ -10,6 +10,7 @@
 
 
 
+
 <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Dar's Documentation - Compiling From Source</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
@@ -506,8 +507,17 @@ resulting executable is expected to be very slow<span style="font-weight: bold;"
       <h3><br>
       </h3>
       <h3 style="margin-left: 40px;">Presentation</h3>
-      <div style="margin-left: 80px;">To manage its source code
-versions DAR uses GIT (it used CVS up to Q1 2012).<br>
+      <div style="margin-left: 80px;">To
+manage its source code
+versions DAR uses GIT (it used CVS up to Q1 2012 and even the older RCS
+in 2002). Since September 2nd 2017, the GIT repository has been cloned
+to <a href="https://github.com/Edrusb/DAR">GitHub</a>
+while the original repository at Sourceforge still stays updated. Both
+should contain the exact same code as on what's on GitHub both are feed
+from the author's computer never the opposite way from repository to
+private computer so there is no direct synchronization between both
+repositories. Now, that's up to you to choose the repository you
+prefer. For sanity also, starting September 3rd 2017, git tags including those for release candidates will be signed with GPG.<br>
       </div>
       <h3 style="margin-left: 40px;">Dar's repository Organization</h3>
       <div style="margin-left: 80px;">GIT (more than CVS) eases the use
@@ -563,8 +573,8 @@ you have first to <span style="font-weight: bold;">clone</span> the
 repository hosted at sourceforge:<br>
       <br>
       </div>
-      <div style="margin-left: 120px;"><span style="font-family: monospace;"></span><code>git clone git://git.code.sf.net/p/dar/code dar-code<br>
-cd dar-code<br>
+      <div style="margin-left: 120px;"><span style="font-family: monospace;"></span><code>git clone https://github.com/Edrusb/DAR.git<br>
+cd DAR<br>
       </code> </div>
       <div style="margin-left: 80px;"><br>
 You will probably not want to use current development code so you have
@@ -589,10 +599,10 @@ is as easy as using (no need to clone the repository from scratch
 again):&nbsp; <code></code><br>
       <br>
       </div>
-      <div style="margin-left: 120px;"><code>git pull origin branch_2.5.x</code><code></code>
+      <div style="margin-left: 120px;"><code>git pull</code><code></code>
       </div>
       <div style="margin-left: 80px;"><br>
-There is also a web interface to git: <a href="http://sourceforge.net/p/dar/code/">gitweb</a><br>
+There is also a web interface to git at <a href="https://github.com/Edrusb/DAR">github</a><br>
       </div>
       <h3 style="margin-left: 40px;"><span style="font-weight: bold;">Having
 the sources ready for compilation</span></h3>
