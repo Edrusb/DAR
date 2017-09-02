@@ -12,7 +12,7 @@ FreeBSD and NetBSD, and has been reported as working under Mac OS X 10.3
 External GUI are possible and exist thanks to the libdar library and its API,
 which is contained in within this source package.
 
-Actually dar is a set of six commands over libdar library:
+Actually dar is a set of seven commands over libdar library:
         dar
         dar_xform
         dar_slave
@@ -20,6 +20,7 @@ Actually dar is a set of six commands over libdar library:
         dar_static (statically linked version of dar, not all system
 	            support static linking)
         dar_cp
+	dar_split
 
 This library is part of dar and licensed under the GNU General
 Public License (GPL in the following), like all the source code of the Dar
