@@ -123,4 +123,5 @@ _ + retry on change                      --retry-on-change <count[:max byte]>
 < + backup hook mask                     --backup-hook-include
 > + backup hook mask                     --backup-hook-exclude
 = + backup hook execute                  --backup-hook-execute
-\ !
+\ + ignored as a symlinks		 --ignored-as-symlinks <absolute path>[:<absolute path]...
+

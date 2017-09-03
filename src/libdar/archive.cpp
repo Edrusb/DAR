@@ -504,6 +504,7 @@ namespace libdar
 				       options.get_delta_mask(),
 				       options.get_delta_sig_min_size(),
 				       options.get_delta_diff(),
+				       options.get_ignored_as_symlink(),
 				       progressive_report);
 		    exploitable = false;
 		    stack.terminate();
@@ -762,6 +763,7 @@ namespace libdar
 				     options.get_delta_mask(), // delta_mask
 				     options.get_delta_sig_min_size(),
 				     false,                    // delta diff
+				     set<string>(),          // empty list
 				     st_ptr);
 		    exploitable = false;
 		    stack.terminate();
@@ -1869,6 +1871,7 @@ namespace libdar
 				     const mask & delta_mask,
 				     const infinint & delta_sig_min_size,
 				     bool delta_diff,
+				     const set<string> & ignored_symlinks,
 				     statistics * progressive_report)
     {
         statistics st = false;  // false => no lock for this internal object
@@ -2026,6 +2029,7 @@ namespace libdar
 			 delta_mask,
 			 delta_sig_min_size,
 			 delta_diff,
+			 ignored_symlinks,
 			 st_ptr);
 
 	return *st_ptr;
@@ -2097,6 +2101,7 @@ namespace libdar
 				   const mask & delta_mask,
 				   const infinint & delta_sig_min_size,
 				   bool delta_diff,
+				   const set<string> & ignored_symlinks,
 				   statistics * st_ptr)
     {
 	try
@@ -2263,7 +2268,8 @@ namespace libdar
 					      delta_signature,
 					      delta_sig_min_size,
 					      delta_mask,
-					      delta_diff);
+					      delta_diff,
+					      ignored_symlinks);
 				// build_delta_sig is not used for archive creation it is always implied when delta_signature is set
 			}
 			catch(...)

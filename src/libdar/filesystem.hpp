@@ -56,6 +56,8 @@ extern "C"
 #include "cat_all_entrees.hpp"
 #include "compile_time_features.hpp"
 
+#include <set>
+
 namespace libdar
 {
 	/// \addtogroup Private
@@ -87,6 +89,12 @@ namespace libdar
 
 	    /// provide the FSA scope used by the object
 	const fsa_scope get_fsa_scope() const { return sc; };
+
+	    /// let the user define which file to not consider as symlinks
+	    ///
+	    /// \note argument is a list of full paths. No mask or special character is taken into account
+	void set_ignored_symlinks_list(const std::set<std::string> & x_ignored_symlinks)
+	{ ignored_symlinks = x_ignored_symlinks; };
 
     protected:
 	    // reset the whole list of hard linked inodes (hard linked inode stay alive but are no more referenced by the current object)
@@ -129,6 +137,12 @@ namespace libdar
 	infinint etiquette_counter;
 	bool furtive_read_mode;
 	fsa_scope sc;
+	std::set<std::string> ignored_symlinks;
+
+	    // private methods
+
+	bool ignore_if_symlink(const std::string & full_path)
+	{ return ignored_symlinks.find(full_path) != ignored_symlinks.end(); };
 
     };
 

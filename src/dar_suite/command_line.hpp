@@ -164,6 +164,7 @@ struct line_param
     ent_params aux_remote;        //< remote entrepot coordinates for the auxiliary archive
     bool sizes_in_bytes;          //< whether to display sizes in bytes of to the larges unit (Mo, Go, To,...)
     bool header_only;             //< whether we just display the header of archives to be read
+    string ignored_as_symlink;    //< column separated list of absolute paths of links to follow rather to record as such
 
 	// constructor for line_param
     line_param()

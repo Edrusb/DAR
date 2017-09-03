@@ -674,6 +674,20 @@ vector<string> line_tools_split(const string & val, char sep)
     return ret;
 }
 
+set<string> line_tools_vector_to_set(const vector<string> & list)
+{
+    set<string> ret;
+    vector<string>::const_iterator it = list.begin();
+
+    while(it != list.end())
+    {
+	ret.insert(*it);
+	++it;
+    }
+
+    return ret;
+}
+
 void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
 							bool detruire,
 							bool more_recent,

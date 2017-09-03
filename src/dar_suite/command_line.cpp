@@ -90,7 +90,7 @@ extern "C"
 #include "criterium.hpp"
 #include "fichier_local.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:8:{:}:j:"
+#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:8:{:}:j:\\:"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c option"
@@ -341,6 +341,7 @@ bool get_args(shell_interaction & dialog,
     p.aux_remote.clear();
     p.sizes_in_bytes = false;
     p.header_only = false;
+    p.ignored_as_symlink = "";
 
     try
     {
@@ -1874,6 +1875,11 @@ static bool get_args_recursive(recursive_param & rec,
 		    p.aux_remote.network_retry = tmp;
 		}
 		break;
+	    case '\\':
+		if(optarg == nullptr)
+		    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+		p.ignored_as_symlink = optarg;
+		break;
             case ':':
                 throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(optopt)));
             case '?':
@@ -2455,6 +2461,7 @@ const struct option *get_long_opt()
 	{"exclude-delta-sig", required_argument, nullptr, '}'},
 	{"delta-sig-min-size", required_argument, nullptr, '6'},
 	{"network-retry-delay", required_argument, nullptr, 'j'},
+	{"ignored-as-symlink", required_argument, nullptr, '\\'},
         { nullptr, 0, nullptr, 0 }
     };
 

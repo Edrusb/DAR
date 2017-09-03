@@ -106,6 +106,7 @@ extern "C"
 
 
 #include <map>
+#include <algorithm>
 
 #include "filesystem.hpp"
 #include "tools.hpp"
@@ -192,6 +193,7 @@ namespace libdar
 ///////////////// filesystem_hard_link_read methods ///////////////
 ///////////////////////////////////////////////////////////////////
 
+
     cat_nomme *filesystem_hard_link_read::make_read_entree(path & lieu, const string & name, bool see_hard_link, const mask & ea_mask)
     {
 	const string display = name.empty() ? lieu.display() : (lieu + path(name)).display();
@@ -202,8 +204,15 @@ namespace libdar
 
 	try
 	{
+	    int val = 0;
+	    bool use_stat = ignore_if_symlink(display);
 
-	    if(lstat(ptr_name, &buf) < 0)
+	    if(use_stat)
+		val = stat(ptr_name, &buf);
+	    else
+		val = lstat(ptr_name, &buf);
+
+	    if(val < 0)
 	    {
 		switch(errno)
 		{
@@ -489,7 +498,6 @@ namespace libdar
 
         return ref;
     }
-
 
 ///////////////////////////////////////////////////////////////////
 ///////////////// filesystem_backup methods ///////////////////////

@@ -2131,11 +2131,19 @@ namespace libdar
         return ret;
     }
 
-    datetime tools_get_mtime(const std::string & s)
+    datetime tools_get_mtime(const string & s,
+			     const set<string> & ignored_as_symlink)
     {
         struct stat buf;
+	bool use_stat = ignored_as_symlink.find(s) != ignored_as_symlink.end();
+	int sysval;
 
-        if(lstat(s.c_str(), &buf) < 0)
+	if(use_stat)
+	    sysval = stat(s.c_str(), &buf);
+	else
+	    sysval = lstat(s.c_str(), &buf);
+
+        if(sysval < 0)
         {
             string tmp = tools_strerror_r(errno);
             throw Erange("tools_get_mtime", tools_printf(dar_gettext("Cannot get last modification date: %s"), tmp.c_str()));

@@ -42,6 +42,7 @@
 #include "compile_time_features.hpp"
 
 #include <string>
+#include <set>
 
 namespace libdar
 {
@@ -513,6 +514,12 @@ namespace libdar
 	    /// \note by default a min size of 10 kiB is used
 	void set_delta_sig_min_size(const infinint & val) { x_delta_sig_min_size = val; };
 
+	    /// provide a list of full path which if are symlinks will be considered as the inode they point to
+	    ///
+	    /// \note this is espetially intended for use with symlinks pointing to directories
+	    /// to have dar recursing in such pointed to directory instead of just recording that directory
+	void set_ignored_as_symlink(const std::set<std::string> & list) { x_ignored_as_symlink = list; };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -575,6 +582,7 @@ namespace libdar
 	const mask & get_delta_mask() const { return *x_delta_mask; }
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
+	const std::set<std::string> & get_ignored_as_symlink() const { return x_ignored_as_symlink; };
 
     private:
 	archive *x_ref_arch; //< just contains the address of an existing object, no local copy of object is done here
@@ -636,6 +644,7 @@ namespace libdar
 	mask *x_delta_mask;
 	bool has_delta_mask_been_set;
 	infinint x_delta_sig_min_size;
+	std::set<std::string> x_ignored_as_symlink;
 
 	void destroy();
 	void copy_from(const archive_options_create & ref);

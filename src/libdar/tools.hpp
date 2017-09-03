@@ -55,6 +55,7 @@ extern "C"
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 #include "path.hpp"
 #include "infinint.hpp"
 #include "generic_file.hpp"
@@ -358,7 +359,7 @@ namespace libdar
 
 	/// \param[in] env the environment vector as retreived from the third argument of the main() function
 	/// \param[in] clef the key or variable name too look for
-	/// \return nullptr if the key could not be find or a pointer to the env data giving the value of the requested key
+	/// \return nullptr if the key could not be found or a pointer to the env data giving the value of the requested key
 	/// \note the returned value must not be released by any mean as it is just a pointer to an system allocated memory (the env vector).
     extern const char *tools_get_from_env(const char **env, const char *clef);
 
@@ -590,8 +591,12 @@ namespace libdar
 	/// returns the last modification date of the given file
 
 	/// \param[in] s path of the file to get the last mtime
+	/// \param[in] ignored_as_symlink for inodes present in this set,
+	/// get the symlink pointed to date rather than the date of they symlink itself
+	/// (no impact if the inode is not a symlink)
 	/// \return the mtime of the given file
-    extern datetime tools_get_mtime(const std::string & s);
+    extern datetime tools_get_mtime(const std::string & s,
+				    const std::set<std::string> & ignored_as_symlink = std::set<std::string>());
 
 	/// returns the size of the given plain file
 

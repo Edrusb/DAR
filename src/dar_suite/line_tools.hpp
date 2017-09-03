@@ -130,6 +130,8 @@ extern void line_tools_look_for_Q(S_I argc,
 
 extern std::vector<std::string> line_tools_split(const std::string & val, char sep);
 
+extern std::set<std::string> line_tools_vector_to_set(const std::vector<std::string> & list);
+
 extern void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
 							       bool detruire,
 							       bool more_recent,

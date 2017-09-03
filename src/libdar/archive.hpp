@@ -440,6 +440,7 @@ namespace libdar
 				const mask & delta_mask,
 				const infinint & delta_sig_min_size,
 				bool delta_diff,
+				const std::set<std::string> & ignored_symlinks,
 				statistics * progressive_report);
 
 	void op_create_in_sub(user_interaction & dialog,        //< interaction with user
@@ -508,6 +509,7 @@ namespace libdar
 			      const mask & delta_mask,          //< which files to consider delta signature for
 			      const infinint & delta_sig_min_size, //< minimum file size for which to calculate delta signature
 			      bool delta_diff,                     //< whether to allow delta diff backup when delta sig is present
+			      const std::set<std::string> & ignored_symlinks, //< list of symlink pointed to directory to recurse into
 			      statistics * st_ptr);             //< statistics must not be nullptr !
 
 	void disable_natural_destruction();

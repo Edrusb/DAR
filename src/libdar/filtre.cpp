@@ -75,7 +75,8 @@ namespace libdar
 			   semaphore * sem,
 			   bool delta_signature,  //< if set, lead to delta signature to be computed, if false and delta signature already exists it is saved (which in case of merging leads to transfering it in the resulting archive)
 			   bool make_delta_diff,         //< whether delta diff is allowed
-			   infinint & new_wasted_bytes); //< new amount of wasted bytes to return to the caller.
+			   infinint & new_wasted_bytes,  //< new amount of wasted bytes to return to the caller.
+			   set<string> ignored_as_symlink); //< list of file to ignore as symlink and fetch the proper mtime
 
     static bool save_ea(user_interaction & dialog,
 			const string & info_quoi,
@@ -540,7 +541,8 @@ namespace libdar
 			   bool delta_signature,
 			   const infinint & delta_sig_min_size,
 			   const mask & delta_mask,
-			   bool delta_diff)
+			   bool delta_diff,
+			   const set<string> & ignored_symlinks)
     {
         cat_entree *e = nullptr;
         const cat_entree *f = nullptr;
@@ -578,6 +580,7 @@ namespace libdar
         st.clear();
         cat.reset_add();
         ref.reset_compare();
+	fs.set_ignored_symlinks_list(ignored_symlinks);
 
 	try
 	{
@@ -859,7 +862,8 @@ namespace libdar
 						       &sem,
 						       e_file == nullptr ? false : e_file->has_delta_signature_available(),
 						       make_delta_diff,
-						       wasted_bytes))
+						       wasted_bytes,
+						       ignored_symlinks))
 					    st.incr_tooold(); // counting a new dirty file in archive
 
 					st.set_byte_amount(wasted_bytes);
@@ -2625,7 +2629,8 @@ namespace libdar
 				   nullptr,  // semaphore
 				   calculate_delta_signature,
 				   false,    // delta_diff
-				   fake_repeat))
+				   fake_repeat,
+				   set<string>())) // empty list
 			throw SRC_BUG;
 		    else // succeeded saving
 		    {
@@ -2793,7 +2798,8 @@ namespace libdar
 			   semaphore *sem,
 			   bool delta_signature,
 			   bool delta_diff,
-			   infinint & current_wasted_bytes)
+			   infinint & current_wasted_bytes,
+			   set<string> ignored_as_symlink)
     {
 	bool ret = true;
 	infinint current_repeat_count = 0;
@@ -3196,7 +3202,7 @@ namespace libdar
 
 				    try
 				    {
-					changed = fic->get_last_modif() != tools_get_mtime(info_quoi);
+					changed = fic->get_last_modif() != tools_get_mtime(info_quoi, ignored_as_symlink);
 				    }
 				    catch(Erange & e)
 				    {
@@ -3241,7 +3247,7 @@ namespace libdar
 						loop = true;
 
 						    // updating the last modification date of file
-						fic->set_last_modif(tools_get_mtime(info_quoi));
+						fic->set_last_modif(tools_get_mtime(info_quoi, ignored_as_symlink));
 
 						    // updating the size of the file
 						fic->change_size(tools_get_size(info_quoi));

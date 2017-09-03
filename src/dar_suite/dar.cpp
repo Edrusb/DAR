@@ -79,6 +79,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
     const char *env_knownhosts = tools_get_from_env(env, "DAR_SFTP_KNOWNHOSTS_FILE");
     const char *env_pub_filekey = tools_get_from_env(env, "DAR_SFTP_PUBLIC_KEYFILE");
     const char *env_prv_filekey = tools_get_from_env(env, "DAR_SFTP_PRIVATE_KEYFILE");
+    const char *env_ignored_as_symlink = tools_get_from_env(env, "DAR_IGNORED_AS_SYMLINK");
 
     if(home == nullptr)
         home = "/";
@@ -178,6 +179,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	    archive_options_test test_options;
 	    bool no_cipher_given;
 	    vector<string> recipients;
+	    set<string> ignored_as_symlink_listing;
 
 	    if(param.remote.ent_host.size() != 0)
 	    {
@@ -404,6 +406,16 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			create_options.set_delta_mask(*param.delta_mask);
 		    if(repo != nullptr)
 			create_options.set_entrepot(*repo);
+		    if(param.ignored_as_symlink.size() > 0)
+			ignored_as_symlink_listing =
+			    line_tools_vector_to_set(line_tools_split(param.ignored_as_symlink, ':'));
+		    else
+		    {
+			if(env_ignored_as_symlink != nullptr)
+			    ignored_as_symlink_listing =
+				line_tools_vector_to_set(line_tools_split(env_ignored_as_symlink, ':'));
+		    }
+		    create_options.set_ignored_as_symlink(ignored_as_symlink_listing);
 
 		    cur = new (nothrow) archive(dialog, *param.fs_root, *param.sauv_root, param.filename, EXTENSION,
 						create_options,
