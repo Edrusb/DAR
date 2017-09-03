@@ -649,31 +649,6 @@ void line_tools_look_for_Q(S_I argc,
 	Q_is_present = true;
 }
 
-
-vector<string> line_tools_split(const string & val, char sep)
-{
-    vector<string> ret;
-    string::const_iterator be = val.begin();
-    string::const_iterator ne = val.begin();
-
-    while(ne != val.end())
-    {
-	if(*ne != sep)
-	    ++ne;
-	else
-	{
-	    ret.push_back(string(be, ne));
-	    ++ne;
-	    be = ne;
-	}
-    }
-
-    if(be != val.end())
-	ret.push_back(string(be, ne));
-
-    return ret;
-}
-
 void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
 							bool detruire,
 							bool more_recent,
@@ -812,7 +787,7 @@ void line_tools_crypto_split_algo_pass(const secu_string & all,
 					{
 					    secu_string emails;
 					    line_tools_crypto_split_algo_pass(pass, algo, emails, no_cipher_given, recipients);
-					    recipients = line_tools_split(emails.c_str(), ',');
+					    line_tools_split(emails.c_str(), ',', recipients);
 					    pass.clear();
 					}
 					else

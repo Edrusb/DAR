@@ -1825,7 +1825,7 @@ static bool get_args_recursive(recursive_param & rec,
                 if(optarg != nullptr)
                 {
                     if(strlen(optarg) != 0)
-                        p.signatories = line_tools_split(optarg, ',');
+                        line_tools_split(optarg, ',', p.signatories);
                     else
                         throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
                 }
@@ -3091,8 +3091,9 @@ static void split_compression_algo(const char *arg, compression & algo, U_I & le
 static fsa_scope string_to_fsa(const string & arg)
 {
     fsa_scope ret;
-    vector<string> fams = line_tools_split(arg, ',');
+    vector<string> fams;
 
+    line_tools_split(arg, ',', fams);
     ret.clear();
     if(arg != "none")
     {
