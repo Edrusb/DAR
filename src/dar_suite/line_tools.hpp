@@ -128,7 +128,7 @@ extern void line_tools_look_for_Q(S_I argc,
 
     /// split a line in words given the separator character (sep)
 
-template<class T> void line_tools_split(const std::string & val, char sep, T & container);
+extern std::vector<std::string> line_tools_split(const std::string & val, char sep);
 
 extern void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
 							       bool detruire,
@@ -151,28 +151,6 @@ extern void line_tools_crypto_split_algo_pass(const secu_string & all,
 
     /// display information about the signatories
 extern void line_tools_display_signatories(user_interaction & ui, const std::list<signator> & gnupg_signed);
-
-template<class T> void line_tools_split(const std::string & val, char sep, T & container)
-{
-    container.clear();
-    std::string::const_iterator be = val.begin();
-    std::string::const_iterator ne = val.begin();
-
-    while(ne != val.end())
-    {
-	if(*ne != sep)
-	    ++ne;
-	else
-	{
-	    container.push_back(std::string(be, ne));
-	    ++ne;
-	    be = ne;
-	}
-    }
-
-    if(be != val.end())
-	container.push_back(std::string(be, ne));
-}
 
     /// @}
 
