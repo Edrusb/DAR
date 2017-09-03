@@ -20,7 +20,7 @@
 /*********************************************************************/
 
     /// \file messaging.hpp
-    /// \brief messaging_decode and messaging_encode are used to insert messages in a flow if data blocks
+    /// \brief messaging_decode and messaging_encode are used to insert messages in a flow of data blocks
     /// \ingroup Private
     ///
 
