@@ -68,8 +68,8 @@ namespace libdar
 
     archive::archive(user_interaction & dialog,
                      const path & chem,
-		     const std::string & basename,
-		     const std::string & extension,
+		     const string & basename,
+		     const string & extension,
 		     const archive_options_read & options)
     {
         NLS_SWAP_IN;
@@ -538,8 +538,8 @@ namespace libdar
     archive::archive(user_interaction & dialog,
 		     const path & sauv_path,
 		     archive *ref_arch,
-		     const std::string & filename,
-		     const std::string & extension,
+		     const string & filename,
+		     const string & extension,
 		     const archive_options_isolate & options)
     {
 	pool = nullptr;
@@ -566,8 +566,8 @@ namespace libdar
     archive::archive(user_interaction & dialog,
 		     const path & sauv_path,
 		     archive *ref_arch1,
-		     const std::string & filename,
-		     const std::string & extension,
+		     const string & filename,
+		     const string & extension,
 		     const archive_options_merge & options,
 		     statistics * progressive_report)
     {
@@ -1572,7 +1572,7 @@ namespace libdar
 	return ret;
     }
 
-    bool archive::has_subdirectory(const std::string & dir) const
+    bool archive::has_subdirectory(const string & dir) const
     {
 	bool ret = false;
 
