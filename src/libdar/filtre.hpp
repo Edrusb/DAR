@@ -168,6 +168,10 @@ namespace libdar
 			     const infinint & delta_sig_min_size,
 			     const mask & delta_mask);
 
+	/// initialize variables used for merging in step1 and step2
+
+	/// \note routine used for merging and repairing
+
     void filtre_merge_step0(user_interaction & dialog,
 			    memory_pool *pool,
 			    const catalogue * ref1,
@@ -178,6 +182,8 @@ namespace libdar
 			    const crit_action* & overwrite,
 			    bool & abort,
 			    thread_cancellation & thr_cancel);
+
+	/// build a catalogue from two refs with the given policy and filters
 
     void filtre_merge_step1(user_interaction & dialog,
 			    memory_pool *pool,
@@ -197,6 +203,11 @@ namespace libdar
 			    const crit_action* & overwrite,
 			    bool & abort,
 			    thread_cancellation & thr_cancel);
+
+
+	/// copy data of "cat" catalogue to the pdesc of a brand new archive
+
+    	/// \note routine used for merging and repairing
 
     void filtre_merge_step2(user_interaction & dialog,
 			    memory_pool *pool,
