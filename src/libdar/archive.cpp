@@ -2107,10 +2107,10 @@ namespace libdar
 	try
 	{
 	    stack.clear(); // [object member variable]
-	    cat = nullptr;    // [object member variable]
+	    cat = nullptr; // [object member variable]
 	    bool aborting = false;
 	    infinint aborting_next_etoile = 0;
-	    U_64 flag = 0;     // carries the sar option flag
+	    U_64 flag = 0; // carries the sar option flag
 
 	    label internal_name;
 	    generic_file *tmp = nullptr;
