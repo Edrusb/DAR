@@ -179,33 +179,33 @@ namespace libdar
 			    statistics & st,
 			    bool decremental_mode,
 			    crit_action* & decr,
-			    const crit_action* & overwrite,
-			    bool & abort,
-			    thread_cancellation & thr_cancel);
+                            const crit_action* & overwrite,
+                            bool & abort,
+                            thread_cancellation & thr_cancel);
 
-	/// build a catalogue from two refs with the given policy and filters
+        /// build a catalogue from two refs with the given policy and filters
 
     void filtre_merge_step1(user_interaction & dialog,
-			    memory_pool *pool,
-			    const mask & filtre,
-			    const mask & subtree,
-			    catalogue & cat,
-			    const catalogue * ref1,
-			    const catalogue * ref2,
-			    bool info_details,
-			    bool display_treated,
-			    bool display_skipped,
-			    statistics & st,
-			    bool make_empty_dir,
-			    bool warn_overwrite,
-			    bool decremental_mode,
-			    crit_action* & decr,
-			    const crit_action* & overwrite,
-			    bool & abort,
-			    thread_cancellation & thr_cancel);
+                            memory_pool *pool,
+                            const mask & filtre,
+                            const mask & subtree,
+                            catalogue & cat,
+                            const catalogue * ref1,
+                            const catalogue * ref2,
+                            bool info_details,
+                            bool display_treated,
+                            bool display_skipped,
+                            statistics & st,
+                            bool make_empty_dir,
+                            bool warn_overwrite,
+                            bool decremental_mode,
+                            crit_action* & decr,
+                            const crit_action* & overwrite,
+                            bool & abort,
+                            thread_cancellation & thr_cancel);
 
 
-	/// copy data of "cat" catalogue to the pdesc of a brand new archive
+        /// copy data of "cat" catalogue to the pdesc of a brand new archive
 
     	/// \note routine used for merging and repairing
 
