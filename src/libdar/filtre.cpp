@@ -1582,7 +1582,12 @@ namespace libdar
 		      const infinint & delta_sig_min_size,
 		      const mask & delta_mask)
     {
-	compression stock_algo;
+	crit_action *decr = nullptr; // will point to a locally allocated crit_action
+	    // for decremental backup (argument overwrite is ignored)
+	const crit_action *overwrite = &over_action; // may point to &decr if
+	    // decremental backup is asked
+	bool abort = false;
+	thread_cancellation thr_cancel;
 
 	if(display_treated_only_dir && display_treated)
 	    display_treated = false;
@@ -1592,21 +1597,135 @@ namespace libdar
 	else
 	    display_treated_only_dir = false; // avoid incoherence
 
-	stock_algo = pdesc.compr->get_algo();
-	thread_cancellation thr_cancel;
-	const cat_eod tmp_eod;
-	const catalogue *ref_tab[] = { ref1, ref2, nullptr };
-	infinint etiquette_offset = 0;
-	map <infinint, cat_etoile *> corres_copy;
-	const cat_entree *e = nullptr;
-	U_I index = 0;
-	defile juillet = FAKE_ROOT;
-	infinint fake_repeat = 0;
-	bool abort = false;
-	crit_action *decr = nullptr; // will point to a locally allocated crit_action
-	    // for decremental backup (argument overwrite is ignored)
-	const crit_action *overwrite = &over_action; // may point to &decr if
-	    // decremental backup is asked
+	filtre_merge_step0(dialog,
+			   pool,
+			   filtre,
+			   subtree,
+			   pdesc,
+			   cat,
+			   ref1,
+			   ref2,
+			   info_details,
+			   display_treated,
+			   display_treated_only_dir,
+			   display_skipped,
+			   st,
+			   make_empty_dir,
+			   ea_mask,
+			   compr_mask,
+			   min_compr_size,
+			   keep_compressed,
+			   over_action,
+			   warn_overwrite,
+			   decremental_mode,
+			   sparse_file_min_size,
+			   scope,
+			   delta_signature,
+			   build_delta_sig,
+			   delta_sig_min_size,
+			   delta_mask,
+			   decr,
+			   overwrite,
+			   abort,
+			   thr_cancel);
+
+	filtre_merge_step1(dialog,
+			   pool,
+			   filtre,
+			   subtree,
+			   pdesc,
+			   cat,
+			   ref1,
+			   ref2,
+			   info_details,
+			   display_treated,
+			   display_treated_only_dir,
+			   display_skipped,
+			   st,
+			   make_empty_dir,
+			   ea_mask,
+			   compr_mask,
+			   min_compr_size,
+			   keep_compressed,
+			   over_action,
+			   warn_overwrite,
+			   decremental_mode,
+			   sparse_file_min_size,
+			   scope,
+			   delta_signature,
+			   build_delta_sig,
+			   delta_sig_min_size,
+			   delta_mask,
+			   decr,
+			   overwrite,
+			   abort,
+			   thr_cancel);
+
+	filtre_merge_step2(dialog,
+			   pool,
+			   filtre,
+			   subtree,
+			   pdesc,
+			   cat,
+			   ref1,
+			   ref2,
+			   info_details,
+			   display_treated,
+			   display_treated_only_dir,
+			   display_skipped,
+			   st,
+			   make_empty_dir,
+			   ea_mask,
+			   compr_mask,
+			   min_compr_size,
+			   keep_compressed,
+			   over_action,
+			   warn_overwrite,
+			   decremental_mode,
+			   sparse_file_min_size,
+			   scope,
+			   delta_signature,
+			   build_delta_sig,
+			   delta_sig_min_size,
+			   delta_mask,
+			   decr,
+			   overwrite,
+			   abort,
+			   thr_cancel);
+    }
+
+    void filtre_merge_step0(user_interaction & dialog,
+			    memory_pool *pool,
+			    const mask & filtre,
+			    const mask & subtree,
+			    const pile_descriptor & pdesc,
+			    catalogue & cat,
+			    const catalogue * ref1,
+			    const catalogue * ref2,
+			    bool info_details,
+			    bool display_treated,
+			    bool display_treated_only_dir,
+			    bool display_skipped,
+			    statistics & st,
+			    bool make_empty_dir,
+			    const mask & ea_mask,
+			    const mask & compr_mask,
+			    const infinint & min_compr_size,
+			    bool keep_compressed,
+			    const crit_action & over_action,
+			    bool warn_overwrite,
+			    bool decremental_mode,
+			    const infinint & sparse_file_min_size,
+			    const fsa_scope & scope,
+			    bool delta_signature,
+			    bool build_delta_sig,
+			    const infinint & delta_sig_min_size,
+			    const mask & delta_mask,
+			    crit_action* & decr,
+			    const crit_action* & overwrite,
+			    bool & abort,
+			    thread_cancellation & thr_cancel)
+    {
 
 	    // STEP 0: Getting ready
 
@@ -1691,6 +1810,47 @@ namespace libdar
 	}
 
 	    /// End of Step 0
+    }
+
+    void filtre_merge_step1(user_interaction & dialog,
+			    memory_pool *pool,
+			    const mask & filtre,
+			    const mask & subtree,
+			    const pile_descriptor & pdesc,
+			    catalogue & cat,
+			    const catalogue * ref1,
+			    const catalogue * ref2,
+			    bool info_details,
+			    bool display_treated,
+			    bool display_treated_only_dir,
+			    bool display_skipped,
+			    statistics & st,
+			    bool make_empty_dir,
+			    const mask & ea_mask,
+			    const mask & compr_mask,
+			    const infinint & min_compr_size,
+			    bool keep_compressed,
+			    const crit_action & over_action,
+			    bool warn_overwrite,
+			    bool decremental_mode,
+			    const infinint & sparse_file_min_size,
+			    const fsa_scope & scope,
+			    bool delta_signature,
+			    bool build_delta_sig,
+			    const infinint & delta_sig_min_size,
+			    const mask & delta_mask,
+			    crit_action* & decr,
+			    const crit_action* & overwrite,
+			    bool & abort,
+			    thread_cancellation & thr_cancel)
+    {
+	const catalogue *ref_tab[] = { ref1, ref2, nullptr };
+	const cat_entree *e = nullptr;
+	U_I index = 0;
+	defile juillet = FAKE_ROOT;
+	map <infinint, cat_etoile *> corres_copy;
+	infinint etiquette_offset = 0;
+	const cat_eod tmp_eod;
 
 	try
 	{
@@ -2454,6 +2614,46 @@ namespace libdar
 	    overwrite = nullptr;
 	}
 
+    }
+
+    void filtre_merge_step2(user_interaction & dialog,
+			    memory_pool *pool,
+			    const mask & filtre,
+			    const mask & subtree,
+			    const pile_descriptor & pdesc,
+			    catalogue & cat,
+			    const catalogue * ref1,
+			    const catalogue * ref2,
+			    bool info_details,
+			    bool display_treated,
+			    bool display_treated_only_dir,
+			    bool display_skipped,
+			    statistics & st,
+			    bool make_empty_dir,
+			    const mask & ea_mask,
+			    const mask & compr_mask,
+			    const infinint & min_compr_size,
+			    bool keep_compressed,
+			    const crit_action & over_action,
+			    bool warn_overwrite,
+			    bool decremental_mode,
+			    const infinint & sparse_file_min_size,
+			    const fsa_scope & scope,
+			    bool delta_signature,
+			    bool build_delta_sig,
+			    const infinint & delta_sig_min_size,
+			    const mask & delta_mask,
+			    crit_action* & decr,
+			    const crit_action* & overwrite,
+			    bool & abort,
+			    thread_cancellation & thr_cancel)
+    {
+	compression stock_algo  = pdesc.compr->get_algo();
+	defile juillet = FAKE_ROOT;
+	const cat_entree *e = nullptr;
+	infinint fake_repeat = 0;
+
+
 	    // STEP 2:
 	    // 'cat' is now completed
 	    // we must copy the file's data, delta sig, EA and FSA to the archive
@@ -2464,7 +2664,6 @@ namespace libdar
 
 	cat.set_all_mirage_s_inode_wrote_field_to(false);
 	cat.reset_read();
-	juillet = FAKE_ROOT;
 
 	try
 	{
