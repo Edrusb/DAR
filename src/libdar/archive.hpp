@@ -136,6 +136,30 @@ namespace libdar
 		const archive_options_merge & options,
 		statistics * progressive_report);
 
+	    /// this constructor create a new archive from a damaged one [this is the "repair" constructor]
+
+	    /// \param[in,out] dialog for user interaction
+	    /// \param[in] chem_src the path where to look for slices of the archive to repair
+	    /// \param[in] basename_src the slices basename of the archive to repair
+	    /// \param[in] extension_src the slices extension of the archive to repair
+	    /// \param[in] options_read the set of option to use to read the archive repair
+	    /// \param[in] chem_dst the path where to write the repaired archive
+	    /// \param[in] basename_dst the slices basename of the repaired archive
+	    /// \param[in] extension_dst the slices extension of the repaired archive
+	    /// \param[in] options_repair the set of option to use to write the repaired archive
+
+	archive(user_interaction & dialog,
+		const path & chem_src,
+		const std::string & basename_src,
+		const std::string & extension_src,
+		const archive_options_read & options_read,
+		const path & chem_dst,
+		const std::string & basename_dst,
+		const std::string & extension_dst,
+		const archive_options_repair & options_repair);
+
+
+
 	    /// copy constructor (not implemented, throw an exception if called explicitely or implicitely)
 
 	    /// \note this lack of implementation is intentionnal, Archive should rather be manipulated
@@ -351,7 +375,7 @@ namespace libdar
 
 
     private:
-	enum operation { oper_create, oper_isolate, oper_merge };
+	enum operation { oper_create, oper_isolate, oper_merge, oper_repair };
 
 	pile stack;              //< the different layer through which the archive contents is read or wrote
 	header_version ver;      //< information for the archive header

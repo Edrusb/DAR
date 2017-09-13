@@ -793,6 +793,170 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
+    archive::archive(user_interaction & dialog,
+		     const path & chem_src,
+		     const string & basename_src,
+		     const string & extension_src,
+		     const archive_options_read & options_read,
+		     const path & chem_dst,
+		     const string & basename_dst,
+		     const string & extension_dst,
+		     const archive_options_repair & options_repair)
+    {
+	archive_options_read my_options_read = options_read;
+	bool initial_pause = (options_read.get_entrepot() == options_repair.get_entrepot() && chem_src == chem_dst);
+	statistics st;
+
+	    ////
+	    // initializing object fields
+
+	    // stack will be set by op_create_in_sub()
+	    // ver will be set by op_create_in_sub()
+	init_pool(); // initializes pool
+	cat = nullptr; // we be stolen from src
+	exploitable = false;
+	lax_read_mode = false;
+	sequential_read = false;
+	freed_and_checked = false;
+	    // gnupg_signed is not used while creating an archive
+	    // slices will be set by op_create_in_sub()
+	    // local_cat_size not used while creating an archive
+
+	    ////
+	    // initial parameter setup
+
+	entrepot *sauv_path_t = options_repair.get_entrepot().clone();
+	if(sauv_path_t == nullptr)
+	    throw Ememory("archive::archive(repair)");
+
+	try
+	{
+	    sauv_path_t->set_user_ownership(options_repair.get_slice_user_ownership());
+	    sauv_path_t->set_group_ownership(options_repair.get_slice_group_ownership());
+	    sauv_path_t->set_location(chem_dst);
+
+
+		/////
+		// opening the source archive in sequential read mode
+
+	    my_options_read.set_sequential_read(true);
+
+	    archive src = archive(dialog,
+				  chem_src,
+				  basename_src,
+				  extension_src,
+				  my_options_read);
+
+	    try
+	    {
+		    // building the catalogue from tape marks (sequential read)
+
+		(void)src.init_catalogue(dialog);
+	    }
+	    catch(Euser_abort & e)
+	    {
+		throw;
+	    }
+	    catch(Ebug & e)
+	    {
+		throw;
+	    }
+	    catch(Egeneric & e)
+	    {
+		string msg = e.get_message();
+		dialog.printf(gettext("First error met while reading the archive to repair, will not read further: %S"), &msg);
+	    }
+
+		// stealing the catalogue from src
+	    cat = src.cat;
+	    src.cat = nullptr;
+
+	    op_create_in_sub(dialog,
+			     oper_repair,
+			     chem_dst,
+			     *sauv_path_t,
+			     nullptr,             // ref1
+			     nullptr,             // ref2
+			     initial_pause,
+			     bool_mask(true),     // selection
+			     bool_mask(true),     // subtree
+			     basename_dst,
+			     extension_dst,
+			     false,               // allow_over
+			     crit_constant_action(data_preserve, EA_preserve), // overwrite
+			     true, // warn_over
+			     options_repair.get_info_details(),
+			     options_repair.get_display_treated(),
+			     options_repair.get_display_treated_only_dir(),
+			     options_repair.get_display_skipped(),
+			     options_repair.get_display_finished(),
+			     options_repair.get_pause(),
+			     false,               // empty_dir
+			     options_repair.get_compression(),
+			     options_repair.get_compression_level(),
+			     options_repair.get_slice_size(),
+			     options_repair.get_first_slice_size(),
+			     bool_mask(true),     // ea_mask
+			     options_repair.get_execute(),
+			     options_repair.get_crypto_algo(),
+			     options_repair.get_crypto_pass(),
+			     options_repair.get_crypto_size(),
+			     options_repair.get_gnupg_recipients(),
+			     options_repair.get_gnupg_signatories(),
+			     options_repair.get_compr_mask(),
+			     options_repair.get_min_compr_size(),
+			     false,               // nodump
+			     "",                  // exclude_by_ea
+			     0,                   // hourshift
+			     options_repair.get_empty(),
+			     false,               // alter_atime
+			     false,               // furtive_read_mode
+			     false,               // same_fs
+			     cat_inode::cf_all,   // comparison_fields
+			     false,               // snapshot
+			     false,               // cache_directory_tagging,
+			     options_repair.get_keep_compressed(),
+			     0,                   // fixed_date
+			     options_repair.get_slice_permission(),
+			     0,                   // repeat_count
+			     0,                   // repeat_byte
+			     false,               // decremental
+			     options_repair.get_sequential_marks(),
+			     false,               // security_check
+			     options_repair.get_sparse_file_min_size(),
+			     options_repair.get_user_comment(),
+			     options_repair.get_hash_algo(),
+			     options_repair.get_slice_min_digits(),
+			     "",                  // backup_hook_file_execute
+			     bool_mask(true),     // backup_hook_file_mask
+			     false,               // ignore_unknown
+			     all_fsa_families(),  // fsa_scope
+			     options_repair.get_multi_threaded(),
+			     true,                // delta_signature
+			     false,               // build_delta_signature
+			     bool_mask(true),     // delta_mask
+			     0,                   // delta_sig_min_size
+			     false,               // delta_diff
+			     set<string>(),       // ignored_symlinks
+			     &st);
+	}
+	catch(...)
+	{
+	    if(sauv_path_t != nullptr)
+	    {
+		delete sauv_path_t;
+		sauv_path_t = nullptr;
+	    }
+	    throw;
+	}
+	if(sauv_path_t != nullptr)
+	{
+	    delete sauv_path_t;
+	    sauv_path_t = nullptr;
+	}
+    }
+
+
     statistics archive::op_extract(user_interaction & dialog,
                                    const path & fs_root,
 				   const archive_options_extract & options,
@@ -2167,6 +2331,8 @@ namespace libdar
 		    // ********** building the catalogue (empty for now) ************************* //
 		datetime root_mtime;
 		pile_descriptor pdesc(&stack);
+		crit_action* rep_decr = nullptr; // not used, just needed to pass as argumen to filtre_merge_step0()
+		const crit_action *rep_over = &overwrite; // not used, just needed to pass as argumen to filtre_merge_step0()
 
 		if(info_details)
 		    dialog.warning(gettext("Building the catalog object..."));
@@ -2187,16 +2353,27 @@ namespace libdar
 		    throw Erange("archive::op_create_in_sub", tools_printf(gettext("Error while fetching information for %S: "), &tmp) + e.get_message());
 		}
 
-		if(op == oper_merge)
+		switch(op)
+		{
+		case oper_merge:
 		    if(add_marks_for_sequential_reading && !empty)
 			cat = new (pool) escape_catalogue(dialog, pdesc, ref_cat1->get_root_dir_last_modif(), internal_name);
 		    else
 			cat = new (pool) catalogue(dialog, ref_cat1->get_root_dir_last_modif(), internal_name);
-		else // op == oper_create
+		    break;
+		case oper_create:
 		    if(add_marks_for_sequential_reading && !empty)
 			cat = new (pool) escape_catalogue(dialog, pdesc, root_mtime, internal_name);
 		    else
 			cat = new (pool) catalogue(dialog, root_mtime, internal_name);
+		case oper_repair:
+			// cat has been set from the archive to be repared
+			// in the following we will only dump data to the
+			// new stack of generic_files
+		    break;
+		default:
+		    throw SRC_BUG;
+		}
 
 		if(cat == nullptr)
 		    throw Ememory("archive::op_create_in_sub");
@@ -2318,6 +2495,46 @@ namespace libdar
 				     build_delta_sig,
 				     delta_sig_min_size,
 				     delta_mask);
+			break;
+		    case oper_repair:
+			if(info_details)
+			    dialog.warning(gettext("Processing files for fixing..."));
+
+			filtre_merge_step0(dialog,
+					   pool,
+					   ref_cat1,
+					   ref_cat2,
+					   *st_ptr,
+					   false,
+					   rep_decr,
+					   rep_over,
+					   aborting,
+					   thr_cancel);
+			if(rep_decr != nullptr)
+			    throw SRC_BUG;
+			    // we should be prepared to release decr
+			    // but we do not need such argument for fixing op.
+			if(cat == nullptr)
+			    throw SRC_BUG;
+			    // cat should have been setup previously
+			filtre_merge_step2(dialog,
+					   pool,
+					   pdesc,
+					   *cat,
+					   info_details,
+					   display_treated,
+					   false,    // display_trated_only_dir
+					   *st_ptr,
+					   compr_mask,
+					   min_compr_size,
+					   keep_compressed,
+					   sparse_file_min_size,
+					   delta_signature,
+					   build_delta_sig,
+					   delta_sig_min_size,
+					   delta_mask,
+					   aborting,
+					   thr_cancel);
 			break;
 		    default:
 			throw SRC_BUG;
