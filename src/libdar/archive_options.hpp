@@ -1484,6 +1484,219 @@ namespace libdar
 	void copy_from(const archive_options_test & ref);
     };
 
+
+	/////////////////////////////////////////////////////////
+	///////// OPTIONS FOR REPAIRING AN ARCHIVE //////////////
+	/////////////////////////////////////////////////////////
+
+	/// class holding optional parameters used to create an archive
+    class archive_options_repair : public on_pool
+    {
+    public:
+	    // default constructors and destructor.
+
+	archive_options_repair();
+	archive_options_repair(const archive_options_repair & ref);
+	const archive_options_repair & operator = (const archive_options_repair & ref) { destroy(); copy_from(ref); return *this; };
+	~archive_options_repair() { destroy(); };
+
+	    /////////////////////////////////////////////////////////////////////
+	    // set back to default (this is the state just after the object is constructed
+	    // this method is to be used to reuse a given object
+
+	    /// reset all the options to their default values
+	void clear();
+
+
+	    /////////////////////////////////////////////////////////////////////
+	    // setting methods
+
+	    /// defines whether the user needs detailed output of the operation
+	    ///
+	    /// \note in API 5.5.x and before this switch drove the displaying
+	    /// of processing messages and treated files. now it only drives the
+	    /// display of processing messages, use set_display_treated to define
+	    /// whether files under treatement should be display or not
+	void set_info_details(bool info_details) { x_info_details = info_details; };
+
+	    /// defines whether to show treated files
+	    ///
+	    /// \param[in] display_treated true to display processed inodes
+	    /// \param[in] only_dir only display the current directory under process, not its individual files
+	void set_display_treated(bool display_treated, bool only_dir) { x_display_treated = display_treated; x_display_treated_only_dir = only_dir; };
+
+	    /// whether to display files that have been excluded by filters
+	void set_display_skipped(bool display_skipped) { x_display_skipped = display_skipped; };
+
+	    /// whether to display a summary for each completed directory with total saved data and compression ratio
+	void set_display_finished(bool display_finished) { x_display_finished = display_finished; };
+
+	    /// set a pause beteween slices. Set to zero does not pause at all, set to 1 makes libdar pauses each slice, set to 2 makes libdar pause each 2 slices and so on.
+	void set_pause(const infinint & pause) { x_pause = pause; };
+
+	    /// set the compression algorithm to be used
+	void set_compression(compression compr_algo) { x_compr_algo = compr_algo; };
+
+	    /// set the compression level (from 1 to 9)
+	void set_compression_level(U_I compression_level) { x_compression_level = compression_level; };
+
+	    /// define the archive slicing
+
+	    /// \param[in] file_size set the slice size in byte (0 for a single slice whatever its size is)
+	    /// \param[in] first_file_size set the first file size
+	    /// \note if not specified or set to zero, first_file_size is considered equal to file_size
+	void set_slicing(const infinint & file_size, const infinint & first_file_size = 0)
+	{
+	    x_file_size = file_size;
+	    if(first_file_size.is_zero())
+		x_first_file_size = file_size;
+	    else
+		x_first_file_size = first_file_size;
+	};
+
+	    /// set the command to execute after each slice creation
+	void set_execute(const std::string & execute) { x_execute = execute; };
+
+	    /// set the cypher to use
+	void set_crypto_algo(crypto_algo crypto) { x_crypto = crypto; };
+
+	    /// set the pass the password / passphrase to use. Giving an empty string makes the password asked
+	    /// interactively through the dialog argument if encryption has been set.
+	void set_crypto_pass(const secu_string & pass) { x_pass = pass; };
+
+	    /// set the size of the encryption by block to use
+	void set_crypto_size(U_32 crypto_size) { x_crypto_size = crypto_size; };
+
+	    /// set the list of recipients that will be able to read the archive
+	    /// \note this is based on GnuPG keyring and assumes the user running libdar has its keyring
+	    /// containing for each recipient a valid public key. If a list of recipient is given the crypto_pass
+	    /// (see above) is not used, but the crypto_algo stays used to encrypt the archive using a randomly generated key
+	    /// which is encrypted using the public keys of the recipients and dropped that way encrypted inside the archive.
+	    /// \note if crypto_algo is not set while a list of recipient is given, the crypto algo will default to blowfish
+	void set_gnupg_recipients(const std::vector<std::string> & gnupg_recipients) { x_gnupg_recipients = gnupg_recipients; };
+
+
+	    /// the private keys matching the email of the provided list are used to sign the archive random key
+	void set_gnupg_signatories(const std::vector<std::string> & gnupg_signatories) { x_gnupg_signatories = gnupg_signatories; };
+
+	    /// defines files to compress
+	void set_compr_mask(const mask & compr_mask);
+
+	    /// defines file size under which to never compress
+	void set_min_compr_size(const infinint & min_compr_size) { x_min_compr_size = min_compr_size; };
+
+	    /// whether to make a dry-run operation
+	void set_empty(bool empty) { x_empty = empty; };
+
+	    /// make dar ignore the 'algo' argument and do not uncompress / compress files that are selected for merging
+	void set_keep_compressed(bool keep_compressed) { x_keep_compressed = keep_compressed; };
+
+	    /// if not an empty string set the slice permission according to the octal value given.
+	void set_slice_permission(const std::string & slice_permission) { x_slice_permission = slice_permission; };
+
+	    /// if not an empty string set the user ownership of slices accordingly
+	void set_slice_user_ownership(const std::string & slice_user_ownership) { x_slice_user_ownership = slice_user_ownership; };
+
+	    /// if not an empty string set the group ownership of slices accordingly
+	void set_slice_group_ownership(const std::string & slice_group_ownership) { x_slice_group_ownership = slice_group_ownership; };
+
+	    /// whether to add escape sequence aka tape marks to allow sequential reading of the archive
+	void set_sequential_marks(bool sequential) { x_sequential_marks = sequential; };
+
+	    /// whether to try to detect sparse files
+	void set_sparse_file_min_size(const infinint & size) { x_sparse_file_min_size = size; };
+
+	    /// specify a user comment in the archive (always in clear text!)
+	void set_user_comment(const std::string & comment) { x_user_comment = comment; };
+
+	    /// specify whether to produce a hash file of the slice and which hash algo to use
+	    /// \note the libdar::hash_algo data type is defined in hash_fichier.hpp, valid values
+	    /// are for examle libdar::hash_none, libdar::hash_md5, libdar::hash_sha1, libdar::hash_sha512...
+	void set_hash_algo(hash_algo hash) { x_hash = hash; };
+
+	    /// defines the minimum digit a slice must have concerning its number, zeros will be prepended as much as necessary to respect this
+	void set_slice_min_digits(infinint val) { x_slice_min_digits = val; };
+
+	    /// defines the protocol to use for slices
+	void set_entrepot(const entrepot & entr);
+
+	    /// whether libdar is allowed to spawn several threads to possibily work faster on multicore CPU (requires libthreadar)
+	void set_multi_threaded(bool val) { x_multi_threaded = val; };
+
+
+	    /////////////////////////////////////////////////////////////////////
+	    // getting methods
+
+	bool get_info_details() const { return x_info_details; };
+	bool get_display_treated() const { return x_display_treated; };
+	bool get_display_treated_only_dir() const { return x_display_treated_only_dir; };
+	bool get_display_skipped() const { return x_display_skipped; };
+	bool get_display_finished() const { return x_display_finished; };
+	const infinint & get_pause() const { return x_pause; };
+	compression get_compression() const { return x_compr_algo; };
+	U_I get_compression_level() const { return x_compression_level; };
+	const infinint & get_slice_size() const { return x_file_size; };
+	const infinint & get_first_slice_size() const { return x_first_file_size; };
+	const std::string & get_execute() const { return x_execute; };
+	crypto_algo get_crypto_algo() const { return x_crypto; };
+	const secu_string & get_crypto_pass() const { return x_pass; };
+	U_32 get_crypto_size() const { return x_crypto_size; };
+	const std::vector<std::string> & get_gnupg_recipients() const { return x_gnupg_recipients; };
+	const std::vector<std::string> & get_gnupg_signatories() const { return x_gnupg_signatories; };
+	const mask & get_compr_mask() const { if(x_compr_mask == nullptr) throw SRC_BUG; return *x_compr_mask; };
+	const infinint & get_min_compr_size() const { return x_min_compr_size; };
+	bool get_empty() const { return x_empty; };
+	bool get_keep_compressed() const { return x_keep_compressed; };
+	const std::string & get_slice_permission() const { return x_slice_permission; };
+	const std::string & get_slice_user_ownership() const { return x_slice_user_ownership; };
+	const std::string & get_slice_group_ownership() const { return x_slice_group_ownership; };
+	bool get_sequential_marks() const { return x_sequential_marks; };
+	infinint get_sparse_file_min_size() const { return x_sparse_file_min_size; };
+	const std::string & get_user_comment() const { return x_user_comment; };
+	hash_algo get_hash_algo() const { return x_hash; };
+	infinint get_slice_min_digits() const { return x_slice_min_digits; };
+	const entrepot & get_entrepot() const { if(x_entrepot == nullptr) throw SRC_BUG; return *x_entrepot; };
+	bool get_multi_threaded() const { return x_multi_threaded; };
+
+    private:
+	bool x_info_details;
+	bool x_display_treated;
+	bool x_display_treated_only_dir;
+	bool x_display_skipped;
+	bool x_display_finished;
+	infinint x_pause;
+	compression x_compr_algo;
+	U_I x_compression_level;
+	infinint x_file_size;
+	infinint x_first_file_size;
+	std::string x_execute;
+	crypto_algo x_crypto;
+	secu_string x_pass;
+	U_32 x_crypto_size;
+	std::vector<std::string> x_gnupg_recipients;
+	std::vector<std::string> x_gnupg_signatories;
+	mask * x_compr_mask; //< points to a local copy of mask (must be allocated / releases by the archive_option_create objects)
+	infinint x_min_compr_size;
+	bool x_empty;
+	bool x_keep_compressed;
+	std::string x_slice_permission;
+	std::string x_slice_user_ownership;
+	std::string x_slice_group_ownership;
+	bool x_sequential_marks;
+	infinint x_sparse_file_min_size;
+	std::string x_user_comment;
+	hash_algo x_hash;
+	infinint x_slice_min_digits;
+	entrepot *x_entrepot;
+	bool x_multi_threaded;
+
+	void destroy();
+	void copy_from(const archive_options_repair & ref);
+	void destroy_mask(mask * & ptr);
+	void clean_mask(mask * & ptr);
+	void check_mask(const mask & m);
+    };
+
 	/// @}
 
 } // end of namespace

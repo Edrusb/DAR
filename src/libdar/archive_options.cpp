@@ -1708,5 +1708,185 @@ namespace libdar
 	}
     }
 
+    	/////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////
+
+    archive_options_repair::archive_options_repair()
+    {
+        x_compr_mask = nullptr;
+        x_entrepot = nullptr;
+        try
+        {
+            clear();
+        }
+        catch(...)
+        {
+            destroy();
+            throw;
+        }
+    }
+
+    archive_options_repair::archive_options_repair(const archive_options_repair & ref)
+    {
+        x_compr_mask = nullptr;
+        x_entrepot = nullptr;
+        try
+        {
+            copy_from(ref);
+        }
+        catch(...)
+        {
+            destroy();
+            throw;
+        }
+    }
+
+    void archive_options_repair::clear()
+    {
+        NLS_SWAP_IN;
+        try
+        {
+
+            destroy();
+
+            archive_option_clean_mask(x_compr_mask, get_pool());
+            x_info_details = false;
+            x_display_treated = false;
+            x_display_treated_only_dir = false;
+            x_display_skipped = false;
+            x_display_finished = false;
+            x_pause = 0;
+            x_compr_algo = none;
+            x_compression_level = 9;
+            x_file_size = 0;
+            x_first_file_size = 0;
+            x_execute = "";
+            x_crypto = crypto_none;
+            x_pass.clear();
+            x_crypto_size = default_crypto_size;
+            x_gnupg_recipients.clear();
+            x_gnupg_signatories.clear();
+            x_min_compr_size = default_min_compr_size;
+            x_empty = false;
+            x_keep_compressed = false;
+            x_slice_permission = "";
+            x_slice_user_ownership = "";
+            x_slice_group_ownership = "";
+            x_sequential_marks = true;
+            x_sparse_file_min_size = 15;  // min value to activate the feature (0 means no detection of sparse_file)
+            x_user_comment = default_user_comment;
+            x_hash = hash_none;
+            x_slice_min_digits = 0;
+            x_entrepot = new (get_pool()) entrepot_local( "", "", false); // never using furtive_mode to read slices
+            if(x_entrepot == nullptr)
+                throw Ememory("archive_options_repair::clear");
+            x_multi_threaded = true;
+        }
+        catch(...)
+        {
+            NLS_SWAP_OUT;
+            throw;
+        }
+        NLS_SWAP_OUT;
+    }
+
+    void archive_options_repair::set_compr_mask(const mask & compr_mask)
+    {
+        NLS_SWAP_IN;
+        try
+        {
+            archive_option_destroy_mask(x_compr_mask);
+            x_compr_mask = compr_mask.clone();
+            if(x_compr_mask == nullptr)
+                throw Ememory("archive_options_repair::set_compr_mask");
+        }
+        catch(...)
+        {
+            NLS_SWAP_OUT;
+            throw;
+        }
+        NLS_SWAP_OUT;
+    }
+
+    void archive_options_repair::set_entrepot(const entrepot & entr)
+    {
+        if(x_entrepot != nullptr)
+            delete x_entrepot;
+
+        x_entrepot = entr.clone();
+        if(x_entrepot == nullptr)
+            throw Ememory("archive_options_repair::set_entrepot");
+    }
+
+    void archive_options_repair::destroy()
+    {
+        NLS_SWAP_IN;
+        try
+        {
+            archive_option_destroy_mask(x_compr_mask);
+            if(x_entrepot != nullptr)
+            {
+                delete x_entrepot;
+                x_entrepot = nullptr;
+            }
+        }
+        catch(...)
+        {
+            NLS_SWAP_OUT;
+            throw;
+        }
+        NLS_SWAP_OUT;
+    }
+
+    void archive_options_repair::copy_from(const archive_options_repair & ref)
+    {
+        x_compr_mask = nullptr;
+        x_entrepot = nullptr;
+
+        if(ref.x_compr_mask == nullptr)
+            throw SRC_BUG;
+        x_compr_mask = ref.x_compr_mask->clone();
+
+        if(x_compr_mask == nullptr)
+            throw Ememory("archive_options_repair::copy_from");
+
+        x_info_details = ref.x_info_details;
+        x_display_treated = ref.x_display_treated;
+        x_display_treated_only_dir = ref.x_display_treated_only_dir;
+        x_display_skipped = ref.x_display_skipped;
+        x_display_finished = ref.x_display_finished;
+        x_pause = ref.x_pause;
+        x_compr_algo = ref.x_compr_algo;
+        x_compression_level = ref.x_compression_level;
+        x_file_size = ref.x_file_size;
+        x_first_file_size = ref.x_first_file_size;
+        x_execute = ref.x_execute;
+        x_crypto = ref.x_crypto;
+        x_pass = ref.x_pass;
+        x_crypto_size = ref.x_crypto_size;
+        x_gnupg_recipients = ref.x_gnupg_recipients;
+        x_gnupg_signatories = ref.x_gnupg_signatories;
+        x_min_compr_size = ref.x_min_compr_size;
+        x_empty = ref.x_empty;
+	x_keep_compressed = ref.x_keep_compressed;
+	x_slice_permission = ref.x_slice_permission;
+	x_slice_user_ownership = ref.x_slice_user_ownership;
+	x_slice_group_ownership = ref.x_slice_group_ownership;
+	x_sequential_marks = ref.x_sequential_marks;
+	x_sparse_file_min_size = ref.x_sparse_file_min_size;
+	x_user_comment = ref.x_user_comment;
+	x_hash = ref.x_hash;
+	x_slice_min_digits = ref.x_slice_min_digits;
+	if(x_entrepot != nullptr)
+	    throw SRC_BUG;
+	x_entrepot = ref.x_entrepot->clone();
+	if(x_entrepot == nullptr)
+	    throw Ememory("archive_options_repair::copy_from");
+	x_multi_threaded = ref.x_multi_threaded;
+    }
+
+
+
 } // end of namespace
 
