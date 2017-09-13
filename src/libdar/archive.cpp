@@ -801,11 +801,11 @@ namespace libdar
 		     const path & chem_dst,
 		     const string & basename_dst,
 		     const string & extension_dst,
-		     const archive_options_repair & options_repair)
+		     const archive_options_repair & options_repair,
+		     statistics *st)
     {
 	archive_options_read my_options_read = options_read;
 	bool initial_pause = (options_read.get_entrepot() == options_repair.get_entrepot() && chem_src == chem_dst);
-	statistics st;
 
 	    ////
 	    // initializing object fields
@@ -938,7 +938,7 @@ namespace libdar
 			     0,                   // delta_sig_min_size
 			     false,               // delta_diff
 			     set<string>(),       // ignored_symlinks
-			     &st);
+			     st);
 	}
 	catch(...)
 	{
