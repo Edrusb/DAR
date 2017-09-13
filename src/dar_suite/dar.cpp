@@ -250,7 +250,6 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    if(param.sequential_read && param.delta_diff)
 			throw Erange("little_main",gettext("Sequential reading of the archive of reference is not possible when delta difference is requested, you need to read the archive of reference in direct access mode (default mode)"));
 
-
 		    read_options.clear();
 		    if(no_cipher_given)
 			    // since archive format 9 crypto algo used
