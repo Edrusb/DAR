@@ -571,8 +571,6 @@ bool get_args(shell_interaction & dialog,
 		throw Erange("get_args", gettext("-af is not possible with -y option"));
 	    if(p.only_deleted)
 		throw Erange("get_args", gettext("-k option is not possible with -y option"));
-	    if(p.fs_root != nullptr)
-		dialog.warning(gettext("-R option is useless with -y option"));
 	    if(rec.name_include_exclude.size() > 0 || rec.path_include_exclude.size() > 0)
 		throw Erange("get_args", gettext("-X, -I, -P, -g, -], -[ and any other file selection relative commands are not possible with -y option"));
 	    if(p.empty_dir)
@@ -581,25 +579,21 @@ bool get_args(shell_interaction & dialog,
 		dialog.warning(gettext("-r option is useless with -y option"));
 	    if(rec.ea_include_exclude.size() > 0)
 		throw Erange("get_args", gettext("-u, -U, -P, -g, -], -[ and any other EA selection relative commands are not possible with -y option"));
-	    if(p.what_to_check == cat_inode::cf_all)
+	    if(p.what_to_check != cat_inode::cf_all)
 		throw Erange("get_args", gettext("-O option is not possible with -y option"));
 	    if(!p.hourshift.is_zero())
 		dialog.warning(gettext("-H option is useless with -y option"));
-	    if(p.alter_atime && !p.furtive_read_mode)
-		dialog.warning(gettext("-aa option is useless with -y option"));
-	    if(!p.alter_atime && !p.furtive_read_mode)
-		dialog.warning(gettext("-ac option is useless with -y option"));
 	    if(p.filter_unsaved)
 		dialog.warning(gettext("-as option is useless with -y option"));
 	    if(rec.ea_erase)
 		dialog.warning(gettext("-ae option is useless with -y option"));
 	    if(p.decremental)
 		dialog.warning(gettext("-ad option is useless with -y option"));
-	    if(p.security_check)
+	    if(!p.security_check)
 		dialog.warning(gettext("-asecu option is useless with -y option"));
 	    if(p.ignore_unknown_inode)
 		dialog.warning(gettext("-ai option is useless with -y option"));
-	    if(p.no_compare_symlink_date)
+	    if(!p.no_compare_symlink_date)
 		dialog.warning(gettext("--alter=do-not-compare-symlink-mtime option is useless with -y option"));
 	    if(p.same_fs)
 		dialog.warning(gettext("-M option is useless with -y option"));
@@ -609,8 +603,6 @@ bool get_args(shell_interaction & dialog,
 		dialog.warning(gettext("-/ option is useless with -y option"));
 	    if(rec.backup_hook_include_exclude.size() > 0)
 		dialog.warning(gettext("-< and -> options are useless with -y option"));
-	    if(p.scope.size() > 0)
-		dialog.warning(gettext("-4 option is useless with -y option"));
 	    if(p.ea_name_for_exclusion != "")
 		dialog.warning(gettext("-5 option is useless with -y option"));
 	    if(p.delta_sig || !p.delta_diff)
