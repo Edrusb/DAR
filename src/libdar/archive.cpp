@@ -738,32 +738,32 @@ namespace libdar
 				     true,    // alter_atime
 				     false,   // furtive_read_mode
 				     false,   // same_fs
-				     cat_inode::cf_all,   // what_to_check
+				     cat_inode::cf_all,        // what_to_check
 				     false,   // snapshot
 				     false,   // cache_directory_tagging
 				     options.get_keep_compressed(),
 				     0,       // fixed_date
 				     options.get_slice_permission(),
-				     0,  // repeat_count
-				     0,  // repeat_byte
+				     0,       // repeat_count
+				     0,       // repeat_byte
 				     options.get_decremental_mode(),
 				     options.get_sequential_marks(),
-				     false,  // security_check
+				     false,   // security_check
 				     options.get_sparse_file_min_size(),
 				     options.get_user_comment(),
 				     options.get_hash_algo(),
 				     options.get_slice_min_digits(),
 				     "",      // backup_hook_file_execute
-				     bool_mask(false), // backup_hook_file_mask
-				     false,
+				     bool_mask(false),         // backup_hook_file_mask
+				     false,   // ignore_unknown
 				     options.get_fsa_scope(),
 				     options.get_multi_threaded(),
-				     options.get_delta_signature(), // delta signatures
+				     options.get_delta_signature(),
 				     options.get_has_delta_mask_been_set(), // build delta sig
 				     options.get_delta_mask(), // delta_mask
 				     options.get_delta_sig_min_size(),
-				     false,                    // delta diff
-				     set<string>(),          // empty list
+				     false,   // delta diff
+				     set<string>(),            // empty list
 				     st_ptr);
 		    exploitable = false;
 		    stack.terminate();
