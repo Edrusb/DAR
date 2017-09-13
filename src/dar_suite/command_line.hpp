@@ -44,7 +44,7 @@ using namespace libdar;
     /// \addtogroup CMDLINE
     /// @{
 
-enum operation { noop, extract, create, diff, test, listing, isolate, merging, version_or_help };
+enum operation { noop, extract, create, diff, test, listing, isolate, merging, version_or_help, repairing };
     // noop stands for no-operation. get_args() never returns such value,
     // it is just necessary within the command_line module
 

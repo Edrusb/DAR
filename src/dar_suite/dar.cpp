@@ -177,6 +177,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	    archive_options_listing listing_options;
 	    archive_options_diff diff_options;
 	    archive_options_test test_options;
+	    archive_options_repair repair_options;
 	    bool no_cipher_given;
 	    vector<string> recipients;
 	    set<string> ignored_as_symlink_listing;
@@ -236,6 +237,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
             {
             case create:
 	    case merging:
+	    case repairing:
 		if(param.ref_filename != nullptr && param.ref_root != nullptr)
 		{
 		    line_tools_crypto_split_algo_pass(param.pass_ref,
@@ -276,10 +278,15 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    }
 		    if(ref_repo != nullptr)
 			read_options.set_entrepot(*ref_repo);
-		    arch = new (nothrow) archive(dialog, *param.ref_root, *param.ref_filename, EXTENSION,
-						 read_options);
-		    if(arch == nullptr)
-			throw Ememory("little_main");
+		    if(param.op != repairing)
+		    {
+			arch = new (nothrow) archive(dialog, *param.ref_root, *param.ref_filename, EXTENSION,
+						     read_options);
+			if(arch == nullptr)
+			    throw Ememory("little_main");
+		    }
+		    else
+			arch = nullptr;
 		}
 
 		if(param.aux_root != nullptr && param.aux_filename != nullptr)
@@ -481,6 +488,55 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 						EXTENSION,         // const string &
 						merge_options,
 						&st);              // statistics*
+		    if(cur == nullptr)
+			throw Ememory("little_main");
+		    if(!param.quiet)
+			display_merge_stat(dialog, st);
+		    break;
+		case repairing:
+		    repair_options.clear();
+		    repair_options.set_info_details(param.info_details);
+		    repair_options.set_display_treated(param.display_treated,
+						      param.display_treated_only_dir);
+		    repair_options.set_display_skipped(param.display_skipped);
+		    repair_options.set_pause(param.pause);
+		    repair_options.set_compression(param.algo);
+		    repair_options.set_compression_level(param.compression_level);
+		    repair_options.set_slicing(param.file_size, param.first_file_size);
+		    repair_options.set_execute(param.execute);
+		    repair_options.set_crypto_algo(crypto);
+		    repair_options.set_crypto_pass(tmp_pass);
+		    repair_options.set_crypto_size(param.crypto_size);
+		    repair_options.set_gnupg_recipients(recipients);
+		    if(recipients.empty() && !param.signatories.empty())
+			throw Erange("little_main", gettext("Archive signature is only possible with gnupg encryption"));
+		    repair_options.set_gnupg_signatories(param.signatories);
+		    repair_options.set_compr_mask(*param.compress_mask);
+		    repair_options.set_min_compr_size(param.min_compr_size);
+		    repair_options.set_empty(param.empty);
+		    repair_options.set_keep_compressed(param.keep_compressed);
+		    repair_options.set_slice_permission(param.slice_perm);
+		    repair_options.set_slice_user_ownership(param.slice_user);
+		    repair_options.set_slice_group_ownership(param.slice_group);
+		    repair_options.set_sequential_marks(param.use_sequential_marks);
+		    repair_options.set_sparse_file_min_size(param.sparse_file_min_size);
+		    repair_options.set_user_comment(param.user_comment);
+		    repair_options.set_hash_algo(param.hash);
+		    repair_options.set_slice_min_digits(param.num_digits);
+		    repair_options.set_multi_threaded(param.multi_threaded);
+		    if(repo != nullptr)
+			repair_options.set_entrepot(*repo);
+
+		    cur = new (nothrow) archive(dialog,
+						*param.ref_root,
+						*param.ref_filename,
+						EXTENSION,
+						read_options,
+						*param.sauv_root,
+						param.filename,
+						EXTENSION,
+						repair_options,
+						&st);
 		    if(cur == nullptr)
 			throw Ememory("little_main");
 		    if(!param.quiet)

@@ -60,7 +60,7 @@ u + exclude EA from operation (mask)    --exclude-ea
 v + verbose output                      --verbose   --verbose={skipped|treated|messages|dir|masks|all}
 w * do not warn before overwriting      --no-warn
 x + extract archive                     --extract
-y !
+y + repair archive                      --add-missing-catalogue
 z * compression                         --gzip --compress
 A + make a differential backup          --ref
 B + filename taken as command-line extension --config

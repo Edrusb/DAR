@@ -90,7 +90,7 @@ extern "C"
 #include "criterium.hpp"
 #include "fichier_local.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:8:{:}:j:\\:"
+#define OPT_STRING "c:A:x:d:t:l:v::z::y:nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:8:{:}:j:\\:"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c option"
@@ -559,6 +559,68 @@ bool get_args(shell_interaction & dialog,
         if(p.display_finished && p.op != create)
             dialog.warning(gettext("-vf is only useful with -c option"));
 
+	if(p.op == repairing)
+	{
+	    if(p.ref_filename == nullptr)
+		throw Erange("get_args", gettext("-A option is required with -y option"));
+	    if(p.snapshot)
+		throw Erange("get_args", gettext("'-A +' is not possible with -y option"));
+	    if(rec.fixed_date_mode)
+		throw Erange("get_args", gettext("-af is not possible with -y option"));
+	    if(p.warn_over)
+		dialog.warning(gettext("-w option is useless with -y option"));
+	    if(p.only_deleted)
+		throw Erange("get_args", gettext("-k option is not possible with -y option"));
+	    if(p.fs_root != nullptr)
+		dialog.warning(gettext("-R option is useless with -y option"));
+	    if(rec.name_include_exclude.size() > 0 || rec.path_include_exclude.size() > 0)
+		throw Erange("get_args", gettext("-X, -I, -P, -g, -], -[ and any other file selection relative commands are not possible with -y option"));
+	    if(p.empty_dir)
+		dialog.warning(gettext("-D option is useless with -y option"));
+	    if(rec.only_more_recent)
+		dialog.warning(gettext("-r option is useless with -y option"));
+	    if(rec.ea_include_exclude.size() > 0)
+		throw Erange("get_args", gettext("-u, -U, -P, -g, -], -[ and any other EA selection relative commands are not possible with -y option"));
+	    if(p.what_to_check == cat_inode::cf_all)
+		throw Erange("get_args", gettext("-O option is not possible with -y option"));
+	    if(!p.hourshift.is_zero())
+		dialog.warning(gettext("-H option is useless with -y option"));
+	    if(p.alter_atime && !p.furtive_read_mode)
+		dialog.warning(gettext("-aa option is useless with -y option"));
+	    if(!p.alter_atime && !p.furtive_read_mode)
+		dialog.warning(gettext("-ac option is useless with -y option"));
+	    if(p.filter_unsaved)
+		dialog.warning(gettext("-as option is useless with -y option"));
+	    if(rec.ea_erase)
+		dialog.warning(gettext("-ae option is useless with -y option"));
+	    if(p.decremental)
+		dialog.warning(gettext("-ad option is useless with -y option"));
+	    if(p.security_check)
+		dialog.warning(gettext("-asecu option is useless with -y option"));
+	    if(p.ignore_unknown_inode)
+		dialog.warning(gettext("-ai option is useless with -y option"));
+	    if(p.no_compare_symlink_date)
+		dialog.warning(gettext("--alter=do-not-compare-symlink-mtime option is useless with -y option"));
+	    if(p.same_fs)
+		dialog.warning(gettext("-M option is useless with -y option"));
+	    if(p.aux_filename != nullptr)
+		dialog.warning(gettext("-@ option is useless with -y option"));
+	    if(p.overwrite != nullptr)
+		dialog.warning(gettext("-/ option is useless with -y option"));
+	    if(rec.backup_hook_include_exclude.size() > 0)
+		dialog.warning(gettext("-< and -> options are useless with -y option"));
+	    if(p.scope.size() > 0)
+		dialog.warning(gettext("-4 option is useless with -y option"));
+	    if(p.ea_name_for_exclusion != "")
+		dialog.warning(gettext("-5 option is useless with -y option"));
+	    if(p.delta_sig || !p.delta_diff)
+		dialog.warning(gettext("-8 option is useless with -y option"));
+	    if(rec.path_delta_include_exclude.size() > 0)
+		dialog.warning(gettext("-{ and -} options are useless with -y option"));
+	    if(p.ignored_as_symlink != "")
+		dialog.warning(gettext("-\\ option is useless with -y option"));
+	}
+
             //////////////////////
             // generating masks
             // for filenames
@@ -809,6 +871,7 @@ static bool get_args_recursive(recursive_param & rec,
             case 'l':
             case 'C':
             case '+':
+	    case 'y':
                 if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(p.filename != "" || p.sauv_root != nullptr)
@@ -856,6 +919,9 @@ static bool get_args_recursive(recursive_param & rec,
                 case '+':
                     p.op = merging;
                     break;
+		case 'y':
+		    p.op = repairing;
+		    break;
                 default:
                     throw SRC_BUG;
                 }
