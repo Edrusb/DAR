@@ -154,6 +154,60 @@ namespace libdar
 				     bool display_treated,
 				     const catalogue & cat);
 
+    	/// initialize variables used for merging in step1 and step2
+    static void filtre_merge_step0(user_interaction & dialog,
+				   memory_pool *pool,
+				   const catalogue * ref1,
+				   const catalogue * ref2,
+				   statistics & st,
+				   bool decremental_mode,
+				   crit_action* & decr,
+				   const crit_action* & overwrite,
+				   bool & abort,
+				   thread_cancellation & thr_cancel);
+
+        /// builds a catalogue from two refs with the given policy and filters
+    static void filtre_merge_step1(user_interaction & dialog,
+				   memory_pool *pool,
+				   const mask & filtre,
+				   const mask & subtree,
+				   catalogue & cat,
+				   const catalogue * ref1,
+				   const catalogue * ref2,
+				   bool info_details,
+				   bool display_treated,
+				   bool display_skipped,
+				   statistics & st,
+				   bool make_empty_dir,
+				   bool warn_overwrite,
+				   bool decremental_mode,
+				   crit_action* & decr,
+				   const crit_action* & overwrite,
+				   bool & abort,
+				   thread_cancellation & thr_cancel);
+
+
+        /// copies data of "cat" catalogue to the pdesc of a brand new archive
+    static void filtre_merge_step2(user_interaction & dialog,
+				   memory_pool *pool,
+				   const pile_descriptor & pdesc,
+				   catalogue & cat,
+				   bool info_details,
+				   bool display_treated,
+				   bool display_treated_only_dir,
+				   statistics & st,
+				   const mask & compr_mask,
+				   const infinint & min_compr_size,
+				   bool keep_compressed,
+				   const infinint & sparse_file_min_size,
+				   bool delta_signature,
+				   bool build_delta_sig,
+				   const infinint & delta_sig_min_size,
+				   const mask & delta_mask,
+				   bool & abort,
+				   thread_cancellation & thr_cancel);
+
+
     void filtre_restore(user_interaction & dialog,
 			memory_pool *pool,
 			const mask & filtre,
@@ -1647,16 +1701,16 @@ namespace libdar
 			   thr_cancel);
     }
 
-    void filtre_merge_step0(user_interaction & dialog,
-			    memory_pool *pool,
-			    const catalogue * ref1,
-			    const catalogue * ref2,
-			    statistics & st,
-			    bool decremental_mode,
-			    crit_action* & decr,
-			    const crit_action* & overwrite,
-			    bool & abort,
-			    thread_cancellation & thr_cancel)
+    static void filtre_merge_step0(user_interaction & dialog,
+				   memory_pool *pool,
+				   const catalogue * ref1,
+				   const catalogue * ref2,
+				   statistics & st,
+				   bool decremental_mode,
+				   crit_action* & decr,
+				   const crit_action* & overwrite,
+				   bool & abort,
+				   thread_cancellation & thr_cancel)
     {
 
 	    // STEP 0: Getting ready
@@ -1744,24 +1798,24 @@ namespace libdar
 	    /// End of Step 0
     }
 
-    void filtre_merge_step1(user_interaction & dialog,
-			    memory_pool *pool,
-			    const mask & filtre,
-			    const mask & subtree,
-			    catalogue & cat,
-			    const catalogue * ref1,
-			    const catalogue * ref2,
-			    bool info_details,
-			    bool display_treated,
-			    bool display_skipped,
-			    statistics & st,
-			    bool make_empty_dir,
-			    bool warn_overwrite,
-			    bool decremental_mode,
-			    crit_action* & decr,
-			    const crit_action* & overwrite,
-			    bool & abort,
-			    thread_cancellation & thr_cancel)
+    static void filtre_merge_step1(user_interaction & dialog,
+				   memory_pool *pool,
+				   const mask & filtre,
+				   const mask & subtree,
+				   catalogue & cat,
+				   const catalogue * ref1,
+				   const catalogue * ref2,
+				   bool info_details,
+				   bool display_treated,
+				   bool display_skipped,
+				   statistics & st,
+				   bool make_empty_dir,
+				   bool warn_overwrite,
+				   bool decremental_mode,
+				   crit_action* & decr,
+				   const crit_action* & overwrite,
+				   bool & abort,
+				   thread_cancellation & thr_cancel)
     {
 	const catalogue *ref_tab[] = { ref1, ref2, nullptr };
 	const cat_entree *e = nullptr;
@@ -2535,24 +2589,24 @@ namespace libdar
 
     }
 
-    void filtre_merge_step2(user_interaction & dialog,
-			    memory_pool *pool,
-			    const pile_descriptor & pdesc,
-			    catalogue & cat,
-			    bool info_details,
-			    bool display_treated,
-			    bool display_treated_only_dir,
-			    statistics & st,
-			    const mask & compr_mask,
-			    const infinint & min_compr_size,
-			    bool keep_compressed,
-			    const infinint & sparse_file_min_size,
-			    bool delta_signature,
-			    bool build_delta_sig,
-			    const infinint & delta_sig_min_size,
-			    const mask & delta_mask,
-			    bool & abort,
-			    thread_cancellation & thr_cancel)
+    static void filtre_merge_step2(user_interaction & dialog,
+				   memory_pool *pool,
+				   const pile_descriptor & pdesc,
+				   catalogue & cat,
+				   bool info_details,
+				   bool display_treated,
+				   bool display_treated_only_dir,
+				   statistics & st,
+				   const mask & compr_mask,
+				   const infinint & min_compr_size,
+				   bool keep_compressed,
+				   const infinint & sparse_file_min_size,
+				   bool delta_signature,
+				   bool build_delta_sig,
+				   const infinint & delta_sig_min_size,
+				   const mask & delta_mask,
+				   bool & abort,
+				   thread_cancellation & thr_cancel)
     {
 	compression stock_algo  = pdesc.compr->get_algo();
 	defile juillet = FAKE_ROOT;

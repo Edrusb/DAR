@@ -813,7 +813,7 @@ namespace libdar
 	    // stack will be set by op_create_in_sub()
 	    // ver will be set by op_create_in_sub()
 	init_pool(); // initializes pool
-	cat = nullptr; // we be stolen from src
+	cat = nullptr; // will be set by op_create_in_sub()
 	exploitable = false;
 	lax_read_mode = false;
 	sequential_read = false;
@@ -2271,7 +2271,6 @@ namespace libdar
 	try
 	{
 	    stack.clear(); // [object member variable]
-	    cat = nullptr; // [object member variable]
 	    bool aborting = false;
 	    infinint aborting_next_etoile = 0;
 	    U_64 flag = 0; // carries the sar option flag
@@ -2331,8 +2330,8 @@ namespace libdar
 		    // ********** building the catalogue (empty for now) ************************* //
 		datetime root_mtime;
 		pile_descriptor pdesc(&stack);
-		crit_action* rep_decr = nullptr; // not used, just needed to pass as argumen to filtre_merge_step0()
-		const crit_action *rep_over = &overwrite; // not used, just needed to pass as argumen to filtre_merge_step0()
+
+		cat = nullptr; // [object member variable]
 
 		if(info_details)
 		    dialog.warning(gettext("Building the catalog object..."));
@@ -2356,6 +2355,7 @@ namespace libdar
 		switch(op)
 		{
 		case oper_merge:
+		case oper_repair:
 		    if(add_marks_for_sequential_reading && !empty)
 			cat = new (pool) escape_catalogue(dialog, pdesc, ref_cat1->get_root_dir_last_modif(), internal_name);
 		    else
@@ -2366,17 +2366,13 @@ namespace libdar
 			cat = new (pool) escape_catalogue(dialog, pdesc, root_mtime, internal_name);
 		    else
 			cat = new (pool) catalogue(dialog, root_mtime, internal_name);
-		case oper_repair:
-			// cat has been set from the archive to be repared
-			// in the following we will only dump data to the
-			// new stack of generic_files
-		    break;
 		default:
 		    throw SRC_BUG;
 		}
 
 		if(cat == nullptr)
 		    throw Ememory("archive::op_create_in_sub");
+
 
 		    // *********** now we can perform the data filtering operation (adding data to the archive) *************** //
 
@@ -2465,8 +2461,21 @@ namespace libdar
 			}
 			break;
 		    case oper_merge:
+		    case oper_repair:
 			if(info_details)
-			    dialog.warning(gettext("Processing files for merging..."));
+			{
+			    switch(op)
+			    {
+			    case oper_merge:
+				dialog.warning(gettext("Processing files for merging..."));
+				break;
+			    case oper_repair:
+				dialog.warning(gettext("Processing files for fixing..."));
+				break;
+			    default:
+				throw SRC_BUG;
+			    }
+			}
 
 			filtre_merge(dialog,
 				     pool,
@@ -2495,46 +2504,6 @@ namespace libdar
 				     build_delta_sig,
 				     delta_sig_min_size,
 				     delta_mask);
-			break;
-		    case oper_repair:
-			if(info_details)
-			    dialog.warning(gettext("Processing files for fixing..."));
-
-			filtre_merge_step0(dialog,
-					   pool,
-					   ref_cat1,
-					   ref_cat2,
-					   *st_ptr,
-					   false,
-					   rep_decr,
-					   rep_over,
-					   aborting,
-					   thr_cancel);
-			if(rep_decr != nullptr)
-			    throw SRC_BUG;
-			    // we should be prepared to release decr
-			    // but we do not need such argument for fixing op.
-			if(cat == nullptr)
-			    throw SRC_BUG;
-			    // cat should have been setup previously
-			filtre_merge_step2(dialog,
-					   pool,
-					   pdesc,
-					   *cat,
-					   info_details,
-					   display_treated,
-					   false,    // display_trated_only_dir
-					   *st_ptr,
-					   compr_mask,
-					   min_compr_size,
-					   keep_compressed,
-					   sparse_file_min_size,
-					   delta_signature,
-					   build_delta_sig,
-					   delta_sig_min_size,
-					   delta_mask,
-					   aborting,
-					   thr_cancel);
 			break;
 		    default:
 			throw SRC_BUG;
