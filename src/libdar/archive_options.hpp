@@ -1511,6 +1511,12 @@ namespace libdar
 	    /////////////////////////////////////////////////////////////////////
 	    // setting methods
 
+		    /// defines whether overwritting is allowed or not
+	void set_allow_over(bool allow_over) { x_allow_over = allow_over; };
+
+	    /// defines whether a warning shall be issued before overwriting
+	void set_warn_over(bool warn_over) { x_warn_over = warn_over; };
+
 	    /// defines whether the user needs detailed output of the operation
 	    ///
 	    /// \note in API 5.5.x and before this switch drove the displaying
@@ -1627,6 +1633,8 @@ namespace libdar
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
 
+	bool get_allow_over() const { return x_allow_over; };
+	bool get_warn_over() const { return x_warn_over; };
 	bool get_info_details() const { return x_info_details; };
 	bool get_display_treated() const { return x_display_treated; };
 	bool get_display_treated_only_dir() const { return x_display_treated_only_dir; };
@@ -1659,6 +1667,8 @@ namespace libdar
 	bool get_multi_threaded() const { return x_multi_threaded; };
 
     private:
+	bool x_allow_over;
+	bool x_warn_over;
 	bool x_info_details;
 	bool x_display_treated;
 	bool x_display_treated_only_dir;

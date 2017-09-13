@@ -569,8 +569,6 @@ bool get_args(shell_interaction & dialog,
 		throw Erange("get_args", gettext("'-A +' is not possible with -y option"));
 	    if(rec.fixed_date_mode)
 		throw Erange("get_args", gettext("-af is not possible with -y option"));
-	    if(p.warn_over)
-		dialog.warning(gettext("-w option is useless with -y option"));
 	    if(p.only_deleted)
 		throw Erange("get_args", gettext("-k option is not possible with -y option"));
 	    if(p.fs_root != nullptr)

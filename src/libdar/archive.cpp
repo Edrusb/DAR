@@ -882,9 +882,9 @@ namespace libdar
 			     bool_mask(true),     // subtree
 			     basename_dst,
 			     extension_dst,
-			     false,               // allow_over
+			     options_repair.get_allow_over(),
 			     crit_constant_action(data_preserve, EA_preserve), // overwrite
-			     true, // warn_over
+			     options_repair.get_warn_over(),
 			     options_repair.get_info_details(),
 			     options_repair.get_display_treated(),
 			     options_repair.get_display_treated_only_dir(),

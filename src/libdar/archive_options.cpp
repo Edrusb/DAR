@@ -1751,6 +1751,8 @@ namespace libdar
             destroy();
 
             archive_option_clean_mask(x_compr_mask, get_pool());
+	    x_allow_over = true;
+	    x_warn_over = true;
             x_info_details = false;
             x_display_treated = false;
             x_display_treated_only_dir = false;
@@ -1851,6 +1853,8 @@ namespace libdar
         if(x_compr_mask == nullptr)
             throw Ememory("archive_options_repair::copy_from");
 
+	x_allow_over = ref.x_allow_over;
+	x_warn_over = ref.x_warn_over;
         x_info_details = ref.x_info_details;
         x_display_treated = ref.x_display_treated;
         x_display_treated_only_dir = ref.x_display_treated_only_dir;

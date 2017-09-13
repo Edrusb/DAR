@@ -494,6 +494,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    break;
 		case repairing:
 		    repair_options.clear();
+		    repair_options.set_warn_over(param.warn_over);
+		    repair_options.set_allow_over(param.allow_over);
 		    repair_options.set_info_details(param.info_details);
 		    repair_options.set_display_treated(param.display_treated,
 						      param.display_treated_only_dir);
