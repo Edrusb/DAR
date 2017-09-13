@@ -428,6 +428,8 @@ bool get_args(shell_interaction & dialog,
             throw Erange("get_args", gettext("-af option is only available with -c"));
         if(p.ref_filename != nullptr && p.op == listing)
             dialog.warning(gettext("-A option is not available with -l"));
+	if(p.list_mode != archive_options_listing::normal)
+            dialog.warning(gettext("-T option is only available with -l"));
         if(p.op == isolate && p.ref_filename == nullptr)
             throw Erange("get_args", gettext("with -C option, -A option is mandatory"));
         if(p.op == merging && p.ref_filename == nullptr)
