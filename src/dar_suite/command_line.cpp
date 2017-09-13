@@ -2530,6 +2530,7 @@ const struct option *get_long_opt()
 	{"delta-sig-min-size", required_argument, nullptr, '6'},
 	{"network-retry-delay", required_argument, nullptr, 'j'},
 	{"ignored-as-symlink", required_argument, nullptr, '\\'},
+	{"add-missing-catalogue", required_argument, nullptr, 'y'},
         { nullptr, 0, nullptr, 0 }
     };
 
