@@ -2921,7 +2921,7 @@ namespace libdar
 		}
 		catch(Erange & e)
 		{
-		    string msg = string(gettext("Failed reading CRC for EA: ")) + juillet.get_string();
+		    string msg = string(gettext("Failed reading CRC for EA and FSA: ")) + juillet.get_string();
 
 		    if(lax_read_mode)
 			dialog.warning(msg);
