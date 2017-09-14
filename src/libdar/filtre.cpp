@@ -2755,7 +2755,7 @@ namespace libdar
 
 		    if(e_ino->ea_get_saved_status() == cat_inode::ea_full)
 		    {
-			cat.pre_add_ea(e);
+			cat.pre_add_ea(e, &pdesc);
 			    // ignoring the return value of save_ea, exceptions may still propagate
 			(void)save_ea(dialog, juillet.get_string(), e_ino, pdesc, display_treated, repair_mode);
 			cat.pre_add_ea_crc(e,&pdesc);
@@ -2764,7 +2764,7 @@ namespace libdar
 			// saving inode's FSA
 		    if(e_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 		    {
-			cat.pre_add_fsa(e);
+			cat.pre_add_fsa(e, &pdesc);
 			    // ignoring the return value of save_fsa, exceptions may still propagate
 			(void)save_fsa(dialog, juillet.get_string(), e_ino, pdesc, display_treated, repair_mode);
 			cat.pre_add_fsa_crc(e, &pdesc);
@@ -2772,7 +2772,7 @@ namespace libdar
 		}
 		else // not an inode
 		{
-		    cat.pre_add(e);
+		    cat.pre_add(e, &pdesc);
 		    if(e_mir != nullptr && (e_mir->get_inode()->get_saved_status() == s_saved || e_mir->get_inode()->ea_get_saved_status() == cat_inode::ea_full))
 			if(display_treated)
 			    dialog.warning(string(gettext("Adding Hard link to archive: "))+juillet.get_string());
@@ -2965,7 +2965,7 @@ namespace libdar
 	    {
 		    // PRE RECORDING THE INODE (for sequential reading)
 
-		cat.pre_add(e);
+		cat.pre_add(e, &pdesc);
 
 		    // EXITING FOR NON INODE ENTRIES
 
@@ -3081,7 +3081,7 @@ namespace libdar
 			    }
 			    catch(...)
 			    {
-				cat.pre_add_failed_mark();
+				cat.pre_add_failed_mark(&pdesc);
 				throw;
 			    }
 
@@ -3273,7 +3273,7 @@ namespace libdar
 				    //////////////////////////////
 				    // adding the data CRC if escape marks are used
 
-				cat.pre_add_crc(ino);
+				cat.pre_add_crc(ino, &pdesc);
 
 				    //////////////////////////////
 				    // checking if compressed data is smaller than uncompressed one
@@ -3374,7 +3374,7 @@ namespace libdar
 						if(info_details)
 						    dialog.warning(tools_printf(gettext("WARNING! File modified while reading it for backup. Performing retry %i of %i"), &current_repeat_count, &repeat_count));
 						if(pdesc.stack->get_position() != start)
-						    cat.pre_add_waste_mark();
+						    cat.pre_add_waste_mark(&pdesc);
 						loop = true;
 
 						    // updating the last modification date of file
@@ -3394,7 +3394,7 @@ namespace libdar
 					{
 					    dialog.warning(string(gettext("WARNING! File modified while reading it for backup, but no more retry allowed: ")) + info_quoi);
 					    fic->set_dirty(true);
-					    cat.pre_add_dirty(); // when in sequential reading
+					    cat.pre_add_dirty(&pdesc); // when in sequential reading
 					    ret = false;
 					}
 				    }
@@ -3488,7 +3488,7 @@ namespace libdar
 				    }
 
 					// adding a tape mark when in sequential read mode
-				    cat.pre_add_delta_sig();
+				    cat.pre_add_delta_sig(&pdesc);
 				    pdesc.compr->suspend_compression();
 
 					// dropping the data to the archive and recording its location in the cat_file object
@@ -4376,7 +4376,7 @@ namespace libdar
 			throw SRC_BUG;
 		}
 
-		cat.pre_add_delta_sig();
+		cat.pre_add_delta_sig(&pdesc);
 		pdesc.compr->suspend_compression();
 		if(sig != nullptr)
 		    e_file->dump_delta_signature(*sig, *(pdesc.compr), pdesc.esc != nullptr);
