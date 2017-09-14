@@ -215,7 +215,6 @@ namespace libdar
 				   bool info_details,
 				   bool display_treated,
 				   bool display_treated_only_dir,
-				   statistics & st,
 				   const mask & compr_mask,
 				   const infinint & min_compr_size,
 				   bool keep_compressed,

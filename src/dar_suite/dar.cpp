@@ -532,12 +532,9 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 						*param.sauv_root,
 						param.filename,
 						EXTENSION,
-						repair_options,
-						&st);
+						repair_options);
 		    if(cur == nullptr)
 			throw Ememory("little_main");
-		    if(!param.quiet)
-			display_merge_stat(dialog, st);
 		    break;
 		default:
 		    throw SRC_BUG;

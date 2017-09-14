@@ -801,8 +801,7 @@ namespace libdar
 		     const path & chem_dst,
 		     const string & basename_dst,
 		     const string & extension_dst,
-		     const archive_options_repair & options_repair,
-		     statistics *st)
+		     const archive_options_repair & options_repair)
     {
 	archive_options_read my_options_read = options_read;
 	bool initial_pause = (options_read.get_entrepot() == options_repair.get_entrepot() && chem_src == chem_dst);
@@ -917,12 +916,14 @@ namespace libdar
 			     0,                   // delta_sig_min_size
 			     false,               // delta_diff
 			     set<string>(),       // ignored_symlinks
-			     st);
+			     nullptr);            // statistics
 
 		// stealing src's catalogue, our's is still empty at this step
 	    catalogue *tmp = cat;
 	    cat = src.cat;
 	    src.cat = tmp;
+
+	    dialog.printf(gettext("Archive repairing completed. WARNING! it is strongly advised to test the resulting archive before removing the damaged one"));
 	}
 	catch(...)
 	{
@@ -2506,7 +2507,6 @@ namespace libdar
 				info_details,
 				display_treated,
 				false,    // display_trated_only_dir
-				*st_ptr,
 				compr_mask,
 				min_compr_size,
 				keep_compressed,

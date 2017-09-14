@@ -156,8 +156,7 @@ namespace libdar
 		const path & chem_dst,
 		const std::string & basename_dst,
 		const std::string & extension_dst,
-		const archive_options_repair & options_repair,
-		statistics * progressive_report);
+		const archive_options_repair & options_repair);
 
 
 	    /// copy constructor (not implemented, throw an exception if called explicitely or implicitely)
