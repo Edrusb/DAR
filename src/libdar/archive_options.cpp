@@ -1759,8 +1759,6 @@ namespace libdar
             x_display_skipped = false;
             x_display_finished = false;
             x_pause = 0;
-            x_compr_algo = none;
-            x_compression_level = 9;
             x_file_size = 0;
             x_first_file_size = 0;
             x_execute = "";
@@ -1771,12 +1769,10 @@ namespace libdar
             x_gnupg_signatories.clear();
             x_min_compr_size = default_min_compr_size;
             x_empty = false;
-            x_keep_compressed = false;
             x_slice_permission = "";
             x_slice_user_ownership = "";
             x_slice_group_ownership = "";
             x_sequential_marks = true;
-            x_sparse_file_min_size = 15;  // min value to activate the feature (0 means no detection of sparse_file)
             x_user_comment = default_user_comment;
             x_hash = hash_none;
             x_slice_min_digits = 0;
@@ -1861,8 +1857,6 @@ namespace libdar
         x_display_skipped = ref.x_display_skipped;
         x_display_finished = ref.x_display_finished;
         x_pause = ref.x_pause;
-        x_compr_algo = ref.x_compr_algo;
-        x_compression_level = ref.x_compression_level;
         x_file_size = ref.x_file_size;
         x_first_file_size = ref.x_first_file_size;
         x_execute = ref.x_execute;
@@ -1873,12 +1867,10 @@ namespace libdar
         x_gnupg_signatories = ref.x_gnupg_signatories;
         x_min_compr_size = ref.x_min_compr_size;
         x_empty = ref.x_empty;
-	x_keep_compressed = ref.x_keep_compressed;
 	x_slice_permission = ref.x_slice_permission;
 	x_slice_user_ownership = ref.x_slice_user_ownership;
 	x_slice_group_ownership = ref.x_slice_group_ownership;
 	x_sequential_marks = ref.x_sequential_marks;
-	x_sparse_file_min_size = ref.x_sparse_file_min_size;
 	x_user_comment = ref.x_user_comment;
 	x_hash = ref.x_hash;
 	x_slice_min_digits = ref.x_slice_min_digits;

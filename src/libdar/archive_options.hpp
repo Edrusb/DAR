@@ -1540,12 +1540,6 @@ namespace libdar
 	    /// set a pause beteween slices. Set to zero does not pause at all, set to 1 makes libdar pauses each slice, set to 2 makes libdar pause each 2 slices and so on.
 	void set_pause(const infinint & pause) { x_pause = pause; };
 
-	    /// set the compression algorithm to be used
-	void set_compression(compression compr_algo) { x_compr_algo = compr_algo; };
-
-	    /// set the compression level (from 1 to 9)
-	void set_compression_level(U_I compression_level) { x_compression_level = compression_level; };
-
 	    /// define the archive slicing
 
 	    /// \param[in] file_size set the slice size in byte (0 for a single slice whatever its size is)
@@ -1594,9 +1588,6 @@ namespace libdar
 	    /// whether to make a dry-run operation
 	void set_empty(bool empty) { x_empty = empty; };
 
-	    /// make dar ignore the 'algo' argument and do not uncompress / compress files that are selected for merging
-	void set_keep_compressed(bool keep_compressed) { x_keep_compressed = keep_compressed; };
-
 	    /// if not an empty string set the slice permission according to the octal value given.
 	void set_slice_permission(const std::string & slice_permission) { x_slice_permission = slice_permission; };
 
@@ -1608,9 +1599,6 @@ namespace libdar
 
 	    /// whether to add escape sequence aka tape marks to allow sequential reading of the archive
 	void set_sequential_marks(bool sequential) { x_sequential_marks = sequential; };
-
-	    /// whether to try to detect sparse files
-	void set_sparse_file_min_size(const infinint & size) { x_sparse_file_min_size = size; };
 
 	    /// specify a user comment in the archive (always in clear text!)
 	void set_user_comment(const std::string & comment) { x_user_comment = comment; };
@@ -1641,8 +1629,6 @@ namespace libdar
 	bool get_display_skipped() const { return x_display_skipped; };
 	bool get_display_finished() const { return x_display_finished; };
 	const infinint & get_pause() const { return x_pause; };
-	compression get_compression() const { return x_compr_algo; };
-	U_I get_compression_level() const { return x_compression_level; };
 	const infinint & get_slice_size() const { return x_file_size; };
 	const infinint & get_first_slice_size() const { return x_first_file_size; };
 	const std::string & get_execute() const { return x_execute; };
@@ -1654,12 +1640,10 @@ namespace libdar
 	const mask & get_compr_mask() const { if(x_compr_mask == nullptr) throw SRC_BUG; return *x_compr_mask; };
 	const infinint & get_min_compr_size() const { return x_min_compr_size; };
 	bool get_empty() const { return x_empty; };
-	bool get_keep_compressed() const { return x_keep_compressed; };
 	const std::string & get_slice_permission() const { return x_slice_permission; };
 	const std::string & get_slice_user_ownership() const { return x_slice_user_ownership; };
 	const std::string & get_slice_group_ownership() const { return x_slice_group_ownership; };
 	bool get_sequential_marks() const { return x_sequential_marks; };
-	infinint get_sparse_file_min_size() const { return x_sparse_file_min_size; };
 	const std::string & get_user_comment() const { return x_user_comment; };
 	hash_algo get_hash_algo() const { return x_hash; };
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
@@ -1675,8 +1659,6 @@ namespace libdar
 	bool x_display_skipped;
 	bool x_display_finished;
 	infinint x_pause;
-	compression x_compr_algo;
-	U_I x_compression_level;
 	infinint x_file_size;
 	infinint x_first_file_size;
 	std::string x_execute;
@@ -1688,12 +1670,10 @@ namespace libdar
 	mask * x_compr_mask; //< points to a local copy of mask (must be allocated / releases by the archive_option_create objects)
 	infinint x_min_compr_size;
 	bool x_empty;
-	bool x_keep_compressed;
 	std::string x_slice_permission;
 	std::string x_slice_user_ownership;
 	std::string x_slice_group_ownership;
 	bool x_sequential_marks;
-	infinint x_sparse_file_min_size;
 	std::string x_user_comment;
 	hash_algo x_hash;
 	infinint x_slice_min_digits;
