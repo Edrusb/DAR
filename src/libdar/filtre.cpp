@@ -3553,6 +3553,7 @@ namespace libdar
 		if(ino->get_ea() != nullptr)
 		{
 		    crc * val = nullptr;
+		    infinint start;
 
 		    try
 		    {
@@ -3569,9 +3570,7 @@ namespace libdar
 			    pdesc.compr->sync_write(); // reset the compression engine to be able to decompress from that point later
 			}
 
-			ino->ea_set_offset(pdesc.stack->get_position());
-
-
+			start = pdesc.stack->get_position();
 			pdesc.stack->reset_crc(tools_file_size_to_crc_size(ino->ea_get_size())); // start computing CRC for any read/write on stack
 			try
 			{
@@ -3582,6 +3581,8 @@ namespace libdar
 			    val = pdesc.stack->get_crc(); // this keeps "stack" in a coherent status
 			    throw;
 			}
+
+			ino->ea_set_offset(start);
 			val = pdesc.stack->get_crc();
 			if(repair_mode)
 			{
@@ -3670,6 +3671,7 @@ namespace libdar
 		if(ino->get_fsa() != nullptr)
 		{
 		    crc * val = nullptr;
+		    infinint start;
 
 		    try
 		    {
@@ -3680,8 +3682,8 @@ namespace libdar
 			    pdesc.stack->sync_write_above(pdesc.compr);
 			    pdesc.compr->suspend_compression(); // never compress EA (no size or filename consideration)
 			}
-			ino->fsa_set_offset(pdesc.stack->get_position());
 
+			start = pdesc.stack->get_position();
 			pdesc.stack->reset_crc(tools_file_size_to_crc_size(ino->fsa_get_size())); // start computing CRC for any read/write on stack
 			try
 			{
@@ -3692,6 +3694,8 @@ namespace libdar
 			    val = pdesc.stack->get_crc(); // this keeps "" in a coherent status
 			    throw;
 			}
+
+			ino->fsa_set_offset(start);
 			val = pdesc.stack->get_crc();
 			if(repair_mode)
 			{
