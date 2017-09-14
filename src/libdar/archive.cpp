@@ -278,7 +278,7 @@ namespace libdar
 			    }
 			    else // sequentially reading
 			    {
-				if(pdesc.esc != nullptr) // no escape layer is present
+				if(pdesc.esc != nullptr) // escape layer is present
 				{
 				    if(pdesc.esc->skip_to_next_mark(escape::seqt_catalogue, false))
 				    {
