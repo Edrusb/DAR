@@ -501,8 +501,6 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 						      param.display_treated_only_dir);
 		    repair_options.set_display_skipped(param.display_skipped);
 		    repair_options.set_pause(param.pause);
-		    repair_options.set_compression(param.algo);
-		    repair_options.set_compression_level(param.compression_level);
 		    repair_options.set_slicing(param.file_size, param.first_file_size);
 		    repair_options.set_execute(param.execute);
 		    repair_options.set_crypto_algo(crypto);
@@ -515,12 +513,10 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    repair_options.set_compr_mask(*param.compress_mask);
 		    repair_options.set_min_compr_size(param.min_compr_size);
 		    repair_options.set_empty(param.empty);
-		    repair_options.set_keep_compressed(param.keep_compressed);
 		    repair_options.set_slice_permission(param.slice_perm);
 		    repair_options.set_slice_user_ownership(param.slice_user);
 		    repair_options.set_slice_group_ownership(param.slice_group);
 		    repair_options.set_sequential_marks(param.use_sequential_marks);
-		    repair_options.set_sparse_file_min_size(param.sparse_file_min_size);
 		    repair_options.set_user_comment(param.user_comment);
 		    repair_options.set_hash_algo(param.hash);
 		    repair_options.set_slice_min_digits(param.num_digits);

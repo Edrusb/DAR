@@ -892,8 +892,8 @@ namespace libdar
 			     options_repair.get_display_finished(),
 			     options_repair.get_pause(),
 			     false,               // empty_dir
-			     options_repair.get_compression(),
-			     options_repair.get_compression_level(),
+			     src.ver.get_compression_algo(),
+			     9,                   // we keep the data compressed this parameter has no importance
 			     options_repair.get_slice_size(),
 			     options_repair.get_first_slice_size(),
 			     bool_mask(true),     // ea_mask
@@ -915,7 +915,7 @@ namespace libdar
 			     cat_inode::cf_all,   // comparison_fields
 			     false,               // snapshot
 			     false,               // cache_directory_tagging,
-			     options_repair.get_keep_compressed(),
+			     true,                // keep_compressed, always
 			     0,                   // fixed_date
 			     options_repair.get_slice_permission(),
 			     0,                   // repeat_count
@@ -923,7 +923,7 @@ namespace libdar
 			     false,               // decremental
 			     options_repair.get_sequential_marks(),
 			     false,               // security_check
-			     options_repair.get_sparse_file_min_size(),
+			     0,                   // sparse_file_min_size (disabling hole detection)
 			     options_repair.get_user_comment(),
 			     options_repair.get_hash_algo(),
 			     options_repair.get_slice_min_digits(),
