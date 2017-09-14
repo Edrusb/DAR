@@ -2035,7 +2035,7 @@ namespace libdar
 	    thread_cancellation thr_cancel;
 
 	    if(ref_cat1 == nullptr && op != oper_create)
-		SRC_BUG;
+		throw SRC_BUG;
 	    if(st_ptr == nullptr)
 		throw SRC_BUG;
 
