@@ -76,13 +76,15 @@ namespace libdar
 			   bool delta_signature,  //< if set, lead to delta signature to be computed, if false and delta signature already exists it is saved (which in case of merging leads to transfering it in the resulting archive)
 			   bool make_delta_diff,         //< whether delta diff is allowed
 			   infinint & new_wasted_bytes,  //< new amount of wasted bytes to return to the caller.
-			   set<string> ignored_as_symlink); //< list of file to ignore as symlink and fetch the proper mtime
+			   set<string> ignored_as_symlink, //< list of file to ignore as symlink and fetch the proper mtime
+			   bool repair_mode);        //< if set, try to fix CRC and size problem flagging such fixed files as dirty
 
     static bool save_ea(user_interaction & dialog,
 			const string & info_quoi,
 			cat_inode * & ino,
 			const pile_descriptor & pdesc,
-			bool display_treated);
+			bool display_treated,
+			bool repair_mode);
 
     static void restore_atime(const string & chemin, const cat_inode * & ptr);
 
@@ -90,7 +92,8 @@ namespace libdar
 			 const string & info_quoi,
 			 cat_inode * & ino,
 			 const pile_descriptor & pdesc,
-			 bool display_treated);
+			 bool display_treated,
+			 bool repair_mode);
 
 	/// merge two sets of EA
 
@@ -864,7 +867,8 @@ namespace libdar
 						       e_file == nullptr ? false : e_file->has_delta_signature_available(),
 						       make_delta_diff,
 						       wasted_bytes,
-						       ignored_symlinks))
+						       ignored_symlinks,
+						       false))
 					    st.incr_tooold(); // counting a new dirty file in archive
 
 					st.set_byte_amount(wasted_bytes);
@@ -879,7 +883,7 @@ namespace libdar
 					{
 					    if(e_ino->ea_get_saved_status() == cat_inode::ea_full)
 						cat.pre_add_ea(e);
-					    if(save_ea(dialog, juillet.get_string(), e_ino, pdesc, display_treated))
+					    if(save_ea(dialog, juillet.get_string(), e_ino, pdesc, display_treated, false))
 						st.incr_ea_treated();
 					    cat.pre_add_ea_crc(e);
 					}
@@ -889,7 +893,7 @@ namespace libdar
 					if(e_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 					{
 					    cat.pre_add_fsa(e);
-					    if(save_fsa(dialog, juillet.get_string(), e_ino, pdesc, display_treated))
+					    if(save_fsa(dialog, juillet.get_string(), e_ino, pdesc, display_treated, false))
 						st.incr_fsa_treated();
 					    cat.pre_add_fsa_crc(e);
 					}
@@ -1645,7 +1649,8 @@ namespace libdar
 			   delta_sig_min_size,
 			   delta_mask,
 			   abort,
-			   thr_cancel);
+			   thr_cancel,
+			   false);
     }
 
     void filtre_merge_step0(user_interaction & dialog,
@@ -2536,26 +2541,27 @@ namespace libdar
 
     }
 
-    static void filtre_merge_step2(user_interaction & dialog,
-				   memory_pool *pool,
-				   const pile_descriptor & pdesc,
-				   catalogue & cat,
-				   bool info_details,
-				   bool display_treated,
-				   bool display_treated_only_dir,
-				   statistics & st,
-				   const mask & compr_mask,
-				   const infinint & min_compr_size,
-				   bool keep_compressed,
-				   const infinint & sparse_file_min_size,
-				   bool delta_signature,
-				   bool build_delta_sig,
-				   const infinint & delta_sig_min_size,
-				   const mask & delta_mask,
-				   bool & abort,
-				   thread_cancellation & thr_cancel)
+    void filtre_merge_step2(user_interaction & dialog,
+			    memory_pool *pool,
+			    const pile_descriptor & pdesc,
+			    catalogue & cat,
+			    bool info_details,
+			    bool display_treated,
+			    bool display_treated_only_dir,
+			    statistics & st,
+			    const mask & compr_mask,
+			    const infinint & min_compr_size,
+			    bool keep_compressed,
+			    const infinint & sparse_file_min_size,
+			    bool delta_signature,
+			    bool build_delta_sig,
+			    const infinint & delta_sig_min_size,
+			    const mask & delta_mask,
+			    bool & abort,
+			    thread_cancellation & thr_cancel,
+			    bool repair_mode)
     {
-	compression stock_algo  = pdesc.compr->get_algo();
+	compression stock_algo = pdesc.compr->get_algo();
 	defile juillet = FAKE_ROOT;
 	const cat_entree *e = nullptr;
 	infinint fake_repeat = 0;
@@ -2609,7 +2615,7 @@ namespace libdar
 		{
 		    bool compute_file_crc = false;
 
-		    if(e_file != nullptr)
+		    if(e_file != nullptr && !repair_mode)
 		    {
 			const crc *val = nullptr;
 
@@ -2658,7 +2664,7 @@ namespace libdar
 
 		    bool calculate_delta_signature = false;
 
-		    if(e_file != nullptr)
+		    if(e_file != nullptr && !repair_mode)
 		    {
 			if(!delta_signature)
 			{
@@ -2736,7 +2742,8 @@ namespace libdar
 				   calculate_delta_signature,
 				   false,    // delta_diff
 				   fake_repeat,
-				   set<string>())) // empty list
+				   set<string>(), // empty list
+				   repair_mode))
 			throw SRC_BUG;
 		    else // succeeded saving
 		    {
@@ -2750,8 +2757,8 @@ namespace libdar
 		    {
 			cat.pre_add_ea(e);
 			    // ignoring the return value of save_ea, exceptions may still propagate
-			(void)save_ea(dialog, juillet.get_string(), e_ino, pdesc, display_treated);
-			cat.pre_add_ea_crc(e);
+			(void)save_ea(dialog, juillet.get_string(), e_ino, pdesc, display_treated, repair_mode);
+			cat.pre_add_ea_crc(e,&pdesc);
 		    }
 
 			// saving inode's FSA
@@ -2759,8 +2766,8 @@ namespace libdar
 		    {
 			cat.pre_add_fsa(e);
 			    // ignoring the return value of save_fsa, exceptions may still propagate
-			(void)save_fsa(dialog, juillet.get_string(), e_ino, pdesc, display_treated);
-			cat.pre_add_fsa_crc(e);
+			(void)save_fsa(dialog, juillet.get_string(), e_ino, pdesc, display_treated, repair_mode);
+			cat.pre_add_fsa_crc(e, &pdesc);
 		    }
 		}
 		else // not an inode
@@ -2905,7 +2912,8 @@ namespace libdar
 			   bool delta_signature,
 			   bool delta_diff,
 			   infinint & current_wasted_bytes,
-			   set<string> ignored_as_symlink)
+			   set<string> ignored_as_symlink,
+			   bool repair_mode)
     {
 	bool ret = true;
 	infinint current_repeat_count = 0;
@@ -3126,14 +3134,30 @@ namespace libdar
 					    //////////////////////////////
 					    // proceeding to file's data backup
 
-					if(!compute_crc)
-					    crc_available = fic->get_crc(original);
-					else
-					    crc_available = false;
-
 					source->copy_to(*pdesc.stack, crc_size, val);
 					if(val == nullptr)
 					    throw SRC_BUG;
+
+					    // crc must be read after the data has been copied
+					    // case of repairing, we use sequential reading
+
+					try
+					{
+					    if(!compute_crc)
+						crc_available = fic->get_crc(original);
+					    else
+						crc_available = false;
+					}
+					catch(...)
+					{
+					    if(!repair_mode)
+						throw;
+
+					    dialog.printf(gettext("Failed reading data CRC for %S, file may be damaged and will be marked dirty"),
+							  &info_quoi);
+					    fic->set_dirty(true);
+					    fic->set_crc(*val);
+					}
 
 					    //////////////////////////////
 					    // checking crc value and storing it in catalogue
@@ -3256,7 +3280,8 @@ namespace libdar
 
 				if(fic->get_size() <= storage_size
 				   && keep_mode != cat_file::keep_compressed
-				   && fic->get_compression_algo_write() != none)
+				   && fic->get_compression_algo_write() != none
+				   && !repair_mode)
 				{
 				    infinint current_pos_tmp = pdesc.stack->get_position();
 
@@ -3516,7 +3541,8 @@ namespace libdar
 			const string & info_quoi,
 			cat_inode * & ino,
 			const pile_descriptor & pdesc,
-			bool display_treated)
+			bool display_treated,
+			bool repair_mode)
     {
         bool ret = false;
         try
@@ -3557,7 +3583,22 @@ namespace libdar
 			    throw;
 			}
 			val = pdesc.stack->get_crc();
-			ino->ea_set_crc(*val);
+			if(repair_mode)
+			{
+			    const crc *tmp = nullptr;
+
+			    ino->ea_get_crc(tmp);
+			    if(tmp == nullptr)
+				throw SRC_BUG;
+			    if(*tmp != *val)
+			    {
+				dialog.printf(gettext("Computed EA CRC for file %S differs from what was stored in the archive, this file's EA may have been corrupted"),
+					      &info_quoi);
+				ino->ea_set_crc(*val);
+			    }
+			}
+			else
+			    ino->ea_set_crc(*val);
 			ino->ea_detach();
 			ret = true;
 		    }
@@ -3599,6 +3640,8 @@ namespace libdar
         catch(Egeneric & e)
         {
             dialog.warning(string(gettext("Error saving Extended Attributes for ")) + info_quoi + ": " + e.get_message());
+	    if(repair_mode)
+		ino->ea_set_saved_status(cat_inode::ea_none);
         }
         return ret;
     }
@@ -3615,7 +3658,8 @@ namespace libdar
 			 const string & info_quoi,
 			 cat_inode * & ino,
 			 const pile_descriptor & pdesc,
-			 bool display_treated)
+			 bool display_treated,
+			 bool repair_mode)
     {
         bool ret = false;
         try
@@ -3649,7 +3693,22 @@ namespace libdar
 			    throw;
 			}
 			val = pdesc.stack->get_crc();
-			ino->fsa_set_crc(*val);
+			if(repair_mode)
+			{
+			    const crc *tmp = nullptr;
+
+			    ino->fsa_get_crc(tmp);
+			    if(tmp == nullptr)
+				throw SRC_BUG;
+			    if(*tmp != *val)
+			    {
+				dialog.printf(gettext("Computed FSA CRC for file %S differs from what was stored in the archive, this file's EA may have been corrupted"),
+					      &info_quoi);
+				ino->fsa_set_crc(*val);
+			    }
+			}
+			else
+			    ino->fsa_set_crc(*val);
 			ino->fsa_detach();
 			ret = true;
 
@@ -3689,6 +3748,8 @@ namespace libdar
         catch(Egeneric & e)
         {
             dialog.warning(string(gettext("Error saving Filesystem Specific Attributes for ")) + info_quoi + ": " + e.get_message());
+	    if(repair_mode)
+		ino->fsa_set_saved_status(cat_inode::fsa_none);
         }
         return ret;
     }
