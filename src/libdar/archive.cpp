@@ -847,35 +847,14 @@ namespace libdar
 				  extension_src,
 				  my_options_read);
 
-	    try
-	    {
-		    // building the catalogue from tape marks (sequential read)
-
-		(void)src.init_catalogue(dialog);
-	    }
-	    catch(Euser_abort & e)
-	    {
-		throw;
-	    }
-	    catch(Ebug & e)
-	    {
-		throw;
-	    }
-	    catch(Egeneric & e)
-	    {
-		string msg = e.get_message();
-		dialog.printf(gettext("First error met while reading the archive to repair, will not read further: %S"), &msg);
-	    }
-
-		// stealing the catalogue from src
-	    cat = src.cat;
-	    src.cat = nullptr;
+	    if(src.cat == nullptr)
+		throw SRC_BUG;
 
 	    op_create_in_sub(dialog,
 			     oper_repair,
 			     chem_dst,
 			     *sauv_path_t,
-			     nullptr,             // ref1
+			     src.cat,             // ref1
 			     nullptr,             // ref2
 			     initial_pause,
 			     bool_mask(true),     // selection
@@ -939,6 +918,11 @@ namespace libdar
 			     false,               // delta_diff
 			     set<string>(),       // ignored_symlinks
 			     st);
+
+		// stealing src's catalogue, our's is still empty at this step
+	    catalogue *tmp = cat;
+	    cat = src.cat;
+	    src.cat = tmp;
 	}
 	catch(...)
 	{
@@ -2330,6 +2314,9 @@ namespace libdar
 		    // ********** building the catalogue (empty for now) ************************* //
 		datetime root_mtime;
 		pile_descriptor pdesc(&stack);
+		crit_action* rep_decr = nullptr; // not used, just needed to pass as argumen to filtre_merge_step0()
+		const crit_action *rep_over = &overwrite; // not used, just needed to pass as argumen to filtre_merge_step0()
+
 
 		cat = nullptr; // [object member variable]
 
@@ -2461,21 +2448,8 @@ namespace libdar
 			}
 			break;
 		    case oper_merge:
-		    case oper_repair:
 			if(info_details)
-			{
-			    switch(op)
-			    {
-			    case oper_merge:
-				dialog.warning(gettext("Processing files for merging..."));
-				break;
-			    case oper_repair:
-				dialog.warning(gettext("Processing files for fixing..."));
-				break;
-			    default:
-				throw SRC_BUG;
-			    }
-			}
+			    dialog.warning(gettext("Processing files for merging..."));
 
 			filtre_merge(dialog,
 				     pool,
@@ -2504,6 +2478,55 @@ namespace libdar
 				     build_delta_sig,
 				     delta_sig_min_size,
 				     delta_mask);
+			break;
+		    case oper_repair:
+			if(info_details)
+			    dialog.warning(gettext("Processing files for fixing..."));
+
+			try
+			{
+			    filtre_merge_step0(dialog,
+				pool,
+				ref_cat1,
+				ref_cat2,
+				*st_ptr,
+				false,
+				rep_decr,
+				rep_over,
+				aborting,
+				thr_cancel);
+			    if(rep_decr != nullptr)
+				throw SRC_BUG;
+				// we should be prepared to release decr
+				// but we do not need such argument for fixing op.
+			    filtre_merge_step2(dialog,
+				pool,
+				pdesc,
+				*(const_cast<catalogue *>(ref_cat1)),
+				info_details,
+				display_treated,
+				false,    // display_trated_only_dir
+				*st_ptr,
+				compr_mask,
+				min_compr_size,
+				keep_compressed,
+				sparse_file_min_size,
+				delta_signature,
+				build_delta_sig,
+				delta_sig_min_size,
+				delta_mask,
+				aborting,
+				thr_cancel,
+				true);
+				// at this step, cat (the current archive's catalogue) is still empty
+				// we will need to add ref_cat1's content at the end of the archive
+				// not our own's content
+			}
+			catch(Erange & e)
+			{
+				// do nothing, this may be an incoherence due to the fact
+				// the archive has could not be finished, thing we tend to fix here
+			}
 			break;
 		    default:
 			throw SRC_BUG;
@@ -2546,7 +2569,7 @@ namespace libdar
 		macro_tools_close_layers(dialog,
 					 stack,
 					 ver,
-					 *cat,
+					 op != oper_repair ? *cat : *ref_cat1,
 					 info_details,
 					 crypto,
 					 algo,
@@ -2579,6 +2602,10 @@ namespace libdar
 	catch(Euser_abort & e)
 	{
 	    disable_natural_destruction();
+	    throw;
+	}
+	catch(Ebug & e)
+	{
 	    throw;
 	}
 	catch(Erange &e)
