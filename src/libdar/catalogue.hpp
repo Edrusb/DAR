@@ -118,16 +118,16 @@ namespace libdar
 
 	    /// catalogue extension routines for escape sequence
 	    // real implementation is only needed in escape_catalogue class, here there nothing to be done
-	virtual void pre_add(const cat_entree *ref) const {};
-	virtual void pre_add_ea(const cat_entree *ref) const {};
-	virtual void pre_add_crc(const cat_entree *ref) const {};
-	virtual void pre_add_dirty() const {};
-	virtual void pre_add_ea_crc(const cat_entree *ref) const {};
-	virtual void pre_add_waste_mark() const {};
-	virtual void pre_add_failed_mark() const {};
-	virtual void pre_add_fsa(const cat_entree *ref) const {};
-	virtual void pre_add_fsa_crc(const cat_entree *ref) const {};
-	virtual void pre_add_delta_sig() const {};
+	virtual void pre_add(const cat_entree *ref, const pile_descriptor* dest = nullptr) const {};
+	virtual void pre_add_ea(const cat_entree *ref, const pile_descriptor* dest = nullptr) const {};
+	virtual void pre_add_crc(const cat_entree *ref, const pile_descriptor* dest = nullptr) const {};
+	virtual void pre_add_dirty( const pile_descriptor* dest = nullptr) const {};
+	virtual void pre_add_ea_crc(const cat_entree *ref, const pile_descriptor* dest = nullptr) const {};
+	virtual void pre_add_waste_mark(const pile_descriptor* dest = nullptr) const {};
+	virtual void pre_add_failed_mark(const pile_descriptor* dest = nullptr) const {};
+	virtual void pre_add_fsa(const cat_entree *ref, const pile_descriptor* dest = nullptr) const {};
+	virtual void pre_add_fsa_crc(const cat_entree *ref, const pile_descriptor* dest = nullptr) const {};
+	virtual void pre_add_delta_sig(const pile_descriptor* dest = nullptr) const {};
 	virtual escape *get_escape_layer() const { return nullptr; };
 
         void add(cat_entree *ref); // add at end of catalogue (sequential point of view)

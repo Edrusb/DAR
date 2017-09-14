@@ -126,23 +126,25 @@ namespace libdar
 	return *this;
     }
 
-    void escape_catalogue::pre_add(const cat_entree *ref) const
+    void escape_catalogue::pre_add(const cat_entree *ref, const pile_descriptor* dest) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
+	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc)); // pdesc is a smart_pointer not a normal pointer
 
-	if(ceci->pdesc->esc == nullptr)
+	if(where->esc == nullptr)
 	    throw SRC_BUG;
 
-	ceci->pdesc->stack->sync_write_above(pdesc->esc);
-	ceci->pdesc->esc->add_mark_at_current_position(escape::seqt_file);
-	ref->dump(*pdesc, true);
+	where->stack->sync_write_above(where->esc);
+	where->esc->add_mark_at_current_position(escape::seqt_file);
+	ref->dump(*where, true);
     }
 
-    void escape_catalogue::pre_add_ea(const cat_entree *ref) const
+    void escape_catalogue::pre_add_ea(const cat_entree *ref, const pile_descriptor* dest) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
 	const cat_inode *ref_ino = dynamic_cast<const cat_inode *>(ref);
+	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc)); // pdesc is a smart_pointer not a normal pointer
 
 	if(ref_mir != nullptr)
 	    ref_ino = ref_mir->get_inode();
@@ -151,12 +153,12 @@ namespace libdar
 	{
 	    if(ref_ino->ea_get_saved_status() == cat_inode::ea_full)
 	    {
-		if(ceci->pdesc->esc == nullptr)
+		if(where->esc == nullptr)
 		    throw SRC_BUG;
 		else
 		{
-		    ceci->pdesc->stack->sync_write_above(pdesc->esc);
-		    ceci->pdesc->esc->add_mark_at_current_position(escape::seqt_ea);
+		    where->stack->sync_write_above(where->esc);
+		    where->esc->add_mark_at_current_position(escape::seqt_ea);
 		}
 	    }
 		// else, nothing to do.
@@ -164,11 +166,12 @@ namespace libdar
 	    // else, nothing to do.
     }
 
-    void escape_catalogue::pre_add_crc(const cat_entree *ref) const
+    void escape_catalogue::pre_add_crc(const cat_entree *ref, const pile_descriptor* dest) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
 	const cat_file *ref_file = dynamic_cast<const cat_file *>(ref);
+	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc)); // pdesc is a smart_pointer not a normal pointer
 
 	if(ref_mir != nullptr)
 	    ref_file = dynamic_cast<const cat_file *>(ref_mir->get_inode());
@@ -181,12 +184,12 @@ namespace libdar
 
 		if(ref_file->get_crc(c))
 		{
-		    if(ceci->pdesc->esc == nullptr)
+		    if(where->esc == nullptr)
 			throw SRC_BUG;
 
-		    ceci->pdesc->stack->sync_write_above(pdesc->esc);
-		    ceci->pdesc->esc->add_mark_at_current_position(escape::seqt_file_crc);
-		    c->dump(*(ceci->pdesc->esc));
+		    where->stack->sync_write_above(where->esc);
+		    where->esc->add_mark_at_current_position(escape::seqt_file_crc);
+		    c->dump(*(where->esc));
 		}
 		    // else, the data may come from an old archive format
 	    }
@@ -194,22 +197,24 @@ namespace libdar
 	}
     }
 
-    void escape_catalogue::pre_add_dirty() const
+    void escape_catalogue::pre_add_dirty(const pile_descriptor* dest) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
+	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc)); // pdesc is a smart_pointer not a normal pointer
 
-	if(ceci->pdesc->esc == nullptr)
+	if(where->esc == nullptr)
 	    throw SRC_BUG;
-	ceci->pdesc->stack->sync_write_above(pdesc->esc);
-	ceci->pdesc->esc->add_mark_at_current_position(escape::seqt_dirty);
+	where->stack->sync_write_above(where->esc);
+	where->esc->add_mark_at_current_position(escape::seqt_dirty);
     }
 
 
-    void escape_catalogue::pre_add_ea_crc(const cat_entree *ref) const
+    void escape_catalogue::pre_add_ea_crc(const cat_entree *ref, const pile_descriptor* dest) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
 	const cat_inode *ref_ino = dynamic_cast<const cat_inode *>(ref);
+	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc)); // pdesc is a smart_pointer not a normal pointer
 
 	if(ref_mir != nullptr)
 	    ref_ino = ref_mir->get_inode();
@@ -222,11 +227,11 @@ namespace libdar
 
 		ref_ino->ea_get_crc(c);
 
-		if(ceci->pdesc->esc == nullptr)
+		if(where->esc == nullptr)
 		    throw SRC_BUG;
-		ceci->pdesc->stack->sync_write_above(pdesc->esc);
-		ceci->pdesc->esc->add_mark_at_current_position(escape::seqt_ea_crc);
-		c->dump(*(ceci->pdesc->esc));
+		where->stack->sync_write_above(where->esc);
+		where->esc->add_mark_at_current_position(escape::seqt_ea_crc);
+		c->dump(*(where->esc));
 	    }
 		// else, nothing to do.
 	}
@@ -234,31 +239,34 @@ namespace libdar
 
     }
 
-    void escape_catalogue::pre_add_waste_mark() const
+    void escape_catalogue::pre_add_waste_mark(const pile_descriptor* dest) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
+	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc)); // pdesc is a smart_pointer not a normal pointer
 
-	if(ceci->pdesc->esc == nullptr)
+	if(where->esc == nullptr)
 	    throw SRC_BUG;
-	ceci->pdesc->stack->sync_write_above(pdesc->esc);
-	ceci->pdesc->esc->add_mark_at_current_position(escape::seqt_changed);
+	where->stack->sync_write_above(where->esc);
+	where->esc->add_mark_at_current_position(escape::seqt_changed);
     }
 
-    void escape_catalogue::pre_add_failed_mark() const
+    void escape_catalogue::pre_add_failed_mark(const pile_descriptor* dest) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
+	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc)); // pdesc is a smart_pointer not a normal pointer
 
-	if(ceci->pdesc->esc == nullptr)
+	if(where->esc == nullptr)
 	    throw SRC_BUG;
-	ceci->pdesc->stack->sync_write_above(pdesc->esc);
-	ceci->pdesc->esc->add_mark_at_current_position(escape::seqt_failed_backup);
+	where->stack->sync_write_above(where->esc);
+	where->esc->add_mark_at_current_position(escape::seqt_failed_backup);
     }
 
-    void escape_catalogue::pre_add_fsa(const cat_entree *ref) const
+    void escape_catalogue::pre_add_fsa(const cat_entree *ref, const pile_descriptor* dest) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
 	const cat_inode *ref_ino = dynamic_cast<const cat_inode *>(ref);
+	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc)); // pdesc is a smart_pointer not a normal pointer
 
 	if(ref_mir != nullptr)
 	    ref_ino = ref_mir->get_inode();
@@ -267,12 +275,12 @@ namespace libdar
 	{
 	    if(ref_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 	    {
-		if(ceci->pdesc->esc == nullptr)
+		if(where->esc == nullptr)
 		    throw SRC_BUG;
 		else
 		{
-		    ceci->pdesc->stack->sync_write_above(pdesc->esc);
-		    ceci->pdesc->esc->add_mark_at_current_position(escape::seqt_fsa);
+		    where->stack->sync_write_above(where->esc);
+		    where->esc->add_mark_at_current_position(escape::seqt_fsa);
 		}
 	    }
 		// else, nothing to do.
@@ -280,11 +288,12 @@ namespace libdar
 	    // else, nothing to do.
     }
 
-    void escape_catalogue::pre_add_fsa_crc(const cat_entree *ref) const
+    void escape_catalogue::pre_add_fsa_crc(const cat_entree *ref, const pile_descriptor* dest) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
 	const cat_inode *ref_ino = dynamic_cast<const cat_inode *>(ref);
+	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc)); // pdesc is a smart_pointer not a normal pointer
 
 	if(ref_mir != nullptr)
 	    ref_ino = ref_mir->get_inode();
@@ -297,25 +306,26 @@ namespace libdar
 
 		ref_ino->fsa_get_crc(c);
 
-		if(ceci->pdesc->esc == nullptr)
+		if(where->esc == nullptr)
 		    throw SRC_BUG;
-		ceci->pdesc->stack->sync_write_above(pdesc->esc);
-		ceci->pdesc->esc->add_mark_at_current_position(escape::seqt_fsa_crc);
-		c->dump(*(ceci->pdesc->esc));
+		where->stack->sync_write_above(where->esc);
+		where->esc->add_mark_at_current_position(escape::seqt_fsa_crc);
+		c->dump(*(where->esc));
 	    }
 		// else, nothing to do.
 	}
 	    // else, nothing to do.
     }
 
-    void escape_catalogue::pre_add_delta_sig() const
+    void escape_catalogue::pre_add_delta_sig(const pile_descriptor* dest) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
+	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc)); // pdesc is a smart_pointer not a normal pointer
 
-	if(ceci->pdesc->esc == nullptr)
+	if(where->esc == nullptr)
 	    throw SRC_BUG;
-	ceci->pdesc->stack->sync_write_above(pdesc->esc);
-	ceci->pdesc->esc->add_mark_at_current_position(escape::seqt_delta_sig);
+	where->stack->sync_write_above(where->esc);
+	where->esc->add_mark_at_current_position(escape::seqt_delta_sig);
     }
 
     void escape_catalogue::reset_read() const

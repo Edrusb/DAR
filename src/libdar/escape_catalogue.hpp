@@ -68,16 +68,16 @@ namespace libdar
 	~escape_catalogue() { destroy(); };
 
 	    // inherited from catalogue
-	void pre_add(const cat_entree *ref) const;
-	void pre_add_ea(const cat_entree *ref) const;
-	void pre_add_crc(const cat_entree *ref) const;
-	void pre_add_dirty() const;
-	void pre_add_ea_crc(const cat_entree *ref) const;
-	void pre_add_waste_mark() const;
-	void pre_add_failed_mark() const;
-	void pre_add_fsa(const cat_entree *ref) const;
-	void pre_add_fsa_crc(const cat_entree *ref) const;
-	void pre_add_delta_sig() const;
+	void pre_add(const cat_entree *ref, const pile_descriptor* dest) const;
+	void pre_add_ea(const cat_entree *ref, const pile_descriptor* dest) const;
+	void pre_add_crc(const cat_entree *ref, const pile_descriptor* dest) const;
+	void pre_add_dirty(const pile_descriptor* dest) const;
+	void pre_add_ea_crc(const cat_entree *ref, const pile_descriptor* dest) const;
+	void pre_add_waste_mark(const pile_descriptor* dest) const;
+	void pre_add_failed_mark(const pile_descriptor* dest) const;
+	void pre_add_fsa(const cat_entree *ref, const pile_descriptor* dest) const;
+	void pre_add_fsa_crc(const cat_entree *ref, const pile_descriptor* dest) const;
+	void pre_add_delta_sig(const pile_descriptor* dest) const;
 	escape *get_escape_layer() const { return pdesc->esc; };
 
 	void reset_read() const;
