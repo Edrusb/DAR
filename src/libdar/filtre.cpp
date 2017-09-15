@@ -3162,7 +3162,13 @@ namespace libdar
 					    dialog.printf(gettext("Failed reading data CRC for %S, file may be damaged and will be marked dirty"),
 							  &info_quoi);
 					    fic->set_dirty(true);
-					    fic->set_crc(*val);
+						// this leads the storage_size to be set to zero in both sequential data and ending generated catalog
+					    infinint current_pos = pdesc.stack->get_position();
+					    if(!pdesc.stack->skip(start))
+					    {
+						pdesc.stack->skip(current_pos);
+						dialog.printf(gettext("Failed setting storage size to zero for this file with missing data CRC, CRC error will be reported for that file while reading the repaired archive"));
+					    }
 					}
 
 					    //////////////////////////////
