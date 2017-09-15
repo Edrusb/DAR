@@ -2530,8 +2530,9 @@ namespace libdar
 			}
 			catch(Erange & e)
 			{
-				// do nothing, this may be an incoherence due to the fact
-				// the archive has could not be finished, thing we tend to fix here
+				// changing the data_name of the catalogue that will be dropped at the
+				// end of the archive to match the data_name of the slice header
+			    const_cast<catalogue *>(ref_cat1)->set_data_name(internal_name);
 			}
 			break;
 		    default:

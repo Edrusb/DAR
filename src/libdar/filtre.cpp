@@ -2781,8 +2781,14 @@ namespace libdar
 		thr_cancel.block_delayed_cancellation(true);
 	    }
 	}
-	catch(Ethread_cancel & e)
+	catch(Egeneric & e)
 	{
+	    Ethread_cancel* e_thread = dynamic_cast<Ethread_cancel*>(&e);
+	    Erange* e_range = dynamic_cast<Erange*>(&e);
+
+	    if(e_thread == nullptr && e_range == nullptr)
+		throw;
+
 	    cat.tail_catalogue_to_current_read();
 	    cat.change_location(pdesc);
 	    if(pdesc.compr->is_compression_suspended())
