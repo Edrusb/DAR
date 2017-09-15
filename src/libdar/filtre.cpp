@@ -3107,6 +3107,7 @@ namespace libdar
 				    crc * val = nullptr;
 				    const crc * original = nullptr;
 				    bool crc_available = false;
+				    bool set_storage_size_to_zero = false; // only used in repair mode in case of missing CRC and impossibility to skip backward
 
 				    source->skip(0);
 				    source->read_ahead(0);
@@ -3156,21 +3157,34 @@ namespace libdar
 					}
 					catch(...)
 					{
+					    bool fixed = false;
+
 					    if(!repair_mode)
 						throw;
 
 					    dialog.printf(gettext("Failed reading data CRC for %S, file may be damaged and will be marked dirty"),
 							  &info_quoi);
 					    fic->set_dirty(true);
-						// this leads the storage_size to be set to zero in both sequential data and ending generated catalog
+
+						// in the following we try to skip backward to set the storage size to zero
+						// in both sequential data and ending generated catalog
+
 					    infinint current_pos = pdesc.stack->get_position();
-					    if(!pdesc.stack->skip(start))
+					    if(pdesc.stack->skippable(generic_file::skip_backward, current_pos - start))
 					    {
-						pdesc.stack->skip(current_pos);
-						dialog.printf(gettext("Failed setting storage size to zero for this file with missing data CRC, CRC error will be reported for that file while reading the repaired archive"));
+						if(!pdesc.stack->skip(start))
+						    pdesc.stack->skip(current_pos);
+						else
+						    fixed = true;
 					    }
 					    val->clear();
 					    fic->set_crc(*val);
+
+					    if(!fixed)
+					    {
+						dialog.printf(gettext("Failed setting storage size to zero for this file with missing data CRC, CRC error will be reported for that file while reading the repaired archive"));
+						set_storage_size_to_zero = true;
+					    }
 					}
 
 					    //////////////////////////////
@@ -3263,9 +3277,12 @@ namespace libdar
 					dst_hole = nullptr;
 				    }
 
-				    if(pdesc.stack->get_position() >= start)
+				    if(pdesc.stack->get_position() >= start || set_storage_size_to_zero)
 				    {
-					storage_size = pdesc.stack->get_position() - start;
+					if(set_storage_size_to_zero)
+					    storage_size = 0;
+					else
+					    storage_size = pdesc.stack->get_position() - start;
 					fic->set_storage_size(storage_size);
 				    }
 				    else
