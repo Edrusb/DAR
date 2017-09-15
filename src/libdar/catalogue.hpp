@@ -222,6 +222,8 @@ namespace libdar
         const cat_directory *get_contenu() const { return contenu; }; // used by data_tree
 
 	const label & get_data_name() const { return ref_data_name; };
+	void set_data_name(const label & val) { ref_data_name = val; };
+
 	datetime get_root_dir_last_modif() const { return contenu->get_last_modif(); };
 
 	    /// recursive evaluation of directories that have changed (make the cat_directory::get_recurisve_has_changed() method of entry in this catalogue meaningful)
@@ -259,7 +261,6 @@ namespace libdar
 
     protected:
 	entree_stats & access_stats() { return stats; };
-	void set_data_name(const label & val) { ref_data_name = val; };
 	void copy_detruits_from(const catalogue & ref); // needed for escape_catalogue implementation only.
 
 	const cat_eod * get_r_eod_address() const { return & r_eod; }; // cat_eod are never stored in the catalogue
