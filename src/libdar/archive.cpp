@@ -2355,6 +2355,7 @@ namespace libdar
 			cat = new (pool) escape_catalogue(dialog, pdesc, root_mtime, internal_name);
 		    else
 			cat = new (pool) catalogue(dialog, root_mtime, internal_name);
+		    break;
 		default:
 		    throw SRC_BUG;
 		}
