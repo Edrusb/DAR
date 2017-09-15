@@ -2599,6 +2599,8 @@ namespace libdar
 		    {
 			e_ino = e_mir->get_inode();
 			e_file = dynamic_cast<cat_file *>(e_ino);
+			if(repair_mode)
+			    e_mir->disable_reduction_to_normal_inode();
 		    }
 
 		juillet.enfile(e);
