@@ -881,8 +881,8 @@ namespace libdar
 			     options_repair.get_crypto_size(),
 			     options_repair.get_gnupg_recipients(),
 			     options_repair.get_gnupg_signatories(),
-			     options_repair.get_compr_mask(),
-			     options_repair.get_min_compr_size(),
+			     bool_mask(true),     // compr_mask
+			     0,                   // min_compr_size
 			     false,               // nodump
 			     "",                  // exclude_by_ea
 			     0,                   // hourshift

@@ -611,6 +611,12 @@ bool get_args(shell_interaction & dialog,
 		dialog.warning(gettext("-{ and -} options are useless with -y option"));
 	    if(p.ignored_as_symlink != "")
 		dialog.warning(gettext("-\\ option is useless with -y option"));
+	    if(p.algo != none)
+		dialog.warning(gettext("compression (-z option) cannot be changed with -y option"));
+	    if(p.keep_compressed)
+		dialog.warning(gettext("-ak option is useless with -y option"));
+	    if(p.sparse_file_min_size != sparse_file_min_size_default)
+		dialog.warning(gettext("-ah option is useless with -y option"));
 	}
 
             //////////////////////

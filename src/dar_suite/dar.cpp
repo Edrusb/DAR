@@ -510,8 +510,6 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    if(recipients.empty() && !param.signatories.empty())
 			throw Erange("little_main", gettext("Archive signature is only possible with gnupg encryption"));
 		    repair_options.set_gnupg_signatories(param.signatories);
-		    repair_options.set_compr_mask(*param.compress_mask);
-		    repair_options.set_min_compr_size(param.min_compr_size);
 		    repair_options.set_empty(param.empty);
 		    repair_options.set_slice_permission(param.slice_perm);
 		    repair_options.set_slice_user_ownership(param.slice_user);

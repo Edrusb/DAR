@@ -1714,7 +1714,6 @@ namespace libdar
 
     archive_options_repair::archive_options_repair()
     {
-        x_compr_mask = nullptr;
         x_entrepot = nullptr;
         try
         {
@@ -1729,7 +1728,6 @@ namespace libdar
 
     archive_options_repair::archive_options_repair(const archive_options_repair & ref)
     {
-        x_compr_mask = nullptr;
         x_entrepot = nullptr;
         try
         {
@@ -1750,7 +1748,6 @@ namespace libdar
 
             destroy();
 
-            archive_option_clean_mask(x_compr_mask, get_pool());
 	    x_allow_over = true;
 	    x_warn_over = true;
             x_info_details = false;
@@ -1767,7 +1764,6 @@ namespace libdar
             x_crypto_size = default_crypto_size;
             x_gnupg_recipients.clear();
             x_gnupg_signatories.clear();
-            x_min_compr_size = default_min_compr_size;
             x_empty = false;
             x_slice_permission = "";
             x_slice_user_ownership = "";
@@ -1780,24 +1776,6 @@ namespace libdar
             if(x_entrepot == nullptr)
                 throw Ememory("archive_options_repair::clear");
             x_multi_threaded = true;
-        }
-        catch(...)
-        {
-            NLS_SWAP_OUT;
-            throw;
-        }
-        NLS_SWAP_OUT;
-    }
-
-    void archive_options_repair::set_compr_mask(const mask & compr_mask)
-    {
-        NLS_SWAP_IN;
-        try
-        {
-            archive_option_destroy_mask(x_compr_mask);
-            x_compr_mask = compr_mask.clone();
-            if(x_compr_mask == nullptr)
-                throw Ememory("archive_options_repair::set_compr_mask");
         }
         catch(...)
         {
@@ -1822,7 +1800,6 @@ namespace libdar
         NLS_SWAP_IN;
         try
         {
-            archive_option_destroy_mask(x_compr_mask);
             if(x_entrepot != nullptr)
             {
                 delete x_entrepot;
@@ -1839,15 +1816,7 @@ namespace libdar
 
     void archive_options_repair::copy_from(const archive_options_repair & ref)
     {
-        x_compr_mask = nullptr;
         x_entrepot = nullptr;
-
-        if(ref.x_compr_mask == nullptr)
-            throw SRC_BUG;
-        x_compr_mask = ref.x_compr_mask->clone();
-
-        if(x_compr_mask == nullptr)
-            throw Ememory("archive_options_repair::copy_from");
 
 	x_allow_over = ref.x_allow_over;
 	x_warn_over = ref.x_warn_over;
@@ -1865,7 +1834,6 @@ namespace libdar
         x_crypto_size = ref.x_crypto_size;
         x_gnupg_recipients = ref.x_gnupg_recipients;
         x_gnupg_signatories = ref.x_gnupg_signatories;
-        x_min_compr_size = ref.x_min_compr_size;
         x_empty = ref.x_empty;
 	x_slice_permission = ref.x_slice_permission;
 	x_slice_user_ownership = ref.x_slice_user_ownership;
@@ -1881,7 +1849,6 @@ namespace libdar
 	    throw Ememory("archive_options_repair::copy_from");
 	x_multi_threaded = ref.x_multi_threaded;
     }
-
 
 
 } // end of namespace

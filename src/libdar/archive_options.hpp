@@ -1579,12 +1579,6 @@ namespace libdar
 	    /// the private keys matching the email of the provided list are used to sign the archive random key
 	void set_gnupg_signatories(const std::vector<std::string> & gnupg_signatories) { x_gnupg_signatories = gnupg_signatories; };
 
-	    /// defines files to compress
-	void set_compr_mask(const mask & compr_mask);
-
-	    /// defines file size under which to never compress
-	void set_min_compr_size(const infinint & min_compr_size) { x_min_compr_size = min_compr_size; };
-
 	    /// whether to make a dry-run operation
 	void set_empty(bool empty) { x_empty = empty; };
 
@@ -1637,8 +1631,6 @@ namespace libdar
 	U_32 get_crypto_size() const { return x_crypto_size; };
 	const std::vector<std::string> & get_gnupg_recipients() const { return x_gnupg_recipients; };
 	const std::vector<std::string> & get_gnupg_signatories() const { return x_gnupg_signatories; };
-	const mask & get_compr_mask() const { if(x_compr_mask == nullptr) throw SRC_BUG; return *x_compr_mask; };
-	const infinint & get_min_compr_size() const { return x_min_compr_size; };
 	bool get_empty() const { return x_empty; };
 	const std::string & get_slice_permission() const { return x_slice_permission; };
 	const std::string & get_slice_user_ownership() const { return x_slice_user_ownership; };
@@ -1667,8 +1659,6 @@ namespace libdar
 	U_32 x_crypto_size;
 	std::vector<std::string> x_gnupg_recipients;
 	std::vector<std::string> x_gnupg_signatories;
-	mask * x_compr_mask; //< points to a local copy of mask (must be allocated / releases by the archive_option_create objects)
-	infinint x_min_compr_size;
 	bool x_empty;
 	std::string x_slice_permission;
 	std::string x_slice_user_ownership;
