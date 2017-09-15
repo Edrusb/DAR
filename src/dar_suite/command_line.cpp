@@ -617,6 +617,8 @@ bool get_args(shell_interaction & dialog,
 		dialog.warning(gettext("-ak option is useless with -y option"));
 	    if(p.sparse_file_min_size != sparse_file_min_size_default)
 		dialog.warning(gettext("-ah option is useless with -y option"));
+	    if(p.sequential_read)
+		throw Erange("get_args", gettext("--sequential-read is useless with -y option"));
 	}
 
             //////////////////////
