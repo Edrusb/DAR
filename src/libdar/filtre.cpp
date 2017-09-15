@@ -3656,7 +3656,10 @@ namespace libdar
         {
             dialog.warning(string(gettext("Error saving Extended Attributes for ")) + info_quoi + ": " + e.get_message());
 	    if(repair_mode)
+	    {
 		ino->ea_set_saved_status(cat_inode::ea_none);
+		dialog.warning(gettext("be advised that a CRC error will be reported for the EA of that file while sequentially reading the repaired archive"));
+	    }
         }
         return ret;
     }
@@ -3767,7 +3770,10 @@ namespace libdar
         {
             dialog.warning(string(gettext("Error saving Filesystem Specific Attributes for ")) + info_quoi + ": " + e.get_message());
 	    if(repair_mode)
+	    {
 		ino->fsa_set_saved_status(cat_inode::fsa_none);
+		dialog.warning(gettext("be advised that a CRC error will be reported for the FSA of that file while sequentially reading the repaired archive"));
+	    }
         }
         return ret;
     }
