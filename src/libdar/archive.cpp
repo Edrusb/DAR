@@ -805,6 +805,7 @@ namespace libdar
     {
 	archive_options_read my_options_read = options_read;
 	bool initial_pause = (options_read.get_entrepot() == options_repair.get_entrepot() && chem_src == chem_dst);
+	statistics not_filled;
 
 	    ////
 	    // initializing object fields
@@ -916,7 +917,7 @@ namespace libdar
 			     0,                   // delta_sig_min_size
 			     false,               // delta_diff
 			     set<string>(),       // ignored_symlinks
-			     nullptr);            // statistics
+			     &not_filled);        // statistics
 
 		// stealing src's catalogue, our's is still empty at this step
 	    catalogue *tmp = cat;
