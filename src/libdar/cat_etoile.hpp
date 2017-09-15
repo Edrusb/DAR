@@ -63,7 +63,8 @@ namespace libdar
 	cat_inode *get_inode() const { return hosted; };
 	infinint get_etiquette() const { return etiquette; };
 	void change_etiquette(const infinint & new_val) { etiquette = new_val; };
-
+	void disable_reduction_to_normal_inode() { tags.reduceable = 0; };
+	bool cannot_reduce_to_normal_inode() const { return tags.reduceable == 0; };
 
 	bool is_counted() const { return tags.counted; };
 	bool is_wrote() const { return tags.wrote; };
@@ -80,12 +81,13 @@ namespace libdar
     private:
 	struct bool_tags
 	{
-	    unsigned counted : 1; //< whether the inode has been counted
-	    unsigned wrote : 1;   //< whether the inode has its data copied to archive
-	    unsigned dumped : 1;  //< whether the inode information has been dumped in the catalogue
-	    unsigned : 5;         //< padding to get byte boundary and reserved for future use.
+	    unsigned counted : 1;    //< whether the inode has been counted
+	    unsigned wrote : 1;      //< whether the inode has its data copied to archive
+	    unsigned dumped : 1;     //< whether the inode information has been dumped in the catalogue
+	    unsigned reduceable : 1; //< whether the inode can be reduce to normal inode
+	    unsigned : 4;            //< padding to get byte boundary and reserved for future use.
 
-	    bool_tags() { counted = wrote = dumped = 0; };
+	    bool_tags() { counted = wrote = dumped = 0; reduceable = 1; };
 	};
 
 	std::list<void *> refs; //< list of pointers to the mirages objects, in the order of their creation

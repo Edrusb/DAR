@@ -100,6 +100,17 @@ namespace libdar
 	    // overwriting virtual method from cat_entree
 	virtual void change_location(const smart_pointer<pile_descriptor> & pdesc) { get_inode()->change_location(pdesc); };
 
+	    /// always write the inode as a hardlinked inode
+
+	    /// \note when calling dump() on a mirage by default if the inode pointed
+	    /// by the mirage has is referred only once, it is saved as a normal inode
+	    /// that's to say a non hard linked inode. In some circumstances, the total
+	    /// number of hard link on that inode is not yet known at the time the inode
+	    /// is written (repair operation), we cannot assume the hard linked inode is
+	    /// a normal inode as new hard links pointing on that same inode may have not
+	    /// been read yet.
+	void disable_reduction_to_normal_inode() { star_ref->disable_reduction_to_normal_inode(); };
+
     protected:
 	void inherited_dump(const pile_descriptor & pdesc, bool small) const;
 

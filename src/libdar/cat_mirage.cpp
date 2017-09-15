@@ -290,7 +290,7 @@ namespace libdar
 	else
 	    ptr = pdesc.stack;
 
-        if(star_ref->get_ref_count() > 1)
+        if(star_ref->get_ref_count() > 1 || star_ref->cannot_reduce_to_normal_inode())
         {
             char buffer[] = { MIRAGE_ALONE, MIRAGE_WITH_INODE };
             cat_nomme::inherited_dump(pdesc, small);
