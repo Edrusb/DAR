@@ -2519,9 +2519,14 @@ namespace libdar
 				aborting,
 				thr_cancel,
 				true);
+
 				// at this step, cat (the current archive's catalogue) is still empty
 				// we will need to add ref_cat1's content at the end of the archive
 				// not our own's content
+
+				// changing the data_name of the catalogue that will be dropped at the
+				// end of the archive to match the data_name of the slice header
+			    const_cast<catalogue *>(ref_cat1)->set_data_name(internal_name);
 			}
 			catch(Erange & e)
 			{
