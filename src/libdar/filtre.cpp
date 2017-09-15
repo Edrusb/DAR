@@ -3169,6 +3169,8 @@ namespace libdar
 						pdesc.stack->skip(current_pos);
 						dialog.printf(gettext("Failed setting storage size to zero for this file with missing data CRC, CRC error will be reported for that file while reading the repaired archive"));
 					    }
+					    val->clear();
+					    fic->set_crc(*val);
 					}
 
 					    //////////////////////////////
