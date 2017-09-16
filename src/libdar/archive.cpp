@@ -2497,37 +2497,37 @@ namespace libdar
 			try
 			{
 			    filtre_merge_step0(dialog,
-				pool,
-				ref_cat1,
-				ref_cat2,
-				*st_ptr,
-				false,
-				rep_decr,
-				rep_over,
-				aborting,
-				thr_cancel);
+					       pool,
+					       ref_cat1,
+					       ref_cat2,
+					       *st_ptr,
+					       false,
+					       rep_decr,
+					       rep_over,
+					       aborting,
+					       thr_cancel);
 			    if(rep_decr != nullptr)
 				throw SRC_BUG;
 				// we should be prepared to release decr
 				// but we do not need such argument for fixing op.
 			    filtre_merge_step2(dialog,
-				pool,
-				pdesc,
-				*(const_cast<catalogue *>(ref_cat1)),
-				info_details,
-				display_treated,
+					       pool,
+					       pdesc,
+					       *(const_cast<catalogue *>(ref_cat1)),
+					       info_details,
+					       display_treated,
 					       display_treated_only_dir,
-				compr_mask,
-				min_compr_size,
-				keep_compressed,
-				sparse_file_min_size,
-				delta_signature,
-				build_delta_sig,
-				delta_sig_min_size,
-				delta_mask,
-				aborting,
-				thr_cancel,
-				true);
+					       compr_mask,
+					       min_compr_size,
+					       keep_compressed,
+					       sparse_file_min_size,
+					       delta_signature,
+					       build_delta_sig,
+					       delta_sig_min_size,
+					       delta_mask,
+					       aborting,
+					       thr_cancel,
+					       true);
 
 				// at this step, cat (the current archive's catalogue) is still empty
 				// we will need to add ref_cat1's content at the end of the archive
