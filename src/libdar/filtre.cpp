@@ -2664,7 +2664,7 @@ namespace libdar
 
 		    bool calculate_delta_signature = false;
 
-		    if(e_file != nullptr && !repair_mode)
+		    if(e_file != nullptr)
 		    {
 			if(!delta_signature)
 			{
@@ -3137,18 +3137,19 @@ namespace libdar
 					    pdesc.stack->push(dst_hole);
 					}
 
-					    //////////////////////////////
-					    // proceeding to file's data backup
-
-					source->copy_to(*pdesc.stack, crc_size, val);
-					if(val == nullptr)
-					    throw SRC_BUG;
-
-					    // crc must be read after the data has been copied
-					    // case of repairing, we use sequential reading
-
 					try
 					{
+
+						//////////////////////////////
+						// proceeding to file's data backup
+
+					    source->copy_to(*pdesc.stack, crc_size, val);
+					    if(val == nullptr)
+						throw SRC_BUG;
+
+						// crc must be read after the data has been copied
+						// case of repairing, we use sequential reading
+
 					    if(!compute_crc)
 						crc_available = fic->get_crc(original);
 					    else
@@ -3184,6 +3185,9 @@ namespace libdar
 						dialog.printf(gettext("Failed setting storage size to zero for this file with missing data CRC, CRC error will be reported for that file while reading the repaired archive"));
 						set_storage_size_to_zero = true;
 					    }
+
+					    if(fic->has_delta_signature_structure())
+						fic->clear_delta_signature_only();
 					}
 
 					    // in repair_mode, the file offset points to the data
@@ -3457,7 +3461,7 @@ namespace libdar
 					if(!delta_diff)
 					{
 						// merging context, signature not calculated here but already existing: we need to transfer it
-					    if(fic->has_delta_signature_available())
+					    if(fic->has_delta_signature_available() || repair_mode)
 						fic->read_delta_signature(delta_sig);
 					}
 					    // else delta diff without delta signature, storing en empty zero length signature
