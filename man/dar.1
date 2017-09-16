@@ -1031,10 +1031,10 @@ Another way of doing differential backup is to make a normal full backup without
 options. Binary delta signature will then be calculated based on the saved files. Then, using the resulting isolated catalogue as reference dar will be able to proceed to binary delta for the differential backup. If this works pretty well for differential backup (or the first incremental backup) which is based on a full backup, for incremental backup this is less adapted as a file that has not changed since the archive of reference was made does not hold any data and calculating the delta signature is not possible. The first method explained two paragraphs above is better as the incremental backup fetches the already calculated delta signature from the reference to keep it in the resulting incremental backup, so even without data, binary delta is still possible.
 .P
 Isolated catalogue using the --delta sig option, can still be used as backup of the internal catalogue they have been isolated from. However, as they hold their own delta signatures, such isolated catalogue can only have access to its own ones, not to those of the archive of reference. In particular when testing an archive (-t option), using -A option to rescue the archive internal catalogue using an isolated catalogue containing delta signatures, dar will not be able to check that there is no corruption in the delta signatures fields of the archive under test. For that type of testing either use the internal catalogue of the archive or rescue it using an isolated catalogue built without --delta sig option.
+.RE
 .TP 20
 -\\, --ignored-as-symlink <absolute path>[:<absolute path>[:...]]
 When dar reach a inode which is part of this provided column separated list, if this inode is not a symlink this option has no effect, but if it is a symlinks dar saves the file the symlink points to and not the symlink itself as dar does by default. In particular, if the pointed to inode is a directory dar recurses in that directory. You can also pass this list as argument to the DAR_IGNORED_AS_SYMLINK environment instead of using --ignored-as-symlink (which takes precedence over the environment variable).
-.RE
 .PP
 .PP
 .B RESTORATION SPECIFIC OPTIONS (to use with -x)
