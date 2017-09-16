@@ -3121,7 +3121,6 @@ namespace libdar
 
 					// now that compression has reset we can fetch the location where the data will be dropped:
 				    start = pdesc.stack->get_position();
-				    fic->set_offset(start);
 
 				    try
 				    {
@@ -3186,6 +3185,14 @@ namespace libdar
 						set_storage_size_to_zero = true;
 					    }
 					}
+
+					    // in repair_mode, the file offset points to the data
+					    // in the damaged archive, it must not be set before the
+					    // data is read at which time it record the offset in the
+					    // repaired archive, the offset may change espetially when
+					    // encryption is used, due to variable sized elastic buffers
+					fic->set_offset(start);
+
 
 					    //////////////////////////////
 					    // checking crc value and storing it in catalogue
