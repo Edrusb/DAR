@@ -2589,6 +2589,9 @@ static void make_args_from_file(user_interaction & dialog,
     case isolate:
         cibles.push_back("isolate");
         break;
+    case repairing:
+	cibles.push_back("repair");
+	break;
     default:
         throw SRC_BUG;
     }
