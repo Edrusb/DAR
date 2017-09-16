@@ -835,6 +835,14 @@ namespace libdar
 	    sauv_path_t->set_group_ownership(options_repair.get_slice_group_ownership());
 	    sauv_path_t->set_location(chem_dst);
 
+	    tools_avoid_slice_overwriting_regex(dialog,
+						*sauv_path_t,
+						basename_dst,
+						extension_dst,
+						options_repair.get_info_details(),
+						options_repair.get_allow_over(),
+						options_repair.get_warn_over(),
+						options_repair.get_empty());
 
 		/////
 		// opening the source archive in sequential read mode
