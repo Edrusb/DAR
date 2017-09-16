@@ -5,6 +5,7 @@
 
 
 
+
 <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR/LIBDAR Internals - Notes</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -276,7 +277,7 @@ scheme from the slice header (what we just detailed) and fetch the
 archive contents at the end of this same last slice.<br>
       </div>
       <div style="text-align: justify; margin-left: 40px;"><br>
-      <span style="font-weight: bold; text-decoration: underline;">The
+      <span style="text-decoration: underline; font-weight: bold;">The
 trailer</span>
 (which is one byte length) is new since archive format version 8
 (released 2.4.0). It contains the value that was located in the header
@@ -339,17 +340,18 @@ In brief:<br>
       <table style="text-align: left; width: 1038px; height: 124px; margin-left: auto; margin-right: 0px;" border="1" cellpadding="2" cellspacing="2">
         <tbody>
           <tr>
-            <td style="vertical-align: top; font-weight: bold; text-align: center; width: 20%;">Fields</td>
-            <td style="vertical-align: top; width: 20%; font-weight: bold; text-align: center;">Normal
+            <td style="vertical-align: top; text-align: center; width: 20%; font-weight: bold;">Fields</td>
+            <td style="vertical-align: top; width: 20%; text-align: center; font-weight: bold;">Normal
 Archive<br>
             </td>
-            <td style="vertical-align: top; width: 20%; font-weight: bold; text-align: center;">Resliced
+            <td style="vertical-align: top; width: 20%; text-align: center; font-weight: bold;">Resliced
 Using dar_xform<br>
             </td>
-            <td style="vertical-align: top; width: 20%; font-weight: bold; text-align: center;">Resulting
+            <td style="vertical-align: top; width: 20%; text-align: center; font-weight: bold;">Resulting
 From Isolation<br>
             </td>
             <td style="vertical-align: top; text-align: center; width: 20%;">&nbsp;<span style="font-weight: bold;">isolated archive <br>
+
 resliced with dar_xform</span><br>
             </td>
           </tr>
@@ -425,7 +427,7 @@ archive in sequential mode, to be able to prepare the proper
 compression layer, and known whether escape sequence mark are present
 in the archive.<br>
       <br>
-the <span style="font-weight: bold; text-decoration: underline;">version
+the <span style="text-decoration: underline; font-weight: bold;">version
 trailer</span> (which may still be called "version header" in some
 part of the documentation because it was only located at the
 beginning of the archive in previous archive format) is composed of:<br>
@@ -481,26 +483,87 @@ as an escape sequence mark) and encryption layer.<br>
       <br>
       <span style="text-decoration: underline; font-weight: bold;">The
 data</span>
-is a suite of file contents, with EA if present. When tape mark is
+is a suite of file contents, with EA and FSA if present. When tape mark
+is
 used, a copy of the CRC is placed after's file Data and file's EA, to
 be used when reading the archive in sequential mode. This CRC is also
 dropped into the catalogue which takes place at the end of the archive
-to be used when reading the archive in direct access mode (the default).<br>
+to be used when reading the archive in direct access mode (the
+default). Last when delta binary is used, a file signature may follow
+the file's data:<br>
       <br>
       </div>
-      <div style="margin-left: 80px;"><code>&nbsp; ....</code><code>--+---------------------+----+------------+-----------+----+---....</code><br>
-      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; file
-data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | EA | file
-data&nbsp; | file data | EA |</code><br>
+      <div style="margin-left: 80px;"><code>&nbsp; ....</code><code>--+---------------------+-------+----+----+------------+------------+----+-----------+-----+-....</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; file1
+data&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; | delta | EA | FSA| file2
+data | file3 data | EA | file4&nbsp;&nbsp;&nbsp;&nbsp; | FSA |</code><br>
       <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | (may be
-compressed) |&nbsp;&nbsp;&nbsp; | (no EA)&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp; |</code><br>
+compressed) | sig &nbsp; |&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; |(no EA/FSA)
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;
+|&nbsp;&nbsp;&nbsp; | delta sig |&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
       <code>&nbsp;
-....--+---------------------+----+------------+-----------+----+---....</code><br>
+....--+---------------------+-------+----+----+------------+------------+----+-----------+-----+-....</code><br>
       <code></code></div>
-      <div style="margin-left: 40px;"><br>
+      <div style="margin-left: 40px;">
+      <div style="margin-left: 40px;">in the previous archive example, we find:<br>
+      <ul>
+        <li>for file1: his data, a delta signature of this dada, Extended Attributes, and File Specific Attributes</li>
+        <li>for file2: only his data, he has no delta signature, no EA no FSA</li>
+        <li>for file3: data and EA</li>
+        <li>for file4: no data, only a delta signature and FSA</li>
+      </ul>
+file1 shows all fields that can be associated with an inode, but none
+is mandatory, though if present they always follow this order:<br>
+      <ul>
+        <li><span style="font-weight: bold;">Data</span> or <span style="font-weight: bold;">delta patch</span></li>
+        <li>followed by data/delta patch CRC when tape marks as set<br>
+        </li>
+        <li><span style="font-weight: bold;">Delta signature</span> <br>
+        </li>
+        <li>followed by delta signature CRC when tape marks are set<br>
+        </li>
+        <li><span style="font-weight: bold;">Extended Attributes</span> <br>
+        </li>
+        <li>followed by EA CRC when tape maks are set<br>
+        </li>
+        <li><span style="font-weight: bold;">File Specific Attributes</span> <br>
+        </li>
+        <li>followed by FSA CRC when tape marks are set<br>
+        </li>
+      </ul>
       </div>
+</div>
+      <div style="margin-left: 80px;">More precisely about<span style="font-weight: bold;"> delta signature </span>combined with tape marks, there is additional fields present than just the delta sig and its CRC<br>
+      </div>
+      <div style="margin-left: 120px;"><code>+------+------+---------------+----------+--------+</code><br>
+      <code>| base | sig&nbsp; | <span style="font-weight: bold;">sig data</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | <span style="font-weight: bold;">data CRC </span>| result |</code><br>
+      <code>| CRC&nbsp; | size | (if size &gt; 0) |&nbsp;&nbsp;&nbsp; if&nbsp;&nbsp;&nbsp; |&nbsp; CRC&nbsp;&nbsp; |</code><br>
+      <code>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+| size &gt; 0 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+      <code>+------+------+---------------+----------+--------+</code><br>
+      </div>
+      <div style="margin-left: 40px;">
+      <ul>
+        <li><span style="font-weight: bold;">base CRC</span> is the CRC of the file that delta signature has been based on, used at restoration time before applying a patch</li>
+        <li><span style="font-weight: bold;">sig size</span> gives the
+size of the next field, that may be zero if the file does not has
+signature associated but the file's data is a delta patch and thus base
+and result CRCs are needed<br>
+        </li>
+        <li><span style="font-weight: bold;">sig data</span> is the
+delta signature data. This field and the following are the only one
+present outside the ending catalogue about delta signatures when tape
+marks are not set.<br>
+        </li>
+        <li><span style="font-weight: bold;">data CRC</span> is the CRC on the previous field "sig data"<br>
+        </li>
+        <li><span style="font-weight: bold;">result CRC</span> is the CRC of the resulting file once patched&nbsp; (to check the patching was successful)</li>
+      </ul>
+
+      </div>
+
       <div style="text-align: justify; margin-left: 40px;"><span style="text-decoration: underline; font-weight: bold;">the
 catalogue</span>,
 contains all inode, directory structure and hard_links information as
