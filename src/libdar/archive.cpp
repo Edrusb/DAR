@@ -2516,7 +2516,7 @@ namespace libdar
 				*(const_cast<catalogue *>(ref_cat1)),
 				info_details,
 				display_treated,
-				false,    // display_trated_only_dir
+					       display_treated_only_dir,
 				compr_mask,
 				min_compr_size,
 				keep_compressed,
