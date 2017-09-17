@@ -2,6 +2,8 @@ from 2.5.12 to 2.5.13
 - added -az option to automatically nullify negative dates returned from
   the system
 - included the birthtime (HFS FSA) into the negative dates handling
+- modified behavior: dar now fails upon unknown option instead of warning
+  the option is unknown and thus ignored
 
 from 2.5.11 to 2.5.12
 - documenting in man page the limitation of -[ and -] options concerning
