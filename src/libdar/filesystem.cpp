@@ -359,7 +359,11 @@ namespace libdar
 			throw Ememory("filesystem_hard_link_read::make_entree");
 		    try
 		    {
-			fsal->get_fsa_from_filesystem_for(display, sc, buf.st_mode);
+			fsal->get_fsa_from_filesystem_for(get_ui(),
+							  display,
+							  sc,
+							  buf.st_mode,
+							  get_ask_before_zeroing_neg_dates());
 			if(!fsal->empty())
 			{
 			    ino->fsa_set_saved_status(cat_inode::fsa_full);
@@ -1802,9 +1806,11 @@ namespace libdar
 
 		    try
 		    {
-			fsa.get_fsa_from_filesystem_for(spot,
+			fsa.get_fsa_from_filesystem_for(get_ui(),
+							spot,
 							all_fsa_families(),
-							in_place_symlink != nullptr);
+							in_place_symlink != nullptr,
+							get_ask_before_zeroing_neg_dates());
 		    }
 		    catch(Ethread_cancel & e)
 		    {

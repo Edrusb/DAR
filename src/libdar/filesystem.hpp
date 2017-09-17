@@ -103,6 +103,7 @@ namespace libdar
 				    bool see_hard_link,        //< whether we want to detect hard_link and eventually return a cat_mirage object (not necessary when diffing an archive with filesystem)
 				    const mask & ea_mask);    //< which EA to consider when creating the object
 
+	bool get_ask_before_zeroing_neg_dates() const { return ask_before_zeroing_neg_dates; };
     private:
 
 	    // private datastructure
