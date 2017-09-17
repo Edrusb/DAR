@@ -1133,25 +1133,25 @@ configuration files (-B option, $HOME/.darrc and /etc/darrc) usually contain a s
 A condition takes the form of reserved word immediately followed by a colon ':'. This word + colon must stand alone on its line, eventually with spaces or tabs beside it. The available conditions are:
 .TP 20
 extract:
-all option listed after this condition get used if previously on command line or file the -x option has been used
+all option listed after this condition get used if previously on command line or file the -x command has been used
 .TP 20
 create:
-all option listed after this condition get used if previously on command line or file (-B option) the -c option has been used
+all option listed after this condition get used if previously on command line or file (-B option) the -c command has been used
 .TP 20
 list: (or listing:)
-if -l option has been used
+if -l command has been used
 .TP 20
 test:
-if -t option has been used
+if -t command has been used
 .TP 20
 diff:
-if -d option has been used
+if -d command has been used
 .TP 20
 isolate:
-if -C option has been used
+if -C command has been used
 .TP 20
 merge:
-if -+ option has been used
+if -+ command has been used
 .TP 20
 reference:
 if -A option has been used (except when -A is used for the snapshot feature or in conjunction with -af)
