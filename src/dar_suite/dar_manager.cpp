@@ -490,10 +490,9 @@ static bool command_line(shell_interaction & dialog,
 		case ':':
 		    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(optopt)));
 		case '?':
-		    dialog.warning(tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
-		    break;
+		    throw Erange("get_args", tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
 		default:
-		    dialog.warning(tools_printf(gettext("Ignoring unknown option -%c"), char(lu)));
+		    throw Erange("get_args", tools_printf(gettext("Ignoring unknown option -%c"), char(lu)));
 		}
 		if(lu == 'o' || lu == 'r')
 		    break; // stop reading arguments

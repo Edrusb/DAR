@@ -224,10 +224,9 @@ static bool command_line(shell_interaction & dialog,
         case ':':
             throw Erange("command_line", tools_printf(gettext("Missing parameter to option -%c"), char(optopt)));
         case '?':
-            dialog.warning(tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
-            break;
+            throw Erange("command_line", tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
         default:
-            dialog.warning(tools_printf(gettext("Ignoring unknown option -%c"), char(lu)));
+            throw Erange("command_line", tools_printf(gettext("Ignoring unknown option -%c"), char(lu)));
         }
     }
 

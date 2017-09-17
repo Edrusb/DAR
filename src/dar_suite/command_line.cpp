@@ -1952,10 +1952,9 @@ static bool get_args_recursive(recursive_param & rec,
             case ':':
                 throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(optopt)));
             case '?':
-                rec.dialog->warning(tools_printf(gettext("Ignoring unknown option -%c"),char(optopt)));
-                break;
+                throw Erange("get_args", tools_printf(gettext("Unknown option -%c"),char(optopt)));
             default:
-                rec.dialog->warning(tools_printf(gettext("Ignoring unknown option -%c"),char(lu)));
+                throw Erange("get_args", tools_printf(gettext("Unknown option -%c"),char(lu)));
             }
         }
 

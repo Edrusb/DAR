@@ -483,8 +483,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
             case ':':
                 throw Erange("command_line", tools_printf(gettext("Missing parameter to option -%c"), char(optopt)));
             case '?':
-                dialog.warning(tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
-                break;
+                throw Erange("command_line", tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
             default:
                 throw SRC_BUG;
             }
