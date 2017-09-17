@@ -521,7 +521,7 @@ namespace libdar
 			   bool ignore_unknown,
 			   const fsa_scope & scope,
 			   const string & exclude_by_ea,
-			   bool warn_before_zeroing_neg_dates)
+			   bool auto_zeroing_neg_dates)
     {
         cat_entree *e = nullptr;
         const cat_entree *f = nullptr;
@@ -556,7 +556,7 @@ namespace libdar
 	infinint skipped_dump, fs_errors;
 	infinint wasted_bytes = 0;
 
-	if(!warn_before_zeroing_neg_dates)
+	if(auto_zeroing_neg_dates)
 	    fs.zeroing_negative_dates_without_asking();
 
         st.clear();

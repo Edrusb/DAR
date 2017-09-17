@@ -89,7 +89,7 @@ namespace libdar
 	const fsa_scope get_fsa_scope() const { return sc; };
 
 	    /// don't ask before zeroing negative date just warn user
-	void zeroing_negative_dates_without_asking() { ask_before_zeroing_neg_dates = true; };
+	void zeroing_negative_dates_without_asking() { ask_before_zeroing_neg_dates = false; };
 
     protected:
 	    // reset the whole list of hard linked inodes (hard linked inode stay alive but are no more referenced by the current object)
