@@ -152,27 +152,6 @@ namespace libdar
 				       memory_pool *pool);
     static mode_t get_file_permission(const string & path);
 
-    template <class T> void check_negative(T & val,
-					   user_interaction & ui,
-					   const char *inode_path,
-					   const char *nature,
-					   bool ask_before)
-    {
-	if(val < 0)
-	{
-	    string msg = tools_printf(gettext("Found negative date (%s) for inode %s ."),
-					      nature,
-					      inode_path);
-	    if(ask_before)
-		ui.pause(tools_printf(gettext("%S Can we read it as if it was zero (1st January 1970 at 00:00:00 UTC)?"),
-				      &msg));
-	    else // just warn
-	    		ui.warning(msg + gettext("Considering date as if it was zero (Jan 1970)"));
-
-	    val = 0;
-	}
-    }
-
 ///////////////////////////////////////////////////////////////////
 ///////////////// filesystem_hard_link_read methods ///////////////
 ///////////////////////////////////////////////////////////////////
@@ -215,17 +194,17 @@ namespace libdar
 	    else
 	    {
 #ifdef LIBDAR_MICROSECOND_READ_ACCURACY
-		check_negative(buf.st_atim.tv_sec,
+		tools_check_negative_date(buf.st_atim.tv_sec,
 			       get_ui(),
 			       ptr_name,
 			       gettext("atime, data access time"),
 			       ask_before_zeroing_neg_dates);
-		check_negative(buf.st_mtim.tv_sec,
+		tools_check_negative_date(buf.st_mtim.tv_sec,
 			       get_ui(),
 			       ptr_name,
 			       gettext("mtime, data modification time"),
 			       ask_before_zeroing_neg_dates);
-		check_negative(buf.st_ctim.tv_sec,
+		tools_check_negative_date(buf.st_ctim.tv_sec,
 			       get_ui(),
 			       ptr_name,
 			       gettext("ctime, inode change time"),
@@ -241,17 +220,17 @@ namespace libdar
 		if(ctime.is_null()) // assuming an error avoids getting time that way
 		    ctime = datetime(buf.st_ctime, 0, datetime::tu_second);
 #else
-		check_negative(buf.st_atime,
+		tools_check_negative_date(buf.st_atime,
 			       get_ui(),
 			       ptr_name,
 			       gettext("atime, data access time"),
 			       ask_before_zeroing_neg_dates);
-		check_negative(buf.st_mtime,
+		tools_check_negative_date(buf.st_mtime,
 			       get_ui(),
 			       ptr_name,
 			       gettext("mtime, data modification time"),
 			       ask_before_zeroing_neg_dates);
-		check_negative(buf.st_ctime,
+		tools_check_negative_date(buf.st_ctime,
 			       get_ui(),
 			       ptr_name,
 			       gettext("ctime, inode change time"),

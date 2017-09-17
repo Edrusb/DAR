@@ -880,10 +880,38 @@ namespace libdar
     extern std::string tools_escape_chars_in_string(const std::string & val, const char *to_escape);
 
 	/// convert an infinint to U_64 (aka "uint64_t" or yet "unsigned long long")
-	///
+
 	/// \note: if the infinint is too large to fit in an U_64 it returns false
     extern bool tools_infinint2U_64(infinint val, U_64 & res);
 
+
+	/// check the value is not negative, and if asked set it to zero
+
+	///\param[in,out] val variable which value to check
+	///\param[in,out] ui for user interaction if necessary
+	///\param[in] path to the inode for message info
+	///\param[in] nature type of the date/time (mtime,atime,ctime,birthtime,...)
+	///\param[in] whether to just warn or ask user for confirmation
+    template <class T> void tools_check_negative_date(T & val,
+						      user_interaction & ui,
+						      const char *inode_path,
+						      const char *nature,
+						      bool ask_before)
+    {
+	if(val < 0)
+	{
+	    std::string msg = tools_printf(gettext("Found negative date (%s) for inode %s ."),
+				      nature,
+				      inode_path);
+	    if(ask_before)
+		ui.pause(tools_printf(gettext("%S Can we read it as if it was zero (1st January 1970 at 00:00:00 UTC)?"),
+				      &msg));
+	    else // just warn
+		ui.warning(msg + gettext("Considering date as if it was zero (Jan 1970)"));
+
+	    val = 0;
+	}
+    }
 
 } /// end of namespace
 
