@@ -2097,7 +2097,9 @@ namespace libdar
 		try
 		{
 		    if(fs_root.display() != "<ROOT>")
-			root_mtime = tools_get_mtime(fs_root.display());
+			root_mtime = tools_get_mtime(dialog,
+						     fs_root.display(),
+						     zeroing_neg_date);
 		    else // case of merging operation for example
 		    {
 			datetime mtime1 = ref_cat1 != nullptr ? ref_cat1->get_root_mtime() : datetime(0);

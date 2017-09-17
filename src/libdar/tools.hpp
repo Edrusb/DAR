@@ -569,9 +569,13 @@ namespace libdar
 
 	/// returns the last modification date of the given file
 
+	/// \param[in,out] dialog for user interaction
 	/// \param[in] s path of the file to get the last mtime
+	/// \param[in] auto_zeroing whether to just warn instead of asking user confirmation
 	/// \return the mtime of the given file
-    extern datetime tools_get_mtime(const std::string & s);
+    extern datetime tools_get_mtime(user_interaction & dialog,
+				    const std::string & s,
+				    bool auto_zeroing);
 
 	/// returns the size of the given plain file
 
