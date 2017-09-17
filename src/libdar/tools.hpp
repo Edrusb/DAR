@@ -572,10 +572,12 @@ namespace libdar
 	/// \param[in,out] dialog for user interaction
 	/// \param[in] s path of the file to get the last mtime
 	/// \param[in] auto_zeroing whether to just warn instead of asking user confirmation
+	/// \param[in] silent if set do not warn nor ask
 	/// \return the mtime of the given file
     extern datetime tools_get_mtime(user_interaction & dialog,
 				    const std::string & s,
-				    bool auto_zeroing);
+				    bool auto_zeroing,
+				    bool silent);
 
 	/// returns the size of the given plain file
 
@@ -893,25 +895,30 @@ namespace libdar
 
 	///\param[in,out] val variable which value to check
 	///\param[in,out] ui for user interaction if necessary
-	///\param[in] path to the inode for message info
+	///\param[in] inode_path to the inode for message info
 	///\param[in] nature type of the date/time (mtime,atime,ctime,birthtime,...)
-	///\param[in] whether to just warn or ask user for confirmation
+	///\param[in] ask_before whether to just warn or ask user for confirmation
+	///\param[in] silent if set, do not warn nor ask
     template <class T> void tools_check_negative_date(T & val,
 						      user_interaction & ui,
 						      const char *inode_path,
 						      const char *nature,
-						      bool ask_before)
+						      bool ask_before,
+						      bool silent)
     {
 	if(val < 0)
 	{
-	    std::string msg = tools_printf(gettext("Found negative date (%s) for inode %s ."),
-				      nature,
+	    if(!silent)
+	    {
+		std::string msg = tools_printf(gettext("Found negative date (%s) for inode %s ."),
+					       nature,
 				      inode_path);
-	    if(ask_before)
-		ui.pause(tools_printf(gettext("%S Can we read it as if it was zero (1st January 1970 at 00:00:00 UTC)?"),
-				      &msg));
-	    else // just warn
-		ui.warning(msg + gettext("Considering date as if it was zero (Jan 1970)"));
+		if(ask_before)
+		    ui.pause(tools_printf(gettext("%S Can we read it as if it was zero (1st January 1970 at 00:00:00 UTC)?"),
+					  &msg));
+		else // just warn
+		    ui.warning(msg + gettext("Considering date as if it was zero (Jan 1970)"));
+	    }
 
 	    val = 0;
 	}

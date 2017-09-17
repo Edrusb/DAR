@@ -2961,7 +2961,8 @@ namespace libdar
 				{
 				    changed = fic->get_last_modif() != tools_get_mtime(dialog,
 										       info_quoi,
-										       true);
+										       true,
+										       true); // silently set to zero negative dates
 				}
 				catch(Erange & e)
 				{
@@ -3008,7 +3009,8 @@ namespace libdar
 						// updating the last modification date of file
 					    fic->set_last_modif(tools_get_mtime(dialog,
 										info_quoi,
-										true));
+										true,
+										true)); // silently set to zero negative date
 
 						// updating the size of the file
 					    fic->change_size(tools_get_size(info_quoi));

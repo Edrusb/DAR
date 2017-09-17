@@ -195,20 +195,23 @@ namespace libdar
 	    {
 #ifdef LIBDAR_MICROSECOND_READ_ACCURACY
 		tools_check_negative_date(buf.st_atim.tv_sec,
-			       get_ui(),
-			       ptr_name,
-			       gettext("atime, data access time"),
-			       ask_before_zeroing_neg_dates);
+					  get_ui(),
+					  ptr_name,
+					  gettext("atime, data access time"),
+					  ask_before_zeroing_neg_dates,
+					  false); // not silent
 		tools_check_negative_date(buf.st_mtim.tv_sec,
-			       get_ui(),
-			       ptr_name,
-			       gettext("mtime, data modification time"),
-			       ask_before_zeroing_neg_dates);
+					  get_ui(),
+					  ptr_name,
+					  gettext("mtime, data modification time"),
+					  ask_before_zeroing_neg_dates,
+					  false); // not silent
 		tools_check_negative_date(buf.st_ctim.tv_sec,
-			       get_ui(),
-			       ptr_name,
-			       gettext("ctime, inode change time"),
-			       ask_before_zeroing_neg_dates);
+					  get_ui(),
+					  ptr_name,
+					  gettext("ctime, inode change time"),
+					  ask_before_zeroing_neg_dates,
+					  false); // not silent
 		datetime atime = datetime(buf.st_atim.tv_sec, buf.st_atim.tv_nsec/1000, datetime::tu_microsecond);
 		datetime mtime = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec/1000, datetime::tu_microsecond);
 		datetime ctime = datetime(buf.st_ctim.tv_sec, buf.st_ctim.tv_nsec/1000, datetime::tu_microsecond);
@@ -221,20 +224,23 @@ namespace libdar
 		    ctime = datetime(buf.st_ctime, 0, datetime::tu_second);
 #else
 		tools_check_negative_date(buf.st_atime,
-			       get_ui(),
-			       ptr_name,
-			       gettext("atime, data access time"),
-			       ask_before_zeroing_neg_dates);
+					  get_ui(),
+					  ptr_name,
+					  gettext("atime, data access time"),
+					  ask_before_zeroing_neg_dates,
+					  false); // not silent
 		tools_check_negative_date(buf.st_mtime,
-			       get_ui(),
-			       ptr_name,
-			       gettext("mtime, data modification time"),
-			       ask_before_zeroing_neg_dates);
+					  get_ui(),
+					  ptr_name,
+					  gettext("mtime, data modification time"),
+					  ask_before_zeroing_neg_dates,
+					  false); // not silent
 		tools_check_negative_date(buf.st_ctime,
-			       get_ui(),
-			       ptr_name,
-			       gettext("ctime, inode change time"),
-			       ask_before_zeroing_neg_dates);
+					  get_ui(),
+					  ptr_name,
+					  gettext("ctime, inode change time"),
+					  ask_before_zeroing_neg_dates,
+					  false); // not silent
 		datetime atime = datetime(buf.st_atime, 0, datetime::tu_second);
 		datetime mtime = datetime(buf.st_mtime, 0, datetime::tu_second);
 		datetime ctime = datetime(buf.st_ctime, 0, datetime::tu_second);
