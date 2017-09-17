@@ -311,6 +311,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    create_options.set_slice_min_digits(param.num_digits);
 		    create_options.set_fsa_scope(param.scope);
 		    create_options.set_multi_threaded(param.multi_threaded);
+		    create_options.set_auto_zeroing_neg_dates(param.zeroing_neg_dates);
 
 		    if(param.backup_hook_mask != nullptr)
 			create_options.set_backup_hook(param.backup_hook_execute, *param.backup_hook_mask);

@@ -881,6 +881,9 @@ This way, one can stop a database just before it is about to be backed up, and r
 .TP 20
 -ai, --alter=ignore-unknown-inode-type
 When dar meets an inode type it is not aware about (some times ago, it was the case for Door inode on Solaris for example, Door inodes are handled by dar since release 2.4.0), it issues a warning about its inability to handle such inode. This warning occurs even if that entry is filtered out by mean of -X, -I, -P, -g, -[ or -] options, as soon as some other entry in that same directory has to be considered for backup, leading dar to read that directory contents and failing on that unknown inode type (filtering is done based on the result of directory listing). This option is to avoid dar issuing such warning in that situation.
+.TP 20
+-az, --alter=zeroing-negative-dates
+dar/libdar saves dates as a number of seconds since the beginning of year 1970, the well known "Unix time" (plus a positive fraction for sub-second time-stamping). Some systems may return a negative number as the Unix time of a given file (files having dates before 1970), in that situation by default and since release 2.5.12 dar pauses and asks the user whether to assume the date as being zero. But with -az option, dar/libdar automatically assumes such negative dates to be zero and just issue a warning about the problem met.
 .PP
 .PP
 .B RESTORATION SPECIFIC OPTIONS (to use with -x)
