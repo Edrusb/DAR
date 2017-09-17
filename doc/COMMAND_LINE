@@ -23,6 +23,7 @@ a * alteration of operation		--alter	  argument:
 							    file-auth[entication]
 							    g[lob]
 							    h[oles-recheck]
+							    header
 							    i[gnore-unknown-inode-type]
 							    k[eep-compressed]
 							    l[axist]
@@ -36,7 +37,7 @@ a * alteration of operation		--alter	  argument:
 							    t[ape-marks]
 							    test-self-reported-bug
 							    y abyte[s]
-							    header
+							    z[eroing-negative-dates]
 b - terminal bell                       --bell
 c + create archive                      --create
 d + difference with filesystem          --diff

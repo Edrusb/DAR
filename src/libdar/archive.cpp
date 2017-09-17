@@ -504,6 +504,7 @@ namespace libdar
 				       options.get_delta_mask(),
 				       options.get_delta_sig_min_size(),
 				       options.get_delta_diff(),
+				       options.get_auto_zeroing_neg_dates(),
 				       options.get_ignored_as_symlink(),
 				       progressive_report);
 		    exploitable = false;
@@ -763,8 +764,10 @@ namespace libdar
 				     options.get_delta_mask(), // delta_mask
 				     options.get_delta_sig_min_size(),
 				     false,   // delta diff
+				     true,    // zeroing_neg_date
 				     set<string>(),            // empty list
 				     st_ptr);
+
 		    exploitable = false;
 		    stack.terminate();
 		}
@@ -924,6 +927,7 @@ namespace libdar
 			     bool_mask(true),     // delta_mask
 			     0,                   // delta_sig_min_size
 			     false,               // delta_diff
+			     false,               // zeroing_neg_date
 			     set<string>(),       // ignored_symlinks
 			     &not_filled);        // statistics
 
@@ -2029,6 +2033,7 @@ namespace libdar
 				     const mask & delta_mask,
 				     const infinint & delta_sig_min_size,
 				     bool delta_diff,
+				     bool zeroing_neg_date,
 				     const set<string> & ignored_symlinks,
 				     statistics * progressive_report)
     {
@@ -2187,6 +2192,7 @@ namespace libdar
 			 delta_mask,
 			 delta_sig_min_size,
 			 delta_diff,
+			 zeroing_neg_date,
 			 ignored_symlinks,
 			 st_ptr);
 
@@ -2259,6 +2265,7 @@ namespace libdar
 				   const mask & delta_mask,
 				   const infinint & delta_sig_min_size,
 				   bool delta_diff,
+				   bool zeroing_neg_date,
 				   const set<string> & ignored_symlinks,
 				   statistics * st_ptr)
     {
@@ -2274,7 +2281,7 @@ namespace libdar
 	    thread_cancellation thr_cancel;
 
 	    if(ref_cat1 == nullptr && op != oper_create)
-		SRC_BUG;
+		throw SRC_BUG;
 	    if(st_ptr == nullptr)
 		throw SRC_BUG;
 
@@ -2335,7 +2342,10 @@ namespace libdar
 		try
 		{
 		    if(fs_root.display() != "<ROOT>")
-			root_mtime = tools_get_mtime(fs_root.display());
+			root_mtime = tools_get_mtime(dialog,
+						     fs_root.display(),
+						     zeroing_neg_date,
+						     false); // not silent
 		    else // case of merging operation for example
 		    {
 			datetime mtime1 = ref_cat1 != nullptr ? ref_cat1->get_root_mtime() : datetime(0);
@@ -2440,6 +2450,7 @@ namespace libdar
 					      delta_sig_min_size,
 					      delta_mask,
 					      delta_diff,
+					      zeroing_neg_date,
 					      ignored_symlinks);
 				// build_delta_sig is not used for archive creation it is always implied when delta_signature is set
 			}

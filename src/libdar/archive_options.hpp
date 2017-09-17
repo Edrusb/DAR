@@ -514,6 +514,9 @@ namespace libdar
 	    /// \note by default a min size of 10 kiB is used
 	void set_delta_sig_min_size(const infinint & val) { x_delta_sig_min_size = val; };
 
+	    /// whether to automatically zeroing negative dates read from the filesystem (just warn, don't ask whether to pursue)
+	void set_auto_zeroing_neg_dates(bool val) { x_auto_zeroing_neg_dates = val; };
+
 	    /// provide a list of full path which if are symlinks will be considered as the inode they point to
 	    ///
 	    /// \note this is espetially intended for use with symlinks pointing to directories
@@ -582,6 +585,7 @@ namespace libdar
 	const mask & get_delta_mask() const { return *x_delta_mask; }
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
+	bool get_auto_zeroing_neg_dates() const { return x_auto_zeroing_neg_dates; };
 	const std::set<std::string> & get_ignored_as_symlink() const { return x_ignored_as_symlink; };
 
     private:
@@ -644,6 +648,7 @@ namespace libdar
 	mask *x_delta_mask;
 	bool has_delta_mask_been_set;
 	infinint x_delta_sig_min_size;
+	bool x_auto_zeroing_neg_dates;
 	std::set<std::string> x_ignored_as_symlink;
 
 	void destroy();

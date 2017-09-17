@@ -106,6 +106,7 @@ namespace libdar
 				  const infinint & delta_sig_min_size, //< size below which to never calculate delta sig
 				  const mask & delta_mask,  //< mask defining for which file to calculate delta sig
 				  bool delta_diff,          //< whether to perform delta diff backup when delta sig is present
+				  bool auto_zeroing_neg_dates,
 				  const std::set<std::string> & ignored_symlinks);
 
     extern void filtre_difference(user_interaction & dialog,

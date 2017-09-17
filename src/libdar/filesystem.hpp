@@ -73,7 +73,8 @@ namespace libdar
     public:
 	filesystem_hard_link_read(user_interaction & dialog,
 				  bool x_furtive_read_mode,
-				  const fsa_scope & scope) : mem_ui(&dialog) { furtive_read_mode = x_furtive_read_mode; sc = scope; };
+				  const fsa_scope & scope) : mem_ui(&dialog)
+	{ furtive_read_mode = x_furtive_read_mode; sc = scope; ask_before_zeroing_neg_dates = true; };
 
 	    // the copy of the current object would make copy of addresses in
 	    // corres_read that could be released twice ... thus, copy constructor and
@@ -89,6 +90,9 @@ namespace libdar
 
 	    /// provide the FSA scope used by the object
 	const fsa_scope get_fsa_scope() const { return sc; };
+
+	    /// don't ask before zeroing negative date just warn user
+	void zeroing_negative_dates_without_asking() { ask_before_zeroing_neg_dates = false; };
 
 	    /// let the user define which file to not consider as symlinks
 	    ///
@@ -108,6 +112,7 @@ namespace libdar
 				    bool see_hard_link,        //< whether we want to detect hard_link and eventually return a cat_mirage object (not necessary when diffing an archive with filesystem)
 				    const mask & ea_mask);    //< which EA to consider when creating the object
 
+	bool get_ask_before_zeroing_neg_dates() const { return ask_before_zeroing_neg_dates; };
     private:
 
 	    // private datastructure
@@ -137,13 +142,13 @@ namespace libdar
 	infinint etiquette_counter;
 	bool furtive_read_mode;
 	fsa_scope sc;
+	bool ask_before_zeroing_neg_dates;
 	std::set<std::string> ignored_symlinks;
 
 	    // private methods
 
 	bool ignore_if_symlink(const std::string & full_path)
 	{ return ignored_symlinks.find(full_path) != ignored_symlinks.end(); };
-
     };
 
 

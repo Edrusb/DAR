@@ -175,20 +175,6 @@ namespace libdar
 				     const string & destination_path,
 				     const crc *expected_crc);
 
-    template <class T> void check_negative(T & val,
-					   user_interaction & ui,
-					   const char *inode_path,
-					   const char *nature)
-    {
-	if(val < 0)
-	{
-	    ui.pause(tools_printf(gettext("Found negative date (%s) for inode %s, can we read it as if it was zero (1st January 1970 at 00:00:00 UTC)?"),
-				  nature,
-				  inode_path));
-	    val = 0;
-	}
-    }
-
 ///////////////////////////////////////////////////////////////////
 ///////////////// filesystem_hard_link_read methods ///////////////
 ///////////////////////////////////////////////////////////////////
@@ -239,18 +225,24 @@ namespace libdar
 	    else
 	    {
 #ifdef LIBDAR_MICROSECOND_READ_ACCURACY
-		check_negative(buf.st_atim.tv_sec,
-			       get_ui(),
-			       ptr_name,
-			       gettext("atime, data access time"));
-		check_negative(buf.st_mtim.tv_sec,
-			       get_ui(),
-			       ptr_name,
-			       gettext("mtime, data modification time"));
-		check_negative(buf.st_ctim.tv_sec,
-			       get_ui(),
-			       ptr_name,
-			       gettext("ctime, inode change time"));
+		tools_check_negative_date(buf.st_atim.tv_sec,
+					  get_ui(),
+					  ptr_name,
+					  gettext("atime, data access time"),
+					  ask_before_zeroing_neg_dates,
+					  false); // not silent
+		tools_check_negative_date(buf.st_mtim.tv_sec,
+					  get_ui(),
+					  ptr_name,
+					  gettext("mtime, data modification time"),
+					  ask_before_zeroing_neg_dates,
+					  false); // not silent
+		tools_check_negative_date(buf.st_ctim.tv_sec,
+					  get_ui(),
+					  ptr_name,
+					  gettext("ctime, inode change time"),
+					  ask_before_zeroing_neg_dates,
+					  false); // not silent
 		datetime atime = datetime(buf.st_atim.tv_sec, buf.st_atim.tv_nsec/1000, datetime::tu_microsecond);
 		datetime mtime = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec/1000, datetime::tu_microsecond);
 		datetime ctime = datetime(buf.st_ctim.tv_sec, buf.st_ctim.tv_nsec/1000, datetime::tu_microsecond);
@@ -262,18 +254,24 @@ namespace libdar
 		if(ctime.is_null()) // assuming an error avoids getting time that way
 		    ctime = datetime(buf.st_ctime, 0, datetime::tu_second);
 #else
-		check_negative(buf.st_atime,
-			       get_ui(),
-			       ptr_name,
-			       gettext("atime, data access time"));
-		check_negative(buf.st_mtime,
-			       get_ui(),
-			       ptr_name,
-			       gettext("mtime, data modification time"));
-		check_negative(buf.st_ctime,
-			       get_ui(),
-			       ptr_name,
-			       gettext("ctime, inode change time"));
+		tools_check_negative_date(buf.st_atime,
+					  get_ui(),
+					  ptr_name,
+					  gettext("atime, data access time"),
+					  ask_before_zeroing_neg_dates,
+					  false); // not silent
+		tools_check_negative_date(buf.st_mtime,
+					  get_ui(),
+					  ptr_name,
+					  gettext("mtime, data modification time"),
+					  ask_before_zeroing_neg_dates,
+					  false); // not silent
+		tools_check_negative_date(buf.st_ctime,
+					  get_ui(),
+					  ptr_name,
+					  gettext("ctime, inode change time"),
+					  ask_before_zeroing_neg_dates,
+					  false); // not silent
 		datetime atime = datetime(buf.st_atime, 0, datetime::tu_second);
 		datetime mtime = datetime(buf.st_mtime, 0, datetime::tu_second);
 		datetime ctime = datetime(buf.st_ctime, 0, datetime::tu_second);
@@ -398,7 +396,11 @@ namespace libdar
 			throw Ememory("filesystem_hard_link_read::make_entree");
 		    try
 		    {
-			fsal->get_fsa_from_filesystem_for(display, sc, buf.st_mode);
+			fsal->get_fsa_from_filesystem_for(get_ui(),
+							  display,
+							  sc,
+							  buf.st_mode,
+							  get_ask_before_zeroing_neg_dates());
 			if(!fsal->empty())
 			{
 			    ino->fsa_set_saved_status(cat_inode::fsa_full);
@@ -840,6 +842,7 @@ namespace libdar
 	    detruire();
 	    throw;
 	}
+	zeroing_negative_dates_without_asking(); // when reading existing inode from filesystem
     }
 
 
@@ -1403,6 +1406,7 @@ namespace libdar
 	empty = x_empty;
 	only_overwrite = x_only_overwrite;
 	reset_write();
+	zeroing_negative_dates_without_asking(); // when reading existing inode to evaluate overwriting action
     }
 
     void filesystem_restore::reset_write()
@@ -1880,9 +1884,11 @@ namespace libdar
 
 		    try
 		    {
-			fsa.get_fsa_from_filesystem_for(spot,
+			fsa.get_fsa_from_filesystem_for(get_ui(),
+							spot,
 							all_fsa_families(),
-							in_place_symlink != nullptr);
+							in_place_symlink != nullptr,
+							get_ask_before_zeroing_neg_dates());
 		    }
 		    catch(Ethread_cancel & e)
 		    {

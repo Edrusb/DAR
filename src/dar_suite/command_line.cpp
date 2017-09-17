@@ -341,6 +341,7 @@ bool get_args(shell_interaction & dialog,
     p.aux_remote.clear();
     p.sizes_in_bytes = false;
     p.header_only = false;
+    p.zeroing_neg_dates = false;
     p.ignored_as_symlink = "";
 
     try
@@ -1586,6 +1587,8 @@ static bool get_args_recursive(recursive_param & rec,
 		    p.sizes_in_bytes = true;
 		else if(strcasecmp("header", optarg) == 0)
 		    p.header_only = true;
+		else if(strcasecmp("z", optarg) == 0 || strcasecmp("zeroing-negative-dates", optarg) == 0)
+		    p.zeroing_neg_dates = true;
 		else
                     throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
                 break;

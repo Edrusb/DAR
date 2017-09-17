@@ -154,9 +154,11 @@ namespace libdar
 	void write(generic_file & f) const;
 
 	    /// read FSA list from filesystem
-	void get_fsa_from_filesystem_for(const std::string & target,
+	void get_fsa_from_filesystem_for(user_interaction & ui,
+					 const std::string & target,
 					 const fsa_scope & scope,
-					 mode_t itype);
+					 mode_t itype,
+					 bool auto_zeroing_neg_dates);
 
 	    /// set FSA list to filesystem
 	    /// \param [in] target path of file to restore FSA to
@@ -205,7 +207,10 @@ namespace libdar
 	void sort_fsa();
 
 	void fill_extX_FSA_with(const std::string & target, mode_t itype);
-	void fill_HFS_FSA_with(const std::string & target, mode_t itype);
+	void fill_HFS_FSA_with(user_interaction & ui,
+			       const std::string & target,
+			       mode_t itype,
+			       bool auto_zeroing_neg_dates);
 
 	    /// \note return true if some FSA could be set
 	bool set_extX_FSA_to(user_interaction & ui, const std::string & target) const;

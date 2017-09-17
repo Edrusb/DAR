@@ -346,6 +346,7 @@ namespace libdar
 	    x_delta_signature = false;
 	    has_delta_mask_been_set = false;
 	    x_delta_sig_min_size = default_delta_sig_min_size;
+	    x_auto_zeroing_neg_dates = false;
 	    x_ignored_as_symlink.clear();
 	}
 	catch(...)
@@ -589,6 +590,7 @@ namespace libdar
 	x_delta_mask = ref.x_delta_mask->clone();
 	has_delta_mask_been_set = ref.has_delta_mask_been_set;
 	x_delta_sig_min_size = ref.x_delta_sig_min_size;
+	x_auto_zeroing_neg_dates = ref.x_auto_zeroing_neg_dates;
 	x_ignored_as_symlink = ref.x_ignored_as_symlink;
     }
 
