@@ -155,13 +155,20 @@ namespace libdar
     template <class T> void check_negative(T & val,
 					   user_interaction & ui,
 					   const char *inode_path,
-					   const char *nature)
+					   const char *nature,
+					   bool ask_before)
     {
 	if(val < 0)
 	{
-	    ui.pause(tools_printf(gettext("Found negative date (%s) for inode %s, can we read it as if it was zero (1st January 1970 at 00:00:00 UTC)?"),
-				  nature,
-				  inode_path));
+	    string msg = tools_printf(gettext("Found negative date (%s) for inode %s ."),
+					      nature,
+					      inode_path);
+	    if(ask_before)
+		ui.pause(tools_printf(gettext("%S Can we read it as if it was zero (1st January 1970 at 00:00:00 UTC)?"),
+				      &msg));
+	    else // just warn
+	    		ui.warning(msg + gettext("Considering date as if it was zero (Jan 1970)"));
+
 	    val = 0;
 	}
     }
@@ -211,15 +218,18 @@ namespace libdar
 		check_negative(buf.st_atim.tv_sec,
 			       get_ui(),
 			       ptr_name,
-			       gettext("atime, data access time"));
+			       gettext("atime, data access time"),
+			       ask_before_zeroing_neg_dates);
 		check_negative(buf.st_mtim.tv_sec,
 			       get_ui(),
 			       ptr_name,
-			       gettext("mtime, data modification time"));
+			       gettext("mtime, data modification time"),
+			       ask_before_zeroing_neg_dates);
 		check_negative(buf.st_ctim.tv_sec,
 			       get_ui(),
 			       ptr_name,
-			       gettext("ctime, inode change time"));
+			       gettext("ctime, inode change time"),
+			       ask_before_zeroing_neg_dates);
 		datetime atime = datetime(buf.st_atim.tv_sec, buf.st_atim.tv_nsec/1000, datetime::tu_microsecond);
 		datetime mtime = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec/1000, datetime::tu_microsecond);
 		datetime ctime = datetime(buf.st_ctim.tv_sec, buf.st_ctim.tv_nsec/1000, datetime::tu_microsecond);
@@ -234,15 +244,18 @@ namespace libdar
 		check_negative(buf.st_atime,
 			       get_ui(),
 			       ptr_name,
-			       gettext("atime, data access time"));
+			       gettext("atime, data access time"),
+			       ask_before_zeroing_neg_dates);
 		check_negative(buf.st_mtime,
 			       get_ui(),
 			       ptr_name,
-			       gettext("mtime, data modification time"));
+			       gettext("mtime, data modification time"),
+			       ask_before_zeroing_neg_dates);
 		check_negative(buf.st_ctime,
 			       get_ui(),
 			       ptr_name,
-			       gettext("ctime, inode change time"));
+			       gettext("ctime, inode change time"),
+			       ask_before_zeroing_neg_dates);
 		datetime atime = datetime(buf.st_atime, 0, datetime::tu_second);
 		datetime mtime = datetime(buf.st_mtime, 0, datetime::tu_second);
 		datetime ctime = datetime(buf.st_ctime, 0, datetime::tu_second);
@@ -810,6 +823,7 @@ namespace libdar
 	    detruire();
 	    throw;
 	}
+	zeroing_negative_dates_without_asking(); // when reading existing inode from filesystem
     }
 
 
@@ -1373,6 +1387,7 @@ namespace libdar
 	empty = x_empty;
 	only_overwrite = x_only_overwrite;
 	reset_write();
+	zeroing_negative_dates_without_asking(); // when reading existing inode to evaluate overwriting action
     }
 
     void filesystem_restore::reset_write()

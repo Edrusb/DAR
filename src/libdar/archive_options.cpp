@@ -340,6 +340,7 @@ namespace libdar
 		throw Ememory("archive_options_create::clear");
 	    x_scope = all_fsa_families();
 	    x_multi_threaded = true;
+	    x_auto_zeroing_neg_dates = false;
 	}
 	catch(...)
 	{
@@ -556,6 +557,7 @@ namespace libdar
 	    throw Ememory("archive_options_create::copy_from");
 	x_scope = ref.x_scope;
 	x_multi_threaded = ref.x_multi_threaded;
+	x_auto_zeroing_neg_dates = ref.x_auto_zeroing_neg_dates;
     }
 
 

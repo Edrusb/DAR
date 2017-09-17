@@ -491,6 +491,7 @@ namespace libdar
 				       options.get_ignore_unknown_inode_type(),
 				       options.get_fsa_scope(),
 				       options.get_multi_threaded(),
+				       options.get_auto_zeroing_neg_dates(),
 				       progressive_report);
 		    exploitable = false;
 		    stack.terminate();
@@ -735,7 +736,9 @@ namespace libdar
 				     false,
 				     options.get_fsa_scope(),
 				     options.get_multi_threaded(),
+				     true,
 				     st_ptr);
+
 		    exploitable = false;
 		    stack.terminate();
 		}
@@ -1804,6 +1807,7 @@ namespace libdar
 				     bool ignore_unknown,
 				     const fsa_scope & scope,
 				     bool multi_threaded,
+				     bool zeroing_neg_date,
 				     statistics * progressive_report)
     {
         statistics st = false;  // false => no lock for this internal object
@@ -1954,6 +1958,7 @@ namespace libdar
 			 ignore_unknown,
 			 scope,
 			 multi_threaded,
+			 zeroing_neg_date,
 			 st_ptr);
 
 	return *st_ptr;
@@ -2020,6 +2025,7 @@ namespace libdar
 				   bool ignore_unknown,
 				   const fsa_scope & scope,
 				   bool multi_threaded,
+				   bool zeroing_neg_date,
 				   statistics * st_ptr)
     {
 	try
@@ -2182,7 +2188,8 @@ namespace libdar
 					      backup_hook_file_mask,
 					      ignore_unknown,
 					      scope,
-					      exclude_by_ea);
+					      exclude_by_ea,
+					      zeroing_neg_date);
 			}
 			catch(...)
 			{

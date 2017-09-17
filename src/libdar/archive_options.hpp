@@ -496,6 +496,9 @@ namespace libdar
 	    /// whether libdar is allowed to spawn several threads to possibily work faster on multicore CPU (requires libthreadar)
 	void set_multi_threaded(bool val) { x_multi_threaded = val; };
 
+	    /// whether to automatically zeroing negative dates read from the filesystem (just warn, don't ask whether to pursue)
+	void set_auto_zeroing_neg_dates(bool val) { x_auto_zeroing_neg_dates = val; };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -553,6 +556,7 @@ namespace libdar
 	const entrepot & get_entrepot() const { if(x_entrepot == nullptr) throw SRC_BUG; return *x_entrepot; };
 	const fsa_scope & get_fsa_scope() const { return x_scope; };
 	bool get_multi_threaded() const { return x_multi_threaded; };
+	bool get_auto_zeroing_neg_dates() const { return x_auto_zeroing_neg_dates; };
 
     private:
 	archive *x_ref_arch; //< just contains the address of an existing object, no local copy of object is done here
@@ -609,6 +613,7 @@ namespace libdar
 	entrepot *x_entrepot;
 	fsa_scope x_scope;
 	bool x_multi_threaded;
+	bool x_auto_zeroing_neg_dates;
 
 	void destroy();
 	void copy_from(const archive_options_create & ref);
