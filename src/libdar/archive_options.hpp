@@ -513,6 +513,9 @@ namespace libdar
 	    /// \note by default a min size of 10 kiB is used
 	void set_delta_sig_min_size(const infinint & val) { x_delta_sig_min_size = val; };
 
+	    /// whether to automatically zeroing negative dates read from the filesystem (just warn, don't ask whether to pursue)
+	void set_auto_zeroing_neg_dates(bool val) { x_auto_zeroing_neg_dates = val; };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -575,6 +578,7 @@ namespace libdar
 	const mask & get_delta_mask() const { return *x_delta_mask; }
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
+	bool get_auto_zeroing_neg_dates() const { return x_auto_zeroing_neg_dates; };
 
     private:
 	archive *x_ref_arch; //< just contains the address of an existing object, no local copy of object is done here
@@ -636,6 +640,7 @@ namespace libdar
 	mask *x_delta_mask;
 	bool has_delta_mask_been_set;
 	infinint x_delta_sig_min_size;
+	bool x_auto_zeroing_neg_dates;
 
 	void destroy();
 	void copy_from(const archive_options_create & ref);

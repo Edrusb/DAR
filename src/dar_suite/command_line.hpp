@@ -144,6 +144,7 @@ struct line_param
     infinint delta_sig_min_size;  //< size below which to never calculate delta signatures
     bool sizes_in_bytes;          //< whether to display sizes in bytes of to the larges unit (Mo, Go, To,...)
     bool header_only;             //< whether we just display the header of archives to be read
+    bool zeroing_neg_dates;       //< whether to automatically zeroing negative dates while reading inode from filesystem
 
 	// constructor for line_param
     line_param()

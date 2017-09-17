@@ -504,6 +504,7 @@ namespace libdar
 				       options.get_delta_mask(),
 				       options.get_delta_sig_min_size(),
 				       options.get_delta_diff(),
+				       options.get_auto_zeroing_neg_dates(),
 				       progressive_report);
 		    exploitable = false;
 		    stack.terminate();
@@ -762,7 +763,9 @@ namespace libdar
 				     options.get_delta_mask(), // delta_mask
 				     options.get_delta_sig_min_size(),
 				     false,                    // delta diff
+				     true,
 				     st_ptr);
+
 		    exploitable = false;
 		    stack.terminate();
 		}
@@ -1869,6 +1872,7 @@ namespace libdar
 				     const mask & delta_mask,
 				     const infinint & delta_sig_min_size,
 				     bool delta_diff,
+				     bool zeroing_neg_date,
 				     statistics * progressive_report)
     {
         statistics st = false;  // false => no lock for this internal object
@@ -2027,6 +2031,7 @@ namespace libdar
 			 delta_mask,
 			 delta_sig_min_size,
 			 delta_diff,
+			 zeroing_neg_date,
 			 st_ptr);
 
 	return *st_ptr;
@@ -2098,6 +2103,7 @@ namespace libdar
 				   const mask & delta_mask,
 				   const infinint & delta_sig_min_size,
 				   bool delta_diff,
+				   bool zeroing_neg_date,
 				   statistics * st_ptr)
     {
 	try
@@ -2113,7 +2119,7 @@ namespace libdar
 	    thread_cancellation thr_cancel;
 
 	    if(ref_cat1 == nullptr && op != oper_create)
-		SRC_BUG;
+		throw SRC_BUG;
 	    if(st_ptr == nullptr)
 		throw SRC_BUG;
 
@@ -2169,7 +2175,10 @@ namespace libdar
 		try
 		{
 		    if(fs_root.display() != "<ROOT>")
-			root_mtime = tools_get_mtime(fs_root.display());
+			root_mtime = tools_get_mtime(dialog,
+						     fs_root.display(),
+						     zeroing_neg_date,
+						     false); // not silent
 		    else // case of merging operation for example
 		    {
 			datetime mtime1 = ref_cat1 != nullptr ? ref_cat1->get_root_mtime() : datetime(0);
@@ -2264,8 +2273,9 @@ namespace libdar
 					      delta_signature,
 					      delta_sig_min_size,
 					      delta_mask,
-					      delta_diff);
+					      delta_diff,
 				// build_delta_sig is not used for archive creation it is always implied when delta_signature is set
+					      zeroing_neg_date);
 			}
 			catch(...)
 			{

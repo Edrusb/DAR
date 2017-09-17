@@ -540,7 +540,8 @@ namespace libdar
 			   bool delta_signature,
 			   const infinint & delta_sig_min_size,
 			   const mask & delta_mask,
-			   bool delta_diff)
+			   bool delta_diff,
+			   bool auto_zeroing_neg_dates)
     {
         cat_entree *e = nullptr;
         const cat_entree *f = nullptr;
@@ -574,6 +575,9 @@ namespace libdar
 	thread_cancellation thr_cancel;
 	infinint skipped_dump, fs_errors;
 	infinint wasted_bytes = 0;
+
+	if(auto_zeroing_neg_dates)
+	    fs.zeroing_negative_dates_without_asking();
 
         st.clear();
         cat.reset_add();
@@ -3196,7 +3200,11 @@ namespace libdar
 
 				    try
 				    {
-					changed = fic->get_last_modif() != tools_get_mtime(info_quoi);
+					changed = fic->get_last_modif() != tools_get_mtime(dialog,
+											   info_quoi,
+											   true,
+											   true); // silently set to zero negative dates
+
 				    }
 				    catch(Erange & e)
 				    {
@@ -3241,7 +3249,10 @@ namespace libdar
 						loop = true;
 
 						    // updating the last modification date of file
-						fic->set_last_modif(tools_get_mtime(info_quoi));
+						fic->set_last_modif(tools_get_mtime(dialog,
+										    info_quoi,
+										    true,
+										    true)); // silently set to zero negative date
 
 						    // updating the size of the file
 						fic->change_size(tools_get_size(info_quoi));

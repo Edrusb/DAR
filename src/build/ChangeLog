@@ -1,3 +1,8 @@
+from 2.5.12 to 2.5.13
+- added -az option to automatically nullify negative dates returned from
+  the system
+- included the birthtime (HFS FSA) into the negative dates handling
+
 from 2.5.11 to 2.5.12
 - documenting in man page the limitation of -[ and -] options concerning
   the maximum line length that could be used in a listing file. This

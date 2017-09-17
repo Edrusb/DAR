@@ -302,15 +302,20 @@ namespace libdar
 	}
     }
 
-    void filesystem_specific_attribute_list::get_fsa_from_filesystem_for(const string & target,
+    void filesystem_specific_attribute_list::get_fsa_from_filesystem_for(user_interaction & ui,
+									 const string & target,
 									 const fsa_scope & scope,
-									 mode_t itype)
+									 mode_t itype,
+									 bool auto_zeroing_neg_dates)
     {
 	clear();
 
 	if(scope.find(fsaf_hfs_plus) != scope.end())
 	{
-	    fill_HFS_FSA_with(target, itype);
+	    fill_HFS_FSA_with(ui,
+			      target,
+			      itype,
+			      auto_zeroing_neg_dates);
 	}
 
 	if(scope.find(fsaf_linux_extX) != scope.end())
@@ -617,8 +622,10 @@ namespace libdar
 #endif
     }
 
-    void filesystem_specific_attribute_list::fill_HFS_FSA_with(const std::string & target,
-							       mode_t itype)
+    void filesystem_specific_attribute_list::fill_HFS_FSA_with(user_interaction & ui,
+							       const std::string & target,
+							       mode_t itype,
+							       bool auto_zeroing_neg_dates)
     {
 #ifdef LIBDAR_BIRTHTIME
 	struct stat tmp;
@@ -630,10 +637,20 @@ namespace libdar
 	{
 	    fsa_time * ptr = nullptr;
 #ifdef LIBDAR_MICROSECOND_READ_ACCURACY
+	    tools_check_negative_date(tmp.st_birthtim.tv_sec,
+				      ui,
+				      target.c_str(),
+				      "birthtime",
+				      auto_zeroing_neg_dates);
 	    datetime birthtime = datetime(tmp.st_birthtim.tv_sec, tmp.st_birthtim.tv_nsec/1000, datetime::tu_microsecond);
 	    if(birthtime.is_null()) // assuming an error avoids getting time that way
 		birthtime = datetime(tmp.st_birthtime, 0, datetime::tu_second);
 #else
+	    tools_check_negative_date(tmp.st_birthtime,
+				      ui,
+				      target.c_str(),
+				      "birthtime",
+				      auto_zeroing_neg_dates);
 	    datetime birthtime = datetime(tmp.st_birthtime, 0, datetime::tu_second);
 #endif
 	    create_or_throw(ptr, get_pool(), fsaf_hfs_plus, fsan_creation_date, birthtime);

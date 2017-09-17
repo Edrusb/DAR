@@ -1930,7 +1930,10 @@ namespace libdar
         return ret;
     }
 
-    datetime tools_get_mtime(const std::string & s)
+    datetime tools_get_mtime(user_interaction & dialog,
+			     const std::string & s,
+			     bool auto_zeroing,
+			     bool silent)
     {
         struct stat buf;
 
@@ -1941,10 +1944,22 @@ namespace libdar
         }
 
 #ifdef LIBDAR_MICROSECOND_READ_ACCURACY
+	tools_check_negative_date(buf.st_mtim.tv_sec,
+				  dialog,
+				  s.c_str(),
+				  "mtime",
+				  auto_zeroing,
+				  silent);
         datetime val = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec/1000, datetime::tu_microsecond);
-        if(val.is_null()) // assuming an error avoids getting time that way
+        if(val.is_null() && !auto_zeroing) // assuming an error avoids getting time that way
             val = datetime(buf.st_mtime, 0, datetime::tu_second);
 #else
+	tools_check_negative_date(buf.st_mtime,
+				  dialog,
+				  s.c_str(),
+				  "mtime",
+				  auto_zeroing,
+				  silent);
         datetime val = datetime(buf.st_mtime, 0, datetime::tu_second);
 #endif
 

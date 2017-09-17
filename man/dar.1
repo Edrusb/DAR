@@ -972,6 +972,8 @@ options. Binary delta signature will then be calculated based on the saved files
 .P
 Isolated catalogue using the --delta sig option, can still be used as backup of the internal catalogue they have been isolated from. However, as they hold their own delta signatures, such isolated catalogue can only have access to its own ones, not to those of the archive of reference. In particular when testing an archive (-t option), using -A option to rescue the archive internal catalogue using an isolated catalogue containing delta signatures, dar will not be able to check that there is no corruption in the delta signatures fields of the archive under test. For that type of testing either use the internal catalogue of the archive or rescue it using an isolated catalogue built without --delta sig option.
 .RE
+-az, --alter=zeroing-negative-dates
+dar/libdar saves dates as a number of seconds since the beginning of year 1970, the well known "Unix time" (plus a positive fraction for sub-second time-stamping). Some systems may return a negative number as the Unix time of a given file (files having dates before 1970), in that situation by default and since release 2.5.12 dar pauses and asks the user whether to assume the date as being zero. But with -az option, dar/libdar automatically assumes such negative dates to be zero and just issue a warning about the problem met.
 .PP
 .PP
 .B RESTORATION SPECIFIC OPTIONS (to use with -x)
@@ -1227,25 +1229,25 @@ configuration files (-B option, $HOME/.darrc and /etc/darrc) usually contain a s
 A condition takes the form of reserved word immediately followed by a colon ':'. This word + colon must stand alone on its line, eventually with spaces or tabs beside it. The available conditions are:
 .TP 20
 extract:
-all option listed after this condition get used if previously on command line or file the -x option has been used
+all option listed after this condition get used if previously on command line or file the -x command has been used
 .TP 20
 create:
-all option listed after this condition get used if previously on command line or file (-B option) the -c option has been used
+all option listed after this condition get used if previously on command line or file (-B option) the -c command has been used
 .TP 20
 list: (or listing:)
-if -l option has been used
+if -l command has been used
 .TP 20
 test:
-if -t option has been used
+if -t command has been used
 .TP 20
 diff:
-if -d option has been used
+if -d command has been used
 .TP 20
 isolate:
-if -C option has been used
+if -C command has been used
 .TP 20
 merge:
-if -+ option has been used
+if -+ command has been used
 .TP 20
 reference:
 if -A option has been used (except when -A is used for the snapshot feature or in conjunction with -af)
