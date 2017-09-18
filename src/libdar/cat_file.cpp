@@ -280,7 +280,7 @@ namespace libdar
                 if(offset == nullptr)
                     throw Ememory("cat_file::cat_file(generic_file)");
 
-                storage_size = new (get_pool()) infinint(0); // cannot known the storage_size at that time
+                storage_size = new (get_pool()) infinint(0); // cannot know the storage_size at that time
                 if(storage_size == nullptr)
                     throw Ememory("cat_file::cat_file(generic_file)");
 
