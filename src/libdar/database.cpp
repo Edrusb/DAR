@@ -67,11 +67,16 @@ namespace libdar
 	data_files = nullptr;
 	check_order_asked = true;
 	cur_db_version = database_header_get_supported_version();
+	algo = gzip;   // stays the default algorithm for new databases
     }
 
     database::database(user_interaction & dialog, const string & base, const database_open_options & opt)
     {
-	generic_file *f = database_header_open(dialog, get_pool(), base, cur_db_version);
+	generic_file *f = database_header_open(dialog,
+					       get_pool(),
+					       base,
+					       cur_db_version,
+					       algo);
 
 	if(f == nullptr)
 	    throw Ememory("database::database");
@@ -161,7 +166,11 @@ namespace libdar
 	if(files == nullptr && data_files == nullptr)
 	    throw Erange("database::dump", gettext("Cannot write down a read-only database"));
 
-	generic_file *f = database_header_create(dialog, get_pool(), filename, opt.get_overwrite());
+	generic_file *f = database_header_create(dialog,
+						 get_pool(),
+						 filename,
+						 opt.get_overwrite(),
+						 algo);
 	if(f == nullptr)
 	    throw Ememory("database::dump");
 
@@ -362,10 +371,12 @@ namespace libdar
 
 	    if(!dialog.get_use_dar_manager_contents())
 	    {
+		string compr = compression2string(algo);
 		dialog.warning("\n");
 		dialog.printf(gettext("dar path        : %S\n"), &dar_path);
 		dialog.printf(gettext("dar options     : %S\n"), &opt);
 		dialog.printf(gettext("database version: %d\n"), cur_db_version);
+		dialog.printf(gettext("compression used: %S\n"), &compr);
 		dialog.warning("\n");
 		dialog.printf(gettext("archive #   |    path      |    basename\n"));
 		dialog.printf("------------+--------------+---------------\n");

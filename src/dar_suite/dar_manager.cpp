@@ -79,7 +79,7 @@ using namespace libdar;
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c"
 #define INVALID_ARG "Invalid argument given to -%c (requires integer)"
-#define OPT_STRING "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:ka:9:"
+#define OPT_STRING "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:ka:9:z:"
 
 enum operation { none_op, create, add, listing, del, chbase, where, options, dar, restore, used, files, stats, moving, interactive, check, batch };
 
@@ -97,6 +97,7 @@ static bool command_line(shell_interaction & dialog,
 			 bool & ignore_dat_options,
 			 bool & even_when_removed,
 			 bool & check_order,
+			 compression & algozip,
 			 bool recursive); // true if called from op_batch
 static void show_usage(shell_interaction & dialog, const char *command);
 static void show_version(shell_interaction & dialog, const char *command);
@@ -104,7 +105,7 @@ static void show_version(shell_interaction & dialog, const char *command);
 #if HAVE_GETOPT_LONG
 static const struct option *get_long_opt();
 #endif
-static void op_create(shell_interaction & dialog, const string & base, bool info_details);
+static void op_create(shell_interaction & dialog, const string & base, compression algozip, bool info_details);
 static void op_add(shell_interaction & dialog, database *dat, const string &arg, string fake, const infinint & min_digits, bool info_details);
 static void op_listing(shell_interaction & dialog, const database *dat, bool info_details);
 static void op_del(shell_interaction & dialog, database *dat, S_I min, archive_num max, bool info_details);
@@ -182,10 +183,26 @@ S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[], const
     bool ignore_dat_options;
     bool even_when_removed;
     bool check_order;
+    compression algozip;
 
     dialog.change_non_interactive_output(&cout);
 
-    if(!command_line(dialog, argc, argv, op, base, arg, num, rest, num2, date, info_details, ignore_dat_options, even_when_removed, check_order, false))
+    if(!command_line(dialog,
+		     argc,
+		     argv,
+		     op,
+		     base,
+		     arg,
+		     num,
+		     rest,
+		     num2,
+		     date,
+		     info_details,
+		     ignore_dat_options,
+		     even_when_removed,
+		     check_order,
+		     algozip,
+		     false))
 	return EXIT_SYNTAX;
 
     if(op == none_op)
@@ -221,7 +238,7 @@ S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[], const
     }
 
     if(op == create)
-	op_create(dialog, base, info_details);
+	op_create(dialog, base, algozip, info_details);
     else
     {
 	if(info_details)
@@ -272,6 +289,7 @@ static bool command_line(shell_interaction & dialog,
 			 bool & ignore_dat_options,
 			 bool & even_when_removed,
 			 bool & check_order,
+			 compression & algozip,
 			 bool recursive)
 {
     S_I lu, min;
@@ -288,6 +306,7 @@ static bool command_line(shell_interaction & dialog,
     ignore_dat_options = false;
     even_when_removed = false;
     check_order = true;
+    algozip = gzip;
     string extra = "";
 
     try
@@ -487,6 +506,11 @@ static bool command_line(shell_interaction & dialog,
 		    else
 			throw Erange("command_line", tools_printf(gettext(INVALID_ARG), char(lu)));
 		    break;
+		case 'z':
+		    if(optarg == nullptr)
+			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+		    algozip = string2compression(optarg);
+		    break;
 		case ':':
 		    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(optopt)));
 		case '?':
@@ -612,10 +636,11 @@ static bool command_line(shell_interaction & dialog,
     return true;
 }
 
-static void op_create(shell_interaction & dialog, const string & base, bool info_details)
+static void op_create(shell_interaction & dialog, const string & base, compression algozip, bool info_details)
 {
     database dat; // created empty;
 
+    dat.set_compression(algozip);
     if(info_details)
     {
         dialog.warning(gettext("Creating file..."));
@@ -966,6 +991,7 @@ static const struct option *get_long_opt()
 	{"min-digits", required_argument, nullptr, '9'},
 	{"ignore-when-removed", no_argument, nullptr, 'k'},
 	{"alter", required_argument, nullptr, 'a'},
+	{"compression", required_argument, nullptr, 'z'},
         { nullptr, 0, nullptr, 0 }
     };
 
@@ -1269,6 +1295,7 @@ static void op_batch(shell_interaction & dialog, database *dat, const string & f
     bool ignore_dat_options;
     bool even_when_removed;
     bool check_order; // not used here
+    compression algozip; // not used here neither
 
     if(dat == nullptr)
 	throw SRC_BUG;
@@ -1308,7 +1335,22 @@ static void op_batch(shell_interaction & dialog, database *dat, const string & f
 	    for(U_I i = 0; i < mots.size(); ++i)
 		cmdline.set_arg(mots[i], i+1);
 
-	    if(!command_line(dialog, cmdline.argc(), cmdline.argv(), sub_op, faked_base, arg, num, rest, num2, date, sub_info_details, ignore_dat_options, even_when_removed, check_order, true))
+	    if(!command_line(dialog,
+			     cmdline.argc(),
+			     cmdline.argv(),
+			     sub_op,
+			     faked_base,
+			     arg,
+			     num,
+			     rest,
+			     num2,
+			     date,
+			     sub_info_details,
+			     ignore_dat_options,
+			     even_when_removed,
+			     check_order,
+			     algozip,
+			     true))
 		throw Erange("op_batch", tools_printf(gettext("Syntax error in batch file: %S"), &line));
 
 	    if(sub_op == create)

@@ -50,7 +50,6 @@ extern "C"
 } // end extern "C"
 
 #include "database_header.hpp"
-#include "compressor.hpp"
 #include "tools.hpp"
 #include "user_interaction.hpp"
 #include "integers.hpp"
@@ -65,17 +64,74 @@ namespace libdar
     static const unsigned char database_version = 5;
 
 #define HEADER_OPTION_NONE 0x00
+#define HEADER_OPTION_COMPRESSOR 0x01
+#define HEADER_OPTION_EXTENSION 0x80
+	// if EXTENSION bit is set, the option field is two bytes wide
+	// this mechanism can be extended in the future by a second extension bit 0x8080
+	// and so on
 
-    struct database_header
+    class database_header
     {
+    public:
+	database_header() { version = database_version; options = HEADER_OPTION_NONE; algo = gzip; };
+
+	void read(generic_file & f);
+	void write(generic_file & f);
+
+	void set_compression(compression algozip);
+
+	U_I get_version() const { return version; };
+	compression get_compression() const { return algo; };
+
+    private:
 	unsigned char version;
 	unsigned char options;
-
-	void read(generic_file & f) { f.read((char *)&version, 1); f.read((char *)&options, 1); };
-	void write(generic_file & f) { f.write((char *)&version, 1); f.write((char *)&options, 1); };
+	compression algo;
     };
 
-    generic_file *database_header_create(user_interaction & dialog, memory_pool *pool, const string & filename, bool overwrite)
+    void database_header::read(generic_file & f)
+    {
+	f.read((char *)&version, 1);
+	if(version > database_version)
+	    throw Erange("database_header::read", gettext("The format version of this database is too high for that software version, use a more recent software to read or modify this database"));
+	f.read((char *)&options, 1);
+	if((options & HEADER_OPTION_EXTENSION) != 0)
+	    throw Erange("database_header::read",  gettext("Unknown header option in database, aborting\n"));
+	if((options & HEADER_OPTION_COMPRESSOR) != 0)
+	{
+	    char tmp;
+	    f.read(&tmp, 1);
+	    algo = char2compression(tmp);
+	}
+	else
+	    algo = gzip; // was the default before choice was available
+    }
+
+    void database_header::write(generic_file & f)
+    {
+	f.write((char *)&version, 1);
+	f.write((char *)&options, 1);
+	if((options & HEADER_OPTION_COMPRESSOR) != 0)
+	{
+	    char tmp = compression2char(algo);
+	    f.write(&tmp, 1);
+	}
+    }
+
+    void database_header::set_compression(compression algozip)
+    {
+	algo = algozip;
+	if(algo != gzip)
+	    options |= HEADER_OPTION_COMPRESSOR;
+	else
+	    options &= ~HEADER_OPTION_COMPRESSOR;
+    }
+
+    generic_file *database_header_create(user_interaction & dialog,
+					 memory_pool *pool,
+					 const string & filename,
+					 bool overwrite,
+					 compression algozip)
     {
 	generic_file *ret = nullptr;
 
@@ -91,11 +147,10 @@ namespace libdar
 
 	try
 	{
-	    h.version = database_version;
-	    h.options = HEADER_OPTION_NONE;
+	    h.set_compression(algozip);
 	    h.write(*ret);
 
-	    comp = new (pool) compressor(gzip, ret); // upon success, ret is owned by compr
+	    comp = new (pool) compressor(algozip, ret); // upon success, ret is owned by compr
 	    if(comp == nullptr)
 		throw Ememory("database_header_create");
 	    else
@@ -110,7 +165,11 @@ namespace libdar
 	return ret;
     }
 
-    generic_file *database_header_open(user_interaction & dialog, memory_pool *pool, const string & filename, unsigned char & db_version)
+    generic_file *database_header_open(user_interaction & dialog,
+				       memory_pool *pool,
+				       const string & filename,
+				       unsigned char & db_version,
+				       compression & algozip)
     {
 	generic_file *ret = nullptr;
 
@@ -131,13 +190,10 @@ namespace libdar
 		throw Ememory("database_header_open");
 
 	    h.read(*ret);
-	    if(h.version > database_version)
-		throw Erange("database_header_open", gettext("The format version of this database is too high for that software version, use a more recent software to read or modify this database"));
-	    db_version = h.version;
-	    if(h.options != HEADER_OPTION_NONE)
-		throw Erange("database_header_open", gettext("Unknown header option in database, aborting\n"));
+	    db_version = h.get_version();
+	    algozip = h.get_compression();
 
-	    comp = new (pool) compressor(gzip, ret);
+	    comp = new (pool) compressor(h.get_compression(), ret);
 	    if(comp == nullptr)
 		throw Ememory("database_header_open");
 	    else

@@ -4,7 +4,7 @@
 dar_manager \- compiles several archives contents in a database to ease file restoration
 .SH SYNOPSIS
 
-dar_manager [-v] -C [<path>/]<database>
+dar_manager [-v] -C [<path>/]<database> [-z <algo>]
 
 dar_manager [-v] -B [<path>/]<database> -A [<path>/]<basename> [-9 <min-digits>] [[<path>/]<archive_basename>]
 
@@ -142,6 +142,9 @@ avoid dar_manager to issue a warning for each file not following a chronological
 .TP 20
 -@, --batch <filename>
 allows you to do several operations on a given database. All operations are defined in the provided <filename> and refer to the same database as defined by the -B switch on command line. This batch file, must thus not contain neither -B, -C, -i or -ai option (-ai are global to the batch operation). The batch file expected layout is one command per line, thus several arguments (like -l -v for example) may take place on a given line of the file (-v can be found both on command line for verbose output about the batch operation steps, as well as inside the batch file for verbose output of a particular batched command). Arguments are separated by spaces or tabs, other characters are passed as-is. In consequence, you should only need to use quotes (using " or ') if you intend to use an argument containing space. Last, comments may be placed on any line beginning by a hash character (#).
+.TP 20
+-z, --compression <algo>
+Only available with while creating a database (-C option), it let you set the compression algorithm used to store the database in file. By default gzip is used.
 .TP 20
 -Q
 Do not display any message on stderr when not launched from a terminal (for example when launched from an at job or crontab). Remains that any question to the user will be assumed a 'no' answer, which most of the time will abort the program.

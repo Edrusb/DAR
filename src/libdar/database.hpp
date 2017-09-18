@@ -130,6 +130,9 @@ namespace libdar
 	    /// \note this method *is* available with partially extracted databases, but with partial_read_only ones
 	void set_dar_path(const std::string & chemin) { dar_path = chemin; };
 
+	    /// change compression to use when storing base on file
+	void set_compression(compression algozip) { algo = algozip; };
+
 
 	    // "GETTINGS"
 
@@ -141,11 +144,14 @@ namespace libdar
 	    /// return the options used with dar for restoration
 	std::vector<std::string> get_options() const { return options_to_dar; }; // show option passed to dar
 
-	    /// return the path for dar
+	    /// returns the path for dar
 
 	    /// \return the path to dar used when restoring files
 	    /// \note empty string means that dar is taken from the PATH variable
 	std::string get_dar_path() const { return dar_path; }; // show path to dar command
+
+	    /// returns the compression algorithm used on filesystem
+	compression get_compression() const { return algo; };
 
 	    /// list files which are present in a given archive
 
@@ -216,6 +222,7 @@ namespace libdar
 	storage *data_files;                         //< when reading archive in partial mode, this is where is located the "not readed" part of the archive (is set to nullptr in partial-read-only mode)
 	bool check_order_asked;                      //< whether order check has been asked
 	unsigned char cur_db_version;                //< current db version (for informational purposes)
+	compression algo;                            //< compression used/to use when writing down the base to file
 
 	void build(user_interaction & dialog, generic_file & f, bool partial, bool read_only, unsigned char db_version);  //< used by constructors
 	archive_num get_real_archive_num(archive_num num, bool revert) const;

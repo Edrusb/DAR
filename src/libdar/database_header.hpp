@@ -31,6 +31,7 @@
 #include "generic_file.hpp"
 
 #include "user_interaction.hpp"
+#include "compressor.hpp"
 
 namespace libdar
 {
@@ -44,12 +45,14 @@ namespace libdar
 	/// \param[in] pool memory pool to use or nullptr for default memory allocation
 	/// \param[in] filename is the file's name to create/overwrite
 	/// \param[in] overwrite set to true to allow file overwriting (else generates an error if file exists)
+	/// \param[in] algozip compression algorithm used for the database
 	/// \return the database header has been read and checked the database can now be read from the returned generic_file pointed by the returned value
 	/// then it must be destroyed with the delete operator.
     extern generic_file *database_header_create(user_interaction & dialog,
 						memory_pool *pool,
 						const std::string & filename,
-						bool overwrite);
+						bool overwrite,
+						compression algozip);
 
 	/// read the header of a dar_manager database
 
@@ -61,7 +64,8 @@ namespace libdar
     extern generic_file *database_header_open(user_interaction & dialog,
 					      memory_pool *pool,
 					      const std::string & filename,
-					      unsigned char & db_version);
+					      unsigned char & db_version,
+					      compression & algozip);
 
     extern const unsigned char database_header_get_supported_version();
 
