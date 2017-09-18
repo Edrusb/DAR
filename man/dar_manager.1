@@ -42,14 +42,14 @@ dar_manager -V
 
 .SH DESCRIPTION
 .B dar_manager
-is part of the Disk Archive suite. Its purpose is to simplify the restoration of a set of few files present in many backup, full or differential. This is achieved by gathering the catalogue of each archive (this has to be done once). At any time you just have to give the relative path to the files you want to restore, dar_manager will call dar with the proper options and restore the last version of each file (or the last version before given date). Note that dar_manager is to be used when you have remove some files by accident some time ago and wish to recover them. It thus not adapted to restore the state a directory tree had at a given time, in particular when some files have to be removed. For that you must use dar directly with the corresponding archive to the date for which you wish to restore the state.
+is part of the Disk Archive suite. Its purpose is to simplify the restoration of a set of few files present in many backup, full or differential. This is achieved by gathering the catalogue of each archive (this has to be done once). At any time you just have to give the relative path to the files you want to restore, dar_manager will call dar with the proper options and restore the last version of each file (or the last version before given date). Note that dar_manager is especially interesting when you have removed some files by accident some time ago and wish to recover them from a set of full and differential backups. It is thus not really adapted/efficient to restore the state a directory tree had at a given time, in particular when some files have to be removed. For that you would better use dar directly with the corresponding archive(s) up to the date for which you wish to restore the state of a whole directory tree.
 .PP
-you can restore any file by hand without
+You can restore any file by hand without
 .B dar_manager
-, but if you make a lot of differential backup, you may spend many time to find the archive that contains the last version of your file, as dar will not save it if it has not changed since previous backup.
+, but if you have a lot of differential backups, you may spend a long time to find the archive that contains the last version of your files, as dar will not save it if it has not changed since previous backup.
 .B
 dar_manager
-simplify the process by looking in its internal database, built from archive "catalogues".
+simplify the process by looking in its internal database, built from archive "catalogues" (= table of contents).
 .SH OPTIONS
 .TP 20
 -C, --create [<path>/]<database>

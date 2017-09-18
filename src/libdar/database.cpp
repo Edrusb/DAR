@@ -93,7 +93,11 @@ namespace libdar
 	delete f;
     }
 
-    void database::build(user_interaction & dialog, generic_file & f, bool partial, bool read_only, const unsigned char db_version)
+    void database::build(user_interaction & dialog,
+			 generic_file & f,
+			 bool partial,
+			 bool read_only,
+			 const unsigned char db_version)
     {
 	NLS_SWAP_IN;
 	try
@@ -161,7 +165,9 @@ namespace libdar
 	    delete data_files;
     }
 
-    void database::dump(user_interaction & dialog, const std::string & filename, const database_dump_options & opt) const
+    void database::dump(user_interaction & dialog,
+			const std::string & filename,
+			const database_dump_options & opt) const
     {
 	if(files == nullptr && data_files == nullptr)
 	    throw Erange("database::dump", gettext("Cannot write down a read-only database"));
