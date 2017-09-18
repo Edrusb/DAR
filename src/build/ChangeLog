@@ -11,6 +11,10 @@ from 2.5.x to 2.6.0
 - new feature: display filters nature (-vmasks option)
 - new feature: follow some symlinks as defined by the --ignored-as-symlink
   option
+- new feature: one can define the compression algorithm a dar_manager
+  database will use. This choice is done at database creation only using
+  new dar_manager's -z option. In particular -z none to avoid using
+  compression
 
 from 2.5.12 to 2.5.13
 - added -az option to automatically nullify negative dates returned from
