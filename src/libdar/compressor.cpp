@@ -916,6 +916,9 @@ namespace libdar
 	if(a == "xz" || a == "lzma")
 	    return xz;
 
+	if(a == "none")
+	    return none;
+
 	throw Erange("string2compression", tools_printf(gettext("unknown compression algorithm: %S"), &a));
     }
 
