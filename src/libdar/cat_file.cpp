@@ -201,8 +201,8 @@ namespace libdar
                 }
                 else // not saved
                 {
-			// since format 9 the flag is present in any case
-		    if(reading_ver >= 9)
+			// since format 10 the flag is present in any case
+		    if(reading_ver >= 10)
 		    {
 			ptr->read(&file_data_status_read, sizeof(file_data_status_read));
 
@@ -261,8 +261,8 @@ namespace libdar
                 }
 		else // not saved
 		{
-			// since format 9 the flag is present in any case
-		    if(reading_ver >= 9)
+			// since format 10 the flag is present in any case
+		    if(reading_ver >= 10)
 		    {
 			ptr->read(&file_data_status_read, sizeof(file_data_status_read));
 			if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
