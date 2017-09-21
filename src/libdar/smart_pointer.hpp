@@ -22,6 +22,8 @@
     /// \file smart_pointer.hpp
     /// \brief template class implementing memory efficient smart pointer
     /// \ingroup Private
+    /// \note Why not using std::shared_ptr? because I needed to have a warranty on the
+    /// scalability in term of max number of smart_pointers that can be bound to an object
 
 #ifndef SMART_POINTER_HPP
 #define SMART_POINTER_HPP
