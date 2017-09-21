@@ -166,8 +166,8 @@ namespace libdar
 	    /// Moreover, having two objets one copy of the other may lead to unexpected behaviors while
 	    /// merging or creating, isolating or merging archives.
 
-	archive(const archive & ref) : stack(ref.stack) { throw Efeature(dar_gettext("Archive copy constructor is not implemented")); };
-	archive & operator = (const archive & ref) { throw Efeature(dar_gettext("Archive assignment operator is not implemented")); };
+	archive(const archive & ref) = delete;
+	archive & operator = (const archive & ref) = delete;
 
 	    /// the destructor
 	~archive() throw(Ebug) { free_all(); };

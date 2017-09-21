@@ -852,11 +852,11 @@ namespace libdar
 
 	    my_options_read.set_sequential_read(true);
 
-	    archive src = archive(dialog,
-				  chem_src,
-				  basename_src,
-				  extension_src,
-				  my_options_read);
+	    archive src(dialog,
+			chem_src,
+			basename_src,
+			extension_src,
+			my_options_read);
 
 	    if(src.cat == nullptr)
 		throw SRC_BUG;
