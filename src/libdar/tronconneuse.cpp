@@ -88,7 +88,7 @@ namespace libdar
 	    // has not been initialized.
     }
 
-    const tronconneuse & tronconneuse::operator = (const tronconneuse & ref)
+    tronconneuse & tronconneuse::operator = (const tronconneuse & ref)
     {
 	generic_file *moi = this;
 	const generic_file *toi = &ref;

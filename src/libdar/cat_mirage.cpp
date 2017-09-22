@@ -230,7 +230,7 @@ namespace libdar
         }
     }
 
-    const cat_mirage & cat_mirage::operator = (const cat_mirage & ref)
+    cat_mirage & cat_mirage::operator = (const cat_mirage & ref)
     {
         cat_etoile *tmp_ref;
         const cat_nomme * ref_nom = & ref;

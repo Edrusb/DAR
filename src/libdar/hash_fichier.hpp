@@ -91,7 +91,7 @@ namespace libdar
 	hash_fichier(const hash_fichier & ref) : fichier_global(ref) { throw SRC_BUG; };
 
 	    // assignment operator
-	const hash_fichier & operator = (const hash_fichier & ref) { throw SRC_BUG; };
+	hash_fichier & operator = (const hash_fichier & ref) { throw SRC_BUG; };
 
 	    // destructor
 	~hash_fichier();

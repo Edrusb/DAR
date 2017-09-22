@@ -156,7 +156,7 @@ namespace libdar
         throw Efeature(gettext("Cannot copy a wrapperlib object (NOT IMPLEMENTED)"));
     }
 
-    const wrapperlib & wrapperlib::operator = (const wrapperlib & ref)
+    wrapperlib & wrapperlib::operator = (const wrapperlib & ref)
     {
         throw Efeature(gettext("Cannot copy a wrapperlib object (NOT IMPLEMENTED)"));
     }

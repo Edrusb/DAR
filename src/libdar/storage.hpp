@@ -75,7 +75,7 @@ namespace libdar
         ~storage() throw(Ebug)
 	{  detruit(first); };
 
-        const storage & operator = (const storage & val)
+        storage & operator = (const storage & val)
 	{  detruit(first); copy_from(val); return *this; };
 
         bool operator < (const storage & ref) const

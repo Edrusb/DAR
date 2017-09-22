@@ -77,7 +77,7 @@ namespace libdar
 	    /// to always use the default value for this constructor or to explicitely give "true" as argument.
 	statistics(bool lock = true) { init(lock); clear(); };
 	statistics(const statistics & ref) { copy_from(ref); };
-	const statistics & operator = (const statistics & ref) { detruit(); copy_from(ref); return *this; };
+	statistics & operator = (const statistics & ref) { detruit(); copy_from(ref); return *this; };
 
 	    /// destructor
 	~statistics() { detruit(); };

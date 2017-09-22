@@ -178,7 +178,7 @@ namespace libdar
 	    status_plus(const status_plus & ref): status(ref) { copy_from(ref); };
 	    ~status_plus() { detruit(); };
 
-	    const status_plus & operator = (const status_plus & ref) { detruit(); copy_from(ref); return *this; };
+	    status_plus & operator = (const status_plus & ref) { detruit(); copy_from(ref); return *this; };
 
 	    crc *base; //< only present for s_delta status, to have a link with the file to apply the patch to
 	    crc *result; //< present for s_delta, s_saved, s_not_saved this is the crc of the data (or crc of the data resulting from the patch)

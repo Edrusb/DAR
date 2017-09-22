@@ -48,7 +48,7 @@ namespace libdar
 	    throw SRC_BUG;
     }
 
-    const mycurl_shared_handle & mycurl_shared_handle::operator = (mycurl_shared_handle && arg)
+    mycurl_shared_handle & mycurl_shared_handle::operator = (mycurl_shared_handle && arg)
     {
 	ref = std::move(arg.ref);
 	if(!arg.ref.is_null())

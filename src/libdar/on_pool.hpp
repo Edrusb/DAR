@@ -72,7 +72,7 @@ namespace libdar
 	    ///
 	    /// \note the assignement operator must not modify the field "dynamic" so we must not use
 	    /// the default operator
-	const on_pool & operator = (const on_pool & ref) { return *this; };
+	on_pool & operator = (const on_pool & ref) { return *this; };
 
 	    /// virtual destructor as this class will have inherited classes
 	virtual ~on_pool() throw(Ebug) {};

@@ -87,7 +87,7 @@ namespace libdar
         ~infinint() throw(Ebug)
 	{ detruit(); };
 
-        const infinint & operator = (const infinint & ref)
+        infinint & operator = (const infinint & ref)
 	{ detruit(); copy_from(ref); return *this; };
 
         void dump(generic_file &x) const; // write byte sequence to file

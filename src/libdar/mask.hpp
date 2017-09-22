@@ -130,7 +130,7 @@ namespace libdar
 	    /// copy constructor
         simple_mask(const simple_mask & m) : mask(m) { copy_from(m); };
 	    /// assignment operator
-        const simple_mask & operator = (const simple_mask & m);
+        simple_mask & operator = (const simple_mask & m);
 
 	    /// inherited from the mask class
         bool is_covered(const std::string &expression) const;
@@ -204,7 +204,7 @@ namespace libdar
 	    /// copy constructor
         not_mask(const not_mask & m) : mask(m) { copy_from(m); };
 	    /// assignment operator
-        const not_mask & operator = (const not_mask & m);
+        not_mask & operator = (const not_mask & m);
 	    /// destructor
         ~not_mask() { detruit(); };
 
@@ -240,7 +240,7 @@ namespace libdar
 	    /// copy constructor
         et_mask(const et_mask &m) : mask(m) { copy_from(m); };
 	    /// assignment operator
-        const et_mask & operator = (const et_mask &m);
+        et_mask & operator = (const et_mask &m);
 	    /// destructor
         ~et_mask() { detruit(); };
 

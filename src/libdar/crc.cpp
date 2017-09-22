@@ -336,7 +336,7 @@ namespace libdar
 	}
     }
 
-    const crc_n & crc_n::operator = (const crc_n & ref)
+    crc_n & crc_n::operator = (const crc_n & ref)
     {
 	if(size != ref.size)
 	{

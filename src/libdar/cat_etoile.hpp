@@ -54,7 +54,7 @@ namespace libdar
 	    ///\note the given cat_inode is now managed by the cat_etoile object
 	cat_etoile(cat_inode *host, const infinint & etiquette_number);
 	cat_etoile(const cat_etoile & ref) { throw SRC_BUG; }; // copy constructor not allowed for this class
-	const cat_etoile & operator = (const cat_etoile & ref) { throw SRC_BUG; }; // assignment not allowed for this class
+	cat_etoile & operator = (const cat_etoile & ref) = delete; // assignment not allowed for this class
 	~cat_etoile() { delete hosted; };
 
 	void add_ref(void *ref);

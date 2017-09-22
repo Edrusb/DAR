@@ -61,7 +61,7 @@ namespace libdar
 	crypto_asym(const crypto_asym & ref): mem_ui(ref) { throw SRC_BUG; };
 
 	    /// disabling object assignment
-	const crypto_asym & operator = (const crypto_asym & ref) { throw SRC_BUG; };
+	crypto_asym & operator = (const crypto_asym & ref) { throw SRC_BUG; };
 
 	    /// defines the list of email which associated key will be used for signing
 	void set_signatories(const std::vector<std::string> & signatories);

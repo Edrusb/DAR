@@ -105,7 +105,7 @@ namespace libdar
 	escape(generic_file *below,                           //< "Below" is the generic file that holds the escaped data
 	       const std::set<sequence_type> & x_unjumpable); //< a set of marks that can never been jumped over when skipping for the next mark of a any given type.
 	escape(const escape & ref) : generic_file(ref) { copy_from(ref); };
-	const escape & operator = (const escape & ref);
+	escape & operator = (const escape & ref);
 	~escape();
 
 	    // escape specific routines

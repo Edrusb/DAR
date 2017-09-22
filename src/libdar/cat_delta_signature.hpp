@@ -102,7 +102,7 @@ namespace libdar
 	cat_delta_signature(const cat_delta_signature & ref) { init(); copy_from(ref); };
 
 	    /// assignement operator
-	const cat_delta_signature & operator = (const cat_delta_signature & ref) { destroy(); init(); copy_from(ref); return *this; };
+	cat_delta_signature & operator = (const cat_delta_signature & ref) { destroy(); init(); copy_from(ref); return *this; };
 
 	    /// destructor
 	~cat_delta_signature() { destroy(); };

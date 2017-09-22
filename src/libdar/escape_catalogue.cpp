@@ -110,7 +110,7 @@ namespace libdar
 	    }
     }
 
-    const escape_catalogue & escape_catalogue::operator = (const escape_catalogue &ref)
+    escape_catalogue & escape_catalogue::operator = (const escape_catalogue &ref)
     {
 	catalogue *me = this;
 	const catalogue *you = &ref;

@@ -73,7 +73,7 @@ namespace libdar
 		  const label & lax_layer1_data_name, //< ignored unless in lax mode, in lax mode unless it is a cleared label, forces the catalogue label to be equal to the lax_layer1_data_name for it be considered a plain internal catalogue, even in case of corruption
 		  bool only_detruit = false); //< if set to true, only directories and detruit objects are read from the archive
         catalogue(const catalogue & ref) : mem_ui(ref), out_compare(ref.out_compare) { partial_copy_from(ref); };
-        const catalogue & operator = (const catalogue &ref);
+        catalogue & operator = (const catalogue &ref);
         virtual ~catalogue() { detruire(); };
 
 

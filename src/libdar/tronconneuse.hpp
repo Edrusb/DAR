@@ -74,7 +74,7 @@ namespace libdar
 	tronconneuse(const tronconneuse & ref) : generic_file(ref) { copy_from(ref); };
 
 	    /// assignment operator
-	const tronconneuse & operator = (const tronconneuse & ref);
+	tronconneuse & operator = (const tronconneuse & ref);
 
 	    /// destructor
 	virtual ~tronconneuse() { detruit(); }; // must not write pure virtual method from here, directly or not

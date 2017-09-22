@@ -79,7 +79,7 @@ namespace libdar
 		  saved_status saved,
 		  bool small);
         cat_inode(const cat_inode & ref);
-	const cat_inode & operator = (const cat_inode & ref);
+	cat_inode & operator = (const cat_inode & ref);
         ~cat_inode() throw(Ebug);
 
         const infinint & get_uid() const { return uid; };

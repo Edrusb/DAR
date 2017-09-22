@@ -60,10 +60,10 @@ namespace libdar
 	mycurl_shared_handle(mycurl_shared_handle && arg);
 
 	    // no assignment operator
-	const mycurl_shared_handle & operator = (const mycurl_shared_handle & ref) = delete;
+	mycurl_shared_handle & operator = (const mycurl_shared_handle & ref) = delete;
 
 	    // only move assignment one
-	const mycurl_shared_handle & operator = (mycurl_shared_handle && arg);
+	mycurl_shared_handle & operator = (mycurl_shared_handle && arg);
 
 	    // destructor
 	~mycurl_shared_handle() { if(!ref.is_null()) ref->set_used_mode(false); };

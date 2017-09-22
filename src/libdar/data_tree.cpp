@@ -985,7 +985,7 @@ namespace libdar
 
 	trecord() { set = false; date = datetime(0); };
 	trecord(const trecord & ref) { date = ref.date; set = ref.set; };
-	const trecord & operator = (const trecord & ref) { date = ref.date; set = ref.set; return *this; };
+	trecord & operator = (const trecord & ref) { date = ref.date; set = ref.set; return *this; };
     };
 
 

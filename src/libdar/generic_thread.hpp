@@ -61,7 +61,7 @@ namespace libdar
 		       U_I ctrl_block_size = tampon_block_size_ctrl,
 		       U_I ctrl_num_block = tampon_num_block_ctrl);
 	generic_thread(const generic_thread & ref); //< copy constructor is disabled (throws exception)
-	const generic_thread & operator = (const generic_thread & ref) { throw SRC_BUG; };
+	generic_thread & operator = (const generic_thread & ref) { throw SRC_BUG; };
 	virtual ~generic_thread();
 
 	    // inherited methods from generic_file

@@ -93,7 +93,7 @@ namespace libdar
 	    /// destructor
 	~trivial_sar();
 
-	const trivial_sar & operator = (const trivial_sar & ref) { throw SRC_BUG; };
+	trivial_sar & operator = (const trivial_sar & ref) { throw SRC_BUG; };
 	bool skippable(skippability direction, const infinint & amount) { return reference->skippable(direction, amount); };
         bool skip(const infinint & pos);
         bool skip_to_eof() { if(is_terminated()) throw SRC_BUG; return reference->skip_to_eof(); };

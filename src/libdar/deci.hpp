@@ -68,7 +68,7 @@ namespace libdar
 
 
 	    /// copy operator
-        const deci & operator = (const deci & ref)
+        deci & operator = (const deci & ref)
 	{ detruit(); copy_from(ref); return *this; };
 
 	    /// this produce a infinint from the decimal stored in the current object

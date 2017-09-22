@@ -62,7 +62,7 @@ namespace libdar
 	mycurl_easyhandle_node root;
 	std::list<smart_pointer<mycurl_easyhandle_node> > clone_table;
 
-	const mycurl_easyhandle_sharing & operator = (const mycurl_easyhandle_sharing & ref) { throw SRC_BUG; };
+	mycurl_easyhandle_sharing & operator = (const mycurl_easyhandle_sharing & ref) { throw SRC_BUG; };
     };
 
 #else

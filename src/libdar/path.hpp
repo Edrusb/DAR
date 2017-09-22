@@ -73,7 +73,7 @@ namespace libdar
         path(const path & ref);
 
 	    /// assignment operator
-        const path & operator = (const path & ref);
+        path & operator = (const path & ref);
 
 	    /// comparison operator
         bool operator == (const path & ref) const;

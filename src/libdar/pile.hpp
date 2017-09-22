@@ -49,7 +49,7 @@ namespace libdar
 
 	pile() : generic_file(gf_read_only) { stack.clear(); };
 	pile(const pile & ref) : generic_file(ref) { copy_from(ref); };
-	const pile & operator = (const pile & ref) { detruit(); copy_from(ref); return *this; };
+	pile & operator = (const pile & ref) { detruit(); copy_from(ref); return *this; };
 	~pile() { detruit(); };
 
 	    /// add a generic_file on the top

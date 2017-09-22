@@ -45,9 +45,9 @@ namespace libdar
     public:
         scrambler(const secu_string & pass, generic_file & hidden_side);
 	scrambler(const scrambler & ref) : generic_file(ref) { throw SRC_BUG; };
+	scrambler & operator = (const scrambler & ref) = delete;
         ~scrambler() { if(buffer != nullptr) meta_delete(buffer); };
 
-	const scrambler & operator = (const scrambler & ref) { throw SRC_BUG; };
 
 	bool skippable(skippability direction, const infinint & amount) { return ref->skippable(direction, amount); };
         bool skip(const infinint & pos) { if(ref == nullptr) throw SRC_BUG; return ref->skip(pos); };

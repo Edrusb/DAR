@@ -234,7 +234,7 @@ namespace libdar
 	    delete read_crc;
     }
 
-    const catalogue & catalogue::operator = (const catalogue &ref)
+    catalogue & catalogue::operator = (const catalogue &ref)
     {
 	mem_ui * me = this;
 	const mem_ui & you = ref;

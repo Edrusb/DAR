@@ -47,7 +47,7 @@ namespace libdar
     public:
 	mem_allocator(mem_manager *ptr) { if(ptr == nullptr) throw SRC_BUG; manager = ptr; };
 	mem_allocator(const mem_allocator & ref) { throw SRC_BUG; };
-	const mem_allocator & operator = (const mem_allocator & ref) { throw SRC_BUG; };
+	mem_allocator & operator = (const mem_allocator & ref) { throw SRC_BUG; };
 	virtual ~mem_allocator() {};
 
 	    /// this is the interface to use to release a memory block owned by this mem_allocator

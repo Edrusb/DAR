@@ -69,7 +69,7 @@ namespace libdar
 	crc_i(const infinint & width);
 	crc_i(const infinint & width, generic_file & f);
 	crc_i(const crc_i & ref) : size(ref.size), cyclic(ref.size) { copy_data_from(ref); pointer = cyclic.begin(); };
-	const crc_i & operator = (const crc_i & ref) { copy_from(ref); return *this; };
+	crc_i & operator = (const crc_i & ref) { copy_from(ref); return *this; };
 
 	bool operator == (const crc & ref) const;
 
@@ -101,7 +101,7 @@ namespace libdar
 	crc_n(U_I width);
 	crc_n(U_I width, generic_file & f);
 	crc_n(const crc_n & ref) { copy_from(ref); };
-	const crc_n & operator = (const crc_n & ref);
+	crc_n & operator = (const crc_n & ref);
 	~crc_n() { destroy(); };
 
 	bool operator == (const crc & ref) const;

@@ -81,7 +81,7 @@ namespace libdar
 	    // assignement are forbidden for this class:
 
 	filesystem_hard_link_read(const filesystem_hard_link_read & ref) : mem_ui(ref) { throw SRC_BUG; };
-	const filesystem_hard_link_read & operator = (const filesystem_hard_link_read & ref) { throw SRC_BUG; };
+	filesystem_hard_link_read & operator = (const filesystem_hard_link_read & ref) { throw SRC_BUG; };
 
 	    // get the last assigned number for a hard linked inode
 	const infinint & get_last_etoile_ref() const { return etiquette_counter; };
@@ -170,7 +170,7 @@ namespace libdar
 			  bool x_ignore_unknown,
 			  const fsa_scope & scope);
         filesystem_backup(const filesystem_backup & ref) : mem_ui(ref), filesystem_hard_link_read(ref.get_ui(), ref.furtive_read_mode, get_fsa_scope()) { copy_from(ref); };
-        const filesystem_backup & operator = (const filesystem_backup & ref) { detruire(); copy_from(ref); return *this; };
+        filesystem_backup & operator = (const filesystem_backup & ref) { detruire(); copy_from(ref); return *this; };
         ~filesystem_backup() { detruire(); };
 
         void reset_read(infinint & root_fs_device);
@@ -209,7 +209,7 @@ namespace libdar
 			bool furtive_read_mode,
 			const fsa_scope & scope);
         filesystem_diff(const filesystem_diff & ref) : mem_ui(ref), filesystem_hard_link_read(ref.get_ui(), ref.furtive_read_mode, get_fsa_scope()) { copy_from(ref); };
-        const filesystem_diff & operator = (const filesystem_diff & ref) { detruire(); copy_from(ref); return *this; };
+        filesystem_diff & operator = (const filesystem_diff & ref) { detruire(); copy_from(ref); return *this; };
         ~filesystem_diff() { detruire(); };
 
         void reset_read();
@@ -249,7 +249,7 @@ namespace libdar
     public:
 	filesystem_hard_link_write(user_interaction & dialog) : mem_ui(& dialog) { corres_write.clear(); };
 	filesystem_hard_link_write(const filesystem_hard_link_write & ref) : mem_ui(ref) { throw SRC_BUG; };
-	const filesystem_hard_link_write & operator = (const filesystem_hard_link_write & ref) { throw SRC_BUG; };
+	filesystem_hard_link_write & operator = (const filesystem_hard_link_write & ref) { throw SRC_BUG; };
 
         void write_hard_linked_target_if_not_set(const cat_mirage *ref, const std::string & chemin);
             // if a hard linked inode has not been restored (no change, or less recent than the one on filesystem)
@@ -329,7 +329,7 @@ namespace libdar
 	    /// copy constructor is forbidden (throws an exception)
         filesystem_restore(const filesystem_restore & ref) : mem_ui(ref), filesystem_hard_link_write(ref), filesystem_hard_link_read(get_ui(), compile_time::furtive_read(), get_fsa_scope()) { throw SRC_BUG; };
 	    /// assignment operator is forbidden (throws an exception)
-        const filesystem_restore & operator = (const filesystem_restore  & ref) { throw SRC_BUG; };
+        filesystem_restore & operator = (const filesystem_restore  & ref) { throw SRC_BUG; };
 	    /// destructor
         ~filesystem_restore() { restore_stack_dir_ownership(); detruire(); };
 

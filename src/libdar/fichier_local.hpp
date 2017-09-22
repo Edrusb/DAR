@@ -72,7 +72,7 @@ namespace libdar
 	fichier_local(const fichier_local & ref) : fichier_global(ref) { copy_from(ref); };
 
 	    // assignment operator
-	const fichier_local & operator = (const fichier_local & ref) { detruit(); copy_parent_from(ref); copy_from(ref); return *this; };
+	fichier_local & operator = (const fichier_local & ref) { detruit(); copy_parent_from(ref); copy_from(ref); return *this; };
 
 	    // destructor
 	~fichier_local() { detruit(); };

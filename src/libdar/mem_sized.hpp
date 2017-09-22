@@ -45,7 +45,7 @@ namespace libdar
     public:
 	mem_sized(U_I x_block_size);
 	mem_sized(const mem_sized & ref) { throw SRC_BUG; };
-	const mem_sized & operator = (const mem_sized & ref) { throw SRC_BUG; };
+	mem_sized & operator = (const mem_sized & ref) { throw SRC_BUG; };
 	~mem_sized();
 
 	    /// to allocate a block of memory

@@ -337,7 +337,7 @@ namespace libdar
 	}
     }
 
-    const cat_inode & cat_inode::operator = (const cat_inode & ref)
+    cat_inode & cat_inode::operator = (const cat_inode & ref)
     {
         cat_nomme *me = this;
         const cat_nomme *nref = &ref;

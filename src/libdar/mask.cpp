@@ -49,7 +49,7 @@ namespace libdar
 	    the_mask = wilde_card_expression;
     }
 
-    const simple_mask & simple_mask::operator = (const simple_mask & m)
+    simple_mask & simple_mask::operator = (const simple_mask & m)
     {
 	const mask *src = & m;
 	mask *dst = this;
@@ -145,7 +145,7 @@ namespace libdar
 
     }
 
-    const not_mask & not_mask::operator = (const not_mask & m)
+    not_mask & not_mask::operator = (const not_mask & m)
     {
 	const mask *src = &m;
 	mask *dst = this;
@@ -188,7 +188,7 @@ namespace libdar
         }
     }
 
-    const et_mask & et_mask::operator = (const et_mask &m)
+    et_mask & et_mask::operator = (const et_mask &m)
     {
 	const mask *src = &m;
 	mask *dst = this;

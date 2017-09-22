@@ -72,7 +72,7 @@ namespace libdar
 
         header();
         header(const header & ref) { copy_from(ref); };
-        const header & operator = (const header & ref) { free_pointers(); copy_from(ref); return *this; };
+        header & operator = (const header & ref) { free_pointers(); copy_from(ref); return *this; };
 	~header() { free_pointers(); };
 
 	    // global methods

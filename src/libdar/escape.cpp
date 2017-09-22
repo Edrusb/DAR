@@ -107,7 +107,7 @@ namespace libdar
 	}
     }
 
-    const escape & escape::operator = (const escape & ref)
+    escape & escape::operator = (const escape & ref)
     {
 	generic_file *me = this;
 	const generic_file *you = &ref;

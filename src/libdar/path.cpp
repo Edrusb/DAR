@@ -107,7 +107,7 @@ namespace libdar
         reading = dirs.begin();
     }
 
-    const path & path::operator = (const path & ref)
+    path & path::operator = (const path & ref)
     {
         dirs = ref.dirs;
         relative = ref.relative;

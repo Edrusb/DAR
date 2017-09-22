@@ -57,7 +57,7 @@ namespace libdar
 	cache_global(cache_global & ref): fichier_global(ref) { throw SRC_BUG; };
 
 	    /// assignment operator
-	const cache_global & operator = (const cache_global & ref) { throw SRC_BUG; };
+	cache_global & operator = (const cache_global & ref) = delete;
 
 	    /// destructor
 	~cache_global() { detruit(); };

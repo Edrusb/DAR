@@ -66,7 +66,7 @@ namespace libdar
 
 	    /// the copy constructor, assignment operator and destructor
 	archive_options_read(const archive_options_read & ref) : x_ref_chem(ref.x_ref_chem) { copy_from(ref); };
-	const archive_options_read & operator = (const archive_options_read & ref) { destroy(); copy_from(ref); return *this; };
+	archive_options_read & operator = (const archive_options_read & ref) { destroy(); copy_from(ref); return *this; };
 	~archive_options_read() { destroy(); };
 
 
@@ -269,7 +269,7 @@ namespace libdar
 
 	archive_options_create();
 	archive_options_create(const archive_options_create & ref);
-	const archive_options_create & operator = (const archive_options_create & ref) { destroy(); copy_from(ref); return *this; };
+	archive_options_create & operator = (const archive_options_create & ref) { destroy(); copy_from(ref); return *this; };
 	~archive_options_create() { destroy(); };
 
 	    /////////////////////////////////////////////////////////////////////
@@ -673,7 +673,7 @@ namespace libdar
     public:
 	archive_options_isolate();
 	archive_options_isolate(const archive_options_isolate & ref);
-	const archive_options_isolate & operator = (const archive_options_isolate & ref) { destroy(); copy_from(ref); return *this; };
+	archive_options_isolate & operator = (const archive_options_isolate & ref) { destroy(); copy_from(ref); return *this; };
 	~archive_options_isolate() { destroy(); };
 
 
@@ -854,7 +854,7 @@ namespace libdar
 
 	archive_options_merge() { x_selection = x_subtree = x_ea_mask = x_compr_mask = x_delta_mask = nullptr; x_overwrite = nullptr; x_entrepot = nullptr; clear(); };
 	archive_options_merge(const archive_options_merge & ref) { copy_from(ref); };
-	const archive_options_merge & operator = (const archive_options_merge & ref) { destroy(); copy_from(ref); return *this; };
+	archive_options_merge & operator = (const archive_options_merge & ref) { destroy(); copy_from(ref); return *this; };
 	~archive_options_merge() { destroy(); };
 
 	void clear();
@@ -1118,7 +1118,7 @@ namespace libdar
 
 	archive_options_extract() { x_selection = x_subtree = x_ea_mask = nullptr; x_overwrite = nullptr; clear(); };
 	archive_options_extract(const archive_options_extract & ref) { copy_from(ref); };
-	const archive_options_extract & operator = (const archive_options_extract & ref) { destroy(); copy_from(ref); return *this; };
+	archive_options_extract & operator = (const archive_options_extract & ref) { destroy(); copy_from(ref); return *this; };
 	~archive_options_extract() { destroy(); };
 
 	void clear();
@@ -1255,7 +1255,7 @@ namespace libdar
     public:
 	archive_options_listing() { x_selection = x_subtree = nullptr;  x_slicing_first = x_slicing_others = nullptr; clear(); };
 	archive_options_listing(const archive_options_listing & ref) { copy_from(ref); };
-	const archive_options_listing & operator = (const archive_options_listing & ref) { destroy(); copy_from(ref); return *this; };
+	archive_options_listing & operator = (const archive_options_listing & ref) { destroy(); copy_from(ref); return *this; };
 	~archive_options_listing() { destroy(); };
 
 	void clear();
@@ -1320,7 +1320,7 @@ namespace libdar
     public:
 	archive_options_diff() { x_selection = x_subtree = x_ea_mask = nullptr; clear(); };
 	archive_options_diff(const archive_options_diff & ref) { copy_from(ref); };
-	const archive_options_diff & operator = (const archive_options_diff & ref) { destroy(); copy_from(ref); return *this; };
+	archive_options_diff & operator = (const archive_options_diff & ref) { destroy(); copy_from(ref); return *this; };
 	~archive_options_diff() { destroy(); };
 
 	void clear();
@@ -1431,7 +1431,7 @@ namespace libdar
     public:
 	archive_options_test() { x_selection = x_subtree = nullptr; clear(); };
 	archive_options_test(const archive_options_test & ref) { copy_from(ref); };
-	const archive_options_test & operator = (const archive_options_test & ref) { destroy(); copy_from(ref); return *this; };
+	archive_options_test & operator = (const archive_options_test & ref) { destroy(); copy_from(ref); return *this; };
 	~archive_options_test() { destroy(); };
 
 	void clear();
@@ -1502,7 +1502,7 @@ namespace libdar
 
 	archive_options_repair();
 	archive_options_repair(const archive_options_repair & ref);
-	const archive_options_repair & operator = (const archive_options_repair & ref) { destroy(); copy_from(ref); return *this; };
+	archive_options_repair & operator = (const archive_options_repair & ref) { destroy(); copy_from(ref); return *this; };
 	~archive_options_repair() { destroy(); };
 
 	    /////////////////////////////////////////////////////////////////////

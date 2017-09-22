@@ -114,7 +114,7 @@ namespace libdar
 
 
 	    /// assignment operator
-	const generic_file & operator = (const generic_file & ref) { destroy(); copy_from(ref); return *this; };
+	generic_file & operator = (const generic_file & ref) { destroy(); copy_from(ref); return *this; };
 
 	    /// compaire the object content (implies skipping and reading)
 	    ///

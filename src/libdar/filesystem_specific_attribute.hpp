@@ -132,7 +132,7 @@ namespace libdar
     public:
 	filesystem_specific_attribute_list() {};
 	filesystem_specific_attribute_list(const filesystem_specific_attribute_list & ref) { copy_from(ref); };
-	const filesystem_specific_attribute_list & operator = (const filesystem_specific_attribute_list & ref) { clear(); copy_from(ref); return *this; };
+	filesystem_specific_attribute_list & operator = (const filesystem_specific_attribute_list & ref) { clear(); copy_from(ref); return *this; };
 	~filesystem_specific_attribute_list() { clear(); };
 
 	    /// clear all attributes

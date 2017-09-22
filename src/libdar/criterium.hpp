@@ -170,7 +170,7 @@ namespace libdar
 	    /// \param[in] go_false is the action to use for evaluation if the criterium states false
 	testing(const criterium & input, const crit_action & go_true, const crit_action & go_false);
 	testing(const testing & ref) : crit_action(ref) { copy_from(ref); if(!check()) throw Ememory("testing::testing(const testing &)"); };
-	const testing & operator = (const testing & ref) { free(); copy_from(ref); if(!check()) throw Ememory("testing::testing(const testing &)"); return *this; };
+	testing & operator = (const testing & ref) { free(); copy_from(ref); if(!check()) throw Ememory("testing::testing(const testing &)"); return *this; };
 	~testing() { free(); };
 
 
@@ -206,7 +206,7 @@ namespace libdar
     public:
 	crit_chain() { sequence.clear(); };
 	crit_chain(const crit_chain & ref) : crit_action(ref) { copy_from(ref); };
-	const crit_chain & operator = (const crit_chain & ref) { destroy(); copy_from(ref); return *this; };
+	crit_chain & operator = (const crit_chain & ref) { destroy(); copy_from(ref); return *this; };
 	~crit_chain() { destroy(); };
 
 	void add(const crit_action & act);
@@ -483,7 +483,7 @@ namespace libdar
     public:
 	crit_not(const criterium & crit) { x_crit = crit.clone(); if(x_crit == nullptr) throw Ememory("crit_not::crit_not"); };
 	crit_not(const crit_not & ref) : criterium (ref) { copy_from(ref); };
-	const crit_not & operator = (const crit_not & ref) { destroy(); copy_from(ref); return *this; };
+	crit_not & operator = (const crit_not & ref) { destroy(); copy_from(ref); return *this; };
 	~crit_not() { destroy(); };
 
 	bool evaluate(const cat_nomme & first, const cat_nomme & second) const { return ! x_crit->evaluate(first, second); };
@@ -504,7 +504,7 @@ namespace libdar
     public:
 	crit_and() { clear(); };
 	crit_and(const crit_and & ref) : criterium(ref) { copy_from(ref); };
-	const crit_and & operator = (const crit_and & ref) { detruit(); copy_from(ref); return *this; };
+	crit_and & operator = (const crit_and & ref) { detruit(); copy_from(ref); return *this; };
 	~crit_and() { detruit(); };
 
 	void add_crit(const criterium & ref);

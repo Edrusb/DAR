@@ -48,7 +48,7 @@ namespace libdar
     public:
 	header_version();
 	header_version(const header_version & ref) { copy_from(ref); };
-	const header_version & operator = (const header_version & ref) { detruit(); copy_from(ref); return * this; };
+	header_version & operator = (const header_version & ref) { detruit(); copy_from(ref); return * this; };
 	~header_version() { detruit(); };
 
 	    /// read the header or trailer from the archive

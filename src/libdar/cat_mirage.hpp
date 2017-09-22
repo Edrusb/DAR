@@ -72,7 +72,7 @@ namespace libdar
 		   bool lax,
 		   bool small);
 	cat_mirage(const cat_mirage & ref) : cat_nomme (ref) { star_ref = ref.star_ref; if(star_ref == nullptr) throw SRC_BUG; star_ref->add_ref(this); };
-	const cat_mirage & operator = (const cat_mirage & ref);
+	cat_mirage & operator = (const cat_mirage & ref);
 	~cat_mirage() { star_ref->drop_ref(this); };
 
 	bool operator == (const cat_entree & ref) const;

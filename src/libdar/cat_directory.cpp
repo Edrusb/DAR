@@ -69,7 +69,7 @@ namespace libdar
 	updated_sizes = false;
     }
 
-    const cat_directory & cat_directory::operator = (const cat_directory & ref)
+    cat_directory & cat_directory::operator = (const cat_directory & ref)
     {
 	const cat_inode *ref_ino = &ref;
 	cat_inode * this_ino = this;
