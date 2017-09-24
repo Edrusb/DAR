@@ -59,6 +59,12 @@ namespace libdar
 	    /// \param[in] opt extendable list of options to use for this operation
  	database(user_interaction & dialog, const std::string & base, const database_open_options & opt);
 
+	    /// disabling copy constructor
+	database(const database & ref) = delete;
+
+	    /// disabling assignement operator
+	database & operator = (const database & ref) = delete;
+
 	    /// database destructor (no implicit file saving)
 	~database();
 

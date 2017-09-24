@@ -111,8 +111,8 @@ void go_sig(const string & src_file,
 				      false,
 				      true,
 				      false);
-    generic_rsync go = generic_rsync(&res,
-				     &src);
+    generic_rsync go(&res,
+		     &src);
     fichier_local control = fichier_local(ui,
 					  src_file + ".bak",
 					  gf_write_only,
@@ -136,9 +136,9 @@ void go_delta(const string & sig_file,
 				      false,
 				      true,
 				      false);
-    generic_rsync go = generic_rsync(&sig,
-				     &src,
-				     true);
+    generic_rsync go(&sig,
+		     &src,
+		     true);
     go.copy_to(res);
 }
 
@@ -162,9 +162,9 @@ void go_patch(const string & base_file,
     base.copy_to(black_hole);
     crc *ori = base.get_crc();
     base.skip(0);
-    generic_rsync go = generic_rsync(&base,
-				     &sig,
-				     ori);
+    generic_rsync go(&base,
+		     &sig,
+		     ori);
     go.copy_to(res);
     go.terminate();
 }

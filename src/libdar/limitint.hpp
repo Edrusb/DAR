@@ -109,6 +109,9 @@ namespace libdar
 	    // read an limitint from a file
 	limitint(generic_file & x);
 
+	limitint(const limitint & ref) = default;
+	limitint & operator = (const limitint & ref) = default;
+
 	    // for coherent footprint with real infinint
 	~limitint() throw(Ebug) {};
 
@@ -166,11 +169,6 @@ namespace libdar
 	B debug_get_field() const { return field; };
 
     private :
-        static const int TG = 4;
-	static const U_32 sizeof_field = sizeof(B); // number of bytes
-
-        enum endian { big_endian, little_endian, not_initialized };
-        typedef unsigned char group[TG];
 
         B field;
 
@@ -182,6 +180,12 @@ namespace libdar
             /////////////////////////
             // static statments
             //
+        static const int TG = 4;
+	static const U_32 sizeof_field = sizeof(B); // number of bytes
+
+        enum endian { big_endian, little_endian, not_initialized };
+        typedef unsigned char group[TG];
+
         static endian used_endian;
         static const U_I bytesize = sizeof(B);
         static const B max_value = ~B(0) > 0 ? ~B(0) : ~(B(1) << (bytesize*8 - 1));

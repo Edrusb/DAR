@@ -56,6 +56,9 @@ namespace libdar
 	elastic(U_32 size);
 	elastic(const unsigned char *buffer, U_32 size, elastic_direction dir, const archive_version & reading_ver);
 	elastic(generic_file &f, elastic_direction dir, const archive_version & reading_ver);
+	elastic(const elastic & ref) = default;
+	elastic & operator = (const elastic & ref) = default;
+	~elastic() = default;
 
 	U_32 dump(unsigned char *buffer, U_32 size) const;
 	U_32 get_size() const { return taille; };

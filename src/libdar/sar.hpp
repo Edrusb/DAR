@@ -120,9 +120,12 @@ namespace libdar
 	    bool format_07_compatible,
 	    const std::string & execute = "");
 
-	    /// the destructor
+	    /// the copy constructor
 
-   	sar(const sar & ref) : generic_file(ref), mem_ui(ref) { throw Efeature("class sar's copy constructor is not implemented"); };
+   	sar(const sar & ref) = delete;
+
+	    /// assignment operator
+	sar & operator = (const sar & ref) = delete;
 
 	    /// destructor
         ~sar();

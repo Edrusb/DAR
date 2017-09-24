@@ -114,6 +114,6 @@ void f2(const string & src, const string & dst)
 {
     generic_file *src_f = new fichier_local(src);
     generic_file *dst_f = new fichier_local(ui, dst, gf_write_only, 0600, false, true, false);
-    generic_thread t1 = generic_thread(dst_f, 10, 20);
+    generic_thread t1(dst_f, 10, 20);
     src_f->copy_to(t1);
 }

@@ -54,7 +54,7 @@ namespace libdar
 	cache_global(user_interaction & dialog, fichier_global *x_ptr, bool shift_mode, U_I size = default_cache_size);
 
 	    /// copy constructor
-	cache_global(cache_global & ref): fichier_global(ref) { throw SRC_BUG; };
+	cache_global(cache_global & ref) = delete;
 
 	    /// assignment operator
 	cache_global & operator = (const cache_global & ref) = delete;

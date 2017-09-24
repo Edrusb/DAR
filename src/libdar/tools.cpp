@@ -873,6 +873,9 @@ namespace libdar
                 when.tm_isdst = 1;           // provided time is local daylight saving time
                 tmp = 0;
             };
+	    scan(const scan & ref) = default;
+	    scan & operator = (const scan & ref) = default;
+	    ~scan() = default;
 
             status get_etat() const { return etat; };
             tm get_struct() const { return when; };

@@ -88,10 +88,10 @@ namespace libdar
 		     hash_algo algo);
 
 	    // copy constructor
-	hash_fichier(const hash_fichier & ref) : fichier_global(ref) { throw SRC_BUG; };
+	hash_fichier(const hash_fichier & ref) = delete;
 
 	    // assignment operator
-	hash_fichier & operator = (const hash_fichier & ref) { throw SRC_BUG; };
+	hash_fichier & operator = (const hash_fichier & ref) = delete;
 
 	    // destructor
 	~hash_fichier();

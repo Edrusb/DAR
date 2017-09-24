@@ -73,8 +73,8 @@ namespace libdar
 			 const std::string & sftp_prv_keyfile,   //< where to fetch the private key (sftp only)
 			 const std::string & sftp_known_hosts,   //< location of the known_hosts file (empty string to disable this security check)
 			 U_I waiting_time);
-	    // default copy constructor is OK
-	    // default assignment operator is OK
+	entrepot_libcurl(const entrepot_libcurl & ref) = default;
+	entrepot_libcurl & operator = (const entrepot_libcurl & ref) = default;
 	~entrepot_libcurl() throw () {};
 
 

@@ -76,11 +76,14 @@ namespace libdar
 			U_I permission,                 //< file permission to enforce if force_permission is set
 			bool erase);                    //< whether to erase the file before writing to it
 
-	    // no copy constructor available
-	    // because we inherit from libthreadar::thread that has not copy constructor
+	    /// no copy constructor available
 
-	    // no assignment operator
-	    // because we inherit from libthreadar::thread that has not copy constructor
+	    ///\note because we inherit from libthreadar::thread that has not copy constructor
+	fichier_libcurl(const fichier_libcurl & ref) = delete;
+
+	    /// no assignment operator
+	    ///\note because we inherit from libthreadar::thread that has not copy constructor
+	fichier_libcurl & operator = (const fichier_libcurl & ref) = delete;
 
 	    /// destructor
 	~fichier_libcurl() noexcept { detruit(); };

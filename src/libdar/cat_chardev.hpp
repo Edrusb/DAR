@@ -64,6 +64,11 @@ namespace libdar
 		    saved_status saved,
 		    bool small) : cat_device(dialog, pdesc, reading_ver, saved, small) {};
 
+	cat_chardev(const cat_chardev & ref) = default;
+	cat_chardev & operator = (const cat_chardev & ref) = default;
+	~cat_chardev() = default;
+
+
 	bool operator == (const cat_entree & ref) const;
 
             // using dump from cat_device class

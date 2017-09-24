@@ -89,8 +89,8 @@ namespace libdar
 		      generic_file *delta,
 		      bool not_used);
 
-	generic_rsync(const generic_rsync & ref): generic_file(ref) { throw SRC_BUG; };
-	generic_rsync & operator = (const generic_rsync & ref) { throw SRC_BUG; };
+	generic_rsync(const generic_rsync & ref) = delete;
+	generic_rsync & operator = (const generic_rsync & ref) = delete;
 
 	~generic_rsync() throw(Ebug);
 

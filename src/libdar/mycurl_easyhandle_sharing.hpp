@@ -49,10 +49,10 @@ namespace libdar
     class mycurl_easyhandle_sharing
     {
     public:
-	mycurl_easyhandle_sharing() {};
+	mycurl_easyhandle_sharing() = default;
 	mycurl_easyhandle_sharing(const mycurl_easyhandle_sharing & ref): root(ref.root) { clone_table.clear(); };
-	    // assignement operator made privater and forbidden
-	    // default destructor OK
+	mycurl_easyhandle_sharing & operator = (const mycurl_easyhandle_sharing & ref) = delete;
+	~mycurl_easyhandle_sharing() = default;
 
 	CURL *get_root_handle() const { return root.get_handle(); };
 
@@ -61,8 +61,6 @@ namespace libdar
     private:
 	mycurl_easyhandle_node root;
 	std::list<smart_pointer<mycurl_easyhandle_node> > clone_table;
-
-	mycurl_easyhandle_sharing & operator = (const mycurl_easyhandle_sharing & ref) { throw SRC_BUG; };
     };
 
 #else

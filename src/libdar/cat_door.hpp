@@ -63,6 +63,10 @@ namespace libdar
 		 compression default_algo,
 		 bool small) : cat_file(dialog, pdesc, reading_ver, saved, default_algo, small) {};
 
+	cat_door(const cat_door & ref) = default;
+	cat_door & operator = (const cat_door & ref) = default;
+	~cat_door() = default;
+
 	bool operator == (const cat_entree & ref) const;
 
         unsigned char signature() const { return mk_signature('o', get_saved_status()); };

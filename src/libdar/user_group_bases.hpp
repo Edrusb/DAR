@@ -53,6 +53,9 @@ namespace libdar
     {
     public:
 	user_group_bases() : filled(false) {};
+	user_group_bases(const user_group_bases & ref) = default;
+	user_group_bases & operator = (const user_group_bases & ref) = default;
+	~user_group_bases() = default;
 
 	    /// return the user name corresponding to the given uid
 

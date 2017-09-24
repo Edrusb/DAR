@@ -50,6 +50,9 @@ namespace libdar
 
 	tlv() { type = 0; };
 	tlv(generic_file & f) { init(f); };
+	tlv(const tlv & ref) = default;
+	tlv & operator = (const tlv & ref) = default;
+	~tlv() = default;
 
 	    // methods (dump / setup tlv datastructure to/from file)
 

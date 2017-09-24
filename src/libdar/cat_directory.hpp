@@ -59,7 +59,6 @@ namespace libdar
 		      const datetime & last_change,
 		      const std::string & xname,
 		      const infinint & device);
-        cat_directory(const cat_directory &ref); // only the inode part is build, no children is duplicated (empty dir)
         cat_directory(user_interaction & dialog,
 		      const smart_pointer<pile_descriptor> & pdesc,
 		      const archive_version & reading_ver,
@@ -70,6 +69,7 @@ namespace libdar
 		      bool lax,
 		      bool only_detruit, // objects of other class than detruit and cat_directory are not built in memory
 		      bool small);
+	cat_directory(const cat_directory &ref); // only the inode part is build, no children is duplicated (empty dir)
 	cat_directory & operator = (const cat_directory & ref); // set the inode part *only* no subdirectories/subfiles are copies or removed.
         ~cat_directory() throw(Ebug); // detruit aussi tous les fils et se supprime de son 'parent'
 

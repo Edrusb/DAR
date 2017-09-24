@@ -78,6 +78,9 @@ namespace libdar
 	    /// constructor used to read a FSA from a libdar archive
 	filesystem_specific_attribute(generic_file & f, fsa_family xfam, fsa_nature xnat) { fam = xfam; nat = xnat; };
 
+	filesystem_specific_attribute(const filesystem_specific_attribute & ref) = default;
+	filesystem_specific_attribute & operator = (const filesystem_specific_attribute & ref) = default;
+
 	    /// virtual destructor for inherited classes
 	virtual ~filesystem_specific_attribute() throw(Ebug) {};
 
@@ -244,6 +247,9 @@ namespace libdar
     public:
 	fsa_bool(fsa_family f, fsa_nature n, bool xval) : filesystem_specific_attribute(f), val(xval) { set_nature(n); };
 	fsa_bool(generic_file & f, fsa_family fam, fsa_nature nat);
+	fsa_bool(const fsa_bool & ref) = default;
+	fsa_bool & operator = (const fsa_bool & ref) = default;
+	~fsa_bool() = default;
 
 	bool get_value() const { return val; };
 
@@ -267,6 +273,9 @@ namespace libdar
     public:
 	fsa_infinint(fsa_family f, fsa_nature n, infinint xval) : filesystem_specific_attribute(f), val(xval) { set_nature(n); };
 	fsa_infinint(generic_file & f, fsa_family fam, fsa_nature nat);
+	fsa_infinint(const fsa_infinint & ref) = default;
+	fsa_infinint & operator = (const fsa_infinint & ref) = default;
+	~fsa_infinint() = default;
 
 	const infinint & get_value() const { return val; };
 
@@ -290,6 +299,9 @@ namespace libdar
     public:
 	fsa_time(fsa_family f, fsa_nature n, datetime xval) : filesystem_specific_attribute(f), val(xval) { set_nature(n); };
 	fsa_time(generic_file & f, archive_version ver, fsa_family fam, fsa_nature nat);
+	fsa_time(const fsa_time & ref) = default;
+	fsa_time & operator = (const fsa_time & ref) = default;
+	~fsa_time() = default;
 
 	const datetime & get_value() const { return val; };
 

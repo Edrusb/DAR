@@ -51,6 +51,10 @@ namespace libdar
     {
     public :
         null_file(gf_mode m) : generic_file(m) {};
+	null_file(const null_file & ref) = default;
+	null_file & operator = (const null_file & ref) = default;
+	~null_file() = default;
+
 	bool skippable(skippability direction, const infinint & amount) { return true; };
         bool skip(const infinint &pos) { return true; };
         bool skip_to_eof() { return true; };

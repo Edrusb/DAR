@@ -106,15 +106,16 @@ namespace libdar
 	    /// copy constructor
 	generic_file(const generic_file &ref) { copy_from(ref); };
 
-	    /// virtual destructor, this let inherited destructor to be called even from a generic_file pointer to an inherited class
+	    /// assignment operator
+	generic_file & operator = (const generic_file & ref) { destroy(); copy_from(ref); return *this; };
+
+	    /// virtual destructor,
+
+	    /// \note this let inherited destructor to be called even from a generic_file pointer to an inherited class
 	virtual ~generic_file() throw(Ebug) { destroy(); };
 
 	    /// destructor-like call, except that it is allowed to throw exceptions
 	void terminate() const;
-
-
-	    /// assignment operator
-	generic_file & operator = (const generic_file & ref) { destroy(); copy_from(ref); return *this; };
 
 	    /// compaire the object content (implies skipping and reading)
 	    ///
@@ -366,6 +367,8 @@ namespace libdar
     {
     public :
 	contextual() { status = ""; };
+	contextual(const contextual & ref) = default;
+	contextual & operator = (const contextual & ref) = default;
 	virtual ~contextual() throw(Ebug) {};
 
 	    /// defines the new contextual value

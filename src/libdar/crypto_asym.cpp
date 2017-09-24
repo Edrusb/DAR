@@ -111,8 +111,8 @@ namespace libdar
 	build_key_list(recipients_email, ciphering_keys, false);
 	try
 	{
-	    generic_file_overlay_for_gpgme o_clear = &clear;
-	    generic_file_overlay_for_gpgme o_ciphered = &ciphered;
+	    generic_file_overlay_for_gpgme o_clear(&clear);
+	    generic_file_overlay_for_gpgme o_ciphered(&ciphered);
 	    gpgme_error_t err;
 
 	    if(!has_signatories)
@@ -153,8 +153,8 @@ namespace libdar
     void crypto_asym::decrypt(generic_file & ciphered, generic_file & clear)
     {
 #if GPGME_SUPPORT
-	generic_file_overlay_for_gpgme o_clear = &clear;
-	generic_file_overlay_for_gpgme o_ciphered = &ciphered;
+	generic_file_overlay_for_gpgme o_clear(&clear);
+	generic_file_overlay_for_gpgme o_ciphered(&ciphered);
 	gpgme_error_t err = gpgme_op_decrypt_verify(context, o_ciphered.get_gpgme_handle(), o_clear.get_gpgme_handle());
 
 	signing_result.clear();

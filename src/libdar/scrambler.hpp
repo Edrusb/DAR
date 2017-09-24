@@ -44,7 +44,7 @@ namespace libdar
     {
     public:
         scrambler(const secu_string & pass, generic_file & hidden_side);
-	scrambler(const scrambler & ref) : generic_file(ref) { throw SRC_BUG; };
+	scrambler(const scrambler & ref) = delete;
 	scrambler & operator = (const scrambler & ref) = delete;
         ~scrambler() { if(buffer != nullptr) meta_delete(buffer); };
 

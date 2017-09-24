@@ -93,7 +93,7 @@ void encrypt(vector<string> recipients, const string & src, const string & dst)
 {
     fichier_local fsrc = fichier_local(ui, src, gf_read_only, 0, false, false, false);
     fichier_local fdst = fichier_local(ui, dst, gf_write_only, 0644, false, true, false);
-    crypto_asym engine = ui;
+    crypto_asym engine(ui);
 
     engine.encrypt(recipients, fsrc, fdst);
 }
@@ -102,7 +102,7 @@ void decrypt(const string & src, const string & dst)
 {
     fichier_local fsrc = fichier_local(ui, src, gf_read_only, 0, false, false, false);
     fichier_local fdst = fichier_local(ui, dst, gf_write_only, 0644, false, true, false);
-    crypto_asym engine = ui;
+    crypto_asym engine(ui);
 
     engine.decrypt(fsrc, fdst);
 }

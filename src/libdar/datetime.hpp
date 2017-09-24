@@ -72,6 +72,11 @@ namespace libdar
 	    /// constructor reading data dump() into a generic_file
 	datetime(generic_file &x, archive_version ver) { read(x, ver); };
 
+	datetime(const datetime & ref) = default;
+	datetime & operator = (const datetime & ref) = default;
+	~datetime() = default;
+
+
 	    // comparison operators
 
 	bool operator < (const datetime & ref) const;

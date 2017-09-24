@@ -99,9 +99,9 @@ int main()
 void f1()
 {
     fichier_local f = fichier_local(*ui, "toto", gf_read_only, 0, false, false, false);
-    cache c = cache(f,
-		    false,
-		    20);
+    cache c(f,
+	    false,
+	    20);
     char buffer[200];
 
     c.read(buffer, 3);
@@ -126,9 +126,9 @@ void f2()
 	return;
     }
     fichier_local g = fichier_local(*ui, "titi", gf_read_write, 0666, false, true, false);
-    cache c = cache(g,
-		    false,
-		    20);
+    cache c(g,
+	    false,
+	    20);
     const char *buf = "coucou les amis";
     c.write(buf, strlen(buf));
     c.write(" ", 1);

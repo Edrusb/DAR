@@ -57,6 +57,10 @@ namespace libdar
 		 const archive_version & reading_ver,
 		 saved_status saved,
 		 bool small);
+       	cat_lien(const cat_lien & ref) = default;
+	cat_lien & operator = (const cat_lien & ref) = default;
+	~cat_lien() = default;
+
 
 	bool operator == (const cat_entree & ref) const;
 

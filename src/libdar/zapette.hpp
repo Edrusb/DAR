@@ -62,6 +62,8 @@ namespace libdar
 	    /// \param[in] output is used to send orders to slave_zapette
 	    /// \param[in] by_the_end if true dar will try to open the archive starting from the end else it will try starting from the first bytes
         zapette(const user_interaction & dialog, generic_file *input, generic_file *output, bool by_the_end);
+	zapette(const zapette & ref) = default;
+	zapette & operator = (const zapette & ref) = default;
         ~zapette();
 
             // inherited methods from generic_file
@@ -135,6 +137,8 @@ namespace libdar
 	    /// \param[in] output is used to return informations or data in answer to received orders
 	    /// \param[in] data is where the informations or data is taken from. Object must inherit from contextual
         slave_zapette(generic_file *input, generic_file *output, generic_file *data);
+	slave_zapette(const slave_zapette & ref) = default;
+	slave_zapette & operator = (const slave_zapette & ref) = default;
         ~slave_zapette();
 
 

@@ -46,10 +46,12 @@ namespace libdar
     public:
         cat_nomme(const std::string & name) { xname = name; };
         cat_nomme(const smart_pointer<pile_descriptor> & pdesc, bool small);
+	cat_nomme(const cat_nomme & ref) = default;
+	cat_nomme & operator = (const cat_nomme & ref) = default;
+	virtual ~cat_nomme() = default;
+
 	bool operator == (const cat_entree & ref) const;
 	virtual bool operator < (const cat_nomme & ref) const { return xname < ref.xname; };
-	virtual ~cat_nomme() throw(Ebug) {};
-
         const std::string & get_name() const { return xname; };
         void change_name(const std::string & x) { xname = x; };
 

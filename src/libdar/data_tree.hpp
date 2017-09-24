@@ -80,7 +80,9 @@ namespace libdar
 
 	data_tree(const std::string &name);
 	data_tree(generic_file & f, unsigned char db_version);
-	virtual ~data_tree() {};
+	data_tree(const data_tree & ref) = default;
+	data_tree & operator = (const data_tree & ref) = default;
+	virtual ~data_tree() = default;
 
 	virtual void dump(generic_file & f) const;
 	std::string get_name() const { return filename; };
@@ -160,7 +162,10 @@ namespace libdar
 	public:
 	    status(): date(0) { present = et_absent; };
 	    status(const datetime & d, etat p) { date = d; present = p; };
-	    virtual ~status() {};
+	    status(const status & ref) = default;
+	    status & operator = (const status & ref) = default;
+	    virtual ~status() = default;
+
 	    datetime date;                             //< date of the event
 	    etat present;                              //< file's status in the archive
 
@@ -176,9 +181,8 @@ namespace libdar
 	    status_plus() { base = result = nullptr; };
 	    status_plus(const datetime & d, etat p, const crc *xbase, const crc *xresult);
 	    status_plus(const status_plus & ref): status(ref) { copy_from(ref); };
-	    ~status_plus() { detruit(); };
-
 	    status_plus & operator = (const status_plus & ref) { detruit(); copy_from(ref); return *this; };
+	    ~status_plus() { detruit(); };
 
 	    crc *base; //< only present for s_delta status, to have a link with the file to apply the patch to
 	    crc *result; //< present for s_delta, s_saved, s_not_saved this is the crc of the data (or crc of the data resulting from the patch)
@@ -218,8 +222,9 @@ namespace libdar
     public:
 	data_dir(const std::string &name);
 	data_dir(generic_file &f, unsigned char db_version);
-	data_dir(const data_dir & ref);
 	data_dir(const data_tree & ref);
+	data_dir(const data_dir & ref);
+	data_dir & operator = (const data_dir & ref) { rejetons.clear(); return *this; };
 	~data_dir();
 
 	void dump(generic_file & f) const;

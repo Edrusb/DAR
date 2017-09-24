@@ -77,18 +77,17 @@ namespace libdar
 	{ infinint_from(a); };
 #endif
 #endif
+	    // read an infinint from a file
+	infinint(generic_file & x);
 
         infinint(const infinint & ref)
 	{ copy_from(ref); }
 
-	    // read an infinint from a file
-	infinint(generic_file & x);
+	infinint & operator = (const infinint & ref)
+	{ detruit(); copy_from(ref); return *this; };
 
         ~infinint() throw(Ebug)
 	{ detruit(); };
-
-        infinint & operator = (const infinint & ref)
-	{ detruit(); copy_from(ref); return *this; };
 
         void dump(generic_file &x) const; // write byte sequence to file
         void read(generic_file &f) { detruit(); build_from_file(f); };

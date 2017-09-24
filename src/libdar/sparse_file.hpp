@@ -71,6 +71,9 @@ namespace libdar
 	    ///\param[in] hole_size the size below which to ignore holes (zeroed bytes)
 	    // this parameter is only used if "below" is in write-only mode
 	sparse_file(generic_file *below, const infinint & hole_size = 15);
+	sparse_file(const sparse_file & ref) = default;
+	sparse_file & operator = (const sparse_file & ref) = default;
+	~sparse_file() = default;
 
 	void write_as_escape(bool mode) { escape_write = mode; }; // if set to true, inherited_write() call will not make any lookup for holes, the written data will simply be escaped if it could collide with a mark used to signal the start of a hole
 	void read_as_escape(bool mode) { escape_read = mode; }; // if set to true, the data will be unescaped or eof will be signaled to the first mark met, instead of interpreting the mark and what follows as a hole data structure.

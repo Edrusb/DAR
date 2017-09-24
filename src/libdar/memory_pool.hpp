@@ -47,8 +47,8 @@ namespace libdar
 #else
 	memory_pool() { throw Efeature("Special allocation"); };
 #endif
-	memory_pool(const memory_pool & ref) { throw SRC_BUG ; };
-	memory_pool & operator = (const memory_pool & ref) { throw SRC_BUG; };
+	memory_pool(const memory_pool & ref) = default;
+	memory_pool & operator = (const memory_pool & ref) = default;
 	~memory_pool() throw(Ebug);
 
 

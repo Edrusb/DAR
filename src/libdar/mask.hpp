@@ -62,7 +62,10 @@ namespace libdar
     class mask : public on_pool
     {
     public :
-        virtual ~mask() {};
+	mask() = default;
+	mask(const mask & ref) = default;
+	mask & operator = (const mask & ref) = default;
+        virtual ~mask() = default;
 
 	    /// check wether the given string is covered by the mask
 
@@ -102,6 +105,9 @@ namespace libdar
 	    /// when the is_covered method will be used
 	    /// \note once initialized an object cannot change its behavior
         bool_mask(bool always) { val = always; };
+	bool_mask(const bool_mask & ref) = default;
+	bool_mask & operator = (const bool_mask & ref) = default;
+	~bool_mask() = default;
 
 	    /// inherited from the mask class
         bool is_covered(const std::string & expression) const { return val; };
@@ -127,10 +133,16 @@ namespace libdar
 	    /// \param[in] wilde_card_expression is the glob expression that defines the mask
 	    /// \param[in] case_sensit whether the mask is case sensitive or not
         simple_mask(const std::string & wilde_card_expression, bool case_sensit);
+
 	    /// copy constructor
         simple_mask(const simple_mask & m) : mask(m) { copy_from(m); };
+
 	    /// assignment operator
         simple_mask & operator = (const simple_mask & m);
+
+	    /// default destructor
+	~simple_mask() = default;
+
 
 	    /// inherited from the mask class
         bool is_covered(const std::string &expression) const;
@@ -161,10 +173,12 @@ namespace libdar
 	    /// \param[in] x_case_sensit whether the mask is case sensitive or not
         regular_mask(const std::string & wilde_card_expression,
 		     bool x_case_sensit);
+
 	    /// the copy constructor
 	regular_mask(const regular_mask & ref);
+
 	    /// the assignment operator
-	regular_mask & operator= (const regular_mask & ref);
+	regular_mask & operator = (const regular_mask & ref);
 
 	    /// destructor
         virtual ~regular_mask() { regfree(&preg); };
@@ -201,10 +215,13 @@ namespace libdar
 	    /// \note the mask used as argument need not to survive the just created not_mask object
 	    /// as an internal copy of the mask given in argument has been done.
         not_mask(const mask &m) { copy_from(m); };
+
 	    /// copy constructor
         not_mask(const not_mask & m) : mask(m) { copy_from(m); };
+
 	    /// assignment operator
         not_mask & operator = (const not_mask & m);
+
 	    /// destructor
         ~not_mask() { detruit(); };
 
@@ -236,11 +253,14 @@ namespace libdar
 	    /// \note at this stage the mask is not usable and will
 	    /// throw an exception until some mask are added to the *AND*
 	    /// thanks to the add_mask() method
-        et_mask() {};
+        et_mask() = default;
+
 	    /// copy constructor
         et_mask(const et_mask &m) : mask(m) { copy_from(m); };
+
 	    /// assignment operator
         et_mask & operator = (const et_mask &m);
+
 	    /// destructor
         ~et_mask() { detruit(); };
 
@@ -307,6 +327,11 @@ namespace libdar
     class ou_mask : public et_mask
     {
     public:
+	ou_mask() = default;
+	ou_mask(const ou_mask & ref) = default;
+	ou_mask & operator = (const ou_mask & ref) = default;
+	~ou_mask() = default;
+
 	    /// inherited from the mask class
         bool is_covered(const std::string & expression) const { return t_is_covered(expression); };
         bool is_covered(const path & chemin) const { return t_is_covered(chemin); };
@@ -342,6 +367,9 @@ namespace libdar
 	    /// \param[in] case_sensit whether the mask is case sensitive or not
 	    /// \note p must be a valid path
         simple_path_mask(const path &p, bool case_sensit) : chemin(p) { case_s = case_sensit; };
+	simple_path_mask(const simple_path_mask & ref) = default;
+	simple_path_mask & operator = (const simple_path_mask & ref) = default;
+	~simple_path_mask() = default;
 
 	    /// inherited from the mask class
         bool is_covered(const std::string & expression) const { throw SRC_BUG; };
@@ -367,6 +395,9 @@ namespace libdar
 	    /// \param[in] p is the path to compare with
 	    /// \param[in] case_sensit whether the mask is case sensitive or not
         same_path_mask(const std::string &p, bool case_sensit) { chemin = p; case_s = case_sensit; };
+	same_path_mask(const same_path_mask & ref) = default;
+	same_path_mask & operator = (const same_path_mask & ref) = default;
+	~same_path_mask() = default;
 
 	    /// inherited from the mask class
         bool is_covered(const std::string &chemin) const;
@@ -393,6 +424,9 @@ namespace libdar
 	    /// \param[in] p is the path to compare with
 	    /// \param[in] case_sensit whether the mask is case sensitive or not
 	exclude_dir_mask(const std::string &p, bool case_sensit) { chemin = p; case_s = case_sensit;};
+	exclude_dir_mask(const exclude_dir_mask & ref) = default;
+	exclude_dir_mask & operator = (const exclude_dir_mask & ref) = default;
+	~exclude_dir_mask() = default;
 
 	    /// inherited from the mask class
 	bool is_covered(const std::string &expression) const { throw SRC_BUG; }

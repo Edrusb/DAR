@@ -109,11 +109,11 @@ void f1(const string & src_filename, const string & dst_filename, hash_algo algo
 	    throw Ememory("f1");
 	else
 	{
-	    hash_fichier dst = hash_fichier(*ui,
-					    dst_data,
-					    src_filename,
-					    dst_hash,
-					    algo);
+	    hash_fichier dst(*ui,
+			     dst_data,
+			     src_filename,
+			     dst_hash,
+			     algo);
 	    dst_hash = nullptr; // now owned by dst
 	    dst_data = nullptr; // now owned by dst
 	    fichier_local src = fichier_local(src_filename);

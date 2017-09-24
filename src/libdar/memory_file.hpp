@@ -41,6 +41,9 @@ namespace libdar
 
 	    /// Constructors & Destructor
 	memory_file() : generic_file(gf_read_write), data(0) { position = 0; };
+	memory_file(const memory_file & ref) = default;
+	memory_file & operator = (const memory_file & ref) = default;
+	~memory_file() = default;
 
 	    // memory_storage specific methods
 

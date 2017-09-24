@@ -54,14 +54,15 @@ namespace libdar
 	    /// general use constructor
 	crypto_asym(const user_interaction & ui) : mem_ui(ui) { build_context(); has_signatories = false; };
 
+	    /// disabling copy constructor
+	crypto_asym(const crypto_asym & ref) = delete;
+
+	    /// disabling object assignment
+	crypto_asym & operator = (const crypto_asym & ref) = delete;
+
 	    /// the destructor
 	~crypto_asym() { release_context(); };
 
-	    /// disabling copy constructor
-	crypto_asym(const crypto_asym & ref): mem_ui(ref) { throw SRC_BUG; };
-
-	    /// disabling object assignment
-	crypto_asym & operator = (const crypto_asym & ref) { throw SRC_BUG; };
 
 	    /// defines the list of email which associated key will be used for signing
 	void set_signatories(const std::vector<std::string> & signatories);

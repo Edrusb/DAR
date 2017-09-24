@@ -73,6 +73,14 @@ namespace libdar
         alire = attr.begin();
     }
 
+    ea_attributs & ea_attributs::operator = (const ea_attributs & ref)
+    {
+        attr = ref.attr;
+        alire = attr.begin();
+
+	return *this;
+    }
+
     void ea_attributs::dump(generic_file & f) const
     {
         map<string, string>::const_iterator it = attr.begin();

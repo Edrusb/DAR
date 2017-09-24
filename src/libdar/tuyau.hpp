@@ -56,6 +56,8 @@ namespace libdar
 	      const std::string &filename,     //< named pipe to open
 	      gf_mode mode);                   //< forces the mode if possible
 	tuyau(const user_interaction & dialog);//< creates a anonymous pipe and bind itself to the writing end. The reading end can be obtained by get_read_side() method
+	tuyau(const tuyau & ref) = default;
+	tuyau & operator = (const tuyau & ref) = default;
         ~tuyau();
 
 	    // provides the reading end of the anonymous pipe when the current object has created it (no filedesc, no path given to constructor).
@@ -90,13 +92,12 @@ namespace libdar
 	void inherited_terminate();
 
     private:
-	enum
+	enum                //< anonymous structure for pipe_mode field
 	{
 	    pipe_fd,        //< holds a single file descriptor for the pipe
 	    pipe_path,      //< holds a filename to be openned (named pipe)
 	    pipe_both       //< holds a pair of file descriptors
-	}
-	    pipe_mode;          //< defines how the object's status (which possible values defined by the anonymous enum above)
+	} pipe_mode;        //< defines how the object's status (which possible values defined by the anonymous enum above)
 	infinint position;  //< recorded position in the stream
 	int filedesc;       //< file descriptors of the pipe
 	int other_end_fd;   //< in pipe_both mode, this holds the reading side of the anonymous pipe

@@ -46,6 +46,11 @@ namespace libdar
     class terminateur
     {
     public :
+	terminateur() = default;
+	terminateur(const terminateur & ref) = default;
+	terminateur & operator = (const terminateur & ref) = default;
+	~terminateur() = default;
+
         void set_catalogue_start(infinint xpos) { pos = xpos; };
         void dump(generic_file &f);
         void read_catalogue(generic_file &f, bool with_elastic, const archive_version & reading_ver, const infinint & where_from = 0);

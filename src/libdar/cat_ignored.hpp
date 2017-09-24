@@ -46,6 +46,9 @@ namespace libdar
     public :
         cat_ignored(const std::string & name) : cat_nomme(name) {};
         cat_ignored(const smart_pointer<pile_descriptor> & pdesc, bool small) : cat_nomme(pdesc, small) { throw SRC_BUG; };
+	cat_ignored(const cat_ignored & ref) = default;
+	cat_ignored & operator = (const cat_ignored & ref) = default;
+	~cat_ignored() = default;
 
 	bool operator == (const cat_entree & ref) const;
 

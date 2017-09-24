@@ -56,6 +56,9 @@ namespace libdar
     {
     public:
 	list_entry();
+	list_entry(const list_entry & ref) = default;
+	list_entry & operator = (const list_entry & ref) = default;
+	~list_entry() = default;
 
 	    // methods for API users
 	    // field that are not set are returned as empty string

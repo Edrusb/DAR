@@ -75,6 +75,9 @@ namespace libdar
 	    /// assignment operator
         path & operator = (const path & ref);
 
+	    /// destructor
+	~path() = default;
+
 	    /// comparison operator
         bool operator == (const path & ref) const;
 	bool operator != (const path & ref) const { return !(*this == ref); };

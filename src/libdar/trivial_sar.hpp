@@ -88,12 +88,14 @@ namespace libdar
 		    const std::string & execute);
 
 	    /// copy constructor (disabled)
-	trivial_sar(const trivial_sar & ref) : generic_file(ref), mem_ui(ref) { throw SRC_BUG; };
+	trivial_sar(const trivial_sar & ref) = delete;
+
+	    /// assignment operator (disabled)
+	trivial_sar & operator = (const trivial_sar & ref) = delete;
 
 	    /// destructor
 	~trivial_sar();
 
-	trivial_sar & operator = (const trivial_sar & ref) { throw SRC_BUG; };
 	bool skippable(skippability direction, const infinint & amount) { return reference->skippable(direction, amount); };
         bool skip(const infinint & pos);
         bool skip_to_eof() { if(is_terminated()) throw SRC_BUG; return reference->skip_to_eof(); };

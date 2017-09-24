@@ -71,18 +71,18 @@ namespace libdar
 	    /// need to be called from the copy constructor of any inherited class that explicitely define one
 	mem_ui(const mem_ui & ref) { copy_from(ref); };
 
+	    /// assignement operator
+
+	    /// you need to call it from the inherited class assignement operator
+	    /// if the inherited class explicitely defines its own one.
+	mem_ui & operator = (const mem_ui & ref) { detruire(); copy_from(ref); return *this; };
+
 	    /// destructor
 
 	    /// it is declared as virtual, for precaution, as it may not be very frequent to
 	    /// release an object having just a mem_ui pointer on it.
 	virtual ~mem_ui() throw(Ebug) { detruire(); };
 
-
-	    /// assignement operator
-
-	    /// you need to call it from the inherited class assignement operator
-	    /// if the inherited class explicitely defines its own one.
-	mem_ui & operator = (const mem_ui & ref) { detruire(); copy_from(ref); return *this; };
 
     protected:
 	    /// get access to the user_interaction cloned object

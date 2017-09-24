@@ -69,6 +69,8 @@ namespace libdar
 		      bool erase,
 		      bool furtive_mode);
 	fichier_local(const std::string & chemin, bool furtive_mode = false); // builds a read-only object
+
+	    // copy constructor
 	fichier_local(const fichier_local & ref) : fichier_global(ref) { copy_from(ref); };
 
 	    // assignment operator

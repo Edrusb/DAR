@@ -44,6 +44,7 @@ namespace libdar
 	label(); // builds a label equal to 'zero'
 	label(const label & ref) { copy_from(ref); };
 	label & operator = (const label & ref) { copy_from(ref); return *this; };
+	~label() = default;
 
 	bool operator == (const label & ref) const;
 	bool operator != (const label & ref) const { return ! ((*this) == ref); };

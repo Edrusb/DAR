@@ -50,6 +50,8 @@ namespace libdar
         cat_detruit(const std::string & name, unsigned char firm, const datetime & date) : cat_nomme(name) , del_date(date) { signe = firm; };
         cat_detruit(const smart_pointer<pile_descriptor> & pdesc, const archive_version & reading_ver, bool small);
 	cat_detruit(const cat_nomme & ref) : cat_nomme(ref.get_name()), del_date(0) { signe = ref.signature(); };
+	cat_detruit & operator = (const cat_detruit & ref) = default;
+	~cat_detruit() = default;
 
 	bool operator == (const cat_entree & ref) const;
 

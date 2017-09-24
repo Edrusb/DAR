@@ -101,7 +101,9 @@ namespace libdar
 
 	    /// class constructor.
 	user_interaction();
-	virtual ~user_interaction() {};
+	user_interaction(const user_interaction & ref) = default;
+	user_interaction & operator = (const user_interaction & ref) = default;
+	virtual ~user_interaction() = default;
 
 	    /// method used to ask a boolean question to the user.
 
@@ -356,6 +358,9 @@ namespace libdar
 				  std::string (*x_string_callback)(const std::string &x, bool echo, void *context),
 				  secu_string (*x_secu_string_callback)(const std::string &x, bool echo, void *context),
 				  void *context_value);
+	user_interaction_callback(const user_interaction_callback & ref) = default;
+	user_interaction_callback & operator = (const user_interaction_callback & ref) = default;
+	~user_interaction_callback() = default;
 
 	    /// overwritting method from parent class.
        	void pause(const std::string & message);
@@ -516,6 +521,11 @@ namespace libdar
     class user_interaction_blind : public user_interaction
     {
     public:
+	user_interaction_blind() = default;
+	user_interaction_blind(const user_interaction_blind & ref) = default;
+	user_interaction_blind & operator = (const user_interaction_blind & ref) = default;
+	~user_interaction_blind() = default;
+
 	bool pause2(const std::string & message) { return false; };
 
 	std::string get_string(const std::string & message, bool echo) { return "user_interaction_blind, is blindly answering no"; };

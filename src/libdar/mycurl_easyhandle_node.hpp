@@ -58,7 +58,7 @@ namespace libdar
 	    /// move constructor
 	mycurl_easyhandle_node(mycurl_easyhandle_node && ref);
 
-	    /// assignment operator (no move assigment operator)
+	    /// assignment operator (no move assigment operator neither)
 	mycurl_easyhandle_node & operator = (const mycurl_easyhandle_node & ref) = delete;
 
 	    /// destructor

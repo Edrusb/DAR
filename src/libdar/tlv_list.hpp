@@ -41,8 +41,11 @@ namespace libdar
     class tlv_list : public on_pool
     {
     public:
-	tlv_list() {};                            //< builds an empty list
+	tlv_list() = default;                     //< builds an empty list
 	tlv_list(generic_file & f) { init(f); };  //< builds a list from a file
+	tlv_list(const tlv_list & ref) = default;
+	tlv_list & operator = (const tlv_list & ref) = default;
+	~tlv_list() = default;
 
 	void dump(generic_file & f) const;        //< dump tlv_list to file
 	void read(generic_file & f) { init(f); }; //< erase and read a list from a file

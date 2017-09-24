@@ -65,8 +65,14 @@ namespace libdar
 	    /// constructor
 	entrepot();
 
+	    /// copy constructor
+	entrepot(const entrepot & ref) = default;
+
+	    /// assignment operator
+	entrepot & operator = (const entrepot & ref) = default;
+
 	    /// destructor
-	virtual ~entrepot() {};
+	virtual ~entrepot() = default;
 
 	    /// says whether two entrepot objects points to the same location
 	bool operator == (const entrepot & ref) const { return get_url() == ref.get_url(); };

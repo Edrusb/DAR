@@ -71,13 +71,14 @@ namespace libdar
 		 const infinint & taille,
 		 const infinint & fs_device,
 		 bool x_furtive_read_mode);
-        cat_file(const cat_file & ref);
         cat_file(user_interaction & dialog,
 		 const smart_pointer<pile_descriptor> & pdesc,
 		 const archive_version & reading_ver,
 		 saved_status saved,
 		 compression default_algo,
 		 bool small);
+	cat_file(const cat_file & ref);
+	cat_file & operator = (const cat_file & ref) = default;
         ~cat_file() { detruit(); };
 
         bool has_changed_since(const cat_inode & ref, const infinint & hourshift, cat_inode::comparison_fields what_to_check) const;

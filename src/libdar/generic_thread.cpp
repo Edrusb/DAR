@@ -86,17 +86,6 @@ namespace libdar
 	}
     }
 
-    generic_thread::generic_thread(const generic_thread & ref):
-	generic_file (gf_read_only),
-	toslave_data(2, 10),
-	tomaster_data(2, 10),
-	toslave_ctrl(2, 10),
-	tomaster_ctrl(2, 10)
-    {
-	throw SRC_BUG;
-    }
-
-
     generic_thread::~generic_thread()
     {
 	if(remote != nullptr)

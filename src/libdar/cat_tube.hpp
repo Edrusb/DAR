@@ -60,6 +60,10 @@ namespace libdar
 		 saved_status saved,
 		 bool small): cat_inode(dialog, pdesc, reading_ver, saved, small) {};
 
+	cat_tube(const cat_tube & ref) = default;
+	cat_tube & operator = (const cat_tube & ref) = default;
+	~cat_tube() = default;
+
 	bool operator == (const cat_entree & ref) const;
 
             // using dump from cat_inode class

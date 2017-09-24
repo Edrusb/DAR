@@ -46,6 +46,9 @@ namespace libdar
     public:
 	static const U_I OLD_CRC_SIZE = 2;
 
+	crc() = default;
+	crc(const crc & ref) = default;
+	crc & operator = (const crc & ref) = default;
 	virtual ~crc() throw(Ebug) {};
 
 	virtual bool operator == (const crc & ref) const = 0;
@@ -70,6 +73,7 @@ namespace libdar
 	crc_i(const infinint & width, generic_file & f);
 	crc_i(const crc_i & ref) : size(ref.size), cyclic(ref.size) { copy_data_from(ref); pointer = cyclic.begin(); };
 	crc_i & operator = (const crc_i & ref) { copy_from(ref); return *this; };
+	~crc_i() = default;
 
 	bool operator == (const crc & ref) const;
 

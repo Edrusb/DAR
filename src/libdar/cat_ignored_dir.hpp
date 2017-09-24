@@ -50,6 +50,9 @@ namespace libdar
 			const smart_pointer<pile_descriptor> & pdesc,
 			const archive_version & reading_ver,
 			bool small) : cat_inode(dialog, pdesc, reading_ver, s_not_saved, small) { throw SRC_BUG; };
+	cat_ignored_dir(const cat_ignored_dir & ref) = default;
+	cat_ignored_dir & operator = (const cat_ignored_dir & ref) = default;
+	~cat_ignored_dir() = default;
 
 	bool operator == (const cat_entree & ref) const;
 

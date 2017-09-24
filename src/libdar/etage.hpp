@@ -53,6 +53,9 @@ namespace libdar
 	      const datetime & x_last_mod,
 	      bool cache_directory_tagging,
 	      bool furtive_read_mode);
+	etage(const etage & ref) = default;
+	etage & operator = (const etage & ref) = default;
+	~etage() = default;
 
         bool read(std::string & ref);
 

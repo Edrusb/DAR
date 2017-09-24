@@ -199,17 +199,17 @@ namespace libdar
 
 	try
 	{
-	    filesystem_restore fs = filesystem_restore(dialog,
-						       fs_racine,
-						       fs_warn_overwrite,
-						       display_treated,
-						       ea_mask,
-						       what_to_check,
-						       warn_remove_no_match,
-						       empty,
-						       &overwrite,
-						       only_deleted,
-						       scope);
+	    filesystem_restore fs(dialog,
+				  fs_racine,
+				  fs_warn_overwrite,
+				  display_treated,
+				  ea_mask,
+				  what_to_check,
+				  warn_remove_no_match,
+				  empty,
+				  &overwrite,
+				  only_deleted,
+				  scope);
 		// if only_deleted, we set the filesystem to only overwrite mode (no creatation if not existing)
 		// we also filter to only restore directories and detruit objects.
 
@@ -567,17 +567,17 @@ namespace libdar
 
 	stock_algo = pdesc.compr->get_algo();
 	infinint root_fs_device;
-        filesystem_backup fs = filesystem_backup(dialog,
-						 fs_racine,
-						 info_details,
-						 ea_mask,
-						 nodump,
-						 alter_atime,
-						 furtive_read_mode,
-						 cache_directory_tagging,
-						 root_fs_device,
-						 ignore_unknown,
-						 scope);
+        filesystem_backup fs(dialog,
+			     fs_racine,
+			     info_details,
+			     ea_mask,
+			     nodump,
+			     alter_atime,
+			     furtive_read_mode,
+			     cache_directory_tagging,
+			     root_fs_device,
+			     ignore_unknown,
+			     scope);
 	thread_cancellation thr_cancel;
 	infinint skipped_dump, fs_errors;
 	infinint wasted_bytes = 0;
@@ -1123,13 +1123,13 @@ namespace libdar
         const cat_entree *e;
         defile juillet = fs_racine;
         const cat_eod tmp_eod;
-        filesystem_diff fs = filesystem_diff(dialog,
-					     fs_racine,
-					     info_details,
-					     ea_mask,
-					     alter_atime,
-					     furtive_read_mode,
-					     scope);
+        filesystem_diff fs(dialog,
+			   fs_racine,
+			   info_details,
+			   ea_mask,
+			   alter_atime,
+			   furtive_read_mode,
+			   scope);
 	thread_cancellation thr_cancel;
 
 	if(display_treated_only_dir && display_treated)

@@ -77,8 +77,12 @@ namespace libdar
     class crit_action: public on_pool
     {
     public:
+	crit_action() = default;
+	crit_action(const crit_action & ref) = default;
+	crit_action & operator = (const crit_action & ref) = default;
+
 	    /// the destructor
-	virtual ~crit_action() {};
+	virtual ~crit_action() = default;
 
 	    /// the action to take based on the files to compare
 
@@ -110,6 +114,9 @@ namespace libdar
 	    /// \param[in] data the action to perform on data
 	    /// \param[in] ea the action to perform on EA
 	crit_constant_action(over_action_data data, over_action_ea ea) { x_data = data; x_ea = ea; };
+	crit_constant_action(const crit_constant_action & ref) = default;
+	crit_constant_action & operator = (const crit_constant_action & ref) = default;
+	~crit_constant_action() = default;
 
 
 	    /// the inherited pure virtual methods from class action that must be implemented
@@ -133,6 +140,9 @@ namespace libdar
     class criterium : public on_pool
     {
     public:
+	criterium() = default;
+	criterium(const criterium & ref) = default;
+	criterium & operator = (const criterium & ref) = default;
 	virtual ~criterium() throw(Ebug) {};
 
 	    /// criterum interface method
@@ -237,6 +247,11 @@ namespace libdar
     class crit_in_place_is_inode : public criterium
     {
     public:
+	crit_in_place_is_inode() = default;
+	crit_in_place_is_inode(const crit_in_place_is_inode & ref) = default;
+	crit_in_place_is_inode & operator = (const crit_in_place_is_inode & ref) = default;
+	~crit_in_place_is_inode() = default;
+
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const;
 	criterium *clone() const { return new (get_pool()) crit_in_place_is_inode(*this); };
     };
@@ -247,6 +262,11 @@ namespace libdar
     class crit_in_place_is_dir : public criterium
     {
     public:
+	crit_in_place_is_dir() = default;
+	crit_in_place_is_dir(const crit_in_place_is_dir & ref) = default;
+	crit_in_place_is_dir & operator = (const crit_in_place_is_dir & ref) = default;
+	~crit_in_place_is_dir() = default;
+
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const { return dynamic_cast<const cat_directory *>(&first) != nullptr; };
 	criterium *clone() const { return new (get_pool()) crit_in_place_is_dir(*this); };
     };
@@ -257,6 +277,11 @@ namespace libdar
     class crit_in_place_is_file : public criterium
     {
     public:
+	crit_in_place_is_file() = default;
+	crit_in_place_is_file(const crit_in_place_is_file & ref) = default;
+	crit_in_place_is_file & operator = (const crit_in_place_is_file & ref) = default;
+	~crit_in_place_is_file() = default;
+
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const;
 	criterium *clone() const { return new (get_pool()) crit_in_place_is_file(*this); };
     };
@@ -268,6 +293,11 @@ namespace libdar
     class crit_in_place_is_hardlinked_inode : public criterium
     {
     public:
+	crit_in_place_is_hardlinked_inode() = default;
+	crit_in_place_is_hardlinked_inode(const crit_in_place_is_hardlinked_inode & ref) = default;
+	crit_in_place_is_hardlinked_inode & operator = (const crit_in_place_is_hardlinked_inode & ref) = default;
+	~crit_in_place_is_hardlinked_inode() = default;
+
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const;
 	criterium *clone() const { return new (get_pool()) crit_in_place_is_hardlinked_inode(*this); };
     };
@@ -277,6 +307,11 @@ namespace libdar
     class crit_in_place_is_new_hardlinked_inode : public criterium
     {
     public:
+	crit_in_place_is_new_hardlinked_inode() = default;
+	crit_in_place_is_new_hardlinked_inode(const crit_in_place_is_new_hardlinked_inode & ref) = default;
+	crit_in_place_is_new_hardlinked_inode & operator = (const crit_in_place_is_new_hardlinked_inode & ref) = default;
+	~crit_in_place_is_new_hardlinked_inode() = default;
+
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const;
 	criterium *clone() const { return new (get_pool()) crit_in_place_is_new_hardlinked_inode(*this); };
     };
@@ -290,6 +325,9 @@ namespace libdar
     {
     public:
 	crit_in_place_data_more_recent(const infinint & hourshift = 0) : x_hourshift(hourshift) {};
+	crit_in_place_data_more_recent(const crit_in_place_data_more_recent & ref) = default;
+	crit_in_place_data_more_recent & operator = (const crit_in_place_data_more_recent & ref) = default;
+	~crit_in_place_data_more_recent() = default;
 
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const;
 	criterium *clone() const { return new (get_pool()) crit_in_place_data_more_recent(*this); };
@@ -308,6 +346,9 @@ namespace libdar
     {
     public:
 	crit_in_place_data_more_recent_or_equal_to(const infinint & date, const infinint & hourshift = 0) : x_hourshift(hourshift), x_date(date) {};
+	crit_in_place_data_more_recent_or_equal_to(const crit_in_place_data_more_recent_or_equal_to & ref) = default;
+	crit_in_place_data_more_recent_or_equal_to & operator = (const crit_in_place_data_more_recent_or_equal_to & ref) = default;
+	~crit_in_place_data_more_recent_or_equal_to() = default;
 
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const;
 	criterium *clone() const { return new (get_pool()) crit_in_place_data_more_recent_or_equal_to(*this); };
@@ -325,6 +366,11 @@ namespace libdar
     class crit_in_place_data_bigger : public criterium
     {
     public:
+	crit_in_place_data_bigger() = default;
+	crit_in_place_data_bigger(const crit_in_place_data_bigger & ref) = default;
+	crit_in_place_data_bigger & operator = (const crit_in_place_data_bigger & ref) = default;
+	~crit_in_place_data_bigger() = default;
+
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const;
 	criterium *clone() const { return new (get_pool()) crit_in_place_data_bigger(*this); };
     };
@@ -338,6 +384,11 @@ namespace libdar
     class crit_in_place_data_saved : public criterium
     {
     public:
+	crit_in_place_data_saved() = default;
+	crit_in_place_data_saved(const crit_in_place_data_saved & ref) = default;
+	crit_in_place_data_saved & operator = (const crit_in_place_data_saved & ref) = default;
+	~crit_in_place_data_saved() = default;
+
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const;
 	criterium *clone() const { return new (get_pool()) crit_in_place_data_saved(*this); };
     };
@@ -348,6 +399,11 @@ namespace libdar
     class crit_in_place_data_dirty : public criterium
     {
     public:
+	crit_in_place_data_dirty() = default;
+	crit_in_place_data_dirty(const crit_in_place_data_dirty & ref) = default;
+	crit_in_place_data_dirty & operator = (const crit_in_place_data_dirty & ref) = default;
+	~crit_in_place_data_dirty() = default;
+
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const;
 	criterium *clone() const { return new (get_pool()) crit_in_place_data_dirty(*this); };
     };
@@ -357,6 +413,11 @@ namespace libdar
     class crit_in_place_data_sparse : public criterium
     {
     public:
+	crit_in_place_data_sparse() = default;
+	crit_in_place_data_sparse(const crit_in_place_data_sparse & ref) = default;
+	crit_in_place_data_sparse & operator = (const crit_in_place_data_sparse & ref) = default;
+	~crit_in_place_data_sparse() = default;
+
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const;
 	criterium *clone() const { return new (get_pool()) crit_in_place_data_sparse(*this); };
     };
@@ -367,6 +428,11 @@ namespace libdar
     class crit_in_place_has_delta_sig : public criterium
     {
     public:
+	crit_in_place_has_delta_sig() = default;
+	crit_in_place_has_delta_sig(const crit_in_place_has_delta_sig & ref) = default;
+	crit_in_place_has_delta_sig & operator = (const crit_in_place_has_delta_sig & ref) = default;
+	~crit_in_place_has_delta_sig() = default;
+
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const;
 	criterium *clone() const { return new (get_pool()) crit_in_place_has_delta_sig(*this); };
     };
@@ -378,6 +444,11 @@ namespace libdar
     class crit_in_place_EA_present : public criterium
     {
     public:
+	crit_in_place_EA_present() = default;
+	crit_in_place_EA_present(const crit_in_place_EA_present & ref) = default;
+	crit_in_place_EA_present & operator = (const crit_in_place_EA_present & ref) = default;
+	~crit_in_place_EA_present() = default;
+
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const
 	{
 	    const cat_inode *tmp = dynamic_cast<const cat_inode *>(&first);
@@ -398,6 +469,10 @@ namespace libdar
     {
     public:
 	crit_in_place_EA_more_recent(const infinint & hourshift = 0) : x_hourshift(hourshift) {};
+	crit_in_place_EA_more_recent(const crit_in_place_EA_more_recent & ref) = default;
+	crit_in_place_EA_more_recent & operator = (const crit_in_place_EA_more_recent & ref) = default;
+	~crit_in_place_EA_more_recent() = default;
+
 
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const;
 	criterium *clone() const { return new (get_pool()) crit_in_place_EA_more_recent(*this); };
@@ -416,6 +491,9 @@ namespace libdar
     {
     public:
 	crit_in_place_EA_more_recent_or_equal_to(const infinint & date, const infinint & hourshift = 0) : x_hourshift(hourshift), x_date(date) {};
+	crit_in_place_EA_more_recent_or_equal_to(const crit_in_place_EA_more_recent_or_equal_to & ref) = default;
+	crit_in_place_EA_more_recent_or_equal_to & operator = (const crit_in_place_EA_more_recent_or_equal_to & ref) = default;
+	~crit_in_place_EA_more_recent_or_equal_to() = default;
 
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const;
 	criterium *clone() const { return new (get_pool()) crit_in_place_EA_more_recent_or_equal_to(*this); };
@@ -433,6 +511,11 @@ namespace libdar
     class crit_in_place_more_EA : public criterium
     {
     public:
+	crit_in_place_more_EA() = default;
+	crit_in_place_more_EA(const crit_in_place_more_EA & ref) = default;
+	crit_in_place_more_EA & operator = (const crit_in_place_more_EA & ref) = default;
+	~crit_in_place_more_EA() = default;
+
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const;
 	criterium *clone() const { return new (get_pool()) crit_in_place_more_EA(*this); };
     };
@@ -446,6 +529,11 @@ namespace libdar
     class crit_in_place_EA_bigger : public crit_in_place_more_EA
     {
     public:
+	crit_in_place_EA_bigger() = default;
+	crit_in_place_EA_bigger(const crit_in_place_EA_bigger & ref) = default;
+	crit_in_place_EA_bigger & operator = (const crit_in_place_EA_bigger & ref) = default;
+	~crit_in_place_EA_bigger() = default;
+
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const;
 	criterium *clone() const { return new (get_pool()) crit_in_place_EA_bigger(*this); };
     };
@@ -458,6 +546,11 @@ namespace libdar
     class crit_in_place_EA_saved : public criterium
     {
     public:
+	crit_in_place_EA_saved() = default;
+	crit_in_place_EA_saved(const crit_in_place_EA_saved & ref) = default;
+	crit_in_place_EA_saved & operator = (const crit_in_place_EA_saved & ref) = default;
+	~crit_in_place_EA_saved() = default;
+
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const;
 	criterium *clone() const { return new (get_pool()) crit_in_place_EA_saved(*this); };
     };
@@ -471,6 +564,11 @@ namespace libdar
     class crit_same_type : public criterium
     {
     public:
+	crit_same_type() = default;
+	crit_same_type(const crit_same_type & ref) = default;
+	crit_same_type & operator = (const crit_same_type & ref) = default;
+	~crit_same_type() = default;
+
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const;
 	criterium *clone() const { return new (get_pool()) crit_same_type(*this); };
     };
@@ -528,6 +626,9 @@ namespace libdar
     {
     public:
 	crit_or() { clear(); };
+	crit_or(const crit_or & ref) = default;
+	crit_or & operator = (const crit_or & ref) = default;
+	~crit_or() = default;
 
 	bool evaluate(const cat_nomme & first, const cat_nomme & second) const;
 	criterium *clone() const { return new (get_pool()) crit_or(*this); };
@@ -538,6 +639,9 @@ namespace libdar
     {
     public:
 	crit_invert(const criterium & crit) : crit_not(crit) {};
+	crit_invert(const crit_invert & ref) = default;
+	crit_invert & operator = (const crit_invert & ref) = default;
+	~crit_invert() = default;
 
 	bool evaluate(const cat_nomme & first, const cat_nomme & second) const { return x_crit->evaluate(second, first); };
 	criterium *clone() const { return new (get_pool()) crit_invert(*this); };

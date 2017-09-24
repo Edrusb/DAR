@@ -43,6 +43,9 @@ namespace libdar
     public:
 	range() { parts.clear(); };
 	range(const infinint & low, const infinint & high) { parts.push_back(segment(low, high)); };
+	range(const range & ref) = default;
+	range & operator = (const range & ref) = default;
+	~range() = default;
 
 	void operator += (const range & ref);
 	range operator + (const range & ref) const { range ret = *this; ret += ref; return ret; };

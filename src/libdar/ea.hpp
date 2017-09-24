@@ -50,6 +50,8 @@ namespace libdar
         ea_attributs() { alire = attr.begin(); };
         ea_attributs(generic_file & f, const archive_version & edit);
         ea_attributs(const ea_attributs & ref);
+	ea_attributs & operator = (const ea_attributs & ref);
+	~ea_attributs() = default;
 
 	bool operator == (const ea_attributs & ref) const { return attr == ref.attr; };
 

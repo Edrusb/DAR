@@ -109,6 +109,9 @@ namespace libdar
 				bool only_detruit,
 				bool small);
 
+	    /// setup an object when read from filesystem
+	cat_entree() = default;
+
 	    /// setup an object when read from an archive
 	    ///
 	    /// \param[in] pdesc points to an existing stack that will be read from to setup fields of inherited classes,
@@ -117,11 +120,10 @@ namespace libdar
 	cat_entree(const smart_pointer<pile_descriptor> & pdesc, bool small);
 
 	    // copy constructor is fine as we only copy the address of pointers
+	cat_entree(const cat_entree & ref) = default;
 
 	    // assignment operator is fine too for the same reason
-
-	    /// setup an object when read from filesystem
-	cat_entree() {};
+	cat_entree & operator = (const cat_entree & ref) = default;
 
 	    /// destructor
         virtual ~cat_entree() throw(Ebug) {};

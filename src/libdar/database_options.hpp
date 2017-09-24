@@ -44,6 +44,10 @@ namespace libdar
     {
     public:
 	database_open_options() { clear(); };
+	database_open_options(const database_open_options & ref) = default;
+	database_open_options & operator = (const database_open_options & ref) = default;
+	~database_open_options() = default;
+
 
 	void clear() { x_partial = false; x_partial_read_only = false; x_warn_order = true; };
 
@@ -87,6 +91,9 @@ namespace libdar
     {
     public:
 	database_dump_options() { clear(); };
+	database_dump_options(const database_dump_options & ref) = default;
+	database_dump_options & operator = (const database_dump_options & ref) = default;
+	~database_dump_options() = default;
 
 	void clear() { x_overwrite = false; };
 
@@ -111,6 +118,9 @@ namespace libdar
     {
     public:
 	database_add_options() { clear(); };
+	database_add_options(const database_add_options & ref) = default;
+	database_add_options & operator = (const database_add_options & ref) = default;
+	~database_add_options() = default;
 
 	void clear() {};
     };
@@ -121,6 +131,9 @@ namespace libdar
     {
     public:
 	database_remove_options() { clear(); };
+	database_remove_options(const database_remove_options & ref) = default;
+	database_remove_options & operator = (const database_remove_options & ref) = default;
+	~database_remove_options() = default;
 
 	void clear() { x_revert_archive_numbering = false; };
 
@@ -140,6 +153,9 @@ namespace libdar
     {
     public:
 	database_change_basename_options() { clear(); };
+	database_change_basename_options(const database_change_basename_options & ref) = default;
+	database_change_basename_options & operator = (const database_change_basename_options & ref) = default;
+	~database_change_basename_options() = default;
 
 	void clear() { x_revert_archive_numbering = false; };
 
@@ -160,6 +176,9 @@ namespace libdar
     {
     public:
 	database_change_path_options() { clear(); };
+	database_change_path_options(const database_change_path_options & ref) = default;
+	database_change_path_options & operator = (const database_change_path_options & ref) = default;
+	~database_change_path_options() = default;
 
 	void clear() { x_revert_archive_numbering = false; };
 
@@ -179,6 +198,9 @@ namespace libdar
     {
     public:
 	database_restore_options() { clear(); };
+	database_restore_options(const database_restore_options & ref) = default;
+	database_restore_options & operator = (const database_restore_options & ref) = default;
+	~database_restore_options() = default;
 
 	void clear() { x_early_release = x_info_details = x_ignore_dar_options_in_database = x_even_when_removed = false; x_date = 0; x_extra_options_for_dar.clear(); };
 
@@ -244,6 +266,9 @@ namespace libdar
     {
     public:
 	database_used_options() { clear(); };
+	database_used_options(const database_used_options & ref) = default;
+	database_used_options & operator = (const database_used_options & ref) = default;
+	~database_used_options() = default;
 
 	void clear() { x_revert_archive_numbering = false; };
 

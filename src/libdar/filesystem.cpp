@@ -565,52 +565,6 @@ namespace libdar
 	}
     }
 
-    void filesystem_backup::copy_from(const filesystem_backup & ref)
-    {
-	const filesystem_hard_link_read *proto_ref = &ref;
-	filesystem_hard_link_read *proto_me = this;
-	*proto_me = *proto_ref;  // invoke the copy from parent class
-
-	fs_root = nullptr;
-	current_dir = nullptr;
-	ea_mask = nullptr;
-	try
-	{
-	    if(ref.fs_root != nullptr)
-	    {
-		fs_root = new (get_pool()) path(*ref.fs_root);
-		if(fs_root == nullptr)
-		    throw Ememory("filesystem_backup::copy_from");
-	    }
-	    else
-		fs_root = nullptr;
-
-	    if(ref.current_dir != nullptr)
-	    {
-		current_dir = new (get_pool()) path(*ref.current_dir);
-		if(current_dir == nullptr)
-		    throw Ememory("filesystem_backup::copy_from");
-	    }
-	    else
-		current_dir = nullptr;
-	    info_details = ref.info_details;
-	    ea_mask = ref.ea_mask->clone();
-	    if(ea_mask == nullptr)
-		throw Ememory("filesystem_backup::copy_from");
-	    no_dump_check = ref.no_dump_check;
-	    alter_atime = ref.alter_atime;
-	    furtive_read_mode = ref.furtive_read_mode;
-	    cache_directory_tagging = ref.cache_directory_tagging;
-	    pile = ref.pile;
-	    ignore_unknown = ref.ignore_unknown;
-	}
-	catch(...)
-	{
-	    detruire();
-	    throw;
-	}
-    }
-
     void filesystem_backup::reset_read(infinint & root_fs_device)
     {
         corres_reset();
@@ -940,48 +894,6 @@ namespace libdar
 	    ea_mask = nullptr;
 	}
     }
-
-    void filesystem_diff::copy_from(const filesystem_diff & ref)
-    {
-	fs_root = nullptr;
-	ea_mask = nullptr;
-	current_dir = nullptr;
-	try
-	{
-	    const filesystem_hard_link_read *proto_ref = &ref;
-	    filesystem_hard_link_read *proto_me = this;
-	    *proto_me = *proto_ref;
-	    if(ref.fs_root != nullptr)
-	    {
-		fs_root = new (get_pool()) path(*ref.fs_root);
-		if(fs_root == nullptr)
-		    throw Ememory("filesystem_diff::copy_from");
-	    }
-	    else
-		fs_root = nullptr;
-	    if(ref.current_dir != nullptr)
-	    {
-		current_dir = new (get_pool()) path(*ref.current_dir);
-		if(current_dir == nullptr)
-		    throw Ememory("filesystem_diff::copy_from");
-	    }
-	    else
-		current_dir = nullptr;
-	    info_details = ref.info_details;
-	    ea_mask = ref.ea_mask->clone();
-	    if(ea_mask == nullptr)
-		throw Ememory("filesystem_diff::copy_from");
-	    alter_atime = ref.alter_atime;
-	    furtive_read_mode = ref.furtive_read_mode;
-	    filename_pile = ref.filename_pile;
-	}
-	catch(...)
-	{
-	    detruire();
-	    throw;
-	}
-    }
-
 
 
 ///////////////////////////////////////////////////////////////////

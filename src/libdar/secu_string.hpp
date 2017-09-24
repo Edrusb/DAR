@@ -82,13 +82,15 @@ namespace libdar
 	    /// the assignment operator
 	secu_string & operator = (const secu_string & ref) { clean_and_destroy(); copy_from(ref); return *this; };
 
+	    /// the destructor (set memory to zero before releasing it)
+	~secu_string() throw(Ebug) { clean_and_destroy(); };
+
+
 	bool operator != (const std::string & ref) const { return ! (*this == ref); };
 	bool operator != (const secu_string & ref) const { return ! (*this == ref); };
 	bool operator == (const std::string &ref) const { return compare_with(ref.c_str(),(U_I)(ref.size())); };
 	bool operator == (const secu_string &ref) const { return compare_with(ref.mem, *(ref.string_size)); };
 
-	    /// the destructor (set memory to zero before releasing it)
-	~secu_string() throw(Ebug) { clean_and_destroy(); };
 
 	    /// fill the object with data
 	    ///

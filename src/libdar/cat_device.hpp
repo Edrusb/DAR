@@ -58,6 +58,9 @@ namespace libdar
 		   const archive_version & reading_ver,
 		   saved_status saved,
 		   bool small);
+	cat_device(const cat_device & ref) = default;
+	cat_device & operator = (const cat_device & ref) = default;
+	~cat_device() = default;
 
 	bool operator == (const cat_entree & ref) const;
 

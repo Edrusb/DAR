@@ -67,7 +67,7 @@ static void f1()
     where.set_location("./test");
     try
     {
-	sar sar1 = sar(*ui, gf_write_only, "destination", "txt", 100, 110, true, false, 0, where, internal_name, data_name, false, 0, hash_none, false, 0);
+	sar sar1(*ui, gf_write_only, "destination", "txt", 100, 110, true, false, 0, where, internal_name, data_name, false, 0, hash_none, false, 0);
         fichier_local src = fichier_local(*ui, "./test/source.txt", gf_read_only, 0666, false, false, false);
         src.copy_to(sar1);
     }
@@ -83,7 +83,7 @@ static void f2()
     where.set_location("./test");
     try
     {
-        sar sar2 = sar(*ui, "destination", "txt", where, 0, false);
+        sar sar2(*ui, "destination", "txt", where, 0, false);
         fichier_local dst = fichier_local(*ui, "./test/destination.txt", gf_write_only, 0777, false, true, false);
 
         sar2.copy_to(dst);
@@ -101,7 +101,7 @@ static void f3()
 
     try
     {
-        sar sar3 = sar(*ui, "destination", "txt", where, 0, false);
+        sar sar3(*ui, "destination", "txt", where, 0, false);
         fichier_local src = fichier_local(*ui, "./test/source.txt", gf_read_only, 0666, false, false, false);
 
         display(sar3.get_position());
@@ -169,7 +169,7 @@ void f4()
 
     try
     {
-        sar sar2 = sar(*ui, "destination", "txt", where, 0, true, "echo SLICE %n");
+        sar sar2(*ui, "destination", "txt", where, 0, true, "echo SLICE %n");
 
 	display(sar2.get_position());
 	display_back_read(*ui, sar2);

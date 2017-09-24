@@ -69,6 +69,12 @@ namespace libdar
 	    /// the constructor
 	thread_cancellation();
 
+	    /// copy constructor
+	thread_cancellation(const thread_cancellation & ref) = default;
+
+	    /// assignment operator
+	thread_cancellation & operator = (const thread_cancellation & ref) = default;
+
 	    /// the destructor
 	virtual ~thread_cancellation() throw(Ebug);
 

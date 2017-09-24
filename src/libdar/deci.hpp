@@ -62,14 +62,14 @@ namespace libdar
         deci(const deci & ref)
 	{ copy_from(ref); };
 
+	    /// assignment operator
+        deci & operator = (const deci & ref)
+	{ detruit(); copy_from(ref); return *this; };
+
 	    /// destructor
         ~deci()
 	{ detruit(); };
 
-
-	    /// copy operator
-        deci & operator = (const deci & ref)
-	{ detruit(); copy_from(ref); return *this; };
 
 	    /// this produce a infinint from the decimal stored in the current object
         infinint computer() const;

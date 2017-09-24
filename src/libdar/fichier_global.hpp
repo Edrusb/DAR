@@ -85,8 +85,11 @@ namespace libdar
 						     mem_ui(ref),
 						     disk_full(ref.disk_full) {};
 
-	    // default assignment operator is fine here
-	    // default destructor is fine too here
+	    // assignment operator
+	fichier_global & operator = (const fichier_global & ref) = default;
+
+	    // destructor
+	~fichier_global() = default;
 
 	    /// set the ownership of the file
 	virtual void change_ownership(const std::string & user, const std::string & group) = 0;

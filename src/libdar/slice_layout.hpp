@@ -41,6 +41,11 @@ namespace libdar
     class slice_layout : public on_pool
     {
     public:
+	slice_layout() = default;
+	slice_layout(const slice_layout & ref) = default;
+	slice_layout & operator = (const slice_layout & ref) = default;
+	~slice_layout() = default;
+
 	    // field still exposed (slice_layout was a struct before being a class)
 	    // we keep these fields as is for now
 

@@ -57,6 +57,9 @@ namespace libdar
         tronc(generic_file *f, const infinint &offset, bool own_f = false);
         tronc(generic_file *f, const infinint &offset, gf_mode mode, bool own_f = false);
 
+	tronc(const tronc & ref) = default;
+	tronc & operator = (const tronc & ref) = default;
+
 	    /// destructor
 	~tronc()
 	{
