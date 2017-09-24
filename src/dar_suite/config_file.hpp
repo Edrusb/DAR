@@ -40,7 +40,9 @@ class config_file : public hide_file
 {
 public:
     config_file(const vector<string> & target, generic_file &f);
-
+    config_file(const config_file & ref) = default;
+    config_file & operator = (const config_file & ref) = default;
+    ~config_file() = default;
 
     vector<string> get_read_targets() const;
 

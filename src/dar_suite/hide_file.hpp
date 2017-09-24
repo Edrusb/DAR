@@ -41,6 +41,9 @@ class hide_file : public generic_file
 {
 public:
     hide_file(generic_file &f);
+    hide_file(const hide_file & ref) = default;
+    hide_file & operator = (const hide_file & ref) = default;
+    ~hide_file() = default;
 
     bool skippable(skippability direction, const infinint & amount) { return true; };
     bool skip(const infinint & pos);

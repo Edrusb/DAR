@@ -60,6 +60,9 @@ public:
 	/// copy constructor
     shell_interaction(const shell_interaction & ref);
 
+	/// assignment operator (not implmented)
+    shell_interaction & operator = (const shell_interaction & ref) = delete;
+
 	/// destructor
     ~shell_interaction();
 
