@@ -65,7 +65,7 @@ namespace libdar
         virtual ~Egeneric() = default;
 
 	    /// add more detailed couple of information to the exception
-        virtual void stack(const std::string & passage, const std::string & message = "") { pile.push_back(niveau(passage, message)); };
+        void stack(const std::string & passage, const std::string & message = "") { pile.push_back(niveau(passage, message)); };
 
 	    /// get the message explaing the nature of the exception
 
@@ -125,7 +125,7 @@ namespace libdar
 
     protected:
         Ememory(const std::string &source, const std::string & message) : Egeneric(source, message) {};
-        std::string exceptionID() const { return "MEMORY"; };
+        virtual std::string exceptionID() const override { return "MEMORY"; };
     };
 
 	/// exception used when secure memory has been exhausted
@@ -139,7 +139,7 @@ namespace libdar
 	~Esecu_memory() = default;
 
     protected:
-        std::string exceptionID() const { return "SECU_MEMORY"; };
+        virtual std::string exceptionID() const override { return "SECU_MEMORY"; };
     };
 
 
@@ -159,7 +159,7 @@ namespace libdar
         void stack(const std::string & passage, const std::string & file, const std::string & line);
 
     protected :
-        std::string exceptionID() const { return "BUG"; };
+        virtual std::string exceptionID() const override { return "BUG"; };
     };
 
 	/// exception used when arithmetic error is detected when operating on infinint
@@ -175,7 +175,7 @@ namespace libdar
 	~Einfinint() = default;
 
     protected :
-        std::string exceptionID() const { return "INFININT"; };
+        virtual std::string exceptionID() const override { return "INFININT"; };
     };
 
 	/// exception used when a limitint overflow is detected, the maximum value of the limitint has been exceeded
@@ -191,7 +191,7 @@ namespace libdar
 	~Elimitint() = default;
 
     protected :
-        std::string exceptionID() const { return "LIMITINT"; };
+        virtual std::string exceptionID() const override { return "LIMITINT"; };
     };
 
 	/// exception used to signal range error
@@ -207,7 +207,7 @@ namespace libdar
 	~Erange() = default;
 
     protected :
-        std::string exceptionID() const { return "RANGE"; };
+        virtual std::string exceptionID() const override { return "RANGE"; };
     };
 
 	/// exception used to signal convertion problem between infinint and string (decimal representation)
@@ -224,7 +224,7 @@ namespace libdar
 	~Edeci() = default;
 
     protected :
-        std::string exceptionID() const { return "DECI"; };
+        virtual std::string exceptionID() const override { return "DECI"; };
     };
 
 	/// exception used when a requested feature is not (yet) implemented
@@ -240,7 +240,7 @@ namespace libdar
 	~Efeature() = default;
 
     protected :
-        std::string exceptionID() const { return "UNIMPLEMENTED FEATURE"; };
+        virtual std::string exceptionID() const override { return "UNIMPLEMENTED FEATURE"; };
     };
 
 	/// exception used when hardware problem is found
@@ -256,7 +256,7 @@ namespace libdar
 	~Ehardware() = default;
 
     protected :
-        std::string exceptionID() const { return "HARDWARE ERROR"; };
+        virtual std::string exceptionID() const override { return "HARDWARE ERROR"; };
     };
 
 	/// exception used to signal that the user has aborted the operation
@@ -272,7 +272,7 @@ namespace libdar
 	~Euser_abort() = default;
 
     protected :
-        std::string exceptionID() const { return "USER ABORTED OPERATION"; };
+        virtual std::string exceptionID() const override { return "USER ABORTED OPERATION"; };
     };
 
 
@@ -289,7 +289,7 @@ namespace libdar
 	~Edata() = default;
 
     protected :
-        std::string exceptionID() const { return "ERROR IN TREATED DATA"; };
+        virtual std::string exceptionID() const override { return "ERROR IN TREATED DATA"; };
     };
 
 	/// exception used when error the inter-slice user command returned an error code
@@ -305,7 +305,7 @@ namespace libdar
 	~Escript() = default;
 
     protected :
-        std::string exceptionID() const { return "USER ABORTED OPERATION"; };
+        virtual std::string exceptionID() const override { return "USER ABORTED OPERATION"; };
     };
 
 	/// exception used to signal an error in the argument given to libdar call of the API
@@ -321,7 +321,7 @@ namespace libdar
 	~Elibcall() = default;
 
     protected :
-        std::string exceptionID() const { return "USER ABORTED OPERATION"; };
+        virtual std::string exceptionID() const override { return "USER ABORTED OPERATION"; };
     };
 
 	/// exception used when a requested fearture has not beed activated at compilation time
@@ -337,7 +337,7 @@ namespace libdar
 	~Ecompilation() = default;
 
     protected :
-        std::string exceptionID() const { return "FEATURE DISABLED AT COMPILATION TIME"; };
+        virtual std::string exceptionID() const override { return "FEATURE DISABLED AT COMPILATION TIME"; };
     };
 
 
@@ -355,7 +355,7 @@ namespace libdar
 	U_64 get_flag() const { return flag; };
 
     protected:
-	std::string exceptionID() const { return "THREAD CANCELLATION REQUESTED, ABORTING"; };
+	virtual std::string exceptionID() const override { return "THREAD CANCELLATION REQUESTED, ABORTING"; };
 
     private:
 	bool immediate;
@@ -382,7 +382,7 @@ namespace libdar
 	io_error get_code() const { return x_code; };
 
     protected:
-	virtual std::string exceptionID() const { return "SYSTEM ERROR MET"; };
+	virtual std::string exceptionID() const override { return "SYSTEM ERROR MET"; };
 
     private:
 	io_error x_code;
@@ -399,7 +399,7 @@ namespace libdar
 	~Enet_auth() = default;
 
     protected:
-	std::string exceptionID() const { return "NETWORK AUTHENTICATION ERROR"; };
+	virtual std::string exceptionID() const override { return "NETWORK AUTHENTICATION ERROR"; };
     };
 
 
