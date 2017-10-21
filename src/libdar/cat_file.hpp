@@ -226,6 +226,7 @@ namespace libdar
 	cat_delta_signature *delta_sig; //< delta signature and associated CRC
 
         void detruit();
+
     };
 
 	/// @}
