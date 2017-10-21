@@ -201,6 +201,9 @@ namespace libdar
 	    /// remove any information about delta signature
 	void clear_delta_signature_structure();
 
+	    /// not used
+	virtual bool operator == (const cat_entree & ref) const override { return true; };
+
     protected:
         void sub_compare(const cat_inode & other, bool isolated_mode) const;
         void inherited_dump(const pile_descriptor & pdesc, bool small) const;

@@ -129,7 +129,7 @@ namespace libdar
         virtual ~cat_entree() throw(Ebug) {};
 
 	    /// returns true if the two object have the same content
-	virtual bool operator == (const cat_entree & ref) const { return true; };
+	virtual bool operator == (const cat_entree & ref) const = 0;
 	bool operator != (const cat_entree & ref) const { return ! (*this == ref); };
 
 	    /// write down the object information to a stack
