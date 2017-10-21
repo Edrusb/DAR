@@ -44,7 +44,9 @@ namespace libdar
     }
 
     generic_file *cat_door::get_data(get_data_mode mode,
-	memory_file *delta_sig) const
+				     memory_file *delta_sig,
+				     generic_file *delta_ref,
+				     const crc**checksum) const
     {
 	generic_file *ret = nullptr;
 
@@ -59,7 +61,7 @@ namespace libdar
 		throw Ememory("cat_door::get_data");
 	}
 	else
-	    ret = cat_file::get_data(mode, nullptr, nullptr);
+	    ret = cat_file::get_data(mode, nullptr, nullptr, checksum);
 
 	return ret;
     }

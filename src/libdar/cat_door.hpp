@@ -71,8 +71,11 @@ namespace libdar
 
         unsigned char signature() const { return mk_signature('o', get_saved_status()); };
 
-        generic_file *get_data(get_data_mode mode,
-			       memory_file *delta_sig) const; // inherited from class cat_file
+	    // inherited from class cat_file
+        virtual generic_file *get_data(get_data_mode mode,
+				       memory_file *delta_sig,
+				       generic_file *delta_ref,
+				       const crc**checksum) const override;
 
     };
 
