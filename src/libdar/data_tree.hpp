@@ -227,7 +227,7 @@ namespace libdar
 	data_dir & operator = (const data_dir & ref) { rejetons.clear(); return *this; };
 	~data_dir();
 
-	void dump(generic_file & f) const;
+	virtual void dump(generic_file & f) const override;
 
 	void add(const cat_inode *entry, const archive_num & archive);
 	void add(const cat_detruit *entry, const archive_num & archive);
@@ -238,21 +238,21 @@ namespace libdar
 					  const archive_num & ignore_archives_greater_or_equal);
 
 	    // inherited methods
-	bool check_order(user_interaction & dialog, const path & current_path, bool & initial_warn) const;
-	void finalize(const archive_num & archive, const datetime & deleted_date, const archive_num & ignore_archives_greater_or_equal);
-	bool remove_all_from(const archive_num & archive_to_remove, const archive_num & last_archive);
+	virtual bool check_order(user_interaction & dialog, const path & current_path, bool & initial_warn) const override;
+	virtual void finalize(const archive_num & archive, const datetime & deleted_date, const archive_num & ignore_archives_greater_or_equal) override;
+	virtual bool remove_all_from(const archive_num & archive_to_remove, const archive_num & last_archive) override;
 
 	    /// list the most recent files owned by that archive (or by any archive if num == 0)
 	void show(user_interaction & dialog, archive_num num, std::string marge = "") const;
-	void apply_permutation(archive_num src, archive_num dst);
-	void skip_out(archive_num num);
+	virtual void apply_permutation(archive_num src, archive_num dst) override;
+	virtual void skip_out(archive_num num) override;
 	void compute_most_recent_stats(std::vector<infinint> & data, std::vector<infinint> & ea,
 				       std::vector<infinint> & total_data, std::vector<infinint> & total_ea) const;
 
-	char obj_signature() const { return signature(); };
+	virtual char obj_signature() const override { return signature(); };
 	static char signature() { return 'd'; };
 
-	virtual bool fix_corruption(); // inherited from data_tree
+	virtual bool fix_corruption() override; // inherited from data_tree
 
 
     private:
