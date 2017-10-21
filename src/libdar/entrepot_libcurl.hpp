@@ -82,25 +82,25 @@ namespace libdar
 
 	    /// \note this is expected to have a double slash after the host:port
 	    /// like ftp://www.some.where:8021//tmp/sub/dir
-	std::string get_url() const { return base_URL + get_full_path().display(); };
-	void read_dir_reset() const;
-	bool read_dir_next(std::string & filename) const;
-	entrepot *clone() const { return new (get_pool()) entrepot_libcurl(*this); };
+	virtual std::string get_url() const override { return base_URL + get_full_path().display(); };
+	virtual void read_dir_reset() const override;
+	virtual bool read_dir_next(std::string & filename) const override;
+	virtual entrepot *clone() const override { return new (get_pool()) entrepot_libcurl(*this); };
 
     protected:
 
 	    // inherited from class entrepot
 
-	fichier_global *inherited_open(user_interaction & dialog,
-				       const std::string & filename,
-				       gf_mode mode,
-				       bool force_permission,
-				       U_I permission,
-				       bool fail_if_exists,
-				       bool erase) const;
+	virtual fichier_global *inherited_open(user_interaction & dialog,
+					       const std::string & filename,
+					       gf_mode mode,
+					       bool force_permission,
+					       U_I permission,
+					       bool fail_if_exists,
+					       bool erase) const override;
 
-	void inherited_unlink(const std::string & filename) const;
-	void read_dir_flush();
+	virtual void inherited_unlink(const std::string & filename) const override;
+	virtual void read_dir_flush() override;
 
     private:
 	mycurl_protocol x_proto;

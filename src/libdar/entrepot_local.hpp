@@ -68,24 +68,24 @@ namespace libdar
 	entrepot_local & operator = (const entrepot_local & ref);
 	~entrepot_local() { detruit(); };
 
-	std::string get_url() const { return std::string("file://") + get_full_path().display(); };
+	virtual std::string get_url() const override { return std::string("file://") + get_full_path().display(); };
 
-	void read_dir_reset() const;
-	bool read_dir_next(std::string & filename) const;
+	virtual void read_dir_reset() const override;
+	virtual bool read_dir_next(std::string & filename) const override;
 
-	entrepot *clone() const { return new (get_pool()) entrepot_local(*this); };
+	virtual entrepot *clone() const override { return new (get_pool()) entrepot_local(*this); };
 
     protected:
-	fichier_global *inherited_open(user_interaction & dialog,
-				       const std::string & filename,
-				       gf_mode mode,
-				       bool force_permission,
-				       U_I permission,
-				       bool fail_if_exists,
-				       bool erase) const;
+	virtual fichier_global *inherited_open(user_interaction & dialog,
+					       const std::string & filename,
+					       gf_mode mode,
+					       bool force_permission,
+					       U_I permission,
+					       bool fail_if_exists,
+					       bool erase) const override;
 
-	void inherited_unlink(const std::string & filename) const;
-	void read_dir_flush() { detruit(); };
+	virtual void inherited_unlink(const std::string & filename) const override;
+	virtual void read_dir_flush() override { detruit(); };
 
     private:
 	bool furtive_mode;
