@@ -120,8 +120,8 @@ namespace libdar
 
 
 	    /// the inherited pure virtual methods from class action that must be implemented
-	void get_action(const cat_nomme & first, const cat_nomme & second, over_action_data & data, over_action_ea & ea) const { data = x_data; ea = x_ea; };
-	crit_action *clone() const { return new (get_pool()) crit_constant_action(*this); };
+	virtual void get_action(const cat_nomme & first, const cat_nomme & second, over_action_data & data, over_action_ea & ea) const override { data = x_data; ea = x_ea; };
+	virtual crit_action *clone() const override { return new (get_pool()) crit_constant_action(*this); };
 
     private:
 	over_action_data x_data;
@@ -185,7 +185,7 @@ namespace libdar
 
 
 	    /// the inherited pure virtual method from class action that must be gimplemented
-	void get_action(const cat_nomme & first, const cat_nomme & second, over_action_data & data, over_action_ea & ea) const
+	virtual void get_action(const cat_nomme & first, const cat_nomme & second, over_action_data & data, over_action_ea & ea) const override
 	{
 	    if(x_input->evaluate(first, second))
 		x_go_true->get_action(first, second, data, ea);
@@ -193,7 +193,7 @@ namespace libdar
 		x_go_false->get_action(first, second, data, ea);
 	};
 
-	crit_action *clone() const { return new (get_pool()) testing(*this); };
+	virtual crit_action *clone() const override { return new (get_pool()) testing(*this); };
 
     private:
 	criterium *x_input;
@@ -223,9 +223,9 @@ namespace libdar
 	void clear() { destroy(); };
 	void gobe(crit_chain & to_be_voided);
 
-	void get_action(const cat_nomme & first, const cat_nomme & second, over_action_data & data, over_action_ea & ea) const;
+	virtual void get_action(const cat_nomme & first, const cat_nomme & second, over_action_data & data, over_action_ea & ea) const override;
 
-	crit_action *clone() const { return new (get_pool()) crit_chain(*this); };
+	virtual crit_action *clone() const override { return new (get_pool()) crit_chain(*this); };
 
     private:
 	std::vector<crit_action *> sequence;
