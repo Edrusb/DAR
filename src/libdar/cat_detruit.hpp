@@ -53,7 +53,7 @@ namespace libdar
 	cat_detruit & operator = (const cat_detruit & ref) = default;
 	~cat_detruit() = default;
 
-	bool operator == (const cat_entree & ref) const;
+	virtual bool operator == (const cat_entree & ref) const override;
 
         unsigned char get_signature() const { return signe; };
         void set_signature(unsigned char x) { signe = x; };
@@ -62,12 +62,12 @@ namespace libdar
 	void set_date(const datetime & ref) { del_date = ref; };
 
 	    /// inherited from cat_entree
-        unsigned char signature() const { return 'x'; };
+        virtual unsigned char signature() const override { return 'x'; };
 	    /// inherited from cat_entree
-        cat_entree *clone() const { return new (get_pool()) cat_detruit(*this); };
+        virtual cat_entree *clone() const override { return new (get_pool()) cat_detruit(*this); };
 
     protected:
-        void inherited_dump(const pile_descriptor & pdesc, bool small) const;
+        virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override;
 
     private :
         unsigned char signe;

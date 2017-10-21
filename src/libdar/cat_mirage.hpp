@@ -75,10 +75,10 @@ namespace libdar
 	cat_mirage & operator = (const cat_mirage & ref);
 	~cat_mirage() { star_ref->drop_ref(this); };
 
-	bool operator == (const cat_entree & ref) const;
+	virtual bool operator == (const cat_entree & ref) const override;
 
-	unsigned char signature() const { return 'm'; };
-	cat_entree *clone() const { return new (get_pool()) cat_mirage(*this); };
+	virtual unsigned char signature() const override { return 'm'; };
+	virtual cat_entree *clone() const override { return new (get_pool()) cat_mirage(*this); };
 
 	cat_inode *get_inode() const { if(star_ref == nullptr) throw SRC_BUG; return star_ref->get_inode(); };
 	infinint get_etiquette() const { return star_ref->get_etiquette(); };
@@ -92,13 +92,13 @@ namespace libdar
 	void set_inode_wrote(bool val) const { star_ref->set_wrote(val); };
 	void set_inode_dumped(bool val) const { star_ref->set_dumped(val); };
 
-	void post_constructor(const pile_descriptor & pdesc);
+	virtual void post_constructor(const pile_descriptor & pdesc) override;
 
 	    /// whether we are the mirage that triggered this hard link creation
 	bool is_first_mirage() const { return star_ref->get_first_ref() == this; };
 
 	    // overwriting virtual method from cat_entree
-	virtual void change_location(const smart_pointer<pile_descriptor> & pdesc) { get_inode()->change_location(pdesc); };
+	virtual void change_location(const smart_pointer<pile_descriptor> & pdesc) override { get_inode()->change_location(pdesc); };
 
 	    /// always write the inode as a hardlinked inode
 
@@ -112,7 +112,7 @@ namespace libdar
 	void disable_reduction_to_normal_inode() { star_ref->disable_reduction_to_normal_inode(); };
 
     protected:
-	void inherited_dump(const pile_descriptor & pdesc, bool small) const;
+	virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override;
 
     private:
 	cat_etoile *star_ref;

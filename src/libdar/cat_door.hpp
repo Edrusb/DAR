@@ -67,9 +67,9 @@ namespace libdar
 	cat_door & operator = (const cat_door & ref) = default;
 	~cat_door() = default;
 
-	bool operator == (const cat_entree & ref) const;
+	virtual bool operator == (const cat_entree & ref) const override;
 
-        unsigned char signature() const { return mk_signature('o', get_saved_status()); };
+        virtual unsigned char signature() const override { return mk_signature('o', get_saved_status()); };
 
 	    // inherited from class cat_file
         virtual generic_file *get_data(get_data_mode mode,

@@ -60,7 +60,7 @@ namespace libdar
         cat_entree *clone() const { return new (get_pool()) cat_ignored_dir(*this); };
 
     protected:
-        void inherited_dump(const pile_descriptor & pdesc, bool small) const; // behaves like an empty cat_directory
+        virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override; // behaves like an empty cat_directory
 
     };
 

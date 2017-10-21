@@ -65,13 +65,13 @@ namespace libdar
 	cat_blockdev & operator = (const cat_blockdev & ref) = default;
 	~cat_blockdev() = default;
 
-	bool operator == (const cat_entree & ref) const;
+	virtual bool operator == (const cat_entree & ref) const override;
 
             // using dump from cat_device class
             // using method is_more_recent_than() from cat_device class
             // using method has_changed_since() from cat_device class
-        unsigned char signature() const { return mk_signature('b', get_saved_status()); };
-        cat_entree *clone() const { return new (get_pool()) cat_blockdev(*this); };
+        virtual unsigned char signature() const override { return mk_signature('b', get_saved_status()); };
+        virtual cat_entree *clone() const override { return new (get_pool()) cat_blockdev(*this); };
     };
 
 	/// @}

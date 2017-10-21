@@ -62,7 +62,7 @@ namespace libdar
 	cat_device & operator = (const cat_device & ref) = default;
 	~cat_device() = default;
 
-	bool operator == (const cat_entree & ref) const;
+	virtual bool operator == (const cat_entree & ref) const override;
 
         int get_major() const { if(get_saved_status() != s_saved) throw SRC_BUG; else return xmajor; };
         int get_minor() const { if(get_saved_status() != s_saved) throw SRC_BUG; else return xminor; };
@@ -74,8 +74,8 @@ namespace libdar
             // signature is left pure abstract
 
     protected :
-        void sub_compare(const cat_inode & other, bool isolated_mode) const;
-        void inherited_dump(const pile_descriptor & pdesc, bool small) const;
+        virtual void sub_compare(const cat_inode & other, bool isolated_mode) const override;
+        virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override;
 
     private :
         U_16 xmajor, xminor;

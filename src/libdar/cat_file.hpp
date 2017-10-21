@@ -81,7 +81,7 @@ namespace libdar
 	cat_file & operator = (const cat_file & ref) = default;
         ~cat_file() { detruit(); };
 
-        bool has_changed_since(const cat_inode & ref, const infinint & hourshift, cat_inode::comparison_fields what_to_check) const;
+        virtual bool has_changed_since(const cat_inode & ref, const infinint & hourshift, cat_inode::comparison_fields what_to_check) const override;
         infinint get_size() const { return *size; };
 	void change_size(const infinint & s) const { *size = s; };
         infinint get_storage_size() const { return *storage_size; };
@@ -110,7 +110,7 @@ namespace libdar
         void clean_data(); // partially free memory (but get_data() becomes disabled)
         void set_offset(const infinint & r);
 	const infinint & get_offset() const;
-        unsigned char signature() const { return mk_signature('f', get_saved_status()); };
+        virtual unsigned char signature() const override { return mk_signature('f', get_saved_status()); };
 
         void set_crc(const crc &c);
         bool get_crc(const crc * & c) const; //< the argument is set the an allocated crc object the owned by the "cat_file" object, its stay valid while this "cat_file" object exists and MUST NOT be deleted by the caller in any case
@@ -127,7 +127,7 @@ namespace libdar
 	bool get_sparse_file_detection_read() const { return (file_data_status_read & FILE_DATA_WITH_HOLE) != 0; };
 	bool get_sparse_file_detection_write() const { return (file_data_status_write & FILE_DATA_WITH_HOLE) != 0; };
 
-        cat_entree *clone() const { return new (get_pool()) cat_file(*this); };
+        virtual cat_entree *clone() const override { return new (get_pool()) cat_file(*this); };
 
         compression get_compression_algo_read() const { return algo_read; };
 
@@ -205,9 +205,9 @@ namespace libdar
 	virtual bool operator == (const cat_entree & ref) const override { return true; };
 
     protected:
-        void sub_compare(const cat_inode & other, bool isolated_mode) const;
-        void inherited_dump(const pile_descriptor & pdesc, bool small) const;
-	void post_constructor(const pile_descriptor & pdesc);
+        virtual void sub_compare(const cat_inode & other, bool isolated_mode) const override;
+        virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override;
+	virtual void post_constructor(const pile_descriptor & pdesc) override;
 
         enum { empty, from_path, from_cat } status;
 

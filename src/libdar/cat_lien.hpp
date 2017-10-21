@@ -62,7 +62,7 @@ namespace libdar
 	~cat_lien() = default;
 
 
-	bool operator == (const cat_entree & ref) const;
+	virtual bool operator == (const cat_entree & ref) const override;
 
         const std::string & get_target() const;
         void set_target(std::string x);
@@ -71,14 +71,14 @@ namespace libdar
             // using method has_changed_since() from cat_inode class
 
 	    /// inherited from cat_entree
-        unsigned char signature() const { return mk_signature('l', get_saved_status()); };
+        virtual unsigned char signature() const override { return mk_signature('l', get_saved_status()); };
 
 	    /// inherited from cat_entree
-        cat_entree *clone() const { return new (get_pool()) cat_lien(*this); };
+        virtual cat_entree *clone() const override { return new (get_pool()) cat_lien(*this); };
 
     protected :
-        void sub_compare(const cat_inode & other, bool isolated_mode) const;
-        void inherited_dump(const pile_descriptor & pdesc, bool small) const;
+        virtual void sub_compare(const cat_inode & other, bool isolated_mode) const override;
+        virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override;
 
     private :
         std::string points_to;

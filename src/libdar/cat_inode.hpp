@@ -192,7 +192,7 @@ namespace libdar
 	bool get_small_read() const { return small_read; }; //< true if object has been created by sequential reading of an archive
 
 	    // inherited from cat_entree
-        void inherited_dump(const pile_descriptor & pdesc, bool small) const;
+        virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override;
 
 
     private :

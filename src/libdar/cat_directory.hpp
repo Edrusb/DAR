@@ -74,7 +74,7 @@ namespace libdar
         ~cat_directory() throw(Ebug); // detruit aussi tous les fils et se supprime de son 'parent'
 
 	    /// attention this compares only the directories themselves, not the list of their children
-	bool operator == (const cat_entree & ref) const;
+	virtual bool operator == (const cat_entree & ref) const override;
 
         void add_children(cat_nomme *r); // when r is a cat_directory, 'parent' is set to 'this'
 	bool has_children() const { return !ordered_fils.empty(); };
@@ -99,7 +99,7 @@ namespace libdar
 
             // using is_more_recent_than() from cat_inode class
             // using method has_changed_since() from cat_inode class
-        unsigned char signature() const { return mk_signature('d', get_saved_status()); };
+        virtual unsigned char signature() const override { return mk_signature('d', get_saved_status()); };
 
 	    /// detemine whether some data has changed since archive of reference in this cat_directory or subdirectories
 	bool get_recursive_has_changed() const { return recursive_has_changed; };
@@ -133,7 +133,7 @@ namespace libdar
 	    /// set the value of inode_dumped for all mirage (recusively)
 	void set_all_mirage_s_inode_dumped_field_to(bool val);
 
-        cat_entree *clone() const { return new (get_pool()) cat_directory(*this); };
+        virtual cat_entree *clone() const override { return new (get_pool()) cat_directory(*this); };
 
 	const infinint & get_size() const { recursive_update_sizes(); return x_size; };
 	const infinint & get_storage_size() const { recursive_update_sizes(); return x_storage_size; };
@@ -141,10 +141,10 @@ namespace libdar
 	void recursively_set_to_unsaved_data_and_FSA();
 
 	    /// overwrite virtual method of cat_entree to propagate the action to all entries of the directory tree
-	void change_location(const smart_pointer<pile_descriptor> & pdesc);
+	virtual void change_location(const smart_pointer<pile_descriptor> & pdesc) override;
 
     protected:
-        void inherited_dump(const pile_descriptor & pdesc, bool small) const;
+        virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override;
 
     private:
 	static const cat_eod fin;

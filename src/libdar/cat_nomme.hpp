@@ -50,7 +50,7 @@ namespace libdar
 	cat_nomme & operator = (const cat_nomme & ref) = default;
 	virtual ~cat_nomme() = default;
 
-	bool operator == (const cat_entree & ref) const;
+	virtual bool operator == (const cat_entree & ref) const override;
 	virtual bool operator < (const cat_nomme & ref) const { return xname < ref.xname; };
         const std::string & get_name() const { return xname; };
         void change_name(const std::string & x) { xname = x; };
@@ -64,7 +64,7 @@ namespace libdar
             // clone() is also ketp abstract
 
     protected:
-        void inherited_dump(const pile_descriptor & pdesc, bool small) const;
+        virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override;
 
     private:
         std::string xname;

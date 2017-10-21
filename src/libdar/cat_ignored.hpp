@@ -50,13 +50,13 @@ namespace libdar
 	cat_ignored & operator = (const cat_ignored & ref) = default;
 	~cat_ignored() = default;
 
-	bool operator == (const cat_entree & ref) const;
+	virtual bool operator == (const cat_entree & ref) const override;
 
-        unsigned char signature() const { return 'i'; };
-        cat_entree *clone() const { return new (get_pool()) cat_ignored(*this); };
+        virtual unsigned char signature() const override { return 'i'; };
+        virtual cat_entree *clone() const override { return new (get_pool()) cat_ignored(*this); };
 
     protected:
-        void inherited_dump(const pile_descriptor & pdesc, bool small) const { throw SRC_BUG; };
+        virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override { throw SRC_BUG; };
 
     };
 
