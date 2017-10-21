@@ -77,15 +77,15 @@ namespace libdar
 
 	bool operator == (const crc & ref) const;
 
-	void compute(const infinint & offset, const char *buffer, U_I length);
-	void compute(const char *buffer, U_I length); // for sequential read only
-	void clear();
-	void dump(generic_file & f) const;
-	std::string crc2str() const;
-	infinint get_size() const { return size; };
+	virtual void compute(const infinint & offset, const char *buffer, U_I length) override;
+	virtual void compute(const char *buffer, U_I length) override; // for sequential read only
+	virtual void clear() override;
+	virtual void dump(generic_file & f) const override;
+	virtual std::string crc2str() const override;
+	virtual infinint get_size() const override { return size; };
 
     protected:
-	crc *clone() const { return new (get_pool()) crc_i(*this); };
+	virtual crc *clone() const override { return new (get_pool()) crc_i(*this); };
 
     private:
 
@@ -110,15 +110,15 @@ namespace libdar
 
 	bool operator == (const crc & ref) const;
 
-	void compute(const infinint & offset, const char *buffer, U_I length);
-	void compute(const char *buffer, U_I length); // for sequential read only
-	void clear();
-	void dump(generic_file & f) const;
-	std::string crc2str() const;
-	infinint get_size() const { return size; };
+	virtual void compute(const infinint & offset, const char *buffer, U_I length) override;
+	virtual void compute(const char *buffer, U_I length) override; // for sequential read only
+	virtual void clear() override;
+	virtual void dump(generic_file & f) const override;
+	virtual std::string crc2str() const override;
+	virtual infinint get_size() const override { return size; };
 
     protected:
-	crc *clone() const { return new (get_pool()) crc_n(*this); };
+	virtual crc *clone() const override { return new (get_pool()) crc_n(*this); };
 
     private:
 
