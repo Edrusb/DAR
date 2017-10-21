@@ -37,6 +37,7 @@
 #include "entrepot.hpp"
 #include "tools.hpp"
 #include "slice_layout.hpp"
+#include "contextual.hpp"
 
 namespace libdar
 {

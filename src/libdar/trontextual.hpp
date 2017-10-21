@@ -31,6 +31,7 @@
 #include "tronc.hpp"
 #include "infinint.hpp"
 #include "generic_file.hpp"
+#include "contextual.hpp"
 
 namespace libdar
 {

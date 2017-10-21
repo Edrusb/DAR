@@ -340,60 +340,6 @@ namespace libdar
 	void copy_from(const generic_file & ref);
     };
 
-#define CONTEXT_INIT "init"
-#define CONTEXT_OP   "operation"
-#define CONTEXT_LAST_SLICE  "last_slice"
-
-	/// the contextual class adds the information of phases in the generic_file
-
-	/// several phases are defined like for example
-	/// - INIT phase
-	/// - OPERATIONAL phase
-	/// - LAST SLICE phase
-	/// .
-	/// these are used to help the command launched between slices to
-	/// decide the action to do depending on the context when reading an archive
-	/// (first slice / last slice read, ...)
-	/// the context must also be transfered to dar_slave through the pair of tuyau objects
-	///
-	/// this class also support some additional informations common to all 'level1' layer of
-	/// archive, such as:
-	/// - the data_name information
-	///
-
-    class label;
-
-    class contextual
-    {
-    public :
-	contextual() { status = ""; };
-	contextual(const contextual & ref) = default;
-	contextual & operator = (const contextual & ref) = default;
-	virtual ~contextual() throw(Ebug) {};
-
-	    /// defines the new contextual value
-	    ///
-	    /// \note inherited class may redefine this call but
-	    /// but must call the parent method to set the value
-	    /// contextual:set_info_status()
-	virtual void set_info_status(const std::string & s) { status = s; };
-
-	    /// get the current contextual value
-        virtual std::string get_info_status() const { return status; };
-
-	    /// returns whether the archive is a old archive (format < 8)
-	virtual bool is_an_old_start_end_archive() const = 0;
-
-	    /// obtain the data_name of the archive (label associated with the archive's data)
-	    ///
-	    /// \note label are conserved with dar_xform and archive isolation, but are
-	    /// not with archive merging or archive creation (full or differential backup)
-	virtual const label & get_data_name() const = 0;
-
-    private:
-	std::string status;
-    };
-
 	/// @}
 
 } // end of namespace
