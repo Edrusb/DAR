@@ -68,25 +68,25 @@ namespace libdar
 	~escape_catalogue() { destroy(); };
 
 	    // inherited from catalogue
-	void pre_add(const cat_entree *ref, const pile_descriptor* dest) const;
-	void pre_add_ea(const cat_entree *ref, const pile_descriptor* dest) const;
-	void pre_add_crc(const cat_entree *ref, const pile_descriptor* dest) const;
-	void pre_add_dirty(const pile_descriptor* dest) const;
-	void pre_add_ea_crc(const cat_entree *ref, const pile_descriptor* dest) const;
-	void pre_add_waste_mark(const pile_descriptor* dest) const;
-	void pre_add_failed_mark(const pile_descriptor* dest) const;
-	void pre_add_fsa(const cat_entree *ref, const pile_descriptor* dest) const;
-	void pre_add_fsa_crc(const cat_entree *ref, const pile_descriptor* dest) const;
-	void pre_add_delta_sig(const pile_descriptor* dest) const;
-	escape *get_escape_layer() const { return pdesc->esc; };
+	virtual void pre_add(const cat_entree *ref, const pile_descriptor* dest) const override;
+	virtual void pre_add_ea(const cat_entree *ref, const pile_descriptor* dest) const override;
+	virtual void pre_add_crc(const cat_entree *ref, const pile_descriptor* dest) const override;
+	virtual void pre_add_dirty(const pile_descriptor* dest) const override;
+	virtual void pre_add_ea_crc(const cat_entree *ref, const pile_descriptor* dest) const override;
+	virtual void pre_add_waste_mark(const pile_descriptor* dest) const override;
+	virtual void pre_add_failed_mark(const pile_descriptor* dest) const override;
+	virtual void pre_add_fsa(const cat_entree *ref, const pile_descriptor* dest) const override;
+	virtual void pre_add_fsa_crc(const cat_entree *ref, const pile_descriptor* dest) const override;
+	virtual void pre_add_delta_sig(const pile_descriptor* dest) const override;
+	virtual escape *get_escape_layer() const override { return pdesc->esc; };
 
-	void reset_read() const;
-	void end_read() const;
-	void skip_read_to_parent_dir() const;
-	bool read(const cat_entree * & ref) const;
-	bool read_if_present(std::string *name, const cat_nomme * & ref) const;
-	void tail_catalogue_to_current_read();
-	bool read_second_time_dir() const { return status == ec_detruits; };
+	virtual void reset_read() const override;
+	virtual void end_read() const override;
+	virtual void skip_read_to_parent_dir() const override;
+	virtual bool read(const cat_entree * & ref) const override;
+	virtual bool read_if_present(std::string *name, const cat_nomme * & ref) const override;
+	virtual void tail_catalogue_to_current_read() override;
+	virtual bool read_second_time_dir() const override { return status == ec_detruits; };
 
     private:
 	enum state
