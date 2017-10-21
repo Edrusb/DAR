@@ -49,19 +49,19 @@ namespace libdar
         ~scrambler() { if(buffer != nullptr) meta_delete(buffer); };
 
 
-	bool skippable(skippability direction, const infinint & amount) { return ref->skippable(direction, amount); };
-        bool skip(const infinint & pos) { if(ref == nullptr) throw SRC_BUG; return ref->skip(pos); };
-        bool skip_to_eof() { if(ref==nullptr) throw SRC_BUG; return ref->skip_to_eof(); };
-        bool skip_relative(S_I x) { if(ref == nullptr) throw SRC_BUG; return ref->skip_relative(x); };
-        infinint get_position() const { if(ref == nullptr) throw SRC_BUG; return ref->get_position(); };
+	virtual bool skippable(skippability direction, const infinint & amount) override { return ref->skippable(direction, amount); };
+        virtual bool skip(const infinint & pos) override { if(ref == nullptr) throw SRC_BUG; return ref->skip(pos); };
+        virtual bool skip_to_eof() override { if(ref==nullptr) throw SRC_BUG; return ref->skip_to_eof(); };
+        virtual bool skip_relative(S_I x) override { if(ref == nullptr) throw SRC_BUG; return ref->skip_relative(x); };
+        virtual infinint get_position() const override { if(ref == nullptr) throw SRC_BUG; return ref->get_position(); };
 
     protected:
-	void inherited_read_ahead(const infinint & amount) { ref->read_ahead(amount); };
-        U_I inherited_read(char *a, U_I size);
-        void inherited_write(const char *a, U_I size);
-	void inherited_sync_write() {}; // nothing to do
-	void inherited_flush_read() {}; // nothing to do
-	void inherited_terminate() {};  // nothing to do
+	virtual void inherited_read_ahead(const infinint & amount) override { ref->read_ahead(amount); };
+        virtual U_I inherited_read(char *a, U_I size) override;
+        virtual void inherited_write(const char *a, U_I size) override;
+	virtual void inherited_sync_write() override {}; // nothing to do
+	virtual void inherited_flush_read() override {}; // nothing to do
+	virtual void inherited_terminate() override {};  // nothing to do
 
     private:
         secu_string key;

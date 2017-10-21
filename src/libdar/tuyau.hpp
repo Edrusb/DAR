@@ -75,21 +75,21 @@ namespace libdar
 	void do_not_close_read_fd();
 
             // inherited from generic_file
-	bool skippable(skippability direction, const infinint & amount);
-        bool skip(const infinint & pos);
-        bool skip_to_eof();
-        bool skip_relative(signed int x);
-        infinint get_position() const { return position; };
+	virtual bool skippable(skippability direction, const infinint & amount) override;
+        virtual bool skip(const infinint & pos) override;
+        virtual bool skip_to_eof() override;
+        virtual bool skip_relative(signed int x) override;
+        virtual infinint get_position() const override { return position; };
 
 	bool has_next_to_read();
 
     protected:
-	void inherited_read_ahead(const infinint & amount) {}; // relying on the operating system
-        virtual U_I inherited_read(char *a, U_I size);
-        virtual void inherited_write(const char *a, U_I size);
-	void inherited_sync_write() {};
-	void inherited_flush_read() {};
-	void inherited_terminate();
+	virtual void inherited_read_ahead(const infinint & amount) override {}; // relying on the operating system
+        virtual U_I inherited_read(char *a, U_I size) override;
+        virtual void inherited_write(const char *a, U_I size) override;
+	virtual void inherited_sync_write() override {};
+	virtual void inherited_flush_read() override {};
+	virtual void inherited_terminate() override;
 
     private:
 	enum                //< anonymous structure for pipe_mode field

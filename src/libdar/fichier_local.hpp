@@ -81,23 +81,23 @@ namespace libdar
 
 
 	    /// set the ownership of the file
-	virtual void change_ownership(const std::string & user, const std::string & group);
+	virtual void change_ownership(const std::string & user, const std::string & group) override;
 
 	    /// change the permission of the file
-	virtual void change_permission(U_I perm);
+	virtual void change_permission(U_I perm) override;
 
 	    /// return the size of the file
-        infinint get_size() const;
+        virtual infinint get_size() const override;
 
 	    /// set posix_fadvise for the whole file
-	void fadvise(advise adv) const;
+	virtual void fadvise(advise adv) const override;
 
             // inherited from generic_file
-	bool skippable(skippability direction, const infinint & amount) { return true; };
-        bool skip(const infinint & pos);
-        bool skip_to_eof();
-        bool skip_relative(S_I x);
-        infinint get_position() const;
+	virtual bool skippable(skippability direction, const infinint & amount) override { return true; };
+        virtual bool skip(const infinint & pos) override;
+        virtual bool skip_to_eof() override;
+        virtual bool skip_relative(S_I x) override;
+        virtual infinint get_position() const override;
 
 	    /// provide the low level filedescriptor to the call and terminate()
 	    ///
@@ -106,14 +106,14 @@ namespace libdar
 
     protected :
 	    // inherited from generic_file grand-parent class
-	void inherited_read_ahead(const infinint & amount) {}; // nothing done, calling readahead(2) could be added in the future
-	void inherited_sync_write() { fsync(); };
-	void inherited_flush_read() {}; // nothing stored in transit in this object
-	void inherited_terminate() { if(adv == advise_dontneed) fadvise(adv); };
+	virtual void inherited_read_ahead(const infinint & amount) override {}; // nothing done, calling readahead(2) could be added in the future
+	virtual void inherited_sync_write() override { fsync(); };
+	virtual void inherited_flush_read() override {}; // nothing stored in transit in this object
+	virtual void inherited_terminate() override { if(adv == advise_dontneed) fadvise(adv); };
 
 	    // inherited from fichier_global parent class
-	U_I fichier_global_inherited_write(const char *a, U_I size);
-        bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message);
+	virtual U_I fichier_global_inherited_write(const char *a, U_I size) override;
+        virtual bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message) override;
 
     private :
         S_I filedesc;

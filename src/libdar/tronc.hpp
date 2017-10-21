@@ -75,15 +75,15 @@ namespace libdar
 	void modify() { modify(0); };
 
 	    /// inherited from generic_file
-	bool skippable(skippability direction, const infinint & amount);
+	virtual bool skippable(skippability direction, const infinint & amount) override;
 	    /// inherited from generic_file
-        bool skip(const infinint & pos);
+        virtual bool skip(const infinint & pos) override;
 	    /// inherited from generic_file
-        bool skip_to_eof();
+        virtual bool skip_to_eof() override;
 	    /// inherited from generic_file
-        bool skip_relative(S_I x);
+        virtual bool skip_relative(S_I x) override;
 	    /// inherited from generic_file
-        infinint get_position() const { return current; };
+        virtual infinint get_position() const override { return current; };
 
 	    /// when a tronc is used over a compressor, it becomes necessary to disable position check
 	    ///
@@ -97,14 +97,14 @@ namespace libdar
 
     protected :
 	    /// inherited from generic_file
-	void inherited_read_ahead(const infinint & amount);
+	virtual void inherited_read_ahead(const infinint & amount) override;
 	    /// inherited from generic_file
-        U_I inherited_read(char *a, U_I size);
+        virtual U_I inherited_read(char *a, U_I size) override;
 	    /// inherited from generic_file
-        void inherited_write(const char *a, U_I size);
-	void inherited_sync_write() { ref->sync_write(); }
-	void inherited_flush_read() {};
-	void inherited_terminate() {if(own_ref) ref->terminate(); };
+        virtual void inherited_write(const char *a, U_I size) override;
+	virtual void inherited_sync_write() override { ref->sync_write(); }
+	virtual void inherited_flush_read() override {};
+	virtual void inherited_terminate() override {if(own_ref) ref->terminate(); };
 
     private :
         infinint start;    //< offset in the global generic file to start at

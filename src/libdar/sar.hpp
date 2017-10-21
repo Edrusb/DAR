@@ -132,11 +132,11 @@ namespace libdar
         ~sar();
 
             // inherited from generic_file
-	bool skippable(skippability direction, const infinint & amount);
-        bool skip(const infinint &pos);
-        bool skip_to_eof();
-        bool skip_relative(S_I x);
-        infinint get_position() const;
+	virtual bool skippable(skippability direction, const infinint & amount) override;
+        virtual bool skip(const infinint &pos) override;
+        virtual bool skip_to_eof() override;
+        virtual bool skip_relative(S_I x) override;
+        virtual infinint get_position() const override;
 
             // informational routines
 	const slice_layout & get_slicing() const { return slicing; };
@@ -167,12 +167,12 @@ namespace libdar
 	const infinint & get_non_first_slice_header_size() const { return slicing.other_slice_header; };
 
     protected :
-	void inherited_read_ahead(const infinint & amount);
-        U_I inherited_read(char *a, U_I size);
-        void inherited_write(const char *a, U_I size);
-	void inherited_sync_write() {}; // nothing to do
-	void inherited_flush_read() {}; // nothing to do
-	void inherited_terminate();
+	virtual void inherited_read_ahead(const infinint & amount) override;
+        virtual U_I inherited_read(char *a, U_I size) override;
+        virtual void inherited_write(const char *a, U_I size) override;
+	virtual void inherited_sync_write() override {}; // nothing to do
+	virtual void inherited_flush_read() override {}; // nothing to do
+	virtual void inherited_terminate() override;
 
     private :
 	entrepot *entr;              //< where are stored slices

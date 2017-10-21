@@ -133,19 +133,19 @@ namespace libdar
 	    // thus incorrectly consider it as normal data. Such event should only occure upon archive corruption and will be detected
 	    // by checksum mechanisms.
 
-	bool skippable(skippability direction, const infinint & amount);
-	bool skip(const infinint & pos);
-	bool skip_to_eof();
-	bool skip_relative(S_I x);
-	infinint get_position() const;
+	virtual bool skippable(skippability direction, const infinint & amount) override;
+	virtual bool skip(const infinint & pos) override;
+	virtual bool skip_to_eof() override;
+	virtual bool skip_relative(S_I x) override;
+	virtual infinint get_position() const override;
 
     protected:
-	void inherited_read_ahead(const infinint & amount);
-	U_I inherited_read(char *a, U_I size);
-	void inherited_write(const char *a, U_I size);
-	void inherited_sync_write() { flush_write(); };
-	void inherited_flush_read() { flush_write(); clean_read(); };
-	void inherited_terminate() { flush_or_clean(); };
+	virtual void inherited_read_ahead(const infinint & amount) override;
+	virtual U_I inherited_read(char *a, U_I size) override;
+	virtual void inherited_write(const char *a, U_I size) override;
+	virtual void inherited_sync_write() override { flush_write(); };
+	virtual void inherited_flush_read() override { flush_write(); clean_read(); };
+	virtual void inherited_terminate() override { flush_or_clean(); };
 
 	void change_fixed_escape_sequence(unsigned char value) { fixed_sequence[0] = value; };
 	bool has_escaped_data_since_last_skip() const { return escaped_data_count_since_last_skip > 0; };

@@ -57,31 +57,31 @@ namespace libdar
 	~generic_to_global_file() = default;
 
 	    // virtual method inherited from generic_file
-	bool skippable(skippability direction, const infinint & amount) { return data->skippable(direction, amount); }
-	bool skip(const infinint & pos) { return data->skip(pos); };
-	bool skip_to_eof() { return data->skip_to_eof(); };
-	bool skip_relative(S_I x) { return data->skip_relative(x); };
-	infinint get_position() const { return data->get_position(); };
+	virtual bool skippable(skippability direction, const infinint & amount) override { return data->skippable(direction, amount); }
+	virtual bool skip(const infinint & pos) override { return data->skip(pos); };
+	virtual bool skip_to_eof() override { return data->skip_to_eof(); };
+	virtual bool skip_relative(S_I x) override { return data->skip_relative(x); };
+	virtual infinint get_position() const override { return data->get_position(); };
 
 
 	    // virtual method inherited from fichier_global
-	void change_ownership(const std::string & user, const std::string & group) {};
-	void change_permission(U_I perm) {};
-	infinint get_size() const { return data->get_position(); }; //< yes, this is the drawback of this template class convertion, get_size() does not return the real size of the object
-	void fadvise(advise adv) const {};
+	virtual void change_ownership(const std::string & user, const std::string & group) override {};
+	virtual void change_permission(U_I perm) override {};
+	virtual infinint get_size() const override { return data->get_position(); }; //< yes, this is the drawback of this template class convertion, get_size() does not return the real size of the object
+	virtual void fadvise(advise adv) const override {};
 
 
     protected:
 
 	    // virtual method inherited from generic_file
-	void inherited_read_ahead(const infinint & amount) {}; // no optimization can be done here, we rely on the OS here
-	void inherited_sync_write() {};
-	void inherited_flush_read() {};
-	void inherited_terminate() {};
+	virtual void inherited_read_ahead(const infinint & amount) override {}; // no optimization can be done here, we rely on the OS here
+	virtual void inherited_sync_write() override {};
+	virtual void inherited_flush_read() override {};
+	virtual void inherited_terminate() override {};
 
 	    // inherited from fichier_global
-	U_I fichier_global_inherited_write(const char *a, U_I size) { data->write(a, size); return size; };
-	bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message) { read = data->read(a, size); message = "THIS IS A BUG IN GENERIC_TO_GLOBAL_FILE, PLEASE REPORT TO THE MAINTAINER!"; return true; };
+	virtual U_I fichier_global_inherited_write(const char *a, U_I size) override { data->write(a, size); return size; };
+	virtual bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message) override { read = data->read(a, size); message = "THIS IS A BUG IN GENERIC_TO_GLOBAL_FILE, PLEASE REPORT TO THE MAINTAINER!"; return true; };
 
     private:
 	generic_file *data;

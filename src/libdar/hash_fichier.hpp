@@ -97,31 +97,31 @@ namespace libdar
 	~hash_fichier();
 
 	    // inherited from fichier_global
-	void change_ownership(const std::string & user, const std::string & group) { if(ref == nullptr || hash_ref == nullptr) throw SRC_BUG; ref->change_ownership(user, group); hash_ref->change_ownership(user, group); };
-	void change_permission(U_I perm) { if(ref == nullptr || hash_ref == nullptr) throw SRC_BUG; ref->change_permission(perm); hash_ref->change_permission(perm); };
-	infinint get_size() const { if(ref == nullptr) throw SRC_BUG; return ref->get_size(); };
-	void fadvise(advise adv) const { if(ref == nullptr) throw SRC_BUG; ref->fadvise(adv); };
+	virtual void change_ownership(const std::string & user, const std::string & group) override { if(ref == nullptr || hash_ref == nullptr) throw SRC_BUG; ref->change_ownership(user, group); hash_ref->change_ownership(user, group); };
+	virtual void change_permission(U_I perm) override { if(ref == nullptr || hash_ref == nullptr) throw SRC_BUG; ref->change_permission(perm); hash_ref->change_permission(perm); };
+	virtual infinint get_size() const override { if(ref == nullptr) throw SRC_BUG; return ref->get_size(); };
+	virtual void fadvise(advise adv) const override { if(ref == nullptr) throw SRC_BUG; ref->fadvise(adv); };
 
 	    // inherited from generic_file
-	bool skippable(skippability direction, const infinint & amount) { return false; };
-        bool skip(const infinint & pos) {if(ref == nullptr || pos != ref->get_position()) throw SRC_BUG; else return true; };
-        bool skip_to_eof() { if(get_mode() == gf_write_only) return true; else throw SRC_BUG; };
-        bool skip_relative(S_I x) { if(x != 0) throw SRC_BUG; else return true; };
-	infinint get_position() const { if(ref == nullptr) throw SRC_BUG; return ref->get_position(); };
+	virtual bool skippable(skippability direction, const infinint & amount) override { return false; };
+        virtual bool skip(const infinint & pos) override {if(ref == nullptr || pos != ref->get_position()) throw SRC_BUG; else return true; };
+        virtual bool skip_to_eof() override { if(get_mode() == gf_write_only) return true; else throw SRC_BUG; };
+        virtual bool skip_relative(S_I x) override { if(x != 0) throw SRC_BUG; else return true; };
+	virtual infinint get_position() const override { if(ref == nullptr) throw SRC_BUG; return ref->get_position(); };
 
 	    /// for debugging purposes only
 	void set_only_hash() { only_hash = true; };
 
     protected:
 	    // inherited from fichier_global
-	void inherited_read_ahead(const infinint & amount) { ref->read_ahead(amount); };
-	U_I fichier_global_inherited_write(const char *a, U_I size);
- 	bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message);
+	virtual void inherited_read_ahead(const infinint & amount) override { ref->read_ahead(amount); };
+	virtual U_I fichier_global_inherited_write(const char *a, U_I size) override;
+ 	virtual bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message) override;
 
 	    // inherited from generic_file
-	void inherited_sync_write() {};
-	void inherited_flush_read() {};
-	void inherited_terminate();
+	virtual void inherited_sync_write() override {};
+	virtual void inherited_flush_read() override {};
+	virtual void inherited_terminate() override;
 
     private:
 	fichier_global *ref;

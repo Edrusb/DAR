@@ -77,18 +77,18 @@ namespace libdar
 	tronconneuse & operator = (const tronconneuse & ref);
 
 	    /// destructor
-	virtual ~tronconneuse() { detruit(); }; // must not write pure virtual method from here, directly or not
+	virtual ~tronconneuse() override { detruit(); }; // must not write pure virtual method from here, directly or not
 
 	    /// inherited from generic_file
-	bool skippable(skippability direction, const infinint & amount);
+	virtual bool skippable(skippability direction, const infinint & amount) override;
 	    /// inherited from generic_file
-	bool skip(const infinint & pos);
+	virtual bool skip(const infinint & pos) override;
 	    /// inherited from generic_file
-	bool skip_to_eof();
+	virtual bool skip_to_eof() override;
 	    /// inherited from generic_file
-	bool skip_relative(S_I x);
+	virtual bool skip_relative(S_I x) override;
 	    /// inherited from generic_file
-	infinint get_position() const { if(is_terminated()) throw SRC_BUG; return current_position; };
+	virtual infinint get_position() const override { if(is_terminated()) throw SRC_BUG; return current_position; };
 
 	    /// in write_only mode indicate that end of file is reached
 
@@ -116,24 +116,24 @@ namespace libdar
 	    /// inherited from generic_file
 
 	    /// this protected inherited method is now private for inherited classes of tronconneuse
-	void inherited_read_ahead(const infinint & amount);
+	virtual void inherited_read_ahead(const infinint & amount) override;
 
 	    /// this protected inherited method is now private for inherited classes of tronconneuse
-	U_I inherited_read(char *a, U_I size);
+	virtual U_I inherited_read(char *a, U_I size) override;
 
 	    /// inherited from generic_file
 
 	    /// this protected inherited method is now private for inherited classes of tronconneuse
-	void inherited_write(const char *a, U_I size);
+	virtual void inherited_write(const char *a, U_I size) override;
 
 	    /// this protected inherited method is now private for inherited classes of tronconneuse
-	void inherited_sync_write() { flush(); };
+	virtual void inherited_sync_write() override { flush(); };
 
 	    /// this protected inherited method is now private for inherited classes of tronconneuse
-	void inherited_flush_read() { buf_byte_data = 0; };
+	virtual void inherited_flush_read() override { buf_byte_data = 0; };
 
 	    /// this protected inherited method is now private for inherited classes of tronconneuse
-	void inherited_terminate() {};
+	virtual void inherited_terminate() override {};
 
     protected:
 	    /// defines the size necessary to encrypt a given amount of clear data

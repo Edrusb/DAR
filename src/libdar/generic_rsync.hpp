@@ -96,19 +96,19 @@ namespace libdar
 
 	    // inherited from generic_file
 
-	bool skippable(skippability direction, const infinint & amount) { return false; };
-	bool skip(const infinint & pos) {if(pos != 0 || !initial) throw SRC_BUG; else return true; };
-	bool skip_to_eof() { throw SRC_BUG; };
-	bool skip_relative(S_I x) { if(x != 0) throw SRC_BUG; else return true; };
-	infinint get_position() const { return x_below->get_position(); };
+	virtual bool skippable(skippability direction, const infinint & amount) override { return false; };
+	virtual bool skip(const infinint & pos) override {if(pos != 0 || !initial) throw SRC_BUG; else return true; };
+	virtual bool skip_to_eof() override { throw SRC_BUG; };
+	virtual bool skip_relative(S_I x) override { if(x != 0) throw SRC_BUG; else return true; };
+	virtual infinint get_position() const override { return x_below->get_position(); };
 
     protected:
-	void inherited_read_ahead(const infinint & amount) {};
-	U_I inherited_read(char *a, U_I size);
-	void inherited_write(const char *a, U_I size);
-	void inherited_sync_write() {};
-	void inherited_flush_read() {};
-	void inherited_terminate();
+	virtual void inherited_read_ahead(const infinint & amount) override {};
+	virtual U_I inherited_read(char *a, U_I size) override;
+	virtual void inherited_write(const char *a, U_I size) override;
+	virtual void inherited_sync_write() override {};
+	virtual void inherited_flush_read() override {};
+	virtual void inherited_terminate() override;
 
     private:
 	enum { sign, delta, patch } status;

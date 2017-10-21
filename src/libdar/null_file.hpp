@@ -55,16 +55,16 @@ namespace libdar
 	null_file & operator = (const null_file & ref) = default;
 	~null_file() = default;
 
-	bool skippable(skippability direction, const infinint & amount) { return true; };
-        bool skip(const infinint &pos) { return true; };
-        bool skip_to_eof() { return true; };
-        bool skip_relative(signed int x) { return false; };
-        infinint get_position() const { return 0; };
+	virtual bool skippable(skippability direction, const infinint & amount) override { return true; };
+        virtual bool skip(const infinint &pos) override { return true; };
+        virtual bool skip_to_eof() override { return true; };
+        virtual bool skip_relative(signed int x) override { return false; };
+        virtual infinint get_position() const override { return 0; };
 
     protected :
-	void inherited_read_ahead(const infinint & amount) {};
+	virtual void inherited_read_ahead(const infinint & amount) override {};
 
-        U_I inherited_read(char *a, U_I size)
+        virtual U_I inherited_read(char *a, U_I size) override
 	{
 #ifdef MUTEX_WORKS
 	    check_self_cancellation();
@@ -72,16 +72,16 @@ namespace libdar
 	    return 0;
 	};
 
-        void inherited_write(const char *a, U_I size)
+        virtual void inherited_write(const char *a, U_I siz) override
 	{
 #ifdef MUTEX_WORKS
 	    check_self_cancellation();
 #endif
 	};
 
-	void inherited_sync_write() {};
-	void inherited_flush_read() {};
-	void inherited_terminate() {};
+	virtual void inherited_sync_write() override {};
+	virtual void inherited_flush_read() override {};
+	virtual void inherited_terminate() override {};
     };
 
 	/// @}

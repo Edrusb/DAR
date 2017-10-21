@@ -64,19 +64,19 @@ namespace libdar
 
 	    // inherited from fichier_global
 
-	virtual void change_ownership(const std::string & user, const std::string & group) { ptr->change_ownership(user, group); };
-	virtual void change_permission(U_I perm) { ptr->change_permission(perm); };
-        virtual infinint get_size() const { return ptr->get_size(); };
-	virtual void fadvise(advise adv) const { ptr->fadvise(adv); };
+	virtual void change_ownership(const std::string & user, const std::string & group) override { ptr->change_ownership(user, group); };
+	virtual void change_permission(U_I perm) override { ptr->change_permission(perm); };
+        virtual infinint get_size() const override { return ptr->get_size(); };
+	virtual void fadvise(advise adv) const override { ptr->fadvise(adv); };
 
 
 	    // inherited from generic_file grand-parent class
 
-	virtual bool skippable(skippability direction, const infinint & amount) { return buffer->skippable(direction, amount); };
-        virtual bool skip(const infinint & pos) { return buffer->skip(pos); };
-        virtual bool skip_to_eof() { return buffer->skip_to_eof(); };
-        virtual bool skip_relative(S_I x) { return buffer->skip_relative(x); };
-        virtual infinint get_position() const { return buffer->get_position(); };
+	virtual bool skippable(skippability direction, const infinint & amount) override { return buffer->skippable(direction, amount); };
+        virtual bool skip(const infinint & pos) override { return buffer->skip(pos); };
+        virtual bool skip_to_eof() override { return buffer->skip_to_eof(); };
+        virtual bool skip_relative(S_I x) override { return buffer->skip_relative(x); };
+        virtual infinint get_position() const override { return buffer->get_position(); };
 
 	    // expose cache specific methods
 
@@ -86,14 +86,14 @@ namespace libdar
 
 	    // inherited from fichier_global
 
-	virtual U_I fichier_global_inherited_write(const char *a, U_I size) { buffer->write(a, size); return size; };
-	virtual bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message) { read = buffer->read(a, size); return true; };
+	virtual U_I fichier_global_inherited_write(const char *a, U_I size) override { buffer->write(a, size); return size; };
+	virtual bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message) override { read = buffer->read(a, size); return true; };
 
 	    // inherted from generic_file
-	virtual void inherited_read_ahead(const infinint & amount) { buffer->read_ahead(amount); };
-	virtual void inherited_sync_write() { buffer->sync_write(); ptr->sync_write(); };
-	virtual void inherited_flush_read() { buffer->flush_read();  };
-	virtual void inherited_terminate() { buffer->terminate(); ptr->terminate(); };
+	virtual void inherited_read_ahead(const infinint & amount) override { buffer->read_ahead(amount); };
+	virtual void inherited_sync_write() override { buffer->sync_write(); ptr->sync_write(); };
+	virtual void inherited_flush_read() override { buffer->flush_read();  };
+	virtual void inherited_terminate() override { buffer->terminate(); ptr->terminate(); };
 
 
     private:

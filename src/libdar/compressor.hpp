@@ -85,19 +85,19 @@ namespace libdar
 
 
             // inherited from generic file
-	bool skippable(skippability direction, const infinint & amount) { return compressed->skippable(direction, amount); };
-        bool skip(const infinint & pos) { compr_flush_write(); compr_flush_read(); clean_read(); return compressed->skip(pos); };
-        bool skip_to_eof()  { compr_flush_write(); compr_flush_read(); clean_read(); return compressed->skip_to_eof(); };
-        bool skip_relative(S_I x) { compr_flush_write(); compr_flush_read(); clean_read(); return compressed->skip_relative(x); };
-        infinint get_position() const { return compressed->get_position(); };
+	virtual bool skippable(skippability direction, const infinint & amount) override { return compressed->skippable(direction, amount); };
+        virtual bool skip(const infinint & pos) override { compr_flush_write(); compr_flush_read(); clean_read(); return compressed->skip(pos); };
+        virtual bool skip_to_eof() override { compr_flush_write(); compr_flush_read(); clean_read(); return compressed->skip_to_eof(); };
+        virtual bool skip_relative(S_I x) override { compr_flush_write(); compr_flush_read(); clean_read(); return compressed->skip_relative(x); };
+        virtual infinint get_position() const override { return compressed->get_position(); };
 
     protected :
-	void inherited_read_ahead(const infinint & amount) { compressed->read_ahead(amount); };
-        U_I inherited_read(char *a, U_I size) { return (this->*read_ptr)(a, size); };
-        void inherited_write(const char *a, U_I size) { (this->*write_ptr)(a, size); };
-	void inherited_sync_write() { compr_flush_write(); };
-	void inherited_flush_read() { compr_flush_read(); clean_read(); };
-	void inherited_terminate() { local_terminate(); };
+	virtual void inherited_read_ahead(const infinint & amount) override { compressed->read_ahead(amount); };
+        virtual U_I inherited_read(char *a, U_I size) override { return (this->*read_ptr)(a, size); };
+        virtual void inherited_write(const char *a, U_I size) override { (this->*write_ptr)(a, size); };
+	virtual void inherited_sync_write() override { compr_flush_write(); };
+	virtual void inherited_flush_read() override { compr_flush_read(); clean_read(); };
+	virtual void inherited_terminate() override { local_terminate(); };
 
     private :
         struct xfer : public on_pool

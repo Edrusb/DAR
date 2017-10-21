@@ -89,37 +89,38 @@ namespace libdar
 	~fichier_libcurl() noexcept { detruit(); };
 
 	    /// change the permission of the file
-	virtual void change_permission(U_I perm);
+	virtual void change_permission(U_I perm) override;
 
 	    /// set the ownership of the file
-	virtual void change_ownership(const std::string & user, const std::string & group) { throw Efeature(gettext("user/group ownership not supported for this repository")); }; // not supported
+	virtual void change_ownership(const std::string & user, const std::string & group) override
+	{ throw Efeature(gettext("user/group ownership not supported for this repository")); }; // not supported
 
 	    /// return the size of the file
-        infinint get_size() const;
+        virtual infinint get_size() const override;
 
 	    /// set posix_fadvise for the whole file
-	virtual void fadvise(advise adv) const {}; // not supported and ignored
+	virtual void fadvise(advise adv) const override {}; // not supported and ignored
 
             // inherited from generic_file
-	bool skippable(skippability direction, const infinint & amount);
-        bool skip(const infinint & pos);
-        bool skip_to_eof();
-        bool skip_relative(S_I x);
-        infinint get_position() const { return current_offset; };
+	virtual bool skippable(skippability direction, const infinint & amount) override;
+        virtual bool skip(const infinint & pos) override;
+        virtual bool skip_to_eof() override;
+        virtual bool skip_relative(S_I x) override;
+        virtual infinint get_position() const override { return current_offset; };
 
     protected:
 	    // inherited from generic_file grand-parent class
-	void inherited_read_ahead(const infinint & amount);
-	void inherited_sync_write();
-	void inherited_flush_read();
-	void inherited_terminate();
+	virtual void inherited_read_ahead(const infinint & amount) override;
+	virtual void inherited_sync_write() override;
+	virtual void inherited_flush_read() override;
+	virtual void inherited_terminate() override;
 
 	    // inherited from fichier_global parent class
-	U_I fichier_global_inherited_write(const char *a, U_I size);
-        bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message);
+	virtual U_I fichier_global_inherited_write(const char *a, U_I size) override;
+        virtual bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message);
 
 	    // inherited from thread
-	void inherited_run();
+	virtual void inherited_run() override;
 
     private:
 	static const U_I tampon_size = CURL_MAX_WRITE_SIZE;

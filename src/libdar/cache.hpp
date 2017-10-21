@@ -62,20 +62,20 @@ namespace libdar
 
 	    // inherited from generic_file
 
-	bool skippable(skippability direction, const infinint & amount);
-	bool skip(const infinint & pos);
-	bool skip_to_eof();
-	bool skip_relative(S_I x);
-	infinint get_position() const { return buffer_offset + next; };
+	virtual bool skippable(skippability direction, const infinint & amount) override;
+	virtual bool skip(const infinint & pos) override;
+	virtual bool skip_to_eof() override;
+	virtual bool skip_relative(S_I x) override;
+	virtual infinint get_position() const override { return buffer_offset + next; };
 
     protected:
 	    // inherited from generic_file
-	void inherited_read_ahead(const infinint & amount);
-	U_I inherited_read(char *a, U_I size);
-	void inherited_write(const char *a, U_I size);
-	void inherited_sync_write() { flush_write(); };
-	void inherited_flush_read() { flush_write(); clear_buffer(); };
-	void inherited_terminate() { flush_write(); };
+	virtual void inherited_read_ahead(const infinint & amount) override;
+	virtual U_I inherited_read(char *a, U_I size) override;
+	virtual void inherited_write(const char *a, U_I size) override;
+	virtual void inherited_sync_write() override { flush_write(); };
+	virtual void inherited_flush_read() override { flush_write(); clear_buffer(); };
+	virtual void inherited_terminate() override { flush_write(); };
 
     private:
 	generic_file *ref;                //< underlying file, (not owned by "this', not to be delete by "this")

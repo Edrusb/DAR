@@ -133,8 +133,8 @@ namespace libdar
 	bool disk_full; //< whether user refused to continue due to disk being full
 
 	    // inherited from generic_file class and relocated as private methods
-	void inherited_write(const char *a, U_I size);
-	U_I inherited_read(char *a, U_I size);
+	virtual void inherited_write(const char *a, U_I size) override;
+	virtual U_I inherited_read(char *a, U_I size) override;
     };
 
 

@@ -97,11 +97,11 @@ namespace libdar
 	    /// destructor
 	~trivial_sar();
 
-	bool skippable(skippability direction, const infinint & amount) { return reference->skippable(direction, amount); };
-        bool skip(const infinint & pos);
-        bool skip_to_eof() { if(is_terminated()) throw SRC_BUG; return reference->skip_to_eof(); };
-        bool skip_relative(S_I x);
-        infinint get_position() const { return cur_pos; };
+	virtual bool skippable(skippability direction, const infinint & amount) override { return reference->skippable(direction, amount); };
+        virtual bool skip(const infinint & pos) override;
+        virtual bool skip_to_eof() override { if(is_terminated()) throw SRC_BUG; return reference->skip_to_eof(); };
+        virtual bool skip_relative(S_I x) override;
+        virtual infinint get_position() const override { return cur_pos; };
 
 	    // contextual inherited method
 	bool is_an_old_start_end_archive() const { return old_sar; };
@@ -117,12 +117,12 @@ namespace libdar
 	void enable_natural_destruction() { natural_destruction = true; };
 
     protected:
-	void inherited_read_ahead(const infinint & amount) { reference->read_ahead(amount); };
-        U_I inherited_read(char *a, U_I size);
-        void inherited_write(const char *a, U_I size);
-	void inherited_sync_write() { if(reference != nullptr) reference->sync_write(); };
-	void inherited_flush_read() { if(reference != nullptr) reference->flush_read(); };
-	void inherited_terminate();
+	virtual void inherited_read_ahead(const infinint & amount) override { reference->read_ahead(amount); };
+        virtual U_I inherited_read(char *a, U_I size) override;
+        virtual void inherited_write(const char *a, U_I size) override;
+	virtual void inherited_sync_write() override { if(reference != nullptr) reference->sync_write(); };
+	virtual void inherited_flush_read() override { if(reference != nullptr) reference->flush_read(); };
+	virtual void inherited_terminate() override;
 
     private:
         generic_file *reference;  //< points to the underlying data, owned by "this"

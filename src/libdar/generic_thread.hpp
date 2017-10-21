@@ -66,25 +66,25 @@ namespace libdar
 
 	    // inherited methods from generic_file
 
-	virtual bool skippable(skippability direction, const infinint & amount);
-	virtual bool skip(const infinint & pos);
-	virtual bool skip_to_eof();
-	virtual bool skip_relative(S_I x);
-	virtual infinint get_position() const;
+	virtual bool skippable(skippability direction, const infinint & amount) override;
+	virtual bool skip(const infinint & pos) override;
+	virtual bool skip_to_eof() override;
+	virtual bool skip_relative(S_I x) override;
+	virtual infinint get_position() const  override;
 
     protected:
 	    // inherited from generic_file
-	virtual void inherited_read_ahead(const infinint & amount);
-	virtual U_I inherited_read(char *a, U_I size);
-	virtual void inherited_write(const char *a, U_I size);
+	virtual void inherited_read_ahead(const infinint & amount) override;
+	virtual U_I inherited_read(char *a, U_I size) override;
+	virtual void inherited_write(const char *a, U_I size) override;
 
 	    /// generic_file inherited method to sync all pending writes
 	    ///
 	    /// \note no data in transit in this object so we should not do anything,
 	    /// however for performance propagating the order to slave_thread
-	virtual void inherited_sync_write();
-	virtual void inherited_flush_read();
-	virtual void inherited_terminate();
+	virtual void inherited_sync_write() override;
+	virtual void inherited_flush_read() override;
+	virtual void inherited_terminate() override;
 
 
     private:

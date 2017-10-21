@@ -61,23 +61,23 @@ namespace libdar
 
 
 	    // virtual method inherited from generic_file
-	bool skippable(skippability direction, const infinint & amount) { return true; };
-	bool skip(const infinint & pos);
-	bool skip_to_eof();
-	bool skip_relative(S_I x);
-	infinint get_position() const { if(is_terminated()) throw SRC_BUG; return position; };
+	virtual bool skippable(skippability direction, const infinint & amount) override { return true; };
+	virtual bool skip(const infinint & pos) override;
+	virtual bool skip_to_eof() override;
+	virtual bool skip_relative(S_I x) override;
+	virtual infinint get_position() const override { if(is_terminated()) throw SRC_BUG; return position; };
 
 	const secu_string & get_contents() const { return data; };
 
     protected:
 
 	    // virtual method inherited from generic_file
-	void inherited_read_ahead(const infinint & amount) {};
-	U_I inherited_read(char *a, U_I size);
-	void inherited_write(const char *a, U_I size);
-	void inherited_sync_write() {};
-	void inherited_flush_read() {};
-	void inherited_terminate() {};
+	virtual void inherited_read_ahead(const infinint & amount) override {};
+	virtual U_I inherited_read(char *a, U_I size) override;
+	virtual void inherited_write(const char *a, U_I size) override;
+	virtual void inherited_sync_write() override {};
+	virtual void inherited_flush_read() override {};
+	virtual void inherited_terminate() override {};
 
     private:
 	secu_string data;

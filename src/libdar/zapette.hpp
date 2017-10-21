@@ -68,11 +68,11 @@ namespace libdar
         ~zapette();
 
             // inherited methods from generic_file
-	bool skippable(skippability direction, const infinint & amount) { return true; };
-        bool skip(const infinint &pos);
-        bool skip_to_eof() { if(is_terminated()) throw SRC_BUG; position = file_size; return true; };
-        bool skip_relative(S_I x);
-        infinint get_position() const { if(is_terminated()) throw SRC_BUG; return position; };
+	virtual bool skippable(skippability direction, const infinint & amount) override { return true; };
+        virtual bool skip(const infinint &pos) override;
+        virtual bool skip_to_eof() override { if(is_terminated()) throw SRC_BUG; position = file_size; return true; };
+        virtual bool skip_relative(S_I x) override;
+        virtual infinint get_position() const override { if(is_terminated()) throw SRC_BUG; return position; };
 
 	    // overwritten inherited methods from contextual
         void set_info_status(const std::string & s);
@@ -90,12 +90,12 @@ namespace libdar
 	infinint get_non_first_slice_header_size() const;
 
     protected:
-	void inherited_read_ahead(const infinint & amount) {}; // optimization will be done when zapette will use the messaging_encode/decode exchange format
-        U_I inherited_read(char *a, U_I size);
-        void inherited_write(const char *a, U_I size);
-	void inherited_sync_write() {};
-	void inherited_flush_read() {};
-	void inherited_terminate();
+	virtual void inherited_read_ahead(const infinint & amount) {}; // optimization will be done when zapette will use the messaging_encode/decode exchange format
+        virtual U_I inherited_read(char *a, U_I size) override;
+        virtual void inherited_write(const char *a, U_I size) override;
+	virtual void inherited_sync_write() override {};
+	virtual void inherited_flush_read() override {};
+	virtual void inherited_terminate() override;
 
     private:
         generic_file *in, *out;
