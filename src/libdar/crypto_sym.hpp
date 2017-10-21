@@ -84,14 +84,14 @@ namespace libdar
 	static bool is_a_strong_password(crypto_algo algo, const secu_string & password);
 
     protected:
-	U_32 encrypted_block_size_for(U_32 clear_block_size);
-	U_32 clear_block_allocated_size_for(U_32 clear_block_size);
-	U_32 encrypt_data(const infinint & block_num,
+	virtual U_32 encrypted_block_size_for(U_32 clear_block_size) override;
+	virtual U_32 clear_block_allocated_size_for(U_32 clear_block_size) override;
+	virtual U_32 encrypt_data(const infinint & block_num,
 			  const char *clear_buf, const U_32 clear_size, const U_32 clear_allocated,
-			  char *crypt_buf, U_32 crypt_size);
-	U_32 decrypt_data(const infinint & block_num,
+			  char *crypt_buf, U_32 crypt_size) override;
+	virtual U_32 decrypt_data(const infinint & block_num,
 			  const char *crypt_buf, const U_32 crypt_size,
-			  char *clear_buf, U_32 clear_size);
+			  char *clear_buf, U_32 clear_size) override;
 
     private:
 #if CRYPTO_AVAILABLE
