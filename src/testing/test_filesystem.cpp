@@ -67,7 +67,9 @@ extern "C"
 #include <iostream>
 
 #include "libdar.hpp"
-#include "filesystem.hpp"
+#include "filesystem_backup.hpp"
+#include "filesystem_restore.hpp"
+#include "filesystem_diff.hpp"
 #include "user_interaction.hpp"
 #include "integers.hpp"
 #include "shell_interaction.hpp"
