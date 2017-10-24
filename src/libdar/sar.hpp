@@ -150,13 +150,13 @@ namespace libdar
 	void enable_natural_destruction() { natural_destruction = true; };
 
 	    // true if sar's header is from an old archive format (<= "07")
-	bool is_an_old_start_end_archive() const { return slicing.older_sar_than_v8; };
+	virtual bool is_an_old_start_end_archive() const override { return slicing.older_sar_than_v8; };
 
 	    // return the internal_name used to link slices toghether
 	const label & get_internal_name_used() const { return of_internal_name; };
 
 	    // return the data_name used to link slices toghether
-	const label & get_data_name() const { return of_data_name; };
+	virtual const label & get_data_name() const override { return of_data_name; };
 
 	const entrepot *get_entrepot() const { return entr; };
 

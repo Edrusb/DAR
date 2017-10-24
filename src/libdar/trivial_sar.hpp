@@ -104,8 +104,8 @@ namespace libdar
         virtual infinint get_position() const override { return cur_pos; };
 
 	    // contextual inherited method
-	bool is_an_old_start_end_archive() const { return old_sar; };
-	const label & get_data_name() const { return of_data_name; };
+	virtual bool is_an_old_start_end_archive() const override { return old_sar; };
+	virtual const label & get_data_name() const override { return of_data_name; };
 
 	    /// size of the slice header
 	const infinint & get_slice_header_size() const { return offset; };

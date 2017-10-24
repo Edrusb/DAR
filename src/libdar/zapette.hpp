@@ -75,9 +75,9 @@ namespace libdar
         virtual infinint get_position() const override { if(is_terminated()) throw SRC_BUG; return position; };
 
 	    // overwritten inherited methods from contextual
-        void set_info_status(const std::string & s);
-	bool is_an_old_start_end_archive() const;
-	const label & get_data_name() const;
+        virtual void set_info_status(const std::string & s) override;
+	virtual bool is_an_old_start_end_archive() const override;
+	virtual const label & get_data_name() const override;
 
 	    /// get the first slice header
 	    ///
