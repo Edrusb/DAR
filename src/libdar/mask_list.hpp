@@ -66,15 +66,15 @@ namespace libdar
 	~mask_list() = default;
 
             /// inherited from the mask class
-        bool is_covered(const std::string & expression) const;
+        virtual bool is_covered(const std::string & expression) const override;
             /// inherited from the mask class
-        mask *clone() const { return new (get_pool()) mask_list(*this); };
+        virtual mask *clone() const override { return new (get_pool()) mask_list(*this); };
 
             /// routing only necessary for doing some testing
         U_I size() const { return contenu.size(); };
 
 	    /// output the listing content
-	std::string dump(const std::string & prefix) const;
+	virtual std::string dump(const std::string & prefix) const override;
 
     private:
 
