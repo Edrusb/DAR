@@ -92,17 +92,17 @@ namespace libdar
 	    /// normal data and hole (number of zeroed bytes to skip to reach next normal data)
 	    /// leading to only restore the data not equal to zero (passed a certain
 	    /// amount of contiguous zeroed bytes).
-	void copy_to(generic_file & ref) { crc *tmp = nullptr; copy_to(ref, 0, tmp); if(tmp != nullptr) throw SRC_BUG; };
+	virtual void copy_to(generic_file & ref) override { crc *tmp = nullptr; copy_to(ref, 0, tmp); if(tmp != nullptr) throw SRC_BUG; };
 
 	    /// same as sparse_file::copy_to(generic_file) just above but here with crc, this also overwrite the corresponding class generic_file method, as we need a specific implementation here
-	void copy_to(generic_file & ref, const infinint & crc_size, crc * & value);
+	virtual void copy_to(generic_file & ref, const infinint & crc_size, crc * & value) override;
 
 	    // indirectly inherited from generic_file
-	bool skippable(skippability direction, const infinint & amount) { return false; };
-	bool skip(const infinint & pos) { if(pos != offset) throw Efeature("skip in sparse_file"); else return true; };
-	bool skip_to_eof() { throw Efeature("skip in sparse_file"); };
-	bool skip_relative(S_I x)  { if(x != 0) throw Efeature("skip in sparse_file"); return true; };
-	infinint get_position() const;
+	virtual bool skippable(skippability direction, const infinint & amount) override { return false; };
+	virtual bool skip(const infinint & pos) override { if(pos != offset) throw Efeature("skip in sparse_file"); else return true; };
+	virtual bool skip_to_eof() override { throw Efeature("skip in sparse_file"); };
+	virtual bool skip_relative(S_I x) override { if(x != 0) throw Efeature("skip in sparse_file"); return true; };
+	virtual infinint get_position() const override;
 
     protected:
 
@@ -115,9 +115,9 @@ namespace libdar
 
 	    // methods from generic_file redefined as protected
 
-	U_I inherited_read(char *a, U_I size);
-	void inherited_write(const char *a, U_I size);
-	void inherited_sync_write();
+	virtual U_I inherited_read(char *a, U_I size) override;
+	virtual void inherited_write(const char *a, U_I size) override;
+	virtual void inherited_sync_write() override;
 	    // inherited_flush_read() kept as is from the escape class
 	    // inherited_terminate() kept as is from the escape class
 
