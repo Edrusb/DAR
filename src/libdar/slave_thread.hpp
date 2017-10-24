@@ -63,7 +63,7 @@ namespace libdar
 	bool wake_me_up() const { if(wake_me) { const_cast<slave_thread *>(this)->wake_me = false; return true; } else return false; };
 
     protected:
-	virtual void inherited_run();
+	virtual void inherited_run() override;
 
     private:
 	generic_file *data;
