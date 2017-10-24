@@ -68,7 +68,7 @@ namespace libdar
 #endif
 
 	    /// inherited from mem_manager
-	virtual void push_to_release_list(mem_allocator *ref);
+	virtual void push_to_release_list(mem_allocator *ref) override;
 
     private:
 	static const U_I average_table_size = 10240;
