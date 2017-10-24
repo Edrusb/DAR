@@ -65,12 +65,12 @@ namespace libdar
 	std::string dump() const;
 
 	    /// inherited from allocator, allow an allocated memory block to be recycled as available memory block
-	virtual void release(void *ptr);
+	virtual void release(void *ptr) override;
 
 #ifdef LIBDAR_DEBUG_MEMORY
-	virtual U_I max_percent_full() const { return (max_available_blocks - min_avail_reached)*100/max_available_blocks; };
+	virtual U_I max_percent_full() const override { return (max_available_blocks - min_avail_reached)*100/max_available_blocks; };
 #else
-	virtual U_I max_percent_full() const { return 0; };
+	virtual U_I max_percent_full() const override { return 0; };
 #endif
 
     private:
