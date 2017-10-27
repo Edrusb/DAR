@@ -37,7 +37,7 @@ extern "C"
 #include "../my_config.h"
 #include <iostream>
 
-#include "user_interaction.hpp"
+#include "user_interaction_callback.hpp"
 
 using namespace std;
 using namespace libdar;

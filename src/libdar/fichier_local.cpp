@@ -79,6 +79,7 @@ extern "C"
 #include "int_tools.hpp"
 #include "tools.hpp"
 #include "fichier_local.hpp"
+#include "user_interaction_blind.hpp"
 
 #include <iostream>
 #include <sstream>

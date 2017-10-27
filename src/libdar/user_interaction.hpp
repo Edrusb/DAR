@@ -20,25 +20,9 @@
 /*********************************************************************/
 
     /// \file user_interaction.hpp
-    /// \brief defines the interaction between libdar and the user.
+    /// \brief defines the interaction interface between libdar and users.
     /// \ingroup API
     ///
-    /// Three classes are defined
-    /// - user_interaction is the root class that you can use to make your own classes
-    /// - user_interaction_callback is a specialized inherited class which is implements
-    ///   user interaction thanks to callback functions
-    /// - user_interaction_blind provides fully usable objects that do not show anything
-    ///   and always assume a negative answer from the user
-    /// .
-
-///////////////////////////////////////////////////////////////////////
-// IMPORTANT : THIS FILE MUST ALWAYS BE INCLUDE AFTER infinint.hpp   //
-//             (and infinint.hpp must be included too, always)       //
-///////////////////////////////////////////////////////////////////////
-#include "infinint.hpp"
-///////////////////////////////////////////////////////////////////////
-
-
 
 #ifndef USER_INTERACTION_HPP
 #define USER_INTERACTION_HPP
@@ -50,14 +34,13 @@
 #include "integers.hpp"
 #include "secu_string.hpp"
 #include "on_pool.hpp"
+#include "infinint.hpp"
 
 namespace libdar
 {
 
 	/// \addtogroup API
 	/// @{
-
-
 
 	/// This is a pure virtual class that is used by libdar when interaction with the user is required.
 
@@ -331,212 +314,6 @@ namespace libdar
 
     };
 
-
-	/// full implemented class for user_interaction based on callback functions.
-
-	//! this class is an inherited class of user_interaction it is used by
-	//! dar command line programs, but you can use it if you wish.
-	//! \ingroup API
-    class user_interaction_callback : public user_interaction
-    {
-    public:
-
-	    /// constructor which receive the callback functions.
-
-	    //! \param[in] x_warning_callback is used by warning() method
-	    //! \param[in] x_answer_callback is used by the pause() method
-	    //! \param[in] x_string_callback is used by get_string() method
-	    //! \param[in] x_secu_string_callback is used by get_secu_string() method
-	    //! \param[in] context_value will be passed as last argument of callbacks when
-	    //! called from this object.
-	    //! \note The context argument of each callback is set with the context_value given
-	    //! in the user_interaction_callback object constructor. The value can
-	    //! can be any arbitrary value (nullptr is valid), and can be used as you wish.
-	    //! Note that the listing callback is not defined here, but thanks to a specific method
-	user_interaction_callback(void (*x_warning_callback)(const std::string &x, void *context),
-				  bool (*x_answer_callback)(const std::string &x, void *context),
-				  std::string (*x_string_callback)(const std::string &x, bool echo, void *context),
-				  secu_string (*x_secu_string_callback)(const std::string &x, bool echo, void *context),
-				  void *context_value);
-	user_interaction_callback(const user_interaction_callback & ref) = default;
-	user_interaction_callback & operator = (const user_interaction_callback & ref) = default;
-	~user_interaction_callback() = default;
-
-	    /// overwritting method from parent class.
-       	void pause(const std::string & message);
-	    /// overwritting method from parent class.
-	std::string get_string(const std::string & message, bool echo);
-	    /// overwritting method from parent class.
-	secu_string get_secu_string(const std::string & message, bool echo);
-	    /// overwritting method from parent class.
-        void listing(const std::string & flag,
-		     const std::string & perm,
-		     const std::string & uid,
-		     const std::string & gid,
-		     const std::string & size,
-		     const std::string & date,
-		     const std::string & filename,
-		     bool is_dir,
-		     bool has_children);
-
-	    /// overwritting method from parent class
-	void dar_manager_show_files(const std::string & filename,
-				    bool available_data,
-				    bool available_ea);
-
-	    /// overwritting method from parent class
-	void dar_manager_contents(U_I number,
-				  const std::string & chemin,
-				  const std::string & archive_name);
-
-	    /// overwritting method from parent class
-	void dar_manager_statistics(U_I number,
-				    const infinint & data_count,
-				    const infinint & total_data,
-				    const infinint & ea_count,
-				    const infinint & total_ea);
-
-	    /// overwritting method from parent class
-	void dar_manager_show_version(U_I number,
-				      const std::string & data_date,
-				      const std::string & data_presence,
-				      const std::string & ea_date,
-				      const std::string & ea_presence);
-
-	    /// You can set a listing callback thanks to this method.
-
-	    //! If set, when file listing will this callback function will
-	    //! be used instead of the x_warning_callback given as argument
-	    //! of the constructor.
-        void set_listing_callback(void (*callback)(const std::string & flag,
-						   const std::string & perm,
-						   const std::string & uid,
-						   const std::string & gid,
-						   const std::string & size,
-						   const std::string & date,
-						   const std::string & filename,
-						   bool is_dir,
-						   bool has_children,
-						   void *context))
-	{
-	    tar_listing_callback = callback;
-	    set_use_listing(true); // this is to inform libdar to use listing()
-	};
-
-	    // You can set a dar_manager_show_files callback thanks to this method
-
-	void set_dar_manager_show_files_callback(void (*callback)(const std::string & filename,
-								  bool available_data,
-								  bool available_ea,
-								  void *context))
-	{
-	    dar_manager_show_files_callback = callback;
-	    set_use_dar_manager_show_files(true); // this is to inform libdar to use the dar_manager_show_files() method
-	};
-
-	void set_dar_manager_contents_callback(void (*callback)(U_I number,
-								const std::string & chemin,
-								const std::string & archive_name,
-								void *context))
-	{
-	    dar_manager_contents_callback = callback;
-	    set_use_dar_manager_contents(true); // this is to inform libdar to use the dar_manager_contents() method
-	};
-
-	void set_dar_manager_statistics_callback(void (*callback)(U_I number,
-								  const infinint & data_count,
-								  const infinint & total_data,
-								  const infinint & ea_count,
-								  const infinint & total_ea,
-								  void *context))
-	{
-	    dar_manager_statistics_callback = callback;
-	    set_use_dar_manager_statistics(true); // this is to inform libdar to use the dar_manager_statistics() method
-	};
-
-	void set_dar_manager_show_version_callback(void (*callback)(U_I number,
-								    const std::string & data_date,
-								    const std::string & data_presence,
-								    const std::string & ea_date,
-								    const std::string & ea_presence,
-								    void *context))
-	{
-	    dar_manager_show_version_callback = callback;
-	    set_use_dar_manager_show_version(true);  // this is to inform libdar to use the dar_manager_show_version() method
-	};
-
-
-	    /// overwritting method from parent class.
-	virtual user_interaction *clone() const;
-
-    protected:
-	    /// change the context value of the object that will be given to callback functions
-	void change_context_value(void *new_value) { context_val = new_value; };
-
-	    /// overwritting method from parent class.
-	void inherited_warning(const std::string & message);
-
-    private:
-	void (*warning_callback)(const std::string & x, void *context);  // pointer to function
-	bool (*answer_callback)(const std::string & x, void *context);   // pointer to function
-	std::string (*string_callback)(const std::string & x, bool echo, void *context); // pointer to function
-	secu_string (*secu_string_callback)(const std::string & x, bool echo, void *context); // pointer to function
-	void (*tar_listing_callback)(const std::string & flags,
-				     const std::string & perm,
-				     const std::string & uid,
-				     const std::string & gid,
-				     const std::string & size,
-				     const std::string & date,
-				     const std::string & filename,
-				     bool is_dir,
-				     bool has_children,
-				     void *context);
-	void (*dar_manager_show_files_callback)(const std::string & filename,
-						bool available_data,
-						bool available_ea,
-						void *context);
-	void (*dar_manager_contents_callback)(U_I number,
-					      const std::string & chemin,
-					      const std::string & archive_name,
-					      void *context);
-	void (*dar_manager_statistics_callback)(U_I number,
-						const infinint & data_count,
-						const infinint & total_data,
-						const infinint & ea_count,
-						const infinint & total_ea,
-						void *context);
-	void (*dar_manager_show_version_callback)(U_I number,
-						  const std::string & data_date,
-						  const std::string & data_presence,
-						  const std::string & ea_date,
-						  const std::string & ea_presence,
-						  void *context);
-
-	void *context_val;
-    };
-
-
-	/// full implementation class for user_interaction, which shows nothing and assumes answer "no" to any question
-
-    class user_interaction_blind : public user_interaction
-    {
-    public:
-	user_interaction_blind() = default;
-	user_interaction_blind(const user_interaction_blind & ref) = default;
-	user_interaction_blind & operator = (const user_interaction_blind & ref) = default;
-	~user_interaction_blind() = default;
-
-	bool pause2(const std::string & message) { return false; };
-
-	std::string get_string(const std::string & message, bool echo) { return "user_interaction_blind, is blindly answering no"; };
-	secu_string get_secu_string(const std::string & message, bool echo) { return secu_string(); };
-
-	user_interaction *clone() const { user_interaction *ret = new (get_pool()) user_interaction_blind(); if(ret == nullptr) throw Ememory("user_interaction_blind::clone"); return ret; };
-
-    protected:
-	void inherited_warning(const std::string & message) {}; // do not display any warning, this is "bind user_interaction" !
-
-    };
 
 	/// @}
 

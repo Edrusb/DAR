@@ -45,6 +45,7 @@ extern "C"
 #include "cygwin_adapt.hpp"
 #include "tools.hpp"
 #include "fichier_local.hpp"
+#include "user_interaction_blind.hpp"
 
 using namespace std;
 

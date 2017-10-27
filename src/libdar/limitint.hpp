@@ -70,7 +70,6 @@ namespace libdar
 
 
     class generic_file;
-    class user_interaction;
 
 	/// limitint template class
 	/// \ingroup Private
@@ -242,7 +241,6 @@ namespace libdar
     ///////////////////////////////////////////////////////////////////////
 
 #include "generic_file.hpp"
-#include "user_interaction.hpp"
 
 namespace libdar
 {

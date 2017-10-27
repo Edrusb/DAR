@@ -33,6 +33,7 @@
 #include "infinint.hpp"
 #include "on_pool.hpp"
 #include "datetime.hpp"
+#include "user_interaction.hpp"
 
 namespace libdar
 {

@@ -62,7 +62,6 @@ extern "C"
 #include "thread_cancellation.hpp"
 #include "label.hpp"
 #include "crc.hpp"
-#include "user_interaction.hpp"
 #include "on_pool.hpp"
 
 #include <string>

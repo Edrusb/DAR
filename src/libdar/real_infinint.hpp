@@ -50,7 +50,6 @@ extern "C"
 namespace libdar
 {
     class generic_file;
-    class user_interaction;
 
 	/// the arbitrary large positive integer class
 

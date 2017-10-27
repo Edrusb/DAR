@@ -28,6 +28,7 @@
 
 #include "generic_file.hpp"
 #include "storage.hpp"
+#include "secu_string.hpp"
 
 namespace libdar
 {
