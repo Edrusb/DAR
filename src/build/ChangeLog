@@ -1,6 +1,6 @@
 from 2.5.12 to 2.5.13
 - added -az option to automatically nullify negative dates returned from
-  the system
+  the system in the archive under creation (filesystem is not modified)
 - included the birthtime (HFS FSA) into the negative dates handling
 - modified behavior: dar now fails upon unknown option instead of warning
   the option is unknown and thus ignored
