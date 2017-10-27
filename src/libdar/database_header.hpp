@@ -60,6 +60,7 @@ namespace libdar
 	/// \param[in] pool memory pool to use or nullptr for default memory allocation
 	/// \param[in] filename is the filename to read from
 	/// \param[out] db_version version of the database
+	/// \param[out] algozip compression algorithm used in the database
 	/// \return the generic_file where the database header has been put
     extern generic_file *database_header_open(user_interaction & dialog,
 					      memory_pool *pool,
