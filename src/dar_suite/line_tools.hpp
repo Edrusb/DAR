@@ -46,7 +46,7 @@ public:
     argc_argv(S_I size = 0);
     argc_argv(const argc_argv & ref) { throw Efeature("argc_argv"); };
     argc_argv & operator = (const argc_argv & ref) { throw Efeature("argc_argv"); };
-    ~argc_argv();
+    ~argc_argv() throw(Ebug);
 
     void resize(S_I size);
     void set_arg(const std::string & arg, S_I index);
