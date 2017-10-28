@@ -3,6 +3,12 @@ version 2.6.0
 Many Thanks Gulikoza who helped troubleshooting around the poorly
 documented librsync library.
 
+version 2.5.13
+--------------
+Thanks to Volker Wysk for bug report, thanks to Neil Darlow for help in
+dar-support mailing list and to Ralph Slooten for point me to missing
+email I missed after having been unsubscribed from the list.
+
 version 2.5.12
 --------------
 Thanks once again to Andrew Loftus for help solving a bug, complex and
