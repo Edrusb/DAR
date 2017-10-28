@@ -641,6 +641,7 @@ namespace libdar
 				      ui,
 				      target.c_str(),
 				      "birthtime",
+				      !auto_zeroing_neg_dates,
 				      auto_zeroing_neg_dates);
 	    datetime birthtime = datetime(tmp.st_birthtim.tv_sec, tmp.st_birthtim.tv_nsec/1000, datetime::tu_microsecond);
 	    if(birthtime.is_null()) // assuming an error avoids getting time that way
@@ -650,6 +651,7 @@ namespace libdar
 				      ui,
 				      target.c_str(),
 				      "birthtime",
+				      !auto_zeroing_neg_dates,
 				      auto_zeroing_neg_dates);
 	    datetime birthtime = datetime(tmp.st_birthtime, 0, datetime::tu_second);
 #endif
