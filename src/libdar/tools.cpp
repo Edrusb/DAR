@@ -1644,7 +1644,7 @@ namespace libdar
         ret = utime(chemin.c_str() , &temps);
 #endif
         if(ret < 0)
-            Erange("tools_make_date", string(dar_gettext("Cannot set last access and last modification time: ")) + tools_strerror_r(errno));
+            throw Erange("tools_make_date", string(dar_gettext("Cannot set last access and last modification time: ")) + tools_strerror_r(errno));
     }
 
     void tools_noexcept_make_date(const string & chem, bool symlink, const datetime & last_acc, const datetime & last_mod, const datetime & birth)
