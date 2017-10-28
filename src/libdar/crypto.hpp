@@ -41,13 +41,11 @@ extern "C"
 namespace libdar
 {
 
-	/// \ingroup Private
+	/// \ingroup API
 	/// @}
 
 	/// the different cypher available for encryption (strong or weak)
 
-	/// values to be used as argument of libdar API calls
-	/// \ingroup API
     enum crypto_algo
     {
 	crypto_none,          ///< no encryption
@@ -59,6 +57,7 @@ namespace libdar
 	crypto_camellia256    ///< camellia 256 strong encryption
     };
 
+	/// signator status
 
     struct signator
     {
