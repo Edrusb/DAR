@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: dar 2.5.13\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2017-10-28 12:44+0200\n"
+"POT-Creation-Date: 2017-10-28 16:23+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2168,7 +2168,7 @@ msgid "a binary digit is either 0 or 1"
 msgstr ""
 
 #: src/libdar/filesystem_specific_attribute.cpp:232
-#: src/libdar/filesystem_specific_attribute.cpp:1119
+#: src/libdar/filesystem_specific_attribute.cpp:1121
 msgid "invalid length for FSA family flag"
 msgstr ""
 
@@ -2176,78 +2176,78 @@ msgstr ""
 msgid "invalid length for FSA nature flag"
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:693
+#: src/libdar/filesystem_specific_attribute.cpp:695
 msgid "Failed setting (opening) extX family FSA: "
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:706
+#: src/libdar/filesystem_specific_attribute.cpp:708
 msgid "Failed reading existing extX family FSA: "
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:733
-#: src/libdar/filesystem_specific_attribute.cpp:746
-#: src/libdar/filesystem_specific_attribute.cpp:759
-#: src/libdar/filesystem_specific_attribute.cpp:772
-#: src/libdar/filesystem_specific_attribute.cpp:791
-#: src/libdar/filesystem_specific_attribute.cpp:805
-#: src/libdar/filesystem_specific_attribute.cpp:818
-#: src/libdar/filesystem_specific_attribute.cpp:831
-#: src/libdar/filesystem_specific_attribute.cpp:844
-#: src/libdar/filesystem_specific_attribute.cpp:857
-#: src/libdar/filesystem_specific_attribute.cpp:870
-#: src/libdar/filesystem_specific_attribute.cpp:883
+#: src/libdar/filesystem_specific_attribute.cpp:735
+#: src/libdar/filesystem_specific_attribute.cpp:748
+#: src/libdar/filesystem_specific_attribute.cpp:761
+#: src/libdar/filesystem_specific_attribute.cpp:774
+#: src/libdar/filesystem_specific_attribute.cpp:793
+#: src/libdar/filesystem_specific_attribute.cpp:807
+#: src/libdar/filesystem_specific_attribute.cpp:820
+#: src/libdar/filesystem_specific_attribute.cpp:833
+#: src/libdar/filesystem_specific_attribute.cpp:846
+#: src/libdar/filesystem_specific_attribute.cpp:859
+#: src/libdar/filesystem_specific_attribute.cpp:872
+#: src/libdar/filesystem_specific_attribute.cpp:885
 #, c-format
 msgid ""
 "Warning: FSA %s/%s support has not been found at compilation time, cannot "
 "restore it for inode %s"
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:928
+#: src/libdar/filesystem_specific_attribute.cpp:930
 msgid "Failed set extX family FSA: "
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:955
+#: src/libdar/filesystem_specific_attribute.cpp:957
 #, c-format
 msgid ""
 "Not setting FSA extX IMMUTABLE flags for %s due to of lack of capability"
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:983
+#: src/libdar/filesystem_specific_attribute.cpp:985
 #, c-format
 msgid ""
 "Not setting FSA extX SYSTEM RESOURCE flags for %s due to of lack of "
 "capability"
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:1001
+#: src/libdar/filesystem_specific_attribute.cpp:1003
 #, c-format
 msgid ""
 "Warning! %s Filesystem Specific Attribute support have not been activated at "
 "compilation time and could not be restored for %s"
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:1021
+#: src/libdar/filesystem_specific_attribute.cpp:1023
 #, c-format
 msgid ""
 "Birth Time attribute cannot be restored for %s because no FSA familly able "
 "to carry that attribute could be activated at compilation time."
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:1125
-#: src/libdar/filesystem_specific_attribute.cpp:1126
+#: src/libdar/filesystem_specific_attribute.cpp:1127
+#: src/libdar/filesystem_specific_attribute.cpp:1128
 msgid "invalid FSA family flag"
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:1160
 #: src/libdar/filesystem_specific_attribute.cpp:1162
+#: src/libdar/filesystem_specific_attribute.cpp:1164
 msgid "invalid FSA nature flag"
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:1186
+#: src/libdar/filesystem_specific_attribute.cpp:1188
 msgid "Unexepected value for boolean FSA, data corruption may have occurred"
 msgstr ""
 
-#: src/libdar/filesystem_specific_attribute.cpp:1190
+#: src/libdar/filesystem_specific_attribute.cpp:1192
 msgid "Error while reading FSA: "
 msgstr ""
 
