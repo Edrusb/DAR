@@ -45,11 +45,11 @@ public:
     hide_file & operator = (const hide_file & ref) = default;
     ~hide_file() = default;
 
-    bool skippable(skippability direction, const infinint & amount) { return true; };
-    bool skip(const infinint & pos);
-    bool skip_to_eof();
-    bool skip_relative(S_I x);
-    infinint get_position() const;
+    virtual bool skippable(skippability direction, const infinint & amount) override { return true; };
+    virtual bool skip(const infinint & pos) override;
+    virtual bool skip_to_eof() override;
+    virtual bool skip_relative(S_I x) override;
+    virtual infinint get_position() const override;
 
 protected:
     struct partie
@@ -61,12 +61,12 @@ protected:
     vector <partie> morceau;
     generic_file *ref;
 
-    void inherited_read_ahead(const infinint & amount) { ref->read_ahead(amount); };
-    U_I inherited_read(char *a, U_I size);
-    void inherited_write(const char *a, size_t size);
-    void inherited_sync_write() {};
-    void inherited_flush_read() {};
-    void inherited_terminate() {};
+    virtual void inherited_read_ahead(const infinint & amount) override { ref->read_ahead(amount); };
+    virtual U_I inherited_read(char *a, U_I size) override;
+    virtual void inherited_write(const char *a, size_t size) override;
+    virtual void inherited_sync_write() override {};
+    virtual void inherited_flush_read() override {};
+    virtual void inherited_terminate() override {};
 
     virtual void fill_morceau() = 0;
         // the inherited classes have with this method
