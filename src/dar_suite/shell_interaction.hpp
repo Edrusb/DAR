@@ -72,7 +72,7 @@ public:
 
 
 	/// overwritting method from parent class.
-    virtual user_interaction *clone() const { user_interaction *ret = new (get_pool()) shell_interaction(*this); if(ret == nullptr) throw Ememory("shell_interaction::clone"); return ret; };
+    virtual user_interaction *clone() const override { user_interaction *ret = new (get_pool()) shell_interaction(*this); if(ret == nullptr) throw Ememory("shell_interaction::clone"); return ret; };
 
 private:
 	// data type

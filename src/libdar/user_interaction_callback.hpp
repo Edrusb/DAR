@@ -82,45 +82,45 @@ namespace libdar
 	~user_interaction_callback() = default;
 
 	    /// overwritting method from parent class.
-       	void pause(const std::string & message);
+       	virtual void pause(const std::string & message) override;
 	    /// overwritting method from parent class.
-	std::string get_string(const std::string & message, bool echo);
+	virtual std::string get_string(const std::string & message, bool echo) override;
 	    /// overwritting method from parent class.
-	secu_string get_secu_string(const std::string & message, bool echo);
+	virtual secu_string get_secu_string(const std::string & message, bool echo) override;
 	    /// overwritting method from parent class.
-        void listing(const std::string & flag,
-		     const std::string & perm,
-		     const std::string & uid,
-		     const std::string & gid,
-		     const std::string & size,
-		     const std::string & date,
-		     const std::string & filename,
-		     bool is_dir,
-		     bool has_children);
+        virtual void listing(const std::string & flag,
+			     const std::string & perm,
+			     const std::string & uid,
+			     const std::string & gid,
+			     const std::string & size,
+			     const std::string & date,
+			     const std::string & filename,
+			     bool is_dir,
+			     bool has_children) override;
 
 	    /// overwritting method from parent class
-	void dar_manager_show_files(const std::string & filename,
-				    bool available_data,
-				    bool available_ea);
+	virtual void dar_manager_show_files(const std::string & filename,
+					    bool available_data,
+					    bool available_ea) override;
 
 	    /// overwritting method from parent class
-	void dar_manager_contents(U_I number,
-				  const std::string & chemin,
-				  const std::string & archive_name);
+	virtual void dar_manager_contents(U_I number,
+					  const std::string & chemin,
+					  const std::string & archive_name) override;
 
 	    /// overwritting method from parent class
-	void dar_manager_statistics(U_I number,
-				    const infinint & data_count,
-				    const infinint & total_data,
-				    const infinint & ea_count,
-				    const infinint & total_ea);
+	virtual void dar_manager_statistics(U_I number,
+					    const infinint & data_count,
+					    const infinint & total_data,
+					    const infinint & ea_count,
+					    const infinint & total_ea) override;
 
 	    /// overwritting method from parent class
-	void dar_manager_show_version(U_I number,
-				      const std::string & data_date,
-				      const std::string & data_presence,
-				      const std::string & ea_date,
-				      const std::string & ea_presence);
+	virtual void dar_manager_show_version(U_I number,
+					      const std::string & data_date,
+					      const std::string & data_presence,
+					      const std::string & ea_date,
+					      const std::string & ea_presence) override;
 
 	    /// You can set a listing callback thanks to this method.
 
@@ -186,14 +186,14 @@ namespace libdar
 
 
 	    /// overwritting method from parent class.
-	virtual user_interaction *clone() const;
+	virtual user_interaction *clone() const override;
 
     protected:
 	    /// change the context value of the object that will be given to callback functions
 	void change_context_value(void *new_value) { context_val = new_value; };
 
 	    /// overwritting method from parent class.
-	void inherited_warning(const std::string & message);
+	virtual void inherited_warning(const std::string & message) override;
 
     private:
 	void (*warning_callback)(const std::string & x, void *context);  // pointer to function
