@@ -47,7 +47,7 @@ public:
     vector<string> get_read_targets() const;
 
 protected:
-    void fill_morceau();
+    virtual void fill_morceau() override;
 
 private:
     struct t_cible

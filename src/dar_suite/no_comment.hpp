@@ -45,7 +45,7 @@ public:
     ~no_comment() = default;
 
 protected:
-    void fill_morceau();
+    virtual void fill_morceau() override;
 };
 
     // @}
