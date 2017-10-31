@@ -291,7 +291,7 @@ namespace libdar
 	}
     }
 
-    void filesystem_tools_attach_ea(const string &chemin, cat_inode *ino, const mask & ea_mask, memory_pool *pool)
+    void filesystem_tools_attach_ea(const string &chemin, cat_inode *ino, const mask & ea_mask)
     {
         ea_attributs *eat = nullptr;
         try
@@ -371,8 +371,7 @@ namespace libdar
 
     path *filesystem_tools_get_root_with_symlink(user_interaction & dialog,
 						 const path & root,
-						 bool info_details,
-						 memory_pool *pool)
+						 bool info_details)
     {
 	path *ret = nullptr;
 	const string display = root.display();
@@ -387,13 +386,13 @@ namespace libdar
 
 	if(S_ISDIR(buf.st_mode))
 	{
-	    ret = new (pool) path(root);
+	    ret = new (nothrow) path(root);
 	    if(ret == nullptr)
 		throw  Ememory("get_root_with_symlink");
 	}
 	else if(S_ISLNK(buf.st_mode))
 	{
-	    ret = new (pool) path(tools_readlink(ptr));
+	    ret = new (nothrow) path(tools_readlink(ptr));
 	    if(ret == nullptr)
 		throw Ememory("get_root_with_symlink");
 	    if(ret->is_relative())

@@ -36,7 +36,6 @@ extern "C"
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "fsa_family.hpp"
-#include "on_pool.hpp"
 #include "cat_all_entrees.hpp"
 #include "crc.hpp"
 #include "user_interaction.hpp"
@@ -66,15 +65,13 @@ namespace libdar
 
     void filesystem_tools_attach_ea(const std::string &chemin,
 				    cat_inode *ino,
-				    const mask & ea_mask,
-				    memory_pool *pool);
+				    const mask & ea_mask);
     bool filesystem_tools_is_nodump_flag_set(user_interaction & dialog,
 					     const path & chem, const std::string & filename,
 					     bool info);
     path *filesystem_tools_get_root_with_symlink(user_interaction & dialog,
 						 const path & root,
-						 bool info_details,
-						 memory_pool *pool);
+						 bool info_details);
     mode_t filesystem_tools_get_file_permission(const std::string & path);
 
     void filesystem_tools_make_delta_patch(user_interaction & dialog,

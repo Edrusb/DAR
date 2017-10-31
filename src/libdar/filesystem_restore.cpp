@@ -147,7 +147,7 @@ namespace libdar
 	overwrite = nullptr;
 	try
 	{
-	    fs_root = filesystem_tools_get_root_with_symlink(get_ui(), root, x_info_details, nullptr);
+	    fs_root = filesystem_tools_get_root_with_symlink(get_ui(), root, x_info_details);
 	    if(fs_root == nullptr)
 		throw Ememory("filesystem_write::filesystem_write");
 	    ea_mask = x_ea_mask.clone();

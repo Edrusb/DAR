@@ -144,7 +144,7 @@ namespace libdar
 	current_dir = nullptr;
 	try
 	{
-	    fs_root = filesystem_tools_get_root_with_symlink(get_ui(), root, x_info_details, nullptr);
+	    fs_root = filesystem_tools_get_root_with_symlink(get_ui(), root, x_info_details);
 	    if(fs_root == nullptr)
 		throw Ememory("filesystem_diff::filesystem_diff");
 	    info_details = x_info_details;
