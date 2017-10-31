@@ -52,7 +52,7 @@ namespace libdar
         {
         case zlib_mode:
 #if LIBZ_AVAILABLE
-	    meta_new(z_ptr, 1);
+	    z_ptr = new (nothrow) z_stream;
             if(z_ptr == nullptr)
                 throw Ememory("wrapperlib::wrapperlib");
 #if LIBBZ2_AVAILABLE
@@ -85,7 +85,7 @@ namespace libdar
 #endif
         case bzlib_mode:
 #if LIBBZ2_AVAILABLE
-	    meta_new(bz_ptr, 1);
+	    bz_ptr = new (nothrow) bz_stream;
             if(bz_ptr == nullptr)
                 throw Ememory("wrapperlib::wrapperlib");
 #if LIBZ_AVAILABLE
@@ -124,7 +124,7 @@ namespace libdar
             bz_ptr = nullptr;
 #endif
 #if LIBLZMA_AVAILABLE
-	    meta_new(lzma_ptr, 1);
+	    lzma_ptr = new (nothrow) lzma_stream;
 	    if(lzma_ptr == nullptr)
 		throw Ememory("wrapperlib::wrapperlib");
 	    *lzma_ptr = LZMA_STREAM_INIT;
@@ -165,17 +165,17 @@ namespace libdar
     {
 #if LIBZ_AVAILABLE
         if(z_ptr != nullptr)
-	    meta_delete(z_ptr);
+	    delete z_ptr;
 #endif
 #if LIBBZ2_AVAILABLE
         if(bz_ptr != nullptr)
-	    meta_delete(bz_ptr);
+	    delete bz_ptr;
 #endif
 #if LIBLZMA_AVAILABLE
 	if(lzma_ptr != nullptr)
 	{
 	    ::lzma_end(lzma_ptr);
-	    meta_delete(lzma_ptr);
+	    delete lzma_ptr;
 	}
 #endif
     }

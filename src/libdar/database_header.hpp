@@ -32,6 +32,7 @@
 
 #include "user_interaction.hpp"
 #include "compressor.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {
