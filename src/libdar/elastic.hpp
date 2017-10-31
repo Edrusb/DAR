@@ -50,7 +50,7 @@ namespace libdar
 	/// retreive later without any other knowledge which bytes are information and which byte are from the
 	/// elastic buffer. The main purpose is for strong encryption
 	/// \ingroup Private
-    class elastic : public on_pool
+    class elastic
     {
     public:
 	elastic(U_32 size);
