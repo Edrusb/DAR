@@ -31,7 +31,6 @@
 #include "mem_ui.hpp"
 #include "mask.hpp"
 #include "catalogue.hpp"
-#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -63,7 +62,7 @@ namespace libdar
 	/// be saved once the backup is completed, may it be normally or due to an exception being thrown.
 
 
-    class semaphore : public mem_ui, public on_pool
+    class semaphore : public mem_ui
     {
     public:
 
