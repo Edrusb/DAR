@@ -29,7 +29,6 @@
 #include "../my_config.h"
 #include "path.hpp"
 #include "cat_entree.hpp"
-#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -45,7 +44,7 @@ namespace libdar
 	/// this class is used to display the progression of the filtering routing,
 	/// and the file on which the filtering routine operates
 	/// \ingroup Private
-    class defile : public on_pool
+    class defile
     {
     public :
         defile(const path &racine) : chemin(racine) { init = true; };
