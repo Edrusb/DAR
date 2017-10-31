@@ -74,7 +74,7 @@ namespace libdar
         virtual unsigned char signature() const override { return mk_signature('l', get_saved_status()); };
 
 	    /// inherited from cat_entree
-        virtual cat_entree *clone() const override { return new (get_pool()) cat_lien(*this); };
+        virtual cat_entree *clone() const override { return new (std::nothrow) cat_lien(*this); };
 
     protected :
         virtual void sub_compare(const cat_inode & other, bool isolated_mode) const override;

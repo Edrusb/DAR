@@ -54,7 +54,7 @@ namespace libdar
             // dump defined by cat_entree
 	virtual bool operator == (const cat_entree & ref) const override { return true; };
         virtual unsigned char signature() const override { return 'z'; };
-        cat_entree *clone() const { return new (get_pool()) cat_eod(); };
+        cat_entree *clone() const { return new (std::nothrow) cat_eod(); };
 
     };
 

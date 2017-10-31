@@ -414,7 +414,6 @@ namespace libdar
 			try
 			{
 			    ref = cat_entree::read(get_ui(),
-						   nullptr,
 						   pdesc,
 						   x_ver.get_edition(),
 						   ceci->access_stats(),

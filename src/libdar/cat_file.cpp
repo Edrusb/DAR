@@ -69,9 +69,9 @@ namespace libdar
 
         try
         {
-            offset = new (get_pool()) infinint(0);
-            size = new (get_pool()) infinint(taille);
-            storage_size = new (get_pool()) infinint(0);
+            offset = new (nothrow) infinint(0);
+            size = new (nothrow) infinint(taille);
+            storage_size = new (nothrow) infinint(0);
             if(offset == nullptr || size == nullptr || storage_size == nullptr)
                 throw Ememory("cat_file::cat_file");
         }
@@ -127,7 +127,7 @@ namespace libdar
 
         try
         {
-            size = new (get_pool()) infinint(*ptr);
+            size = new (nothrow) infinint(*ptr);
             if(size == nullptr)
                 throw Ememory("cat_file::cat_file(generic_file)");
 
@@ -136,12 +136,12 @@ namespace libdar
                 if(saved == s_saved
 		    || saved == s_delta)
                 {
-                    offset = new (get_pool()) infinint(*ptr);
+                    offset = new (nothrow) infinint(*ptr);
                     if(offset == nullptr)
                         throw Ememory("cat_file::cat_file(generic_file)");
                     if(reading_ver > 1)
                     {
-                        storage_size = new (get_pool()) infinint(*ptr);
+                        storage_size = new (nothrow) infinint(*ptr);
                         if(storage_size == nullptr)
                             throw Ememory("cat_file::cat_file(generic_file)");
                         if(reading_ver > 7)
@@ -180,7 +180,7 @@ namespace libdar
                     }
                     else // archive format version is "1"
                     {
-                        storage_size = new (get_pool()) infinint(*size);
+                        storage_size = new (nothrow) infinint(*size);
                         if(storage_size == nullptr)
                             throw Ememory("cat_file::cat_file(generic_file)");
                         *storage_size *= 2;
@@ -192,7 +192,7 @@ namespace libdar
 
                     if(reading_ver >= 8)
                     {
-			check = create_crc_from_file(*ptr, get_pool());
+			check = create_crc_from_file(*ptr, nullptr);
                         if(check == nullptr)
                             throw Ememory("cat_file::cat_file");
                     }
@@ -211,8 +211,8 @@ namespace libdar
 			file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
 		    }
 
-                    offset = new (get_pool()) infinint(0);
-                    storage_size = new (get_pool()) infinint(0);
+                    offset = new (nothrow) infinint(0);
+                    storage_size = new (nothrow) infinint(0);
                     if(offset == nullptr || storage_size == nullptr)
                         throw Ememory("cat_file::cat_file(generic_file)");
                 }
@@ -229,7 +229,7 @@ namespace libdar
                             // for archive version >= 8, the crc is only present
                             // if the archive contains file data
 
-                        check = create_crc_from_file(*ptr, get_pool(), true);
+                        check = create_crc_from_file(*ptr, nullptr, true);
                         if(check == nullptr)
                             throw Ememory("cat_file::cat_file");
                     }
@@ -276,11 +276,11 @@ namespace libdar
 
                     // Now that all data has been read, setting default value for the undumped ones:
 
-		offset = new (get_pool()) infinint(0); // can only be set from post_constructor
+		offset = new (nothrow) infinint(0); // can only be set from post_constructor
                 if(offset == nullptr)
                     throw Ememory("cat_file::cat_file(generic_file)");
 
-                storage_size = new (get_pool()) infinint(0); // cannot know the storage_size at that time
+                storage_size = new (nothrow) infinint(0); // cannot know the storage_size at that time
                 if(storage_size == nullptr)
                     throw Ememory("cat_file::cat_file(generic_file)");
 
@@ -341,15 +341,15 @@ namespace libdar
             }
             else
                 check = nullptr;
-            offset = new (get_pool()) infinint(*ref.offset);
-            size = new (get_pool()) infinint(*ref.size);
-            storage_size = new (get_pool()) infinint(*ref.storage_size);
+            offset = new (nothrow) infinint(*ref.offset);
+            size = new (nothrow) infinint(*ref.size);
+            storage_size = new (nothrow) infinint(*ref.storage_size);
             if(offset == nullptr || size == nullptr || storage_size == nullptr)
                 throw Ememory("cat_file::cat_file(cat_file)");
 
 	    if(ref.delta_sig != nullptr)
 	    {
-		delta_sig = new (get_pool()) cat_delta_signature(*ref.delta_sig);
+		delta_sig = new (nothrow) cat_delta_signature(*ref.delta_sig);
 		if(delta_sig == nullptr)
 		    throw Ememory("cat_file::cat_file(cat_file)");
 	    }
@@ -520,14 +520,14 @@ namespace libdar
 		fichier_local *tmp = nullptr;
 		if(mode != normal && mode != plain)
 		    throw SRC_BUG; // keep compressed/keep_hole is not possible on an inode take from a filesystem
-		ret = tmp = new (get_pool()) fichier_local(chemin, furtive_read_mode);
+		ret = tmp = new (nothrow) fichier_local(chemin, furtive_read_mode);
 		if(tmp != nullptr)
 			// telling *tmp to flush the data from the cache as soon as possible
 		    tmp->fadvise(fichier_global::advise_dontneed);
 
 		if(delta_sig_mem != nullptr || delta_ref != nullptr)
 		{
-		    pile *data = new (get_pool()) pile();
+		    pile *data = new (nothrow) pile();
 		    if(data == nullptr)
 			throw Ememory("cat_file::get_data");
 		    try
@@ -543,7 +543,7 @@ namespace libdar
 
 		    if(delta_sig_mem != nullptr)
 		    {
-			generic_rsync *delta = new (get_pool()) generic_rsync(delta_sig_mem, data->top());
+			generic_rsync *delta = new (nothrow) generic_rsync(delta_sig_mem, data->top());
 			if(delta == nullptr)
 			    throw Ememory("cat_file::get_data");
 			try
@@ -559,7 +559,7 @@ namespace libdar
 
 		    if(delta_ref != nullptr)
 		    {
-			generic_rsync *diff = new (get_pool()) generic_rsync(delta_ref,
+			generic_rsync *diff = new (nothrow) generic_rsync(delta_ref,
 									     data->top(),
 									     tools_file_size_to_crc_size(get_size()),
 									     checksum);
@@ -586,7 +586,7 @@ namespace libdar
 		    else
 		    {
 			    // we will return a small stack of generic_file over the catalogue stack
-			pile *data = new (get_pool()) pile();
+			pile *data = new (nothrow) pile();
 			if(data == nullptr)
 			    throw Ememory("cat_file::get_data");
 
@@ -622,7 +622,7 @@ namespace libdar
 			    {
 				if(get_compression_algo_read() == none)
 				{
-				    generic_file *tmp = new (get_pool()) tronc(get_pile(), *offset, *storage_size, gf_read_only);
+				    generic_file *tmp = new (nothrow) tronc(get_pile(), *offset, *storage_size, gf_read_only);
 				    if(tmp == nullptr)
 					throw Ememory("cat_file::get_data");
 				    try
@@ -653,7 +653,7 @@ namespace libdar
 
 			    if(get_sparse_file_detection_read() && mode != keep_compressed && mode != keep_hole)
 			    {
-				sparse_file *stmp = new (get_pool()) sparse_file(parent);
+				sparse_file *stmp = new (nothrow) sparse_file(parent);
 				if(stmp == nullptr)
 				    throw Ememory("cat_file::get_data");
 				try
@@ -691,7 +691,7 @@ namespace libdar
 
 			    if(delta_sig_mem != nullptr)
 			    {
-				generic_rsync *delta = new (get_pool()) generic_rsync(delta_sig_mem, parent);
+				generic_rsync *delta = new (nothrow) generic_rsync(delta_sig_mem, parent);
 				if(delta == nullptr)
 				    throw Ememory("cat_file::get_data");
 				try
@@ -716,7 +716,7 @@ namespace libdar
 			    if(data->is_empty())
 			    {
 				tronc *tronc_tmp;
-				generic_file *tmp = tronc_tmp = new (get_pool()) tronc(get_pile(), *offset, gf_read_only);
+				generic_file *tmp = tronc_tmp = new (nothrow) tronc(get_pile(), *offset, gf_read_only);
 				if(tmp == nullptr)
 				    throw Ememory("cat_file::get_data");
 				if(tronc_tmp == nullptr)
@@ -841,7 +841,7 @@ namespace libdar
 			    else
 				throw SRC_BUG; // how is this possible ??? it should always be zero in sequential read mode !
 
-			    tmp = create_crc_from_file(*(get_escape_layer()), get_pool());
+			    tmp = create_crc_from_file(*(get_escape_layer()), nullptr);
 			    if(tmp == nullptr)
 				throw SRC_BUG;
 			    else
@@ -859,7 +859,7 @@ namespace libdar
 			    // to avoid trying reading it again later on
 			if(check == nullptr)
 			{
-			    const_cast<cat_file *>(this)->check = new (get_pool()) crc_n(1);
+			    const_cast<cat_file *>(this)->check = new (nothrow) crc_n(1);
 			    if(check == nullptr)
 				throw Ememory("cat_file::cat_file");
 			}
@@ -957,7 +957,7 @@ namespace libdar
     {
 	if(delta_sig == nullptr)
 	{
-	    delta_sig = new (get_pool()) cat_delta_signature();
+	    delta_sig = new (nothrow) cat_delta_signature();
 	    if(delta_sig == nullptr)
 		throw Ememory("cat_file::will_have_delta_signature()");
 	}

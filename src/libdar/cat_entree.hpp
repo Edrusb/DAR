@@ -36,7 +36,6 @@ extern "C"
 #include "user_interaction.hpp"
 #include "pile.hpp"
 #include "escape.hpp"
-#include "on_pool.hpp"
 #include "archive_version.hpp"
 #include "compressor.hpp"
 #include "pile_descriptor.hpp"
@@ -83,13 +82,12 @@ namespace libdar
     };
 
 	/// the root class from all other inherite for any entry in the catalogue
-    class cat_entree : public on_pool
+    class cat_entree
     {
     public :
 	    /// read and create an object of inherited class of class cat_entree
 	    ///
 	    /// \param[in] dialog for user interaction
-	    /// \param[in] pool for memory allocation (nullptr if special_alloc not activated)
 	    /// \param[in] f where from to read data in order to create the object
 	    /// \param[in] reading_ver archive version format to use for reading
 	    /// \param[in,out] stats updated statistical fields
@@ -99,7 +97,6 @@ namespace libdar
 	    /// \param[in] only_detruit whether to only consider detruit objects (in addition to the directory tree)
 	    /// \param[in] small whether the dump() to read has been done with the small argument set
         static cat_entree *read(user_interaction & dialog,
-				memory_pool *pool,
 				const smart_pointer<pile_descriptor> & f,
 				const archive_version & reading_ver,
 				entree_stats & stats,

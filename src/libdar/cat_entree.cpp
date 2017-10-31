@@ -145,7 +145,6 @@ namespace libdar
     }
 
     cat_entree *cat_entree::read(user_interaction & dialog,
-				 memory_pool *pool,
 				 const smart_pointer<pile_descriptor> & pdesc,
 				 const archive_version & reading_ver,
 				 entree_stats & stats,
@@ -200,34 +199,34 @@ namespace libdar
 	    case ' ':
 		break; // returned value will be nullptr
             case 'f':
-                ret = new (pool) cat_file(dialog, pdesc, reading_ver, saved, default_algo, small);
+                ret = new (nothrow) cat_file(dialog, pdesc, reading_ver, saved, default_algo, small);
                 break;
             case 'l':
-                ret = new (pool) cat_lien(dialog, pdesc, reading_ver, saved, small);
+                ret = new (nothrow) cat_lien(dialog, pdesc, reading_ver, saved, small);
                 break;
             case 'c':
-                ret = new (pool) cat_chardev(dialog, pdesc, reading_ver, saved, small);
+                ret = new (nothrow) cat_chardev(dialog, pdesc, reading_ver, saved, small);
                 break;
             case 'b':
-                ret = new (pool) cat_blockdev(dialog, pdesc, reading_ver, saved, small);
+                ret = new (nothrow) cat_blockdev(dialog, pdesc, reading_ver, saved, small);
                 break;
             case 'p':
-                ret = new (pool) cat_tube(dialog, pdesc, reading_ver, saved, small);
+                ret = new (nothrow) cat_tube(dialog, pdesc, reading_ver, saved, small);
                 break;
             case 's':
-                ret = new (pool) cat_prise(dialog, pdesc, reading_ver, saved, small);
+                ret = new (nothrow) cat_prise(dialog, pdesc, reading_ver, saved, small);
                 break;
             case 'd':
-                ret = new (pool) cat_directory(dialog, pdesc, reading_ver, saved, stats, corres, default_algo, lax, only_detruit, small);
+                ret = new (nothrow) cat_directory(dialog, pdesc, reading_ver, saved, stats, corres, default_algo, lax, only_detruit, small);
                 break;
             case 'm':
-                ret = new (pool) cat_mirage(dialog, pdesc, reading_ver, saved, stats, corres, default_algo, cat_mirage::fmt_mirage, lax, small);
+                ret = new (nothrow) cat_mirage(dialog, pdesc, reading_ver, saved, stats, corres, default_algo, cat_mirage::fmt_mirage, lax, small);
                 break;
             case 'h': // old hard-link object
-                ret = new (pool) cat_mirage(dialog, pdesc, reading_ver, saved, stats, corres, default_algo, cat_mirage::fmt_hard_link, lax, small);
+                ret = new (nothrow) cat_mirage(dialog, pdesc, reading_ver, saved, stats, corres, default_algo, cat_mirage::fmt_hard_link, lax, small);
                 break;
             case 'e': // old etiquette object
-                ret = new (pool) cat_mirage(dialog, pdesc, reading_ver, saved, stats, corres, default_algo, lax, small);
+                ret = new (nothrow) cat_mirage(dialog, pdesc, reading_ver, saved, stats, corres, default_algo, lax, small);
                 break;
             case 'z':
                 if(saved != s_saved)
@@ -237,7 +236,7 @@ namespace libdar
                     else
                         dialog.warning(gettext("LAX MODE: Unexpected saved status for end of directory entry, assuming data corruption occurred, ignoring and continuing"));
                 }
-                ret = new (pool) cat_eod(pdesc, small);
+                ret = new (nothrow) cat_eod(pdesc, small);
                 break;
             case 'x':
                 if(saved != s_saved)
@@ -247,10 +246,10 @@ namespace libdar
                     else
                         dialog.warning(gettext("LAX MODE: Unexpected saved status for class \"cat_detruit\" object, assuming data corruption occurred, ignoring and continuing"));
                 }
-                ret = new (pool) cat_detruit(pdesc, reading_ver, small);
+                ret = new (nothrow) cat_detruit(pdesc, reading_ver, small);
                 break;
 	    case 'o':
-		ret = new (pool) cat_door(dialog, pdesc, reading_ver, saved, default_algo, small);
+		ret = new (nothrow) cat_door(dialog, pdesc, reading_ver, saved, default_algo, small);
 		break;
             default :
                 if(!lax)
@@ -290,7 +289,7 @@ namespace libdar
 
 	    try
 	    {
-		crc *crc_read = create_crc_from_file(*ptr, pool);
+		crc *crc_read = create_crc_from_file(*ptr, nullptr);
 		if(crc_read == nullptr)
 		    throw SRC_BUG;
 

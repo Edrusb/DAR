@@ -64,7 +64,7 @@ namespace libdar
 	    /// inherited from cat_entree
         virtual unsigned char signature() const override { return 'x'; };
 	    /// inherited from cat_entree
-        virtual cat_entree *clone() const override { return new (get_pool()) cat_detruit(*this); };
+        virtual cat_entree *clone() const override { return new (std::nothrow) cat_detruit(*this); };
 
     protected:
         virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override;

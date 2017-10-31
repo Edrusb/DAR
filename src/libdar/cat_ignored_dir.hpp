@@ -57,7 +57,7 @@ namespace libdar
 	bool operator == (const cat_entree & ref) const;
 
         unsigned char signature() const { return 'j'; };
-        cat_entree *clone() const { return new (get_pool()) cat_ignored_dir(*this); };
+        cat_entree *clone() const { return new (std::nothrow) cat_ignored_dir(*this); };
 
     protected:
         virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override; // behaves like an empty cat_directory

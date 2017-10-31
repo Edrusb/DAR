@@ -99,7 +99,7 @@ namespace libdar
             last_acc = last_access;
             last_mod = last_modif;
 	    last_cha = last_change;
-            fs_dev = new (get_pool()) infinint(fs_device);
+            fs_dev = new (nothrow) infinint(fs_device);
             if(fs_dev == nullptr)
                 throw Ememory("cat_inode::cat_inode");
         }
@@ -191,7 +191,7 @@ namespace libdar
 
 		if(ea_saved == ea_full)
 		{
-		    ea_size = new (get_pool()) infinint(*ptr);
+		    ea_size = new (nothrow) infinint(*ptr);
 		    if(ea_size == nullptr)
 			throw Ememory("cat_inode::cat_inode(file)");
 		}
@@ -207,13 +207,13 @@ namespace libdar
 		switch(ea_saved)
 		{
 		case ea_full:
-		    ea_offset = new (get_pool()) infinint(*ptr);
+		    ea_offset = new (nothrow) infinint(*ptr);
 		    if(ea_offset == nullptr)
 			throw Ememory("cat_inode::cat_inode(file)");
 
 		    if(reading_ver <= 7)
 		    {
-			ea_crc = create_crc_from_file(*ptr, get_pool(), true);
+			ea_crc = create_crc_from_file(*ptr, nullptr, true);
 			if(ea_crc == nullptr)
 			    throw SRC_BUG;
 
@@ -221,7 +221,7 @@ namespace libdar
 		    }
 		    else // archive format >= 8
 		    {
-			ea_crc = create_crc_from_file(*ptr, get_pool(), false);
+			ea_crc = create_crc_from_file(*ptr, nullptr, false);
 			if(ea_crc == nullptr)
 			    throw SRC_BUG;
 		    }
@@ -275,14 +275,14 @@ namespace libdar
 
 		if(fsa_saved != fsa_none)
 		{
-		    fsa_families = new (get_pool()) infinint(*ptr);
+		    fsa_families = new (nothrow) infinint(*ptr);
 		    if(fsa_families == nullptr)
 			throw Ememory("cat_inode::cat_inode(file)");
 		}
 
 		if(fsa_saved == fsa_full)
 		{
-		    fsa_size = new (get_pool()) infinint(*ptr);
+		    fsa_size = new (nothrow) infinint(*ptr);
 		    if(fsa_size == nullptr)
 			throw Ememory("cat_inode::cat_inode(file)");
 		}
@@ -292,8 +292,8 @@ namespace libdar
 		    switch(fsa_saved)
 		    {
 		    case fsa_full:
-			fsa_offset = new (get_pool()) infinint(*ptr);
-			fsa_crc = create_crc_from_file(*ptr, get_pool());
+			fsa_offset = new (nothrow) infinint(*ptr);
+			fsa_crc = create_crc_from_file(*ptr, nullptr);
 			if(fsa_offset == nullptr || fsa_crc == nullptr)
 			    throw Ememory("cat_inode::cat_inode(file)");
 			break;
@@ -679,7 +679,7 @@ namespace libdar
 		delete ea_size;
 		ea_size = nullptr;
 	    }
-            ea_size = new (get_pool()) infinint(ref->space_used());
+            ea_size = new (nothrow) infinint(ref->space_used());
 	    if(ea_size == nullptr)
 		throw Ememory("cat_inode::ea_attach");
             ea = ref;
@@ -749,7 +749,7 @@ namespace libdar
 			    {
 				if(edit <= 1)
 				    throw SRC_BUG;   // EA do not exist in that archive format
-				const_cast<ea_attributs *&>(ea) = new (get_pool()) ea_attributs(*get_pile(), edit);
+				const_cast<ea_attributs *&>(ea) = new (nothrow) ea_attributs(*get_pile(), edit);
 				if(ea == nullptr)
 				    throw Ememory("cat_inode::get_ea");
 			    }
@@ -825,7 +825,7 @@ namespace libdar
             {
                 if(ea != nullptr)
 		{
-                    const_cast<cat_inode *>(this)->ea_size = new (get_pool()) infinint (ea->space_used());
+                    const_cast<cat_inode *>(this)->ea_size = new (nothrow) infinint (ea->space_used());
 		    if(ea_size == nullptr)
 			throw Ememory("cat_inode::ea_get_size");
 		}
@@ -842,7 +842,7 @@ namespace libdar
     {
 	if(ea_offset == nullptr)
 	{
-	    ea_offset = new (get_pool()) infinint(pos);
+	    ea_offset = new (nothrow) infinint(pos);
 	    if(ea_offset == nullptr)
 		throw Ememory("cat_inode::ea_set_offset");
 	}
@@ -890,9 +890,9 @@ namespace libdar
                 try
                 {
                     if(edit >= 8)
-                        tmp = create_crc_from_file(*get_escape_layer(), get_pool(), false);
+                        tmp = create_crc_from_file(*get_escape_layer(), nullptr, false);
                     else // archive format <= 7
-                        tmp = create_crc_from_file(*get_escape_layer(), get_pool(), true);
+                        tmp = create_crc_from_file(*get_escape_layer(), nullptr, true);
 		    if(tmp == nullptr)
 			throw SRC_BUG;
                     const_cast<cat_inode *>(this)->ea_crc = tmp;
@@ -909,7 +909,7 @@ namespace libdar
             }
             else // skip failed on the escape layer
             {
-                crc *tmp = new (get_pool()) crc_n(1); // creating a default CRC
+                crc *tmp = new (nothrow) crc_n(1); // creating a default CRC
                 if(tmp == nullptr)
                     throw Ememory("cat_inode::ea_get_crc");
 
@@ -987,7 +987,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	if(fsa_families == nullptr)
-	    fsa_families = new(get_pool()) infinint(fsa_scope_to_infinint(val));
+	    fsa_families = new(nothrow) infinint(fsa_scope_to_infinint(val));
 	else
 	    *fsa_families = fsa_scope_to_infinint(val);
     }
@@ -1011,8 +1011,8 @@ namespace libdar
 	    }
 	    try
 	    {
-		fsa_size = new (get_pool()) infinint (ref->storage_size());
-		fsa_families = new(get_pool()) infinint(fsa_scope_to_infinint(ref->get_fsa_families()));
+		fsa_size = new (nothrow) infinint (ref->storage_size());
+		fsa_families = new(nothrow) infinint(fsa_scope_to_infinint(ref->get_fsa_families()));
 		if(fsa_size == nullptr || fsa_families == nullptr)
 		    throw Ememory("cat_inode::fsa_attach");
 	    }
@@ -1108,7 +1108,7 @@ namespace libdar
 			{
 			    try
 			    {
-				const_cast<cat_inode *>(this)->fsal = new (get_pool()) filesystem_specific_attribute_list();
+				const_cast<cat_inode *>(this)->fsal = new (nothrow) filesystem_specific_attribute_list();
 				if(fsal == nullptr)
 				    throw Ememory("cat_inode::get_fsa");
 				try
@@ -1191,7 +1191,7 @@ namespace libdar
     {
 	if(fsa_offset == nullptr)
 	{
-	    fsa_offset = new (get_pool()) infinint(pos);
+	    fsa_offset = new (nothrow) infinint(pos);
 	    if(fsa_offset == nullptr)
 		throw Ememory("cat_inode::fsa_set_offset");
 	}
@@ -1242,7 +1242,7 @@ namespace libdar
 
                 try
                 {
-		    tmp = create_crc_from_file(*get_escape_layer(), get_pool(), false);
+		    tmp = create_crc_from_file(*get_escape_layer(), nullptr, false);
 		    if(tmp == nullptr)
 			throw SRC_BUG;
                     const_cast<cat_inode *>(this)->fsa_crc = tmp;
@@ -1260,7 +1260,7 @@ namespace libdar
             }
             else // fsa_crc mark not found
             {
-                crc *tmp = new (get_pool()) crc_n(1); // creating a default CRC
+                crc *tmp = new (nothrow) crc_n(1); // creating a default CRC
                 if(tmp == nullptr)
                     throw Ememory("cat_inode::fsa_get_crc");
 
@@ -1394,9 +1394,9 @@ namespace libdar
 	    ea_saved = ref.ea_saved;
 	    fsa_saved = ref.fsa_saved;
 	    small_read = ref.small_read;
-	    copy_ptr(ref.ea_offset, ea_offset, get_pool());
-	    copy_ptr(ref.ea, ea, get_pool());
-	    copy_ptr(ref.ea_size, ea_size, get_pool());
+	    copy_ptr(ref.ea_offset, ea_offset, nullptr);
+	    copy_ptr(ref.ea, ea, nullptr);
+	    copy_ptr(ref.ea_size, ea_size, nullptr);
 	    if(ref.ea_crc != nullptr)
 	    {
 		ea_crc = (ref.ea_crc)->clone();
@@ -1405,10 +1405,10 @@ namespace libdar
 	    }
 	    else
 		ea_crc = nullptr;
-	    copy_ptr(ref.fsa_families, fsa_families, get_pool());
-	    copy_ptr(ref.fsa_offset, fsa_offset, get_pool());
-	    copy_ptr(ref.fsal, fsal, get_pool());
-	    copy_ptr(ref.fsa_size, fsa_size, get_pool());
+	    copy_ptr(ref.fsa_families, fsa_families, nullptr);
+	    copy_ptr(ref.fsa_offset, fsa_offset, nullptr);
+	    copy_ptr(ref.fsal, fsal, nullptr);
+	    copy_ptr(ref.fsa_size, fsa_size, nullptr);
 	    if(ref.fsa_crc != nullptr)
 	    {
 		fsa_crc = (ref.fsa_crc)->clone();
@@ -1417,7 +1417,7 @@ namespace libdar
 	    }
 	    else
 		fsa_crc = nullptr;
-	    copy_ptr(ref.fs_dev, fs_dev, get_pool());
+	    copy_ptr(ref.fs_dev, fs_dev, nullptr);
 	    edit = ref.edit;
 	}
 	catch(...)

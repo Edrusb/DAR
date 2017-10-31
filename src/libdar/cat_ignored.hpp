@@ -53,7 +53,7 @@ namespace libdar
 	virtual bool operator == (const cat_entree & ref) const override;
 
         virtual unsigned char signature() const override { return 'i'; };
-        virtual cat_entree *clone() const override { return new (get_pool()) cat_ignored(*this); };
+        virtual cat_entree *clone() const override { return new (std::nothrow) cat_ignored(*this); };
 
     protected:
         virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override { throw SRC_BUG; };

@@ -153,7 +153,7 @@ namespace libdar
 
             if(fmt == fmt_file_etiquette)
             {
-                cat_nomme *tmp_ptr = new (get_pool()) cat_file(dialog, pdesc, reading_ver, saved, default_algo, small);
+                cat_nomme *tmp_ptr = new (nothrow) cat_file(dialog, pdesc, reading_ver, saved, default_algo, small);
                 entree_ptr = tmp_ptr;
                 if(tmp_ptr != nullptr)
                 {
@@ -165,7 +165,7 @@ namespace libdar
                     throw Ememory("cat_mirage::init");
             }
             else
-                entree_ptr = cat_entree::read(dialog, get_pool(), pdesc, reading_ver, fake_stats, corres, default_algo, lax, false, small);
+                entree_ptr = cat_entree::read(dialog, pdesc, reading_ver, fake_stats, corres, default_algo, lax, false, small);
 
             ino_ptr = dynamic_cast<cat_inode *>(entree_ptr);
             if(ino_ptr == nullptr || dynamic_cast<cat_directory *>(entree_ptr) != nullptr)
@@ -189,7 +189,7 @@ namespace libdar
                 {
                         // we can now create the cat_etoile and add it in the corres map;
 
-                    star_ref = new (get_pool()) cat_etoile(ino_ptr, tmp_tiquette);
+                    star_ref = new (nothrow) cat_etoile(ino_ptr, tmp_tiquette);
                     try
                     {
                         if(star_ref == nullptr)

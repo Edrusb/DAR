@@ -114,7 +114,7 @@ namespace libdar
 	    {
 		try
 		{
-		    p = cat_entree::read(dialog, get_pool(), pdesc, reading_ver, stats, corres, default_algo, lax, only_detruit, small);
+		    p = cat_entree::read(dialog, pdesc, reading_ver, stats, corres, default_algo, lax, only_detruit, small);
 		}
 		catch(Euser_abort & e)
 		{

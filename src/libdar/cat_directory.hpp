@@ -133,7 +133,7 @@ namespace libdar
 	    /// set the value of inode_dumped for all mirage (recusively)
 	void set_all_mirage_s_inode_dumped_field_to(bool val);
 
-        virtual cat_entree *clone() const override { return new (get_pool()) cat_directory(*this); };
+        virtual cat_entree *clone() const override { return new (std::nothrow) cat_directory(*this); };
 
 	const infinint & get_size() const { recursive_update_sizes(); return x_size; };
 	const infinint & get_storage_size() const { recursive_update_sizes(); return x_storage_size; };

@@ -135,7 +135,7 @@ void f1()
         cat_entree *ref = (cat_entree *)1; // != nullptr
         for(S_I i = 0; ref != nullptr; ++i)
         {
-            ref = cat_entree::read(*ui, nullptr, pdesc, macro_tools_supported_version, stats, corres, none, false, false, false);
+            ref = cat_entree::read(*ui, pdesc, macro_tools_supported_version, stats, corres, none, false, false, false);
             if(ref != nullptr)
                 delete ref;
         }
@@ -165,7 +165,7 @@ void f1()
 
         v_dir->dump(*pdesc, false);
         stack.skip(0);
-        ref = cat_entree::read(*ui, nullptr, pdesc, macro_tools_supported_version, stats, corres, none, false, false, false);
+        ref = cat_entree::read(*ui, pdesc, macro_tools_supported_version, stats, corres, none, false, false, false);
         v_sub_dir = dynamic_cast<cat_directory *>(ref);
         delete ref;
 	stack.clear();
