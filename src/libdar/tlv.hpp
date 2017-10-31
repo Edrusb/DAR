@@ -28,7 +28,6 @@
 
 #include "memory_file.hpp"
 #include "storage.hpp"
-#include "on_pool.hpp"
 
 namespace libdar
 {

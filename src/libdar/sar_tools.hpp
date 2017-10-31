@@ -34,7 +34,6 @@
 #include "generic_file.hpp"
 #include "header.hpp"
 #include "sar.hpp"
-#include "memory_pool.hpp"
 #include "label.hpp"
 
 

@@ -33,7 +33,6 @@ extern "C"
 } // end extern "C"
 
 #include <list>
-#include "on_pool.hpp"
 #include "cat_inode.hpp"
 
 namespace libdar
@@ -43,7 +42,7 @@ namespace libdar
 
 
 	/// the hard link implementation (etoile means star in French, seen a star as a point from which are thrown many ray of light)
-    class cat_etoile : public on_pool
+    class cat_etoile
     {
     public:
 

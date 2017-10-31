@@ -42,7 +42,6 @@
 #include "erreurs.hpp"
 #include "integers.hpp"
 #include "secu_string.hpp"
-#include "on_pool.hpp"
 
 namespace libdar
 {

@@ -21,7 +21,7 @@ else
 endif
 
 
-noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_special_alloc test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_escape test_hash_fichier moving_file make_sparse_file hashsum test_crypto_asym test_range $(LIBTHREADAR_TEST_MODULES) test_rsync test_smart_pointer test_datetime test_entrepot_libcurl
+noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_escape test_hash_fichier moving_file make_sparse_file hashsum test_crypto_asym test_range $(LIBTHREADAR_TEST_MODULES) test_rsync test_smart_pointer test_datetime test_entrepot_libcurl
 
 LDADD = ../libdar/$(MYLIB).la $(GPGME_LIBS)
 
@@ -91,9 +91,6 @@ test_generic_file_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 test_storage_SOURCES = test_storage.cpp
 test_storage_DEPENDENCIES = ../libdar/$(MYLIB).la
-
-test_special_alloc_SOURCES = test_special_alloc.cpp
-test_special_alloc_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 test_limitint_SOURCES = test_limitint.cpp
 test_limitint_LDADD =  ../dar_suite/shell_interaction.o $(LDADD)

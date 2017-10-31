@@ -113,6 +113,7 @@ extern "C"
 #include "generic_rsync.hpp"
 #include "null_file.hpp"
 #include "ea_filesystem.hpp"
+#include "cygwin_adapt.hpp"
 
 using namespace std;
 
