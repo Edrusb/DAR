@@ -682,7 +682,7 @@ namespace libdar
 			    dialog.printf("Arguments sent through anonymous pipe are:");
 			    dialog.warning(tools_concat_vector(" ", argvpipe));
 			}
-			tools_system_with_pipe(dialog, dar_cmd, argvpipe, nullptr);
+			tools_system_with_pipe(dialog, dar_cmd, argvpipe);
 		    }
 		    catch(Erange & e)
 		    {

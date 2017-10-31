@@ -174,7 +174,7 @@ namespace libdar
     static void runson(user_interaction & dialog, char * const argv[]);
     static void ignore_deadson(S_I sig);
     static void abort_on_deadson(S_I sig);
-    static bool is_a_slice_available(user_interaction & ui, const string & base, const string & extension, memory_pool *pool);
+    static bool is_a_slice_available(user_interaction & ui, const string & base, const string & extension);
     static string retreive_basename(const string & base, const string & extension);
     static void tools_localtime(const time_t & timep, struct tm *result);
 
@@ -428,7 +428,7 @@ namespace libdar
         return it;
     }
 
-    void tools_split_path_basename(const char *all, path * &chemin, string & base, memory_pool *pool)
+    void tools_split_path_basename(const char *all, path * &chemin, string & base)
     {
         chemin = nullptr;
         string src = all;
@@ -438,23 +438,23 @@ namespace libdar
         {
 	    it += 1;
             base = string(it, src.end());
-            chemin = new (pool) path(string(src.begin(), it), true);
+            chemin = new (nothrow) path(string(src.begin(), it), true);
         }
         else
         {
             base = src;
-            chemin = new (pool) path(".");
+            chemin = new (nothrow) path(".");
         }
 
         if(chemin == nullptr)
             throw Ememory("tools_split_path_basename");
     }
 
-    void tools_split_path_basename(const string & all, string & chemin, string & base, memory_pool *pool)
+    void tools_split_path_basename(const string & all, string & chemin, string & base)
     {
         path *tmp = nullptr;
 
-        tools_split_path_basename(all.c_str(), tmp, base, pool);
+        tools_split_path_basename(all.c_str(), tmp, base);
         if(tmp == nullptr)
             throw SRC_BUG;
         chemin = tmp->display();
@@ -647,23 +647,22 @@ namespace libdar
                           const string &input,
                           const string & output,
                           tuyau *&in,
-                          tuyau *&out,
-                          memory_pool *pool)
+                          tuyau *&out)
     {
         in = out = nullptr;
         try
         {
             if(input != "")
-                in = new (pool) tuyau(dialog, input, gf_read_only);
+                in = new (nothrow) tuyau(dialog, input, gf_read_only);
             else
-                in = new (pool) tuyau(dialog, 0, gf_read_only); // stdin by default
+                in = new (nothrow) tuyau(dialog, 0, gf_read_only); // stdin by default
             if(in == nullptr)
                 throw Ememory("tools_open_pipes");
 
             if(output != "")
-                out = new (pool) tuyau(dialog, output, gf_write_only);
+                out = new (nothrow) tuyau(dialog, output, gf_write_only);
             else
-                out = new (pool) tuyau(dialog, 1, gf_write_only); // stdout by default
+                out = new (nothrow) tuyau(dialog, 1, gf_write_only); // stdout by default
             if(out == nullptr)
                 throw Ememory("tools_open_pipes");
 
@@ -1131,8 +1130,7 @@ namespace libdar
 
     void tools_system_with_pipe(user_interaction & dialog,
                                 const string & dar_cmd,
-                                const vector<string> & argvpipe,
-                                memory_pool *pool)
+                                const vector<string> & argvpipe)
     {
         const char *argv[] = { dar_cmd.c_str(), "--pipe-fd", nullptr, nullptr };
         bool loop = false;
@@ -1143,7 +1141,7 @@ namespace libdar
 
             try
             {
-                tube = new (pool) tuyau(dialog);
+                tube = new (nothrow) tuyau(dialog);
                 if(tube == nullptr)
                     throw Ememory("tools_system_with_pipe");
 
@@ -1395,7 +1393,7 @@ namespace libdar
             return num <= hourshift;
     }
 
-    void tools_check_basename(user_interaction & dialog, const path & loc, string & base, const string & extension, memory_pool *pool)
+    void tools_check_basename(user_interaction & dialog, const path & loc, string & base, const string & extension)
     {
         NLS_SWAP_IN;
         try
@@ -1408,7 +1406,7 @@ namespace libdar
                 return; // not a suspect basename
 
                 // is there a slice available ?
-            if(is_a_slice_available(dialog, old_path, extension, pool))
+            if(is_a_slice_available(dialog, old_path, extension))
                 return; // yes, thus basename is not a mistake
 
                 // removing the suspicious end (.<number>.extension)
@@ -1416,7 +1414,7 @@ namespace libdar
 
             string new_base = retreive_basename(base, extension);
             string new_path = (loc+new_base).display();
-            if(is_a_slice_available(dialog, new_path, extension, pool))
+            if(is_a_slice_available(dialog, new_path, extension))
             {
                 try
                 {
@@ -1752,7 +1750,7 @@ namespace libdar
 #endif
     }
 
-    static bool is_a_slice_available(user_interaction & ui, const string & base, const string & extension, memory_pool *pool)
+    static bool is_a_slice_available(user_interaction & ui, const string & base, const string & extension)
     {
         path *chem = nullptr;
         bool ret = false;
@@ -1761,7 +1759,7 @@ namespace libdar
         {
             string rest;
 
-            tools_split_path_basename(base.c_str(), chem, rest, pool);
+            tools_split_path_basename(base.c_str(), chem, rest);
 
             try
             {
@@ -3285,7 +3283,7 @@ namespace libdar
     }
 
 
-    struct dirent *tools_allocate_struct_dirent(const std::string & path_name, U_64 & max_name_length, memory_pool *pool)
+    struct dirent *tools_allocate_struct_dirent(const std::string & path_name, U_64 & max_name_length)
     {
 	struct dirent *ret;
 	S_64 name_max = pathconf(path_name.c_str(), _PC_NAME_MAX);
@@ -3296,11 +3294,8 @@ namespace libdar
 	if(name_max < NAME_MAX)
 	    name_max = NAME_MAX;
 	len = offsetof(struct dirent, d_name) + name_max + 1;
-	if(pool == nullptr)
-	    ret = (struct dirent *) new (nothrow) char[len];
-	else
-	    ret = (struct dirent *) new (pool) char[len];
 
+	ret = (struct dirent *) new (nothrow) char[len];
 	if(ret == nullptr)
 	    throw Ememory("tools_allocate_struc_dirent");
 	memset(ret, '\0', len);
