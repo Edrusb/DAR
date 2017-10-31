@@ -129,8 +129,7 @@ namespace libdar
 {
     static void attach_ea(const string &chemin,
 			  cat_inode *ino,
-			  const mask & ea_mask,
-			  memory_pool *pool);
+			  const mask & ea_mask);
 
     cat_nomme *filesystem_hard_link_read::make_read_entree(path & lieu, const string & name, bool see_hard_link, const mask & ea_mask)
     {
@@ -233,7 +232,7 @@ namespace libdar
 		{
 		    string pointed = tools_readlink(ptr_name);
 
-		    ref = new (get_pool()) cat_lien(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+		    ref = new (nothrow) cat_lien(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 						    atime,
 						    mtime,
 						    ctime,
@@ -242,7 +241,7 @@ namespace libdar
 						    buf.st_dev);
 		}
 		else if(S_ISREG(buf.st_mode))
-		    ref = new (get_pool()) cat_file(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+		    ref = new (nothrow) cat_file(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 						    atime,
 						    mtime,
 						    ctime,
@@ -252,14 +251,14 @@ namespace libdar
 						    buf.st_dev,
 						    furtive_read_mode);
 		else if(S_ISDIR(buf.st_mode))
-		    ref = new (get_pool()) cat_directory(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+		    ref = new (nothrow) cat_directory(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 							 atime,
 							 mtime,
 							 ctime,
 							 name,
 							 buf.st_dev);
 		else if(S_ISCHR(buf.st_mode))
-		    ref = new (get_pool()) cat_chardev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+		    ref = new (nothrow) cat_chardev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 						       atime,
 						       mtime,
 						       ctime,
@@ -268,7 +267,7 @@ namespace libdar
 						       minor(buf.st_rdev), // makedev(major, minor)
 						       buf.st_dev);
 		else if(S_ISBLK(buf.st_mode))
-		    ref = new (get_pool()) cat_blockdev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+		    ref = new (nothrow) cat_blockdev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 							atime,
 							mtime,
 							ctime,
@@ -277,14 +276,14 @@ namespace libdar
 							minor(buf.st_rdev), // makedev(major, minor)
 							buf.st_dev);
 		else if(S_ISFIFO(buf.st_mode))
-		    ref = new (get_pool()) cat_tube(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+		    ref = new (nothrow) cat_tube(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 						    atime,
 						    mtime,
 						    ctime,
 						    name,
 						    buf.st_dev);
 		else if(S_ISSOCK(buf.st_mode))
-		    ref = new (get_pool()) cat_prise(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+		    ref = new (nothrow) cat_prise(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 						     atime,
 						     mtime,
 						     ctime,
@@ -292,7 +291,7 @@ namespace libdar
 						     buf.st_dev);
 #if HAVE_DOOR
 		else if(S_ISDOOR(buf.st_mode))
-		    ref = new (get_pool()) door(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+		    ref = new (nothrow) door(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 						atime,
 						mtime,
 						ctime,
@@ -314,7 +313,7 @@ namespace libdar
 
 		    try
 		    {
-			attach_ea(ptr_name, ino, ea_mask, get_pool());
+			attach_ea(ptr_name, ino, ea_mask);
 		    }
 		    catch(Ebug & e)
 		    {
@@ -343,7 +342,7 @@ namespace libdar
 			// Filesystem Specific Attributes Considerations
 			//
 
-		    filesystem_specific_attribute_list *fsal = new (get_pool()) filesystem_specific_attribute_list();
+		    filesystem_specific_attribute_list *fsal = new (nothrow) filesystem_specific_attribute_list();
 		    if(fsal == nullptr)
 			throw Ememory("filesystem_hard_link_read::make_entree");
 		    try
@@ -392,7 +391,7 @@ namespace libdar
 
 			if(ino_ref == nullptr)
 			    throw SRC_BUG;
-			tmp_et = new (get_pool()) cat_etoile(ino_ref, etiquette_counter++);
+			tmp_et = new (nothrow) cat_etoile(ino_ref, etiquette_counter++);
 			if(tmp_et == nullptr)
 			    throw Ememory("filesystem_hard_link_read::make_read_entree");
 			try
@@ -415,7 +414,7 @@ namespace libdar
 			    throw;
 			}
 
-			ref = new (get_pool()) cat_mirage(name, tmp_et);
+			ref = new (nothrow) cat_mirage(name, tmp_et);
 		    }
 		    else // inode already seen creating a new cat_mirage on the given cat_etoile
 		    {
@@ -425,7 +424,7 @@ namespace libdar
 
 			if(ref != nullptr)
 			    delete ref;  // we don't need this just created inode as it is already attached to the cat_etoile object
-			ref = new (get_pool()) cat_mirage(name, it->second.obj);
+			ref = new (nothrow) cat_mirage(name, it->second.obj);
 			if(ref != nullptr)
 			{
 			    it->second.count--;
@@ -453,14 +452,14 @@ namespace libdar
         return ref;
     }
 
-    static void attach_ea(const string &chemin, cat_inode *ino, const mask & ea_mask, memory_pool *pool)
+    static void attach_ea(const string &chemin, cat_inode *ino, const mask & ea_mask)
     {
         ea_attributs *eat = nullptr;
         try
         {
             if(ino == nullptr)
                 throw SRC_BUG;
-            eat = ea_filesystem_read_ea(chemin, ea_mask, pool);
+            eat = ea_filesystem_read_ea(chemin, ea_mask, nullptr);
             if(eat != nullptr)
             {
 		if(eat->size() <= 0)

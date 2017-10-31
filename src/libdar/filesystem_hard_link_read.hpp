@@ -46,7 +46,6 @@ extern "C"
 #include "etage.hpp"
 #include "criterium.hpp"
 #include "fsa_family.hpp"
-#include "on_pool.hpp"
 #include "cat_all_entrees.hpp"
 #include "compile_time_features.hpp"
 
@@ -59,7 +58,7 @@ namespace libdar
 
 	/// keep trace of hard links when reading the filesystem
 
-    class filesystem_hard_link_read : virtual protected mem_ui, virtual public on_pool
+    class filesystem_hard_link_read : virtual protected mem_ui
     {
             // this class is not to be used directly
             // it only provides some routine for the inherited classes

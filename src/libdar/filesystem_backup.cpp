@@ -147,7 +147,7 @@ namespace libdar
 	ea_mask = nullptr;
 	try
 	{
-	    fs_root = filesystem_tools_get_root_with_symlink(get_ui(), root, x_info_details, get_pool());
+	    fs_root = filesystem_tools_get_root_with_symlink(get_ui(), root, x_info_details, nullptr);
 	    if(fs_root == nullptr)
 		throw Ememory("filesystem_backup::filesystem_backup");
 	    info_details = x_info_details;
@@ -193,7 +193,7 @@ namespace libdar
         corres_reset();
         if(current_dir != nullptr)
             delete current_dir;
-        current_dir = new (get_pool()) path(*fs_root);
+        current_dir = new (nothrow) path(*fs_root);
         if(current_dir == nullptr)
             throw Ememory("filesystem_backup::reset_read");
         pile.clear();
@@ -263,7 +263,7 @@ namespace libdar
 		    {
                         if(! current_dir->pop(tmp))
                             throw SRC_BUG;
-                        ref = new (get_pool()) cat_eod();
+                        ref = new (nothrow) cat_eod();
                     }
                 }
                 else // could read a filename in directory
