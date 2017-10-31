@@ -28,7 +28,6 @@
 
 #include "../my_config.h"
 
-#include "on_pool.hpp"
 #include "cat_nomme.hpp"
 #include "cat_inode.hpp"
 #include "cat_directory.hpp"
@@ -74,7 +73,7 @@ namespace libdar
 	/// this class is a generic interface to handle what action to perform on both EA and Data
 	/// based on two files to evaluate.
 
-    class crit_action: public on_pool
+    class crit_action
     {
     public:
 	crit_action() = default;
@@ -121,7 +120,7 @@ namespace libdar
 
 	    /// the inherited pure virtual methods from class action that must be implemented
 	virtual void get_action(const cat_nomme & first, const cat_nomme & second, over_action_data & data, over_action_ea & ea) const override { data = x_data; ea = x_ea; };
-	virtual crit_action *clone() const override { return new (get_pool()) crit_constant_action(*this); };
+	virtual crit_action *clone() const override { return new (std::nothrow) crit_constant_action(*this); };
 
     private:
 	over_action_data x_data;
@@ -137,7 +136,7 @@ namespace libdar
 	/// criterium classes defined below. It defines a common
 	/// interface for all of them.
 
-    class criterium : public on_pool
+    class criterium
     {
     public:
 	criterium() = default;
@@ -193,7 +192,7 @@ namespace libdar
 		x_go_false->get_action(first, second, data, ea);
 	};
 
-	virtual crit_action *clone() const override { return new (get_pool()) testing(*this); };
+	virtual crit_action *clone() const override { return new (std::nothrow) testing(*this); };
 
     private:
 	criterium *x_input;
@@ -225,7 +224,7 @@ namespace libdar
 
 	virtual void get_action(const cat_nomme & first, const cat_nomme & second, over_action_data & data, over_action_ea & ea) const override;
 
-	virtual crit_action *clone() const override { return new (get_pool()) crit_chain(*this); };
+	virtual crit_action *clone() const override { return new (std::nothrow) crit_chain(*this); };
 
     private:
 	std::vector<crit_action *> sequence;
@@ -253,7 +252,7 @@ namespace libdar
 	~crit_in_place_is_inode() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
-	virtual criterium *clone() const override { return new (get_pool()) crit_in_place_is_inode(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_is_inode(*this); };
     };
 
 
@@ -268,7 +267,7 @@ namespace libdar
 	~crit_in_place_is_dir() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const { return dynamic_cast<const cat_directory *>(&first) != nullptr; };
-	virtual criterium *clone() const override { return new (get_pool()) crit_in_place_is_dir(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_is_dir(*this); };
     };
 
 
@@ -283,7 +282,7 @@ namespace libdar
 	~crit_in_place_is_file() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
-	virtual criterium *clone() const override { return new (get_pool()) crit_in_place_is_file(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_is_file(*this); };
     };
 
 	/// returns true if the first entry is a inode with several hard links (whatever is the second entry)
@@ -299,7 +298,7 @@ namespace libdar
 	~crit_in_place_is_hardlinked_inode() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
-	virtual criterium *clone() const override { return new (get_pool()) crit_in_place_is_hardlinked_inode(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_is_hardlinked_inode(*this); };
     };
 
 
@@ -313,7 +312,7 @@ namespace libdar
 	~crit_in_place_is_new_hardlinked_inode() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
-	virtual criterium *clone() const override { return new (get_pool()) crit_in_place_is_new_hardlinked_inode(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_is_new_hardlinked_inode(*this); };
     };
 
 
@@ -330,7 +329,7 @@ namespace libdar
 	~crit_in_place_data_more_recent() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
-	virtual criterium *clone() const override { return new (get_pool()) crit_in_place_data_more_recent(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_data_more_recent(*this); };
 
     private:
 	infinint x_hourshift;
@@ -351,7 +350,7 @@ namespace libdar
 	~crit_in_place_data_more_recent_or_equal_to() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
-	virtual criterium *clone() const override { return new (get_pool()) crit_in_place_data_more_recent_or_equal_to(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_data_more_recent_or_equal_to(*this); };
 
     private:
 	infinint x_hourshift;
@@ -372,7 +371,7 @@ namespace libdar
 	~crit_in_place_data_bigger() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
-	virtual criterium *clone() const override { return new (get_pool()) crit_in_place_data_bigger(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_data_bigger(*this); };
     };
 
 
@@ -390,7 +389,7 @@ namespace libdar
 	~crit_in_place_data_saved() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
-	virtual criterium *clone() const override { return new (get_pool()) crit_in_place_data_saved(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_data_saved(*this); };
     };
 
 
@@ -405,7 +404,7 @@ namespace libdar
 	~crit_in_place_data_dirty() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
-	virtual criterium *clone() const override { return new (get_pool()) crit_in_place_data_dirty(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_data_dirty(*this); };
     };
 
 	/// return true if the entry is a sparse file (or hard linked sparse file)
@@ -419,7 +418,7 @@ namespace libdar
 	~crit_in_place_data_sparse() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
-	virtual criterium *clone() const override { return new (get_pool()) crit_in_place_data_sparse(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_data_sparse(*this); };
     };
 
 
@@ -434,7 +433,7 @@ namespace libdar
 	~crit_in_place_has_delta_sig() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
-	virtual criterium *clone() const override { return new (get_pool()) crit_in_place_has_delta_sig(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_has_delta_sig(*this); };
     };
 
 
@@ -454,7 +453,7 @@ namespace libdar
 	    const cat_inode *tmp = dynamic_cast<const cat_inode *>(&first);
 	    return tmp != nullptr && tmp->ea_get_saved_status() != cat_inode::ea_none && tmp->ea_get_saved_status() != cat_inode::ea_removed;
 	};
-	virtual criterium *clone() const override { return new (get_pool()) crit_in_place_EA_present(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_EA_present(*this); };
     };
 
 
@@ -475,7 +474,7 @@ namespace libdar
 
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
-	virtual criterium *clone() const override { return new (get_pool()) crit_in_place_EA_more_recent(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_EA_more_recent(*this); };
 
     private:
 	infinint x_hourshift;
@@ -496,7 +495,7 @@ namespace libdar
 	~crit_in_place_EA_more_recent_or_equal_to() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
-	virtual criterium *clone() const override { return new (get_pool()) crit_in_place_EA_more_recent_or_equal_to(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_EA_more_recent_or_equal_to(*this); };
 
     private:
 	infinint x_hourshift;
@@ -517,7 +516,7 @@ namespace libdar
 	~crit_in_place_more_EA() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
-	virtual criterium *clone() const override { return new (get_pool()) crit_in_place_more_EA(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_more_EA(*this); };
     };
 
 
@@ -535,7 +534,7 @@ namespace libdar
 	~crit_in_place_EA_bigger() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
-	virtual criterium *clone() const override { return new (get_pool()) crit_in_place_EA_bigger(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_EA_bigger(*this); };
     };
 
 
@@ -552,7 +551,7 @@ namespace libdar
 	~crit_in_place_EA_saved() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
-	virtual criterium *clone() const override { return new (get_pool()) crit_in_place_EA_saved(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_EA_saved(*this); };
     };
 
 
@@ -570,7 +569,7 @@ namespace libdar
 	~crit_same_type() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
-	virtual criterium *clone() const override { return new (get_pool()) crit_same_type(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_same_type(*this); };
     };
 
 
@@ -585,7 +584,7 @@ namespace libdar
 	~crit_not() { destroy(); };
 
 	virtual bool evaluate(const cat_nomme & first, const cat_nomme & second) const override { return ! x_crit->evaluate(first, second); };
-	virtual criterium *clone() const override { return new (get_pool()) crit_not(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_not(*this); };
 
     protected:
 	const criterium *x_crit;
@@ -612,7 +611,7 @@ namespace libdar
 	void gobe(crit_and & to_be_voided);
 
 	virtual bool evaluate(const cat_nomme & first, const cat_nomme & second) const override;
-	virtual criterium *clone() const override { return new (get_pool()) crit_and(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_and(*this); };
 
     protected:
 	std::vector<criterium *> operand;
@@ -631,7 +630,7 @@ namespace libdar
 	~crit_or() = default;
 
 	virtual bool evaluate(const cat_nomme & first, const cat_nomme & second) const override;
-	virtual criterium *clone() const override { return new (get_pool()) crit_or(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_or(*this); };
 
     };
 
@@ -644,7 +643,7 @@ namespace libdar
 	~crit_invert() = default;
 
 	virtual bool evaluate(const cat_nomme & first, const cat_nomme & second) const override { return x_crit->evaluate(second, first); };
-	virtual criterium *clone() const override { return new (get_pool()) crit_invert(*this); };
+	virtual criterium *clone() const override { return new (std::nothrow) crit_invert(*this); };
     };
 
 
