@@ -32,7 +32,6 @@
 #include <list>
 #include <string>
 #include "erreurs.hpp"
-#include "on_pool.hpp"
 
 const std::string PSEUDO_ROOT = "<ROOT>";
 
@@ -49,7 +48,7 @@ namespace libdar
 	/// by libdar
 	/// \ingroup API
 
-    class path : public on_pool
+    class path
     {
     public :
 	    /// constructor from a string
