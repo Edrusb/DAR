@@ -40,7 +40,6 @@
 #include "escape_catalogue.hpp"
 #include "pile.hpp"
 #include "list_entry.hpp"
-#include "on_pool.hpp"
 #include "crypto.hpp"
 #include "slice_layout.hpp"
 
@@ -53,7 +52,7 @@ namespace libdar
 	/// are the same abstraction level as the operation realized by the DAR
 	/// command line tool.
 	/// \ingroup API
-    class archive : public on_pool
+    class archive
     {
     public:
 
@@ -170,7 +169,7 @@ namespace libdar
 	archive & operator = (const archive & ref) = delete;
 
 	    /// the destructor
-	~archive() throw(Ebug) { free_all(); };
+	~archive() { free_mem(); };
 
 
 	    /// extraction of data from an archive
@@ -348,14 +347,6 @@ namespace libdar
 	    /// change all inode as unsaved (equal to differential backup with no change met)
 	void set_to_unsaved_data_and_FSA() { if(cat == nullptr) throw SRC_BUG; cat->set_to_unsaved_data_and_FSA(); };
 
-	    /// check that the internal memory_pool has all its blocks properly freeed
-	    ///
-	    /// \return an empty string in normal situation, else a status report about the
-	    /// still allocated blocks that remain in the internal memory_pool
-	    /// \note this must be the last call done to that object before destruction and it must
-	    /// be done only once
-	std::string free_and_check_memory() const;
-
 	    /// get the first slice header
 	    ///
 	    /// get_first_slice_header_size() and get_non_first_slice_header_size() can be used to translate
@@ -378,19 +369,15 @@ namespace libdar
 
 	pile stack;              //< the different layer through which the archive contents is read or wrote
 	header_version ver;      //< information for the archive header
-	memory_pool *pool;       //< points to local_pool or inherited pool or to nullptr if no memory_pool has to be used
 	catalogue *cat;          //< archive contents
 	infinint local_cat_size; //< size of the catalogue on disk
 	bool exploitable;        //< is false if only the catalogue is available (for reference backup or isolation).
 	bool lax_read_mode;      //< whether the archive has been openned in lax mode (unused for creation/merging/isolation)
 	bool sequential_read;    //< whether the archive is read in sequential mode
-	bool freed_and_checked;  //< whether free_and_check has been run
 	std::list<signator> gnupg_signed; //< list of signature found in the archive (reading an existing archive)
 	slice_layout slices;     //< slice layout, archive is not sliced <=> first_size or other_size fields is set to zero (in practice both are set to zero, but one being set is enought to determine the archive is not sliced)
 
-	void free_except_memory_pool();
-	void free_all();
-	void init_pool();
+	void free_mem();
 	void check_gnupg_signed(user_interaction & dialog) const;
 
 	const catalogue & get_cat() const { if(cat == nullptr) throw SRC_BUG; else return *cat; };

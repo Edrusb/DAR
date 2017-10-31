@@ -1095,27 +1095,6 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	if(param.info_details)
 	    dialog.warning(gettext("Final memory cleanup..."));
 
-	string mesg;
-
-	if(arch != nullptr)
-	{
-	    mesg = arch->free_and_check_memory();
-	    if(!mesg.empty())
-		cerr << mesg << endl;
-	}
-	if(aux != nullptr)
-	{
-	    mesg = aux->free_and_check_memory();
-	    if(!mesg.empty())
-		cerr << mesg << endl;
-	}
-	if(cur != nullptr)
-	{
-	    mesg = cur->free_and_check_memory();
-	    if(!mesg.empty())
-		cerr << mesg << endl;
-	}
-
 	if(arch != nullptr)
 	{
 	    delete arch;

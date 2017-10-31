@@ -81,9 +81,7 @@ namespace libdar
 	    if(where == nullptr)
 		throw Ememory("archive::archive");
 
-	    pool = nullptr;
 	    cat = nullptr;
-	    freed_and_checked = false;
 
 	    try
 	    {
@@ -98,8 +96,6 @@ namespace libdar
 		sequential_read = options.get_sequential_read(); // updating the archive object's field
 		where->set_location(chem);
 
-		init_pool();
-
 		try
 		{
 		    if(info_details)
@@ -107,7 +103,7 @@ namespace libdar
 
 			// we open the main archive to get the different layers (level1, scram and level2).
 		    macro_tools_open_archive(dialog,
-					     pool,
+					     nullptr,
 					     *where,
 					     basename,
 					     options.get_slice_min_digits(),
@@ -164,7 +160,7 @@ namespace libdar
 
 				    // we open the archive of reference also to get its different layers (ref_stack)
 				macro_tools_open_archive(dialog,
-							 pool,
+							 nullptr,
 							 *ref_where,
 							 options.get_ref_basename(),
 							 options.get_ref_slice_min_digits(),
@@ -224,7 +220,7 @@ namespace libdar
 			    dialog.warning(gettext("Loading isolated catalogue in memory..."));
 
 			cat = macro_tools_get_derivated_catalogue_from(dialog,
-								       pool,
+								       nullptr,
 								       stack,
 								       ref_stack,
 								       ref_ver,
@@ -259,7 +255,7 @@ namespace libdar
 				if(info_details)
 				    dialog.warning(gettext("Loading catalogue into memory..."));
 				cat = macro_tools_get_catalogue_from(dialog,
-								     pool,
+								     nullptr,
 								     stack,
 								     ver,
 								     options.get_info_details(),
@@ -293,7 +289,7 @@ namespace libdar
 					    lab = layer1->get_data_name();
 
 					cat = macro_tools_read_catalogue(dialog,
-									 pool,
+									 nullptr,
 									 ver,
 									 pdesc,
 									 0, // cannot determine cat_size at this stage
@@ -315,11 +311,11 @@ namespace libdar
 				    {
 					if(info_details)
 					    dialog.warning(gettext("The catalogue will be filled while sequentially reading the archive, preparing the data structure..."));
-					cat = new (pool) escape_catalogue(dialog,
-									  pdesc,
-									  ver,
-									  gnupg_signed,
-									  options.get_lax());
+					cat = new (nothrow) escape_catalogue(dialog,
+									     pdesc,
+									     ver,
+									     gnupg_signed,
+									     options.get_lax());
 				    }
 				    if(cat == nullptr)
 					throw Ememory("archive::archive");
@@ -361,7 +357,7 @@ namespace libdar
 					label tmp;
 					tmp.clear(); // this way we do not modify the catalogue data name even in lax mode
 					cat = macro_tools_lax_search_catalogue(dialog,
-									       pool,
+									       nullptr,
 									       stack,
 									       ver.get_edition(),
 									       ver.get_compression_algo(),
@@ -374,7 +370,7 @@ namespace libdar
 					dialog.printf(gettext("LAX MODE: Could not find a whole catalogue in the archive. If you have an isolated catalogue, stop here and use it as backup of the internal catalogue, else continue but be advised that all data will not be able to be retrieved..."));
 					dialog.pause(gettext("LAX MODE: Do you want to try finding portions of the original catalogue if some remain (this may take even more time and in any case, it will only permit to recover some files, at most)?"));
 					cat = macro_tools_lax_search_catalogue(dialog,
-									       pool,
+									       nullptr,
 									       stack,
 									       ver.get_edition(),
 									       ver.get_compression_algo(),
@@ -401,7 +397,7 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		free_all();
+		free_mem();
 		throw;
 	    }
 	}
@@ -426,10 +422,7 @@ namespace libdar
         NLS_SWAP_IN;
         try
         {
-	    pool = nullptr;
 	    cat = nullptr;
-	    freed_and_checked = false;
-	    init_pool();
 
 	    try
 	    {
@@ -521,7 +514,7 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		free_all();
+		free_mem();
 		throw;
 	    }
 	}
@@ -543,13 +536,11 @@ namespace libdar
 		     const string & extension,
 		     const archive_options_isolate & options)
     {
-	pool = nullptr;
 	cat = nullptr;
 	local_cat_size = 0;
 	exploitable = false;
 	lax_read_mode = false;
 	sequential_read = false;
-	freed_and_checked = true;
 
 	if(ref_arch == nullptr)
 	    throw Elibcall("deprecated isolate constructor", "nullptr argument given to \"ref_arch\"");
@@ -580,14 +571,11 @@ namespace libdar
 	compression algo_kept = none;
 	entrepot *sauv_path_t = options.get_entrepot().clone();
 	entrepot_local *sauv_path_t_local = dynamic_cast<entrepot_local *>(sauv_path_t);
-	freed_and_checked = false;
 
 	NLS_SWAP_IN;
 	try
 	{
-	    pool = nullptr;
 	    cat = nullptr;
-	    init_pool();
 
 	    try
 	    {
@@ -784,7 +772,7 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		free_all();
+		free_mem();
 		throw;
 	    }
 	}
@@ -815,12 +803,10 @@ namespace libdar
 
 	    // stack will be set by op_create_in_sub()
 	    // ver will be set by op_create_in_sub()
-	init_pool(); // initializes pool
 	cat = nullptr; // will be set by op_create_in_sub()
 	exploitable = false;
 	lax_read_mode = false;
 	sequential_read = false;
-	freed_and_checked = false;
 	    // gnupg_signed is not used while creating an archive
 	    // slices will be set by op_create_in_sub()
 	    // local_cat_size not used while creating an archive
@@ -968,8 +954,6 @@ namespace libdar
         {
                 // sanity checks
 
-	    if(freed_and_checked)
-		throw Erange("catalogue::op_extract", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
             if(!exploitable)
                 throw Elibcall("op_extract", gettext("This archive is not exploitable, check documentation for more"));
 
@@ -992,7 +976,7 @@ namespace libdar
 	    try
 	    {
 		filtre_restore(dialog,
-			       pool,
+			       nullptr,
 			       options.get_selection(),
 			       options.get_subtree(),
 			       get_cat(),
@@ -1055,8 +1039,6 @@ namespace libdar
 
 		// sanity checks
 
-	    if(freed_and_checked)
-		throw Erange("catalogue::summary", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
 	    if(!exploitable)
 		throw Elibcall("summary", gettext("This archive is not exploitable, check the archive class usage in the API documentation"));
 
@@ -1162,8 +1144,6 @@ namespace libdar
 		// a warning is issued in that case
 
 
-	    if(freed_and_checked)
-		throw Erange("catalogue::op_listing", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
             enable_natural_destruction();
             try
             {
@@ -1267,8 +1247,6 @@ namespace libdar
 
                 // sanity checks
 
-	    if(freed_and_checked)
-		throw Erange("catalogue::op_diff", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
             if(!exploitable)
                 throw Elibcall("op_diff", gettext("This archive is not exploitable, check documentation for more"));
 
@@ -1288,7 +1266,7 @@ namespace libdar
             try
             {
                 filtre_difference(dialog,
-				  pool,
+				  nullptr,
 				  options.get_selection(),
 				  options.get_subtree(),
 				  get_cat(),
@@ -1353,8 +1331,6 @@ namespace libdar
 
                 // sanity checks
 
-	    if(freed_and_checked)
-		throw Erange("catalogue::op_test", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
             if(!exploitable)
                 throw Elibcall("op_test", gettext("This archive is not exploitable, check the archive class usage in the API documentation"));
 
@@ -1390,7 +1366,7 @@ namespace libdar
 		    }
 		    else
 			filtre_test(dialog,
-				    pool,
+				    nullptr,
 				    options.get_selection(),
 				    options.get_subtree(),
 				    get_cat(),
@@ -1478,7 +1454,7 @@ namespace libdar
 					  isol_ver,
 					  isol_slices,
 					  &slices, // giving our slice_layout as reference to be stored in the archive header/trailer
-					  get_pool(),
+					  nullptr, // pool
 					  *sauv_path_t,
 					  filename,
 					  extension,
@@ -1581,8 +1557,6 @@ namespace libdar
         NLS_SWAP_IN;
         try
         {
-	    if(freed_and_checked)
-		throw Erange("catalogue::get_children_of", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
 	    if(exploitable && sequential_read) // the catalogue is not even yet read, so we must first read it entirely
 	    {
 		if(only_contains_an_isolated_catalogue())
@@ -1627,8 +1601,6 @@ namespace libdar
 	    const cat_directory * parent = get_dir_object(dir);
 	    const cat_nomme *tmp_ptr = nullptr;
 
-	    if(freed_and_checked)
-		throw Erange("catalogue::get_children_in_table", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
             if(parent == nullptr)
 		throw SRC_BUG;
 
@@ -1744,8 +1716,6 @@ namespace libdar
 	    const cat_directory *parent = get_dir_object(dir);
 	    const cat_nomme *tmp_ptr = nullptr;
 
-	    if(freed_and_checked)
-		throw Erange("catalogue::has_subdirectory", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
 	    parent->reset_read_children();
 	    while(parent->read_children(tmp_ptr) && !ret)
 	    {
@@ -1768,8 +1738,6 @@ namespace libdar
 	NLS_SWAP_IN;
         try
         {
-	    if(freed_and_checked)
-		throw Erange("catalogue::init_catalogue", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
 	    if(exploitable && sequential_read) // the catalogue is not even yet read, so we must first read it entirely
 	    {
 		if(only_contains_an_isolated_catalogue())
@@ -1807,8 +1775,6 @@ namespace libdar
 
 	try
 	{
-	    if(freed_and_checked)
-		throw Erange("catalogue::get_catalogue", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
 	    if(exploitable && sequential_read)
 		throw Elibcall("archive::get_catalogue", "Reading the first time the catalogue of an archive open in sequential read mode needs passing a \"user_interaction\" object to the argument of archive::get_catalogue or call init_catalogue() first ");
 
@@ -1839,8 +1805,6 @@ namespace libdar
 
 	try
 	{
-	    if(freed_and_checked)
-		throw Erange("catalogue::drop_all_filedescriptors", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
 	    if(exploitable && sequential_read)
 		throw Elibcall("archive::drop_all_filedescriptiors", "Dropping all filedescriptors for an archive in sequential read mode that has not yet been read need passing a \"user_interaction\" object to the argument of archive::drop_all_filedescriptors");
 
@@ -1863,8 +1827,6 @@ namespace libdar
 
 	try
 	{
-	    if(freed_and_checked)
-		throw Erange("catalogue::drop_all_filedescriptors(user_interaction)", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
 	    if(exploitable && sequential_read)
 	    {
 		if(only_contains_an_isolated_catalogue())
@@ -1889,32 +1851,6 @@ namespace libdar
 	}
 
 	NLS_SWAP_OUT;
-    }
-
-    string archive::free_and_check_memory() const
-    {
-	string ret = "";
-	archive *me = const_cast<archive *>(this);
-
-	if(freed_and_checked)
-	    throw Erange("catalogue::free_and_check_memory", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
-
-	if(me == nullptr)
-	    throw SRC_BUG;
-	me->freed_and_checked = true;
-	me->free_except_memory_pool();
-
-	if(pool != nullptr)
-	{
-#ifdef LIBDAR_DEBUG_MEMORY
-	    ret += pool->max_percent_full();
-#endif
-	    pool->garbage_collect();
-	    if(!pool->is_empty())
-		ret += pool->dump();
-	}
-
-	return ret;
     }
 
     U_64 archive::get_first_slice_header_size() const
@@ -2300,7 +2236,7 @@ namespace libdar
 					  ver,   // this object field is set!
 					  slices,// this object field is set!
 					  nullptr,  // no slicing reference stored in archive header/trailer
-					  pool,  // this object field
+					  nullptr,  // this object field
 					  sauv_path_t,
 					  filename,
 					  extension,
@@ -2364,15 +2300,15 @@ namespace libdar
 		case oper_merge:
 		case oper_repair:
 		    if(add_marks_for_sequential_reading && !empty)
-			cat = new (pool) escape_catalogue(dialog, pdesc, ref_cat1->get_root_dir_last_modif(), internal_name);
+			cat = new (nothrow) escape_catalogue(dialog, pdesc, ref_cat1->get_root_dir_last_modif(), internal_name);
 		    else
-			cat = new (pool) catalogue(dialog, ref_cat1->get_root_dir_last_modif(), internal_name);
+			cat = new (nothrow) catalogue(dialog, ref_cat1->get_root_dir_last_modif(), internal_name);
 		    break;
 		case oper_create:
 		    if(add_marks_for_sequential_reading && !empty)
-			cat = new (pool) escape_catalogue(dialog, pdesc, root_mtime, internal_name);
+			cat = new (nothrow) escape_catalogue(dialog, pdesc, root_mtime, internal_name);
 		    else
-			cat = new (pool) catalogue(dialog, root_mtime, internal_name);
+			cat = new (nothrow) catalogue(dialog, root_mtime, internal_name);
 		    break;
 		default:
 		    throw SRC_BUG;
@@ -2398,9 +2334,9 @@ namespace libdar
 
 			    label data_name;
 			    data_name.clear();
-			    void_cat = new (pool) catalogue(dialog,
-							    datetime(0),
-							    data_name);
+			    void_cat = new (nothrow) catalogue(dialog,
+							       datetime(0),
+							       data_name);
 			    if(void_cat == nullptr)
 				throw Ememory("archive::op_create_in_sub");
 			    ref_cat_ptr = void_cat;
@@ -2411,7 +2347,7 @@ namespace libdar
 			    if(info_details)
 				dialog.warning(gettext("Processing files for backup..."));
 			    filtre_sauvegarde(dialog,
-					      pool,
+					      nullptr,
 					      selection,
 					      subtree,
 					      pdesc,
@@ -2474,7 +2410,7 @@ namespace libdar
 			    dialog.warning(gettext("Processing files for merging..."));
 
 			filtre_merge(dialog,
-				     pool,
+				     nullptr,
 				     selection,
 				     subtree,
 				     pdesc,
@@ -2508,7 +2444,7 @@ namespace libdar
 			try
 			{
 			    filtre_merge_step0(dialog,
-					       pool,
+					       nullptr,
 					       ref_cat1,
 					       ref_cat2,
 					       *st_ptr,
@@ -2522,7 +2458,7 @@ namespace libdar
 				// we should be prepared to release decr
 				// but we do not need such argument for fixing op.
 			    filtre_merge_step2(dialog,
-					       pool,
+					       nullptr,
 					       pdesc,
 					       *(const_cast<catalogue *>(ref_cat1)),
 					       info_details,
@@ -2642,7 +2578,7 @@ namespace libdar
 	}
     }
 
-    void archive::free_except_memory_pool()
+    void archive::free_mem()
     {
 	stack.clear();
 	gnupg_signed.clear();
@@ -2653,42 +2589,6 @@ namespace libdar
 	    delete cat;
 	    cat = nullptr;
 	}
-    }
-
-    void archive::free_all()
-    {
-	free_except_memory_pool();
-
-	if(pool != nullptr)
-	{
-	    if(get_pool() == nullptr)
-	    {
-		delete pool;
-		pool = nullptr;
-	    }
-	    else
-	    {
-		if(pool != get_pool())
-		    throw SRC_BUG;
-		pool = nullptr;
-	    }
-	}
-    }
-
-    void archive::init_pool()
-    {
-	pool = nullptr;
-
-#ifdef LIBDAR_SPECIAL_ALLOC
-	if(get_pool() == nullptr)
-	{
-	    pool = new (nothrow) memory_pool();
-	    if(pool == nullptr)
-		throw Ememory("archive::archive (read) for memory_pool");
-	}
-	else
-	    pool = get_pool();
-#endif
     }
 
     void archive::check_gnupg_signed(user_interaction & dialog) const
