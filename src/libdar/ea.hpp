@@ -34,7 +34,6 @@
 #include "generic_file.hpp"
 #include "mask.hpp"
 #include "header_version.hpp"
-#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -44,7 +43,7 @@ namespace libdar
 
 	/// the class ea_attributs manages the set of EA that can be associated to an inode
 
-    class ea_attributs : public on_pool
+    class ea_attributs
     {
     public:
         ea_attributs() { alire = attr.begin(); };
