@@ -211,7 +211,7 @@ namespace libdar
 	{
 	    infinint key_size = f;
 
-	    crypted_key = new (get_pool()) memory_file();
+	    crypted_key = new (nothrow) memory_file();
 	    if(crypted_key == nullptr)
 		throw Ememory("header_version::read");
 	    if(f.copy_to(*crypted_key, key_size) != key_size)
@@ -223,7 +223,7 @@ namespace libdar
 	    try
 	    {
 		if(ref_layout == nullptr)
-		    ref_layout = new (get_pool()) slice_layout();
+		    ref_layout = new (nothrow) slice_layout();
 		if(ref_layout == nullptr)
 		    throw Ememory("header_version::read");
 		ref_layout->read(f);
@@ -260,7 +260,7 @@ namespace libdar
 
 	    if(edition > 7)
 	    {
-		crc *coh = create_crc_from_file(f, get_pool());
+		crc *coh = create_crc_from_file(f);
 
 		if(coh == nullptr)
 		    throw SRC_BUG;
@@ -419,7 +419,7 @@ namespace libdar
 	sym = ref.sym;
 	if(ref.crypted_key != nullptr)
 	{
-	    crypted_key = new (get_pool()) memory_file(*ref.crypted_key);
+	    crypted_key = new (nothrow) memory_file(*ref.crypted_key);
 	    if(crypted_key == nullptr)
 		throw Ememory("header_version::copy_from");
 	}
@@ -427,7 +427,7 @@ namespace libdar
 	    crypted_key = nullptr;
 	if(ref.ref_layout != nullptr)
 	{
-	    ref_layout = new (get_pool()) slice_layout(*ref.ref_layout);
+	    ref_layout = new (nothrow) slice_layout(*ref.ref_layout);
 	    if(ref_layout == nullptr)
 		throw Ememory("header_version::copy_from");
 	}

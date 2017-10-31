@@ -31,7 +31,6 @@
 #include "generic_file.hpp"
 #include "tools.hpp"
 #include "archive_version.hpp"
-#include "on_pool.hpp"
 #include "crypto.hpp"
 #include "slice_layout.hpp"
 #include "compressor.hpp"
@@ -43,7 +42,7 @@ namespace libdar
 	/// @{
 
 	/// manages the archive header and trailer
-    class header_version : public on_pool
+    class header_version
     {
     public:
 	header_version();
