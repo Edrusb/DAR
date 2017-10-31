@@ -41,6 +41,8 @@ extern "C"
 #include "generic_file.hpp"
 #include "tools.hpp"
 
+using namespace std;
+
 namespace libdar
 {
 
@@ -92,7 +94,7 @@ namespace libdar
 
                 try
                 {
-                    field = new (get_pool()) storage(x, skip);
+                    field = new (nothrow) storage(x, skip);
                 }
                 catch(...)
                 {
@@ -671,7 +673,7 @@ namespace libdar
     {
         if(ref.is_valid())
         {
-            field = new (get_pool()) storage(*(ref.field));
+            field = new (nothrow) storage(*(ref.field));
             if(field == nullptr)
                 throw Ememory("infinint::copy_from");
         }

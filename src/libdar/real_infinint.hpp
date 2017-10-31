@@ -43,7 +43,6 @@ extern "C"
 #include "storage.hpp"
 #include "integers.hpp"
 #include "int_tools.hpp"
-#include "on_pool.hpp"
 
 #define ZEROED_SIZE 50
 
@@ -55,7 +54,7 @@ namespace libdar
 
 	/// can only handle positive integer numbers
 	/// \ingroup Private
-    class infinint : public on_pool
+    class infinint
     {
     public :
 
