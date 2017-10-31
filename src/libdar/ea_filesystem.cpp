@@ -82,8 +82,8 @@ namespace libdar
 
     static bool write_ea(const string & chemin, const ea_attributs & val, const mask & filter);
     static bool remove_ea(const string & name, const ea_attributs & val, const mask & filter);
-    static ea_attributs * read_ea(const string & name, const mask & filter, memory_pool *p);
-    static vector<string> ea_filesystem_get_ea_list_for(const char *filename, memory_pool *p);
+    static ea_attributs * read_ea(const string & name, const mask & filter);
+    static vector<string> ea_filesystem_get_ea_list_for(const char *filename);
 #endif
 
     bool ea_filesystem_write_ea(const string & chemin, const ea_attributs & val, const mask & filter)
@@ -95,19 +95,19 @@ namespace libdar
 #endif
     }
 
-    ea_attributs * ea_filesystem_read_ea(const string & name, const mask & filter, memory_pool *p)
+    ea_attributs * ea_filesystem_read_ea(const string & name, const mask & filter)
     {
 #ifdef EA_SUPPORT
-        return read_ea(name, filter, p);
+        return read_ea(name, filter);
 #else
 	return nullptr;
 #endif
     }
 
-    void ea_filesystem_clear_ea(const string &name, const mask & filter, memory_pool *p)
+    void ea_filesystem_clear_ea(const string &name, const mask & filter)
     {
 #ifdef EA_SUPPORT
-        ea_attributs * eat =  ea_filesystem_read_ea(name, filter, p);
+        ea_attributs * eat =  ea_filesystem_read_ea(name, filter);
 	try
 	{
 	    if(eat != nullptr)
@@ -126,23 +126,23 @@ namespace libdar
 #endif
     }
 
-    bool ea_filesystem_has_ea(const string & name, memory_pool *p)
+    bool ea_filesystem_has_ea(const string & name)
     {
 #ifdef EA_SUPPORT
-	vector<string> val = ea_filesystem_get_ea_list_for(name.c_str(), p);
+	vector<string> val = ea_filesystem_get_ea_list_for(name.c_str());
 	return ! val.empty();
 #else
 	return false;
 #endif
     }
 
-    bool ea_filesystem_has_ea(const string & name, const ea_attributs & list, const mask & filter, memory_pool *p)
+    bool ea_filesystem_has_ea(const string & name, const ea_attributs & list, const mask & filter)
     {
 #ifdef EA_SUPPORT
 	const char *p_name = name.c_str();
 	bool ret = false;
 
-	vector<string> val = ea_filesystem_get_ea_list_for(p_name, p);
+	vector<string> val = ea_filesystem_get_ea_list_for(p_name);
 	vector<string>::iterator it = val.begin();
 	string tmp;
 
@@ -221,12 +221,12 @@ namespace libdar
         return num > 0;
     }
 
-    static ea_attributs * read_ea(const string & name, const mask & filter, memory_pool *p)
+    static ea_attributs * read_ea(const string & name, const mask & filter)
     {
         const char *n_ptr = name.c_str();
 	ea_attributs *ret = nullptr;
 
-	vector<string> ea_liste = ea_filesystem_get_ea_list_for(n_ptr, p);
+	vector<string> ea_liste = ea_filesystem_get_ea_list_for(n_ptr);
 	vector<string>::iterator it = ea_liste.begin();
 
 	try
@@ -249,7 +249,7 @@ namespace libdar
 
 		    if(ret == nullptr)
 		    {
-			ret = new (p) ea_attributs();
+			ret = new (nothrow) ea_attributs();
 			if(ret == nullptr)
 			    throw Ememory("read_ea");
 			ret->clear();
@@ -257,11 +257,7 @@ namespace libdar
 
 		    if(taille > 0)
 		    {
-			if(p == nullptr)
-			    value = new (nothrow) char[taille+MARGIN];
-			else
-			    value = (char *)p->alloc(taille+MARGIN);
-
+			value = new (nothrow) char[taille+MARGIN];
 			if(value == nullptr)
 			    throw Ememory("filesystem : read_ea_from");
 			try
@@ -280,16 +276,10 @@ namespace libdar
 			}
 			catch(...)
 			{
-			    if(p == nullptr)
-				delete [] value;
-			    else
-				p->release(value);
+			    delete [] value;
 			    throw;
 			}
-			if(p == nullptr)
-			    delete [] value;
-			else
-			    p->release(value);
+			delete [] value;
 		    }
 		    else // trivial case where the value has a length of zero
 		    {
@@ -314,7 +304,7 @@ namespace libdar
 	return ret;
     }
 
-    static vector<string> ea_filesystem_get_ea_list_for(const char *filename, memory_pool *p)
+    static vector<string> ea_filesystem_get_ea_list_for(const char *filename)
     {
         vector<string> ret;
         const U_I MARGIN = 2;
@@ -331,10 +321,7 @@ namespace libdar
 				      filename, tmp.c_str()));
         }
 
-	if(p == nullptr)
-	    liste = new (nothrow) char[taille+MARGIN];
-	else
-	    liste = (char *)p->alloc(taille+MARGIN);
+	liste = new (nothrow) char[taille+MARGIN];
         if(liste == nullptr)
             throw Ememory("filesystem : get_ea_list_for");
         try
@@ -356,16 +343,10 @@ namespace libdar
         }
         catch(...)
         {
-	    if(p == nullptr)
-		delete [] liste;
-	    else
-		p->release(liste);
+	    delete [] liste;
             throw;
         }
-	if(p == nullptr)
-	    delete [] liste;
-	else
-	    p->release(liste);
+	delete [] liste;
 
         return ret;
     }

@@ -220,7 +220,7 @@ namespace libdar
 
                 // Clearing all EA
                 //
-	    ea_filesystem_clear_ea(spot, bool_mask(true), nullptr);
+	    ea_filesystem_clear_ea(spot, bool_mask(true));
 	    ret = true;
         }
         catch(Euser_abort & e)

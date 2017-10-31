@@ -633,7 +633,7 @@ namespace libdar
 
 		    try
 		    {
-			ea = ea_filesystem_read_ea(spot, bool_mask(true), nullptr);
+			ea = ea_filesystem_read_ea(spot, bool_mask(true));
 		    }
 		    catch(Ethread_cancel & e)
 		    {

@@ -298,7 +298,7 @@ namespace libdar
         {
             if(ino == nullptr)
                 throw SRC_BUG;
-            eat = ea_filesystem_read_ea(chemin, ea_mask, pool);
+            eat = ea_filesystem_read_ea(chemin, ea_mask);
             if(eat != nullptr)
             {
 		if(eat->size() <= 0)
