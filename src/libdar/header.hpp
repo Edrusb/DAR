@@ -34,7 +34,6 @@
 #include "user_interaction.hpp"
 #include "tlv_list.hpp"
 #include "label.hpp"
-#include "on_pool.hpp"
 
 #include <vector>
 
@@ -65,7 +64,7 @@ namespace libdar
 	/// old implementation to be able to use more recent archives
 	/// the main use of TLV is to handle optional fields easily.
 
-    class header : public on_pool
+    class header
     {
     public:
 	    // constructors & Co.
