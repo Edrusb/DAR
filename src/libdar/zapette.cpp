@@ -220,7 +220,7 @@ namespace libdar
         char *buffer = nullptr;
         U_16 buf_size = 1024;
 
-	meta_new(buffer, buf_size);
+	buffer = new (nothrow) char[buf_size];
 	if(buffer == nullptr)
 	    throw Ememory("slave_zapette::action");
 
@@ -240,9 +240,9 @@ namespace libdar
                         if(req.size > buf_size)
                         {
                             if(buffer != nullptr)
-				meta_delete(buffer);
+				delete [] buffer;
 
-			    meta_new(buffer, req.size);
+			    buffer = new (nothrow) char [req.size];
                             if(buffer == nullptr)
                                 throw Ememory("slave_zapette::action");
                             else
@@ -331,12 +331,12 @@ namespace libdar
         catch(...)
         {
             if(buffer != nullptr)
-		meta_delete(buffer);
+		delete [] buffer;
             throw;
         }
 
         if(buffer != nullptr)
-	    meta_delete(buffer);
+	    delete [] buffer;
     }
 
     zapette::zapette(const user_interaction & dialog,

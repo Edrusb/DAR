@@ -38,7 +38,6 @@
 #include "integers.hpp"
 #include "mem_ui.hpp"
 #include "contextual.hpp"
-#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -129,7 +128,7 @@ namespace libdar
 	/// through a pair of pipes slave_zapette return information about
 	/// a given local archive (single or multi slices).
 	/// \ingroup Private
-    class slave_zapette : public on_pool
+    class slave_zapette
     {
     public:
 
