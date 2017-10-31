@@ -255,15 +255,15 @@ namespace libdar
 	try
 	{
 #ifdef LIBTHREADAR_AVAILABLE
-	    fichier_libcurl *ret_libcurl = new (get_pool()) fichier_libcurl(dialog,
-									    chemin,
-									    x_proto,
-									    easyh.alloc_instance(),
-									    hidden_mode,
-									    wait_delay,
-									    force_permission,
-									    permission,
-									    erase);
+	    fichier_libcurl *ret_libcurl = new (nothrow) fichier_libcurl(dialog,
+									 chemin,
+									 x_proto,
+									 easyh.alloc_instance(),
+									 hidden_mode,
+									 wait_delay,
+									 force_permission,
+									 permission,
+									 erase);
 	    ret = ret_libcurl;
 
 	    if(ret == nullptr)

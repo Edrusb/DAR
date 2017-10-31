@@ -125,11 +125,11 @@ namespace libdar
 
 		    try
 		    {
-			tmp = new (get_pool()) hash_fichier(dialog,
-							    ret,
-							    filename,
-							    hash_file,
-							    algo);
+			tmp = new (nothrow) hash_fichier(dialog,
+							 ret,
+							 filename,
+							 hash_file,
+							 algo);
 			if(tmp == nullptr)
 			    throw Ememory("entrepot::entrepot");
 			else

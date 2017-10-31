@@ -73,7 +73,7 @@ namespace libdar
 	virtual void read_dir_reset() const override;
 	virtual bool read_dir_next(std::string & filename) const override;
 
-	virtual entrepot *clone() const override { return new (get_pool()) entrepot_local(*this); };
+	virtual entrepot *clone() const override { return new (std::nothrow) entrepot_local(*this); };
 
     protected:
 	virtual fichier_global *inherited_open(user_interaction & dialog,

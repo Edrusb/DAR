@@ -49,7 +49,6 @@
 #include "hash_fichier.hpp"
 #include "etage.hpp"
 #include "path.hpp"
-#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -58,7 +57,7 @@ namespace libdar
 
 	/// the Entrepot interface
 
-    class entrepot : public on_pool
+    class entrepot
     {
     public:
 

@@ -83,7 +83,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	me->detruit();
-	me->contents = new (get_pool()) etage(aveugle, get_location().display().c_str(), datetime(0), datetime(0), false, furtive_mode);
+	me->contents = new (nothrow) etage(aveugle, get_location().display().c_str(), datetime(0), datetime(0), false, furtive_mode);
 	if(contents == nullptr)
 	    throw Ememory("entrepot_local::read_dir_reset");
     }
@@ -120,13 +120,13 @@ namespace libdar
 	U_I perm = force_permission ? permission : 0666;
 
 
-	ret = new (get_pool()) fichier_local(dialog,
-					     fullname,
-					     mode,
-					     perm,
-					     fail_if_exists,
-					     erase,
-					     false);
+	ret = new (nothrow) fichier_local(dialog,
+					  fullname,
+					  mode,
+					  perm,
+					  fail_if_exists,
+					  erase,
+					  false);
 	if(ret == nullptr)
 	    throw Ememory("entrepot_local::inherited_open");
 	try
