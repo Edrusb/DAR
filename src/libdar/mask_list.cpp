@@ -92,10 +92,9 @@ namespace libdar
 		    /////////////
 		    // building buffer that will be used to split read data line by line
 
-		meta_new(buffer, buf_size+1); // one char more to be able to add a '\0' if necessary
+		buffer = new (nothrow) char[buf_size+1]; // one char more to be able to add a '\0' if necessary
 		if(buffer == nullptr)
 		    throw Erange("mask_list::mask_list", tools_printf(gettext("Cannot allocate memory for buffer while reading %S"), &filename_list_st));
-
 
 
 		    /////////////
@@ -167,10 +166,10 @@ namespace libdar
 		}
 		catch(...)
 		{
-		    meta_delete(buffer);
+		    delete [] buffer;
 		    throw;
 		}
-		meta_delete(buffer);
+		delete [] buffer;
 		buffer = nullptr;
 
 

@@ -68,7 +68,7 @@ namespace libdar
             /// inherited from the mask class
         virtual bool is_covered(const std::string & expression) const override;
             /// inherited from the mask class
-        virtual mask *clone() const override { return new (get_pool()) mask_list(*this); };
+        virtual mask *clone() const override { return new (std::nothrow) mask_list(*this); };
 
             /// routing only necessary for doing some testing
         U_I size() const { return contenu.size(); };
