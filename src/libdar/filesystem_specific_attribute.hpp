@@ -48,7 +48,6 @@ extern "C"
 #include "integers.hpp"
 #include "crc.hpp"
 #include "fsa_family.hpp"
-#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -64,7 +63,7 @@ namespace libdar
 	/// the liste of FSA and given the list of FSA will try to set them back to the
 	/// filesystem
 
-    class filesystem_specific_attribute : public on_pool
+    class filesystem_specific_attribute
     {
     public:
 
@@ -130,7 +129,7 @@ namespace libdar
 
 ///////////////////////////////////////////////////////////////////////////
 
-    class filesystem_specific_attribute_list : public on_pool
+    class filesystem_specific_attribute_list
     {
     public:
 	filesystem_specific_attribute_list() {};
@@ -229,11 +228,11 @@ namespace libdar
 
 ///////////////////////////////////////////////////////////////////////////
 
-    template <class T> T *cloner(const T *x, memory_pool *p)
+    template <class T> T *cloner(const T *x)
     {
 	if(x == nullptr)
 	    throw SRC_BUG;
-	T *ret = new (p) T(*x);
+	T *ret = new (std::nothrow) T(*x);
 	if(ret == nullptr)
 	    throw Ememory("cloner template");
 
@@ -257,7 +256,7 @@ namespace libdar
 	virtual std::string show_val() const { return val ? gettext("true") : gettext("false"); };
 	virtual void write(generic_file & f) const { f.write(val ? "T" : "F", 1); };
 	virtual infinint storage_size() const { return 1; };
-	virtual filesystem_specific_attribute *clone() const { return cloner(this, get_pool()); };
+	virtual filesystem_specific_attribute *clone() const { return cloner(this); };
 
     protected:
 	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const;
@@ -283,7 +282,7 @@ namespace libdar
 	virtual std::string show_val() const;
 	virtual void write(generic_file & f) const { val.dump(f); };
 	virtual infinint storage_size() const { return val.get_storage_size(); };
-	virtual filesystem_specific_attribute *clone() const { return cloner(this, get_pool()); };
+	virtual filesystem_specific_attribute *clone() const { return cloner(this); };
 
     protected:
 	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const;
@@ -309,7 +308,7 @@ namespace libdar
 	virtual std::string show_val() const;
 	virtual void write(generic_file & f) const { val.dump(f); };
 	virtual infinint storage_size() const { return val.get_storage_size(); };
-	virtual filesystem_specific_attribute *clone() const { return cloner(this, get_pool()); };
+	virtual filesystem_specific_attribute *clone() const { return cloner(this); };
 
     protected:
 	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const;
