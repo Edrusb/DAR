@@ -30,7 +30,7 @@ namespace libdar
     namespace compile_time
     {
 
-	bool ea()
+	bool ea() noexcept
 	{
 #ifdef EA_SUPPORT
 	    return true;
@@ -40,7 +40,7 @@ namespace libdar
 	}
 
 
-	bool largefile()
+	bool largefile() noexcept
 	{
 #if defined( _FILE_OFFSET_BITS ) ||  defined( _LARGE_FILES )
 	    return true;
@@ -50,18 +50,18 @@ namespace libdar
 	}
 
 
-	bool nodump()
+	bool nodump() noexcept
 	{
 	    return FSA_linux_extX();
 	}
 
-	bool special_alloc()
+	bool special_alloc() noexcept
 	{
 	    return false;
 	}
 
 
-	U_I bits()
+	U_I bits() noexcept
 	{
 #ifdef LIBDAR_MODE
 	    return LIBDAR_MODE;
@@ -71,7 +71,7 @@ namespace libdar
 	}
 
 
-	bool thread_safe()
+	bool thread_safe() noexcept
 	{
 #if defined( MUTEX_WORKS ) && !defined ( MISSING_REENTRANT_LIBCALL )
 	    return true;
@@ -81,7 +81,7 @@ namespace libdar
 	}
 
 
-	bool libz()
+	bool libz() noexcept
 	{
 #if LIBZ_AVAILABLE
 	    return true;
@@ -91,7 +91,7 @@ namespace libdar
 	}
 
 
-	bool libbz2()
+	bool libbz2() noexcept
 	{
 #if LIBBZ2_AVAILABLE
 	    return true;
@@ -101,7 +101,7 @@ namespace libdar
 	}
 
 
-	bool liblzo()
+	bool liblzo() noexcept
 	{
 #if LIBLZO2_AVAILABLE
 	    return true;
@@ -110,7 +110,7 @@ namespace libdar
 #endif
 	}
 
-	bool libxz()
+	bool libxz() noexcept
 	{
 #if LIBLZMA_AVAILABLE
 	    return true;
@@ -119,7 +119,7 @@ namespace libdar
 #endif
 	}
 
-	bool libgcrypt()
+	bool libgcrypt() noexcept
 	{
 #if CRYPTO_AVAILABLE
 	    return true;
@@ -129,7 +129,7 @@ namespace libdar
 	}
 
 
-	bool furtive_read()
+	bool furtive_read() noexcept
 	{
 #if FURTIVE_READ_MODE_AVAILABLE
 	    return true;
@@ -139,7 +139,7 @@ namespace libdar
 	}
 
 
-	endian system_endian()
+	endian system_endian() noexcept
 	{
 	    endian ret;
 
@@ -155,7 +155,7 @@ namespace libdar
 	    return ret;
 	}
 
-	bool posix_fadvise()
+	bool posix_fadvise() noexcept
 	{
 #if HAVE_POSIX_FADVISE
 	    return true;
@@ -164,7 +164,7 @@ namespace libdar
 #endif
 	}
 
-	bool fast_dir()
+	bool fast_dir() noexcept
 	{
 #if LIBDAR_FAST_DIR
 	    return true;
@@ -173,7 +173,7 @@ namespace libdar
 #endif
 	}
 
-	bool FSA_linux_extX()
+	bool FSA_linux_extX() noexcept
 	{
 #ifdef LIBDAR_NODUMP_FEATURE
 	    return true;
@@ -182,7 +182,7 @@ namespace libdar
 #endif
 	}
 
-	bool FSA_birthtime()
+	bool FSA_birthtime() noexcept
 	{
 #ifdef LIBDAR_BIRTHTIME
 	    return true;
@@ -191,7 +191,7 @@ namespace libdar
 #endif
 	}
 
-	bool microsecond_read()
+	bool microsecond_read() noexcept
 	{
 #ifdef LIBDAR_MICROSECOND_READ_ACCURACY
 	    return true;
@@ -200,7 +200,7 @@ namespace libdar
 #endif
 	}
 
-	bool microsecond_write()
+	bool microsecond_write() noexcept
 	{
 #ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
 	    return true;
@@ -209,7 +209,7 @@ namespace libdar
 #endif
 	}
 
-	bool symlink_restore_dates()
+	bool symlink_restore_dates() noexcept
 	{
 #ifdef HAVE_LUTIMES
 	    return true;
@@ -219,7 +219,7 @@ namespace libdar
 	}
 
 
-	bool public_key_cipher()
+	bool public_key_cipher() noexcept
 	{
 #ifdef GPGME_SUPPORT
 	    return true;
@@ -228,7 +228,7 @@ namespace libdar
 #endif
 	}
 
-	bool libthreadar()
+	bool libthreadar() noexcept
 	{
 #ifdef LIBTHREADAR_AVAILABLE
 	    return true;
@@ -237,7 +237,7 @@ namespace libdar
 #endif
 	}
 
-	bool librsync()
+	bool librsync() noexcept
 	{
 #if LIBRSYNC_AVAILABLE
 	    return true;
@@ -246,7 +246,7 @@ namespace libdar
 #endif
 	}
 
-	bool remote_repository()
+	bool remote_repository() noexcept
 	{
 #if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	    return true;

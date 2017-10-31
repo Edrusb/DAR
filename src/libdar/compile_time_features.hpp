@@ -46,45 +46,45 @@ namespace libdar
     namespace compile_time
     {
 	    /// returns whether EA support has been activated at compilation time
-	bool ea();
+	bool ea() noexcept;
 
 	    /// returns whether largefile (>2GiB) support has been activated at compilation time
-	bool largefile();
+	bool largefile() noexcept;
 
 	    /// returns whether nodump flag support has been activated at compilation time
-	bool nodump();
+	bool nodump() noexcept;
 
 	    /// returns whether special allocation support has been activated at compilation time
 	    ///
 	    /// special allocation support brings from a tiny to an important improvement in
 	    /// execution time, depending on the number of small files involved in the operation
-	bool special_alloc();
+	bool special_alloc() noexcept;
 
 	    /// returns the internal integer type used
 
 	    /// \note zero is returned if infinint type is used
-	U_I bits();
+	U_I bits() noexcept;
 
 	    /// returns whether the current libdar is thread safe
-	bool thread_safe();
+	bool thread_safe() noexcept;
 
 	    /// returns whether libdar is dependent on libz and if so has gzip compression/decompression available
-	bool libz();
+	bool libz() noexcept;
 
 	    /// returns whether libdar is dependent on libbz2 and if so has bzip2 compression/decompression available
-	bool libbz2();
+	bool libbz2() noexcept;
 
 	    /// returns whether libdar is dependent on liblzo and if so has lzo compression/decompression available
-	bool liblzo();
+	bool liblzo() noexcept;
 
 	    /// returns whether libdar is dependent on liblxz/liblzma and if so has xz compression/decompression available
-	bool libxz();
+	bool libxz() noexcept;
 
 	    /// returns whether libdar is dependent on libgcrypt and if so has strong encryption and hashing features available
-	bool libgcrypt();
+	bool libgcrypt() noexcept;
 
 	    /// returns whether libdar can support furtive read mode when run by privileged user
-	bool furtive_read();
+	bool furtive_read() noexcept;
 
 	    /// type used to return the endian nature of the current system
 	enum endian
@@ -95,40 +95,40 @@ namespace libdar
 	};
 
 	    /// returns the detected integer endian of the system
-	endian system_endian();
+	endian system_endian() noexcept;
 
 	    /// returns true if libdar has support for posix_fadvise activated available
-	bool posix_fadvise();
+	bool posix_fadvise() noexcept;
 
 	    /// returns whether libdar has been built with speed optimization for last directory
-	bool fast_dir();
+	bool fast_dir() noexcept;
 
 	    /// returns whether libdar has been built with support for linux ext2/3/4 FSA
-	bool FSA_linux_extX();
+	bool FSA_linux_extX() noexcept;
 
 	    /// returns whether libdar has been built with support for HFS+ FSA
-	bool FSA_birthtime();
+	bool FSA_birthtime() noexcept;
 
 	    /// returns whether libdar is able to read timestamps at a microsecond accuracy
-	bool microsecond_read();
+	bool microsecond_read() noexcept;
 
 	    /// returns whether libdar is able to write timestamps at a microsecond accuracy
-	bool microsecond_write();
+	bool microsecond_write() noexcept;
 
 	    /// returns whether libdar is able to restore dates of symlinks
-	bool symlink_restore_dates();
+	bool symlink_restore_dates() noexcept;
 
 	    /// returns whether public key cipher (relying on gpgme) are available
-	bool public_key_cipher();
+	bool public_key_cipher() noexcept;
 
 	    /// returns whether libthreadar linking will be done, allowing libdar to span several threads
-	bool libthreadar();
+	bool libthreadar() noexcept;
 
 	    /// returns whether delta compression is available and delta diff stuff with it
-	bool librsync();
+	bool librsync() noexcept;
 
 	    /// returns whether remote repository feature is available
-	bool remote_repository();
+	bool remote_repository() noexcept;
 
     }
 
