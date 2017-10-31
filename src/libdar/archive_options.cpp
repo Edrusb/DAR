@@ -41,7 +41,7 @@ namespace libdar
 	// some local helper functions
 
     inline void archive_option_destroy_mask(mask * & ptr);
-    inline void archive_option_clean_mask(mask * & ptr, memory_pool *pool, bool all = true);
+    inline void archive_option_clean_mask(mask * & ptr, bool all = true);
     inline void archive_option_destroy_crit_action(crit_action * & ptr);
     inline void archive_option_clean_crit_action(crit_action * & ptr);
 
@@ -51,10 +51,10 @@ namespace libdar
 	/////////////////////////////////////////////////////////
 
 
-    inline void archive_option_clean_mask(mask * & ptr, memory_pool *pool, bool all)
+    inline void archive_option_clean_mask(mask * & ptr, bool all)
     {
 	archive_option_destroy_mask(ptr);
-	ptr = new (pool) bool_mask(all);
+	ptr = new (nothrow) bool_mask(all);
 	if(ptr == nullptr)
 	    throw Ememory("archive_option_clean_mask");
     }
@@ -114,7 +114,7 @@ namespace libdar
 	x_lax = false;
 	x_sequential_read = false;
 	x_slice_min_digits = 0;
-	x_entrepot = new (get_pool()) entrepot_local("", "", false); // never using furtive_mode to read slices
+	x_entrepot = new (nothrow) entrepot_local("", "", false); // never using furtive_mode to read slices
 	if(x_entrepot == nullptr)
 	    throw Ememory("archive_options_read::clear");
 	x_ignore_signature_check_failure = false;
@@ -129,7 +129,7 @@ namespace libdar
 	x_ref_crypto_size = default_crypto_size;
 	x_ref_execute = "";
 	x_ref_slice_min_digits = 0;
-	x_ref_entrepot = new (get_pool()) entrepot_local("", "", false); // never using furtive_mode to read slices
+	x_ref_entrepot = new (nothrow) entrepot_local("", "", false); // never using furtive_mode to read slices
 	if(x_ref_entrepot == nullptr)
 	    throw Ememory("archive_options_read::clear");
 	x_header_only = false;
@@ -281,12 +281,12 @@ namespace libdar
 
 	    destroy();
 
-	    archive_option_clean_mask(x_selection, get_pool());
-	    archive_option_clean_mask(x_subtree, get_pool());
-	    archive_option_clean_mask(x_ea_mask, get_pool());
-	    archive_option_clean_mask(x_compr_mask, get_pool());
-	    archive_option_clean_mask(x_backup_hook_file_mask, get_pool(), false);
-	    archive_option_clean_mask(x_delta_mask, get_pool());
+	    archive_option_clean_mask(x_selection);
+	    archive_option_clean_mask(x_subtree);
+	    archive_option_clean_mask(x_ea_mask);
+	    archive_option_clean_mask(x_compr_mask);
+	    archive_option_clean_mask(x_backup_hook_file_mask, false);
+	    archive_option_clean_mask(x_delta_mask);
 	    x_ref_arch = nullptr;
 	    x_allow_over = true;
 	    x_warn_over = true;
@@ -337,7 +337,7 @@ namespace libdar
 	    x_slice_min_digits = 0;
 	    x_backup_hook_file_execute = "";
 	    x_ignore_unknown = false;
-	    x_entrepot = new (get_pool()) entrepot_local( "", "", false); // never using furtive_mode to read slices
+	    x_entrepot = new (nothrow) entrepot_local( "", "", false); // never using furtive_mode to read slices
 	    if(x_entrepot == nullptr)
 		throw Ememory("archive_options_create::clear");
 	    x_scope = all_fsa_families();
@@ -658,12 +658,12 @@ namespace libdar
 	    x_hash = hash_none;
 	    x_slice_min_digits = 0;
 	    x_sequential_marks = true;
-	    x_entrepot = new (get_pool()) entrepot_local("", "", false); // never using furtive_mode to read slices
+	    x_entrepot = new (nothrow) entrepot_local("", "", false); // never using furtive_mode to read slices
 	    if(x_entrepot == nullptr)
 		throw Ememory("archive_options_isolate::clear");
 	    x_multi_threaded = true;
 	    x_delta_signature = false;
-	    archive_option_clean_mask(x_delta_mask, get_pool());
+	    archive_option_clean_mask(x_delta_mask);
 	    has_delta_mask_been_set = false;
 	    x_delta_sig_min_size = default_delta_sig_min_size;
 	}
@@ -768,11 +768,11 @@ namespace libdar
 	{
 	    destroy();
 
-	    archive_option_clean_mask(x_selection, get_pool());
-	    archive_option_clean_mask(x_subtree, get_pool());
-	    archive_option_clean_mask(x_ea_mask, get_pool());
-	    archive_option_clean_mask(x_compr_mask, get_pool());
-	    archive_option_clean_mask(x_delta_mask, get_pool());
+	    archive_option_clean_mask(x_selection);
+	    archive_option_clean_mask(x_subtree);
+	    archive_option_clean_mask(x_ea_mask);
+	    archive_option_clean_mask(x_compr_mask);
+	    archive_option_clean_mask(x_delta_mask);
 	    archive_option_clean_crit_action(x_overwrite);
 	    x_ref = nullptr;
 	    x_allow_over = true;
@@ -805,7 +805,7 @@ namespace libdar
 	    x_user_comment = default_user_comment;
 	    x_hash = hash_none;
 	    x_slice_min_digits = 0;
-	    x_entrepot = new (get_pool()) entrepot_local("", "", false); // never using furtive_mode to read slices
+	    x_entrepot = new (nothrow) entrepot_local("", "", false); // never using furtive_mode to read slices
 	    if(x_entrepot == nullptr)
 		throw Ememory("archive_options_merge::clear");
 	    x_scope = all_fsa_families();
@@ -1071,9 +1071,9 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_clean_mask(x_selection, get_pool());
-	    archive_option_clean_mask(x_subtree, get_pool());
-	    archive_option_clean_mask(x_ea_mask, get_pool());
+	    archive_option_clean_mask(x_selection);
+	    archive_option_clean_mask(x_subtree);
+	    archive_option_clean_mask(x_ea_mask);
 	    archive_option_clean_crit_action(x_overwrite);
 	    x_warn_over = true;
 	    x_info_details = false;
@@ -1248,8 +1248,8 @@ namespace libdar
 
 	    x_info_details = false;
 	    x_list_mode = normal;
-	    archive_option_clean_mask(x_selection, get_pool());
-	    archive_option_clean_mask(x_subtree, get_pool());
+	    archive_option_clean_mask(x_selection);
+	    archive_option_clean_mask(x_subtree);
 	    x_filter_unsaved = false;
 	    x_display_ea = false;
 	    x_sizes_in_bytes = false;
@@ -1303,7 +1303,7 @@ namespace libdar
     {
 	if(x_slicing_first == nullptr)
 	{
-	    x_slicing_first = new (get_pool()) infinint(slicing_first);
+	    x_slicing_first = new (nothrow) infinint(slicing_first);
 	    if(x_slicing_first == nullptr)
 		throw Ememory("archive_options_listing::set_user_slicing");
 	}
@@ -1312,7 +1312,7 @@ namespace libdar
 
 	if(x_slicing_others == nullptr)
 	{
-	    x_slicing_others = new (get_pool()) infinint(slicing_others);
+	    x_slicing_others = new (nothrow) infinint(slicing_others);
 	    if(x_slicing_others == nullptr)
 		throw Ememory("archive_options_listing::set_user_slicing");
 	}
@@ -1390,13 +1390,13 @@ namespace libdar
 		throw Ememory("archive_options_listing::copy_from");
 	    if(ref.x_slicing_first != nullptr)
 	    {
-		x_slicing_first = new (get_pool()) infinint(*ref.x_slicing_first);
+		x_slicing_first = new (nothrow) infinint(*ref.x_slicing_first);
 		if(x_slicing_first == nullptr)
 		    throw Ememory("archive_options_listing::copy_from");
 	    }
 	    if(ref.x_slicing_others != nullptr)
 	    {
-		x_slicing_others = new (get_pool()) infinint(*ref.x_slicing_others);
+		x_slicing_others = new (nothrow) infinint(*ref.x_slicing_others);
 		if(x_slicing_others == nullptr)
 		    throw Ememory("archive_options_listing::copy_from");
 	    }
@@ -1426,13 +1426,13 @@ namespace libdar
 	{
 	    destroy();
 
-	    archive_option_clean_mask(x_selection, get_pool());
-	    archive_option_clean_mask(x_subtree, get_pool());
+	    archive_option_clean_mask(x_selection);
+	    archive_option_clean_mask(x_subtree);
 	    x_info_details = false;
 	    x_display_treated = false;
 	    x_display_treated_only_dir = false;
 	    x_display_skipped = false;
-	    archive_option_clean_mask(x_ea_mask, get_pool());
+	    archive_option_clean_mask(x_ea_mask);
 	    x_what_to_check = cat_inode::cf_all;
 	    x_alter_atime = true;
 	    x_old_alter_atime = true;
@@ -1608,8 +1608,8 @@ namespace libdar
 	{
 	    destroy();
 
-	    archive_option_clean_mask(x_selection, get_pool());
-	    archive_option_clean_mask(x_subtree, get_pool());
+	    archive_option_clean_mask(x_selection);
+	    archive_option_clean_mask(x_subtree);
 	    x_info_details = false;
 	    x_display_treated = false;
 	    x_display_treated_only_dir = false;
@@ -1774,7 +1774,7 @@ namespace libdar
             x_user_comment = default_user_comment;
             x_hash = hash_none;
             x_slice_min_digits = 0;
-            x_entrepot = new (get_pool()) entrepot_local( "", "", false); // never using furtive_mode to read slices
+            x_entrepot = new (nothrow) entrepot_local( "", "", false); // never using furtive_mode to read slices
             if(x_entrepot == nullptr)
                 throw Ememory("archive_options_repair::clear");
             x_multi_threaded = true;

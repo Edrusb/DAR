@@ -38,7 +38,6 @@
 #include "nls_swap.hpp"
 #include "entrepot.hpp"
 #include "fsa_family.hpp"
-#include "on_pool.hpp"
 #include "compile_time_features.hpp"
 
 #include <string>
@@ -58,7 +57,7 @@ namespace libdar
 
 
 	/// class holding optional parameters used to read an existing archive
-    class archive_options_read : public on_pool
+    class archive_options_read
     {
     public:
 	    /// build an object and set options to their default values
@@ -262,7 +261,7 @@ namespace libdar
 	/////////////////////////////////////////////////////////
 
 	/// class holding optional parameters used to create an archive
-    class archive_options_create : public on_pool
+    class archive_options_create
     {
     public:
 	    // default constructors and destructor.
@@ -668,7 +667,7 @@ namespace libdar
 	/////////////////////////////////////////////////////////
 
     	/// class holding optional parameters used to isolate an existing archive
-    class archive_options_isolate : public on_pool
+    class archive_options_isolate
     {
     public:
 	archive_options_isolate();
@@ -848,7 +847,7 @@ namespace libdar
 	/////////////////////////////////////////////////////////
 
     	/// class holding optional parameters used to proceed to the merge operation
-    class archive_options_merge : public on_pool
+    class archive_options_merge
     {
     public:
 
@@ -1111,7 +1110,7 @@ namespace libdar
 	/////////////////////////////////////////////////////////
 
     	/// class holding optional parameters used to extract files from an existing archive
-    class archive_options_extract : public on_pool
+    class archive_options_extract
     {
     public:
 	enum t_dirty { dirty_ignore, dirty_warn, dirty_ok };
@@ -1250,7 +1249,7 @@ namespace libdar
 	/////////////////////////////////////////////////////////
 
     	/// class holding optional parameters used to list the contents of an existing archive
-    class archive_options_listing : public on_pool
+    class archive_options_listing
     {
     public:
 	archive_options_listing() { x_selection = x_subtree = nullptr;  x_slicing_first = x_slicing_others = nullptr; clear(); };
@@ -1315,7 +1314,7 @@ namespace libdar
 	/////////////////////////////////////////////////////////
 
 
-    class archive_options_diff : public on_pool
+    class archive_options_diff
     {
     public:
 	archive_options_diff() { x_selection = x_subtree = x_ea_mask = nullptr; clear(); };
@@ -1426,7 +1425,7 @@ namespace libdar
 	/////////////////////////////////////////////////////////
 
     	/// class holding optional parameters used to test the structure coherence of an existing archive
-    class archive_options_test : public on_pool
+    class archive_options_test
     {
     public:
 	archive_options_test() { x_selection = x_subtree = nullptr; clear(); };
@@ -1495,7 +1494,7 @@ namespace libdar
 	/////////////////////////////////////////////////////////
 
 	/// class holding optional parameters used to create an archive
-    class archive_options_repair : public on_pool
+    class archive_options_repair
     {
     public:
 	    // default constructors and destructor.
