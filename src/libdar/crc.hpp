@@ -33,7 +33,6 @@
 #include "integers.hpp"
 #include "storage.hpp"
 #include "infinint.hpp"
-#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -41,10 +40,10 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-    class crc : public on_pool
+    class crc
     {
     public:
-	static const U_I OLD_CRC_SIZE = 2;
+	static constexpr U_I OLD_CRC_SIZE = 2;
 
 	crc() = default;
 	crc(const crc & ref) = default;
@@ -63,8 +62,8 @@ namespace libdar
 	virtual crc *clone() const = 0;
     };
 
-    extern crc *create_crc_from_file(generic_file & f, memory_pool *pool, bool old = false);
-    extern crc *create_crc_from_size(infinint width, memory_pool *pool);
+    extern crc *create_crc_from_file(generic_file & f, bool old = false);
+    extern crc *create_crc_from_size(infinint width);
 
     class crc_i : public crc
     {
@@ -73,7 +72,7 @@ namespace libdar
 	crc_i(const infinint & width, generic_file & f);
 	crc_i(const crc_i & ref) : size(ref.size), cyclic(ref.size) { copy_data_from(ref); pointer = cyclic.begin(); };
 	crc_i & operator = (const crc_i & ref) { copy_from(ref); return *this; };
-	~crc_i() = default;
+	~crc_i() throw(Ebug) {};
 
 	bool operator == (const crc & ref) const;
 
@@ -85,7 +84,7 @@ namespace libdar
 	virtual infinint get_size() const override { return size; };
 
     protected:
-	virtual crc *clone() const override { return new (get_pool()) crc_i(*this); };
+	virtual crc *clone() const override { crc *tmp = new (std::nothrow) crc_i(*this); if(tmp == nullptr) throw Ememory("crc"); return tmp; };
 
     private:
 
@@ -118,7 +117,7 @@ namespace libdar
 	virtual infinint get_size() const override { return size; };
 
     protected:
-	virtual crc *clone() const override { return new (get_pool()) crc_n(*this); };
+	virtual crc *clone() const override { crc *tmp = new (std::nothrow) crc_n(*this); if(tmp == nullptr) throw Ememory("crc"); return tmp; };
 
     private:
 

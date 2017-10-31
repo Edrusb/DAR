@@ -406,31 +406,26 @@ namespace libdar
     {
 	size = width;
 
-	if(get_pool() == nullptr)
-	{
-		//////////////////////////////////////////////////////////////////////
-		// the following trick is to have cyclic aligned at its boundary size
-		// (its allocated address is a multiple of it size)
-		// some CPU need that (sparc), and it does not hurt for other ones.
+	    //////////////////////////////////////////////////////////////////////
+	    // the following trick is to have cyclic aligned at its boundary size
+	    // (its allocated address is a multiple of it size)
+	    // some CPU need that (sparc), and it does not hurt for other ones.
 
-	    if(width % 8 == 0)
-		cyclic = (unsigned char *)(new (nothrow) U_64[width/8]);
-	    else if(width % 4 == 0)
-		cyclic = (unsigned char *)(new (nothrow) U_32[width/4]);
-	    else if(width % 2 == 0)
-		cyclic = (unsigned char *)(new (nothrow) U_16[width/2]);
-	    else
-		cyclic = new (nothrow) unsigned char[size];
-		// end of the trick and back to default situation
-
-		//////////////////////////////////////////////////////////////////////
-		// WARNING! this trick allows the use of 2, 4 or 8 bytes operations //
-		// instead of byte by byte one, in n_compute calls B_compute_block  //
-		// CODE MUST BE ADAPTED THERE AND IN destroy() IF CHANGED HERE!!!   //
-		//////////////////////////////////////////////////////////////////////
-	}
+	if(width % 8 == 0)
+	    cyclic = (unsigned char *)(new (nothrow) U_64[width/8]);
+	else if(width % 4 == 0)
+	    cyclic = (unsigned char *)(new (nothrow) U_32[width/4]);
+	else if(width % 2 == 0)
+	    cyclic = (unsigned char *)(new (nothrow) U_16[width/2]);
 	else
-	    cyclic = (unsigned char *)get_pool()->alloc(width); // pool should provide aligned data in any case
+	    cyclic = new (nothrow) unsigned char[size];
+	    // end of the trick and back to default situation
+
+	    //////////////////////////////////////////////////////////////////////
+	    // WARNING! this trick allows the use of 2, 4 or 8 bytes operations //
+	    // instead of byte by byte one, in n_compute calls B_compute_block  //
+	    // CODE MUST BE ADAPTED THERE AND IN destroy() IF CHANGED HERE!!!   //
+	    //////////////////////////////////////////////////////////////////////
 
 	if(cyclic == nullptr)
 	    throw Ememory("crc::copy_from");
@@ -455,10 +450,7 @@ namespace libdar
     {
 	if(cyclic != nullptr)
 	{
-	    if(get_pool() == nullptr)
-		delete [] cyclic;
-	    else
-		get_pool()->release(cyclic);
+	    delete [] cyclic;
 	    cyclic = nullptr;
 	}
 	size = 0;
@@ -469,11 +461,11 @@ namespace libdar
 	// exported routines implementation
 	//
 
-    crc *create_crc_from_file(generic_file & f, memory_pool *pool, bool old)
+    crc *create_crc_from_file(generic_file & f, bool old)
     {
 	crc *ret = nullptr;
 	if(old)
-	    ret = new (pool) crc_n(crc::OLD_CRC_SIZE, f);
+	    ret = new (nothrow) crc_n(crc::OLD_CRC_SIZE, f);
 	else
 	{
 	    infinint taille = f; // reading the crc size
@@ -484,10 +476,10 @@ namespace libdar
 		taille.unstack(s);
 		if(!taille.is_zero())
 		    throw SRC_BUG;
-		ret = new (pool) crc_n(s, f);
+		ret = new (nothrow) crc_n(s, f);
 	    }
 	    else
-		ret = new (pool) crc_i(taille, f);
+		ret = new (nothrow) crc_i(taille, f);
 	}
 
 	if(ret == nullptr)
@@ -496,7 +488,7 @@ namespace libdar
 	return ret;
     }
 
-    crc *create_crc_from_size(infinint width, memory_pool *pool)
+    crc *create_crc_from_size(infinint width)
     {
 	crc *ret = nullptr;
 
@@ -507,10 +499,10 @@ namespace libdar
 	    if(!width.is_zero())
 		throw SRC_BUG;
 
-	    ret = new (pool) crc_n(s);
+	    ret = new (nothrow) crc_n(s);
 	}
 	else
-	    ret = new (pool) crc_i(width);
+	    ret = new (nothrow) crc_i(width);
 
 	if(ret == nullptr)
 	    throw Ememory("create_crc_from_size");

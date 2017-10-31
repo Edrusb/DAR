@@ -203,9 +203,9 @@ namespace libdar
 	case 5:
 	    f.read((char *)&flag, 1);
 	    if((flag & STATUS_PLUS_FLAG_ME) != 0)
-		base = create_crc_from_file(f, get_pool(), false);
+		base = create_crc_from_file(f, false);
 	    if((flag & STATUS_PLUS_FLAG_REF) != 0)
-		result = create_crc_from_file(f, get_pool(), false);
+		result = create_crc_from_file(f, false);
 	    break;
 	default:
 	    throw SRC_BUG;

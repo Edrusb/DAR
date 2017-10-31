@@ -245,7 +245,7 @@ namespace libdar
 
 	if(!crc_size.is_zero())
 	{
-	    value = create_crc_from_size(crc_size, get_pool());
+	    value = create_crc_from_size(crc_size);
 	    if(value == nullptr)
 		throw SRC_BUG;
 	}

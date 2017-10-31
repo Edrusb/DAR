@@ -186,7 +186,7 @@ namespace libdar
 		// creating the delta job
 
 	    if(checksum != nullptr)
-		data_crc = create_crc_from_size(crc_size, get_pool());
+		data_crc = create_crc_from_size(crc_size);
 	    if(data_crc == nullptr)
 		throw Ememory("generic_rsync::generic_rsync");
 

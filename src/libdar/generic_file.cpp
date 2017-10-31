@@ -343,7 +343,7 @@ namespace libdar
         f.skip(0);
 	read_ahead(me_read_ahead);
 	f.read_ahead(you_read_ahead);
-	value = create_crc_from_size(crc_size, get_pool());
+	value = create_crc_from_size(crc_size);
 	if(value == nullptr)
 	    throw SRC_BUG;
 	try
@@ -397,7 +397,7 @@ namespace libdar
             throw SRC_BUG; // crc still active, previous CRC value never read
 	if(checksum != nullptr)
 	    throw SRC_BUG; // checksum is only created when crc mode is activated
-	checksum = create_crc_from_size(width, get_pool());
+	checksum = create_crc_from_size(width);
         enable_crc(true);
     }
 

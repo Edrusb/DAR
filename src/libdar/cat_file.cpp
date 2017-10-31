@@ -229,7 +229,7 @@ namespace libdar
                             // for archive version >= 8, the crc is only present
                             // if the archive contains file data
 
-                        check = create_crc_from_file(*ptr, nullptr, true);
+                        check = create_crc_from_file(*ptr, true);
                         if(check == nullptr)
                             throw Ememory("cat_file::cat_file");
                     }

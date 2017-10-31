@@ -213,7 +213,7 @@ namespace libdar
 
 		    if(reading_ver <= 7)
 		    {
-			ea_crc = create_crc_from_file(*ptr, nullptr, true);
+			ea_crc = create_crc_from_file(*ptr, true);
 			if(ea_crc == nullptr)
 			    throw SRC_BUG;
 
@@ -221,7 +221,7 @@ namespace libdar
 		    }
 		    else // archive format >= 8
 		    {
-			ea_crc = create_crc_from_file(*ptr, nullptr, false);
+			ea_crc = create_crc_from_file(*ptr, false);
 			if(ea_crc == nullptr)
 			    throw SRC_BUG;
 		    }
@@ -890,9 +890,9 @@ namespace libdar
                 try
                 {
                     if(edit >= 8)
-                        tmp = create_crc_from_file(*get_escape_layer(), nullptr, false);
+                        tmp = create_crc_from_file(*get_escape_layer(), false);
                     else // archive format <= 7
-                        tmp = create_crc_from_file(*get_escape_layer(), nullptr, true);
+                        tmp = create_crc_from_file(*get_escape_layer(), true);
 		    if(tmp == nullptr)
 			throw SRC_BUG;
                     const_cast<cat_inode *>(this)->ea_crc = tmp;
@@ -1242,7 +1242,7 @@ namespace libdar
 
                 try
                 {
-		    tmp = create_crc_from_file(*get_escape_layer(), nullptr, false);
+		    tmp = create_crc_from_file(*get_escape_layer(), false);
 		    if(tmp == nullptr)
 			throw SRC_BUG;
                     const_cast<cat_inode *>(this)->fsa_crc = tmp;
