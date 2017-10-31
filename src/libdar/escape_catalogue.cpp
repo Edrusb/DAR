@@ -414,7 +414,7 @@ namespace libdar
 			try
 			{
 			    ref = cat_entree::read(get_ui(),
-						   get_pool(),
+						   nullptr,
 						   pdesc,
 						   x_ver.get_edition(),
 						   ceci->access_stats(),
@@ -576,7 +576,7 @@ namespace libdar
 			// all the non detruits objects
 
 		    ceci->cat_det = macro_tools_read_catalogue(get_ui(),
-							       get_pool(),
+							       nullptr,
 							       x_ver,
 							       *pdesc,
 							       0, // cat_size cannot be determined in sequential_read mode
@@ -697,7 +697,7 @@ namespace libdar
     void escape_catalogue::set_esc_and_stack(const pile_descriptor & x_pdesc)
     {
 	x_pdesc.check(true); // always expecting an escape layer
-	pdesc.assign(new (get_pool()) pile_descriptor(x_pdesc));
+	pdesc.assign(new (nothrow) pile_descriptor(x_pdesc));
 	if(pdesc.is_null())
 	    throw Ememory("escape_catalogue::set_esc_and_stack");
     }
@@ -713,7 +713,7 @@ namespace libdar
 	if(ref.cat_det == nullptr)
 	    cat_det = nullptr;
 	else
-	    cat_det = new (get_pool()) catalogue(*ref.cat_det);
+	    cat_det = new (nothrow) catalogue(*ref.cat_det);
 	if(cat_det == nullptr)
 	    throw Ememory("escape_catalogue::copy_from");
 	min_read_offset = ref.min_read_offset;

@@ -44,7 +44,6 @@ extern "C"
 #include "user_interaction.hpp"
 #include "label.hpp"
 #include "escape.hpp"
-#include "on_pool.hpp"
 #include "datetime.hpp"
 #include "slice_layout.hpp"
 #include "mem_ui.hpp"
@@ -59,7 +58,7 @@ namespace libdar
 	/// @{
 
 	/// the catalogue class which gather all objects contained in a give archive
-    class catalogue : protected mem_ui, public on_pool
+    class catalogue : protected mem_ui
     {
     public :
         catalogue(const user_interaction & dialog,
