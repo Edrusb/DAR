@@ -43,7 +43,6 @@ extern "C"
 } // end extern "C"
 
 #include "../my_config.h"
-#include "on_pool.hpp"
 #include "infinint.hpp"
 #include "archive_version.hpp"
 
@@ -52,7 +51,7 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-    class datetime : public on_pool
+    class datetime
     {
     public:
 	    // time units must be sorted: the first is the smallest step, last is the largest increment.
