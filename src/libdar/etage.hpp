@@ -31,7 +31,6 @@
 #include <list>
 #include <string>
 #include "infinint.hpp"
-#include "on_pool.hpp"
 #include "datetime.hpp"
 #include "user_interaction.hpp"
 
@@ -45,7 +44,7 @@ namespace libdar
 	/// contains the contents of a directory, and can then be stored beside
 	/// other etage structures corresponding to subdirectories
 	/// \ingroup Private
-    struct etage : public on_pool
+    struct etage
     {
 	etage() { fichier.clear(); last_mod = datetime(0); last_acc = datetime(0); }; // required to fake an empty dir when one is impossible to open
         etage(user_interaction & ui,
