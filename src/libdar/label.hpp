@@ -30,7 +30,6 @@
 
 #include "integers.hpp"
 #include "generic_file.hpp"
-#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -38,7 +37,7 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-    class label : public on_pool
+    class label
     {
     public:
 	label(); // builds a label equal to 'zero'
