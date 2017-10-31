@@ -36,7 +36,6 @@
 
 #include <string>
 #include "integers.hpp"
-#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -54,7 +53,7 @@ namespace libdar
 	/// not yet secured, where from the set() method that fetches data directly from a
 	/// filedescriptor (set() low-level system call) which might be a tty for example
 
-    class secu_string : public on_pool
+    class secu_string
     {
     public:
 	    /// to know if secure memory is available
