@@ -976,7 +976,6 @@ namespace libdar
 	    try
 	    {
 		filtre_restore(dialog,
-			       nullptr,
 			       options.get_selection(),
 			       options.get_subtree(),
 			       get_cat(),
@@ -1266,7 +1265,6 @@ namespace libdar
             try
             {
                 filtre_difference(dialog,
-				  nullptr,
 				  options.get_selection(),
 				  options.get_subtree(),
 				  get_cat(),
@@ -1366,7 +1364,6 @@ namespace libdar
 		    }
 		    else
 			filtre_test(dialog,
-				    nullptr,
 				    options.get_selection(),
 				    options.get_subtree(),
 				    get_cat(),
@@ -2347,7 +2344,6 @@ namespace libdar
 			    if(info_details)
 				dialog.warning(gettext("Processing files for backup..."));
 			    filtre_sauvegarde(dialog,
-					      nullptr,
 					      selection,
 					      subtree,
 					      pdesc,
@@ -2410,7 +2406,6 @@ namespace libdar
 			    dialog.warning(gettext("Processing files for merging..."));
 
 			filtre_merge(dialog,
-				     nullptr,
 				     selection,
 				     subtree,
 				     pdesc,
@@ -2444,7 +2439,6 @@ namespace libdar
 			try
 			{
 			    filtre_merge_step0(dialog,
-					       nullptr,
 					       ref_cat1,
 					       ref_cat2,
 					       *st_ptr,
@@ -2458,7 +2452,6 @@ namespace libdar
 				// we should be prepared to release decr
 				// but we do not need such argument for fixing op.
 			    filtre_merge_step2(dialog,
-					       nullptr,
 					       pdesc,
 					       *(const_cast<catalogue *>(ref_cat1)),
 					       info_details,
