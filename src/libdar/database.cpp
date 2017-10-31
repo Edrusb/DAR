@@ -128,7 +128,7 @@ namespace libdar
 
 	    if(!partial)
 	    {
-		files = data_tree_read(f, db_version, nullptr);
+		files = data_tree_read(f, db_version);
 		if(files == nullptr)
 		    throw Ememory("database::database");
 		if(files->get_name() != ".")

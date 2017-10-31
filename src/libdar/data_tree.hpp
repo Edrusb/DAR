@@ -38,7 +38,6 @@
 #include "infinint.hpp"
 #include "user_interaction.hpp"
 #include "path.hpp"
-#include "on_pool.hpp"
 #include "cat_directory.hpp"
 #include "cat_inode.hpp"
 #include "cat_detruit.hpp"
@@ -57,7 +56,7 @@ namespace libdar
 	/// the data associated to a given file are the different modification dates
 	/// that this file has been found in the archive the database has been feed by
 	/// \ingroup Private
-    class data_tree : public on_pool
+    class data_tree
     {
     public:
 	enum lookup         //< the available status of a lookup
@@ -175,7 +174,7 @@ namespace libdar
 	};
 
 
-	class status_plus : public status, public on_pool
+	class status_plus : public status
 	{
 	public:
 	    status_plus() { base = result = nullptr; };
@@ -263,7 +262,7 @@ namespace libdar
 	data_tree *find_or_addition(const std::string & name, bool is_dir, const archive_num & archive);
     };
 
-    extern data_dir *data_tree_read(generic_file & f, unsigned char db_version, memory_pool *pool);
+    extern data_dir *data_tree_read(generic_file & f, unsigned char db_version);
 
 	/// lookup routine to find a pointer to the dat_tree object corresponding to the given path
 
