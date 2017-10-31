@@ -34,7 +34,6 @@ extern "C"
 
 #include "memory_file.hpp"
 #include "cat_tools.hpp"
-#include "on_pool.hpp"
 #include "crc.hpp"
 
 namespace libdar
@@ -86,7 +85,7 @@ namespace libdar
 	/// write down the given delta signature (with metadata in sequential mode)
 	/// write down the metadata
 	/// the signature is not stored
-    class cat_delta_signature : public on_pool
+    class cat_delta_signature
     {
     public:
 	    /// constructor reading the object METADATA (and also its DATA when in sequential mode) from an archive
