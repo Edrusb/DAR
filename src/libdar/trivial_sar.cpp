@@ -276,9 +276,9 @@ namespace libdar
 	try
 	{
 	    if(pipename == "-")
-		reference = new (get_pool()) tuyau(get_ui(), 0, gf_read_only);
+		reference = new (nothrow) tuyau(get_ui(), 0, gf_read_only);
 	    else
-		reference = new (get_pool()) tuyau(get_ui(), pipename, gf_read_only);
+		reference = new (nothrow) tuyau(get_ui(), pipename, gf_read_only);
 
 	    if(reference == nullptr)
 		throw Ememory("trivial_sar::trivial_sar");

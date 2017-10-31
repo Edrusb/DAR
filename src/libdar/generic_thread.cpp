@@ -67,11 +67,11 @@ namespace libdar
 	if(!order.get_block(&data_header_eof, tmp))
 	    throw SRC_BUG;
 
-	remote = new (get_pool()) slave_thread(x_ptr,
-					       &toslave_data,
-					       &tomaster_data,
-					       &toslave_ctrl,
-					       &tomaster_ctrl);
+	remote = new (nothrow) slave_thread(x_ptr,
+					    &toslave_data,
+					    &tomaster_data,
+					    &toslave_ctrl,
+					    &tomaster_ctrl);
 	if(remote == nullptr)
 	    throw Ememory("generic_thread::generic_thread");
 	try

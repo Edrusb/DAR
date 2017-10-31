@@ -67,10 +67,10 @@ namespace libdar
         {
             if(buffer != nullptr)
             {
-                meta_delete(buffer);
+                delete [] buffer;
                 buffer = nullptr;
             }
-            meta_new(buffer, size);
+            buffer = new (nothrow) unsigned char[size];
             if(buffer != nullptr)
                 buf_size = size;
             else

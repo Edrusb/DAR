@@ -412,11 +412,7 @@ namespace libdar
 	if(buffer != nullptr)
 	    throw SRC_BUG;
 
-	if(get_pool() != nullptr)
-	    buffer = (char *)get_pool()->alloc(x_size);
-	else
-	    buffer = new (nothrow) char[x_size];
-
+	buffer = new (nothrow) char[x_size];
 	if(buffer == nullptr)
 	    throw Ememory("cache::alloc_buffer");
 	size = x_size;
@@ -428,10 +424,7 @@ namespace libdar
 	if(buffer == nullptr)
 	    throw SRC_BUG;
 
-	if(get_pool() != nullptr)
-	    get_pool()->release(buffer);
-	else
-	    delete [] buffer;
+	delete [] buffer;
 	buffer = nullptr;
 	size = 0;
 	half = 0;

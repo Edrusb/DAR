@@ -299,17 +299,17 @@ namespace libdar
     {
 	if(buf != nullptr)
 	{
-	    meta_delete(buf);
+	    delete [] buf;
 	    buf = nullptr;
 	}
 	if(encrypted_buf != nullptr)
 	{
-	    meta_delete(encrypted_buf);
+	    delete [] encrypted_buf;
 	    encrypted_buf = nullptr;
 	}
 	if(extra_buf != nullptr)
 	{
-	    meta_delete(extra_buf);
+	    delete [] extra_buf;
 	    extra_buf = nullptr;
 	}
 	buf_size = 0;
@@ -334,7 +334,7 @@ namespace libdar
 	    buf_offset = ref.buf_offset;
 	    buf_byte_data = ref.buf_byte_data;
 	    buf_size = ref.buf_size;
-	    meta_new(buf, buf_size);
+	    buf = new (nothrow) char[buf_size];
 	    if(buf == nullptr)
 		throw Ememory("tronconneuse::copy_from");
 	    (void)memcpy(buf, ref.buf, buf_byte_data);
@@ -347,14 +347,14 @@ namespace libdar
 
 	    encrypted_buf_size = ref.encrypted_buf_size;
 	    encrypted_buf_data = ref.encrypted_buf_data;
-	    meta_new(encrypted_buf, encrypted_buf_size);
+	    encrypted_buf = new (nothrow) char[encrypted_buf_size];
 	    if(encrypted_buf == nullptr)
 		throw Ememory("tronconneuse::copy_from");
 	    (void)memcpy(encrypted_buf, ref.encrypted_buf, encrypted_buf_data);
 
 	    extra_buf_size = ref.extra_buf_size;
 	    extra_buf_data = ref.extra_buf_data;
-	    meta_new(extra_buf, extra_buf_size);
+	    extra_buf = new (nothrow) char[extra_buf_size];
 	    if(extra_buf == nullptr)
 		throw Ememory("tronconneuse::copy_from");
 	    (void)memcpy(extra_buf, ref.extra_buf, extra_buf_data);
@@ -501,7 +501,7 @@ namespace libdar
 	{
 	    encrypted_buf_data = 0;
 	    encrypted_buf_size = encrypted_block_size_for(clear_block_size);
-	    meta_new(encrypted_buf, encrypted_buf_size);
+	    encrypted_buf = new (nothrow) char[encrypted_buf_size];
 	    if(encrypted_buf == nullptr)
 	    {
 		encrypted_buf_size = 0;
@@ -514,7 +514,7 @@ namespace libdar
 	    buf_size = clear_block_allocated_size_for(clear_block_size);
 	    if(buf_size < clear_block_size)
 		throw SRC_BUG; // buf_size must be larger than or equal to clear_block_size
-	    meta_new(buf, buf_size);
+	    buf = new (nothrow) char[buf_size];
 	    if(buf == nullptr)
 	    {
 		buf_size = 0;
@@ -525,7 +525,7 @@ namespace libdar
 	{
 	    extra_buf_data = 0;
 	    extra_buf_size = encrypted_buf_size; // using same size as encrypted_buf
-	    meta_new(extra_buf, extra_buf_size);
+	    extra_buf = new (nothrow) char[extra_buf_size];
 	    if(extra_buf == nullptr)
 	    {
 		extra_buf_size = 0;

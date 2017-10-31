@@ -69,7 +69,7 @@ namespace libdar
 
 	    // setting up the object
 
-	meta_new(working_buffer, BUFFER_SIZE);
+	working_buffer = new (nothrow) char[BUFFER_SIZE];
 	if(working_buffer == nullptr)
 	    throw Ememory("generic_rsync::generic_rsync (sign)");
 	try
@@ -93,7 +93,7 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    meta_delete(working_buffer);
+	    delete [] working_buffer;
 	    throw;
 	}
 #else
@@ -131,7 +131,7 @@ namespace libdar
 	initial = true;
 	patching_completed = false; // not used in delta mode
 	data_crc = nullptr;
-	meta_new(working_buffer, BUFFER_SIZE);
+	working_buffer = new (nothrow) char[BUFFER_SIZE];
 	if(working_buffer == nullptr)
 	    throw Ememory("generic_rsync::generic_rsync (sign)");
 
@@ -142,8 +142,8 @@ namespace libdar
 	    job = rs_loadsig_begin(&sumset);
 	    try
 	    {
-		meta_new(inbuf, BUFFER_SIZE);
-		meta_new(outbuf, SMALL_BUF); // nothing should be output
+		inbuf = new (nothrow) char[BUFFER_SIZE];
+		outbuf = new (nothrow) char [SMALL_BUF]; // nothing should be output
 		if(inbuf == nullptr || outbuf == nullptr)
 		    throw Ememory("generic_rsync::generic_rsync (delta)");
 
@@ -166,18 +166,30 @@ namespace libdar
 		}
 		while(!eof);
 
-		meta_delete(inbuf);
-		inbuf = nullptr;
-		meta_delete(outbuf);
-		outbuf = nullptr;
+		if(inbuf != nullptr)
+		{
+		    delete [] inbuf;
+		    inbuf = nullptr;
+		}
+		if(outbuf != nullptr)
+		{
+		    delete [] outbuf;
+		    outbuf = nullptr;
+		}
 		free_job();
 	    }
 	    catch(...)
 	    {
 		if(inbuf != nullptr)
-		    meta_delete(inbuf);
+		{
+		    delete [] inbuf;
+		    inbuf = nullptr;
+		}
 		if(outbuf != nullptr)
-		    meta_delete(outbuf);
+		{
+		    delete [] outbuf;
+		    outbuf = nullptr;
+		}
 		free_job();
 		rs_free_sumset(sumset);
 		throw;
@@ -212,7 +224,7 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    meta_delete(working_buffer);
+	    delete [] working_buffer;
 	    throw;
 	}
 #else
@@ -246,7 +258,7 @@ namespace libdar
 	initial = true;
 	working_size = 0;
 	data_crc = nullptr;
-	meta_new(working_buffer,BUFFER_SIZE);
+	working_buffer = new (nothrow) char[BUFFER_SIZE];
 	if(working_buffer == nullptr)
 	    throw Ememory("generic_rsync::generic_rsync (sign)");
 	try
@@ -255,7 +267,7 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    meta_delete(working_buffer);
+	    delete [] working_buffer;
 	    throw;
 	}
 #else
@@ -267,7 +279,7 @@ namespace libdar
     generic_rsync::~generic_rsync() throw(Ebug)
     {
 	terminate();
-	meta_delete(working_buffer);
+	delete [] working_buffer;
     }
 
     U_I generic_rsync::inherited_read(char *a, U_I size)
