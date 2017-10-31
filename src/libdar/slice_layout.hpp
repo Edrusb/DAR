@@ -33,12 +33,11 @@
 #include "../my_config.h"
 #include "infinint.hpp"
 #include "generic_file.hpp"
-#include "on_pool.hpp"
 
 namespace libdar
 {
 
-    class slice_layout : public on_pool
+    class slice_layout
     {
     public:
 	slice_layout() = default;
