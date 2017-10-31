@@ -412,7 +412,7 @@ namespace libdar
 
     compressor::xfer::xfer(U_I sz, wrapperlib_mode mode) : wrap(mode)
     {
-        meta_new(buffer, sz);
+        buffer = new (nothrow) char[sz];
         if(buffer == nullptr)
             throw Ememory("compressor::xfer::xfer");
         size = sz;
@@ -420,7 +420,11 @@ namespace libdar
 
     compressor::xfer::~xfer()
     {
-        meta_delete(buffer);
+	if(buffer != nullptr)
+	{
+	    delete [] buffer;
+	    buffer = nullptr;
+	}
     }
 
     U_I compressor::none_read(char *a, U_I size)

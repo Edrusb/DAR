@@ -100,7 +100,7 @@ namespace libdar
 	virtual void inherited_terminate() override { local_terminate(); };
 
     private :
-        struct xfer : public on_pool
+        struct xfer
         {
             wrapperlib wrap;
             char *buffer;
