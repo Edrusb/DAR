@@ -1368,13 +1368,13 @@ namespace libdar
         }
     }
 
-    template <class T> void copy_ptr(const T *src, T * & dst, memory_pool *p)
+    template <class T> void copy_ptr(const T *src, T * & dst)
     {
 	if(src == nullptr)
 	    dst = nullptr;
 	else
 	{
-	    dst = new (p) T(*src);
+	    dst = new (nothrow) T(*src);
 	    if(dst == nullptr)
 		throw Ememory("copy_ptr template");
 	}
@@ -1394,9 +1394,9 @@ namespace libdar
 	    ea_saved = ref.ea_saved;
 	    fsa_saved = ref.fsa_saved;
 	    small_read = ref.small_read;
-	    copy_ptr(ref.ea_offset, ea_offset, nullptr);
-	    copy_ptr(ref.ea, ea, nullptr);
-	    copy_ptr(ref.ea_size, ea_size, nullptr);
+	    copy_ptr(ref.ea_offset, ea_offset);
+	    copy_ptr(ref.ea, ea);
+	    copy_ptr(ref.ea_size, ea_size);
 	    if(ref.ea_crc != nullptr)
 	    {
 		ea_crc = (ref.ea_crc)->clone();
@@ -1405,10 +1405,10 @@ namespace libdar
 	    }
 	    else
 		ea_crc = nullptr;
-	    copy_ptr(ref.fsa_families, fsa_families, nullptr);
-	    copy_ptr(ref.fsa_offset, fsa_offset, nullptr);
-	    copy_ptr(ref.fsal, fsal, nullptr);
-	    copy_ptr(ref.fsa_size, fsa_size, nullptr);
+	    copy_ptr(ref.fsa_families, fsa_families);
+	    copy_ptr(ref.fsa_offset, fsa_offset);
+	    copy_ptr(ref.fsal, fsal);
+	    copy_ptr(ref.fsa_size, fsa_size);
 	    if(ref.fsa_crc != nullptr)
 	    {
 		fsa_crc = (ref.fsa_crc)->clone();
@@ -1417,7 +1417,7 @@ namespace libdar
 	    }
 	    else
 		fsa_crc = nullptr;
-	    copy_ptr(ref.fs_dev, fs_dev, nullptr);
+	    copy_ptr(ref.fs_dev, fs_dev);
 	    edit = ref.edit;
 	}
 	catch(...)
