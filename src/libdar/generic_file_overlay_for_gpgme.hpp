@@ -35,14 +35,13 @@ extern "C"
 
 #include "../my_config.h"
 #include "generic_file.hpp"
-#include "on_pool.hpp"
 
 namespace libdar
 {
 	/// \ingroup Private
 	/// @}
 
-    class generic_file_overlay_for_gpgme : public on_pool
+    class generic_file_overlay_for_gpgme
     {
     public:
 	    /// create a gpgme data buffer of the given generic_file
