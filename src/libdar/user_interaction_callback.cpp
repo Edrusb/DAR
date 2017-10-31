@@ -322,7 +322,7 @@ namespace libdar
 
     user_interaction * user_interaction_callback::clone() const
     {
-	user_interaction *ret = new (get_pool()) user_interaction_callback(*this); // copy constructor
+	user_interaction *ret = new (nothrow) user_interaction_callback(*this); // copy constructor
 	if(ret == nullptr)
 	    throw Ememory("user_interaction_callback::clone");
 	else

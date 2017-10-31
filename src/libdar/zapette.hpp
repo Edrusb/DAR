@@ -38,6 +38,7 @@
 #include "integers.hpp"
 #include "mem_ui.hpp"
 #include "contextual.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {

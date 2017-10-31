@@ -33,7 +33,6 @@
 #include "erreurs.hpp"
 #include "integers.hpp"
 #include "secu_string.hpp"
-#include "on_pool.hpp"
 #include "infinint.hpp"
 
 namespace libdar
@@ -78,7 +77,7 @@ namespace libdar
 	//! *needs* to make local copies of these objects, if the copy constructor
 	//!  is not properly defined in your inherited class this will crash the application.
 	//! \ingroup API
-    class user_interaction : public on_pool
+    class user_interaction
     {
     public:
 
