@@ -28,7 +28,6 @@
 
 #include "tlv.hpp"
 #include "generic_file.hpp"
-#include "on_pool.hpp"
 
 #include <vector>
 
@@ -38,7 +37,7 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-    class tlv_list : public on_pool
+    class tlv_list
     {
     public:
 	tlv_list() = default;                     //< builds an empty list
