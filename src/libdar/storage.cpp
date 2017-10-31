@@ -282,15 +282,15 @@ namespace libdar
 
             if(can_rem < number)
             {
-                if(it.offset > 0)
+                if(it.offset > 0) // we must keep data of the current cellule located before it.offset
                 {
 		    unsigned char *p = nullptr;
-                    meta_new(p, it.offset);
+                    p = new (nothrow) unsigned char[it.offset];
 
                     if(p != nullptr)
                     {
 			(void)memcpy(p, it.cell->data, it.offset);
-                        meta_delete(it.cell->data);
+                        delete [] it.cell->data;
 
                         it.cell->data = p;
                         it.cell->size -= can_rem;
@@ -301,7 +301,7 @@ namespace libdar
                     else
                         throw Ememory("storage::remove_bytes_at_iterator");
                 }
-                else
+                else // we can remove from the chain the whole cellule
                 {
                     struct cellule *t = it.cell->next;
 
@@ -322,16 +322,16 @@ namespace libdar
                     it.cell = t;
                 }
             }
-            else // can_rem >= number
+            else // can_rem >= number, some data of the current cell must be kept after part to be removed
             {
 		unsigned char *p = nullptr;
-                meta_new(p, it.cell->size - number);
+                p = new (nothrow) unsigned char[it.cell->size - number];
 
                 if(p != nullptr)
                 {
 		    (void)memcpy(p, it.cell->data, it.offset);
 		    (void)memcpy(p + it.offset, it.cell->data + it.offset + number, it.cell->size - it.offset - number);
-                    meta_delete(it.cell->data);
+                    delete [] it.cell->data;
 
                     it.cell->data = p;
                     it.cell->size -= number;
@@ -467,7 +467,7 @@ namespace libdar
                 if(somme < failed_alloc)
                 {
 		    unsigned char *p = nullptr;
-                    meta_new(p, somme);
+                    p = new (nothrow) unsigned char[somme];
 
                     if(p != nullptr)
                     {
@@ -475,7 +475,7 @@ namespace libdar
 
 			(void)memcpy(p, glisseur->data, glisseur->size);
 			(void)memcpy(p + glisseur->size, tmp->data, somme - glisseur->size);
-                        meta_delete(glisseur->data);
+                        delete [] glisseur->data;
 
                         glisseur->data = p;
                         glisseur->size = somme;
@@ -608,12 +608,12 @@ namespace libdar
                 throw SRC_BUG;
             if(c->data != nullptr)
 	    {
-                meta_delete(c->data);
+                delete [] c->data;
 		c->data = nullptr;
 	    }
             t = c->next;
-            meta_delete(c);
-            c = t;
+            delete c;
+            c = t; // ready to destroy the next cellule
         }
     }
 
@@ -629,7 +629,7 @@ namespace libdar
 	{
 	    do
 	    {
-		meta_new(newone, 1);
+		newone = new (nothrow) cellule;
 		if(newone != nullptr)
 		{
 		    newone->prev = previous;
@@ -648,7 +648,7 @@ namespace libdar
 
 		do
 		{
-		    meta_new(newone->data, dsize);
+		    newone->data = new (nothrow) unsigned char[dsize];
 		    if(newone->data != nullptr)
 		    {
 			size -= dsize;
