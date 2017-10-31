@@ -131,7 +131,6 @@ namespace libdar
     }
 
     generic_file *database_header_create(user_interaction & dialog,
-					 memory_pool *pool,
 					 const string & filename,
 					 bool overwrite,
 					 compression algozip)
@@ -144,7 +143,7 @@ namespace libdar
 
 	if(stat(filename.c_str(), &buf) >= 0 && !overwrite)
 	    throw Erange("database_header_create", gettext("Cannot create database, file exists"));
-	ret = new (pool) fichier_local(dialog, filename, gf_write_only, 0666, !overwrite, overwrite, false);
+	ret = new (nothrow) fichier_local(dialog, filename, gf_write_only, 0666, !overwrite, overwrite, false);
 	if(ret == nullptr)
 	    throw Ememory("database_header_create");
 
@@ -153,7 +152,7 @@ namespace libdar
 	    h.set_compression(algozip);
 	    h.write(*ret);
 
-	    comp = new (pool) compressor(algozip, ret); // upon success, ret is owned by compr
+	    comp = new (nothrow) compressor(algozip, ret); // upon success, ret is owned by compr
 	    if(comp == nullptr)
 		throw Ememory("database_header_create");
 	    else
@@ -169,7 +168,6 @@ namespace libdar
     }
 
     generic_file *database_header_open(user_interaction & dialog,
-				       memory_pool *pool,
 				       const string & filename,
 				       unsigned char & db_version,
 				       compression & algozip)
@@ -183,7 +181,7 @@ namespace libdar
 
 	    try
 	    {
-		ret = new (pool) fichier_local(filename, false);
+		ret = new (nothrow) fichier_local(filename, false);
 	    }
 	    catch(Erange & e)
 	    {
@@ -196,7 +194,7 @@ namespace libdar
 	    db_version = h.get_version();
 	    algozip = h.get_compression();
 
-	    comp = new (pool) compressor(h.get_compression(), ret);
+	    comp = new (nothrow) compressor(h.get_compression(), ret);
 	    if(comp == nullptr)
 		throw Ememory("database_header_open");
 	    else

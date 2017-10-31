@@ -73,7 +73,6 @@ namespace libdar
     database::database(user_interaction & dialog, const string & base, const database_open_options & opt)
     {
 	generic_file *f = database_header_open(dialog,
-					       nullptr,
 					       base,
 					       cur_db_version,
 					       algo);
@@ -173,7 +172,6 @@ namespace libdar
 	    throw Erange("database::dump", gettext("Cannot write down a read-only database"));
 
 	generic_file *f = database_header_create(dialog,
-						 nullptr,
 						 filename,
 						 opt.get_overwrite(),
 						 algo);
