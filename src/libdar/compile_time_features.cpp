@@ -57,11 +57,7 @@ namespace libdar
 
 	bool special_alloc()
 	{
-#ifdef LIBDAR_SPECIAL_ALLOC
-	    return true;
-#else
 	    return false;
-#endif
 	}
 
 

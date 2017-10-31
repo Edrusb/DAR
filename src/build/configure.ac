@@ -964,13 +964,6 @@ AC_ARG_ENABLE( [build-html],
 	       ]
              )
 
-AC_ARG_ENABLE(  [special-alloc],
-                AC_HELP_STRING(--enable-special-alloc, [special memory allcation scheme makes dar using less memory and run a bit faster, in particular in conjunction with --enable-mode=32 or 64, deprecated since release 2.5.5 you can re-enable it if you like]),
-                [AC_DEFINE(LIBDAR_SPECIAL_ALLOC, [], [if set activates specific new and delete operator which do better allocation for a lot of small items])
-                local_special_alloc="yes"
-                ],
-                [])
-
 AC_ARG_ENABLE( [upx],
                 AC_HELP_STRING(--disable-upx, [by default configure looks for UPX and if available make executables compressed at installation time, you can disable this feature]),
                 [  AC_MSG_NOTICE([ignoring UPX])
@@ -990,7 +983,7 @@ AC_ARG_ENABLE( [fast-dir],
 	     )
 
 AC_ARG_ENABLE(  [thread-safe],
-                AC_HELP_STRING(--disable-thread-safe, [libdar is thread safe if POSIX mutex are available, you can manually disable the use of POSIX mutex, the resulting libdar library will not be thread-safe anymore unless special-alloc is disabled too]),
+                AC_HELP_STRING(--disable-thread-safe, [libdar is thread safe if POSIX mutex are available, you can manually disable the use of POSIX mutex, the resulting libdar library will not be thread-safe anymore]),
                 [ AC_MSG_NOTICE([thread-safe support disabled])
                 ],
                 [ AC_CHECK_LIB(pthread, [pthread_mutex_init], [], [])
@@ -1355,13 +1348,6 @@ fi
 
 printf "   HFS+ FSA support           : "
 if [ "$local_birthtime" = "yes" ] ; then
-  echo "YES"
-else
-  echo "NO"
-fi
-
-printf "   Special allocation scheme  : "
-if [ "$local_special_alloc" = "yes" ] ; then
   echo "YES"
 else
   echo "NO"
