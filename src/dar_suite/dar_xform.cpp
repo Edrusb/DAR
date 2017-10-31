@@ -191,7 +191,6 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 		if(size.is_zero())
 		    if(dst == "-")
 			dst_sar = macro_tools_open_archive_tuyau(dialog,
-								 nullptr,
 								 1,
 								 gf_write_only,
 								 internal_name,

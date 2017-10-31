@@ -575,7 +575,6 @@ namespace libdar
 			// all the non detruits objects
 
 		    ceci->cat_det = macro_tools_read_catalogue(get_ui(),
-							       nullptr,
 							       x_ver,
 							       *pdesc,
 							       0, // cat_size cannot be determined in sequential_read mode

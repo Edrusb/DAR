@@ -103,7 +103,6 @@ namespace libdar
 
 			// we open the main archive to get the different layers (level1, scram and level2).
 		    macro_tools_open_archive(dialog,
-					     nullptr,
 					     *where,
 					     basename,
 					     options.get_slice_min_digits(),
@@ -160,7 +159,6 @@ namespace libdar
 
 				    // we open the archive of reference also to get its different layers (ref_stack)
 				macro_tools_open_archive(dialog,
-							 nullptr,
 							 *ref_where,
 							 options.get_ref_basename(),
 							 options.get_ref_slice_min_digits(),
@@ -220,7 +218,6 @@ namespace libdar
 			    dialog.warning(gettext("Loading isolated catalogue in memory..."));
 
 			cat = macro_tools_get_derivated_catalogue_from(dialog,
-								       nullptr,
 								       stack,
 								       ref_stack,
 								       ref_ver,
@@ -255,7 +252,6 @@ namespace libdar
 				if(info_details)
 				    dialog.warning(gettext("Loading catalogue into memory..."));
 				cat = macro_tools_get_catalogue_from(dialog,
-								     nullptr,
 								     stack,
 								     ver,
 								     options.get_info_details(),
@@ -289,7 +285,6 @@ namespace libdar
 					    lab = layer1->get_data_name();
 
 					cat = macro_tools_read_catalogue(dialog,
-									 nullptr,
 									 ver,
 									 pdesc,
 									 0, // cannot determine cat_size at this stage
@@ -357,7 +352,6 @@ namespace libdar
 					label tmp;
 					tmp.clear(); // this way we do not modify the catalogue data name even in lax mode
 					cat = macro_tools_lax_search_catalogue(dialog,
-									       nullptr,
 									       stack,
 									       ver.get_edition(),
 									       ver.get_compression_algo(),
@@ -370,7 +364,6 @@ namespace libdar
 					dialog.printf(gettext("LAX MODE: Could not find a whole catalogue in the archive. If you have an isolated catalogue, stop here and use it as backup of the internal catalogue, else continue but be advised that all data will not be able to be retrieved..."));
 					dialog.pause(gettext("LAX MODE: Do you want to try finding portions of the original catalogue if some remain (this may take even more time and in any case, it will only permit to recover some files, at most)?"));
 					cat = macro_tools_lax_search_catalogue(dialog,
-									       nullptr,
 									       stack,
 									       ver.get_edition(),
 									       ver.get_compression_algo(),
@@ -1451,7 +1444,6 @@ namespace libdar
 					  isol_ver,
 					  isol_slices,
 					  &slices, // giving our slice_layout as reference to be stored in the archive header/trailer
-					  nullptr, // pool
 					  *sauv_path_t,
 					  filename,
 					  extension,
@@ -2233,7 +2225,6 @@ namespace libdar
 					  ver,   // this object field is set!
 					  slices,// this object field is set!
 					  nullptr,  // no slicing reference stored in archive header/trailer
-					  nullptr,  // this object field
 					  sauv_path_t,
 					  filename,
 					  extension,

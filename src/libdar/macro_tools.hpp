@@ -77,7 +77,6 @@ namespace libdar
 
 	/// create an container to write an archive to a pipe
     extern trivial_sar *macro_tools_open_archive_tuyau(user_interaction & dialog,
-						       memory_pool *pool,
 						       S_I fd,
 						       gf_mode mode,
 						       const label & internal_name,
@@ -114,7 +113,6 @@ namespace libdar
 	/// the cache or crypto_sym or scrambler which then has two Labels (_CLEAR and _UNCYPHERED)
 
     extern void macro_tools_open_archive(user_interaction & dialog,     //< for user interaction
-					 memory_pool *pool,             //< whether memory_pool allocation has to be performed
 					 const entrepot &where,         //< slices location
                                          const std::string &basename,   //< slice basename
 					 const infinint & min_digits,   //< minimum digits for the slice number
@@ -140,7 +138,6 @@ namespace libdar
 
 	/// uses terminator to skip to the position where to find the catalogue and read it, taking care of having this catalogue pointing to the real data (context of isolated catalogue --- cata_stack --- used to rescue an internal archive --- data_stack)
     extern catalogue *macro_tools_get_derivated_catalogue_from(user_interaction & dialog,
-							       memory_pool *pool,
 							       pile & data_stack,  // where to get the files and EA from
 							       pile & cata_stack,  // where to get the catalogue from
 							       const header_version & ver, // version format as defined in the header of the archive to read
@@ -152,7 +149,6 @@ namespace libdar
 
 	/// uses terminator to skip to the position where to find the catalogue and read it
     extern catalogue *macro_tools_get_catalogue_from(user_interaction & dialog,
-						     memory_pool *pool,
 						     pile & stack,  // raw data access object
 						     const header_version & ver, // version format as defined in the header of the archive to read
                                                      bool info_details, // verbose display (throught user_interaction)
@@ -163,7 +159,6 @@ namespace libdar
 
 	/// read the catalogue from cata_stack assuming the cata_stack is positionned at the beginning of the area containing archive's dumped data
     extern catalogue *macro_tools_read_catalogue(user_interaction & dialog,
-						 memory_pool *pool,
 						 const header_version & ver,
 						 const pile_descriptor & cata_pdesc,
 						 const infinint & cat_size,
@@ -173,7 +168,6 @@ namespace libdar
 						 bool only_detruits);
 
     extern catalogue *macro_tools_lax_search_catalogue(user_interaction & dialog,
-						       memory_pool *pool,
 						       pile & stack,
 						       const archive_version & edition,
 						       compression compr_algo,
@@ -191,7 +185,6 @@ namespace libdar
 	/// \param[out] ver the archive "header" to be dropped at end of archive
 	/// \param[out] slicing slicing layout of the archive
 	/// \param[in]  ref_slicing if not nullptr the pointed to slicing_layout will be stored in the header/trailer version of the archive
-	/// \param[in]  pool memory pool to use for memory allocation (nullptr for no pool usage)
 	/// \param[in]  sauv_path_t where to create the archive
 	/// \param[in]  filename archive base name
 	/// \param[in]  extension archive extension
@@ -249,7 +242,6 @@ namespace libdar
 					  header_version & ver,
 					  slice_layout & slicing,
 					  const slice_layout *ref_slicing,
-					  memory_pool *pool,
 					  const entrepot & sauv_path_t,
 					  const std::string & filename,
 					  const std::string & extension,

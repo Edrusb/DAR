@@ -84,7 +84,6 @@ namespace libdar
     static void version_check(user_interaction & dialog, const header_version & ver);
 
     catalogue *macro_tools_get_catalogue_from(user_interaction & dialog,
-					      memory_pool *pool,
 					      pile & stack,
 					      const header_version & ver,
 					      bool info_details,
@@ -94,7 +93,6 @@ namespace libdar
 					      bool lax_mode)
     {
 	return macro_tools_get_derivated_catalogue_from(dialog,
-							pool,
 							stack,
 							stack,
 							ver,
@@ -106,7 +104,6 @@ namespace libdar
     }
 
     catalogue *macro_tools_get_derivated_catalogue_from(user_interaction & dialog,
-							memory_pool *pool,
 							pile & data_stack,
 							pile & cata_stack,
 							const header_version & ver,
@@ -155,7 +152,6 @@ namespace libdar
 	    cat_size = term.get_terminateur_start() - term.get_catalogue_start();
 
 	    ret = macro_tools_read_catalogue(dialog,
-					     pool,
 					     ver,
 					     cata_pdesc,
 					     cat_size,
@@ -190,7 +186,6 @@ namespace libdar
     }
 
     catalogue *macro_tools_read_catalogue(user_interaction & dialog,
-					  memory_pool *pool,
 					  const header_version & ver,
 					  const pile_descriptor & cata_pdesc,
 					  const infinint & cat_size,
@@ -249,13 +244,13 @@ namespace libdar
 	    {
 		if(!cat_size.is_zero())
 		    cata_pdesc.stack->read_ahead(cat_size);
-		ret = new (pool) catalogue(dialog,
-					   cata_pdesc,
-					   ver.get_edition(),
-					   ver.get_compression_algo(),
-					   lax_mode,
-					   lax_layer1_data_name,
-					   only_detruits);
+		ret = new (nothrow) catalogue(dialog,
+					      cata_pdesc,
+					      ver.get_edition(),
+					      ver.get_compression_algo(),
+					      lax_mode,
+					      lax_layer1_data_name,
+					      only_detruits);
 		if(ret == nullptr)
 		    throw Ememory("macro_tools_read_catalogue");
 		try
@@ -337,7 +332,6 @@ namespace libdar
 
 
     void macro_tools_open_archive(user_interaction & dialog,
-				  memory_pool *pool,
 				  const entrepot &where,
                                   const string &basename,
 				  const infinint & min_digits,
@@ -395,17 +389,17 @@ namespace libdar
 		    {
 			if(info_details)
 			    dialog.warning(gettext("Opening standard input to read the archive..."));
-			tmp = new (pool) trivial_sar(dialog,
-						     basename,
-						     lax);
+			tmp = new (nothrow) trivial_sar(dialog,
+							basename,
+							lax);
 		    }
 		    else
 		    {
 			if(info_details)
 			    dialog.printf(gettext("Opening named pipe %S as input to read the archive..."), &input_pipe);
-			tmp = new (pool) trivial_sar(dialog,
-						     input_pipe,
-						     lax);
+			tmp = new (nothrow) trivial_sar(dialog,
+							input_pipe,
+							lax);
 		    }
 		}
 		else
@@ -416,8 +410,8 @@ namespace libdar
 		    try
 		    {
 			dialog.printf(gettext("Opening a pair of pipes to read the archive, expecting dar_slave at the other ends..."));
-			tools_open_pipes(dialog, input_pipe, output_pipe, in, out, pool);
-			tmp = new (pool) zapette(dialog, in, out, true);
+			tools_open_pipes(dialog, input_pipe, output_pipe, in, out, nullptr);
+			tmp = new (nothrow) zapette(dialog, in, out, true);
 			if(tmp == nullptr)
 			{
 			    delete in;
@@ -446,14 +440,14 @@ namespace libdar
 		sar *tmp_sar = nullptr;
 		if(info_details)
 		    dialog.warning(gettext("Opening the archive using the multi-slice abstraction layer..."));
-		tmp = tmp_sar = new (pool) sar(dialog,
-					       basename,
-					       extension,
-					       where,
-					       !sequential_read, // not openned by the end in sequential read mode
-					       min_digits,
-					       lax,
-					       execute);
+		tmp = tmp_sar = new (nothrow) sar(dialog,
+						  basename,
+						  extension,
+						  where,
+						  !sequential_read, // not openned by the end in sequential read mode
+						  min_digits,
+						  lax,
+						  execute);
 		if(tmp_sar != nullptr)
 		    sl = tmp_sar->get_slicing();
 	    }
@@ -525,7 +519,7 @@ namespace libdar
 	    {
 		if(info_details)
 		    dialog.printf(gettext("Opening construction layer..."));
-		tmp = new (pool) tronc(stack.top(), 0, second_terminateur_offset, false);
+		tmp = new (nothrow) tronc(stack.top(), 0, second_terminateur_offset, false);
 		if(tmp == nullptr)
 		    throw Ememory("macro_tools_open_archive");
 		else
@@ -598,7 +592,7 @@ namespace libdar
 
 			// adding the cache layer only if no escape layer will tape place
 			// over. escape layer act a bit like a cache, making caching here useless
-		    tmp = tmp_cache = new (pool) cache (*(stack.top()), false);
+		    tmp = tmp_cache = new (nothrow) cache (*(stack.top()), false);
 		    if(tmp == nullptr)
 			dialog.warning(gettext("Failed opening the cache layer, lack of memory, archive read performances will not be optimized"));
 		}
@@ -616,33 +610,33 @@ namespace libdar
 		if(info_details)
 		    dialog.warning(gettext("Opening cyphering layer..."));
 #ifdef LIBDAR_NO_OPTIMIZATION
-		    tools_secu_string_show(dialog, string("Used clear key: "), real_pass);
+		tools_secu_string_show(dialog, string("Used clear key: "), real_pass);
 #endif
 		if(!second_terminateur_offset.is_zero()
 		   || tmp_ctxt->is_an_old_start_end_archive()) // we have openned the archive by the end
 		{
 		    crypto_sym *tmp_ptr = nullptr;
 
-		    tmp = tmp_ptr = new (pool) crypto_sym(crypto_size,
-							  real_pass,
-							  *(stack.top()),
-							  true,
-							  ver.get_edition(),
-							  crypto,
-							  ver.get_crypted_key() == nullptr);
+		    tmp = tmp_ptr = new (nothrow) crypto_sym(crypto_size,
+							     real_pass,
+							     *(stack.top()),
+							     true,
+							     ver.get_edition(),
+							     crypto,
+							     ver.get_crypted_key() == nullptr);
 		    if(tmp_ptr != nullptr)
 			tmp_ptr->set_initial_shift(ver.get_initial_offset());
 		}
 		else // archive openned by the beginning
 		{
 		    crypto_sym *tmp_ptr;
-		    tmp = tmp_ptr = new (pool) crypto_sym(crypto_size,
-							  real_pass,
-							  *(stack.top()),
-							  false,
-							  ver.get_edition(),
-							  crypto,
-							  ver.get_crypted_key() == nullptr);
+		    tmp = tmp_ptr = new (nothrow) crypto_sym(crypto_size,
+							     real_pass,
+							     *(stack.top()),
+							     false,
+							     ver.get_edition(),
+							     crypto,
+							     ver.get_crypted_key() == nullptr);
 
 		    if(tmp_ptr != nullptr)
 		    {
@@ -662,7 +656,7 @@ namespace libdar
 #ifdef LIBDAR_NO_OPTIMIZATION
 		tools_secu_string_show(dialog, string("Used clear key: "), real_pass);
 #endif
-		tmp = new (pool) scrambler(real_pass, *(stack.top()));
+		tmp = new (nothrow) scrambler(real_pass, *(stack.top()));
 		break;
 	    default:
 		throw Erange("macro_tools_open_archive", gettext("Unknown encryption algorithm"));
@@ -686,7 +680,7 @@ namespace libdar
 	    {
 		if(info_details)
 		    dialog.warning(gettext("Creating a new thread to run the previously created layers..."));
-		tmp = new (pool) generic_thread(stack.top());
+		tmp = new (nothrow) generic_thread(stack.top());
 		if(tmp == nullptr)
 		    throw Ememory("op_create_in_sub");
 		if(sequential_read)
@@ -744,7 +738,7 @@ namespace libdar
 		set<escape::sequence_type> unjump;
 
 		unjump.insert(escape::seqt_catalogue);
-		tmp = new (pool) escape(stack.top(), unjump);
+		tmp = new (nothrow) escape(stack.top(), unjump);
 		if(tmp == nullptr)
 		    throw Ememory("open_archive");
 #ifdef LIBTHREADAR_AVAILABLE
@@ -768,7 +762,7 @@ namespace libdar
 		{
 		    if(info_details)
 			dialog.warning(gettext("Creating a new thread to run the escape layer..."));
-		    generic_thread *tmp = new (pool) generic_thread(stack.top());
+		    generic_thread *tmp = new (nothrow) generic_thread(stack.top());
 		    if(tmp == nullptr)
 			throw Ememory("op_create_in_sub");
 		    stack.push(tmp);
@@ -792,7 +786,7 @@ namespace libdar
 
 	    version_check(dialog, ver);
 
-	    tmp = new (pool) compressor(ver.get_compression_algo(), *(stack.top()));
+	    tmp = new (nothrow) compressor(ver.get_compression_algo(), *(stack.top()));
 
 	    if(tmp == nullptr)
 		throw Ememory("open_archive");
@@ -812,7 +806,7 @@ namespace libdar
 		{
 		    if(info_details)
 			dialog.warning(gettext("Creating a new thread to run the compression layer..."));
-		    tmp = new (pool) generic_thread(stack.top());
+		    tmp = new (nothrow) generic_thread(stack.top());
 		    if(tmp == nullptr)
 			throw Ememory("op_create_in_sub");
 		    stack.clear_label(LIBDAR_STACK_LABEL_UNCOMPRESSED);
@@ -840,7 +834,6 @@ namespace libdar
     }
 
     catalogue *macro_tools_lax_search_catalogue(user_interaction & dialog,
-						memory_pool *pool,
 						pile & stack,
 						const archive_version & edition,
 						compression compr_algo,
@@ -957,7 +950,7 @@ namespace libdar
 
 	    try
 	    {
-		ret = new (pool) catalogue(dialog, pdesc, edition, compr_algo, even_partial_catalogue, layer1_data_name);
+		ret = new (nothrow) catalogue(dialog, pdesc, edition, compr_algo, even_partial_catalogue, layer1_data_name);
 		if(ret == nullptr)
 		    throw Ememory("macro_tools_lax_search_catalogue");
 		stats = ret->get_stats();
@@ -1030,7 +1023,6 @@ namespace libdar
 				   header_version & ver,
 				   slice_layout & slicing,
 				   const slice_layout *ref_slicing,
-				   memory_pool *pool,
 				   const entrepot & sauv_path_t,
 				   const string & filename,
 				   const string & extension,
@@ -1096,7 +1088,7 @@ namespace libdar
 		    if(info_details)
 			dialog.warning(gettext("Creating low layer: Writing archive into a black hole object (equivalent to /dev/null)..."));
 
-		    tmp = new (pool) null_file(open_mode);
+		    tmp = new (nothrow) null_file(open_mode);
 		}
 		else
 		    if(file_size.is_zero()) // one SLICE
@@ -1106,7 +1098,6 @@ namespace libdar
 				dialog.warning(gettext("Creating low layer: Writing archive into standard output object..."));
 			    writing_to_pipe = true;
 			    tmp = macro_tools_open_archive_tuyau(dialog,
-								 pool,
 								 1,
 								 gf_write_only, // always write only
 								 internal_name,
@@ -1118,45 +1109,45 @@ namespace libdar
 			{
 			    if(info_details)
 				dialog.warning(gettext("Creating low layer: Writing archive into a plain file object..."));
-			    tmp = new (pool) trivial_sar(dialog,
-							 open_mode,
-							 filename,
-							 extension,
-							 sauv_path_t, // entrepot !!
-							 internal_name,
-							 data_name,
-							 execute,
-							 allow_over,
-							 warn_over,
-							 force_permission,
-							 permission,
-							 hash,
-							 slice_min_digits,
-							 false);
+			    tmp = new (nothrow) trivial_sar(dialog,
+							    open_mode,
+							    filename,
+							    extension,
+							    sauv_path_t, // entrepot !!
+							    internal_name,
+							    data_name,
+							    execute,
+							    allow_over,
+							    warn_over,
+							    force_permission,
+							    permission,
+							    hash,
+							    slice_min_digits,
+							    false);
 			}
 		    else
 		    {
 			sar *tmp_sar = nullptr;
 			if(info_details)
 			    dialog.warning(gettext("Creating low layer: Writing archive into a sar object (Segmentation and Reassembly) for slicing..."));
-			tmp = tmp_sar = new (pool) sar(dialog,
-						       open_mode,
-						       filename,
-						       extension,
-						       file_size,
-						       first_file_size,
-						       warn_over,
-						       allow_over,
-						       pause,
-						       sauv_path_t, // entrepot !!
-						       internal_name,
-						       data_name,
-						       force_permission,
-						       permission,
-						       hash,
-						       slice_min_digits,
-						       false,
-						       execute);
+			tmp = tmp_sar = new (nothrow) sar(dialog,
+							  open_mode,
+							  filename,
+							  extension,
+							  file_size,
+							  first_file_size,
+							  warn_over,
+							  allow_over,
+							  pause,
+							  sauv_path_t, // entrepot !!
+							  internal_name,
+							  data_name,
+							  force_permission,
+							  permission,
+							  hash,
+							  slice_min_digits,
+							  false,
+							  execute);
 
 			if(tmp_sar != nullptr)
 			    slicing = tmp_sar->get_slicing();
@@ -1178,7 +1169,7 @@ namespace libdar
 		    if(info_details)
 			dialog.warning(gettext("Adding cache layer over pipe to provide limited skippability..."));
 
-		    cache *c_tmp = new (pool) cache(*(layers.top()), true);
+		    cache *c_tmp = new (nothrow) cache(*(layers.top()), true);
 		    if(c_tmp == nullptr)
 			throw Ememory("op_create_in_sub");
 		    else
@@ -1212,7 +1203,7 @@ namespace libdar
 		if(!gnupg_recipients.empty())
 		{
 #if GPGME_SUPPORT
-		    memory_file *key = new (pool) memory_file();
+		    memory_file *key = new (nothrow) memory_file();
 		    if(key == nullptr)
 			throw Ememory("macro_tools_create_layers");
 
@@ -1331,7 +1322,7 @@ namespace libdar
 
 		if(ref_slicing != nullptr)
 		{
-		    slice_layout *tmp = new (pool) slice_layout(*ref_slicing);
+		    slice_layout *tmp = new (nothrow) slice_layout(*ref_slicing);
 		    if(tmp == nullptr)
 			throw Ememory("macro_tools_create_layers");
 		    try
@@ -1373,7 +1364,7 @@ namespace libdar
 		case crypto_scrambling:
 		    if(info_details)
 			dialog.warning(gettext("Adding a new layer on top: scrambler object..."));
-		    tmp = new (pool) scrambler(real_pass, *(layers.top()));
+		    tmp = new (nothrow) scrambler(real_pass, *(layers.top()));
 #ifdef LIBDAR_NO_OPTIMIZATION
 		    tools_secu_string_show(dialog, string("real_pass used: "), real_pass);
 #endif
@@ -1385,13 +1376,13 @@ namespace libdar
 		case crypto_camellia256:
 		    if(info_details)
 			dialog.warning(gettext("Adding a new layer on top: Strong encryption object..."));
-		    tmp = new (pool) crypto_sym(crypto_size,
-						real_pass,
-						*(layers.top()),
-						false,
-						macro_tools_supported_version,
-						crypto,
-						gnupg_recipients.empty());
+		    tmp = new (nothrow) crypto_sym(crypto_size,
+						   real_pass,
+						   *(layers.top()),
+						   false,
+						   macro_tools_supported_version,
+						   crypto,
+						   gnupg_recipients.empty());
 
 #ifdef LIBDAR_NO_OPTIMIZATION
 		    tools_secu_string_show(dialog, string("real_pass used: "), real_pass);
@@ -1402,7 +1393,7 @@ namespace libdar
 		    {
 			if(info_details)
 			    dialog.warning(gettext("Adding a new layer on top: Caching layer for better performances..."));
-			tmp = new (pool) cache(*(layers.top()), false);
+			tmp = new (nothrow) cache(*(layers.top()), false);
 		    }
 		    else
 			tmp = nullptr; // a cache is already present just below
@@ -1429,7 +1420,7 @@ namespace libdar
 		    {
 			if(info_details)
 			    dialog.warning(gettext("Creating a new thread to run the previously created layers..."));
-			tmp = new (pool) generic_thread(layers.top());
+			tmp = new (nothrow) generic_thread(layers.top());
 			if(tmp == nullptr)
 			    throw Ememory("op_create_in_sub");
 			layers.push(tmp);
@@ -1460,7 +1451,7 @@ namespace libdar
 		    if(info_details)
 			dialog.warning(gettext("Adding a new layer on top: Escape layer to allow sequential reading..."));
 		    unjump.insert(escape::seqt_catalogue);
-		    tmp = esc = new (pool) escape(layers.top(), unjump);
+		    tmp = esc = new (nothrow) escape(layers.top(), unjump);
 		    if(tmp == nullptr)
 			throw Ememory("op_create_in_sub");
 		    else
@@ -1475,7 +1466,7 @@ namespace libdar
 			{
 			    if(info_details)
 				dialog.warning(gettext("Creating a new thread to run the escape layer..."));
-			    tmp = new (pool) generic_thread(layers.top());
+			    tmp = new (nothrow) generic_thread(layers.top());
 			    if(tmp == nullptr)
 				throw Ememory("op_create_in_sub");
 			    layers.push(tmp);
@@ -1489,7 +1480,7 @@ namespace libdar
 
 		if(info_details && algo != none)
 		    dialog.warning(gettext("Adding a new layer on top: compression..."));
-		tmp = new (pool) compressor(algo, *(layers.top()), compression_level);
+		tmp = new (nothrow) compressor(algo, *(layers.top()), compression_level);
 		if(tmp == nullptr)
 		    throw Ememory("op_create_in_sub");
 		else
@@ -1507,7 +1498,7 @@ namespace libdar
 		{
 		    if(info_details)
 			dialog.warning(gettext("Creating a new thread to run the compression layer..."));
-		    tmp = new (pool) generic_thread(layers.top());
+		    tmp = new (nothrow) generic_thread(layers.top());
 		    if(tmp == nullptr)
 			throw Ememory("op_create_in_sub");
 		    layers.push(tmp);
@@ -1952,7 +1943,6 @@ namespace libdar
     }
 
     trivial_sar *macro_tools_open_archive_tuyau(user_interaction & dialog,
-						memory_pool *pool,
 						S_I fd,
 						gf_mode mode,
 						const label & internal_name,
@@ -1965,15 +1955,15 @@ namespace libdar
 
         try
         {
-            tmp = new (pool) tuyau(dialog, fd, mode);
+            tmp = new (nothrow) tuyau(dialog, fd, mode);
             if(tmp == nullptr)
                 throw Ememory("macro_tools_open_archive_tuyau");
-            ret = new (pool) trivial_sar(dialog,
-					 tmp,
-					 internal_name,
-					 data_name,
-					 slice_header_format_07,
-					 execute);
+            ret = new (nothrow) trivial_sar(dialog,
+					    tmp,
+					    internal_name,
+					    data_name,
+					    slice_header_format_07,
+					    execute);
             if(ret == nullptr)
                 throw Ememory("macro_tools_open_archive_tuyau");
 	    else
