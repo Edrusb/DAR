@@ -57,7 +57,6 @@ extern "C"
 #include "integers.hpp"
 #include "erreurs.hpp"
 #include "int_tools.hpp"
-#include "on_pool.hpp"
 
 
 #define ZEROED_SIZE 50
@@ -83,7 +82,7 @@ namespace libdar
 	/// byte of information that this type can handle, and it is also assumed that
 	/// the bytes of information are contiguous.
 
-    template<class B> class limitint : public on_pool
+    template<class B> class limitint
     {
     public :
 
