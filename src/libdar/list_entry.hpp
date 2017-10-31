@@ -37,7 +37,6 @@
 #include "tools.hpp"
 #include "compressor.hpp"
 #include "integers.hpp"
-#include "on_pool.hpp"
 #include "datetime.hpp"
 #include "range.hpp"
 
@@ -52,7 +51,7 @@ namespace libdar
 	/// This has the advantage to let the possiblity to add new fields in the future
 	/// without breaking anything in API, and in consequences in user programs.
 	/// \ingroup API
-    class list_entry : public on_pool
+    class list_entry
     {
     public:
 	list_entry();
