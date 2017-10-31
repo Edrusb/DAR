@@ -99,9 +99,9 @@ namespace libdar
         {
         public :
             iterator() : ref(nullptr), cell(nullptr), offset(0) {};
-                // default constructor by reference is OK
-                // default destructor is OK
-                // default operator = is OK
+	    iterator(const iterator & ref) = default;
+	    iterator & operator = (const iterator & ref) = default;
+	    ~iterator() = default;
 
             iterator operator ++ (S_I x)
 	    { iterator ret = *this; skip_plus_one(); return ret; };
