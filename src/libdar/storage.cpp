@@ -604,8 +604,6 @@ namespace libdar
 
         while(c != nullptr)
         {
-            if(c->size == 0 && c->data != nullptr)
-                throw SRC_BUG;
             if(c->data != nullptr)
 	    {
                 delete [] c->data;

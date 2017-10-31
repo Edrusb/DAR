@@ -73,8 +73,7 @@ namespace libdar
         storage & operator = (const storage & val)
 	{  detruit(first); copy_from(val); return *this; };
         storage(generic_file & f, const infinint &size);
-        ~storage() throw(Ebug)
-	{  detruit(first); };
+        ~storage() { detruit(first); };
 
         bool operator < (const storage & ref) const
 	{ return difference(ref) < 0; }; // true if arg uses more space than this

@@ -111,7 +111,7 @@ namespace libdar
 	limitint & operator = (const limitint & ref) = default;
 
 	    // for coherent footprint with real infinint
-	~limitint() throw(Ebug) {};
+	~limitint() = default;
 
         void dump(generic_file &x) const; // write byte sequence to file
         void read(generic_file &f) { build_from_file(f); };
