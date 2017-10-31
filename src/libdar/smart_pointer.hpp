@@ -32,7 +32,6 @@
 
 #include "infinint.hpp"
 #include "erreurs.hpp"
-#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -41,7 +40,7 @@ namespace libdar
 	///
 	/// \note it should not be used directly, rather see below the smart_pointer class template
 
-    template <class T> class smart_node: public on_pool
+    template <class T> class smart_node
     {
     public:
 	    /// \note the given pointed to object passes under the responsibility of the smart_node
@@ -69,7 +68,7 @@ namespace libdar
 	/// - pointed to memory must never be deleted manually, the last smart_pointer will do it at its
 	///   destruction time
 
-    template <class T> class smart_pointer: public on_pool
+    template <class T> class smart_pointer
     {
     public:
 	    /// creates a smart_pointer equivalent to a pointer to NULL
@@ -85,7 +84,7 @@ namespace libdar
 	{
 	    if(arg != nullptr)
 	    {
-		ptr = new (get_pool()) smart_node<T>(arg);
+		ptr = new (std::nothrow) smart_node<T>(arg);
 		if(ptr == nullptr)
 		    throw Ememory("smart_pointer::smart_pointer");
 		ptr->add_ref();
