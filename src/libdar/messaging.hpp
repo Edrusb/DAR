@@ -78,7 +78,7 @@ namespace libdar
     extern msg_type msg_continuation_of(msg_type x);
 
 
-    class messaging_decode : public on_pool
+    class messaging_decode
     {
     public:
 	messaging_decode() {msgt = msg_type::unset; };
@@ -122,7 +122,7 @@ namespace libdar
     };
 
 
-    class messaging_encode : public on_pool
+    class messaging_encode
     {
     public:
 	    /// constructor
