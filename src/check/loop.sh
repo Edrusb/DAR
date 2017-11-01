@@ -16,7 +16,7 @@ MY_MAKEFILE=my_makefile
 
 rm -f $TMP_FILE $MY_MAKEFILE
 
-printf "Building the Makefile... "
+printf "Building the Makefile (patience, this takes some minutes)... "
 
 # for multi_thread in n y ; do
 multi_thread="n"
