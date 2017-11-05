@@ -627,7 +627,7 @@ namespace libdar
     }
 
 
-    bool infinint::is_valid() const
+    bool infinint::is_valid() const noexcept
     {
         return field != nullptr;
     }
@@ -679,6 +679,14 @@ namespace libdar
         }
         else
             throw SRC_BUG;
+    }
+
+    void infinint::move_from(infinint && ref)
+    {
+	storage *tmp = field;
+
+	field = ref.field;
+	ref.field = tmp;
     }
 
     void infinint::detruit()

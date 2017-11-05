@@ -78,11 +78,11 @@ namespace libdar
 	    // read an infinint from a file
 	infinint(generic_file & x);
 
-        infinint(const infinint & ref)
-	{ copy_from(ref); }
+        infinint(const infinint & ref) { copy_from(ref); }
+	infinint(infinint && ref) { move_from(std::move(ref)); };
 
-	infinint & operator = (const infinint & ref)
-	{ detruit(); copy_from(ref); return *this; };
+	infinint & operator = (const infinint & ref) { detruit(); copy_from(ref); return *this; };
+	infinint & operator = (infinint && ref) { move_from(std::move(ref)); return *this; }
 
         ~infinint() { detruit(); };
 
@@ -121,7 +121,7 @@ namespace libdar
         template <class T>void unstack(T &v)
 	{ infinint_unstack_to(v); }
 
-	infinint get_storage_size() const { return field->size(); };
+	infinint get_storage_size() const noexcept { return field->size(); };
 	    // it returns number of byte of information necessary to store the integer
 
 	unsigned char operator [] (const infinint & position) const;
@@ -140,17 +140,18 @@ namespace libdar
 	static bool is_system_big_endian();
 
     private :
-        static const int TG = 4;
+        static constexpr int TG = 4;
 
         enum endian { big_endian, little_endian, not_initialized };
         typedef unsigned char group[TG];
 
         storage *field;
 
-        bool is_valid() const;
+        bool is_valid() const noexcept;
         void build_from_file(generic_file & x);
         void reduce(); // put the object in canonical form : no leading byte equal to zero
         void copy_from(const infinint & ref);
+	void move_from(infinint && ref);
         void detruit();
         void make_at_least_as_wider_as(const infinint & ref);
         template <class T> void infinint_from(T a);
@@ -324,7 +325,7 @@ namespace libdar
 	return x;
     }
 
-    template <class T> void infinint::infinint_unstack_to(T &a)
+    template <class T> void infinint::infinint_unstack_to(T & a)
     {
 	    // T is supposed to be an unsigned "integer"
 	    // (ie.: sizeof() returns the width of the storage bit field  and no sign bit is present)
