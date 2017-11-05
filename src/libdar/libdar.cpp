@@ -381,7 +381,7 @@ namespace libdar
 			throw Erange("libdar_init_libgcrypt", tools_printf(gettext("Too old version for libgcrypt, minimum required version is %s\n"), MIN_VERSION_GCRYPT));
 
 			// initializing default sized secured memory for libgcrypt
-		    (void)gcry_control(GCRYCTL_INIT_SECMEM, 65536);
+		    (void)gcry_control(GCRYCTL_INIT_SECMEM, 262144);
 			// if secured memory could not be allocated, further request of secured memory will fail
 			// and a warning will show at that time (we cannot send a warning (just failure notice) at that time).
 
