@@ -65,14 +65,13 @@ namespace libdar
         };
 
     public:
-        storage(U_32 size)
-	{ make_alloc(size, first, last); };
+        storage(U_32 size) { make_alloc(size, first, last); };
         storage(const infinint & size);
-        storage(const storage & ref)
-	{ copy_from(ref); };
-        storage & operator = (const storage & val)
-	{  detruit(first); copy_from(val); return *this; };
-        storage(generic_file & f, const infinint &size);
+        storage(generic_file & f, const infinint & size);
+        storage(const storage & ref) { copy_from(ref); };
+	storage(storage && ref): first(nullptr), last(nullptr) { move_from(std::move(ref)); };
+        storage & operator = (const storage & val) { detruit(first); copy_from(val); return *this; };
+	storage & operator = (storage && val) { move_from(std::move(val)); return *this; };
         ~storage() { detruit(first); };
 
         bool operator < (const storage & ref) const
@@ -98,7 +97,9 @@ namespace libdar
         public :
             iterator() : ref(nullptr), cell(nullptr), offset(0) {};
 	    iterator(const iterator & ref) = default;
+	    iterator(iterator && ref) = default;
 	    iterator & operator = (const iterator & ref) = default;
+	    iterator & operator = (iterator && ref) = default;
 	    ~iterator() = default;
 
             iterator operator ++ (S_I x)
@@ -183,13 +184,14 @@ namespace libdar
         struct cellule *first, *last;
 
         void copy_from(const storage & ref);
+	void move_from(storage && ref);
         S_32 difference(const storage & ref) const;
         void reduce(); // heuristic that tries to free some memory;
         void insert_bytes_at_iterator_cmn(iterator it, bool constant, unsigned char *a, U_I size);
         void fusionne(struct cellule *a_first, struct cellule *a_last, struct cellule *b_first, struct cellule *b_last,
                       struct cellule *&res_first, struct cellule * & res_last);
 
-        static void detruit(struct cellule *c);
+        static void detruit(struct cellule *c); // destroy all cells following 'c' including 'c' itself
         static void make_alloc(U_32 size, struct cellule * & begin, struct cellule * & end);
         static void make_alloc(infinint size, cellule * & begin, struct cellule * & end);
 

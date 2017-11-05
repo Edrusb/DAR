@@ -432,6 +432,18 @@ namespace libdar
 	}
     }
 
+    void storage::move_from(storage && ref)
+    {
+	struct cellule *tmp = first;
+
+	first = ref.first;
+	ref.first = tmp;
+
+	tmp = last;
+	last = ref.last;
+	ref.last = tmp;
+    }
+
     S_32 storage::difference(const storage & ref) const
     {
         struct cellule *b = last, *a = ref.last;
