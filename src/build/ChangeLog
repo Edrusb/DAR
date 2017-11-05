@@ -1,3 +1,7 @@
+from 2.5.13 to 2.5.14
+- made libgcrypt built-in memory guard be initialized before obtaining
+  ligcrypt version, to respect libgcrypt usage
+
 from 2.5.12 to 2.5.13
 - added -az option to automatically nullify negative dates returned from
   the system in the archive under creation (filesystem is not modified)
