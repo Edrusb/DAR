@@ -74,22 +74,22 @@ namespace libdar
 	storage & operator = (storage && val) { move_from(std::move(val)); return *this; };
         ~storage() { detruit(first); };
 
-        bool operator < (const storage & ref) const
+        bool operator < (const storage & ref) const noexcept
 	{ return difference(ref) < 0; }; // true if arg uses more space than this
-        bool operator == (const storage & ref) const
+        bool operator == (const storage & ref) const noexcept
 	{ return difference(ref) == 0; }; //true if arg have same space than this
-        bool operator > (const storage & ref) const
+        bool operator > (const storage & ref) const noexcept
 	{ return difference(ref) > 0; };
-        bool operator <= (const storage & ref) const
+        bool operator <= (const storage & ref) const noexcept
 	{ return difference(ref) <= 0; };
-        bool operator >= (const storage & ref) const
+        bool operator >= (const storage & ref) const noexcept
 	{ return difference(ref) >= 0; };
-        bool operator != (const storage & ref) const
+        bool operator != (const storage & ref) const noexcept
 	{ return difference(ref) != 0; };
         unsigned char & operator [](infinint position);
         unsigned char operator [](const infinint & position) const;
-        infinint size() const;
-        void clear(unsigned char val = 0);
+        infinint size() const noexcept;
+        void clear(unsigned char val = 0) noexcept;
         void dump(generic_file & f) const;
 
         class iterator
@@ -121,21 +121,21 @@ namespace libdar
             void skip_to(const storage & st, infinint val); // absolute position in st
             infinint get_position() const;
 
-            bool operator == (const iterator & cmp) const
+            bool operator == (const iterator & cmp) const noexcept
 	    { return ref == cmp.ref && cell == cmp.cell && offset == cmp.offset; };
-            bool operator != (const iterator & cmp) const
+            bool operator != (const iterator & cmp) const noexcept
 	    { return ! (*this == cmp); };
 
         private:
-            static const U_32 OFF_BEGIN = 1;
-            static const U_32 OFF_END = 2;
+            static constexpr U_32 OFF_BEGIN = 1;
+            static constexpr U_32 OFF_END = 2;
 
             const storage *ref;
             struct cellule *cell;
             U_32 offset;
 
             void relative_skip_to(S_32 val);
-            bool points_on_data() const
+            bool points_on_data() const noexcept
 	    {  return ref != nullptr && cell != nullptr && offset < cell->size; };
 
             inline void skip_plus_one();

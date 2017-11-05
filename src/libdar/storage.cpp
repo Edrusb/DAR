@@ -120,7 +120,7 @@ namespace libdar
         return ptr->data[offset];
     }
 
-    infinint storage::size() const
+    infinint storage::size() const noexcept
     {
         infinint ret = 0;
         struct cellule *ptr = first;
@@ -134,7 +134,7 @@ namespace libdar
         return ret;
     }
 
-    void storage::clear(unsigned char val)
+    void storage::clear(unsigned char val) noexcept
     {
         struct cellule *cur = first;
 
