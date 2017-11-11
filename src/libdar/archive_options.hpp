@@ -65,7 +65,9 @@ namespace libdar
 
 	    /// the copy constructor, assignment operator and destructor
 	archive_options_read(const archive_options_read & ref) : x_ref_chem(ref.x_ref_chem) { copy_from(ref); };
+	archive_options_read(archive_options_read && ref);
 	archive_options_read & operator = (const archive_options_read & ref) { destroy(); copy_from(ref); return *this; };
+	archive_options_read & operator = (archive_options_read && ref) { move_from(std::move(ref)); return *this; };
 	~archive_options_read() { destroy(); };
 
 
@@ -252,7 +254,8 @@ namespace libdar
 	bool x_header_only;
 
 	void copy_from(const archive_options_read & ref);
-	void destroy();
+	void move_from(archive_options_read && ref);
+	void destroy() noexcept;
     };
 
 

@@ -23,6 +23,7 @@
 
 #include "archive_options.hpp"
 #include "entrepot_local.hpp"
+#include "tools.hpp"
 
 using namespace std;
 
@@ -89,6 +90,12 @@ namespace libdar
 	/////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////
+
+    archive_options_read::archive_options_read(archive_options_read && ref)
+	: x_entrepot(nullptr), x_ref_chem("/"), x_ref_entrepot(nullptr)
+    {
+	move_from(std::move(ref));
+    }
 
     archive_options_read::archive_options_read() : x_ref_chem(default_ref_chem)
     {
@@ -222,7 +229,35 @@ namespace libdar
 	x_header_only = ref.x_header_only;
     }
 
-    void archive_options_read::destroy()
+    void archive_options_read::move_from(archive_options_read && ref)
+    {
+	x_crypto = move(ref.x_crypto);
+	x_pass = move(ref.x_pass);
+	x_crypto_size = move(ref.x_crypto_size);
+	x_input_pipe = move(ref.x_input_pipe);
+	x_output_pipe = move(ref.x_output_pipe);
+	x_execute = move(ref.x_execute);
+	x_info_details = move(ref.x_info_details);
+	x_lax = move(ref.x_lax);
+	x_sequential_read = move(ref.x_sequential_read);
+	x_slice_min_digits = move(ref.x_slice_min_digits);
+	tools_swap(x_entrepot, ref.x_entrepot);
+	x_ignore_signature_check_failure = move(ref.x_ignore_signature_check_failure);
+	x_multi_threaded = move(ref.x_multi_threaded);
+
+	external_cat = move(ref.external_cat);
+	x_ref_chem = move(ref.x_ref_chem);
+	x_ref_basename = move(ref.x_ref_basename);
+	x_ref_crypto = move(ref.x_ref_crypto);
+	x_ref_pass = move(ref.x_ref_pass);
+	x_ref_crypto_size = move(ref.x_ref_crypto_size);
+	x_ref_execute = move(ref.x_ref_execute);
+	x_ref_slice_min_digits = move(ref.x_ref_slice_min_digits);
+	tools_swap(x_ref_entrepot, ref.x_ref_entrepot);
+	x_header_only = move(ref.x_header_only);
+    }
+
+    void archive_options_read::destroy() noexcept
     {
 	if(x_entrepot != nullptr)
 	{
