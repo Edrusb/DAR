@@ -280,8 +280,7 @@ namespace libdar
 
     archive_options_create::archive_options_create()
     {
-	x_selection = x_subtree = x_ea_mask = x_compr_mask = x_backup_hook_file_mask = x_delta_mask = nullptr;
-	x_entrepot = nullptr;
+	nullifyptr();
 	try
 	{
 	    clear();
@@ -295,8 +294,7 @@ namespace libdar
 
     archive_options_create::archive_options_create(const archive_options_create & ref)
     {
-	x_selection = x_subtree = x_ea_mask = x_compr_mask = x_backup_hook_file_mask = x_delta_mask = nullptr;
-	x_entrepot = nullptr;
+	nullifyptr();
 	try
 	{
 	    copy_from(ref);
@@ -514,7 +512,13 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
-    void archive_options_create::destroy()
+    void archive_options_create::nullifyptr() noexcept
+    {
+	x_selection = x_subtree = x_ea_mask = x_compr_mask = x_backup_hook_file_mask = x_delta_mask = nullptr;
+	x_entrepot = nullptr;
+    }
+
+    void archive_options_create::destroy() noexcept
     {
 	NLS_SWAP_IN;
 	try
@@ -629,6 +633,70 @@ namespace libdar
 	x_ignored_as_symlink = ref.x_ignored_as_symlink;
     }
 
+    void archive_options_create::move_from(archive_options_create && ref) noexcept
+    {
+	tools_swap(x_selection, ref.x_selection);
+	tools_swap(x_subtree, ref.x_subtree);
+	tools_swap(x_ea_mask, ref.x_ea_mask);
+	tools_swap(x_compr_mask, ref.x_compr_mask);
+	tools_swap(x_backup_hook_file_mask, ref.x_backup_hook_file_mask);
+	tools_swap(x_entrepot, ref.x_entrepot);
+
+	x_ref_arch = move(ref.x_ref_arch);
+	x_allow_over = move(ref.x_allow_over);
+	x_warn_over = move(ref.x_warn_over);
+	x_info_details = move(ref.x_info_details);
+	x_display_treated = move(ref.x_display_treated);
+	x_display_treated_only_dir = move(ref.x_display_treated_only_dir);
+	x_display_skipped = move(ref.x_display_skipped);
+	x_display_finished = move(ref.x_display_finished);
+	x_pause = move(ref.x_pause);
+	x_empty_dir = move(ref.x_empty_dir);
+	x_compr_algo = move(ref.x_compr_algo);
+	x_compression_level = move(ref.x_compression_level);
+	x_file_size = move(ref.x_file_size);
+	x_first_file_size = move(ref.x_first_file_size);
+	x_execute = move(ref.x_execute);
+	x_crypto = move(ref.x_crypto);
+	x_pass = move(ref.x_pass);
+	x_crypto_size = move(ref.x_crypto_size);
+	x_gnupg_recipients = move(ref.x_gnupg_recipients);
+	x_gnupg_signatories = move(ref.x_gnupg_signatories);
+	x_min_compr_size = move(ref.x_min_compr_size);
+	x_nodump = move(ref.x_nodump);
+	x_what_to_check = move(ref.x_what_to_check);
+	x_hourshift = move(ref.x_hourshift);
+	x_empty = move(ref.x_empty);
+	x_alter_atime = move(ref.x_alter_atime);
+	x_old_alter_atime = move(ref.x_old_alter_atime);
+	x_furtive_read = move(ref.x_furtive_read);
+	x_same_fs = move(ref.x_same_fs);
+	x_snapshot = move(ref.x_snapshot);
+	x_cache_directory_tagging = move(ref.x_cache_directory_tagging);
+	x_fixed_date = move(ref.x_fixed_date);
+	x_slice_permission = move(ref.x_slice_permission);
+	x_slice_user_ownership = move(ref.x_slice_user_ownership);
+	x_slice_group_ownership = move(ref.x_slice_group_ownership);
+	x_repeat_count = move(ref.x_repeat_count);
+	x_repeat_byte = move(ref.x_repeat_byte);
+	x_sequential_marks = move(ref.x_sequential_marks);
+	x_sparse_file_min_size = move(ref.x_sparse_file_min_size);
+	x_security_check = move(ref.x_security_check);
+	x_user_comment = move(ref.x_user_comment);
+	x_hash = move(ref.x_hash);
+	x_slice_min_digits = move(ref.x_slice_min_digits);
+	x_backup_hook_file_execute = move(ref.x_backup_hook_file_execute);
+	x_ignore_unknown = move(ref.x_ignore_unknown);
+	x_scope = move(ref.x_scope);
+	x_multi_threaded = move(ref.x_multi_threaded);
+	x_delta_diff = move(ref.x_delta_diff);
+	x_delta_signature = move(ref.x_delta_signature);
+	x_delta_mask = move(ref.x_delta_mask->clone());
+	has_delta_mask_been_set = move(ref.has_delta_mask_been_set);
+	x_delta_sig_min_size = move(ref.x_delta_sig_min_size);
+	x_auto_zeroing_neg_dates = move(ref.x_auto_zeroing_neg_dates);
+	x_ignored_as_symlink = move(ref.x_ignored_as_symlink);
+    }
 
 	/////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////

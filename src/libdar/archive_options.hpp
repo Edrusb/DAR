@@ -271,7 +271,9 @@ namespace libdar
 
 	archive_options_create();
 	archive_options_create(const archive_options_create & ref);
+	archive_options_create(archive_options_create && ref) { nullifyptr(); move_from(std::move(ref)); };
 	archive_options_create & operator = (const archive_options_create & ref) { destroy(); copy_from(ref); return *this; };
+	archive_options_create & operator = (archive_options_create && ref) { move_from(std::move(ref)); return *this; };
 	~archive_options_create() { destroy(); };
 
 	    /////////////////////////////////////////////////////////////////////
@@ -653,8 +655,10 @@ namespace libdar
 	bool x_auto_zeroing_neg_dates;
 	std::set<std::string> x_ignored_as_symlink;
 
-	void destroy();
+	void nullifyptr() noexcept;
+	void destroy() noexcept;
 	void copy_from(const archive_options_create & ref);
+	void move_from(archive_options_create && ref) noexcept;
 	void destroy_mask(mask * & ptr);
 	void clean_mask(mask * & ptr);
 	void check_mask(const mask & m);
