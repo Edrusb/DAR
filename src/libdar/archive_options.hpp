@@ -862,9 +862,11 @@ namespace libdar
     {
     public:
 
-	archive_options_merge() { x_selection = x_subtree = x_ea_mask = x_compr_mask = x_delta_mask = nullptr; x_overwrite = nullptr; x_entrepot = nullptr; clear(); };
+	archive_options_merge() { nullifyptr(); clear(); };
 	archive_options_merge(const archive_options_merge & ref) { copy_from(ref); };
+	archive_options_merge(archive_options_merge && ref) { nullifyptr(); move_from(std::move(ref)); };
 	archive_options_merge & operator = (const archive_options_merge & ref) { destroy(); copy_from(ref); return *this; };
+	archive_options_merge & operator = (archive_options_merge && ref) { move_from(std::move(ref)); return *this; };
 	~archive_options_merge() { destroy(); };
 
 	void clear();
@@ -1111,8 +1113,10 @@ namespace libdar
 	bool has_delta_mask_been_set;
 	infinint x_delta_sig_min_size;
 
-	void destroy();
+	void destroy() noexcept;
 	void copy_from(const archive_options_merge & ref);
+	void move_from(archive_options_merge && ref) noexcept;
+	void nullifyptr() noexcept;
     };
 
 

@@ -1088,40 +1088,24 @@ namespace libdar
     }
 
 
-    void archive_options_merge::destroy()
+    void archive_options_merge::destroy() noexcept
     {
-	NLS_SWAP_IN;
-	try
+	archive_option_destroy_mask(x_selection);
+	archive_option_destroy_mask(x_subtree);
+	archive_option_destroy_mask(x_ea_mask);
+	archive_option_destroy_mask(x_compr_mask);
+	archive_option_destroy_mask(x_delta_mask);
+	archive_option_destroy_crit_action(x_overwrite);
+	if(x_entrepot != nullptr)
 	{
-	    archive_option_destroy_mask(x_selection);
-	    archive_option_destroy_mask(x_subtree);
-	    archive_option_destroy_mask(x_ea_mask);
-	    archive_option_destroy_mask(x_compr_mask);
-	    archive_option_destroy_mask(x_delta_mask);
-	    archive_option_destroy_crit_action(x_overwrite);
-	    if(x_entrepot != nullptr)
-	    {
-		delete x_entrepot;
-		x_entrepot = nullptr;
-	    }
+	    delete x_entrepot;
+	    x_entrepot = nullptr;
 	}
-	catch(...)
-	{
-	    NLS_SWAP_OUT;
-	    throw;
-	}
-	NLS_SWAP_OUT;
     }
 
     void archive_options_merge::copy_from(const archive_options_merge & ref)
     {
-	x_selection = nullptr;
-	x_subtree = nullptr;
-	x_ea_mask = nullptr;
-	x_compr_mask = nullptr;
-	x_overwrite = nullptr;
-	x_entrepot = nullptr;
-	x_delta_mask = nullptr;
+	nullifyptr();
 
 	try
 	{
@@ -1200,6 +1184,61 @@ namespace libdar
 	    throw;
 	}
     }
+
+    void archive_options_merge::move_from(archive_options_merge && ref) noexcept
+    {
+	tools_swap(x_selection, ref.x_selection);
+	tools_swap(x_subtree, ref.x_subtree);
+	tools_swap(x_ea_mask,ref.x_ea_mask);
+	tools_swap(x_compr_mask, ref.x_compr_mask);
+	tools_swap(x_overwrite, ref.x_overwrite);
+	tools_swap(x_entrepot, ref.x_entrepot);
+	tools_swap(x_delta_mask, ref.x_delta_mask);
+
+	x_ref = move(ref.x_ref);
+	x_allow_over = move(ref.x_allow_over);
+	x_warn_over = move(ref.x_warn_over);
+	x_info_details = move(ref.x_info_details);
+	x_display_treated = move(ref.x_display_treated);
+	x_display_treated_only_dir = move(ref.x_display_treated_only_dir);
+	x_display_skipped = move(ref.x_display_skipped);
+	x_pause = move(ref.x_pause);
+	x_empty_dir = move(ref.x_empty_dir);
+	x_compr_algo = move(ref.x_compr_algo);
+	x_compression_level = move(ref.x_compression_level);
+	x_file_size = move(ref.x_file_size);
+	x_first_file_size = move(ref.x_first_file_size);
+	x_execute = move(ref.x_execute);
+	x_crypto = move(ref.x_crypto);
+	x_pass = move(ref.x_pass);
+	x_crypto_size = move(ref.x_crypto_size);
+	x_gnupg_recipients = move(ref.x_gnupg_recipients);
+	x_gnupg_signatories = move(ref.x_gnupg_signatories);
+	x_min_compr_size = move(ref.x_min_compr_size);
+	x_empty = move(ref.x_empty);
+	x_keep_compressed = move(ref.x_keep_compressed);
+	x_slice_permission = move(ref.x_slice_permission);
+	x_slice_user_ownership = move(ref.x_slice_user_ownership);
+	x_slice_group_ownership = move(ref.x_slice_group_ownership);
+	x_decremental = move(ref.x_decremental);
+	x_sequential_marks = move(ref.x_sequential_marks);
+	x_sparse_file_min_size = move(ref.x_sparse_file_min_size);
+	x_user_comment = move(ref.x_user_comment);
+	x_hash = move(ref.x_hash);
+	x_slice_min_digits = move(ref.x_slice_min_digits);
+	x_scope = move(ref.x_scope);
+	x_multi_threaded = move(ref.x_multi_threaded);
+	x_delta_signature = move(ref.x_delta_signature);
+	has_delta_mask_been_set = move(ref.has_delta_mask_been_set);
+	x_delta_sig_min_size = move(ref.x_delta_sig_min_size);
+    }
+
+    void archive_options_merge::nullifyptr() noexcept
+    {
+	x_selection = x_subtree = x_ea_mask = x_compr_mask = x_delta_mask = nullptr;
+	x_overwrite = nullptr; x_entrepot = nullptr;
+    }
+
 
 	/////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////
