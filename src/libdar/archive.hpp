@@ -166,7 +166,9 @@ namespace libdar
 	    /// merging or creating, isolating or merging archives.
 
 	archive(const archive & ref) = delete;
+	archive(archive && ref) = delete;
 	archive & operator = (const archive & ref) = delete;
+	archive & operator = (archive && ref) = delete;
 
 	    /// the destructor
 	~archive() { free_mem(); };
