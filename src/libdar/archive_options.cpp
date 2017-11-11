@@ -1349,30 +1349,23 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
-    void archive_options_extract::destroy()
+    void archive_options_extract::destroy() noexcept
     {
-	NLS_SWAP_IN;
-	try
-	{
-	    archive_option_destroy_mask(x_selection);
-	    archive_option_destroy_mask(x_subtree);
-	    archive_option_destroy_mask(x_ea_mask);
-	    archive_option_destroy_crit_action(x_overwrite);
-	}
-	catch(...)
-	{
-	    NLS_SWAP_OUT;
-	    throw;
-	}
-	NLS_SWAP_OUT;
+	archive_option_destroy_mask(x_selection);
+	archive_option_destroy_mask(x_subtree);
+	archive_option_destroy_mask(x_ea_mask);
+	archive_option_destroy_crit_action(x_overwrite);
+    }
+
+    void archive_options_extract::nullifyptr() noexcept
+    {
+	x_selection = x_subtree = x_ea_mask = nullptr;
+	x_overwrite = nullptr;
     }
 
     void archive_options_extract::copy_from(const archive_options_extract & ref)
     {
-	x_selection = nullptr;
-	x_subtree = nullptr;
-	x_ea_mask = nullptr;
-	x_overwrite = nullptr;
+	nullifyptr();
 
 	try
 	{
@@ -1412,6 +1405,29 @@ namespace libdar
 	    clear();
 	    throw;
 	}
+    }
+
+    void archive_options_extract::move_from(archive_options_extract && ref) noexcept
+    {
+	tools_swap(x_selection, ref.x_selection);
+	tools_swap(x_subtree, ref.x_subtree);
+	tools_swap(x_ea_mask, ref.x_ea_mask);
+	tools_swap(x_overwrite, ref.x_overwrite);
+
+	x_warn_over = move(ref.x_warn_over);
+	x_info_details = move(ref.x_info_details);
+	x_display_treated = move(ref.x_display_treated);
+	x_display_treated_only_dir = move(ref.x_display_treated_only_dir);
+	x_display_skipped = move(ref.x_display_skipped);
+	x_flat = move(ref.x_flat);
+	x_what_to_check = move(ref.x_what_to_check);
+	x_warn_remove_no_match = move(ref.x_warn_remove_no_match);
+	x_empty = move(ref.x_empty);
+	x_empty_dir = move(ref.x_empty_dir);
+	x_dirty = move(ref.x_dirty);
+	x_only_deleted = move(ref.x_only_deleted);
+	x_ignore_deleted = move(ref.x_ignore_deleted);
+	x_scope = move(ref.x_scope);
     }
 
 	/////////////////////////////////////////////////////////

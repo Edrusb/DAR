@@ -1130,9 +1130,11 @@ namespace libdar
     public:
 	enum t_dirty { dirty_ignore, dirty_warn, dirty_ok };
 
-	archive_options_extract() { x_selection = x_subtree = x_ea_mask = nullptr; x_overwrite = nullptr; clear(); };
+	archive_options_extract() { nullifyptr(); clear(); };
 	archive_options_extract(const archive_options_extract & ref) { copy_from(ref); };
+	archive_options_extract(archive_options_extract && ref) { nullifyptr(); move_from(std::move(ref)); };
 	archive_options_extract & operator = (const archive_options_extract & ref) { destroy(); copy_from(ref); return *this; };
+	archive_options_extract & operator = (archive_options_extract && ref) { move_from(std::move(ref)); return *this; };
 	~archive_options_extract() { destroy(); };
 
 	void clear();
@@ -1252,8 +1254,10 @@ namespace libdar
 	bool x_ignore_deleted;
 	fsa_scope x_scope;
 
-	void destroy();
+	void destroy() noexcept;
+	void nullifyptr() noexcept;
 	void copy_from(const archive_options_extract & ref);
+	void move_from(archive_options_extract && ref) noexcept;
     };
 
 
