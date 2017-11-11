@@ -679,7 +679,9 @@ namespace libdar
     public:
 	archive_options_isolate();
 	archive_options_isolate(const archive_options_isolate & ref);
+	archive_options_isolate(archive_options_isolate && ref) { nullifyptr(); move_from(std::move(ref)); };
 	archive_options_isolate & operator = (const archive_options_isolate & ref) { destroy(); copy_from(ref); return *this; };
+	archive_options_isolate & operator = (archive_options_isolate && ref) { move_from(std::move(ref)); return *this; };
 	~archive_options_isolate() { destroy(); };
 
 
@@ -844,7 +846,9 @@ namespace libdar
 	infinint x_delta_sig_min_size;
 
 	void copy_from(const archive_options_isolate & ref);
-	void destroy();
+	void move_from(archive_options_isolate && ref);
+	void destroy() noexcept;
+	void nullifyptr() noexcept;
     };
 
 

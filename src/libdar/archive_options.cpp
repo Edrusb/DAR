@@ -704,8 +704,7 @@ namespace libdar
 
     archive_options_isolate::archive_options_isolate()
     {
-	x_entrepot = nullptr;
-	x_delta_mask = nullptr;
+	nullifyptr();
 	try
 	{
 	    clear();
@@ -719,8 +718,7 @@ namespace libdar
 
     archive_options_isolate::archive_options_isolate(const archive_options_isolate & ref)
     {
-	x_entrepot = nullptr;
-	x_delta_mask = nullptr;
+	nullifyptr();
 	try
 	{
 	    copy_from(ref);
@@ -812,7 +810,7 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
-    void archive_options_isolate::destroy()
+    void archive_options_isolate::destroy() noexcept
     {
 	archive_option_destroy_mask(x_delta_mask);
 	if(x_entrepot != nullptr)
@@ -856,6 +854,45 @@ namespace libdar
 	x_delta_mask = ref.x_delta_mask->clone();
 	has_delta_mask_been_set = ref.has_delta_mask_been_set;
 	x_delta_sig_min_size = ref.x_delta_sig_min_size;
+    }
+
+    void archive_options_isolate::move_from(archive_options_isolate && ref)
+    {
+	tools_swap(x_entrepot, ref.x_entrepot);
+	tools_swap(x_delta_mask, ref.x_delta_mask);
+
+	x_allow_over = move(ref.x_allow_over);
+	x_warn_over = move(ref.x_warn_over);
+	x_info_details = move(ref.x_info_details);
+	x_pause = move(ref.x_pause);
+	x_algo = move(ref.x_algo);
+	x_compression_level = move(ref.x_compression_level);
+	x_file_size = move(ref.x_file_size);
+	x_first_file_size = move(ref.x_first_file_size);
+	x_execute = move(ref.x_execute);
+	x_crypto = move(ref.x_crypto);
+	x_pass = move(ref.x_pass);
+	x_crypto_size = move(ref.x_crypto_size);
+	x_gnupg_recipients = move(ref.x_gnupg_recipients);
+	x_gnupg_signatories = move(ref.x_gnupg_signatories);
+	x_empty = move(ref.x_empty);
+	x_slice_permission = move(ref.x_slice_permission);
+	x_slice_user_ownership = move(ref.x_slice_user_ownership);
+	x_slice_group_ownership = move(ref.x_slice_group_ownership);
+	x_user_comment = move(ref.x_user_comment);
+	x_hash = move(ref.x_hash);
+	x_slice_min_digits = move(ref.x_slice_min_digits);
+	x_sequential_marks = move(ref.x_sequential_marks);
+	x_multi_threaded = move(ref.x_multi_threaded);
+	x_delta_signature = move(ref.x_delta_signature);
+	has_delta_mask_been_set = move(ref.has_delta_mask_been_set);
+	x_delta_sig_min_size = move(ref.x_delta_sig_min_size);
+    }
+
+    void archive_options_isolate::nullifyptr() noexcept
+    {
+	x_entrepot = nullptr;
+	x_delta_mask = nullptr;
     }
 
 
