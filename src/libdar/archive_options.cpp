@@ -41,9 +41,9 @@ namespace libdar
 
 	// some local helper functions
 
-    inline void archive_option_destroy_mask(mask * & ptr);
+    inline void archive_option_destroy_mask(mask * & ptr) noexcept;
     inline void archive_option_clean_mask(mask * & ptr, bool all = true);
-    inline void archive_option_destroy_crit_action(crit_action * & ptr);
+    inline void archive_option_destroy_crit_action(crit_action * & ptr) noexcept;
     inline void archive_option_clean_crit_action(crit_action * & ptr);
 
 
@@ -60,7 +60,7 @@ namespace libdar
 	    throw Ememory("archive_option_clean_mask");
     }
 
-    inline void archive_option_destroy_mask(mask * & ptr)
+    inline void archive_option_destroy_mask(mask * & ptr) noexcept
     {
 	if(ptr != nullptr)
 	{
@@ -77,7 +77,7 @@ namespace libdar
 	    throw Ememory("archive_options::archive_option_clean_crit_action");
     }
 
-    inline void archive_option_destroy_crit_action(crit_action * & ptr)
+    inline void archive_option_destroy_crit_action(crit_action * & ptr) noexcept
     {
 	if(ptr != nullptr)
 	{
