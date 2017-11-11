@@ -1271,9 +1271,11 @@ namespace libdar
     class archive_options_listing
     {
     public:
-	archive_options_listing() { x_selection = x_subtree = nullptr;  x_slicing_first = x_slicing_others = nullptr; clear(); };
+	archive_options_listing() { nullifyptr(); clear(); };
 	archive_options_listing(const archive_options_listing & ref) { copy_from(ref); };
+	archive_options_listing(archive_options_listing && ref) { nullifyptr(); move_from(std::move(ref)); };
 	archive_options_listing & operator = (const archive_options_listing & ref) { destroy(); copy_from(ref); return *this; };
+	archive_options_listing & operator = (archive_options_listing && ref) { move_from(std::move(ref)); return *this; };
 	~archive_options_listing() { destroy(); };
 
 	void clear();
@@ -1323,8 +1325,10 @@ namespace libdar
 	infinint *x_slicing_others;
 	bool x_sizes_in_bytes;
 
-	void destroy();
+	void destroy() noexcept;
+	void nullifyptr() noexcept;
 	void copy_from(const archive_options_listing & ref);
+	void move_from(archive_options_listing && ref) noexcept;
     };
 
 
