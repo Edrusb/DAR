@@ -51,6 +51,7 @@ extern "C"
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "integers.hpp"
+#include "tools.hpp"
 
 using namespace std;
 
@@ -434,14 +435,8 @@ namespace libdar
 
     void storage::move_from(storage && ref)
     {
-	struct cellule *tmp = first;
-
-	first = ref.first;
-	ref.first = tmp;
-
-	tmp = last;
-	last = ref.last;
-	ref.last = tmp;
+	tools_swap(first, ref.first);
+	tools_swap(last, ref.last);
     }
 
     S_32 storage::difference(const storage & ref) const
