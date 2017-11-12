@@ -65,7 +65,9 @@ namespace libdar
 		    bool small) : cat_device(dialog, pdesc, reading_ver, saved, small) {};
 
 	cat_chardev(const cat_chardev & ref) = default;
+	cat_chardev(cat_chardev && ref) = default;
 	cat_chardev & operator = (const cat_chardev & ref) = default;
+	cat_chardev & operator = (cat_chardev && ref) = default;
 	~cat_chardev() = default;
 
 
