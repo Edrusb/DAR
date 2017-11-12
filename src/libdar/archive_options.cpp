@@ -229,7 +229,7 @@ namespace libdar
 	x_header_only = ref.x_header_only;
     }
 
-    void archive_options_read::move_from(archive_options_read && ref)
+    void archive_options_read::move_from(archive_options_read && ref) noexcept
     {
 	x_crypto = move(ref.x_crypto);
 	x_pass = move(ref.x_pass);
@@ -856,7 +856,7 @@ namespace libdar
 	x_delta_sig_min_size = ref.x_delta_sig_min_size;
     }
 
-    void archive_options_isolate::move_from(archive_options_isolate && ref)
+    void archive_options_isolate::move_from(archive_options_isolate && ref) noexcept
     {
 	tools_swap(x_entrepot, ref.x_entrepot);
 	tools_swap(x_delta_mask, ref.x_delta_mask);

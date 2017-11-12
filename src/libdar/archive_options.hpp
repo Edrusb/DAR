@@ -254,7 +254,7 @@ namespace libdar
 	bool x_header_only;
 
 	void copy_from(const archive_options_read & ref);
-	void move_from(archive_options_read && ref);
+	void move_from(archive_options_read && ref) noexcept;
 	void destroy() noexcept;
     };
 
@@ -846,7 +846,7 @@ namespace libdar
 	infinint x_delta_sig_min_size;
 
 	void copy_from(const archive_options_isolate & ref);
-	void move_from(archive_options_isolate && ref);
+	void move_from(archive_options_isolate && ref) noexcept;
 	void destroy() noexcept;
 	void nullifyptr() noexcept;
     };
