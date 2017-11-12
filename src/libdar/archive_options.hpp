@@ -1340,9 +1340,11 @@ namespace libdar
     class archive_options_diff
     {
     public:
-	archive_options_diff() { x_selection = x_subtree = x_ea_mask = nullptr; clear(); };
+	archive_options_diff() { nullifyptr(); clear(); };
 	archive_options_diff(const archive_options_diff & ref) { copy_from(ref); };
+	archive_options_diff(archive_options_diff && ref) { nullifyptr(); move_from(std::move(ref)); };
 	archive_options_diff & operator = (const archive_options_diff & ref) { destroy(); copy_from(ref); return *this; };
+	archive_options_diff & operator = (archive_options_diff && ref) { move_from(std::move(ref)); return *this; };
 	~archive_options_diff() { destroy(); };
 
 	void clear();
@@ -1436,8 +1438,10 @@ namespace libdar
 	bool x_compare_symlink_date;
 	fsa_scope x_scope;
 
-	void destroy();
+	void destroy() noexcept;
+	void nullifyptr() noexcept;
 	void copy_from(const archive_options_diff & ref);
+	void move_from(archive_options_diff && ref) noexcept;
     };
 
 

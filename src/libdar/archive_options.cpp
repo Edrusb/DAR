@@ -1737,28 +1737,21 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
-    void archive_options_diff::destroy()
+    void archive_options_diff::destroy() noexcept
     {
-	NLS_SWAP_IN;
-	try
-	{
-	    archive_option_destroy_mask(x_selection);
-	    archive_option_destroy_mask(x_subtree);
-	    archive_option_destroy_mask(x_ea_mask);
-	}
-        catch(...)
-        {
-            NLS_SWAP_OUT;
-            throw;
-        }
-        NLS_SWAP_OUT;
+	archive_option_destroy_mask(x_selection);
+	archive_option_destroy_mask(x_subtree);
+	archive_option_destroy_mask(x_ea_mask);
+    }
+
+    void archive_options_diff::nullifyptr() noexcept
+    {
+	x_selection = x_subtree = x_ea_mask = nullptr;
     }
 
     void archive_options_diff::copy_from(const archive_options_diff & ref)
     {
-	x_selection = nullptr;
-	x_subtree = nullptr;
-	x_ea_mask = nullptr;
+	nullifyptr();
 
 	try
 	{
@@ -1795,6 +1788,24 @@ namespace libdar
 	}
     }
 
+    void archive_options_diff::move_from(archive_options_diff && ref) noexcept
+    {
+	tools_swap(x_selection, ref.x_selection);
+	tools_swap(x_subtree, ref.x_subtree);
+	tools_swap(x_ea_mask, ref.x_ea_mask);
+
+	x_info_details = move(ref.x_info_details);
+	x_display_treated = move(ref.x_display_treated);
+	x_display_treated_only_dir = move(ref.x_display_treated_only_dir);
+	x_display_skipped = move(ref.x_display_skipped);
+	x_what_to_check = move(ref.x_what_to_check);
+	x_alter_atime = move(ref.x_alter_atime);
+	x_old_alter_atime = move(ref.x_old_alter_atime);
+	x_furtive_read = move(ref.x_furtive_read);
+	x_hourshift = move(ref.x_hourshift);
+	x_compare_symlink_date = move(ref.x_compare_symlink_date);
+	x_scope = move(ref.x_scope);
+    }
 
 
 	/////////////////////////////////////////////////////////
