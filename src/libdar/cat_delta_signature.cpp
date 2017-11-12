@@ -258,7 +258,7 @@ namespace libdar
 	    throw Ememory("cat_delta_signature::set_crc");
     }
 
-    void cat_delta_signature::init()
+    void cat_delta_signature::init() noexcept
     {
 	delta_sig_offset = 0;
 	delta_sig_size = 0;
@@ -304,7 +304,26 @@ namespace libdar
 	just_crc = ref.just_crc;
     }
 
-    void cat_delta_signature::clear_sig()
+    void cat_delta_signature::move_from(cat_delta_signature && ref) noexcept
+    {
+	delta_sig_offset = move(ref.delta_sig_offset);
+	delta_sig_size = move(ref.delta_sig_size);
+
+	    // for sig_is_ours field, we cannot assume bool's move operator
+	    // swaps the values (implementation dependant),
+	    // we need to be sure values are swapped:
+	tools_swap(sig_is_ours, ref.sig_is_ours);
+
+	    // we can swap the memory file, because sig_is_ours is swapped
+	    // too and we will known when destroying ref whether we own
+	    // the object pointed to by sig or not
+	tools_swap(sig, ref.sig);
+	tools_swap(patch_base_check, ref.patch_base_check);
+	tools_swap(patch_result_check, ref.patch_result_check);
+	just_crc = move(ref.just_crc);
+    }
+
+    void cat_delta_signature::clear_sig() noexcept
     {
 	if(sig != nullptr)
 	{
@@ -314,7 +333,7 @@ namespace libdar
 	}
     }
 
-    void cat_delta_signature::destroy()
+    void cat_delta_signature::destroy() noexcept
     {
 	clear_sig();
 	if(patch_base_check != nullptr)

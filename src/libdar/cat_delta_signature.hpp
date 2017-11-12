@@ -100,8 +100,14 @@ namespace libdar
 	    /// copy constructor
 	cat_delta_signature(const cat_delta_signature & ref) { init(); copy_from(ref); };
 
+	    /// move constructor
+	cat_delta_signature(cat_delta_signature && ref) { init(); move_from(std::move(ref)); };
+
 	    /// assignement operator
 	cat_delta_signature & operator = (const cat_delta_signature & ref) { destroy(); init(); copy_from(ref); return *this; };
+
+	    /// move assignment operator
+	cat_delta_signature & operator = (cat_delta_signature && ref) { move_from(std::move(ref)); return *this; };
 
 	    /// destructor
 	~cat_delta_signature() { destroy(); };
@@ -180,10 +186,11 @@ namespace libdar
 	crc *patch_result_check;    //< associated CRC
 	bool just_crc;              //< whether a delta signature is present or just checksum are stored
 
-	void init();
+	void init() noexcept;
 	void copy_from(const cat_delta_signature & ref);
-	void clear_sig();
-	void destroy();
+	void move_from(cat_delta_signature && ref) noexcept;
+	void clear_sig() noexcept;
+	void destroy() noexcept;
     };
 
 	/// @}
