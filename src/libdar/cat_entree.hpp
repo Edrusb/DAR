@@ -119,8 +119,14 @@ namespace libdar
 	    // copy constructor is fine as we only copy the address of pointers
 	cat_entree(const cat_entree & ref) = default;
 
+	    // move constructor
+	cat_entree(cat_entree && ref) = default;
+
 	    // assignment operator is fine too for the same reason
 	cat_entree & operator = (const cat_entree & ref) = default;
+
+	    // move assignment operator
+	cat_entree & operator = (cat_entree && ref) = default;
 
 	    /// destructor
         virtual ~cat_entree() throw(Ebug) {};
