@@ -1873,21 +1873,15 @@ namespace libdar
     }
 
 
-    void archive_options_test::destroy()
+    void archive_options_test::destroy() noexcept
     {
-	NLS_SWAP_IN;
-	try
-	{
-	    archive_option_destroy_mask(x_selection);
-	    archive_option_destroy_mask(x_subtree);
-	}
-        catch(...)
-        {
-            NLS_SWAP_OUT;
-            throw;
-        }
-        NLS_SWAP_OUT;
+	archive_option_destroy_mask(x_selection);
+	archive_option_destroy_mask(x_subtree);
+    }
 
+    void archive_options_test::nullifyptr() noexcept
+    {
+	x_selection = x_subtree = nullptr;
     }
 
     void archive_options_test::copy_from(const archive_options_test & ref)
@@ -1919,6 +1913,18 @@ namespace libdar
 	    clear();
 	    throw;
 	}
+    }
+
+    void archive_options_test::move_from(archive_options_test && ref) noexcept
+    {
+	tools_swap(x_selection, ref.x_selection);
+	tools_swap(x_subtree, ref.x_subtree);
+
+	x_info_details = move(ref.x_info_details);
+	x_display_treated = move(ref.x_display_treated);
+	x_display_treated_only_dir = move(ref.x_display_treated_only_dir);
+	x_display_skipped = move(ref.x_display_skipped);
+	x_empty = move(ref.x_empty);
     }
 
     	/////////////////////////////////////////////////////////

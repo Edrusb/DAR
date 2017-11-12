@@ -1455,9 +1455,11 @@ namespace libdar
     class archive_options_test
     {
     public:
-	archive_options_test() { x_selection = x_subtree = nullptr; clear(); };
+	archive_options_test() { nullifyptr(); clear(); };
 	archive_options_test(const archive_options_test & ref) { copy_from(ref); };
+	archive_options_test(archive_options_test && ref) { nullifyptr(); move_from(std::move(ref)); };
 	archive_options_test & operator = (const archive_options_test & ref) { destroy(); copy_from(ref); return *this; };
+	archive_options_test & operator = (archive_options_test && ref) { move_from(std::move(ref)); return *this; };
 	~archive_options_test() { destroy(); };
 
 	void clear();
@@ -1511,8 +1513,10 @@ namespace libdar
 	bool x_display_skipped;
 	bool x_empty;
 
-	void destroy();
+	void destroy() noexcept;
+	void nullifyptr() noexcept;
 	void copy_from(const archive_options_test & ref);
+	void move_from(archive_options_test && ref) noexcept;
     };
 
 
