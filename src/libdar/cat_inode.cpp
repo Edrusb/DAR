@@ -1300,7 +1300,7 @@ namespace libdar
             return false;
     }
 
-    void cat_inode::nullifyptr()
+    void cat_inode::nullifyptr() noexcept
     {
         ea_offset = nullptr;
 	ea = nullptr;
@@ -1314,7 +1314,7 @@ namespace libdar
         fs_dev = nullptr;
     }
 
-    void cat_inode::destroy()
+    void cat_inode::destroy() noexcept
     {
         if(ea_offset != nullptr)
         {
@@ -1425,6 +1425,31 @@ namespace libdar
 	    destroy();
 	    throw;
 	}
+    }
+
+    void cat_inode::move_from(cat_inode && ref) noexcept
+    {
+	uid = move(ref.uid);
+	gid = move(ref.gid);
+	perm = move(ref.perm);
+	last_acc = move(ref.last_acc);
+	last_mod = move(ref.last_mod);
+	last_cha = move(ref.last_cha);
+	xsaved = move(ref.xsaved);
+	ea_saved = move(ref.ea_saved);
+	fsa_saved = move(ref.fsa_saved);
+	small_read = move(ref.small_read);
+	tools_swap(ref.ea_offset, ea_offset);
+	tools_swap(ref.ea, ea);
+	tools_swap(ref.ea_size, ea_size);
+	tools_swap(ref.ea_crc, ea_crc);
+	tools_swap(ref.fsa_families, fsa_families);
+	tools_swap(ref.fsa_offset, fsa_offset);
+	tools_swap(ref.fsal, fsal);
+	tools_swap(ref.fsa_size, fsa_size);
+	tools_swap(ref.fsa_crc, fsa_crc);
+	tools_swap(ref.fs_dev, fs_dev);
+	edit = move(ref.edit);
     }
 
 

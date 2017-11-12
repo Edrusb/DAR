@@ -79,7 +79,9 @@ namespace libdar
 		  saved_status saved,
 		  bool small);
         cat_inode(const cat_inode & ref);
+	cat_inode(cat_inode && ref): cat_nomme(std::move(ref)) { nullifyptr(); move_from(std::move(ref)); };
 	cat_inode & operator = (const cat_inode & ref);
+	cat_inode & operator = (cat_inode && ref) { cat_nomme::operator = (std::move(ref)); move_from(std::move(ref)); return *this; };
         ~cat_inode() throw(Ebug);
 
         const infinint & get_uid() const { return uid; };
@@ -225,9 +227,10 @@ namespace libdar
 	archive_version edit;    //< need to know EA and FSA format used in archive file
 
 
-	void nullifyptr();
-	void destroy();
+	void nullifyptr() noexcept;
+	void destroy() noexcept;
 	void copy_from(const cat_inode & ref);
+	void move_from(cat_inode && ref) noexcept;
 
 	static const ea_attributs empty_ea;
     };
