@@ -56,8 +56,14 @@ namespace libdar
 	    /// copy constructor
 	cache_global(cache_global & ref) = delete;
 
+	    /// move constructor
+	cache_global(cache_global && ref) = delete;
+
 	    /// assignment operator
 	cache_global & operator = (const cache_global & ref) = delete;
+
+	    /// move assignment operator
+	cache_global & operator = (cache_global && ref) = delete;
 
 	    /// destructor
 	~cache_global() { detruit(); };
