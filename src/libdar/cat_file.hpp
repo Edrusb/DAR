@@ -78,7 +78,9 @@ namespace libdar
 		 compression default_algo,
 		 bool small);
 	cat_file(const cat_file & ref);
-	cat_file & operator = (const cat_file & ref) = default;
+	cat_file(cat_file && ref) = delete;
+	cat_file & operator = (const cat_file & ref) = delete;
+	cat_file & operator = (cat_file && ref) = delete;
         ~cat_file() { detruit(); };
 
         virtual bool has_changed_since(const cat_inode & ref, const infinint & hourshift, cat_inode::comparison_fields what_to_check) const override;
