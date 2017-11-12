@@ -54,7 +54,9 @@ namespace libdar
 	archive_version(U_16 x = 0, unsigned char fix = 0);
 
 	archive_version(const archive_version & ref) = default;
+	archive_version(archive_version && ref) = default;
 	archive_version & operator = (const archive_version & ref) = default;
+	archive_version & operator = (archive_version && ref) = default;
 	~archive_version() = default;
 
 	bool operator < (const archive_version & ref) const { return value() < ref.value(); };
