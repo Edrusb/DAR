@@ -51,7 +51,7 @@ namespace libdar
 			    fmt_hard_link,        //< old dual format
 			    fmt_file_etiquette }; //< old dual format
 
-	cat_mirage(const std::string & name, cat_etoile *ref) : cat_nomme(name) { star_ref = ref; if(ref == nullptr) throw SRC_BUG; star_ref->add_ref(this); };
+	cat_mirage(const std::string & name, cat_etoile *ref) : cat_nomme(name) { dup_on(ref); };
 	cat_mirage(user_interaction & dialog,
 		   const smart_pointer<pile_descriptor> & pdesc,
 		   const archive_version & reading_ver,
@@ -71,8 +71,10 @@ namespace libdar
 		   compression default_algo,
 		   bool lax,
 		   bool small);
-	cat_mirage(const cat_mirage & ref) : cat_nomme (ref) { star_ref = ref.star_ref; if(star_ref == nullptr) throw SRC_BUG; star_ref->add_ref(this); };
+	cat_mirage(const cat_mirage & ref) : cat_nomme (ref) { dup_on(ref.star_ref); };
+	cat_mirage(cat_mirage && ref): cat_nomme(std::move(ref)) { dup_on(ref.star_ref); };
 	cat_mirage & operator = (const cat_mirage & ref);
+	cat_mirage & operator = (cat_mirage && ref);
 	~cat_mirage() { star_ref->drop_ref(this); };
 
 	virtual bool operator == (const cat_entree & ref) const override;
@@ -127,6 +129,8 @@ namespace libdar
 		  mirage_format fmt,
 		  bool lax,
 		  bool small);
+
+	void dup_on(cat_etoile * ref);
     };
 
 	/// @}

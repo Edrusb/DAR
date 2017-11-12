@@ -232,17 +232,35 @@ namespace libdar
 
     cat_mirage & cat_mirage::operator = (const cat_mirage & ref)
     {
-        cat_etoile *tmp_ref;
-        const cat_nomme * ref_nom = & ref;
-        cat_nomme * this_nom = this;
-        *this_nom = *ref_nom; // copying the cat_nomme part of these objects
+	if(ref.star_ref == nullptr)
+            throw SRC_BUG;
 
+	    // copying the cat_nomme part of these objects
+	cat_nomme::operator = (ref);
+
+	if(ref.star_ref != star_ref)
+	{
+	    ref.star_ref->add_ref(this);
+	    star_ref->drop_ref(this);
+	    star_ref = ref.star_ref;
+	}
+        return *this;
+    }
+
+    cat_mirage & cat_mirage::operator = (cat_mirage && ref)
+    {
         if(ref.star_ref == nullptr)
             throw SRC_BUG;
-        tmp_ref = star_ref;
-        star_ref = ref.star_ref;
-        star_ref->add_ref(this);
-        tmp_ref->drop_ref(this);
+
+	    // moving the cat_nomme part of these objects
+	cat_nomme::operator = (move(ref));
+
+	if(ref.star_ref != star_ref)
+	{
+	    ref.star_ref->add_ref(this);
+	    star_ref->drop_ref(this);
+	    star_ref = ref.star_ref;
+	}
 
         return *this;
     }
@@ -314,5 +332,12 @@ namespace libdar
         }
     }
 
+    void cat_mirage::dup_on(cat_etoile * ref)
+    {
+	if(star_ref == nullptr)
+	    throw SRC_BUG;
+	star_ref = ref;
+	star_ref->add_ref(this);
+    }
 
 } // end of namespace
