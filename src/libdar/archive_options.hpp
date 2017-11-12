@@ -1532,7 +1532,9 @@ namespace libdar
 
 	archive_options_repair();
 	archive_options_repair(const archive_options_repair & ref);
+	archive_options_repair(archive_options_repair && ref) { nullifyptr(); move_from(std::move(ref)); };
 	archive_options_repair & operator = (const archive_options_repair & ref) { destroy(); copy_from(ref); return *this; };
+	archive_options_repair & operator = (archive_options_repair && ref) { move_from(std::move(ref)); return *this; };
 	~archive_options_repair() { destroy(); };
 
 	    /////////////////////////////////////////////////////////////////////
@@ -1705,11 +1707,10 @@ namespace libdar
 	entrepot *x_entrepot;
 	bool x_multi_threaded;
 
-	void destroy();
+	void destroy() noexcept;
+	void nullifyptr() noexcept { x_entrepot = nullptr; };
 	void copy_from(const archive_options_repair & ref);
-	void destroy_mask(mask * & ptr);
-	void clean_mask(mask * & ptr);
-	void check_mask(const mask & m);
+	void move_from(archive_options_repair && ref) noexcept;
     };
 
 	/// @}

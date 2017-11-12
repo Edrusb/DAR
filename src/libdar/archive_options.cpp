@@ -1933,7 +1933,7 @@ namespace libdar
 
     archive_options_repair::archive_options_repair()
     {
-        x_entrepot = nullptr;
+	nullifyptr();
         try
         {
             clear();
@@ -1947,7 +1947,7 @@ namespace libdar
 
     archive_options_repair::archive_options_repair(const archive_options_repair & ref)
     {
-        x_entrepot = nullptr;
+	nullifyptr();
         try
         {
             copy_from(ref);
@@ -2014,23 +2014,13 @@ namespace libdar
             throw Ememory("archive_options_repair::set_entrepot");
     }
 
-    void archive_options_repair::destroy()
+    void archive_options_repair::destroy() noexcept
     {
-        NLS_SWAP_IN;
-        try
-        {
-            if(x_entrepot != nullptr)
-            {
-                delete x_entrepot;
-                x_entrepot = nullptr;
-            }
-        }
-        catch(...)
-        {
-            NLS_SWAP_OUT;
-            throw;
-        }
-        NLS_SWAP_OUT;
+	if(x_entrepot != nullptr)
+	{
+	    delete x_entrepot;
+	    x_entrepot = nullptr;
+	}
     }
 
     void archive_options_repair::copy_from(const archive_options_repair & ref)
@@ -2069,6 +2059,36 @@ namespace libdar
 	x_multi_threaded = ref.x_multi_threaded;
     }
 
+    void archive_options_repair::move_from(archive_options_repair && ref) noexcept
+    {
+	tools_swap(x_entrepot, ref.x_entrepot);
+
+	x_allow_over = move(ref.x_allow_over);
+	x_warn_over = move(ref.x_warn_over);
+        x_info_details = move(ref.x_info_details);
+        x_display_treated = move(ref.x_display_treated);
+        x_display_treated_only_dir = move(ref.x_display_treated_only_dir);
+        x_display_skipped = move(ref.x_display_skipped);
+        x_display_finished = move(ref.x_display_finished);
+        x_pause = move(ref.x_pause);
+        x_file_size = move(ref.x_file_size);
+        x_first_file_size = move(ref.x_first_file_size);
+        x_execute = move(ref.x_execute);
+        x_crypto = move(ref.x_crypto);
+        x_pass = move(ref.x_pass);
+        x_crypto_size = move(ref.x_crypto_size);
+        x_gnupg_recipients = move(ref.x_gnupg_recipients);
+        x_gnupg_signatories = move(ref.x_gnupg_signatories);
+        x_empty = move(ref.x_empty);
+	x_slice_permission = move(ref.x_slice_permission);
+	x_slice_user_ownership = move(ref.x_slice_user_ownership);
+	x_slice_group_ownership = move(ref.x_slice_group_ownership);
+	x_sequential_marks = move(ref.x_sequential_marks);
+	x_user_comment = move(ref.x_user_comment);
+	x_hash = move(ref.x_hash);
+	x_slice_min_digits = move(ref.x_slice_min_digits);
+	x_multi_threaded = move(ref.x_multi_threaded);
+    }
 
 } // end of namespace
 
