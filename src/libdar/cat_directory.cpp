@@ -57,29 +57,37 @@ namespace libdar
 	updated_sizes = false;
     }
 
-    cat_directory::cat_directory(const cat_directory &ref) : cat_inode(ref)
+    cat_directory::cat_directory(const cat_directory & ref) : cat_inode(ref)
     {
-	parent = nullptr;
-#ifdef LIBDAR_FAST_DIR
-	fils.clear();
-#endif
-	ordered_fils.clear();
-	it = ordered_fils.begin();
+	init();
 	recursive_has_changed = ref.recursive_has_changed;
-	updated_sizes = false;
+    }
+
+    cat_directory::cat_directory(cat_directory && ref) : cat_inode(move(ref))
+    {
+	init();
+	recursive_has_changed = move(ref.recursive_has_changed);
     }
 
     cat_directory & cat_directory::operator = (const cat_directory & ref)
     {
-	const cat_inode *ref_ino = &ref;
-	cat_inode * this_ino = this;
+	    // this assigns the inode part of the object
+ 	    // we don't modify the existing subfiles or subdirectories nor we copy them from the reference cat_directory
+	cat_inode::operator = (ref);
 
-	*this_ino = *ref_ino; // this assigns the inode part of the object
-	    // we don't modify the existing subfiles or subdirectories nor we copy them from the reference cat_directory
 	recursive_flag_size_to_update();
 	return *this;
     }
 
+    cat_directory & cat_directory::operator = (cat_directory && ref)
+    {
+	    // this assigns the inode part of the object
+ 	    // we don't modify the existing subfiles or subdirectories nor we copy them from the reference cat_directory
+	cat_inode::operator = (move(ref));
+
+	recursive_flag_size_to_update();
+	return *this;
+    }
 
     cat_directory::cat_directory(user_interaction & dialog,
 				 const smart_pointer<pile_descriptor> & pdesc,
@@ -516,6 +524,17 @@ namespace libdar
 	    (*tmp_it)->change_location(pdesc);
 	    ++tmp_it;
 	}
+    }
+
+    void cat_directory::init() noexcept
+    {
+    	parent = nullptr;
+#ifdef LIBDAR_FAST_DIR
+	fils.clear();
+#endif
+	ordered_fils.clear();
+	it = ordered_fils.begin();
+	updated_sizes = false;
     }
 
     void cat_directory::clear()

@@ -70,7 +70,9 @@ namespace libdar
 		      bool only_detruit, // objects of other class than detruit and cat_directory are not built in memory
 		      bool small);
 	cat_directory(const cat_directory &ref); // only the inode part is build, no children is duplicated (empty dir)
+	cat_directory(cat_directory && ref);
 	cat_directory & operator = (const cat_directory & ref); // set the inode part *only* no subdirectories/subfiles are copies or removed.
+	cat_directory & operator = (cat_directory && ref);
         ~cat_directory() throw(Ebug); // detruit aussi tous les fils et se supprime de son 'parent'
 
 	    /// attention this compares only the directories themselves, not the list of their children
@@ -160,6 +162,7 @@ namespace libdar
         std::list<cat_nomme *>::iterator it; //< next to entry to be returned by read_children
 	bool recursive_has_changed;
 
+	void init() noexcept;
 	void clear();
 	void recursive_update_sizes() const;
 	void recursive_flag_size_to_update() const;
