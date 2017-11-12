@@ -237,7 +237,7 @@ namespace libdar
 	if(list_ea && e_ino != nullptr && e_ino->ea_get_saved_status() == cat_inode::ea_full)
 	{
 	    string new_begin = beginning + "\t";
-	    local_display_ea(dialog, e_ino, new_begin + "<EA_entry> ea_name=\"", "\">", true);
+	    local_display_ea(dialog, e_ino, new_begin + "<EA_entry ea_name=\"", "\" />", true);
 	    dialog.printf("%S</Attributes>", &beginning);
 	}
     }
