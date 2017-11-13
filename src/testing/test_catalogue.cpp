@@ -185,7 +185,7 @@ void f2()
     try
     {
 	label data_name;
-        catalogue cat = catalogue(*ui, datetime(12), data_name);
+        catalogue cat(*ui, datetime(12), data_name);
         const cat_entree *ref;
 	bool_mask tmp = true;
 	label lax_label;
@@ -244,7 +244,7 @@ void f2()
 
         cat.dump(pdesc);
         stack.skip(0);
-        catalogue lst = catalogue(*ui, pdesc, macro_tools_supported_version, none, false, lax_label);
+        catalogue lst(*ui, pdesc, macro_tools_supported_version, none, false, lax_label);
         lst.listing(false, tmp, tmp, false, false, false, "");
         bool ok;
 
@@ -296,8 +296,8 @@ void f2()
 void f3()
 {
     label data_name;
-    catalogue cat = catalogue(*ui, datetime(180), data_name);
-    catalogue dif = catalogue(*ui, datetime(190), data_name);
+    catalogue cat(*ui, datetime(180), data_name);
+    catalogue dif(*ui, datetime(190), data_name);
     bool_mask tmp = true;
 
     cat.reset_add();

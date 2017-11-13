@@ -234,15 +234,10 @@ namespace libdar
 	    delete read_crc;
     }
 
-    catalogue & catalogue::operator = (const catalogue &ref)
+    catalogue & catalogue::operator = (const catalogue & ref)
     {
-	mem_ui * me = this;
-	const mem_ui & you = ref;
-
 	detruire();
-	if(me == nullptr)
-	    throw SRC_BUG;
-	*me = you; // copying the mem_ui data
+	mem_ui::operator = (ref);
 
 	    // now copying the catalogue's data
 
