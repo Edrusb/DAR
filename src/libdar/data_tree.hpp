@@ -80,7 +80,9 @@ namespace libdar
 	data_tree(const std::string &name);
 	data_tree(generic_file & f, unsigned char db_version);
 	data_tree(const data_tree & ref) = default;
+	data_tree(data_tree && ref) noexcept = default;
 	data_tree & operator = (const data_tree & ref) = default;
+	data_tree & operator = (data_tree && ref) noexcept = default;
 	virtual ~data_tree() = default;
 
 	virtual void dump(generic_file & f) const;
@@ -162,7 +164,9 @@ namespace libdar
 	    status(): date(0) { present = et_absent; };
 	    status(const datetime & d, etat p) { date = d; present = p; };
 	    status(const status & ref) = default;
+	    status(status && ref) noexcept = default;
 	    status & operator = (const status & ref) = default;
+	    status & operator = (status && ref) noexcept = default;
 	    virtual ~status() = default;
 
 	    datetime date;                             //< date of the event
@@ -180,7 +184,9 @@ namespace libdar
 	    status_plus() { base = result = nullptr; };
 	    status_plus(const datetime & d, etat p, const crc *xbase, const crc *xresult);
 	    status_plus(const status_plus & ref): status(ref) { copy_from(ref); };
+	    status_plus(status_plus && ref): status(std::move(ref)) { nullifyptr(); move_from(std::move(ref)); };
 	    status_plus & operator = (const status_plus & ref) { detruit(); copy_from(ref); return *this; };
+	    status_plus & operator = (status_plus && ref) noexcept { status_plus::operator = (std::move(ref)); move_from(std::move(ref)); return *this; };
 	    ~status_plus() { detruit(); };
 
 	    crc *base; //< only present for s_delta status, to have a link with the file to apply the patch to
@@ -191,7 +197,9 @@ namespace libdar
 		      unsigned char db_version);
 
 	private:
+	    void nullifyptr() noexcept { base = result = nullptr; };
 	    void copy_from(const status_plus & ref);
+	    void move_from(status_plus && ref) noexcept;
 	    void detruit();
 	};
 
@@ -223,7 +231,9 @@ namespace libdar
 	data_dir(generic_file &f, unsigned char db_version);
 	data_dir(const data_tree & ref);
 	data_dir(const data_dir & ref);
+	data_dir(data_dir && ref) noexcept = default;
 	data_dir & operator = (const data_dir & ref) { rejetons.clear(); return *this; };
+	data_dir & operator = (data_dir && ref) noexcept = default;
 	~data_dir();
 
 	virtual void dump(generic_file & f) const override;

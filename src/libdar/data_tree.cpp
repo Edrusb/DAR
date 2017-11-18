@@ -238,6 +238,12 @@ namespace libdar
 	    result = nullptr;
     }
 
+    void data_tree::status_plus::move_from(status_plus && ref) noexcept
+    {
+	tools_swap(base, ref.base);
+	tools_swap(result, ref.result);
+    }
+
     void data_tree::status_plus::detruit()
     {
 	if(base != nullptr)
