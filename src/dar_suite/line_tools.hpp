@@ -33,7 +33,7 @@
 #include "infinint.hpp"
 #include "tlv_list.hpp"
 #include "integers.hpp"
-#include "criterium.hpp"
+#include "crit_action.hpp"
 
 using namespace libdar;
 

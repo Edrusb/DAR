@@ -32,7 +32,7 @@
 #include "mask.hpp"
 #include "compressor.hpp"
 #include "catalogue.hpp"
-#include "criterium.hpp"
+#include "crit_action.hpp"
 #include "hash_fichier.hpp"
 #include "secu_string.hpp"
 #include "nls_swap.hpp"

@@ -28,7 +28,7 @@
 #define CRIT_ACTION_CMD_LINE_HPP
 
 #include "../my_config.h"
-#include "criterium.hpp"
+#include "crit_action.hpp"
 #include "user_interaction.hpp"
 
     /// \addtogroup CMDLINE
