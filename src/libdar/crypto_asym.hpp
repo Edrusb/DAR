@@ -57,8 +57,14 @@ namespace libdar
 	    /// disabling copy constructor
 	crypto_asym(const crypto_asym & ref) = delete;
 
+	    /// disabling move constuctor
+	crypto_asym(crypto_asym && ref) = delete;
+
 	    /// disabling object assignment
 	crypto_asym & operator = (const crypto_asym & ref) = delete;
+
+	    /// disabling move assignment operator
+	crypto_asym & operator = (crypto_asym && ref) = delete;
 
 	    /// the destructor
 	~crypto_asym() { release_context(); };
