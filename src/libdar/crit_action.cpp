@@ -74,6 +74,13 @@ namespace libdar
 	}
     }
 
+    void testing::move_from(testing && ref)
+    {
+	tools_swap(x_input, ref.x_input);
+	tools_swap(x_go_true, ref.x_go_true);
+	tools_swap(x_go_false, ref.x_go_false);
+    }
+
     bool testing::check() const
     {
 	return x_input != nullptr && x_go_true != nullptr && x_go_false != nullptr;

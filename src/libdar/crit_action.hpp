@@ -79,7 +79,9 @@ namespace libdar
     public:
 	crit_action() = default;
 	crit_action(const crit_action & ref) = default;
+	crit_action(crit_action && ref) = default;
 	crit_action & operator = (const crit_action & ref) = default;
+	crit_action & operator = (crit_action && ref) = default;
 
 	    /// the destructor
 	virtual ~crit_action() = default;
@@ -144,7 +146,9 @@ namespace libdar
 	    /// \param[in] go_false is the action to use for evaluation if the criterium states false
 	testing(const criterium & input, const crit_action & go_true, const crit_action & go_false);
 	testing(const testing & ref) : crit_action(ref) { copy_from(ref); if(!check()) throw Ememory("testing::testing(const testing &)"); };
+	testing(testing && ref) : crit_action(std::move(ref)) { nullifyptr(); move_from(std::move(ref)); };
 	testing & operator = (const testing & ref) { free(); copy_from(ref); if(!check()) throw Ememory("testing::testing(const testing &)"); return *this; };
+	testing & operator = (testing && ref) { crit_action::operator = (std::move(ref)); move_from(std::move(ref)); return *this; };
 	~testing() { free(); };
 
 
@@ -164,8 +168,10 @@ namespace libdar
 	crit_action *x_go_true;
 	crit_action *x_go_false;
 
+	void nullifyptr() { x_input = nullptr; x_go_true = x_go_false = nullptr; };
 	void free();
 	void copy_from(const testing & ref);
+	void move_from(testing && ref);
 	bool check() const; //< returns false if an field is nullptr
     };
 
@@ -180,7 +186,9 @@ namespace libdar
     public:
 	crit_chain() { sequence.clear(); };
 	crit_chain(const crit_chain & ref) : crit_action(ref) { copy_from(ref); };
+	crit_chain(crit_chain && ref) : crit_action(std::move(ref)) { sequence = std::move(ref.sequence); };
 	crit_chain & operator = (const crit_chain & ref) { destroy(); copy_from(ref); return *this; };
+	crit_chain & operator = (crit_chain && ref) { crit_action::operator = (std::move(ref)); sequence = std::move(ref.sequence); return *this; };
 	~crit_chain() { destroy(); };
 
 	void add(const crit_action & act);
