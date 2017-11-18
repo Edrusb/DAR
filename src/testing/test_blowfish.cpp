@@ -88,7 +88,7 @@ void f1(user_interaction *dialog)
 {
     fichier_local fic = fichier_local(*dialog, "toto", gf_write_only, 0666, false, true, false);
     string pass = "bonjour";
-    crypto_sym bf = crypto_sym(10, secu_string(pass.c_str(), pass.size()), fic, false, macro_tools_supported_version, crypto_blowfish, true);
+    crypto_sym bf(10, secu_string(pass.c_str(), pass.size()), fic, false, macro_tools_supported_version, crypto_blowfish, true);
     char buffer[100] = "bonjour les amis il fait chaud il fait beau ! ";
 
     bf.write(buffer, strlen(buffer));
@@ -101,7 +101,7 @@ void f2(user_interaction *dialog)
 {
     fichier_local fic = fichier_local(*dialog, "toto", gf_read_only, 0666, false, false, false);
     string pass = "bonjour";
-    crypto_sym bf = crypto_sym(10, secu_string(pass.c_str(), pass.size()), fic, false, macro_tools_supported_version, crypto_blowfish, true);
+    crypto_sym bf(10, secu_string(pass.c_str(), pass.size()), fic, false, macro_tools_supported_version, crypto_blowfish, true);
     char buffer[100];
     S_I lu;
     bool ret;
