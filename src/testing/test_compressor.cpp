@@ -75,9 +75,9 @@ static void f1()
 	fichier_local dst2 = fichier_local(*ui, "tutu.gz", gf_write_only, 0666, false, true, false);
 	fichier_local dst3 = fichier_local(*ui, "tutu.bz", gf_write_only, 0666, false, true, false);
 
-        compressor c1 = compressor(none, dst1);
-        compressor c2 = compressor(gzip, dst2);
-        compressor c3 = compressor(bzip2, dst3);
+        compressor c1(none, dst1);
+        compressor c2(gzip, dst2);
+        compressor c3(bzip2, dst3);
 
         src1.copy_to(c1);
         src2.copy_to(c2);
@@ -119,9 +119,9 @@ static void f1()
         fichier_local dst2 = fichier_local(*ui, "tutu.gz.bak", gf_write_only, 0666, false, true, false);
         fichier_local dst3 = fichier_local(*ui, "tutu.bz.bak", gf_write_only, 0666, false, true, false);
 
-        compressor c1 = compressor(none, src1);
-        compressor c2 = compressor(gzip, src2);
-        compressor c3 = compressor(bzip2, src3);
+        compressor c1(none, src1);
+        compressor c2(gzip, src2);
+        compressor c3(bzip2, src3);
 
         c1.copy_to(dst1);
 

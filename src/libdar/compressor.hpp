@@ -73,8 +73,10 @@ namespace libdar
         compressor(compression algo, generic_file *compressed_side, U_I compression_level = 9);
             // compressed_side is owned by the object and will be
             // deleted a destructor time
-	compressor(const compressor & ref) = default;
-	compressor & operator = (const compressor & ref) = default;
+	compressor(const compressor & ref) = delete;
+	compressor(compressor && ref) = delete;
+	compressor & operator = (const compressor & ref) = delete;
+	compressor & operator = (compressor && ref) = delete;
         ~compressor();
 
         compression get_algo() const { return (current_algo == lzo1x_1_15 || current_algo == lzo1x_1) ? lzo : current_algo; };
