@@ -50,7 +50,9 @@ namespace libdar
     public:
 	criterium() = default;
 	criterium(const criterium & ref) = default;
+	criterium(criterium && ref) = default;
 	criterium & operator = (const criterium & ref) = default;
+	criterium & operator = (criterium && ref) = default;
 	virtual ~criterium() throw(Ebug) {};
 
 	    /// criterum interface method
@@ -86,7 +88,9 @@ namespace libdar
     public:
 	crit_in_place_is_inode() = default;
 	crit_in_place_is_inode(const crit_in_place_is_inode & ref) = default;
+	crit_in_place_is_inode(crit_in_place_is_inode && ref) = default;
 	crit_in_place_is_inode & operator = (const crit_in_place_is_inode & ref) = default;
+	crit_in_place_is_inode & operator = (crit_in_place_is_inode && ref) = default;
 	~crit_in_place_is_inode() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
@@ -101,7 +105,9 @@ namespace libdar
     public:
 	crit_in_place_is_dir() = default;
 	crit_in_place_is_dir(const crit_in_place_is_dir & ref) = default;
+	crit_in_place_is_dir(crit_in_place_is_dir && ref) = default;
 	crit_in_place_is_dir & operator = (const crit_in_place_is_dir & ref) = default;
+	crit_in_place_is_dir & operator = (crit_in_place_is_dir && ref) = default;
 	~crit_in_place_is_dir() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const { return dynamic_cast<const cat_directory *>(&first) != nullptr; };
@@ -116,7 +122,9 @@ namespace libdar
     public:
 	crit_in_place_is_file() = default;
 	crit_in_place_is_file(const crit_in_place_is_file & ref) = default;
+	crit_in_place_is_file(crit_in_place_is_file && ref) = default;
 	crit_in_place_is_file & operator = (const crit_in_place_is_file & ref) = default;
+	crit_in_place_is_file & operator = (crit_in_place_is_file && ref) = default;
 	~crit_in_place_is_file() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
@@ -132,7 +140,9 @@ namespace libdar
     public:
 	crit_in_place_is_hardlinked_inode() = default;
 	crit_in_place_is_hardlinked_inode(const crit_in_place_is_hardlinked_inode & ref) = default;
+	crit_in_place_is_hardlinked_inode(crit_in_place_is_hardlinked_inode && ref) = default;
 	crit_in_place_is_hardlinked_inode & operator = (const crit_in_place_is_hardlinked_inode & ref) = default;
+	crit_in_place_is_hardlinked_inode & operator = (crit_in_place_is_hardlinked_inode && ref) = default;
 	~crit_in_place_is_hardlinked_inode() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
@@ -146,7 +156,9 @@ namespace libdar
     public:
 	crit_in_place_is_new_hardlinked_inode() = default;
 	crit_in_place_is_new_hardlinked_inode(const crit_in_place_is_new_hardlinked_inode & ref) = default;
+	crit_in_place_is_new_hardlinked_inode(crit_in_place_is_new_hardlinked_inode && ref) = default;
 	crit_in_place_is_new_hardlinked_inode & operator = (const crit_in_place_is_new_hardlinked_inode & ref) = default;
+	crit_in_place_is_new_hardlinked_inode & operator = (crit_in_place_is_new_hardlinked_inode && ref) = default;
 	~crit_in_place_is_new_hardlinked_inode() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
@@ -163,7 +175,9 @@ namespace libdar
     public:
 	crit_in_place_data_more_recent(const infinint & hourshift = 0) : x_hourshift(hourshift) {};
 	crit_in_place_data_more_recent(const crit_in_place_data_more_recent & ref) = default;
+	crit_in_place_data_more_recent(crit_in_place_data_more_recent && ref) = default;
 	crit_in_place_data_more_recent & operator = (const crit_in_place_data_more_recent & ref) = default;
+	crit_in_place_data_more_recent & operator = (crit_in_place_data_more_recent && ref) = default;
 	~crit_in_place_data_more_recent() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
@@ -184,7 +198,9 @@ namespace libdar
     public:
 	crit_in_place_data_more_recent_or_equal_to(const infinint & date, const infinint & hourshift = 0) : x_hourshift(hourshift), x_date(date) {};
 	crit_in_place_data_more_recent_or_equal_to(const crit_in_place_data_more_recent_or_equal_to & ref) = default;
+	crit_in_place_data_more_recent_or_equal_to(crit_in_place_data_more_recent_or_equal_to && ref) = default;
 	crit_in_place_data_more_recent_or_equal_to & operator = (const crit_in_place_data_more_recent_or_equal_to & ref) = default;
+	crit_in_place_data_more_recent_or_equal_to & operator = (crit_in_place_data_more_recent_or_equal_to && ref) = default;
 	~crit_in_place_data_more_recent_or_equal_to() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
@@ -205,7 +221,9 @@ namespace libdar
     public:
 	crit_in_place_data_bigger() = default;
 	crit_in_place_data_bigger(const crit_in_place_data_bigger & ref) = default;
+	crit_in_place_data_bigger(crit_in_place_data_bigger && ref) = default;
 	crit_in_place_data_bigger & operator = (const crit_in_place_data_bigger & ref) = default;
+	crit_in_place_data_bigger & operator = (crit_in_place_data_bigger && ref) = default;
 	~crit_in_place_data_bigger() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
@@ -223,7 +241,9 @@ namespace libdar
     public:
 	crit_in_place_data_saved() = default;
 	crit_in_place_data_saved(const crit_in_place_data_saved & ref) = default;
+	crit_in_place_data_saved(crit_in_place_data_saved && ref) = default;
 	crit_in_place_data_saved & operator = (const crit_in_place_data_saved & ref) = default;
+	crit_in_place_data_saved & operator = (crit_in_place_data_saved && ref) = default;
 	~crit_in_place_data_saved() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
@@ -238,7 +258,9 @@ namespace libdar
     public:
 	crit_in_place_data_dirty() = default;
 	crit_in_place_data_dirty(const crit_in_place_data_dirty & ref) = default;
+	crit_in_place_data_dirty(crit_in_place_data_dirty && ref) = default;
 	crit_in_place_data_dirty & operator = (const crit_in_place_data_dirty & ref) = default;
+	crit_in_place_data_dirty & operator = (crit_in_place_data_dirty && ref) = default;
 	~crit_in_place_data_dirty() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
@@ -252,7 +274,9 @@ namespace libdar
     public:
 	crit_in_place_data_sparse() = default;
 	crit_in_place_data_sparse(const crit_in_place_data_sparse & ref) = default;
+	crit_in_place_data_sparse(crit_in_place_data_sparse && ref) = default;
 	crit_in_place_data_sparse & operator = (const crit_in_place_data_sparse & ref) = default;
+	crit_in_place_data_sparse & operator = (crit_in_place_data_sparse && ref) = default;
 	~crit_in_place_data_sparse() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
@@ -267,7 +291,9 @@ namespace libdar
     public:
 	crit_in_place_has_delta_sig() = default;
 	crit_in_place_has_delta_sig(const crit_in_place_has_delta_sig & ref) = default;
+	crit_in_place_has_delta_sig(crit_in_place_has_delta_sig && ref) = default;
 	crit_in_place_has_delta_sig & operator = (const crit_in_place_has_delta_sig & ref) = default;
+	crit_in_place_has_delta_sig & operator = (crit_in_place_has_delta_sig && ref) = default;
 	~crit_in_place_has_delta_sig() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
@@ -283,7 +309,9 @@ namespace libdar
     public:
 	crit_in_place_EA_present() = default;
 	crit_in_place_EA_present(const crit_in_place_EA_present & ref) = default;
+	crit_in_place_EA_present(crit_in_place_EA_present && ref) = default;
 	crit_in_place_EA_present & operator = (const crit_in_place_EA_present & ref) = default;
+	crit_in_place_EA_present & operator = (crit_in_place_EA_present && ref) = default;
 	~crit_in_place_EA_present() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override
@@ -307,7 +335,9 @@ namespace libdar
     public:
 	crit_in_place_EA_more_recent(const infinint & hourshift = 0) : x_hourshift(hourshift) {};
 	crit_in_place_EA_more_recent(const crit_in_place_EA_more_recent & ref) = default;
+	crit_in_place_EA_more_recent(crit_in_place_EA_more_recent && ref) = default;
 	crit_in_place_EA_more_recent & operator = (const crit_in_place_EA_more_recent & ref) = default;
+	crit_in_place_EA_more_recent & operator = (crit_in_place_EA_more_recent && ref) = default;
 	~crit_in_place_EA_more_recent() = default;
 
 
@@ -329,7 +359,9 @@ namespace libdar
     public:
 	crit_in_place_EA_more_recent_or_equal_to(const infinint & date, const infinint & hourshift = 0) : x_hourshift(hourshift), x_date(date) {};
 	crit_in_place_EA_more_recent_or_equal_to(const crit_in_place_EA_more_recent_or_equal_to & ref) = default;
+	crit_in_place_EA_more_recent_or_equal_to(crit_in_place_EA_more_recent_or_equal_to && ref) = default;
 	crit_in_place_EA_more_recent_or_equal_to & operator = (const crit_in_place_EA_more_recent_or_equal_to & ref) = default;
+	crit_in_place_EA_more_recent_or_equal_to & operator = (crit_in_place_EA_more_recent_or_equal_to && ref) = default;
 	~crit_in_place_EA_more_recent_or_equal_to() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
@@ -350,7 +382,9 @@ namespace libdar
     public:
 	crit_in_place_more_EA() = default;
 	crit_in_place_more_EA(const crit_in_place_more_EA & ref) = default;
+	crit_in_place_more_EA(crit_in_place_more_EA && ref) = default;
 	crit_in_place_more_EA & operator = (const crit_in_place_more_EA & ref) = default;
+	crit_in_place_more_EA & operator = (crit_in_place_more_EA && ref) = default;
 	~crit_in_place_more_EA() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
@@ -368,7 +402,9 @@ namespace libdar
     public:
 	crit_in_place_EA_bigger() = default;
 	crit_in_place_EA_bigger(const crit_in_place_EA_bigger & ref) = default;
+	crit_in_place_EA_bigger(crit_in_place_EA_bigger && ref) = default;
 	crit_in_place_EA_bigger & operator = (const crit_in_place_EA_bigger & ref) = default;
+	crit_in_place_EA_bigger & operator = (crit_in_place_EA_bigger && ref) = default;
 	~crit_in_place_EA_bigger() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
@@ -385,7 +421,9 @@ namespace libdar
     public:
 	crit_in_place_EA_saved() = default;
 	crit_in_place_EA_saved(const crit_in_place_EA_saved & ref) = default;
+	crit_in_place_EA_saved(crit_in_place_EA_saved && ref) = default;
 	crit_in_place_EA_saved & operator = (const crit_in_place_EA_saved & ref) = default;
+	crit_in_place_EA_saved & operator = (crit_in_place_EA_saved && ref) = default;
 	~crit_in_place_EA_saved() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
@@ -403,7 +441,9 @@ namespace libdar
     public:
 	crit_same_type() = default;
 	crit_same_type(const crit_same_type & ref) = default;
+	crit_same_type(crit_same_type && ref) = default;
 	crit_same_type & operator = (const crit_same_type & ref) = default;
+	crit_same_type & operator = (crit_same_type && ref) = default;
 	~crit_same_type() = default;
 
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
@@ -417,8 +457,10 @@ namespace libdar
     {
     public:
 	crit_not(const criterium & crit) { x_crit = crit.clone(); if(x_crit == nullptr) throw Ememory("crit_not::crit_not"); };
-	crit_not(const crit_not & ref) : criterium (ref) { copy_from(ref); };
+	crit_not(const crit_not & ref): criterium(ref) { copy_from(ref); };
+	crit_not(crit_not && ref): criterium(std::move(ref)) { x_crit = nullptr; tools_swap(x_crit, ref.x_crit); };
 	crit_not & operator = (const crit_not & ref) { destroy(); copy_from(ref); return *this; };
+	crit_not & operator = (crit_not && ref) { criterium::operator = (std::move(ref)); tools_swap(x_crit, ref.x_crit); return *this; };
 	~crit_not() { destroy(); };
 
 	virtual bool evaluate(const cat_nomme & first, const cat_nomme & second) const override { return ! x_crit->evaluate(first, second); };
@@ -439,7 +481,9 @@ namespace libdar
     public:
 	crit_and() { clear(); };
 	crit_and(const crit_and & ref) : criterium(ref) { copy_from(ref); };
+	crit_and(crit_and && ref) = default; // moving the vector<criterium *> while the pointed to object are untouched
 	crit_and & operator = (const crit_and & ref) { detruit(); copy_from(ref); return *this; };
+	crit_and & operator = (crit_and && ref) = default; // moving the vector<criterium *> while the pointed to object are untouched
 	~crit_and() { detruit(); };
 
 	void add_crit(const criterium & ref);
@@ -464,7 +508,9 @@ namespace libdar
     public:
 	crit_or() { clear(); };
 	crit_or(const crit_or & ref) = default;
+	crit_or(crit_or && ref) = default;
 	crit_or & operator = (const crit_or & ref) = default;
+	crit_or & operator = (crit_or && ref) = default;
 	~crit_or() = default;
 
 	virtual bool evaluate(const cat_nomme & first, const cat_nomme & second) const override;
@@ -477,7 +523,9 @@ namespace libdar
     public:
 	crit_invert(const criterium & crit) : crit_not(crit) {};
 	crit_invert(const crit_invert & ref) = default;
+	crit_invert(crit_invert && ref) = default;
 	crit_invert & operator = (const crit_invert & ref) = default;
+	crit_invert & operator = (crit_invert && ref) = default;
 	~crit_invert() = default;
 
 	virtual bool evaluate(const cat_nomme & first, const cat_nomme & second) const override { return x_crit->evaluate(second, first); };
