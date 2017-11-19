@@ -75,7 +75,9 @@ namespace libdar
     public:
 	database_header() { version = database_version; options = HEADER_OPTION_NONE; algo = gzip; };
 	database_header(const database_header & ref) = default;
-	database_header & operator = (const database_header & re) = default;
+	database_header(database_header && ref) noexcept = default;
+	database_header & operator = (const database_header & ref) = default;
+	database_header & operator = (database_header && ref) noexcept = default;
 	~database_header() = default;
 
 	void read(generic_file & f);
