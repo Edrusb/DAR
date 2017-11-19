@@ -247,22 +247,23 @@ namespace libdar
         return *this;
     }
 
-    cat_mirage & cat_mirage::operator = (cat_mirage && ref)
+    cat_mirage & cat_mirage::operator = (cat_mirage && ref) noexcept
     {
-        if(ref.star_ref == nullptr)
-            throw SRC_BUG;
-
 	    // moving the cat_nomme part of these objects
 	cat_nomme::operator = (move(ref));
 
-	if(ref.star_ref != star_ref)
+	if(ref.star_ref != nullptr)
 	{
-	    ref.star_ref->add_ref(this);
-	    star_ref->drop_ref(this);
-	    star_ref = ref.star_ref;
+	    if(ref.star_ref != star_ref)
+	    {
+		ref.star_ref->add_ref(this);
+		star_ref->drop_ref(this);
+		star_ref = ref.star_ref;
+	    }
 	}
+	    // else this is a bug condition, but we are inside an noexcept method
 
-        return *this;
+	return *this;
     }
 
     void cat_mirage::post_constructor(const pile_descriptor & pdesc)

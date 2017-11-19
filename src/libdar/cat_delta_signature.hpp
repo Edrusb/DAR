@@ -101,13 +101,13 @@ namespace libdar
 	cat_delta_signature(const cat_delta_signature & ref) { init(); copy_from(ref); };
 
 	    /// move constructor
-	cat_delta_signature(cat_delta_signature && ref) { init(); move_from(std::move(ref)); };
+	cat_delta_signature(cat_delta_signature && ref) noexcept { init(); move_from(std::move(ref)); };
 
 	    /// assignement operator
 	cat_delta_signature & operator = (const cat_delta_signature & ref) { destroy(); init(); copy_from(ref); return *this; };
 
 	    /// move assignment operator
-	cat_delta_signature & operator = (cat_delta_signature && ref) { move_from(std::move(ref)); return *this; };
+	cat_delta_signature & operator = (cat_delta_signature && ref) noexcept { move_from(std::move(ref)); return *this; };
 
 	    /// destructor
 	~cat_delta_signature() { destroy(); };

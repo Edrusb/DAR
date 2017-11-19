@@ -91,7 +91,7 @@ namespace libdar
 	/////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////
 
-    archive_options_read::archive_options_read(archive_options_read && ref)
+    archive_options_read::archive_options_read(archive_options_read && ref) noexcept
 	: x_entrepot(nullptr), x_ref_chem("/"), x_ref_entrepot(nullptr)
     {
 	move_from(std::move(ref));

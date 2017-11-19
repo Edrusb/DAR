@@ -47,9 +47,9 @@ namespace libdar
         cat_nomme(const std::string & name) { xname = name; };
         cat_nomme(const smart_pointer<pile_descriptor> & pdesc, bool small);
 	cat_nomme(const cat_nomme & ref) = default;
-	cat_nomme(cat_nomme && ref) = default;
+	cat_nomme(cat_nomme && ref) noexcept = default;
 	cat_nomme & operator = (const cat_nomme & ref) = default;
-	cat_nomme & operator = (cat_nomme && ref) = default;
+	cat_nomme & operator = (cat_nomme && ref) noexcept = default;
 	virtual ~cat_nomme() = default;
 
 	virtual bool operator == (const cat_entree & ref) const override;

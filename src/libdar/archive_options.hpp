@@ -65,9 +65,9 @@ namespace libdar
 
 	    /// the copy constructor, assignment operator and destructor
 	archive_options_read(const archive_options_read & ref) : x_ref_chem(ref.x_ref_chem) { copy_from(ref); };
-	archive_options_read(archive_options_read && ref);
+	archive_options_read(archive_options_read && ref) noexcept;
 	archive_options_read & operator = (const archive_options_read & ref) { destroy(); copy_from(ref); return *this; };
-	archive_options_read & operator = (archive_options_read && ref) { move_from(std::move(ref)); return *this; };
+	archive_options_read & operator = (archive_options_read && ref) noexcept { move_from(std::move(ref)); return *this; };
 	~archive_options_read() { destroy(); };
 
 
@@ -271,9 +271,9 @@ namespace libdar
 
 	archive_options_create();
 	archive_options_create(const archive_options_create & ref);
-	archive_options_create(archive_options_create && ref) { nullifyptr(); move_from(std::move(ref)); };
+	archive_options_create(archive_options_create && ref) noexcept { nullifyptr(); move_from(std::move(ref)); };
 	archive_options_create & operator = (const archive_options_create & ref) { destroy(); copy_from(ref); return *this; };
-	archive_options_create & operator = (archive_options_create && ref) { move_from(std::move(ref)); return *this; };
+	archive_options_create & operator = (archive_options_create && ref) noexcept { move_from(std::move(ref)); return *this; };
 	~archive_options_create() { destroy(); };
 
 	    /////////////////////////////////////////////////////////////////////
@@ -679,9 +679,9 @@ namespace libdar
     public:
 	archive_options_isolate();
 	archive_options_isolate(const archive_options_isolate & ref);
-	archive_options_isolate(archive_options_isolate && ref) { nullifyptr(); move_from(std::move(ref)); };
+	archive_options_isolate(archive_options_isolate && ref) noexcept { nullifyptr(); move_from(std::move(ref)); };
 	archive_options_isolate & operator = (const archive_options_isolate & ref) { destroy(); copy_from(ref); return *this; };
-	archive_options_isolate & operator = (archive_options_isolate && ref) { move_from(std::move(ref)); return *this; };
+	archive_options_isolate & operator = (archive_options_isolate && ref) noexcept { move_from(std::move(ref)); return *this; };
 	~archive_options_isolate() { destroy(); };
 
 
@@ -864,9 +864,9 @@ namespace libdar
 
 	archive_options_merge() { nullifyptr(); clear(); };
 	archive_options_merge(const archive_options_merge & ref) { copy_from(ref); };
-	archive_options_merge(archive_options_merge && ref) { nullifyptr(); move_from(std::move(ref)); };
+	archive_options_merge(archive_options_merge && ref) noexcept { nullifyptr(); move_from(std::move(ref)); };
 	archive_options_merge & operator = (const archive_options_merge & ref) { destroy(); copy_from(ref); return *this; };
-	archive_options_merge & operator = (archive_options_merge && ref) { move_from(std::move(ref)); return *this; };
+	archive_options_merge & operator = (archive_options_merge && ref) noexcept { move_from(std::move(ref)); return *this; };
 	~archive_options_merge() { destroy(); };
 
 	void clear();
@@ -1132,9 +1132,9 @@ namespace libdar
 
 	archive_options_extract() { nullifyptr(); clear(); };
 	archive_options_extract(const archive_options_extract & ref) { copy_from(ref); };
-	archive_options_extract(archive_options_extract && ref) { nullifyptr(); move_from(std::move(ref)); };
+	archive_options_extract(archive_options_extract && ref) noexcept { nullifyptr(); move_from(std::move(ref)); };
 	archive_options_extract & operator = (const archive_options_extract & ref) { destroy(); copy_from(ref); return *this; };
-	archive_options_extract & operator = (archive_options_extract && ref) { move_from(std::move(ref)); return *this; };
+	archive_options_extract & operator = (archive_options_extract && ref) noexcept { move_from(std::move(ref)); return *this; };
 	~archive_options_extract() { destroy(); };
 
 	void clear();
@@ -1273,9 +1273,9 @@ namespace libdar
     public:
 	archive_options_listing() { nullifyptr(); clear(); };
 	archive_options_listing(const archive_options_listing & ref) { copy_from(ref); };
-	archive_options_listing(archive_options_listing && ref) { nullifyptr(); move_from(std::move(ref)); };
+	archive_options_listing(archive_options_listing && ref) noexcept { nullifyptr(); move_from(std::move(ref)); };
 	archive_options_listing & operator = (const archive_options_listing & ref) { destroy(); copy_from(ref); return *this; };
-	archive_options_listing & operator = (archive_options_listing && ref) { move_from(std::move(ref)); return *this; };
+	archive_options_listing & operator = (archive_options_listing && ref) noexcept { move_from(std::move(ref)); return *this; };
 	~archive_options_listing() { destroy(); };
 
 	void clear();
@@ -1342,9 +1342,9 @@ namespace libdar
     public:
 	archive_options_diff() { nullifyptr(); clear(); };
 	archive_options_diff(const archive_options_diff & ref) { copy_from(ref); };
-	archive_options_diff(archive_options_diff && ref) { nullifyptr(); move_from(std::move(ref)); };
+	archive_options_diff(archive_options_diff && ref) noexcept { nullifyptr(); move_from(std::move(ref)); };
 	archive_options_diff & operator = (const archive_options_diff & ref) { destroy(); copy_from(ref); return *this; };
-	archive_options_diff & operator = (archive_options_diff && ref) { move_from(std::move(ref)); return *this; };
+	archive_options_diff & operator = (archive_options_diff && ref) noexcept { move_from(std::move(ref)); return *this; };
 	~archive_options_diff() { destroy(); };
 
 	void clear();
@@ -1457,9 +1457,9 @@ namespace libdar
     public:
 	archive_options_test() { nullifyptr(); clear(); };
 	archive_options_test(const archive_options_test & ref) { copy_from(ref); };
-	archive_options_test(archive_options_test && ref) { nullifyptr(); move_from(std::move(ref)); };
+	archive_options_test(archive_options_test && ref) noexcept { nullifyptr(); move_from(std::move(ref)); };
 	archive_options_test & operator = (const archive_options_test & ref) { destroy(); copy_from(ref); return *this; };
-	archive_options_test & operator = (archive_options_test && ref) { move_from(std::move(ref)); return *this; };
+	archive_options_test & operator = (archive_options_test && ref) noexcept { move_from(std::move(ref)); return *this; };
 	~archive_options_test() { destroy(); };
 
 	void clear();
@@ -1532,9 +1532,9 @@ namespace libdar
 
 	archive_options_repair();
 	archive_options_repair(const archive_options_repair & ref);
-	archive_options_repair(archive_options_repair && ref) { nullifyptr(); move_from(std::move(ref)); };
+	archive_options_repair(archive_options_repair && ref) noexcept { nullifyptr(); move_from(std::move(ref)); };
 	archive_options_repair & operator = (const archive_options_repair & ref) { destroy(); copy_from(ref); return *this; };
-	archive_options_repair & operator = (archive_options_repair && ref) { move_from(std::move(ref)); return *this; };
+	archive_options_repair & operator = (archive_options_repair && ref) noexcept { move_from(std::move(ref)); return *this; };
 	~archive_options_repair() { destroy(); };
 
 	    /////////////////////////////////////////////////////////////////////

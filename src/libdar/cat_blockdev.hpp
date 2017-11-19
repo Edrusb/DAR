@@ -62,9 +62,9 @@ namespace libdar
 		     bool small) : cat_device(dialog, pdesc, reading_ver, saved, small) {};
 
 	cat_blockdev(const cat_blockdev & ref) = default;
-	cat_blockdev(cat_blockdev && ref) = default;
+	cat_blockdev(cat_blockdev && ref) noexcept = default;
 	cat_blockdev & operator = (const cat_blockdev & ref) = default;
-	cat_blockdev & operator = (cat_blockdev && ref) = default;
+	cat_blockdev & operator = (cat_blockdev && ref) noexcept = default;
 	~cat_blockdev() = default;
 
 	virtual bool operator == (const cat_entree & ref) const override;

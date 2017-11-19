@@ -43,7 +43,7 @@ namespace libdar
 	}
     }
 
-    void testing::free()
+    void testing::free() noexcept
     {
 	if(x_input != nullptr)
 	{
@@ -74,7 +74,7 @@ namespace libdar
 	}
     }
 
-    void testing::move_from(testing && ref)
+    void testing::move_from(testing && ref) noexcept
     {
 	tools_swap(x_input, ref.x_input);
 	tools_swap(x_go_true, ref.x_go_true);

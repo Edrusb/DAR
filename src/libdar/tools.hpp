@@ -949,7 +949,7 @@ namespace libdar
 
 	/// swap variable's values
 
-    template <class T> void tools_swap(T & a, T & b)
+    template <class T> void tools_swap(T & a, T & b) noexcept
     {
 	auto tmp(a);
 	a = b;

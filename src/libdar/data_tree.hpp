@@ -184,7 +184,7 @@ namespace libdar
 	    status_plus() { base = result = nullptr; };
 	    status_plus(const datetime & d, etat p, const crc *xbase, const crc *xresult);
 	    status_plus(const status_plus & ref): status(ref) { copy_from(ref); };
-	    status_plus(status_plus && ref): status(std::move(ref)) { nullifyptr(); move_from(std::move(ref)); };
+	    status_plus(status_plus && ref) noexcept: status(std::move(ref)) { nullifyptr(); move_from(std::move(ref)); };
 	    status_plus & operator = (const status_plus & ref) { detruit(); copy_from(ref); return *this; };
 	    status_plus & operator = (status_plus && ref) noexcept { status_plus::operator = (std::move(ref)); move_from(std::move(ref)); return *this; };
 	    ~status_plus() { detruit(); };

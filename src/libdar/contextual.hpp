@@ -77,9 +77,9 @@ namespace libdar
     public :
 	contextual() { status = ""; };
 	contextual(const contextual & ref) = default;
-	contextual(contextual && ref) = default;
+	contextual(contextual && ref) noexcept = default;
 	contextual & operator = (const contextual & ref) = default;
-	contextual & operator = (contextual && ref) = default;
+	contextual & operator = (contextual && ref) noexcept = default;
 	virtual ~contextual() throw(Ebug) {};
 
 	    /// defines the new contextual value

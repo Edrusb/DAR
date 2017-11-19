@@ -63,7 +63,7 @@ namespace libdar
 	recursive_has_changed = ref.recursive_has_changed;
     }
 
-    cat_directory::cat_directory(cat_directory && ref) : cat_inode(move(ref))
+    cat_directory::cat_directory(cat_directory && ref) noexcept: cat_inode(move(ref))
     {
 	init();
 	recursive_has_changed = move(ref.recursive_has_changed);
@@ -79,10 +79,11 @@ namespace libdar
 	return *this;
     }
 
-    cat_directory & cat_directory::operator = (cat_directory && ref)
+    cat_directory & cat_directory::operator = (cat_directory && ref) noexcept
     {
 	    // this assigns the inode part of the object
  	    // we don't modify the existing subfiles or subdirectories nor we copy them from the reference cat_directory
+	    // to stay coherent with the copy_from operation
 	cat_inode::operator = (move(ref));
 
 	recursive_flag_size_to_update();

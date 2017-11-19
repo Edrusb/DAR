@@ -120,13 +120,13 @@ namespace libdar
 	cat_entree(const cat_entree & ref) = default;
 
 	    // move constructor
-	cat_entree(cat_entree && ref) = default;
+	cat_entree(cat_entree && ref) noexcept = default;
 
 	    // assignment operator is fine too for the same reason
 	cat_entree & operator = (const cat_entree & ref) = default;
 
 	    // move assignment operator
-	cat_entree & operator = (cat_entree && ref) = default;
+	cat_entree & operator = (cat_entree && ref) noexcept = default;
 
 	    /// destructor
         virtual ~cat_entree() throw(Ebug) {};

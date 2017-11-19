@@ -47,9 +47,9 @@ namespace libdar
 
 	crc() = default;
 	crc(const crc & ref) = default;
-	crc(crc && ref) = default;
+	crc(crc && ref) noexcept = default;
 	crc & operator = (const crc & ref) = default;
-	crc & operator = (crc && ref) = default;
+	crc & operator = (crc && ref) noexcept = default;
 	virtual ~crc() = default;
 
 	virtual bool operator == (const crc & ref) const = 0;
@@ -73,9 +73,9 @@ namespace libdar
 	crc_i(const infinint & width);
 	crc_i(const infinint & width, generic_file & f);
 	crc_i(const crc_i & ref) : size(ref.size), cyclic(ref.size) { copy_data_from(ref); pointer = cyclic.begin(); };
-	crc_i(crc_i && ref) = default;
+	crc_i(crc_i && ref) noexcept = default;
 	crc_i & operator = (const crc_i & ref) { copy_from(ref); return *this; };
-	crc_i & operator = (crc_i && ref) = default;
+	crc_i & operator = (crc_i && ref) noexcept = default;
 	~crc_i() = default;
 
 	bool operator == (const crc & ref) const;
@@ -108,9 +108,9 @@ namespace libdar
 	crc_n(U_I width);
 	crc_n(U_I width, generic_file & f);
 	crc_n(const crc_n & ref) { copy_from(ref); };
-	crc_n(crc_n && ref) = default;
+	crc_n(crc_n && ref) noexcept = default;
 	crc_n & operator = (const crc_n & ref);
-	crc_n & operator = (crc_n && ref) = default;
+	crc_n & operator = (crc_n && ref) noexcept = default;
 	~crc_n() { destroy(); };
 
 	bool operator == (const crc & ref) const;
