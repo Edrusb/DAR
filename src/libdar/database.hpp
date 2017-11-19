@@ -68,7 +68,7 @@ namespace libdar
 	database & operator = (const database & ref) = delete;
 
 	    /// disabling move assignment operator
-	database & operator = (database && ref) = deelte
+	database & operator = (database && ref) = delete;
 
 	    /// database destructor (no implicit file saving)
 	~database();
