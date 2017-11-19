@@ -67,8 +67,14 @@ namespace libdar
 	    /// copy constructor
 	entrepot(const entrepot & ref) = default;
 
+	    /// move constructor
+	entrepot(entrepot && ref) noexcept = default;
+
 	    /// assignment operator
 	entrepot & operator = (const entrepot & ref) = default;
+
+	    /// move operator
+	entrepot & operator = (entrepot && ref) noexcept = default;
 
 	    /// destructor
 	virtual ~entrepot() = default;
