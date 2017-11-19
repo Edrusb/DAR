@@ -61,8 +61,14 @@ namespace libdar
 	    /// disabling copy constructor
 	database(const database & ref) = delete;
 
+	    /// disabling move constructor
+	database(database && ref) = delete;
+
 	    /// disabling assignement operator
 	database & operator = (const database & ref) = delete;
+
+	    /// disabling move assignment operator
+	database & operator = (database && ref) = deelte
 
 	    /// database destructor (no implicit file saving)
 	~database();
