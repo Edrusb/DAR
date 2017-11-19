@@ -74,7 +74,9 @@ namespace libdar
 			 const std::string & sftp_known_hosts,   //< location of the known_hosts file (empty string to disable this security check)
 			 U_I waiting_time);
 	entrepot_libcurl(const entrepot_libcurl & ref) = default;
+	entrepot_libcurl(entrepot_libcurl && ref) noexcept = default;
 	entrepot_libcurl & operator = (const entrepot_libcurl & ref) = default;
+	entrepot_libcurl & operator = (entrepot_libcurl && ref) noexcept = default;
 	~entrepot_libcurl() throw () {};
 
 
