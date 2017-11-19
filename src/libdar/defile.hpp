@@ -49,7 +49,9 @@ namespace libdar
     public :
         defile(const path &racine) : chemin(racine) { init = true; };
 	defile(const defile & ref) = default;
+	defile(defile && ref) noexcept = default;
 	defile & operator = (const defile & ref) = default;
+	defile & operator = (defile && ref) noexcept = default;
 	~defile() = default;
 
         void enfile(const cat_entree *e);
