@@ -72,7 +72,9 @@ namespace libdar
 	datetime(generic_file &x, archive_version ver) { read(x, ver); };
 
 	datetime(const datetime & ref) = default;
+	datetime(datetime && ref) noexcept = default;
 	datetime & operator = (const datetime & ref) = default;
+	datetime & operator = (datetime && ref) noexcept = default;
 	~datetime() = default;
 
 
