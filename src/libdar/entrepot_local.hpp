@@ -50,6 +50,7 @@
 #include "hash_fichier.hpp"
 #include "etage.hpp"
 #include "path.hpp"
+#include "tools.hpp"
 
 namespace libdar
 {
@@ -65,7 +66,9 @@ namespace libdar
     public:
 	entrepot_local(const std::string & user, const std::string & group, bool x_furtive_mode);
 	entrepot_local(const entrepot_local & ref): entrepot(ref) { copy_from(ref); };
+	entrepot_local(entrepot_local && ref) noexcept: entrepot(std::move(ref)) { nullifyptr(); move_from(std::move(ref)); };
 	entrepot_local & operator = (const entrepot_local & ref);
+	entrepot_local & operator = (entrepot_local && ref) noexcept { entrepot::operator = (std::move(ref)); move_from(std::move(ref)); return *this; };
 	~entrepot_local() { detruit(); };
 
 	virtual std::string get_url() const override { return std::string("file://") + get_full_path().display(); };
@@ -91,7 +94,9 @@ namespace libdar
 	bool furtive_mode;
 	etage *contents;
 
+	void nullifyptr() noexcept { contents = nullptr; };
 	void copy_from(const entrepot_local & ref) { furtive_mode = ref.furtive_mode; contents = nullptr; };
+	void move_from(entrepot_local && ref) noexcept { tools_swap(contents, ref.contents), tools_swap(furtive_mode, ref.furtive_mode); };
 	void detruit() { if(contents != nullptr) { delete contents; contents = nullptr; } };
     };
 
