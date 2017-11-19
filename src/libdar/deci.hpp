@@ -30,6 +30,7 @@
 #include <iostream>
 #include "storage.hpp"
 #include "infinint.hpp"
+#include "tools.hpp"
 
 namespace libdar
 {
@@ -58,16 +59,19 @@ namespace libdar
         deci(const infinint & x);
 
 	    /// copy constructor
-        deci(const deci & ref)
-	{ copy_from(ref); };
+        deci(const deci & ref) { copy_from(ref); };
+
+	    /// move constructor
+	deci(deci && ref) noexcept { decimales = nullptr; tools_swap(decimales, ref.decimales); };
 
 	    /// assignment operator
-        deci & operator = (const deci & ref)
-	{ detruit(); copy_from(ref); return *this; };
+        deci & operator = (const deci & ref) { detruit(); copy_from(ref); return *this; };
+
+	    /// assignment move operator
+	deci & operator = (deci && ref) noexcept { tools_swap(decimales, ref.decimales); return *this; };
 
 	    /// destructor
-        ~deci()
-	{ detruit(); };
+        ~deci() { detruit(); };
 
 
 	    /// this produce a infinint from the decimal stored in the current object
