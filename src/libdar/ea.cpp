@@ -73,9 +73,23 @@ namespace libdar
         alire = attr.begin();
     }
 
+    ea_attributs::ea_attributs(ea_attributs && ref) noexcept
+    {
+        attr = move(ref.attr);
+        alire = attr.begin();
+    }
+
     ea_attributs & ea_attributs::operator = (const ea_attributs & ref)
     {
         attr = ref.attr;
+        alire = attr.begin();
+
+	return *this;
+    }
+
+    ea_attributs & ea_attributs::operator = (ea_attributs && ref) noexcept
+    {
+        attr = move(ref.attr);
         alire = attr.begin();
 
 	return *this;
