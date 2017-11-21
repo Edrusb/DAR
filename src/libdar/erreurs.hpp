@@ -58,8 +58,14 @@ namespace libdar
 	    /// copy constructor
 	Egeneric(const Egeneric & ref) = default;
 
+	    /// move constructor
+	Egeneric(Egeneric && ref) = default;
+
 	    /// assignment operator
 	Egeneric & operator = (const Egeneric & ref) = default;
+
+	    /// move operator
+	Egeneric & operator = (Egeneric && ref) = default;
 
 	    /// the destructor
         virtual ~Egeneric() = default;
@@ -120,7 +126,9 @@ namespace libdar
     public:
         Ememory(const std::string &source) : Egeneric(source, dar_gettext("Lack of Memory")) {};
 	Ememory(const Ememory & ref) = default;
+	Ememory(Ememory && ref) = default;
 	Ememory & operator = (const Ememory & ref) = default;
+	Ememory & operator = (Ememory && ref) = default;
 	~Ememory() = default;
 
     protected:
@@ -135,7 +143,9 @@ namespace libdar
     public:
         Esecu_memory(const std::string &source) : Ememory(source, dar_gettext("Lack of Secured Memory")) {};
 	Esecu_memory(const Esecu_memory & ref) = default;
+	Esecu_memory(Esecu_memory && ref) = default;
 	Esecu_memory & operator = (const Esecu_memory & ref) = default;
+	Esecu_memory & operator = (Esecu_memory && ref) = default;
 	~Esecu_memory() = default;
 
     protected:
@@ -152,7 +162,9 @@ namespace libdar
     public :
         Ebug(const std::string & file, S_I line);
 	Ebug(const Ebug & ref) = default;
+	Ebug(Ebug && ref) = default;
 	Ebug & operator = (const Ebug & ref) = default;
+	Ebug & operator = (Ebug && ref) = default;
 	~Ebug() = default;
 
 	using Egeneric::stack; // to avoid warning with clang
@@ -171,7 +183,9 @@ namespace libdar
     public :
         Einfinint(const std::string & source, const std::string & message) : Egeneric(source, message) {};
 	Einfinint(const Einfinint & ref) = default;
+	Einfinint(Einfinint && ref) = default;
 	Einfinint & operator = (const Einfinint & ref) = default;
+	Einfinint & operator = (Einfinint && ref) = default;
 	~Einfinint() = default;
 
     protected :
@@ -187,7 +201,9 @@ namespace libdar
     public :
         Elimitint() : Egeneric("", dar_gettext("Cannot handle such a too large integer. Use a full version of libdar (compiled to rely on the \"infinint\" integer type) to solve this problem")) {};
 	Elimitint(const Elimitint & ref) = default;
+	Elimitint(Elimitint && ref) = default;
 	Elimitint & operator = (const Elimitint & ref) = default;
+	Elimitint & operator = (Elimitint && ref) = default;
 	~Elimitint() = default;
 
     protected :
@@ -203,7 +219,9 @@ namespace libdar
     public :
         Erange(const std::string & source, const std::string & message) : Egeneric(source, message) {};
 	Erange(const Erange & ref) = default;
+	Erange(Erange && ref) = default;
 	Erange & operator = (const Erange & ref) = default;
+	Erange & operator = (Erange && ref) = default;
 	~Erange() = default;
 
     protected :
@@ -220,7 +238,9 @@ namespace libdar
     public :
         Edeci(const std::string & source, const std::string & message) : Egeneric(source, message) {};
 	Edeci(const Edeci & ref) = default;
+	Edeci(Edeci && ref) = default;
 	Edeci & operator = (const Edeci & ref) = default;
+	Edeci & operator = (Edeci && ref) = default;
 	~Edeci() = default;
 
     protected :
@@ -236,7 +256,9 @@ namespace libdar
     public :
         Efeature(const std::string & message) : Egeneric("", message) {};
 	Efeature(const Efeature & ref) = default;
+	Efeature(Efeature && ref) = default;
 	Efeature & operator = (const Efeature & ref) = default;
+	Efeature & operator = (Efeature && ref) = default;
 	~Efeature() = default;
 
     protected :
@@ -252,7 +274,9 @@ namespace libdar
     public :
         Ehardware(const std::string & source, const std::string & message) : Egeneric(source, message) {};
 	Ehardware(const Ehardware & ref) = default;
+	Ehardware(Ehardware && ref) = default;
 	Ehardware & operator = (const Ehardware & ref) = default;
+	Ehardware & operator = (Ehardware && ref) = default;
 	~Ehardware() = default;
 
     protected :
@@ -268,7 +292,9 @@ namespace libdar
     public :
         Euser_abort(const std::string & msg) : Egeneric("",msg) {};
 	Euser_abort(const Euser_abort & ref) = default;
+	Euser_abort(Euser_abort && ref) = default;
 	Euser_abort & operator = (const Euser_abort & ref) = default;
+	Euser_abort & operator = (Euser_abort && ref) = default;
 	~Euser_abort() = default;
 
     protected :
@@ -285,7 +311,9 @@ namespace libdar
     public :
         Edata(const std::string & msg) : Egeneric("", msg) {};
 	Edata(const Edata & ref) = default;
+	Edata(Edata && ref) = default;
 	Edata & operator = (const Edata & ref) = default;
+	Edata & operator = (Edata && ref) = default;
 	~Edata() = default;
 
     protected :
@@ -301,7 +329,9 @@ namespace libdar
     public :
         Escript(const std::string & source, const std::string & msg) : Egeneric(source ,msg) {};
 	Escript(const Escript & ref) = default;
+	Escript(Escript && ref) = default;
 	Escript & operator = (const Escript & ref) = default;
+	Escript & operator = (Escript && ref) = default;
 	~Escript() = default;
 
     protected :
@@ -317,7 +347,9 @@ namespace libdar
     public :
         Elibcall(const std::string & source, const std::string & msg) : Egeneric(source ,msg) {};
 	Elibcall(const Elibcall & ref) = default;
+	Elibcall(Elibcall && ref) = default;
 	Elibcall & operator = (const Elibcall & ref) = default;
+	Elibcall & operator = (Elibcall && ref) = default;
 	~Elibcall() = default;
 
     protected :
@@ -333,7 +365,9 @@ namespace libdar
     public :
         Ecompilation(const std::string & msg) : Egeneric("" ,msg) {};
 	Ecompilation(const Ecompilation & ref) = default;
+	Ecompilation(Ecompilation && ref) = default;
 	Ecompilation & operator = (const Ecompilation & ref) = default;
+	Ecompilation & operator = (Ecompilation && ref) = default;
 	~Ecompilation() = default;
 
     protected :
@@ -348,7 +382,9 @@ namespace libdar
     public:
 	Ethread_cancel(bool now, U_64 x_flag) : Egeneric("", now ? dar_gettext("Thread cancellation requested, aborting as soon as possible") : dar_gettext("Thread cancellation requested, aborting as properly as possible")) { immediate = now; flag = x_flag; };
 	Ethread_cancel(const Ethread_cancel & ref) = default;
+	Ethread_cancel(Ethread_cancel && ref) = default;
 	Ethread_cancel & operator = (const Ethread_cancel & ref) = default;
+	Ethread_cancel & operator = (Ethread_cancel && ref) = default;
 	~Ethread_cancel() = default;
 
 	bool immediate_cancel() const { return immediate; };
@@ -376,7 +412,9 @@ namespace libdar
 
 	Esystem(const std::string & source, const std::string & message, io_error code);
 	Esystem(const Esystem & ref) = default;
+	Esystem(Esystem && ref) = default;
 	Esystem & operator = (const Esystem & ref) = default;
+	Esystem & operator = (Esystem && ref) = default;
 	~Esystem() = default;
 
 	io_error get_code() const { return x_code; };
@@ -395,7 +433,9 @@ namespace libdar
     public:
 	Enet_auth(const std::string & message): Egeneric("on the network", message) {};
 	Enet_auth(const Enet_auth & ref) = default;
+	Enet_auth(Enet_auth && ref) = default;
 	Enet_auth & operator = (const Enet_auth & ref) = default;
+	Enet_auth & operator = (Enet_auth && ref) = default;
 	~Enet_auth() = default;
 
     protected:

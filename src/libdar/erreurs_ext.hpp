@@ -28,6 +28,7 @@
 
 #include "erreurs.hpp"
 #include "infinint.hpp"
+#include "tools.hpp"
 
 namespace libdar
 {
@@ -43,7 +44,9 @@ namespace libdar
     public :
 	Ethread_cancel_with_attr(bool now, U_64 x_flag, const infinint & attr);
 	Ethread_cancel_with_attr(const Ethread_cancel_with_attr & ref): Ethread_cancel(ref) { copy_from(ref); };
+	Ethread_cancel_with_attr(Ethread_cancel_with_attr && ref): Ethread_cancel(std::move(ref)) { x_attr = nullptr; tools_swap(x_attr, ref.x_attr); };
 	Ethread_cancel_with_attr & operator = (const Ethread_cancel_with_attr & ref) { detruit(); copy_from(ref); return *this; };
+	Ethread_cancel_with_attr & operator = (Ethread_cancel_with_attr && ref);
 	~Ethread_cancel_with_attr() { detruit(); };
 
 	const infinint get_attr() const { return *x_attr; };
