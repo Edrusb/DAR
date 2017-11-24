@@ -75,7 +75,9 @@ namespace libdar
 			  bool x_ignore_unknown,
 			  const fsa_scope & scope);
         filesystem_backup(const filesystem_backup & ref) = delete;
+	filesystem_backup(filesystem_backup && ref) = delete;
         filesystem_backup & operator = (const filesystem_backup & ref) = delete;
+	filesystem_backup & operator = (filesystem_backup && ref) = delete;
         ~filesystem_backup() { detruire(); };
 
         void reset_read(infinint & root_fs_device);
