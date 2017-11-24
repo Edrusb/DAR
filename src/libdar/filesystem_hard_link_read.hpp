@@ -74,7 +74,9 @@ namespace libdar
 	    // assignement are forbidden for this class:
 
 	filesystem_hard_link_read(const filesystem_hard_link_read & ref) = delete;
+	filesystem_hard_link_read(filesystem_hard_link_read && ref) = delete;
 	filesystem_hard_link_read & operator = (const filesystem_hard_link_read & ref) = delete;
+	filesystem_hard_link_read & operator = (filesystem_hard_link_read && ref) = delete;
 
 	virtual ~filesystem_hard_link_read() = default;
 
