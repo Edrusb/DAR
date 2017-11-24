@@ -70,7 +70,9 @@ namespace libdar
 			bool furtive_read_mode,
 			const fsa_scope & scope);
         filesystem_diff(const filesystem_diff & ref) = delete;
+	filesystem_diff(filesystem_diff && ref) = delete;
         filesystem_diff & operator = (const filesystem_diff & ref) = delete;
+	filesystem_diff & operator = (filesystem_diff && ref) = delete;
         ~filesystem_diff() { detruire(); };
 
         void reset_read();
