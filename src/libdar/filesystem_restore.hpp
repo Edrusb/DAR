@@ -77,8 +77,12 @@ namespace libdar
 			   const fsa_scope & scope);
 	    /// copy constructor is forbidden
         filesystem_restore(const filesystem_restore & ref) = delete;
+	    /// move constructor is forbidden
+	filesystem_restore(filesystem_restore && ref) = delete;
 	    /// assignment operator is forbidden
         filesystem_restore & operator = (const filesystem_restore  & ref) = delete;
+	    /// move operator is forbidden
+	filesystem_restore & operator = (filesystem_restore && ref) = delete;
 	    /// destructor
         ~filesystem_restore() { restore_stack_dir_ownership(); detruire(); };
 
