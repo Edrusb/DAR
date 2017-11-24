@@ -66,7 +66,9 @@ namespace libdar
     public:
 	filesystem_hard_link_write(user_interaction & dialog) : mem_ui(& dialog) { corres_write.clear(); };
 	filesystem_hard_link_write(const filesystem_hard_link_write & ref) = delete;
+	filesystem_hard_link_write(filesystem_hard_link_write && ref) = delete;
 	filesystem_hard_link_write & operator = (const filesystem_hard_link_write & ref) = delete;
+	filesystem_hard_link_write & operator = (filesystem_hard_link_write && ref) = delete;
 	~filesystem_hard_link_write() = default;
 
         void write_hard_linked_target_if_not_set(const cat_mirage *ref, const std::string & chemin);
