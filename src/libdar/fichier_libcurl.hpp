@@ -81,9 +81,15 @@ namespace libdar
 	    ///\note because we inherit from libthreadar::thread that has not copy constructor
 	fichier_libcurl(const fichier_libcurl & ref) = delete;
 
+	    /// no move constructor
+	fichier_libcurl(fichier_libcurl && ref) = delete;
+
 	    /// no assignment operator
 	    ///\note because we inherit from libthreadar::thread that has not copy constructor
 	fichier_libcurl & operator = (const fichier_libcurl & ref) = delete;
+
+	    /// no move operator
+	fichier_libcurl & operator = (fichier_libcurl && ref) = delete;
 
 	    /// destructor
 	~fichier_libcurl() noexcept { detruit(); };
