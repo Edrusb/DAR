@@ -105,7 +105,9 @@ namespace libdar
 	escape(generic_file *below,                           //< "Below" is the generic file that holds the escaped data
 	       const std::set<sequence_type> & x_unjumpable); //< a set of marks that can never been jumped over when skipping for the next mark of a any given type.
 	escape(const escape & ref) : generic_file(ref) { copy_from(ref); };
+	escape(escape && ref) noexcept : generic_file(std::move(ref)) { nullifyptr(); move_from(std::move(ref)); };
 	escape & operator = (const escape & ref);
+	escape & operator = (escape && ref) noexcept { generic_file::operator = (std::move(ref)); move_from(std::move(ref)); return *this; };
 	~escape();
 
 	    // escape specific routines
@@ -155,9 +157,9 @@ namespace libdar
 	    //-- constants
 
 	    /// total lenght of the escape sequence
-	static const U_I ESCAPE_SEQUENCE_LENGTH = 6;
-	static const U_I WRITE_BUFFER_SIZE = 2*ESCAPE_SEQUENCE_LENGTH;
-	static const U_I READ_BUFFER_SIZE = MAX_BUFFER_SIZE;
+	static constexpr U_I ESCAPE_SEQUENCE_LENGTH = 6;
+	static constexpr U_I WRITE_BUFFER_SIZE = 2*ESCAPE_SEQUENCE_LENGTH;
+	static constexpr U_I READ_BUFFER_SIZE = MAX_BUFFER_SIZE;
 	static const infinint READ_BUFFER_SIZE_INFININT;
 
 	    /// escape sequence value
@@ -206,7 +208,9 @@ namespace libdar
 		throw SRC_BUG;
 	    }
 	};
+	void nullifyptr() noexcept { x_below = nullptr; };
 	void copy_from(const escape & ref);
+	void move_from(escape && ref) noexcept;
 	bool mini_read_buffer(); //< returns true if it could end having at least ESCAPE_SEQUENCE_LENGTH bytes in read_buffer, false else (EOF reached).
 
 	    //-- static routine(s)

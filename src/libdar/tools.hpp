@@ -956,6 +956,13 @@ namespace libdar
 	b = tmp;
     }
 
+    template <class T> void tools_swap_array(T* a, T* b) noexcept
+    {
+	auto tmp(a);
+	a = b;
+	b = tmp;
+    }
+
 } /// end of namespace
 
 #endif
