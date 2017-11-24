@@ -70,13 +70,19 @@ namespace libdar
 		      bool furtive_mode);
 	fichier_local(const std::string & chemin, bool furtive_mode = false); // builds a read-only object
 
-	    // copy constructor
+	    /// copy constructor
 	fichier_local(const fichier_local & ref) : fichier_global(ref) { copy_from(ref); };
 
-	    // assignment operator
-	fichier_local & operator = (const fichier_local & ref) { detruit(); copy_parent_from(ref); copy_from(ref); return *this; };
+	    /// move constructor
+	fichier_local(fichier_local && ref) noexcept: fichier_global(std::move(ref)) { move_from(std::move(ref)); };
 
-	    // destructor
+	    /// assignment operator
+	fichier_local & operator = (const fichier_local & ref) { detruit(); fichier_local::operator = (ref); copy_from(ref); return *this; };
+
+	    /// move operator
+	fichier_local & operator = (fichier_local && ref) noexcept { fichier_global::operator = (std::move(ref)); move_from(std::move(ref)); return *this; };
+
+	    /// destructor
 	~fichier_local() { detruit(); };
 
 
@@ -127,7 +133,7 @@ namespace libdar
 		  bool furtive_mode);
 
 	void copy_from(const fichier_local & ref);
-	void copy_parent_from(const fichier_local & ref);
+	void move_from(fichier_local && ref) noexcept;
 	void detruit() { if(filedesc >= 0) close(filedesc); filedesc = -1; };
 	int advise_to_int(advise arg) const;
 

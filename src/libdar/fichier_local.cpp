@@ -462,11 +462,10 @@ namespace libdar
 	}
     }
 
-    void fichier_local::copy_parent_from(const fichier_local & ref)
+    void fichier_local::move_from(fichier_local && ref) noexcept
     {
-	fichier_global *me = this;
-	const fichier_global *you = &ref;
-	*me = *you;
+	tools_swap(filedesc, ref.filedesc);
+	tools_swap(adv, ref.adv);
     }
 
     int fichier_local::advise_to_int(advise arg) const
