@@ -80,13 +80,16 @@ namespace libdar
 								       disk_full(false) {};
 
 	    /// copy constructor
-	fichier_global(const fichier_global & ref) : generic_file(ref),
-						     thread_cancellation(ref),
-						     mem_ui(ref),
-						     disk_full(ref.disk_full) {};
+	fichier_global(const fichier_global & ref) = default;
 
-	    // assignment operator
+	    /// move constructor
+	fichier_global(fichier_global && ref) noexcept = default;
+
+	    /// assignment operator
 	fichier_global & operator = (const fichier_global & ref) = default;
+
+	    /// move operator
+	fichier_global & operator = (fichier_global && ref) noexcept = default;
 
 	    // destructor
 	~fichier_global() = default;
