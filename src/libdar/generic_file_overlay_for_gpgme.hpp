@@ -52,8 +52,14 @@ namespace libdar
 	    /// no copy constructor allowed
 	generic_file_overlay_for_gpgme(const generic_file_overlay_for_gpgme & ref) = delete;
 
+	    /// no move constructor allowed
+	generic_file_overlay_for_gpgme(generic_file_overlay_for_gpgme && re) noexcept = delete;
+
 	    /// no asignment operator
-	generic_file_overlay_for_gpgme operator = (const generic_file_overlay_for_gpgme & ref) = delete;
+	generic_file_overlay_for_gpgme & operator = (const generic_file_overlay_for_gpgme & ref) = delete;
+
+	    // no move operator
+	generic_file_overlay_for_gpgme & operator = (generic_file_overlay_for_gpgme && ref) noexcept = delete;
 
 #ifdef GPGME_SUPPORT
 	    /// destructor
