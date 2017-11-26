@@ -90,7 +90,9 @@ namespace libdar
 		      bool not_used);
 
 	generic_rsync(const generic_rsync & ref) = delete;
+	generic_rsync(generic_rsync && ref) noexcept = delete;
 	generic_rsync & operator = (const generic_rsync & ref) = delete;
+	generic_rsync & operator = (generic_rsync && ref) noexcept = delete;
 
 	~generic_rsync() throw(Ebug);
 
