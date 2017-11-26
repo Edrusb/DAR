@@ -78,7 +78,9 @@ namespace libdar
 	filesystem_specific_attribute(generic_file & f, fsa_family xfam, fsa_nature xnat) { fam = xfam; nat = xnat; };
 
 	filesystem_specific_attribute(const filesystem_specific_attribute & ref) = default;
+	filesystem_specific_attribute(filesystem_specific_attribute && ref) noexcept = default;
 	filesystem_specific_attribute & operator = (const filesystem_specific_attribute & ref) = default;
+	filesystem_specific_attribute & operator = (filesystem_specific_attribute && ref) noexcept = default;
 
 	    /// virtual destructor for inherited classes
 	virtual ~filesystem_specific_attribute() throw(Ebug) {};
