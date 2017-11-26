@@ -505,6 +505,14 @@ namespace libdar
 	active_write = ref.active_write;
     }
 
+    void generic_file::move_from(generic_file && ref) noexcept
+    {
+	rw = move(ref.rw);
+	tools_swap(checksum, ref.checksum);
+	terminated = move(ref.terminated);
+	no_read_ahead = move(ref.no_read_ahead);
+    }
+
     const char * generic_file_get_name(gf_mode mode)
     {
 	const char *ret = nullptr;

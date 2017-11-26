@@ -104,8 +104,14 @@ namespace libdar
 	    /// copy constructor
 	generic_file(const generic_file &ref) { copy_from(ref); };
 
+	    /// move constructor
+	generic_file(generic_file && ref) noexcept { nullifyptr(); move_from(std::move(ref)); };
+
 	    /// assignment operator
 	generic_file & operator = (const generic_file & ref) { destroy(); copy_from(ref); return *this; };
+
+	    /// move operator
+	generic_file & operator = (generic_file && ref) noexcept { move_from(std::move(ref)); return *this; };
 
 	    /// virtual destructor,
 
@@ -335,7 +341,9 @@ namespace libdar
         U_I read_crc(char *a, U_I size);
         void write_crc(const char *a, U_I size);
 	void destroy();
+	void nullifyptr() noexcept { checksum = nullptr; };
 	void copy_from(const generic_file & ref);
+	void move_from(generic_file && ref) noexcept;
     };
 
 	/// @}
