@@ -53,7 +53,9 @@ namespace libdar
 	generic_to_global_file(user_interaction & dialog, generic_file *d, gf_mode mode): fichier_global(dialog, mode) { if(d == nullptr) throw SRC_BUG; if(d->get_mode() != gf_read_write && d->get_mode() != mode) throw SRC_BUG; data = d; };
 
 	generic_to_global_file(const generic_to_global_file & ref) = default;
+	generic_to_global_file(generic_to_global_file && ref) noexcept = default;
 	generic_to_global_file & operator = (const generic_to_global_file & ref) = default;
+	generic_to_global_file & operator = (generic_to_global_file && ref) noexcept = default;
 	~generic_to_global_file() = default;
 
 	    // virtual method inherited from generic_file
