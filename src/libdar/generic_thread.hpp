@@ -61,7 +61,9 @@ namespace libdar
 		       U_I ctrl_block_size = tampon_block_size_ctrl,
 		       U_I ctrl_num_block = tampon_num_block_ctrl);
 	generic_thread(const generic_thread & ref) = delete;
+	generic_thread(generic_thread && ref) noexcept = delete;
 	generic_thread & operator = (const generic_thread & ref) = delete;
+	generic_thread & operator = (generic_thread && ref) noexcept = delete;
 	virtual ~generic_thread();
 
 	    // inherited methods from generic_file
