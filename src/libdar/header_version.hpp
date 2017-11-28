@@ -47,7 +47,9 @@ namespace libdar
     public:
 	header_version();
 	header_version(const header_version & ref) { copy_from(ref); };
+	header_version(header_version && ref) noexcept { nullifyptr(); move_from(std::move(ref)); };
 	header_version & operator = (const header_version & ref) { detruit(); copy_from(ref); return * this; };
+	header_version & operator = (header_version && ref) noexcept { move_from(std::move(ref)); return *this; };
 	~header_version() { detruit(); };
 
 	    /// read the header or trailer from the archive
@@ -107,7 +109,9 @@ namespace libdar
 	bool ciphered;   // whether the archive is ciphered, even if we do not know its crypto algorithm (old archives)
 	bool arch_signed;     // whether the archive is signed
 
+	void nullifyptr() noexcept { crypted_key = nullptr; ref_layout = nullptr; };
 	void copy_from(const header_version & ref);
+	void move_from(header_version && ref) noexcept;
 	void detruit();
 
 	    // FLAG VALUES

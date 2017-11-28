@@ -404,12 +404,6 @@ namespace libdar
 	dialog.printf(gettext("User comment                         : %S\n"), &(get_command_line()));
     }
 
-    void header_version::detruit()
-    {
-	clear_crypted_key();
-	clear_slice_layout();
-    }
-
     void header_version::copy_from(const header_version & ref)
     {
 	edition = ref.edition;
@@ -436,6 +430,26 @@ namespace libdar
 	has_tape_marks = ref.has_tape_marks;
 	ciphered = ref.ciphered;
 	arch_signed = ref.arch_signed;
+    }
+
+    void header_version::move_from(header_version && ref) noexcept
+    {
+	edition = move(ref.edition);
+	algo_zip = move(ref.algo_zip);
+	cmd_line = move(ref.cmd_line);
+	initial_offset = move(ref.initial_offset);
+	sym = move(ref.sym);
+	tools_swap(crypted_key, ref.crypted_key);
+	tools_swap(ref_layout, ref.ref_layout);
+	has_tape_marks = move(ref.has_tape_marks);
+	ciphered = move(ref.ciphered);
+	arch_signed = move(ref.arch_signed);
+    }
+
+    void header_version::detruit()
+    {
+	clear_crypted_key();
+	clear_slice_layout();
     }
 
 
