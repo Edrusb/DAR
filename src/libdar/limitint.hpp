@@ -108,9 +108,9 @@ namespace libdar
 	limitint(generic_file & x);
 
 	limitint(const limitint & ref) = default;
-	limitint(limitint && ref) = default;
+	limitint(limitint && ref) noexcept = default;
 	limitint & operator = (const limitint & ref) = default;
-	limitint & operator = (limitint && ref) = default;
+	limitint & operator = (limitint && ref) noexcept = default;
 
 	    // for coherent footprint with real infinint
 	~limitint() = default;
