@@ -49,15 +49,6 @@ namespace libdar
 	    the_mask = wilde_card_expression;
     }
 
-    simple_mask & simple_mask::operator = (const simple_mask & m)
-    {
-	const mask *src = & m;
-	mask *dst = this;
-	*dst = *src; // explicitely invoke the inherited "mask" class's operator =
-	copy_from(m);
-	return *this;
-    }
-
     bool simple_mask::is_covered(const string &expression) const
     {
 	if(!case_s)
@@ -81,12 +72,6 @@ namespace libdar
 			    &sensit);
     }
 
-    void simple_mask::copy_from(const simple_mask & m)
-    {
-        the_mask = m.the_mask;
-	case_s = m.case_s;
-    }
-
     regular_mask::regular_mask(const string & wilde_card_expression,
 			       bool x_case_sensit)
     {
@@ -95,22 +80,20 @@ namespace libdar
 	set_preg(mask_exp, case_sensit);
     }
 
-    regular_mask::regular_mask(const regular_mask & ref) : mask(ref)
+    regular_mask & regular_mask::operator = (const regular_mask & ref)
     {
-	mask_exp = ref.mask_exp;
-	case_sensit = ref.case_sensit;
-	set_preg(mask_exp, case_sensit);
+	mask::operator = (ref);
+	detruit();
+	copy_from(ref);
+
+	return *this;
     }
 
-    regular_mask & regular_mask::operator= (const regular_mask & ref)
+    regular_mask & regular_mask::operator = (regular_mask && ref) noexcept
     {
-	const mask *ref_ptr = &ref;
-	mask *me = this;
-	*me = *ref_ptr; // initializing the inherited mask part of the object
-	mask_exp = ref.mask_exp;
-	case_sensit = ref.case_sensit;
-	regfree(&preg);
-	set_preg(mask_exp, case_sensit);
+	mask::operator = (move(ref));
+	detruit();
+	move_from(move(ref));
 
 	return *this;
     }
@@ -130,14 +113,15 @@ namespace libdar
 			    &sensit);
     }
 
-
     void regular_mask::set_preg(const string & wilde_card_expression, bool x_case_sensit)
     {
 	S_I ret;
 
-	if((ret = regcomp(&preg, wilde_card_expression.c_str(), REG_NOSUB|(x_case_sensit ? 0 : REG_ICASE)|REG_EXTENDED)) != 0)
+	if((ret = regcomp(&preg,
+			  wilde_card_expression.c_str(),
+			  REG_NOSUB|(x_case_sensit ? 0 : REG_ICASE)|REG_EXTENDED)) != 0)
 	{
-	    const S_I msg_size = 1024;
+	    constexpr S_I msg_size = 1024;
 	    char msg[msg_size];
 	    regerror(ret, &preg, msg, msg_size);
 	    throw Erange("regular_mask::regular_mask", msg);
@@ -145,13 +129,27 @@ namespace libdar
 
     }
 
+    void regular_mask::copy_from(const regular_mask & ref)
+    {
+	mask_exp = ref.mask_exp;
+	case_sensit = ref.case_sensit;
+	set_preg(mask_exp, case_sensit);
+    }
+
+    void regular_mask::move_from(regular_mask && ref) noexcept
+    {
+	mask_exp = move(ref.mask_exp);
+	case_sensit = move(ref.case_sensit);
+	preg = ref.preg; // yes we copy the data, not the possibly pointed to data though
+	ref.detruit();
+    }
+
     not_mask & not_mask::operator = (const not_mask & m)
     {
-	const mask *src = &m;
-	mask *dst = this;
-	*dst = *src; // explicitely invoke the inherited "mask" class's operator =
+	mask::operator = (m);
 	detruit();
 	copy_from(m);
+
 	return *this;
     }
 
@@ -177,6 +175,11 @@ namespace libdar
         ref = m.clone();
         if(ref == nullptr)
             throw Ememory("not_mask::copy_from(mask)");
+    }
+
+    void not_mask::move_from(not_mask && m) noexcept
+    {
+	tools_swap(ref, m.ref);
     }
 
     void not_mask::detruit()
@@ -241,6 +244,13 @@ namespace libdar
             detruit();
             throw Ememory("et_mask::copy_from");
         }
+    }
+
+    void et_mask::move_from(et_mask && m) noexcept
+    {
+	detruit();
+	lst = move(m.lst);
+	m.lst.clear();
     }
 
     void et_mask::detruit()

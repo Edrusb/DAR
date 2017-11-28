@@ -63,7 +63,9 @@ namespace libdar
     public :
 	mask() = default;
 	mask(const mask & ref) = default;
+	mask(mask && ref) noexcept = default;
 	mask & operator = (const mask & ref) = default;
+	mask & operator = (mask && ref) noexcept = default;
         virtual ~mask() = default;
 
 	    /// check wether the given string is covered by the mask
@@ -105,7 +107,9 @@ namespace libdar
 	    /// \note once initialized an object cannot change its behavior
         bool_mask(bool always) { val = always; };
 	bool_mask(const bool_mask & ref) = default;
+	bool_mask(bool_mask && ref) noexcept = default;
 	bool_mask & operator = (const bool_mask & ref) = default;
+	bool_mask & operator = (bool_mask && ref) noexcept = default;
 	~bool_mask() = default;
 
 	    /// inherited from the mask class
@@ -134,10 +138,16 @@ namespace libdar
         simple_mask(const std::string & wilde_card_expression, bool case_sensit);
 
 	    /// copy constructor
-        simple_mask(const simple_mask & m) : mask(m) { copy_from(m); };
+        simple_mask(const simple_mask & m) = default;
+
+	    /// move constructor
+	simple_mask(simple_mask && ref) noexcept = default;
 
 	    /// assignment operator
-        simple_mask & operator = (const simple_mask & m);
+        simple_mask & operator = (const simple_mask & m) = default;
+
+	    /// move operator
+	simple_mask & operator = (simple_mask && ref) noexcept = default;
 
 	    /// default destructor
 	~simple_mask() = default;
@@ -155,8 +165,6 @@ namespace libdar
     private :
         std::string the_mask;
 	bool case_s;
-
-        void copy_from(const simple_mask & m);
     };
 
 
@@ -174,13 +182,19 @@ namespace libdar
 		     bool x_case_sensit);
 
 	    /// the copy constructor
-	regular_mask(const regular_mask & ref);
+	regular_mask(const regular_mask & ref): mask(ref) { copy_from(ref); };
+
+	    /// the move constructor
+	regular_mask(regular_mask && ref) noexcept: mask(std::move(ref)) { move_from(std::move(ref)); };
 
 	    /// the assignment operator
 	regular_mask & operator = (const regular_mask & ref);
 
+	    /// the move operator
+	regular_mask & operator = (regular_mask && ref) noexcept;
+
 	    /// destructor
-        virtual ~regular_mask() { regfree(&preg); };
+        virtual ~regular_mask() { detruit(); };
 
 	    /// inherited from the mask class
         bool is_covered(const std::string & expression) const override;
@@ -198,6 +212,10 @@ namespace libdar
 
 	void set_preg(const std::string & wilde_card_expression,
 		      bool x_case_sensit);
+
+	void copy_from(const regular_mask & ref);
+	void move_from(regular_mask && ref) noexcept;
+	void detruit() noexcept { regfree(&preg); };
     };
 
 
@@ -218,8 +236,14 @@ namespace libdar
 	    /// copy constructor
         not_mask(const not_mask & m) : mask(m) { copy_from(m); };
 
+	    /// move constructor
+	not_mask(not_mask && m) noexcept: mask(std::move(m)) { nullifyptr(); move_from(std::move(m)); };
+
 	    /// assignment operator
         not_mask & operator = (const not_mask & m);
+
+	    /// move operator
+	not_mask & operator = (not_mask && m) noexcept { move_from(std::move(m)); return *this; };
 
 	    /// destructor
         ~not_mask() { detruit(); };
@@ -235,8 +259,10 @@ namespace libdar
     private :
         mask *ref;
 
+	void nullifyptr() noexcept { ref = nullptr; };
         void copy_from(const not_mask &m);
         void copy_from(const mask &m);
+	void move_from(not_mask && ref) noexcept;
         void detruit();
     };
 
@@ -257,8 +283,14 @@ namespace libdar
 	    /// copy constructor
         et_mask(const et_mask &m) : mask(m) { copy_from(m); };
 
+	    /// move constructor
+	et_mask(et_mask && m) noexcept: mask(std::move(m)) { move_from(std::move(m)); };
+
 	    /// assignment operator
         et_mask & operator = (const et_mask &m);
+
+	    /// move operator
+	et_mask & operator = (et_mask && m) noexcept { mask::operator = (std::move(m)); move_from(std::move(m)); return *this; };
 
 	    /// destructor
         ~et_mask() { detruit(); };
@@ -299,6 +331,7 @@ namespace libdar
 
     private :
         void copy_from(const et_mask & m);
+	void move_from(et_mask && m) noexcept;
         void detruit();
 
 	template<class T> bool t_is_covered(const T & expression) const
@@ -328,7 +361,9 @@ namespace libdar
     public:
 	ou_mask() = default;
 	ou_mask(const ou_mask & ref) = default;
+	ou_mask(ou_mask && ref) noexcept = default;
 	ou_mask & operator = (const ou_mask & ref) = default;
+	ou_mask & operator = (ou_mask && ref) noexcept = default;
 	~ou_mask() = default;
 
 	    /// inherited from the mask class
@@ -367,7 +402,9 @@ namespace libdar
 	    /// \note p must be a valid path
         simple_path_mask(const path &p, bool case_sensit) : chemin(p) { case_s = case_sensit; };
 	simple_path_mask(const simple_path_mask & ref) = default;
+	simple_path_mask(simple_path_mask && ref) noexcept = default;
 	simple_path_mask & operator = (const simple_path_mask & ref) = default;
+	simple_path_mask & operator = (simple_path_mask && ref) noexcept = default;
 	~simple_path_mask() = default;
 
 	    /// inherited from the mask class
@@ -395,7 +432,9 @@ namespace libdar
 	    /// \param[in] case_sensit whether the mask is case sensitive or not
         same_path_mask(const std::string &p, bool case_sensit) { chemin = p; case_s = case_sensit; };
 	same_path_mask(const same_path_mask & ref) = default;
+	same_path_mask(same_path_mask && ref) noexcept = default;
 	same_path_mask & operator = (const same_path_mask & ref) = default;
+	same_path_mask & operator = (same_path_mask && ref) noexcept = default;
 	~same_path_mask() = default;
 
 	    /// inherited from the mask class
@@ -424,7 +463,9 @@ namespace libdar
 	    /// \param[in] case_sensit whether the mask is case sensitive or not
 	exclude_dir_mask(const std::string &p, bool case_sensit) { chemin = p; case_s = case_sensit;};
 	exclude_dir_mask(const exclude_dir_mask & ref) = default;
+	exclude_dir_mask(exclude_dir_mask && ref) noexcept = default;
 	exclude_dir_mask & operator = (const exclude_dir_mask & ref) = default;
+	exclude_dir_mask & operator = (exclude_dir_mask && ref) noexcept = default;
 	~exclude_dir_mask() = default;
 
 	    /// inherited from the mask class

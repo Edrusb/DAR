@@ -62,7 +62,9 @@ namespace libdar
 	    /// \param[in] include whether the mask_list is used for file inclusion or file exclusion
         mask_list(const std::string & filename_list_st, bool case_sensit, const path & prefix, bool include);
 	mask_list(const mask_list & ref) = default;
+	mask_list(mask_list && ref) noexcept = default;
 	mask_list & operator = (const mask_list & ref) = default;
+	mask_list & operator = (mask_list && ref) noexcept = default;
 	~mask_list() = default;
 
             /// inherited from the mask class
