@@ -71,7 +71,9 @@ namespace libdar
 
         header();
         header(const header & ref) { copy_from(ref); };
+	header(header && ref) noexcept { nullifyptr(); move_from(std::move(ref)); };
         header & operator = (const header & ref) { free_pointers(); copy_from(ref); return *this; };
+	header & operator = (header && ref) noexcept { move_from(std::move(ref)); return *this; };
 	~header() { free_pointers(); };
 
 	    // global methods
@@ -118,7 +120,9 @@ namespace libdar
 	infinint *slice_size;  //< size of slices (except first slice if specified else and last if not fulfilled)
 	bool old_header;       //< true if the header has been read from an old archive (before release 2.4.0, format 07 and below) and if true when writing, create an old slice header (compatible with format 07).
 
+	void nullifyptr() noexcept { first_size = slice_size = nullptr; };
         void copy_from(const header & ref);
+	void move_from(header && ref) noexcept;
 	void free_pointers();
 	void fill_from(user_interaction & ui, const tlv_list & list);
 	tlv_list build_tlv_list(user_interaction & ui) const;

@@ -319,6 +319,17 @@ namespace libdar
 	}
     }
 
+    void header::move_from(header && ref) noexcept
+    {
+	magic = move(ref.magic);
+	internal_name = move(ref.internal_name);
+	data_name = move(ref.data_name);
+	flag = move(ref.flag);
+	tools_swap(first_size, ref.first_size);
+	tools_swap(slice_size, ref.slice_size);
+	old_header = move(ref.old_header);
+    }
+
     void header::free_pointers()
     {
 	if(first_size != nullptr)
