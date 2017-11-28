@@ -133,6 +133,11 @@ namespace libdar
 	(void)memcpy(val, ref.val, LABEL_SIZE);
     }
 
+    void label::move_from(label && ref) noexcept
+    {
+	tools_swap_array(val, ref.val);
+    }
+
     const label label_zero;
 
 } // end of namespace

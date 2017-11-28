@@ -42,7 +42,9 @@ namespace libdar
     public:
 	label(); // builds a label equal to 'zero'
 	label(const label & ref) { copy_from(ref); };
+	label(label && ref) noexcept { move_from(std::move(ref)); };
 	label & operator = (const label & ref) { copy_from(ref); return *this; };
+	label & operator = (label && ref) noexcept { move_from(std::move(ref)); return *this; };
 	~label() = default;
 
 	bool operator == (const label & ref) const;
@@ -68,11 +70,12 @@ namespace libdar
 	static U_I common_size() { return LABEL_SIZE; };
 
     private:
-	static const U_I LABEL_SIZE = 10;
+	static constexpr U_I LABEL_SIZE = 10;
 
 	char val[LABEL_SIZE];
 
 	void copy_from(const label & ref);
+	void move_from(label && ref) noexcept;
     };
 
 
