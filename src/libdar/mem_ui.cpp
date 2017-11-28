@@ -26,6 +26,9 @@
 // including "mem_ui.hpp" here, lead to cyclic dependancy of headers...  this points needs to be clarified
 
 #include "mem_ui.hpp"
+#include "tools.hpp"
+
+using namespace std;
 
 namespace libdar
 {
@@ -69,6 +72,12 @@ namespace libdar
 		cloned = false;
 	    }
 	}
+    }
+
+    void mem_ui::move_from(mem_ui && ref) noexcept
+    {
+	tools_swap(ui, ref.ui);
+	cloned = move(ref.cloned);
     }
 
     void mem_ui::set_ui(const user_interaction & dialog)

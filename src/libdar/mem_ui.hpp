@@ -71,11 +71,18 @@ namespace libdar
 	    /// need to be called from the copy constructor of any inherited class that explicitely define one
 	mem_ui(const mem_ui & ref) { copy_from(ref); };
 
+	    /// the move constructor
+	mem_ui(mem_ui && ref) noexcept { nullifyptr(); move_from(std::move(ref)); };
+
 	    /// assignement operator
 
 	    /// you need to call it from the inherited class assignement operator
 	    /// if the inherited class explicitely defines its own one.
 	mem_ui & operator = (const mem_ui & ref) { detruire(); copy_from(ref); return *this; };
+
+	    /// move operator
+	mem_ui & operator = (mem_ui && ref) noexcept { move_from(std::move(ref)); return *this; };
+
 
 	    /// destructor
 
@@ -96,7 +103,9 @@ namespace libdar
 	bool cloned;
 
 	void detruire();
+	void nullifyptr() noexcept { ui = nullptr; };
 	void copy_from(const mem_ui & ref);
+	void move_from(mem_ui && ref) noexcept;
 	void set_ui(const user_interaction & dialog);
     };
 
