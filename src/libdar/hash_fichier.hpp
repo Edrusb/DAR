@@ -87,13 +87,19 @@ namespace libdar
 		     fichier_global *hash_file,
 		     hash_algo algo);
 
-	    // copy constructor
+	    /// copy constructor
 	hash_fichier(const hash_fichier & ref) = delete;
 
-	    // assignment operator
+	    /// move constructor
+	hash_fichier(hash_fichier && ref) noexcept = delete;
+
+	    /// assignment operator
 	hash_fichier & operator = (const hash_fichier & ref) = delete;
 
-	    // destructor
+	    /// move operator
+	hash_fichier & operator = (hash_fichier && ref) noexcept = delete;
+
+	    /// destructor
 	~hash_fichier();
 
 	    // inherited from fichier_global
