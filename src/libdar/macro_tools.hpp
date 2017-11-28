@@ -281,16 +281,16 @@ namespace libdar
 	/// \param[in] gnupg_signatories used to sign the catalog, use an empty vector to disable signning
 	/// \param[in] algo compression algorithm used
 	/// \param[in] empty dry-run execution (null_file at bottom of the stack)
-    void macro_tools_close_layers(user_interaction & dialog,
-				  pile & layers,
-				  const header_version & ver,
-				  const catalogue & cat,
-				  bool info_details,
-				  crypto_algo crypto,
-				  compression algo,
-				  const std::vector<std::string> & gnupg_recipients,
-				  const std::vector<std::string> & gnupg_signatories,
-				  bool empty);
+    extern void macro_tools_close_layers(user_interaction & dialog,
+					 pile & layers,
+					 const header_version & ver,
+					 const catalogue & cat,
+					 bool info_details,
+					 crypto_algo crypto,
+					 compression algo,
+					 const std::vector<std::string> & gnupg_recipients,
+					 const std::vector<std::string> & gnupg_signatories,
+					 bool empty);
 
 
 	/// gives the location of data EA and FSA (when they are saved) of the object given in argument
@@ -299,7 +299,7 @@ namespace libdar
 	/// \param[in] sl slice layout of the archive
 	/// \return a set of slices which will be required to restore that particular file (over the slice(s)
 	/// containing the catalogue of course).
-    range macro_tools_get_slices(const cat_nomme *obj, slice_layout sl);
+    extern range macro_tools_get_slices(const cat_nomme *obj, slice_layout sl);
 
 } // end of namespace
 
