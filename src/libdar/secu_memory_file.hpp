@@ -43,7 +43,9 @@ namespace libdar
 	    // Constructors & Destructor
 	secu_memory_file(U_I storage_size) : generic_file(gf_read_write), data(storage_size) { position = 0; };
 	secu_memory_file(const secu_memory_file & ref) = default;
+	secu_memory_file(secu_memory_file && ref) noexcept = default;
 	secu_memory_file & operator = (const secu_memory_file & ref) = default;
+	secu_memory_file & operator = (secu_memory_file && ref) noexcept = default;
 	~secu_memory_file() = default;
 
 	    // memory_storage specific methods
