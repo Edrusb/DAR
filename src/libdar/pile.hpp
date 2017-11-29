@@ -48,8 +48,10 @@ namespace libdar
 	    /// thus when empty we choose the arbitrary gf_read_only value, because the stack is empty.
 
 	pile() : generic_file(gf_read_only) { stack.clear(); };
-	pile(const pile & ref) : generic_file(ref) { copy_from(ref); };
-	pile & operator = (const pile & ref) { detruit(); copy_from(ref); return *this; };
+	pile(const pile & ref) = delete;
+	pile(pile && ref) noexcept = delete;
+	pile & operator = (const pile & ref) = delete;
+	pile & operator = (pile && ref) noexcept = delete;
 	~pile() { detruit(); };
 
 	    /// add a generic_file on the top
@@ -167,10 +169,6 @@ namespace libdar
 
 	std::vector<face> stack;
 
-	void copy_from(const pile & ref)
-	{
-	    throw SRC_BUG; // it is not possible to copy an object to its another of the exact same type when only a pure virtual pointer pointing on it is available, or when no virtual "clone'-like method is available from the root pure virtual class (generic_file here).
-	};
 	void detruit();
 	std::vector<face>::iterator look_for_label(const std::string & label);
     };
