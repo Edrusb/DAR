@@ -464,8 +464,8 @@ namespace libdar
 
     void fichier_local::move_from(fichier_local && ref) noexcept
     {
-	tools_swap(filedesc, ref.filedesc);
-	tools_swap(adv, ref.adv);
+	swap(filedesc, ref.filedesc);
+	swap(adv, ref.adv);
     }
 
     int fichier_local::advise_to_int(advise arg) const

@@ -435,8 +435,8 @@ namespace libdar
 
     void storage::move_from(storage && ref)
     {
-	tools_swap(first, ref.first);
-	tools_swap(last, ref.last);
+	swap(first, ref.first);
+	swap(last, ref.last);
     }
 
     S_32 storage::difference(const storage & ref) const

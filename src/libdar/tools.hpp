@@ -947,22 +947,6 @@ namespace libdar
 	}
     }
 
-	/// swap variable's values
-
-    template <class T> void tools_swap(T & a, T & b) noexcept
-    {
-	auto tmp(a);
-	a = b;
-	b = tmp;
-    }
-
-    template <class T> void tools_swap_array(T* a, T* b) noexcept
-    {
-	auto tmp(a);
-	a = b;
-	b = tmp;
-    }
-
 } /// end of namespace
 
 #endif

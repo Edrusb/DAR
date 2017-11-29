@@ -62,13 +62,13 @@ namespace libdar
         deci(const deci & ref) { copy_from(ref); };
 
 	    /// move constructor
-	deci(deci && ref) noexcept { decimales = nullptr; tools_swap(decimales, ref.decimales); };
+	deci(deci && ref) noexcept { decimales = nullptr; std::swap(decimales, ref.decimales); };
 
 	    /// assignment operator
         deci & operator = (const deci & ref) { detruit(); copy_from(ref); return *this; };
 
 	    /// assignment move operator
-	deci & operator = (deci && ref) noexcept { tools_swap(decimales, ref.decimales); return *this; };
+	deci & operator = (deci && ref) noexcept { std::swap(decimales, ref.decimales); return *this; };
 
 	    /// destructor
         ~deci() { detruit(); };

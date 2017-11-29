@@ -240,8 +240,8 @@ namespace libdar
 
     void data_tree::status_plus::move_from(status_plus && ref) noexcept
     {
-	tools_swap(base, ref.base);
-	tools_swap(result, ref.result);
+	swap(base, ref.base);
+	swap(result, ref.result);
     }
 
     void data_tree::status_plus::detruit()

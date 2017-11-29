@@ -96,7 +96,7 @@ namespace libdar
 
 	void nullifyptr() noexcept { contents = nullptr; };
 	void copy_from(const entrepot_local & ref) { furtive_mode = ref.furtive_mode; contents = nullptr; };
-	void move_from(entrepot_local && ref) noexcept { tools_swap(contents, ref.contents), tools_swap(furtive_mode, ref.furtive_mode); };
+	void move_from(entrepot_local && ref) noexcept { std::swap(contents, ref.contents), std::swap(furtive_mode, ref.furtive_mode); };
 	void detruit() { if(contents != nullptr) { delete contents; contents = nullptr; } };
     };
 

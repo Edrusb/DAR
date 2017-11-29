@@ -312,14 +312,14 @@ namespace libdar
 	    // for sig_is_ours field, we cannot assume bool's move operator
 	    // swaps the values (implementation dependant),
 	    // we need to be sure values are swapped:
-	tools_swap(sig_is_ours, ref.sig_is_ours);
+	swap(sig_is_ours, ref.sig_is_ours);
 
 	    // we can swap the memory file, because sig_is_ours is swapped
 	    // too and we will known when destroying ref whether we own
 	    // the object pointed to by sig or not
-	tools_swap(sig, ref.sig);
-	tools_swap(patch_base_check, ref.patch_base_check);
-	tools_swap(patch_result_check, ref.patch_result_check);
+	swap(sig, ref.sig);
+	swap(patch_base_check, ref.patch_base_check);
+	swap(patch_result_check, ref.patch_result_check);
 	just_crc = move(ref.just_crc);
     }
 

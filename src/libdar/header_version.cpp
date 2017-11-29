@@ -439,8 +439,8 @@ namespace libdar
 	cmd_line = move(ref.cmd_line);
 	initial_offset = move(ref.initial_offset);
 	sym = move(ref.sym);
-	tools_swap(crypted_key, ref.crypted_key);
-	tools_swap(ref_layout, ref.ref_layout);
+	swap(crypted_key, ref.crypted_key);
+	swap(ref_layout, ref.ref_layout);
 	has_tape_marks = move(ref.has_tape_marks);
 	ciphered = move(ref.ciphered);
 	arch_signed = move(ref.arch_signed);

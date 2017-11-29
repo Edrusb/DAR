@@ -135,7 +135,7 @@ namespace libdar
 
     void label::move_from(label && ref) noexcept
     {
-	tools_swap_array(val, ref.val);
+	std::swap(val, ref.val);
     }
 
     const label label_zero;

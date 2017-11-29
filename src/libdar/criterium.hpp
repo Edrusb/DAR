@@ -458,9 +458,9 @@ namespace libdar
     public:
 	crit_not(const criterium & crit) { x_crit = crit.clone(); if(x_crit == nullptr) throw Ememory("crit_not::crit_not"); };
 	crit_not(const crit_not & ref): criterium(ref) { copy_from(ref); };
-	crit_not(crit_not && ref) noexcept: criterium(std::move(ref)) { x_crit = nullptr; tools_swap(x_crit, ref.x_crit); };
+	crit_not(crit_not && ref) noexcept: criterium(std::move(ref)) { x_crit = nullptr; std::swap(x_crit, ref.x_crit); };
 	crit_not & operator = (const crit_not & ref) { destroy(); copy_from(ref); return *this; };
-	crit_not & operator = (crit_not && ref) noexcept { criterium::operator = (std::move(ref)); tools_swap(x_crit, ref.x_crit); return *this; };
+	crit_not & operator = (crit_not && ref) noexcept { criterium::operator = (std::move(ref)); std::swap(x_crit, ref.x_crit); return *this; };
 	~crit_not() { destroy(); };
 
 	virtual bool evaluate(const cat_nomme & first, const cat_nomme & second) const override { return ! x_crit->evaluate(first, second); };

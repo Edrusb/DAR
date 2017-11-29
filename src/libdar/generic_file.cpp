@@ -508,7 +508,7 @@ namespace libdar
     void generic_file::move_from(generic_file && ref) noexcept
     {
 	rw = move(ref.rw);
-	tools_swap(checksum, ref.checksum);
+	swap(checksum, ref.checksum);
 	terminated = move(ref.terminated);
 	no_read_ahead = move(ref.no_read_ahead);
     }

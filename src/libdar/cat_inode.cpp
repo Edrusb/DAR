@@ -1439,16 +1439,16 @@ namespace libdar
 	ea_saved = move(ref.ea_saved);
 	fsa_saved = move(ref.fsa_saved);
 	small_read = move(ref.small_read);
-	tools_swap(ref.ea_offset, ea_offset);
-	tools_swap(ref.ea, ea);
-	tools_swap(ref.ea_size, ea_size);
-	tools_swap(ref.ea_crc, ea_crc);
-	tools_swap(ref.fsa_families, fsa_families);
-	tools_swap(ref.fsa_offset, fsa_offset);
-	tools_swap(ref.fsal, fsal);
-	tools_swap(ref.fsa_size, fsa_size);
-	tools_swap(ref.fsa_crc, fsa_crc);
-	tools_swap(ref.fs_dev, fs_dev);
+	swap(ref.ea_offset, ea_offset);
+	swap(ref.ea, ea);
+	swap(ref.ea_size, ea_size);
+	swap(ref.ea_crc, ea_crc);
+	swap(ref.fsa_families, fsa_families);
+	swap(ref.fsa_offset, fsa_offset);
+	swap(ref.fsal, fsal);
+	swap(ref.fsa_size, fsa_size);
+	swap(ref.fsa_crc, fsa_crc);
+	swap(ref.fs_dev, fs_dev);
 	edit = move(ref.edit);
     }
 

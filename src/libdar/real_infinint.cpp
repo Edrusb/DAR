@@ -683,7 +683,7 @@ namespace libdar
 
     void infinint::move_from(infinint && ref)
     {
-	tools_swap(field, ref.field);
+	swap(field, ref.field);
     }
 
     void infinint::detruit()

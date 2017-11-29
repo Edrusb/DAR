@@ -76,7 +76,7 @@ namespace libdar
 
     void mem_ui::move_from(mem_ui && ref) noexcept
     {
-	tools_swap(ui, ref.ui);
+	swap(ui, ref.ui);
 	cloned = move(ref.cloned);
     }
 

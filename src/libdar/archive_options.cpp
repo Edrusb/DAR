@@ -241,7 +241,7 @@ namespace libdar
 	x_lax = move(ref.x_lax);
 	x_sequential_read = move(ref.x_sequential_read);
 	x_slice_min_digits = move(ref.x_slice_min_digits);
-	tools_swap(x_entrepot, ref.x_entrepot);
+	swap(x_entrepot, ref.x_entrepot);
 	x_ignore_signature_check_failure = move(ref.x_ignore_signature_check_failure);
 	x_multi_threaded = move(ref.x_multi_threaded);
 
@@ -253,7 +253,7 @@ namespace libdar
 	x_ref_crypto_size = move(ref.x_ref_crypto_size);
 	x_ref_execute = move(ref.x_ref_execute);
 	x_ref_slice_min_digits = move(ref.x_ref_slice_min_digits);
-	tools_swap(x_ref_entrepot, ref.x_ref_entrepot);
+	swap(x_ref_entrepot, ref.x_ref_entrepot);
 	x_header_only = move(ref.x_header_only);
     }
 
@@ -635,12 +635,12 @@ namespace libdar
 
     void archive_options_create::move_from(archive_options_create && ref) noexcept
     {
-	tools_swap(x_selection, ref.x_selection);
-	tools_swap(x_subtree, ref.x_subtree);
-	tools_swap(x_ea_mask, ref.x_ea_mask);
-	tools_swap(x_compr_mask, ref.x_compr_mask);
-	tools_swap(x_backup_hook_file_mask, ref.x_backup_hook_file_mask);
-	tools_swap(x_entrepot, ref.x_entrepot);
+	swap(x_selection, ref.x_selection);
+	swap(x_subtree, ref.x_subtree);
+	swap(x_ea_mask, ref.x_ea_mask);
+	swap(x_compr_mask, ref.x_compr_mask);
+	swap(x_backup_hook_file_mask, ref.x_backup_hook_file_mask);
+	swap(x_entrepot, ref.x_entrepot);
 
 	x_ref_arch = move(ref.x_ref_arch);
 	x_allow_over = move(ref.x_allow_over);
@@ -858,8 +858,8 @@ namespace libdar
 
     void archive_options_isolate::move_from(archive_options_isolate && ref) noexcept
     {
-	tools_swap(x_entrepot, ref.x_entrepot);
-	tools_swap(x_delta_mask, ref.x_delta_mask);
+	swap(x_entrepot, ref.x_entrepot);
+	swap(x_delta_mask, ref.x_delta_mask);
 
 	x_allow_over = move(ref.x_allow_over);
 	x_warn_over = move(ref.x_warn_over);
@@ -1187,13 +1187,13 @@ namespace libdar
 
     void archive_options_merge::move_from(archive_options_merge && ref) noexcept
     {
-	tools_swap(x_selection, ref.x_selection);
-	tools_swap(x_subtree, ref.x_subtree);
-	tools_swap(x_ea_mask,ref.x_ea_mask);
-	tools_swap(x_compr_mask, ref.x_compr_mask);
-	tools_swap(x_overwrite, ref.x_overwrite);
-	tools_swap(x_entrepot, ref.x_entrepot);
-	tools_swap(x_delta_mask, ref.x_delta_mask);
+	swap(x_selection, ref.x_selection);
+	swap(x_subtree, ref.x_subtree);
+	swap(x_ea_mask,ref.x_ea_mask);
+	swap(x_compr_mask, ref.x_compr_mask);
+	swap(x_overwrite, ref.x_overwrite);
+	swap(x_entrepot, ref.x_entrepot);
+	swap(x_delta_mask, ref.x_delta_mask);
 
 	x_ref = move(ref.x_ref);
 	x_allow_over = move(ref.x_allow_over);
@@ -1409,10 +1409,10 @@ namespace libdar
 
     void archive_options_extract::move_from(archive_options_extract && ref) noexcept
     {
-	tools_swap(x_selection, ref.x_selection);
-	tools_swap(x_subtree, ref.x_subtree);
-	tools_swap(x_ea_mask, ref.x_ea_mask);
-	tools_swap(x_overwrite, ref.x_overwrite);
+	swap(x_selection, ref.x_selection);
+	swap(x_subtree, ref.x_subtree);
+	swap(x_ea_mask, ref.x_ea_mask);
+	swap(x_overwrite, ref.x_overwrite);
 
 	x_warn_over = move(ref.x_warn_over);
 	x_info_details = move(ref.x_info_details);
@@ -1603,10 +1603,10 @@ namespace libdar
 
     void archive_options_listing::move_from(archive_options_listing && ref) noexcept
     {
-	tools_swap(x_selection, ref.x_selection);
-	tools_swap(x_subtree, ref.x_subtree);
-	tools_swap(x_slicing_first, ref.x_slicing_first);
-	tools_swap(x_slicing_others, ref.x_slicing_others);
+	swap(x_selection, ref.x_selection);
+	swap(x_subtree, ref.x_subtree);
+	swap(x_slicing_first, ref.x_slicing_first);
+	swap(x_slicing_others, ref.x_slicing_others);
 
 	x_info_details = move(ref.x_info_details);
 	x_list_mode = move(ref.x_list_mode);
@@ -1790,9 +1790,9 @@ namespace libdar
 
     void archive_options_diff::move_from(archive_options_diff && ref) noexcept
     {
-	tools_swap(x_selection, ref.x_selection);
-	tools_swap(x_subtree, ref.x_subtree);
-	tools_swap(x_ea_mask, ref.x_ea_mask);
+	swap(x_selection, ref.x_selection);
+	swap(x_subtree, ref.x_subtree);
+	swap(x_ea_mask, ref.x_ea_mask);
 
 	x_info_details = move(ref.x_info_details);
 	x_display_treated = move(ref.x_display_treated);
@@ -1917,8 +1917,8 @@ namespace libdar
 
     void archive_options_test::move_from(archive_options_test && ref) noexcept
     {
-	tools_swap(x_selection, ref.x_selection);
-	tools_swap(x_subtree, ref.x_subtree);
+	swap(x_selection, ref.x_selection);
+	swap(x_subtree, ref.x_subtree);
 
 	x_info_details = move(ref.x_info_details);
 	x_display_treated = move(ref.x_display_treated);
@@ -2061,7 +2061,7 @@ namespace libdar
 
     void archive_options_repair::move_from(archive_options_repair && ref) noexcept
     {
-	tools_swap(x_entrepot, ref.x_entrepot);
+	swap(x_entrepot, ref.x_entrepot);
 
 	x_allow_over = move(ref.x_allow_over);
 	x_warn_over = move(ref.x_warn_over);

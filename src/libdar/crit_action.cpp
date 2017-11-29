@@ -76,9 +76,9 @@ namespace libdar
 
     void testing::move_from(testing && ref) noexcept
     {
-	tools_swap(x_input, ref.x_input);
-	tools_swap(x_go_true, ref.x_go_true);
-	tools_swap(x_go_false, ref.x_go_false);
+	swap(x_input, ref.x_input);
+	swap(x_go_true, ref.x_go_true);
+	swap(x_go_false, ref.x_go_false);
     }
 
     bool testing::check() const

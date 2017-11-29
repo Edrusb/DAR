@@ -925,16 +925,16 @@ namespace libdar
 
     void escape::move_from(escape && ref) noexcept
     {
-	tools_swap(x_below, ref.x_below);
+	swap(x_below, ref.x_below);
 	write_buffer_size = move(ref.write_buffer_size);
-	tools_swap_array(write_buffer, ref.write_buffer);
+	swap(write_buffer, ref.write_buffer);
 	read_buffer_size = move(ref.read_buffer_size);
 	already_read = move(ref.already_read);
 	read_eof = move(ref.read_eof);
 	escape_seq_offset_in_buffer = move(ref.escape_seq_offset_in_buffer);
-	tools_swap_array(read_buffer, ref.read_buffer);
+	swap(read_buffer, ref.read_buffer);
 	unjumpable = move(ref.unjumpable);
-	tools_swap_array(fixed_sequence, ref.fixed_sequence);
+	swap(fixed_sequence, ref.fixed_sequence);
 	escaped_data_count_since_last_skip = move(ref.escaped_data_count_since_last_skip);
 	below_position = move(ref.below_position);
     }

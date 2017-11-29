@@ -179,7 +179,7 @@ namespace libdar
 
     void not_mask::move_from(not_mask && m) noexcept
     {
-	tools_swap(ref, m.ref);
+	swap(ref, m.ref);
     }
 
     void not_mask::detruit()
