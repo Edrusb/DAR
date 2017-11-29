@@ -51,7 +51,9 @@ namespace libdar
     public:
 	mycurl_easyhandle_sharing() = default;
 	mycurl_easyhandle_sharing(const mycurl_easyhandle_sharing & ref): root(ref.root) { clone_table.clear(); };
+	mycurl_easyhandle_sharing(mycurl_easyhandle_sharing && ref) noexcept: root(std::move(ref.root)) { std::swap(clone_table, ref.clone_table); };
 	mycurl_easyhandle_sharing & operator = (const mycurl_easyhandle_sharing & ref) = delete;
+	mycurl_easyhandle_sharing & operator = (mycurl_easyhandle_sharing && ref) noexcept = delete;
 	~mycurl_easyhandle_sharing() = default;
 
 	CURL *get_root_handle() const { return root.get_handle(); };
