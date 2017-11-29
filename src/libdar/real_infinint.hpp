@@ -60,29 +60,25 @@ namespace libdar
 
 #if SIZEOF_OFF_T > SIZEOF_TIME_T
 #if SIZEOF_OFF_T > SIZEOF_SIZE_T
-        infinint(off_t a = 0)
-	{ infinint_from(a); };
+        infinint(off_t a = 0) { infinint_from(a); };
 #else
-        infinint(size_t a = 0)
-	{ infinint_from(a); };
+        infinint(size_t a = 0) { infinint_from(a); };
 #endif
 #else
 #if SIZEOF_TIME_T > SIZEOF_SIZE_T
-        infinint(time_t a = 0)
-	{ infinint_from(a); };
+        infinint(time_t a = 0) { infinint_from(a); };
 #else
-        infinint(size_t a = 0)
-	{ infinint_from(a); };
+        infinint(size_t a = 0) { infinint_from(a); };
 #endif
 #endif
-	    // read an infinint from a file
+	    /// read an infinint from a file
 	infinint(generic_file & x);
 
         infinint(const infinint & ref) { copy_from(ref); }
-	infinint(infinint && ref) { move_from(std::move(ref)); };
+	infinint(infinint && ref) noexcept { move_from(std::move(ref)); };
 
 	infinint & operator = (const infinint & ref) { detruit(); copy_from(ref); return *this; };
-	infinint & operator = (infinint && ref) { move_from(std::move(ref)); return *this; }
+	infinint & operator = (infinint && ref) noexcept { move_from(std::move(ref)); return *this; }
 
         ~infinint() { detruit(); };
 
@@ -151,7 +147,7 @@ namespace libdar
         void build_from_file(generic_file & x);
         void reduce(); // put the object in canonical form : no leading byte equal to zero
         void copy_from(const infinint & ref);
-	void move_from(infinint && ref);
+	void move_from(infinint && ref) noexcept { std::swap(field, ref.field); };
         void detruit();
         void make_at_least_as_wider_as(const infinint & ref);
         template <class T> void infinint_from(T a);

@@ -681,11 +681,6 @@ namespace libdar
             throw SRC_BUG;
     }
 
-    void infinint::move_from(infinint && ref)
-    {
-	swap(field, ref.field);
-    }
-
     void infinint::detruit()
     {
         if(field != nullptr)
