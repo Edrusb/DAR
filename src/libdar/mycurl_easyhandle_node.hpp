@@ -56,10 +56,13 @@ namespace libdar
 	mycurl_easyhandle_node(const mycurl_easyhandle_node & ref);
 
 	    /// move constructor
-	mycurl_easyhandle_node(mycurl_easyhandle_node && ref);
+	mycurl_easyhandle_node(mycurl_easyhandle_node && ref) noexcept;
 
-	    /// assignment operator (no move assigment operator neither)
+	    /// assignment operator
 	mycurl_easyhandle_node & operator = (const mycurl_easyhandle_node & ref) = delete;
+
+	    /// move operator
+	mycurl_easyhandle_node & operator = (mycurl_easyhandle_node && ref) noexcept = delete;
 
 	    /// destructor
 	~mycurl_easyhandle_node() { if(handle != nullptr) curl_easy_cleanup(handle); };

@@ -54,7 +54,7 @@ namespace libdar
 	used = false;
     }
 
-    mycurl_easyhandle_node::mycurl_easyhandle_node(mycurl_easyhandle_node && ref)
+    mycurl_easyhandle_node::mycurl_easyhandle_node(mycurl_easyhandle_node && ref) noexcept
     {
 	handle = ref.handle;
 	used = ref.used;
