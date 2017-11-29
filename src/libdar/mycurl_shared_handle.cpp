@@ -41,14 +41,14 @@ namespace libdar
 	ref->set_used_mode(true);
     }
 
-    mycurl_shared_handle::mycurl_shared_handle(mycurl_shared_handle && arg)
+    mycurl_shared_handle::mycurl_shared_handle(mycurl_shared_handle && arg) noexcept
     {
 	ref = std::move(arg.ref);
 	if(!arg.ref.is_null())
 	    throw SRC_BUG;
     }
 
-    mycurl_shared_handle & mycurl_shared_handle::operator = (mycurl_shared_handle && arg)
+    mycurl_shared_handle & mycurl_shared_handle::operator = (mycurl_shared_handle && arg) noexcept
     {
 	ref = std::move(arg.ref);
 	if(!arg.ref.is_null())
