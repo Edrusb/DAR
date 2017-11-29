@@ -122,11 +122,16 @@ namespace libdar
 	    const std::string & execute = "");
 
 	    /// the copy constructor
-
    	sar(const sar & ref) = delete;
+
+	    /// move constructor
+	sar(sar && ref) noexcept = delete;
 
 	    /// assignment operator
 	sar & operator = (const sar & ref) = delete;
+
+	    /// move operator
+	sar & operator = (sar && ref) noexcept = delete;
 
 	    /// destructor
         ~sar();
