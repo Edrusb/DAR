@@ -83,7 +83,9 @@ namespace libdar
     public:
 	messaging_decode() {msgt = msg_type::unset; };
 	messaging_decode(const messaging_decode & ref) = default;
+	messaging_decode(messaging_decode && ref) noexcept = default;
 	messaging_decode & operator = (const messaging_decode & ref) = default;
+	messaging_decode & operator = (messaging_decode && ref) noexcept = default;
 	~messaging_decode() = default;
 
 	    /// reset the object to its initial state
@@ -128,7 +130,9 @@ namespace libdar
 	    /// constructor
 	messaging_encode() { msgt = msg_type::unset; };
 	messaging_encode(const messaging_encode & ref) = default;
+	messaging_encode(messaging_encode && ref) noexcept = default;
 	messaging_encode & operator = (const messaging_encode & ref) = default;
+	messaging_encode & operator = (messaging_encode && ref) noexcept = default;
 	~messaging_encode() = default;
 
 	    /// reset the object to its initial state
