@@ -71,8 +71,14 @@ namespace libdar
 	    /// copy constructor
         path(const path & ref);
 
+	    /// move constructor
+	path(path && ref) noexcept = default;
+
 	    /// assignment operator
         path & operator = (const path & ref);
+
+	    /// move operator
+	path & operator = (path && ref) noexcept = default;
 
 	    /// destructor
 	~path() = default;
