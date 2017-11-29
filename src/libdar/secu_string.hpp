@@ -78,8 +78,14 @@ namespace libdar
 	    /// the copy constructor
 	secu_string(const secu_string & ref) { copy_from(ref); };
 
+	    /// the move constructor
+	secu_string(secu_string && ref) noexcept { nullifyptr(); move_from(std::move(ref)); };
+
 	    /// the assignment operator
 	secu_string & operator = (const secu_string & ref) { clean_and_destroy(); copy_from(ref); return *this; };
+
+	    /// the move operator
+	secu_string & operator = (secu_string && ref) noexcept { move_from(std::move(ref)); return *this; };
 
 	    /// the destructor (set memory to zero before releasing it)
 	~secu_string() throw(Ebug) { clean_and_destroy(); };
@@ -164,10 +170,12 @@ namespace libdar
 	char *mem;
 	U_I *string_size;
 
+	void nullifyptr() noexcept { allocated_size = string_size = nullptr; mem = nullptr; };
 	void init(U_I size);   //< to be used at creation time or after clean_and_destroy() only
 	void copy_from(const secu_string & ref); //< to be used at creation time or after clean_and_destroy() only
+	void move_from(secu_string && ref) noexcept { std::swap(allocated_size, ref.allocated_size); std::swap(mem, ref.mem); std::swap(string_size, ref.string_size); };
 	bool compare_with(const char *ptr, U_I size) const; // return true if given sequence is the same as the one stored in "this"
-	void clean_and_destroy();
+	void clean_and_destroy() noexcept;
     };
 
 	/// @}

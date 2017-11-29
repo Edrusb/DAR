@@ -179,9 +179,7 @@ namespace libdar
 
     void secu_string::init(U_I size)
     {
-	allocated_size = nullptr;
-	mem = nullptr;
-	string_size = nullptr;
+	nullifyptr();
 
 	try
 	{
@@ -255,7 +253,7 @@ namespace libdar
 	}
     }
 
-    void secu_string::clean_and_destroy()
+    void secu_string::clean_and_destroy() noexcept
     {
 	if(string_size != nullptr)
 	{
