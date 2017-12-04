@@ -42,7 +42,9 @@ namespace libdar
     public:
 	slice_layout() = default;
 	slice_layout(const slice_layout & ref) = default;
+	slice_layout(slice_layout && ref) noexcept = default;
 	slice_layout & operator = (const slice_layout & ref) = default;
+	slice_layout & operator = (slice_layout && ref) noexcept = default;
 	~slice_layout() = default;
 
 	    // field still exposed (slice_layout was a struct before being a class)
