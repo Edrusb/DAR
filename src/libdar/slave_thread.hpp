@@ -56,7 +56,9 @@ namespace libdar
 		     libthreadar::fast_tampon<char> *x_input_ctrl,
 		     libthreadar::fast_tampon<char> *x_output_ctrl);
 	slave_thread(const slave_thread & ref) = delete;
+	slave_thread(slave_thread && ref) noexcept = delete;
 	slave_thread & operator = (const slave_thread & ref) = delete;
+	slave_thread & operator = (slave_thread && ref) noexcept = delete;
 	~slave_thread() noexcept {};
 
 	    /// true if the thread has suspended waiting for a new order (no data to write, no read_ahead to perform)
