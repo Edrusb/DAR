@@ -81,8 +81,14 @@ namespace libdar
 	    /// copy constructor
 	semaphore(const semaphore & ref) : mem_ui(ref) { copy_from(ref); };
 
+	    /// move constructor
+	semaphore(semaphore && ref) noexcept: mem_ui(std::move(ref)) { nullifyptr(); move_from(std::move(ref)); };
+
 	    /// assignment operator
 	semaphore & operator = (const semaphore & ref) { detruit(); copy_from(ref); return *this; };
+
+	    /// move operator
+	semaphore & operator = (semaphore && ref) noexcept { move_from(std::move(ref)); return *this; };
 
 	    /// destructor
 	~semaphore() { detruit(); };
@@ -114,8 +120,10 @@ namespace libdar
 	std::string execute;  //< command to execute
 	const mask *match;    //< for which file to run the execute command
 
+	void nullifyptr() noexcept { match = nullptr; };
 	std::string build_string(const std::string & context);
 	void copy_from(const semaphore & ref);
+	void move_from(semaphore && ref) noexcept;
 	void detruit();
     };
 

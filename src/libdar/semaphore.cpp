@@ -146,6 +146,18 @@ namespace libdar
 	    throw Ememory("semaphore::copy_from");
     }
 
+    void semaphore::move_from(semaphore && ref) noexcept
+    {
+	count = move(ref.count);
+	chem = move(ref.chem);
+	filename = move(ref.filename);
+	uid = move(ref.uid);
+	gid = move(ref.gid);
+	sig = move(ref.sig);
+	execute = move(ref.execute);
+	swap(match, ref.match);
+    }
+
     void semaphore::detruit()
     {
 	if(match != nullptr)
