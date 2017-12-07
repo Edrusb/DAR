@@ -57,15 +57,13 @@ namespace libdar
         tronc(generic_file *f, const infinint &offset, bool own_f = false);
         tronc(generic_file *f, const infinint &offset, gf_mode mode, bool own_f = false);
 
-	tronc(const tronc & ref) = default;
-	tronc & operator = (const tronc & ref) = default;
+	tronc(const tronc & ref) = delete;
+	tronc(tronc && ref) noexcept = delete;
+	tronc & operator = (const tronc & ref) = delete;
+	tronc & operator = (tronc && ref) = delete;
 
 	    /// destructor
-	~tronc()
-	{
-	    if(own_ref)
-		delete ref;
-	};
+	~tronc() { detruit(); };
 
 	    /// modify the tronc object to zoom on another (size limited) portion of the underlying object
 	void modify(const infinint & new_offset, const infinint & new_size);
@@ -116,6 +114,7 @@ namespace libdar
 	bool check_pos;    //< whether to check and eventually adjust (seek) the position of the underlying layer at each read or write
 
 	void set_back_current_position();
+	void detruit() noexcept { if(own_ref && ref != nullptr) delete ref; };
     };
 
 	/// @}

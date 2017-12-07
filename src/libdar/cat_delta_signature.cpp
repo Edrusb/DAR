@@ -78,7 +78,7 @@ namespace libdar
 
 	    try
 	    {
-		tronc bounded = tronc(&f, delta_sig_offset, delta_sig_size, false);
+		tronc bounded(&f, delta_sig_offset, delta_sig_size, false);
 		infinint crc_size = tools_file_size_to_crc_size(delta_sig_size);
 
 		sig = new memory_file();
