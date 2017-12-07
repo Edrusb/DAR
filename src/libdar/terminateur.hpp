@@ -48,7 +48,9 @@ namespace libdar
     public :
 	terminateur() = default;
 	terminateur(const terminateur & ref) = default;
+	terminateur(terminateur && ref) noexcept = default;
 	terminateur & operator = (const terminateur & ref) = default;
+	terminateur & operator = (terminateur && ref) noexcept = default;
 	~terminateur() = default;
 
         void set_catalogue_start(infinint xpos) { pos = xpos; };
