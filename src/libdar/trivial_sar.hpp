@@ -91,8 +91,14 @@ namespace libdar
 	    /// copy constructor (disabled)
 	trivial_sar(const trivial_sar & ref) = delete;
 
+	    /// move constructor
+	trivial_sar(trivial_sar && ref) noexcept = delete;
+
 	    /// assignment operator (disabled)
 	trivial_sar & operator = (const trivial_sar & ref) = delete;
+
+	    /// move operator
+	trivial_sar & operator = (trivial_sar && ref) noexcept = delete;
 
 	    /// destructor
 	~trivial_sar();
