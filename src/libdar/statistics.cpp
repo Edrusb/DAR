@@ -128,6 +128,22 @@ namespace libdar
 	fsa_treated = ref.fsa_treated;
     }
 
+    void statistics::move_from(statistics && ref) noexcept
+    {
+	swap(lock_mutex, ref.lock_mutex);
+	swap(locking, ref.locking);
+	treated = move(ref.treated);
+	hard_links = move(ref.hard_links);
+	skipped = move(ref.skipped);
+	ignored = move(ref.ignored);
+	tooold = move(ref.tooold);
+	errored = move(ref.errored);
+	deleted = move(ref.deleted);
+	ea_treated = move(ref.ea_treated);
+	byte_amount = move(ref.byte_amount);
+	fsa_treated = move(ref.fsa_treated);
+    }
+
     void statistics::dump(user_interaction & dialog) const
     {
 	dialog.printf("--------- Statistics DUMP ----------");

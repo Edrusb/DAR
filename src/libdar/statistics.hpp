@@ -77,7 +77,9 @@ namespace libdar
 	    /// to always use the default value for this constructor or to explicitely give "true" as argument.
 	statistics(bool lock = true) { init(lock); clear(); };
 	statistics(const statistics & ref) { copy_from(ref); };
+	statistics(statistics && ref) noexcept { init(false); move_from(std::move(ref)); };
 	statistics & operator = (const statistics & ref) { detruit(); copy_from(ref); return *this; };
+	statistics & operator = (statistics && ref) noexcept { move_from(std::move(ref)); return *this; };
 
 	    /// destructor
 	~statistics() { detruit(); };
@@ -239,6 +241,7 @@ namespace libdar
 	void init(bool lock); // set locking & mutex
 	void detruit();       // release and free the mutex
 	void copy_from(const statistics & ref); // reset mutex and copy data from the object of reference
+	void move_from(statistics && ref) noexcept;
 
     };
 
