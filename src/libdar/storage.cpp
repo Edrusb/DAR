@@ -433,7 +433,7 @@ namespace libdar
 	}
     }
 
-    void storage::move_from(storage && ref)
+    void storage::move_from(storage && ref) noexcept
     {
 	swap(first, ref.first);
 	swap(last, ref.last);

@@ -69,9 +69,9 @@ namespace libdar
         storage(const infinint & size);
         storage(generic_file & f, const infinint & size);
         storage(const storage & ref) { copy_from(ref); };
-	storage(storage && ref): first(nullptr), last(nullptr) { move_from(std::move(ref)); };
+	storage(storage && ref) noexcept: first(nullptr), last(nullptr) { move_from(std::move(ref)); };
         storage & operator = (const storage & val) { detruit(first); copy_from(val); return *this; };
-	storage & operator = (storage && val) { move_from(std::move(val)); return *this; };
+	storage & operator = (storage && val) noexcept { move_from(std::move(val)); return *this; };
         ~storage() { detruit(first); };
 
         bool operator < (const storage & ref) const noexcept
@@ -184,7 +184,7 @@ namespace libdar
         struct cellule *first, *last;
 
         void copy_from(const storage & ref);
-	void move_from(storage && ref);
+	void move_from(storage && ref) noexcept;
         S_32 difference(const storage & ref) const;
         void reduce(); // heuristic that tries to free some memory;
         void insert_bytes_at_iterator_cmn(iterator it, bool constant, unsigned char *a, U_I size);
