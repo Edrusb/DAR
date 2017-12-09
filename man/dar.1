@@ -592,7 +592,7 @@ pauses before writing to a new slice (this requires -s). By default there is no 
 -D, --empty-dir
 At backup time, when excluding directories either explicitly using -P or -] options, or implicitly by giving a -g or -[ options (a directory is excluded if it does not match mask given with -g options or -[ options)
 .B dar
-does not store anything about these. But with -D option, dar stores them as empty directories. This can be useful, if excluding a mount point (like /proc or /dev/pts). At restoration time, dar will then recreate these directories (if necessary). This option has no meaning with -C and is ignored in that case. Independently of that, -D can also be used at restoration time, but it activates a slightly different feature (see restoration options below).
+does not store anything about these. But with -D option, dar stores them as empty directories. This can be useful, if excluding a mount point (like /proc or /dev/pts). At restoration time, dar will then recreate these directories (if necessary). This option has no meaning with -C and is ignored in that case. Independently of that, -D can also be used at restoration time, but it activates a slightly different feature (see RESTORATION SPECIFIC OPTIONS below).
 .TP 20
 -Z, --exclude-compression <mask>
 Filenames covered by this mask are not compressed. It is only useful in conjunction with -z option. By default, all file are compressed (if compression is used). This option can be used several times, in that case a file that matches one of the -Z mask will not be compressed. Argument given to -Z must not be include any path, just the filename (eventually/probably using wildcards).
@@ -632,7 +632,7 @@ don't save contents of directories that use the Cache Directory Tagging Standard
 This option let the user define when or how file overwriting can occur at restoration or archive merging time. It does no apply to slice overwriting which are driven by the -n option, it does instead apply to file during extraction and files inside archives when merging two of them. When considering overwriting, a file is said to be 'in place' while an other is known as 'new' or 'to be added'. At restoration time, the 'in place' is the one that is present in filesystem while the 'to be added' is the one from the archive. At merging time, the 'in place' is the one of the '-A' archive of reference while the 'to be added' is the one from the auxiliary '-@' archive or reference.
 .RS
 .PP
-As soon as you use -/ option -n only applies only to slice overwriting and the -r, -k and -ae options are ignored (restoration options).
+As soon as you use -/ option -n only applies only to slice overwriting and the -r, -k and -ae options are ignored (restoration specific options).
 .PP
 The given <policy> argument is composed of actions and eventually of conditional expressions. Actions do define how to solve overwriting conflict about file's data on one side and file's Attributes (Extended and Filesystem Specific) on the other side. An action is thus a couple of action for Data and for EA+FSA. Actions for Data are represented by uppercase letters, while action for EA+FSA are defined by lowercase letters. Both actions are independent of each other:
 .RE

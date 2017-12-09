@@ -3,6 +3,8 @@ from 2.5.13 to 2.5.14
   ligcrypt version, to respect libgcrypt usage
 - fixed syntax error in XML listing output (EA_entry and Attributes
   tags)
+- fixed typo in dar man page
+- Updating Tutorial
 
 from 2.5.12 to 2.5.13
 - added -az option to automatically nullify negative dates returned from
