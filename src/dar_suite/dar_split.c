@@ -191,15 +191,22 @@ static void pipe_handle_end(int x)
 
 static void normal_read_to_multiple_write(char *filename)
 {
-    char buffer[BUFSIZE];
+    char* buffer = (char*) malloc(BUFSIZE);
     int lu;
     int ecru;
     int offset;
-    int fd = open_write(filename);
+    int fd = buffer == NULL ? -1 : open_write(filename);
+    int run = 1;
+
+    if(buffer == NULL)
+    {
+	fprintf(stderr, "Error allocating %u bytes memory block: %s\n", BUFSIZE, strerror(errno));
+	run = 0;
+    }
 
     signal(SIGPIPE, pipe_handle_pause); /* handling case when writing to pipe that has no reader */
 
-    while(1)
+    while(run)
     {
 	lu = read(0, buffer, BUFSIZE);
 	if(lu == 0) /* reached EOF */
@@ -265,15 +272,22 @@ static void normal_read_to_multiple_write(char *filename)
 
 static void multi_read_to_normal_write(char *filename)
 {
-    char buffer[BUFSIZE];
+    char* buffer = (char*)malloc(BUFSIZE);
     int lu;
     int ecru;
     int offset;
-    int fd = open_read(filename);
+    int fd = buffer == NULL ? -1 : open_read(filename);
+    int run = 1;
+
+    if(buffer == NULL)
+    {
+	fprintf(stderr, "Error allocating %u bytes memory block: %s\n", BUFSIZE, strerror(errno));
+	run = 0;
+    }
 
     signal(SIGPIPE, pipe_handle_end); /* handling case when writing to pipe that has no reader */
 
-    while(1)
+    while(run)
     {
 	lu = read(fd, buffer, BUFSIZE);
 	if(lu == 0) // EOF
