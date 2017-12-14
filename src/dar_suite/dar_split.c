@@ -20,6 +20,7 @@
 ******************************************************************** */
 
 #include "../my_config.h"
+#include "cygwin_adapt.h"
 
 #if HAVE_STDIO_H
 #include <stdio.h>
@@ -378,7 +379,7 @@ static int open_write(char *filename)
 
     do
     {
-	fd = open(filename, O_WRONLY);
+	fd = open(filename, O_WRONLY|O_BINARY);
 	if(fd < 0)
 	{
 	    fprintf(stderr,"Error opening output: %s\n", strerror(errno));
@@ -396,7 +397,7 @@ static int open_read(char *filename)
 
     do
     {
-	fd = open(filename, O_RDONLY);
+	fd = open(filename, O_RDONLY|O_BINARY);
 	if(fd < 0)
 	{
 	    fprintf(stderr,"Error opening input: %s\n", strerror(errno));
