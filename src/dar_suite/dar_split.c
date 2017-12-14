@@ -248,7 +248,7 @@ static void normal_read_to_multiple_write(char *filename)
 		    stop_and_wait();
 		    break;
 		}
-		continue; /* starting over the while do - while loop */
+		continue; /* starting over the do - while loop */
 	    }
 
 	    if(ecru > lu)
