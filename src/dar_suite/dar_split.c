@@ -378,7 +378,7 @@ static int open_write(char *filename)
 
     do
     {
-	fd = open(filename, O_WRONLY|O_SYNC);
+	fd = open(filename, O_WRONLY);
 	if(fd < 0)
 	{
 	    fprintf(stderr,"Error opening output: %s\n", strerror(errno));
