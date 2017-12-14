@@ -61,6 +61,10 @@
 #include <stdlib.h>
 #endif
 
+#if HAVE_LIMITS_H
+#include <limits.h>
+#endif
+
 /// the compiler Nature MACRO
 #ifdef __GNUC__
 #define CC_NAT "GNUC"
@@ -69,6 +73,13 @@
 #endif
 
 #define BUFSIZE 102400
+#ifdef SSIZE_MAX
+#if SSIZE_MAX < BUFSIZE
+#undef BUFSIZE
+#define BUFSIZE SSIZE_MAX
+#endif
+#endif
+
 #define KEY_INPUT "split_input"
 #define KEY_OUTPUT "split_output"
 #define DAR_SPLIT_VERSION "1.0.0"
