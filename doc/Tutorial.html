@@ -432,7 +432,7 @@ on the partition of your new hard drive:<br>
       </code></div>
       <div style="text-align: justify;">would do the trick<br>
       <br>
-6 bis. If you want to restore your system over several partitions like
+6-alternative. If you want to restore your system over several partitions like
 /usr /var /home and / , you must create the partitions, format them as seen above and then
 create the directories that will be used as mounting point an mount the
 partitions on these directories. For example if you have / , /usr ,
@@ -467,9 +467,9 @@ the key to know which device to use in place of the fancy /dev/sga). We
 will remove dar_static from your new hard drive at the end of
 restoration.<br>
       <br>
-10. Now we can restore the archive. The stuff has to go in /disk subdirectory<br>
+8. Now we can restore the archive. The stuff has to go in /disk subdirectory<br>
 *** here comes the option: -R /disk<br>
-      <br>11. The process may be long, thus it might be useful to be noticed when
+      <br>9. The process may be long, thus it might be useful to be noticed when
 a user action is required by dar.<br>
 *** here comes the option: -b<br>
 note that -p option is not required here because if a slice is missing
@@ -500,7 +500,7 @@ let's go restoring!<br>
 xterm /
 virtual console or suspend dar by CTRL-Z and awake it back by the 'fg'
 command. Then press &lt;enter&gt; to proceed with dar<br>
-      <br>12.
+      <br>10.
 Once finished with the restoration of linux_full, we have to do the
 same with any following differential/incremental backup. However, doing
 so will warn you any time dar restores a more recent file (file
@@ -524,15 +524,15 @@ Then any additional archive:<br>
 ...<br>
 /disk/dar_static -x /usb_key/linux...&nbsp;&nbsp;&nbsp; -R /disk -b -w</code><br>
       </div>
-      <div style="text-align: justify;"><br>13. Finally, remove the dar binary from the disk:<br>
+      <div style="text-align: justify;"><br>11. Finally, remove the dar binary from the disk:<br>
       </div>
       
       <div style="margin-left: 40px; text-align: justify;"><code>rm
 /disk/dar_static</code><br>
       </div><div style="text-align: justify;"><br>
-14. modify the /etc/fstab with the new UUID you have recorded at step 4, 5 and eventually 6 bis.<br>
+12. modify the /etc/fstab with the new UUID you have recorded at step 4, 5 and eventually 6 bis.<br>
 <br>
-15. Last, reinstall you original boot loader&nbsp; from the restored data:<br>
+13. Last, reinstall you original boot loader&nbsp; from the restored data:<br>
       </div>
       
       <div style="margin-left: 40px; text-align: justify;"><code></code><code><span style="font-family: serif;">If you still use lilo type:</span></code><br>
@@ -549,7 +549,7 @@ grub-install /dev/sda<br>
       <code><span style="font-family: serif;"></span></code></div>
       <code><span style="font-family: serif;"><br>
       </span></code>
-      </div><div style="text-align: justify;">16. You can reboot you machine and be happy with you brand-new hard
+      </div><div style="text-align: justify;">14. You can reboot you machine and be happy with you brand-new hard
 disk with your old precious data on it:<br>
       </div>
       <div style="margin-left: 40px; text-align: justify;"><code>shutdown
