@@ -19,22 +19,36 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \file cygwin_adapt.hpp
-    /// \brief thin C++ adaptation layer to Cygwin specifities
+    /// \file cygwin_adapt.h
+    /// \brief thin C adaptation layer to Cygwin specifities
     /// \ingroup Private
 
-#ifndef CYGWIN_ADAPT_HPP
-#define CYGWIN_ADAPT_HPP
+#ifndef CYGWIN_ADAPT_H
+#define CYGWIN_ADAPT_H
 
 #include "../my_config.h"
 
     /// \ingroup Private
     /// @}
 
-extern "C"
-{
-#include "cygwin_adapt.h"
-} // end extern "C"
+#if HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+	// if fcntl.h does not define O_TEXT nor O_BINARY (which is a Cygwin
+	// speciality), we define them as neutral ORed values : zero
+
+#ifndef O_TEXT
+// zero is neutral in ORed expression where it is expected to be used
+#define O_TEXT 0
+#endif
+
+#ifndef O_BINARY
+// zero is neutral in ORed expression where it is expected to be used
+#define O_BINARY 0
+#else
+#define CYGWIN_BUILD 1
+// if O_BINARY is defined we are compiling on or for a cygwin plateform
+#endif
 
     ///    @}
 
