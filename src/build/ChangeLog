@@ -5,11 +5,14 @@ from 2.5.13 to 2.5.14
   tags)
 - fixed typo in dar man page
 - Updating Tutorial
-- fixed bugs in dar_split (cygwin support, remove sync erroneous write
-  for full performance, filedescriptors were not explicitely closed at
-  end of execution, allocating buffer on head rather than in the stack
-  for better size flexibility, avoiding buffer size to be greater than
-  SSIZE_MAX)
+- fixed bugs in dar_split (cygwin support, filedescriptors were not
+  explicitely closed at end of execution, allocating buffer on head
+  rather than in the stack for better size flexibility, avoiding buffer
+  size to be greater than SSIZE_MAX)
+- added -s option to dar_split in order to disable the by default SYNC
+  write that was used and which caused poor performance. To keep the same
+  behavior of the older dar_split (and its poor performances) you need
+  now using -s option.
 
 from 2.5.12 to 2.5.13
 - added -az option to automatically nullify negative dates returned from

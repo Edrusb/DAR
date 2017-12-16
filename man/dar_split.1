@@ -3,7 +3,7 @@
 .SH NAME
 dar_split \- dar helper to split an archive over several tapes
 .SH SYNOPSIS
-dar_split { split_input | split_output } <filename>
+dar_split { split_input | [-s] split_output } <filename>
 .P
 dar_split -v
 .P
@@ -12,7 +12,7 @@ dar_split -h
 .B dar_split
 is to be used with dar to read or write a large archive from or to several tapes.
 
-.SH OPTIONS
+.SH COMMANDS
 .B dar_split
 has two modes of operation: split_input and split_output
 .TP 20
@@ -21,6 +21,10 @@ in this mode dar_split copies <filename> to its standard output. <filename> may 
 .TP 20
 split_output
 in this mode dar_split copies its standard input to <filename>. However if <filename> is full, dar_split suspends and waits for the user to press the return key in order to continue. In the meanwhile, the user can rewind and change the tape. When dar_split is awaken again, it reopens <filename> and continues to copy to <filename> what was not yet written previously.
+
+.SH OPTIONS
+.B -s
+is only available for split_output mode an leads dar_split to perform sync writes in place of normal writes. This has the drawback to drastically reduce performances but may be necessary under certain circumstances where the operating system cache reports a write operation as successful while the cache underlying medium is already full.
 
 .SH EXAMPLES OF USE
 creating an archive over several tapes
