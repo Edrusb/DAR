@@ -262,6 +262,7 @@ static void normal_read_to_multiple_write(char *filename, int sync_mode)
 		case EINTR:
 		    break;
 		case ENOSPC:
+		    syncfs(fd);
 		    close(fd);
 		    fprintf(stderr, "No space left on destination, please to something!\n");
 		    stop_and_wait();

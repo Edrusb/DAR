@@ -13,6 +13,8 @@ from 2.5.13 to 2.5.14
   write that was used and which caused poor performance. To keep the same
   behavior of the older dar_split (and its poor performances) you need
   now using -s option.
+- dar_split enhancement: added call to syncfs before closing the file
+  descriptor in split_output mode
 
 from 2.5.12 to 2.5.13
 - added -az option to automatically nullify negative dates returned from
