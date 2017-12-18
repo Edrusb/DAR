@@ -254,6 +254,7 @@ static void normal_read_to_multiple_write(char *filename, int sync_mode)
     int offset;
     int fd = buffer == NULL ? -1 : open_write(filename, sync_mode);
     int run = 1;
+    size_t tape_size = 0;
 
     if(buffer == NULL)
     {
@@ -297,9 +298,10 @@ static void normal_read_to_multiple_write(char *filename, int sync_mode)
 		case ENOSPC:
 		    syncfs(fd);
 		    close(fd);
-		    fprintf(stderr, "No space left on destination, please to something!\n");
 		    stop_and_wait();
 		    fd = open_write(filename, sync_mode);
+			fprintf(stderr, "No space left on destination after having written %ld bytes, please to something!\n", tape_size);
+			tape_size = 0;
 		    break;
 		default:
 		    fprintf(stderr, "Error writing data: %s\n", strerror(errno));
@@ -319,12 +321,16 @@ static void normal_read_to_multiple_write(char *filename, int sync_mode)
 
 	    offset += ecru;
 	    lu -= ecru;
+		    offset += ecru;
 	}
 	while(lu > 0);
 
 	if(lu > 0)
 	    break; /* not all data could be written, aborting */
     }
+
+    fprintf(stderr, "%ld bytes written since the last media change", tape_size);
+
     if(fd >= 0)
     {
 	syncfs(fd);
