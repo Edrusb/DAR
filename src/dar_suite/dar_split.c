@@ -391,7 +391,10 @@ static void multi_read_to_normal_write(char *filename)
     }
 
     if(fd >= 0)
+    {
+	syncfs(fd);
 	close(fd);
+    }
     if(buffer != NULL)
 	free(buffer);
 }
