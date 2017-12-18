@@ -326,7 +326,10 @@ static void normal_read_to_multiple_write(char *filename, int sync_mode)
 	    break; /* not all data could be written, aborting */
     }
     if(fd >= 0)
+    {
+	syncfs(fd);
 	close(fd);
+    }
     if(buffer != NULL)
 	free(buffer);
 }
@@ -424,10 +427,7 @@ static void multi_read_to_normal_write(char *filename)
     }
 
     if(fd >= 0)
-    {
-	syncfs(fd);
 	close(fd);
-    }
     if(buffer != NULL)
 	free(buffer);
 }
