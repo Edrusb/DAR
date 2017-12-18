@@ -88,6 +88,8 @@
 static void usage(char *a);
 static void show_version(char *a);
 static int init();
+static void blocking_read(int fd, int mode);
+static void purge_fd(int fd);
 static void stop_and_wait();
 static void pipe_handle_pause(int x);
 static void pipe_handle_end(int x);
@@ -193,10 +195,41 @@ static int init()
 	return 1; /* true */
 }
 
+static void blocking_read(int fd, int mode)
+{
+    int flags = fcntl(fd_inter, F_GETFL, 0);
+
+	/* code fetched from tools_blocking_read() but not usable as is because dar_split is written in basic C (not C++) */
+
+    if(flags < 0)
+	fprintf(stderr, "Cannot read \"fcbtl\" file's flags: %s\n", strerror(errno));
+    else
+    {
+	if(!mode)
+	    flags |= O_NONBLOCK;
+	else
+	    flags &= ~O_NONBLOCK;
+	if(fcntl(fd, F_SETFL, flags) < 0)
+	    fprintf(stderr, "Cannot modify the NONBLOCK fcntl flag: %s", strerror(errno));
+    }
+}
+
+static void purge_fd(int fd)
+{
+    static const int bufsize = 10;
+    char buf[bufsize];
+
+    blocking_read(fd, 0 == 1);
+    while(read(fd, buf, bufsize) >= 0)
+	;
+    blocking_read(fd, 0 == 0);
+}
+
 static void stop_and_wait()
 {
     char tmp[10];
 
+    purge_fd(fd_inter);
     fprintf(stderr, "Press return when ready to continue or hit CTRL-C to abort\n");
     read(fd_inter, tmp, 3);
 }
