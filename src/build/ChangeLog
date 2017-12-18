@@ -6,7 +6,7 @@ from 2.5.13 to 2.5.14
 - fixed typo in dar man page
 - Updating Tutorial
 - fixed bugs in dar_split (cygwin support, filedescriptors were not
-  explicitely closed at end of execution, allocating buffer on head
+  explicitly closed at end of execution, allocating buffer on head
   rather than in the stack for better size flexibility, avoiding buffer
   size to be greater than SSIZE_MAX)
 - added -s option to dar_split in order to disable the by default SYNC
@@ -15,6 +15,12 @@ from 2.5.13 to 2.5.14
   now using -s option.
 - dar_split enhancement: added call to syncfs before closing the file
   descriptor in split_output mode
+- fixed bug in dar_split that was did not lead dar_split to completely
+  fulfill an device before asking for user to change the media when
+  used in split_output mode
+- added feature in dar_split to show the amount of data written since
+  the last media change
+
 
 from 2.5.12 to 2.5.13
 - added -az option to automatically nullify negative dates returned from
