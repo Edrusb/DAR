@@ -255,6 +255,7 @@ static void normal_read_to_multiple_write(char *filename, int sync_mode)
     int fd = buffer == NULL ? -1 : open_write(filename, sync_mode);
     int run = 1;
     size_t tape_size = 0;
+    size_t step;
 
     if(buffer == NULL)
     {
@@ -284,9 +285,10 @@ static void normal_read_to_multiple_write(char *filename, int sync_mode)
 	    /* now we have data to write down */
 
 	offset = 0;
+	step = lu;
 	do
 	{
-	    ecru = write(fd, buffer + offset, lu);
+	    ecru = write(fd, buffer + offset, step);
 
 	    if(ecru < 0) /* an error occured */
 	    {
@@ -296,32 +298,40 @@ static void normal_read_to_multiple_write(char *filename, int sync_mode)
 		case EINTR:
 		    break;
 		case ENOSPC:
-		    syncfs(fd);
-		    close(fd);
-		    stop_and_wait();
-		    fd = open_write(filename, sync_mode);
+		    if(step > 1)
+			step /= 2;
+		    else
+		    {
+			syncfs(fd);
+			close(fd);
 			fprintf(stderr, "No space left on destination after having written %ld bytes, please to something!\n", tape_size);
 			tape_size = 0;
+			step = lu;
+			stop_and_wait();
+			fd = open_write(filename, sync_mode);
+		    }
 		    break;
 		default:
 		    fprintf(stderr, "Error writing data: %s\n", strerror(errno));
 		    stop_and_wait();
-		    break;
 		}
-		continue; /* starting over the do - while loop */
 	    }
-
-	    if(ecru > lu)
+	    else
 	    {
-		fprintf(stderr, "BUG MET at line %d\n", __LINE__);
-		break; /* end or processing */
-	    }
+		if(ecru > lu)
+		{
+		    fprintf(stderr, "BUG MET at line %d\n", __LINE__);
+		    break; /* end or processing */
+		}
+		else
+		{
+			/* starting from here no error occurred and ecru >= 0 */
 
-		/* starting from here no error occurred and ecru >= 0 */
-
-	    offset += ecru;
-	    lu -= ecru;
 		    offset += ecru;
+		    lu -= ecru;
+		    tape_size += ecru;
+		}
+	    }
 	}
 	while(lu > 0);
 
