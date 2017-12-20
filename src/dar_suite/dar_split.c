@@ -83,7 +83,7 @@
 
 #define KEY_INPUT "split_input"
 #define KEY_OUTPUT "split_output"
-#define DAR_SPLIT_VERSION "1.1.0"
+#define DAR_SPLIT_VERSION "1.1.1"
 
 static void usage(char *a);
 static void show_version(char *a);
@@ -302,7 +302,11 @@ static void normal_read_to_multiple_write(char *filename, int sync_mode)
 			step /= 2;
 		    else
 		    {
+#if HAVE_SYNCFS
 			syncfs(fd);
+#else
+			sync();
+#endif
 			close(fd);
 			fprintf(stderr, "No space left on destination after having written %ld bytes, please to something!\n", tape_size);
 			tape_size = 0;
@@ -343,7 +347,11 @@ static void normal_read_to_multiple_write(char *filename, int sync_mode)
 
     if(fd >= 0)
     {
+#if HAVE_SYNCFS
 	syncfs(fd);
+#else
+	sync();
+#endif
 	close(fd);
     }
     if(buffer != NULL)

@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.69)
-AC_INIT([DAR], [2.5.14], [[http://sourceforge.net/tracker/?group_id=65612&atid=511612]])
+AC_INIT([DAR], [2.5.14-bis], [[http://sourceforge.net/tracker/?group_id=65612&atid=511612]])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -270,6 +270,21 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 		   [ AC_MSG_RESULT([not available])
 		   ])
 
+AC_MSG_CHECKING([for syncfs() availability])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
+			           #if HAVE_UNISTD_H
+				   #include <unistd.h>
+				   #endif
+				   }]],
+				   [
+				   (void)syncfs(0);
+				   ])
+		   ],
+		   [ AC_DEFINE(HAVE_SYNCFS, 1, [whether the system provides syncfs() system call])
+		     AC_MSG_RESULT(available)
+		   ],
+		   [ AC_MSG_RESULT([not available])
+		   ])
 
 AC_MSG_CHECKING([for the possibility to set timestamps at a microsecond precision])
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {

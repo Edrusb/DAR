@@ -1,3 +1,8 @@
+from 2.5.14 to 2.5.14-bis
+- avoiding using the syncfs() system call in dar_split when the
+  platform does not support it (replacing it by sync() in that case
+  for compilation to be successful)
+
 from 2.5.13 to 2.5.14
 - made libgcrypt built-in memory guard be initialized before obtaining
   ligcrypt version, to respect libgcrypt usage (but no problem was seen
