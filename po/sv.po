@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2017-10-28 16:23+0200\n"
+"POT-Creation-Date: 2017-12-20 16:20+0100\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -3903,39 +3903,39 @@ msgstr "Ogiltig NULL-pekare givet till 'close_archive'"
 msgid "Initialization problem for liblzo2 library"
 msgstr "Initieringsproblem för liblzo2-biblioteket"
 
-#: src/libdar/libdar.cpp:375 src/libdar/libdar.cpp:397
-#, c-format
-msgid "Too old version for libgcrypt, minimum required version is %s\n"
-msgstr "För gammal version av libgcrypt, som minst krävs version %s\n"
-
-#: src/libdar/libdar.cpp:384
+#: src/libdar/libdar.cpp:374
 #, c-format
 msgid "Error while activating libgcrypt's memory guard: %s/%s"
 msgstr "Fel vid aktivering av 'libgcrypts' minnesskydd: %s/%s"
 
-#: src/libdar/libdar.cpp:388
+#: src/libdar/libdar.cpp:381 src/libdar/libdar.cpp:399
+#, c-format
+msgid "Too old version for libgcrypt, minimum required version is %s\n"
+msgstr "För gammal version av libgcrypt, som minst krävs version %s\n"
+
+#: src/libdar/libdar.cpp:390
 #, c-format
 msgid "Error while telling libgcrypt that initialization is finished: %s/%s"
 msgstr ""
 "Fel vid meddelande till 'libgcrypt' att initialiseringen är avslutad: %s/%s"
 
-#: src/libdar/libdar.cpp:393
+#: src/libdar/libdar.cpp:395
 msgid "libgcrypt not initialized and libdar not allowed to do so"
 msgstr "'libgcrypt' är ej initialiserad och 'libdar' ej tillåten att göra så"
 
-#: src/libdar/libdar.cpp:404
+#: src/libdar/libdar.cpp:406
 #, c-format
 msgid "GPGME version requirement is not satisfied, requires version > %s"
 msgstr ""
 
-#: src/libdar/libdar.cpp:408
+#: src/libdar/libdar.cpp:410
 #, c-format
 msgid "GPGME engine not available: %s"
 msgstr ""
 
-#: src/libdar/libdar.cpp:441 src/libdar/libdar.cpp:461
-#: src/libdar/libdar.cpp:480 src/libdar/libdar.cpp:502
-#: src/libdar/libdar.cpp:522
+#: src/libdar/libdar.cpp:443 src/libdar/libdar.cpp:463
+#: src/libdar/libdar.cpp:482 src/libdar/libdar.cpp:504
+#: src/libdar/libdar.cpp:524
 #, fuzzy
 msgid "Invalid nullptr argument given to 'ptr'"
 msgstr "Ogiltigt NULL-argument givet till 'ptr'"
@@ -5760,7 +5760,7 @@ msgstr "EA storlek       :\t  %i  \t  %i"
 msgid "directory"
 msgstr "mapp"
 
-#: src/libdar/criterium.cpp:969 src/libdar/cat_tools.cpp:394
+#: src/libdar/criterium.cpp:969 src/libdar/cat_tools.cpp:397
 msgid "hard linked inode"
 msgstr "hårdlänkad inode"
 
@@ -5772,11 +5772,11 @@ msgstr "enkel fil"
 msgid "soft link"
 msgstr "mjuk länk"
 
-#: src/libdar/criterium.cpp:975 src/libdar/cat_tools.cpp:379
+#: src/libdar/criterium.cpp:975 src/libdar/cat_tools.cpp:382
 msgid "char device"
 msgstr "teckenenhet"
 
-#: src/libdar/criterium.cpp:977 src/libdar/cat_tools.cpp:382
+#: src/libdar/criterium.cpp:977 src/libdar/cat_tools.cpp:385
 msgid "block device"
 msgstr "blockenhet"
 
@@ -6696,48 +6696,48 @@ msgstr "[Sparad]"
 msgid "[InRef]"
 msgstr "[InRef]"
 
-#: src/libdar/cat_tools.cpp:361
+#: src/libdar/cat_tools.cpp:364
 #, fuzzy
 msgid "ignored directory"
 msgstr "mapp"
 
-#: src/libdar/cat_tools.cpp:364
+#: src/libdar/cat_tools.cpp:367
 msgid "folder"
 msgstr ""
 
-#: src/libdar/cat_tools.cpp:367
+#: src/libdar/cat_tools.cpp:370
 #, fuzzy
 msgid "deleted file"
 msgstr "fördröjd inmatning"
 
-#: src/libdar/cat_tools.cpp:370
+#: src/libdar/cat_tools.cpp:373
 msgid "door"
 msgstr ""
 
-#: src/libdar/cat_tools.cpp:373
+#: src/libdar/cat_tools.cpp:376
 msgid "file"
 msgstr ""
 
-#: src/libdar/cat_tools.cpp:376
+#: src/libdar/cat_tools.cpp:379
 #, fuzzy
 msgid "symlink"
 msgstr "mjuk länk"
 
-#: src/libdar/cat_tools.cpp:385
+#: src/libdar/cat_tools.cpp:388
 msgid "pipe"
 msgstr ""
 
-#: src/libdar/cat_tools.cpp:388
+#: src/libdar/cat_tools.cpp:391
 #, fuzzy
 msgid "socket"
 msgstr "unix sockel"
 
-#: src/libdar/cat_tools.cpp:391
+#: src/libdar/cat_tools.cpp:394
 #, fuzzy
 msgid "ignored entry"
 msgstr "fördröjd inmatning"
 
-#: src/libdar/cat_tools.cpp:397
+#: src/libdar/cat_tools.cpp:400
 #, fuzzy
 msgid "end of directory"
 msgstr "mapp"

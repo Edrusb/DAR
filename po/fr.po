@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: DAR 2.5.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2017-10-28 16:23+0200\n"
+"POT-Creation-Date: 2017-12-20 16:20+0100\n"
 "PO-Revision-Date: 2017-10-27 22:14+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -4042,43 +4042,43 @@ msgstr "valeur nullptr donnée à \"close_archive\""
 msgid "Initialization problem for liblzo2 library"
 msgstr "Problème d'initialisation pour la bibliothèque liblzo2"
 
-#: src/libdar/libdar.cpp:375 src/libdar/libdar.cpp:397
+#: src/libdar/libdar.cpp:374
+#, c-format
+msgid "Error while activating libgcrypt's memory guard: %s/%s"
+msgstr "Erreur lors de l'activation du garde de mémoire de libgcrypt : %s/%s"
+
+#: src/libdar/libdar.cpp:381 src/libdar/libdar.cpp:399
 #, c-format
 msgid "Too old version for libgcrypt, minimum required version is %s\n"
 msgstr ""
 "Version trop ancienne pour libgcrypt, la version minimale requise est %s\n"
 
-#: src/libdar/libdar.cpp:384
-#, c-format
-msgid "Error while activating libgcrypt's memory guard: %s/%s"
-msgstr "Erreur lors de l'activation du garde de mémoire de libgcrypt : %s/%s"
-
-#: src/libdar/libdar.cpp:388
+#: src/libdar/libdar.cpp:390
 #, c-format
 msgid "Error while telling libgcrypt that initialization is finished: %s/%s"
 msgstr ""
 "Erreur lors de la communication à libgcrypt que l'initialisation est "
 "terminée : %s/%s"
 
-#: src/libdar/libdar.cpp:393
+#: src/libdar/libdar.cpp:395
 msgid "libgcrypt not initialized and libdar not allowed to do so"
 msgstr ""
 "libgcrypt n'a pas été initialisée et libdar n'est pas autorisé à le faire"
 
-#: src/libdar/libdar.cpp:404
+#: src/libdar/libdar.cpp:406
 #, c-format
 msgid "GPGME version requirement is not satisfied, requires version > %s"
 msgstr ""
 "prérequis insatisfait pour GPGME, une version supérieure à %s est nécessaire"
 
-#: src/libdar/libdar.cpp:408
+#: src/libdar/libdar.cpp:410
 #, c-format
 msgid "GPGME engine not available: %s"
 msgstr "le moteur GPGME n'est pas disponible: %s"
 
-#: src/libdar/libdar.cpp:441 src/libdar/libdar.cpp:461
-#: src/libdar/libdar.cpp:480 src/libdar/libdar.cpp:502
-#: src/libdar/libdar.cpp:522
+#: src/libdar/libdar.cpp:443 src/libdar/libdar.cpp:463
+#: src/libdar/libdar.cpp:482 src/libdar/libdar.cpp:504
+#: src/libdar/libdar.cpp:524
 msgid "Invalid nullptr argument given to 'ptr'"
 msgstr "valeur nullptr donnée à \"ptr\""
 
@@ -5971,7 +5971,7 @@ msgstr "Taille totale des Attr. Eten.:\t  %i  \t\t  %i"
 msgid "directory"
 msgstr "répertoire"
 
-#: src/libdar/criterium.cpp:969 src/libdar/cat_tools.cpp:394
+#: src/libdar/criterium.cpp:969 src/libdar/cat_tools.cpp:397
 msgid "hard linked inode"
 msgstr "inode liée en dur"
 
@@ -5983,11 +5983,11 @@ msgstr "fichier plein"
 msgid "soft link"
 msgstr "lien symbolique"
 
-#: src/libdar/criterium.cpp:975 src/libdar/cat_tools.cpp:379
+#: src/libdar/criterium.cpp:975 src/libdar/cat_tools.cpp:382
 msgid "char device"
 msgstr "fichier spécial caractère"
 
-#: src/libdar/criterium.cpp:977 src/libdar/cat_tools.cpp:382
+#: src/libdar/criterium.cpp:977 src/libdar/cat_tools.cpp:385
 msgid "block device"
 msgstr "fichier spécial bloc"
 
@@ -6928,43 +6928,43 @@ msgstr "[Sauvé]"
 msgid "[InRef]"
 msgstr "[EnRef]"
 
-#: src/libdar/cat_tools.cpp:361
+#: src/libdar/cat_tools.cpp:364
 msgid "ignored directory"
 msgstr "répertoire ignoré"
 
-#: src/libdar/cat_tools.cpp:364
+#: src/libdar/cat_tools.cpp:367
 msgid "folder"
 msgstr "répertoire"
 
-#: src/libdar/cat_tools.cpp:367
+#: src/libdar/cat_tools.cpp:370
 msgid "deleted file"
 msgstr "entrée supprimée"
 
-#: src/libdar/cat_tools.cpp:370
+#: src/libdar/cat_tools.cpp:373
 msgid "door"
 msgstr "porte"
 
-#: src/libdar/cat_tools.cpp:373
+#: src/libdar/cat_tools.cpp:376
 msgid "file"
 msgstr "fichier"
 
-#: src/libdar/cat_tools.cpp:376
+#: src/libdar/cat_tools.cpp:379
 msgid "symlink"
 msgstr "lien symbolique"
 
-#: src/libdar/cat_tools.cpp:385
+#: src/libdar/cat_tools.cpp:388
 msgid "pipe"
 msgstr "tube nommé"
 
-#: src/libdar/cat_tools.cpp:388
+#: src/libdar/cat_tools.cpp:391
 msgid "socket"
 msgstr "prise unix"
 
-#: src/libdar/cat_tools.cpp:391
+#: src/libdar/cat_tools.cpp:394
 msgid "ignored entry"
 msgstr "entrée ignorée"
 
-#: src/libdar/cat_tools.cpp:397
+#: src/libdar/cat_tools.cpp:400
 msgid "end of directory"
 msgstr "fin de répertoire"
 
