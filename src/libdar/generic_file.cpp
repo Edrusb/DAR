@@ -511,6 +511,8 @@ namespace libdar
 	swap(checksum, ref.checksum);
 	terminated = move(ref.terminated);
 	no_read_ahead = move(ref.no_read_ahead);
+	active_read = move(ref.active_read);
+	active_write = move(ref.active_write);
     }
 
     const char * generic_file_get_name(gf_mode mode)
