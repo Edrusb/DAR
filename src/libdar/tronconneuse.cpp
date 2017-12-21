@@ -88,17 +88,12 @@ namespace libdar
 	    // has not been initialized.
     }
 
+
     tronconneuse & tronconneuse::operator = (const tronconneuse & ref)
     {
-	generic_file *moi = this;
-	const generic_file *toi = &ref;
-
-	if(is_terminated())
-	    throw SRC_BUG;
-
 	detruit();
-	*moi = *toi;
-	copy_from(ref);
+	generic_file::operator = (ref);
+
 	return *this;
     }
 
@@ -295,7 +290,7 @@ namespace libdar
 	    throw caught;
     }
 
-    void tronconneuse::detruit()
+    void tronconneuse::detruit() noexcept
     {
 	if(buf != nullptr)
 	{
@@ -320,10 +315,17 @@ namespace libdar
 	extra_buf_data = 0;
     }
 
-    void tronconneuse::copy_from(const tronconneuse & ref)
+    void tronconneuse::nullifyptr() noexcept
     {
 	buf = nullptr;
+	encrypted = nullptr;
 	encrypted_buf = nullptr;
+	extra_buf = nullptr;
+    }
+
+    void tronconneuse::copy_from(const tronconneuse & ref)
+    {
+	nullifyptr();
 
 	if(is_terminated())
 	    throw SRC_BUG;
@@ -368,6 +370,29 @@ namespace libdar
 	    detruit();
 	    throw;
 	}
+    }
+
+    void tronconneuse::move_from(tronconneuse && ref) noexcept
+    {
+	initial_shift = move(ref.initial_shift);
+	buf_offset = move(ref.buf_offset);
+	buf_byte_data = move(ref.buf_byte_data);
+	buf_size = move(ref.buf_size);
+	std::swap(buf, ref.buf);
+	clear_block_size = move(ref.clear_block_size);
+	current_position = move(ref.current_position);
+	block_num = move(ref.block_num);
+	encrypted = ref.encrypted; // yes, we copy the pointed to object address, here
+	encrypted_buf_size = move(ref.encrypted_buf_size);
+	encrypted_buf_data = move(ref.encrypted_buf_data);
+	std::swap(encrypted_buf, ref.encrypted_buf);
+	extra_buf_offset = move(ref.extra_buf_offset);
+	extra_buf_size = move(ref.extra_buf_size);
+	std::swap(extra_buf, ref.extra_buf);
+	weof = move(ref.weof);
+	reof = move(ref.reof);
+	reading_ver = move(ref.reading_ver);
+	trailing_clear_data = move(ref.trailing_clear_data);
     }
 
     U_32 tronconneuse::fill_buf()

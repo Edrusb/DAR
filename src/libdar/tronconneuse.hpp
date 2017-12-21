@@ -73,8 +73,14 @@ namespace libdar
 	    /// copy constructor
 	tronconneuse(const tronconneuse & ref) : generic_file(ref) { copy_from(ref); };
 
+	    /// move constructor
+	tronconneuse(tronconneuse && ref) noexcept: generic_file(std::move(ref)) { nullifyptr(); move_from(std::move(ref)); };
+
 	    /// assignment operator
 	tronconneuse & operator = (const tronconneuse & ref);
+
+	    /// move operator
+	tronconneuse & operator = (tronconneuse && ref) noexcept { generic_file::operator = (std::move(ref)); move_from(std::move(ref)); return *this; };
 
 	    /// destructor
 	virtual ~tronconneuse() override { detruit(); }; // must not write pure virtual method from here, directly or not
@@ -213,8 +219,10 @@ namespace libdar
 	infinint (*trailing_clear_data)(generic_file & below, const archive_version & reading_ver); //< callback function that gives the amount of clear data found at the end of the given file
 
 
-	void detruit();
+	void nullifyptr() noexcept;
+	void detruit() noexcept;
 	void copy_from(const tronconneuse & ref);
+	void move_from(tronconneuse && ref) noexcept;
 	U_32 fill_buf();       // returns the position (of the next read op) inside the buffer and fill the buffer with clear data
 	void flush();          // flush any pending data (write mode only) to encrypted device
 	void init_buf();       // initialize if necessary the various buffers that relies on inherited method values
