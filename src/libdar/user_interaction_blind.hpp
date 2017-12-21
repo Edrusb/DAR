@@ -50,7 +50,9 @@ namespace libdar
     public:
 	user_interaction_blind() = default;
 	user_interaction_blind(const user_interaction_blind & ref) = default;
+	user_interaction_blind(user_interaction_blind && ref) noexcept = default;
 	user_interaction_blind & operator = (const user_interaction_blind & ref) = default;
+	user_interaction_blind & operator = (user_interaction_blind && ref) noexcept = default;
 	~user_interaction_blind() = default;
 
 	virtual bool pause2(const std::string & message) override { return false; };
