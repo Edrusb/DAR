@@ -57,7 +57,9 @@ namespace libdar
 	      gf_mode mode);                   //< forces the mode if possible
 	tuyau(const user_interaction & dialog);//< creates a anonymous pipe and bind itself to the writing end. The reading end can be obtained by get_read_side() method
 	tuyau(const tuyau & ref) = default;
+	tuyau(tuyau && ref) noexcept = default;
 	tuyau & operator = (const tuyau & ref) = default;
+	tuyau & operator = (tuyau && ref) noexcept = default;
         ~tuyau();
 
 	    // provides the reading end of the anonymous pipe when the current object has created it (no filedesc, no path given to constructor).
