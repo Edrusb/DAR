@@ -84,7 +84,9 @@ namespace libdar
 	    /// class constructor.
 	user_interaction();
 	user_interaction(const user_interaction & ref) = default;
+	user_interaction(user_interaction && ref) noexcept = default;
 	user_interaction & operator = (const user_interaction & ref) = default;
+	user_interaction & operator = (user_interaction && ref) noexcept = default;
 	virtual ~user_interaction() = default;
 
 	    /// method used to ask a boolean question to the user.
