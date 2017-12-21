@@ -151,16 +151,6 @@ namespace libdar
         level = -1;
     }
 
-    wrapperlib::wrapperlib(const wrapperlib & ref)
-    {
-        throw Efeature(gettext("Cannot copy a wrapperlib object (NOT IMPLEMENTED)"));
-    }
-
-    wrapperlib & wrapperlib::operator = (const wrapperlib & ref)
-    {
-        throw Efeature(gettext("Cannot copy a wrapperlib object (NOT IMPLEMENTED)"));
-    }
-
     wrapperlib::~wrapperlib()
     {
 #if LIBZ_AVAILABLE

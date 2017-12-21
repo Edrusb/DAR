@@ -77,8 +77,10 @@ namespace libdar
     {
     public:
         wrapperlib(wrapperlib_mode mode);
-        wrapperlib(const wrapperlib & ref);
-        wrapperlib & operator = (const wrapperlib & ref);
+        wrapperlib(const wrapperlib & ref) = delete;
+	wrapperlib(wrapperlib && ref) noexcept = delete;
+        wrapperlib & operator = (const wrapperlib & ref) = delete;
+	wrapperlib & operator = (wrapperlib && ref) noexcept = delete;
         ~wrapperlib();
 
         void set_next_in(const char *x) { return (this->*x_set_next_in)(x); };
