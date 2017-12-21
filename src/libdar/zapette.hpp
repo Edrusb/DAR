@@ -64,7 +64,9 @@ namespace libdar
 	    /// \param[in] by_the_end if true dar will try to open the archive starting from the end else it will try starting from the first bytes
         zapette(const user_interaction & dialog, generic_file *input, generic_file *output, bool by_the_end);
 	zapette(const zapette & ref) = default;
+	zapette(zapette && ref) noexcept = default;
 	zapette & operator = (const zapette & ref) = default;
+	zapette & operator = (zapette && ref) noexcept = default;
         ~zapette();
 
             // inherited methods from generic_file
