@@ -77,7 +77,9 @@ namespace libdar
 				  secu_string (*x_secu_string_callback)(const std::string &x, bool echo, void *context),
 				  void *context_value);
 	user_interaction_callback(const user_interaction_callback & ref) = default;
+	user_interaction_callback(user_interaction_callback && ref) noexcept = default;
 	user_interaction_callback & operator = (const user_interaction_callback & ref) = default;
+	user_interaction_callback & operator = (user_interaction_callback && ref) noexcept = default;
 	~user_interaction_callback() = default;
 
 	    /// overwritting method from parent class.
