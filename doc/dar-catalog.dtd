@@ -5,7 +5,7 @@
 
         <!-- describes single Extended Attribute -->
 <!ELEMENT EA_entry EMPTY>
-<!ATTLIST Ea_entry ea_name CDATA #REQUIRED>
+<!ATTLIST EA_entry ea_name CDATA #REQUIRED>
 
 <!ELEMENT Attributes (EA_entry)*>
 	<!-- saved (data saved),                                                     -->
@@ -22,7 +22,6 @@
 <!ATTLIST Attributes atime CDATA #REQUIRED>      <!-- decimal, posix time            -->
 <!ATTLIST Attributes mtime CDATA #REQUIRED>      <!-- decimal, posix time            -->
 <!ATTLIST Attributes ctime CDATA #REQUIRED>      <!-- decimal, posix time            -->
-
 
 <!ELEMENT Directory (Attributes,(File|Symlink|Device|Pipe|Socket|Directory)*)>
 <!ATTLIST Directory name CDATA #REQUIRED>        <!-- string, entry name             -->
@@ -50,7 +49,6 @@
 
 <!ELEMENT Socket (Attributes)>
 <!ATTLIST Socket name CDATA #REQUIRED>           <!-- string, entry name             -->
-
 
 <!ELEMENT Pipe (Attributes)>
 <!ATTLIST Pipe name CDATA #REQUIRED>             <!-- string, entry name             -->

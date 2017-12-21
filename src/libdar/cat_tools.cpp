@@ -256,12 +256,15 @@ namespace libdar
 	    ctime = "";
 	}
 
-	dialog.printf("%S<Attributes data=\"%S\" metadata=\"%S\" user=\"%S\" group=\"%S\" permissions=\"%S\" atime=\"%S\" mtime=\"%S\" ctime=\"%S\" />\n",
-		      &beginning, &data, &metadata, &user, &group, &permissions, &atime, &mtime, &ctime);
-	if(list_ea && e_ino != nullptr && e_ino->ea_get_saved_status() == cat_inode::ea_full)
+	bool go_ea = list_ea && e_ino != nullptr && e_ino->ea_get_saved_status() == cat_inode::ea_full;
+	string end_tag = go_ea ? ">" : " />";
+
+	dialog.printf("%S<Attributes data=\"%S\" metadata=\"%S\" user=\"%S\" group=\"%S\" permissions=\"%S\" atime=\"%S\" mtime=\"%S\" ctime=\"%S\"%S\n",
+		      &beginning, &data, &metadata, &user, &group, &permissions, &atime, &mtime, &ctime, &end_tag);
+	if(go_ea)
 	{
 	    string new_begin = beginning + "\t";
-	    local_display_ea(dialog, e_ino, new_begin + "<EA_entry> ea_name=\"", "\">", true);
+	    local_display_ea(dialog, e_ino, new_begin + "<EA_entry ea_name=\"", "\" />", true);
 	    dialog.printf("%S</Attributes>", &beginning);
 	}
     }
