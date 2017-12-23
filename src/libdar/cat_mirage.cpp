@@ -335,8 +335,6 @@ namespace libdar
 
     void cat_mirage::dup_on(cat_etoile * ref)
     {
-	if(star_ref == nullptr)
-	    throw SRC_BUG;
 	star_ref = ref;
 	star_ref->add_ref(this);
     }
