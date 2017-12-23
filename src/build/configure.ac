@@ -267,6 +267,21 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 		   [ AC_MSG_RESULT([not available])
 		   ])
 
+AC_MSG_CHECKING([for syncfs() availability])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
+			           #if HAVE_UNISTD_H
+				   #include <unistd.h>
+				   #endif
+				   }]],
+				   [
+				   (void)syncfs(0);
+				   ])
+		   ],
+		   [ AC_DEFINE(HAVE_SYNCFS, 1, [whether the system provides syncfs() system call])
+		     AC_MSG_RESULT(available)
+		   ],
+		   [ AC_MSG_RESULT([not available])
+		   ])
 
 AC_MSG_CHECKING([for the possibility to set timestamps at a microsecond precision])
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {

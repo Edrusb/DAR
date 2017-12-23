@@ -16,6 +16,36 @@ from 2.5.x to 2.6.0
   new dar_manager's -z option. In particular -z none to avoid using
   compression
 
+from 2.5.14 to 2.5.14-bis
+- avoiding using the syncfs() system call in dar_split when the
+  platform does not support it (replacing it by sync() in that case
+  for compilation to be successful)
+
+from 2.5.13 to 2.5.14
+- made libgcrypt built-in memory guard be initialized before obtaining
+  ligcrypt version, to respect libgcrypt usage (but no problem was seen
+  nor reported about this inconsistency)
+- fixed syntax error in XML listing output (EA_entry and Attributes
+  tags)
+- fixed typos in dar man page
+- Updating Tutorial for restoration
+- fixed bugs in dar_split: cygwin support, filedescriptors were not
+  explicitly closed at end of execution, allocating buffer on heap
+  rather than in the stack for better size flexibility, avoiding buffer
+  size to be greater than SSIZE_MAX.
+- added -s option to dar_split in order to disable the by default SYNC
+  write that was used and which caused poor performance. To keep the
+  same behavior as the older dar_split (and its poor performances) you
+  need now using -s option.
+- dar_split enhancement: added call to syncfs before closing the file
+  descriptor in split_output mode
+- fixed bug in dar_split that was did not lead dar_split to completely
+  fulfill an device before asking for user to change the media when
+  used in split_output mode, this was sometimes leading dar reporting
+  file as corrupted at dar_split at media boundary.
+- added feature in dar_split to show the amount of data written since
+  the last media change
+
 from 2.5.12 to 2.5.13
 - added -az option to automatically nullify negative dates returned from
   the system in the archive under creation (filesystem is not modified)

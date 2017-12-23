@@ -20,6 +20,7 @@
 ******************************************************************** */
 
 #include "../my_config.h"
+#include "cygwin_adapt.h"
 
 #if HAVE_STDIO_H
 #include <stdio.h>
@@ -61,6 +62,10 @@
 #include <stdlib.h>
 #endif
 
+#if HAVE_LIMITS_H
+#include <limits.h>
+#endif
+
 /// the compiler Nature MACRO
 #ifdef __GNUC__
 #define CC_NAT "GNUC"
@@ -69,27 +74,41 @@
 #endif
 
 #define BUFSIZE 102400
+#ifdef SSIZE_MAX
+#if SSIZE_MAX < BUFSIZE
+#undef BUFSIZE
+#define BUFSIZE SSIZE_MAX
+#endif
+#endif
+
 #define KEY_INPUT "split_input"
 #define KEY_OUTPUT "split_output"
-#define DAR_SPLIT_VERSION "1.0.0"
+#define DAR_SPLIT_VERSION "1.1.1"
 
 static void usage(char *a);
 static void show_version(char *a);
 static int init();
+static void blocking_read(int fd, int mode);
+static void purge_fd(int fd);
 static void stop_and_wait();
 static void pipe_handle_pause(int x);
 static void pipe_handle_end(int x);
-static void normal_read_to_multiple_write(char *filename);
+static void normal_read_to_multiple_write(char *filename, int sync_mode);
 static void multi_read_to_normal_write(char *filename);
 static int open_read(char *filemane);  /* returns the filedescriptor */
-static int open_write(char *filename); /* returns the filedescriptor */
+static int open_write(char *filename, int sync_mode); /* returns the filedescriptor */
 
 static int fd_inter = -1;
 
 int main(int argc, char *argv[])
 {
-    if(argc == 2)
+    int key_index = 1; /* the expected position of the command */
+
+	/* command line parsing */
+
+    switch(argc)
     {
+    case 2:
 	if(strcmp("-v", argv[1]) == 0
 	   || strcmp("--version", argv[1]) == 0
 	   || strcmp("-V", argv[1]) == 0)
@@ -102,33 +121,51 @@ int main(int argc, char *argv[])
 	    usage(argv[0]);
 	    return 1;
 	}
-    }
-
-    if(argc != 3)
-    {
+    case 3:
+	break;
+    case 4:
+	if(strcmp(argv[1], "-s") != 0)
+	{
+	    usage(argv[0]);
+	    return 1;
+	}
+	else /* -s option has been given */
+	    key_index = 2;
+	break;
+    default:
 	usage(argv[0]);
 	return 1;
     }
 
+	/* initialization */
+
     if(!init())
 	return 2;
 
-    if(strcmp(KEY_OUTPUT, argv[1]) == 0)
-	normal_read_to_multiple_write(argv[2]);
+	/* execution */
+
+    if(strcmp(KEY_OUTPUT, argv[key_index]) == 0)
+	normal_read_to_multiple_write(argv[key_index + 1], key_index == 2);
     else
-	if(strcmp(KEY_INPUT, argv[1]) == 0)
-	    multi_read_to_normal_write(argv[2]);
+	if(strcmp(KEY_INPUT, argv[key_index]) == 0)
+	    if(key_index == 1)
+		multi_read_to_normal_write(argv[key_index + 1]);
+	    else
+		usage(argv[0]); /* -s option not available with KEY_INPUT */
 	else
 	    usage(argv[0]);
+
+	/* normal exit */
 
     return 0;
 }
 
 static void usage(char *a)
 {
-    fprintf(stderr, "usage: %s { %s | %s } <filename>\n", a, KEY_INPUT, KEY_OUTPUT);
-    fprintf(stderr, "- in %s mode, the data sent to %s's input is copied to the given filename\nwhich may possibly be a non permanent output (retrying to write in case of failure)\n", KEY_OUTPUT, a);
-    fprintf(stderr, "- in %s mode, the data is read from the given filename which may possibly\nbe non permanent input (retrying to read in case of failure) and copied to %s's output\n", KEY_INPUT, a);
+    fprintf(stderr, "usage: %s { %s | [-s] %s } <filename>\n", a, KEY_INPUT, KEY_OUTPUT);
+    fprintf(stderr, "- in %s mode, the data sent to %s's input is copied to the given filename\n  which may possibly be a non permanent output (retrying to write in case of failure)\n", KEY_OUTPUT, a);
+    fprintf(stderr, "- in %s mode, the data is read from the given filename which may possibly\n  be non permanent input (retrying to read in case of failure) and copied to\n  %s's output\n", KEY_INPUT, a);
+    fprintf(stderr, "\nThe -s option for %s mode leads %s to make SYNC writes, this avoid\n  operating system's caching to wrongly report a write as successful. This flag\n  reduces write performances but may be necessary when the end of tape is not\n  properly detected by %s\n", KEY_OUTPUT, a, a);
 }
 
 static void show_version(char *a)
@@ -158,11 +195,42 @@ static int init()
 	return 1; /* true */
 }
 
+static void blocking_read(int fd, int mode)
+{
+    int flags = fcntl(fd_inter, F_GETFL, 0);
+
+	/* code fetched from tools_blocking_read() but not usable as is because dar_split is written in basic C (not C++) */
+
+    if(flags < 0)
+	fprintf(stderr, "Cannot read \"fcbtl\" file's flags: %s\n", strerror(errno));
+    else
+    {
+	if(!mode)
+	    flags |= O_NONBLOCK;
+	else
+	    flags &= ~O_NONBLOCK;
+	if(fcntl(fd, F_SETFL, flags) < 0)
+	    fprintf(stderr, "Cannot modify the NONBLOCK fcntl flag: %s", strerror(errno));
+    }
+}
+
+static void purge_fd(int fd)
+{
+    static const int bufsize = 10;
+    char buf[bufsize];
+
+    blocking_read(fd, 0 == 1);
+    while(read(fd, buf, bufsize) >= 0)
+	;
+    blocking_read(fd, 0 == 0);
+}
+
 static void stop_and_wait()
 {
     char tmp[10];
 
-    fprintf(stderr, "Press return when ready to continue\n");
+    purge_fd(fd_inter);
+    fprintf(stderr, "Press return when ready to continue or hit CTRL-C to abort\n");
     read(fd_inter, tmp, 3);
 }
 
@@ -178,17 +246,26 @@ static void pipe_handle_end(int x)
 }
 
 
-static void normal_read_to_multiple_write(char *filename)
+static void normal_read_to_multiple_write(char *filename, int sync_mode)
 {
-    char buffer[BUFSIZE];
+    char* buffer = (char*) malloc(BUFSIZE);
     int lu;
     int ecru;
     int offset;
-    int fd = open_write(filename);
+    int fd = buffer == NULL ? -1 : open_write(filename, sync_mode);
+    int run = 1;
+    size_t tape_size = 0;
+    size_t step;
+
+    if(buffer == NULL)
+    {
+	fprintf(stderr, "Error allocating %u bytes memory block: %s\n", BUFSIZE, strerror(errno));
+	run = 0;
+    }
 
     signal(SIGPIPE, pipe_handle_pause); /* handling case when writing to pipe that has no reader */
 
-    while(1)
+    while(run)
     {
 	lu = read(0, buffer, BUFSIZE);
 	if(lu == 0) /* reached EOF */
@@ -208,9 +285,10 @@ static void normal_read_to_multiple_write(char *filename)
 	    /* now we have data to write down */
 
 	offset = 0;
+	step = lu;
 	do
 	{
-	    ecru = write(fd, buffer + offset, lu);
+	    ecru = write(fd, buffer + offset, step);
 
 	    if(ecru < 0) /* an error occured */
 	    {
@@ -220,49 +298,85 @@ static void normal_read_to_multiple_write(char *filename)
 		case EINTR:
 		    break;
 		case ENOSPC:
-		    close(fd);
-		    fprintf(stderr, "No space left on destination, please to something!\n");
-		    stop_and_wait();
-		    fd = open_write(filename);
+		    if(step > 1)
+			step /= 2;
+		    else
+		    {
+#if HAVE_SYNCFS
+			syncfs(fd);
+#else
+			sync();
+#endif
+			close(fd);
+			fprintf(stderr, "No space left on destination after having written %ld bytes, please to something!\n", tape_size);
+			tape_size = 0;
+			step = lu;
+			stop_and_wait();
+			fd = open_write(filename, sync_mode);
+		    }
 		    break;
 		default:
 		    fprintf(stderr, "Error writing data: %s\n", strerror(errno));
 		    stop_and_wait();
-		    break;
 		}
-		continue; /* starting over the while do - while loop */
 	    }
-
-	    if(ecru > lu)
+	    else
 	    {
-		fprintf(stderr, "BUG MET at line %d\n", __LINE__);
-		break; /* end or processing */
+		if(ecru > lu)
+		{
+		    fprintf(stderr, "BUG MET at line %d\n", __LINE__);
+		    break; /* end or processing */
+		}
+		else
+		{
+			/* starting from here no error occurred and ecru >= 0 */
+
+		    offset += ecru;
+		    lu -= ecru;
+		    tape_size += ecru;
+		}
 	    }
-
-		/* starting from here no error occurred and ecru >= 0 */
-
-	    offset += ecru;
-	    lu -= ecru;
 	}
 	while(lu > 0);
 
 	if(lu > 0)
 	    break; /* not all data could be written, aborting */
     }
+
+    fprintf(stderr, "%ld bytes written since the last media change", tape_size);
+
+    if(fd >= 0)
+    {
+#if HAVE_SYNCFS
+	syncfs(fd);
+#else
+	sync();
+#endif
+	close(fd);
+    }
+    if(buffer != NULL)
+	free(buffer);
 }
 
 
 static void multi_read_to_normal_write(char *filename)
 {
-    char buffer[BUFSIZE];
+    char* buffer = (char*)malloc(BUFSIZE);
     int lu;
     int ecru;
     int offset;
-    int fd = open_read(filename);
+    int fd = buffer == NULL ? -1 : open_read(filename);
+    int run = 1;
+
+    if(buffer == NULL)
+    {
+	fprintf(stderr, "Error allocating %u bytes memory block: %s\n", BUFSIZE, strerror(errno));
+	run = 0;
+    }
 
     signal(SIGPIPE, pipe_handle_end); /* handling case when writing to pipe that has no reader */
 
-    while(1)
+    while(run)
     {
 	lu = read(fd, buffer, BUFSIZE);
 	if(lu == 0) // EOF
@@ -335,16 +449,22 @@ static void multi_read_to_normal_write(char *filename)
 	if(lu > 0)
 	    break; /* not all data could be written, aborting */
     }
+
+    if(fd >= 0)
+	close(fd);
+    if(buffer != NULL)
+	free(buffer);
 }
 
 
-static int open_write(char *filename)
+static int open_write(char *filename, int sync_mode)
 {
     int fd;
+    int flag = sync_mode ? O_SYNC : 0;
 
     do
     {
-	fd = open(filename, O_WRONLY|O_SYNC);
+	fd = open(filename, O_WRONLY|O_BINARY|flag);
 	if(fd < 0)
 	{
 	    fprintf(stderr,"Error opening output: %s\n", strerror(errno));
@@ -362,7 +482,7 @@ static int open_read(char *filename)
 
     do
     {
-	fd = open(filename, O_RDONLY);
+	fd = open(filename, O_RDONLY|O_BINARY);
 	if(fd < 0)
 	{
 	    fprintf(stderr,"Error opening input: %s\n", strerror(errno));

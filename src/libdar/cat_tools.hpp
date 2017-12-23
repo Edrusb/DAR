@@ -62,7 +62,11 @@ namespace libdar
 				       bool list_ea = false);     //< whether to list Extended Attributes
     extern bool extract_base_and_status(unsigned char signature, unsigned char & base, saved_status & saved);
     extern bool extract_base_and_status_isolated(unsigned char sig, unsigned char & base, saved_status & state, bool isolated);
-    extern void local_display_ea(user_interaction & dialog, const cat_inode * ino, const std::string &prefix, const std::string &suffix, bool xml_output = false);
+    extern void local_display_ea(user_interaction & dialog,
+				 const cat_inode * ino,
+				 const std::string &prefix,
+				 const std::string &suffix,
+				 bool xml_output = false);
     extern unsigned char mk_signature(unsigned char base, saved_status state);
     extern void unmk_signature(unsigned char sig, unsigned char & base, saved_status & state, bool isolated);
     extern bool compatible_signature(unsigned char a, unsigned char b);

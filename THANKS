@@ -5,6 +5,12 @@ documented librsync library. Thanks to "Lademann" at sourceforge for the
 proposed patch adapted and integrated in this release (--ignored-as-symlink
 new feature)
 
+version 2.5.14
+--------------
+Double thanks to Eric Junkermann for bug feedback. Thanks to Volker Wysk
+for feedback. Thanks to Tsukasa for feedback, bug report and help
+improving the dar_split command.
+
 version 2.5.13
 --------------
 Thanks to Volker Wysk for bug report, thanks to Neil Darlow for help in
