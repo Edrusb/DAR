@@ -226,7 +226,7 @@ namespace libdar
 	    datetime root_last_mod;  //< last modification date of the root directory
 	};
 
-	std::vector<struct archive_data> coordinate; //< list of archive used to build the database
+	std::deque<struct archive_data> coordinate;  //< list of archive used to build the database
 	std::vector<std::string> options_to_dar;     //< options to use when calling dar for restoration
 	std::string dar_path;                        //< path to dar
 	data_dir *files;                             //< structure containing files and their status in the set of archive used for that database (is set to nullptr in partial mode)
