@@ -75,7 +75,7 @@ namespace libdar
 	infinint(generic_file & x);
 
         infinint(const infinint & ref) { copy_from(ref); }
-	infinint(infinint && ref) noexcept { move_from(std::move(ref)); };
+	infinint(infinint && ref) noexcept { field = nullptr; move_from(std::move(ref)); };
 
 	infinint & operator = (const infinint & ref) { detruit(); copy_from(ref); return *this; };
 	infinint & operator = (infinint && ref) noexcept { move_from(std::move(ref)); return *this; }
