@@ -28,6 +28,8 @@
 
 #include "../my_config.h"
 
+#include <deque>
+
 #include "cat_nomme.hpp"
 #include "cat_inode.hpp"
 #include "cat_directory.hpp"
@@ -481,9 +483,9 @@ namespace libdar
     public:
 	crit_and() { clear(); };
 	crit_and(const crit_and & ref) : criterium(ref) { copy_from(ref); };
-	crit_and(crit_and && ref) noexcept = default; // moving the vector<criterium *> while the pointed to object are untouched
+	crit_and(crit_and && ref) noexcept = default; // moving the deque<criterium *> while the pointed to object are untouched
 	crit_and & operator = (const crit_and & ref) { detruit(); copy_from(ref); return *this; };
-	crit_and & operator = (crit_and && ref) noexcept = default; // moving the vector<criterium *> while the pointed to object are untouched
+	crit_and & operator = (crit_and && ref) noexcept = default; // moving the deque<criterium *> while the pointed to object are untouched
 	~crit_and() { detruit(); };
 
 	void add_crit(const criterium & ref);
@@ -496,7 +498,7 @@ namespace libdar
 	virtual criterium *clone() const override { return new (std::nothrow) crit_and(*this); };
 
     protected:
-	std::vector<criterium *> operand;
+	std::deque<criterium *> operand;
 
     private:
 	void copy_from(const crit_and & ref);

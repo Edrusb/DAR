@@ -361,7 +361,7 @@ namespace libdar
 
     void crit_and::gobe(crit_and & to_be_voided)
     {
-	vector<criterium *>::iterator it = to_be_voided.operand.begin();
+	deque<criterium *>::iterator it = to_be_voided.operand.begin();
 
 	try
 	{
@@ -399,7 +399,7 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    vector<criterium *>::const_iterator it = operand.begin();
+	    deque<criterium *>::const_iterator it = operand.begin();
 
 	    if(it == operand.end())
 		throw Erange("crit_and::evaluate", gettext("Cannot evaluate this crit_and criterium as no criterium has been added to it"));
@@ -422,7 +422,7 @@ namespace libdar
 
     void crit_and::copy_from(const crit_and & ref)
     {
-	vector<criterium *>::const_iterator it = ref.operand.begin();
+	deque<criterium *>::const_iterator it = ref.operand.begin();
 
 	operand.clear();
 	try
@@ -447,7 +447,7 @@ namespace libdar
 
     void crit_and::detruit()
     {
-	vector<criterium *>::iterator it = operand.begin();
+	deque<criterium *>::iterator it = operand.begin();
 
 	while(it != operand.end())
 	{
@@ -468,7 +468,7 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    vector<criterium *>::const_iterator it = operand.begin();
+	    deque<criterium *>::const_iterator it = operand.begin();
 
 	    if(it == operand.end())
 		throw Erange("crit_or::evaluate", gettext("Cannot evaluate this crit_or criterium as no criterium has been added to it"));
