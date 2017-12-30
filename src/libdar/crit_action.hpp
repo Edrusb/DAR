@@ -28,6 +28,8 @@
 
 #include "../my_config.h"
 
+#include <deque>
+
 #include "cat_nomme.hpp"
 #include "cat_inode.hpp"
 #include "cat_directory.hpp"
@@ -200,7 +202,7 @@ namespace libdar
 	virtual crit_action *clone() const override { return new (std::nothrow) crit_chain(*this); };
 
     private:
-	std::vector<crit_action *> sequence;
+	std::deque<crit_action *> sequence;
 
 	void destroy();
 	void copy_from(const crit_chain & ref);

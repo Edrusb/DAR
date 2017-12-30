@@ -96,7 +96,7 @@ namespace libdar
 
     void crit_chain::gobe(crit_chain & to_be_voided)
     {
-	vector<crit_action *>::iterator it = to_be_voided.sequence.begin();
+	deque<crit_action *>::iterator it = to_be_voided.sequence.begin();
 
 	try
 	{
@@ -133,7 +133,7 @@ namespace libdar
  	NLS_SWAP_IN;
 	try
 	{
-	    vector<crit_action *>::const_iterator it = sequence.begin();
+	    deque<crit_action *>::const_iterator it = sequence.begin();
 	    over_action_data tmp_data;
 	    over_action_ea tmp_ea;
 
@@ -164,7 +164,7 @@ namespace libdar
 
     void crit_chain::destroy()
     {
-	vector<crit_action *>::iterator it = sequence.begin();
+	deque<crit_action *>::iterator it = sequence.begin();
 
 	while(it != sequence.end())
 	{
@@ -181,7 +181,7 @@ namespace libdar
 
     void crit_chain::copy_from(const crit_chain & ref)
     {
-	vector<crit_action *>::const_iterator it = ref.sequence.begin();
+	deque<crit_action *>::const_iterator it = ref.sequence.begin();
 	crit_action * tmp = nullptr;
 	sequence.clear();
 
