@@ -255,8 +255,10 @@ namespace libdar
 	void show(user_interaction & dialog, archive_num num, std::string marge = "") const;
 	virtual void apply_permutation(archive_num src, archive_num dst) override;
 	virtual void skip_out(archive_num num) override;
-	void compute_most_recent_stats(std::vector<infinint> & data, std::vector<infinint> & ea,
-				       std::vector<infinint> & total_data, std::vector<infinint> & total_ea) const;
+	void compute_most_recent_stats(std::vector<infinint> & data,
+				       std::vector<infinint> & ea,
+				       std::vector<infinint> & total_data,
+				       std::vector<infinint> & total_ea) const;
 
 	virtual char obj_signature() const override { return signature(); };
 	static char signature() { return 'd'; };
