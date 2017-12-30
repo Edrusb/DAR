@@ -43,7 +43,7 @@ extern "C"
 } // end extern "C"
 
 #include <string>
-#include <vector>
+#include <deque>
 
 #include "path.hpp"
 #include "tools.hpp"
@@ -325,7 +325,7 @@ namespace libdar
 	void clear() { detruit(); };
 
     protected :
-        std::vector<mask *> lst;
+        std::deque<mask *> lst;
 
 	std::string dump_logical(const std::string & prefix, const std::string & boolop) const;
 
@@ -336,7 +336,7 @@ namespace libdar
 
 	template<class T> bool t_is_covered(const T & expression) const
 	{
-	    std::vector<mask *>::const_iterator it = lst.begin();
+	    std::deque<mask *>::const_iterator it = lst.begin();
 
 	    if(lst.empty())
 		throw Erange("et_mask::is_covered", dar_gettext("No mask in the list of mask to operate on"));
@@ -376,7 +376,7 @@ namespace libdar
     private:
 	template<class T> bool t_is_covered(const T & expression) const
 	{
-	    std::vector<mask *>::const_iterator it = lst.begin();
+	    std::deque<mask *>::const_iterator it = lst.begin();
 
 	    if(lst.empty())
 		throw Erange("et_mask::is_covered", dar_gettext("No mask to operate on in the list of mask"));

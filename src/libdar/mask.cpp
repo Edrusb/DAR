@@ -212,7 +212,7 @@ namespace libdar
 
     string et_mask::dump_logical(const string & prefix, const string & boolop) const
     {
-	vector<mask *>::const_iterator it = lst.begin();
+	deque<mask *>::const_iterator it = lst.begin();
 	string recursive_prefix = prefix + "  | ";
 
 	string ret = prefix + boolop + "\n";
@@ -230,7 +230,7 @@ namespace libdar
 
     void et_mask::copy_from(const et_mask &m)
     {
-        vector<mask *>::const_iterator it = m.lst.begin();
+        deque<mask *>::const_iterator it = m.lst.begin();
         mask *tmp;
 
         while(it != m.lst.end() && (tmp = (*it)->clone()) != nullptr)
@@ -255,7 +255,7 @@ namespace libdar
 
     void et_mask::detruit()
     {
-        vector<mask *>::iterator it = lst.begin();
+        deque<mask *>::iterator it = lst.begin();
 
         while(it != lst.end())
         {
