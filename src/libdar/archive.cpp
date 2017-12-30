@@ -1983,7 +1983,7 @@ namespace libdar
 
 	fs_root.explode_undisclosed();
 
-	const catalogue *ref_cat = nullptr;
+	catalogue *ref_cat = nullptr;
 	bool initial_pause = false;
 	path sauv_path_abs = sauv_path_t.get_location();
 	const entrepot_local *sauv_path_t_local = dynamic_cast<const entrepot_local *>(&sauv_path_t);
@@ -2046,7 +2046,7 @@ namespace libdar
 	    const entrepot *ref_where = ref_arch->get_entrepot();
 	    if(ref_where != nullptr)
 		initial_pause = (*ref_where == sauv_path_t);
-	    ref_cat = & ref_arch->get_catalogue(dialog);
+	    ref_cat = const_cast<catalogue *>(& ref_arch->get_catalogue(dialog));
 	}
 
 	op_create_in_sub(dialog,
@@ -2126,7 +2126,7 @@ namespace libdar
 				   operation op,
 				   const path & fs_root,
 				   const entrepot & sauv_path_t,
-				   const catalogue *ref_cat1,
+				   catalogue *ref_cat1,
 				   const catalogue *ref_cat2,
 				   bool initial_pause,
 				   const mask & selection,
@@ -2442,7 +2442,7 @@ namespace libdar
 				// but we do not need such argument for fixing op.
 			    filtre_merge_step2(dialog,
 					       pdesc,
-					       *(const_cast<catalogue *>(ref_cat1)),
+					       *ref_cat1,
 					       info_details,
 					       display_treated,
 					       display_treated_only_dir,
@@ -2464,13 +2464,13 @@ namespace libdar
 
 				// changing the data_name of the catalogue that will be dropped at the
 				// end of the archive to match the data_name of the slice header
-			    const_cast<catalogue *>(ref_cat1)->set_data_name(internal_name);
+			    ref_cat1->set_data_name(internal_name);
 			}
 			catch(Erange & e)
 			{
 				// changing the data_name of the catalogue that will be dropped at the
 				// end of the archive to match the data_name of the slice header
-			    const_cast<catalogue *>(ref_cat1)->set_data_name(internal_name);
+			    ref_cat1->set_data_name(internal_name);
 			}
 			break;
 		    default:
@@ -2619,9 +2619,8 @@ namespace libdar
     const label & archive::get_layer1_data_name() const
     {
 	contextual *l1 = nullptr;
-	archive *ceci = const_cast<archive *>(this);
 
-	ceci->stack.find_first_from_bottom(l1);
+	stack.find_first_from_bottom(l1);
 	if(l1 != nullptr)
 	    return l1->get_data_name();
 	else

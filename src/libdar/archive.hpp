@@ -460,7 +460,7 @@ namespace libdar
 			      operation op,                     //< the filter operation to bind to
 			      const path & fs_root,             //< root of the filesystem to act on
 			      const entrepot & sauv_path_t,     //< where to create the archive
-			      const catalogue * ref_cat1,       //< catalogue of the archive of reference, (cannot be nullptr if ref_cat2 is not nullptr)
+			      catalogue * ref_cat1,             //< catalogue of the archive of reference, (cannot be nullptr if ref_cat2 is not nullptr)
 			      const catalogue * ref_cat2,       //< secondary catalogue used for merging, can be nullptr if not used
 			      bool initial_pause,               //< whether we shall pause before starting the archive creation
 			      const mask & selection,           //< filter on filenames

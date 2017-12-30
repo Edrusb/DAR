@@ -96,10 +96,10 @@ namespace libdar
 	    /// this template let the class user find out the higher object on the stack of the given type
 	    /// \param[in,out] ref gives the type of the object to look for, and gets the address of the first object found starting from the top
 	    /// \note if no object of that type could be found in the stack ref is set to nullptr
-	template<class T> void find_first_from_top(T * & ref);
+	template<class T> void find_first_from_top(T * & ref) const;
 
 	    /// this template is similar to the template "find_first_from_top" except that the search is started from the bottom of the stack
-	template<class T> void find_first_from_bottom(T * & ref);
+	template<class T> void find_first_from_bottom(T * & ref) const;
 
 
 	    /// return the generic_file object just below the given object or nullptr if the object is at the bottom of the stack or is not in the stack
@@ -196,18 +196,18 @@ namespace libdar
 	    return false;
     }
 
-    template <class T> void pile::find_first_from_top(T * & ref)
+    template <class T> void pile::find_first_from_top(T * & ref) const
     {
 	ref = nullptr;
-	for(std::vector<face>::reverse_iterator it = stack.rbegin(); it != stack.rend() && ref == nullptr; ++it)
+	for(std::vector<face>::const_reverse_iterator it = stack.rbegin(); it != stack.rend() && ref == nullptr; ++it)
 	    ref = dynamic_cast<T *>(it->ptr);
     }
 
 
-    template <class T> void pile::find_first_from_bottom(T * & ref)
+    template <class T> void pile::find_first_from_bottom(T * & ref) const
     {
 	ref = nullptr;
-	for(std::vector<face>::iterator it = stack.begin(); it != stack.end() && ref == nullptr; ++it)
+	for(std::vector<face>::const_iterator it = stack.begin(); it != stack.end() && ref == nullptr; ++it)
 	    ref = dynamic_cast<T *>(it->ptr);
     }
 
