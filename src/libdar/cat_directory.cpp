@@ -853,17 +853,17 @@ namespace libdar
 	recursive_flag_size_to_update();
     }
 
-    void cat_directory::set_all_mirage_s_inode_wrote_field_to(bool val)
+    void cat_directory::set_all_mirage_s_inode_wrote_field_to(bool val) const
     {
-	list <cat_nomme *>::iterator curs = ordered_fils.begin();
-	cat_mirage *mir = nullptr;
-	cat_directory *dir = nullptr;
+	list <cat_nomme *>::const_iterator curs = ordered_fils.begin();
+	const cat_mirage *mir = nullptr;
+	const cat_directory *dir = nullptr;
 
 
 	while(curs != ordered_fils.end())
 	{
-	    mir = dynamic_cast<cat_mirage *>(*curs);
-	    dir = dynamic_cast<cat_directory *>(*curs);
+	    mir = dynamic_cast<const cat_mirage *>(*curs);
+	    dir = dynamic_cast<const cat_directory *>(*curs);
 
 	    if(mir != nullptr)
 		mir->set_inode_wrote(val);
@@ -874,16 +874,16 @@ namespace libdar
 	}
     }
 
-    void cat_directory::set_all_mirage_s_inode_dumped_field_to(bool val)
+    void cat_directory::set_all_mirage_s_inode_dumped_field_to(bool val) const
     {
-	list<cat_nomme *>::iterator curs = ordered_fils.begin();
+	list<cat_nomme *>::const_iterator curs = ordered_fils.begin();
 
 	while(curs != ordered_fils.end())
 	{
 	    if(*curs == nullptr)
 		throw SRC_BUG;
-	    cat_directory *d = dynamic_cast<cat_directory *>(*curs);
-	    cat_mirage *m = dynamic_cast<cat_mirage *>(*curs);
+	    const cat_directory *d = dynamic_cast<const cat_directory *>(*curs);
+	    const cat_mirage *m = dynamic_cast<const cat_mirage *>(*curs);
 
 		// recursive call
 	    if(d != nullptr)

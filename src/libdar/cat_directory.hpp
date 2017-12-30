@@ -130,10 +130,10 @@ namespace libdar
 	void remove_all_mirages_and_reduce_dirs();
 
 	    /// recursively set all mirage inode_wrote flag
-	void set_all_mirage_s_inode_wrote_field_to(bool val);
+	void set_all_mirage_s_inode_wrote_field_to(bool val) const;
 
 	    /// set the value of inode_dumped for all mirage (recusively)
-	void set_all_mirage_s_inode_dumped_field_to(bool val);
+	void set_all_mirage_s_inode_dumped_field_to(bool val) const;
 
         virtual cat_entree *clone() const override { return new (std::nothrow) cat_directory(*this); };
 
