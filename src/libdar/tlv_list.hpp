@@ -29,7 +29,7 @@
 #include "tlv.hpp"
 #include "generic_file.hpp"
 
-#include <vector>
+#include <deque>
 
 namespace libdar
 {
@@ -56,7 +56,7 @@ namespace libdar
 	void add(const tlv & next) { contents.push_back(next); };
 
     private:
-	std::vector<tlv> contents;
+	std::deque<tlv> contents;
 
 	void init(generic_file & f);
     };

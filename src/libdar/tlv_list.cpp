@@ -29,8 +29,8 @@ namespace libdar
     void tlv_list::dump(generic_file & f) const
     {
 	infinint number = contents.size();
-	vector<tlv>::iterator it = const_cast<tlv_list *>(this)->contents.begin();
-	vector<tlv>::iterator fin = const_cast<tlv_list *>(this)->contents.end();
+	deque<tlv>::iterator it = const_cast<tlv_list *>(this)->contents.begin();
+	deque<tlv>::iterator fin = const_cast<tlv_list *>(this)->contents.end();
 
 	number.dump(f);
 	while(it != fin)
