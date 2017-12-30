@@ -161,7 +161,7 @@ void desalloc(void *p)
     debug_mem_report(p, "DEL");
 }
 
-void * operator new (size_t size) throw (std::bad_alloc)
+void * operator new (size_t size)
 {
     void *ret = alloc(size);
     if(ret == nullptr)
@@ -169,12 +169,12 @@ void * operator new (size_t size) throw (std::bad_alloc)
     return ret;
 }
 
-void * operator new (size_t size, const std::nothrow_t& nothrow_constant) throw ()
+void * operator new (size_t size, const std::nothrow_t& nothrow_constant) noexcept
 {
     return alloc(size);
 }
 
-void * operator new[] (size_t size) throw (std::bad_alloc)
+void * operator new[] (size_t size)
 {
     void *ret = alloc(size);
     if(ret == nullptr)
@@ -182,28 +182,28 @@ void * operator new[] (size_t size) throw (std::bad_alloc)
     return ret;
 }
 
-void * operator new[] (size_t size, const std::nothrow_t& nothrow_constant) throw ()
+void * operator new[] (size_t size, const std::nothrow_t& nothrow_constant) noexcept
 {
     return alloc(size);
 }
 
 
-void operator delete (void * p) throw()
+void operator delete (void * p) noexcept
 {
     desalloc(p);
 }
 
-void operator delete (void * p, const std::nothrow_t& nothrow_constant) throw()
+void operator delete (void * p, const std::nothrow_t& nothrow_constant) noexcept
 {
     desalloc(p);
 }
 
-void operator delete[] (void * p) throw()
+void operator delete[] (void * p) noexcept
 {
     desalloc(p);
 }
 
-void operator delete[] (void * p, const std::nothrow_t& nothrow_constant) throw()
+void operator delete[] (void * p, const std::nothrow_t& nothrow_constant) noexcept
 {
     desalloc(p);
 }
