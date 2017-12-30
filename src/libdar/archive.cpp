@@ -1846,8 +1846,7 @@ namespace libdar
     {
 	U_64 ret;
 	infinint pre_ret;
-	archive *me = const_cast<archive *>(this);
-	const generic_file *bottom = me->stack.bottom();
+	const generic_file *bottom = stack.bottom();
 	const trivial_sar *b_triv = dynamic_cast<const trivial_sar *>(bottom);
 	const sar *b_sar = dynamic_cast<const sar *>(bottom);
 	const zapette *b_zap = dynamic_cast<const zapette *>(bottom);
@@ -1871,8 +1870,7 @@ namespace libdar
     {
 	U_64 ret;
 	infinint pre_ret;
-	archive *me = const_cast<archive *>(this);
-	const generic_file *bottom = me->stack.bottom();
+	const generic_file *bottom = stack.bottom();
 	const trivial_sar *b_triv = dynamic_cast<const trivial_sar *>(bottom);
 	const sar *b_sar = dynamic_cast<const sar *>(bottom);
 	const zapette *b_zap = dynamic_cast<const zapette *>(bottom);

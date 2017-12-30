@@ -79,10 +79,10 @@ namespace libdar
 	template <class T> bool pop_and_close_if_type_is(T *ptr);
 
 	    /// returns the address of the top generic_file
-	generic_file *top() { if(stack.empty()) return nullptr; else return stack.back().ptr; };
+	generic_file *top() const { if(stack.empty()) return nullptr; else return stack.back().ptr; };
 
 	    /// returns the address of the bottom generic_file
-	generic_file *bottom() { if(stack.empty()) return nullptr; else return stack[0].ptr; };
+	generic_file *bottom() const { if(stack.empty()) return nullptr; else return stack[0].ptr; };
 
 	    /// returns the number of objects in the stack
 	U_I size() const { return stack.size(); };
