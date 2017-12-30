@@ -249,39 +249,35 @@ namespace libdar
 
     void catalogue::reset_read() const
     {
-	catalogue *ceci = const_cast<catalogue *>(this);
-	ceci->current_read = ceci->contenu;
-	ceci->contenu->reset_read_children();
+	current_read = contenu;
+	contenu->reset_read_children();
     }
 
     void catalogue::end_read() const
     {
-	catalogue *ceci = const_cast<catalogue *>(this);
-	ceci->current_read = ceci->contenu;
-	ceci->contenu->end_read();
+	current_read = contenu;
+	contenu->end_read();
     }
 
     void catalogue::skip_read_to_parent_dir() const
     {
-	catalogue *ceci = const_cast<catalogue *>(this);
-	cat_directory *tmp = ceci->current_read->get_parent();
+	cat_directory *tmp = current_read->get_parent();
 
 	if(tmp == nullptr)
 	    throw Erange("catalogue::skip_read_to_parent_dir", gettext("root does not have a parent directory"));
-	ceci->current_read = tmp;
+	current_read = tmp;
     }
 
     bool catalogue::read(const cat_entree * & ref) const
     {
-	catalogue *ceci = const_cast<catalogue *>(this);
 	const cat_nomme *tmp;
 
-	if(ceci->current_read->read_children(tmp))
+	if(current_read->read_children(tmp))
 	{
 	    const cat_directory *dir = dynamic_cast<const cat_directory *>(tmp);
 	    if(dir != nullptr)
 	    {
-		ceci->current_read = const_cast<cat_directory *>(dir);
+		current_read = const_cast<cat_directory *>(dir);
 		dir->reset_read_children();
 	    }
 	    ref = tmp;
@@ -289,13 +285,13 @@ namespace libdar
 	}
 	else
 	{
-	    cat_directory *papa = ceci->current_read->get_parent();
+	    cat_directory *papa = current_read->get_parent();
 	    ref = &r_eod;
 	    if(papa == nullptr)
 		return false; // we reached end of root, no cat_eod generation
 	    else
 	    {
-		ceci->current_read = papa;
+		current_read = papa;
 		return true;
 	    }
 	}
@@ -303,7 +299,6 @@ namespace libdar
 
     bool catalogue::read_if_present(string *name, const cat_nomme * & ref) const
     {
-	catalogue *ceci = const_cast<catalogue *>(this);
 	const cat_nomme *tmp;
 
 	if(current_read == nullptr)
@@ -313,7 +308,7 @@ namespace libdar
 	    if(current_read->get_parent() == nullptr)
 		throw Erange("catalogue::read_if_present", gettext("root directory has no parent directory"));
 	    else
-		ceci->current_read = current_read->get_parent();
+		current_read = current_read->get_parent();
 	    ref = nullptr;
 	    return true;
 	}
@@ -322,7 +317,7 @@ namespace libdar
 	    {
 		cat_directory *d = dynamic_cast<cat_directory *>(const_cast<cat_nomme *>(tmp));
 		if(d != nullptr) // this is a directory need to chdir to it
-		    ceci->current_read = d;
+		    current_read = d;
 		ref = tmp;
 		return true;
 	    }
@@ -392,7 +387,7 @@ namespace libdar
 	    {
 		const cat_nomme *xtmp;
 
-		if(const_cast<cat_directory *>(current_read)->search_children(tmp, xtmp))
+		if(current_read->search_children(tmp, xtmp))
 		{
 		    ref = xtmp;
 		    const cat_directory *dir = dynamic_cast<const cat_directory *>(xtmp);
@@ -491,7 +486,7 @@ namespace libdar
     {
 	const cat_nomme *sub = nullptr;
 
-	if(const_cast<const cat_directory *>(current_add)->search_children(subdirname, sub))
+	if(current_add->search_children(subdirname, sub))
 	{
 	    const cat_directory *subdir = dynamic_cast<const cat_directory *>(sub);
 	    if(subdir != nullptr)
@@ -521,36 +516,32 @@ namespace libdar
 
     void catalogue::reset_compare() const
     {
-	catalogue *me = const_cast<catalogue *>(this);
-	if(me == nullptr)
+	if(contenu == nullptr)
 	    throw SRC_BUG;
-	me->current_compare = me->contenu;
-	me->out_compare = "/";
+	current_compare = contenu;
+	out_compare = "/";
     }
 
     bool catalogue::compare(const cat_entree * target, const cat_entree * & extracted) const
     {
-	catalogue *me = const_cast<catalogue *>(this);
 	const cat_mirage *mir = dynamic_cast<const cat_mirage *>(target);
 	const cat_directory *dir = dynamic_cast<const cat_directory *>(target);
 	const cat_eod *fin = dynamic_cast<const cat_eod *>(target);
 	const cat_nomme *nom = dynamic_cast<const cat_nomme *>(target);
 
-	if(me == nullptr)
-	    throw SRC_BUG;
 	if(mir != nullptr)
 	    dir = dynamic_cast<const cat_directory *>(mir->get_inode());
 
 	if(out_compare.degre() > 1) // actually scanning a nonexisting directory
 	{
 	    if(dir != nullptr)
-		me->out_compare += dir->get_name();
+		out_compare += dir->get_name();
 	    else
 		if(fin != nullptr)
 		{
 		    string tmp_s;
 
-		    if(!me->out_compare.pop(tmp_s))
+		    if(!out_compare.pop(tmp_s))
 		    {
 			if(out_compare.is_relative())
 			    throw SRC_BUG; // should not be a relative path !!!
@@ -570,7 +561,7 @@ namespace libdar
 		cat_directory *tmp = current_compare->get_parent();
 		if(tmp == nullptr)
 		    throw Erange("catalogue::compare", gettext("root has no parent directory"));
-		me->current_compare = tmp;
+		current_compare = tmp;
 		extracted = target;
 		return true;
 	    }
@@ -598,9 +589,9 @@ namespace libdar
 		{
 		    const cat_directory *d_ext = dynamic_cast<const cat_directory *>(dst_ino);
 		    if(d_ext != nullptr)
-			me->current_compare = const_cast<cat_directory *>(d_ext);
+			current_compare = const_cast<cat_directory *>(d_ext);
 		    else
-			me->out_compare += dir->get_name();
+			out_compare += dir->get_name();
 		}
 
 		    // now comparing the objects :
@@ -633,7 +624,7 @@ namespace libdar
 	    else
 	    {
 		if(dir != nullptr)
-		    me->out_compare += dir->get_name();
+		    out_compare += dir->get_name();
 		return false;
 	    }
 	}
@@ -1626,11 +1617,9 @@ namespace libdar
 
     void catalogue::reset_dump() const
     {
-	cat_directory * d = const_cast<cat_directory *>(contenu);
-
-	if(d == nullptr)
+	if(contenu == nullptr)
 	    throw SRC_BUG;
-	d->set_all_mirage_s_inode_dumped_field_to(false);
+	contenu->set_all_mirage_s_inode_dumped_field_to(false);
     }
 
     void catalogue::dump(const pile_descriptor & pdesc) const

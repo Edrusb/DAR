@@ -274,15 +274,15 @@ namespace libdar
 	void swap_stuff(catalogue & ref);
 
     private :
-        cat_directory *contenu;           ///< catalogue contents
-        path out_compare;                 ///< stores the missing directory structure, when extracting
-        cat_directory *current_compare;   ///< points to the current directory when extracting
-        cat_directory *current_add;       ///< points to the directory where to add the next file with add_file;
-        cat_directory *current_read;      ///< points to the directory where the next item will be read
-        path *sub_tree;                   ///< path to sub_tree
-        signed int sub_count;             ///< count the depth in of read routine in the sub_tree
-        entree_stats stats;               ///< statistics catalogue contents
-	label ref_data_name;              ///< name of the archive where is located the data
+        cat_directory *contenu;                   ///< catalogue contents
+        mutable path out_compare;                 ///< stores the missing directory structure, when extracting
+        mutable cat_directory *current_compare;   ///< points to the current directory when extracting
+        mutable cat_directory *current_add;       ///< points to the directory where to add the next file with add_file;
+        mutable cat_directory *current_read;      ///< points to the directory where the next item will be read
+        path *sub_tree;                           ///< path to sub_tree
+        mutable signed int sub_count;             ///< count the depth in of read routine in the sub_tree
+        entree_stats stats;                       ///< statistics catalogue contents
+	label ref_data_name;                      ///< name of the archive where is located the data
 
         void partial_copy_from(const catalogue &ref);
         void detruire();
