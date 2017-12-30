@@ -182,10 +182,10 @@ namespace libdar
 	    /// \param[in] sig is the signature to dump
 	    /// \param[in] where is the location where to write down the signature
 	    /// \param[in] small if set to true drop down additional information to allow sequential reading mode
-	void dump_delta_signature(memory_file & sig, generic_file & where, bool small);
+	void dump_delta_signature(memory_file & sig, generic_file & where, bool small) const;
 
 	    /// variant of dump_delta_signature when just CRC have to be dumped
-	void dump_delta_signature(generic_file & where, bool small);
+	void dump_delta_signature(generic_file & where, bool small) const;
 
 	    /// fetch the delta signature from the archive
 	    ///

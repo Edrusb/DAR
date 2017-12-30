@@ -972,25 +972,25 @@ namespace libdar
 	delta_sig->will_have_signature();
     }
 
-    void cat_file::dump_delta_signature(memory_file &sig, generic_file & where, bool small)
+    void cat_file::dump_delta_signature(memory_file &sig, generic_file & where, bool small) const
     {
 	infinint crc_size;
 
 	if(delta_sig == nullptr)
 	    throw SRC_BUG;
 
-	delta_sig->set_sig_ref(&sig);
+	const_cast<cat_delta_signature *>(delta_sig)->set_sig_ref(&sig);
 	delta_sig->dump_data(where, small);
     }
 
-    void cat_file::dump_delta_signature(generic_file & where, bool small)
+    void cat_file::dump_delta_signature(generic_file & where, bool small) const
     {
 	infinint crc_size;
 
 	if(delta_sig == nullptr)
 	    throw SRC_BUG;
 
-	delta_sig->set_sig_ref();
+	const_cast<cat_delta_signature *>(delta_sig)->set_sig_ref();
 	delta_sig->dump_data(where, small);
     }
 
