@@ -217,7 +217,7 @@ namespace libdar
 	    U_32 cur;
 	    U_32 len;
 	    static const unsigned char base = 254;
-	    vector <unsigned char> digits = tools_number_base_decomposition_in_big_endian(taille, (unsigned char)(base));
+	    deque <unsigned char> digits = tools_number_base_decomposition_in_big_endian(taille, (unsigned char)(base));
 
 		// let's randomize a little more
 	    srand(::time(nullptr)+getpid());

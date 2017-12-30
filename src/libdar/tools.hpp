@@ -54,6 +54,7 @@ extern "C"
 
 #include <string>
 #include <vector>
+#include <deque>
 #include <map>
 #include <set>
 #include "path.hpp"
@@ -806,9 +807,9 @@ namespace libdar
 	/// like what exists for infinint. A specific overriden fonction for this type would be better.
 	/// \note, the name "big_endian" is erroneous, it gives a little endian vector
 
-    template <class N, class B> std::vector<B> tools_number_base_decomposition_in_big_endian(N number, const B & base)
+    template <class N, class B> std::deque<B> tools_number_base_decomposition_in_big_endian(N number, const B & base)
     {
-	std::vector<B> ret;
+	std::deque<B> ret;
 
 	if(base <= 0)
 	    throw Erange("tools_number_decoupe_in_big_endian", "base must be strictly positive");

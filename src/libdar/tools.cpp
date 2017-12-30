@@ -2619,8 +2619,8 @@ namespace libdar
 
     string tools_int2octal(const U_I & perm)
     {
-        vector<U_I> digits = tools_number_base_decomposition_in_big_endian(perm, (U_I)8);
-        vector<U_I>::iterator it = digits.begin();
+        deque<U_I> digits = tools_number_base_decomposition_in_big_endian(perm, (U_I)8);
+        deque<U_I>::iterator it = digits.begin();
         string ret = "";
 
         while(it != digits.end())
@@ -2984,8 +2984,8 @@ namespace libdar
     string tools_unsigned_char_to_hexa(unsigned char x)
     {
         string ret;
-        vector<U_I> digit = tools_number_base_decomposition_in_big_endian(x, (U_I)(16));
-        vector<U_I>::reverse_iterator itr = digit.rbegin();
+        deque<U_I> digit = tools_number_base_decomposition_in_big_endian(x, (U_I)(16));
+        deque<U_I>::reverse_iterator itr = digit.rbegin();
 
         switch(digit.size())
         {
