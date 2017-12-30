@@ -41,7 +41,7 @@ extern "C"
 } // end extern "C"
 
 #include <map>
-#include <vector>
+#include <deque>
 #include "catalogue.hpp"
 #include "infinint.hpp"
 #include "etage.hpp"
@@ -95,7 +95,7 @@ namespace libdar
 	bool furtive_read_mode;  //< whether to use furtive read mode (if true, alter_atime is ignored)
 	bool cache_directory_tagging; //< whether to consider cache directory taggin standard
         path *current_dir;       //< needed to translate from an hard linked inode to an  already allocated object
-        std::vector<etage> pile; //< to store the contents of a directory
+        std::deque<etage> pile;  //< to store the contents of a directory
 	bool ignore_unknown;     //< whether to ignore unknown inode types
 
         void detruire();
