@@ -119,7 +119,7 @@ namespace libdar
 	virtual ~generic_file() throw(Ebug) { destroy(); };
 
 	    /// destructor-like call, except that it is allowed to throw exceptions
-	void terminate() const;
+	void terminate();
 
 	    /// compaire the object content (implies skipping and reading)
 	    ///

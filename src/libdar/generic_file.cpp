@@ -95,20 +95,19 @@ using namespace std;
 namespace libdar
 {
 
-    void generic_file::terminate() const
+    void generic_file::terminate()
     {
-	generic_file *ceci = const_cast<generic_file *>(this);
 	try
 	{
 	    if(!terminated)
-		ceci->inherited_terminate();
+		inherited_terminate();
 	}
 	catch(...)
 	{
-	    ceci->terminated = true;
+	    terminated = true;
 	    throw;
 	}
-	ceci->terminated = true;
+	terminated = true;
     }
 
     bool generic_file::operator == (generic_file & ref)
