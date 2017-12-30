@@ -77,7 +77,7 @@ namespace libdar
 
     private:
 	std::map<std::string, std::string> attr;
-	std::map<std::string, std::string>::iterator alire;
+	mutable std::map<std::string, std::string>::iterator alire;
     };
 
 	/// @}
