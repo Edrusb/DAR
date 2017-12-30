@@ -61,6 +61,8 @@ extern "C"
 #endif
 } // end extern "C"
 
+#include <deque>
+
 #include "ea_filesystem.hpp"
 #include "ea.hpp"
 #include "tools.hpp"
@@ -83,7 +85,7 @@ namespace libdar
     static bool write_ea(const string & chemin, const ea_attributs & val, const mask & filter);
     static bool remove_ea(const string & name, const ea_attributs & val, const mask & filter);
     static ea_attributs * read_ea(const string & name, const mask & filter);
-    static vector<string> ea_filesystem_get_ea_list_for(const char *filename);
+    static deque<string> ea_filesystem_get_ea_list_for(const char *filename);
 #endif
 
     bool ea_filesystem_write_ea(const string & chemin, const ea_attributs & val, const mask & filter)
@@ -129,7 +131,7 @@ namespace libdar
     bool ea_filesystem_has_ea(const string & name)
     {
 #ifdef EA_SUPPORT
-	vector<string> val = ea_filesystem_get_ea_list_for(name.c_str());
+	deque<string> val = ea_filesystem_get_ea_list_for(name.c_str());
 	return ! val.empty();
 #else
 	return false;
@@ -142,8 +144,8 @@ namespace libdar
 	const char *p_name = name.c_str();
 	bool ret = false;
 
-	vector<string> val = ea_filesystem_get_ea_list_for(p_name);
-	vector<string>::iterator it = val.begin();
+	deque<string> val = ea_filesystem_get_ea_list_for(p_name);
+	deque<string>::iterator it = val.begin();
 	string tmp;
 
 	while(it != val.end() && ! ret)
@@ -226,8 +228,8 @@ namespace libdar
         const char *n_ptr = name.c_str();
 	ea_attributs *ret = nullptr;
 
-	vector<string> ea_liste = ea_filesystem_get_ea_list_for(n_ptr);
-	vector<string>::iterator it = ea_liste.begin();
+	deque<string> ea_liste = ea_filesystem_get_ea_list_for(n_ptr);
+	deque<string>::iterator it = ea_liste.begin();
 
 	try
 	{
@@ -304,9 +306,9 @@ namespace libdar
 	return ret;
     }
 
-    static vector<string> ea_filesystem_get_ea_list_for(const char *filename)
+    static deque<string> ea_filesystem_get_ea_list_for(const char *filename)
     {
-        vector<string> ret;
+        deque<string> ret;
         const U_I MARGIN = 2;
         ssize_t taille = my_llistxattr(filename, nullptr, 0);
         char *liste = nullptr;
