@@ -227,7 +227,7 @@ namespace libdar
 
 		if(e_mir != nullptr)
 		{
-		    e_ino = const_cast<const cat_inode *>(e_mir->get_inode());
+		    e_ino = e_mir->get_inode();
 		    if(e_ino == nullptr)
 			throw SRC_BUG; // !?! how is this possible ?
 		    e_mir->get_inode()->change_name(e_mir->get_name()); // temporarily changing the inode name to the one of the cat_mirage
@@ -1195,7 +1195,7 @@ namespace libdar
 						st.incr_treated();
 					    if(!alter_atime)
 					    {
-						const cat_inode * tmp_exists = const_cast<const cat_inode *>(exists);
+						const cat_inode * tmp_exists = exists;
 						restore_atime(juillet.get_string(), tmp_exists);
 					    }
 					}
@@ -1214,7 +1214,7 @@ namespace libdar
 						st.incr_errored();
 					    if(!alter_atime)
 					    {
-						const cat_inode * tmp_exists = const_cast<const cat_inode *>(exists);
+						const cat_inode * tmp_exists = exists;
 						restore_atime(juillet.get_string(), tmp_exists);
 					    }
 					}
