@@ -77,7 +77,7 @@ namespace libdar
 
     static bool compare_for_sort(const filesystem_specific_attribute *a, const filesystem_specific_attribute *b);
 
-    template <class T> bool binary_search_in_sorted_list(const vector<T*> & table, const T *val, U_I & index)
+    template <class T> bool binary_search_in_sorted_list(const deque<T*> & table, const T *val, U_I & index)
     {
 	U_I min = 0;
 	U_I max = table.size();
@@ -141,7 +141,7 @@ namespace libdar
 
     void filesystem_specific_attribute_list::clear()
     {
-	vector<filesystem_specific_attribute *>::iterator it = fsa.begin();
+	deque<filesystem_specific_attribute *>::iterator it = fsa.begin();
 
 	while(it != fsa.end())
 	{
@@ -165,8 +165,8 @@ namespace libdar
     bool filesystem_specific_attribute_list::is_included_in(const filesystem_specific_attribute_list & ref, const fsa_scope & scope) const
     {
 	bool ret = true;
-	vector<filesystem_specific_attribute *>::const_iterator it = fsa.begin();
-	vector<filesystem_specific_attribute *>::const_iterator rt = ref.fsa.begin();
+	deque<filesystem_specific_attribute *>::const_iterator it = fsa.begin();
+	deque<filesystem_specific_attribute *>::const_iterator rt = ref.fsa.begin();
 
 	while(ret && it != fsa.end())
 	{
@@ -281,7 +281,7 @@ namespace libdar
     void filesystem_specific_attribute_list::write(generic_file & f) const
     {
 	infinint size = fsa.size();
-	vector<filesystem_specific_attribute *>::const_iterator it = fsa.begin();
+	deque<filesystem_specific_attribute *>::const_iterator it = fsa.begin();
 
 	size.dump(f);
 
@@ -354,7 +354,7 @@ namespace libdar
     infinint filesystem_specific_attribute_list::storage_size() const
     {
 	infinint ret = infinint(size()).get_storage_size();
-	vector<filesystem_specific_attribute *>::const_iterator it = fsa.begin();
+	deque<filesystem_specific_attribute *>::const_iterator it = fsa.begin();
 	infinint overhead = family_to_signature(fsaf_hfs_plus).size()
 	    + nature_to_signature(fsan_creation_date).size();
 
@@ -372,7 +372,7 @@ namespace libdar
     filesystem_specific_attribute_list filesystem_specific_attribute_list::operator + (const filesystem_specific_attribute_list & arg) const
     {
 	filesystem_specific_attribute_list ret = *this;
-	vector<filesystem_specific_attribute *>::const_iterator it = arg.fsa.begin();
+	deque<filesystem_specific_attribute *>::const_iterator it = arg.fsa.begin();
 
 	while(it != arg.fsa.end())
 	{
@@ -404,7 +404,7 @@ namespace libdar
 
     void filesystem_specific_attribute_list::copy_from(const filesystem_specific_attribute_list & ref)
     {
-	vector<filesystem_specific_attribute *>::const_iterator it = ref.fsa.begin();
+	deque<filesystem_specific_attribute *>::const_iterator it = ref.fsa.begin();
 	fsa.clear();
 
 	while(it != ref.fsa.end())
@@ -420,7 +420,7 @@ namespace libdar
 
     void filesystem_specific_attribute_list::update_familes()
     {
-	vector<filesystem_specific_attribute *>::iterator it = fsa.begin();
+	deque<filesystem_specific_attribute *>::iterator it = fsa.begin();
 
 	familes.clear();
 	while(it != fsa.end())
@@ -667,7 +667,7 @@ namespace libdar
     {
 	bool ret = false;
 	bool has_extX_FSA = false;
-	vector<filesystem_specific_attribute *>::const_iterator it = fsa.begin();
+	deque<filesystem_specific_attribute *>::const_iterator it = fsa.begin();
 
 	while(!has_extX_FSA && it != fsa.end())
 	{

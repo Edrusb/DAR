@@ -43,7 +43,7 @@ extern "C"
 } // end extern "C"
 
 #include <string>
-#include <vector>
+#include <deque>
 
 #include "integers.hpp"
 #include "crc.hpp"
@@ -202,7 +202,7 @@ namespace libdar
 	bool find(fsa_family fam, fsa_nature nat, const filesystem_specific_attribute *&ptr) const;
 
     private:
-	std::vector<filesystem_specific_attribute *> fsa; //< sorted list of FSA
+	std::deque<filesystem_specific_attribute *> fsa; //< sorted list of FSA
 	fsa_scope familes;
 
 	void copy_from(const filesystem_specific_attribute_list & ref);
