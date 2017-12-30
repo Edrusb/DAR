@@ -27,7 +27,6 @@
 #define FILTRE_HPP
 
 #include "../my_config.h"
-#include <vector>
 #include "mask.hpp"
 #include "pile.hpp"
 #include "catalogue.hpp"

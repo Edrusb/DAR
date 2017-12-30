@@ -35,8 +35,6 @@
 #include "tlv_list.hpp"
 #include "label.hpp"
 
-#include <vector>
-
 namespace libdar
 {
 
