@@ -249,12 +249,8 @@ namespace libdar
     {
 	if(!updated_sizes)
 	{
-	    cat_directory *me = const_cast<cat_directory *>(this);
-
-	    if(me == nullptr)
-		throw SRC_BUG;
-	    me->x_size = 0;
-	    me->x_storage_size = 0;
+	    x_size = 0;
+	    x_storage_size = 0;
 	    list<cat_nomme *>::const_iterator it = ordered_fils.begin();
 	    const cat_directory *f_dir = nullptr;
 	    const cat_file *f_file = nullptr;
@@ -270,16 +266,16 @@ namespace libdar
 			// recursion occurs here
 			// by calling get_size() and get_storage_size() of child directories
 			/// which in turn will call the recursive_update_sizes() of child objects
-		    me->x_size += f_dir->get_size();
-		    me->x_storage_size += f_dir->get_storage_size();
+		    x_size += f_dir->get_size();
+		    x_storage_size += f_dir->get_storage_size();
 		}
 		else if(f_file != nullptr && (f_file->get_saved_status() == s_saved || f_file->get_saved_status() == s_delta))
 		{
-		    me->x_size += f_file->get_size();
+		    x_size += f_file->get_size();
 		    if(!f_file->get_storage_size().is_zero() || f_file->get_sparse_file_detection_read())
-			me->x_storage_size += f_file->get_storage_size();
+			x_storage_size += f_file->get_storage_size();
 		    else
-			me->x_storage_size += f_file->get_size();
+			x_storage_size += f_file->get_size();
 			// in very first archive formats, storage_size was set to zero to
 			// indicate "no compression used"
 			// the only way to have zero as storage_size is either file size is
@@ -290,16 +286,13 @@ namespace libdar
 
 		++it;
 	    }
-	    me->updated_sizes = true;
+	    updated_sizes = true;
 	}
     }
 
     void cat_directory::recursive_flag_size_to_update() const
     {
-	cat_directory *me = const_cast<cat_directory *>(this);
-	if(me == nullptr)
-	    throw SRC_BUG;
-	me->updated_sizes = false;
+	updated_sizes = false;
 	if(parent != nullptr)
 	    parent->recursive_flag_size_to_update();
     }
@@ -368,23 +361,24 @@ namespace libdar
 
     void cat_directory::reset_read_children() const
     {
+	    // "moi" is necessary to avoid assigning a const_iterator to an iterator
 	cat_directory *moi = const_cast<cat_directory *>(this);
 	moi->it = moi->ordered_fils.begin();
     }
 
     void cat_directory::end_read() const
     {
+	    // "moi" is necessary to avoid assigning a const_iterator to an iterator
 	cat_directory *moi = const_cast<cat_directory *>(this);
 	moi->it = moi->ordered_fils.end();
     }
 
     bool cat_directory::read_children(const cat_nomme *&r) const
     {
-	cat_directory *moi = const_cast<cat_directory *>(this);
-	if(moi->it != moi->ordered_fils.end())
+	if(it != ordered_fils.end())
 	{
-	    r = *(moi->it);
-	    ++(moi->it);
+	    r = *it;
+	    ++it;
 	    return true;
 	}
 	else
@@ -626,7 +620,7 @@ namespace libdar
 
 		if(current->search_children(segment, tmp_nom))
 		{
-		    next_nom = const_cast<const cat_nomme *>(tmp_nom);
+		    next_nom = tmp_nom;
 		    next_mir = dynamic_cast<const cat_mirage *>(next_nom);
 		    if(next_mir != nullptr)
 			next_dir = dynamic_cast<const cat_directory *>(next_mir->get_inode());
@@ -693,7 +687,7 @@ namespace libdar
     {
 	list<cat_nomme *>::const_iterator it = ordered_fils.begin();
 
-	const_cast<cat_directory *>(this)->recursive_has_changed = false;
+	recursive_has_changed = false;
 	while(it != ordered_fils.end())
 	{
 	    const cat_directory *d = dynamic_cast<cat_directory *>(*it);
@@ -701,10 +695,10 @@ namespace libdar
 	    if(d != nullptr)
 	    {
 		d->recursive_has_changed_update();
-		const_cast<cat_directory *>(this)->recursive_has_changed |= d->get_recursive_has_changed();
+		recursive_has_changed |= d->get_recursive_has_changed();
 	    }
 	    if(ino != nullptr && !recursive_has_changed)
-		const_cast<cat_directory *>(this)->recursive_has_changed |=
+		recursive_has_changed |=
 		    ino->get_saved_status() != s_not_saved
 		    || ino->ea_get_saved_status() == ea_full
 		    || ino->ea_get_saved_status() == ea_removed;

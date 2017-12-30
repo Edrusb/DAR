@@ -151,16 +151,16 @@ namespace libdar
     private:
 	static const cat_eod fin;
 
-	infinint x_size;
-	infinint x_storage_size;
-	bool updated_sizes;
+	mutable infinint x_size;
+	mutable infinint x_storage_size;
+	mutable bool updated_sizes;
         cat_directory *parent;
 #ifdef LIBDAR_FAST_DIR
         std::map<std::string, cat_nomme *> fils; // used for fast lookup
 #endif
 	std::list<cat_nomme *> ordered_fils;
-        std::list<cat_nomme *>::iterator it; //< next to entry to be returned by read_children
-	bool recursive_has_changed;
+        mutable std::list<cat_nomme *>::iterator it; //< next to entry to be returned by read_children
+	mutable bool recursive_has_changed;
 
 	void init() noexcept;
 	void clear();
