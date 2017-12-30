@@ -40,7 +40,7 @@ extern "C"
 } // end extern "C"
 
 #include <map>
-#include <vector>
+#include <deque>
 #include "catalogue.hpp"
 #include "infinint.hpp"
 #include "etage.hpp"
@@ -141,7 +141,7 @@ namespace libdar
         bool warn_overwrite;
 	cat_inode::comparison_fields what_to_check;
 	bool warn_remove_no_match;
-        std::vector<stack_dir_t> stack_dir;
+        std::deque<stack_dir_t> stack_dir;
         path *current_dir;
 	bool empty;
 	bool ignore_over_restricts;
