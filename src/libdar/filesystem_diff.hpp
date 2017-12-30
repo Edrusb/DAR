@@ -40,7 +40,7 @@ extern "C"
 } // end extern "C"
 
 #include <map>
-#include <vector>
+#include <deque>
 #include "catalogue.hpp"
 #include "infinint.hpp"
 #include "etage.hpp"
@@ -96,7 +96,7 @@ namespace libdar
 	bool alter_atime;
 	bool furtive_read_mode;
         path *current_dir;
-        std::vector<filename_struct> filename_pile;
+        std::deque<filename_struct> filename_pile;
 
         void detruire();
     };
