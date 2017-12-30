@@ -40,7 +40,6 @@ extern "C"
 } // end extern "C"
 
 #include <map>
-#include <vector>
 #include "catalogue.hpp"
 #include "infinint.hpp"
 #include "etage.hpp"
