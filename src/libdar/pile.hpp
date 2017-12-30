@@ -29,7 +29,7 @@
 
 #include "../my_config.h"
 
-#include <vector>
+#include <deque>
 #include <list>
 #include "generic_file.hpp"
 
@@ -167,10 +167,10 @@ namespace libdar
 	    // in French but also is the name of the face of a coin where its value is written. The opposite face of a coin is called "face" in French
 	    // because often a face is design there and the expression "tirer `a pile ou face" (meaning "to toss up") is very common.
 
-	std::vector<face> stack;
+	std::deque<face> stack;
 
 	void detruit();
-	std::vector<face>::iterator look_for_label(const std::string & label);
+	std::deque<face>::iterator look_for_label(const std::string & label);
     };
 
 
@@ -199,7 +199,7 @@ namespace libdar
     template <class T> void pile::find_first_from_top(T * & ref) const
     {
 	ref = nullptr;
-	for(std::vector<face>::const_reverse_iterator it = stack.rbegin(); it != stack.rend() && ref == nullptr; ++it)
+	for(std::deque<face>::const_reverse_iterator it = stack.rbegin(); it != stack.rend() && ref == nullptr; ++it)
 	    ref = dynamic_cast<T *>(it->ptr);
     }
 
@@ -207,7 +207,7 @@ namespace libdar
     template <class T> void pile::find_first_from_bottom(T * & ref) const
     {
 	ref = nullptr;
-	for(std::vector<face>::const_iterator it = stack.begin(); it != stack.end() && ref == nullptr; ++it)
+	for(std::deque<face>::const_iterator it = stack.begin(); it != stack.end() && ref == nullptr; ++it)
 	    ref = dynamic_cast<T *>(it->ptr);
     }
 

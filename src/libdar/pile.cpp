@@ -73,7 +73,7 @@ namespace libdar
 
     generic_file *pile::get_below(const generic_file *ref)
     {
-	vector<face>::reverse_iterator it = stack.rbegin();
+	deque<face>::reverse_iterator it = stack.rbegin();
 
 	while(it != stack.rend() && it->ptr != ref)
 	    ++it;
@@ -92,7 +92,7 @@ namespace libdar
 
     generic_file *pile::get_above(const generic_file *ref)
     {
-	vector<face>::iterator it = stack.begin();
+	deque<face>::iterator it = stack.begin();
 
 	while(it != stack.end() && it->ptr != ref)
 	    ++it;
@@ -116,7 +116,7 @@ namespace libdar
 	    throw SRC_BUG;
 	else
 	{
-	    vector<face>::iterator it = look_for_label(label);
+	    deque<face>::iterator it = look_for_label(label);
 
 	    if(it == stack.end())
 		throw Erange("pile::get_by_label", "Label requested in generic_file stack is unknown");
@@ -132,7 +132,7 @@ namespace libdar
     {
 	if(label == "")
 	    throw Erange("pile::clear_label", "Empty string is an invalid label, cannot clear it");
-	vector<face>::iterator it = look_for_label(label);
+	deque<face>::iterator it = look_for_label(label);
 	if(it != stack.end())
 	{
 	    list<string>::iterator lab = find(it->labels.begin(), it->labels.end(), label);
@@ -302,7 +302,7 @@ namespace libdar
 
     void pile::sync_write_above(generic_file *ptr)
     {
-	vector<face>::reverse_iterator it = stack.rbegin();
+	deque<face>::reverse_iterator it = stack.rbegin();
 
 	    //  we start from the top of the stack down to ptr
 	while(it != stack.rend() && it->ptr != ptr)
@@ -316,7 +316,7 @@ namespace libdar
 
     void pile::flush_read_above(generic_file *ptr)
     {
-	vector<face>::reverse_iterator it = stack.rbegin();
+	deque<face>::reverse_iterator it = stack.rbegin();
 
 	    // we start from the top of the stack down to ptr
 	while(it != stack.rend() && it->ptr != ptr)
@@ -331,7 +331,7 @@ namespace libdar
 
     void pile::inherited_sync_write()
     {
-	for(vector<face>::reverse_iterator it = stack.rbegin() ; it != stack.rend() ; ++it)
+	for(deque<face>::reverse_iterator it = stack.rbegin() ; it != stack.rend() ; ++it)
 	    if(it->ptr != nullptr)
 		it->ptr->sync_write();
 	    else
@@ -340,7 +340,7 @@ namespace libdar
 
     void pile::inherited_flush_read()
     {
-	for(vector<face>::iterator it = stack.begin() ; it != stack.end() ; ++it)
+	for(deque<face>::iterator it = stack.begin() ; it != stack.end() ; ++it)
 	    if(it->ptr != nullptr)
 		it->ptr->flush_read();
 	    else
@@ -350,7 +350,7 @@ namespace libdar
 
     void pile::inherited_terminate()
     {
-	for(vector<face>::reverse_iterator it = stack.rbegin() ; it != stack.rend() ; ++it)
+	for(deque<face>::reverse_iterator it = stack.rbegin() ; it != stack.rend() ; ++it)
 	    if(it->ptr != nullptr)
 		it->ptr->terminate();
 	    else
@@ -360,7 +360,7 @@ namespace libdar
 
     void pile::detruit()
     {
-	for(vector<face>::reverse_iterator it = stack.rbegin() ; it != stack.rend() ; ++it)
+	for(deque<face>::reverse_iterator it = stack.rbegin() ; it != stack.rend() ; ++it)
 	{
 	    if(it->ptr != nullptr)
 	    {
@@ -378,9 +378,9 @@ namespace libdar
 	stack.clear();
     }
 
-    vector<pile::face>::iterator pile::look_for_label(const std::string & label)
+    deque<pile::face>::iterator pile::look_for_label(const std::string & label)
     {
-	vector<face>::iterator it = stack.begin();
+	deque<face>::iterator it = stack.begin();
 
 	while(it != stack.end() && find(it->labels.begin(), it->labels.end(), label) == it->labels.end())
 	    ++it;
