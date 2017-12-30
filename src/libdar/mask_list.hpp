@@ -80,7 +80,7 @@ namespace libdar
 
     private:
 
-        std::vector <std::string> contenu;
+        std::deque <std::string> contenu;
         U_I taille;
         bool case_s;
         bool including;   // mask is used for including files (not for excluding files)

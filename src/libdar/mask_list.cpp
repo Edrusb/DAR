@@ -212,7 +212,7 @@ namespace libdar
 		tmp.sort(&modified_lexicalorder_a_lessthan_b);
 		tmp.unique(); // remove duplicates
 
-		    // converting the sorted list to vector, to get the indexing feature of this type
+		    // converting the sorted list to deque, to get the indexing feature of this type
 		contenu.assign(tmp.begin(), tmp.end());
 		taille = contenu.size();
 		if(taille < contenu.size())
@@ -270,7 +270,7 @@ namespace libdar
 
     string mask_list::dump(const string & prefix) const
     {
-	vector<string>::const_iterator it = contenu.begin();
+	deque<string>::const_iterator it = contenu.begin();
 	string rec_pref = prefix + "  | ";
 
 	string ret = prefix + "If matches one of the following line(s):\n";
