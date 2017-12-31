@@ -43,6 +43,7 @@ extern "C"
 }
 
 #include <string>
+#include <deque>
 #include "entrepot.hpp"
 #include "secu_string.hpp"
 #include "mem_ui.hpp"
@@ -110,7 +111,7 @@ namespace libdar
 #if LIBCURL_AVAILABLE
 	mycurl_easyhandle_sharing easyh;
 #endif
-	std::list<std::string> current_dir;
+	std::deque<std::string> current_dir;
 	std::string reading_dir_tmp;
 	U_I wait_delay;
 
