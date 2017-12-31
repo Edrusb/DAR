@@ -33,9 +33,9 @@ extern "C"
 
 using namespace libdar;
 
-config_file::config_file(const vector<string> & target, generic_file &f) : hide_file(f)
+config_file::config_file(const deque<string> & target, generic_file &f) : hide_file(f)
 {
-    vector<string>::const_iterator it = target.begin();
+    deque<string>::const_iterator it = target.begin();
 
     cibles.clear();
     while(it != target.end())
@@ -45,10 +45,10 @@ config_file::config_file(const vector<string> & target, generic_file &f) : hide_
     }
 }
 
-vector<string> config_file::get_read_targets() const
+deque<string> config_file::get_read_targets() const
 {
-    vector<string> ret;
-    vector<t_cible>::const_iterator it = cibles.begin();
+    deque<string> ret;
+    deque<t_cible>::const_iterator it = cibles.begin();
 
     while(it != cibles.end())
     {
@@ -117,7 +117,7 @@ void config_file::fill_morceau()
 
 bool config_file::is_a_target(const string & val)
 {
-    vector<t_cible>::iterator it = cibles.begin();
+    deque<t_cible>::iterator it = cibles.begin();
 
     while(it != cibles.end() && it->target != val)
 	++it;

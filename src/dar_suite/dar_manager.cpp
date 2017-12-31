@@ -50,7 +50,7 @@ extern "C"
 #include "getopt_decision.h"
 } // end extern "C"
 
-#include <vector>
+#include <deque>
 #include <string>
 #include <new>
 
@@ -800,13 +800,13 @@ static void op_dar(shell_interaction & dialog, database *dat, const string & arg
 static void op_restore(shell_interaction & dialog, database *dat, const vector<string> & rest, const infinint & date, const string & options_for_dar, bool info_details, bool early_release, bool ignore_dar_options_in_base, bool even_when_removed)
 {
     thread_cancellation thr;
-    vector <string> options = tools_split_in_words(options_for_dar);
-
+    vector<string> options;
     database_restore_options dat_opt;
 
     if(dat == nullptr)
 	throw SRC_BUG;
 
+    tools_split_in_words(options_for_dar, options);
     thr.check_self_cancellation();
     if(info_details)
 	dialog.warning(gettext("Looking in archives for requested files, classifying files archive by archive..."));
@@ -1283,7 +1283,7 @@ static void op_batch(shell_interaction & dialog, database *dat, const string & f
     string line;
     char tmp;
     bool sub_info_details;
-    vector<string> mots;
+    deque<string> mots;
     argc_argv cmdline;
     operation sub_op;
     string faked_base;
@@ -1321,7 +1321,7 @@ static void op_batch(shell_interaction & dialog, database *dat, const string & f
 	    while(proper.read(&tmp,  1) == 1 && tmp != '\n')
 		line += tmp;
 
-	    mots = tools_split_in_words(line);
+	    tools_split_in_words(line, mots);
 
 	    if(mots.size() == 0)
 		continue;

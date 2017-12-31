@@ -28,7 +28,7 @@
 #define CONFIG_FILE_HPP
 
 #include "../my_config.h"
-#include <vector>
+#include <deque>
 #include "hide_file.hpp"
 
 using namespace libdar;
@@ -39,12 +39,12 @@ using namespace libdar;
 class config_file : public hide_file
 {
 public:
-    config_file(const vector<string> & target, generic_file &f);
+    config_file(const deque<string> & target, generic_file &f);
     config_file(const config_file & ref) = default;
     config_file & operator = (const config_file & ref) = default;
     ~config_file() = default;
 
-    vector<string> get_read_targets() const;
+    deque<string> get_read_targets() const;
 
 protected:
     virtual void fill_morceau() override;
@@ -59,7 +59,7 @@ private:
 	t_cible() { target = ""; seen = false; };
     };
 
-    vector<t_cible> cibles;
+    deque<t_cible> cibles;
 
     bool is_a_target(const string & val);
     bool find_next_target(generic_file &f, infinint & debut, string & nature, infinint & fin);

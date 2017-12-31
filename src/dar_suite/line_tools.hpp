@@ -30,6 +30,7 @@
 
 #include <string>
 #include <vector>
+#include <deque>
 #include "infinint.hpp"
 #include "tlv_list.hpp"
 #include "integers.hpp"
@@ -74,10 +75,10 @@ std::string::const_iterator line_tools_find_last_char_out_of_parenth(const std::
 std::string line_tools_expand_user_comment(const std::string & user_comment, S_I argc, char *const argv[]);
 
     /// split a PATH environement variable string into its components (/usr/lib:/lib => /usr/lib /lib)
-std::vector<std::string> line_tools_explode_PATH(const char *the_path);
+std::deque<std::string> line_tools_explode_PATH(const char *the_path);
 
     /// return the full path of the given filename (eventually unchanged of pointing to the first file of that name present in the_path directories
-std::string line_tools_get_full_path_from_PATH(const std::vector<std::string> & the_path, const char * filename);
+std::string line_tools_get_full_path_from_PATH(const std::deque<std::string> & the_path, const char * filename);
 
     /// return split at the first space met the string given as first argument, and provide the two splitted string as second and third argument
 void line_tools_split_at_first_space(const char *field, std::string & before_space, std::string & after_space);
@@ -95,7 +96,7 @@ void line_tools_get_min_digits(std::string arg, infinint & num, infinint & ref_n
 #endif
     /// \param[in] stop_scan if this (char) option is met, stop scanning for wanted options
     /// \param[out] presence is a subset of arguments containing the option found on command-line
-extern void line_tools_look_for(const std::vector<char> & arguments,
+extern void line_tools_look_for(const std::deque<char> & arguments,
 				S_I argc,
 				char *const argv[],
 				const char *getopt_string,
@@ -103,7 +104,7 @@ extern void line_tools_look_for(const std::vector<char> & arguments,
 				const struct option *long_options,
 #endif
 				char stop_scan,
-				std::vector<char> & presence);
+				std::deque<char> & presence);
 
 
     /// test the presence of -Q and -j options on the command line
@@ -128,9 +129,29 @@ extern void line_tools_look_for_Q(S_I argc,
 
     /// split a line in words given the separator character (sep)
 
-extern std::vector<std::string> line_tools_split(const std::string & val, char sep);
+template <class T> void line_tools_split(const std::string & val, char sep, T & split)
+{
+    std::string::const_iterator be = val.begin();
+    std::string::const_iterator ne = val.begin();
+    split.clear();
 
-extern std::set<std::string> line_tools_vector_to_set(const std::vector<std::string> & list);
+    while(ne != val.end())
+    {
+	if(*ne != sep)
+	    ++ne;
+	else
+	{
+	    split.push_back(std::string(be, ne));
+	    ++ne;
+	    be = ne;
+	}
+    }
+
+    if(be != val.end())
+	split.push_back(std::string(be, ne));
+}
+
+extern std::set<std::string> line_tools_deque_to_set(const std::deque<std::string> & list);
 
 extern void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
 							       bool detruire,

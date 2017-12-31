@@ -28,6 +28,7 @@
 
 #include "../my_config.h"
 #include <string>
+#include <deque>
 #include <vector>
 #include "infinint.hpp"
 #include "compressor.hpp"
@@ -218,8 +219,8 @@ struct line_param
 
 extern bool get_args(shell_interaction & dialog,
 		     const char *home,
-		     const vector<string> & dar_dcf_path,
-		     const vector<string> & dar_duc_path,
+		     const deque<string> & dar_dcf_path,
+		     const deque<string> & dar_duc_path,
                      S_I argc,
 		     char * const argv[],
 		     line_param & param);

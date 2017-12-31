@@ -66,8 +66,6 @@ extern "C"
 
 #include <string>
 #include <algorithm>
-#include <vector>
-#include <deque>
 #include <iostream>
 #include <new>
 
@@ -148,10 +146,10 @@ struct recursive_param
         // input parameters
     shell_interaction *dialog;
     const char *home;
-    const vector<string> dar_dcf_path;
-    const vector<string> dar_duc_path;
+    const deque<string> dar_dcf_path;
+    const deque<string> dar_duc_path;
         // output parameters
-    vector<string> inclusions;
+    deque<string> inclusions;
     deque<pre_mask> name_include_exclude;
     deque<pre_mask> path_include_exclude;
     deque<pre_mask> ea_include_exclude;
@@ -159,7 +157,7 @@ struct recursive_param
     deque<pre_mask> backup_hook_include_exclude;
     bool readconfig;
     bool glob_mode;
-    vector<string> non_options; // list of user targets
+    deque<string> non_options; // list of user targets
     bool ordered_filters;
     bool case_sensit;
     bool fixed_date_mode;
@@ -169,14 +167,14 @@ struct recursive_param
     bool only_more_recent;
     bool detruire;
     bool no_inter;
-    vector<string> read_targets; // list of not found uset targets so far
+    deque<string> read_targets; // list of not found uset targets so far
     deque<pre_mask> path_delta_include_exclude;
     bool duc_and;
 
     recursive_param(shell_interaction & x_dialog,
                     const char *x_home,
-                    const vector<string> & x_dar_dcf_path,
-                    const vector<string> & x_dar_duc_path): dar_dcf_path(x_dar_dcf_path), dar_duc_path(x_dar_duc_path)
+                    const deque<string> & x_dar_dcf_path,
+                    const deque<string> & x_dar_duc_path): dar_dcf_path(x_dar_dcf_path), dar_duc_path(x_dar_duc_path)
     {
         dialog = new (nothrow) shell_interaction(x_dialog);
         if(dialog == nullptr)
@@ -218,11 +216,11 @@ static bool get_args_recursive(recursive_param & rec,
 
 static void make_args_from_file(user_interaction & dialog,
                                 operation op,
-                                const vector<string> & targets,
+                                const deque<string> & targets,
                                 const string & filename,
                                 S_I & argc,
                                 char **&argv,
-                                vector<string> & read_targets, // read targets are removed from this argument
+                                deque<string> & read_targets, // read targets are removed from this argument
                                 bool info_details);
 static void destroy(S_I argc, char **argv);
 static void skip_getopt(S_I argc, char *const argv[], S_I next_to_read);
@@ -234,7 +232,7 @@ static mask *make_exclude_path_unordered(const string & x, mask_opt opt);
 static mask *make_include_path(const string & x, mask_opt opt);
 static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_mask) (const string & x, mask_opt opt), mask *(*make_exclude_mask)(const string & x, mask_opt opt), const path & prefix);
 static mask *make_unordered_mask(deque<pre_mask> & listing, mask *(*make_include_mask) (const string & x, mask_opt opt), mask *(*make_exclude_mask)(const string & x, mask_opt opt), const path & prefix);
-static void add_non_options(S_I argc, char * const argv[], vector<string> & non_options);
+static void add_non_options(S_I argc, char * const argv[], deque<string> & non_options);
 
 // #define DEBOGGAGE
 #ifdef DEBOGGAGE
@@ -243,8 +241,8 @@ static void show_args(S_I argc, char *argv[]);
 
 bool get_args(shell_interaction & dialog,
               const char *home,
-              const vector<string> & dar_dcf_path,
-              const vector<string> & dar_duc_path,
+              const deque<string> & dar_dcf_path,
+              const deque<string> & dar_duc_path,
               S_I argc,
               char *const argv[],
               line_param & p)
@@ -363,7 +361,7 @@ bool get_args(shell_interaction & dialog,
         {
             if(!rec.non_options.empty())
             {
-                vector<string>::iterator it = rec.non_options.begin();
+                deque<string>::iterator it = rec.non_options.begin();
                 bool init_message_done = false;
 
                 while(it != rec.non_options.end())
@@ -387,16 +385,16 @@ bool get_args(shell_interaction & dialog,
 
             // some sanity checks
 
-        vector<string> unseen = tools_substract_from_vector(rec.non_options, rec.read_targets);
-	vector<string> special_targets;
+        deque<string> unseen = tools_substract_from_deque(rec.non_options, rec.read_targets);
+	deque<string> special_targets;
 	special_targets.push_back(AUXILIARY_TARGET);
 	special_targets.push_back(REFERENCE_TARGET);
-	unseen = tools_substract_from_vector(unseen, special_targets);
+	unseen = tools_substract_from_deque(unseen, special_targets);
         if(!unseen.empty())
         {
             string not_seen;
 
-            for(vector<string>::iterator it = unseen.begin(); it != unseen.end(); ++it)
+            for(deque<string>::iterator it = unseen.begin(); it != unseen.end(); ++it)
                 not_seen += *it + " ";
 
             throw Erange("get_args", tools_printf(gettext("Given user target(s) could not be found: %S"), &not_seen));
@@ -1895,7 +1893,7 @@ static bool get_args_recursive(recursive_param & rec,
                 if(optarg != nullptr)
                 {
                     if(strlen(optarg) != 0)
-                        p.signatories = line_tools_split(optarg, ',');
+                        line_tools_split(optarg, ',', p.signatories);
                     else
                         throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
                 }
@@ -2540,15 +2538,15 @@ const struct option *get_long_opt()
 
 static void make_args_from_file(user_interaction & dialog,
                                 operation op,
-                                const vector<string> & targets,
+                                const deque<string> & targets,
                                 const string & filename,
                                 S_I & argc,
                                 char **&argv,
-                                vector<string> & read_targets,
+                                deque<string> & read_targets,
                                 bool info_details)
 {
-    vector <string> cibles;
-    vector <string> locally_unread_targets;
+    deque <string> cibles;
+    deque <string> locally_unread_targets;
     argv = nullptr;
     argc = 0;
 
@@ -2616,16 +2614,16 @@ static void make_args_from_file(user_interaction & dialog,
 
     try
     {
-        vector <string> mots;
+        deque <string> mots;
 
 
             // now parsing the file and cutting words
             // taking care of quotes
             //
-        mots = tools_split_in_words(surconf);
+        tools_split_in_words(surconf, mots);
 
 
-            // now converting the mots of type vector<string> to argc/argv arguments
+            // now converting the mots of type deque<string> to argc/argv arguments
             //
         argc = mots.size()+1;
         if(argc < 0)
@@ -2676,7 +2674,7 @@ static void make_args_from_file(user_interaction & dialog,
         throw;
     }
 
-    tools_merge_to_vector(read_targets, surconf.get_read_targets());
+    tools_merge_to_deque(read_targets, surconf.get_read_targets());
 }
 
 
@@ -3170,12 +3168,13 @@ static void split_compression_algo(const char *arg, compression & algo, U_I & le
 static fsa_scope string_to_fsa(const string & arg)
 {
     fsa_scope ret;
-    vector<string> fams = line_tools_split(arg, ',');
+    deque<string> fams;
 
+    line_tools_split(arg, ',', fams);
     ret.clear();
     if(arg != "none")
     {
-        for(vector<string>::iterator it = fams.begin();
+        for(deque<string>::iterator it = fams.begin();
             it != fams.end();
             ++it)
         {
@@ -3194,7 +3193,7 @@ static fsa_scope string_to_fsa(const string & arg)
     return ret;
 }
 
-static void add_non_options(S_I argc, char * const argv[], vector<string> & non_options)
+static void add_non_options(S_I argc, char * const argv[], deque<string> & non_options)
 {
     (void)line_tools_reset_getopt();
 

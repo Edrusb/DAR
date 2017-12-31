@@ -71,8 +71,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
     S_I ret = EXIT_OK;
     line_param param;
     const char *home = tools_get_from_env(env, "HOME");
-    vector<string> dar_dcf_path = line_tools_explode_PATH(tools_get_from_env(env, "DAR_DCF_PATH"));
-    vector<string> dar_duc_path = line_tools_explode_PATH(tools_get_from_env(env, "DAR_DUC_PATH"));
+    deque<string> dar_dcf_path = line_tools_explode_PATH(tools_get_from_env(env, "DAR_DCF_PATH"));
+    deque<string> dar_duc_path = line_tools_explode_PATH(tools_get_from_env(env, "DAR_DUC_PATH"));
     string sftp_known_hosts = string(home) + "/.ssh/known_hosts";
     string sftp_pub_filekey = string(home) + "/.ssh/id_rsa.pub";
     string sftp_prv_filekey = string(home) + "/.ssh/id_rsa";
@@ -415,13 +415,21 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    if(repo != nullptr)
 			create_options.set_entrepot(*repo);
 		    if(param.ignored_as_symlink.size() > 0)
-			ignored_as_symlink_listing =
-			    line_tools_vector_to_set(line_tools_split(param.ignored_as_symlink, ':'));
+		    {
+			deque<string> tmp;
+
+			line_tools_split(param.ignored_as_symlink, ':', tmp);
+			ignored_as_symlink_listing = line_tools_deque_to_set(tmp);
+		    }
 		    else
 		    {
 			if(env_ignored_as_symlink != nullptr)
-			    ignored_as_symlink_listing =
-				line_tools_vector_to_set(line_tools_split(env_ignored_as_symlink, ':'));
+			{
+			    deque<string> tmp;
+
+			    line_tools_split(env_ignored_as_symlink, ':', tmp);
+			    ignored_as_symlink_listing = line_tools_deque_to_set(tmp);
+			}
 		    }
 		    create_options.set_ignored_as_symlink(ignored_as_symlink_listing);
 

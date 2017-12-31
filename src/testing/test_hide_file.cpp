@@ -68,7 +68,7 @@ void f1()
 
 void f2()
 {
-    vector<string> cibles;
+    deque<string> cibles;
 
     cibles.push_back("coucou");
     cibles.push_back("all");

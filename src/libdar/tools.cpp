@@ -2213,115 +2213,6 @@ namespace libdar
         return ret;
     }
 
-    vector<string> tools_split_in_words(generic_file & f)
-    {
-        vector <string> mots;
-        vector <char> quotes;
-        string current = "";
-        char a;
-        bool loop = true;
-        bool escaped = false;
-
-
-        while(loop)
-        {
-            if(f.read(&a, 1) != 1) // reached end of file
-            {
-                loop = false;
-                a = ' '; // to close the last word
-            }
-
-            if(escaped)
-            {
-                current += a; // added without consideration of quoting of any sort
-                escaped = false;
-                continue; // continuing at beginning of the while loop
-            }
-            else
-            {
-                if(a == '\\')
-                {
-                    escaped = true;
-                    continue; // continuing at beginning of the while loop
-                }
-            }
-
-            if(quotes.empty()) // outside a word
-                switch(a)
-                {
-                case ' ':
-                case '\t':
-                case '\n':
-                case '\r':
-                    break;
-                case '"':
-                case '\'':
-                case '`':
-                    quotes.push_back(a);
-                    break;
-                default:
-                    quotes.push_back(' '); // the quote space means no quote
-                    current += a; // a new argument is starting
-                    break;
-                }
-            else // inside a word
-                switch(a)
-                {
-                case '\t':
-                    if(quotes.back() != ' ')
-                    {
-                            // this is the end of the wor(l)d ;-)
-                            // ...once again... 1000, 1999, 2012, and the next ones to come...
-                        break;
-                    }
-                        // no break !
-                case '\n':
-                case '\r':
-                    a = ' '; // replace carriage return inside quoted string by a space
-                        // no break !
-                case ' ':
-                case '"':
-                case '\'':
-                case '`':
-                    if(a == quotes.back()) // "a" is an ending quote
-                    {
-                        quotes.pop_back();
-                        if(quotes.empty()) // reached end of word
-                        {
-                            mots.push_back(current);
-                            current = "";
-                        }
-                        else
-                            current += a;
-                    }
-                    else // "a" is a nested starting quote
-                    {
-                        if(a != ' ') // quote ' ' does not have ending quote
-                            quotes.push_back(a);
-                        current += a;
-                    }
-                    break;
-                default:
-                    current += a;
-                }
-        }
-        if(!quotes.empty())
-            throw Erange("make_args_from_file", tools_printf(dar_gettext("Parse error: Unmatched `%c'"), quotes.back()));
-
-        return mots;
-    }
-
-
-    std::vector<std::string> tools_split_in_words(const std::string & arg)
-    {
-	memory_file mem;
-
-	mem.write(arg.c_str(), arg.size());
-	mem.skip(0);
-	return tools_split_in_words(mem);
-    }
-
-
     bool tools_find_next_char_out_of_parenthesis(const string & data, const char what,  U_32 start, U_32 & found)
     {
         U_32 nested_parenth = 0;
@@ -3244,13 +3135,13 @@ namespace libdar
     }
 #endif
 
-    void tools_merge_to_vector(vector<string> & a, const vector<string> & b)
+    void tools_merge_to_deque(deque<string> & a, const deque<string> & b)
     {
-        vector<string>::const_iterator ptrb = b.begin();
+        deque<string>::const_iterator ptrb = b.begin();
 
         while(ptrb != b.end())
         {
-            vector<string>::const_iterator ptra = a.begin();
+            deque<string>::const_iterator ptra = a.begin();
 
             while(ptra != a.end() && *ptra != *ptrb)
                 ++ptra;
@@ -3262,14 +3153,14 @@ namespace libdar
         }
     }
 
-    vector<string> tools_substract_from_vector(const vector<string> & a, const vector<string> & b)
+    deque<string> tools_substract_from_deque(const deque<string> & a, const deque<string> & b)
     {
-        vector<string> ret;
-        vector<string>::const_iterator ptra = a.begin();
+        deque<string> ret;
+        deque<string>::const_iterator ptra = a.begin();
 
         while(ptra != a.end())
         {
-            vector<string>::const_iterator ptrb = b.begin();
+            deque<string>::const_iterator ptrb = b.begin();
 
             while(ptrb != b.end() && *ptra != *ptrb)
                 ++ptrb;

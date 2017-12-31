@@ -37,7 +37,6 @@ extern "C"
 
 #include <new>
 #include <algorithm>
-#include <vector>
 #include <string>
 
 #include "line_tools.hpp"
@@ -403,9 +402,9 @@ string line_tools_expand_user_comment(const string & user_comment, S_I argc, cha
     return ret;
 }
 
-vector<string> line_tools_explode_PATH(const char *the_path)
+deque<string> line_tools_explode_PATH(const char *the_path)
 {
-    vector<string> ret;
+    deque<string> ret;
     const char *it = the_path;
     const char *last = it;
 
@@ -430,7 +429,7 @@ vector<string> line_tools_explode_PATH(const char *the_path)
     return ret;
 }
 
-string line_tools_get_full_path_from_PATH(const vector<string> & the_path, const char * filename)
+string line_tools_get_full_path_from_PATH(const deque<string> & the_path, const char * filename)
 {
     string ret;
     bool no_path = false;
@@ -464,7 +463,7 @@ string line_tools_get_full_path_from_PATH(const vector<string> & the_path, const
 	ret = filename;
     else
     {
-	vector<string>::const_iterator it = the_path.begin();
+	deque<string>::const_iterator it = the_path.begin();
 	bool found = false;
 
 	while(!found && it != the_path.end())
@@ -584,7 +583,7 @@ void line_tools_get_min_digits(string the_arg, infinint & num, infinint & ref_nu
     }
 }
 
-void line_tools_look_for(const vector<char> & arguments,
+void line_tools_look_for(const deque<char> & arguments,
 			 S_I argc,
 			 char *const argv[],
 			 const char *getopt_string,
@@ -592,7 +591,7 @@ void line_tools_look_for(const vector<char> & arguments,
 			 const struct option *long_options,
 #endif
 			 char stop_scan,
-			 vector<char> & presence)
+			 deque<char> & presence)
 {
     S_I lu;
     presence.clear();
@@ -609,7 +608,7 @@ void line_tools_look_for(const vector<char> & arguments,
 	while((lu = getopt(argc, argv, getopt_string)) != EOF && stop_scan != lu)
 #endif
 	{
-	    vector<char>::const_iterator it = find(arguments.begin(), arguments.end(), (char)lu);
+	    deque<char>::const_iterator it = find(arguments.begin(), arguments.end(), (char)lu);
 
 	    if(it != arguments.end())
 		presence.push_back(lu);
@@ -626,9 +625,9 @@ void line_tools_look_for_Q(S_I argc,
 			    char stop_scan,
 			    bool & Q_is_present)
 {
-    vector<char> arguments;
-    vector<char> presence;
-    vector<char>::const_iterator it;
+    deque<char> arguments;
+    deque<char> presence;
+    deque<char>::const_iterator it;
 
     Q_is_present = false;
 
@@ -649,35 +648,10 @@ void line_tools_look_for_Q(S_I argc,
 	Q_is_present = true;
 }
 
-
-vector<string> line_tools_split(const string & val, char sep)
-{
-    vector<string> ret;
-    string::const_iterator be = val.begin();
-    string::const_iterator ne = val.begin();
-
-    while(ne != val.end())
-    {
-	if(*ne != sep)
-	    ++ne;
-	else
-	{
-	    ret.push_back(string(be, ne));
-	    ++ne;
-	    be = ne;
-	}
-    }
-
-    if(be != val.end())
-	ret.push_back(string(be, ne));
-
-    return ret;
-}
-
-set<string> line_tools_vector_to_set(const vector<string> & list)
+set<string> line_tools_deque_to_set(const deque<string> & list)
 {
     set<string> ret;
-    vector<string>::const_iterator it = list.begin();
+    deque<string>::const_iterator it = list.begin();
 
     while(it != list.end())
     {
@@ -826,7 +800,7 @@ void line_tools_crypto_split_algo_pass(const secu_string & all,
 					{
 					    secu_string emails;
 					    line_tools_crypto_split_algo_pass(pass, algo, emails, no_cipher_given, recipients);
-					    recipients = line_tools_split(emails.c_str(), ',');
+					    line_tools_split(emails.c_str(), ',', recipients);
 					    pass.clear();
 					}
 					else
