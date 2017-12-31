@@ -83,7 +83,7 @@ namespace libdar
 
     const string & Egeneric::find_object(const string & location) const
     {
-	list<niveau>::const_iterator it = pile.begin();
+	deque<niveau>::const_iterator it = pile.begin();
 
 	while(it != pile.end() && it->lieu != location)
 	    it++;
@@ -110,14 +110,11 @@ namespace libdar
     string Egeneric::dump_str() const
     {
 	string ret;
-        list<niveau> & tmp = const_cast< list<niveau> & >(pile);
-        list<niveau>::iterator it;
-
-        it = tmp.begin();
+        deque<niveau>::const_iterator it = pile.begin();
 
         ret +=  "---- exception type = [" + exceptionID() + "] ----------\n";
         ret +=  "[source]\n";
-        while(it != tmp.end())
+        while(it != pile.end())
         {
             ret += "\t" + it->lieu + " : " + it->objet + "\n";
             it++;

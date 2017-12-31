@@ -34,6 +34,7 @@ extern "C"
 } // end extern "C"
 
 #include <string>
+#include <list>
 #include "erreurs.hpp"
 #include "mycurl_shared_handle.hpp"
 

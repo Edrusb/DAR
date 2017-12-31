@@ -29,7 +29,7 @@
 #include "../my_config.h"
 
 #include <string>
-#include <list>
+#include <deque>
 #include "integers.hpp"
 #include "erreurs.hpp"
 
@@ -111,7 +111,7 @@ namespace libdar
             std::string lieu, objet;
         };
 
-        std::list<niveau> pile;
+        std::deque<niveau> pile;
 
 	static const std::string empty_string;
     };
