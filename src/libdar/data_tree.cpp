@@ -1134,7 +1134,7 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    list<data_tree *>::iterator next = rejetons.begin();
+	    deque<data_tree *>::iterator next = rejetons.begin();
 	    while(next != rejetons.end())
 	    {
 		delete *next;
@@ -1159,7 +1159,7 @@ namespace libdar
 
     data_dir::~data_dir()
     {
-	list<data_tree *>::iterator next = rejetons.begin();
+	deque<data_tree *>::iterator next = rejetons.begin();
 	while(next != rejetons.end())
 	{
 	    delete *next;
@@ -1170,7 +1170,7 @@ namespace libdar
 
     void data_dir::dump(generic_file & f) const
     {
-	list<data_tree *>::const_iterator it = rejetons.begin();
+	deque<data_tree *>::const_iterator it = rejetons.begin();
 	infinint tmp = rejetons.size();
 
 	data_tree::dump(f);
@@ -1312,7 +1312,7 @@ namespace libdar
 
     const data_tree *data_dir::read_child(const string & name) const
     {
-	list<data_tree *>::const_iterator it = rejetons.begin();
+	deque<data_tree *>::const_iterator it = rejetons.begin();
 
 	while(it != rejetons.end() && *it != nullptr && (*it)->get_name() != name)
 	    ++it;
@@ -1328,7 +1328,7 @@ namespace libdar
 
     void data_dir::read_all_children(vector<string> & fils) const
     {
-	list<data_tree *>::const_iterator it = rejetons.begin();
+	deque<data_tree *>::const_iterator it = rejetons.begin();
 
 	fils.clear();
 	while(it != rejetons.end())
@@ -1337,7 +1337,7 @@ namespace libdar
 
     bool data_dir::check_order(user_interaction & dialog, const path & current_path, bool & initial_warn) const
     {
-	list<data_tree *>::const_iterator it = rejetons.begin();
+	deque<data_tree *>::const_iterator it = rejetons.begin();
 	bool ret = data_tree::check_order(dialog, current_path, initial_warn);
 	path subpath = current_path.display() == "." ? get_name() : current_path + get_name();
 
@@ -1385,7 +1385,7 @@ namespace libdar
 
     void data_dir::finalize_except_self(const archive_num & archive, const datetime & deleted_date, const archive_num & ignore_archives_greater_or_equal)
     {
-	list<data_tree *>::iterator it = rejetons.begin();
+	deque<data_tree *>::iterator it = rejetons.begin();
 
 	while(it != rejetons.end())
 	{
@@ -1408,7 +1408,7 @@ namespace libdar
 
     bool data_dir::remove_all_from(const archive_num & archive_to_remove, const archive_num & last_archive)
     {
-	list<data_tree *>::iterator it = rejetons.begin();
+	deque<data_tree *>::iterator it = rejetons.begin();
 
 	while(it != rejetons.end())
 	{
@@ -1418,7 +1418,7 @@ namespace libdar
 	    {
 		delete *it; // release the memory used by the object
 		*it = nullptr;
-		rejetons.erase(it); // remove the entry from the list
+		rejetons.erase(it); // remove the entry from the deque
 		it = rejetons.begin(); // does not seems "it" points to the next item after erase, so we restart from the beginning
 	    }
 	    else
@@ -1430,7 +1430,7 @@ namespace libdar
 
     void data_dir::show(user_interaction & dialog, archive_num num, string marge) const
     {
-	list<data_tree *>::const_iterator it = rejetons.begin();
+	deque<data_tree *>::const_iterator it = rejetons.begin();
 	set<archive_num> ou_data;
 	archive_num ou_ea;
 	bool data, ea;
@@ -1475,7 +1475,7 @@ namespace libdar
 
     void data_dir::apply_permutation(archive_num src, archive_num dst)
     {
-	list<data_tree *>::iterator it = rejetons.begin();
+	deque<data_tree *>::iterator it = rejetons.begin();
 
 	data_tree::apply_permutation(src, dst);
 	while(it != rejetons.end())
@@ -1488,7 +1488,7 @@ namespace libdar
 
     void data_dir::skip_out(archive_num num)
     {
-	list<data_tree *>::iterator it = rejetons.begin();
+	deque<data_tree *>::iterator it = rejetons.begin();
 
 	data_tree::skip_out(num);
 	while(it != rejetons.end())
@@ -1501,7 +1501,7 @@ namespace libdar
     void data_dir::compute_most_recent_stats(vector<infinint> & data, vector<infinint> & ea,
 					     vector<infinint> & total_data, vector<infinint> & total_ea) const
     {
-	list<data_tree *>::const_iterator it = rejetons.begin();
+	deque<data_tree *>::const_iterator it = rejetons.begin();
 
 	data_tree::compute_most_recent_stats(data, ea, total_data, total_ea);
 	while(it != rejetons.end())
@@ -1535,7 +1535,7 @@ namespace libdar
 
     void data_dir::remove_child(const string & name)
     {
-	list<data_tree *>::iterator it = rejetons.begin();
+	deque<data_tree *>::iterator it = rejetons.begin();
 
 	while(it != rejetons.end() && *it != nullptr && (*it)->get_name() != name)
 	    ++it;

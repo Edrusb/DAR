@@ -31,7 +31,7 @@
 
 #include <map>
 #include <string>
-#include <list>
+#include <deque>
 #include <set>
 #include "infinint.hpp"
 #include "generic_file.hpp"
@@ -267,7 +267,7 @@ namespace libdar
 
 
     private:
-	std::list<data_tree *> rejetons;          //< subdir and subfiles of the current dir
+	std::deque<data_tree *> rejetons;          //< subdir and subfiles of the current dir
 
 	void add_child(data_tree *fils);          //< "this" is now responsible of "fils" disalocation
 	void remove_child(const std::string & name);
