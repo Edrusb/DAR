@@ -218,7 +218,7 @@ namespace libdar
 
     void cat_directory::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
-	list<cat_nomme *>::const_iterator x = ordered_fils.begin();
+	deque<cat_nomme *>::const_iterator x = ordered_fils.begin();
 
 	cat_inode::inherited_dump(pdesc, small);
 	if(!small)
@@ -251,7 +251,7 @@ namespace libdar
 	{
 	    x_size = 0;
 	    x_storage_size = 0;
-	    list<cat_nomme *>::const_iterator it = ordered_fils.begin();
+	    deque<cat_nomme *>::const_iterator it = ordered_fils.begin();
 	    const cat_directory *f_dir = nullptr;
 	    const cat_file *f_file = nullptr;
 
@@ -312,7 +312,7 @@ namespace libdar
 	    if(a_dir != nullptr && d != nullptr) // both directories : merging them
 	    {
 		a_dir = d; // updates the inode part, does not touch the cat_directory specific part as defined in the cat_directory::operator =
-		list<cat_nomme *>::iterator xit = d->ordered_fils.begin();
+		deque<cat_nomme *>::iterator xit = d->ordered_fils.begin();
 		while(xit != d->ordered_fils.end())
 		{
 		    const_cast<cat_directory *>(a_dir)->add_children(*xit);
@@ -389,7 +389,7 @@ namespace libdar
     {
 #ifdef LIBDAR_FAST_DIR
 	map<string, cat_nomme *>::iterator dest;
-	list<cat_nomme *>::iterator ordered_dest = it;
+	deque<cat_nomme *>::iterator ordered_dest = it;
 
 	while(ordered_dest != ordered_fils.end())
 	{
@@ -419,7 +419,7 @@ namespace libdar
     {
 
 	    // locating old object in ordered_fils
-	list<cat_nomme *>::iterator ot = ordered_fils.begin();
+	deque<cat_nomme *>::iterator ot = ordered_fils.begin();
 
 	while(ot != ordered_fils.end() && *ot != nullptr && (*ot)->get_name() != name)
 	    ++ot;
@@ -463,7 +463,7 @@ namespace libdar
 
     void cat_directory::recursively_set_to_unsaved_data_and_FSA()
     {
-	list<cat_nomme *>::iterator it = ordered_fils.begin();
+	deque<cat_nomme *>::iterator it = ordered_fils.begin();
 	cat_directory *n_dir = nullptr;
 	cat_inode *n_ino = nullptr;
 	cat_mirage *n_mir = nullptr;
@@ -508,7 +508,7 @@ namespace libdar
 
     void cat_directory::change_location(const smart_pointer<pile_descriptor> & pdesc)
     {
-	list<cat_nomme *>::iterator tmp_it = ordered_fils.begin();
+	deque<cat_nomme *>::iterator tmp_it = ordered_fils.begin();
 
 	cat_nomme::change_location(pdesc);
 	while(tmp_it != ordered_fils.end())
@@ -567,7 +567,7 @@ namespace libdar
 	else
 	    ptr = nullptr;
 #else
-	list<cat_nomme *>::const_iterator ot = ordered_fils.begin();
+	deque<cat_nomme *>::const_iterator ot = ordered_fils.begin();
 
 	while(ot != ordered_fils.end() && *ot != nullptr && (*ot)->get_name() != name)
 	    ++ot;
@@ -685,7 +685,7 @@ namespace libdar
 
     void cat_directory::recursive_has_changed_update() const
     {
-	list<cat_nomme *>::const_iterator it = ordered_fils.begin();
+	deque<cat_nomme *>::const_iterator it = ordered_fils.begin();
 
 	recursive_has_changed = false;
 	while(it != ordered_fils.end())
@@ -711,7 +711,7 @@ namespace libdar
 	infinint ret = ordered_fils.size();
 	const cat_directory *fils_dir = nullptr;
 
-	list<cat_nomme *>::const_iterator ot = ordered_fils.begin();
+	deque<cat_nomme *>::const_iterator ot = ordered_fils.begin();
 	while(ot != ordered_fils.end())
 	{
 	    if(*ot == nullptr)
@@ -730,7 +730,7 @@ namespace libdar
     {
 	infinint ret = 0;
 
-	list<cat_nomme *>::const_iterator it = ordered_fils.begin();
+	deque<cat_nomme *>::const_iterator it = ordered_fils.begin();
 
 	while(it != ordered_fils.end())
 	{
@@ -758,7 +758,7 @@ namespace libdar
     {
 	infinint ret = 0;
 
-	list<cat_nomme *>::const_iterator it = ordered_fils.begin();
+	deque<cat_nomme *>::const_iterator it = ordered_fils.begin();
 
 	while(it != ordered_fils.end())
 	{
@@ -780,7 +780,7 @@ namespace libdar
 
     void cat_directory::get_etiquettes_found_in_tree(map<infinint, infinint> & already_found) const
     {
-	list<cat_nomme *>::const_iterator it = ordered_fils.begin();
+	deque<cat_nomme *>::const_iterator it = ordered_fils.begin();
 
 	while(it != ordered_fils.end())
 	{
@@ -807,7 +807,7 @@ namespace libdar
 
     void cat_directory::remove_all_mirages_and_reduce_dirs()
     {
-	list<cat_nomme *>::iterator curs = ordered_fils.begin();
+	deque<cat_nomme *>::iterator curs = ordered_fils.begin();
 
 	while(curs != ordered_fils.end())
 	{
@@ -849,7 +849,7 @@ namespace libdar
 
     void cat_directory::set_all_mirage_s_inode_wrote_field_to(bool val) const
     {
-	list <cat_nomme *>::const_iterator curs = ordered_fils.begin();
+	deque <cat_nomme *>::const_iterator curs = ordered_fils.begin();
 	const cat_mirage *mir = nullptr;
 	const cat_directory *dir = nullptr;
 
@@ -870,7 +870,7 @@ namespace libdar
 
     void cat_directory::set_all_mirage_s_inode_dumped_field_to(bool val) const
     {
-	list<cat_nomme *>::const_iterator curs = ordered_fils.begin();
+	deque<cat_nomme *>::const_iterator curs = ordered_fils.begin();
 
 	while(curs != ordered_fils.end())
 	{

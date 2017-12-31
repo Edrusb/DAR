@@ -158,8 +158,8 @@ namespace libdar
 #ifdef LIBDAR_FAST_DIR
         std::map<std::string, cat_nomme *> fils; // used for fast lookup
 #endif
-	std::list<cat_nomme *> ordered_fils;
-        mutable std::list<cat_nomme *>::iterator it; //< next to entry to be returned by read_children
+	std::deque<cat_nomme *> ordered_fils;
+        mutable std::deque<cat_nomme *>::iterator it; //< next entry to be returned by read_children
 	mutable bool recursive_has_changed;
 
 	void init() noexcept;
