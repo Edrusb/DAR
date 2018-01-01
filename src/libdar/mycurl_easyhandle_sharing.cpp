@@ -34,7 +34,7 @@ namespace libdar
 
     mycurl_shared_handle mycurl_easyhandle_sharing::alloc_instance() const
     {
-	std::list<smart_pointer<mycurl_easyhandle_node> >::const_iterator it = clone_table.begin();
+	deque<smart_pointer<mycurl_easyhandle_node> >::const_iterator it = clone_table.begin();
 
 	while(it != clone_table.end() && (*it)->get_used_mode())
 	    ++it;

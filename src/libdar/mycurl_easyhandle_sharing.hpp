@@ -34,7 +34,7 @@ extern "C"
 } // end extern "C"
 
 #include <string>
-#include <list>
+#include <deque>
 #include "erreurs.hpp"
 #include "mycurl_shared_handle.hpp"
 
@@ -63,7 +63,7 @@ namespace libdar
 
     private:
 	mycurl_easyhandle_node root;
-	std::list<smart_pointer<mycurl_easyhandle_node> > clone_table;
+	std::deque<smart_pointer<mycurl_easyhandle_node> > clone_table;
     };
 
 #else
