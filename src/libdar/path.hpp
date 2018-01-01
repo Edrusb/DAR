@@ -29,7 +29,7 @@
 #define PATH_HPP
 
 #include "../my_config.h"
-#include <list>
+#include <deque>
 #include <string>
 #include "erreurs.hpp"
 
@@ -95,14 +95,14 @@ namespace libdar
 	    /// reset the read_subdir operation
 
 	    /// reset for read_subdir. next call to read_subdir is the most global
-        void reset_read() { reading = dirs.begin(); };
+        void reset_read() const { reading = dirs.begin(); };
 
 	    /// sequentially read the elements that compose the path
 
 	    /// \param[out] r the next element of the path
 	    /// \return true if a next element could be read
 	    /// \note the reading starts at the root and ends with the basename of the path
-        bool read_subdir(std::string & r);
+        bool read_subdir(std::string & r) const;
 
 	    /// whether the path is relative or absolute (= start with a /)
         bool is_relative() const { return relative; };
@@ -165,8 +165,8 @@ namespace libdar
 	void explode_undisclosed() const;
 
     private :
-        std::list<std::string>::iterator reading;
-        std::list<std::string> dirs;
+        mutable std::deque<std::string>::const_iterator reading;
+        std::deque<std::string> dirs;
         bool relative;
 	bool undisclosed;
 
