@@ -84,20 +84,13 @@ namespace libdar
 	return ret;
     }
 
-    void range::reset_read() const
-    {
-	range *me = const_cast<range *>(this);
-	me->read_cursor = parts.begin();
-    }
-
     bool range::read_next_segment(infinint & low, infinint & high) const
     {
-	range *me = const_cast<range *>(this);
-	if(me->read_cursor != parts.end())
+	if(read_cursor != parts.end())
 	{
-	    low = me->read_cursor->get_low();
-	    high = me->read_cursor->get_high();
-	    ++me->read_cursor;
+	    low = read_cursor->get_low();
+	    high = read_cursor->get_high();
+	    ++read_cursor;
 	    return true;
 	}
 	else

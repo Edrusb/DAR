@@ -59,7 +59,7 @@ namespace libdar
 	    /// will return true for each new segment giving in argument its low and high value
 	    /// when no more segment are available it returns false, reset_read() can be call at
 	    /// any time to reset the reading operation
-	void reset_read() const;
+	void reset_read() const { read_cursor = parts.begin(); };
 
 	    /// read the next available segment
 	    ///
@@ -99,7 +99,7 @@ namespace libdar
 	};
 
 	std::list<segment> parts;
-	std::list<segment>::const_iterator read_cursor;
+	mutable std::list<segment>::const_iterator read_cursor;
 
     };
 
