@@ -28,7 +28,7 @@
 #define ETAGE_HPP
 
 #include "../my_config.h"
-#include <list>
+#include <deque>
 #include <string>
 #include "infinint.hpp"
 #include "datetime.hpp"
@@ -61,7 +61,7 @@ namespace libdar
 
         bool read(std::string & ref);
 
-        std::list<std::string> fichier; //< holds the list of entry in the directory
+        std::deque<std::string> fichier; //< holds the list of entry in the directory
         datetime last_mod;              //< the last_lod of the directory itself
 	datetime last_acc;              //< the last_acc of the directory itself
     };
