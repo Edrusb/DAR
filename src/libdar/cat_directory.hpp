@@ -159,13 +159,15 @@ namespace libdar
         std::map<std::string, cat_nomme *> fils; // used for fast lookup
 #endif
 	std::deque<cat_nomme *> ordered_fils;
-        mutable std::deque<cat_nomme *>::iterator it; //< next entry to be returned by read_children
+        mutable std::deque<cat_nomme *>::const_iterator it; //< next entry to be returned by read_children
 	mutable bool recursive_has_changed;
 
 	void init() noexcept;
 	void clear();
 	void recursive_update_sizes() const;
 	void recursive_flag_size_to_update() const;
+	void erase_ordered_fils(std::deque<cat_nomme *>::const_iterator debut,
+				std::deque<cat_nomme *>::const_iterator fin);
     };
 
 	/// @}

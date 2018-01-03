@@ -361,9 +361,7 @@ namespace libdar
 
     void cat_directory::reset_read_children() const
     {
-	    // "moi" is necessary to avoid assigning a const_iterator to an iterator
-	cat_directory *moi = const_cast<cat_directory *>(this);
-	moi->it = moi->ordered_fils.begin();
+	it = ordered_fils.begin();
     }
 
     void cat_directory::end_read() const
@@ -385,11 +383,22 @@ namespace libdar
 	    return false;
     }
 
+    void cat_directory::erase_ordered_fils(deque<cat_nomme *>::const_iterator debut, deque<cat_nomme *>::const_iterator fin)
+    {
+	for(deque<cat_nomme *>::const_iterator ut = debut;
+	    ut != fin;
+	    ++ut)
+	    if(*ut != nullptr)
+		delete *ut;
+	ordered_fils.erase(debut, fin);
+    }
+
+
     void cat_directory::tail_to_read_children()
     {
 #ifdef LIBDAR_FAST_DIR
 	map<string, cat_nomme *>::iterator dest;
-	deque<cat_nomme *>::iterator ordered_dest = it;
+	deque<cat_nomme *>::const_iterator ordered_dest = it;
 
 	while(ordered_dest != ordered_fils.end())
 	{
@@ -398,19 +407,20 @@ namespace libdar
 		if(*ordered_dest == nullptr)
 		    throw SRC_BUG;
 		dest = fils.find((*ordered_dest)->get_name());
+		if(dest == fils.end())
+		    throw SRC_BUG;
 		fils.erase(dest);
-		delete *ordered_dest;
-		*ordered_dest = nullptr;
 		ordered_dest++;
 	    }
 	    catch(...)
 	    {
-		ordered_fils.erase(it, ordered_dest);
+		erase_ordered_fils(it, ordered_dest);
+		it = ordered_fils.end();
 		throw;
 	    }
 	}
 #endif
-	ordered_fils.erase(it, ordered_fils.end());
+	erase_ordered_fils(it, ordered_fils.end());
 	it = ordered_fils.end();
 	recursive_flag_size_to_update();
     }
@@ -534,18 +544,10 @@ namespace libdar
 
     void cat_directory::clear()
     {
-	it = ordered_fils.begin();
-	while(it != ordered_fils.end())
-	{
-	    if(*it == nullptr)
-		throw SRC_BUG;
-	    delete *it;
-	    *it = nullptr;
-	    ++it;
-	}
 #ifdef LIBDAR_FAST_DIR
 	fils.clear();
 #endif
+	erase_ordered_fils(ordered_fils.begin(), ordered_fils.end());
 	ordered_fils.clear();
 	it = ordered_fils.begin();
 	recursive_flag_size_to_update();
