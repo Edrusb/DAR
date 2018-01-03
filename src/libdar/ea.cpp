@@ -109,9 +109,7 @@ namespace libdar
 
     void ea_attributs::reset_read() const
     {
-	    // "moi" is necessary to avoid assigning a const_iterator to an iterator
-        ea_attributs *moi = const_cast<ea_attributs *>(this);
-        moi->alire = moi->attr.begin();
+        alire = attr.begin();
     }
 
     bool ea_attributs::read(string & key, string & value) const
