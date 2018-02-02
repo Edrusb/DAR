@@ -187,8 +187,6 @@ namespace libdar
 	static size_t read_meta_callback(char *bufptr, size_t size, size_t nitems, void *userp);
     };
 
-#endif
-
 #ifdef LIBTHREADAR_AVAILABLE
 	/// helper function to handle libcurl error code
 	/// wait or throw an exception depending on error condition
@@ -209,6 +207,8 @@ namespace libdar
 						    const std::string & err_context)
     { throw SRC_BUG; }
 #endif
+#endif
+
 #endif
 	/// @}
 
