@@ -308,7 +308,7 @@ static void normal_read_to_multiple_write(char *filename, int sync_mode)
 			sync();
 #endif
 			close(fd);
-			fprintf(stderr, "No space left on destination after having written %ld bytes, please to something!\n", tape_size);
+			fprintf(stderr, "No space left on destination after having written %lu bytes, please to something!\n", (unsigned long)tape_size);
 			tape_size = 0;
 			step = lu;
 			stop_and_wait();
@@ -343,7 +343,7 @@ static void normal_read_to_multiple_write(char *filename, int sync_mode)
 	    break; /* not all data could be written, aborting */
     }
 
-    fprintf(stderr, "%ld bytes written since the last media change", tape_size);
+    fprintf(stderr, "%ld bytes written since the last media change", (unsigned long)tape_size);
 
     if(fd >= 0)
     {
