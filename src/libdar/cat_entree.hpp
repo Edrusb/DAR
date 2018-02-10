@@ -131,9 +131,18 @@ namespace libdar
 	    /// destructor
         virtual ~cat_entree() throw(Ebug) {};
 
-	    /// returns true if the two object have the same content
+	    /// returns true if the two object are the same
 	virtual bool operator == (const cat_entree & ref) const = 0;
 	bool operator != (const cat_entree & ref) const { return ! (*this == ref); };
+
+	    /// return true of the two objects would generate the same entry on filsystem
+
+	    /// for a and b two cat_entree, if a == b, then a.same_as(b) is true also.
+	    /// But the opposit may be wrong if for example a is a hardlink pointing to an inode
+	    /// while b is a normal inode, restoring both could lead to having the same entry in
+	    /// filsystem while a and b are different for libdar: here they objects of two
+	    /// different classes.
+	bool same_as(const cat_entree & ref) const { return true; };
 
 	    /// write down the object information to a stack
 	    ///

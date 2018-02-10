@@ -60,7 +60,7 @@ namespace libdar
 	    /// compares two objects
 	    ///
             /// \note no need to have a virtual method, as signature will differ in inherited classes (argument type changes)
-        bool same_as(const cat_nomme & ref) const { return xname == ref.xname; };
+        bool same_as(const cat_nomme & ref) const { return cat_nomme::same_as(ref) && xname == ref.xname; };
 
             // signature() is kept as an abstract method
             // clone() is also ketp abstract
