@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 	    catch(Egeneric & e)
 	    {
 		ui->warning(e.get_message());
-		e.dump();
+		cerr << e.dump_str();
 	    }
 	}
 	catch(...)

@@ -102,11 +102,6 @@ namespace libdar
 	pile.front().objet = context + pile.front().objet;
     }
 
-    void Egeneric::dump() const
-    {
-	cerr << dump_str();
-    }
-
     string Egeneric::dump_str() const
     {
 	string ret;
