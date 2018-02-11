@@ -380,16 +380,6 @@ namespace libdar
 	/// \note an exception can occur if lack of memory or invalid argument given (nullptr or empty string), system call error...
     extern std::string tools_readlink(const char *root);
 
-	/// test the presence of an argument
-
-	/// \param[in] argument is the command line argument to look for
-	/// \param[in] argc is the number of argument on the command line
-	/// \param[in] argv is the list of argument on the command line
-	/// \return true if the argument is present in the list
-	/// \note THIS ROUTINE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE VERSION OF LIBDAR
-    extern bool tools_look_for(const char *argument, S_I argc, char *const argv[]);
-
-
 	/// set dates of a given file, no exception thrown
 
 	/// \param[in] chem the path to the file to set

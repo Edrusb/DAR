@@ -1544,17 +1544,6 @@ namespace libdar
         return ret;
     }
 
-
-    bool tools_look_for(const char *argument, S_I argc, char *const argv[])
-    {
-        S_I count = 0;
-
-        while(count < argc && strcmp(argv[count], argument) != 0)
-            count++;
-
-        return count < argc;
-    }
-
     void tools_make_date(const std::string & chemin, bool symlink, const datetime & access, const datetime & modif, const datetime & birth)
     {
 #ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
