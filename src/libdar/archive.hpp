@@ -99,17 +99,6 @@ namespace libdar
 		const archive_options_create & options,
 		statistics * progressive_report);
 
-
-	    /// WARNING this is a deprecated constructor, use the op_isolate() method for better performances
-	    /// \note this method will be remove from the API in a future version of libdar
-	archive(user_interaction & dialog,
-		const path & sauv_path,
-		archive *ref_arch,
-		const std::string & filename,
-		const std::string & extension,
-		const archive_options_isolate & options);
-
-
 	    /// this constructor builds an archive from two given archive [this is the "merge" constructor]
 
 	    /// \param[in,out] dialog for user interaction
