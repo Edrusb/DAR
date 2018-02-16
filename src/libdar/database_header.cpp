@@ -73,7 +73,7 @@ namespace libdar
     class database_header
     {
     public:
-	database_header() { version = database_version; options = HEADER_OPTION_NONE; algo = gzip; };
+	database_header() { version = database_version; options = HEADER_OPTION_NONE; algo = compression::gzip; };
 	database_header(const database_header & ref) = default;
 	database_header(database_header && ref) noexcept = default;
 	database_header & operator = (const database_header & ref) = default;
@@ -109,7 +109,7 @@ namespace libdar
 	    algo = char2compression(tmp);
 	}
 	else
-	    algo = gzip; // was the default before choice was available
+	    algo = compression::gzip; // was the default before choice was available
     }
 
     void database_header::write(generic_file & f)
@@ -126,7 +126,7 @@ namespace libdar
     void database_header::set_compression(compression algozip)
     {
 	algo = algozip;
-	if(algo != gzip)
+	if(algo != compression::gzip)
 	    options |= HEADER_OPTION_COMPRESSOR;
 	else
 	    options &= ~HEADER_OPTION_COMPRESSOR;

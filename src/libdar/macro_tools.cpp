@@ -778,7 +778,7 @@ namespace libdar
 
 	    if(info_details)
 	    {
-		if(ver.get_compression_algo() == none)
+		if(ver.get_compression_algo() == compression::none)
 		    dialog.warning(gettext("Opening the compression abstraction layer (compression algorithm used is none)..."));
 		else
 		    dialog.warning(gettext("Opening the compression layer..."));
@@ -802,7 +802,7 @@ namespace libdar
 		tmp = nullptr;
 
 #ifdef LIBTHREADAR_AVAILABLE
-		if(multi_threaded && ver.get_compression_algo() != none)
+		if(multi_threaded && ver.get_compression_algo() != compression::none)
 		{
 		    if(info_details)
 			dialog.warning(gettext("Creating a new thread to run the compression layer..."));
@@ -1187,8 +1187,8 @@ namespace libdar
 
 		ver.set_edition(macro_tools_supported_version);
 		ver.set_compression_algo(algo);
-		if(algo == lzo1x_1_15 || algo == lzo1x_1)
-		    ver.set_compression_algo(lzo);
+		if(algo == compression::lzo1x_1_15 || algo == compression::lzo1x_1)
+		    ver.set_compression_algo(compression::lzo);
 		ver.set_command_line(user_comment);
 		ver.set_sym_crypto_algo(crypto);
 		ver.set_tape_marks(add_marks_for_sequential_reading);
@@ -1478,7 +1478,7 @@ namespace libdar
 
 		    // ********** building the level2 layer (compression) ************************ //
 
-		if(info_details && algo != none)
+		if(info_details && algo != compression::none)
 		    dialog.warning(gettext("Adding a new layer on top: compression..."));
 		tmp = new (nothrow) compressor(algo, *(layers.top()), compression_level);
 		if(tmp == nullptr)
@@ -1494,7 +1494,7 @@ namespace libdar
 		    // adding a generic_thread object in the stack for
 		    // a separated thread proceed to read/write to the object pushed on the stack
 
-		if(multi_threaded && algo != none)
+		if(multi_threaded && algo != compression::none)
 		{
 		    if(info_details)
 			dialog.warning(gettext("Creating a new thread to run the compression layer..."));
@@ -1719,7 +1719,7 @@ namespace libdar
 
 	    // releasing the compression layer
 
-	if(info_details && algo != none)
+	if(info_details && algo != compression::none)
 	    dialog.warning(gettext("Closing the compression layer..."));
 
 #ifdef LIBTHREADAR_AVAILABLE

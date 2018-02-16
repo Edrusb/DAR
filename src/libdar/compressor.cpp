@@ -127,19 +127,19 @@ namespace libdar
 
         switch(algo)
         {
-        case none:
+        case compression::none:
             read_ptr = &compressor::none_read;
             write_ptr = &compressor::none_write;
             break;
-        case bzip2:
-	case xz:
-	    if(algo == bzip2)
+        case compression::bzip2:
+	case compression::xz:
+	    if(algo == compression::bzip2)
 		wr_mode = bzlib_mode;
-	    if(algo == xz)
+	    if(algo == compression::xz)
 		wr_mode = xz_mode;
 
                 // NO BREAK !
-        case gzip:
+        case compression::gzip:
             read_ptr = &compressor::gzip_read;
             write_ptr = &compressor::gzip_write;
             compr = new (nothrow) xfer(BUFFER_SIZE, wr_mode);
@@ -207,9 +207,9 @@ namespace libdar
                 throw SRC_BUG;
             }
             break;
-	case lzo:
-	case lzo1x_1_15:
-	case lzo1x_1:
+	case compression::lzo:
+	case compression::lzo1x_1_15:
+	case compression::lzo1x_1:
 #if LIBLZO2_AVAILABLE
 	    read_ptr = &compressor::lzo_read;
 	    write_ptr = &compressor::lzo_write;
@@ -224,13 +224,13 @@ namespace libdar
 		lzo_compressed = new (nothrow) char[LZO_COMPRESSED_BUFFER_SIZE];
 		switch(algo)
 		{
-		case lzo:
+		case compression::lzo:
 		    lzo_wrkmem = new (nothrow) char[LZO1X_999_MEM_COMPRESS];
 		    break;
-		case lzo1x_1_15:
+		case compression::lzo1x_1_15:
 		    lzo_wrkmem = new (nothrow) char[LZO1X_1_15_MEM_COMPRESS];
 		    break;
-		case lzo1x_1:
+		case compression::lzo1x_1:
 		    lzo_wrkmem = new (nothrow) char[LZO1X_1_MEM_COMPRESS];
 		    break;
 		default:
@@ -306,7 +306,7 @@ namespace libdar
 	if(!suspended)
 	{
 	    suspended_compr = current_algo;
-	    change_algo(none);
+	    change_algo(compression::none);
 	    suspended = true;
 	}
     }
@@ -718,13 +718,13 @@ namespace libdar
 	    //compressing data to lzo_compress buffer
 	switch(current_algo)
 	{
-	case lzo:
+	case compression::lzo:
 	    status = lzo1x_999_compress_level((lzo_bytep)lzo_write_buffer, lzo_write_size, (lzo_bytep)lzo_compressed, &compr_size, lzo_wrkmem, nullptr, 0, 0, current_level);
 	    break;
-	case lzo1x_1_15:
+	case compression::lzo1x_1_15:
 	    status = lzo1x_1_15_compress((lzo_bytep)lzo_write_buffer, lzo_write_size, (lzo_bytep)lzo_compressed, &compr_size, lzo_wrkmem);
 	    break;
-	case lzo1x_1:
+	case compression::lzo1x_1:
 	    status = lzo1x_1_compress((lzo_bytep)lzo_write_buffer, lzo_write_size, (lzo_bytep)lzo_compressed, &compr_size, lzo_wrkmem);
 	    break;
 	default:
@@ -836,19 +836,19 @@ namespace libdar
         switch(a)
         {
         case 'n':
-            return none;
+            return compression::none;
         case 'z':
-            return gzip;
+            return compression::gzip;
         case 'y':
-            return bzip2;
+            return compression::bzip2;
 	case 'j':
-	    return lzo1x_1_15;
+	    return compression::lzo1x_1_15;
 	case 'k':
-	    return lzo1x_1;
+	    return compression::lzo1x_1;
 	case 'l':
-	    return lzo;
+	    return compression::lzo;
 	case 'x':
-	    return xz;
+	    return compression::xz;
         default :
             throw Erange("char2compression", gettext("unknown compression"));
         }
@@ -858,19 +858,19 @@ namespace libdar
     {
         switch(c)
         {
-        case none:
+        case compression::none:
             return 'n';
-        case gzip:
+        case compression::gzip:
             return 'z';
-        case bzip2:
+        case compression::bzip2:
             return 'y';
-	case lzo:
+	case compression::lzo:
 	    return 'l';
-	case xz:
+	case compression::xz:
 	    return 'x';
-	case lzo1x_1_15:
+	case compression::lzo1x_1_15:
 	    return 'j';
-	case lzo1x_1:
+	case compression::lzo1x_1:
 	    return 'k';
         default:
             throw Erange("compression2char", gettext("unknown compression"));
@@ -881,19 +881,19 @@ namespace libdar
     {
         switch(c)
         {
-        case none:
+        case compression::none:
             return "none";
-        case gzip:
+        case compression::gzip:
             return "gzip";
-        case bzip2:
+        case compression::bzip2:
             return "bzip2";
-	case lzo:
+	case compression::lzo:
 	    return "lzo";
-	case xz:
+	case compression::xz:
 	    return "xz";
-	case lzo1x_1_15:
+	case compression::lzo1x_1_15:
 	    return "lzop-1";
-	case lzo1x_1:
+	case compression::lzo1x_1:
 	    return "lzop-3";
         default:
             throw Erange("compresion2string", gettext("unknown compression"));
@@ -903,25 +903,25 @@ namespace libdar
     compression string2compression(const std::string & a)
     {
 	if(a == "gzip" || a == "gz")
-	    return gzip;
+	    return compression::gzip;
 
 	if(a == "bzip2" || a == "bzip" || a == "bz")
-	    return bzip2;
+	    return compression::bzip2;
 
 	if(a == "lzo" || a == "lz" || a == "l")
-	    return lzo;
+	    return compression::lzo;
 
 	if(a == "lzop-1" || a == "lzop1")
-	    return lzo1x_1_15;
+	    return compression::lzo1x_1_15;
 
 	if(a == "lzop-3" || a == "lzop3")
-	    return lzo1x_1;
+	    return compression::lzo1x_1;
 
 	if(a == "xz" || a == "lzma")
-	    return xz;
+	    return compression::xz;
 
 	if(a == "none")
-	    return none;
+	    return compression::none;
 
 	throw Erange("string2compression", tools_printf(gettext("unknown compression algorithm: %S"), &a));
     }

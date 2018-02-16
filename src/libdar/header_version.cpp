@@ -42,7 +42,7 @@ namespace libdar
 
     header_version::header_version()
     {
-	algo_zip = none;
+	algo_zip = compression::none;
 	cmd_line = "";
 	initial_offset = 0;
 	sym = crypto_none;
@@ -116,13 +116,13 @@ namespace libdar
 
 		    string answ = dialog.get_string(gettext("LAX MODE: Unknown compression algorithm used, assuming data corruption occurred. Please help me, answering with one of the following words \"none\", \"gzip\", \"bzip2\" or \"lzo\" at the next prompt:"), true);
 		    if(answ == gettext("none"))
-			tmp = compression2char(none);
+			tmp = compression2char(compression::none);
 		    else if(answ == gettext("gzip"))
-			tmp = compression2char(gzip);
+			tmp = compression2char(compression::gzip);
 		    else if(answ == gettext("bzip2"))
-			tmp = compression2char(bzip2);
+			tmp = compression2char(compression::bzip2);
 		    else if(answ == gettext("lzo"))
-			tmp = compression2char(lzo);
+			tmp = compression2char(compression::lzo);
 		}
 	    }
 	    while(!ok);

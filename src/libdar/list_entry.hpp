@@ -110,7 +110,7 @@ namespace libdar
 	{ last_change.get_value(second, fraction, tu); }
 
 	std::string get_file_size() const { return deci(file_size).human(); };
-	std::string get_compression_ratio() const { return tools_get_compression_ratio(storage_size, file_size, compression_algo != none); };
+	std::string get_compression_ratio() const { return tools_get_compression_ratio(storage_size, file_size, compression_algo != compression::none); };
 	bool is_sparse() const { return sparse_file; };
 	std::string get_compression_algo() const { return compression2string(compression_algo); };
 	bool is_dirty() const { return dirty; };

@@ -535,7 +535,7 @@ namespace libdar
 	catalogue *ref_cat1 = nullptr;
 	catalogue *ref_cat2 = nullptr;
 	archive *ref_arch2 = options.get_auxilliary_ref();
-	compression algo_kept = none;
+	compression algo_kept = compression::none;
 	entrepot *sauv_path_t = options.get_entrepot().clone();
 	entrepot_local *sauv_path_t_local = dynamic_cast<entrepot_local *>(sauv_path_t);
 
@@ -622,7 +622,7 @@ namespace libdar
 				throw SRC_BUG;
 			    ref_cat1 = ref_arch1->cat;
 			    ref_cat2 = ref_arch2->cat;
-			    if(ref_arch1->ver.get_compression_algo() != ref_arch2->ver.get_compression_algo() && ref_arch1->ver.get_compression_algo() != none && ref_arch2->ver.get_compression_algo() != none && options.get_keep_compressed())
+			    if(ref_arch1->ver.get_compression_algo() != ref_arch2->ver.get_compression_algo() && ref_arch1->ver.get_compression_algo() != compression::none && ref_arch2->ver.get_compression_algo() != compression::none && options.get_keep_compressed())
 				throw Efeature(gettext("the \"Keep file compressed\" feature is not possible when merging two archives using different compression algorithms (This is for a future version of dar). You can still merge these two archives but without keeping file compressed (thus you will probably like to use compression (-z or -y options) for the resulting archive"));
 			}
 
@@ -632,7 +632,7 @@ namespace libdar
 			    throw SRC_BUG;
 
 			algo_kept = ref_arch1->ver.get_compression_algo();
-			if(algo_kept == none && ref_cat2 != nullptr)
+			if(algo_kept == compression::none && ref_cat2 != nullptr)
 			{
 			    if(ref_arch2 == nullptr)
 				throw SRC_BUG;

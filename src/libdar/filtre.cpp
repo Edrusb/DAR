@@ -832,7 +832,7 @@ namespace libdar
 						    // may be a hard link, in which case its name is not carried by e_ino nor e_file
 						e_file->change_compression_algo_write(stock_algo);
 					    else
-						e_file->change_compression_algo_write(none);
+						e_file->change_compression_algo_write(compression::none);
 					}
 
 					    // DECIDING WHETHER DELTA SIGNATURE WILL BE CALCULATED
@@ -2621,7 +2621,7 @@ namespace libdar
 			    if(compr_mask.is_covered(e_nom->get_name()) && e_file->get_size() >= min_compr_size)
 				e_file->change_compression_algo_write(stock_algo);
 			    else
-				e_file->change_compression_algo_write(none);
+				e_file->change_compression_algo_write(compression::none);
 			else // keep compressed:
 			    e_file->change_compression_algo_write(e_file->get_compression_algo_read());
 		    }
@@ -3101,7 +3101,7 @@ namespace libdar
 
 				    pdesc.stack->sync_write_above(pdesc.compr);
 				    pdesc.compr->sync_write(); // necessary in any case to reset the compression engine to be able at later time to decompress starting at that position
-				    if(keep_mode == cat_file::keep_compressed || fic->get_compression_algo_write() == none)
+				    if(keep_mode == cat_file::keep_compressed || fic->get_compression_algo_write() == compression::none)
 					pdesc.compr->suspend_compression();
 				    else
 					pdesc.compr->resume_compression();
@@ -3309,7 +3309,7 @@ namespace libdar
 
 				if(fic->get_size() <= storage_size
 				   && keep_mode != cat_file::keep_compressed
-				   && fic->get_compression_algo_write() != none
+				   && fic->get_compression_algo_write() != compression::none
 				   && !repair_mode)
 				{
 				    infinint current_pos_tmp = pdesc.stack->get_position();
@@ -3326,7 +3326,7 @@ namespace libdar
 						resave_uncompressed = true;
 					    else
 						throw SRC_BUG; // should only be tried once per inode
-					    fic->change_compression_algo_write(none);
+					    fic->change_compression_algo_write(compression::none);
 					    break; // stop the inner loop
 					}
 					catch(Ebug & e)
@@ -3717,7 +3717,7 @@ namespace libdar
 		    {
 			if(display_treated)
 			    dialog.warning(string(gettext("Saving Filesystem Specific Attributes for ")) + info_quoi);
-			if(pdesc.compr->get_algo() != none)
+			if(pdesc.compr->get_algo() != compression::none)
 			{
 			    pdesc.stack->sync_write_above(pdesc.compr);
 			    pdesc.compr->suspend_compression(); // never compress EA (no size or filename consideration)

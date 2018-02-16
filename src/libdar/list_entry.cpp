@@ -41,7 +41,7 @@ namespace libdar
 	file_size = 0;
 	storage_size = 0;
 	sparse_file = 0;
-	compression_algo = none;
+	compression_algo = compression::none;
 	dirty = false;
 	target = "";
 	major = 0;

@@ -1098,7 +1098,7 @@ namespace libdar
 			{
 				// FSA is never stored compressed, we must change the compression algo
 				// but only if necessary
-			    if(get_compressor_layer()->get_algo() != none)
+			    if(get_compressor_layer()->get_algo() != compression::none)
 				get_compressor_layer()->suspend_compression();
 			}
 

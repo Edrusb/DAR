@@ -58,8 +58,8 @@ namespace libdar
         offset = nullptr;
         size = nullptr;
         storage_size = nullptr;
-        algo_read = none; // field not used for backup
-        algo_write = none; // may be set later by change_compression_algo_write()
+        algo_read = compression::none; // field not used for backup
+        algo_write = compression::none; // may be set later by change_compression_algo_write()
         furtive_read_mode = x_furtive_read_mode;
         file_data_status_read = 0;
         file_data_status_write = 0;
@@ -169,7 +169,7 @@ namespace libdar
                             if(storage_size->is_zero()) // in older archive storage_size was set to zero if data was not compressed
                             {
                                 *storage_size = *size;
-                                algo_read = none;
+                                algo_read = compression::none;
 				algo_write = algo_read;
                             }
                             else
@@ -595,7 +595,7 @@ namespace libdar
 
 				// changing the compression algo of the archive stack
 
-			    if(get_compression_algo_read() != none && mode != keep_compressed)
+			    if(get_compression_algo_read() != compression::none && mode != keep_compressed)
 			    {
 				if(get_compression_algo_read() != get_compressor_layer()->get_algo())
 				{
@@ -608,7 +608,7 @@ namespace libdar
 			    }
 			    else  // disabling de-compression
 			    {
-				if(get_compressor_layer()->get_algo() != none)
+				if(get_compressor_layer()->get_algo() != compression::none)
 				{
 				    get_pile()->flush_read_above(get_compressor_layer());
 				    get_compressor_layer()->suspend_compression();
@@ -620,7 +620,7 @@ namespace libdar
 
 			    if(!get_small_read())
 			    {
-				if(get_compression_algo_read() == none)
+				if(get_compression_algo_read() == compression::none)
 				{
 				    generic_file *tmp = new (nothrow) tronc(get_pile(), *offset, *storage_size, gf_read_only);
 				    if(tmp == nullptr)

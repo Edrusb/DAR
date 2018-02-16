@@ -37,7 +37,7 @@ namespace libdar
     {
 	set_esc_and_stack(x_pdesc);
 	x_ver.set_edition(macro_tools_supported_version);
-	x_ver.set_compression_algo(none);
+	x_ver.set_compression_algo(compression::none);
 	x_lax = false;
 	corres.clear();
 	status = ec_completed; // yes, with that constructor, the catalogue contains all known object and entree do not miss any field
@@ -519,7 +519,7 @@ namespace libdar
 			    if(pdesc->compr->is_compression_suspended())
 			    {
 				pdesc->compr->resume_compression();
-				if(pdesc->compr->get_algo() != none)
+				if(pdesc->compr->get_algo() != compression::none)
 				    pdesc->stack->flush_read_above(pdesc->compr);
 			    }
 

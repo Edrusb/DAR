@@ -67,7 +67,7 @@ namespace libdar
 	data_files = nullptr;
 	check_order_asked = true;
 	cur_db_version = database_header_get_supported_version();
-	algo = gzip;   // stays the default algorithm for new databases
+	algo = compression::gzip;   // stays the default algorithm for new databases
     }
 
     database::database(user_interaction & dialog, const string & base, const database_open_options & opt)

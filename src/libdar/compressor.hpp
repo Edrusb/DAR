@@ -40,7 +40,7 @@ namespace libdar
 
 	/// values to be used as argument of libdar API calls
 	/// \ingroup API
-    enum compression
+    enum class compression
     {
 	none = 'n',  ///< no compression
 	gzip = 'z',  ///< gzip compression
@@ -50,6 +50,7 @@ namespace libdar
 	lzo1x_1_15 = 'j', ///< lzo degraded algo corresponding to lzop -1
 	lzo1x_1 = 'k' ///< lzo degraded algo corresponding to lzo -2 to lzo -6
     };
+
 	/// \note lzo1x_1_15 and lzo1x_1 should never be found in archive but instead lzo should
 	/// be put in place. In consequence, the two letters 'j' and 'k' reserved here, shall
 	/// well be modified to other value if necessary in the future, thus would not break
@@ -79,7 +80,7 @@ namespace libdar
 	compressor & operator = (compressor && ref) = delete;
         ~compressor();
 
-        compression get_algo() const { return (current_algo == lzo1x_1_15 || current_algo == lzo1x_1) ? lzo : current_algo; };
+        compression get_algo() const { return (current_algo == compression::lzo1x_1_15 || current_algo == compression::lzo1x_1) ? compression::lzo : current_algo; };
 
 	void suspend_compression();
 	void resume_compression();

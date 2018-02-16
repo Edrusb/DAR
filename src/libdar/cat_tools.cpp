@@ -191,7 +191,7 @@ namespace libdar
 	    ret += string("[")
 		+ tools_get_compression_ratio(fic->get_storage_size(),
 					      fic->get_size(),
-					      fic->get_compression_algo_read() != none || fic->get_sparse_file_detection_read())
+					      fic->get_compression_algo_read() != compression::none || fic->get_sparse_file_detection_read())
 		+ "]";
 
 	else if(dir != nullptr)

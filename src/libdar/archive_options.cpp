@@ -330,7 +330,7 @@ namespace libdar
 	    x_display_finished = false;
 	    x_pause = 0;
 	    x_empty_dir = false;
-	    x_compr_algo = none;
+	    x_compr_algo = compression::none;
 	    x_compression_level = 9;
 	    x_file_size = 0;
 	    x_first_file_size = 0;
@@ -741,7 +741,7 @@ namespace libdar
 	    x_warn_over = true;
 	    x_info_details = false;
 	    x_pause = 0;
-	    x_algo = none;
+	    x_algo = compression::none;
 	    x_compression_level = 9;
 	    x_file_size = 0;
 	    x_first_file_size = 0;
@@ -923,7 +923,7 @@ namespace libdar
 	    x_display_skipped = false;
 	    x_pause = 0;
 	    x_empty_dir = false;
-	    x_compr_algo = none;
+	    x_compr_algo = compression::none;
 	    x_compression_level = 9;
 	    x_file_size = 0;
 	    x_first_file_size = 0;
