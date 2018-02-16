@@ -41,20 +41,16 @@ extern "C"
 #include <iostream>
 #include <new>
 
-#include "sar.hpp"
-#include "trivial_sar.hpp"
-#include "user_interaction.hpp"
 #include "tools.hpp"
-#include "tuyau.hpp"
 #include "dar_suite.hpp"
-#include "integers.hpp"
 #include "shell_interaction.hpp"
 #include "libdar.hpp"
-#include "thread_cancellation.hpp"
-#include "header.hpp"
 #include "line_tools.hpp"
-#include "entrepot_local.hpp"
+    // includes directives that should be removed once dar_xform will be integrated into libdar
+#include "trivial_sar.hpp"
+#include "sar.hpp"
 #include "macro_tools.hpp"
+    //  ---
 
 using namespace libdar;
 

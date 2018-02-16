@@ -58,7 +58,7 @@ extern "C"
 #include "tools.hpp"
 #include "cygwin_adapt.hpp"
 #include "dar_suite.hpp"
-#include "thread_cancellation.hpp"
+#include "libdar.hpp"
 
 #define DAR_CP_VERSION "1.2.10"
 

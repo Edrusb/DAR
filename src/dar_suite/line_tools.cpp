@@ -40,10 +40,7 @@ extern "C"
 #include <string>
 
 #include "line_tools.hpp"
-#include "deci.hpp"
-#include "erreurs.hpp"
 #include "tools.hpp"
-#include "fichier_local.hpp"
 
 using namespace std;
 using namespace libdar;

@@ -52,19 +52,15 @@ extern "C"
 #include <iostream>
 #include <new>
 
-#include "user_interaction.hpp"
-#include "zapette.hpp"
-#include "sar.hpp"
-#include "path.hpp"
-#include "tuyau.hpp"
-#include "erreurs.hpp"
 #include "tools.hpp"
 #include "dar_suite.hpp"
-#include "integers.hpp"
 #include "libdar.hpp"
-#include "shell_interaction.hpp"
 #include "line_tools.hpp"
-#include "entrepot_local.hpp"
+
+    // to be removed when dar_slave will be part of libdar
+#include "tuyau.hpp"
+#include "sar.hpp"
+#include "zapette.hpp"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define OPT_STRING "i:o:hVE:Qj9:"

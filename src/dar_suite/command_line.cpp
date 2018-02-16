@@ -69,24 +69,18 @@ extern "C"
 #include <iostream>
 #include <new>
 
-#include "deci.hpp"
 #include "command_line.hpp"
-#include "user_interaction.hpp"
 #include "tools.hpp"
 #include "line_tools.hpp"
 #include "dar.hpp"
 #include "dar_suite.hpp"
-#include "integers.hpp"
 #include "no_comment.hpp"
 #include "config_file.hpp"
 #include "shell_interaction.hpp"
 #include "dar.hpp"
-#include "libdar.hpp"
 #include "cygwin_adapt.hpp"
-#include "mask_list.hpp"
 #include "crit_action_cmd_line.hpp"
-#include "criterium.hpp"
-#include "fichier_local.hpp"
+#include "libdar.hpp"
 
 #define OPT_STRING "c:A:x:d:t:l:v::z::y:nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:8:{:}:j:\\:"
 

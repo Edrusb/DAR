@@ -48,12 +48,8 @@ extern "C"
 #include <iostream>
 #include <new>
 
-#include "integers.hpp"
 #include "dar_suite.hpp"
-#include "erreurs.hpp"
 #include "libdar.hpp"
-#include "thread_cancellation.hpp"
-#include "memory_check.hpp"
 #include "line_tools.hpp"
 #ifdef HAVE_LIBTHREADAR_LIBTHREADAR_HPP
 #include <libthreadar/libthreadar.hpp>

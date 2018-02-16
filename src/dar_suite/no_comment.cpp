@@ -21,7 +21,6 @@
 
 #include "../my_config.h"
 #include "no_comment.hpp"
-#include "infinint.hpp"
 
 using namespace libdar;
 

@@ -30,13 +30,7 @@
 #include <string>
 #include <deque>
 #include <vector>
-#include "infinint.hpp"
-#include "compressor.hpp"
-#include "mask.hpp"
-#include "path.hpp"
-#include "catalogue.hpp"
-#include "archive.hpp"
-#include "criterium.hpp"
+#include "libdar.hpp"
 #include "shell_interaction.hpp"
 
 using namespace std;

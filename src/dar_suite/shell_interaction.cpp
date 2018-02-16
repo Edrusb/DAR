@@ -80,13 +80,10 @@ extern "C"
 #define L_ctermid 200
 #endif
 
-#include "integers.hpp"
-#include "shell_interaction.hpp"
-#include "erreurs.hpp"
 #include "tools.hpp"
 #include "integers.hpp"
 #include "cygwin_adapt.hpp"
-#include "tools.hpp"
+#include "shell_interaction.hpp"
 
 #ifndef L_ctermid
 // cygwin does not always define L_ctermid in stdio.h

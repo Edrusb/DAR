@@ -26,17 +26,10 @@
 #include <new>
 #include <vector>
 
-#include "erreurs.hpp"
-#include "user_interaction.hpp"
-#include "command_line.hpp"
-#include "tools.hpp"
-#include "dar.hpp"
-#include "dar_suite.hpp"
-#include "integers.hpp"
-#include "deci.hpp"
 #include "libdar.hpp"
 #include "shell_interaction.hpp"
-#include "criterium.hpp"
+#include "dar_suite.hpp"
+#include "command_line.hpp"
 #include "line_tools.hpp"
 
 #ifndef DAR_VERSION

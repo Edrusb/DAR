@@ -25,7 +25,6 @@
 
 #include "crit_action_cmd_line.hpp"
 #include "tools.hpp"
-#include "deci.hpp"
 #include "line_tools.hpp"
 
 using namespace std;

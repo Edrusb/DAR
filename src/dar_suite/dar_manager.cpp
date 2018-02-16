@@ -55,21 +55,12 @@ extern "C"
 #include <new>
 
 #include "dar_suite.hpp"
-#include "macro_tools.hpp"
-#include "data_tree.hpp"
-#include "database.hpp"
-#include "user_interaction.hpp"
-#include "integers.hpp"
 #include "libdar.hpp"
 #include "shell_interaction.hpp"
 #include "tools.hpp"
-#include "thread_cancellation.hpp"
-#include "archive.hpp"
 #include "cygwin_adapt.hpp"
 #include "no_comment.hpp"
 #include "line_tools.hpp"
-#include "fichier_local.hpp"
-#include "deci.hpp"
 
 using namespace libdar;
 

@@ -21,7 +21,6 @@
 
 #include "../my_config.h"
 #include "hide_file.hpp"
-#include "infinint.hpp"
 
 using namespace libdar;
 

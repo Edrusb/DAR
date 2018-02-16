@@ -28,7 +28,7 @@
 
 #include "../my_config.h"
 #include <vector>
-#include "infinint.hpp"
+#include "libdar.hpp"
 #include "generic_file.hpp"
 
 using namespace libdar;
