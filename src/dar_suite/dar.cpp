@@ -26,7 +26,7 @@
 #include <new>
 #include <vector>
 
-#include "libdar.hpp"
+#include "libdar5.hpp"
 #include "shell_interaction.hpp"
 #include "dar_suite.hpp"
 #include "command_line.hpp"
@@ -37,7 +37,7 @@
 #endif
 
 using namespace std;
-using namespace libdar;
+using namespace libdar5;
 
 static void display_sauv_stat(user_interaction & dialog, const statistics & st);
 static void display_rest_stat(user_interaction & dialog, const statistics & st);
@@ -248,7 +248,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    // since archive format 9 crypto algo used
 			    // is stored in the archive, it will be used
 			    // unless we specify explicitely the cipher to use
-			read_options.set_crypto_algo(libdar::crypto_none);
+			read_options.set_crypto_algo(crypto_none);
 		    else
 			read_options.set_crypto_algo(crypto);
 		    read_options.set_crypto_pass(tmp_pass);
@@ -299,7 +299,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 				// since archive format 9 crypto algo used
 				// is stored in the archive, it will be used
 				// unless we specify explicitely the cipher to use
-			    read_options.set_crypto_algo(libdar::crypto_none);
+			    read_options.set_crypto_algo(crypto_none);
 			else
 			    read_options.set_crypto_algo(aux_crypto);
 			read_options.set_crypto_pass(tmp_pass);
@@ -639,7 +639,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			// since archive format 9 crypto algo used
 			// is stored in the archive, it will be used
 			// unless we specify explicitely the cipher to use
-		    read_options.set_crypto_algo(libdar::crypto_none);
+		    read_options.set_crypto_algo(crypto_none);
 		else
 		    read_options.set_crypto_algo(crypto);
 		read_options.set_crypto_pass(tmp_pass);
@@ -728,7 +728,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			// since archive format 9 crypto algo used
 			// is stored in the archive, it will be used
 			// unless we specify explicitely the cipher to use
-		    read_options.set_crypto_algo(libdar::crypto_none);
+		    read_options.set_crypto_algo(crypto_none);
 		else
 		    read_options.set_crypto_algo(crypto);
 		read_options.set_crypto_pass(tmp_pass);
@@ -760,7 +760,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    // since archive format 9 crypto algo used
 			    // is stored in the archive, it will be used
 			    // unless we specify explicitely the cipher to use
-			read_options.set_ref_crypto_algo(libdar::crypto_none);
+			read_options.set_ref_crypto_algo(crypto_none);
 		    else
   		        read_options.set_ref_crypto_algo(ref_crypto);
 		    read_options.set_ref_crypto_pass(ref_tmp_pass);
@@ -838,7 +838,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			// since archive format 9 crypto algo used
 			// is stored in the archive, it will be used
 			// unless we specify explicitely the cipher to use
-		    read_options.set_crypto_algo(libdar::crypto_none);
+		    read_options.set_crypto_algo(crypto_none);
 		else
  		    read_options.set_crypto_algo(crypto);
 		read_options.set_crypto_pass(tmp_pass);
@@ -870,7 +870,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    // since archive format 9 crypto algo used
 			    // is stored in the archive, it will be used
 			    // unless we specify explicitely the cipher to use
-			read_options.set_ref_crypto_algo(libdar::crypto_none);
+			read_options.set_ref_crypto_algo(crypto_none);
 		    else
 			read_options.set_ref_crypto_algo(ref_crypto);
 		    read_options.set_ref_crypto_pass(ref_tmp_pass);
@@ -921,7 +921,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			// since archive format 9 crypto algo used
 			// is stored in the archive, it will be used
 			// unless we specify explicitely the cipher to use
-		    read_options.set_crypto_algo(libdar::crypto_none);
+		    read_options.set_crypto_algo(crypto_none);
 		else
 		    read_options.set_crypto_algo(crypto);
 		read_options.set_crypto_pass(tmp_pass);
@@ -953,7 +953,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    // since archive format 9 crypto algo used
 			    // is stored in the archive, it will be used
 			    // unless we specify explicitely the cipher to use
-			read_options.set_ref_crypto_algo(libdar::crypto_none);
+			read_options.set_ref_crypto_algo(crypto_none);
 		    else
 			read_options.set_ref_crypto_algo(ref_crypto);
 		    read_options.set_ref_crypto_pass(ref_tmp_pass);
@@ -997,7 +997,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			// since archive format 9 crypto algo used
 			// is stored in the archive, it will be used
 			// unless we specify explicitely the cipher to use
-		    read_options.set_crypto_algo(libdar::crypto_none);
+		    read_options.set_crypto_algo(crypto_none);
 		else
 		    read_options.set_crypto_algo(crypto);
 		read_options.set_crypto_pass(tmp_pass);

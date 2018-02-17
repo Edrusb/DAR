@@ -22,7 +22,7 @@
 #include "../my_config.h"
 #include "hide_file.hpp"
 
-using namespace libdar;
+using namespace libdar5;
 
 #define CHECK_INIT if(!is_init) init()
 

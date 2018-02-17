@@ -28,7 +28,7 @@
 #include "line_tools.hpp"
 
 using namespace std;
-using namespace libdar;
+using namespace libdar5;
 
 static const criterium * criterium_create_from_string(user_interaction & dialog, const string & argument, const infinint & hourshift);
 

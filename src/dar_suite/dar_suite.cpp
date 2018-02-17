@@ -49,7 +49,7 @@ extern "C"
 #include <new>
 
 #include "dar_suite.hpp"
-#include "libdar.hpp"
+#include "libdar5.hpp"
 #include "line_tools.hpp"
 #ifdef HAVE_LIBTHREADAR_LIBTHREADAR_HPP
 #include <libthreadar/libthreadar.hpp>

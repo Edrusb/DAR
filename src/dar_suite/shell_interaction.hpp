@@ -37,10 +37,10 @@ extern "C"
 #include "../my_config.h"
 #include <iostream>
 
-#include "libdar.hpp"
+#include "libdar5.hpp"
 
 using namespace std;
-using namespace libdar;
+using namespace libdar5;
 
     /// \addtogroup CMDLINE
     /// @{

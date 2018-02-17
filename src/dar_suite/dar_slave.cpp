@@ -54,7 +54,7 @@ extern "C"
 
 #include "tools.hpp"
 #include "dar_suite.hpp"
-#include "libdar.hpp"
+#include "libdar5.hpp"
 #include "line_tools.hpp"
 
     // to be removed when dar_slave will be part of libdar
@@ -65,7 +65,7 @@ extern "C"
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define OPT_STRING "i:o:hVE:Qj9:"
 
-using namespace libdar;
+using namespace libdar5;
 using namespace std;
 
 #define DAR_SLAVE_VERSION "1.4.10"
@@ -102,9 +102,9 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 
     if(command_line(dialog, argc, argv, chemin, filename, input_pipe, output_pipe, execute, min_digits))
     {
-        tuyau *input = nullptr;
-        tuyau *output = nullptr;
-        sar *source = nullptr;
+	libdar::tuyau *input = nullptr;
+	libdar::tuyau *output = nullptr;
+	libdar::sar *source = nullptr;
 	entrepot_local entrep = entrepot_local("", "", false);
 
 	if(chemin == nullptr)
@@ -113,13 +113,13 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	entrep.set_location(*chemin);
         try
         {
-	    source = new (nothrow) sar(dialog, filename, EXTENSION, entrep, true, min_digits, false, execute);
+	    source = new (nothrow) libdar::sar(dialog, filename, EXTENSION, entrep, true, min_digits, false, execute);
             if(source == nullptr)
                 throw Ememory("little_main");
 
             tools_open_pipes(dialog, input_pipe, output_pipe, input, output);
 
-            slave_zapette zap = slave_zapette(input, output, source);
+	    libdar::slave_zapette zap = libdar::slave_zapette(input, output, source);
             input = output = nullptr; // now managed by zap;
             source = nullptr;  // now managed by zap;
 

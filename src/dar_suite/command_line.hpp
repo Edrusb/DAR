@@ -30,11 +30,11 @@
 #include <string>
 #include <deque>
 #include <vector>
-#include "libdar.hpp"
+#include "libdar5.hpp"
 #include "shell_interaction.hpp"
 
 using namespace std;
-using namespace libdar;
+using namespace libdar5;
 
     /// \addtogroup CMDLINE
     /// @{

@@ -28,10 +28,10 @@
 
 #include "../my_config.h"
 #include <vector>
-#include "libdar.hpp"
+#include "libdar5.hpp"
 #include "generic_file.hpp"
 
-using namespace libdar;
+using namespace libdar5;
 using namespace std;
 
     /// \addtogroup CMDLINE

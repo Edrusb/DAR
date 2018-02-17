@@ -80,7 +80,7 @@ extern "C"
 #include "dar.hpp"
 #include "cygwin_adapt.hpp"
 #include "crit_action_cmd_line.hpp"
-#include "libdar.hpp"
+#include "libdar5.hpp"
 
 #define OPT_STRING "c:A:x:d:t:l:v::z::y:nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:8:{:}:j:\\:"
 
@@ -93,7 +93,7 @@ extern "C"
 
 
 using namespace std;
-using namespace libdar;
+using namespace libdar5;
 struct pre_mask
 {
     bool included;      // whether it is a include or exclude entry
@@ -456,7 +456,7 @@ bool get_args(shell_interaction & dialog,
             dialog.pause(msg);
         }
         if(p.furtive_read_mode
-           && capability_FOWNER(dialog, p.info_details) != libdar::capa_set
+           && capability_FOWNER(dialog, p.info_details) != capa_set
            && getuid() != 0)
         {
             if(p.op == create || p.op == diff)
@@ -936,7 +936,7 @@ static bool get_args_recursive(recursive_param & rec,
                                 // note that the namespace specification is necessary
                                 // due to similar existing name in std namespace under
                                 // certain OS (FreeBSD 10.0)
-                            libdar::deci tmp = string(optarg);
+                            libdar5::deci tmp = string(optarg);
                             p.fixed_date = tmp.computer();
                         }
                         catch(Edeci & e)
@@ -1057,7 +1057,7 @@ static bool get_args_recursive(recursive_param & rec,
                         // note that the namespace specification is necessary
                         // due to similar existing name in std namespace under
                         // certain OS (FreeBSD 10.0)
-                    libdar::deci conv = string(optarg);
+                    libdar5::deci conv = string(optarg);
                     p.pause = conv.computer();
                 }
                 else
@@ -1479,7 +1479,7 @@ static bool get_args_recursive(recursive_param & rec,
                             // note that the namespace specification is necessary
                             // due to similar existing name in std namespace under
                             // certain OS (FreeBSD 10.0)
-                        p.hourshift = libdar::deci(string(optarg)).computer();
+                        p.hourshift = libdar5::deci(string(optarg)).computer();
                     }
                     catch(Edeci & e)
                     {

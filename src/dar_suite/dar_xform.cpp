@@ -52,7 +52,7 @@ extern "C"
 #include "macro_tools.hpp"
     //  ---
 
-using namespace libdar;
+using namespace libdar5;
 
 #define DAR_XFORM_VERSION "1.5.10"
 
@@ -153,7 +153,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 		dialog.set_beep(beep);
 		if(src == "-")
 		{
-		    trivial_sar *tmp_sar = new (nothrow) trivial_sar(dialog, src, false);
+		    libdar::trivial_sar *tmp_sar = new (nothrow) libdar::trivial_sar(dialog, src, false);
 		    if(tmp_sar == nullptr)
 			throw Ememory("sub_main");
 		    format_07_compatible = tmp_sar->is_an_old_start_end_archive();
@@ -171,7 +171,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 		    else
 			throw SRC_BUG;
 
-		    sar *tmp_sar = new (nothrow) sar(dialog, src, EXTENSION, entrep, false, src_min_digits, false, execute_src);
+		    libdar::sar *tmp_sar = new (nothrow) libdar::sar(dialog, src, EXTENSION, entrep, false, src_min_digits, false, execute_src);
 		    if(tmp_sar == nullptr)
 			throw Ememory("main");
 		    else
@@ -199,21 +199,21 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 			    entrep.set_location(*dst_dir);
 			else
 			    throw SRC_BUG;
-			dst_sar = new (nothrow) trivial_sar(dialog,
-							    gf_write_only,
-							    dst,
-							    EXTENSION,
-							    entrep,
-							    internal_name,
-							    data_name,
-							    execute_dst,
-							    allow,
-							    warn,
-							    force_perm,
-							    perm,
-							    hash,
-							    dst_min_digits,
-							    format_07_compatible);
+			dst_sar = new (nothrow) libdar::trivial_sar(dialog,
+								    gf_write_only,
+								    dst,
+								    EXTENSION,
+								    entrep,
+								    internal_name,
+								    data_name,
+								    execute_dst,
+								    allow,
+								    warn,
+								    force_perm,
+								    perm,
+								    hash,
+								    dst_min_digits,
+								    format_07_compatible);
 		    }
 		else
 		{
@@ -221,24 +221,24 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 			entrep.set_location(*dst_dir);
 		    else
 			throw SRC_BUG;
-		    dst_sar = new (nothrow) sar(dialog,
-						gf_write_only,
-						dst,
-						EXTENSION,
-						size,
-						first,
-						warn,
-						allow,
-						pause,
-						entrep,
-						internal_name,
-						data_name,
-						force_perm,
-						perm,
-						hash,
-						dst_min_digits,
-						format_07_compatible,
-						execute_dst);
+		    dst_sar = new (nothrow) libdar::sar(dialog,
+							gf_write_only,
+							dst,
+							EXTENSION,
+							size,
+							first,
+							warn,
+							allow,
+							pause,
+							entrep,
+							internal_name,
+							data_name,
+							force_perm,
+							perm,
+							hash,
+							dst_min_digits,
+							format_07_compatible,
+							execute_dst);
 		}
 		if(dst_sar == nullptr)
 		    throw Ememory("main");

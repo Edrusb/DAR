@@ -43,7 +43,7 @@ extern "C"
 #include "tools.hpp"
 
 using namespace std;
-using namespace libdar;
+using namespace libdar5;
 
 
 ////

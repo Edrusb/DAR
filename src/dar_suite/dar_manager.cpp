@@ -55,14 +55,14 @@ extern "C"
 #include <new>
 
 #include "dar_suite.hpp"
-#include "libdar.hpp"
+#include "libdar5.hpp"
 #include "shell_interaction.hpp"
 #include "tools.hpp"
 #include "cygwin_adapt.hpp"
 #include "no_comment.hpp"
 #include "line_tools.hpp"
 
-using namespace libdar;
+using namespace libdar5;
 
 #define DAR_MANAGER_VERSION "1.7.13"
 
@@ -480,7 +480,7 @@ static bool command_line(shell_interaction & dialog,
 			    // note that the namespace specification is necessary
 			    // due to similar existing name in std namespace under
 			    // certain OS (FreeBSD 10.0)
-			libdar::deci tmp = string(optarg);
+			libdar5::deci tmp = string(optarg);
 			date = tmp.computer();
 			date_set = date_set_by_9;
 		    }

@@ -58,11 +58,11 @@ extern "C"
 #include "tools.hpp"
 #include "cygwin_adapt.hpp"
 #include "dar_suite.hpp"
-#include "libdar.hpp"
+#include "libdar5.hpp"
 
 #define DAR_CP_VERSION "1.2.10"
 
-using namespace libdar;
+using namespace libdar5;
 using namespace std;
 
 static void show_usage(shell_interaction & dialog, char *argv0);

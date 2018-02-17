@@ -31,7 +31,7 @@
 #include <deque>
 #include "hide_file.hpp"
 
-using namespace libdar;
+using namespace libdar5;
 
     /// \addtogroup CMDLINE
     /// @{

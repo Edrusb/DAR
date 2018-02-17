@@ -64,7 +64,7 @@
 #define CC_NAT "unknown"
 #endif
 
-using namespace libdar;
+using namespace libdar5;
 
     /// \addtogroup CMDLINE
     /// @{
