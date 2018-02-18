@@ -197,14 +197,14 @@ namespace libdar
 	    /// listing of the archive contents
 
 	    /// \param[in,out] dialog for user interaction
+	    /// \param[in] callback callback function used to provide data in splitted field
 	    /// \param[in] options list of optional parameters to use for the operation
-	    /// \note this call covers the whole listing and uses the user_interaction
-	    /// to provide the archive contents (in particular using its listing() method
-	    /// if set and activated by its set_use_listing() method). There is however two
-	    /// alternative way to get archive contents:
+	    /// \note if callback is nullptr (or NULL), the output is done using user_interaction
+	    /// \note alternative way to get archive contents:
 	    /// . archive::get_children_of() method
 	    /// . archive::init_catalogue()+get_children_in_table()
 	void op_listing(user_interaction & dialog,
+			catalogue_listing_callback callback,
 			const archive_options_listing & options);
 
 	    /// archive comparison with filesystem
@@ -274,7 +274,8 @@ namespace libdar
 
 	    /// getting information about a given directory
 
-	    /// \param[in,out] dialog for user interaction
+	    /// \param[in] dialog for user interaction
+	    /// \param[in] callback callback function used to provide data in splitted field
 	    /// \param[in] dir relative path the directory to get information about
 	    /// \return true if some children have been found and thus if
 	    /// the dialog.listing() method has been called at least once.
@@ -282,6 +283,7 @@ namespace libdar
 	    /// to send back data to the user. If it is not redifined in the
 	    /// dialog object nothing will get sent back to the user
 	bool get_children_of(user_interaction & dialog,
+			     catalogue_listing_callback callback,
 			     const std::string & dir);
 
 	    /// getting information about the given directory (alternative to get_children_of)

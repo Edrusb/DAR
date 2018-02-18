@@ -51,7 +51,7 @@ extern "C"
 #include "user_interaction_callback.hpp"
 #include "user_interaction_blind.hpp"
 #include "deci.hpp"
-#include "archive.hpp"
+#include "archive5.hpp"
 #include "crypto.hpp"
 #include "thread_cancellation.hpp"
 #include "compile_time_features.hpp"
@@ -62,6 +62,7 @@ extern "C"
 #include "entrepot_local.hpp"
 #include "data_tree.hpp"
 #include "database.hpp"
+#include "get_version.hpp"
 
     /// \addtogroup API5
     /// @{
@@ -151,14 +152,11 @@ namespace libdar5
 	// from cat_inode.hpp
     using libdar::cat_inode;
 
-    	// from user_interaction.hpp
-    using libdar::user_interaction;
-
 	// from user_interaction_callback.hpp
-    using libdar::user_interaction_callback;
+	// using libdar::user_interaction_callback;
 
 	// from user_interaction_blind.hpp
-    using libdar::user_interaction_blind;
+	// using libdar::user_interaction_blind;
 
 	// from path.hpp
     using libdar::path;
@@ -190,18 +188,6 @@ namespace libdar5
 
     using libdar::signator;
 
-	// from archive_options.hpp
-    using libdar::archive_options_read;
-    using libdar::archive_options_create;
-    using libdar::archive_options_isolate;
-    using libdar::archive_options_merge;
-    using libdar::archive_options_read;
-    using libdar::archive_options_extract;
-    using libdar::archive_options_listing;
-    using libdar::archive_options_diff;
-    using libdar::archive_options_test;
-    using libdar::archive_options_repair;
-
 	// from statistics.hpp
     using libdar::statistics;
 
@@ -209,7 +195,7 @@ namespace libdar5
     using libdar::list_entry;
 
 	// from archive.hpp
-    using libdar::archive;
+	// using libdar::archive;
 
 	// from capabilities.hpp
     using libdar::capa_status;

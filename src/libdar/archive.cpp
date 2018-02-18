@@ -1096,6 +1096,7 @@ namespace libdar
     }
 
     void archive::op_listing(user_interaction & dialog,
+			     catalogue_listing_callback callback,
 			     const archive_options_listing & options)
     {
         NLS_SWAP_IN;
@@ -1116,7 +1117,9 @@ namespace libdar
                 switch(options.get_list_mode())
 		{
 		case archive_options_listing::normal:
-		    get_cat().tar_listing(only_contains_an_isolated_catalogue(),
+		    get_cat().tar_listing(dialog,
+					  callback,
+					  only_contains_an_isolated_catalogue(),
 					  options.get_selection(),
 					  options.get_subtree(),
 					  options.get_filter_unsaved(),
@@ -1125,7 +1128,8 @@ namespace libdar
 					  "");
 		    break;
 		case archive_options_listing::tree:
-		    get_cat().listing(only_contains_an_isolated_catalogue(),
+		    get_cat().listing(dialog,
+				      only_contains_an_isolated_catalogue(),
 				      options.get_selection(),
 				      options.get_subtree(),
 				      options.get_filter_unsaved(),
@@ -1134,7 +1138,8 @@ namespace libdar
 				      "");
 		    break;
 		case archive_options_listing::xml:
-		    get_cat().xml_listing(only_contains_an_isolated_catalogue(),
+		    get_cat().xml_listing(dialog,
+					  only_contains_an_isolated_catalogue(),
 					  options.get_selection(),
 					  options.get_subtree(),
 					  options.get_filter_unsaved(),
@@ -1169,7 +1174,11 @@ namespace libdar
 				throw Erange("archive::op_listing", gettext("No slice layout of the archive of reference for the current isolated catalogue is available, cannot provide slicing information, aborting"));
 			}
 		    }
-		    get_cat().slice_listing(only_contains_an_isolated_catalogue(), options.get_selection(), options.get_subtree(), used_layout);
+		    get_cat().slice_listing(dialog,
+					    only_contains_an_isolated_catalogue(),
+					    options.get_selection(),
+					    options.get_subtree(),
+					    used_layout);
 		    break;
 		default:
 		    throw SRC_BUG;
@@ -1514,6 +1523,7 @@ namespace libdar
 
 
     bool archive::get_children_of(user_interaction & dialog,
+				  catalogue_listing_callback callback,
                                   const string & dir)
     {
 	bool ret;
@@ -1541,7 +1551,7 @@ namespace libdar
 
 		// OK, now that we have the whole catalogue available in memory, let's rock!
 
-            ret = get_cat().get_contenu()->callback_for_children_of(dialog, dir);
+            ret = get_cat().get_contenu()->callback_for_children_of(callback, dir);
         }
         catch(...)
         {

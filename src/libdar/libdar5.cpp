@@ -67,12 +67,11 @@ extern "C"
 #include <string>
 #include <iostream>
 #include "libdar5.hpp"
-#include "libdar.hpp"
 #include "erreurs.hpp"
 #include "infinint.hpp"
 #include "generic_file.hpp"
-#include "user_interaction.hpp"
-#include "archive.hpp"
+#include "user_interaction5.hpp"
+#include "archive5.hpp"
 #include "nls_swap.hpp"
 #ifdef __DYNAMIC__
 #include "user_group_bases.hpp"

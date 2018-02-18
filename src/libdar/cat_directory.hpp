@@ -39,6 +39,7 @@ extern "C"
 #include <list>
 #include "cat_inode.hpp"
 #include "cat_tools.hpp"
+#include "catalogue_listing_callback.hpp"
 
 namespace libdar
 {
@@ -97,7 +98,9 @@ namespace libdar
 
         cat_directory * get_parent() const { return parent; };
         bool search_children(const std::string &name, const cat_nomme *&ref) const;
-	bool callback_for_children_of(user_interaction & dialog, const std::string & sdir, bool isolated = false) const;
+	bool callback_for_children_of(catalogue_listing_callback callback,
+				      const std::string & sdir,
+				      bool isolated = false) const;
 
             // using is_more_recent_than() from cat_inode class
             // using method has_changed_since() from cat_inode class

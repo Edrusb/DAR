@@ -46,32 +46,34 @@ extern "C"
 #include "escape.hpp"
 #include "datetime.hpp"
 #include "slice_layout.hpp"
-#include "mem_ui.hpp"
 #include "cat_entree.hpp"
 #include "cat_nomme.hpp"
 #include "cat_directory.hpp"
+#include "catalogue_listing_callback.hpp"
 
 namespace libdar
 {
+
+
 
 	/// \addtogroup Private
 	/// @{
 
 	/// the catalogue class which gather all objects contained in a give archive
-    class catalogue : protected mem_ui
+    class catalogue
     {
     public :
-        catalogue(const user_interaction & dialog,
+        catalogue(user_interaction & ui,
 		  const datetime & root_last_modif,
 		  const label & data_name);
-        catalogue(const user_interaction & dialog,
+        catalogue(user_interaction & ui,
 		  const pile_descriptor & pdesc,
 		  const archive_version & reading_ver,
 		  compression default_algo,
 		  bool lax,
 		  const label & lax_layer1_data_name, //< ignored unless in lax mode, in lax mode unless it is a cleared label, forces the catalogue label to be equal to the lax_layer1_data_name for it be considered a plain internal catalogue, even in case of corruption
 		  bool only_detruit = false); //< if set to true, only directories and detruit objects are read from the archive
-        catalogue(const catalogue & ref) : mem_ui(ref), out_compare(ref.out_compare) { partial_copy_from(ref); };
+        catalogue(const catalogue & ref) : out_compare(ref.out_compare) { partial_copy_from(ref); };
 	catalogue(catalogue && ref) = delete;
         catalogue & operator = (const catalogue &ref);
 	catalogue & operator = (catalogue && ref) = delete;
@@ -101,7 +103,7 @@ namespace libdar
 
 
         void reset_sub_read(const path &sub); // initialise sub_read to the given directory
-        bool sub_read(const cat_entree * &ref); // sequential read of the catalogue, ignoring all that
+        bool sub_read(user_interaction & ui, const cat_entree * &ref); // sequential read of the catalogue, ignoring all that
             // is not part of the subdirectory specified with reset_sub_read
             // the read include the inode leading to the sub_tree as well as the pending cat_eod
 
@@ -189,28 +191,33 @@ namespace libdar
 	    /// write down the whole catalogue to file
         void dump(const pile_descriptor & pdesc) const;
 
-        void listing(bool isolated,
+        void listing(user_interaction & ui,
+		     bool isolated,
 		     const mask &selection,
 		     const mask & subtree,
 		     bool filter_unsaved,
 		     bool list_ea,
 		     bool sizes_in_bytes,
 		     std::string marge) const;
-        void tar_listing(bool isolated,
+        void tar_listing(user_interaction & ui,
+			 catalogue_listing_callback callback,
+			 bool isolated,
 			 const mask & selection,
 			 const mask & subtree,
 			 bool filter_unsaved,
 			 bool list_ea,
 			 bool sizes_in_bytes,
 			 std::string beginning) const;
-        void xml_listing(bool isolated,
+        void xml_listing(user_interaction & ui,
+			 bool isolated,
 			 const mask & selection,
 			 const mask & subtree,
 			 bool filter_unsaved,
 			 bool list_ea,
 			 bool sizes_in_bytes,
 			 std::string beginning) const;
-	void slice_listing(bool isolated,
+	void slice_listing(user_interaction & ui,
+			   bool isolated,
 			   const mask & selection,
 			   const mask & subtree,
 			   const slice_layout & slicing) const;

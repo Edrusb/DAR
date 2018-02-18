@@ -586,7 +586,9 @@ namespace libdar
 	return ptr != nullptr;
     }
 
-    bool cat_directory::callback_for_children_of(user_interaction & dialog, const string & sdir, bool isolated) const
+    bool cat_directory::callback_for_children_of(catalogue_listing_callback callback,
+						 const string & sdir,
+						 bool isolated) const
     {
 	const cat_directory *current = this;
 	const cat_nomme *next_nom = nullptr;
@@ -598,8 +600,8 @@ namespace libdar
 	bool loop = true;
 	const cat_nomme *tmp_nom;
 
-	if(!dialog.get_use_listing())
-	    throw Erange("cat_directory::callback_for_children_of", gettext("listing() method must be given"));
+	if(callback == nullptr)
+	    throw Erange("cat_directory::callback_for_children_of", gettext("callback function must be given"));
 
 	if(sdir != "")
 	{
@@ -668,14 +670,14 @@ namespace libdar
 		string e = local_date(*next_ino);
 		string f = local_flag(*next_ino, isolated, false);
 		string g = next_ino->get_name();
-		dialog.listing(f,a,b,c,d,e,g, next_dir != nullptr, next_dir != nullptr && next_dir->has_children());
+		(*callback)(f,a,b,c,d,e,g, next_dir != nullptr, next_dir != nullptr && next_dir->has_children());
 		loop = true;
 	    }
 	    else
 		if(next_detruit != nullptr)
 		{
 		    string a = next_detruit->get_name();
-		    dialog.listing(REMOVE_TAG, "xxxxxxxxxx", "", "", "", "", a, false, false);
+		    (*callback)(REMOVE_TAG, "xxxxxxxxxx", "", "", "", "", a, false, false);
 		    loop = true;
 		}
 		else

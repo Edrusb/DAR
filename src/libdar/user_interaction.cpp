@@ -71,122 +71,74 @@ extern "C"
 #include "user_interaction.hpp"
 #include "erreurs.hpp"
 #include "tools.hpp"
-#include "integers.hpp"
-#include "deci.hpp"
 #include "nls_swap.hpp"
 
 using namespace std;
 
 namespace libdar
 {
-
-    user_interaction::user_interaction()
+    bool user_interaction::pause(const string & message)
     {
-	use_listing = false;
-	use_dar_manager_show_files = false;
-	use_dar_manager_contents = false;
-	use_dar_manager_statistics = false;
-	use_dar_manager_show_version = false;
-	at_once = 0;
-	count = 0;
-    }
-
-    void user_interaction::warning(const std::string & message)
-    {
-	if(at_once > 0)
-	{
- 	    U_I c = 0, max = message.size();
-	    while(c < max)
-	    {
-		if(message[c] == '\n')
-		    count++;
-		c++;
-	    }
-	    count++; // for the implicit \n at end of message
-	    if(count >= at_once)
-	    {
-		count = 0;
-		(void)this->pause(dar_gettext("Continue? "));
-	    }
-	}
-	inherited_warning(message);
-    }
-
-    void user_interaction::listing(const std::string & flag,
-				   const std::string & perm,
-				   const std::string & uid,
-				   const std::string & gid,
-				   const std::string & size,
-				   const std::string & date,
-				   const std::string & filename,
-				   bool is_dir,
-				   bool has_children)
-    {
-	    // stupid code to stop having compiler complaining against unused arguments
-
-	throw Elibcall("user_interaction::listing",
-		       tools_printf("Not overwritten listing() method called with: (%S, %S, %S, %S, %S, %S, %S, %s, %s)",
-				    &flag,
-				    &perm,
-				    &uid,
-				    &gid,
-				    &size,
-				    &date,
-				    &filename,
-				    is_dir ? "true" : "false",
-				    has_children ? "true" : "false"));
-    }
-
-    void user_interaction::dar_manager_show_files(const string & filename,
-						  bool data_change,
-						  bool ea_change)
-    {
-	throw Elibcall("user_interaction::dar_manager_show_files", "Not overwritten dar_manager_show_files() method has been called!");
-    }
-
-    void user_interaction::dar_manager_contents(U_I number,
-						const string & chemin,
-						const string & archive_name)
-    {
-	throw Elibcall("user_interaction::dar_manager_contents", "Not overwritten dar_manager_contents() method has been called!");
-    }
-
-    void user_interaction::dar_manager_statistics(U_I number,
-						  const infinint & data_count,
-						  const infinint & total_data,
-						  const infinint & ea_count,
-						  const infinint & total_ea)
-    {
-	throw Elibcall("user_interaction::dar_manager_statistics", "Not overwritten dar_manager_statistics() method has been called!");
-    }
-
-    void user_interaction::dar_manager_show_version(U_I number,
-						    const string & data_date,
-						    const string & data_presence,
-						    const string & ea_date,
-						    const string & ea_presence)
-    {
-	throw Elibcall("user_interaction::dar_manager_show_version", "Not overwritten dar_manager_show_version() method has been called!");
-    }
-
-
-    void user_interaction::printf(const char *format, ...)
-    {
-	va_list ap;
-	va_start(ap, format);
-	string output = "";
 	try
 	{
-	    output = tools_vprintf(format, ap);
+	    return inherited_pause(message);
 	}
 	catch(...)
 	{
-	    va_end(ap);
-	    throw;
+	    throw Elibcall("user_interaction::pause", "user_interaction::inherited_pause should not throw an exception toward libdar");
 	}
-	va_end(ap);
-	tools_remove_last_char_if_equal_to('\n', output);
-	warning(output);
+    }
+
+    void user_interaction::warning(const string & message)
+    {
+	try
+	{
+	    return inherited_warning(message);
+	}
+	catch(...)
+	{
+	    throw Elibcall("user_interaction::warning", "ser_interaction::inherited_warnig should not throw an exception toward libdar");
+	}
+    }
+
+    string user_interaction::get_string(const string & message, bool echo)
+    {
+	try
+	{
+	    return inherited_get_string(message, echo);
+	}
+	catch(...)
+	{
+	    throw Elibcall("user_interaction::get_string", "user_interaction::inherited_get_string should not throw an exception toward libdar");
+	}
+    }
+
+    secu_string user_interaction::get_secu_string(const string & message, bool echo)
+    {
+	try
+	{
+	    return inherited_get_secu_string(message, echo);
+	}
+	catch(...)
+	{
+	    throw Elibcall("user_interaction::get_secu_string", "user_interaction::inherited_get_secu_string should not throw an exception toward libdar");
+	}
+    }
+
+    void user_interaction::printf(const char *format, ...)
+    {
+        va_list ap;
+        va_start(ap, format);
+        try
+        {
+            warning(tools_vprintf(format, ap));
+        }
+        catch(...)
+        {
+            va_end(ap);
+            throw;
+        }
+        va_end(ap);
     }
 
 } // end of namespace
