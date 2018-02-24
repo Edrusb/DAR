@@ -57,9 +57,9 @@ static void write_to_file(generic_file &f, archive_num a);
 static void display_line(user_interaction & dialog,
 			 archive_num num,
 			 const datetime *data,
-			 data_tree::etat data_presence,
+			 db_etat data_presence,
 			 const datetime *ea,
-			 data_tree::etat ea_presence);
+			 db_etat ea_presence);
 
 constexpr const char * const ETAT_SAVED = "S";
 constexpr const char * const ETAT_PATCH = "O";
@@ -79,22 +79,22 @@ namespace libdar
 	date.dump(f);
 	switch(present)
 	{
-	case et_saved:
+	case db_etat::et_saved:
 	    f.write(ETAT_SAVED, 1);
 	    break;
-	case et_patch:
+	case db_etat::et_patch:
 	    f.write(ETAT_PATCH, 1);
 	    break;
-	case et_patch_unusable:
+	case db_etat::et_patch_unusable:
 	    f.write(ETAT_PATCH_UNUSABLE, 1);
 	    break;
-	case et_present:
+	case db_etat::et_present:
 	    f.write(ETAT_PRESENT, 1);
 	    break;
-	case et_removed:
+	case db_etat::et_removed:
 	    f.write(ETAT_REMOVED, 1);
 	    break;
-	case et_absent:
+	case db_etat::et_absent:
 	    f.write(ETAT_ABSENT, 1);
 	    break;
 	default:
@@ -112,22 +112,22 @@ namespace libdar
 	switch(tmp)
 	{
 	case ETAT_SAVED[0]:
-	    present = et_saved;
+	    present = db_etat::et_saved;
 	    break;
 	case ETAT_PRESENT[0]:
-	    present = et_present;
+	    present = db_etat::et_present;
 	    break;
 	case ETAT_REMOVED[0]:
-	    present = et_removed;
+	    present = db_etat::et_removed;
 	    break;
 	case ETAT_ABSENT[0]:
-	    present = et_absent;
+	    present = db_etat::et_absent;
 	    break;
 	case ETAT_PATCH[0]:
-	    present = et_patch;
+	    present = db_etat::et_patch;
 	    break;
 	case ETAT_PATCH_UNUSABLE[0]:
-	    present = et_patch_unusable;
+	    present = db_etat::et_patch_unusable;
 	    break;
 	default:
 	    throw Erange("data_tree::status::read", gettext("Unexpected value found in database"));
@@ -135,7 +135,7 @@ namespace libdar
     }
 
     data_tree::status_plus::status_plus(const datetime & d,
-					etat p,
+					db_etat p,
 					const crc *xbase,
 					const crc *xresult): status(d, p)
     {
@@ -279,7 +279,7 @@ namespace libdar
 	    {
 	    case 1:
 		sta_plus.date = infinint(f);
-		sta_plus.present = et_saved;
+		sta_plus.present = db_etat::et_saved;
 		    // me and ref fields are already set to nullptr
 		last_mod[k] = sta_plus;
 		break;
@@ -304,7 +304,7 @@ namespace libdar
 	    {
 	    case 1:
 		sta.date = infinint(f);
-		sta.present = et_saved;
+		sta.present = db_etat::et_saved;
 		last_change[k] = sta;
 		break;
 	    case 2:
@@ -366,7 +366,7 @@ namespace libdar
 	archive_num last_archive_seen = 0; //< last archive number (in the order of the database) in which a valid entry has been found (any state)
 	set<archive_num> last_archive_even_when_removed; //< last archive number in which a valid entry with data available has been found
 	bool presence_seen = false; //< whether the last found valid entry indicates file was present or removed
-	bool presence_real = false; //< whether the last found valid entry not being an "et_present" state was present or removed
+	bool presence_real = false; //< whether the last found valid entry not being an "db_etat::et_present" state was present or removed
 	bool broken_patch = false;  //< record whether there is a broken patch the avoid restoring data
 	lookup ret;
 
@@ -382,21 +382,21 @@ namespace libdar
 		max_seen_date = it->second.date;
 		switch(it->second.present)
 		{
-		case et_saved:
+		case db_etat::et_saved:
 		    broken_patch = false;
 			// no break !
-		case et_present:
-		case et_patch:
+		case db_etat::et_present:
+		case db_etat::et_patch:
 		    presence_seen = true;
 		    last_archive_seen = it->first;
 		    break;
-		case et_patch_unusable:
+		case db_etat::et_patch_unusable:
 		    broken_patch = true;
 		    presence_seen = false;
 			// we do not record this archive number as last_seen
 		    break;
-		case et_removed:
-		case et_absent:
+		case db_etat::et_removed:
+		case db_etat::et_absent:
 		    presence_seen = false;
 		    last_archive_seen = it->first;
 		    break;
@@ -410,29 +410,29 @@ namespace libdar
 		   // and we must be able to see a value of 0 (initially max = 0) which is valid.
 	       && (date.is_null() || it->second.date <= date))
 	    {
-		if(it->second.present != et_present && !broken_patch)
+		if(it->second.present != db_etat::et_present && !broken_patch)
 		{
 		    max_real_date = it->second.date;
 		    switch(it->second.present)
 		    {
-		    case et_saved:
+		    case db_etat::et_saved:
 			archive.clear();
 			last_archive_even_when_removed.clear();
 			    // no break !!! //
-		    case et_patch:
+		    case db_etat::et_patch:
 			archive.insert(it->first);
 			last_archive_even_when_removed.insert(it->first);
 			presence_real = true;
 			break;
-		    case et_removed:
-		    case et_absent:
+		    case db_etat::et_removed:
+		    case db_etat::et_absent:
 			archive.clear();
 			archive.insert(it->first);
 			presence_real = false;
 			break;
-		    case et_present:
+		    case db_etat::et_present:
 			throw SRC_BUG;
-		    case et_patch_unusable:
+		    case db_etat::et_patch_unusable:
 			throw SRC_BUG;
 		    default:
 			throw SRC_BUG;
@@ -511,12 +511,12 @@ namespace libdar
 		last_archive_seen = it->first;
 		switch(it->second.present)
 		{
-		case et_saved:
-		case et_present:
+		case db_etat::et_saved:
+		case db_etat::et_present:
 		    presence_seen = true;
 		    break;
-		case et_removed:
-		case et_absent:
+		case db_etat::et_removed:
+		case db_etat::et_absent:
 		    presence_seen = false;
 		    break;
 		default:
@@ -528,21 +528,21 @@ namespace libdar
 		   // and we must be able to see a value of 0 (initially max = 0) which is valid.
 	       && (date.is_null() || it->second.date <= date))
 	    {
-		if(it->second.present != et_present)
+		if(it->second.present != db_etat::et_present)
 		{
 		    max_real_date = it->second.date;
 		    archive = it->first;
 		    switch(it->second.present)
 		    {
-		    case et_saved:
+		    case db_etat::et_saved:
 			presence_real = true;
 			last_archive_even_when_removed = archive;
 			break;
-		    case et_removed:
-		    case et_absent:
+		    case db_etat::et_removed:
+		    case db_etat::et_absent:
 			presence_real = false;
 			break;
-		    case et_present:
+		    case db_etat::et_present:
 			throw SRC_BUG;
 		    default:
 			throw SRC_BUG;
@@ -585,7 +585,7 @@ namespace libdar
 
     bool data_tree::read_data(archive_num num,
 			      datetime & val,
-			      etat & present) const
+			      db_etat & present) const
     {
 	map<archive_num, status_plus>::const_iterator it = last_mod.find(num);
 
@@ -601,7 +601,7 @@ namespace libdar
 
     bool data_tree::read_EA(archive_num num,
 			    datetime & val,
-			    etat & present) const
+			    db_etat & present) const
     {
 	map<archive_num, status>::const_iterator it = last_change.find(num);
 
@@ -629,7 +629,7 @@ namespace libdar
 
 	while(itp != last_mod.end() && !found_in_archive)
 	{
-	    if(itp->first == archive && itp->second.present != et_absent)
+	    if(itp->first == archive && itp->second.present != db_etat::et_absent)
 		found_in_archive = true;
 	    else
 		if(itp->first > num_max && (itp->first < ignore_archives_greater_or_equal || ignore_archives_greater_or_equal == 0))
@@ -637,15 +637,15 @@ namespace libdar
 		    num_max = itp->first;
 		    switch(itp->second.present)
 		    {
-		    case et_saved:
-		    case et_present:
-		    case et_patch:
-		    case et_patch_unusable:
+		    case db_etat::et_saved:
+		    case db_etat::et_present:
+		    case db_etat::et_patch:
+		    case db_etat::et_patch_unusable:
 			presence_max = true;
 			last_mtime = itp->second.date; // used as deleted_data for EA
 			break;
-		    case et_removed:
-		    case et_absent:
+		    case db_etat::et_removed:
+		    case db_etat::et_absent:
 			presence_max = false;
 			last_mtime = itp->second.date; // keeping this date as it is
 			    // not possible to know when the EA have been removed
@@ -659,7 +659,7 @@ namespace libdar
 	    ++itp;
 	}
 
-	if(!found_in_archive) // not entry found for asked archive (or recorded as et_absent)
+	if(!found_in_archive) // not entry found for asked archive (or recorded as db_etat::et_absent)
 	{
 	    if(presence_max)
 	    {
@@ -670,10 +670,10 @@ namespace libdar
 		    // archive we currently add.
 
 		if(deleted_date > last_mtime)
-		    set_data(archive, deleted_date, et_absent);
+		    set_data(archive, deleted_date, db_etat::et_absent);
 		    // add an entry telling that this file does no more exist in the current archive
 		else
-		    set_data(archive, last_mtime, et_absent);
+		    set_data(archive, last_mtime, db_etat::et_absent);
 		    // add an entry telling thatthis file does no more exists, using the last known date
 		    // as deleted data. This situation may appear when one makes a first backup
 		    // then a second one but excluding from the backup that particular file. This file
@@ -691,14 +691,14 @@ namespace libdar
 		{
 		    switch(itp->second.present)
 		    {
-		    case et_saved:
-		    case et_present:
-		    case et_patch:
-		    case et_patch_unusable:
+		    case db_etat::et_saved:
+		    case db_etat::et_present:
+		    case db_etat::et_patch:
+		    case db_etat::et_patch_unusable:
 			throw SRC_BUG; // entry has not been found in the current archive
-		    case et_removed:
+		    case db_etat::et_removed:
 			break;         // we must keep it, it was in the original archive
-		    case et_absent:
+		    case db_etat::et_absent:
 			last_mod.erase(itp); // this entry had been added from previous neighbor archive, we must remove it now, it was not part of the original archive
 			break;
 		    default:
@@ -724,7 +724,7 @@ namespace libdar
 
 	while(it != last_change.end() && !found_in_archive)
 	{
-	    if(it->first == archive && it->second.present != et_absent)
+	    if(it->first == archive && it->second.present != db_etat::et_absent)
 		found_in_archive = true;
 	    else
 		if(it->first > num_max && (it->first < ignore_archives_greater_or_equal || ignore_archives_greater_or_equal == 0))
@@ -732,17 +732,17 @@ namespace libdar
 		    num_max = it->first;
 		    switch(it->second.present)
 		    {
-		    case et_saved:
-		    case et_present:
+		    case db_etat::et_saved:
+		    case db_etat::et_present:
 			presence_max = true;
 			break;
-		    case et_removed:
-		    case et_absent:
+		    case db_etat::et_removed:
+		    case db_etat::et_absent:
 			presence_max = false;
 			break;
-		    case et_patch:
+		    case db_etat::et_patch:
 			throw SRC_BUG;
-		    case et_patch_unusable:
+		    case db_etat::et_patch_unusable:
 			throw SRC_BUG;
 		    default:
 			throw SRC_BUG;
@@ -755,7 +755,7 @@ namespace libdar
 	{
 	    if(num_max != 0) // num_max may be equal to zero if this entry never had any EA in any recorded archive
 		if(presence_max)
-		    set_EA(archive, (last_mtime < deleted_date ? deleted_date : last_mtime), et_absent); // add an entry telling that EA for this file do no more exist in the current archive
+		    set_EA(archive, (last_mtime < deleted_date ? deleted_date : last_mtime), db_etat::et_absent); // add an entry telling that EA for this file do no more exist in the current archive
 		// else last entry found stated the EA was removed, nothing more to do
 	}
 	    // else, entry found for the current archive
@@ -773,20 +773,20 @@ namespace libdar
 	if(archive_to_remove < last_archive)
 	{
 	    datetime del_date;
-	    etat status;
+	    db_etat status;
 	    if(last_mod.size() > 1 && read_data(archive_to_remove, del_date, status))
-		if(status == et_removed)
+		if(status == db_etat::et_removed)
 		{
 		    datetime tmp;
 		    if(!read_data(archive_to_remove + 1, tmp, status))
-			set_data(archive_to_remove + 1, del_date, et_removed);
+			set_data(archive_to_remove + 1, del_date, db_etat::et_removed);
 		}
 	    if(last_change.size() > 1 && read_EA(archive_to_remove, del_date, status))
-		if(status == et_removed)
+		if(status == db_etat::et_removed)
 		{
 		    datetime tmp;
 		    if(!read_EA(archive_to_remove + 1, tmp, status))
-			set_EA(archive_to_remove + 1, del_date, et_removed);
+			set_EA(archive_to_remove + 1, del_date, db_etat::et_removed);
 		}
 	}
 
@@ -924,7 +924,7 @@ namespace libdar
 
 	while(itp != last_mod.end())
 	{
-	    if(itp->second.present == et_saved)
+	    if(itp->second.present == db_etat::et_saved)
 	    {
 		if(itp->second.date >= max)
 		{
@@ -944,7 +944,7 @@ namespace libdar
 
 	while(it != last_change.end())
 	{
-	    if(it->second.present == et_saved)
+	    if(it->second.present == db_etat::et_saved)
 	    {
 		if(it->second.date >= max)
 		{
@@ -966,7 +966,7 @@ namespace libdar
 
 	while(itp != last_mod.end() && ret)
 	{
-	    if(itp->second.present != et_removed && itp->second.present != et_absent)
+	    if(itp->second.present != db_etat::et_removed && itp->second.present != db_etat::et_absent)
 		ret = false;
 	    ++itp;
 	}
@@ -974,7 +974,7 @@ namespace libdar
 	map<archive_num, status>::iterator it = last_change.begin();
 	while(it != last_change.end() && ret)
 	{
-	    if(it->second.present != et_removed && it->second.present != et_absent)
+	    if(it->second.present != db_etat::et_removed && it->second.present != db_etat::et_absent)
 		ret = false;
 	    ++it;
 	}
@@ -1075,27 +1075,27 @@ namespace libdar
 	{
 	    switch(it->second.present)
 	    {
-	    case et_saved:
+	    case db_etat::et_saved:
 		prev = it->second.result;
 		break;
-	    case et_patch:
-	    case et_patch_unusable:
+	    case db_etat::et_patch:
+	    case db_etat::et_patch_unusable:
 		if(it->second.base == nullptr)
 		    throw SRC_BUG;
 		if(prev != nullptr && *prev == *(it->second.base))
-		    it->second.present = et_patch;
+		    it->second.present = db_etat::et_patch;
 		else
 		{
-		    it->second.present = et_patch_unusable;
+		    it->second.present = db_etat::et_patch_unusable;
 		    ret = false;
 		}
 		prev = it->second.result;
 		break;
-	    case et_present:
+	    case db_etat::et_present:
 		prev = it->second.result;
 		break;
-	    case et_removed:
-	    case et_absent:
+	    case db_etat::et_removed:
+	    case db_etat::et_absent:
 		prev = nullptr;
 		break;
 	    default:
@@ -1247,7 +1247,7 @@ namespace libdar
 		if(!entry_file->get_crc(res))
 		    res = nullptr;
 	    }
-	    tree->set_data(archive, last_mod, et_saved, base, res);
+	    tree->set_data(archive, last_mod, db_etat::et_saved, base, res);
 	    break;
 	case s_delta:
 	    if(entry_file == nullptr)
@@ -1256,7 +1256,7 @@ namespace libdar
 		base = nullptr;
 	    if(!entry_file->get_patch_result_crc(res))
 		res = nullptr;
-	    tree->set_data(archive, last_mod, et_patch, base, res);
+	    tree->set_data(archive, last_mod, db_etat::et_patch, base, res);
 	    break;
 	case s_not_saved:
 	    if(entry_file != nullptr)
@@ -1267,7 +1267,7 @@ namespace libdar
 		if(!entry_file->get_patch_base_crc(base))
 		    base = nullptr;
 	    }
-	    tree->set_data(archive, last_mod, et_present, base, res);
+	    tree->set_data(archive, last_mod, db_etat::et_present, base, res);
 	    break;
 	default:
 	    throw SRC_BUG;
@@ -1284,11 +1284,11 @@ namespace libdar
 		// else no need to add an et_remove entry in the map
 	    break;
 	case cat_inode::ea_partial:
-	    tree->set_EA(archive, entry->get_last_change(), et_present);
+	    tree->set_EA(archive, entry->get_last_change(), db_etat::et_present);
 	    break;
 	case cat_inode::ea_fake:
 	case cat_inode::ea_full:
-	    tree->set_EA(archive, entry->get_last_change(), et_saved);
+	    tree->set_EA(archive, entry->get_last_change(), db_etat::et_saved);
 	    break;
 	default:
 	    throw SRC_BUG;
@@ -1356,7 +1356,7 @@ namespace libdar
     {
 	datetime new_deleted_date;
 	set<archive_num> tmp_archive_set;
-	etat tmp_presence;
+	db_etat tmp_presence;
 
 	data_tree::finalize(archive, deleted_date, ignore_archives_greater_or_equal);
 
@@ -1710,9 +1710,9 @@ static void write_to_file(generic_file &f, archive_num a)
 static void display_line(user_interaction & dialog,
 			 archive_num num,
 			 const datetime *data,
-			 data_tree::etat data_presence,
+			 db_etat data_presence,
 			 const datetime *ea,
-			 data_tree::etat ea_presence)
+			 db_etat ea_presence)
 {
 
     const string REMOVED = gettext("removed ");

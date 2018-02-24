@@ -67,16 +67,6 @@ namespace libdar
 	    not_restorable  //< file data/EA has been found existing at that date but not possible to restore (lack of data, missing archive in base, etc.)
 	};
 
-	enum etat
-	{
-	    et_saved,       //< data/EA present in the archive
-	    et_patch,       //< data present as patch from the previous version
-	    et_patch_unusable, //< data present as patch but base version not found in archive set
-	    et_present,     //< file/EA present in the archive but data not saved (differential backup)
-	    et_removed,     //< file/EA stored as deleted since archive of reference of file/EA not present in the archive
-	    et_absent       //< file not even mentionned in the archive, This entry is equivalent to et_removed, but is required to be able to properly re-order the archive when user asks to do so. The dates associated to this state are computed from neighbor archives in the database
-	};
-
 	data_tree(const std::string &name);
 	data_tree(generic_file & f, unsigned char db_version);
 	data_tree(const data_tree & ref) = default;
@@ -103,22 +93,22 @@ namespace libdar
 	    /// return the date of file's last modification date within the give archive and whether the file has been saved or deleted
 	bool read_data(archive_num num,
 		       datetime & val,
-		       etat & present) const;
+		       db_etat & present) const;
 
 	    /// return the date of last inode change and whether the EA has been saved or deleted
-	bool read_EA(archive_num num, datetime & val, etat & present) const;
+	bool read_EA(archive_num num, datetime & val, db_etat & present) const;
 
 	void set_data(const archive_num & archive,
 		      const datetime & date,
-		      etat present) { set_data(archive, date, present, nullptr, nullptr); };
+		      db_etat present) { set_data(archive, date, present, nullptr, nullptr); };
 
 	void set_data(const archive_num & archive,
 		      const datetime & date,
-		      etat present,
+		      db_etat present,
 		      const crc *base,
 		      const crc *result) { last_mod[archive] = status_plus(date, present, base, result); (void) check_delta_validity(); };
 
-	void set_EA(const archive_num & archive, const datetime & date, etat present) { status sta(date, present); last_change[archive] = sta; };
+	void set_EA(const archive_num & archive, const datetime & date, db_etat present) { status sta(date, present); last_change[archive] = sta; };
 
 	    /// check date order between archives withing the database ; throw Erange if problem found with date order
 	virtual bool check_order(user_interaction & dialog, const path & current_path, bool & initial_warn) const { return check_map_order(dialog, last_mod, current_path, "data", initial_warn) && check_map_order(dialog, last_change, current_path, "EA", initial_warn); };
@@ -161,8 +151,8 @@ namespace libdar
 	class status
 	{
 	public:
-	    status(): date(0) { present = et_absent; };
-	    status(const datetime & d, etat p) { date = d; present = p; };
+	    status(): date(0) { present = db_etat::et_absent; };
+	    status(const datetime & d, db_etat p) { date = d; present = p; };
 	    status(const status & ref) = default;
 	    status(status && ref) noexcept = default;
 	    status & operator = (const status & ref) = default;
@@ -170,7 +160,7 @@ namespace libdar
 	    virtual ~status() = default;
 
 	    datetime date;                             //< date of the event
-	    etat present;                              //< file's status in the archive
+	    db_etat present;                              //< file's status in the archive
 
 	    virtual void dump(generic_file & f) const; //< write the struct to file
 	    virtual void read(generic_file &f,         //< set the struct from file
@@ -182,7 +172,7 @@ namespace libdar
 	{
 	public:
 	    status_plus() { base = result = nullptr; };
-	    status_plus(const datetime & d, etat p, const crc *xbase, const crc *xresult);
+	    status_plus(const datetime & d, db_etat p, const crc *xbase, const crc *xresult);
 	    status_plus(const status_plus & ref): status(ref) { copy_from(ref); };
 	    status_plus(status_plus && ref) noexcept: status(std::move(ref)) { nullifyptr(); move_from(std::move(ref)); };
 	    status_plus & operator = (const status_plus & ref) { detruit(); copy_from(ref); return *this; };
