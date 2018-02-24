@@ -87,7 +87,7 @@ namespace libdar
 
     catalogue::catalogue(user_interaction & ui,
 			 const datetime & root_last_modif,
-			 const label & data_name): out_compare("/")
+			 const label & data_name): mem_ui(ui), out_compare("/")
     {
 	contenu = nullptr;
 
@@ -118,7 +118,7 @@ namespace libdar
 			 compression default_algo,
 			 bool lax,
 			 const label & lax_layer1_data_name,
-			 bool only_detruit): out_compare("/")
+			 bool only_detruit): mem_ui(ui), out_compare("/")
     {
 	string tmp;
 	unsigned char a;
