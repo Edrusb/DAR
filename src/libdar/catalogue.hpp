@@ -201,6 +201,7 @@ namespace libdar
 		     std::string marge) const;
         void tar_listing(user_interaction & ui,
 			 catalogue_listing_callback callback,
+			 void *context,
 			 bool isolated,
 			 const mask & selection,
 			 const mask & subtree,

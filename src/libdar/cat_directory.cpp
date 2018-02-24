@@ -587,6 +587,7 @@ namespace libdar
     }
 
     bool cat_directory::callback_for_children_of(catalogue_listing_callback callback,
+						 void *context,
 						 const string & sdir,
 						 bool isolated) const
     {
@@ -670,14 +671,14 @@ namespace libdar
 		string e = local_date(*next_ino);
 		string f = local_flag(*next_ino, isolated, false);
 		string g = next_ino->get_name();
-		(*callback)(f,a,b,c,d,e,g, next_dir != nullptr, next_dir != nullptr && next_dir->has_children());
+		(*callback)(context, f,a,b,c,d,e,g, next_dir != nullptr, next_dir != nullptr && next_dir->has_children());
 		loop = true;
 	    }
 	    else
 		if(next_detruit != nullptr)
 		{
 		    string a = next_detruit->get_name();
-		    (*callback)(REMOVE_TAG, "xxxxxxxxxx", "", "", "", "", a, false, false);
+		    (*callback)(context, REMOVE_TAG, "xxxxxxxxxx", "", "", "", "", a, false, false);
 		    loop = true;
 		}
 		else

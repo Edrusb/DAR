@@ -1097,6 +1097,7 @@ namespace libdar
 
     void archive::op_listing(user_interaction & dialog,
 			     catalogue_listing_callback callback,
+			     void *context,
 			     const archive_options_listing & options)
     {
         NLS_SWAP_IN;
@@ -1119,6 +1120,7 @@ namespace libdar
 		case archive_options_listing::normal:
 		    get_cat().tar_listing(dialog,
 					  callback,
+					  context,
 					  only_contains_an_isolated_catalogue(),
 					  options.get_selection(),
 					  options.get_subtree(),
@@ -1524,6 +1526,7 @@ namespace libdar
 
     bool archive::get_children_of(user_interaction & dialog,
 				  catalogue_listing_callback callback,
+				  void *context,
                                   const string & dir)
     {
 	bool ret;
@@ -1551,7 +1554,7 @@ namespace libdar
 
 		// OK, now that we have the whole catalogue available in memory, let's rock!
 
-            ret = get_cat().get_contenu()->callback_for_children_of(callback, dir);
+            ret = get_cat().get_contenu()->callback_for_children_of(callback, context, dir);
         }
         catch(...)
         {

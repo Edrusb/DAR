@@ -99,6 +99,7 @@ namespace libdar
         cat_directory * get_parent() const { return parent; };
         bool search_children(const std::string &name, const cat_nomme *&ref) const;
 	bool callback_for_children_of(catalogue_listing_callback callback,
+				      void *context,
 				      const std::string & sdir,
 				      bool isolated = false) const;
 

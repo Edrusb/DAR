@@ -1024,6 +1024,7 @@ namespace libdar
 
     void catalogue::tar_listing(user_interaction & ui,
 				catalogue_listing_callback callback,
+				void *context,
 				bool isolated,
 				const mask &selection,
 				const mask &subtree,
@@ -1085,7 +1086,7 @@ namespace libdar
 			    string tmp = e_nom->get_name();
 			    string tmp_date = ! e_det->get_date().is_null() ? tools_display_date(e_det->get_date()) : "Unknown date";
 			    if(callback != nullptr)
-				(*callback)(REMOVE_TAG, "xxxxxxxxxx", "", "", "", tmp_date, beginning+sep+tmp, false, false);
+				(*callback)(context, REMOVE_TAG, "xxxxxxxxxx", "", "", "", tmp_date, beginning+sep+tmp, false, false);
 			    else
 			    {
 				saved_status poub;
@@ -1129,7 +1130,7 @@ namespace libdar
 				    }
 
 				    if(callback != nullptr)
-					(*callback)(f, a, b, c, d, e, beginning+sep+nom, e_dir != nullptr, e_dir != nullptr && e_dir->has_children());
+					(*callback)(context, f, a, b, c, d, e, beginning+sep+nom, e_dir != nullptr, e_dir != nullptr && e_dir->has_children());
 				    else
 					ui.warning(tools_printf("%S %S   %S\t%S\t%S\t%S\t%S%S%S\n", &f, &a, &b, &c, &d, &e, &beginning, &sep, &nom));
 				    if(list_ea)
