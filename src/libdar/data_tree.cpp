@@ -355,7 +355,7 @@ namespace libdar
 	}
     }
 
-    data_tree::lookup data_tree::get_data(set<archive_num> & archive, const datetime & date, bool even_when_removed) const
+    db_lookup data_tree::get_data(set<archive_num> & archive, const datetime & date, bool even_when_removed) const
     {
 	    // archive (first argument of the method) will hold the set of archive numbers to use to obtain the latest requested state of the file
 	    // for plain data the set will contain 1 number, for delta difference, it may contain many number of archive to restore in turn for that file
@@ -368,7 +368,7 @@ namespace libdar
 	bool presence_seen = false; //< whether the last found valid entry indicates file was present or removed
 	bool presence_real = false; //< whether the last found valid entry not being an "db_etat::et_present" state was present or removed
 	bool broken_patch = false;  //< record whether there is a broken patch the avoid restoring data
-	lookup ret;
+	db_lookup ret;
 
 	archive.clear(); // empty set will be used if no archive found
 
@@ -453,7 +453,7 @@ namespace libdar
 	{
 	    archive.clear();
 	    archive.insert(last_archive_seen);
-	    ret = not_restorable;
+	    ret = db_lookup::not_restorable;
 	}
 	else
 	{
@@ -462,10 +462,10 @@ namespace libdar
 		{
 		    archive.clear();
 		    archive.insert(last_archive_seen);
-		    ret = not_restorable;
+		    ret = db_lookup::not_restorable;
 		}
 		else
-		    ret = not_found;
+		    ret = db_lookup::not_found;
 	    else
 		if(last_archive_seen != 0)
 		    if(presence_seen && !presence_real)
@@ -474,16 +474,16 @@ namespace libdar
 		    {
 			archive.clear();
 			archive.insert(last_archive_seen);
-			ret = not_restorable;
+			ret = db_lookup::not_restorable;
 		    }
 		    else
 			if(presence_seen != presence_real)
 			    throw SRC_BUG;
 			else  // archive > 0 && presence_seen == present_real
 			    if(presence_real)
-				ret = found_present;
+				ret = db_lookup::found_present;
 			    else
-				ret = found_removed;
+				ret = db_lookup::found_removed;
 		else // archive != 0 but last_archive_seen == 0
 		    throw SRC_BUG;
 	}
@@ -491,14 +491,14 @@ namespace libdar
 	return ret;
     }
 
-    data_tree::lookup data_tree::get_EA(archive_num & archive, const datetime & date, bool even_when_removed) const
+    db_lookup data_tree::get_EA(archive_num & archive, const datetime & date, bool even_when_removed) const
     {
 	map<archive_num, status>::const_iterator it = last_change.begin();
 	datetime max_seen_date = datetime(0), max_real_date = datetime(0);
 	bool presence_seen = false, presence_real = false;
 	archive_num last_archive_seen = 0;
 	archive_num last_archive_even_when_removed = 0;
-	lookup ret;
+	db_lookup ret;
 
 	archive = 0; // 0 is never assigned to an archive number
 	while(it != last_change.end())
@@ -562,21 +562,21 @@ namespace libdar
 
 	if(archive == 0)
 	    if(last_archive_seen != 0) // last acceptable entry is a file present but not saved, but no full backup is present in a previous archive
-		ret = not_restorable;
+		ret = db_lookup::not_restorable;
 	    else
-		ret = not_found;
+		ret = db_lookup::not_found;
 	else
 	    if(last_archive_seen != 0)
 		if(presence_seen && !presence_real) // last acceptable entry is a file present but not saved, but no full backup is present in a previous archive
-		    ret = not_restorable;
+		    ret = db_lookup::not_restorable;
 		else
 		    if(presence_seen != presence_real)
 			throw SRC_BUG;
 		    else  // archive > 0 && presence_seen == present_real
 			if(presence_real)
-			    ret = found_present;
+			    ret = db_lookup::found_present;
 			else
-			    ret = found_removed;
+			    ret = db_lookup::found_removed;
 	    else
 		throw SRC_BUG;
 
@@ -1233,7 +1233,7 @@ namespace libdar
 	const cat_file *entry_file = dynamic_cast<const cat_file *>(entry);
 	data_tree * tree = find_or_addition(entry->get_name(), entry_dir != nullptr, archive);
 	archive_num last_archive;
-	lookup result;
+	db_lookup result;
 	datetime last_mod = entry->get_last_modif() > entry->get_last_change() ? entry->get_last_modif() : entry->get_last_change();
 	const crc *base = nullptr;
 	const crc *res = nullptr;
@@ -1279,9 +1279,9 @@ namespace libdar
 	    break;
 	case cat_inode::ea_removed:
 	    result = tree->get_EA(last_archive, datetime(0), false);
-	    if(result == found_present || result == not_restorable)
-		tree->set_EA(archive, entry->get_last_change(), et_removed);
-		// else no need to add an et_remove entry in the map
+	    if(result == db_lookup::found_present || result == db_lookup::not_restorable)
+		tree->set_EA(archive, entry->get_last_change(), db_etat::et_removed);
+		// else no need to add an db_etat::et_remove entry in the map
 	    break;
 	case cat_inode::ea_partial:
 	    tree->set_EA(archive, entry->get_last_change(), db_etat::et_present);
@@ -1300,14 +1300,14 @@ namespace libdar
 	data_tree * tree = find_or_addition(entry->get_name(), false, archive);
 	set<archive_num> last_archive_set;
 	archive_num last_archive;
-	lookup result;
+	db_lookup result;
 
 	result = tree->get_data(last_archive_set, datetime(0), false);
-	if(result == found_present || result == not_restorable)
-	    tree->set_data(archive, entry->get_date(), et_removed);
+	if(result == db_lookup::found_present || result == db_lookup::not_restorable)
+	    tree->set_data(archive, entry->get_date(), db_etat::et_removed);
 	result = tree->get_EA(last_archive, datetime(0), false);
-	if(result == found_present || result == not_restorable)
-	    tree->set_EA(archive, entry->get_date(), et_removed);
+	if(result == db_lookup::found_present || result == db_lookup::not_restorable)
+	    tree->set_EA(archive, entry->get_date(), db_etat::et_removed);
     }
 
     const data_tree *data_dir::read_child(const string & name) const
@@ -1362,14 +1362,14 @@ namespace libdar
 
 	switch(get_data(tmp_archive_set, datetime(0), false))
 	{
-	case found_present:
-	case found_removed:
+	case db_lookup::found_present:
+	case db_lookup::found_removed:
 	    break; // acceptable result
-	case not_found:
+	case db_lookup::not_found:
 	    if(fix_corruption())
 		throw Edata("This is to signal the caller of this method that this object has to be removed from database"); // exception caugth in data_dir::finalize_except_self
 	    throw Erange("data_dir::finalize", gettext("This database has been corrupted probably due to a bug in release 2.4.0 to 2.4.9, and it has not been possible to cleanup this corruption, please rebuild the database from archives or extracted \"catalogues\", if the database has never been used by one of the previously mentioned released, you are welcome to open a bug report and provide as much as possible details about the circumstances"));
-	case not_restorable:
+	case db_lookup::not_restorable:
 	    break;  // also an acceptable result;
 	default:
 	    throw SRC_BUG;
@@ -1435,7 +1435,7 @@ namespace libdar
 	archive_num ou_ea;
 	bool data, ea;
 	string etat, name;
-	lookup lo_data, lo_ea;
+	db_lookup lo_data, lo_ea;
 	bool even_when_removed = (num != 0);
 
 	while(it != rejetons.end())
@@ -1446,9 +1446,9 @@ namespace libdar
 
 	    lo_data = (*it)->get_data(ou_data, datetime(0), even_when_removed);
 	    lo_ea = (*it)->get_EA(ou_ea, datetime(0), even_when_removed);
-	    data = lo_data == found_present && (ou_data.find(num) != ou_data.end() || num == 0);
-	    ea = lo_ea == found_present && (ou_ea == num || num == 0);
-	    name = (*it)->get_name();
+	    data = lo_data == db_lookup::found_present && (ou_data.find(num) != ou_data.end() || num == 0);
+	    ea = lo_ea == db_lookup::found_present && (ou_ea == num || num == 0);
+	    name = marge + (*it)->get_name();
 	    if(data || ea || num == 0)
 	    {
 		etat = "";

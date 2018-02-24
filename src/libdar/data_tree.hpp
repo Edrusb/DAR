@@ -59,14 +59,6 @@ namespace libdar
     class data_tree
     {
     public:
-	enum lookup         //< the available status of a lookup
-	{
-	    found_present,  //< file data/EA has been found completely usable
-	    found_removed,  //< file data/EA has been found as removed at that date
-	    not_found,      //< no such file has been found in any archive of the base
-	    not_restorable  //< file data/EA has been found existing at that date but not possible to restore (lack of data, missing archive in base, etc.)
-	};
-
 	data_tree(const std::string &name);
 	data_tree(generic_file & f, unsigned char db_version);
 	data_tree(const data_tree & ref) = default;
@@ -85,10 +77,10 @@ namespace libdar
 	    /// \param[in] date date above which to ignore data found in the database
 	    /// \param[in] even_when_removed is true when user requested to restore the file in its latest state even if it has been removed afterward
 	    /// \return the success of failure status of the requested lookup
-	lookup get_data(std::set<archive_num> & archive, const datetime & date, bool even_when_removed) const;
+	db_lookup get_data(std::set<archive_num> & archive, const datetime & date, bool even_when_removed) const;
 
 	    /// if EA has been saved alone later, returns in which version for the state of the file at the given date.
-	lookup get_EA(archive_num & archive, const datetime & date, bool even_when_removed) const;
+	db_lookup get_EA(archive_num & archive, const datetime & date, bool even_when_removed) const;
 
 	    /// return the date of file's last modification date within the give archive and whether the file has been saved or deleted
 	bool read_data(archive_num num,

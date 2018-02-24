@@ -530,25 +530,25 @@ namespace libdar
 		    set<archive_num> num_data;
 		    archive_num max_data = 0;
 		    archive_num num_ea = 0;
-		    data_tree::lookup look_ea, look_data;
+		    db_lookup look_ea, look_data;
 
 		    look_data = ptr->get_data(num_data, opt.get_date(), opt.get_even_when_removed());
 		    look_ea = ptr->get_EA(num_ea, opt.get_date(), opt.get_even_when_removed());
 
 		    switch(look_data)
 		    {
-		    case data_tree::found_present:
+		    case db_lookup::found_present:
 			break;
-		    case data_tree::found_removed:
+		    case db_lookup::found_removed:
 			num_data.clear(); // we do not restore any data
 			if(opt.get_info_details())
 			    dialog.warning(string(gettext("File recorded as removed at this date in database: ")) + anneau.front());
 			break;
-		    case data_tree::not_found:
+		    case db_lookup::not_found:
 			num_data.clear();
 			dialog.warning(string(gettext("File not found in database: ")) + anneau.front());
 			break;
-		    case data_tree::not_restorable:
+		    case db_lookup::not_restorable:
 			num_data.clear();
 			dialog.warning(string(gettext("File found in database but impossible to restore (only found \"unchanged\" in differential backups, or delta patch without reference to base it on in any previous archive of the base): ")) + anneau.front());
 			break;
@@ -558,16 +558,16 @@ namespace libdar
 
 		    switch(look_ea)
 		    {
-		    case data_tree::found_present:
+		    case db_lookup::found_present:
 			num_ea = 0; // we cannot restore it
 			break;
-		    case data_tree::found_removed:
+		    case db_lookup::found_removed:
 			num_ea = 0; // we cannot restore it
 			break;
-		    case data_tree::not_found:
+		    case db_lookup::not_found:
 			num_ea = 0; // we cannot restore it
 			break;
-		    case data_tree::not_restorable:
+		    case db_lookup::not_restorable:
 			num_ea = 0; // we cannot restore it
 			dialog.warning(string(gettext("Extended Attribute of file found in database but impossible to restore (only found \"unchanged\" in differential backups): ")) + anneau.front());
 			break;
