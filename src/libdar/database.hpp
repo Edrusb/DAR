@@ -36,6 +36,7 @@
 #include "data_tree.hpp"
 #include "storage.hpp"
 #include "database_options.hpp"
+#include "database_listing_callback.hpp"
 
 namespace libdar
 {
@@ -166,12 +167,16 @@ namespace libdar
 
 	    /// list files which are present in a given archive
 
-	    /// \param[in,out] dialog where to display listing to
+	    /// \param[in] callback is called to provide each entry in turn from the list
+	    /// \param[in] context is given as first argument of the callback as is provided here
 	    /// \param[in] num is the archive number to look at
 	    /// \param[in] opt optional parameters for this operation
 	    /// \note if "num" is set to zero all archive contents is listed
 	    /// \note this method is not available with partially extracted databases.
-	void show_files(user_interaction & dialog, archive_num num, const database_used_options & opt) const;
+	void get_files(database_listing_show_files_callback callback,
+		       void *context,
+		       archive_num num,
+		       const database_used_options & opt) const;
 
 	    /// list the archive where a give file is present
 

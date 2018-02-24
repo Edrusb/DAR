@@ -405,7 +405,10 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
-    void database::show_files(user_interaction & dialog, archive_num num, const database_used_options & opt) const
+    void database::get_files(database_listing_show_files_callback callback,
+			     void *context,
+			     archive_num num,
+			     const database_used_options & opt) const
     {
 	NLS_SWAP_IN;
 	try
@@ -416,7 +419,7 @@ namespace libdar
 		throw SRC_BUG;
 
 	    if(num < coordinate.size())
-		files->show(dialog, num);
+		files->show(callback, context, num);
 	    else
 		throw Erange("database::show_files", gettext("Non existent archive in database"));
 	}

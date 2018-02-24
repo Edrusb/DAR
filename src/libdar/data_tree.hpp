@@ -41,6 +41,7 @@
 #include "cat_directory.hpp"
 #include "cat_inode.hpp"
 #include "cat_detruit.hpp"
+#include "database_listing_callback.hpp"
 #include "database_aux.hpp"
 
 namespace libdar
@@ -232,7 +233,10 @@ namespace libdar
 	virtual bool remove_all_from(const archive_num & archive_to_remove, const archive_num & last_archive) override;
 
 	    /// list the most recent files owned by that archive (or by any archive if num == 0)
-	void show(user_interaction & dialog, archive_num num, std::string marge = "") const;
+	void show(database_listing_show_files_callback callback,
+		  void *tag,
+		  archive_num num,
+		  std::string marge = "") const;
 	virtual void apply_permutation(archive_num src, archive_num dst) override;
 	virtual void skip_out(archive_num num) override;
 	void compute_most_recent_stats(std::vector<infinint> & data,

@@ -1428,13 +1428,16 @@ namespace libdar
 	return data_tree::remove_all_from(archive_to_remove, last_archive) && rejetons.size() == 0;
     }
 
-    void data_dir::show(user_interaction & dialog, archive_num num, string marge) const
+    void data_dir::show(database_listing_show_files_callback callback,
+			void *tag,
+			archive_num num,
+			string marge) const
     {
 	deque<data_tree *>::const_iterator it = rejetons.begin();
 	set<archive_num> ou_data;
 	archive_num ou_ea;
 	bool data, ea;
-	string etat, name;
+	string name;
 	db_lookup lo_data, lo_ea;
 	bool even_when_removed = (num != 0);
 
@@ -1450,25 +1453,9 @@ namespace libdar
 	    ea = lo_ea == db_lookup::found_present && (ou_ea == num || num == 0);
 	    name = marge + (*it)->get_name();
 	    if(data || ea || num == 0)
-	    {
-		etat = "";
-		if(data)
-		    etat += gettext("[ Saved ]");
-		else
-		    etat += gettext("[       ]");
-
-		if(ea)
-		    etat += gettext("[  EA   ]");
-		else
-		    etat += gettext("[       ]");
-
-		if(dialog.get_use_dar_manager_show_files())
-		    dialog.dar_manager_show_files(name, data, ea);
-		else
-		    dialog.printf("%S  %S%S\n", &etat, &marge, &name);
-	    }
+		callback(tag, name, data, ea);
 	    if(dir != nullptr)
-		dir->show(dialog, num, marge+name+"/");
+		dir->show(callback, tag, num, name + "/");
 	    ++it;
 	}
     }
