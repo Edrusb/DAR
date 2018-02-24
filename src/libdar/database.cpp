@@ -366,43 +366,21 @@ namespace libdar
         NLS_SWAP_OUT;
     }
 
-    void database::show_contents(user_interaction & dialog) const
+    database_archives_list database::get_contents() const
     {
-	NLS_SWAP_IN;
-	try
-	{
-	    string opt = tools_concat_vector(" ", options_to_dar);
+	database_archives_list ret;
+	database_archives tmp;
 
-	    if(!dialog.get_use_dar_manager_contents())
-	    {
-		string compr = compression2string(algo);
-		dialog.warning("\n");
-		dialog.printf(gettext("dar path        : %S\n"), &dar_path);
-		dialog.printf(gettext("dar options     : %S\n"), &opt);
-		dialog.printf(gettext("database version: %d\n"), cur_db_version);
-		dialog.printf(gettext("compression used: %S\n"), &compr);
-		dialog.warning("\n");
-		dialog.printf(gettext("archive #   |    path      |    basename\n"));
-		dialog.printf("------------+--------------+---------------\n");
-	    }
+	ret.push_back(tmp); // index 0 is not used
 
-	    for(archive_num i = 1; i < coordinate.size(); ++i)
-	    {
-		if(dialog.get_use_dar_manager_contents())
-		    dialog.dar_manager_contents(i, coordinate[i].chemin, coordinate[i].basename);
-		else
-		{
-		    opt = (coordinate[i].chemin == "") ? gettext("<empty>") : coordinate[i].chemin;
-		    dialog.printf(" \t%u\t%S\t%S\n", i, &opt, &coordinate[i].basename);
-		}
-	    }
-	}
-	catch(...)
+	for(archive_num i = 1; i < coordinate.size(); ++i)
 	{
-	    NLS_SWAP_OUT;
-	    throw;
+	    tmp.set_path(coordinate[i].chemin);
+	    tmp.set_basename(coordinate[i].basename);
+	    ret.push_back(tmp);
 	}
-	NLS_SWAP_OUT;
+
+	return ret;
     }
 
     void database::get_files(database_listing_show_files_callback callback,

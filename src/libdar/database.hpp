@@ -36,6 +36,7 @@
 #include "data_tree.hpp"
 #include "storage.hpp"
 #include "database_options.hpp"
+#include "database_archives.hpp"
 #include "database_listing_callback.hpp"
 
 namespace libdar
@@ -148,10 +149,8 @@ namespace libdar
 
 	    // "GETTINGS"
 
-	    /// show the list of archive used to build the database
-
-	    /// \param[in,out] dialog is the user_interaction to use to report the listing
-	void show_contents(user_interaction & dialog) const; // displays all archive information
+	    /// provides the list of archive used to build the database
+	database_archives_list get_contents() const;
 
 	    /// return the options used with dar for restoration
 	std::vector<std::string> get_options() const { return options_to_dar; }; // show option passed to dar
