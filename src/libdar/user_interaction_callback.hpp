@@ -55,9 +55,15 @@ namespace libdar
 	//! this class is an inherited class of user_interaction it is used by
 	//! dar command line programs, but you can use it if you wish.
 	//! \ingroup API
+
     class user_interaction_callback : public user_interaction
     {
     public:
+
+	using warning_callback = void (*)(const std::string &x, void *context);
+	using pause_callback = 	bool (*)(const std::string &x, void *context);
+	using get_string_callback = std::string (*)(const std::string &x, bool echo, void *context);
+	using get_secu_string_callback = secu_string (*)(const std::string &x, bool echo, void *context);
 
 	    /// constructor which receive the callback functions.
 
@@ -71,10 +77,10 @@ namespace libdar
 	    //! in the user_interaction_callback object constructor. The value can
 	    //! can be any arbitrary value (nullptr is valid), and can be used as you wish.
 	    //! Note that the listing callback is not defined here, but thanks to a specific method
-	user_interaction_callback(void (*x_warning_callback)(const std::string &x, void *context),
-				  bool (*x_answer_callback)(const std::string &x, void *context),
-				  std::string (*x_string_callback)(const std::string &x, bool echo, void *context),
-				  secu_string (*x_secu_string_callback)(const std::string &x, bool echo, void *context),
+	user_interaction_callback(warning_callback x_warning_callback,
+				  pause_callback x_answer_callback,
+				  get_string_callback x_string_callback,
+				  get_secu_string_callback x_secu_string_callback,
 				  void *context_value);
 	user_interaction_callback(const user_interaction_callback & ref) = default;
 	user_interaction_callback(user_interaction_callback && ref) noexcept = default;
@@ -82,156 +88,42 @@ namespace libdar
 	user_interaction_callback & operator = (user_interaction_callback && ref) noexcept = default;
 	~user_interaction_callback() = default;
 
-	    /// overwritting method from parent class.
-       	virtual void pause(const std::string & message) override;
-	    /// overwritting method from parent class.
-	virtual std::string get_string(const std::string & message, bool echo) override;
-	    /// overwritting method from parent class.
-	virtual secu_string get_secu_string(const std::string & message, bool echo) override;
-	    /// overwritting method from parent class.
-        virtual void listing(const std::string & flag,
-			     const std::string & perm,
-			     const std::string & uid,
-			     const std::string & gid,
-			     const std::string & size,
-			     const std::string & date,
-			     const std::string & filename,
-			     bool is_dir,
-			     bool has_children) override;
+	    /// listing callback can be now passed directly to archive::get_children_of()
 
-	    /// overwritting method from parent class
-	virtual void dar_manager_show_files(const std::string & filename,
-					    bool available_data,
-					    bool available_ea) override;
+	    /// dar_manager_show_files callback can now be passed directly to database::get_files()
 
-	    /// overwritting method from parent class
-	virtual void dar_manager_contents(U_I number,
-					  const std::string & chemin,
-					  const std::string & archive_name) override;
+	    /// dar_manager_contents callback is not necessary, use database::get_contents() method
 
-	    /// overwritting method from parent class
-	virtual void dar_manager_statistics(U_I number,
-					    const infinint & data_count,
-					    const infinint & total_data,
-					    const infinint & ea_count,
-					    const infinint & total_ea) override;
+	    /// dar_manager_statistics callback can now be passed directly to database::show_most_recent_stats()
 
-	    /// overwritting method from parent class
-	virtual void dar_manager_show_version(U_I number,
-					      const std::string & data_date,
-					      const std::string & data_presence,
-					      const std::string & ea_date,
-					      const std::string & ea_presence) override;
-
-	    /// You can set a listing callback thanks to this method.
-
-	    //! If set, when file listing will this callback function will
-	    //! be used instead of the x_warning_callback given as argument
-	    //! of the constructor.
-        void set_listing_callback(void (*callback)(const std::string & flag,
-						   const std::string & perm,
-						   const std::string & uid,
-						   const std::string & gid,
-						   const std::string & size,
-						   const std::string & date,
-						   const std::string & filename,
-						   bool is_dir,
-						   bool has_children,
-						   void *context))
-	{
-	    tar_listing_callback = callback;
-	    set_use_listing(true); // this is to inform libdar to use listing()
-	};
-
-	    // You can set a dar_manager_show_files callback thanks to this method
-
-	void set_dar_manager_show_files_callback(void (*callback)(const std::string & filename,
-								  bool available_data,
-								  bool available_ea,
-								  void *context))
-	{
-	    dar_manager_show_files_callback = callback;
-	    set_use_dar_manager_show_files(true); // this is to inform libdar to use the dar_manager_show_files() method
-	};
-
-	void set_dar_manager_contents_callback(void (*callback)(U_I number,
-								const std::string & chemin,
-								const std::string & archive_name,
-								void *context))
-	{
-	    dar_manager_contents_callback = callback;
-	    set_use_dar_manager_contents(true); // this is to inform libdar to use the dar_manager_contents() method
-	};
-
-	void set_dar_manager_statistics_callback(void (*callback)(U_I number,
-								  const infinint & data_count,
-								  const infinint & total_data,
-								  const infinint & ea_count,
-								  const infinint & total_ea,
-								  void *context))
-	{
-	    dar_manager_statistics_callback = callback;
-	    set_use_dar_manager_statistics(true); // this is to inform libdar to use the dar_manager_statistics() method
-	};
-
-	void set_dar_manager_show_version_callback(void (*callback)(U_I number,
-								    const std::string & data_date,
-								    const std::string & data_presence,
-								    const std::string & ea_date,
-								    const std::string & ea_presence,
-								    void *context))
-	{
-	    dar_manager_show_version_callback = callback;
-	    set_use_dar_manager_show_version(true);  // this is to inform libdar to use the dar_manager_show_version() method
-	};
+	    /// dar_manager_get_show_version callback can now be passed directly to database::get_version()
 
 
 	    /// overwritting method from parent class.
 	virtual user_interaction *clone() const override;
 
     protected:
-	    /// change the context value of the object that will be given to callback functions
-	void change_context_value(void *new_value) { context_val = new_value; };
+
+	    /// overwritting method from parent class.
+       	virtual bool inherited_pause(const std::string & message) override;
 
 	    /// overwritting method from parent class.
 	virtual void inherited_warning(const std::string & message) override;
 
-    private:
-	void (*warning_callback)(const std::string & x, void *context);  // pointer to function
-	bool (*answer_callback)(const std::string & x, void *context);   // pointer to function
-	std::string (*string_callback)(const std::string & x, bool echo, void *context); // pointer to function
-	secu_string (*secu_string_callback)(const std::string & x, bool echo, void *context); // pointer to function
-	void (*tar_listing_callback)(const std::string & flags,
-				     const std::string & perm,
-				     const std::string & uid,
-				     const std::string & gid,
-				     const std::string & size,
-				     const std::string & date,
-				     const std::string & filename,
-				     bool is_dir,
-				     bool has_children,
-				     void *context);
-	void (*dar_manager_show_files_callback)(const std::string & filename,
-						bool available_data,
-						bool available_ea,
-						void *context);
-	void (*dar_manager_contents_callback)(U_I number,
-					      const std::string & chemin,
-					      const std::string & archive_name,
-					      void *context);
-	void (*dar_manager_statistics_callback)(U_I number,
-						const infinint & data_count,
-						const infinint & total_data,
-						const infinint & ea_count,
-						const infinint & total_ea,
-						void *context);
-	void (*dar_manager_show_version_callback)(U_I number,
-						  const std::string & data_date,
-						  const std::string & data_presence,
-						  const std::string & ea_date,
-						  const std::string & ea_presence,
-						  void *context);
+	    /// overwritting method from parent class.
+	virtual std::string inherited_get_string(const std::string & message, bool echo) override;
 
+	    /// overwritting method from parent class.
+	virtual secu_string inherited_get_secu_string(const std::string & message, bool echo) override;
+
+	    /// change the context value of the object that will be given to callback functions
+	void change_context_value(void *new_value) { context_val = new_value; };
+
+    private:
+	warning_callback warning_cb;
+	pause_callback pause_cb;
+	get_string_callback get_string_cb;
+	get_secu_string_callback get_secu_string_cb;
 	void *context_val;
     };
 

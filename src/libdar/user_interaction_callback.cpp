@@ -79,11 +79,16 @@ using namespace std;
 
 namespace libdar
 {
+    using libdar::Elibcall;
+    using libdar::Ebug;
+    using libdar::Egeneric;
+    using libdar::dar_gettext;
+    using libdar::Ememory;
 
-    user_interaction_callback::user_interaction_callback(void (*x_warning_callback)(const string &x, void *context),
-							 bool (*x_answer_callback)(const string &x, void *context),
-							 string (*x_string_callback)(const string &x, bool echo, void *context),
-							 secu_string (*x_secu_string_callback)(const string &x, bool echo, void *context),
+    user_interaction_callback::user_interaction_callback(warning_callback x_warning_callback,
+							 pause_callback x_answer_callback,
+							 get_string_callback x_string_callback,
+							 get_secu_string_callback x_secu_string_callback,
 							 void *context_value)
     {
 	NLS_SWAP_IN;
@@ -91,15 +96,10 @@ namespace libdar
 	{
 	    if(x_warning_callback == nullptr || x_answer_callback == nullptr)
 		throw Elibcall("user_interaction_callback::user_interaction_callback", dar_gettext("nullptr given as argument of user_interaction_callback()"));
-	    warning_callback = x_warning_callback;
-	    answer_callback  = x_answer_callback;
-	    string_callback  = x_string_callback;
-	    secu_string_callback  = x_secu_string_callback;
-	    tar_listing_callback = nullptr;
-	    dar_manager_show_files_callback = nullptr;
-	    dar_manager_contents_callback = nullptr;
-	    dar_manager_statistics_callback = nullptr;
-	    dar_manager_show_version_callback = nullptr;
+	    warning_cb = x_warning_callback;
+	    pause_cb  = x_answer_callback;
+	    get_string_cb  = x_string_callback;
+	    get_secu_string_cb = x_secu_string_callback;
 	    context_val = context_value;
 	}
 	catch(...)
@@ -110,215 +110,36 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
-    void user_interaction_callback::pause(const string & message)
-    {
-        if(answer_callback == nullptr)
-	    throw SRC_BUG;
-        else
-	{
-	    try
-	    {
-		if(! (*answer_callback)(message, context_val))
-		    throw Euser_abort(message);
-	    }
-	    catch(Euser_abort & e)
-	    {
-		throw;
-	    }
-	    catch(Egeneric & e)
-	    {
-		throw Elibcall("user_interaction_callback::pause", string(dar_gettext("No exception allowed from libdar callbacks")) + ": " + e.get_message());
-	    }
-	    catch(...)
-
-	    {
-		throw Elibcall("user_interaction_callback::pause", dar_gettext("No exception allowed from libdar callbacks"));
-	    }
-	}
-    }
-
     void user_interaction_callback::inherited_warning(const string & message)
     {
-        if(warning_callback == nullptr)
+        if(warning_cb == nullptr)
 	    throw SRC_BUG;
         else
-	{
-	    try
-	    {
-		(*warning_callback)(message + '\n', context_val);
-	    }
-	    catch(Egeneric & e)
-	    {
-		throw Elibcall("user_interaction_callback::warning", string(dar_gettext("No exception allowed from libdar callbacks")) + ": " + e.get_message());
-	    }
-	    catch(...)
-	    {
-		throw Elibcall("user_interaction_callback::warning", dar_gettext("No exception allowed from libdar callbacks"));
-	    }
-	}
+	    (*warning_cb)(message + '\n', context_val);
     }
 
-    string user_interaction_callback::get_string(const string & message, bool echo)
+    bool user_interaction_callback::inherited_pause(const string & message)
     {
-	if(string_callback == nullptr)
+        if(pause_cb == nullptr)
+	    throw SRC_BUG;
+        else
+	    return (*pause_cb)(message, context_val);
+    }
+    string user_interaction_callback::inherited_get_string(const string & message, bool echo)
+    {
+	if(get_string_cb == nullptr)
 	    throw SRC_BUG;
 	else
-	{
-	    try
-	    {
-		return (*string_callback)(message, echo, context_val);
-	    }
-	    catch(Egeneric & e)
-	    {
-		throw Elibcall("user_interaction_callback::get_string", string(dar_gettext("No exception allowed from libdar callbacks")) + ": " + e.get_message());
-	    }
-	    catch(...)
-	    {
-		throw Elibcall("user_interaction_callback::get_string", dar_gettext("No exception allowed from libdar callbacks"));
-	    }
-	}
+	    return (*get_string_cb)(message, echo, context_val);
     }
 
-    secu_string user_interaction_callback::get_secu_string(const string & message, bool echo)
+    secu_string user_interaction_callback::inherited_get_secu_string(const string & message, bool echo)
     {
-	if(string_callback == nullptr)
+	if(get_secu_string_cb == nullptr)
 	    throw SRC_BUG;
 	else
-	{
-	    try
-	    {
-		return (*secu_string_callback)(message, echo, context_val);
-	    }
-	    catch(Ebug & e)
-	    {
-		throw;
-	    }
-	    catch(Egeneric & e)
-	    {
-		throw Elibcall("user_interaction_callback::get_secu_string", string(dar_gettext("No exception allowed from libdar callbacks")) + ": " + e.get_message());
-	    }
-	    catch(...)
-	    {
-		throw Elibcall("user_interaction_callback::get_secu_string", dar_gettext("No exception allowed from libdar callbacks"));
-	    }
-	}
+	    return (*get_secu_string_cb)(message, echo, context_val);
     }
-
-    void user_interaction_callback::listing(const string & flag,
-					    const string & perm,
-					    const string & uid,
-					    const string & gid,
-					    const string & size,
-					    const string & date,
-					    const string & filename,
-					    bool is_dir,
-					    bool has_children)
-    {
-	if(tar_listing_callback != nullptr)
-	{
-	    try
-	    {
-		(*tar_listing_callback)(flag, perm, uid, gid, size, date, filename, is_dir, has_children, context_val);
-	    }
-	    catch(Egeneric & e)
-	    {
-		throw Elibcall("user_interaction_callback::listing", string(dar_gettext("No exception allowed from libdar callbacks")) + ": " + e.get_message());
-	    }
-	    catch(...)
-	    {
-		throw Elibcall("user_interaction_callback::listing", dar_gettext("No exception allowed from libdar callbacks"));
-	    }
-	}
-    }
-
-    void user_interaction_callback::dar_manager_show_files(const string & filename,
-							   bool available_data,
-							   bool available_ea)
-    {
-	if(dar_manager_show_files_callback != nullptr)
-	{
-	    try
-	    {
-		(*dar_manager_show_files_callback)(filename, available_data, available_ea, context_val);
-	    }
-	    catch(Egeneric & e)
-	    {
-		throw Elibcall("user_interaction_callback::dar_manager_show_files", string(dar_gettext("No exception allowed from libdar callbacks")) + ": " + e.get_message());
-	    }
-	    catch(...)
-	    {
-		throw Elibcall("user_interaction_callback::dar_manager_show_files", dar_gettext("No exception allowed from libdar callbacks"));
-	    }
-	}
-    }
-
-    void user_interaction_callback::dar_manager_contents(U_I number,
-							 const std::string & chemin,
-							 const std::string & archive_name)
-    {
-	if(dar_manager_contents_callback != nullptr)
-	{
-	    try
-	    {
-		(*dar_manager_contents_callback)(number, chemin, archive_name, context_val);
-	    }
-	    catch(Egeneric & e)
-	    {
-		throw Elibcall("user_interaction_callback::dar_manager_contents", string(dar_gettext("No exception allowed from libdar callbacks")) + ": " + e.get_message());
-	    }
-	    catch(...)
-	    {
-		throw Elibcall("user_interaction_callback::dar_manager_contents", dar_gettext("No exception allowed from libdar callbacks"));
-	    }
-	}
-    }
-
-    void user_interaction_callback::dar_manager_statistics(U_I number,
-							   const infinint & data_count,
-							   const infinint & total_data,
-							   const infinint & ea_count,
-							   const infinint & total_ea)
-    {
-	if(dar_manager_statistics_callback != nullptr)
-	{
-	    try
-	    {
-		(*dar_manager_statistics_callback)(number, data_count, total_data, ea_count, total_ea, context_val);
-	    }
-	    catch(Egeneric & e)
-	    {
-		throw Elibcall("user_interaction_callback::dar_manager_statistics", string(dar_gettext("No exception allowed from libdar callbacks")) + ": " + e.get_message());
-	    }
-	    catch(...)
-	    {
-		throw Elibcall("user_interaction_callback::dar_manager_statistics", dar_gettext("No exception allowed from libdar callbacks"));
-	    }
-	}
-    }
-
-    void user_interaction_callback::dar_manager_show_version(U_I number,
-							     const string & data_date,
-							     const string & data_presence,
-							     const string & ea_date,
-							     const string & ea_presence)
-    {
-	if(dar_manager_show_version_callback != nullptr)
-	{
-	    try
-	    {
-		(*dar_manager_show_version_callback)(number, data_date, data_presence, ea_date, ea_presence, context_val);
-	    }
-	    catch(Egeneric & e)
-	    {
-		throw Elibcall("user_interaction_callback::dar_manager_show_version", string(dar_gettext("No exception allowed from libdar callbacks")) + ": " + e.get_message());
-	    }
-	    catch(...)
-	    {
-		throw Elibcall("user_interaction_callback::dar_manager_show_version", dar_gettext("No exception allowed from libdar callbacks"));
-	    }
-	}
-    }
-
 
     user_interaction * user_interaction_callback::clone() const
     {
