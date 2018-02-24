@@ -55,16 +55,13 @@ namespace libdar
 	user_interaction_blind & operator = (user_interaction_blind && ref) noexcept = default;
 	~user_interaction_blind() = default;
 
-	virtual bool pause2(const std::string & message) override { return false; };
-
-	virtual std::string get_string(const std::string & message, bool echo) override { return "user_interaction_blind, is blindly answering no"; };
-	virtual secu_string get_secu_string(const std::string & message, bool echo) override { return secu_string(); };
-
 	virtual user_interaction *clone() const override { user_interaction *ret = new (std::nothrow) user_interaction_blind(); if(ret == nullptr) throw Ememory("user_interaction_blind::clone"); return ret; };
 
     protected:
-	virtual void inherited_warning(const std::string & message) override {}; // do not display any warning, this is "bind user_interaction" !
-
+	virtual bool inherited_pause(const std::string & message) override { return false; };
+	virtual void inherited_warning(const std::string & message) override { }; // do nothing
+	virtual std::string inherited_get_string(const std::string & message, bool echo) override { return "user_interaction_blind, is blindly answering no"; };
+	virtual secu_string inherited_get_secu_string(const std::string & message, bool echo) override { return secu_string(); };
     };
 
 	/// @}
