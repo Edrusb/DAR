@@ -29,10 +29,14 @@ extern "C"
 } // extern "C"
 
 #include "archive5.hpp"
+#include "erreurs.hpp"
 
 #define ARCHIVE_NOT_EXPLOITABLE "Archive of reference given is not exploitable"
 
 using namespace std;
+
+using libdar::Erange;
+using libdar::Ebug;
 
 namespace libdar5
 {
@@ -40,27 +44,54 @@ namespace libdar5
     void archive::op_listing(user_interaction & dialog,
 			     const archive_options_listing & options)
     {
-	if(dialog.get_use_listing())
-	    libdar::archive::op_listing(dialog,
-					dialog.listing,
-					options);
-	else
-	    libdar::archive::op_listing(dialog,
-					nullptr,
-					options);
+	libdar::archive::op_listing(dialog,
+				    nullptr,
+				    nullptr,
+				    options);
     }
 
     bool archive::get_children_of(user_interaction & dialog,
 				  const std::string & dir)
     {
-	if(dialog.get_use_listing())
-	    return libdar::archive::get_children_of(dialog,
-						    dialog.listing,
-						    options);
-	else
-	    return libdar::archive::get_children_of(dialog,
-						    nullptr,
-						    options);
+	if(!dialog.get_use_listing())
+	    throw Erange("archive::get_childen_of", gettext("listing() method must be given"));
+
+	return libdar::archive::get_children_of(dialog,
+						listing_callback,
+						&dialog,
+						dir);
     }
+
+    void archive::listing_callback(void *context,
+				   const string & flag,
+				   const string & perm,
+				   const string & uid,
+				   const string & gid,
+				   const string & size,
+				   const string & date,
+				   const string & filename,
+				   bool is_dir,
+				   bool has_children)
+    {
+	user_interaction *dialog = (user_interaction *)(context);
+
+	if(dialog == nullptr)
+	    throw SRC_BUG;
+
+	if(dialog->get_use_listing())
+	    dialog->listing(flag,
+			    perm,
+			    uid,
+			    gid,
+			    size,
+			    date,
+			    filename,
+			    is_dir,
+			    has_children);
+	else
+	    throw SRC_BUG;
+
+    }
+
 
 } // end of namespace

@@ -30,6 +30,7 @@
 #include "../my_config.h"
 
 #include "archive.hpp"
+#include "user_interaction5.hpp"
 
 namespace libdar5
 {
@@ -66,6 +67,18 @@ namespace libdar5
 	    /// overloading get_children_of to use the user_interaction object as callback
 	bool get_children_of(user_interaction & dialog,
 			     const std::string & dir);
+
+    private:
+	static void listing_callback(void *context,
+				     const std::string & flag,
+				     const std::string & perm,
+				     const std::string & uid,
+				     const std::string & gid,
+				     const std::string & size,
+				     const std::string & date,
+				     const std::string & filename,
+				     bool is_dir,
+				     bool has_children);
 
     };
 
