@@ -61,8 +61,8 @@ namespace libdar
 	    // the following methode are used by libdar and rely in their inherited_* versions
 	    // than must be defined in the inherited classes
 
+	void message(const std::string & message);
 	bool pause(const std::string & message);
-	void warning(const std::string & message);
 	std::string get_string(const std::string & message, bool echo);
 	secu_string get_secu_string(const std::string & message, bool echo);
 	void printf(const char *format, ...);
@@ -78,16 +78,17 @@ namespace libdar
 	virtual user_interaction *clone() const = 0;
 
     protected:
+	    /// method used to display a warning or a message to the user.
+	    ///
+	    /// \param[in] message is the message to display.
+	virtual void inherited_message(const std::string & message) = 0;
+
 	    /// method used to ask a boolean question to the user.
 
 	    //! \param[in] message The boolean question to ask to the user
 	    //! \return the answer of the user (true/yes or no/false)
 	virtual bool inherited_pause(const std::string & message) = 0;
 
-	    /// method used to display a warning or a message to the user.
-	    ///
-	    /// \param[in] message is the message to display.
-	virtual void inherited_warning(const std::string & message) = 0;
 
 	    /// method used to ask a question that needs an arbitrary answer.
 

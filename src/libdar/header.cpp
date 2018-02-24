@@ -127,7 +127,7 @@ namespace libdar
 			throw Ememory("header::read");
 		    else
 		    {
-			ui.warning(gettext("LAX MODE: slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
+			ui.message(gettext("LAX MODE: slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
 			slice_size = new (nothrow) infinint(0);
 			if(slice_size == nullptr)
 			    throw Ememory("header::read");
@@ -149,7 +149,7 @@ namespace libdar
 		    throw Ememory("header::read");
 		else
 		{
-		    ui.warning(gettext("LAX MODE: slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
+		    ui.message(gettext("LAX MODE: slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
 		    slice_size = new (nothrow) infinint(0);
 		    if(slice_size == nullptr)
 			throw Ememory("header::read");
@@ -164,7 +164,7 @@ namespace libdar
 			throw Ememory("header::read");
 		    else
 		    {
-			ui.warning(gettext("LAX MODE: first slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
+			ui.message(gettext("LAX MODE: first slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
 			first_size = new (nothrow) infinint(0);
 			if(first_size == nullptr)
 			    throw Ememory("header::read");
@@ -179,7 +179,7 @@ namespace libdar
 		if(!lax)
 		    throw Erange("header::read", gettext("Archive format older than \"08\" (release 2.4.0) cannot be read through a single pipe. It only can be read using dar_slave or normal plain file (slice)"));
 		else
-		    ui.warning(gettext("LAX MODE: first slice size is not possible to read, continuing anyway..."));
+		    ui.message(gettext("LAX MODE: first slice size is not possible to read, continuing anyway..."));
 	    old_header = true;
             break;
 	case extension_tlv:
@@ -197,7 +197,7 @@ namespace libdar
 		throw Erange("header::read", gettext("Badly formatted SAR header (unknown TLV type in slice header)"));
 	    else
 	    {
-		ui.warning(gettext("LAX MODE: Unknown data in slice header, ignoring and continuing"));
+		ui.message(gettext("LAX MODE: Unknown data in slice header, ignoring and continuing"));
 		slice_size = new (nothrow) infinint(0);
 		if(slice_size == nullptr)
 		    throw Ememory("header::read");

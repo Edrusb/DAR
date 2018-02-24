@@ -60,7 +60,7 @@ namespace libdar
     {
     public:
 
-	using warning_callback = void (*)(const std::string &x, void *context);
+	using message_callback = void (*)(const std::string &x, void *context);
 	using pause_callback = 	bool (*)(const std::string &x, void *context);
 	using get_string_callback = std::string (*)(const std::string &x, bool echo, void *context);
 	using get_secu_string_callback = secu_string (*)(const std::string &x, bool echo, void *context);
@@ -77,7 +77,7 @@ namespace libdar
 	    //! in the user_interaction_callback object constructor. The value can
 	    //! can be any arbitrary value (nullptr is valid), and can be used as you wish.
 	    //! Note that the listing callback is not defined here, but thanks to a specific method
-	user_interaction_callback(warning_callback x_warning_callback,
+	user_interaction_callback(message_callback x_message_callback,
 				  pause_callback x_answer_callback,
 				  get_string_callback x_string_callback,
 				  get_secu_string_callback x_secu_string_callback,
@@ -105,10 +105,10 @@ namespace libdar
     protected:
 
 	    /// overwritting method from parent class.
-       	virtual bool inherited_pause(const std::string & message) override;
+	virtual void inherited_message(const std::string & message) override;
 
 	    /// overwritting method from parent class.
-	virtual void inherited_warning(const std::string & message) override;
+       	virtual bool inherited_pause(const std::string & message) override;
 
 	    /// overwritting method from parent class.
 	virtual std::string inherited_get_string(const std::string & message, bool echo) override;
@@ -120,7 +120,7 @@ namespace libdar
 	void change_context_value(void *new_value) { context_val = new_value; };
 
     private:
-	warning_callback warning_cb;
+	message_callback message_cb;
 	pause_callback pause_cb;
 	get_string_callback get_string_cb;
 	get_secu_string_callback get_secu_string_cb;

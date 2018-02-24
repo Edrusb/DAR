@@ -298,7 +298,7 @@ namespace libdar
 			    case EPERM:  // filesystem does not support hard link creation
 				    // can't make hard link, trying to duplicate the inode
 				tmp = tools_strerror_r(errno);
-				get_ui().warning(tools_printf(gettext("Error creating hard link %s : %s\n Trying to duplicate the inode"),
+				get_ui().message(tools_printf(gettext("Error creating hard link %s : %s\n Trying to duplicate the inode"),
 							      name, tmp.c_str()));
 				create_file = true;
 				clear_corres_if_pointing_to(ref_mir->get_etiquette(), old); // always succeeds as the etiquette points to "old"
@@ -312,14 +312,14 @@ namespace libdar
 				    clear_corres_if_pointing_to(ref_mir->get_etiquette(), old); // always succeeds as the etiquette points to "old"
 					// need to remove this entry to be able
 					// to restore EA for other copies
-				    get_ui().warning(tools_printf(gettext("Error creating hard link : %s , the inode to link with [ %s ] has disappeared, re-creating it"),
+				    get_ui().message(tools_printf(gettext("Error creating hard link : %s , the inode to link with [ %s ] has disappeared, re-creating it"),
 								  name, old));
 
 				}
 				else
 				{
 				    create_file = false; // nothing to do;
-				    get_ui().warning(tools_printf(gettext("Error creating hard link : %s , the inode to link with [ %s ] is not present, cannot restore this hard link"), name, old));
+				    get_ui().message(tools_printf(gettext("Error creating hard link : %s , the inode to link with [ %s ] is not present, cannot restore this hard link"), name, old));
 				}
 				break;
 			    default :
@@ -557,11 +557,11 @@ namespace libdar
 
 #if HAVE_LCHOWN
 		if(lchown(name, tmp_uid, tmp_gid) < 0)
-		    dialog.warning(chem + string(gettext("Could not restore original file ownership: ")) + tools_strerror_r(errno));
+		    dialog.message(chem + string(gettext("Could not restore original file ownership: ")) + tools_strerror_r(errno));
 #else
 		if(dynamic_cast<const cat_lien *>(&ref) == nullptr) // not a symbolic link
 		    if(chown(name, tmp_uid, tmp_gid) < 0)
-			dialog.warning(chem + string(gettext("Could not restore original file ownership: ")) + tools_strerror_r(errno));
+			dialog.message(chem + string(gettext("Could not restore original file ownership: ")) + tools_strerror_r(errno));
 		    //
 		    // we don't/can't restore ownership for symbolic links (no system call to do that)
 		    //
@@ -575,7 +575,7 @@ namespace libdar
 		    if(chmod(name, permission) < 0)
 		    {
 			string tmp = tools_strerror_r(errno);
-			dialog.warning(tools_printf(gettext("Cannot restore permissions of %s : %s"), name, tmp.c_str()));
+			dialog.message(tools_printf(gettext("Cannot restore permissions of %s : %s"), name, tmp.c_str()));
 		    }
 	}
 	catch(Egeneric &e)

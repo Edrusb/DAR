@@ -1423,7 +1423,7 @@ namespace libdar
                 }
                 catch(Euser_abort & e)
                 {
-                    dialog.warning(tools_printf(gettext("OK, keeping %S as basename"), &base));
+                    dialog.message(tools_printf(gettext("OK, keeping %S as basename"), &base));
                 }
             }
         }
@@ -1723,10 +1723,10 @@ namespace libdar
         if(execvp(argv[0], argv) < 0)
         {
             string tmp = tools_strerror_r(errno);
-            dialog.warning(tools_printf(dar_gettext("Error trying to run %s: %s"), argv[0], tmp.c_str()));
+            dialog.message(tools_printf(dar_gettext("Error trying to run %s: %s"), argv[0], tmp.c_str()));
         }
         else
-            dialog.warning(string(dar_gettext("execvp() failed but did not returned error code")));
+            dialog.message(string(dar_gettext("execvp() failed but did not returned error code")));
 #ifndef EXIT_ERROR
 #define EXIT_ERROR 2
         exit(EXIT_ERROR);
@@ -1956,7 +1956,7 @@ namespace libdar
             {
 		const string c_entry = (chemin + entry).display();
                 if(info_details)
-                    dialog.warning(tools_printf(dar_gettext("Removing file %s"), c_entry.c_str()));
+                    dialog.message(tools_printf(dar_gettext("Removing file %s"), c_entry.c_str()));
 
 		try
 		{
@@ -1973,7 +1973,7 @@ namespace libdar
 		catch(Egeneric & e)
                 {
                     string tmp = tools_strerror_r(errno);
-                    dialog.warning(tools_printf(dar_gettext("Error removing file %s: %s"), c_entry.c_str(), tmp.c_str()));
+                    dialog.message(tools_printf(dar_gettext("Error removing file %s: %s"), c_entry.c_str(), tmp.c_str()));
                 }
             }
     }
@@ -3202,7 +3202,7 @@ namespace libdar
 	    res += tools_printf(" %d |", key[index]);
 
 	res += tools_printf(" %d ]", key[max]);
-	dialog.warning(res);
+	dialog.message(res);
     }
 
     void tools_unlink(const std::string & filename)

@@ -102,8 +102,8 @@ namespace libdar
 
 	static const U_I bufsize;
 
+	static void interaction_message(const std::string & message, void *context);
 	static bool interaction_pause(const std::string &message, void *context);
-	static void interaction_warning(const std::string & message, void *context);
 	static std::string interaction_string(const std::string & message, bool echo, void *context);
 	static secu_string interaction_secu_string(const std::string & message, bool echo, void *context);
     };

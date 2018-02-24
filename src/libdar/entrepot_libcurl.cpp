@@ -462,7 +462,7 @@ namespace libdar
 					      curl_easy_strerror(err)));
 	    }
 	    else
-		dialog.warning("Warning: known_hosts file check has been disabled, connecting to remote host is subjet to man-in-the-middle attack and login/password credential for remote sftp server to be stolen");
+		dialog.message("Warning: known_hosts file check has been disabled, connecting to remote host is subjet to man-in-the-middle attack and login/password credential for remote sftp server to be stolen");
 
 	    err = curl_easy_setopt(easyh.get_root_handle(),
 				   CURLOPT_SSH_PUBLIC_KEYFILE,

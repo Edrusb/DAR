@@ -90,28 +90,6 @@ namespace libdar5
 	at_once = 0;
 	count = 0;
     }
-/*
-    void user_interaction::warning(const std::string & message)
-    {
-	if(at_once > 0)
-	{
- 	    U_I c = 0, max = message.size();
-	    while(c < max)
-	    {
-		if(message[c] == '\n')
-		    count++;
-		c++;
-	    }
-	    count++; // for the implicit \n at end of message
-	    if(count >= at_once)
-	    {
-		count = 0;
-		(void)this->pause(dar_gettext("Continue? "));
-	    }
-	}
-	inherited_warning(message);
-    }
-*/
 
     void user_interaction::listing(const std::string & flag,
 				   const std::string & perm,
@@ -187,7 +165,28 @@ namespace libdar5
 	}
 	va_end(ap);
 	libdar::tools_remove_last_char_if_equal_to('\n', output);
-	warning(output);
+	message(output);
+    }
+
+    void user_interaction::inherited_message(const std::string & message)
+    {
+	if(at_once > 0)
+	{
+ 	    U_I c = 0, max = message.size();
+	    while(c < max)
+	    {
+		if(message[c] == '\n')
+		    count++;
+		c++;
+	    }
+	    count++; // for the implicit \n at end of message
+	    if(count >= at_once)
+	    {
+		count = 0;
+		(void)pause(libdar::dar_gettext("Continue? "));
+	    }
+	}
+	inherited_warning(message);
     }
 
     bool user_interaction::inherited_pause(const string & message)

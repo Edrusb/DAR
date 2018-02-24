@@ -89,11 +89,11 @@ namespace libdar
 	}
     }
 
-    void user_interaction::warning(const string & message)
+    void user_interaction::message(const string & message)
     {
 	try
 	{
-	    return inherited_warning(message);
+	    return inherited_message(message);
 	}
 	catch(...)
 	{
@@ -131,7 +131,7 @@ namespace libdar
         va_start(ap, format);
         try
         {
-            warning(tools_vprintf(format, ap));
+            message(tools_vprintf(format, ap));
         }
         catch(...)
         {

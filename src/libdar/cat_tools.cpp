@@ -334,7 +334,7 @@ namespace libdar
 	    {
 		if(xml_output)
 		    key = tools_output2xml(key);
-		dialog.warning(prefix + key + suffix);
+		dialog.message(prefix + key + suffix);
 	    }
 	}
     }

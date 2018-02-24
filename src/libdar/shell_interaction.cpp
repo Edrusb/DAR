@@ -108,7 +108,7 @@ namespace libdar
 
 
     shell_interaction::shell_interaction(ostream *out, ostream *interact, bool silent):
-	user_interaction_callback(interaction_warning,
+	user_interaction_callback(interaction_message,
 				  interaction_pause,
 				  interaction_string,
 				  interaction_secu_string,
@@ -180,7 +180,7 @@ namespace libdar
 	    if(e.get_message() == "")
 	    {
 		if(!silent)
-		    warning(gettext("No terminal found for user interaction. All questions will be assumed a negative answer (less destructive choice), which most of the time will abort the program."));
+		    message(gettext("No terminal found for user interaction. All questions will be assumed a negative answer (less destructive choice), which most of the time will abort the program."));
 	    }
 	    else
 		throw;
@@ -268,6 +268,18 @@ namespace libdar
 	    throw Erange("shell_interaction : set_term_mod", string(gettext("Error while changing user terminal properties: ")) + strerror(errno));
     }
 
+    void shell_interaction::interaction_message(const string & message, void *context)
+    {
+	shell_interaction *obj = (shell_interaction *)(context);
+
+	if(obj == nullptr)
+	    throw SRC_BUG;
+
+	if(obj->output == nullptr)
+	    throw SRC_BUG; // shell_interaction has not been properly initialized
+	*(obj->output) << message;
+    }
+
     bool shell_interaction::interaction_pause(const string &message, void *context)
     {
 	shell_interaction *obj = (shell_interaction *)(context);
@@ -341,18 +353,6 @@ namespace libdar
 	obj->set_term_mod(shell_interaction::m_initial);
 
 	return ret;
-    }
-
-    void shell_interaction::interaction_warning(const string & message, void *context)
-    {
-	shell_interaction *obj = (shell_interaction *)(context);
-
-	if(obj == nullptr)
-	    throw SRC_BUG;
-
-	if(obj->output == nullptr)
-	    throw SRC_BUG; // shell_interaction has not been properly initialized
-	*(obj->output) << message;
     }
 
     string shell_interaction::interaction_string(const string & message, bool echo, void *context)

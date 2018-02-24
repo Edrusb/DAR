@@ -97,6 +97,15 @@ namespace libdar5
 	user_interaction & operator = (user_interaction && ref) noexcept = default;
 	virtual ~user_interaction() = default;
 
+	    /// method added for backward compatibility with API v5
+
+	    /// \note warning() has been renamed message() in libdar::user_interaction
+	    /// to let libdar5::user_interaction intercept the inherted_message() to
+	    /// inherited_warning() and keep implementing the warning_with_more() feature
+	    /// as warning() does not exist in the parent class and some API v5 program
+	    /// may call it we add a warning() methode here:
+	void warning(const std::string & msg) { message(msg); };
+
 	    /// method used to ask a boolean question to the user.
 
 	    //! \param[in] message is the message to be displayed, that is the question.
@@ -302,9 +311,14 @@ namespace libdar5
 	    /// need to be overwritten in place of the warning() method since API 3.1.x
 
 	    // inherited from libdar::user_interaction
+	virtual void inherited_message(const std::string & message) override;
 	virtual bool inherited_pause(const std::string & message) override;
 	virtual std::string inherited_get_string(const std::string & message, bool echo) override;
 	virtual secu_string inherited_get_secu_string(const std::string & message, bool echo) override;
+
+	    // to be defined by inherited classes
+	virtual void inherited_warning(const std::string & message) = 0;
+
 
     private:
 	bool use_listing;

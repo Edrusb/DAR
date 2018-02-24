@@ -113,7 +113,7 @@ namespace libdar
 		else // using back normal access mode
 		{
 		    string tmp = tools_strerror_r(errno);
-		    ui.warning(tools_printf(gettext("Could not open directory %s in furtive read mode (%s), using normal mode"), dirname, tmp.c_str()));
+		    ui.message(tools_printf(gettext("Could not open directory %s in furtive read mode (%s), using normal mode"), dirname, tmp.c_str()));
 		}
 	    }
 	}
@@ -156,7 +156,7 @@ namespace libdar
 		    ret->d_name[max_alloc_filename] = '\0'; // yes, one byte is allocated for the terminal zero
 		    if(strlen(ret->d_name) >= max_alloc_filename)
 		    {
-			ui.warning(tools_printf(gettext("Filename provided by the operating system seems truncated in directory %s ignoring it: %s"), dirname, ret->d_name));
+			ui.message(tools_printf(gettext("Filename provided by the operating system seems truncated in directory %s ignoring it: %s"), dirname, ret->d_name));
 			continue;
 		    }
 #else
@@ -188,7 +188,7 @@ namespace libdar
 	    if(is_cache_dir)
 	    {
 		fichier.clear();
-		ui.warning(tools_printf(gettext("Detected Cache Directory Tagging Standard for %s, the contents of that directory will not be saved"), dirname));
+		ui.message(tools_printf(gettext("Detected Cache Directory Tagging Standard for %s, the contents of that directory will not be saved"), dirname));
 		    // drop all the contents of the directory because it follows the Cache Directory Tagging Standard
 	    }
 

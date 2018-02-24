@@ -215,7 +215,7 @@ namespace libdar
 			ref_ver.set_compression_algo(ver.get_compression_algo()); // set the default encryption to use to the one of the main archive
 
 			if(info_details)
-			    dialog.warning(gettext("Loading isolated catalogue in memory..."));
+			    dialog.message(gettext("Loading isolated catalogue in memory..."));
 
 			cat = macro_tools_get_derivated_catalogue_from(dialog,
 								       stack,
@@ -250,7 +250,7 @@ namespace libdar
 			    if(!options.get_sequential_read())
 			    {
 				if(info_details)
-				    dialog.warning(gettext("Loading catalogue into memory..."));
+				    dialog.message(gettext("Loading catalogue into memory..."));
 				cat = macro_tools_get_catalogue_from(dialog,
 								     stack,
 								     ver,
@@ -275,7 +275,7 @@ namespace libdar
 				    if(pdesc.esc->skip_to_next_mark(escape::seqt_catalogue, false))
 				    {
 					if(info_details)
-					    dialog.warning(gettext("No data found in that archive, sequentially reading the catalogue found at the end of the archive..."));
+					    dialog.message(gettext("No data found in that archive, sequentially reading the catalogue found at the end of the archive..."));
 					pdesc.stack->flush_read_above(pdesc.esc);
 
 					contextual *layer1 = nullptr;
@@ -305,7 +305,7 @@ namespace libdar
 				    else
 				    {
 					if(info_details)
-					    dialog.warning(gettext("The catalogue will be filled while sequentially reading the archive, preparing the data structure..."));
+					    dialog.message(gettext("The catalogue will be filled while sequentially reading the archive, preparing the data structure..."));
 					cat = new (nothrow) escape_catalogue(dialog,
 									     pdesc,
 									     ver,
@@ -649,7 +649,7 @@ namespace libdar
 			if(options.get_keep_compressed() && options.get_has_delta_mask_been_set())
 			    throw Elibcall("op_merge", gettext("Cannot calculate delta signature when merging if keep compressed is asked"));
 			if(options.get_sparse_file_min_size().is_zero() && options.get_has_delta_mask_been_set())
-			    dialog.warning(gettext("To calculate delta signatures of files saved as sparse files, you need to activate sparse file detection mechanism with merging operation"));
+			    dialog.message(gettext("To calculate delta signatures of files saved as sparse files, you need to activate sparse file detection mechanism with merging operation"));
 		    }
 
 			// then we call op_create_in_sub which will call filter_merge operation to build the archive described by the catalogue
@@ -978,7 +978,7 @@ namespace libdar
 	    catch(Erange &e)
 	    {
 		string msg = string(gettext("Error while restoring data: ")) + e.get_message();
-		dialog.warning(msg);
+		dialog.message(msg);
 		throw Edata(msg);
 	    }
         }
@@ -1073,7 +1073,7 @@ namespace libdar
 		dialog.printf(gettext("The overall archive size includes %i byte(s) wasted due to bad compression ratio"), &delta);
 	    }
 	    else
-		dialog.warning(string(gettext("The global data compression ratio is: "))
+		dialog.message(string(gettext("The global data compression ratio is: "))
 			       + tools_get_compression_ratio(g_storage_size,
 							     g_size,
 							     true));
@@ -1161,7 +1161,7 @@ namespace libdar
 				    dialog.printf(gettext("Using user provided modified slicing (first slice = %i bytes, other slices = %i bytes)"), &used_layout.first_size, &used_layout.other_size);
 			    }
 			    else
-				dialog.warning(gettext("Using the slice layout of the archive of reference recorded at the time this isolated catalogue was done\n Note: if this reference has been resliced this isolated catalogue has been created, the resulting slicing information given here will be wrong and will probably lead to an error. Check documentation to know hos to manually specify the slicing to use"));
+				dialog.message(gettext("Using the slice layout of the archive of reference recorded at the time this isolated catalogue was done\n Note: if this reference has been resliced this isolated catalogue has been created, the resulting slicing information given here will be wrong and will probably lead to an error. Check documentation to know hos to manually specify the slicing to use"));
 			}
 			else // no slicing of the archive of reference stored in this isolated catalogue's header/trailer
 			{
@@ -1171,7 +1171,7 @@ namespace libdar
 				// older than version 9.
 
 			    if(options.get_user_slicing(used_layout.first_size, used_layout.other_size))
-				dialog.warning(gettext("Warning: No slice layout of the archive of reference has been recorded in this isolated catalogue. The additional slicing information you provided may still lead the operation to fail because the archive has an _unsupported_ (too old) format for this feature"));
+				dialog.message(gettext("Warning: No slice layout of the archive of reference has been recorded in this isolated catalogue. The additional slicing information you provided may still lead the operation to fail because the archive has an _unsupported_ (too old) format for this feature"));
 			    else
 				throw Erange("archive::op_listing", gettext("No slice layout of the archive of reference for the current isolated catalogue is available, cannot provide slicing information, aborting"));
 			}
@@ -1233,7 +1233,7 @@ namespace libdar
 	    }
 	    catch(Erange & e)
 	    {
-		dialog.warning("This archive contains an isolated catalogue, only meta data can be used for comparison, CRC will be used to compare data of delta signature if present. Warning: Succeeding this comparison does not mean there is no difference as two different files may have the same CRC or the same delta signature");
+		dialog.message("This archive contains an isolated catalogue, only meta data can be used for comparison, CRC will be used to compare data of delta signature if present. Warning: Succeeding this comparison does not mean there is no difference as two different files may have the same CRC or the same delta signature");
 		isolated_mode = true;
 	    }
                 // end of sanity checks
@@ -1274,7 +1274,7 @@ namespace libdar
             catch(Erange & e)
             {
                 string msg = string(gettext("Error while comparing archive with filesystem: "))+e.get_message();
-                dialog.warning(msg);
+                dialog.message(msg);
                 throw Edata(msg);
             }
         }
@@ -1320,7 +1320,7 @@ namespace libdar
 		    // we can return normally at this point
 		    // as the catalogue has already been read
 		    // thus all that could be tested has been tested
-		dialog.warning(gettext("WARNING! This is an isolated catalogue, no data or EA is present in this archive, only the catalogue structure can be checked"));
+		dialog.message(gettext("WARNING! This is an isolated catalogue, no data or EA is present in this archive, only the catalogue structure can be checked"));
 		isolated = true;
 	    }
 
@@ -1354,7 +1354,7 @@ namespace libdar
 		}
 		catch(Erange & e)
 		{
-		    dialog.warning(gettext("A problem occurred while reading this archive contents: ") + e.get_message());
+		    dialog.message(gettext("A problem occurred while reading this archive contents: ") + e.get_message());
 		}
             }
             catch(Euser_abort & e)
@@ -1370,7 +1370,7 @@ namespace libdar
             catch(Erange & e)
             {
                 string msg = string(gettext("Error while testing archive: "))+e.get_message();
-                dialog.warning(msg);
+                dialog.message(msg);
                 throw Edata(msg);
             }
         }
@@ -2247,7 +2247,7 @@ namespace libdar
 		cat = nullptr; // [object member variable]
 
 		if(info_details)
-		    dialog.warning(gettext("Building the catalog object..."));
+		    dialog.message(gettext("Building the catalog object..."));
 		try
 		{
 		    if(fs_root.display() != "<ROOT>")
@@ -2318,7 +2318,7 @@ namespace libdar
 			try
 			{
 			    if(info_details)
-				dialog.warning(gettext("Processing files for backup..."));
+				dialog.message(gettext("Processing files for backup..."));
 			    filtre_sauvegarde(dialog,
 					      selection,
 					      subtree,
@@ -2379,7 +2379,7 @@ namespace libdar
 			break;
 		    case oper_merge:
 			if(info_details)
-			    dialog.warning(gettext("Processing files for merging..."));
+			    dialog.message(gettext("Processing files for merging..."));
 
 			filtre_merge(dialog,
 				     selection,
@@ -2410,7 +2410,7 @@ namespace libdar
 			break;
 		    case oper_repair:
 			if(info_details)
-			    dialog.warning(gettext("Processing files for fixing..."));
+			    dialog.message(gettext("Processing files for fixing..."));
 
 			try
 			{
@@ -2491,7 +2491,7 @@ namespace libdar
 		if(ref_cat1 != nullptr && op == oper_create)
 		{
 		    if(info_details)
-			dialog.warning(gettext("Adding reference to files that have been destroyed since reference backup..."));
+			dialog.message(gettext("Adding reference to files that have been destroyed since reference backup..."));
 		    if(aborting)
 			cat->update_absent_with(*ref_cat1, aborting_next_etoile);
 		    else

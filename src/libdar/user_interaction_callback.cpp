@@ -85,7 +85,7 @@ namespace libdar
     using libdar::dar_gettext;
     using libdar::Ememory;
 
-    user_interaction_callback::user_interaction_callback(warning_callback x_warning_callback,
+    user_interaction_callback::user_interaction_callback(message_callback x_message_callback,
 							 pause_callback x_answer_callback,
 							 get_string_callback x_string_callback,
 							 get_secu_string_callback x_secu_string_callback,
@@ -94,9 +94,9 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    if(x_warning_callback == nullptr || x_answer_callback == nullptr)
+	    if(x_message_callback == nullptr || x_answer_callback == nullptr)
 		throw Elibcall("user_interaction_callback::user_interaction_callback", dar_gettext("nullptr given as argument of user_interaction_callback()"));
-	    warning_cb = x_warning_callback;
+	    message_cb = x_message_callback;
 	    pause_cb  = x_answer_callback;
 	    get_string_cb  = x_string_callback;
 	    get_secu_string_cb = x_secu_string_callback;
@@ -110,12 +110,12 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
-    void user_interaction_callback::inherited_warning(const string & message)
+    void user_interaction_callback::inherited_message(const string & message)
     {
-        if(warning_cb == nullptr)
+        if(message_cb == nullptr)
 	    throw SRC_BUG;
         else
-	    (*warning_cb)(message + '\n', context_val);
+	    (*message_cb)(message + '\n', context_val);
     }
 
     bool user_interaction_callback::inherited_pause(const string & message)

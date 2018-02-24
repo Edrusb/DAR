@@ -229,7 +229,7 @@ namespace libdar
 
 		resp = dialog.get_string(gettext("\nYour decision about file's data:\n[P]reserve\n[O]verwrite\nmark [S]aved and preserve\nmark saved and overwri[T]e\n[R]emove\n[*] keep undefined\n[A]bort\n Your Choice? "), true);
 		if(resp.size() != 1)
-		    dialog.warning(gettext("Please answer by the character between brackets ('[' and ']') and press return"));
+		    dialog.message(gettext("Please answer by the character between brackets ('[' and ']') and press return"));
 		else
 		{
 		    switch(*resp.begin())
@@ -263,10 +263,10 @@ namespace libdar
 			if(resp == confirm)
 			    throw Ethread_cancel(false, 0);
 			else
-			    dialog.warning(gettext("Cancellation no confirmed"));
+			    dialog.message(gettext("Cancellation no confirmed"));
 			break;
 		    default:
-			dialog.warning(string(gettext("Unknown choice: ")) + resp);
+			dialog.message(string(gettext("Unknown choice: ")) + resp);
 		    }
 		}
 	    }
@@ -300,7 +300,7 @@ namespace libdar
 
 		resp = dialog.get_string(gettext("\nYour decision about file's EA:\n[p]reserve\n[o]verwrite\nmark [s]aved and preserve\nmark saved and overwri[t]e\n[m]erge EA and preserve\nmerge EA a[n]d overwrite\n[r]emove\n[*] keep undefined\n[a]bort\n  Your choice? "), true);
 		if(resp.size() != 1)
-		    dialog.warning(gettext("Please answer by the character between brackets ('[' and ']') and press return"));
+		    dialog.message(gettext("Please answer by the character between brackets ('[' and ']') and press return"));
 		else
 		{
 		    switch(*resp.begin())
@@ -342,10 +342,10 @@ namespace libdar
 			if(resp == confirm)
 			    throw Ethread_cancel(false, 0);
 			else
-			    dialog.warning(gettext("Cancellation no confirmed"));
+			    dialog.message(gettext("Cancellation no confirmed"));
 			break;
 		    default:
-			dialog.warning(string(gettext("Unknown choice: ")) + resp);
+			dialog.message(string(gettext("Unknown choice: ")) + resp);
 		    }
 		}
 	    }
@@ -380,7 +380,7 @@ namespace libdar
 
 		resp = dialog.get_string(gettext("\nYour decision about file's FSA:\n[p]reserve\n[o]verwrite\nmark [s]aved and preserve\nmark saved and overwri[t]e\n[*] keep undefined\n[a]bort\n  Your choice? "), true);
 		if(resp.size() != 1)
-		    dialog.warning(gettext("Please answer by the character between brackets ('[' and ']') and press return"));
+		    dialog.message(gettext("Please answer by the character between brackets ('[' and ']') and press return"));
 		else
 		{
 		    switch(*resp.begin())
@@ -410,10 +410,10 @@ namespace libdar
 			if(resp == confirm)
 			    throw Ethread_cancel(false, 0);
 			else
-			    dialog.warning(gettext("Cancellation no confirmed"));
+			    dialog.message(gettext("Cancellation no confirmed"));
 			break;
 		    default:
-			dialog.warning(string(gettext("Unknown choice: ")) + resp);
+			dialog.message(string(gettext("Unknown choice: ")) + resp);
 		    }
 		}
 	    }

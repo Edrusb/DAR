@@ -232,11 +232,11 @@ namespace libdar
 
 #if HAVE_LCHOWN
 		if(lchown(name, tmp_uid, tmp_gid) < 0)
-		    dialog.warning(chem + string(gettext("Could not restore original file ownership: ")) + tools_strerror_r(errno));
+		    dialog.message(chem + string(gettext("Could not restore original file ownership: ")) + tools_strerror_r(errno));
 #else
 		if(dynamic_cast<const cat_lien *>(&ref) == nullptr) // not a symbolic link
 		    if(chown(name, tmp_uid, tmp_gid) < 0)
-			dialog.warning(chem + string(gettext("Could not restore original file ownership: ")) + tools_strerror_r(errno));
+			dialog.message(chem + string(gettext("Could not restore original file ownership: ")) + tools_strerror_r(errno));
 		    //
 		    // we don't/can't restore ownership for symbolic links (no system call to do that)
 		    //
@@ -250,7 +250,7 @@ namespace libdar
 		    if(chmod(name, permission) < 0)
 		    {
 			string tmp = tools_strerror_r(errno);
-			dialog.warning(tools_printf(gettext("Cannot restore permissions of %s : %s"), name, tmp.c_str()));
+			dialog.message(tools_printf(gettext("Cannot restore permissions of %s : %s"), name, tmp.c_str()));
 		    }
 	}
 	catch(Egeneric &e)
@@ -336,7 +336,7 @@ namespace libdar
 	    if(info)
 	    {
 		string tmp = tools_strerror_r(errno);
-		dialog.warning(tools_printf(gettext("Failed to open %S while checking for nodump flag: %s"), &filename, tmp.c_str()));
+		dialog.message(tools_printf(gettext("Failed to open %S while checking for nodump flag: %s"), &filename, tmp.c_str()));
 	    }
 	}
 	else
@@ -350,7 +350,7 @@ namespace libdar
 			if(info)
 			{
 			    string tmp = tools_strerror_r(errno);
-			    dialog.warning(tools_printf(gettext("Cannot get ext2 attributes (and nodump flag value) for %S : %s"), &filename, tmp.c_str()));
+			    dialog.message(tools_printf(gettext("Cannot get ext2 attributes (and nodump flag value) for %S : %s"), &filename, tmp.c_str()));
 			}
 		    }
 		    f = 0;
@@ -411,7 +411,7 @@ namespace libdar
 		    // a symlink to where ???
 	    }
 	    if(info_details && ! (*ret == root) )
-		dialog.warning(tools_printf(gettext("Replacing %s in the -R option by the directory pointed to by this symbolic link: "), ptr) + ret->display());
+		dialog.message(tools_printf(gettext("Replacing %s in the -R option by the directory pointed to by this symbolic link: "), ptr) + ret->display());
 	}
 	else // not a directory given as argument
 	    throw Erange("filesystem:get_root_with_symlink", tools_printf(gettext("The given path %s must be a directory (or symbolic link to an existing directory)"), ptr));

@@ -294,7 +294,7 @@ namespace libdar
 		    if((has_data_saved || hard_link || x_dir != nullptr) && !only_overwrite)
 		    {
 			if(info_details)
-			    get_ui().warning(string(gettext("Restoring file's data: ")) + spot_display);
+			    get_ui().message(string(gettext("Restoring file's data: ")) + spot_display);
 
 			if(!empty)
 			    make_file(x_nom, *current_dir, false, what_to_check, get_fsa_scope());
@@ -311,7 +311,7 @@ namespace libdar
 			if(has_ea_saved)
 			{
 			    if(info_details)
-				get_ui().warning(string(gettext("Restoring file's EA: ")) + spot_display);
+				get_ui().message(string(gettext("Restoring file's EA: ")) + spot_display);
 
 			    if(!empty)
 			    {
@@ -322,7 +322,7 @@ namespace libdar
 				}
 				catch(Erange & e)
 				{
-				    get_ui().warning(tools_printf(gettext("Restoration of EA for %S aborted: "), &spot_display) + e.get_message());
+				    get_ui().message(tools_printf(gettext("Restoration of EA for %S aborted: "), &spot_display) + e.get_message());
 				}
 			    }
 			    else
@@ -332,7 +332,7 @@ namespace libdar
 			if(has_fsa_saved)
 			{
 			    if(info_details)
-				get_ui().warning(string(gettext("Restoring file's FSA: ")) + spot_display);
+				get_ui().message(string(gettext("Restoring file's FSA: ")) + spot_display);
 
 			    if(!empty)
 			    {
@@ -345,7 +345,7 @@ namespace libdar
 				}
 				catch(Erange & e)
 				{
-				    get_ui().warning(tools_printf(gettext("Restoration of FSA for %S aborted: "), &spot_display) + e.get_message());
+				    get_ui().message(tools_printf(gettext("Restoration of FSA for %S aborted: "), &spot_display) + e.get_message());
 				}
 			    }
 			}
@@ -405,7 +405,7 @@ namespace libdar
 				    // we do not take care of overwriting data here as it is the
 				    // expected behavior for delta binary patching
 				if(info_details)
-				    get_ui().warning(string(gettext("Restoring file's data using a delta patching: ")) + spot_display);
+				    get_ui().message(string(gettext("Restoring file's data using a delta patching: ")) + spot_display);
 				filesystem_tools_make_delta_patch(get_ui(),
 								  *exists_file,
 								  spot_display,
@@ -422,7 +422,7 @@ namespace libdar
 			    else
 			    {
 				    // cannot overwrite the existing inode as we do not have the base data to use for patching
-				get_ui().warning(tools_printf(gettext("Cannot restore delta diff for %S as exsiting inode is not a plain file"), &spot_display));
+				get_ui().message(tools_printf(gettext("Cannot restore delta diff for %S as exsiting inode is not a plain file"), &spot_display));
 			    }
 			}
 			else // no data saved in the object to restore
@@ -447,7 +447,7 @@ namespace libdar
 				}
 				catch(Erange & e)
 				{
-				    get_ui().warning(tools_printf(gettext("Restoration of EA for %S aborted: "), &spot_display) + e.get_message());
+				    get_ui().message(tools_printf(gettext("Restoration of EA for %S aborted: "), &spot_display) + e.get_message());
 				}
 			    }
 
@@ -459,7 +459,7 @@ namespace libdar
 				}
 				catch(Erange & e)
 				{
-				    get_ui().warning(tools_printf(gettext("Restoration of FSA for %S aborted: "), &spot_display) + e.get_message());
+				    get_ui().message(tools_printf(gettext("Restoration of FSA for %S aborted: "), &spot_display) + e.get_message());
 				}
 			    }
 
@@ -611,7 +611,7 @@ namespace libdar
 	    }
 
 	    if(info_details)
-		get_ui().warning(string(gettext("Restoring file's data: ")) + spot);
+		get_ui().message(string(gettext("Restoring file's data: ")) + spot);
 
 	    if(tba_dir != nullptr && tba_ino->same_as(*in_place))
 	    {
@@ -642,7 +642,7 @@ namespace libdar
 		    catch(Egeneric & ex)
 		    {
 			got_ea = false;
-			get_ui().warning(tools_printf(gettext("Existing EA for %S could not be read and preserved: "), &spot) + ex.get_message());
+			get_ui().message(tools_printf(gettext("Existing EA for %S could not be read and preserved: "), &spot) + ex.get_message());
 		    }
 
 			// reading FSA present on filesystem
@@ -662,7 +662,7 @@ namespace libdar
 		    catch(Egeneric & ex)
 		    {
 			got_fsa = false;
-			get_ui().warning(tools_printf(gettext("Existing FSA for %S could not be read and preserved: "), &spot) + ex.get_message());
+			get_ui().message(tools_printf(gettext("Existing FSA for %S could not be read and preserved: "), &spot) + ex.get_message());
 		    }
 
 			// removing current entry and creating the new entry in place
@@ -702,7 +702,7 @@ namespace libdar
 		    catch(Egeneric & e)
 		    {
 			if(ea != nullptr && !ea->size().is_zero())
-			    get_ui().warning(tools_printf(gettext("Existing EA for %S could not be preserved : "), &spot) + e.get_message());
+			    get_ui().message(tools_printf(gettext("Existing EA for %S could not be preserved : "), &spot) + e.get_message());
 		    }
 
 			// restoring FSA that were present on filesystem
@@ -719,7 +719,7 @@ namespace libdar
 		    catch(Egeneric & e)
 		    {
 			if(ea != nullptr && !ea->size().is_zero())
-			    get_ui().warning(tools_printf(gettext("Existing FSA for %S could not be preserved : "), &spot) + e.get_message());
+			    get_ui().message(tools_printf(gettext("Existing FSA for %S could not be preserved : "), &spot) + e.get_message());
 		    }
 		}
 		catch(...)
@@ -819,7 +819,7 @@ namespace libdar
 	    else // successfully cleared EA
 	    {
 		if(info_details)
-		    get_ui().warning(string(gettext("Restoring file's EA: ")) + spot);
+		    get_ui().message(string(gettext("Restoring file's EA: ")) + spot);
 
 		const ea_attributs *tba_ea = tba_ino->get_ea();
 		if(!empty)
@@ -850,7 +850,7 @@ namespace libdar
 	    else
 	    {
 		if(info_details)
-		    get_ui().warning(string(gettext("Clearing file's EA (requested by overwriting policy): ")) + spot);
+		    get_ui().message(string(gettext("Clearing file's EA (requested by overwriting policy): ")) + spot);
 		ret = true;
 	    }
 	    break;
@@ -962,7 +962,7 @@ namespace libdar
 	    else
 	    {
 		if(info_details)
-		    get_ui().warning(string(gettext("Restoring file's FSA: ")) + spot);
+		    get_ui().message(string(gettext("Restoring file's FSA: ")) + spot);
 
 		if(!empty)
 		{

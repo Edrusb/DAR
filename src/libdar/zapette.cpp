@@ -606,7 +606,7 @@ namespace libdar
             if(req.offset == REQUEST_OFFSET_END_TRANSMIT)
             {
                 if(ans.size != 0 && ans.type != ANSWER_TYPE_DATA)
-                    get_ui().warning(gettext("Bad answer from peer, while closing connection"));
+                    get_ui().message(gettext("Bad answer from peer, while closing connection"));
             }
             else if(req.offset == REQUEST_OFFSET_GET_FILESIZE)
             {

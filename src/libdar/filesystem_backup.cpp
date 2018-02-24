@@ -299,7 +299,7 @@ namespace libdar
 				    {
 					string tmp;
 
-					get_ui().warning(tools_printf(gettext("Cannot read directory contents: %s : "), ptr_name) + e.get_message());
+					get_ui().message(tools_printf(gettext("Cannot read directory contents: %s : "), ptr_name) + e.get_message());
 
 					try
 					{
@@ -336,7 +336,7 @@ namespace libdar
                         else // EXT2 nodump flag is set, and we must not consider such file for backup
                         {
                             if(info_details)
-                                get_ui().warning(string(gettext("Ignoring file with NODUMP flag set: ")) + (*current_dir + name).display());
+                                get_ui().message(string(gettext("Ignoring file with NODUMP flag set: ")) + (*current_dir + name).display());
 			    skipped_dump++;
                             once_again = true;
                         }
@@ -344,12 +344,12 @@ namespace libdar
 		    catch(Edata & e)
 		    {
 			if(!ignore_unknown)
-			    get_ui().warning(string(gettext("Error reading directory contents: ")) + e.get_message() + gettext(" . Ignoring file or directory"));
+			    get_ui().message(string(gettext("Error reading directory contents: ")) + e.get_message() + gettext(" . Ignoring file or directory"));
                         once_again = true;
 		    }
                     catch(Erange & e)
                     {
-			get_ui().warning(string(gettext("Error reading directory contents: ")) + e.get_message() + gettext(" . Ignoring file or directory"));
+			get_ui().message(string(gettext("Error reading directory contents: ")) + e.get_message() + gettext(" . Ignoring file or directory"));
                         once_again = true;
 			errors++;
                     }

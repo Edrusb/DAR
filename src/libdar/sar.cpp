@@ -678,7 +678,7 @@ namespace libdar
 	    {
 		if(lax)
 		{
-		    get_ui().warning(string(gettext("LAX MODE: Caught exception: "))+ e.get_message());
+		    get_ui().message(string(gettext("LAX MODE: Caught exception: "))+ e.get_message());
 		    get_ui().pause(tools_printf(gettext("LAX MODE: %S is missing, You have the possibility to create a zero byte length file under the name of this slice, to replace this missing file. This will of course generate error messages about the information that is missing in this slice, but at least libdar will be able to continue. Can we continue now?"), &fic));
 		    continue; // we restart the while loop
 		}
@@ -743,7 +743,7 @@ namespace libdar
 		    continue;
 		}
 		else
-		    get_ui().warning(tools_printf(gettext("LAX MODE: %S has a bad or corrupted header, trying to guess original values and continuing if possible"), &fic));
+		    get_ui().message(tools_printf(gettext("LAX MODE: %S has a bad or corrupted header, trying to guess original values and continuing if possible"), &fic));
             }
 
                 // checking against the magic number
@@ -757,7 +757,7 @@ namespace libdar
 		    continue;
 		}
 		else
-		    get_ui().warning(tools_printf(gettext("LAX MODE: In spite of its name, %S does not appear to be a dar slice, assuming a data corruption took place and continuing"), &fic));
+		    get_ui().message(tools_printf(gettext("LAX MODE: In spite of its name, %S does not appear to be a dar slice, assuming a data corruption took place and continuing"), &fic));
             }
 
 	    if(h.is_old_header() && slicing.first_slice_header.is_zero() && num != 1)
@@ -800,7 +800,7 @@ namespace libdar
 				}
 				catch(Edeci &e)
 				{
-				    get_ui().warning(gettext("LAX MODE: Please provide an strictly positive integer number"));
+				    get_ui().message(gettext("LAX MODE: Please provide an strictly positive integer number"));
 				    tmp_num = 0;
 				}
 			    }
@@ -814,7 +814,7 @@ namespace libdar
 			}
 			catch(Euser_abort & e)
 			{
-			    get_ui().warning(gettext("LAX MODE: In spite of a the absence of a known slice size, continuing anyway"));
+			    get_ui().message(gettext("LAX MODE: In spite of a the absence of a known slice size, continuing anyway"));
 			}
 		    }
 
@@ -845,7 +845,7 @@ namespace libdar
 		    }
 		    else
 		    {
-			get_ui().warning(gettext("LAX MODE: internal name of the slice leads dar to consider it is not member of the same archive. Assuming data corruption occurred and relying on the filename of this slice as proof of its membership to the archive"));
+			get_ui().message(gettext("LAX MODE: internal name of the slice leads dar to consider it is not member of the same archive. Assuming data corruption occurred and relying on the filename of this slice as proof of its membership to the archive"));
 		    }
                 }
 	    }
@@ -902,7 +902,7 @@ namespace libdar
 			    throw Erange("sar::open_readonly", tools_printf(gettext("Two different slices (%i and %i) are marked as the last slice of the backup!"), &of_last_file_num, &num));
 			else
 			{
-			    get_ui().warning(tools_printf(gettext("LAX MODE: slices %i and %i are both recorded as last slice of the archive, keeping the higher number as the real last slice"), &of_last_file_num, &num));
+			    get_ui().message(tools_printf(gettext("LAX MODE: slices %i and %i are both recorded as last slice of the archive, keeping the higher number as the real last slice"), &of_last_file_num, &num));
 			    if(num > of_last_file_num)
 			    {
 				of_last_file_num = num;
@@ -953,7 +953,7 @@ namespace libdar
 		    }
 		    else
 		    {
-			get_ui().warning(gettext("LAX MODE: Slice flag corrupted, but a slice of higher number has been seen, thus the header flag was surely not indicating this slice as the last of the archive. Continuing"));
+			get_ui().message(gettext("LAX MODE: Slice flag corrupted, but a slice of higher number has been seen, thus the header flag was surely not indicating this slice as the last of the archive. Continuing"));
 			h.get_set_flag() = flag_type_non_terminal;
 		    }
             }
@@ -997,7 +997,7 @@ namespace libdar
 	    catch(Erange & e)
 	    {
 		string tmp = e.get_message();
-		get_ui().warning(tools_printf(gettext("failed openning slice %S: %S. Will try to erase it first, if allowed"), &fic, &tmp));
+		get_ui().message(tools_printf(gettext("failed openning slice %S: %S. Will try to erase it first, if allowed"), &fic, &tmp));
 		throw Esystem("sar::open_writeonly", "failed openning, will try erasing first", Esystem::io_exist);
 	    }
 	}
@@ -1238,7 +1238,7 @@ namespace libdar
 			    }
 			    catch(Euser_abort & e)
 			    {
-				get_ui().warning(string(gettext("If you really want to abort the archive creation hit CTRL-C, then press enter.")));
+				get_ui().message(string(gettext("If you really want to abort the archive creation hit CTRL-C, then press enter.")));
 				ready = false;
 			    }
 			}

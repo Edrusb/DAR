@@ -495,7 +495,7 @@ namespace libdar
 		throw SRC_BUG;
 
 	    if(opt.get_info_details())
-		dialog.warning(gettext("Checking chronological ordering of files between the archives..."));
+		dialog.message(gettext("Checking chronological ordering of files between the archives..."));
 	    check_order(dialog);
 
 		// determination of the archives to restore and files to restore for each selected file
@@ -519,15 +519,15 @@ namespace libdar
 		    case db_lookup::found_removed:
 			num_data.clear(); // we do not restore any data
 			if(opt.get_info_details())
-			    dialog.warning(string(gettext("File recorded as removed at this date in database: ")) + anneau.front());
+			    dialog.message(string(gettext("File recorded as removed at this date in database: ")) + anneau.front());
 			break;
 		    case db_lookup::not_found:
 			num_data.clear();
-			dialog.warning(string(gettext("File not found in database: ")) + anneau.front());
+			dialog.message(string(gettext("File not found in database: ")) + anneau.front());
 			break;
 		    case db_lookup::not_restorable:
 			num_data.clear();
-			dialog.warning(string(gettext("File found in database but impossible to restore (only found \"unchanged\" in differential backups, or delta patch without reference to base it on in any previous archive of the base): ")) + anneau.front());
+			dialog.message(string(gettext("File found in database but impossible to restore (only found \"unchanged\" in differential backups, or delta patch without reference to base it on in any previous archive of the base): ")) + anneau.front());
 			break;
 		    default:
 			throw SRC_BUG;
@@ -546,7 +546,7 @@ namespace libdar
 			break;
 		    case db_lookup::not_restorable:
 			num_ea = 0; // we cannot restore it
-			dialog.warning(string(gettext("Extended Attribute of file found in database but impossible to restore (only found \"unchanged\" in differential backups): ")) + anneau.front());
+			dialog.message(string(gettext("Extended Attribute of file found in database but impossible to restore (only found \"unchanged\" in differential backups): ")) + anneau.front());
 			break;
 		    default:
 			throw SRC_BUG;
@@ -657,13 +657,13 @@ namespace libdar
 			if(opt.get_info_details())
 			{
 			    dialog.printf("Arguments sent through anonymous pipe are:");
-			    dialog.warning(tools_concat_vector(" ", argvpipe));
+			    dialog.message(tools_concat_vector(" ", argvpipe));
 			}
 			tools_system_with_pipe(dialog, dar_cmd, argvpipe);
 		    }
 		    catch(Erange & e)
 		    {
-			dialog.warning(string(gettext("Error while restoring the following files: "))
+			dialog.message(string(gettext("Error while restoring the following files: "))
 				       + tools_concat_vector( " ", ut->second)
 				       + "   : "
 				       + e.get_message());
@@ -672,7 +672,7 @@ namespace libdar
 		}
 	    }
 	    else
-		dialog.warning(gettext("Cannot restore any file, nothing done"));
+		dialog.message(gettext("Cannot restore any file, nothing done"));
 	}
 	catch(...)
 	{

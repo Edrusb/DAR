@@ -139,7 +139,7 @@ namespace libdar
 			throw;
 		    else
 		    {
-			dialog.warning(string(gettext("LAX MODE: Error met building a catalogue entry, skipping this entry and continuing. Skipped error is: ")) + e.get_message());
+			dialog.message(string(gettext("LAX MODE: Error met building a catalogue entry, skipping this entry and continuing. Skipped error is: ")) + e.get_message());
 			p = nullptr;
 		    }
 		}

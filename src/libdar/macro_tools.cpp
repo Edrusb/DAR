@@ -131,7 +131,7 @@ namespace libdar
 	    throw SRC_BUG;
 
         if(info_details)
-            dialog.warning(gettext("Locating archive contents..."));
+            dialog.message(gettext("Locating archive contents..."));
 
 	if(ver.get_edition() > 3)
 	    term.read_catalogue(*crypto, ver.is_ciphered(), ver.get_edition(), 0);
@@ -143,7 +143,7 @@ namespace libdar
 	cata_stack.flush_read_above(crypto);
 
         if(info_details)
-            dialog.warning(gettext("Reading archive contents..."));
+            dialog.message(gettext("Reading archive contents..."));
 
         if(cata_stack.skip(term.get_catalogue_start()))
         {
@@ -278,7 +278,7 @@ namespace libdar
 			if(clear_read_hash.diff(hash_to_compare, 0, 0, 1, tmp)) // difference!
 			{
 			    if(lax_mode)
-				dialog.warning(gettext("LAX MODE: catalogue computed hash does not match the signed hash of the archive, ignoring"));
+				dialog.message(gettext("LAX MODE: catalogue computed hash does not match the signed hash of the archive, ignoring"));
 			    else
 				throw Edata(gettext("Catalogue computed hash does not match the signed hash of the archive, archive has been modified since it was signed!"));
 			}
@@ -388,7 +388,7 @@ namespace libdar
 		    if(input_pipe == "")
 		    {
 			if(info_details)
-			    dialog.warning(gettext("Opening standard input to read the archive..."));
+			    dialog.message(gettext("Opening standard input to read the archive..."));
 			tmp = new (nothrow) trivial_sar(dialog,
 							basename,
 							lax);
@@ -439,7 +439,7 @@ namespace libdar
 	    {
 		sar *tmp_sar = nullptr;
 		if(info_details)
-		    dialog.warning(gettext("Opening the archive using the multi-slice abstraction layer..."));
+		    dialog.message(gettext("Opening the archive using the multi-slice abstraction layer..."));
 		tmp = tmp_sar = new (nothrow) sar(dialog,
 						  basename,
 						  extension,
@@ -473,9 +473,9 @@ namespace libdar
 	    if(info_details)
 	    {
 		if(sequential_read || (tmp_ctxt != nullptr && tmp_ctxt->is_an_old_start_end_archive()))
-		    dialog.warning(gettext("Reading the archive header..."));
+		    dialog.message(gettext("Reading the archive header..."));
 		else
-		    dialog.warning(gettext("Reading the archive trailer..."));
+		    dialog.message(gettext("Reading the archive trailer..."));
 	    }
 
 	    if(sequential_read
@@ -535,7 +535,7 @@ namespace libdar
 		// *************  building the encryption layer if necessary ************** //
 
 	    if(info_details)
-		dialog.warning(gettext("Considering cyphering layer..."));
+		dialog.message(gettext("Considering cyphering layer..."));
 
 	    if(ver.is_ciphered() && ver.get_edition() >= 9 && crypto == crypto_none && ver.get_sym_crypto_algo() != crypto_none)
 		crypto = ver.get_sym_crypto_algo(); // using the crypto algorithm recorded in the archive
@@ -544,7 +544,7 @@ namespace libdar
 	    {
 		if(lax)
 		{
-		    dialog.warning(gettext("LAX MODE: Archive seems to be ciphered, but you did not have provided any encryption algorithm, assuming data corruption and considering that the archive is not ciphered"));
+		    dialog.message(gettext("LAX MODE: Archive seems to be ciphered, but you did not have provided any encryption algorithm, assuming data corruption and considering that the archive is not ciphered"));
 		}
 		else
 		    throw Erange("macro_tools_open_archive", tools_printf(gettext("The archive %S is encrypted and no encryption cipher has been given, cannot open archive."), &basename));
@@ -578,7 +578,7 @@ namespace libdar
 	    if(crypto != crypto_none && real_pass == "")
 	    {
 		if(!secu_string::is_string_secured())
-		    dialog.warning(gettext("WARNING: support for secure memory was not available at compilation time, in case of heavy memory load, this may lead the password you are about to provide to be wrote to disk (swap space) in clear. You have been warned!"));
+		    dialog.message(gettext("WARNING: support for secure memory was not available at compilation time, in case of heavy memory load, this may lead the password you are about to provide to be wrote to disk (swap space) in clear. You have been warned!"));
 		real_pass = dialog.get_secu_string(tools_printf(gettext("Archive %S requires a password: "), &basename), false);
 	    }
 
@@ -588,18 +588,18 @@ namespace libdar
 		if(!ver.get_tape_marks())
 		{
 		    if(info_details)
-			dialog.warning(gettext("No cyphering layer opened, adding cache layer for better performance"));
+			dialog.message(gettext("No cyphering layer opened, adding cache layer for better performance"));
 
 			// adding the cache layer only if no escape layer will tape place
 			// over. escape layer act a bit like a cache, making caching here useless
 		    tmp = tmp_cache = new (nothrow) cache (*(stack.top()), false);
 		    if(tmp == nullptr)
-			dialog.warning(gettext("Failed opening the cache layer, lack of memory, archive read performances will not be optimized"));
+			dialog.message(gettext("Failed opening the cache layer, lack of memory, archive read performances will not be optimized"));
 		}
 		else
 		{
 		    if(info_details)
-			dialog.warning(gettext("No cyphering layer opened"));
+			dialog.message(gettext("No cyphering layer opened"));
 		}
 		break;
 	    case crypto_blowfish:
@@ -608,7 +608,7 @@ namespace libdar
 	    case crypto_serpent256:
 	    case crypto_camellia256:
 		if(info_details)
-		    dialog.warning(gettext("Opening cyphering layer..."));
+		    dialog.message(gettext("Opening cyphering layer..."));
 #ifdef LIBDAR_NO_OPTIMIZATION
 		tools_secu_string_show(dialog, string("Used clear key: "), real_pass);
 #endif
@@ -652,7 +652,7 @@ namespace libdar
 		break;
 	    case crypto_scrambling:
 		if(info_details)
-		    dialog.warning(gettext("Opening cyphering layer..."));
+		    dialog.message(gettext("Opening cyphering layer..."));
 #ifdef LIBDAR_NO_OPTIMIZATION
 		tools_secu_string_show(dialog, string("Used clear key: "), real_pass);
 #endif
@@ -679,7 +679,7 @@ namespace libdar
 	    if(multi_threaded && crypto != crypto_none)
 	    {
 		if(info_details)
-		    dialog.warning(gettext("Creating a new thread to run the previously created layers..."));
+		    dialog.message(gettext("Creating a new thread to run the previously created layers..."));
 		tmp = new (nothrow) generic_thread(stack.top());
 		if(tmp == nullptr)
 		    throw Ememory("op_create_in_sub");
@@ -699,7 +699,7 @@ namespace libdar
 		if(ver.get_tape_marks())
 		{
 		    if(info_details)
-			dialog.warning(gettext("Opening escape sequence abstraction layer..."));
+			dialog.message(gettext("Opening escape sequence abstraction layer..."));
 		    if(lax)
 		    {
 			if(!sequential_read)
@@ -724,7 +724,7 @@ namespace libdar
 		    else // lax mode
 			if(sequential_read)
 			{
-			    dialog.warning(gettext("LAX MODE: the requested sequential read mode relies on escape sequence which seem to be absent from this archive. Assuming data corruption occurred. However, if no data corruption occurred and thus no escape sequence are present in this archive, do not use sequential reading mode to explore this archive else you will just get nothing usable from it"));
+			    dialog.message(gettext("LAX MODE: the requested sequential read mode relies on escape sequence which seem to be absent from this archive. Assuming data corruption occurred. However, if no data corruption occurred and thus no escape sequence are present in this archive, do not use sequential reading mode to explore this archive else you will just get nothing usable from it"));
 			    ver.set_tape_marks(true);
 			    throw Euser_abort("this exception triggers the creation of the escape layer");
 			}
@@ -761,7 +761,7 @@ namespace libdar
 		if(multi_threaded)
 		{
 		    if(info_details)
-			dialog.warning(gettext("Creating a new thread to run the escape layer..."));
+			dialog.message(gettext("Creating a new thread to run the escape layer..."));
 		    generic_thread *tmp = new (nothrow) generic_thread(stack.top());
 		    if(tmp == nullptr)
 			throw Ememory("op_create_in_sub");
@@ -779,9 +779,9 @@ namespace libdar
 	    if(info_details)
 	    {
 		if(ver.get_compression_algo() == compression::none)
-		    dialog.warning(gettext("Opening the compression abstraction layer (compression algorithm used is none)..."));
+		    dialog.message(gettext("Opening the compression abstraction layer (compression algorithm used is none)..."));
 		else
-		    dialog.warning(gettext("Opening the compression layer..."));
+		    dialog.message(gettext("Opening the compression layer..."));
 	    }
 
 	    version_check(dialog, ver);
@@ -805,7 +805,7 @@ namespace libdar
 		if(multi_threaded && ver.get_compression_algo() != compression::none)
 		{
 		    if(info_details)
-			dialog.warning(gettext("Creating a new thread to run the compression layer..."));
+			dialog.message(gettext("Creating a new thread to run the compression layer..."));
 		    tmp = new (nothrow) generic_thread(stack.top());
 		    if(tmp == nullptr)
 			throw Ememory("op_create_in_sub");
@@ -819,7 +819,7 @@ namespace libdar
 		// ************* warning info ************************ //
 
 	    if(info_details)
-		dialog.warning(gettext("All layers have been created successfully"));
+		dialog.message(gettext("All layers have been created successfully"));
 
 	    if(ver.is_ciphered())
 		dialog.printf(gettext("Warning, the archive %S has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted\n"),  &basename);
@@ -883,7 +883,7 @@ namespace libdar
 	    max_offset = stack.get_position();
 	else
 	{
-	    dialog.warning(gettext("LAX MODE: Cannot skip at the end of the archive! Using current position to start the catalogue search"));
+	    dialog.message(gettext("LAX MODE: Cannot skip at the end of the archive! Using current position to start the catalogue search"));
 	    max_offset = stack.get_position();
 	}
 
@@ -902,7 +902,7 @@ namespace libdar
 
 	if(pdesc.esc != nullptr)
 	{
-	    dialog.warning(gettext("LAX MODE: Escape sequence seems present in this archive. I have thus two different methods, either I look for the escape sequence indicating the start of the catalogue or I try each position in turn in the hope it will not be data that look like a catalogue"));
+	    dialog.message(gettext("LAX MODE: Escape sequence seems present in this archive. I have thus two different methods, either I look for the escape sequence indicating the start of the catalogue or I try each position in turn in the hope it will not be data that look like a catalogue"));
 	    try
 	    {
 		dialog.pause(gettext("LAX MODE: Trying to locate the escape sequence (safer choice) ?"));
@@ -910,7 +910,7 @@ namespace libdar
 		    throw SRC_BUG;
 		if(pdesc.esc->skip_to_next_mark(escape::seqt_catalogue, true))
 		{
-		    dialog.warning(gettext("LAX MODE: Good point! I could find the escape sequence marking the beginning of the catalogue, now trying to read it..."));
+		    dialog.message(gettext("LAX MODE: Good point! I could find the escape sequence marking the beginning of the catalogue, now trying to read it..."));
 		    pdesc.stack->flush_read_above(pdesc.esc);
 		    if(pdesc.stack->get_position() != pdesc.esc->get_position())
 			throw SRC_BUG;
@@ -919,7 +919,7 @@ namespace libdar
 		}
 		else
 		{
-		    dialog.warning(gettext("LAX MODE: Escape sequence could not be found, it may have been corrupted or out of the scanned portion of the archive, trying to find the catalogue the other way"));
+		    dialog.message(gettext("LAX MODE: Escape sequence could not be found, it may have been corrupted or out of the scanned portion of the archive, trying to find the catalogue the other way"));
 		    throw Euser_abort("THIS MESSAGE SHOULD NEVER APPEAR, It branches the execution to the second way of looking for the catalogue");
 		}
 	    }
@@ -942,7 +942,7 @@ namespace libdar
 		if(info_details)
 		{
 		    infinint ratio = (offset - min_offset)*100/amplitude;
-		    dialog.warning(tools_printf(gettext("LAX MODE: %i %% remaining"), & ratio));
+		    dialog.message(tools_printf(gettext("LAX MODE: %i %% remaining"), & ratio));
 		}
 	    }
 
@@ -988,7 +988,7 @@ namespace libdar
 		if(offset >= max_offset)
 		{
 		    if(info_details)
-			dialog.warning(gettext("LAX MODE: Reached the end of the area to scan, FAILED to find any catalogue"));
+			dialog.message(gettext("LAX MODE: Reached the end of the area to scan, FAILED to find any catalogue"));
 		    ret = nullptr;
 		    ok = true;
 		}
@@ -1086,7 +1086,7 @@ namespace libdar
 		if(empty)
 		{
 		    if(info_details)
-			dialog.warning(gettext("Creating low layer: Writing archive into a black hole object (equivalent to /dev/null)..."));
+			dialog.message(gettext("Creating low layer: Writing archive into a black hole object (equivalent to /dev/null)..."));
 
 		    tmp = new (nothrow) null_file(open_mode);
 		}
@@ -1095,7 +1095,7 @@ namespace libdar
 			if(filename == "-") // output to stdout
 			{
 			    if(info_details)
-				dialog.warning(gettext("Creating low layer: Writing archive into standard output object..."));
+				dialog.message(gettext("Creating low layer: Writing archive into standard output object..."));
 			    writing_to_pipe = true;
 			    tmp = macro_tools_open_archive_tuyau(dialog,
 								 1,
@@ -1108,7 +1108,7 @@ namespace libdar
 			else
 			{
 			    if(info_details)
-				dialog.warning(gettext("Creating low layer: Writing archive into a plain file object..."));
+				dialog.message(gettext("Creating low layer: Writing archive into a plain file object..."));
 			    tmp = new (nothrow) trivial_sar(dialog,
 							    open_mode,
 							    filename,
@@ -1129,7 +1129,7 @@ namespace libdar
 		    {
 			sar *tmp_sar = nullptr;
 			if(info_details)
-			    dialog.warning(gettext("Creating low layer: Writing archive into a sar object (Segmentation and Reassembly) for slicing..."));
+			    dialog.message(gettext("Creating low layer: Writing archive into a sar object (Segmentation and Reassembly) for slicing..."));
 			tmp = tmp_sar = new (nothrow) sar(dialog,
 							  open_mode,
 							  filename,
@@ -1167,7 +1167,7 @@ namespace libdar
 		if(writing_to_pipe)
 		{
 		    if(info_details)
-			dialog.warning(gettext("Adding cache layer over pipe to provide limited skippability..."));
+			dialog.message(gettext("Adding cache layer over pipe to provide limited skippability..."));
 
 		    cache *c_tmp = new (nothrow) cache(*(layers.top()), true);
 		    if(c_tmp == nullptr)
@@ -1197,7 +1197,7 @@ namespace libdar
 		if(crypto != crypto_none || !gnupg_recipients.empty())
 		{
 		    if(!secu_string::is_string_secured())
-			dialog.warning(gettext("WARNING: support for secure memory was not available at compilation time, in case of heavy memory load, this may lead the password/passphrase provided to be wrote to disk (swap space) in clear. You have been warned!"));
+			dialog.message(gettext("WARNING: support for secure memory was not available at compilation time, in case of heavy memory load, this may lead the password/passphrase provided to be wrote to disk (swap space) in clear. You have been warned!"));
 		}
 
 		if(!gnupg_recipients.empty())
@@ -1212,7 +1212,7 @@ namespace libdar
 			    // generating random key for symmetric encryption
 
 			if(info_details)
-			    dialog.warning(gettext("Generating random key for symmetric encryption..."));
+			    dialog.message(gettext("Generating random key for symmetric encryption..."));
 
 			switch(crypto)
 			{
@@ -1260,18 +1260,18 @@ namespace libdar
 				clear.randomize(gnupg_key_size);
 				++iter;
 				if(iter % next == 0)
-				    dialog.warning(tools_printf(gettext("For your information, this is the iteration %d for which the randomly generated key is reported to be weak by libgcrypt, continuing generating another random key... patience"), iter));
+				    dialog.message(tools_printf(gettext("For your information, this is the iteration %d for which the randomly generated key is reported to be weak by libgcrypt, continuing generating another random key... patience"), iter));
 				next *= 10;
 			    }
 			    if(iter > 1)
-				dialog.warning(tools_printf(gettext("... A strong randomly generated key could be found after %d iteration(s)"), iter));
+				dialog.message(tools_printf(gettext("... A strong randomly generated key could be found after %d iteration(s)"), iter));
 			    break;
 			default:
 			    throw SRC_BUG;
 			}
 
 			if(info_details)
-			    dialog.warning(gettext("Key generated"));
+			    dialog.message(gettext("Key generated"));
 
 #ifdef LIBDAR_NO_OPTIMIZATION
 			tools_secu_string_show(dialog, string("Generated key: "), clear.get_contents());
@@ -1347,7 +1347,7 @@ namespace libdar
 		    // is corrupted.
 
 		if(info_details)
-		    dialog.warning(gettext("Writing down the archive header..."));
+		    dialog.message(gettext("Writing down the archive header..."));
 		ver.write(layers);
 
 		    // now we can add the initial offset in the archive_header datastructure, which will be written
@@ -1363,7 +1363,7 @@ namespace libdar
 		{
 		case crypto_scrambling:
 		    if(info_details)
-			dialog.warning(gettext("Adding a new layer on top: scrambler object..."));
+			dialog.message(gettext("Adding a new layer on top: scrambler object..."));
 		    tmp = new (nothrow) scrambler(real_pass, *(layers.top()));
 #ifdef LIBDAR_NO_OPTIMIZATION
 		    tools_secu_string_show(dialog, string("real_pass used: "), real_pass);
@@ -1375,7 +1375,7 @@ namespace libdar
 		case crypto_serpent256:
 		case crypto_camellia256:
 		    if(info_details)
-			dialog.warning(gettext("Adding a new layer on top: Strong encryption object..."));
+			dialog.message(gettext("Adding a new layer on top: Strong encryption object..."));
 		    tmp = new (nothrow) crypto_sym(crypto_size,
 						   real_pass,
 						   *(layers.top()),
@@ -1392,7 +1392,7 @@ namespace libdar
 		    if(!writing_to_pipe)
 		    {
 			if(info_details)
-			    dialog.warning(gettext("Adding a new layer on top: Caching layer for better performances..."));
+			    dialog.message(gettext("Adding a new layer on top: Caching layer for better performances..."));
 			tmp = new (nothrow) cache(*(layers.top()), false);
 		    }
 		    else
@@ -1419,7 +1419,7 @@ namespace libdar
 		    if(multi_threaded && crypto != crypto_none)
 		    {
 			if(info_details)
-			    dialog.warning(gettext("Creating a new thread to run the previously created layers..."));
+			    dialog.message(gettext("Creating a new thread to run the previously created layers..."));
 			tmp = new (nothrow) generic_thread(layers.top());
 			if(tmp == nullptr)
 			    throw Ememory("op_create_in_sub");
@@ -1437,7 +1437,7 @@ namespace libdar
 		if(crypto != crypto_none) // initial elastic buffer
 		{
 		    if(info_details)
-			dialog.warning(gettext("Writing down the initial elastic buffer through the encryption layer..."));
+			dialog.message(gettext("Writing down the initial elastic buffer through the encryption layer..."));
 		    tools_add_elastic_buffer(layers, GLOBAL_ELASTIC_BUFFER_SIZE, 0, 0);
 		}
 
@@ -1449,7 +1449,7 @@ namespace libdar
 		    set<escape::sequence_type> unjump;
 
 		    if(info_details)
-			dialog.warning(gettext("Adding a new layer on top: Escape layer to allow sequential reading..."));
+			dialog.message(gettext("Adding a new layer on top: Escape layer to allow sequential reading..."));
 		    unjump.insert(escape::seqt_catalogue);
 		    tmp = esc = new (nothrow) escape(layers.top(), unjump);
 		    if(tmp == nullptr)
@@ -1465,7 +1465,7 @@ namespace libdar
 			if(multi_threaded)
 			{
 			    if(info_details)
-				dialog.warning(gettext("Creating a new thread to run the escape layer..."));
+				dialog.message(gettext("Creating a new thread to run the escape layer..."));
 			    tmp = new (nothrow) generic_thread(layers.top());
 			    if(tmp == nullptr)
 				throw Ememory("op_create_in_sub");
@@ -1479,7 +1479,7 @@ namespace libdar
 		    // ********** building the level2 layer (compression) ************************ //
 
 		if(info_details && algo != compression::none)
-		    dialog.warning(gettext("Adding a new layer on top: compression..."));
+		    dialog.message(gettext("Adding a new layer on top: compression..."));
 		tmp = new (nothrow) compressor(algo, *(layers.top()), compression_level);
 		if(tmp == nullptr)
 		    throw Ememory("op_create_in_sub");
@@ -1497,7 +1497,7 @@ namespace libdar
 		if(multi_threaded && algo != compression::none)
 		{
 		    if(info_details)
-			dialog.warning(gettext("Creating a new thread to run the compression layer..."));
+			dialog.message(gettext("Creating a new thread to run the compression layer..."));
 		    tmp = new (nothrow) generic_thread(layers.top());
 		    if(tmp == nullptr)
 			throw Ememory("op_create_in_sub");
@@ -1507,7 +1507,7 @@ namespace libdar
 #endif
 
 		if(info_details)
-		    dialog.warning(gettext("All layers have been created successfully"));
+		    dialog.message(gettext("All layers have been created successfully"));
 	    }
 	    catch(...)
 	    {
@@ -1630,7 +1630,7 @@ namespace libdar
 	    coord.set_catalogue_start(layers.get_position());
 
 	    if(info_details)
-		dialog.warning(gettext("Writing down archive contents..."));
+		dialog.message(gettext("Writing down archive contents..."));
 	    cat.reset_dump();
 	    cat.dump(pdesc);
 
@@ -1654,7 +1654,7 @@ namespace libdar
 		crypto_asym engine(dialog);
 
 		if(info_details)
-		    dialog.warning(gettext("Calculating the signature of the catalogue hash..."));
+		    dialog.message(gettext("Calculating the signature of the catalogue hash..."));
 
 		    // ciphering and signing the hash of the catalogue //
 
@@ -1670,7 +1670,7 @@ namespace libdar
 		    // writing down the size of the hash followed by the hash //
 
 		if(info_details)
-		    dialog.warning(gettext("Writing down the signed hash of the catalogue..."));
+		    dialog.message(gettext("Writing down the signed hash of the catalogue..."));
 
 		signed_hash->dump(layers);
 	    }
@@ -1720,7 +1720,7 @@ namespace libdar
 	    // releasing the compression layer
 
 	if(info_details && algo != compression::none)
-	    dialog.warning(gettext("Closing the compression layer..."));
+	    dialog.message(gettext("Closing the compression layer..."));
 
 #ifdef LIBTHREADAR_AVAILABLE
 	(void)layers.pop_and_close_if_type_is(thread_ptr);
@@ -1735,7 +1735,7 @@ namespace libdar
 	if(pdesc.esc != nullptr)
 	{
 	    if(info_details)
-		dialog.warning(gettext("Closing the escape layer..."));
+		dialog.message(gettext("Closing the escape layer..."));
 #ifdef LIBTHREADAR_AVAILABLE
 	    (void)layers.pop_and_close_if_type_is(thread_ptr);
 #endif
@@ -1755,13 +1755,13 @@ namespace libdar
 	scram_ptr = dynamic_cast<scrambler *>(layers.top());
 
 	if(info_details)
-	    dialog.warning(gettext("Writing down the first archive terminator..."));
+	    dialog.message(gettext("Writing down the first archive terminator..."));
 	coord.dump(layers); // since format "04" the terminateur is encrypted
 
 	if(crypto != crypto_none)
 	{
 	    if(info_details)
-		dialog.warning(gettext("writing down the final elastic buffer through the encryption layer..."));
+		dialog.message(gettext("writing down the final elastic buffer through the encryption layer..."));
 
 		// obtaining the crypto block size (for clear data)
 
@@ -1800,7 +1800,7 @@ namespace libdar
 	if(tronco_ptr != nullptr || scram_ptr != nullptr)
 	{
 	    if(info_details)
-		dialog.warning(gettext("Closing the encryption layer..."));
+		dialog.message(gettext("Closing the encryption layer..."));
 	}
 
 	if(tronco_ptr != nullptr)
@@ -1822,12 +1822,12 @@ namespace libdar
 	    // *********** writing down the trailier_version with the second terminateur *************** //
 
 	if(info_details)
-	    dialog.warning(gettext("Writing down archive trailer..."));
+	    dialog.message(gettext("Writing down archive trailer..."));
 	coord.set_catalogue_start(layers.get_position());
 	ver.write(layers);
 
 	if(info_details)
-	    dialog.warning(gettext("Writing down the second archive terminator..."));
+	    dialog.message(gettext("Writing down the second archive terminator..."));
 	    // due to the possibility a file get shorter after being resaved because it was modified at the
 	    // time it was read for backup, we must be sure the last terminator is well positionned at end of file
 	layers.skip_to_eof();
@@ -1838,7 +1838,7 @@ namespace libdar
 	    // *********** closing the archive ******************** //
 
 	if(info_details)
-	    dialog.warning(gettext("Closing archive low layer..."));
+	    dialog.message(gettext("Closing archive low layer..."));
 
 	    // closing all generic_files remaining in the layers
 	try
@@ -1855,7 +1855,7 @@ namespace libdar
 	layers.clear();
 
 	if(info_details)
-	    dialog.warning(gettext("Archive is closed."));
+	    dialog.message(gettext("Archive is closed."));
     }
 
     range macro_tools_get_slices(const cat_nomme *obj, slice_layout sl)

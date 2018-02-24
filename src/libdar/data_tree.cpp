@@ -1044,7 +1044,7 @@ namespace libdar
 		    dialog.printf(gettext("Dates of file's %S are not increasing when database's archive number grows. Concerned file is: %S"), &field_nature, &tmp);
 		    if(initial_warn)
 		    {
-			dialog.warning(gettext("Dates are not increasing for all files when database's archive number grows, working with this database may lead to improper file's restored version. Please reorder the archive within the database in the way that the older is the first archive and so on up to the most recent archive being the last of the database"));
+			dialog.message(gettext("Dates are not increasing for all files when database's archive number grows, working with this database may lead to improper file's restored version. Please reorder the archive within the database in the way that the older is the first archive and so on up to the most recent archive being the last of the database"));
 			try
 			{
 			    dialog.pause(gettext("Do you want to ignore the same type of error for other files?"));

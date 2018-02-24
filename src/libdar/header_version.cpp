@@ -71,7 +71,7 @@ namespace libdar
 		U_I equivalent;
 		bool ok = false;
 
-		dialog.warning(gettext("LAX MODE: Failed to read the archive header's format version."));
+		dialog.message(gettext("LAX MODE: Failed to read the archive header's format version."));
 		do
 		{
 		    answ = dialog.get_string(tools_printf(gettext("LAX MODE: Please provide the archive format: You can use the table at %s to find the archive format depending on the release version, (for example if this archive has been created using dar release 2.3.4 to 2.3.7 answer \"6\" without the quotes here): "), LIBDAR_URL_VERSION), true);
@@ -234,7 +234,7 @@ namespace libdar
 	    {
 		if(lax_mode)
 		{
-		    dialog.warning(gettext("Error met while reading archive of reference slicing layout, ignoring this field and continuing"));
+		    dialog.message(gettext("Error met while reading archive of reference slicing layout, ignoring this field and continuing"));
 		    clear_slice_layout();
 		}
 		else
@@ -255,7 +255,7 @@ namespace libdar
 	    if(edition == empty_archive_version())
 	    {
 		if(lax_mode)
-		    dialog.warning(gettext("Consistency check failed for archive header"));
+		    dialog.message(gettext("Consistency check failed for archive header"));
 		else
 		    throw Erange("header_version::read", gettext("Consistency check failed for archive header"));
 	    }
@@ -279,7 +279,7 @@ namespace libdar
 		    if(*coh != *ctrl)
 		    {
 			if(lax_mode)
-			    dialog.warning(gettext("Consistency check failed for archive header"));
+			    dialog.message(gettext("Consistency check failed for archive header"));
 			else
 			    throw Erange("header_version::read", gettext("Consistency check failed for archive header"));
 		    }

@@ -1031,7 +1031,7 @@ namespace libdar
 		    ui.pause(tools_printf(gettext("%S Can we read it as if it was zero (1st January 1970 at 00:00:00 UTC)?"),
 					  &msg));
 		else // just warn
-		    ui.warning(msg + gettext("Considering date as if it was zero (Jan 1970)"));
+		    ui.message(msg + gettext("Considering date as if it was zero (Jan 1970)"));
 	    }
 
 	    val = 0;

@@ -89,7 +89,7 @@ namespace libdar
 		    throw Erange("escape_catalogue::escape_catalogue", gettext("incoherent data after escape sequence, cannot read internal data set label"));
 		else
 		{
-		    get_ui().warning("LAX MODE: Could not read the internal data set label, using a fake value, this will probably avoid using isolated catalogue");
+		    get_ui().message("LAX MODE: Could not read the internal data set label, using a fake value, this will probably avoid using isolated catalogue");
 		    set_data_name(label_zero);
 		}
 	    }
@@ -102,7 +102,7 @@ namespace libdar
 		contextual *cont_data = nullptr;
 		pdesc->stack->find_first_from_bottom(cont_data);
 
-		get_ui().warning("LAX MODE: Could not read the internal data set label, using a fake value, this will probably avoid using isolated catalogue");
+		get_ui().message("LAX MODE: Could not read the internal data set label, using a fake value, this will probably avoid using isolated catalogue");
 		if(cont_data == nullptr)
 		    set_data_name(label_zero);
 		else
@@ -448,7 +448,7 @@ namespace libdar
 					throw Erange("escape_catalogue::read", gettext("Escape sequences used for reading lead the archive to place some files out of the specified root. To overcome this problem, try reading the archive in direct mode (not using sequential reading), try repairing the archive using Parchive if redundancy data has been created or in last resort try using the lax mode"));
 				    else // lax mode
 				    {
-					get_ui().warning(gettext("LAX MODE: Archive directory structure is corrupted, it would lead to place some files out of the specified root directory. Restoring different directory contents at the root not out of it, which will put files of different directories in the specified root directory"));
+					get_ui().message(gettext("LAX MODE: Archive directory structure is corrupted, it would lead to place some files out of the specified root directory. Restoring different directory contents at the root not out of it, which will put files of different directories in the specified root directory"));
 					if(ref == nullptr)
 					    throw SRC_BUG;
 					delete ref; // this is the CAT_EOD object
@@ -463,7 +463,7 @@ namespace libdar
 				throw;
 			    else
 			    {
-				get_ui().warning(gettext("LAX MODE: found unknown catalogue entry, assuming data corruption occurred. Skipping to the next entry, this may lead to improper directory structure being restored, if the corrupted data was a directory"));
+				get_ui().message(gettext("LAX MODE: found unknown catalogue entry, assuming data corruption occurred. Skipping to the next entry, this may lead to improper directory structure being restored, if the corrupted data was a directory"));
 				ref = nullptr;
 				continue; // restarts the while loop
 			    }
@@ -499,7 +499,7 @@ namespace libdar
 		    {
 			if(!depth.is_zero())
 			{
-			    get_ui().warning(gettext("Uncompleted archive! Assuming it has been interrupted during the backup process. If an error has been reported just above, simply ignore it, this is about the file that was saved at the time of the interruption."));
+			    get_ui().message(gettext("Uncompleted archive! Assuming it has been interrupted during the backup process. If an error has been reported just above, simply ignore it, this is about the file that was saved at the time of the interruption."));
 			    ceci->status = ec_eod;
 			    ref = get_r_eod_address();
 			    if(ref == nullptr)
@@ -537,7 +537,7 @@ namespace libdar
 				    throw Erange("escape_catalogue::read", gettext("Cannot extract from the internal catalogue the list of files to remove"));
 				else
 				{
-				    get_ui().warning("LAX MODE: Cannot extract from the internal catalogue the list of files to remove, skipping this step");
+				    get_ui().message("LAX MODE: Cannot extract from the internal catalogue the list of files to remove, skipping this step");
 				    ref = nullptr;
 				    stop = true;
 				}
@@ -746,7 +746,7 @@ namespace libdar
 	    break;
 	case ec_marks:
 	case ec_eod:
-	    get_ui().warning(gettext("Resetting the sequential reading process of the archive contents while it is not finished, will make all data unread so far becoming inaccessible"));
+	    get_ui().message(gettext("Resetting the sequential reading process of the archive contents while it is not finished, will make all data unread so far becoming inaccessible"));
 	    corres.clear();
 	    status = ec_completed;
 	    break;

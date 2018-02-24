@@ -234,7 +234,7 @@ namespace libdar
                     if(!lax)
                         throw Erange("cat_entree::read", gettext("corrupted file"));
                     else
-                        dialog.warning(gettext("LAX MODE: Unexpected saved status for end of directory entry, assuming data corruption occurred, ignoring and continuing"));
+                        dialog.message(gettext("LAX MODE: Unexpected saved status for end of directory entry, assuming data corruption occurred, ignoring and continuing"));
                 }
                 ret = new (nothrow) cat_eod(pdesc, small);
                 break;
@@ -244,7 +244,7 @@ namespace libdar
                     if(!lax)
                         throw Erange("cat_entree::read", gettext("corrupted file"));
                     else
-                        dialog.warning(gettext("LAX MODE: Unexpected saved status for class \"cat_detruit\" object, assuming data corruption occurred, ignoring and continuing"));
+                        dialog.message(gettext("LAX MODE: Unexpected saved status for class \"cat_detruit\" object, assuming data corruption occurred, ignoring and continuing"));
                 }
                 ret = new (nothrow) cat_detruit(pdesc, reading_ver, small);
                 break;
@@ -256,7 +256,7 @@ namespace libdar
                     throw Erange("cat_entree::read", gettext("unknown type of data in catalogue"));
                 else
                 {
-                    dialog.warning(gettext("LAX MODE: found unknown catalogue entry, assuming data corruption occurred, cannot read further the catalogue as I do not know the length of this type of entry"));
+                    dialog.message(gettext("LAX MODE: found unknown catalogue entry, assuming data corruption occurred, cannot read further the catalogue as I do not know the length of this type of entry"));
                     return ret;  // nullptr
                 }
             }

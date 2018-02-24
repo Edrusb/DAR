@@ -412,7 +412,7 @@ namespace libdar
 	}
 
 	if(prev_was_bad)
-	    obj->get_ui().warning(gettext("Error, invalid passphrase given, try again:"));
+	    obj->get_ui().message(gettext("Error, invalid passphrase given, try again:"));
 	pass = obj->get_ui().get_secu_string(message, false);
 	th.check_self_cancellation();
 
@@ -420,16 +420,16 @@ namespace libdar
 	if(wrote < 0 || (U_I)(wrote) != pass.get_size())
 	{
 	    if(wrote == -1)
-		obj->get_ui().warning(string(gettext("Error, while sending the passphrase to GPGME:")) + tools_strerror_r(errno));
+		obj->get_ui().message(string(gettext("Error, while sending the passphrase to GPGME:")) + tools_strerror_r(errno));
 	    else
-		obj->get_ui().warning(gettext("Failed sending the totality of the passphrase to GPGME"));
+		obj->get_ui().message(gettext("Failed sending the totality of the passphrase to GPGME"));
 	    ret = GPG_ERR_CANCELED;
 	}
 	else
 	{
 	    wrote = write(fd, "\n", 1);
 	    if(wrote != 1)
-		obj->get_ui().warning(gettext("Failed sending CR after the passphrase"));
+		obj->get_ui().message(gettext("Failed sending CR after the passphrase"));
 	    ret = GPG_ERR_NO_ERROR;
 	}
 

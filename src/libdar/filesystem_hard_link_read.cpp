@@ -155,12 +155,12 @@ namespace libdar
 		{
 		case EACCES:
 		    tmp = tools_strerror_r(errno);
-		    get_ui().warning(tools_printf(gettext("Error reading inode of file %s : %s"), ptr_name, tmp.c_str()));
+		    get_ui().message(tools_printf(gettext("Error reading inode of file %s : %s"), ptr_name, tmp.c_str()));
 		    break;
 		case ENOENT:
 		    if(display.size() >= PATH_MAX
 		       || name.size() >= NAME_MAX)
-			get_ui().warning(tools_printf(gettext("Failed reading inode information for %s: "), ptr_name) + tools_strerror_r(errno));
+			get_ui().message(tools_printf(gettext("Failed reading inode information for %s: "), ptr_name) + tools_strerror_r(errno));
 			// Cygwin may return shorter name than expected using readdir (see class etage) which
 			// leads the file to be truncated, and thus when we here fetch inode information
 			// we get file non existent error. In that situation this is not the case of a
@@ -333,7 +333,7 @@ namespace libdar
 		    }
 		    catch(Egeneric & ex)
 		    {
-			get_ui().warning(string(gettext("Error reading EA for "))+ptr_name+ " : " + ex.get_message());
+			get_ui().message(string(gettext("Error reading EA for "))+ptr_name+ " : " + ex.get_message());
 			    // no throw !
 			    // we must be able to continue without EA
 		    }

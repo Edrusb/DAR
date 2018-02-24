@@ -156,7 +156,7 @@ namespace libdar
 		{
 		    if(ref_data_name != lax_layer1_data_name && !lax_layer1_data_name.is_cleared())
 		    {
-			ui.warning(gettext("LAX MODE: catalogue label does not match archive label, as if it was an extracted catalogue, assuming data corruption occurred and fixing the catalogue to be considered an a plain internal catalogue"));
+			ui.message(gettext("LAX MODE: catalogue label does not match archive label, as if it was an extracted catalogue, assuming data corruption occurred and fixing the catalogue to be considered an a plain internal catalogue"));
 			ref_data_name = lax_layer1_data_name;
 		    }
 		}
@@ -400,7 +400,7 @@ namespace libdar
 		    else
 			if(sub_tree->read_subdir(tmp))
 			{
-			    ui.warning(sub_tree->display() + gettext(" is not present in the archive"));
+			    ui.message(sub_tree->display() + gettext(" is not present in the archive"));
 			    delete sub_tree;
 			    sub_tree = nullptr;
 			    sub_count = -2;
@@ -414,7 +414,7 @@ namespace libdar
 		}
 		else
 		{
-		    ui.warning(sub_tree->display() + gettext(" is not present in the archive"));
+		    ui.message(sub_tree->display() + gettext(" is not present in the archive"));
 		    delete sub_tree;
 		    sub_tree = nullptr;
 		    sub_count = -2;
@@ -921,8 +921,8 @@ namespace libdar
 	defile juillet = FAKE_ROOT;
 	const cat_eod tmp_eod;
 
-	ui.warning(tools_printf(gettext("Access mode    | User | Group | Size  |          Date                 | [Data ][D][ EA  ][FSA][Compr][S]|   Filename\n")));
-	ui.warning(tools_printf("---------------+------+-------+-------+-------------------------------+---------------------------------+-----------\n"));
+	ui.message(tools_printf(gettext("Access mode    | User | Group | Size  |          Date                 | [Data ][D][ EA  ][FSA][Compr][S]|   Filename\n")));
+	ui.message(tools_printf("---------------+------+-------+-------+-------------------------------+---------------------------------+-----------\n"));
 	if(filter_unsaved)
 	    contenu->recursive_has_changed_update();
 
@@ -947,7 +947,7 @@ namespace libdar
 		    marge.erase(length - marge_plus_length, marge_plus_length);
 		else
 		    throw SRC_BUG;
-		ui.warning(tools_printf("%S +---\n", &marge));
+		ui.message(tools_printf("%S +---\n", &marge));
 	    }
 	    else
 		if(e_nom == nullptr)
@@ -966,7 +966,7 @@ namespace libdar
 				type = '?';
 			    if(type == 'f')
 				type = '-';
-			    ui.warning(tools_printf(gettext("%S [%c] [ REMOVED ENTRY ] (%S)  %S\n"), &marge, type, &tmp_date, &tmp));
+			    ui.message(tools_printf(gettext("%S [%c] [ REMOVED ENTRY ] (%S)  %S\n"), &marge, type, &tmp_date, &tmp));
 			}
 			else
 			{
@@ -995,7 +995,7 @@ namespace libdar
 					g += tools_printf(" [%i] ", &tiq);
 				    }
 
-				    ui.warning(tools_printf("%S%S\t%S\t%S\t%S\t%S\t%S %S\n", &marge, &a, &b, &c, &d, &e, &f, &g));
+				    ui.message(tools_printf("%S%S\t%S\t%S\t%S\t%S\t%S %S\n", &marge, &a, &b, &c, &d, &e, &f, &g));
 				    if(list_ea)
 					local_display_ea(ui, e_ino, marge + gettext("      Extended Attribute: ["), "]");
 
@@ -1040,8 +1040,8 @@ namespace libdar
 
 	if(callback == nullptr)
 	{
-	    ui.warning(tools_printf(gettext("[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size  |          Date                 |    filename\n")));
-	    ui.warning(tools_printf("--------------------------------+------------+-------+-------+-------+-------------------------------+------------\n"));
+	    ui.message(tools_printf(gettext("[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size  |          Date                 |    filename\n")));
+	    ui.message(tools_printf("--------------------------------+------------+-------+-------+-------+-------------------------------+------------\n"));
 	}
 	if(filter_unsaved)
 	    contenu->recursive_has_changed_update();
@@ -1096,7 +1096,7 @@ namespace libdar
 				    type = '?';
 				if(type == 'f')
 				    type = '-';
-				ui.warning(tools_printf("%s (%S) [%c] %S%S%S\n", REMOVE_TAG, &tmp_date, type,  &beginning, &sep, &tmp));
+				ui.message(tools_printf("%s (%S) [%c] %S%S%S\n", REMOVE_TAG, &tmp_date, type,  &beginning, &sep, &tmp));
 			    }
 			}
 			else
@@ -1132,7 +1132,7 @@ namespace libdar
 				    if(callback != nullptr)
 					(*callback)(context, f, a, b, c, d, e, beginning+sep+nom, e_dir != nullptr, e_dir != nullptr && e_dir->has_children());
 				    else
-					ui.warning(tools_printf("%S %S   %S\t%S\t%S\t%S\t%S%S%S\n", &f, &a, &b, &c, &d, &e, &beginning, &sep, &nom));
+					ui.message(tools_printf("%S %S   %S\t%S\t%S\t%S\t%S%S%S\n", &f, &a, &b, &c, &d, &e, &beginning, &sep, &nom));
 				    if(list_ea)
 					local_display_ea(ui, e_ino, gettext("      Extended Attribute: ["), "]");
 
@@ -1174,9 +1174,9 @@ namespace libdar
 	thread_cancellation thr;
 	defile juillet = FAKE_ROOT;
 
-	ui.warning("<?xml version=\"1.0\" ?>");
-	ui.warning("<!DOCTYPE Catalog SYSTEM \"dar-catalog.dtd\">\n");
-	ui.warning("<Catalog format=\"1.2\">");
+	ui.message("<?xml version=\"1.0\" ?>");
+	ui.message("<!DOCTYPE Catalog SYSTEM \"dar-catalog.dtd\">\n");
+	ui.message("<Catalog format=\"1.2\">");
 	if(filter_unsaved)
 	    contenu->recursive_has_changed_update();
 
@@ -1204,7 +1204,7 @@ namespace libdar
 		    beginning.erase(length - 1, 1); // removing the last tab character
 		else
 		    throw SRC_BUG;
-		ui.warning(tools_printf("%S</Directory>\n", &beginning));
+		ui.message(tools_printf("%S</Directory>\n", &beginning));
 	    }
 	    else
 		if(e_nom == nullptr)
@@ -1227,41 +1227,41 @@ namespace libdar
 			    switch(sig)
 			    {
 			    case 'd':
-				ui.warning(tools_printf("%S<Directory name=\"%S\">\n", &beginning, &name));
+				ui.message(tools_printf("%S<Directory name=\"%S\">\n", &beginning, &name));
 				xml_listing_attributes(ui, beginning, data, metadata);
-				ui.warning(tools_printf("%S</Directory>\n", &beginning));
+				ui.message(tools_printf("%S</Directory>\n", &beginning));
 				break;
 			    case 'f':
 			    case 'h':
 			    case 'e':
-				ui.warning(tools_printf("%S<File name=\"%S\">\n", &beginning, &name));
+				ui.message(tools_printf("%S<File name=\"%S\">\n", &beginning, &name));
 				xml_listing_attributes(ui, beginning, data, metadata);
-				ui.warning(tools_printf("%S</File>\n", &beginning));
+				ui.message(tools_printf("%S</File>\n", &beginning));
 				break;
 			    case 'l':
-				ui.warning(tools_printf("%S<Symlink name=\"%S\">\n", &beginning, &name));
+				ui.message(tools_printf("%S<Symlink name=\"%S\">\n", &beginning, &name));
 				xml_listing_attributes(ui, beginning, data, metadata);
-				ui.warning(tools_printf("%S</Symlink>\n", &beginning));
+				ui.message(tools_printf("%S</Symlink>\n", &beginning));
 				break;
 			    case 'c':
-				ui.warning(tools_printf("%S<Device name=\"%S\" type=\"character\">\n", &beginning, &name));
+				ui.message(tools_printf("%S<Device name=\"%S\" type=\"character\">\n", &beginning, &name));
 				xml_listing_attributes(ui, beginning, data, metadata);
-				ui.warning(tools_printf("%S</Device>\n", &beginning));
+				ui.message(tools_printf("%S</Device>\n", &beginning));
 				break;
 			    case 'b':
-				ui.warning(tools_printf("%S<Device name=\"%S\" type=\"block\">\n", &beginning, &name));
+				ui.message(tools_printf("%S<Device name=\"%S\" type=\"block\">\n", &beginning, &name));
 				xml_listing_attributes(ui, beginning, data, metadata);
-				ui.warning(tools_printf("%S</Device>\n", &beginning));
+				ui.message(tools_printf("%S</Device>\n", &beginning));
 				break;
 			    case 'p':
-				ui.warning(tools_printf("%S<Pipe name=\"%S\">\n", &beginning, &name));
+				ui.message(tools_printf("%S<Pipe name=\"%S\">\n", &beginning, &name));
 				xml_listing_attributes(ui, beginning, data, metadata);
-				ui.warning(tools_printf("%S</Pipe>\n", &beginning));
+				ui.message(tools_printf("%S</Pipe>\n", &beginning));
 				break;
 			    case 's':
-				ui.warning(tools_printf("%S<Socket name=\"%S\">\n", &beginning, &name));
+				ui.message(tools_printf("%S<Socket name=\"%S\">\n", &beginning, &name));
 				xml_listing_attributes(ui, beginning, data, metadata);
-				ui.warning(tools_printf("%S</Socket>\n", &beginning));
+				ui.message(tools_printf("%S</Socket>\n", &beginning));
 				break;
 			    default:
 				throw SRC_BUG;
@@ -1345,7 +1345,7 @@ namespace libdar
 				switch(sig)
 				{
 				case 'd': // directories
-				    ui.warning(tools_printf("%S<Directory name=\"%S\">\n", &beginning, &name));
+				    ui.message(tools_printf("%S<Directory name=\"%S\">\n", &beginning, &name));
 				    xml_listing_attributes(ui, beginning, data, metadata, e, list_ea);
 				    beginning += "\t";
 				    break;
@@ -1388,20 +1388,20 @@ namespace libdar
 				    else
 					chkresultsum = "";
 
-				    ui.warning(tools_printf("%S<File name=\"%S\" size=\"%S\" stored=\"%S\" crc=\"%S\" dirty=\"%S\" sparse=\"%S\" delta_sig=\"%S\" patch_base_crc=\"%S\" patch_result_crc=\"%S\">\n",
+				    ui.message(tools_printf("%S<File name=\"%S\" size=\"%S\" stored=\"%S\" crc=\"%S\" dirty=\"%S\" sparse=\"%S\" delta_sig=\"%S\" patch_base_crc=\"%S\" patch_result_crc=\"%S\">\n",
 							    &beginning, &name, &size, &stored, &chksum, &dirty, &sparse, &delta_sig, &chkbasesum, &chkresultsum));
 				    xml_listing_attributes(ui, beginning, data, metadata, e, list_ea);
-				    ui.warning(tools_printf("%S</File>\n", &beginning));
+				    ui.message(tools_printf("%S</File>\n", &beginning));
 				    break;
 				case 'l': // soft link
 				    if(data_st == s_saved)
 					target = tools_output2xml(e_sym->get_target());
 				    else
 					target = "";
-				    ui.warning(tools_printf("%S<Symlink name=\"%S\" target=\"%S\">\n",
+				    ui.message(tools_printf("%S<Symlink name=\"%S\" target=\"%S\">\n",
 							    &beginning, &name, &target));
 				    xml_listing_attributes(ui, beginning, data, metadata, e, list_ea);
-				    ui.warning(tools_printf("%S</Symlink>\n", &beginning));
+				    ui.message(tools_printf("%S</Symlink>\n", &beginning));
 				    break;
 				case 'c':
 				case 'b':
@@ -1426,20 +1426,20 @@ namespace libdar
 				    else
 					maj = min = "";
 
-				    ui.warning(tools_printf("%S<Device name=\"%S\" type=\"%S\" major=\"%S\" minor=\"%S\">\n",
+				    ui.message(tools_printf("%S<Device name=\"%S\" type=\"%S\" major=\"%S\" minor=\"%S\">\n",
 							    &beginning, &name, &target, &maj, &min));
 				    xml_listing_attributes(ui, beginning, data, metadata, e, list_ea);
-				    ui.warning(tools_printf("%S</Device>\n", &beginning));
+				    ui.message(tools_printf("%S</Device>\n", &beginning));
 				    break;
 				case 'p':
-				    ui.warning(tools_printf("%S<Pipe name=\"%S\">\n", &beginning, &name));
+				    ui.message(tools_printf("%S<Pipe name=\"%S\">\n", &beginning, &name));
 				    xml_listing_attributes(ui, beginning, data, metadata, e, list_ea);
-				    ui.warning(tools_printf("%S</Pipe>\n", &beginning));
+				    ui.message(tools_printf("%S</Pipe>\n", &beginning));
 				    break;
 				case 's':
-				    ui.warning(tools_printf("%S<Socket name=\"%S\">\n", &beginning, &name));
+				    ui.message(tools_printf("%S<Socket name=\"%S\">\n", &beginning, &name));
 				    xml_listing_attributes(ui, beginning, data, metadata, e, list_ea);
-				    ui.warning(tools_printf("%S</Socket>\n", &beginning));
+				    ui.message(tools_printf("%S</Socket>\n", &beginning));
 				    break;
 				default:
 				    throw SRC_BUG;
@@ -1465,7 +1465,7 @@ namespace libdar
 		}
 	}
 
-	ui.warning("</Catalog>");
+	ui.message("</Catalog>");
     }
 
     void catalogue::slice_listing(user_interaction & ui,
@@ -1481,8 +1481,8 @@ namespace libdar
 	range all_slices;
 	range file_slices;
 
-	ui.warning("Slice(s)|[Data ][D][ EA  ][FSA][Compr][S]|Permission| Filemane");
-	ui.warning("--------+--------------------------------+----------+-----------------------------");
+	ui.message("Slice(s)|[Data ][D][ EA  ][FSA][Compr][S]|Permission| Filemane");
+	ui.message("--------+--------------------------------+----------+-----------------------------");
 	reset_read();
 	while(read(e))
 	{
@@ -1509,7 +1509,7 @@ namespace libdar
 		    all_slices += file_slices;
 
 		    if(e_det != nullptr)
-			ui.warning(tools_printf("%s\t %s%s\n", file_slices.display().c_str(), REMOVE_TAG, juillet.get_string().c_str()));
+			ui.message(tools_printf("%s\t %s%s\n", file_slices.display().c_str(), REMOVE_TAG, juillet.get_string().c_str()));
 		    else
 		    {
 			if(e_hard != nullptr)
@@ -1523,7 +1523,7 @@ namespace libdar
 			    string a = local_perm(*e_ino, e_hard != nullptr);
 			    string f = local_flag(*e_ino, isolated, dirty_seq);
 
-			    ui.warning(tools_printf("%s\t %S%S %s\n", file_slices.display().c_str(), &f, &a, juillet.get_string().c_str()));
+			    ui.message(tools_printf("%s\t %S%S %s\n", file_slices.display().c_str(), &f, &a, juillet.get_string().c_str()));
 			}
 		    }
 		}
@@ -1537,9 +1537,9 @@ namespace libdar
 	    }
 	}
 
-	ui.warning("-----");
-	ui.warning(tools_printf("All displayed files have their data in slice range [%s]\n", all_slices.display().c_str()));
-	ui.warning("-----");
+	ui.message("-----");
+	ui.message(tools_printf("All displayed files have their data in slice range [%s]\n", all_slices.display().c_str()));
+	ui.message("-----");
     }
 
     void catalogue::drop_all_non_detruits()
