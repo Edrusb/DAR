@@ -121,7 +121,8 @@ namespace libdar
 	virtual bool remove_all_from(const archive_num & archive_to_remove, const archive_num & last_archive);
 
 	    /// list where is saved this file
-	void listing(user_interaction & dialog) const;
+	void listing(database_listing_get_version_callback callback,
+		     void *tag) const;
 	virtual void apply_permutation(archive_num src, archive_num dst);
 
 	    /// decrement archive numbers above num

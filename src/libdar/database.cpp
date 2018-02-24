@@ -432,7 +432,9 @@ namespace libdar
     }
 
 
-    void database::show_version(user_interaction & dialog, path chemin) const
+    void database::get_version(database_listing_get_version_callback callback,
+			       void *context,
+			       path chemin) const
     {
 	NLS_SWAP_IN;
 	try
@@ -462,7 +464,7 @@ namespace libdar
 	    if(ptr == nullptr)
 		throw Erange("database::show_version", gettext("Non existent file in database"));
 	    else
-		ptr->listing(dialog);
+		ptr->listing(callback, context);
 	}
 	catch(...)
 	{

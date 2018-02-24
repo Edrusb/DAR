@@ -180,10 +180,13 @@ namespace libdar
 
 	    /// list the archive where a give file is present
 
-	    /// \param[in,out] dialog where to display the listing to
+	    /// \param[in] callback is used to provide each entry in turn from the list
+	    /// \param[in] context is given as first argument of the callback as is provided here
 	    /// \param[in] chemin path to the file to look for
 	    /// \note this method is not available with partially extracted databases.
-	void show_version(user_interaction & dialog, path chemin) const;
+	void get_version(database_listing_get_version_callback callback,
+			 void *context,
+			 path chemin) const;
 
 	    /// compute some statistics about the location of most recent file versions
 

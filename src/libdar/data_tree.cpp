@@ -54,7 +54,8 @@ using namespace libdar;
 static data_tree *read_from_file(generic_file & f, unsigned char db_version);
 static void read_from_file(generic_file &f, archive_num &a);
 static void write_to_file(generic_file &f, archive_num a);
-static void display_line(user_interaction & dialog,
+static void display_line(database_listing_get_version_callback callback,
+			 void *tag,
 			 archive_num num,
 			 const datetime *data,
 			 db_etat data_presence,
@@ -818,13 +819,11 @@ namespace libdar
 	return last_mod.empty() && last_change.empty();
     }
 
-    void data_tree::listing(user_interaction & dialog) const
+    void data_tree::listing(database_listing_get_version_callback callback,
+			    void *tag) const
     {
 	map<archive_num, status_plus>::const_iterator it = last_mod.begin();
 	map<archive_num, status>::const_iterator ut = last_change.begin();
-
-	dialog.printf(gettext("Archive number |  Data                   | status ||  EA                     | status \n"));
-	dialog.printf(gettext("---------------+-------------------------+--------++-------------------------+----------\n"));
 
 	while(it != last_mod.end() || ut != last_change.end())
 	{
@@ -832,29 +831,29 @@ namespace libdar
 		if(ut != last_change.end())
 		    if(it->first == ut->first)
 		    {
-			display_line(dialog, it->first, &(it->second.date), it->second.present, &(ut->second.date), ut->second.present);
+			display_line(callback, tag, it->first, &(it->second.date), it->second.present, &(ut->second.date), ut->second.present);
 			++it;
 			++ut;
 		    }
 		    else // not in the same archive
 			if(it->first < ut->first) // it only
 			{
-			    display_line(dialog, it->first, &(it->second.date), it->second.present, nullptr, data_tree::et_removed);
+			    display_line(callback, tag, it->first, &(it->second.date), it->second.present, nullptr, db_etat::et_removed);
 			    ++it;
 			}
 			else // ut only
 			{
-			    display_line(dialog, ut->first, nullptr, data_tree::et_removed, &(ut->second.date), ut->second.present);
+			    display_line(callback, tag, ut->first, nullptr, db_etat::et_removed, &(ut->second.date), ut->second.present);
 			    ++ut;
 			}
 		else // ut at end of list thus it != last_mod.end() (see while condition)
 		{
-		    display_line(dialog, it->first, &(it->second.date), it->second.present, nullptr, data_tree::et_removed);
+		    display_line(callback, tag, it->first, &(it->second.date), it->second.present, nullptr, db_etat::et_removed);
 		    ++it;
 		}
 	    else // it at end of list, this ut != last_change.end() (see while condition)
 	    {
-		display_line(dialog, ut->first, nullptr, data_tree::et_removed, &(ut->second.date), ut->second.present);
+		display_line(callback, tag, ut->first, nullptr, db_etat::et_removed, &(ut->second.date), ut->second.present);
 		++ut;
 	    }
 	}
@@ -1694,90 +1693,29 @@ static void write_to_file(generic_file &f, archive_num a)
     f.write(buffer, sizeof(archive_num));
 }
 
-static void display_line(user_interaction & dialog,
+static void display_line(database_listing_get_version_callback callback,
+			 void *tag,
 			 archive_num num,
 			 const datetime *data,
 			 db_etat data_presence,
 			 const datetime *ea,
 			 db_etat ea_presence)
 {
-
-    const string REMOVED = gettext("removed ");
-    const string PRESENT = gettext("present ");
-    const string SAVED   = gettext("saved   ");
-    const string ABSENT  = gettext("absent  ");
-    const string PATCH   = gettext("patch   ");
-    const string BROKEN  = gettext("BROKEN  ");
-    const string NO_DATE = "                          ";
-
-    string data_state;
-    string ea_state;
-    string data_date;
-    string ea_date;
-
-    switch(data_presence)
-    {
-    case data_tree::et_saved:
-	data_state = SAVED;
-	break;
-    case data_tree::et_patch:
-	data_state = PATCH;
-	break;
-    case data_tree::et_patch_unusable:
-	data_state = BROKEN;
-	break;
-    case data_tree::et_present:
-	data_state = PRESENT;
-	break;
-    case data_tree::et_removed:
-	data_state = REMOVED;
-	break;
-    case data_tree::et_absent:
-	data_state = ABSENT;
-	break;
-    default:
-	throw SRC_BUG;
-    }
-
-    switch(ea_presence)
-    {
-    case data_tree::et_saved:
-	ea_state = SAVED;
-	break;
-    case data_tree::et_present:
-	ea_state = PRESENT;
-	break;
-    case data_tree::et_removed:
-	ea_state = REMOVED;
-	break;
-    case data_tree::et_absent:
-	throw SRC_BUG; // state not used for EA
-    case data_tree::et_patch:
-	throw SRC_BUG;
-    case data_tree::et_patch_unusable:
-	throw SRC_BUG;
-    default:
-	throw SRC_BUG;
-    }
+    bool has_data_date = true;
+    bool has_ea_date = true;
 
     if(data == nullptr)
-    {
-	data_state = ABSENT;
-	data_date = NO_DATE;
-    }
-    else
-	data_date = tools_display_date(*data);
+	has_data_date = false;
 
     if(ea == nullptr)
-    {
-	ea_state = ABSENT;
-	ea_date = NO_DATE;
-    }
-    else
-	ea_date = tools_display_date(*ea);
+	has_ea_date = false;
 
-    if(dialog.get_use_dar_manager_show_version())
-	dialog.dar_manager_show_version(num, data_date, data_state, ea_date, ea_state);
-    else
-	dialog.printf(" \t%u\t%S  %S  %S  %S\n", num, &data_date, &data_state, &ea_date, &ea_state);
+    callback(tag,
+	     num,
+	     data_presence,
+	     has_data_date,
+	     has_data_date ? *data : datetime(0),
+	     ea_presence,
+	     has_ea_date,
+	     has_ea_date ? *ea : datetime(0));
 }
