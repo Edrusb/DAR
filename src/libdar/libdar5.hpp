@@ -60,7 +60,7 @@ extern "C"
 #include "memory_check.hpp"
 #include "entrepot_local.hpp"
 #include "data_tree.hpp"
-#include "database.hpp"
+#include "database5.hpp"
 
     /// \addtogroup API5
     /// @{
@@ -215,19 +215,6 @@ namespace libdar5
 
 	// from data_tree.hpp
     using libdar::archive_num;
-
-	// from database.hpp
-    using libdar::database;
-
-	// from database_options.hpp
-    using libdar::database_open_options;
-    using libdar::database_dump_options;
-    using libdar::database_add_options;
-    using libdar::database_remove_options;
-    using libdar::database_change_basename_options;
-    using libdar::database_change_path_options;
-    using libdar::database_restore_options;
-    using libdar::database_used_options;
 
 	// from criterium.hpp
     using libdar::criterium;
