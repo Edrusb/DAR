@@ -164,6 +164,9 @@ namespace libdar
 	    /// returns the compression algorithm used on filesystem
 	compression get_compression() const { return algo; };
 
+	    /// return the database format version
+	std::string get_database_version() const { return tools_uint2str(cur_db_version); };
+
 	    /// list files which are present in a given archive
 
 	    /// \param[in] callback is called to provide each entry in turn from the list
