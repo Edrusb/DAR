@@ -41,15 +41,13 @@
 #include "cat_directory.hpp"
 #include "cat_inode.hpp"
 #include "cat_detruit.hpp"
+#include "database_aux.hpp"
 
 namespace libdar
 {
 
 	/// \ingroup Private
 	/// @}
-
-    typedef U_16 archive_num;
-#define ARCHIVE_NUM_MAX  65534
 
 	/// the data_tree class stores presence of a given file in a set of archives
 
