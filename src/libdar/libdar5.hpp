@@ -48,8 +48,7 @@ extern "C"
 #include "infinint.hpp"
 #include "statistics.hpp"
 #include "user_interaction.hpp"
-#include "user_interaction_callback.hpp"
-#include "user_interaction_blind.hpp"
+#include "user_interaction_callback5.hpp"
 #include "deci.hpp"
 #include "archive5.hpp"
 #include "crypto.hpp"
@@ -150,12 +149,6 @@ namespace libdar5
 
 	// from cat_inode.hpp
     using libdar::cat_inode;
-
-	// from user_interaction_callback.hpp
-	// using libdar::user_interaction_callback;
-
-	// from user_interaction_blind.hpp
-	// using libdar::user_interaction_blind;
 
 	// from path.hpp
     using libdar::path;

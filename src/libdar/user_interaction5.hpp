@@ -42,6 +42,10 @@ namespace libdar5
     using libdar::Euser_abort;
     using libdar::Elibcall;
 
+    using libdar::Ebug;
+    using libdar::Egeneric;
+    using libdar::Ememory;
+
 	/// \addtogroup API5
 	/// @{
 
