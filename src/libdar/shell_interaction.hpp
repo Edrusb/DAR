@@ -37,7 +37,7 @@ extern "C"
 #include "../my_config.h"
 #include <iostream>
 
-#include "user_interaction_callback.hpp"
+#include "user_interaction.hpp"
 
 namespace libdar
 {
@@ -45,7 +45,7 @@ namespace libdar
 	/// \addtogroup CMDLINE
 	/// @{
 
-    class shell_interaction : public user_interaction_callback
+    class shell_interaction : public user_interaction
     {
     public:
 	    /// constructor
@@ -76,9 +76,25 @@ namespace libdar
 	void read_char(char & a);
 	void set_beep(bool mode) { beep = mode; };
 
+		    /// make a pause each N line of output when calling the warning method
+
+	    //! \param[in] num is the number of line to display at once, zero for unlimited display
+	    //! \note. Since API 3.1, the warning method is no more a pure virtual function
+	    //! you need to call the parent warning method in your method for this warning_with_more
+	    //! method works as expected.
+	void warning_with_more(U_I num) { at_once = num; count = 0; };
+
 
 	    /// overwritting method from parent class.
 	virtual user_interaction *clone() const override { user_interaction *ret = new (std::nothrow) shell_interaction(*this); if(ret == nullptr) throw Ememory("shell_interaction::clone"); return ret; };
+
+    protected:
+	    // inherited methods from user_interaction class
+
+	virtual void inherited_message(const std::string & message) override;
+	virtual bool inherited_pause(const std::string &message) override;
+	virtual std::string inherited_get_string(const std::string & message, bool echo) override;
+	virtual secu_string inherited_get_secu_string(const std::string & message, bool echo) override;
 
     private:
 	    // data type
@@ -95,17 +111,15 @@ namespace libdar
 	termios interaction;     //< controlling terminal configuration to use when requiring user interaction
 	termios initial_noecho;  //< controlling terminal configuration to use when noecho has been requested
 	bool has_terminal;       //< true if a terminal could be found
+	U_I at_once, count;      //< used by warning_with_more
 
 	void set_term_mod(mode m);
+	void my_message(const std::string & mesg);
 
 	    // class fields and methods
 
 	static const U_I bufsize;
 
-	static void interaction_message(const std::string & message, void *context);
-	static bool interaction_pause(const std::string &message, void *context);
-	static std::string interaction_string(const std::string & message, bool echo, void *context);
-	static secu_string interaction_secu_string(const std::string & message, bool echo, void *context);
     };
 
     /// @}
