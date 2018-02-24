@@ -189,9 +189,11 @@ namespace libdar
 
 	    /// compute some statistics about the location of most recent file versions
 
-	    /// \param[in] dialog where to display the listing to
+	    /// \param[in] callback is used to provide each entry in turn from the list
+	    /// \param[in] context is given as first argument of the callback as is provided here
 	    /// \note this method is not available with partially extracted databases.
-	void show_most_recent_stats(user_interaction & dialog) const;
+	void show_most_recent_stats(database_listing_statistics_callback callback,
+				    void *context) const;
 
 	    // "ACTIONS" (not available with partially extracted databases)
 

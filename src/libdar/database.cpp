@@ -452,7 +452,8 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
-    void database::show_most_recent_stats(user_interaction & dialog) const
+    void database::show_most_recent_stats(database_listing_statistics_callback callback,
+					  void *context) const
     {
 	NLS_SWAP_IN;
 	try
@@ -461,20 +462,13 @@ namespace libdar
 	    vector<infinint> stats_ea(coordinate.size(), 0);
 	    vector<infinint> total_data(coordinate.size(), 0);
 	    vector<infinint> total_ea(coordinate.size(), 0);
+
 	    if(files == nullptr)
 		throw SRC_BUG;
-	    files->compute_most_recent_stats(stats_data, stats_ea, total_data, total_ea);
 
-	    if(!dialog.get_use_dar_manager_statistics())
-	    {
-		dialog.printf(gettext("  archive #   |  most recent/total data |  most recent/total EA\n"));
-		dialog.printf(gettext("--------------+-------------------------+-----------------------\n")); // having it with gettext let the translater adjust columns width
-	    }
+	    files->compute_most_recent_stats(stats_data, stats_ea, total_data, total_ea);
 	    for(archive_num i = 1; i < coordinate.size(); ++i)
-		if(dialog.get_use_dar_manager_statistics())
-		    dialog.dar_manager_statistics(i, stats_data[i], total_data[i], stats_ea[i], total_ea[i]);
-		else
-		    dialog.printf("\t%u %i/%i \t\t\t %i/%i\n", i, &stats_data[i], &total_data[i], &stats_ea[i], &total_ea[i]);
+		callback(context, i, stats_data[i], total_data[i], stats_ea[i], total_ea[i]);
 	}
 	catch(...)
 	{
