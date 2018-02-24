@@ -64,13 +64,13 @@ namespace libdar
 	database(const database & ref) = delete;
 
 	    /// disabling move constructor
-	database(database && ref) = delete;
+	database(database && ref) noexcept = delete;
 
 	    /// disabling assignement operator
 	database & operator = (const database & ref) = delete;
 
 	    /// disabling move assignment operator
-	database & operator = (database && ref) = delete;
+	database & operator = (database && ref) noexcept = delete;
 
 	    /// database destructor (no implicit file saving)
 	~database();
