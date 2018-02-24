@@ -76,6 +76,7 @@ extern "C"
 #ifdef __DYNAMIC__
 #include "user_group_bases.hpp"
 #endif
+#include "get_version.hpp"
 
 #include <list>
 
@@ -173,6 +174,9 @@ namespace libdar5
     void get_version(U_I & major, U_I & medium, U_I & minor, bool init_libgcrypt)
     {
 	libdar::get_version(major, medium, minor, init_libgcrypt);
+	major = LIBDAR_COMPILE_TIME_MAJOR;
+	medium = LIBDAR_COMPILE_TIME_MEDIUM;
+	minor = LIBDAR_COMPILE_TIME_MINOR;
     }
 
     void get_version_noexcept(U_I & major, U_I & medium, U_I & minor, U_16 & exception, std::string & except_msg, bool init_libgcrypt)
@@ -181,7 +185,7 @@ namespace libdar5
 	WRAPPER_IN
 	    get_version(major, medium, minor, init_libgcrypt);
 	WRAPPER_OUT(exception, except_msg)
-	    NLS_SWAP_OUT;
+	NLS_SWAP_OUT;
     }
 
     void close_and_clean()

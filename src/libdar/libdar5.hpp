@@ -62,7 +62,6 @@ extern "C"
 #include "entrepot_local.hpp"
 #include "data_tree.hpp"
 #include "database.hpp"
-#include "get_version.hpp"
 
     /// \addtogroup API5
     /// @{
