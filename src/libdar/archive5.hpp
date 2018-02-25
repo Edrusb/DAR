@@ -19,8 +19,8 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \file archive.hpp
-    /// \brief the archive class is defined in this module
+    /// \file archive5.hpp
+    /// \brief API v5 backward compatible class archive
     /// \ingroup API
 
 

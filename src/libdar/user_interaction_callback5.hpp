@@ -19,21 +19,13 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \file user_interaction_callback.hpp
-    /// \brief defines the interaction between libdar and the user based on callback functions
+    /// \file user_interaction_callback5.hpp
+    /// \brief API v5 backward compatible user_interaction_callback class
     /// \ingroup API
     ///
-    /// Three classes are defined
-    /// - user_interaction is the root class that you can use to make your own classes
-    /// - user_interaction_callback is a specialized inherited class which is implements
-    ///   user interaction thanks to callback functions
-    /// - user_interaction_blind provides fully usable objects that do not show anything
-    ///   and always assume a negative answer from the user
-    /// .
 
-
-#ifndef USER_INTERACTION_CALLBACK_HPP
-#define USER_INTERACTION_CALLBACK_HPP
+#ifndef USER_INTERACTION_CALLBACK5_HPP
+#define USER_INTERACTION_CALLBACK5_HPP
 
 #include "../my_config.h"
 

@@ -19,8 +19,8 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \file user_interaction.hpp
-    /// \brief defines the interaction interface between libdar and users.
+    /// \file user_interaction5.hpp
+    /// \brief API v5 backward compatible class user_interaction
     /// \ingroup API
     ///
 
