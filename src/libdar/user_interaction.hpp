@@ -91,27 +91,35 @@ namespace libdar
 	    /// method used to display a warning or a message to the user.
 	    ///
 	    /// \param[in] message is the message to display.
+	    /// \note messages passed by libdar are not ending with a newline by default
+	    /// its up to the implementation to separate messages by the adequate mean
 	virtual void inherited_message(const std::string & message) = 0;
 
 	    /// method used to ask a boolean question to the user.
 
-	    //! \param[in] message The boolean question to ask to the user
-	    //! \return the answer of the user (true/yes or no/false)
+	    /// \param[in] message The boolean question to ask to the user
+	    /// \return the answer of the user (true/yes or no/false)
+	    /// \note messages passed by libdar are not ending with a newline by default
+	    /// its up to the implementation to separate messages by the adequate mean
 	virtual bool inherited_pause(const std::string & message) = 0;
 
 
 	    /// method used to ask a question that needs an arbitrary answer.
 
-	    //! \param[in] message is the question to display to the user.
-	    //! \param[in] echo is set to false is the answer must not be shown while the user answers.
-	    //! \return the user's answer.
+	    /// \param[in] message is the question to display to the user.
+	    /// \param[in] echo is set to false is the answer must not be shown while the user answers.
+	    /// \return the user's answer.
+	    /// \note messages passed by libdar are not ending with a newline by default
+	    /// its up to the implementation to separate messages by the adequate mean
 	virtual std::string inherited_get_string(const std::string & message, bool echo) = 0;
 
 	    /// same a get_string() but uses libdar::secu_string instead of std::string
 
-	    //! \param[in] message is the question to display to the user.
-	    //! \param[in] echo is set to false is the answer must not be shown while the user answers.
-	    //! \return the user's answer.
+	    /// \param[in] message is the question to display to the user.
+	    /// \param[in] echo is set to false is the answer must not be shown while the user answers.
+	    /// \return the user's answer.
+	    /// \note messages passed by libdar are not ending with a newline by default
+	    /// its up to the implementation to separate messages by the adequate mean
 	virtual secu_string inherited_get_secu_string(const std::string & message, bool echo) = 0;
 
 
