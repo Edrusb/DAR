@@ -67,7 +67,7 @@ namespace libdar
 
 	    /// constructor which receive the callback functions.
 
-	    //! \param[in] x_warning_callback is used by warning() method
+	    //! \param[in] x_message_callback is used by message() method
 	    //! \param[in] x_answer_callback is used by the pause() method
 	    //! \param[in] x_string_callback is used by get_string() method
 	    //! \param[in] x_secu_string_callback is used by get_secu_string() method
