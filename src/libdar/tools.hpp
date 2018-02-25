@@ -601,6 +601,7 @@ namespace libdar
 	/// read a file and split its contents into words
 
 	/// \param[in,out] f is the file to read
+	/// \param[out] mots std container to receive the split result
 	/// \return the list of words found in this order in the file
 	/// \note The different quotes are taken into account
     template <class T> void tools_split_in_words(generic_file & f, T & mots)
@@ -703,6 +704,7 @@ namespace libdar
 	/// read a std::string and split its contents into words
 
 	/// \param[in,out] arg is the string to read
+	/// \param[out] mots a std container to receive the split result
 	/// \return the list of words found in this order in the file
 	/// \note The different quotes are taken into account
     template <class T> void tools_split_in_words(const std::string & arg, T & mots)
