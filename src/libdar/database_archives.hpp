@@ -19,7 +19,7 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \file database_archive.hpp
+    /// \file database_archives.hpp
     /// \brief this file stores the list of archive a database has been built from
     /// \ingroup API
 
