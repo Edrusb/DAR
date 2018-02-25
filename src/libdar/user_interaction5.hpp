@@ -242,17 +242,6 @@ namespace libdar5
 					      const std::string & ea_date,
 					      const std::string & ea_presence);
 
-	    /// libdar uses this call to format output before send to warning() method.
-
-	    //! This is not a virtual method, it has not to be overwritten, it is
-	    //! just a sublayer over warning()
-	    //! Supported masks for the format string are:
-	    //! - \%s \%c \%d \%\%  (normal behavior)
-	    //! - \%i (matches infinint *)
-	    //! - \%S (matches std::string *)
-	    //! .
-	void printf(const char *format, ...);
-
 	    /// for libdar to know if it is interesting to use listing(), dar_manager_show_files(),
 	    /// dar_manager_contents(), dar_manager_statistics() or to keep reporting listing thanks
 	    /// to the warning() method,
@@ -268,6 +257,7 @@ namespace libdar5
 	    //! this is not a virtual method, it has not to be overwritten in inherited classes.
 	bool get_use_dar_manager_show_version() const { return use_dar_manager_show_version; };
 
+	virtual void printf(const char *format, ...);
 
 	    /// make a newly allocated object which has the same properties as "this".
 

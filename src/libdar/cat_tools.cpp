@@ -259,7 +259,7 @@ namespace libdar
 	bool go_ea = list_ea && e_ino != nullptr && e_ino->ea_get_saved_status() == cat_inode::ea_full;
 	string end_tag = go_ea ? ">" : " />";
 
-	dialog.printf("%S<Attributes data=\"%S\" metadata=\"%S\" user=\"%S\" group=\"%S\" permissions=\"%S\" atime=\"%S\" mtime=\"%S\" ctime=\"%S\"%S\n",
+	dialog.printf("%S<Attributes data=\"%S\" metadata=\"%S\" user=\"%S\" group=\"%S\" permissions=\"%S\" atime=\"%S\" mtime=\"%S\" ctime=\"%S\"%S",
 		      &beginning, &data, &metadata, &user, &group, &permissions, &atime, &mtime, &ctime, &end_tag);
 	if(go_ea)
 	{

@@ -1016,29 +1016,29 @@ namespace libdar
 	    infinint cat_size = get_cat_size();
 	    get_header().display(dialog);
 	    if(!cat_size.is_zero())
-		dialog.printf(gettext("Catalogue size in archive            : %i bytes\n"), &cat_size);
+		dialog.printf(gettext("Catalogue size in archive            : %i bytes"), &cat_size);
 	    else
-		dialog.printf(gettext("Catalogue size in archive            : N/A\n"));
-	    dialog.printf("\n");
+		dialog.printf(gettext("Catalogue size in archive            : N/A"));
+	    dialog.printf("");
 
 	    try
 	    {
 		if(get_sar_param(sub_file_size, first_file_size, last_file_size, file_number))
 		{
-		    dialog.printf(gettext("Archive is composed of %i file(s)\n"), &file_number);
+		    dialog.printf(gettext("Archive is composed of %i file(s)"), &file_number);
 		    if(file_number == 1)
-			dialog.printf(gettext("File size: %i bytes\n"), &last_file_size);
+			dialog.printf(gettext("File size: %i bytes"), &last_file_size);
 		    else
 		    {
 			if(first_file_size != sub_file_size)
-			    dialog.printf(gettext("First file size       : %i bytes\n"), &first_file_size);
-			dialog.printf(gettext("File size             : %i bytes\n"), &sub_file_size);
-			dialog.printf(gettext("Last file size        : %i bytes\n"), &last_file_size);
+			    dialog.printf(gettext("First file size       : %i bytes"), &first_file_size);
+			dialog.printf(gettext("File size             : %i bytes"), &sub_file_size);
+			dialog.printf(gettext("Last file size        : %i bytes"), &last_file_size);
 		    }
 		    if(file_number > 1)
 		    {
 			infinint total = first_file_size + (file_number-2)*sub_file_size + last_file_size;
-			dialog.printf(gettext("Archive total size is : %i bytes\n"), &total);
+			dialog.printf(gettext("Archive total size is : %i bytes"), &total);
 		    }
 		}
 		else // not reading from a sar
@@ -1046,8 +1046,8 @@ namespace libdar
 		    infinint arch_size = get_level2_size();
 		    if(!arch_size.is_zero())
 		    {
-			dialog.printf(gettext("Archive size is: %i bytes\n"), &arch_size);
-			dialog.printf(gettext("Previous archive size does not include headers present in each slice\n"));
+			dialog.printf(gettext("Archive size is: %i bytes"), &arch_size);
+			dialog.printf(gettext("Previous archive size does not include headers present in each slice"));
 		    }
 		    else
 			dialog.printf(gettext("Archive size is unknown (reading from a pipe)"));
@@ -1056,7 +1056,7 @@ namespace libdar
 	    catch(Erange & e)
 	    {
 		string msg = e.get_message();
-		dialog.printf("%S\n", &msg);
+		dialog.printf("%S", &msg);
 	    }
 
 	    entree_stats stats = get_cat().get_stats();
@@ -2673,7 +2673,7 @@ namespace libdar
                && real_decoupe->get_last_file_size(last_file_size))
                 return true;
             else // could not read size parameters
-                throw Erange("archive::get_sar_param", gettext("Sorry, file size is unknown at this step of the program.\n"));
+                throw Erange("archive::get_sar_param", gettext("Sorry, file size is unknown at this step of the program."));
         }
         else
             return false;

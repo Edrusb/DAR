@@ -73,14 +73,14 @@ namespace libdar5
 		string compr = compression2string(get_compression());
 		string dar_path = get_dar_path();
 		string db_version = get_database_version();
-		dialog.warning("\n");
-		dialog.printf(gettext("dar path        : %S\n"), &dar_path);
-		dialog.printf(gettext("dar options     : %S\n"), &opt);
-		dialog.printf(gettext("database version: %S\n"), &db_version);
-		dialog.printf(gettext("compression used: %S\n"), &compr);
-		dialog.warning("\n");
-		dialog.printf(gettext("archive #   |    path      |    basename\n"));
-		dialog.printf("------------+--------------+---------------\n");
+		dialog.warning("");
+		dialog.printf(gettext("dar path        : %S"), &dar_path);
+		dialog.printf(gettext("dar options     : %S"), &opt);
+		dialog.printf(gettext("database version: %S"), &db_version);
+		dialog.printf(gettext("compression used: %S"), &compr);
+		dialog.warning("");
+		dialog.printf(gettext("archive #   |    path      |    basename"));
+		dialog.printf("------------+--------------+---------------");
 	    }
 
 	    string road, base;
@@ -94,7 +94,7 @@ namespace libdar5
 		else
 		{
 		    opt = (road == "") ? gettext("<empty>") : road;
-		    dialog.printf(" \t%u\t%S\t%S\n", i, &opt, &base);
+		    dialog.printf(" \t%u\t%S\t%S", i, &opt, &base);
 		}
 	    }
 	}
@@ -144,8 +144,8 @@ namespace libdar5
 	{
 	    if(!dialog.get_use_dar_manager_statistics())
 	    {
-		dialog.printf(gettext("  archive #   |  most recent/total data |  most recent/total EA\n"));
-		dialog.printf(gettext("--------------+-------------------------+-----------------------\n")); // having it with gettext let the translater adjust columns width
+		dialog.printf(gettext("  archive #   |  most recent/total data |  most recent/total EA"));
+		dialog.printf(gettext("--------------+-------------------------+-----------------------")); // having it with gettext let the translater adjust columns width
 	    }
 	    libdar::database::show_most_recent_stats(statistics_callback, &dialog);
 	}
@@ -186,7 +186,7 @@ namespace libdar5
 	    else
 		etat += gettext("[       ]");
 
-	    dialog->printf("%S  %S\n", &etat, &filename);
+	    dialog->printf("%S  %S", &etat, &filename);
 	}
     }
 
@@ -279,7 +279,7 @@ namespace libdar5
 	if(dialog->get_use_dar_manager_show_version())
 	    dialog->dar_manager_show_version(num, data_date, data_state, ea_date, ea_state);
 	else
-	    dialog->printf(" \t%u\t%S  %S  %S  %S\n", num, &data_date, &data_state, &ea_date, &ea_state);
+	    dialog->printf(" \t%u\t%S  %S  %S  %S", num, &data_date, &data_state, &ea_date, &ea_state);
     }
 
     void database::statistics_callback(void *tag,
@@ -297,7 +297,7 @@ namespace libdar5
 	if(dialog->get_use_dar_manager_statistics())
 	    dialog->dar_manager_statistics(number, data_count, total_data, ea_count, total_ea);
 	else
-	    dialog->printf("\t%u %i/%i \t\t\t %i/%i\n", number, &data_count, &total_data, &ea_count, &total_ea);
+	    dialog->printf("\t%u %i/%i \t\t\t %i/%i", number, &data_count, &total_data, &ea_count, &total_ea);
     }
 
 

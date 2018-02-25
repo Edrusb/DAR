@@ -65,7 +65,17 @@ namespace libdar
 	bool pause(const std::string & message);
 	std::string get_string(const std::string & message, bool echo);
 	secu_string get_secu_string(const std::string & message, bool echo);
-	void printf(const char *format, ...);
+
+	    /// libdar uses this call to format output before send to message() method.
+
+	    //! This is not a virtual method, it has not to be overwritten, it is
+	    //! just a sublayer over warning()
+	    //! Supported masks for the format string are:
+	    //! - \%s \%c \%d \%\%  (normal behavior)
+	    //! - \%i (matches infinint *)
+	    //! - \%S (matches std::string *)
+	    //! .
+	virtual void printf(const char *format, ...);
 
 
 	    /// make a newly allocated object which has the same properties as "this".

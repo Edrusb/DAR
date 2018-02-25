@@ -397,13 +397,13 @@ namespace libdar
 	string asym = get_edition() >= 9 && (get_crypted_key() != nullptr) ? "gnupg" : gettext("none");
 	string xsigned = is_signed() ? gettext("yes") : gettext("no");
 
-	dialog.printf(gettext("Archive version format               : %s\n"), get_edition().display().c_str());
-	dialog.printf(gettext("Compression algorithm used           : %S\n"), &algo);
-	dialog.printf(gettext("Symmetric key encryption used        : %S\n"), &sym);
-	dialog.printf(gettext("Asymmetric key encryption used       : %S\n"), &asym);
-	dialog.printf(gettext("Archive is signed                    : %S\n"), &xsigned);
-	dialog.printf(gettext("Sequential reading marks             : %s\n"), (get_tape_marks() ? gettext("present") : gettext("absent")));
-	dialog.printf(gettext("User comment                         : %S\n"), &(get_command_line()));
+	dialog.printf(gettext("Archive version format               : %s"), get_edition().display().c_str());
+	dialog.printf(gettext("Compression algorithm used           : %S"), &algo);
+	dialog.printf(gettext("Symmetric key encryption used        : %S"), &sym);
+	dialog.printf(gettext("Asymmetric key encryption used       : %S"), &asym);
+	dialog.printf(gettext("Archive is signed                    : %S"), &xsigned);
+	dialog.printf(gettext("Sequential reading marks             : %s"), (get_tape_marks() ? gettext("present") : gettext("absent")));
+	dialog.printf(gettext("User comment                         : %S"), &(get_command_line()));
     }
 
     void header_version::copy_from(const header_version & ref)

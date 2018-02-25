@@ -142,7 +142,7 @@ namespace libdar
 			// by the libgcrypt documentation
 
 		    if(!gcry_check_version(MIN_VERSION_GCRYPT))
-			throw Erange("libdar_init_libgcrypt", tools_printf(gettext("Too old version for libgcrypt, minimum required version is %s\n"), MIN_VERSION_GCRYPT));
+			throw Erange("libdar_init_libgcrypt", tools_printf(gettext("Too old version for libgcrypt, minimum required version is %s"), MIN_VERSION_GCRYPT));
 
 			// initializing default sized secured memory for libgcrypt
 		    (void)gcry_control(GCRYCTL_INIT_SECMEM, 262144);
@@ -160,7 +160,7 @@ namespace libdar
 	    }
 	    else
 		if(!gcry_check_version(MIN_VERSION_GCRYPT))
-		    throw Erange("libdar_init_libgcrypt", tools_printf(gettext("Too old version for libgcrypt, minimum required version is %s\n"), MIN_VERSION_GCRYPT));
+		    throw Erange("libdar_init_libgcrypt", tools_printf(gettext("Too old version for libgcrypt, minimum required version is %s"), MIN_VERSION_GCRYPT));
 #endif
 
 	    // initializing gpgme

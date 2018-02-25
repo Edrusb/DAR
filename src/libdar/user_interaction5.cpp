@@ -148,26 +148,6 @@ namespace libdar5
 	throw Elibcall("user_interaction::dar_manager_show_version", "Not overwritten dar_manager_show_version() method has been called!");
     }
 
-
-    void user_interaction::printf(const char *format, ...)
-    {
-	va_list ap;
-	va_start(ap, format);
-	string output = "";
-	try
-	{
-	    output = libdar::tools_vprintf(format, ap);
-	}
-	catch(...)
-	{
-	    va_end(ap);
-	    throw;
-	}
-	va_end(ap);
-	libdar::tools_remove_last_char_if_equal_to('\n', output);
-	message(output);
-    }
-
     void user_interaction::inherited_message(const std::string & message)
     {
 	if(at_once > 0)
@@ -211,6 +191,25 @@ namespace libdar5
     secu_string user_interaction::inherited_get_secu_string(const string & message, bool echo)
     {
 	return get_secu_string(message, echo);
+    }
+
+    void user_interaction::printf(const char *format, ...)
+    {
+	va_list ap;
+	va_start(ap, format);
+	string output = "";
+	try
+	{
+	    output = libdar::tools_vprintf(format, ap);
+	}
+	catch(...)
+	{
+	    va_end(ap);
+	    throw;
+	}
+	va_end(ap);
+	libdar::tools_remove_last_char_if_equal_to('\n', output);
+	message(output);
     }
 
 } // end of namespace

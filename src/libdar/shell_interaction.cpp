@@ -453,7 +453,7 @@ namespace libdar
     {
 	if(output == nullptr)
 	    throw SRC_BUG; // shell_interaction has not been properly initialized
-	*output << mesg;
+	*output << mesg << endl;
     }
 
 

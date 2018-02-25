@@ -1309,24 +1309,24 @@ namespace libdar
             const char *endy = nullptr;
             string time_accuracy = "";
 
-            dialog.printf(gettext("   Libz compression (gzip)      : %s\n"), YES_NO(compile_time::libz()));
-            dialog.printf(gettext("   Libbz2 compression (bzip2)   : %s\n"), YES_NO(compile_time::libbz2()));
-            dialog.printf(gettext("   Liblzo2 compression (lzo)    : %s\n"), YES_NO(compile_time::liblzo()));
-            dialog.printf(gettext("   Liblzma compression (xz)     : %s\n"), YES_NO(compile_time::libxz()));
-            dialog.printf(gettext("   Strong encryption (libgcrypt): %s\n"), YES_NO(compile_time::libgcrypt()));
-            dialog.printf(gettext("   Public key ciphers (gpgme)   : %s\n"), YES_NO(compile_time::public_key_cipher()));
-            dialog.printf(gettext("   Extended Attributes support  : %s\n"), YES_NO(compile_time::ea()));
-            dialog.printf(gettext("   Large files support (> 2GB)  : %s\n"), YES_NO(compile_time::largefile()));
-            dialog.printf(gettext("   ext2fs NODUMP flag support   : %s\n"), YES_NO(compile_time::nodump()));
-            dialog.printf(gettext("   Special allocation scheme    : %s\n"), YES_NO(compile_time::special_alloc()));
+            dialog.printf(gettext("   Libz compression (gzip)      : %s"), YES_NO(compile_time::libz()));
+            dialog.printf(gettext("   Libbz2 compression (bzip2)   : %s"), YES_NO(compile_time::libbz2()));
+            dialog.printf(gettext("   Liblzo2 compression (lzo)    : %s"), YES_NO(compile_time::liblzo()));
+            dialog.printf(gettext("   Liblzma compression (xz)     : %s"), YES_NO(compile_time::libxz()));
+            dialog.printf(gettext("   Strong encryption (libgcrypt): %s"), YES_NO(compile_time::libgcrypt()));
+            dialog.printf(gettext("   Public key ciphers (gpgme)   : %s"), YES_NO(compile_time::public_key_cipher()));
+            dialog.printf(gettext("   Extended Attributes support  : %s"), YES_NO(compile_time::ea()));
+            dialog.printf(gettext("   Large files support (> 2GB)  : %s"), YES_NO(compile_time::largefile()));
+            dialog.printf(gettext("   ext2fs NODUMP flag support   : %s"), YES_NO(compile_time::nodump()));
+            dialog.printf(gettext("   Special allocation scheme    : %s"), YES_NO(compile_time::special_alloc()));
             if(compile_time::bits() == 0)
-                dialog.printf(gettext("   Integer size used            : unlimited\n"));
+                dialog.printf(gettext("   Integer size used            : unlimited"));
             else
-                dialog.printf(gettext("   Integer size used            : %d bits\n"), compile_time::bits());
-            dialog.printf(gettext("   Thread safe support          : %s\n"), YES_NO(compile_time::thread_safe()));
-            dialog.printf(gettext("   Furtive read mode support    : %s\n"), YES_NO(compile_time::furtive_read()));
-            dialog.printf(gettext("   Linux ext2/3/4 FSA support   : %s\n"), YES_NO(compile_time::FSA_linux_extX()));
-            dialog.printf(gettext("   Mac OS X HFS+ FSA support    : %s\n"), YES_NO(compile_time::FSA_birthtime()));
+                dialog.printf(gettext("   Integer size used            : %d bits"), compile_time::bits());
+            dialog.printf(gettext("   Thread safe support          : %s"), YES_NO(compile_time::thread_safe()));
+            dialog.printf(gettext("   Furtive read mode support    : %s"), YES_NO(compile_time::furtive_read()));
+            dialog.printf(gettext("   Linux ext2/3/4 FSA support   : %s"), YES_NO(compile_time::FSA_linux_extX()));
+            dialog.printf(gettext("   Mac OS X HFS+ FSA support    : %s"), YES_NO(compile_time::FSA_birthtime()));
 
             switch(compile_time::system_endian())
             {
@@ -1349,16 +1349,16 @@ namespace libdar
                 time_accuracy = "1 microsecond";
             else
                 time_accuracy = "1 s";
-            dialog.printf(gettext("   Timestamp read accuracy      : %S\n"), &time_accuracy);
+            dialog.printf(gettext("   Timestamp read accuracy      : %S"), &time_accuracy);
             if(compile_time::microsecond_write())
                 time_accuracy = "1 microsecond";
             else
                 time_accuracy = "1 s";
-            dialog.printf(gettext("   Timestamp write accuracy     : %S\n"), &time_accuracy);
-            dialog.printf(gettext("   Restores dates of symlinks   : %s\n"), YES_NO(compile_time::symlink_restore_dates()));
-	    dialog.printf(gettext("   Can uses multiple threads    : %s\n"), YES_NO(compile_time::libthreadar()));
-	    dialog.printf(gettext("   Delta compression support    : %s\n"), YES_NO(compile_time::librsync()));
-	    dialog.printf(gettext("   Remote repository support    : %s\n"), YES_NO(compile_time::remote_repository()));
+            dialog.printf(gettext("   Timestamp write accuracy     : %S"), &time_accuracy);
+            dialog.printf(gettext("   Restores dates of symlinks   : %s"), YES_NO(compile_time::symlink_restore_dates()));
+	    dialog.printf(gettext("   Can uses multiple threads    : %s"), YES_NO(compile_time::libthreadar()));
+	    dialog.printf(gettext("   Delta compression support    : %s"), YES_NO(compile_time::librsync()));
+	    dialog.printf(gettext("   Remote repository support    : %s"), YES_NO(compile_time::remote_repository()));
         }
         catch(...)
         {

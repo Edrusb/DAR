@@ -115,7 +115,7 @@ namespace libdar
         if(message_cb == nullptr)
 	    throw SRC_BUG;
         else
-	    (*message_cb)(message + '\n', context_val);
+	    (*message_cb)(message, context_val);
     }
 
     bool user_interaction_callback::inherited_pause(const string & message)

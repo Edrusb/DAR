@@ -125,23 +125,25 @@ namespace libdar
 
     void entree_stats::listing(user_interaction & dialog) const
     {
-        dialog.printf(gettext("\nCATALOGUE CONTENTS :\n\n"));
-        dialog.printf(gettext("total number of inode : %i\n"), &total);
-        dialog.printf(gettext("saved inode           : %i\n"), &saved);
-        dialog.printf(gettext("distribution of inode(s)\n"));
-        dialog.printf(gettext(" - directories        : %i\n"), &num_d);
-        dialog.printf(gettext(" - plain files        : %i\n"), &num_f);
-        dialog.printf(gettext(" - symbolic links     : %i\n"), &num_l);
-        dialog.printf(gettext(" - named pipes        : %i\n"), &num_p);
-        dialog.printf(gettext(" - unix sockets       : %i\n"), &num_s);
-        dialog.printf(gettext(" - character devices  : %i\n"), &num_c);
-        dialog.printf(gettext(" - block devices      : %i\n"), &num_b);
-	dialog.printf(gettext(" - Door entries       : %i\n"), &num_D);
-        dialog.printf(gettext("hard links information\n"));
-        dialog.printf(gettext(" - number of inode with hard link           : %i\n"), &num_hard_linked_inodes);
-        dialog.printf(gettext(" - number of reference to hard linked inodes: %i\n"), &num_hard_link_entries);
-        dialog.printf(gettext("destroyed entries information\n"));
-        dialog.printf(gettext("   %i file(s) have been record as destroyed since backup of reference\n\n"), &num_x);
+	dialog.printf("");
+        dialog.printf(gettext("CATALOGUE CONTENTS :"));
+        dialog.printf(gettext("total number of inode : %i"), &total);
+        dialog.printf(gettext("saved inode           : %i"), &saved);
+        dialog.printf(gettext("distribution of inode(s)"));
+        dialog.printf(gettext(" - directories        : %i"), &num_d);
+        dialog.printf(gettext(" - plain files        : %i"), &num_f);
+        dialog.printf(gettext(" - symbolic links     : %i"), &num_l);
+        dialog.printf(gettext(" - named pipes        : %i"), &num_p);
+        dialog.printf(gettext(" - unix sockets       : %i"), &num_s);
+        dialog.printf(gettext(" - character devices  : %i"), &num_c);
+        dialog.printf(gettext(" - block devices      : %i"), &num_b);
+	dialog.printf(gettext(" - Door entries       : %i"), &num_D);
+        dialog.printf(gettext("hard links information"));
+        dialog.printf(gettext(" - number of inode with hard link           : %i"), &num_hard_linked_inodes);
+        dialog.printf(gettext(" - number of reference to hard linked inodes: %i"), &num_hard_link_entries);
+        dialog.printf(gettext("destroyed entries information"));
+        dialog.printf(gettext("   %i file(s) have been record as destroyed since backup of reference"), &num_x);
+	dialog.printf("");
     }
 
     cat_entree *cat_entree::read(user_interaction & dialog,

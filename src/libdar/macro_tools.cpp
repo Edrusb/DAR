@@ -822,7 +822,7 @@ namespace libdar
 		dialog.message(gettext("All layers have been created successfully"));
 
 	    if(ver.is_ciphered())
-		dialog.printf(gettext("Warning, the archive %S has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted\n"),  &basename);
+		dialog.printf(gettext("Warning, the archive %S has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted"),  &basename);
 	}
 	catch(...)
 	{
