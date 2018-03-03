@@ -55,8 +55,6 @@ namespace libdar
 	user_interaction_blind & operator = (user_interaction_blind && ref) noexcept = default;
 	~user_interaction_blind() = default;
 
-	virtual user_interaction *clone() const override { user_interaction *ret = new (std::nothrow) user_interaction_blind(); if(ret == nullptr) throw Ememory("user_interaction_blind::clone"); return ret; };
-
     protected:
 	virtual void inherited_message(const std::string & message) override { }; // do nothing
 	virtual bool inherited_pause(const std::string & message) override { return false; };

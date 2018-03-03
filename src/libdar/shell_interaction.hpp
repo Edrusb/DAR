@@ -84,10 +84,6 @@ namespace libdar
 	    //! method works as expected.
 	void warning_with_more(U_I num) { at_once = num; count = 0; };
 
-
-	    /// overwritting method from parent class.
-	virtual user_interaction *clone() const override { user_interaction *ret = new (std::nothrow) shell_interaction(*this); if(ret == nullptr) throw Ememory("shell_interaction::clone"); return ret; };
-
     protected:
 	    // inherited methods from user_interaction class
 

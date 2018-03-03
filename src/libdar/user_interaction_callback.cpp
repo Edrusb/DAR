@@ -141,13 +141,4 @@ namespace libdar
 	    return (*get_secu_string_cb)(message, echo, context_val);
     }
 
-    user_interaction * user_interaction_callback::clone() const
-    {
-	user_interaction *ret = new (nothrow) user_interaction_callback(*this); // copy constructor
-	if(ret == nullptr)
-	    throw Ememory("user_interaction_callback::clone");
-	else
-	    return ret;
-    }
-
 } // end of namespace

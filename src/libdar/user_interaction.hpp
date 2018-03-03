@@ -78,15 +78,6 @@ namespace libdar
 	virtual void printf(const char *format, ...);
 
 
-	    /// make a newly allocated object which has the same properties as "this".
-
-	    //! This *is* a virtual method, it *must* be overwritten in any inherited class
-	    //! copy constructor and = operator may have to be overwritten too if necessary
-	    //! Warning !
-	    //! clone() must throw exception if necessary (Ememory), but never
-	    //! return a nullptr pointer !
-	virtual user_interaction *clone() const = 0;
-
     protected:
 	    /// method used to display a warning or a message to the user.
 	    ///

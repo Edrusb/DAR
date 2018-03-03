@@ -98,10 +98,6 @@ namespace libdar
 
 	    /// dar_manager_get_show_version callback can now be passed directly to database::get_version()
 
-
-	    /// overwritting method from parent class.
-	virtual user_interaction *clone() const override;
-
     protected:
 
 	    /// overwritting method from parent class.

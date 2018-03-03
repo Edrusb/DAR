@@ -144,7 +144,7 @@ namespace libdar
 		do
 		{
 		    err = curl_easy_perform(easyh.get_root_handle());
-		    fichier_libcurl_check_wait_or_throw(get_ui(),
+		    fichier_libcurl_check_wait_or_throw(get_pointer(),
 							err,
 							wait_delay,
 							tools_printf(gettext("Error met while listing FTP/SFTP directory %s"),
@@ -351,7 +351,7 @@ namespace libdar
 		do
 		{
 		    err = curl_easy_perform(easyh.get_root_handle());
-		    fichier_libcurl_check_wait_or_throw(get_ui(),
+		    fichier_libcurl_check_wait_or_throw(get_pointer(),
 							err,
 							wait_delay,
 							tools_printf(gettext("Error met while removing file %S"),

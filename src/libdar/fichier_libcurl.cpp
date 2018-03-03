@@ -142,7 +142,7 @@ namespace libdar
 	    do
 	    {
 		err = curl_easy_perform(ehandle.get_handle());
-		fichier_libcurl_check_wait_or_throw(get_ui(),
+		fichier_libcurl_check_wait_or_throw(get_pointer(),
 						    err,
 						    wait_delay,
 						    tools_printf(gettext("%s: %s"),
@@ -186,7 +186,7 @@ namespace libdar
 	    do
 	    {
 		err = curl_easy_perform(ehandle.get_handle());
-		fichier_libcurl_check_wait_or_throw(get_ui(),
+		fichier_libcurl_check_wait_or_throw(get_pointer(),
 						    err,
 						    wait_delay,
 						    tools_printf(gettext("Error met while fetching file size: %s"),
@@ -460,12 +460,13 @@ namespace libdar
 		// parent thread is still suspended
 
 	    CURLcode err;
-	    user_interaction *thread_ui = nullptr;
+	    shared_ptr<user_interaction> thread_ui = get_pointer();
 	    infinint local_network_block = network_block; // set before unlocking parent thread
 
 	    try
 	    {
-		thread_ui = get_ui().clone();
+		if(!thread_ui)
+		    throw Ememory("fichier_libcurl::inherited_run");
 		subthread_cur_offset = current_offset;
 	    }
 	    catch(...)
@@ -478,70 +479,59 @@ namespace libdar
 
 	    initialize_subthread();
 
-	    try
+	    if(local_network_block.is_zero()) // network_block may be non null only in read-only mode
 	    {
-		if(local_network_block.is_zero()) // network_block may be non null only in read-only mode
+		do
 		{
+		    err = curl_easy_perform(ehandle.get_handle());
+		    if(!end_data_mode)
+			fichier_libcurl_check_wait_or_throw(thread_ui,
+							    err,
+							    wait_delay,
+							    gettext("Error met during network transfer: "));
+		}
+		while(err != CURLE_OK && !end_data_mode);
+	    }
+	    else // reading by block to avoid having interrupting libcurl
+	    {
+		infinint cycle_subthread_net_offset;
+
+		do
+		{
+		    cycle_subthread_net_offset = 0; // how many bytes have will we read in the next do/while loop
 		    do
 		    {
-			err = curl_easy_perform(ehandle.get_handle());
-			if(!end_data_mode)
-			    fichier_libcurl_check_wait_or_throw(*thread_ui,
+			subthread_net_offset = 0; // keeps trace of the amount of bytes sent to main thread by callback
+			set_range(subthread_cur_offset, local_network_block);
+			try
+			{
+			    err = curl_easy_perform(ehandle.get_handle());
+			    if(err == CURLE_BAD_DOWNLOAD_RESUME)
+				err = CURLE_OK;
+			    fichier_libcurl_check_wait_or_throw(thread_ui,
 								err,
 								wait_delay,
-								gettext("Error met during network transfer: "));
+								tools_printf(gettext("Error met while reading a block of data: %s"),
+									     curl_easy_strerror(err)));
+			    subthread_cur_offset += subthread_net_offset;
+			    if(local_network_block < subthread_net_offset)
+				throw SRC_BUG; // we acquired more data from libcurl than expected!
+			    local_network_block -= subthread_net_offset;
+			    cycle_subthread_net_offset += subthread_net_offset;
+			}
+			catch(...)
+			{
+			    unset_range();
+			    throw;
+			}
+			unset_range();
 		    }
 		    while(err != CURLE_OK && !end_data_mode);
 		}
-		else // reading by block to avoid having interrupting libcurl
-		{
-		    infinint cycle_subthread_net_offset;
-
-		    do
-		    {
-			cycle_subthread_net_offset = 0; // how many bytes have will we read in the next do/while loop
-			do
-			{
-			    subthread_net_offset = 0; // keeps trace of the amount of bytes sent to main thread by callback
-			    set_range(subthread_cur_offset, local_network_block);
-			    try
-			    {
-				err = curl_easy_perform(ehandle.get_handle());
-				if(err == CURLE_BAD_DOWNLOAD_RESUME)
-				    err = CURLE_OK;
-				fichier_libcurl_check_wait_or_throw(*thread_ui,
-								    err,
-								    wait_delay,
-								    tools_printf(gettext("Error met while reading a block of data: %s"),
-										 curl_easy_strerror(err)));
-				subthread_cur_offset += subthread_net_offset;
-				if(local_network_block < subthread_net_offset)
-				    throw SRC_BUG; // we acquired more data from libcurl than expected!
-				local_network_block -= subthread_net_offset;
-				cycle_subthread_net_offset += subthread_net_offset;
-			    }
-			    catch(...)
-			    {
-				unset_range();
-				throw;
-			    }
-			    unset_range();
-			}
-			while(err != CURLE_OK && !end_data_mode);
-		    }
-		    while(!cycle_subthread_net_offset.is_zero()     // we just grabbed some data in this ending cycle (not reached eof)
-			  && !end_data_mode                   // the current thread has not been asked to stop
-			  && !local_network_block.is_zero()); // whe still not have gathered all the requested data
-		}
+		while(!cycle_subthread_net_offset.is_zero()     // we just grabbed some data in this ending cycle (not reached eof)
+		      && !end_data_mode                   // the current thread has not been asked to stop
+		      && !local_network_block.is_zero()); // whe still not have gathered all the requested data
 	    }
-	    catch(...)
-	    {
-		delete thread_ui;
-		thread_ui = nullptr;
-		throw;
-	    }
-	    delete thread_ui;
-	    thread_ui = nullptr;
 	}
 	catch(...)
 	{
@@ -907,7 +897,7 @@ namespace libdar
 	return 0;
     }
 
-    void fichier_libcurl_check_wait_or_throw(user_interaction & dialog,
+    void fichier_libcurl_check_wait_or_throw(const shared_ptr<user_interaction> & dialog,
 					     CURLcode err,
 					     U_I wait_seconds,
 					     const string & err_context)
@@ -962,16 +952,16 @@ namespace libdar
 	default:
 	    if(wait_seconds > 0)
 	    {
-		dialog.printf(gettext("%S: %s, retrying in %d seconds"),
+		dialog->printf(gettext("%S: %s, retrying in %d seconds"),
 			      &err_context,
 			      curl_easy_strerror(err),
 			      wait_seconds);
 		sleep(wait_seconds);
 	    }
 	    else
-		dialog.pause(tools_printf(gettext("%S: %s, do we retry network operation?"),
-					  &err_context,
-					  curl_easy_strerror(err)));
+		dialog->pause(tools_printf(gettext("%S: %s, do we retry network operation?"),
+					   &err_context,
+					   curl_easy_strerror(err)));
 	    break;
 	}
     }

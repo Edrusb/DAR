@@ -195,13 +195,13 @@ namespace libdar
 	/// \param[in] err is the curl easy code to examin
 	/// \param[in] wait_seconds is the time to wait for recoverable error
 	/// \param[in] err_context is the error context message use to prepend waiting message or exception throw
-    extern void fichier_libcurl_check_wait_or_throw(user_interaction & dialog,
+    extern void fichier_libcurl_check_wait_or_throw(const std::shared_ptr<user_interaction> & dialog,
 						    CURLcode err,
 						    U_I wait_seconds,
 						    const std::string & err_context);
 #else
 #if LIBCURL_AVAILABLE
-    inline void fichier_libcurl_check_wait_or_throw(user_interaction & dialog,
+    inline void fichier_libcurl_check_wait_or_throw(const std::shared_ptr<user_interaction> & dialog,
 						    CURLcode err,
 						    U_I wait_seconds,
 						    const std::string & err_context)
