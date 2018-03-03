@@ -172,6 +172,14 @@ extern void line_tools_crypto_split_algo_pass(const secu_string & all,
     /// display information about the signatories
 extern void line_tools_display_signatories(user_interaction & ui, const std::list<signator> & gnupg_signed);
 
+	/// Extract from anonymous pipe a tlv_list
+
+	/// \param[in,out] dialog for user interaction
+	/// \param[in] fd the filedescriptor for the anonymous pipe's read extremity
+	/// \param[out] result the resulting tlv_list
+extern void line_tools_read_from_pipe(user_interaction & dialog, S_I fd, tlv_list & result);
+
+
     /// @}
 
 #endif

@@ -1771,7 +1771,7 @@ static bool get_args_recursive(recursive_param & rec,
                     argc_argv arg;
                     bool ret;
 
-                    tools_read_from_pipe(*rec.dialog, tools_str2int(optarg), tmp);
+                    line_tools_read_from_pipe(*rec.dialog, tools_str2int(optarg), tmp);
                     line_tools_tlv_list2argv(*rec.dialog, tmp, arg);
 
                     S_I optind_mem = line_tools_reset_getopt(); // save the external variable to use recursivity (see getopt)

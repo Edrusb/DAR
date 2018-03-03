@@ -41,6 +41,7 @@ extern "C"
 
 #include "line_tools.hpp"
 #include "tools.hpp"
+#include "tuyau.hpp"
 
 using namespace std;
 using namespace libdar5;
@@ -872,6 +873,17 @@ void line_tools_display_signatories(user_interaction & ui, const list<signator> 
     }
     ui.printf("------------------+----------------+----------------------------------------+-------------------------+");
     ui.printf(" For more information about a key, use the command: gpg --list-key <fingeprint>");
+}
+
+void line_tools_read_from_pipe(user_interaction & dialog, S_I fd, tlv_list & result)
+{
+    user_interaction *tmp = dialog.clone();
+
+    if(tmp == nullptr)
+	throw Ememory("line_tools_read_from_pipe");
+
+    tuyau tube = tuyau(shared_ptr<user_interaction>(tmp), fd);
+    result.read(tube);
 }
 
 ///////////////////

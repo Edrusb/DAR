@@ -61,6 +61,7 @@ extern "C"
 #include "entrepot_local.hpp"
 #include "data_tree.hpp"
 #include "database5.hpp"
+#include "tuyau.hpp"
 
     /// \addtogroup API5
     /// @{
@@ -322,7 +323,6 @@ namespace libdar5
     using libdar::tools_split_entrepot_path;
     using libdar::tools_split_path_basename;
     using libdar::tools_str2int;
-    using libdar::tools_read_from_pipe;
     using libdar::tools_extract_basename;
     using libdar::tools_str2charptr;
     using libdar::tools_merge_to_deque;
@@ -366,6 +366,9 @@ namespace libdar5
 
 	// from datetime
     using libdar::datetime;
+
+	// from tuyau
+    using libdar::tuyau;
 
 
 	///  libdar Major version defined at compilation time

@@ -2858,17 +2858,6 @@ namespace libdar
 	return (U_I)(max*((float)(rand())/RAND_MAX));
     }
 
-    void tools_read_from_pipe(user_interaction & dialog, S_I fd, tlv_list & result)
-    {
-	user_interaction *tmp = dialog.clone();
-
-	if(tmp == nullptr)
-	    throw Ememory("tools_read_from_pipe");
-
-        tuyau tube = tuyau(shared_ptr<user_interaction>(tmp), fd);
-        result.read(tube);
-    }
-
     string tools_unsigned_char_to_hexa(unsigned char x)
     {
         string ret;

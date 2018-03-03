@@ -874,15 +874,6 @@ namespace libdar
 
 
 
-	/// Extract from anonymous pipe a tlv_list
-
-	/// \param[in,out] dialog for user interaction
-	/// \param[in] fd the filedescriptor for the anonymous pipe's read extremity
-	/// \param[out] result the resulting tlv_list
-    extern void tools_read_from_pipe(user_interaction & dialog, S_I fd, tlv_list & result);
-
-
-
 	/// Produces a pseudo random number x, where 0 <= x < max
 
 	/// \param[in] max defines the range of the random number to return
