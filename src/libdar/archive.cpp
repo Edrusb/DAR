@@ -70,16 +70,13 @@ namespace libdar
                      const path & chem,
 		     const string & basename,
 		     const string & extension,
-		     const archive_options_read & options)
+		     const archive_options_read & options): mem_ui(dialog)
     {
         NLS_SWAP_IN;
         try
         {
 	    entrepot *where = options.get_entrepot().clone();
 	    bool info_details = options.get_info_details();
-
-	    if(!dialog)
-		throw SRC_BUG; // dialog points to nothing
 
 	    if(where == nullptr)
 		throw Ememory("archive::archive");
@@ -105,7 +102,7 @@ namespace libdar
 			dialog->printf(gettext("Opening archive %s ..."), basename.c_str());
 
 			// we open the main archive to get the different layers (level1, scram and level2).
-		    macro_tools_open_archive(dialog,
+		    macro_tools_open_archive(get_pointer(),
 					     *where,
 					     basename,
 					     options.get_slice_min_digits(),
@@ -130,7 +127,7 @@ namespace libdar
 
 		    if(options.get_header_only())
 		    {
-			ver.display(*dialog);
+			ver.display(get_ui());
 			throw Erange("archive::achive",
 				     gettext("header only mode asked"));
 		    }
@@ -161,7 +158,7 @@ namespace libdar
 				    throw Erange("archive::archive", gettext("The basename '+' is reserved for special a purpose that has no meaning in this context"));
 
 				    // we open the archive of reference also to get its different layers (ref_stack)
-				macro_tools_open_archive(dialog,
+				macro_tools_open_archive(get_pointer(),
 							 *ref_where,
 							 options.get_ref_basename(),
 							 options.get_ref_slice_min_digits(),
@@ -379,7 +376,7 @@ namespace libdar
 			}
 		    }
 		    if(!options.get_ignore_signature_check_failure())
-			check_gnupg_signed(*dialog);
+			check_gnupg_signed();
 		    exploitable = true;
 		}
 		catch(...)
@@ -413,15 +410,12 @@ namespace libdar
                      const string & filename,
                      const string & extension,
 		     const archive_options_create & options,
-                     statistics * progressive_report)
+                     statistics * progressive_report): mem_ui(dialog)
     {
         NLS_SWAP_IN;
         try
         {
 	    cat = nullptr;
-
-	    if(!dialog)
-		throw SRC_BUG; // dialog points to nothing
 
 	    try
 	    {
@@ -435,8 +429,7 @@ namespace libdar
 		try
 		{
 		    sequential_read = false; // updating the archive field
-		    (void)op_create_in(dialog,
-				       oper_create,
+		    (void)op_create_in(oper_create,
 				       tools_relative2absolute_path(fs_root, tools_getcwd()),
 				       *sauv_path_t,
 				       options.get_reference(),
@@ -534,7 +527,7 @@ namespace libdar
 		     const string & filename,
 		     const string & extension,
 		     const archive_options_merge & options,
-		     statistics * progressive_report)
+		     statistics * progressive_report): mem_ui(dialog)
     {
 	statistics st = false;
 	statistics *st_ptr = progressive_report == nullptr ? &st : progressive_report;
@@ -549,9 +542,6 @@ namespace libdar
 	try
 	{
 	    cat = nullptr;
-
-	    if(!dialog)
-		throw SRC_BUG; // dialog points to nothing
 
 	    try
 	    {
@@ -576,7 +566,7 @@ namespace libdar
 		    if(options.get_crypto_size() < 10 && options.get_crypto_algo() != crypto_none)
 			throw Elibcall("op_merge", gettext("Crypto block size must be greater than 10 bytes"));
 
-		    check_libgcrypt_hash_bug(*dialog, options.get_hash_algo(), options.get_first_slice_size(), options.get_slice_size());
+		    check_libgcrypt_hash_bug(get_ui(), options.get_hash_algo(), options.get_first_slice_size(), options.get_slice_size());
 
 		    if(ref_arch1 != nullptr)
 			if(ref_arch1->only_contains_an_isolated_catalogue())
@@ -592,7 +582,7 @@ namespace libdar
 		    sauv_path_t->set_location(sauv_path);
 
 		    if(!options.get_empty() && sauv_path_t_local != nullptr)
-			tools_avoid_slice_overwriting_regex(*dialog,
+			tools_avoid_slice_overwriting_regex(get_ui(),
 							    *sauv_path_t,
 							    filename,
 							    extension,
@@ -662,8 +652,7 @@ namespace libdar
 		    }
 
 			// then we call op_create_in_sub which will call filter_merge operation to build the archive described by the catalogue
-		    op_create_in_sub(dialog,
-				     oper_merge,
+		    op_create_in_sub(oper_merge,
 				     path(FAKE_ROOT),
 				     *sauv_path_t,
 				     ref_cat1,
@@ -768,7 +757,7 @@ namespace libdar
 		     const path & chem_dst,
 		     const string & basename_dst,
 		     const string & extension_dst,
-		     const archive_options_repair & options_repair)
+		     const archive_options_repair & options_repair): mem_ui(dialog)
     {
 	archive_options_read my_options_read = options_read;
 	bool initial_pause = (options_read.get_entrepot() == options_repair.get_entrepot() && chem_src == chem_dst);
@@ -787,9 +776,6 @@ namespace libdar
 	    // slices will be set by op_create_in_sub()
 	    // local_cat_size not used while creating an archive
 
-	if(!dialog)
-	    throw SRC_BUG; // dialog points to nothing
-
 	    ////
 	    // initial parameter setup
 
@@ -803,7 +789,7 @@ namespace libdar
 	    sauv_path_t->set_group_ownership(options_repair.get_slice_group_ownership());
 	    sauv_path_t->set_location(chem_dst);
 
-	    tools_avoid_slice_overwriting_regex(*dialog,
+	    tools_avoid_slice_overwriting_regex(get_ui(),
 						*sauv_path_t,
 						basename_dst,
 						extension_dst,
@@ -826,8 +812,7 @@ namespace libdar
 	    if(src.cat == nullptr)
 		throw SRC_BUG;
 
-	    op_create_in_sub(dialog,
-			     oper_repair,
+	    op_create_in_sub(oper_repair,
 			     chem_dst,
 			     *sauv_path_t,
 			     src.cat,             // ref1
@@ -920,8 +905,7 @@ namespace libdar
     }
 
 
-    statistics archive::op_extract(const shared_ptr<user_interaction> & dialog,
-                                   const path & fs_root,
+    statistics archive::op_extract(const path & fs_root,
 				   const archive_options_extract & options,
 				   statistics * progressive_report)
     {
@@ -934,13 +918,10 @@ namespace libdar
 
                 // sanity checks
 
-	    if(!dialog)
-		throw SRC_BUG; // dialog points to nothing
-
 	    if(!exploitable)
                 throw Elibcall("op_extract", gettext("This archive is not exploitable, check documentation for more"));
 
-	    check_against_isolation(*dialog, lax_read_mode);
+	    check_against_isolation(lax_read_mode);
 		// this avoid to try extracting archive directly from an isolated catalogue
 		// the isolated catalogue can be used to extract data (since format "08") but only
 		// associated with the real plain archive, not alone.
@@ -958,7 +939,7 @@ namespace libdar
 
 	    try
 	    {
-		filtre_restore(dialog,
+		filtre_restore(get_pointer(),
 			       options.get_selection(),
 			       options.get_subtree(),
 			       get_cat(),
@@ -994,7 +975,7 @@ namespace libdar
 	    catch(Erange &e)
 	    {
 		string msg = string(gettext("Error while restoring data: ")) + e.get_message();
-		dialog->message(msg);
+		get_ui().message(msg);
 		throw Edata(msg);
 	    }
         }
@@ -1012,7 +993,7 @@ namespace libdar
         return *st_ptr;
     }
 
-    void archive::summary(const shared_ptr<user_interaction> & dialog)
+    void archive::summary()
     {
         NLS_SWAP_IN;
 
@@ -1020,9 +1001,6 @@ namespace libdar
         {
 
 		// sanity checks
-
-	    if(!dialog)
-		throw SRC_BUG; // dialog points to nothing
 
 	    if(!exploitable)
 		throw Elibcall("summary", gettext("This archive is not exploitable, check the archive class usage in the API documentation"));
@@ -1034,31 +1012,31 @@ namespace libdar
 	    infinint first_file_size;
 	    infinint last_file_size, file_number;
 	    infinint cat_size = get_cat_size();
-	    get_header().display(*dialog);
+	    get_header().display(get_ui());
 	    if(!cat_size.is_zero())
-		dialog->printf(gettext("Catalogue size in archive            : %i bytes"), &cat_size);
+		get_ui().printf(gettext("Catalogue size in archive            : %i bytes"), &cat_size);
 	    else
-		dialog->printf(gettext("Catalogue size in archive            : N/A"));
-	    dialog->printf("");
+		get_ui().printf(gettext("Catalogue size in archive            : N/A"));
+	    get_ui().printf("");
 
 	    try
 	    {
 		if(get_sar_param(sub_file_size, first_file_size, last_file_size, file_number))
 		{
-		    dialog->printf(gettext("Archive is composed of %i file(s)"), &file_number);
+		    get_ui().printf(gettext("Archive is composed of %i file(s)"), &file_number);
 		    if(file_number == 1)
-			dialog->printf(gettext("File size: %i bytes"), &last_file_size);
+			get_ui().printf(gettext("File size: %i bytes"), &last_file_size);
 		    else
 		    {
 			if(first_file_size != sub_file_size)
-			    dialog->printf(gettext("First file size       : %i bytes"), &first_file_size);
-			dialog->printf(gettext("File size             : %i bytes"), &sub_file_size);
-			dialog->printf(gettext("Last file size        : %i bytes"), &last_file_size);
+			    get_ui().printf(gettext("First file size       : %i bytes"), &first_file_size);
+			get_ui().printf(gettext("File size             : %i bytes"), &sub_file_size);
+			get_ui().printf(gettext("Last file size        : %i bytes"), &last_file_size);
 		    }
 		    if(file_number > 1)
 		    {
 			infinint total = first_file_size + (file_number-2)*sub_file_size + last_file_size;
-			dialog->printf(gettext("Archive total size is : %i bytes"), &total);
+			get_ui().printf(gettext("Archive total size is : %i bytes"), &total);
 		    }
 		}
 		else // not reading from a sar
@@ -1066,17 +1044,17 @@ namespace libdar
 		    infinint arch_size = get_level2_size();
 		    if(!arch_size.is_zero())
 		    {
-			dialog->printf(gettext("Archive size is: %i bytes"), &arch_size);
-			dialog->printf(gettext("Previous archive size does not include headers present in each slice"));
+			get_ui().printf(gettext("Archive size is: %i bytes"), &arch_size);
+			get_ui().printf(gettext("Previous archive size does not include headers present in each slice"));
 		    }
 		    else
-			dialog->printf(gettext("Archive size is unknown (reading from a pipe)"));
+			get_ui().printf(gettext("Archive size is unknown (reading from a pipe)"));
 		}
 	    }
 	    catch(Erange & e)
 	    {
 		string msg = e.get_message();
-		dialog->printf("%S", &msg);
+		get_ui().printf("%S", &msg);
 	    }
 
 	    entree_stats stats = get_cat().get_stats();
@@ -1090,18 +1068,18 @@ namespace libdar
 	    if(g_size < g_storage_size)
 	    {
 		infinint delta = g_storage_size - g_size;
-		dialog->printf(gettext("The overall archive size includes %i byte(s) wasted due to bad compression ratio"), &delta);
+		get_ui().printf(gettext("The overall archive size includes %i byte(s) wasted due to bad compression ratio"), &delta);
 	    }
 	    else
-		dialog->message(string(gettext("The global data compression ratio is: "))
+		get_ui().message(string(gettext("The global data compression ratio is: "))
 			       + tools_get_compression_ratio(g_storage_size,
 							     g_size,
 							     true));
 
 	    if(only_contains_an_isolated_catalogue())
-		dialog->printf(gettext("\nWARNING! This archive only contains the contents of another archive, it can only be used as reference for differential backup or as rescue in case of corruption of the original archive's content. You cannot restore any data from this archive alone\n"));
+		get_ui().printf(gettext("\nWARNING! This archive only contains the contents of another archive, it can only be used as reference for differential backup or as rescue in case of corruption of the original archive's content. You cannot restore any data from this archive alone\n"));
 
-	    stats.listing(*dialog);
+	    stats.listing(get_ui());
 	}
 	catch(...)
 	{
@@ -1115,8 +1093,7 @@ namespace libdar
 	    exploitable = false;
     }
 
-    void archive::op_listing(const shared_ptr<user_interaction> & dialog,
-			     catalogue_listing_callback callback,
+    void archive::op_listing(catalogue_listing_callback callback,
 			     void *context,
 			     const archive_options_listing & options)
     {
@@ -1131,16 +1108,13 @@ namespace libdar
 		// in the archive header/trailer which is a copy of the one of the archive of reference
 		// a warning is issued in that case
 
-	    if(!dialog)
-		throw SRC_BUG; // dialog points to nothing
-
             enable_natural_destruction();
             try
             {
                 switch(options.get_list_mode())
 		{
 		case archive_options_listing::normal:
-		    get_cat().tar_listing(*dialog,
+		    get_cat().tar_listing(get_ui(),
 					  callback,
 					  context,
 					  only_contains_an_isolated_catalogue(),
@@ -1152,7 +1126,7 @@ namespace libdar
 					  "");
 		    break;
 		case archive_options_listing::tree:
-		    get_cat().listing(*dialog,
+		    get_cat().listing(get_ui(),
 				      only_contains_an_isolated_catalogue(),
 				      options.get_selection(),
 				      options.get_subtree(),
@@ -1162,7 +1136,7 @@ namespace libdar
 				      "");
 		    break;
 		case archive_options_listing::xml:
-		    get_cat().xml_listing(*dialog,
+		    get_cat().xml_listing(get_ui(),
 					  only_contains_an_isolated_catalogue(),
 					  options.get_selection(),
 					  options.get_subtree(),
@@ -1180,10 +1154,10 @@ namespace libdar
 			    if(options.get_user_slicing(used_layout.first_size, used_layout.other_size))
 			    {
 				if(options.get_info_details())
-				    dialog->printf(gettext("Using user provided modified slicing (first slice = %i bytes, other slices = %i bytes)"), &used_layout.first_size, &used_layout.other_size);
+				    get_ui().printf(gettext("Using user provided modified slicing (first slice = %i bytes, other slices = %i bytes)"), &used_layout.first_size, &used_layout.other_size);
 			    }
 			    else
-				dialog->message(gettext("Using the slice layout of the archive of reference recorded at the time this isolated catalogue was done\n Note: if this reference has been resliced this isolated catalogue has been created, the resulting slicing information given here will be wrong and will probably lead to an error. Check documentation to know hos to manually specify the slicing to use"));
+				get_ui().message(gettext("Using the slice layout of the archive of reference recorded at the time this isolated catalogue was done\n Note: if this reference has been resliced this isolated catalogue has been created, the resulting slicing information given here will be wrong and will probably lead to an error. Check documentation to know hos to manually specify the slicing to use"));
 			}
 			else // no slicing of the archive of reference stored in this isolated catalogue's header/trailer
 			{
@@ -1193,12 +1167,12 @@ namespace libdar
 				// older than version 9.
 
 			    if(options.get_user_slicing(used_layout.first_size, used_layout.other_size))
-				dialog->message(gettext("Warning: No slice layout of the archive of reference has been recorded in this isolated catalogue. The additional slicing information you provided may still lead the operation to fail because the archive has an _unsupported_ (too old) format for this feature"));
+				get_ui().message(gettext("Warning: No slice layout of the archive of reference has been recorded in this isolated catalogue. The additional slicing information you provided may still lead the operation to fail because the archive has an _unsupported_ (too old) format for this feature"));
 			    else
 				throw Erange("archive::op_listing", gettext("No slice layout of the archive of reference for the current isolated catalogue is available, cannot provide slicing information, aborting"));
 			}
 		    }
-		    get_cat().slice_listing(*dialog,
+		    get_cat().slice_listing(get_ui(),
 					    only_contains_an_isolated_catalogue(),
 					    options.get_selection(),
 					    options.get_subtree(),
@@ -1231,8 +1205,7 @@ namespace libdar
 	    exploitable = false;
     }
 
-    statistics archive::op_diff(const std::shared_ptr<user_interaction> & dialog,
-                                const path & fs_root,
+    statistics archive::op_diff(const path & fs_root,
 				const archive_options_diff & options,
 				statistics * progressive_report)
     {
@@ -1246,20 +1219,16 @@ namespace libdar
 
                 // sanity checks
 
-	    if(!dialog)
-		throw SRC_BUG; // dialog points to nothing
-
-
             if(!exploitable)
                 throw Elibcall("op_diff", gettext("This archive is not exploitable, check documentation for more"));
 
 	    try
 	    {
-		check_against_isolation(*dialog, lax_read_mode);
+		check_against_isolation(lax_read_mode);
 	    }
 	    catch(Erange & e)
 	    {
-		dialog->message("This archive contains an isolated catalogue, only meta data can be used for comparison, CRC will be used to compare data of delta signature if present. Warning: Succeeding this comparison does not mean there is no difference as two different files may have the same CRC or the same delta signature");
+		get_ui().message("This archive contains an isolated catalogue, only meta data can be used for comparison, CRC will be used to compare data of delta signature if present. Warning: Succeeding this comparison does not mean there is no difference as two different files may have the same CRC or the same delta signature");
 		isolated_mode = true;
 	    }
                 // end of sanity checks
@@ -1268,7 +1237,7 @@ namespace libdar
             enable_natural_destruction();
             try
             {
-                filtre_difference(dialog,
+                filtre_difference(get_pointer(),
 				  options.get_selection(),
 				  options.get_subtree(),
 				  get_cat(),
@@ -1300,7 +1269,7 @@ namespace libdar
             catch(Erange & e)
             {
                 string msg = string(gettext("Error while comparing archive with filesystem: "))+e.get_message();
-                dialog->message(msg);
+                get_ui().message(msg);
                 throw Edata(msg);
             }
         }
@@ -1319,8 +1288,7 @@ namespace libdar
         return *st_ptr;
     }
 
-    statistics archive::op_test(const shared_ptr<user_interaction> & dialog,
-				const archive_options_test & options,
+    statistics archive::op_test(const archive_options_test & options,
 				statistics * progressive_report)
     {
         statistics st = false;  // false => no lock for this internal object
@@ -1333,15 +1301,12 @@ namespace libdar
 
                 // sanity checks
 
-	    if(!dialog)
-		throw SRC_BUG; // dialog points to nothing
-
             if(!exploitable)
                 throw Elibcall("op_test", gettext("This archive is not exploitable, check the archive class usage in the API documentation"));
 
 	    try
 	    {
-		check_against_isolation(*dialog, lax_read_mode);
+		check_against_isolation(lax_read_mode);
 	    }
 	    catch(Erange & e)
 	    {
@@ -1349,7 +1314,7 @@ namespace libdar
 		    // we can return normally at this point
 		    // as the catalogue has already been read
 		    // thus all that could be tested has been tested
-		dialog->message(gettext("WARNING! This is an isolated catalogue, no data or EA is present in this archive, only the catalogue structure can be checked"));
+		get_ui().message(gettext("WARNING! This is an isolated catalogue, no data or EA is present in this archive, only the catalogue structure can be checked"));
 		isolated = true;
 	    }
 
@@ -1370,7 +1335,7 @@ namespace libdar
 			cat->reset_read();
 		    }
 		    else
-			filtre_test(dialog,
+			filtre_test(get_pointer(),
 				    options.get_selection(),
 				    options.get_subtree(),
 				    get_cat(),
@@ -1383,7 +1348,7 @@ namespace libdar
 		}
 		catch(Erange & e)
 		{
-		    dialog->message(gettext("A problem occurred while reading this archive contents: ") + e.get_message());
+		    get_ui().message(gettext("A problem occurred while reading this archive contents: ") + e.get_message());
 		}
             }
             catch(Euser_abort & e)
@@ -1399,7 +1364,7 @@ namespace libdar
             catch(Erange & e)
             {
                 string msg = string(gettext("Error while testing archive: "))+e.get_message();
-                dialog->message(msg);
+                get_ui().message(msg);
                 throw Edata(msg);
             }
         }
@@ -1418,8 +1383,7 @@ namespace libdar
     }
 
 
-    void archive::op_isolate(const std::shared_ptr<user_interaction> & dialog,
-			     const path &sauv_path,
+    void archive::op_isolate(const path &sauv_path,
 			     const string & filename,
 			     const string & extension,
 			     const archive_options_isolate & options)
@@ -1433,9 +1397,6 @@ namespace libdar
 	    sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
 	    sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
 	    sauv_path_t->set_location(sauv_path);
-
-	    if(!dialog)
-		throw SRC_BUG; // dialog points to nothing
 
 	    try
 	    {
@@ -1456,7 +1417,7 @@ namespace libdar
 		internal_name = isol_data_name;
 
 
-		macro_tools_create_layers(dialog,
+		macro_tools_create_layers(get_pointer(),
 					  layers,
 					  isol_ver,
 					  isol_slices,
@@ -1526,7 +1487,7 @@ namespace libdar
 		    // should never equal the data_name of the catalogue
 		    // when performing isolation
 
-		macro_tools_close_layers(dialog,
+		macro_tools_close_layers(get_pointer(),
 					 layers,
 					 isol_ver,
 					 *cat,
@@ -1556,8 +1517,7 @@ namespace libdar
     }
 
 
-    bool archive::get_children_of(const shared_ptr<user_interaction> & dialog,
-				  catalogue_listing_callback callback,
+    bool archive::get_children_of(catalogue_listing_callback callback,
 				  void *context,
                                   const string & dir)
     {
@@ -1565,9 +1525,6 @@ namespace libdar
         NLS_SWAP_IN;
         try
         {
-
-	    if(!dialog)
-		throw SRC_BUG; // dialog points to nothing
 
 	    if(exploitable && sequential_read) // the catalogue is not even yet read, so we must first read it entirely
 	    {
@@ -1585,7 +1542,7 @@ namespace libdar
 			// here we have a plain archive, doing the test operation
 			// is the simplest way to read the whole archive and thus get its contents
 			// (i.e.: the catalogue)
-		    (void)op_test(dialog, archive_options_test(), nullptr);
+		    (void)op_test(archive_options_test(), nullptr);
 	    }
 
 		// OK, now that we have the whole catalogue available in memory, let's rock!
@@ -1745,7 +1702,7 @@ namespace libdar
 	return ret;
     }
 
-    void archive::init_catalogue(const shared_ptr<user_interaction> & dialog) const
+    void archive::init_catalogue() const
     {
 	NLS_SWAP_IN;
         try
@@ -1766,7 +1723,7 @@ namespace libdar
 		{
 		    if(cat == nullptr)
 			throw SRC_BUG;
-		    filtre_sequentially_read_all_catalogue(*cat, dialog, lax_read_mode);
+		    filtre_sequentially_read_all_catalogue(*cat, get_pointer(), lax_read_mode);
 		}
 	    }
 
@@ -1804,36 +1761,7 @@ namespace libdar
 	return *cat;
     }
 
-
-    const catalogue & archive::get_catalogue(const shared_ptr<user_interaction> & dialog) const
-    {
-	init_catalogue(dialog);
-	return get_catalogue();
-    }
-
     void archive::drop_all_filedescriptors()
-    {
-	NLS_SWAP_IN;
-
-	try
-	{
-	    if(exploitable && sequential_read)
-		throw Elibcall("archive::drop_all_filedescriptiors", "Dropping all filedescriptors for an archive in sequential read mode that has not yet been read need passing a \"user_interaction\" object to the argument of archive::drop_all_filedescriptors");
-
-	    stack.clear();
-	    exploitable = false;
-	}
-	catch(...)
-	{
-	    NLS_SWAP_OUT;
-	    throw;
-	}
-
-	NLS_SWAP_OUT;
-    }
-
-
-    void archive::drop_all_filedescriptors(const shared_ptr<user_interaction> & dialog)
     {
 	NLS_SWAP_IN;
 
@@ -1850,7 +1778,7 @@ namespace libdar
 		    cat->reset_read();
 		}
 		else
-		    (void)op_test(dialog, archive_options_test(), nullptr);
+		    (void)op_test(archive_options_test(), nullptr);
 	    }
 
 	    stack.clear();
@@ -1918,8 +1846,7 @@ namespace libdar
 	// PRIVATE METHODS FOLLOW
 	//
 
-    statistics archive::op_create_in(const shared_ptr<user_interaction> & dialog,
-                                     operation op,
+    statistics archive::op_create_in(operation op,
 				     const path & fs_root,
                                      const entrepot & sauv_path_t,
 				     archive *ref_arch,
@@ -2000,7 +1927,7 @@ namespace libdar
 	    throw Ecompilation(gettext("nodump flag feature has not been activated at compilation time, it is thus not available"));
 #endif
 
-	check_libgcrypt_hash_bug(*dialog, hash, first_file_size, file_size);
+	check_libgcrypt_hash_bug(get_ui(), hash, first_file_size, file_size);
 
             // end of sanity checks
 
@@ -2015,7 +1942,7 @@ namespace libdar
 	if(sauv_path_abs.is_relative())
 	    sauv_path_abs = sauv_path_t.get_root() + sauv_path_abs;
 
-	tools_avoid_slice_overwriting_regex(*dialog,
+	tools_avoid_slice_overwriting_regex(get_ui(),
 					    sauv_path_t,
 					    filename,
 					    extension,
@@ -2059,7 +1986,7 @@ namespace libdar
 	    while(cov && sauv_path_abs.pop(drop));
 
 	    if(cov)
-		dialog->pause(tools_printf(gettext("WARNING! The archive is located in the directory to backup, this may create an endless loop when the archive will try to save itself. You can either add -X \"%S.*.%S\" on the command line, or change the location of the archive (see -h for help). Do you really want to continue?"), &filename, &extension));
+		get_ui().pause(tools_printf(gettext("WARNING! The archive is located in the directory to backup, this may create an endless loop when the archive will try to save itself. You can either add -X \"%S.*.%S\" on the command line, or change the location of the archive (see -h for help). Do you really want to continue?"), &filename, &extension));
 	}
 
 	    // building the reference catalogue
@@ -2069,11 +1996,10 @@ namespace libdar
 	    const entrepot *ref_where = ref_arch->get_entrepot();
 	    if(ref_where != nullptr)
 		initial_pause = (*ref_where == sauv_path_t);
-	    ref_cat = const_cast<catalogue *>(& ref_arch->get_catalogue(dialog));
+	    ref_cat = const_cast<catalogue *>(& ref_arch->get_catalogue());
 	}
 
-	op_create_in_sub(dialog,
-			 op,
+	op_create_in_sub(op,
 			 fs_root,
 			 sauv_path_t,
 			 ref_cat,
@@ -2145,8 +2071,7 @@ namespace libdar
 	return *st_ptr;
     }
 
-    void archive::op_create_in_sub(const shared_ptr<user_interaction> & dialog,
-				   operation op,
+    void archive::op_create_in_sub(operation op,
 				   const path & fs_root,
 				   const entrepot & sauv_path_t,
 				   catalogue *ref_cat1,
@@ -2239,9 +2164,9 @@ namespace libdar
 		    // pausing if saving in the same directory where is located the archive of reference
 
 		if(!pause.is_zero() && initial_pause)
-		    dialog->pause(gettext("Ready to start writing down the archive?"));
+		    get_ui().pause(gettext("Ready to start writing down the archive?"));
 
-		macro_tools_create_layers(dialog,
+		macro_tools_create_layers(get_pointer(),
 					  stack, // this object field is set!
 					  ver,   // this object field is set!
 					  slices,// this object field is set!
@@ -2283,11 +2208,11 @@ namespace libdar
 		cat = nullptr; // [object member variable]
 
 		if(info_details)
-		    dialog->message(gettext("Building the catalog object..."));
+		    get_ui().message(gettext("Building the catalog object..."));
 		try
 		{
 		    if(fs_root.display() != "<ROOT>")
-			root_mtime = tools_get_mtime(*dialog,
+			root_mtime = tools_get_mtime(get_ui(),
 						     fs_root.display(),
 						     zeroing_neg_date,
 						     false); // not silent
@@ -2309,15 +2234,15 @@ namespace libdar
 		case oper_merge:
 		case oper_repair:
 		    if(add_marks_for_sequential_reading && !empty)
-			cat = new (nothrow) escape_catalogue(dialog, pdesc, ref_cat1->get_root_dir_last_modif(), internal_name);
+			cat = new (nothrow) escape_catalogue(get_pointer(), pdesc, ref_cat1->get_root_dir_last_modif(), internal_name);
 		    else
-			cat = new (nothrow) catalogue(dialog, ref_cat1->get_root_dir_last_modif(), internal_name);
+			cat = new (nothrow) catalogue(get_pointer(), ref_cat1->get_root_dir_last_modif(), internal_name);
 		    break;
 		case oper_create:
 		    if(add_marks_for_sequential_reading && !empty)
-			cat = new (nothrow) escape_catalogue(dialog, pdesc, root_mtime, internal_name);
+			cat = new (nothrow) escape_catalogue(get_pointer(), pdesc, root_mtime, internal_name);
 		    else
-			cat = new (nothrow) catalogue(dialog, root_mtime, internal_name);
+			cat = new (nothrow) catalogue(get_pointer(), root_mtime, internal_name);
 		    break;
 		default:
 		    throw SRC_BUG;
@@ -2343,7 +2268,7 @@ namespace libdar
 
 			    label data_name;
 			    data_name.clear();
-			    void_cat = new (nothrow) catalogue(dialog,
+			    void_cat = new (nothrow) catalogue(get_pointer(),
 							       datetime(0),
 							       data_name);
 			    if(void_cat == nullptr)
@@ -2354,8 +2279,8 @@ namespace libdar
 			try
 			{
 			    if(info_details)
-				dialog->message(gettext("Processing files for backup..."));
-			    filtre_sauvegarde(dialog,
+				get_ui().message(gettext("Processing files for backup..."));
+			    filtre_sauvegarde(get_pointer(),
 					      selection,
 					      subtree,
 					      pdesc,
@@ -2415,9 +2340,9 @@ namespace libdar
 			break;
 		    case oper_merge:
 			if(info_details)
-			    dialog->message(gettext("Processing files for merging..."));
+			    get_ui().message(gettext("Processing files for merging..."));
 
-			filtre_merge(dialog,
+			filtre_merge(get_pointer(),
 				     selection,
 				     subtree,
 				     pdesc,
@@ -2446,11 +2371,11 @@ namespace libdar
 			break;
 		    case oper_repair:
 			if(info_details)
-			    dialog->message(gettext("Processing files for fixing..."));
+			    get_ui().message(gettext("Processing files for fixing..."));
 
 			try
 			{
-			    filtre_merge_step0(dialog,
+			    filtre_merge_step0(get_pointer(),
 					       ref_cat1,
 					       ref_cat2,
 					       *st_ptr,
@@ -2463,7 +2388,7 @@ namespace libdar
 				throw SRC_BUG;
 				// we should be prepared to release decr
 				// but we do not need such argument for fixing op.
-			    filtre_merge_step2(dialog,
+			    filtre_merge_step2(get_pointer(),
 					       pdesc,
 					       *ref_cat1,
 					       info_details,
@@ -2527,14 +2452,14 @@ namespace libdar
 		if(ref_cat1 != nullptr && op == oper_create)
 		{
 		    if(info_details)
-			dialog->message(gettext("Adding reference to files that have been destroyed since reference backup..."));
+			get_ui().message(gettext("Adding reference to files that have been destroyed since reference backup..."));
 		    if(aborting)
 			cat->update_absent_with(*ref_cat1, aborting_next_etoile);
 		    else
 			st_ptr->add_to_deleted(cat->update_destroyed_with(*ref_cat1));
 		}
 
-		macro_tools_close_layers(dialog,
+		macro_tools_close_layers(get_pointer(),
 					 stack,
 					 ver,
 					 op != oper_repair ? *cat : *ref_cat1,
@@ -2596,7 +2521,7 @@ namespace libdar
 	}
     }
 
-    void archive::check_gnupg_signed(user_interaction & dialog) const
+    void archive::check_gnupg_signed() const
     {
 	list<signator>::const_iterator it = gnupg_signed.begin();
 
@@ -2604,7 +2529,7 @@ namespace libdar
 	    ++it;
 
 	if(it != gnupg_signed.end())
-	    dialog.pause(gettext("WARNING! Incorrect signature found for archive, continue anyway?"));
+	    get_ui().pause(gettext("WARNING! Incorrect signature found for archive, continue anyway?"));
     }
 
     void archive::disable_natural_destruction()
@@ -2663,7 +2588,7 @@ namespace libdar
 	return get_layer1_data_name() != get_catalogue_data_name() && ver.get_edition() >= 8;
     }
 
-    void archive::check_against_isolation(user_interaction & dialog, bool lax) const
+    void archive::check_against_isolation(bool lax) const
     {
 	if(cat != nullptr)
 	{
@@ -2679,7 +2604,7 @@ namespace libdar
 			// note2: Old isolated catalogue do not carry any data, this is safe to try to restore them because any
 			// pointer to data and/or EA has been removed during the isolation.
 		    else
-			dialog.pause(gettext("LAX MODE: Archive seems to be only an isolated catalogue (no data in it), Can I assume data corruption occurred and consider the archive as being a real archive?"));
+			get_ui().pause(gettext("LAX MODE: Archive seems to be only an isolated catalogue (no data in it), Can I assume data corruption occurred and consider the archive as being a real archive?"));
 		}
 	    }
 	    catch(Erange & e)

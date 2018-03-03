@@ -127,15 +127,14 @@ namespace libdar5
 			      const archive_options_extract & options,
 			      statistics *progressive_report)
 	{
-	    return libdar::archive::op_extract(user_interaction5_clone_to_shared_ptr(dialog),
-					       fs_root,
+	    return libdar::archive::op_extract(fs_root,
 					       options,
 					       progressive_report);
 	}
 
 	void summary(user_interaction & dialog)
 	{
-	    libdar::archive::summary(user_interaction5_clone_to_shared_ptr(dialog));
+	    libdar::archive::summary();
 	}
 
 	    /// overwriting op_listing to use the user_interaction as callback
@@ -147,8 +146,7 @@ namespace libdar5
 			   const archive_options_diff & options,
 			   statistics * progressive_report)
 	{
-	    return libdar::archive::op_diff(user_interaction5_clone_to_shared_ptr(dialog),
-					    fs_root,
+	    return libdar::archive::op_diff(fs_root,
 					    options,
 					    progressive_report);
 	}
@@ -157,8 +155,7 @@ namespace libdar5
 			   const archive_options_test & options,
 			   statistics * progressive_report)
 	{
-	    return libdar::archive::op_test(user_interaction5_clone_to_shared_ptr(dialog),
-					    options,
+	    return libdar::archive::op_test(options,
 					    progressive_report);
 	}
 
@@ -168,8 +165,7 @@ namespace libdar5
 			const std::string & extension,
 			const archive_options_isolate & options)
 	{
-	    libdar::archive::op_isolate(user_interaction5_clone_to_shared_ptr(dialog),
-					sauv_path,
+	    libdar::archive::op_isolate(sauv_path,
 					filename,
 					extension,
 					options);
@@ -181,17 +177,17 @@ namespace libdar5
 
 	void init_catalogue(user_interaction & dialog) const
 	{
-	    libdar::archive::init_catalogue(user_interaction5_clone_to_shared_ptr(dialog));
+	    libdar::archive::init_catalogue();
 	}
 
 	const catalogue & get_catalogue(user_interaction & dialog) const
 	{
-	    return libdar::archive::get_catalogue(user_interaction5_clone_to_shared_ptr(dialog));
+	    return libdar::archive::get_catalogue();
 	}
 
 	void drop_all_filedescriptors(user_interaction & dialog)
 	{
-	    libdar::archive::drop_all_filedescriptors(user_interaction5_clone_to_shared_ptr(dialog));
+	    libdar::archive::drop_all_filedescriptors();
 	}
 
     private:

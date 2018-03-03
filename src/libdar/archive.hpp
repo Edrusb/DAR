@@ -42,6 +42,7 @@
 #include "list_entry.hpp"
 #include "crypto.hpp"
 #include "slice_layout.hpp"
+#include "mem_ui.hpp"
 
 namespace libdar
 {
@@ -52,7 +53,7 @@ namespace libdar
 	/// are the same abstraction level as the operation realized by the DAR
 	/// command line tool.
 	/// \ingroup API
-    class archive
+    class archive: public mem_ui
     {
     public:
 
@@ -165,7 +166,6 @@ namespace libdar
 
 	    /// extraction of data from an archive
 
-	    /// \param[in,out] dialog for user interaction
 	    /// \param[in] fs_root the filesystem to take as root for the restoration
 	    /// \param[in] options optional parameter to be used for the operation
 	    /// \param[in,out] progressive_report points to an already existing statistics object that can be consulted at any time
@@ -183,20 +183,18 @@ namespace libdar
 	    /// - .hard_links: number of hard link restored
 	    /// - .ea_treated: number of entry having some EA
 	    /// .
-	statistics op_extract(const std::shared_ptr<user_interaction> & dialog,
-			      const path &fs_root,
+	statistics op_extract(const path &fs_root,
 			      const archive_options_extract & options,
 			      statistics *progressive_report);
 
 	    /// display a summary of the archive
 	    ///
 	    /// \note see also get_stats() method
-	void summary(const std::shared_ptr<user_interaction> & dialog);
+	void summary();
 
 
 	    /// listing of the archive contents
 
-	    /// \param[in,out] dialog for user interaction
 	    /// \param[in] callback callback function used to provide data in splitted field (not used if null is given)
 	    /// \param[in] context will be passed as first argument of the callback as is provided here
 	    /// \param[in] options list of optional parameters to use for the operation
@@ -204,14 +202,12 @@ namespace libdar
 	    /// \note alternative way to get archive contents:
 	    /// . archive::get_children_of() method
 	    /// . archive::init_catalogue()+get_children_in_table()
-	void op_listing(const std::shared_ptr<user_interaction> & dialog,
-			catalogue_listing_callback callback,
+	void op_listing(catalogue_listing_callback callback,
 			void *context,
 			const archive_options_listing & options);
 
 	    /// archive comparison with filesystem
 
-	    /// \param[in,out] dialog for user interaction
 	    /// \param[in] fs_root the filesystem to take as root for the comparison
 	    /// \param[in] options optional parameters to be used with the operation
 	    /// \param[in,out] progressive_report points to an already existing statistics object that can be consulted at any time
@@ -224,15 +220,13 @@ namespace libdar
 	    /// - .errored: number of files that do not match or could not be read
 	    /// - .ignored: number of files excluded by filters
 	    /// .
-	statistics op_diff(const std::shared_ptr<user_interaction> & dialog,
-			   const path & fs_root,
+	statistics op_diff(const path & fs_root,
 			   const archive_options_diff & options,
 			   statistics * progressive_report);
 
 
 	    /// test the archive integrity
 
-	    /// \param[in,out] dialog for user interaction
 	    /// \param[in] options optional parameter to use for the operation
 	    /// \param[in,out] progressive_report points to an already existing statistics object that can be consulted at any time
 	    /// during the call (see the returned value to know the useful fields and their meining),
@@ -251,14 +245,12 @@ namespace libdar
 	    /// - .skipped: number of file older than the one on filesystem
 	    /// - .errored: number of files with error
 	    /// .
-	statistics op_test(const std::shared_ptr<user_interaction> & dialog,
-			   const archive_options_test & options,
+	statistics op_test(const archive_options_test & options,
 			   statistics * progressive_report);
 
 
 	    /// this methodes isolates the catalogue of a the current archive into a separated archive
 
-	    /// \param[in,out] dialog for user interaction
 	    /// \param[in] sauv_path the path where to create slices
 	    /// \param[in] filename base name of the slices ("-" for standard output)
 	    /// \param[in] extension slices extension ("dar")
@@ -267,8 +259,7 @@ namespace libdar
 	    /// to keep them in the resulting isolated catalogue the current archive object (but
 	    /// not the archive file) is modified (forget delta signature) --- this is not a
 	    /// const method.
-	void op_isolate(const std::shared_ptr<user_interaction> & dialog,
-			const path &sauv_path,
+	void op_isolate(const path &sauv_path,
 			const std::string & filename,
 			const std::string & extension,
 			const archive_options_isolate & options);
@@ -276,16 +267,11 @@ namespace libdar
 
 	    /// getting information about a given directory
 
-	    /// \param[in] dialog for user interaction
 	    /// \param[in] callback callback function used to provide data in splitted field
 	    /// \param[in] context will be passed as first argument of the callback as is provided here
 	    /// \param[in] dir relative path the directory to get information about
 	    /// \return true if some children have been found and the callback has been run at least once
-	    /// \note the get_children_of() call uses the listing() method
-	    /// to send back data to the user. If it is not redifined in the
-	    /// dialog object nothing will get sent back to the user
-	bool get_children_of(const std::shared_ptr<user_interaction> & dialog,
-			     catalogue_listing_callback callback,
+	bool get_children_of(catalogue_listing_callback callback,
 			     void *context,
 			     const std::string & dir);
 
@@ -311,7 +297,7 @@ namespace libdar
 
 	    /// necessary to get the catalogue fully loaded in memory in any situation
 	    /// in particular in sequential reading mode
-	void init_catalogue(const std::shared_ptr<user_interaction> & dialog) const;
+	void init_catalogue() const;
 
 	    /// gives access to internal catalogue (not to be used from the API)
 
@@ -324,21 +310,11 @@ namespace libdar
 	    /// or call init_catalogue() first.
 	const catalogue & get_catalogue() const;
 
-	    /// gives access to internal catalogue (not to be used from the API) even in sequential read mode
-	const catalogue & get_catalogue(const std::shared_ptr<user_interaction> & dialog) const;
-
-	    /// closes all filedescriptors and associated data, just keep the catalogue
+	    /// closes all filedescriptors and associated even when in sequential read mode
 
 	    /// \note once this method has been called, the archive object can only be used
 	    /// as reference for a differential archive.
-	    /// \note this method is not usable (throws an exception) if the archive has been
-	    /// open in sequential read mode and the catalogue has not yet been read; use the
-	    /// same method but with user_interaction argument instead in that situation
 	void drop_all_filedescriptors();
-
-	    /// closes all filedescriptors and associated even when in sequential read mode
-
-	void drop_all_filedescriptors(const std::shared_ptr<user_interaction> & dialog);
 
 	    /// change all inode as unsaved (equal to differential backup with no change met)
 	void set_to_unsaved_data_and_FSA() { if(cat == nullptr) throw SRC_BUG; cat->set_to_unsaved_data_and_FSA(); };
@@ -374,7 +350,7 @@ namespace libdar
 	slice_layout slices;     //< slice layout, archive is not sliced <=> first_size or other_size fields is set to zero (in practice both are set to zero, but one being set is enought to determine the archive is not sliced)
 
 	void free_mem();
-	void check_gnupg_signed(user_interaction & dialog) const;
+	void check_gnupg_signed() const;
 
 	const catalogue & get_cat() const { if(cat == nullptr) throw SRC_BUG; else return *cat; };
 	const header_version & get_header() const { return ver; };
@@ -385,8 +361,7 @@ namespace libdar
 	infinint get_level2_size();
 	infinint get_cat_size() const { return local_cat_size; };
 
-	statistics op_create_in(const std::shared_ptr<user_interaction> & dialog,
-				operation op,
+	statistics op_create_in(operation op,
 				const path & fs_root,
 				const entrepot & sauv_path_t,
 				archive *ref_arch,
@@ -450,8 +425,7 @@ namespace libdar
 				const std::set<std::string> & ignored_symlinks,
 				statistics * progressive_report);
 
-	void op_create_in_sub(const std::shared_ptr<user_interaction> & dialog,        //< interaction with user
-			      operation op,                     //< the filter operation to bind to
+	void op_create_in_sub(operation op,                     //< the filter operation to bind to
 			      const path & fs_root,             //< root of the filesystem to act on
 			      const entrepot & sauv_path_t,     //< where to create the archive
 			      catalogue * ref_cat1,             //< catalogue of the archive of reference, (cannot be nullptr if ref_cat2 is not nullptr)
@@ -525,7 +499,7 @@ namespace libdar
 	const label & get_layer1_data_name() const;
 	const label & get_catalogue_data_name() const;
 	bool only_contains_an_isolated_catalogue() const; //< true if the current archive only contains an isolated catalogue
-	void check_against_isolation(user_interaction & dialog, bool lax) const; //< throw Erange exception if the archive only contains an isolated catalogue
+	void check_against_isolation(bool lax) const; //< throw Erange exception if the archive only contains an isolated catalogue
 	const cat_directory *get_dir_object(const std::string & dir) const;
     };
 
