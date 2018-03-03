@@ -55,7 +55,7 @@ extern "C"
 #include "thread_cancellation.hpp"
 #include "compile_time_features.hpp"
 #include "capabilities.hpp"
-#include "entrepot_libcurl.hpp"
+#include "entrepot_libcurl5.hpp"
 #include "fichier_local.hpp"
 #include "memory_check.hpp"
 #include "entrepot_local.hpp"
@@ -346,9 +346,6 @@ namespace libdar5
 
 	// from fichier_local.hpp
     using libdar::fichier_local;
-
-	// from entrepot_libcurl.hpp
-    using libdar::entrepot_libcurl;
 
 	// from mycurl_protocol.hpp
     using libdar::mycurl_protocol;

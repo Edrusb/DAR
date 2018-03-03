@@ -121,7 +121,7 @@ using namespace std;
 namespace libdar
 {
 
-    trivial_sar::trivial_sar(const user_interaction & dialog,
+    trivial_sar::trivial_sar(const shared_ptr<user_interaction> & dialog,
 			     gf_mode open_mode,
 			     const std::string & base_name,
 			     const std::string & extension,
@@ -168,7 +168,7 @@ namespace libdar
 	{
 	    try
 	    {
-		tmp = where.open(get_ui(),
+		tmp = where.open(dialog,
 				 filename,
 				 open_mode,
 				 force_permission,
@@ -192,7 +192,7 @@ namespace libdar
 
 		    try
 		    {
-			tmp = where.open(get_ui(),
+			tmp = where.open(dialog,
 					 filename,
 					 open_mode,
 					 force_permission,
@@ -254,7 +254,7 @@ namespace libdar
     }
 
 
-    trivial_sar::trivial_sar(const user_interaction & dialog,
+    trivial_sar::trivial_sar(const shared_ptr<user_interaction> & dialog,
 			     const std::string & pipename,
 			     bool lax) : generic_file(gf_read_only) , mem_ui(dialog)
     {
@@ -276,9 +276,9 @@ namespace libdar
 	try
 	{
 	    if(pipename == "-")
-		reference = new (nothrow) tuyau(get_ui(), 0, gf_read_only);
+		reference = new (nothrow) tuyau(dialog, 0, gf_read_only);
 	    else
-		reference = new (nothrow) tuyau(get_ui(), pipename, gf_read_only);
+		reference = new (nothrow) tuyau(dialog, pipename, gf_read_only);
 
 	    if(reference == nullptr)
 		throw Ememory("trivial_sar::trivial_sar");
@@ -297,7 +297,7 @@ namespace libdar
 	}
     }
 
-    trivial_sar::trivial_sar(const user_interaction & dialog,
+    trivial_sar::trivial_sar(const shared_ptr<user_interaction> & dialog,
 			     generic_file *f,
 			     const label & internal_name,
 			     const label & data_name,

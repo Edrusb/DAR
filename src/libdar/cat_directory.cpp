@@ -90,7 +90,7 @@ namespace libdar
 	return *this;
     }
 
-    cat_directory::cat_directory(user_interaction & dialog,
+    cat_directory::cat_directory(const shared_ptr<user_interaction> & dialog,
 				 const smart_pointer<pile_descriptor> & pdesc,
 				 const archive_version & reading_ver,
 				 saved_status saved,
@@ -139,7 +139,7 @@ namespace libdar
 			throw;
 		    else
 		    {
-			dialog.message(string(gettext("LAX MODE: Error met building a catalogue entry, skipping this entry and continuing. Skipped error is: ")) + e.get_message());
+			dialog->message(string(gettext("LAX MODE: Error met building a catalogue entry, skipping this entry and continuing. Skipped error is: ")) + e.get_message());
 			p = nullptr;
 		    }
 		}

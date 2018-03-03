@@ -121,7 +121,7 @@ namespace libdar
 {
 
 
-    sar::sar(const user_interaction & dialog,
+    sar::sar(const shared_ptr<user_interaction> & dialog,
 	     const string & base_name,
 	     const string & extension,
 	     const entrepot & where,
@@ -189,7 +189,7 @@ namespace libdar
 	}
     }
 
-    sar::sar(const user_interaction & dialog,
+    sar::sar(const shared_ptr<user_interaction> & dialog,
 	     gf_mode open_mode,
 	     const string & base_name,
 	     const string & extension,
@@ -660,7 +660,7 @@ namespace libdar
                 //
 	    try
 	    {
-		of_fd = entr->open(get_ui(),
+		of_fd = entr->open(get_pointer(),
 				   fic,
 				   gf_read_only,
 				   false, //< force permission
@@ -984,7 +984,7 @@ namespace libdar
 	{
 	    try
 	    {
-		of_fd = entr->open(get_ui(),
+		of_fd = entr->open(get_pointer(),
 				   fic,
 				   hash == hash_none ? gf_read_write : gf_write_only,
 				       // yes, no anymore always writeonly as stated in the name of this method
@@ -1012,7 +1012,7 @@ namespace libdar
 		    {
 			    // the file exists, re-trying opening it without fail_if_exists
 
-			of_fd = entr->open(get_ui(),
+			of_fd = entr->open(get_pointer(),
 					   fic,
 					   gf_read_only,
 					   false,  //< force permission
@@ -1101,7 +1101,7 @@ namespace libdar
 			    unlink_on_error = true;
 
 			    // open with overwriting
-			of_fd = entr->open(get_ui(),
+			of_fd = entr->open(get_pointer(),
 					   fic,
 					   hash == hash_none ? gf_read_write : gf_write_only, // yes, no more write only as stated in the name of this method
 					   force_perm,
@@ -1112,7 +1112,7 @@ namespace libdar
 		    }
 		    else // open without overwriting
 			if(hash == hash_none)
-			    of_fd = entr->open(get_ui(),
+			    of_fd = entr->open(get_pointer(),
 					       fic,
 					       hash == hash_none ? gf_read_write : gf_write_only, // yes, no more write only as stated in the name of this method
 					       force_perm,

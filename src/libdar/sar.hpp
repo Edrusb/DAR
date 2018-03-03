@@ -70,7 +70,7 @@ namespace libdar
 	    /// the first slice size (used starting archive format "08"), Else, the slice size is not possible to open as the offset
 	    /// of the data cannot be determin. If slice header is too old the sar class will fallback openning the first slice and
 	    /// directly get the first slice.
-        sar(const user_interaction & dialog,
+        sar(const std::shared_ptr<user_interaction> & dialog,
 	    const std::string & base_name,
 	    const std::string & extension,
 	    const entrepot & where,
@@ -102,7 +102,7 @@ namespace libdar
 	    /// \param[in] execute is the command to execute after each slice creation (once it is completed)
 	    /// \note data_name should be equal to internal_name except when reslicing an archive as dar_xform does in which
 	    /// case internal_name is randomly, and data_name is kept from the source archive
-        sar(const user_interaction  & dialog,
+        sar(const std::shared_ptr<user_interaction> & dialog,
 	    gf_mode open_mode,
 	    const std::string & base_name,
 	    const std::string & extension,

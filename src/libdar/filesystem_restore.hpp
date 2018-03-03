@@ -64,7 +64,7 @@ namespace libdar
     {
     public:
 	    /// constructor
-        filesystem_restore(user_interaction & dialog,
+        filesystem_restore(const std::shared_ptr<user_interaction> & dialog,
 			   const path & root,
 			   bool x_warn_overwrite,
 			   bool x_info_details,
@@ -150,6 +150,8 @@ namespace libdar
 
         void detruire();
 	void restore_stack_dir_ownership();
+	user_interaction & get_ui() const { return filesystem_hard_link_read::get_ui(); };
+	std::shared_ptr<user_interaction> get_pointer() const { return filesystem_hard_link_read::get_pointer(); };
 
 	    // subroutines of write()
 

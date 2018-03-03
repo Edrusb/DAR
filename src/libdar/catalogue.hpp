@@ -61,10 +61,10 @@ namespace libdar
     class catalogue: public mem_ui
     {
     public :
-        catalogue(user_interaction & ui,
+        catalogue(const std::shared_ptr<user_interaction> & ui,
 		  const datetime & root_last_modif,
 		  const label & data_name);
-        catalogue(user_interaction & ui,
+        catalogue(const std::shared_ptr<user_interaction> & ui,
 		  const pile_descriptor & pdesc,
 		  const archive_version & reading_ver,
 		  compression default_algo,

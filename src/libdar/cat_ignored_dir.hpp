@@ -46,7 +46,7 @@ namespace libdar
     {
     public:
         cat_ignored_dir(const cat_directory &target) : cat_inode(target) {};
-        cat_ignored_dir(user_interaction & dialog,
+        cat_ignored_dir(const std::shared_ptr<user_interaction> & dialog,
 			const smart_pointer<pile_descriptor> & pdesc,
 			const archive_version & reading_ver,
 			bool small) : cat_inode(dialog, pdesc, reading_ver, s_not_saved, small) { throw SRC_BUG; };

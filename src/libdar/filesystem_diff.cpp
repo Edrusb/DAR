@@ -129,14 +129,13 @@ using namespace std;
 namespace libdar
 {
 
-    filesystem_diff::filesystem_diff(user_interaction & dialog,
+    filesystem_diff::filesystem_diff(const std::shared_ptr<user_interaction> & dialog,
 				     const path &root,
 				     bool x_info_details,
 				     const mask & x_ea_mask,
 				     bool x_alter_atime,
 				     bool x_furtive_read_mode,
-				     const fsa_scope & scope) :
-	mem_ui(&dialog),
+				     const fsa_scope & scope):
 	filesystem_hard_link_read(dialog, x_furtive_read_mode, scope)
     {
 	fs_root = nullptr;
@@ -144,7 +143,7 @@ namespace libdar
 	current_dir = nullptr;
 	try
 	{
-	    fs_root = filesystem_tools_get_root_with_symlink(get_ui(), root, x_info_details);
+	    fs_root = filesystem_tools_get_root_with_symlink(dialog, root, x_info_details);
 	    if(fs_root == nullptr)
 		throw Ememory("filesystem_diff::filesystem_diff");
 	    info_details = x_info_details;

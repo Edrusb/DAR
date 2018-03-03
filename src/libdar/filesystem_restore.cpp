@@ -128,7 +128,7 @@ using namespace std;
 
 namespace libdar
 {
-    filesystem_restore::filesystem_restore(user_interaction & dialog,
+    filesystem_restore::filesystem_restore(const std::shared_ptr<user_interaction> & dialog,
 					   const path &root,
 					   bool x_warn_overwrite,
                                            bool x_info_details,
@@ -138,8 +138,9 @@ namespace libdar
 					   bool x_empty,
 					   const crit_action *x_overwrite,
 					   bool x_only_overwrite,
-					   const fsa_scope & scope) :
-	mem_ui(&dialog), filesystem_hard_link_write(dialog), filesystem_hard_link_read(dialog, compile_time::furtive_read(), scope)
+					   const fsa_scope & scope):
+	filesystem_hard_link_write(dialog),
+	filesystem_hard_link_read(dialog, compile_time::furtive_read(), scope)
     {
 	fs_root = nullptr;
 	ea_mask = nullptr;
@@ -147,7 +148,7 @@ namespace libdar
 	overwrite = nullptr;
 	try
 	{
-	    fs_root = filesystem_tools_get_root_with_symlink(get_ui(), root, x_info_details);
+	    fs_root = filesystem_tools_get_root_with_symlink(dialog, root, x_info_details);
 	    if(fs_root == nullptr)
 		throw Ememory("filesystem_write::filesystem_write");
 	    ea_mask = x_ea_mask.clone();
@@ -221,7 +222,7 @@ namespace libdar
 		{
 		    string chem = (*current_dir + stack_dir.back().get_name()).display();
 
-		    filesystem_tools_make_owner_perm(get_ui(), stack_dir.back(), chem, true, what_to_check, get_fsa_scope());
+		    filesystem_tools_make_owner_perm(get_pointer(), stack_dir.back(), chem, true, what_to_check, get_fsa_scope());
 		    filesystem_tools_make_date(stack_dir.back(), chem, what_to_check, get_fsa_scope());
 		}
 	    }
@@ -406,12 +407,12 @@ namespace libdar
 				    // expected behavior for delta binary patching
 				if(info_details)
 				    get_ui().message(string(gettext("Restoring file's data using a delta patching: ")) + spot_display);
-				filesystem_tools_make_delta_patch(get_ui(),
+				filesystem_tools_make_delta_patch(get_pointer(),
 								  *exists_file,
 								  spot_display,
 								  *x_fil,
 								  *current_dir);
-				filesystem_tools_make_owner_perm(get_ui(),
+				filesystem_tools_make_owner_perm(get_pointer(),
 								 *x_fil,
 								 spot_display,
 								 true,
@@ -616,7 +617,7 @@ namespace libdar
 	    if(tba_dir != nullptr && tba_ino->same_as(*in_place))
 	    {
 		if(!empty)
-		    filesystem_tools_make_owner_perm(get_ui(), *tba_ino, spot, false, what_to_check, get_fsa_scope());
+		    filesystem_tools_make_owner_perm(get_pointer(), *tba_ino, spot, false, what_to_check, get_fsa_scope());
 		data_done = done_data_restored;
 	    }
 	    else // not both in_place and to_be_added are directories
@@ -1055,7 +1056,7 @@ namespace libdar
 	{
 	    string chem = (*current_dir + stack_dir.back().get_name()).display();
 	    if(!empty)
-		filesystem_tools_make_owner_perm(get_ui(), stack_dir.back(), chem, true, what_to_check, get_fsa_scope());
+		filesystem_tools_make_owner_perm(get_pointer(), stack_dir.back(), chem, true, what_to_check, get_fsa_scope());
 	    stack_dir.pop_back();
 	}
 	if(stack_dir.size() > 0)

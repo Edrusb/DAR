@@ -73,7 +73,7 @@ namespace libdar
 	    return get_location();
     }
 
-    fichier_global *entrepot::open(user_interaction & dialog,
+    fichier_global *entrepot::open(const shared_ptr<user_interaction> & dialog,
 				   const std::string & filename,
 				   gf_mode mode,
 				   bool force_permission,

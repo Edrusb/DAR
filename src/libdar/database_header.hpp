@@ -29,9 +29,10 @@
 #include "../my_config.h"
 #include "infinint.hpp"
 #include "generic_file.hpp"
-
 #include "user_interaction.hpp"
 #include "compressor.hpp"
+
+#include <memory>
 
 namespace libdar
 {
@@ -47,7 +48,7 @@ namespace libdar
 	/// \param[in] algozip compression algorithm used for the database
 	/// \return the database header has been read and checked the database can now be read from the returned generic_file pointed by the returned value
 	/// then it must be destroyed with the delete operator.
-    extern generic_file *database_header_create(user_interaction & dialog,
+    extern generic_file *database_header_create(const std::shared_ptr<user_interaction> & dialog,
 						const std::string & filename,
 						bool overwrite,
 						compression algozip);
@@ -59,7 +60,7 @@ namespace libdar
 	/// \param[out] db_version version of the database
 	/// \param[out] algozip compression algorithm used in the database
 	/// \return the generic_file where the database header has been put
-    extern generic_file *database_header_open(user_interaction & dialog,
+    extern generic_file *database_header_open(const std::shared_ptr<user_interaction> & dialog,
 					      const std::string & filename,
 					      unsigned char & db_version,
 					      compression & algozip);

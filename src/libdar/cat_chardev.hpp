@@ -58,7 +58,7 @@ namespace libdar
 							     last_change,
 							     name,
 							     major, minor, fs_device) {};
-        cat_chardev(user_interaction & dialog,
+        cat_chardev(const std::shared_ptr<user_interaction> & dialog,
 		    const smart_pointer<pile_descriptor> & pdesc,
 		    const archive_version & reading_ver,
 		    saved_status saved,

@@ -18,6 +18,8 @@ from 2.5.x to 2.6.0
 - repair mode added to create a completed archive (suitable for direct
   access mode and merging) from an interrupted one
 - simplified user_interface class in libdar API
+- using std::shared_ptr and std::unique_ptr to explicitely show the
+  ownership of the given pointed objects in API
 
 from 2.5.14 to 2.5.14-bis
 - avoiding using the syncfs() system call in dar_split when the

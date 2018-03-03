@@ -61,7 +61,7 @@ namespace libdar
 
 	    // constructors
 
-        fichier_local(user_interaction & dialog,
+        fichier_local(const std::shared_ptr<user_interaction> & dialog,
 		      const std::string & chemin,
 		      gf_mode m,
 		      U_I permission,

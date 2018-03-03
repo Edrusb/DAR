@@ -110,7 +110,7 @@ namespace libdar
         }
     }
 
-    cat_inode::cat_inode(user_interaction & dialog,
+    cat_inode::cat_inode(const shared_ptr<user_interaction> & dialog,
 			 const smart_pointer<pile_descriptor> & pdesc,
 			 const archive_version & reading_ver,
 			 saved_status saved,

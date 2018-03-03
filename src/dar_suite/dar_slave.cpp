@@ -113,11 +113,22 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	entrep.set_location(*chemin);
         try
         {
-	    source = new (nothrow) libdar::sar(dialog, filename, EXTENSION, entrep, true, min_digits, false, execute);
+	    source = new (nothrow) libdar::sar(user_interaction5_clone_to_shared_ptr(dialog),
+					       filename,
+					       EXTENSION,
+					       entrep,
+					       true,
+					       min_digits,
+					       false,
+					       execute);
             if(source == nullptr)
                 throw Ememory("little_main");
 
-            tools_open_pipes(dialog, input_pipe, output_pipe, input, output);
+            tools_open_pipes(user_interaction5_clone_to_shared_ptr(dialog),
+			     input_pipe,
+			     output_pipe,
+			     input,
+			     output);
 
 	    libdar::slave_zapette zap = libdar::slave_zapette(input, output, source);
             input = output = nullptr; // now managed by zap;

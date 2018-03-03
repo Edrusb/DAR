@@ -51,7 +51,7 @@ namespace libdar
 	    /// \param[in] size cache size
 	    /// \note the object pointed to by x_ptr passed under the responsibility of the cache_global object,
 	    /// it will be automatically deleted when no more needed
-	cache_global(user_interaction & dialog, fichier_global *x_ptr, bool shift_mode, U_I size = default_cache_size);
+	cache_global(const std::shared_ptr<user_interaction> & dialog, fichier_global *x_ptr, bool shift_mode, U_I size = default_cache_size);
 
 	    /// copy constructor
 	cache_global(cache_global & ref) = delete;

@@ -44,7 +44,7 @@ namespace libdar
 	set_saved_status(s_saved);
     }
 
-    cat_lien::cat_lien(user_interaction & dialog,
+    cat_lien::cat_lien(const shared_ptr<user_interaction> & dialog,
 		       const smart_pointer<pile_descriptor> & pdesc,
 		       const archive_version & reading_ver,
 		       saved_status saved,

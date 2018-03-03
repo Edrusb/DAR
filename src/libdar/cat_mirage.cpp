@@ -39,7 +39,7 @@ using namespace std;
 namespace libdar
 {
 
-    cat_mirage::cat_mirage(user_interaction & dialog,
+    cat_mirage::cat_mirage(const shared_ptr<user_interaction> & dialog,
 			   const smart_pointer<pile_descriptor> & pdesc,
 			   const archive_version & reading_ver,
 			   saved_status saved,
@@ -62,7 +62,7 @@ namespace libdar
              small);
     }
 
-    cat_mirage::cat_mirage(user_interaction & dialog,
+    cat_mirage::cat_mirage(const shared_ptr<user_interaction> & dialog,
 			   const smart_pointer<pile_descriptor> & pdesc,
 			   const archive_version & reading_ver,
 			   saved_status saved,
@@ -84,7 +84,7 @@ namespace libdar
              small);
     }
 
-    void cat_mirage::init(user_interaction & dialog,
+    void cat_mirage::init(const shared_ptr<user_interaction> & dialog,
 			  const smart_pointer<pile_descriptor> & pdesc,
 			  const archive_version & reading_ver,
 			  saved_status saved,

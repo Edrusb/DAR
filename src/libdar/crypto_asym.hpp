@@ -52,7 +52,7 @@ namespace libdar
     public:
 
 	    /// general use constructor
-	crypto_asym(const user_interaction & ui) : mem_ui(ui) { build_context(); has_signatories = false; };
+	crypto_asym(const std::shared_ptr<user_interaction> & ui) : mem_ui(ui) { build_context(); has_signatories = false; };
 
 	    /// disabling copy constructor
 	crypto_asym(const crypto_asym & ref) = delete;

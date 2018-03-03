@@ -39,7 +39,7 @@ namespace libdar
 
 #if LIBCURL_AVAILABLE
 
-    fichier_libcurl::fichier_libcurl(user_interaction & dialog,
+    fichier_libcurl::fichier_libcurl(const shared_ptr<user_interaction> & dialog,
 				     const std::string & chemin,
 				     mycurl_protocol proto,
 				     mycurl_shared_handle && handle,

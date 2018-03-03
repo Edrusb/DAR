@@ -57,15 +57,15 @@ namespace libdar
 
 	/// keep trace of hard links when reading the filesystem
 
-    class filesystem_hard_link_read : virtual protected mem_ui
+    class filesystem_hard_link_read : protected mem_ui
     {
             // this class is not to be used directly
             // it only provides some routine for the inherited classes
 
     public:
-	filesystem_hard_link_read(user_interaction & dialog,
+	filesystem_hard_link_read(const std::shared_ptr<user_interaction> & dialog,
 				  bool x_furtive_read_mode,
-				  const fsa_scope & scope) : mem_ui(&dialog)
+				  const fsa_scope & scope) : mem_ui(dialog)
 	{ furtive_read_mode = x_furtive_read_mode; sc = scope; ask_before_zeroing_neg_dates = true; };
 
 	    // the copy of the current object would make copy of addresses in

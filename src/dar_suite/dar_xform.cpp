@@ -153,7 +153,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 		dialog.set_beep(beep);
 		if(src == "-")
 		{
-		    libdar::trivial_sar *tmp_sar = new (nothrow) libdar::trivial_sar(dialog, src, false);
+		    libdar::trivial_sar *tmp_sar = new (nothrow) libdar::trivial_sar(user_interaction5_clone_to_shared_ptr(dialog), src, false);
 		    if(tmp_sar == nullptr)
 			throw Ememory("sub_main");
 		    format_07_compatible = tmp_sar->is_an_old_start_end_archive();
@@ -171,7 +171,14 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 		    else
 			throw SRC_BUG;
 
-		    libdar::sar *tmp_sar = new (nothrow) libdar::sar(dialog, src, EXTENSION, entrep, false, src_min_digits, false, execute_src);
+		    libdar::sar *tmp_sar = new (nothrow) libdar::sar(user_interaction5_clone_to_shared_ptr(dialog),
+								     src,
+								     EXTENSION,
+								     entrep,
+								     false,
+								     src_min_digits,
+								     false,
+								     execute_src);
 		    if(tmp_sar == nullptr)
 			throw Ememory("main");
 		    else
@@ -186,7 +193,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 
 		if(size.is_zero())
 		    if(dst == "-")
-			dst_sar = macro_tools_open_archive_tuyau(dialog,
+			dst_sar = macro_tools_open_archive_tuyau(user_interaction5_clone_to_shared_ptr(dialog),
 								 1,
 								 gf_write_only,
 								 internal_name,
@@ -199,7 +206,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 			    entrep.set_location(*dst_dir);
 			else
 			    throw SRC_BUG;
-			dst_sar = new (nothrow) libdar::trivial_sar(dialog,
+			dst_sar = new (nothrow) libdar::trivial_sar(user_interaction5_clone_to_shared_ptr(dialog),
 								    gf_write_only,
 								    dst,
 								    EXTENSION,
@@ -221,7 +228,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 			entrep.set_location(*dst_dir);
 		    else
 			throw SRC_BUG;
-		    dst_sar = new (nothrow) libdar::sar(dialog,
+		    dst_sar = new (nothrow) libdar::sar(user_interaction5_clone_to_shared_ptr(dialog),
 							gf_write_only,
 							dst,
 							EXTENSION,

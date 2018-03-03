@@ -62,7 +62,7 @@ namespace libdar
     class filesystem_diff : public filesystem_hard_link_read
     {
     public:
-        filesystem_diff(user_interaction & dialog,
+        filesystem_diff(const std::shared_ptr<user_interaction> & dialog,
 			const path &root,
 			bool x_info_details,
 			const mask & x_ea_mask,

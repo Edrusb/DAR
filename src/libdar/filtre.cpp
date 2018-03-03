@@ -58,7 +58,7 @@ namespace libdar
 	// returns false if file has changed during backup (inode is saved however, but the saved data may be invalid)
 	// return true if file has not change, false if file need not resaving or does not add wasted bytes in archive
 	// throw exceptions in case of error
-    static bool save_inode(user_interaction & dialog,//< how to report to user
+    static bool save_inode(const shared_ptr<user_interaction> & dialog,//< how to report to user
 			   const string &info_quoi,  //< full path name of the file to save (including its name)
 			   cat_entree * & e,         //< cat_entree to save into the archive
 			   const cat_entree * ref,   //< reference object if it exists (to grab CRC and delta signature from if present and necessary)
@@ -80,7 +80,7 @@ namespace libdar
 			   set<string> ignored_as_symlink, //< list of file to ignore as symlink and fetch the proper mtime
 			   bool repair_mode);        //< if set, try to fix CRC and size problem flagging such fixed files as dirty
 
-    static bool save_ea(user_interaction & dialog,
+    static bool save_ea(const shared_ptr<user_interaction> & dialog,
 			const string & info_quoi,
 			cat_inode * & ino,
 			const pile_descriptor & pdesc,
@@ -89,7 +89,7 @@ namespace libdar
 
     static void restore_atime(const string & chemin, const cat_inode * & ptr);
 
-    static bool save_fsa(user_interaction & dialog,
+    static bool save_fsa(const shared_ptr<user_interaction> & dialog,
 			 const string & info_quoi,
 			 cat_inode * & ino,
 			 const pile_descriptor & pdesc,
@@ -136,7 +136,7 @@ namespace libdar
 	/// \note actions set to EA_preserve EA_preserve_mark_already_saved and EA_clear are left intentionnaly unimplemented!
 	/// \note the nullptr given as argument means that the object is not an cat_inode
 
-    static void do_EFSA_transfert(user_interaction &dialog,
+    static void do_EFSA_transfert(const shared_ptr<user_interaction> &dialog,
 				  over_action_ea action,
 				  cat_inode *in_place,
 				  const cat_inode *to_add);
@@ -146,7 +146,7 @@ namespace libdar
     static const crit_action *make_overwriting_for_only_deleted();
 
 	/// write down delta signature for unsaved files taking it from entry of reference or computing from filesystem
-    static void save_delta_signature(user_interaction & dialog,
+    static void save_delta_signature(const shared_ptr<user_interaction> & dialog,
 				     const string & info_quoi,
 				     cat_file * e_file,
 				     const cat_file * ref_file,
@@ -156,7 +156,7 @@ namespace libdar
 				     const catalogue & cat);
 
 
-    void filtre_restore(user_interaction & dialog,
+    void filtre_restore(const shared_ptr<user_interaction> & dialog,
 			const mask & filtre,
 			const mask & subtree,
 			const catalogue & cat,
@@ -185,6 +185,9 @@ namespace libdar
 	thread_cancellation thr_cancel;
 	const crit_action * when_only_deleted = only_deleted ? make_overwriting_for_only_deleted() : nullptr;
 	const crit_action & overwrite = only_deleted ? *when_only_deleted : x_overwrite;
+
+	if(!dialog)
+	    throw SRC_BUG; // dialog points to nothing
 
 	if(display_treated_only_dir && display_treated)
 	    display_treated = false;
@@ -242,7 +245,7 @@ namespace libdar
 		if(display_treated_only_dir)
 		{
 		    if(e_dir != nullptr)
-			dialog.message(string(gettext("Inspecting directory ")) + juillet.get_string());
+			dialog->message(string(gettext("Inspecting directory ")) + juillet.get_string());
 		}
 
 		if(e_nom != nullptr)
@@ -278,7 +281,7 @@ namespace libdar
 			    if(dirty == archive_options_extract::dirty_warn && e_file != nullptr && e_file->is_dirty())
 			    {
 				string tmp = juillet.get_string();
-				dialog.pause(tools_printf(gettext("File %S has changed during backup and is probably not saved in a valid state (\"dirty file\"), do you want to consider it for restoration anyway?"), &tmp));
+				dialog->pause(tools_printf(gettext("File %S has changed during backup and is probably not saved in a valid state (\"dirty file\"), do you want to consider it for restoration anyway?"), &tmp));
 			    }
 
 			    do
@@ -288,7 +291,7 @@ namespace libdar
 				    const cat_file *e_file = dynamic_cast<const cat_file *>(e_ino);
 
 				    if(info_details)
-					dialog.message(string(gettext("File had changed during backup and had been copied another time, restoring the next copy of file: ")) + juillet.get_string());
+					dialog->message(string(gettext("File had changed during backup and had been copied another time, restoring the next copy of file: ")) + juillet.get_string());
 
 					// we must let the filesystem object forget that
 					// this hard linked inode has already been seen
@@ -359,16 +362,16 @@ namespace libdar
 				switch(dirty)
 				{
 				case archive_options_extract::dirty_warn:
-				    dialog.pause(tools_printf(gettext("The just restored file %S has been marked as dirty (sequential reading can only detect the dirty status after restoration), do we remove this just restored dirty file?"), &tmp));
+				    dialog->pause(tools_printf(gettext("The just restored file %S has been marked as dirty (sequential reading can only detect the dirty status after restoration), do we remove this just restored dirty file?"), &tmp));
 					// NO BREAK HERE !!! This is intended.
 				case archive_options_extract::dirty_ignore:
 					// we must remove the file
 				    if(info_details)
 				    {
 					if(dirty == archive_options_extract::dirty_ignore)
-					    dialog.message(tools_printf(gettext("The just restored file %S has been marked as dirty (sequential reading can only detect the dirty status after restoration), removing the just restored dirty file as it is asked to ignore this type of file"), &tmp));
+					    dialog->message(tools_printf(gettext("The just restored file %S has been marked as dirty (sequential reading can only detect the dirty status after restoration), removing the just restored dirty file as it is asked to ignore this type of file"), &tmp));
 					else
-					    dialog.message(tools_printf(gettext("Removing the dirty file %S"), &tmp));
+					    dialog->message(tools_printf(gettext("Removing the dirty file %S"), &tmp));
 				    }
 				    fs.ignore_overwrite_restrictions_for_next_write();
 				    fs.write(&killer, tmp_data_restored, tmp_ea_restored, tmp_created_retry, tmp_hard_link, tmp_fsa_restored);
@@ -415,9 +418,9 @@ namespace libdar
 			    if(display_skipped)
 			    {
 				if(!path_covered || !name_covered || !dirty_covered)
-				    dialog.message(string(gettext(SKIPPED)) + juillet.get_string());
+				    dialog->message(string(gettext(SKIPPED)) + juillet.get_string());
 				else
-				    dialog.message(string(gettext(SQUEEZED)) + juillet.get_string());
+				    dialog->message(string(gettext(SQUEEZED)) + juillet.get_string());
 			    }
 
 			    if(e_dir == nullptr || !cat.read_second_time_dir())
@@ -441,11 +444,11 @@ namespace libdar
 		    }
 		    catch(Euser_abort & e)
 		    {
-			dialog.message(juillet.get_string() + gettext(" not restored (user choice)"));
+			dialog->message(juillet.get_string() + gettext(" not restored (user choice)"));
 
 			if(e_dir != nullptr && !flat)
 			{
-			    dialog.message(gettext("No file in this directory will be restored."));
+			    dialog->message(gettext("No file in this directory will be restored."));
 			    cat.skip_read_to_parent_dir();
 			    juillet.enfile(&tmp_eod);
 			}
@@ -463,12 +466,12 @@ namespace libdar
 		    catch(Egeneric & e)
 		    {
 			if(!only_deleted || e_dir == nullptr)
-			    dialog.message(string(gettext("Error while restoring ")) + juillet.get_string() + " : " + e.get_message());
+			    dialog->message(string(gettext("Error while restoring ")) + juillet.get_string() + " : " + e.get_message());
 
 			if(e_dir != nullptr && !flat)
 			{
 			    if(!only_deleted)
-				dialog.message(string(gettext("Warning! No file in that directory will be restored: ")) + juillet.get_string());
+				dialog->message(string(gettext("Warning! No file in that directory will be restored: ")) + juillet.get_string());
 			    cat.skip_read_to_parent_dir();
 			    juillet.enfile(&tmp_eod);
 			}
@@ -503,7 +506,7 @@ namespace libdar
 	    delete when_only_deleted;
     }
 
-    void filtre_sauvegarde(user_interaction & dialog,
+    void filtre_sauvegarde(const shared_ptr<user_interaction> & dialog,
 			   const mask &filtre,
                            const mask &subtree,
 			   const pile_descriptor & pdesc,
@@ -545,7 +548,10 @@ namespace libdar
 			   bool auto_zeroing_neg_dates,
 			   const set<string> & ignored_symlinks)
     {
-        cat_entree *e = nullptr;
+	if(!dialog)
+	    throw SRC_BUG; // dialog points to nothing
+
+	cat_entree *e = nullptr;
         const cat_entree *f = nullptr;
         defile juillet = fs_racine;
         const cat_eod tmp_eod;
@@ -607,7 +613,7 @@ namespace libdar
 		    if(display_treated_only_dir)
 		    {
 			if(dir != nullptr)
-			    dialog.message(string(gettext("Inspecting directory ")) + juillet.get_string());
+			    dialog->message(string(gettext("Inspecting directory ")) + juillet.get_string());
 		    }
 
 		    if(e_mir != nullptr)
@@ -648,7 +654,7 @@ namespace libdar
 					   || e_mir->get_inode()->get_saved_status() == s_delta
 					   || e_mir->get_inode()->ea_get_saved_status() == cat_inode::ea_full)
 					    if(display_treated)
-						dialog.message(string(gettext("Recording hard link into the archive: "))+juillet.get_string());
+						dialog->message(string(gettext("Recording hard link into the archive: "))+juillet.get_string());
 				    }
 				    else
 					throw SRC_BUG; // known_hard_link is true and e_mir == nullptr !???
@@ -715,7 +721,7 @@ namespace libdar
 								{
 								    string tmp = juillet.get_string();
 
-								    dialog.printf(gettext("SECURITY WARNING! SUSPICIOUS FILE %S: ctime changed since archive of reference was done, while no other inode information changed"), &tmp);
+								    dialog->printf(gettext("SECURITY WARNING! SUSPICIOUS FILE %S: ctime changed since archive of reference was done, while no other inode information changed"), &tmp);
 								}
 							    }
 							}
@@ -927,7 +933,7 @@ namespace libdar
 				sem.raise(juillet.get_string(), e, false);
 
 				if(display_skipped)
-				    dialog.message(string(gettext(SKIPPED)) + juillet.get_string());
+				    dialog->message(string(gettext(SKIPPED)) + juillet.get_string());
 
 				if(dir != nullptr && make_empty_dir)
 				    ig = ignode = new (nothrow) cat_ignored_dir(*dir);
@@ -1015,7 +1021,7 @@ namespace libdar
 			    if(how != "write") // error did not occured while adding data to the archive
 			    {
 				cat_nomme *tmp = new (nothrow) cat_ignored(nom->get_name());
-				dialog.message(string(gettext("Error while saving ")) + juillet.get_string() + ": " + ex.get_message());
+				dialog->message(string(gettext("Error while saving ")) + juillet.get_string() + ": " + ex.get_message());
 				st.incr_errored();
 
 				    // now we can destroy the object
@@ -1030,7 +1036,7 @@ namespace libdar
 				{
 				    fs.skip_read_to_parent_dir();
 				    juillet.enfile(&tmp_eod);
-				    dialog.message(gettext("NO FILE IN THAT DIRECTORY CAN BE SAVED."));
+				    dialog->message(gettext("NO FILE IN THAT DIRECTORY CAN BE SAVED."));
 				}
 			    }
 			    else
@@ -1058,7 +1064,7 @@ namespace libdar
 				ratio += tools_get_compression_ratio(cur.get_storage_size(), cur.get_size(), true);
 			    else
 				ratio = "";
-			    dialog.printf(gettext("Finished Inspecting directory %S , saved %S%S"),
+			    dialog->printf(gettext("Finished Inspecting directory %S , saved %S%S"),
 					  &what,
 					  &size,
 					  &ratio);
@@ -1095,7 +1101,7 @@ namespace libdar
 	}
     }
 
-    void filtre_difference(user_interaction & dialog,
+    void filtre_difference(const shared_ptr<user_interaction> & dialog,
 			   const mask &filtre,
                            const mask &subtree,
                            const catalogue & cat,
@@ -1114,7 +1120,10 @@ namespace libdar
 			   const fsa_scope & scope,
 			   bool isolated_mode)
     {
-        const cat_entree *e;
+	if(!dialog)
+	    throw SRC_BUG; // dialog points to nothing
+
+	const cat_entree *e;
         defile juillet = fs_racine;
         const cat_eod tmp_eod;
         filesystem_diff fs(dialog,
@@ -1154,7 +1163,7 @@ namespace libdar
 		    e_mir->get_inode()->change_name(e_mir->get_name());
 		}
 		else
-		    dialog.message(gettext("SKIPPED (hard link in sequential read mode): ") + e_mir->get_name());
+		    dialog->message(gettext("SKIPPED (hard link in sequential read mode): ") + e_mir->get_name());
 	    }
 
 	    juillet.enfile(e);
@@ -1162,7 +1171,7 @@ namespace libdar
 	    if(display_treated_only_dir)
 	    {
 		if(e_dir != nullptr)
-		    dialog.message(string(gettext("Inspecting directory ")) + juillet.get_string());
+		    dialog->message(string(gettext("Inspecting directory ")) + juillet.get_string());
 	    }
 
 	    try
@@ -1190,7 +1199,7 @@ namespace libdar
 					{
 					    e_ino->compare(*exists, ea_mask, what_to_check, hourshift, compare_symlink_date, scope, isolated_mode);
 					    if(display_treated)
-						dialog.message(string(gettext("OK   "))+juillet.get_string());
+						dialog->message(string(gettext("OK   "))+juillet.get_string());
 					    if(e_dir == nullptr || !cat.read_second_time_dir())
 						st.incr_treated();
 					    if(!alter_atime)
@@ -1201,7 +1210,7 @@ namespace libdar
 					}
 					catch(Erange & e)
 					{
-					    dialog.message(string(gettext("DIFF "))+juillet.get_string()+": "+ e.get_message());
+					    dialog->message(string(gettext("DIFF "))+juillet.get_string()+": "+ e.get_message());
 					    if(e_dir == nullptr && exists_dir != nullptr)
 						fs.skip_read_filename_in_parent_dir();
 					    if(e_dir != nullptr && exists_dir == nullptr)
@@ -1233,7 +1242,7 @@ namespace libdar
 			    }
 			    else // can't compare, nothing of that name in filesystem
 			    {
-				dialog.message(string(gettext("DIFF "))+ juillet.get_string() + gettext(": file not present in filesystem"));
+				dialog->message(string(gettext("DIFF "))+ juillet.get_string() + gettext(": file not present in filesystem"));
 				if(e_dir != nullptr)
 				{
 				    cat.skip_read_to_parent_dir();
@@ -1250,7 +1259,7 @@ namespace libdar
 		    else // not covered by filters
 		    {
 			if(display_skipped)
-			    dialog.message(string(gettext(SKIPPED)) + juillet.get_string());
+			    dialog->message(string(gettext(SKIPPED)) + juillet.get_string());
 
 			if(e_dir == nullptr || !cat.read_second_time_dir())
 			    st.incr_ignored();
@@ -1285,7 +1294,7 @@ namespace libdar
 	    }
 	    catch(Egeneric & e)
 	    {
-		dialog.message(string(gettext("ERR  ")) + juillet.get_string() + " : " + e.get_message());
+		dialog->message(string(gettext("ERR  ")) + juillet.get_string() + " : " + e.get_message());
 		if(e_dir == nullptr || !cat.read_second_time_dir())
 		    st.incr_errored();
 	    }
@@ -1294,7 +1303,7 @@ namespace libdar
             // this call here only to restore dates of the root (-R option) directory
     }
 
-    void filtre_test(user_interaction & dialog,
+    void filtre_test(const shared_ptr<user_interaction> & dialog,
 		     const mask &filtre,
                      const mask &subtree,
                      const catalogue & cat,
@@ -1313,6 +1322,9 @@ namespace libdar
 	thread_cancellation thr_cancel;
 	string perimeter;
 	memory_file *delta_sig = nullptr;
+
+	if(!dialog)
+	    throw SRC_BUG; // dialog points to nothing
 
 	if(display_treated_only_dir && display_treated)
 	    display_treated = false;
@@ -1339,7 +1351,7 @@ namespace libdar
 	    if(display_treated_only_dir)
 	    {
 		if(e_dir != nullptr)
-		    dialog.message(string(gettext("Inspecting directory ")) + juillet.get_string());
+		    dialog->message(string(gettext("Inspecting directory ")) + juillet.get_string());
 	    }
 
 	    perimeter = "";
@@ -1514,12 +1526,12 @@ namespace libdar
 
 			    // still no exception raised, this all is fine
 			if(display_treated)
-			    dialog.message(string(gettext("OK  ")) + juillet.get_string() + "  " + perimeter);
+			    dialog->message(string(gettext("OK  ")) + juillet.get_string() + "  " + perimeter);
 		    }
                     else // excluded by filter
                     {
 			if(display_skipped)
-			    dialog.message(string(gettext(SKIPPED)) + juillet.get_string());
+			    dialog->message(string(gettext(SKIPPED)) + juillet.get_string());
 
                         if(e_dir != nullptr)
                         {
@@ -1549,14 +1561,14 @@ namespace libdar
 	    }
             catch(Egeneric & e)
             {
-                dialog.message(string(gettext("ERR ")) + juillet.get_string() + " : " + e.get_message());
+                dialog->message(string(gettext("ERR ")) + juillet.get_string() + " : " + e.get_message());
 		if(e_dir == nullptr || !cat.read_second_time_dir())
 		    st.incr_errored();
             }
         }
     }
 
-    void filtre_merge(user_interaction & dialog,
+    void filtre_merge(const shared_ptr<user_interaction> & dialog,
 		      const mask & filtre,
 		      const mask & subtree,
 		      const pile_descriptor & pdesc,
@@ -1589,6 +1601,9 @@ namespace libdar
 	    // decremental backup is asked
 	bool abort = false;
 	thread_cancellation thr_cancel;
+
+	if(!dialog)
+	    throw SRC_BUG; // dialog points to nothing
 
 	if(display_treated_only_dir && display_treated)
 	    display_treated = false;
@@ -1645,7 +1660,7 @@ namespace libdar
 			   false);
     }
 
-    void filtre_merge_step0(user_interaction & dialog,
+    void filtre_merge_step0(const shared_ptr<user_interaction> & dialog,
 			    const catalogue * ref1,
 			    const catalogue * ref2,
 			    statistics & st,
@@ -1655,6 +1670,8 @@ namespace libdar
 			    bool & abort,
 			    thread_cancellation & thr_cancel)
     {
+	if(!dialog)
+	    throw SRC_BUG; // dialog points to nothing
 
 	    // STEP 0: Getting ready
 
@@ -1664,7 +1681,7 @@ namespace libdar
 	{
 	    if(ref1 == nullptr || ref2 == nullptr)
 	    {
-		dialog.pause(gettext("Decremental mode is useless when merging is not applied to both an archive of reference and an auxiliary archive of reference. Ignore decremental mode and continue?"));
+		dialog->pause(gettext("Decremental mode is useless when merging is not applied to both an archive of reference and an auxiliary archive of reference. Ignore decremental mode and continue?"));
 		decremental_mode = false;
 	    }
 	    else
@@ -1741,7 +1758,7 @@ namespace libdar
 	    /// End of Step 0
     }
 
-    void filtre_merge_step1(user_interaction & dialog,
+    void filtre_merge_step1(const shared_ptr<user_interaction> & dialog,
 			    const mask & filtre,
 			    const mask & subtree,
 			    catalogue & cat,
@@ -1772,6 +1789,9 @@ namespace libdar
 
 	    if(overwrite == nullptr)
 		throw SRC_BUG;
+
+	    if(!dialog)
+		throw SRC_BUG; // dialog points to nothing
 
 
 		// STEP 1:
@@ -1804,7 +1824,7 @@ namespace libdar
 			    ptr = gettext("next"); // not yet used, but room is made for future evolutions
 			    break;
 			}
-			dialog.printf(gettext("Merging/filtering files from the %s archive..."), ptr);
+			dialog->printf(gettext("Merging/filtering files from the %s archive..."), ptr);
 		    }
 
 		    while(ref_tab[index]->read(e)) // examining the content of the current archive of reference, each entry one by one
@@ -1867,7 +1887,7 @@ namespace libdar
 					    overwrite->get_action(*already_here, *dolly_nom, act_data, act_ea);
 
 					    if(act_data == data_ask)
-						act_data = crit_ask_user_for_data_action(dialog, full_name, already_here, dolly);
+						act_data = crit_ask_user_for_data_action(*dialog, full_name, already_here, dolly);
 
 						// possibly modifying the resulting action when warning is requested
 
@@ -1898,7 +1918,7 @@ namespace libdar
 							default:
 							    throw SRC_BUG;
 							}
-							dialog.pause(tools_printf(gettext("Data of file %S is about to be %S, proceed?"), &full_name, &action));
+							dialog->pause(tools_printf(gettext("Data of file %S is about to be %S, proceed?"), &full_name, &action));
 						    }
 						    catch(Euser_abort & e)
 						    {
@@ -1942,7 +1962,7 @@ namespace libdar
 							default:
 							    throw SRC_BUG;
 							}
-							dialog.pause(tools_printf(gettext("EA and FSA of file %S are about to be %S, proceed?"), &full_name, &action));
+							dialog->pause(tools_printf(gettext("EA and FSA of file %S are about to be %S, proceed?"), &full_name, &action));
 						    }
 						    catch(Euser_abort & e)
 						    {
@@ -1990,7 +2010,7 @@ namespace libdar
 							   || dolly_ino->fsa_get_saved_status() != cat_inode::fsa_none
 							   || al_ino->fsa_get_saved_status() != cat_inode::fsa_none)
 							)
-							act_ea = crit_ask_user_for_EA_action(dialog, full_name, already_here, dolly);
+							act_ea = crit_ask_user_for_EA_action(*dialog, full_name, already_here, dolly);
 						    else
 							act_ea = EA_preserve; // whatever what we want is, as no EA exist for both inplace and to be added objects, there is just no need to ask for that.
 						}
@@ -2006,7 +2026,7 @@ namespace libdar
 						case EA_merge_preserve:
 						case EA_merge_overwrite:
 						    if(display_treated)
-							dialog.message(tools_printf(gettext("EA and FSA of file %S from first archive have been updated with those of same named file of the auxiliary archive"), &full_name));
+							dialog->message(tools_printf(gettext("EA and FSA of file %S from first archive have been updated with those of same named file of the auxiliary archive"), &full_name));
 						    do_EFSA_transfert(dialog, act_ea, const_cast<cat_inode *>(al_ino), dolly_ino);
 						    break;
 
@@ -2016,13 +2036,13 @@ namespace libdar
 						    {
 							const_cast<cat_inode *>(al_ino)->ea_set_saved_status(cat_inode::ea_partial);
 							if(display_treated)
-							    dialog.message(tools_printf(gettext("EA of file %S from first archive have been dropped and marked as already saved"), &full_name));
+							    dialog->message(tools_printf(gettext("EA of file %S from first archive have been dropped and marked as already saved"), &full_name));
 						    }
 						    if(al_ino != nullptr && al_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 						    {
 							const_cast<cat_inode *>(al_ino)->fsa_set_saved_status(cat_inode::fsa_partial);
 							if(display_treated)
-							    dialog.message(tools_printf(gettext("FSA of file %S from first archive have been dropped and marked as already saved"), &full_name));
+							    dialog->message(tools_printf(gettext("FSA of file %S from first archive have been dropped and marked as already saved"), &full_name));
 						    }
 						    break;
 
@@ -2032,7 +2052,7 @@ namespace libdar
 							if(al_ino->ea_get_saved_status() == cat_inode::ea_full)
 							    st.decr_ea_treated();
 							if(display_treated)
-							    dialog.message(tools_printf(gettext("EA of file %S from first archive have been removed"), &full_name));
+							    dialog->message(tools_printf(gettext("EA of file %S from first archive have been removed"), &full_name));
 							const_cast<cat_inode *>(al_ino)->ea_set_saved_status(cat_inode::ea_none);
 						    }
 						    if(al_ino != nullptr && al_ino->fsa_get_saved_status() != cat_inode::fsa_none)
@@ -2040,7 +2060,7 @@ namespace libdar
 							if(al_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 							    st.decr_fsa_treated();
 							if(display_treated)
-							    dialog.message(tools_printf(gettext("FSA of file %S from first archive have been removed"), &full_name));
+							    dialog->message(tools_printf(gettext("FSA of file %S from first archive have been removed"), &full_name));
 							const_cast<cat_inode *>(al_ino)->fsa_set_saved_status(cat_inode::fsa_none);
 						    }
 
@@ -2054,7 +2074,7 @@ namespace libdar
 						    // we must keep the existing entry in the catalogue
 
 						if(display_skipped && (dolly_dir == nullptr || al_dir == nullptr))
-						    dialog.message(tools_printf(gettext("Data of file %S from first archive has been preserved from overwriting"), &full_name));
+						    dialog->message(tools_printf(gettext("Data of file %S from first archive has been preserved from overwriting"), &full_name));
 
 						if(al_dir != nullptr && dolly_dir != nullptr)
 						{
@@ -2105,10 +2125,10 @@ namespace libdar
 						    switch(act_data)
 						    {
 						    case data_remove:
-							dialog.message(tools_printf(gettext("Data of file %S taken from the first archive of reference has been removed"), &full_name));
+							dialog->message(tools_printf(gettext("Data of file %S taken from the first archive of reference has been removed"), &full_name));
 							break;
 						    default:
-							dialog.message(tools_printf(gettext("Data of file %S taken from the first archive of reference has been overwritten"), &full_name));
+							dialog->message(tools_printf(gettext("Data of file %S taken from the first archive of reference has been overwritten"), &full_name));
 						    }
 						}
 
@@ -2127,7 +2147,7 @@ namespace libdar
 							|| al_ino->ea_get_saved_status() != cat_inode::ea_none
 							|| dolly_ino->fsa_get_saved_status() != cat_inode::fsa_none
 							|| al_ino->fsa_get_saved_status() != cat_inode::fsa_none))
-							act_ea = crit_ask_user_for_EA_action(dialog, full_name, already_here, dolly);
+							act_ea = crit_ask_user_for_EA_action(*dialog, full_name, already_here, dolly);
 						    else
 							act_ea = EA_overwrite; // no need to ask here neither as both entries have no EA.
 						}
@@ -2142,34 +2162,34 @@ namespace libdar
 							break;
 						    case EA_overwrite:
 							if(display_treated)
-							    dialog.message(tools_printf(gettext("EA of file %S has been overwritten"), &full_name));
+							    dialog->message(tools_printf(gettext("EA of file %S has been overwritten"), &full_name));
 							break; // nothing to do
 						    case EA_overwrite_mark_already_saved:
 							if(display_treated)
-							    dialog.message(tools_printf(gettext("EA of file %S has been overwritten and marked as already saved"), &full_name));
+							    dialog->message(tools_printf(gettext("EA of file %S has been overwritten and marked as already saved"), &full_name));
 							if(dolly_ino != nullptr && dolly_ino->ea_get_saved_status() == cat_inode::ea_full)
 							    dolly_ino->ea_set_saved_status(cat_inode::ea_partial);
 							break;
 						    case EA_merge_preserve:
 							if(display_treated)
-							    dialog.message(tools_printf(gettext("EA of file %S from first archive have been updated with those of the same named file of the auxiliary archive"), &full_name));
+							    dialog->message(tools_printf(gettext("EA of file %S from first archive have been updated with those of the same named file of the auxiliary archive"), &full_name));
 							do_EFSA_transfert(dialog, EA_merge_overwrite, dolly_ino, al_ino);
 							break;
 						    case EA_merge_overwrite:
 							if(display_treated)
-							    dialog.message(tools_printf(gettext("EA of file %S from first archive have been updated with those of the same named file of the auxiliary archive"), &full_name));
+							    dialog->message(tools_printf(gettext("EA of file %S from first archive have been updated with those of the same named file of the auxiliary archive"), &full_name));
 							do_EFSA_transfert(dialog, EA_merge_preserve, dolly_ino, al_ino);
 							break;
 						    case EA_preserve_mark_already_saved:
 							if(display_treated)
-							    dialog.message(tools_printf(gettext("EA of file %S has been overwritten and marked as already saved"), &full_name));
+							    dialog->message(tools_printf(gettext("EA of file %S has been overwritten and marked as already saved"), &full_name));
 							do_EFSA_transfert(dialog, EA_overwrite_mark_already_saved, dolly_ino, al_ino);
 							break;
 						    case EA_clear:
 							if(al_ino->ea_get_saved_status() != cat_inode::ea_none)
 							{
 							    if(display_treated)
-								dialog.message(tools_printf(gettext("EA of file %S from first archive have been removed"), &full_name));
+								dialog->message(tools_printf(gettext("EA of file %S from first archive have been removed"), &full_name));
 							    dolly_ino->ea_set_saved_status(cat_inode::ea_none);
 							}
 							break;
@@ -2425,7 +2445,7 @@ namespace libdar
 				    }
 
 				    if(display_skipped)
-					dialog.message(string(gettext(SKIPPED)) + juillet.get_string());
+					dialog->message(string(gettext(SKIPPED)) + juillet.get_string());
 
 				    st.incr_ignored();
 				    if(e_dir != nullptr)
@@ -2441,11 +2461,11 @@ namespace libdar
 			    }
 			    catch(Euser_abort & e)
 			    {
-				dialog.message(juillet.get_string() + gettext(" not merged (user choice)"));
+				dialog->message(juillet.get_string() + gettext(" not merged (user choice)"));
 
 				if(e_dir != nullptr)
 				{
-				    dialog.message(gettext("No file in this directory will be considered for merging."));
+				    dialog->message(gettext("No file in this directory will be considered for merging."));
 				    ref_tab[index]->skip_read_to_parent_dir();
 				    juillet.enfile(&tmp_eod);
 				}
@@ -2465,11 +2485,11 @@ namespace libdar
 			    }
 			    catch(Egeneric & e)
 			    {
-				dialog.message(string(gettext("Error while considering file ")) + juillet.get_string() + " : " + e.get_message());
+				dialog->message(string(gettext("Error while considering file ")) + juillet.get_string() + " : " + e.get_message());
 
 				if(e_dir != nullptr)
 				{
-				    dialog.message(string(gettext("Warning! No file in this directory will be considered for merging: ")) + juillet.get_string());
+				    dialog->message(string(gettext("Warning! No file in this directory will be considered for merging: ")) + juillet.get_string());
 				    ref_tab[index]->skip_read_to_parent_dir();
 				    juillet.enfile(&tmp_eod);
 				}
@@ -2506,7 +2526,7 @@ namespace libdar
 	    catch(Ethread_cancel & e)
 	    {
 		abort = true;
-		dialog.message(gettext("File selection has been aborted. Now building the resulting archive with the already selected files"));
+		dialog->message(gettext("File selection has been aborted. Now building the resulting archive with the already selected files"));
 		if(e.immediate_cancel())
 		    throw;
 	    }
@@ -2531,7 +2551,7 @@ namespace libdar
 
     }
 
-    void filtre_merge_step2(user_interaction & dialog,
+    void filtre_merge_step2(const shared_ptr<user_interaction> & dialog,
 			    const pile_descriptor & pdesc,
 			    catalogue & cat,
 			    bool info_details,
@@ -2554,6 +2574,8 @@ namespace libdar
 	const cat_entree *e = nullptr;
 	infinint fake_repeat = 0;
 
+	if(!dialog)
+	    throw SRC_BUG; // dialog points to nothing
 
 	    // STEP 2:
 	    // 'cat' is now completed
@@ -2561,7 +2583,7 @@ namespace libdar
 
 
 	if(info_details)
-	    dialog.message("Copying filtered files to the resulting archive...");
+	    dialog->message("Copying filtered files to the resulting archive...");
 
 	cat.set_all_mirage_s_inode_wrote_field_to(false);
 	cat.reset_read();
@@ -2598,7 +2620,7 @@ namespace libdar
 		if(display_treated_only_dir)
 		{
 		    if(e_dir != nullptr)
-			dialog.message(string(gettext("Inspecting directory ")) + juillet.get_string());
+			dialog->message(string(gettext("Inspecting directory ")) + juillet.get_string());
 		}
 
 		if(e_ino != nullptr) // inode
@@ -2681,7 +2703,7 @@ namespace libdar
 					    {
 						string tmp = juillet.get_string();
 
-						dialog.message(tools_printf(gettext("Need to activate sparse file detection in order to calculate delta signature for sparse file %S"), &tmp));
+						dialog->message(tools_printf(gettext("Need to activate sparse file detection in order to calculate delta signature for sparse file %S"), &tmp));
 					    }
 					    else
 					    {
@@ -2764,7 +2786,7 @@ namespace libdar
 		    cat.pre_add(e, &pdesc);
 		    if(e_mir != nullptr && (e_mir->get_inode()->get_saved_status() == s_saved || e_mir->get_inode()->ea_get_saved_status() == cat_inode::ea_full))
 			if(display_treated)
-			    dialog.message(string(gettext("Adding Hard link to archive: "))+juillet.get_string());
+			    dialog->message(string(gettext("Adding Hard link to archive: "))+juillet.get_string());
 		}
 
 		    // we can now check for interrution requests
@@ -2804,7 +2826,7 @@ namespace libdar
     }
 
     void filtre_sequentially_read_all_catalogue(catalogue & cat,
-						user_interaction & dialog,
+						const shared_ptr<user_interaction> & dialog,
 						bool lax_read_mode)
     {
 	const cat_entree *e;
@@ -2844,7 +2866,7 @@ namespace libdar
 		{
 		    string msg = string(gettext("failed reading CRC from file: ")) + juillet.get_string();
 		    if(lax_read_mode)
-			dialog.message(msg);
+			dialog->message(msg);
 		    else
 			throw Edata(msg);
 		}
@@ -2873,7 +2895,7 @@ namespace libdar
 		    string msg = string(gettext("Failed reading CRC for EA and FSA: ")) + juillet.get_string();
 
 		    if(lax_read_mode)
-			dialog.message(msg);
+			dialog->message(msg);
 		    else
 			throw Edata(msg);
 		}
@@ -2881,13 +2903,13 @@ namespace libdar
 	}
 	catch(Erange & e)
 	{
-	    dialog.message(string(gettext("Error met while reading next entry: ")) + juillet.get_string());
+	    dialog->message(string(gettext("Error met while reading next entry: ")) + juillet.get_string());
 	}
     }
 
 
 
-    static bool save_inode(user_interaction & dialog,
+    static bool save_inode(const shared_ptr<user_interaction> & dialog,
 			   const string & info_quoi,
 			   cat_entree * & e,
 			   const cat_entree * ref,
@@ -3001,15 +3023,15 @@ namespace libdar
 		if(display_treated)
 		{
 		    if(resave_uncompressed)
-			dialog.message(string(gettext("Resaving file without compression: ")) + info_quoi);
+			dialog->message(string(gettext("Resaving file without compression: ")) + info_quoi);
 		    else
 		    {
 			if(delta_sig_ref != nullptr)
-			    dialog.message(string(gettext("Delta saving file to archive: ")) + info_quoi);
+			    dialog->message(string(gettext("Delta saving file to archive: ")) + info_quoi);
 			else
 			{
 			    string i_type = entree_to_string(ino);
-			    dialog.message(tools_printf(gettext("Adding %S to archive: %S"), &i_type, &info_quoi));
+			    dialog->message(tools_printf(gettext("Adding %S to archive: %S"), &i_type, &info_quoi));
 			}
 		    }
 		}
@@ -3149,7 +3171,7 @@ namespace libdar
 					    if(!repair_mode)
 						throw;
 
-					    dialog.printf(gettext("Failed reading data CRC for %S, file may be damaged and will be marked dirty"),
+					    dialog->printf(gettext("Failed reading data CRC for %S, file may be damaged and will be marked dirty"),
 							  &info_quoi);
 					    fic->set_dirty(true);
 
@@ -3169,7 +3191,7 @@ namespace libdar
 
 					    if(!fixed)
 					    {
-						dialog.printf(gettext("Failed setting storage size to zero for this file with missing data CRC, CRC error will be reported for that file while reading the repaired archive"));
+						dialog->printf(gettext("Failed setting storage size to zero for this file with missing data CRC, CRC error will be reported for that file while reading the repaired archive"));
 						set_storage_size_to_zero = true;
 					    }
 
@@ -3336,7 +3358,7 @@ namespace libdar
 					catch(...)
 					{
 					    if(info_details)
-						dialog.message(info_quoi + gettext(" : Failed resaving uncompressed the inode data"));
+						dialog->message(info_quoi + gettext(" : Failed resaving uncompressed the inode data"));
 						// ignoring the error and continuing
 					    resave_uncompressed = false;
 					    if(pdesc.stack->get_position() != current_pos_tmp)
@@ -3346,7 +3368,7 @@ namespace libdar
 				    else
 				    {
 					if(info_details)
-					    dialog.message(info_quoi  + gettext(" : Resaving uncompressed the inode data to gain space is not possible, keeping data compressed"));
+					    dialog->message(info_quoi  + gettext(" : Resaving uncompressed the inode data to gain space is not possible, keeping data compressed"));
 				    }
 				}
 				else
@@ -3362,7 +3384,7 @@ namespace libdar
 
 				    try
 				    {
-					changed = fic->get_last_modif() != tools_get_mtime(dialog,
+					changed = fic->get_last_modif() != tools_get_mtime(*dialog,
 											   info_quoi,
 											   true,
 											   true, // silently set to zero negative dates
@@ -3370,7 +3392,7 @@ namespace libdar
 				    }
 				    catch(Erange & e)
 				    {
-					dialog.message(tools_printf(gettext("File has disappeared while we were reading it, cannot check whether it has changed during its backup: %S"), &info_quoi));
+					dialog->message(tools_printf(gettext("File has disappeared while we were reading it, cannot check whether it has changed during its backup: %S"), &info_quoi));
 					changed = false;
 				    }
 
@@ -3405,13 +3427,13 @@ namespace libdar
 					    if(repeat_byte.is_zero() || (current_wasted_bytes < repeat_byte))
 					    {
 						if(info_details)
-						    dialog.message(tools_printf(gettext("WARNING! File modified while reading it for backup. Performing retry %i of %i"), &current_repeat_count, &repeat_count));
+						    dialog->message(tools_printf(gettext("WARNING! File modified while reading it for backup. Performing retry %i of %i"), &current_repeat_count, &repeat_count));
 						if(pdesc.stack->get_position() != start)
 						    cat.pre_add_waste_mark(&pdesc);
 						loop = true;
 
 						    // updating the last modification date of file
-						fic->set_last_modif(tools_get_mtime(dialog,
+						fic->set_last_modif(tools_get_mtime(*dialog,
 										    info_quoi,
 										    true,
 										    true, // silently set to zero negative date
@@ -3422,14 +3444,14 @@ namespace libdar
 					    }
 					    else
 					    {
-						dialog.message(string(gettext("WARNING! File modified while reading it for backup. No more retry for that file to not exceed the wasted byte limit. File is ")) + info_quoi);
+						dialog->message(string(gettext("WARNING! File modified while reading it for backup. No more retry for that file to not exceed the wasted byte limit. File is ")) + info_quoi);
 						fic->set_dirty(true);
 						ret = false;
 					    }
 					}
 					else
 					{
-					    dialog.message(string(gettext("WARNING! File modified while reading it for backup, but no more retry allowed: ")) + info_quoi);
+					    dialog->message(string(gettext("WARNING! File modified while reading it for backup, but no more retry allowed: ")) + info_quoi);
 					    fic->set_dirty(true);
 					    cat.pre_add_dirty(&pdesc); // when in sequential reading
 					    ret = false;
@@ -3449,7 +3471,7 @@ namespace libdar
 				if(fic->has_delta_signature_structure() && !loop)
 				{
 				    if(display_treated)
-					dialog.message(string(gettext("Dumping delta signature structure for saved file: ")) + info_quoi);
+					dialog->message(string(gettext("Dumping delta signature structure for saved file: ")) + info_quoi);
 
 				    if(delta_sig == nullptr)
 				    {
@@ -3574,7 +3596,7 @@ namespace libdar
 	return ret;
     }
 
-    static bool save_ea(user_interaction & dialog,
+    static bool save_ea(const shared_ptr<user_interaction> & dialog,
 			const string & info_quoi,
 			cat_inode * & ino,
 			const pile_descriptor & pdesc,
@@ -3595,7 +3617,7 @@ namespace libdar
 		    try
 		    {
 			if(display_treated)
-			    dialog.message(string(gettext("Saving Extended Attributes for ")) + info_quoi);
+			    dialog->message(string(gettext("Saving Extended Attributes for ")) + info_quoi);
 			if(pdesc.compr->is_compression_suspended())
 			{
 			    pdesc.stack->sync_write_above(pdesc.compr);
@@ -3630,7 +3652,7 @@ namespace libdar
 				throw SRC_BUG;
 			    if(*tmp != *val)
 			    {
-				dialog.printf(gettext("Computed EA CRC for file %S differs from what was stored in the archive, this file's EA may have been corrupted"),
+				dialog->printf(gettext("Computed EA CRC for file %S differs from what was stored in the archive, this file's EA may have been corrupted"),
 					      &info_quoi);
 				ino->ea_set_crc(*val);
 			    }
@@ -3677,11 +3699,11 @@ namespace libdar
 	}
         catch(Egeneric & e)
         {
-            dialog.message(string(gettext("Error saving Extended Attributes for ")) + info_quoi + ": " + e.get_message());
+            dialog->message(string(gettext("Error saving Extended Attributes for ")) + info_quoi + ": " + e.get_message());
 	    if(repair_mode)
 	    {
 		ino->ea_set_saved_status(cat_inode::ea_none);
-		dialog.message(gettext("be advised that a CRC error will be reported for the EA of that file while sequentially reading the repaired archive"));
+		dialog->message(gettext("be advised that a CRC error will be reported for the EA of that file while sequentially reading the repaired archive"));
 	    }
         }
         return ret;
@@ -3695,7 +3717,7 @@ namespace libdar
 	    tools_noexcept_make_date(chemin, false, ptr_f->get_last_access(), ptr_f->get_last_modif(), ptr_f->get_last_modif());
     }
 
-    static bool save_fsa(user_interaction & dialog,
+    static bool save_fsa(const shared_ptr<user_interaction> & dialog,
 			 const string & info_quoi,
 			 cat_inode * & ino,
 			 const pile_descriptor & pdesc,
@@ -3716,7 +3738,7 @@ namespace libdar
 		    try
 		    {
 			if(display_treated)
-			    dialog.message(string(gettext("Saving Filesystem Specific Attributes for ")) + info_quoi);
+			    dialog->message(string(gettext("Saving Filesystem Specific Attributes for ")) + info_quoi);
 			if(pdesc.compr->get_algo() != compression::none)
 			{
 			    pdesc.stack->sync_write_above(pdesc.compr);
@@ -3746,7 +3768,7 @@ namespace libdar
 				throw SRC_BUG;
 			    if(*tmp != *val)
 			    {
-				dialog.printf(gettext("Computed FSA CRC for file %S differs from what was stored in the archive, this file's EA may have been corrupted"),
+				dialog->printf(gettext("Computed FSA CRC for file %S differs from what was stored in the archive, this file's EA may have been corrupted"),
 					      &info_quoi);
 				ino->fsa_set_crc(*val);
 			    }
@@ -3791,17 +3813,17 @@ namespace libdar
 	}
         catch(Egeneric & e)
         {
-            dialog.message(string(gettext("Error saving Filesystem Specific Attributes for ")) + info_quoi + ": " + e.get_message());
+            dialog->message(string(gettext("Error saving Filesystem Specific Attributes for ")) + info_quoi + ": " + e.get_message());
 	    if(repair_mode)
 	    {
 		ino->fsa_set_saved_status(cat_inode::fsa_none);
-		dialog.message(gettext("be advised that a CRC error will be reported for the FSA of that file while sequentially reading the repaired archive"));
+		dialog->message(gettext("be advised that a CRC error will be reported for the FSA of that file while sequentially reading the repaired archive"));
 	    }
         }
         return ret;
     }
 
-    static void do_EFSA_transfert(user_interaction &dialog,
+    static void do_EFSA_transfert(const shared_ptr<user_interaction> &dialog,
 				  over_action_ea action,
 				  cat_inode *place_ino,
 				  const cat_inode *add_ino)
@@ -4331,7 +4353,7 @@ namespace libdar
 	return ret;
     }
 
-    static void save_delta_signature(user_interaction & dialog,
+    static void save_delta_signature(const shared_ptr<user_interaction> & dialog,
 				     const string & info_quoi,
 				     cat_file * e_file,
 				     const cat_file * ref_file,
@@ -4351,7 +4373,7 @@ namespace libdar
 		   && ref_file->has_delta_signature_structure())
 		{
 		    if(display_treated)
-			dialog.message(string(gettext("Copying delta signature structure from the archive of reference: ")) + info_quoi);
+			dialog->message(string(gettext("Copying delta signature structure from the archive of reference: ")) + info_quoi);
 
 		    if(ref_file->has_delta_signature_available())
 		    {
@@ -4388,7 +4410,7 @@ namespace libdar
 			generic_file *data = nullptr;
 
 			if(display_treated)
-			    dialog.message(string(gettext("Calculating delta signature from filesystem: "))
+			    dialog->message(string(gettext("Calculating delta signature from filesystem: "))
 					   + info_quoi);
 			try
 			{

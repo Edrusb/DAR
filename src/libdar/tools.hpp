@@ -201,7 +201,7 @@ namespace libdar
 	/// \param[out] in resulting tuyau object for input
 	/// \param[out] out resulting tuyau object for output
 	/// \note in and out parameters must be released by the caller thanks to the "delete" operator
-    extern void tools_open_pipes(user_interaction & dialog,
+    extern void tools_open_pipes(const std::shared_ptr<user_interaction> & dialog,
 				 const std::string &input,
 				 const std::string & output,
                                  tuyau *&in,
@@ -292,7 +292,7 @@ namespace libdar
 	/// \param[in] argvpipe the list of arguments to pass through anonymous pipe
 	/// \note the command to execute must understand the --pipe-fd option that
 	/// gives the filedescriptor to read from the command-line options
-    extern void tools_system_with_pipe(user_interaction & dialog,
+    extern void tools_system_with_pipe(const std::shared_ptr<user_interaction> & dialog,
 				       const std::string & dar_cmd,
 				       const std::vector<std::string> & argvpipe);
 

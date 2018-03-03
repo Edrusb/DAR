@@ -41,6 +41,8 @@ extern "C"
 #include "pile_descriptor.hpp"
 #include "smart_pointer.hpp"
 
+#include <memory>
+
 namespace libdar
 {
     class cat_etoile;
@@ -96,7 +98,7 @@ namespace libdar
 	    /// \param[in] lax whether to use relax mode
 	    /// \param[in] only_detruit whether to only consider detruit objects (in addition to the directory tree)
 	    /// \param[in] small whether the dump() to read has been done with the small argument set
-        static cat_entree *read(user_interaction & dialog,
+        static cat_entree *read(const std::shared_ptr<user_interaction> & dialog,
 				const smart_pointer<pile_descriptor> & f,
 				const archive_version & reading_ver,
 				entree_stats & stats,

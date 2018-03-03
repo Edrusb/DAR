@@ -45,6 +45,9 @@ namespace libdar5
     using libdar::archive_options_diff;
     using libdar::archive_options_test;
     using libdar::archive_options_repair;
+    using libdar::path;
+    using libdar::statistics;
+    using libdar::catalogue;
 
 	/// the archive class realizes the most general operations on archives
 
@@ -55,20 +58,144 @@ namespace libdar5
     class archive: public libdar::archive
     {
     public:
-	    // using original constructors
+	archive(user_interaction & dialog,
+		const path & chem,
+		const std::string & basename,
+		const std::string & extension,
+		const archive_options_read & options):
+	    libdar::archive(user_interaction5_clone_to_shared_ptr(dialog),
+			    chem,
+			    basename,
+			    extension,
+			    options)
+	{}
 
-	using libdar::archive::archive;
+	archive(user_interaction & dialog,
+		const path & fs_root,
+		const path & sauv_path,
+		const std::string & filename,
+		const std::string & extension,
+		const archive_options_create & options,
+		statistics * progressive_report):
+	    libdar::archive(user_interaction5_clone_to_shared_ptr(dialog),
+			    fs_root,
+			    sauv_path,
+			    filename,
+			    extension,
+			    options,
+			    progressive_report)
+	{}
+
+	archive(user_interaction & dialog,
+		const path & sauv_path,
+		archive *ref_arch1,
+		const std::string & filename,
+		const std::string & extension,
+		const archive_options_merge & options,
+		statistics * progressive_report):
+	    libdar::archive(user_interaction5_clone_to_shared_ptr(dialog),
+			    sauv_path,
+			    ref_arch1,
+			    filename,
+			    extension,
+			    options,
+			    progressive_report)
+	{}
+
+	archive(user_interaction & dialog,
+		const path & chem_src,
+		const std::string & basename_src,
+		const std::string & extension_src,
+		const archive_options_read & options_read,
+		const path & chem_dst,
+		const std::string & basename_dst,
+		const std::string & extension_dst,
+		const archive_options_repair & options_repair):
+	    libdar::archive(user_interaction5_clone_to_shared_ptr(dialog),
+			    chem_src,
+			    basename_src,
+			    extension_src,
+			    options_read,
+			    chem_dst,
+			    basename_dst,
+			    extension_dst,
+			    options_repair)
+	{}
+
+	statistics op_extract(user_interaction & dialog,
+			      const path &fs_root,
+			      const archive_options_extract & options,
+			      statistics *progressive_report)
+	{
+	    return libdar::archive::op_extract(user_interaction5_clone_to_shared_ptr(dialog),
+					       fs_root,
+					       options,
+					       progressive_report);
+	}
+
+	void summary(user_interaction & dialog)
+	{
+	    libdar::archive::summary(user_interaction5_clone_to_shared_ptr(dialog));
+	}
 
 	    /// overwriting op_listing to use the user_interaction as callback
 	void op_listing(user_interaction & dialog,
 			const archive_options_listing & options);
 
+	statistics op_diff(user_interaction & dialog,
+			   const path & fs_root,
+			   const archive_options_diff & options,
+			   statistics * progressive_report)
+	{
+	    return libdar::archive::op_diff(user_interaction5_clone_to_shared_ptr(dialog),
+					    fs_root,
+					    options,
+					    progressive_report);
+	}
+
+	statistics op_test(user_interaction & dialog,
+			   const archive_options_test & options,
+			   statistics * progressive_report)
+	{
+	    return libdar::archive::op_test(user_interaction5_clone_to_shared_ptr(dialog),
+					    options,
+					    progressive_report);
+	}
+
+	void op_isolate(user_interaction & dialog,
+			const path &sauv_path,
+			const std::string & filename,
+			const std::string & extension,
+			const archive_options_isolate & options)
+	{
+	    libdar::archive::op_isolate(user_interaction5_clone_to_shared_ptr(dialog),
+					sauv_path,
+					filename,
+					extension,
+					options);
+	}
 
 	    /// overloading get_children_of to use the user_interaction object as callback
 	bool get_children_of(user_interaction & dialog,
 			     const std::string & dir);
 
+	void init_catalogue(user_interaction & dialog) const
+	{
+	    libdar::archive::init_catalogue(user_interaction5_clone_to_shared_ptr(dialog));
+	}
+
+	const catalogue & get_catalogue(user_interaction & dialog) const
+	{
+	    return libdar::archive::get_catalogue(user_interaction5_clone_to_shared_ptr(dialog));
+	}
+
+	void drop_all_filedescriptors(user_interaction & dialog)
+	{
+	    libdar::archive::drop_all_filedescriptors(user_interaction5_clone_to_shared_ptr(dialog));
+	}
+
     private:
+
 	static void listing_callback(void *context,
 				     const std::string & flag,
 				     const std::string & perm,

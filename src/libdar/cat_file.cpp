@@ -96,7 +96,7 @@ namespace libdar
         }
     }
 
-    cat_file::cat_file(user_interaction & dialog,
+    cat_file::cat_file(const shared_ptr<user_interaction> & dialog,
 		       const smart_pointer<pile_descriptor> & pdesc,
 		       const archive_version & reading_ver,
 		       saved_status saved,

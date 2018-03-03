@@ -71,7 +71,7 @@ namespace libdar
 		 const infinint & taille,
 		 const infinint & fs_device,
 		 bool x_furtive_read_mode);
-        cat_file(user_interaction & dialog,
+        cat_file(const std::shared_ptr<user_interaction> & dialog,
 		 const smart_pointer<pile_descriptor> & pdesc,
 		 const archive_version & reading_ver,
 		 saved_status saved,

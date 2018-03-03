@@ -70,8 +70,11 @@ namespace libdar
 	algo = compression::gzip;   // stays the default algorithm for new databases
     }
 
-    database::database(user_interaction & dialog, const string & base, const database_open_options & opt)
+    database::database(const shared_ptr<user_interaction> & dialog, const string & base, const database_open_options & opt)
     {
+	if(!dialog)
+	    throw SRC_BUG; // dialog points to nothing
+
 	generic_file *f = database_header_open(dialog,
 					       base,
 					       cur_db_version,
@@ -92,7 +95,7 @@ namespace libdar
 	delete f;
     }
 
-    void database::build(user_interaction & dialog,
+    void database::build(const shared_ptr<user_interaction> & dialog,
 			 generic_file & f,
 			 bool partial,
 			 bool read_only,
@@ -102,6 +105,9 @@ namespace libdar
 	try
 	{
 	    struct archive_data dat;
+
+	    if(!dialog)
+		throw SRC_BUG; // dialog points to nothing
 
 	    if(db_version > database_header_get_supported_version())
 		throw SRC_BUG; // we should not get there if the database is more recent than what that software can handle. this is necessary if we do not want to destroy the database or loose data.
@@ -164,10 +170,13 @@ namespace libdar
 	    delete data_files;
     }
 
-    void database::dump(user_interaction & dialog,
+    void database::dump(const shared_ptr<user_interaction> & dialog,
 			const std::string & filename,
 			const database_dump_options & opt) const
     {
+	if(!dialog)
+	    throw SRC_BUG; // dialog points to nothing
+
 	if(files == nullptr && data_files == nullptr)
 	    throw Erange("database::dump", gettext("Cannot write down a read-only database"));
 
@@ -479,7 +488,7 @@ namespace libdar
     }
 
 
-    void database::restore(user_interaction & dialog,
+    void database::restore(const std::shared_ptr<user_interaction> & dialog,
 			   const vector<string> & filename,
 			   const database_restore_options & opt)
     {
@@ -490,12 +499,15 @@ namespace libdar
 	    deque<string> anneau;
 	    const data_tree *ptr;
 
+	    if(!dialog)
+		throw SRC_BUG; // dialog points to nothing
+
 	    anneau.assign(filename.begin(), filename.end());
 	    if(files == nullptr)
 		throw SRC_BUG;
 
 	    if(opt.get_info_details())
-		dialog.message(gettext("Checking chronological ordering of files between the archives..."));
+		dialog->message(gettext("Checking chronological ordering of files between the archives..."));
 	    check_order(dialog);
 
 		// determination of the archives to restore and files to restore for each selected file
@@ -519,15 +531,15 @@ namespace libdar
 		    case db_lookup::found_removed:
 			num_data.clear(); // we do not restore any data
 			if(opt.get_info_details())
-			    dialog.message(string(gettext("File recorded as removed at this date in database: ")) + anneau.front());
+			    dialog->message(string(gettext("File recorded as removed at this date in database: ")) + anneau.front());
 			break;
 		    case db_lookup::not_found:
 			num_data.clear();
-			dialog.message(string(gettext("File not found in database: ")) + anneau.front());
+			dialog->message(string(gettext("File not found in database: ")) + anneau.front());
 			break;
 		    case db_lookup::not_restorable:
 			num_data.clear();
-			dialog.message(string(gettext("File found in database but impossible to restore (only found \"unchanged\" in differential backups, or delta patch without reference to base it on in any previous archive of the base): ")) + anneau.front());
+			dialog->message(string(gettext("File found in database but impossible to restore (only found \"unchanged\" in differential backups, or delta patch without reference to base it on in any previous archive of the base): ")) + anneau.front());
 			break;
 		    default:
 			throw SRC_BUG;
@@ -546,7 +558,7 @@ namespace libdar
 			break;
 		    case db_lookup::not_restorable:
 			num_ea = 0; // we cannot restore it
-			dialog.message(string(gettext("Extended Attribute of file found in database but impossible to restore (only found \"unchanged\" in differential backups): ")) + anneau.front());
+			dialog->message(string(gettext("Extended Attribute of file found in database but impossible to restore (only found \"unchanged\" in differential backups): ")) + anneau.front());
 			break;
 		    default:
 			throw SRC_BUG;
@@ -559,7 +571,7 @@ namespace libdar
 			{
 			    string fic = anneau.front();
 			    if(opt.get_info_details())
-				dialog.printf(gettext("%S did not exist before specified date and cannot be restored"), &fic);
+				dialog->printf(gettext("%S did not exist before specified date and cannot be restored"), &fic);
 			}
 		    }
 		    else // there is something to restore for that file
@@ -588,7 +600,7 @@ namespace libdar
 			    {
 				string fic = anneau.front();
 				if(!opt.get_even_when_removed())
-				    dialog.printf(gettext("Either archives in database are not properly tidied, or file last modification date has been artificially set to an more ancient date. This may lead improper Extended Attribute restoration for inode %S"), &fic);
+				    dialog->printf(gettext("Either archives in database are not properly tidied, or file last modification date has been artificially set to an more ancient date. This may lead improper Extended Attribute restoration for inode %S"), &fic);
 			    }
 		    }
 
@@ -607,7 +619,7 @@ namespace libdar
 		else
 		{
 		    string fic = anneau.front();
-		    dialog.printf(gettext("Cannot restore file %S : non existent file in database"), &fic);
+		    dialog->printf(gettext("Cannot restore file %S : non existent file in database"), &fic);
 		}
 		anneau.pop_front();
 	    }
@@ -653,17 +665,17 @@ namespace libdar
 			argvpipe += opt.get_extra_options_for_dar();
 			argvpipe += ut->second;
 
-			dialog.printf("CALLING DAR: restoring %d files from archive %S using anonymous pipe to transmit configuration to the dar process", ut->second.size()/2, &archive_name);
+			dialog->printf("CALLING DAR: restoring %d files from archive %S using anonymous pipe to transmit configuration to the dar process", ut->second.size()/2, &archive_name);
 			if(opt.get_info_details())
 			{
-			    dialog.printf("Arguments sent through anonymous pipe are:");
-			    dialog.message(tools_concat_vector(" ", argvpipe));
+			    dialog->printf("Arguments sent through anonymous pipe are:");
+			    dialog->message(tools_concat_vector(" ", argvpipe));
 			}
 			tools_system_with_pipe(dialog, dar_cmd, argvpipe);
 		    }
 		    catch(Erange & e)
 		    {
-			dialog.message(string(gettext("Error while restoring the following files: "))
+			dialog->message(string(gettext("Error while restoring the following files: "))
 				       + tools_concat_vector( " ", ut->second)
 				       + "   : "
 				       + e.get_message());
@@ -672,7 +684,7 @@ namespace libdar
 		}
 	    }
 	    else
-		dialog.message(gettext("Cannot restore any file, nothing done"));
+		dialog->message(gettext("Cannot restore any file, nothing done"));
 	}
 	catch(...)
 	{

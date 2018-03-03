@@ -643,7 +643,7 @@ namespace libdar
 	return ret;
     }
 
-    void tools_open_pipes(user_interaction & dialog,
+    void tools_open_pipes(const shared_ptr<user_interaction> & dialog,
                           const string &input,
                           const string & output,
                           tuyau *&in,
@@ -1128,12 +1128,15 @@ namespace libdar
         delete [] argv;
     }
 
-    void tools_system_with_pipe(user_interaction & dialog,
+    void tools_system_with_pipe(const shared_ptr<user_interaction> & dialog,
                                 const string & dar_cmd,
                                 const vector<string> & argvpipe)
     {
         const char *argv[] = { dar_cmd.c_str(), "--pipe-fd", nullptr, nullptr };
         bool loop = false;
+
+	if(!dialog)
+	    throw SRC_BUG; // dialog points to nothing
 
         do
         {
@@ -1167,7 +1170,7 @@ namespace libdar
                             tube->do_not_close_read_fd();
                             delete tube; // C++ object is destroyed but read filedescriptor has been kept open
                             tube = nullptr;
-                            runson(dialog, const_cast<char * const*>(argv));
+                            runson(*dialog, const_cast<char * const*>(argv));
                             throw SRC_BUG;
                         }
                         else
@@ -1179,7 +1182,7 @@ namespace libdar
                     }
                 default: // fork has succeeded, we are the parent process
                     tube->close_read_fd();
-                    pipeargs = tools_string2tlv_list(dialog, 0, argvpipe);
+                    pipeargs = tools_string2tlv_list(*dialog, 0, argvpipe);
                     pipeargs.dump(*tube);
                     ignore_deadson(0); // now we can ignore SIGCHLD signals just before destroying the pipe filedescriptor, which will trigger and EOF while reading on pipe
                         // in the child process
@@ -1194,7 +1197,7 @@ namespace libdar
                         {
                             try
                             {
-                                dialog.pause(string(dar_gettext("DAR terminated upon signal reception: "))
+                                dialog->pause(string(dar_gettext("DAR terminated upon signal reception: "))
 #if HAVE_DECL_SYS_SIGLIST
                                              + (WTERMSIG(status) < NSIG ? sys_siglist[WTERMSIG(status)] : tools_int2str(WTERMSIG(status)))
 #else
@@ -1205,12 +1208,12 @@ namespace libdar
                             }
                             catch(Euser_abort & e)
                             {
-                                dialog.pause(dar_gettext(" Continue anyway ?"));
+                                dialog->pause(dar_gettext(" Continue anyway ?"));
                             }
                         }
                         else // normal terminaison checking exit status code
                             if(WEXITSTATUS(status) != 0)
-                                dialog.pause(string(dar_gettext("DAR sub-process has terminated with exit code "))
+                                dialog->pause(string(dar_gettext("DAR sub-process has terminated with exit code "))
                                              + tools_int2str(WEXITSTATUS(status))
                                              + dar_gettext(" Continue anyway ?"));
 
@@ -2857,7 +2860,12 @@ namespace libdar
 
     void tools_read_from_pipe(user_interaction & dialog, S_I fd, tlv_list & result)
     {
-        tuyau tube = tuyau(dialog, fd);
+	user_interaction *tmp = dialog.clone();
+
+	if(tmp == nullptr)
+	    throw Ememory("tools_read_from_pipe");
+
+        tuyau tube = tuyau(shared_ptr<user_interaction>(tmp), fd);
         result.read(tube);
     }
 

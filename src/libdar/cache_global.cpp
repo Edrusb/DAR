@@ -31,7 +31,7 @@ using namespace std;
 
 namespace libdar
 {
-    cache_global::cache_global(user_interaction & dialog, fichier_global *x_ptr, bool shift_mode, U_I size)
+    cache_global::cache_global(const shared_ptr<user_interaction> & dialog, fichier_global *x_ptr, bool shift_mode, U_I size)
 	: fichier_global(dialog,
 			 x_ptr == nullptr ? throw SRC_BUG : x_ptr->get_mode())
     {

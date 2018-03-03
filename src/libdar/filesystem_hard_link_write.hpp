@@ -57,13 +57,13 @@ namespace libdar
 
 	/// keep trace of already written inodes to restore hard links
 
-    class filesystem_hard_link_write : virtual protected mem_ui
+    class filesystem_hard_link_write : protected mem_ui
     {
             // this class is not to be used directly
             // it only provides routines to its inherited classes
 
     public:
-	filesystem_hard_link_write(user_interaction & dialog) : mem_ui(& dialog) { corres_write.clear(); };
+	filesystem_hard_link_write(const std::shared_ptr<user_interaction> & dialog): mem_ui(dialog) { corres_write.clear(); };
 	filesystem_hard_link_write(const filesystem_hard_link_write & ref) = delete;
 	filesystem_hard_link_write(filesystem_hard_link_write && ref) = delete;
 	filesystem_hard_link_write & operator = (const filesystem_hard_link_write & ref) = delete;

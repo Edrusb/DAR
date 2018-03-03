@@ -58,7 +58,7 @@ namespace libdar
 	    /// \param[in] dialog for user interaction
 	    /// \param[in] base database filename
 	    /// \param[in] opt extendable list of options to use for this operation
- 	database(user_interaction & dialog, const std::string & base, const database_open_options & opt);
+ 	database(const std::shared_ptr<user_interaction> & dialog, const std::string & base, const database_open_options & opt);
 
 	    /// disabling copy constructor
 	database(const database & ref) = delete;
@@ -81,7 +81,7 @@ namespace libdar
 	    /// \param[in] filename name of file to save database to
 	    /// \param[in] opt extendable list of options to use for this operation
 	    /// \note this method is not available with partially extracted databases.
-	void dump(user_interaction & dialog, const std::string & filename, const database_dump_options & opt) const;
+	void dump(const std::shared_ptr<user_interaction> & dialog, const std::string & filename, const database_dump_options & opt) const;
 
 	    // SETTINGS
 
@@ -206,7 +206,7 @@ namespace libdar
 	    /// \param[in] filename list of filename to restore
 	    /// \param[in] opt extendable list of options to use for this operation
 	    /// \note this method is not available with partially extracted databases.
-	void restore(user_interaction & dialog,
+	void restore(const std::shared_ptr<user_interaction> & dialog,
 		     const std::vector<std::string> & filename,
 		     const database_restore_options & opt);
 
@@ -215,14 +215,14 @@ namespace libdar
 	    /// \param[in,out] dialog for user interaction
 	    /// \return true if check succeeded, false if warning have been issued
 	    /// \note this method is not available with partially extracted databases.
-	bool check_order(user_interaction & dialog) const
+	bool check_order(const std::shared_ptr<user_interaction> & dialog) const
 	{
 	    bool initial_warn = true;
 
 	    if(files == nullptr)
 		throw SRC_BUG;
 	    if(check_order_asked)
-		return files->check_order(dialog, ".", initial_warn) && initial_warn;
+		return files->check_order(*dialog, ".", initial_warn) && initial_warn;
 	    else
 		return true;
 	}
@@ -247,7 +247,7 @@ namespace libdar
 	unsigned char cur_db_version;                //< current db version (for informational purposes)
 	compression algo;                            //< compression used/to use when writing down the base to file
 
-	void build(user_interaction & dialog, generic_file & f, bool partial, bool read_only, unsigned char db_version);  //< used by constructors
+	void build(const std::shared_ptr<user_interaction> & dialog, generic_file & f, bool partial, bool read_only, unsigned char db_version);  //< used by constructors
 	archive_num get_real_archive_num(archive_num num, bool revert) const;
 
 	const datetime & get_root_last_mod(const archive_num & num) const;

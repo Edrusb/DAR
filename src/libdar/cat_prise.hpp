@@ -55,7 +55,7 @@ namespace libdar
 	    cat_inode(xuid, xgid, xperm, last_access, last_modif, last_change, xname, fs_device)
 	{ set_saved_status(s_saved); };
 
-	cat_prise(user_interaction & dialog,
+	cat_prise(const std::shared_ptr<user_interaction> & dialog,
 		  const smart_pointer<pile_descriptor> & pdesc,
 		  const archive_version & reading_ver,
 		  saved_status saved,

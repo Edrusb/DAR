@@ -79,7 +79,7 @@ namespace libdar
 	virtual entrepot *clone() const override { return new (std::nothrow) entrepot_local(*this); };
 
     protected:
-	virtual fichier_global *inherited_open(user_interaction & dialog,
+	virtual fichier_global *inherited_open(const std::shared_ptr<user_interaction> & dialog,
 					       const std::string & filename,
 					       gf_mode mode,
 					       bool force_permission,

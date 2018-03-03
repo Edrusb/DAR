@@ -76,7 +76,7 @@ namespace libdar
     extern const std::string LIBDAR_STACK_LABEL_LEVEL1;
 
 	/// create an container to write an archive to a pipe
-    extern trivial_sar *macro_tools_open_archive_tuyau(user_interaction & dialog,
+    extern trivial_sar *macro_tools_open_archive_tuyau(const std::shared_ptr<user_interaction> & dialog,
 						       S_I fd,
 						       gf_mode mode,
 						       const label & internal_name,
@@ -112,7 +112,7 @@ namespace libdar
 	/// \note _CLEAR is associated to the generic_thread below compressor else escape else
 	/// the cache or crypto_sym or scrambler which then has two Labels (_CLEAR and _UNCYPHERED)
 
-    extern void macro_tools_open_archive(user_interaction & dialog,     //< for user interaction
+    extern void macro_tools_open_archive(const std::shared_ptr<user_interaction> & dialog,     //< for user interaction
 					 const entrepot &where,         //< slices location
                                          const std::string &basename,   //< slice basename
 					 const infinint & min_digits,   //< minimum digits for the slice number
@@ -137,7 +137,7 @@ namespace libdar
         // all allocated objects (ret1, ret2, scram), must be deleted when no more needed by the caller of this routine
 
 	/// uses terminator to skip to the position where to find the catalogue and read it, taking care of having this catalogue pointing to the real data (context of isolated catalogue --- cata_stack --- used to rescue an internal archive --- data_stack)
-    extern catalogue *macro_tools_get_derivated_catalogue_from(user_interaction & dialog,
+    extern catalogue *macro_tools_get_derivated_catalogue_from(const std::shared_ptr<user_interaction> & dialog,
 							       pile & data_stack,  // where to get the files and EA from
 							       pile & cata_stack,  // where to get the catalogue from
 							       const header_version & ver, // version format as defined in the header of the archive to read
@@ -148,7 +148,7 @@ namespace libdar
 							       bool lax_mode);         // whether to do relaxed checkings
 
 	/// uses terminator to skip to the position where to find the catalogue and read it
-    extern catalogue *macro_tools_get_catalogue_from(user_interaction & dialog,
+    extern catalogue *macro_tools_get_catalogue_from(const std::shared_ptr<user_interaction> & dialog,
 						     pile & stack,  // raw data access object
 						     const header_version & ver, // version format as defined in the header of the archive to read
                                                      bool info_details, // verbose display (throught user_interaction)
@@ -158,7 +158,7 @@ namespace libdar
 						     bool lax_mode);
 
 	/// read the catalogue from cata_stack assuming the cata_stack is positionned at the beginning of the area containing archive's dumped data
-    extern catalogue *macro_tools_read_catalogue(user_interaction & dialog,
+    extern catalogue *macro_tools_read_catalogue(const std::shared_ptr<user_interaction> & dialog,
 						 const header_version & ver,
 						 const pile_descriptor & cata_pdesc,
 						 const infinint & cat_size,
@@ -167,7 +167,7 @@ namespace libdar
 						 const label & lax_layer1_data_name,
 						 bool only_detruits);
 
-    extern catalogue *macro_tools_lax_search_catalogue(user_interaction & dialog,
+    extern catalogue *macro_tools_lax_search_catalogue(const std::shared_ptr<user_interaction> & dialog,
 						       pile & stack,
 						       const archive_version & edition,
 						       compression compr_algo,
@@ -237,7 +237,7 @@ namespace libdar
 	/// \note the generic_thread are inserted in the stack if multi-threading is possible and allowed
 	///
 
-    extern void macro_tools_create_layers(user_interaction & dialog,
+    extern void macro_tools_create_layers(const std::shared_ptr<user_interaction> & dialog,
 					  pile & layers,
 					  header_version & ver,
 					  slice_layout & slicing,
@@ -281,7 +281,7 @@ namespace libdar
 	/// \param[in] gnupg_signatories used to sign the catalog, use an empty vector to disable signning
 	/// \param[in] algo compression algorithm used
 	/// \param[in] empty dry-run execution (null_file at bottom of the stack)
-    extern void macro_tools_close_layers(user_interaction & dialog,
+    extern void macro_tools_close_layers(const std::shared_ptr<user_interaction> & dialog,
 					 pile & layers,
 					 const header_version & ver,
 					 const catalogue & cat,

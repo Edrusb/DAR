@@ -52,7 +52,7 @@ namespace libdar
     bool filesystem_tools_has_immutable(const cat_inode & arg);
     void filesystem_tools_set_immutable(const std::string & target, bool val, user_interaction &ui);
     void filesystem_tools_supprime(user_interaction & ui, const std::string & ref);
-    void filesystem_tools_make_owner_perm(user_interaction & dialog,
+    void filesystem_tools_make_owner_perm(const std::shared_ptr<user_interaction> & dialog,
 					  const cat_inode & ref,
 					  const std::string & chem,
 					  bool dir_perm,
@@ -66,15 +66,15 @@ namespace libdar
     void filesystem_tools_attach_ea(const std::string &chemin,
 				    cat_inode *ino,
 				    const mask & ea_mask);
-    bool filesystem_tools_is_nodump_flag_set(user_interaction & dialog,
+    bool filesystem_tools_is_nodump_flag_set(const std::shared_ptr<user_interaction> & dialog,
 					     const path & chem, const std::string & filename,
 					     bool info);
-    path *filesystem_tools_get_root_with_symlink(user_interaction & dialog,
+    path *filesystem_tools_get_root_with_symlink(const std::shared_ptr<user_interaction> & dialog,
 						 const path & root,
 						 bool info_details);
     mode_t filesystem_tools_get_file_permission(const std::string & path);
 
-    void filesystem_tools_make_delta_patch(user_interaction & dialog,
+    void filesystem_tools_make_delta_patch(const std::shared_ptr<user_interaction> & dialog,
 					   const cat_file & existing,
 					   const std::string & existing_pathname,
 					   const cat_file & patcher,
@@ -84,12 +84,12 @@ namespace libdar
 	///
 	/// \return a read-write object the caller has the duty to destroy, exception thrown
 	/// if no filename could be created
-    fichier_local *filesystem_tools_create_non_existing_file_based_on(user_interaction & dialog,
+    fichier_local *filesystem_tools_create_non_existing_file_based_on(const std::shared_ptr<user_interaction> & dialog,
 								      std::string filename,
 								      path where,
 								      std::string & new_filename);
 
-    void filesystem_tools_copy_content_from_to(user_interaction & dialog,
+    void filesystem_tools_copy_content_from_to(const std::shared_ptr<user_interaction> & dialog,
 					       const std::string & source_path,
 					       const std::string & destination_path,
 					       const crc *expected_crc);

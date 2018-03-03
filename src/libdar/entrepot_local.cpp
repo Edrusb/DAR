@@ -107,7 +107,7 @@ namespace libdar
 	return true;
     }
 
-    fichier_global *entrepot_local::inherited_open(user_interaction & dialog,
+    fichier_global *entrepot_local::inherited_open(const shared_ptr<user_interaction> & dialog,
 						   const std::string & filename,
 						   gf_mode mode,
 						   bool force_permission,

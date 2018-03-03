@@ -81,7 +81,7 @@ namespace libdar
 	    /// \param[in] algo hash algorithm to use. hash_none is not an acceptable value
 	    /// \note if the constructor succeed, the objects pointed to by under and hash_file are owned and deleted by this hash_file object
 
-        hash_fichier(user_interaction & dialog,
+        hash_fichier(const std::shared_ptr<user_interaction> & dialog,
 		     fichier_global *under,
 		     const std::string & under_filename,
 		     fichier_global *hash_file,

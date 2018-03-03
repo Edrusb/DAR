@@ -52,7 +52,7 @@ namespace libdar
 			    fmt_file_etiquette }; //< old dual format
 
 	cat_mirage(const std::string & name, cat_etoile *ref) : cat_nomme(name) { dup_on(ref); };
-	cat_mirage(user_interaction & dialog,
+	cat_mirage(const std::shared_ptr<user_interaction> & dialog,
 		   const smart_pointer<pile_descriptor> & pdesc,
 		   const archive_version & reading_ver,
 		   saved_status saved,
@@ -62,7 +62,7 @@ namespace libdar
 		   mirage_format fmt,
 		   bool lax,
 		   bool small);
-	cat_mirage(user_interaction & dialog,
+	cat_mirage(const std::shared_ptr<user_interaction> & dialog,
 		   const smart_pointer<pile_descriptor> & pdesc,
 		   const archive_version & reading_ver,
 		   saved_status saved,
@@ -119,7 +119,7 @@ namespace libdar
     private:
 	cat_etoile *star_ref;
 
-	void init(user_interaction & dialog,
+	void init(const std::shared_ptr<user_interaction> & dialog,
 		  const smart_pointer<pile_descriptor> & pdesc,
 		  const archive_version & reading_ver,
 		  saved_status saved,

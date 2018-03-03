@@ -112,7 +112,7 @@ namespace libdar
 	    /// \param[in] algo defines the hash file to create, other value than hash_none are accepted only in writeonly mode with erase or fail_if_exist set
 	    /// \return upon success returns an object from a class inherited from fichier_global that the caller has the duty to delete, else an exception is thrown (most of the time it should be a Esystem object)
 	    /// by the called inherited class
-	fichier_global *open(user_interaction & dialog,
+	fichier_global *open(const std::shared_ptr<user_interaction> & dialog,
 			     const std::string & filename,
 			     gf_mode mode,
 			     bool force_permission,
@@ -131,7 +131,7 @@ namespace libdar
 	virtual entrepot *clone() const = 0;
 
     protected:
-	virtual fichier_global *inherited_open(user_interaction & dialog,     //< for user interaction
+	virtual fichier_global *inherited_open(const std::shared_ptr<user_interaction> & dialog,     //< for user interaction
 					       const std::string & filename,  //< filename to open
 					       gf_mode mode,                  //< mode to use
 					       bool force_permission,         //< set the permission of the file to open

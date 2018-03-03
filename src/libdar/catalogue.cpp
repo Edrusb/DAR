@@ -85,7 +85,7 @@ namespace libdar
 
     static inline string yes_no(bool val) { return (val ? "yes" : "no"); }
 
-    catalogue::catalogue(user_interaction & ui,
+    catalogue::catalogue(const std::shared_ptr<user_interaction> & ui,
 			 const datetime & root_last_modif,
 			 const label & data_name): mem_ui(ui), out_compare("/")
     {
@@ -112,7 +112,7 @@ namespace libdar
 	stats.clear();
     }
 
-    catalogue::catalogue(user_interaction & ui,
+    catalogue::catalogue(const std::shared_ptr<user_interaction> & ui,
 			 const pile_descriptor &pdesc,
 			 const archive_version & reading_ver,
 			 compression default_algo,
@@ -156,7 +156,7 @@ namespace libdar
 		{
 		    if(ref_data_name != lax_layer1_data_name && !lax_layer1_data_name.is_cleared())
 		    {
-			ui.message(gettext("LAX MODE: catalogue label does not match archive label, as if it was an extracted catalogue, assuming data corruption occurred and fixing the catalogue to be considered an a plain internal catalogue"));
+			get_ui().message(gettext("LAX MODE: catalogue label does not match archive label, as if it was an extracted catalogue, assuming data corruption occurred and fixing the catalogue to be considered an a plain internal catalogue"));
 			ref_data_name = lax_layer1_data_name;
 		    }
 		}
@@ -213,7 +213,7 @@ namespace libdar
 		    if(!lax)
 			throw Erange("catalogue::catalogue(generic_file &)", gettext("CRC failed for table of contents (aka \"catalogue\")"));
 		    else
-			ui.pause(gettext("LAX MODE: CRC failed for catalogue, the archive contents is corrupted. This may even lead dar to see files in the archive that never existed, but this will most probably lead to other failures in restoring files. Shall we proceed anyway?"));
+			get_ui().pause(gettext("LAX MODE: CRC failed for catalogue, the archive contents is corrupted. This may even lead dar to see files in the archive that never existed, but this will most probably lead to other failures in restoring files. Shall we proceed anyway?"));
 		}
 	    }
 	}

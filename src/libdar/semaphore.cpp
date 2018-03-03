@@ -33,9 +33,9 @@ using namespace std;
 namespace libdar
 {
 
-    semaphore::semaphore(user_interaction & dialog,
+    semaphore::semaphore(const std::shared_ptr<user_interaction> & dialog,
 			 const string & backup_hook_file_execute,
-			 const mask & backup_hook_file_mask) : mem_ui(& dialog)
+			 const mask & backup_hook_file_mask) : mem_ui(dialog)
     {
 	count = 0;
 	chem = "";

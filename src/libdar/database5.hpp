@@ -78,7 +78,38 @@ namespace libdar5
     class database: public libdar::database
     {
     public:
-	using libdar::database::database;
+	database(): libdar::database() {};
+
+	database(user_interaction & dialog,
+		 const std::string & base,
+		 const database_open_options & opt):
+	    libdar::database(user_interaction5_clone_to_shared_ptr(dialog),
+			     base,
+			     opt)
+	{}
+
+	    /// disabling copy constructor
+	database(const database & ref) = delete;
+
+	    /// disabling move constructor
+	database(database && ref) noexcept = delete;
+
+	    /// disabling assignement operator
+	database & operator = (const database & ref) = delete;
+
+	    /// disabling move assignment operator
+	database & operator = (database && ref) noexcept = delete;
+
+	    /// database destructor (no implicit file saving)
+	~database() = default;
+
+
+	void dump(user_interaction & dialog, const std::string & filename, const database_dump_options & opt) const
+	{
+	    libdar::database::dump(user_interaction5_clone_to_shared_ptr(dialog),
+				   filename,
+				   opt);
+	}
 
 
 
@@ -110,6 +141,20 @@ namespace libdar5
 	    /// \param[in] dialog where to display the listing to
 	    /// \note this method is not available with partially extracted databases.
 	void show_most_recent_stats(user_interaction & dialog) const;
+
+	void restore(user_interaction & dialog,
+		     const std::vector<std::string> & filename,
+		     const database_restore_options & opt)
+	{
+	    libdar::database::restore(user_interaction5_clone_to_shared_ptr(dialog),
+				      filename,
+				      opt);
+	}
+
+	bool check_order(user_interaction & dialog) const
+	{
+	    return libdar::database::check_order(user_interaction5_clone_to_shared_ptr(dialog));
+	}
 
     private:
 

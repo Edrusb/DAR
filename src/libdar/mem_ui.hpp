@@ -29,6 +29,7 @@
 #include "../my_config.h"
 
 #include "user_interaction.hpp"
+#include <memory>
 
 namespace libdar
 {
@@ -59,54 +60,45 @@ namespace libdar
 	    /// \param[in] dialog the user_interaction object to clone and store
 	    /// If you plan to use mem_ui, you should pass the user_interaction to its constructor
 	    /// for you later be able to call get_ui() at any time from the inherited class
-	mem_ui(const user_interaction & dialog) { set_ui(dialog); };
-
-	    /// \param[in] dialog pointer to a user_interaction object that will be *referred* to
-	    /// and which must stay alive during the whole life of "this" object. This object is not
-	    /// destroyed nor cloned by mem_ui.
-	mem_ui(user_interaction *dialog) { ui = dialog; cloned = false; };
+	mem_ui(const std::shared_ptr<user_interaction> & dialog): ui(dialog) { if(!ui) throw SRC_BUG; };
 
 	    /// the copy constructor
 
 	    /// need to be called from the copy constructor of any inherited class that explicitely define one
-	mem_ui(const mem_ui & ref) { copy_from(ref); };
+	mem_ui(const mem_ui & ref) = default;
 
 	    /// the move constructor
-	mem_ui(mem_ui && ref) noexcept { nullifyptr(); move_from(std::move(ref)); };
+	mem_ui(mem_ui && ref) noexcept = default;
 
 	    /// assignement operator
 
 	    /// you need to call it from the inherited class assignement operator
 	    /// if the inherited class explicitely defines its own one.
-	mem_ui & operator = (const mem_ui & ref) { detruire(); copy_from(ref); return *this; };
+	mem_ui & operator = (const mem_ui & ref) = default;
 
 	    /// move operator
-	mem_ui & operator = (mem_ui && ref) noexcept { move_from(std::move(ref)); return *this; };
+	mem_ui & operator = (mem_ui && ref) noexcept = default;
 
 
 	    /// destructor
 
 	    /// it is declared as virtual, for precaution, as it may not be very frequent to
 	    /// release an object having just a mem_ui pointer on it.
-	virtual ~mem_ui() throw(Ebug) { detruire(); };
+	virtual ~mem_ui() throw(Ebug) {};
 
 
     protected:
-	    /// get access to the user_interaction cloned object
+	    /// get access to the user_interaction object
 
 	    /// \return a reference to the clone object. This reference stays valid during all
 	    /// the live of the object.
-	user_interaction & get_ui() const;
+	user_interaction & get_ui() const { return *ui; };
+
+	    /// get access to the shared_ptr pointing to the user_interaction
+	std::shared_ptr<user_interaction> get_pointer() const { return ui; };
 
     private:
-	user_interaction *ui;
-	bool cloned;
-
-	void detruire();
-	void nullifyptr() noexcept { ui = nullptr; };
-	void copy_from(const mem_ui & ref);
-	void move_from(mem_ui && ref) noexcept;
-	void set_ui(const user_interaction & dialog);
+	std::shared_ptr<user_interaction> ui;
     };
 
 	/// @}

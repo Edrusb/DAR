@@ -52,7 +52,7 @@ namespace libdar
 		 const std::string & name,
 		 const std::string & target,
 		 const infinint & fs_device);
-        cat_lien(user_interaction & dialog,
+        cat_lien(const std::shared_ptr<user_interaction> & dialog,
 		 const smart_pointer<pile_descriptor> & pdesc,
 		 const archive_version & reading_ver,
 		 saved_status saved,

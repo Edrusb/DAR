@@ -57,7 +57,7 @@ namespace libdar
     {
     public:
 	    /// constructor to build a new single sliced archive
-	trivial_sar(const user_interaction & dialog,   //< how to interact with the user
+	trivial_sar(const std::shared_ptr<user_interaction> & dialog,   //< how to interact with the user
 		    gf_mode open_mode,                 //< read_write or write_only are the only acceptable values
 		    const std::string & base_name,     //< archive basename to create
 		    const std::string & extension,     //< archive extension
@@ -75,13 +75,13 @@ namespace libdar
 
 
 	    /// constructor to read a (single sliced) archive from a pipe
-	trivial_sar(const user_interaction & dialog,   //< how to interact with the user
+	trivial_sar(const std::shared_ptr<user_interaction> & dialog,   //< how to interact with the user
 		    const std::string & pipename,      //< if set to '-' the data are read from standard input, else the given file is expected to be named pipe to read data from
 		    bool lax);                         //< whether to be laxist or follow the normal and strict controlled procedure
 
 
 	    /// constructor to write a (single sliced) archive to a anonymous pipe
-	trivial_sar(const user_interaction & dialog,
+	trivial_sar(const std::shared_ptr<user_interaction> & dialog,
 		    generic_file * f, //< in case of exception the generic_file "f" is not released, this is the duty of the caller to do so, else (success), the object becomes owned by the trivial_sar and must not be released by the caller.
 		    const label & internal_name,
 		    const label & data_name,

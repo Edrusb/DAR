@@ -132,7 +132,7 @@ namespace libdar
 	    options &= ~HEADER_OPTION_COMPRESSOR;
     }
 
-    generic_file *database_header_create(user_interaction & dialog,
+    generic_file *database_header_create(const shared_ptr<user_interaction> & dialog,
 					 const string & filename,
 					 bool overwrite,
 					 compression algozip)
@@ -169,7 +169,7 @@ namespace libdar
 	return ret;
     }
 
-    generic_file *database_header_open(user_interaction & dialog,
+    generic_file *database_header_open(const shared_ptr<user_interaction> & dialog,
 				       const string & filename,
 				       unsigned char & db_version,
 				       compression & algozip)

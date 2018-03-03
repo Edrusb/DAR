@@ -66,7 +66,7 @@ namespace libdar
     public:
 
 	    /// constructor
-	fichier_libcurl(user_interaction & dialog,      //< for user interaction requested by fichier_global
+	fichier_libcurl(const std::shared_ptr<user_interaction> & dialog,      //< for user interaction requested by fichier_global
 			const std::string & chemin,     //< full path of the file to open
 			mycurl_protocol proto,          //< to workaround some libcurl strange behavior for some protocols
 			mycurl_shared_handle && handle, //< the easy handle wrapper object

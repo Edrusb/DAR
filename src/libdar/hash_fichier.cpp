@@ -49,7 +49,7 @@ namespace libdar
     }
 
 
-    hash_fichier::hash_fichier(user_interaction & dialog,
+    hash_fichier::hash_fichier(const shared_ptr<user_interaction> & dialog,
 			       fichier_global *under,
 			       const std::string & under_filename,
 			       fichier_global *hash_file,

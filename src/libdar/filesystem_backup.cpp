@@ -129,7 +129,7 @@ using namespace std;
 namespace libdar
 {
 
-    filesystem_backup::filesystem_backup(user_interaction & dialog,
+    filesystem_backup::filesystem_backup(const std::shared_ptr<user_interaction> & dialog,
 					 const path &root,
 					 bool x_info_details,
 					 const mask & x_ea_mask,
@@ -139,15 +139,15 @@ namespace libdar
 					 bool x_cache_directory_tagging,
 					 infinint & root_fs_device,
 					 bool x_ignore_unknown,
-					 const fsa_scope & scope)
-	: mem_ui(&dialog), filesystem_hard_link_read(dialog, x_furtive_read_mode, scope)
+					 const fsa_scope & scope):
+	filesystem_hard_link_read(dialog, x_furtive_read_mode, scope)
     {
 	fs_root = nullptr;
 	current_dir = nullptr;
 	ea_mask = nullptr;
 	try
 	{
-	    fs_root = filesystem_tools_get_root_with_symlink(get_ui(), root, x_info_details);
+	    fs_root = filesystem_tools_get_root_with_symlink(dialog, root, x_info_details);
 	    if(fs_root == nullptr)
 		throw Ememory("filesystem_backup::filesystem_backup");
 	    info_details = x_info_details;
@@ -272,7 +272,7 @@ namespace libdar
                     {
                             // checking the EXT2 nodump flag (if set ignoring the file)
 
-                        if(!no_dump_check || !filesystem_tools_is_nodump_flag_set(get_ui(), *current_dir, name, info_details))
+                        if(!no_dump_check || !filesystem_tools_is_nodump_flag_set(get_pointer(), *current_dir, name, info_details))
                         {
 			    ref = make_read_entree(*current_dir, name, true, *ea_mask);
 

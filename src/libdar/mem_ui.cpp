@@ -26,67 +26,13 @@
 // including "mem_ui.hpp" here, lead to cyclic dependancy of headers...  this points needs to be clarified
 
 #include "mem_ui.hpp"
-#include "tools.hpp"
 
 using namespace std;
 
 namespace libdar
 {
 
-    user_interaction & mem_ui::get_ui() const
-    {
-	if(ui == nullptr)
-	    throw SRC_BUG;
-
-	return *(const_cast<mem_ui *>(this)->ui);
-    }
-
-    void mem_ui::detruire()
-    {
-	if(ui != nullptr)
-	{
-	    if(cloned)
-	    {
-		delete ui;
-		ui = nullptr;
-	    }
-	    else
-		ui = nullptr;
-	}
-    }
-
-    void mem_ui::copy_from(const mem_ui & ref)
-    {
-	if(ref.ui == nullptr)
-	    ui = nullptr;
-	else
-	{
-	    if(ref.cloned)
-	    {
-		set_ui(*(ref.ui));
-		cloned = true;
-	    }
-	    else
-	    {
-		ui = ref.ui;
-		cloned = false;
-	    }
-	}
-    }
-
-    void mem_ui::move_from(mem_ui && ref) noexcept
-    {
-	swap(ui, ref.ui);
-	cloned = move(ref.cloned);
-    }
-
-    void mem_ui::set_ui(const user_interaction & dialog)
-    {
-	ui = dialog.clone();
-	if(ui == nullptr)
-	    throw Ememory("mem_ui::set_ui");
-	cloned = true;
-    }
+	// all is now inline in mem_ui.hpp
 
 } // end of namespace
 

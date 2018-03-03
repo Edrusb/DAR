@@ -44,7 +44,7 @@ namespace libdar5
     void archive::op_listing(user_interaction & dialog,
 			     const archive_options_listing & options)
     {
-	libdar::archive::op_listing(dialog,
+	libdar::archive::op_listing(user_interaction5_clone_to_shared_ptr(dialog),
 				    nullptr,
 				    nullptr,
 				    options);
@@ -56,7 +56,7 @@ namespace libdar5
 	if(!dialog.get_use_listing())
 	    throw Erange("archive::get_childen_of", gettext("listing() method must be given"));
 
-	return libdar::archive::get_children_of(dialog,
+	return libdar::archive::get_children_of(user_interaction5_clone_to_shared_ptr(dialog),
 						listing_callback,
 						&dialog,
 						dir);

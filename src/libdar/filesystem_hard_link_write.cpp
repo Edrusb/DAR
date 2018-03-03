@@ -360,7 +360,7 @@ namespace libdar
 		    generic_file *ou;
 		    infinint seek;
 
-		    fichier_local dest = fichier_local(get_ui(), display, gf_write_only, 0700, false, true, false);
+		    fichier_local dest = fichier_local(get_pointer(), display, gf_write_only, 0700, false, true, false);
 			// the implicit destruction of dest (exiting the block)
 			// will close the 'ret' file descriptor (see ~fichier_local())
 		    ou = ref_fil->get_data(cat_file::normal, nullptr, nullptr);

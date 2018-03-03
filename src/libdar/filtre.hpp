@@ -41,7 +41,7 @@ namespace libdar
 	/// \ingroup Private
 	/// @}
 
-    extern void filtre_restore(user_interaction & dialog, //< for user interaction
+    extern void filtre_restore(const std::shared_ptr<user_interaction> & dialog, //< for user interaction
 			       const mask &filtre,        //< which filename to restore
                                const mask & subtree,      //< which directory and paths to restore
                                const catalogue & cat,     //< table of content to extract information from
@@ -64,7 +64,7 @@ namespace libdar
 			       bool not_deleted,          //< wether to consider deleted files
 			       const fsa_scope & scope);  //< scope of FSA to take into account
 
-    extern void filtre_sauvegarde(user_interaction & dialog,
+    extern void filtre_sauvegarde(const std::shared_ptr<user_interaction> & dialog,
 				  const mask &filtre,
                                   const mask &subtree,
                                   const pile_descriptor & pdesc,
@@ -106,7 +106,7 @@ namespace libdar
 				  bool auto_zeroing_neg_dates,
 				  const std::set<std::string> & ignored_symlinks);
 
-    extern void filtre_difference(user_interaction & dialog,
+    extern void filtre_difference(const std::shared_ptr<user_interaction> & dialog,
 				  const mask &filtre,
                                   const mask &subtree,
                                   const catalogue & cat,
@@ -125,7 +125,7 @@ namespace libdar
 				  const fsa_scope & scope,
 				  bool isolated_mode);
 
-    extern void filtre_test(user_interaction & dialog,
+    extern void filtre_test(const std::shared_ptr<user_interaction> & dialog,
 			    const mask &filtre,
                             const mask &subtree,
                             const catalogue & cat,
@@ -136,7 +136,7 @@ namespace libdar
 			    bool empty,
                             statistics & st);
 
-    extern void filtre_merge(user_interaction & dialog,
+    extern void filtre_merge(const std::shared_ptr<user_interaction> & dialog,
 			     const mask & filtre,
 			     const mask & subtree,
 			     const pile_descriptor & pdesc,
@@ -167,7 +167,7 @@ namespace libdar
 	/// initialize variables used for merging in step1 and step2
 
 	/// \note also used for repairing
-    extern void filtre_merge_step0(user_interaction & dialog,
+    extern void filtre_merge_step0(const std::shared_ptr<user_interaction> & dialog,
 				   const catalogue * ref1,
 				   const catalogue * ref2,
 				   statistics & st,
@@ -179,7 +179,7 @@ namespace libdar
 
         /// builds a catalogue from two refs with the given policy and filters
 
-    extern void filtre_merge_step1(user_interaction & dialog,
+    extern void filtre_merge_step1(const std::shared_ptr<user_interaction> & dialog,
 				   const mask & filtre,
 				   const mask & subtree,
 				   catalogue & cat,
@@ -201,7 +201,7 @@ namespace libdar
         /// copies data of "cat" catalogue to the pdesc of a brand new archive
 
 	/// \note also used for repairing
-    extern void filtre_merge_step2(user_interaction & dialog,
+    extern void filtre_merge_step2(const std::shared_ptr<user_interaction> & dialog,
 				   const pile_descriptor & pdesc,
 				   catalogue & cat,
 				   bool info_details,
@@ -221,7 +221,7 @@ namespace libdar
 
 
     void filtre_sequentially_read_all_catalogue(catalogue & cat,
-						user_interaction & dialog,
+						const std::shared_ptr<user_interaction> & dialog,
 						bool lax_read_mode);
 
 

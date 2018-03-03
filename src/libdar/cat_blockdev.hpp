@@ -55,7 +55,7 @@ namespace libdar
 		     const infinint & fs_device) : cat_device(uid, gid, perm, last_access,
 							      last_modif, last_change, name,
 							      major, minor, fs_device) {};
-        cat_blockdev(user_interaction & dialog,
+        cat_blockdev(const std::shared_ptr<user_interaction> & dialog,
 		     const smart_pointer<pile_descriptor> & pdesc,
 		     const archive_version & reading_ver,
 		     saved_status saved,

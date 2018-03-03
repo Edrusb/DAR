@@ -52,13 +52,13 @@ namespace libdar
     public:
 
 	    /// constructor to setup a escape_catalogue that will drop marks all along the archive and drop its content at end of archive
-        escape_catalogue(user_interaction & dialog,
+        escape_catalogue(const std::shared_ptr<user_interaction> & dialog,
 			 const pile_descriptor & x_pdesc,
 			 const datetime & root_last_modif,
 			 const label & data_name);
 
 	    /// constructor to setup a escape_catalogue that will be fed by sequentially reading the archive
-        escape_catalogue(user_interaction & dialog,        //< user interaction
+        escape_catalogue(const std::shared_ptr<user_interaction> & dialog,        //< user interaction
 			 const pile_descriptor & x_pdesc,  //< stack descriptor where to write to
 			 const header_version & ver,       //< archive header version read
 			 const std::list<signator> & known_signatories, //< signatories that signed the archive header, to be compared with internal catalogue when reaching the end of the archive

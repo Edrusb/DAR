@@ -212,4 +212,19 @@ namespace libdar5
 	message(output);
     }
 
+    shared_ptr<user_interaction> user_interaction5_clone_to_shared_ptr(user_interaction & dialog)
+    {
+	user_interaction *tmp = dialog.clone();
+
+	if(tmp == nullptr)
+	    throw Ememory("archive::clone_to_shared_ptr");
+
+	    // the pointed to object is newly created here
+	    // and never used afterward, thus passing it
+	    // as is to a shared_ptr does not lead to an
+	    // undefined behavior
+	return shared_ptr<user_interaction>(tmp);
+    }
+
+
 } // end of namespace

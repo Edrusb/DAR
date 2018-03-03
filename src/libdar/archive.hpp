@@ -58,13 +58,13 @@ namespace libdar
 
 	    /// this constructor opens an already existing archive (for reading) [this is the "read" constructor]
 
-	    /// \param[in,out] dialog for user interaction
+	    /// \param[in,out] dialog for user- interaction
 	    /// \param[in] chem the path where to look for slices
 	    /// \param[in] basename the slices basename of the archive to read
 	    /// ("-" means standard input, and activates the output_pipe and input_pipe arguments)
 	    /// \param[in] extension the slice extension (should always be "dar")
 	    /// \param[in] options A set of option to use to read the archive
-	archive(user_interaction & dialog,
+	archive(const std::shared_ptr<user_interaction> & dialog,
 		const path & chem,
 		const std::string & basename,
 		const std::string & extension,
@@ -91,7 +91,7 @@ namespace libdar
 	    /// - .ea_treated: number of entry having some EA
 	    /// - .byte_amount : number of wasted bytes due to repeat on change feature
 	    /// .
-	archive(user_interaction & dialog,
+	archive(const std::shared_ptr<user_interaction> & dialog,
 		const path & fs_root,
 		const path & sauv_path,
 		const std::string & filename,
@@ -116,7 +116,7 @@ namespace libdar
 	    /// - .ea_treated: number of entry with EA
 	    /// .
 
-	archive(user_interaction & dialog,
+	archive(const std::shared_ptr<user_interaction> & dialog,
 		const path & sauv_path,
 		archive *ref_arch1,
 		const std::string & filename,
@@ -136,7 +136,7 @@ namespace libdar
 	    /// \param[in] extension_dst the slices extension of the repaired archive
 	    /// \param[in] options_repair the set of option to use to write the repaired archive
 
-	archive(user_interaction & dialog,
+	archive(const std::shared_ptr<user_interaction> & dialog,
 		const path & chem_src,
 		const std::string & basename_src,
 		const std::string & extension_src,
@@ -183,7 +183,7 @@ namespace libdar
 	    /// - .hard_links: number of hard link restored
 	    /// - .ea_treated: number of entry having some EA
 	    /// .
-	statistics op_extract(user_interaction & dialog,
+	statistics op_extract(const std::shared_ptr<user_interaction> & dialog,
 			      const path &fs_root,
 			      const archive_options_extract & options,
 			      statistics *progressive_report);
@@ -191,7 +191,7 @@ namespace libdar
 	    /// display a summary of the archive
 	    ///
 	    /// \note see also get_stats() method
-	void summary(user_interaction & dialog);
+	void summary(const std::shared_ptr<user_interaction> & dialog);
 
 
 	    /// listing of the archive contents
@@ -204,7 +204,7 @@ namespace libdar
 	    /// \note alternative way to get archive contents:
 	    /// . archive::get_children_of() method
 	    /// . archive::init_catalogue()+get_children_in_table()
-	void op_listing(user_interaction & dialog,
+	void op_listing(const std::shared_ptr<user_interaction> & dialog,
 			catalogue_listing_callback callback,
 			void *context,
 			const archive_options_listing & options);
@@ -224,7 +224,7 @@ namespace libdar
 	    /// - .errored: number of files that do not match or could not be read
 	    /// - .ignored: number of files excluded by filters
 	    /// .
-	statistics op_diff(user_interaction & dialog,
+	statistics op_diff(const std::shared_ptr<user_interaction> & dialog,
 			   const path & fs_root,
 			   const archive_options_diff & options,
 			   statistics * progressive_report);
@@ -251,7 +251,7 @@ namespace libdar
 	    /// - .skipped: number of file older than the one on filesystem
 	    /// - .errored: number of files with error
 	    /// .
-	statistics op_test(user_interaction & dialog,
+	statistics op_test(const std::shared_ptr<user_interaction> & dialog,
 			   const archive_options_test & options,
 			   statistics * progressive_report);
 
@@ -267,7 +267,7 @@ namespace libdar
 	    /// to keep them in the resulting isolated catalogue the current archive object (but
 	    /// not the archive file) is modified (forget delta signature) --- this is not a
 	    /// const method.
-	void op_isolate(user_interaction & dialog,
+	void op_isolate(const std::shared_ptr<user_interaction> & dialog,
 			const path &sauv_path,
 			const std::string & filename,
 			const std::string & extension,
@@ -284,7 +284,7 @@ namespace libdar
 	    /// \note the get_children_of() call uses the listing() method
 	    /// to send back data to the user. If it is not redifined in the
 	    /// dialog object nothing will get sent back to the user
-	bool get_children_of(user_interaction & dialog,
+	bool get_children_of(const std::shared_ptr<user_interaction> & dialog,
 			     catalogue_listing_callback callback,
 			     void *context,
 			     const std::string & dir);
@@ -311,7 +311,7 @@ namespace libdar
 
 	    /// necessary to get the catalogue fully loaded in memory in any situation
 	    /// in particular in sequential reading mode
-	void init_catalogue(user_interaction & dialog) const;
+	void init_catalogue(const std::shared_ptr<user_interaction> & dialog) const;
 
 	    /// gives access to internal catalogue (not to be used from the API)
 
@@ -325,7 +325,7 @@ namespace libdar
 	const catalogue & get_catalogue() const;
 
 	    /// gives access to internal catalogue (not to be used from the API) even in sequential read mode
-	const catalogue & get_catalogue(user_interaction & dialog) const;
+	const catalogue & get_catalogue(const std::shared_ptr<user_interaction> & dialog) const;
 
 	    /// closes all filedescriptors and associated data, just keep the catalogue
 
@@ -338,7 +338,7 @@ namespace libdar
 
 	    /// closes all filedescriptors and associated even when in sequential read mode
 
-	void drop_all_filedescriptors(user_interaction & dialog);
+	void drop_all_filedescriptors(const std::shared_ptr<user_interaction> & dialog);
 
 	    /// change all inode as unsaved (equal to differential backup with no change met)
 	void set_to_unsaved_data_and_FSA() { if(cat == nullptr) throw SRC_BUG; cat->set_to_unsaved_data_and_FSA(); };
@@ -385,7 +385,7 @@ namespace libdar
 	infinint get_level2_size();
 	infinint get_cat_size() const { return local_cat_size; };
 
-	statistics op_create_in(user_interaction & dialog,
+	statistics op_create_in(const std::shared_ptr<user_interaction> & dialog,
 				operation op,
 				const path & fs_root,
 				const entrepot & sauv_path_t,
@@ -450,7 +450,7 @@ namespace libdar
 				const std::set<std::string> & ignored_symlinks,
 				statistics * progressive_report);
 
-	void op_create_in_sub(user_interaction & dialog,        //< interaction with user
+	void op_create_in_sub(const std::shared_ptr<user_interaction> & dialog,        //< interaction with user
 			      operation op,                     //< the filter operation to bind to
 			      const path & fs_root,             //< root of the filesystem to act on
 			      const entrepot & sauv_path_t,     //< where to create the archive

@@ -30,7 +30,7 @@ using namespace std;
 namespace libdar
 {
 
-    escape_catalogue::escape_catalogue(user_interaction & dialog,
+    escape_catalogue::escape_catalogue(const shared_ptr<user_interaction> & dialog,
 				       const pile_descriptor & x_pdesc,
 				       const datetime & root_last_modif,
 				       const label & data_name) : catalogue(dialog, root_last_modif, data_name)
@@ -52,7 +52,7 @@ namespace libdar
 	data_name.dump(*(pdesc->esc));
     }
 
-    escape_catalogue::escape_catalogue(user_interaction & dialog,
+    escape_catalogue::escape_catalogue(const shared_ptr<user_interaction> & dialog,
 				       const pile_descriptor & x_pdesc,
 				       const header_version & ver,
 				       const list<signator> & known_signatories,
@@ -413,7 +413,7 @@ namespace libdar
 			ceci->min_read_offset = pdesc->esc->get_position();
 			try
 			{
-			    ref = cat_entree::read(get_ui(),
+			    ref = cat_entree::read(get_pointer(),
 						   pdesc,
 						   x_ver.get_edition(),
 						   ceci->access_stats(),
@@ -574,7 +574,7 @@ namespace libdar
 			// and CRC used so far for sequential reading, then if OK, we must drop from it
 			// all the non detruits objects
 
-		    ceci->cat_det = macro_tools_read_catalogue(get_ui(),
+		    ceci->cat_det = macro_tools_read_catalogue(get_pointer(),
 							       x_ver,
 							       *pdesc,
 							       0, // cat_size cannot be determined in sequential_read mode

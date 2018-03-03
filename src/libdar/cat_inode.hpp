@@ -73,7 +73,7 @@ namespace libdar
 		  const datetime & last_change,
 		  const std::string & xname,
 		  const infinint & device);
-        cat_inode(user_interaction & dialog,
+        cat_inode(const std::shared_ptr<user_interaction> & dialog,
 		  const smart_pointer<pile_descriptor> & pdesc,
 		  const archive_version & reading_ver,
 		  saved_status saved,

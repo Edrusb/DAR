@@ -339,7 +339,7 @@ namespace libdar
 	    delete [] buffer;
     }
 
-    zapette::zapette(const user_interaction & dialog,
+    zapette::zapette(const shared_ptr<user_interaction> & dialog,
 		     generic_file *input,
 		     generic_file *output,
 		     bool by_the_end) : generic_file(gf_read_only), mem_ui(dialog)
