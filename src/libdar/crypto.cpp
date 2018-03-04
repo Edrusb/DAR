@@ -75,8 +75,6 @@ namespace libdar
 	    return 'p';
 	case crypto_algo::camellia256:
 	    return 'c';
-	case crypto_algo::unknown:
-	    throw SRC_BUG;
 	default:
 	    throw SRC_BUG;
 	}
