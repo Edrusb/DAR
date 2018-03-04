@@ -127,6 +127,7 @@ namespace libdar
     {
 	dialog.printf("");
         dialog.printf(gettext("CATALOGUE CONTENTS :"));
+	dialog.printf("");
         dialog.printf(gettext("total number of inode : %i"), &total);
         dialog.printf(gettext("saved inode           : %i"), &saved);
         dialog.printf(gettext("distribution of inode(s)"));

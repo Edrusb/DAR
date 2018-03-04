@@ -999,87 +999,67 @@ namespace libdar
 
         try
         {
+	    archive_summary sum = summary_data();
+	    infinint tmp;
 
-		// sanity checks
+	    sum.get_header().display(get_ui());
 
-	    if(!exploitable)
-		throw Elibcall("summary", gettext("This archive is not exploitable, check the archive class usage in the API documentation"));
-
-
-		// end of sanity checks
-
-	    infinint sub_file_size;
-	    infinint first_file_size;
-	    infinint last_file_size, file_number;
-	    infinint cat_size = get_cat_size();
-	    get_header().display(get_ui());
-	    if(!cat_size.is_zero())
-		get_ui().printf(gettext("Catalogue size in archive            : %i bytes"), &cat_size);
+	    tmp = sum.get_catalog_size();
+	    if(!tmp.is_zero())
+		get_ui().printf(gettext("Catalogue size in archive            : %i bytes"), &tmp);
 	    else
 		get_ui().printf(gettext("Catalogue size in archive            : N/A"));
 	    get_ui().printf("");
 
-	    try
+	    tmp = sum.get_slice_number();
+	    if(!tmp.is_zero())
 	    {
-		if(get_sar_param(sub_file_size, first_file_size, last_file_size, file_number))
+		get_ui().printf(gettext("Archive is composed of %i file(s)"), &tmp);
+		if(tmp == 1)
 		{
-		    get_ui().printf(gettext("Archive is composed of %i file(s)"), &file_number);
-		    if(file_number == 1)
-			get_ui().printf(gettext("File size: %i bytes"), &last_file_size);
-		    else
-		    {
-			if(first_file_size != sub_file_size)
-			    get_ui().printf(gettext("First file size       : %i bytes"), &first_file_size);
-			get_ui().printf(gettext("File size             : %i bytes"), &sub_file_size);
-			get_ui().printf(gettext("Last file size        : %i bytes"), &last_file_size);
-		    }
-		    if(file_number > 1)
-		    {
-			infinint total = first_file_size + (file_number-2)*sub_file_size + last_file_size;
-			get_ui().printf(gettext("Archive total size is : %i bytes"), &total);
-		    }
+		    tmp = sum.get_last_slice_size();
+		    get_ui().printf(gettext("File size: %i bytes"), &tmp);
 		}
-		else // not reading from a sar
+		else
 		{
-		    infinint arch_size = get_level2_size();
-		    if(!arch_size.is_zero())
-		    {
-			get_ui().printf(gettext("Archive size is: %i bytes"), &arch_size);
-			get_ui().printf(gettext("Previous archive size does not include headers present in each slice"));
-		    }
-		    else
-			get_ui().printf(gettext("Archive size is unknown (reading from a pipe)"));
+		    infinint first = sum.get_first_slice_size();
+		    infinint slice = sum.get_slice_size();
+		    infinint last = sum.get_last_slice_size();
+		    infinint total = sum.get_archive_size();
+		    if(first != slice)
+			get_ui().printf(gettext("First file size       : %i bytes"), &first);
+		    get_ui().printf(gettext("File size             : %i bytes"), &slice);
+		    get_ui().printf(gettext("Last file size        : %i bytes"), &last);
+		    get_ui().printf(gettext("Archive total size is : %i bytes"), &total);
 		}
 	    }
-	    catch(Erange & e)
+	    else // not reading from a sar
 	    {
-		string msg = e.get_message();
-		get_ui().printf("%S", &msg);
+		tmp = sum.get_archive_size();
+		if(!tmp.is_zero())
+		{
+		    get_ui().printf(gettext("Archive size is: %i bytes"), &tmp);
+		    get_ui().printf(gettext("Previous archive size does not include headers present in each slice"));
+		}
+		else
+		    get_ui().printf(gettext("Archive size is unknown (reading from a pipe)"));
 	    }
 
-	    entree_stats stats = get_cat().get_stats();
-
-	    if(get_cat().get_contenu() == nullptr)
-		throw SRC_BUG;
-
-	    infinint g_storage_size = get_cat().get_contenu()->get_storage_size();
-	    infinint g_size =  get_cat().get_contenu()->get_size();
-
-	    if(g_size < g_storage_size)
+	    if(sum.get_data_size() < sum.get_storage_size())
 	    {
-		infinint delta = g_storage_size - g_size;
+		infinint delta = sum.get_storage_size() - sum.get_data_size();
 		get_ui().printf(gettext("The overall archive size includes %i byte(s) wasted due to bad compression ratio"), &delta);
 	    }
 	    else
 		get_ui().message(string(gettext("The global data compression ratio is: "))
-			       + tools_get_compression_ratio(g_storage_size,
-							     g_size,
-							     true));
+				 + tools_get_compression_ratio(sum.get_storage_size(),
+							       sum.get_data_size(),
+							       true));
 
 	    if(only_contains_an_isolated_catalogue())
 		get_ui().printf(gettext("\nWARNING! This archive only contains the contents of another archive, it can only be used as reference for differential backup or as rescue in case of corruption of the original archive's content. You cannot restore any data from this archive alone\n"));
 
-	    stats.listing(get_ui());
+	    sum.get_contents().listing(get_ui());
 	}
 	catch(...)
 	{
