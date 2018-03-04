@@ -43,6 +43,7 @@
 #include "database_listing_callback.hpp"
 #include "database_aux.hpp"
 #include "datetime.hpp"
+#include "user_interaction_blind.hpp"
 
 
     // from path.hpp
@@ -78,7 +79,7 @@ namespace libdar5
     class database: public libdar::database
     {
     public:
-	database(): libdar::database() {};
+	database(): libdar::database(std::shared_ptr<libdar::user_interaction>(new libdar::user_interaction_blind())) {};
 
 	database(user_interaction & dialog,
 		 const std::string & base,
@@ -106,8 +107,7 @@ namespace libdar5
 
 	void dump(user_interaction & dialog, const std::string & filename, const database_dump_options & opt) const
 	{
-	    libdar::database::dump(user_interaction5_clone_to_shared_ptr(dialog),
-				   filename,
+	    libdar::database::dump(filename,
 				   opt);
 	}
 
@@ -146,14 +146,13 @@ namespace libdar5
 		     const std::vector<std::string> & filename,
 		     const database_restore_options & opt)
 	{
-	    libdar::database::restore(user_interaction5_clone_to_shared_ptr(dialog),
-				      filename,
+	    libdar::database::restore(filename,
 				      opt);
 	}
 
 	bool check_order(user_interaction & dialog) const
 	{
-	    return libdar::database::check_order(user_interaction5_clone_to_shared_ptr(dialog));
+	    return libdar::database::check_order();
 	}
 
     private:

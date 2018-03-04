@@ -22,6 +22,8 @@ from 2.5.x to 2.6.0
   ownership of the given pointed objects
 - API: simplified class archive to only require user_interaction at
   object construction time
+- API: simplified class database to only require user_interaction at
+  object construction time
 
 from 2.5.14 to 2.5.14-bis
 - avoiding using the syncfs() system call in dar_split when the

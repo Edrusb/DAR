@@ -38,6 +38,7 @@
 #include "database_options.hpp"
 #include "database_archives.hpp"
 #include "database_listing_callback.hpp"
+#include "mem_ui.hpp"
 
 namespace libdar
 {
@@ -47,11 +48,11 @@ namespace libdar
 	/// use of this class interface. This class also defines internally
 	/// the data structure of the database.
 	/// \ingroup API
-    class database
+    class database: public mem_ui
     {
     public:
 	    /// this constructor build an empty database
-	database();
+	database(const std::shared_ptr<user_interaction> & dialog);
 
 	    /// this constructor reads database from a file
 
@@ -77,11 +78,10 @@ namespace libdar
 
 	    /// write the database to a file (see database_header first)
 
-	    /// \param[in] dialog for user interaction
 	    /// \param[in] filename name of file to save database to
 	    /// \param[in] opt extendable list of options to use for this operation
 	    /// \note this method is not available with partially extracted databases.
-	void dump(const std::shared_ptr<user_interaction> & dialog, const std::string & filename, const database_dump_options & opt) const;
+	void dump(const std::string & filename, const database_dump_options & opt) const;
 
 	    // SETTINGS
 
@@ -202,27 +202,24 @@ namespace libdar
 
 	    /// restore files calling dar on the appropriated archive
 
-	    /// \param[in,out] dialog where to have user interaction
 	    /// \param[in] filename list of filename to restore
 	    /// \param[in] opt extendable list of options to use for this operation
 	    /// \note this method is not available with partially extracted databases.
-	void restore(const std::shared_ptr<user_interaction> & dialog,
-		     const std::vector<std::string> & filename,
+	void restore(const std::vector<std::string> & filename,
 		     const database_restore_options & opt);
 
 	    /// check that all files's Data and EA are more recent when archive number grows within the database, only warn the user
 
-	    /// \param[in,out] dialog for user interaction
 	    /// \return true if check succeeded, false if warning have been issued
 	    /// \note this method is not available with partially extracted databases.
-	bool check_order(const std::shared_ptr<user_interaction> & dialog) const
+	bool check_order() const
 	{
 	    bool initial_warn = true;
 
 	    if(files == nullptr)
 		throw SRC_BUG;
 	    if(check_order_asked)
-		return files->check_order(*dialog, ".", initial_warn) && initial_warn;
+		return files->check_order(get_ui(), ".", initial_warn) && initial_warn;
 	    else
 		return true;
 	}
@@ -247,7 +244,7 @@ namespace libdar
 	unsigned char cur_db_version;                //< current db version (for informational purposes)
 	compression algo;                            //< compression used/to use when writing down the base to file
 
-	void build(const std::shared_ptr<user_interaction> & dialog, generic_file & f, bool partial, bool read_only, unsigned char db_version);  //< used by constructors
+	void build(generic_file & f, bool partial, bool read_only, unsigned char db_version);  //< used by constructors
 	archive_num get_real_archive_num(archive_num num, bool revert) const;
 
 	const datetime & get_root_last_mod(const archive_num & num) const;
