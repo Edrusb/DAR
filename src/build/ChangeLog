@@ -24,6 +24,7 @@ from 2.5.x to 2.6.0
   object construction time
 - API: simplified class database to only require user_interaction at
   object construction time
+- API: making enum crypto_algo an C++11 "enum class" type
 
 from 2.5.14 to 2.5.14-bis
 - avoiding using the syncfs() system call in dar_split when the

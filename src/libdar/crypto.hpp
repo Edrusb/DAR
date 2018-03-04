@@ -46,16 +46,16 @@ namespace libdar
 
 	/// the different cypher available for encryption (strong or weak)
 
-    enum crypto_algo
+    enum class crypto_algo
     {
-	crypto_none,          ///< no encryption
-	crypto_scrambling,    ///< scrambling weak encryption
-	crypto_blowfish,      ///< blowfish strong encryption
-	crypto_aes256,        ///< AES 256 strong encryption
-	crypto_twofish256,    ///< twofish 256 strong encryption
-	crypto_serpent256,    ///< serpent 256 strong encryption
-	crypto_camellia256,   ///< camellia 256 strong encryption
-	crypto_unknown        ///< archive format 8 and below only store the fact the archive is encrypted, but the algorithm is unknown
+	none,          ///< no encryption
+	scrambling,    ///< scrambling weak encryption
+	blowfish,      ///< blowfish strong encryption
+	aes256,        ///< AES 256 strong encryption
+	twofish256,    ///< twofish 256 strong encryption
+	serpent256,    ///< serpent 256 strong encryption
+	camellia256,   ///< camellia 256 strong encryption
+	unknown        ///< archive format 8 and below only store the fact the archive is encrypted, but the algorithm is unknown
     };
 	///\note crypto_unknown is only used to report an archive
 	/// encryption algorithm is not used, this value is never

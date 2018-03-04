@@ -111,7 +111,7 @@ namespace libdar
 
 	destroy();
 
-	x_crypto = crypto_none;
+	x_crypto = crypto_algo::none;
 	x_pass.clear();
 	x_crypto_size = default_crypto_size;
 	x_input_pipe = "";
@@ -131,7 +131,7 @@ namespace libdar
 	external_cat = false;
 	x_ref_chem = default_ref_chem;
 	x_ref_basename = "";
-	x_ref_crypto = crypto_none;
+	x_ref_crypto = crypto_algo::none;
 	x_ref_pass.clear();
 	x_ref_crypto_size = default_crypto_size;
 	x_ref_execute = "";
@@ -335,7 +335,7 @@ namespace libdar
 	    x_file_size = 0;
 	    x_first_file_size = 0;
 	    x_execute = "";
-	    x_crypto = crypto_none;
+	    x_crypto = crypto_algo::none;
 	    x_pass.clear();
 	    x_crypto_size = default_crypto_size;
 	    x_gnupg_recipients.clear();
@@ -746,7 +746,7 @@ namespace libdar
 	    x_file_size = 0;
 	    x_first_file_size = 0;
 	    x_execute = "";
-	    x_crypto = crypto_none;
+	    x_crypto = crypto_algo::none;
 	    x_pass.clear();
 	    x_crypto_size = default_crypto_size;
 	    x_gnupg_recipients.clear();
@@ -928,7 +928,7 @@ namespace libdar
 	    x_file_size = 0;
 	    x_first_file_size = 0;
 	    x_execute = "";
-	    x_crypto = crypto_none;
+	    x_crypto = crypto_algo::none;
 	    x_pass.clear();
 	    x_crypto_size = default_crypto_size;
 	    x_gnupg_recipients.clear();
@@ -1978,7 +1978,7 @@ namespace libdar
             x_file_size = 0;
             x_first_file_size = 0;
             x_execute = "";
-            x_crypto = crypto_none;
+            x_crypto = crypto_algo::none;
             x_pass.clear();
             x_crypto_size = default_crypto_size;
             x_gnupg_recipients.clear();

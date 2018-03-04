@@ -38,19 +38,19 @@ namespace libdar
     {
 	switch(algo)
 	{
-	case crypto_none:
+	case crypto_algo::none:
 	    return gettext("none");
-	case crypto_scrambling:
+	case crypto_algo::scrambling:
 	    return gettext("scrambling (weak encryption)");
-	case crypto_blowfish:
+	case crypto_algo::blowfish:
 	    return "blowfish";
-	case crypto_aes256:
+	case crypto_algo::aes256:
 	    return "AES 256";
-	case crypto_twofish256:
+	case crypto_algo::twofish256:
 	    return "twofish 256";
-	case crypto_serpent256:
+	case crypto_algo::serpent256:
 	    return "serpent 256";
-	case crypto_camellia256:
+	case crypto_algo::camellia256:
 	    return "camellia 256";
 	default:
 	    throw SRC_BUG;
@@ -61,20 +61,22 @@ namespace libdar
     {
 	switch(a)
 	{
-	case crypto_none:
+	case crypto_algo::none:
 	    return 'n';
-	case crypto_scrambling:
+	case crypto_algo::scrambling:
 	    return 's';
-	case crypto_blowfish:
+	case crypto_algo::blowfish:
 	    return 'b';
-	case crypto_aes256:
+	case crypto_algo::aes256:
 	    return 'a';
-	case crypto_twofish256:
+	case crypto_algo::twofish256:
 	    return 't';
-	case crypto_serpent256:
+	case crypto_algo::serpent256:
 	    return 'p';
-	case crypto_camellia256:
+	case crypto_algo::camellia256:
 	    return 'c';
+	case crypto_algo::unknown:
+	    throw SRC_BUG;
 	default:
 	    throw SRC_BUG;
 	}
@@ -85,19 +87,19 @@ namespace libdar
 	switch(a)
 	{
 	case 'n':
-	    return crypto_none;
+	    return crypto_algo::none;
 	case 's':
-	    return crypto_scrambling;
+	    return crypto_algo::scrambling;
 	case 'b':
-	    return crypto_blowfish;
+	    return crypto_algo::blowfish;
 	case 'a':
-	    return crypto_aes256;
+	    return crypto_algo::aes256;
 	case 't':
-	    return crypto_twofish256;
+	    return crypto_algo::twofish256;
 	case 'p':
-	    return crypto_serpent256;
+	    return crypto_algo::serpent256;
 	case 'c':
-	    return crypto_camellia256;
+	    return crypto_algo::camellia256;
 	default:
 	    throw Erange("char_to_sym_crypto", gettext("Unknown crypto algorithm"));
 	}

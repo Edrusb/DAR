@@ -163,7 +163,7 @@ namespace libdar
 #if CRYPTO_AVAILABLE
 	size_t key_len = max_key_len(algo);
 
-	if(algo == crypto_blowfish)
+	if(algo == crypto_algo::blowfish)
 	    key_len = 56; // for historical reasons
 
 	return key_len;
@@ -488,7 +488,7 @@ namespace libdar
 	unsigned int IV_hashing;
 
 	if(ver >= archive_version(8,1)
-	    && main_cipher != crypto_blowfish)
+	    && main_cipher != crypto_algo::blowfish)
 	{
 	    IV_cipher = GCRY_CIPHER_AES256; // to have an algorithm available when ligcrypt is used in FIPS mode
 	    IV_hashing = GCRY_MD_SHA256; // SHA224 was also ok but as time passes, it would get sooner unsave
@@ -668,7 +668,7 @@ namespace libdar
 	string p3 = string("\0\0\0\0", 4);
 	pass.clear();
 	pass.append(p3.c_str(), (U_I)p3.size());
-	dar_set_essiv(pass, esivkey, 1, crypto_blowfish);
+	dar_set_essiv(pass, esivkey, 1, crypto_algo::blowfish);
 
 	try
 	{
@@ -700,19 +700,19 @@ namespace libdar
 
 	switch(algo)
 	{
-	case crypto_blowfish:
+	case crypto_algo::blowfish:
 	    algo_id = GCRY_CIPHER_BLOWFISH;
 	    break;
-	case crypto_aes256:
+	case crypto_algo::aes256:
 	    algo_id = GCRY_CIPHER_AES256;
 	    break;
-	case crypto_twofish256:
+	case crypto_algo::twofish256:
 	    algo_id = GCRY_CIPHER_TWOFISH;
 	    break;
-	case crypto_serpent256:
+	case crypto_algo::serpent256:
 	    algo_id = GCRY_CIPHER_SERPENT256;
 	    break;
-	case crypto_camellia256:
+	case crypto_algo::camellia256:
 	    algo_id = GCRY_CIPHER_CAMELLIA256;
 	    break;
 	default:

@@ -543,10 +543,10 @@ namespace libdar
 	    if(info_details)
 		dialog->message(gettext("Considering cyphering layer..."));
 
-	    if(ver.is_ciphered() && ver.get_edition() >= 9 && crypto == crypto_none && ver.get_sym_crypto_algo() != crypto_none)
+	    if(ver.is_ciphered() && ver.get_edition() >= 9 && crypto == crypto_algo::none && ver.get_sym_crypto_algo() != crypto_algo::none)
 		crypto = ver.get_sym_crypto_algo(); // using the crypto algorithm recorded in the archive
 
-	    if(ver.is_ciphered() && crypto == crypto_none)
+	    if(ver.is_ciphered() && crypto == crypto_algo::none)
 	    {
 		if(lax)
 		{
@@ -581,7 +581,7 @@ namespace libdar
 		real_pass = clear_key.get_contents();
 	    }
 
-	    if(crypto != crypto_none && real_pass == "")
+	    if(crypto != crypto_algo::none && real_pass == "")
 	    {
 		if(!secu_string::is_string_secured())
 		    dialog->message(gettext("WARNING: support for secure memory was not available at compilation time, in case of heavy memory load, this may lead the password you are about to provide to be wrote to disk (swap space) in clear. You have been warned!"));
@@ -590,7 +590,7 @@ namespace libdar
 
 	    switch(crypto)
 	    {
-	    case crypto_none:
+	    case crypto_algo::none:
 		if(!ver.get_tape_marks())
 		{
 		    if(info_details)
@@ -608,11 +608,11 @@ namespace libdar
 			dialog->message(gettext("No cyphering layer opened"));
 		}
 		break;
-	    case crypto_blowfish:
-	    case crypto_aes256:
-	    case crypto_twofish256:
-	    case crypto_serpent256:
-	    case crypto_camellia256:
+	    case crypto_algo::blowfish:
+	    case crypto_algo::aes256:
+	    case crypto_algo::twofish256:
+	    case crypto_algo::serpent256:
+	    case crypto_algo::camellia256:
 		if(info_details)
 		    dialog->message(gettext("Opening cyphering layer..."));
 #ifdef LIBDAR_NO_OPTIMIZATION
@@ -656,7 +656,7 @@ namespace libdar
 		    }
 		}
 		break;
-	    case crypto_scrambling:
+	    case crypto_algo::scrambling:
 		if(info_details)
 		    dialog->message(gettext("Opening cyphering layer..."));
 #ifdef LIBDAR_NO_OPTIMIZATION
@@ -670,7 +670,7 @@ namespace libdar
 
 	    if(tmp == nullptr)
 	    {
-		if(crypto != crypto_none || !ver.get_tape_marks())
+		if(crypto != crypto_algo::none || !ver.get_tape_marks())
 		    throw Ememory("open_archive");
 	    }
 	    else
@@ -682,7 +682,7 @@ namespace libdar
 	    }
 
 #ifdef LIBTHREADAR_AVAILABLE
-	    if(multi_threaded && crypto != crypto_none)
+	    if(multi_threaded && crypto != crypto_algo::none)
 	    {
 		if(info_details)
 		    dialog->message(gettext("Creating a new thread to run the previously created layers..."));
@@ -1079,7 +1079,7 @@ namespace libdar
 
 	    secu_string real_pass = pass;
 
-	    if(hash != hash_none || crypto != crypto_none)
+	    if(hash != hash_none || crypto != crypto_algo::none)
 		open_mode = gf_write_only;
 
 	    try
@@ -1203,7 +1203,7 @@ namespace libdar
 		ver.set_tape_marks(add_marks_for_sequential_reading);
 		ver.set_signed(!gnupg_signatories.empty());
 
-		if(crypto != crypto_none || !gnupg_recipients.empty())
+		if(crypto != crypto_algo::none || !gnupg_recipients.empty())
 		{
 		    if(!secu_string::is_string_secured())
 			dialog->message(gettext("WARNING: support for secure memory was not available at compilation time, in case of heavy memory load, this may lead the password/passphrase provided to be wrote to disk (swap space) in clear. You have been warned!"));
@@ -1225,17 +1225,17 @@ namespace libdar
 
 			switch(crypto)
 			{
-			case crypto_none:
+			case crypto_algo::none:
 			    throw SRC_BUG;
-			case crypto_scrambling:
+			case crypto_algo::scrambling:
 			    throw Erange("macro_tools_create_layers",
 					 gettext("Scrambling is a very weak encryption algorithm, this is a non-sens to use with asymmetric encryption"));
 			    break;
-			case crypto_blowfish:
-			case crypto_aes256:
-			case crypto_twofish256:
-			case crypto_serpent256:
-			case crypto_camellia256:
+			case crypto_algo::blowfish:
+			case crypto_algo::aes256:
+			case crypto_algo::twofish256:
+			case crypto_algo::serpent256:
+			case crypto_algo::camellia256:
 			    gnupg_key_size = tools_max(crypto_sym::max_key_len(crypto),
 						       crypto_sym::max_key_len_libdar(crypto));
 			    break;
@@ -1255,15 +1255,15 @@ namespace libdar
 
 			switch(crypto)
 			{
-			case crypto_none:
+			case crypto_algo::none:
 			    throw SRC_BUG;
-			case crypto_scrambling:
+			case crypto_algo::scrambling:
 			    break;
-			case crypto_blowfish:
-			case crypto_aes256:
-			case crypto_twofish256:
-			case crypto_serpent256:
-			case crypto_camellia256:
+			case crypto_algo::blowfish:
+			case crypto_algo::aes256:
+			case crypto_algo::twofish256:
+			case crypto_algo::serpent256:
+			case crypto_algo::camellia256:
 			    while(!crypto_sym::is_a_strong_password(crypto, clear.get_contents()))
 			    {
 				clear.randomize(gnupg_key_size);
@@ -1300,8 +1300,8 @@ namespace libdar
 			if(real_pass.get_size() == 0)
 			    throw SRC_BUG;
 
-			if(crypto == crypto_none)
-			    crypto = crypto_blowfish;
+			if(crypto == crypto_algo::none)
+			    crypto = crypto_algo::blowfish;
 
 			ver.set_crypted_key(key);
 			key = nullptr; // now the pointed to object is under the responsibility of ver object
@@ -1319,7 +1319,7 @@ namespace libdar
 
 		    // optaining a password on-fly if necessary
 
-		if(crypto != crypto_none && real_pass.get_size() == 0)
+		if(crypto != crypto_algo::none && real_pass.get_size() == 0)
 		{
 		    secu_string t1 = dialog->get_secu_string(tools_printf(gettext("Archive %S requires a password: "), &filename), false);
 		    secu_string t2 = dialog->get_secu_string(gettext("Please confirm your password: "), false);
@@ -1370,7 +1370,7 @@ namespace libdar
 
 		switch(crypto)
 		{
-		case crypto_scrambling:
+		case crypto_algo::scrambling:
 		    if(info_details)
 			dialog->message(gettext("Adding a new layer on top: scrambler object..."));
 		    tmp = new (nothrow) scrambler(real_pass, *(layers.top()));
@@ -1378,11 +1378,11 @@ namespace libdar
 		    tools_secu_string_show(*dialog, string("real_pass used: "), real_pass);
 #endif
 		    break;
-		case crypto_blowfish:
-		case crypto_aes256:
-		case crypto_twofish256:
-		case crypto_serpent256:
-		case crypto_camellia256:
+		case crypto_algo::blowfish:
+		case crypto_algo::aes256:
+		case crypto_algo::twofish256:
+		case crypto_algo::serpent256:
+		case crypto_algo::camellia256:
 		    if(info_details)
 			dialog->message(gettext("Adding a new layer on top: Strong encryption object..."));
 		    tmp = new (nothrow) crypto_sym(crypto_size,
@@ -1397,7 +1397,7 @@ namespace libdar
 		    tools_secu_string_show(*dialog, string("real_pass used: "), real_pass);
 #endif
 		    break;
-		case crypto_none:
+		case crypto_algo::none:
 		    if(!writing_to_pipe)
 		    {
 			if(info_details)
@@ -1411,7 +1411,7 @@ namespace libdar
 		    throw SRC_BUG; // cryto value should have been checked before
 		}
 
-		if(!writing_to_pipe || crypto != crypto_none)
+		if(!writing_to_pipe || crypto != crypto_algo::none)
 		{
 		    if(tmp == nullptr)
 			throw Ememory("op_create_in_sub");
@@ -1425,7 +1425,7 @@ namespace libdar
 			// adding a generic_thread object in the stack for
 			// a separated thread proceed to read/write to the object pushed on the stack
 
-		    if(multi_threaded && crypto != crypto_none)
+		    if(multi_threaded && crypto != crypto_algo::none)
 		    {
 			if(info_details)
 			    dialog->message(gettext("Creating a new thread to run the previously created layers..."));
@@ -1443,7 +1443,7 @@ namespace libdar
 			throw SRC_BUG;
 		}
 
-		if(crypto != crypto_none) // initial elastic buffer
+		if(crypto != crypto_algo::none) // initial elastic buffer
 		{
 		    if(info_details)
 			dialog->message(gettext("Writing down the initial elastic buffer through the encryption layer..."));
@@ -1767,7 +1767,7 @@ namespace libdar
 	    dialog->message(gettext("Writing down the first archive terminator..."));
 	coord.dump(layers); // since format "04" the terminateur is encrypted
 
-	if(crypto != crypto_none)
+	if(crypto != crypto_algo::none)
 	{
 	    if(info_details)
 		dialog->message(gettext("writing down the final elastic buffer through the encryption layer..."));

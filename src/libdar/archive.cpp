@@ -563,7 +563,7 @@ namespace libdar
 			throw Elibcall("op_merge", gettext("Compression_level must be between 1 and 9 included"));
 		    if(options.get_slice_size().is_zero() && !options.get_first_slice_size().is_zero())
 			throw Elibcall("op_merge", gettext("\"first_file_size\" cannot be different from zero if \"file_size\" is equal to zero"));
-		    if(options.get_crypto_size() < 10 && options.get_crypto_algo() != crypto_none)
+		    if(options.get_crypto_size() < 10 && options.get_crypto_algo() != crypto_algo::none)
 			throw Elibcall("op_merge", gettext("Crypto block size must be greater than 10 bytes"));
 
 		    check_libgcrypt_hash_bug(get_ui(), options.get_hash_algo(), options.get_first_slice_size(), options.get_slice_size());
@@ -1972,7 +1972,7 @@ namespace libdar
             throw Elibcall("op_create_in", gettext("Compression_level must be between 1 and 9 included"));
         if(file_size.is_zero() && !first_file_size.is_zero())
             throw Elibcall("op_create_in", gettext("\"first_file_size\" cannot be different from zero if \"file_size\" is equal to zero"));
-        if(crypto_size < 10 && crypto != crypto_none)
+        if(crypto_size < 10 && crypto != crypto_algo::none)
             throw Elibcall("op_create_in", gettext("Crypto block size must be greater than 10 bytes"));
 #ifndef	LIBDAR_NODUMP_FEATURE
 	if(nodump)

@@ -171,13 +171,13 @@ namespace libdar5
 
 	// from crypto.hpp
     using libdar::crypto_algo;
-    constexpr crypto_algo crypto_none = crypto_algo::crypto_none;
-    constexpr crypto_algo crypto_scrambling = crypto_algo::crypto_scrambling;
-    constexpr crypto_algo crypto_blowfish = crypto_algo::crypto_blowfish;
-    constexpr crypto_algo crypto_aes256 = crypto_algo::crypto_aes256;
-    constexpr crypto_algo crypto_twofish256 = crypto_algo::crypto_twofish256;
-    constexpr crypto_algo crypto_serpent256 = crypto_algo::crypto_serpent256;
-    constexpr crypto_algo crypto_camellia256 = crypto_algo::crypto_camellia256;
+    constexpr crypto_algo crypto_none = crypto_algo::none;
+    constexpr crypto_algo crypto_scrambling = crypto_algo::scrambling;
+    constexpr crypto_algo crypto_blowfish = crypto_algo::blowfish;
+    constexpr crypto_algo crypto_aes256 = crypto_algo::aes256;
+    constexpr crypto_algo crypto_twofish256 = crypto_algo::twofish256;
+    constexpr crypto_algo crypto_serpent256 = crypto_algo::serpent256;
+    constexpr crypto_algo crypto_camellia256 = crypto_algo::camellia256;
 
     using libdar::signator;
 

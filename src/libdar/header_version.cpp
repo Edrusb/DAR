@@ -45,7 +45,7 @@ namespace libdar
 	algo_zip = compression::none;
 	cmd_line = "";
 	initial_offset = 0;
-	sym = crypto_none;
+	sym = crypto_algo::none;
 	crypted_key = nullptr;
 	ref_layout = nullptr;
 	ciphered = false;
@@ -178,7 +178,7 @@ namespace libdar
 		    if(!lax_mode)
 			throw;
 		    dialog.printf("Unknown crypto algorithm used in archive, ignoring that field and simply assuming the archive has been encrypted, if not done you will need to specify the crypto algorithm to use in order to read this archive");
-		    sym = crypto_none;
+		    sym = crypto_algo::none;
 		}
 	    }
 	    else
@@ -186,12 +186,12 @@ namespace libdar
 		    // not coherent with flag which has the FLAG_SCRAMBLED bit set
 		    // but that this way we record that the crypto algo has
 		    // to be provided by the user
-		sym = crypto_none;
+		sym = crypto_algo::none;
 	}
 	else
 	{
 	    ciphered = false;
-	    sym = crypto_none; // no crypto used, coherent with flag
+	    sym = crypto_algo::none; // no crypto used, coherent with flag
 	}
 
 	has_tape_marks = (flag & FLAG_SEQUENCE_MARK) != 0;
@@ -330,7 +330,7 @@ namespace libdar
 	if(has_tape_marks)
 	    flag[0] |= FLAG_SEQUENCE_MARK;
 
-	if(sym != crypto_none)
+	if(sym != crypto_algo::none)
 	    flag[0] |= FLAG_SCRAMBLED;
 	    // Note: we cannot set this flag (even if ciphered is true) if we do not know the crypto algo
 	    // as since version 9 the presence of this flag implies the existence
@@ -357,7 +357,7 @@ namespace libdar
 	f.write((char *)&(flag[0]), sizeof(unsigned char));
 	if(initial_offset != 0)
 	    initial_offset.dump(f);
-	if(sym != crypto_none)
+	if(sym != crypto_algo::none)
 	{
 	    tmp = crypto_algo_2_char(sym);
 	    f.write(&tmp, sizeof(tmp));
@@ -412,7 +412,7 @@ namespace libdar
 	algo_zip = compression::none;
 	cmd_line = "";
 	initial_offset = 0;
-	sym = crypto_none;
+	sym = crypto_algo::none;
 	clear_crypted_key();
 	clear_slice_layout();
 	has_tape_marks = false;

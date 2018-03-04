@@ -84,7 +84,7 @@ namespace libdar
 	const std::string & get_command_line() const { return cmd_line; };
 	const infinint & get_initial_offset() const { return initial_offset; };
 
-	bool is_ciphered() const { return ciphered || sym != crypto_none; };
+	bool is_ciphered() const { return ciphered || sym != crypto_algo::none; };
 	bool is_signed() const { return arch_signed; };
 	crypto_algo get_sym_crypto_algo() const { return sym; };
 	memory_file *get_crypted_key() const { return crypted_key; };
