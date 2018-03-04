@@ -93,6 +93,9 @@ namespace libdar
 	const std::list<signator> & verify() const { return signing_result; };
 
 	    /// exposing to public visibility the protected method of mem_ui
+
+	    /// used to provide access to the user_interaction from the callback function
+	    /// required by gpgme_set_passphrase_cb().
 	user_interaction & get_ui() const { return mem_ui::get_ui(); };
 
     private:
