@@ -406,6 +406,20 @@ namespace libdar
 	dialog.printf(gettext("User comment                         : %S"), &(get_command_line()));
     }
 
+    void header_version::clear()
+    {
+	edition = archive_version();
+	algo_zip = compression::none;
+	cmd_line = "";
+	initial_offset = 0;
+	sym = crypto_none;
+	clear_crypted_key();
+	clear_slice_layout();
+	has_tape_marks = false;
+	ciphered = false;
+	arch_signed = false;
+    }
+
     void header_version::copy_from(const header_version & ref)
     {
 	edition = ref.edition;

@@ -95,6 +95,10 @@ namespace libdar
 
 	void display(user_interaction & dialg) const;
 
+	    // clear
+
+	void clear();
+
     private:
         archive_version edition; //< archive format
         compression algo_zip;    //< compression algorithm used
