@@ -1093,6 +1093,78 @@ namespace libdar
 	    exploitable = false;
     }
 
+    archive_summary archive::summary_data()
+    {
+	archive_summary ret;
+	infinint sub_slice_size;
+	infinint first_slice_size;
+	infinint last_slice_size;
+	infinint slice_number;
+	infinint archive_size;
+
+	    // sanity checks
+
+	if(!exploitable)
+	    throw Elibcall("summary", gettext("This archive is not exploitable, check the archive class usage in the API documentation"));
+
+	    // end of sanity checks
+
+	try
+	{
+	    if(get_sar_param(sub_slice_size, first_slice_size, last_slice_size, slice_number))
+	    {
+		if(slice_number == 1)
+		{
+		    sub_slice_size = last_slice_size;
+		    first_slice_size = last_slice_size;
+		    archive_size = last_slice_size;
+		}
+
+		if(slice_number > 1)
+		    archive_size = first_slice_size + (slice_number - 2)*sub_slice_size + last_slice_size;
+		else
+		    archive_size = 0; // unknown
+	    }
+	    else // not reading from a sar
+	    {
+		archive_size = get_level2_size();
+		(void)archive_size.is_zero();
+		sub_slice_size = 0;
+		first_slice_size = 0;
+		last_slice_size = 0;
+		slice_number = 0;
+	    }
+	}
+	catch(Erange & e)
+	{
+	    get_ui().message(e.get_message());
+	    sub_slice_size = 0;
+	    first_slice_size = 0;
+	    last_slice_size = 0;
+	    slice_number = 0;
+	    archive_size = get_level2_size();
+	}
+
+	ret.set_slice_size(sub_slice_size);
+	ret.set_first_slice_size(first_slice_size);
+	ret.set_last_slice_size(last_slice_size);
+	ret.set_slice_number(slice_number);
+	ret.set_archive_size(archive_size);
+
+	ret.set_catalog_size(get_cat_size());
+	ret.set_header(get_header());
+
+	if(get_cat().get_contenu() == nullptr)
+	    throw SRC_BUG;
+	ret.set_storage_size(get_cat().get_contenu()->get_storage_size());
+	ret.set_data_size(get_cat().get_contenu()->get_size());
+
+	ret.set_contents(get_cat().get_stats());
+
+	return ret;
+    }
+
+
     void archive::op_listing(catalogue_listing_callback callback,
 			     void *context,
 			     const archive_options_listing & options)

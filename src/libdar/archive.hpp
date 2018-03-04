@@ -43,6 +43,7 @@
 #include "crypto.hpp"
 #include "slice_layout.hpp"
 #include "mem_ui.hpp"
+#include "archive_summary.hpp"
 
 namespace libdar
 {
@@ -191,6 +192,9 @@ namespace libdar
 	    ///
 	    /// \note see also get_stats() method
 	void summary();
+
+	    /// same summary information but as broken out data
+	archive_summary summary_data();
 
 
 	    /// listing of the archive contents

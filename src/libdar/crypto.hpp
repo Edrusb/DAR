@@ -54,8 +54,12 @@ namespace libdar
 	crypto_aes256,        ///< AES 256 strong encryption
 	crypto_twofish256,    ///< twofish 256 strong encryption
 	crypto_serpent256,    ///< serpent 256 strong encryption
-	crypto_camellia256    ///< camellia 256 strong encryption
+	crypto_camellia256,   ///< camellia 256 strong encryption
+	crypto_unknown        ///< archive format 8 and below only store the fact the archive is encrypted, but the algorithm is unknown
     };
+	///\note crypto_unknown is only used to report an archive
+	/// encryption algorithm is not used, this value is never
+	/// stored inside an archive
 
 	/// signator status
 
