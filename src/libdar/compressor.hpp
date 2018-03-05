@@ -32,37 +32,14 @@
 #include "generic_file.hpp"
 #include "integers.hpp"
 #include "wrapperlib.hpp"
+#include "compression.hpp"
 
 namespace libdar
 {
 
-	/// the different compression algorithm available
-
-	/// values to be used as argument of libdar API calls
-	/// \ingroup API
-    enum class compression
-    {
-	none = 'n',  ///< no compression
-	gzip = 'z',  ///< gzip compression
-	bzip2 = 'y', ///< bzip2 compression
-	lzo = 'l',   ///< lzo compression
-	xz = 'x',     ///< lzma compression
-	lzo1x_1_15 = 'j', ///< lzo degraded algo corresponding to lzop -1
-	lzo1x_1 = 'k' ///< lzo degraded algo corresponding to lzo -2 to lzo -6
-    };
-
-	/// \note lzo1x_1_15 and lzo1x_1 should never be found in archive but instead lzo should
-	/// be put in place. In consequence, the two letters 'j' and 'k' reserved here, shall
-	/// well be modified to other value if necessary in the future, thus would not break
-	/// any backward compatibility.
 
 	/// \ingroup Private
-	/// @}
-
-    extern compression char2compression(char a);
-    extern char compression2char(compression c);
-    extern std::string compression2string(compression c);
-    extern compression string2compression(const std::string & a); // throw Erange if an unknown string is given
+	/// @{
 
 	/// compression class for gzip and bzip2 algorithms
     class compressor : public generic_file
