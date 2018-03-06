@@ -1494,9 +1494,6 @@ static void signed_int_to_archive_num(S_I input, archive_num &num, bool & positi
 
     if(input < 0)
 	throw SRC_BUG;
-    if(input >= ARCHIVE_NUM_MAX)
-	throw Erange("signed_int_to_archive_name", tools_printf(gettext("Absolute value too high for an archive number: %d"), input));
-    else
-	num = input;
+    num = input;
 }
 

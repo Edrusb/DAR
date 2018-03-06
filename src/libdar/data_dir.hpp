@@ -57,7 +57,7 @@ namespace libdar
     {
     public:
 	data_dir(const std::string &name);
-	data_dir(generic_file &f, unsigned char db_version);
+	data_dir(generic_file &f, unsigned char db_version); //< does not read signature
 	data_dir(const data_tree & ref);
 	data_dir(const data_dir & ref);
 	data_dir(data_dir && ref) noexcept = default;
@@ -65,7 +65,7 @@ namespace libdar
 	data_dir & operator = (data_dir && ref) noexcept = default;
 	~data_dir();
 
-	virtual void dump(generic_file & f) const override;
+	virtual void dump(generic_file & f) const override; //< write signature followed by data constructor will read
 
 	void add(const cat_inode *entry, const archive_num & archive);
 	void add(const cat_detruit *entry, const archive_num & archive);
@@ -97,6 +97,23 @@ namespace libdar
 
 	virtual bool fix_corruption() override; // inherited from data_tree
 
+	    /// lookup routine to find a pointer to the dat_tree object corresponding to the given path
+
+	    /// \param[in] chemin is the path to look for
+	    /// \param[out] ptr is a pointer to the looked node, if found
+	    /// \return true if a node could be found in the database
+	bool data_tree_find(path chemin, const data_tree *& ptr) const;
+
+	    /// add a directory to the dat_dir
+	void data_tree_update_with(const cat_directory *dir, archive_num archive);
+
+
+	    /// read a signature and then run the data_dir constructor but aborts if not a data_dir
+
+	    /// \note the constructors of data_tree and data_dir do not read the signature
+	    /// because its purpose it to know whether the following is a data_dir or data_tree
+	    /// dump() result.
+	static data_dir *data_tree_read(generic_file & f, unsigned char db_version);
 
     private:
 	std::deque<data_tree *> rejetons;          //< subdir and subfiles of the current dir
@@ -104,18 +121,13 @@ namespace libdar
 	void add_child(data_tree *fils);          //< "this" is now responsible of "fils" disalocation
 	void remove_child(const std::string & name);
 	data_tree *find_or_addition(const std::string & name, bool is_dir, const archive_num & archive);
+
+	    /// read signature and depening on it run data_tree or data_dir constructor
+	static data_tree *read_next_in_list_from_file(generic_file & f, unsigned char db_version);
     };
 
-    extern data_dir *data_tree_read(generic_file & f, unsigned char db_version);
 
-	/// lookup routine to find a pointer to the dat_tree object corresponding to the given path
 
-	/// \param[in] chemin is the path to look for
-	/// \param[in] racine is the database to look into
-	/// \param[out] ptr is a pointer to the looked node if found
-	/// \return true if a node could be found in the database
-    extern bool data_tree_find(path chemin, const data_dir & racine, const data_tree *& ptr);
-    extern void data_tree_update_with(const cat_directory *dir, archive_num archive, data_dir *racine);
 
 	/// @}
 

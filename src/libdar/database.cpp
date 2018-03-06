@@ -126,7 +126,7 @@ namespace libdar
 
 	    if(!partial)
 	    {
-		files = data_tree_read(f, db_version);
+		files = data_dir::data_tree_read(f, db_version);
 		if(files == nullptr)
 		    throw Ememory("database::database");
 		if(files->get_name() != ".")
@@ -217,6 +217,7 @@ namespace libdar
 
 	    if(files == nullptr)
 		throw SRC_BUG;
+
 	    if(basename == "")
 		throw Erange("database::add_archive", gettext("Empty string is an invalid archive basename"));
 
@@ -224,7 +225,7 @@ namespace libdar
 	    dat.basename = basename;
 	    dat.root_last_mod = arch.get_catalogue().get_root_dir_last_modif();
 	    coordinate.push_back(dat);
-	    data_tree_update_with(arch.get_catalogue().get_contenu(), number, files);
+	    files->data_tree_update_with(arch.get_catalogue().get_contenu(), number);
 	    if(number > 1)
 		files->finalize_except_self(number, get_root_last_mod(number), 0);
 	}
@@ -496,7 +497,9 @@ namespace libdar
 		// determination of the archives to restore and files to restore for each selected file
 	    while(!anneau.empty())
 	    {
-		if(data_tree_find(anneau.front(), *files, ptr))
+		if(files == nullptr)
+		    throw SRC_BUG;
+		if(files->data_tree_find(anneau.front(), ptr))
 		{
 		    const data_dir *ptr_dir = dynamic_cast<const data_dir *>(ptr);
 		    set<archive_num> num_data;

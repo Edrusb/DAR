@@ -51,8 +51,6 @@ extern "C"
 using namespace std;
 using namespace libdar;
 
-static data_tree *read_from_file(generic_file & f, unsigned char db_version);
-
 namespace libdar
 {
 
@@ -71,7 +69,7 @@ namespace libdar
 	{
 	    while(!tmp.is_zero())
 	    {
-		entry = read_from_file(f, db_version);
+		entry = read_next_in_list_from_file(f, db_version);
 		if(entry == nullptr)
 		    throw Erange("data_dir::data_dir", gettext("Unexpected end of file"));
 		rejetons.push_back(entry);
@@ -460,47 +458,10 @@ namespace libdar
 
     }
 
-    void data_dir::add_child(data_tree *fils)
-    {
-	if(fils == nullptr)
-	    throw SRC_BUG;
-	rejetons.push_back(fils);
-    }
-
-    void data_dir::remove_child(const string & name)
-    {
-	deque<data_tree *>::iterator it = rejetons.begin();
-
-	while(it != rejetons.end() && *it != nullptr && (*it)->get_name() != name)
-	    ++it;
-
-	if(it != rejetons.end())
-	{
-	    if(*it == nullptr)
-		throw SRC_BUG;
-	    else
-		rejetons.erase(it);
-	}
-    }
-
-
-////////////////////////////////////////////////////////////////
-
-    data_dir *data_tree_read(generic_file & f, unsigned char db_version)
-    {
-	data_tree *lu = read_from_file(f, db_version);
-	data_dir *ret = dynamic_cast<data_dir *>(lu);
-
-	if(ret == nullptr && lu != nullptr)
-	    delete lu;
-
-	return ret;
-    }
-
-    bool data_tree_find(path chemin, const data_dir & racine, const data_tree *& ptr)
+    bool data_dir::data_tree_find(path chemin, const data_tree *& ptr) const
     {
 	string filename;
-	const data_dir *current = &racine;
+	const data_dir *current = this;
 	bool loop = true;
 
 	if(!chemin.is_relative())
@@ -530,9 +491,12 @@ namespace libdar
 	return ptr != nullptr;
     }
 
-    void data_tree_update_with(const cat_directory *dir, archive_num archive, data_dir *racine)
+    void data_dir::data_tree_update_with(const cat_directory *dir, archive_num archive)
     {
 	const cat_nomme *entry;
+
+	if(dir == nullptr)
+	    throw SRC_BUG;
 
 	dir->reset_read_children();
 	while(dir->read_children(entry))
@@ -552,50 +516,84 @@ namespace libdar
 		if(entry_det != nullptr)
 		{
 		    if(!entry_det->get_date().is_null())
-			racine->add(entry_det, archive);
+			add(entry_det, archive);
 			// else this is an old archive that does not store date with cat_detruit objects
 		}
 		else
 		    continue; // continue with next loop, we ignore entree objects that are neither inode nor cat_detruit
 	    else
-		racine->add(entry_ino, archive);
+		add(entry_ino, archive);
 
 	    if(entry_dir != nullptr) // going into recursion
 	    {
-		data_tree *new_root = const_cast<data_tree *>(racine->read_child(entry->get_name()));
+		data_tree *new_root = const_cast<data_tree *>(read_child(entry->get_name()));
 		data_dir *new_root_dir = dynamic_cast<data_dir *>(new_root);
 
 		if(new_root == nullptr)
-		    throw SRC_BUG; // the racine->add method did not add an item for "entry"
+		    throw SRC_BUG; // the add() method did not add an item for "entry"
 		if(new_root_dir == nullptr)
-		    throw SRC_BUG; // the racine->add method did not add a data_dir item
-		data_tree_update_with(entry_dir, archive, new_root_dir);
+		    throw SRC_BUG; // the add() method did not add a data_dir item
+		new_root_dir->data_tree_update_with(entry_dir, archive);
 	    }
 	}
     }
 
+    data_dir *data_dir::data_tree_read(generic_file & f, unsigned char db_version)
+    {
+	data_tree *lu = read_next_in_list_from_file(f, db_version);
+	data_dir *ret = dynamic_cast<data_dir *>(lu);
+
+	if(ret == nullptr && lu != nullptr)
+	    delete lu;
+
+	return ret;
+    }
+
+
+    void data_dir::add_child(data_tree *fils)
+    {
+	if(fils == nullptr)
+	    throw SRC_BUG;
+	rejetons.push_back(fils);
+    }
+
+    void data_dir::remove_child(const string & name)
+    {
+	deque<data_tree *>::iterator it = rejetons.begin();
+
+	while(it != rejetons.end() && *it != nullptr && (*it)->get_name() != name)
+	    ++it;
+
+	if(it != rejetons.end())
+	{
+	    if(*it == nullptr)
+		throw SRC_BUG;
+	    else
+		rejetons.erase(it);
+	}
+    }
+
+    data_tree *data_dir::read_next_in_list_from_file(generic_file & f, unsigned char db_version)
+    {
+	char sign;
+	data_tree *ret;
+
+	if(f.read(&sign, 1) != 1)
+	    return nullptr; // nothing more to read
+
+	if(sign == data_tree::signature())
+	    ret = new (nothrow) data_tree(f, db_version);
+	else if(sign == data_dir::signature())
+	    ret = new (nothrow) data_dir(f, db_version);
+	else
+	    throw Erange("read_next_in_list_from_file", gettext("Unknown record type"));
+
+	if(ret == nullptr)
+	    throw Ememory("read_next_in_list_from_file");
+
+	return ret;
+    }
+
 } // end of namesapce
 
-////////////////////////////////////////////////////////////////
-
-static data_tree *read_from_file(generic_file & f, unsigned char db_version)
-{
-    char sign;
-    data_tree *ret;
-
-    if(f.read(&sign, 1) != 1)
-        return nullptr; // nothing more to read
-
-    if(sign == data_tree::signature())
-        ret = new (nothrow) data_tree(f, db_version);
-    else if(sign == data_dir::signature())
-        ret = new (nothrow) data_dir(f, db_version);
-    else
-        throw Erange("read_from_file", gettext("Unknown record type"));
-
-    if(ret == nullptr)
-        throw Ememory("read_from_file");
-
-    return ret;
-}
 
