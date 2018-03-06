@@ -56,14 +56,20 @@ extern "C"
 #include "cat_lien.hpp"
 #include "tools.hpp"
 
+    /// all values of FLAG for EA are covered by the EA_MASK:
 #define INODE_FLAG_EA_MASK  0x07
+
+    // FLAG values for EA
 #define INODE_FLAG_EA_FULL  0x01
 #define INODE_FLAG_EA_PART  0x02
 #define INODE_FLAG_EA_NONE  0x03
 #define INODE_FLAG_EA_FAKE  0x04
 #define INODE_FLAG_EA_REMO  0x05
 
+    /// all values of FLAG for FSA are covered by the FSA_MASK:
 #define INODE_FLAG_FSA_MASK 0x18
+
+    // FLAG values for FSA
 #define INODE_FLAG_FSA_NONE 0x00
 #define INODE_FLAG_FSA_PART 0x08
 #define INODE_FLAG_FSA_FULL 0x10
