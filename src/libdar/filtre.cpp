@@ -699,7 +699,7 @@ namespace libdar
 						{
 							// both are inodes
 
-						    if(compatible_signature(f_ino->signature(), e_ino->signature())
+						    if(f_ino->signature().compatible_signature(e_ino->signature())
 							   // both are of the same type of inode
 						       && f_file != nullptr)
 							    // both are plain files (no warning issued for other inode types)
@@ -2380,9 +2380,9 @@ namespace libdar
 						dolly_ino = nullptr;
 
 						if(e_mir != nullptr)
-						    firm = e_mir->get_inode()->signature();
+						    firm = e_mir->get_inode()->signature().get_base();
 						else
-						    firm = e->signature();
+						    firm = e->signature().get_base();
 
 						dolly = new (nothrow) cat_detruit(the_name, firm, ref_tab[index]->get_current_reading_dir().get_last_modif());
 						if(dolly == nullptr)

@@ -41,6 +41,7 @@ extern "C"
 #include "pile_descriptor.hpp"
 #include "smart_pointer.hpp"
 #include "entree_stats.hpp"
+#include "cat_signature.hpp"
 
 #include <memory>
 
@@ -51,13 +52,6 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-    enum saved_status
-    {
-	s_saved,      //< inode is saved in the archive
-	s_fake,       //< inode is not saved in the archive but is in the archive of reference (isolation context) s_fake is no more used in archive format "08" and above: isolated catalogue do keep the data pointers and s_saved stays a valid status in isolated catalogues.
-	s_not_saved,  //< inode is not saved in the archive
-	s_delta       //< inode is saved but as delta binary from the content (delta signature) of what was found in the archive of reference
-    };
 
 	/// the root class from all other inherite for any entry in the catalogue
     class cat_entree
@@ -142,7 +136,7 @@ namespace libdar
 	virtual void post_constructor(const pile_descriptor & pdesc) {};
 
 	    /// inherited class signature
-        virtual unsigned char signature() const = 0;
+        virtual cat_signature signature() const = 0;
 
 	    /// a way to copy the exact type of an object even if pointed to by a parent class pointer
         virtual cat_entree *clone() const = 0;

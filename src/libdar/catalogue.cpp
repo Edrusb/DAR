@@ -121,7 +121,6 @@ namespace libdar
 			 bool only_detruit): mem_ui(ui), out_compare("/")
     {
 	string tmp;
-	unsigned char a;
 	saved_status st;
 	unsigned char base;
 	map <infinint, cat_etoile *> corres;
@@ -161,8 +160,11 @@ namespace libdar
 		    }
 		}
 
-		pdesc.stack->read((char *)&a, 1); // need to read the signature before constructing "contenu"
-		if(! extract_base_and_status(a, base, st) && !lax)
+		cat_signature cat_sig;
+		if(!cat_sig.read(*(pdesc.stack), reading_ver))
+		    throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
+
+		if(!cat_sig.get_base_and_status(base, st) && !lax)
 		    throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
 		if(base != 'd' && !lax)
 		    throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
@@ -671,9 +673,9 @@ namespace libdar
 		unsigned char firm;
 
 		if(pro_mir != nullptr)
-		    firm = pro_mir->get_inode()->signature();
+		    firm = pro_mir->get_inode()->signature().get_base();
 		else
-		    firm = pro_nom->signature();
+		    firm = pro_nom->signature().get_base();
 
 		cat_detruit *det_tmp = new (nothrow) cat_detruit(pro_nom->get_name(), firm, current->get_last_modif());
 		if(det_tmp == nullptr)
@@ -961,8 +963,9 @@ namespace libdar
 			    string tmp_date = !e_det->get_date().is_null() ? tools_display_date(e_det->get_date()) : "Unknown date";
 			    saved_status poub;
 			    char type;
+			    cat_signature cat_sig(e_det->get_signature());
 
-			    if(!extract_base_and_status(e_det->get_signature(), (unsigned char &)type, poub))
+			    if(!cat_sig.get_base_and_status((unsigned char &)type, poub))
 				type = '?';
 			    if(type == 'f')
 				type = '-';
@@ -1091,8 +1094,9 @@ namespace libdar
 			    {
 				saved_status poub;
 				char type;
+				cat_signature cat_sig(e_det->get_signature());
 
-				if(!extract_base_and_status(e_det->get_signature(), (unsigned char &)type, poub))
+				if(!cat_sig.get_base_and_status((unsigned char &)type, poub))
 				    type = '?';
 				if(type == 'f')
 				    type = '-';
@@ -1221,8 +1225,9 @@ namespace libdar
 			    saved_status state;
 			    string data = "deleted";
 			    string metadata = "absent";
+			    cat_signature cat_sig = e_det->get_signature();
 
-			    if(!extract_base_and_status_isolated(e_det->get_signature(), sig, state, isolated))
+			    if(!cat_sig.get_base_and_status_isolated(sig, state, isolated))
 				throw Erange("catalogue::xml_listing", gettext("Invalid signature found"));
 			    switch(sig)
 			    {
@@ -1296,8 +1301,9 @@ namespace libdar
 				saved_status data_st;
 				cat_inode::ea_status ea_st = isolated ? cat_inode::ea_fake : e_ino->ea_get_saved_status();
 				unsigned char sig;
+				cat_signature cat_sig = e_ino->signature();
 
-				if(!extract_base_and_status_isolated(e_ino->signature(), sig, data_st, isolated))
+				if(!cat_sig.get_base_and_status_isolated(sig, data_st, isolated))
 				    throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
 				data_st = isolated ? s_fake : e_ino->get_saved_status(); // the trusted source for cat_inode status is get_saved_status, not the signature (may change in future, who knows)
 				if(stored == "0" && (reg == nullptr || !reg->get_sparse_file_detection_read()))

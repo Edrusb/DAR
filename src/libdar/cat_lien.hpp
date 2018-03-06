@@ -73,7 +73,7 @@ namespace libdar
             // using method has_changed_since() from cat_inode class
 
 	    /// inherited from cat_entree
-        virtual unsigned char signature() const override { return mk_signature('l', get_saved_status()); };
+        virtual cat_signature signature() const override { return cat_signature('l', get_saved_status()); };
 
 	    /// inherited from cat_entree
         virtual cat_entree *clone() const override { return new (std::nothrow) cat_lien(*this); };

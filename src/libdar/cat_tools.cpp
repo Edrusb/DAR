@@ -33,17 +33,6 @@ using namespace std;
 
 namespace libdar
 {
-    const U_8 SAVED_FAKE_BIT = 0x80;
-    const U_8 SAVED_NON_DELTA_BIT = 0x40;
-    // in ASCII lower case letter have binary values 11xxxxx and higher case
-    // have binary values 10xxxxx The the 7th byte is always set to 1. We can
-    // thus play with it to store the delta diff flag:
-    // - when set to 1, this is a non delta binary file (backward compatibility)
-    //   and the signature byte is a letter (lower or higher case to tell whether
-    //   the inode is saved or not
-    // - when set to 0, this is a delta saved file, setting it back to 1 should
-    //   give a lower case letter corresponding to the inode type.
-
 
 	// local sub routines
 
@@ -55,9 +44,10 @@ namespace libdar
     {
 	saved_status st;
 	char type;
+	cat_signature cat_sig = ref.signature();
 
 	U_32 perm = ref.get_perm();
-	if(!extract_base_and_status(ref.signature(), (unsigned char &)type, st))
+	if(!cat_sig.get_base_and_status((unsigned char &)type, st))
 	    throw SRC_BUG;
 
 	return tools_get_permission_string(type, perm, hard);
@@ -269,49 +259,6 @@ namespace libdar
 	}
     }
 
-    bool extract_base_and_status(unsigned char signature, unsigned char & base, saved_status & saved)
-    {
-        bool fake = (signature & SAVED_FAKE_BIT) != 0;
-	bool non_delta = (signature & SAVED_NON_DELTA_BIT) != 0;
-
-        signature &= ~SAVED_FAKE_BIT;
-	signature |= SAVED_NON_DELTA_BIT;
-        if(!isalpha(signature))
-            return false;
-        base = tolower(signature);
-
-        if(fake)
-            if(base == signature)
-		if(non_delta)
-		    saved = s_fake;
-		else
-		    return false; // cannot be s_fake and s_delta at the same time
-	    else
-		return false;
-        else
-            if(signature == base)
-		if(non_delta)
-		    saved = s_saved;
-		else
-		    saved = s_delta;
-            else
-		if(non_delta)
-		    saved = s_not_saved;
-		else
-		    return false; // cannot be s_not_saved and s_delta at the same time
-        return true;
-    }
-
-    bool extract_base_and_status_isolated(unsigned char sig, unsigned char & base, saved_status & state, bool isolated)
-    {
-	bool ret = extract_base_and_status(sig, base, state);
-
-	if(isolated)
-	    state = s_fake;
-
-	return ret;
-    }
-
     void local_display_ea(user_interaction & dialog,
 			  const cat_inode * ino,
 			  const string &prefix,
@@ -339,59 +286,13 @@ namespace libdar
 	}
     }
 
-    unsigned char mk_signature(unsigned char base, saved_status state)
-    {
-        if(! islower(base))
-            throw SRC_BUG;
-        switch(state)
-        {
-        case s_saved:
-            return base;
-        case s_fake:
-            return base | SAVED_FAKE_BIT;
-        case s_not_saved:
-            return toupper(base);
-	case s_delta:
-	    return base & ~SAVED_NON_DELTA_BIT;
-        default:
-            throw SRC_BUG;
-        }
-    }
-
-    bool compatible_signature(unsigned char a, unsigned char b)
-    {
-        a = get_base_signature(a);
-        b = get_base_signature(b);
-
-        switch(a)
-        {
-        case 'e':
-        case 'f':
-            return b == 'e' || b == 'f';
-        default:
-            return b == a;
-        }
-    }
-
-    unsigned char get_base_signature(unsigned char a)
-    {
-	unsigned char ret;
-	saved_status st;
-	if(!extract_base_and_status_isolated(a, ret, st, false))
-	    throw SRC_BUG;
-	if(ret == 'e')
-	    ret = 'f';
-
-	return ret;
-    }
-
     string entree_to_string(const cat_entree *obj)
     {
 	string ret;
 	if(obj == nullptr)
 	    throw SRC_BUG;
 
-	switch(get_base_signature(obj->signature()))
+	switch(obj->signature().get_base())
 	{
 	case 'j':
 	    ret = gettext("ignored directory");

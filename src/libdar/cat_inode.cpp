@@ -363,7 +363,7 @@ namespace libdar
 
     bool cat_inode::same_as(const cat_inode & ref) const
     {
-        return cat_nomme::same_as(ref) && compatible_signature(ref.signature(), signature());
+        return cat_nomme::same_as(ref) && signature().compatible_signature(ref.signature());
     }
 
     bool cat_inode::is_more_recent_than(const cat_inode & ref, const infinint & hourshift) const

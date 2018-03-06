@@ -1644,12 +1644,12 @@ namespace libdar
 		if(tmp_mir == nullptr)
 		{
 		    ent.set_hard_link(false);
-		    ent.set_type(get_base_signature(tmp_ptr->signature()));
+		    ent.set_type(tmp_ptr->signature().get_base());
 		}
 		else
 		{
 		    ent.set_hard_link(true);
-		    ent.set_type(get_base_signature(tmp_mir->get_inode()->signature()));
+		    ent.set_type(tmp_mir->get_inode()->signature().get_base());
 		    tmp_inode = tmp_mir->get_inode();
 		    tmp_file = dynamic_cast<const cat_file *>(tmp_inode);
 		    tmp_lien = dynamic_cast<const cat_lien *>(tmp_inode);

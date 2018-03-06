@@ -71,7 +71,7 @@ namespace libdar
 
 	virtual bool operator == (const cat_entree & ref) const override;
 
-        virtual unsigned char signature() const override { return mk_signature('o', get_saved_status()); };
+        virtual cat_signature signature() const override { return cat_signature('o', get_saved_status()); };
 
 	    // inherited from class cat_file
         virtual generic_file *get_data(get_data_mode mode,

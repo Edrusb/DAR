@@ -49,7 +49,7 @@ namespace libdar
     public :
         cat_detruit(const std::string & name, unsigned char firm, const datetime & date) : cat_nomme(name) , del_date(date) { signe = firm; };
         cat_detruit(const smart_pointer<pile_descriptor> & pdesc, const archive_version & reading_ver, bool small);
-	cat_detruit(const cat_nomme & ref) : cat_nomme(ref.get_name()), del_date(0) { signe = ref.signature(); };
+	cat_detruit(const cat_nomme & ref) : cat_nomme(ref.get_name()), del_date(0) { signe = ref.signature().get_base(); };
 	cat_detruit(const cat_detruit & ref) = default;
 	cat_detruit(cat_detruit && ref) noexcept = default;
 	cat_detruit & operator = (const cat_detruit & ref) = default;
@@ -65,7 +65,7 @@ namespace libdar
 	void set_date(const datetime & ref) { del_date = ref; };
 
 	    /// inherited from cat_entree
-        virtual unsigned char signature() const override { return 'x'; };
+        virtual cat_signature signature() const override { return 'x'; };
 	    /// inherited from cat_entree
         virtual cat_entree *clone() const override { return new (std::nothrow) cat_detruit(*this); };
 

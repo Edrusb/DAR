@@ -72,13 +72,13 @@ namespace libdar
 
         try
         {
-            S_I lu = ptr->read(&type, 1);
+	    cat_signature cat_sig;
 
-            if(lu == 0)
-		type = ' '; // used to by-pass object construction and return nullptr as value of this method
+            if(!cat_sig.read(*ptr, reading_ver))
+	       type = ' '; // used to by-pass object construction and return nullptr as value of this method
 	    else
 	    {
-		if(!extract_base_and_status((unsigned char)type, (unsigned char &)type, saved))
+		if(!cat_sig.get_base_and_status((unsigned char &)type, saved))
 		{
 		    if(!lax)
 			throw Erange("cat_entree::read", gettext("corrupted file"));
@@ -298,13 +298,13 @@ namespace libdar
 
     void cat_entree::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
-        char s = signature();
+        cat_signature s = signature();
 
 	pdesc.check(small);
 	if(small)
-	    pdesc.esc->write(&s, 1);
+	    s.write(*(pdesc.esc));
 	else
-	    pdesc.stack->write(&s, 1);
+	    s.write(*(pdesc.stack));
     }
 
     generic_file *cat_entree::get_read_cat_layer(bool small) const
