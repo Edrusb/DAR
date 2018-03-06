@@ -201,9 +201,17 @@ namespace libdar
 						bool & initial_warn) const;
 
 	bool check_delta_validity(); // return true if no error has been met about delta patch (no delta is broken, missing its reference)
+
+	    /// gives new archive number when an database has its archive reordered
+
+	    /// \param[in] src the archive number to move
+	    /// \param[in] dst the new position of the archive number given by src
+	    /// \param[in] x any archive number in the database, which new position is to be calculated in regard to the src -> dst move
+	    /// \return the new archive number of archive x in regard to the src -> dst move
+	static archive_num data_tree_permutation(archive_num src, archive_num dst, archive_num x);
     };
 
-    extern archive_num data_tree_permutation(archive_num src, archive_num dst, archive_num x);
+
 
 	/// @}
 

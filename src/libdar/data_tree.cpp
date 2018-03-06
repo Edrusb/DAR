@@ -1102,7 +1102,7 @@ namespace libdar
 	return ret;
     }
 
-    archive_num data_tree_permutation(archive_num src, archive_num dst, archive_num x)
+    archive_num data_tree::data_tree_permutation(archive_num src, archive_num dst, archive_num x)
     {
 	if(src < dst)
 	    if(x < src || x > dst)
