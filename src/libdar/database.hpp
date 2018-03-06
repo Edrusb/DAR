@@ -33,7 +33,7 @@
 
 #include "archive.hpp"
 #include "generic_file.hpp"
-#include "data_tree.hpp"
+#include "data_dir.hpp"
 #include "storage.hpp"
 #include "database_options.hpp"
 #include "database_archives.hpp"
