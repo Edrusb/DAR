@@ -430,8 +430,10 @@ namespace libdar
 	}
     }
 
-    void data_dir::compute_most_recent_stats(vector<infinint> & data, vector<infinint> & ea,
-					     vector<infinint> & total_data, vector<infinint> & total_ea) const
+    void data_dir::compute_most_recent_stats(deque<infinint> & data,
+					     deque<infinint> & ea,
+					     deque<infinint> & total_data,
+					     deque<infinint> & total_ea) const
     {
 	deque<data_tree *>::const_iterator it = rejetons.begin();
 

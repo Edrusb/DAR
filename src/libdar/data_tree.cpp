@@ -903,8 +903,10 @@ namespace libdar
 	last_change = resultant;
     }
 
-    void data_tree::compute_most_recent_stats(vector<infinint> & data, vector<infinint> & ea,
-					      vector<infinint> & total_data, vector<infinint> & total_ea) const
+    void data_tree::compute_most_recent_stats(deque<infinint> & data,
+					      deque<infinint> & ea,
+					      deque<infinint> & total_data,
+					      deque<infinint> & total_ea) const
     {
 	archive_num most_recent = 0;
 	datetime max = datetime(0);

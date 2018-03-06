@@ -455,10 +455,10 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    vector<infinint> stats_data(coordinate.size(), 0);
-	    vector<infinint> stats_ea(coordinate.size(), 0);
-	    vector<infinint> total_data(coordinate.size(), 0);
-	    vector<infinint> total_ea(coordinate.size(), 0);
+	    deque<infinint> stats_data(coordinate.size(), 0);
+	    deque<infinint> stats_ea(coordinate.size(), 0);
+	    deque<infinint> total_data(coordinate.size(), 0);
+	    deque<infinint> total_ea(coordinate.size(), 0);
 
 	    if(files == nullptr)
 		throw SRC_BUG;

@@ -127,10 +127,10 @@ namespace libdar
 
 	    /// decrement archive numbers above num
 	virtual void skip_out(archive_num num);
-	virtual void compute_most_recent_stats(std::vector<infinint> & data,
-					       std::vector<infinint> & ea,
-					       std::vector<infinint> & total_data,
-					       std::vector<infinint> & total_ea) const;
+	virtual void compute_most_recent_stats(std::deque<infinint> & data,
+					       std::deque<infinint> & ea,
+					       std::deque<infinint> & total_data,
+					       std::deque<infinint> & total_ea) const;
 
 	virtual char obj_signature() const { return signature(); };
 	static char signature() { return 't'; };
