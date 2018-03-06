@@ -51,14 +51,6 @@ extern "C"
 using namespace std;
 using namespace libdar;
 
-static void display_line(database_listing_get_version_callback callback,
-			 void *tag,
-			 archive_num num,
-			 const datetime *data,
-			 db_etat data_presence,
-			 const datetime *ea,
-			 db_etat ea_presence);
-
 constexpr const char * const ETAT_SAVED = "S";
 constexpr const char * const ETAT_PATCH = "O";
 constexpr const char * const ETAT_PATCH_UNUSABLE = "U";
@@ -1125,35 +1117,34 @@ namespace libdar
 			return x+1;
     }
 
+    void data_tree::display_line(database_listing_get_version_callback callback,
+				 void *tag,
+				 archive_num num,
+				 const datetime *data,
+				 db_etat data_presence,
+				 const datetime *ea,
+				 db_etat ea_presence)
+    {
+	bool has_data_date = true;
+	bool has_ea_date = true;
+
+	if(data == nullptr)
+	has_data_date = false;
+
+	if(ea == nullptr)
+	    has_ea_date = false;
+
+	callback(tag,
+		 num,
+		 data_presence,
+		 has_data_date,
+		 has_data_date ? *data : datetime(0),
+		 ea_presence,
+		 has_ea_date,
+		 has_ea_date ? *ea : datetime(0));
+    }
+
+
 } // end of namespace
 
 
-
-////////////////////////////////////////////////////////////////
-
-static void display_line(database_listing_get_version_callback callback,
-			 void *tag,
-			 archive_num num,
-			 const datetime *data,
-			 db_etat data_presence,
-			 const datetime *ea,
-			 db_etat ea_presence)
-{
-    bool has_data_date = true;
-    bool has_ea_date = true;
-
-    if(data == nullptr)
-	has_data_date = false;
-
-    if(ea == nullptr)
-	has_ea_date = false;
-
-    callback(tag,
-	     num,
-	     data_presence,
-	     has_data_date,
-	     has_data_date ? *data : datetime(0),
-	     ea_presence,
-	     has_ea_date,
-	     has_ea_date ? *ea : datetime(0));
-}

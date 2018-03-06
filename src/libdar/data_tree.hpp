@@ -209,6 +209,16 @@ namespace libdar
 	    /// \param[in] x any archive number in the database, which new position is to be calculated in regard to the src -> dst move
 	    /// \return the new archive number of archive x in regard to the src -> dst move
 	static archive_num data_tree_permutation(archive_num src, archive_num dst, archive_num x);
+
+	    /// helper method to provide information to a database_listing_get_version_callback
+	static void display_line(database_listing_get_version_callback callback,
+				 void *tag,
+				 archive_num num,
+				 const datetime *data,
+				 db_etat data_presence,
+				 const datetime *ea,
+				 db_etat ea_presence);
+
     };
 
 
