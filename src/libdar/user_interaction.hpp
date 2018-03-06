@@ -62,7 +62,7 @@ namespace libdar
 	    // than must be defined in the inherited classes
 
 	void message(const std::string & message);
-	bool pause(const std::string & message);
+	void pause(const std::string & message);
 	std::string get_string(const std::string & message, bool echo);
 	secu_string get_secu_string(const std::string & message, bool echo);
 

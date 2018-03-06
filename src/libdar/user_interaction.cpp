@@ -77,16 +77,19 @@ using namespace std;
 
 namespace libdar
 {
-    bool user_interaction::pause(const string & message)
+    void user_interaction::pause(const string & message)
     {
+	bool ret = false;
 	try
 	{
-	    return inherited_pause(message);
+	    ret = inherited_pause(message);
 	}
 	catch(...)
 	{
 	    throw Elibcall("user_interaction::pause", "user_interaction::inherited_pause should not throw an exception toward libdar");
 	}
+	if(!ret)
+	    throw Euser_abort(message);
     }
 
     void user_interaction::message(const string & message)
