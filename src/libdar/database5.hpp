@@ -61,7 +61,6 @@ using libdar::database_used_options;
 
     //  from database_aux.hpp
 using libdar::archive_num;
-constexpr archive_num ARCHIVE_NUM_MAX = libdar::ARCHIVE_NUM_MAX;
 using libdar::db_lookup;
 using libdar::db_etat;
 

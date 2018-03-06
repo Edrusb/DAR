@@ -219,8 +219,6 @@ namespace libdar
 		throw SRC_BUG;
 	    if(basename == "")
 		throw Erange("database::add_archive", gettext("Empty string is an invalid archive basename"));
-	    if(number >= ARCHIVE_NUM_MAX)
-		throw Erange("database::add_archive", gettext("Cannot add another archive, database is full"));
 
 	    dat.chemin = chemin;
 	    dat.basename = basename;

@@ -51,8 +51,6 @@ extern "C"
 using namespace std;
 using namespace libdar;
 
-static void read_from_file(generic_file &f, archive_num &a);
-static void write_to_file(generic_file &f, archive_num a);
 static void display_line(database_listing_get_version_callback callback,
 			 void *tag,
 			 archive_num num,
@@ -274,7 +272,7 @@ namespace libdar
 	infinint tmp = infinint(f); // number of entry in last_mod map
 	while(!tmp.is_zero())
 	{
-	    read_from_file(f, k);
+	    k.read_from_file(f);
 	    switch(db_version)
 	    {
 	    case 1:
@@ -299,7 +297,7 @@ namespace libdar
 	tmp = infinint(f); // number of entry in last_change map
 	while(!tmp.is_zero())
 	{
-	    read_from_file(f, k);
+	    k.read_from_file(f);
 	    switch(db_version)
 	    {
 	    case 1:
@@ -336,8 +334,8 @@ namespace libdar
 	sz.dump(f);
 	while(itp != last_mod.end())
 	{
-	    write_to_file(f, itp->first); // key
-	    itp->second.dump(f); // value
+	    itp->first.write_to_file(f); // key
+	    itp->second.dump(f);         // value
 	    ++itp;
 	}
 
@@ -349,8 +347,8 @@ namespace libdar
 	map<archive_num, status>::const_iterator it = last_change.begin();
 	while(it != last_change.end())
 	{
-	    write_to_file(f, it->first); // key
-	    it->second.dump(f); // value
+	    it->first.write_to_file(f); // key
+	    it->second.dump(f);         // value
 	    ++it;
 	}
     }
@@ -1132,24 +1130,6 @@ namespace libdar
 
 
 ////////////////////////////////////////////////////////////////
-
-static void read_from_file(generic_file &f, archive_num &a)
-{
-    char buffer[sizeof(archive_num)];
-    archive_num *ptr = (archive_num *)&(buffer[0]);
-
-    f.read(buffer, sizeof(archive_num));
-    a = ntohs(*ptr);
-}
-
-static void write_to_file(generic_file &f, archive_num a)
-{
-    char buffer[sizeof(archive_num)];
-    archive_num *ptr = (archive_num *)&(buffer[0]);
-
-    *ptr = htons(a);
-    f.write(buffer, sizeof(archive_num));
-}
 
 static void display_line(database_listing_get_version_callback callback,
 			 void *tag,

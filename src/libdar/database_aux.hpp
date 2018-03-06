@@ -37,9 +37,6 @@ namespace libdar
 	/// \ingroup API
 	/// @}
 
-    using archive_num = U_16;
-    const archive_num ARCHIVE_NUM_MAX = 65534;
-
     enum class db_lookup         //< the available status of a lookup
     {
 	found_present,  //< file data/EA has been found completely usable
