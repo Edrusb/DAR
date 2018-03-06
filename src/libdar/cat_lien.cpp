@@ -41,7 +41,7 @@ namespace libdar
 		       const infinint & fs_device) : cat_inode(uid, gid, perm, last_access, last_modif, last_change, name, fs_device)
     {
 	points_to = target;
-	set_saved_status(s_saved);
+	set_saved_status(saved_status::saved);
     }
 
     cat_lien::cat_lien(const shared_ptr<user_interaction> & dialog,
@@ -58,7 +58,7 @@ namespace libdar
 	else
 	    ptr = pdesc->stack;
 
-	if(saved == s_saved)
+	if(saved == saved_status::saved)
 	    tools_read_string(*ptr, points_to);
     }
 
@@ -75,14 +75,14 @@ namespace libdar
 
     const string & cat_lien::get_target() const
     {
-	if(get_saved_status() != s_saved)
+	if(get_saved_status() != saved_status::saved)
 	    throw SRC_BUG;
 	return points_to;
     }
 
     void cat_lien::set_target(string x)
     {
-	set_saved_status(s_saved);
+	set_saved_status(saved_status::saved);
 	points_to = x;
     }
 
@@ -92,7 +92,7 @@ namespace libdar
 	if(l_other == nullptr)
 	    throw SRC_BUG; // bad argument cat_inode::compare has a bug
 
-	if(get_saved_status() == s_saved && l_other->get_saved_status() == s_saved)
+	if(get_saved_status() == saved_status::saved && l_other->get_saved_status() == saved_status::saved)
 	    if(get_target() != l_other->get_target())
 		throw Erange("cat_lien:sub_compare", string(gettext("symbolic link does not point to the same target: "))
 			     + get_target() + " <--> " + l_other->get_target());
@@ -110,7 +110,7 @@ namespace libdar
 
 	cat_inode::inherited_dump(pdesc, small);
 
-	if(get_saved_status() == s_saved)
+	if(get_saved_status() == saved_status::saved)
 	    tools_write_string(*ptr, points_to);
     }
 

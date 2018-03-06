@@ -219,7 +219,7 @@ namespace libdar
             // restoring fields that are defined by "what_to_check"
 
         if(what_to_check == cat_inode::cf_all)
-            if(ref.get_saved_status() == s_saved)
+            if(ref.get_saved_status() == saved_status::saved)
             {
                 uid_t tmp_uid = 0;
                 gid_t tmp_gid = 0;
@@ -467,9 +467,9 @@ namespace libdar
 
         if(!dialog)
             throw SRC_BUG; // dialog points to nothing
-        if(existing.get_saved_status() != s_saved)
+        if(existing.get_saved_status() != saved_status::saved)
             throw SRC_BUG;
-        if(patcher.get_saved_status() != s_delta)
+        if(patcher.get_saved_status() != saved_status::delta)
             throw SRC_BUG;
 
             //

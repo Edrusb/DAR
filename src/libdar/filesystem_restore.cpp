@@ -236,8 +236,8 @@ namespace libdar
 	    throw SRC_BUG; // neither "cat_nomme" nor "cat_eod"
 	else // cat_nomme
 	{
-	    bool has_data_saved = (x_ino != nullptr && x_ino->get_saved_status() == s_saved) || x_det != nullptr;
-	    bool has_patch = x_ino != nullptr && x_ino->get_saved_status() == s_delta;
+	    bool has_data_saved = (x_ino != nullptr && x_ino->get_saved_status() == saved_status::saved) || x_det != nullptr;
+	    bool has_patch = x_ino != nullptr && x_ino->get_saved_status() == saved_status::delta;
 	    bool has_ea_saved = x_ino != nullptr && (x_ino->ea_get_saved_status() == cat_inode::ea_full || x_ino->ea_get_saved_status() == cat_inode::ea_removed);
 	    bool has_fsa_saved = x_ino != nullptr && x_ino->fsa_get_saved_status() == cat_inode::fsa_full;
 	    path spot = *current_dir + x_nom->get_name();

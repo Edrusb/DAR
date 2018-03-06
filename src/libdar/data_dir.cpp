@@ -185,8 +185,8 @@ namespace libdar
 
 	switch(entry->get_saved_status())
 	{
-	case s_saved:
-	case s_fake:
+	case saved_status::saved:
+	case saved_status::fake:
 	    if(entry_file != nullptr)
 	    {
 		if(!entry_file->get_crc(res))
@@ -194,7 +194,7 @@ namespace libdar
 	    }
 	    tree->set_data(archive, last_mod, db_etat::et_saved, base, res);
 	    break;
-	case s_delta:
+	case saved_status::delta:
 	    if(entry_file == nullptr)
 		throw SRC_BUG;
 	    if(!entry_file->get_patch_base_crc(base))
@@ -203,7 +203,7 @@ namespace libdar
 		res = nullptr;
 	    tree->set_data(archive, last_mod, db_etat::et_patch, base, res);
 	    break;
-	case s_not_saved:
+	case saved_status::not_saved:
 	    if(entry_file != nullptr)
 	    {
 		if(!entry_file->get_crc(res))

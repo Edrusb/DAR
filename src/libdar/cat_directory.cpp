@@ -52,7 +52,7 @@ namespace libdar
 #endif
 	ordered_fils.clear();
 	it = ordered_fils.begin();
-	set_saved_status(s_saved);
+	set_saved_status(saved_status::saved);
 	recursive_has_changed = true;
 	updated_sizes = false;
     }
@@ -269,7 +269,7 @@ namespace libdar
 		    x_size += f_dir->get_size();
 		    x_storage_size += f_dir->get_storage_size();
 		}
-		else if(f_file != nullptr && (f_file->get_saved_status() == s_saved || f_file->get_saved_status() == s_delta))
+		else if(f_file != nullptr && (f_file->get_saved_status() == saved_status::saved || f_file->get_saved_status() == saved_status::delta))
 		{
 		    x_size += f_file->get_size();
 		    if(!f_file->get_storage_size().is_zero() || f_file->get_sparse_file_detection_read())
@@ -479,7 +479,7 @@ namespace libdar
 	cat_mirage *n_mir = nullptr;
 
 	    // dropping info for the current cat_directory
-	set_saved_status(s_not_saved);
+	set_saved_status(saved_status::not_saved);
 	if(ea_get_saved_status() == cat_inode::ea_full)
 	    ea_set_saved_status(cat_inode::ea_partial);
 	if(fsa_get_saved_status() == cat_inode::fsa_full)
@@ -504,7 +504,7 @@ namespace libdar
 	    {
 		if(n_ino != nullptr)
 		{
-		    n_ino->set_saved_status(s_not_saved);
+		    n_ino->set_saved_status(saved_status::not_saved);
 		    if(n_ino->ea_get_saved_status() == cat_inode::ea_full)
 			n_ino->ea_set_saved_status(ea_partial);
 		    if(n_ino->fsa_get_saved_status() == cat_inode::fsa_full)
@@ -704,7 +704,7 @@ namespace libdar
 	    }
 	    if(ino != nullptr && !recursive_has_changed)
 		recursive_has_changed |=
-		    ino->get_saved_status() != s_not_saved
+		    ino->get_saved_status() != saved_status::not_saved
 		    || ino->ea_get_saved_status() == ea_full
 		    || ino->ea_get_saved_status() == ea_removed;
 	    ++it;

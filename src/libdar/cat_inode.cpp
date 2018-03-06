@@ -94,7 +94,7 @@ namespace libdar
         uid = xuid;
         gid = xgid;
         perm = xperm;
-        xsaved = s_not_saved;
+        xsaved = saved_status::not_saved;
         ea_saved = ea_none;
 	fsa_saved = fsa_none;
         edit = 0;

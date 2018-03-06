@@ -115,27 +115,27 @@ namespace libdar
 	saved_status st = ref.get_saved_status();
 	cat_inode::ea_status ea_st = ref.ea_get_saved_status();
 
-	if(isolated && st == s_saved && !dirty)
-	    st = s_fake;
+	if(isolated && st == saved_status::saved && !dirty)
+	    st = saved_status::fake;
 
 	if(isolated && ea_st == cat_inode::ea_full)
 	    ea_st = cat_inode::ea_fake;
 
 	switch(st)
 	{
-	case s_saved:
+	case saved_status::saved:
 	    if(dirty)
 		ret = gettext("[DIRTY]");
 	    else
 		ret = gettext("[Saved]");
 	    break;
-	case s_fake:
+	case saved_status::fake:
 	    ret = gettext("[InRef]");
 	    break;
-	case s_not_saved:
+	case saved_status::not_saved:
 	    ret = "[     ]";
 	    break;
-	case s_delta:
+	case saved_status::delta:
 	    ret = "[Delta]";
 	    break;
 	default:
@@ -177,7 +177,7 @@ namespace libdar
 	const cat_file *fic = dynamic_cast<const cat_file *>(&ref);
 	const cat_directory *dir = dynamic_cast<const cat_directory *>(&ref);
 	if(fic != nullptr &&
-	   (fic->get_saved_status() == s_saved ||fic->get_saved_status() == s_delta))
+	   (fic->get_saved_status() == saved_status::saved ||fic->get_saved_status() == saved_status::delta))
 	    ret += string("[")
 		+ tools_get_compression_ratio(fic->get_storage_size(),
 					      fic->get_size(),

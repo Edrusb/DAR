@@ -59,8 +59,8 @@ namespace libdar
             if(ino != nullptr)
             {
                 ++total;
-                if(ino->get_saved_status() == s_saved
-		   || ino->get_saved_status() == s_delta)
+                if(ino->get_saved_status() == saved_status::saved
+		   || ino->get_saved_status() == saved_status::delta)
                     ++saved;
             }
 

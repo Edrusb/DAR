@@ -306,7 +306,7 @@ namespace libdar
 				    // to restore EA for other copies
 				break;
 			    case ENOENT:  // path to the hard link to create does not exit
-				if(ref_mir->get_inode()->get_saved_status() == s_saved)
+				if(ref_mir->get_inode()->get_saved_status() == saved_status::saved)
 				{
 				    create_file = true;
 				    clear_corres_if_pointing_to(ref_mir->get_etiquette(), old); // always succeeds as the etiquette points to "old"
@@ -542,7 +542,7 @@ namespace libdar
 	    // restoring fields that are defined by "what_to_check"
 
 	if(what_to_check == cat_inode::cf_all)
-	    if(ref.get_saved_status() == s_saved)
+	    if(ref.get_saved_status() == saved_status::saved)
 	    {
 		uid_t tmp_uid = 0;
 		gid_t tmp_gid = 0;

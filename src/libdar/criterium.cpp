@@ -107,7 +107,7 @@ namespace libdar
 	const cat_inode *first_i = get_inode(&first);
 
 	if(first_i != nullptr)
-	    return first_i->get_saved_status() == s_saved;
+	    return first_i->get_saved_status() == saved_status::saved;
 	else
 	    return true;
     }

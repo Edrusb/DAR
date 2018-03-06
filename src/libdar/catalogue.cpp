@@ -781,7 +781,7 @@ namespace libdar
 
 			// converting cat_inode to unsaved entry
 
-		    clo_ino->set_saved_status(s_not_saved);
+		    clo_ino->set_saved_status(saved_status::not_saved);
 		    if(clo_ino->ea_get_saved_status() != cat_inode::ea_none)
 		    {
 			if(clo_ino->ea_get_saved_status() == cat_inode::ea_removed)
@@ -980,7 +980,7 @@ namespace libdar
 				throw SRC_BUG;
 			    else
 				if(!filter_unsaved
-				   || e_ino->get_saved_status() != s_not_saved
+				   || e_ino->get_saved_status() != saved_status::not_saved
 				   || (e_ino->ea_get_saved_status() == cat_inode::ea_full || e_ino->ea_get_saved_status() == cat_inode::ea_fake)
 				   || (e_dir != nullptr && e_dir->get_recursive_has_changed()))
 				{
@@ -1115,7 +1115,7 @@ namespace libdar
 				string nom = e_nom->get_name();
 
 				if(!filter_unsaved
-				   || e_ino->get_saved_status() != s_not_saved
+				   || e_ino->get_saved_status() != saved_status::not_saved
 				   || (e_ino->ea_get_saved_status() == cat_inode::ea_full || e_ino->ea_get_saved_status() == cat_inode::ea_fake)
 				   || (e_dir != nullptr && e_dir->get_recursive_has_changed()))
 				{
@@ -1285,7 +1285,7 @@ namespace libdar
 				throw SRC_BUG; // this is a cat_nomme which is neither a cat_detruit nor an cat_inode
 
 			    if(!filter_unsaved
-			       || e_ino->get_saved_status() != s_not_saved
+			       || e_ino->get_saved_status() != saved_status::not_saved
 			       || (e_ino->ea_get_saved_status() == cat_inode::ea_full || e_ino->ea_get_saved_status() == cat_inode::ea_fake)
 			       || (e_dir != nullptr && e_dir->get_recursive_has_changed()))
 			    {
@@ -1305,7 +1305,7 @@ namespace libdar
 
 				if(!cat_sig.get_base_and_status_isolated(sig, data_st, isolated))
 				    throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
-				data_st = isolated ? s_fake : e_ino->get_saved_status(); // the trusted source for cat_inode status is get_saved_status, not the signature (may change in future, who knows)
+				data_st = isolated ? saved_status::fake : e_ino->get_saved_status(); // the trusted source for cat_inode status is get_saved_status, not the signature (may change in future, who knows)
 				if(stored == "0" && (reg == nullptr || !reg->get_sparse_file_detection_read()))
 				    stored = size;
 
@@ -1313,14 +1313,14 @@ namespace libdar
 
 				switch(data_st)
 				{
-				case s_saved:
+				case saved_status::saved:
 				    data = "saved";
 				    break;
-				case s_fake:
-				case s_not_saved:
+				case saved_status::fake:
+				case saved_status::not_saved:
 				    data = "referenced";
 				    break;
-				case s_delta:
+				case saved_status::delta:
 				    data = "patch";
 				    break;
 				default:
@@ -1359,7 +1359,7 @@ namespace libdar
 				case 'e': // hard linked files
 				    throw SRC_BUG; // no more used in dynamic data
 				case 'f': // plain files
-				    if(data_st == s_saved)
+				    if(data_st == saved_status::saved)
 				    {
 					const cat_file * f_ino = dynamic_cast<const cat_file *>(e_ino);
 
@@ -1400,7 +1400,7 @@ namespace libdar
 				    ui.message(tools_printf("%S</File>", &beginning));
 				    break;
 				case 'l': // soft link
-				    if(data_st == s_saved)
+				    if(data_st == saved_status::saved)
 					target = tools_output2xml(e_sym->get_target());
 				    else
 					target = "";
@@ -1424,7 +1424,7 @@ namespace libdar
 					target = "block";
 					// we re-used target variable which is not used for the current cat_inode
 
-				    if(data_st == s_saved)
+				    if(data_st == saved_status::saved)
 				    {
 					maj = tools_uword2str(e_dev->get_major());
 					min = tools_uword2str(e_dev->get_minor());
@@ -1778,8 +1778,8 @@ namespace libdar
 			if(sig_ptr != nullptr)
 			    delete sig_ptr;
 		    }
-		    else // we need to remove the delta signature, but not the delta signature structure when status is s_delta
-			if(e_file->get_saved_status() == s_delta)
+		    else // we need to remove the delta signature, but not the delta signature structure when status is saved_status::delta
+			if(e_file->get_saved_status() == saved_status::delta)
 			{
 			    memory_file *sig_ptr = nullptr;
 
@@ -1819,7 +1819,7 @@ namespace libdar
 			{
 			    switch(e_file->get_saved_status())
 			    {
-			    case s_saved:
+			    case saved_status::saved:
 				data = e_file->get_data(cat_file::plain, &mem, nullptr, checksum);
 
 				if(data == nullptr)
@@ -1853,10 +1853,10 @@ namespace libdar
 				e_file->set_patch_result_crc(*my_crc);
 				e_file->dump_delta_signature(mem, *(destination.compr), false);
 				break;
-			    case s_fake:
-			    case s_not_saved:
+			    case saved_status::fake:
+			    case saved_status::not_saved:
 				break;
-			    case s_delta:
+			    case saved_status::delta:
 				    // reading the crc from the archive in sequential read mode
 				if(sequential_read)
 				    e_file->get_crc(my_crc);

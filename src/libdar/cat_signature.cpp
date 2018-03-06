@@ -39,13 +39,13 @@ namespace libdar
             throw SRC_BUG;
         switch(status)
         {
-        case s_saved:
+        case saved_status::saved:
             old_field = original;
-        case s_fake:
+        case saved_status::fake:
             old_field = original | SAVED_FAKE_BIT;
-        case s_not_saved:
+        case saved_status::not_saved:
             old_field = toupper(original);
-	case s_delta:
+	case saved_status::delta:
 	    old_field = original & ~SAVED_NON_DELTA_BIT;
         default:
             throw SRC_BUG;
@@ -86,22 +86,22 @@ namespace libdar
         if(fake)
             if(base == tmp)
 		if(non_delta)
-		    saved = s_fake;
+		    saved = saved_status::fake;
 		else
-		    return false; // cannot be s_fake and s_delta at the same time
+		    return false; // cannot be saved_status::fake and saved_status::delta at the same time
 	    else
 		return false;
         else
             if(tmp == base)
 		if(non_delta)
-		    saved = s_saved;
+		    saved = saved_status::saved;
 		else
-		    saved = s_delta;
+		    saved = saved_status::delta;
             else
 		if(non_delta)
-		    saved = s_not_saved;
+		    saved = saved_status::not_saved;
 		else
-		    return false; // cannot be s_not_saved and s_delta at the same time
+		    return false; // cannot be saved_status::not_saved and saved_status::delta at the same time
         return true;
     }
 
@@ -110,7 +110,7 @@ namespace libdar
 	bool ret = get_base_and_status(base, state);
 
 	if(isolated)
-	    state = s_fake;
+	    state = saved_status::fake;
 
 	return ret;
     }

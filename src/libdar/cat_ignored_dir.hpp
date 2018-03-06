@@ -49,7 +49,7 @@ namespace libdar
         cat_ignored_dir(const std::shared_ptr<user_interaction> & dialog,
 			const smart_pointer<pile_descriptor> & pdesc,
 			const archive_version & reading_ver,
-			bool small) : cat_inode(dialog, pdesc, reading_ver, s_not_saved, small) { throw SRC_BUG; };
+			bool small) : cat_inode(dialog, pdesc, reading_ver, saved_status::not_saved, small) { throw SRC_BUG; };
 	cat_ignored_dir(const cat_ignored_dir & ref) = default;
 	cat_ignored_dir(cat_ignored_dir && ref) noexcept = default;
 	cat_ignored_dir & operator = (const cat_ignored_dir & ref) = default;

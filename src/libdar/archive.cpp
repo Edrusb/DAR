@@ -1694,14 +1694,14 @@ namespace libdar
 		    ent.set_compression_algo(tmp_file->get_compression_algo_read());
 		    ent.set_dirtiness(tmp_file->is_dirty());
 		    ent.set_delta_sig(tmp_file->has_delta_signature_available());
-		    if(tmp_file->get_saved_status() == s_saved)
+		    if(tmp_file->get_saved_status() == saved_status::saved)
 		    {
 			ent.set_archive_offset_for_data(tmp_file->get_offset());
 			ent.set_storage_size_for_data(tmp_file->get_storage_size());
 		    }
 		}
 
-		if(tmp_lien != nullptr && tmp_lien->get_saved_status() == s_saved)
+		if(tmp_lien != nullptr && tmp_lien->get_saved_status() == saved_status::saved)
 		    ent.set_link_target(tmp_lien->get_target());
 
 		if(tmp_device != nullptr)

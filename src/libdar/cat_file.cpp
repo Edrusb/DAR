@@ -54,7 +54,7 @@ namespace libdar
     {
         chemin = (che + src).display();
         status = from_path;
-        set_saved_status(s_saved);
+        set_saved_status(saved_status::saved);
         offset = nullptr;
         size = nullptr;
         storage_size = nullptr;
@@ -133,8 +133,8 @@ namespace libdar
 
             if(!small) // inode not partially dumped
             {
-                if(saved == s_saved
-		    || saved == s_delta)
+                if(saved == saved_status::saved
+		    || saved == saved_status::delta)
                 {
                     offset = new (nothrow) infinint(*ptr);
                     if(offset == nullptr)
@@ -243,8 +243,8 @@ namespace libdar
             }
             else // partial dump has been done
             {
-                if(saved == s_saved
-		   || saved == s_delta)
+                if(saved == saved_status::saved
+		   || saved == saved_status::delta)
                 {
                     char tmp;
 
@@ -325,8 +325,8 @@ namespace libdar
         try
         {
             if(ref.check != nullptr || (ref.get_escape_layer() != nullptr
-					&& (ref.get_saved_status() == s_saved
-					    || ref.get_saved_status() == s_delta)))
+					&& (ref.get_saved_status() == saved_status::saved
+					    || ref.get_saved_status() == saved_status::delta)))
             {
 		if(ref.check == nullptr)
 		{
@@ -390,8 +390,8 @@ namespace libdar
         size->dump(*ptr);
         if(!small)
         {
-            if(get_saved_status() == s_saved
-	       || get_saved_status() == s_delta)
+            if(get_saved_status() == saved_status::saved
+	       || get_saved_status() == saved_status::delta)
             {
                 char tmp = compression2char(algo_write);
 
@@ -403,8 +403,8 @@ namespace libdar
 	    else // since format 9 flag is present in any case to know whether object has delta signature
                 ptr->write(&flags, sizeof(flags));
 
-	    if(get_saved_status() == s_saved
-	       || get_saved_status() == s_delta)
+	    if(get_saved_status() == saved_status::saved
+	       || get_saved_status() == saved_status::delta)
 	    {
                     // since archive version 8, crc is only present for saved inode
                 if(check == nullptr)
@@ -418,8 +418,8 @@ namespace libdar
         }
         else // we only know whether the file will be compressed or using sparse_file data structure
         {
-            if(get_saved_status() == s_saved
-	       || get_saved_status() == s_delta)
+            if(get_saved_status() == saved_status::saved
+	       || get_saved_status() == saved_status::delta)
             {
                 char tmp = compression2char(algo_write);
 
@@ -458,7 +458,7 @@ namespace libdar
 		throw Erange("cat_file::get_data", gettext("cannot provide data from a \"not saved\" file object"));
 
 	    if(delta_ref != nullptr
-	       && get_saved_status() != s_delta)
+	       && get_saved_status() != saved_status::delta)
 		throw SRC_BUG;
 
 	    if(delta_ref != nullptr
@@ -785,8 +785,8 @@ namespace libdar
 
     const infinint & cat_file::get_offset() const
     {
-	if(get_saved_status() != s_saved
-	   || get_saved_status() != s_delta)
+	if(get_saved_status() != saved_status::saved
+	   || get_saved_status() != saved_status::delta)
 	    throw SRC_BUG;
 	if(offset == nullptr)
 	    throw SRC_BUG;
@@ -817,8 +817,8 @@ namespace libdar
 		return false;
 	else
 	{
-	    if(get_saved_status() == s_saved
-	       || get_saved_status() == s_delta)
+	    if(get_saved_status() == saved_status::saved
+	       || get_saved_status() == saved_status::delta)
 	    {
 		if(check == nullptr)
 		{
@@ -923,7 +923,7 @@ namespace libdar
 	    else
 		throw SRC_BUG;
 	}
-	else if(check != nullptr && get_saved_status() == s_saved)
+	else if(check != nullptr && get_saved_status() == saved_status::saved)
 	{
 	    c = check;
 	    return true;
@@ -947,7 +947,7 @@ namespace libdar
 	    //
 	    // This field is thus used only when delta_signature
 	    // is present and when the file's data is already a
-	    // patch (s_delta) or the s_not_saved status of a
+	    // patch (saved_status::delta) or the saved_status::not_saved status of a
 	    // unchanged patch.
 
 	delta_sig->set_patch_result_crc(c);
@@ -1092,7 +1092,7 @@ namespace libdar
     {
 	if(delta_sig != nullptr)
 	{
-	    if(get_saved_status() == s_delta)
+	    if(get_saved_status() == saved_status::delta)
 		delta_sig->set_sig_ref();
 	    else
 		clear_delta_signature_structure();
@@ -1121,10 +1121,10 @@ namespace libdar
 	    throw Erange("cat_file::sub_compare", tools_printf(gettext("not same size: %i <--> %i"), &s1, &s2));
 	}
 
-	if(f_other->get_saved_status() != s_saved)
+	if(f_other->get_saved_status() != saved_status::saved)
 	    throw SRC_BUG; // we should compare with a plain object provided by a filesystem object
 
-	if(get_saved_status() == s_saved && ! isolated_mode)
+	if(get_saved_status() == saved_status::saved && ! isolated_mode)
 	{
 		// compare file content and CRC
 
@@ -1275,13 +1275,13 @@ namespace libdar
 	{
 	    const crc *my_crc = nullptr;
 
-	    if(get_saved_status() == s_delta && !has_patch_result_crc())
+	    if(get_saved_status() == saved_status::delta && !has_patch_result_crc())
 		throw SRC_BUG;
 
 		// if we have a CRC available for data
-	    if((get_saved_status() != s_delta && get_crc(my_crc))
+	    if((get_saved_status() != saved_status::delta && get_crc(my_crc))
 	       ||
-	       (get_saved_status() == s_delta && get_patch_result_crc(my_crc)))
+	       (get_saved_status() == saved_status::delta && get_patch_result_crc(my_crc)))
 	    {
 		    // just compare CRC (as for isolated_mode)
 

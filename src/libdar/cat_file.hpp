@@ -90,7 +90,7 @@ namespace libdar
         void set_storage_size(const infinint & s) { *storage_size = s; };
 
 	    /// check whether the object will be able to provide a object using get_data() method
-	bool can_get_data() const { return get_saved_status() == s_saved || get_saved_status() == s_delta || status == from_path; };
+	bool can_get_data() const { return get_saved_status() == saved_status::saved || get_saved_status() == saved_status::delta || status == from_path; };
 
 	    /// returns a newly allocated object in read_only mode
 	    ///

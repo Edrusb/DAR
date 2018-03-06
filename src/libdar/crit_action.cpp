@@ -479,7 +479,7 @@ namespace libdar
 		    dialog.printf(gettext("Sparse file      :\t  %S  \t\t  %S"), al_sparse ? &yes : &no, do_sparse ? &yes : &no);
 		    dialog.printf(gettext("Dirty file       :\t  %S  \t\t  %S"), al_dirty ? &yes : &no, do_dirty ? &yes : &no);
 		}
-		dialog.printf(gettext("Data full saved  :\t  %S  \t\t  %S"),al_inode->get_saved_status() == s_saved ? &yes:&no , do_inode->get_saved_status() == s_saved ? &yes:&no);
+		dialog.printf(gettext("Data full saved  :\t  %S  \t\t  %S"),al_inode->get_saved_status() == saved_status::saved ? &yes:&no , do_inode->get_saved_status() == saved_status::saved ? &yes:&no);
 		dialog.printf(gettext("EA full saved    :\t  %S  \t\t  %S"),al_ea_saved ? &yes:&no , do_ea_saved ? &yes:&no);
 		if(al_ea_saved || do_ea_saved)
 		    dialog.printf(gettext("EA more recent   :\t  %S  \t\t  %S"),in_place_ea_recent ? &me : &notme , in_place_data_recent ? &notme : &me);

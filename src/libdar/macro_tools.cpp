@@ -1932,7 +1932,7 @@ namespace libdar
 
 	if(tmp_file != nullptr)
 	{
-	    if(tmp_file->get_saved_status() == s_saved)
+	    if(tmp_file->get_saved_status() == saved_status::saved)
 	    {
 		offset = tmp_file->get_offset();
 		sl.which_slice(offset,

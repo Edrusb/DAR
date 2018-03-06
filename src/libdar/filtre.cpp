@@ -650,8 +650,8 @@ namespace libdar
 				    st.incr_treated();
 				    if(e_mir != nullptr)
 				    {
-					if(e_mir->get_inode()->get_saved_status() == s_saved
-					   || e_mir->get_inode()->get_saved_status() == s_delta
+					if(e_mir->get_inode()->get_saved_status() == saved_status::saved
+					   || e_mir->get_inode()->get_saved_status() == saved_status::delta
 					   || e_mir->get_inode()->ea_get_saved_status() == cat_inode::ea_full)
 					    if(display_treated)
 						dialog->message(string(gettext("Recording hard link into the archive: "))+juillet.get_string());
@@ -790,18 +790,18 @@ namespace libdar
 
 					    // MODIFIYING INODE IF NECESSARY
 
-					if(e_ino->get_saved_status() != s_saved)
+					if(e_ino->get_saved_status() != saved_status::saved)
 					    throw SRC_BUG; // filsystem should always provide "saved" "cat_entree"
 
 					if(avoid_saving_inode)
 					{
-					    e_ino->set_saved_status(s_not_saved);
+					    e_ino->set_saved_status(saved_status::not_saved);
 					    st.incr_skipped();
 					}
 
 					if(make_delta_diff)
 					{
-					    e_ino->set_saved_status(s_delta);
+					    e_ino->set_saved_status(saved_status::delta);
 					    if(e_file != nullptr)
 						e_file->will_have_delta_signature_structure();
 						// this structure is necessary to store base and result CRC
@@ -975,7 +975,7 @@ namespace libdar
 					    else
 						tosave = true;
 
-					    ignode->set_saved_status(tosave && !snapshot ? s_saved : s_not_saved);
+					    ignode->set_saved_status(tosave && !snapshot ? saved_status::saved : saved_status::not_saved);
 					}
 					catch(...)
 					{
@@ -1373,8 +1373,8 @@ namespace libdar
                             // checking data file if any
 
                         if(e_file != nullptr &&
-			   (e_file->get_saved_status() == s_saved
-			    || e_file->get_saved_status() == s_delta))
+			   (e_file->get_saved_status() == saved_status::saved
+			    || e_file->get_saved_status() == saved_status::delta))
                         {
 			    perimeter = gettext("Data");
 			    if(!empty)
@@ -1996,8 +1996,8 @@ namespace libdar
 						   && al_ino != nullptr)
 						{
 						    cat_inode *tmp = const_cast<cat_inode *>(al_ino);
-						    if(tmp->get_saved_status() == s_saved)
-							tmp->set_saved_status(s_not_saved); // dropping data
+						    if(tmp->get_saved_status() == saved_status::saved)
+							tmp->set_saved_status(saved_status::not_saved); // dropping data
 						}
 
 						    // EA consideration
@@ -2134,8 +2134,8 @@ namespace libdar
 
 						if(act_data == data_overwrite_mark_already_saved && dolly_ino != nullptr)
 						{
-						    if(dolly_ino->get_saved_status() == s_saved)
-							dolly_ino->set_saved_status(s_not_saved); // dropping data
+						    if(dolly_ino->get_saved_status() == saved_status::saved)
+							dolly_ino->set_saved_status(saved_status::not_saved); // dropping data
 						}
 
 						    // EA consideration
@@ -2784,7 +2784,7 @@ namespace libdar
 		else // not an inode
 		{
 		    cat.pre_add(e, &pdesc);
-		    if(e_mir != nullptr && (e_mir->get_inode()->get_saved_status() == s_saved || e_mir->get_inode()->ea_get_saved_status() == cat_inode::ea_full))
+		    if(e_mir != nullptr && (e_mir->get_inode()->get_saved_status() == saved_status::saved || e_mir->get_inode()->ea_get_saved_status() == cat_inode::ea_full))
 			if(display_treated)
 			    dialog->message(string(gettext("Adding Hard link to archive: "))+juillet.get_string());
 		}
@@ -2958,7 +2958,7 @@ namespace libdar
 	try // protecting delta_sig_ref
 	{
 
-	    if(fic != nullptr && fic->get_saved_status() == s_delta)
+	    if(fic != nullptr && fic->get_saved_status() == saved_status::delta)
 	    {
 		if(delta_diff) // not a merging operation
 		{
@@ -2992,8 +2992,8 @@ namespace libdar
 
 		if(fic != nullptr
 		   && fic->has_delta_signature_structure()
-		   && fic->get_saved_status() != s_saved
-		   && fic->get_saved_status() != s_delta)
+		   && fic->get_saved_status() != saved_status::saved
+		   && fic->get_saved_status() != saved_status::delta)
 		{
 		    save_delta_signature(dialog,
 					 info_quoi,
@@ -3007,8 +3007,8 @@ namespace libdar
 
 		    // EXITING FOR INODE ENTRY WITHOUT DATA TO SAVE
 
-		if(ino->get_saved_status() != s_saved
-		   && ino->get_saved_status() != s_delta)
+		if(ino->get_saved_status() != saved_status::saved
+		   && ino->get_saved_status() != saved_status::delta)
 		{
 		    if(sem != nullptr)
 			sem->raise(info_quoi, ino, false);
@@ -3491,15 +3491,15 @@ namespace libdar
 
 					switch(fic->get_saved_status())
 					{
-					case s_saved:
+					case saved_status::saved:
 				 	    fic->get_crc(tmp);
 					    break;
-					case s_fake:
+					case saved_status::fake:
 					    throw SRC_BUG;
-					case s_not_saved:
+					case saved_status::not_saved:
 					    throw SRC_BUG;
 						// we should not reach this statement with this status
-					case s_delta:
+					case saved_status::delta:
 					    if(ref_fic->has_patch_result_crc())
 						ref_fic->get_patch_result_crc(tmp);
 					    else
@@ -3520,19 +3520,19 @@ namespace libdar
 
 					switch(fic->get_saved_status())
 					{
-					case s_saved:
+					case saved_status::saved:
 					    fic->get_crc(tmp);
 					    break;
-					case s_fake:
+					case saved_status::fake:
 					    throw SRC_BUG;
-					case s_not_saved:
+					case saved_status::not_saved:
 					    if(ref_fic == nullptr)
 						throw SRC_BUG;
 					    if(!ref_fic->has_patch_result_crc())
 						throw SRC_BUG;
 					    ref_fic->get_patch_result_crc(tmp);
 					    break;
-					case s_delta:
+					case saved_status::delta:
 					    if(result_crc == nullptr)
 						throw SRC_BUG;
 					    tmp = result_crc;
@@ -3558,7 +3558,7 @@ namespace libdar
 				}
 			    }
 			    else
-				throw SRC_BUG; // saved_status == s_saved, but no data available, and no exception raised;
+				throw SRC_BUG; // saved_status == saved_status::saved, but no data available, and no exception raised;
 			}
 			while(loop); // INNER LOOP
 		    }
@@ -4404,7 +4404,7 @@ namespace libdar
 		else // no ref_file inode, trying to calculate the delta signature from data
 		{
 		    if(e_file->can_get_data()
-		       && e_file->get_saved_status() != s_delta)
+		       && e_file->get_saved_status() != saved_status::delta)
 		    {
 			null_file trou_noir(gf_write_only);
 			generic_file *data = nullptr;

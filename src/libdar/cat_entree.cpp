@@ -122,7 +122,7 @@ namespace libdar
                 ret = new (nothrow) cat_mirage(dialog, pdesc, reading_ver, saved, stats, corres, default_algo, lax, small);
                 break;
             case 'z':
-                if(saved != s_saved)
+                if(saved != saved_status::saved)
                 {
                     if(!lax)
                         throw Erange("cat_entree::read", gettext("corrupted file"));
@@ -132,7 +132,7 @@ namespace libdar
                 ret = new (nothrow) cat_eod(pdesc, small);
                 break;
             case 'x':
-                if(saved != s_saved)
+                if(saved != saved_status::saved)
                 {
                     if(!lax)
                         throw Erange("cat_entree::read", gettext("corrupted file"));

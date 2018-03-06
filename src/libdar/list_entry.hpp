@@ -77,7 +77,7 @@ namespace libdar
 	bool is_removed_entry() const { return type == 'x'; };
 	bool is_door_inode() const { return type == 'o'; };
 
-	bool has_data_present_in_the_archive() const { return data_status == s_saved; };
+	bool has_data_present_in_the_archive() const { return data_status == saved_status::saved; };
 	bool has_EA() const { return ea_status != cat_inode::ea_none && ea_status != cat_inode::ea_removed; };
 	bool has_EA_saved_in_the_archive() const { return ea_status == cat_inode::ea_full; };
 	bool has_FSA() const { return fsa_status != cat_inode::fsa_none; };

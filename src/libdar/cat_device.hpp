@@ -66,8 +66,8 @@ namespace libdar
 
 	virtual bool operator == (const cat_entree & ref) const override;
 
-        int get_major() const { if(get_saved_status() != s_saved) throw SRC_BUG; else return xmajor; };
-        int get_minor() const { if(get_saved_status() != s_saved) throw SRC_BUG; else return xminor; };
+        int get_major() const { if(get_saved_status() != saved_status::saved) throw SRC_BUG; else return xmajor; };
+        int get_minor() const { if(get_saved_status() != saved_status::saved) throw SRC_BUG; else return xminor; };
         void set_major(int x) { xmajor = x; };
         void set_minor(int x) { xminor = x; };
 

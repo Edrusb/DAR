@@ -70,7 +70,7 @@ namespace libdar
     {
 	xmajor = major;
 	xminor = minor;
-	set_saved_status(s_saved);
+	set_saved_status(saved_status::saved);
     }
 
     cat_device::cat_device(const shared_ptr<user_interaction> & dialog,
@@ -88,7 +88,7 @@ namespace libdar
 	else
 	    ptr = pdesc->stack;
 
-	if(saved == s_saved)
+	if(saved == saved_status::saved)
 	{
 	    if(ptr->read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
 		throw Erange("special::special", gettext("missing data to build a special device"));
@@ -125,7 +125,7 @@ namespace libdar
 
 	cat_inode::inherited_dump(pdesc, small);
 
-	if(get_saved_status() == s_saved)
+	if(get_saved_status() == saved_status::saved)
 	{
 	    tmp = htons(xmajor);
 	    ptr->write((char *)&tmp, sizeof(tmp));
@@ -139,7 +139,7 @@ namespace libdar
 	const cat_device *d_other = dynamic_cast<const cat_device *>(&other);
 	if(d_other == nullptr)
 	    throw SRC_BUG; // bug in cat_inode::compare
-	if(get_saved_status() == s_saved && d_other->get_saved_status() == s_saved)
+	if(get_saved_status() == saved_status::saved && d_other->get_saved_status() == saved_status::saved)
 	{
 	    if(get_major() != d_other->get_major())
 		throw Erange("cat_device::sub_compare", tools_printf(gettext("devices have not the same major number: %d <--> %d"), get_major(), d_other->get_major()));
