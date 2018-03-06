@@ -358,11 +358,6 @@ namespace libdar
         }
     }
 
-    void unmk_signature(unsigned char sig, unsigned char & base, saved_status & state, bool isolated)
-    {
-	extract_base_and_status_isolated(sig, base, state, isolated);
-    }
-
     bool compatible_signature(unsigned char a, unsigned char b)
     {
         a = get_base_signature(a);
@@ -382,7 +377,8 @@ namespace libdar
     {
 	unsigned char ret;
 	saved_status st;
-	unmk_signature(a, ret, st, false);
+	if(!extract_base_and_status_isolated(a, ret, st, false))
+	    throw SRC_BUG;
 	if(ret == 'e')
 	    ret = 'f';
 
