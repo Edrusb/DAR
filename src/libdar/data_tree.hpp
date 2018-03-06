@@ -59,14 +59,14 @@ namespace libdar
     {
     public:
 	data_tree(const std::string &name);
-	data_tree(generic_file & f, unsigned char db_version);
+	data_tree(generic_file & f, unsigned char db_version); //< constructor does not read signature
 	data_tree(const data_tree & ref) = default;
 	data_tree(data_tree && ref) noexcept = default;
 	data_tree & operator = (const data_tree & ref) = default;
 	data_tree & operator = (data_tree && ref) noexcept = default;
 	virtual ~data_tree() = default;
 
-	virtual void dump(generic_file & f) const;
+	virtual void dump(generic_file & f) const; //< dump signature followed by data constructor will read
 	std::string get_name() const { return filename; };
 	void set_name(const std::string & name) { filename = name; };
 
