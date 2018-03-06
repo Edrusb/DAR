@@ -71,9 +71,9 @@ namespace libdar
 	void add(const cat_detruit *entry, const archive_num & archive);
 	const data_tree *read_child(const std::string & name) const;
 	void read_all_children(std::vector<std::string> & fils) const;
-	virtual void finalize_except_self(const archive_num & archive,
-					  const datetime & deleted_date,
-					  const archive_num & ignore_archives_greater_or_equal);
+	void finalize_except_self(const archive_num & archive,
+				  const datetime & deleted_date,
+				  const archive_num & ignore_archives_greater_or_equal);
 
 	    // inherited methods
 	virtual bool check_order(user_interaction & dialog, const path & current_path, bool & initial_warn) const override;
