@@ -112,7 +112,7 @@ namespace libdar
         void clean_data(); // partially free memory (but get_data() becomes disabled)
         void set_offset(const infinint & r);
 	const infinint & get_offset() const;
-        virtual cat_signature signature() const override { return cat_signature('f', get_saved_status()); };
+        virtual unsigned char signature() const override { return 'f'; };
 
         void set_crc(const crc &c);
         bool get_crc(const crc * & c) const; //< the argument is set the an allocated crc object the owned by the "cat_file" object, its stay valid while this "cat_file" object exists and MUST NOT be deleted by the caller in any case

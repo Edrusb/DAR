@@ -89,7 +89,7 @@ namespace libdar
 		filename = o_nom->get_name();
 		uid = o_ino != nullptr ? o_ino->get_uid() : 0;
 		gid = o_ino != nullptr ? o_ino->get_gid() : 0;
-		sig = object->signature().get_base();
+		sig = object->signature();
 		tools_hook_execute(get_ui(), build_string("start"));
 	    }
 	}

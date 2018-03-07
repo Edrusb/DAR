@@ -105,7 +105,7 @@ namespace libdar
 
             // using is_more_recent_than() from cat_inode class
             // using method has_changed_since() from cat_inode class
-        virtual cat_signature signature() const override { return cat_signature('d', get_saved_status()); };
+        virtual unsigned char signature() const override { return 'd'; };
 
 	    /// detemine whether some data has changed since archive of reference in this cat_directory or subdirectories
 	bool get_recursive_has_changed() const { return recursive_has_changed; };

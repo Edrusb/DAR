@@ -452,7 +452,7 @@ namespace libdar
 	    dialog.printf(gettext("Is directory     :\t  %S  \t\t  %S"), al_directory == nullptr ? &no : &yes , do_directory == nullptr ? &no : &yes);
 	    dialog.printf(gettext("Is plain file    :\t  %S  \t\t  %S"), al_file == nullptr ? &no : &yes , do_file == nullptr ? &no : &yes);
 	    dialog.printf(gettext("Is hard linked   :\t  %S  \t\t  %S"), al_mirage == nullptr ? &no : &yes , do_mirage == nullptr ? &no : &yes);
-	    dialog.printf(gettext("Entry type       :\t  %s  \t  %s"), signature2string(already_here->signature().get_base()), signature2string(dolly->signature().get_base()));
+	    dialog.printf(gettext("Entry type       :\t  %s  \t  %s"), signature2string(already_here->signature()), signature2string(dolly->signature()));
 
 	    if(al_inode != nullptr && do_inode != nullptr)
 	    {

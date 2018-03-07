@@ -48,6 +48,10 @@ namespace libdar
 	delta       //< inode is saved but as delta binary from the content (delta signature) of what was found in the archive of reference
     };
 
+	/// class cat_signature combines the cat_entree::signature() of the object with its saved_status and read and store this combinason
+
+	/// historically these two fields were saved on a single byte, but as libdar received new feature it was to narrow
+	/// where from this class to transparently manage this field evolution
     class cat_signature
     {
     public:
@@ -68,7 +72,7 @@ namespace libdar
 	bool get_base_and_status_isolated(unsigned char & base, saved_status & state, bool isolated) const;
 	unsigned char get_base() const;
 
-	bool compatible_signature(const cat_signature & ref) const;
+	static bool compatible_signature(unsigned char a, unsigned char b);
 
     private:
 	static constexpr U_8 SAVED_FAKE_BIT = 0x80;

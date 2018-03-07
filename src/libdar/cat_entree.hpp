@@ -136,7 +136,7 @@ namespace libdar
 	virtual void post_constructor(const pile_descriptor & pdesc) {};
 
 	    /// inherited class signature
-        virtual cat_signature signature() const = 0;
+        virtual unsigned char signature() const = 0;
 
 	    /// a way to copy the exact type of an object even if pointed to by a parent class pointer
         virtual cat_entree *clone() const = 0;

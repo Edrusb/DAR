@@ -292,7 +292,7 @@ namespace libdar
 	if(obj == nullptr)
 	    throw SRC_BUG;
 
-	switch(obj->signature().get_base())
+	switch(obj->signature())
 	{
 	case 'j':
 	    ret = gettext("ignored directory");

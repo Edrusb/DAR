@@ -298,7 +298,7 @@ namespace libdar
 
     void cat_entree::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
-        cat_signature s = signature();
+        cat_signature s(signature(), get_saved_status());
 
 	pdesc.check(small);
 	if(small)

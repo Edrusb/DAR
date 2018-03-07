@@ -673,9 +673,9 @@ namespace libdar
 		unsigned char firm;
 
 		if(pro_mir != nullptr)
-		    firm = pro_mir->get_inode()->signature().get_base();
+		    firm = pro_mir->get_inode()->signature();
 		else
-		    firm = pro_nom->signature().get_base();
+		    firm = pro_nom->signature();
 
 		cat_detruit *det_tmp = new (nothrow) cat_detruit(pro_nom->get_name(), firm, current->get_last_modif());
 		if(det_tmp == nullptr)

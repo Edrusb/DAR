@@ -124,11 +124,8 @@ namespace libdar
 	return base;
     }
 
-    bool cat_signature::compatible_signature(const cat_signature & ref) const
+    bool cat_signature::compatible_signature(unsigned char a, unsigned char b)
     {
-        unsigned char a = get_base();
-        unsigned char b = ref.get_base();
-
         switch(a)
         {
         case 'e':

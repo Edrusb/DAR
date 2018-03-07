@@ -533,7 +533,7 @@ namespace libdar
 	    if(warn_overwrite)
 		get_ui().pause(tools_printf(gettext("%S is about to be removed from filesystem, continue?"), &spot));
 
-	    if(in_place->signature().compatible_signature(to_be_added->get_signature()))
+	    if(cat_signature::compatible_signature(in_place->signature(), to_be_added->get_signature()))
 	    {
 		if(info_details)
 		    get_ui().printf(gettext("Removing file (reason is file recorded as removed in archive): %S"), &spot);

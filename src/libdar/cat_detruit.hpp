@@ -65,7 +65,7 @@ namespace libdar
 	void set_date(const datetime & ref) { del_date = ref; };
 
 	    /// inherited from cat_entree
-        virtual cat_signature signature() const override { return 'x'; };
+        virtual unsigned char signature() const override { return 'x'; };
 	    /// inherited from cat_entree
         virtual cat_entree *clone() const override { return new (std::nothrow) cat_detruit(*this); };
 

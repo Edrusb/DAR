@@ -55,7 +55,7 @@ namespace libdar
         cat_eod(const smart_pointer<pile_descriptor> & pdesc, bool small): cat_entree(pdesc, small) {};
             // dump defined by cat_entree
 	virtual bool operator == (const cat_entree & ref) const override { return true; };
-        virtual cat_signature signature() const override { return 'z'; };
+        virtual unsigned char signature() const override { return 'z'; };
         cat_entree *clone() const { return new (std::nothrow) cat_eod(); };
 
     };
