@@ -206,6 +206,9 @@ namespace libdar
 	    /// not used
 	virtual bool operator == (const cat_entree & ref) const override { return true; };
 
+	    /// compare just data not inode information EA nor FSA
+	bool same_data_as(const cat_file & other);
+
     protected:
         virtual void sub_compare(const cat_inode & other, bool isolated_mode) const override;
         virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override;

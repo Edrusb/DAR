@@ -798,6 +798,20 @@ namespace libdar
 					    e_ino->set_saved_status(saved_status::not_saved);
 					    st.incr_skipped();
 					}
+					else // checking whether we can leverage the inode_only status
+					{
+						// the inode should be saved,
+						// but if we find that data is the same
+						// we don't save it and just record metadata has changed
+					    if(f_file != nullptr && e_file != nullptr)
+					    {
+						if(e_file->same_data_as(*f_file))
+						{
+						    e_file->set_saved_status(saved_status::inode_only);
+						    make_delta_diff = false;
+						}
+					    }
+					}
 
 					if(make_delta_diff)
 					{

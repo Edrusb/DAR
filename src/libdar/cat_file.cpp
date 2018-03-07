@@ -1108,6 +1108,12 @@ namespace libdar
 	}
     }
 
+    bool cat_file::same_data_as(const cat_file & other)
+    {
+	return get_size() == other.get_size()
+	    && get_last_modif() == other.get_last_modif();
+    }
+
     void cat_file::sub_compare(const cat_inode & other, bool isolated_mode) const
     {
 	const cat_file *f_other = dynamic_cast<const cat_file *>(&other);
