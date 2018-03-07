@@ -129,6 +129,9 @@ namespace libdar
 	    else
 		ret = gettext("[Saved]");
 	    break;
+	case saved_status::inode_only:
+	    ret = gettext("[Inode]");
+	    break;
 	case saved_status::fake:
 	    ret = gettext("[InRef]");
 	    break;
