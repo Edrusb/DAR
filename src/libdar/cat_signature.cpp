@@ -35,74 +35,79 @@ namespace libdar
 
     cat_signature::cat_signature(unsigned char original, saved_status status)
     {
-        if(! islower(original))
+        if(!islower(original))
             throw SRC_BUG;
+
         switch(status)
         {
         case saved_status::saved:
-            old_field = original;
+	    field = 3;
+	    break;
+	case saved_status::inode_only:
+	    field = 4;
+	    break;
         case saved_status::fake:
-            old_field = original | SAVED_FAKE_BIT;
+	    field = 7;
+	    break;
         case saved_status::not_saved:
-            old_field = toupper(original);
+	    field = 2;
+	    break;
 	case saved_status::delta:
-	    old_field = original & ~SAVED_NON_DELTA_BIT;
+	    field = 1;
+	    break;
         default:
             throw SRC_BUG;
         }
-	field_v10 = 0; // not used for now
+
+	field <<= 5;
+	field |= original;
     }
 
     bool cat_signature::read(generic_file & f, const archive_version & reading_ver)
     {
-	bool ret;
-	if(reading_ver < 10)
-	    ret = f.read((char *)&old_field, 1) == 1;
-	else
-	    ret = f.read((char *)&old_field, 1) == 1;
-	field_v10 = 0;
-
-	return ret;
+	return f.read((char *)&field, 1) == 1;
     }
 
     void cat_signature::write(generic_file &f)
     {
-	f.write((const char *)&old_field, 1); // archive format < 9 for now
+	f.write((const char *)&field, 1);
     }
 
     bool cat_signature::get_base_and_status(unsigned char & base, saved_status & saved) const
     {
-	bool fake = (old_field & SAVED_FAKE_BIT) != 0;
-	bool non_delta = (old_field & SAVED_NON_DELTA_BIT) != 0;
-	unsigned char tmp;
+	    // building the lowercase letter by forcing the bits 6, 7 and 8 to the value 011:
+	    // 0x1F is 0001 1111 in binary
+	    // 0x60 is 0110 0000 in binary
+	base = ((field & 0x1F) | 0x60);
 
-	tmp = old_field;
-        tmp &= ~SAVED_FAKE_BIT;
-	tmp |= SAVED_NON_DELTA_BIT;
-        if(!isalpha(tmp))
-            return false;
-        base = tolower(tmp);
+	U_I val = field >> 5;
+	switch(val)
+	{
+	case 0:
+	    return false;
+	case 1:
+	    saved = saved_status::delta;
+	    break;
+	case 2:
+	    saved = saved_status::not_saved;
+	    break;
+	case 3:
+	    saved = saved_status::saved;
+	    break;
+	case 4:
+	    saved = saved_status::inode_only;
+	    break;
+	case 5:
+	case 6:
+	    return false;
+	case 7:
+	    saved = saved_status::fake;
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
 
-        if(fake)
-            if(base == tmp)
-		if(non_delta)
-		    saved = saved_status::fake;
-		else
-		    return false; // cannot be saved_status::fake and saved_status::delta at the same time
-	    else
-		return false;
-        else
-            if(tmp == base)
-		if(non_delta)
-		    saved = saved_status::saved;
-		else
-		    saved = saved_status::delta;
-            else
-		if(non_delta)
-		    saved = saved_status::not_saved;
-		else
-		    return false; // cannot be saved_status::not_saved and saved_status::delta at the same time
-        return true;
+	return true;
     }
 
     bool cat_signature::get_base_and_status_isolated(unsigned char & base, saved_status & state, bool isolated) const
@@ -113,15 +118,6 @@ namespace libdar
 	    state = saved_status::fake;
 
 	return ret;
-    }
-
-    unsigned char cat_signature::get_base() const
-    {
-	unsigned char base;
-	saved_status status;
-
-	(void)(get_base_and_status(base, status));
-	return base;
     }
 
     bool cat_signature::compatible_signature(unsigned char a, unsigned char b)
