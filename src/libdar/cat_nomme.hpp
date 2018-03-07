@@ -44,8 +44,8 @@ namespace libdar
     class cat_nomme : public cat_entree
     {
     public:
-        cat_nomme(const std::string & name) { xname = name; };
-        cat_nomme(const smart_pointer<pile_descriptor> & pdesc, bool small);
+        cat_nomme(const std::string & name, saved_status arg): cat_entree(arg) { xname = name; };
+        cat_nomme(const smart_pointer<pile_descriptor> & pdesc, bool small, saved_status val);
 	cat_nomme(const cat_nomme & ref) = default;
 	cat_nomme(cat_nomme && ref) noexcept = default;
 	cat_nomme & operator = (const cat_nomme & ref) = default;

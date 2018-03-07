@@ -34,7 +34,7 @@ using namespace std;
 namespace libdar
 {
 
-    cat_nomme::cat_nomme(const smart_pointer<pile_descriptor> & pdesc, bool small) : cat_entree(pdesc, small)
+    cat_nomme::cat_nomme(const smart_pointer<pile_descriptor> & pdesc, bool small, saved_status val) : cat_entree(pdesc, small, val)
     {
 	pdesc->check(small);
 	if(small)

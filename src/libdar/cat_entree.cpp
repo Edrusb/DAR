@@ -237,7 +237,7 @@ namespace libdar
         return ret;
     }
 
-    cat_entree::cat_entree(const smart_pointer<pile_descriptor> & x_pdesc, bool small)
+    cat_entree::cat_entree(const smart_pointer<pile_descriptor> & x_pdesc, bool small, saved_status val): xsaved(val)
     {
 	if(small && x_pdesc->esc == nullptr)
 	    throw SRC_BUG;

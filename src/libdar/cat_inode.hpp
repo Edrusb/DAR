@@ -91,8 +91,6 @@ namespace libdar
         datetime get_last_modif() const { return last_mod; };
         void set_last_access(const datetime & x_time) { last_acc = x_time; };
         void set_last_modif(const datetime & x_time) { last_mod = x_time; };
-        saved_status get_saved_status() const { return xsaved; };
-        void set_saved_status(saved_status x) { xsaved = x; };
 	infinint get_device() const { if(fs_dev == nullptr) throw SRC_BUG; return *fs_dev; };
 
         bool same_as(const cat_inode & ref) const;
@@ -204,7 +202,6 @@ namespace libdar
         datetime last_acc;       //< last access time (atime)
 	datetime last_mod;       //< last modification time (mtime)
         datetime last_cha;       //< last inode meta data change (ctime)
-        saved_status xsaved;     //< inode data status
         ea_status ea_saved;      //< inode Extended Attribute status
 	fsa_status fsa_saved;    //< inode Filesystem Specific Attribute status
 

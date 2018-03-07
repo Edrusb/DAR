@@ -88,13 +88,12 @@ namespace libdar
 			 const datetime & last_modif,
 			 const datetime & last_change,
 			 const string & xname,
-			 const infinint & fs_device) : cat_nomme(xname)
+			 const infinint & fs_device) : cat_nomme(xname, saved_status::saved)
     {
 	nullifyptr();
         uid = xuid;
         gid = xgid;
         perm = xperm;
-        xsaved = saved_status::not_saved;
         ea_saved = ea_none;
 	fsa_saved = fsa_none;
         edit = 0;
@@ -120,7 +119,7 @@ namespace libdar
 			 const smart_pointer<pile_descriptor> & pdesc,
 			 const archive_version & reading_ver,
 			 saved_status saved,
-			 bool small) : cat_nomme(pdesc, small)
+			 bool small) : cat_nomme(pdesc, small, saved)
     {
         U_16 tmp;
         unsigned char flag;
@@ -135,7 +134,6 @@ namespace libdar
 	nullifyptr();
 	try
 	{
-	    xsaved = saved;
 	    edit = reading_ver;
 	    small_read = small;
 
@@ -1396,7 +1394,6 @@ namespace libdar
 	    last_acc = ref.last_acc;
 	    last_mod = ref.last_mod;
 	    last_cha = ref.last_cha;
-	    xsaved = ref.xsaved;
 	    ea_saved = ref.ea_saved;
 	    fsa_saved = ref.fsa_saved;
 	    small_read = ref.small_read;
@@ -1441,7 +1438,6 @@ namespace libdar
 	last_acc = move(ref.last_acc);
 	last_mod = move(ref.last_mod);
 	last_cha = move(ref.last_cha);
-	xsaved = move(ref.xsaved);
 	ea_saved = move(ref.ea_saved);
 	fsa_saved = move(ref.fsa_saved);
 	small_read = move(ref.small_read);

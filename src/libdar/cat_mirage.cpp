@@ -48,7 +48,7 @@ namespace libdar
 			   compression default_algo,
 			   mirage_format fmt,
 			   bool lax,
-			   bool small) : cat_nomme(pdesc, small)
+			   bool small) : cat_nomme(pdesc, small, saved_status::saved)
     {
         init(dialog,
              pdesc,
@@ -70,7 +70,7 @@ namespace libdar
 			   std::map <infinint, cat_etoile *> & corres,
 			   compression default_algo,
 			   bool lax,
-			   bool small) : cat_nomme("TEMP")
+			   bool small): cat_nomme("TEMP", saved_status::saved)
     {
         init(dialog,
              pdesc,

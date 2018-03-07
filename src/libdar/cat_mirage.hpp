@@ -51,7 +51,7 @@ namespace libdar
 			    fmt_hard_link,        //< old dual format
 			    fmt_file_etiquette }; //< old dual format
 
-	cat_mirage(const std::string & name, cat_etoile *ref) : cat_nomme(name) { dup_on(ref); };
+	cat_mirage(const std::string & name, cat_etoile *ref): cat_nomme(name, saved_status::saved) { dup_on(ref); };
 	cat_mirage(const std::shared_ptr<user_interaction> & dialog,
 		   const smart_pointer<pile_descriptor> & pdesc,
 		   const archive_version & reading_ver,

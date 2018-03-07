@@ -32,7 +32,7 @@ using namespace std;
 namespace libdar
 {
 
-    cat_detruit::cat_detruit(const smart_pointer<pile_descriptor> & pdesc, const archive_version & reading_ver, bool small) : cat_nomme(pdesc, small)
+    cat_detruit::cat_detruit(const smart_pointer<pile_descriptor> & pdesc, const archive_version & reading_ver, bool small) : cat_nomme(pdesc, small, saved_status::saved)
     {
 	generic_file *ptr = nullptr;
 

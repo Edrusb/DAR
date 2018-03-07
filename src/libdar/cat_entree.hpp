@@ -79,14 +79,14 @@ namespace libdar
 				bool small);
 
 	    /// setup an object when read from filesystem
-	cat_entree() = default;
+	cat_entree(saved_status val): xsaved(val) {};
 
 	    /// setup an object when read from an archive
 	    ///
 	    /// \param[in] pdesc points to an existing stack that will be read from to setup fields of inherited classes,
 	    /// this pointed to pile object must survive the whole life of the cat_entree object
 	    /// \param[in] small whether a small or a whole read is to be read, (inode has been dump() with small set to true)
-	cat_entree(const smart_pointer<pile_descriptor> & pdesc, bool small);
+	cat_entree(const smart_pointer<pile_descriptor> & pdesc, bool small, saved_status val);
 
 	    // copy constructor is fine as we only copy the address of pointers
 	cat_entree(const cat_entree & ref) = default;
@@ -114,7 +114,7 @@ namespace libdar
 	    /// while b is a normal inode, restoring both could lead to having the same entry in
 	    /// filsystem while a and b are different for libdar: here they objects of two
 	    /// different classes.
-	bool same_as(const cat_entree & ref) const { return true; };
+	bool same_as(const cat_entree & ref) const { return xsaved == ref.xsaved; };
 
 	    /// write down the object information to a stack
 	    ///
@@ -150,6 +150,12 @@ namespace libdar
 	    /// as well for mirage to propagate the change to the hard linked inode
 	virtual void change_location(const smart_pointer<pile_descriptor> & pdesc);
 
+	    /// obtain the saved status of the object
+	saved_status get_saved_status() const { return xsaved; };
+
+	    /// modify the saved_status of the object
+        void set_saved_status(saved_status x) { xsaved = x; };
+
 
     protected:
 	    /// inherited class may overload this method but shall first call the parent's inherited_dump() in the overloaded method
@@ -179,6 +185,7 @@ namespace libdar
     private:
 	static const U_I ENTREE_CRC_SIZE;
 
+	saved_status xsaved;     //< inode data status, this field is stored with signature() in the cat_signature field -> must be managed by cat_entree
 	smart_pointer<pile_descriptor> pdesc;
     };
 

@@ -45,14 +45,14 @@ namespace libdar
     class cat_eod : public cat_entree
     {
     public :
-        cat_eod() = default;
+        cat_eod(): cat_entree(saved_status::saved) {};
 	cat_eod(const cat_eod & ref) = default;
 	cat_eod(cat_eod && ref) noexcept = default;
 	cat_eod & operator = (const cat_eod & ref) = default;
 	cat_eod & operator = (cat_eod && ref) noexcept = default;
 	~cat_eod() = default;
 
-        cat_eod(const smart_pointer<pile_descriptor> & pdesc, bool small): cat_entree(pdesc, small) {};
+        cat_eod(const smart_pointer<pile_descriptor> & pdesc, bool small): cat_entree(pdesc, small, saved_status::saved) {};
             // dump defined by cat_entree
 	virtual bool operator == (const cat_entree & ref) const override { return true; };
         virtual unsigned char signature() const override { return 'z'; };
