@@ -546,7 +546,8 @@ namespace libdar
 			   const mask & delta_mask,
 			   bool delta_diff,
 			   bool auto_zeroing_neg_dates,
-			   const set<string> & ignored_symlinks)
+			   const set<string> & ignored_symlinks,
+			   modified_data_detection mod_data_detect)
     {
 	if(!dialog)
 	    throw SRC_BUG; // dialog points to nothing
@@ -800,17 +801,34 @@ namespace libdar
 					}
 					else // checking whether we can leverage the inode_only status
 					{
-						// the inode should be saved,
-						// but if we find that data is the same
-						// we don't save it and just record metadata has changed
 					    if(f_file != nullptr && e_file != nullptr)
 					    {
-						if(e_file->same_data_as(*f_file))
+						bool same_data = false;
+
+						    // the whole inode is about to be resaved
+						    // checking whether data has really changed
+						    // or whether the change only concerns metadata
+						switch(mod_data_detect)
+						{
+						case modified_data_detection::any_change:
+						    break;
+						case modified_data_detection::mtime_size:
+						    same_data = e_file->same_data_as(*f_file, false, hourshift);
+						    break;
+						case modified_data_detection::mtime_size_crc:
+						    same_data = e_file->same_data_as(*f_file, true, hourshift);
+						    break;
+						default:
+						    throw SRC_BUG;
+						}
+
+						if(same_data)
 						{
 						    e_file->set_saved_status(saved_status::inode_only);
 						    make_delta_diff = false;
 						}
 					    }
+						// nothing to do else
 					}
 
 					if(make_delta_diff)

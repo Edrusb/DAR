@@ -104,7 +104,8 @@ namespace libdar
 				  const mask & delta_mask,  //< mask defining for which file to calculate delta sig
 				  bool delta_diff,          //< whether to perform delta diff backup when delta sig is present
 				  bool auto_zeroing_neg_dates,
-				  const std::set<std::string> & ignored_symlinks);
+				  const std::set<std::string> & ignored_symlinks,
+				  modified_data_detection mod_data_detect);
 
     extern void filtre_difference(const std::shared_ptr<user_interaction> & dialog,
 				  const mask &filtre,

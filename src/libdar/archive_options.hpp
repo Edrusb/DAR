@@ -39,6 +39,7 @@
 #include "entrepot.hpp"
 #include "fsa_family.hpp"
 #include "compile_time_features.hpp"
+#include "archive_aux.hpp"
 
 #include <string>
 #include <set>
@@ -527,6 +528,10 @@ namespace libdar
 	    /// to have dar recursing in such pointed to directory instead of just recording that directory
 	void set_ignored_as_symlink(const std::set<std::string> & list) { x_ignored_as_symlink = list; };
 
+	    /// defines when to resave a file's data which inode metadata changed
+
+	void set_modified_data_detection(modified_data_detection val) { x_modified_data_detection = val; };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -591,6 +596,7 @@ namespace libdar
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
 	bool get_auto_zeroing_neg_dates() const { return x_auto_zeroing_neg_dates; };
 	const std::set<std::string> & get_ignored_as_symlink() const { return x_ignored_as_symlink; };
+	modified_data_detection get_modified_data_detection() const { return x_modified_data_detection; };
 
     private:
 	archive *x_ref_arch; //< just contains the address of an existing object, no local copy of object is done here
@@ -654,6 +660,7 @@ namespace libdar
 	infinint x_delta_sig_min_size;
 	bool x_auto_zeroing_neg_dates;
 	std::set<std::string> x_ignored_as_symlink;
+	modified_data_detection x_modified_data_detection;
 
 	void nullifyptr() noexcept;
 	void destroy() noexcept;

@@ -119,6 +119,7 @@ _ + retry on change                      --retry-on-change <count[:max byte]>
 8 + delta binary diff                    --delta sig, --delta patch
 9 + min_digits                           --min-digits archive[,ref[,aux]];
 " + anonymous pipe descriptor to read conf from. --pipe-fd
+' + how to detect modified date in diff backup --modified-data-detection= {any-change | crc-comparison}
 . + user comment                         --user-comment
 ; x (forbidden by getopt)
 < + backup hook mask                     --backup-hook-include

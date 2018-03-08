@@ -491,6 +491,7 @@ namespace libdar
 				       options.get_delta_diff(),
 				       options.get_auto_zeroing_neg_dates(),
 				       options.get_ignored_as_symlink(),
+				       options.get_modified_data_detection(),
 				       progressive_report);
 		    exploitable = false;
 		    stack.terminate();
@@ -719,6 +720,7 @@ namespace libdar
 				     false,   // delta diff
 				     true,    // zeroing_neg_date
 				     set<string>(),            // empty list
+				     modified_data_detection::any_change, // not used for merging
 				     st_ptr);
 
 		    exploitable = false;
@@ -879,6 +881,7 @@ namespace libdar
 			     false,               // delta_diff
 			     false,               // zeroing_neg_date
 			     set<string>(),       // ignored_symlinks
+			     modified_data_detection::any_change, // not used for repairing
 			     &not_filled);        // statistics
 
 		// stealing src's catalogue, our's is still empty at this step
@@ -1960,6 +1963,7 @@ namespace libdar
 				     bool delta_diff,
 				     bool zeroing_neg_date,
 				     const set<string> & ignored_symlinks,
+				     modified_data_detection mod_data_detect,
 				     statistics * progressive_report)
     {
         statistics st = false;  // false => no lock for this internal object
@@ -2118,6 +2122,7 @@ namespace libdar
 			 delta_diff,
 			 zeroing_neg_date,
 			 ignored_symlinks,
+			 mod_data_detect,
 			 st_ptr);
 
 	return *st_ptr;
@@ -2190,6 +2195,7 @@ namespace libdar
 				   bool delta_diff,
 				   bool zeroing_neg_date,
 				   const set<string> & ignored_symlinks,
+				   modified_data_detection mod_data_detect,
 				   statistics * st_ptr)
     {
 	try
@@ -2372,7 +2378,8 @@ namespace libdar
 					      delta_mask,
 					      delta_diff,
 					      zeroing_neg_date,
-					      ignored_symlinks);
+					      ignored_symlinks,
+					      mod_data_detect);
 				// build_delta_sig is not used for archive creation it is always implied when delta_signature is set
 			}
 			catch(...)

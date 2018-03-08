@@ -427,6 +427,7 @@ namespace libdar
 				bool delta_diff,
 				bool zeroing_neg_date,
 				const std::set<std::string> & ignored_symlinks,
+				modified_data_detection mod_data_detect,
 				statistics * progressive_report);
 
 	void op_create_in_sub(operation op,                     //< the filter operation to bind to
@@ -496,6 +497,7 @@ namespace libdar
 			      bool delta_diff,                     //< whether to allow delta diff backup when delta sig is present
 			      bool zeroing_neg_date,            //< if true just warn before zeroing neg date, dont ask user
 			      const std::set<std::string> & ignored_symlinks, //< list of symlink pointed to directory to recurse into
+			      modified_data_detection mod_data_detect, //< how to verify data has not changed upon inode metadata change
 			      statistics * st_ptr);             //< statistics must not be nullptr !
 
 	void disable_natural_destruction();

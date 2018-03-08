@@ -17,6 +17,7 @@ from 2.5.x to 2.6.0
   compression
 - repair mode added to create a completed archive (suitable for direct
   access mode and merging) from an interrupted one
+- modified backup behavior use --modified-data-detection for old behavior
 - API: simplified user_interface class
 - API: using std::shared_ptr and std::unique_ptr to explicitely show the
   ownership of the given pointed objects

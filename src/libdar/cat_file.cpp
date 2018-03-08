@@ -1108,13 +1108,29 @@ namespace libdar
 	}
     }
 
-    bool cat_file::same_data_as(const cat_file & other)
+    bool cat_file::same_data_as(const cat_file & other, bool check_data, const infinint & hourshift)
     {
-	return get_size() == other.get_size()
-	    && get_last_modif() == other.get_last_modif();
+	bool ret = true;
+	try
+	{
+	    sub_compare_internal(other, false, check_data, hourshift);
+	}
+	catch(Erange & e)
+	{
+	    ret = false;
+	}
+	return ret;
     }
 
     void cat_file::sub_compare(const cat_inode & other, bool isolated_mode) const
+    {
+	sub_compare_internal(other, !isolated_mode, true, 0);
+    }
+
+    void cat_file::sub_compare_internal(const cat_inode & other,
+					bool can_read_my_data,
+					bool can_read_other_data,
+					const infinint & hourshift) const
     {
 	const cat_file *f_other = dynamic_cast<const cat_file *>(&other);
 	if(f_other == nullptr)
@@ -1127,10 +1143,27 @@ namespace libdar
 	    throw Erange("cat_file::sub_compare", tools_printf(gettext("not same size: %i <--> %i"), &s1, &s2));
 	}
 
+	if(!can_read_other_data) // we cannot compare data, nor CRC, no signature, so we just rely on mtime
+	{
+		// not that hourshift (field from cat_inode) is only used in that context
+		// the mtime comparison is also done at cat_inode level when calling compare()
+		// but in that contaxt can_read_other_data is true, this we do not compare twice mtimes
+
+	    if(!tools_is_equal_with_hourshift(hourshift, get_last_modif(), other.get_last_modif()))
+	    {
+		string s1 = tools_display_date(get_last_modif());
+		string s2 = tools_display_date(other.get_last_modif());
+		throw Erange("cat_file::sub_compare_internal", tools_printf(gettext("difference of last modification date: %S <--> %S"), &s1, &s2));
+	    }
+
+	    return; //<<< we stop the method here in that case
+	}
+
+
 	if(f_other->get_saved_status() != saved_status::saved)
 	    throw SRC_BUG; // we should compare with a plain object provided by a filesystem object
 
-	if(get_saved_status() == saved_status::saved && ! isolated_mode)
+	if(get_saved_status() == saved_status::saved && can_read_my_data)
 	{
 		// compare file content and CRC
 
@@ -1277,7 +1310,7 @@ namespace libdar
 		    delete sig_me;
 	    }
 	}
-	else
+	else // isolated_mode and no signature or no data
 	{
 	    const crc *my_crc = nullptr;
 

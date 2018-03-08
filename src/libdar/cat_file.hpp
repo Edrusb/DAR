@@ -207,7 +207,7 @@ namespace libdar
 	virtual bool operator == (const cat_entree & ref) const override { return true; };
 
 	    /// compare just data not inode information EA nor FSA
-	bool same_data_as(const cat_file & other);
+	bool same_data_as(const cat_file & other, bool check_data, const infinint & hourshift);
 
     protected:
         virtual void sub_compare(const cat_inode & other, bool isolated_mode) const override;
@@ -230,7 +230,11 @@ namespace libdar
 	char file_data_status_write; //< defines the datastructure to apply when writing down the data
 	cat_delta_signature *delta_sig; //< delta signature and associated CRC
 
-        void detruit();
+	void sub_compare_internal(const cat_inode & other,
+				  bool can_read_my_data,
+				  bool can_read_other_data,
+				  const infinint & hourshift) const;
+	void detruit();
 
     };
 

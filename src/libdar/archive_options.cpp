@@ -381,6 +381,7 @@ namespace libdar
 	    x_delta_sig_min_size = default_delta_sig_min_size;
 	    x_auto_zeroing_neg_dates = false;
 	    x_ignored_as_symlink.clear();
+	    x_modified_data_detection = modified_data_detection::mtime_size;
 	}
 	catch(...)
 	{
@@ -631,6 +632,7 @@ namespace libdar
 	x_delta_sig_min_size = ref.x_delta_sig_min_size;
 	x_auto_zeroing_neg_dates = ref.x_auto_zeroing_neg_dates;
 	x_ignored_as_symlink = ref.x_ignored_as_symlink;
+	x_modified_data_detection = ref.x_modified_data_detection;
     }
 
     void archive_options_create::move_from(archive_options_create && ref) noexcept
@@ -696,6 +698,7 @@ namespace libdar
 	x_delta_sig_min_size = move(ref.x_delta_sig_min_size);
 	x_auto_zeroing_neg_dates = move(ref.x_auto_zeroing_neg_dates);
 	x_ignored_as_symlink = move(ref.x_ignored_as_symlink);
+	x_modified_data_detection = move(ref.x_modified_data_detection);
     }
 
 	/////////////////////////////////////////////////////////
