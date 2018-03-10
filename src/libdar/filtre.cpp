@@ -3046,6 +3046,8 @@ namespace libdar
 		{
 		    if(sem != nullptr)
 			sem->raise(info_quoi, ino, false);
+		    if(ino->get_saved_status() == saved_status::inode_only && display_treated)
+			dialog->message(tools_printf(gettext("Adding only inode metadata to archive: %S"), &info_quoi));
 		    return ret;  // <<<<< we exit at this point for inode that have no data to save
 		}
 
