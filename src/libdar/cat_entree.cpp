@@ -72,12 +72,10 @@ namespace libdar
 
         try
         {
-	    cat_signature cat_sig;
-
-            if(!cat_sig.read(*ptr, reading_ver))
-	       type = ' '; // used to by-pass object construction and return nullptr as value of this method
-	    else
+	    try
 	    {
+		cat_signature cat_sig(*ptr, reading_ver);
+
 		if(!cat_sig.get_base_and_status((unsigned char &)type, saved))
 		{
 		    if(!lax)
@@ -85,6 +83,10 @@ namespace libdar
 		    else
 			type = ' '; // used to by-pass object construction and return nullptr as value of this method
 		}
+	    }
+	    catch(Erange & e)
+	    {
+		type = ' '; // used to by-pass object construction and return nullptr as value of this method
 	    }
 
             switch(type)

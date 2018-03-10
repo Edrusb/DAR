@@ -57,7 +57,10 @@ namespace libdar
     {
     public:
 	    /// set a signature from running libdar
-	cat_signature(unsigned char original = 0, saved_status status = saved_status::saved); // -> mk_signature()
+	cat_signature(unsigned char original, saved_status status); // -> mk_signature()
+
+	    /// set a signature from an disk archive
+	cat_signature(generic_file & f, const archive_version & reading_ver);
 
 	    /// read a signature from archive for an existing cat_signature object (overwrite its value)
 
@@ -74,9 +77,6 @@ namespace libdar
 	    /// \param[ou] saved the get_saved_status() of the entry
 	    /// \return false if the field read from the archive is malformed, in which case the returned argument are meaningless
 	bool get_base_and_status(unsigned char & base, saved_status & saved) const;
-
-	    /// same as get_base_and_status() but in the context of isolated catalogue
-	bool get_base_and_status_isolated(unsigned char & base, saved_status & state, bool isolated) const;
 
 	static bool compatible_signature(unsigned char a, unsigned char b);
 

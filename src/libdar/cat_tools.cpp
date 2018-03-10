@@ -42,13 +42,8 @@ namespace libdar
 
     string local_perm(const cat_inode &ref, bool hard)
     {
-	saved_status st;
-	char type;
-	cat_signature cat_sig = ref.signature();
-
+	unsigned char type = ref.signature();
 	U_32 perm = ref.get_perm();
-	if(!cat_sig.get_base_and_status((unsigned char &)type, st))
-	    throw SRC_BUG;
 
 	return tools_get_permission_string(type, perm, hard);
     }

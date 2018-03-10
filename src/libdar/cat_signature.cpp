@@ -60,7 +60,16 @@ namespace libdar
         }
 
 	field <<= 5;
-	field |= original;
+	field |= (original & 0x1F); // only adding the 5 lower bits of "original" field
+    }
+
+    cat_signature::cat_signature(generic_file & f, const archive_version & reading_ver)
+    {
+	unsigned char tmp_base;
+	saved_status tmp_status;
+
+	if(!read(f, reading_ver) || !get_base_and_status(tmp_base, tmp_status))
+	    throw Erange("cat_signature::cat_signature(generic_file)", gettext("incoherent catalogue structure"));
     }
 
     bool cat_signature::read(generic_file & f, const archive_version & reading_ver)
@@ -79,6 +88,8 @@ namespace libdar
 	    // 0x1F is 0001 1111 in binary
 	    // 0x60 is 0110 0000 in binary
 	base = ((field & 0x1F) | 0x60);
+	if(!islower(base))
+	    return false; // must be a letter
 
 	U_I val = field >> 5;
 	switch(val)
@@ -108,16 +119,6 @@ namespace libdar
 	}
 
 	return true;
-    }
-
-    bool cat_signature::get_base_and_status_isolated(unsigned char & base, saved_status & state, bool isolated) const
-    {
-	bool ret = get_base_and_status(base, state);
-
-	if(isolated)
-	    state = saved_status::fake;
-
-	return ret;
     }
 
     bool cat_signature::compatible_signature(unsigned char a, unsigned char b)

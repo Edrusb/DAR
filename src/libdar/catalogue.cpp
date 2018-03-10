@@ -160,9 +160,7 @@ namespace libdar
 		    }
 		}
 
-		cat_signature cat_sig;
-		if(!cat_sig.read(*(pdesc.stack), reading_ver))
-		    throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
+		cat_signature cat_sig(*pdesc.stack, reading_ver);
 
 		if(!cat_sig.get_base_and_status(base, st) && !lax)
 		    throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
@@ -963,7 +961,7 @@ namespace libdar
 			    string tmp_date = !e_det->get_date().is_null() ? tools_display_date(e_det->get_date()) : "Unknown date";
 			    saved_status poub;
 			    char type;
-			    cat_signature cat_sig(e_det->get_signature());
+			    cat_signature cat_sig(e_det->get_signature(), e_det->get_saved_status());
 
 			    if(!cat_sig.get_base_and_status((unsigned char &)type, poub))
 				type = '?';
@@ -1094,7 +1092,7 @@ namespace libdar
 			    {
 				saved_status poub;
 				char type;
-				cat_signature cat_sig(e_det->get_signature());
+				cat_signature cat_sig(e_det->get_signature(), e_det->get_saved_status());
 
 				if(!cat_sig.get_base_and_status((unsigned char &)type, poub))
 				    type = '?';
@@ -1221,14 +1219,10 @@ namespace libdar
 
 			if(e_det != nullptr)
 			{
-			    unsigned char sig;
-			    saved_status state;
+			    unsigned char sig = e_nom->signature();
 			    string data = "deleted";
 			    string metadata = "absent";
-			    cat_signature cat_sig = e_det->get_signature();
 
-			    if(!cat_sig.get_base_and_status_isolated(sig, state, isolated))
-				throw Erange("catalogue::xml_listing", gettext("Invalid signature found"));
 			    switch(sig)
 			    {
 			    case 'd':
@@ -1289,6 +1283,7 @@ namespace libdar
 			       || (e_ino->ea_get_saved_status() == cat_inode::ea_full || e_ino->ea_get_saved_status() == cat_inode::ea_fake)
 			       || (e_dir != nullptr && e_dir->get_recursive_has_changed()))
 			    {
+				const cat_file * f_ino = dynamic_cast<const cat_file *>(e_ino);
 				string data, metadata, maj, min, chksum, chkbasesum, chkresultsum, target, delta_sig;
 				string dirty, sparse;
 				string size = local_size(*e_ino, sizes_in_bytes);
@@ -1298,14 +1293,19 @@ namespace libdar
 				const crc *crc_patch_base = nullptr;
 				const crc *crc_patch_result = nullptr;
 
-				saved_status data_st;
-				cat_inode::ea_status ea_st = isolated ? cat_inode::ea_fake : e_ino->ea_get_saved_status();
-				unsigned char sig;
-				cat_signature cat_sig = e_ino->signature();
+				unsigned char sig = e_ino->signature();
+				saved_status data_st = e_ino->get_saved_status();
+				cat_inode::ea_status ea_st = e_ino->ea_get_saved_status();
 
-				if(!cat_sig.get_base_and_status_isolated(sig, data_st, isolated))
-				    throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
-				data_st = isolated ? saved_status::fake : e_ino->get_saved_status(); // the trusted source for cat_inode status is get_saved_status, not the signature (may change in future, who knows)
+				if(isolated)
+				{
+				    if(data_st == saved_status::saved
+				       && (f_ino == nullptr
+					   || !f_ino->is_dirty()))
+					data_st = saved_status::fake;
+				    ea_st = cat_inode::ea_fake;
+				}
+
 				if(stored == "0" && (reg == nullptr || !reg->get_sparse_file_detection_read()))
 				    stored = size;
 
@@ -1361,8 +1361,6 @@ namespace libdar
 				case 'f': // plain files
 				    if(data_st == saved_status::saved)
 				    {
-					const cat_file * f_ino = dynamic_cast<const cat_file *>(e_ino);
-
 					if(f_ino == nullptr)
 					    throw SRC_BUG;
 					dirty = yes_no(f_ino->is_dirty());
