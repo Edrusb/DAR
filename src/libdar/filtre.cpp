@@ -2030,7 +2030,9 @@ namespace libdar
 						   && al_ino != nullptr)
 						{
 						    cat_inode *tmp = const_cast<cat_inode *>(al_ino);
-						    if(tmp->get_saved_status() == saved_status::saved)
+
+						    if(tmp->get_saved_status() == saved_status::saved
+						       || tmp->get_saved_status() == saved_status::inode_only)
 							tmp->set_saved_status(saved_status::not_saved); // dropping data
 						}
 
@@ -2168,7 +2170,8 @@ namespace libdar
 
 						if(act_data == data_overwrite_mark_already_saved && dolly_ino != nullptr)
 						{
-						    if(dolly_ino->get_saved_status() == saved_status::saved)
+						    if(dolly_ino->get_saved_status() == saved_status::saved
+						       || dolly_ino->get_saved_status() == saved_status::inode_only)
 							dolly_ino->set_saved_status(saved_status::not_saved); // dropping data
 						}
 
