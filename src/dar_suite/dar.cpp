@@ -1138,6 +1138,7 @@ static void display_sauv_stat(user_interaction & dialog, const statistics & st)
     infinint hard_links = st.get_hard_links();
     infinint tooold = st.get_tooold();
     infinint skipped = st.get_skipped();
+    infinint inode_only = st.get_inode_only();
     infinint ignored = st.get_ignored();
     infinint errored = st.get_errored();
     infinint deleted = st.get_deleted();
@@ -1150,6 +1151,7 @@ static void display_sauv_stat(user_interaction & dialog, const statistics & st)
     dialog.printf(gettext("   including %i hard link(s) treated\n"), &hard_links);
     dialog.printf(gettext(" %i inode(s) changed at the moment of the backup and could not be saved properly\n"), &tooold);
     dialog.printf(gettext(" %i byte(s) have been wasted in the archive to resave changing files"), & byte_count);
+    dialog.printf(gettext(" %i inode(s) with only metadata changed\n"), &inode_only);
     dialog.printf(gettext(" %i inode(s) not saved (no inode/file change)\n"), &skipped);
     dialog.printf(gettext(" %i inode(s) failed to be saved (filesystem error)\n"), &errored);
     dialog.printf(gettext(" %i inode(s) ignored (excluded by filters)\n"), &ignored);

@@ -93,6 +93,7 @@ namespace libdar
 	void incr_treated() { (this->*increment)(&treated); };       ///< increment by one the treated counter
 	void incr_hard_links() { (this->*increment)(&hard_links); }; ///< increment by one the hard_links counter
 	void incr_skipped() { (this->*increment)(&skipped); };       ///< increment by one the skipped counter
+	void incr_inode_only() { (this->*increment)(&inode_only); };  ///< increment by one the inode_only counter
 	void incr_ignored() { (this->*increment)(&ignored); };       ///< increment by one the ignored counter
 	void incr_tooold() { (this->*increment)(&tooold); };         ///< increment by one the tooold counter
 	void incr_errored() { (this->*increment)(&errored); };       ///< increment by one the errored counter
@@ -113,6 +114,7 @@ namespace libdar
 	infinint get_treated() const { return (this->*returned)(&treated); };     ///< returns the current value of the treated counter
 	infinint get_hard_links() const { return (this->*returned)(&hard_links); }; ///< returns the current value of the hard_links counter
 	infinint get_skipped() const { return (this->*returned)(&skipped); };     ///< returns the current value of the skipped counter
+	infinint get_inode_only() const { return (this->*returned)(&inode_only); }; ///< returns the current value of the inode_only counter
 	infinint get_ignored() const { return (this->*returned)(&ignored); };     ///< returns the current value of the ignored counter
 	infinint get_tooold() const { return (this->*returned)(&tooold); };       ///< returns the current value of the tooold counter
 	infinint get_errored() const { return (this->*returned)(&errored); };     ///< returns the current value of the errored counter
@@ -124,6 +126,7 @@ namespace libdar
 	void decr_treated() { (this->*decrement)(&treated); };        ///< decrement by one the treated counter
 	void decr_hard_links() { (this->*decrement)(&hard_links); };  ///< decrement by one the hard_links counter
 	void decr_skipped() { (this->*decrement)(&skipped); };        ///< decrement by one the skipped counter
+	void decr_inode_only() { (this->*decrement)(&inode_only); };  ///< decrement by one the inode_only counter
 	void decr_ignored() { (this->*decrement)(&ignored); };        ///< decrement by one the ignored counter
 	void decr_tooold() { (this->*decrement)(&tooold); };          ///< decrement by one the toold counter
 	void decr_errored() { (this->*decrement)(&errored); };        ///< decrement by one the errored counter
@@ -145,6 +148,7 @@ namespace libdar
         infinint treated;       ///< number of inode treated (saved, restored, etc.) [all operations]
         infinint hard_links;    ///< number of hard linked inodes treated (including those ignored by filters)
         infinint skipped;       ///< files not changed since last backup / file not restored because not saved in backup
+	infinint inode_only;    ///< files which operation only affected inode metadata not its data
         infinint ignored;       ///< ignored files due to filters
         infinint tooold;        ///< ignored files because less recent than the filesystem entry [restoration] / modfied during backup
         infinint errored;       ///< files that could not be saved / files that could not be restored (filesystem access right)

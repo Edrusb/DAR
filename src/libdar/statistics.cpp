@@ -47,11 +47,11 @@ namespace libdar
 	if(locking)
 	{
 	    LOCK_IN;
-	    treated = hard_links = skipped = ignored = tooold = errored = deleted = ea_treated = byte_amount = fsa_treated = 0;
+	    treated = hard_links = skipped = inode_only = ignored = tooold = errored = deleted = ea_treated = byte_amount = fsa_treated = 0;
 	    LOCK_OUT;
 	}
 	else
-	    treated = hard_links = skipped = ignored = tooold = errored = deleted = ea_treated = byte_amount = fsa_treated = 0;
+	    treated = hard_links = skipped = inode_only = ignored = tooold = errored = deleted = ea_treated = byte_amount = fsa_treated = 0;
     }
 
     infinint statistics::total() const
@@ -61,12 +61,12 @@ namespace libdar
 	if(locking)
 	{
 	    LOCK_IN_CONST;
-	    ret = treated+skipped+ignored+tooold+errored+deleted;
+	    ret = treated+skipped+inode_only+ignored+tooold+errored+deleted;
 		// hard_link are also counted in other counters
 	    LOCK_OUT_CONST;
 	}
 	else
-	    ret = treated+skipped+ignored+tooold+errored+deleted;
+	    ret = treated+skipped+inode_only+ignored+tooold+errored+deleted;
 
 	return ret;
     }
@@ -119,6 +119,7 @@ namespace libdar
 	treated = ref.treated;
 	hard_links = ref.hard_links;
 	skipped = ref.skipped;
+	inode_only = ref.inode_only;
 	ignored = ref.ignored;
 	tooold = ref.tooold;
 	errored = ref.errored;
@@ -135,6 +136,7 @@ namespace libdar
 	treated = move(ref.treated);
 	hard_links = move(ref.hard_links);
 	skipped = move(ref.skipped);
+	inode_only = move(ref.inode_only);
 	ignored = move(ref.ignored);
 	tooold = move(ref.tooold);
 	errored = move(ref.errored);
@@ -151,6 +153,7 @@ namespace libdar
 	dialog.printf("treated = %i", &treated);
 	dialog.printf("hard_links = %i", &hard_links);
 	dialog.printf("skipped = %i", &skipped);
+	dialog.printf("inode only = %i", inode_only);
 	dialog.printf("ignored = %i", &ignored);
 	dialog.printf("tooold = %i", &tooold);
 	dialog.printf("errored = %i", &errored);

@@ -826,6 +826,8 @@ namespace libdar
 						{
 						    e_file->set_saved_status(saved_status::inode_only);
 						    make_delta_diff = false;
+						    avoid_saving_inode = true;
+						    st.incr_inode_only();
 						}
 					    }
 						// nothing to do else
