@@ -60,10 +60,12 @@ namespace libdar
         infinint num_hard_link_entries;  //< total number of hard links (file directory entry pointing to an
                                          //< inode already linked in the same or another directory (i.e. hard linked))
         infinint saved; //< total number of saved inode (unix inode, not inode class) hard links do not count here
+	infinint patched; //< total number of saved data as binary delta patch
+	infinint inode_only; //< total number of inode which metadata changed without data being modified
         infinint total; //< total number of inode in archive (unix inode, not inode class) hard links do not count here
         void clear() { num_x = num_d = num_f = num_c = num_b = num_p
                 = num_s = num_l = num_D = num_hard_linked_inodes
-                = num_hard_link_entries = saved = total = 0; };
+                = num_hard_link_entries = saved = patched = inode_only = total = 0; };
         void add(const cat_entree *ref);
         void listing(user_interaction & dialog) const;
     };

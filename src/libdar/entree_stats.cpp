@@ -59,9 +59,23 @@ namespace libdar
             if(ino != nullptr)
             {
                 ++total;
-                if(ino->get_saved_status() == saved_status::saved
-		   || ino->get_saved_status() == saved_status::delta)
-                    ++saved;
+		switch(ino->get_saved_status())
+		{
+		case saved_status::saved:
+		    ++saved;
+		    break;
+		case saved_status::inode_only:
+		    ++inode_only;
+		    break;
+		case saved_status::fake:
+		case saved_status::not_saved:
+		    break;
+		case saved_status::delta:
+		    ++patched;
+		    break;
+		default:
+		    throw SRC_BUG;
+		}
             }
 
             if(x != nullptr)
@@ -126,7 +140,9 @@ namespace libdar
         dialog.printf(gettext("CATALOGUE CONTENTS :"));
 	dialog.printf("");
         dialog.printf(gettext("total number of inode : %i"), &total);
-        dialog.printf(gettext("saved inode           : %i"), &saved);
+        dialog.printf(gettext("fully saved           : %i"), &saved);
+	dialog.printf(gettext("binay delta patch     : %i"), &patched);
+	dialog.printf(gettext("inode metadata only   : %i"), &inode_only);
         dialog.printf(gettext("distribution of inode(s)"));
         dialog.printf(gettext(" - directories        : %i"), &num_d);
         dialog.printf(gettext(" - plain files        : %i"), &num_f);
