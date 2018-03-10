@@ -1054,10 +1054,13 @@ namespace libdar
 		get_ui().printf(gettext("The overall archive size includes %i byte(s) wasted due to bad compression ratio"), &delta);
 	    }
 	    else
-		get_ui().message(string(gettext("The global data compression ratio is: "))
-				 + tools_get_compression_ratio(sum.get_storage_size(),
-							       sum.get_data_size(),
-							       true));
+	    {
+		if(!sum.get_storage_size().is_zero())
+		    get_ui().message(string(gettext("The global data compression ratio is: "))
+				     + tools_get_compression_ratio(sum.get_storage_size(),
+								   sum.get_data_size(),
+								   true));
+	    }
 
 	    if(only_contains_an_isolated_catalogue())
 		get_ui().printf(gettext("\nWARNING! This archive only contains the contents of another archive, it can only be used as reference for differential backup or as rescue in case of corruption of the original archive's content. You cannot restore any data from this archive alone\n"));
