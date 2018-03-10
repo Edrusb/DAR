@@ -807,7 +807,7 @@ B
 true only if both 'in place' and 'to be added' are plain file (hard linked or not) and if the 'in place' file's data is larger or equal to the 'to be added' file's data. If one or both entry are not plain files (or hard link to plain file) and thus the file size comparison is not possible, the 'in place' entry is assumed to be 'bigger' than the 'to be added' entry.
 .TP 5
 S
-true only if the 'in place' data is saved in the archive (not marked as unchanged since the archive of reference). Note that while extracting files from an archive, the 'in place' file is the one in the filesystem, which always has its data 'saved' (from libdar point of view). The 'inversion' of this atomic operator ~S may still be interesting in the context of restoration.
+true only if the 'in place' data is saved in the archive (not marked as unchanged nor marked as only inode metadata changed, since the archive of reference). Note that while extracting files from an archive, the 'in place' file is the one in the filesystem, which always has its data 'saved' (from libdar point of view). The 'inversion' of this atomic operator ~S may still be interesting in the context of restoration.
 .TP 5
 Y
 true only if the 'in place' data is saved but dirty (plain file having its data changed at the time it was read for backup). Note, that restoring in sequential read mode, it is not possible to known whether a file is dirty (it is possible to know it once having read its data, but sequential reading does not allows then to skip forward to get the dirty state of the file and skip backward to eventually restore that file, depending on the overwriting policy result).
