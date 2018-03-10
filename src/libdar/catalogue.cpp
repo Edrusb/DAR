@@ -1323,6 +1323,9 @@ namespace libdar
 				case saved_status::delta:
 				    data = "patch";
 				    break;
+				case saved_status::inode_only:
+				    data = "inode-only";
+				    break;
 				default:
 				    throw SRC_BUG;
 				}

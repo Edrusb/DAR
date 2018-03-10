@@ -15,7 +15,7 @@
 	<!-- saved (if extended attributes are saved),                               -->
     <!-- referenced (if entry is present but not saved; for differential archive)    -->
 	<!-- absent (if no extended attributes are associated to this entry          -->
-<!ATTLIST Attributes metadata (saved|referenced|absent) #REQUIRED>
+<!ATTLIST Attributes metadata (saved|referenced|absent|patch|inode-only) #REQUIRED>
 <!ATTLIST Attributes user CDATA #REQUIRED>       <!-- string, user name              -->
 <!ATTLIST Attributes group CDATA #REQUIRED>      <!-- string, group name             -->
 <!ATTLIST Attributes permissions CDATA #REQUIRED>    <!-- string, posix permissions      -->
