@@ -219,31 +219,30 @@ namespace libdar
             // restoring fields that are defined by "what_to_check"
 
         if(what_to_check == cat_inode::cf_all)
-            if(ref.get_saved_status() == saved_status::saved)
-            {
-                uid_t tmp_uid = 0;
-                gid_t tmp_gid = 0;
-                infinint tmp = ref.get_uid();
-                tmp.unstack(tmp_uid);
-                if(!tmp.is_zero())
-                    throw Erange("make_owner_perm", gettext("uid value is too high for this system for libdar be able to restore it properly"));
-                tmp = ref.get_gid();
-                tmp.unstack(tmp_gid);
-                if(!tmp.is_zero())
-                    throw Erange("make_owner_perm", gettext("gid value is too high for this system for libdar be able to restore it properly"));
+	{
+	    uid_t tmp_uid = 0;
+	    gid_t tmp_gid = 0;
+	    infinint tmp = ref.get_uid();
+	    tmp.unstack(tmp_uid);
+	    if(!tmp.is_zero())
+		throw Erange("make_owner_perm", gettext("uid value is too high for this system for libdar be able to restore it properly"));
+	    tmp = ref.get_gid();
+	    tmp.unstack(tmp_gid);
+	    if(!tmp.is_zero())
+		throw Erange("make_owner_perm", gettext("gid value is too high for this system for libdar be able to restore it properly"));
 
 #if HAVE_LCHOWN
-                if(lchown(name, tmp_uid, tmp_gid) < 0)
-                    dialog->message(chem + string(gettext("Could not restore original file ownership: ")) + tools_strerror_r(errno));
+	    if(lchown(name, tmp_uid, tmp_gid) < 0)
+		dialog->message(chem + string(gettext("Could not restore original file ownership: ")) + tools_strerror_r(errno));
 #else
-                if(dynamic_cast<const cat_lien *>(&ref) == nullptr) // not a symbolic link
-                    if(chown(name, tmp_uid, tmp_gid) < 0)
-                        dialog->message(chem + string(gettext("Could not restore original file ownership: ")) + tools_strerror_r(errno));
-                    //
-                    // we don't/can't restore ownership for symbolic links (no system call to do that)
-                    //
+	    if(dynamic_cast<const cat_lien *>(&ref) == nullptr) // not a symbolic link
+		if(chown(name, tmp_uid, tmp_gid) < 0)
+		    dialog->message(chem + string(gettext("Could not restore original file ownership: ")) + tools_strerror_r(errno));
+		//
+		// we don't/can't restore ownership for symbolic links (no system call to do that)
+		//
 #endif
-            }
+	}
 
         try
         {

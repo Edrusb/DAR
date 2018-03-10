@@ -238,6 +238,7 @@ namespace libdar
 	{
 	    bool has_data_saved = (x_ino != nullptr && x_ino->get_saved_status() == saved_status::saved) || x_det != nullptr;
 	    bool has_patch = x_ino != nullptr && x_ino->get_saved_status() == saved_status::delta;
+	    bool has_just_inode = x_ino != nullptr && x_ino->get_saved_status() == saved_status::inode_only;
 	    bool has_ea_saved = x_ino != nullptr && (x_ino->ea_get_saved_status() == cat_inode::ea_full || x_ino->ea_get_saved_status() == cat_inode::ea_removed);
 	    bool has_fsa_saved = x_ino != nullptr && x_ino->fsa_get_saved_status() == cat_inode::fsa_full;
 	    path spot = *current_dir + x_nom->get_name();
@@ -274,6 +275,12 @@ namespace libdar
 		    throw Erange("filesystem_restore::write", string(gettext("Cannot restore a delta binary patch without a file to patch on filesystem")));
 		if(x_fil == nullptr)
 		    throw SRC_BUG;
+	    }
+
+	    if(has_just_inode)
+	    {
+		if(exists == nullptr)
+		    throw Erange("filesystem_restore::write", string(gettext("Cannot restore a inode metadata only without an existing file on filesystem")));
 	    }
 
 	    try
@@ -394,7 +401,7 @@ namespace libdar
 			}
 		    else // a normal inode (or hard linked one) is to be restored
 		    {
-			if(has_data_saved)
+			if(has_data_saved || has_just_inode)
 			{
 			    action_over_data(exists_ino, x_nom, spot_display, act_data, data_restored);
 			}
@@ -614,18 +621,22 @@ namespace libdar
 	    if(info_details)
 		get_ui().message(string(gettext("Restoring file's data: ")) + spot);
 
-	    if(tba_dir != nullptr && tba_ino->same_as(*in_place))
+	    if((tba_dir != nullptr || tba_ino->get_saved_status() == saved_status::inode_only)
+	       && tba_ino->same_as(*in_place))
 	    {
 		if(!empty)
 		    filesystem_tools_make_owner_perm(get_pointer(), *tba_ino, spot, false, what_to_check, get_fsa_scope());
 		data_done = done_data_restored;
 	    }
-	    else // not both in_place and to_be_added are directories
+	    else // not both in_place and to_be_added are directories, or we can only restore the inode metadata and existing file is of different type
 	    {
 		ea_attributs *ea = nullptr; // saving original EA of existing inode
 		filesystem_specific_attribute_list fsa; // saving original FSA of existing inode
 		bool got_ea = true;
 		bool got_fsa = true;
+
+		if(tba_ino->get_saved_status() == saved_status::inode_only)
+		    throw Erange("filesystem_restore::write", string(gettext("Existing file is of a different nature, cannot only restore inode metadata")));
 
 		try
 		{
