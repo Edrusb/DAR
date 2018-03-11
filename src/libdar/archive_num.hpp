@@ -53,6 +53,10 @@ namespace libdar
 	U_16 operator = (U_16 arg) { set(arg); return arg; };
 	archive_num & operator++() { set(val+1); return *this; };
 
+	    // no need of order operator (<, <=, >, >=, ==, !=)
+	    // thanks to the implicit conversion to U_16 defined
+	    // above
+
 	void read_from_file(generic_file &f);
 	void write_to_file(generic_file &f) const;
 
