@@ -47,9 +47,9 @@ extern "C"
 #include "path.hpp"
 #include "datetime.hpp"
 #include "cat_all_entrees.hpp"
+#include "candidates.hpp"
 
 using namespace std;
-using namespace libdar;
 
 constexpr const char * const ETAT_SAVED = "S";
 constexpr const char * const ETAT_PATCH = "O";
@@ -57,6 +57,7 @@ constexpr const char * const ETAT_PATCH_UNUSABLE = "U";
 constexpr const char * const ETAT_PRESENT = "P";
 constexpr const char * const ETAT_REMOVED = "R";
 constexpr const char * const ETAT_ABSENT = "A";
+constexpr const char * const ETAT_INODE = "I";
 
 const unsigned char STATUS_PLUS_FLAG_ME = 0x01;
 const unsigned char STATUS_PLUS_FLAG_REF = 0x02;
@@ -77,6 +78,9 @@ namespace libdar
 	    break;
 	case db_etat::et_patch_unusable:
 	    f.write(ETAT_PATCH_UNUSABLE, 1);
+	    break;
+	case db_etat::et_inode:
+	    f.write(ETAT_INODE, 1);
 	    break;
 	case db_etat::et_present:
 	    f.write(ETAT_PRESENT, 1);
@@ -109,6 +113,9 @@ namespace libdar
 	    break;
 	case ETAT_REMOVED[0]:
 	    present = db_etat::et_removed;
+	    break;
+	case ETAT_INODE[0]:
+	    present = db_etat::et_inode;
 	    break;
 	case ETAT_ABSENT[0]:
 	    present = db_etat::et_absent;
@@ -347,138 +354,33 @@ namespace libdar
 
     db_lookup data_tree::get_data(set<archive_num> & archive, const datetime & date, bool even_when_removed) const
     {
-	    // archive (first argument of the method) will hold the set of archive numbers to use to obtain the latest requested state of the file
-	    // for plain data the set will contain 1 number, for delta difference, it may contain many number of archive to restore in turn for that file
 
-	map<archive_num, status_plus>::const_iterator it = last_mod.begin();
+		// we will pass each element of the last_mod map, following the order used by std::map
+		// which is based on the order of the first element, here archive_num, thus "it" will
+		// be pointing at the each entry, from the smallest to the highest archive number
+
 	datetime max_seen_date = datetime(0);
-	datetime max_real_date = datetime(0);
 	archive_num last_archive_seen = 0; //< last archive number (in the order of the database) in which a valid entry has been found (any state)
-	set<archive_num> last_archive_even_when_removed; //< last archive number in which a valid entry with data available has been found
-	bool presence_seen = false; //< whether the last found valid entry indicates file was present or removed
-	bool presence_real = false; //< whether the last found valid entry not being an "db_etat::et_present" state was present or removed
-	bool broken_patch = false;  //< record whether there is a broken patch the avoid restoring data
-	db_lookup ret;
-
-	archive.clear(); // empty set will be used if no archive found
+	candidates candy(even_when_removed); //< Au pays de Candy, comme dans tous les pays ...
+	map<archive_num, status_plus>::const_iterator it = last_mod.begin();
 
 	while(it != last_mod.end())
 	{
+		// this test is necessary to take care of problem of order in the database
 	    if(it->second.date >= max_seen_date
 		   // ">=" (not ">") because there should never be twice the same value
 		   // and we must be able to see a value of 0 (initially max = 0) which is valid.
 	       && (date.is_null() || it->second.date <= date))
 	    {
 		max_seen_date = it->second.date;
-		switch(it->second.present)
-		{
-		case db_etat::et_saved:
-		    broken_patch = false;
-			// no break !
-		case db_etat::et_present:
-		case db_etat::et_patch:
-		    presence_seen = true;
-		    last_archive_seen = it->first;
-		    break;
-		case db_etat::et_patch_unusable:
-		    broken_patch = true;
-		    presence_seen = false;
-			// we do not record this archive number as last_seen
-		    break;
-		case db_etat::et_removed:
-		case db_etat::et_absent:
-		    presence_seen = false;
-		    last_archive_seen = it->first;
-		    break;
-		default:
-		    throw SRC_BUG;
-		}
+		last_archive_seen = it->first;
+		candy.add(it->first, it->second.present);
 	    }
-
-	    if(it->second.date >= max_real_date
-		   // ">=" (not ">") because there should never be twice the same value
-		   // and we must be able to see a value of 0 (initially max = 0) which is valid.
-	       && (date.is_null() || it->second.date <= date))
-	    {
-		if(it->second.present != db_etat::et_present && !broken_patch)
-		{
-		    max_real_date = it->second.date;
-		    switch(it->second.present)
-		    {
-		    case db_etat::et_saved:
-			archive.clear();
-			last_archive_even_when_removed.clear();
-			    // no break !!! //
-		    case db_etat::et_patch:
-			archive.insert(it->first);
-			last_archive_even_when_removed.insert(it->first);
-			presence_real = true;
-			break;
-		    case db_etat::et_removed:
-		    case db_etat::et_absent:
-			archive.clear();
-			archive.insert(it->first);
-			presence_real = false;
-			break;
-		    case db_etat::et_present:
-			throw SRC_BUG;
-		    case db_etat::et_patch_unusable:
-			throw SRC_BUG;
-		    default:
-			throw SRC_BUG;
-		    }
-		}
-	    }
-
 	    ++it;
 	}
 
-	if(even_when_removed && !last_archive_even_when_removed.empty())
-	{
-	    archive = last_archive_even_when_removed;
-	    presence_seen = presence_real = true;
-	}
-
-	if(broken_patch)
-	{
-	    archive.clear();
-	    archive.insert(last_archive_seen);
-	    ret = db_lookup::not_restorable;
-	}
-	else
-	{
-	    if(archive.empty())
-		if(last_archive_seen != 0) // last acceptable entry is a file present but not saved, but no full backup is present in a previous archive
-		{
-		    archive.clear();
-		    archive.insert(last_archive_seen);
-		    ret = db_lookup::not_restorable;
-		}
-		else
-		    ret = db_lookup::not_found;
-	    else
-		if(last_archive_seen != 0)
-		    if(presence_seen && !presence_real)
-			    // last acceptable entry is a file present but not saved,
-			    // but no full backup is present in a previous archive
-		    {
-			archive.clear();
-			archive.insert(last_archive_seen);
-			ret = db_lookup::not_restorable;
-		    }
-		    else
-			if(presence_seen != presence_real)
-			    throw SRC_BUG;
-			else  // archive > 0 && presence_seen == present_real
-			    if(presence_real)
-				ret = db_lookup::found_present;
-			    else
-				ret = db_lookup::found_removed;
-		else // archive != 0 but last_archive_seen == 0
-		    throw SRC_BUG;
-	}
-
-	return ret;
+	candy.set_the_set(archive);
+	return candy.get_status();
     }
 
     db_lookup data_tree::get_EA(archive_num & archive, const datetime & date, bool even_when_removed) const
@@ -631,6 +533,7 @@ namespace libdar
 		    case db_etat::et_present:
 		    case db_etat::et_patch:
 		    case db_etat::et_patch_unusable:
+		    case db_etat::et_inode:
 			presence_max = true;
 			last_mtime = itp->second.date; // used as deleted_data for EA
 			break;
@@ -685,6 +588,7 @@ namespace libdar
 		    case db_etat::et_present:
 		    case db_etat::et_patch:
 		    case db_etat::et_patch_unusable:
+		    case db_etat::et_inode:
 			throw SRC_BUG; // entry has not been found in the current archive
 		    case db_etat::et_removed:
 			break;         // we must keep it, it was in the original archive
@@ -1082,6 +986,7 @@ namespace libdar
 		prev = it->second.result;
 		break;
 	    case db_etat::et_present:
+	    case db_etat::et_inode:
 		prev = it->second.result;
 		break;
 	    case db_etat::et_removed:
