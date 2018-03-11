@@ -29,7 +29,6 @@ extern "C"
 }
 
 #include <iostream>
-#include <algorithm>
 #include "path.hpp"
 #include "tools.hpp"
 #include "nls_swap.hpp"
@@ -134,7 +133,7 @@ namespace libdar
             return "/";
     }
 
-    bool path::read_subdir(string & r) const
+    bool path::read_subdir(string & r)
     {
         if(reading != dirs.end())
         {
@@ -195,8 +194,8 @@ namespace libdar
         if(!arg.relative)
             throw Erange("path::operator +", dar_gettext("Cannot add an absolute path"));
 
-        deque<string>::const_iterator it = arg.dirs.begin();
-        deque<string>::const_iterator it_fin = arg.dirs.end();
+        list<string>::const_iterator it = arg.dirs.begin();
+        list<string>::const_iterator it_fin = arg.dirs.end();
         while(it != it_fin)
         {
             if(*it != string("."))
@@ -244,7 +243,7 @@ namespace libdar
     string path::display() const
     {
         string ret = relative ? "" : "/";
-        deque<string>::const_iterator it = dirs.begin();
+        list<string>::const_iterator it = dirs.begin();
 
         if(it != dirs.end())
             ret += *it++;
@@ -268,25 +267,25 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    reading = dirs.begin();
+	    me->reading = me->dirs.begin();
 	}
     }
 
     void path::reduce()
     {
-        remove(dirs.begin(), dirs.end(), ".");
+        dirs.remove(".");
         if(relative && dirs.empty())
 	    dirs.push_back(".");
         else
         {
-            deque<string>::iterator it = dirs.begin();
-            deque<string>::iterator prev = it;
+            list<string>::iterator it = dirs.begin();
+            list<string>::iterator prev = it;
 
             while(it != dirs.end())
             {
                 if(*it == ".." && *prev != "..")
                 {
-                    deque<string>::iterator tmp = prev;
+                    list<string>::iterator tmp = prev;
 
                     it = dirs.erase(it);
                     if(prev != dirs.begin())
