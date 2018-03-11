@@ -205,6 +205,7 @@ namespace libdar5
 	const string ABSENT  = gettext("absent  ");
 	const string PATCH   = gettext("patch   ");
 	const string BROKEN  = gettext("BROKEN  ");
+	const string INODE   = gettext("inode   ");
 	const string NO_DATE = "                          ";
 	string data_state;
 	string ea_state;
@@ -225,6 +226,9 @@ namespace libdar5
 	    break;
 	case db_etat::et_patch_unusable:
 	    data_state = BROKEN;
+	    break;
+	case db_etat::et_inode:
+	    data_state = INODE;
 	    break;
 	case db_etat::et_present:
 	    data_state = PRESENT;
