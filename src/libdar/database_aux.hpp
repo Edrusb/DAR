@@ -48,12 +48,17 @@ namespace libdar
     enum class db_etat
     {
 	et_saved,       //< data/EA present in the archive
-	et_patch,       //< data present as patch from the previous version
+	et_patch,       //< data present as patch since the previous version
 	et_patch_unusable, //< data present as patch but base version not found in archive set
+	et_inode,       //< only inode metadata has been modified since previous version
 	et_present,     //< file/EA present in the archive but data not saved (differential backup)
 	et_removed,     //< file/EA stored as deleted since archive of reference or file/EA not present in the archive
 	et_absent       //< file not even mentionned in the archive, This entry is equivalent to et_removed, but is required to be able to properly re-order the archive when user asks to do so. The dates associated to this state are computed from neighbor archives in the database
     };
+	/// \note when restoring an et_patch entry, it is required to also restore all  to all intermediate
+	/// et_patch since the last et_saved status. While restoring et_inode
+	/// only need to restore the previous et_saved and the latest et_inode available. Intermediate et_inode
+	/// have not to be restored.
 
 	/// @}
 
