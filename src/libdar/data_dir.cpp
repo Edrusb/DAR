@@ -203,6 +203,17 @@ namespace libdar
 		res = nullptr;
 	    tree->set_data(archive, last_mod, db_etat::et_patch, base, res);
 	    break;
+	case saved_status::inode_only:
+	    if(entry_file != nullptr)
+	    {
+		if(!entry_file->get_crc(res))
+		    if(!entry_file->get_patch_result_crc(res))
+			res = nullptr;
+		if(!entry_file->get_patch_base_crc(base))
+		    base = nullptr;
+	    }
+	    tree->set_data(archive, last_mod, db_etat::et_inode, base, res);
+	    break;
 	case saved_status::not_saved:
 	    if(entry_file != nullptr)
 	    {
