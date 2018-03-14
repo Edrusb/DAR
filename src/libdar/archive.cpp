@@ -1262,9 +1262,25 @@ namespace libdar
 	    entrepot *sauv_path_t = options.get_entrepot().clone();
 	    if(sauv_path_t == nullptr)
 		throw Ememory("archive::archive");
+	    const entrepot_local *sauv_path_t_local = dynamic_cast<const entrepot_local *>(sauv_path_t);
 	    sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
 	    sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
 	    sauv_path_t->set_location(sauv_path);
+
+	    path sauv_path_abs = sauv_path_t->get_location();
+	    if(sauv_path_abs.is_relative())
+		sauv_path_abs = sauv_path_t->get_root() + sauv_path_abs;
+
+	    if(!options.get_empty() && sauv_path_t_local != nullptr)
+		tools_avoid_slice_overwriting_regex(dialog,
+						    sauv_path_abs,
+						    filename,
+						    extension,
+						    options.get_info_details(),
+						    options.get_allow_over(),
+						    options.get_warn_over(),
+						    options.get_empty());
+
 
 	    try
 	    {

@@ -1,6 +1,9 @@
 from 2.5.14-bis to 2.5.15
 - fixing self report bug message met when trying to create an isolatede
   catalogue into a directory that does not exist
+- adding slice overwriting verification before creating a isolated
+  catalogue, to be coherent with other operation creating an archive
+  (backup and merging)
 
 from 2.5.14 to 2.5.14-bis
 - avoiding using the syncfs() system call in dar_split when the
