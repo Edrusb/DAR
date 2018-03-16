@@ -159,7 +159,7 @@ namespace libdar
 	    /// \brief returns the number of member in the path
 	    ///
 	    /// \note a absolute path counts one more that its relative brother
-        unsigned int degre() const { return dirs.size() + (relative ? 0 : 1); };
+        U_I degre() const { return dirs.size() + (relative ? 0 : 1); };
 
 	    /// \brief if the current object is an undisclosed path, tries to convert it back to normal path
 	void explode_undisclosed() const;
