@@ -60,7 +60,7 @@ namespace libdar
 	    /// \param[in] dialog the user_interaction object to clone and store
 	    /// If you plan to use mem_ui, you should pass the user_interaction to its constructor
 	    /// for you later be able to call get_ui() at any time from the inherited class
-	mem_ui(const std::shared_ptr<user_interaction> & dialog): ui(dialog) { if(!ui) throw SRC_BUG; };
+	mem_ui(const std::shared_ptr<user_interaction> & dialog);
 
 	    /// the copy constructor
 

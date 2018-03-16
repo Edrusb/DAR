@@ -26,13 +26,18 @@
 // including "mem_ui.hpp" here, lead to cyclic dependancy of headers...  this points needs to be clarified
 
 #include "mem_ui.hpp"
+#include "shell_interaction.hpp"
 
 using namespace std;
 
 namespace libdar
 {
 
-	// all is now inline in mem_ui.hpp
+    mem_ui::mem_ui(const std::shared_ptr<user_interaction> & dialog): ui(dialog)
+    {
+	if(!ui)
+	    ui = make_shared<shell_interaction>(cerr, cerr, false);
+    }
 
 } // end of namespace
 
