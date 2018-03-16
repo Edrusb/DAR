@@ -18,6 +18,10 @@ from 2.5.x to 2.6.0
 - repair mode added to create a completed archive (suitable for direct
   access mode and merging) from an interrupted one
 - modified backup behavior use --modified-data-detection for old behavior
+- dar can now only save metadata inode change without resaving the whole
+  file if its data has not changed. Dar_manager also handle this by
+  restoring the full backup and then the inode metadata only when
+  necessary.
 - API: simplified user_interface class
 - API: using std::shared_ptr and std::unique_ptr to explicitely show the
   ownership of the given pointed objects
