@@ -976,7 +976,7 @@ namespace libdar
 		break;
 	    case db_etat::et_present:
 	    case db_etat::et_inode:
-		prev = it->second.result;
+		    // we do not modify prev
 		break;
 	    case db_etat::et_removed:
 	    case db_etat::et_absent:
