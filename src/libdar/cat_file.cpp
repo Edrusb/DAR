@@ -1143,19 +1143,18 @@ namespace libdar
 	    throw Erange("cat_file::sub_compare", tools_printf(gettext("not same size: %i <--> %i"), &s1, &s2));
 	}
 
+	if(!tools_is_equal_with_hourshift(hourshift, get_last_modif(), other.get_last_modif()))
+	{
+	    string s1 = tools_display_date(get_last_modif());
+	    string s2 = tools_display_date(other.get_last_modif());
+	    throw Erange("cat_file::sub_compare_internal", tools_printf(gettext("difference of last modification date: %S <--> %S"), &s1, &s2));
+	}
+
 	if(!can_read_other_data) // we cannot compare data, nor CRC, no signature, so we just rely on mtime
 	{
 		// not that hourshift (field from cat_inode) is only used in that context
 		// the mtime comparison is also done at cat_inode level when calling compare()
 		// but in that contaxt can_read_other_data is true, this we do not compare twice mtimes
-
-	    if(!tools_is_equal_with_hourshift(hourshift, get_last_modif(), other.get_last_modif()))
-	    {
-		string s1 = tools_display_date(get_last_modif());
-		string s2 = tools_display_date(other.get_last_modif());
-		throw Erange("cat_file::sub_compare_internal", tools_printf(gettext("difference of last modification date: %S <--> %S"), &s1, &s2));
-	    }
-
 	    return; //<<< we stop the method here in that case
 	}
 
