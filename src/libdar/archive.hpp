@@ -120,7 +120,7 @@ namespace libdar
 
 	archive(const std::shared_ptr<user_interaction> & dialog,
 		const path & sauv_path,
-		archive *ref_arch1,
+		std::shared_ptr<archive> ref_arch1,
 		const std::string & filename,
 		const std::string & extension,
 		const archive_options_merge & options,

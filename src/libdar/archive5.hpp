@@ -95,7 +95,7 @@ namespace libdar5
 		statistics * progressive_report):
 	    libdar::archive(user_interaction5_clone_to_shared_ptr(dialog),
 			    sauv_path,
-			    ref_arch1,
+			    std::shared_ptr<archive>(ref_arch1),
 			    filename,
 			    extension,
 			    options,

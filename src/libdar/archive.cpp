@@ -524,7 +524,7 @@ namespace libdar
 
     archive::archive(const std::shared_ptr<user_interaction> & dialog,
 		     const path & sauv_path,
-		     archive *ref_arch1,
+		     shared_ptr<archive> ref_arch1,
 		     const string & filename,
 		     const string & extension,
 		     const archive_options_merge & options,
@@ -569,7 +569,7 @@ namespace libdar
 
 		    check_libgcrypt_hash_bug(get_ui(), options.get_hash_algo(), options.get_first_slice_size(), options.get_slice_size());
 
-		    if(ref_arch1 != nullptr)
+		    if(ref_arch1)
 			if(ref_arch1->only_contains_an_isolated_catalogue())
 				// convert all data to unsaved
 			    ref_arch1->set_to_unsaved_data_and_FSA();
