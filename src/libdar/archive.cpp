@@ -720,7 +720,7 @@ namespace libdar
 				     false,   // delta diff
 				     true,    // zeroing_neg_date
 				     set<string>(),            // empty list
-				     modified_data_detection::any_change, // not used for merging
+				     modified_data_detection::any_inode_change, // not used for merging
 				     st_ptr);
 
 		    exploitable = false;
@@ -881,7 +881,7 @@ namespace libdar
 			     false,               // delta_diff
 			     false,               // zeroing_neg_date
 			     set<string>(),       // ignored_symlinks
-			     modified_data_detection::any_change, // not used for repairing
+			     modified_data_detection::any_inode_change, // not used for repairing
 			     &not_filled);        // statistics
 
 		// stealing src's catalogue, our's is still empty at this step

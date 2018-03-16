@@ -1945,8 +1945,8 @@ static bool get_args_recursive(recursive_param & rec,
 	    case '\'':
 		if(optarg == nullptr)
 		    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
-		if(strcasecmp(optarg, "any-change") == 0)
-		    p.modet = modified_data_detection::any_change;
+		if(strcasecmp(optarg, "any-inode-change") == 0)
+		    p.modet = modified_data_detection::any_inode_change;
 		else if(strcasecmp(optarg, "crc-comparison") == 0)
 		    p.modet = modified_data_detection::mtime_size_crc;
 		else

@@ -810,7 +810,7 @@ namespace libdar
 						    // or whether the change only concerns metadata
 						switch(mod_data_detect)
 						{
-						case modified_data_detection::any_change:
+						case modified_data_detection::any_inode_change:
 						    break;
 						case modified_data_detection::mtime_size:
 						    same_data = e_file->same_data_as(*f_file, false, hourshift);
