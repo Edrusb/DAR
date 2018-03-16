@@ -140,6 +140,17 @@ namespace libdar
 
     private:
 
+	static constexpr const char * const ETAT_SAVED = "S";
+	static constexpr const char * const ETAT_PATCH = "O";
+	static constexpr const char * const ETAT_PATCH_UNUSABLE = "U";
+	static constexpr const char * const ETAT_PRESENT = "P";
+	static constexpr const char * const ETAT_REMOVED = "R";
+	static constexpr const char * const ETAT_ABSENT = "A";
+	static constexpr const char * const ETAT_INODE = "I";
+
+	static constexpr unsigned char STATUS_PLUS_FLAG_ME = 0x01;
+	static constexpr unsigned char STATUS_PLUS_FLAG_REF = 0x02;
+
 	class status
 	{
 	public:

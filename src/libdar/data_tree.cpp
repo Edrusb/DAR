@@ -51,17 +51,6 @@ extern "C"
 
 using namespace std;
 
-constexpr const char * const ETAT_SAVED = "S";
-constexpr const char * const ETAT_PATCH = "O";
-constexpr const char * const ETAT_PATCH_UNUSABLE = "U";
-constexpr const char * const ETAT_PRESENT = "P";
-constexpr const char * const ETAT_REMOVED = "R";
-constexpr const char * const ETAT_ABSENT = "A";
-constexpr const char * const ETAT_INODE = "I";
-
-const unsigned char STATUS_PLUS_FLAG_ME = 0x01;
-const unsigned char STATUS_PLUS_FLAG_REF = 0x02;
-
 namespace libdar
 {
 
