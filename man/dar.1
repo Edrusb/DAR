@@ -1039,15 +1039,12 @@ dar/libdar saves dates as a number of seconds since the beginning of year 1970, 
 -\\, --ignored-as-symlink <absolute path>[:<absolute path>[:...]]
 When dar reach a inode which is part of this provided column separated list, if this inode is not a symlink this option has no effect, but if it is a symlinks dar saves the file the symlink points to and not the symlink itself as dar does by default. In particular, if the pointed to inode is a directory dar recurses in that directory. You can also pass this list as argument to the DAR_IGNORED_AS_SYMLINK environment instead of using --ignored-as-symlink (which takes precedence over the environment variable).
 .TP 20
--'\\'', --modified-data-detection=any-change, --modified-data-detection=crc-comparison
+-'\\'', --modified-data-detection=any-inode-change, --modified-data-detection=mtime-and-size
 Before release 2.6.0, during a differential/incremental backup if any part of a file's inode metadata changed (ownership, permission, ...) even if the mtime (last modification time) and file size stood the same, dar had no choice than resaving the whole file for backup to record the metadata changes. This lead to a waste of backup time and space if in fact and for example only the ownership had been modified. You can still keep this historical behavior by invoking the
 .B
---modified-data-detection=any-change
+--modified-data-detection=any-inode-change
 option.
-Since release 2.6.0 a new entry status ("inode-only") has been added. Dar can now resave only metadata when the inode change does not concern the data. To know whether the data has changed or not, by default (no --modified-data-detection option given) dar looks at mtime and at file's size only. In complement to this new behavior and its backward compatible fall back seen previously, a second feature
-.B
---modified-data-detection=crc-comparison
-let dar compute file's CRC and compare it with what it was a the time of the backup of reference (mtime and file size are still compared first). But, note that comparing CRC implies reading the whole file from filesystem a first time. If the CRC are equal dar uses the new "inode-only" status, record only the inode metadata and considers the next file. Else it reads the file a second time for backup and uses the "saved" status as done in previous releases. Last point, if all inode fields are unchanged, no CRC calculation and comparison is performed, the file is recorded as "not_saved" as before.
+Since release 2.6.0 a new entry status ("inode-only") has been added. Dar can now resave only metadata when the inode change does not concern the data. To know whether the data has changed or not, by default (no --modified-data-detection option given) dar looks at mtime and at file's size only. Specifying --modified-data-detection=mtime-and-size (which is the default behavior) can be used to revert the action of --modified-data-detection=any-inode-change for example when playing with included files (DCF files): the latest met takes precedence.
 .PP
 .PP
 .B RESTORATION SPECIFIC OPTIONS (to use with -x)

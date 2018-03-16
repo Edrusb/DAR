@@ -815,9 +815,6 @@ namespace libdar
 						case modified_data_detection::mtime_size:
 						    same_data = e_file->same_data_as(*f_file, false, hourshift);
 						    break;
-						case modified_data_detection::mtime_size_crc:
-						    same_data = e_file->same_data_as(*f_file, true, hourshift);
-						    break;
 						default:
 						    throw SRC_BUG;
 						}

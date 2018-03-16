@@ -39,9 +39,8 @@ namespace libdar
 
     enum class modified_data_detection //< how to detect data has changed when some fields
     {
-	any_inode_change,     //< historical behavior, resave an inode on any metadata change
-        mtime_size,           //< default behavior since release 2.6.0 resave only if file size of mtime changed
-        mtime_size_crc        //< extended verification where if size and mtime stayed the same, CRC computation and comparison is done
+	any_inode_change, //< historical behavior, resave an inode on any metadata change
+        mtime_size,       //< default behavior since release 2.6.0 resave only if file size of mtime changed
     };
 
 	/// @}
