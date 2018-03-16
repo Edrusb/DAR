@@ -69,6 +69,9 @@ namespace libdar
 	/// - it must not be used to point to non dynamically allocated memory using the "new" operator,
 	/// - pointed to memory must never be deleted manually, the last smart_pointer will do it at its
 	///   destruction time
+	/// \note IMPORTANT: smart_pointer cannot be shared between different threads, for efficiency,
+	/// the smart_pointer nor the pointed to object is protected against concurrent access of several
+	/// threads
 
     template <class T> class smart_pointer
     {
