@@ -62,6 +62,7 @@ extern "C"
 #include "data_tree.hpp"
 #include "database5.hpp"
 #include "tuyau.hpp"
+#include "archive_aux.hpp"
 
     /// \addtogroup API5
     /// @{
@@ -369,6 +370,9 @@ namespace libdar5
 
 	// from tuyau
     using libdar::tuyau;
+
+	// from archive_aux.hpp
+    using libdar::modified_data_detection;
 
 
 	///  libdar Major version defined at compilation time

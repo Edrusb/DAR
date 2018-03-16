@@ -335,6 +335,7 @@ bool get_args(shell_interaction & dialog,
     p.header_only = false;
     p.zeroing_neg_dates = false;
     p.ignored_as_symlink = "";
+    p.modet = modified_data_detection::mtime_size;
 
     try
     {
@@ -1941,6 +1942,16 @@ static bool get_args_recursive(recursive_param & rec,
 		    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
 		p.ignored_as_symlink = optarg;
 		break;
+	    case '\'':
+		if(optarg == nullptr)
+		    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+		if(strcasecmp(optarg, "any-change") == 0)
+		    p.modet = modified_data_detection::any_change;
+		else if(strcasecmp(optarg, "crc-comparison") == 0)
+		    p.modet = modified_data_detection::mtime_size_crc;
+		else
+		    throw Erange("get_args", string(gettext("Unknown parameter given to --modified-data-detection option: ")) + optarg);
+		break;
             case ':':
                 throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(optopt)));
             case '?':
@@ -2523,6 +2534,7 @@ const struct option *get_long_opt()
 	{"network-retry-delay", required_argument, nullptr, 'j'},
 	{"ignored-as-symlink", required_argument, nullptr, '\\'},
 	{"add-missing-catalogue", required_argument, nullptr, 'y'},
+	{"modified-data-detection", required_argument, nullptr, '\''},
         { nullptr, 0, nullptr, 0 }
     };
 

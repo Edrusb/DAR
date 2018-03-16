@@ -425,6 +425,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			}
 		    }
 		    create_options.set_ignored_as_symlink(ignored_as_symlink_listing);
+		    create_options.set_modified_data_detection(param.modet);
 
 		    cur = new (nothrow) archive(dialog, *param.fs_root, *param.sauv_root, param.filename, EXTENSION,
 						create_options,
