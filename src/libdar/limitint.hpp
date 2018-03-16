@@ -234,7 +234,7 @@ namespace libdar
 #ifndef INFININT_BASE_TYPE
 #error INFININT_BASE_TYPE not defined cannot instantiate template
 #else
-    typedef limitint<INFININT_BASE_TYPE> infinint;
+    using infinint = limitint<INFININT_BASE_TYPE>;
 #endif
 } // end of namespace
     ///////////////////////////////////////////////////////////////////////
