@@ -25,3 +25,4 @@ rm -rf "$SUB3"
 
 cd "$SUB1"
 rm  blockdev
+chgrp sys plain_file2.txt

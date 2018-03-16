@@ -5,7 +5,7 @@ if [ $# -ne 2 ] ; then
   exit 1
 fi
 
-SUB1=S"$2"B
+SUB1=S"$2"B1
 SUB2=S"$2"B2
 SUB3=S"$2"B3
 
@@ -54,3 +54,7 @@ setfacl -m u:bin:rw- chardev
 mknod blockdev b 1 1
 ln chardev chardev_hard
 ln blockdev blockdev_hard
+echo "another simple plain file" > plain_file2.txt
+chgrp root plain_file2.txt
+
+
