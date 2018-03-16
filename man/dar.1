@@ -1039,7 +1039,7 @@ dar/libdar saves dates as a number of seconds since the beginning of year 1970, 
 -\\, --ignored-as-symlink <absolute path>[:<absolute path>[:...]]
 When dar reach a inode which is part of this provided column separated list, if this inode is not a symlink this option has no effect, but if it is a symlinks dar saves the file the symlink points to and not the symlink itself as dar does by default. In particular, if the pointed to inode is a directory dar recurses in that directory. You can also pass this list as argument to the DAR_IGNORED_AS_SYMLINK environment instead of using --ignored-as-symlink (which takes precedence over the environment variable).
 .TP 20
--'\'', --modified-data-detection=any-change, --modified-data-detection=crc-comparison
+-'\\'', --modified-data-detection=any-change, --modified-data-detection=crc-comparison
 Before release 2.6.0, during a differential/incremental backup if any part of a file's inode metadata changed (ownership, permission, ...) even if the mtime (last modification time) and file size stood the same, dar had no choice than resaving the whole file for backup to record the metadata changes. This lead to a waste of backup time and space if in fact and for example only the ownership had been modified. You can still keep this historical behavior by invoking the
 .B
 --modified-data-detection=any-change
