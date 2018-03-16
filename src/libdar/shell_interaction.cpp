@@ -107,24 +107,15 @@ namespace libdar
 
 
 
-    shell_interaction::shell_interaction(shared_ptr<ostream> out,
-					 shared_ptr<ostream> interact,
-					 bool silent)
+    shell_interaction::shell_interaction(ostream & out,
+					 ostream & interact,
+					 bool silent): output(&out), inter(&interact)
     {
 	has_terminal = false;
 	beep = false;
 	at_once = 0;
 	count = 0;
 
-	if(out)
-	    output = out;
-	else
-	    throw SRC_BUG;
-
-	if(interact)
-	    inter = interact;
-	else
-	    throw SRC_BUG;
 	    // looking for an input terminal
 	    //
 	    // we do not use anymore standart input but open a new descriptor
@@ -216,12 +207,9 @@ namespace libdar
 	}
     }
 
-    void shell_interaction::change_non_interactive_output(shared_ptr<ostream> out)
+    void shell_interaction::change_non_interactive_output(ostream & out)
     {
-	if(out)
-	    output = out;
-	else
-	    throw SRC_BUG;
+	output = &out;
     }
 
     void shell_interaction::read_char(char & a)

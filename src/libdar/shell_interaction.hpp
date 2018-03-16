@@ -53,8 +53,8 @@ namespace libdar
 	    /// \param[in] out defines where are sent non interactive messages (informative messages)
 	    /// \param[in] interact defines where are sent interactive messages (those requiring an answer or confirmation) from the user
 	    /// \param[in] silent whether to send a warning message if the process is not attached to a terminal
-	shell_interaction(std::shared_ptr<std::ostream> out,
-			  std::shared_ptr<std::ostream> interact,
+	shell_interaction(std::ostream & out,
+			  std::ostream & interact,
 			  bool silent);
 
 	    /// copy constructor
@@ -72,7 +72,7 @@ namespace libdar
 	    /// destructor
 	~shell_interaction();
 
-	void change_non_interactive_output(std::shared_ptr<std::ostream> out);
+	void change_non_interactive_output(std::ostream & out);
 	void read_char(char & a);
 	void set_beep(bool mode) { beep = mode; };
 
@@ -100,8 +100,8 @@ namespace libdar
 	    // object fields and methods
 
 	S_I input;               //< filedescriptor to read from the user's answers
-	std::shared_ptr<std::ostream> output;    //< holds the destination for non interactive messages
-	std::shared_ptr<std::ostream> inter;     //< holds the destination for interactive messages
+	std::ostream *output;    //< holds the destination for non interactive messages
+	std::ostream *inter;     //< holds the destination for interactive messages
 	bool beep;               //< whether to issue bell char before displaying a new interactive message
         termios initial;         //< controlling terminal configuration when the object has been created
 	termios interaction;     //< controlling terminal configuration to use when requiring user interaction
