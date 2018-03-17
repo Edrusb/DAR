@@ -43,7 +43,6 @@ extern "C"
 
 #include "tools.hpp"
 #include "dar_suite.hpp"
-#include "shell_interaction.hpp"
 #include "libdar.hpp"
 #include "line_tools.hpp"
     // includes directives that should be removed once dar_xform will be integrated into libdar
@@ -52,7 +51,8 @@ extern "C"
 #include "macro_tools.hpp"
     //  ---
 
-using namespace libdar5;
+using namespace libdar;
+using namespace std;
 
 #define DAR_XFORM_VERSION "1.5.10"
 
@@ -79,7 +79,7 @@ static bool command_line(shell_interaction & dialog,
 
 static void show_usage(shell_interaction & dialog, const char *command_name);
 static void show_version(shell_interaction & dialog, const char *command_name);
-static S_I sub_main(shell_interaction & dialog, S_I argc, char *const argv[], const char **env);
+static S_I sub_main(shared_ptr<user_interaction> & dialog, S_I argc, char *const argv[], const char **env);
 
 int main(S_I argc, char *const argv[], const char **env)
 {
@@ -94,7 +94,7 @@ int main(S_I argc, char *const argv[], const char **env)
 			    &sub_main);
 }
 
-static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], const char **env)
+static S_I sub_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const argv[], const char **env)
 {
     path *src_dir = nullptr;
     path *dst_dir = nullptr;
@@ -111,10 +111,16 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
     infinint src_min_digits;
     infinint dst_min_digits;
     S_I ret = EXIT_OK;
+    shell_interaction *ptr = dynamic_cast<shell_interaction *>(dialog.get());
+
+    if(!dialog)
+	throw SRC_BUG;
+    if(ptr != nullptr)
+	throw SRC_BUG;
 
     try
     {
-	if(command_line(dialog, argc, argv, src_dir, src, dst_dir, dst, first, size,
+	if(command_line(*ptr, argc, argv, src_dir, src, dst_dir, dst, first, size,
 			warn, allow, pause, beep, execute_src, execute_dst, slice_perm, slice_user, slice_group, hash,
 			src_min_digits, dst_min_digits))
 	{
@@ -137,8 +143,8 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 	    {
 		if(dst != "-")
 		{
-		    dialog.change_non_interactive_output(&cout);
-		    tools_avoid_slice_overwriting_regex(dialog,
+		    ptr->change_non_interactive_output(cout);
+		    tools_avoid_slice_overwriting_regex(*dialog,
 							entrep,
 							dst,
 							EXTENSION,
@@ -150,10 +156,10 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 
 		thr.check_self_cancellation();
 
-		dialog.set_beep(beep);
+		ptr->set_beep(beep);
 		if(src == "-")
 		{
-		    libdar::trivial_sar *tmp_sar = new (nothrow) libdar::trivial_sar(user_interaction5_clone_to_shared_ptr(dialog), src, false);
+		    libdar::trivial_sar *tmp_sar = new (nothrow) libdar::trivial_sar(dialog, src, false);
 		    if(tmp_sar == nullptr)
 			throw Ememory("sub_main");
 		    format_07_compatible = tmp_sar->is_an_old_start_end_archive();
@@ -171,7 +177,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 		    else
 			throw SRC_BUG;
 
-		    libdar::sar *tmp_sar = new (nothrow) libdar::sar(user_interaction5_clone_to_shared_ptr(dialog),
+		    libdar::sar *tmp_sar = new (nothrow) libdar::sar(dialog,
 								     src,
 								     EXTENSION,
 								     entrep,
@@ -193,7 +199,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 
 		if(size.is_zero())
 		    if(dst == "-")
-			dst_sar = macro_tools_open_archive_tuyau(user_interaction5_clone_to_shared_ptr(dialog),
+			dst_sar = macro_tools_open_archive_tuyau(dialog,
 								 1,
 								 gf_write_only,
 								 internal_name,
@@ -206,7 +212,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 			    entrep.set_location(*dst_dir);
 			else
 			    throw SRC_BUG;
-			dst_sar = new (nothrow) libdar::trivial_sar(user_interaction5_clone_to_shared_ptr(dialog),
+			dst_sar = new (nothrow) libdar::trivial_sar(dialog,
 								    gf_write_only,
 								    dst,
 								    EXTENSION,
@@ -228,7 +234,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 			entrep.set_location(*dst_dir);
 		    else
 			throw SRC_BUG;
-		    dst_sar = new (nothrow) libdar::sar(user_interaction5_clone_to_shared_ptr(dialog),
+		    dst_sar = new (nothrow) libdar::sar(dialog,
 							gf_write_only,
 							dst,
 							EXTENSION,
@@ -274,7 +280,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 		catch(Egeneric & e)
 		{
 		    string msg = string(gettext("Error transforming the archive :"))+e.get_message();
-		    dialog.warning(msg);
+		    dialog->message(msg);
 		    throw Edata(msg);
 		}
 	    }
@@ -369,7 +375,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
                     }
                     catch(Edeci &e)
                     {
-                        dialog.warning(gettext("Invalid size for option -s"));
+                        dialog.message(gettext("Invalid size for option -s"));
                         return false;
                     }
                 }
@@ -389,11 +395,11 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
                             {
                                 first_file_size = tools_get_extended_size(optarg, suffix_base);
                                 if(first_file_size == file_size)
-                                    dialog.warning(gettext("Giving -S option the same value as the one given to -s is useless"));
+                                    dialog.message(gettext("Giving -S option the same value as the one given to -s is useless"));
                             }
                             catch(Egeneric &e)
                             {
-                                dialog.warning(gettext("Invalid size for option -S"));
+                                dialog.message(gettext("Invalid size for option -S"));
                                 return false;
                             }
 
@@ -494,12 +500,12 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
             // reading arguments remain on the command line
         if(optind + 2 > argc)
         {
-            dialog.warning(gettext("Missing source or destination argument on command line, see -h option for help"));
+            dialog.message(gettext("Missing source or destination argument on command line, see -h option for help"));
             return false;
         }
         if(optind + 2 < argc)
         {
-            dialog.warning(gettext("Too many argument on command line, see -h option for help"));
+            dialog.message(gettext("Too many argument on command line, see -h option for help"));
             return false;
         }
         if(string(argv[optind]) != string(""))
@@ -509,14 +515,14 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
 	}
         else
         {
-            dialog.warning(gettext("Invalid argument as source archive"));
+            dialog.message(gettext("Invalid argument as source archive"));
             return false;
         }
         if(string(argv[optind+1]) != string(""))
             tools_split_path_basename(argv[optind+1], dst_dir, dst);
         else
         {
-            dialog.warning(gettext("Invalid argument as destination archive"));
+            dialog.message(gettext("Invalid argument as destination archive"));
             return false;
         }
 
@@ -541,7 +547,7 @@ static void show_usage(shell_interaction & dialog, const char *command_name)
 {
     string name;
     tools_extract_basename(command_name, name);
-    dialog.change_non_interactive_output(&cout);
+    dialog.change_non_interactive_output(cout);
 
     dialog.printf("usage :\t %s [options] [<path>/]<basename> [<path>/]<basename>\n", name.c_str());
     dialog.printf("       \t %s -h\n",name.c_str());
@@ -576,7 +582,7 @@ static void show_version(shell_interaction & dialog, const char *command_name)
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    dialog.change_non_interactive_output(&cout);
+    dialog.change_non_interactive_output(cout);
 
     dialog.printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n\n", name.c_str(), DAR_XFORM_VERSION);
     if(maj > 2)
@@ -587,7 +593,7 @@ static void show_version(shell_interaction & dialog, const char *command_name)
     dialog.printf("\n");
     dialog.printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT, __VERSION__);
     dialog.printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), name.c_str(), PACKAGE_VERSION);
-    dialog.warning(tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details\n type `%s -W'."), name.c_str(), "dar")
+    dialog.message(tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details\n type `%s -W'."), name.c_str(), "dar")
 		   + tools_printf(gettext(" This is free software, and you are welcome\n to redistribute it under certain conditions;"))
 		   + tools_printf(gettext(" type `%s -L | more'\n for details.\n\n"), "dar"));
 }

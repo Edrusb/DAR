@@ -44,7 +44,7 @@ extern "C"
 #include "tuyau.hpp"
 
 using namespace std;
-using namespace libdar5;
+using namespace libdar;
 
 
 ////
@@ -754,7 +754,7 @@ void line_tools_crypto_split_algo_pass(const secu_string & all,
 
     if(all.get_size() == 0)
     {
-	algo = crypto_none;
+	algo = crypto_algo::none;
 	pass.clear();
     }
     else
@@ -774,25 +774,25 @@ void line_tools_crypto_split_algo_pass(const secu_string & all,
 	    no_cipher_given = (tmp == "");
 
 	    if(tmp == "scrambling" || tmp == "scram")
-		algo = crypto_scrambling;
+		algo = crypto_algo::scrambling;
 	    else
 		if(tmp == "none")
-		    algo = crypto_none;
+		    algo = crypto_algo::none;
 		else
 		    if(tmp == "blowfish" || tmp == "bf" || tmp == "")
-			algo = crypto_blowfish; // blowfish is the default cypher ("")
+			algo = crypto_algo::blowfish; // blowfish is the default cypher ("")
 		    else
 			if(tmp == "aes" || tmp == "aes256")
-			    algo = crypto_aes256;
+			    algo = crypto_algo::aes256;
 			else
 			    if(tmp == "twofish" || tmp == "twofish256")
-				algo = crypto_twofish256;
+				algo = crypto_algo::twofish256;
 			    else
 				if(tmp == "serpent" || tmp == "serpent256")
-				    algo = crypto_serpent256;
+				    algo = crypto_algo::serpent256;
 				else
 				    if(tmp == "camellia" || tmp == "camellia256")
-					algo = crypto_camellia256;
+					algo = crypto_algo::camellia256;
 				    else
 					if(tmp == "gnupg")
 					{
@@ -807,7 +807,7 @@ void line_tools_crypto_split_algo_pass(const secu_string & all,
 	else // no ':' using blowfish as default cypher
 	{
 	    no_cipher_given = true;
-	    algo = crypto_blowfish;
+	    algo = crypto_algo::blowfish;
 	    pass = all;
 	}
     }
@@ -862,11 +862,11 @@ void line_tools_display_signatories(user_interaction & ui, const list<signator> 
 	}
 	tmp += it->fingerprint + "|";
 	tmp += tools_display_date(it->signing_date) + " |";
-	ui.warning(tmp);
+	ui.message(tmp);
 	if(it->key_validity == signator::expired)
 	{
 	    tmp = "                  |" + tools_display_date(it->signature_expiration_date);
-	    ui.warning(tmp);
+	    ui.message(tmp);
 	}
 
 	++it;
@@ -875,14 +875,9 @@ void line_tools_display_signatories(user_interaction & ui, const list<signator> 
     ui.printf(" For more information about a key, use the command: gpg --list-key <fingeprint>");
 }
 
-void line_tools_read_from_pipe(user_interaction & dialog, S_I fd, tlv_list & result)
+void line_tools_read_from_pipe(shared_ptr<user_interaction> & dialog, S_I fd, tlv_list & result)
 {
-    user_interaction *tmp = dialog.clone();
-
-    if(tmp == nullptr)
-	throw Ememory("line_tools_read_from_pipe");
-
-    tuyau tube = tuyau(shared_ptr<user_interaction>(tmp), fd);
+    tuyau tube = tuyau(dialog, fd);
     result.read(tube);
 }
 

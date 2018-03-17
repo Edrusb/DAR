@@ -54,7 +54,7 @@ extern "C"
 
 #include "tools.hpp"
 #include "dar_suite.hpp"
-#include "libdar5.hpp"
+#include "libdar.hpp"
 #include "line_tools.hpp"
 
     // to be removed when dar_slave will be part of libdar
@@ -65,7 +65,7 @@ extern "C"
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define OPT_STRING "i:o:hVE:Qj9:"
 
-using namespace libdar5;
+using namespace libdar;
 using namespace std;
 
 #define DAR_SLAVE_VERSION "1.4.10"
@@ -76,7 +76,7 @@ static bool command_line(shell_interaction & dialog,
 			 infinint & min_digits);
 static void show_usage(shell_interaction & dialog, const char *command);
 static void show_version(shell_interaction & dialog, const char *command);
-static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[], const char **env);
+static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const argv[], const char **env);
 
 int main(S_I argc, char * const argv[], const char **env)
 {
@@ -91,7 +91,7 @@ int main(S_I argc, char * const argv[], const char **env)
 			    &little_main);
 }
 
-static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[], const char **env)
+static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const argv[], const char **env)
 {
     path *chemin = nullptr;
     string filename;
@@ -99,8 +99,14 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
     string output_pipe;
     string execute;
     infinint min_digits;
+    shell_interaction *ptr = dynamic_cast<shell_interaction *>(dialog.get());
 
-    if(command_line(dialog, argc, argv, chemin, filename, input_pipe, output_pipe, execute, min_digits))
+    if(!dialog)
+	throw SRC_BUG;
+    if(ptr != nullptr)
+	throw SRC_BUG;
+
+    if(command_line(*ptr, argc, argv, chemin, filename, input_pipe, output_pipe, execute, min_digits))
     {
 	libdar::tuyau *input = nullptr;
 	libdar::tuyau *output = nullptr;
@@ -113,7 +119,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	entrep.set_location(*chemin);
         try
         {
-	    source = new (nothrow) libdar::sar(user_interaction5_clone_to_shared_ptr(dialog),
+	    source = new (nothrow) libdar::sar(dialog,
 					       filename,
 					       EXTENSION,
 					       entrep,
@@ -124,7 +130,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
             if(source == nullptr)
                 throw Ememory("little_main");
 
-            tools_open_pipes(user_interaction5_clone_to_shared_ptr(dialog),
+            tools_open_pipes(dialog,
 			     input_pipe,
 			     output_pipe,
 			     input,
@@ -140,7 +146,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
             }
             catch(Erange &e)
             {
-                dialog.warning(e.get_message());
+                dialog->message(e.get_message());
                 throw Edata(e.get_message());
             }
         }
@@ -179,7 +185,7 @@ static bool command_line(shell_interaction & dialog,
 
     if(argc < 1)
     {
-        dialog.warning(gettext("Cannot read arguments on command line, aborting"));
+        dialog.message(gettext("Cannot read arguments on command line, aborting"));
         return false;
     }
 
@@ -193,7 +199,7 @@ static bool command_line(shell_interaction & dialog,
             if(input_pipe == "")
                 input_pipe = optarg;
             else
-                dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                dialog.message(tools_printf(gettext(ONLY_ONCE), char(lu)));
             break;
         case 'o':
             if(optarg == nullptr)
@@ -201,7 +207,7 @@ static bool command_line(shell_interaction & dialog,
             if(output_pipe == "")
                 output_pipe = optarg;
             else
-                dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                dialog.message(tools_printf(gettext(ONLY_ONCE), char(lu)));
             break;
         case 'h':
             show_usage(dialog, argv[0]);
@@ -239,13 +245,13 @@ static bool command_line(shell_interaction & dialog,
 
     if(optind + 1 > argc)
     {
-        dialog.warning(gettext("Missing archive basename, see -h option for help"));
+        dialog.message(gettext("Missing archive basename, see -h option for help"));
         return false;
     }
 
     if(optind + 1 < argc)
     {
-        dialog.warning(gettext("Too many argument on command line, see -h option for help"));
+        dialog.message(gettext("Too many argument on command line, see -h option for help"));
         return false;
     }
 
@@ -258,7 +264,7 @@ static void show_usage(shell_interaction & dialog, const char *command)
 {
     string cmd;
     tools_extract_basename(command, cmd);
-    dialog.change_non_interactive_output(&cout);
+    dialog.change_non_interactive_output(cout);
 
     dialog.printf("\nusage : \n");
     dialog.printf("  command1 | %s [options] [<path>/]basename | command2\n", cmd.c_str());
@@ -281,7 +287,7 @@ static void show_version(shell_interaction & dialog, const char *command)
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    dialog.change_non_interactive_output(&cout);
+    dialog.change_non_interactive_output(cout);
     dialog.printf("\n %s version %s Copyright (C) 2002-2052 Denis Corbin\n\n", cmd.c_str(), DAR_SLAVE_VERSION);
     if(maj > 2)
 	dialog.printf(gettext(" Using libdar %u.%u.%u built with compilation time options:\n"), maj, med, min);
@@ -291,7 +297,7 @@ static void show_version(shell_interaction & dialog, const char *command)
     dialog.printf("\n");
     dialog.printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT,  __VERSION__);
     dialog.printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), cmd.c_str(), PACKAGE_VERSION);
-    dialog.warning(tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY;"), cmd.c_str())
+    dialog.message(tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY;"), cmd.c_str())
 		   + tools_printf(gettext(" for details\n type `dar -W'."))
 		   + tools_printf(gettext(" This is free software, and you are welcome\n to redistribute it under certain conditions;"))
 		   + tools_printf(gettext(" type `dar -L | more'\n for details.\n\n")));

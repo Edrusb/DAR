@@ -1,4 +1,4 @@
-//*********************************************************************/
+/*********************************************************************/
 // dar - disk archive - a backup/restoration program
 // Copyright (C) 2002-2052 Denis Corbin
 //
@@ -26,7 +26,7 @@
 #include <new>
 #include <vector>
 
-#include "libdar5.hpp"
+#include "libdar.hpp"
 #include "shell_interaction.hpp"
 #include "dar_suite.hpp"
 #include "command_line.hpp"
@@ -37,14 +37,14 @@
 #endif
 
 using namespace std;
-using namespace libdar5;
+using namespace libdar;
 
 static void display_sauv_stat(user_interaction & dialog, const statistics & st);
 static void display_rest_stat(user_interaction & dialog, const statistics & st);
 static void display_diff_stat(user_interaction & dialog, const statistics &st);
 static void display_test_stat(user_interaction & dialog, const statistics & st);
 static void display_merge_stat(user_interaction & dialog, const statistics & st);
-static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[], const char **env);
+static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const argv[], const char **env);
 
 int main(S_I argc, char * const argv[], const char **env)
 {
@@ -59,7 +59,7 @@ int main(S_I argc, char * const argv[], const char **env)
 			    &little_main);
 }
 
-static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[], const char **env)
+static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const argv[], const char **env)
 {
     S_I ret = EXIT_OK;
     line_param param;
@@ -74,6 +74,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
     const char *env_prv_filekey = tools_get_from_env(env, "DAR_SFTP_PRIVATE_KEYFILE");
     const char *env_ignored_as_symlink = tools_get_from_env(env, "DAR_IGNORED_AS_SYMLINK");
 
+    if(!dialog)
+	throw SRC_BUG;
     if(home == nullptr)
         home = "/";
     if(env_knownhosts != nullptr)
@@ -98,14 +100,13 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
     }
     else // get_args is OK, we've got a valid command line
     {
-	archive *arch = nullptr;
-	archive *aux = nullptr;
-	archive *cur = nullptr;
 	entrepot_libcurl *repo = nullptr;
 	entrepot_libcurl *ref_repo = nullptr;
 	entrepot_libcurl *aux_repo = nullptr;
+	shell_interaction *ptr = dynamic_cast<shell_interaction *>(dialog.get());
 
-        dialog.set_beep(param.beep);
+	if(ptr != nullptr)
+	    ptr->set_beep(param.beep);
 
 	if(param.display_masks)
 	{
@@ -113,52 +114,60 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	    if(param.subtree != nullptr)
 	    {
 		string res = param.subtree->dump(initial_prefix);
-		dialog.warning("directory tree filter:");
-		dialog.warning(res);
-		dialog.warning("");
+		dialog->message("directory tree filter:");
+		dialog->message(res);
+		dialog->message("");
 	    }
 
 	    if(param.selection != nullptr)
 	    {
 		string res = param.selection->dump(initial_prefix);
-		dialog.warning("filename filter:");
-		dialog.warning(res);
-		dialog.warning("");
+		dialog->message("filename filter:");
+		dialog->message(res);
+		dialog->message("");
 	    }
 
 	    if(param.ea_mask != nullptr)
 	    {
 		string res = param.ea_mask->dump(initial_prefix);
-		dialog.warning("EA filter:");
-		dialog.warning(res);
-		dialog.warning("");
+		dialog->message("EA filter:");
+		dialog->message(res);
+		dialog->message("");
 	    }
 
 	    if(param.compress_mask != nullptr)
 	    {
 		string res = param.compress_mask->dump(initial_prefix);
-		dialog.warning("Compression filter:");
-		dialog.warning(res);
-		dialog.warning("");
+		dialog->message("Compression filter:");
+		dialog->message(res);
+		dialog->message("");
 	    }
 
 	    if(param.backup_hook_mask != nullptr)
 	    {
 		string res = param.backup_hook_mask->dump(initial_prefix);
-		dialog.warning("backup hook filter:");
-		dialog.warning(res);
-		dialog.warning("");
+		dialog->message("backup hook filter:");
+		dialog->message(res);
+		dialog->message("");
 	    }
 	}
 
         if(param.filename != "-"
 	   || (param.output_pipe != "" && param.op != create && param.op != isolate && param.op != merging))
-            dialog.change_non_interactive_output(&cout);
+	{
+	    shell_interaction *ptr = dynamic_cast<shell_interaction *>(dialog.get());
+
+	    if(ptr != nullptr)
+		ptr->change_non_interactive_output(cout);
+	}
             // standart output can be used to send non interactive
             // messages
 
 	try
 	{
+	    shared_ptr<archive> arch;
+	    shared_ptr<archive> aux;
+	    unique_ptr<archive> cur;
 	    statistics st = false;
 	    secu_string tmp_pass;
 	    crypto_algo crypto, aux_crypto;
@@ -239,7 +248,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 						      no_cipher_given,
 						      recipients);
 		    if(param.op == merging && param.aux_root != nullptr && param.info_details)
-			dialog.warning(gettext("Considering the (first) archive of reference:"));
+			dialog->message(gettext("Considering the (first) archive of reference:"));
 		    if(param.sequential_read && param.delta_diff)
 			throw Erange("little_main",gettext("Sequential reading of the archive of reference is not possible when delta difference is requested, you need to read the archive of reference in direct access mode (default mode)"));
 
@@ -248,7 +257,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    // since archive format 9 crypto algo used
 			    // is stored in the archive, it will be used
 			    // unless we specify explicitely the cipher to use
-			read_options.set_crypto_algo(crypto_none);
+			read_options.set_crypto_algo(crypto_algo::none);
 		    else
 			read_options.set_crypto_algo(crypto);
 		    read_options.set_crypto_pass(tmp_pass);
@@ -270,15 +279,19 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    }
 		    if(ref_repo != nullptr)
 			read_options.set_entrepot(*ref_repo);
+
 		    if(param.op != repairing)
 		    {
-			arch = new (nothrow) archive(dialog, *param.ref_root, *param.ref_filename, EXTENSION,
-						     read_options);
-			if(arch == nullptr)
+			arch.reset(new (nothrow) archive(dialog,
+							 *param.ref_root,
+							 *param.ref_filename,
+							 EXTENSION,
+							 read_options));
+			if(!arch)
 			    throw Ememory("little_main");
 		    }
-		    else
-			arch = nullptr;
+		    else // repairing
+			arch.reset();
 		}
 
 		if(param.aux_root != nullptr && param.aux_filename != nullptr)
@@ -288,7 +301,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    if(param.op == merging)
 		    {
 			if(param.info_details)
-			    dialog.warning(gettext("Considering the second (alias auxiliary) archive of reference:"));
+			    dialog->message(gettext("Considering the second (alias auxiliary) archive of reference:"));
 			line_tools_crypto_split_algo_pass(param.aux_pass,
 							  aux_crypto,
 							  tmp_pass,
@@ -299,7 +312,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 				// since archive format 9 crypto algo used
 				// is stored in the archive, it will be used
 				// unless we specify explicitely the cipher to use
-			    read_options.set_crypto_algo(crypto_none);
+			    read_options.set_crypto_algo(crypto_algo::none);
 			else
 			    read_options.set_crypto_algo(aux_crypto);
 			read_options.set_crypto_pass(tmp_pass);
@@ -315,9 +328,12 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			if(aux_repo != nullptr)
 			    read_options.set_entrepot(*aux_repo);
 
-			aux = new (nothrow) archive(dialog, *param.aux_root, *param.aux_filename, EXTENSION,
-						    read_options);
-			if(aux == nullptr)
+			aux.reset(new (nothrow) archive(dialog,
+							*param.aux_root,
+							*param.aux_filename,
+							EXTENSION,
+							read_options));
+			if(!aux)
 			    throw Ememory("little_main");
 		    }
 		}
@@ -332,7 +348,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		{
 		case create:
 		    create_options.clear();
-		    if(arch != nullptr)
+		    if(arch)
 		    {
 			if(!param.delta_sig && !param.delta_diff)
 				// we may need to copy delta_sig
@@ -342,7 +358,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 				// is requested
 				// We may also need to read delta_sig
 				// to perform the delta difference
-			    arch->drop_all_filedescriptors(dialog);
+			    arch->drop_all_filedescriptors();
 			create_options.set_reference(arch);
 		    }
 		    create_options.set_selection(*param.selection);
@@ -427,13 +443,17 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    create_options.set_ignored_as_symlink(ignored_as_symlink_listing);
 		    create_options.set_modified_data_detection(param.modet);
 
-		    cur = new (nothrow) archive(dialog, *param.fs_root, *param.sauv_root, param.filename, EXTENSION,
-						create_options,
-						&st);
-		    if(cur == nullptr)
+		    cur.reset(new (nothrow) archive(dialog,
+						    *param.fs_root,
+						    *param.sauv_root,
+						    param.filename,
+						    EXTENSION,
+						    create_options,
+						    &st));
+		    if(!cur)
 			throw Ememory("little_main");
 		    if(!param.quiet)
-			display_sauv_stat(dialog, st);
+			display_sauv_stat(*dialog, st);
 		    break;
 		case merging:
 		    merge_options.clear();
@@ -484,17 +504,17 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    if(repo != nullptr)
 			merge_options.set_entrepot(*repo);
 
-		    cur = new (nothrow) archive(dialog,  // user_interaction &
-						*param.sauv_root,  //const path &
-						arch,              // archive *
-						param.filename,    // const string &
-						EXTENSION,         // const string &
-						merge_options,
-						&st);              // statistics*
-		    if(cur == nullptr)
+		    cur.reset(new (nothrow) archive(dialog,            // user_interaction &
+						    *param.sauv_root,  //const path &
+						    arch,              // the mandatory archive of reference
+						    param.filename,    // const string &
+						    EXTENSION,         // const string &
+						    merge_options,
+						    &st));             // statistics*
+		    if(!cur)
 			throw Ememory("little_main");
 		    if(!param.quiet)
-			display_merge_stat(dialog, st);
+			display_merge_stat(*dialog, st);
 		    break;
 		case repairing:
 		    repair_options.clear();
@@ -526,16 +546,16 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    if(repo != nullptr)
 			repair_options.set_entrepot(*repo);
 
-		    cur = new (nothrow) archive(dialog,
-						*param.ref_root,
-						*param.ref_filename,
-						EXTENSION,
-						read_options,
-						*param.sauv_root,
-						param.filename,
-						EXTENSION,
-						repair_options);
-		    if(cur == nullptr)
+		    cur.reset(new (nothrow) archive(dialog,
+						    *param.ref_root,
+						    *param.ref_filename,
+						    EXTENSION,
+						    read_options,
+						    *param.sauv_root,
+						    param.filename,
+						    EXTENSION,
+						    repair_options));
+		    if(!cur)
 			throw Ememory("little_main");
 		    break;
 		default:
@@ -545,18 +565,9 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    // making some room in memory
 
 		if(param.info_details)
-		    dialog.warning(gettext("Making room in memory (releasing memory used by archive of reference)..."));
-
-		if(arch != nullptr)
-		{
-		    delete arch;
-		    arch = nullptr;
-		}
-		if(aux != nullptr)
-		{
-		    delete aux;
-		    aux = nullptr;
-		}
+		    dialog->message(gettext("Making room in memory (releasing memory used by archive of reference)..."));
+		arch.reset();
+		aux.reset();
 
 		    // checking for onfly isolation
 
@@ -573,7 +584,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			if(param.op == create)
 			{
 			    if(!param.quiet)
-				dialog.warning(gettext("Now performing on-fly isolation..."));
+				dialog->message(gettext("Now performing on-fly isolation..."));
 			    if(cur == nullptr)
 				throw SRC_BUG;
 			    line_tools_crypto_split_algo_pass(param.aux_pass,
@@ -587,15 +598,15 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    isolate_options.set_info_details(param.info_details);
 			    isolate_options.set_pause(param.pause);
 			    if(compile_time::libbz2())
-				isolate_options.set_compression(bzip2);
+				isolate_options.set_compression(compression::bzip2);
 			    else
 				if(compile_time::libz())
-				    isolate_options.set_compression(gzip);
+				    isolate_options.set_compression(compression::gzip);
 				else
 				    if(compile_time::liblzo())
-					isolate_options.set_compression(lzo);
+					isolate_options.set_compression(compression::lzo);
 				    else // no compression
-					isolate_options.set_compression(none);
+					isolate_options.set_compression(compression::none);
 			    isolate_options.set_execute(param.aux_execute);
 			    isolate_options.set_crypto_algo(aux_crypto);
 			    isolate_options.set_crypto_pass(tmp_pass);
@@ -621,8 +632,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    if(aux_repo != nullptr)
 				isolate_options.set_entrepot(*aux_repo);
 
-			    cur->op_isolate(dialog,
-					    *param.aux_root,
+			    cur->op_isolate(*param.aux_root,
 					    *param.aux_filename,
 					    EXTENSION,
 					    isolate_options);
@@ -640,7 +650,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			// since archive format 9 crypto algo used
 			// is stored in the archive, it will be used
 			// unless we specify explicitely the cipher to use
-		    read_options.set_crypto_algo(crypto_none);
+		    read_options.set_crypto_algo(crypto_algo::none);
 		else
 		    read_options.set_crypto_algo(crypto);
 		read_options.set_crypto_pass(tmp_pass);
@@ -659,18 +669,16 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    // yes this is "ref_repo" where is located the -A-pointed-to archive
 		    // -C-pointed-to archive is located in the "repo" entrepot
 
-		arch = new (nothrow) archive(dialog,
-					     *param.ref_root,
-					     *param.ref_filename,
-					     EXTENSION,
-					     read_options);
-		if(arch == nullptr)
+		arch.reset(new (nothrow) archive(dialog,
+						 *param.ref_root,
+						 *param.ref_filename,
+						 EXTENSION,
+						 read_options));
+		if(!arch)
 		    throw Ememory("little_main");
-		else
-		{
-		    if(!param.delta_sig)
-			arch->drop_all_filedescriptors(dialog);
-		}
+
+		if(!param.delta_sig)
+		    arch->drop_all_filedescriptors();
 
 		line_tools_crypto_split_algo_pass(param.pass,
 						  crypto,
@@ -712,8 +720,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    // yes this is "ref_repo" where is located the -A-pointed-to archive
 		    // -C-pointed-to archive is located in the "repo" entrepot
 
-                arch->op_isolate(dialog,
-				 *param.sauv_root,
+                arch->op_isolate(*param.sauv_root,
 				 param.filename,
 				 EXTENSION,
 				 isolate_options);
@@ -729,7 +736,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			// since archive format 9 crypto algo used
 			// is stored in the archive, it will be used
 			// unless we specify explicitely the cipher to use
-		    read_options.set_crypto_algo(crypto_none);
+		    read_options.set_crypto_algo(crypto_algo::none);
 		else
 		    read_options.set_crypto_algo(crypto);
 		read_options.set_crypto_pass(tmp_pass);
@@ -761,7 +768,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    // since archive format 9 crypto algo used
 			    // is stored in the archive, it will be used
 			    // unless we specify explicitely the cipher to use
-			read_options.set_ref_crypto_algo(crypto_none);
+			read_options.set_ref_crypto_algo(crypto_algo::none);
 		    else
   		        read_options.set_ref_crypto_algo(ref_crypto);
 		    read_options.set_ref_crypto_pass(ref_tmp_pass);
@@ -772,12 +779,12 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			read_options.set_ref_entrepot(*ref_repo);
 		}
 
-		arch = new (nothrow) archive(dialog,
-					     *param.sauv_root,
-					     param.filename,
-					     EXTENSION,
-					     read_options);
-		if(arch == nullptr)
+		arch.reset(new (nothrow) archive(dialog,
+						 *param.sauv_root,
+						 param.filename,
+						 EXTENSION,
+						 read_options));
+		if(!arch)
 		    throw Ememory("little_main");
 
 		extract_options.clear();
@@ -819,12 +826,11 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		extract_options.set_ignore_deleted(param.not_deleted);
 		extract_options.set_fsa_scope(param.scope);
 
-                st = arch->op_extract(dialog,
-				      *param.fs_root,
+                st = arch->op_extract(*param.fs_root,
 				      extract_options,
 				      nullptr);
 		if(!param.quiet)
-		    display_rest_stat(dialog, st);
+		    display_rest_stat(*dialog, st);
                 if(st.get_errored() > 0)
                     throw Edata(gettext("All files asked could not be restored"));
                 break;
@@ -839,7 +845,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			// since archive format 9 crypto algo used
 			// is stored in the archive, it will be used
 			// unless we specify explicitely the cipher to use
-		    read_options.set_crypto_algo(crypto_none);
+		    read_options.set_crypto_algo(crypto_algo::none);
 		else
  		    read_options.set_crypto_algo(crypto);
 		read_options.set_crypto_pass(tmp_pass);
@@ -871,7 +877,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    // since archive format 9 crypto algo used
 			    // is stored in the archive, it will be used
 			    // unless we specify explicitely the cipher to use
-			read_options.set_ref_crypto_algo(crypto_none);
+			read_options.set_ref_crypto_algo(crypto_algo::none);
 		    else
 			read_options.set_ref_crypto_algo(ref_crypto);
 		    read_options.set_ref_crypto_pass(ref_tmp_pass);
@@ -881,12 +887,12 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    if(ref_repo != nullptr)
 			read_options.set_ref_entrepot(*ref_repo);
 		}
-		arch = new (nothrow) archive(dialog,
-					     *param.sauv_root,
-					     param.filename,
-					     EXTENSION,
-					     read_options);
-		if(arch == nullptr)
+		arch.reset(new (nothrow) archive(dialog,
+						 *param.sauv_root,
+						 param.filename,
+						 EXTENSION,
+						 read_options));
+		if(!arch)
 		    throw Ememory("little_main");
 
 		diff_options.clear();
@@ -903,11 +909,11 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		diff_options.set_hourshift(param.hourshift);
 		diff_options.set_compare_symlink_date(param.no_compare_symlink_date);
 		diff_options.set_fsa_scope(param.scope);
-                st = arch->op_diff(dialog, *param.fs_root,
+                st = arch->op_diff(*param.fs_root,
 				   diff_options,
 				   nullptr);
 		if(!param.quiet)
-		    display_diff_stat(dialog, st);
+		    display_diff_stat(*dialog, st);
                 if(st.get_errored() > 0 || st.get_deleted() > 0)
                     throw Edata(gettext("Some file comparisons failed"));
                 break;
@@ -922,7 +928,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			// since archive format 9 crypto algo used
 			// is stored in the archive, it will be used
 			// unless we specify explicitely the cipher to use
-		    read_options.set_crypto_algo(crypto_none);
+		    read_options.set_crypto_algo(crypto_algo::none);
 		else
 		    read_options.set_crypto_algo(crypto);
 		read_options.set_crypto_pass(tmp_pass);
@@ -954,7 +960,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    // since archive format 9 crypto algo used
 			    // is stored in the archive, it will be used
 			    // unless we specify explicitely the cipher to use
-			read_options.set_ref_crypto_algo(crypto_none);
+			read_options.set_ref_crypto_algo(crypto_algo::none);
 		    else
 			read_options.set_ref_crypto_algo(ref_crypto);
 		    read_options.set_ref_crypto_pass(ref_tmp_pass);
@@ -964,12 +970,12 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    if(ref_repo != nullptr)
 			read_options.set_ref_entrepot(*ref_repo);
 		}
-		arch = new (nothrow) archive(dialog,
-					     *param.sauv_root,
-					     param.filename,
-					     EXTENSION,
-					     read_options);
-		if(arch == nullptr)
+		arch.reset(new (nothrow) archive(dialog,
+						 *param.sauv_root,
+						 param.filename,
+						 EXTENSION,
+						 read_options));
+		if(!arch)
 		    throw Ememory("little_main");
 
 		test_options.clear();
@@ -980,9 +986,9 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 						 param.display_treated_only_dir);
 		test_options.set_display_skipped(param.display_skipped);
 		test_options.set_empty(param.empty);
-                st = arch->op_test(dialog, test_options, nullptr);
+                st = arch->op_test(test_options, nullptr);
 		if(!param.quiet)
-		    display_test_stat(dialog, st);
+		    display_test_stat(*dialog, st);
                 if(st.get_errored() > 0)
                     throw Edata(gettext("Some files are corrupted in the archive and it will not be possible to restore them"));
                 break;
@@ -998,7 +1004,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			// since archive format 9 crypto algo used
 			// is stored in the archive, it will be used
 			// unless we specify explicitely the cipher to use
-		    read_options.set_crypto_algo(crypto_none);
+		    read_options.set_crypto_algo(crypto_algo::none);
 		else
 		    read_options.set_crypto_algo(crypto);
 		read_options.set_crypto_pass(tmp_pass);
@@ -1016,28 +1022,28 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    read_options.set_entrepot(*repo);
 		read_options.set_header_only(param.header_only);
 
-		arch = new (nothrow) archive(dialog,
-					     *param.sauv_root,
-					     param.filename,
-					     EXTENSION,
-					     read_options);
-		if(arch == nullptr)
+		arch.reset(new (nothrow) archive(dialog,
+						 *param.sauv_root,
+						 param.filename,
+						 EXTENSION,
+						 read_options));
+		if(!arch)
 		    throw Ememory("little_main");
 
 		if(param.quiet)
 		{
 		    const list<signator> & gnupg_signed = arch->get_signatories();
-		    arch->summary(dialog);
-		    line_tools_display_signatories(dialog, gnupg_signed);
+		    arch->summary();
+		    line_tools_display_signatories(*dialog, gnupg_signed);
 		}
 		else
 		{
 		    if(param.info_details)
 		    {
 			const list<signator> & gnupg_signed = arch->get_signatories();
-			arch->summary(dialog);
-			line_tools_display_signatories(dialog, gnupg_signed);
-			dialog.pause(gettext("Continue listing archive contents?"));
+			arch->summary();
+			line_tools_display_signatories(*dialog, gnupg_signed);
+			dialog->pause(gettext("Continue listing archive contents?"));
 		    }
 		    listing_options.clear();
 		    listing_options.set_info_details(param.info_details);
@@ -1049,7 +1055,9 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    if(!param.file_size.is_zero() && param.list_mode == archive_options_listing::slicing)
 			listing_options.set_user_slicing(param.first_file_size, param.file_size);
 		    listing_options.set_sizes_in_bytes(param.sizes_in_bytes);
-		    arch->op_listing(dialog, listing_options);
+		    arch->op_listing(nullptr,
+				     nullptr,
+				     listing_options);
 		}
                 break;
             default:
@@ -1059,23 +1067,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	catch(...)
 	{
 	    if(!param.quiet)
-		dialog.warning(gettext("Final memory cleanup..."));
+		dialog->message(gettext("Final memory cleanup..."));
 
-	    if(arch != nullptr)
-	    {
-		delete arch;
-		arch = nullptr;
-	    }
-	    if(cur != nullptr)
-	    {
-		delete cur;
-		cur = nullptr;
-	    }
-	    if(aux != nullptr)
-	    {
-		delete aux;
-		aux = nullptr;
-	    }
 	    if(repo != nullptr)
 	    {
 		delete repo;
@@ -1095,23 +1088,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	}
 
 	if(param.info_details)
-	    dialog.warning(gettext("Final memory cleanup..."));
+	    dialog->message(gettext("Final memory cleanup..."));
 
-	if(arch != nullptr)
-	{
-	    delete arch;
-	    arch = nullptr;
-	}
-	if(cur != nullptr)
-	{
-	    delete cur;
-	    cur = nullptr;
-	}
-	if(aux != nullptr)
-	{
-	    delete aux;
-	    aux = nullptr;
-	}
 	if(repo != nullptr)
 	{
 	    delete repo;

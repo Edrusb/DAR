@@ -76,11 +76,10 @@ extern "C"
 #include "dar_suite.hpp"
 #include "no_comment.hpp"
 #include "config_file.hpp"
-#include "shell_interaction.hpp"
 #include "dar.hpp"
 #include "cygwin_adapt.hpp"
 #include "crit_action_cmd_line.hpp"
-#include "libdar5.hpp"
+#include "libdar.hpp"
 
 #define OPT_STRING "c:A:x:d:t:l:v::z::y:nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:8:{:}:j:\\:"
 
@@ -93,7 +92,7 @@ extern "C"
 
 
 using namespace std;
-using namespace libdar5;
+using namespace libdar;
 struct pre_mask
 {
     bool included;      // whether it is a include or exclude entry
@@ -124,10 +123,10 @@ static const U_I sparse_file_min_size_default = 15;
 static const char * AUXILIARY_TARGET = "auxiliary";
 static const char * REFERENCE_TARGET = "reference";
 
-static void show_license(shell_interaction & dialog);
-static void show_warranty(shell_interaction & dialog);
-static void show_version(shell_interaction & dialog, const char *command_name);
-static void usage(shell_interaction & dialog, const char *command_name);
+static void show_license(user_interaction & dialog);
+static void show_warranty(user_interaction & dialog);
+static void show_version(user_interaction & dialog, const char *command_name);
+static void usage(user_interaction & dialog, const char *command_name);
 static void split_compression_algo(const char *arg, compression & algo, U_I & level);
 static fsa_scope string_to_fsa(const string & arg);
 
@@ -138,7 +137,7 @@ const struct option *get_long_opt();
 struct recursive_param
 {
         // input parameters
-    shell_interaction *dialog;
+    shared_ptr<user_interaction> dialog;
     const char *home;
     const deque<string> dar_dcf_path;
     const deque<string> dar_duc_path;
@@ -165,13 +164,13 @@ struct recursive_param
     deque<pre_mask> path_delta_include_exclude;
     bool duc_and;
 
-    recursive_param(shell_interaction & x_dialog,
+    recursive_param(shared_ptr<user_interaction> & x_dialog,
                     const char *x_home,
                     const deque<string> & x_dar_dcf_path,
                     const deque<string> & x_dar_duc_path): dar_dcf_path(x_dar_dcf_path), dar_duc_path(x_dar_duc_path)
     {
-        dialog = new (nothrow) shell_interaction(x_dialog);
-        if(dialog == nullptr)
+        dialog = x_dialog;
+        if(!dialog)
             throw Ememory("recursive_param::recursive_param");
         home = x_home;
 
@@ -194,12 +193,6 @@ struct recursive_param
     {
         throw SRC_BUG;
     }
-
-    ~recursive_param()
-    {
-        if(dialog != nullptr)
-            delete dialog;
-    }
 };
 
 static bool get_args_recursive(recursive_param & rec,
@@ -208,7 +201,7 @@ static bool get_args_recursive(recursive_param & rec,
                                char  * const argv[]);
 
 
-static void make_args_from_file(user_interaction & dialog,
+static void make_args_from_file(shared_ptr<user_interaction> & dialog,
                                 operation op,
                                 const deque<string> & targets,
                                 const string & filename,
@@ -228,12 +221,7 @@ static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_m
 static mask *make_unordered_mask(deque<pre_mask> & listing, mask *(*make_include_mask) (const string & x, mask_opt opt), mask *(*make_exclude_mask)(const string & x, mask_opt opt), const path & prefix);
 static void add_non_options(S_I argc, char * const argv[], deque<string> & non_options);
 
-// #define DEBOGGAGE
-#ifdef DEBOGGAGE
-static void show_args(S_I argc, char *argv[]);
-#endif
-
-bool get_args(shell_interaction & dialog,
+bool get_args(shared_ptr<user_interaction> & dialog,
               const char *home,
               const deque<string> & dar_dcf_path,
               const deque<string> & dar_duc_path,
@@ -257,7 +245,7 @@ bool get_args(shell_interaction & dialog,
     p.display_skipped = false;
     p.display_finished = false;
     p.display_masks = false;
-    p.algo = none;
+    p.algo = compression::none;
     p.compression_level = 9;
     p.pause = 0;
     p.beep = false;
@@ -337,6 +325,9 @@ bool get_args(shell_interaction & dialog,
     p.ignored_as_symlink = "";
     p.modet = modified_data_detection::mtime_size;
 
+    if(!dialog)
+	throw SRC_BUG;
+
     try
     {
         opterr = 0;
@@ -365,16 +356,16 @@ bool get_args(shell_interaction & dialog,
                     {
                         if(!init_message_done)
                         {
-                            dialog.warning(gettext("User target found on command line or included file(s):"));
+                            dialog->message(gettext("User target found on command line or included file(s):"));
                             init_message_done = true;
                         }
-                        dialog.printf("\t%S", &(*it)); // yes, strange syntax, where "&(*it)" is not equal to "it" ... :-)
+                        dialog->printf("\t%S", &(*it)); // yes, strange syntax, where "&(*it)" is not equal to "it" ... :-)
                     }
                     ++it;
                 }
 
                 if(!init_message_done)
-                    dialog.warning(gettext("No user target found on command line"));
+                    dialog->message(gettext("No user target found on command line"));
             }
         }
 
@@ -403,13 +394,13 @@ bool get_args(shell_interaction & dialog,
             if(p.sauv_root == nullptr)
                 throw SRC_BUG;
         if(p.filename != "-")
-            tools_check_basename(dialog, *p.sauv_root, p.filename, EXTENSION);
+            tools_check_basename(*dialog, *p.sauv_root, p.filename, EXTENSION);
         if((p.op == merging || p.op == create) && p.aux_filename != nullptr)
         {
             if(p.aux_root == nullptr)
                 throw SRC_BUG;
             else
-                tools_check_basename(dialog, *p.aux_root, *p.aux_filename, EXTENSION);
+                tools_check_basename(*dialog, *p.aux_root, *p.aux_filename, EXTENSION);
         }
 
         if(p.fs_root == nullptr)
@@ -421,15 +412,15 @@ bool get_args(shell_interaction & dialog,
         if(rec.fixed_date_mode && p.op != create)
             throw Erange("get_args", gettext("-af option is only available with -c"));
         if(p.ref_filename != nullptr && p.op == listing)
-            dialog.warning(gettext("-A option is not available with -l"));
+            dialog->message(gettext("-A option is not available with -l"));
 	if(p.list_mode != archive_options_listing::normal)
-            dialog.warning(gettext("-T option is only available with -l"));
+            dialog->message(gettext("-T option is only available with -l"));
         if(p.op == isolate && p.ref_filename == nullptr)
             throw Erange("get_args", gettext("with -C option, -A option is mandatory"));
         if(p.op == merging && p.ref_filename == nullptr)
             throw Erange("get_args", gettext("with -+ option, -A option is mandatory"));
         if(p.op != extract && !p.warn_remove_no_match)
-            dialog.warning(gettext("-wa is only useful with -x option"));
+            dialog->message(gettext("-wa is only useful with -x option"));
         if(p.filename == "-" && p.ref_filename != nullptr && *p.ref_filename == "-"
            && p.output_pipe == "" && !p.sequential_read)
             throw Erange("get_args", gettext("-o is mandatory when using \"-A -\" with \"-c -\" \"-C -\" or \"-+ -\""));
@@ -438,73 +429,73 @@ bool get_args(shell_interaction & dialog,
             if(p.ref_root == nullptr)
                 throw SRC_BUG;
             else
-                tools_check_basename(dialog, *p.ref_root, *p.ref_filename, EXTENSION);
+                tools_check_basename(*dialog, *p.ref_root, *p.ref_filename, EXTENSION);
         }
 
-        if(p.algo != none && p.op != create && p.op != isolate && p.op != merging)
-            dialog.warning(gettext("-z option needs only to be used with -c -C or -+ options"));
+        if(p.algo != compression::none && p.op != create && p.op != isolate && p.op != merging)
+            dialog->message(gettext("-z option needs only to be used with -c -C or -+ options"));
         if(!p.first_file_size.is_zero() && p.file_size.is_zero())
             throw Erange("get_args", gettext("-S option requires the use of -s"));
         if(p.what_to_check != cat_inode::cf_all && (p.op == isolate || (p.op == create && p.ref_root == nullptr) || p.op == test || p.op == listing || p.op == merging))
-            dialog.warning(gettext("ignoring -O option, as it is useless in this situation"));
+            dialog->message(gettext("ignoring -O option, as it is useless in this situation"));
         if(p.what_to_check == cat_inode::cf_all
            && p.op == extract
-           && capability_CHOWN(dialog, p.info_details)
+           && capability_CHOWN(*dialog, p.info_details)
            && getuid() != 0) // uid == 0 for root
         {
             p.what_to_check = cat_inode::cf_ignore_owner;
             string msg = tools_printf(gettext("File ownership will not be restored as %s has not the CHOWN capability nor is running as root. to avoid this message use -O option"), cmd.c_str());
-            dialog.pause(msg);
+            dialog->pause(msg);
         }
         if(p.furtive_read_mode
-           && capability_FOWNER(dialog, p.info_details) != capa_set
+           && capability_FOWNER(*dialog, p.info_details) != capa_set
            && getuid() != 0)
         {
             if(p.op == create || p.op == diff)
-                dialog.printf(gettext("Furtive read mode has been disabled as %s has not the FOWNER capability nor is running as root"), cmd.c_str());
+                dialog->printf(gettext("Furtive read mode has been disabled as %s has not the FOWNER capability nor is running as root"), cmd.c_str());
             p.furtive_read_mode = false;
         }
 
         if(p.execute_ref != "" && p.ref_filename == nullptr)
-            dialog.warning(gettext("-F is only useful with -A option, for the archive of reference"));
+            dialog->message(gettext("-F is only useful with -A option, for the archive of reference"));
         if(p.pass_ref != "" && p.ref_filename == nullptr)
         {
-            dialog.warning(gettext("-J is only useful with -A option, for the archive of reference"));
+            dialog->message(gettext("-J is only useful with -A option, for the archive of reference"));
         }
         if(p.flat && p.op != extract)
-            dialog.warning(gettext("-f in only available with -x option, ignoring"));
+            dialog->message(gettext("-f in only available with -x option, ignoring"));
         if(p.min_compr_size != min_compr_size_default && p.op != create && p.op != merging)
-            dialog.warning(gettext("-m is only useful with -c"));
+            dialog->message(gettext("-m is only useful with -c"));
         if(!p.hourshift.is_zero())
         {
             if(p.op == create)
             {
                 if(p.ref_filename == nullptr)
-                    dialog.warning(gettext("-H is only useful with -A option when making a backup"));
+                    dialog->message(gettext("-H is only useful with -A option when making a backup"));
             }
             else
                 if(p.op == extract)
                 {
                     if(!rec.only_more_recent)
-                        dialog.warning(gettext("-H is only useful with -r option when extracting"));
+                        dialog->message(gettext("-H is only useful with -r option when extracting"));
                 }
                 else
                     if(p.op != diff)
-                        dialog.warning(gettext("-H is only useful with -c, -d or -x"));
+                        dialog->message(gettext("-H is only useful with -c, -d or -x"));
         }
 
         if(p.filter_unsaved && p.op != listing)
-            dialog.warning(gettext("-as is only available with -l, ignoring -as option"));
+            dialog->message(gettext("-as is only available with -l, ignoring -as option"));
         if(p.empty && p.op != create && p.op != extract && p.op != merging && p.op != test)
-            dialog.warning(gettext("-e is only useful with -x, -c or -+ options"));
+            dialog->message(gettext("-e is only useful with -x, -c or -+ options"));
         if(!p.alter_atime && p.op != create && p.op != diff)
-            dialog.warning(gettext("-ac is only useful with -c or -d"));
+            dialog->message(gettext("-ac is only useful with -c or -d"));
         if(p.same_fs && p.op != create)
-            dialog.warning(gettext("-M is only useful with -c"));
+            dialog->message(gettext("-M is only useful with -c"));
         if(p.snapshot && p.op != create)
-            dialog.warning(gettext("The snapshot backup (-A +) is only available with -c option, ignoring"));
+            dialog->message(gettext("The snapshot backup (-A +) is only available with -c option, ignoring"));
         if(p.cache_directory_tagging && p.op != create)
-            dialog.warning(gettext("The Cache Directory Tagging Standard is only useful while performing a backup, ignoring it here"));
+            dialog->message(gettext("The Cache Directory Tagging Standard is only useful while performing a backup, ignoring it here"));
 
         if((p.aux_root != nullptr || p.aux_filename != nullptr) && p.op != merging && p.op != create)
             throw Erange("get_args", gettext("-@ is only available with -+ and -c options"));
@@ -516,35 +507,35 @@ bool get_args(shell_interaction & dialog,
             throw Erange("get_args", tools_printf(gettext("-%% is only available with -+ option")));
 
         if(p.aux_pass != "" && p.aux_filename == nullptr)
-            dialog.warning(gettext("-$ is only useful with -@ option, for the auxiliary archive of reference"));
+            dialog->message(gettext("-$ is only useful with -@ option, for the auxiliary archive of reference"));
         if(p.aux_crypto_size != DEFAULT_CRYPTO_SIZE && p.aux_filename == nullptr)
-            dialog.printf(gettext("-%% is only useful with -@ option, for the auxiliary archive of reference"));
+            dialog->printf(gettext("-%% is only useful with -@ option, for the auxiliary archive of reference"));
         if(p.aux_execute != "" && p.aux_filename == nullptr)
-            dialog.warning(gettext("-~ is only useful with -@ option, for the auxiliary archive of reference"));
+            dialog->message(gettext("-~ is only useful with -@ option, for the auxiliary archive of reference"));
         if(p.keep_compressed && p.op != merging)
         {
-            dialog.warning(gettext("-ak is only available while merging (operation -+), ignoring -ak"));
+            dialog->message(gettext("-ak is only available while merging (operation -+), ignoring -ak"));
             p.keep_compressed = false;
         }
 
-        if(p.algo != none && p.op == merging && p.keep_compressed)
-            dialog.warning(gettext("Compression option (-z option) is useless and ignored when using -ak option"));
+        if(p.algo != compression::none && p.op == merging && p.keep_compressed)
+            dialog->message(gettext("Compression option (-z option) is useless and ignored when using -ak option"));
 
             // sparse files handling
 
         if(p.sparse_file_min_size != sparse_file_min_size_default)
         {
             if(p.op != merging && p.op != create)
-                dialog.warning(gettext("--sparse-file-min-size only available while saving or merging archives, ignoring"));
+                dialog->message(gettext("--sparse-file-min-size only available while saving or merging archives, ignoring"));
             else
                 if(p.op == merging && !rec.sparse_file_reactivation)
-                    dialog.warning(gettext("To use --sparse-file-min-size while merging archive, you need to use -ah option too, please check man page for details"));
+                    dialog->message(gettext("To use --sparse-file-min-size while merging archive, you need to use -ah option too, please check man page for details"));
         }
         if(p.op == merging && !rec.sparse_file_reactivation)
             p.sparse_file_min_size = 0; // disabled by default for archive merging
 
         if((p.not_deleted || p.only_deleted) && p.op != extract)
-            dialog.warning(gettext("-k option is only useful with -x option"));
+            dialog->message(gettext("-k option is only useful with -x option"));
 
         if(p.not_deleted && p.only_deleted)
             throw Erange("get_args", gettext("-konly and -kignore cannot be used at the same time"));
@@ -553,7 +544,7 @@ bool get_args(shell_interaction & dialog,
             throw Erange("get_args", gettext("-p and -Q options are mutually exclusives"));
 
         if(p.display_finished && p.op != create)
-            dialog.warning(gettext("-vf is only useful with -c option"));
+            dialog->message(gettext("-vf is only useful with -c option"));
 
 	if(p.op == repairing)
 	{
@@ -568,49 +559,49 @@ bool get_args(shell_interaction & dialog,
 	    if(rec.name_include_exclude.size() > 0 || rec.path_include_exclude.size() > 0)
 		throw Erange("get_args", gettext("-X, -I, -P, -g, -], -[ and any other file selection relative commands are not possible with -y option"));
 	    if(p.empty_dir)
-		dialog.warning(gettext("-D option is useless with -y option"));
+		dialog->message(gettext("-D option is useless with -y option"));
 	    if(rec.only_more_recent)
-		dialog.warning(gettext("-r option is useless with -y option"));
+		dialog->message(gettext("-r option is useless with -y option"));
 	    if(rec.ea_include_exclude.size() > 0)
 		throw Erange("get_args", gettext("-u, -U, -P, -g, -], -[ and any other EA selection relative commands are not possible with -y option"));
 	    if(p.what_to_check != cat_inode::cf_all)
 		throw Erange("get_args", gettext("-O option is not possible with -y option"));
 	    if(!p.hourshift.is_zero())
-		dialog.warning(gettext("-H option is useless with -y option"));
+		dialog->message(gettext("-H option is useless with -y option"));
 	    if(p.filter_unsaved)
-		dialog.warning(gettext("-as option is useless with -y option"));
+		dialog->message(gettext("-as option is useless with -y option"));
 	    if(rec.ea_erase)
-		dialog.warning(gettext("-ae option is useless with -y option"));
+		dialog->message(gettext("-ae option is useless with -y option"));
 	    if(p.decremental)
-		dialog.warning(gettext("-ad option is useless with -y option"));
+		dialog->message(gettext("-ad option is useless with -y option"));
 	    if(!p.security_check)
-		dialog.warning(gettext("-asecu option is useless with -y option"));
+		dialog->message(gettext("-asecu option is useless with -y option"));
 	    if(p.ignore_unknown_inode)
-		dialog.warning(gettext("-ai option is useless with -y option"));
+		dialog->message(gettext("-ai option is useless with -y option"));
 	    if(!p.no_compare_symlink_date)
-		dialog.warning(gettext("--alter=do-not-compare-symlink-mtime option is useless with -y option"));
+		dialog->message(gettext("--alter=do-not-compare-symlink-mtime option is useless with -y option"));
 	    if(p.same_fs)
-		dialog.warning(gettext("-M option is useless with -y option"));
+		dialog->message(gettext("-M option is useless with -y option"));
 	    if(p.aux_filename != nullptr)
-		dialog.warning(gettext("-@ option is useless with -y option"));
+		dialog->message(gettext("-@ option is useless with -y option"));
 	    if(p.overwrite != nullptr)
-		dialog.warning(gettext("-/ option is useless with -y option"));
+		dialog->message(gettext("-/ option is useless with -y option"));
 	    if(rec.backup_hook_include_exclude.size() > 0)
-		dialog.warning(gettext("-< and -> options are useless with -y option"));
+		dialog->message(gettext("-< and -> options are useless with -y option"));
 	    if(p.ea_name_for_exclusion != "")
-		dialog.warning(gettext("-5 option is useless with -y option"));
+		dialog->message(gettext("-5 option is useless with -y option"));
 	    if(p.delta_sig || !p.delta_diff)
-		dialog.warning(gettext("-8 option is useless with -y option"));
+		dialog->message(gettext("-8 option is useless with -y option"));
 	    if(rec.path_delta_include_exclude.size() > 0)
-		dialog.warning(gettext("-{ and -} options are useless with -y option"));
+		dialog->message(gettext("-{ and -} options are useless with -y option"));
 	    if(p.ignored_as_symlink != "")
-		dialog.warning(gettext("-\\ option is useless with -y option"));
-	    if(p.algo != none)
-		dialog.warning(gettext("compression (-z option) cannot be changed with -y option"));
+		dialog->message(gettext("-\\ option is useless with -y option"));
+	    if(p.algo != compression::none)
+		dialog->message(gettext("compression (-z option) cannot be changed with -y option"));
 	    if(p.keep_compressed)
-		dialog.warning(gettext("-ak option is useless with -y option"));
+		dialog->message(gettext("-ak option is useless with -y option"));
 	    if(p.sparse_file_min_size != sparse_file_min_size_default)
-		dialog.warning(gettext("-ah option is useless with -y option"));
+		dialog->message(gettext("-ah option is useless with -y option"));
 	    if(p.sequential_read)
 		throw Erange("get_args", gettext("--sequential-read is useless with -y option"));
 	}
@@ -654,15 +645,15 @@ bool get_args(shell_interaction & dialog,
             // generating mask for
             // compression selected files
             //
-        if(p.algo == none)
+        if(p.algo == compression::none)
         {
             if(!rec.compr_include_exclude.empty())
-                dialog.warning(gettext("-Y and -Z are only useful with compression (-z option), ignoring any -Y and -Z option"));
+                dialog->message(gettext("-Y and -Z are only useful with compression (-z option), ignoring any -Y and -Z option"));
             if(p.min_compr_size != min_compr_size_default)
-                dialog.warning(gettext("-m is only useful with compression (-z option), ignoring -m"));
+                dialog->message(gettext("-m is only useful with compression (-z option), ignoring -m"));
         }
 
-        if(p.algo != none)
+        if(p.algo != compression::none)
             if(rec.ordered_filters)
                 p.compress_mask = make_ordered_mask(rec.compr_include_exclude,
                                                     &make_include_exclude_name,
@@ -709,15 +700,15 @@ bool get_args(shell_interaction & dialog,
             {
                 p.backup_hook_execute = "";
                 if(p.op != create)
-                    dialog.warning(gettext("-= option is valid only while saving files, thus in conjunction with -c option, ignoring"));
+                    dialog->message(gettext("-= option is valid only while saving files, thus in conjunction with -c option, ignoring"));
                 else
-                    dialog.warning(gettext("-= option will be ignored as it is useless if you do not specify to which files or directories this backup hook is to be applied, thanks to -< and -> options. See man page for more details."));
+                    dialog->message(gettext("-= option will be ignored as it is useless if you do not specify to which files or directories this backup hook is to be applied, thanks to -< and -> options. See man page for more details."));
             }
         }
         else
             if(p.op != create)
             {
-                dialog.warning(gettext("backup hook feature (-<, -> or -= options) is only available when saving files, ignoring"));
+                dialog->message(gettext("backup hook feature (-<, -> or -= options) is only available when saving files, ignoring"));
                 p.backup_hook_mask = nullptr;
                 p.backup_hook_execute = "";
             }
@@ -785,7 +776,7 @@ bool get_args(shell_interaction & dialog,
             {
                 delete p.overwrite;
                 p.overwrite = nullptr;
-                dialog.warning(gettext("-/ option is only useful with -+ option, ignoring"));
+                dialog->message(gettext("-/ option is only useful with -+ option, ignoring"));
             }
         }
 
@@ -796,12 +787,12 @@ bool get_args(shell_interaction & dialog,
 
         if(p.user_comment != "")
             if(p.op != create && p.op != merging && p.op != isolate)
-                dialog.warning(gettext("-. option is only useful when merging, creating or isolating an archive, ignoring"));
+                dialog->message(gettext("-. option is only useful when merging, creating or isolating an archive, ignoring"));
             else
             {
                 p.user_comment = line_tools_expand_user_comment(p.user_comment, argc, argv);
                 if(p.info_details)
-                    dialog.printf(gettext("The following user comment will be placed in clear text in the archive: %S"), &p.user_comment);
+                    dialog->printf(gettext("The following user comment will be placed in clear text in the archive: %S"), &p.user_comment);
             }
         else
             p.user_comment = "N/A";
@@ -825,7 +816,7 @@ bool get_args(shell_interaction & dialog,
     }
     catch(Erange & e)
     {
-        dialog.warning(string(gettext("Parse error: ")) + e.get_message());
+        dialog->message(string(gettext("Parse error: ")) + e.get_message());
         return false;
     }
     return true;
@@ -937,7 +928,7 @@ static bool get_args_recursive(recursive_param & rec,
                                 // note that the namespace specification is necessary
                                 // due to similar existing name in std namespace under
                                 // certain OS (FreeBSD 10.0)
-                            libdar5::deci tmp = string(optarg);
+                            libdar::deci tmp = string(optarg);
                             p.fixed_date = tmp.computer();
                         }
                         catch(Edeci & e)
@@ -1027,8 +1018,8 @@ static bool get_args_recursive(recursive_param & rec,
                 if(optarg != nullptr)
                     split_compression_algo(optarg, p.algo, p.compression_level);
                 else
-                    if(p.algo == none)
-                        p.algo = gzip;
+                    if(p.algo == compression::none)
+                        p.algo = compression::gzip;
                     else
                         throw Erange("get_args", gettext("Choose only one compression algorithm"));
                 break;
@@ -1036,7 +1027,7 @@ static bool get_args_recursive(recursive_param & rec,
                 p.allow_over = false;
                 if(!p.warn_over)
                 {
-                    rec.dialog->warning(gettext("-w option is useless with -n"));
+                    rec.dialog->message(gettext("-w option is useless with -n"));
                     p.warn_over = false;
                 }
                 break;
@@ -1058,7 +1049,7 @@ static bool get_args_recursive(recursive_param & rec,
                         // note that the namespace specification is necessary
                         // due to similar existing name in std namespace under
                         // certain OS (FreeBSD 10.0)
-                    libdar5::deci conv = string(optarg);
+                    libdar::deci conv = string(optarg);
                     p.pause = conv.computer();
                 }
                 else
@@ -1130,7 +1121,7 @@ static bool get_args_recursive(recursive_param & rec,
                     }
                     catch(Edeci &e)
                     {
-                        rec.dialog->warning(tools_printf(gettext(INVALID_SIZE), char(lu)));
+                        rec.dialog->message(tools_printf(gettext(INVALID_SIZE), char(lu)));
                         return false;
                     }
                 }
@@ -1150,11 +1141,11 @@ static bool get_args_recursive(recursive_param & rec,
                             {
                                 p.first_file_size = tools_get_extended_size(optarg, rec.suffix_base);
                                 if(p.first_file_size == p.file_size)
-                                    rec.dialog->warning(gettext("Giving to -S option the same value as the one given to -s option is useless"));
+                                    rec.dialog->message(gettext("Giving to -S option the same value as the one given to -s option is useless"));
                             }
                             catch(Egeneric &e)
                             {
-                                rec.dialog->warning(tools_printf(gettext(INVALID_SIZE), char(lu)));
+                                rec.dialog->message(tools_printf(gettext(INVALID_SIZE), char(lu)));
                                 return false;
                             }
 
@@ -1219,15 +1210,15 @@ static bool get_args_recursive(recursive_param & rec,
                 return false;
             case 'D':
                 if(p.empty_dir)
-                    rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                    rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                     p.empty_dir = true;
                 break;
             case 'r':
                 if(!p.allow_over)
-                    rec.dialog->warning(gettext("-r is useless with -n"));
+                    rec.dialog->message(gettext("-r is useless with -n"));
                 if(rec.only_more_recent)
-                    rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                    rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                     rec.only_more_recent = true;
                 break;
@@ -1252,7 +1243,7 @@ static bool get_args_recursive(recursive_param & rec,
                 if(p.input_pipe == "")
                     p.input_pipe = optarg;
                 else
-                    rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                    rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 break;
             case 'o':
                 if(optarg == nullptr)
@@ -1260,11 +1251,11 @@ static bool get_args_recursive(recursive_param & rec,
                 if(p.output_pipe == "")
                     p.output_pipe = optarg;
                 else
-                    rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                    rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 break;
             case 'O':
                 if(p.what_to_check != cat_inode::cf_all)
-                    rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                    rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                     if(optarg == nullptr)
                         p.what_to_check = cat_inode::cf_ignore_owner;
@@ -1333,7 +1324,7 @@ static bool get_args_recursive(recursive_param & rec,
                 if(p.pass_ref == "")
                     p.pass_ref = secu_string(optarg, strlen(optarg));
                 else
-                    rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                    rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 break;
             case 'K':
                 if(optarg == nullptr)
@@ -1341,7 +1332,7 @@ static bool get_args_recursive(recursive_param & rec,
                 if(p.pass == "")
                     p.pass = secu_string(optarg, strlen(optarg));
                 else
-                    rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                    rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 break;
             case 'Y':
                 if(optarg == nullptr)
@@ -1374,7 +1365,7 @@ static bool get_args_recursive(recursive_param & rec,
                     bool ret;
                     try
                     {
-                        make_args_from_file(*rec.dialog,
+                        make_args_from_file(rec.dialog,
                                             p.op,
                                             rec.non_options,
                                             tmp_string,
@@ -1393,9 +1384,7 @@ static bool get_args_recursive(recursive_param & rec,
                         Erange modif = Erange("get_args", tools_printf(gettext("Error in included file (%s): "), optarg) + e.get_message());
                         throw modif;
                     }
-#if DEBOGGAGE
-                    show_args(rec_c, rec_v);
-#endif
+
                     S_I optind_mem = line_tools_reset_getopt(); // save the external variable to use recursivity (see getopt)
                         // reset getopt module
 
@@ -1438,32 +1427,32 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'f':
                 if(p.flat)
-                    rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                    rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                     p.flat = true;
                 break;
             case 'm':
                 if(p.min_compr_size != min_compr_size_default)
-                    rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                    rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                 {
                     if(optarg == nullptr)
                         throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                     p.min_compr_size = tools_get_extended_size(optarg, rec.suffix_base);
                     if(p.min_compr_size == min_compr_size_default)
-                        rec.dialog->warning(tools_printf(gettext("%d is the default value for -m, no need to specify it on command line, ignoring"), min_compr_size_default));
+                        rec.dialog->message(tools_printf(gettext("%d is the default value for -m, no need to specify it on command line, ignoring"), min_compr_size_default));
                     break;
                 }
             case 'N':
                 if(!rec.readconfig)
-                    rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                    rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                     rec.readconfig = false;
                 break;
             case ' ':
 #ifdef LIBDAR_NODUMP_FEATURE
                 if(p.nodump)
-                    rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                    rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                     p.nodump = true;
                 break;
@@ -1480,7 +1469,7 @@ static bool get_args_recursive(recursive_param & rec,
                             // note that the namespace specification is necessary
                             // due to similar existing name in std namespace under
                             // certain OS (FreeBSD 10.0)
-                        p.hourshift = libdar5::deci(string(optarg)).computer();
+                        p.hourshift = libdar::deci(string(optarg)).computer();
                     }
                     catch(Edeci & e)
                     {
@@ -1508,7 +1497,7 @@ static bool get_args_recursive(recursive_param & rec,
                 else if(strcasecmp("m", optarg) == 0 || strcasecmp("mask", optarg) == 0)
                 {
                     if(rec.ordered_filters)
-                        rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                        rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                     else
                         rec.ordered_filters = true;
                 }
@@ -1519,14 +1508,14 @@ static bool get_args_recursive(recursive_param & rec,
                 else if(strcasecmp("s", optarg) == 0 || strcasecmp("saved", optarg) == 0)
                 {
                     if(p.filter_unsaved)
-                        rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                        rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                     else
                         p.filter_unsaved = true;
                 }
                 else if(strcasecmp("e", optarg) == 0 || strcasecmp("erase_ea", optarg) == 0)
                 {
                     if(rec.ea_erase)
-                        rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                        rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                     else
                         rec.ea_erase = true;
                 }
@@ -1537,7 +1526,7 @@ static bool get_args_recursive(recursive_param & rec,
                 else if(strcasecmp("k", optarg) == 0 || strcasecmp("keep-compressed", optarg) == 0)
                 {
                     if(p.keep_compressed)
-                        rec.dialog->warning(gettext("-ak option need not be specified more than once, ignoring extra -ak options"));
+                        rec.dialog->message(gettext("-ak option need not be specified more than once, ignoring extra -ak options"));
                     p.keep_compressed = true;
                 }
                 else if(strcasecmp("f", optarg) == 0 || strcasecmp("fixed-date", optarg) == 0)
@@ -1545,7 +1534,7 @@ static bool get_args_recursive(recursive_param & rec,
                     if(p.ref_filename != nullptr || p.ref_root != nullptr || p.snapshot)
                         throw Erange("get_args", gettext("-af must be present before -A option not after!"));
                     if(rec.fixed_date_mode)
-                        rec.dialog->warning(gettext("-af option need not be specified more than once, ignoring extra -af options"));
+                        rec.dialog->message(gettext("-af option need not be specified more than once, ignoring extra -af options"));
                     rec.fixed_date_mode = true;
                 }
                 else if(strcasecmp("d", optarg) == 0 || strcasecmp("decremental", optarg) == 0)
@@ -1587,7 +1576,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'e':
                 if(p.empty)
-                    rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                    rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                     p.empty = true;
                 break;
@@ -1604,7 +1593,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'M':
                 if(p.same_fs)
-                    rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                    rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                     p.same_fs = true;
                 break;
@@ -1622,7 +1611,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case ',':
                 if(p.cache_directory_tagging)
-                    rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                    rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                     p.cache_directory_tagging = true;
                 break;
@@ -1687,7 +1676,7 @@ static bool get_args_recursive(recursive_param & rec,
                 if(p.aux_pass == "")
                     p.aux_pass = secu_string(optarg, strlen(optarg));
                 else
-                    rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                    rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 break;
             case '%':
                 if(! tools_my_atoi(optarg, tmp))
@@ -1710,7 +1699,7 @@ static bool get_args_recursive(recursive_param & rec,
                     }
                 }
                 else
-                    rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                    rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 break;
             case '^':
                 if(optarg == nullptr)
@@ -1730,7 +1719,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case '1':
                 if(p.sparse_file_min_size != sparse_file_min_size_default)
-                    rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                    rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                 {
                     if(optarg == nullptr)
@@ -1739,7 +1728,7 @@ static bool get_args_recursive(recursive_param & rec,
                     {
                         p.sparse_file_min_size = tools_get_extended_size(optarg, rec.suffix_base);
                         if(p.sparse_file_min_size == sparse_file_min_size_default)
-                            rec.dialog->warning(tools_printf(gettext("%d is the default value for --sparse-file-min-size, no need to specify it on command line, ignoring"), sparse_file_min_size_default));
+                            rec.dialog->message(tools_printf(gettext("%d is the default value for --sparse-file-min-size, no need to specify it on command line, ignoring"), sparse_file_min_size_default));
                     }
                     catch(Edeci & e)
                     {
@@ -1749,7 +1738,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case '2':
                 if(p.dirty != dirtyb_warn)
-                    rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                    rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                 {
                     if(optarg == nullptr)
@@ -1772,7 +1761,7 @@ static bool get_args_recursive(recursive_param & rec,
                     argc_argv arg;
                     bool ret;
 
-                    line_tools_read_from_pipe(*rec.dialog, tools_str2int(optarg), tmp);
+                    line_tools_read_from_pipe(rec.dialog, tools_str2int(optarg), tmp);
                     line_tools_tlv_list2argv(*rec.dialog, tmp, arg);
 
                     S_I optind_mem = line_tools_reset_getopt(); // save the external variable to use recursivity (see getopt)
@@ -1868,7 +1857,7 @@ static bool get_args_recursive(recursive_param & rec,
                         list += fsa_family_to_string(*it);
                         ++it;
                     }
-                    rec.dialog->warning(string("FSA family in scope:") + list);
+                    rec.dialog->message(string("FSA family in scope:") + list);
                 }
                 break;
             case '5':
@@ -1964,11 +1953,15 @@ static bool get_args_recursive(recursive_param & rec,
     return true;
 }
 
-static void usage(shell_interaction & dialog, const char *command_name)
+static void usage(user_interaction & dialog, const char *command_name)
 {
     string name;
+    shell_interaction *ptr = dynamic_cast<shell_interaction *>(&dialog);
+
     tools_extract_basename(command_name, name);
-    dialog.change_non_interactive_output(&cout);
+
+    if(ptr != nullptr)
+	ptr->change_non_interactive_output(cout);
 
     dialog.printf(gettext("usage: %s [ -c | -x | -d | -t | -l | -C | -+ ] [<path>/]<basename> [options...]\n"), name.c_str());
     dialog.printf("       %s -h\n", name.c_str());
@@ -2065,9 +2058,12 @@ static void usage(shell_interaction & dialog, const char *command_name)
     dialog.printf(gettext("Type \"man dar\" for more details and for all other available options.\n"));
 }
 
-static void show_warranty(shell_interaction & dialog)
+static void show_warranty(user_interaction & dialog)
 {
-    dialog.change_non_interactive_output(&cout);
+    shell_interaction *ptr = dynamic_cast<shell_interaction *>(&dialog);
+
+    if(ptr != nullptr)
+	ptr->change_non_interactive_output(cout);
     dialog.printf("                     NO WARRANTY\n");
     dialog.printf("\n");
     dialog.printf("  11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY\n");
@@ -2092,9 +2088,12 @@ static void show_warranty(shell_interaction & dialog)
     dialog.printf("\n");
 }
 
-static void show_license(shell_interaction & dialog)
+static void show_license(user_interaction & dialog)
 {
-    dialog.change_non_interactive_output(&cout);
+    shell_interaction *ptr = dynamic_cast<shell_interaction *>(&dialog);
+
+    if(ptr != nullptr)
+	ptr->change_non_interactive_output(cout);
     dialog.printf("             GNU GENERAL PUBLIC LICENSE\n");
     dialog.printf("                Version 2, June 1991\n");
     dialog.printf("\n");
@@ -2417,22 +2416,26 @@ static void show_license(shell_interaction & dialog)
     dialog.printf("\n");
 }
 
-static void show_version(shell_interaction & dialog, const char *command_name)
+static void show_version(user_interaction & dialog, const char *command_name)
 {
     string name;
     tools_extract_basename(command_name, name);
     U_I maj, med, min;
 
+    shell_interaction *ptr = dynamic_cast<shell_interaction *>(&dialog);
+
     get_version(maj, med, min);
-    dialog.change_non_interactive_output(&cout);
-    dialog.warning(tools_printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n",  name.c_str(), ::dar_version())
+    if(ptr != nullptr)
+	ptr->change_non_interactive_output(cout);
+
+    dialog.message(tools_printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n",  name.c_str(), ::dar_version())
                    + "   " + dar_suite_command_line_features()
                    + "\n"
                    + (maj > 2 ? tools_printf(gettext(" Using libdar %u.%u.%u built with compilation time options:"), maj, med, min)
                       : tools_printf(gettext(" Using libdar %u.%u built with compilation time options:"), maj, min)));
     tools_display_features(dialog);
     dialog.printf("\n");
-    dialog.warning(tools_printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT, __VERSION__)
+    dialog.message(tools_printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT, __VERSION__)
                    + tools_printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), name.c_str(), PACKAGE_VERSION)
                    + tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details\n type `%s -W'."), name.c_str(), name.c_str())
                    + tools_printf(gettext(" This is free software, and you are welcome\n to redistribute it under certain conditions;"))
@@ -2542,7 +2545,7 @@ const struct option *get_long_opt()
 }
 #endif
 
-static void make_args_from_file(user_interaction & dialog,
+static void make_args_from_file(shared_ptr<user_interaction> & dialog,
                                 operation op,
                                 const deque<string> & targets,
                                 const string & filename,
@@ -2651,15 +2654,15 @@ static void make_args_from_file(user_interaction & dialog,
         pseudo_command = nullptr;
 
         if(info_details)
-            dialog.printf(gettext("Arguments read from %S :"), &filename);
+            dialog->printf(gettext("Arguments read from %S :"), &filename);
         for(U_I i = 0; i < mots.size(); ++i)
         {
             argv[i+1] = tools_str2charptr(mots[i]); // mots[i] goes to argv[i+1] !
             if(info_details)
-                dialog.printf(" \"%s\"", argv[i+1]);
+                dialog->printf(" \"%s\"", argv[i+1]);
         }
         if(info_details)
-            dialog.printf("\n");
+            dialog->printf("\n");
     }
     catch(...)
     {
@@ -2704,16 +2707,6 @@ static void skip_getopt(S_I argc, char * const argv[], S_I next_to_read)
 #endif
 }
 
-#ifdef DEBOGGAGE
-static void show_args(S_I argc, char *argv[])
-{
-    S_I i;
-    for(i = 0; i < argc; ++i)
-        dialog.printf("[%s]\n", argv[i]);
-}
-#endif
-
-
 static bool update_with_config_files(recursive_param & rec, line_param & p)
 {
     string buffer;
@@ -2729,7 +2722,7 @@ static bool update_with_config_files(recursive_param & rec, line_param & p)
 
     try
     {
-        make_args_from_file(*rec.dialog,
+        make_args_from_file(rec.dialog,
                             p.op,
                             rec.non_options,
                             buffer,
@@ -2804,7 +2797,7 @@ static bool update_with_config_files(recursive_param & rec, line_param & p)
         try
         {
 
-            make_args_from_file(*rec.dialog,
+            make_args_from_file(rec.dialog,
                                 p.op,
                                 rec.non_options,
                                 buffer,
@@ -3148,7 +3141,7 @@ static void split_compression_algo(const char *arg, compression & algo, U_I & le
                 }
             }
             else // argument is a compression level, algorithm is gzip by default
-                algo = gzip;
+                algo = compression::gzip;
         }
         else // a ':' has been found and "it" points to it
         {
@@ -3158,7 +3151,7 @@ static void split_compression_algo(const char *arg, compression & algo, U_I & le
             if(first_part != "")
                 algo = string2compression(first_part);
             else
-                algo = gzip; // default algorithm
+                algo = compression::gzip; // default algorithm
 
             if(second_part != "")
             {

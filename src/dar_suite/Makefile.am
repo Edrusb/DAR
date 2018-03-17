@@ -80,19 +80,19 @@ else
 AM_LDFLAGS = @LTLIBINTL@ $(LD_PROF)
 endif
 
-dar_SOURCES =  command_line.cpp command_line.hpp config_file.cpp config_file.hpp dar.cpp dar.hpp dar_suite.cpp dar_suite.hpp hide_file.cpp hide_file.hpp no_comment.cpp no_comment.hpp shell_interaction.cpp shell_interaction.hpp getopt_decision.h my_getopt_long.h line_tools.hpp line_tools.cpp crit_action_cmd_line.cpp crit_action_cmd_line.hpp
+dar_SOURCES =  command_line.cpp command_line.hpp config_file.cpp config_file.hpp dar.cpp dar.hpp dar_suite.cpp dar_suite.hpp hide_file.cpp hide_file.hpp no_comment.cpp no_comment.hpp getopt_decision.h my_getopt_long.h line_tools.hpp line_tools.cpp crit_action_cmd_line.cpp crit_action_cmd_line.hpp
 dar_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-dar_xform_SOURCES = dar_suite.cpp dar_suite.hpp dar_xform.cpp shell_interaction.cpp shell_interaction.hpp line_tools.hpp line_tools.cpp
+dar_xform_SOURCES = dar_suite.cpp dar_suite.hpp dar_xform.cpp line_tools.hpp line_tools.cpp
 dar_xform_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-dar_slave_SOURCES =  dar_suite.cpp dar_suite.hpp dar_slave.cpp shell_interaction.cpp shell_interaction.hpp line_tools.hpp line_tools.cpp
+dar_slave_SOURCES =  dar_suite.cpp dar_suite.hpp dar_slave.cpp line_tools.hpp line_tools.cpp
 dar_slave_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-dar_manager_SOURCES = dar_suite.cpp dar_suite.hpp dar_manager.cpp shell_interaction.cpp shell_interaction.hpp getopt_decision.h my_getopt_long.h line_tools.hpp line_tools.cpp no_comment.cpp no_comment.hpp hide_file.cpp hide_file.hpp
+dar_manager_SOURCES = dar_suite.cpp dar_suite.hpp dar_manager.cpp getopt_decision.h my_getopt_long.h line_tools.hpp line_tools.cpp no_comment.cpp no_comment.hpp hide_file.cpp hide_file.hpp
 dar_manager_DEPENDENCIES = ../libdar/$(MYLIB).la
 
-dar_cp_SOURCES = dar_suite.cpp dar_suite.hpp dar_cp.cpp shell_interaction.cpp shell_interaction.hpp line_tools.hpp line_tools.cpp
+dar_cp_SOURCES = dar_suite.cpp dar_suite.hpp dar_cp.cpp line_tools.hpp line_tools.cpp
 dar_cp_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 dar_split_SOURCES = dar_split.c
@@ -101,6 +101,6 @@ dar_split_SOURCES = dar_split.c
 # dar_static ( --enable-dar-static )
 #
 
-dar_static_SOURCES =  command_line.cpp command_line.hpp config_file.cpp config_file.hpp dar.cpp dar.hpp dar_suite.cpp dar_suite.hpp hide_file.cpp hide_file.hpp no_comment.cpp no_comment.hpp shell_interaction.cpp shell_interaction.hpp getopt_decision.h my_getopt_long.h line_tools.hpp line_tools.cpp crit_action_cmd_line.cpp crit_action_cmd_line.hpp
+dar_static_SOURCES =  command_line.cpp command_line.hpp config_file.cpp config_file.hpp dar.cpp dar.hpp dar_suite.cpp dar_suite.hpp hide_file.cpp hide_file.hpp no_comment.cpp no_comment.hpp getopt_decision.h my_getopt_long.h line_tools.hpp line_tools.cpp crit_action_cmd_line.cpp crit_action_cmd_line.hpp
 dar_static_DEPENDENCIES = ../libdar/$(MYLIB).la
 dar_static_LDFLAGS = -all-static @LTLIBINTL@

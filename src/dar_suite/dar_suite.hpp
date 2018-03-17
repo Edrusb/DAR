@@ -27,7 +27,8 @@
 #define DAR_SUITE_HPP
 
 #include "../my_config.h"
-#include "shell_interaction.hpp"
+#include "libdar.hpp"
+#include <memory>
 
 #define EXIT_OK 0           // all that was asked is done
 #define EXIT_SYNTAX 1       // syntax error on command line
@@ -64,10 +65,12 @@
 #define CC_NAT "unknown"
 #endif
 
-using namespace libdar5;
+using namespace libdar;
 
     /// \addtogroup CMDLINE
     /// @{
+
+using cli_callback = S_I (*)(std::shared_ptr<user_interaction> & dialog, int, char *const [], const char **env);
 
 extern void dar_suite_reset_signal_handler();
 
@@ -90,7 +93,7 @@ extern int dar_suite_global(int argc,
 			    const struct option *long_options,
 #endif
 			    char stop_scan,
-			    int (*call)(shell_interaction & dialog, int, char *const [], const char **env));
+			    cli_callback call);
 
 extern std::string dar_suite_command_line_features();
 

@@ -30,11 +30,10 @@
 #include <string>
 #include <deque>
 #include <vector>
-#include "libdar5.hpp"
-#include "shell_interaction.hpp"
+#include "libdar.hpp"
 
 using namespace std;
-using namespace libdar5;
+using namespace libdar;
 
     /// \addtogroup CMDLINE
     /// @{
@@ -212,7 +211,7 @@ struct line_param
 
     /// main routine to extract parameters from command-line and included files
 
-extern bool get_args(shell_interaction & dialog,
+extern bool get_args(shared_ptr<user_interaction> & dialog,
 		     const char *home,
 		     const deque<string> & dar_dcf_path,
 		     const deque<string> & dar_duc_path,

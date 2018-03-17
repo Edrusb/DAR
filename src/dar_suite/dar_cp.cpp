@@ -58,24 +58,23 @@ extern "C"
 #include "tools.hpp"
 #include "cygwin_adapt.hpp"
 #include "dar_suite.hpp"
-#include "libdar5.hpp"
+#include "libdar.hpp"
 
 #define DAR_CP_VERSION "1.2.10"
 
-using namespace libdar5;
+using namespace libdar;
 using namespace std;
 
-static void show_usage(shell_interaction & dialog, char *argv0);
-static void show_version(shell_interaction & dialog, char *argv0);
-static int open_files(shell_interaction & dialog, char *src, char *dst, int *fds, int *fdd);
-static int copy_max(shell_interaction & dialog, int src, int dst);
-static int little_main(shell_interaction & dialog, int argc, char * const argv[], const char **env);
+static void show_usage(user_interaction & dialog, char *argv0);
+static void show_version(user_interaction & dialog, char *argv0);
+static int open_files(user_interaction & dialog, char *src, char *dst, int *fds, int *fdd);
+static int copy_max(user_interaction & dialog, int src, int dst);
 static void xfer_before_error(int block, char *buffer, int src, int dst);
 static int skip_to_next_readable(int block, char *buffer, int src, int dst, off_t & missed);
     /* return 0 if not found any more readable data, else return 1 */
 static int normal_copy(int block, char *buffer, int src, int dst);
     /* return the number of copied bytes (negative value upon error, zero at end of file) */
-static int little_main(shell_interaction & dialog, int argc, char * const argv[], const char **env);
+static int little_main(shared_ptr<user_interaction> & dialog, int argc, char * const argv[], const char **env);
 
 int main(int argc, char * const argv[], const char **env)
 {
@@ -90,28 +89,28 @@ int main(int argc, char * const argv[], const char **env)
 			    &little_main);
 }
 
-static int little_main(shell_interaction & dialog, int argc, char * const argv[], const char **env)
+static int little_main(shared_ptr<user_interaction> & dialog, int argc, char * const argv[], const char **env)
 {
     int fds, fdd;
     int ret = EXIT_OK;
 
     if(argc > 1 && strcmp(argv[1],"-V") == 0)
     {
-        show_version(dialog, argv[0]);
+        show_version(*dialog, argv[0]);
         ret = EXIT_OK;
     }
     else
 	if(argc != 3 || string(argv[1]) == string("-h"))
 	{
-	    show_usage(dialog, argv[0]);
+	    show_usage(*dialog, argv[0]);
 	    ret = EXIT_SYNTAX;
 	}
 	else
-	    if(open_files(dialog, argv[1], argv[2], &fds, &fdd))
+	    if(open_files(*dialog, argv[1], argv[2], &fds, &fdd))
 	    {
 		try
 		{
-		    ret = copy_max(dialog, fds, fdd);
+		    ret = copy_max(*dialog, fds, fdd);
 		    close(fds);
 		    close(fdd);
 		}
@@ -126,12 +125,12 @@ static int little_main(shell_interaction & dialog, int argc, char * const argv[]
     return ret;
 }
 
-static void show_usage(shell_interaction & dialog, char *argv0)
+static void show_usage(user_interaction & dialog, char *argv0)
 {
-    dialog.warning(tools_printf(gettext("usage : %s <source> <destination>\n"), argv0));
+    dialog.message(tools_printf(gettext("usage : %s <source> <destination>\n"), argv0));
 }
 
-static void show_version(shell_interaction & dialog, char *argv0)
+static void show_version(user_interaction & dialog, char *argv0)
 {
 /* C++ syntax used*/
     try
@@ -139,22 +138,22 @@ static void show_version(shell_interaction & dialog, char *argv0)
 	string cmd;
 	tools_extract_basename(argv0, cmd);
 	    // never return a nullptr pointer but
-	dialog.warning(tools_printf("\n %s version %s Copyright (C) 2002-2052 Denis Corbin\n\n\n", cmd.c_str(), DAR_CP_VERSION));
-	dialog.warning(tools_printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT,  __VERSION__));
-	dialog.warning(tools_printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), cmd.c_str(), PACKAGE_VERSION));
-	dialog.warning(tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details type `dar -W'."), cmd.c_str()));
-	dialog.warning(tools_printf(gettext(" This is free software, and you are welcome to redistribute it under")));
-	dialog.warning(tools_printf(gettext(" certain conditions; type `dar -L | more' for details.\n\n")));
+	dialog.message(tools_printf("\n %s version %s Copyright (C) 2002-2052 Denis Corbin\n\n\n", cmd.c_str(), DAR_CP_VERSION));
+	dialog.message(tools_printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT,  __VERSION__));
+	dialog.message(tools_printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), cmd.c_str(), PACKAGE_VERSION));
+	dialog.message(tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details type `dar -W'."), cmd.c_str()));
+	dialog.message(tools_printf(gettext(" This is free software, and you are welcome to redistribute it under")));
+	dialog.message(tools_printf(gettext(" certain conditions; type `dar -L | more' for details.\n\n")));
     }
     catch(...)
     {
-	dialog.warning(tools_printf(gettext("Unexpected exception from libdar")));
+	dialog.message(tools_printf(gettext("Unexpected exception from libdar")));
 	throw SRC_BUG;
     }
 /* END of C++ syntax used*/
 }
 
-static int open_files(shell_interaction & dialog, char *src, char *dst, int *fds, int *fdd)
+static int open_files(user_interaction & dialog, char *src, char *dst, int *fds, int *fdd)
 {
     struct stat buf;
     int val = stat(dst, &buf);
@@ -165,7 +164,7 @@ static int open_files(shell_interaction & dialog, char *src, char *dst, int *fds
         tmp = (char *)malloc(strlen(src)+strlen(dst)+1+1);
         if(tmp == nullptr)
         {
-            dialog.warning(tools_printf(gettext("Memory allocation failed : %s"), strerror(errno)));
+            dialog.message(tools_printf(gettext("Memory allocation failed : %s"), strerror(errno)));
             return 0;
         }
         string tmp2;
@@ -181,7 +180,7 @@ static int open_files(shell_interaction & dialog, char *src, char *dst, int *fds
 
     if(*fds < 0)
     {
-        dialog.warning(tools_printf(gettext("Cannot open source file : %s"), strerror(errno)));
+        dialog.message(tools_printf(gettext("Cannot open source file : %s"), strerror(errno)));
         if(tmp != nullptr)
             free(tmp);
         return 0; // error
@@ -192,7 +191,7 @@ static int open_files(shell_interaction & dialog, char *src, char *dst, int *fds
         free(tmp);
     if(*fdd < 0)
     {
-        dialog.warning(tools_printf(gettext("Cannot open destination file : %s"), strerror(errno)));
+        dialog.message(tools_printf(gettext("Cannot open destination file : %s"), strerror(errno)));
         close(*fds);
         *fds = -1;
         return 0;
@@ -201,7 +200,7 @@ static int open_files(shell_interaction & dialog, char *src, char *dst, int *fds
         return 1;
 }
 
-static int copy_max(shell_interaction & dialog, int src, int dst)
+static int copy_max(user_interaction & dialog, int src, int dst)
 {
     thread_cancellation thr;
 
@@ -217,7 +216,7 @@ static int copy_max(shell_interaction & dialog, int src, int dst)
     off_t taille = lseek(src, 0, SEEK_END);
     lseek(src, 0, SEEK_SET);
 
-    dialog.warning(tools_printf(gettext("Starting the copy of %u byte(s)"), taille));
+    dialog.message(tools_printf(gettext("Starting the copy of %u byte(s)"), taille));
     do
     {
 	thr.check_self_cancellation();
@@ -237,7 +236,7 @@ static int copy_max(shell_interaction & dialog, int src, int dst)
 	    }
             else
 	    {
-		dialog.warning(tools_printf(gettext("Reached End of File, no correct data could be found after the last error\n")));
+		dialog.message(tools_printf(gettext("Reached End of File, no correct data could be found after the last error\n")));
 		missed += (taille - current);
                 lu = 0;
 	    }

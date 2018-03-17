@@ -28,7 +28,7 @@
 #define CRIT_ACTION_CMD_LINE_HPP
 
 #include "../my_config.h"
-#include "libdar5.hpp"
+#include "libdar.hpp"
 
     /// \addtogroup CMDLINE
     /// @{
@@ -52,9 +52,9 @@ extern std::string crit_action_canonize_string(const std::string & argument);
     /// \note this function is recursive, it may throw Erange exception in case of syntaxical error
     /// \note second point, the returned object is dynamically allocated, this is the duty of the caller
     /// to release its memory calling the delete operator.
-extern const libdar5::crit_action * crit_action_create_from_string(libdar5::user_interaction & dialog,
-								   const std::string & argument,
-								   const libdar5::infinint & hourshift);
+extern const libdar::crit_action * crit_action_create_from_string(libdar::user_interaction & dialog,
+								  const std::string & argument,
+								   const libdar::infinint & hourshift);
 
     /// @}
 

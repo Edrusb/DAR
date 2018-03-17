@@ -49,28 +49,21 @@ extern "C"
 #include <new>
 
 #include "dar_suite.hpp"
-#include "libdar5.hpp"
+#include "libdar.hpp"
 #include "line_tools.hpp"
+#include "shell_interaction.hpp"
 #ifdef HAVE_LIBTHREADAR_LIBTHREADAR_HPP
 #include <libthreadar/libthreadar.hpp>
 #endif
 
-#define GENERAL_REPORT(msg) 	if(ui != nullptr)		\
-    {							\
-	ui->change_non_interactive_output(&cerr);	\
-	ui->warning(msg);				\
-    }							\
-    else						\
-	cerr << msg << endl;
-
-
-
 using namespace libdar;
+using namespace std;
 
-static shell_interaction *ui = nullptr;
+static shared_ptr<user_interaction> ui;
 static void signals_abort(int l, bool now);
 static void signal_abort_delayed(int l);
 static void signal_abort_now(int l);
+static void general_report(const std::string & msg);
 
 void dar_suite_reset_signal_handler()
 {
@@ -96,7 +89,7 @@ int dar_suite_global(int argc,
 		     const struct option *long_options,
 #endif
 		     char stop_scan,
-		     int (*call)(shell_interaction & dialog, int, char * const [], const char **env))
+		     cli_callback call)
 {
     int ret = EXIT_OK;
 
@@ -133,18 +126,18 @@ int dar_suite_global(int argc,
 #endif
 			      stop_scan,
 			      silent);
-	ui = new (nothrow) shell_interaction(&cerr, &cerr, silent);
-	if(ui == nullptr)
+	ui.reset(new (nothrow) shell_interaction(cerr, cerr, silent));
+	if(!ui)
 	    throw Ememory("dar_suite_global");
 
 	get_version(maj, med, min);
 	if(maj != LIBDAR_COMPILE_TIME_MAJOR || med < LIBDAR_COMPILE_TIME_MEDIUM)
 	{
-	    GENERAL_REPORT(tools_printf(gettext("We have linked with an incompatible version of libdar. Expecting version %d.%d.x but having linked with version %d.%d.%d"), LIBDAR_COMPILE_TIME_MAJOR, LIBDAR_COMPILE_TIME_MEDIUM, maj, med, min));
+	    general_report(tools_printf(gettext("We have linked with an incompatible version of libdar. Expecting version %d.%d.x but having linked with version %d.%d.%d"), LIBDAR_COMPILE_TIME_MAJOR, LIBDAR_COMPILE_TIME_MEDIUM, maj, med, min));
 	    ret = EXIT_ERROR;
 	}
 	else
-	    ret = (*call)(*ui, argc, argv, env);
+	    ret = (*call)(ui, argc, argv, env);
 
 	    // closing libdar
 
@@ -152,93 +145,93 @@ int dar_suite_global(int argc,
     }
     catch(Efeature & e)
     {
-	GENERAL_REPORT(string(gettext("NOT YET IMPLEMENTED FEATURE has been used: ")) + e.get_message());
-	GENERAL_REPORT(string(gettext("Please check documentation or upgrade your software if available")));
+	general_report(string(gettext("NOT YET IMPLEMENTED FEATURE has been used: ")) + e.get_message());
+	general_report(string(gettext("Please check documentation or upgrade your software if available")));
 	ret = EXIT_SYNTAX;
     }
     catch(Ehardware & e)
     {
-	GENERAL_REPORT(string(gettext("SEEMS TO BE A HARDWARE PROBLEM: "))+e.get_message());
-	GENERAL_REPORT(string(gettext("Please check your hardware")));
+	general_report(string(gettext("SEEMS TO BE A HARDWARE PROBLEM: "))+e.get_message());
+	general_report(string(gettext("Please check your hardware")));
 	ret = EXIT_ERROR;
     }
     catch(Esecu_memory & e)
     {
-	GENERAL_REPORT(string(gettext("Lack of SECURED memory to achieve the operation, aborting operation")));
+	general_report(string(gettext("Lack of SECURED memory to achieve the operation, aborting operation")));
 	ret = EXIT_ERROR;
     }
     catch(Ememory & e)
     {
-	GENERAL_REPORT(string(gettext("Lack of memory to achieve the operation, aborting operation")));
+	general_report(string(gettext("Lack of memory to achieve the operation, aborting operation")));
 	ret = EXIT_ERROR;
     }
     catch(std::bad_alloc & e)
     {
-        GENERAL_REPORT(string(gettext("Lack of memory to achieve the operation, aborting operation")));
+        general_report(string(gettext("Lack of memory to achieve the operation, aborting operation")));
         ret = EXIT_ERROR;
     }
     catch(Erange & e)
     {
-	GENERAL_REPORT(string(gettext("FATAL error, aborting operation")));
-	GENERAL_REPORT(e.get_message());
+	general_report(string(gettext("FATAL error, aborting operation")));
+	general_report(e.get_message());
 	ret = EXIT_ERROR;
     }
     catch(Euser_abort & e)
     {
-	GENERAL_REPORT(string(gettext("Aborting program. User refused to continue while asking: ")) + e.get_message());
+	general_report(string(gettext("Aborting program. User refused to continue while asking: ")) + e.get_message());
 	ret = EXIT_USER_ABORT;
     }
     catch(Ethread_cancel & e)
     {
-	GENERAL_REPORT(string(gettext("Program has been aborted for the following reason: ")) + e.get_message());
+	general_report(string(gettext("Program has been aborted for the following reason: ")) + e.get_message());
 	ret = EXIT_USER_ABORT;
     }
     catch(Edata & e)
     {
-	GENERAL_REPORT(e.get_message());
+	general_report(e.get_message());
 	ret = EXIT_DATA_ERROR;
     }
     catch(Escript & e)
     {
-	GENERAL_REPORT(string(gettext("Aborting program. An error occurred concerning user command execution: ")) + e.get_message());
+	general_report(string(gettext("Aborting program. An error occurred concerning user command execution: ")) + e.get_message());
 	ret = EXIT_SCRIPT_ERROR;
     }
     catch(Elibcall & e)
     {
-	GENERAL_REPORT(string(gettext("Aborting program. An error occurred while calling libdar: ")) + e.get_message());
+	general_report(string(gettext("Aborting program. An error occurred while calling libdar: ")) + e.get_message());
 	ret = EXIT_LIBDAR;
     }
     catch(Einfinint & e)
     {
-	GENERAL_REPORT(string(gettext("Aborting program. ")) + e.get_message());
+	general_report(string(gettext("Aborting program. ")) + e.get_message());
 	ret = EXIT_BUG;
     }
     catch(Elimitint & e)
     {
-	GENERAL_REPORT(string(gettext("Aborting program. ")) + e.get_message());
+	general_report(string(gettext("Aborting program. ")) + e.get_message());
 	ret = EXIT_LIMITINT;
     }
     catch(Ecompilation & e)
     {
-	GENERAL_REPORT(string(gettext("Aborting program. The requested operation needs a feature that has been disabled at compilation time: ")) + e.get_message());
+	general_report(string(gettext("Aborting program. The requested operation needs a feature that has been disabled at compilation time: ")) + e.get_message());
 	ret = EXIT_COMPILATION;
     }
     catch(Esystem & e)
     {
-	GENERAL_REPORT(string(gettext("FATAL error, aborting operation")));
-	GENERAL_REPORT(e.get_message());
+	general_report(string(gettext("FATAL error, aborting operation")));
+	general_report(e.get_message());
 	ret = EXIT_ERROR;
     }
     catch(Enet_auth & e)
     {
-	GENERAL_REPORT(string(gettext("FATAL error, aborting operation")));
-	GENERAL_REPORT(e.get_message());
+	general_report(string(gettext("FATAL error, aborting operation")));
+	general_report(e.get_message());
 	ret = EXIT_ERROR;
     }
     catch(Egeneric & e)
     {
 	cerr << e.dump_str();
-	GENERAL_REPORT(string(gettext("INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER")));
+	general_report(string(gettext("INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER")));
 	ret = EXIT_BUG;
     }
 #ifdef LIBTHREADAR_AVAILABLE
@@ -257,28 +250,18 @@ int dar_suite_global(int argc,
     {
 	Ebug x = SRC_BUG;
 	cerr << x.dump_str();
-	GENERAL_REPORT(string(gettext("CAUGHT A NON (LIB)DAR EXCEPTION")));
-	GENERAL_REPORT(string(gettext("INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER")));
+	general_report(string(gettext("CAUGHT A NON (LIB)DAR EXCEPTION")));
+	general_report(string(gettext("INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER")));
 	ret = EXIT_BUG;
     }
 
 
     if(thread_cancellation::count() != 0)
     {
-	GENERAL_REPORT(string(gettext("SANITY CHECK: AT LEAST ONE THREAD_CANCELLATION OBJECT HAS NOT BEEN DESTROYED AND REMAINS IN MEMORY WHILE THE PROGRAM REACHED ITS END")));
+	general_report(string(gettext("SANITY CHECK: AT LEAST ONE THREAD_CANCELLATION OBJECT HAS NOT BEEN DESTROYED AND REMAINS IN MEMORY WHILE THE PROGRAM REACHED ITS END")));
     }
 
-	// restoring terminal settings
-    try
-    {
-	if(ui != nullptr)
-	    delete ui;
-	ui = nullptr;
-    }
-    catch(...)
-    {
-	ret = EXIT_UNKNOWN_ERROR;
-    }
+    ui.reset();
     memory_check_snapshot();
     return ret;
 }
@@ -307,27 +290,40 @@ static void signal_abort_now(int l)
 static void signals_abort(int l, bool now)
 {
 #if HAVE_DECL_SYS_SIGLIST
-    GENERAL_REPORT(tools_printf(gettext("Received signal: %s"), sys_siglist[l]));
+    general_report(tools_printf(gettext("Received signal: %s"), sys_siglist[l]));
 #else
-    GENERAL_REPORT(tools_printf(gettext("Received signal: %d"), l));
+    general_report(tools_printf(gettext("Received signal: %d"), l));
 #endif
 
 #if MUTEX_WORKS
     if(now)
     {
-	GENERAL_REPORT(string(gettext("Archive fast termination engaged")));
+	general_report(string(gettext("Archive fast termination engaged")));
     }
     else
     {
-	GENERAL_REPORT(string(gettext("Archive delayed termination engaged")));
+	general_report(string(gettext("Archive delayed termination engaged")));
     }
 #if HAVE_SIGNAL_H
     signal(l, SIG_DFL);
-    GENERAL_REPORT(string(gettext("Disabling signal handler, the next time this signal is received the program will abort immediately")));
+    general_report(string(gettext("Disabling signal handler, the next time this signal is received the program will abort immediately")));
 #endif
     cancel_thread(pthread_self(), now);
 #else
-    GENERAL_REPORT(string(gettext("Cannot cleanly abort the operation, thread-safe support is missing, will thus abruptly stop the program, generated archive may be unusable")));
+    general_report(string(gettext("Cannot cleanly abort the operation, thread-safe support is missing, will thus abruptly stop the program, generated archive may be unusable")));
     exit(EXIT_USER_ABORT);
 #endif
+}
+
+static void general_report(const std::string & msg)
+{
+    if(ui)
+    {
+        shell_interaction *ptr = dynamic_cast<shell_interaction *>(ui.get());
+        if(ptr != nullptr)
+	    ptr->change_non_interactive_output(cerr);
+	ui->message(msg);
+    }
+    else
+	cerr << msg << endl;
 }

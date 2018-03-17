@@ -38,7 +38,7 @@
 class no_comment : public hide_file
 {
 public:
-    no_comment(libdar5::generic_file & f) : hide_file(f) {};
+    no_comment(libdar::generic_file & f) : hide_file(f) {};
     no_comment(const no_comment & ref) = default;
     no_comment & operator = (const no_comment & ref) = default;
     ~no_comment() = default;

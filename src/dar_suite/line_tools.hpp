@@ -31,9 +31,10 @@
 #include <string>
 #include <vector>
 #include <deque>
-#include "libdar5.hpp"
+#include <memory>
+#include "libdar.hpp"
 
-using namespace libdar5;
+using namespace libdar;
 
     /// \addtogroup CMDLINE
     /// @{
@@ -153,9 +154,9 @@ extern std::set<std::string> line_tools_deque_to_set(const std::deque<std::strin
 extern void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
 							       bool detruire,
 							       bool more_recent,
-							       const libdar5::infinint & hourshift,
+							       const libdar::infinint & hourshift,
 							       bool ea_erase,
-							       const libdar5::crit_action * & overwrite);
+							       const libdar::crit_action * & overwrite);
 
     /// split the argument to -K, -J and -$ in their different parts
     /// \param[in] all is what the user provided on command-line
@@ -177,7 +178,7 @@ extern void line_tools_display_signatories(user_interaction & ui, const std::lis
 	/// \param[in,out] dialog for user interaction
 	/// \param[in] fd the filedescriptor for the anonymous pipe's read extremity
 	/// \param[out] result the resulting tlv_list
-extern void line_tools_read_from_pipe(user_interaction & dialog, S_I fd, tlv_list & result);
+extern void line_tools_read_from_pipe(std::shared_ptr<user_interaction> & dialog, S_I fd, tlv_list & result);
 
 
     /// @}
