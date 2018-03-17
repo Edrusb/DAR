@@ -31,20 +31,11 @@
 
 #include "archive.hpp"
 #include "user_interaction5.hpp"
+#include "archive_options5.hpp"
 
 namespace libdar5
 {
 	// from archive_options.hpp
-    using libdar::archive_options_read;
-    using libdar::archive_options_create;
-    using libdar::archive_options_isolate;
-    using libdar::archive_options_merge;
-    using libdar::archive_options_read;
-    using libdar::archive_options_extract;
-    using libdar::archive_options_listing;
-    using libdar::archive_options_diff;
-    using libdar::archive_options_test;
-    using libdar::archive_options_repair;
     using libdar::path;
     using libdar::statistics;
     using libdar::catalogue;
