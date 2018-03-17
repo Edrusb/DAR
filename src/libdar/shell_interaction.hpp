@@ -38,6 +38,7 @@ extern "C"
 #include <iostream>
 
 #include "user_interaction.hpp"
+#include "database.hpp"
 
 namespace libdar
 {
@@ -84,6 +85,12 @@ namespace libdar
 	    //! method works as expected.
 	void warning_with_more(U_I num) { at_once = num; count = 0; };
 
+	    // some routine to display formated informations provided database
+	void database_show_contents(const database & ref);
+	void database_show_files(const database & ref, archive_num num, const database_used_options & opt);
+	void database_show_version(const database & ref, const path & chem);
+	void database_show_statistics(const database &ref);
+
     protected:
 	    // inherited methods from user_interaction class
 
@@ -115,6 +122,30 @@ namespace libdar
 	    // class fields and methods
 
 	static const U_I bufsize;
+
+
+	static void show_files_callback(void *tag,
+					const std::string & filename,
+					bool available_data,
+					bool available_ea);
+
+
+	static void get_version_callback(void *tag,
+					 archive_num num,
+					 db_etat data_presence,
+					 bool has_data_date,
+					 datetime data,
+					 db_etat ea_presence,
+					 bool has_ea_date,
+					 datetime ea);
+
+	static void statistics_callback(void *tag,
+					U_I number,
+					const infinint & data_count,
+					const infinint & total_data,
+					const infinint & ea_count,
+					const infinint & total_ea);
+
 
     };
 

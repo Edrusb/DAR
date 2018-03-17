@@ -228,6 +228,95 @@ namespace libdar
 	tools_set_back_blocked_signals(old_mask);
     }
 
+    void shell_interaction::database_show_contents(const database & ref)
+    {
+	NLS_SWAP_IN;
+	try
+	{
+	    database_archives_list content = ref.get_contents();
+
+	    string opt = tools_concat_vector(" ", ref.get_options());
+	    string road, base;
+	    string compr = compression2string(ref.get_compression());
+	    string dar_path = ref.get_dar_path();
+	    string db_version = ref.get_database_version();
+
+	    message("");
+	    printf(gettext("dar path        : %S"), &dar_path);
+	    printf(gettext("dar options     : %S"), &opt);
+	    printf(gettext("database version: %S"), &db_version);
+	    printf(gettext("compression used: %S"), &compr);
+	    message("");
+	    printf(gettext("archive #   |    path      |    basename"));
+	    printf("------------+--------------+---------------");
+
+
+	    for(archive_num i = 1; i < content.size(); ++i)
+	    {
+		road = content[i].get_path();
+		base = content[i].get_basename();
+		opt = (road == "") ? gettext("<empty>") : road;
+		printf(" \t%u\t%S\t%S", i, &opt, &base);
+	    }
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }
+
+    void shell_interaction::database_show_files(const database & ref,
+						archive_num num,
+						const database_used_options & opt)
+    {
+	NLS_SWAP_IN;
+	try
+	{
+ 	    ref.get_files(show_files_callback, this, num, opt);
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }
+
+
+    void shell_interaction::database_show_version(const database & ref, const path & chemin)
+    {
+	NLS_SWAP_IN;
+	try
+	{
+	    ref.get_version(get_version_callback, this, chemin);
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }
+
+    void shell_interaction::database_show_statistics(const database & ref)
+    {
+	NLS_SWAP_IN;
+	try
+	{
+	    printf(gettext("  archive #   |  most recent/total data |  most recent/total EA"));
+	    printf(gettext("--------------+-------------------------+-----------------------")); // having it with gettext let the translater adjust columns width
+	    ref.show_most_recent_stats(statistics_callback, this);
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }
+
     void shell_interaction::inherited_message(const string & message)
     {
 	if(at_once > 0)
@@ -440,6 +529,138 @@ namespace libdar
 	if(output == nullptr)
 	    throw SRC_BUG; // shell_interaction has not been properly initialized
 	*output << mesg << endl;
+    }
+
+    void shell_interaction::show_files_callback(void *tag,
+						const std::string & filename,
+						bool available_data,
+						bool available_ea)
+    {
+	shell_interaction *dialog = (shell_interaction *)(tag);
+	string etat = "";
+
+	if(dialog == nullptr)
+	    throw SRC_BUG;
+
+	if(available_data)
+	    etat += gettext("[ Saved ]");
+	else
+	    etat += gettext("[       ]");
+
+	if(available_ea)
+	    etat += gettext("[  EA   ]");
+	else
+	    etat += gettext("[       ]");
+
+	dialog->printf("%S  %S", &etat, &filename);
+    }
+
+    void shell_interaction::get_version_callback(void *tag,
+						 archive_num num,
+						 db_etat data_presence,
+						 bool has_data_date,
+						 datetime data,
+						 db_etat ea_presence,
+						 bool has_ea_date,
+						 datetime ea)
+    {
+	const string REMOVED = gettext("removed ");
+	const string PRESENT = gettext("present ");
+	const string SAVED   = gettext("saved   ");
+	const string ABSENT  = gettext("absent  ");
+	const string PATCH   = gettext("patch   ");
+	const string BROKEN  = gettext("BROKEN  ");
+	const string INODE   = gettext("inode   ");
+	const string NO_DATE = "                          ";
+	string data_state;
+	string ea_state;
+	string data_date;
+	string ea_date;
+	shell_interaction *dialog = (shell_interaction *)(tag);
+
+	if(dialog == nullptr)
+	    throw SRC_BUG;
+
+	switch(data_presence)
+	{
+	case db_etat::et_saved:
+	    data_state = SAVED;
+	    break;
+	case db_etat::et_patch:
+	    data_state = PATCH;
+	    break;
+	case db_etat::et_patch_unusable:
+	    data_state = BROKEN;
+	    break;
+	case db_etat::et_inode:
+	    data_state = INODE;
+	    break;
+	case db_etat::et_present:
+	    data_state = PRESENT;
+	    break;
+	case db_etat::et_removed:
+	    data_state = REMOVED;
+	    break;
+	case db_etat::et_absent:
+	    data_state = ABSENT;
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
+
+	switch(ea_presence)
+	{
+	case db_etat::et_saved:
+	    ea_state = SAVED;
+	    break;
+	case db_etat::et_present:
+	    ea_state = PRESENT;
+	    break;
+	case db_etat::et_removed:
+	    ea_state = REMOVED;
+	    break;
+	case db_etat::et_absent:
+	    throw SRC_BUG; // state not used for EA
+	case db_etat::et_patch:
+	    throw SRC_BUG;
+	case db_etat::et_patch_unusable:
+	    throw SRC_BUG;
+	default:
+	    throw SRC_BUG;
+	}
+
+	if(!has_data_date)
+	{
+	    data_state = ABSENT;
+	    data_date = NO_DATE;
+	}
+	else
+	    data_date = tools_display_date(data);
+
+	if(!has_ea_date)
+	{
+	    ea_state = ABSENT;
+	    ea_date = NO_DATE;
+	}
+	else
+	    ea_date = tools_display_date(ea);
+
+	dialog->printf(" \t%u\t%S  %S  %S  %S", num, &data_date, &data_state, &ea_date, &ea_state);
+    }
+
+    void shell_interaction::statistics_callback(void *tag,
+						U_I number,
+						const infinint & data_count,
+						const infinint & total_data,
+						const infinint & ea_count,
+						const infinint & total_ea)
+    {
+	shell_interaction *dialog = (shell_interaction *)(tag);
+
+	if(dialog == nullptr)
+	    throw SRC_BUG;
+
+	dialog->printf("\t%u %i/%i \t\t\t %i/%i", number, &data_count, &total_data, &ea_count, &total_ea);
     }
 
 
