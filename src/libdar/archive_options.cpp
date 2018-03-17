@@ -320,7 +320,7 @@ namespace libdar
 	    archive_option_clean_mask(x_compr_mask);
 	    archive_option_clean_mask(x_backup_hook_file_mask, false);
 	    archive_option_clean_mask(x_delta_mask);
-	    x_ref_arch = nullptr;
+	    x_ref_arch.reset();
 	    x_allow_over = true;
 	    x_warn_over = true;
 	    x_info_details = false;
@@ -917,7 +917,7 @@ namespace libdar
 	    archive_option_clean_mask(x_compr_mask);
 	    archive_option_clean_mask(x_delta_mask);
 	    archive_option_clean_crit_action(x_overwrite);
-	    x_ref = nullptr;
+	    x_ref.reset();
 	    x_allow_over = true;
 	    x_warn_over = true;
 	    x_info_details = false;

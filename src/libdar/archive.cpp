@@ -432,7 +432,7 @@ namespace libdar
 		    (void)op_create_in(oper_create,
 				       tools_relative2absolute_path(fs_root, tools_getcwd()),
 				       *sauv_path_t,
-				       options.get_reference(),
+				       options.get_reference().get(),
 				       options.get_selection(),
 				       options.get_subtree(),
 				       filename,
@@ -534,7 +534,7 @@ namespace libdar
 	statistics *st_ptr = progressive_report == nullptr ? &st : progressive_report;
 	catalogue *ref_cat1 = nullptr;
 	catalogue *ref_cat2 = nullptr;
-	archive *ref_arch2 = options.get_auxilliary_ref();
+	shared_ptr<archive> ref_arch2 = options.get_auxilliary_ref();
 	compression algo_kept = compression::none;
 	entrepot *sauv_path_t = options.get_entrepot().clone();
 	entrepot_local *sauv_path_t_local = dynamic_cast<entrepot_local *>(sauv_path_t);
@@ -574,7 +574,7 @@ namespace libdar
 				// convert all data to unsaved
 			    ref_arch1->set_to_unsaved_data_and_FSA();
 
-		    if(ref_arch2 != nullptr)
+		    if(!ref_arch2)
 			if(ref_arch2->only_contains_an_isolated_catalogue())
 			    ref_arch2->set_to_unsaved_data_and_FSA();
 
@@ -593,7 +593,7 @@ namespace libdar
 							    options.get_empty());
 
 		    if(ref_arch1 == nullptr)
-			if(ref_arch2 == nullptr)
+			if(!ref_arch2)
 			    throw Elibcall("archive::archive[merge]", string(gettext("Both reference archive are nullptr, cannot merge archive from nothing")));
 			else
 			    if(ref_arch2->cat == nullptr)
@@ -604,7 +604,7 @@ namespace libdar
 				else
 				    throw Elibcall("archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
 		    else
-			if(ref_arch2 == nullptr)
+			if(!ref_arch2)
 			    if(ref_arch1->cat == nullptr)
 				throw SRC_BUG; // an archive should always have a catalogue available
 			    else
@@ -634,7 +634,7 @@ namespace libdar
 			algo_kept = ref_arch1->ver.get_compression_algo();
 			if(algo_kept == compression::none && ref_cat2 != nullptr)
 			{
-			    if(ref_arch2 == nullptr)
+			    if(!ref_arch2)
 				throw SRC_BUG;
 			    else
 				algo_kept = ref_arch2->ver.get_compression_algo();

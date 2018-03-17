@@ -289,7 +289,7 @@ namespace libdar
 	    // setting methods
 
 	    /// set the archive to take as reference (nullptr for a full backup)
-	void set_reference(archive *ref_arch) { x_ref_arch = ref_arch; };
+	void set_reference(std::shared_ptr<archive> ref_arch) { x_ref_arch = ref_arch; };
 
 	    /// defines the filenames to only save (except directory) as those that match the given mask
 	void set_selection(const mask & selection);
@@ -536,7 +536,7 @@ namespace libdar
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
 
-	archive *get_reference() const { return x_ref_arch; };
+	std::shared_ptr<archive> get_reference() const { return x_ref_arch; };
 	const mask & get_selection() const { if(x_selection == nullptr) throw SRC_BUG; return *x_selection; };
 	const mask & get_subtree() const { if(x_subtree == nullptr) throw SRC_BUG; return *x_subtree; };
 	bool get_allow_over() const { return x_allow_over; };
@@ -599,7 +599,7 @@ namespace libdar
 	modified_data_detection get_modified_data_detection() const { return x_modified_data_detection; };
 
     private:
-	archive *x_ref_arch; //< just contains the address of an existing object, no local copy of object is done here
+	std::shared_ptr<archive> x_ref_arch; //< just contains the address of an existing object, no local copy of object is done here
 	mask * x_selection;  //< points to a local copy of mask (must be allocated / releases by the archive_option_create object)
 	mask * x_subtree;    //< points to a local copy of mask (must be allocated / releases by the archive_option_create objects)
 	bool x_allow_over;
@@ -881,7 +881,7 @@ namespace libdar
 	    /////////////////////////////////////////////////////////////////////
 	    // setting methods
 
-	void set_auxilliary_ref(archive *ref) { x_ref = ref; };
+	void set_auxilliary_ref(std::shared_ptr<archive> ref) { x_ref = ref; };
 
 	    /// defines the filenames to only save (except directory) as those that match the given mask
 	void set_selection(const mask & selection);
@@ -1031,7 +1031,7 @@ namespace libdar
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
 
-	archive * get_auxilliary_ref() const { return x_ref; };
+	std::shared_ptr<archive>  get_auxilliary_ref() const { return x_ref; };
 	const mask & get_selection() const { if(x_selection == nullptr) throw SRC_BUG; return *x_selection; };
 	const mask & get_subtree() const { if(x_subtree == nullptr) throw SRC_BUG; return *x_subtree; };
 	bool get_allow_over() const { return x_allow_over; };
@@ -1076,7 +1076,7 @@ namespace libdar
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
 
     private:
-	archive * x_ref;    //< points to an external existing object, must never be deleted by "this"
+	std::shared_ptr<archive> x_ref;
 	mask * x_selection;
 	mask * x_subtree;
 	bool x_allow_over;
