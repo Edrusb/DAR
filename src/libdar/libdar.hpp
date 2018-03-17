@@ -85,5 +85,6 @@
 #include "data_tree.hpp"
 #include "database.hpp"
 #include "get_version.hpp"
+#include "shell_interaction.hpp"
 
 #endif
