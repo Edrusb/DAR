@@ -153,7 +153,7 @@ namespace libdar
 	dialog.printf("treated = %i", &treated);
 	dialog.printf("hard_links = %i", &hard_links);
 	dialog.printf("skipped = %i", &skipped);
-	dialog.printf("inode only = %i", inode_only);
+	dialog.printf("inode only = %i", &inode_only);
 	dialog.printf("ignored = %i", &ignored);
 	dialog.printf("tooold = %i", &tooold);
 	dialog.printf("errored = %i", &errored);
