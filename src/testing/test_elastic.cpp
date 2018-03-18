@@ -139,13 +139,13 @@ void f2()
 
 void f3()
 {
-    user_interaction *dialog = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(dialog == nullptr)
+    shared_ptr<user_interaction> dialog(new (nothrow) shell_interaction(cout, cerr, false));
+    if(!dialog)
 	cout << "ERREUR !" << endl;
 
     try
     {
-	fichier_local fic = fichier_local(*dialog, "toto", gf_read_write, 0666, false, true, false);
+	fichier_local fic = fichier_local(dialog, "toto", gf_read_write, 0666, false, true, false);
 	const unsigned int taille = 500;
 	unsigned char buffer[taille];
 	const char *ttt =  "Bonjour les amis comment ca va ? ";
@@ -217,6 +217,5 @@ void f3()
 	cout << "unknown exception caught" << endl;
     }
 
-    if(dialog != nullptr)
-	delete dialog;
+    dialog.reset();
 }

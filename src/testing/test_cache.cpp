@@ -68,15 +68,15 @@ using namespace std;
 void f1();
 void f2();
 
-static user_interaction *ui = nullptr;
+static shared_ptr<user_interaction>ui;
 
 int main()
 {
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(ui == nullptr)
+    ui.reset(new (nothrow) shell_interaction(cout, cerr, false));
+    if(!ui)
 	cout << "ERREUR !" << endl;
     try
     {
@@ -85,20 +85,19 @@ int main()
     }
     catch(Ebug & e)
     {
-	ui->warning(e.dump_str());
+	ui->message(e.dump_str());
     }
     catch(Egeneric & e)
     {
-	ui->warning(string("Aborting on exception: ") + e.get_message());
+	ui->message(string("Aborting on exception: ") + e.get_message());
     }
-    if(ui != nullptr)
-	delete ui;
+    ui.reset();
 }
 
 
 void f1()
 {
-    fichier_local f = fichier_local(*ui, "toto", gf_read_only, 0, false, false, false);
+    fichier_local f = fichier_local(ui, "toto", gf_read_only, 0, false, false, false);
     cache c(f,
 	    false,
 	    20);
@@ -125,7 +124,7 @@ void f2()
 	printf("%s\n", strerror(errno));
 	return;
     }
-    fichier_local g = fichier_local(*ui, "titi", gf_read_write, 0666, false, true, false);
+    fichier_local g = fichier_local(ui, "titi", gf_read_write, 0666, false, true, false);
     cache c(g,
 	    false,
 	    20);

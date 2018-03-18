@@ -58,20 +58,19 @@ using namespace std;
 static void routine1();
 static void routine2();
 
-static user_interaction *ui = nullptr;
+static shared_ptr<user_interaction>ui;
 
 int main()
 {
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
+    ui.reset(new (nothrow) shell_interaction(cout, cerr, false));
     if(ui == nullptr)
 	cout << "ERREUR !" << endl;
     routine1();
     routine2();
-    if(ui != nullptr)
-	delete ui;
+    ui.reset();
 }
 
 static void routine1()
@@ -84,9 +83,9 @@ static void routine1()
     libdar::deci d2 = f2;
     libdar::deci d3 = f3;
 
-    ui->warning(d1.human() + " " + d2.human() + " " + d3.human());
+    ui->message(d1.human() + " " + d2.human() + " " + d3.human());
 
-    fichier_local *fic = new (nothrow) fichier_local(*ui, "toto", gf_write_only, 0600, false, true, false);
+    fichier_local *fic = new (nothrow) fichier_local(ui, "toto", gf_write_only, 0600, false, true, false);
     if(fic == nullptr)
 	throw Ememory("routine1");
     f1.dump(*fic);
@@ -99,39 +98,39 @@ static void routine1()
 
     f3 = infinint(*fic);
     d3 = libdar::deci(f3);
-    ui->warning(d3.human());
+    ui->message(d3.human());
     delete fic;
     fic = nullptr;
 
     f1 += 3;
     d1 = libdar::deci(f1);
-    ui->warning(d1.human());
+    ui->message(d1.human());
 
     f1 -= 2;
     d1 = libdar::deci(f1);
-    ui->warning(d1.human());
+    ui->message(d1.human());
 
     f1 *= 10;
     d1 = libdar::deci(f1);
-    ui->warning(d1.human());
+    ui->message(d1.human());
 
     f2 = f1;
     f1 /= 3;
     d1 = libdar::deci(f1);
-    ui->warning(d1.human());
+    ui->message(d1.human());
 
     f2 %= 3;
     d2 = libdar::deci(f2);
-    ui->warning(d2.human());
+    ui->message(d2.human());
 
     f2 >>= 12;
     d2 = libdar::deci(f2);
-    ui->warning(d2.human());
+    ui->message(d2.human());
 
     f1 = 4;
     f2 >>= f1;
     d2 = libdar::deci(f2);
-    ui->warning(d2.human());
+    ui->message(d2.human());
 
     f1 = 4+12;
     f2 = f3;
@@ -142,9 +141,9 @@ static void routine1()
     cout << (123 << 16) << endl;
     f2 <<= 4+12;
     d2 = libdar::deci(f2);
-    ui->warning(d2.human());
+    ui->message(d2.human());
     d3 = libdar::deci(f3);
-    ui->warning(d3.human());
+    ui->message(d3.human());
 
     try
     {
@@ -185,27 +184,27 @@ static void routine1()
             d1 = libdar::deci(f1);
             d2 = libdar::deci(f2);
             d3 = libdar::deci(f3);
-            ui->warning(d1.human() + " " + d2.human() + " " + d3.human());
+            ui->message(d1.human() + " " + d2.human() + " " + d3.human());
             f2 *= f3;
             d2 = libdar::deci(f2);
-            ui->warning(d2.human());
+            ui->message(d2.human());
         }
     }
     catch(Elimitint & e)
     {
-        ui->warning(e.get_message());
+        ui->message(e.get_message());
     }
     d2 = libdar::deci(f2);
     d1 = libdar::deci(f1);
-    ui->warning(string("factoriel(") + d1.human() + ") = " + d2.human());
+    ui->message(string("factoriel(") + d1.human() + ") = " + d2.human());
 }
 
 static void routine2()
 {
-    ui->warning(libdar::deci(infinint(2).power((U_I)0)).human());
-    ui->warning(libdar::deci(infinint(2).power(infinint(0))).human());
-    ui->warning(libdar::deci(infinint(2).power((U_I)1)).human());
-    ui->warning(libdar::deci(infinint(2).power(infinint(1))).human());
-    ui->warning(libdar::deci(infinint(2).power((U_I)2)).human());
-    ui->warning(libdar::deci(infinint(2).power(infinint(2))).human());
+    ui->message(libdar::deci(infinint(2).power((U_I)0)).human());
+    ui->message(libdar::deci(infinint(2).power(infinint(0))).human());
+    ui->message(libdar::deci(infinint(2).power((U_I)1)).human());
+    ui->message(libdar::deci(infinint(2).power(infinint(1))).human());
+    ui->message(libdar::deci(infinint(2).power((U_I)2)).human());
+    ui->message(libdar::deci(infinint(2).power(infinint(2))).human());
 }

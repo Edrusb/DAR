@@ -51,15 +51,15 @@ extern "C"
 using namespace libdar;
 using namespace std;
 
-static user_interaction *ui = nullptr;
+static shared_ptr<user_interaction> ui;
 
 int main(S_I argc, char *argv[])
 {
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(ui == nullptr)
+    ui.reset(new (nothrow) shell_interaction(cout, cerr, false));
+    if(!ui)
 	cout << "ERREUR !" << endl;
 
     if(argc < 3)
@@ -68,14 +68,14 @@ int main(S_I argc, char *argv[])
         return -1;
     }
 
-    fichier_local f1 = fichier_local(*ui, argv[1], gf_read_only, 0, false, false, false);
+    fichier_local f1 = fichier_local(ui, argv[1], gf_read_only, 0, false, false, false);
     S_I fd = ::open(argv[2], O_WRONLY|O_CREAT|O_TRUNC|O_BINARY);
     if(fd < 0)
     {
         cout << "cannot open "<< argv[2] << endl;
         return -1;
     }
-    fichier_local f2 = fichier_local(*ui, argv[2], gf_write_only, 0666, false, true, false);
+    fichier_local f2 = fichier_local(ui, argv[2], gf_write_only, 0666, false, true, false);
 
     f1.reset_crc(crc::OLD_CRC_SIZE);
     f2.reset_crc(crc::OLD_CRC_SIZE);
@@ -102,8 +102,7 @@ int main(S_I argc, char *argv[])
 	else
 	    cout << "CRC PROBLEM" << endl;
 
-	if(ui != nullptr)
-	    delete ui;
+	ui.reset();
     }
     catch(...)
     {

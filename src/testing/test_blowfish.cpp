@@ -54,12 +54,12 @@ extern "C"
 using namespace libdar;
 using namespace std;
 
-void f1(user_interaction *dialog);
-void f2(user_interaction *dialog);
+void f1(const shared_ptr<user_interaction> & dialog);
+void f2(const shared_ptr<user_interaction> & dialog);
 
 int main()
 {
-    user_interaction *dialog = new (nothrow) shell_interaction(&cout, &cerr, false);
+    shared_ptr<user_interaction> dialog(new (nothrow) shell_interaction(cout, cerr, false));
     U_I maj, med, min;
     get_version(maj, med, min);
 
@@ -80,15 +80,14 @@ int main()
 	cout << "unknown exception caught" << endl;
     }
 
-    if(dialog != nullptr)
-	delete dialog;
+    dialog.reset();
 }
 
-void f1(user_interaction *dialog)
+void f1(const shared_ptr<user_interaction> & dialog)
 {
-    fichier_local fic = fichier_local(*dialog, "toto", gf_write_only, 0666, false, true, false);
+    fichier_local fic = fichier_local(dialog, "toto", gf_write_only, 0666, false, true, false);
     string pass = "bonjour";
-    crypto_sym bf(10, secu_string(pass.c_str(), pass.size()), fic, false, macro_tools_supported_version, crypto_blowfish, true);
+    crypto_sym bf(10, secu_string(pass.c_str(), pass.size()), fic, false, macro_tools_supported_version, crypto_algo::blowfish, true);
     char buffer[100] = "bonjour les amis il fait chaud il fait beau ! ";
 
     bf.write(buffer, strlen(buffer));
@@ -97,11 +96,11 @@ void f1(user_interaction *dialog)
     bf.write_end_of_file();
 }
 
-void f2(user_interaction *dialog)
+void f2(const shared_ptr<user_interaction> & dialog)
 {
-    fichier_local fic = fichier_local(*dialog, "toto", gf_read_only, 0666, false, false, false);
+    fichier_local fic = fichier_local(dialog, "toto", gf_read_only, 0666, false, false, false);
     string pass = "bonjour";
-    crypto_sym bf(10, secu_string(pass.c_str(), pass.size()), fic, false, macro_tools_supported_version, crypto_blowfish, true);
+    crypto_sym bf(10, secu_string(pass.c_str(), pass.size()), fic, false, macro_tools_supported_version, crypto_algo::blowfish, true);
     char buffer[100];
     S_I lu;
     bool ret;

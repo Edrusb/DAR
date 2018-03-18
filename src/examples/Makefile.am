@@ -20,13 +20,13 @@ LDADD = ../libdar/$(MYLIB).la $(GPGME_LIBS)
 AM_LDFLAGS = @LTLIBINTL@
 
 factoriel_SOURCES = factoriel.cpp
-factoriel_LDADD =  ../dar_suite/shell_interaction.o ../dar_suite/dar_suite.o ../dar_suite/line_tools.o $(LDADD)
-factoriel_DEPENDENCIES = ../libdar/$(MYLIB).la ../dar_suite/shell_interaction.cpp ../dar_suite/dar_suite.cpp
+factoriel_LDADD =  ../dar_suite/dar_suite.o ../dar_suite/line_tools.o $(LDADD)
+factoriel_DEPENDENCIES = ../libdar/$(MYLIB).la ../dar_suite/dar_suite.cpp
 
 prime_SOURCES = prime.cpp
-prime_LDADD = ../dar_suite/shell_interaction.o ../dar_suite/dar_suite.o ../dar_suite/line_tools.o  $(LDADD)
-prime_DEPENDENCIES = ../libdar/$(MYLIB).la ../dar_suite/shell_interaction.cpp ../dar_suite/dar_suite.cpp
+prime_LDADD = ../dar_suite/dar_suite.o ../dar_suite/line_tools.o  $(LDADD)
+prime_DEPENDENCIES = ../libdar/$(MYLIB).la ../dar_suite/dar_suite.cpp
 
 formula_SOURCES = formula.cpp
-formula_LDADD = ../dar_suite/shell_interaction.o ../dar_suite/dar_suite.o ../dar_suite/crit_action_cmd_line.o ../dar_suite/line_tools.o  $(LDADD)
-formula_DEPENDENCIES = ../libdar/$(MYLIB).la ../dar_suite/line_tools.cpp ../dar_suite/shell_interaction.cpp ../dar_suite/crit_action_cmd_line.cpp ../dar_suite/dar_suite.cpp
+formula_LDADD = ../dar_suite/dar_suite.o ../dar_suite/crit_action_cmd_line.o ../dar_suite/line_tools.o  $(LDADD)
+formula_DEPENDENCIES = ../libdar/$(MYLIB).la ../dar_suite/line_tools.cpp ../dar_suite/crit_action_cmd_line.cpp ../dar_suite/dar_suite.cpp

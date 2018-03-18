@@ -54,24 +54,23 @@ using namespace std;
 
 static void f1();
 
-static user_interaction *ui = nullptr;
+static shared_ptr<user_interaction> ui;
 
 int main()
 {
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(ui == nullptr)
+    ui.reset(new (nothrow) shell_interaction(cout, cerr, false));
+    if(!ui)
 	cout << "ERREUR !" << endl;
     f1();
-    if(ui != nullptr)
-	delete ui;
+    ui.reset();
 }
 
 static void f1()
 {
-    fichier_local toto = fichier_local(*ui, "toto", gf_read_write, 0666, false, true, false);
+    fichier_local toto = fichier_local(ui, "toto", gf_read_write, 0666, false, true, false);
     terminateur term;
 
     infinint grand = 1;

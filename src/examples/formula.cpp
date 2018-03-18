@@ -29,7 +29,6 @@
 #include "integers.hpp"
 #include "erreurs.hpp"
 #include "tools.hpp"
-#include "../dar_suite/shell_interaction.hpp"
 #include "../dar_suite/dar_suite.hpp"
 #include "../dar_suite/crit_action_cmd_line.hpp"
 #include "../dar_suite/line_tools.hpp"
@@ -37,7 +36,7 @@
 using namespace libdar;
 using namespace std;
 
-int little_main(shell_interaction & ui, S_I argc, char * const argv[], const char **env);
+int little_main(shared_ptr<user_interaction> & ui, S_I argc, char * const argv[], const char **env);
 
 static infinint calculus(const string & formula); // recusive call
 
@@ -52,7 +51,7 @@ int main(S_I argc, char * const argv[], const char **env)
 			    &little_main);
 }
 
-int little_main(shell_interaction & ui, S_I argc, char * const argv[], const char **env)
+int little_main(shared_ptr<user_interaction> & ui, S_I argc, char * const argv[], const char **env)
 {
     if(argc != 2)
     {

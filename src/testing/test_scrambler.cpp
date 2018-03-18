@@ -29,6 +29,7 @@ extern "C"
 } // end extern "C"
 
 #include <string>
+#include <memory>
 
 #include "scrambler.hpp"
 #include "dar_suite.hpp"
@@ -38,8 +39,9 @@ extern "C"
 #include "tools.hpp"
 
 using namespace libdar;
+using namespace std;
 
-S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[], const char **env);
+S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const argv[], const char **env);
 
 int main(S_I argc, char * const argv[])
 {
@@ -52,7 +54,7 @@ int main(S_I argc, char * const argv[])
 			    &little_main);
 }
 
-S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[], const char **env)
+S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const argv[], const char **env)
 {
     if(argc != 4)
     {

@@ -64,6 +64,9 @@ extern "C"
 #include "macro_tools.hpp"
 #include "fichier_local.hpp"
 
+using namespace std;
+using namespace libdar;
+
 class test : public tronconneuse
 {
 public:
@@ -99,16 +102,16 @@ U_32 test::decrypt_data(const infinint & block_num, const char *crypt_buf, const
 }
 
 
-void f1(user_interaction *dialog);
-void f2(user_interaction *dialog);
-void f3(user_interaction *dialog);
+void f1(const shared_ptr<user_interaction> & dialog);
+void f2(const shared_ptr<user_interaction> & dialog);
+void f3(const shared_ptr<user_interaction> & dialog);
 
 int main()
 {
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    user_interaction *dialog = new (nothrow) shell_interaction(&cout, &cerr, false);
+    shared_ptr<user_interaction> dialog(new (nothrow) shell_interaction(cout, cerr, false));
     try
     {
 	f1(dialog);
@@ -123,13 +126,12 @@ int main()
     {
 	cout << "unknown exception caught" << endl;
     }
-    if(dialog != nullptr)
-	delete dialog;
+    dialog.reset();
 }
 
-void f1(user_interaction *dialog)
+void f1(const shared_ptr<user_interaction> & dialog)
 {
-    fichier_local fic = fichier_local(*dialog, "toto", gf_write_only, 0666, false, true, false);
+    fichier_local fic = fichier_local(dialog, "toto", gf_write_only, 0666, false, true, false);
 
     test *toto = new test(*dialog, 10, fic);
     if(toto == nullptr)
@@ -149,9 +151,9 @@ void f1(user_interaction *dialog)
     delete toto;
 }
 
-void f2(user_interaction *dialog)
+void f2(const shared_ptr<user_interaction> & dialog)
 {
-    fichier_local fic = fichier_local(*dialog, "toto", gf_read_only, 0666, false, false, false);
+    fichier_local fic = fichier_local(dialog, "toto", gf_read_only, 0666, false, false, false);
 
     test *toto = new test(*dialog, 10, fic);
     if(toto == nullptr)
@@ -193,10 +195,10 @@ void f2(user_interaction *dialog)
 }
 
 
-void f3(user_interaction *dialog)
+void f3(const shared_ptr<user_interaction> & dialog)
 {
-    fichier_local foc = fichier_local(*dialog, "toto", gf_write_only, 0666, false, false, false);
-    fichier_local fic = fichier_local(*dialog, "titi", gf_write_only, 0666, false, true, false);
+    fichier_local foc = fichier_local(dialog, "toto", gf_write_only, 0666, false, false, false);
+    fichier_local fic = fichier_local(dialog, "titi", gf_write_only, 0666, false, true, false);
 
     WRITE_TO(foc, "Hello les amis");
     WRITE_TO(fic, "Hello les amis");

@@ -32,8 +32,9 @@ extern "C"
 #include "shell_interaction.hpp"
 
 using namespace libdar;
+using namespace std;
 
-static shell_interaction ui = shell_interaction(&cout, &cerr, false);
+static shell_interaction ui(cout, cerr, false);
 
 void f1();
 void f2();

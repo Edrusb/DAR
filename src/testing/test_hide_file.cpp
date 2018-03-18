@@ -41,27 +41,26 @@ using namespace libdar;
 void f1();
 void f2();
 
-static user_interaction *ui = nullptr;
+static shared_ptr<user_interaction> ui;
 
 int main()
 {
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(ui == nullptr)
+    ui.reset(new (nothrow) shell_interaction(cout, cerr, false));
+    if(!ui)
 	cout << "ERREUR !" << endl;
     f1();
     f2();
-    if(ui != nullptr)
-	delete ui;
+    ui.reset();
 }
 
 void f1()
 {
-    fichier_local src = fichier_local(*ui, "toto", gf_read_only, 0666, false, false, false);
+    fichier_local src = fichier_local(ui, "toto", gf_read_only, 0666, false, false, false);
     no_comment strip = no_comment(src);
-    fichier_local dst = fichier_local(*ui, "titi", gf_write_only, 0666, false, true, false);
+    fichier_local dst = fichier_local(ui, "titi", gf_write_only, 0666, false, true, false);
 
     strip.copy_to(dst);
 }
@@ -74,9 +73,9 @@ void f2()
     cibles.push_back("all");
     cibles.push_back("default");
 
-    fichier_local src = fichier_local(*ui, "toto", gf_read_only, 0666, false, false, false);
+    fichier_local src = fichier_local(ui, "toto", gf_read_only, 0666, false, false, false);
     config_file strip = config_file(cibles, src);
-    fichier_local dst = fichier_local(*ui, "tutu", gf_write_only, 0666, false, true, false);
+    fichier_local dst = fichier_local(ui, "tutu", gf_write_only, 0666, false, true, false);
 
     strip.copy_to(dst);
 }

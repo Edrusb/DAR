@@ -65,6 +65,7 @@ extern "C"
 
 #include <string.h>
 #include <iostream>
+#include <memory>
 
 #include "libdar.hpp"
 #include "filesystem_backup.hpp"
@@ -78,14 +79,15 @@ extern "C"
 #include "fichier_local.hpp"
 #include "tuyau.hpp"
 
-static user_interaction *ui = nullptr;
+using namespace libdar;
+using namespace std;
+
+static shared_ptr<user_interaction> ui;
 
 static void build();
 static void test();
 static void del();
 static void re_test();
-
-using namespace libdar;
 
 static catalogue *cat;
 
@@ -95,10 +97,10 @@ int main()
     label data_name;
 
     get_version(maj, med, min);
-    user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(ui == nullptr)
+    ui.reset(new (nothrow) shell_interaction(cout, cerr, false));
+    if(!ui)
 	cout << "ERREUR !" << endl;
-    cat = new catalogue(*ui, datetime(120), data_name);
+    cat = new catalogue(ui, datetime(120), data_name);
     build();
     test();
     {
@@ -106,8 +108,7 @@ int main()
         del();
     }
     delete cat;
-    if(ui != nullptr)
-	delete ui;
+    ui.reset();
 }
 
 static void build()
@@ -158,7 +159,7 @@ static void test()
     bool_mask all = true;
     fsa_scope sc;
 
-    filesystem_backup fs(*ui, path("arbo"), true, bool_mask(true), false, false, false,false, root_fs_device, false, sc);
+    filesystem_backup fs(ui, path("arbo"), true, bool_mask(true), false, false, false,false, root_fs_device, false, sc);
 
     while(fs.read(p, errors, skipped_dump))
     {
@@ -173,7 +174,7 @@ static void test()
                 crc *val = nullptr;
 		infinint crc_size = 1;
 
-                tuyau sortie = tuyau(*ui, dup(1));
+                tuyau sortie = tuyau(ui, dup(1));
                 entree->copy_to(sortie, crc_size, val);
 		if(val == nullptr)
 		    throw SRC_BUG;
@@ -196,7 +197,7 @@ static void test()
             delete entree;
         }
     }
-    cat->listing(false, all, all, false, false, false, "");
+    cat->listing(*ui, false, all, all, false, false, false, "");
 }
 
 static void re_test()
@@ -210,7 +211,7 @@ static void re_test()
 	bool_mask all = true;
 	crit_constant_action todo =  crit_constant_action(data_preserve, EA_preserve);
 	fsa_scope sc;
-	filesystem_restore fs(*ui, where, true, true, all, cat_inode::cf_all, true, false, &todo, false, sc);
+	filesystem_restore fs(ui, where, true, true, all, cat_inode::cf_all, true, false, &todo, false, sc);
 	bool hasbeencreated, ea_restored, hard_link, fsa_restored;
 	libdar::filesystem_restore::action_done_for_data  data_restored;
 

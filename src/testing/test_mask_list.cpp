@@ -48,15 +48,15 @@ extern "C"
 using namespace libdar;
 using namespace std;
 
-void f1(user_interaction *dialog, const char *filename);
+void f1(const shared_ptr<user_interaction> & dialog, const char *filename);
 
 int main(int argc, char *argv[])
 {
-    user_interaction *dialog = new (nothrow) shell_interaction(&cout, &cerr, false);
+    shared_ptr<user_interaction> dialog(new (nothrow) shell_interaction(cout, cerr, false));
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    if(dialog == nullptr)
+    if(!dialog)
 	cout << "ERREUR !" << endl;
 
     try
@@ -73,12 +73,10 @@ int main(int argc, char *argv[])
     {
 	cout << "unknown exception caught" << endl;
     }
-
-    if(dialog != nullptr)
-	delete dialog;
+    dialog.reset();
 }
 
-void f1(user_interaction *dialog, const char *filename)
+void f1(const shared_ptr<user_interaction> & dialog, const char *filename)
 {
     mask_list m = mask_list(filename, true, "/toto/tutu", true);
     string tester;

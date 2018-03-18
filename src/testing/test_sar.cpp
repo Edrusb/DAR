@@ -21,6 +21,7 @@
 
 #include "../my_config.h"
 #include <iostream>
+#include <memory>
 
 #include "sar.hpp"
 #include "deci.hpp"
@@ -33,8 +34,9 @@
 #include "entrepot_local.hpp"
 
 using namespace libdar;
+using namespace std;
 
-static user_interaction *ui = nullptr;
+static shared_ptr<user_interaction> ui;
 
 static label data_name;
 static label internal_name;
@@ -48,8 +50,8 @@ int main()
 {
     U_I major, medium, minor;
     get_version(major, medium, minor);
-    user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(ui == nullptr)
+    ui.reset(new (nothrow) shell_interaction(cout, cerr, false));
+    if(!ui)
 	cout << "ERREUR !" << endl;
     data_name.clear();
     internal_name.generate_internal_filename();
@@ -57,8 +59,7 @@ int main()
     f2();
     f3();
     f4();
-    if(ui != nullptr)
-	delete ui;
+    ui.reset();
 }
 
 static void f1()
@@ -67,8 +68,8 @@ static void f1()
     where.set_location("./test");
     try
     {
-	sar sar1(*ui, gf_write_only, "destination", "txt", 100, 110, true, false, 0, where, internal_name, data_name, false, 0, hash_none, false, 0);
-        fichier_local src = fichier_local(*ui, "./test/source.txt", gf_read_only, 0666, false, false, false);
+	sar sar1(ui, gf_write_only, "destination", "txt", 100, 110, true, false, 0, where, internal_name, data_name, false, 0, hash_none, false, 0);
+        fichier_local src = fichier_local(ui, "./test/source.txt", gf_read_only, 0666, false, false, false);
         src.copy_to(sar1);
     }
     catch(Egeneric &e)
@@ -83,8 +84,8 @@ static void f2()
     where.set_location("./test");
     try
     {
-        sar sar2(*ui, "destination", "txt", where, 0, false);
-        fichier_local dst = fichier_local(*ui, "./test/destination.txt", gf_write_only, 0777, false, true, false);
+        sar sar2(ui, "destination", "txt", where, 0, false);
+        fichier_local dst = fichier_local(ui, "./test/destination.txt", gf_write_only, 0777, false, true, false);
 
         sar2.copy_to(dst);
     }
@@ -101,8 +102,8 @@ static void f3()
 
     try
     {
-        sar sar3(*ui, "destination", "txt", where, 0, false);
-        fichier_local src = fichier_local(*ui, "./test/source.txt", gf_read_only, 0666, false, false, false);
+        sar sar3(ui, "destination", "txt", where, 0, false);
+        fichier_local src = fichier_local(ui, "./test/source.txt", gf_read_only, 0666, false, false, false);
 
         display(sar3.get_position());
         display(src.get_position());
@@ -169,7 +170,7 @@ void f4()
 
     try
     {
-        sar sar2(*ui, "destination", "txt", where, 0, true, "echo SLICE %n");
+        sar sar2(ui, "destination", "txt", where, 0, true, "echo SLICE %n");
 
 	display(sar2.get_position());
 	display_back_read(*ui, sar2);

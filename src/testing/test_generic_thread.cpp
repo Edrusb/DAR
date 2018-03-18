@@ -35,7 +35,7 @@ extern "C"
 using namespace std;
 using namespace libdar;
 
-static shell_interaction ui = shell_interaction(&cout, &cerr, false);
+static shared_ptr<shell_interaction> ui(new shell_interaction(cout, cerr, false));
 
 void f1();
 void f2(const string & src, const string & dst);
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     }
     catch(Egeneric & e)
     {
-	ui.printf("Exception caught: %S", &(e.get_message()));
+	ui->printf("Exception caught: %S", &(e.get_message()));
 	cout << e.dump_str() << endl;
     }
     catch(libthreadar::exception_base & e)
@@ -66,11 +66,11 @@ int main(int argc, char *argv[])
 
 	for(unsigned int i = 0; i < e.size(); ++i)
 	    msg = e[i] + ": " + msg;
-	ui.printf("libthreadar exception: %S", &msg);
+	ui->printf("libthreadar exception: %S", &msg);
     }
     catch(...)
     {
-	ui.printf("unknown exception caught");
+	ui->printf("unknown exception caught");
     }
 
     return 0;
@@ -85,7 +85,7 @@ void f1()
 
     t1->copy_to(dst);
     tmp = dst.size();
-    ui.printf("dst size = %i\n", &tmp);
+    ui->printf("dst size = %i\n", &tmp);
 
     t1->skip(0);
     dst.reset();
@@ -96,7 +96,7 @@ void f1()
     dst.reset();
     t1->read_ahead(1000);
     tmp = t1->get_position();
-    ui.printf("t1 posiiton = %i\n", &tmp);
+    ui->printf("t1 posiiton = %i\n", &tmp);
     t1->copy_to(dst);
 
     delete t1;
@@ -105,7 +105,7 @@ void f1()
     dst.skip(0);
     dst.copy_to(*t1);
     tmp = t1->get_position();
-    ui.printf("t1 position = %i\n", &tmp);
+    ui->printf("t1 position = %i\n", &tmp);
 
     delete t1;
 }

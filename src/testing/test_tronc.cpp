@@ -45,6 +45,7 @@ extern "C"
 } // end extern "C"
 
 #include <iostream>
+#include <string>
 
 #include "libdar.hpp"
 #include "tronc.hpp"
@@ -57,6 +58,7 @@ extern "C"
 #include "fichier_local.hpp"
 
 using namespace libdar;
+using namespace std;
 
 void f1();
 void f2();
@@ -75,17 +77,17 @@ void f1()
     {
 	get_version(maj, med, min);
 	string p = "test/source.txt";
-	shell_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-	if(ui == nullptr)
+	shared_ptr<user_interaction> ui(new (nothrow) shell_interaction(cout, cerr, false));
+	if(!ui)
 	    cout << "ERREUR !" << endl;
 
-	fichier_local h = fichier_local(*ui, p, gf_read_only, 0777, false, true, false);
+	fichier_local h = fichier_local(ui, p, gf_read_only, 0777, false, true, false);
 
 	display_read(*ui, h);
 
 	try
 	{
-	    fichier_local f = fichier_local(*ui, "test/source.txt", gf_read_only, 0777, false, false, false);
+	    fichier_local f = fichier_local(ui, "test/source.txt", gf_read_only, 0777, false, false, false);
 	    tronc *t;
 
 	    t = new tronc(&f, 0, infinint(10));
@@ -111,7 +113,7 @@ void f1()
 	    cout << f.get_position() << endl;
 
 	    delete t;
-	    fichier_local g = fichier_local(*ui, "test/destination.txt", gf_read_write, 0666, false, true, false);
+	    fichier_local g = fichier_local(ui, "test/destination.txt", gf_read_write, 0666, false, true, false);
 	    f.skip(0);
 	    f.copy_to(g);
 	    t = new tronc(&g, 10, infinint(10));
@@ -146,8 +148,7 @@ void f1()
 	{
 	    cerr << f.dump_str();
 	}
-	if(ui != nullptr)
-	    delete ui;
+	ui.reset();
     }
     catch(Egeneric & f)
     {
@@ -161,13 +162,13 @@ void f2()
     try
     {
 	string p = "test/source.txt";
-	user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-	if(ui == nullptr)
+	shared_ptr<user_interaction> ui(new (nothrow) shell_interaction(cout, cerr, false));
+	if(!ui)
 	    cout << "ERREUR !" << endl;
 
 	try
 	{
-	    fichier_local f = fichier_local(*ui, "test/source.txt", gf_read_only, 0666, false, false, false);
+	    fichier_local f = fichier_local(ui, "test/source.txt", gf_read_only, 0666, false, false, false);
 	    tronc *t;
 
 	    t = new tronc(&f, 1);
@@ -201,7 +202,7 @@ void f2()
 
 		/////// now testing writing mode
 
-	    fichier_local g = fichier_local(*ui, "test/destination.txt", gf_read_write, 0666, false, true, false);
+	    fichier_local g = fichier_local(ui, "test/destination.txt", gf_read_write, 0666, false, true, false);
 	    g.skip(0);
 	    display_read(*ui, g);
 
@@ -227,8 +228,7 @@ void f2()
 	{
 	    cerr << e.dump_str();
 	}
-	if(ui != nullptr)
-	    delete ui;
+	ui.reset();
     }
     catch(Egeneric & f)
     {

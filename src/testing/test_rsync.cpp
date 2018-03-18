@@ -36,7 +36,7 @@ extern "C"
 using namespace std;
 using namespace libdar;
 
-static shell_interaction ui = shell_interaction(&cout, &cerr, false);
+static shared_ptr<shell_interaction> ui(new shell_interaction(cout, cerr, false));
 
 void usage(const char *argv0)
 {
@@ -89,12 +89,12 @@ int main(int argc, char *argv[])
     }
     catch(Egeneric & e)
     {
-	ui.printf("Exception caught: %S", &(e.get_message()));
+	ui->printf("Exception caught: %S", &(e.get_message()));
 	cout << e.dump_str() << endl;
     }
     catch(...)
     {
-	ui.printf("unknown exception caught");
+	ui->printf("unknown exception caught");
     }
 
     return 0;

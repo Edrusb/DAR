@@ -33,13 +33,12 @@ extern "C"
 #include "infinint.hpp"
 #include "deci.hpp"
 #include "integers.hpp"
-#include "../dar_suite/shell_interaction.hpp"
 #include "../dar_suite/dar_suite.hpp"
 
 using namespace libdar;
 using namespace std;
 
-int little_main(shell_interaction & ui, S_I argc, char * const argv[], const char **env);
+int little_main(shared_ptr<user_interaction> & ui, S_I argc, char * const argv[], const char **env);
 
 int main(S_I argc, char * const argv[], const char **env)
 {
@@ -52,7 +51,7 @@ int main(S_I argc, char * const argv[], const char **env)
 			    &little_main);
 }
 
-int little_main(shell_interaction & ui, S_I argc, char * const argv[], const char **env)
+int little_main(shared_ptr<user_interaction> & ui, S_I argc, char * const argv[], const char **env)
 {
     if(argc != 2)
     {

@@ -124,7 +124,7 @@ void f1(int argc, char *argv[])
 	     chemin,
 	     port);
 
-    shell_interaction ui(&cout, &cerr, true);
+    shared_ptr<user_interaction> ui(new shell_interaction(cout, cerr, true));
     entrepot_libcurl reposito(ui,
 			      proto,
 			      login,
@@ -180,7 +180,7 @@ void f1(int argc, char *argv[])
 	}
 	catch(Erange & e)
 	{
-	    ui.warning(e.get_message());
+	    ui->message(e.get_message());
 	}
 
 	cout << "Listing: " << reposito.get_url() << endl;
@@ -224,7 +224,7 @@ void f1(int argc, char *argv[])
 	try
 	{
 	    infinint file_size = fic->get_size();
-	    ui.printf("size = %i", &file_size);
+	    ui->printf("size = %i", &file_size);
 
 	    fic->copy_to(*writetome);
 	}
@@ -292,9 +292,9 @@ void f1(int argc, char *argv[])
 	    buf[utamp] = '\0';
 	    cout << "reading " << step << " first chars: " << buf << endl;
 	    tamp = fac->get_position();
-	    ui.printf("position = %i", &tamp);
+	    ui->printf("position = %i", &tamp);
 	    tamp = fac->get_size();
-	    ui.printf("file size = %i", &tamp);
+	    ui->printf("file size = %i", &tamp);
 
 	    tamp = fac->read(buf, step);
 	    utamp = 0;
@@ -302,7 +302,7 @@ void f1(int argc, char *argv[])
 	    buf[utamp] = '\0';
 	    cout << "reading " << step << " next chars:  " << buf << endl;
 	    tamp = fac->get_position();
-	    ui.printf("position = %i", &tamp);
+	    ui->printf("position = %i", &tamp);
 	}
 	catch(...)
 	{

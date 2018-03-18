@@ -45,7 +45,7 @@ void display_read(user_interaction & dialog, generic_file & f)
         buffer[lu] = '\0';
     else
         buffer[size-1] = '\0';
-    dialog.warning(tools_printf("lu = %d : [%s]\n", lu, buffer));
+    dialog.message(tools_printf("lu = %d : [%s]\n", lu, buffer));
 }
 
 void display_back_read(user_interaction & dialog, generic_file & f)
@@ -59,5 +59,5 @@ void display_back_read(user_interaction & dialog, generic_file & f)
         buffer[lu] = '\0';
     else
         buffer[size-1] = '\0';
-    dialog.warning(tools_printf("lu = %d : [%s]\n", lu, buffer));
+    dialog.message(tools_printf("lu = %d : [%s]\n", lu, buffer));
 }

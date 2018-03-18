@@ -51,7 +51,7 @@ void f3();
 void f4();
 void f5();
 
-static user_interaction_callback ui = user_interaction_callback(warning, question, getstring, getsecustring,(void *)1000);
+static shared_ptr<user_interaction> ui(new user_interaction_callback(warning, question, getstring, getsecustring,(void *)1000));
 
 int main()
 {
@@ -72,7 +72,7 @@ void f1()
     libdar::compile_time::endian endy;
 
     get_version(maj, med, min);
-    ui.printf("version %u.%u.%u\n", maj, med, min);
+    ui->printf("version %u.%u.%u\n", maj, med, min);
     ea = libdar::compile_time::ea();
     large = libdar::compile_time::largefile();
     nodump = libdar::compile_time::nodump();
@@ -85,7 +85,7 @@ void f1()
     libcrypto = libdar::compile_time::libgcrypt();
     furtive = libdar::compile_time::furtive_read();
     endy = libdar::compile_time::system_endian();
-    ui.printf("features:\nEA = %s\nLARGE = %s\nNODUMP = %s\nSPECIAL = %s\nbits = %u\nthread = %s\nlibz =%s\nlibbz2 = %s\nliblzo = %s\nlibcrypto = %s\nfurtive = %s\nendian = %c\n",
+    ui->printf("features:\nEA = %s\nLARGE = %s\nNODUMP = %s\nSPECIAL = %s\nbits = %u\nthread = %s\nlibz =%s\nlibbz2 = %s\nliblzo = %s\nlibcrypto = %s\nfurtive = %s\nendian = %c\n",
 	      BOOL2STR(ea),
 	      BOOL2STR(large),
 	      BOOL2STR(nodump),
@@ -138,87 +138,59 @@ void listing(const std::string & flag,
 	     bool has_children,
 	     void *context)
 {
-    ui.printf("[[%p]][%S][%S][%S][%S][%S][%S][%S][%s][%s]\n", context, &flag, &perm, &uid, &gid, &size, &date, &filename, is_dir ? "dir" : "not_dir", has_children ? "has children" : "no children");
+    ui->printf("[[%p]][%S][%S][%S][%S][%S][%S][%S][%s][%s]\n", context, &flag, &perm, &uid, &gid, &size, &date, &filename, is_dir ? "dir" : "not_dir", has_children ? "has children" : "no children");
 }
 
 void f2()
 {
-    U_16 code;
-    string msg;
     statistics st;
     archive_options_read read_options;
     archive_options_create create_options;
 
     create_options.set_subtree(simple_path_mask("/etc", true));
-    archive *toto = create_archive_noexcept(ui,
-					    "/",
-					    ".",
-					    "toto",
-					    "dar",
-					    create_options,
-					    &st,
-					    code,
-					    msg);
-    if(code != LIBDAR_NOEXCEPT && code != LIBDAR_EUSER_ABORT)
+    archive *toto = nullptr;
+
+    try
     {
-	ui.printf("exception creating archive: %S\n", &msg);
-	return;
+	toto = new (nothrow) archive(ui,
+				     "/",
+				     ".",
+				     "toto",
+				     "dar",
+				     create_options,
+				     &st);
+	if(toto != nullptr)
+	{
+	    archive_options_listing options;
+
+	    options.clear();
+	    options.set_info_details(true);
+	    options.set_list_mode(archive_options_listing::normal);
+	    options.set_selection(bool_mask(true));
+	    options.set_filter_unsaved(false);
+	    toto->op_listing(nullptr, nullptr, options);
+	}
+    }
+    catch(...)
+    {
+	if(toto != nullptr)
+	    delete toto;
+	throw;
     }
     if(toto != nullptr)
     {
-	archive_options_listing options;
-
-	options.clear();
-	options.set_info_details(true);
-	options.set_list_mode(archive_options_listing::normal);
-	options.set_selection(bool_mask(true));
-	options.set_filter_unsaved(false);
-	op_listing_noexcept(ui, toto, options, code, msg);
-	if(code != LIBDAR_NOEXCEPT && code != LIBDAR_EUSER_ABORT)
-	{
-	    ui.printf("exception creating archive: %S\n", &msg);
-	}
-	close_archive_noexcept(toto, code, msg);
+	delete toto;
+	toto = nullptr;
     }
 
     read_options.clear();
     read_options.set_info_details(true);
-    archive *arch = open_archive_noexcept(ui, ".", "toto", "dar", read_options, code, msg);
-    if(code != LIBDAR_NOEXCEPT)
+    archive *arch = new (nothrow) archive(ui, ".", "toto", "dar", read_options);
+    if(arch != nullptr)
     {
-	ui.printf("exception openning archive: %S\n", &msg);
-	return;
-    }
-
-    ui.set_listing_callback(&listing);
-    bool ret = get_children_of_noexcept(ui, arch, "etc/rc.d", code, msg);
-    if(code != LIBDAR_NOEXCEPT)
-    {
-	ui.printf("exception looking for children: %S\n", &msg);
-	return;
-    }
-    if(ret)
-	ui.printf("found children\n");
-    else
-	ui.printf("no found children\n");
-
-    ret = get_children_of_noexcept(ui, arch, "", code, msg);
-    if(code != LIBDAR_NOEXCEPT)
-    {
-	ui.printf("exception looking for children of root: %S\n", &msg);
-	return;
-    }
-    if(ret)
-	ui.printf("found children\n");
-    else
-	ui.printf("no found children\n");
-
-
-    close_archive_noexcept(arch, code, msg);
-    if(code != LIBDAR_NOEXCEPT)
-    {
-	ui.printf("exception closing: %S\n", &msg);
-	return;
+	vector<list_entry> liste = arch->get_children_in_table("");
+	delete arch;
+	arch = nullptr;
     }
 }
 
@@ -227,47 +199,23 @@ void f3()
     archive_options_read read_options;
 
 	// need to create an archive named "titi" with file recorded as removed since reference backup
-    U_16 code;
-    string msg;
     read_options.clear();
     read_options.set_info_details(true);
-    archive *arch = open_archive_noexcept(ui, ".", "toto", "dar", read_options, code, msg);
-    if(code != LIBDAR_NOEXCEPT)
+    archive *arch = new (nothrow) archive(ui, ".", "toto", "dar", read_options);
+    if(arch != nullptr)
     {
-	ui.printf("exception openning archive: %S\n", &msg);
-	return;
+	arch->init_catalogue();
+	vector<list_entry> contents = arch->get_children_in_table("etc");
+	vector<list_entry>::iterator it = contents.begin();
+	while(it != contents.end())
+	{
+	    string line = it->get_name() + " " + (it->has_data_present_in_the_archive() ? "SAVED" : "not saved") + "\n";
+	    cout << line;
+	    ++it;
+	}
+	delete arch;
+	arch = nullptr;
     }
-
-    ui.set_listing_callback(&listing);
-    bool ret = get_children_of_noexcept(ui, arch, "etc/rc.d", code, msg);
-    if(code != LIBDAR_NOEXCEPT)
-    {
-	ui.printf("exception looking for children: %S\n", &msg);
-	return;
-    }
-    if(ret)
-	ui.printf("found children\n");
-    else
-	ui.printf("no found children\n");
-
-    arch->init_catalogue(ui);
-    vector<list_entry> contents = arch->get_children_in_table("etc");
-    vector<list_entry>::iterator it = contents.begin();
-    while(it != contents.end())
-    {
-	string line = it->get_name() + " " + (it->has_data_present_in_the_archive() ? "SAVED" : "not saved") + "\n";
-	cout << line;
-	++it;
-    }
-
-    close_archive_noexcept(arch, code, msg);
-    if(code != LIBDAR_NOEXCEPT)
-    {
-	ui.printf("exception closing: %S\n", &msg);
-	return;
-    }
-
-
 }
 
 void f4()
@@ -287,7 +235,7 @@ void f4()
 	fake.write("coucouc les amsi", 10);
 	cancel_thread(tid);
 	fake.write("coucouc les amsi", 10);
-	ui.printf("this statement should never be reached\n");
+	ui->printf("this statement should never be reached\n");
 	ret = ret+1; // avoid warning of unused variable
     }
     catch(Egeneric & e)
@@ -296,7 +244,7 @@ void f4()
     }
     catch(...)
     {
-	ui.printf("unknown expcetion caught\n");
+	ui->printf("unknown expcetion caught\n");
     }
 #endif
 }
@@ -305,8 +253,8 @@ void f5()
 {
     string ret;
 
-    ret = ui.get_string("Mot de passe svp :", false);
+    ret = ui->get_string("Mot de passe svp :", false);
     cout << "---[" << ret << "]---" << endl;
-    ret = ui.get_string("Mot de passe svp :", true);
+    ret = ui->get_string("Mot de passe svp :", true);
     cout << "---[" << ret << "]---" << endl;
 }

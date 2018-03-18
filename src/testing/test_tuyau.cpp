@@ -51,6 +51,7 @@ extern "C"
 } // end extern "C"
 
 #include <iostream>
+#include <memory>
 
 #include "tuyau.hpp"
 #include "tools.hpp"
@@ -59,11 +60,12 @@ extern "C"
 #include "shell_interaction.hpp"
 
 using namespace libdar;
+using namespace std;
 
 static const unsigned int buffer_size = 10000;
 static bool xmit = true;
 
-static int little_main(shell_interaction & dialog, int argc, char * const argv[], const char **env);
+static int little_main(shared_ptr<user_interaction> & dialog, int argc, char * const argv[], const char **env);
 static void action_xmit(user_interaction & dialog, tuyau *in, tuyau *out, U_32 duration);
 static void action_loop(tuyau *in, tuyau *out);
 static void stop_xmit(int l);
@@ -79,16 +81,20 @@ int main(int argc, char * const argv[])
 			    &little_main);
 }
 
-static int little_main(shell_interaction & dialog, int argc, char * const argv[], const char **env)
+static int little_main(shared_ptr<user_interaction> & dialog, int argc, char * const argv[], const char **env)
 {
     tuyau *in = nullptr, *out = nullptr;
     U_32 duration;
 
-    dialog.change_non_interactive_output(&cout);
+    shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
+    if(shelli == nullptr)
+	throw SRC_BUG;
+
+    shelli->change_non_interactive_output(cout);
     if(argc != 4)
     {
-        dialog.printf("usage : %s <input> <output> <seconds>\n", argv[0]);
-        dialog.printf("usage : %s <input> <output> loop\n", argv[0]);
+        dialog->printf("usage : %s <input> <output> <seconds>\n", argv[0]);
+        dialog->printf("usage : %s <input> <output> loop\n", argv[0]);
         return 0;
     }
 
@@ -98,7 +104,7 @@ static int little_main(shell_interaction & dialog, int argc, char * const argv[]
     else
     {
         duration = atol(argv[3]);
-        action_xmit(dialog, in, out, duration);
+        action_xmit(*dialog, in, out, duration);
     }
     return 0;
 }

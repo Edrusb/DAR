@@ -41,6 +41,7 @@ extern "C"
 } // end extern "C"
 
 #include <iostream>
+#include <memory>
 
 #include "integers.hpp"
 #include "infinint.hpp"
@@ -52,36 +53,35 @@ extern "C"
 #include "generic_file.hpp"
 #include "fichier_local.hpp"
 
-
-static void routine_limitint(user_interaction & dialog);
-static void routine_real_infinint(user_interaction & dialog);
-
 using namespace libdar;
+using namespace std;
 
-user_interaction *ui = nullptr;
+static void routine_limitint(shared_ptr<user_interaction> & dialog);
+static void routine_real_infinint(shared_ptr<user_interaction> & dialog);
+
+shared_ptr<user_interaction> ui;
 
 int main()
 {
-    user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(ui == nullptr)
+    ui.reset(new (nothrow) shell_interaction(cout, cerr, false));
+    if(!ui)
 	cout << "ERREUR !" << endl;
 
     try
     {
         ui->pause("Esc = generating dump of large real_integer, OK = testing limitint");
-        routine_limitint(*ui);
+        routine_limitint(ui);
     }
     catch(Euser_abort & e)
     {
-        routine_real_infinint(*ui);
+        routine_real_infinint(ui);
     }
-    if(ui != nullptr)
-	delete ui;
+    ui.reset();
 }
 
-static void routine_real_infinint(user_interaction & dialog)
+static void routine_real_infinint(shared_ptr<user_interaction> & dialog)
 {
-    fichier_local fic = fichier_local(*ui, "toto", gf_read_write, 0666, false, true, false);
+    fichier_local fic = fichier_local(ui, "toto", gf_read_write, 0666, false, true, false);
     infinint r1 = 1;
 
     r1 <<= 32;
@@ -92,7 +92,7 @@ static void routine_real_infinint(user_interaction & dialog)
     r1.dump(fic);
 }
 
-static void routine_limitint(user_interaction & dialog)
+static void routine_limitint(shared_ptr<user_interaction> & dialog)
 {
         /////////////////////////////////////////
         // testing construction overflow
@@ -121,7 +121,7 @@ static void routine_limitint(user_interaction & dialog)
     }
     catch(Elimitint & e)
     {
-        dialog.warning(e.get_message());
+        dialog->message(e.get_message());
     }
 
     try
@@ -131,7 +131,7 @@ static void routine_limitint(user_interaction & dialog)
     }
     catch(Elimitint & e)
     {
-        dialog.warning(e.get_message());
+        dialog->message(e.get_message());
     }
 
         //////////////////////////////////////////////
@@ -145,7 +145,7 @@ static void routine_limitint(user_interaction & dialog)
     }
     catch(Elimitint & e)
     {
-        dialog.warning(e.get_message());
+        dialog->message(e.get_message());
     }
 
     infinint c = twopower31;
@@ -159,7 +159,7 @@ static void routine_limitint(user_interaction & dialog)
     }
     catch(Elimitint & e)
     {
-        dialog.warning(e.get_message());
+        dialog->message(e.get_message());
     }
 
 
@@ -185,7 +185,7 @@ static void routine_limitint(user_interaction & dialog)
     }
     catch(Elimitint & e)
     {
-        dialog.warning(e.get_message());
+        dialog->message(e.get_message());
     }
 
         // testing left shift overflow
@@ -199,6 +199,6 @@ static void routine_limitint(user_interaction & dialog)
     }
     catch(Elimitint & e)
     {
-        dialog.warning(e.get_message());
+        dialog->message(e.get_message());
     }
 }

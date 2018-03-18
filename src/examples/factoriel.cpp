@@ -62,13 +62,12 @@ extern "C"
 #include "integers.hpp"
 #include "cygwin_adapt.hpp"
 #include "fichier_local.hpp"
-#include "../dar_suite/shell_interaction.hpp"
 #include "../dar_suite/dar_suite.hpp"
 
 using namespace libdar;
 using namespace std;
 
-static int little_main(shell_interaction & ui, int argc, char * const argv[], const char **env);
+static int little_main(shared_ptr<user_interaction> & ui, int argc, char * const argv[], const char **env);
 
 int main(S_I argc, char * const argv[], const char **env)
 {
@@ -81,7 +80,7 @@ int main(S_I argc, char * const argv[], const char **env)
 			    &little_main);
 }
 
-static int little_main(shell_interaction & ui, int argc, char * const argv[], const char **env)
+static int little_main(shared_ptr<user_interaction> & ui, int argc, char * const argv[], const char **env)
 {
     if(argc != 2 && argc != 3)
 	exit(1);
@@ -98,9 +97,9 @@ static int little_main(shell_interaction & ui, int argc, char * const argv[], co
 	++i;
     }
 
-    ui.warning("calcul finished, now computing the decimal representation ... ");
+    ui->message("calcul finished, now computing the decimal representation ... ");
     f = libdar::deci(p);
-    ui.warning(f.human());
+    ui->message(f.human());
 
     if(argc == 3)
     {
@@ -116,7 +115,7 @@ static int little_main(shell_interaction & ui, int argc, char * const argv[], co
 	p.dump(fic);
 	fic.skip(0);
 	cp = infinint(fic);
-	ui.warning(string("read from file: ") + libdar::deci(cp).human());
+	ui->message(string("read from file: ") + libdar::deci(cp).human());
     }
 
     return EXIT_OK;

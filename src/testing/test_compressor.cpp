@@ -36,6 +36,7 @@ extern "C"
 #endif
 } // end extern "C"
 
+#include <memory>
 #include "libdar.hpp"
 #include "compressor.hpp"
 #include "integers.hpp"
@@ -44,8 +45,9 @@ extern "C"
 #include "fichier_local.hpp"
 
 using namespace libdar;
+using namespace std;
 
-static user_interaction *ui = nullptr;
+static shared_ptr<user_interaction> ui;
 static void f1();
 
 int main()
@@ -54,12 +56,11 @@ int main()
 
     get_version(maj, med, min);
 
-    ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(ui == nullptr)
+    ui.reset(new (nothrow) shell_interaction(cout, cerr, false));
+    if(!ui)
 	cout << "ERREUR !" << endl;
     f1();
-    if(ui != nullptr)
-	delete ui;
+    ui.reset();
 }
 
 static void f1()
@@ -68,16 +69,16 @@ static void f1()
 
     try
     {
-        fichier_local src1 = fichier_local(*ui, "toto", gf_read_only, 0666, false, false, false);
-        fichier_local src2 = fichier_local(*ui, "toto", gf_read_only, 0666, false, false, false);
-        fichier_local src3 = fichier_local(*ui, "toto", gf_read_only, 0666, false, false, false);
-        fichier_local dst1 = fichier_local(*ui, "tutu.none", gf_write_only, 0666, false, true, false);
-	fichier_local dst2 = fichier_local(*ui, "tutu.gz", gf_write_only, 0666, false, true, false);
-	fichier_local dst3 = fichier_local(*ui, "tutu.bz", gf_write_only, 0666, false, true, false);
+        fichier_local src1 = fichier_local(ui, "toto", gf_read_only, 0666, false, false, false);
+        fichier_local src2 = fichier_local(ui, "toto", gf_read_only, 0666, false, false, false);
+        fichier_local src3 = fichier_local(ui, "toto", gf_read_only, 0666, false, false, false);
+        fichier_local dst1 = fichier_local(ui, "tutu.none", gf_write_only, 0666, false, true, false);
+	fichier_local dst2 = fichier_local(ui, "tutu.gz", gf_write_only, 0666, false, true, false);
+	fichier_local dst3 = fichier_local(ui, "tutu.bz", gf_write_only, 0666, false, true, false);
 
-        compressor c1(none, dst1);
-        compressor c2(gzip, dst2);
-        compressor c3(bzip2, dst3);
+        compressor c1(compression::none, dst1);
+        compressor c2(compression::gzip, dst2);
+        compressor c3(compression::bzip2, dst3);
 
         src1.copy_to(c1);
         src2.copy_to(c2);
@@ -112,16 +113,16 @@ static void f1()
 
     try
     {
-        fichier_local src1 = fichier_local(*ui, "tutu.none", gf_read_only, 0666, false, false, false);
-        fichier_local src2 = fichier_local(*ui, "tutu.gz", gf_read_only, 0666, false, false, false);
-        fichier_local src3 = fichier_local(*ui, "tutu.bz", gf_read_only, 0666, false, false, false);
-        fichier_local dst1 = fichier_local(*ui, "tutu.none.bak", gf_write_only, 0666, false, true, false);
-        fichier_local dst2 = fichier_local(*ui, "tutu.gz.bak", gf_write_only, 0666, false, true, false);
-        fichier_local dst3 = fichier_local(*ui, "tutu.bz.bak", gf_write_only, 0666, false, true, false);
+        fichier_local src1 = fichier_local(ui, "tutu.none", gf_read_only, 0666, false, false, false);
+        fichier_local src2 = fichier_local(ui, "tutu.gz", gf_read_only, 0666, false, false, false);
+        fichier_local src3 = fichier_local(ui, "tutu.bz", gf_read_only, 0666, false, false, false);
+        fichier_local dst1 = fichier_local(ui, "tutu.none.bak", gf_write_only, 0666, false, true, false);
+        fichier_local dst2 = fichier_local(ui, "tutu.gz.bak", gf_write_only, 0666, false, true, false);
+        fichier_local dst3 = fichier_local(ui, "tutu.bz.bak", gf_write_only, 0666, false, true, false);
 
-        compressor c1(none, src1);
-        compressor c2(gzip, src2);
-        compressor c3(bzip2, src3);
+        compressor c1(compression::none, src1);
+        compressor c2(compression::gzip, src2);
+        compressor c3(compression::bzip2, src3);
 
         c1.copy_to(dst1);
 

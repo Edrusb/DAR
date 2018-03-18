@@ -44,11 +44,12 @@ extern "C"
 #include "pile.hpp"
 
 using namespace libdar;
+using namespace std;
 
 #define FIC1 "test/dump.bin"
 #define FIC2 "test/dump2.bin"
 
-static user_interaction *ui = nullptr;
+static shared_ptr<user_interaction> ui;
 
 void f1();
 void f2();
@@ -60,8 +61,8 @@ int main()
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(ui == nullptr)
+    ui.reset(new (nothrow) shell_interaction(cout, cerr, false));
+    if(!ui)
 	cout << "ERREUR !" << endl;
 
     try
@@ -76,8 +77,7 @@ int main()
         throw SRC_BUG;
     }
 
-    if(ui != nullptr)
-	delete ui;
+    ui.reset();
     return 0;
 }
 
@@ -92,8 +92,8 @@ void f1()
     unlink(FIC2);
     try
     {
-        fichier_local *dump = new fichier_local(*ui, FIC1, gf_read_write, 0644, false, false, false);
-	compressor *comp = new compressor(none, *dump, 1);
+        fichier_local *dump = new fichier_local(ui, FIC1, gf_read_write, 0644, false, false, false);
+	compressor *comp = new compressor(compression::none, *dump, 1);
 	pile stack;
 	smart_pointer<pile_descriptor> pdesc(new pile_descriptor());
 	std::map <infinint, cat_etoile *> corres;
@@ -125,7 +125,7 @@ void f1()
             cat_inode *ino = dynamic_cast<cat_inode *>(liste[i]);
 
             if(ino != nullptr)
-                ino->set_saved_status(s_saved);
+                ino->set_saved_status(saved_status::saved);
             liste[i]->dump(*pdesc, false);
         }
 
@@ -135,7 +135,7 @@ void f1()
         cat_entree *ref = (cat_entree *)1; // != nullptr
         for(S_I i = 0; ref != nullptr; ++i)
         {
-            ref = cat_entree::read(*ui, pdesc, macro_tools_supported_version, stats, corres, none, false, false, false);
+            ref = cat_entree::read(ui, pdesc, macro_tools_supported_version, stats, corres, compression::none, false, false, false);
             if(ref != nullptr)
                 delete ref;
         }
@@ -155,8 +155,8 @@ void f1()
         unlink(FIC2);
 
         stats.clear();
-        dump = new fichier_local(*ui, FIC1, gf_read_write, 0644, false, true, false);
-	comp = new compressor(none, *dump, 1);
+        dump = new fichier_local(ui, FIC1, gf_read_write, 0644, false, true, false);
+	comp = new compressor(compression::none, *dump, 1);
 	stack.push(dump);
 	dump = nullptr;
 	stack.push(comp);
@@ -165,7 +165,7 @@ void f1()
 
         v_dir->dump(*pdesc, false);
         stack.skip(0);
-        ref = cat_entree::read(*ui, pdesc, macro_tools_supported_version, stats, corres, none, false, false, false);
+        ref = cat_entree::read(ui, pdesc, macro_tools_supported_version, stats, corres, compression::none, false, false, false);
         v_sub_dir = dynamic_cast<cat_directory *>(ref);
         delete ref;
 	stack.clear();
@@ -185,13 +185,13 @@ void f2()
     try
     {
 	label data_name;
-        catalogue cat(*ui, datetime(12), data_name);
+        catalogue cat(ui, datetime(12), data_name);
         const cat_entree *ref;
 	bool_mask tmp = true;
 	label lax_label;
 
 	lax_label.clear();
-        cat.listing(false, tmp, tmp, false, false, false, "");
+        cat.listing(*ui, false, tmp, tmp, false, false, false, "");
 
         cat.reset_add();
         try
@@ -212,7 +212,7 @@ void f2()
         cat.add(new cat_prise(1030, 108, 0650, datetime(19), datetime(20), datetime(21),  "prise", 0));
         cat.add(new cat_detruit("ancien fichier", 'f', datetime(102)));
 
-        cat.listing(false, tmp, tmp, false, false, false, "");
+        cat.listing(*ui, false, tmp, tmp, false, false, false, "");
 
         cat.reset_read();
         while(cat.read(ref))
@@ -231,8 +231,8 @@ void f2()
         }
 
         unlink(FIC1);
-        fichier_local *f = new fichier_local(*ui, FIC1, gf_read_write, 0644, false, true, false);
-	compressor *comp = new compressor(none, f, 1);
+        fichier_local *f = new fichier_local(ui, FIC1, gf_read_write, 0644, false, true, false);
+	compressor *comp = new compressor(compression::none, f, 1);
 	pile stack;
 	pile_descriptor pdesc;
 
@@ -244,8 +244,8 @@ void f2()
 
         cat.dump(pdesc);
         stack.skip(0);
-        catalogue lst(*ui, pdesc, macro_tools_supported_version, none, false, lax_label);
-        lst.listing(false, tmp, tmp, false, false, false, "");
+        catalogue lst(ui, pdesc, macro_tools_supported_version, compression::none, false, lax_label);
+        lst.listing(*ui, false, tmp, tmp, false, false, false, "");
         bool ok;
 
         lst.reset_read();
@@ -296,8 +296,8 @@ void f2()
 void f3()
 {
     label data_name;
-    catalogue cat(*ui, datetime(180), data_name);
-    catalogue dif(*ui, datetime(190), data_name);
+    catalogue cat(ui, datetime(180), data_name);
+    catalogue dif(ui, datetime(190), data_name);
     bool_mask tmp = true;
 
     cat.reset_add();
@@ -322,8 +322,8 @@ void f3()
 
     dif.update_destroyed_with(cat);
 
-    cat.listing(false, tmp, tmp, false, false, false, "");
-    dif.listing(false, tmp, tmp, false, false, false, "");
+    cat.listing(*ui, false, tmp, tmp, false, false, false, "");
+    dif.listing(*ui, false, tmp, tmp, false, false, false, "");
 }
 
 

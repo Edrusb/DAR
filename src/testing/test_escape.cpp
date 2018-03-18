@@ -37,7 +37,7 @@ extern "C"
 using namespace libdar;
 using namespace std;
 
-static user_interaction *ui = nullptr;
+static shared_ptr<user_interaction> ui;
 
 void f1();
 void f2();
@@ -47,8 +47,8 @@ int main()
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(ui == nullptr)
+    ui.reset(new (nothrow) shell_interaction(cout, cerr, false));
+    if(!ui)
 	cout << "ERREUR !" << endl;
 
     f1();
@@ -58,7 +58,7 @@ int main()
 void f1()
 {
     set<escape::sequence_type> nojump;
-    fichier_local below = fichier_local(*ui, "escape_below", gf_write_only, 0666, false, true, false);
+    fichier_local below = fichier_local(ui, "escape_below", gf_write_only, 0666, false, true, false);
     escape tested = escape(&below, nojump);
 
     const char *seq1 = "bonjour les amis";
@@ -82,7 +82,7 @@ void f2()
     set<escape::sequence_type> nojump;
     const U_I buf_size = 100;
     unsigned char buffer[buf_size];
-    fichier_local below = fichier_local(*ui, "escape_below", gf_read_only, 0666, false, false, false);
+    fichier_local below = fichier_local(ui, "escape_below", gf_read_only, 0666, false, false, false);
     escape tested = escape(&below, nojump);
     S_I lu = 0;
 

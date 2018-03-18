@@ -37,64 +37,55 @@ extern "C"
 #include "fichier_local.hpp"
 
 using namespace libdar;
+using namespace std;
 
 void f1(const string & src_filename, const string & dst_filename, hash_algo algo);
 void error(const string & argv0);
 libdar::hash_algo str2hash(const string & val);
 
-static user_interaction *ui = nullptr;
+static shared_ptr<user_interaction> ui;
 
 int main(int argc, char *argv[])
 {
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    ui = new (nothrow) shell_interaction(&cout, &cerr, true);
-    if(ui == nullptr)
+    ui.reset(new (nothrow) shell_interaction(cout, cerr, true));
+    if(!ui)
 	cout << "ERREUR !" << endl;
 
     try
     {
 	try
 	{
-	    try
-	    {
-		if(argc != 4)
-		    error(argv[0]);
-		else
-		    f1(argv[1], argv[2], str2hash(argv[3]));
-	    }
-	    catch(Egeneric & e)
-	    {
-		ui->warning(e.get_message());
-		cerr << e.dump_str();
-	    }
+	    if(argc != 4)
+		error(argv[0]);
+	    else
+		f1(argv[1], argv[2], str2hash(argv[3]));
 	}
-	catch(...)
+	catch(Egeneric & e)
 	{
-	    if(ui != nullptr)
-		delete ui;
-	    throw;
+	    ui->message(e.get_message());
+	    cerr << e.dump_str();
 	}
-	if(ui != nullptr)
-	    delete ui;
     }
     catch(Egeneric & e)
     {
 	cout << e.dump_str() << endl;
     }
+    ui.reset();
 }
 
 void f1(const string & src_filename, const string & dst_filename, hash_algo algo)
 {
-    fichier_local *dst_hash = new (nothrow) fichier_local(*ui,
+    fichier_local *dst_hash = new (nothrow) fichier_local(ui,
 							  src_filename + "." + hash_algo_to_string(algo),
 							  gf_write_only,
 							  tools_octal2int("0777"),
 							  true, // fail if exsts
 							  false, // erase
 							  false); // furtive read mode
-    fichier_local *dst_data = new (nothrow) fichier_local(*ui,
+    fichier_local *dst_data = new (nothrow) fichier_local(ui,
 							  dst_filename,
 							  gf_write_only,
 							  tools_octal2int("0777"),
@@ -109,7 +100,7 @@ void f1(const string & src_filename, const string & dst_filename, hash_algo algo
 	    throw Ememory("f1");
 	else
 	{
-	    hash_fichier dst(*ui,
+	    hash_fichier dst(ui,
 			     dst_data,
 			     src_filename,
 			     dst_hash,
