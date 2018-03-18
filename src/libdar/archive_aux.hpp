@@ -19,7 +19,7 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \file catalogue_aux.hpp
+    /// \file archive_aux.hpp
     /// \brief set of datastructures used to interact with a catalogue object
     /// \ingroup API
 

@@ -73,8 +73,9 @@ namespace libdar
 	void write(generic_file &f);
 
 	    /// provide typ and status as read from the archive
-	    /// \param[ou] base the signature() of the entry
-	    /// \param[ou] saved the get_saved_status() of the entry
+
+	    /// \param[out] base the signature() of the entry
+	    /// \param[out] saved the get_saved_status() of the entry
 	    /// \return false if the field read from the archive is malformed, in which case the returned argument are meaningless
 	bool get_base_and_status(unsigned char & base, saved_status & saved) const;
 

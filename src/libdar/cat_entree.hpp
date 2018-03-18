@@ -86,6 +86,7 @@ namespace libdar
 	    /// \param[in] pdesc points to an existing stack that will be read from to setup fields of inherited classes,
 	    /// this pointed to pile object must survive the whole life of the cat_entree object
 	    /// \param[in] small whether a small or a whole read is to be read, (inode has been dump() with small set to true)
+	    /// \param[in] val saved_status to assign the the new object
 	cat_entree(const smart_pointer<pile_descriptor> & pdesc, bool small, saved_status val);
 
 	    // copy constructor is fine as we only copy the address of pointers
