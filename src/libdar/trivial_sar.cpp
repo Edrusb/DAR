@@ -208,7 +208,14 @@ namespace libdar
 			case Esystem::io_exist:
 			    throw SRC_BUG;
 			case Esystem::io_absent:
-			    throw SRC_BUG;
+			    if(tmp != nullptr)
+				throw SRC_BUG;
+			    else
+			    {
+				string tmp = where.get_full_path().display();
+				e.prepend_message(tools_printf(gettext("Directory component in %S does not exist or is a dangling symbolic link: "), &tmp));
+			    }
+			    throw;
 			case Esystem::io_access:
 			    e.prepend_message(tools_printf(gettext("Failed creating slice %S: "), &filename));
 			    throw; // propagate the exception
@@ -221,7 +228,11 @@ namespace libdar
 		    if(tmp != nullptr)
 			throw SRC_BUG;
 		    else
-			throw SRC_BUG; // not for the same reason, must know that reporting the same error but on a different line
+		    {
+			string tmp = where.get_full_path().display();
+			e.prepend_message(tools_printf(gettext("Directory component in %S does not exist or is a dangling symbolic link: "), &tmp));
+		    }
+		    throw;
 		case Esystem::io_access:
 		    e.prepend_message(tools_printf(gettext("Failed creating slice %S: "), &filename));
 		    throw; // propagate the exception
