@@ -5,6 +5,10 @@ documented librsync library. Thanks to "Lademann" at sourceforge for the
 proposed patch adapted and integrated in this release (--ignored-as-symlink
 new feature)
 
+version 2.5.15
+--------------
+Thanks to Marco Falda for bug report
+
 version 2.5.14
 --------------
 Double thanks to Eric Junkermann for bug feedback. Thanks to Volker Wysk

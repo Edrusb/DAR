@@ -257,7 +257,7 @@ namespace libdar
 			bool dirty_covered = e_file == nullptr || !e_file->is_dirty() || dirty != archive_options_extract::dirty_ignore;  // checking against dirty files
 			bool empty_dir_covered = e_dir == nullptr || empty_dir || e_dir->get_recursive_has_changed(); // checking whether this is not a directory without any file to restore in it
 			bool flat_covered = e_dir == nullptr || !flat; // we do not restore directories in flat mode
-			bool only_deleted_covered = !only_deleted || e_dir != nullptr || e_det != nullptr; // we do not restore other thing that directories and cat_detruits when in "only_deleted" mode
+			bool only_deleted_covered = !only_deleted || e_dir != nullptr || e_det != nullptr; // we do not restore other thing than directories and cat_detruits when in "only_deleted" mode
 
 			if(path_covered && name_covered && dirty_covered && empty_dir_covered && flat_covered && only_deleted_covered)
 			{
