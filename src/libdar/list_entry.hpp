@@ -36,7 +36,6 @@
 #include "tools.hpp"
 #include "compression.hpp"
 #include "integers.hpp"
-#include "cat_inode.hpp"
 #include "datetime.hpp"
 #include "range.hpp"
 #include "cat_status.hpp"
