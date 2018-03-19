@@ -44,6 +44,7 @@
 #include "slice_layout.hpp"
 #include "mem_ui.hpp"
 #include "archive_summary.hpp"
+#include "archive_listing_callback.hpp"
 
 namespace libdar
 {

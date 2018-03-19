@@ -35,9 +35,9 @@ namespace libdar
 
 	/// callback function type expected for archive::op_listing and archive::get_children_of()
 	/// \addtogroup API
-    using catalogue_listing_callback = void (*)(const std::string & the_path,
-						const list_entry & entry,
-						void *context);
+    using archive_listing_callback = void (*)(const std::string & the_path,
+					      const list_entry & entry,
+					      void *context);
 
 } // end of namespace
 
