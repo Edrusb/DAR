@@ -41,7 +41,7 @@ namespace libdar
     class range
     {
     public:
-	range() { parts.clear(); };
+	range() { clear(); };
 	range(const infinint & low, const infinint & high) { parts.push_back(segment(low, high)); };
 	range(const range & ref) = default;
 	range(range && ref) noexcept = default;
@@ -68,6 +68,8 @@ namespace libdar
 	    /// \return true and set the low and high value when a next segment is available in the range, returns
 	    /// false if all segment have been read low and high are not modified in that case.
 	bool read_next_segment(infinint & low, infinint & high) const;
+
+	void clear() { parts.clear(); };
 
     private:
 	class segment
