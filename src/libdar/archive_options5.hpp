@@ -115,7 +115,11 @@ namespace libdar5
 	////////// OPTIONS FOR LISTING AN ARCHIVE ///////////////
 	/////////////////////////////////////////////////////////
 
-    using libdar::archive_options_listing;
+    class archive_options_listing: public libdar::archive_options_listing_shell
+    {
+    public:
+	using libdar::archive_options_listing_shell::archive_options_listing_shell;
+    };
 
 
 	/////////////////////////////////////////////////////////

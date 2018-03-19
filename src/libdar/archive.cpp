@@ -1153,7 +1153,7 @@ namespace libdar
 
     void archive::op_listing(catalogue_listing_callback callback,
 			     void *context,
-			     const archive_options_listing & options)
+			     const archive_options_listing_shell & options)
     {
         NLS_SWAP_IN;
 
@@ -1166,7 +1166,7 @@ namespace libdar
             {
                 switch(options.get_list_mode())
 		{
-		case archive_options_listing::normal:
+		case archive_options_listing_shell::normal:
 		    get_cat().tar_listing(get_ui(),
 					  callback,
 					  context,
@@ -1178,7 +1178,7 @@ namespace libdar
 					  options.get_sizes_in_bytes(),
 					  "");
 		    break;
-		case archive_options_listing::tree:
+		case archive_options_listing_shell::tree:
 		    get_cat().listing(get_ui(),
 				      only_contains_an_isolated_catalogue(),
 				      options.get_selection(),
@@ -1188,7 +1188,7 @@ namespace libdar
 				      options.get_sizes_in_bytes(),
 				      "");
 		    break;
-		case archive_options_listing::xml:
+		case archive_options_listing_shell::xml:
 		    get_cat().xml_listing(get_ui(),
 					  only_contains_an_isolated_catalogue(),
 					  options.get_selection(),
@@ -1198,8 +1198,9 @@ namespace libdar
 					  options.get_sizes_in_bytes(),
 					  "");
 		    break;
-		case archive_options_listing::slicing:
+		case archive_options_listing_shell::slicing:
 		    if(!get_catalogue_slice_layout(used_layout))
+		    {
 			if(options.get_user_slicing(used_layout.first_size, used_layout.other_size))
 			{
 			    if(options.get_info_details())
@@ -1207,6 +1208,7 @@ namespace libdar
 			}
 			else
 			    throw Erange("archive::op_listing", gettext("No slice layout of the archive of reference for the current isolated catalogue is available, cannot provide slicing information, aborting"));
+		    }
 
 		    get_cat().slice_listing(get_ui(),
 					    only_contains_an_isolated_catalogue(),

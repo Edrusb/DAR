@@ -209,7 +209,7 @@ namespace libdar
 	    /// . archive::init_catalogue()+get_children_in_table()
 	void op_listing(catalogue_listing_callback callback,
 			void *context,
-			const archive_options_listing & options);
+			const archive_options_listing_shell & options);
 
 	    /// archive comparison with filesystem
 
