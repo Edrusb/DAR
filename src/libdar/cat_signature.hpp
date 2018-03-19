@@ -29,6 +29,7 @@
 #include "../my_config.h"
 #include "generic_file.hpp"
 #include "archive_version.hpp"
+#include "cat_status.hpp"
 
 extern "C"
 {
@@ -39,15 +40,6 @@ namespace libdar
 {
 	/// \addtogroup Private
 	/// @{
-
-    enum class saved_status
-    {
-	saved,      //< inode is saved in the archive
-	inode_only, //< data is not saved but inode meta data has changed since the archive of reference
-	fake,       //< inode is not saved in the archive but is in the archive of reference (isolation context) s_fake is no more used in archive format "08" and above: isolated catalogue do keep the data pointers and s_saved stays a valid status in isolated catalogues.
-	not_saved,  //< inode is not saved in the archive
-	delta       //< inode is saved but as delta binary from the content (delta signature) of what was found in the archive of reference
-    };
 
 	/// class cat_signature combines the cat_entree::signature() of the object with its saved_status and read and store this combinason
 

@@ -480,8 +480,8 @@ namespace libdar
 
 	    // dropping info for the current cat_directory
 	set_saved_status(saved_status::not_saved);
-	if(ea_get_saved_status() == cat_inode::ea_full)
-	    ea_set_saved_status(cat_inode::ea_partial);
+	if(ea_get_saved_status() == ea_saved_status::full)
+	    ea_set_saved_status(ea_saved_status::partial);
 	if(fsa_get_saved_status() == cat_inode::fsa_full)
 	    fsa_set_saved_status(cat_inode::fsa_partial);
 
@@ -505,8 +505,8 @@ namespace libdar
 		if(n_ino != nullptr)
 		{
 		    n_ino->set_saved_status(saved_status::not_saved);
-		    if(n_ino->ea_get_saved_status() == cat_inode::ea_full)
-			n_ino->ea_set_saved_status(ea_partial);
+		    if(n_ino->ea_get_saved_status() == ea_saved_status::full)
+			n_ino->ea_set_saved_status(ea_saved_status::partial);
 		    if(n_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 			n_ino->fsa_set_saved_status(cat_inode::fsa_partial);
 		}
@@ -705,8 +705,8 @@ namespace libdar
 	    if(ino != nullptr && !recursive_has_changed)
 		recursive_has_changed |=
 		    ino->get_saved_status() != saved_status::not_saved
-		    || ino->ea_get_saved_status() == ea_full
-		    || ino->ea_get_saved_status() == ea_removed;
+		    || ino->ea_get_saved_status() == ea_saved_status::full
+		    || ino->ea_get_saved_status() == ea_saved_status::removed;
 	    ++it;
 	}
     }
@@ -747,7 +747,8 @@ namespace libdar
 		fils_ino = fils_mir->get_inode();
 
 	    if(fils_ino != nullptr)
-		if(fils_ino->ea_get_saved_status() != ea_none && fils_ino->ea_get_saved_status() != ea_removed)
+		if(fils_ino->ea_get_saved_status() != ea_saved_status::none
+		   && fils_ino->ea_get_saved_status() != ea_saved_status::removed)
 		    ++ret;
 	    if(fils_dir != nullptr)
 		ret += fils_dir->get_tree_ea_num();

@@ -639,7 +639,7 @@ namespace libdar
 			    if(subtree.is_covered(juillet.get_path())
 			       && (dir != nullptr || filtre.is_covered(nom->get_name()))
 			       && (! same_fs || e_ino == nullptr || e_ino->get_device() == root_fs_device)
-			       && (e_ino == nullptr || exclude_by_ea == "" || e_ino->ea_get_saved_status() != cat_inode::ea_full || e_ino->get_ea() == nullptr || !e_ino->get_ea()->find(exclude_by_ea, tmp_val)))
+			       && (e_ino == nullptr || exclude_by_ea == "" || e_ino->ea_get_saved_status() != ea_saved_status::full || e_ino->get_ea() == nullptr || !e_ino->get_ea()->find(exclude_by_ea, tmp_val)))
 			    {
 				if(known_hard_link)
 				{
@@ -653,7 +653,7 @@ namespace libdar
 				    {
 					if(e_mir->get_inode()->get_saved_status() == saved_status::saved
 					   || e_mir->get_inode()->get_saved_status() == saved_status::delta
-					   || e_mir->get_inode()->ea_get_saved_status() == cat_inode::ea_full)
+					   || e_mir->get_inode()->ea_get_saved_status() == ea_saved_status::full)
 					    if(display_treated)
 						dialog->message(string(gettext("Recording hard link into the archive: "))+juillet.get_string());
 				    }
@@ -742,10 +742,10 @@ namespace libdar
 					    // EVALUATING THE ACTION TO PERFORM
 
 					bool change_to_remove_ea =
-					    e_ino != nullptr && e_ino->ea_get_saved_status() == cat_inode::ea_none
+					    e_ino != nullptr && e_ino->ea_get_saved_status() == ea_saved_status::none
 						// current inode to backup does not have any EA
-					    && f_ino != nullptr && f_ino->ea_get_saved_status() != cat_inode::ea_none
-					    && f_ino->ea_get_saved_status() != cat_inode::ea_removed;
+					    && f_ino != nullptr && f_ino->ea_get_saved_status() != ea_saved_status::none
+					    && f_ino->ea_get_saved_status() != ea_saved_status::removed;
 					    // and reference was an inode with EA
 
 					bool avoid_saving_inode =
@@ -769,9 +769,9 @@ namespace libdar
 					bool avoid_saving_ea =
 					    snapshot
 						// don't backup if doing a snapshot
-					    || (!fixed_date.is_zero() && e_ino != nullptr &&  e_ino->ea_get_saved_status() != cat_inode::ea_none && e_ino->get_last_change() < fixed_date)
+					    || (!fixed_date.is_zero() && e_ino != nullptr &&  e_ino->ea_get_saved_status() != ea_saved_status::none && e_ino->get_last_change() < fixed_date)
 						// don't backup if older than given date (if reference date given)
-					    || (fixed_date.is_zero() && e_ino != nullptr && e_ino->ea_get_saved_status() == cat_inode::ea_full && f_ino != nullptr && f_ino->ea_get_saved_status() != cat_inode::ea_none && e_ino->get_last_change() <= f_ino->get_last_change())
+					    || (fixed_date.is_zero() && e_ino != nullptr && e_ino->ea_get_saved_status() == ea_saved_status::full && f_ino != nullptr && f_ino->ea_get_saved_status() != ea_saved_status::none && e_ino->get_last_change() <= f_ino->get_last_change())
 						// don't backup if doing differential backup and entry is the same as the one in the archive of reference
 					    ;
 
@@ -844,8 +844,8 @@ namespace libdar
 
 					if(avoid_saving_ea)
 					{
-					    if(e_ino->ea_get_saved_status() == cat_inode::ea_full)
-						e_ino->ea_set_saved_status(cat_inode::ea_partial);
+					    if(e_ino->ea_get_saved_status() == ea_saved_status::full)
+						e_ino->ea_set_saved_status(ea_saved_status::partial);
 					}
 
 					if(avoid_saving_fsa)
@@ -855,7 +855,7 @@ namespace libdar
 					}
 
 					if(change_to_remove_ea)
-					    e_ino->ea_set_saved_status(cat_inode::ea_removed);
+					    e_ino->ea_set_saved_status(ea_saved_status::removed);
 
 					if(e_file != nullptr)
 					    e_file->set_sparse_file_detection_write(sparse_file_detection);
@@ -915,9 +915,9 @@ namespace libdar
 
 					    // PERFORMING ACTION FOR EA
 
-					if(e_ino->ea_get_saved_status() != cat_inode::ea_removed)
+					if(e_ino->ea_get_saved_status() != ea_saved_status::removed)
 					{
-					    if(e_ino->ea_get_saved_status() == cat_inode::ea_full)
+					    if(e_ino->ea_get_saved_status() == ea_saved_status::full)
 						cat.pre_add_ea(e);
 					    if(save_ea(dialog, juillet.get_string(), e_ino, pdesc, display_treated, false))
 						st.incr_ea_treated();
@@ -1518,7 +1518,7 @@ namespace libdar
 
 			    // checking inode EA if any
 
-			if(e_ino != nullptr && e_ino->ea_get_saved_status() == cat_inode::ea_full)
+			if(e_ino != nullptr && e_ino->ea_get_saved_status() == ea_saved_status::full)
 			{
 			    if(perimeter == "")
 				perimeter = "EA";
@@ -2038,8 +2038,8 @@ namespace libdar
 						if(act_ea == EA_ask)
 						{
 						    if(dolly_ino != nullptr && al_ino != nullptr
-						       && (dolly_ino->ea_get_saved_status() != cat_inode::ea_none
-							   || al_ino->ea_get_saved_status() != cat_inode::ea_none
+						       && (dolly_ino->ea_get_saved_status() != ea_saved_status::none
+							   || al_ino->ea_get_saved_status() != ea_saved_status::none
 							   || dolly_ino->fsa_get_saved_status() != cat_inode::fsa_none
 							   || al_ino->fsa_get_saved_status() != cat_inode::fsa_none)
 							)
@@ -2065,9 +2065,9 @@ namespace libdar
 
 						case EA_preserve_mark_already_saved:
 
-						    if(al_ino != nullptr && al_ino->ea_get_saved_status() == cat_inode::ea_full)
+						    if(al_ino != nullptr && al_ino->ea_get_saved_status() == ea_saved_status::full)
 						    {
-							const_cast<cat_inode *>(al_ino)->ea_set_saved_status(cat_inode::ea_partial);
+							const_cast<cat_inode *>(al_ino)->ea_set_saved_status(ea_saved_status::partial);
 							if(display_treated)
 							    dialog->message(tools_printf(gettext("EA of file %S from first archive have been dropped and marked as already saved"), &full_name));
 						    }
@@ -2080,13 +2080,13 @@ namespace libdar
 						    break;
 
 						case EA_clear:
-						    if(al_ino != nullptr && al_ino->ea_get_saved_status() != cat_inode::ea_none)
+						    if(al_ino != nullptr && al_ino->ea_get_saved_status() != ea_saved_status::none)
 						    {
-							if(al_ino->ea_get_saved_status() == cat_inode::ea_full)
+							if(al_ino->ea_get_saved_status() == ea_saved_status::full)
 							    st.decr_ea_treated();
 							if(display_treated)
 							    dialog->message(tools_printf(gettext("EA of file %S from first archive have been removed"), &full_name));
-							const_cast<cat_inode *>(al_ino)->ea_set_saved_status(cat_inode::ea_none);
+							const_cast<cat_inode *>(al_ino)->ea_set_saved_status(ea_saved_status::none);
 						    }
 						    if(al_ino != nullptr && al_ino->fsa_get_saved_status() != cat_inode::fsa_none)
 						    {
@@ -2177,8 +2177,8 @@ namespace libdar
 						if(act_ea == EA_ask && act_data != data_remove)
 						{
 						    if(dolly_ino != nullptr && al_ino != nullptr &&
-						       (dolly_ino->ea_get_saved_status() != cat_inode::ea_none
-							|| al_ino->ea_get_saved_status() != cat_inode::ea_none
+						       (dolly_ino->ea_get_saved_status() != ea_saved_status::none
+							|| al_ino->ea_get_saved_status() != ea_saved_status::none
 							|| dolly_ino->fsa_get_saved_status() != cat_inode::fsa_none
 							|| al_ino->fsa_get_saved_status() != cat_inode::fsa_none))
 							act_ea = crit_ask_user_for_EA_action(*dialog, full_name, already_here, dolly);
@@ -2201,8 +2201,8 @@ namespace libdar
 						    case EA_overwrite_mark_already_saved:
 							if(display_treated)
 							    dialog->message(tools_printf(gettext("EA of file %S has been overwritten and marked as already saved"), &full_name));
-							if(dolly_ino != nullptr && dolly_ino->ea_get_saved_status() == cat_inode::ea_full)
-							    dolly_ino->ea_set_saved_status(cat_inode::ea_partial);
+							if(dolly_ino != nullptr && dolly_ino->ea_get_saved_status() == ea_saved_status::full)
+							    dolly_ino->ea_set_saved_status(ea_saved_status::partial);
 							break;
 						    case EA_merge_preserve:
 							if(display_treated)
@@ -2220,11 +2220,11 @@ namespace libdar
 							do_EFSA_transfert(dialog, EA_overwrite_mark_already_saved, dolly_ino, al_ino);
 							break;
 						    case EA_clear:
-							if(al_ino->ea_get_saved_status() != cat_inode::ea_none)
+							if(al_ino->ea_get_saved_status() != ea_saved_status::none)
 							{
 							    if(display_treated)
 								dialog->message(tools_printf(gettext("EA of file %S from first archive have been removed"), &full_name));
-							    dolly_ino->ea_set_saved_status(cat_inode::ea_none);
+							    dolly_ino->ea_set_saved_status(ea_saved_status::none);
 							}
 							break;
 						    default:
@@ -2263,7 +2263,7 @@ namespace libdar
 						    st.decr_treated();
 
 						    if(al_ino != nullptr)
-							if(al_ino->ea_get_saved_status() == cat_inode::ea_full)
+							if(al_ino->ea_get_saved_status() == ea_saved_status::full)
 							    st.decr_ea_treated();
 
 							// hard link specific actions
@@ -2279,7 +2279,7 @@ namespace libdar
 							if(al_ptr_ino == nullptr)
 							    throw SRC_BUG;
 							else
-							    if(al_ptr_ino->ea_get_saved_status() == cat_inode::ea_full)
+							    if(al_ptr_ino->ea_get_saved_status() == ea_saved_status::full)
 								st.decr_ea_treated();
 
 							    // cleaning the corres_copy map from the pointed to cat_etoile object reference if necessary
@@ -2443,7 +2443,7 @@ namespace libdar
 
 					    if(e_ino != nullptr)
 					    {
-						if(e_ino->ea_get_saved_status() == cat_inode::ea_full)
+						if(e_ino->ea_get_saved_status() == ea_saved_status::full)
 						    st.incr_ea_treated();
 
 						if(e_ino->fsa_get_saved_status() == cat_inode::fsa_full)
@@ -2798,7 +2798,7 @@ namespace libdar
 
 			// saving inode's EA
 
-		    if(e_ino->ea_get_saved_status() == cat_inode::ea_full)
+		    if(e_ino->ea_get_saved_status() == ea_saved_status::full)
 		    {
 			cat.pre_add_ea(e, &pdesc);
 			    // ignoring the return value of save_ea, exceptions may still propagate
@@ -2818,7 +2818,7 @@ namespace libdar
 		else // not an inode
 		{
 		    cat.pre_add(e, &pdesc);
-		    if(e_mir != nullptr && (e_mir->get_inode()->get_saved_status() == saved_status::saved || e_mir->get_inode()->ea_get_saved_status() == cat_inode::ea_full))
+		    if(e_mir != nullptr && (e_mir->get_inode()->get_saved_status() == saved_status::saved || e_mir->get_inode()->ea_get_saved_status() == ea_saved_status::full))
 			if(display_treated)
 			    dialog->message(string(gettext("Adding Hard link to archive: "))+juillet.get_string());
 		}
@@ -2912,7 +2912,7 @@ namespace libdar
 		{
 		    if(e_ino != nullptr)
 		    {
-			if(e_ino->ea_get_saved_status() == cat_inode::ea_full)
+			if(e_ino->ea_get_saved_status() == ea_saved_status::full)
 			{
 			    (void)e_ino->get_ea();
 			    e_ino->ea_get_crc(check);
@@ -3644,7 +3644,7 @@ namespace libdar
         {
             switch(ino->ea_get_saved_status())
             {
-            case cat_inode::ea_full: // if there is something to save
+            case ea_saved_status::full: // if there is something to save
 		if(ino->get_ea() != nullptr)
 		{
 		    crc * val = nullptr;
@@ -3710,12 +3710,12 @@ namespace libdar
 		else
 		    throw SRC_BUG;
 		break;
-            case cat_inode::ea_partial:
-	    case cat_inode::ea_none:
+            case ea_saved_status::partial:
+	    case ea_saved_status::none:
 		break;
-	    case cat_inode::ea_fake:
+	    case ea_saved_status::fake:
                 throw SRC_BUG; //filesystem, must not provide inode in such a status
-	    case cat_inode::ea_removed:
+	    case ea_saved_status::removed:
 		throw SRC_BUG; //filesystem, must not provide inode in such a status
             default:
                 throw SRC_BUG;
@@ -3738,7 +3738,7 @@ namespace libdar
             dialog->message(string(gettext("Error saving Extended Attributes for ")) + info_quoi + ": " + e.get_message());
 	    if(repair_mode)
 	    {
-		ino->ea_set_saved_status(cat_inode::ea_none);
+		ino->ea_set_saved_status(ea_saved_status::none);
 		dialog->message(gettext("be advised that a CRC error will be reported for the EA of that file while sequentially reading the repaired archive"));
 	    }
         }
@@ -3904,24 +3904,24 @@ namespace libdar
 
 	    switch(add_ino->ea_get_saved_status())
 	    {
-	    case cat_inode::ea_none:
-	    case cat_inode::ea_removed:
-		place_ino->ea_set_saved_status(cat_inode::ea_none);
+	    case ea_saved_status::none:
+	    case ea_saved_status::removed:
+		place_ino->ea_set_saved_status(ea_saved_status::none);
 		break;
-	    case cat_inode::ea_partial:
-	    case cat_inode::ea_fake:
-		place_ino->ea_set_saved_status(cat_inode::ea_partial);
+	    case ea_saved_status::partial:
+	    case ea_saved_status::fake:
+		place_ino->ea_set_saved_status(ea_saved_status::partial);
 		break;
-	    case cat_inode::ea_full:
+	    case ea_saved_status::full:
 		tmp_ea = new (nothrow) ea_attributs(*add_ino->get_ea()); // we clone the EA of add_ino
 		if(tmp_ea == nullptr)
 		    throw Ememory("filtre::do_EFSA_transfert");
 		try
 		{
-		    if(place_ino->ea_get_saved_status() == cat_inode::ea_full) // then we must drop the old EA:
+		    if(place_ino->ea_get_saved_status() == ea_saved_status::full) // then we must drop the old EA:
 			place_ino->ea_detach();
 		    else
-			place_ino->ea_set_saved_status(cat_inode::ea_full);
+			place_ino->ea_set_saved_status(ea_saved_status::full);
 		    place_ino->ea_attach(tmp_ea);
 		    tmp_ea = nullptr;
 		}
@@ -3988,8 +3988,8 @@ namespace libdar
 		// EA considerations
 
 	    place_ino->ea_set_saved_status(add_ino->ea_get_saved_status()); // at this step, ea_full may be set, it will be changed to ea_partial below.
-	    if(place_ino->ea_get_saved_status() == cat_inode::ea_full || place_ino->ea_get_saved_status() == cat_inode::ea_fake)
-		place_ino->ea_set_saved_status(cat_inode::ea_partial);
+	    if(place_ino->ea_get_saved_status() == ea_saved_status::full || place_ino->ea_get_saved_status() == ea_saved_status::fake)
+		place_ino->ea_set_saved_status(ea_saved_status::partial);
 
 		// FSA considerations
 
@@ -4005,7 +4005,7 @@ namespace libdar
 
 		// EA considerations
 
-	    if(place_ino->ea_get_saved_status() == cat_inode::ea_full && add_ino->ea_get_saved_status() == cat_inode::ea_full) // we have something to merge
+	    if(place_ino->ea_get_saved_status() == ea_saved_status::full && add_ino->ea_get_saved_status() == ea_saved_status::full) // we have something to merge
 	    {
 		tmp_ea = new (nothrow) ea_attributs();
 		if(tmp_ea == nullptr)
@@ -4028,9 +4028,9 @@ namespace libdar
 		}
 	    }
 	    else
-		if(add_ino->ea_get_saved_status() == cat_inode::ea_full)
+		if(add_ino->ea_get_saved_status() == ea_saved_status::full)
 		{
-		    place_ino->ea_set_saved_status(cat_inode::ea_full); // it was not the case else we would have executed the above block
+		    place_ino->ea_set_saved_status(ea_saved_status::full); // it was not the case else we would have executed the above block
 		    tmp_ea = new (nothrow) ea_attributs(*add_ino->get_ea());   // we clone the EA set of to_add
 		    if(tmp_ea == nullptr)
 			throw Ememory("filtre.cpp:do_EFSA_transfert");
@@ -4115,7 +4115,7 @@ namespace libdar
 
 		// EA considerations
 
-	    if(place_ino->ea_get_saved_status() == cat_inode::ea_full && add_ino->ea_get_saved_status() == cat_inode::ea_full)
+	    if(place_ino->ea_get_saved_status() == ea_saved_status::full && add_ino->ea_get_saved_status() == ea_saved_status::full)
 	    {
 		tmp_ea = new (nothrow) ea_attributs();
 		if(tmp_ea == nullptr)
@@ -4138,9 +4138,9 @@ namespace libdar
 		}
 	    }
 	    else
-		if(add_ino->ea_get_saved_status() == cat_inode::ea_full)
+		if(add_ino->ea_get_saved_status() == ea_saved_status::full)
 		{
-		    place_ino->ea_set_saved_status(cat_inode::ea_full); // it was not the case else we would have executed the above block
+		    place_ino->ea_set_saved_status(ea_saved_status::full); // it was not the case else we would have executed the above block
 		    tmp_ea = new (nothrow) ea_attributs(*add_ino->get_ea());
 		    if(tmp_ea == nullptr)
 			throw Ememory("filtre.cpp:do_EFSA_transfert");

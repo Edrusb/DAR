@@ -231,19 +231,19 @@ namespace libdar
 
 	switch(entry->ea_get_saved_status())
 	{
-	case cat_inode::ea_none:
+	case ea_saved_status::none:
 	    break;
-	case cat_inode::ea_removed:
+	case ea_saved_status::removed:
 	    result = tree->get_EA(last_archive, datetime(0), false);
 	    if(result == db_lookup::found_present || result == db_lookup::not_restorable)
 		tree->set_EA(archive, entry->get_last_change(), db_etat::et_removed);
 		// else no need to add an db_etat::et_remove entry in the map
 	    break;
-	case cat_inode::ea_partial:
+	case ea_saved_status::partial:
 	    tree->set_EA(archive, entry->get_last_change(), db_etat::et_present);
 	    break;
-	case cat_inode::ea_fake:
-	case cat_inode::ea_full:
+	case ea_saved_status::fake:
+	case ea_saved_status::full:
 	    tree->set_EA(archive, entry->get_last_change(), db_etat::et_saved);
 	    break;
 	default:

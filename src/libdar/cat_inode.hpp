@@ -120,16 +120,9 @@ namespace libdar
             // EXTENDED ATTRIBUTES Methods
             //
 
-        enum ea_status { ea_none, ea_partial, ea_fake, ea_full, ea_removed };
-            // ea_none    : no EA  present for this inode in filesystem
-            // ea_partial : EA present in filesystem but not stored (ctime used to check changes)
-	    // ea_fake    : EA present in filesystem but not attached to this inode (isolation context) no more used in archive version "08" and above, ea_partial or ea_full stays a valid status in isolated catalogue because pointers to EA and data are no more removed during isolation process.
-            // ea_full    : EA present in filesystem and attached to this inode
-	    // ea_removed : EA were present in the reference version, but not present anymore
-
             // I : to know whether EA data is present or not for this object
-        void ea_set_saved_status(ea_status status);
-        ea_status ea_get_saved_status() const { return ea_saved; };
+        void ea_set_saved_status(ea_saved_status status);
+        ea_saved_status ea_get_saved_status() const { return ea_saved; };
 
             // II : to associate EA list to an cat_inode object (mainly for backup operation) #EA_FULL only#
         void ea_attach(ea_attributs *ref);
@@ -202,7 +195,7 @@ namespace libdar
         datetime last_acc;       //< last access time (atime)
 	datetime last_mod;       //< last modification time (mtime)
         datetime last_cha;       //< last inode meta data change (ctime)
-        ea_status ea_saved;      //< inode Extended Attribute status
+        ea_saved_status ea_saved;//< inode Extended Attribute status
 	fsa_status fsa_saved;    //< inode Filesystem Specific Attribute status
 
 	bool small_read;         //< whether we the object has been built with sequential-reading

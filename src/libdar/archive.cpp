@@ -1665,7 +1665,7 @@ namespace libdar
 		    ent.set_ea_status(tmp_inode->ea_get_saved_status());
 		    if(tmp_inode->has_last_change())
 			ent.set_last_change(tmp_inode->get_last_change());
-		    if(tmp_inode->ea_get_saved_status() == cat_inode::ea_full)
+		    if(tmp_inode->ea_get_saved_status() == ea_saved_status::full)
 		    {
 			infinint tmp;
 

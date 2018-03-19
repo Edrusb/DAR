@@ -1890,7 +1890,7 @@ namespace libdar
 	{
 	    if(!sl.first_size.is_zero())
 	    {
-		if(tmp_inode->ea_get_saved_status() == cat_inode::ea_full)
+		if(tmp_inode->ea_get_saved_status() == ea_saved_status::full)
 		{
 		    if(tmp_inode->ea_get_offset(offset))
 		    {

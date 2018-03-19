@@ -108,13 +108,13 @@ namespace libdar
 	const cat_file *ref_f = dynamic_cast<const cat_file *>(&ref);
 	bool dirty = dirty_seq || (ref_f != nullptr ? ref_f->is_dirty() : false);
 	saved_status st = ref.get_saved_status();
-	cat_inode::ea_status ea_st = ref.ea_get_saved_status();
+	ea_saved_status ea_st = ref.ea_get_saved_status();
 
 	if(isolated && st == saved_status::saved && !dirty)
 	    st = saved_status::fake;
 
-	if(isolated && ea_st == cat_inode::ea_full)
-	    ea_st = cat_inode::ea_fake;
+	if(isolated && ea_st == ea_saved_status::full)
+	    ea_st = ea_saved_status::fake;
 
 	switch(st)
 	{
@@ -152,19 +152,19 @@ namespace libdar
 
 	switch(ea_st)
 	{
-	case cat_inode::ea_full:
+	case ea_saved_status::full:
 	    ret += gettext("[Saved]");
 	    break;
-	case cat_inode::ea_fake:
+	case ea_saved_status::fake:
 	    ret += gettext("[InRef]");
 	    break;
-	case cat_inode::ea_partial:
+	case ea_saved_status::partial:
 	    ret += "[     ]";
 	    break;
-	case cat_inode::ea_none:
+	case ea_saved_status::none:
 	    ret += "       ";
 	    break;
-	case cat_inode::ea_removed:
+	case ea_saved_status::removed:
 	    ret += "[Suppr]";
 	    break;
 	default:
@@ -244,7 +244,7 @@ namespace libdar
 	    ctime = "";
 	}
 
-	bool go_ea = list_ea && e_ino != nullptr && e_ino->ea_get_saved_status() == cat_inode::ea_full;
+	bool go_ea = list_ea && e_ino != nullptr && e_ino->ea_get_saved_status() == ea_saved_status::full;
 	string end_tag = go_ea ? ">" : " />";
 
 	dialog.printf("%S<Attributes data=\"%S\" metadata=\"%S\" user=\"%S\" group=\"%S\" permissions=\"%S\" atime=\"%S\" mtime=\"%S\" ctime=\"%S\"%S",
@@ -266,7 +266,7 @@ namespace libdar
 	if(ino == nullptr)
 	    return;
 
-	if(ino->ea_get_saved_status() == cat_inode::ea_full)
+	if(ino->ea_get_saved_status() == ea_saved_status::full)
 	{
 	    const ea_attributs *owned = ino->get_ea();
 	    string key, val;

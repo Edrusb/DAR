@@ -156,8 +156,8 @@ namespace libdar
 	{
 	    switch(first_i->ea_get_saved_status())
 	    {
-	    case cat_inode::ea_none:
-	    case cat_inode::ea_removed:
+	    case ea_saved_status::none:
+	    case ea_saved_status::removed:
 		ctime_f = datetime(0);
 		break;
 	    default:
@@ -172,8 +172,8 @@ namespace libdar
 	{
 	    switch(second_i->ea_get_saved_status())
 	    {
-	    case cat_inode::ea_none:
-	    case cat_inode::ea_removed:
+	    case ea_saved_status::none:
+	    case ea_saved_status::removed:
 		return true;
 		break;
 	    default:
@@ -197,8 +197,8 @@ namespace libdar
 	{
 	    switch(first_i->ea_get_saved_status())
 	    {
-	    case cat_inode::ea_none:
-	    case cat_inode::ea_removed:
+	    case ea_saved_status::none:
+	    case ea_saved_status::removed:
 		ctime_f = datetime(0);
 		break;
 	    default:
@@ -223,7 +223,7 @@ namespace libdar
 	{
 	    switch(first_i->ea_get_saved_status())
 	    {
-	    case cat_inode::ea_full:
+	    case ea_saved_status::full:
 		first_nEA = first_i->get_ea()->size();
 		break;
 	    default:
@@ -237,7 +237,7 @@ namespace libdar
 	{
 	    switch(second_i->ea_get_saved_status())
 	    {
-	    case cat_inode::ea_full:
+	    case ea_saved_status::full:
 		second_nEA = second_i->get_ea()->size();
 		break;
 	    default:
@@ -260,7 +260,7 @@ namespace libdar
 	{
 	    switch(first_i->ea_get_saved_status())
 	    {
-	    case cat_inode::ea_full:
+	    case ea_saved_status::full:
 		first_EA_size = first_i->get_ea()->space_used();
 		break;
 	    default:
@@ -274,7 +274,7 @@ namespace libdar
 	{
 	    switch(second_i->ea_get_saved_status())
 	    {
-	    case cat_inode::ea_full:
+	    case ea_saved_status::full:
 		second_EA_size = second_i->get_ea()->space_used();
 		break;
 	    default:
@@ -291,7 +291,7 @@ namespace libdar
     {
 	const cat_inode *first_i = get_inode(&first);
 
-	return first_i != nullptr && first_i->ea_get_saved_status() == cat_inode::ea_full;
+	return first_i != nullptr && first_i->ea_get_saved_status() == ea_saved_status::full;
     }
 
     bool crit_same_type::evaluate(const cat_nomme &first, const cat_nomme &second) const

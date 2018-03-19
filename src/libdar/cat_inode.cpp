@@ -94,7 +94,7 @@ namespace libdar
         uid = xuid;
         gid = xgid;
         perm = xperm;
-        ea_saved = ea_none;
+        ea_saved = ea_saved_status::none;
 	fsa_saved = fsa_none;
         edit = 0;
 	small_read = false;
@@ -144,26 +144,26 @@ namespace libdar
 		switch(ea_flag)
 		{
 		case INODE_FLAG_EA_FULL:
-		    ea_saved = ea_full;
+		    ea_saved = ea_saved_status::full;
 		    break;
 		case INODE_FLAG_EA_PART:
-		    ea_saved = ea_partial;
+		    ea_saved = ea_saved_status::partial;
 		    break;
 		case INODE_FLAG_EA_NONE:
-		    ea_saved = ea_none;
+		    ea_saved = ea_saved_status::none;
 		    break;
 		case INODE_FLAG_EA_FAKE:
-		    ea_saved = ea_fake;
+		    ea_saved = ea_saved_status::fake;
 		    break;
 		case INODE_FLAG_EA_REMO:
-		    ea_saved = ea_removed;
+		    ea_saved = ea_saved_status::removed;
 		    break;
 		default:
 		    throw Erange("cat_inode::cat_inode", gettext("badly structured inode: unknown inode flag"));
 		}
 	    }
 	    else
-		ea_saved = ea_none;
+		ea_saved = ea_saved_status::none;
 
 	    if(reading_ver <= 7)
 	    {
@@ -193,7 +193,7 @@ namespace libdar
 	    {
 		last_cha.read(*ptr, reading_ver);
 
-		if(ea_saved == ea_full)
+		if(ea_saved == ea_saved_status::full)
 		{
 		    ea_size = new (nothrow) infinint(*ptr);
 		    if(ea_size == nullptr)
@@ -210,7 +210,7 @@ namespace libdar
 	    {
 		switch(ea_saved)
 		{
-		case ea_full:
+		case ea_saved_status::full:
 		    ea_offset = new (nothrow) infinint(*ptr);
 		    if(ea_offset == nullptr)
 			throw Ememory("cat_inode::cat_inode(file)");
@@ -230,15 +230,15 @@ namespace libdar
 			    throw SRC_BUG;
 		    }
 		    break;
-		case ea_partial:
-		case ea_fake:
+		case ea_saved_status::partial:
+		case ea_saved_status::fake:
 		    if(reading_ver <= 7)
 		    {
 			last_cha.read(*ptr, reading_ver);
 		    }
 		    break;
-		case ea_none:
-		case ea_removed:
+		case ea_saved_status::none:
+		case ea_saved_status::removed:
 		    if(reading_ver <= 7)
 		    {
 			last_cha.nullify();
@@ -420,8 +420,8 @@ namespace libdar
 
         switch(ea_get_saved_status())
         {
-        case ea_full:
-            if(other.ea_get_saved_status() == ea_full)
+        case ea_saved_status::full:
+            if(other.ea_get_saved_status() == ea_saved_status::full)
             {
 		if(!isolated_mode)
 		{
@@ -444,9 +444,9 @@ namespace libdar
                 // we check that all data in current object are the same in the argument
                 // but additional data can reside in the argument
             break;
-        case ea_partial:
-        case ea_fake:
-            if(other.ea_get_saved_status() != ea_none && other.ea_get_saved_status() != ea_removed)
+        case ea_saved_status::partial:
+        case ea_saved_status::fake:
+            if(other.ea_get_saved_status() != ea_saved_status::none && other.ea_get_saved_status() != ea_saved_status::removed)
             {
                 if(!tools_is_equal_with_hourshift(hourshift, get_last_change(), other.get_last_change())
                    && get_last_change() < other.get_last_change())
@@ -461,8 +461,8 @@ namespace libdar
 #endif
             }
             break;
-        case ea_none:
-        case ea_removed:
+        case ea_saved_status::none:
+        case ea_saved_status::removed:
             break;
         default:
             throw SRC_BUG;
@@ -526,19 +526,19 @@ namespace libdar
 
         switch(ea_saved)
         {
-        case ea_none:
+        case ea_saved_status::none:
             flag |= INODE_FLAG_EA_NONE;
             break;
-        case ea_partial:
+        case ea_saved_status::partial:
             flag |= INODE_FLAG_EA_PART;
             break;
-        case ea_fake:
+        case ea_saved_status::fake:
             flag |= INODE_FLAG_EA_FAKE;
             break;
-        case ea_full:
+        case ea_saved_status::full:
             flag |= INODE_FLAG_EA_FULL;
             break;
-        case ea_removed:
+        case ea_saved_status::removed:
             flag |= INODE_FLAG_EA_REMO;
             break;
         default:
@@ -577,14 +577,14 @@ namespace libdar
 
 	    // EA part
 
-        if(ea_saved == ea_full)
+        if(ea_saved == ea_saved_status::full)
             ea_get_size().dump(*ptr);
 
         if(!small)
         {
             switch(ea_saved)
             {
-            case ea_full:
+            case ea_saved_status::full:
 		if(ea_offset == nullptr)
 		    throw SRC_BUG;
                 ea_offset->dump(*ptr);
@@ -592,10 +592,10 @@ namespace libdar
                     throw SRC_BUG;
                 ea_crc->dump(*ptr);
                 break;
-            case ea_partial:
-            case ea_fake:
-            case ea_none:
-            case ea_removed:
+            case ea_saved_status::partial:
+            case ea_saved_status::fake:
+            case ea_saved_status::none:
+            case ea_saved_status::removed:
                 break;
             default:
                 throw SRC_BUG;
@@ -638,16 +638,16 @@ namespace libdar
 	}
     }
 
-    void cat_inode::ea_set_saved_status(ea_status status)
+    void cat_inode::ea_set_saved_status(ea_saved_status status)
     {
         if(status == ea_saved)
             return;
         switch(status)
         {
-        case ea_none:
-        case ea_removed:
-        case ea_partial:
-        case ea_fake:
+        case ea_saved_status::none:
+        case ea_saved_status::removed:
+        case ea_saved_status::partial:
+        case ea_saved_status::fake:
             if(ea != nullptr)
             {
                 delete ea;
@@ -659,7 +659,7 @@ namespace libdar
 		ea_offset = nullptr;
 	    }
             break;
-        case ea_full:
+        case ea_saved_status::full:
             if(ea != nullptr)
                 throw SRC_BUG;
 	    if(ea_offset != nullptr)
@@ -673,7 +673,7 @@ namespace libdar
 
     void cat_inode::ea_attach(ea_attributs *ref)
     {
-        if(ea_saved != ea_full)
+        if(ea_saved != ea_saved_status::full)
             throw SRC_BUG;
 
         if(ref != nullptr && ea == nullptr)
@@ -696,7 +696,7 @@ namespace libdar
     {
         switch(ea_saved)
         {
-        case ea_full:
+        case ea_saved_status::full:
             if(ea != nullptr)
                 return ea;
             else
@@ -804,7 +804,7 @@ namespace libdar
                     throw SRC_BUG;
                 // no need of break here
             throw SRC_BUG; // but ... instead of break we use some more radical precaution.
-        case ea_removed:
+        case ea_saved_status::removed:
             return &empty_ea;
                 // no need of break here
         default:
@@ -823,7 +823,7 @@ namespace libdar
 
     infinint cat_inode::ea_get_size() const
     {
-        if(ea_saved == ea_full)
+        if(ea_saved == ea_saved_status::full)
         {
             if(ea_size == nullptr) // reading an old archive
             {
@@ -879,7 +879,7 @@ namespace libdar
 
     void cat_inode::ea_get_crc(const crc * & ptr) const
     {
-	if(ea_get_saved_status() != ea_full)
+	if(ea_get_saved_status() != ea_saved_status::full)
 	    throw SRC_BUG;
 
         if(small_read && ea_crc == nullptr)

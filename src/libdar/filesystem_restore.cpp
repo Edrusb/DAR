@@ -239,7 +239,7 @@ namespace libdar
 	    bool has_data_saved = (x_ino != nullptr && x_ino->get_saved_status() == saved_status::saved) || x_det != nullptr;
 	    bool has_patch = x_ino != nullptr && x_ino->get_saved_status() == saved_status::delta;
 	    bool has_just_inode = x_ino != nullptr && x_ino->get_saved_status() == saved_status::inode_only;
-	    bool has_ea_saved = x_ino != nullptr && (x_ino->ea_get_saved_status() == cat_inode::ea_full || x_ino->ea_get_saved_status() == cat_inode::ea_removed);
+	    bool has_ea_saved = x_ino != nullptr && (x_ino->ea_get_saved_status() == ea_saved_status::full || x_ino->ea_get_saved_status() == ea_saved_status::removed);
 	    bool has_fsa_saved = x_ino != nullptr && x_ino->fsa_get_saved_status() == cat_inode::fsa_full;
 	    path spot = *current_dir + x_nom->get_name();
 	    string spot_display = spot.display();
@@ -783,13 +783,13 @@ namespace libdar
 
 	    // modifying the EA action when the in place inode has not EA
 
-	if(in_place->ea_get_saved_status() != cat_inode::ea_full) // no EA in filesystem
+	if(in_place->ea_get_saved_status() != ea_saved_status::full) // no EA in filesystem
 	{
 	    if(action == EA_merge_preserve || action == EA_merge_overwrite)
 		action = EA_overwrite; // merging when in_place has no EA is equivalent to overwriting
 	}
 
-	if(tba_ino->ea_get_saved_status() == cat_inode::ea_removed) // EA have been removed since archive of reference
+	if(tba_ino->ea_get_saved_status() == ea_saved_status::removed) // EA have been removed since archive of reference
 	{
 	    if(action == EA_merge_preserve || action == EA_merge_overwrite)
 		action = EA_clear; // we must remove EA instead of merging
@@ -804,7 +804,7 @@ namespace libdar
 	    break;
 	case EA_overwrite:
 	case EA_overwrite_mark_already_saved:
-	    if(tba_ino->ea_get_saved_status() != cat_inode::ea_full && tba_ino->ea_get_saved_status() != cat_inode::ea_removed)
+	    if(tba_ino->ea_get_saved_status() != ea_saved_status::full && tba_ino->ea_get_saved_status() != ea_saved_status::removed)
 		throw SRC_BUG;
 	    if(warn_overwrite)
 	    {
@@ -868,7 +868,7 @@ namespace libdar
 	    break;
 	case EA_merge_preserve:
 	case EA_merge_overwrite:
-	    if(in_place->ea_get_saved_status() != cat_inode::ea_full)
+	    if(in_place->ea_get_saved_status() != ea_saved_status::full)
 		throw SRC_BUG; // should have been redirected to EA_overwrite !
 
 	    if(warn_overwrite)
@@ -883,7 +883,7 @@ namespace libdar
 		}
 	    }
 
-	    if(tba_ino->ea_get_saved_status() == cat_inode::ea_full) // Note, that cat_inode::ea_removed is the other valid value
+	    if(tba_ino->ea_get_saved_status() == ea_saved_status::full) // Note, that ea_saved_status::removed is the other valid value
 	    {
 		const ea_attributs *tba_ea = tba_ino->get_ea();
 		const ea_attributs *ip_ea = in_place->get_ea();

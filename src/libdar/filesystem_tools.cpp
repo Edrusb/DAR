@@ -305,12 +305,12 @@ namespace libdar
             {
                 if(eat->size() <= 0)
                     throw SRC_BUG;
-                ino->ea_set_saved_status(cat_inode::ea_full);
+                ino->ea_set_saved_status(ea_saved_status::full);
                 ino->ea_attach(eat);
                 eat = nullptr; // allocated memory now managed by the cat_inode object
             }
             else
-                ino->ea_set_saved_status(cat_inode::ea_none);
+                ino->ea_set_saved_status(ea_saved_status::none);
         }
         catch(...)
         {

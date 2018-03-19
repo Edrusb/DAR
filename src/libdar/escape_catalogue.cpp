@@ -151,7 +151,7 @@ namespace libdar
 
 	if(ref_ino != nullptr)
 	{
-	    if(ref_ino->ea_get_saved_status() == cat_inode::ea_full)
+	    if(ref_ino->ea_get_saved_status() == ea_saved_status::full)
 	    {
 		if(where->esc == nullptr)
 		    throw SRC_BUG;
@@ -221,7 +221,7 @@ namespace libdar
 
 	if(ref_ino != nullptr)
 	{
-	    if(ref_ino->ea_get_saved_status() == cat_inode::ea_full)
+	    if(ref_ino->ea_get_saved_status() == ea_saved_status::full)
 	    {
 		const crc * c = nullptr;
 

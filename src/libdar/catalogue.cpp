@@ -780,12 +780,12 @@ namespace libdar
 			// converting cat_inode to unsaved entry
 
 		    clo_ino->set_saved_status(saved_status::not_saved);
-		    if(clo_ino->ea_get_saved_status() != cat_inode::ea_none)
+		    if(clo_ino->ea_get_saved_status() != ea_saved_status::none)
 		    {
-			if(clo_ino->ea_get_saved_status() == cat_inode::ea_removed)
-			    clo_ino->ea_set_saved_status(cat_inode::ea_none);
+			if(clo_ino->ea_get_saved_status() == ea_saved_status::removed)
+			    clo_ino->ea_set_saved_status(ea_saved_status::none);
 			else
-			    clo_ino->ea_set_saved_status(cat_inode::ea_partial);
+			    clo_ino->ea_set_saved_status(ea_saved_status::partial);
 		    }
 
 			// handling hard links
@@ -979,7 +979,7 @@ namespace libdar
 			    else
 				if(!filter_unsaved
 				   || e_ino->get_saved_status() != saved_status::not_saved
-				   || (e_ino->ea_get_saved_status() == cat_inode::ea_full || e_ino->ea_get_saved_status() == cat_inode::ea_fake)
+				   || (e_ino->ea_get_saved_status() == ea_saved_status::full || e_ino->ea_get_saved_status() == ea_saved_status::fake)
 				   || (e_dir != nullptr && e_dir->get_recursive_has_changed()))
 				{
 				    bool dirty_seq = local_check_dirty_seq(get_escape_layer());
@@ -1114,7 +1114,7 @@ namespace libdar
 
 				if(!filter_unsaved
 				   || e_ino->get_saved_status() != saved_status::not_saved
-				   || (e_ino->ea_get_saved_status() == cat_inode::ea_full || e_ino->ea_get_saved_status() == cat_inode::ea_fake)
+				   || (e_ino->ea_get_saved_status() == ea_saved_status::full || e_ino->ea_get_saved_status() == ea_saved_status::fake)
 				   || (e_dir != nullptr && e_dir->get_recursive_has_changed()))
 				{
 				    bool dirty_seq = local_check_dirty_seq(get_escape_layer());
@@ -1280,7 +1280,7 @@ namespace libdar
 
 			    if(!filter_unsaved
 			       || e_ino->get_saved_status() != saved_status::not_saved
-			       || (e_ino->ea_get_saved_status() == cat_inode::ea_full || e_ino->ea_get_saved_status() == cat_inode::ea_fake)
+			       || (e_ino->ea_get_saved_status() == ea_saved_status::full || e_ino->ea_get_saved_status() == ea_saved_status::fake)
 			       || (e_dir != nullptr && e_dir->get_recursive_has_changed()))
 			    {
 				const cat_file * f_ino = dynamic_cast<const cat_file *>(e_ino);
@@ -1295,7 +1295,7 @@ namespace libdar
 
 				unsigned char sig = e_ino->signature();
 				saved_status data_st = e_ino->get_saved_status();
-				cat_inode::ea_status ea_st = e_ino->ea_get_saved_status();
+				ea_saved_status ea_st = e_ino->ea_get_saved_status();
 
 				if(isolated)
 				{
@@ -1303,7 +1303,7 @@ namespace libdar
 				       && (f_ino == nullptr
 					   || !f_ino->is_dirty()))
 					data_st = saved_status::fake;
-				    ea_st = cat_inode::ea_fake;
+				    ea_st = ea_saved_status::fake;
 				}
 
 				if(stored == "0" && (reg == nullptr || !reg->get_sparse_file_detection_read()))
@@ -1334,15 +1334,15 @@ namespace libdar
 
 				switch(ea_st)
 				{
-				case cat_inode::ea_full:
+				case ea_saved_status::full:
 				    metadata = "saved";
 				    break;
-				case cat_inode::ea_partial:
-				case cat_inode::ea_fake:
+				case ea_saved_status::partial:
+				case ea_saved_status::fake:
 				    metadata = "referenced";
 				    break;
-				case cat_inode::ea_none:
-				case cat_inode::ea_removed:
+				case ea_saved_status::none:
+				case ea_saved_status::removed:
 				    metadata = "absent";
 				    break;
 				default:
@@ -1891,7 +1891,7 @@ namespace libdar
 	    {
 		    // EA
 
-		if(ent_inode->ea_get_saved_status() == cat_inode::ea_full)
+		if(ent_inode->ea_get_saved_status() == ea_saved_status::full)
 		{
 		    (void)ent_inode->get_ea();
 		    ent_inode->ea_detach();

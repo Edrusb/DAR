@@ -319,7 +319,9 @@ namespace libdar
 	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override
 	{
 	    const cat_inode *tmp = dynamic_cast<const cat_inode *>(&first);
-	    return tmp != nullptr && tmp->ea_get_saved_status() != cat_inode::ea_none && tmp->ea_get_saved_status() != cat_inode::ea_removed;
+	    return tmp != nullptr
+		&& tmp->ea_get_saved_status() != ea_saved_status::none
+		&& tmp->ea_get_saved_status() != ea_saved_status::removed;
 	};
 	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_EA_present(*this); };
     };

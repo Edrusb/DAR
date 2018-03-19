@@ -460,8 +460,8 @@ namespace libdar
 		const string notme = "";
 		bool in_place_data_recent = al_inode->get_last_modif() >= do_inode->get_last_modif();
 		bool in_place_ea_recent = al_inode->get_last_change() >= do_inode->get_last_change();
-		bool al_ea_saved = al_inode->ea_get_saved_status() == cat_inode::ea_full;
-		bool do_ea_saved = do_inode->ea_get_saved_status() == cat_inode::ea_full;
+		bool al_ea_saved = al_inode->ea_get_saved_status() == ea_saved_status::full;
+		bool do_ea_saved = do_inode->ea_get_saved_status() == ea_saved_status::full;
 		bool al_fsa_saved = al_inode->fsa_get_saved_status() == cat_inode::fsa_full;
 		bool do_fsa_saved = do_inode->fsa_get_saved_status() == cat_inode::fsa_full;
 

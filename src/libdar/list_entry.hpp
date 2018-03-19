@@ -33,12 +33,13 @@
 #include "../my_config.h"
 #include "infinint.hpp"
 #include "deci.hpp"
-#include "catalogue.hpp"
 #include "tools.hpp"
-#include "compressor.hpp"
+#include "compression.hpp"
 #include "integers.hpp"
+#include "cat_inode.hpp"
 #include "datetime.hpp"
 #include "range.hpp"
+#include "cat_status.hpp"
 
 namespace libdar
 {
@@ -85,8 +86,8 @@ namespace libdar
 	bool is_door_inode() const { return type == 'o'; };
 
 	bool has_data_present_in_the_archive() const { return data_status == saved_status::saved; };
-	bool has_EA() const { return ea_status != cat_inode::ea_none && ea_status != cat_inode::ea_removed; };
-	bool has_EA_saved_in_the_archive() const { return ea_status == cat_inode::ea_full; };
+	bool has_EA() const { return ea_status != ea_saved_status::none && ea_status != ea_saved_status::removed; };
+	bool has_EA_saved_in_the_archive() const { return ea_status == ea_saved_status::full; };
 	bool has_FSA() const { return fsa_status != cat_inode::fsa_none; };
 	bool has_FSA_saved_in_the_archive() const { return fsa_status == cat_inode::fsa_full; };
 
@@ -191,7 +192,7 @@ namespace libdar
 	void set_last_access(const datetime & val) { last_access = val; };
 	void set_last_modif(const datetime & val) { last_modif = val; };
 	void set_saved_status(saved_status val) { data_status = val; };
-	void set_ea_status(cat_inode::ea_status val) { ea_status = val; };
+	void set_ea_status(ea_saved_status val) { ea_status = val; };
 	void set_last_change(const datetime & val) { last_change = val; };
 	void set_fsa_status(cat_inode::fsa_status val) { fsa_status = val; };
 	void set_file_size(const infinint & val) { file_size = val; };
@@ -221,7 +222,7 @@ namespace libdar
 	datetime last_access;
 	datetime last_modif;
 	saved_status data_status;
-	cat_inode::ea_status ea_status;
+	ea_saved_status ea_status;
 	datetime last_change;
 	cat_inode::fsa_status fsa_status;
 	infinint file_size;
