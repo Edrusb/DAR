@@ -1159,12 +1159,7 @@ namespace libdar
 
         try
         {
-	    slice_layout used_layout = slices;
-		// by default we use the slice layout of the current archive,
-		// this is modified if the current archive is an isolated catalogue
-		// in archive format 9 or greater, then we use the slice layout contained
-		// in the archive header/trailer which is a copy of the one of the archive of reference
-		// a warning is issued in that case
+	    slice_layout used_layout;
 
             enable_natural_destruction();
             try
@@ -1204,32 +1199,15 @@ namespace libdar
 					  "");
 		    break;
 		case archive_options_listing::slicing:
-		    if(only_contains_an_isolated_catalogue())
-		    {
-			if(ver.get_slice_layout() != nullptr)
+		    if(!get_catalogue_slice_layout(used_layout))
+			if(options.get_user_slicing(used_layout.first_size, used_layout.other_size))
 			{
-			    used_layout = *ver.get_slice_layout();
-			    if(options.get_user_slicing(used_layout.first_size, used_layout.other_size))
-			    {
-				if(options.get_info_details())
-				    get_ui().printf(gettext("Using user provided modified slicing (first slice = %i bytes, other slices = %i bytes)"), &used_layout.first_size, &used_layout.other_size);
-			    }
-			    else
-				get_ui().message(gettext("Using the slice layout of the archive of reference recorded at the time this isolated catalogue was done\n Note: if this reference has been resliced this isolated catalogue has been created, the resulting slicing information given here will be wrong and will probably lead to an error. Check documentation to know hos to manually specify the slicing to use"));
+			    if(options.get_info_details())
+				get_ui().printf(gettext("Using user provided modified slicing (first slice = %i bytes, other slices = %i bytes)"), &used_layout.first_size, &used_layout.other_size);
 			}
-			else // no slicing of the archive of reference stored in this isolated catalogue's header/trailer
-			{
-			    if(ver.get_edition() >= 9)
-				throw SRC_BUG; // starting revision 9 isolated catalogue should always contain
-				// the slicing of the archive of reference, even if that reference is using an archive format
-				// older than version 9.
+			else
+			    throw Erange("archive::op_listing", gettext("No slice layout of the archive of reference for the current isolated catalogue is available, cannot provide slicing information, aborting"));
 
-			    if(options.get_user_slicing(used_layout.first_size, used_layout.other_size))
-				get_ui().message(gettext("Warning: No slice layout of the archive of reference has been recorded in this isolated catalogue. The additional slicing information you provided may still lead the operation to fail because the archive has an _unsupported_ (too old) format for this feature"));
-			    else
-				throw Erange("archive::op_listing", gettext("No slice layout of the archive of reference for the current isolated catalogue is available, cannot provide slicing information, aborting"));
-			}
-		    }
 		    get_cat().slice_listing(get_ui(),
 					    only_contains_an_isolated_catalogue(),
 					    options.get_selection(),
@@ -1862,6 +1840,37 @@ namespace libdar
 
 	NLS_SWAP_OUT;
     }
+
+    bool archive::get_catalogue_slice_layout(slice_layout & slicing) const
+    {
+	slicing = slices;
+	    // by default we use the slice layout of the current archive,
+	    // this is modified if the current archive is an isolated catalogue
+	    // in archive format 9 or greater, then we use the slice layout contained
+	    // in the archive header/trailer which is a copy of the one of the archive of reference
+	    // a warning is issued in that case
+
+	if(only_contains_an_isolated_catalogue())
+	{
+	    if(ver.get_slice_layout() != nullptr)
+	    {
+		slicing = *ver.get_slice_layout();
+		return true;
+	    }
+	    else // no slicing of the archive of reference stored in this isolated catalogue's header/trailer
+	    {
+
+		if(ver.get_edition() >= 9)
+		    throw SRC_BUG; // starting revision 9 isolated catalogue should always contain
+		    // the slicing of the archive of reference, even if that reference is using an archive format
+		    // older than version 9.
+		return false;
+	    }
+	}
+	else
+	    return true;
+    }
+
 
     U_64 archive::get_first_slice_header_size() const
     {

@@ -323,6 +323,13 @@ namespace libdar
 	    /// change all inode as unsaved (equal to differential backup with no change met)
 	void set_to_unsaved_data_and_FSA() { if(cat == nullptr) throw SRC_BUG; cat->set_to_unsaved_data_and_FSA(); };
 
+	    /// returns the slice layout of the archive, or of the archive of reference in case of isolated catalogue
+
+	    /// \param[out] slicing slice layout as refered by the catalogue
+	    /// \return if the catalogue slice layout could be determined, in that case slicing is set accordingly
+	    /// else (false is returned) the slicing argument is not set
+	bool get_catalogue_slice_layout(slice_layout & slicing) const;
+
 	    /// get the first slice header
 	    ///
 	    /// get_first_slice_header_size() and get_non_first_slice_header_size() can be used to translate
