@@ -273,7 +273,7 @@ namespace libdar
 
 	if(ref_ino != nullptr)
 	{
-	    if(ref_ino->fsa_get_saved_status() == cat_inode::fsa_full)
+	    if(ref_ino->fsa_get_saved_status() == fsa_saved_status::full)
 	    {
 		if(where->esc == nullptr)
 		    throw SRC_BUG;
@@ -300,7 +300,7 @@ namespace libdar
 
 	if(ref_ino != nullptr)
 	{
-	    if(ref_ino->fsa_get_saved_status() == cat_inode::fsa_full)
+	    if(ref_ino->fsa_get_saved_status() == fsa_saved_status::full)
 	    {
 		const crc * c = nullptr;
 

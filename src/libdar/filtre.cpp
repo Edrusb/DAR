@@ -778,9 +778,9 @@ namespace libdar
 					bool avoid_saving_fsa =
 					    snapshot
 						// don't backup if doing a snapshot
-					    || (!fixed_date.is_zero() && e_ino != nullptr && e_ino->fsa_get_saved_status() != cat_inode::fsa_none && e_ino->get_last_change() < fixed_date)
+					    || (!fixed_date.is_zero() && e_ino != nullptr && e_ino->fsa_get_saved_status() != fsa_saved_status::none && e_ino->get_last_change() < fixed_date)
 						// don't backup if older than given date (if reference date given)
-					    || (fixed_date.is_zero() && e_ino != nullptr && e_ino->fsa_get_saved_status() == cat_inode::fsa_full && f_ino != nullptr && f_ino->fsa_get_saved_status() != cat_inode::fsa_none && e_ino->get_last_change() <= f_ino->get_last_change())
+					    || (fixed_date.is_zero() && e_ino != nullptr && e_ino->fsa_get_saved_status() == fsa_saved_status::full && f_ino != nullptr && f_ino->fsa_get_saved_status() != fsa_saved_status::none && e_ino->get_last_change() <= f_ino->get_last_change())
 						// don't backup if doing differential backup and entry is the same as the one in the archive of reference
 					    ;
 
@@ -850,8 +850,8 @@ namespace libdar
 
 					if(avoid_saving_fsa)
 					{
-					    if(e_ino->fsa_get_saved_status() == cat_inode::fsa_full)
-						e_ino->fsa_set_saved_status(cat_inode::fsa_partial);
+					    if(e_ino->fsa_get_saved_status() == fsa_saved_status::full)
+						e_ino->fsa_set_saved_status(fsa_saved_status::partial);
 					}
 
 					if(change_to_remove_ea)
@@ -926,7 +926,7 @@ namespace libdar
 
 					    // PERFORMING ACTION FOR FSA
 
-					if(e_ino->fsa_get_saved_status() == cat_inode::fsa_full)
+					if(e_ino->fsa_get_saved_status() == fsa_saved_status::full)
 					{
 					    cat.pre_add_fsa(e);
 					    if(save_fsa(dialog, juillet.get_string(), e_ino, pdesc, display_treated, false))
@@ -1533,7 +1533,7 @@ namespace libdar
 			}
 
 			    // checking FSA if any
-			if(e_ino != nullptr && e_ino->fsa_get_saved_status() == cat_inode::fsa_full)
+			if(e_ino != nullptr && e_ino->fsa_get_saved_status() == fsa_saved_status::full)
 			{
 			    if(perimeter == "")
 				perimeter = "FSA";
@@ -2040,8 +2040,8 @@ namespace libdar
 						    if(dolly_ino != nullptr && al_ino != nullptr
 						       && (dolly_ino->ea_get_saved_status() != ea_saved_status::none
 							   || al_ino->ea_get_saved_status() != ea_saved_status::none
-							   || dolly_ino->fsa_get_saved_status() != cat_inode::fsa_none
-							   || al_ino->fsa_get_saved_status() != cat_inode::fsa_none)
+							   || dolly_ino->fsa_get_saved_status() != fsa_saved_status::none
+							   || al_ino->fsa_get_saved_status() != fsa_saved_status::none)
 							)
 							act_ea = crit_ask_user_for_EA_action(*dialog, full_name, already_here, dolly);
 						    else
@@ -2071,9 +2071,9 @@ namespace libdar
 							if(display_treated)
 							    dialog->message(tools_printf(gettext("EA of file %S from first archive have been dropped and marked as already saved"), &full_name));
 						    }
-						    if(al_ino != nullptr && al_ino->fsa_get_saved_status() == cat_inode::fsa_full)
+						    if(al_ino != nullptr && al_ino->fsa_get_saved_status() == fsa_saved_status::full)
 						    {
-							const_cast<cat_inode *>(al_ino)->fsa_set_saved_status(cat_inode::fsa_partial);
+							const_cast<cat_inode *>(al_ino)->fsa_set_saved_status(fsa_saved_status::partial);
 							if(display_treated)
 							    dialog->message(tools_printf(gettext("FSA of file %S from first archive have been dropped and marked as already saved"), &full_name));
 						    }
@@ -2088,13 +2088,13 @@ namespace libdar
 							    dialog->message(tools_printf(gettext("EA of file %S from first archive have been removed"), &full_name));
 							const_cast<cat_inode *>(al_ino)->ea_set_saved_status(ea_saved_status::none);
 						    }
-						    if(al_ino != nullptr && al_ino->fsa_get_saved_status() != cat_inode::fsa_none)
+						    if(al_ino != nullptr && al_ino->fsa_get_saved_status() != fsa_saved_status::none)
 						    {
-							if(al_ino->fsa_get_saved_status() == cat_inode::fsa_full)
+							if(al_ino->fsa_get_saved_status() == fsa_saved_status::full)
 							    st.decr_fsa_treated();
 							if(display_treated)
 							    dialog->message(tools_printf(gettext("FSA of file %S from first archive have been removed"), &full_name));
-							const_cast<cat_inode *>(al_ino)->fsa_set_saved_status(cat_inode::fsa_none);
+							const_cast<cat_inode *>(al_ino)->fsa_set_saved_status(fsa_saved_status::none);
 						    }
 
 						    break;
@@ -2179,8 +2179,8 @@ namespace libdar
 						    if(dolly_ino != nullptr && al_ino != nullptr &&
 						       (dolly_ino->ea_get_saved_status() != ea_saved_status::none
 							|| al_ino->ea_get_saved_status() != ea_saved_status::none
-							|| dolly_ino->fsa_get_saved_status() != cat_inode::fsa_none
-							|| al_ino->fsa_get_saved_status() != cat_inode::fsa_none))
+							|| dolly_ino->fsa_get_saved_status() != fsa_saved_status::none
+							|| al_ino->fsa_get_saved_status() != fsa_saved_status::none))
 							act_ea = crit_ask_user_for_EA_action(*dialog, full_name, already_here, dolly);
 						    else
 							act_ea = EA_overwrite; // no need to ask here neither as both entries have no EA.
@@ -2446,7 +2446,7 @@ namespace libdar
 						if(e_ino->ea_get_saved_status() == ea_saved_status::full)
 						    st.incr_ea_treated();
 
-						if(e_ino->fsa_get_saved_status() == cat_inode::fsa_full)
+						if(e_ino->fsa_get_saved_status() == fsa_saved_status::full)
 						    st.incr_fsa_treated();
 					    }
 
@@ -2807,7 +2807,7 @@ namespace libdar
 		    }
 
 			// saving inode's FSA
-		    if(e_ino->fsa_get_saved_status() == cat_inode::fsa_full)
+		    if(e_ino->fsa_get_saved_status() == fsa_saved_status::full)
 		    {
 			cat.pre_add_fsa(e, &pdesc);
 			    // ignoring the return value of save_fsa, exceptions may still propagate
@@ -2917,7 +2917,7 @@ namespace libdar
 			    (void)e_ino->get_ea();
 			    e_ino->ea_get_crc(check);
 			}
-			if(e_ino->fsa_get_saved_status() == cat_inode::fsa_full)
+			if(e_ino->fsa_get_saved_status() == fsa_saved_status::full)
 			{
 			    (void)e_ino->get_fsa();
 			    e_ino->fsa_get_crc(check);
@@ -3765,7 +3765,7 @@ namespace libdar
         {
             switch(ino->fsa_get_saved_status())
             {
-            case cat_inode::fsa_full: // if there is something to save
+            case fsa_saved_status::full: // if there is something to save
 		if(ino->get_fsa() != nullptr)
 		{
 		    crc * val = nullptr;
@@ -3828,8 +3828,8 @@ namespace libdar
 		else
 		    throw SRC_BUG;
 		break;
-            case cat_inode::fsa_partial:
-	    case cat_inode::fsa_none:
+            case fsa_saved_status::partial:
+	    case fsa_saved_status::none:
 		break;
             default:
                 throw SRC_BUG;
@@ -3852,7 +3852,7 @@ namespace libdar
             dialog->message(string(gettext("Error saving Filesystem Specific Attributes for ")) + info_quoi + ": " + e.get_message());
 	    if(repair_mode)
 	    {
-		ino->fsa_set_saved_status(cat_inode::fsa_none);
+		ino->fsa_set_saved_status(fsa_saved_status::none);
 		dialog->message(gettext("be advised that a CRC error will be reported for the FSA of that file while sequentially reading the repaired archive"));
 	    }
         }
@@ -3943,23 +3943,23 @@ namespace libdar
 
 	    switch(add_ino->fsa_get_saved_status())
 	    {
-	    case cat_inode::fsa_none:
-		place_ino->fsa_set_saved_status(cat_inode::fsa_none);
+	    case fsa_saved_status::none:
+		place_ino->fsa_set_saved_status(fsa_saved_status::none);
 		break;
-	    case cat_inode::fsa_partial:
-		place_ino->fsa_set_saved_status(cat_inode::fsa_partial);
+	    case fsa_saved_status::partial:
+		place_ino->fsa_set_saved_status(fsa_saved_status::partial);
 		place_ino->fsa_partial_attach(add_ino->fsa_get_families());
 		break;
-	    case cat_inode::fsa_full:
+	    case fsa_saved_status::full:
 		tmp_fsa = new (nothrow) filesystem_specific_attribute_list(*add_ino->get_fsa()); // we clone the FSA of add_ino
 		if(tmp_fsa == nullptr)
 		    throw Ememory("filtre::do_EFSA_transfer");
 		try
 		{
-		    if(place_ino->fsa_get_saved_status() == cat_inode::fsa_full) // we must drop the old FSA
+		    if(place_ino->fsa_get_saved_status() == fsa_saved_status::full) // we must drop the old FSA
 			place_ino->fsa_detach();
 		    else
-			place_ino->fsa_set_saved_status(cat_inode::fsa_full);
+			place_ino->fsa_set_saved_status(fsa_saved_status::full);
 		    place_ino->fsa_attach(tmp_fsa);
 		    tmp_fsa = nullptr;
 		}
@@ -3994,8 +3994,8 @@ namespace libdar
 		// FSA considerations
 
 	    place_ino->fsa_set_saved_status(add_ino->fsa_get_saved_status()); // at this step fsa_full may be set, will be changed to fsa_partial below
-	    if(place_ino->fsa_get_saved_status() == cat_inode::fsa_full)
-		place_ino->fsa_set_saved_status(cat_inode::fsa_partial);
+	    if(place_ino->fsa_get_saved_status() == fsa_saved_status::full)
+		place_ino->fsa_set_saved_status(fsa_saved_status::partial);
 
 	    break;
 
@@ -4055,7 +4055,7 @@ namespace libdar
 
 		// FSA considerations
 
-	    if(place_ino->fsa_get_saved_status() == cat_inode::fsa_full && add_ino->fsa_get_saved_status() == cat_inode::fsa_full) // we have something to merge
+	    if(place_ino->fsa_get_saved_status() == fsa_saved_status::full && add_ino->fsa_get_saved_status() == fsa_saved_status::full) // we have something to merge
 	    {
 		tmp_fsa = new (nothrow) filesystem_specific_attribute_list();
 		if(tmp_fsa == nullptr)
@@ -4080,9 +4080,9 @@ namespace libdar
 	    }
 	    else
 	    {
-		if(add_ino->fsa_get_saved_status() == cat_inode::fsa_full)
+		if(add_ino->fsa_get_saved_status() == fsa_saved_status::full)
 		{
-		    place_ino->fsa_set_saved_status(cat_inode::fsa_full);
+		    place_ino->fsa_set_saved_status(fsa_saved_status::full);
 		    tmp_fsa = new (nothrow) filesystem_specific_attribute_list(*add_ino->get_fsa());
 		    if(tmp_fsa == nullptr)
 			throw Ememory("filtre.cpp:do_EFSA_transfert");
@@ -4164,7 +4164,7 @@ namespace libdar
 
 		// FSA considerations
 
-	    if(place_ino->fsa_get_saved_status() == cat_inode::fsa_full && add_ino->fsa_get_saved_status() == cat_inode::fsa_full) // we have something to merge
+	    if(place_ino->fsa_get_saved_status() == fsa_saved_status::full && add_ino->fsa_get_saved_status() == fsa_saved_status::full) // we have something to merge
 	    {
 		tmp_fsa = new (nothrow) filesystem_specific_attribute_list();
 		if(tmp_fsa == nullptr)
@@ -4189,9 +4189,9 @@ namespace libdar
 	    }
 	    else
 	    {
-		if(add_ino->fsa_get_saved_status() == cat_inode::fsa_full)
+		if(add_ino->fsa_get_saved_status() == fsa_saved_status::full)
 		{
-		    place_ino->fsa_set_saved_status(cat_inode::fsa_full);
+		    place_ino->fsa_set_saved_status(fsa_saved_status::full);
 		    tmp_fsa = new (nothrow) filesystem_specific_attribute_list(*add_ino->get_fsa());
 		    if(tmp_fsa == nullptr)
 			throw Ememory("filtre.cpp:do_EFSA_transfert");

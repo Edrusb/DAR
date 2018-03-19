@@ -95,7 +95,7 @@ namespace libdar
         gid = xgid;
         perm = xperm;
         ea_saved = ea_saved_status::none;
-	fsa_saved = fsa_none;
+	fsa_saved =  fsa_saved_status::none;
         edit = 0;
 	small_read = false;
 
@@ -265,26 +265,26 @@ namespace libdar
 		switch(fsa_flag)
 		{
 		case INODE_FLAG_FSA_NONE:
-		    fsa_saved = fsa_none;
+		    fsa_saved =  fsa_saved_status::none;
 		    break;
 		case INODE_FLAG_FSA_PART:
-		    fsa_saved = fsa_partial;
+		    fsa_saved =  fsa_saved_status::partial;
 		    break;
 		case INODE_FLAG_FSA_FULL:
-		    fsa_saved = fsa_full;
+		    fsa_saved =  fsa_saved_status::full;
 		    break;
 		default:
 		    throw Erange("cat_inode::cat_inode", gettext("badly structured inode: unknown inode flag for FSA"));
 		}
 
-		if(fsa_saved != fsa_none)
+		if(fsa_saved !=  fsa_saved_status::none)
 		{
 		    fsa_families = new (nothrow) infinint(*ptr);
 		    if(fsa_families == nullptr)
 			throw Ememory("cat_inode::cat_inode(file)");
 		}
 
-		if(fsa_saved == fsa_full)
+		if(fsa_saved ==  fsa_saved_status::full)
 		{
 		    fsa_size = new (nothrow) infinint(*ptr);
 		    if(fsa_size == nullptr)
@@ -295,14 +295,14 @@ namespace libdar
 		{
 		    switch(fsa_saved)
 		    {
-		    case fsa_full:
+		    case  fsa_saved_status::full:
 			fsa_offset = new (nothrow) infinint(*ptr);
 			fsa_crc = create_crc_from_file(*ptr, nullptr);
 			if(fsa_offset == nullptr || fsa_crc == nullptr)
 			    throw Ememory("cat_inode::cat_inode(file)");
 			break;
-		    case fsa_partial:
-		    case fsa_none:
+		    case fsa_saved_status::partial:
+		    case  fsa_saved_status::none:
 			break;
 		    default:
 			throw SRC_BUG;
@@ -317,7 +317,7 @@ namespace libdar
 		}
 	    }
 	    else // older archive than version 9 do not support FSA
-		fsa_saved = fsa_none;
+		fsa_saved =  fsa_saved_status::none;
         }
         catch(...)
         {
@@ -470,8 +470,8 @@ namespace libdar
 
 	switch(fsa_get_saved_status())
 	{
-	case fsa_full:
-	    if(other.fsa_get_saved_status() == fsa_full)
+	case  fsa_saved_status::full:
+	    if(other.fsa_get_saved_status() == fsa_saved_status::full)
 	    {
 		if(!isolated_mode)
 		{
@@ -493,8 +493,8 @@ namespace libdar
 		    throw Erange("cat_inode::compare", gettext("No Filesystem Specific Attribute to compare with"));
 	    }
 	    break;
-	case fsa_partial:
-	    if(other.fsa_get_saved_status() != fsa_none)
+	case fsa_saved_status::partial:
+	    if(other.fsa_get_saved_status() != fsa_saved_status::none)
 	    {
 		if(!tools_is_equal_with_hourshift(hourshift, get_last_change(), other.get_last_change())
                    && get_last_change() < other.get_last_change())
@@ -503,7 +503,7 @@ namespace libdar
 	    else
 		throw Erange("cat_inode::compare", gettext("Filesystem Specific Attribute are missing"));
 	    break;
-	case fsa_none:
+	case fsa_saved_status::none:
 	    break; // nothing to check
 	default:
 	    throw SRC_BUG;
@@ -547,13 +547,13 @@ namespace libdar
 
 	switch(fsa_saved)
 	{
-	case fsa_none:
+	case fsa_saved_status::none:
 	    flag |= INODE_FLAG_FSA_NONE;
 	    break;
-	case fsa_partial:
+	case fsa_saved_status::partial:
 	    flag |= INODE_FLAG_FSA_PART;
 	    break;
-	case fsa_full:
+	case fsa_saved_status::full:
 	    flag |= INODE_FLAG_FSA_FULL;
 	    break;
 	default:
@@ -604,13 +604,13 @@ namespace libdar
 
 	    // FSA part
 
-	if(fsa_saved != fsa_none)
+	if(fsa_saved !=  fsa_saved_status::none)
 	{
 	    if(fsa_families == nullptr)
 		throw SRC_BUG;
 	    fsa_families->dump(*ptr);
 	}
-	if(fsa_saved == fsa_full)
+	if(fsa_saved ==  fsa_saved_status::full)
 	{
 	    if(fsa_size == nullptr)
 		throw SRC_BUG;
@@ -621,7 +621,7 @@ namespace libdar
 	{
 	    switch(fsa_saved)
 	    {
-	    case fsa_full:
+	    case fsa_saved_status::full:
 		if(fsa_offset == nullptr)
 		    throw SRC_BUG;
 		fsa_offset->dump(*ptr);
@@ -629,8 +629,8 @@ namespace libdar
 		    throw SRC_BUG;
 		fsa_crc->dump(*ptr);
 		break;
-	    case fsa_partial:
-	    case fsa_none:
+	    case fsa_saved_status::partial:
+	    case fsa_saved_status::none:
 		break;
 	    default:
 		throw SRC_BUG;
@@ -953,14 +953,14 @@ namespace libdar
             return false;
     }
 
-    void cat_inode::fsa_set_saved_status(fsa_status status)
+    void cat_inode::fsa_set_saved_status(fsa_saved_status status)
     {
 	if(status == fsa_saved)
 	    return;
 	switch(status)
 	{
-	case fsa_none:
-	case fsa_partial:
+	case fsa_saved_status::none:
+	case fsa_saved_status::partial:
 	    if(fsal != nullptr)
 	    {
 		delete fsal;
@@ -972,7 +972,7 @@ namespace libdar
 		fsa_offset = nullptr;
 	    }
 	    break;
-	case fsa_full:
+	case fsa_saved_status::full:
 	    if(fsal != nullptr)
 		throw SRC_BUG;
 	    if(fsa_offset != nullptr)
@@ -987,7 +987,7 @@ namespace libdar
 
     void cat_inode::fsa_partial_attach(const fsa_scope & val)
     {
-	if(fsa_saved != fsa_partial)
+	if(fsa_saved != fsa_saved_status::partial)
 	    throw SRC_BUG;
 
 	if(fsa_families == nullptr)
@@ -998,7 +998,7 @@ namespace libdar
 
     void cat_inode::fsa_attach(filesystem_specific_attribute_list *ref)
     {
-        if(fsa_saved != fsa_full)
+        if(fsa_saved != fsa_saved_status::full)
             throw SRC_BUG;
 
         if(ref != nullptr && fsal == nullptr)
@@ -1053,7 +1053,7 @@ namespace libdar
     {
         switch(fsa_saved)
         {
-        case fsa_full:
+        case fsa_saved_status::full:
             if(fsal != nullptr)
                 return fsal;
             else
@@ -1182,7 +1182,7 @@ namespace libdar
 
     infinint cat_inode::fsa_get_size() const
     {
-        if(fsa_saved == fsa_full)
+        if(fsa_saved == fsa_saved_status::full)
 	    if(fsa_size != nullptr)
 		return *fsa_size;
 	    else
@@ -1229,7 +1229,7 @@ namespace libdar
 
     void cat_inode::fsa_get_crc(const crc * & ptr) const
     {
-	if(fsa_get_saved_status() != fsa_full)
+	if(fsa_get_saved_status() != fsa_saved_status::full)
 	    throw SRC_BUG;
 
         if(small_read && fsa_crc == nullptr)

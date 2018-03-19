@@ -1674,7 +1674,7 @@ namespace libdar
 			ent.set_storage_size_for_EA(tmp_inode->ea_get_size());
 		    }
 		    ent.set_fsa_status(tmp_inode->fsa_get_saved_status());
-		    if(tmp_inode->fsa_get_saved_status() == cat_inode::fsa_full)
+		    if(tmp_inode->fsa_get_saved_status() == fsa_saved_status::full)
 		    {
 			infinint tmp;
 

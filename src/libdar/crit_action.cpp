@@ -462,8 +462,8 @@ namespace libdar
 		bool in_place_ea_recent = al_inode->get_last_change() >= do_inode->get_last_change();
 		bool al_ea_saved = al_inode->ea_get_saved_status() == ea_saved_status::full;
 		bool do_ea_saved = do_inode->ea_get_saved_status() == ea_saved_status::full;
-		bool al_fsa_saved = al_inode->fsa_get_saved_status() == cat_inode::fsa_full;
-		bool do_fsa_saved = do_inode->fsa_get_saved_status() == cat_inode::fsa_full;
+		bool al_fsa_saved = al_inode->fsa_get_saved_status() == fsa_saved_status::full;
+		bool do_fsa_saved = do_inode->fsa_get_saved_status() == fsa_saved_status::full;
 
 		dialog.printf(gettext("Data more recent :\t  %S  \t\t  %S"), in_place_data_recent ? &me : &notme , in_place_data_recent ? &notme : &me);
 		if(al_file != nullptr && do_file != nullptr)

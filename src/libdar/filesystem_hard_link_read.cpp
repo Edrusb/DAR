@@ -354,13 +354,13 @@ namespace libdar
 							  get_ask_before_zeroing_neg_dates());
 			if(!fsal->empty())
 			{
-			    ino->fsa_set_saved_status(cat_inode::fsa_full);
+			    ino->fsa_set_saved_status(fsa_saved_status::full);
 			    ino->fsa_attach(fsal);
 			    fsal = nullptr; // now managed by *ino
 			}
 			else
 			{
-			    ino->fsa_set_saved_status(cat_inode::fsa_none);
+			    ino->fsa_set_saved_status(fsa_saved_status::none);
 			    delete fsal;
 			    fsal = nullptr;
 			}

@@ -150,17 +150,10 @@ namespace libdar
             //////////////////////////////////
             // FILESYSTEM SPECIFIC ATTRIBUTES Methods
             //
-	    // there is not "remove status for FSA, either the cat_inode contains
-	    // full copy of FSA or only remembers the families of FSA found in the unchanged cat_inode
-	    // FSA none is used when the file has no FSA because:
-	    //  - either the underlying filesystem has no known FSA
-	    //  - or the underlying filesystem FSA support has not been activated at compilation time
-	    //  - or the fsa_scope requested at execution time exclude the filesystem FSA families available here
-	enum fsa_status { fsa_none, fsa_partial, fsa_full };
 
 	    // I : which FSA are present
-	void fsa_set_saved_status(fsa_status status);
-	fsa_status fsa_get_saved_status() const { return fsa_saved; };
+	void fsa_set_saved_status(fsa_saved_status status);
+	fsa_saved_status fsa_get_saved_status() const { return fsa_saved; };
 	    /// gives the set of FSA family recorded for that inode
 	fsa_scope fsa_get_families() const { if(fsa_families == nullptr) throw SRC_BUG; return infinint_to_fsa_scope(*fsa_families); };
 
@@ -189,14 +182,14 @@ namespace libdar
 
 
     private :
-        infinint uid;            //< inode owner's user ID
-        infinint gid;            //< inode owner's group ID
-        U_16 perm;               //< inode's permission
-        datetime last_acc;       //< last access time (atime)
-	datetime last_mod;       //< last modification time (mtime)
-        datetime last_cha;       //< last inode meta data change (ctime)
-        ea_saved_status ea_saved;//< inode Extended Attribute status
-	fsa_status fsa_saved;    //< inode Filesystem Specific Attribute status
+        infinint uid;               //< inode owner's user ID
+        infinint gid;               //< inode owner's group ID
+        U_16 perm;                  //< inode's permission
+        datetime last_acc;          //< last access time (atime)
+	datetime last_mod;          //< last modification time (mtime)
+        datetime last_cha;          //< last inode meta data change (ctime)
+        ea_saved_status ea_saved;   //< inode Extended Attribute status
+	fsa_saved_status fsa_saved; //< inode Filesystem Specific Attribute status
 
 	bool small_read;         //< whether we the object has been built with sequential-reading
 

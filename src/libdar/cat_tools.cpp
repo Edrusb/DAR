@@ -344,10 +344,10 @@ namespace libdar
     {
 	string ret = "";
 
-	if(ref.fsa_get_saved_status() != cat_inode::fsa_none)
+	if(ref.fsa_get_saved_status() != fsa_saved_status::none)
 	{
 	    fsa_scope sc = ref.fsa_get_families();
-	    bool upper = ref.fsa_get_saved_status() == cat_inode::fsa_full;
+	    bool upper = ref.fsa_get_saved_status() == fsa_saved_status::full;
 	    ret = fsa_scope_to_string(upper, sc);
 	    if(ret.size() < 3)
 		ret += "-";

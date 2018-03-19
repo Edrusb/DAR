@@ -482,8 +482,8 @@ namespace libdar
 	set_saved_status(saved_status::not_saved);
 	if(ea_get_saved_status() == ea_saved_status::full)
 	    ea_set_saved_status(ea_saved_status::partial);
-	if(fsa_get_saved_status() == cat_inode::fsa_full)
-	    fsa_set_saved_status(cat_inode::fsa_partial);
+	if(fsa_get_saved_status() == fsa_saved_status::full)
+	    fsa_set_saved_status(fsa_saved_status::partial);
 
 	    // doing the same for each entry found in that cat_directory
 	while(it != ordered_fils.end())
@@ -507,8 +507,8 @@ namespace libdar
 		    n_ino->set_saved_status(saved_status::not_saved);
 		    if(n_ino->ea_get_saved_status() == ea_saved_status::full)
 			n_ino->ea_set_saved_status(ea_saved_status::partial);
-		    if(n_ino->fsa_get_saved_status() == cat_inode::fsa_full)
-			n_ino->fsa_set_saved_status(cat_inode::fsa_partial);
+		    if(n_ino->fsa_get_saved_status() == fsa_saved_status::full)
+			n_ino->fsa_set_saved_status(fsa_saved_status::partial);
 		}
 	    }
 

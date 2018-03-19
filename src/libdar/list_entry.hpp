@@ -88,8 +88,8 @@ namespace libdar
 	bool has_data_present_in_the_archive() const { return data_status == saved_status::saved; };
 	bool has_EA() const { return ea_status != ea_saved_status::none && ea_status != ea_saved_status::removed; };
 	bool has_EA_saved_in_the_archive() const { return ea_status == ea_saved_status::full; };
-	bool has_FSA() const { return fsa_status != cat_inode::fsa_none; };
-	bool has_FSA_saved_in_the_archive() const { return fsa_status == cat_inode::fsa_full; };
+	bool has_FSA() const { return fsa_status != fsa_saved_status::none; };
+	bool has_FSA_saved_in_the_archive() const { return fsa_status == fsa_saved_status::full; };
 
 	std::string get_uid() const { return deci(uid).human(); };
 	std::string get_gid() const { return deci(gid).human(); };
@@ -194,7 +194,7 @@ namespace libdar
 	void set_saved_status(saved_status val) { data_status = val; };
 	void set_ea_status(ea_saved_status val) { ea_status = val; };
 	void set_last_change(const datetime & val) { last_change = val; };
-	void set_fsa_status(cat_inode::fsa_status val) { fsa_status = val; };
+	void set_fsa_status(fsa_saved_status val) { fsa_status = val; };
 	void set_file_size(const infinint & val) { file_size = val; };
 	void set_storage_size(const infinint & val) { storage_size = val; };
 	void set_is_sparse_file(bool val) { sparse_file = val; };
@@ -224,7 +224,7 @@ namespace libdar
 	saved_status data_status;
 	ea_saved_status ea_status;
 	datetime last_change;
-	cat_inode::fsa_status fsa_status;
+	fsa_saved_status fsa_status;
 	infinint file_size;
 	infinint storage_size;
 	bool sparse_file;

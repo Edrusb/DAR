@@ -37,7 +37,7 @@ namespace libdar
 	perm = 0;
 	data_status = saved_status::saved;
 	ea_status = ea_saved_status::none;
-	fsa_status = cat_inode::fsa_none;
+	fsa_status = fsa_saved_status::none;
 	file_size = 0;
 	storage_size = 0;
 	sparse_file = 0;

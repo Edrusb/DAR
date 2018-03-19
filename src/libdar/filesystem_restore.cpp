@@ -240,7 +240,7 @@ namespace libdar
 	    bool has_patch = x_ino != nullptr && x_ino->get_saved_status() == saved_status::delta;
 	    bool has_just_inode = x_ino != nullptr && x_ino->get_saved_status() == saved_status::inode_only;
 	    bool has_ea_saved = x_ino != nullptr && (x_ino->ea_get_saved_status() == ea_saved_status::full || x_ino->ea_get_saved_status() == ea_saved_status::removed);
-	    bool has_fsa_saved = x_ino != nullptr && x_ino->fsa_get_saved_status() == cat_inode::fsa_full;
+	    bool has_fsa_saved = x_ino != nullptr && x_ino->fsa_get_saved_status() == fsa_saved_status::full;
 	    path spot = *current_dir + x_nom->get_name();
 	    string spot_display = spot.display();
 
@@ -932,7 +932,7 @@ namespace libdar
 
 	    // modifying the FSA action when the in place inode has not FSA
 
-	if(in_place->fsa_get_saved_status() != cat_inode::fsa_full) // no EA in filesystem
+	if(in_place->fsa_get_saved_status() != fsa_saved_status::full) // no EA in filesystem
 	{
 	    if(action == EA_merge_preserve || action == EA_merge_overwrite)
 		action = EA_overwrite; // merging when in_place has no EA is equivalent to overwriting
@@ -947,7 +947,7 @@ namespace libdar
 	    break;
 	case EA_overwrite:
 	case EA_overwrite_mark_already_saved:
-	    if(tba_ino->fsa_get_saved_status() != cat_inode::fsa_full)
+	    if(tba_ino->fsa_get_saved_status() != fsa_saved_status::full)
 		throw SRC_BUG;
 	    if(warn_overwrite)
 	    {
@@ -992,7 +992,7 @@ namespace libdar
 	    break;
 	case EA_merge_preserve:
 	case EA_merge_overwrite:
-	    if(in_place->fsa_get_saved_status() != cat_inode::fsa_full)
+	    if(in_place->fsa_get_saved_status() != fsa_saved_status::full)
 		throw SRC_BUG; // should have been redirected to EA_overwrite !
 
 	    if(warn_overwrite)
@@ -1007,7 +1007,7 @@ namespace libdar
 		}
 	    }
 
-	    if(tba_ino->fsa_get_saved_status() == cat_inode::fsa_full)
+	    if(tba_ino->fsa_get_saved_status() == fsa_saved_status::full)
 	    {
 		const filesystem_specific_attribute_list *tba_fsa = tba_ino->get_fsa();
 		const filesystem_specific_attribute_list *ip_fsa = in_place->get_fsa();

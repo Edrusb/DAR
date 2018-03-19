@@ -56,6 +56,21 @@ namespace libdar
 	removed  //< EA were present in the reference version, but not present anymore
 
     };
+
+	    /// there is not "remove status for FSA, either the cat_inode contains
+	    /// full copy of FSA or only remembers the families of FSA found in the unchanged cat_inode
+	    /// FSA none is used when the file has no FSA because:
+	    /// - either the underlying filesystem has no known FSA
+	    /// - or the underlying filesystem FSA support has not been activated at compilation time
+	    /// - or the fsa_scope requested at execution time exclude the filesystem FSA families available here
+    enum class fsa_saved_status
+    {
+	none,
+	partial,
+	full
+    };
+
+
 	/// @}
 
 } // end of namespace

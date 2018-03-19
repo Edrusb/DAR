@@ -1909,7 +1909,7 @@ namespace libdar
 			throw SRC_BUG; // has EA saved but no offset ?!?
 		}
 
-		if(tmp_inode->fsa_get_saved_status() == cat_inode::fsa_full)
+		if(tmp_inode->fsa_get_saved_status() == fsa_saved_status::full)
 		{
 		    if(tmp_inode->fsa_get_offset(offset))
 		    {

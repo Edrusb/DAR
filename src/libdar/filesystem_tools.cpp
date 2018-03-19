@@ -122,7 +122,7 @@ namespace libdar
 
     bool filesystem_tools_has_immutable(const cat_inode & arg)
     {
-        if(arg.fsa_get_saved_status() == cat_inode::fsa_full)
+        if(arg.fsa_get_saved_status() == fsa_saved_status::full)
         {
             const filesystem_specific_attribute_list *fsal = arg.get_fsa();
             const filesystem_specific_attribute *fsa = nullptr;
@@ -274,7 +274,7 @@ namespace libdar
             datetime birthtime = ref.get_last_modif();
             fsa_scope::iterator it = scope.find(fsaf_hfs_plus);
 
-            if(ref.fsa_get_saved_status() == cat_inode::fsa_full && it != scope.end())
+            if(ref.fsa_get_saved_status() == fsa_saved_status::full && it != scope.end())
             {
                 const filesystem_specific_attribute_list * fsa = ref.get_fsa();
                 const filesystem_specific_attribute *ptr = nullptr;

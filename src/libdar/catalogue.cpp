@@ -1899,7 +1899,7 @@ namespace libdar
 
 		    // FSA
 
-		if(ent_inode->fsa_get_saved_status() == cat_inode::fsa_full)
+		if(ent_inode->fsa_get_saved_status() == fsa_saved_status::full)
 		{
 		    (void)ent_inode->get_fsa();
 		    ent_inode->fsa_detach();
