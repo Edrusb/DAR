@@ -61,6 +61,13 @@ namespace libdar
 	list_entry & operator = (list_entry && ref) noexcept = default;
 	~list_entry() = default;
 
+	    /// method used to know whether the returned entry signals a End of Directory
+
+	    /// \note such entry does not contain any valid information, it signals the next
+	    /// entry will be taken from the parent directory, instead of the current directory.
+	    /// Such entry is necessary for archive::op_listing
+	bool is_eod() const { return type == 'z'; };
+
 	    // methods for API users
 	    // field that are not set are returned as empty string
 
