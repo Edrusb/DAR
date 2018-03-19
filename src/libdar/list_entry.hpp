@@ -212,6 +212,8 @@ namespace libdar
 	void set_archive_offset_for_FSA(const infinint & val) { offset_for_FSA = val; };
 	void set_storage_size_for_FSA(const infinint & val) { storage_size_for_FSA = val; };
 
+	void clear();
+
     private:
 	std::string my_name;
 	bool hard_link;

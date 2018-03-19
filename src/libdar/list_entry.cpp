@@ -49,6 +49,38 @@ namespace libdar
 	delta_sig = false;
     }
 
+    void list_entry::clear()
+    {
+	my_name = "";
+	hard_link = false;
+	type = ' ';
+	uid = 0;
+	gid = 0;
+	perm = 0;
+	last_access.nullify();
+	last_modif.nullify();
+	data_status = saved_status::saved;
+	ea_status = ea_saved_status::none;
+	last_change.nullify();
+	fsa_status = fsa_saved_status::none;
+	file_size = 0;
+	storage_size = 0;
+	sparse_file = false;
+	compression_algo = compression::none;
+	dirty = false;
+	target = "";
+	major = 0;
+	minor = 0;
+	slices.clear();
+	delta_sig = false;
+	offset_for_data = 0;
+	storage_size_for_data = 0;
+	offset_for_EA = 0;
+	storage_size_for_EA = 0;
+	offset_for_FSA = 0;
+	storage_size_for_FSA = 0;
+    }
+
     time_t list_entry::datetime2time_t(const datetime & val)
     {
 	time_t ret = 0;
