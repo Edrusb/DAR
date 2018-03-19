@@ -1283,7 +1283,55 @@ namespace libdar
 	archive_options_listing(archive_options_listing && ref) noexcept { nullifyptr(); move_from(std::move(ref)); };
 	archive_options_listing & operator = (const archive_options_listing & ref) { destroy(); copy_from(ref); return *this; };
 	archive_options_listing & operator = (archive_options_listing && ref) noexcept { move_from(std::move(ref)); return *this; };
-	~archive_options_listing() { destroy(); };
+	virtual ~archive_options_listing() { destroy(); };
+
+	void clear();
+
+	    /////////////////////////////////////////////////////////////////////
+	    // setting methods
+
+	void set_info_details(bool info_details) { x_info_details = info_details; };
+	void set_selection(const mask & selection);
+	void set_subtree(const mask & subtree);
+	void set_filter_unsaved(bool filter_unsaved) { x_filter_unsaved = filter_unsaved; };
+
+	    /////////////////////////////////////////////////////////////////////
+	    // getting methods
+
+	bool get_info_details() const { return x_info_details; };
+	const mask & get_selection() const;
+	const mask & get_subtree() const;
+	bool get_filter_unsaved() const { return x_filter_unsaved; };
+
+    private:
+	bool x_info_details;
+	mask * x_selection;
+	mask * x_subtree;
+	bool x_filter_unsaved;
+
+	void destroy() noexcept;
+	void nullifyptr() noexcept;
+	void copy_from(const archive_options_listing & ref);
+	void move_from(archive_options_listing && ref) noexcept;
+    };
+
+	/////////////////////////////////////////////////////////
+	////// OPTIONS FOR LISTING AN ARCHIVE IN A SHELL ////////
+	/////////////////////////////////////////////////////////
+
+	/// class holding optional shell specific parameters used to list the contents of an existing archive
+
+	/// \note this class is both used for historical reason and user convenience, but to simplify/clarity the API
+	/// the original archive_options_listing only retain the shell independant parameters
+    class archive_options_listing_shell: public archive_options_listing
+    {
+    public:
+	archive_options_listing_shell() { nullifyptr(); clear(); };
+	archive_options_listing_shell(const archive_options_listing_shell & ref): archive_options_listing(ref) { copy_from(ref); };
+	archive_options_listing_shell(archive_options_listing_shell && ref) noexcept: archive_options_listing(std::move(ref)) { nullifyptr(); move_from(std::move(ref)); };
+	archive_options_listing_shell & operator = (const archive_options_listing_shell & ref) { destroy(); archive_options_listing::operator =(ref); copy_from(ref); return *this; };
+	archive_options_listing_shell & operator = (archive_options_listing_shell && ref) noexcept { archive_options_listing::operator =(std::move(ref)); move_from(std::move(ref)); return *this; };
+	~archive_options_listing_shell() { destroy(); };
 
 	void clear();
 
@@ -1300,11 +1348,7 @@ namespace libdar
 	    /////////////////////////////////////////////////////////////////////
 	    // setting methods
 
-	void set_info_details(bool info_details) { x_info_details = info_details; };
 	void set_list_mode(listformat list_mode) { x_list_mode = list_mode; };
-	void set_selection(const mask & selection);
-	void set_subtree(const mask & subtree);
-	void set_filter_unsaved(bool filter_unsaved) { x_filter_unsaved = filter_unsaved; };
 	void set_display_ea(bool display_ea) { x_display_ea = display_ea; };
 	void set_user_slicing(const infinint & slicing_first, const infinint & slicing_others);
 	void set_sizes_in_bytes(bool arg) { x_sizes_in_bytes = arg; };
@@ -1312,21 +1356,13 @@ namespace libdar
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
 
-	bool get_info_details() const { return x_info_details; };
 	listformat get_list_mode() const { return x_list_mode; };
-	const mask & get_selection() const;
-	const mask & get_subtree() const;
-	bool get_filter_unsaved() const { return x_filter_unsaved; };
 	bool get_display_ea() const { return x_display_ea; };
 	bool get_user_slicing(infinint & slicing_first, infinint & slicing_others) const;
 	bool get_sizes_in_bytes() const { return x_sizes_in_bytes; };
 
     private:
-	bool x_info_details;
 	listformat x_list_mode;
-	mask * x_selection;
-	mask * x_subtree;
-	bool x_filter_unsaved;
 	bool x_display_ea;
 	infinint *x_slicing_first;
 	infinint *x_slicing_others;
@@ -1334,8 +1370,8 @@ namespace libdar
 
 	void destroy() noexcept;
 	void nullifyptr() noexcept;
-	void copy_from(const archive_options_listing & ref);
-	void move_from(archive_options_listing && ref) noexcept;
+	void copy_from(const archive_options_listing_shell & ref);
+	void move_from(archive_options_listing_shell && ref) noexcept;
     };
 
 

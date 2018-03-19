@@ -1445,12 +1445,9 @@ namespace libdar
 	    destroy();
 
 	    x_info_details = false;
-	    x_list_mode = normal;
 	    archive_option_clean_mask(x_selection);
 	    archive_option_clean_mask(x_subtree);
 	    x_filter_unsaved = false;
-	    x_display_ea = false;
-	    x_sizes_in_bytes = false;
 	}
 	catch(...)
 	{
@@ -1497,27 +1494,6 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
-    void archive_options_listing::set_user_slicing(const infinint & slicing_first, const infinint & slicing_others)
-    {
-	if(x_slicing_first == nullptr)
-	{
-	    x_slicing_first = new (nothrow) infinint(slicing_first);
-	    if(x_slicing_first == nullptr)
-		throw Ememory("archive_options_listing::set_user_slicing");
-	}
-	else
-	    *x_slicing_first = slicing_first;
-
-	if(x_slicing_others == nullptr)
-	{
-	    x_slicing_others = new (nothrow) infinint(slicing_others);
-	    if(x_slicing_others == nullptr)
-		throw Ememory("archive_options_listing::set_user_slicing");
-	}
-	else
-	    *x_slicing_others = slicing_others;
-    }
-
     const mask & archive_options_listing::get_selection() const
     {
 	if(x_selection == nullptr)
@@ -1532,30 +1508,8 @@ namespace libdar
 	return *x_subtree;
     }
 
-    bool archive_options_listing::get_user_slicing(infinint & slicing_first, infinint & slicing_others) const
-    {
-	if(x_slicing_first != nullptr && x_slicing_others != nullptr)
-	{
-	    slicing_first = *x_slicing_first;
-	    slicing_others = *x_slicing_others;
-	    return true;
-	}
-	else
-	    return false;
-    }
-
     void archive_options_listing::destroy() noexcept
     {
-	if(x_slicing_first != nullptr)
-	{
-	    delete x_slicing_first;
-	    x_slicing_first = nullptr;
-	}
-	if(x_slicing_others != nullptr)
-	{
-	    delete x_slicing_others;
-	    x_slicing_others = nullptr;
-	}
 	archive_option_destroy_mask(x_selection);
 	archive_option_destroy_mask(x_subtree);
     }
@@ -1563,7 +1517,6 @@ namespace libdar
     void archive_options_listing::nullifyptr() noexcept
     {
 	x_selection = x_subtree = nullptr;
-	x_slicing_first = x_slicing_others = nullptr;
     }
 
     void archive_options_listing::copy_from(const archive_options_listing & ref)
@@ -1578,24 +1531,9 @@ namespace libdar
 	    x_subtree = ref.x_subtree->clone();
 	    if(x_selection == nullptr || x_subtree == nullptr)
 		throw Ememory("archive_options_listing::copy_from");
-	    if(ref.x_slicing_first != nullptr)
-	    {
-		x_slicing_first = new (nothrow) infinint(*ref.x_slicing_first);
-		if(x_slicing_first == nullptr)
-		    throw Ememory("archive_options_listing::copy_from");
-	    }
-	    if(ref.x_slicing_others != nullptr)
-	    {
-		x_slicing_others = new (nothrow) infinint(*ref.x_slicing_others);
-		if(x_slicing_others == nullptr)
-		    throw Ememory("archive_options_listing::copy_from");
-	    }
 
 	    x_info_details = ref.x_info_details;
-	    x_list_mode = ref.x_list_mode;
 	    x_filter_unsaved = ref.x_filter_unsaved;
-	    x_display_ea = ref.x_display_ea;
-	    x_sizes_in_bytes = ref.x_sizes_in_bytes;
 	}
 	catch(...)
 	{
@@ -1608,12 +1546,122 @@ namespace libdar
     {
 	swap(x_selection, ref.x_selection);
 	swap(x_subtree, ref.x_subtree);
+
+	x_info_details = move(ref.x_info_details);
+	x_filter_unsaved = move(ref.x_filter_unsaved);
+    }
+
+    	/////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////
+
+    void archive_options_listing_shell::clear()
+    {
+	NLS_SWAP_IN;
+	try
+	{
+	    destroy();
+
+	    x_list_mode = normal;
+	    x_display_ea = false;
+	    x_sizes_in_bytes = false;
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }
+
+    void archive_options_listing_shell::set_user_slicing(const infinint & slicing_first, const infinint & slicing_others)
+    {
+	if(x_slicing_first == nullptr)
+	{
+	    x_slicing_first = new (nothrow) infinint(slicing_first);
+	    if(x_slicing_first == nullptr)
+		throw Ememory("archive_options_listing_shell::set_user_slicing");
+	}
+	else
+	    *x_slicing_first = slicing_first;
+
+	if(x_slicing_others == nullptr)
+	{
+	    x_slicing_others = new (nothrow) infinint(slicing_others);
+	    if(x_slicing_others == nullptr)
+		throw Ememory("archive_options_listing_shell::set_user_slicing");
+	}
+	else
+	    *x_slicing_others = slicing_others;
+    }
+
+    bool archive_options_listing_shell::get_user_slicing(infinint & slicing_first, infinint & slicing_others) const
+    {
+	if(x_slicing_first != nullptr && x_slicing_others != nullptr)
+	{
+	    slicing_first = *x_slicing_first;
+	    slicing_others = *x_slicing_others;
+	    return true;
+	}
+	else
+	    return false;
+    }
+
+    void archive_options_listing_shell::destroy() noexcept
+    {
+	if(x_slicing_first != nullptr)
+	{
+	    delete x_slicing_first;
+	    x_slicing_first = nullptr;
+	}
+	if(x_slicing_others != nullptr)
+	{
+	    delete x_slicing_others;
+	    x_slicing_others = nullptr;
+	}
+    }
+
+    void archive_options_listing_shell::nullifyptr() noexcept
+    {
+	x_slicing_first = x_slicing_others = nullptr;
+    }
+
+    void archive_options_listing_shell::copy_from(const archive_options_listing_shell & ref)
+    {
+	nullifyptr();
+
+	try
+	{
+	    if(ref.x_slicing_first != nullptr)
+	    {
+		x_slicing_first = new (nothrow) infinint(*ref.x_slicing_first);
+		if(x_slicing_first == nullptr)
+		    throw Ememory("archive_options_listing_shell::copy_from");
+	    }
+	    if(ref.x_slicing_others != nullptr)
+	    {
+		x_slicing_others = new (nothrow) infinint(*ref.x_slicing_others);
+		if(x_slicing_others == nullptr)
+		    throw Ememory("archive_options_listing_shell::copy_from");
+	    }
+
+	    x_list_mode = ref.x_list_mode;
+	    x_display_ea = ref.x_display_ea;
+	    x_sizes_in_bytes = ref.x_sizes_in_bytes;
+	}
+	catch(...)
+	{
+	    clear();
+	    throw;
+	}
+    }
+
+    void archive_options_listing_shell::move_from(archive_options_listing_shell && ref) noexcept
+    {
 	swap(x_slicing_first, ref.x_slicing_first);
 	swap(x_slicing_others, ref.x_slicing_others);
 
-	x_info_details = move(ref.x_info_details);
 	x_list_mode = move(ref.x_list_mode);
-	x_filter_unsaved = move(ref.x_filter_unsaved);
 	x_display_ea = move(ref.x_display_ea);
 	x_sizes_in_bytes = move(ref.x_sizes_in_bytes);
     }
