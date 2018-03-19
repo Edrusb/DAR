@@ -28,6 +28,7 @@ extern "C"
 #include "cat_entree.hpp"
 #include "cat_all_entrees.hpp"
 #include "cat_tools.hpp"
+#include "macro_tools.hpp"
 
 using namespace std;
 
@@ -296,6 +297,93 @@ namespace libdar
         }
         else
             inherited_dump(pdesc, small);
+    }
+
+    void cat_entree::set_list_entry(const slice_layout *sly, list_entry & ent) const
+    {
+	const cat_nomme *tmp_nom = dynamic_cast<const cat_nomme *>(this);
+	const cat_inode *tmp_inode = dynamic_cast<const cat_inode *>(this);
+	const cat_file *tmp_file = dynamic_cast<const cat_file *>(this);
+	const cat_lien *tmp_lien = dynamic_cast<const cat_lien *>(this);
+	const cat_device *tmp_device = dynamic_cast<const cat_device *>(this);
+	const cat_mirage *tmp_mir = dynamic_cast<const cat_mirage *>(this);
+
+	ent.clear();
+
+	if(tmp_nom != nullptr)
+	    ent.set_name(tmp_nom->get_name());
+
+	if(tmp_mir == nullptr)
+	{
+	    ent.set_hard_link(false);
+	    ent.set_type(signature());
+	}
+	else
+	{
+	    ent.set_hard_link(true);
+	    ent.set_type(tmp_mir->get_inode()->signature());
+	    tmp_inode = tmp_mir->get_inode();
+	    tmp_file = dynamic_cast<const cat_file *>(tmp_inode);
+	    tmp_lien = dynamic_cast<const cat_lien *>(tmp_inode);
+	    tmp_device = dynamic_cast<const cat_device *>(tmp_inode);
+	}
+
+	if(tmp_inode != nullptr)
+	{
+	    ent.set_uid(tmp_inode->get_uid());
+	    ent.set_gid(tmp_inode->get_gid());
+	    ent.set_perm(tmp_inode->get_perm());
+	    ent.set_last_access(tmp_inode->get_last_access());
+	    ent.set_last_modif(tmp_inode->get_last_modif());
+	    ent.set_saved_status(tmp_inode->get_saved_status());
+	    ent.set_ea_status(tmp_inode->ea_get_saved_status());
+	    if(tmp_inode->has_last_change())
+		ent.set_last_change(tmp_inode->get_last_change());
+	    if(tmp_inode->ea_get_saved_status() == ea_saved_status::full)
+	    {
+		infinint tmp;
+
+		if(tmp_inode->ea_get_offset(tmp))
+		    ent.set_archive_offset_for_EA(tmp);
+		ent.set_storage_size_for_EA(tmp_inode->ea_get_size());
+	    }
+	    ent.set_fsa_status(tmp_inode->fsa_get_saved_status());
+	    if(tmp_inode->fsa_get_saved_status() == fsa_saved_status::full)
+	    {
+		infinint tmp;
+
+		if(tmp_inode->fsa_get_offset(tmp))
+		    ent.set_archive_offset_for_FSA(tmp);
+		ent.set_storage_size_for_FSA(tmp_inode->fsa_get_size());
+	    }
+	}
+
+	if(tmp_file != nullptr)
+	{
+	    ent.set_file_size(tmp_file->get_size());
+	    ent.set_storage_size(tmp_file->get_storage_size());
+	    ent.set_is_sparse_file(tmp_file->get_sparse_file_detection_read());
+	    ent.set_compression_algo(tmp_file->get_compression_algo_read());
+	    ent.set_dirtiness(tmp_file->is_dirty());
+	    ent.set_delta_sig(tmp_file->has_delta_signature_available());
+	    if(tmp_file->get_saved_status() == saved_status::saved)
+	    {
+		ent.set_archive_offset_for_data(tmp_file->get_offset());
+		ent.set_storage_size_for_data(tmp_file->get_storage_size());
+	    }
+	}
+
+	if(tmp_lien != nullptr && tmp_lien->get_saved_status() == saved_status::saved)
+	    ent.set_link_target(tmp_lien->get_target());
+
+	if(tmp_device != nullptr)
+	{
+	    ent.set_major(tmp_device->get_major());
+	    ent.set_minor(tmp_device->get_minor());
+	}
+
+	if(sly != nullptr)
+	    ent.set_slices(macro_tools_get_slices(tmp_nom, *sly));
     }
 
     void cat_entree::inherited_dump(const pile_descriptor & pdesc, bool small) const

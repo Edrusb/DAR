@@ -42,6 +42,8 @@ extern "C"
 #include "smart_pointer.hpp"
 #include "entree_stats.hpp"
 #include "cat_signature.hpp"
+#include "list_entry.hpp"
+#include "slice_layout.hpp"
 
 #include <memory>
 
@@ -157,6 +159,13 @@ namespace libdar
 	    /// modify the saved_status of the object
         void set_saved_status(saved_status x) { xsaved = x; };
 
+	    /// setup a list_entry object relative to the current cat_entree object
+
+	    /// \param[in] sly the slice layout that shall be used for file location in slices
+	    /// \param[out] ent the list_entry that will be setup by the call
+	    /// \note if sly is set to nullptr, no slice location is performed, this
+	    /// brings some speed improvement when this information is not required
+	void set_list_entry(const slice_layout *sly, list_entry & ent) const;
 
     protected:
 	    /// inherited class may overload this method but shall first call the parent's inherited_dump() in the overloaded method
