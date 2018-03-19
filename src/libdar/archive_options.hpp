@@ -1291,10 +1291,30 @@ namespace libdar
 	    /////////////////////////////////////////////////////////////////////
 	    // setting methods
 
+	    /// whether output should be verbosed --> to be moved to shell output
 	void set_info_details(bool info_details) { x_info_details = info_details; };
+
+	    /// mask applied to filename, only those marching it will be listed
+
+	    /// \note this mask does not reject directory (it does not apply to it)
 	void set_selection(const mask & selection);
+
+	    /// mask applied to the full path, only those matching it will be listed
+
+	    /// \note a directory excluded by it implies all its content to be excluded (pruned)
 	void set_subtree(const mask & subtree);
+
+	    /// whether to only show entries that have their data fully saved
 	void set_filter_unsaved(bool filter_unsaved) { x_filter_unsaved = filter_unsaved; };
+
+	    /// whether to calculate the slice location of each file
+	void set_slicing_location(bool val) { x_slicing_location = val; };
+
+	    /// when slice location is performed, user may modify the slice layout of the archive
+
+	    /// \note this is needed for archive format older than 8 and when listing an
+	    /// isolated catalogue which original archive has been resized after the isolation
+	    /// operation. This option is not used if set_slicing_location is set to false
 	void set_user_slicing(const infinint & slicing_first, const infinint & slicing_others);
 
 	    /////////////////////////////////////////////////////////////////////
@@ -1305,6 +1325,7 @@ namespace libdar
 	const mask & get_subtree() const;
 	bool get_filter_unsaved() const { return x_filter_unsaved; };
 	bool get_user_slicing(infinint & slicing_first, infinint & slicing_others) const;
+	bool get_slicing_location() const { return x_slicing_location; };
 
     private:
 	bool x_info_details;
@@ -1313,6 +1334,7 @@ namespace libdar
 	bool x_filter_unsaved;
 	infinint *x_slicing_first;
 	infinint *x_slicing_others;
+	bool x_slicing_location;
 
 	void destroy() noexcept;
 	void nullifyptr() noexcept;

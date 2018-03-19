@@ -1448,6 +1448,7 @@ namespace libdar
 	    archive_option_clean_mask(x_selection);
 	    archive_option_clean_mask(x_subtree);
 	    x_filter_unsaved = false;
+	    x_slicing_location = false;
 	}
 	catch(...)
 	{
@@ -1590,6 +1591,7 @@ namespace libdar
 
 	    x_info_details = ref.x_info_details;
 	    x_filter_unsaved = ref.x_filter_unsaved;
+	    x_slicing_location = ref.x_slicing_location;
 	}
 	catch(...)
 	{
@@ -1607,6 +1609,7 @@ namespace libdar
 
 	x_info_details = move(ref.x_info_details);
 	x_filter_unsaved = move(ref.x_filter_unsaved);
+	x_slicing_location = move(ref.x_slicing_location);
     }
 
     	/////////////////////////////////////////////////////////
