@@ -161,11 +161,11 @@ void f2()
 				     &st);
 	if(toto != nullptr)
 	{
-	    archive_options_listing options;
+	    archive_options_listing_shell options;
 
 	    options.clear();
 	    options.set_info_details(true);
-	    options.set_list_mode(archive_options_listing::normal);
+	    options.set_list_mode(archive_options_listing_shell::normal);
 	    options.set_selection(bool_mask(true));
 	    options.set_filter_unsaved(false);
 	    toto->op_listing(nullptr, nullptr, options);

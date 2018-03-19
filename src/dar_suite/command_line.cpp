@@ -274,7 +274,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.cache_directory_tagging = false;
     p.crypto_size = DEFAULT_CRYPTO_SIZE;
     p.crypto_size_ref = DEFAULT_CRYPTO_SIZE;
-    p.list_mode = archive_options_listing::normal;
+    p.list_mode = archive_options_listing_shell::normal;
     p.aux_pass.clear();
     p.aux_execute = "";
     p.aux_crypto_size = DEFAULT_CRYPTO_SIZE;
@@ -413,7 +413,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             throw Erange("get_args", gettext("-af option is only available with -c"));
         if(p.ref_filename != nullptr && p.op == listing)
             dialog->message(gettext("-A option is not available with -l"));
-	if(p.list_mode != archive_options_listing::normal)
+	if(p.list_mode != archive_options_listing_shell::normal)
             dialog->message(gettext("-T option is only available with -l"));
         if(p.op == isolate && p.ref_filename == nullptr)
             throw Erange("get_args", gettext("with -C option, -A option is mandatory"));
@@ -1274,15 +1274,15 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'T':
                 if(optarg == nullptr)
-                    p.list_mode = archive_options_listing::tree;
+                    p.list_mode = archive_options_listing_shell::tree;
                 else if(strcasecmp("normal", optarg) == 0)
-                    p.list_mode = archive_options_listing::normal;
+                    p.list_mode = archive_options_listing_shell::normal;
                 else if(strcasecmp("tree", optarg) == 0)
-                    p.list_mode = archive_options_listing::tree;
+                    p.list_mode = archive_options_listing_shell::tree;
                 else if(strcasecmp("xml", optarg) == 0)
-                    p.list_mode = archive_options_listing::xml;
+                    p.list_mode = archive_options_listing_shell::xml;
                 else if(strcasecmp("slicing", optarg) == 0 || strcasecmp("slice", optarg) == 0)
-                    p.list_mode = archive_options_listing::slicing;
+                    p.list_mode = archive_options_listing_shell::slicing;
                 else
                     throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
                 break;

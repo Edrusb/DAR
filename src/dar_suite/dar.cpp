@@ -176,7 +176,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 	    archive_options_isolate isolate_options;
 	    archive_options_merge merge_options;
 	    archive_options_extract extract_options;
-	    archive_options_listing listing_options;
+	    archive_options_listing_shell listing_options;
 	    archive_options_diff diff_options;
 	    archive_options_test test_options;
 	    archive_options_repair repair_options;
@@ -1052,7 +1052,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    listing_options.set_subtree(*param.subtree);
 		    listing_options.set_filter_unsaved(param.filter_unsaved);
 		    listing_options.set_display_ea(param.list_ea);
-		    if(!param.file_size.is_zero() && param.list_mode == archive_options_listing::slicing)
+		    if(!param.file_size.is_zero() && param.list_mode == archive_options_listing_shell::slicing)
 			listing_options.set_user_slicing(param.first_file_size, param.file_size);
 		    listing_options.set_sizes_in_bytes(param.sizes_in_bytes);
 		    arch->op_listing(nullptr,
