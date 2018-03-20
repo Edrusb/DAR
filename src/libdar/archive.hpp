@@ -207,9 +207,9 @@ namespace libdar
 	    /// \note alternative way to get archive contents:
 	    /// . archive::get_children_of() method
 	    /// . archive::init_catalogue()+get_children_in_table()
-	void op_listing(catalogue_listing_callback callback,
+	void op_listing(archive_listing_callback callback,
 			void *context,
-			const archive_options_listing_shell & options);
+			const archive_options_listing & options);
 
 	    /// archive comparison with filesystem
 

@@ -54,6 +54,8 @@ extern "C"
 #include "crypto_sym.hpp"
 #include "cat_all_entrees.hpp"
 #include "zapette.hpp"
+#include "path.hpp"
+#include "defile.hpp"
 
 #define ARCHIVE_NOT_EXPLOITABLE "Archive of reference given is not exploitable"
 
@@ -1151,74 +1153,93 @@ namespace libdar
     }
 
 
-    void archive::op_listing(catalogue_listing_callback callback,
+    void archive::op_listing(archive_listing_callback callback,
 			     void *context,
-			     const archive_options_listing_shell & options)
+			     const archive_options_listing & options)
     {
         NLS_SWAP_IN;
 
         try
         {
 	    slice_layout used_layout;
+	    slice_layout *slice_ptr = nullptr;
+	    thread_cancellation thr;
+
+	    if(options.get_slicing_location())
+	    {
+		slice_ptr = & used_layout;
+		if(!get_catalogue_slice_layout(used_layout))
+		{
+		    if(options.get_user_slicing(used_layout.first_size, used_layout.other_size))
+		    {
+			if(options.get_info_details())
+			    get_ui().printf(gettext("Using user provided modified slicing (first slice = %i bytes, other slices = %i bytes)"), &used_layout.first_size, &used_layout.other_size);
+		    }
+		    else
+			throw Erange("archive::op_listing", gettext("No slice layout of the archive of reference for the current isolated catalogue is available, cannot provide slicing information, aborting"));
+		}
+	    }
+
+	    if(options.get_filter_unsaved())
+		get_cat().launch_recursive_has_changed_update();
 
             enable_natural_destruction();
             try
             {
-                switch(options.get_list_mode())
-		{
-		case archive_options_listing_shell::normal:
-		    get_cat().tar_listing(get_ui(),
-					  callback,
-					  context,
-					  only_contains_an_isolated_catalogue(),
-					  options.get_selection(),
-					  options.get_subtree(),
-					  options.get_filter_unsaved(),
-					  options.get_display_ea(),
-					  options.get_sizes_in_bytes(),
-					  "");
-		    break;
-		case archive_options_listing_shell::tree:
-		    get_cat().listing(get_ui(),
-				      only_contains_an_isolated_catalogue(),
-				      options.get_selection(),
-				      options.get_subtree(),
-				      options.get_filter_unsaved(),
-				      options.get_display_ea(),
-				      options.get_sizes_in_bytes(),
-				      "");
-		    break;
-		case archive_options_listing_shell::xml:
-		    get_cat().xml_listing(get_ui(),
-					  only_contains_an_isolated_catalogue(),
-					  options.get_selection(),
-					  options.get_subtree(),
-					  options.get_filter_unsaved(),
-					  options.get_display_ea(),
-					  options.get_sizes_in_bytes(),
-					  "");
-		    break;
-		case archive_options_listing_shell::slicing:
-		    if(!get_catalogue_slice_layout(used_layout))
-		    {
-			if(options.get_user_slicing(used_layout.first_size, used_layout.other_size))
-			{
-			    if(options.get_info_details())
-				get_ui().printf(gettext("Using user provided modified slicing (first slice = %i bytes, other slices = %i bytes)"), &used_layout.first_size, &used_layout.other_size);
-			}
-			else
-			    throw Erange("archive::op_listing", gettext("No slice layout of the archive of reference for the current isolated catalogue is available, cannot provide slicing information, aborting"));
-		    }
+		const cat_entree *e = nullptr;
+		const cat_nomme *e_nom = nullptr;
+		const cat_inode *e_ino = nullptr;
+		const cat_directory *e_dir = nullptr;
+		const cat_eod *e_eod = nullptr;
+		const cat_eod tmp_eod;
+		thread_cancellation thr;
+		defile juillet = FAKE_ROOT;
+		list_entry ent;
 
-		    get_cat().slice_listing(get_ui(),
-					    only_contains_an_isolated_catalogue(),
-					    options.get_selection(),
-					    options.get_subtree(),
-					    used_layout);
-		    break;
-		default:
-		    throw SRC_BUG;
-                }
+		get_cat().reset_read();
+		while(get_cat().read(e))
+		{
+		    e_nom = dynamic_cast<const cat_nomme *>(e);
+		    e_dir = dynamic_cast<const cat_directory *>(e);
+		    e_eod = dynamic_cast<const cat_eod *>(e);
+		    e_ino = dynamic_cast<const cat_inode *>(e);
+
+		    if(e == nullptr)
+			throw SRC_BUG;
+
+		    thr.check_self_cancellation();
+		    juillet.enfile(e);
+
+		    if(options.get_subtree().is_covered(juillet.get_path())
+		       && (e_dir != nullptr || options.get_selection().is_covered(e_nom->get_name())))
+		    {
+			e->set_list_entry(slice_ptr, ent);
+			if(!options.get_filter_unsaved()        // invoking callback if not filtering unsaved
+			   || e_eod != nullptr                  // invoking callback for all eod
+			   || e->get_saved_status() == saved_status::saved // involing call back for file having data saved
+			   || (e_ino != nullptr && e_ino->ea_get_saved_status() == ea_saved_status::full) // invoking callback for files having EA saved
+			   || (e_dir != nullptr && e_dir->get_recursive_has_changed()) // invoking callback for directory containing saved files
+			    )
+			{
+			    try
+			    {
+				callback(juillet.get_string(), ent, context);
+			    }
+			    catch(...)
+			    {
+				throw Elibcall("archive::op_listing", gettext("Exception caught from archive_listing_callback execution"));
+			    }
+			}
+		    }
+		    else // not saved, filtered out
+		    {
+			if(e_dir != nullptr)
+			{
+			    get_cat().skip_read_to_parent_dir();
+			    juillet.enfile(&tmp_eod);
+			}
+		    }
+		}
             }
             catch(Euser_abort & e)
             {
