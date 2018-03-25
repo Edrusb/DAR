@@ -2730,6 +2730,25 @@ namespace libdar
 	return parent;
     }
 
+    bool archive::local_check_dirty_seq(escape *ptr)
+    {
+	bool ret;
+
+	if(ptr != nullptr)
+	{
+	    bool already_set = ptr->is_unjumpable_mark(escape::seqt_file);
+
+	    if(!already_set)
+		ptr->add_unjumpable_mark(escape::seqt_file);
+	    ret = ptr != nullptr && ptr->skip_to_next_mark(escape::seqt_dirty, true);
+	    if(!already_set)
+		ptr->remove_unjumpable_mark(escape::seqt_file);
+	}
+	else
+	    ret = false;
+
+	return ret;
+    }
 
     void archive::check_libgcrypt_hash_bug(user_interaction & dialog, hash_algo hash, const infinint & first_file_size, const infinint & file_size)
     {
