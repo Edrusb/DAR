@@ -1655,7 +1655,7 @@ namespace libdar
     }
 
 
-    const vector<list_entry> archive::get_children_in_table(const string & dir) const
+    const vector<list_entry> archive::get_children_in_table(const string & dir, bool fetch_ea) const
     {
 	vector <list_entry> ret;
 
@@ -1675,7 +1675,7 @@ namespace libdar
 		if(tmp_ptr == nullptr)
 		    throw SRC_BUG;
 
-		tmp_ptr->set_list_entry(&slices, ent);
+		tmp_ptr->set_list_entry(&slices, fetch_ea, ent);
 
 		    // fill a new entry in the table
 		ret.push_back(ent);
@@ -2787,5 +2787,7 @@ namespace libdar
 	}
 #endif
     }
+
+
 
 } // end of namespace

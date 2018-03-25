@@ -289,7 +289,7 @@ namespace libdar
 	    /// be added to the future the table contains an object that provide a method per field.
 	    /// \note before calling this method on this object, a single call to init_catalogue() is
 	    /// mandatory
-	const std::vector<list_entry> get_children_in_table(const std::string & dir) const;
+	const std::vector<list_entry> get_children_in_table(const std::string & dir, bool fetch_ea = false) const;
 
 	    /// returns true if the pointed directory has one or more subdirectories
 	bool has_subdirectory(const std::string & dir) const;
