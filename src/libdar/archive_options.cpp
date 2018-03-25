@@ -1449,6 +1449,17 @@ namespace libdar
 	    archive_option_clean_mask(x_subtree);
 	    x_filter_unsaved = false;
 	    x_slicing_location = false;
+	    if(x_slicing_first != nullptr)
+	    {
+		delete x_slicing_first;
+		x_slicing_first = nullptr;
+	    }
+	    if(x_slicing_others != nullptr)
+	    {
+		delete x_slicing_others;
+		x_slicing_others = nullptr;
+	    }
+	    x_display_ea = false;
 	}
 	catch(...)
 	{
@@ -1573,15 +1584,21 @@ namespace libdar
 	    if(ref.x_selection == nullptr)
 		throw SRC_BUG;
 	    x_selection = ref.x_selection->clone();
+
+	    if(ref.x_subtree == nullptr)
+		throw SRC_BUG;
 	    x_subtree = ref.x_subtree->clone();
+
 	    if(x_selection == nullptr || x_subtree == nullptr)
 		throw Ememory("archive_options_listing::copy_from");
+
 	    if(ref.x_slicing_first != nullptr)
 	    {
 		x_slicing_first = new (nothrow) infinint(*ref.x_slicing_first);
 		if(x_slicing_first == nullptr)
 		    throw Ememory("archive_options_listing_shell::copy_from");
 	    }
+
 	    if(ref.x_slicing_others != nullptr)
 	    {
 		x_slicing_others = new (nothrow) infinint(*ref.x_slicing_others);

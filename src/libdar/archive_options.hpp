@@ -1384,7 +1384,7 @@ namespace libdar
 	    /////////////////////////////////////////////////////////////////////
 	    // setting methods
 
-	void set_list_mode(listformat list_mode) { x_list_mode = list_mode; };
+	void set_list_mode(listformat list_mode) { x_list_mode = list_mode; set_slicing_location(list_mode == slicing); };
 	void set_sizes_in_bytes(bool arg) { x_sizes_in_bytes = arg; };
 
 	    /////////////////////////////////////////////////////////////////////
