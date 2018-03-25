@@ -176,6 +176,7 @@ namespace libdar
 	    return tools_get_compression_ratio(storage_size,
 					       file_size,
 					       compression_algo != compression::none
+					       || is_sparse()
 					       || is_dir());
 	else
 	    return "";
