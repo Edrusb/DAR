@@ -299,7 +299,9 @@ namespace libdar
             inherited_dump(pdesc, small);
     }
 
-    void cat_entree::set_list_entry(const slice_layout *sly, list_entry & ent) const
+    void cat_entree::set_list_entry(const slice_layout *sly,
+				    bool fetch_ea,
+				    list_entry & ent) const
     {
 	const cat_nomme *tmp_nom = dynamic_cast<const cat_nomme *>(this);
 	const cat_inode *tmp_inode = dynamic_cast<const cat_inode *>(this);
@@ -307,11 +309,10 @@ namespace libdar
 	const cat_lien *tmp_lien = dynamic_cast<const cat_lien *>(this);
 	const cat_device *tmp_device = dynamic_cast<const cat_device *>(this);
 	const cat_mirage *tmp_mir = dynamic_cast<const cat_mirage *>(this);
+	const cat_directory *tmp_dir = dynamic_cast<const cat_directory *>(this);
+	const cat_detruit *tmp_det = dynamic_cast<const cat_detruit *>(this);
 
 	ent.clear();
-
-	if(tmp_nom != nullptr)
-	    ent.set_name(tmp_nom->get_name());
 
 	if(tmp_mir == nullptr)
 	{
@@ -326,6 +327,16 @@ namespace libdar
 	    tmp_file = dynamic_cast<const cat_file *>(tmp_inode);
 	    tmp_lien = dynamic_cast<const cat_lien *>(tmp_inode);
 	    tmp_device = dynamic_cast<const cat_device *>(tmp_inode);
+	    ent.set_etiquette(tmp_mir->get_etiquette());
+	}
+
+	if(tmp_nom != nullptr)
+	    ent.set_name(tmp_nom->get_name());
+
+	if(tmp_det != nullptr)
+	{
+	    ent.set_removed_type(tmp_det->get_signature());
+	    ent.set_removal_date(tmp_det->get_date());
 	}
 
 	if(tmp_inode != nullptr)
@@ -346,6 +357,23 @@ namespace libdar
 		if(tmp_inode->ea_get_offset(tmp))
 		    ent.set_archive_offset_for_EA(tmp);
 		ent.set_storage_size_for_EA(tmp_inode->ea_get_size());
+		if(fetch_ea)
+		{
+		    const ea_attributs *owned = tmp_inode->get_ea();
+
+		    try
+		    {
+			if(owned == nullptr)
+			    throw SRC_BUG;
+			ent.set_ea(*owned);
+		    }
+		    catch(...)
+		    {
+			delete owned;
+			throw;
+		    }
+		    delete owned;
+		}
 	    }
 	    ent.set_fsa_status(tmp_inode->fsa_get_saved_status());
 	    if(tmp_inode->fsa_get_saved_status() == fsa_saved_status::full)
@@ -355,22 +383,37 @@ namespace libdar
 		if(tmp_inode->fsa_get_offset(tmp))
 		    ent.set_archive_offset_for_FSA(tmp);
 		ent.set_storage_size_for_FSA(tmp_inode->fsa_get_size());
+		ent.set_fsa_scope(tmp_inode->fsa_get_families());
 	    }
 	}
 
 	if(tmp_file != nullptr)
 	{
+	    const crc *crc_tmp = nullptr;
+
 	    ent.set_file_size(tmp_file->get_size());
 	    ent.set_storage_size(tmp_file->get_storage_size());
 	    ent.set_is_sparse_file(tmp_file->get_sparse_file_detection_read());
 	    ent.set_compression_algo(tmp_file->get_compression_algo_read());
 	    ent.set_dirtiness(tmp_file->is_dirty());
-	    ent.set_delta_sig(tmp_file->has_delta_signature_available());
 	    if(tmp_file->get_saved_status() == saved_status::saved)
 	    {
 		ent.set_archive_offset_for_data(tmp_file->get_offset());
 		ent.set_storage_size_for_data(tmp_file->get_storage_size());
+		if(tmp_file->get_crc(crc_tmp) && crc_tmp != nullptr)
+		    ent.set_data_crc(*crc_tmp);
 	    }
+	    ent.set_delta_sig(tmp_file->has_delta_signature_available());
+	    if(tmp_file->has_patch_base_crc() && tmp_file->get_patch_base_crc(crc_tmp) && crc_tmp != nullptr)
+		ent.set_delta_patch_base_crc(*crc_tmp);
+	    if(tmp_file->has_patch_result_crc() && tmp_file->get_patch_result_crc(crc_tmp) && crc_tmp != nullptr)
+		ent.set_delta_patch_result_crc(*crc_tmp);
+	}
+
+	if(tmp_dir != nullptr)
+	{
+	    ent.set_file_size(tmp_dir->get_size());
+	    ent.set_storage_size(tmp_dir->get_storage_size());
 	}
 
 	if(tmp_lien != nullptr && tmp_lien->get_saved_status() == saved_status::saved)

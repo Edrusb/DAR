@@ -162,10 +162,13 @@ namespace libdar
 	    /// setup a list_entry object relative to the current cat_entree object
 
 	    /// \param[in] sly the slice layout that shall be used for file location in slices
+	    /// \param[in] fetch_ea whether to fetch EA and fill these values into the generated list_entry
 	    /// \param[out] ent the list_entry that will be setup by the call
 	    /// \note if sly is set to nullptr, no slice location is performed, this
 	    /// brings some speed improvement when this information is not required
-	void set_list_entry(const slice_layout *sly, list_entry & ent) const;
+	void set_list_entry(const slice_layout *sly,
+			    bool fetch_ea,
+			    list_entry & ent) const;
 
     protected:
 	    /// inherited class may overload this method but shall first call the parent's inherited_dump() in the overloaded method
