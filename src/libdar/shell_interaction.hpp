@@ -85,6 +85,9 @@ namespace libdar
 	    //! method works as expected.
 	void warning_with_more(U_I num) { at_once = num; count = 0; };
 
+	    /// display an archive content
+	void archive_show_contents(const archive & ref, const archive_options_listing_shell & options);
+
 	    // some routine to display formated informations provided database
 	void database_show_contents(const database & ref);
 	void database_show_files(const database & ref, archive_num num, const database_used_options & opt);
@@ -116,13 +119,37 @@ namespace libdar
 	bool has_terminal;       //< true if a terminal could be found
 	U_I at_once, count;      //< used by warning_with_more
 
+	    // field used by listing_callbacks
+
+	bool archive_listing_sizes_in_bytes; ///< to be used by listing_callbacks
+	bool archive_listing_display_ea;     ///< to be used by listing_callbacks
+	range all_slices;                    ///< all the slices covered by the slicing listing operation
+	std::string marge;                   ///< used for the tree and XML listing operation
+
 	void set_term_mod(mode m);
 	void my_message(const std::string & mesg);
+	void xml_listing_attributes(const list_entry & entry);
+
 
 	    // class fields and methods
 
 	static const U_I bufsize;
 
+	static void archive_listing_callback_tree(const std::string & the_path,
+						  const list_entry & entry,
+						  void *context);
+
+	static void archive_listing_callback_tar(const std::string & the_path,
+						 const list_entry & entry,
+						 void *context);
+
+	static void archive_listing_callback_xml(const std::string & the_path,
+						 const list_entry & entry,
+						 void *context);
+
+	static void archive_listing_callback_slicing(const std::string & the_path,
+						     const list_entry & entry,
+						     void *context);
 
 	static void show_files_callback(void *tag,
 					const std::string & filename,
@@ -146,6 +173,7 @@ namespace libdar
 					const infinint & ea_count,
 					const infinint & total_ea);
 
+	static std::string yes_no(bool val) { return (val ? "yes" : "no"); }
 
     };
 

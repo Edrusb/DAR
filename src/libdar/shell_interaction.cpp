@@ -228,6 +228,46 @@ namespace libdar
 	tools_set_back_blocked_signals(old_mask);
     }
 
+
+    void shell_interaction::archive_show_contents(const archive & ref, const archive_options_listing_shell & options)
+    {
+	archive_listing_sizes_in_bytes = options.get_sizes_in_bytes();
+	archive_listing_display_ea = options.get_display_ea();
+	all_slices.clear();
+	marge = "";
+
+	switch(options.get_list_mode())
+	{
+	case archive_options_listing_shell::normal:
+	    printf(gettext("[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size  |          Date                 |    filename"));
+	    printf("--------------------------------+------------+-------+-------+-------+-------------------------------+------------");
+	    ref.op_listing(archive_listing_callback_tar, this, options);
+	    break;
+	case archive_options_listing_shell::tree:
+	    printf(gettext("Access mode    | User | Group | Size  |          Date                 | [Data ][D][ EA  ][FSA][Compr][S]|   Filename"));
+	    printf("---------------+------+-------+-------+-------------------------------+---------------------------------+-----------");
+	    ref.op_listing(archive_listing_callback_tree, this, options);
+	    break;
+	case archive_options_listing_shell::xml:
+	    message("<?xml version=\"1.0\" ?>");
+	    message("<!DOCTYPE Catalog SYSTEM \"dar-catalog.dtd\">");
+	    message("<Catalog format=\"1.2\">");
+	    ref.op_listing(archive_listing_callback_xml, this, options);
+	    message("</Catalog>");
+	    break;
+	case archive_options_listing_shell::slicing:
+	    message("Slice(s)|[Data ][D][ EA  ][FSA][Compr][S]|Permission| Filemane");
+	    message("--------+--------------------------------+----------+-----------------------------");
+	    ref.op_listing(archive_listing_callback_slicing, this, options);
+	    message("-----");
+	    message(tools_printf("All displayed files have their data in slice range [%s]", all_slices.display().c_str()));
+	    message("-----");
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
+    }
+
     void shell_interaction::database_show_contents(const database & ref)
     {
 	NLS_SWAP_IN;
@@ -531,6 +571,326 @@ namespace libdar
 	*output << mesg << endl;
     }
 
+    void shell_interaction::archive_listing_callback_tree(const std::string & the_path,
+							  const list_entry & entry,
+							  void *context)
+    {
+	static const string marge_plus = " |  ";
+	static const U_I marge_plus_length = marge_plus.size();
+
+	shell_interaction *me = (shell_interaction *)(context);
+	if(me == nullptr)
+	    throw SRC_BUG;
+
+	if(entry.is_eod())
+	{
+	    U_I length = me->marge.size();
+
+	    if(length > marge_plus_length)
+		me->marge.erase(length - marge_plus_length, marge_plus_length);
+	    else
+		throw SRC_BUG;
+	}
+	else
+	{
+	    string nom = entry.get_name();
+
+	    if(entry.is_removed_entry())
+	    {
+		string tmp_date = entry.get_removal_date();
+		char type = tools_cast_type_to_unix_type(entry.get_removed_type());
+		me->message(tools_printf(gettext("%S [%c] [ REMOVED ENTRY ] (%S)  %S"), &me->marge, type, &tmp_date, &nom));
+	    }
+	    else // not a removed entry
+	    {
+		string a = entry.get_perm();
+		string b = entry.get_uid(true);
+		string c = entry.get_gid(true);
+		string d = entry.get_file_size(me->archive_listing_sizes_in_bytes);
+		string e = entry.get_last_modif();
+		string f =
+		    entry.get_data_flag()
+		    + entry.get_delta_flag()
+		    + entry.get_ea_flag()
+		    + entry.get_fsa_flag()
+		    + entry.get_compression_ratio_flag()
+		    + entry.get_sparse_flag();
+
+		if(me->archive_listing_display_ea && entry.is_hard_linked())
+		{
+		    string tiq = entry.get_etiquette();
+		    nom += tools_printf(" [%S] ", &tiq);
+		}
+
+		me->printf("%S%S\t%S\t%S\t%S\t%S\t%S %S", &me->marge, &a, &b, &c, &d, &e, &f, &nom);
+		if(me->archive_listing_display_ea)
+		{
+		    string key;
+
+		    entry.get_ea_reset_read();
+		    while(entry.get_ea_read_next(key))
+			me->message(me->marge + gettext("      Extended Attribute: [") + key + "]");
+		}
+
+		if(entry.is_dir())
+		    me->marge += marge_plus;
+	    }
+	}
+    }
+
+    void shell_interaction::archive_listing_callback_tar(const std::string & the_path,
+						 const list_entry & entry,
+						 void *context)
+    {
+	shell_interaction *me = (shell_interaction *)(context);
+	if(me == nullptr)
+	    throw SRC_BUG;
+
+	string sep = (the_path == "") ? "" : "/";
+
+	if(entry.is_eod())
+	    return;
+
+	string nom = entry.get_name();
+
+	if(entry.is_removed_entry())
+	{
+	    string tmp_date = entry.get_removal_date();
+	    char type = tools_cast_type_to_unix_type(entry.get_removed_type());
+	    me->printf("%s (%S) [%c] %S%S%S", REMOVE_TAG, &tmp_date, type,  &the_path, &sep, &nom);
+	}
+	else
+	{
+	    string a = entry.get_perm();
+	    string b = entry.get_uid(true);
+	    string c = entry.get_gid(true);
+	    string d = entry.get_file_size(me->archive_listing_sizes_in_bytes);
+	    string e = entry.get_last_modif();
+	    string f =
+		entry.get_data_flag()
+		+ entry.get_delta_flag()
+		+ entry.get_ea_flag()
+		+ entry.get_fsa_flag()
+		+ entry.get_compression_ratio_flag()
+		+ entry.get_sparse_flag();
+
+	    if(me->archive_listing_display_ea && entry.is_hard_linked())
+	    {
+		string tiq = entry.get_etiquette();
+		nom += tools_printf(" [%S] ", &tiq);
+	    }
+
+	    me->printf("%S %S   %S\t%S\t%S\t%S\t%S%S%S", &f, &a, &b, &c, &d, &e, &the_path, &sep, &nom);
+	    if(me->archive_listing_display_ea)
+	    {
+		string key;
+
+		entry.get_ea_reset_read();
+		while(entry.get_ea_read_next(key))
+		    me->message(gettext("      Extended Attribute: [") + key + "]");
+	    }
+	}
+    }
+
+    void shell_interaction::archive_listing_callback_xml(const std::string & the_path,
+							 const list_entry & entry,
+							 void *context)
+    {
+	shell_interaction *me = (shell_interaction *)(context);
+	if(me == nullptr)
+	    throw SRC_BUG;
+
+	if(entry.is_eod())
+	{
+	    U_I length = me->marge.size();
+
+	    if(length > 0)
+		me->marge.erase(length - 1, 1); // removing the last tab character
+	    else
+		throw SRC_BUG;
+	    me->printf("%S</Directory>", &me->marge);
+	}
+	else
+	{
+	    string name = tools_output2xml(entry.get_name());
+	    unsigned char sig = entry.get_type();
+
+	    if(entry.is_removed_entry())
+	    {
+		me->xml_listing_attributes(entry);
+		switch(sig)
+		{
+		case 'd':
+		    me->printf("%S<Directory name=\"%S\">", &(me->marge), &name);
+		    me->xml_listing_attributes(entry);
+		    me->printf("%S</Directory>", &(me->marge));
+		    break;
+		case 'f':
+		case 'h':
+		case 'e':
+		    me->printf("%S<File name=\"%S\">", &(me->marge), &name);
+		    me->xml_listing_attributes(entry);
+		    me->printf("%S</File>", &(me->marge));
+		    break;
+		case 'l':
+		    me->printf("%S<Symlink name=\"%S\">", &(me->marge), &name);
+		    me->xml_listing_attributes(entry);
+		    me->printf("%S</Symlink>", &(me->marge));
+		    break;
+		case 'c':
+		    me->printf("%S<Device name=\"%S\" type=\"character\">", &(me->marge), &name);
+		    me->xml_listing_attributes(entry);
+		    me->printf("%S</Device>", &(me->marge));
+		    break;
+		case 'b':
+		    me->printf("%S<Device name=\"%S\" type=\"block\">", &(me->marge), &name);
+		    me->xml_listing_attributes(entry);
+		    me->printf("%S</Device>", &(me->marge));
+		    break;
+		case 'p':
+		    me->printf("%S<Pipe name=\"%S\">", &(me->marge), &name);
+		    me->xml_listing_attributes(entry);
+		    me->printf("%S</Pipe>", &(me->marge));
+		    break;
+		case 's':
+		    me->printf("%S<Socket name=\"%S\">", &(me->marge), &name);
+		    me->xml_listing_attributes(entry);
+		    me->printf("%S</Socket>", &(me->marge));
+		    break;
+		default:
+		    throw SRC_BUG;
+		}
+	    }
+	    else // other than cat_detruit object
+	    {
+
+		string maj, min, chksum, chkbasesum, chkresultsum, target, delta_sig;
+		string dirty, sparse;
+		string size = entry.get_file_size(me->archive_listing_sizes_in_bytes);
+		string stored = entry.get_storage_size_for_data(me->archive_listing_sizes_in_bytes);
+		string crc_tmp;
+		string crc_patch_base;
+		string crc_patch_result;
+
+		if(!entry.is_file() || !entry.is_sparse())
+		{
+		    infinint stor;
+		    entry.get_storage_size_for_data(stor);
+
+		    if(stor.is_zero())
+			stored = size;
+		}
+
+		    // building entry for each type of cat_inode
+
+		switch(sig)
+		{
+		case 'd': // directories
+		    me->printf("%S<Directory name=\"%S\">", &(me->marge), &name);
+		    me->xml_listing_attributes(entry);
+		    me->marge += "\t";
+		    break;
+		case 'h': // hard linked files
+		case 'e': // hard linked files
+		    throw SRC_BUG; // no more used in dynamic data
+		case 'f': // plain files
+		    dirty = yes_no(entry.is_dirty());
+		    sparse = yes_no(entry.is_sparse());
+		    if(!entry.has_data_present_in_the_archive())
+			stored = "";
+
+		    chksum = entry.get_data_crc();
+		    delta_sig = yes_no(entry.has_delta_signature());
+		    chkbasesum = entry.get_delta_patch_base_crc();
+		    chkresultsum = entry.get_delta_patch_result_crc();
+
+		    me->printf("%S<File name=\"%S\" size=\"%S\" stored=\"%S\" crc=\"%S\" dirty=\"%S\" sparse=\"%S\" delta_sig=\"%S\" patch_base_crc=\"%S\" patch_result_crc=\"%S\">",
+			       &(me->marge), &name, &size, &stored, &chksum, &dirty, &sparse, &delta_sig, &chkbasesum, &chkresultsum);
+		    me->xml_listing_attributes(entry);
+		    me->printf("%S</File>", &(me->marge));
+		    break;
+		case 'l': // soft link
+		    target = tools_output2xml(entry.get_link_target());
+		    me->printf("%S<Symlink name=\"%S\" target=\"%S\">",
+			       &(me->marge), &name, &target);
+		    me->xml_listing_attributes(entry);
+		    me->printf("%S</Symlink>", &(me->marge));
+		    break;
+		case 'c':
+		case 'b':
+			// this is maybe less performant, to have both 'c' and 'b' here and
+			// make an additional test, but this has the advantage to not duplicate
+			// very similar code, which would obviously evoluate the same way.
+			// Experience shows that two identical codes even when driven by the same need
+			// are an important source of bugs, as one may forget to update both of them, the
+			// same way...
+
+		    if(sig == 'c')
+			target = "character";
+		    else
+			target = "block";
+			// we re-used target variable which is not used for the current cat_inode
+
+		    if(entry.has_data_present_in_the_archive())
+		    {
+			maj = entry.get_major();
+			min = entry.get_minor();
+		    }
+		    else
+			maj = min = "";
+
+		    me->printf("%S<Device name=\"%S\" type=\"%S\" major=\"%S\" minor=\"%S\">",
+			       &(me->marge), &name, &target, &maj, &min);
+		    me->xml_listing_attributes(entry);
+		    me->printf("%S</Device>", &(me->marge));
+		    break;
+		case 'p':
+		    me->printf("%S<Pipe name=\"%S\">", &(me->marge), &name);
+		    me->xml_listing_attributes(entry);
+		    me->printf("%S</Pipe>", &(me->marge));
+		    break;
+		case 's':
+		    me->printf("%S<Socket name=\"%S\">", &(me->marge), &name);
+		    me->xml_listing_attributes(entry);
+		    me->printf("%S</Socket>", &(me->marge));
+		    break;
+		default:
+		    throw SRC_BUG;
+		}
+	    }
+	}
+    }
+
+    void shell_interaction::archive_listing_callback_slicing(const std::string & the_path,
+							     const list_entry & entry,
+							     void *context)
+    {
+	shell_interaction *me = (shell_interaction *)(context);
+	if(me == nullptr)
+	    throw SRC_BUG;
+
+	me->all_slices += entry.get_slices();
+
+	string sep = (the_path == "") ? "" : "/";
+	string nom = the_path + sep + entry.get_name();
+
+	if(entry.is_removed_entry())
+	    me->message(tools_printf("%s\t %s%s", entry.get_slices().display().c_str(), REMOVE_TAG, nom.c_str()));
+	else
+	{
+	    string a = entry.get_perm();
+	    string f = entry.get_data_flag()
+		+ entry.get_delta_flag()
+		+ entry.get_ea_flag()
+		+ entry.get_fsa_flag()
+		+ entry.get_compression_ratio_flag()
+		+ entry.get_sparse_flag();
+
+	    me->printf("%s\t %S%S %s", entry.get_slices().display().c_str(), &f, &a, nom.c_str());
+	}
+    }
+
+
     void shell_interaction::show_files_callback(void *tag,
 						const std::string & filename,
 						bool available_data,
@@ -664,5 +1024,80 @@ namespace libdar
     }
 
 
+    void shell_interaction::xml_listing_attributes(const list_entry & entry)
+    {
+	string user = entry.get_uid(true);
+	string group = entry.get_gid(true);
+	string permissions = entry.get_perm();
+	string atime = entry.get_last_access();
+	string mtime = entry.get_last_modif();
+	string ctime = entry.get_last_change();
+	string data;
+	string metadata;
+	string ending_data;
+
+	    // defining "data" string
+
+	switch(entry.get_data_status())
+	{
+	case saved_status::saved:
+	    data = "saved";
+	    break;
+	case saved_status::fake:
+	case saved_status::not_saved:
+	    data = "referenced";
+	    break;
+	case saved_status::delta:
+	    data = "patch";
+	    break;
+	case saved_status::inode_only:
+	    data = "inode-only";
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
+
+	if(entry.is_removed_entry())
+	    data = "deleted";
+
+	    // defining "metadata" string
+
+	switch(entry.get_ea_status())
+	{
+	case ea_saved_status::full:
+	    metadata = "saved";
+	    break;
+	case ea_saved_status::partial:
+	case ea_saved_status::fake:
+	    metadata = "referenced";
+	    break;
+	case ea_saved_status::none:
+	case ea_saved_status::removed:
+	    metadata = "absent";
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
+
+	if(entry.is_removed_entry())
+	    metadata = "absent";
+
+	bool go_ea = archive_listing_display_ea  && entry.has_EA_saved_in_the_archive() && !entry.is_removed_entry();
+	string end_tag = go_ea ? ">" : " />";
+
+	printf("%S<Attributes data=\"%S\" metadata=\"%S\" user=\"%S\" group=\"%S\" permissions=\"%S\" atime=\"%S\" mtime=\"%S\" ctime=\"%S\"%S",
+	       &marge, &data, &metadata, &user, &group, &permissions, &atime, &mtime, &ctime, &end_tag);
+
+	if(go_ea)
+	{
+	    string new_begin = marge + "\t";
+	    string key;
+
+	    entry.get_ea_reset_read();
+	    while(entry.get_ea_read_next(key))
+		message(new_begin + "<EA_entry ea_name=\"" + key + "\" />");
+	    printf("%S</Attributes>", &marge);
+	}
+    }
 } // end of namespace
 
