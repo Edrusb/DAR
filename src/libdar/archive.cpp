@@ -1153,8 +1153,13 @@ namespace libdar
 
     void archive::op_listing(archive_listing_callback callback,
 			     void *context,
-			     const archive_options_listing & options)
+			     const archive_options_listing & options) const
     {
+	archive *me = const_cast<archive *>(this);
+
+	if(me == nullptr)
+	    throw SRC_BUG;
+
         NLS_SWAP_IN;
 
         try
@@ -1181,7 +1186,7 @@ namespace libdar
 	    if(options.get_filter_unsaved())
 		get_cat().launch_recursive_has_changed_update();
 
-            enable_natural_destruction();
+            me->enable_natural_destruction();
             try
             {
 		const cat_entree *e = nullptr;
@@ -1189,18 +1194,21 @@ namespace libdar
 		const cat_inode *e_ino = nullptr;
 		const cat_directory *e_dir = nullptr;
 		const cat_eod *e_eod = nullptr;
+		const cat_mirage *e_mir = nullptr;
 		const cat_eod tmp_eod;
 		thread_cancellation thr;
 		defile juillet = FAKE_ROOT;
 		list_entry ent;
+		bool isolated = only_contains_an_isolated_catalogue();
 
 		get_cat().reset_read();
 		while(get_cat().read(e))
 		{
 		    e_nom = dynamic_cast<const cat_nomme *>(e);
+		    e_ino = dynamic_cast<const cat_inode *>(e);
 		    e_dir = dynamic_cast<const cat_directory *>(e);
 		    e_eod = dynamic_cast<const cat_eod *>(e);
-		    e_ino = dynamic_cast<const cat_inode *>(e);
+		    e_mir = dynamic_cast<const cat_mirage *>(e);
 
 		    if(e == nullptr)
 			throw SRC_BUG;
@@ -1211,14 +1219,24 @@ namespace libdar
 		    if(options.get_subtree().is_covered(juillet.get_path())
 		       && (e_dir != nullptr || options.get_selection().is_covered(e_nom->get_name())))
 		    {
-			e->set_list_entry(slice_ptr, ent);
+			if(e_mir != nullptr)
+			    e_ino = e_mir->get_inode();
+
 			if(!options.get_filter_unsaved()        // invoking callback if not filtering unsaved
 			   || e_eod != nullptr                  // invoking callback for all eod
 			   || e->get_saved_status() == saved_status::saved // involing call back for file having data saved
 			   || (e_ino != nullptr && e_ino->ea_get_saved_status() == ea_saved_status::full) // invoking callback for files having EA saved
+			   || (e_ino != nullptr && e_ino->ea_get_saved_status() == ea_saved_status::fake) // invoking callback for saved in recorded in isolated catalogue
 			   || (e_dir != nullptr && e_dir->get_recursive_has_changed()) // invoking callback for directory containing saved files
 			    )
 			{
+			    e->set_list_entry(slice_ptr,
+					      options.get_display_ea(),
+					      ent);
+			    if(local_check_dirty_seq(get_cat().get_escape_layer()))
+				ent.set_dirtiness(true);
+			    if(isolated && e->get_saved_status() == saved_status::saved)
+				ent.set_saved_status(saved_status::fake);
 			    try
 			    {
 				callback(juillet.get_string(), ent, context);
@@ -1228,8 +1246,16 @@ namespace libdar
 				throw Elibcall("archive::op_listing", gettext("Exception caught from archive_listing_callback execution"));
 			    }
 			}
+			else // not saved, filtered out
+			{
+			    if(e_dir != nullptr)
+			    {
+				get_cat().skip_read_to_parent_dir();
+				juillet.enfile(&tmp_eod);
+			    }
+			}
 		    }
-		    else // not saved, filtered out
+		    else // filtered out
 		    {
 			if(e_dir != nullptr)
 			{
@@ -1241,7 +1267,7 @@ namespace libdar
             }
             catch(Euser_abort & e)
             {
-                disable_natural_destruction();
+                me->disable_natural_destruction();
                 throw;
             }
             catch(Erange & e)
@@ -1254,12 +1280,12 @@ namespace libdar
         {
             NLS_SWAP_OUT;
 	    if(sequential_read)
-		exploitable = false;
+		me->exploitable = false;
             throw;
         }
         NLS_SWAP_OUT;
 	if(sequential_read)
-	    exploitable = false;
+	    me->exploitable = false;
     }
 
     statistics archive::op_diff(const path & fs_root,
