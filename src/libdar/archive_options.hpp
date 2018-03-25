@@ -1317,6 +1317,12 @@ namespace libdar
 	    /// operation. This option is not used if set_slicing_location is set to false
 	void set_user_slicing(const infinint & slicing_first, const infinint & slicing_others);
 
+	    /// whether to fetch EA for listing
+
+	    /// \note this operation implies a lot of processing
+	void set_display_ea(bool display_ea) { x_display_ea = display_ea; };
+
+
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
 
@@ -1326,6 +1332,7 @@ namespace libdar
 	bool get_filter_unsaved() const { return x_filter_unsaved; };
 	bool get_user_slicing(infinint & slicing_first, infinint & slicing_others) const;
 	bool get_slicing_location() const { return x_slicing_location; };
+	bool get_display_ea() const { return x_display_ea; };
 
     private:
 	bool x_info_details;
@@ -1335,6 +1342,7 @@ namespace libdar
 	infinint *x_slicing_first;
 	infinint *x_slicing_others;
 	bool x_slicing_location;
+	bool x_display_ea;
 
 	void destroy() noexcept;
 	void nullifyptr() noexcept;
@@ -1377,19 +1385,16 @@ namespace libdar
 	    // setting methods
 
 	void set_list_mode(listformat list_mode) { x_list_mode = list_mode; };
-	void set_display_ea(bool display_ea) { x_display_ea = display_ea; };
 	void set_sizes_in_bytes(bool arg) { x_sizes_in_bytes = arg; };
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
 
 	listformat get_list_mode() const { return x_list_mode; };
-	bool get_display_ea() const { return x_display_ea; };
 	bool get_sizes_in_bytes() const { return x_sizes_in_bytes; };
 
     private:
 	listformat x_list_mode;
-	bool x_display_ea;
 	bool x_sizes_in_bytes;
     };
 

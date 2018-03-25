@@ -1592,6 +1592,7 @@ namespace libdar
 	    x_info_details = ref.x_info_details;
 	    x_filter_unsaved = ref.x_filter_unsaved;
 	    x_slicing_location = ref.x_slicing_location;
+	    x_display_ea = ref.x_display_ea;
 	}
 	catch(...)
 	{
@@ -1610,6 +1611,7 @@ namespace libdar
 	x_info_details = move(ref.x_info_details);
 	x_filter_unsaved = move(ref.x_filter_unsaved);
 	x_slicing_location = move(ref.x_slicing_location);
+	x_display_ea = move(ref.x_display_ea);
     }
 
     	/////////////////////////////////////////////////////////
@@ -1620,7 +1622,6 @@ namespace libdar
     {
 	archive_options_listing::clear();
 	x_list_mode = normal;
-	x_display_ea = false;
 	x_sizes_in_bytes = false;
     }
 
