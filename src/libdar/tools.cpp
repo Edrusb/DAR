@@ -2517,15 +2517,23 @@ namespace libdar
         return string("0") + ret;  // leading zero for octal format indication
     }
 
+    char tools_cast_type_to_unix_type(char type)
+    {
+	char ret = type;
+
+        if(type == 'f') // plain files
+            ret = '-';
+        if(type == 'o') // door "files"
+            ret = 'D';
+
+	return ret;
+    }
+
     string tools_get_permission_string(char type, U_32 perm, bool hard)
     {
         string ret = hard ? "*" : " ";
 
-        if(type == 'f') // plain files
-            type = '-';
-        if(type == 'o') // door "files"
-            type = 'D';
-        ret += type;
+        ret += tools_cast_type_to_unix_type(type);
 
         if((perm & 0400) != 0)
             ret += 'r';

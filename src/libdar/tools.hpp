@@ -817,6 +817,10 @@ namespace libdar
 	/// \return the corresponding octal string
     extern std::string tools_int2octal(const U_I & perm);
 
+	/// change the libdar internal type representation to the usual unix char type
+
+    extern char tools_cast_type_to_unix_type(char type);
+
 	/// convert a permission number into its string representation (rwxrwxrwx)
 
     extern std::string tools_get_permission_string(char type, U_32 perm, bool hard);
