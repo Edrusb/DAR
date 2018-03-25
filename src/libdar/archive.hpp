@@ -515,6 +515,8 @@ namespace libdar
 	bool only_contains_an_isolated_catalogue() const; //< true if the current archive only contains an isolated catalogue
 	void check_against_isolation(bool lax) const; //< throw Erange exception if the archive only contains an isolated catalogue
 	const cat_directory *get_dir_object(const std::string & dir) const;
+
+	static void check_libgcrypt_hash_bug(user_interaction & dialog, hash_algo hash, const infinint & first_file_size, const infinint & file_size);
     };
 
 } // end of namespace

@@ -64,8 +64,6 @@ using namespace std;
 namespace libdar
 {
 
-    static void check_libgcrypt_hash_bug(user_interaction & dialog, hash_algo hash, const infinint & first_file_size, const infinint & file_size);
-
 	// opens an already existing archive
 
     archive::archive(const std::shared_ptr<user_interaction> & dialog,
@@ -2733,7 +2731,7 @@ namespace libdar
     }
 
 
-    static void check_libgcrypt_hash_bug(user_interaction & dialog, hash_algo hash, const infinint & first_file_size, const infinint & file_size)
+    void archive::check_libgcrypt_hash_bug(user_interaction & dialog, hash_algo hash, const infinint & first_file_size, const infinint & file_size)
     {
 #if CRYPTO_AVAILABLE
 	if(hash != hash_none && !crypto_min_ver_libgcrypt_no_bug())
