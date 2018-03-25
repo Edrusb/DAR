@@ -73,8 +73,11 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
     const char *env_pub_filekey = tools_get_from_env(env, "DAR_SFTP_PUBLIC_KEYFILE");
     const char *env_prv_filekey = tools_get_from_env(env, "DAR_SFTP_PRIVATE_KEYFILE");
     const char *env_ignored_as_symlink = tools_get_from_env(env, "DAR_IGNORED_AS_SYMLINK");
+    shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
 
     if(!dialog)
+	throw SRC_BUG;
+    if(shelli == nullptr)
 	throw SRC_BUG;
     if(home == nullptr)
         home = "/";
@@ -1055,9 +1058,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    if(!param.file_size.is_zero() && param.list_mode == archive_options_listing_shell::slicing)
 			listing_options.set_user_slicing(param.first_file_size, param.file_size);
 		    listing_options.set_sizes_in_bytes(param.sizes_in_bytes);
-		    arch->op_listing(nullptr,
-				     nullptr,
-				     listing_options);
+		    shelli->archive_show_contents(*arch, listing_options);
 		}
                 break;
             default:
