@@ -786,7 +786,7 @@ namespace libdar
     const infinint & cat_file::get_offset() const
     {
 	if(get_saved_status() != saved_status::saved
-	   || get_saved_status() != saved_status::delta)
+	   && get_saved_status() != saved_status::delta)
 	    throw SRC_BUG;
 	if(offset == nullptr)
 	    throw SRC_BUG;
