@@ -47,13 +47,13 @@ namespace libdar
 	/// @{
 
 
-    extern std::string local_perm(const cat_inode & ref, bool hard);
-    extern std::string local_uid(const cat_inode & ref);
-    extern std::string local_gid(const cat_inode & ref);
-    extern std::string local_size(const cat_inode & ref, bool sizes_in_bytes);
-    extern std::string local_storage_size(const cat_inode & ref);
-    extern std::string local_date(const cat_inode & ref);
-    extern std::string local_flag(const cat_inode & ref, bool isolated, bool dirty_seq);
+    extern std::string local_perm(const cat_inode & ref, bool hard); ///< voir list_entry::get_perm()
+    extern std::string local_uid(const cat_inode & ref);             ///< voir list_entry::get_uid(true);
+    extern std::string local_gid(const cat_inode & ref);             ///< voir list_entry::get_gid(true);
+    extern std::string local_size(const cat_inode & ref, bool sizes_in_bytes); ///< voir list_entry::get_file_size(size_in_bytes)
+    extern std::string local_storage_size(const cat_inode & ref);    ///< voir list_entry::get_storage_size_for_data()
+    extern std::string local_date(const cat_inode & ref);            ///< voir list_entry::get_last_modif()
+    extern std::string local_flag(const cat_inode & ref, bool isolated, bool dirty_seq);  ///< list_entry::get_data_flag()+get_delta_flag()+get_ea_flag()+get_fsa_flag()+get_compression_ratio_flag()+get_sparse_flag()
     extern void xml_listing_attributes(user_interaction & dialog, //< for user interaction
 				       const std::string & beginning,  //< character std::string to use as margin
 				       const std::string & data,       //< ("saved" | "referenced" | "deleted")
@@ -69,7 +69,7 @@ namespace libdar
 	/// returns a string describing the object type
 	///
 	/// \note argument must point to a valid object
-    extern std::string entree_to_string(const cat_entree *obj);
+    extern std::string entree_to_string(const cat_entree *obj);   ///< voir list_entry::get_type_description
 
 	/// @}
 
