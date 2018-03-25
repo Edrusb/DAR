@@ -30,6 +30,7 @@ extern "C"
 
 #include "archive5.hpp"
 #include "erreurs.hpp"
+#include "shell_interaction_emulator.hpp"
 
 #define ARCHIVE_NOT_EXPLOITABLE "Archive of reference given is not exploitable"
 
@@ -44,9 +45,9 @@ namespace libdar5
     void archive::op_listing(user_interaction & dialog,
 			     const archive_options_listing & options)
     {
-	libdar::archive::op_listing(nullptr,
-				    nullptr,
-				    options);
+	libdar::shell_interaction_emulator emul(&dialog);
+
+	emul.archive_show_contents(*this, options);
     }
 
     bool archive::get_children_of(user_interaction & dialog,
