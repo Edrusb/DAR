@@ -1285,7 +1285,7 @@ namespace libdar
 	archive_options_listing & operator = (archive_options_listing && ref) noexcept { move_from(std::move(ref)); return *this; };
 	virtual ~archive_options_listing() { destroy(); };
 
-	void clear();
+	virtual void clear();
 
 
 	    /////////////////////////////////////////////////////////////////////
@@ -1360,7 +1360,7 @@ namespace libdar
 	archive_options_listing_shell & operator = (archive_options_listing_shell && ref) noexcept = default;
 	~archive_options_listing_shell() = default;
 
-	void clear();
+	virtual void clear() override;
 
 	    /// defines the way archive listing is done:
 

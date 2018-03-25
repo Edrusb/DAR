@@ -1618,6 +1618,7 @@ namespace libdar
 
     void archive_options_listing_shell::clear()
     {
+	archive_options_listing::clear();
 	x_list_mode = normal;
 	x_display_ea = false;
 	x_sizes_in_bytes = false;
