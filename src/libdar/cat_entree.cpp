@@ -414,6 +414,7 @@ namespace libdar
 	{
 	    ent.set_file_size(tmp_dir->get_size());
 	    ent.set_storage_size(tmp_dir->get_storage_size());
+	    ent.set_empty_dir(tmp_dir->is_empty());
 	}
 
 	if(tmp_lien != nullptr && tmp_lien->get_saved_status() == saved_status::saved)

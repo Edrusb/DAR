@@ -86,6 +86,7 @@ namespace libdar
 	bool is_hard_linked() const { return hard_link; };
 	bool is_removed_entry() const { return type == 'x'; };
 	bool is_door_inode() const { return type == 'o'; };
+	bool is_empty_dir() const { return empty_dir; };
 
 	unsigned char get_removed_type() const;  ///< valid only for removed_entries
 	std::string get_removed_type_description() const; ///< valid only for removed_entries
@@ -246,6 +247,7 @@ namespace libdar
 	void set_data_crc(const crc & ptr) { data_crc = ptr.crc2str(); };
 	void set_delta_patch_base_crc(const crc & ptr) { patch_base_crc = ptr.crc2str(); };
 	void set_delta_patch_result_crc(const crc & ptr) { patch_result_crc = ptr.crc2str(); };
+	void set_empty_dir(bool val) { if(!is_dir()) throw SRC_BUG; empty_dir = val; };
 
 	void clear();
 
@@ -285,6 +287,7 @@ namespace libdar
 	std::string data_crc;
 	std::string patch_base_crc;
 	std::string patch_result_crc;
+	bool empty_dir;
 
 	static time_t datetime2time_t(const datetime & val);
 	static std::string type_to_string(unsigned char type);

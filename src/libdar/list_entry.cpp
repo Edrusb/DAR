@@ -290,6 +290,7 @@ namespace libdar
 	ea.clear();
 	it_ea = ea.begin();
 	etiquette = 0;
+	empty_dir = false;
     }
 
     time_t list_entry::datetime2time_t(const datetime & val)
