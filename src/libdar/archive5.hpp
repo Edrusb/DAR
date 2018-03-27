@@ -183,17 +183,9 @@ namespace libdar5
 
     private:
 
-	static void listing_callback(void *context,
-				     const std::string & flag,
-				     const std::string & perm,
-				     const std::string & uid,
-				     const std::string & gid,
-				     const std::string & size,
-				     const std::string & date,
-				     const std::string & filename,
-				     bool is_dir,
-				     bool has_children);
-
+	static void listing_callback(const std::string & the_path,
+				     const libdar::list_entry & entry,
+				     void *context);
     };
 
 } // end of namespace

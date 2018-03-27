@@ -61,18 +61,26 @@ namespace libdar5
 						dir);
     }
 
-    void archive::listing_callback(void *context,
-				   const string & flag,
-				   const string & perm,
-				   const string & uid,
-				   const string & gid,
-				   const string & size,
-				   const string & date,
-				   const string & filename,
-				   bool is_dir,
-				   bool has_children)
+    void archive::listing_callback(const string & the_path,
+				   const libdar::list_entry & entry,
+				   void *context)
     {
 	user_interaction *dialog = (user_interaction *)(context);
+	const std::string & flag =
+	    entry.get_data_flag()
+	    + entry.get_delta_flag()
+	    + entry.get_ea_flag()
+	    + entry.get_fsa_flag()
+	    + entry.get_compression_ratio_flag()
+	    + entry.get_sparse_flag();
+	const std::string & perm = entry.get_perm();
+	const std::string & uid = entry.get_uid(true);
+	const std::string & gid = entry.get_gid(true);
+	const std::string & size = entry.get_file_size(true); //<<<<< listing sizes in bytes
+	const std::string & date = entry.get_last_modif();
+	const std::string & filename = entry.get_name();
+	bool is_dir = entry.is_dir();
+	bool has_children = !entry.is_empty_dir();
 
 	if(dialog == nullptr)
 	    throw SRC_BUG;
@@ -89,7 +97,6 @@ namespace libdar5
 			    has_children);
 	else
 	    throw SRC_BUG;
-
     }
 
 
