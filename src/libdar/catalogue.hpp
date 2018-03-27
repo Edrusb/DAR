@@ -49,7 +49,6 @@ extern "C"
 #include "cat_entree.hpp"
 #include "cat_nomme.hpp"
 #include "cat_directory.hpp"
-#include "catalogue_listing_callback.hpp"
 
 namespace libdar
 {
@@ -188,38 +187,6 @@ namespace libdar
 
 	    /// write down the whole catalogue to file
         void dump(const pile_descriptor & pdesc) const;
-
-        void listing(user_interaction & ui,
-		     bool isolated,
-		     const mask &selection,
-		     const mask & subtree,
-		     bool filter_unsaved,
-		     bool list_ea,
-		     bool sizes_in_bytes,
-		     std::string marge) const;
-        void tar_listing(user_interaction & ui,
-			 catalogue_listing_callback callback,
-			 void *context,
-			 bool isolated,
-			 const mask & selection,
-			 const mask & subtree,
-			 bool filter_unsaved,
-			 bool list_ea,
-			 bool sizes_in_bytes,
-			 std::string beginning) const;
-        void xml_listing(user_interaction & ui,
-			 bool isolated,
-			 const mask & selection,
-			 const mask & subtree,
-			 bool filter_unsaved,
-			 bool list_ea,
-			 bool sizes_in_bytes,
-			 std::string beginning) const;
-	void slice_listing(user_interaction & ui,
-			   bool isolated,
-			   const mask & selection,
-			   const mask & subtree,
-			   const slice_layout & slicing) const;
 
         entree_stats get_stats() const { return stats; };
 

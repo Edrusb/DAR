@@ -26,7 +26,6 @@ extern "C"
 } // end extern "C"
 
 #include "cat_all_entrees.hpp"
-#include "cat_tools.hpp"
 
 using namespace std;
 
@@ -584,108 +583,6 @@ namespace libdar
 	    ptr = nullptr;
 #endif
 	return ptr != nullptr;
-    }
-
-    bool cat_directory::callback_for_children_of(catalogue_listing_callback callback,
-						 void *context,
-						 const string & sdir,
-						 bool isolated) const
-    {
-	const cat_directory *current = this;
-	const cat_nomme *next_nom = nullptr;
-	const cat_directory *next_dir = nullptr;
-	const cat_inode *next_ino = nullptr;
-	const cat_detruit *next_detruit = nullptr;
-	const cat_mirage *next_mir = nullptr;
-	string segment;
-	bool loop = true;
-	const cat_nomme *tmp_nom;
-
-	if(callback == nullptr)
-	    throw Erange("cat_directory::callback_for_children_of", gettext("callback function must be given"));
-
-	if(sdir != "")
-	{
-	    path dir = sdir;
-
-	    if(!dir.is_relative())
-		throw Erange("cat_directory::callback_for_children_of", gettext("argument must be a relative path"));
-
-		///////////////////////////
-		// looking for the inner most cat_directory (basename of given path)
-		//
-
-	    do
-	    {
-		if(!dir.pop_front(segment))
-		{
-		    segment = dir.display();
-		    loop = false;
-		}
-
-		if(current->search_children(segment, tmp_nom))
-		{
-		    next_nom = tmp_nom;
-		    next_mir = dynamic_cast<const cat_mirage *>(next_nom);
-		    if(next_mir != nullptr)
-			next_dir = dynamic_cast<const cat_directory *>(next_mir->get_inode());
-		    else
-			next_dir = dynamic_cast<const cat_directory *>(next_nom);
-
-		    if(next_dir != nullptr)
-			current = next_dir;
-		    else
-			return false;
-		}
-		else
-		    return false;
-	    }
-	    while(loop);
-	}
-
-	    ///////////////////////////
-	    // calling listing() for each element of the "current" cat_directory
-	    //
-
-	if(current == nullptr)
-	    throw SRC_BUG;
-
-	loop = false; // loop now serves as returned value
-
-	current->reset_read_children();
-	while(current->read_children(next_nom))
-	{
-	    next_mir = dynamic_cast<const cat_mirage *>(next_nom);
-	    if(next_mir != nullptr)
-		next_ino = next_mir->get_inode();
-	    else
-		next_ino = dynamic_cast<const cat_inode *>(next_nom);
-	    next_detruit = dynamic_cast<const cat_detruit *>(next_nom);
-	    next_dir = dynamic_cast<const cat_directory *>(next_ino);
-	    if(next_ino != nullptr)
-	    {
-		string a = local_perm(*next_ino, next_mir != nullptr);
-		string b = local_uid(*next_ino);
-		string c = local_gid(*next_ino);
-		string d = local_size(*next_ino, false);
-		string e = local_date(*next_ino);
-		string f = local_flag(*next_ino, isolated, false);
-		string g = next_ino->get_name();
-		(*callback)(context, f,a,b,c,d,e,g, next_dir != nullptr, next_dir != nullptr && next_dir->has_children());
-		loop = true;
-	    }
-	    else
-		if(next_detruit != nullptr)
-		{
-		    string a = next_detruit->get_name();
-		    (*callback)(context, REMOVE_TAG, "xxxxxxxxxx", "", "", "", "", a, false, false);
-		    loop = true;
-		}
-		else
-		    throw SRC_BUG; // unknown class
-	}
-
-	return loop;
     }
 
     void cat_directory::recursive_has_changed_update() const

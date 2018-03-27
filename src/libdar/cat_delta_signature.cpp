@@ -27,6 +27,7 @@ extern "C"
 
 #include "tronc.hpp"
 #include "cat_delta_signature.hpp"
+#include "tools.hpp"
 
 using namespace std;
 

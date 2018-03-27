@@ -27,7 +27,6 @@ extern "C"
 
 #include "cat_entree.hpp"
 #include "cat_all_entrees.hpp"
-#include "cat_tools.hpp"
 #include "macro_tools.hpp"
 
 using namespace std;

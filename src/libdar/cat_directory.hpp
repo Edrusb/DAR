@@ -38,8 +38,6 @@ extern "C"
 
 #include <list>
 #include "cat_inode.hpp"
-#include "cat_tools.hpp"
-#include "catalogue_listing_callback.hpp"
 
 namespace libdar
 {

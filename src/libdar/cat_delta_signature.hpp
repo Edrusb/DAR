@@ -33,7 +33,6 @@ extern "C"
 } // end extern "C"
 
 #include "memory_file.hpp"
-#include "cat_tools.hpp"
 #include "crc.hpp"
 
 namespace libdar
