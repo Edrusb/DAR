@@ -1168,6 +1168,9 @@ namespace libdar
 	    slice_layout *slice_ptr = nullptr;
 	    thread_cancellation thr;
 
+	    if(options.get_display_ea() && sequential_read)
+		throw Erange("archive::get_children_of", gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
+
 	    if(options.get_slicing_location())
 	    {
 		slice_ptr = & used_layout;
@@ -1641,6 +1644,8 @@ namespace libdar
         NLS_SWAP_IN;
         try
         {
+	    if(fetch_ea && sequential_read)
+		throw Erange("archive::get_children_of", gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
 	    load_catalogue();
 		// OK, now that we have the whole catalogue available in memory, let's rock!
 
@@ -1664,8 +1669,16 @@ namespace libdar
 	NLS_SWAP_IN;
         try
         {
-	    const cat_directory * parent = get_dir_object(dir);
-	    const cat_nomme *tmp_ptr = nullptr;
+	    archive* me = const_cast<archive*>(this);
+	    if(me == nullptr)
+		throw SRC_BUG;
+
+	    if(fetch_ea && sequential_read)
+		throw Erange("archive::get_children_of", gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
+	    me->load_catalogue();
+
+	    const cat_directory* parent = get_dir_object(dir);
+	    const cat_nomme* tmp_ptr = nullptr;
 	    list_entry ent;
 
             if(parent == nullptr)
