@@ -3066,7 +3066,7 @@ namespace libdar
 			    dialog->message(string(gettext("Delta saving file to archive: ")) + info_quoi);
 			else
 			{
-			    string i_type = entree_to_string(ino);
+			    string i_type = ino->get_description();
 			    dialog->message(tools_printf(gettext("Adding %S to archive: %S"), &i_type, &info_quoi));
 			}
 		    }
