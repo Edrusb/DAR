@@ -1611,6 +1611,27 @@ namespace libdar
         NLS_SWAP_OUT;
     }
 
+    void archive::load_catalogue()
+    {
+	if(exploitable && sequential_read) // the catalogue is not even yet read, so we must first read it entirely
+	{
+	    if(only_contains_an_isolated_catalogue())
+		    // this is easy... asking just an entry
+		    //from the catalogue makes its whole being read
+	    {
+		const cat_entree *tmp;
+		if(cat == nullptr)
+		    throw SRC_BUG;
+		cat->read(tmp); // should be enough to have the whole catalogue being read
+		cat->reset_read();
+	    }
+	    else
+		    // here we have a plain archive, doing the test operation
+		    // is the simplest way to read the whole archive and thus get its contents
+		    // (i.e.: the catalogue)
+		(void)op_test(archive_options_test(), nullptr);
+	}
+    }
 
     bool archive::get_children_of(catalogue_listing_callback callback,
 				  void *context,
@@ -1620,26 +1641,7 @@ namespace libdar
         NLS_SWAP_IN;
         try
         {
-
-	    if(exploitable && sequential_read) // the catalogue is not even yet read, so we must first read it entirely
-	    {
-		if(only_contains_an_isolated_catalogue())
-			// this is easy... asking just an entry
-			//from the catalogue makes its whole being read
-		{
-		    const cat_entree *tmp;
-		    if(cat == nullptr)
-			throw SRC_BUG;
-		    cat->read(tmp); // should be enough to have the whole catalogue being read
-		    cat->reset_read();
-		}
-		else
-			// here we have a plain archive, doing the test operation
-			// is the simplest way to read the whole archive and thus get its contents
-			// (i.e.: the catalogue)
-		    (void)op_test(archive_options_test(), nullptr);
-	    }
-
+	    load_catalogue();
 		// OK, now that we have the whole catalogue available in memory, let's rock!
 
             ret = get_cat().get_contenu()->callback_for_children_of(callback, context, dir);
