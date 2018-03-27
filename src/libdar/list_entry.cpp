@@ -40,19 +40,6 @@ namespace libdar
 	    return '!';
     }
 
-    string list_entry::get_removed_type_description() const
-    {
-	if(is_removed_entry())
-	{
-	    if(target.size() != 1)
-		return type_to_string(target[0]);
-	    else
-		return gettext("unspecified type");
-	}
-	else
-	    return "";
-    }
-
     string list_entry::get_data_flag() const
     {
 	switch(data_status)
@@ -301,41 +288,6 @@ namespace libdar
 	(void) val.get_value(ret, unused, datetime::tu_second);
 
 	return ret;
-    }
-
-    string list_entry::type_to_string(unsigned char type)
-    {
-	switch(type)
-	{
-	case 'j':
-	    return gettext("ignored directory");
-	case 'd':
-	    return gettext("folder");
-	case 'x':
-	    return gettext("deleted file");
-	case 'o':
-	    return gettext("door");
-	case 'f':
-	    return gettext("file");
-	case 'l':
-	    return gettext("symlink");
-	case 'c':
-	    return gettext("char device");
-	case 'b':
-	    return gettext("block device");
-	case 'p':
-	    return gettext("pipe");
-	case 's':
-	    return gettext("socket");
-	case 'i':
-	    return gettext("ignored entry");
-	case 'm':
-	    return gettext("hard linked inode");
-	case 'z':
-	    return gettext("end of directory");
-	default:
-	    throw SRC_BUG; // missing inode type
-	}
     }
 
 } // end of namespace

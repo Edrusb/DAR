@@ -75,7 +75,6 @@ namespace libdar
 
 	const std::string & get_name() const { return my_name; };
 	unsigned char get_type() const { return type; };
-	std::string get_type_description() const { return type_to_string(type); };
 	bool is_dir() const { return type == 'd'; };
 	bool is_file() const { return type == 'f'; };
 	bool is_symlink() const { return type == 'l'; };
@@ -89,7 +88,6 @@ namespace libdar
 	bool is_empty_dir() const { return empty_dir; };
 
 	unsigned char get_removed_type() const;  ///< valid only for removed_entries
-	std::string get_removed_type_description() const; ///< valid only for removed_entries
 
 	bool has_data_present_in_the_archive() const { return data_status == saved_status::saved || data_status == saved_status::delta; };
 	std::string get_data_flag() const;
@@ -290,7 +288,6 @@ namespace libdar
 	bool empty_dir;
 
 	static time_t datetime2time_t(const datetime & val);
-	static std::string type_to_string(unsigned char type);
     };
 
 } // end of namespace
