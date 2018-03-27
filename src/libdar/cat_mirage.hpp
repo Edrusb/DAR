@@ -80,6 +80,8 @@ namespace libdar
 	virtual bool operator == (const cat_entree & ref) const override;
 
 	virtual unsigned char signature() const override { return 'm'; };
+	virtual std::string get_description() const override { return "hard linked inode"; };
+
 	virtual cat_entree *clone() const override { return new (std::nothrow) cat_mirage(*this); };
 
 	cat_inode *get_inode() const { if(star_ref == nullptr) throw SRC_BUG; return star_ref->get_inode(); };

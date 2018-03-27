@@ -76,6 +76,8 @@ namespace libdar
 
 	    /// inherited from cat_entree
         virtual unsigned char signature() const override { return 's'; };
+	virtual std::string get_description() const override { return "socket"; };
+
 
 	    /// inherited from cat_entree
         virtual cat_entree *clone() const override { return new (std::nothrow) cat_prise(*this); };

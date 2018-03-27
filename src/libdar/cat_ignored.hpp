@@ -55,6 +55,7 @@ namespace libdar
 	virtual bool operator == (const cat_entree & ref) const override;
 
         virtual unsigned char signature() const override { return 'i'; };
+	virtual std::string get_description() const override { return "ignored entry"; };
         virtual cat_entree *clone() const override { return new (std::nothrow) cat_ignored(*this); };
 
     protected:

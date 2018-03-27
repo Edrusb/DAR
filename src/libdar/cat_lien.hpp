@@ -76,6 +76,9 @@ namespace libdar
         virtual unsigned char signature() const override { return 'l'; };
 
 	    /// inherited from cat_entree
+	virtual std::string get_description() const override { return "symlink"; };
+
+	    /// inherited from cat_entree
         virtual cat_entree *clone() const override { return new (std::nothrow) cat_lien(*this); };
 
     protected :

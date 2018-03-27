@@ -141,6 +141,9 @@ namespace libdar
 	    /// inherited class signature
         virtual unsigned char signature() const = 0;
 
+	    /// inherited class designation
+	virtual std::string get_description() const = 0;
+
 	    /// a way to copy the exact type of an object even if pointed to by a parent class pointer
         virtual cat_entree *clone() const = 0;
 

@@ -73,6 +73,7 @@ namespace libdar
             // using method is_more_recent_than() from cat_device class
             // using method has_changed_since() from cat_device class
         virtual unsigned char signature() const override { return 'b'; };
+	virtual std::string get_description() const override { return "block device"; };
         virtual cat_entree *clone() const override { return new (std::nothrow) cat_blockdev(*this); };
     };
 

@@ -72,6 +72,8 @@ namespace libdar
 	virtual bool operator == (const cat_entree & ref) const override;
 
         virtual unsigned char signature() const override { return 'o'; };
+	virtual std::string get_description() const override { return "door"; };
+
 
 	    // inherited from class cat_file
         virtual generic_file *get_data(get_data_mode mode,

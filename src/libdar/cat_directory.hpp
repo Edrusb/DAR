@@ -98,14 +98,13 @@ namespace libdar
 
         cat_directory * get_parent() const { return parent; };
         bool search_children(const std::string &name, const cat_nomme *&ref) const;
-	bool callback_for_children_of(catalogue_listing_callback callback,
-				      void *context,
-				      const std::string & sdir,
-				      bool isolated = false) const;
 
             // using is_more_recent_than() from cat_inode class
             // using method has_changed_since() from cat_inode class
         virtual unsigned char signature() const override { return 'd'; };
+
+	virtual std::string get_description() const override { return "folder"; };
+
 
 	    /// detemine whether some data has changed since archive of reference in this cat_directory or subdirectories
 	bool get_recursive_has_changed() const { return recursive_has_changed; };
