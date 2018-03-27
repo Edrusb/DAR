@@ -275,15 +275,17 @@ namespace libdar
 	    /// \param[in] callback callback function used to provide data in splitted field
 	    /// \param[in] context will be passed as first argument of the callback as is provided here
 	    /// \param[in] dir relative path the directory to get information about
+	    /// \param[in] fetch_ea whether to look for EA (not possible in sequential read mode)
 	    /// \return true if some children have been found and the callback has been run at least once
-	bool get_children_of(catalogue_listing_callback callback,
+	bool get_children_of(archive_listing_callback callback,
 			     void *context,
-			     const std::string & dir);
+			     const std::string & dir,
+			     bool fetch_ea = false);
 
 	    /// getting information about the given directory (alternative to get_children_of)
 	    ///
 	    /// \param[in] dir relative path the directory to get information about, use empty string for root directory
-	    /// \param[in] fetch_ea whether to fetch Extended Attributes relative information in each returned list_entry
+	    /// \param[in] fetch_ea whether to fetch Extended Attributes relative information in each returned list_entry (not possible in sequential read mode)
 	    /// \return a table information about all subdir and subfile for the given directory
 	    /// \note at the difference of get_children_of, this call does not rely on a user_interaction class
 	    /// to provide the information, but rather returns a table of children. To allow new fields to

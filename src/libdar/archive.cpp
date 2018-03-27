@@ -1636,9 +1636,11 @@ namespace libdar
 	}
     }
 
-    bool archive::get_children_of(catalogue_listing_callback callback,
+
+    bool archive::get_children_of(archive_listing_callback callback,
 				  void *context,
-                                  const string & dir)
+                                  const string & dir,
+				  bool fetch_ea)
     {
 	bool ret;
         NLS_SWAP_IN;
@@ -1649,7 +1651,12 @@ namespace libdar
 	    load_catalogue();
 		// OK, now that we have the whole catalogue available in memory, let's rock!
 
-            ret = get_cat().get_contenu()->callback_for_children_of(callback, context, dir);
+	    vector<list_entry> tmp = get_children_in_table(dir,fetch_ea);
+	    vector<list_entry>::iterator it = tmp.begin();
+
+	    ret = (it != tmp.end());
+	    while(it != tmp.end())
+		callback(dir, *it, context);
         }
         catch(...)
         {
