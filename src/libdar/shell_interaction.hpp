@@ -134,6 +134,7 @@ namespace libdar
 	    // class fields and methods
 
 	static const U_I bufsize;
+	static constexpr const char* REMOVE_TAG = "[--- REMOVED ENTRY ----]";
 
 	static void archive_listing_callback_tree(const std::string & the_path,
 						  const list_entry & entry,

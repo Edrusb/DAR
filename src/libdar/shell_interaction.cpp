@@ -657,7 +657,7 @@ namespace libdar
 	{
 	    string tmp_date = entry.get_removal_date();
 	    char type = tools_cast_type_to_unix_type(entry.get_removed_type());
-	    me->printf("%s (%S) [%c] %S%S%S", REMOVE_TAG, &tmp_date, type,  &the_path, &sep, &nom);
+	    me->printf("%s (%S) [%c] %S%S%S", gettext(REMOVE_TAG), &tmp_date, type,  &the_path, &sep, &nom);
 	}
 	else
 	{
@@ -875,7 +875,7 @@ namespace libdar
 	string nom = the_path + sep + entry.get_name();
 
 	if(entry.is_removed_entry())
-	    me->message(tools_printf("%s\t %s%s", entry.get_slices().display().c_str(), REMOVE_TAG, nom.c_str()));
+	    me->message(tools_printf("%s\t %s%s", entry.get_slices().display().c_str(), gettext(REMOVE_TAG), nom.c_str()));
 	else
 	{
 	    string a = entry.get_perm();
