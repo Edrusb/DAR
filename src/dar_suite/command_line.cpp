@@ -413,7 +413,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             throw Erange("get_args", gettext("-af option is only available with -c"));
         if(p.ref_filename != nullptr && p.op == listing)
             dialog->message(gettext("-A option is not available with -l"));
-	if(p.list_mode != archive_options_listing_shell::normal)
+	if(p.list_mode != archive_options_listing_shell::normal && p.op != listing)
             dialog->message(gettext("-T option is only available with -l"));
         if(p.op == isolate && p.ref_filename == nullptr)
             throw Erange("get_args", gettext("with -C option, -A option is mandatory"));
