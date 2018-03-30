@@ -253,6 +253,24 @@ namespace libdar
         return ret;
     }
 
+    string path::display_without_root() const
+    {
+        string ret = "";
+        list<string>::const_iterator it = dirs.begin();
+
+	if(relative)
+	    ++it;
+	    // else we as we ignore the leading / we are all set
+
+        if(it != dirs.end())
+            ret += *it++;
+        while(it != dirs.end())
+            ret += string("/") + *it++;
+
+        return ret;
+    }
+
+
     void path::explode_undisclosed() const
     {
 	path *me = const_cast<path *>(this);

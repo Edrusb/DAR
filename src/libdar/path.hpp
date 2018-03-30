@@ -156,6 +156,12 @@ namespace libdar
 	    /// the returned string is the representation of the current object in Unix notation
         std::string display() const;
 
+	    /// display the path as a string but without the first member of the path
+
+	    /// \note if path is equal to root (the first member if relative of / if absolute)
+	    /// an empty string is returned
+	std::string display_without_root() const;
+
 	    /// \brief returns the number of member in the path
 	    ///
 	    /// \note a absolute path counts one more that its relative brother
