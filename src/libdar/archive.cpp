@@ -1242,7 +1242,7 @@ namespace libdar
 				ent.set_saved_status(saved_status::fake);
 			    try
 			    {
-				callback(juillet.get_string(), ent, context);
+				callback(juillet.get_string_without_root(), ent, context);
 			    }
 			    catch(...)
 			    {
