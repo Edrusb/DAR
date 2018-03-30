@@ -54,7 +54,17 @@ namespace libdar
                     init = true;
             }
 	}
-	cache = chemin.display();
+	cache_set = false;
+    }
+
+    const string & defile::get_string() const
+    {
+	if(!cache_set)
+	{
+	    cache = chemin.display();
+	    cache_set = true;
+	}
+	return cache;
     }
 
 } // end of namespace

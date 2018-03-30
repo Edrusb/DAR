@@ -47,7 +47,7 @@ namespace libdar
     class defile
     {
     public :
-        defile(const path &racine) : chemin(racine) { init = true; };
+        defile(const path &racine) : chemin(racine) { init = true; cache_set = false; };
 	defile(const defile & ref) = default;
 	defile(defile && ref) noexcept = default;
 	defile & operator = (const defile & ref) = default;
@@ -56,12 +56,13 @@ namespace libdar
 
         void enfile(const cat_entree *e);
         const path & get_path() const { return chemin; };
-        const std::string & get_string() const { return cache; };
+        const std::string & get_string() const;
 
     private :
         path chemin; //< current path
         bool init;   //< true if reached the "root" (all pushed arguments have been poped)
-	std::string cache; //< cache of "chemin" converted into string
+	mutable bool cache_set; //< whether cache is accurate
+	mutable std::string cache; //< cache of "chemin" converted into string
     };
 
 	/// @}
