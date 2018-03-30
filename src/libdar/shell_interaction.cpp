@@ -586,10 +586,12 @@ namespace libdar
 	{
 	    U_I length = me->marge.size();
 
-	    if(length > marge_plus_length)
+	    if(length >= marge_plus_length)
 		me->marge.erase(length - marge_plus_length, marge_plus_length);
 	    else
 		throw SRC_BUG;
+	    me->printf("%S +---", &(me->marge));
+
 	}
 	else
 	{
