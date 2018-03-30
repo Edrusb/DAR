@@ -1244,6 +1244,12 @@ namespace libdar
 			    {
 				callback(juillet.get_string_without_root(), ent, context);
 			    }
+			    catch(Egeneric & e)
+			    {
+				throw Elibcall("archive::op_listing",
+					       tools_printf(gettext("Exception caught from archive_listing_callback execution: %s"),
+							    e.dump_str().c_str()));
+			    }
 			    catch(...)
 			    {
 				throw Elibcall("archive::op_listing", gettext("Exception caught from archive_listing_callback execution"));
