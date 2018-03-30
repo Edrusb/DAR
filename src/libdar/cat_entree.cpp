@@ -425,7 +425,7 @@ namespace libdar
 	    ent.set_minor(tmp_device->get_minor());
 	}
 
-	if(sly != nullptr)
+	if(sly != nullptr && tmp_nom != nullptr)
 	    ent.set_slices(macro_tools_get_slices(tmp_nom, *sly));
     }
 
