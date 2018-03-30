@@ -648,18 +648,14 @@ namespace libdar
 	if(me == nullptr)
 	    throw SRC_BUG;
 
-	string sep = (the_path == "") ? "" : "/";
-
 	if(entry.is_eod())
 	    return;
-
-	string nom = entry.get_name();
 
 	if(entry.is_removed_entry())
 	{
 	    string tmp_date = entry.get_removal_date();
 	    char type = tools_cast_type_to_unix_type(entry.get_removed_type());
-	    me->printf("%s (%S) [%c] %S%S%S", gettext(REMOVE_TAG), &tmp_date, type,  &the_path, &sep, &nom);
+	    me->printf("%s (%S) [%c] %S", gettext(REMOVE_TAG), &tmp_date, type, &the_path);
 	}
 	else
 	{
@@ -675,14 +671,12 @@ namespace libdar
 		+ entry.get_fsa_flag()
 		+ entry.get_compression_ratio_flag()
 		+ entry.get_sparse_flag();
+	    string tiq = "";
 
 	    if(me->archive_listing_display_ea && entry.is_hard_linked())
-	    {
-		string tiq = entry.get_etiquette();
-		nom += tools_printf(" [%S] ", &tiq);
-	    }
+		tiq = tools_printf(" [%s]", entry.get_etiquette().c_str());
 
-	    me->printf("%S %S   %S\t%S\t%S\t%S\t%S%S%S", &f, &a, &b, &c, &d, &e, &the_path, &sep, &nom);
+	    me->printf("%S %S   %S\t%S\t%S\t%S\t%S%S", &f, &a, &b, &c, &d, &e, &the_path, &tiq);
 	    if(me->archive_listing_display_ea)
 	    {
 		string key;
@@ -871,13 +865,13 @@ namespace libdar
 	if(me == nullptr)
 	    throw SRC_BUG;
 
+	if(entry.is_eod())
+	    return;
+
 	me->all_slices += entry.get_slices();
 
-	string sep = (the_path == "") ? "" : "/";
-	string nom = the_path + sep + entry.get_name();
-
 	if(entry.is_removed_entry())
-	    me->message(tools_printf("%s\t %s%s", entry.get_slices().display().c_str(), gettext(REMOVE_TAG), nom.c_str()));
+	    me->message(tools_printf("%s\t %s%S", entry.get_slices().display().c_str(), gettext(REMOVE_TAG), &the_path));
 	else
 	{
 	    string a = entry.get_perm();
@@ -888,7 +882,7 @@ namespace libdar
 		+ entry.get_compression_ratio_flag()
 		+ entry.get_sparse_flag();
 
-	    me->printf("%s\t %S%S %s", entry.get_slices().display().c_str(), &f, &a, nom.c_str());
+	    me->printf("%s\t %S%S %S", entry.get_slices().display().c_str(), &f, &a, &the_path);
 	}
     }
 
