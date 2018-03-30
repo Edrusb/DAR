@@ -1351,7 +1351,7 @@ namespace libdar
     };
 
 	/////////////////////////////////////////////////////////
-	////// OPTIONS FOR LISTING AN ARCHIVE IN A SHELL ////////
+	////// OPTIONS FOR LISTING AN ARCHIVE AS IN SHELL ///////
 	/////////////////////////////////////////////////////////
 
 	/// class holding optional shell specific parameters used to list the contents of an existing archive
