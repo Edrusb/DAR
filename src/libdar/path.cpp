@@ -133,7 +133,7 @@ namespace libdar
             return "/";
     }
 
-    bool path::read_subdir(string & r)
+    bool path::read_subdir(string & r) const
     {
         if(reading != dirs.end())
         {
@@ -285,7 +285,7 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    me->reading = me->dirs.begin();
+	    reading = dirs.begin();
 	}
     }
 
