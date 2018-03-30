@@ -1025,9 +1025,9 @@ namespace libdar
 	string user = entry.get_uid(true);
 	string group = entry.get_gid(true);
 	string permissions = entry.get_perm();
-	string atime = entry.get_last_access();
-	string mtime = entry.get_last_modif();
-	string ctime = entry.get_last_change();
+	string atime = tools_uint2str(entry.get_last_access_s());
+	string mtime = tools_uint2str(entry.get_last_modif_s());
+	string ctime = tools_uint2str(entry.get_last_change_s());
 	string data;
 	string metadata;
 	string ending_data;
