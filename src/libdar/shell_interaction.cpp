@@ -568,7 +568,9 @@ namespace libdar
     {
 	if(output == nullptr)
 	    throw SRC_BUG; // shell_interaction has not been properly initialized
-	*output << mesg << endl;
+	*output << mesg;
+	if(mesg.rbegin() == mesg.rend() || *(mesg.rbegin()) != '\n')
+	    *output << endl;
     }
 
     void shell_interaction::archive_listing_callback_tree(const std::string & the_path,
