@@ -1035,6 +1035,11 @@ namespace libdar
 				throw Erange("archive::op_listing", gettext("No slice layout of the archive of reference for the current isolated catalogue is available, cannot provide slicing information, aborting"));
 			}
 		    }
+		    else
+		    {
+			if(sequential_read)
+			    throw Erange("archive::op_listing", gettext("slicing focused output is not available in sequential-read mode"));
+		    }
 		    get_cat().slice_listing(only_contains_an_isolated_catalogue(), options.get_selection(), options.get_subtree(), used_layout);
 		    break;
 		default:
