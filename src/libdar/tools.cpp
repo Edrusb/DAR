@@ -352,40 +352,38 @@ namespace libdar
         }
 
         ret = deci(number).human();
-        if(unit.size() > 0)
-            ret += " "; // a space is required by convention to separate the number from its unit
 
         switch(power)
         {
         case 0:
             if(!number.is_zero())
-                ret += unit;
+                ret += " " + unit;
                 // not displaying unit for zero for clarity in particular when octets symbol is used
                 // which would give "0 o" that is somehow not very easy to read/understand
             break;
         case 1:
-            ret += (binary ? "ki" : "k") + unit;
+            ret += string(" ") + (binary ? "ki" : "k") + unit;
             break;
         case 2:
-            ret += (binary ? "Mi" : "M") + unit;
+            ret += string(" ") + (binary ? "Mi" : "M") + unit;
             break;
         case 3:
-            ret += (binary ? "Gi" : "G") + unit;
+            ret += string(" ") + (binary ? "Gi" : "G") + unit;
             break;
         case 4:
-            ret += (binary ? "Ti" : "T") + unit;
+            ret += string(" ") + (binary ? "Ti" : "T") + unit;
             break;
         case 5:
-            ret += (binary ? "Pi" : "P") + unit;
+            ret += string(" ") + (binary ? "Pi" : "P") + unit;
             break;
         case 6:
-            ret += (binary ? "Ei" : "E") + unit;
+            ret += string(" ") + (binary ? "Ei" : "E") + unit;
             break;
         case 7:
-            ret += (binary ? "Zi" : "Z") + unit;
+            ret += string(" ") + (binary ? "Zi" : "Z") + unit;
             break;
         default:
-            ret += (binary ? "Yi" : "Y") + unit;
+            ret += string(" ") + (binary ? "Yi" : "Y") + unit;
             break;
         }
 
