@@ -239,13 +239,13 @@ namespace libdar
 	switch(options.get_list_mode())
 	{
 	case archive_options_listing_shell::normal:
-	    printf(gettext("[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size  |          Date                 |    filename"));
-	    printf("--------------------------------+------------+-------+-------+-------+-------------------------------+------------");
+	    printf(gettext("[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size    |          Date                 |    filename"));
+	    printf(        "--------------------------------+------------+-------+-------+---------+-------------------------------+------------");
 	    ref.op_listing(archive_listing_callback_tar, this, options);
 	    break;
 	case archive_options_listing_shell::tree:
-	    printf(gettext("Access mode    | User | Group | Size  |          Date                 | [Data ][D][ EA  ][FSA][Compr][S]|   Filename"));
-	    printf("---------------+------+-------+-------+-------------------------------+---------------------------------+-----------");
+	    printf(gettext("Access mode    | User | Group | Size   |          Date                 |[Data ][D][ EA  ][FSA][Compr][S]|   Filename"));
+	    printf(        "---------------+------+-------+--------+-------------------------------+--------------------------------+-----------");
 	    ref.op_listing(archive_listing_callback_tree, this, options);
 	    break;
 	case archive_options_listing_shell::xml:
