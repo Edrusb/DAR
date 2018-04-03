@@ -160,7 +160,7 @@ namespace libdar
     {
 	if((is_file() && has_data_present_in_the_archive())
 	   || is_dir())
-	    return tools_get_compression_ratio(storage_size,
+	    return tools_get_compression_ratio(storage_size_for_data,
 					       file_size,
 					       compression_algo != compression::none
 					       || is_sparse()
@@ -259,7 +259,6 @@ namespace libdar
 	last_change.nullify();
 	fsa_status = fsa_saved_status::none;
 	file_size = 0;
-	storage_size = 0;
 	sparse_file = false;
 	compression_algo = compression::none;
 	dirty = false;

@@ -382,7 +382,6 @@ namespace libdar
 	    const crc *crc_tmp = nullptr;
 
 	    ent.set_file_size(tmp_file->get_size());
-	    ent.set_storage_size(tmp_file->get_storage_size());
 	    ent.set_is_sparse_file(tmp_file->get_sparse_file_detection_read());
 	    ent.set_compression_algo(tmp_file->get_compression_algo_read());
 	    ent.set_dirtiness(tmp_file->is_dirty());
@@ -404,7 +403,7 @@ namespace libdar
 	if(tmp_dir != nullptr)
 	{
 	    ent.set_file_size(tmp_dir->get_size());
-	    ent.set_storage_size(tmp_dir->get_storage_size());
+	    ent.set_storage_size_for_data(tmp_dir->get_storage_size());
 	    ent.set_empty_dir(tmp_dir->is_empty());
 	}
 

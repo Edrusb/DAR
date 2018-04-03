@@ -224,7 +224,6 @@ namespace libdar
 	void set_last_change(const datetime & val) { last_change = val; };
 	void set_fsa_status(fsa_saved_status val) { fsa_status = val; };
 	void set_file_size(const infinint & val) { file_size = val; };
-	void set_storage_size(const infinint & val) { storage_size = val; };
 	void set_is_sparse_file(bool val) { sparse_file = val; };
 	void set_compression_algo(compression val) { compression_algo = val; };
 	void set_dirtiness(bool val) { dirty = val; };
@@ -264,7 +263,6 @@ namespace libdar
 	fsa_saved_status fsa_status;
 	fsa_scope fsa_sc;
 	infinint file_size;
-	infinint storage_size;
 	bool sparse_file;
 	compression compression_algo;
 	bool dirty;
