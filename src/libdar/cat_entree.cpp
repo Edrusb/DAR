@@ -386,7 +386,8 @@ namespace libdar
 	    ent.set_is_sparse_file(tmp_file->get_sparse_file_detection_read());
 	    ent.set_compression_algo(tmp_file->get_compression_algo_read());
 	    ent.set_dirtiness(tmp_file->is_dirty());
-	    if(tmp_file->get_saved_status() == saved_status::saved)
+	    if(tmp_file->get_saved_status() == saved_status::saved
+	       || tmp_file->get_saved_status() == saved_status::delta)
 	    {
 		ent.set_archive_offset_for_data(tmp_file->get_offset());
 		ent.set_storage_size_for_data(tmp_file->get_storage_size());
