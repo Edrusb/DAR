@@ -2842,6 +2842,10 @@ namespace libdar
 				    if(s_fic != nullptr)
 					s_fic->fadvise(fichier_global::advise_dontneed);
 				    source->terminate();
+
+					// we need this for amount of data written to be properly calculated
+				    pdesc.stack->sync_write_above(pdesc.compr);
+				    pdesc.compr->sync_write();
 				}
 				catch(...)
 				{
