@@ -358,20 +358,11 @@ namespace libdar
 		ent.set_storage_size_for_EA(tmp_inode->ea_get_size());
 		if(fetch_ea)
 		{
-		    const ea_attributs *owned = tmp_inode->get_ea();
+		    const ea_attributs *not_owned = tmp_inode->get_ea();
 
-		    try
-		    {
-			if(owned == nullptr)
-			    throw SRC_BUG;
-			ent.set_ea(*owned);
-		    }
-		    catch(...)
-		    {
-			delete owned;
-			throw;
-		    }
-		    delete owned;
+		    if(not_owned == nullptr)
+			throw SRC_BUG;
+		    ent.set_ea(*not_owned);
 		}
 	    }
 	    ent.set_fsa_status(tmp_inode->fsa_get_saved_status());

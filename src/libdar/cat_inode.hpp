@@ -126,6 +126,8 @@ namespace libdar
 
             // II : to associate EA list to an cat_inode object (mainly for backup operation) #EA_FULL only#
         void ea_attach(ea_attributs *ref);
+
+	    /// the returned value is the address of an existing file of the cat_inode object and shall not be deleted by the caller
         const ea_attributs *get_ea() const;              //   #<-- EA_FULL *and* EA_REMOVED# for this call only
         void ea_detach() const; //discards any future call to get_ea() !
 	infinint ea_get_size() const; //returns the size of EA (still valid if ea have been detached) mainly used to define CRC width
