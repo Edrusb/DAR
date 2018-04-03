@@ -37,6 +37,9 @@ from 2.5.14-bis to 2.5.15
 - adding slice overwriting verification before creating a isolated
   catalogue, to be coherent with other operation creating an archive
   (backup and merging)
+- storage size of compressed files was often wrongly stored in archive
+  (shorter than reality), the only impact took place at archive listing
+  time where the compression ratio was better than reality
 
 from 2.5.14 to 2.5.14-bis
 - avoiding using the syncfs() system call in dar_split when the
