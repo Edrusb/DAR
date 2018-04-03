@@ -277,6 +277,9 @@ namespace libdar
 	ea.clear();
 	it_ea = ea.begin();
 	etiquette = 0;
+	data_crc = "";
+	patch_base_crc = "";
+	patch_result_crc = "";
 	empty_dir = false;
     }
 
