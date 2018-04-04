@@ -1559,14 +1559,18 @@ namespace libdar
 		    throw SRC_BUG;
 
 		    // note:
-		    // an isolated catalogue keep the data, EA and FSA pointers of the archive they come from
-		    // but if they have delta signature their offset is those of the isolated catalogue archive
-		    // not/no more those of the archive the catalogue has been isolated from.
+		    // an isolated catalogue keeps the data, EA and FSA pointers of the archive they come from
+		    // but have their own copy of the delta signature if present, in order to be able to make
+		    // a differential/incremental delta binary based on an isplated catalogue. The drawback is
+		    // that reading an archive with the help of an isolated catalogue, the delta signature used
+		    // will always be those of the isolated catalogue, not those of the archive the catalogue
+		    // has been isolated from.
 		    // Using an isolated catalogue as backup of the internal catalogue stays possible but not
-		    // for the delta_signature that are ignored by libdar in that situation. However delta_signature
-		    // are only used at archive creation, thus reading an other archive as reference, either the
-		    // original archive with all its contents, or an isolated catalogue with metadata and eventually
-		    // delta_signatures.
+		    // for the delta_signature which are ignored by libdar in that situation (archive reading).
+		    // However as delta_signature are only used at archive creation time this does not hurt. Delta
+		    // signature will be available during a differential backup either from the isolated catalogue
+		    // using its own copy of them, or from the original archive which would contain their original
+		    // version.
 
 		if(options.get_delta_signature())
 		{
