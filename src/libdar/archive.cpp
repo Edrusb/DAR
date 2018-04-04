@@ -1238,7 +1238,9 @@ namespace libdar
 					      ent);
 			    if(local_check_dirty_seq(get_cat().get_escape_layer()))
 				ent.set_dirtiness(true);
-			    if(isolated && e->get_saved_status() == saved_status::saved)
+			    if(isolated &&
+			       (e->get_saved_status() == saved_status::saved
+				|| e->get_saved_status() == saved_status::delta))
 				ent.set_saved_status(saved_status::fake);
 			    try
 			    {
