@@ -1173,6 +1173,10 @@ namespace libdar
 
 	    if(options.get_slicing_location())
 	    {
+		if(!only_contains_an_isolated_catalogue()
+		   && sequential_read)
+		    throw Erange("archive::op_listing", gettext("slicing focused output is not available in sequential-read mode"));
+
 		slice_ptr = & used_layout;
 		if(!get_catalogue_slice_layout(used_layout))
 		{
