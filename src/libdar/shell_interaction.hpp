@@ -39,6 +39,7 @@ extern "C"
 
 #include "user_interaction.hpp"
 #include "database.hpp"
+#include "archive_options_listing_shell.hpp"
 
 namespace libdar
 {

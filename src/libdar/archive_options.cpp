@@ -1596,14 +1596,14 @@ namespace libdar
 	    {
 		x_slicing_first = new (nothrow) infinint(*ref.x_slicing_first);
 		if(x_slicing_first == nullptr)
-		    throw Ememory("archive_options_listing_shell::copy_from");
+		    throw Ememory("archive_options_listing::copy_from");
 	    }
 
 	    if(ref.x_slicing_others != nullptr)
 	    {
 		x_slicing_others = new (nothrow) infinint(*ref.x_slicing_others);
 		if(x_slicing_others == nullptr)
-		    throw Ememory("archive_options_listing_shell::copy_from");
+		    throw Ememory("archive_options_listing::copy_from");
 	    }
 
 	    x_info_details = ref.x_info_details;
@@ -1630,18 +1630,6 @@ namespace libdar
 	x_slicing_location = move(ref.x_slicing_location);
 	x_display_ea = move(ref.x_display_ea);
     }
-
-    	/////////////////////////////////////////////////////////
-	/////////////////////////////////////////////////////////
-	/////////////////////////////////////////////////////////
-
-    void archive_options_listing_shell::clear()
-    {
-	archive_options_listing::clear();
-	x_list_mode = normal;
-	x_sizes_in_bytes = false;
-    }
-
 
 	/////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////

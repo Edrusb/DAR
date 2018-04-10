@@ -27,6 +27,7 @@
 #define ARCHIVE_OPTIONS5_HPP
 
 #include "archive_options.hpp"
+#include "archive_options_listing_shell.hpp"
 
 namespace libdar5
 {

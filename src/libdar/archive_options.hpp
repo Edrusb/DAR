@@ -1351,55 +1351,6 @@ namespace libdar
     };
 
 	/////////////////////////////////////////////////////////
-	////// OPTIONS FOR LISTING AN ARCHIVE AS IN SHELL ///////
-	/////////////////////////////////////////////////////////
-
-	/// class holding optional shell specific parameters used to list the contents of an existing archive
-
-	/// \note this class is both used for historical reason and user convenience, but to simplify/clarity the API
-	/// the original archive_options_listing only retain the shell independant parameters
-    class archive_options_listing_shell: public archive_options_listing
-    {
-    public:
-	archive_options_listing_shell() { clear(); };
-	archive_options_listing_shell(const archive_options_listing_shell & ref) = default;
-	archive_options_listing_shell(archive_options_listing_shell && ref) noexcept = default;
-	archive_options_listing_shell & operator = (const archive_options_listing_shell & ref) = default;
-	archive_options_listing_shell & operator = (archive_options_listing_shell && ref) noexcept = default;
-	~archive_options_listing_shell() = default;
-
-	virtual void clear() override;
-
-	    /// defines the way archive listing is done:
-
-	enum listformat
-	{
-	    normal,   //< the tar-like listing (this is the default)
-	    tree,     //< the original dar's tree listing (for those that like forest)
-	    xml,      //< the xml catalogue output
-	    slicing   //< the slicing output (give info about where files are located)
-	};
-
-
-	    /////////////////////////////////////////////////////////////////////
-	    // setting methods
-
-	void set_list_mode(listformat list_mode) { x_list_mode = list_mode; set_slicing_location(list_mode == slicing); };
-	void set_sizes_in_bytes(bool arg) { x_sizes_in_bytes = arg; };
-
-	    /////////////////////////////////////////////////////////////////////
-	    // getting methods
-
-	listformat get_list_mode() const { return x_list_mode; };
-	bool get_sizes_in_bytes() const { return x_sizes_in_bytes; };
-
-    private:
-	listformat x_list_mode;
-	bool x_sizes_in_bytes;
-    };
-
-
-	/////////////////////////////////////////////////////////
 	////////// OPTONS FOR DIFFING AN ARCHIVE ////////////////
 	/////////////////////////////////////////////////////////
 
