@@ -48,7 +48,7 @@ namespace libdar
 
 	/// zapette emulate a file that is remotely controlled by slave_zapette
 
-	/// class zapette sends order to slave_zapette throw a
+	/// class zapette sends order to slave_zapette through a
 	/// a first pipe and receive informations or data in return
 	/// from a second pipe from slave_zapette
 	/// \ingroup Private
@@ -123,39 +123,6 @@ namespace libdar
 	    /// string
 
 	void make_transfert(U_16 size, const infinint &offset, char *data, const std::string & info, S_I & lu, infinint & arg) const;
-    };
-
-	/// this class answers to order given by a zapette object
-
-	/// through a pair of pipes slave_zapette return information about
-	/// a given local archive (single or multi slices).
-	/// \ingroup Private
-    class slave_zapette
-    {
-    public:
-
-	    /// slave_zapette constructor
-
-	    /// \param[in] input is used to receive orders from an zapette object
-	    /// \param[in] output is used to return informations or data in answer to received orders
-	    /// \param[in] data is where the informations or data is taken from. Object must inherit from contextual
-        slave_zapette(generic_file *input, generic_file *output, generic_file *data);
-	slave_zapette(const slave_zapette & ref) = default;
-	slave_zapette & operator = (const slave_zapette & ref) = default;
-        ~slave_zapette();
-
-
-	    /// main execution method for slave_zapette class
-
-	    /// this method implement a loop waiting for orders and answering to them
-	    /// the loop stops when a special order is received from the peer zapette object
-        void action();
-
-    private:
-        generic_file *in;     //< where to read orders from
-	generic_file *out;    //< where to send requested info or data to
-	generic_file *src;    //< where to read data from
-	contextual *src_ctxt; //< same as src but seen as contextual
     };
 
 	/// @}

@@ -60,7 +60,7 @@ extern "C"
     // to be removed when dar_slave will be part of libdar
 #include "tuyau.hpp"
 #include "sar.hpp"
-#include "zapette.hpp"
+#include "slave_zapette.hpp"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define OPT_STRING "i:o:hVE:Qj9:"
@@ -136,7 +136,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 			     input,
 			     output);
 
-	    libdar::slave_zapette zap = libdar::slave_zapette(input, output, source);
+	    libdar::slave_zapette zap(input, output, source);
             input = output = nullptr; // now managed by zap;
             source = nullptr;  // now managed by zap;
 
