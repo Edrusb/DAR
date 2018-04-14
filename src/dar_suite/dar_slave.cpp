@@ -71,8 +71,13 @@ using namespace std;
 #define DAR_SLAVE_VERSION "1.4.10"
 
 static bool command_line(shell_interaction & dialog,
-			 S_I argc, char * const argv[], path * &chemin, string & filename,
-                         string &input_pipe, string &output_pipe, string & execute,
+			 S_I argc,
+			 char * const argv[],
+			 string & chemin,
+			 string & filename,
+                         string & input_pipe,
+			 string & output_pipe,
+			 string & execute,
 			 infinint & min_digits);
 static void show_usage(shell_interaction & dialog, const char *command);
 static void show_version(shell_interaction & dialog, const char *command);
@@ -93,7 +98,7 @@ int main(S_I argc, char * const argv[], const char **env)
 
 static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const argv[], const char **env)
 {
-    path *chemin = nullptr;
+    string chemin;
     string filename;
     string input_pipe;
     string output_pipe;
@@ -108,67 +113,15 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 
     if(command_line(*ptr, argc, argv, chemin, filename, input_pipe, output_pipe, execute, min_digits))
     {
-	libdar::tuyau *input = nullptr;
-	libdar::tuyau *output = nullptr;
-	libdar::sar *source = nullptr;
-	entrepot_local entrep = entrepot_local("", "", false);
-
-	if(chemin == nullptr)
-	    throw SRC_BUG;
-
-	entrep.set_location(*chemin);
-        try
-        {
-	    source = new (nothrow) libdar::sar(dialog,
-					       filename,
-					       EXTENSION,
-					       entrep,
-					       true,
-					       min_digits,
-					       false,
-					       execute);
-            if(source == nullptr)
-                throw Ememory("little_main");
-
-            tools_open_pipes(dialog,
-			     input_pipe,
-			     output_pipe,
-			     input,
-			     output);
-
-	    libdar::slave_zapette zap(input, output, source);
-            input = output = nullptr; // now managed by zap;
-            source = nullptr;  // now managed by zap;
-
-            try
-            {
-                zap.action();
-            }
-            catch(Erange &e)
-            {
-                dialog->message(e.get_message());
-                throw Edata(e.get_message());
-            }
-        }
-        catch(...)
-        {
-            delete chemin;
-            if(input != nullptr)
-                delete input;
-            if(output != nullptr)
-                delete output;
-            if(source != nullptr)
-                delete source;
-            throw;
-        }
-        delete chemin;
-        if(input != nullptr)
-            delete input;
-        if(output != nullptr)
-            delete output;
-        if(source != nullptr)
-            delete source;
-
+	libdar::libdar_slave slave(dialog,
+				   chemin,
+				   filename,
+				   EXTENSION,
+				   input_pipe,
+				   output_pipe,
+				   execute,
+				   min_digits);
+	slave.run();
         return EXIT_OK;
     }
     else
@@ -176,12 +129,18 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 }
 
 static bool command_line(shell_interaction & dialog,
-			 S_I argc,char * const argv[], path * &chemin, string & filename,
-                         string &input_pipe, string &output_pipe, string & execute,
+			 S_I argc,
+			 char* const argv[],
+			 string & chemin,
+			 string & filename,
+                         string & input_pipe,
+			 string & output_pipe,
+			 string & execute,
     			 infinint & min_digits)
 {
     S_I lu;
     execute = "";
+    path *tmp = nullptr;
 
     if(argc < 1)
     {
@@ -255,8 +214,28 @@ static bool command_line(shell_interaction & dialog,
         return false;
     }
 
-    tools_split_path_basename(argv[optind], chemin, filename);
-    tools_check_basename(dialog, *chemin, filename, EXTENSION);
+    try
+    {
+	tools_split_path_basename(argv[optind], tmp, filename);
+	if(tmp == nullptr)
+	    throw SRC_BUG;
+	chemin = tmp->display();
+    }
+    catch(...)
+    {
+	if(tmp != nullptr)
+	{
+	    delete tmp;
+	    tmp = nullptr;
+	}
+	throw;
+    }
+    if(tmp != nullptr)
+    {
+	delete tmp;
+	tmp = nullptr;
+    }
+
     return true;
 }
 

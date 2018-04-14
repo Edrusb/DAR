@@ -49,6 +49,9 @@ namespace libdar
 	tuyau *input = nullptr;
 	tuyau *output = nullptr;
 	sar *source = nullptr;
+	string base = basename;
+
+	tools_check_basename(*dialog, chemin, base, extension);
 
 	entrep.reset(new (nothrow) entrepot_local("", "", false));
 	if(!entrep)
@@ -59,7 +62,7 @@ namespace libdar
 	try
 	{
 	    source = new (nothrow) sar(dialog,
-				       basename,
+				       base,
 				       extension,
 				       *entrep,
 				       true,

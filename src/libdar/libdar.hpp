@@ -86,5 +86,6 @@
 #include "database.hpp"
 #include "get_version.hpp"
 #include "shell_interaction.hpp"
+#include "libdar_slave.hpp"
 
 #endif
