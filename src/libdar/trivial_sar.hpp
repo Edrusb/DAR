@@ -79,6 +79,9 @@ namespace libdar
 		    const std::string & pipename,      //< if set to '-' the data are read from standard input, else the given file is expected to be named pipe to read data from
 		    bool lax);                         //< whether to be laxist or follow the normal and strict controlled procedure
 
+	trivial_sar(const std::shared_ptr<user_interaction> & dialog,  //< how to interact with the user
+		    int filedescriptor,                //< if set to '-' the data are read from standard input, else the given file is expected to be named pipe to read data from
+		    bool lax);                         //< whether to be laxist or follow the normal and strict controlled procedure
 
 	    /// constructor to write a (single sliced) archive to a anonymous pipe
 	trivial_sar(const std::shared_ptr<user_interaction> & dialog,

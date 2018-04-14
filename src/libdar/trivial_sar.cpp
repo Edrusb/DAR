@@ -309,6 +309,45 @@ namespace libdar
     }
 
     trivial_sar::trivial_sar(const shared_ptr<user_interaction> & dialog,
+			     int filedescriptor,
+			     bool lax) : generic_file(gf_read_only) , mem_ui(dialog)
+    {
+	label for_init;
+	reference = nullptr;
+	offset = 0;
+	cur_pos = 0;
+	end_of_slice = 0;
+	hook = "";
+	base = "";
+	ext = "";
+	old_sar = false;
+	min_digits = 0;
+	hook_where = "";
+	base_url = "";
+	natural_destruction = true;
+
+	set_info_status(CONTEXT_INIT);
+	try
+	{
+	    reference = new (nothrow) tuyau(dialog, filedescriptor, gf_read_only);
+	    if(reference == nullptr)
+		throw Ememory("trivial_sar::trivial_sar");
+
+	    for_init.clear();
+	    init(for_init);
+	}
+	catch(...)
+	{
+	    if(reference != nullptr)
+	    {
+		delete reference;
+		reference = nullptr;
+	    }
+	    throw;
+	}
+    }
+
+    trivial_sar::trivial_sar(const shared_ptr<user_interaction> & dialog,
 			     generic_file *f,
 			     const label & internal_name,
 			     const label & data_name,
