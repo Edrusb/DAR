@@ -115,7 +115,7 @@ static S_I sub_main(shared_ptr<user_interaction> & dialog, S_I argc, char * cons
 
     if(!dialog)
 	throw SRC_BUG;
-    if(ptr != nullptr)
+    if(ptr == nullptr)
 	throw SRC_BUG;
 
     try
