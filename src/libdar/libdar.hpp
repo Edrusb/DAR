@@ -87,5 +87,6 @@
 #include "get_version.hpp"
 #include "shell_interaction.hpp"
 #include "libdar_slave.hpp"
+#include "libdar_xform.hpp"
 
 #endif
