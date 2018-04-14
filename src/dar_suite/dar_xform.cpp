@@ -41,7 +41,6 @@ extern "C"
 #include <iostream>
 #include <new>
 
-#include "tools.hpp"
 #include "dar_suite.hpp"
 #include "libdar.hpp"
 #include "line_tools.hpp"
@@ -49,6 +48,7 @@ extern "C"
 #include "trivial_sar.hpp"
 #include "sar.hpp"
 #include "macro_tools.hpp"
+#include "libdar.hpp"
     //  ---
 
 using namespace libdar;
@@ -112,6 +112,7 @@ static S_I sub_main(shared_ptr<user_interaction> & dialog, S_I argc, char * cons
     infinint dst_min_digits;
     S_I ret = EXIT_OK;
     shell_interaction *ptr = dynamic_cast<shell_interaction *>(dialog.get());
+    std::unique_ptr<libdar_xform> xform;
 
     if(!dialog)
 	throw SRC_BUG;
@@ -124,178 +125,40 @@ static S_I sub_main(shared_ptr<user_interaction> & dialog, S_I argc, char * cons
 			warn, allow, pause, beep, execute_src, execute_dst, slice_perm, slice_user, slice_group, hash,
 			src_min_digits, dst_min_digits))
 	{
-	    generic_file *dst_sar = nullptr;
-	    generic_file *src_sar = nullptr;
-	    label data_name;
-	    label internal_name;
-	    entrepot_local entrep = entrepot_local(slice_user, slice_group, false);
-	    bool format_07_compatible = false;
-	    bool force_perm = slice_perm != "";
-	    U_I perm = force_perm ? tools_octal2int(slice_perm) : 0;
+	    if(dst != "-")
+		ptr->change_non_interactive_output(cout);
+	    ptr->set_beep(beep);
 
-	    if(dst_dir == nullptr)
-		throw SRC_BUG;
-	    entrep.set_location(*dst_dir);
 
-	    data_name.clear();
-	    internal_name.generate_internal_filename();
-	    try
-	    {
-		if(dst != "-")
-		{
-		    ptr->change_non_interactive_output(cout);
-		    tools_avoid_slice_overwriting_regex(*dialog,
-							entrep,
-							dst,
-							EXTENSION,
-							false,
-							allow,
-							warn,
-							false);
-		}
+	    if(src == "-")
+		xform.reset(new (nothrow) libdar_xform(dialog, 0));
+	    else
+		xform.reset(new (nothrow) libdar_xform(dialog,
+						       src_dir->display(),
+						       src,
+						       EXTENSION,
+						       src_min_digits,
+						       execute_src));
+	    if(!xform)
+		throw Ememory("dar_xform");
 
-		thr.check_self_cancellation();
-
-		ptr->set_beep(beep);
-		if(src == "-")
-		{
-		    libdar::trivial_sar *tmp_sar = new (nothrow) libdar::trivial_sar(dialog, src, false);
-		    if(tmp_sar == nullptr)
-			throw Ememory("sub_main");
-		    format_07_compatible = tmp_sar->is_an_old_start_end_archive();
-
-		    src_sar = tmp_sar;
-		    if(src_sar != nullptr)
-			data_name = tmp_sar->get_data_name();
-		    else
-			throw SRC_BUG;
-		}
-		else 	// source not from a pipe
-		{
-		    if(src_dir != nullptr)
-			entrep.set_location(*src_dir);
-		    else
-			throw SRC_BUG;
-
-		    libdar::sar *tmp_sar = new (nothrow) libdar::sar(dialog,
-								     src,
-								     EXTENSION,
-								     entrep,
-								     false,
-								     src_min_digits,
-								     false,
-								     execute_src);
-		    if(tmp_sar == nullptr)
-			throw Ememory("main");
-		    else
-			tmp_sar->set_info_status(CONTEXT_OP);
-		    format_07_compatible = tmp_sar->is_an_old_start_end_archive();
-		    src_sar = tmp_sar;
-		    if(src_sar != nullptr)
-			data_name = tmp_sar->get_data_name();
-		    else
-			throw SRC_BUG;
-		}
-
-		if(size.is_zero())
-		    if(dst == "-")
-			dst_sar = macro_tools_open_archive_tuyau(dialog,
-								 1,
-								 gf_write_only,
-								 internal_name,
-								 data_name,
-								 format_07_compatible,
-								 execute_dst);
-		    else
-		    {
-			if(dst_dir != nullptr)
-			    entrep.set_location(*dst_dir);
-			else
-			    throw SRC_BUG;
-			dst_sar = new (nothrow) libdar::trivial_sar(dialog,
-								    gf_write_only,
-								    dst,
-								    EXTENSION,
-								    entrep,
-								    internal_name,
-								    data_name,
-								    execute_dst,
-								    allow,
-								    warn,
-								    force_perm,
-								    perm,
-								    hash,
-								    dst_min_digits,
-								    format_07_compatible);
-		    }
-		else
-		{
-		    if(dst_dir != nullptr)
-			entrep.set_location(*dst_dir);
-		    else
-			throw SRC_BUG;
-		    dst_sar = new (nothrow) libdar::sar(dialog,
-							gf_write_only,
-							dst,
-							EXTENSION,
-							size,
-							first,
-							warn,
-							allow,
-							pause,
-							entrep,
-							internal_name,
-							data_name,
-							force_perm,
-							perm,
-							hash,
-							dst_min_digits,
-							format_07_compatible,
-							execute_dst);
-		}
-		if(dst_sar == nullptr)
-		    throw Ememory("main");
-
-		thr.check_self_cancellation();
-		try
-		{
-		    src_sar->copy_to(*dst_sar);
-		}
-		catch(Escript & e)
-		{
-		    throw;
-		}
-		catch(Euser_abort & e)
-		{
-		    throw;
-		}
-		catch(Ebug & e)
-		{
-		    throw;
-		}
-		catch(Ethread_cancel & e)
-		{
-		    throw;
-		}
-		catch(Egeneric & e)
-		{
-		    string msg = string(gettext("Error transforming the archive :"))+e.get_message();
-		    dialog->message(msg);
-		    throw Edata(msg);
-		}
-	    }
-	    catch(...)
-	    {
-		if(dst_sar != nullptr)
-		    delete dst_sar;
-		if(src_sar != nullptr)
-		    delete src_sar;
-		throw;
-	    }
-	    if(src_sar != nullptr)
-		delete src_sar;
-	    if(dst_sar != nullptr)
-		delete dst_sar;
+	    if(dst == "-")
+		xform->xform_to(1, execute_dst);
+	    else
+		xform->xform_to(dst_dir->display(),
+				dst,
+				EXTENSION,
+				allow,
+				warn,
+				pause,
+				first,
+				size,
+				slice_perm,
+				slice_user,
+				slice_group,
+				hash,
+				dst_min_digits,
+				execute_dst);
 
 	    ret = EXIT_OK;
 	}
