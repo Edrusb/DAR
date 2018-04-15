@@ -148,7 +148,7 @@ namespace libdar
 	entrep->set_group_ownership(slice_group);
 	tools_avoid_slice_overwriting_regex(get_ui(),
 					    *entrep,
-					    chem,
+					    basename,
 					    extension,
 					    false,
 					    allow_over,
@@ -161,7 +161,7 @@ namespace libdar
 	{
 	    destination.reset(new (nothrow) libdar::trivial_sar(get_pointer(),
 								gf_write_only,
-								chem,
+								basename,
 								extension,
 								*entrep,
 								internal_name,
@@ -179,7 +179,7 @@ namespace libdar
 	{
 	    destination.reset(new (nothrow) libdar::sar(get_pointer(),
 							gf_write_only,
-							chem,
+							basename,
 							extension,
 							slice_size,
 							first_slice_size,
