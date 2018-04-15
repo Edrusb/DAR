@@ -574,7 +574,7 @@ namespace libdar
 				// convert all data to unsaved
 			    ref_arch1->set_to_unsaved_data_and_FSA();
 
-		    if(!ref_arch2)
+		    if(ref_arch2)
 			if(ref_arch2->only_contains_an_isolated_catalogue())
 			    ref_arch2->set_to_unsaved_data_and_FSA();
 
