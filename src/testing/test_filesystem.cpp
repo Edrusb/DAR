@@ -197,7 +197,7 @@ static void test()
             delete entree;
         }
     }
-    cat->listing(*ui, false, all, all, false, false, false, "");
+//  cat->listing(*ui, false, all, all, false, false, false, "");
 }
 
 static void re_test()

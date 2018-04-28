@@ -191,7 +191,8 @@ void f2()
 	label lax_label;
 
 	lax_label.clear();
-        cat.listing(*ui, false, tmp, tmp, false, false, false, "");
+//        cat.listing(*ui, false, tmp, tmp, false, false, false, "");
+// listing feature has been moved out of catalogue to archive class for release 2.6.0
 
         cat.reset_add();
         try
@@ -212,7 +213,7 @@ void f2()
         cat.add(new cat_prise(1030, 108, 0650, datetime(19), datetime(20), datetime(21),  "prise", 0));
         cat.add(new cat_detruit("ancien fichier", 'f', datetime(102)));
 
-        cat.listing(*ui, false, tmp, tmp, false, false, false, "");
+//        cat.listing(*ui, false, tmp, tmp, false, false, false, "");
 
         cat.reset_read();
         while(cat.read(ref))
@@ -245,7 +246,7 @@ void f2()
         cat.dump(pdesc);
         stack.skip(0);
         catalogue lst(ui, pdesc, macro_tools_supported_version, compression::none, false, lax_label);
-        lst.listing(*ui, false, tmp, tmp, false, false, false, "");
+//        lst.listing(*ui, false, tmp, tmp, false, false, false, "");
         bool ok;
 
         lst.reset_read();
@@ -322,8 +323,8 @@ void f3()
 
     dif.update_destroyed_with(cat);
 
-    cat.listing(*ui, false, tmp, tmp, false, false, false, "");
-    dif.listing(*ui, false, tmp, tmp, false, false, false, "");
+//    cat.listing(*ui, false, tmp, tmp, false, false, false, "");
+//    dif.listing(*ui, false, tmp, tmp, false, false, false, "");
 }
 
 
