@@ -2111,28 +2111,6 @@ namespace libdar
         return buf.st_size;
     }
 
-    bool tools_find_next_char_out_of_parenthesis(const string & data, const char what,  U_32 start, U_32 & found)
-    {
-        U_32 nested_parenth = 0;
-
-        while(start < data.size() && (nested_parenth != 0 || data[start] != what))
-        {
-            if(data[start] == '(')
-                nested_parenth++;
-            if(data[start] == ')' && nested_parenth > 0)
-                nested_parenth--;
-            start++;
-        }
-
-        if(start < data.size() && nested_parenth == 0 && data[start] == what)
-        {
-            found = start;
-            return true;
-        }
-        else
-            return false;
-    }
-
     string tools_substitute(const string & hook,
                             const map<char, string> & corres)
     {

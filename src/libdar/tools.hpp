@@ -664,19 +664,6 @@ namespace libdar
 	tools_split_in_words(mem, mots);
     }
 
-	/// look next char in string out of parenthesis
-
-	/// \param[in] data is the string to look into
-	/// \param[in] what is the char to look for
-	/// \param[in] start is the index in string to start from, assuming at given position we are out of parenthesis
-	/// \param[out] found the position of the next char equal to what
-	/// \return true if a char equal to 'what' has been found and set the 'found' argument to its position or returns false if
-	/// no such character has been found out of parenthesis
-	/// \note the 'found' argument is assigned only if the call returns true, its value is not to be used when false is returned from the call
-	/// \note second point, the start data should point to a character that is out of any parenthesis, behavior is undefined else.
-    extern bool tools_find_next_char_out_of_parenthesis(const std::string & data, const char what,  U_32 start, U_32 & found);
-
-
 	/// produce the string resulting from the substition of % macro defined in the map
 
 	/// \param[in] hook is the user's expression in which to proceed to substitution
