@@ -63,7 +63,7 @@ namespace libdar
 	    source = new (nothrow) sar(dialog,
 				       base,
 				       extension,
-				       *entrep,
+				       entrep,
 				       true,
 				       min_digits,
 				       false,

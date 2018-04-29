@@ -75,7 +75,7 @@ namespace libdar
         NLS_SWAP_IN;
         try
         {
-	    entrepot *where = options.get_entrepot().clone();
+	    shared_ptr<entrepot> where = options.get_entrepot();
 	    bool info_details = options.get_info_details();
 
 	    if(where == nullptr)
@@ -103,7 +103,7 @@ namespace libdar
 
 			// we open the main archive to get the different layers (level1, scram and level2).
 		    macro_tools_open_archive(get_pointer(),
-					     *where,
+					     where,
 					     basename,
 					     options.get_slice_min_digits(),
 					     extension,
@@ -137,7 +137,7 @@ namespace libdar
 		    if(options.is_external_catalogue_set())
 		    {
 			pile ref_stack;
-			entrepot *ref_where = options.get_ref_entrepot().clone();
+			shared_ptr<entrepot> ref_where = options.get_ref_entrepot();
 			if(ref_where == nullptr)
 			    throw Ememory("archive::archive");
 
@@ -159,7 +159,7 @@ namespace libdar
 
 				    // we open the archive of reference also to get its different layers (ref_stack)
 				macro_tools_open_archive(get_pointer(),
-							 *ref_where,
+							 ref_where,
 							 options.get_ref_basename(),
 							 options.get_ref_slice_min_digits(),
 							 extension,
@@ -203,12 +203,10 @@ namespace libdar
 			}
 			catch(...)
 			{
-			    if(ref_where != nullptr)
-				delete ref_where;
+			    ref_where.reset();
 			    throw;
 			}
-			if(ref_where != nullptr)
-			    delete ref_where;
+			ref_where.reset();
 
 			    // fetching the catalogue in the archive of reference, making it point on the main archive layers.
 
@@ -381,12 +379,10 @@ namespace libdar
 		}
 		catch(...)
 		{
-		    if(where != nullptr)
-			delete where;
+		    where.reset();
 		    throw;
 		}
-		if(where != nullptr)
-		    delete where;
+		where.reset();
 	    }
 	    catch(...)
 	    {
@@ -419,7 +415,7 @@ namespace libdar
 
 	    try
 	    {
-		entrepot *sauv_path_t = options.get_entrepot().clone();
+		shared_ptr<entrepot> sauv_path_t = options.get_entrepot();
 		if(sauv_path_t == nullptr)
 		    throw Ememory("archive::archive");
 		sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
@@ -431,7 +427,7 @@ namespace libdar
 		    sequential_read = false; // updating the archive field
 		    (void)op_create_in(oper_create,
 				       tools_relative2absolute_path(fs_root, tools_getcwd()),
-				       *sauv_path_t,
+				       sauv_path_t,
 				       options.get_reference().get(),
 				       options.get_selection(),
 				       options.get_subtree(),
@@ -498,12 +494,10 @@ namespace libdar
 		}
 		catch(...)
 		{
-		    if(sauv_path_t != nullptr)
-			delete sauv_path_t;
+		    sauv_path_t.reset();
 		    throw;
 		}
-		if(sauv_path_t != nullptr)
-		    delete sauv_path_t;
+		sauv_path_t.reset();
 	    }
 	    catch(...)
 	    {
@@ -536,8 +530,8 @@ namespace libdar
 	catalogue *ref_cat2 = nullptr;
 	shared_ptr<archive> ref_arch2 = options.get_auxilliary_ref();
 	compression algo_kept = compression::none;
-	entrepot *sauv_path_t = options.get_entrepot().clone();
-	entrepot_local *sauv_path_t_local = dynamic_cast<entrepot_local *>(sauv_path_t);
+	shared_ptr<entrepot> sauv_path_t = options.get_entrepot();
+	entrepot_local *sauv_path_t_local = dynamic_cast<entrepot_local *>(sauv_path_t.get());
 
 	NLS_SWAP_IN;
 	try
@@ -655,7 +649,7 @@ namespace libdar
 			// then we call op_create_in_sub which will call filter_merge operation to build the archive described by the catalogue
 		    op_create_in_sub(oper_merge,
 				     path(FAKE_ROOT),
-				     *sauv_path_t,
+				     sauv_path_t,
 				     ref_cat1,
 				     ref_cat2,
 				     false,  // initial_pause
@@ -728,14 +722,10 @@ namespace libdar
 		}
 		catch(...)
 		{
-		    if(sauv_path_t != nullptr)
-			delete sauv_path_t;
+		    sauv_path_t.reset();
 		    throw;
 		}
-
-		if(sauv_path_t != nullptr)
-		    delete sauv_path_t;
-		sauv_path_t = nullptr;
+		sauv_path_t.reset();
 	    }
 	    catch(...)
 	    {
@@ -762,7 +752,7 @@ namespace libdar
 		     const archive_options_repair & options_repair): mem_ui(dialog)
     {
 	archive_options_read my_options_read = options_read;
-	bool initial_pause = (options_read.get_entrepot() == options_repair.get_entrepot() && chem_src == chem_dst);
+	bool initial_pause = (*options_read.get_entrepot() == *options_repair.get_entrepot() && chem_src == chem_dst);
 	statistics not_filled;
 
 	    ////
@@ -781,7 +771,7 @@ namespace libdar
 	    ////
 	    // initial parameter setup
 
-	entrepot *sauv_path_t = options_repair.get_entrepot().clone();
+	shared_ptr<entrepot> sauv_path_t = options_repair.get_entrepot();
 	if(sauv_path_t == nullptr)
 	    throw Ememory("archive::archive(repair)");
 
@@ -816,7 +806,7 @@ namespace libdar
 
 	    op_create_in_sub(oper_repair,
 			     chem_dst,
-			     *sauv_path_t,
+			     sauv_path_t,
 			     src.cat,             // ref1
 			     nullptr,             // ref2
 			     initial_pause,
@@ -893,18 +883,12 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    if(sauv_path_t != nullptr)
-	    {
-		delete sauv_path_t;
-		sauv_path_t = nullptr;
-	    }
+	    if(!sauv_path_t)
+		sauv_path_t.reset();
 	    throw;
 	}
-	if(sauv_path_t != nullptr)
-	{
-	    delete sauv_path_t;
-	    sauv_path_t = nullptr;
-	}
+	if(!sauv_path_t)
+	    sauv_path_t.reset();
     }
 
 
@@ -1489,10 +1473,10 @@ namespace libdar
         NLS_SWAP_IN;
         try
         {
-	    entrepot *sauv_path_t = options.get_entrepot().clone();
+	    shared_ptr<entrepot> sauv_path_t = options.get_entrepot();
 	    if(sauv_path_t == nullptr)
 		throw Ememory("archive::archive");
-	    const entrepot_local *sauv_path_t_local = dynamic_cast<const entrepot_local *>(sauv_path_t);
+	    const entrepot_local *sauv_path_t_local = dynamic_cast<const entrepot_local *>(sauv_path_t.get());
 
 	    sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
 	    sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
@@ -1532,7 +1516,7 @@ namespace libdar
 					  isol_ver,
 					  isol_slices,
 					  &slices, // giving our slice_layout as reference to be stored in the archive header/trailer
-					  *sauv_path_t,
+					  sauv_path_t,
 					  filename,
 					  extension,
 					  options.get_allow_over(),
@@ -1614,13 +1598,10 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		if(sauv_path_t != nullptr)
-		    delete sauv_path_t;
+		sauv_path_t.reset();
 		throw;
 	    }
-
-	    if(sauv_path_t != nullptr)
-		delete sauv_path_t;
+	    sauv_path_t.reset();
         }
         catch(...)
         {
@@ -1934,7 +1915,7 @@ namespace libdar
 
     statistics archive::op_create_in(operation op,
 				     const path & fs_root,
-                                     const entrepot & sauv_path_t,
+                                     const shared_ptr<entrepot> & sauv_path_t,
 				     archive *ref_arch,
                                      const mask & selection,
 				     const mask & subtree,
@@ -2022,15 +2003,15 @@ namespace libdar
 
 	catalogue *ref_cat = nullptr;
 	bool initial_pause = false;
-	path sauv_path_abs = sauv_path_t.get_location();
-	const entrepot_local *sauv_path_t_local = dynamic_cast<const entrepot_local *>(&sauv_path_t);
+	path sauv_path_abs = sauv_path_t->get_location();
+	const entrepot_local *sauv_path_t_local = dynamic_cast<const entrepot_local *>(sauv_path_t.get());
 	path fs_root_abs = fs_root.is_relative() ? tools_relative2absolute_path(fs_root, tools_getcwd()) : fs_root;
 
 	if(sauv_path_abs.is_relative())
-	    sauv_path_abs = sauv_path_t.get_root() + sauv_path_abs;
+	    sauv_path_abs = sauv_path_t->get_root() + sauv_path_abs;
 
 	tools_avoid_slice_overwriting_regex(get_ui(),
-					    sauv_path_t,
+					    *sauv_path_t,
 					    filename,
 					    extension,
 					    info_details,
@@ -2080,9 +2061,9 @@ namespace libdar
 
 	if(ref_arch != nullptr) // from a existing archive
 	{
-	    const entrepot *ref_where = ref_arch->get_entrepot();
-	    if(ref_where != nullptr)
-		initial_pause = (*ref_where == sauv_path_t);
+	    const shared_ptr<entrepot> ref_where = ref_arch->get_entrepot();
+	    if(ref_where)
+		initial_pause = (*ref_where == *sauv_path_t);
 	    ref_cat = const_cast<catalogue *>(& ref_arch->get_catalogue());
 	}
 
@@ -2161,7 +2142,7 @@ namespace libdar
 
     void archive::op_create_in_sub(operation op,
 				   const path & fs_root,
-				   const entrepot & sauv_path_t,
+				   const shared_ptr<entrepot> & sauv_path_t,
 				   catalogue *ref_cat1,
 				   const catalogue *ref_cat2,
 				   bool initial_pause,
@@ -2730,22 +2711,21 @@ namespace libdar
             return false;
     }
 
-    const entrepot *archive::get_entrepot()
+    shared_ptr<entrepot> archive::get_entrepot()
     {
-	const entrepot *ret = nullptr;
+	shared_ptr<entrepot> ret;
 	sar *real_decoupe = nullptr;
 
 	stack.find_first_from_bottom(real_decoupe);
 	if(real_decoupe != nullptr)
 	{
 	    ret = real_decoupe->get_entrepot();
-	    if(ret == nullptr)
+	    if(!ret)
 		throw SRC_BUG;
 	}
 
 	return ret;
     }
-
 
     infinint archive::get_level2_size()
     {

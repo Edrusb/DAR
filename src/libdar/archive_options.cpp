@@ -92,15 +92,13 @@ namespace libdar
 	/////////////////////////////////////////////////////////
 
     archive_options_read::archive_options_read(archive_options_read && ref) noexcept
-	: x_entrepot(nullptr), x_ref_chem("/"), x_ref_entrepot(nullptr)
+	: x_ref_chem("/")
     {
 	move_from(std::move(ref));
     }
 
     archive_options_read::archive_options_read() : x_ref_chem(default_ref_chem)
     {
-	x_entrepot = nullptr;
-	x_ref_entrepot = nullptr;
 	clear();
     }
 
@@ -108,8 +106,6 @@ namespace libdar
     {
 
 	    // setting the default values for all options
-
-	destroy();
 
 	x_crypto = crypto_algo::none;
 	x_pass.clear();
@@ -121,8 +117,8 @@ namespace libdar
 	x_lax = false;
 	x_sequential_read = false;
 	x_slice_min_digits = 0;
-	x_entrepot = new (nothrow) entrepot_local("", "", false); // never using furtive_mode to read slices
-	if(x_entrepot == nullptr)
+	x_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local("", "", false)); // never using furtive_mode to read slices
+	if(!x_entrepot)
 	    throw Ememory("archive_options_read::clear");
 	x_ignore_signature_check_failure = false;
 	x_multi_threaded = true;
@@ -136,8 +132,8 @@ namespace libdar
 	x_ref_crypto_size = default_crypto_size;
 	x_ref_execute = "";
 	x_ref_slice_min_digits = 0;
-	x_ref_entrepot = new (nothrow) entrepot_local("", "", false); // never using furtive_mode to read slices
-	if(x_ref_entrepot == nullptr)
+	x_ref_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local("", "", false)); // never using furtive_mode to read slices
+	if(!x_ref_entrepot)
 	    throw Ememory("archive_options_read::clear");
 	x_header_only = false;
     }
@@ -204,11 +200,9 @@ namespace libdar
 	x_lax = ref.x_lax;
 	x_sequential_read = ref.x_sequential_read;
 	x_slice_min_digits = ref.x_slice_min_digits;
-	if(ref.x_entrepot == nullptr)
+	if(!ref.x_entrepot)
 	    throw SRC_BUG;
-	x_entrepot = ref.x_entrepot->clone();
-	if(x_entrepot == nullptr)
-	    throw Ememory("archive_options_read::copy_from");
+	x_entrepot = ref.x_entrepot;
 	x_ignore_signature_check_failure = ref.x_ignore_signature_check_failure;
 	x_multi_threaded = ref.x_multi_threaded;
 	    //
@@ -221,11 +215,9 @@ namespace libdar
 	x_ref_crypto_size = ref.x_ref_crypto_size;
 	x_ref_execute = ref.x_ref_execute;
 	x_ref_slice_min_digits = ref.x_ref_slice_min_digits;
-	if(ref.x_ref_entrepot == nullptr)
+	if(!ref.x_ref_entrepot)
 	    throw SRC_BUG;
-	x_ref_entrepot = ref.x_ref_entrepot->clone();
-	if(x_ref_entrepot == nullptr)
-	    throw Ememory("archive_options_read::copy_from");
+	x_ref_entrepot = ref.x_ref_entrepot;
 	x_header_only = ref.x_header_only;
     }
 
@@ -241,7 +233,7 @@ namespace libdar
 	x_lax = move(ref.x_lax);
 	x_sequential_read = move(ref.x_sequential_read);
 	x_slice_min_digits = move(ref.x_slice_min_digits);
-	swap(x_entrepot, ref.x_entrepot);
+	x_entrepot = move(ref.x_entrepot);
 	x_ignore_signature_check_failure = move(ref.x_ignore_signature_check_failure);
 	x_multi_threaded = move(ref.x_multi_threaded);
 
@@ -253,22 +245,8 @@ namespace libdar
 	x_ref_crypto_size = move(ref.x_ref_crypto_size);
 	x_ref_execute = move(ref.x_ref_execute);
 	x_ref_slice_min_digits = move(ref.x_ref_slice_min_digits);
-	swap(x_ref_entrepot, ref.x_ref_entrepot);
+	x_ref_entrepot = move(ref.x_ref_entrepot);
 	x_header_only = move(ref.x_header_only);
-    }
-
-    void archive_options_read::destroy() noexcept
-    {
-	if(x_entrepot != nullptr)
-	{
-	    delete x_entrepot;
-	    x_entrepot = nullptr;
-	}
-	if(x_ref_entrepot != nullptr)
-	{
-	    delete x_ref_entrepot;
-	    x_ref_entrepot = nullptr;
-	}
     }
 
 
@@ -370,8 +348,8 @@ namespace libdar
 	    x_slice_min_digits = 0;
 	    x_backup_hook_file_execute = "";
 	    x_ignore_unknown = false;
-	    x_entrepot = new (nothrow) entrepot_local( "", "", false); // never using furtive_mode to read slices
-	    if(x_entrepot == nullptr)
+	    x_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local( "", "", false)); // never using furtive_mode to read slices
+	    if(!x_entrepot)
 		throw Ememory("archive_options_create::clear");
 	    x_scope = all_fsa_families();
 	    x_multi_threaded = true;
@@ -484,16 +462,6 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
-    void archive_options_create::set_entrepot(const entrepot & entr)
-    {
-	if(x_entrepot != nullptr)
-	    delete x_entrepot;
-
-	x_entrepot = entr.clone();
-	if(x_entrepot == nullptr)
-	    throw Ememory("archive_options_create::set_entrepot");
-    }
-
     void archive_options_create::set_delta_mask(const mask & delta_mask)
     {
 	NLS_SWAP_IN;
@@ -516,7 +484,6 @@ namespace libdar
     void archive_options_create::nullifyptr() noexcept
     {
 	x_selection = x_subtree = x_ea_mask = x_compr_mask = x_backup_hook_file_mask = x_delta_mask = nullptr;
-	x_entrepot = nullptr;
     }
 
     void archive_options_create::destroy() noexcept
@@ -530,11 +497,6 @@ namespace libdar
 	    archive_option_destroy_mask(x_compr_mask);
 	    archive_option_destroy_mask(x_backup_hook_file_mask);
 	    archive_option_destroy_mask(x_delta_mask);
-	    if(x_entrepot != nullptr)
-	    {
-		delete x_entrepot;
-		x_entrepot = nullptr;
-	    }
 	}
 	catch(...)
 	{
@@ -551,7 +513,6 @@ namespace libdar
 	x_ea_mask = nullptr;
 	x_compr_mask = nullptr;
 	x_backup_hook_file_mask = nullptr;
-	x_entrepot = nullptr;
 	x_delta_mask = nullptr;
 
 	if(ref.x_selection == nullptr)
@@ -618,10 +579,10 @@ namespace libdar
 	x_slice_min_digits = ref.x_slice_min_digits;
 	x_backup_hook_file_execute = ref.x_backup_hook_file_execute;
 	x_ignore_unknown = ref.x_ignore_unknown;
-	if(x_entrepot != nullptr)
+	if(!ref.x_entrepot)
 	    throw SRC_BUG;
-	x_entrepot = ref.x_entrepot->clone();
-	if(x_entrepot == nullptr)
+	x_entrepot = ref.x_entrepot;
+	if(!x_entrepot)
 	    throw Ememory("archive_options_create::copy_from");
 	x_scope = ref.x_scope;
 	x_multi_threaded = ref.x_multi_threaded;
@@ -642,8 +603,8 @@ namespace libdar
 	swap(x_ea_mask, ref.x_ea_mask);
 	swap(x_compr_mask, ref.x_compr_mask);
 	swap(x_backup_hook_file_mask, ref.x_backup_hook_file_mask);
-	swap(x_entrepot, ref.x_entrepot);
 
+	x_entrepot = ref.x_entrepot;
 	x_ref_arch = move(ref.x_ref_arch);
 	x_allow_over = move(ref.x_allow_over);
 	x_warn_over = move(ref.x_warn_over);
@@ -762,8 +723,8 @@ namespace libdar
 	    x_hash = hash_none;
 	    x_slice_min_digits = 0;
 	    x_sequential_marks = true;
-	    x_entrepot = new (nothrow) entrepot_local("", "", false); // never using furtive_mode to read slices
-	    if(x_entrepot == nullptr)
+	    x_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local("", "", false)); // never using furtive_mode to read slices
+	    if(!x_entrepot)
 		throw Ememory("archive_options_isolate::clear");
 	    x_multi_threaded = true;
 	    x_delta_signature = false;
@@ -777,16 +738,6 @@ namespace libdar
 	    throw;
 	}
 	NLS_SWAP_OUT;
-    }
-
-    void archive_options_isolate::set_entrepot(const entrepot & entr)
-    {
-	if(x_entrepot != nullptr)
-	    delete x_entrepot;
-
-	x_entrepot = entr.clone();
-	if(x_entrepot == nullptr)
-	    throw Ememory("archive_options_isolate::set_entrepot");
     }
 
     void archive_options_isolate::set_delta_mask(const mask & delta_mask)
@@ -816,11 +767,6 @@ namespace libdar
     void archive_options_isolate::destroy() noexcept
     {
 	archive_option_destroy_mask(x_delta_mask);
-	if(x_entrepot != nullptr)
-	{
-	    delete x_entrepot;
-	    x_entrepot = nullptr;
-	}
     }
 
     void archive_options_isolate::copy_from(const archive_options_isolate & ref)
@@ -849,7 +795,7 @@ namespace libdar
 	x_sequential_marks = ref.x_sequential_marks;
 	if(ref.x_entrepot == nullptr)
 	    throw SRC_BUG;
-	x_entrepot = ref.x_entrepot->clone();
+	x_entrepot = ref.x_entrepot;
 	if(x_entrepot == nullptr)
 	    throw Ememory("archive_options_isolate::copy_from");
 	x_multi_threaded = ref.x_multi_threaded;
@@ -948,7 +894,7 @@ namespace libdar
 	    x_user_comment = default_user_comment;
 	    x_hash = hash_none;
 	    x_slice_min_digits = 0;
-	    x_entrepot = new (nothrow) entrepot_local("", "", false); // never using furtive_mode to read slices
+	    x_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local("", "", false)); // never using furtive_mode to read slices
 	    if(x_entrepot == nullptr)
 		throw Ememory("archive_options_merge::clear");
 	    x_scope = all_fsa_families();
@@ -1080,17 +1026,6 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
-    void archive_options_merge::set_entrepot(const entrepot & entr)
-    {
-	if(x_entrepot != nullptr)
-	    delete x_entrepot;
-
-	x_entrepot = entr.clone();
-	if(x_entrepot == nullptr)
-	    throw Ememory("archive_options_merge::set_entrepot");
-    }
-
-
     void archive_options_merge::destroy() noexcept
     {
 	archive_option_destroy_mask(x_selection);
@@ -1099,11 +1034,6 @@ namespace libdar
 	archive_option_destroy_mask(x_compr_mask);
 	archive_option_destroy_mask(x_delta_mask);
 	archive_option_destroy_crit_action(x_overwrite);
-	if(x_entrepot != nullptr)
-	{
-	    delete x_entrepot;
-	    x_entrepot = nullptr;
-	}
     }
 
     void archive_options_merge::copy_from(const archive_options_merge & ref)
@@ -1132,7 +1062,7 @@ namespace libdar
 	    x_ea_mask = ref.x_ea_mask->clone();
 	    x_compr_mask = ref.x_compr_mask->clone();
 	    x_overwrite = ref.x_overwrite->clone();
-	    x_entrepot = ref.x_entrepot->clone();
+	    x_entrepot = ref.x_entrepot;
 	    x_delta_mask = ref.x_delta_mask->clone();
 
 	    if(x_selection == nullptr
@@ -1950,29 +1880,13 @@ namespace libdar
     archive_options_repair::archive_options_repair()
     {
 	nullifyptr();
-        try
-        {
-            clear();
-        }
-        catch(...)
-        {
-            destroy();
-            throw;
-        }
+	clear();
     }
 
     archive_options_repair::archive_options_repair(const archive_options_repair & ref)
     {
 	nullifyptr();
-        try
-        {
-            copy_from(ref);
-        }
-        catch(...)
-        {
-            destroy();
-            throw;
-        }
+	copy_from(ref);
     }
 
     void archive_options_repair::clear()
@@ -1980,9 +1894,6 @@ namespace libdar
         NLS_SWAP_IN;
         try
         {
-
-            destroy();
-
 	    x_allow_over = true;
 	    x_warn_over = true;
             x_info_details = false;
@@ -2007,7 +1918,7 @@ namespace libdar
             x_user_comment = default_user_comment;
             x_hash = hash_none;
             x_slice_min_digits = 0;
-            x_entrepot = new (nothrow) entrepot_local( "", "", false); // never using furtive_mode to read slices
+            x_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local( "", "", false)); // never using furtive_mode to read slices
             if(x_entrepot == nullptr)
                 throw Ememory("archive_options_repair::clear");
             x_multi_threaded = true;
@@ -2020,29 +1931,8 @@ namespace libdar
         NLS_SWAP_OUT;
     }
 
-    void archive_options_repair::set_entrepot(const entrepot & entr)
-    {
-        if(x_entrepot != nullptr)
-            delete x_entrepot;
-
-        x_entrepot = entr.clone();
-        if(x_entrepot == nullptr)
-            throw Ememory("archive_options_repair::set_entrepot");
-    }
-
-    void archive_options_repair::destroy() noexcept
-    {
-	if(x_entrepot != nullptr)
-	{
-	    delete x_entrepot;
-	    x_entrepot = nullptr;
-	}
-    }
-
     void archive_options_repair::copy_from(const archive_options_repair & ref)
     {
-        x_entrepot = nullptr;
-
 	x_allow_over = ref.x_allow_over;
 	x_warn_over = ref.x_warn_over;
         x_info_details = ref.x_info_details;
@@ -2067,18 +1957,13 @@ namespace libdar
 	x_user_comment = ref.x_user_comment;
 	x_hash = ref.x_hash;
 	x_slice_min_digits = ref.x_slice_min_digits;
-	if(x_entrepot != nullptr)
-	    throw SRC_BUG;
-	x_entrepot = ref.x_entrepot->clone();
-	if(x_entrepot == nullptr)
-	    throw Ememory("archive_options_repair::copy_from");
+	x_entrepot = ref.x_entrepot;
 	x_multi_threaded = ref.x_multi_threaded;
     }
 
     void archive_options_repair::move_from(archive_options_repair && ref) noexcept
     {
-	swap(x_entrepot, ref.x_entrepot);
-
+	x_entrepot = ref.x_entrepot;
 	x_allow_over = move(ref.x_allow_over);
 	x_warn_over = move(ref.x_warn_over);
         x_info_details = move(ref.x_info_details);

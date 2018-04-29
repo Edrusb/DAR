@@ -73,7 +73,7 @@ namespace libdar
         sar(const std::shared_ptr<user_interaction> & dialog,
 	    const std::string & base_name,
 	    const std::string & extension,
-	    const entrepot & where,
+	    const std::shared_ptr<entrepot> & where,
 	    bool by_the_end,
 	    const infinint & x_min_digits,
 	    bool lax = false,
@@ -111,7 +111,7 @@ namespace libdar
  	    bool x_warn_overwrite,
 	    bool x_allow_overwrite,
 	    const infinint & pause,
-	    const entrepot & where,
+	    const std::shared_ptr<entrepot> & where,
 	    const label & internal_name,
 	    const label & data_name,
 	    bool force_permission,
@@ -163,7 +163,7 @@ namespace libdar
 	    // return the data_name used to link slices toghether
 	virtual const label & get_data_name() const override { return of_data_name; };
 
-	const entrepot *get_entrepot() const { return entr; };
+	const std::shared_ptr<entrepot> & get_entrepot() const { return entr; };
 
 	    /// get the first slice header
 	const infinint & get_first_slice_header_size() const { return slicing.first_slice_header; };
@@ -180,7 +180,7 @@ namespace libdar
 	virtual void inherited_terminate() override;
 
     private :
-	entrepot *entr;              //< where are stored slices
+	std::shared_ptr<entrepot> entr; //< where are stored slices
         std::string base;            //< archive base name
 	std::string ext;             //< archive extension
         std::string hook;            //< command line to execute between slices

@@ -124,7 +124,7 @@ namespace libdar
     sar::sar(const shared_ptr<user_interaction> & dialog,
 	     const string & base_name,
 	     const string & extension,
-	     const entrepot & where,
+	     const shared_ptr<entrepot> & where,
 	     bool by_the_end,
 	     const infinint & x_min_digits,
 	     bool x_lax,
@@ -142,16 +142,15 @@ namespace libdar
 	hash = hash_none;
 	lax = x_lax;
 	min_digits = x_min_digits;
-	entr = nullptr;
+	entr = where;
 	force_perm = false;
 	to_read_ahead = 0;
 
         open_file_init();
 	try
 	{
-	    entr = where.clone();
-	    if(entr == nullptr)
-		throw Ememory("sar::sar");
+	    if(!entr)
+		throw SRC_BUG;
 
 	    if(by_the_end)
 	    {
@@ -183,8 +182,6 @@ namespace libdar
 		    of_fd = nullptr;
 		}
 	    }
-	    if(entr != nullptr)
-		delete entr;
 	    throw;
 	}
     }
@@ -198,7 +195,7 @@ namespace libdar
 	     bool x_warn_overwrite,
 	     bool x_allow_overwrite,
 	     const infinint & x_pause,
-	     const entrepot & where,
+	     const shared_ptr<entrepot> & where,
 	     const label & internal_name,
 	     const label & data_name,
 	     bool force_permission,
@@ -240,14 +237,13 @@ namespace libdar
 	of_fd = nullptr;
 	of_flag = '\0';
 	slicing.older_sar_than_v8 = format_07_compatible;
-	entr = nullptr;
 	to_read_ahead = 0;
 
 	try
 	{
-	    entr = where.clone();
-	    if(entr == nullptr)
-		throw Ememory("sar::sar");
+	    entr = where;
+	    if(!entr)
+		throw SRC_BUG;
 
 	    open_file_init();
 	    open_file(1, false);
@@ -266,8 +262,6 @@ namespace libdar
 		    of_fd = nullptr;
 		}
 	    }
-	    if(entr != nullptr)
-		delete entr;
 	    throw;
 	}
     }
@@ -292,8 +286,6 @@ namespace libdar
 	{
 		// ignore all exception
 	}
-	if(entr != nullptr)
-	    delete entr;
     }
 
     bool sar::skippable(skippability direction, const infinint & amount)
@@ -1369,7 +1361,7 @@ namespace libdar
 		deci conv = num;
 		string num_str = conv.human();
 
-		if(entr == nullptr)
+		if(!entr)
 		    throw SRC_BUG;
 
 		tools_hook_substitute_and_execute(get_ui(),

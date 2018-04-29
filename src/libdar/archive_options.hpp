@@ -43,6 +43,7 @@
 
 #include <string>
 #include <set>
+#include <memory>
 
 namespace libdar
 {
@@ -67,9 +68,9 @@ namespace libdar
 	    /// the copy constructor, assignment operator and destructor
 	archive_options_read(const archive_options_read & ref) : x_ref_chem(ref.x_ref_chem) { copy_from(ref); };
 	archive_options_read(archive_options_read && ref) noexcept;
-	archive_options_read & operator = (const archive_options_read & ref) { destroy(); copy_from(ref); return *this; };
+	archive_options_read & operator = (const archive_options_read & ref) { copy_from(ref); return *this; };
 	archive_options_read & operator = (archive_options_read && ref) noexcept { move_from(std::move(ref)); return *this; };
-	~archive_options_read() { destroy(); };
+	~archive_options_read() = default;
 
 
 	    /////////////////////////////////////////////////////////////////////
@@ -146,7 +147,7 @@ namespace libdar
 
 
 	    /// defines the protocol to use to retrieve slices
-	void set_entrepot(const entrepot & entr) { if(x_entrepot != nullptr) delete x_entrepot; x_entrepot = entr.clone(); if(x_entrepot == nullptr) throw Ememory("archive_options_read::set_entrepot"); };
+	void set_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("archive_options_read::set_entrepot", "null entrepot pointer given in argument"); x_entrepot = entr; };
 
 	    /// whether to warn (true) or ignore (false) signature failure (default is true)
 	void set_ignore_signature_check_failure(bool val) { x_ignore_signature_check_failure = val; };
@@ -188,7 +189,7 @@ namespace libdar
 	void set_ref_slice_min_digits(infinint val) { x_ref_slice_min_digits = val; };
 
 	    /// defines the protocol to use to retrieve slices of the reference archive (where the external catalogue resides)
-	void set_ref_entrepot(const entrepot & entr) { if(x_ref_entrepot != nullptr) delete x_ref_entrepot; x_ref_entrepot = entr.clone(); if(x_ref_entrepot == nullptr) throw Ememory("archive_options_read::set_entrepot"); };
+	void set_ref_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("archive_options_read::set_ref_entrepot", "null entrepot pointer given in argument"); x_ref_entrepot = entr; };
 
 	    /// whether we only read the archive header and exit
 	void set_header_only(bool val) { x_header_only = val; };
@@ -209,7 +210,7 @@ namespace libdar
 	bool get_lax() const { return x_lax; };
 	bool get_sequential_read() const { return x_sequential_read; };
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
-	const entrepot & get_entrepot() const { if(x_entrepot == nullptr) throw SRC_BUG; return *x_entrepot; };
+	const std::shared_ptr<entrepot> & get_entrepot() const { return x_entrepot; };
 	bool get_ignore_signature_check_failure() const { return x_ignore_signature_check_failure; };
 	bool get_multi_threaded() const { return x_multi_threaded; };
 
@@ -222,7 +223,7 @@ namespace libdar
 	U_32 get_ref_crypto_size() const { return x_ref_crypto_size; };
 	const std::string & get_ref_execute() const { return x_ref_execute; };
 	infinint get_ref_slice_min_digits() const { return x_ref_slice_min_digits; };
-	const entrepot & get_ref_entrepot() const { if(x_ref_entrepot == nullptr) throw SRC_BUG; return *x_ref_entrepot; };
+	const std::shared_ptr<entrepot> & get_ref_entrepot() const { return x_ref_entrepot; };
 	bool get_header_only() const { return x_header_only; };
 
 
@@ -237,7 +238,7 @@ namespace libdar
 	bool x_lax;
 	bool x_sequential_read;
 	infinint x_slice_min_digits;
-	entrepot *x_entrepot;
+	std::shared_ptr<entrepot> x_entrepot;
 	bool x_ignore_signature_check_failure;
 	bool x_multi_threaded;
 
@@ -251,12 +252,11 @@ namespace libdar
 	U_32 x_ref_crypto_size;
 	std::string x_ref_execute;
 	infinint x_ref_slice_min_digits;
-	entrepot *x_ref_entrepot;
+	std::shared_ptr<entrepot> x_ref_entrepot;
 	bool x_header_only;
 
 	void copy_from(const archive_options_read & ref);
 	void move_from(archive_options_read && ref) noexcept;
-	void destroy() noexcept;
     };
 
 
@@ -495,7 +495,7 @@ namespace libdar
 	void set_ignore_unknown_inode_type(bool val) { x_ignore_unknown = val; };
 
 	    /// defines the protocol to use for slices
-	void set_entrepot(const entrepot & entr);
+	void set_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("archive_options_create::set_entrepot", "null entrepot pointer given in argument"); x_entrepot = entr; };
 
 	    /// defines the FSA (Filesystem Specific Attribute) to only consider (by default all FSA activated at compilation time are considered)
 	void set_fsa_scope(const fsa_scope & scope) { x_scope = scope; };
@@ -586,7 +586,7 @@ namespace libdar
 	const std::string & get_backup_hook_file_execute() const { return x_backup_hook_file_execute; };
 	const mask & get_backup_hook_file_mask() const { return *x_backup_hook_file_mask; };
 	bool get_ignore_unknown_inode_type() const { return x_ignore_unknown; };
-	const entrepot & get_entrepot() const { if(x_entrepot == nullptr) throw SRC_BUG; return *x_entrepot; };
+	const std::shared_ptr<entrepot> & get_entrepot() const { return x_entrepot; };
 	const fsa_scope & get_fsa_scope() const { return x_scope; };
 	bool get_multi_threaded() const { return x_multi_threaded; };
 	bool get_delta_diff() const { return x_delta_diff; };
@@ -650,7 +650,7 @@ namespace libdar
 	mask * x_backup_hook_file_mask;
 	std::string x_backup_hook_file_execute;
 	bool x_ignore_unknown;
-	entrepot *x_entrepot;
+	std::shared_ptr<entrepot> x_entrepot;
 	fsa_scope x_scope;
 	bool x_multi_threaded;
 	bool x_delta_diff;
@@ -773,7 +773,7 @@ namespace libdar
 	void set_sequential_marks(bool sequential) { x_sequential_marks = sequential; };
 
 	    /// defines the protocol to use for slices
-	void set_entrepot(const entrepot & entr);
+	void set_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("archive_options_isolated::set_entrepot", "null entrepot pointer given in argument"); x_entrepot = entr; };
 
 	    /// whether libdar is allowed to created several thread to work possibily faster on multicore CPU (require libthreadar)
 	void set_multi_threaded(bool val) { x_multi_threaded = val; };
@@ -815,7 +815,7 @@ namespace libdar
 	hash_algo get_hash_algo() const { return x_hash; };
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
 	bool get_sequential_marks() const { return x_sequential_marks; };
-	const entrepot & get_entrepot() const { if(x_entrepot == nullptr) throw SRC_BUG; return *x_entrepot; };
+	const std::shared_ptr<entrepot> & get_entrepot() const { return x_entrepot; };
 	bool get_multi_threaded() const { return x_multi_threaded; };
 	bool get_delta_signature() const { return x_delta_signature; };
 	const mask & get_delta_mask() const { return *x_delta_mask; }
@@ -845,7 +845,7 @@ namespace libdar
 	hash_algo x_hash;
 	infinint x_slice_min_digits;
 	bool x_sequential_marks;
-	entrepot *x_entrepot;
+	std::shared_ptr<entrepot> x_entrepot;
 	bool x_multi_threaded;
 	bool x_delta_signature;
 	mask *x_delta_mask;
@@ -1004,7 +1004,7 @@ namespace libdar
 	void set_slice_min_digits(infinint val) { x_slice_min_digits = val; };
 
 	    /// defines the protocol to use for slices
-	void set_entrepot(const entrepot & entr);
+	void set_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("archive_options_merge::set_entrepot", "null entrepot pointer given in argument"); x_entrepot = entr; };
 
 	    /// defines the FSA (Filesystem Specific Attribute) to only consider (by default all FSA are considered)
 	void set_fsa_scope(const fsa_scope & scope) { x_scope = scope; };
@@ -1067,7 +1067,7 @@ namespace libdar
 	const std::string & get_user_comment() const { return x_user_comment; };
 	hash_algo get_hash_algo() const { return x_hash; };
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
-	const entrepot & get_entrepot() const { if(x_entrepot == nullptr) throw SRC_BUG; return *x_entrepot; };
+	const std::shared_ptr<entrepot> & get_entrepot() const { return x_entrepot; };
 	const fsa_scope & get_fsa_scope() const { return x_scope; };
 	bool get_multi_threaded() const { return x_multi_threaded; };
 	bool get_delta_signature() const { return x_delta_signature; };
@@ -1112,7 +1112,7 @@ namespace libdar
 	std::string x_user_comment;
 	hash_algo x_hash;
 	infinint x_slice_min_digits;
-	entrepot *x_entrepot;
+	std::shared_ptr<entrepot> x_entrepot;
 	fsa_scope x_scope;
 	bool x_multi_threaded;
 	bool x_delta_signature;
@@ -1551,9 +1551,9 @@ namespace libdar
 	archive_options_repair();
 	archive_options_repair(const archive_options_repair & ref);
 	archive_options_repair(archive_options_repair && ref) noexcept { nullifyptr(); move_from(std::move(ref)); };
-	archive_options_repair & operator = (const archive_options_repair & ref) { destroy(); copy_from(ref); return *this; };
+	archive_options_repair & operator = (const archive_options_repair & ref) { copy_from(ref); return *this; };
 	archive_options_repair & operator = (archive_options_repair && ref) noexcept { move_from(std::move(ref)); return *this; };
-	~archive_options_repair() { destroy(); };
+	~archive_options_repair() = default;
 
 	    /////////////////////////////////////////////////////////////////////
 	    // set back to default (this is the state just after the object is constructed
@@ -1661,7 +1661,7 @@ namespace libdar
 	void set_slice_min_digits(infinint val) { x_slice_min_digits = val; };
 
 	    /// defines the protocol to use for slices
-	void set_entrepot(const entrepot & entr);
+	void set_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("archive_options_repair::set_entrepot", "null entrepot pointer given in argument"); x_entrepot = entr; };
 
 	    /// whether libdar is allowed to spawn several threads to possibily work faster on multicore CPU (requires libthreadar)
 	void set_multi_threaded(bool val) { x_multi_threaded = val; };
@@ -1694,7 +1694,7 @@ namespace libdar
 	const std::string & get_user_comment() const { return x_user_comment; };
 	hash_algo get_hash_algo() const { return x_hash; };
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
-	const entrepot & get_entrepot() const { if(x_entrepot == nullptr) throw SRC_BUG; return *x_entrepot; };
+	const std::shared_ptr<entrepot> & get_entrepot() const { return x_entrepot; };
 	bool get_multi_threaded() const { return x_multi_threaded; };
 
     private:
@@ -1722,11 +1722,10 @@ namespace libdar
 	std::string x_user_comment;
 	hash_algo x_hash;
 	infinint x_slice_min_digits;
-	entrepot *x_entrepot;
+	std::shared_ptr<entrepot> x_entrepot;
 	bool x_multi_threaded;
 
-	void destroy() noexcept;
-	void nullifyptr() noexcept { x_entrepot = nullptr; };
+	void nullifyptr() noexcept {};
 	void copy_from(const archive_options_repair & ref);
 	void move_from(archive_options_repair && ref) noexcept;
     };

@@ -360,7 +360,7 @@ namespace libdar
 
 
     void macro_tools_open_archive(const shared_ptr<user_interaction> & dialog,
-				  const entrepot &where,
+				  const shared_ptr<entrepot> & where,
                                   const string &basename,
 				  const infinint & min_digits,
                                   const string &extension,
@@ -387,7 +387,7 @@ namespace libdar
 	contextual *tmp_ctxt = nullptr;
 	cache *tmp_cache = nullptr;
 #ifdef LIBCURL_AVAILABLE
-	bool libcurl_repo = dynamic_cast<const entrepot_libcurl *>(&where) != nullptr;
+	bool libcurl_repo = dynamic_cast<const entrepot_libcurl *>(where.get()) != nullptr;
 #else
 	bool libcurl_repo = false;
 #endif
@@ -1051,7 +1051,7 @@ namespace libdar
 				   header_version & ver,
 				   slice_layout & slicing,
 				   const slice_layout *ref_slicing,
-				   const entrepot & sauv_path_t,
+				   const shared_ptr<entrepot> & sauv_path_t,
 				   const string & filename,
 				   const string & extension,
 				   bool allow_over,
@@ -1141,7 +1141,7 @@ namespace libdar
 							    open_mode,
 							    filename,
 							    extension,
-							    sauv_path_t, // entrepot !!
+							    *sauv_path_t, // entrepot !!
 							    internal_name,
 							    data_name,
 							    execute,
@@ -1167,7 +1167,7 @@ namespace libdar
 							  warn_over,
 							  allow_over,
 							  pause,
-							  sauv_path_t, // entrepot !!
+							  sauv_path_t, // shared_ptr<entrepot> !!
 							  internal_name,
 							  data_name,
 							  force_permission,

@@ -30,6 +30,7 @@
 #include "../my_config.h"
 #include <vector>
 #include <string>
+#include <memory>
 
 #include "erreurs.hpp"
 #include "path.hpp"
@@ -372,13 +373,13 @@ namespace libdar
 
 	bool get_sar_param(infinint & sub_file_size, infinint & first_file_size, infinint & last_file_size,
 			   infinint & total_file_number);
-	const entrepot *get_entrepot(); //< this method may return nullptr if no entrepot is used (pipes used for archive building, etc.)
+	std::shared_ptr<entrepot> get_entrepot(); //< this method may return nullptr if no entrepot is used (pipes used for archive building, etc.)
 	infinint get_level2_size();
 	infinint get_cat_size() const { return local_cat_size; };
 
 	statistics op_create_in(operation op,
 				const path & fs_root,
-				const entrepot & sauv_path_t,
+				const std::shared_ptr<entrepot> & sauv_path_t,
 				archive *ref_arch,
 				const mask & selection,
 				const mask & subtree,
@@ -443,7 +444,7 @@ namespace libdar
 
 	void op_create_in_sub(operation op,                     //< the filter operation to bind to
 			      const path & fs_root,             //< root of the filesystem to act on
-			      const entrepot & sauv_path_t,     //< where to create the archive
+			      const std::shared_ptr<entrepot> & sauv_path_t,     //< where to create the archive
 			      catalogue * ref_cat1,             //< catalogue of the archive of reference, (cannot be nullptr if ref_cat2 is not nullptr)
 			      const catalogue * ref_cat2,       //< secondary catalogue used for merging, can be nullptr if not used
 			      bool initial_pause,               //< whether we shall pause before starting the archive creation

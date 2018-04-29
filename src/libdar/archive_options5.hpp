@@ -39,7 +39,26 @@ namespace libdar5
 	/// \addtogroup API
 	/// @{
 
-    using libdar::archive_options_read;
+    class archive_options_read: public libdar::archive_options_read
+    {
+    public:
+	void set_entrepot(const entrepot & entr)
+	{
+	    std::shared_ptr<libdar::entrepot> tmp(entr.clone());
+	    if(!tmp)
+		throw Ememory("libdar5::archive_options_create::set_entrepot");
+	    libdar::archive_options_create::set_entrepot(tmp);
+	}
+
+	void set_ref_entrepot(const entrepot & entr)
+	{
+	    std::shared_ptr<libdar::entrepot> tmp(entr.clone());
+	    if(!tmp)
+		throw Ememory("libdar5::archive_options_create::set_ref_entrepot");
+	    libdar::archive_options_create::set_ref_entrepot(tmp);
+	}
+    };
+
 
 	/////////////////////////////////////////////////////////
 	///////// OPTIONS FOR CREATING AN ARCHIVE ///////////////
@@ -74,13 +93,40 @@ namespace libdar5
 		    // by ref, this is why it does nothing
 		);
 	};
+
+	void set_entrepot(const entrepot & entr)
+	{
+	    std::shared_ptr<libdar::entrepot> tmp(entr.clone());
+	    if(!tmp)
+		throw Ememory("libdar5::archive_options_create::set_entrepot");
+	    libdar::archive_options_create::set_entrepot(tmp);
+	}
+
+	void set_ref_entrepot(const entrepot & entr)
+	{
+	    std::shared_ptr<libdar::entrepot> tmp(entr.clone());
+	    if(!tmp)
+		throw Ememory("libdar5::archive_options_create::set_ref_entrepot");
+	    libdar::archive_options_create::set_ref_entrepot(tmp);
+	}
+
     };
 
 	/////////////////////////////////////////////////////////
 	//////////// OPTIONS FOR ISOLATING A CATALOGUE //////////
 	/////////////////////////////////////////////////////////
 
-    using libdar::archive_options_isolate;
+
+    class archive_options_isolate: public libdar::archive_options_isolate
+    {
+	void set_entrepot(const entrepot & entr)
+	{
+	    std::shared_ptr<libdar::entrepot> tmp(entr.clone());
+	    if(!tmp)
+		throw Ememory("libdar5::archive_options_create::set_entrepot");
+	    libdar::archive_options_create::set_entrepot(tmp);
+	}
+    }
 
 	/////////////////////////////////////////////////////////
 	////////// OPTONS FOR MERGING ARCHIVES //////////////////
@@ -102,6 +148,21 @@ namespace libdar5
 		);
 	};
 
+	void set_entrepot(const entrepot & entr)
+	{
+	    std::shared_ptr<libdar::entrepot> tmp(entr.clone());
+	    if(!tmp)
+		throw Ememory("libdar5::archive_options_create::set_entrepot");
+	    libdar::archive_options_create::set_entrepot(tmp);
+	}
+
+	void set_ref_entrepot(const entrepot & entr)
+	{
+	    std::shared_ptr<libdar::entrepot> tmp(entr.clone());
+	    if(!tmp)
+		throw Ememory("libdar5::archive_options_create::set_ref_entrepot");
+	    libdar::archive_options_create::set_ref_entrepot(tmp);
+	}
     };
 
 

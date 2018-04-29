@@ -113,8 +113,8 @@ namespace libdar
 	/// \note _CLEAR is associated to the generic_thread below compressor else escape else
 	/// the cache or crypto_sym or scrambler which then has two Labels (_CLEAR and _UNCYPHERED)
 
-    extern void macro_tools_open_archive(const std::shared_ptr<user_interaction> & dialog,     //< for user interaction
-					 const entrepot &where,         //< slices location
+    extern void macro_tools_open_archive(const std::shared_ptr<user_interaction> & dialog, //< for user interaction
+					 const std::shared_ptr<entrepot> & where,          //< slices location
                                          const std::string &basename,   //< slice basename
 					 const infinint & min_digits,   //< minimum digits for the slice number
                                          const std::string &extension,  //< slice extensions
@@ -243,7 +243,7 @@ namespace libdar
 					  header_version & ver,
 					  slice_layout & slicing,
 					  const slice_layout *ref_slicing,
-					  const entrepot & sauv_path_t,
+					  const std::shared_ptr<entrepot> & sauv_path_t,
 					  const std::string & filename,
 					  const std::string & extension,
 					  bool allow_over,

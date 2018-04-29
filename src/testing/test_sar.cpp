@@ -64,8 +64,10 @@ int main()
 
 static void f1()
 {
-    entrepot_local where = entrepot_local("", "", false);
-    where.set_location("./test");
+    shared_ptr<entrepot> where(new entrepot_local("", "", false));
+    if(!where)
+	throw Ememory("f1");
+    where->set_location("./test");
     try
     {
 	sar sar1(ui, gf_write_only, "destination", "txt", 100, 110, true, false, 0, where, internal_name, data_name, false, 0, hash_none, false, 0);
@@ -80,8 +82,10 @@ static void f1()
 
 static void f2()
 {
-    entrepot_local where = entrepot_local("", "", false);
-    where.set_location("./test");
+    shared_ptr<entrepot> where(new entrepot_local("", "", false));
+    if(!where)
+	throw Ememory("f2");
+    where->set_location("./test");
     try
     {
         sar sar2(ui, "destination", "txt", where, 0, false);
@@ -97,8 +101,10 @@ static void f2()
 
 static void f3()
 {
-    entrepot_local where = entrepot_local("", "", false);
-    where.set_location("./test");
+    shared_ptr<entrepot> where(new entrepot_local("", "", false));
+    if(!where)
+	throw Ememory("f3");
+    where->set_location("./test");
 
     try
     {
@@ -165,8 +171,10 @@ static void f3()
 
 void f4()
 {
-    entrepot_local where = entrepot_local("", "", false);
-    where.set_location("./test");
+    shared_ptr<entrepot> where(new entrepot_local("", "", false));
+    if(!where)
+	throw Ememory("f4");
+    where->set_location("./test");
 
     try
     {
