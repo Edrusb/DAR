@@ -127,7 +127,10 @@ namespace libdar
 
 	void unlink(const std::string & filename) const { inherited_unlink(filename); }; //< done this way for homogeneity with open/inherited_open
 
+	    /// generate a clone of "this"
 
+	    /// \deprecated this method will disapear in the future it is only kept
+	    /// there to allow the APIv5 adaptation layer to work over APIv6
 	virtual entrepot *clone() const = 0;
 
     protected:
