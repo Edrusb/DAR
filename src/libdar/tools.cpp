@@ -148,12 +148,12 @@ extern "C"
 #include "integers.hpp"
 #include "mask.hpp"
 #include "etage.hpp"
-#include "elastic.hpp"
 #ifdef __DYNAMIC__
 #include "user_group_bases.hpp"
 #endif
 #include "compile_time_features.hpp"
 #include "memory_file.hpp"
+#include "tuyau.hpp"
 
 #define YES_NO(x) (x ? gettext("YES") : gettext("NO"))
 
@@ -639,40 +639,6 @@ namespace libdar
 	}
 
 	return ret;
-    }
-
-    void tools_open_pipes(const shared_ptr<user_interaction> & dialog,
-                          const string &input,
-                          const string & output,
-                          tuyau *&in,
-                          tuyau *&out)
-    {
-        in = out = nullptr;
-        try
-        {
-            if(input != "")
-                in = new (nothrow) tuyau(dialog, input, gf_read_only);
-            else
-                in = new (nothrow) tuyau(dialog, 0, gf_read_only); // stdin by default
-            if(in == nullptr)
-                throw Ememory("tools_open_pipes");
-
-            if(output != "")
-                out = new (nothrow) tuyau(dialog, output, gf_write_only);
-            else
-                out = new (nothrow) tuyau(dialog, 1, gf_write_only); // stdout by default
-            if(out == nullptr)
-                throw Ememory("tools_open_pipes");
-
-        }
-        catch(...)
-        {
-            if(in != nullptr)
-                delete in;
-            if(out != nullptr)
-                delete out;
-            throw;
-        }
     }
 
     void tools_blocking_read(S_I fd, bool mode)
@@ -2024,37 +1990,6 @@ namespace libdar
                 }
             }
         }
-    }
-
-    void tools_add_elastic_buffer(generic_file & f,
-				  U_32 max_size,
-				  U_32 modulo,
-				  U_32 offset)
-    {
-	U_32 size = tools_pseudo_random(max_size-1) + 1; // range from 1 to max_size;
-
-	if(modulo > 0)
-	{
-	    U_32 shift = modulo - (offset % modulo);
-	    size = (size/modulo)*modulo + shift;
-	}
-
-        elastic tic = size;
-        char *buffer = new (nothrow) char[tic.get_size()];
-
-        if(buffer == nullptr)
-            throw Ememory("tools_add_elastic_buffer");
-        try
-        {
-            tic.dump((unsigned char *)buffer, tic.get_size());
-            f.write(buffer, tic.get_size());
-        }
-        catch(...)
-        {
-            delete [] buffer;
-            throw;
-        }
-        delete [] buffer;
     }
 
     bool tools_are_on_same_filesystem(const string & file1, const string & file2)

@@ -54,10 +54,10 @@ extern "C"
 #include <memory>
 
 #include "tuyau.hpp"
-#include "tools.hpp"
 #include "user_interaction.hpp"
 #include "dar_suite.hpp"
 #include "shell_interaction.hpp"
+#include "macro_tools.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -98,7 +98,7 @@ static int little_main(shared_ptr<user_interaction> & dialog, int argc, char * c
         return 0;
     }
 
-    tools_open_pipes(dialog, argv[1], argv[2], in, out);
+    macro_tools_open_pipes(dialog, argv[1], argv[2], in, out);
     if(strcmp(argv[3],"loop") == 0)
         action_loop(in, out);
     else

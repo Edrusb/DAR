@@ -50,6 +50,7 @@ extern "C"
 #include "range.hpp"
 #include "slice_layout.hpp"
 #include "trivial_sar.hpp"
+#include "tuyau.hpp"
 
 
     /// \addtogroup Private
@@ -300,6 +301,21 @@ namespace libdar
 	/// \return a set of slices which will be required to restore that particular file (over the slice(s)
 	/// containing the catalogue of course).
     extern range macro_tools_get_slices(const cat_nomme *obj, slice_layout sl);
+
+    	/// open a pair of tuyau objects encapsulating two named pipes.
+
+	/// \param[in,out] dialog for user interaction
+	/// \param[in] input path to the input named pipe
+	/// \param[in] output path to the output named pipe
+	/// \param[out] in resulting tuyau object for input
+	/// \param[out] out resulting tuyau object for output
+	/// \note in and out parameters must be released by the caller thanks to the "delete" operator
+    extern void macro_tools_open_pipes(const std::shared_ptr<user_interaction> & dialog,
+				       const std::string &input,
+				       const std::string & output,
+				       tuyau *&in,
+				       tuyau *&out);
+
 
 } // end of namespace
 

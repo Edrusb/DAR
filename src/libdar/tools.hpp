@@ -60,7 +60,6 @@ extern "C"
 #include "path.hpp"
 #include "infinint.hpp"
 #include "generic_file.hpp"
-#include "tuyau.hpp"
 #include "integers.hpp"
 #include "tlv_list.hpp"
 #include "datetime.hpp"
@@ -177,6 +176,7 @@ namespace libdar
     extern void tools_split_path_basename(const std::string &all, std::string & chemin, std::string & base);
 
 	/// split a given full remote repository path in parts
+
 	/// \param[in] all is the argument to split in parts
 	/// \param[out] proto is the protocol field
 	/// \param[out] login is the login field (empty string is returned if not provided)
@@ -192,20 +192,6 @@ namespace libdar
 					  std::string & hostname,
 					  std::string & port,
 					  std::string & path_basename);
-
-	/// open a pair of tuyau objects encapsulating two named pipes.
-
-	/// \param[in,out] dialog for user interaction
-	/// \param[in] input path to the input named pipe
-	/// \param[in] output path to the output named pipe
-	/// \param[out] in resulting tuyau object for input
-	/// \param[out] out resulting tuyau object for output
-	/// \note in and out parameters must be released by the caller thanks to the "delete" operator
-    extern void tools_open_pipes(const std::shared_ptr<user_interaction> & dialog,
-				 const std::string &input,
-				 const std::string & output,
-                                 tuyau *&in,
-				 tuyau *&out);
 
 	/// set blocking/not blocking mode for reading on a file descriptor
 
@@ -508,32 +494,6 @@ namespace libdar
 						    bool allow_overwriting,
 						    bool warn_overwriting,
 						    bool dry_run);
-
-	/// append an elastic buffer of given size to the file
-
-	/// \param[in,out] f file to append elastic buffer to
-	/// \param[in] max_size size of the elastic buffer to add
-	/// \param[in] modulo defines the size to choose (see note)
-	/// \param[in] offset defines the offset to apply (see note)
-	/// \note the size of the elastic buffer should not exceed max_size but
-	/// should be chosen in order to reach a size which is zero modulo "modulo"
-	/// assuming the offset we add the elastic buffer at is "offset". If modulo is zero
-	/// this the elastic buffer is randomly chosen from 1 to max_size without any
-	/// concern about being congruent to a given modulo.
-	/// Example if module is 5 and offset is 2, the elastic buffer possible size
-	/// can be 3 (2+3 is congruent to 0 modulo 5), 8 (2+8 is congruent to modulo 5), 12, etc.
-	/// but not exceed max_size+modulo-1
-	/// \note this is to accomodate the case when encrypted data is followed by clear data
-	/// at the end of an archive. There is no way to known when we read clear data, but we
-	/// know the clear data size is very inferior to crypted block size, thus when reading
-	/// a uncompleted block of data we can be sure we have reached and of file and that
-	/// the data is clear without any encrypted part because else we would have read an entire
-	/// block of data.
-    extern void tools_add_elastic_buffer(generic_file & f,
-					 U_32 max_size,
-					 U_32 modulo,
-					 U_32 offset);
-
 
 	/// tells whether two files are on the same mounted filesystem
 

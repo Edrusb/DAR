@@ -115,6 +115,7 @@ extern "C"
 #include "entrepot.hpp"
 #include "sar_tools.hpp"
 #include "trivial_sar.hpp"
+#include "tuyau.hpp"
 
 using namespace std;
 

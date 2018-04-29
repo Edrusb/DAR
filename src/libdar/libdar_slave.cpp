@@ -30,6 +30,7 @@ extern "C"
 
 #include "libdar_slave.hpp"
 #include "path.hpp"
+#include "macro_tools.hpp"
 
 using namespace std;
 
@@ -72,11 +73,11 @@ namespace libdar
 	    if(source == nullptr)
 		throw Ememory("libdar_slave::libdar_slave");
 
-	    tools_open_pipes(dialog,
-			     input_pipe,
-			     output_pipe,
-			     input,
-			     output);
+	    macro_tools_open_pipes(dialog,
+				   input_pipe,
+				   output_pipe,
+				   input,
+				   output);
 
 	    zap.reset(new (nothrow) slave_zapette(input, output, source));
 	    if(!zap)

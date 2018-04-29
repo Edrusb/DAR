@@ -83,6 +83,31 @@ namespace libdar
 
     static void version_check(user_interaction & dialog, const header_version & ver);
 
+	/// append an elastic buffer of given size to the file
+
+	/// \param[in,out] f file to append elastic buffer to
+	/// \param[in] max_size size of the elastic buffer to add
+	/// \param[in] modulo defines the size to choose (see note)
+	/// \param[in] offset defines the offset to apply (see note)
+	/// \note the size of the elastic buffer should not exceed max_size but
+	/// should be chosen in order to reach a size which is zero modulo "modulo"
+	/// assuming the offset we add the elastic buffer at is "offset". If modulo is zero
+	/// this the elastic buffer is randomly chosen from 1 to max_size without any
+	/// concern about being congruent to a given modulo.
+	/// Example if module is 5 and offset is 2, the elastic buffer possible size
+	/// can be 3 (2+3 is congruent to 0 modulo 5), 8 (2+8 is congruent to modulo 5), 12, etc.
+	/// but not exceed max_size+modulo-1
+	/// \note this is to accomodate the case when encrypted data is followed by clear data
+	/// at the end of an archive. There is no way to known when we read clear data, but we
+	/// know the clear data size is very inferior to crypted block size, thus when reading
+	/// a uncompleted block of data we can be sure we have reached and of file and that
+	/// the data is clear without any encrypted part because else we would have read an entire
+	/// block of data.
+    static void macro_tools_add_elastic_buffer(generic_file & f,
+					       U_32 max_size,
+					       U_32 modulo,
+					       U_32 offset);
+
     catalogue *macro_tools_get_catalogue_from(const shared_ptr<user_interaction> & dialog,
 					      pile & stack,
 					      const header_version & ver,
@@ -416,7 +441,7 @@ namespace libdar
 		    try
 		    {
 			dialog->printf(gettext("Opening a pair of pipes to read the archive, expecting dar_slave at the other ends..."));
-			tools_open_pipes(dialog, input_pipe, output_pipe, in, out);
+			macro_tools_open_pipes(dialog, input_pipe, output_pipe, in, out);
 			tmp = new (nothrow) zapette(dialog, in, out, true);
 			if(tmp == nullptr)
 			{
@@ -1012,12 +1037,6 @@ namespace libdar
 	    return ret;
     }
 
-    static void version_check(user_interaction & dialog, const header_version & ver)
-    {
-        if(ver.get_edition() > macro_tools_supported_version)
-            dialog.pause(gettext("The format version of the archive is too high for that software version, try reading anyway?"));
-    }
-
     infinint macro_tools_get_terminator_start(generic_file & f, const archive_version & reading_ver)
     {
 	terminateur term;
@@ -1447,7 +1466,7 @@ namespace libdar
 		{
 		    if(info_details)
 			dialog->message(gettext("Writing down the initial elastic buffer through the encryption layer..."));
-		    tools_add_elastic_buffer(layers, GLOBAL_ELASTIC_BUFFER_SIZE, 0, 0);
+		    macro_tools_add_elastic_buffer(layers, GLOBAL_ELASTIC_BUFFER_SIZE, 0, 0);
 		}
 
 
@@ -1796,10 +1815,10 @@ namespace libdar
 		    throw SRC_BUG;
 	    }
 
-	    tools_add_elastic_buffer(layers,
-				     GLOBAL_ELASTIC_BUFFER_SIZE,
-				     block_size,
-				     offset);
+	    macro_tools_add_elastic_buffer(layers,
+					   GLOBAL_ELASTIC_BUFFER_SIZE,
+					   block_size,
+					   offset);
 		// terminal elastic buffer (after terminateur to protect against
 		// plain text attack on the terminator string)
 	}
@@ -1989,5 +2008,81 @@ namespace libdar
 
         return ret;
     }
+
+    void macro_tools_open_pipes(const shared_ptr<user_interaction> & dialog,
+				const string &input,
+				const string & output,
+				tuyau *&in,
+				tuyau *&out)
+    {
+        in = out = nullptr;
+        try
+        {
+            if(input != "")
+                in = new (nothrow) tuyau(dialog, input, gf_read_only);
+            else
+                in = new (nothrow) tuyau(dialog, 0, gf_read_only); // stdin by default
+            if(in == nullptr)
+                throw Ememory("tools_open_pipes");
+
+            if(output != "")
+                out = new (nothrow) tuyau(dialog, output, gf_write_only);
+            else
+                out = new (nothrow) tuyau(dialog, 1, gf_write_only); // stdout by default
+            if(out == nullptr)
+                throw Ememory("tools_open_pipes");
+
+        }
+        catch(...)
+        {
+            if(in != nullptr)
+                delete in;
+            if(out != nullptr)
+                delete out;
+            throw;
+        }
+    }
+
+
+	//////////// STATIC FUNCTIONS //////////////////////////////////////////
+
+
+    static void version_check(user_interaction & dialog, const header_version & ver)
+    {
+        if(ver.get_edition() > macro_tools_supported_version)
+            dialog.pause(gettext("The format version of the archive is too high for that software version, try reading anyway?"));
+    }
+
+    static void macro_tools_add_elastic_buffer(generic_file & f,
+					       U_32 max_size,
+					       U_32 modulo,
+					       U_32 offset)
+    {
+	U_32 size = tools_pseudo_random(max_size-1) + 1; // range from 1 to max_size;
+
+	if(modulo > 0)
+	{
+	    U_32 shift = modulo - (offset % modulo);
+	    size = (size/modulo)*modulo + shift;
+	}
+
+        elastic tic = size;
+        char *buffer = new (nothrow) char[tic.get_size()];
+
+        if(buffer == nullptr)
+            throw Ememory("tools_add_elastic_buffer");
+        try
+        {
+            tic.dump((unsigned char *)buffer, tic.get_size());
+            f.write(buffer, tic.get_size());
+        }
+        catch(...)
+        {
+            delete [] buffer;
+            throw;
+        }
+        delete [] buffer;
+    }
+
 
 } // end of namespace
