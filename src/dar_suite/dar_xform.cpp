@@ -373,8 +373,8 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
         }
         if(string(argv[optind]) != string(""))
 	{
-            tools_split_path_basename(argv[optind], src_dir, src);
-	    tools_check_basename(dialog, *src_dir, src, EXTENSION);
+            line_tools_split_path_basename(argv[optind], src_dir, src);
+	    line_tools_check_basename(dialog, *src_dir, src, EXTENSION);
 	}
         else
         {
@@ -382,7 +382,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
             return false;
         }
         if(string(argv[optind+1]) != string(""))
-            tools_split_path_basename(argv[optind+1], dst_dir, dst);
+            line_tools_split_path_basename(argv[optind+1], dst_dir, dst);
         else
         {
             dialog.message(gettext("Invalid argument as destination archive"));
@@ -409,7 +409,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
 static void show_usage(shell_interaction & dialog, const char *command_name)
 {
     string name;
-    tools_extract_basename(command_name, name);
+    line_tools_extract_basename(command_name, name);
     dialog.change_non_interactive_output(cout);
 
     dialog.printf("usage :\t %s [options] [<path>/]<basename> [<path>/]<basename>\n", name.c_str());
@@ -441,7 +441,7 @@ static void show_usage(shell_interaction & dialog, const char *command_name)
 static void show_version(shell_interaction & dialog, const char *command_name)
 {
     string name;
-    tools_extract_basename(command_name, name);
+    line_tools_extract_basename(command_name, name);
     U_I maj, med, min;
 
     get_version(maj, med, min);
@@ -452,7 +452,7 @@ static void show_version(shell_interaction & dialog, const char *command_name)
 	dialog.printf(gettext(" Using libdar %u.%u.%u built with compilation time options:\n"), maj, med, min);
     else
 	dialog.printf(gettext(" Using libdar %u.%u built with compilation time options:\n"), maj, min);
-    tools_display_features(dialog);
+    line_tools_display_features(dialog);
     dialog.printf("\n");
     dialog.printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT, __VERSION__);
     dialog.printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), name.c_str(), PACKAGE_VERSION);

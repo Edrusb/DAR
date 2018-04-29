@@ -180,6 +180,250 @@ extern void line_tools_display_signatories(user_interaction & ui, const std::lis
 	/// \param[out] result the resulting tlv_list
 extern void line_tools_read_from_pipe(std::shared_ptr<user_interaction> & dialog, S_I fd, tlv_list & result);
 
+    /// extracts the basename of a file (removing path part)
+
+    /// \param[in] command_name is the full path of the file
+    /// \param[out] basename the basename of the file
+    /// \exception Ememory can be thrown if memory allocation failed
+extern void line_tools_extract_basename(const char *command_name, std::string & basename);
+
+    /// give a pointer to the last character of the given value in the given string
+
+    /// \param[in] s is the given string
+    /// \param[in] v is the given char value
+    /// \return a interator on s, pointing on the first char of s equal to v or a pointing to s.end() if no such char could be found is "s"
+    /// \note the arguments are not modified neither the data they are pointing to. However the const statement has not been used to
+    /// be able to return a iterator on the string (and not a const_interator). There is probably other ways to do that (using const_cast) for example
+extern std::string::iterator line_tools_find_first_char_of(std::string &s, unsigned char v);
+
+    /// split a given full path in path part and basename part
+
+    /// \param[in] all is the path to split
+    /// \param[out] chemin is the resulting path part, it points to a newly allocated path object
+    /// \param[out] base is the resulting basename
+    /// \note chemin argument must be release by the caller thanks to the "delete" operator.
+extern void line_tools_split_path_basename(const char *all, path * &chemin, std::string & base);
+
+    /// split a given full path in path part and basename part
+
+    /// \param[in] all is the path to split
+    /// \param[out] chemin is the resulting path part, it points to a newly allocated path object
+    /// \param[out] base is the resulting basename
+    /// \note chemin argument must be release by the caller thanks to the "delete" operator.
+extern void line_tools_split_path_basename(const std::string &all, std::string & chemin, std::string & base);
+
+    /// split a given full remote repository path in parts
+
+    /// \param[in] all is the argument to split in parts
+    /// \param[out] proto is the protocol field
+    /// \param[out] login is the login field (empty string is returned if not provided)
+    /// \param[out] password is the password field (empty string if not provided)
+    /// \param[out] hostname is the hostname field
+    /// \param[out] port is the port field (empty string if not provided)
+    /// \param[out] path_basename is the path+basename remaing field
+    /// \return false if the all argument does not follow the remote repository syntax
+extern bool line_tools_split_entrepot_path(const std::string &all,
+					   std::string & proto,
+					   std::string & login,
+					   secu_string & password,
+					   std::string & hostname,
+					   std::string & port,
+					   std::string & path_basename);
+
+    /// convert a signed integer written in decimal notation to the corresponding value
+
+    /// \param[in] x the decimal representation of the integer
+    /// \return the value corresponding to the decimal representation given
+extern S_I line_tools_str2signed_int(const std::string & x);
+
+    /// convert a human readable date representation in number of second since the system reference date
+
+    /// \param[in] repres the date's human representation
+    /// \return the corresponding number of seconds (computer time)
+    /// \note the string expected format is "[[[year/]month/]day-]hour:minute[:second]"
+extern infinint line_tools_convert_date(const std::string & repres);
+
+    /// display the compilation time features of libdar
+
+    /// \param[in,out] dialog for user interaction
+    /// \note this call uses the compile_time:: routines, and will
+    /// not change its interface upon new feature addition
+extern void line_tools_display_features(user_interaction & dialog);
+
+    /// isolate the value of a given variable from the environment vector
+
+    /// \param[in] env the environment vector as retreived from the third argument of the main() function
+    /// \param[in] clef the key or variable name too look for
+    /// \return nullptr if the key could not be found or a pointer to the env data giving the value of the requested key
+    /// \note the returned value must not be released by any mean as it is just a pointer to an system allocated memory (the env vector).
+extern const char *line_tools_get_from_env(const char **env, const char *clef);
+
+    /// does sanity checks on a slice name, check presence and detect whether the given basename is not rather a filename
+
+    /// \param[in,out] dialog for user interaction
+    /// \param[in] loc the path where resides the slice
+    /// \param[in,out] base the basename of the slice
+    /// \param[in] extension the extension of dar's slices
+    /// \note if user accepted the change of slice name proposed by libdar through dialog the base argument is changed
+extern void line_tools_check_basename(user_interaction & dialog,
+				      const path & loc,
+				      std::string & base,
+				      const std::string & extension);
+
+    /// from a string with a range notation (min-max) extract the range values
+
+    /// \param[in] s the string to parse
+    /// \param[out] min the minimum value of the range
+    /// \param[out] max the maximum value of the range
+    /// \exception Erange is thrown is the string to parse is incorrect
+    /// \note: either a single number (positive or negative) is returned in min
+    /// (max is set to min if min is positive or to zero if min is negative)
+    /// or a range of positive numbers.
+extern void line_tools_read_range(const std::string & s, S_I & min, U_I & max);
+
+    /// read a file and split its contents into words
+
+    /// \param[in,out] f is the file to read
+    /// \param[out] mots std container to receive the split result
+    /// \return the list of words found in this order in the file
+    /// \note The different quotes are taken into account
+template <class T> void line_tools_split_in_words(generic_file & f, T & mots)
+{
+    std::deque <char> quotes;
+    std::string current = "";
+    char a;
+    bool loop = true;
+    bool escaped = false;
+
+    mots.clear();
+    while(loop)
+    {
+	if(f.read(&a, 1) != 1) // reached end of file
+	{
+	    loop = false;
+	    a = ' '; // to close the last word
+	}
+
+	if(escaped)
+	{
+	    current += a; // added without consideration of quoting of any sort
+	    escaped = false;
+	    continue; // continuing at beginning of the while loop
+	}
+	else
+	{
+	    if(a == '\\')
+	    {
+		escaped = true;
+		continue; // continuing at beginning of the while loop
+	    }
+	}
+
+	if(quotes.empty()) // outside a word
+	    switch(a)
+	    {
+	    case ' ':
+	    case '\t':
+	    case '\n':
+	    case '\r':
+		break;
+	    case '"':
+	    case '\'':
+	    case '`':
+		quotes.push_back(a);
+		break;
+	    default:
+		quotes.push_back(' '); // the quote space means no quote
+		current += a; // a new argument is starting
+		break;
+	    }
+	else // inside a word
+	    switch(a)
+	    {
+	    case '\t':
+		if(quotes.back() != ' ')
+		{
+			// this is the end of the wor(l)d ;-)
+			// ...once again... 1000, 1999, 2012, and the next ones to come...
+		    break;
+		}
+		    // no break !
+	    case '\n':
+	    case '\r':
+		a = ' '; // replace carriage return inside quoted string by a space
+		    // no break !
+	    case ' ':
+	    case '"':
+	    case '\'':
+	    case '`':
+		if(a == quotes.back()) // "a" is an ending quote
+		{
+		    quotes.pop_back();
+		    if(quotes.empty()) // reached end of word
+		    {
+			mots.push_back(current);
+			current = "";
+		    }
+		    else
+			current += a;
+		}
+		else // "a" is a nested starting quote
+		{
+		    if(a != ' ') // quote ' ' does not have ending quote
+			quotes.push_back(a);
+		    current += a;
+		}
+		break;
+	    default:
+		current += a;
+	    }
+    }
+    if(!quotes.empty())
+	throw Erange("make_args_from_file", tools_printf(dar_gettext("Parse error: Unmatched `%c'"), quotes.back()));
+}
+
+
+
+    /// read a std::string and split its contents into words
+
+    /// \param[in,out] arg is the string to read
+    /// \param[out] mots a std container to receive the split result
+    /// \return the list of words found in this order in the file
+    /// \note The different quotes are taken into account
+template <class T> void line_tools_split_in_words(const std::string & arg, T & mots)
+{
+    memory_file mem;
+
+    mem.write(arg.c_str(), arg.size());
+    mem.skip(0);
+    line_tools_split_in_words(mem, mots);
+}
+
+    /// builds a regex from root directory and user provided regex to be applied to the relative path
+
+    /// \param[in] prefix is the root portion of the path
+    /// \param[in] relative_part is the user provided regex to be applied to the relative path
+    /// \return the corresponding regex to be applied to full absolute path
+extern std::string line_tools_build_regex_for_exclude_mask(const std::string & prefix,
+							   const std::string & relative_part);
+
+    /// return a string containing the Effective UID
+extern std::string line_tools_get_euid();
+
+    /// return a string containing the Effective UID
+extern std::string line_tools_get_egid();
+
+    /// return a string containing the hostname of the current host
+extern std::string line_tools_get_hostname();
+
+    /// return a string containing the current time (UTC)
+extern std::string line_tools_get_date_utc();
+
+    /// add in 'a', element of 'b' not already found in 'a'
+extern void line_tools_merge_to_deque(std::deque<std::string> & a, const  std::deque<std::string> & b);
+
+    /// remove from 'a' elements found in 'b' and return the resulting deque
+extern std::deque<std::string> line_tools_substract_from_deque(const std::deque<std::string> & a, const std::deque<std::string> & b);
 
     /// @}
 

@@ -21,6 +21,8 @@
 
 #include "../my_config.h"
 
+#include "line_tools.hpp"
+
 extern "C"
 {
 #if HAVE_STDIO_H
@@ -136,7 +138,7 @@ static void show_version(user_interaction & dialog, char *argv0)
     try
     {
 	string cmd;
-	tools_extract_basename(argv0, cmd);
+	line_tools_extract_basename(argv0, cmd);
 	    // never return a nullptr pointer but
 	dialog.message(tools_printf("\n %s version %s Copyright (C) 2002-2052 Denis Corbin\n\n\n", cmd.c_str(), DAR_CP_VERSION));
 	dialog.message(tools_printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT,  __VERSION__));
@@ -168,7 +170,7 @@ static int open_files(user_interaction & dialog, char *src, char *dst, int *fds,
             return 0;
         }
         string tmp2;
-        tools_extract_basename(src, tmp2);
+        line_tools_extract_basename(src, tmp2);
         strcpy(tmp, dst);
         strcat(tmp, "/");
         strcat(tmp, tmp2.c_str());

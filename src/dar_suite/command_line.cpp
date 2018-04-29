@@ -371,11 +371,11 @@ bool get_args(shared_ptr<user_interaction> & dialog,
 
             // some sanity checks
 
-        deque<string> unseen = tools_substract_from_deque(rec.non_options, rec.read_targets);
+        deque<string> unseen = line_tools_substract_from_deque(rec.non_options, rec.read_targets);
 	deque<string> special_targets;
 	special_targets.push_back(AUXILIARY_TARGET);
 	special_targets.push_back(REFERENCE_TARGET);
-	unseen = tools_substract_from_deque(unseen, special_targets);
+	unseen = line_tools_substract_from_deque(unseen, special_targets);
         if(!unseen.empty())
         {
             string not_seen;
@@ -394,13 +394,13 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             if(p.sauv_root == nullptr)
                 throw SRC_BUG;
         if(p.filename != "-")
-            tools_check_basename(*dialog, *p.sauv_root, p.filename, EXTENSION);
+            line_tools_check_basename(*dialog, *p.sauv_root, p.filename, EXTENSION);
         if((p.op == merging || p.op == create) && p.aux_filename != nullptr)
         {
             if(p.aux_root == nullptr)
                 throw SRC_BUG;
             else
-                tools_check_basename(*dialog, *p.aux_root, *p.aux_filename, EXTENSION);
+                line_tools_check_basename(*dialog, *p.aux_root, *p.aux_filename, EXTENSION);
         }
 
         if(p.fs_root == nullptr)
@@ -429,7 +429,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             if(p.ref_root == nullptr)
                 throw SRC_BUG;
             else
-                tools_check_basename(*dialog, *p.ref_root, *p.ref_filename, EXTENSION);
+                line_tools_check_basename(*dialog, *p.ref_root, *p.ref_filename, EXTENSION);
         }
 
         if(p.algo != compression::none && p.op != create && p.op != isolate && p.op != merging)
@@ -865,18 +865,18 @@ static bool get_args_recursive(recursive_param & rec,
 		{
 		    string path_basename;
 
-		    if(tools_split_entrepot_path(optarg,
-						 p.remote.ent_proto,
-						 p.remote.ent_login,
-						 p.remote.ent_pass,
-						 p.remote.ent_host,
-						 p.remote.ent_port,
-						 path_basename))
-			tools_split_path_basename(path_basename.c_str(), p.sauv_root, p.filename);
+		    if(line_tools_split_entrepot_path(optarg,
+						      p.remote.ent_proto,
+						      p.remote.ent_login,
+						      p.remote.ent_pass,
+						      p.remote.ent_host,
+						      p.remote.ent_port,
+						      path_basename))
+			line_tools_split_path_basename(path_basename.c_str(), p.sauv_root, p.filename);
 		    else
 		    {
 			p.remote.clear();
-			tools_split_path_basename(optarg, p.sauv_root, p.filename);
+			line_tools_split_path_basename(optarg, p.sauv_root, p.filename);
 		    }
 		}
                 else
@@ -935,7 +935,7 @@ static bool get_args_recursive(recursive_param & rec,
                         {
                                 // fallback to human readable string
 
-                            p.fixed_date = tools_convert_date(optarg);
+                            p.fixed_date = line_tools_convert_date(optarg);
                         }
                     }
                     catch(Egeneric & e)
@@ -955,18 +955,18 @@ static bool get_args_recursive(recursive_param & rec,
                         {
 			    string path_basename;
 
-			    if(tools_split_entrepot_path(optarg,
-							 p.ref_remote.ent_proto,
-							 p.ref_remote.ent_login,
-							 p.ref_remote.ent_pass,
-							 p.ref_remote.ent_host,
-							 p.ref_remote.ent_port,
-							 path_basename))
-				tools_split_path_basename(path_basename.c_str(), p.ref_root, *p.ref_filename);
+			    if(line_tools_split_entrepot_path(optarg,
+							      p.ref_remote.ent_proto,
+							      p.ref_remote.ent_login,
+							      p.ref_remote.ent_pass,
+							      p.ref_remote.ent_host,
+							      p.ref_remote.ent_port,
+							      path_basename))
+				line_tools_split_path_basename(path_basename.c_str(), p.ref_root, *p.ref_filename);
 			    else
 			    {
 				p.ref_remote.clear();
-				tools_split_path_basename(optarg, p.ref_root, *p.ref_filename);
+				line_tools_split_path_basename(optarg, p.ref_root, *p.ref_filename);
 				rec.non_options.push_back("reference");
 			    }
                         }
@@ -1631,18 +1631,18 @@ static bool get_args_recursive(recursive_param & rec,
                     {
 			string path_basename;
 
-			if(tools_split_entrepot_path(optarg,
-						     p.aux_remote.ent_proto,
-						     p.aux_remote.ent_login,
-						     p.aux_remote.ent_pass,
-						     p.aux_remote.ent_host,
-						     p.aux_remote.ent_port,
-						     path_basename))
-			    tools_split_path_basename(path_basename.c_str(), p.aux_root, *p.aux_filename);
+			if(line_tools_split_entrepot_path(optarg,
+							  p.aux_remote.ent_proto,
+							  p.aux_remote.ent_login,
+							  p.aux_remote.ent_pass,
+							  p.aux_remote.ent_host,
+							  p.aux_remote.ent_port,
+							  path_basename))
+			    line_tools_split_path_basename(path_basename.c_str(), p.aux_root, *p.aux_filename);
 			else
 			{
 			    p.aux_remote.clear();
-			    tools_split_path_basename(optarg, p.aux_root, *p.aux_filename);
+			    line_tools_split_path_basename(optarg, p.aux_root, *p.aux_filename);
 			    rec.non_options.push_back("auxiliary");
 			}
                     }
@@ -1958,7 +1958,7 @@ static void usage(user_interaction & dialog, const char *command_name)
     string name;
     shell_interaction *ptr = dynamic_cast<shell_interaction *>(&dialog);
 
-    tools_extract_basename(command_name, name);
+    line_tools_extract_basename(command_name, name);
 
     if(ptr != nullptr)
 	ptr->change_non_interactive_output(cout);
@@ -2419,7 +2419,7 @@ static void show_license(user_interaction & dialog)
 static void show_version(user_interaction & dialog, const char *command_name)
 {
     string name;
-    tools_extract_basename(command_name, name);
+    line_tools_extract_basename(command_name, name);
     U_I maj, med, min;
 
     shell_interaction *ptr = dynamic_cast<shell_interaction *>(&dialog);
@@ -2433,7 +2433,7 @@ static void show_version(user_interaction & dialog, const char *command_name)
                    + "\n"
                    + (maj > 2 ? tools_printf(gettext(" Using libdar %u.%u.%u built with compilation time options:"), maj, med, min)
                       : tools_printf(gettext(" Using libdar %u.%u built with compilation time options:"), maj, min)));
-    tools_display_features(dialog);
+    line_tools_display_features(dialog);
     dialog.printf("\n");
     dialog.message(tools_printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT, __VERSION__)
                    + tools_printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), name.c_str(), PACKAGE_VERSION)
@@ -2629,7 +2629,7 @@ static void make_args_from_file(shared_ptr<user_interaction> & dialog,
             // now parsing the file and cutting words
             // taking care of quotes
             //
-        tools_split_in_words(surconf, mots);
+        line_tools_split_in_words(surconf, mots);
 
 
             // now converting the mots of type deque<string> to argc/argv arguments
@@ -2683,7 +2683,7 @@ static void make_args_from_file(shared_ptr<user_interaction> & dialog,
         throw;
     }
 
-    tools_merge_to_deque(read_targets, surconf.get_read_targets());
+    line_tools_merge_to_deque(read_targets, surconf.get_read_targets());
 }
 
 
@@ -2905,7 +2905,7 @@ static mask *make_exclude_path_ordered(const string & x, mask_opt opt)
         }
         else // regex
         {
-            ret = new (nothrow) regular_mask(tools_build_regex_for_exclude_mask(opt.prefix.display(), x), opt.case_sensit);
+            ret = new (nothrow) regular_mask(line_tools_build_regex_for_exclude_mask(opt.prefix.display(), x), opt.case_sensit);
 
             if(ret == nullptr)
                 throw Ememory("make_exclude_path");
@@ -2926,7 +2926,7 @@ static mask *make_exclude_path_unordered(const string & x, mask_opt opt)
         if(opt.glob_exp)
             ret = new (nothrow) simple_mask((opt.prefix + x).display(), opt.case_sensit);
         else
-            ret = new (nothrow) regular_mask(tools_build_regex_for_exclude_mask(opt.prefix.display(), x), opt.case_sensit);
+            ret = new (nothrow) regular_mask(line_tools_build_regex_for_exclude_mask(opt.prefix.display(), x), opt.case_sensit);
     if(ret == nullptr)
         throw Ememory("make_exclude_path");
 

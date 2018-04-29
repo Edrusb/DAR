@@ -63,16 +63,16 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 {
     S_I ret = EXIT_OK;
     line_param param;
-    const char *home = tools_get_from_env(env, "HOME");
-    deque<string> dar_dcf_path = line_tools_explode_PATH(tools_get_from_env(env, "DAR_DCF_PATH"));
-    deque<string> dar_duc_path = line_tools_explode_PATH(tools_get_from_env(env, "DAR_DUC_PATH"));
+    const char *home = line_tools_get_from_env(env, "HOME");
+    deque<string> dar_dcf_path = line_tools_explode_PATH(line_tools_get_from_env(env, "DAR_DCF_PATH"));
+    deque<string> dar_duc_path = line_tools_explode_PATH(line_tools_get_from_env(env, "DAR_DUC_PATH"));
     string sftp_known_hosts = string(home) + "/.ssh/known_hosts";
     string sftp_pub_filekey = string(home) + "/.ssh/id_rsa.pub";
     string sftp_prv_filekey = string(home) + "/.ssh/id_rsa";
-    const char *env_knownhosts = tools_get_from_env(env, "DAR_SFTP_KNOWNHOSTS_FILE");
-    const char *env_pub_filekey = tools_get_from_env(env, "DAR_SFTP_PUBLIC_KEYFILE");
-    const char *env_prv_filekey = tools_get_from_env(env, "DAR_SFTP_PRIVATE_KEYFILE");
-    const char *env_ignored_as_symlink = tools_get_from_env(env, "DAR_IGNORED_AS_SYMLINK");
+    const char *env_knownhosts = line_tools_get_from_env(env, "DAR_SFTP_KNOWNHOSTS_FILE");
+    const char *env_pub_filekey = line_tools_get_from_env(env, "DAR_SFTP_PUBLIC_KEYFILE");
+    const char *env_prv_filekey = line_tools_get_from_env(env, "DAR_SFTP_PRIVATE_KEYFILE");
+    const char *env_ignored_as_symlink = line_tools_get_from_env(env, "DAR_IGNORED_AS_SYMLINK");
     shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
 
     if(!dialog)

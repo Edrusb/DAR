@@ -80,14 +80,6 @@ namespace libdar
 	/// libdar internal use only: it is launched from close_and_clean() and releases tools internal variables
     extern void tools_end();
 
-	/// convert a string to a char *
-
-	/// \param[in] x is the string to convert
-	/// \return the address of newly allocated memory containing the equivalent string as the argument
-	/// \exception Ememory is thrown if the memory allocation failed, this call never return nullptr
-	/// \note Do not use this function, use std::string::c_str(). The allocated memory must be released by the caller thanks to the "delete []" operator
-    extern char *tools_str2charptr(const std::string &x);
-
 	/// write a string to a file with a '\\0' at then end
 
 	/// \param[in] f the file to write to
@@ -119,27 +111,12 @@ namespace libdar
 	/// \return the size of the file in byte
     extern infinint tools_get_filesize(const path &p);
 
-	/// convert the given string to infinint taking care of multiplication suffixes like k, M, T, etc.
-
-	/// \param[in] s is the string to read
-	/// \param[in] base is the multiplication factor (base = 1000 for SI, base = 1024 for computer science use)
-	/// \return the value encoded in the given string
-    extern infinint tools_get_extended_size(std::string s, U_I base);
-
 	/// convert an integer to its decimal representation with the highest unit of metric system
 	/// \param[in] number is the integer to convert
 	/// \param[in] unit unit symbol (o for octet, m for meter, etc.) to apply metric system to, this may be nullptr
 	/// \param[in] binary if set to true using the ki, Gi, Mi ... scale instead of the traditional k, G, M, ... prefixes
 	/// \return the string representing the number in metric system (ex: "1 ko", "200 Mio", ...)
     extern std::string tools_display_integer_in_metric_system(infinint number, const std::string & unit, bool binary);
-
-	/// extracts the basename of a file (removing path part)
-
-	/// \param[in] command_name is the full path of the file
-	/// \param[out] basename the basename of the file
-	/// \exception Ememory can be thrown if memory allocation failed
-    extern void tools_extract_basename(const char *command_name, std::string & basename);
-
 
 	/// give a pointer to the last character of the given value in the given string
 
@@ -149,49 +126,6 @@ namespace libdar
 	/// \note the arguments are not modified neither the data they are pointing to. However the const statement has not been used to
 	/// be able to return a iterator on the string (and not a const_interator). There is probably other ways to do that (using const_cast) for example
     extern std::string::iterator tools_find_last_char_of(std::string &s, unsigned char v);
-
-	/// give a pointer to the last character of the given value in the given string
-
-	/// \param[in] s is the given string
-	/// \param[in] v is the given char value
-	/// \return a interator on s, pointing on the first char of s equal to v or a pointing to s.end() if no such char could be found is "s"
-	/// \note the arguments are not modified neither the data they are pointing to. However the const statement has not been used to
-	/// be able to return a iterator on the string (and not a const_interator). There is probably other ways to do that (using const_cast) for example
-    extern std::string::iterator tools_find_first_char_of(std::string &s, unsigned char v);
-
-	/// split a given full path in path part and basename part
-
-	/// \param[in] all is the path to split
-	/// \param[out] chemin is the resulting path part, it points to a newly allocated path object
-	/// \param[out] base is the resulting basename
-	/// \note chemin argument must be release by the caller thanks to the "delete" operator.
-    extern void tools_split_path_basename(const char *all, path * &chemin, std::string & base);
-
-	/// split a given full path in path part and basename part
-
-	/// \param[in] all is the path to split
-	/// \param[out] chemin is the resulting path part, it points to a newly allocated path object
-	/// \param[out] base is the resulting basename
-	/// \note chemin argument must be release by the caller thanks to the "delete" operator.
-    extern void tools_split_path_basename(const std::string &all, std::string & chemin, std::string & base);
-
-	/// split a given full remote repository path in parts
-
-	/// \param[in] all is the argument to split in parts
-	/// \param[out] proto is the protocol field
-	/// \param[out] login is the login field (empty string is returned if not provided)
-	/// \param[out] password is the password field (empty string if not provided)
-	/// \param[out] hostname is the hostname field
-	/// \param[out] port is the port field (empty string if not provided)
-	/// \param[out] path_basename is the path+basename remaing field
-	/// \return false if the all argument does not follow the remote repository syntax
-    extern bool tools_split_entrepot_path(const std::string &all,
-					  std::string & proto,
-					  std::string & login,
-					  secu_string & password,
-					  std::string & hostname,
-					  std::string & port,
-					  std::string & path_basename);
 
 	/// set blocking/not blocking mode for reading on a file descriptor
 
@@ -224,27 +158,6 @@ namespace libdar
     extern std::string tools_int2str(S_I x);
     extern std::string tools_uint2str(U_I x);
 
-	/// convert an integer written in decimal notation to the corresponding value
-
-	/// \param[in] x the decimal representation of the integer
-	/// \return the value corresponding to the decimal representation given
-    extern U_I tools_str2int(const std::string & x);
-
-	/// convert a signed integer written in decimal notation to the corresponding value
-
-	/// \param[in] x the decimal representation of the integer
-	/// \return the value corresponding to the decimal representation given
-    extern S_I tools_str2signed_int(const std::string & x);
-
-	/// ascii to integer conversion
-
-	/// \param[in] a is the ascii string to convert
-	/// \param[out] val is the resulting value
-	/// \return true if the conversion could be done false if the given string does not
-	/// correspond to the decimal representation of an unsigned integer
-	/// \note this call is now a warapper around tools_str2int
-    extern bool tools_my_atoi(const char *a, U_I & val);
-
 	/// prepend spaces before the given string
 
 	/// \param[in] s the string to append spaces to
@@ -258,12 +171,19 @@ namespace libdar
 	/// \return the human representation corresponding to the argument
     extern std::string tools_display_date(const datetime & date);
 
-	/// convert a human readable date representation in number of second since the system reference date
+        /// convert a string to a char *
 
-	/// \param[in] repres the date's human representation
-	/// \return the corresponding number of seconds (computer time)
-	/// \note the string expected format is "[[[year/]month/]day-]hour:minute[:second]"
-    extern infinint tools_convert_date(const std::string & repres);
+	/// \param[in] x is the string to convert
+	/// \return the address of newly allocated memory containing the equivalent string as the argument
+	/// \exception Ememory is thrown if the memory allocation failed, this call never return nullptr
+	/// \note Do not use this function, use std::string::c_str(). The allocated memory must be released by the caller thanks to the "delete []" operator
+    extern char *tools_str2charptr(const std::string &x);
+
+        /// convert an integer written in decimal notation to the corresponding value
+
+	/// \param[in] x the decimal representation of the integer
+	/// \return the value corresponding to the decimal representation given
+    extern U_I tools_str2int(const std::string & x);
 
 	/// wrapper to the "system" system call.
 
@@ -310,14 +230,6 @@ namespace libdar
     std::vector<std::string> operator + (std::vector<std::string> a, std::vector<std::string> b);
 
 
-	/// display the compilation time features of libdar
-
-	/// \param[in,out] dialog for user interaction
-	/// \note this call uses the compile_time:: routines, and will
-	/// not change its interface upon new feature addition
-    extern void tools_display_features(user_interaction & dialog);
-
-
 	/// test if two dates are equal taking care of a integer hour of difference
 
 	/// \param[in] hourshift is the number of integer hour more or less two date can be considered equal
@@ -335,29 +247,6 @@ namespace libdar
     }
 
 
-	/// isolate the value of a given variable from the environment vector
-
-	/// \param[in] env the environment vector as retreived from the third argument of the main() function
-	/// \param[in] clef the key or variable name too look for
-	/// \return nullptr if the key could not be found or a pointer to the env data giving the value of the requested key
-	/// \note the returned value must not be released by any mean as it is just a pointer to an system allocated memory (the env vector).
-    extern const char *tools_get_from_env(const char **env, const char *clef);
-
-	/// does sanity checks on a slice name, check presence and detect whether the given basename is not rather a filename
-
-	/// \param[in,out] dialog for user interaction
-	/// \param[in] loc the path where resides the slice
-	/// \param[in,out] base the basename of the slice
-	/// \param[in] extension the extension of dar's slices
-	/// \note if user accepted the change of slice name proposed by libdar through dialog the base argument is changed
-    extern void tools_check_basename(user_interaction & dialog,
-                                     const path & loc,
-				     std::string & base,
-				     const std::string & extension);
-
-	/// get current working directory
-
-    extern std::string tools_getcwd();
 
 	/// returns the file pointed to by a symbolic link (or transparent if the file is not a symlink).
 
@@ -409,18 +298,6 @@ namespace libdar
 	/// like cirillic and greek letters.
     extern void tools_to_wupper(std::wstring & r);
 #endif
-
-	/// from a string with a range notation (min-max) extract the range values
-
-	/// \param[in] s the string to parse
-	/// \param[out] min the minimum value of the range
-	/// \param[out] max the maximum value of the range
-	/// \exception Erange is thrown is the string to parse is incorrect
-	/// \note: either a single number (positive or negative) is returned in min
-	/// (max is set to min if min is positive or to zero if min is negative)
-	/// or a range of positive numbers.
-    extern void tools_read_range(const std::string & s, S_I & min, U_I & max);
-
 
 	/// make printf-like formating to a std::string
 
@@ -546,123 +423,12 @@ namespace libdar
 	/// \return the size if the file in byte
     extern infinint tools_get_size(const std::string & s);
 
-	/// read a file and split its contents into words
+        /// convert the given string to infinint taking care of multiplication suffixes like k, M, T, etc.
 
-	/// \param[in,out] f is the file to read
-	/// \param[out] mots std container to receive the split result
-	/// \return the list of words found in this order in the file
-	/// \note The different quotes are taken into account
-    template <class T> void tools_split_in_words(generic_file & f, T & mots)
-    {
-	std::deque <char> quotes;
-	std::string current = "";
-        char a;
-        bool loop = true;
-        bool escaped = false;
-
-	mots.clear();
-        while(loop)
-        {
-            if(f.read(&a, 1) != 1) // reached end of file
-            {
-                loop = false;
-                a = ' '; // to close the last word
-            }
-
-            if(escaped)
-            {
-                current += a; // added without consideration of quoting of any sort
-                escaped = false;
-                continue; // continuing at beginning of the while loop
-            }
-            else
-            {
-                if(a == '\\')
-                {
-                    escaped = true;
-                    continue; // continuing at beginning of the while loop
-                }
-            }
-
-            if(quotes.empty()) // outside a word
-                switch(a)
-                {
-                case ' ':
-                case '\t':
-                case '\n':
-                case '\r':
-                    break;
-                case '"':
-                case '\'':
-                case '`':
-                    quotes.push_back(a);
-                    break;
-                default:
-                    quotes.push_back(' '); // the quote space means no quote
-                    current += a; // a new argument is starting
-                    break;
-                }
-            else // inside a word
-                switch(a)
-                {
-                case '\t':
-                    if(quotes.back() != ' ')
-                    {
-                            // this is the end of the wor(l)d ;-)
-                            // ...once again... 1000, 1999, 2012, and the next ones to come...
-                        break;
-                    }
-                        // no break !
-                case '\n':
-                case '\r':
-                    a = ' '; // replace carriage return inside quoted string by a space
-                        // no break !
-                case ' ':
-                case '"':
-                case '\'':
-                case '`':
-                    if(a == quotes.back()) // "a" is an ending quote
-                    {
-                        quotes.pop_back();
-                        if(quotes.empty()) // reached end of word
-                        {
-                            mots.push_back(current);
-                            current = "";
-                        }
-                        else
-                            current += a;
-                    }
-                    else // "a" is a nested starting quote
-                    {
-                        if(a != ' ') // quote ' ' does not have ending quote
-                            quotes.push_back(a);
-                        current += a;
-                    }
-                    break;
-                default:
-                    current += a;
-                }
-        }
-        if(!quotes.empty())
-            throw Erange("make_args_from_file", tools_printf(dar_gettext("Parse error: Unmatched `%c'"), quotes.back()));
-    }
-
-
-
-	/// read a std::string and split its contents into words
-
-	/// \param[in,out] arg is the string to read
-	/// \param[out] mots a std container to receive the split result
-	/// \return the list of words found in this order in the file
-	/// \note The different quotes are taken into account
-    template <class T> void tools_split_in_words(const std::string & arg, T & mots)
-    {
-	memory_file mem;
-
-	mem.write(arg.c_str(), arg.size());
-	mem.skip(0);
-	tools_split_in_words(mem, mots);
-    }
+	/// \param[in] s is the string to read
+	/// \param[in] base is the multiplication factor (base = 1000 for SI, base = 1024 for computer science use)
+	/// \return the value encoded in the given string
+    extern infinint tools_get_extended_size(std::string s, U_I base);
 
 	/// produce the string resulting from the substition of % macro defined in the map
 
@@ -724,14 +490,6 @@ namespace libdar
 						  const std::string & context,
 						  const std::string & base_url);
 
-	/// builds a regex from root directory and user provided regex to be applied to the relative path
-
-
-	/// \param[in] prefix is the root portion of the path
-	/// \param[in] relative_part is the user provided regex to be applied to the relative path
-	/// \return the corresponding regex to be applied to full absolute path
-    extern std::string tools_build_regex_for_exclude_mask(const std::string & prefix,
-							  const std::string & relative_part);
 
 	/// convert string for xml output
 
@@ -864,17 +622,8 @@ namespace libdar
 	/// \return crc_size is the size of the crc to use
     extern infinint tools_file_size_to_crc_size(const infinint & size);
 
-	/// return a string containing the Effective UID
-    extern std::string tools_get_euid();
-
-	/// return a string containing the Effective UID
-    extern std::string tools_get_egid();
-
-	/// return a string containing the hostname of the current host
-    extern std::string tools_get_hostname();
-
-	/// return a string containing the current time (UTC)
-    extern std::string tools_get_date_utc();
+        /// get current working directory
+    extern std::string tools_getcwd();
 
 	/// return the string about compression ratio
     extern std::string tools_get_compression_ratio(const infinint & storage_size, const infinint & file_size, bool compressed);
@@ -895,12 +644,6 @@ namespace libdar
     extern std::string tools_wstring_to_string(const std::wstring & val);
 #endif
 
-	/// add in 'a', element of 'b' not already found in 'a'
-    extern void tools_merge_to_deque(std::deque<std::string> & a, const  std::deque<std::string> & b);
-
-	/// remove from 'a' elements found in 'b' and return the resulting deque
-    extern std::deque<std::string> tools_substract_from_deque(const std::deque<std::string> & a, const std::deque<std::string> & b);
-
 	/// allocate a new dirent structure for use with readdir_r
 	///
 	/// \param[in] path_name is the path of to the directory (and its underlying filesystem)
@@ -910,7 +653,6 @@ namespace libdar
 	/// \param[out] max_name_length is the maximum filename length allocated in the returned structure
 	/// \return a pointer to the newly allocated dirent structure
     struct dirent *tools_allocate_struct_dirent(const std::string & path_name, U_64 & max_name_length);
-
 
 	/// release a dirent structure as allocated by tools_allocate_struct_dirent
 	///
@@ -933,6 +675,15 @@ namespace libdar
 
 	/// \note: if the infinint is too large to fit in an U_64 it returns false
     extern bool tools_infinint2U_64(infinint val, U_64 & res);
+
+        /// ascii to integer conversion
+
+	/// \param[in] a is the ascii string to convert
+	/// \param[out] val is the resulting value
+	/// \return true if the conversion could be done false if the given string does not
+	/// correspond to the decimal representation of an unsigned integer
+	/// \note this call is now a warapper around line_tools_str2int
+    extern bool tools_my_atoi(const char *a, U_I & val);
 
 	/// convert a double (float) to infinint (integer) taking care of rounding it to the closest value
     extern infinint tools_double2infinint(double arg);

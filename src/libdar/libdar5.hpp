@@ -315,29 +315,11 @@ namespace libdar5
     using libdar::tlv_list;
 
 	// from tools.hpp
-    using libdar::tools_substract_from_deque;
     using libdar::tools_printf;
     using libdar::tools_getcwd;
-    using libdar::tools_convert_date;
     using libdar::tools_get_extended_size;
     using libdar::tools_my_atoi;
-    using libdar::tools_split_entrepot_path;
-    using libdar::tools_split_path_basename;
-    using libdar::tools_str2int;
-    using libdar::tools_extract_basename;
-    using libdar::tools_str2charptr;
-    using libdar::tools_merge_to_deque;
-    using libdar::tools_build_regex_for_exclude_mask;
-    using libdar::tools_get_from_env;
-    using libdar::tools_find_first_char_of;
-    using libdar::tools_get_date_utc;
-    using libdar::tools_get_euid;
-    using libdar::tools_get_egid;
-    using libdar::tools_get_hostname;
     using libdar::tools_octal2int;
-    using libdar::tools_read_range;
-    using libdar::tools_str2signed_int;
-    using libdar::tools_split_in_words;
 
 	// from compile_time_features.hpp
     namespace compile_time

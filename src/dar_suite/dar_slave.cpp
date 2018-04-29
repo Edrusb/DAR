@@ -113,7 +113,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 
     if(command_line(*ptr, argc, argv, chemin, filename, input_pipe, output_pipe, execute, min_digits))
     {
-	tools_check_basename(*dialog, chemin, filename, EXTENSION);
+	line_tools_check_basename(*dialog, chemin, filename, EXTENSION);
 	libdar::libdar_slave slave(dialog,
 				   chemin,
 				   filename,
@@ -217,7 +217,7 @@ static bool command_line(shell_interaction & dialog,
 
     try
     {
-	tools_split_path_basename(argv[optind], tmp, filename);
+	line_tools_split_path_basename(argv[optind], tmp, filename);
 	if(tmp == nullptr)
 	    throw SRC_BUG;
 	chemin = tmp->display();
@@ -243,7 +243,7 @@ static bool command_line(shell_interaction & dialog,
 static void show_usage(shell_interaction & dialog, const char *command)
 {
     string cmd;
-    tools_extract_basename(command, cmd);
+    line_tools_extract_basename(command, cmd);
     dialog.change_non_interactive_output(cout);
 
     dialog.printf("\nusage : \n");
@@ -263,7 +263,7 @@ static void show_usage(shell_interaction & dialog, const char *command)
 static void show_version(shell_interaction & dialog, const char *command)
 {
     string cmd;
-    tools_extract_basename(command, cmd);
+    line_tools_extract_basename(command, cmd);
     U_I maj, med, min;
 
     get_version(maj, med, min);
@@ -273,7 +273,7 @@ static void show_version(shell_interaction & dialog, const char *command)
 	dialog.printf(gettext(" Using libdar %u.%u.%u built with compilation time options:\n"), maj, med, min);
     else
 	dialog.printf(gettext(" Using libdar %u.%u built with compilation time options:\n"), maj, min);
-    tools_display_features(dialog);
+    line_tools_display_features(dialog);
     dialog.printf("\n");
     dialog.printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT,  __VERSION__);
     dialog.printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), cmd.c_str(), PACKAGE_VERSION);

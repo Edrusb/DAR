@@ -340,8 +340,8 @@ static bool command_line(shell_interaction & dialog,
 		    op = add;
 		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
-		    tools_split_path_basename(optarg, chem, filename);
-		    tools_check_basename(dialog, chem, filename, EXTENSION);
+		    line_tools_split_path_basename(optarg, chem, filename);
+		    line_tools_check_basename(dialog, chem, filename, EXTENSION);
 		    arg = (path(chem)+filename).display();
 		    break;
 		case 'l':
@@ -357,7 +357,7 @@ static bool command_line(shell_interaction & dialog,
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		    try
 		    {
-			tools_read_range(string(optarg), min, max);
+			line_tools_read_range(string(optarg), min, max);
 		    }
 		    catch(Edeci & e)
 		    {
@@ -372,7 +372,7 @@ static bool command_line(shell_interaction & dialog,
 		    op = chbase;
 		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
-		    num = tools_str2signed_int(optarg);
+		    num = line_tools_str2signed_int(optarg);
 		    break;
 		case 'p':
 		    if(op != none_op)
@@ -380,7 +380,7 @@ static bool command_line(shell_interaction & dialog,
 		    op = where;
 		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
-		    num = tools_str2signed_int(optarg);
+		    num = line_tools_str2signed_int(optarg);
 		    break;
 		case 'o':
 		    if(op != none_op)
@@ -406,7 +406,7 @@ static bool command_line(shell_interaction & dialog,
 		    op = used;
 		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
-		    num = tools_str2signed_int(optarg);
+		    num = line_tools_str2signed_int(optarg);
 		    break;
 		case 'f':
 		    if(op != none_op)
@@ -443,7 +443,7 @@ static bool command_line(shell_interaction & dialog,
 		case 'w':
 		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
-		    date = tools_convert_date(optarg);
+		    date = line_tools_convert_date(optarg);
 		    date_set = date_set_by_w;
 		    break;
 		case 'i':
@@ -660,7 +660,7 @@ static void op_add(shared_ptr<user_interaction> & dialog, database *dat, const s
     thr.check_self_cancellation();
     if(info_details)
 	dialog->message(gettext("Reading catalogue of the archive to add..."));
-    tools_split_path_basename(arg, arch_path, arch_base);
+    line_tools_split_path_basename(arg, arch_path, arch_base);
     read_options.set_info_details(info_details);
     read_options.set_slice_min_digits(min_digits);
     archive *arch = new (nothrow) archive(dialog, path(arch_path), arch_base, EXTENSION, read_options);
@@ -676,7 +676,7 @@ static void op_add(shared_ptr<user_interaction> & dialog, database *dat, const s
 	    dialog->message(gettext("Updating database with catalogue..."));
 	if(fake == "")
 	    fake = arg;
-	tools_split_path_basename(fake, chemin, b);
+	line_tools_split_path_basename(fake, chemin, b);
 	dat->add_archive(*arch, chemin, b, database_add_options());
 	thr.check_self_cancellation();
 	if(info_details)
@@ -802,7 +802,7 @@ static void op_restore(shared_ptr<user_interaction> & dialog, database *dat, con
     if(dat == nullptr)
 	throw SRC_BUG;
 
-    tools_split_in_words(options_for_dar, options);
+    line_tools_split_in_words(options_for_dar, options);
     thr.check_self_cancellation();
     if(info_details)
 	dialog->message(gettext("Looking in archives for requested files, classifying files archive by archive..."));
@@ -936,7 +936,7 @@ static void show_usage(shell_interaction & dialog, const char *command)
 static void show_version(shell_interaction & dialog, const char *command_name)
 {
     string name;
-    tools_extract_basename(command_name, name);
+    line_tools_extract_basename(command_name, name);
     U_I maj, med, min;
 
     get_version(maj, med, min);
@@ -947,7 +947,7 @@ static void show_version(shell_interaction & dialog, const char *command_name)
 	dialog.printf(gettext(" Using libdar %u.%u.%u built with compilation time options:\n"), maj, med, min);
     else
 	dialog.printf(gettext(" Using libdar %u.%u built with compilation time options:\n"), maj, min);
-    tools_display_features(dialog);
+    line_tools_display_features(dialog);
     dialog.printf("\n");
     dialog.printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT, __VERSION__);
     dialog.printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), name.c_str(), PACKAGE_VERSION);
@@ -1095,7 +1095,7 @@ static void op_interactive(shared_ptr<user_interaction> & dialog, database *dat,
 		break;
 	    case 'u':
 		input = dialog->get_string(gettext("Archive number: "), true);
-		tmp_si = tools_str2signed_int(input);
+		tmp_si = line_tools_str2signed_int(input);
 		signed_int_to_archive_num(tmp_si, num, tmp_sign);
 		opt_used.set_revert_archive_numbering(!tmp_sign);
 		shelli->database_show_files(*dat, num, opt_used);
@@ -1106,7 +1106,7 @@ static void op_interactive(shared_ptr<user_interaction> & dialog, database *dat,
 		break;
 	    case 'b':
 		input = dialog->get_string(gettext("Archive number to modify: "), true);
-		tmp_si = tools_str2signed_int(input);
+		tmp_si = line_tools_str2signed_int(input);
 		signed_int_to_archive_num(tmp_si, num, tmp_sign);
 		opt_change_name.set_revert_archive_numbering(!tmp_sign);
 		input = dialog->get_string(tools_printf(gettext("New basename for archive number %d: "), tmp_si), true);
@@ -1133,7 +1133,7 @@ static void op_interactive(shared_ptr<user_interaction> & dialog, database *dat,
 	    case 'A':
 		input = dialog->get_string(gettext("Archive basename (or extracted catalogue basename) to add: "), true);
 		dialog->message(gettext("Reading catalogue of the archive to add..."));
-		tools_split_path_basename(input, input, input2);
+		line_tools_split_path_basename(input, input, input2);
 		read_options.clear();
 		read_options.set_info_details(true);
 		arch = new (nothrow) archive(dialog, path(input), input2, EXTENSION, read_options);
@@ -1159,7 +1159,7 @@ static void op_interactive(shared_ptr<user_interaction> & dialog, database *dat,
 		break;
 	    case 'D':
 		input = dialog->get_string(gettext("Archive number to remove: "), true);
-		tmp_si = tools_str2signed_int(input);
+		tmp_si = line_tools_str2signed_int(input);
 		signed_int_to_archive_num(tmp_si, num, tmp_sign);
 		opt_remove.set_revert_archive_numbering(!tmp_sign);
 		dialog->pause(tools_printf(gettext("Are you sure to remove archive number %d ?"), tmp_si));
@@ -1180,7 +1180,7 @@ static void op_interactive(shared_ptr<user_interaction> & dialog, database *dat,
 		break;
 	    case 'p':
 		input = dialog->get_string(gettext("Archive number who's path to modify: "), true);
-		tmp_si = tools_str2signed_int(input);
+		tmp_si = line_tools_str2signed_int(input);
 		signed_int_to_archive_num(tmp_si, num, tmp_sign);
 		opt_change_path.set_revert_archive_numbering(!tmp_sign);
 		input = dialog->get_string(tools_printf(gettext("New path to give to archive number %d: "), tmp_si), true);
@@ -1324,7 +1324,7 @@ static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const
 	    while(proper.read(&tmp,  1) == 1 && tmp != '\n')
 		line += tmp;
 
-	    tools_split_in_words(line, mots);
+	    line_tools_split_in_words(line, mots);
 
 	    if(mots.size() == 0)
 		continue;

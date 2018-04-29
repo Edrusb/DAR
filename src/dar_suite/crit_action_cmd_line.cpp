@@ -419,7 +419,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 		    }
 		    catch(Edeci & e)
 		    {
-			date = tools_convert_date(sub_arg);
+			date = line_tools_convert_date(sub_arg);
 		    }
 		    break;
 		default:
