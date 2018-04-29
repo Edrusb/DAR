@@ -849,14 +849,14 @@ namespace libdar
 
 	/// \param[in] x is the byte to convert
 	/// \return the string representing the value of x written in hexadecimal
-    std::string tools_unsigned_char_to_hexa(unsigned char x);
+    extern std::string tools_unsigned_char_to_hexa(unsigned char x);
 
 	/// convert a string into its hexadecima representation
 
 	/// \param[in] input input string to convert
 	/// \return a string containing an hexadecimal number corresponding to the bytes of the input string
 
-    std::string tools_string_to_hexa(const std::string & input);
+    extern std::string tools_string_to_hexa(const std::string & input);
 
 	/// Defines the CRC size to use for a given filesize
 
