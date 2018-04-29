@@ -194,16 +194,16 @@ namespace libdar
 	    /// \note see also get_stats() method
 	void summary();
 
-	    /// same summary information but as broken out data
+	    /// same information as summary() but as broken out data
 	archive_summary summary_data();
 
 
 	    /// listing of the archive contents
 
 	    /// \param[in] callback callback function used to provide data in splitted field (not used if null is given)
-	    /// \param[in] context will be passed as first argument of the callback as is provided here
+	    /// \param[in] context will be passed as is to the last argument of the provided callback
 	    /// \param[in] options list of optional parameters to use for the operation
-	    /// \note if callback is nullptr (or NULL), the output is done using user_interaction
+	    /// \note if callback is nullptr (or NULL), the output is done using user_interaction provided with archive constructor
 	    /// \note alternative way to get archive contents:
 	    /// . archive::get_children_of() method
 	    /// . archive::init_catalogue()+get_children_in_table()

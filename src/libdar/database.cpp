@@ -209,6 +209,14 @@ namespace libdar
 
     void database::add_archive(const archive & arch, const string & chemin, const string & basename, const database_add_options & opt)
     {
+	    // note: this methode could now leverage the use of
+	    // list_entry provided by op_listing to a callback function, but
+	    // it does not worth the effort as it brings no value to the code
+	    // and would probably cost the introduction of some bugs
+	    //
+	    // so we need accessing the internal catalogue object of a given archive
+	    // to keep this implementation as is
+
 	NLS_SWAP_IN;
 	try
 	{
