@@ -260,10 +260,10 @@ namespace libdar
 	    /// \param[in] filename base name of the slices ("-" for standard output)
 	    /// \param[in] extension slices extension ("dar")
 	    /// \param[in] options optional parameters to use for the operation
-	    /// \note that if the archive contains delta sig and isolation options specify not
-	    /// to keep them in the resulting isolated catalogue the current archive object (but
-	    /// not the archive file) is modified (forget delta signature) --- this is not a
-	    /// const method.
+	    /// \note that if the archive contains delta sig and isolation options, specifying not
+	    /// to keep them in the resulting isolated catalogue leads the current archive object
+	    /// (but not the corresponding archive stored on filesystem) to be modified
+	    /// (delta signature are removed) --- this is not a const method.
 	void op_isolate(const path &sauv_path,
 			const std::string & filename,
 			const std::string & extension,
