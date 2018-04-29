@@ -2111,27 +2111,6 @@ namespace libdar
         return buf.st_size;
     }
 
-
-    datetime tools_get_ctime(const std::string & s)
-    {
-        struct stat buf;
-
-        if(lstat(s.c_str(), &buf) < 0)
-        {
-            string tmp = tools_strerror_r(errno);
-            throw Erange("tools_get_mtime", tools_printf(dar_gettext("Cannot get mtime: %s"), tmp.c_str()));
-        }
-
-#ifdef LIBDAR_MICROSECOND_READ_ACCURACY
-        datetime ret = datetime(buf.st_ctim.tv_sec, buf.st_ctim.tv_nsec/1000, datetime::tu_microsecond);
-        if(ret.is_null()) // assuming an error avoids getting time that way
-            ret = datetime(buf.st_ctime, 0, datetime::tu_second);
-#else
-        datetime ret = datetime(buf.st_ctime, 0, datetime::tu_second);
-#endif
-        return ret;
-    }
-
     bool tools_find_next_char_out_of_parenthesis(const string & data, const char what,  U_32 start, U_32 & found)
     {
         U_32 nested_parenth = 0;

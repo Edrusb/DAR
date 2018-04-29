@@ -546,12 +546,6 @@ namespace libdar
 	/// \return the size if the file in byte
     extern infinint tools_get_size(const std::string & s);
 
-	/// returns the last change date of the given file
-
-	/// \param[in] s path of the file to get the last ctime
-	/// \return the ctime of the given file
-    extern datetime tools_get_ctime(const std::string & s);
-
 	/// read a file and split its contents into words
 
 	/// \param[in,out] f is the file to read
