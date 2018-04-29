@@ -52,8 +52,6 @@ namespace libdar
 	sar *source = nullptr;
 	string base = basename;
 
-	tools_check_basename(*dialog, chemin, base, extension);
-
 	entrep.reset(new (nothrow) entrepot_local("", "", false));
 	if(!entrep)
 	    throw Ememory("libdar_slave::libdar_slave");
