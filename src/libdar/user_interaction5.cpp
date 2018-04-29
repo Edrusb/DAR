@@ -79,6 +79,7 @@ using namespace std;
 
 namespace libdar5
 {
+    static void remove_last_char_if_equal_to(char c, string & s);
 
     user_interaction::user_interaction()
     {
@@ -208,7 +209,7 @@ namespace libdar5
 	    throw;
 	}
 	va_end(ap);
-	libdar::tools_remove_last_char_if_equal_to('\n', output);
+	remove_last_char_if_equal_to('\n', output);
 	message(output);
     }
 
@@ -224,6 +225,12 @@ namespace libdar5
 	    // as is to a shared_ptr does not lead to an
 	    // undefined behavior
 	return shared_ptr<user_interaction>(tmp);
+    }
+
+    static void remove_last_char_if_equal_to(char c, string & s)
+    {
+	if(s[s.size()-1] == c)
+	    s = string(s.begin(), s.begin()+(s.size() - 1));
     }
 
 

@@ -1668,12 +1668,6 @@ namespace libdar
     }
 #endif
 
-    void tools_remove_last_char_if_equal_to(char c, string & s)
-    {
-        if(s[s.size()-1] == c)
-            s = string(s.begin(), s.begin()+(s.size() - 1));
-    }
-
     static void ignore_deadson(S_I sig)
     {
         signal(SIGCHLD, &ignore_deadson);

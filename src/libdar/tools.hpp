@@ -410,12 +410,6 @@ namespace libdar
     extern void tools_to_wupper(std::wstring & r);
 #endif
 
-	/// remove last character of a string is it equal to a given value
-
-	/// \param[in] c the given value to compare the last char with
-	/// \param[in,out] s the string to modify
-    extern void tools_remove_last_char_if_equal_to(char c, std::string & s);
-
 	/// from a string with a range notation (min-max) extract the range values
 
 	/// \param[in] s the string to parse
