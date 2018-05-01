@@ -23,21 +23,17 @@
     /// \brief contains a class that permits arbitrary large data storage
     /// \ingroup Private
 
-#include "../my_config.h"
-#include "erreurs.hpp"
-#include "integers.hpp"
-
-#ifdef LIBDAR_MODE
-#include "infinint.hpp"
-#endif
-
-    // it is necessary to not protect the previous inclusion inside
-    // the STORAGE_HPP protection to avoid cyclic dependancies.
-
 #ifndef STORAGE_HPP
 #define STORAGE_HPP
 
-#ifndef LIBDAR_MODE
+#include "../my_config.h"
+#include "erreurs.hpp"
+#include "integers.hpp"
+#include "proto_generic_file.hpp"
+
+#if LIBDAR_MODE == 32 || LIBDAR_MODE == 64
+#include "infinint.hpp"
+#else
 namespace libdar
 {
     class infinint;
@@ -46,7 +42,6 @@ namespace libdar
 
 namespace libdar
 {
-    class generic_file;
 
 	/// arbitrary large storage structure
 
@@ -67,7 +62,7 @@ namespace libdar
     public:
         storage(U_32 size) { make_alloc(size, first, last); };
         storage(const infinint & size);
-        storage(generic_file & f, const infinint & size);
+        storage(proto_generic_file & f, const infinint & size);
         storage(const storage & ref) { copy_from(ref); };
 	storage(storage && ref) noexcept: first(nullptr), last(nullptr) { move_from(std::move(ref)); };
         storage & operator = (const storage & val) { detruit(first); copy_from(val); return *this; };
@@ -90,7 +85,7 @@ namespace libdar
         unsigned char operator [](const infinint & position) const;
         infinint size() const noexcept;
         void clear(unsigned char val = 0) noexcept;
-        void dump(generic_file & f) const;
+        void dump(proto_generic_file & f) const;
 
         class iterator
         {

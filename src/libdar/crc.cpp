@@ -50,7 +50,6 @@ extern "C"
 #include <iostream>
 #include <sstream>
 
-#include "generic_file.hpp"
 #include "crc.hpp"
 
 using namespace std;
@@ -212,7 +211,7 @@ namespace libdar
 	clear();
     }
 
-    crc_i::crc_i(const infinint & width, generic_file & f) : size(width), cyclic(f, width)
+    crc_i::crc_i(const infinint & width, proto_generic_file & f) : size(width), cyclic(f, width)
     {
 	pointer = cyclic.begin();
     }
@@ -253,7 +252,7 @@ namespace libdar
 	pointer = cyclic.begin();
     }
 
-    void crc_i::dump(generic_file & f) const
+    void crc_i::dump(proto_generic_file & f) const
     {
 	size.dump(f);
 	cyclic.dump(f);
@@ -320,7 +319,7 @@ namespace libdar
 	}
     }
 
-    crc_n::crc_n(U_I width, generic_file & f)
+    crc_n::crc_n(U_I width, proto_generic_file & f)
     {
 	pointer = nullptr;
 	cyclic = nullptr;
@@ -389,7 +388,7 @@ namespace libdar
 	pointer = cyclic;
     }
 
-    void crc_n::dump(generic_file & f) const
+    void crc_n::dump(proto_generic_file & f) const
     {
 	infinint tmp = size;
 	tmp.dump(f);
@@ -461,7 +460,7 @@ namespace libdar
 	// exported routines implementation
 	//
 
-    crc *create_crc_from_file(generic_file & f, bool old)
+    crc *create_crc_from_file(proto_generic_file & f, bool old)
     {
 	crc *ret = nullptr;
 	if(old)

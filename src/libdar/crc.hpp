@@ -33,6 +33,7 @@
 #include "integers.hpp"
 #include "storage.hpp"
 #include "infinint.hpp"
+#include "proto_generic_file.hpp"
 
 namespace libdar
 {
@@ -58,20 +59,20 @@ namespace libdar
 	virtual void compute(const infinint & offset, const char *buffer, U_I length) = 0;
 	virtual void compute(const char *buffer, U_I length) = 0; // for sequential read only
 	virtual void clear() = 0;
-	virtual void dump(generic_file & f) const = 0;
+	virtual void dump(proto_generic_file & f) const = 0;
 	virtual std::string crc2str() const = 0;
 	virtual infinint get_size() const = 0;
 	virtual crc *clone() const = 0;
     };
 
-    extern crc *create_crc_from_file(generic_file & f, bool old = false);
+    extern crc *create_crc_from_file(proto_generic_file & f, bool old = false);
     extern crc *create_crc_from_size(infinint width);
 
     class crc_i : public crc
     {
     public:
 	crc_i(const infinint & width);
-	crc_i(const infinint & width, generic_file & f);
+	crc_i(const infinint & width, proto_generic_file & f);
 	crc_i(const crc_i & ref) : size(ref.size), cyclic(ref.size) { copy_data_from(ref); pointer = cyclic.begin(); };
 	crc_i(crc_i && ref) noexcept = default;
 	crc_i & operator = (const crc_i & ref) { copy_from(ref); return *this; };
@@ -83,7 +84,7 @@ namespace libdar
 	virtual void compute(const infinint & offset, const char *buffer, U_I length) override;
 	virtual void compute(const char *buffer, U_I length) override; // for sequential read only
 	virtual void clear() override;
-	virtual void dump(generic_file & f) const override;
+	virtual void dump(proto_generic_file & f) const override;
 	virtual std::string crc2str() const override;
 	virtual infinint get_size() const override { return size; };
 
@@ -106,7 +107,7 @@ namespace libdar
     public:
 
 	crc_n(U_I width);
-	crc_n(U_I width, generic_file & f);
+	crc_n(U_I width, proto_generic_file & f);
 	crc_n(const crc_n & ref) { copy_from(ref); };
 	crc_n(crc_n && ref) noexcept = default;
 	crc_n & operator = (const crc_n & ref);
@@ -118,7 +119,7 @@ namespace libdar
 	virtual void compute(const infinint & offset, const char *buffer, U_I length) override;
 	virtual void compute(const char *buffer, U_I length) override; // for sequential read only
 	virtual void clear() override;
-	virtual void dump(generic_file & f) const override;
+	virtual void dump(proto_generic_file & f) const override;
 	virtual std::string crc2str() const override;
 	virtual infinint get_size() const override { return size; };
 

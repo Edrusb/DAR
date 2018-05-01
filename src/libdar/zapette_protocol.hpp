@@ -32,6 +32,7 @@ extern "C"
 #include <new>
 #include "integers.hpp"
 #include "infinint.hpp"
+#include "generic_file.hpp"
 
 namespace libdar
 {

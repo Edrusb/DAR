@@ -40,16 +40,15 @@ extern "C"
 
 #include <typeinfo>
 
-#include "storage.hpp"
 #include "integers.hpp"
 #include "int_tools.hpp"
+#include "proto_generic_file.hpp"
+#include "storage.hpp"
 
 #define ZEROED_SIZE 50
 
 namespace libdar
 {
-    class generic_file;
-
 	/// the arbitrary large positive integer class
 
 	/// can only handle positive integer numbers
@@ -72,7 +71,7 @@ namespace libdar
 #endif
 #endif
 	    /// read an infinint from a file
-	infinint(generic_file & x);
+	infinint(proto_generic_file & x);
 
         infinint(const infinint & ref) { copy_from(ref); }
 	infinint(infinint && ref) noexcept { field = nullptr; move_from(std::move(ref)); };
@@ -82,8 +81,8 @@ namespace libdar
 
         ~infinint() { detruit(); };
 
-        void dump(generic_file &x) const; // write byte sequence to file
-        void read(generic_file &f) { detruit(); build_from_file(f); };
+        void dump(proto_generic_file &x) const; // write byte sequence to file
+        void read(proto_generic_file &f) { detruit(); build_from_file(f); };
 
         infinint & operator += (const infinint & ref);
         infinint & operator -= (const infinint & ref);
@@ -144,7 +143,7 @@ namespace libdar
         storage *field;
 
         bool is_valid() const noexcept;
-        void build_from_file(generic_file & x);
+        void build_from_file(proto_generic_file & x);
         void reduce(); // put the object in canonical form : no leading byte equal to zero
         void copy_from(const infinint & ref);
 	void move_from(infinint && ref) noexcept { std::swap(field, ref.field); };

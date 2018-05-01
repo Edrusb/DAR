@@ -34,19 +34,8 @@
     /// - file access
     /// .
 
-
-///////////////////////////////////////////////////////////////////////
-// IMPORTANT : THIS FILE MUST ALWAYS BE INCLUDE AFTER infinint.hpp   //
-//             (and infinint.hpp must be included too, always)       //
-///////////////////////////////////////////////////////////////////////
-#include "infinint.hpp"
-///////////////////////////////////////////////////////////////////////
-
-
-
 #ifndef GENERIC_FILE_HPP
 #define GENERIC_FILE_HPP
-
 
 #include "../my_config.h"
 
@@ -57,11 +46,12 @@ extern "C"
 #endif
 } // end extern "C"
 
+#include "proto_generic_file.hpp"
 #include "path.hpp"
 #include "integers.hpp"
 #include "thread_cancellation.hpp"
-#include "label.hpp"
 #include "crc.hpp"
+#include "infinint.hpp"
 
 #include <string>
 
@@ -95,7 +85,7 @@ namespace libdar
 	/// Thus, it is blocked until all bytes are written or occures an exception
 	/// inconsequences the returned value is always the value of the argument
 	/// "size".
-    class generic_file
+    class generic_file: public proto_generic_file
     {
     public :
 	    /// main constructor
@@ -116,7 +106,7 @@ namespace libdar
 	    /// virtual destructor,
 
 	    /// \note this let inherited destructor to be called even from a generic_file pointer to an inherited class
-	virtual ~generic_file() throw(Ebug) { destroy(); };
+	~generic_file() throw(Ebug) { destroy(); };
 
 	    /// destructor-like call, except that it is allowed to throw exceptions
 	void terminate();
@@ -144,19 +134,11 @@ namespace libdar
 	    /// to provide read content to reader thread. However, read_ahead is a waste of CPU cycle for in a single threading model
 	void ignore_read_ahead(bool mode) { no_read_ahead = mode; };
 
-	    /// read data from the generic_file
+	    /// read data from the generic_file inherited from proto_generic_file
+        virtual U_I read(char *a, U_I size) override;
 
-	    /// \param[in, out] a is where to put the data to read
-	    /// \param[in] size is how much data to read
-	    /// \return the exact number of byte read.
-	    /// \note read as much as requested data, unless EOF is met (only EOF can lead to reading less than requested data)
-	    /// \note EOF is met if read() returns less than size
-        U_I read(char *a, U_I size);
-
-	    /// write data to the generic_file
-
-	    /// \note throws a exception if not all data could be written as expected
-        void write(const char *a, U_I size);
+	    /// write data to the generic_file inherited from proto_generic_file
+        virtual void write(const char *a, U_I size) override;
 
 	    /// write a string to the generic_file
 

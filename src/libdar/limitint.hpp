@@ -57,6 +57,7 @@ extern "C"
 #include "integers.hpp"
 #include "erreurs.hpp"
 #include "int_tools.hpp"
+#include "proto_generic_file.hpp"
 
 
 #define ZEROED_SIZE 50
@@ -66,9 +67,6 @@ namespace libdar
 
 	/// \addtogroup Private
 	/// @{
-
-
-    class generic_file;
 
 	/// limitint template class
 	/// \ingroup Private
@@ -105,7 +103,7 @@ namespace libdar
 #endif
 
 	    // read an limitint from a file
-	limitint(generic_file & x);
+	limitint(proto_generic_file & x);
 
 	limitint(const limitint & ref) = default;
 	limitint(limitint && ref) noexcept = default;
@@ -115,8 +113,8 @@ namespace libdar
 	    // for coherent footprint with real infinint
 	~limitint() = default;
 
-        void dump(generic_file &x) const; // write byte sequence to file
-        void read(generic_file &f) { build_from_file(f); };
+        void dump(proto_generic_file &x) const; // write byte sequence to file
+        void read(proto_generic_file &f) { build_from_file(f); };
 
         limitint & operator += (const limitint & ref);
         limitint & operator -= (const limitint & ref);
@@ -172,7 +170,7 @@ namespace libdar
 
         B field;
 
-        void build_from_file(generic_file & x);
+        void build_from_file(proto_generic_file & x);
         template <class T> void limitint_from(T a);
 	template <class T> T max_val_of(T x);
         template <class T> void limitint_unstack_to(T &a);
@@ -241,21 +239,19 @@ namespace libdar
     /////////  template implementation ////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
 
-#include "generic_file.hpp"
-
 namespace libdar
 {
 
     template <class B> typename limitint<B>::endian limitint<B>::used_endian = not_initialized;
 
 
-    template <class B> limitint<B>::limitint(generic_file & x)
+    template <class B> limitint<B>::limitint(proto_generic_file & x)
     {
 	build_from_file(x);
     }
 
 
-    template <class B> void limitint<B>::build_from_file(generic_file & x)
+    template <class B> void limitint<B>::build_from_file(proto_generic_file & x)
     {
         unsigned char a;
         bool fin = false;
@@ -269,7 +265,7 @@ namespace libdar
             lu = x.read((char *)&a, 1);
 
             if(lu <= 0)
-                throw Erange("limitint::build_from_file(generic_file)", gettext("Reached end of file before all data could be read"));
+                throw Erange("limitint::build_from_file(proto_generic_file)", gettext("Reached end of file before all data could be read"));
 
             if(a == 0)
                 ++skip;
@@ -282,7 +278,7 @@ namespace libdar
                 for(S_I i = 0; i < 8; ++i)
                     pos += bf[i];
                 if(pos != 1)
-                    throw Erange("limitint::build_from_file(generic_file)", gettext("Badly formed \"infinint\" or not supported format")); // more than 1 bit is set to 1
+                    throw Erange("limitint::build_from_file(proto_generic_file)", gettext("Badly formed \"infinint\" or not supported format")); // more than 1 bit is set to 1
 
                 pos = 0;
                 while(bf[pos] == 0)
@@ -311,7 +307,7 @@ namespace libdar
     }
 
 
-    template <class B> void limitint<B>::dump(generic_file & x) const
+    template <class B> void limitint<B>::dump(proto_generic_file & x) const
     {
         B width = bytesize;
         B pos;

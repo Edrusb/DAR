@@ -38,7 +38,6 @@ extern "C"
 
 #include "real_infinint.hpp"
 #include "erreurs.hpp"
-#include "generic_file.hpp"
 #include "tools.hpp"
 
 using namespace std;
@@ -49,12 +48,12 @@ namespace libdar
     infinint::endian infinint::used_endian = not_initialized;
     U_8 infinint::zeroed_field[ZEROED_SIZE];
 
-    infinint::infinint(generic_file & x)
+    infinint::infinint(proto_generic_file & x)
     {
 	build_from_file(x);
     }
 
-    void infinint::build_from_file(generic_file & x)
+    void infinint::build_from_file(proto_generic_file & x)
     {
         unsigned char a;
         bool fin = false;
@@ -68,7 +67,7 @@ namespace libdar
             lu = x.read((char *)&a, 1);
 
             if(lu <= 0)
-                throw Erange("infinint::build_from_file(generic_file)", gettext("Reached end of file before all data could be read"));
+                throw Erange("infinint::build_from_file(proto_generic_file)", gettext("Reached end of file before all data could be read"));
 
             if(a == 0)
                 ++skip;
@@ -81,7 +80,7 @@ namespace libdar
                 for(S_I i = 0; i < 8; ++i)
                     pos += bf[i];
                 if(pos != 1)
-                    throw Erange("infinint::build_from_file(generic_file)", gettext("Badly formed \"infinint\" or not supported format")); // more than 1 bit is set to 1
+                    throw Erange("infinint::build_from_file(proto_generic_file)", gettext("Badly formed \"infinint\" or not supported format")); // more than 1 bit is set to 1
 
                 pos = 0;
                 while(bf[pos] == 0)
@@ -108,14 +107,14 @@ namespace libdar
                     fin = true;
                 }
                 else
-                    throw Ememory("infinint::build_from_file(generic_file)");
+                    throw Ememory("infinint::build_from_file(proto_generic_file)");
             }
         }
         reduce(); // necessary to reduce due to TG storage
     }
 
 
-    void infinint::dump(generic_file & x) const
+    void infinint::dump(proto_generic_file & x) const
     {
         infinint width;
         infinint pos;

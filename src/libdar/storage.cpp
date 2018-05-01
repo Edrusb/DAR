@@ -49,7 +49,6 @@ extern "C"
 
 #include "storage.hpp"
 #include "infinint.hpp"
-#include "generic_file.hpp"
 #include "integers.hpp"
 #include "tools.hpp"
 
@@ -63,7 +62,7 @@ namespace libdar
         make_alloc(size, first, last);
     }
 
-    storage::storage(generic_file & f, const infinint & size)
+    storage::storage(proto_generic_file & f, const infinint & size)
     {
         U_32 lu, tmp;
         make_alloc(size, first, last);
@@ -146,7 +145,7 @@ namespace libdar
         }
     }
 
-    void storage::dump(generic_file & f) const
+    void storage::dump(proto_generic_file & f) const
     {
         const struct cellule *ptr = first;
 
