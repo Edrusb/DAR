@@ -39,6 +39,8 @@ namespace libdar5
 	/// \addtogroup API
 	/// @{
 
+    using libdar::entrepot;
+
     class archive_options_read: public libdar::archive_options_read
     {
     public:
@@ -47,7 +49,7 @@ namespace libdar5
 	    std::shared_ptr<libdar::entrepot> tmp(entr.clone());
 	    if(!tmp)
 		throw Ememory("libdar5::archive_options_create::set_entrepot");
-	    libdar::archive_options_create::set_entrepot(tmp);
+	    libdar::archive_options_read::set_entrepot(tmp);
 	}
 
 	void set_ref_entrepot(const entrepot & entr)
@@ -55,7 +57,7 @@ namespace libdar5
 	    std::shared_ptr<libdar::entrepot> tmp(entr.clone());
 	    if(!tmp)
 		throw Ememory("libdar5::archive_options_create::set_ref_entrepot");
-	    libdar::archive_options_create::set_ref_entrepot(tmp);
+	    libdar::archive_options_read::set_ref_entrepot(tmp);
 	}
     };
 
@@ -102,14 +104,6 @@ namespace libdar5
 	    libdar::archive_options_create::set_entrepot(tmp);
 	}
 
-	void set_ref_entrepot(const entrepot & entr)
-	{
-	    std::shared_ptr<libdar::entrepot> tmp(entr.clone());
-	    if(!tmp)
-		throw Ememory("libdar5::archive_options_create::set_ref_entrepot");
-	    libdar::archive_options_create::set_ref_entrepot(tmp);
-	}
-
     };
 
 	/////////////////////////////////////////////////////////
@@ -124,9 +118,9 @@ namespace libdar5
 	    std::shared_ptr<libdar::entrepot> tmp(entr.clone());
 	    if(!tmp)
 		throw Ememory("libdar5::archive_options_create::set_entrepot");
-	    libdar::archive_options_create::set_entrepot(tmp);
+	    libdar::archive_options_isolate::set_entrepot(tmp);
 	}
-    }
+    };
 
 	/////////////////////////////////////////////////////////
 	////////// OPTONS FOR MERGING ARCHIVES //////////////////
@@ -153,15 +147,7 @@ namespace libdar5
 	    std::shared_ptr<libdar::entrepot> tmp(entr.clone());
 	    if(!tmp)
 		throw Ememory("libdar5::archive_options_create::set_entrepot");
-	    libdar::archive_options_create::set_entrepot(tmp);
-	}
-
-	void set_ref_entrepot(const entrepot & entr)
-	{
-	    std::shared_ptr<libdar::entrepot> tmp(entr.clone());
-	    if(!tmp)
-		throw Ememory("libdar5::archive_options_create::set_ref_entrepot");
-	    libdar::archive_options_create::set_ref_entrepot(tmp);
+	    libdar::archive_options_merge::set_entrepot(tmp);
 	}
     };
 
