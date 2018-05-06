@@ -34,7 +34,6 @@ extern "C"
 } // end extern "C"
 
 #include <string>
-#include "erreurs.hpp"
 
 namespace libdar
 {

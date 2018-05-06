@@ -27,7 +27,6 @@
 #define TLV_HPP
 
 #include "memory_file.hpp"
-#include "storage.hpp"
 
 namespace libdar
 {

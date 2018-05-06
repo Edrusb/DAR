@@ -31,7 +31,6 @@
 #include <string>
 
 #include "integers.hpp"
-#include "infinint.hpp"
 #include "generic_file.hpp"
 
 namespace libdar

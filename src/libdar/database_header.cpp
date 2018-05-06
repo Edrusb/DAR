@@ -55,6 +55,7 @@ extern "C"
 #include "integers.hpp"
 #include "cygwin_adapt.hpp"
 #include "fichier_local.hpp"
+#include "compressor.hpp"
 
 using namespace std;
 

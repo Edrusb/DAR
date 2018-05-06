@@ -34,11 +34,8 @@
 
 #include "erreurs.hpp"
 #include "path.hpp"
-#include "scrambler.hpp"
 #include "statistics.hpp"
 #include "archive_options.hpp"
-#include "escape.hpp"
-#include "escape_catalogue.hpp"
 #include "pile.hpp"
 #include "list_entry.hpp"
 #include "crypto.hpp"
@@ -46,6 +43,7 @@
 #include "mem_ui.hpp"
 #include "archive_summary.hpp"
 #include "archive_listing_callback.hpp"
+#include "catalogue.hpp"
 
 namespace libdar
 {
@@ -520,9 +518,6 @@ namespace libdar
 	void check_against_isolation(bool lax) const; //< throw Erange exception if the archive only contains an isolated catalogue
 	const cat_directory *get_dir_object(const std::string & dir) const;
 	void load_catalogue();
-
-	static bool local_check_dirty_seq(escape *ptr); ///< checks file is not dirty when reading in sequential mode
-	static void check_libgcrypt_hash_bug(user_interaction & dialog, hash_algo hash, const infinint & first_file_size, const infinint & file_size);
     };
 
 } // end of namespace

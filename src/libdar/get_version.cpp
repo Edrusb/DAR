@@ -68,6 +68,7 @@ extern "C"
 #include "get_version.hpp"
 #include "erreurs.hpp"
 #include "nls_swap.hpp"
+#include "tools.hpp"
 
 using namespace std;
 

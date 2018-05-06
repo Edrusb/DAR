@@ -29,11 +29,9 @@
 #include "../my_config.h"
 
 #include "integers.hpp"
-#include "erreurs.hpp"
 #include "infinint.hpp"
 #include "generic_file.hpp"
-#include "header_version.hpp"
-
+#include "archive_version.hpp"
 
 namespace libdar
 {

@@ -36,7 +36,6 @@
 
 #include "generic_file.hpp"
 #include "messaging.hpp"
-#include "erreurs.hpp"
 
 namespace libdar
 {

@@ -38,9 +38,6 @@ extern "C"
 } // end extern "C"
 
 #include "integers.hpp"
-#include "thread_cancellation.hpp"
-#include "label.hpp"
-#include "crc.hpp"
 #include "user_interaction.hpp"
 #include "fichier_global.hpp"
 

@@ -39,15 +39,10 @@ extern "C"
 #endif
 } // end extern "C"
 
-#include <map>
 #include <deque>
-#include "catalogue.hpp"
-#include "infinint.hpp"
-#include "etage.hpp"
 #include "crit_action.hpp"
 #include "fsa_family.hpp"
 #include "cat_all_entrees.hpp"
-#include "compile_time_features.hpp"
 #include "filesystem_hard_link_read.hpp"
 #include "filesystem_hard_link_write.hpp"
 

@@ -30,8 +30,6 @@
 #include "../my_config.h"
 #include <string>
 #include "infinint.hpp"
-#include "crypto.hpp"
-#include "compressor.hpp"
 #include "header_version.hpp"
 #include "cat_entree.hpp"
 

@@ -59,6 +59,7 @@ extern "C"
 #include "cat_all_entrees.hpp"
 #include "crc.hpp"
 #include "entrepot_libcurl.hpp"
+#include "scrambler.hpp"
 
 #ifdef LIBTHREADAR_AVAILABLE
 #include "generic_thread.hpp"

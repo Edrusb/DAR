@@ -29,11 +29,12 @@
 #include "../my_config.h"
 #include "infinint.hpp"
 #include "generic_file.hpp"
-#include "tools.hpp"
 #include "archive_version.hpp"
 #include "crypto.hpp"
 #include "slice_layout.hpp"
-#include "compressor.hpp"
+#include "compression.hpp"
+#include "user_interaction.hpp"
+#include "memory_file.hpp"
 
 namespace libdar
 {

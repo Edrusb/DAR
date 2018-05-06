@@ -25,6 +25,7 @@
 #include "../my_config.h"
 
 #include "mycurl_easyhandle_node.hpp"
+#include "erreurs.hpp"
 
 using namespace std;
 

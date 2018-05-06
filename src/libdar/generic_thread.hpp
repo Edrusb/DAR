@@ -33,7 +33,6 @@
 #include "generic_file.hpp"
 #include "messaging.hpp"
 #include "slave_thread.hpp"
-#include "erreurs.hpp"
 
 namespace libdar
 {

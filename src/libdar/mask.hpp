@@ -45,8 +45,8 @@ extern "C"
 #include <string>
 #include <deque>
 
+#include "erreurs.hpp"
 #include "path.hpp"
-#include "tools.hpp"
 
 namespace libdar
 {

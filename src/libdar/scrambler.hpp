@@ -31,7 +31,6 @@
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "erreurs.hpp"
-#include "infinint.hpp"
 #include "secu_string.hpp"
 
 namespace libdar

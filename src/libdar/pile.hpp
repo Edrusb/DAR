@@ -29,7 +29,6 @@
 
 #include "../my_config.h"
 
-#include <deque>
 #include <list>
 #include "generic_file.hpp"
 

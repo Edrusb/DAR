@@ -31,6 +31,7 @@ extern "C"
 
 #include "header_version.hpp"
 #include "integers.hpp"
+#include "tools.hpp"
 
 #define LIBDAR_URL_VERSION "http://dar.linux.free.fr/pre-release/doc/Notes.html#Dar_version_naming"
 

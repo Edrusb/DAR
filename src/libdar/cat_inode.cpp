@@ -55,6 +55,7 @@ extern "C"
 #include "cat_inode.hpp"
 #include "cat_lien.hpp"
 #include "tools.hpp"
+#include "cat_signature.hpp"
 
     /// all values of FLAG for EA are covered by the EA_MASK:
 #define INODE_FLAG_EA_MASK  0x07

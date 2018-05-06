@@ -24,6 +24,7 @@
 #include "archive_options.hpp"
 #include "entrepot_local.hpp"
 #include "tools.hpp"
+#include "hash_fichier.hpp"
 
 using namespace std;
 

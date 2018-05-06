@@ -37,10 +37,8 @@
 
 #include "../my_config.h"
 
-#include "user_interaction.hpp"
 #include <string>
-#include "erreurs.hpp"
-#include "integers.hpp"
+#include "user_interaction.hpp"
 #include "secu_string.hpp"
 
 namespace libdar

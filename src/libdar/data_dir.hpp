@@ -29,20 +29,15 @@
 
 #include "../my_config.h"
 
-#include <map>
 #include <string>
 #include <deque>
-#include <set>
 #include "infinint.hpp"
 #include "generic_file.hpp"
-#include "infinint.hpp"
 #include "user_interaction.hpp"
 #include "path.hpp"
 #include "cat_directory.hpp"
 #include "cat_inode.hpp"
 #include "cat_detruit.hpp"
-#include "database_listing_callback.hpp"
-#include "database_aux.hpp"
 #include "data_tree.hpp"
 
 namespace libdar

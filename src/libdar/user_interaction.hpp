@@ -30,8 +30,6 @@
 #include "../my_config.h"
 
 #include <string>
-#include "erreurs.hpp"
-#include "integers.hpp"
 #include "secu_string.hpp"
 #include "infinint.hpp"
 

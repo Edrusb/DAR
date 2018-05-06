@@ -31,8 +31,6 @@
 #include <deque>
 
 #include "cat_nomme.hpp"
-#include "cat_inode.hpp"
-#include "cat_directory.hpp"
 #include "criterium.hpp"
 
 namespace libdar

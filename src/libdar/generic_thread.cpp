@@ -29,6 +29,7 @@ extern "C"
 } // end extern "C"
 
 #include "generic_thread.hpp"
+#include "thread_cancellation.hpp"
 
 using namespace std;
 

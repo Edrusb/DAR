@@ -40,13 +40,9 @@ extern "C"
 } // end extern "C"
 
 #include <map>
-#include "catalogue.hpp"
 #include "infinint.hpp"
-#include "etage.hpp"
-#include "criterium.hpp"
 #include "fsa_family.hpp"
 #include "cat_all_entrees.hpp"
-#include "compile_time_features.hpp"
 
 #include <set>
 

@@ -56,6 +56,8 @@ extern "C"
 #include "zapette.hpp"
 #include "path.hpp"
 #include "defile.hpp"
+#include "escape.hpp"
+#include "escape_catalogue.hpp"
 
 #define ARCHIVE_NOT_EXPLOITABLE "Archive of reference given is not exploitable"
 
@@ -63,6 +65,13 @@ using namespace std;
 
 namespace libdar
 {
+	/// checks file is not dirty when reading in sequential mode
+    static bool local_check_dirty_seq(escape *ptr);
+
+    static void check_libgcrypt_hash_bug(user_interaction & dialog,
+					 hash_algo hash,
+					 const infinint & first_file_size,
+					 const infinint & file_size);
 
 	// opens an already existing archive
 
@@ -2774,7 +2783,7 @@ namespace libdar
 	return parent;
     }
 
-    bool archive::local_check_dirty_seq(escape *ptr)
+    static bool local_check_dirty_seq(escape *ptr)
     {
 	bool ret;
 
@@ -2794,7 +2803,10 @@ namespace libdar
 	return ret;
     }
 
-    void archive::check_libgcrypt_hash_bug(user_interaction & dialog, hash_algo hash, const infinint & first_file_size, const infinint & file_size)
+    static void check_libgcrypt_hash_bug(user_interaction & dialog,
+					 hash_algo hash,
+					 const infinint & first_file_size,
+					 const infinint & file_size)
     {
 #if CRYPTO_AVAILABLE
 	if(hash != hash_none && !crypto_min_ver_libgcrypt_no_bug())
@@ -2805,7 +2817,5 @@ namespace libdar
 	}
 #endif
     }
-
-
 
 } // end of namespace

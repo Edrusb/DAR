@@ -36,6 +36,7 @@
 
 #include <string>
 #include "integers.hpp"
+#include "erreurs.hpp"
 
 namespace libdar
 {

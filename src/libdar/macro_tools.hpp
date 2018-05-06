@@ -37,21 +37,17 @@ extern "C"
 #include <string>
 
 #include "catalogue.hpp"
-#include "compressor.hpp"
+#include "compression.hpp"
 #include "infinint.hpp"
 #include "header_version.hpp"
 #include "generic_file.hpp"
-#include "scrambler.hpp"
 #include "crypto.hpp"
-#include "escape.hpp"
 #include "pile.hpp"
 #include "entrepot.hpp"
-#include "tools.hpp"
 #include "range.hpp"
 #include "slice_layout.hpp"
-#include "trivial_sar.hpp"
 #include "tuyau.hpp"
-
+#include "trivial_sar.hpp"
 
     /// \addtogroup Private
     /// @{

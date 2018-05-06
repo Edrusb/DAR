@@ -27,7 +27,6 @@
 #define STORAGE_HPP
 
 #include "../my_config.h"
-#include "erreurs.hpp"
 #include "integers.hpp"
 #include "proto_generic_file.hpp"
 

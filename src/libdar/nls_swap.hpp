@@ -30,8 +30,6 @@
 
 #include <string>
 
-#include "tools.hpp"
-
 #ifdef ENABLE_NLS
 
     /// \addtogroup Private

@@ -33,7 +33,6 @@ extern "C"
 #endif
 } // end extern "C"
 
-#include <string>
 #include <deque>
 #include "erreurs.hpp"
 #include "mycurl_shared_handle.hpp"

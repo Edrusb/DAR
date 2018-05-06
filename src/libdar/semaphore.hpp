@@ -30,7 +30,6 @@
 
 #include "mem_ui.hpp"
 #include "mask.hpp"
-#include "catalogue.hpp"
 
 namespace libdar
 {

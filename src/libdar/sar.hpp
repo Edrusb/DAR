@@ -32,10 +32,8 @@
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "header.hpp"
-#include "path.hpp"
 #include "integers.hpp"
 #include "entrepot.hpp"
-#include "tools.hpp"
 #include "slice_layout.hpp"
 #include "contextual.hpp"
 

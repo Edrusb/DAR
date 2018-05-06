@@ -29,8 +29,6 @@
 
 #include "../my_config.h"
 
-#include "integers.hpp"
-
 namespace libdar
 {
 

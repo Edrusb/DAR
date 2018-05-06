@@ -44,12 +44,10 @@ extern "C"
 #include <libthreadar/libthreadar.hpp>
 #endif
 #include "integers.hpp"
-#include "thread_cancellation.hpp"
-#include "label.hpp"
 #include "user_interaction.hpp"
 #include "fichier_global.hpp"
-#include "mycurl_easyhandle_sharing.hpp"
 #include "mycurl_protocol.hpp"
+#include "mycurl_shared_handle.hpp"
 
 namespace libdar
 {

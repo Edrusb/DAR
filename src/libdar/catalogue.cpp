@@ -74,6 +74,7 @@ extern "C"
 #include "null_file.hpp"
 #include "range.hpp"
 #include "cat_all_entrees.hpp"
+#include "cat_signature.hpp"
 
 using namespace std;
 

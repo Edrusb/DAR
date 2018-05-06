@@ -32,12 +32,12 @@ extern "C"
 {
 } // end extern "C"
 
+#include "cat_inode.hpp"
+
 #ifdef LIBDAR_FAST_DIR
 #include <map>
 #endif
-
 #include <list>
-#include "cat_inode.hpp"
 
 namespace libdar
 {

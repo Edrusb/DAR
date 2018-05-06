@@ -31,7 +31,7 @@
 #include "../my_config.h"
 #include <list>
 #include <string>
-#include "erreurs.hpp"
+#include "integers.hpp"
 
 const std::string PSEUDO_ROOT = "<ROOT>";
 

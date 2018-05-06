@@ -119,6 +119,8 @@ extern "C"
 #include "fichier_local.hpp"
 #include "generic_rsync.hpp"
 #include "null_file.hpp"
+#include "cat_signature.hpp"
+#include "compile_time_features.hpp"
 
 #ifndef UNIX_PATH_MAX
 #define UNIX_PATH_MAX 104

@@ -31,6 +31,7 @@
 #include <string>
 #include "database_aux.hpp"
 #include "archive_num.hpp"
+#include "datetime.hpp"
 
 namespace libdar
 {

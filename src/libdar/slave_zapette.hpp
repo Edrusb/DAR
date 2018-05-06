@@ -33,10 +33,7 @@
 #define SLAVE_ZAPETTE_HPP
 
 #include "../my_config.h"
-#include "infinint.hpp"
 #include "generic_file.hpp"
-#include "integers.hpp"
-#include "mem_ui.hpp"
 #include "contextual.hpp"
 
 namespace libdar

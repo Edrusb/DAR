@@ -32,7 +32,6 @@
 #include "catalogue.hpp"
 #include "path.hpp"
 #include "statistics.hpp"
-#include "criterium.hpp"
 #include "archive_options.hpp"
 
 namespace libdar

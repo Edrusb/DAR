@@ -41,9 +41,8 @@ extern "C"
 } // end extern "C"
 
 #include "integers.hpp"
+#include "generic_file.hpp"
 #include "thread_cancellation.hpp"
-#include "label.hpp"
-#include "crc.hpp"
 #include "user_interaction.hpp"
 #include "mem_ui.hpp"
 

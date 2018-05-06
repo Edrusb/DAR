@@ -21,6 +21,7 @@
 
 #include "../my_config.h"
 #include "range.hpp"
+#include "deci.hpp"
 
 using namespace std;
 

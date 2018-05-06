@@ -31,6 +31,7 @@ extern "C"
 #include "libdar_slave.hpp"
 #include "path.hpp"
 #include "macro_tools.hpp"
+#include "sar.hpp"
 
 using namespace std;
 

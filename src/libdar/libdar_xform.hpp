@@ -27,12 +27,10 @@
 #define LIBDAR_XFORM_HPP
 
 #include "../my_config.h"
-#include "tuyau.hpp"
 #include "entrepot_local.hpp"
-#include "sar.hpp"
-#include "slave_zapette.hpp"
 #include "infinint.hpp"
 #include "mem_ui.hpp"
+#include "label.hpp"
 
 namespace libdar
 {

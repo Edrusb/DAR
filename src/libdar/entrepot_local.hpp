@@ -42,15 +42,10 @@
 #include "../my_config.h"
 
 #include <string>
-#include "infinint.hpp"
-#include "generic_file.hpp"
 #include "user_interaction.hpp"
 #include "entrepot.hpp"
 #include "fichier_global.hpp"
-#include "hash_fichier.hpp"
 #include "etage.hpp"
-#include "path.hpp"
-#include "tools.hpp"
 
 namespace libdar
 {

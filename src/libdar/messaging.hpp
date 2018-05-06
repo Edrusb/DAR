@@ -35,7 +35,6 @@
 #include "label.hpp"
 #include "infinint.hpp"
 #include "memory_file.hpp"
-#include "infinint.hpp"
 
 namespace libdar
 {

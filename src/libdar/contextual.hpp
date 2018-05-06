@@ -38,7 +38,6 @@ extern "C"
 #endif
 } // end extern "C"
 
-#include "integers.hpp"
 #include "erreurs.hpp"
 #include "label.hpp"
 

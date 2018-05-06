@@ -47,9 +47,7 @@ extern "C"
 } // end extern "C"
 
 #include "proto_generic_file.hpp"
-#include "path.hpp"
 #include "integers.hpp"
-#include "thread_cancellation.hpp"
 #include "crc.hpp"
 #include "infinint.hpp"
 

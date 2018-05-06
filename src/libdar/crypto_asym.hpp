@@ -35,8 +35,6 @@ extern "C"
 
 #include "../my_config.h"
 #include "generic_file.hpp"
-#include "generic_file_overlay_for_gpgme.hpp"
-#include "erreurs.hpp"
 #include "mem_ui.hpp"
 #include "crypto.hpp"
 

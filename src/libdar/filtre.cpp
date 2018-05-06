@@ -46,6 +46,7 @@ extern "C"
 #include "cat_all_entrees.hpp"
 #include "null_file.hpp"
 #include "generic_rsync.hpp"
+#include "cat_signature.hpp"
 
 using namespace std;
 

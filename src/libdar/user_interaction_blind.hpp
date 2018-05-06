@@ -33,8 +33,6 @@
 
 #include <string>
 #include "user_interaction.hpp"
-#include "erreurs.hpp"
-#include "integers.hpp"
 #include "secu_string.hpp"
 
 namespace libdar

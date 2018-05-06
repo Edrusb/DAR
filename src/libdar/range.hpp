@@ -33,7 +33,6 @@
 
 #include "../my_config.h"
 #include "infinint.hpp"
-#include "deci.hpp"
 
 namespace libdar
 {

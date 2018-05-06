@@ -32,8 +32,6 @@
 #define GENERIC_TO_GLOBAL_FILE_HPP
 
 #include "fichier_global.hpp"
-#include "memory_file.hpp"
-#include "storage.hpp"
 
 namespace libdar
 {

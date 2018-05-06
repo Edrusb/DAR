@@ -41,7 +41,6 @@ extern "C"
 #include "pile_descriptor.hpp"
 #include "smart_pointer.hpp"
 #include "entree_stats.hpp"
-#include "cat_signature.hpp"
 #include "list_entry.hpp"
 #include "slice_layout.hpp"
 

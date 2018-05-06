@@ -35,10 +35,9 @@
 #include "generic_file.hpp"
 #include "data_dir.hpp"
 #include "storage.hpp"
+#include "mem_ui.hpp"
 #include "database_options.hpp"
 #include "database_archives.hpp"
-#include "database_listing_callback.hpp"
-#include "mem_ui.hpp"
 
 namespace libdar
 {

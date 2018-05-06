@@ -29,13 +29,8 @@
 #include "../my_config.h"
 
 #include <string>
-#include "integers.hpp"
 #include "infinint.hpp"
-#include "generic_file.hpp"
-#include "header.hpp"
-#include "sar.hpp"
-#include "label.hpp"
-
+#include "entrepot.hpp"
 
 namespace libdar
 {

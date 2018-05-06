@@ -27,10 +27,9 @@
 #define DATABASE_HEADER_HPP
 
 #include "../my_config.h"
-#include "infinint.hpp"
 #include "generic_file.hpp"
 #include "user_interaction.hpp"
-#include "compressor.hpp"
+#include "compression.hpp"
 
 #include <memory>
 

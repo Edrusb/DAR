@@ -38,8 +38,9 @@
 
 #include "catalogue.hpp"
 #include "escape.hpp"
-#include "pile.hpp"
+#include "pile_descriptor.hpp"
 #include "smart_pointer.hpp"
+#include "header_version.hpp"
 
 namespace libdar
 {

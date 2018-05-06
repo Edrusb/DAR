@@ -30,7 +30,6 @@
 #include <iostream>
 #include "storage.hpp"
 #include "infinint.hpp"
-#include "tools.hpp"
 
 namespace libdar
 {
