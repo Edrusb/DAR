@@ -21,7 +21,7 @@
 
     /// \file range.hpp
     /// \brief class than provide a way to manipulate and represent range of integer numbers (infinint)
-    /// \ingroup Private
+    /// \ingroup API
 
 
 #ifndef RANGE_HPP
@@ -36,6 +36,8 @@
 
 namespace libdar
 {
+	/// \addtogroup API
+	/// @{
 
     class range
     {
@@ -104,6 +106,7 @@ namespace libdar
 
     };
 
+	/// @}
 
 } // end of namespace
 

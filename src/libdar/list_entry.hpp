@@ -140,6 +140,12 @@ namespace libdar
 	std::string get_link_target() const { return target; };
 	std::string get_major() const { return tools_int2str(major); };
 	std::string get_minor() const { return tools_int2str(minor); };
+
+	    /// provides slice information
+
+	    /// \note you must activate slice lookup from archive options for this
+	    /// field to me set by libdar, this operation has a additional cost in
+	    /// storage and computation
 	const range & get_slices() const { return slices; };
 	bool has_delta_signature() const { return delta_sig; };
 	std::string get_delta_flag() const;
@@ -196,7 +202,18 @@ namespace libdar
 	bool get_storage_size_for_FSA(U_64 & val) const { return tools_infinint2U_64(storage_size_for_FSA, val) && !storage_size_for_FSA.is_zero(); };
 	std::string get_storage_size_for_FSA() const { return storage_size_for_FSA.is_zero() ? "" : deci(storage_size_for_FSA).human(); };
 
+	    /// reset the reading of Extended Attributes names
+
+	    /// \note see get_ea_read_next()
 	void get_ea_reset_read() const { it_ea = ea.begin(); };
+
+	    /// read the next Extended Attribute name
+
+	    /// \param[out] key is set to the EA name
+	    /// \return true if some other attribute can be read, false if this one is the last
+	    /// \note to have list_entry objects filled with this information you need to
+	    /// activate it in archive options listing (archive::op_listing) of set fetch_ea to true
+	    /// in archive::get_children_of() and in archive_get_children_in_table()
 	bool get_ea_read_next(std::string & key) const;
 
 	std::string get_etiquette() const { return deci(etiquette).human(); }; ///< this is the hard-link ID, only valid for hard linked entries
