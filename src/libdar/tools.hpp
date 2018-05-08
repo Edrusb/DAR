@@ -19,9 +19,6 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-/// \defgroup Tools Tools
-/// \brief a set of tool routine
-///
 /// \file tools.hpp
 /// \brief a set of general purpose routines
 /// \ingroup Private

@@ -21,7 +21,7 @@
 
     /// \file user_interaction_callback5.hpp
     /// \brief API v5 backward compatible user_interaction_callback class
-    /// \ingroup API
+    /// \ingroup API5
     ///
 
 #ifndef USER_INTERACTION_CALLBACK5_HPP
@@ -34,7 +34,7 @@
 namespace libdar5
 {
 
-	/// \addtogroup API
+	/// \addtogroup API5
 	/// @{
 
 
@@ -42,7 +42,8 @@ namespace libdar5
 
 	//! this class is an inherited class of user_interaction it is used by
 	//! dar command line programs, but you can use it if you wish.
-	//! \ingroup API
+	//! \ingroup API5
+
     class user_interaction_callback : public user_interaction
     {
     public:

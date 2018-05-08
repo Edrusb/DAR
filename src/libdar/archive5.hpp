@@ -21,7 +21,7 @@
 
     /// \file archive5.hpp
     /// \brief API v5 backward compatible class archive
-    /// \ingroup API
+    /// \ingroup API5
 
 
 #ifndef ARCHIVE5_HPP
@@ -45,7 +45,8 @@ namespace libdar5
 	/// the operations corresponds to the one the final user expects, these
 	/// are the same abstraction level as the operation realized by the DAR
 	/// command line tool.
-	/// \ingroup API
+	/// \ingroup API5
+
     class archive: public libdar::archive
     {
     public:

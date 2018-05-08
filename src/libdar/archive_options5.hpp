@@ -21,7 +21,7 @@
 
     /// \file archive_options5.hpp
     /// \brief API v5 compatible archive_options_* classes
-    /// \ingroup API
+    /// \ingroup API5
 
 #ifndef ARCHIVE_OPTIONS5_HPP
 #define ARCHIVE_OPTIONS5_HPP
@@ -36,7 +36,7 @@ namespace libdar5
 	////////////// OPTIONS FOR OPENNING AN ARCHIVE //////////
 	/////////////////////////////////////////////////////////
 
-	/// \addtogroup API
+	/// \addtogroup API5
 	/// @{
 
     using libdar::entrepot;
