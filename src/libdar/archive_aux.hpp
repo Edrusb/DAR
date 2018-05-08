@@ -32,15 +32,20 @@
 namespace libdar
 {
 
-	/// \ingroup API
-	/// @}
+    	/// \addtogroup API
+	/// @{
 
-    enum class modified_data_detection //< how to detect data has changed when some fields
+	/// how to detect data has changed when some fields
+    enum class modified_data_detection
+    {
+	any_inode_change, ///< historical behavior, resave an inode on any metadata change
+        mtime_size,       ///< default behavior since release 2.6.0 resave only if file size of mtime changed
+    };
+
+
 	/// how to consider file change during comparison and incremental backup
     enum class comparison_fields
     {
-	any_inode_change, //< historical behavior, resave an inode on any metadata change
-        mtime_size,       //< default behavior since release 2.6.0 resave only if file size of mtime changed
 	cf_all,          ///< consider any available field for comparing inodes
 	cf_ignore_owner, ///< consider any available field except ownership fields
 	cf_mtime,        ///< consider any available field except ownership and permission fields

@@ -32,7 +32,7 @@
 namespace libdar
 {
 
-    	/// \ingroup Private
+    	/// \addtogroup API
 	/// @{
 
 	/// the different compression algorithm available
