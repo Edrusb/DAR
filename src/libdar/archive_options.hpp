@@ -115,9 +115,11 @@ namespace libdar
 
 	    /// several macros are available:
 	    /// - %%n : the slice number to be read
+	    /// - %%N : the slice number with padded zeros according to slice_min_digits given option
 	    /// - %%b : the archive basename
 	    /// - %%p : the slices path
 	    /// - %%e : the archive extension (usually "dar")
+	    /// - %%c : the archive context ("init", "operation" or "last_slice") see dar(1) man page for more details
 	    /// - %%% : substitued by %%
 	    /// .
 	void set_execute(const std::string & execute) { x_execute = execute; };
@@ -173,9 +175,11 @@ namespace libdar
 
 	    /// several macros are available:
 	    /// - %%n : the slice number to be read
+	    /// - %%N : the slice number with padded zeros according to slice_min_digits given option
 	    /// - %%b : the archive basename
 	    /// - %%p : the slices path
 	    /// - %%e : the archive extension (usually "dar")
+	    /// - %%c : the archive context ("init", "operation" or "last_slice") see dar(1) man page for more details
 	    /// - %%% : substitued by %%
 	    /// .
 	void set_ref_execute(const std::string & ref_execute) { x_ref_execute = ref_execute; };
@@ -351,6 +355,16 @@ namespace libdar
 	void set_ea_mask(const mask & ea_mask);
 
 	    /// set the command to execute after each slice creation
+
+	    /// several macros are available:
+	    /// - %%n : the number of the just created slice
+	    /// - %%N : the slice number with padded zeros according to slice_min_digits given option
+	    /// - %%b : the archive basename
+	    /// - %%p : the slices path
+	    /// - %%e : the archive extension (usually "dar")
+	    /// - %%c : the archive context ("init", "operation" or "last_slice") see dar(1) man page for more details
+	    /// - %%% : substitued by %%
+	    /// .
 	void set_execute(const std::string & execute) { x_execute = execute; };
 
 	    /// set the cypher to use
@@ -727,6 +741,16 @@ namespace libdar
 	};
 
 	    /// command to execute after each slice creation
+
+	    /// several macros are available:
+	    /// - %%n : the number of the just created slice
+	    /// - %%N : the slice number with padded zeros according to slice_min_digits given option
+	    /// - %%b : the archive basename
+	    /// - %%p : the slices path
+	    /// - %%e : the archive extension (usually "dar")
+	    /// - %%c : the archive context ("init", "operation" or "last_slice") see dar(1) man page for more details
+	    /// - %%% : substitued by %%
+	    /// .
 	void set_execute(const std::string & execute) { x_execute = execute; };
 
 	    /// cypher to use
@@ -942,6 +966,16 @@ namespace libdar
 	void set_ea_mask(const mask & ea_mask);
 
 	    /// set the command to execute after each slice creation
+
+	    /// several macros are available:
+	    /// - %%n : the number of the just created slice
+	    /// - %%N : the slice number with padded zeros according to slice_min_digits given option
+	    /// - %%b : the archive basename
+	    /// - %%p : the slices path
+	    /// - %%e : the archive extension (usually "dar")
+	    /// - %%c : the archive context ("init", "operation" or "last_slice") see dar(1) man page for more details
+	    /// - %%% : substitued by %%
+	    /// .
 	void set_execute(const std::string & execute) { x_execute = execute; };
 
 	    /// set the cypher to use
@@ -1607,6 +1641,16 @@ namespace libdar
 	};
 
 	    /// set the command to execute after each slice creation
+
+	    /// several macros are available:
+	    /// - %%n : the number of the just created slice
+	    /// - %%N : the slice number with padded zeros according to slice_min_digits given option
+	    /// - %%b : the archive basename
+	    /// - %%p : the slices path
+	    /// - %%e : the archive extension (usually "dar")
+	    /// - %%c : the archive context ("init", "operation" or "last_slice") see dar(1) man page for more details
+	    /// - %%% : substitued by %%
+	    /// .
 	void set_execute(const std::string & execute) { x_execute = execute; };
 
 	    /// set the cypher to use
