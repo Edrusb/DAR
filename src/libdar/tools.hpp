@@ -22,16 +22,9 @@
 /// \defgroup Tools Tools
 /// \brief a set of tool routine
 ///
-/// these routines are available from libdar for historical
-/// reason, but are not part of the API.
-/// They are shared and used by dar, dar_slave, dar_xform,
-/// and dar_manager command. You should avoid using them in
-/// external program as they may be removed or changed without
-/// backward compatibility support.
-
 /// \file tools.hpp
 /// \brief a set of general purpose routines
-/// \ingroup Tools
+/// \ingroup Private
 
 
 #ifndef TOOLS_HPP
@@ -71,7 +64,7 @@ extern "C"
 namespace libdar
 {
 
-	/// \addtogroup Tools
+	/// \addtogroup Private
 	/// @{
 
 

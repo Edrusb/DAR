@@ -21,7 +21,7 @@
 
     /// \file deci.hpp
     /// \brief manages the decimal representation of infinint
-    /// \ingroup Tools
+    /// \ingroup Private
 
 #ifndef DECI_HPP
 #define DECI_HPP
@@ -35,7 +35,7 @@
 namespace libdar
 {
 
-	/// \ingroup Tools
+	/// \ingroup Private
 	/// @}
 
 
@@ -92,7 +92,7 @@ namespace libdar
 	/// including "deci.hpp" let this operator available so you can
 	/// display infinint with the << std::ostream operator as you can
 	/// do for standard types.
-	/// \ingroup Tools
+	/// \ingroup Private
     extern std::ostream & operator << (std::ostream & ref, const infinint & arg);
 
 	/// @}
