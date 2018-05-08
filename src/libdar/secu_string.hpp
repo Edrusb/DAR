@@ -21,7 +21,7 @@
 
     /// \file secu_string.hpp
     /// \brief this file contains the definition of secu_string class, a std::string like class but allocated in secure memory
-    /// \ingroup Private
+    /// \ingroup API
     ///
     /// secure memory is a allocated memory that is never swapped out (wrote to disk)
     /// the implementation relies on gcrypt_malloc_secure() call (libgcrypt)
@@ -41,7 +41,7 @@
 namespace libdar
 {
 
-	/// \addtogroup Private
+	/// \addtogroup API
 	/// @{
 
 	/// class secu_string

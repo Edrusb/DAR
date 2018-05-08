@@ -41,8 +41,8 @@ extern "C"
 namespace libdar
 {
 
-	/// \ingroup API
-	/// @}
+	/// \addtogroup API
+	/// @{
 
 	/// the different cypher available for encryption (strong or weak)
 
