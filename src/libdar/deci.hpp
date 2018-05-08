@@ -28,6 +28,7 @@
 
 #include "../my_config.h"
 #include <iostream>
+#include <string>
 #include "storage.hpp"
 #include "infinint.hpp"
 
