@@ -30,6 +30,7 @@
 
 #include "infinint.hpp"
 #include "user_interaction.hpp"
+#include "deci.hpp"
 
 extern "C"
 {
@@ -111,17 +112,71 @@ namespace libdar
 	void sub_from_hard_links(const infinint & val) { (this->*sub_from)(&hard_links, val); };
 	void sub_from_fsa_treated(const infinint & val) { (this->*sub_from)(&fsa_treated, val); };
 
-	infinint get_treated() const { return (this->*returned)(&treated); };     ///< returns the current value of the treated counter
-	infinint get_hard_links() const { return (this->*returned)(&hard_links); }; ///< returns the current value of the hard_links counter
-	infinint get_skipped() const { return (this->*returned)(&skipped); };     ///< returns the current value of the skipped counter
-	infinint get_inode_only() const { return (this->*returned)(&inode_only); }; ///< returns the current value of the inode_only counter
-	infinint get_ignored() const { return (this->*returned)(&ignored); };     ///< returns the current value of the ignored counter
-	infinint get_tooold() const { return (this->*returned)(&tooold); };       ///< returns the current value of the tooold counter
-	infinint get_errored() const { return (this->*returned)(&errored); };     ///< returns the current value of the errored counter
-	infinint get_deleted() const { return (this->*returned)(&deleted); };     ///< returns the current value of the deleted counter
-	infinint get_ea_treated() const { return (this->*returned)(&ea_treated); };  ///< returns the current value of the ea_treated counter
-	infinint get_byte_amount() const { return (this->*returned)(&byte_amount); };  ///< returns the current value of the byte_amount counter
-	infinint get_fsa_treated() const { return (this->*returned)(&fsa_treated); }; ///< returns the current value of the fsa_treated counter
+	    /// returns the current value of the treated counter
+	infinint get_treated() const { return (this->*returned)(&treated); };
+
+	    /// returns the current value of the treated counter as a std::string
+	std::string get_treated_str() const { return deci(get_treated()).human(); };
+
+	    /// returns the current value of the hard_links counter
+	infinint get_hard_links() const { return (this->*returned)(&hard_links); };
+
+	    /// returns the current value of the hard_links counter as a std::string;
+	std::string get_hard_links_str() const { return deci(get_hard_links()).human(); };
+
+	    /// returns the current value of the skipped counter
+	infinint get_skipped() const { return (this->*returned)(&skipped); };
+
+		    /// returns the current value of the skipped counter as a std::string
+	std::string get_skipped_str() const { return deci(get_skipped()).human(); };
+
+	    /// returns the current value of the inode_only counter
+	infinint get_inode_only() const { return (this->*returned)(&inode_only); };
+
+		    /// returns the current value of the inode_only counter as a std::string
+	std::string get_inode_only_str() const { return deci(get_inode_only()).human(); };
+
+	    /// returns the current value of the ignored counter
+	infinint get_ignored() const { return (this->*returned)(&ignored); };
+
+		    /// returns the current value of the ignored counter as a std::string
+	std::string get_ignored_str() const { return deci(get_ignored()).human();};
+
+	    /// returns the current value of the tooold counter
+	infinint get_tooold() const { return (this->*returned)(&tooold); };
+
+		    /// returns the current value of the tooold counter as a std::string
+	std::string get_tooold_str() const { return deci(get_tooold()).human(); };
+
+	    /// returns the current value of the errored counter
+	infinint get_errored() const { return (this->*returned)(&errored); };
+
+	    /// returns the current value of the errored counter as a std::string
+	std::string get_errored_str() const { return deci(get_errored()).human(); };
+
+	    /// returns the current value of the deleted counter
+	infinint get_deleted() const { return (this->*returned)(&deleted); };
+
+	    /// returns the current value of the deleted counter as a std::string
+	std::string get_deleted_str() const { return deci(get_deleted()).human(); };
+
+	    /// returns the current value of the ea_treated counter
+	infinint get_ea_treated() const { return (this->*returned)(&ea_treated); };
+
+	    /// returns the current value of the ea_treated counter as a std::string
+	std::string get_ea_treated_str() const { return deci(get_ea_treated()).human(); };
+
+	    /// returns the current value of the byte_amount counter
+	infinint get_byte_amount() const { return (this->*returned)(&byte_amount); };
+
+	    /// returns the current value of the byte_amount counter as a std::string
+	std::string get_byte_amount_str() const { return deci(get_byte_amount()).human(); };
+
+	    /// returns the current value of the fsa_treated counter
+	infinint get_fsa_treated() const { return (this->*returned)(&fsa_treated); };
+
+	    /// returns the current value of the fsa_treated counter as a std::string
+	std::string get_fsa_treated_str() const { return deci(get_fsa_treated()).human(); };
 
 	void decr_treated() { (this->*decrement)(&treated); };        ///< decrement by one the treated counter
 	void decr_hard_links() { (this->*decrement)(&hard_links); };  ///< decrement by one the hard_links counter
