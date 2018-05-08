@@ -91,6 +91,12 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
+    void get_version(bool init_libgcrypt)
+    {
+	U_I maj, min, med;
+	get_version(maj, min, med, init_libgcrypt);
+    }
+
     void get_version(U_I & major, U_I & medium, U_I & minor, bool init_libgcrypt)
     {
 	NLS_SWAP_IN;

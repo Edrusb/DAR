@@ -81,10 +81,13 @@ namespace libdar
 	/// \param[out] medium the medium number of the version
 	/// \param[out] minor the minor number of the version
 	/// \param[in] init_libgcrypt whether to initialize libgcrypt if not already done (not used if libcrypt is not linked with libdar)
-	/// \note the calling application must match that the major function
+	/// \note the calling application should check that the major function
 	/// is the same as the libdar used at compilation time. See API tutorial for a
 	/// sample code.
     extern void get_version(U_I & major, U_I & medium, U_I & minor, bool init_libgcrypt = true);
+
+	/// this method is to be used when you don't want to bother with major, medium and minor
+    extern void get_version(bool init_libgcrypt = true);
 
 	///////////////////////////////////////////////
 	// CLOSING/CLEANING LIBDAR                   //

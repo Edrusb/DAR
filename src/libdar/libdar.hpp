@@ -24,13 +24,11 @@
     /// \mainpage
     /// You will find here the reference documentation for the dar and libdar source code, split in several "modules".
     /// - API module: contains all information for using libdar within your program
-    /// - Tools module: contains some routines you may like to have a look at (but using them with caution)
     /// - Private module: contains all libdar internal documentation, it is not necessary to read it to be able to use libdar
     /// - CMDLINE module: contains the documentation for command-line tools, you might want to have a look for illustration of library usage.
     /// .
-    /// CMDLINE module is out of any namespace as it is not inteded to be used by external application. All other symbols are part of the libdar namespace.
     ///
-    /// Please not that an API tutorial is also available for a higher view of this library.
+    /// Please not that an API tutorial is also available and should be a starting point for for using libdar
 
 
     /// \defgroup API API
