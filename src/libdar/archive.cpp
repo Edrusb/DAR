@@ -696,7 +696,7 @@ namespace libdar
 				     true,    // alter_atime
 				     false,   // furtive_read_mode
 				     false,   // same_fs
-				     cat_inode::cf_all,        // what_to_check
+				     comparison_fields::cf_all,        // what_to_check
 				     false,   // snapshot
 				     false,   // cache_directory_tagging
 				     options.get_keep_compressed(),
@@ -853,7 +853,7 @@ namespace libdar
 			     false,               // alter_atime
 			     false,               // furtive_read_mode
 			     false,               // same_fs
-			     cat_inode::cf_all,   // comparison_fields
+			     comparison_fields::cf_all,   // comparison_fields
 			     false,               // snapshot
 			     false,               // cache_directory_tagging,
 			     true,                // keep_compressed, always
@@ -1959,7 +1959,7 @@ namespace libdar
                                      bool alter_atime,
 				     bool furtive_read_mode,
                                      bool same_fs,
-				     cat_inode::comparison_fields what_to_check,
+				     comparison_fields what_to_check,
                                      bool snapshot,
                                      bool cache_directory_tagging,
 				     const infinint & fixed_date,
@@ -2189,7 +2189,7 @@ namespace libdar
 				   bool alter_atime,
 				   bool furtive_read_mode,
 				   bool same_fs,
-				   cat_inode::comparison_fields what_to_check,
+				   comparison_fields what_to_check,
 				   bool snapshot,
 				   bool cache_directory_tagging,
 				   bool keep_compressed,

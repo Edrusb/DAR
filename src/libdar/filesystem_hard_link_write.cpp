@@ -131,7 +131,7 @@ namespace libdar
 				const cat_inode & ref,
 				const string & chem,
 				bool dir_perm,
-				cat_inode::comparison_fields what_to_check,
+				comparison_fields what_to_check,
 				const fsa_scope & scope);
     static mode_t get_file_permission(const string & path);
 
@@ -251,7 +251,7 @@ namespace libdar
     void filesystem_hard_link_write::make_file(const cat_nomme * ref,
 					       const path & ou,
 					       bool dir_perm,
-					       cat_inode::comparison_fields what_to_check,
+					       comparison_fields what_to_check,
 					       const fsa_scope & scope)
     {
         const cat_directory *ref_dir = dynamic_cast<const cat_directory *>(ref);
@@ -507,7 +507,7 @@ namespace libdar
 				const cat_inode & ref,
 				const string & chem,
 				bool dir_perm,
-				cat_inode::comparison_fields what_to_check,
+				comparison_fields what_to_check,
 				const fsa_scope & scope)
     {
         const char *name = chem.c_str();
@@ -541,7 +541,7 @@ namespace libdar
 
 	    // restoring fields that are defined by "what_to_check"
 
-	if(what_to_check == cat_inode::cf_all)
+	if(what_to_check == comparison_fields::cf_all)
 	    if(ref.get_saved_status() == saved_status::saved)
 	    {
 		uid_t tmp_uid = 0;
@@ -570,7 +570,7 @@ namespace libdar
 
 	try
 	{
-	    if(what_to_check == cat_inode::cf_all || what_to_check == cat_inode::cf_ignore_owner)
+	    if(what_to_check == comparison_fields::cf_all || what_to_check == comparison_fields::cf_ignore_owner)
 		if(ref_lie == nullptr) // not restoring permission for symbolic links, it would modify the target not the symlink itself
 		    if(chmod(name, permission) < 0)
 		    {

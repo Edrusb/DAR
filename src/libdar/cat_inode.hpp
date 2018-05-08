@@ -40,6 +40,7 @@ extern "C"
 #include "filesystem_specific_attribute.hpp"
 #include "datetime.hpp"
 #include "cat_nomme.hpp"
+#include "archive_aux.hpp"
 
 namespace libdar
 {
@@ -53,14 +54,6 @@ namespace libdar
     public:
 
 	    /// flag used to only consider certain fields when comparing/restoring inodes
-
-	enum comparison_fields
-	{
-	    cf_all,          //< consider any available field for comparing inodes
-	    cf_ignore_owner, //< consider any available field except ownership fields
-	    cf_mtime,        //< consider any available field except ownership and permission fields
-	    cf_inode_type    //< only consider the file type
-	};
 
         cat_inode(const infinint & xuid,
 		  const infinint & xgid,

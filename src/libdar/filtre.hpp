@@ -53,7 +53,7 @@ namespace libdar
                                statistics & st,           //< statistics result about the operation
                                const mask & ea_mask,      //< defines EA to restore/not restore
                                bool flat,                 //< if true, directories are not restores, all files are placed directly at in fs_racine directory
-			       cat_inode::comparison_fields what_to_check, //< which file properties to restore
+			       comparison_fields what_to_check, //< which file properties to restore
 			       bool warn_remove_no_match, //< wether to warn for file to remove not matching the expected type
 			       bool empty,                //< dry-run execution
 			       bool empty_dir,            //< whether to restore directories that do contain any file to restore
@@ -85,7 +85,7 @@ namespace libdar
 				  bool alter_time,
 				  bool furtive_read_mode,
 				  bool same_fs,
-				  cat_inode::comparison_fields what_to_check,
+				  comparison_fields what_to_check,
 				  bool snapshot,
 				  bool cache_directory_tagging,
 				  bool security_check,
@@ -119,7 +119,7 @@ namespace libdar
 				  const mask & ea_mask,
 				  bool alter_time,
 				  bool furtive_read_mode,
-				  cat_inode::comparison_fields what_to_check,
+				  comparison_fields what_to_check,
 				  const infinint & hourshift,
 				  bool compare_symlink_date,
 				  const fsa_scope & scope,

@@ -434,7 +434,7 @@ namespace libdar
         }
     }
 
-    bool cat_file::has_changed_since(const cat_inode & ref, const infinint & hourshift, cat_inode::comparison_fields what_to_check) const
+    bool cat_file::has_changed_since(const cat_inode & ref, const infinint & hourshift, comparison_fields what_to_check) const
     {
         const cat_file *tmp = dynamic_cast<const cat_file *>(&ref);
         if(tmp != nullptr)

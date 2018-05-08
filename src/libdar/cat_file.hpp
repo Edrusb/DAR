@@ -82,7 +82,7 @@ namespace libdar
 	cat_file & operator = (cat_file && ref) = delete;
         ~cat_file() { detruit(); };
 
-        virtual bool has_changed_since(const cat_inode & ref, const infinint & hourshift, cat_inode::comparison_fields what_to_check) const override;
+        virtual bool has_changed_since(const cat_inode & ref, const infinint & hourshift, comparison_fields what_to_check) const override;
         infinint get_size() const { return *size; };
 	void change_size(const infinint & s) const { *size = s; };
         infinint get_storage_size() const { return *storage_size; };

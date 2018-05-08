@@ -56,11 +56,11 @@ namespace libdar
 					  const cat_inode & ref,
 					  const std::string & chem,
 					  bool dir_perm,
-					  cat_inode::comparison_fields what_to_check,
+					  comparison_fields what_to_check,
 					  const fsa_scope & scope);
     void filesystem_tools_make_date(const cat_inode & ref,
 				    const std::string & chem,
-				    cat_inode::comparison_fields what_to_check,
+				    comparison_fields what_to_check,
 				    const fsa_scope & scope);
 
     void filesystem_tools_attach_ea(const std::string &chemin,

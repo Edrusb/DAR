@@ -372,10 +372,10 @@ namespace libdar
 
     bool cat_inode::has_changed_since(const cat_inode & ref, const infinint & hourshift, comparison_fields what_to_check) const
     {
-        return (what_to_check != cf_inode_type && (!hourshift.is_zero() ? !tools_is_equal_with_hourshift(hourshift, ref.last_mod, last_mod) : !ref.last_mod.loose_equal(last_mod)))
-            || (what_to_check == cf_all && uid != ref.uid)
-            || (what_to_check == cf_all && gid != ref.gid)
-            || (what_to_check != cf_mtime && what_to_check != cf_inode_type && perm != ref.perm);
+        return (what_to_check != comparison_fields::cf_inode_type && (!hourshift.is_zero() ? !tools_is_equal_with_hourshift(hourshift, ref.last_mod, last_mod) : !ref.last_mod.loose_equal(last_mod)))
+            || (what_to_check == comparison_fields::cf_all && uid != ref.uid)
+            || (what_to_check == comparison_fields::cf_all && gid != ref.gid)
+            || (what_to_check != comparison_fields::cf_mtime && what_to_check != comparison_fields::cf_inode_type && perm != ref.perm);
     }
 
     void cat_inode::compare(const cat_inode &other,
@@ -390,26 +390,26 @@ namespace libdar
 
         if(!same_as(other))
             throw Erange("cat_inode::compare",gettext("different file type"));
-        if(what_to_check == cf_all && get_uid() != other.get_uid())
+        if(what_to_check == comparison_fields::cf_all && get_uid() != other.get_uid())
 	{
 	    infinint u1 = get_uid();
 	    infinint u2 = other.get_uid();
             throw Erange("cat_inode.compare", tools_printf(gettext("different owner (uid): %i <--> %i"), &u1, &u2));
 	}
-        if(what_to_check == cf_all && get_gid() != other.get_gid())
+        if(what_to_check == comparison_fields::cf_all && get_gid() != other.get_gid())
 	{
 	    infinint g1 = get_gid();
 	    infinint g2 = other.get_gid();
             throw Erange("cat_inode.compare", tools_printf(gettext("different owner group (gid): %i <--> %i"), &g1, &g2));
 	}
-        if((what_to_check == cf_all || what_to_check == cf_ignore_owner) && get_perm() != other.get_perm())
+        if((what_to_check == comparison_fields::cf_all || what_to_check == comparison_fields::cf_ignore_owner) && get_perm() != other.get_perm())
 	{
 	    string p1 = tools_int2octal(get_perm());
 	    string p2 = tools_int2octal(other.get_perm());
             throw Erange("cat_inode.compare", tools_printf(gettext("different permission: %S <--> %S"), &p1, &p2));
 	}
         if(do_mtime_test
-	   && (what_to_check == cf_all || what_to_check == cf_ignore_owner || what_to_check == cf_mtime)
+	   && (what_to_check == comparison_fields::cf_all || what_to_check == comparison_fields::cf_ignore_owner || what_to_check == comparison_fields::cf_mtime)
            && !tools_is_equal_with_hourshift(hourshift, get_last_modif(), other.get_last_modif()))
 	{
 	    string s1 = tools_display_date(get_last_modif());

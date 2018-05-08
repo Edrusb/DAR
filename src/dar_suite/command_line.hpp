@@ -89,7 +89,7 @@ struct line_param
     mask * ea_mask;               //< which EA to work on
     string input_pipe;            //< if not an empty string, name of the pipe through which to read data from dar_slave
     string output_pipe;           //< if not an empty string, name of the pipe through which to write orders to dar_slave
-    cat_inode::comparison_fields what_to_check; //< what fields to take into account when comparing/restoring files,
+    comparison_fields what_to_check; //< what fields to take into account when comparing/restoring files,
     string execute;               //< if not an empty string, the command to execute between slices
     string execute_ref;           //< if not an empty string, the command to execute between slices of the archive of reference
     secu_string pass;             //< if not an empty string, encrypt the archive with the given algo:pass string

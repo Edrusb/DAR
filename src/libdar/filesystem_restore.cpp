@@ -135,7 +135,7 @@ namespace libdar
 					   bool x_warn_overwrite,
                                            bool x_info_details,
                                            const mask & x_ea_mask,
-					   cat_inode::comparison_fields x_what_to_check,
+					   comparison_fields x_what_to_check,
 					   bool x_warn_remove_no_match,
 					   bool x_empty,
 					   const crit_action *x_overwrite,

@@ -389,8 +389,8 @@ namespace libdar
 	void set_exclude_by_ea(const std::string & ea_name)
 	{ exclude_by_ea = (ea_name == "" ? "user.libdar_no_backup" : ea_name); };
 
-	    /// set the fields to consider when comparing inodes with reference archive (see cat_inode::comparison_fields enumeration in catalogue.hpp)
-	void set_what_to_check(cat_inode::comparison_fields what_to_check) { x_what_to_check = what_to_check; };
+	    /// set the fields to consider when comparing inodes with reference archive (see comparison_fields enumeration in catalogue.hpp)
+	void set_what_to_check(comparison_fields what_to_check) { x_what_to_check = what_to_check; };
 
 	    /// ignore differences of at most this integer number of hours while looking for changes in dates
 	void set_hourshift(const infinint & hourshift) { x_hourshift = hourshift; };
@@ -560,7 +560,7 @@ namespace libdar
 	const infinint & get_min_compr_size() const { return x_min_compr_size; };
 	bool get_nodump() const { return x_nodump; };
 	const std::string & get_exclude_by_ea() const { return exclude_by_ea; };
-	cat_inode::comparison_fields get_comparison_fields() const { return x_what_to_check; };
+	comparison_fields get_comparison_fields() const { return x_what_to_check; };
 	const infinint & get_hourshift() const { return x_hourshift; };
 	bool get_empty() const { return x_empty; };
 	bool get_alter_atime() const { return x_alter_atime; };
@@ -623,7 +623,7 @@ namespace libdar
 	infinint x_min_compr_size;
 	bool x_nodump;
 	std::string exclude_by_ea;
-	cat_inode::comparison_fields x_what_to_check;
+	comparison_fields x_what_to_check;
 	infinint x_hourshift;
 	bool x_empty;
 	bool x_alter_atime;
@@ -1177,8 +1177,8 @@ namespace libdar
 	    /// whether to ignore directory structure and restore all files in the same directory
 	void set_flat(bool flat) { x_flat = flat; };
 
-	    /// fields to consider when comparing inodes with those on filesystem to determine if it is more recent (see cat_inode::comparison_fields enumeration), also defines whether mtime has to be restored (cf_mtime) whether permission have to be too (cf_ignore_owner) whether ownership has to be restored too (cf_all)
-	void set_what_to_check(cat_inode::comparison_fields what_to_check) { x_what_to_check = what_to_check; };
+	    /// fields to consider when comparing inodes with those on filesystem to determine if it is more recent (see comparison_fields enumeration), also defines whether mtime has to be restored (cf_mtime) whether permission have to be too (cf_ignore_owner) whether ownership has to be restored too (cf_all)
+	void set_what_to_check(comparison_fields what_to_check) { x_what_to_check = what_to_check; };
 
 	    /// whether a warning must be issue if a file to remove does not match the expected type of file
 	void set_warn_remove_no_match(bool warn_remove_no_match) { x_warn_remove_no_match = warn_remove_no_match; };
@@ -1228,7 +1228,7 @@ namespace libdar
 	bool get_display_skipped() const { return x_display_skipped; };
 	const mask & get_ea_mask() const { if(x_ea_mask == nullptr) throw SRC_BUG; return *x_ea_mask; };
 	bool get_flat() const { return x_flat; };
-	cat_inode::comparison_fields get_what_to_check() const { return x_what_to_check; };
+	comparison_fields get_what_to_check() const { return x_what_to_check; };
 	bool get_warn_remove_no_match() const { return x_warn_remove_no_match; };
 	bool get_empty() const { return x_empty; };
 	bool get_empty_dir() const { return x_empty_dir; };
@@ -1248,7 +1248,7 @@ namespace libdar
 	bool x_display_skipped;
 	mask * x_ea_mask;
 	bool x_flat;
-	cat_inode::comparison_fields x_what_to_check;
+	comparison_fields x_what_to_check;
 	bool x_warn_remove_no_match;
 	bool x_empty;
 	bool x_empty_dir;
@@ -1392,8 +1392,8 @@ namespace libdar
 	    /// defines the Extended Attributes to compare
 	void set_ea_mask(const mask & ea_mask);
 
-	    /// fields to consider wien comparing inodes with those on filesystem (see cat_inode::comparison_fields enumeration in catalogue.hpp)
-	void set_what_to_check(cat_inode::comparison_fields what_to_check) { x_what_to_check = what_to_check; };
+	    /// fields to consider wien comparing inodes with those on filesystem (see comparison_fields enumeration in catalogue.hpp)
+	void set_what_to_check(comparison_fields what_to_check) { x_what_to_check = what_to_check; };
 
 	    /// whether to alter atime or ctime in the filesystem when reading files to compare
 
@@ -1430,7 +1430,7 @@ namespace libdar
 	bool get_display_treated_only_dir() const { return x_display_treated_only_dir; };
 	bool get_display_skipped() const { return x_display_skipped; };
 	const mask & get_ea_mask() const { if(x_ea_mask == nullptr) throw SRC_BUG; return *x_ea_mask; };
-	cat_inode::comparison_fields get_what_to_check() const { return x_what_to_check; };
+	comparison_fields get_what_to_check() const { return x_what_to_check; };
 	bool get_alter_atime() const { return x_alter_atime; };
 	bool get_furtive_read_mode() const { return x_furtive_read; };
 	const infinint & get_hourshift() const { return x_hourshift; };
@@ -1445,7 +1445,7 @@ namespace libdar
 	bool x_display_treated_only_dir;
 	bool x_display_skipped;
 	mask * x_ea_mask;
-	cat_inode::comparison_fields x_what_to_check;
+	comparison_fields x_what_to_check;
 	bool x_alter_atime;
 	bool x_old_alter_atime;
 	bool x_furtive_read;

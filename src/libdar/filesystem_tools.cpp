@@ -183,7 +183,7 @@ namespace libdar
                                           const cat_inode & ref,
                                           const string & chem,
                                           bool dir_perm,
-                                          cat_inode::comparison_fields what_to_check,
+                                          comparison_fields what_to_check,
                                           const fsa_scope & scope)
     {
         const char *name = chem.c_str();
@@ -219,7 +219,7 @@ namespace libdar
 
             // restoring fields that are defined by "what_to_check"
 
-        if(what_to_check == cat_inode::cf_all)
+        if(what_to_check == comparison_fields::cf_all)
 	{
 	    uid_t tmp_uid = 0;
 	    gid_t tmp_gid = 0;
@@ -247,7 +247,7 @@ namespace libdar
 
         try
         {
-            if(what_to_check == cat_inode::cf_all || what_to_check == cat_inode::cf_ignore_owner)
+            if(what_to_check == comparison_fields::cf_all || what_to_check == comparison_fields::cf_ignore_owner)
                 if(ref_lie == nullptr) // not restoring permission for symbolic links, it would modify the target not the symlink itself
                     if(chmod(name, permission) < 0)
                     {
@@ -265,12 +265,12 @@ namespace libdar
 
     void filesystem_tools_make_date(const cat_inode & ref,
                                     const string & chem,
-                                    cat_inode::comparison_fields what_to_check,
+                                    comparison_fields what_to_check,
                                     const fsa_scope & scope)
     {
         const cat_lien *ref_lie = dynamic_cast<const cat_lien *>(&ref);
 
-        if(what_to_check == cat_inode::cf_all || what_to_check == cat_inode::cf_ignore_owner || what_to_check == cat_inode::cf_mtime)
+        if(what_to_check == comparison_fields::cf_all || what_to_check == comparison_fields::cf_ignore_owner || what_to_check == comparison_fields::cf_mtime)
         {
             datetime birthtime = ref.get_last_modif();
             fsa_scope::iterator it = scope.find(fsaf_hfs_plus);

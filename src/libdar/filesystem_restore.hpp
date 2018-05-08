@@ -64,7 +64,7 @@ namespace libdar
 			   bool x_warn_overwrite,
 			   bool x_info_details,
                            const mask & x_ea_mask,
-			   cat_inode::comparison_fields what_to_check,
+			   comparison_fields what_to_check,
 			   bool x_warn_remove_no_match,
 			   bool empty,
 			   const crit_action *x_overwrite,
@@ -134,7 +134,7 @@ namespace libdar
         bool info_details;
 	mask *ea_mask;
         bool warn_overwrite;
-	cat_inode::comparison_fields what_to_check;
+	comparison_fields what_to_check;
 	bool warn_remove_no_match;
         std::deque<stack_dir_t> stack_dir;
         path *current_dir;
