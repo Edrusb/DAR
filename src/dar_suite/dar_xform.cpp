@@ -213,7 +213,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
     slice_perm = "";
     slice_user = "";
     slice_group = "";
-    hash = hash_none;
+    hash = hash_algo::hash_none;
     src_min_digits = 0;
     dst_min_digits = 0;
 
@@ -335,10 +335,10 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
 		if(optarg == nullptr)
 		    throw Erange("command_line", tools_printf(gettext("Missing argument to --hash"), char(lu)));
 		if(strcasecmp(optarg, "md5") == 0)
-		    hash = hash_md5;
+		    hash = hash_algo::hash_md5;
 		else
 		    if(strcasecmp(optarg, "sha1") == 0)
-			hash = hash_sha1;
+			hash = hash_algo::hash_sha1;
 		    else
 			throw Erange("command_line", string(gettext("Unknown parameter given to --hash option: ")) + optarg);
 		break;

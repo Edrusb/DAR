@@ -46,20 +46,13 @@ extern "C"
 
 #include "fichier_global.hpp"
 #include "integers.hpp"
+#include "archive_aux.hpp"
 
 namespace libdar
 {
 
 	/// the available hashing algorithms
 	/// \ingroup API
-
-    enum hash_algo
-    {
-	hash_none,  ///< no hashing algorithm
-	hash_md5,   ///< MD5 algorithm
-	hash_sha1,  ///< SHA1 algorithm
-	hash_sha512 ///< SHA-512 algorithm
-    };
 
 
 	/// \addtogroup Private

@@ -52,6 +52,15 @@ namespace libdar
 	cf_inode_type    ///< only consider the file type
     };
 
+    enum class hash_algo
+    {
+	hash_none,  ///< no hashing algorithm
+	hash_md5,   ///< MD5 algorithm
+	hash_sha1,  ///< SHA1 algorithm
+	hash_sha512 ///< SHA-512 algorithm
+    };
+
+
 	/// @}
 
 } // end of namespace

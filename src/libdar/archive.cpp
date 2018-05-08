@@ -2809,7 +2809,7 @@ namespace libdar
 					 const infinint & file_size)
     {
 #if CRYPTO_AVAILABLE
-	if(hash != hash_none && !crypto_min_ver_libgcrypt_no_bug())
+	if(hash != hash_algo::hash_none && !crypto_min_ver_libgcrypt_no_bug())
 	{
 	    const infinint limit = tools_get_extended_size("256G", 1024);
 	    if(file_size >= limit || first_file_size >= limit)

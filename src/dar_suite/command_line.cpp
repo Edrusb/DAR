@@ -299,7 +299,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.dirty = dirtyb_warn;
     p.security_check = true;
     p.user_comment = "";
-    p.hash = hash_none;
+    p.hash = hash_algo::hash_none;
     p.num_digits = 0;
     p.ref_num_digits = 0;
     p.aux_num_digits = 0;
@@ -1788,13 +1788,13 @@ static bool get_args_recursive(recursive_param & rec,
                 if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext("Missing argument to --hash"), char(lu)));
                 if(strcasecmp(optarg, "md5") == 0)
-                    p.hash = hash_md5;
+                    p.hash = hash_algo::hash_md5;
                 else
                     if(strcasecmp(optarg, "sha1") == 0)
-                        p.hash = hash_sha1;
+                        p.hash = hash_algo::hash_sha1;
                     else
 			if(strcasecmp(optarg, "sha512") == 0)
-			    p.hash = hash_sha512;
+			    p.hash = hash_algo::hash_sha512;
 			else
 			    throw Erange("get_args", string(gettext("Unknown parameter given to --hash option: ")) + optarg);
                 break;

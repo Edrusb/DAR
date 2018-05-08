@@ -139,7 +139,7 @@ namespace libdar
         hook = execute;
         set_info_status(CONTEXT_INIT);
 	slicing.older_sar_than_v8 = false; // will be set to true at header read time a bit further if necessary
-	hash = hash_none;
+	hash = hash_algo::hash_none;
 	lax = x_lax;
 	min_digits = x_min_digits;
 	entr = where;
@@ -290,7 +290,7 @@ namespace libdar
 
     bool sar::skippable(skippability direction, const infinint & amount)
     {
-	if(hash != hash_none)
+	if(hash != hash_algo::hash_none)
 	    return false;
 
 	switch(direction)
@@ -659,7 +659,7 @@ namespace libdar
 				   0,     //< permission to enforce (not used here)
 				   false, //<  fail if exists
 				   false, //<  erase
-				   hash_none);
+				   hash_algo::hash_none);
 		if(of_fd == nullptr)
 		    throw SRC_BUG;
 		of_fd->fadvise(fichier_global::advise_normal);
@@ -978,7 +978,7 @@ namespace libdar
 	    {
 		of_fd = entr->open(get_pointer(),
 				   fic,
-				   hash == hash_none ? gf_read_write : gf_write_only,
+				   hash == hash_algo::hash_none ? gf_read_write : gf_write_only,
 				       // yes, no anymore always writeonly as stated in the name of this method
 				   force_perm,
 				   perm,
@@ -1011,7 +1011,7 @@ namespace libdar
 					   0,      //< permission to enforce (not used here)
 					   false,  //< fail if exists
 					   false,  //< erase
-					   hash_none);
+					   hash_algo::hash_none);
 
 			if(of_fd == nullptr)
 			    throw SRC_BUG;
@@ -1095,7 +1095,7 @@ namespace libdar
 			    // open with overwriting
 			of_fd = entr->open(get_pointer(),
 					   fic,
-					   hash == hash_none ? gf_read_write : gf_write_only, // yes, no more write only as stated in the name of this method
+					   hash == hash_algo::hash_none ? gf_read_write : gf_write_only, // yes, no more write only as stated in the name of this method
 					   force_perm,
 					   perm,
 					   false,    //< fail if exists
@@ -1103,10 +1103,10 @@ namespace libdar
 					   hash);
 		    }
 		    else // open without overwriting
-			if(hash == hash_none)
+			if(hash == hash_algo::hash_none)
 			    of_fd = entr->open(get_pointer(),
 					       fic,
-					       hash == hash_none ? gf_read_write : gf_write_only, // yes, no more write only as stated in the name of this method
+					       hash == hash_algo::hash_none ? gf_read_write : gf_write_only, // yes, no more write only as stated in the name of this method
 					       force_perm,
 					       perm,
 					       false, //< fail if exists
