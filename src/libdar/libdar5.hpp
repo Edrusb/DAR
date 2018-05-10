@@ -159,13 +159,13 @@ namespace libdar5
 
 	// from compressor.hpp
     using libdar::compression;
-    constexpr compression none = libdar::compression::none;
-    constexpr compression gzip = libdar::compression::gzip;
-    constexpr compression bzip2 = libdar::compression::bzip2;
-    constexpr compression lzo = libdar::compression::lzo;
-    constexpr compression xz = libdar::compression::xz;
-    constexpr compression lzo1x_1_15 = libdar::compression::lzo1x_1_15;
-    constexpr compression lzo1x_1 = libdar::compression::lzo1x_1;
+    constexpr compression none = compression::none;
+    constexpr compression gzip = compression::gzip;
+    constexpr compression bzip2 = compression::bzip2;
+    constexpr compression lzo = compression::lzo;
+    constexpr compression xz = compression::xz;
+    constexpr compression lzo1x_1_15 = compression::lzo1x_1_15;
+    constexpr compression lzo1x_1 = compression::lzo1x_1;
 
     inline compression char2compression(char a) { return libdar::char2compression(a); }
     inline char compression2char(compression c) { return libdar::compression2char(c); }
