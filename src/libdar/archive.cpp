@@ -657,7 +657,7 @@ namespace libdar
 
 			// then we call op_create_in_sub which will call filter_merge operation to build the archive described by the catalogue
 		    op_create_in_sub(oper_merge,
-				     path(FAKE_ROOT),
+				     FAKE_ROOT,
 				     sauv_path_t,
 				     ref_cat1,
 				     ref_cat2,

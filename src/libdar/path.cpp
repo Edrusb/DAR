@@ -38,6 +38,10 @@ using namespace std;
 namespace libdar
 {
 
+    const std::string PSEUDO_ROOT = "<ROOT>";
+    const path FAKE_ROOT(PSEUDO_ROOT, true);
+
+
 	/// extract the first path member of a given path
 
 	/// \param[in,out] p is the given path (in), it receive the new path without the first path member

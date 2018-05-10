@@ -33,13 +33,8 @@
 #include <string>
 #include "integers.hpp"
 
-const std::string PSEUDO_ROOT = "<ROOT>";
-
-#define FAKE_ROOT path(PSEUDO_ROOT, true)
-
 namespace libdar
 {
-
 	/// the class path is here to manipulate paths in the Unix notation: using'/'
 
 	/// several operations are provided as well as convertion functions, but
@@ -179,6 +174,8 @@ namespace libdar
         void reduce();
     };
 
+    extern const std::string PSEUDO_ROOT;
+    extern const path FAKE_ROOT;
 
 } // end of namespace
 
