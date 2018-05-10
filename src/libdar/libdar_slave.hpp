@@ -37,6 +37,9 @@ namespace libdar
 	/// \addtogroup API
 	/// @{
 
+
+	/// class implementing the dar_slave feature
+
     class libdar_slave
     {
     public:
