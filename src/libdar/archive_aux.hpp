@@ -46,10 +46,10 @@ namespace libdar
 	/// how to consider file change during comparison and incremental backup
     enum class comparison_fields
     {
-	cf_all,          ///< consider any available field for comparing inodes
-	cf_ignore_owner, ///< consider any available field except ownership fields
-	cf_mtime,        ///< consider any available field except ownership and permission fields
-	cf_inode_type    ///< only consider the file type
+	all,          ///< consider any available field for comparing inodes
+	ignore_owner, ///< consider any available field except ownership fields
+	mtime,        ///< consider any available field except ownership and permission fields
+	inode_type    ///< only consider the file type
     };
 
     enum class hash_algo

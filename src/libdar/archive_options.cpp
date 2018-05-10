@@ -35,7 +35,7 @@ namespace libdar
     static const U_32 default_crypto_size = 10240;
     static const path default_ref_chem = "/";
     static const U_I default_min_compr_size = 100;
-    static const comparison_fields default_comparison_fields = comparison_fields::cf_all;
+    static const comparison_fields default_comparison_fields = comparison_fields::all;
     static const crit_constant_action default_crit_action = crit_constant_action(data_preserve, EA_preserve);
     static const string default_user_comment = "N/A";
     static const U_32 default_delta_sig_min_size = 10240;
@@ -1580,7 +1580,7 @@ namespace libdar
 	    x_display_treated_only_dir = false;
 	    x_display_skipped = false;
 	    archive_option_clean_mask(x_ea_mask);
-	    x_what_to_check = comparison_fields::cf_all;
+	    x_what_to_check = comparison_fields::all;
 	    x_alter_atime = true;
 	    x_old_alter_atime = true;
 #if FURTIVE_READ_MODE_AVAILABLE

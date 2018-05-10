@@ -252,7 +252,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.empty_dir = false;
     p.input_pipe = "";
     p.output_pipe = "";
-    p.what_to_check = comparison_fields::cf_all;
+    p.what_to_check = comparison_fields::all;
     p.execute = "";
     p.execute_ref = "";
     p.pass.clear();
@@ -436,14 +436,14 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             dialog->message(gettext("-z option needs only to be used with -c -C or -+ options"));
         if(!p.first_file_size.is_zero() && p.file_size.is_zero())
             throw Erange("get_args", gettext("-S option requires the use of -s"));
-        if(p.what_to_check != comparison_fields::cf_all && (p.op == isolate || (p.op == create && p.ref_root == nullptr) || p.op == test || p.op == listing || p.op == merging))
+        if(p.what_to_check != comparison_fields::all && (p.op == isolate || (p.op == create && p.ref_root == nullptr) || p.op == test || p.op == listing || p.op == merging))
             dialog->message(gettext("ignoring -O option, as it is useless in this situation"));
-        if(p.what_to_check == comparison_fields::cf_all
+        if(p.what_to_check == comparison_fields::all
            && p.op == extract
            && capability_CHOWN(*dialog, p.info_details)
            && getuid() != 0) // uid == 0 for root
         {
-            p.what_to_check = comparison_fields::cf_ignore_owner;
+            p.what_to_check = comparison_fields::ignore_owner;
             string msg = tools_printf(gettext("File ownership will not be restored as %s has not the CHOWN capability nor is running as root. to avoid this message use -O option"), cmd.c_str());
             dialog->pause(msg);
         }
@@ -564,7 +564,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
 		dialog->message(gettext("-r option is useless with -y option"));
 	    if(rec.ea_include_exclude.size() > 0)
 		throw Erange("get_args", gettext("-u, -U, -P, -g, -], -[ and any other EA selection relative commands are not possible with -y option"));
-	    if(p.what_to_check != comparison_fields::cf_all)
+	    if(p.what_to_check != comparison_fields::all)
 		throw Erange("get_args", gettext("-O option is not possible with -y option"));
 	    if(!p.hourshift.is_zero())
 		dialog->message(gettext("-H option is useless with -y option"));
@@ -1254,20 +1254,20 @@ static bool get_args_recursive(recursive_param & rec,
                     rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 break;
             case 'O':
-                if(p.what_to_check != comparison_fields::cf_all)
+                if(p.what_to_check != comparison_fields::all)
                     rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                     if(optarg == nullptr)
-                        p.what_to_check = comparison_fields::cf_ignore_owner;
+                        p.what_to_check = comparison_fields::ignore_owner;
                     else
                         if(strcasecmp(optarg, "ignore-owner") == 0)
-                            p.what_to_check = comparison_fields::cf_ignore_owner;
+                            p.what_to_check = comparison_fields::ignore_owner;
                         else
                             if(strcasecmp(optarg, "mtime") == 0)
-                                p.what_to_check = comparison_fields::cf_mtime;
+                                p.what_to_check = comparison_fields::mtime;
                             else
                                 if(strcasecmp(optarg, "inode-type") == 0)
-                                    p.what_to_check = comparison_fields::cf_inode_type;
+                                    p.what_to_check = comparison_fields::inode_type;
                                 else
                                     throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
 

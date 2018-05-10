@@ -541,7 +541,7 @@ namespace libdar
 
 	    // restoring fields that are defined by "what_to_check"
 
-	if(what_to_check == comparison_fields::cf_all)
+	if(what_to_check == comparison_fields::all)
 	    if(ref.get_saved_status() == saved_status::saved)
 	    {
 		uid_t tmp_uid = 0;
@@ -570,7 +570,7 @@ namespace libdar
 
 	try
 	{
-	    if(what_to_check == comparison_fields::cf_all || what_to_check == comparison_fields::cf_ignore_owner)
+	    if(what_to_check == comparison_fields::all || what_to_check == comparison_fields::ignore_owner)
 		if(ref_lie == nullptr) // not restoring permission for symbolic links, it would modify the target not the symlink itself
 		    if(chmod(name, permission) < 0)
 		    {

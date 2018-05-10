@@ -696,7 +696,7 @@ namespace libdar
 				     true,    // alter_atime
 				     false,   // furtive_read_mode
 				     false,   // same_fs
-				     comparison_fields::cf_all,        // what_to_check
+				     comparison_fields::all,        // what_to_check
 				     false,   // snapshot
 				     false,   // cache_directory_tagging
 				     options.get_keep_compressed(),
@@ -853,7 +853,7 @@ namespace libdar
 			     false,               // alter_atime
 			     false,               // furtive_read_mode
 			     false,               // same_fs
-			     comparison_fields::cf_all,   // comparison_fields
+			     comparison_fields::all,   // comparison_fields
 			     false,               // snapshot
 			     false,               // cache_directory_tagging,
 			     true,                // keep_compressed, always

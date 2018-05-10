@@ -211,7 +211,7 @@ static void re_test()
 	bool_mask all = true;
 	crit_constant_action todo =  crit_constant_action(data_preserve, EA_preserve);
 	fsa_scope sc;
-	filesystem_restore fs(ui, where, true, true, all, comparison_fields::cf_all, true, false, &todo, false, sc);
+	filesystem_restore fs(ui, where, true, true, all, comparison_fields::all, true, false, &todo, false, sc);
 	bool hasbeencreated, ea_restored, hard_link, fsa_restored;
 	libdar::filesystem_restore::action_done_for_data  data_restored;
 

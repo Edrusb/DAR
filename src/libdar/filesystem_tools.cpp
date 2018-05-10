@@ -219,7 +219,7 @@ namespace libdar
 
             // restoring fields that are defined by "what_to_check"
 
-        if(what_to_check == comparison_fields::cf_all)
+        if(what_to_check == comparison_fields::all)
 	{
 	    uid_t tmp_uid = 0;
 	    gid_t tmp_gid = 0;
@@ -247,7 +247,7 @@ namespace libdar
 
         try
         {
-            if(what_to_check == comparison_fields::cf_all || what_to_check == comparison_fields::cf_ignore_owner)
+            if(what_to_check == comparison_fields::all || what_to_check == comparison_fields::ignore_owner)
                 if(ref_lie == nullptr) // not restoring permission for symbolic links, it would modify the target not the symlink itself
                     if(chmod(name, permission) < 0)
                     {
@@ -270,7 +270,7 @@ namespace libdar
     {
         const cat_lien *ref_lie = dynamic_cast<const cat_lien *>(&ref);
 
-        if(what_to_check == comparison_fields::cf_all || what_to_check == comparison_fields::cf_ignore_owner || what_to_check == comparison_fields::cf_mtime)
+        if(what_to_check == comparison_fields::all || what_to_check == comparison_fields::ignore_owner || what_to_check == comparison_fields::mtime)
         {
             datetime birthtime = ref.get_last_modif();
             fsa_scope::iterator it = scope.find(fsaf_hfs_plus);
