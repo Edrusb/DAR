@@ -357,7 +357,11 @@ namespace libdar5
 
 	// from archive_aux.hpp
     using libdar::modified_data_detection;
-
+    using libdar::comparison_fields;
+    constexpr comparison_fields cf_all = comparison_fields::all;
+    constexpr comparison_fields cf_ignore_owner = comparison_fields::ignore_owner;
+    constexpr comparison_fields cf_mtime = comparison_fields::mtime;
+    constexpr comparison_fields cf_inode_type = comparison_fields::inode_type;
 
 	///  libdar Major version defined at compilation time
     const U_I LIBDAR_COMPILE_TIME_MAJOR = 5;
