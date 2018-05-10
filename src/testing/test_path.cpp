@@ -23,6 +23,7 @@
 #include <iostream>
 
 #include "path.hpp"
+#include "erreurs.hpp"
 
 using namespace libdar;
 using namespace std;

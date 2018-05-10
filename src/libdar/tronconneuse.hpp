@@ -232,7 +232,7 @@ namespace libdar
 
 	    ///\param[in] pos is the position in the clear data
 	    ///\param[out] file_buf_start is the position of the beginning of the crypted block where can be found the data
-	    ///\param[out] file_buf_clear is the position of the beginning of the corresponding clear block
+	    ///\param[out] clear_buf_start is the position of the beginning of the corresponding clear block
 	    ///\param[out] pos_in_buf is the position in the clear block of the 'pos' offset
 	    ///\param[out] block_num is the block number we have our requested position inside
 	void position_clear2crypt(const infinint & pos,

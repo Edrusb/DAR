@@ -70,7 +70,7 @@ static void f1()
     where->set_location("./test");
     try
     {
-	sar sar1(ui, gf_write_only, "destination", "txt", 100, 110, true, false, 0, where, internal_name, data_name, false, 0, hash_none, false, 0);
+	sar sar1(ui, gf_write_only, "destination", "txt", 100, 110, true, false, 0, where, internal_name, data_name, false, 0, hash_algo::hash_none, false, 0);
         fichier_local src = fichier_local(ui, "./test/source.txt", gf_read_only, 0666, false, false, false);
         src.copy_to(sar1);
     }
