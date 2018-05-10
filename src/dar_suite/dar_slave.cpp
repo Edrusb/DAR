@@ -118,8 +118,10 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 				   chemin,
 				   filename,
 				   EXTENSION,
-				   input_pipe,
-				   output_pipe,
+				   input_pipe.size() == 0,
+				   input_pipe.size() == 0 ? "0" : input_pipe,
+				   output_pipe.size() == 0,
+				   output_pipe.size() == 0 ? "1" : output_pipe,
 				   execute,
 				   min_digits);
 	slave.run();

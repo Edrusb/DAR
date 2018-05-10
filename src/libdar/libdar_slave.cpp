@@ -42,7 +42,9 @@ namespace libdar
 			       const string & folder,
 			       const string & basename,
 			       const string & extension,
+			       bool input_pipe_is_fd,
 			       const string & input_pipe,
+			       bool output_pipe_is_fd,
 			       const string & output_pipe,
 			       const string & execute,
 			       const infinint & min_digits)
@@ -52,6 +54,21 @@ namespace libdar
 	tuyau *output = nullptr;
 	sar *source = nullptr;
 	string base = basename;
+	U_I input_fd;
+	U_I output_fd;
+
+	if(input_pipe.size() == 0)
+	    throw Elibcall("libdar_slave::libdar_slave", "empty string given to argument input_pipe of libdar_slave constructor");
+	if(output_pipe.size() == 0)
+	    throw Elibcall("libdar_slave::libdar_slave", "empty string given to argument input_pipe of libdar_slave constructor");
+
+	if(input_pipe_is_fd)
+	    if(!tools_my_atoi(input_pipe.c_str(), input_fd))
+		throw Elibcall("libdar_slave::libdar_slave", "non integer provided to argument input_pipe of libdar_slave constructor while input_pipe_is_fd was set");
+
+	if(output_pipe_is_fd)
+	    if(!tools_my_atoi(output_pipe.c_str(), output_fd))
+		throw Elibcall("libdar_slave::libdar_slave", "non integer provided to argument output_pipe of libdar_slave constructor while output_pipe_is_fd was set");
 
 	entrep.reset(new (nothrow) entrepot_local("", "", false));
 	if(!entrep)
@@ -72,11 +89,21 @@ namespace libdar
 	    if(source == nullptr)
 		throw Ememory("libdar_slave::libdar_slave");
 
-	    macro_tools_open_pipes(dialog,
-				   input_pipe,
-				   output_pipe,
-				   input,
-				   output);
+	    if(input_pipe_is_fd)
+		input = new (nothrow) tuyau(dialog, input_fd, gf_read_only);
+	    else
+		input = new (nothrow) tuyau(dialog, input_pipe, gf_read_only);
+
+	    if(input == nullptr)
+		throw Ememory("libdar_slave::libdar_slave");
+
+	    if(output_pipe_is_fd)
+		output = new (nothrow) tuyau(dialog, output_fd, gf_write_only);
+	    else
+		output = new (nothrow) tuyau(dialog, output_pipe, gf_write_only);
+
+	    if(output == nullptr)
+		throw Ememory("libdar_slave::libdar_slave");
 
 	    zap.reset(new (nothrow) slave_zapette(input, output, source));
 	    if(!zap)
