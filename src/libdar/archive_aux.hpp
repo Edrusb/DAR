@@ -54,10 +54,10 @@ namespace libdar
 
     enum class hash_algo
     {
-	hash_none,  ///< no hashing algorithm
-	hash_md5,   ///< MD5 algorithm
-	hash_sha1,  ///< SHA1 algorithm
-	hash_sha512 ///< SHA-512 algorithm
+	none,  ///< no hashing algorithm
+	md5,   ///< MD5 algorithm
+	sha1,  ///< SHA1 algorithm
+	sha512 ///< SHA-512 algorithm
     };
 
 

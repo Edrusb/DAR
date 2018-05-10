@@ -85,7 +85,7 @@ namespace libdar
 	fichier_global *ret = nullptr;
 
 	    // sanity check
-	if(algo != hash_algo::hash_none && (mode != gf_write_only || (!erase && !fail_if_exists)))
+	if(algo != hash_algo::none && (mode != gf_write_only || (!erase && !fail_if_exists)))
 	    throw SRC_BUG; // if hashing is asked, we cannot accept to open an existing file without erasing its contents
 
 
@@ -103,7 +103,7 @@ namespace libdar
 
 	try
 	{
-	    if(algo != hash_algo::hash_none)
+	    if(algo != hash_algo::none)
 	    {
 		fichier_global *hash_file = nullptr;
 		fichier_global *tmp = nullptr;

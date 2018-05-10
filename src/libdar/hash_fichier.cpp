@@ -35,13 +35,13 @@ namespace libdar
     {
 	switch(algo)
 	{
-	case hash_algo::hash_none:
+	case hash_algo::none:
 	    throw SRC_BUG;
-	case hash_algo::hash_md5:
+	case hash_algo::md5:
 	    return "md5";
-	case hash_algo::hash_sha1:
+	case hash_algo::sha1:
 	    return "sha1";
-	case hash_algo::hash_sha512:
+	case hash_algo::sha512:
 	    return "sha512";
 	default:
 	    throw SRC_BUG;
@@ -76,15 +76,15 @@ namespace libdar
 
 	switch(algo)
 	{
-	case hash_algo::hash_none:
+	case hash_algo::none:
 	    throw SRC_BUG;
-	case hash_algo::hash_md5:
+	case hash_algo::md5:
 	    hash_gcrypt = GCRY_MD_MD5;
 	    break;
-	case hash_algo::hash_sha1:
+	case hash_algo::sha1:
 	    hash_gcrypt = GCRY_MD_SHA1;
 	    break;
-	case hash_algo::hash_sha512:
+	case hash_algo::sha512:
 	    hash_gcrypt = GCRY_MD_SHA512;
 	    break;
 	default:

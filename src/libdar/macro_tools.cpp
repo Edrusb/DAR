@@ -250,7 +250,7 @@ namespace libdar
 							global_cata_top_stack,
 							"x",
 							global_hash_to_compare,
-							hash_algo::hash_sha512);
+							hash_algo::sha512);
 		    if(hasher == nullptr)
 			throw Ememory("macro_tools_get_derivated_catalogue_from");
 
@@ -1099,7 +1099,7 @@ namespace libdar
 
 	    secu_string real_pass = pass;
 
-	    if(hash != hash_algo::hash_none || crypto != crypto_algo::none)
+	    if(hash != hash_algo::none || crypto != crypto_algo::none)
 		open_mode = gf_write_only;
 
 	    try
@@ -1630,7 +1630,7 @@ namespace libdar
 							global_layers,
 							string("x"),
 							global_hash_to_sign,
-							hash_algo::hash_sha512);
+							hash_algo::sha512);
 		    if(hasher == nullptr)
 			throw Ememory("macro_tools_close_layers");
 

@@ -196,7 +196,7 @@ void f1(int argc, char *argv[])
 						0644,
 						true,
 						true,
-						hash_algo::hash_none);
+						hash_algo::none);
 	if(remotew == nullptr)
 	    throw SRC_BUG;
 	try
@@ -217,7 +217,7 @@ void f1(int argc, char *argv[])
 					    0,
 					    false,
 					    false,
-					    hash_algo::hash_none);
+					    hash_algo::none);
 	if(fic == nullptr)
 	    throw SRC_BUG;
 
@@ -245,7 +245,7 @@ void f1(int argc, char *argv[])
 					    0,
 					    false,
 					    false,
-					    hash_algo::hash_none);
+					    hash_algo::none);
 
 	if(foc == nullptr)
 	    throw SRC_BUG;
@@ -272,7 +272,7 @@ void f1(int argc, char *argv[])
 					    0,     // permission
 					    false, // fail if exist
 					    false, // erase
-					    hash_algo::hash_none);
+					    hash_algo::none);
 	const U_I BUFSIZE = 1000;
 	char buf[BUFSIZE];
 	infinint tamp;
@@ -319,7 +319,7 @@ void f1(int argc, char *argv[])
 					    0644,  // permission
 					    false, // fail if exist
 					    false,  // erase
-					    hash_algo::hash_none);
+					    hash_algo::none);
 	if(fec == nullptr)
 	    throw SRC_BUG;
 	try

@@ -131,8 +131,8 @@ void error(const string & argv0)
 libdar::hash_algo str2hash(const string & val)
 {
     if(val == "md5")
-	return libdar::hash_algo::hash_md5;
+	return libdar::hash_algo::md5;
     if(val == "sha1")
-	return libdar::hash_algo::hash_sha1;
+	return libdar::hash_algo::sha1;
     throw Erange("str2hash", "unknown hash algorithm");
 }

@@ -277,10 +277,10 @@ namespace libdar5
 
 	// from hash_fichier.hpp
     using libdar::hash_algo;
-    constexpr hash_algo hash_none = hash_algo::hash_none;
-    constexpr hash_algo hash_md5 = hash_algo::hash_md5;
-    constexpr hash_algo hash_sha1 = hash_algo::hash_sha1;
-    constexpr hash_algo hash_sha512= hash_algo::hash_sha512;
+    constexpr hash_algo hash_none = hash_algo::none;
+    constexpr hash_algo hash_md5 = hash_algo::md5;
+    constexpr hash_algo hash_sha1 = hash_algo::sha1;
+    constexpr hash_algo hash_sha512= hash_algo::sha512;
 
 	// from fsa_family.hpp
     using libdar::fsa_family;

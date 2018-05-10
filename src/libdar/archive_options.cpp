@@ -345,7 +345,7 @@ namespace libdar
 	    x_sparse_file_min_size = 15;  // min value to activate the feature (0 means no detection of sparse_file)
 	    x_security_check = true;
 	    x_user_comment = default_user_comment;
-	    x_hash = hash_algo::hash_none;
+	    x_hash = hash_algo::none;
 	    x_slice_min_digits = 0;
 	    x_backup_hook_file_execute = "";
 	    x_ignore_unknown = false;
@@ -721,7 +721,7 @@ namespace libdar
 	    x_slice_user_ownership = "";
 	    x_slice_group_ownership = "";
 	    x_user_comment = default_user_comment;
-	    x_hash = hash_algo::hash_none;
+	    x_hash = hash_algo::none;
 	    x_slice_min_digits = 0;
 	    x_sequential_marks = true;
 	    x_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local("", "", false)); // never using furtive_mode to read slices
@@ -893,7 +893,7 @@ namespace libdar
 	    x_sequential_marks = true;
 	    x_sparse_file_min_size = 0; // disabled by default
 	    x_user_comment = default_user_comment;
-	    x_hash = hash_algo::hash_none;
+	    x_hash = hash_algo::none;
 	    x_slice_min_digits = 0;
 	    x_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local("", "", false)); // never using furtive_mode to read slices
 	    if(x_entrepot == nullptr)
@@ -1917,7 +1917,7 @@ namespace libdar
             x_slice_group_ownership = "";
             x_sequential_marks = true;
             x_user_comment = default_user_comment;
-            x_hash = hash_algo::hash_none;
+            x_hash = hash_algo::none;
             x_slice_min_digits = 0;
             x_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local( "", "", false)); // never using furtive_mode to read slices
             if(x_entrepot == nullptr)
