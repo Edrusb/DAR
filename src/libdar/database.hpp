@@ -58,7 +58,9 @@ namespace libdar
 	    /// \param[in] dialog for user interaction
 	    /// \param[in] base database filename
 	    /// \param[in] opt extendable list of options to use for this operation
- 	database(const std::shared_ptr<user_interaction> & dialog, const std::string & base, const database_open_options & opt);
+ 	database(const std::shared_ptr<user_interaction> & dialog,
+		 const std::string & base,
+		 const database_open_options & opt);
 
 	    /// disabling copy constructor
 	database(const database & ref) = delete;
