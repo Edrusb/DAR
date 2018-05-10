@@ -1,15 +1,14 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head>
-  <title>Libdar API - Tutorial</title>
+<html><head><title>Libdar API - Tutorial</title>
+
+  
 
   
   
   <meta content="Denis Corbin" name="author">
 
   
-  <meta content="Tutorial for using libdar library" name="description">
-
-</head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
+  <meta content="Tutorial for using libdar library" name="description"></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
@@ -22,7 +21,7 @@
       <h1 style="text-align: center;">APPLICATION INTERFACE <br>
       </h1>
       <h1 style="text-align: center;">TUTORIAL</h1>
-      <div style="text-align: center;"> for API version 6.0.x and above<br>
+      <div style="text-align: center;"> for API version 6.0.x and laters<br>
       </div>
       <h1 style="text-align: center;"> </h1>
       </td>
@@ -377,7 +376,7 @@ By default the PIPE signal leads the receiving processus to terminate.<br>
       <td style="vertical-align: top;">
       <h2>4 - Libdar classes<br>
       </h2>
-The main components of libdar are a set of&nbsp; classes:<span style="font-weight: bold;"></span>
+The main components of libdar are four classes:<span style="font-weight: bold;"></span>
       <ul>
         <li><span style="font-weight: bold;">class libdar::archive</span>
 to play with dar archives<br>
@@ -395,7 +394,7 @@ libdar::archive</span> which will take most of our effort as other
 classes which we will see at the end are very simple to use.<br>
       <br>
       <h2>5 - Multithreaded environment</h2>
-      <div style="text-align: justify;">Except some exceptions that
+      <div style="text-align: justify;">Except some specific cases that
 will be mentionned, a given libdar object can only be manpulated by a
 single thread. You can however perform several operations concurrently
 from different thread, each having its own set of objects. Though, if
@@ -403,24 +402,24 @@ one
 thread is creating an archive by mean of an first object and at the
 same
 time another thread by mean of a second object is trying to read the
-archive under construction, things might not work as expected, but this
+same archive under construction, things might not work as expected. But this
 is obvious considerations we will not dig any further assuming you
 know what you are doing.<br>
       </div>
       <h2>6 - Let's create a simple archive</h2>
       <span style="font-weight: bold;"></span>Creating a <span style="font-weight: bold;">libdar::archive</span> object depending on
-the constructor used leads to either:<br>
+the constructor used, leads to either:<br>
       <ul>
         <li>the creation of a brand new archive on filesystem, thus
 performing a backup (full, incremental, differential, decremental, ...)<br>
         </li>
-        <li>opening an archive existing on filesystem, for further
+        <li>the opening an archive existing on filesystem, for further
 operation (listing,&nbsp; file restoration,&nbsp; archive testing,
 archive difference, ...) <br>
         </li>
-        <li>merging two existing archives into a new one</li>
-        <li>repair an archive which catalogue (i.e.: table of content
-is missing)</li>
+        <li>the merging two existing archives into a new one</li>
+        <li>the repairation of an archive which catalogue is missing or damaged. The <span style="font-style: italic;">catalogue</span> (which means catalog in French) is the table of content of an archive.<br>
+</li>
       </ul>
       <h3>6.1 - Basic archive creation</h3>
 For <span style="font-weight: bold;">archive creation</span> the
@@ -452,10 +451,10 @@ const archive_options_create &amp; options,</span><br style="font-weight: bold;"
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 statistics * progressive_report);</span><br>
       <br>
-      </code>For now we will left beside several parameters we will see
+      </code>For now we will left beside several parameters seen
 in detail later:<br>
       <ul style="text-align: justify;">
-        <li style="text-align: justify;"><span style="font-weight: bold;">dialog</span> can be set to <span style="font-weight: bold;">a null pointer</span> for now, this means
+        <li style="text-align: justify;"><span style="font-weight: bold;">dialog</span> can be set to <span style="font-weight: bold;">std::nullptr</span> for now, this means
 that all interaction with the user will be done by mean of standard
 input, output and error.</li>
         <li style="text-align: justify;"><span style="font-weight: bold;">fs_root</span> is the directory to take as
@@ -473,13 +472,15 @@ without argument</span> so all options are set to their default that way</li>
         <li style="text-align: justify;"><span style="font-weight: bold;">statistics</span> can
 receive the address of an existing object that another thread can read
 while a first one is doing a backup operation, we will see this feature
-later on, but for now let's set this to a <span style="font-weight: bold;">null pointer</span>.</li>
-      </ul>
-      <div style="text-align: justify;">Once the object has been
+later on, but for now let's set this to a <span style="font-weight: bold;">null pointer</span> (i.e.: std::nullptr)<br>
+</li>
+      </ul>Once the object has been
 created (the constructor has returned), the
 archive operation has completed and a new file has been completely
 written on disk.<br>
-      </div>
+
+      
+      
       </td>
     </tr>
   </tbody>
@@ -634,8 +635,8 @@ of class libdar::statistics are:<br>
         </li>
       </ul>
 If you have a doubt about the meaning and use of a particular counter
-in a particular operation, please refer to the doxygen documentation of
-class statistics, the private fields corresponding ot these counter are
+in a particular operation, please refer to API reference documentation of
+class libdar::statistics, the private fields corresponding to these counter are
 explicitely defined there.<br>
       </div>
       </td>
@@ -689,13 +690,12 @@ std::cout &lt;&lt; <span style="font-weight: bold;">stats.get_ea_treated_str()</
       <h3>6.3 - Archive creation options<br>
       </h3>
       <div style="text-align: justify;">in the previous example, we
-have created an object of class libdar::archive_options_create and
-passed it on-fly to the archive constructor without modifying it, thus
-we used the default options for th void set_selection(const mask &amp;
-selection);is operations. But <span style="text-decoration: underline; font-weight: bold;">a lot</span>
+have created an object of class <span style="font-weight: bold;">libdar::archive_options_create</span> and
+passed it on-fly to the archive constructor without modifying it. Thus
+we used the default options for this operations. But <span style="text-decoration: underline; font-weight: bold;">a lot</span>
 of options are available, each one can be modified by a specific
-method, you will quite never use all of them. Follows a subset of the
-available options, we won't details but you can refer the doxygen
+method, you will quite never use all of them. Follow is a subset of the
+available options. We won't details them all, but you can refer the doxygen
 documentation of <span style="font-weight: bold;">class
 libdar::archive_options_create</span> for more information.<br>
       </div>
@@ -817,7 +817,7 @@ C++11 shared smart-pointer to an existing archive object. We will see
 how to use it next when performing differential backup<br>
           <span style="font-weight: bold;"></span></li>
         <li><span style="font-weight: bold;">infinint</span> can be set
-from an <span style="font-weight: bold;">classical unsigned int</span>,
+from a <span style="font-weight: bold;">classical unsigned int</span>,
 unsigned long or other unsigned integer type</li>
         <li><span style="font-weight: bold;">mask</span> is a bit more
 complex, we will see how to use it in a
@@ -855,10 +855,10 @@ ptr, U_I <span style="font-weight: bold;">size</span>)</li>
         <li><span style="font-weight: bold;">comparison_fields</span>
 is an enumeration with values like</li>
         <ul>
-          <li><code>libdar::comparison_fields::<span style="font-weight: bold;">cf_all</span></code></li>
-          <li><code>libdar::comparison_fields::<span style="font-weight: bold;">cf_ignore_owner</span></code></li>
-          <li><code>libdar::comparison_fields::<span style="font-weight: bold;">cf_mtime</span></code></li>
-          <li><code>libdar::comparison_fields::<span style="font-weight: bold;">cf_inode_type</span></code></li>
+          <li><code>libdar::comparison_fields::<span style="font-weight: bold;">all</span></code></li>
+          <li><code>libdar::comparison_fields::<span style="font-weight: bold;">ignore_owner</span></code></li>
+          <li><code>libdar::comparison_fields::<span style="font-weight: bold;">mtime</span></code></li>
+          <li><code>libdar::comparison_fields::<span style="font-weight: bold;">inode_type</span></code></li>
         </ul>
       </ul>
       </td>
@@ -982,8 +982,7 @@ details with archive listing</li>
       <div style="margin-left: 40px;"><code><span style="font-weight: bold;"></span>&nbsp; // first we open the
 previously created archive in read mode:<br>
       <br>
-std::shared_ptr&lt;libdar::archive&gt; <span style="font-weight: bold;">ref_archive</span>(<span style="font-weight: bold;">new</span> libdar::archive(nullptr,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+std::shared_ptr&lt;libdar::archive&gt; <span style="font-weight: bold;">ref_archive</span>(<span style="font-weight: bold;">new</span> libdar::archive(nullptr,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 "/home/me",<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -1471,7 +1470,7 @@ exercice, we will change some default options:<br>
       </code><code>archive_options_diff <span style="font-weight: bold;">opt</span>;</code><br>
       <code> <span style="font-weight: bold;">opt</span>.set_info_details(true);
 // to have a verbose output<br>
-      <span style="font-weight: bold;">opt</span>.set_what_to_check(libdar::comparison_fields::cf_ignore_owner);<br>
+      <span style="font-weight: bold;">opt</span>.set_what_to_check(libdar::comparison_fields::ignore_owner);<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // this option above will consider equal
 two files which<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // only change due to user or group
@@ -1606,8 +1605,7 @@ archive_options_extract <span style="font-weight: bold;">opt</span>;<br>
       <br>
 (void) my_backup.<span style="font-weight: bold;">op_extract</span>("/home/me/my_home_copy",<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <span style="font-weight: bold;">opt</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<span style="font-weight: bold;">opt</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 nullptr); // we have seen previously how to use statistics<br>
 &nbsp; </code><span style="font-family: monospace;"></span><code></code><br>
       </div>
@@ -1710,7 +1708,7 @@ std::shared_ptr&lt;libdar::archive&gt; <span style="font-weight: bold;">system_b
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 &nbsp; &nbsp; &nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <span style="font-weight: bold;">opt</span>);<br>
+<span style="font-weight: bold;">opt</span>);<br>
       <br>
 &nbsp; // 3 - setting up the options for merging<br>
       <br>
@@ -1721,22 +1719,19 @@ opt_merge.set_slicing(1048576, 0); // all slice would have 1 MiB at most<br>
 opt_merge.set_compression(libdar::compression::bzip2);<br>
 opt_merge.set_keep_compressed(true);<br>
 opt_merge.set_user_comment("archive resulting of the merging of home_backup and system_backup");<br>
-opt_merge.set_hash_algo(libdar::hash_algo::hash_sh512); // will generate on-fly hash file for each slice<br>
+opt_merge.set_hash_algo(libdar::hash_algo::sha512); // will generate on-fly hash file for each slice<br>
       <br>
 &nbsp; // 4 - now performing the merging operation<br>
       <br>
-libdar::archive <span style="font-weight: bold;">merged</span>(nullptr,&nbsp; // still the user_interaction we will see further<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+libdar::archive <span style="font-weight: bold;">merged</span>(nullptr,&nbsp; // still the user_interaction we will see further<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 "/tmp",<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <span style="font-weight: bold;">home_backup</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<span style="font-weight: bold;">home_backup</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 "merged",<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 "dar",<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <span style="font-weight: bold;">opt_merge</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<span style="font-weight: bold;">opt_merge</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 nullptr);&nbsp; // progressive_report we don't use here<br>
       <br>
       </code><code></code><br>
@@ -1882,15 +1877,14 @@ libdar::archive repaired(nullptr,&nbsp;&nbsp; // still the user_interaction we h
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 "dar",<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <span style="font-weight: bold;">archive_options_read()</span>,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<span style="font-weight: bold;">archive_options_read()</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 "/tmp",<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 "home_backup_repaired",<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 "dar",<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <span style="font-weight: bold;">archive_options_repair()</span>);<br>
+<span style="font-weight: bold;">archive_options_repair()</span>);<br>
       <br>
 &nbsp; // we have not done fancy things with the two option classes, but we did above<br>
 &nbsp; // enough time for you get all the necessary information from the API reference <br>
@@ -2136,8 +2130,7 @@ bool echo, void *context);</code><br>
       <br>
 Then you can create an libdar::user_interaction_callback object using this constructor:<br>
       <br>
-      <code style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user_interaction_callback(message_callback x_message_callback,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <code style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user_interaction_callback(message_callback x_message_callback,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 pause_callback x_answer_callback,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 get_string_callback x_string_callback,<br>
@@ -2441,6 +2434,8 @@ testing
 operation. In this case the situation is as if the <span style="font-style: italic;">fs_root</span> was set to the value "<span style="font-style: italic;">&lt;ROOT&gt;</span>". For example, masks
 will be compared to <span style="font-style: italic;">"&lt;ROOT&gt;/some/file"</span>
 when performing an archive test operation.<br>
+      <br>
+instead of using explicit string "&lt;ROOT&gt;" you can use <span style="font-weight: bold;">libdar::PSEUDO_ROOT</span> const std::string variable<br>
       </div>
       <div style="margin-left: 80px; text-align: justify;"> </div>
       <ul>
@@ -2512,9 +2507,11 @@ thread ID in which we want to have
 lidbar call canceled<br>
 &nbsp;&nbsp; // here for simplicity we don't describe the way the
 ID has been obtained<br>
+&nbsp;&nbsp; // but it could be for example the result of a call to pthread_self() as<br>
+&nbsp;&nbsp; // defined in &lt;pthread.h&gt; system header file<br>
 pthread_t thread_id = 161720;<br>
 &nbsp;&nbsp; <br>
-&nbsp;&nbsp; // the most simple call is :<br>
+&nbsp;&nbsp; // the most simple call is:<br>
 libdar::cancel_thread(thread_id);<br>
 &nbsp;&nbsp; // this will make any libdar call in this thread be
 canceled immediately<br>
@@ -2741,7 +2738,29 @@ different method of the class <span style="font-style: italic;">database</span>
       </div>
       <br>
       <h3>Database object construction</h3>
-Two constructor are available: </td>
+Two constructor are available. The first creates a brand-new but empty database in memory<br>
+      <br>
+      <div style="margin-left: 40px;"><code>database(const std::shared_ptr&lt;user_interaction&gt; &amp; dialog);</code><br>
+      </div>
+      <br>
+As seen for libdar::archive dialog can be set to a null pointer if the
+default interaction mode (stdin/stdout/stderr) suits your need.<br>
+The second constructor opens an existing database from filesystem and stores its contents into memory ready for further use.<br>
+      <br>
+      <div style="margin-left: 40px;"><code>database(const std::shared_ptr&lt;user_interaction&gt; &amp; dialog,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp; base,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+const database_open_options &amp; opt);</code><br>
+      </div>
+      <br>
+      <ul>
+        <li>dialog here to can be set to a null pointer or can point to an user_interaction object of your own</li>
+        <li>base is the path and filename of the database to read</li>
+        <li>opt is an object containing a few options. As seen with
+libdar::archive we can use an default temporary object to use default
+option</li>
+      </ul>
+ </td>
     </tr>
   </tbody>
 </table>
@@ -2753,38 +2772,33 @@ Two constructor are available: </td>
 
   <tbody>
     <tr>
-      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>#include
-&lt;dar/database.hpp&gt;<br>
-      </code><code><span style="font-weight: bold;"></span><br>
-void my_sample_function(user_interaction &amp; dialog)<br>
-{<br>
-&nbsp; &nbsp; database base; &nbsp; // we have created an empty
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code></code><code>&nbsp; &nbsp; database base; &nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // we have created an empty
 database (no archive in it) called "base"<br>
       <br>
-&nbsp; &nbsp; database other&nbsp; = database(dialog,
-"/tmp/existing_base.dmd", database_open_options());<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// we have created a database object called "other" which contains <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// (in RAM) all information that were contained in the <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; &nbsp; database other&nbsp; = database(nullptr,<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; "/tmp/existing_base.dmd", <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+database_open_options());<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// we have created a database object called "other" which contains <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// (in RAM) all information that were contained in the <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // database file "/tmp/existing_base.dmd"<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// I will explain below the last argument<br>
+&nbsp;&nbsp;&nbsp;&nbsp; <br>
       <br>
 &nbsp;&nbsp;&nbsp; database_open_option opt;<br>
 &nbsp;&nbsp;&nbsp; opt.set_partial(true);<br>
-&nbsp;&nbsp;&nbsp; database other2 = database(dialog,
-"/tmp/existing_base.dmd", opt);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// we have created a database object called "other2" which differs<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// from "other" in the option we used. While "other" is a fully loaded <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// database, "other2" is a partial database. This notion is explained <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// below<br>
-}</code> <br>
+&nbsp;&nbsp;&nbsp; opt.set_warn_order(false);<br>
+&nbsp;&nbsp;&nbsp; database other2 = database(nullptr,
       <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"/tmp/existing_base.dmd", <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+opt);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// we have created yet another database object called "other2" which differs<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// from "other" by the option we used. While "other" is a fully loaded <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// database, "other2" is a partial database. This notion is explained <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// below</code><br>
       </td>
     </tr>
   </tbody>
@@ -2797,74 +2811,69 @@ database (no archive in it) called "base"<br>
   <tbody>
     <tr>
       <td style="vertical-align: top;">
-      <div style="text-align: justify;">So far, this is not much
-complicated.
-You can build an empty database
-from nothing, or load a database to memory from a file using the second
-constructor. As you can see over the filename to give in this later
-constructor, we need a <span style="font-style: italic;">user_interaction</span>
-object to be able to inform the
-user of any problem that could be met, and an object of class
-database_open_options. This last object contains options to use for
-this call (options are set to their default unless modified
-explicitely). Currently, the only available option is the "partial"
-option which is a boolean argument:<br>
-      <br>
-In all the available methods for class database, some require to load
-the whole database in the memory while some other only require
-the database header. Loading just the database header is much faster
-than loading the whole database, of course, and as you guess it
-requires
-much less memory. While you can perform any operation with a full
-loaded database, only a subset of available method will be available
-with a partially loaded database.&nbsp; If you try a method that
-requires a completely loaded database, you will get an exception if the
-object you use has been loaded with "true" as last argument (called
-"partial") of the constructor, and of course an empty database (built
-with the first
-constructor) is a completely loaded database, so you don't have
-restriction in using a new database object. <br>
-      <br>
-But now let's see the
-available method for that class:<br>
+      <div style="text-align: justify;">
+      <ul>
+        <li><span style="font-weight: bold;">database_open_options::set_partial(bool value)</span>
+leads dar to only load the database header into memory, which is
+quicker than loading the full database. But some operation we will see
+bellow need fully loaded database,&nbsp; the other can work with both</li>
+        <li><span style="font-weight: bold;">database_open_options::set_partial_read_only(bool value)</span>
+in addition to have only the header the archive is open in read-only
+mode which of course forbids any modification to the database but is
+even faster than just a partial read-write database. For just database
+listing this is perfectly adapted.</li>
+        <li><span style="font-weight: bold;">database_open_options::set_warn_order(bool value)</span> avoid warning about ordering problem between archive<br>
+        </li>
+      </ul>
+In the following we will indicate whether a database operation can be
+applied to a partially loaded database or not. All operation can be
+applied to a fully loaded databse.<br>
       </div>
       <br>
       <h3>Database's methods <br>
-      </h3>
-First we will see methods that work with both partially and completely
-loaded databases:<br>
-      <ul><li>dump(...) : it is used to write back the database to a
-file. <br>
-        </li><li>change_name() : change the basename of the archive which
-index is
-given in argument</li><li>set_path() : change the path to the archive which index is
-given
-in argument</li><li>set_options() : change the default options to always pass
-to dar
-when performing restoration</li><li>set_dar_path() : specify the path to dar (use empty string
-to
-rely on the PATH variable)</li><li>show_contents() : list the archives used to build the
-database</li><li>get_options() : list the options that will be passed to dar
+</h3>First we will see methods that can work with a <span style="font-weight: bold;">partial and read-only</span> database<br>
+      <ul>
+<li><span style="font-weight: bold;">show_contents()</span> : list the archives used to build the
+database</li><li><span style="font-weight: bold;">get_options()</span> : list the options that will be passed to dar
 (as
-defined with the set_options() method)</li><li>get_dar_path() : return the path to dar (or empty string if
-relying on the PATH variable)</li></ul>
-      <br>
-Now let's see the database methods that only work with completely
+defined with the set_options() method)</li><li><span style="font-weight: bold;">get_dar_path()</span> : return the path to dar (or empty string if
+relying on the PATH variable)</li>
+      </ul>
+
+Second we will see methods that can work with&nbsp; <span style="font-weight: bold;">partially</span> loaded databases:<br>
+      <ul><li><span style="font-weight: bold;">all methods seen above</span><br>
+          <span style="font-weight: bold;"></span></li>
+        <li><span style="font-weight: bold;">dump(...)</span> : it is used to write back the database to a
+file. <br>
+        </li>
+<li><span style="font-weight: bold;">change_name()</span> : change the basename of the archive which
+index is
+given in argument</li><li><span style="font-weight: bold;">set_path()</span> : change the path to the archive which index is
+given
+in argument</li><li><span style="font-weight: bold;">set_options() </span>: change the default options to always pass
+to dar
+when performing restoration</li><li><span style="font-weight: bold;">set_dar_path()</span> : specify the path to dar (use empty string
+to
+rely on the PATH variable)</li></ul>last, let's see the database methods that can work with completely
 loaded databases:<br>
-      <ul><li>add_archive() : add an archive to the database</li><li>remove_archive() : remove an archive from the database</li><li>set_permutation() : change archive relative order within
+      <ul><li><span style="font-weight: bold;">all methods seen above</span><br>
+          <span style="font-weight: bold;"></span></li>
+        <li><span style="font-weight: bold;">add_archive()</span> : add an archive to the database</li>
+<li><span style="font-weight: bold;">remove_archive()</span> : remove an archive from the database</li><li><span style="font-weight: bold;">set_permutation()</span> : change archive relative order within
 the
-database</li><li>show_files() : list the files which are present in the
+database</li><li><span style="font-weight: bold;">show_files()</span> : list the files which are present in the
 given
 archive<br>
-        </li><li>show_version() : list the archive where the given file is
-saved</li><li>show_most_recent_stats() :&nbsp; compute statistics about
+        </li><li><span style="font-weight: bold;">show_version()</span> : list the archive where the given file is
+saved</li><li><span style="font-weight: bold;">show_most_recent_stats()</span> :&nbsp; compute statistics about
 the
-location of most recent file versions</li><li>restore() : restore a set of given files given in argument.</li></ul>
-      <div style="text-align: justify;">Well, you might now say that as
+location of most recent file versions</li><li><span style="font-weight: bold;">restore()</span> : restore a set of given files given in argument.</li></ul>
+      <div style="text-align: justify;">Well,
+you might now say that as
 description this is a bit light for a
 tutorial, yes. In fact these call are really very simple to use, you
-can find a complete description in the reference documentation of the
-API. This documentation is built if doxygen is available and is put
+can find a complete description in the API reference documentation.
+This documentation is built if doxygen is available and is put
 under doc/html after calling make in the source
 package. It is also available from <a href="http://dar.linux.free.fr/html/">dar's
 homepage</a>. </div>
@@ -2875,12 +2884,268 @@ homepage</a>. </div>
 
 <br>
 <hr style="width: 100%; height: 2px;"><br>
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h2>22 - dar_slave API<br>
+      </h2>dar_slave
+role is to read an archive while interacting with a dar process through
+a paire of pipes. Dar asks portion of the archive or information about
+the archive in the first pipe from dar to dar_slave. And dar_slave
+sends the requested informations into the other pipe toward dar.<br>
+      <br>
+Since API 6.0.x, dar_slave has an API. It is implemented by the class
+libdar::libdar_slave. You need firs to create an object using the
+following constructor:<br>
+      <br>
+      <div style="margin-left: 40px;"><code></code><code><span style="font-weight: bold;"> libdar_slave(std::shared_ptr&lt;user_interaction&gt; &amp; dialog,</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp; folder,</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp; basename,</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp; extension,</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bool input_pipe_is_fd,</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp; input_pipe,</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bool output_pipe_is_fd,</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp; output_pipe,</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp; execute,</span><br style="font-weight: bold;">
+      <span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const infinint &amp; min_digits);</span><br>
+      </code></div>
+      <br>
+      <ul>
+        <li><span style="font-weight: bold;">dialog</span> as seen for other libdar classes can be set to a null pointer for interaction on stdin and stdout</li>
+        <li><span style="font-weight: bold;">folder</span> is the directory where resides the archive to read</li>
+        <li><span style="font-weight: bold;">basename</span> is the basename of the archive</li>
+        <li><span style="font-weight: bold;">extension</span> should always be set to "dar"</li>
+        <li><span style="font-weight: bold;">input_pipe_is_fd</span> if
+set to true, the next argument is not the path to a named pipe but a
+number corresponding to a file descriptor open open in read mode<br>
+        </li>
+        <li><span style="font-weight: bold;">input_pipe</span> is the path of a named pipe to read from. It can also be an empty string to use stdin as input pipe</li>
+        <li><span style="font-weight: bold;">out_pipe_is_fd</span> if
+set to true, the next argument is not the path to a named pipe but a
+number corresponding to a file descriptor open in write mode<br>
+        </li>
+        <li><span style="font-weight: bold;">output_pipe </span>is the path of a named pipe to write from. It can also be an empty string to use stdout as input pipe</li>
+      </ul>
+Once the object is created, you will need to call the <span style="font-weight: bold;">libdar_slave::run()</span> method which will end when the dar process at the other end will no more need of this slave<br>
+</td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+
+
+<code></code><code></code>
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
+
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code></code><code>libdar::libdar_slave slave(nullptr,<br>
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"/tmp",<br>
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"first_backup",<br>
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"dar",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+false,<br>
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"/tmp/toslave", // assuming this is an existing named pipe<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+false,<br>
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"/tmp/todar",&nbsp;&nbsp; // assuming this is also an existing named
+pipe<br>
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"echo 'reading slice %p/%b.%N.%e in context %c'",<br>
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0);<br>
+      <br>
+slave.run();<br>
+&nbsp; <br>
+&nbsp; // once run() has returned, you can launch it again for another process or the same<br>
+&nbsp; // one as previously has access to the /tmp/first_backup.*.dar archive<br>
+</code>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<br>
+<hr style="width: 100%; height: 2px;"><br>
+
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h2>23 - dar_xform API<br>
+      </h2>dar_xform
+creates a copy of a given archive modifying its slicing. it does not
+require decompressing nor decyphering the archive to do so. There is
+different constructor depending whether the archive is read from
+filesystem, from a named pipe of from a provided file descriptor<br>
+      <br>
+      <span style="font-weight: bold;">Reading from a file</span><br>
+      <br>
+      <div style="margin-left: 40px;"><code></code><code>libdar_xform(const std::shared_ptr&lt;user_interaction&gt; &amp; ui,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp; chem,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp; basename,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp; extension,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const infinint &amp; min_digits,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp; execute);</code><br>
+</div>
+      
+      <ul><li><span style="font-weight: bold;">ui</span> as seen for other libdar classes can be set to a null pointer for interaction on stdin and stdout</li><li><span style="font-weight: bold;">chem</span> is the directory where resides the archive to read</li><li><span style="font-weight: bold;">basename</span> is the basename of the archive</li><li><span style="font-weight: bold;">extension</span> should always be set to "dar"</li><li><span style="font-weight: bold;">min_digits</span> is the minimum number of digits slice number in filename have been created with (use zero if you don't know what it is)<br>
+</li></ul><span style="font-weight: bold;">Reading from a named pipe</span><br>
+      <br>
+      <div style="margin-left: 40px;"><code>libdar_xform(const std::shared_ptr&lt;user_interaction&gt; &amp; dialog,</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp; pipename);</code><br>
+      </div>
+      <ul>
+        <li><span style="font-weight: bold;">dialog</span> as seen for other libdar classes, it can be set to nullptr</li>
+        <li><span style="font-weight: bold;">pipename</span> complete path to the named pipe to read the archive from</li>
+      </ul>
+      <span style="font-weight: bold;">Reading from a file descriptor</span><br>
+      <br>
+      <div style="margin-left: 40px;"><code>libdar_xform(const std::shared_ptr&lt;user_interaction&gt; &amp; dialog,</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int filedescriptor);</code><br>
+      </div>
+      <ul>
+        <li><span style="font-weight: bold;">dialog</span> same as above</li>
+        <li><span style="font-weight: bold;">filedescriptor</span> is an read opened file descriptor to read the archive from<br>
+        </li>
+      </ul>
+Once the libdar::libdar_xform object is created it can copy the
+referred archive to another location in another form thanks to one of
+the two <span style="font-weight: bold;">libdar_xform::xform_to</span> methods. There is not link between the <span style="font-weight: bold;">constructor</span> used and the <span style="font-weight: bold;">libdar_xform::xform_to</span> flavor used, any combination is possible.<br>
+      <br>
+      <span style="font-weight: bold;">Creating a single or multi-sliced archive on filesystem<br>
+      <br>
+      </span>
+      <div style="margin-left: 40px;"><code>void xform_to(const std::string &amp; path,</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp; basename,</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp; extension,</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bool allow_over,</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bool warn_over,</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const infinint &amp; pause,</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const infinint &amp; first_slice_size,</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const infinint &amp; slice_size,</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp; slice_perm,</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp; slice_user,</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp; slice_group,</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; hash_algo hash,</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const infinint &amp; min_digits,</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp; execute);</code><br>
+      </div>
+      <br>
+      <span style="font-weight: bold;">Creating a single sliced archive toward a filedescriptor</span><br>
+      <br>
+      <div style="margin-left: 40px;"><code>void xform_to(int filedescriptor,</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp; execute);</code><br>
+      </div>
+      <br>
+Here follows an example of use. We will convert a possibly multi-sliced
+archive to a single slice one generating a sha512 hash file on-fly<br>
+</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<br>
+
+
+
+
+<code></code><code></code>
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
+
+
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code></code><code>libdar::libdar_xform transform(nullptr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"/tmp",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"my_first_archive",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"dar",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"echo 'reading slice %p/%b.%N.%e context is %c'");<br>
+      <br>
+transform.xform_to("/tmp",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"my_other_first_archive",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "dar",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+false,&nbsp;&nbsp;&nbsp;&nbsp; // no overwriting allowed<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+true,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // does not matter whether we warn
+or not as we do not allow overwriting<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // no pause between
+slices<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // no specific first
+slice<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // no slicing at all
+(previous argument is thus not used anyway)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"",&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // using default
+permission for created slices<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"",&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // using default user
+ownership for created slices<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"",&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // using default group
+ownership for created slices<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+libdar::hash_algo::sha512, // the hash algo to use (for no hashing use
+hash_none instead)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // min_digits ...
+not using this feature here<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"echo 'Slice %p/%b.%N.%e has been written. Context is %c'");<br>
+<br>
+</code>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+<br>
+<hr style="width: 100%; height: 2px;"><br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;"><br>
-      <h2>15 - Compilation &amp; Linking<br>
+      
+      <h2>24 - Compilation &amp; Linking<br>
       </h2>
+
       <h3>Compilation</h3>
       <div style="text-align: justify;">All the symbols found in the
 libdar API except the one relative to dar_manager (see below) are
