@@ -1,6 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><title>Libdar API - Tutorial</title>
 
+
+
   
 
   
@@ -21,7 +23,7 @@
       <h1 style="text-align: center;">APPLICATION INTERFACE <br>
       </h1>
       <h1 style="text-align: center;">TUTORIAL</h1>
-      <div style="text-align: center;"> for API version 6.0.x and laters<br>
+      <div style="text-align: center;"> for API version 6.0.x and later<br>
       </div>
       <h1 style="text-align: center;"> </h1>
       </td>
@@ -63,7 +65,7 @@ have been released under the <span style="font-style: italic;">Gnu
 General Public License </span>(GPL). All code linked to libdar
 (statically or dynamically), <span style="font-weight: bold;"> must
 also be covered by the GPL.</span> Commercial use is prohibited unless
-a contract has been agreeded with libdar's author.<br>
+a contract has been agreed with libdar's author.<br>
       </div>
       <div style="text-align: justify;"> <br>
       </div>
@@ -174,7 +176,7 @@ Most of the time you will use only one of the following two methods:<br>
       <span style="font-weight: bold;">get_message() </span>returns a
 message string describing the error met<br>
       <span style="font-weight: bold;">dump_str() </span>returns a
-text paragraph with additional informations about the stack as well as
+text paragraph with additional information about the stack as well as
 context the error occurred in.<br>
       <br>
 We will only focus on one specific exception type <span style="font-weight: bold;">libdar::Ebug</span> that is used within
@@ -203,7 +205,7 @@ exception.<br>
       <code>{</code><br>
       <code>&nbsp;&nbsp;&nbsp; std::string msg = e.dump_str();</code><br>
       <code></code><br>
-      <code>&nbsp;&nbsp;&nbsp; // do someting with msg like for example:</code><br>
+      <code>&nbsp;&nbsp;&nbsp; // do something with msg like for example:</code><br>
       <code>&nbsp;&nbsp;&nbsp; std::cerr &lt;&lt; msg </code><br>
       <code>}</code><br>
       <code>catch(libdar::Egeneric &amp; e)</code><br>
@@ -268,7 +270,7 @@ concurrently from several threads at the same time.<br>
       </h2>
       <div style="text-align: justify;">Libdar used
 some
-datastructures (mutex, secured memory, etc.) that need to be released
+data-structures (mutex, secured memory, etc.) that need to be released
 properly before ending the program. It is important to invoke the
 following function before exiting your program if you invoked
 get_version() previously.<br>
@@ -304,7 +306,7 @@ activated in libdar at compilation time.<br>
       </div>
       <br>
       <br>
-All in one, at the higest level, you code should look like the following<br>
+All in one, at the highest level, you code should look like the following<br>
       </td>
     </tr>
   </tbody>
@@ -328,7 +330,7 @@ All in one, at the higest level, you code should look like the following<br>
       <code>{</code><br>
       <code>&nbsp;&nbsp;&nbsp; std::string msg = <span style="font-weight: bold;">e.dump_str()</span>;</code><br>
       <code> </code><br>
-      <code>&nbsp;&nbsp;&nbsp; // do someting with msg like for example:</code><br>
+      <code>&nbsp;&nbsp;&nbsp; // do something with msg like for example:</code><br>
       <code>&nbsp;&nbsp;&nbsp; std::cerr &lt;&lt; msg </code><br>
       <code>}</code><br>
       <code>catch(<span style="font-weight: bold;">libdar::Egeneric
@@ -358,11 +360,11 @@ All in one, at the higest level, you code should look like the following<br>
 use of any signal (see signal(2) and
 kill(2)). However, gpgme library with which libdar may be linked with
 in order to
-support asymetrical strong encryption (i.e. encryption using
+support asymmetrical strong encryption (i.e. encryption using
 public/private keys) may trigger the PIPE signal. Your application
 shall thus
 either ignore it (signal(SIGPIPE, SIG_IGN)) or provide an adhoc handle.
-By default the PIPE signal leads the receiving processus to terminate.<br>
+By default the PIPE signal leads the receiving process to terminate.<br>
       </div>
       </td>
     </tr>
@@ -387,7 +389,7 @@ play with dar_manager databases</li>
 to take the role of dar_slave<br>
         </li>
         <li><span style="font-weight: bold;">class libdar::libdar_xform</span>
-to reslice existing archives like dar_xform does</li>
+to re-slice existing archives like dar_xform does</li>
       </ul>
 In the following we will first see <span style="font-weight: bold;">class
 libdar::archive</span> which will take most of our effort as other
@@ -395,7 +397,7 @@ classes which we will see at the end are very simple to use.<br>
       <br>
       <h2>5 - Multithreaded environment</h2>
       <div style="text-align: justify;">Except some specific cases that
-will be mentionned, a given libdar object can only be manpulated by a
+will be mentioned, a given libdar object can only be manipulated by a
 single thread. You can however perform several operations concurrently
 from different thread, each having its own set of objects. Though, if
 one
@@ -418,7 +420,7 @@ operation (listing,&nbsp; file restoration,&nbsp; archive testing,
 archive difference, ...) <br>
         </li>
         <li>the merging two existing archives into a new one</li>
-        <li>the repairation of an archive which catalogue is missing or damaged. The <span style="font-style: italic;">catalogue</span> (which means catalog in French) is the table of content of an archive.<br>
+        <li>the reparation of an archive which catalogue is missing or damaged. The <span style="font-style: italic;">catalogue</span> (which means catalog in French) is the table of content of an archive.<br>
 </li>
       </ul>
       <h3>6.1 - Basic archive creation</h3>
@@ -522,10 +524,10 @@ my_first_backup(nullptr,</code><br>
       <td style="vertical-align: top; text-align: justify;">Thus, the
 previous command will create a single sliced archive "<span style="font-weight: bold;">first_backup.1.dar</span>" located under <span style="font-weight: bold;">/tmp</span>. It will contain the content of
 the directory <span style="font-weight: bold;">/home/me</span>
-and its subdirectories, without compression and without ciphering. You
+and its sub-directories, without compression and without ciphering. You
 have guessed compression, slicing, ciphering can be set by playing with
 passing an adhoc <span style="font-weight: bold;">archive_option_create</span>
-object to this archive constructor, we will se that later.<br>
+object to this archive constructor, we will see that later.<br>
       <br>
 Once the object has been created there is only little thing we can do
 with it, like archive listing or archive isolation. But archive
@@ -588,7 +590,7 @@ archive_options_create(),</code><br>
 &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
 nullptr);<br>
 &nbsp; // we assume std::bad_alloc would be thrown if an allocation
-problem had occured<br>
+problem had occurred<br>
 &nbsp; // same thing if libdar throws an exception at constructor time,
 the object would<br>
 &nbsp; // not be created and would not have to be deleted.<br>
@@ -637,7 +639,7 @@ of class libdar::statistics are:<br>
 If you have a doubt about the meaning and use of a particular counter
 in a particular operation, please refer to API reference documentation of
 class libdar::statistics, the private fields corresponding to these counter are
-explicitely defined there.<br>
+explicitly defined there.<br>
       </div>
       </td>
     </tr>
@@ -1039,7 +1041,7 @@ backup).<br>
       <h2>8 - Archive listing</h2>
 Archive listing operation consist of the creation of an archive object
 in read-mode as we just did above and invoking a method on that newly
-object to see all or a subdirectory content of the archive. Before
+object to see all or a sub-directory content of the archive. Before
 looking at the listing method let's zoom on the class
 libdar::archive_create_options_read we just skip over previously.<br>
       <br>
@@ -1061,7 +1063,7 @@ val)</li>
 set_execute() has runs a command before reading a new slice of the
 archive. See API reference documentation for details. You will meet
 that class in order to test an archive, compare an archive with
-filesystem, isolate an archive and repaire an archive.<br>
+filesystem, isolate an archive and repair an archive.<br>
       <br>
       <h3>8.2 - Listing methods</h3>
 There is several way to read an given archive contents:<br>
@@ -1224,7 +1226,7 @@ possibility: we use the callback defined above<br>
 don't care of context here<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-archive_options_listing()) // and still se default listing options<br>
+archive_options_listing()) // and still the default listing options<br>
       <br>
       </code><code> </code></div>
       </td>
@@ -1254,7 +1256,7 @@ if you want to use list_entry::get_ea_reset_read()/get_ea_next_read()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; nullptr, // we still
 don't care of context here<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">opt</span>) // and still se default listing
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">opt</span>) // and still the default listing
 options<br>
       <br>
       </code><code> </code></div>
@@ -1299,10 +1301,10 @@ true); &nbsp;&nbsp; // and ask for EA retrieval, but as we do not<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // callback this is just wasting CPU and memory<br>
       <br>
-or course if you have a subdirectory /home/me/.gnupg/private-keys-v1.d
+or course if you have a sub-directory /home/me/.gnupg/private-keys-v1.d
 in your home directory and you want to check how it is saved in the
 archive, as we defined the root of the backup as /home/me and as you
-always have to pass a relative path (no leeding /) you could do that by
+always have to pass a relative path (no leading /) you could do that by
 calling the following:<br>
       <br>
       </code><code>my_backup.<span style="font-weight: bold;">get_children_of</span>(my_listing_callback,<br>
@@ -1403,7 +1405,7 @@ management.<br>
       <td style="vertical-align: top; background-color: rgb(204, 204, 204); width: 50%;"><code><br>
       </code>
       <div style="margin-left: 40px;"><code>&nbsp;&nbsp; // for the
-exercice, we will change some default options:<br>
+exercise, we will change some default options:<br>
       <br>
       </code><code>archive_options_test <span style="font-weight: bold;">opt</span>;</code><br>
       <code><span style="font-weight: bold;">opt</span>.set_info_details(true);
@@ -1465,7 +1467,7 @@ which define which directory of the filesystem to compare the archive to<br>
       <td style="vertical-align: top; background-color: rgb(204, 204, 204); width: 50%;"><code><br>
       </code>
       <div style="margin-left: 40px;"><code>&nbsp;&nbsp; // for the
-exercice, we will change some default options:<br>
+exercise, we will change some default options:<br>
       <br>
       </code><code>archive_options_diff <span style="font-weight: bold;">opt</span>;</code><br>
       <code> <span style="font-weight: bold;">opt</span>.set_info_details(true);
@@ -1513,7 +1515,7 @@ const std::string &amp; extension,<br>
 const archive_options_isolate &amp; options);<br>
       </code><code style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       </code><br>
-      <div style="text-align: justify;">You will find similitudes with
+      <div style="text-align: justify;">You will find similitude with
 the archive creation though here this is not a constructor<br>
       <br>
       <span style="font-weight: bold;">sauv_path </span>is the
@@ -1536,7 +1538,7 @@ archive_options_create class we saw at the beginning of this tutorial<br>
     <tr>
       <td style="vertical-align: top; background-color: rgb(204, 204, 204); width: 50%;"><code></code>
       <div style="margin-left: 40px;"><code>&nbsp;&nbsp; // for the
-exercice, we will change some default options:<br>
+exercise, we will change some default options:<br>
       <br>
       </code><code>archive_options_isolate <span style="font-weight: bold;">opt</span>;</code><br>
       <code> <span style="font-weight: bold;">opt</span>.set_warn_over(false);&nbsp;
@@ -1714,7 +1716,7 @@ std::shared_ptr&lt;libdar::archive&gt; <span style="font-weight: bold;">system_b
       <br>
 libdar::archive_options_merge <span style="font-weight: bold;">opt_merge</span>;<br>
       <br>
-opt_merge.set_auxilliary_ref(<span style="font-weight: bold;">system_backup</span>);<br>
+opt_merge.set_auxiliary_ref(<span style="font-weight: bold;">system_backup</span>);<br>
 opt_merge.set_slicing(1048576, 0); // all slice would have 1 MiB at most<br>
 opt_merge.set_compression(libdar::compression::bzip2);<br>
 opt_merge.set_keep_compressed(true);<br>
@@ -1845,7 +1847,7 @@ const std::string &amp; extension_dst,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 const archive_options_repair &amp; options_repair);</code><br>
       <br>
-You should now be familliarized with the different types and variable
+You should now be familiarized with the different types and variable
 uses. As you can note, this constructor takes in charge the work to
 read the damaged archive, so you won't have to do it first. As always,
 this constructor will end only once the operation will have completed.<br>
@@ -1944,7 +1946,7 @@ constraints is present there (just note the presence of more bugs in
 lower numbers).<br>
       <br>
 If you use libgcrypt beside libdar in your application you should
-initialize libgcrypt and not let it be done by libdar the lastest
+initialize libgcrypt and not let it be done by libdar the latest
 argument of this form should be set to false in that case. Note
 that <a href="https://www.gnupg.org/documentation/manuals/gcrypt/Initializing-the-library.html#Initializing-the-library">libgcrypt
 documentation</a> indicates that libgcrypt must be initialized directly
@@ -2176,7 +2178,7 @@ libdar::secu_string my_secu_string_cb(const std::string &amp; x, bool echo, void
 &nbsp; // to be defined<br>
 }<br>
       <br>
-&nbsp;&nbsp; // enventually using a context_value that will be passed to the callback of the object<br>
+&nbsp;&nbsp; // eventually using a context_value that will be passed to the callback of the object<br>
 void *context_value = (void *)(&amp; some_datastructure);<br>
       <br>
 std::shared_ptr&lt;libdar::user_interaction&gt; my_user_interaction(new libdar::user_interaction_callback(my_message_cb,<br>
@@ -2198,7 +2200,7 @@ context_value));</code><br>
   <tbody>
     <tr>
       <td style="vertical-align: top;">
-      You will also find pre-defined classes like <span style="font-weight: bold;">libdar::user_interaction_blind</span> which always says no in name of the user displays nothing and provide empty strings, as well as <span style="font-weight: bold;">libdar::shell_interaction_emulator</span>
+      You will also find predefined classes like <span style="font-weight: bold;">libdar::user_interaction_blind</span> which always says no in name of the user displays nothing and provide empty strings, as well as <span style="font-weight: bold;">libdar::shell_interaction_emulator</span>
 which given a user_interaction object send to it formatted information
 as if it was a shell_interaction object, leading one to emulate libdar
 default behavior under any time of "terminal".<span style="font-weight: bold;"><br>
@@ -2327,7 +2329,7 @@ elected by this mask</code><br>
       <code>&nbsp; libdar::bool_mask m1(true);&nbsp;&nbsp;&nbsp; <br>
       <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // all string that match the glob
-expession "A*~" will match. <br>
+expression "A*~" will match. <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // the second argument of the
 constructor tell whether the match is case sensitive so here <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // any file beginning by 'A' or by 'a'
@@ -2356,7 +2358,7 @@ true);<br>
       <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // now let's do some more complex things:<br>
       </code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // m5 will now match
-only struings that are selected by both m2 AND m4</code><br>
+only strings that are selected by both m2 AND m4</code><br>
       <code>&nbsp; libdar::et_mask m5;<br>
 &nbsp; m5.add_mask(m2);<br>
 &nbsp; m5.add_mask(m4);<br>
@@ -2397,7 +2399,7 @@ possible to have masks referring each other!</code><br>
       <td style="vertical-align: top;">The idea here is not to create
 object manually, but to link their
 creation to the action and choices the user makes from the user
-interface (Graphical User Interface of your aplication, for example)<br>
+interface (Graphical User Interface of your application, for example)<br>
       <br>
 Now that you've seen the power
 of these masks, you should know that in
@@ -2444,13 +2446,13 @@ Extended Attributes (EA), this is the argument of the <span style="font-weight: 
 archive_options classes. It is applied to the full EA name in the form
 &lt;domain&gt;.&lt;name&gt; where &lt;domain&gt; is any string value
 like but not limited to the usual "user" or "system" domains.</li>
-        <li>A fourth place concerne the file to compress or to avoid
+        <li>A fourth place concerns the file to compress or to avoid
 compressing. This is the argument of the <span style="font-weight: bold;">set_compr_mask()</span>
 method of <span style="font-style: italic;">libdar::archive_options_*</span>
 classes. it is works the same as
 set_selection() seen above, based only to filename without any path
 consideration.</li>
-        <li>A fifth place concern files that have need be prepared for
+        <li>A fifth place concerns files that have need be prepared for
 backup, this is the argument of the <span style="font-weight: bold;">set_backup_hook()
           </span>method
 of <span style="font-style: italic;">libdar::archive_option_create</span>
@@ -2893,9 +2895,9 @@ homepage</a>. </div>
       <h2>22 - dar_slave API<br>
       </h2>dar_slave
 role is to read an archive while interacting with a dar process through
-a paire of pipes. Dar asks portion of the archive or information about
+a pair of pipes. Dar asks portion of the archive or information about
 the archive in the first pipe from dar to dar_slave. And dar_slave
-sends the requested informations into the other pipe toward dar.<br>
+sends the requested information into the other pipe toward dar.<br>
       <br>
 Since API 6.0.x, dar_slave has an API. It is implemented by the class
 libdar::libdar_slave. You need firs to create an object using the
@@ -2997,7 +2999,7 @@ slave.run();<br>
       <h2>23 - dar_xform API<br>
       </h2>dar_xform
 creates a copy of a given archive modifying its slicing. it does not
-require decompressing nor decyphering the archive to do so. There is
+require decompressing nor deciphering the archive to do so. There is
 different constructor depending whether the archive is read from
 filesystem, from a named pipe of from a provided file descriptor<br>
       <br>
