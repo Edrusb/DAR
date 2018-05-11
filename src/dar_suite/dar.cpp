@@ -460,7 +460,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    break;
 		case merging:
 		    merge_options.clear();
-		    merge_options.set_auxilliary_ref(aux);
+		    merge_options.set_auxiliary_ref(aux);
 		    merge_options.set_selection(*param.selection);
 		    merge_options.set_subtree(*param.subtree);
 		    merge_options.set_allow_over(param.allow_over);

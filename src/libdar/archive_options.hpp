@@ -902,7 +902,7 @@ namespace libdar
 	    /////////////////////////////////////////////////////////////////////
 	    // setting methods
 
-	void set_auxilliary_ref(std::shared_ptr<archive> ref) { x_ref = ref; };
+	void set_auxiliary_ref(std::shared_ptr<archive> ref) { x_ref = ref; };
 
 	    /// defines the filenames to only save (except directory) as those that match the given mask
 	void set_selection(const mask & selection);
@@ -1062,7 +1062,7 @@ namespace libdar
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
 
-	std::shared_ptr<archive>  get_auxilliary_ref() const { return x_ref; };
+	std::shared_ptr<archive>  get_auxiliary_ref() const { return x_ref; };
 	const mask & get_selection() const { if(x_selection == nullptr) throw SRC_BUG; return *x_selection; };
 	const mask & get_subtree() const { if(x_subtree == nullptr) throw SRC_BUG; return *x_subtree; };
 	bool get_allow_over() const { return x_allow_over; };

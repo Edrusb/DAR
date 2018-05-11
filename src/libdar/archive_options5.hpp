@@ -134,7 +134,7 @@ namespace libdar5
 
 	void set_auxilliary_ref(libdar::archive *ref)
 	{
-	    libdar::archive_options_merge::set_auxilliary_ref(
+	    libdar::archive_options_merge::set_auxiliary_ref(
 		std::shared_ptr<libdar::archive>(ref,
 						 [](libdar::archive* ptr) {})
 		    // the custom deleter must not delete the object pointed to by

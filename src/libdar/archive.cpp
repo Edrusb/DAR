@@ -537,7 +537,7 @@ namespace libdar
 	statistics *st_ptr = progressive_report == nullptr ? &st : progressive_report;
 	catalogue *ref_cat1 = nullptr;
 	catalogue *ref_cat2 = nullptr;
-	shared_ptr<archive> ref_arch2 = options.get_auxilliary_ref();
+	shared_ptr<archive> ref_arch2 = options.get_auxiliary_ref();
 	compression algo_kept = compression::none;
 	shared_ptr<entrepot> sauv_path_t = options.get_entrepot();
 	entrepot_local *sauv_path_t_local = dynamic_cast<entrepot_local *>(sauv_path_t.get());
