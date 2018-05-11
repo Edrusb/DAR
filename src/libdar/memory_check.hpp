@@ -19,28 +19,34 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
+    /// \file memory_check.hpp
+    /// \brief the main file of the libdar API definitions
+    /// \ingroup Private
+    /// \note this module redefines the two global operators new and delete
+    /// no need to include this header anywhere as these operators will
+    /// be used in any case as replacement of the default ones
+
 #ifndef MEMORY_CHECK_HPP
 #define MEMORY_CHECK_HPP
 
 #include "../my_config.h"
 
-// this module redefines the two global operators new and delete
-// no need to include this header anywhere as these operators will
-// be used in any case as replacement of the default ones
+namespace libdar
+{
 
-    /// adds dump of currently allocated blocks to the debug_memory_output
-extern void memory_check_snapshot();
+	/// \addtogroup Private
+	/// @{
 
-    /// log special_alloc_operations
-extern void memory_check_special_report_new(const void *ptr, unsigned long taille);
-extern void memory_check_special_report_delete(const void *ptr);
-extern void memory_check_special_new_sized(unsigned long taille);
+	/// adds dump of currently allocated blocks to the debug_memory_output
+    extern void memory_check_snapshot();
 
-#else
+	/// log special_alloc_operations
+    extern void memory_check_special_report_new(const void *ptr, unsigned long taille);
+    extern void memory_check_special_report_delete(const void *ptr);
+    extern void memory_check_special_new_sized(unsigned long taille);
 
-#define memory_check_snapshot(null)
-#define memory_check_special_report_new(ptr, taille)
-#define memory_check_special_report_delete(ptr)
-#define memory_check_special_new_sized(taille)
+	/// @}
+
+} // end of namespace
 
 #endif
