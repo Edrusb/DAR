@@ -55,7 +55,6 @@ namespace libdar
 	/// In write_only no skip() is allowed, writing is sequential from the beginning of the file to the end
 	/// (like writing to a pipe).
 	/// In read_only all skip() functions are available.
-	/// \ingroup Private
     class tronconneuse : public generic_file
     {
     public:
@@ -192,61 +191,61 @@ namespace libdar
 
 
     private:
-	infinint initial_shift;    //< the initial_shift first bytes of the underlying file are not encrypted
+	infinint initial_shift;    ///< the initial_shift first bytes of the underlying file are not encrypted
 	    //
-	infinint buf_offset;       //< offset of the first byte in buf
-	U_32 buf_byte_data;        //< number of byte of information in buf (buf_byte_data <= buf_size)
-	U_32 buf_size;             //< size of allocated memory for clear data in buf
-	char *buf;                 //< decrypted data (or data to encrypt)
+	infinint buf_offset;       ///< offset of the first byte in buf
+	U_32 buf_byte_data;        ///< number of byte of information in buf (buf_byte_data <= buf_size)
+	U_32 buf_size;             ///< size of allocated memory for clear data in buf
+	char *buf;                 ///< decrypted data (or data to encrypt)
 	    //
-	U_32 clear_block_size;     //< max amount of data that will be encrypted at once (must stay less than buf_size)
-	infinint current_position; //< position of the next character to read or write from the upper layer perspective, offset zero is the first encrypted byte, thus the first byte after initial_shift
-	infinint block_num;        //< block number we next read or write
-	generic_file *encrypted;   //< generic_file where is put / get the encrypted data
+	U_32 clear_block_size;     ///< max amount of data that will be encrypted at once (must stay less than buf_size)
+	infinint current_position; ///< position of the next character to read or write from the upper layer perspective, offset zero is the first encrypted byte, thus the first byte after initial_shift
+	infinint block_num;        ///< block number we next read or write
+	generic_file *encrypted;   ///< generic_file where is put / get the encrypted data
 	    //
-	U_32 encrypted_buf_size;   //< allocated size of encrypted_buf
-	U_32 encrypted_buf_data;   //< amount of byte of information in encrypted_buf
-	char *encrypted_buf;       //< buffer of encrypted data (read or to write)
+	U_32 encrypted_buf_size;   ///< allocated size of encrypted_buf
+	U_32 encrypted_buf_data;   ///< amount of byte of information in encrypted_buf
+	char *encrypted_buf;       ///< buffer of encrypted data (read or to write)
 	    //
-	infinint extra_buf_offset; //< offset of the first byte of extra_buf
-	U_32 extra_buf_size;       //< allocated size of extra_buf
-	U_32 extra_buf_data;       //< amount of byte of information in extra_buf
-	char *extra_buf;           //< additional read encrypted that follow what is in encrypted_buf used to check for clear data after encrypted data
+	infinint extra_buf_offset; ///< offset of the first byte of extra_buf
+	U_32 extra_buf_size;       ///< allocated size of extra_buf
+	U_32 extra_buf_data;       ///< amount of byte of information in extra_buf
+	char *extra_buf;           ///< additional read encrypted that follow what is in encrypted_buf used to check for clear data after encrypted data
 	    //
-	bool weof;                 //< whether write_end_of_file() has been called
-	bool reof;                 //< whether we reached eof while reading
-	archive_version reading_ver;//< archive format we currently read
-	infinint (*trailing_clear_data)(generic_file & below, const archive_version & reading_ver); //< callback function that gives the amount of clear data found at the end of the given file
+	bool weof;                 ///< whether write_end_of_file() has been called
+	bool reof;                 ///< whether we reached eof while reading
+	archive_version reading_ver; ///< archive format we currently read
+	infinint (*trailing_clear_data)(generic_file & below, const archive_version & reading_ver); ///< callback function that gives the amount of clear data found at the end of the given file
 
 
 	void nullifyptr() noexcept;
 	void detruit() noexcept;
 	void copy_from(const tronconneuse & ref);
 	void move_from(tronconneuse && ref) noexcept;
-	U_32 fill_buf();       // returns the position (of the next read op) inside the buffer and fill the buffer with clear data
-	void flush();          // flush any pending data (write mode only) to encrypted device
-	void init_buf();       // initialize if necessary the various buffers that relies on inherited method values
+	U_32 fill_buf();       ///< returns the position (of the next read op) inside the buffer and fill the buffer with clear data
+	void flush();          ///< flush any pending data (write mode only) to encrypted device
+	void init_buf();       ///< initialize if necessary the various buffers that relies on inherited method values
 
 
 	    /// convert clear position to corresponding position in the encrypted data
 
-	    ///\param[in] pos is the position in the clear data
-	    ///\param[out] file_buf_start is the position of the beginning of the crypted block where can be found the data
-	    ///\param[out] clear_buf_start is the position of the beginning of the corresponding clear block
-	    ///\param[out] pos_in_buf is the position in the clear block of the 'pos' offset
-	    ///\param[out] block_num is the block number we have our requested position inside
+	    /// \param[in] pos is the position in the clear data
+	    /// \param[out] file_buf_start is the position of the beginning of the crypted block where can be found the data
+	    /// \param[out] clear_buf_start is the position of the beginning of the corresponding clear block
+	    /// \param[out] pos_in_buf is the position in the clear block of the 'pos' offset
+	    /// \param[out] block_num is the block number we have our requested position inside
 	void position_clear2crypt(const infinint & pos,
 				  infinint & file_buf_start,
 				  infinint & clear_buf_start,
 				  infinint & pos_in_buf,
 				  infinint & block_num);
 
+	    /// gives the position of the next character
+	    /// of clear data that corresponds to the encrypted data which index is pos
 	void position_crypt2clear(const infinint & pos, infinint & clear_pos);
-	    // gives the position of the next character
-	    // of clear data that corresponds to the encrypted data which index is pos
 
+	    /// return true if a there is a byte of information at the given offset
 	bool check_current_position() { return fill_buf() < buf_byte_data; };
-	    // return true if a there is a byte of information at the given offset
 
 	    /// remove clear data at the end of the encrypted_buf
 	    /// \param[in] crypt_offset is the offset of the first byte of encrypted_buf not

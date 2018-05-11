@@ -35,8 +35,8 @@
 namespace libdar
 {
 
-	/// \ingroup Private
-	/// @}
+	/// \addtogroup Private
+	/// @{
 
 
 	/// decimal class, convert infinint from and to decimal represention
@@ -92,7 +92,6 @@ namespace libdar
 	/// including "deci.hpp" let this operator available so you can
 	/// display infinint with the << std::ostream operator as you can
 	/// do for standard types.
-	/// \ingroup Private
     extern std::ostream & operator << (std::ostream & ref, const infinint & arg);
 
 	/// @}

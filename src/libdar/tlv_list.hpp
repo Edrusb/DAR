@@ -40,16 +40,16 @@ namespace libdar
     class tlv_list
     {
     public:
-	tlv_list() = default;                     //< builds an empty list
-	tlv_list(generic_file & f) { init(f); };  //< builds a list from a file
+	tlv_list() = default;                     ///< builds an empty list
+	tlv_list(generic_file & f) { init(f); };  ///< builds a list from a file
 	tlv_list(const tlv_list & ref) = default;
 	tlv_list(tlv_list && ref) noexcept = default;
 	tlv_list & operator = (const tlv_list & ref) = default;
 	tlv_list & operator = (tlv_list && ref) noexcept = default;
 	~tlv_list() = default;
 
-	void dump(generic_file & f) const;        //< dump tlv_list to file
-	void read(generic_file & f) { init(f); }; //< erase and read a list from a file
+	void dump(generic_file & f) const;        ///< dump tlv_list to file
+	void read(generic_file & f) { init(f); }; ///< erase and read a list from a file
 	U_I size() const { return contents.size(); };
 	tlv & operator[] (U_I item) const;
 	void clear() { contents.clear(); };

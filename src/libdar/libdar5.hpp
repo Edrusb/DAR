@@ -19,9 +19,6 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \defgroup API5 API v5
-    /// \brief APplication Interface backward compatibility for API version 5
-
     /// \file libdar5.hpp
     /// \brief backward compatibility to libdar API 5
     /// \ingroup API5
@@ -111,8 +108,6 @@ namespace libdar5
 {
 	/// \addtogroup API5
 	/// @{
-
-
 
 	// from integers.hpp
     using libdar::U_8;

@@ -25,10 +25,12 @@
     /// You will find here the reference documentation for the dar and libdar source code, split in several "modules".
     /// - API module: contains all information for using libdar within your program
     /// - Private module: contains all libdar internal documentation, it is not necessary to read it to be able to use libdar
-    /// - CMDLINE module: contains the documentation for command-line tools, you might want to have a look for illustration of library usage.
+    /// - CMDLINE module: contains the documentation for command-line tools,
+    /// you might want to have a look for illustration of library usage.
+    /// - API5 module: contains API v5 symbols as found on release 2.5.x and 2.4.x
     /// .
     ///
-    /// Please not that an API tutorial is also available and should be a starting point for for using libdar
+    /// Please not that an API tutorial is also available and should be a starting point for using libdar
 
 
     /// \defgroup API API
@@ -42,13 +44,15 @@
 
 
     /// \defgroup Private Private
-    /// \brief Symbols that are not to be used by external software.
+    /// \brief Libdar internal symbols
     ///
-    /// never use threses symboles (function, macro, variables, types, etc.)
-    /// they are not intended to be used by external programs
-    /// and may change or disapear without any warning or backward
-    /// compatibility. Some are however documented for libdar development ease.
+    /// Understanding this is not necessary to use libdar through the API.
+    /// This is libdar internal code documentation
 
+    /// \defgroup API5 API5
+    /// \brief APplication Interface backward compatibility for API version 5
+    ///
+    /// backward compatible namespace with dar/libdar releases 2.5.x and 2.4.x
 
     /// \file libdar.hpp
     /// \brief the main file of the libdar API definitions

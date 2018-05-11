@@ -41,6 +41,7 @@ namespace libdar
 	/// @{
 
 	/// the block device class
+
     class cat_blockdev : public cat_device
     {
     public:

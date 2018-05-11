@@ -23,7 +23,7 @@
     /// \brief main module for dar command-line tool
     /// \ingroup CMDLINE
 
-    /// \defgroup CMDLINE Command-line
+    /// \defgroup CMDLINE CMDLINE
     /// \brief command-line interface
     ///
     /// this module contains all the command-line specific routines, classes and datastructures. The intention of

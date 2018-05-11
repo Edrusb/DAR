@@ -76,7 +76,7 @@ namespace libdar
 
 	    /// no copy constructor available
 
-	    ///\note because we inherit from libthreadar::thread that has not copy constructor
+	    /// \note because we inherit from libthreadar::thread that has not copy constructor
 	fichier_libcurl(const fichier_libcurl & ref) = delete;
 
 	    /// no move constructor
@@ -150,34 +150,34 @@ namespace libdar
 	    // - "network_block" is set by the main thread to define the amount of data to be fetched it
 	    //   it used to setup libcurl and is read by the subthread for control/validation purposes
 
-	bool end_data_mode;               //< true if subthread has been requested to end
-	bool sub_is_dying;                //< is set by subthread when about to end
-	mycurl_shared_handle ehandle;     //< easy handle (wrapped in C++ object) that we modify when necessary
-	bool metadatamode;                //< wether we are acting on metadata rather than file's data
-	infinint current_offset;          //< current offset we are reading / writing at
-	bool has_maxpos;                  //< true if maxpos is set
-	infinint maxpos;                  //< in read mode this is the filesize, in write mode this the offset where to append data (not ovewriting)
-	bool append_write;                //< whether we should append to data (and not replace) when uploading
-	char meta_tampon[tampon_size];    //< trash in transit data used to carry metadata
-	U_I meta_inbuf;                   //< amount of byte available in "meta_tampon"
-	U_I wait_delay;                   //< time in second to wait before retrying in case of network error
-	infinint network_block;           //< maximum amount of data read at once from the network (only read by subthread)
-	infinint subthread_net_offset;    //< updated by sub thread in network block mode to give amount of bytes pushed to interthread
-	infinint subthread_cur_offset;    //< subthread copy of current_offset
-	libthreadar::fast_tampon<char> interthread; //< data channel for reading or writing with subthread
-	libthreadar::barrier synchronize; //< used to be sure subthread has been launched
-	mycurl_protocol x_proto;          //< used to workaround some libcurl strange behavoir for some protocols
+	bool end_data_mode;               ///< true if subthread has been requested to end
+	bool sub_is_dying;                ///< is set by subthread when about to end
+	mycurl_shared_handle ehandle;     ///< easy handle (wrapped in C++ object) that we modify when necessary
+	bool metadatamode;                ///< wether we are acting on metadata rather than file's data
+	infinint current_offset;          ///< current offset we are reading / writing at
+	bool has_maxpos;                  ///< true if maxpos is set
+	infinint maxpos;                  ///< in read mode this is the filesize, in write mode this the offset where to append data (not ovewriting)
+	bool append_write;                ///< whether we should append to data (and not replace) when uploading
+	char meta_tampon[tampon_size];    ///< trash in transit data used to carry metadata
+	U_I meta_inbuf;                   ///< amount of byte available in "meta_tampon"
+	U_I wait_delay;                   ///< time in second to wait before retrying in case of network error
+	infinint network_block;           ///< maximum amount of data read at once from the network (only read by subthread)
+	infinint subthread_net_offset;    ///< updated by sub thread in network block mode to give amount of bytes pushed to interthread
+	infinint subthread_cur_offset;    ///< subthread copy of current_offset
+	libthreadar::fast_tampon<char> interthread; ///< data channel for reading or writing with subthread
+	libthreadar::barrier synchronize; ///< used to be sure subthread has been launched
+	mycurl_protocol x_proto;          ///< used to workaround some libcurl strange behavoir for some protocols
 
-	void set_range(const infinint & begin, const infinint & range_size); //< set range in easyhandle
-	void unset_range();  //< unset range in easyhandler
-	void switch_to_metadata(bool mode);//< set to true to get or set file's metadata, false to read/write file's data
-	void detruit();     //< get ready for object destruction
-	void run_thread();  //< run subthread with the previously defined parameters
-	void stop_thread(); //< ask subthread to stop and wait for its end
-	void relaunch_thread(const infinint & block_size); //< re-run the subthread if not running
-	void initialize_subthread(); //< subthread routine to init itself
-	void finalize_subthread();   //< subthread routine to end itself
-	void set_subthread(U_I & needed_bytes); //< set parameters and run subthtread if necessary
+	void set_range(const infinint & begin, const infinint & range_size); ///< set range in easyhandle
+	void unset_range();  ///< unset range in easyhandler
+	void switch_to_metadata(bool mode);///< set to true to get or set file's metadata, false to read/write file's data
+	void detruit();     ///< get ready for object destruction
+	void run_thread();  ///< run subthread with the previously defined parameters
+	void stop_thread(); ///< ask subthread to stop and wait for its end
+	void relaunch_thread(const infinint & block_size); ///< re-run the subthread if not running
+	void initialize_subthread(); ///< subthread routine to init itself
+	void finalize_subthread();   ///< subthread routine to end itself
+	void set_subthread(U_I & needed_bytes); ///< set parameters and run subthtread if necessary
 
 	static size_t write_data_callback(char *buffer, size_t size, size_t nmemb, void *userp);
 	static size_t read_data_callback(char *bufptr, size_t size, size_t nitems, void *userp);
@@ -188,7 +188,7 @@ namespace libdar
 #ifdef LIBTHREADAR_AVAILABLE
 	/// helper function to handle libcurl error code
 	/// wait or throw an exception depending on error condition
-	///
+
 	/// \param[in] dialog used to report the reason we are waiting for and how much time we wait
 	/// \param[in] err is the curl easy code to examin
 	/// \param[in] wait_seconds is the time to wait for recoverable error

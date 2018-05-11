@@ -41,7 +41,9 @@ namespace libdar
 	/// @{
 
 
-	/// the hard link implementation (etoile means star in French, seen a star as a point from which are thrown many ray of light)
+	/// the hard link implementation
+
+	/// etoile means star in French. See a star as a point from which are thrown many ray of light
     class cat_etoile
     {
     public:
@@ -80,18 +82,19 @@ namespace libdar
 
 
     private:
+	    /// bitfield used to record pointed to inode information
 	struct bool_tags
 	{
-	    unsigned counted : 1;    //< whether the inode has been counted
-	    unsigned wrote : 1;      //< whether the inode has its data copied to archive
-	    unsigned dumped : 1;     //< whether the inode information has been dumped in the catalogue
-	    unsigned reduceable : 1; //< whether the inode can be reduce to normal inode
-	    unsigned : 4;            //< padding to get byte boundary and reserved for future use.
+	    unsigned counted : 1;    ///< whether the inode has been counted
+	    unsigned wrote : 1;      ///< whether the inode has its data copied to archive
+	    unsigned dumped : 1;     ///< whether the inode information has been dumped in the catalogue
+	    unsigned reduceable : 1; ///< whether the inode can be reduce to normal inode
+	    unsigned : 4;            ///< padding to get byte boundary and reserved for future use.
 
 	    bool_tags() { counted = wrote = dumped = 0; reduceable = 1; };
 	};
 
-	std::list<void *> refs; //< list of pointers to the mirages objects, in the order of their creation
+	std::list<void *> refs; ///< list of pointers to the mirages objects, in the order of their creation
 	cat_inode *hosted;
 	infinint etiquette;
 	bool_tags tags;

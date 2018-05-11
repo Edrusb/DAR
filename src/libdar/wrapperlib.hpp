@@ -71,8 +71,6 @@ namespace libdar
 
 	/// this is mainly an adaptation of libbz2 specificities to
 	/// have libb2 acting exactly as libz does.
-	/// \ingroup Private
-
     class wrapperlib
     {
     public:

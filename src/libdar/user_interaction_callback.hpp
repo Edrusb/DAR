@@ -50,9 +50,9 @@ namespace libdar
 
 	/// full implemented class for user_interaction based on callback functions.
 
-	//! this class is an inherited class of user_interaction it is used by
-	//! dar command line programs, but you can use it if you wish.
-	//! \ingroup API
+	/// this class is an inherited class of user_interaction it is used by
+	/// dar command line programs, but you can use it if you wish.
+	/// \ingroup API
 
     class user_interaction_callback : public user_interaction
     {
@@ -65,16 +65,16 @@ namespace libdar
 
 	    /// constructor which receive the callback functions.
 
-	    //! \param[in] x_message_callback is used by message() method
-	    //! \param[in] x_answer_callback is used by the pause() method
-	    //! \param[in] x_string_callback is used by get_string() method
-	    //! \param[in] x_secu_string_callback is used by get_secu_string() method
-	    //! \param[in] context_value will be passed as last argument of callbacks when
-	    //! called from this object.
-	    //! \note The context argument of each callback is set with the context_value given
-	    //! in the user_interaction_callback object constructor. The value can
-	    //! can be any arbitrary value (nullptr is valid), and can be used as you wish.
-	    //! Note that the listing callback is not defined here, but thanks to a specific method
+	    /// \param[in] x_message_callback is used by message() method
+	    /// \param[in] x_answer_callback is used by the pause() method
+	    /// \param[in] x_string_callback is used by get_string() method
+	    /// \param[in] x_secu_string_callback is used by get_secu_string() method
+	    /// \param[in] context_value will be passed as last argument of callbacks when
+	    /// called from this object.
+	    /// \note The context argument of each callback is set with the context_value given
+	    /// in the user_interaction_callback object constructor. The value can
+	    /// can be any arbitrary value (nullptr is valid), and can be used as you wish.
+	    /// Note that the listing callback is not defined here, but thanks to a specific method
 	user_interaction_callback(message_callback x_message_callback,
 				  pause_callback x_answer_callback,
 				  get_string_callback x_string_callback,

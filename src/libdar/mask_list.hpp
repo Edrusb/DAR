@@ -42,7 +42,7 @@ namespace libdar
         /// @{
 
         /// the mask_list class, matches string that are present in a given file
-	///
+
         /// the given file must contain one entry per line (thus no carriage return
         /// is allowed in a given entry). Note that the file listed in the
         /// file may have a relative path or an absolute path.

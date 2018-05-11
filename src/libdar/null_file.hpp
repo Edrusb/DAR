@@ -45,7 +45,6 @@ namespace libdar
 	/// all that is writen to is lost, and nothing can be read from
 	/// it (empty file). This is a completed implementation all
 	/// call are consistent.
-	/// \ingroup Private
 
     class null_file : public generic_file, public thread_cancellation
     {

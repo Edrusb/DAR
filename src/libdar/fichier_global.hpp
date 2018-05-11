@@ -24,7 +24,6 @@
     /// class fichier_global is an abstraction of files objects whatever is their localisation
     /// like local filesystem, remote ftp server, etc. inherited classes (like fichier_local)
     /// provide full implementation
-
     /// \ingroup Private
 
 #ifndef FICHIER_GLOBAL_HPP
@@ -61,16 +60,16 @@ namespace libdar
     public :
 	enum advise
 	{
-	    advise_normal,     //< no advise given by the application
-	    advise_sequential, //< application expect to read the data sequentially
-	    advise_random,     //< application expect to read the data in random order
-	    advise_noreuse,    //< application does not expect to read the data more than once
-	    advise_willneed,   //< application expect to read the data again in near future
-	    advise_dontneed    //< application will not read the data in near future
+	    advise_normal,     ///< no advise given by the application
+	    advise_sequential, ///< application expect to read the data sequentially
+	    advise_random,     ///< application expect to read the data in random order
+	    advise_noreuse,    ///< application does not expect to read the data more than once
+	    advise_willneed,   ///< application expect to read the data again in near future
+	    advise_dontneed    ///< application will not read the data in near future
 	};
 
 	    /// constructor
-	    ///
+
 	    /// \note some well defined error case must generate an Esystem exception, other by Erange or
 	    /// more appropriated Egeneric exceptions to known what type of error must be handled
 	    /// by Esystem object, see the Esystem::io_error enum
@@ -108,7 +107,7 @@ namespace libdar
 
     protected :
 	    /// replaces generic_file::inherited_write() method, to allow the return of partial writings
-	    ///
+
 	    /// a partial writing is allowed when no space is available for writing
 	    /// this let global_ficher interact with the user asking whether it can make place
 	    /// or if (s)he wants to abord
@@ -121,7 +120,7 @@ namespace libdar
 
 
 	    /// replaces generic_file::inherited_read() method, to allow the return of partial reading
-	    ///
+
 	    /// a partial reading is signaled by the inherited class by returning false
 	    /// \param[in] a points to the area where to store read data
 	    /// \param[in] size is the available place to store data
@@ -133,7 +132,7 @@ namespace libdar
 	virtual bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message) = 0;
 
     private:
-	bool disk_full; //< whether user refused to continue due to disk being full
+	bool disk_full; ///< whether user refused to continue due to disk being full
 
 	    // inherited from generic_file class and relocated as private methods
 	virtual void inherited_write(const char *a, U_I size) override;

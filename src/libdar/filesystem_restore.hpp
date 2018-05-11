@@ -70,14 +70,19 @@ namespace libdar
 			   const crit_action *x_overwrite,
 			   bool x_only_overwrite,
 			   const fsa_scope & scope);
+
 	    /// copy constructor is forbidden
         filesystem_restore(const filesystem_restore & ref) = delete;
+
 	    /// move constructor is forbidden
 	filesystem_restore(filesystem_restore && ref) = delete;
+
 	    /// assignment operator is forbidden
         filesystem_restore & operator = (const filesystem_restore  & ref) = delete;
+
 	    /// move operator is forbidden
 	filesystem_restore & operator = (filesystem_restore && ref) = delete;
+
 	    /// destructor
         ~filesystem_restore() { restore_stack_dir_ownership(); detruire(); };
 
@@ -111,6 +116,7 @@ namespace libdar
 
 
 	    /// ask for no warning or user interaction for the next write operation
+
 	    /// \note this is used when a file has been saved several times due to its changes at the time of the backup
 	    /// and is restored in sequential read. Restoring each failed backup would lead to ask each time the
 	    /// actions to take about overwriting... anoying for the user

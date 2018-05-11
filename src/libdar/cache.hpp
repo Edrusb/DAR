@@ -33,11 +33,11 @@
 namespace libdar
 {
 
-	/// \ingroup Private
-	/// @}
+	/// \addtogroup Private
+	/// @{
 
 	/// the cache class implements a fixed length read/write caching mechanism
-	///
+
 	/// it is intended to reduce context switches when no compression is used
 	/// and when reading or writing catalogue through a pipe. The catalogue
 	/// read and write is done by calling dump/constructor methods of the many
@@ -52,9 +52,10 @@ namespace libdar
     class cache : public generic_file
     {
     public:
-	cache(generic_file & hidden, 	          //< is the file to cache, it is never deleted by the cache object,
-	      bool shift_mode,                    //< if true, when all cached data has been read, half of the data is flushed from the cache, the other half is shifted and new data take place to fill the cache. This is necessary for sequential reading, but has some CPU overhead.
-	      U_I size = 102400);                 //< is the (fixed) size of the cache
+	cache(generic_file & hidden, 	          ///< is the file to cache, it is never deleted by the cache object,
+	      bool shift_mode,                    ///< if true, when all cached data has been read, half of the data is flushed from the cache, the other half is shifted and new data take place to fill the cache. This is necessary for sequential reading, but has some CPU overhead.
+	      U_I size = 102400                   ///< is the (fixed) size of the cache
+	    );
 	cache(const cache & ref) = delete;
 	cache(cache && ref) = delete;
 	cache & operator = (const cache & ref) = delete;
@@ -80,20 +81,20 @@ namespace libdar
 	virtual void inherited_terminate() override { flush_write(); };
 
     private:
-	generic_file *ref;                //< underlying file, (not owned by "this', not to be delete by "this")
-	char *buffer;                     //< data in transit
-	U_I size;                         //< allocated size
-	U_I half;                         //< precalculated half = size / 2
-	U_I next;                         //< next to read or next place to write to
-	U_I last;                         //< first byte of invalid data in the cache. we have: next <= last < size
-	U_I first_to_write;               //< position of the first byte that need to be written. if greater than last, no byte need writing
-	infinint buffer_offset;           //< position of the first byte in buffer
-	bool shifted_mode;                //< whether to half flush and shift or totally flush data
-	infinint eof_offset;              //< size of the underlying file (read-only mode), set to zero if unknown
+	generic_file *ref;                ///< underlying file, (not owned by "this', not to be delete by "this")
+	char *buffer;                     ///< data in transit
+	U_I size;                         ///< allocated size
+	U_I half;                         ///< precalculated half = size / 2
+	U_I next;                         ///< next to read or next place to write to
+	U_I last;                         ///< first byte of invalid data in the cache. we have: next <= last < size
+	U_I first_to_write;               ///< position of the first byte that need to be written. if greater than last, no byte need writing
+	infinint buffer_offset;           ///< position of the first byte in buffer
+	bool shifted_mode;                ///< whether to half flush and shift or totally flush data
+	infinint eof_offset;              ///< size of the underlying file (read-only mode), set to zero if unknown
 
 	bool need_flush_write() const { return first_to_write < last; };
-	void alloc_buffer(size_t x_size); //< allocate x_size byte in buffer field and set size accordingly
-	void release_buffer();            //< release memory set buffer to nullptr and size to zero
+	void alloc_buffer(size_t x_size); ///< allocate x_size byte in buffer field and set size accordingly
+	void release_buffer();            ///< release memory set buffer to nullptr and size to zero
 	void shift_by_half();
 	void clear_buffer();
 	void flush_write();

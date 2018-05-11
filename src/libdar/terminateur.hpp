@@ -37,12 +37,12 @@
 
 namespace libdar
 {
+	/// \addtogroup Private
+        /// @{
 
 	/// terminateur class indicates the location of the beginning of the catalogue
 
 	/// it is the last bytes sequence of an archive.
-	/// \ingroup Private
-
     class terminateur
     {
     public :
@@ -63,6 +63,8 @@ namespace libdar
         infinint pos;
 	infinint t_start;
     };
+
+	/// @}
 
 } // end of namespace
 

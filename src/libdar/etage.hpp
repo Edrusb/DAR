@@ -36,13 +36,16 @@
 namespace libdar
 {
 
+        /// \addtogroup Private
+        /// @{
+
 	/// the etage structure keep trace of directory contents
 
 	/// it relies on the [fd]opendir() system call family than
 	/// cannot be used recursively. Thus each etage structure
 	/// contains the contents of a directory, and can then be stored beside
 	/// other etage structures corresponding to subdirectories
-	/// \ingroup Private
+
     struct etage
     {
 	etage() { fichier.clear(); last_mod = datetime(0); last_acc = datetime(0); }; // required to fake an empty dir when one is impossible to open
@@ -60,10 +63,12 @@ namespace libdar
 
         bool read(std::string & ref);
 
-        std::deque<std::string> fichier; //< holds the list of entry in the directory
-        datetime last_mod;              //< the last_lod of the directory itself
-	datetime last_acc;              //< the last_acc of the directory itself
+        std::deque<std::string> fichier; ///< holds the list of entry in the directory
+        datetime last_mod;              ///< the last_lod of the directory itself
+	datetime last_acc;              ///< the last_acc of the directory itself
     };
+
+	/// @}
 
 } // end of namespace
 

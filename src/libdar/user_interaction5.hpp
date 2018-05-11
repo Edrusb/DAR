@@ -21,8 +21,7 @@
 
     /// \file user_interaction5.hpp
     /// \brief API v5 backward compatible class user_interaction
-    /// \ingroup API
-    ///
+    /// \ingroup API5
 
 #ifndef USER_INTERACTION5_HPP
 #define USER_INTERACTION5_HPP
@@ -37,6 +36,9 @@
 namespace libdar5
 {
 
+	/// \addtogroup API5
+        /// @{
+
     using libdar::secu_string;
     using libdar::U_I;
     using libdar::infinint;
@@ -47,45 +49,41 @@ namespace libdar5
     using libdar::Egeneric;
     using libdar::Ememory;
 
-        /// \addtogroup API5
-        /// @{
-
         /// This is a pure virtual class that is used by libdar when interaction with the user is required.
 
-        //! You can base your own class on it using C++ inheritance
-        //! or use the class user_interaction_callback which implements
-        //! the interaction based on callback functions.
-        //! The user_interaction class is used by libdar in the following circumpstances:
-        //! - when is required a boolean answer to a question the pause() method is used
-        //! - when a warning needs to be displayed to the user the warning() method is used
-        //! - when a directory listing needs to be returned to the user the listing() method is used
-        //! .
-        //! the printf() method is built over the warning() methods to display a formated message
-        //! it has not to be redefined in any inherited class.
-        //! If you want to define you own class as inherited class of user_interaction
-        //! you need to overwrite:
-        //! - the clone() method. It is used to make local temporary copies of objets
-        //!  in libdar. It acts like the constructor copy but is virtual.
-        //! - the pause() method
-        //! - the warning() method
-        //! - the listing() method (this is not mandatory).  inherited classes *can*
-        //! overwrite the listing() method, which will be used if the use_listing
-        //! is set to true thanks to the set_use_listing() protected method.
-        //! In that case the listing of archive contents is done thanks to this listing()
-        //! method instead of the warning() method.
-        //! - get_string() method
-        //! - get_secu_string() method
-        //! .
-        //! WARNING !
-        //! if your own class has specific fields, you will probably
-        //! need to redefine the copy constructor as well as operator =
-        //! if you don't understand this and why, don't play trying making your
-        //! own class, and/or read good C++ book about canonical form
-        //! of a C++ class, as well as how to properly make an inherited class.
-        //! And don't, complain if libdar segfault or core dumps. Libdar
-        //! *needs* to make local copies of these objects, if the copy constructor
-        //!  is not properly defined in your inherited class this will crash the application.
-        //! \ingroup API
+        /// You can base your own class on it using C++ inheritance
+        /// or use the class user_interaction_callback which implements
+        /// the interaction based on callback functions.
+        /// The user_interaction class is used by libdar in the following circumpstances:
+        /// - when is required a boolean answer to a question the pause() method is used
+        /// - when a warning needs to be displayed to the user the warning() method is used
+        /// - when a directory listing needs to be returned to the user the listing() method is used
+        /// .
+        /// the printf() method is built over the warning() methods to display a formated message
+        /// it has not to be redefined in any inherited class.
+        /// If you want to define you own class as inherited class of user_interaction
+        /// you need to overwrite:
+        /// - the clone() method. It is used to make local temporary copies of objets
+        ///  in libdar. It acts like the constructor copy but is virtual.
+        /// - the pause() method
+        /// - the warning() method
+        /// - the listing() method (this is not mandatory).  inherited classes *can*
+        /// overwrite the listing() method, which will be used if the use_listing
+        /// is set to true thanks to the set_use_listing() protected method.
+        /// In that case the listing of archive contents is done thanks to this listing()
+        /// method instead of the warning() method.
+        /// - get_string() method
+        /// - get_secu_string() method
+        /// .
+        /// WARNING !
+        /// if your own class has specific fields, you will probably
+        /// need to redefine the copy constructor as well as operator =
+        /// if you don't understand this and why, don't play trying making your
+        /// own class, and/or read good C++ book about canonical form
+        /// of a C++ class, as well as how to properly make an inherited class.
+        /// And don't, complain if libdar segfault or core dumps. Libdar
+        /// *needs* to make local copies of these objects, if the copy constructor
+        ///  is not properly defined in your inherited class this will crash the application.
     class user_interaction : public libdar::user_interaction
     {
     public:
@@ -109,9 +107,9 @@ namespace libdar5
 
             /// method used to ask a boolean question to the user.
 
-            //! \param[in] message is the message to be displayed, that is the question.
-            //! \exception Euser_abort If the user answer "false" or "no" to the question the method
-            //! must throw an exception of type "Euser_abort".
+            /// \param[in] message is the message to be displayed, that is the question.
+            /// \exception Euser_abort If the user answer "false" or "no" to the question the method
+            /// must throw an exception of type "Euser_abort".
         virtual void pause(const std::string & message)
         {
             if(!pause2(message))
@@ -120,27 +118,27 @@ namespace libdar5
 
             /// alternative method to the pause() method
 
-            //! \param[in] message The boolean question to ask to the user
-            //! \return the answer of the user (true/yes or no/false)
-            //! \note either pause2() or pause() *must* be overwritten, but not both.
-            //! libdar always calls pause() which default implementation relies on pause2() where it converts negative
-            //! return from pause2() by throwing the appropriated exception. As soon as you overwrite pause(),
-            //! pause2() is no more used.
+            /// \param[in] message The boolean question to ask to the user
+            /// \return the answer of the user (true/yes or no/false)
+            /// \note either pause2() or pause() *must* be overwritten, but not both.
+            /// libdar always calls pause() which default implementation relies on pause2() where it converts negative
+            /// return from pause2() by throwing the appropriated exception. As soon as you overwrite pause(),
+            /// pause2() is no more used.
         virtual bool pause2(const std::string & message)
         { throw Elibcall("user_interaction::pause2", "user_interaction::pause() or pause2() must be overwritten !"); };
 
             /// method used to ask a question that needs an arbitrary answer.
 
-            //! \param[in] message is the question to display to the user.
-            //! \param[in] echo is set to false is the answer must not be shown while the user answers.
-            //! \return the user's answer.
+            /// \param[in] message is the question to display to the user.
+            /// \param[in] echo is set to false is the answer must not be shown while the user answers.
+            /// \return the user's answer.
         virtual std::string get_string(const std::string & message, bool echo) = 0;
 
             /// same a get_string() but uses secu_string instead
 
-            //! \param[in] message is the question to display to the user.
-            //! \param[in] echo is set to false is the answer must not be shown while the user answers.
-            //! \return the user's answer.
+            /// \param[in] message is the question to display to the user.
+            /// \param[in] echo is set to false is the answer must not be shown while the user answers.
+            /// \return the user's answer.
         virtual secu_string get_secu_string(const std::string & message, bool echo) = 0;
 
 
@@ -151,17 +149,17 @@ namespace libdar5
             /// from the constructor of your inherited class (for example) to tell libdar that the listing() method is
             /// to be used in place of the warning() method for archive listing.
 
-            //! \param[in] flag is the given information about the EA, compression, presence of saved data.
-            //! \param[in] perm is the access permission of the file.
-            //! \param[in] uid User ID of the file.
-            //! \param[in] gid Group ID of the file.
-            //! \param[in] size file size.
-            //! \param[in] date file modification date.
-            //! \param[in] filename file name.
-            //! \param[in] is_dir true if file is a directory.
-            //! \param[in] has_children true if file is a directory which is not empty.
-            //! \note This is not a pure virtual method, this is normal,
-            //! so your inherited class is not obliged to overwrite it.
+            /// \param[in] flag is the given information about the EA, compression, presence of saved data.
+            /// \param[in] perm is the access permission of the file.
+            /// \param[in] uid User ID of the file.
+            /// \param[in] gid Group ID of the file.
+            /// \param[in] size file size.
+            /// \param[in] date file modification date.
+            /// \param[in] filename file name.
+            /// \param[in] is_dir true if file is a directory.
+            /// \param[in] has_children true if file is a directory which is not empty.
+            /// \note This is not a pure virtual method, this is normal,
+            /// so your inherited class is not obliged to overwrite it.
         virtual void listing(const std::string & flag,
                              const std::string & perm,
                              const std::string & uid,
@@ -247,44 +245,44 @@ namespace libdar5
             /// dar_manager_contents(), dar_manager_statistics() or to keep reporting listing thanks
             /// to the warning() method,
 
-            //! this is not a virtual method, it has not to be overwritten in inherited classes.
+            /// this is not a virtual method, it has not to be overwritten in inherited classes.
         bool get_use_listing() const { return use_listing; };
-            //! this is not a virtual method, it has not to be overwritten in inherited classes.
+            /// this is not a virtual method, it has not to be overwritten in inherited classes.
         bool get_use_dar_manager_show_files() const { return use_dar_manager_show_files; };
-            //! this is not a virtual method, it has not to be overwritten in inherited classes.
+            /// this is not a virtual method, it has not to be overwritten in inherited classes.
         bool get_use_dar_manager_contents() const { return use_dar_manager_contents; };
-            //! this is not a virtual method, it has not to be overwritten in inherited classes.
+            /// this is not a virtual method, it has not to be overwritten in inherited classes.
         bool get_use_dar_manager_statistics() const { return use_dar_manager_statistics; };
-            //! this is not a virtual method, it has not to be overwritten in inherited classes.
+            /// this is not a virtual method, it has not to be overwritten in inherited classes.
         bool get_use_dar_manager_show_version() const { return use_dar_manager_show_version; };
 
         virtual void printf(const char *format, ...);
 
             /// make a newly allocated object which has the same properties as "this".
 
-            //! This *is* a virtual method, it *must* be overwritten in any inherited class
-            //! copy constructor and = operator may have to be overwritten too if necessary
-            //! Warning !
-            //! clone() must throw exception if necessary (Ememory), but never
-            //! return a nullptr pointer !
+            /// This *is* a virtual method, it *must* be overwritten in any inherited class
+            /// copy constructor and = operator may have to be overwritten too if necessary
+            /// Warning !
+            /// clone() must throw exception if necessary (Ememory), but never
+            /// return a nullptr pointer !
         virtual user_interaction *clone() const = 0;
 
             /// make a pause each N line of output when calling the warning method
 
-            //! \param[in] num is the number of line to display at once, zero for unlimited display
-            //! \note. Since API 3.1, the warning method is no more a pure virtual function
-            //! you need to call the parent warning method in your method for this warning_with_more
-            //! method works as expected.
+            /// \param[in] num is the number of line to display at once, zero for unlimited display
+            /// \note. Since API 3.1, the warning method is no more a pure virtual function
+            /// you need to call the parent warning method in your method for this warning_with_more
+            /// method works as expected.
         void warning_with_more(U_I num) { at_once = num; count = 0; };
 
     protected:
 
             /// method to be called with true as argument if you have defined a listing() method.
 
-            //! in the constructor of any inherited class that define a listing() method
-            //! it is advisable to call set_use_listing() with true as argument for libdar
-            //! knows that the listing() call has to be used in place of the warning() call
-            //! for file listing.
+            /// in the constructor of any inherited class that define a listing() method
+            /// it is advisable to call set_use_listing() with true as argument for libdar
+            /// knows that the listing() call has to be used in place of the warning() call
+            /// for file listing.
         void set_use_listing(bool val) { use_listing = val; };
 
             /// method to be called with true as argument if you have defined a dar_manager_show_files() method.
@@ -307,7 +305,7 @@ namespace libdar5
         virtual std::string inherited_get_string(const std::string & message, bool echo) override;
         virtual secu_string inherited_get_secu_string(const std::string & message, bool echo) override;
 
-            // to be defined by inherited classes
+            /// to be defined by inherited classes
         virtual void inherited_warning(const std::string & message) = 0;
 
 

@@ -72,10 +72,11 @@ namespace libdar
             // it is necessary to inform filesystem, where to hard link on, any future hard_link
             // that could be necessary to restore.
 
+	    /// \return true if an inode in filesystem has been seen for that hard linked inode
         bool known_etiquette(const infinint & eti);
-            // return true if an inode in filesystem has been seen for that hard linked inode
 
 	    /// forget everything about a hard link if the path used to build subsequent hard links is the one given in argument
+
 	    /// \param[in] ligne is the etiquette number for that hard link
 	    /// \param[in] path if the internaly recorded path to build subsequent hard link to that inode is equal to path, forget everything about this hard linked inode
         void clear_corres_if_pointing_to(const infinint & ligne, const std::string & path);
@@ -84,11 +85,12 @@ namespace libdar
         void corres_reset() { corres_write.clear(); };
 
 	    /// generate inode or make a hard link on an already restored or existing inode.
-        void make_file(const cat_nomme * ref,            //< object to restore in filesystem
-		       const path & ou,                  //< where to restore it
-		       bool dir_perm,                    //< false for already existing directories, this makes dar set the minimum available permission to be able to restore files in that directory at a later time
-		       comparison_fields what_to_check,  //< defines whether to restore permission, ownership, dates, etc.
-		       const fsa_scope & scope);         //< fsa scope to use for restoration
+        void make_file(const cat_nomme * ref,            ///< object to restore in filesystem
+		       const path & ou,                  ///< where to restore it
+		       bool dir_perm,                    ///< false for already existing directories, this makes dar set the minimum available permission to be able to restore files in that directory at a later time
+		       comparison_fields what_to_check,  ///< defines whether to restore permission, ownership, dates, etc.
+		       const fsa_scope & scope           ///< fsa scope to use for restoration
+	    );
 
 	    /// add the given EA matching the given mask to the file pointed to by "e" and spot
 

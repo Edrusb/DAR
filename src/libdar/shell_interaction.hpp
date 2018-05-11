@@ -20,8 +20,8 @@
 /*********************************************************************/
 
     /// \file shell_interaction.hpp
-    /// \brief user_interaction class for command_line tools
-    /// \ingroup CMDLINE
+    /// \brief user_interaction class used by default
+    /// \ingroup API
 
 
 #ifndef SHELL_INTERACTION_HPP
@@ -80,19 +80,25 @@ namespace libdar
 
 	    /// make a pause each N line of output when calling the warning method
 
-	    //! \param[in] num is the number of line to display at once, zero for unlimited display
-	    //! \note. Since API 3.1, the warning method is no more a pure virtual function
-	    //! you need to call the parent warning method in your method for this warning_with_more
-	    //! method works as expected.
+	    /// \param[in] num is the number of line to display at once, zero for unlimited display
+	    /// \note. Since API 3.1, the warning method is no more a pure virtual function
+	    /// you need to call the parent warning method in your method for this warning_with_more
+	    /// method works as expected.
 	void warning_with_more(U_I num) { at_once = num; count = 0; };
 
 	    /// display an archive content
 	void archive_show_contents(const archive & ref, const archive_options_listing_shell & options);
 
-	    // some routine to display formated informations provided database
+	    /// show database contents
 	void database_show_contents(const database & ref);
+
+	    /// show files of a given archive in database
 	void database_show_files(const database & ref, archive_num num, const database_used_options & opt);
+
+	    /// show versions of a given file in database
 	void database_show_version(const database & ref, const path & chem);
+
+	    /// show per archive statistics of the database
 	void database_show_statistics(const database &ref);
 
     protected:
@@ -110,15 +116,15 @@ namespace libdar
 
 	    // object fields and methods
 
-	S_I input;               //< filedescriptor to read from the user's answers
-	std::ostream *output;    //< holds the destination for non interactive messages
-	std::ostream *inter;     //< holds the destination for interactive messages
-	bool beep;               //< whether to issue bell char before displaying a new interactive message
-        termios initial;         //< controlling terminal configuration when the object has been created
-	termios interaction;     //< controlling terminal configuration to use when requiring user interaction
-	termios initial_noecho;  //< controlling terminal configuration to use when noecho has been requested
-	bool has_terminal;       //< true if a terminal could be found
-	U_I at_once, count;      //< used by warning_with_more
+	S_I input;               ///< filedescriptor to read from the user's answers
+	std::ostream *output;    ///< holds the destination for non interactive messages
+	std::ostream *inter;     ///< holds the destination for interactive messages
+	bool beep;               ///< whether to issue bell char before displaying a new interactive message
+        termios initial;         ///< controlling terminal configuration when the object has been created
+	termios interaction;     ///< controlling terminal configuration to use when requiring user interaction
+	termios initial_noecho;  ///< controlling terminal configuration to use when noecho has been requested
+	bool has_terminal;       ///< true if a terminal could be found
+	U_I at_once, count;      ///< used by warning_with_more
 
 	    // field used by listing_callbacks
 

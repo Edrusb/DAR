@@ -23,9 +23,8 @@
 /*********************************************************************/
 
 
-    /// \file entrepot_libcurl.hpp
+    /// \file entrepot_libcurl5.hpp
     /// \brief defines the implementation for remote filesystem entrepot using libcurl
-
     /// \ingroup API
 
 #ifndef ENTREPOT_LIBCURL5_HPP
@@ -54,7 +53,7 @@ namespace libdar5
 	/// @{
 
 	/// implementation for entrepot to access to local filesystem
-	///
+
 	/// entrepot_local generates objects of class "fichier_local" inherited class of fichier_global
 
     using libdar::mycurl_protocol;
@@ -62,16 +61,16 @@ namespace libdar5
     class entrepot_libcurl : public libdar::entrepot_libcurl
     {
     public:
-	entrepot_libcurl(user_interaction & dialog,         //< for user interaction
-			 mycurl_protocol proto,             //< network protocol to use
-			 const std::string & login,              //< user login on remote host
-			 const secu_string & password,      //< user password on remote host (empty for file auth or user interaction)
-			 const std::string & host,               //< the remote server to connect to
-			 const std::string & port,               //< TCP/UDP port to connec to (empty string for default)
-			 bool auth_from_file,               //< whether to check $HOME/.netrc for password
-			 const std::string & sftp_pub_keyfile,   //< where to fetch the public key (sftp only)
-			 const std::string & sftp_prv_keyfile,   //< where to fetch the private key (sftp only)
-			 const std::string & sftp_known_hosts,   //< location of the known_hosts file (empty string to disable this security check)
+	entrepot_libcurl(user_interaction & dialog,         ///< for user interaction
+			 mycurl_protocol proto,             ///< network protocol to use
+			 const std::string & login,              ///< user login on remote host
+			 const secu_string & password,      ///< user password on remote host (empty for file auth or user interaction)
+			 const std::string & host,               ///< the remote server to connect to
+			 const std::string & port,               ///< TCP/UDP port to connec to (empty string for default)
+			 bool auth_from_file,               ///< whether to check $HOME/.netrc for password
+			 const std::string & sftp_pub_keyfile,   ///< where to fetch the public key (sftp only)
+			 const std::string & sftp_prv_keyfile,   ///< where to fetch the private key (sftp only)
+			 const std::string & sftp_known_hosts,   ///< location of the known_hosts file (empty string to disable this security check)
 			 U_I waiting_time):
 	    libdar::entrepot_libcurl(user_interaction5_clone_to_shared_ptr(dialog),
 				     proto,

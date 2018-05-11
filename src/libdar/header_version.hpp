@@ -101,18 +101,18 @@ namespace libdar
 	void clear();
 
     private:
-        archive_version edition; //< archive format
-        compression algo_zip;    //< compression algorithm used
-        std::string cmd_line;    //< used long ago to store cmd_line, then abandonned, then recycled as a user comment field
-	infinint initial_offset; //< defines at which offset starts the archive (passed the archive header), this field is obiously only used in the trailer not in the header
+        archive_version edition; ///< archive format
+        compression algo_zip;    ///< compression algorithm used
+        std::string cmd_line;    ///< used long ago to store cmd_line, then abandonned, then recycled as a user comment field
+	infinint initial_offset; ///< defines at which offset starts the archive (passed the archive header), this field is obiously only used in the trailer not in the header
 	    // has to be set to zero when it is unknown, in that case this field is not dump to archive
-	crypto_algo sym;         //< strong encryption algorithm used for symmetrical encryption
-	memory_file *crypted_key;//< optional field containing the asymmetrically ciphered key used for strong encryption ciphering
-	slice_layout *ref_layout;//< optional field used in isolated catalogues to record the slicing layout of their archive of reference
-	bool has_tape_marks;     //< whether the archive contains tape marks aka escape marks aka sequence marks
+	crypto_algo sym;         ///< strong encryption algorithm used for symmetrical encryption
+	memory_file *crypted_key;///< optional field containing the asymmetrically ciphered key used for strong encryption ciphering
+	slice_layout *ref_layout;///< optional field used in isolated catalogues to record the slicing layout of their archive of reference
+	bool has_tape_marks;     ///< whether the archive contains tape marks aka escape marks aka sequence marks
 
-	bool ciphered;   // whether the archive is ciphered, even if we do not know its crypto algorithm (old archives)
-	bool arch_signed;     // whether the archive is signed
+	bool ciphered;   ///< whether the archive is ciphered, even if we do not know its crypto algorithm (old archives)
+	bool arch_signed;     ///< whether the archive is signed
 
 	void nullifyptr() noexcept { crypted_key = nullptr; ref_layout = nullptr; };
 	void copy_from(const header_version & ref);
@@ -121,16 +121,16 @@ namespace libdar
 
 	    // FLAG VALUES
 
-	static const U_I FLAG_SAVED_EA_ROOT = 0x80;      //< no more used since version "05"
-	static const U_I FLAG_SAVED_EA_USER = 0x40;      //< no more used since version "05"
-	static const U_I FLAG_SCRAMBLED     = 0x20;      //< scrambled or strong encryption used
-	static const U_I FLAG_SEQUENCE_MARK = 0x10;      //< escape sequence marks present for sequential reading
-	static const U_I FLAG_INITIAL_OFFSET = 0x08;     //< whether the header contains the initial offset (size of clear data before encrypted) NOTE : This value is set internally by header_version, no need to set flag with it! But that's OK to set it or not, it will be updated according to initial_offset's value.
-	static const U_I FLAG_HAS_CRYPTED_KEY = 0x04;    //< the header contains a symmetrical key encrypted with asymmetrical algorithm
-	static const U_I FLAG_HAS_REF_SLICING = 0x02;    //< the header contains the slicing information of the archive of reference (used for isolated catalogue)
-	static const U_I FLAG_HAS_AN_EXTENDED_SIZE = 0x01; //< the flag is two bytes length
-	static const U_I FLAG_ARCHIVE_IS_SIGNED = 0x0200;  //< archive is signed
-	static const U_I FLAG_HAS_AN_SECOND_EXTENDED_SIZE = 0x0101; //< reserved for future use
+	static constexpr U_I FLAG_SAVED_EA_ROOT = 0x80;      ///< no more used since version "05"
+	static constexpr U_I FLAG_SAVED_EA_USER = 0x40;      ///< no more used since version "05"
+	static constexpr U_I FLAG_SCRAMBLED     = 0x20;      ///< scrambled or strong encryption used
+	static constexpr U_I FLAG_SEQUENCE_MARK = 0x10;      ///< escape sequence marks present for sequential reading
+	static constexpr U_I FLAG_INITIAL_OFFSET = 0x08;     ///< whether the header contains the initial offset (size of clear data before encrypted) NOTE : This value is set internally by header_version, no need to set flag with it! But that's OK to set it or not, it will be updated according to initial_offset's value.
+	static constexpr U_I FLAG_HAS_CRYPTED_KEY = 0x04;    ///< the header contains a symmetrical key encrypted with asymmetrical algorithm
+	static constexpr U_I FLAG_HAS_REF_SLICING = 0x02;    ///< the header contains the slicing information of the archive of reference (used for isolated catalogue)
+	static constexpr U_I FLAG_HAS_AN_EXTENDED_SIZE = 0x01; ///< the flag is two bytes length
+	static constexpr U_I FLAG_ARCHIVE_IS_SIGNED = 0x0200;  ///< archive is signed
+	static constexpr U_I FLAG_HAS_AN_SECOND_EXTENDED_SIZE = 0x0101; ///< reserved for future use
     };
 
 } // end of namespace

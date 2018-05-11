@@ -33,7 +33,6 @@
     /// generates (inherited from class fichier_global), libdar uses them throught the
     /// generic interface. This avoids having network related stuff inside libdar, which
     /// for security reason and functions/roles separation would not be a good idea
-
     /// \ingroup Private
 
 #ifndef ENTREPOT_LOCAL_HPP

@@ -46,10 +46,6 @@ extern "C"
 #include "generic_file.hpp"
 #include "escape.hpp"
 
-    /// \addtogroup Private
-    /// @{
-
-
 #define SPARSE_FIXED_ZEROED_BLOCK 40960
 #ifdef SSIZE_MAX
 #if SSIZE_MAX < MAX_BUFFER_SIZE
@@ -58,18 +54,20 @@ extern "C"
 #endif
 #endif
 
-
 namespace libdar
 {
+
+	/// \addtogroup Private
+	/// @{
 
     class sparse_file : public escape
     {
     public:
 	    /// constructor
 
-	    ///\param[in] below object where to read or write data to or from
-	    ///\param[in] hole_size the size below which to ignore holes (zeroed bytes)
-	    // this parameter is only used if "below" is in write-only mode
+	    /// \param[in] below object where to read or write data to or from
+	    /// \param[in] hole_size the size below which to ignore holes (zeroed bytes)
+	    /// this parameter is only used if "below" is in write-only mode
 	sparse_file(generic_file *below, const infinint & hole_size = 15);
 	sparse_file(const sparse_file & ref) = default;
 	sparse_file(sparse_file && ref) noexcept = default;
@@ -77,14 +75,26 @@ namespace libdar
 	sparse_file & operator = (sparse_file && ref) noexcept = default;
 	~sparse_file() = default;
 
-	void write_as_escape(bool mode) { escape_write = mode; }; // if set to true, inherited_write() call will not make any lookup for holes, the written data will simply be escaped if it could collide with a mark used to signal the start of a hole
-	void read_as_escape(bool mode) { escape_read = mode; }; // if set to true, the data will be unescaped or eof will be signaled to the first mark met, instead of interpreting the mark and what follows as a hole data structure.
-	void copy_to_without_skip(bool mode) { copy_to_no_skip = mode; }; // if set to true, the copy_to() methods, write zeroed data in place of skipping over a hole to restore it into the target generic_file
+	    /// \note if set to true, inherited_write() call will not make any
+	    /// lookup for holes, the written data will simply be escaped if it
+	    /// could collide with a mark used to signal the start of a hole
+	void write_as_escape(bool mode) { escape_write = mode; };
+
+	    /// \note  if set to true, the data will be unescaped or eof will
+	    /// be signaled to the first mark met, instead of interpreting the
+	    /// mark and what follows as a hole data structure.
+	void read_as_escape(bool mode) { escape_read = mode; };
+
+	    /// \note if set to true, the copy_to() methods, write zeroed data
+	    /// in place of skipping over a hole to restore it into the target
+	    /// generic_file
+	void copy_to_without_skip(bool mode) { copy_to_no_skip = mode; };
 
 	bool has_seen_hole() const { return seen_hole; };
 	bool has_escaped_data() const { return data_escaped; };
 
-	    /// copies data of the current object using holes to the given generic_file, overwrites the generic_file method
+	    /// copies data of the current object using holes to the given
+	    /// generic_file, overwrites the generic_file method
 
 	    /// \note, this assumes the underlying generic_file (where the sparse_file object
 	    /// reads its data before writing it to "ref") uses a special
@@ -96,7 +106,9 @@ namespace libdar
 	    /// amount of contiguous zeroed bytes).
 	virtual void copy_to(generic_file & ref) override { crc *tmp = nullptr; copy_to(ref, 0, tmp); if(tmp != nullptr) throw SRC_BUG; };
 
-	    /// same as sparse_file::copy_to(generic_file) just above but here with crc, this also overwrite the corresponding class generic_file method, as we need a specific implementation here
+	    /// same as sparse_file::copy_to(generic_file) just above but here with crc,
+
+	    /// \note this also overwrite the corresponding class generic_file method, as we need a specific implementation here
 	virtual void copy_to(generic_file & ref, const infinint & crc_size, crc * & value) override;
 
 	    // indirectly inherited from generic_file
@@ -124,19 +136,19 @@ namespace libdar
 	    // inherited_terminate() kept as is from the escape class
 
     private:
-	static bool initialized; //< whether static field "zeroed_field" has been initialized
-        static unsigned char zeroed_field[SPARSE_FIXED_ZEROED_BLOCK]; //< read-only, used when the sequence of zeros is too short for a hole
+	static bool initialized; ///< whether static field "zeroed_field" has been initialized
+        static unsigned char zeroed_field[SPARSE_FIXED_ZEROED_BLOCK]; ///< read-only, used when the sequence of zeros is too short for a hole
 
-	enum { normal, hole } mode; //< wether we are currently reading/writing a hole or normal data
-	infinint zero_count;     //< number of zeroed byte pending in the current hole
-	infinint offset;         //< current offset in file (as if it was a plain file).
-	infinint min_hole_size;  //< minimum size of hole to consider
-	U_I UI_min_hole_size;    //< if possible store min_hole_size as U_I, if not this field is set to zero which disables the hole lookup inside buffers while writing data
-	bool escape_write;       //< whether to behave like an escape object when writing down data
-	bool escape_read;        //< whether to behave like an escape object when reading out data
-	bool copy_to_no_skip;    //< whether to hide holes by zeored bytes in the copy_to() methods
-	bool seen_hole;          //< whether a hole has been seen or this is a plain file so far
-	bool data_escaped;       //< whether some data has been escaped to not collide with a mark (may occur even when no hole is met)
+	enum { normal, hole } mode; ///< wether we are currently reading/writing a hole or normal data
+	infinint zero_count;     ///< number of zeroed byte pending in the current hole
+	infinint offset;         ///< current offset in file (as if it was a plain file).
+	infinint min_hole_size;  ///< minimum size of hole to consider
+	U_I UI_min_hole_size;    ///< if possible store min_hole_size as U_I, if not this field is set to zero which disables the hole lookup inside buffers while writing data
+	bool escape_write;       ///< whether to behave like an escape object when writing down data
+	bool escape_read;        ///< whether to behave like an escape object when reading out data
+	bool copy_to_no_skip;    ///< whether to hide holes by zeored bytes in the copy_to() methods
+	bool seen_hole;          ///< whether a hole has been seen or this is a plain file so far
+	bool data_escaped;       ///< whether some data has been escaped to not collide with a mark (may occur even when no hole is met)
 
 	    /// write down the amount of byte zero not yet written.
 	    /// which may be normal zeros or hole depending on their amount
@@ -153,13 +165,13 @@ namespace libdar
 
 	    /// analyse a buffer for a hole
 
-	    ///\param[in] a pointer to the buffer area
-	    ///\param[in] size size of the buffer to inspect
-	    ///\param[in] min_hole_size minimum size of hole to consider, if set to zero only consider hole at end of buffer
-	    ///\param[out] offset in "a" where starts the found hole
-	    ///\param[out] length length of the hole in byte
-	    ///\return true if a hole has been found, false else
-	    ///\note if the buffer ends by zeros, start points to the first zero, and length may be less than min_hole_size
+	    /// \param[in] a pointer to the buffer area
+	    /// \param[in] size size of the buffer to inspect
+	    /// \param[in] min_hole_size minimum size of hole to consider, if set to zero only consider hole at end of buffer
+	    /// \param[out] offset in "a" where starts the found hole
+	    /// \param[out] length length of the hole in byte
+	    /// \return true if a hole has been found, false else
+	    /// \note if the buffer ends by zeros, start points to the first zero, and length may be less than min_hole_size
 	static bool look_for_hole(const char *a, U_I size, U_I min_hole_size, U_I & start, U_I & length);
 
 	    /// count the number of zeroed byte starting at the provided buffer
@@ -170,9 +182,9 @@ namespace libdar
 	static U_I count_initial_zeros(const char *a, U_I size);
     };
 
+        /// @}
 
 } // end of namespace
 
-    /// @}
 
 #endif

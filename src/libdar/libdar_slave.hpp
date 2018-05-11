@@ -86,8 +86,8 @@ namespace libdar
 	void run() { zap->action(); };
 
     private:
-	std::shared_ptr<entrepot_local> entrep; // must be deleted last
-	std::unique_ptr<slave_zapette> zap; // must be deleted first
+	std::shared_ptr<entrepot_local> entrep; ///< must be deleted last
+	std::unique_ptr<slave_zapette> zap; ///< must be deleted first
     };
 
 	/// @}

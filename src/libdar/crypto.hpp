@@ -81,12 +81,17 @@ namespace libdar
 	bool operator == (const signator & ref) const { return result == ref.result && key_validity == ref.key_validity && fingerprint == ref.fingerprint && signature_expiration_date == ref.signature_expiration_date; };
     };
 
-
+	/// convert crypto algo to readable std::string
     extern std::string crypto_algo_2_string(crypto_algo algo);
 
+	/// convert crypto algo to char
     extern char crypto_algo_2_char(crypto_algo a);
+
+	/// convert char to crypto algo
     extern crypto_algo char_2_crypto_algo(char a);
 
+
+	/// return whether the two signators lists match
     extern bool same_signatories(const std::list<signator> & a, const std::list<signator> & b);
 
 	/// @}

@@ -38,8 +38,8 @@
 namespace libdar
 {
 
-	/// \ingroup Private
-	/// @}
+	/// \addtogroup Private
+	/// @{
 
 	/// the class ea_attributs manages the set of EA that can be associated to an inode
 

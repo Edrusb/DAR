@@ -47,7 +47,7 @@ namespace libdar
 
 	/// through a pair of pipes slave_zapette return information about
 	/// a given local archive (single or multi slices).
-	/// \ingroup Private
+
     class slave_zapette
     {
     public:
@@ -71,10 +71,10 @@ namespace libdar
         void action();
 
     private:
-        generic_file *in;     //< where to read orders from
-	generic_file *out;    //< where to send requested info or data to
-	generic_file *src;    //< where to read data from
-	contextual *src_ctxt; //< same as src but seen as contextual
+        generic_file *in;     ///< where to read orders from
+	generic_file *out;    ///< where to send requested info or data to
+	generic_file *src;    ///< where to read data from
+	contextual *src_ctxt; ///< same as src but seen as contextual
     };
 
 	/// @}

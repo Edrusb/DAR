@@ -36,6 +36,10 @@
 namespace libdar
 {
 
+	/// \addtogroup API
+        /// @{
+
+
 	/// the archive_summary class provides information about a given archive
 
     class archive_summary
@@ -78,16 +82,16 @@ namespace libdar
 	void clear();
 
     private:
-	infinint slice_size;          //< slice of the first slice or zero if not applicable
-	infinint first_slice_size;    //< slice of the middle slices or zero if not applicable
-	infinint last_slice_size;     //< slice of the last slice or zero if not applicable
-	infinint slice_number;        //< number of slices composing the archive of zero if unknown
-	infinint archive_size;        //< total size of the archive
-	header_version header;        //< information found in the archive header
-	infinint catalog_size;        //< catalogue size if known, zero if not
-	infinint storage_size;        //< amount of byte used to store (compressed/encrypted) data
-	infinint data_size;           //< amount of data saved (once uncompressed/unciphered)
-	entree_stats contents;        //< nature of saved files
+	infinint slice_size;          ///< slice of the first slice or zero if not applicable
+	infinint first_slice_size;    ///< slice of the middle slices or zero if not applicable
+	infinint last_slice_size;     ///< slice of the last slice or zero if not applicable
+	infinint slice_number;        ///< number of slices composing the archive of zero if unknown
+	infinint archive_size;        ///< total size of the archive
+	header_version header;        ///< information found in the archive header
+	infinint catalog_size;        ///< catalogue size if known, zero if not
+	infinint storage_size;        ///< amount of byte used to store (compressed/encrypted) data
+	infinint data_size;           ///< amount of data saved (once uncompressed/unciphered)
+	entree_stats contents;        ///< nature of saved files
     };
 
 } // end of namespace

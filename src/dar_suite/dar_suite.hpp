@@ -75,6 +75,7 @@ using cli_callback = S_I (*)(std::shared_ptr<user_interaction> & dialog, int, ch
 extern void dar_suite_reset_signal_handler();
 
     /// common routine for all dar command-line tools to initialize environment and convert uncaught exceptions to exit status code
+
     /// \param[in] argc is the number of argument on the command line
     /// \param[in] argv is the list of arguments on the command line
     /// \param[in] env is the environment variables table obtained from main()

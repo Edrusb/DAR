@@ -47,8 +47,8 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-
 	/// the root class for all cat_inode
+
     class cat_inode : public cat_nomme
     {
     public:
@@ -96,7 +96,7 @@ namespace libdar
 		     const infinint & hourshift,
 		     bool symlink_date,
 		     const fsa_scope & scope,
-		     bool isolated_mode) const; //< do not try to compare pointed to data, EA of FSA (suitable for isolated catalogue)
+		     bool isolated_mode) const; ///< do not try to compare pointed to data, EA of FSA (suitable for isolated catalogue)
 
             // throw Erange exception if a difference has been detected
             // this is not a symetrical comparison, but all what is present
@@ -126,8 +126,8 @@ namespace libdar
         void ea_set_offset(const infinint & pos);
 	bool ea_get_offset(infinint & pos) const;
         void ea_set_crc(const crc & val);
-	void ea_get_crc(const crc * & ptr) const; //< the argument is set to point to an allocated crc object owned by this "cat_inode" object, this reference stays valid while the "cat_inode" object exists and MUST NOT be deleted by the caller in any case
-	bool ea_get_crc_size(infinint & val) const; //< returns true if crc is know and puts its width in argument
+	void ea_get_crc(const crc * & ptr) const; ///< the argument is set to point to an allocated crc object owned by this "cat_inode" object, this reference stays valid while the "cat_inode" object exists and MUST NOT be deleted by the caller in any case
+	bool ea_get_crc_size(infinint & val) const; ///< returns true if crc is know and puts its width in argument
 
             // IV : to know/record if EA and FSA have been modified # any EA status# and FSA status #
         datetime get_last_change() const { return last_cha; };
@@ -167,39 +167,39 @@ namespace libdar
 
     protected:
         virtual void sub_compare(const cat_inode & other, bool isolated_mode) const {};
-	bool get_small_read() const { return small_read; }; //< true if object has been created by sequential reading of an archive
+	bool get_small_read() const { return small_read; }; ///< true if object has been created by sequential reading of an archive
 
 	    // inherited from cat_entree
         virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override;
 
 
     private :
-        infinint uid;               //< inode owner's user ID
-        infinint gid;               //< inode owner's group ID
-        U_16 perm;                  //< inode's permission
-        datetime last_acc;          //< last access time (atime)
-	datetime last_mod;          //< last modification time (mtime)
-        datetime last_cha;          //< last inode meta data change (ctime)
-        ea_saved_status ea_saved;   //< inode Extended Attribute status
-	fsa_saved_status fsa_saved; //< inode Filesystem Specific Attribute status
+        infinint uid;               ///< inode owner's user ID
+        infinint gid;               ///< inode owner's group ID
+        U_16 perm;                  ///< inode's permission
+        datetime last_acc;          ///< last access time (atime)
+	datetime last_mod;          ///< last modification time (mtime)
+        datetime last_cha;          ///< last inode meta data change (ctime)
+        ea_saved_status ea_saved;   ///< inode Extended Attribute status
+	fsa_saved_status fsa_saved; ///< inode Filesystem Specific Attribute status
 
-	bool small_read;         //< whether we the object has been built with sequential-reading
+	bool small_read;         ///< whether we the object has been built with sequential-reading
 
             //  the following is used only if ea_saved == full
-        infinint *ea_offset;     //< offset in archive where to find EA
-        ea_attributs *ea;        //< Extended Attributes read or to be written down
-	infinint *ea_size;       //< storage size required by EA
+        infinint *ea_offset;     ///< offset in archive where to find EA
+        ea_attributs *ea;        ///< Extended Attributes read or to be written down
+	infinint *ea_size;       ///< storage size required by EA
             // the following is used if ea_saved == full or ea_saved == partial or
-        crc *ea_crc;             //< CRC computed on EA
+        crc *ea_crc;             ///< CRC computed on EA
 
-	infinint *fsa_families; //< list of FSA families present for that inode (set to nullptr in fsa_none mode)
-	infinint *fsa_offset;    //< offset in archive where to find FSA  # always allocated (to be reviewed)
-	filesystem_specific_attribute_list *fsal; //< Filesystem Specific Attributes read or to be written down # only allocated if fsa_saved if set to FULL
-	infinint *fsa_size;      //< storage size required for FSA
-	crc *fsa_crc;            //< CRC computed on FSA
+	infinint *fsa_families; ///< list of FSA families present for that inode (set to nullptr in fsa_none mode)
+	infinint *fsa_offset;    ///< offset in archive where to find FSA  # always allocated (to be reviewed)
+	filesystem_specific_attribute_list *fsal; ///< Filesystem Specific Attributes read or to be written down # only allocated if fsa_saved if set to FULL
+	infinint *fsa_size;      ///< storage size required for FSA
+	crc *fsa_crc;            ///< CRC computed on FSA
 	    //
-	infinint *fs_dev;        //< filesystem ID on which resides the inode (only used when read from filesystem)
-	archive_version edit;    //< need to know EA and FSA format used in archive file
+	infinint *fs_dev;        ///< filesystem ID on which resides the inode (only used when read from filesystem)
+	archive_version edit;    ///< need to know EA and FSA format used in archive file
 
 
 	void nullifyptr() noexcept;

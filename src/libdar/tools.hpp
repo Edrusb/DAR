@@ -708,6 +708,8 @@ namespace libdar
 	}
     }
 
+	/// @}
+
 } /// end of namespace
 
 #endif

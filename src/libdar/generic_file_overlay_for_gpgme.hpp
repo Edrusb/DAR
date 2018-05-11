@@ -38,14 +38,16 @@ extern "C"
 
 namespace libdar
 {
-	/// \ingroup Private
-	/// @}
+	/// \addtogroup Private
+	/// @{
+
+	/// generic_file interface for for gpgme
 
     class generic_file_overlay_for_gpgme
     {
     public:
 	    /// create a gpgme data buffer of the given generic_file
-	    ///
+
 	    /// \param[in] f is a pointer to an existing generic_file that must exist during the whole live of this overlay object
 	generic_file_overlay_for_gpgme(generic_file *f);
 
@@ -58,7 +60,7 @@ namespace libdar
 	    /// no asignment operator
 	generic_file_overlay_for_gpgme & operator = (const generic_file_overlay_for_gpgme & ref) = delete;
 
-	    // no move operator
+	    /// no move operator
 	generic_file_overlay_for_gpgme & operator = (generic_file_overlay_for_gpgme && ref) noexcept = delete;
 
 #ifdef GPGME_SUPPORT

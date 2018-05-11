@@ -44,6 +44,7 @@ namespace libdar
 
 
 	/// the deleted file entry
+
     class cat_detruit : public cat_nomme
     {
     public :

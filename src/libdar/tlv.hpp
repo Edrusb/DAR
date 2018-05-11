@@ -56,11 +56,11 @@ namespace libdar
 
 	    // methods (dump / setup tlv datastructure to/from file)
 
-	void setup(generic_file & f); //< same as the constructor but on an existing object
-	void dump(generic_file & f) const; //< dumps the tlv contents to file
+	void setup(generic_file & f); ///< same as the constructor but on an existing object
+	void dump(generic_file & f) const; ///< dumps the tlv contents to file
 
-	U_16 get_type() const { return type; };      //< get the TLV type
-	void set_type(U_16 val) { type = val; };     //< set the TLV type
+	U_16 get_type() const { return type; };      ///< get the TLV type
+	void set_type(U_16 val) { type = val; };     ///< set the TLV type
 
     private:
 	U_16 type;

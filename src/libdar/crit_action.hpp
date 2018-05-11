@@ -43,29 +43,30 @@ namespace libdar
 
     enum over_action_data
     {
-	data_preserve,                     //< do not overwrite (keep the 'in place' entry)
-	data_overwrite,                    //< overwirte the 'in place' entry by the 'to be added' one
-	data_preserve_mark_already_saved,  //< keep the 'in place' but mark it as already saved in the archive of reference
-	data_overwrite_mark_already_saved, //< overwrite the 'in place' but mark the 'to be added' as already saved in the archive of reference
-	data_remove,                       //< remove the original data/EA (file is completely deleted)
-	data_undefined,                    //< action still undefined at this step of the evaluation
-	data_ask                           //< ask for user decision about file's data
+	data_preserve,                     ///< do not overwrite (keep the 'in place' entry)
+	data_overwrite,                    ///< overwirte the 'in place' entry by the 'to be added' one
+	data_preserve_mark_already_saved,  ///< keep the 'in place' but mark it as already saved in the archive of reference
+	data_overwrite_mark_already_saved, ///< overwrite the 'in place' but mark the 'to be added' as already saved in the archive of reference
+	data_remove,                       ///< remove the original data/EA (file is completely deleted)
+	data_undefined,                    ///< action still undefined at this step of the evaluation
+	data_ask                           ///< ask for user decision about file's data
     };
 
 
 	/// the possible action for overwriting EA
 
-    enum over_action_ea //< define the action to apply to each EA entry (not to the EA set of a particular inode)
+	/// define the action to apply to each EA entry (not to the EA set of a particular inode)
+    enum over_action_ea
     {
-	EA_preserve,                     //< keep the EA of the 'in place' entry
-	EA_overwrite,                    //< keep the EA of the 'to be added' entry
-	EA_clear,                        //< drop the EA for the elected entry
-        EA_preserve_mark_already_saved,  //< drop any EA but mark them as already saved in the archive of reference (ctime is the one of the 'in place' inode)
-        EA_overwrite_mark_already_saved, //< drop any EA but mark them as already saved in the archive of reference (ctime is the one of the 'to be added' inode)
-	EA_merge_preserve,               //< merge EA but do not overwrite existing EA of 'in place' by one of the same name of 'to be added' inode
-	EA_merge_overwrite,              //< merge EA but if both inode share an EA with the same name, take keep the one of the 'to be added' inode
-	EA_undefined,                    //< action still undefined at this step of the evaluation
-	EA_ask                           //< ask for user decision about EA
+	EA_preserve,                     ///< keep the EA of the 'in place' entry
+	EA_overwrite,                    ///< keep the EA of the 'to be added' entry
+	EA_clear,                        ///< drop the EA for the elected entry
+        EA_preserve_mark_already_saved,  ///< drop any EA but mark them as already saved in the archive of reference (ctime is the one of the 'in place' inode)
+        EA_overwrite_mark_already_saved, ///< drop any EA but mark them as already saved in the archive of reference (ctime is the one of the 'to be added' inode)
+	EA_merge_preserve,               ///< merge EA but do not overwrite existing EA of 'in place' by one of the same name of 'to be added' inode
+	EA_merge_overwrite,              ///< merge EA but if both inode share an EA with the same name, take keep the one of the 'to be added' inode
+	EA_undefined,                    ///< action still undefined at this step of the evaluation
+	EA_ask                           ///< ask for user decision about EA
     };
 
 
@@ -172,7 +173,7 @@ namespace libdar
 	void free() noexcept;
 	void copy_from(const testing & ref);
 	void move_from(testing && ref) noexcept;
-	bool check() const; //< returns false if an field is nullptr
+	bool check() const; ///< returns false if an field is nullptr
     };
 
 

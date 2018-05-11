@@ -37,31 +37,32 @@
 namespace libdar
 {
 
-	/// \ingroup Private
-	/// @}
+	/// \addtogroup Private
+	/// @{
 
-    extern void filtre_restore(const std::shared_ptr<user_interaction> & dialog, //< for user interaction
-			       const mask &filtre,        //< which filename to restore
-                               const mask & subtree,      //< which directory and paths to restore
-                               const catalogue & cat,     //< table of content to extract information from
-                               const path & fs_racine,    //< root path under which to restore directiry tree and files
-                               bool fs_warn_overwrite,    //< whether to warn before overwriting (to be replaced by overwriting policy)
-                               bool info_details,         //< whether to display processing messages
-			       bool display_treated,      //< whether to display treated files
-			       bool display_treated_only_dir, //< whether to only display current directory of treated file
-			       bool display_skipped,      //< whether to display skipped files
-                               statistics & st,           //< statistics result about the operation
-                               const mask & ea_mask,      //< defines EA to restore/not restore
-                               bool flat,                 //< if true, directories are not restores, all files are placed directly at in fs_racine directory
-			       comparison_fields what_to_check, //< which file properties to restore
-			       bool warn_remove_no_match, //< wether to warn for file to remove not matching the expected type
-			       bool empty,                //< dry-run execution
-			       bool empty_dir,            //< whether to restore directories that do contain any file to restore
-			       const crit_action & x_overwrite, //< how and whether to overwrite files
- 			       archive_options_extract::t_dirty dirty, //< whether to restore dirty files
-			       bool only_deleted,         //< whether to only consider deleted files
-			       bool not_deleted,          //< wether to consider deleted files
-			       const fsa_scope & scope);  //< scope of FSA to take into account
+    extern void filtre_restore(const std::shared_ptr<user_interaction> & dialog, ///< for user interaction
+			       const mask &filtre,        ///< which filename to restore
+                               const mask & subtree,      ///< which directory and paths to restore
+                               const catalogue & cat,     ///< table of content to extract information from
+                               const path & fs_racine,    ///< root path under which to restore directiry tree and files
+                               bool fs_warn_overwrite,    ///< whether to warn before overwriting (to be replaced by overwriting policy)
+                               bool info_details,         ///< whether to display processing messages
+			       bool display_treated,      ///< whether to display treated files
+			       bool display_treated_only_dir, ///< whether to only display current directory of treated file
+			       bool display_skipped,      ///< whether to display skipped files
+                               statistics & st,           ///< statistics result about the operation
+                               const mask & ea_mask,      ///< defines EA to restore/not restore
+                               bool flat,                 ///< if true, directories are not restores, all files are placed directly at in fs_racine directory
+			       comparison_fields what_to_check, ///< which file properties to restore
+			       bool warn_remove_no_match, ///< wether to warn for file to remove not matching the expected type
+			       bool empty,                ///< dry-run execution
+			       bool empty_dir,            ///< whether to restore directories that do contain any file to restore
+			       const crit_action & x_overwrite, ///< how and whether to overwrite files
+ 			       archive_options_extract::t_dirty dirty, ///< whether to restore dirty files
+			       bool only_deleted,         ///< whether to only consider deleted files
+			       bool not_deleted,          ///< wether to consider deleted files
+			       const fsa_scope & scope    ///< scope of FSA to take into account
+	);
 
     extern void filtre_sauvegarde(const std::shared_ptr<user_interaction> & dialog,
 				  const mask &filtre,
@@ -98,10 +99,10 @@ namespace libdar
 				  bool ignore_unknown,
 				  const fsa_scope & scope,
 				  const std::string & exclude_by_ea,
-				  bool delta_signature,     //< whether to compute delta sig file on the saved file
-				  const infinint & delta_sig_min_size, //< size below which to never calculate delta sig
-				  const mask & delta_mask,  //< mask defining for which file to calculate delta sig
-				  bool delta_diff,          //< whether to perform delta diff backup when delta sig is present
+				  bool delta_signature,     // whether to compute delta sig file on the saved file
+				  const infinint & delta_sig_min_size, // size below which to never calculate delta sig
+				  const mask & delta_mask,  // mask defining for which file to calculate delta sig
+				  bool delta_diff,          // whether to perform delta diff backup when delta sig is present
 				  bool auto_zeroing_neg_dates,
 				  const std::set<std::string> & ignored_symlinks,
 				  modified_data_detection mod_data_detect);

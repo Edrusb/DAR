@@ -39,6 +39,7 @@ namespace libdar
 	/// \addtogroup API
 	/// @{
 
+	/// stores a range of integers or a set of ranges
     class range
     {
     public:
@@ -55,7 +56,7 @@ namespace libdar
 	std::string display() const;
 
 	    /// provides a way to read range contents segment by segment
-	    ///
+
 	    /// \note reset_read() is to be called once then read_next_segment()
 	    /// will return true for each new segment giving in argument its low and high value
 	    /// when no more segment are available it returns false, reset_read() can be call at
@@ -63,7 +64,7 @@ namespace libdar
 	void reset_read() const { read_cursor = parts.begin(); };
 
 	    /// read the next available segment
-	    ///
+
 	    /// \param[out] low when read_next_segment() returns true, contains the low value of the next segment
 	    /// \param[out] high when read_next_segment() returns true, contains the high value of the next segment
 	    /// \return true and set the low and high value when a next segment is available in the range, returns

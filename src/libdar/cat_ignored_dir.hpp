@@ -42,6 +42,7 @@ namespace libdar
 	/// @{
 
 	/// the ignored cat_directory class, to be promoted later as empty cat_directory if needed
+
     class cat_ignored_dir : public cat_inode
     {
     public:

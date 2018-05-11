@@ -39,16 +39,23 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
+	/// provides a fichier_global interface for any type of generic_file
+
     class generic_to_global_file : public fichier_global
     {
     public:
 
 	    /// Constructors & Destructor
-	    ///
+
 	    /// \param[in] dialog for user interaction
 	    /// \param[in] d pointer to the generic_file object to provide a fichier_global interface to.
+	    /// \param[in] mode read/write mode to use
 	    /// \note the pointed to generic_file object must survive the whole live of the generic_to_gloabl_file. This generic_file is not owned nor deleted by the generic_to_global_file object that points to it.
-	generic_to_global_file(const std::shared_ptr<user_interaction> & dialog, generic_file *d, gf_mode mode): fichier_global(dialog, mode) { if(d == nullptr) throw SRC_BUG; if(d->get_mode() != gf_read_write && d->get_mode() != mode) throw SRC_BUG; data = d; };
+	generic_to_global_file(const std::shared_ptr<user_interaction> & dialog,
+			       generic_file *d,
+			       gf_mode mode):
+	    fichier_global(dialog, mode)
+	{ if(d == nullptr) throw SRC_BUG; if(d->get_mode() != gf_read_write && d->get_mode() != mode) throw SRC_BUG; data = d; };
 
 	generic_to_global_file(const generic_to_global_file & ref) = default;
 	generic_to_global_file(generic_to_global_file && ref) noexcept = default;

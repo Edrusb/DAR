@@ -58,7 +58,7 @@ namespace libdar
     {
     public:
 	    /// to know if secure memory is available
-	    ///
+
 	    /// it is advised that the user program of class secu_string uses this call before using objects of that class
 	    /// and if returned false, advise the user that the necessary support for secure memory
 	    /// is not present, that any sensitive data may be swapped out under heavy memory load and thus
@@ -66,13 +66,13 @@ namespace libdar
 	static bool is_string_secured();
 
 	    /// constructor 1
-	    ///
+
 	    /// create the allocated string in secure memory
 	    /// \param[in] storage_size is the amount of secured memory to obtain when creating the object
 	secu_string(U_I storage_size = 0) { init(storage_size); };
 
 	    /// constructor 2
-	    ///
+
 	    /// create the string from a pointer to a (secure) string or from a portion of it
 	secu_string(const char *ptr, U_I size) { init(size); append_at(0, ptr, size); };
 
@@ -99,7 +99,7 @@ namespace libdar
 
 
 	    /// fill the object with data
-	    ///
+
 	    /// set at most size bytes of data directly from the filedescriptor,
 	    /// \param[in] fd the filedescriptor to read data from
 	    /// \param[in] size is the maximum number of byte read
@@ -108,7 +108,7 @@ namespace libdar
 	void set(int fd, U_I size);
 
 	    /// append some data to the string at a given offset
-	    ///
+
 	    /// \param[in] offset defines at which offset in the secu_string will be placed the string to append
 	    /// \param[in] ptr is the address of the string to append
 	    /// \param[in] size is the number of byte to append
@@ -136,12 +136,12 @@ namespace libdar
 	void clear() { *string_size = 0; };
 
 	    /// clear and resize the string to the defined allocated size
-	    ///
+
 	    /// \param[in] size is the amount of secure memory to allocated
 	void resize(U_I size) { clean_and_destroy(); init(size); };
 
 	    /// set the string to randomize string of given size
-	    ///
+
 	    /// \note the given size must be less than allocated size
 	void randomize(U_I size);
 
@@ -152,7 +152,7 @@ namespace libdar
 	const char*c_str() const { return mem == nullptr ? throw SRC_BUG : mem; };
 
 	    /// get access to the secure string by index
-	    ///
+
 	    /// \note index must be in the range [ 0 - size() [ to avoid throwing an exception
 	char & operator[] (U_I index);
 	char operator[](U_I index) const { return (const_cast<secu_string *>(this))->operator[](index); };

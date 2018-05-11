@@ -81,7 +81,7 @@ namespace libdar
 					   const path & directory);
 
 	/// create in dirname a brand-new filename which name derives from filename
-	///
+
 	/// \return a read-write object the caller has the duty to destroy, exception thrown
 	/// if no filename could be created
     fichier_local *filesystem_tools_create_non_existing_file_based_on(const std::shared_ptr<user_interaction> & dialog,

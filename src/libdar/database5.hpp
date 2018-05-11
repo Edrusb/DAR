@@ -21,7 +21,7 @@
 
     /// \file database5.hpp
     /// \brief this file holds the database class definition as defined in API version 5
-    /// \ingroup API
+    /// \ingroup API5
 
 
 #ifndef DATABASE5_HPP
@@ -69,12 +69,15 @@ using libdar::datetime;
 
 namespace libdar5
 {
+
+	/// \addtogroup API5
+        /// @{
+
 	/// the database class defines the dar_manager database
 
 	/// all operations for a dar_manager database are defines through the
 	/// use of this class interface. This class also defines internally
 	/// the data structure of the database.
-	/// \ingroup API
     class database: public libdar::database
     {
     public:
@@ -178,6 +181,9 @@ namespace libdar5
 					const infinint & ea_count,
 					const infinint & total_ea);
     };
+
+
+	/// @}
 
 } // end of namespace
 

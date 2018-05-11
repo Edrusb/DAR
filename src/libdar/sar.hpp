@@ -56,17 +56,26 @@ namespace libdar
 
 	    /// this constructor reads data from a set of slices
 
-	    /// \param[in] dialog is for user interation (such a requesting a slice and pausing between slices)
-	    /// \param[in] base_name is the basename of all slices of the set (it will be added the ".<slice numer>.extension" to form a filename
+	    /// \param[in] dialog is for user interation (such a requesting a slice and pausing
+	    /// between slices)
+	    /// \param[in] base_name is the basename of all slices of the set (it will be added
+	    /// the ".<slice numer>.extension" to form a filename
 	    /// \param[in] extension is the extension of slice's filenames
 	    /// \param[in] where defines where to store or where are stored slices
-	    /// \param[in] by_the_end if true dar will try to open the slice set starting from the last slice else it will try starting from the first
-	    /// \param[in] x_min_digits is the minimum number of digits the slices number is stored with in the filename
-	    /// \param[in] lax if set to true will try workaround problems that would otherwise lead the operation to fail
-	    /// \param[in] execute is the command to execute before trying to open each slice for reading
-	    /// \note if by_the_end is set to true, the last slice must have extended slice header that contain informations about
-	    /// the first slice size (used starting archive format "08"), Else, the slice size is not possible to open as the offset
-	    /// of the data cannot be determin. If slice header is too old the sar class will fallback openning the first slice and
+	    /// \param[in] by_the_end if true dar will try to open the slice set starting from
+	    /// the last slice else it will try starting from the first
+	    /// \param[in] x_min_digits is the minimum number of digits the slices number is
+	    /// stored with in the filename
+	    /// \param[in] lax if set to true will try workaround problems that would otherwise
+	    /// lead the operation to fail
+	    /// \param[in] execute is the command to execute before trying to open each slice
+	    /// for reading
+	    /// \note if by_the_end is set to true, the last slice must have extended slice
+	    /// header that contain informations about
+	    /// the first slice size (used starting archive format "08"), Else, the slice size
+	    /// is not possible to open as the offset
+	    /// of the data cannot be determin. If slice header is too old the sar class will
+	    /// fallback openning the first slice and
 	    /// directly get the first slice.
         sar(const std::shared_ptr<user_interaction> & dialog,
 	    const std::string & base_name,
@@ -178,53 +187,55 @@ namespace libdar
 	virtual void inherited_terminate() override;
 
     private :
-	std::shared_ptr<entrepot> entr; //< where are stored slices
-        std::string base;            //< archive base name
-	std::string ext;             //< archive extension
-        std::string hook;            //< command line to execute between slices
-	slice_layout slicing;        //< slice layout
-        infinint file_offset;        //< current reading/writing position in the current slice (relative to the whole slice file, including headers)
-	hash_algo hash;              //< whether to build a hashing when creating slices, and if so, which algorithm to use
-	infinint min_digits;         //< minimum number of digits the slices number is stored with in the filename
-        bool natural_destruction;    //< whether to execute commands between slices on object destruction
+	std::shared_ptr<entrepot> entr; ///< where are stored slices
+        std::string base;            ///< archive base name
+	std::string ext;             ///< archive extension
+        std::string hook;            ///< command line to execute between slices
+	slice_layout slicing;        ///< slice layout
+        infinint file_offset;        ///< current reading/writing position in the current slice (relative to the whole slice file, including headers)
+	hash_algo hash;              ///< whether to build a hashing when creating slices, and if so, which algorithm to use
+	infinint min_digits;         ///< minimum number of digits the slices number is stored with in the filename
+        bool natural_destruction;    ///< whether to execute commands between slices on object destruction
             // these following variables are modified by open_file / open_file_init
             // else the are used only for reading
-        infinint of_current;         //< number of the open slice
-	infinint size_of_current;    //< size of the current slice (used in reading mode only)
-        infinint of_max_seen;        //< highest slice number seen so far
-        bool of_last_file_known;     //< whether the T terminal slice has been met
-        infinint of_last_file_num;   //< number of the last slice (if met)
-        infinint of_last_file_size;  //< size of the last slice (if met)
-        label of_internal_name;      //< internal name shared in all slice header
-	label of_data_name;          //< internal name linked to data (transparent to dar_xform and used by isolated catalogue as reference)
-	bool force_perm;             //< true if any future slice has its permission to be set explicitely
-	U_I perm;                    //< if force_perm is true, value to use for slice permission
-        fichier_global *of_fd;       //< file object currently openned
-        char of_flag;                //< flags of the open file
-        bool initial;                //< do not launch hook command-line during sar initialization
+        infinint of_current;         ///< number of the open slice
+	infinint size_of_current;    ///< size of the current slice (used in reading mode only)
+        infinint of_max_seen;        ///< highest slice number seen so far
+        bool of_last_file_known;     ///< whether the T terminal slice has been met
+        infinint of_last_file_num;   ///< number of the last slice (if met)
+        infinint of_last_file_size;  ///< size of the last slice (if met)
+        label of_internal_name;      ///< internal name shared in all slice header
+	label of_data_name;          ///< internal name linked to data (transparent to dar_xform and used by isolated catalogue as reference)
+	bool force_perm;             ///< true if any future slice has its permission to be set explicitely
+	U_I perm;                    ///< if force_perm is true, value to use for slice permission
+        fichier_global *of_fd;       ///< file object currently openned
+        char of_flag;                ///< flags of the open file
+        bool initial;                ///< do not launch hook command-line during sar initialization
             // these are the option flags
-        bool opt_warn_overwrite;     //<  a warning must be issued before overwriting a slice
-        bool opt_allow_overwrite;    //< is slice overwriting allowed
+        bool opt_warn_overwrite;     ///<  a warning must be issued before overwriting a slice
+        bool opt_allow_overwrite;    ///< is slice overwriting allowed
 	    //
-        infinint pause;              //< do we pause between slices
-	bool lax;                    //< whether to try to go further reading problems
-	infinint to_read_ahead;      //< amount of data to read ahead for next slices
+        infinint pause;              ///< do we pause between slices
+	bool lax;                    ///< whether to try to go further reading problems
+	infinint to_read_ahead;      ///< amount of data to read ahead for next slices
 
-        bool skip_forward(U_I x);                    //< skip forward in sar global contents
-        bool skip_backward(U_I x);                   //< skip backward in sar global contents
-        void close_file(bool terminal);              //< close current openned file, adding (in write mode only) a terminal mark (last slice) or not
-        void open_readonly(const std::string & fic,  //< open file of name "fic" for read only
-			   const infinint &num,      //< "num" is the slice number
-			   bool bytheend);           //< whether to position the read cursor at the beginning or the end of the file
-        void open_writeonly(const std::string & fic, //< open file of name "filename" for write only
-			    const infinint &num,     //< "num" is the slice number
-			    bool bytheend);          //< whether to overwrite or to append data to be written to the file
-        void open_file_init();                       //< initialize some of_* fields
-        void open_file(infinint num, bool bytheend); //< close current slice and open the slice 'num'
-        void set_offset(infinint offset);            //< skip to current slice relative offset
-        void open_last_file(bool bytheend);          //< open the last slice, ask the user, test, until last slice available
-	bool is_current_eof_a_normal_end_of_slice() const;  //< return true if current reading position is at end of slice
-	infinint bytes_still_to_read_in_slice() const;  //< returns the number of bytes expected before the end of slice
+        bool skip_forward(U_I x);                    ///< skip forward in sar global contents
+        bool skip_backward(U_I x);                   ///< skip backward in sar global contents
+        void close_file(bool terminal);              ///< close current openned file, adding (in write mode only) a terminal mark (last slice) or not
+        void open_readonly(const std::string & fic,  ///< open file of name "fic" for read only
+			   const infinint &num,      ///< "num" is the slice number
+			   bool bytheend             ///< whether to position the read cursor at the beginning or the end of the file
+	    );
+        void open_writeonly(const std::string & fic, ///< open file of name "filename" for write only
+			    const infinint &num,     ///< "num" is the slice number
+			    bool bytheend            ///< whether to overwrite or to append data to be written to the file
+	    );
+        void open_file_init();                       ///< initialize some of_* fields
+        void open_file(infinint num, bool bytheend); ///< close current slice and open the slice 'num'
+        void set_offset(infinint offset);            ///< skip to current slice relative offset
+        void open_last_file(bool bytheend);          ///< open the last slice, ask the user, test, until last slice available
+	bool is_current_eof_a_normal_end_of_slice() const;  ///< return true if current reading position is at end of slice
+	infinint bytes_still_to_read_in_slice() const;  ///< returns the number of bytes expected before the end of slice
         header make_write_header(const infinint &num, char flag);
 
             // function to lauch the eventually existing command to execute after/before each slice

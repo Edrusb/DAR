@@ -36,8 +36,11 @@
 namespace libdar
 {
 
+	/// \addtogroup Private
+        /// @{
+
+
 	/// \brief scrambler is a very weak encryption scheme
-	/// \ingroup Private
 
     class scrambler : public generic_file
     {
@@ -71,6 +74,8 @@ namespace libdar
         unsigned char *buffer;
         U_I buf_size;
     };
+
+	/// @}
 
 } // end of namespace
 

@@ -49,8 +49,6 @@ extern "C"
 #include "tuyau.hpp"
 #include "trivial_sar.hpp"
 
-    /// \addtogroup Private
-    /// @{
 
 
 #define BUFFER_SIZE 102400
@@ -61,10 +59,13 @@ extern "C"
 #endif
 #endif
 
-#define GLOBAL_ELASTIC_BUFFER_SIZE 51200
-
 namespace libdar
 {
+
+	/// \addtogroup Private
+	/// @{
+
+    constexpr U_I GLOBAL_ELASTIC_BUFFER_SIZE = 51200;
 
     extern const archive_version macro_tools_supported_version;
     extern const std::string LIBDAR_STACK_LABEL_UNCOMPRESSED;
@@ -83,7 +84,7 @@ namespace libdar
 
 
 	/// setup the given pile object to contain a stack of generic_files suitable to read an archive
-	///
+
 	/// \note the stack has the following contents depending on given options
 	///
 	/// +-top                                           LIBDAR_STACK_LABEL_
@@ -109,28 +110,29 @@ namespace libdar
 	/// \note _CLEAR is associated to the generic_thread below compressor else escape else
 	/// the cache or crypto_sym or scrambler which then has two Labels (_CLEAR and _UNCYPHERED)
 
-    extern void macro_tools_open_archive(const std::shared_ptr<user_interaction> & dialog, //< for user interaction
-					 const std::shared_ptr<entrepot> & where,          //< slices location
-                                         const std::string &basename,   //< slice basename
-					 const infinint & min_digits,   //< minimum digits for the slice number
-                                         const std::string &extension,  //< slice extensions
-					 crypto_algo crypto,            //< encryption algorithm
-                                         const secu_string &pass,       //< pass key for crypto/scrambling
-					 U_32 crypto_size,              //< crypto block size
-					 pile & stack,                  //< the stack of generic_file resulting of the archive openning
-                                         header_version &ver,           //< header read from raw data
-                                         const std::string &input_pipe, //< named pipe for input when basename is "-" (dar_slave)
-                                         const std::string &output_pipe,       //< named pipe for output when basename is "-" (dar_slave)
-                                         const std::string & execute,          //< command to execute between slices
-					 infinint & second_terminateur_offset, //< where to start looking for the second terminateur (set to zero if there is only one terminateur).
-					 bool lax,  // whether we skip&warn the usual verifications
-					 bool has_external_cat,    //< true if the catalogue will not be read from the current archive (flag used in lax mode only)
-					 bool sequential_read, // whether to use the escape sequence (if present) to get archive contents and proceed to sequential reading
-					 bool info_details,    // be or not verbose about the archive openning
-					 std::list<signator> & gnupg_signed, //< list of existing signature found for that archive (valid or not)
-					 slice_layout & sl,    //< slicing layout of the archive
-					 bool multi_threaded,  //< true if several thread shall be run concurrently by libdar
-					 bool header_only);    //< if true, stop the process before openning the encryption layer
+    extern void macro_tools_open_archive(const std::shared_ptr<user_interaction> & dialog, ///< for user interaction
+					 const std::shared_ptr<entrepot> & where,          ///< slices location
+                                         const std::string &basename,   ///< slice basename
+					 const infinint & min_digits,   ///< minimum digits for the slice number
+                                         const std::string &extension,  ///< slice extensions
+					 crypto_algo crypto,            ///< encryption algorithm
+                                         const secu_string &pass,       ///< pass key for crypto/scrambling
+					 U_32 crypto_size,              ///< crypto block size
+					 pile & stack,                  ///< the stack of generic_file resulting of the archive openning
+                                         header_version &ver,           ///< header read from raw data
+                                         const std::string &input_pipe, ///< named pipe for input when basename is "-" (dar_slave)
+                                         const std::string &output_pipe,       ///< named pipe for output when basename is "-" (dar_slave)
+                                         const std::string & execute,          ///< command to execute between slices
+					 infinint & second_terminateur_offset, ///< where to start looking for the second terminateur (set to zero if there is only one terminateur).
+					 bool lax,  ///< whether we skip&warn the usual verifications
+					 bool has_external_cat,    ///< true if the catalogue will not be read from the current archive (flag used in lax mode only)
+					 bool sequential_read, ///< whether to use the escape sequence (if present) to get archive contents and proceed to sequential reading
+					 bool info_details,    ///< be or not verbose about the archive openning
+					 std::list<signator> & gnupg_signed, ///< list of existing signature found for that archive (valid or not)
+					 slice_layout & sl,    ///< slicing layout of the archive
+					 bool multi_threaded,  ///< true if several thread shall be run concurrently by libdar
+					 bool header_only      ///< if true, stop the process before openning the encryption layer
+	);
         // all allocated objects (ret1, ret2, scram), must be deleted when no more needed by the caller of this routine
 
 	/// uses terminator to skip to the position where to find the catalogue and read it, taking care of having this catalogue pointing to the real data (context of isolated catalogue --- cata_stack --- used to rescue an internal archive --- data_stack)
@@ -176,7 +178,7 @@ namespace libdar
     extern infinint macro_tools_get_terminator_start(generic_file & f, const archive_version & reading_ver);
 
 	/// build layers for a new archive
-	///
+
 	/// \param[in]  dialog for user interaction
 	/// \param[out] layers the resulting stack of generic_file layers ready for use
 	/// \param[out] ver the archive "header" to be dropped at end of archive
@@ -267,7 +269,7 @@ namespace libdar
 					  bool multi_threaded);
 
 	/// dumps the catalogue and close all the archive layers to terminate the archive
-	///
+
 	/// \param[in] dialog for user interaction
 	/// \param[in] layers the archive layers to close
 	/// \param[in] ver the archive "header" to be dropped at end of archive
@@ -291,7 +293,7 @@ namespace libdar
 
 
 	/// gives the location of data EA and FSA (when they are saved) of the object given in argument
-	///
+
 	/// \param[in] obj a pointer to the object which data & EFSA is to be located
 	/// \param[in] sl slice layout of the archive
 	/// \return a set of slices which will be required to restore that particular file (over the slice(s)
@@ -312,9 +314,9 @@ namespace libdar
 				       tuyau *&in,
 				       tuyau *&out);
 
+        /// @}
 
 } // end of namespace
 
-    /// @}
 
 #endif

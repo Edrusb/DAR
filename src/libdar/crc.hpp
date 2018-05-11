@@ -41,6 +41,8 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
+	/// pure virtual class defining interface of a CRC object
+
     class crc
     {
     public:
@@ -65,8 +67,13 @@ namespace libdar
 	virtual crc *clone() const = 0;
     };
 
+	/// generate a CRC object reading it from file
     extern crc *create_crc_from_file(proto_generic_file & f, bool old = false);
+
+	/// generate a CRC object with adhoc width based on a file size
     extern crc *create_crc_from_size(infinint width);
+
+	/// crc implementation based on infinint
 
     class crc_i : public crc
     {
@@ -93,14 +100,16 @@ namespace libdar
 
     private:
 
-	infinint size;                              //< size of the checksum
-	storage::iterator pointer;                  //< points to the next byte to modify
-	storage cyclic;                             //< the checksum storage
+	infinint size;                              ///< size of the checksum
+	storage::iterator pointer;                  ///< points to the next byte to modify
+	storage cyclic;                             ///< the checksum storage
 
 	void copy_from(const crc_i & ref);
 	void copy_data_from(const crc_i & ref);
     };
 
+
+	/// crc implementation based on U_I
 
     class crc_n : public crc
     {
@@ -128,9 +137,9 @@ namespace libdar
 
     private:
 
-	U_I size;                                   //< size of checksum (non infinint mode)
-	unsigned char *pointer;                     //< points to the next byte to modify (non infinint mode)
-	unsigned char *cyclic;                      //< the checksum storage (non infinint mode)
+	U_I size;                                   ///< size of checksum (non infinint mode)
+	unsigned char *pointer;                     ///< points to the next byte to modify (non infinint mode)
+	unsigned char *cyclic;                      ///< the checksum storage (non infinint mode)
 
 	void alloc(U_I width);
 	void copy_from(const crc_n & ref);

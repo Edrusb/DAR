@@ -35,6 +35,9 @@
 
 namespace libdar
 {
+	/// \addtogroup API
+        /// @{
+
 	/// the class path is here to manipulate paths in the Unix notation: using'/'
 
 	/// several operations are provided as well as convertion functions, but
@@ -42,25 +45,24 @@ namespace libdar
 	/// However if the argument is not a valid path, an exception may be thrown
 	/// by libdar
 	/// \ingroup API
-
     class path
     {
     public :
 	    /// constructor from a string
 
-	    //! This realizes the string to path convertion function
-	    //! \param[in] s the string to convert to path
-	    //! \param[in] x_undisclosed do not split the given string, consider it as a single directory name, even if some '/' are found in it
-	    //! \note empty string is not a valid string (exception thrown)
-	    //! \note having undisclosed set to true, does not allow one to pop() right away, first push must be made. While having undisclosed set to false
-	    //! let the user pop() right away if the given string is composed of several path members ("member1/member2/member3" for example of path
-	    //! allow one to pop() three time, while in the same example setting undisclosed to true, allow one to pop() just once).
+	    /// This realizes the string to path convertion function
+	    /// \param[in] s the string to convert to path
+	    /// \param[in] x_undisclosed do not split the given string, consider it as a single directory name, even if some '/' are found in it
+	    /// \note empty string is not a valid string (exception thrown)
+	    /// \note having undisclosed set to true, does not allow one to pop() right away, first push must be made. While having undisclosed set to false
+	    /// let the user pop() right away if the given string is composed of several path members ("member1/member2/member3" for example of path
+	    /// allow one to pop() three time, while in the same example setting undisclosed to true, allow one to pop() just once).
         path(const std::string & s, bool x_undisclosed = false);
 
 	    /// constructor from a char *
 
-	    //! this realizes the char * to path convertion function
-	    //! \note empty string is not a valid string (exception thrown)
+	    /// this realizes the char * to path convertion function
+	    /// \note empty string is not a valid string (exception thrown)
         path(const char *s, bool x_undisclosed = false) { *this = path(std::string(s), x_undisclosed); };
 
 	    /// copy constructor
@@ -157,12 +159,12 @@ namespace libdar
 	    /// an empty string is returned
 	std::string display_without_root() const;
 
-	    /// \brief returns the number of member in the path
-	    ///
+	    /// returns the number of member in the path
+
 	    /// \note a absolute path counts one more that its relative brother
         U_I degre() const { return dirs.size() + (relative ? 0 : 1); };
 
-	    /// \brief if the current object is an undisclosed path, tries to convert it back to normal path
+	    /// if the current object is an undisclosed path, tries to convert it back to normal path
 	void explode_undisclosed() const;
 
     private :
@@ -174,8 +176,13 @@ namespace libdar
         void reduce();
     };
 
+	/// root name to use when archive operation does not use filesystem (archive testing for example)
     extern const std::string PSEUDO_ROOT;
+
+	/// root path object based on PSEUDO_ROOT
     extern const path FAKE_ROOT;
+
+	/// @}
 
 } // end of namespace
 

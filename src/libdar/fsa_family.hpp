@@ -39,8 +39,11 @@ namespace libdar
 
 
 	/// FSA family
+
     enum fsa_family { fsaf_hfs_plus, fsaf_linux_extX };
 	// note: adding new fsa_family need updating all_fsa_family()
+
+
 
 	/// FSA nature
     enum fsa_nature { fsan_unset,
@@ -58,16 +61,25 @@ namespace libdar
 		      fsan_synchronous_update,
 		      fsan_top_of_dir_hierarchy };
 
+	/// convert fsa family to readable std::string
     extern std::string fsa_family_to_string(fsa_family f);
+
+	/// convert fsa nature to readable std::string
     extern std::string fsa_nature_to_string(fsa_nature n);
 
+	/// set of fsa families
     typedef std::set<fsa_family> fsa_scope;
 
 	/// provides a scope containing all FSA families
     extern fsa_scope all_fsa_families();
 
+	/// convert an fsa scope to infinint
     extern infinint fsa_scope_to_infinint(const fsa_scope & val);
+
+	/// convert an infinint to fsa_scape
     extern fsa_scope infinint_to_fsa_scope(const infinint & ref);
+
+	/// convert an fsa scope to readable string
     extern std::string fsa_scope_to_string(bool saved, const fsa_scope & scope);
 
 	/// @}

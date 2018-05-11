@@ -56,8 +56,7 @@ namespace libdar
     {
     public :
 
-	    // constructors
-
+	    /// full featured constructors
         fichier_local(const std::shared_ptr<user_interaction> & dialog,
 		      const std::string & chemin,
 		      gf_mode m,
@@ -65,7 +64,11 @@ namespace libdar
 		      bool fail_if_exists,
 		      bool erase,
 		      bool furtive_mode);
-	fichier_local(const std::string & chemin, bool furtive_mode = false); // builds a read-only object
+
+	    /// constructor without user_interaction
+
+	    /// \note can only build a read-only object
+	fichier_local(const std::string & chemin, bool furtive_mode = false);
 
 	    /// copy constructor
 	fichier_local(const fichier_local & ref) : fichier_global(ref) { copy_from(ref); };
@@ -103,7 +106,7 @@ namespace libdar
         virtual infinint get_position() const override;
 
 	    /// provide the low level filedescriptor to the call and terminate()
-	    ///
+
 	    /// \note this is the caller duty to close() the provided filedescriptor
 	S_I give_fd_and_terminate() { int ret = filedesc; filedesc = -1; terminate(); return ret; };
 

@@ -42,6 +42,7 @@ namespace libdar
 	/// @{
 
 	/// the special cat_device root class
+
     class cat_device : public cat_inode
     {
     public :

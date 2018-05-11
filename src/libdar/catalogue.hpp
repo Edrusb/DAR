@@ -20,7 +20,7 @@
 /*********************************************************************/
 
     /// \file catalogue.hpp
-    /// \brief here is defined the many classed which is build of the catalogue
+    /// \brief here is defined the classe used to manage catalogue of archives
     /// \ingroup Private
 
 #ifndef CATALOGUE_HPP
@@ -66,8 +66,8 @@ namespace libdar
 		  const archive_version & reading_ver,
 		  compression default_algo,
 		  bool lax,
-		  const label & lax_layer1_data_name, //< ignored unless in lax mode, in lax mode unless it is a cleared label, forces the catalogue label to be equal to the lax_layer1_data_name for it be considered a plain internal catalogue, even in case of corruption
-		  bool only_detruit = false); //< if set to true, only directories and detruit objects are read from the archive
+		  const label & lax_layer1_data_name, // ignored unless in lax mode, in lax mode unless it is a cleared label, forces the catalogue label to be equal to the lax_layer1_data_name for it be considered a plain internal catalogue, even in case of corruption
+		  bool only_detruit = false); // if set to true, only directories and detruit objects are read from the archive
         catalogue(const catalogue & ref) : mem_ui(ref), out_compare(ref.out_compare) { partial_copy_from(ref); };
 	catalogue(catalogue && ref) = delete;
         catalogue & operator = (const catalogue &ref);
@@ -158,13 +158,13 @@ namespace libdar
 
 
 	    /// add into "this" detruit object corresponding to object of ref absent in "this"
-	    ///
+
 	    ///\note ref must have the same directory tree "this", else the operation generates an exception
         infinint update_destroyed_with(const catalogue & ref);
 
 
 	    /// copy from ref missing files in "this" and mark then as "not_saved" (no change since reference)
-	    ///
+
 	    /// in case of abortion, completes missing files as if what could not be
 	    /// inspected had not changed since the reference was done
 	    /// aborting_last_etoile is the highest etoile reference withing "this" current object.
@@ -175,7 +175,7 @@ namespace libdar
 	void drop_all_non_detruits();
 
 	    /// check whether all inode existing in the "this" and ref have the same attributes
-	    ///
+
 	    /// \note stops at the first inode found in both catalogue that do not match for at least one attribute
 	    /// including CRC for DATA, EA or FSA if present, then return false.
 	bool is_subset_of(const catalogue & ref) const;
@@ -215,7 +215,7 @@ namespace libdar
 	void change_location(const pile_descriptor & pdesc);
 
 	    /// copy delta signatures to the given stack and update the cat_file objects accordingly
-	    ///
+
 	    /// \param[in] destination where to drop delta signatures
 	    /// \param[in] sequential_read whether we read the archive in sequential mode
 	    /// \param[in] build if set and delta signature is not present but data is available for a file, calculate the delta sig
@@ -258,7 +258,7 @@ namespace libdar
         void partial_copy_from(const catalogue &ref);
         void detruire();
 
-        static const cat_eod r_eod;           // needed to return eod reference, without taking risk of saturating memory
+        static const cat_eod r_eod;           ///< needed to return eod reference, without taking risk of saturating memory
 	static const U_I CAT_CRC_SIZE;
     };
 

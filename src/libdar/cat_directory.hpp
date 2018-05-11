@@ -47,6 +47,7 @@ namespace libdar
 	/// @{
 
 	/// the cat_directory inode class
+
     class cat_directory : public cat_inode
     {
     public :
@@ -87,7 +88,7 @@ namespace libdar
 
 
 	    /// remove the given entry from the catalogue
-	    ///
+
 	    /// \note read_children() is taken into account by this operation,
 	    /// no need to call reset_read_children(), if the argument removed was the
 	    /// one about to be read by read_children() the one following the removed entry
@@ -160,7 +161,7 @@ namespace libdar
         std::map<std::string, cat_nomme *> fils; // used for fast lookup
 #endif
 	std::deque<cat_nomme *> ordered_fils;
-        mutable std::deque<cat_nomme *>::const_iterator it; //< next entry to be returned by read_children
+        mutable std::deque<cat_nomme *>::const_iterator it; ///< next entry to be returned by read_children
 	mutable bool recursive_has_changed;
 
 	void init() noexcept;

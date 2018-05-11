@@ -41,6 +41,7 @@ namespace libdar
 	/// @{
 
 	/// the present file to ignore (not to be recorded as deleted later)
+
     class cat_ignored : public cat_nomme
     {
     public :

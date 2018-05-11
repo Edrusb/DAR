@@ -21,7 +21,7 @@
 
     /// \file limitint.hpp
     /// \brief the reviewed implementation of infinint based on system limited integers
-    /// \ingroup Private
+    /// \ingroup API
     ///
     /// the limitint template class implementation defined in this module can
     /// handle positive integers and detect overflow. It shares with infinint the same
@@ -65,7 +65,7 @@ extern "C"
 namespace libdar
 {
 
-	/// \addtogroup Private
+	/// \addtogroup API
 	/// @{
 
 	/// limitint template class

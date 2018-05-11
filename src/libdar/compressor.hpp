@@ -38,7 +38,7 @@ namespace libdar
 {
 
 
-	/// \ingroup Private
+	/// \addtogroup Private
 	/// @{
 
 	/// compression class for gzip and bzip2 algorithms
@@ -48,9 +48,11 @@ namespace libdar
         compressor(compression algo, generic_file & compressed_side, U_I compression_level = 9);
             // compressed_side is not owned by the object and will remains
             // after the objet destruction
+
         compressor(compression algo, generic_file *compressed_side, U_I compression_level = 9);
             // compressed_side is owned by the object and will be
             // deleted a destructor time
+
 	compressor(const compressor & ref) = delete;
 	compressor(compressor && ref) = delete;
 	compressor & operator = (const compressor & ref) = delete;
@@ -92,25 +94,25 @@ namespace libdar
 
 	struct lzo_block_header
 	{
-	    char type;             //< let the possibility to extend this architecture (for now type is fixed)
-	    infinint size;         //< size of the following compressed block of data
+	    char type;             ///< let the possibility to extend this architecture (for now type is fixed)
+	    infinint size;         ///< size of the following compressed block of data
 
 	    void dump(generic_file & f);
 	    void set_from(generic_file & f);
 	};
 
 
-        xfer *compr, *decompr;     //< datastructure for bzip2 an gzip compression
+        xfer *compr, *decompr;     ///< datastructure for bzip2 an gzip compression
 
-	char *lzo_read_buffer;     //< stores clear data (uncompressed) read from the compressed generic_file
-	char *lzo_write_buffer;    //< stores the clear data to be compressed and written to the compressed generic_file
-	U_I lzo_read_size;         //< number of available bytes in the read buffer for lzo decompression
-	U_I lzo_write_size;        //< number of available bytes to compress and next place where to add more data in the wite buffer
-	U_I lzo_read_start;        //< location of the next byte to read out from the read buffer
-	bool lzo_write_flushed;    //< whether write flushing has been done
-	bool lzo_read_reached_eof; //< whether reading reached end of file and the lzo engine has to be reset to uncompress further data
-	char *lzo_compressed;      //< compressed data just read or about to be written
-	char *lzo_wrkmem;          //< work memory for LZO library
+	char *lzo_read_buffer;     ///< stores clear data (uncompressed) read from the compressed generic_file
+	char *lzo_write_buffer;    ///< stores the clear data to be compressed and written to the compressed generic_file
+	U_I lzo_read_size;         ///< number of available bytes in the read buffer for lzo decompression
+	U_I lzo_write_size;        ///< number of available bytes to compress and next place where to add more data in the wite buffer
+	U_I lzo_read_start;        ///< location of the next byte to read out from the read buffer
+	bool lzo_write_flushed;    ///< whether write flushing has been done
+	bool lzo_read_reached_eof; ///< whether reading reached end of file and the lzo engine has to be reset to uncompress further data
+	char *lzo_compressed;      ///< compressed data just read or about to be written
+	char *lzo_wrkmem;          ///< work memory for LZO library
 
         generic_file *compressed;
         bool compressed_owner;

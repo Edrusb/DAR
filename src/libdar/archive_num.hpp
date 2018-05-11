@@ -21,7 +21,7 @@
 
     /// \file archive_num.hpp
     /// \brief class storing the position of an archive inside a database
-    /// \ingroup Private
+    /// \ingroup API
 
 
 #ifndef ARCHIVE_NUM_HPP
@@ -35,10 +35,11 @@
 namespace libdar
 {
 
-	/// \ingroup Private
+	/// \addtogroup API
 	/// @{
 
 	/// class archive_num stores the position of an archive inside a dar_manager database
+
     class archive_num
     {
     public:

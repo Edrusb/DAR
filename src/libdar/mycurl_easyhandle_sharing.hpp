@@ -19,6 +19,10 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
+    /// \file mycurl_easyhandle_sharing.hpp
+    /// \brief used to optimize network session establised by libcurl
+    /// \ingroup Private
+
 #ifndef MYCURL_EASYHANDLE_SHARING_HPP
 #define MYCURL_EASYHANDLE_SHARING_HPP
 

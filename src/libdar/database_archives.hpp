@@ -20,8 +20,9 @@
 /*********************************************************************/
 
     /// \file database_archives.hpp
-    /// \brief this file stores the list of archive a database has been built from
-    /// \ingroup API
+    /// \brief this file stores the list of archives a database has been built from.
+    /// it is part of the database header
+    /// \ingroup Private
 
 
 #ifndef DATABASE_ARCHIVE_HPP
@@ -34,6 +35,12 @@
 
 namespace libdar
 {
+
+	/// \addtogroup Private
+        /// @{
+
+	/// datastructure managing a member of the list of archives used by a database
+
     class database_archives
     {
     public:
@@ -55,8 +62,13 @@ namespace libdar
 	std::string base;
     };
 
-	// index 0 is not used, list starts at index 1
+	/// list of archives found in a database
+
+	/// \note index 0 is not used, list starts at index 1
     using database_archives_list = std::deque<database_archives>;
+
+
+	/// @}
 
 } // end of namespace
 

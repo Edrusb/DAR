@@ -33,7 +33,6 @@
     /// respectively. External applications like webdar can implement entrepot_ftp
     /// and fichier_ftp classes to provide transparent access to dar backup localted on a
     /// remote ftp server. More can follow in the future.
-
     /// \ingroup Private
 
 #ifndef ENTREPOT_HPP
@@ -98,7 +97,7 @@ namespace libdar
 	const std::string & get_group_ownership() const { return group; };
 
 	    /// defines the way to open a file and return a "class fichier_global" object as last argument upon success
-	    ///
+
 	    /// \param[in] dialog for user interaction
 	    /// \param[in] filename is the full path+name of the file to open (read/create/write to)
 	    /// \param[in] mode defines which way to open the file (read-only, read-write or write-only)

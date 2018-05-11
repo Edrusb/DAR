@@ -36,6 +36,9 @@
 namespace libdar
 {
 
+        /// \addtogroup Private
+        /// @{
+
 	/// trontextual class is a contextual class tronc, that's all.
 
     class trontextual : public tronc, public contextual
@@ -53,10 +56,12 @@ namespace libdar
 	virtual const label & get_data_name() const override { if(ref == nullptr) throw SRC_BUG; return ref->get_data_name(); };
 
     private:
-	contextual *ref;   //< this is just a pointer to data owned by the inherited class tronc part of this object
+	contextual *ref;   ///< this is just a pointer to data owned by the inherited class tronc part of this object
 
 	void init(generic_file *f);
     };
+
+	/// @}
 }
 
 #endif

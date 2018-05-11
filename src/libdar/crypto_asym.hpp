@@ -42,8 +42,10 @@ extern "C"
 
 namespace libdar
 {
-	/// \ingroup Private
-	/// @}
+	/// \addtogroup Private
+	/// @{
+
+	/// asymetric ciphering
 
     class crypto_asym : public mem_ui
     {
@@ -72,7 +74,7 @@ namespace libdar
 	void set_signatories(const std::vector<std::string> & signatories);
 
 	    /// encrypt (and sign if signatures have been given using set_signatories) data for the given recipients
-	    ///
+
 	    /// \param[in] recipients_email list of email of recipient that will be able to read the encrypted data
 	    /// \param[in] clear where to read from clear data to be encrypted (the object must be readable)
 	    /// \param[out] ciphered where to write down encrypted data (the object must be writable)
@@ -80,7 +82,7 @@ namespace libdar
 	void encrypt(const std::vector<std::string> & recipients_email, generic_file & clear, generic_file & ciphered);
 
 	    /// un-cipher data
-	    ///
+
 	    /// \param[in] ciphered contains the encrypted data to decipher
 	    /// \param[out] clear resulting un-ciphered (thus clear) data (the object must be readable)
 	    /// \note this assumes the GnuPG keyring has an appropriated private key (the objet must be writable)
@@ -100,12 +102,12 @@ namespace libdar
 	bool has_signatories;
 	std::list<signator> signing_result;
 #if GPGME_SUPPORT
-	gpgme_ctx_t context;                     //< GPGME context
+	gpgme_ctx_t context;                     ///< GPGME context
 
 	void release_context() { gpgme_release(context); };
-	void build_key_list(const std::vector<std::string> & recipients_email,  //< list of email to find a key for
-			    gpgme_key_t * & ciphering_keys,                     //< resulting nullptr terminated list of keys
-			    bool signatories);                                  //< false if email key need encryption capability, true for signing
+	void build_key_list(const std::vector<std::string> & recipients_email,  ///< list of email to find a key for
+			    gpgme_key_t * & ciphering_keys,                     ///< resulting nullptr terminated list of keys
+			    bool signatories);                                  ///< false if email key need encryption capability, true for signing
 	void release_key_list(gpgme_key_t * & ciphering_keys);
 	void fill_signing_result();
 #else

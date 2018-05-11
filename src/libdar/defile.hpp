@@ -33,8 +33,8 @@
 namespace libdar
 {
 
-	/// \ingroup Private
-	/// @}
+	/// \addtogroup Private
+	/// @{
 
 	/// the defile class keep trace of the real path of files while the flow in the filter routines
 
@@ -43,7 +43,6 @@ namespace libdar
 	/// of the current inode, all previously passed inode must be known.
 	/// this class is used to display the progression of the filtering routing,
 	/// and the file on which the filtering routine operates
-	/// \ingroup Private
     class defile
     {
     public :
@@ -60,10 +59,10 @@ namespace libdar
 	const std::string & get_string_without_root() const;
 
     private :
-        path chemin; //< current path
-        bool init;   //< true if reached the "root" (all pushed arguments have been poped)
-	mutable enum { none, full, without_root } cache_set; //< whether cache is accurate
-	mutable std::string cache; //< cache of "chemin" converted into string
+        path chemin; ///< current path
+        bool init;   ///< true if reached the "root" (all pushed arguments have been poped)
+	mutable enum { none, full, without_root } cache_set; ///< whether cache is accurate
+	mutable std::string cache; ///< cache of "chemin" converted into string
     };
 
 	/// @}

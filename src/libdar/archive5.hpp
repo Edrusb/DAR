@@ -35,6 +35,11 @@
 
 namespace libdar5
 {
+
+        /// \addtogroup API5
+        /// @{
+
+
 	// from archive_options.hpp
     using libdar::path;
     using libdar::statistics;
@@ -188,6 +193,8 @@ namespace libdar5
 				     const libdar::list_entry & entry,
 				     void *context);
     };
+
+	/// @}
 
 } // end of namespace
 

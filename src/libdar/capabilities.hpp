@@ -32,14 +32,15 @@
 
 namespace libdar
 {
-	/// \addtogroup API
+	/// \addtogroup Private
 	/// @{
 
-	// return from the EFFECTIVE set the value of the associated capability for the calling thread
+	/// the EFFECTIVE set the value of the associated capability for the calling thread
 
-    enum capa_status { capa_set,       //< current thread has the requested capability
-		       capa_clear,     //< current thread has not the requested capability
-		       capa_unknown }; //< impossible to determine whether the current thread has the requested capability
+	/// returned by the capability_* routines
+    enum capa_status { capa_set,       ///< current thread has the requested capability
+		       capa_clear,     ///< current thread has not the requested capability
+		       capa_unknown }; ///< impossible to determine whether the current thread has the requested capability
 
     extern capa_status capability_LINUX_IMMUTABLE(user_interaction & ui, bool verbose);
 

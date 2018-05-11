@@ -47,9 +47,10 @@ namespace libdar
     class cat_mirage : public cat_nomme
     {
     public:
-	enum mirage_format {fmt_mirage,           //< new format
-			    fmt_hard_link,        //< old dual format
-			    fmt_file_etiquette }; //< old dual format
+	    /// format of mirage
+	enum mirage_format {fmt_mirage,           ///< new format
+			    fmt_hard_link,        ///< old dual format
+			    fmt_file_etiquette }; ///< old dual format
 
 	cat_mirage(const std::string & name, cat_etoile *ref): cat_nomme(name, saved_status::saved) { dup_on(ref); };
 	cat_mirage(const std::shared_ptr<user_interaction> & dialog,

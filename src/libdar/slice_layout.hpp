@@ -36,6 +36,8 @@
 
 namespace libdar
 {
+	/// \addtogroup Private
+	/// @{
 
     class slice_layout
     {
@@ -50,18 +52,18 @@ namespace libdar
 	    // field still exposed (slice_layout was a struct before being a class)
 	    // we keep these fields as is for now
 
-	infinint first_size;         //< size of the first slice
-	infinint other_size;         //< maximum size of other slices
-	infinint first_slice_header; //< size of the slice header in the first slice
-	infinint other_slice_header; //< size of the slice header in the other slices
-	bool older_sar_than_v8;      //< true if the archive format is older than version 8
+	infinint first_size;         ///< size of the first slice
+	infinint other_size;         ///< maximum size of other slices
+	infinint first_slice_header; ///< size of the slice header in the first slice
+	infinint other_slice_header; ///< size of the slice header in the other slices
+	bool older_sar_than_v8;      ///< true if the archive format is older than version 8
 
 	void read(generic_file & f);
 	void write(generic_file & f) const;
 	void clear();
 
 	    /// given a slice_layout and a archive offset, provides the corresponding slice and slice offset
-	    ///
+
 	    /// \param[in] sl slice_layout
 	    /// \param[in] offset input offset as if all slices were sticked toghether
 	    /// \param[out] slice_num slice number where to find the given offset
@@ -74,6 +76,8 @@ namespace libdar
 	static const char OLDER_THAN_V8 = '7';
 	static const char V8 = '8';
     };
+
+	/// @}
 
 } // end of namespace
 

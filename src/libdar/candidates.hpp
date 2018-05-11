@@ -38,8 +38,10 @@
 namespace libdar
 {
 
-	/// \ingroup API
-	/// @}
+	/// \addtogroup Private
+	/// @{
+
+	///helper class for data_tree
 
     	class candidates
 	{

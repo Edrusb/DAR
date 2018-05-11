@@ -21,7 +21,7 @@
 
     /// \file real_infinint.hpp
     /// \brief the original infinint class implementation
-    /// \ingroup Private
+    /// \ingroup API
     ///
     /// the infinint class implementation defined in this module can
     /// handle arbitrary large positive integer numbers
@@ -49,10 +49,12 @@ extern "C"
 
 namespace libdar
 {
+	/// \addtogroup API
+        /// @{
+
 	/// the arbitrary large positive integer class
 
 	/// can only handle positive integer numbers
-	/// \ingroup Private
     class infinint
     {
     public :
@@ -110,18 +112,22 @@ namespace libdar
         U_32 operator % (U_32 arg) const
 	{ return modulo(arg); };
 
-            // increment the argument up to a legal value for its storage type and decrement the object in consequence
-            // note that the initial value of the argument is not ignored !
-            // when the object is null the value of the argument is unchanged
+	    /// convert infinint to standard interger types
+
+            /// \note increment the argument up to a legal value for
+	    /// its storage type and decrement the object in consequence
+            /// note that the initial value of the argument is not ignored!
+            /// when the object is null the value of the argument is unchanged
         template <class T>void unstack(T &v)
 	{ infinint_unstack_to(v); }
 
+	    /// it returns number of byte of information necessary to store the integer
 	infinint get_storage_size() const noexcept { return field->size(); };
-	    // it returns number of byte of information necessary to store the integer
 
+	    /// return in little endian order the information byte storing the integer
 	unsigned char operator [] (const infinint & position) const;
-	    // return in little endian order the information byte storing the integer
 
+	    /// \return true when the object is zero (more efficient than integer comparison)
 	bool is_zero() const;
 
         friend bool operator < (const infinint &, const infinint &);

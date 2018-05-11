@@ -51,14 +51,13 @@ extern "C"
 namespace libdar
 {
 
-	/// the available hashing algorithms
-	/// \ingroup API
-
-
 	/// \addtogroup Private
 	/// @{
 
+	/// convert hash value to human readable string
     extern std::string hash_algo_to_string(hash_algo algo);
+
+	/// manages the generation of a hash
 
     class hash_fichier : public fichier_global
     {
@@ -124,7 +123,7 @@ namespace libdar
     private:
 	fichier_global *ref;
 	fichier_global *hash_ref;
-	bool only_hash; //< if set, avoids copying data to file, only compute hash (debugging purpose)
+	bool only_hash; ///< if set, avoids copying data to file, only compute hash (debugging purpose)
 #if CRYPTO_AVAILABLE
 	gcry_md_hd_t hash_handle;
 #endif

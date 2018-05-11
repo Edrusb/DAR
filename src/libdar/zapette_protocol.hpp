@@ -19,6 +19,10 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
+    /// \file zapette_protocol.hpp
+    /// \brief protocol management between archive and libdar_slave classes
+    /// \ingroup Private
+
 #include "../my_config.h"
 
 #ifndef ZAPETTE_PROTOCOL_HPP
@@ -36,6 +40,9 @@ extern "C"
 
 namespace libdar
 {
+
+	/// \addtogroup Private
+        /// @{
 
     constexpr unsigned char ANSWER_TYPE_DATA = 'D';
     constexpr unsigned char ANSWER_TYPE_INFININT = 'I';
@@ -70,6 +77,8 @@ namespace libdar
         void write(generic_file *f, char *data); // slave side
         void read(generic_file *f, char *data, U_16 max);  // master side
     };
+
+	/// @}
 
 } // end of namespace
 

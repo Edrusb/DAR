@@ -22,7 +22,6 @@
     /// \file user_interaction.hpp
     /// \brief defines the interaction interface between libdar and users.
     /// \ingroup API
-    ///
 
 #ifndef USER_INTERACTION_HPP
 #define USER_INTERACTION_HPP
@@ -41,11 +40,9 @@ namespace libdar
 
 	/// This is a pure virtual class that is used by libdar when interaction with the user is required.
 
-	//! You can base your own class on it using C++ inheritance
-	//! or use the predifined inherited classes user_interaction_callback which implements
-	//! the interaction based on callback functions.
-
-	//! \ingroup API
+	/// You can base your own class on it using C++ inheritance
+	/// or use the predifined inherited classes user_interaction_callback which implements
+	/// the interaction based on callback functions.
     class user_interaction
     {
     public:
@@ -66,13 +63,13 @@ namespace libdar
 
 	    /// libdar uses this call to format output before send to message() method.
 
-	    //! This is not a virtual method, it has not to be overwritten, it is
-	    //! just a sublayer over warning()
-	    //! Supported masks for the format string are:
-	    //! - \%s \%c \%d \%\%  (normal behavior)
-	    //! - \%i (matches infinint *)
-	    //! - \%S (matches std::string *)
-	    //! .
+	    /// This is not a virtual method, it has not to be overwritten, it is
+	    /// just a sublayer over warning()
+	    /// Supported masks for the format string are:
+	    /// - \%s \%c \%d \%\%  (normal behavior)
+	    /// - \%i (matches infinint *)
+	    /// - \%S (matches std::string *)
+	    /// .
 	virtual void printf(const char *format, ...);
 
 
@@ -113,7 +110,6 @@ namespace libdar
 
 
     };
-
 
 	/// @}
 

@@ -36,6 +36,7 @@ namespace libdar
 	/// @{
 
 	/// how to detect data has changed when some fields
+
     enum class modified_data_detection
     {
 	any_inode_change, ///< historical behavior, resave an inode on any metadata change
@@ -44,6 +45,7 @@ namespace libdar
 
 
 	/// how to consider file change during comparison and incremental backup
+
     enum class comparison_fields
     {
 	all,          ///< consider any available field for comparing inodes
@@ -51,6 +53,8 @@ namespace libdar
 	mtime,        ///< consider any available field except ownership and permission fields
 	inode_type    ///< only consider the file type
     };
+
+	/// hashing algorithm available
 
     enum class hash_algo
     {

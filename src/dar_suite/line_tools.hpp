@@ -87,7 +87,7 @@ void line_tools_split_at_first_space(const char *field, std::string & before_spa
 void line_tools_get_min_digits(std::string arg, infinint & num, infinint & ref_num, infinint & aux_num);
 
     /// test the presence of a set of argument on the command line
-    ///
+
     /// \param[in] arguments is the list of options to look for
     /// \param[in] argc is the number of argument on the command line
     /// \param[in] argv is the list of arguments on the command line
@@ -109,7 +109,7 @@ extern void line_tools_look_for(const std::deque<char> & arguments,
 
 
     /// test the presence of -Q and -j options on the command line
-    ///
+
     /// \param[in] argc is the number of argument on the command line
     /// \param[in] argv is the list of arguments on the command line
     /// \param[in] getopt_string is the parsing string to pass to getopt
@@ -176,11 +176,11 @@ extern void line_tools_crypto_split_algo_pass(const secu_string & all,
     /// display information about the signatories
 extern void line_tools_display_signatories(user_interaction & ui, const std::list<signator> & gnupg_signed);
 
-	/// Extract from anonymous pipe a tlv_list
+    /// Extract from anonymous pipe a tlv_list
 
-	/// \param[in,out] dialog for user interaction
-	/// \param[in] fd the filedescriptor for the anonymous pipe's read extremity
-	/// \param[out] result the resulting tlv_list
+    /// \param[in,out] dialog for user interaction
+    /// \param[in] fd the filedescriptor for the anonymous pipe's read extremity
+    /// \param[out] result the resulting tlv_list
 extern void line_tools_read_from_pipe(std::shared_ptr<user_interaction> & dialog, S_I fd, tlv_list & result);
 
     /// extracts the basename of a file (removing path part)

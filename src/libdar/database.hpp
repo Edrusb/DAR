@@ -41,12 +41,15 @@
 
 namespace libdar
 {
+
+	/// \addtogroup API
+        /// @{
+
 	/// the database class defines the dar_manager database
 
 	/// all operations for a dar_manager database are defines through the
 	/// use of this class interface. This class also defines internally
 	/// the data structure of the database.
-	/// \ingroup API
     class database: public mem_ui
     {
     public:
@@ -231,25 +234,27 @@ namespace libdar
 	    /// holds the archive used to create the database
 	struct archive_data
 	{
-	    std::string chemin;      //< path to the archive
-	    std::string basename;    //< basename of the archive
-	    datetime root_last_mod;  //< last modification date of the root directory
+	    std::string chemin;      ///< path to the archive
+	    std::string basename;    ///< basename of the archive
+	    datetime root_last_mod;  ///< last modification date of the root directory
 	};
 
-	std::deque<struct archive_data> coordinate;  //< list of archive used to build the database
-	std::vector<std::string> options_to_dar;     //< options to use when calling dar for restoration
-	std::string dar_path;                        //< path to dar
-	data_dir *files;                             //< structure containing files and their status in the set of archive used for that database (is set to nullptr in partial mode)
-	storage *data_files;                         //< when reading archive in partial mode, this is where is located the "not readed" part of the archive (is set to nullptr in partial-read-only mode)
-	bool check_order_asked;                      //< whether order check has been asked
-	unsigned char cur_db_version;                //< current db version (for informational purposes)
-	compression algo;                            //< compression used/to use when writing down the base to file
+	std::deque<struct archive_data> coordinate;  ///< list of archive used to build the database
+	std::vector<std::string> options_to_dar;     ///< options to use when calling dar for restoration
+	std::string dar_path;                        ///< path to dar
+	data_dir *files;                             ///< structure containing files and their status in the set of archive used for that database (is set to nullptr in partial mode)
+	storage *data_files;                         ///< when reading archive in partial mode, this is where is located the "not readed" part of the archive (is set to nullptr in partial-read-only mode)
+	bool check_order_asked;                      ///< whether order check has been asked
+	unsigned char cur_db_version;                ///< current db version (for informational purposes)
+	compression algo;                            ///< compression used/to use when writing down the base to file
 
-	void build(generic_file & f, bool partial, bool read_only, unsigned char db_version);  //< used by constructors
+	void build(generic_file & f, bool partial, bool read_only, unsigned char db_version);  ///< used by constructors
 	archive_num get_real_archive_num(archive_num num, bool revert) const;
 
 	const datetime & get_root_last_mod(const archive_num & num) const;
     };
+
+	/// @}
 
 } // end of namespace
 

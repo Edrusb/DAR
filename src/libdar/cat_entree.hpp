@@ -55,11 +55,12 @@ namespace libdar
 
 
 	/// the root class from all other inherite for any entry in the catalogue
+
     class cat_entree
     {
     public :
 	    /// read and create an object of inherited class of class cat_entree
-	    ///
+
 	    /// \param[in] dialog for user interaction
 	    /// \param[in] f where from to read data in order to create the object
 	    /// \param[in] reading_ver archive version format to use for reading
@@ -83,7 +84,7 @@ namespace libdar
 	cat_entree(saved_status val): xsaved(val) {};
 
 	    /// setup an object when read from an archive
-	    ///
+
 	    /// \param[in] pdesc points to an existing stack that will be read from to setup fields of inherited classes,
 	    /// this pointed to pile object must survive the whole life of the cat_entree object
 	    /// \param[in] small whether a small or a whole read is to be read, (inode has been dump() with small set to true)
@@ -119,19 +120,19 @@ namespace libdar
 	bool same_as(const cat_entree & ref) const { return true; };
 
 	    /// write down the object information to a stack
-	    ///
+
 	    /// \param[in,out] pdesc is the stack where to write the data to
 	    /// \param[in] small defines whether to do a small or normal dump
         void dump(const pile_descriptor & pdesc, bool small) const;
 
 	    /// this call gives an access to inherited_dump
-	    ///
+
 	    /// \param[in,out] pdesc is the stack where to write the data to
 	    /// \param[in] small defines whether to do a small or normal dump
 	void specific_dump(const pile_descriptor & pdesc, bool small) const { inherited_dump(pdesc, small); };
 
 	    /// let inherited classes build object's data after CRC has been read from file in small read mode
-	    ///
+
 	    /// \param[in] pdesc stack to read the data from
 	    /// \note used from cat_entree::read to complete small read
 	    /// \note this method is called by cat_entree::read and mirage::post_constructor only when contructing an object with small set to true
@@ -146,12 +147,16 @@ namespace libdar
 	    /// a way to copy the exact type of an object even if pointed to by a parent class pointer
         virtual cat_entree *clone() const = 0;
 
-	    /// for archive merging, will let the object drop EA, FSA and Data to an alternate stack than the one it has been read from
-	    ///
-	    /// \note this is used when cloning an object from a catalogue to provide a merged archive. Such cloned object must point
+	    /// for archive merging, will let the object drop EA, FSA and Data
+	    /// to an alternate stack than the one it has been read from
+
+	    /// \note this is used when cloning an object from a catalogue to provide a
+	    /// merged archive. Such cloned object must point
 	    /// the stack of the archive under construction, so we use this call for that need,
-	    /// \note this is also used when opening a catalogue if an isolated catalogue in place of the internal catalogue of an archive
-	    /// \note this method is virtual in order for cat_directory to overwrite it and propagate the change to all entries of the directory tree
+	    /// \note this is also used when opening a catalogue if an isolated
+	    /// catalogue in place of the internal catalogue of an archive
+	    /// \note this method is virtual in order for cat_directory to
+	    /// overwrite it and propagate the change to all entries of the directory tree
 	    /// as well for mirage to propagate the change to the hard linked inode
 	virtual void change_location(const smart_pointer<pile_descriptor> & pdesc);
 
@@ -181,14 +186,14 @@ namespace libdar
 	pile *get_pile() const { return pdesc.is_null() ? nullptr : pdesc->stack; };
 
 	    /// compressor generic_file relative methods
-	    ///
+
 	    /// \note CAUTION: the pointer to object is member of the get_pile() stack and may be managed by another thread
 	    /// all precaution like get_pile()->flush_read_above(get_compressor_layer() shall be take to avoid
 	    /// concurrent access to the compressor object by the current thread and the thread managing this object
 	compressor *get_compressor_layer() const { return pdesc.is_null() ? nullptr : pdesc->compr; };
 
 	    /// escape generic_file relative methods
-	    ///
+
 	    /// \note CAUTION: the pointer to object is member of the get_pile() stack and may be managed by another thread
 	    /// all precaution like get_pile()->flush_read_above(get_escape_layer() shall be take to avoid
 	    /// concurrent access to the compressor object by the current thread and the thread managing this object
@@ -200,7 +205,7 @@ namespace libdar
     private:
 	static const U_I ENTREE_CRC_SIZE;
 
-	saved_status xsaved;     //< inode data status, this field is stored with signature() in the cat_signature field -> must be managed by cat_entree
+	saved_status xsaved;     ///< inode data status, this field is stored with signature() in the cat_signature field -> must be managed by cat_entree
 	smart_pointer<pile_descriptor> pdesc;
     };
 

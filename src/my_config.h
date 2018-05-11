@@ -19,6 +19,10 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
+    /// \file my_config.h
+    /// \brief include macro defined by the configure script and some specific additional ones
+    /// \ingroup Private
+
 #ifndef MY_CONFIG_H
 #define MY_CONFIG_H
 

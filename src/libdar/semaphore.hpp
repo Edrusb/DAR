@@ -60,7 +60,6 @@ namespace libdar
 	/// method, before eventually saving the file, and call the lower() method only for files that had to
 	/// be saved once the backup is completed, may it be normally or due to an exception being thrown.
 
-
     class semaphore : public mem_ui
     {
     public:
@@ -97,7 +96,8 @@ namespace libdar
 	    /// all file has to be given to this call, even the eod objects
 	    /// \param[in] path is the full path to the object
 	    /// \param[in] object is the object about to be saved
-	    /// \param[in] data_to_save tells whether this entry will have to be saved or just recursed into (directory for example)
+	    /// \param[in] data_to_save tells whether this entry will have to
+	    /// be saved or just recursed into (directory for example)
 	    /// \note, if data_to_save is true, the lower() method is expected to be used
 	    /// before a next call to raise. For a directory this is only the call to lower()
 	    /// of the matching EOD that will trigger the hook execution in the "end" context.
@@ -110,14 +110,14 @@ namespace libdar
 	void lower();
 
     private:
-	infinint count;       //< is the number of subdirectories currently saved in the last directory that matched the mask
-	std::string chem;     //< path of the file that has to be call in the "end" context when count will drop to zero
-	std::string filename; //< filename of that same file
-	infinint uid;         //< UID of that same file
-	infinint gid;         //< GID of that same file
-	unsigned char sig;    //< object type
-	std::string execute;  //< command to execute
-	const mask *match;    //< for which file to run the execute command
+	infinint count;       ///< is the number of subdirectories currently saved in the last directory that matched the mask
+	std::string chem;     ///< path of the file that has to be call in the "end" context when count will drop to zero
+	std::string filename; ///< filename of that same file
+	infinint uid;         ///< UID of that same file
+	infinint gid;         ///< GID of that same file
+	unsigned char sig;    ///< object type
+	std::string execute;  ///< command to execute
+	const mask *match;    ///< for which file to run the execute command
 
 	void nullifyptr() noexcept { match = nullptr; };
 	std::string build_string(const std::string & context);

@@ -43,14 +43,13 @@
 namespace libdar
 {
 
-	/// \ingroup Private
+	/// \addtogroup Private
 	/// @{
 
 	/// the data_tree class stores presence of a given file in a set of archives
 
 	/// the data associated to a given file are the different modification dates
 	/// that this file has been found in the archive the database has been feed by
-	/// \ingroup Private
     class data_tree
     {
     public:

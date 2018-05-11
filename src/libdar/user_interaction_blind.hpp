@@ -24,7 +24,7 @@
     /// \note yes blind people do communicate, no offense to them, this class just
     /// "blindly" answer and do never show messages to a particular user
     /// \ingroup API
-    ///
+
 
 #ifndef USER_INTERACTION_BLIND_HPP
 #define USER_INTERACTION_BLIND_HPP

@@ -19,8 +19,8 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \file crypto.hpp
-    /// \brief the crypto algoritm definition
+    /// \file crypto_sym.hpp
+    /// \brief class crypto_sym for symetrical cipherings
     /// \ingroup Private
 
 #ifndef CRYPTO_SYM_HPP
@@ -46,8 +46,8 @@ extern "C"
 namespace libdar
 {
 
-	/// \ingroup Private
-	/// @}
+	/// \addtogroup Private
+	/// @{
 
     inline bool crypto_min_ver_libgcrypt_no_bug()
     {
@@ -58,8 +58,8 @@ namespace libdar
 #endif
     }
 
-	/// inherited class from tronconneuse class
-	/// \ingroup Private
+	/// symetrical strong encryption, interface to grypt library
+
     class crypto_sym : public tronconneuse
     {
     public:
@@ -97,26 +97,26 @@ namespace libdar
 
     private:
 #if CRYPTO_AVAILABLE
-	gcry_cipher_hd_t clef;       //< used to encrypt/decrypt the data
-	gcry_cipher_hd_t essiv_clef; //< used to build the Initialization Vector
+	gcry_cipher_hd_t clef;       ///< used to encrypt/decrypt the data
+	gcry_cipher_hd_t essiv_clef; ///< used to build the Initialization Vector
 #endif
-	size_t algo_block_size;         //< the block size of the algorithm (main key)
-	unsigned char *ivec;            //< algo_block_size allocated in secure memory to be used as Initial Vector
-	U_I algo_id;                    //< algo ID in libgcrypt
+	size_t algo_block_size;         ///< the block size of the algorithm (main key)
+	unsigned char *ivec;            ///< algo_block_size allocated in secure memory to be used as Initial Vector
+	U_I algo_id;                    ///< algo ID in libgcrypt
 
 	void detruit();
 
 	    /// creates a blowfish key using as key a SHA1 of the given string (no IV assigned)
-	    ///
+
 	    /// \note such key is intended to be used to generate IV for the main key
 
 #if CRYPTO_AVAILABLE
-	static void dar_set_essiv(const secu_string & key,       //< the key to base the essiv on
-				  gcry_cipher_hd_t & IVkey,      //< assign essiv from the given (hash) string
-				  const archive_version & ver,   //< archive format we read or write
-				  crypto_algo main_cipher);      //< the choice of the algo for essiv depends on the cipher used for the main key
+	static void dar_set_essiv(const secu_string & key,       ///< the key to base the essiv on
+				  gcry_cipher_hd_t & IVkey,      ///< assign essiv from the given (hash) string
+				  const archive_version & ver,   ///< archive format we read or write
+				  crypto_algo main_cipher);      ///< the choice of the algo for essiv depends on the cipher used for the main key
 	    /// Fills up a new initial vector based on a reference and and a encryption key
-	    ///
+
 	    /// \param[in] ref is the reference to base the IV on
 	    /// \param[in] ivec is the address where to drop down the new IV
 	    /// \param[in] size is the amount of data allocated at ivec address
@@ -128,10 +128,10 @@ namespace libdar
 			      const gcry_cipher_hd_t & IVkey);
 
 	    /// Create a hash string of requested length from a given password and interation cout
-	static secu_string pkcs5_pass2key(const secu_string & password,         //< human provided password
-					  const std::string & salt,             //< salt string
-					  U_I iteration_count,                  //< number of time to shake the melange
-					  U_I output_length);                   //< length of the string to return
+	static secu_string pkcs5_pass2key(const secu_string & password,         ///< human provided password
+					  const std::string & salt,             ///< salt string
+					  U_I iteration_count,                  ///< number of time to shake the melange
+					  U_I output_length);                   ///< length of the string to return
 
 	    /// converts libdar crypto algo designation to index used by libgcrypt
 	static U_I get_algo_id(crypto_algo algo);

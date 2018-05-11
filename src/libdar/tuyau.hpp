@@ -40,9 +40,10 @@
 namespace libdar
 {
 
-	/// pipe implementation under the generic_file interface.
+	/// \addtogroup Private
+	/// @{
 
-	/// \ingroup Private
+    	/// pipe implementation under the generic_file interface.
 
     class tuyau : public generic_file, public thread_cancellation, protected mem_ui
     {
@@ -62,8 +63,8 @@ namespace libdar
 	tuyau & operator = (tuyau && ref) noexcept = default;
         ~tuyau();
 
-	    // provides the reading end of the anonymous pipe when the current object has created it (no filedesc, no path given to constructor).
-	    // it cannot be called more than once.
+	    /// provides the reading end of the anonymous pipe when the current object has created it (no filedesc, no path given to constructor).
+	    /// \note this methid cannot be called more than once.
 	int get_read_fd() const;
 
 	    /// closes the read fd of the anonymous pipe (this is to be used by a writer)
@@ -94,18 +95,18 @@ namespace libdar
 	virtual void inherited_terminate() override;
 
     private:
-	enum                //< anonymous structure for pipe_mode field
+	enum                ///< anonymous structure for pipe_mode field
 	{
-	    pipe_fd,        //< holds a single file descriptor for the pipe
-	    pipe_path,      //< holds a filename to be openned (named pipe)
-	    pipe_both       //< holds a pair of file descriptors
-	} pipe_mode;        //< defines how the object's status (which possible values defined by the anonymous enum above)
-	infinint position;  //< recorded position in the stream
-	int filedesc;       //< file descriptors of the pipe
-	int other_end_fd;   //< in pipe_both mode, this holds the reading side of the anonymous pipe
-        std::string chemin; //< in pipe_path mode only, this holds the named pipe to be open
-	bool has_one_to_read; //< if true, the next char to read is placed in "next_to_read"
-	char next_to_read;  //< when has_one_to_read is true, contains the next to read byte
+	    pipe_fd,        ///< holds a single file descriptor for the pipe
+	    pipe_path,      ///< holds a filename to be openned (named pipe)
+	    pipe_both       ///< holds a pair of file descriptors
+	} pipe_mode;        ///< defines how the object's status (which possible values defined by the anonymous enum above)
+	infinint position;  ///< recorded position in the stream
+	int filedesc;       ///< file descriptors of the pipe
+	int other_end_fd;   ///< in pipe_both mode, this holds the reading side of the anonymous pipe
+        std::string chemin; ///< in pipe_path mode only, this holds the named pipe to be open
+	bool has_one_to_read; ///< if true, the next char to read is placed in "next_to_read"
+	char next_to_read;  ///< when has_one_to_read is true, contains the next to read byte
 
         void ouverture();
 
@@ -118,6 +119,8 @@ namespace libdar
 	    /// skip to eof by reading data
 	bool read_to_eof();
     };
+
+	/// @}
 
 } // end of namespace
 

@@ -75,7 +75,7 @@ namespace libdar
 
 	virtual ~filesystem_hard_link_read() = default;
 
-	    // get the last assigned number for a hard linked inode
+	    /// get the last assigned number for a hard linked inode
 	const infinint & get_last_etoile_ref() const { return etiquette_counter; };
 
 	    /// provide the FSA scope used by the object
@@ -91,16 +91,18 @@ namespace libdar
 	{ ignored_symlinks = x_ignored_symlinks; };
 
     protected:
-	    // reset the whole list of hard linked inodes (hard linked inode stay alive but are no more referenced by the current object)
+
+	    /// reset the whole list of hard linked inodes (hard linked inode stay alive but are no more referenced by the current object)
         void corres_reset() { corres_read.clear(); etiquette_counter = 0; };
 
-	    // create and return a libdar object corresponding to one pointed to by its path
-	    // during this operation, hard linked inode are recorded in a list to be easily pointed
-	    // to by a new reference to it.
-        cat_nomme *make_read_entree(path & lieu,               //< path of the file to read
-				    const std::string & name,  //< name of the file to read
-				    bool see_hard_link,        //< whether we want to detect hard_link and eventually return a cat_mirage object (not necessary when diffing an archive with filesystem)
-				    const mask & ea_mask);    //< which EA to consider when creating the object
+	    /// create and return a libdar object corresponding to one pointed to by its path
+	    /// during this operation, hard linked inode are recorded in a list to be easily pointed
+	    /// to by a new reference to it.
+        cat_nomme *make_read_entree(path & lieu,               ///< path of the file to read
+				    const std::string & name,  ///< name of the file to read
+				    bool see_hard_link,        ///< whether we want to detect hard_link and eventually return a cat_mirage object (not necessary when diffing an archive with filesystem)
+				    const mask & ea_mask       ///< which EA to consider when creating the object
+	    );
 
 	bool get_ask_before_zeroing_neg_dates() const { return ask_before_zeroing_neg_dates; };
     private:
@@ -109,9 +111,9 @@ namespace libdar
 
         struct couple
         {
-            nlink_t count;       //< counts the number of hard link on that inode that have not yet been found in filesystem, once this count reaches zero, the "couple" structure can be dropped and the "holder" too (no more expected hard links to be found)
-            cat_etoile *obj;         //< the address of the corresponding cat_etoile object for that inode
-	    cat_mirage holder;       //< it increments by one the obj internal counters, thus, while this object is alive, the obj will not be destroyed
+            nlink_t count;       ///< counts the number of hard link on that inode that have not yet been found in filesystem, once this count reaches zero, the "couple" structure can be dropped and the "holder" too (no more expected hard links to be found)
+            cat_etoile *obj;     ///< the address of the corresponding cat_etoile object for that inode
+	    cat_mirage holder;   ///< it increments by one the obj internal counters, thus, while this object is alive, the obj will not be destroyed
 
 	    couple(cat_etoile *ptr, nlink_t ino_count) : holder("FAKE", ptr) { count = ino_count; obj = ptr; };
         };

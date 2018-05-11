@@ -22,7 +22,6 @@
     /// \file generic_thread.hpp
     /// \brief class generic_thread provides a way to interact with a generic_file ran in an other thread
     /// \ingroup Private
-    ///
 
 
 #ifndef GENERIC_THREAD_HPP
@@ -37,21 +36,27 @@
 namespace libdar
 {
 
+	/// \addtogroup Private
+        /// @{
+
+	/// let a generic_file be managed by another thread
 
     class generic_thread : public generic_file
     {
     public:
 	    // default values for constuctor
-	static const unsigned int tampon_block_size = 102401;
-	static const unsigned int tampon_num_block = 1000;
-	static const unsigned int tampon_block_size_ctrl = 1024;
-	static const unsigned int tampon_num_block_ctrl = 10;
+	static constexpr unsigned int tampon_block_size = 102401;
+	static constexpr unsigned int tampon_num_block = 1000;
+	static constexpr unsigned int tampon_block_size_ctrl = 1024;
+	static constexpr unsigned int tampon_num_block_ctrl = 10;
 
 	    /// constructor
-	    ///
+
 	    /// \param[in] ptr is the generic_file that will be read from/written to by a separated thread
-	    /// \param[in] block_size is the size of block used to pass information to and from the remote thread
-	    /// \param[in] num_block maximum number of blocks that can be sent without being retrieved by the other threads
+	    /// \param[in] data_block_size is the size of block used to pass information to and from the remote thread
+	    /// \param[in] data_num_block maximum number of blocks that can be sent without being retrieved by the other threads
+	    /// \param[in] ctrl_block_size is the size of block used to pass control information between threads
+	    /// \param[in] ctrl_num_block is the max number of block on-fly for control information between threads
 	    /// \note that the pointed to generic_file must exist during the whole life of the generic_thread. Its memory
 	    /// management after the generic_thread has died is under the responsibility of the caller of the generic_thread
 	generic_thread(generic_file *ptr,
@@ -80,7 +85,7 @@ namespace libdar
 	virtual void inherited_write(const char *a, U_I size) override;
 
 	    /// generic_file inherited method to sync all pending writes
-	    ///
+
 	    /// \note no data in transit in this object so we should not do anything,
 	    /// however for performance propagating the order to slave_thread
 	virtual void inherited_sync_write() override;
@@ -94,11 +99,11 @@ namespace libdar
 	libthreadar::fast_tampon<char> toslave_ctrl;
 	libthreadar::fast_tampon<char> tomaster_ctrl;
 	slave_thread *remote;
-	bool reached_eof;     //< whether we reached end of file
-	char data_header;     //< contains 1 byte header for data
-	char data_header_eof; //< contains 1 byte header for data + eof
-	bool running;         //< whether a remote is expected to run, tid is then set
-	pthread_t tid;        //< thread id of remote
+	bool reached_eof;     ///< whether we reached end of file
+	char data_header;     ///< contains 1 byte header for data
+	char data_header_eof; ///< contains 1 byte header for data + eof
+	bool running;         ///< whether a remote is expected to run, tid is then set
+	pthread_t tid;        ///< thread id of remote
 
 	    // the following variables are locally used in quite all methods
 	    // they do not contain valuable information outside each method call
@@ -109,12 +114,12 @@ namespace libdar
 	label dataname;
 
 	void send_order();
-	void read_answer();   //< \note ptr must be released/recycled after this call
+	void read_answer();   ///< \note ptr must be released/recycled after this call
 	void check_answer(msg_type expected);
-	void wake_up_slave_if_asked(); //< check whether an order to wakeup the slave has been received, and send wake up the slave
+	void wake_up_slave_if_asked(); ///< check whether an order to wakeup the slave has been received, and send wake up the slave
 	void release_block_answer() { tomaster_ctrl.fetch_recycle(ptr); ptr = nullptr; };
 	void release_data_ptr();
-	void purge_data_pipe(); //< drops all data in the toslave_data pipe
+	void purge_data_pipe(); ///< drops all data in the toslave_data pipe
 	void my_run();
 	void my_join();
     };

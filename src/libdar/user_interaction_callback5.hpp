@@ -22,7 +22,6 @@
     /// \file user_interaction_callback5.hpp
     /// \brief API v5 backward compatible user_interaction_callback class
     /// \ingroup API5
-    ///
 
 #ifndef USER_INTERACTION_CALLBACK5_HPP
 #define USER_INTERACTION_CALLBACK5_HPP
@@ -40,9 +39,9 @@ namespace libdar5
 
 	/// full implemented class for user_interaction based on callback functions.
 
-	//! this class is an inherited class of user_interaction it is used by
-	//! dar command line programs, but you can use it if you wish.
-	//! \ingroup API5
+	/// this class is an inherited class of user_interaction it is used by
+	/// dar command line programs, but you can use it if you wish.
+	/// \ingroup API5
 
     class user_interaction_callback : public user_interaction
     {
@@ -50,16 +49,16 @@ namespace libdar5
 
 	    /// constructor which receive the callback functions.
 
-	    //! \param[in] x_warning_callback is used by warning() method
-	    //! \param[in] x_answer_callback is used by the pause() method
-	    //! \param[in] x_string_callback is used by get_string() method
-	    //! \param[in] x_secu_string_callback is used by get_secu_string() method
-	    //! \param[in] context_value will be passed as last argument of callbacks when
-	    //! called from this object.
-	    //! \note The context argument of each callback is set with the context_value given
-	    //! in the user_interaction_callback object constructor. The value can
-	    //! can be any arbitrary value (nullptr is valid), and can be used as you wish.
-	    //! Note that the listing callback is not defined here, but thanks to a specific method
+	    /// \param[in] x_warning_callback is used by warning() method
+	    /// \param[in] x_answer_callback is used by the pause() method
+	    /// \param[in] x_string_callback is used by get_string() method
+	    /// \param[in] x_secu_string_callback is used by get_secu_string() method
+	    /// \param[in] context_value will be passed as last argument of callbacks when
+	    /// called from this object.
+	    /// \note The context argument of each callback is set with the context_value given
+	    /// in the user_interaction_callback object constructor. The value can
+	    /// can be any arbitrary value (nullptr is valid), and can be used as you wish.
+	    /// Note that the listing callback is not defined here, but thanks to a specific method
 	user_interaction_callback(void (*x_warning_callback)(const std::string &x, void *context),
 				  bool (*x_answer_callback)(const std::string &x, void *context),
 				  std::string (*x_string_callback)(const std::string &x, bool echo, void *context),
@@ -114,9 +113,9 @@ namespace libdar5
 
 	    /// You can set a listing callback thanks to this method.
 
-	    //! If set, when file listing will this callback function will
-	    //! be used instead of the x_warning_callback given as argument
-	    //! of the constructor.
+	    /// If set, when file listing will this callback function will
+	    /// be used instead of the x_warning_callback given as argument
+	    /// of the constructor.
         void set_listing_callback(void (*callback)(const std::string & flag,
 						   const std::string & perm,
 						   const std::string & uid,
@@ -132,8 +131,7 @@ namespace libdar5
 	    set_use_listing(true); // this is to inform libdar to use listing()
 	};
 
-	    // You can set a dar_manager_show_files callback thanks to this method
-
+	    /// You can set a dar_manager_show_files callback thanks to this method
 	void set_dar_manager_show_files_callback(void (*callback)(const std::string & filename,
 								  bool available_data,
 								  bool available_ea,

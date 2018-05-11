@@ -21,7 +21,7 @@
 
     /// \file integers.hpp
     /// \brief are defined here basic integer types that tend to be portable
-    /// \ingroup Private
+    /// \ingroup API
 
 
 #ifndef INTEGERS_HPP
@@ -30,7 +30,7 @@
 #include "../my_config.h"
 #include <string>
 
-    /// \addtogroup Private
+    /// \addtogroup API
     /// @{
 
 #ifndef OS_BITS

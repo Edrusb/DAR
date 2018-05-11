@@ -59,11 +59,11 @@ namespace libdar
 			 const label & data_name);
 
 	    /// constructor to setup a escape_catalogue that will be fed by sequentially reading the archive
-        escape_catalogue(const std::shared_ptr<user_interaction> & dialog,        //< user interaction
-			 const pile_descriptor & x_pdesc,  //< stack descriptor where to write to
-			 const header_version & ver,       //< archive header version read
-			 const std::list<signator> & known_signatories, //< signatories that signed the archive header, to be compared with internal catalogue when reaching the end of the archive
-			 bool lax = false);                //< whether to use lax mode
+        escape_catalogue(const std::shared_ptr<user_interaction> & dialog,        ///< user interaction
+			 const pile_descriptor & x_pdesc,  ///< stack descriptor where to write to
+			 const header_version & ver,       ///< archive header version read
+			 const std::list<signator> & known_signatories, ///< signatories that signed the archive header, to be compared with internal catalogue when reaching the end of the archive
+			 bool lax = false);                ///< whether to use lax mode
         escape_catalogue(const escape_catalogue & ref) : catalogue(ref) { copy_from(ref); };
 	escape_catalogue(escape_catalogue && ref) = delete;
         escape_catalogue & operator = (const escape_catalogue &ref);
@@ -94,12 +94,12 @@ namespace libdar
     private:
 	enum state
 	{
-	    ec_init,   //< state in which no one file has yet been searched in the archive
-	    ec_marks,  //< state in which we find the next file using escape sequence marks
-	    ec_eod,    //< state in which the archive is missing trailing EOD entries, due to user interruption, thus returning EOD in enough number to get back to the root directory
-	    ec_signature, //< state in which we compare inline and internal catalogues
-	    ec_detruits,  //< state in which which detruits objects are returned from the catalogue
-	    ec_completed  //< state in which the escape_catalogue object is completed and has all information in memory as a normal catalogue
+	    ec_init,   ///< state in which no one file has yet been searched in the archive
+	    ec_marks,  ///< state in which we find the next file using escape sequence marks
+	    ec_eod,    ///< state in which the archive is missing trailing EOD entries, due to user interruption, thus returning EOD in enough number to get back to the root directory
+	    ec_signature, ///< state in which we compare inline and internal catalogues
+	    ec_detruits,  ///< state in which which detruits objects are returned from the catalogue
+	    ec_completed  ///< state in which the escape_catalogue object is completed and has all information in memory as a normal catalogue
 	};
 
 	smart_pointer<pile_descriptor> pdesc;
@@ -108,10 +108,10 @@ namespace libdar
 	bool x_lax;
 	std::map <infinint, cat_etoile *> corres;
         state status;
-	catalogue *cat_det;         //< holds the final catalogue's detruit objects when no more file can be read from the archive
-	infinint min_read_offset;   //< next offset in archive should be greater than that to identify a mark
-	infinint depth;             //< directory depth of archive being read sequentially
-	infinint wait_parent_depth; //< ignore any further entry while depth is less than wait_parent_depth. disabled is set to zero
+	catalogue *cat_det;         ///< holds the final catalogue's detruit objects when no more file can be read from the archive
+	infinint min_read_offset;   ///< next offset in archive should be greater than that to identify a mark
+	infinint depth;             ///< directory depth of archive being read sequentially
+	infinint wait_parent_depth; ///< ignore any further entry while depth is less than wait_parent_depth. disabled is set to zero
 
 	void set_esc_and_stack(const pile_descriptor & x_pdesc);
 	void copy_from(const escape_catalogue & ref);

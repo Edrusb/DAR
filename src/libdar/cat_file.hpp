@@ -44,20 +44,23 @@ namespace libdar
 
 
 	/// the plain file class
+
     class cat_file : public cat_inode
     {
     public :
+
+	    /// how to get data from archive
 	enum get_data_mode
 	{
-	    keep_compressed, //< provide access to compressed data
-	    keep_hole,       //< provide access to uncompressed data but sparse_file datastructure
-	    normal,          //< provide access to full data (uncompressed, uses skip() to restore holes)
-	    plain            //< provide access to plain data, no skip to restore holes, provide instead zeroed bytes
+	    keep_compressed, ///< provide access to compressed data
+	    keep_hole,       ///< provide access to uncompressed data but sparse_file datastructure
+	    normal,          ///< provide access to full data (uncompressed, uses skip() to restore holes)
+	    plain            ///< provide access to plain data, no skip to restore holes, provide instead zeroed bytes
 	};
 
-	static const U_8 FILE_DATA_WITH_HOLE = 0x01; //< file's data contains hole datastructure
-	static const U_8 FILE_DATA_IS_DIRTY = 0x02;  //< data modified while being saved
-	static const U_8 FILE_DATA_HAS_DELTA_SIG = 0x04; //< delta signature is present
+	static constexpr U_8 FILE_DATA_WITH_HOLE = 0x01;     ///< file's data contains hole datastructure
+	static constexpr U_8 FILE_DATA_IS_DIRTY = 0x02;      ///< data modified while being saved
+	static constexpr U_8 FILE_DATA_HAS_DELTA_SIG = 0x04; ///< delta signature is present
 
         cat_file(const infinint & xuid,
 		 const infinint & xgid,
@@ -82,7 +85,9 @@ namespace libdar
 	cat_file & operator = (cat_file && ref) = delete;
         ~cat_file() { detruit(); };
 
-        virtual bool has_changed_since(const cat_inode & ref, const infinint & hourshift, comparison_fields what_to_check) const override;
+        virtual bool has_changed_since(const cat_inode & ref,
+				       const infinint & hourshift,
+				       comparison_fields what_to_check) const override;
         infinint get_size() const { return *size; };
 	void change_size(const infinint & s) const { *size = s; };
         infinint get_storage_size() const { return *storage_size; };
@@ -92,7 +97,7 @@ namespace libdar
 	bool can_get_data() const { return get_saved_status() == saved_status::saved || get_saved_status() == saved_status::delta || status == from_path; };
 
 	    /// returns a newly allocated object in read_only mode
-	    ///
+
 	    /// \param[in] mode whether to return compressed, with hole or plain file
 	    /// \param[in,out] delta_sig if not nullptr, write to that file the delta signature of the file
 	    /// \param[in] delta_ref if not nullptr, use the provided signature to generate a delta binary
@@ -115,9 +120,9 @@ namespace libdar
 	virtual std::string get_description() const override { return "file"; };
 
         void set_crc(const crc &c);
-        bool get_crc(const crc * & c) const; //< the argument is set the an allocated crc object the owned by the "cat_file" object, its stay valid while this "cat_file" object exists and MUST NOT be deleted by the caller in any case
+        bool get_crc(const crc * & c) const; ///< the argument is set the an allocated crc object the owned by the "cat_file" object, its stay valid while this "cat_file" object exists and MUST NOT be deleted by the caller in any case
 	bool has_crc() const { return check != nullptr; };
-	bool get_crc_size(infinint & val) const; //< returns true if crc is know and puts its width in argument
+	bool get_crc_size(infinint & val) const; ///< returns true if crc is know and puts its width in argument
 	void drop_crc() { if(check != nullptr) { delete check; check = nullptr; } };
 
 	    // whether the plain file has to detect sparse file
@@ -178,7 +183,7 @@ namespace libdar
 	void will_have_delta_signature_available();
 
 	    /// write down to archive the given delta signature
-	    ///
+
 	    /// \param[in] sig is the signature to dump
 	    /// \param[in] where is the location where to write down the signature
 	    /// \param[in] small if set to true drop down additional information to allow sequential reading mode
@@ -188,7 +193,7 @@ namespace libdar
 	void dump_delta_signature(generic_file & where, bool small) const;
 
 	    /// fetch the delta signature from the archive
-	    ///
+
 	    /// \param[in] delta_sig is either nullptr or points to a newly allocated memory_file
 	    /// containing the delta signature. The caller has the duty to destroy this object after use
 	    /// \note nullptr is returned if the delta_signature only contains CRCs
@@ -217,18 +222,18 @@ namespace libdar
         enum { empty, from_path, from_cat } status;
 
     private:
-	std::string chemin;     //< path to the data (when read from filesystem)
-        infinint *offset;       //< start location of the data in 'loc'
-        infinint *size;         //< size of the data (uncompressed)
-        infinint *storage_size; //< how much data used in archive (after compression)
-        crc *check;             //< crc computed on the data
-	bool dirty;             //< true when a file has been modified at the time it was saved
-        compression algo_read;  //< which compression algorithm to use to read the file's data
-	compression algo_write; //< which compression algorithm to use to write down (merging) the file's data
-	bool furtive_read_mode; //< used only when status equals "from_path"
-	char file_data_status_read;  //< defines the datastructure to use when reading the data
-	char file_data_status_write; //< defines the datastructure to apply when writing down the data
-	cat_delta_signature *delta_sig; //< delta signature and associated CRC
+	std::string chemin;     ///< path to the data (when read from filesystem)
+        infinint *offset;       ///< start location of the data in 'loc'
+        infinint *size;         ///< size of the data (uncompressed)
+        infinint *storage_size; ///< how much data used in archive (after compression)
+        crc *check;             ///< crc computed on the data
+	bool dirty;             ///< true when a file has been modified at the time it was saved
+        compression algo_read;  ///< which compression algorithm to use to read the file's data
+	compression algo_write; ///< which compression algorithm to use to write down (merging) the file's data
+	bool furtive_read_mode; ///< used only when status equals "from_path"
+	char file_data_status_read;  ///< defines the datastructure to use when reading the data
+	char file_data_status_write; ///< defines the datastructure to apply when writing down the data
+	cat_delta_signature *delta_sig; ///< delta signature and associated CRC
 
 	void sub_compare_internal(const cat_inode & other,
 				  bool can_read_my_data,

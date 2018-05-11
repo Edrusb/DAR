@@ -75,9 +75,9 @@ namespace libdar
 	static const cat_inode *get_inode(const cat_nomme * arg);
     };
 
-	////////////////////////////////////////////////////////////
-	//////////// a set of criterium classes follows ////////////
-        ////////////////////////////////////////////////////////////
+	// //////////////////////////////////////////////////////////
+	// ////////// a set of criterium classes follows ////////////
+        // //////////////////////////////////////////////////////////
 
 
 	/// returns true if the first entry is an inode (whatever is the second)
@@ -152,7 +152,10 @@ namespace libdar
     };
 
 
-	/// returns true if the first entry is a inode with several hard links (whatever is the second entry) and also if this first entry is the first we meet that points to this hard linked inode
+	/// returns true if the first entry is a inode with several hard links
+	/// (whatever is the second entry) and also if this first entry is the first
+	/// we meet that points to this hard linked inode
+
     class crit_in_place_is_new_hardlinked_inode : public criterium
     {
     public:
@@ -190,7 +193,8 @@ namespace libdar
     };
 
 
-	/// returns true if the data of the first entry is more recent or of the same date as the fixed date given in argument to the constructor
+	/// returns true if the data of the first entry is more recent or of the same date as the fixed
+	/// date given in argument to the constructor
 
 	/// If the in_place entry is not an inode its date is considered equal to zero. Comparison is done on mtime
 
@@ -234,7 +238,8 @@ namespace libdar
 
 
 
-	/// returns true if the data of the first entry is saved int the archive (not marked as unchanged since the archive of reference)
+	/// returns true if the data of the first entry is saved int the archive
+	/// (not marked as unchanged since the archive of reference)
 
 	/// if the entry is not an inode the result is also true
 

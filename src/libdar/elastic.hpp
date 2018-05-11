@@ -36,10 +36,11 @@
 namespace libdar
 {
 
-	/// \ingroup Private
-	/// @}
+	/// \addtogroup Private
+	/// @{
 
 
+	/// reading direction of an elastic buffer
     enum elastic_direction { elastic_forward, elastic_backward };
 
 	/// the elastic buffer class
@@ -47,7 +48,6 @@ namespace libdar
 	/// the elastic class makes possible to insert arbritrary bytes beside information bytes, and to
 	/// retreive later without any other knowledge which bytes are information and which byte are from the
 	/// elastic buffer. The main purpose is for strong encryption
-	/// \ingroup Private
     class elastic
     {
     public:

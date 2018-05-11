@@ -44,12 +44,12 @@ namespace libdar
 
     struct pile_descriptor
     {
-	pile *stack;       //< the stack to read from or write to (should never be equal to nullptr)
-	escape *esc;       //< an escape layer in stack (may be nullptr)
-	compressor *compr; //< a compressor layer in stack (should never be equal to nullptr)
+	pile *stack;       ///< the stack to read from or write to (should never be equal to nullptr)
+	escape *esc;       ///< an escape layer in stack (may be nullptr)
+	compressor *compr; ///< a compressor layer in stack (should never be equal to nullptr)
 	pile_descriptor() { stack = nullptr; esc = nullptr; compr = nullptr; };
 	pile_descriptor(pile *ptr);
-	void check(bool small) const; //< check structure coherence with expected read/write mode (small or normal)
+	void check(bool small) const; ///< check structure coherence with expected read/write mode (small or normal)
     };
 	/// @}
 

@@ -73,7 +73,7 @@ namespace libdar
 
 
 	/// the cat_delta_signature file class
-	///
+
 	/// this class works in to implicit modes
 	/// - read mode
 	/// read the metadata from an archive the caller having knowing where to find it
@@ -88,7 +88,7 @@ namespace libdar
     {
     public:
 	    /// constructor reading the object METADATA (and also its DATA when in sequential mode) from an archive
-	    ///
+
 	    /// \param[in] f where to read the data from
 	    /// \param[in] sequential_read if true read the whole metadata+data as it was dropped in sequential read mode, else only read the metadata (found in a catalogue)
 	cat_delta_signature(generic_file & f, bool sequential_read);
@@ -114,12 +114,12 @@ namespace libdar
 	    /////////// method for read mode ///////////
 
 	    /// same action as the first constructor but on an existing object
-	    ///
+
 	    /// \note in sequential_read mode the data is also read
 	void read_metadata(generic_file & f, bool sequential_read);
 
 	    /// fetch data assuming the object has already read the metadata
-	    ///
+
 	    /// \note may be called several times if necessary to obtain_sig() another time
 	void read_data(generic_file & f);
 
@@ -127,14 +127,14 @@ namespace libdar
 	bool can_obtain_sig() { return !just_crc; };
 
 	    /// provide a memory_file object which the caller has the duty to destroy after use
-	    ///
+
 	    /// \note to obtain the sig data a second time, one must call read_data() again, then obtain_sig() should succeed
 	memory_file *obtain_sig();
 
 	    /////////// method for write mode ///////////
 
 	    /// give the object where to fetch from the delta signature, object must exist up to the next call to dump_data
-	    ///
+
 	    /// \note seg_sig_ref() must be called each time before invoking dump_data(), normally it is done once...
 
 	    /// for can_obtain_sig() to return true before the signature is provided
@@ -177,13 +177,13 @@ namespace libdar
 	void clear() { destroy(); init(); };
 
     private:
-	infinint delta_sig_offset;  //< where to read data from to setup "sig" (set to zero when read in sequential mode, sig is setup on-fly)
-	infinint delta_sig_size;    //< size of the data to setup "sig" (set to zero when reading in sequential mode, sig is then setup on-fly)
-	memory_file *sig;           //< the signature data, if set nullptr it will be fetched from f in direct access mode only
-	bool sig_is_ours;           //< whether sig has been created on our behalf or given as reference by another class
-	crc *patch_base_check;      //< associated CRC for the file this signature has been computed on
-	crc *patch_result_check;    //< associated CRC
-	bool just_crc;              //< whether a delta signature is present or just checksum are stored
+	infinint delta_sig_offset;  ///< where to read data from to setup "sig" (set to zero when read in sequential mode, sig is setup on-fly)
+	infinint delta_sig_size;    ///< size of the data to setup "sig" (set to zero when reading in sequential mode, sig is then setup on-fly)
+	memory_file *sig;           ///< the signature data, if set nullptr it will be fetched from f in direct access mode only
+	bool sig_is_ours;           ///< whether sig has been created on our behalf or given as reference by another class
+	crc *patch_base_check;      ///< associated CRC for the file this signature has been computed on
+	crc *patch_result_check;    ///< associated CRC
+	bool just_crc;              ///< whether a delta signature is present or just checksum are stored
 
 	void init() noexcept;
 	void copy_from(const cat_delta_signature & ref);

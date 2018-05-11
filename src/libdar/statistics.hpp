@@ -41,8 +41,6 @@ extern "C"
 #endif
 }
 
-    /// @{
-    /// \ingroup Private
 
 #if MUTEX_WORKS
 #define LOCK_IN pthread_mutex_lock(&lock_mutex)
@@ -58,6 +56,9 @@ extern "C"
 
 namespace libdar
 {
+
+        /// \addtogroup Private
+	/// @{
 
 	/// class used by libdar::archive class to give a summary of treated file during and after an operation
 
@@ -385,14 +386,14 @@ namespace libdar
 	    /// reset mutex and copy data from the object of reference
 	void copy_from(const statistics & ref);
 
-	    // std::move operation
+	    /// used by to implement move related operations
 	void move_from(statistics && ref) noexcept;
 
     };
 
 	/// @}
 
-} // end of namespace
 
+} // end of namespace
 
 #endif

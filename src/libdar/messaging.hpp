@@ -22,7 +22,6 @@
     /// \file messaging.hpp
     /// \brief messaging_decode and messaging_encode are used to insert messages in a flow of data blocks
     /// \ingroup Private
-    ///
 
 
 #ifndef MESSAGING_HPP
@@ -38,6 +37,11 @@
 
 namespace libdar
 {
+
+	/// \addtogroup Private
+        /// @{
+
+	///  the different types of messages
 
     enum class msg_type
     {
@@ -76,6 +80,7 @@ namespace libdar
     extern msg_type char2msg_type(char x);
     extern msg_type msg_continuation_of(msg_type x);
 
+	/// decoding received messages
 
     class messaging_decode
     {
@@ -122,6 +127,7 @@ namespace libdar
 
     };
 
+	/// encoding messages to be sent
 
     class messaging_encode
     {
@@ -176,6 +182,7 @@ namespace libdar
 
     };
 
+	/// @}
 
 } // end of namespace
 

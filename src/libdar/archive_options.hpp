@@ -56,6 +56,7 @@ namespace libdar
 
 
 	/// class holding optional parameters used to read an existing archive
+
     class archive_options_read
     {
     public:
@@ -83,6 +84,7 @@ namespace libdar
 
 
 	    /// defines the the crypto cypher to use to read the archive (default is crypto_none)
+
 	    /// \note since release 2.5.0 you may and should provide crypto_none in any case (the default value)
 	    /// for libdar uses the algorithm stored in the archive. However you way override this
 	    /// (in case of corruption for example) by explicitely specifying a crypto algorithm
@@ -266,6 +268,7 @@ namespace libdar
 	/////////////////////////////////////////////////////////
 
 	/// class holding optional parameters used to create an archive
+
     class archive_options_create
     {
     public:
@@ -305,7 +308,7 @@ namespace libdar
 	void set_warn_over(bool warn_over) { x_warn_over = warn_over; };
 
 	    /// defines whether the user needs detailed output of the operation
-	    ///
+
 	    /// \note in API 5.5.x and before this switch drove the displaying
 	    /// of processing messages and treated files. now it only drives the
 	    /// display of processing messages, use set_display_treated to define
@@ -313,7 +316,7 @@ namespace libdar
 	void set_info_details(bool info_details) { x_info_details = info_details; };
 
 	    /// defines whether to show treated files
-	    ///
+
 	    /// \param[in] display_treated true to display processed inodes
 	    /// \param[in] only_dir only display the current directory under process, not its individual files
 	void set_display_treated(bool display_treated, bool only_dir) { x_display_treated = display_treated; x_display_treated_only_dir = only_dir; };
@@ -378,6 +381,7 @@ namespace libdar
 	void set_crypto_size(U_32 crypto_size) { x_crypto_size = crypto_size; };
 
 	    /// set the list of recipients that will be able to read the archive
+
 	    /// \note this is based on GnuPG keyring and assumes the user running libdar has its keyring
 	    /// containing for each recipient a valid public key. If a list of recipient is given the crypto_pass
 	    /// (see above) is not used, but the crypto_algo stays used to encrypt the archive using a randomly generated key
@@ -492,6 +496,7 @@ namespace libdar
 	void set_user_comment(const std::string & comment) { x_user_comment = comment; };
 
 	    /// specify whether to produce a hash file of the slice and which hash algo to use
+
 	    /// \note the libdar::hash_algo data type is defined in hash_fichier.hpp, valid values
 	    /// are for examle libdar::hash_none, libdar::hash_md5, libdar::hash_sha1, libdar::hash_sha512...
 	void set_hash_algo(hash_algo hash) { x_hash = hash; };
@@ -515,7 +520,7 @@ namespace libdar
 	void set_multi_threaded(bool val) { x_multi_threaded = val; };
 
 	    /// whether binary delta has to be computed for differential/incremental backup
-	    ///
+
 	    /// \note this requires delta signature to be present in the archive of reference
 	void set_delta_diff(bool val) { if(val && !compile_time::librsync()) throw Ecompilation("librsync"); x_delta_diff = val; };
 
@@ -526,7 +531,7 @@ namespace libdar
 	void set_delta_mask(const mask & delta_mask);
 
 	    /// whether to never calculate delta signature for files which size is smaller or equal to the given argument
-	    ///
+
 	    /// \note by default a min size of 10 kiB is used
 	void set_delta_sig_min_size(const infinint & val) { x_delta_sig_min_size = val; };
 
@@ -534,7 +539,7 @@ namespace libdar
 	void set_auto_zeroing_neg_dates(bool val) { x_auto_zeroing_neg_dates = val; };
 
 	    /// provide a list of full path which if are symlinks will be considered as the inode they point to
-	    ///
+
 	    /// \note this is espetially intended for use with symlinks pointing to directories
 	    /// to have dar recursing in such pointed to directory instead of just recording that directory
 	void set_ignored_as_symlink(const std::set<std::string> & list) { x_ignored_as_symlink = list; };
@@ -610,9 +615,9 @@ namespace libdar
 	modified_data_detection get_modified_data_detection() const { return x_modified_data_detection; };
 
     private:
-	std::shared_ptr<archive> x_ref_arch; //< just contains the address of an existing object, no local copy of object is done here
-	mask * x_selection;  //< points to a local copy of mask (must be allocated / releases by the archive_option_create object)
-	mask * x_subtree;    //< points to a local copy of mask (must be allocated / releases by the archive_option_create objects)
+	std::shared_ptr<archive> x_ref_arch; ///< just contains the address of an existing object, no local copy of object is done here
+	mask * x_selection;  ///< points to a local copy of mask (must be allocated / releases by the archive_option_create object)
+	mask * x_subtree;    ///< points to a local copy of mask (must be allocated / releases by the archive_option_create objects)
 	bool x_allow_over;
 	bool x_warn_over;
 	bool x_info_details;
@@ -626,14 +631,14 @@ namespace libdar
 	U_I x_compression_level;
 	infinint x_file_size;
 	infinint x_first_file_size;
-	mask * x_ea_mask;    //< points to a local copy of mask (must be allocated / releases by the archive_option_create objects)
+	mask * x_ea_mask;    ///< points to a local copy of mask (must be allocated / releases by the archive_option_create objects)
 	std::string x_execute;
 	crypto_algo x_crypto;
 	secu_string x_pass;
 	U_32 x_crypto_size;
 	std::vector<std::string> x_gnupg_recipients;
 	std::vector<std::string> x_gnupg_signatories;
-	mask * x_compr_mask; //< points to a local copy of mask (must be allocated / releases by the archive_option_create objects)
+	mask * x_compr_mask; ///< points to a local copy of mask (must be allocated / releases by the archive_option_create objects)
 	infinint x_min_compr_size;
 	bool x_nodump;
 	std::string exclude_by_ea;
@@ -641,7 +646,7 @@ namespace libdar
 	infinint x_hourshift;
 	bool x_empty;
 	bool x_alter_atime;
-	bool x_old_alter_atime; //< used to backup origina alter_atime value when activating furtive read mode
+	bool x_old_alter_atime; ///< used to backup origina alter_atime value when activating furtive read mode
 	bool x_furtive_read;
 	bool x_same_fs;
 	bool x_snapshot;
@@ -692,6 +697,7 @@ namespace libdar
 	/////////////////////////////////////////////////////////
 
     	/// class holding optional parameters used to isolate an existing archive
+
     class archive_options_isolate
     {
     public:
@@ -920,7 +926,7 @@ namespace libdar
 	void set_overwriting_rules(const crit_action & overwrite);
 
 	    /// defines whether the user needs detailed output of the operation
-	    ///
+
 	    /// \note in API 5.5.x and before this switch drove the displaying
 	    /// of processing messages and treated files. now it only drives the
 	    /// display of processing messages, use set_display_treated to define
@@ -928,7 +934,7 @@ namespace libdar
 	void set_info_details(bool info_details) { x_info_details = info_details; };
 
 	    /// defines whether to show treated files
-	    ///
+
 	    /// \param[in] display_treated true to display processed inodes
 	    /// \param[in] only_dir only display the current directory under processing, not its individual files
 	void set_display_treated(bool display_treated, bool only_dir) { x_display_treated = display_treated; x_display_treated_only_dir = only_dir; };
@@ -1054,7 +1060,7 @@ namespace libdar
 	void set_delta_mask(const mask & delta_mask);
 
 	    /// whether to never calculate delta signature for files which size is smaller or equal to the given argument
-	    ///
+
 	    /// \note by default a min size of 10 kiB is used
 	void set_delta_sig_min_size(const infinint & val) { x_delta_sig_min_size = val; };
 

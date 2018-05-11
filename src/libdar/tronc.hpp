@@ -45,10 +45,10 @@ namespace libdar
     public :
 	    /// constructor
 
-	    //! \param f is the file to take the segment from
-	    //! \param offset is the position of the beginning of the segment
-	    //! \param size is the size of the segment
-	    //! \param own_f is true if this object has to owns and may destroy the 'f' object at tronc's destruction time
+	    /// \param f is the file to take the segment from
+	    /// \param offset is the position of the beginning of the segment
+	    /// \param size is the size of the segment
+	    /// \param own_f is true if this object has to owns and may destroy the 'f' object at tronc's destruction time
         tronc(generic_file *f, const infinint &offset, const infinint &size, bool own_f = false);
         tronc(generic_file *f, const infinint &offset, const infinint &size, gf_mode mode, bool own_f = false);
 
@@ -105,13 +105,13 @@ namespace libdar
 	virtual void inherited_terminate() override {if(own_ref) ref->terminate(); };
 
     private :
-        infinint start;    //< offset in the global generic file to start at
-	infinint sz;       //< length of the portion to consider
-        generic_file *ref; //< global generic file of which to take a piece
-        infinint current;  //< inside position of the next read or write
-	bool own_ref;      //< whether we own ref (and must destroy it when no more needed)
-	bool limited;      //< whether the sz argument is to be considered
-	bool check_pos;    //< whether to check and eventually adjust (seek) the position of the underlying layer at each read or write
+        infinint start;    ///< offset in the global generic file to start at
+	infinint sz;       ///< length of the portion to consider
+        generic_file *ref; ///< global generic file of which to take a piece
+        infinint current;  ///< inside position of the next read or write
+	bool own_ref;      ///< whether we own ref (and must destroy it when no more needed)
+	bool limited;      ///< whether the sz argument is to be considered
+	bool check_pos;    ///< whether to check and eventually adjust (seek) the position of the underlying layer at each read or write
 
 	void set_back_current_position();
 	void detruit() noexcept { if(own_ref && ref != nullptr) delete ref; };

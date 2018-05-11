@@ -37,8 +37,8 @@
 
 namespace libdar
 {
-	/// \ingroup Private
-	/// @}
+	/// \addtogroup Private
+	/// @{
 
 	/// read EA associated to a given file
 

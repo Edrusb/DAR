@@ -80,11 +80,13 @@ namespace libdar
 
 	static const std::string empty_string;
 #if MUTEX_WORKS
-	    // the system call used to read the password and group database are not re-entrant, the mutex
-	    // must block all other thread while a given thread is reading the databases
-	    // the best solution would have to let the user provide such a database object already filled
-	    // but that would rely on it not to destroy this object while threads are using it
-	    // for this reason, here the mutex is 'static'
+	    /// mutex to access the operating system information
+
+	    /// the system call used to read the password and group database are not re-entrant, the mutex
+	    /// must block all other thread while a given thread is reading the databases
+	    /// the best solution would have to let the user provide such a database object already filled
+	    /// but that would rely on it not to destroy this object while threads are using it
+	    /// for this reason, here the mutex is 'static'
 	static pthread_mutex_t lock_fill;
 #endif
     };

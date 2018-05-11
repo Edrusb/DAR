@@ -74,20 +74,20 @@ namespace libdar
     public:
 	enum sequence_type
 	{
-	    seqt_undefined,       //< not enough data to define the type of the escape sequence
-	    seqt_not_a_sequence,  //< to escape data corresponding to an escape sequence's fixed byte sequence
-	    seqt_file,            //< placed before inode information, eventually followed by file data
-	    seqt_ea,              //< placed before EA data
-	    seqt_catalogue,       //< placed before the archive's internal catalogue
-	    seqt_data_name,       //< placed before the archive data_name (at the beginning of the archive)
-	    seqt_file_crc,        //< placed before the CRC of file's data
-	    seqt_ea_crc,          //< placed before the CRC of file's EA
-	    seqt_changed,         //< placed before new copy of file's data if file's data changed while reading it for backup
-	    seqt_dirty,           //< placed after data CRC if file is dirty
-	    seqt_failed_backup,   //< placed after inode information if the file could not be openned at backup time
-	    seqt_fsa,             //< placed before FSA data
-	    seqt_fsa_crc,         //< place before the CRC of file's FSA
-	    seqt_delta_sig        //< place before the delta signature of a file
+	    seqt_undefined,       ///< not enough data to define the type of the escape sequence
+	    seqt_not_a_sequence,  ///< to escape data corresponding to an escape sequence's fixed byte sequence
+	    seqt_file,            ///< placed before inode information, eventually followed by file data
+	    seqt_ea,              ///< placed before EA data
+	    seqt_catalogue,       ///< placed before the archive's internal catalogue
+	    seqt_data_name,       ///< placed before the archive data_name (at the beginning of the archive)
+	    seqt_file_crc,        ///< placed before the CRC of file's data
+	    seqt_ea_crc,          ///< placed before the CRC of file's EA
+	    seqt_changed,         ///< placed before new copy of file's data if file's data changed while reading it for backup
+	    seqt_dirty,           ///< placed after data CRC if file is dirty
+	    seqt_failed_backup,   ///< placed after inode information if the file could not be openned at backup time
+	    seqt_fsa,             ///< placed before FSA data
+	    seqt_fsa_crc,         ///< place before the CRC of file's FSA
+	    seqt_delta_sig        ///< place before the delta signature of a file
 	};
 
 	    // the archive layout of marks is for each entry:
@@ -102,8 +102,8 @@ namespace libdar
 
 	    // constructors & destructors
 
-	escape(generic_file *below,                           //< "Below" is the generic file that holds the escaped data
-	       const std::set<sequence_type> & x_unjumpable); //< a set of marks that can never been jumped over when skipping for the next mark of a any given type.
+	escape(generic_file *below,                           ///< "Below" is the generic file that holds the escaped data
+	       const std::set<sequence_type> & x_unjumpable); ///< a set of marks that can never been jumped over when skipping for the next mark of a any given type.
 	escape(const escape & ref) : generic_file(ref) { copy_from(ref); };
 	escape(escape && ref) noexcept : generic_file(std::move(ref)) { nullifyptr(); move_from(std::move(ref)); };
 	escape & operator = (const escape & ref);
@@ -173,26 +173,26 @@ namespace libdar
 
 	    //-- variables
 
-	generic_file *x_below;                //< the generic_file in which we read/write escaped data from/to the object is not owned by "this"
-	U_I write_buffer_size;                //< amount of data in write transit not yet written to "below" (may have to be escaped)
-	char write_buffer[WRITE_BUFFER_SIZE]; //< data in write transit, all data is unescaped, up to the first real mark, after it, data is raw (may be escaped)
-	                                      //< the first real mark is pointed to by escape_seq_offset_in_buffer
-	U_I read_buffer_size;                 //< amount of data in transit, read from below, but possibly not yet unescaped and returned to the upper layer
-	U_I already_read;                     //< data in buffer that has already been returned to the upper layer
-	bool read_eof;                        //< whether we reached a escape sequence while reading data
-	U_I escape_seq_offset_in_buffer;      //< location of the first escape sequence which is not a data sequence
-	char read_buffer[READ_BUFFER_SIZE];   //< data in read transit
-	std::set<sequence_type> unjumpable;   //< list of mark that cannot be jumped over when searching for the next mark
-	unsigned char fixed_sequence[ESCAPE_SEQUENCE_LENGTH]; //< the preambule of an escape sequence to use/search for
+	generic_file *x_below;                ///< the generic_file in which we read/write escaped data from/to the object is not owned by "this"
+	U_I write_buffer_size;                ///< amount of data in write transit not yet written to "below" (may have to be escaped)
+	char write_buffer[WRITE_BUFFER_SIZE]; ///< data in write transit, all data is unescaped, up to the first real mark, after it, data is raw (may be escaped)
+	                                      ///< the first real mark is pointed to by escape_seq_offset_in_buffer
+	U_I read_buffer_size;                 ///< amount of data in transit, read from below, but possibly not yet unescaped and returned to the upper layer
+	U_I already_read;                     ///< data in buffer that has already been returned to the upper layer
+	bool read_eof;                        ///< whether we reached a escape sequence while reading data
+	U_I escape_seq_offset_in_buffer;      ///< location of the first escape sequence which is not a data sequence
+	char read_buffer[READ_BUFFER_SIZE];   ///< data in read transit
+	std::set<sequence_type> unjumpable;   ///< list of mark that cannot be jumped over when searching for the next mark
+	unsigned char fixed_sequence[ESCAPE_SEQUENCE_LENGTH]; ///< the preambule of an escape sequence to use/search for
 	infinint escaped_data_count_since_last_skip;
-	infinint below_position;              //< remember the position of object pointed to by x_below
+	infinint below_position;              ///< remember the position of object pointed to by x_below
 
 	    //-- routines
 
 	void set_fixed_sequence_for(sequence_type t) { fixed_sequence[ESCAPE_SEQUENCE_LENGTH - 1] = type2char(t); };
 	void check_below() const { if(x_below == nullptr) throw SRC_BUG; };
-	void clean_read();  //< drops all in-transit data
-	void flush_write(); //< write down to "below" all in-transit data
+	void clean_read();  ///< drops all in-transit data
+	void flush_write(); ///< write down to "below" all in-transit data
 	void flush_or_clean()
 	{
 	    switch(get_mode())
@@ -211,7 +211,7 @@ namespace libdar
 	void nullifyptr() noexcept { x_below = nullptr; };
 	void copy_from(const escape & ref);
 	void move_from(escape && ref) noexcept;
-	bool mini_read_buffer(); //< returns true if it could end having at least ESCAPE_SEQUENCE_LENGTH bytes in read_buffer, false else (EOF reached).
+	bool mini_read_buffer(); ///< returns true if it could end having at least ESCAPE_SEQUENCE_LENGTH bytes in read_buffer, false else (EOF reached).
 
 	    //-- static routine(s)
 

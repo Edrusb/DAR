@@ -29,13 +29,11 @@
 
 #include "../my_config.h"
 
-
-    /// \addtogroup API
-    /// @{
-
-
 namespace libdar
 {
+
+        /// \addtogroup API
+	/// @{
 
 	/// nested namespace inside libdar
 
@@ -55,7 +53,7 @@ namespace libdar
 	bool nodump() noexcept;
 
 	    /// returns whether special allocation support has been activated at compilation time
-	    ///
+
 	    /// special allocation support brings from a tiny to an important improvement in
 	    /// execution time, depending on the number of small files involved in the operation
 	bool special_alloc() noexcept;
@@ -130,11 +128,10 @@ namespace libdar
 	    /// returns whether remote repository feature is available
 	bool remote_repository() noexcept;
 
-    }
+    } // end of compile_time namespace
 
-} // end of namespace
+        /// @}
 
-    /// @}
-
+} // end of libdar namespace
 
 #endif

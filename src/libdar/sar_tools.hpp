@@ -35,6 +35,9 @@
 namespace libdar
 {
 
+	/// \addtogroup Private
+        /// @{
+
     extern std::string sar_tools_make_filename(const std::string & base_name,
 					       const infinint & num,
 					       const infinint & min_digits,
@@ -55,6 +58,8 @@ namespace libdar
     extern std::string sar_tools_make_padded_number(const std::string & num,
 						    const infinint & min_digits);
 
+
+	/// @}
 
 } // end of namespace
 

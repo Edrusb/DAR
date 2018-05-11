@@ -53,39 +53,43 @@ namespace libdar
     {
     public:
 	    /// constructor to build a new single sliced archive
-	trivial_sar(const std::shared_ptr<user_interaction> & dialog,   //< how to interact with the user
-		    gf_mode open_mode,                 //< read_write or write_only are the only acceptable values
-		    const std::string & base_name,     //< archive basename to create
-		    const std::string & extension,     //< archive extension
- 		    const entrepot & where,            //< where to store the archive
-		    const label & internal_nale,       //< tag common to all slices of the archive
-		    const label & data_name,           //< tag that follows the data when archive is dar_xform'ed
-		    const std::string & execute,       //< command line to execute at end of slice creation
-		    bool allow_over,                   //< whether to allow overwriting
-		    bool warn_over,                    //< whether to warn before overwriting
-		    bool force_permission,             //< whether to enforce slice permission or not
-		    U_I permission,                    //< value of permission to use if permission enforcement is used
-		    hash_algo x_hash,                  //< whether to build a hash of the slice, and which algo to use for that
-	    	    const infinint & min_digits,       //< is the minimum number of digits the slices number is stored with in the filename
-		    bool format_07_compatible);        //< build a slice header backward compatible with 2.3.x
+	trivial_sar(const std::shared_ptr<user_interaction> & dialog,   ///< how to interact with the user
+		    gf_mode open_mode,                 ///< read_write or write_only are the only acceptable values
+		    const std::string & base_name,     ///< archive basename to create
+		    const std::string & extension,     ///< archive extension
+ 		    const entrepot & where,            ///< where to store the archive
+		    const label & internal_nale,       ///< tag common to all slices of the archive
+		    const label & data_name,           ///< tag that follows the data when archive is dar_xform'ed
+		    const std::string & execute,       ///< command line to execute at end of slice creation
+		    bool allow_over,                   ///< whether to allow overwriting
+		    bool warn_over,                    ///< whether to warn before overwriting
+		    bool force_permission,             ///< whether to enforce slice permission or not
+		    U_I permission,                    ///< value of permission to use if permission enforcement is used
+		    hash_algo x_hash,                  ///< whether to build a hash of the slice, and which algo to use for that
+	    	    const infinint & min_digits,       ///< is the minimum number of digits the slices number is stored with in the filename
+		    bool format_07_compatible          ///< build a slice header backward compatible with 2.3.x
+	    );
 
 
 	    /// constructor to read a (single sliced) archive from a pipe
-	trivial_sar(const std::shared_ptr<user_interaction> & dialog,   //< how to interact with the user
-		    const std::string & pipename,      //< if set to '-' the data are read from standard input, else the given file is expected to be named pipe to read data from
-		    bool lax);                         //< whether to be laxist or follow the normal and strict controlled procedure
+	trivial_sar(const std::shared_ptr<user_interaction> & dialog,   ///< how to interact with the user
+		    const std::string & pipename,      ///< if set to '-' the data are read from standard input, else the given file is expected to be named pipe to read data from
+		    bool lax                           ///< whether to be laxist or follow the normal and strict controlled procedure
+	    );
 
-	trivial_sar(const std::shared_ptr<user_interaction> & dialog,  //< how to interact with the user
-		    int filedescriptor,                //< if set to '-' the data are read from standard input, else the given file is expected to be named pipe to read data from
-		    bool lax);                         //< whether to be laxist or follow the normal and strict controlled procedure
+	trivial_sar(const std::shared_ptr<user_interaction> & dialog,  ///< how to interact with the user
+		    int filedescriptor,                ///< if set to '-' the data are read from standard input, else the given file is expected to be named pipe to read data from
+		    bool lax                           ///< whether to be laxist or follow the normal and strict controlled procedure
+	    );
 
 	    /// constructor to write a (single sliced) archive to a anonymous pipe
-	trivial_sar(const std::shared_ptr<user_interaction> & dialog,
-		    generic_file * f, //< in case of exception the generic_file "f" is not released, this is the duty of the caller to do so, else (success), the object becomes owned by the trivial_sar and must not be released by the caller.
-		    const label & internal_name,
-		    const label & data_name,
-		    bool format_07_compatible,
-		    const std::string & execute);
+	trivial_sar(const std::shared_ptr<user_interaction> & dialog, ///< user interaction
+		    generic_file * f, ///< in case of exception the generic_file "f" is not released, this is the duty of the caller to do so, else (success), the object becomes owned by the trivial_sar and must not be released by the caller.
+		    const label & internal_name, ///< internal name ti use
+		    const label & data_name,     ///< data name
+		    bool format_07_compatible,   ///< whether we have to avoid creating a slice trailer
+		    const std::string & execute  ///< command to execute after each slice
+	    );
 
 	    /// copy constructor (disabled)
 	trivial_sar(const trivial_sar & ref) = delete;
@@ -115,10 +119,10 @@ namespace libdar
 	    /// size of the slice header
 	const infinint & get_slice_header_size() const { return offset; };
 
-		    // disable execution of user command when destroying the current object
+	    /// disable execution of user command when destroying the current object
 	void disable_natural_destruction() { natural_destruction = false; };
 
-	    // enable back execution of user command when destroying the current object
+	    /// enable back execution of user command when destroying the current object
 	void enable_natural_destruction() { natural_destruction = true; };
 
     protected:
@@ -130,28 +134,27 @@ namespace libdar
 	virtual void inherited_terminate() override;
 
     private:
-        generic_file *reference;  //< points to the underlying data, owned by "this"
-        infinint offset;          //< offset to apply to get the first byte of data out of SAR headers
-	infinint cur_pos;         //< current position as returned by get_position()
-	infinint end_of_slice;    //< when end of slice/archive is met, there is an offset by 1 compared to the offset of reference. end_of_slice is set to 1 in that situation, else it is always equal to zero
-	std::string hook;         //< command to execute after slice writing (not used in read-only mode)
-	std::string base;         //< basename of the archive (used for string susbstitution in hook)
-	std::string ext;          //< extension of the archive (used for string substitution in hook)
-	label of_data_name;       //< archive's data name
-	bool old_sar;             //< true if the read sar has an old header (format <= "07") or the to be written is must keep a version 07 format.
-	infinint min_digits;      //< minimum number of digits in slice name
-	std::string hook_where;   //< what value to use for %p substitution in hook
-	std::string base_url;     //< what value to use for %u substitution in hook
-	bool natural_destruction; //< whether user command is executed once the single sliced archive is completed (disable upon user interaction)
+        generic_file *reference;  ///< points to the underlying data, owned by "this"
+        infinint offset;          ///< offset to apply to get the first byte of data out of SAR headers
+	infinint cur_pos;         ///< current position as returned by get_position()
+	infinint end_of_slice;    ///< when end of slice/archive is met, there is an offset by 1 compared to the offset of reference. end_of_slice is set to 1 in that situation, else it is always equal to zero
+	std::string hook;         ///< command to execute after slice writing (not used in read-only mode)
+	std::string base;         ///< basename of the archive (used for string susbstitution in hook)
+	std::string ext;          ///< extension of the archive (used for string substitution in hook)
+	label of_data_name;       ///< archive's data name
+	bool old_sar;             ///< true if the read sar has an old header (format <= "07") or the to be written is must keep a version 07 format.
+	infinint min_digits;      ///< minimum number of digits in slice name
+	std::string hook_where;   ///< what value to use for %p substitution in hook
+	std::string base_url;     ///< what value to use for %u substitution in hook
+	bool natural_destruction; ///< whether user command is executed once the single sliced archive is completed (disable upon user interaction)
 
-	void init(const label & internal_name); //< write the slice header and set the offset field (write mode), or (read-mode),  reads the slice header an set offset field
+	void init(const label & internal_name); ///< write the slice header and set the offset field (write mode), or (read-mode),  reads the slice header an set offset field
 
 	void where_am_i();
     };
 
 
 	/// return the name of a slice given the base_name, slice number and extension
-
     extern std::string sar_make_filename(const std::string & base_name, const infinint & num, const infinint & min_digits, const std::string & ext);
 
 	/// @}

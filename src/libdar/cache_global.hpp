@@ -33,8 +33,8 @@
 namespace libdar
 {
 
-	/// \ingroup Private
-	/// @}
+	/// \addtogroup Private
+	/// @{
 
 	/// the cache_global cache is an adaptation of the cache class to the fichier_global interface
 
@@ -44,7 +44,7 @@ namespace libdar
 	static const U_I default_cache_size = 102400;
 
 	    /// constructor
-	    //
+
 	    /// \param[in] dialog for user interaction requested by fichier_global
 	    /// \param[in] x_ptr the hidden/underlying generic_file to provide caching feature for
 	    /// \param[in] shift_mode see cache class constructor for details

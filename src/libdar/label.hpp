@@ -37,6 +37,8 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
+	/// manage label data structure used in archive slice headers
+
     class label
     {
     public:
@@ -62,7 +64,7 @@ namespace libdar
 
 	    // avoid using these two calls, only here for backward compatibility
 	    // where the cost to move to object is really too heavy than
-	    // sticking with an char array.
+	    // sticking with a char array.
 	U_I size() const { return LABEL_SIZE; };
 	char *data() { return (char *)&val; };
 	const char *data() const { return (char *)&val; };

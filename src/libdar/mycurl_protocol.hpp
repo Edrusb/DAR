@@ -19,6 +19,10 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
+    /// \file mycurl_protocol.hpp
+    /// \brief datastructure defining the network protocols available for entrepot_libcurl class
+    /// \ingroup API
+
 #ifndef MYCURL_PROTOCOL
 #define MYCURL_PROTOCOL
 
@@ -36,12 +40,12 @@ namespace libdar
 
 	/// libcurl protocols supported by libdar
 
-    enum mycurl_protocol { proto_ftp, proto_sftp };
-	/// dar needs to list a directory content to find
+	/// \note dar needs to list a directory content to find
 	/// the last slice available in a directory, which
 	/// feature is not always available with http and https protocols
 	/// and never available with scp protocol
 	/// Thus dar only supports ftp and sftp
+    enum mycurl_protocol { proto_ftp, proto_sftp };
 
 	/// extract mycurl_protocol from a given URL
     extern mycurl_protocol string_to_mycurl_protocol(const std::string & arg);

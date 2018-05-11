@@ -41,6 +41,7 @@ namespace libdar
 	/// @{
 
 	/// the symbolic link inode class
+
     class cat_lien : public cat_inode
     {
     public :

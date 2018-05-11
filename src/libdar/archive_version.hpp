@@ -36,10 +36,11 @@
 namespace libdar
 {
 
-	/// \ingroup Private
-	/// @}
+	/// \addtogroup Private
+	/// @{
 
 	/// class archive_version manages the version of the archive format
+
     class archive_version
     {
     public:

@@ -45,6 +45,9 @@
 namespace libdar
 {
 
+        /// \addtogroup API
+        /// @{
+
 	/// the list_entry class provides mean to get information about a particular entry in the archive
 	///
 	/// it provides methods for libdar to fill up such object and methods for API user
@@ -52,7 +55,6 @@ namespace libdar
 	/// several call to different method to get the full description of the object.
 	/// This has the advantage to let the possiblity to add new fields in the future
 	/// without breaking anything in API, and in consequences in user programs.
-	/// \ingroup API
     class list_entry
     {
     public:
@@ -115,7 +117,7 @@ namespace libdar
 	time_t get_removal_date_s() const; ///< for removed_entry only
 
 	    /// yet an alternative method to get last access time
-	    ///
+
 	    /// \param[in] tu time unit to be used to store fraction (libdar::datetime::tu_microsecond, libdar::datetime::tu_nanosecond,...)
 	    /// \param[out] second integer number of second
 	    /// \param[out] fraction remaining part of the time (expressed as tu unit) to be added to "second" to get the exact time
@@ -152,7 +154,7 @@ namespace libdar
 
 
 	    /// offset in byte where to find first byte of data
-	    ///
+
 	    /// \note: return false if no data is present, else set the argument
 	    /// \note: offset is counted whatever is the number of slice as if there all slice were sticked toghether. But
 	    /// the first bytes of each slice do not count as they hold the slice header. This one is variable
@@ -167,7 +169,7 @@ namespace libdar
 	std::string get_archive_offset_for_data() const { return offset_for_data.is_zero() ? "" : deci(offset_for_data).human(); };
 
 	    /// amount of byte used to store the file's data
-	    ///
+
 	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the
 	    /// infinint of std::string version of this method
 	bool get_storage_size_for_data(infinint & val) const { val = storage_size_for_data; return !val.is_zero(); };
@@ -175,7 +177,7 @@ namespace libdar
 	std::string get_storage_size_for_data(bool size_in_bytes = true) const;
 
 	    /// offset in byte whert to find the first byte of Extended Attributes
-	    ///
+
 	    /// \note see note for get_archive_offset_for_data(infinint)
 	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the infinint of
 	    /// std::string version of this method
@@ -189,7 +191,7 @@ namespace libdar
 	std::string get_storage_size_for_EA() const { return storage_size_for_EA.is_zero() ? "" : deci(storage_size_for_EA).human(); };
 
 	    /// offset in byte where to find the first byte of Filesystem Specific Attributes
-	    ///
+
 	    /// \note see note for get_archive_offset_for_data(infinint)
 	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the
 	    /// infinint of std::string version of this method
@@ -304,6 +306,8 @@ namespace libdar
 
 	static time_t datetime2time_t(const datetime & val);
     };
+
+	/// @}
 
 } // end of namespace
 

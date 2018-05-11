@@ -34,8 +34,8 @@
 namespace libdar
 {
 
-	/// \ingroup API
-	/// @}
+	/// \addtogroup API
+	/// @{
 
 
 	/// options to open a database
@@ -118,6 +118,7 @@ namespace libdar
 
 	/// options to add an archive to base
 
+    	/// for now this is a placeholder class
     class database_add_options
     {
     public:

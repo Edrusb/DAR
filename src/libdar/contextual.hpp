@@ -22,7 +22,6 @@
     /// \file contextual.hpp
     /// \brief class contextual adds the information of phases in the generic_file
     /// \ingroup Private
-    ///
 
 
 #ifndef CONTEXTUAL_HPP
@@ -82,7 +81,7 @@ namespace libdar
 	virtual ~contextual() throw(Ebug) {};
 
 	    /// defines the new contextual value
-	    ///
+
 	    /// \note inherited class may redefine this call but
 	    /// but must call the parent method to set the value
 	    /// contextual:set_info_status()
@@ -95,7 +94,7 @@ namespace libdar
 	virtual bool is_an_old_start_end_archive() const = 0;
 
 	    /// obtain the data_name of the archive (label associated with the archive's data)
-	    ///
+
 	    /// \note label are conserved with dar_xform and archive isolation, but are
 	    /// not with archive merging or archive creation (full or differential backup)
 	virtual const label & get_data_name() const = 0;

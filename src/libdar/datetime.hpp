@@ -62,7 +62,7 @@ namespace libdar
 	datetime(const infinint & value = 0) { val = value; uni = tu_second; };
 
 	    /// general constructor
-	    ///
+
 	    /// \param[in] sec the number of second since the dawn of computer time (1970)
 	    /// \param[in] subsec the fraction of the time below 1 second expressed in the time unit given as next argument
 	    /// \param[in] the time unit in which is expressed the previous argument
@@ -109,7 +109,7 @@ namespace libdar
 	time_unit get_unit() const { return uni; };
 
 	    /// return a time as time_t arguments
-	    ///
+
 	    /// \param[out] second the time value in second
 	    /// \param[out] subsecond is the remaining time fraction as expressed in the unit given as next argument
 	    /// \param[in] unit the unit of the subsecond fraction of the timestamp
@@ -156,7 +156,7 @@ namespace libdar
 	static time_unit char_to_time_unit(const char a);
 
 	    /// return the factor between two units
-	    ///
+
 	    /// \note "source" must be larger than "dest" (source >= dest), else an exception is thrown
 	    /// \return the factor f, which makes the following to be true: source = f*dest
 	static const infinint & get_scaling_factor(time_unit source, time_unit dest);

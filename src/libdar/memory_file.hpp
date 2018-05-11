@@ -35,6 +35,8 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
+	/// generic_file stored in memory
+
     class memory_file : public generic_file
     {
     public:

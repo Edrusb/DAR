@@ -28,14 +28,14 @@
 
 #include "../my_config.h"
 
-    /// \ingroup Private
-    /// @}
+    /// \addtogroup Private
+    /// @{
 
 extern "C"
 {
 #include "cygwin_adapt.h"
 } // end extern "C"
 
-    ///    @}
+    /// @}
 
 #endif

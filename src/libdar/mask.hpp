@@ -207,8 +207,8 @@ namespace libdar
 
     private :
         regex_t preg;
-	std::string mask_exp; //< used only by the copy constructor
-	bool case_sensit;     //< used only by the copy constructor
+	std::string mask_exp; ///< used only by the copy constructor
+	bool case_sensit;     ///< used only by the copy constructor
 
 	void set_preg(const std::string & wilde_card_expression,
 		      bool x_case_sensit);

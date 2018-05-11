@@ -19,6 +19,10 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
+    /// \file mycurl_easyhandle_node.hpp
+    /// \brief used to optimize session creation done by libcurl
+    /// \ingroup Private
+
 #ifndef MYCURL_EASYHANDLE_NODE_HPP
 #define MYCURL_EASYHANDLE_NODE_HPP
 

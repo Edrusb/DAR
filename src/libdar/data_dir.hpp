@@ -43,7 +43,7 @@
 namespace libdar
 {
 
-	/// \ingroup Private
+	/// \addtogroup Private
 	/// @{
 
 	/// the data_dir class inherits from data_tree and holds the directory tree's parent relationship

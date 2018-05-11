@@ -22,8 +22,6 @@
     /// \file proto_generic_file.hpp
     /// \brief precursor class of generic_file used to avoid cyclic dependencies with storage and infinint
     /// \ingroup Private
-    ///
-
 
 #ifndef PROTO_GENERIC_FILE_HPP
 #define PROTO_GENERIC_FILE_HPP
@@ -46,6 +44,12 @@ extern "C"
 namespace libdar
 {
 
+	/// \addtogroup Private
+        /// @{
+
+	/// ancestor class of generic_file
+
+	/// this class exist to avoid cyclic dependency between generic_file and infinint
     class proto_generic_file
     {
     public :

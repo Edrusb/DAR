@@ -51,7 +51,7 @@ namespace libdar
 	/// class zapette sends order to slave_zapette through a
 	/// a first pipe and receive informations or data in return
 	/// from a second pipe from slave_zapette
-	/// \ingroup Private
+
     class zapette : public generic_file, public contextual, protected mem_ui
     {
     public:

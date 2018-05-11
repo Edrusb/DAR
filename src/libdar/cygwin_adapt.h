@@ -28,8 +28,8 @@
 
 #include "../my_config.h"
 
-    /// \ingroup Private
-    /// @}
+    /// \addtogroup Private
+    /// @{
 
 #if HAVE_FCNTL_H
 #include <fcntl.h>
@@ -50,6 +50,6 @@
 // if O_BINARY is defined we are compiling on or for a cygwin plateform
 #endif
 
-    ///    @}
+    /// @}
 
 #endif

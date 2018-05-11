@@ -36,10 +36,13 @@
 namespace libdar
 {
 
-	/// class which holds the address of the allocated memory for many smart_pointers
-	///
-	/// \note it should not be used directly, rather see below the smart_pointer class template
 
+	/// \addtogroup Private
+        /// @{
+
+	/// class which holds the address of the allocated memory for many smart_pointers
+
+	/// \note it should not be used directly, rather see below the smart_pointer class template
     template <class T> class smart_node
     {
     public:
@@ -63,7 +66,7 @@ namespace libdar
 
 
 	/// smart pointer class to be used to automagically manage multiple time pointed to address
-	///
+
 	/// this class tend to mimic normal pointer with the additional feature of automatically releasing
 	/// the pointed to object when no more smart_pointer point to it. In consequence:
 	/// - it must not be used to point to non dynamically allocated memory using the "new" operator,
@@ -72,7 +75,6 @@ namespace libdar
 	/// \note IMPORTANT: smart_pointer cannot be shared between different threads, for efficiency,
 	/// the smart_pointer nor the pointed to object is protected against concurrent access of several
 	/// threads
-
     template <class T> class smart_pointer
     {
     public:
@@ -80,7 +82,7 @@ namespace libdar
 	smart_pointer() { ptr = nullptr; };
 
 	    /// creates a smart_pointer pointing to an allocated memory
-	    ///
+
 	    /// \param[in] arg is the address of the allocated memory the smart_pointer must manage,
 	    /// nullptr is allowed and lead to the same behavior as the constructor without argument
 	    /// \note the given pointed to object, passes under the responsibility of the smart_pointer
@@ -143,7 +145,7 @@ namespace libdar
 	};
 
 	    /// assignment operator from a base type pointer (not from a smart_pointer)
-	    ///
+
 	    /// \note choice has been not to overload/use operator= to avoid risk of error
 	    /// that would lead to create independent smart_pointer sets accidentally
 	const smart_pointer & assign(T *arg)
@@ -165,6 +167,8 @@ namespace libdar
     private:
 	smart_node<T> *ptr;
     };
+
+	/// @}
 
 } // end of namespace
 

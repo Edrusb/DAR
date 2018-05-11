@@ -22,7 +22,6 @@
     /// \file generic_rsync.hpp
     /// \brief class generic_rsync provides a generic_file interface to librsync
     /// \ingroup Private
-    ///
 
 
 #ifndef GENERIC_RSYNC_HPP
@@ -42,11 +41,17 @@ extern "C"
 
 namespace libdar
 {
+
+	/// \addtogroup Private
+        /// @{
+
+	/// generic_file interface to librsync
+
     class generic_rsync : public generic_file
     {
     public:
 	    /// constructor for "signature" operation
-	    ///
+
 	    /// in this mode the generic_rsync object is read only, all data
 	    /// read from it is fetched unchanged from "below" while the signature is
 	    /// computed. The file signature is output to signature_storage
@@ -56,7 +61,7 @@ namespace libdar
 		      generic_file *below);
 
 	    /// constructor for "delta" operation
-	    ///
+
 	    /// in this mode the generic_rsync object is also read only, all data
 	    /// read from it is the resulting delta of the data read from "below" based
 	    /// the given base_signature.
@@ -74,7 +79,7 @@ namespace libdar
 		      const crc **checksum);
 
 	    /// constructor for "patch" operation
-	    ///
+
 	    /// in this mode the generic_rsync object is read only, the data read from
 	    /// it is built from the current file's data and the delta signature
 	    /// as a first step the on current data CRC is computed CRC and compared
@@ -82,7 +87,7 @@ namespace libdar
 	    /// Edata is thrown and nothing is modified on filesystem.
 	    /// \param[in] current_data is a read_only object that contains the data to be used
 	    /// as base for the patch (this data is not modified)
-	    /// \param[in] base_signature is read only and contains the patch to apply
+	    /// \param[in] delta is read only and contains the patch to apply
 	    /// \param[in] not_used is not used but present to make a distinction between this
 	    /// constructor and the constructor used to generate delta signature
 	generic_rsync(generic_file *current_data,
@@ -115,7 +120,7 @@ namespace libdar
     private:
 	enum { sign, delta, patch } status;
 
-	generic_file *x_below;    //< underlying layer to read from / write to
+	generic_file *x_below;    ///< underlying layer to read from / write to
 	generic_file *x_input;
 	generic_file *x_output;
 	bool initial;
@@ -128,7 +133,7 @@ namespace libdar
 	rs_job_t *job;
 	rs_signature_t *sumset;
 
-	    // opaque is pointer to a generic_rsync object
+	    /// opaque is pointer to a generic_rsync object
 	static rs_result patch_callback(void *opaque,
 					rs_long_t pos,
 					size_t *len,
@@ -136,6 +141,7 @@ namespace libdar
 #endif
 
 	    /// feed librsync using rs_job_iter
+
 	    /// \param[in] buffer_in bytes of data to give to librsync
 	    /// \param[in,out] avail_in is the amount of byte available, and after the call the amount of not yet read bytes
 	    /// remaining at the beginning of the buffer_in buffer (when shift_input is set to true) or at the end of buffer_in if shift is set
@@ -153,6 +159,8 @@ namespace libdar
 	void free_job();
 	void send_eof();
     };
+
+	/// @}
 
 } // end of namespace
 

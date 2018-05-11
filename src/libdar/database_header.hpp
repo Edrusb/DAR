@@ -36,8 +36,8 @@
 namespace libdar
 {
 
-	/// \ingroup Private
-	/// @}
+	/// \addtogroup Private
+	/// @{
 
 	/// create the header for a dar_manager database
 

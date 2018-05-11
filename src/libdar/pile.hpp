@@ -38,11 +38,13 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
+	/// stores a stack of generic_files writing/reading on each others
+
     class pile : public generic_file
     {
     public:
 	    /// the constructor
-	    ///
+
 	    /// \note the mode (gf_mode) of the pile is the one of the first object pushed on the stack,
 	    /// thus when empty we choose the arbitrary gf_read_only value, because the stack is empty.
 
@@ -54,7 +56,7 @@ namespace libdar
 	~pile() { detruit(); };
 
 	    /// add a generic_file on the top
-	    ///
+
 	    /// \param[in] f is the address of the object to add to the stack
 	    /// \param[in] label unique label associated to this object in the current stack, exception thrown if label already used in stack
 	    /// \param[in] extend_mode allow the new object to have more read/write permission than the already placed object, which have the effect to change the read/write permission of the stack itself, future push() will accept wider permission even if extend_mode is not set
@@ -66,12 +68,13 @@ namespace libdar
 	void push(generic_file *f, const std::string & label = "", bool extend_mode = false);
 
 	    /// remove the top generic_file from the top
-	    ///
+
 	    /// \returns the address of the object that has been poped from the stack or nullptr if the stack is empty
 	    /// \note this is now the duty of the caller to release this object memory when the object is no more needed
 	generic_file *pop();
 
 	    /// remove the top generic_file and destroy it
+
 	    /// \param[in] ptr is the type of the object that must be found on the top of the stack,
 	    /// It may also be the type of a parent class. Note that the value of the pointer is ignored.
 	    /// \return true if and only if the object on the top of the stack could be matched to the given type, this object is then poped from the stack and destroyed.
@@ -93,6 +96,7 @@ namespace libdar
 	void clear() { detruit(); };
 
 	    /// this template let the class user find out the higher object on the stack of the given type
+
 	    /// \param[in,out] ref gives the type of the object to look for, and gets the address of the first object found starting from the top
 	    /// \note if no object of that type could be found in the stack ref is set to nullptr
 	template<class T> void find_first_from_top(T * & ref) const;
@@ -109,7 +113,7 @@ namespace libdar
 
 
 	    /// find the object associated to a given label
-	    ///
+
 	    /// \param[in] label is the label to look for, empty string is forbidden
 	    /// \return the object associated to label, else an exception is thrown
 	generic_file *get_by_label(const std::string & label);
@@ -117,14 +121,14 @@ namespace libdar
 
 
 	    /// if label is associated to a member of the stack, makes this member of the stack an anoymous member (the label is no more associated to this object, while this object stays in the stack untouched
-	    ///
+
 	    /// \param[in] label the label to clear, empty string is not a valid label an exception is thrown if used here
 	    /// \note no exception is thrown else, even if the label is not present in the stack
 	void clear_label(const std::string & label);
 
 
 	    /// associate a additional label to the object currently at the top of the stack
-	    ///
+
 	    /// \param[in] label the label to add
 	    /// \note this does not remove an eventually existing label that had been added either by push() or add_label() previously
 	    /// \note an object of the stack can thus be refered by several different labels

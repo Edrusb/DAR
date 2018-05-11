@@ -32,9 +32,13 @@
 namespace libdar
 {
 
-	/////////////////////////////////////////////////////////
-	////// OPTIONS FOR LISTING AN ARCHIVE AS IN SHELL ///////
-	/////////////////////////////////////////////////////////
+	/// \addtogroup API
+        /// @{
+
+
+	// ///////////////////////////////////////////////////////
+	// //// OPTIONS FOR LISTING AN ARCHIVE AS IN SHELL ///////
+	// ///////////////////////////////////////////////////////
 
 	/// class holding optional shell specific parameters used to list the contents of an existing archive
 
@@ -56,10 +60,10 @@ namespace libdar
 
 	enum listformat
 	{
-	    normal,   //< the tar-like listing (this is the default)
-	    tree,     //< the original dar's tree listing (for those that like forest)
-	    xml,      //< the xml catalogue output
-	    slicing   //< the slicing output (give info about where files are located)
+	    normal,   ///< the tar-like listing (this is the default)
+	    tree,     ///< the original dar's tree listing (for those that like forest)
+	    xml,      ///< the xml catalogue output
+	    slicing   ///< the slicing output (give info about where files are located)
 	};
 
 

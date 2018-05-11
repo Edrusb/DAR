@@ -21,7 +21,7 @@
 
     /// \file infinint.hpp
     /// \brief switch module to limitint (32 ou 64 bits integers) or infinint
-    /// \ingroup Private
+    /// \ingroup API
 
 
 #ifndef INFININT_HPP

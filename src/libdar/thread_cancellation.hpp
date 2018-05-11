@@ -53,6 +53,9 @@ extern "C"
 namespace libdar
 {
 
+	/// \addtogroup API
+        /// @{
+
 	/// class to be used as parent to provide checkpoints to inherited classes
 
 	/// the class provides a checkpoints to inherited classes and a mechanism
@@ -60,7 +63,6 @@ namespace libdar
 	/// call executing in a given thread. This does not imply the termination
 	/// of the thread itself but it implies the return of the thread execution
 	/// to the code that called libdar
-	/// \ingroup Private
 
     class thread_cancellation
     {
@@ -102,16 +104,16 @@ namespace libdar
 #if MUTEX_WORKS
 	    /// marks the thread given in argument as to be canceled
 
-	    //! \param[in] tid the thread ID of the thread where any libdar call must abort
-	    //! \param[in] x_immediate whether the cancellation must be as fast as possible or can take a
-	    //! \param[in] x_flag is a value to transmit to the Ethread_cancel exception used to cancel libdar's call stack
-	    //! little time to make a usable archive
+	    /// \param[in] tid the thread ID of the thread where any libdar call must abort
+	    /// \param[in] x_immediate whether the cancellation must be as fast as possible or can take a
+	    /// \param[in] x_flag is a value to transmit to the Ethread_cancel exception used to cancel libdar's call stack
+	    /// little time to make a usable archive
 	static void cancel(pthread_t tid, bool x_immediate, U_64 x_flag);
 
 	    /// gives the cancellation status of the given thread ID
 
-	    //! \param[in] tid the thread to check
-	    //! \return true if the given thread is under cancellation
+	    /// \param[in] tid the thread to check
+	    /// \return true if the given thread is under cancellation
 	static bool cancel_status(pthread_t tid);
 
 	    /// abort the pending thread cancellation
@@ -175,10 +177,10 @@ namespace libdar
 
 	    // class's static variables and types
 
-	static pthread_mutex_t access;                 //< mutex for the access to "info"
-	static std::list<thread_cancellation *> info;  //< list of all object
-	static std::list<fields> preborn;              //< canceled thread that still not have a thread_cancellation object to deal with cancellation
-	static std::multimap<pthread_t, pthread_t> thread_asso; //< which other thread to propagate cancellation request to, given a initial tid
+	static pthread_mutex_t access;                 ///< mutex for the access to "info"
+	static std::list<thread_cancellation *> info;  ///< list of all object
+	static std::list<fields> preborn;              ///< canceled thread that still not have a thread_cancellation object to deal with cancellation
+	static std::multimap<pthread_t, pthread_t> thread_asso; ///< which other thread to propagate cancellation request to, given a initial tid
 
 	    // helper class routing
 	static void set_cancellation_in_info_for(pthread_t tid,
@@ -196,6 +198,8 @@ namespace libdar
 
 #endif
     };
+
+	/// @}
 
 } // end of namespace
 

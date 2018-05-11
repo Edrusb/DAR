@@ -56,9 +56,9 @@ namespace libdar
 
 
 	/// Filesystem Specific Attributes (FSA) class
-	///
+
 	/// this class handle the storage of attributes into and from the archive
-	/// the have not filesystem specific knownledge. This aspect is managed
+	/// it has not filesystem specific knownledge. This aspect is managed
 	/// by filesystem_specific_attribute_list that upon system call will create
 	/// the liste of FSA and given the list of FSA will try to set them back to the
 	/// filesystem
@@ -131,6 +131,8 @@ namespace libdar
 
 ///////////////////////////////////////////////////////////////////////////
 
+	/// interface to fileystem for FSA
+
     class filesystem_specific_attribute_list
     {
     public:
@@ -189,12 +191,13 @@ namespace libdar
 	infinint storage_size() const;
 
 	    /// addition operator
-	    ///
+
 	    /// \note this operator is not reflexive (or symetrical if you prefer). Here "a + b" may differ from "b + a"
 	    /// all FSA of the arg are added with overwriting to the FSA of 'this'
 	filesystem_specific_attribute_list operator + (const filesystem_specific_attribute_list & arg) const;
 
 	    /// look for the FSA of given familly and nature
+
 	    /// \param[in] fam family of the FSA to look for
 	    /// \param[in] nat nature of the FSA to look for
 	    /// \param[in, out] ptr points to the FSA if found
@@ -269,6 +272,8 @@ namespace libdar
 
 ///////////////////////////////////////////////////////////////////////////
 
+	/// fsa based on integer
+
     class fsa_infinint : public filesystem_specific_attribute
     {
     public:
@@ -294,6 +299,8 @@ namespace libdar
     };
 
 ///////////////////////////////////////////////////////////////////////////
+
+	/// fsa based on time
 
     class fsa_time : public filesystem_specific_attribute
     {

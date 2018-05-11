@@ -42,11 +42,12 @@ namespace libdar
 namespace libdar
 {
 
+	/// \addtogroup Private
+        /// @{
+
 	/// arbitrary large storage structure
 
 	/// used to store infinint
-	/// \ingroup Private
-
     class storage
     {
     private:
@@ -71,7 +72,7 @@ namespace libdar
         bool operator < (const storage & ref) const noexcept
 	{ return difference(ref) < 0; }; // true if arg uses more space than this
         bool operator == (const storage & ref) const noexcept
-	{ return difference(ref) == 0; }; //true if arg have same space than this
+	{ return difference(ref) == 0; }; // true if arg have same space than this
         bool operator > (const storage & ref) const noexcept
 	{ return difference(ref) > 0; };
         bool operator <= (const storage & ref) const noexcept
@@ -221,6 +222,8 @@ namespace libdar
             }
 	}
     }
+
+	/// @}
 
 } // end of namespace
 

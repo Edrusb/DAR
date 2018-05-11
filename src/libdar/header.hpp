@@ -110,13 +110,13 @@ namespace libdar
 	void set_format_07_compatibility() { old_header = true; };
 
     private:
-        magic_number magic;    //< constant string for all Dar archives
-        label internal_name;   //< constant string for all slices of a given archive (computed based on date and pid)
-	label data_name;       //< constant string for a set of data (constant with dar_xform, used to link isolated catalogue to its original data)
-        char flag;             //< whether slice is the last of the archive or not
-        infinint *first_size;  //< size of the first slice
-	infinint *slice_size;  //< size of slices (except first slice if specified else and last if not fulfilled)
-	bool old_header;       //< true if the header has been read from an old archive (before release 2.4.0, format 07 and below) and if true when writing, create an old slice header (compatible with format 07).
+        magic_number magic;    ///< constant string for all Dar archives
+        label internal_name;   ///< constant string for all slices of a given archive (computed based on date and pid)
+	label data_name;       ///< constant string for a set of data (constant with dar_xform, used to link isolated catalogue to its original data)
+        char flag;             ///< whether slice is the last of the archive or not
+        infinint *first_size;  ///< size of the first slice
+	infinint *slice_size;  ///< size of slices (except first slice if specified else and last if not fulfilled)
+	bool old_header;       ///< true if the header has been read from an old archive (before release 2.4.0, format 07 and below) and if true when writing, create an old slice header (compatible with format 07).
 
 	void nullifyptr() noexcept { first_size = slice_size = nullptr; };
         void copy_from(const header & ref);

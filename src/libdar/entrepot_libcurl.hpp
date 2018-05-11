@@ -25,7 +25,6 @@
 
     /// \file entrepot_libcurl.hpp
     /// \brief defines the implementation for remote filesystem entrepot using libcurl
-
     /// \ingroup API
 
 #ifndef ENTREPOT_LIBCURL_HPP
@@ -57,23 +56,24 @@ namespace libdar
 	/// @{
 
 	/// implementation for entrepot to access to local filesystem
-	///
+
 	/// entrepot_local generates objects of class "fichier_local" inherited class of fichier_global
 
     class entrepot_libcurl : public entrepot, public mem_ui
     {
     public:
-	entrepot_libcurl(const std::shared_ptr<user_interaction> & dialog,         //< for user interaction
-			 mycurl_protocol proto,             //< network protocol to use
-			 const std::string & login,              //< user login on remote host
-			 const secu_string & password,      //< user password on remote host (empty for file auth or user interaction)
-			 const std::string & host,               //< the remote server to connect to
-			 const std::string & port,               //< TCP/UDP port to connec to (empty string for default)
-			 bool auth_from_file,               //< whether to check $HOME/.netrc for password
-			 const std::string & sftp_pub_keyfile,   //< where to fetch the public key (sftp only)
-			 const std::string & sftp_prv_keyfile,   //< where to fetch the private key (sftp only)
-			 const std::string & sftp_known_hosts,   //< location of the known_hosts file (empty string to disable this security check)
-			 U_I waiting_time);
+	entrepot_libcurl(const std::shared_ptr<user_interaction> & dialog,         ///< for user interaction
+			 mycurl_protocol proto,             ///< network protocol to use
+			 const std::string & login,              ///< user login on remote host
+			 const secu_string & password,      ///< user password on remote host (empty for file auth or user interaction)
+			 const std::string & host,               ///< the remote server to connect to
+			 const std::string & port,               ///< TCP/UDP port to connec to (empty string for default)
+			 bool auth_from_file,               ///< whether to check $HOME/.netrc for password
+			 const std::string & sftp_pub_keyfile,   ///< where to fetch the public key (sftp only)
+			 const std::string & sftp_prv_keyfile,   ///< where to fetch the private key (sftp only)
+			 const std::string & sftp_known_hosts,   ///< location of the known_hosts file (empty string to disable this security check)
+			 U_I waiting_time                        ///< time in second to wait before retrying in case of network error
+	    );
 	entrepot_libcurl(const entrepot_libcurl & ref) = default;
 	entrepot_libcurl(entrepot_libcurl && ref) noexcept = default;
 	entrepot_libcurl & operator = (const entrepot_libcurl & ref) = default;
@@ -107,7 +107,7 @@ namespace libdar
 
     private:
 	mycurl_protocol x_proto;
-	std::string base_URL; //< URL of the repository with only minimum path (login/password is given outside the URL)
+	std::string base_URL; ///< URL of the repository with only minimum path (login/password is given outside the URL)
 #if LIBCURL_AVAILABLE
 	mycurl_easyhandle_sharing easyh;
 #endif
@@ -116,14 +116,15 @@ namespace libdar
 	U_I wait_delay;
 
 	void set_libcurl_URL();
-	void set_libcurl_authentication(user_interaction & dialog,         //< for user interaction
-					const std::string & location,      //< server to authenticate with
-					const std::string & login,         //< login to use
-					const secu_string & password,      //< password (emtpy for interaction or file auth)
-					bool auth_from_file,               //< if set, check for $HOME/.netrc for password
-					const std::string & sftp_pub_keyfile,  //< where to fetch the public key (sftp only)
-					const std::string & sftp_prv_keyfile,  //< where to fetch the private key (sftp only)
-					const std::string & sftp_known_hosts); //< where to fetch the .known_hosts file (sftp only)
+	void set_libcurl_authentication(user_interaction & dialog,         ///< for user interaction
+					const std::string & location,      ///< server to authenticate with
+					const std::string & login,         ///< login to use
+					const secu_string & password,      ///< password (emtpy for interaction or file auth)
+					bool auth_from_file,               ///< if set, check for $HOME/.netrc for password
+					const std::string & sftp_pub_keyfile,  ///< where to fetch the public key (sftp only)
+					const std::string & sftp_prv_keyfile,  ///< where to fetch the private key (sftp only)
+					const std::string & sftp_known_hosts   ///< where to fetch the .known_hosts file (sftp only)
+	    );
 	void detruit();
 
 	static std::string mycurl_protocol2string(mycurl_protocol proto);

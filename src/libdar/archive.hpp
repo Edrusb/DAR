@@ -48,12 +48,15 @@
 namespace libdar
 {
 
+        /// \addtogroup API
+        /// @{
+
 	/// the archive class realizes the most general operations on archives
 
 	/// the operations corresponds to the one the final user expects, these
 	/// are the same abstraction level as the operation realized by the DAR
 	/// command line tool.
-	/// \ingroup API
+
     class archive: public mem_ui
     {
     public:
@@ -189,7 +192,7 @@ namespace libdar
 			      statistics *progressive_report);
 
 	    /// display a summary of the archive
-	    ///
+
 	    /// \note see also get_stats() method
 	void summary();
 
@@ -282,7 +285,7 @@ namespace libdar
 			     bool fetch_ea = false);
 
 	    /// getting information about the given directory (alternative to get_children_of)
-	    ///
+
 	    /// \param[in] dir relative path the directory to get information about, use empty string for root directory
 	    /// \param[in] fetch_ea whether to fetch Extended Attributes relative information in each returned list_entry (not possible in sequential read mode)
 	    /// \return a table information about all subdir and subfile for the given directory
@@ -334,7 +337,7 @@ namespace libdar
 	bool get_catalogue_slice_layout(slice_layout & slicing) const;
 
 	    /// get the first slice header
-	    ///
+
 	    /// get_first_slice_header_size() and get_non_first_slice_header_size() can be used to translate
 	    /// from archive offset as reported by the list_entry::get_archive_offset_*() methods to file
 	    /// offset. This can be done by adding the first_slice_header_size to the archive offset, if the
@@ -345,7 +348,7 @@ namespace libdar
 	U_64 get_first_slice_header_size() const;
 
 	    /// get the non first slice header
-	    ///
+
 	    /// \note may return 0 if the slice header is not known
 	U_64 get_non_first_slice_header_size() const;
 
@@ -353,15 +356,15 @@ namespace libdar
     private:
 	enum operation { oper_create, oper_isolate, oper_merge, oper_repair };
 
-	pile stack;              //< the different layer through which the archive contents is read or wrote
-	header_version ver;      //< information for the archive header
-	catalogue *cat;          //< archive contents
-	infinint local_cat_size; //< size of the catalogue on disk
-	bool exploitable;        //< is false if only the catalogue is available (for reference backup or isolation).
-	bool lax_read_mode;      //< whether the archive has been openned in lax mode (unused for creation/merging/isolation)
-	bool sequential_read;    //< whether the archive is read in sequential mode
-	std::list<signator> gnupg_signed; //< list of signature found in the archive (reading an existing archive)
-	slice_layout slices;     //< slice layout, archive is not sliced <=> first_size or other_size fields is set to zero (in practice both are set to zero, but one being set is enought to determine the archive is not sliced)
+	pile stack;              ///< the different layer through which the archive contents is read or wrote
+	header_version ver;      ///< information for the archive header
+	catalogue *cat;          ///< archive contents
+	infinint local_cat_size; ///< size of the catalogue on disk
+	bool exploitable;        ///< is false if only the catalogue is available (for reference backup or isolation).
+	bool lax_read_mode;      ///< whether the archive has been openned in lax mode (unused for creation/merging/isolation)
+	bool sequential_read;    ///< whether the archive is read in sequential mode
+	std::list<signator> gnupg_signed; ///< list of signature found in the archive (reading an existing archive)
+	slice_layout slices;     ///< slice layout, archive is not sliced <=> first_size or other_size fields is set to zero (in practice both are set to zero, but one being set is enought to determine the archive is not sliced)
 
 	void free_mem();
 	void check_gnupg_signed() const;
@@ -371,7 +374,7 @@ namespace libdar
 
 	bool get_sar_param(infinint & sub_file_size, infinint & first_file_size, infinint & last_file_size,
 			   infinint & total_file_number);
-	std::shared_ptr<entrepot> get_entrepot(); //< this method may return nullptr if no entrepot is used (pipes used for archive building, etc.)
+	std::shared_ptr<entrepot> get_entrepot(); ///< this method may return nullptr if no entrepot is used (pipes used for archive building, etc.)
 	infinint get_level2_size();
 	infinint get_cat_size() const { return local_cat_size; };
 
@@ -440,82 +443,83 @@ namespace libdar
 				modified_data_detection mod_data_detect,
 				statistics * progressive_report);
 
-	void op_create_in_sub(operation op,                     //< the filter operation to bind to
-			      const path & fs_root,             //< root of the filesystem to act on
-			      const std::shared_ptr<entrepot> & sauv_path_t,     //< where to create the archive
-			      catalogue * ref_cat1,             //< catalogue of the archive of reference, (cannot be nullptr if ref_cat2 is not nullptr)
-			      const catalogue * ref_cat2,       //< secondary catalogue used for merging, can be nullptr if not used
-			      bool initial_pause,               //< whether we shall pause before starting the archive creation
-			      const mask & selection,           //< filter on filenames
-			      const mask & subtree,             //< filter on directory tree and filenames
-			      const std::string & filename,     //< basename of the archive to create
-			      const std::string & extension,    //< extension of the archives
-			      bool allow_over,                  //< whether to allow overwriting (of slices)
-			      const crit_action & overwrite,    //< whether and how to allow overwriting (for files inside the archive)
-			      bool warn_over,                   //< whether to warn before overwriting
-			      bool info_details,                //< whether to display detailed informations
-			      bool display_treated,             //< whether to display treated files
-			      bool display_treated_only_dir,    //< whether to only display current directory of treated files
-			      bool display_skipped,             //< display skipped files for the operation
-			      bool display_finished,            //< display space and compression ratio summary for each completed directory
-			      const infinint & pause,           //< whether to pause between slices
-			      bool empty_dir,                   //< whether to store excluded dir as empty directories
-			      compression algo,                 //< compression algorithm
-			      U_I compression_level,            //< compression level (range 1 to 9)
-			      const infinint & file_size,       //< slice size
-			      const infinint & first_file_size, //< first slice size
-			      const mask & ea_mask,             //< Extended Attribute to consider
-			      const std::string & execute,      //< Command line to execute between slices
-			      crypto_algo crypto,               //< crypt algorithm
-			      const secu_string & pass,         //< password ("" for onfly request of password)
-			      U_32 crypto_size,                 //< size of crypto blocks
-			      const std::vector<std::string> & gnupg_recipients, //< list of email recipients to encrypted a randomly chosen key inside the archive
-			      const std::vector<std::string> & gnupg_signatories, //< list of email recipients to use for signature
-			      const mask & compr_mask,          //< files to compress
-			      const infinint & min_compr_size,  //< file size under which to not compress files
-			      bool nodump,                      //< whether to consider the "nodump" filesystem flag
-			      const std::string & exclude_by_ea,//< if not empty the ea to use for inode exclusion from backup operation
-			      const infinint & hourshift,       //< hourshift (see man page -H option)
-			      bool empty,                       //< whether to make an "dry-run" execution
-			      bool alter_atime,                 //< whether to alter atime date (by opposition to ctime) when reading files
-			      bool furtive_read_mode,           //< whether to neither alter atime nor ctome (if true alter_atime is ignored)
-			      bool same_fs,                     //< confin the files consideration to a single filesystem
-			      comparison_fields what_to_check,  //< fields to consider wien comparing inodes (see comparison_fields enumeration)
-			      bool snapshot,                    //< make as if all file had not changed
-			      bool cache_directory_tagging,     //< avoid saving directory which follow the cache directory tagging
-			      bool keep_compressed,             //< keep file compressed when merging
-			      const infinint & fixed_date,      //< whether to ignore any archive of reference and only save file which modification is more recent that the given "fixed_date" date
-			      const std::string & slice_permission,      //< permissions of slices that will be created
-			      const infinint & repeat_count,             //< max number of retry to save a file that have changed while it was read for backup
-			      const infinint & repeat_byte,              //< max amount of wasted data used to save a file that have changed while it was read for backup
-			      bool decremental,                          //< in the merging context only, whether to build a decremental backup from the two archives of reference
-			      bool add_marks_for_sequential_reading,     //< whether to add marks for sequential reading
-			      bool security_check,                       //< whether to check for ctime change with no reason (rootkit ?)
-			      const infinint & sparse_file_min_size,     //< starting which size to consider looking for holes in sparse files (0 for no detection)
-			      const std::string & user_comment,          //< user comment to put in the archive
-			      hash_algo hash,                            //< whether to produce hash file, and which algo to use
-			      const infinint & slice_min_digits,         //< minimum digit for slice number
-			      const std::string & backup_hook_file_execute, //< command to execute before and after files to backup
-			      const mask & backup_hook_file_mask,         //< files elected to have a command executed before and after their backup
-			      bool ignore_unknown,                        //< whether to warn when an unknown inode type is met
-			      const fsa_scope & scope,                    //< FSA scope for the operation
-			      bool multi_threaded,              //< whether libdar is allowed to spawn several thread to possibily work faster on multicore CPU
-			      bool delta_signature,             //< whether to calculate and store binary delta signature for each saved file
-			      bool build_delta_sig,             //< whether to rebuild delta sig accordingly to delta_mask
-			      const mask & delta_mask,          //< which files to consider delta signature for
-			      const infinint & delta_sig_min_size, //< minimum file size for which to calculate delta signature
-			      bool delta_diff,                     //< whether to allow delta diff backup when delta sig is present
-			      bool zeroing_neg_date,            //< if true just warn before zeroing neg date, dont ask user
-			      const std::set<std::string> & ignored_symlinks, //< list of symlink pointed to directory to recurse into
-			      modified_data_detection mod_data_detect, //< how to verify data has not changed upon inode metadata change
-			      statistics * st_ptr);             //< statistics must not be nullptr !
+	void op_create_in_sub(operation op,                     ///< the filter operation to bind to
+			      const path & fs_root,             ///< root of the filesystem to act on
+			      const std::shared_ptr<entrepot> & sauv_path_t,     ///< where to create the archive
+			      catalogue * ref_cat1,             ///< catalogue of the archive of reference, (cannot be nullptr if ref_cat2 is not nullptr)
+			      const catalogue * ref_cat2,       ///< secondary catalogue used for merging, can be nullptr if not used
+			      bool initial_pause,               ///< whether we shall pause before starting the archive creation
+			      const mask & selection,           ///< filter on filenames
+			      const mask & subtree,             ///< filter on directory tree and filenames
+			      const std::string & filename,     ///< basename of the archive to create
+			      const std::string & extension,    ///< extension of the archives
+			      bool allow_over,                  ///< whether to allow overwriting (of slices)
+			      const crit_action & overwrite,    ///< whether and how to allow overwriting (for files inside the archive)
+			      bool warn_over,                   ///< whether to warn before overwriting
+			      bool info_details,                ///< whether to display detailed informations
+			      bool display_treated,             ///< whether to display treated files
+			      bool display_treated_only_dir,    ///< whether to only display current directory of treated files
+			      bool display_skipped,             ///< display skipped files for the operation
+			      bool display_finished,            ///< display space and compression ratio summary for each completed directory
+			      const infinint & pause,           ///< whether to pause between slices
+			      bool empty_dir,                   ///< whether to store excluded dir as empty directories
+			      compression algo,                 ///< compression algorithm
+			      U_I compression_level,            ///< compression level (range 1 to 9)
+			      const infinint & file_size,       ///< slice size
+			      const infinint & first_file_size, ///< first slice size
+			      const mask & ea_mask,             ///< Extended Attribute to consider
+			      const std::string & execute,      ///< Command line to execute between slices
+			      crypto_algo crypto,               ///< crypt algorithm
+			      const secu_string & pass,         ///< password ("" for onfly request of password)
+			      U_32 crypto_size,                 ///< size of crypto blocks
+			      const std::vector<std::string> & gnupg_recipients, ///< list of email recipients to encrypted a randomly chosen key inside the archive
+			      const std::vector<std::string> & gnupg_signatories, ///< list of email recipients to use for signature
+			      const mask & compr_mask,          ///< files to compress
+			      const infinint & min_compr_size,  ///< file size under which to not compress files
+			      bool nodump,                      ///< whether to consider the "nodump" filesystem flag
+			      const std::string & exclude_by_ea,///< if not empty the ea to use for inode exclusion from backup operation
+			      const infinint & hourshift,       ///< hourshift (see man page -H option)
+			      bool empty,                       ///< whether to make an "dry-run" execution
+			      bool alter_atime,                 ///< whether to alter atime date (by opposition to ctime) when reading files
+			      bool furtive_read_mode,           ///< whether to neither alter atime nor ctome (if true alter_atime is ignored)
+			      bool same_fs,                     ///< confin the files consideration to a single filesystem
+			      comparison_fields what_to_check,  ///< fields to consider wien comparing inodes (see comparison_fields enumeration)
+			      bool snapshot,                    ///< make as if all file had not changed
+			      bool cache_directory_tagging,     ///< avoid saving directory which follow the cache directory tagging
+			      bool keep_compressed,             ///< keep file compressed when merging
+			      const infinint & fixed_date,      ///< whether to ignore any archive of reference and only save file which modification is more recent that the given "fixed_date" date
+			      const std::string & slice_permission,      ///< permissions of slices that will be created
+			      const infinint & repeat_count,             ///< max number of retry to save a file that have changed while it was read for backup
+			      const infinint & repeat_byte,              ///< max amount of wasted data used to save a file that have changed while it was read for backup
+			      bool decremental,                          ///< in the merging context only, whether to build a decremental backup from the two archives of reference
+			      bool add_marks_for_sequential_reading,     ///< whether to add marks for sequential reading
+			      bool security_check,                       ///< whether to check for ctime change with no reason (rootkit ?)
+			      const infinint & sparse_file_min_size,     ///< starting which size to consider looking for holes in sparse files (0 for no detection)
+			      const std::string & user_comment,          ///< user comment to put in the archive
+			      hash_algo hash,                            ///< whether to produce hash file, and which algo to use
+			      const infinint & slice_min_digits,         ///< minimum digit for slice number
+			      const std::string & backup_hook_file_execute, ///< command to execute before and after files to backup
+			      const mask & backup_hook_file_mask,         ///< files elected to have a command executed before and after their backup
+			      bool ignore_unknown,                        ///< whether to warn when an unknown inode type is met
+			      const fsa_scope & scope,                    ///< FSA scope for the operation
+			      bool multi_threaded,              ///< whether libdar is allowed to spawn several thread to possibily work faster on multicore CPU
+			      bool delta_signature,             ///< whether to calculate and store binary delta signature for each saved file
+			      bool build_delta_sig,             ///< whether to rebuild delta sig accordingly to delta_mask
+			      const mask & delta_mask,          ///< which files to consider delta signature for
+			      const infinint & delta_sig_min_size, ///< minimum file size for which to calculate delta signature
+			      bool delta_diff,                     ///< whether to allow delta diff backup when delta sig is present
+			      bool zeroing_neg_date,            ///< if true just warn before zeroing neg date, dont ask user
+			      const std::set<std::string> & ignored_symlinks, ///< list of symlink pointed to directory to recurse into
+			      modified_data_detection mod_data_detect, ///< how to verify data has not changed upon inode metadata change
+			      statistics * st_ptr             ///< statistics must not be nullptr !
+	    );
 
 	void disable_natural_destruction();
 	void enable_natural_destruction();
 	const label & get_layer1_data_name() const;
 	const label & get_catalogue_data_name() const;
-	bool only_contains_an_isolated_catalogue() const; //< true if the current archive only contains an isolated catalogue
-	void check_against_isolation(bool lax) const; //< throw Erange exception if the archive only contains an isolated catalogue
+	bool only_contains_an_isolated_catalogue() const; ///< true if the current archive only contains an isolated catalogue
+	void check_against_isolation(bool lax) const; ///< throw Erange exception if the archive only contains an isolated catalogue
 	const cat_directory *get_dir_object(const std::string & dir) const;
 	void load_catalogue();
     };
