@@ -2053,29 +2053,38 @@ bool furtive_read = libdar::compile_time::furtive_read</code>();<br>
 we have seen std::shared_pointer on class <span style="font-weight: bold;">libdar::user_interaction</span> previously but did not used this feature.<br>
       <br>
       <h3>18.1 - Defining your own user_interaction class</h3>
+      <div style="text-align: justify;">
 class <span style="font-weight: bold;">libdar::user_interaction</span>
 defines the way libdar interact with the user during an operation, like
 an archive creation, restoration, testing and so on. Only four types of
 interaction are used by libdar:<br>
+      </div>
+
       <br>
       <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; void message(const std::string &amp; message);<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; void pause(const std::string &amp; message);<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; std::string get_string(const std::string &amp; message, bool echo);<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; secu_string get_secu_string(const std::string &amp; message, bool echo);</code><br>
       <br>
+      <div style="text-align: justify;">
 By default an inherited class of libdar::user_interaction called
-shell_interaction is used and implements these four type of exchange by
+      <span style="font-weight: bold;">libdar::shell_interaction</span> is used and implements these four type of exchange by
 mean of text terminal:<br>
-      <ul>
+
+      </div>
+<ul>
         <li><span style="font-weight: bold;">message()</span> sends the std::string provided by libdar to stdout</li>
         <li><span style="font-weight: bold;">pause()</span> does the same and ask for the user to press either return or escape to answer yes or no</li>
         <li><span style="font-weight: bold;">get_string()</span> reads a string from stdin</li>
         <li><span style="font-weight: bold;">get_secu_string()</span> reads a string into a secu_string object from stdin too<br>
         </li>
       </ul>
+      <div style="text-align: justify;">
 For a GUI you will probably not want stdin and stdout to be used. For
 that you have the possibility to implement your own inherited class
 from user_interaction. It should look like the following:<br>
+      </div>
+
       <br>
 </td>
     </tr>
@@ -2203,7 +2212,23 @@ context_value));</code><br>
       You will also find predefined classes like <span style="font-weight: bold;">libdar::user_interaction_blind</span> which always says no in name of the user displays nothing and provide empty strings, as well as <span style="font-weight: bold;">libdar::shell_interaction_emulator</span>
 which given a user_interaction object send to it formatted information
 as if it was a shell_interaction object, leading one to emulate libdar
-default behavior under any time of "terminal".<span style="font-weight: bold;"><br>
+default behavior under any time of "terminal".<br>
+      <br>
+      <div style="text-align: justify;"><span style="font-weight: bold;"><span style="text-decoration: underline;">IMPORTANT:</span> </span>all
+libdar::user_interaction inherited classes provided by libdar are not
+designed to be manipulated by more than one thread at a time. The use
+of std::shared_ptr is only here to let the caller not have to manage
+such object and let libdar release it when no more needed <span style="font-weight: bold;">or</span>
+to let the caller to reuse the same user_interaction object for a
+subsequent call to libdar which would not be possible if a
+std::unique_ptr was used.<br>
+      <br>
+Now if you design your own user_interaction inherited class and provide
+them mecanism (mutex, ...) that allow them to be used simultaneously by
+several thread there is no issue to give pass such one object as
+argument to different libdar object used by different threads.<br>
+      </div>
+<span style="font-weight: bold;">
       <br>
       </span><br>
       <h2>19 - Masks<br>
@@ -2780,8 +2805,7 @@ database (no archive in it) called "base"<br>
       <br>
 &nbsp; &nbsp; database other&nbsp; = database(nullptr,<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; "/tmp/existing_base.dmd", <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; "/tmp/existing_base.dmd", <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 database_open_options());<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // we have created a database object called "other" which contains <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // (in RAM) all information that were contained in the <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
