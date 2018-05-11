@@ -209,7 +209,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
     file_size = 0;
     src = dst = "";
     execute_src = execute_dst = "";
-    U_I suffix_base = TOOLS_BIN_SUFFIX;
+    U_I suffix_base = LINE_TOOLS_BIN_SUFFIX;
     slice_perm = "";
     slice_user = "";
     slice_group = "";
@@ -317,10 +317,10 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
 		if(optarg == nullptr)
 		    throw Erange("command_line", gettext("-a option requires an argument"));
 		if(strcasecmp("SI-unit", optarg) == 0 || strcasecmp("SI", optarg) == 0 || strcasecmp("SI-units", optarg) == 0)
-		    suffix_base = TOOLS_SI_SUFFIX;
+		    suffix_base = LINE_TOOLS_SI_SUFFIX;
 		else
 		    if(strcasecmp("binary-unit", optarg) == 0 || strcasecmp("binary", optarg) == 0 || strcasecmp("binary-units", optarg) == 0)
-			suffix_base = TOOLS_BIN_SUFFIX;
+			suffix_base = LINE_TOOLS_BIN_SUFFIX;
 		    else
 			throw Erange("command_line", string(gettext("Unknown parameter given to -a option: ")) + optarg);
 		break;

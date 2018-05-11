@@ -39,6 +39,9 @@ using namespace libdar;
     /// \addtogroup CMDLINE
     /// @{
 
+constexpr U_I LINE_TOOLS_SI_SUFFIX = 1000;
+constexpr U_I LINE_TOOLS_BIN_SUFFIX = 1024;
+
 class argc_argv
 {
 public:

@@ -55,9 +55,6 @@ extern "C"
 #include "datetime.hpp"
 #include "entrepot.hpp"
 
-#define TOOLS_SI_SUFFIX 1000
-#define TOOLS_BIN_SUFFIX 1024
-
 namespace libdar
 {
 

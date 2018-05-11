@@ -181,7 +181,7 @@ struct recursive_param
         case_sensit = true;
         fixed_date_mode = false;
         sparse_file_reactivation = false;
-        suffix_base = TOOLS_BIN_SUFFIX;
+        suffix_base = LINE_TOOLS_BIN_SUFFIX;
         ea_erase = false;
         only_more_recent = false;
         detruire = true;
@@ -1481,9 +1481,9 @@ static bool get_args_recursive(recursive_param & rec,
                 if(optarg == nullptr)
                     throw Erange("command_line.cpp:get_args_recursive", gettext("-a option requires an argument"));
                 if(strcasecmp("SI-unit", optarg) == 0 || strcasecmp("SI", optarg) == 0 || strcasecmp("SI-units", optarg) == 0)
-                    rec.suffix_base = TOOLS_SI_SUFFIX;
+                    rec.suffix_base = LINE_TOOLS_SI_SUFFIX;
                 else if(strcasecmp("binary-unit", optarg) == 0 || strcasecmp("binary", optarg) == 0 || strcasecmp("binary-units", optarg) == 0)
-                    rec.suffix_base = TOOLS_BIN_SUFFIX;
+                    rec.suffix_base = LINE_TOOLS_BIN_SUFFIX;
                 else if(strcasecmp("atime", optarg) == 0 || strcasecmp("a", optarg) == 0)
                 {
                     p.alter_atime = true;
