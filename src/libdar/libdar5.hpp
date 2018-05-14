@@ -337,10 +337,6 @@ namespace libdar5
 	// from memory_file.hpp
     using libdar::memory_file;
 
-	// from label.hpp
-    using libdar::label;
-    const label label_zero = libdar::label_zero;
-
 	// from entrepot_local
     using libdar::entrepot_local;
 

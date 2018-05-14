@@ -41,6 +41,8 @@ extern "C"
 #include "tools.hpp"
 #include "storage.hpp"
 #include "database_header.hpp"
+#include "i_archive.hpp"
+
 
 using namespace libdar;
 using namespace std;
@@ -231,9 +233,9 @@ namespace libdar
 
 	    dat.chemin = chemin;
 	    dat.basename = basename;
-	    dat.root_last_mod = arch.get_catalogue().get_root_dir_last_modif();
+	    dat.root_last_mod = arch.pimpl->get_catalogue().get_root_dir_last_modif();
 	    coordinate.push_back(dat);
-	    files->data_tree_update_with(arch.get_catalogue().get_contenu(), number);
+	    files->data_tree_update_with(arch.pimpl->get_catalogue().get_contenu(), number);
 	    if(number > 1)
 		files->finalize_except_self(number, get_root_last_mod(number), 0);
 	}

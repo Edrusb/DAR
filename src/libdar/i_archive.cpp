@@ -45,7 +45,6 @@ extern "C"
 #include "elastic.hpp"
 #include "terminateur.hpp"
 #include "compressor.hpp"
-#include "nls_swap.hpp"
 #include "thread_cancellation.hpp"
 #include "erreurs_ext.hpp"
 #include "cache.hpp"
@@ -58,6 +57,7 @@ extern "C"
 #include "defile.hpp"
 #include "escape.hpp"
 #include "escape_catalogue.hpp"
+#include "i_archive.hpp"
 
 #define ARCHIVE_NOT_EXPLOITABLE "Archive of reference given is not exploitable"
 
@@ -75,256 +75,124 @@ namespace libdar
 
 	// opens an already existing archive
 
-    archive::archive(const std::shared_ptr<user_interaction> & dialog,
-                     const path & chem,
-		     const string & basename,
-		     const string & extension,
-		     const archive_options_read & options): mem_ui(dialog)
+    archive::i_archive::i_archive(const std::shared_ptr<user_interaction> & dialog,
+				  const path & chem,
+				  const string & basename,
+				  const string & extension,
+				  const archive_options_read & options): mem_ui(dialog)
     {
-        NLS_SWAP_IN;
-        try
-        {
-	    shared_ptr<entrepot> where = options.get_entrepot();
-	    bool info_details = options.get_info_details();
+	shared_ptr<entrepot> where = options.get_entrepot();
+	bool info_details = options.get_info_details();
 
-	    if(where == nullptr)
-		throw Ememory("archive::archive");
+	if(where == nullptr)
+	    throw Ememory("archive::i_archive::archive");
 
-	    cat = nullptr;
+	cat = nullptr;
+
+	try
+	{
+	    infinint second_terminateur_offset = 0;
+	    infinint ref_second_terminateur_offset = 0;
+	    header_version ref_ver;
+	    pile_descriptor pdesc;
+	    list<signator> tmp1_signatories;
+	    list<signator> tmp2_signatories;
+
+	    lax_read_mode = options.get_lax();
+	    sequential_read = options.get_sequential_read(); // updating the archive object's field
+	    where->set_location(chem);
 
 	    try
 	    {
-		infinint second_terminateur_offset = 0;
-		infinint ref_second_terminateur_offset = 0;
-		header_version ref_ver;
-		pile_descriptor pdesc;
-		list<signator> tmp1_signatories;
-		list<signator> tmp2_signatories;
+		if(info_details)
+		    dialog->printf(gettext("Opening archive %s ..."), basename.c_str());
 
-		lax_read_mode = options.get_lax();
-		sequential_read = options.get_sequential_read(); // updating the archive object's field
-		where->set_location(chem);
+		    // we open the main archive to get the different layers (level1, scram and level2).
+		macro_tools_open_archive(get_pointer(),
+					 where,
+					 basename,
+					 options.get_slice_min_digits(),
+					 extension,
+					 options.get_crypto_algo(),
+					 options.get_crypto_pass(),
+					 options.get_crypto_size(),
+					 stack,
+					 ver,
+					 options.get_input_pipe(),
+					 options.get_output_pipe(),
+					 options.get_execute(),
+					 second_terminateur_offset,
+					 options.get_lax(),
+					 options.is_external_catalogue_set(),
+					 options.get_sequential_read(),
+					 options.get_info_details(),
+					 gnupg_signed,
+					 slices,
+					 options.get_multi_threaded(),
+					 options.get_header_only());
 
-		try
+		if(options.get_header_only())
 		{
+		    ver.display(get_ui());
+		    throw Erange("archive::i_archive::achive",
+				 gettext("header only mode asked"));
+		}
+
+		pdesc = pile_descriptor(&stack);
+
+		if(options.is_external_catalogue_set())
+		{
+		    pile ref_stack;
+		    shared_ptr<entrepot> ref_where = options.get_ref_entrepot();
+		    if(ref_where == nullptr)
+			throw Ememory("archive::i_archive::archive");
+
 		    if(info_details)
-			dialog->printf(gettext("Opening archive %s ..."), basename.c_str());
+			dialog->printf(gettext("Opening the archive of reference %s to retreive the isolated catalog ... "), options.get_ref_basename().c_str());
 
-			// we open the main archive to get the different layers (level1, scram and level2).
-		    macro_tools_open_archive(get_pointer(),
-					     where,
-					     basename,
-					     options.get_slice_min_digits(),
-					     extension,
-					     options.get_crypto_algo(),
-					     options.get_crypto_pass(),
-					     options.get_crypto_size(),
-					     stack,
-					     ver,
-					     options.get_input_pipe(),
-					     options.get_output_pipe(),
-					     options.get_execute(),
-					     second_terminateur_offset,
-					     options.get_lax(),
-					     options.is_external_catalogue_set(),
-					     options.get_sequential_read(),
-					     options.get_info_details(),
-					     gnupg_signed,
-					     slices,
-					     options.get_multi_threaded(),
-					     options.get_header_only());
 
-		    if(options.get_header_only())
+		    try
 		    {
-			ver.display(get_ui());
-			throw Erange("archive::achive",
-				     gettext("header only mode asked"));
-		    }
-
-		    pdesc = pile_descriptor(&stack);
-
-		    if(options.is_external_catalogue_set())
-		    {
-			pile ref_stack;
-			shared_ptr<entrepot> ref_where = options.get_ref_entrepot();
-			if(ref_where == nullptr)
-			    throw Ememory("archive::archive");
-
-			if(info_details)
-			    dialog->printf(gettext("Opening the archive of reference %s to retreive the isolated catalog ... "), options.get_ref_basename().c_str());
-
-
+			ref_where->set_location(options.get_ref_path());
 			try
 			{
-			    ref_where->set_location(options.get_ref_path());
-			    try
-			    {
-				slice_layout ignored;
+			    slice_layout ignored;
 
-				if(options.get_ref_basename() == "-")
-				    throw Erange("archive::archive", gettext("Reading the archive of reference from pipe or standard input is not possible"));
-				if(options.get_ref_basename() == "+")
-				    throw Erange("archive::archive", gettext("The basename '+' is reserved for special a purpose that has no meaning in this context"));
+			    if(options.get_ref_basename() == "-")
+				throw Erange("archive::i_archive::archive", gettext("Reading the archive of reference from pipe or standard input is not possible"));
+			    if(options.get_ref_basename() == "+")
+				throw Erange("archive::i_archive::archive", gettext("The basename '+' is reserved for special a purpose that has no meaning in this context"));
 
-				    // we open the archive of reference also to get its different layers (ref_stack)
-				macro_tools_open_archive(get_pointer(),
-							 ref_where,
-							 options.get_ref_basename(),
-							 options.get_ref_slice_min_digits(),
-							 extension,
-							 options.get_ref_crypto_algo(),
-							 options.get_ref_crypto_pass(),
-							 options.get_ref_crypto_size(),
-							 ref_stack,
-							 ref_ver,
-							 "",
-							 "",
-							 options.get_ref_execute(),
-							 ref_second_terminateur_offset,
-							 options.get_lax(),
-							 false, // has an external catalogue
-							 false, // sequential_read is never used to retreive the isolated catalogue (well, that's possible and easy to add this feature), see later ...
-							 options.get_info_details(),
-							 tmp1_signatories,
-							 ignored,
-							 options.get_multi_threaded(),
-							 false);
-				    // we do not comparing the signatories of the archive of reference with the current archive
-				    // for example the isolated catalogue might be unencrypted and thus not signed
+				// we open the archive of reference also to get its different layers (ref_stack)
+			    macro_tools_open_archive(get_pointer(),
+						     ref_where,
+						     options.get_ref_basename(),
+						     options.get_ref_slice_min_digits(),
+						     extension,
+						     options.get_ref_crypto_algo(),
+						     options.get_ref_crypto_pass(),
+						     options.get_ref_crypto_size(),
+						     ref_stack,
+						     ref_ver,
+						     "",
+						     "",
+						     options.get_ref_execute(),
+						     ref_second_terminateur_offset,
+						     options.get_lax(),
+						     false, // has an external catalogue
+						     false, // sequential_read is never used to retreive the isolated catalogue (well, that's possible and easy to add this feature), see later ...
+						     options.get_info_details(),
+						     tmp1_signatories,
+						     ignored,
+						     options.get_multi_threaded(),
+						     false);
+				// we do not comparing the signatories of the archive of reference with the current archive
+				// for example the isolated catalogue might be unencrypted and thus not signed
 
-			    }
-			    catch(Euser_abort & e)
-			    {
-				throw;
-			    }
-			    catch(Ebug & e)
-			    {
-				throw;
-			    }
-			    catch(Ethread_cancel & e)
-			    {
-				throw;
-			    }
-			    catch(Egeneric & e)
-			    {
-				throw Erange("archive::archive", string(gettext("Error while opening the archive of reference: ")) + e.get_message());
-			    }
 			}
-			catch(...)
+			catch(Euser_abort & e)
 			{
-			    ref_where.reset();
 			    throw;
-			}
-			ref_where.reset();
-
-			    // fetching the catalogue in the archive of reference, making it point on the main archive layers.
-
-			ref_ver.set_compression_algo(ver.get_compression_algo()); // set the default encryption to use to the one of the main archive
-
-			if(info_details)
-			    dialog->message(gettext("Loading isolated catalogue in memory..."));
-
-			cat = macro_tools_get_derivated_catalogue_from(dialog,
-								       stack,
-								       ref_stack,
-								       ref_ver,
-								       options.get_info_details(),
-								       local_cat_size,
-								       ref_second_terminateur_offset,
-								       tmp2_signatories,
-								       false); // never relaxed checking for external catalogue
-			if(!same_signatories(tmp1_signatories, tmp2_signatories))
-			    dialog->pause(gettext("Archive of reference is not signed properly (no the same signatories for the archive and the internal catalogue), do we continue?"));
-			if(cat == nullptr)
-			    throw SRC_BUG;
-
-			    // checking for compatibility of the archive of reference with this archive data_name
-
-			if(get_layer1_data_name() != get_catalogue_data_name())
-			    throw Erange("archive::archive", gettext("The archive and the isolated catalogue do not correspond to the same data, they are thus incompatible between them"));
-
-			    // we drop delta signature as they refer to the isolated catalogue container/archive
-			    // to avoid having to fetch them at wrong offset from the original archive we created
-			    // this isolated catalogue from. Anyway we do not need them to read an archive, we
-			    // only need delta signatures for archive differential backup, in which case we use the
-			    // original archive *or* the isolated catalogue *alone*
-			cat->drop_delta_signatures();
-		    }
-		    else // no isolated archive to fetch the catalogue from
-		    {
-			try
-			{
-			    if(!options.get_sequential_read())
-			    {
-				if(info_details)
-				    dialog->message(gettext("Loading catalogue into memory..."));
-				cat = macro_tools_get_catalogue_from(dialog,
-								     stack,
-								     ver,
-								     options.get_info_details(),
-								     local_cat_size,
-								     second_terminateur_offset,
-								     tmp1_signatories,
-								     options.get_lax());
-				if(!same_signatories(tmp1_signatories, gnupg_signed))
-				{
-				    string msg = gettext("Archive internal catalogue is not identically signed as the archive itself, this might be the sign the archive has been compromised");
-				    if(lax_read_mode)
-					dialog->pause(msg);
-				    else
-					throw Edata(msg);
-				}
-			    }
-			    else // sequentially reading
-			    {
-				if(pdesc.esc != nullptr) // escape layer is present
-				{
-				    if(pdesc.esc->skip_to_next_mark(escape::seqt_catalogue, false))
-				    {
-					if(info_details)
-					    dialog->message(gettext("No data found in that archive, sequentially reading the catalogue found at the end of the archive..."));
-					pdesc.stack->flush_read_above(pdesc.esc);
-
-					contextual *layer1 = nullptr;
-					label lab = label_zero;
-					stack.find_first_from_bottom(layer1);
-					if(layer1 != nullptr)
-					    lab = layer1->get_data_name();
-
-					cat = macro_tools_read_catalogue(dialog,
-									 ver,
-									 pdesc,
-									 0, // cannot determine cat_size at this stage
-									 tmp1_signatories,
-									 options.get_lax(),
-									 lab,
-									 false); // only_detruits
-
-					if(!same_signatories(tmp1_signatories, gnupg_signed))
-					{
-					    string msg = gettext("Archive internal catalogue is not identically signed as the archive itself, this might be the sign the archive has been compromised");
-					    if(lax_read_mode)
-						dialog->pause(msg);
-					    else
-						throw Edata(msg);
-					}
-				    }
-				    else
-				    {
-					if(info_details)
-					    dialog->message(gettext("The catalogue will be filled while sequentially reading the archive, preparing the data structure..."));
-					cat = new (nothrow) escape_catalogue(dialog,
-									     pdesc,
-									     ver,
-									     gnupg_signed,
-									     options.get_lax());
-				    }
-				    if(cat == nullptr)
-					throw Ememory("archive::archive");
-				}
-				else
-				    throw SRC_BUG;
-			    }
 			}
 			catch(Ebug & e)
 			{
@@ -334,204 +202,317 @@ namespace libdar
 			{
 			    throw;
 			}
-			catch(Euser_abort & e)
+			catch(Egeneric & e)
 			{
-			    throw;
+			    throw Erange("archive::i_archive::archive", string(gettext("Error while opening the archive of reference: ")) + e.get_message());
 			}
-			catch(Ememory & e)
+		    }
+		    catch(...)
+		    {
+			ref_where.reset();
+			throw;
+		    }
+		    ref_where.reset();
+
+			// fetching the catalogue in the archive of reference, making it point on the main archive layers.
+
+		    ref_ver.set_compression_algo(ver.get_compression_algo()); // set the default encryption to use to the one of the main archive
+
+		    if(info_details)
+			dialog->message(gettext("Loading isolated catalogue in memory..."));
+
+		    cat = macro_tools_get_derivated_catalogue_from(dialog,
+								   stack,
+								   ref_stack,
+								   ref_ver,
+								   options.get_info_details(),
+								   local_cat_size,
+								   ref_second_terminateur_offset,
+								   tmp2_signatories,
+								   false); // never relaxed checking for external catalogue
+		    if(!same_signatories(tmp1_signatories, tmp2_signatories))
+			dialog->pause(gettext("Archive of reference is not signed properly (no the same signatories for the archive and the internal catalogue), do we continue?"));
+		    if(cat == nullptr)
+			throw SRC_BUG;
+
+			// checking for compatibility of the archive of reference with this archive data_name
+
+		    if(get_layer1_data_name() != get_catalogue_data_name())
+			throw Erange("archive::i_archive::archive", gettext("The archive and the isolated catalogue do not correspond to the same data, they are thus incompatible between them"));
+
+			// we drop delta signature as they refer to the isolated catalogue container/archive
+			// to avoid having to fetch them at wrong offset from the original archive we created
+			// this isolated catalogue from. Anyway we do not need them to read an archive, we
+			// only need delta signatures for archive differential backup, in which case we use the
+			// original archive *or* the isolated catalogue *alone*
+		    cat->drop_delta_signatures();
+		}
+		else // no isolated archive to fetch the catalogue from
+		{
+		    try
+		    {
+			if(!options.get_sequential_read())
 			{
-			    throw;
-			}
-			catch(...)
-			{
-			    if(!options.get_lax())
-				throw;
-			    else // we have tried and failed to read the whole catalogue, now trying to workaround data corruption if possible
+			    if(info_details)
+				dialog->message(gettext("Loading catalogue into memory..."));
+			    cat = macro_tools_get_catalogue_from(dialog,
+								 stack,
+								 ver,
+								 options.get_info_details(),
+								 local_cat_size,
+								 second_terminateur_offset,
+								 tmp1_signatories,
+								 options.get_lax());
+			    if(!same_signatories(tmp1_signatories, gnupg_signed))
 			    {
-				if(options.get_sequential_read())
-				    throw;
-				else // legacy extraction of the catalogue (not sequential mode)
+				string msg = gettext("Archive internal catalogue is not identically signed as the archive itself, this might be the sign the archive has been compromised");
+				if(lax_read_mode)
+				    dialog->pause(msg);
+				else
+				    throw Edata(msg);
+			    }
+			}
+			else // sequentially reading
+			{
+			    if(pdesc.esc != nullptr) // escape layer is present
+			    {
+				if(pdesc.esc->skip_to_next_mark(escape::seqt_catalogue, false))
 				{
-				    dialog->printf(gettext("LAX MODE: The end of the archive is corrupted, cannot get the archive contents (the \"catalogue\")"));
-				    dialog->pause(gettext("LAX MODE: Do you want to bypass some sanity checks and try again reading the archive contents (this may take some time, this may also fail)?"));
-				    try
+				    if(info_details)
+					dialog->message(gettext("No data found in that archive, sequentially reading the catalogue found at the end of the archive..."));
+				    pdesc.stack->flush_read_above(pdesc.esc);
+
+				    contextual *layer1 = nullptr;
+				    label lab = label_zero;
+				    stack.find_first_from_bottom(layer1);
+				    if(layer1 != nullptr)
+					lab = layer1->get_data_name();
+
+				    cat = macro_tools_read_catalogue(dialog,
+								     ver,
+								     pdesc,
+								     0, // cannot determine cat_size at this stage
+								     tmp1_signatories,
+								     options.get_lax(),
+								     lab,
+								     false); // only_detruits
+
+				    if(!same_signatories(tmp1_signatories, gnupg_signed))
 				    {
-					label tmp;
-					tmp.clear(); // this way we do not modify the catalogue data name even in lax mode
-					cat = macro_tools_lax_search_catalogue(dialog,
-									       stack,
-									       ver.get_edition(),
-									       ver.get_compression_algo(),
-									       options.get_info_details(),
-									       false, // even partial
-									       tmp);
+					string msg = gettext("Archive internal catalogue is not identically signed as the archive itself, this might be the sign the archive has been compromised");
+					if(lax_read_mode)
+					    dialog->pause(msg);
+					else
+					    throw Edata(msg);
 				    }
-				    catch(Erange & e)
-				    {
-					dialog->printf(gettext("LAX MODE: Could not find a whole catalogue in the archive. If you have an isolated catalogue, stop here and use it as backup of the internal catalogue, else continue but be advised that all data will not be able to be retrieved..."));
-					dialog->pause(gettext("LAX MODE: Do you want to try finding portions of the original catalogue if some remain (this may take even more time and in any case, it will only permit to recover some files, at most)?"));
-					cat = macro_tools_lax_search_catalogue(dialog,
-									       stack,
-									       ver.get_edition(),
-									       ver.get_compression_algo(),
-									       options.get_info_details(),
-									       true,                     // even partial
-									       get_layer1_data_name());
-				    }
+				}
+				else
+				{
+				    if(info_details)
+					dialog->message(gettext("The catalogue will be filled while sequentially reading the archive, preparing the data structure..."));
+				    cat = new (nothrow) escape_catalogue(dialog,
+									 pdesc,
+									 ver,
+									 gnupg_signed,
+									 options.get_lax());
+				}
+				if(cat == nullptr)
+				    throw Ememory("archive::i_archive::archive");
+			    }
+			    else
+				throw SRC_BUG;
+			}
+		    }
+		    catch(Ebug & e)
+		    {
+			throw;
+		    }
+		    catch(Ethread_cancel & e)
+		    {
+			throw;
+		    }
+		    catch(Euser_abort & e)
+		    {
+			throw;
+		    }
+		    catch(Ememory & e)
+		    {
+			throw;
+		    }
+		    catch(...)
+		    {
+			if(!options.get_lax())
+			    throw;
+			else // we have tried and failed to read the whole catalogue, now trying to workaround data corruption if possible
+			{
+			    if(options.get_sequential_read())
+				throw;
+			    else // legacy extraction of the catalogue (not sequential mode)
+			    {
+				dialog->printf(gettext("LAX MODE: The end of the archive is corrupted, cannot get the archive contents (the \"catalogue\")"));
+				dialog->pause(gettext("LAX MODE: Do you want to bypass some sanity checks and try again reading the archive contents (this may take some time, this may also fail)?"));
+				try
+				{
+				    label tmp;
+				    tmp.clear(); // this way we do not modify the catalogue data name even in lax mode
+				    cat = macro_tools_lax_search_catalogue(dialog,
+									   stack,
+									   ver.get_edition(),
+									   ver.get_compression_algo(),
+									   options.get_info_details(),
+									   false, // even partial
+									   tmp);
+				}
+				catch(Erange & e)
+				{
+				    dialog->printf(gettext("LAX MODE: Could not find a whole catalogue in the archive. If you have an isolated catalogue, stop here and use it as backup of the internal catalogue, else continue but be advised that all data will not be able to be retrieved..."));
+				    dialog->pause(gettext("LAX MODE: Do you want to try finding portions of the original catalogue if some remain (this may take even more time and in any case, it will only permit to recover some files, at most)?"));
+				    cat = macro_tools_lax_search_catalogue(dialog,
+									   stack,
+									   ver.get_edition(),
+									   ver.get_compression_algo(),
+									   options.get_info_details(),
+									   true,                     // even partial
+									   get_layer1_data_name());
 				}
 			    }
 			}
 		    }
-		    if(!options.get_ignore_signature_check_failure())
-			check_gnupg_signed();
-		    exploitable = true;
 		}
-		catch(...)
-		{
-		    where.reset();
-		    throw;
-		}
-		where.reset();
+		if(!options.get_ignore_signature_check_failure())
+		    check_gnupg_signed();
+		exploitable = true;
 	    }
 	    catch(...)
 	    {
-		free_mem();
+		where.reset();
 		throw;
 	    }
+	    where.reset();
 	}
 	catch(...)
 	{
-	    NLS_SWAP_OUT;
+	    free_mem();
 	    throw;
 	}
-	NLS_SWAP_OUT;
     }
 
 	// creates a new archive
 
-    archive::archive(const std::shared_ptr<user_interaction> & dialog,
-                     const path & fs_root,
-                     const path & sauv_path,
-                     const string & filename,
-                     const string & extension,
-		     const archive_options_create & options,
-                     statistics * progressive_report): mem_ui(dialog)
+    archive::i_archive::i_archive(const std::shared_ptr<user_interaction> & dialog,
+				  const path & fs_root,
+				  const path & sauv_path,
+				  const string & filename,
+				  const string & extension,
+				  const archive_options_create & options,
+				  statistics * progressive_report): mem_ui(dialog)
     {
         NLS_SWAP_IN;
         try
         {
 	    cat = nullptr;
 
+	    shared_ptr<entrepot> sauv_path_t = options.get_entrepot();
+	    if(sauv_path_t == nullptr)
+		throw Ememory("archive::i_archive::archive");
+	    sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
+	    sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
+	    sauv_path_t->set_location(sauv_path);
+
 	    try
 	    {
-		shared_ptr<entrepot> sauv_path_t = options.get_entrepot();
-		if(sauv_path_t == nullptr)
-		    throw Ememory("archive::archive");
-		sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
-		sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
-		sauv_path_t->set_location(sauv_path);
-
-		try
-		{
-		    sequential_read = false; // updating the archive field
-		    (void)op_create_in(oper_create,
-				       tools_relative2absolute_path(fs_root, tools_getcwd()),
-				       sauv_path_t,
-				       options.get_reference().get(),
-				       options.get_selection(),
-				       options.get_subtree(),
-				       filename,
-				       extension,
-				       options.get_allow_over(),
-				       options.get_warn_over(),
-				       options.get_info_details(),
-				       options.get_display_treated(),
-				       options.get_display_treated_only_dir(),
-				       options.get_display_skipped(),
-				       options.get_display_finished(),
-				       options.get_pause(),
-				       options.get_empty_dir(),
-				       options.get_compression(),
-				       options.get_compression_level(),
-				       options.get_slice_size(),
-				       options.get_first_slice_size(),
-				       options.get_ea_mask(),
-				       options.get_execute(),
-				       options.get_crypto_algo(),
-				       options.get_crypto_pass(),
-				       options.get_crypto_size(),
-				       options.get_gnupg_recipients(),
-				       options.get_gnupg_signatories(),
-				       options.get_compr_mask(),
-				       options.get_min_compr_size(),
-				       options.get_nodump(),
-				       options.get_exclude_by_ea(),
-				       options.get_hourshift(),
-				       options.get_empty(),
-				       options.get_alter_atime(),
-				       options.get_furtive_read_mode(),
-				       options.get_same_fs(),
-				       options.get_comparison_fields(),
-				       options.get_snapshot(),
-				       options.get_cache_directory_tagging(),
-				       options.get_fixed_date(),
-				       options.get_slice_permission(),
-				       options.get_repeat_count(),
-				       options.get_repeat_byte(),
-				       options.get_sequential_marks(),
-				       options.get_security_check(),
-				       options.get_sparse_file_min_size(),
-				       options.get_user_comment(),
-				       options.get_hash_algo(),
-				       options.get_slice_min_digits(),
-				       options.get_backup_hook_file_execute(),
-				       options.get_backup_hook_file_mask(),
-				       options.get_ignore_unknown_inode_type(),
-				       options.get_fsa_scope(),
-				       options.get_multi_threaded(),
-				       options.get_delta_signature(),
-				       options.get_has_delta_mask_been_set(),
-				       options.get_delta_mask(),
-				       options.get_delta_sig_min_size(),
-				       options.get_delta_diff(),
-				       options.get_auto_zeroing_neg_dates(),
-				       options.get_ignored_as_symlink(),
-				       options.get_modified_data_detection(),
-				       progressive_report);
-		    exploitable = false;
-		    stack.terminate();
-		}
-		catch(...)
-		{
-		    sauv_path_t.reset();
-		    throw;
-		}
-		sauv_path_t.reset();
+		sequential_read = false; // updating the archive field
+		(void)op_create_in(oper_create,
+				   tools_relative2absolute_path(fs_root, tools_getcwd()),
+				   sauv_path_t,
+				   options.get_reference().get(),
+				   options.get_selection(),
+				   options.get_subtree(),
+				   filename,
+				   extension,
+				   options.get_allow_over(),
+				   options.get_warn_over(),
+				   options.get_info_details(),
+				   options.get_display_treated(),
+				   options.get_display_treated_only_dir(),
+				   options.get_display_skipped(),
+				   options.get_display_finished(),
+				   options.get_pause(),
+				   options.get_empty_dir(),
+				   options.get_compression(),
+				   options.get_compression_level(),
+				   options.get_slice_size(),
+				   options.get_first_slice_size(),
+				   options.get_ea_mask(),
+				   options.get_execute(),
+				   options.get_crypto_algo(),
+				   options.get_crypto_pass(),
+				   options.get_crypto_size(),
+				   options.get_gnupg_recipients(),
+				   options.get_gnupg_signatories(),
+				   options.get_compr_mask(),
+				   options.get_min_compr_size(),
+				   options.get_nodump(),
+				   options.get_exclude_by_ea(),
+				   options.get_hourshift(),
+				   options.get_empty(),
+				   options.get_alter_atime(),
+				   options.get_furtive_read_mode(),
+				   options.get_same_fs(),
+				   options.get_comparison_fields(),
+				   options.get_snapshot(),
+				   options.get_cache_directory_tagging(),
+				   options.get_fixed_date(),
+				   options.get_slice_permission(),
+				   options.get_repeat_count(),
+				   options.get_repeat_byte(),
+				   options.get_sequential_marks(),
+				   options.get_security_check(),
+				   options.get_sparse_file_min_size(),
+				   options.get_user_comment(),
+				   options.get_hash_algo(),
+				   options.get_slice_min_digits(),
+				   options.get_backup_hook_file_execute(),
+				   options.get_backup_hook_file_mask(),
+				   options.get_ignore_unknown_inode_type(),
+				   options.get_fsa_scope(),
+				   options.get_multi_threaded(),
+				   options.get_delta_signature(),
+				   options.get_has_delta_mask_been_set(),
+				   options.get_delta_mask(),
+				   options.get_delta_sig_min_size(),
+				   options.get_delta_diff(),
+				   options.get_auto_zeroing_neg_dates(),
+				   options.get_ignored_as_symlink(),
+				   options.get_modified_data_detection(),
+				   progressive_report);
+		exploitable = false;
+		stack.terminate();
 	    }
 	    catch(...)
 	    {
-		free_mem();
+		sauv_path_t.reset();
 		throw;
 	    }
+	    sauv_path_t.reset();
 	}
-        catch(...)
-        {
-            NLS_SWAP_OUT;
-            throw;
-        }
-        NLS_SWAP_OUT;
+	catch(...)
+	{
+	    free_mem();
+	    throw;
+	}
     }
 
 
 	// merge constructor
 
-    archive::archive(const std::shared_ptr<user_interaction> & dialog,
-		     const path & sauv_path,
-		     shared_ptr<archive> ref_arch1,
-		     const string & filename,
-		     const string & extension,
-		     const archive_options_merge & options,
-		     statistics * progressive_report): mem_ui(dialog)
+    archive::i_archive::i_archive(const std::shared_ptr<user_interaction> & dialog,
+				  const path & sauv_path,
+				  shared_ptr<archive> ref_arch1,
+				  const string & filename,
+				  const string & extension,
+				  const archive_options_merge & options,
+				  statistics * progressive_report): mem_ui(dialog)
     {
 	statistics st = false;
 	statistics *st_ptr = progressive_report == nullptr ? &st : progressive_report;
@@ -542,223 +523,216 @@ namespace libdar
 	shared_ptr<entrepot> sauv_path_t = options.get_entrepot();
 	entrepot_local *sauv_path_t_local = dynamic_cast<entrepot_local *>(sauv_path_t.get());
 
-	NLS_SWAP_IN;
+	cat = nullptr;
+
 	try
 	{
-	    cat = nullptr;
+	    if(sauv_path_t == nullptr)
+		throw Ememory("archive::i_archive::archive(merge)");
+	    sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
+	    sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
+	    sauv_path_t->set_location(sauv_path);
 
 	    try
 	    {
-		if(sauv_path_t == nullptr)
-		    throw Ememory("archive::archive(merge)");
-		sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
-		sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
+		exploitable = false;
+		sequential_read = false; // updating the archive field
+
+		    // sanity checks as much as possible to avoid libdar crashing due to bad arguments
+		    // useless arguments are not reported.
+
+		if(options.get_compression_level() > 9 || options.get_compression_level() < 1)
+		    throw Elibcall("op_merge", gettext("Compression_level must be between 1 and 9 included"));
+		if(options.get_slice_size().is_zero() && !options.get_first_slice_size().is_zero())
+		    throw Elibcall("op_merge", gettext("\"first_file_size\" cannot be different from zero if \"file_size\" is equal to zero"));
+		if(options.get_crypto_size() < 10 && options.get_crypto_algo() != crypto_algo::none)
+		    throw Elibcall("op_merge", gettext("Crypto block size must be greater than 10 bytes"));
+
+		check_libgcrypt_hash_bug(get_ui(), options.get_hash_algo(), options.get_first_slice_size(), options.get_slice_size());
+
+		if(ref_arch1)
+		    if(ref_arch1->pimpl->only_contains_an_isolated_catalogue())
+			    // convert all data to unsaved
+			ref_arch1->set_to_unsaved_data_and_FSA();
+
+		if(ref_arch2)
+		    if(ref_arch2->pimpl->only_contains_an_isolated_catalogue())
+			ref_arch2->set_to_unsaved_data_and_FSA();
+
+		    // end of sanity checks
+
 		sauv_path_t->set_location(sauv_path);
 
-		try
-		{
-		    exploitable = false;
-		    sequential_read = false; // updating the archive field
+		if(!options.get_empty() && sauv_path_t_local != nullptr)
+		    tools_avoid_slice_overwriting_regex(get_ui(),
+							*sauv_path_t,
+							filename,
+							extension,
+							options.get_info_details(),
+							options.get_allow_over(),
+							options.get_warn_over(),
+							options.get_empty());
 
-			// sanity checks as much as possible to avoid libdar crashing due to bad arguments
-			// useless arguments are not reported.
-
-		    if(options.get_compression_level() > 9 || options.get_compression_level() < 1)
-			throw Elibcall("op_merge", gettext("Compression_level must be between 1 and 9 included"));
-		    if(options.get_slice_size().is_zero() && !options.get_first_slice_size().is_zero())
-			throw Elibcall("op_merge", gettext("\"first_file_size\" cannot be different from zero if \"file_size\" is equal to zero"));
-		    if(options.get_crypto_size() < 10 && options.get_crypto_algo() != crypto_algo::none)
-			throw Elibcall("op_merge", gettext("Crypto block size must be greater than 10 bytes"));
-
-		    check_libgcrypt_hash_bug(get_ui(), options.get_hash_algo(), options.get_first_slice_size(), options.get_slice_size());
-
-		    if(ref_arch1)
-			if(ref_arch1->only_contains_an_isolated_catalogue())
-				// convert all data to unsaved
-			    ref_arch1->set_to_unsaved_data_and_FSA();
-
-		    if(ref_arch2)
-			if(ref_arch2->only_contains_an_isolated_catalogue())
-			    ref_arch2->set_to_unsaved_data_and_FSA();
-
-			// end of sanity checks
-
-		    sauv_path_t->set_location(sauv_path);
-
-		    if(!options.get_empty() && sauv_path_t_local != nullptr)
-			tools_avoid_slice_overwriting_regex(get_ui(),
-							    *sauv_path_t,
-							    filename,
-							    extension,
-							    options.get_info_details(),
-							    options.get_allow_over(),
-							    options.get_warn_over(),
-							    options.get_empty());
-
-		    if(ref_arch1 == nullptr)
-			if(!ref_arch2)
-			    throw Elibcall("archive::archive[merge]", string(gettext("Both reference archive are nullptr, cannot merge archive from nothing")));
-			else
-			    if(ref_arch2->cat == nullptr)
-				throw SRC_BUG; // an archive should always have a catalogue available
-			    else
-				if(ref_arch2->exploitable)
-				    ref_cat1 = ref_arch2->cat;
-				else
-				    throw Elibcall("archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
+		if(ref_arch1 == nullptr)
+		    if(!ref_arch2)
+			throw Elibcall("archive::i_archive::archive[merge]", string(gettext("Both reference archive are nullptr, cannot merge archive from nothing")));
 		    else
-			if(!ref_arch2)
-			    if(ref_arch1->cat == nullptr)
-				throw SRC_BUG; // an archive should always have a catalogue available
+			if(ref_arch2->pimpl->cat == nullptr)
+			    throw SRC_BUG; // an archive should always have a catalogue available
+			else
+			    if(ref_arch2->pimpl->exploitable)
+				ref_cat1 = ref_arch2->pimpl->cat;
 			    else
-				if(ref_arch1->exploitable)
-				    ref_cat1 = ref_arch1->cat;
-				else
-				    throw Elibcall("archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
-			else // both catalogues available
-			{
-			    if(!ref_arch1->exploitable || !ref_arch2->exploitable)
-				throw Elibcall("archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
-			    if(ref_arch1->cat == nullptr)
-				throw SRC_BUG;
-			    if(ref_arch2->cat == nullptr)
-				throw SRC_BUG;
-			    ref_cat1 = ref_arch1->cat;
-			    ref_cat2 = ref_arch2->cat;
-			    if(ref_arch1->ver.get_compression_algo() != ref_arch2->ver.get_compression_algo() && ref_arch1->ver.get_compression_algo() != compression::none && ref_arch2->ver.get_compression_algo() != compression::none && options.get_keep_compressed())
-				throw Efeature(gettext("the \"Keep file compressed\" feature is not possible when merging two archives using different compression algorithms (This is for a future version of dar). You can still merge these two archives but without keeping file compressed (thus you will probably like to use compression (-z or -y options) for the resulting archive"));
-			}
-
-		    if(options.get_keep_compressed())
+				throw Elibcall("archive::i_archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
+		else
+		    if(!ref_arch2)
+			if(ref_arch1->pimpl->cat == nullptr)
+			    throw SRC_BUG; // an archive should always have a catalogue available
+			else
+			    if(ref_arch1->pimpl->exploitable)
+				ref_cat1 = ref_arch1->pimpl->cat;
+			    else
+				throw Elibcall("archive::i_archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
+		    else // both catalogues available
 		    {
-			if(ref_arch1 == nullptr)
+			if(!ref_arch1->pimpl->exploitable || !ref_arch2->pimpl->exploitable)
+			    throw Elibcall("archive::i_archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
+			if(ref_arch1->pimpl->cat == nullptr)
 			    throw SRC_BUG;
-
-			algo_kept = ref_arch1->ver.get_compression_algo();
-			if(algo_kept == compression::none && ref_cat2 != nullptr)
-			{
-			    if(!ref_arch2)
-				throw SRC_BUG;
-			    else
-				algo_kept = ref_arch2->ver.get_compression_algo();
-			}
+			if(ref_arch2->pimpl->cat == nullptr)
+			    throw SRC_BUG;
+			ref_cat1 = ref_arch1->pimpl->cat;
+			ref_cat2 = ref_arch2->pimpl->cat;
+			if(ref_arch1->pimpl->ver.get_compression_algo() != ref_arch2->pimpl->ver.get_compression_algo()
+			   && ref_arch1->pimpl->ver.get_compression_algo() != compression::none
+			   && ref_arch2->pimpl->ver.get_compression_algo() != compression::none
+			   && options.get_keep_compressed())
+			    throw Efeature(gettext("the \"Keep file compressed\" feature is not possible when merging two archives using different compression algorithms (This is for a future version of dar). You can still merge these two archives but without keeping file compressed (thus you will probably like to use compression (-z or -y options) for the resulting archive"));
 		    }
 
-		    if(ref_cat1 == nullptr)
+		if(options.get_keep_compressed())
+		{
+		    if(ref_arch1 == nullptr)
 			throw SRC_BUG;
 
-		    if(options.get_delta_signature())
+		    algo_kept = ref_arch1->pimpl->ver.get_compression_algo();
+		    if(algo_kept == compression::none && ref_cat2 != nullptr)
 		    {
-			if(options.get_keep_compressed() && options.get_has_delta_mask_been_set())
-			    throw Elibcall("op_merge", gettext("Cannot calculate delta signature when merging if keep compressed is asked"));
-			if(options.get_sparse_file_min_size().is_zero() && options.get_has_delta_mask_been_set())
-			    dialog->message(gettext("To calculate delta signatures of files saved as sparse files, you need to activate sparse file detection mechanism with merging operation"));
+			if(!ref_arch2)
+			    throw SRC_BUG;
+			else
+			    algo_kept = ref_arch2->pimpl->ver.get_compression_algo();
 		    }
-
-			// then we call op_create_in_sub which will call filter_merge operation to build the archive described by the catalogue
-		    op_create_in_sub(oper_merge,
-				     FAKE_ROOT,
-				     sauv_path_t,
-				     ref_cat1,
-				     ref_cat2,
-				     false,  // initial_pause
-				     options.get_selection(),
-				     options.get_subtree(),
-				     filename,
-				     extension,
-				     options.get_allow_over(),
-				     options.get_overwriting_rules(),
-				     options.get_warn_over(),
-				     options.get_info_details(),
-				     options.get_display_treated(),
-				     options.get_display_treated_only_dir(),
-				     options.get_display_skipped(),
-				     false, // display_finished
-				     options.get_pause(),
-				     options.get_empty_dir(),
-				     options.get_keep_compressed() ? algo_kept : options.get_compression(),
-				     options.get_compression_level(),
-				     options.get_slice_size(),
-				     options.get_first_slice_size(),
-				     options.get_ea_mask(),
-				     options.get_execute(),
-				     options.get_crypto_algo(),
-				     options.get_crypto_pass(),
-				     options.get_crypto_size(),
-				     options.get_gnupg_recipients(),
-				     options.get_gnupg_signatories(),
-				     options.get_compr_mask(),
-				     options.get_min_compr_size(),
-				     false,   // nodump
-				     "",      // exclude_by_ea
-				     0,       // hourshift
-				     options.get_empty(),
-				     true,    // alter_atime
-				     false,   // furtive_read_mode
-				     false,   // same_fs
-				     comparison_fields::all,        // what_to_check
-				     false,   // snapshot
-				     false,   // cache_directory_tagging
-				     options.get_keep_compressed(),
-				     0,       // fixed_date
-				     options.get_slice_permission(),
-				     0,       // repeat_count
-				     0,       // repeat_byte
-				     options.get_decremental_mode(),
-				     options.get_sequential_marks(),
-				     false,   // security_check
-				     options.get_sparse_file_min_size(),
-				     options.get_user_comment(),
-				     options.get_hash_algo(),
-				     options.get_slice_min_digits(),
-				     "",      // backup_hook_file_execute
-				     bool_mask(false),         // backup_hook_file_mask
-				     false,   // ignore_unknown
-				     options.get_fsa_scope(),
-				     options.get_multi_threaded(),
-				     options.get_delta_signature(),
-				     options.get_has_delta_mask_been_set(), // build delta sig
-				     options.get_delta_mask(), // delta_mask
-				     options.get_delta_sig_min_size(),
-				     false,   // delta diff
-				     true,    // zeroing_neg_date
-				     set<string>(),            // empty list
-				     modified_data_detection::any_inode_change, // not used for merging
-				     st_ptr);
-
-		    exploitable = false;
-		    stack.terminate();
 		}
-		catch(...)
+
+		if(ref_cat1 == nullptr)
+		    throw SRC_BUG;
+
+		if(options.get_delta_signature())
 		{
-		    sauv_path_t.reset();
-		    throw;
+		    if(options.get_keep_compressed() && options.get_has_delta_mask_been_set())
+			throw Elibcall("op_merge", gettext("Cannot calculate delta signature when merging if keep compressed is asked"));
+		    if(options.get_sparse_file_min_size().is_zero() && options.get_has_delta_mask_been_set())
+			dialog->message(gettext("To calculate delta signatures of files saved as sparse files, you need to activate sparse file detection mechanism with merging operation"));
 		}
-		sauv_path_t.reset();
+
+		    // then we call op_create_in_sub which will call filter_merge operation to build the archive described by the catalogue
+		op_create_in_sub(oper_merge,
+				 FAKE_ROOT,
+				 sauv_path_t,
+				 ref_cat1,
+				 ref_cat2,
+				 false,  // initial_pause
+				 options.get_selection(),
+				 options.get_subtree(),
+				 filename,
+				 extension,
+				 options.get_allow_over(),
+				 options.get_overwriting_rules(),
+				 options.get_warn_over(),
+				 options.get_info_details(),
+				 options.get_display_treated(),
+				 options.get_display_treated_only_dir(),
+				 options.get_display_skipped(),
+				 false, // display_finished
+				 options.get_pause(),
+				 options.get_empty_dir(),
+				 options.get_keep_compressed() ? algo_kept : options.get_compression(),
+				 options.get_compression_level(),
+				 options.get_slice_size(),
+				 options.get_first_slice_size(),
+				 options.get_ea_mask(),
+				 options.get_execute(),
+				 options.get_crypto_algo(),
+				 options.get_crypto_pass(),
+				 options.get_crypto_size(),
+				 options.get_gnupg_recipients(),
+				 options.get_gnupg_signatories(),
+				 options.get_compr_mask(),
+				 options.get_min_compr_size(),
+				 false,   // nodump
+				 "",      // exclude_by_ea
+				 0,       // hourshift
+				 options.get_empty(),
+				 true,    // alter_atime
+				 false,   // furtive_read_mode
+				 false,   // same_fs
+				 comparison_fields::all,        // what_to_check
+				 false,   // snapshot
+				 false,   // cache_directory_tagging
+				 options.get_keep_compressed(),
+				 0,       // fixed_date
+				 options.get_slice_permission(),
+				 0,       // repeat_count
+				 0,       // repeat_byte
+				 options.get_decremental_mode(),
+				 options.get_sequential_marks(),
+				 false,   // security_check
+				 options.get_sparse_file_min_size(),
+				 options.get_user_comment(),
+				 options.get_hash_algo(),
+				 options.get_slice_min_digits(),
+				 "",      // backup_hook_file_execute
+				 bool_mask(false),         // backup_hook_file_mask
+				 false,   // ignore_unknown
+				 options.get_fsa_scope(),
+				 options.get_multi_threaded(),
+				 options.get_delta_signature(),
+				 options.get_has_delta_mask_been_set(), // build delta sig
+				 options.get_delta_mask(), // delta_mask
+				 options.get_delta_sig_min_size(),
+				 false,   // delta diff
+				 true,    // zeroing_neg_date
+				 set<string>(),            // empty list
+				 modified_data_detection::any_inode_change, // not used for merging
+				 st_ptr);
+
+		exploitable = false;
+		stack.terminate();
 	    }
 	    catch(...)
 	    {
-		free_mem();
+		sauv_path_t.reset();
 		throw;
 	    }
+	    sauv_path_t.reset();
 	}
 	catch(...)
 	{
-	    NLS_SWAP_OUT;
+	    free_mem();
 	    throw;
 	}
-	NLS_SWAP_OUT;
     }
 
-    archive::archive(const std::shared_ptr<user_interaction> & dialog,
-		     const path & chem_src,
-		     const string & basename_src,
-		     const string & extension_src,
-		     const archive_options_read & options_read,
-		     const path & chem_dst,
-		     const string & basename_dst,
-		     const string & extension_dst,
-		     const archive_options_repair & options_repair): mem_ui(dialog)
+    archive::i_archive::i_archive(const std::shared_ptr<user_interaction> & dialog,
+				  const path & chem_src,
+				  const string & basename_src,
+				  const string & extension_src,
+				  const archive_options_read & options_read,
+				  const path & chem_dst,
+				  const string & basename_dst,
+				  const string & extension_dst,
+				  const archive_options_repair & options_repair): mem_ui(dialog)
     {
 	archive_options_read my_options_read = options_read;
 	bool initial_pause = (*options_read.get_entrepot() == *options_repair.get_entrepot() && chem_src == chem_dst);
@@ -782,7 +756,7 @@ namespace libdar
 
 	shared_ptr<entrepot> sauv_path_t = options_repair.get_entrepot();
 	if(sauv_path_t == nullptr)
-	    throw Ememory("archive::archive(repair)");
+	    throw Ememory("archive::i_archive::archive(repair)");
 
 	try
 	{
@@ -810,13 +784,13 @@ namespace libdar
 			extension_src,
 			my_options_read);
 
-	    if(src.cat == nullptr)
+	    if(src.pimpl->cat == nullptr)
 		throw SRC_BUG;
 
 	    op_create_in_sub(oper_repair,
 			     chem_dst,
 			     sauv_path_t,
-			     src.cat,             // ref1
+			     src.pimpl->cat,             // ref1
 			     nullptr,             // ref2
 			     initial_pause,
 			     bool_mask(true),     // selection
@@ -833,7 +807,7 @@ namespace libdar
 			     options_repair.get_display_finished(),
 			     options_repair.get_pause(),
 			     false,               // empty_dir
-			     src.ver.get_compression_algo(),
+			     src.pimpl->ver.get_compression_algo(),
 			     9,                   // we keep the data compressed this parameter has no importance
 			     options_repair.get_slice_size(),
 			     options_repair.get_first_slice_size(),
@@ -885,8 +859,8 @@ namespace libdar
 
 		// stealing src's catalogue, our's is still empty at this step
 	    catalogue *tmp = cat;
-	    cat = src.cat;
-	    src.cat = tmp;
+	    cat = src.pimpl->cat;
+	    src.pimpl->cat = tmp;
 
 	    dialog->printf(gettext("Archive repairing completed. WARNING! it is strongly advised to test the resulting archive before removing the damaged one"));
 	}
@@ -901,14 +875,13 @@ namespace libdar
     }
 
 
-    statistics archive::op_extract(const path & fs_root,
-				   const archive_options_extract & options,
-				   statistics * progressive_report)
+    statistics archive::i_archive::op_extract(const path & fs_root,
+					      const archive_options_extract & options,
+					      statistics * progressive_report)
     {
         statistics st = false;  // false => no lock for this internal object
 	statistics *st_ptr = progressive_report == nullptr ? &st : progressive_report;
 
-        NLS_SWAP_IN;
         try
         {
 
@@ -977,22 +950,18 @@ namespace libdar
         }
         catch(...)
         {
-            NLS_SWAP_OUT;
 	    if(sequential_read)
 		exploitable = false;
             throw;
         }
-        NLS_SWAP_OUT;
 	if(sequential_read)
 	    exploitable = false;
 
         return *st_ptr;
     }
 
-    void archive::summary()
+    void archive::i_archive::summary()
     {
-        NLS_SWAP_IN;
-
         try
         {
 	    archive_summary sum = summary_data();
@@ -1062,17 +1031,15 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    NLS_SWAP_OUT;
 	    if(sequential_read)
 		exploitable = false;
 	    throw;
 	}
-	NLS_SWAP_OUT;
 	if(sequential_read)
 	    exploitable = false;
     }
 
-    archive_summary archive::summary_data()
+    archive_summary archive::i_archive::summary_data()
     {
 	archive_summary ret;
 	infinint sub_slice_size;
@@ -1144,16 +1111,14 @@ namespace libdar
     }
 
 
-    void archive::op_listing(archive_listing_callback callback,
-			     void *context,
-			     const archive_options_listing & options) const
+    void archive::i_archive::op_listing(archive_listing_callback callback,
+					void *context,
+					const archive_options_listing & options) const
     {
-	archive *me = const_cast<archive *>(this);
+	i_archive *me = const_cast<i_archive *>(this);
 
 	if(me == nullptr)
 	    throw SRC_BUG;
-
-        NLS_SWAP_IN;
 
         try
         {
@@ -1162,13 +1127,13 @@ namespace libdar
 	    thread_cancellation thr;
 
 	    if(options.get_display_ea() && sequential_read)
-		throw Erange("archive::get_children_of", gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
+		throw Erange("archive::i_archive::get_children_of", gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
 
 	    if(options.get_slicing_location())
 	    {
 		if(!only_contains_an_isolated_catalogue()
 		   && sequential_read)
-		    throw Erange("archive::op_listing", gettext("slicing focused output is not available in sequential-read mode"));
+		    throw Erange("archive::i_archive::op_listing", gettext("slicing focused output is not available in sequential-read mode"));
 
 		slice_ptr = & used_layout;
 		if(!get_catalogue_slice_layout(used_layout))
@@ -1179,7 +1144,7 @@ namespace libdar
 			    get_ui().printf(gettext("Using user provided modified slicing (first slice = %i bytes, other slices = %i bytes)"), &used_layout.first_size, &used_layout.other_size);
 		    }
 		    else
-			throw Erange("archive::op_listing", gettext("No slice layout of the archive of reference for the current isolated catalogue is available, cannot provide slicing information, aborting"));
+			throw Erange("archive::i_archive::op_listing", gettext("No slice layout of the archive of reference for the current isolated catalogue is available, cannot provide slicing information, aborting"));
 		}
 	    }
 
@@ -1245,13 +1210,13 @@ namespace libdar
 			    }
 			    catch(Egeneric & e)
 			    {
-				throw Elibcall("archive::op_listing",
+				throw Elibcall("archive::i_archive::op_listing",
 					       tools_printf(gettext("Exception caught from archive_listing_callback execution: %s"),
 							    e.dump_str().c_str()));
 			    }
 			    catch(...)
 			    {
-				throw Elibcall("archive::op_listing", gettext("Exception caught from archive_listing_callback execution"));
+				throw Elibcall("archive::i_archive::op_listing", gettext("Exception caught from archive_listing_callback execution"));
 			    }
 			}
 			else // not saved, filtered out
@@ -1286,25 +1251,22 @@ namespace libdar
         }
         catch(...)
         {
-            NLS_SWAP_OUT;
 	    if(sequential_read)
 		me->exploitable = false;
             throw;
         }
-        NLS_SWAP_OUT;
 	if(sequential_read)
 	    me->exploitable = false;
     }
 
-    statistics archive::op_diff(const path & fs_root,
-				const archive_options_diff & options,
-				statistics * progressive_report)
+    statistics archive::i_archive::op_diff(const path & fs_root,
+					   const archive_options_diff & options,
+					   statistics * progressive_report)
     {
         statistics st = false;  // false => no lock for this internal object
 	statistics *st_ptr = progressive_report == nullptr ? &st : progressive_report;
 	bool isolated_mode = false;
 
-        NLS_SWAP_IN;
         try
         {
 
@@ -1366,27 +1328,23 @@ namespace libdar
         }
         catch(...)
         {
-            NLS_SWAP_OUT;
 	    if(sequential_read)
 		exploitable = false;
             throw;
         }
-
-        NLS_SWAP_OUT;
 	if(sequential_read)
 	    exploitable = false;
 
         return *st_ptr;
     }
 
-    statistics archive::op_test(const archive_options_test & options,
-				statistics * progressive_report)
+    statistics archive::i_archive::op_test(const archive_options_test & options,
+					   statistics * progressive_report)
     {
         statistics st = false;  // false => no lock for this internal object
 	statistics *st_ptr = progressive_report == nullptr ? &st : progressive_report;
 	bool isolated = false;
 
-        NLS_SWAP_IN;
         try
         {
 
@@ -1461,12 +1419,10 @@ namespace libdar
         }
         catch(...)
         {
-            NLS_SWAP_OUT;
 	    if(sequential_read)
 		exploitable = false;
             throw;
         }
-        NLS_SWAP_OUT;
 	if(sequential_read)
 	    exploitable = false;
 
@@ -1474,153 +1430,143 @@ namespace libdar
     }
 
 
-    void archive::op_isolate(const path &sauv_path,
-			     const string & filename,
-			     const string & extension,
-			     const archive_options_isolate & options)
+    void archive::i_archive::op_isolate(const path &sauv_path,
+					const string & filename,
+					const string & extension,
+					const archive_options_isolate & options)
     {
-        NLS_SWAP_IN;
-        try
-        {
-	    shared_ptr<entrepot> sauv_path_t = options.get_entrepot();
-	    if(sauv_path_t == nullptr)
-		throw Ememory("archive::archive");
-	    const entrepot_local *sauv_path_t_local = dynamic_cast<const entrepot_local *>(sauv_path_t.get());
+	shared_ptr<entrepot> sauv_path_t = options.get_entrepot();
+	if(sauv_path_t == nullptr)
+	    throw Ememory("archive::i_archive::archive");
+	const entrepot_local *sauv_path_t_local = dynamic_cast<const entrepot_local *>(sauv_path_t.get());
 
-	    sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
-	    sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
-	    sauv_path_t->set_location(sauv_path);
+	sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
+	sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
+	sauv_path_t->set_location(sauv_path);
 
-	    if(!options.get_empty() && sauv_path_t_local != nullptr)
-		tools_avoid_slice_overwriting_regex(get_ui(),
-						    *sauv_path_t,
-						    filename,
-						    extension,
-						    options.get_info_details(),
-						    options.get_allow_over(),
-						    options.get_warn_over(),
-						    options.get_empty());
+	if(!options.get_empty() && sauv_path_t_local != nullptr)
+	    tools_avoid_slice_overwriting_regex(get_ui(),
+						*sauv_path_t,
+						filename,
+						extension,
+						options.get_info_details(),
+						options.get_allow_over(),
+						options.get_warn_over(),
+						options.get_empty());
 
-	    try
+	try
+	{
+	    pile layers;
+	    header_version isol_ver;
+	    label isol_data_name;
+	    label internal_name;
+	    slice_layout isol_slices;
+
+	    if(!exploitable && options.get_delta_signature())
+		throw Erange("archive::i_archive::op_isolate", gettext("Isolation with delta signature is not possible on a just created archive (on-fly isolation)"));
+
+	    do
 	    {
-		pile layers;
-		header_version isol_ver;
-		label isol_data_name;
-		label internal_name;
-		slice_layout isol_slices;
-
-		if(!exploitable && options.get_delta_signature())
-		    throw Erange("archive::op_isolate", gettext("Isolation with delta signature is not possible on a just created archive (on-fly isolation)"));
-
-		do
-		{
-		    isol_data_name.generate_internal_filename();
-		}
-		while(isol_data_name == cat->get_data_name());
-		internal_name = isol_data_name;
-
-
-		macro_tools_create_layers(get_pointer(),
-					  layers,
-					  isol_ver,
-					  isol_slices,
-					  &slices, // giving our slice_layout as reference to be stored in the archive header/trailer
-					  sauv_path_t,
-					  filename,
-					  extension,
-					  options.get_allow_over(),
-					  options.get_warn_over(),
-					  options.get_info_details(),
-					  options.get_pause(),
-					  options.get_compression(),
-					  options.get_compression_level(),
-					  options.get_slice_size(),
-					  options.get_first_slice_size(),
-					  options.get_execute(),
-					  options.get_crypto_algo(),
-					  options.get_crypto_pass(),
-					  options.get_crypto_size(),
-					  options.get_gnupg_recipients(),
-					  options.get_gnupg_signatories(),
-					  options.get_empty(),
-					  options.get_slice_permission(),
-					  options.get_sequential_marks(),
-					  options.get_user_comment(),
-					  options.get_hash_algo(),
-					  options.get_slice_min_digits(),
-					  internal_name,
-					  isol_data_name,
-					  options.get_multi_threaded());
-
-		if(cat == nullptr)
-		    throw SRC_BUG;
-
-		    // note:
-		    // an isolated catalogue keeps the data, EA and FSA pointers of the archive they come from
-		    // but have their own copy of the delta signature if present, in order to be able to make
-		    // a differential/incremental delta binary based on an isplated catalogue. The drawback is
-		    // that reading an archive with the help of an isolated catalogue, the delta signature used
-		    // will always be those of the isolated catalogue, not those of the archive the catalogue
-		    // has been isolated from.
-		    // Using an isolated catalogue as backup of the internal catalogue stays possible but not
-		    // for the delta_signature which are ignored by libdar in that situation (archive reading).
-		    // However as delta_signature are only used at archive creation time this does not hurt. Delta
-		    // signature will be available during a differential backup either from the isolated catalogue
-		    // using its own copy of them, or from the original archive which would contain their original
-		    // version.
-
-		if(options.get_delta_signature())
-		{
-		    pile_descriptor pdesc = & layers;
-		    cat->transfer_delta_signatures(pdesc,
-						   sequential_read,
-						   options.get_has_delta_mask_been_set(),
-						   options.get_delta_mask(),
-						   options.get_delta_sig_min_size());
-		}
-		else
-			// we drop the delta signature as they will never be used
-			// because none will be in the isolated catalogue
-			// and that an isolated catalogue as backup of an internal
-			// catalogue cannot rescue the delta signature (they have
-			// to be in the isolated catalogue)
-		    cat->drop_delta_signatures();
-
-
-
-		if(isol_data_name == cat->get_data_name())
-		    throw SRC_BUG;
-		    // data_name generated just above by slice layer
-		    // should never equal the data_name of the catalogue
-		    // when performing isolation
-
-		macro_tools_close_layers(get_pointer(),
-					 layers,
-					 isol_ver,
-					 *cat,
-					 options.get_info_details(),
-					 options.get_crypto_algo(),
-					 options.get_compression(),
-					 options.get_gnupg_recipients(),
-					 options.get_gnupg_signatories(),
-					 options.get_empty());
+		isol_data_name.generate_internal_filename();
 	    }
-	    catch(...)
+	    while(isol_data_name == cat->get_data_name());
+	    internal_name = isol_data_name;
+
+
+	    macro_tools_create_layers(get_pointer(),
+				      layers,
+				      isol_ver,
+				      isol_slices,
+				      &slices, // giving our slice_layout as reference to be stored in the archive header/trailer
+				      sauv_path_t,
+				      filename,
+				      extension,
+				      options.get_allow_over(),
+				      options.get_warn_over(),
+				      options.get_info_details(),
+				      options.get_pause(),
+				      options.get_compression(),
+				      options.get_compression_level(),
+				      options.get_slice_size(),
+				      options.get_first_slice_size(),
+				      options.get_execute(),
+				      options.get_crypto_algo(),
+				      options.get_crypto_pass(),
+				      options.get_crypto_size(),
+				      options.get_gnupg_recipients(),
+				      options.get_gnupg_signatories(),
+				      options.get_empty(),
+				      options.get_slice_permission(),
+				      options.get_sequential_marks(),
+				      options.get_user_comment(),
+				      options.get_hash_algo(),
+				      options.get_slice_min_digits(),
+				      internal_name,
+				      isol_data_name,
+				      options.get_multi_threaded());
+
+	    if(cat == nullptr)
+		throw SRC_BUG;
+
+		// note:
+		// an isolated catalogue keeps the data, EA and FSA pointers of the archive they come from
+		// but have their own copy of the delta signature if present, in order to be able to make
+		// a differential/incremental delta binary based on an isplated catalogue. The drawback is
+		// that reading an archive with the help of an isolated catalogue, the delta signature used
+		// will always be those of the isolated catalogue, not those of the archive the catalogue
+		// has been isolated from.
+		// Using an isolated catalogue as backup of the internal catalogue stays possible but not
+		// for the delta_signature which are ignored by libdar in that situation (archive reading).
+		// However as delta_signature are only used at archive creation time this does not hurt. Delta
+		// signature will be available during a differential backup either from the isolated catalogue
+		// using its own copy of them, or from the original archive which would contain their original
+		// version.
+
+	    if(options.get_delta_signature())
 	    {
-		sauv_path_t.reset();
-		throw;
+		pile_descriptor pdesc = & layers;
+		cat->transfer_delta_signatures(pdesc,
+					       sequential_read,
+					       options.get_has_delta_mask_been_set(),
+					       options.get_delta_mask(),
+					       options.get_delta_sig_min_size());
 	    }
+	    else
+		    // we drop the delta signature as they will never be used
+		    // because none will be in the isolated catalogue
+		    // and that an isolated catalogue as backup of an internal
+		    // catalogue cannot rescue the delta signature (they have
+		    // to be in the isolated catalogue)
+		cat->drop_delta_signatures();
+
+
+
+	    if(isol_data_name == cat->get_data_name())
+		throw SRC_BUG;
+		// data_name generated just above by slice layer
+		// should never equal the data_name of the catalogue
+		// when performing isolation
+
+	    macro_tools_close_layers(get_pointer(),
+				     layers,
+				     isol_ver,
+				     *cat,
+				     options.get_info_details(),
+				     options.get_crypto_algo(),
+				     options.get_compression(),
+				     options.get_gnupg_recipients(),
+				     options.get_gnupg_signatories(),
+				     options.get_empty());
+	}
+	catch(...)
+	{
 	    sauv_path_t.reset();
-        }
-        catch(...)
-        {
-            NLS_SWAP_OUT;
-            throw;
-        }
-        NLS_SWAP_OUT;
+	    throw;
+	}
+	sauv_path_t.reset();
     }
 
-    void archive::load_catalogue()
+    void archive::i_archive::load_catalogue()
     {
 	if(exploitable && sequential_read) // the catalogue is not even yet read, so we must first read it entirely
 	{
@@ -1643,202 +1589,137 @@ namespace libdar
     }
 
 
-    bool archive::get_children_of(archive_listing_callback callback,
-				  void *context,
-                                  const string & dir,
-				  bool fetch_ea)
+    bool archive::i_archive::get_children_of(archive_listing_callback callback,
+					     void *context,
+					     const string & dir,
+					     bool fetch_ea)
     {
 	bool ret;
-        NLS_SWAP_IN;
-        try
-        {
-	    if(fetch_ea && sequential_read)
-		throw Erange("archive::get_children_of", gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
-	    load_catalogue();
-		// OK, now that we have the whole catalogue available in memory, let's rock!
 
-	    vector<list_entry> tmp = get_children_in_table(dir,fetch_ea);
-	    vector<list_entry>::iterator it = tmp.begin();
+	if(fetch_ea && sequential_read)
+	    throw Erange("archive::i_archive::get_children_of", gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
+	load_catalogue();
+	    // OK, now that we have the whole catalogue available in memory, let's rock!
 
-	    ret = (it != tmp.end());
-	    while(it != tmp.end())
-		callback(dir, *it, context);
-        }
-        catch(...)
-        {
-            NLS_SWAP_OUT;
-            throw;
-        }
-        NLS_SWAP_OUT;
+	vector<list_entry> tmp = get_children_in_table(dir,fetch_ea);
+	vector<list_entry>::iterator it = tmp.begin();
+
+	ret = (it != tmp.end());
+	while(it != tmp.end())
+	    callback(dir, *it, context);
 
 	return ret;
     }
 
 
-    const vector<list_entry> archive::get_children_in_table(const string & dir, bool fetch_ea) const
+    const vector<list_entry> archive::i_archive::get_children_in_table(const string & dir, bool fetch_ea) const
     {
 	vector <list_entry> ret;
+	i_archive* me = const_cast<i_archive *>(this);
 
-	NLS_SWAP_IN;
-        try
-        {
-	    archive* me = const_cast<archive*>(this);
-	    if(me == nullptr)
+	if(me == nullptr)
+	    throw SRC_BUG;
+
+	if(fetch_ea && sequential_read)
+	    throw Erange("archive::i_archive::get_children_of", gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
+	me->load_catalogue();
+
+	const cat_directory* parent = get_dir_object(dir);
+	const cat_nomme* tmp_ptr = nullptr;
+	list_entry ent;
+
+	if(parent == nullptr)
+	    throw SRC_BUG;
+
+	parent->reset_read_children();
+	while(parent->read_children(tmp_ptr))
+	{
+	    if(tmp_ptr == nullptr)
 		throw SRC_BUG;
 
-	    if(fetch_ea && sequential_read)
-		throw Erange("archive::get_children_of", gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
-	    me->load_catalogue();
+	    tmp_ptr->set_list_entry(&slices, fetch_ea, ent);
 
-	    const cat_directory* parent = get_dir_object(dir);
-	    const cat_nomme* tmp_ptr = nullptr;
-	    list_entry ent;
-
-            if(parent == nullptr)
-		throw SRC_BUG;
-
-	    parent->reset_read_children();
-	    while(parent->read_children(tmp_ptr))
-	    {
-		if(tmp_ptr == nullptr)
-		    throw SRC_BUG;
-
-		tmp_ptr->set_list_entry(&slices, fetch_ea, ent);
-
-		    // fill a new entry in the table
-		ret.push_back(ent);
-	    }
-
+		// fill a new entry in the table
+	    ret.push_back(ent);
 	}
-        catch(...)
-        {
-	    NLS_SWAP_OUT;
-            throw;
-	}
-        NLS_SWAP_OUT;
 
 	return ret;
     }
 
-    bool archive::has_subdirectory(const string & dir) const
+    bool archive::i_archive::has_subdirectory(const string & dir) const
     {
 	bool ret = false;
+	const cat_directory *parent = get_dir_object(dir);
+	const cat_nomme *tmp_ptr = nullptr;
 
-	NLS_SWAP_IN;
-        try
-        {
-	    const cat_directory *parent = get_dir_object(dir);
-	    const cat_nomme *tmp_ptr = nullptr;
-
-	    parent->reset_read_children();
-	    while(parent->read_children(tmp_ptr) && !ret)
-	    {
-		if(dynamic_cast<const cat_directory *>(tmp_ptr) != nullptr)
-		    ret = true;
-	    }
+	parent->reset_read_children();
+	while(parent->read_children(tmp_ptr) && !ret)
+	{
+	    if(dynamic_cast<const cat_directory *>(tmp_ptr) != nullptr)
+		ret = true;
 	}
-        catch(...)
-        {
-	    NLS_SWAP_OUT;
-            throw;
-	}
-        NLS_SWAP_OUT;
 
 	return ret;
     }
 
-    void archive::init_catalogue() const
+    void archive::i_archive::init_catalogue() const
     {
-	NLS_SWAP_IN;
-        try
-        {
-	    if(exploitable && sequential_read) // the catalogue is not even yet read, so we must first read it entirely
+	if(exploitable && sequential_read) // the catalogue is not even yet read, so we must first read it entirely
+	{
+	    if(only_contains_an_isolated_catalogue())
+		    // this is easy... asking just an entry
+		    //from the catalogue makes its whole being read
 	    {
-		if(only_contains_an_isolated_catalogue())
-			// this is easy... asking just an entry
-			//from the catalogue makes its whole being read
-		{
-		    const cat_entree *tmp;
-		    if(cat == nullptr)
-			throw SRC_BUG;
-		    cat->read(tmp); // should be enough to have the whole catalogue being read
-		    cat->reset_read();
-		}
-		else
-		{
-		    if(cat == nullptr)
-			throw SRC_BUG;
-		    filtre_sequentially_read_all_catalogue(*cat, get_pointer(), lax_read_mode);
-		}
+		const cat_entree *tmp;
+		if(cat == nullptr)
+		    throw SRC_BUG;
+		cat->read(tmp); // should be enough to have the whole catalogue being read
+		cat->reset_read();
 	    }
+	    else
+	    {
+		if(cat == nullptr)
+		    throw SRC_BUG;
+		filtre_sequentially_read_all_catalogue(*cat, get_pointer(), lax_read_mode);
+	    }
+	}
 
-	    if(cat == nullptr)
-		throw SRC_BUG;
-	}
-        catch(...)
-        {
-	    NLS_SWAP_OUT;
-            throw;
-	}
-        NLS_SWAP_OUT;
+	if(cat == nullptr)
+	    throw SRC_BUG;
     }
 
-    const catalogue & archive::get_catalogue() const
+    const catalogue & archive::i_archive::get_catalogue() const
     {
-	NLS_SWAP_IN;
+	if(exploitable && sequential_read)
+	    throw Elibcall("archive::i_archive::get_catalogue", "Reading the first time the catalogue of an archive open in sequential read mode needs passing a \"user_interaction\" object to the argument of archive::i_archive::get_catalogue or call init_catalogue() first ");
 
-	try
-	{
-	    if(exploitable && sequential_read)
-		throw Elibcall("archive::get_catalogue", "Reading the first time the catalogue of an archive open in sequential read mode needs passing a \"user_interaction\" object to the argument of archive::get_catalogue or call init_catalogue() first ");
-
-	    if(cat == nullptr)
-		throw SRC_BUG;
-	}
-	catch(...)
-	{
-	    NLS_SWAP_OUT;
-	    throw;
-	}
-
-	NLS_SWAP_OUT;
+	if(cat == nullptr)
+	    throw SRC_BUG;
 
 	return *cat;
     }
 
-    void archive::drop_all_filedescriptors()
+    void archive::i_archive::drop_all_filedescriptors()
     {
-	NLS_SWAP_IN;
-
-	try
+	if(exploitable && sequential_read)
 	{
-	    if(exploitable && sequential_read)
+	    if(only_contains_an_isolated_catalogue())
 	    {
-		if(only_contains_an_isolated_catalogue())
-		{
-		    const cat_entree *tmp;
-		    if(cat == nullptr)
-			throw SRC_BUG;
-		    cat->read(tmp); // should be enough to have the whole catalogue being read
-		    cat->reset_read();
-		}
-		else
-		    (void)op_test(archive_options_test(), nullptr);
+		const cat_entree *tmp;
+		if(cat == nullptr)
+		    throw SRC_BUG;
+		cat->read(tmp); // should be enough to have the whole catalogue being read
+		cat->reset_read();
 	    }
-
-	    stack.clear();
-	    exploitable = false;
-	}
-	catch(...)
-	{
-	    NLS_SWAP_OUT;
-	    throw;
+	    else
+		(void)op_test(archive_options_test(), nullptr);
 	}
 
-	NLS_SWAP_OUT;
+	stack.clear();
+	exploitable = false;
     }
 
-    bool archive::get_catalogue_slice_layout(slice_layout & slicing) const
+    bool archive::i_archive::get_catalogue_slice_layout(slice_layout & slicing) const
     {
 	slicing = slices;
 	    // by default we use the slice layout of the current archive,
@@ -1869,7 +1750,7 @@ namespace libdar
     }
 
 
-    U_64 archive::get_first_slice_header_size() const
+    U_64 archive::i_archive::get_first_slice_header_size() const
     {
 	U_64 ret;
 	infinint pre_ret;
@@ -1893,7 +1774,7 @@ namespace libdar
 	return ret;
     }
 
-    U_64 archive::get_non_first_slice_header_size() const
+    U_64 archive::i_archive::get_non_first_slice_header_size() const
     {
 	U_64 ret;
 	infinint pre_ret;
@@ -1922,70 +1803,70 @@ namespace libdar
 	// PRIVATE METHODS FOLLOW
 	//
 
-    statistics archive::op_create_in(operation op,
-				     const path & fs_root,
-                                     const shared_ptr<entrepot> & sauv_path_t,
-				     archive *ref_arch,
-                                     const mask & selection,
-				     const mask & subtree,
-                                     const string & filename,
-				     const string & extension,
-                                     bool allow_over,
-				     bool warn_over,
-				     bool info_details,
-				     bool display_treated,
-				     bool display_treated_only_dir,
-				     bool display_skipped,
-				     bool display_finished,
-				     const infinint & pause,
-                                     bool empty_dir,
-				     compression algo,
-				     U_I compression_level,
-                                     const infinint & file_size,
-                                     const infinint & first_file_size,
-                                     const mask & ea_mask,
-                                     const string & execute,
-                                     crypto_algo crypto,
-                                     const secu_string & pass,
-                                     U_32 crypto_size,
-				     const vector<string> & gnupg_recipients,
-				     const vector<string> & gnupg_signatories,
-                                     const mask & compr_mask,
-                                     const infinint & min_compr_size,
-                                     bool nodump,
-				     const string & exclude_by_ea,
-                                     const infinint & hourshift,
-                                     bool empty,
-                                     bool alter_atime,
-				     bool furtive_read_mode,
-                                     bool same_fs,
-				     comparison_fields what_to_check,
-                                     bool snapshot,
-                                     bool cache_directory_tagging,
-				     const infinint & fixed_date,
-				     const string & slice_permission,
-				     const infinint & repeat_count,
-				     const infinint & repeat_byte,
-				     bool add_marks_for_sequential_reading,
-				     bool security_check,
-				     const infinint & sparse_file_min_size,
-				     const string & user_comment,
-				     hash_algo hash,
-				     const infinint & slice_min_digits,
-				     const string & backup_hook_file_execute,
-				     const mask & backup_hook_file_mask,
-				     bool ignore_unknown,
-				     const fsa_scope & scope,
-				     bool multi_threaded,
-				     bool delta_signature,
-				     bool build_delta_sig,
-				     const mask & delta_mask,
-				     const infinint & delta_sig_min_size,
-				     bool delta_diff,
-				     bool zeroing_neg_date,
-				     const set<string> & ignored_symlinks,
-				     modified_data_detection mod_data_detect,
-				     statistics * progressive_report)
+    statistics archive::i_archive::op_create_in(operation op,
+						const path & fs_root,
+						const shared_ptr<entrepot> & sauv_path_t,
+						archive *ref_arch,
+						const mask & selection,
+						const mask & subtree,
+						const string & filename,
+						const string & extension,
+						bool allow_over,
+						bool warn_over,
+						bool info_details,
+						bool display_treated,
+						bool display_treated_only_dir,
+						bool display_skipped,
+						bool display_finished,
+						const infinint & pause,
+						bool empty_dir,
+						compression algo,
+						U_I compression_level,
+						const infinint & file_size,
+						const infinint & first_file_size,
+						const mask & ea_mask,
+						const string & execute,
+						crypto_algo crypto,
+						const secu_string & pass,
+						U_32 crypto_size,
+						const vector<string> & gnupg_recipients,
+						const vector<string> & gnupg_signatories,
+						const mask & compr_mask,
+						const infinint & min_compr_size,
+						bool nodump,
+						const string & exclude_by_ea,
+						const infinint & hourshift,
+						bool empty,
+						bool alter_atime,
+						bool furtive_read_mode,
+						bool same_fs,
+						comparison_fields what_to_check,
+						bool snapshot,
+						bool cache_directory_tagging,
+						const infinint & fixed_date,
+						const string & slice_permission,
+						const infinint & repeat_count,
+						const infinint & repeat_byte,
+						bool add_marks_for_sequential_reading,
+						bool security_check,
+						const infinint & sparse_file_min_size,
+						const string & user_comment,
+						hash_algo hash,
+						const infinint & slice_min_digits,
+						const string & backup_hook_file_execute,
+						const mask & backup_hook_file_mask,
+						bool ignore_unknown,
+						const fsa_scope & scope,
+						bool multi_threaded,
+						bool delta_signature,
+						bool build_delta_sig,
+						const mask & delta_mask,
+						const infinint & delta_sig_min_size,
+						bool delta_diff,
+						bool zeroing_neg_date,
+						const set<string> & ignored_symlinks,
+						modified_data_detection mod_data_detect,
+						statistics * progressive_report)
     {
         statistics st = false;  // false => no lock for this internal object
 	statistics *st_ptr = progressive_report == nullptr ? &st : progressive_report;
@@ -2028,8 +1909,8 @@ namespace libdar
 					    warn_over,
 					    empty);
 
-	if(ref_arch != nullptr && ref_arch->sequential_read && (delta_signature || delta_diff))
-	    throw Erange("archive::op_create_in", gettext("Cannot sequentially read an archive of reference when delta signature or delta patch is requested"));
+	if(ref_arch != nullptr && ref_arch->pimpl->sequential_read && (delta_signature || delta_diff))
+	    throw Erange("archive::i_archive::op_create_in", gettext("Cannot sequentially read an archive of reference when delta signature or delta patch is requested"));
 
 	local_cat_size = 0; // unknown catalogue size (need to re-open the archive, once creation has completed) [object member variable]
 
@@ -2070,10 +1951,10 @@ namespace libdar
 
 	if(ref_arch != nullptr) // from a existing archive
 	{
-	    const shared_ptr<entrepot> ref_where = ref_arch->get_entrepot();
+	    const shared_ptr<entrepot> ref_where = ref_arch->pimpl->get_entrepot();
 	    if(ref_where)
 		initial_pause = (*ref_where == *sauv_path_t);
-	    ref_cat = const_cast<catalogue *>(& ref_arch->get_catalogue());
+	    ref_cat = const_cast<catalogue *>(& ref_arch->pimpl->get_catalogue());
 	}
 
 	op_create_in_sub(op,
@@ -2149,75 +2030,75 @@ namespace libdar
 	return *st_ptr;
     }
 
-    void archive::op_create_in_sub(operation op,
-				   const path & fs_root,
-				   const shared_ptr<entrepot> & sauv_path_t,
-				   catalogue *ref_cat1,
-				   const catalogue *ref_cat2,
-				   bool initial_pause,
-				   const mask & selection,
-				   const mask & subtree,
-				   const string & filename,
-				   const string & extension,
-				   bool allow_over,
-				   const crit_action & overwrite,
-				   bool warn_over,
-				   bool info_details,
-				   bool display_treated,
-				   bool display_treated_only_dir,
-				   bool display_skipped,
-				   bool display_finished,
-				   const infinint & pause,
-				   bool empty_dir,
-				   compression algo,
-				   U_I compression_level,
-				   const infinint & file_size,
-				   const infinint & first_file_size,
-				   const mask & ea_mask,
-				   const string & execute,
-				   crypto_algo crypto,
-				   const secu_string & pass,
-				   U_32 crypto_size,
-				   const vector<string> & gnupg_recipients,
-				   const vector<string> & gnupg_signatories,
-				   const mask & compr_mask,
-				   const infinint & min_compr_size,
-				   bool nodump,
-				   const string & exclude_by_ea,
-				   const infinint & hourshift,
-				   bool empty,
-				   bool alter_atime,
-				   bool furtive_read_mode,
-				   bool same_fs,
-				   comparison_fields what_to_check,
-				   bool snapshot,
-				   bool cache_directory_tagging,
-				   bool keep_compressed,
-				   const infinint & fixed_date,
-				   const string & slice_permission,
-				   const infinint & repeat_count,
-				   const infinint & repeat_byte,
-				   bool decremental,
-				   bool add_marks_for_sequential_reading,
-				   bool security_check,
-				   const infinint & sparse_file_min_size,
-				   const string & user_comment,
-				   hash_algo hash,
-				   const infinint & slice_min_digits,
-				   const string & backup_hook_file_execute,
-				   const mask & backup_hook_file_mask,
-				   bool ignore_unknown,
-				   const fsa_scope & scope,
-				   bool multi_threaded,
-				   bool delta_signature,
-				   bool build_delta_sig,
-				   const mask & delta_mask,
-				   const infinint & delta_sig_min_size,
-				   bool delta_diff,
-				   bool zeroing_neg_date,
-				   const set<string> & ignored_symlinks,
-				   modified_data_detection mod_data_detect,
-				   statistics * st_ptr)
+    void archive::i_archive::op_create_in_sub(operation op,
+					      const path & fs_root,
+					      const shared_ptr<entrepot> & sauv_path_t,
+					      catalogue *ref_cat1,
+					      const catalogue *ref_cat2,
+					      bool initial_pause,
+					      const mask & selection,
+					      const mask & subtree,
+					      const string & filename,
+					      const string & extension,
+					      bool allow_over,
+					      const crit_action & overwrite,
+					      bool warn_over,
+					      bool info_details,
+					      bool display_treated,
+					      bool display_treated_only_dir,
+					      bool display_skipped,
+					      bool display_finished,
+					      const infinint & pause,
+					      bool empty_dir,
+					      compression algo,
+					      U_I compression_level,
+					      const infinint & file_size,
+					      const infinint & first_file_size,
+					      const mask & ea_mask,
+					      const string & execute,
+					      crypto_algo crypto,
+					      const secu_string & pass,
+					      U_32 crypto_size,
+					      const vector<string> & gnupg_recipients,
+					      const vector<string> & gnupg_signatories,
+					      const mask & compr_mask,
+					      const infinint & min_compr_size,
+					      bool nodump,
+					      const string & exclude_by_ea,
+					      const infinint & hourshift,
+					      bool empty,
+					      bool alter_atime,
+					      bool furtive_read_mode,
+					      bool same_fs,
+					      comparison_fields what_to_check,
+					      bool snapshot,
+					      bool cache_directory_tagging,
+					      bool keep_compressed,
+					      const infinint & fixed_date,
+					      const string & slice_permission,
+					      const infinint & repeat_count,
+					      const infinint & repeat_byte,
+					      bool decremental,
+					      bool add_marks_for_sequential_reading,
+					      bool security_check,
+					      const infinint & sparse_file_min_size,
+					      const string & user_comment,
+					      hash_algo hash,
+					      const infinint & slice_min_digits,
+					      const string & backup_hook_file_execute,
+					      const mask & backup_hook_file_mask,
+					      bool ignore_unknown,
+					      const fsa_scope & scope,
+					      bool multi_threaded,
+					      bool delta_signature,
+					      bool build_delta_sig,
+					      const mask & delta_mask,
+					      const infinint & delta_sig_min_size,
+					      bool delta_diff,
+					      bool zeroing_neg_date,
+					      const set<string> & ignored_symlinks,
+					      modified_data_detection mod_data_detect,
+					      statistics * st_ptr)
     {
 	try
 	{
@@ -2305,7 +2186,7 @@ namespace libdar
 		catch(Erange & e)
 		{
 		    string tmp = fs_root.display();
-		    throw Erange("archive::op_create_in_sub", tools_printf(gettext("Error while fetching information for %S: "), &tmp) + e.get_message());
+		    throw Erange("archive::i_archive::op_create_in_sub", tools_printf(gettext("Error while fetching information for %S: "), &tmp) + e.get_message());
 		}
 
 		switch(op)
@@ -2328,7 +2209,7 @@ namespace libdar
 		}
 
 		if(cat == nullptr)
-		    throw Ememory("archive::op_create_in_sub");
+		    throw Ememory("archive::i_archive::op_create_in_sub");
 
 
 		    // *********** now we can perform the data filtering operation (adding data to the archive) *************** //
@@ -2351,7 +2232,7 @@ namespace libdar
 							       datetime(0),
 							       data_name);
 			    if(void_cat == nullptr)
-				throw Ememory("archive::op_create_in_sub");
+				throw Ememory("archive::i_archive::op_create_in_sub");
 			    ref_cat_ptr = void_cat;
 			}
 
@@ -2588,7 +2469,7 @@ namespace libdar
 	}
     }
 
-    void archive::free_mem()
+    void archive::i_archive::free_mem()
     {
 	stack.clear();
 	gnupg_signed.clear();
@@ -2601,7 +2482,7 @@ namespace libdar
 	}
     }
 
-    void archive::check_gnupg_signed() const
+    void archive::i_archive::check_gnupg_signed() const
     {
 	list<signator>::const_iterator it = gnupg_signed.begin();
 
@@ -2612,7 +2493,7 @@ namespace libdar
 	    get_ui().pause(gettext("WARNING! Incorrect signature found for archive, continue anyway?"));
     }
 
-    void archive::disable_natural_destruction()
+    void archive::i_archive::disable_natural_destruction()
     {
         sar *tmp = nullptr;
 	trivial_sar *triv_tmp = nullptr;
@@ -2628,7 +2509,7 @@ namespace libdar
 	}
     }
 
-    void archive::enable_natural_destruction()
+    void archive::i_archive::enable_natural_destruction()
     {
         sar *tmp = nullptr;
 	trivial_sar *triv_tmp = nullptr;
@@ -2644,7 +2525,7 @@ namespace libdar
 	}
     }
 
-    const label & archive::get_layer1_data_name() const
+    const label & archive::i_archive::get_layer1_data_name() const
     {
 	contextual *l1 = nullptr;
 
@@ -2655,7 +2536,7 @@ namespace libdar
 	    throw Erange("catalogue::get_data_name", gettext("Cannot get data name of the archive, this archive is not completely initialized"));
     }
 
-    const label & archive::get_catalogue_data_name() const
+    const label & archive::i_archive::get_catalogue_data_name() const
     {
 	if(cat != nullptr)
 	    return cat->get_data_name();
@@ -2663,12 +2544,12 @@ namespace libdar
 	    throw SRC_BUG;
     }
 
-    bool archive::only_contains_an_isolated_catalogue() const
+    bool archive::i_archive::only_contains_an_isolated_catalogue() const
     {
 	return get_layer1_data_name() != get_catalogue_data_name() && ver.get_edition() >= 8;
     }
 
-    void archive::check_against_isolation(bool lax) const
+    void archive::i_archive::check_against_isolation(bool lax) const
     {
 	if(cat != nullptr)
 	{
@@ -2677,7 +2558,7 @@ namespace libdar
 		if(only_contains_an_isolated_catalogue())
 		{
 		    if(!lax)
-			throw Erange("archive::check_against_isolation", gettext("This archive contains an isolated catalogue, it cannot be used for this operation. It can only be used as reference for a incremental/differential backup or as backup of the original archive's catalogue"));
+			throw Erange("archive::i_archive::check_against_isolation", gettext("This archive contains an isolated catalogue, it cannot be used for this operation. It can only be used as reference for a incremental/differential backup or as backup of the original archive's catalogue"));
 			// note1: that old archives do not have any data_name neither in the catalogue nor in the layer1 of the archive
 			// both are faked equal to a zeroed label when reading them with recent dar version. Older archives than "08" would
 			// thus pass this test successfully if no check was done against the archive version
@@ -2689,7 +2570,7 @@ namespace libdar
 	    }
 	    catch(Erange & e)
 	    {
-		throw Erange("archive::check_against_isolation", string(gettext("Error while fetching archive properties: ")) + e.get_message());
+		throw Erange("archive::i_archive::check_against_isolation", string(gettext("Error while fetching archive properties: ")) + e.get_message());
 	    }
 	}
 	else
@@ -2698,8 +2579,8 @@ namespace libdar
 	    // and this object should be totally exploitable, thus have an available catalogue
     }
 
-    bool archive::get_sar_param(infinint & sub_file_size, infinint & first_file_size, infinint & last_file_size,
-                                infinint & total_file_number)
+    bool archive::i_archive::get_sar_param(infinint & sub_file_size, infinint & first_file_size, infinint & last_file_size,
+					   infinint & total_file_number)
     {
         sar *real_decoupe = nullptr;
 
@@ -2714,13 +2595,13 @@ namespace libdar
                && real_decoupe->get_last_file_size(last_file_size))
                 return true;
             else // could not read size parameters
-                throw Erange("archive::get_sar_param", gettext("Sorry, file size is unknown at this step of the program."));
+                throw Erange("archive::i_archive::get_sar_param", gettext("Sorry, file size is unknown at this step of the program."));
         }
         else
             return false;
     }
 
-    shared_ptr<entrepot> archive::get_entrepot()
+    shared_ptr<entrepot> archive::i_archive::get_entrepot()
     {
 	shared_ptr<entrepot> ret;
 	sar *real_decoupe = nullptr;
@@ -2736,7 +2617,7 @@ namespace libdar
 	return ret;
     }
 
-    infinint archive::get_level2_size()
+    infinint archive::i_archive::get_level2_size()
     {
 	generic_file *level1 = stack.get_by_label(LIBDAR_STACK_LABEL_LEVEL1);
 
@@ -2749,7 +2630,7 @@ namespace libdar
 	    return 0;
     }
 
-    const cat_directory *archive::get_dir_object(const string & dir) const
+    const cat_directory *archive::i_archive::get_dir_object(const string & dir) const
     {
 	const cat_directory *parent = nullptr;
 	const cat_nomme *tmp_ptr = nullptr;
@@ -2775,7 +2656,7 @@ namespace libdar
 		    parent = nullptr;
 
 		if(parent == nullptr)
-		    throw Erange("archive::get_children_in_table", tools_printf("%S entry does not exist", &dir));
+		    throw Erange("archive::i_archive::get_children_in_table", tools_printf("%S entry does not exist", &dir));
 	    }
 	}
 	    // else returning the root of the archive

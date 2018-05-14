@@ -43,7 +43,6 @@ namespace libdar5
 	// from archive_options.hpp
     using libdar::path;
     using libdar::statistics;
-    using libdar::catalogue;
 
 	/// the archive class realizes the most general operations on archives
 
@@ -175,11 +174,6 @@ namespace libdar5
 	void init_catalogue(user_interaction & dialog) const
 	{
 	    libdar::archive::init_catalogue();
-	}
-
-	const catalogue & get_catalogue(user_interaction & dialog) const
-	{
-	    return libdar::archive::get_catalogue();
 	}
 
 	void drop_all_filedescriptors(user_interaction & dialog)
