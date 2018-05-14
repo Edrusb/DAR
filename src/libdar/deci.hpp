@@ -21,7 +21,7 @@
 
     /// \file deci.hpp
     /// \brief manages the decimal representation of infinint
-    /// \ingroup Private
+    /// \ingroup API
 
 #ifndef DECI_HPP
 #define DECI_HPP
@@ -35,7 +35,7 @@
 namespace libdar
 {
 
-	/// \addtogroup Private
+	/// \addtogroup API
 	/// @{
 
 
