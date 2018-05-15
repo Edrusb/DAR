@@ -32,6 +32,8 @@ extern "C"
 #include "sar.hpp"
 #include "trivial_sar.hpp"
 #include "macro_tools.hpp"
+#include "i_libdar_xform.hpp"
+#include "nls_swap.hpp"
 
 using namespace std;
 
@@ -42,81 +44,70 @@ namespace libdar
 			       const string & basename,
 			       const string & extension,
 			       const infinint & min_digits,
-			       const string & execute): mem_ui(ui)
+			       const string & execute)
     {
-	sar *tmp_sar = nullptr;
-
-	can_xform = true;
-	init_entrep();
-	src_path.reset(new (nothrow) path(chem));
-	if(!src_path)
-	    throw Ememory("libdar_xform::lidar_xform");
-
-	entrep->set_location(*src_path);
-
-	tmp_sar = new (nothrow) libdar::sar(get_pointer(),
-					    basename,
-					    extension,
-					    entrep,
-					    false,
-					    min_digits,
-					    false,
-					    execute);
-	source.reset(tmp_sar);
-	if(!source)
-	    throw Ememory("libdar_xform::lidar_xform");
-	if(tmp_sar == nullptr)
-	    throw SRC_BUG;
-	else
-	{
-		// yes we modify directly the object
-		// we assigned to "source", only for
-		// short time and simplicity not to cast
-		// back to libdar::sar type
-	    tmp_sar->set_info_status(CONTEXT_OP);
-	    format_07_compatible = tmp_sar->is_an_old_start_end_archive();
-	    dataname = tmp_sar->get_data_name();
+	NLS_SWAP_IN;
+        try
+        {
+	    pimpl.reset(new (nothrow) i_libdar_xform(ui,
+						     chem,
+						     basename,
+						     extension,
+						     min_digits,
+						     execute));
+	    if(!pimpl)
+		throw Ememory("libdar_xform::libdar_xform");
 	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
     }
 
     libdar_xform::libdar_xform(const shared_ptr<user_interaction> & ui,
-			       const std::string & pipename) : mem_ui(ui)
+			       const std::string & pipename)
     {
-	trivial_sar *tmp_sar = nullptr;
-
-	can_xform = true;
-	init_entrep();
-	tmp_sar = new (nothrow) libdar::trivial_sar(get_pointer(), pipename, false);
-	source.reset(tmp_sar);
-	if(!source)
-	    throw Ememory("libdar_xform::libdar_xform");
-	if(tmp_sar == nullptr)
-	    throw SRC_BUG;
-	else
-	{
-	    format_07_compatible = tmp_sar->is_an_old_start_end_archive();
-	    dataname = tmp_sar->get_data_name();
+	NLS_SWAP_IN;
+        try
+        {
+	    pimpl.reset(new (nothrow) i_libdar_xform(ui,
+						     pipename));
+	    if(!pimpl)
+		throw Ememory("libdar_xform::libdar_xform");
 	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
     }
 
-    libdar_xform::libdar_xform(const shared_ptr<user_interaction> & ui,
-			       int filedescriptor) : mem_ui(ui)
-    {
-	trivial_sar *tmp_sar = nullptr;
+    libdar_xform::libdar_xform(libdar_xform && ref) noexcept = default;
 
-	can_xform = true;
-	init_entrep();
-	tmp_sar = new (nothrow) libdar::trivial_sar(get_pointer(), filedescriptor, false);
-	source.reset(tmp_sar);
-	if(!source)
-	    throw Ememory("libdar_xform::libdar_xform");
-	if(tmp_sar == nullptr)
-	    throw SRC_BUG;
-	else
-	{
-	    format_07_compatible = tmp_sar->is_an_old_start_end_archive();
-	    dataname = tmp_sar->get_data_name();
+    libdar_xform & libdar_xform::operator = (libdar_xform && ref) noexcept = default;
+
+    libdar_xform::~libdar_xform() = default;
+
+    libdar_xform::libdar_xform(const shared_ptr<user_interaction> & ui,
+			       int filedescriptor)
+    {
+	NLS_SWAP_IN;
+        try
+        {
+	    pimpl.reset(new (nothrow) i_libdar_xform(ui,
+						     filedescriptor));
+	    if(!pimpl)
+		throw Ememory("libdar_xform::libdar_xform");
 	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
     }
 
     void libdar_xform::xform_to(const string & chem,
@@ -134,131 +125,47 @@ namespace libdar
 				const infinint & min_digits,
 				const string & execute)
     {
-	unique_ptr<path> dst_path(new (nothrow) path(chem));
-	label internal_name;
-	thread_cancellation thr;
-        unique_ptr<generic_file> destination;
-	bool force_perm = slice_perm != "";
-	U_I perm = force_perm ? tools_octal2int(slice_perm) : 0;
-
-	if(!dst_path)
-	    throw Ememory("libdar_xform::xform_to");
-	entrep->set_location(*dst_path);
-	entrep->set_user_ownership(slice_user);
-	entrep->set_group_ownership(slice_group);
-	tools_avoid_slice_overwriting_regex(get_ui(),
-					    *entrep,
-					    basename,
-					    extension,
-					    false,
-					    allow_over,
-					    warn_over,
-					    false);
-	internal_name.generate_internal_filename();
-
-	thr.check_self_cancellation();
-	if(slice_size.is_zero()) // generating a single-sliced archive
-	{
-	    destination.reset(new (nothrow) libdar::trivial_sar(get_pointer(),
-								gf_write_only,
-								basename,
-								extension,
-								*entrep,
-								internal_name,
-								dataname,
-								execute,
-								allow_over,
-								warn_over,
-								force_perm,
-								perm,
-								hash,
-								min_digits,
-								format_07_compatible));
+	NLS_SWAP_IN;
+        try
+        {
+	    pimpl->xform_to(chem,
+			    basename,
+			    extension,
+			    allow_over,
+			    warn_over,
+			    pause,
+			    first_slice_size,
+			    slice_size,
+			    slice_perm,
+			    slice_user,
+			    slice_group,
+			    hash,
+			    min_digits,
+			    execute);
 	}
-	else // generating multi-sliced archive
+	catch(...)
 	{
-	    destination.reset(new (nothrow) libdar::sar(get_pointer(),
-							gf_write_only,
-							basename,
-							extension,
-							slice_size,
-							first_slice_size,
-							warn_over,
-							allow_over,
-							pause,
-							entrep,
-							internal_name,
-							dataname,
-							force_perm,
-							perm,
-							hash,
-							min_digits,
-							format_07_compatible,
-							execute));
+	    NLS_SWAP_OUT;
+	    throw;
 	}
-	if(!destination)
-	    throw Ememory("libdar_xform::xform_to");
-
-	xform_to(destination.get());
+	NLS_SWAP_OUT;
     }
 
     void libdar_xform::xform_to(int filedescriptor,
 				const string & execute)
     {
-	label internal_name;
-	unique_ptr<generic_file> destination;
-
-	internal_name.generate_internal_filename();
-	destination.reset(macro_tools_open_archive_tuyau(get_pointer(),
-							 filedescriptor,
-							 gf_write_only,
-							 internal_name,
-							 dataname,
-							 format_07_compatible,
-							 execute));
-
-	if(!destination)
-	    throw Ememory("libdar_xform::xform_to");
-
-	xform_to(destination.get());
-    }
-
-    void libdar_xform::init_entrep()
-    {
-	entrep.reset(new (nothrow) entrepot_local("", "", false));
-	if(!entrep)
-	    throw Ememory("libdar_xform::lidar_xform");
-    }
-
-    void libdar_xform::xform_to(generic_file *dst)
-    {
-	if(dst == nullptr)
-	    throw SRC_BUG;
-	try
-	{
-	    source->copy_to(*dst);
+        NLS_SWAP_IN;
+        try
+        {
+	    pimpl->xform_to(filedescriptor,
+			    execute);
 	}
-	catch(Escript & e)
+	catch(...)
 	{
+	    NLS_SWAP_OUT;
 	    throw;
 	}
-	catch(Euser_abort & e)
-	{
-	    throw;
-	}
-	catch(Ebug & e)
-	{
-	    throw;
-	}
-	catch(Ethread_cancel & e)
-	{
-	    throw;
-	}
-	catch(Egeneric & e)
-	{
-	    string msg = string(gettext("Error transforming the archive :"))+e.get_message();
-	    throw Edata(msg);
-	}
+	NLS_SWAP_OUT;
     }
 
 } // end of namespace

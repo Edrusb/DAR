@@ -19,29 +19,29 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \file libdar_xform.hpp
+    /// \file i_libdar_xform.hpp
     /// \brief API for dar_xform functionnality
-    /// \ingroup API
+    /// \ingroup Private
 
-#ifndef LIBDAR_XFORM_HPP
-#define LIBDAR_XFORM_HPP
+#ifndef I_LIBDAR_XFORM_HPP
+#define I_LIBDAR_XFORM_HPP
 
 #include "../my_config.h"
+#include "entrepot_local.hpp"
 #include "infinint.hpp"
-#include "user_interaction.hpp"
-#include "archive_aux.hpp"
-
-#include <memory>
+#include "mem_ui.hpp"
+#include "label.hpp"
+#include "libdar_xform.hpp"
 
 namespace libdar
 {
 
-	/// \addtogroup API
+	/// \addtogroup Private
 	/// @{
 
 	/// class implementing the dar_xform feature
 
-    class libdar_xform
+    class libdar_xform::i_libdar_xform : public mem_ui
     {
     public:
 	    /// the archive to transform is read from a set of slices
@@ -54,7 +54,7 @@ namespace libdar
 	    /// use 0 if this feature was not used at creation time
 	    /// \param[in] execute command to execute before each new slice
 	    /// same substitution is available as archive_options_create::set_execute()
-	libdar_xform(const std::shared_ptr<user_interaction> & ui,
+	i_libdar_xform(const std::shared_ptr<user_interaction> & ui,
 		     const std::string & chem,
 		     const std::string & basename,
 		     const std::string & extension,
@@ -65,30 +65,30 @@ namespace libdar
 
 	    /// \param[in] dialog for user interaction, may be set to std::nullptr
 	    /// \param[in] pipename named pipe where to read the archive from (single sliced one)
-	libdar_xform(const std::shared_ptr<user_interaction> & dialog,
+	i_libdar_xform(const std::shared_ptr<user_interaction> & dialog,
 		     const std::string & pipename); /// < if pipename is set to "-" reading from standard input
 
 	    /// the archive to transform is read from a file descriptor open in read mode
 
 	    /// \param[in] dialog for user interaction, may be set to std::nullptr
 	    /// \param[in] filedescriptor the filedescriptor to reading the archive from
-	libdar_xform(const std::shared_ptr<user_interaction> & dialog,
+	i_libdar_xform(const std::shared_ptr<user_interaction> & dialog,
 		     int filedescriptor);
 
 	    /// copy constructor is not allowed
-	libdar_xform(const libdar_xform & ref) = delete;
+	i_libdar_xform(const i_libdar_xform & ref) = delete;
 
 	    /// move constructor
-	libdar_xform(libdar_xform && ref) noexcept;
+	i_libdar_xform(i_libdar_xform && ref) noexcept = default;
 
 	    /// assignment operator is not allowed
-	libdar_xform & operator = (const libdar_xform & ref) = delete;
+	i_libdar_xform & operator = (const i_libdar_xform & ref) = delete;
 
 	    /// move assignment operator
-	libdar_xform & operator = (libdar_xform && ref) noexcept;
+	i_libdar_xform & operator = (i_libdar_xform && ref) noexcept = default;
 
 	    /// destructor
-	~libdar_xform();
+	~i_libdar_xform() = default;
 
 	    /// the resulting archive is a written to disk possibly multi-sliced
 
@@ -140,9 +140,15 @@ namespace libdar
 		      const std::string & execute);
 
     private:
-	class i_libdar_xform;
-	std::unique_ptr<i_libdar_xform> pimpl;
+	bool can_xform;
+	std::unique_ptr<generic_file> source;
+	std::unique_ptr<path> src_path;        ///< may be null when reading from a pipe
+	std::shared_ptr<entrepot_local> entrep;
+	bool format_07_compatible;
+	label dataname;
 
+	void init_entrep();
+	void xform_to(generic_file *dst);
     };
 
 	/// @}
