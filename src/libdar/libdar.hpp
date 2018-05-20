@@ -74,5 +74,7 @@
 #include "get_version.hpp"
 #include "archive_options_listing_shell.hpp"
 #include "shell_interaction.hpp"
+#include "user_interaction_callback.hpp"
+#include "user_interaction_blind.hpp"
 
 #endif
