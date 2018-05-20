@@ -19,7 +19,7 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \file u_archive.hpp
+    /// \file i_archive.hpp
     /// \brief the archive class implementation is defined in this module
     /// \ingroup Private
 
