@@ -32,12 +32,10 @@
 #include <list>
 
 #include "archive.hpp"
-#include "generic_file.hpp"
-#include "data_dir.hpp"
-#include "storage.hpp"
-#include "mem_ui.hpp"
 #include "database_options.hpp"
 #include "database_archives.hpp"
+#include "archive_num.hpp"
+#include "database_listing_callback.hpp"
 
 namespace libdar
 {
@@ -50,7 +48,7 @@ namespace libdar
 	/// all operations for a dar_manager database are defines through the
 	/// use of this class interface. This class also defines internally
 	/// the data structure of the database.
-    class database: public mem_ui
+    class database
     {
     public:
 	    /// this constructor build an empty database
@@ -85,7 +83,8 @@ namespace libdar
 	    /// \param[in] filename name of file to save database to
 	    /// \param[in] opt extendable list of options to use for this operation
 	    /// \note this method is not available with partially extracted databases.
-	void dump(const std::string & filename, const database_dump_options & opt) const;
+	void dump(const std::string & filename,
+		  const database_dump_options & opt) const;
 
 	    // SETTINGS
 
@@ -96,7 +95,10 @@ namespace libdar
 	    /// \param[in] basename is the archive's basename to record in the database
 	    /// \param[in] opt extendable list of options to use for this operation
 	    /// \note this method is not available with partially extracted databases.
-	void add_archive(const archive & arch, const std::string & chemin, const std::string & basename, const database_add_options & opt);
+	void add_archive(const archive & arch,
+			 const std::string & chemin,
+			 const std::string & basename,
+			 const database_add_options & opt);
 
 	    /// remove an archive from a database
 
@@ -106,7 +108,9 @@ namespace libdar
 	    /// \note the archives which indexes are in the range [min-max] are
 	    /// removed. If you want to remove only one archive choose min equal to max.
 	    /// \note this method is not available with partially extracted databases.
-	void remove_archive(archive_num min, archive_num max, const database_remove_options & opt);
+	void remove_archive(archive_num min,
+			    archive_num max,
+			    const database_remove_options & opt);
 
 	    /// change order of archive within the database
 
@@ -121,7 +125,9 @@ namespace libdar
 	    /// \param[in] basename is the new basename to give to that archive
 	    /// \param[in] opt optional parameters for this operation
 	    /// \note this method *is* available with partially extracted databases, but with partial_read_only ones
-	void change_name(archive_num num, const std::string & basename, const database_change_basename_options &opt);
+	void change_name(archive_num num,
+			 const std::string & basename,
+			 const database_change_basename_options &opt);
 
 	    /// change one's archive path recorded in the database
 
@@ -129,7 +135,9 @@ namespace libdar
 	    /// \param[in] chemin is the new path to give to that archive
 	    /// \param[in] opt optional parameters for this operation
 	    /// \note this method *is* available with partially extracted databases, but with partial_read_only ones
-	void set_path(archive_num num, const std::string & chemin, const database_change_path_options & opt);
+	void set_path(archive_num num,
+		      const std::string & chemin,
+		      const database_change_path_options & opt);
 
 	    /// change the default options given to dar when performing restoration
 
@@ -138,17 +146,17 @@ namespace libdar
 	    /// like for example "-R". Any leading or trailing space will make a different argument
 	    /// than the one without spaces (" -R" is different than "-R" for example).
 	    /// \note this method *is* available with partially extracted databases, but with partial_read_only ones
-    	void set_options(const std::vector<std::string> &opt) { options_to_dar = opt; };
+    	void set_options(const std::vector<std::string> &opt);
 
 	    /// change the path to dar command
 
 	    /// \param[in] chemin is the full path to dar (including dar filename) to use for restoration
 	    /// \note if set to an empty string the dar command found from the PATH will be used (if any)
 	    /// \note this method *is* available with partially extracted databases, but with partial_read_only ones
-	void set_dar_path(const std::string & chemin) { dar_path = chemin; };
+	void set_dar_path(const std::string & chemin);
 
 	    /// change compression to use when storing base on file
-	void set_compression(compression algozip) { algo = algozip; };
+	void set_compression(compression algozip);
 
 
 	    // "GETTINGS"
@@ -157,19 +165,19 @@ namespace libdar
 	database_archives_list get_contents() const;
 
 	    /// return the options used with dar for restoration
-	std::vector<std::string> get_options() const { return options_to_dar; }; // show option passed to dar
+	std::vector<std::string> get_options() const;
 
 	    /// returns the path for dar
 
 	    /// \return the path to dar used when restoring files
 	    /// \note empty string means that dar is taken from the PATH variable
-	std::string get_dar_path() const { return dar_path; }; // show path to dar command
+	std::string get_dar_path() const;
 
 	    /// returns the compression algorithm used on filesystem
-	compression get_compression() const { return algo; };
+	compression get_compression() const;
 
 	    /// return the database format version
-	std::string get_database_version() const { return tools_uint2str(cur_db_version); };
+	std::string get_database_version() const;
 
 	    /// list files which are present in a given archive
 
@@ -216,42 +224,12 @@ namespace libdar
 
 	    /// \return true if check succeeded, false if warning have been issued
 	    /// \note this method is not available with partially extracted databases.
-	bool check_order() const
-	{
-	    bool initial_warn = true;
-
-	    if(files == nullptr)
-		throw SRC_BUG;
-	    if(check_order_asked)
-		return files->check_order(get_ui(), ".", initial_warn) && initial_warn;
-	    else
-		return true;
-	}
-
+	bool check_order() const;
 
     private:
+	class i_database;
+	std::unique_ptr<i_database> pimpl;
 
-	    /// holds the archive used to create the database
-	struct archive_data
-	{
-	    std::string chemin;      ///< path to the archive
-	    std::string basename;    ///< basename of the archive
-	    datetime root_last_mod;  ///< last modification date of the root directory
-	};
-
-	std::deque<struct archive_data> coordinate;  ///< list of archive used to build the database
-	std::vector<std::string> options_to_dar;     ///< options to use when calling dar for restoration
-	std::string dar_path;                        ///< path to dar
-	data_dir *files;                             ///< structure containing files and their status in the set of archive used for that database (is set to nullptr in partial mode)
-	storage *data_files;                         ///< when reading archive in partial mode, this is where is located the "not readed" part of the archive (is set to nullptr in partial-read-only mode)
-	bool check_order_asked;                      ///< whether order check has been asked
-	unsigned char cur_db_version;                ///< current db version (for informational purposes)
-	compression algo;                            ///< compression used/to use when writing down the base to file
-
-	void build(generic_file & f, bool partial, bool read_only, unsigned char db_version);  ///< used by constructors
-	archive_num get_real_archive_num(archive_num num, bool revert) const;
-
-	const datetime & get_root_last_mod(const archive_num & num) const;
     };
 
 	/// @}
