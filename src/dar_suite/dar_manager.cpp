@@ -60,6 +60,7 @@ extern "C"
 #include "cygwin_adapt.hpp"
 #include "no_comment.hpp"
 #include "line_tools.hpp"
+#include "fichier_local.hpp"
 
 using namespace libdar;
 

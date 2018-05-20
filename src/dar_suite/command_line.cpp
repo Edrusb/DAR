@@ -80,6 +80,8 @@ extern "C"
 #include "cygwin_adapt.hpp"
 #include "crit_action_cmd_line.hpp"
 #include "libdar.hpp"
+#include "capabilities.hpp"
+#include "fichier_local.hpp"
 
 #define OPT_STRING "c:A:x:d:t:l:v::z::y:nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:8:{:}:j:\\:"
 

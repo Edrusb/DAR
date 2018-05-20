@@ -55,6 +55,7 @@ extern "C"
 #ifdef HAVE_LIBTHREADAR_LIBTHREADAR_HPP
 #include <libthreadar/libthreadar.hpp>
 #endif
+#include "memory_check.hpp"
 
 using namespace libdar;
 using namespace std;

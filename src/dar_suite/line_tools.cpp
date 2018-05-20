@@ -46,6 +46,8 @@ extern "C"
 #include "line_tools.hpp"
 #include "tools.hpp"
 #include "tuyau.hpp"
+#include "fichier_local.hpp"
+#include "etage.hpp"
 
 using namespace std;
 using namespace libdar;
