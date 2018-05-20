@@ -45,7 +45,7 @@
 
 namespace libdar
 {
-	// need to declare class database friend of class archive
+	// need to declare class database friend of class archive.
 	// class database need to access the archive table of content
 	// though exposing it by mean of a public method of class
 	// archive would let it visibile to the API, thing we do not
