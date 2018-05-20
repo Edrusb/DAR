@@ -455,27 +455,6 @@ namespace libdar
         NLS_SWAP_OUT;
     }
 
-
-    bool archive::get_catalogue_slice_layout(slice_layout & slicing) const
-    {
-	bool tmp;
-
-        NLS_SWAP_IN;
-        try
-        {
-	    tmp = pimpl->get_catalogue_slice_layout(slicing);
-        }
-        catch(...)
-        {
-            NLS_SWAP_OUT;
-            throw;
-        }
-        NLS_SWAP_OUT;
-
-        return tmp;
-    }
-
-
     U_64 archive::get_first_slice_header_size() const
     {
 	U_64 tmp;
