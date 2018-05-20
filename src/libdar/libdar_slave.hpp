@@ -27,9 +27,11 @@
 #define LIBDAR_SLAVE_HPP
 
 #include "../my_config.h"
-#include "entrepot_local.hpp"
-#include "slave_zapette.hpp"
+
+#include <memory>
+
 #include "infinint.hpp"
+#include "user_interaction.hpp"
 
 namespace libdar
 {
@@ -76,18 +78,19 @@ namespace libdar
 	libdar_slave(libdar_slave && ref) noexcept = default;
 	libdar_slave & operator = (const libdar_slave & ref) = delete;
 	libdar_slave & operator = (libdar_slave && ref) noexcept = default;
-	~libdar_slave() { zap.reset(); entrep.reset(); }; // the order is important
+	~libdar_slave();
 
 	    /// enslave this object to the dar process through the created pipes
 
 	    /// \note run() will return when dar will no more need of this slave.
 	    /// if you need to abort this run(), let dar abort properly this will do the
 	    /// expected result properly.
-	void run() { zap->action(); };
+	void run();
 
     private:
-	std::shared_ptr<entrepot_local> entrep; ///< must be deleted last
-	std::unique_ptr<slave_zapette> zap; ///< must be deleted first
+	class i_libdar_slave;
+	std::unique_ptr<i_libdar_slave> pimpl;
+
     };
 
 	/// @}

@@ -32,22 +32,51 @@ extern "C"
 #include "path.hpp"
 #include "macro_tools.hpp"
 #include "sar.hpp"
+#include "slave_zapette.hpp"
+#include "entrepot_local.hpp"
 
 using namespace std;
 
 namespace libdar
 {
 
-    libdar_slave::libdar_slave(shared_ptr<user_interaction> & dialog,
-			       const string & folder,
-			       const string & basename,
-			       const string & extension,
-			       bool input_pipe_is_fd,
-			       const string & input_pipe,
-			       bool output_pipe_is_fd,
-			       const string & output_pipe,
-			       const string & execute,
-			       const infinint & min_digits)
+    class libdar_slave::i_libdar_slave
+    {
+    public:
+	i_libdar_slave(shared_ptr<user_interaction> & dialog,
+		       const string & folder,
+		       const string & basename,
+		       const string & extension,
+		       bool input_pipe_is_fd,
+		       const string & input_pipe,
+		       bool output_pipe_is_fd,
+		       const string & output_pipe,
+		       const string & execute,
+		       const infinint & min_digits);
+	i_libdar_slave(const i_libdar_slave & ref) = delete;
+	i_libdar_slave(i_libdar_slave && ref) noexcept = delete;
+	i_libdar_slave & operator = (const i_libdar_slave & ref) = delete;
+	i_libdar_slave & operator = (i_libdar_slave && ref) noexcept = delete;
+	~i_libdar_slave() { zap.reset(); entrep.reset(); }; // the order is important
+
+	inline void run() { zap->action(); };
+
+    private:
+	shared_ptr<entrepot_local> entrep; ///< must be deleted last
+	unique_ptr<slave_zapette> zap; ///< must be deleted first (so we need a pointer to it)
+    };
+
+
+    libdar_slave::i_libdar_slave::i_libdar_slave(shared_ptr<user_interaction> & dialog,
+						 const string & folder,
+						 const string & basename,
+						 const string & extension,
+						 bool input_pipe_is_fd,
+						 const string & input_pipe,
+						 bool output_pipe_is_fd,
+						 const string & output_pipe,
+						 const string & execute,
+						 const infinint & min_digits)
     {
 	path chemin(folder);
 	tuyau *input = nullptr;
@@ -122,5 +151,39 @@ namespace libdar
 	    throw;
 	}
     }
+
+	//////////////
+	//// libdar_slave public methods
+
+
+    libdar_slave::libdar_slave(std::shared_ptr<user_interaction> & dialog,
+			       const std::string & folder,
+			       const std::string & basename,
+			       const std::string & extension,
+			       bool input_pipe_is_fd,
+			       const std::string & input_pipe,
+			       bool output_pipe_is_fd,
+			       const std::string & output_pipe,
+			       const std::string & execute,
+			       const infinint & min_digits)
+    {
+	pimpl.reset(new (nothrow) i_libdar_slave(dialog,
+						 folder,
+						 basename,
+						 extension,
+						 input_pipe_is_fd,
+						 input_pipe,
+						 output_pipe_is_fd,
+						 output_pipe,
+						 execute,
+						 min_digits));
+
+	if(!pimpl)
+	    throw Ememory("libdar_slave::libdar_slave");
+    }
+
+    libdar_slave::~libdar_slave() = default;
+
+    void libdar_slave::run() { pimpl->run(); }
 
 } // end of namespace
