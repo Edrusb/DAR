@@ -30,6 +30,7 @@
 #include "crypto.hpp"
 #include "integers.hpp"
 #include "mask.hpp"
+#include "mask_list.hpp"
 #include "crit_action.hpp"
 #include "secu_string.hpp"
 #include "nls_swap.hpp"
