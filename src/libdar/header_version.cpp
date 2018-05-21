@@ -391,11 +391,28 @@ namespace libdar
 	    delete ctrl;
     }
 
+    string header_version::get_sym_crypto_name() const
+    {
+	if(get_edition() >= 9)
+	    return crypto_algo_2_string(get_sym_crypto_algo());
+	else
+	    return is_ciphered() ? gettext("yes") : gettext("no");
+    }
+
+    string header_version::get_asym_crypto_name() const
+    {
+	if((get_edition() >= 9)
+	   && (get_crypted_key() != nullptr))
+	    return "gnupg";
+	else
+	    return gettext("none");
+    }
+
     void header_version::display(user_interaction & dialog) const
     {
 	string algo = compression2string(get_compression_algo());
-	string sym = get_edition() >= 9 ? crypto_algo_2_string(get_sym_crypto_algo()) : (is_ciphered() ? gettext("yes") : gettext("no"));
-	string asym = get_edition() >= 9 && (get_crypted_key() != nullptr) ? "gnupg" : gettext("none");
+	string sym = get_sym_crypto_name();
+	string asym = get_asym_crypto_name();
 	string xsigned = is_signed() ? gettext("yes") : gettext("no");
 
 	dialog.printf(gettext("Archive version format               : %s"), get_edition().display().c_str());

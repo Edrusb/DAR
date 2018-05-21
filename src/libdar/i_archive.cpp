@@ -968,7 +968,7 @@ namespace libdar
 	    archive_summary sum = summary_data();
 	    infinint tmp;
 
-	    sum.get_header().display(get_ui());
+	    get_header().display(get_ui());
 
 	    tmp = sum.get_catalog_size();
 	    if(!tmp.is_zero())
@@ -1099,7 +1099,13 @@ namespace libdar
 	ret.set_archive_size(archive_size);
 
 	ret.set_catalog_size(get_cat_size());
-	ret.set_header(get_header());
+	ret.set_edition(get_header().get_edition().display());
+	ret.set_compression_algo(compression2string(get_header().get_compression_algo()));
+	ret.set_user_comment(get_header().get_command_line());
+	ret.set_cipher(get_header().get_sym_crypto_name());
+	ret.set_asym(get_header().get_asym_crypto_name());
+	ret.set_signed(get_header().is_signed());
+	ret.set_tape_marks(get_header().get_tape_marks());
 
 	if(get_cat().get_contenu() == nullptr)
 	    throw SRC_BUG;

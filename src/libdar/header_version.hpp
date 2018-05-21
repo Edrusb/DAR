@@ -88,6 +88,8 @@ namespace libdar
 	bool is_ciphered() const { return ciphered || sym != crypto_algo::none; };
 	bool is_signed() const { return arch_signed; };
 	crypto_algo get_sym_crypto_algo() const { return sym; };
+	std::string get_sym_crypto_name() const;
+	std::string get_asym_crypto_name() const;
 	memory_file *get_crypted_key() const { return crypted_key; };
 	const slice_layout *get_slice_layout() const { return ref_layout; };
 	bool get_tape_marks() const { return has_tape_marks; };

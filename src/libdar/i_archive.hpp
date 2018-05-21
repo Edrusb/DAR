@@ -45,6 +45,7 @@
 #include "archive_listing_callback.hpp"
 #include "catalogue.hpp"
 #include "archive.hpp"
+#include "header_version.hpp"
 
 namespace libdar
 {

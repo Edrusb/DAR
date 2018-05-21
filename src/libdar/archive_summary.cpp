@@ -38,11 +38,17 @@ namespace libdar
 	last_slice_size = 0;
 	slice_number = 0;
 	archive_size = 0;
-	header.clear();
 	catalog_size = 0;
 	storage_size = 0;
 	data_size = 0;
 	contents.clear();
+	edition = "";
+	algo_zip = "";
+	user_comment = "";
+	cipher = "";
+	asym = "";
+	is_signed = false;
+	tape_marks = false;
     }
 
 

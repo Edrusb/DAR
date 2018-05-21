@@ -30,7 +30,6 @@
 #include "../my_config.h"
 #include <string>
 #include "infinint.hpp"
-#include "header_version.hpp"
 #include "entree_stats.hpp"
 
 namespace libdar
@@ -59,11 +58,18 @@ namespace libdar
 	const infinint & get_last_slice_size() const { return last_slice_size; };
 	const infinint & get_slice_number() const { return slice_number; };
 	const infinint & get_archive_size() const { return archive_size; };
-	const header_version & get_header() const { return header; };
 	const infinint & get_catalog_size() const { return catalog_size; };
 	const infinint & get_storage_size() const { return storage_size; };
 	const infinint & get_data_size() const { return data_size; };
 	const entree_stats & get_contents() const { return contents; };
+	std::string get_edition() const { return edition; };
+	std::string get_compression_algo() const { return algo_zip; };
+	std::string get_user_comment() const { return user_comment; };
+	std::string get_cipher() const { return cipher; };
+	std::string get_asym() const { return asym; };
+	bool get_signed() const { return is_signed; };
+	bool get_tape_marks() const { return tape_marks; };
+
 
 	    // SETTINGS
 
@@ -72,12 +78,17 @@ namespace libdar
 	void set_last_slice_size(const infinint & arg) { last_slice_size = arg; };
 	void set_slice_number(const infinint & arg) { slice_number = arg; };
 	void set_archive_size(const infinint & arg) { archive_size = arg; };
-	void set_header(const header_version & arg) { header = arg; };
 	void set_catalog_size(const infinint & arg) { catalog_size = arg; };
 	void set_storage_size(const infinint & arg) { storage_size = arg; };
 	void set_data_size(const infinint & arg) { data_size = arg; };
 	void set_contents(const entree_stats & arg) { contents = arg; };
-
+	void set_edition(const std::string & arg) { edition = arg; };
+	void set_compression_algo(const std::string & arg) { algo_zip = arg; };
+	void set_user_comment(const std::string & arg) { user_comment = arg; };
+	void set_cipher(const std::string & arg) { cipher = arg; };
+	void set_asym(const std::string & arg) { asym = arg; };
+	void set_signed(bool arg) { is_signed = arg; };
+	void set_tape_marks(bool arg) { tape_marks = arg; };
 
 	void clear();
 
@@ -87,11 +98,18 @@ namespace libdar
 	infinint last_slice_size;     ///< slice of the last slice or zero if not applicable
 	infinint slice_number;        ///< number of slices composing the archive of zero if unknown
 	infinint archive_size;        ///< total size of the archive
-	header_version header;        ///< information found in the archive header
 	infinint catalog_size;        ///< catalogue size if known, zero if not
 	infinint storage_size;        ///< amount of byte used to store (compressed/encrypted) data
 	infinint data_size;           ///< amount of data saved (once uncompressed/unciphered)
 	entree_stats contents;        ///< nature of saved files
+	std::string edition;          ///< archive format
+	std::string algo_zip;         ///< compression algorithm
+	std::string user_comment;     ///< user comment
+	std::string cipher;           ///< encryption algorithm
+	std::string asym;             ///< asymetrical encryption
+	bool is_signed;               ///< whether the archive is signed
+	bool tape_marks;              ///< whether the archive has tape marks (for sequential reading)
+
     };
 
 } // end of namespace
