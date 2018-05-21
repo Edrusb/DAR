@@ -31,7 +31,7 @@
 #include <string>
 #include "infinint.hpp"
 #include "header_version.hpp"
-#include "cat_entree.hpp"
+#include "entree_stats.hpp"
 
 namespace libdar
 {
