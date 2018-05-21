@@ -33,7 +33,6 @@
 #include "mask_list.hpp"
 #include "crit_action.hpp"
 #include "secu_string.hpp"
-#include "nls_swap.hpp"
 #include "entrepot.hpp"
 #include "fsa_family.hpp"
 #include "compile_time_features.hpp"
@@ -430,35 +429,7 @@ namespace libdar
 	};
 
 	    /// whether to use furtive read mode (if activated, alter_atime() has no meaning/use)
-	void set_furtive_read_mode(bool furtive_read)
-	{
-	    NLS_SWAP_IN;
-	    try
-	    {
-
-#if FURTIVE_READ_MODE_AVAILABLE
-		x_furtive_read = furtive_read;
-		if(furtive_read)
-		{
-		    x_old_alter_atime = x_alter_atime;
-		    x_alter_atime = true;
-			// this is required to avoid libdar manipulating ctime of inodes
-		}
-		else
-		    x_alter_atime = x_old_alter_atime;
-#else
-		if(furtive_read)
-		    throw Ecompilation(gettext("Furtive read mode"));
-		x_furtive_read = false;
-#endif
-	    }
-	    catch(...)
-	    {
-		NLS_SWAP_OUT;
-		throw;
-	    }
-	    NLS_SWAP_OUT;
-	};
+	void set_furtive_read_mode(bool furtive_read);
 
 	    /// whether to limit the backup to files located on the same filesystem as the directory taken as root of the backup
 	void set_same_fs(bool same_fs) { x_same_fs = same_fs; };

@@ -57,6 +57,7 @@ extern "C"
 #include "defile.hpp"
 #include "escape.hpp"
 #include "escape_catalogue.hpp"
+#include "nls_swap.hpp"
 #include "i_archive.hpp"
 
 #define ARCHIVE_NOT_EXPLOITABLE "Archive of reference given is not exploitable"

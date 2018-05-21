@@ -29,6 +29,7 @@ extern "C"
 } // extern "C"
 
 #include "i_archive.hpp"
+#include "nls_swap.hpp"
 
 using namespace std;
 

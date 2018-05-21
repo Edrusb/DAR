@@ -35,6 +35,7 @@ extern "C"
 #include <iomanip>
 #include <iostream>
 #include <deque>
+#include "nls_swap.hpp"
 #include "database.hpp"
 #include "i_database.hpp"
 

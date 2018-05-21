@@ -25,6 +25,7 @@
 #include "entrepot_local.hpp"
 #include "tools.hpp"
 #include "hash_fichier.hpp"
+#include "nls_swap.hpp"
 
 using namespace std;
 
@@ -441,6 +442,37 @@ namespace libdar
 	}
 	NLS_SWAP_OUT;
     }
+
+    void archive_options_create::set_furtive_read_mode(bool furtive_read)
+    {
+	NLS_SWAP_IN;
+	try
+	{
+
+#if FURTIVE_READ_MODE_AVAILABLE
+	    x_furtive_read = furtive_read;
+	    if(furtive_read)
+	    {
+		x_old_alter_atime = x_alter_atime;
+		x_alter_atime = true;
+		    // this is required to avoid libdar manipulating ctime of inodes
+	    }
+	    else
+		x_alter_atime = x_old_alter_atime;
+#else
+	    if(furtive_read)
+		throw Ecompilation(gettext("Furtive read mode"));
+	    x_furtive_read = false;
+#endif
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }
+
 
     void archive_options_create::set_backup_hook(const std::string & execute, const mask & which_files)
     {

@@ -48,6 +48,7 @@ extern "C"
 #include "tuyau.hpp"
 #include "fichier_local.hpp"
 #include "etage.hpp"
+#include "nls_swap.hpp"
 
 using namespace std;
 using namespace libdar;

@@ -84,6 +84,7 @@ extern "C"
 #include "integers.hpp"
 #include "cygwin_adapt.hpp"
 #include "shell_interaction.hpp"
+#include "nls_swap.hpp"
 
 #ifndef L_ctermid
 // cygwin does not always define L_ctermid in stdio.h

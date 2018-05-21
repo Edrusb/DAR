@@ -37,6 +37,7 @@ extern "C"
 #include <deque>
 #include "tools.hpp"
 #include "storage.hpp"
+#include "nls_swap.hpp"
 #include "database_header.hpp"
 #include "i_archive.hpp"
 #include "i_database.hpp"

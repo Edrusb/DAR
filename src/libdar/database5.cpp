@@ -45,6 +45,7 @@ extern "C"
 #include "generic_file.hpp"
 #include "data_tree.hpp"
 #include "erreurs.hpp"
+#include "nls_swap.hpp"
 
 using namespace libdar5;
 using namespace std;
