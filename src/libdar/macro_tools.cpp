@@ -60,6 +60,7 @@ extern "C"
 #include "crc.hpp"
 #include "entrepot_libcurl.hpp"
 #include "scrambler.hpp"
+#include "hash_fichier.hpp"
 
 #ifdef LIBTHREADAR_AVAILABLE
 #include "generic_thread.hpp"

@@ -44,7 +44,7 @@
 #include "user_interaction.hpp"
 #include "fichier_global.hpp"
 #include "path.hpp"
-#include "hash_fichier.hpp"
+#include "archive_aux.hpp"
 
 namespace libdar
 {

@@ -44,6 +44,7 @@ extern "C"
 #include "entrepot.hpp"
 #include "cygwin_adapt.hpp"
 #include "tools.hpp"
+#include "hash_fichier.hpp"
 
 using namespace std;
 
