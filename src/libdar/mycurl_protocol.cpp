@@ -24,6 +24,10 @@
 
 #include "../my_config.h"
 
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif
+
 #include "tools.hpp"
 #include "mycurl_protocol.hpp"
 

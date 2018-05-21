@@ -40,6 +40,7 @@
 #include "crypto.hpp"
 #include "archive_summary.hpp"
 #include "archive_listing_callback.hpp"
+#include "user_interaction.hpp"
 
 
 namespace libdar
