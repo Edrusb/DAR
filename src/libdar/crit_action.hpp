@@ -99,7 +99,7 @@ namespace libdar
 
 	    /// \return a new object of the same type,
 	    /// \note this method must be implemented in all the leaf classes of the
-	    /// action hierarchy class
+	    /// class crit_action hierarchy
 	virtual crit_action *clone() const = 0;
     };
 
