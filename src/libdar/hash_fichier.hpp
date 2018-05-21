@@ -54,9 +54,6 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-	/// convert hash value to human readable string
-    extern std::string hash_algo_to_string(hash_algo algo);
-
 	/// manages the generation of a hash
 
     class hash_fichier : public fichier_global

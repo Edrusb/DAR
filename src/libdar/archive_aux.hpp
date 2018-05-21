@@ -29,6 +29,8 @@
 
 #include "../my_config.h"
 
+#include <string>
+
 namespace libdar
 {
 
@@ -64,6 +66,8 @@ namespace libdar
 	sha512 ///< SHA-512 algorithm
     };
 
+    	/// convert hash value to human readable string
+    extern std::string hash_algo_to_string(hash_algo algo);
 
 	/// @}
 

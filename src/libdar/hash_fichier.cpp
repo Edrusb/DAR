@@ -31,24 +31,6 @@ using namespace std;
 namespace libdar
 {
 
-    string hash_algo_to_string(hash_algo algo)
-    {
-	switch(algo)
-	{
-	case hash_algo::none:
-	    throw SRC_BUG;
-	case hash_algo::md5:
-	    return "md5";
-	case hash_algo::sha1:
-	    return "sha1";
-	case hash_algo::sha512:
-	    return "sha512";
-	default:
-	    throw SRC_BUG;
-	}
-    }
-
-
     hash_fichier::hash_fichier(const shared_ptr<user_interaction> & dialog,
 			       fichier_global *under,
 			       const std::string & under_filename,
