@@ -34,6 +34,7 @@ extern "C"
 #include "null_file.hpp"
 #include "generic_rsync.hpp"
 #include "compile_time_features.hpp"
+#include "tools.hpp"
 
 using namespace std;
 

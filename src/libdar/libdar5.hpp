@@ -62,6 +62,7 @@ extern "C"
 #include "database5.hpp"
 #include "tuyau.hpp"
 #include "archive_aux.hpp"
+#include "tools.hpp"
 
     /// \addtogroup API5
     /// @{
@@ -307,9 +308,6 @@ namespace libdar5
     constexpr gf_mode gf_read_only = gf_mode::gf_read_only;
     constexpr gf_mode gf_write_only = gf_mode::gf_write_only;
     constexpr gf_mode gf_read_write = gf_mode::gf_read_write;
-
-	// from tlv_list.hpp
-    using libdar::tlv_list;
 
 	// from tools.hpp
     using libdar::tools_printf;

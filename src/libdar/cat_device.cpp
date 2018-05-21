@@ -53,6 +53,7 @@ extern "C"
 } // end extern "C"
 
 #include "cat_device.hpp"
+#include "tools.hpp"
 
 using namespace std;
 

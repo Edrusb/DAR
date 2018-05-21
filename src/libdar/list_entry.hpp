@@ -33,7 +33,6 @@
 #include "../my_config.h"
 #include "infinint.hpp"
 #include "deci.hpp"
-#include "tools.hpp"
 #include "compression.hpp"
 #include "integers.hpp"
 #include "datetime.hpp"
@@ -106,10 +105,10 @@ namespace libdar
 
 	std::string get_uid(bool try_resolving_name = false) const;
 	std::string get_gid(bool try_resolving_name = false) const;
-	std::string get_perm() const { return tools_get_permission_string(type, perm, hard_link); };
-	std::string get_last_access() const { return last_access.is_null() ? "" : tools_display_date(last_access); };
+	std::string get_perm() const;
+	std::string get_last_access() const;
 	std::string get_last_modif() const;
-	std::string get_last_change() const { return last_change.is_null() ? "" : tools_display_date(last_change); };
+	std::string get_last_change() const;
 	std::string get_removal_date() const; ///< for removed_entry only
 	time_t get_last_access_s() const { return datetime2time_t(last_access); };
 	time_t get_last_modif_s() const;
@@ -140,8 +139,8 @@ namespace libdar
 	std::string get_compression_algo() const { return compression2string(compression_algo); };
 	bool is_dirty() const { return dirty; };
 	std::string get_link_target() const { return target; };
-	std::string get_major() const { return tools_int2str(major); };
-	std::string get_minor() const { return tools_int2str(minor); };
+	std::string get_major() const;
+	std::string get_minor() const;
 
 	    /// provides slice information
 
@@ -165,7 +164,7 @@ namespace libdar
 	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the infinint of std::string
 	    /// version of this method
 	bool get_archive_offset_for_data(infinint & val) const { val = offset_for_data; return !val.is_zero(); };
-	bool get_archive_offset_for_data(U_64 & val) const { return tools_infinint2U_64(offset_for_data, val) && !offset_for_data.is_zero(); };
+	bool get_archive_offset_for_data(U_64 & val) const;
 	std::string get_archive_offset_for_data() const { return offset_for_data.is_zero() ? "" : deci(offset_for_data).human(); };
 
 	    /// amount of byte used to store the file's data
@@ -173,7 +172,7 @@ namespace libdar
 	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the
 	    /// infinint of std::string version of this method
 	bool get_storage_size_for_data(infinint & val) const { val = storage_size_for_data; return !val.is_zero(); };
-	bool get_storage_size_for_data(U_64 & val) const { return tools_infinint2U_64(storage_size_for_data, val) && !storage_size_for_data.is_zero(); };
+	bool get_storage_size_for_data(U_64 & val) const;
 	std::string get_storage_size_for_data(bool size_in_bytes = true) const;
 
 	    /// offset in byte whert to find the first byte of Extended Attributes
@@ -182,12 +181,12 @@ namespace libdar
 	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the infinint of
 	    /// std::string version of this method
 	bool get_archive_offset_for_EA(infinint & val) const { val = offset_for_EA; return !val.is_zero(); };
-	bool get_archive_offset_for_EA(U_64 & val) const { return tools_infinint2U_64(offset_for_EA, val) && !offset_for_EA.is_zero(); };
+	bool get_archive_offset_for_EA(U_64 & val) const;
 	std::string get_archive_offset_for_EA() const { return offset_for_EA.is_zero() ? "" : deci(offset_for_EA).human(); };
 
 	    /// amount of byte used to store the file's EA
 	bool get_storage_size_for_EA(infinint & val) const { val = storage_size_for_EA; return !val.is_zero(); };
-	bool get_storage_size_for_EA(U_64 & val) const { return tools_infinint2U_64(storage_size_for_EA, val) && !storage_size_for_EA.is_zero(); };
+	bool get_storage_size_for_EA(U_64 & val) const;
 	std::string get_storage_size_for_EA() const { return storage_size_for_EA.is_zero() ? "" : deci(storage_size_for_EA).human(); };
 
 	    /// offset in byte where to find the first byte of Filesystem Specific Attributes
@@ -196,12 +195,12 @@ namespace libdar
 	    /// \note if an U_64 cannot handle such large value, false is returned, you should use the
 	    /// infinint of std::string version of this method
 	bool get_archive_offset_for_FSA(infinint & val) const { val = offset_for_FSA; return !val.is_zero(); };
-	bool get_archive_offset_for_FSA(U_64 & val) const { return tools_infinint2U_64(offset_for_FSA, val) && !offset_for_FSA.is_zero(); };
+	bool get_archive_offset_for_FSA(U_64 & val) const;
 	std::string get_archive_offset_for_FSA() const { return offset_for_FSA.is_zero() ? "" : deci(offset_for_FSA).human(); };
 
 	    /// amount of byte used to store the file's FSA
 	bool get_storage_size_for_FSA(infinint & val) const { val = storage_size_for_FSA; return !val.is_zero(); };
-	bool get_storage_size_for_FSA(U_64 & val) const { return tools_infinint2U_64(storage_size_for_FSA, val) && !storage_size_for_FSA.is_zero(); };
+	bool get_storage_size_for_FSA(U_64 & val) const;
 	std::string get_storage_size_for_FSA() const { return storage_size_for_FSA.is_zero() ? "" : deci(storage_size_for_FSA).human(); };
 
 	    /// reset the reading of Extended Attributes names

@@ -43,6 +43,7 @@ extern "C"
 #include "infinint.hpp"
 #include "fsa_family.hpp"
 #include "cat_all_entrees.hpp"
+#include "mem_ui.hpp"
 
 #include <set>
 

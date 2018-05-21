@@ -26,6 +26,7 @@ extern "C"
 } // end extern "C"
 
 #include "cat_lien.hpp"
+#include "tools.hpp"
 
 using namespace std;
 

@@ -115,6 +115,7 @@ extern "C"
 #include "ea_filesystem.hpp"
 #include "cygwin_adapt.hpp"
 #include "etage.hpp"
+#include "tools.hpp"
 
 using namespace std;
 

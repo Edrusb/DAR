@@ -32,6 +32,7 @@ extern "C"
 #include "sar.hpp"
 #include "trivial_sar.hpp"
 #include "macro_tools.hpp"
+#include "tools.hpp"
 
 using namespace std;
 

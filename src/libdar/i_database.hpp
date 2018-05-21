@@ -39,6 +39,7 @@
 #include "database_options.hpp"
 #include "database_archives.hpp"
 #include "database.hpp"
+#include "tools.hpp"
 
 namespace libdar
 {

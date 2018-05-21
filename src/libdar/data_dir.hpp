@@ -31,6 +31,7 @@
 
 #include <string>
 #include <deque>
+#include <vector>
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "user_interaction.hpp"

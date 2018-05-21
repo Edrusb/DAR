@@ -47,6 +47,7 @@ extern "C"
 #include "cat_entree.hpp"
 #include "cat_nomme.hpp"
 #include "cat_directory.hpp"
+#include "mem_ui.hpp"
 
 namespace libdar
 {

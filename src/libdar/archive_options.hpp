@@ -39,6 +39,7 @@
 #include "archive_aux.hpp"
 
 #include <string>
+#include <vector>
 #include <set>
 #include <memory>
 

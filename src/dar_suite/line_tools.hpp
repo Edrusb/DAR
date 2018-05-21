@@ -33,6 +33,8 @@
 #include <deque>
 #include <memory>
 #include "libdar.hpp"
+#include "tlv_list.hpp"
+#include "tools.hpp"
 
 using namespace libdar;
 

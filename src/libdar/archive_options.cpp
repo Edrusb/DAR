@@ -21,6 +21,8 @@
 
 #include "../my_config.h"
 
+#include <vector>
+
 #include "archive_options.hpp"
 #include "entrepot_local.hpp"
 #include "tools.hpp"

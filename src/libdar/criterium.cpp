@@ -24,6 +24,7 @@
 #include "criterium.hpp"
 #include "nls_swap.hpp"
 #include "cat_all_entrees.hpp"
+#include "tools.hpp"
 
 using namespace std;
 

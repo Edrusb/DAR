@@ -35,6 +35,7 @@ extern "C"
 #endif
 }
 #include <string>
+#include <vector>
 
 #include "catalogue.hpp"
 #include "compression.hpp"

@@ -29,6 +29,7 @@ extern "C"
 #include "cat_all_entrees.hpp"
 #include "macro_tools.hpp"
 #include "cat_signature.hpp"
+#include "tools.hpp"
 
 using namespace std;
 

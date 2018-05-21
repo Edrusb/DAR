@@ -22,6 +22,7 @@
 #include "../my_config.h"
 #include "tools.hpp"
 #include "list_entry.hpp"
+#include "tools.hpp"
 
 using namespace std;
 
@@ -116,12 +117,27 @@ namespace libdar
 	    return deci(gid).human();
     }
 
+    string list_entry::get_perm() const
+    {
+	return tools_get_permission_string(type, perm, hard_link);
+    }
+
+    string list_entry::get_last_access() const
+    {
+	return last_access.is_null() ? "" : tools_display_date(last_access);
+    }
+
     string list_entry::get_last_modif() const
     {
 	if(!is_removed_entry())
 	    return last_modif.is_null() ? "" : tools_display_date(last_modif);
 	else
 	    return "";
+    }
+
+    string list_entry::get_last_change() const
+    {
+	return last_change.is_null() ? "" : tools_display_date(last_change);
     }
 
     string list_entry::get_removal_date() const
@@ -169,6 +185,16 @@ namespace libdar
 	    return "";
     }
 
+    string list_entry::get_major() const
+    {
+	return tools_int2str(major);
+    }
+
+    string list_entry::get_minor() const
+    {
+	return tools_int2str(minor);
+    }
+
     string list_entry::get_compression_ratio_flag() const
     {
 	string ret = get_compression_ratio();
@@ -190,6 +216,36 @@ namespace libdar
 	    else
 		return "[ ]";
 	}
+    }
+
+    bool list_entry::get_archive_offset_for_data(U_64 & val) const
+    {
+	return tools_infinint2U_64(offset_for_data, val) && !offset_for_data.is_zero();
+    }
+
+    bool list_entry::get_storage_size_for_data(U_64 & val) const
+    {
+	return tools_infinint2U_64(storage_size_for_data, val) && !storage_size_for_data.is_zero();
+    }
+
+    bool list_entry::get_archive_offset_for_EA(U_64 & val) const
+    {
+	return tools_infinint2U_64(offset_for_EA, val) && !offset_for_EA.is_zero();
+    }
+
+    bool list_entry::get_storage_size_for_EA(U_64 & val) const
+    {
+	return tools_infinint2U_64(storage_size_for_EA, val) && !storage_size_for_EA.is_zero();
+    }
+
+    bool list_entry::get_archive_offset_for_FSA(U_64 & val) const
+    {
+	return tools_infinint2U_64(offset_for_FSA, val) && !offset_for_FSA.is_zero();
+    }
+
+    bool list_entry::get_storage_size_for_FSA(U_64 & val) const
+    {
+	return tools_infinint2U_64(storage_size_for_FSA, val) && !storage_size_for_FSA.is_zero();
     }
 
     string list_entry::get_storage_size_for_data(bool size_in_bytes) const

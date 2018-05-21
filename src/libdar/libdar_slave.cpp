@@ -34,6 +34,7 @@ extern "C"
 #include "sar.hpp"
 #include "slave_zapette.hpp"
 #include "entrepot_local.hpp"
+#include "tools.hpp"
 
 using namespace std;
 

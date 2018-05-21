@@ -35,6 +35,7 @@ extern "C"
 #include "hash_fichier.hpp"
 #include "shell_interaction.hpp"
 #include "fichier_local.hpp"
+#include "tools.hpp"
 
 using namespace libdar;
 using namespace std;

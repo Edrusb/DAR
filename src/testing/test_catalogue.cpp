@@ -42,6 +42,7 @@ extern "C"
 #include "label.hpp"
 #include "fichier_local.hpp"
 #include "pile.hpp"
+#include "tools.hpp"
 
 using namespace libdar;
 using namespace std;

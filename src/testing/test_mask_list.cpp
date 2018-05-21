@@ -44,6 +44,7 @@ extern "C"
 #include "shell_interaction.hpp"
 #include "deci.hpp"
 #include "mask_list.hpp"
+#include "tools.hpp"
 
 using namespace libdar;
 using namespace std;
