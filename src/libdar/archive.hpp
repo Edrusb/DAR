@@ -38,7 +38,6 @@
 #include "archive_options.hpp"
 #include "list_entry.hpp"
 #include "crypto.hpp"
-#include "slice_layout.hpp"
 #include "archive_summary.hpp"
 #include "archive_listing_callback.hpp"
 
