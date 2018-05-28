@@ -1,6 +1,11 @@
 from 2.5.15 to 2.5.16
 - bug fix: while rechecking sparse file (-ah option) during a merging
   operation, dar wrongly reported CRC mismatch for saved plain files
+- fixed man page about sparse-file handling while merging: To remove
+  sparse file datastructure during a merging operation you need to
+  set --sparse-file-min-size to a valuer larger than all file sizes
+  contained in the archive (for example 1E for one exabyte)
+
 
 from 2.5.14-bis to 2.5.15
 - fixing self report bug message met when trying to create an isolated

@@ -614,7 +614,10 @@ Define the minimum length of zeroed bytes to replace by "holes". By default, thi
 During merging operation, keep files compressed, this has several restrictions : -z, -Z, -Y, -m are ignored, if two archives have to be merged, both must use the same compression algorithm or one of them must not use compression at all (this last restriction will probably disappear in a next version). The advantage of this option is a greater speed of execution (compression is usually CPU intensive).
 .TP 20
 -ah, --alter=holes-recheck
-For merging, the sparse file detection mechanism is disabled by default. However if you want to activate it (assuming you have an old archive you want to convert the current archive format taking care of sparse files), you need to use -ah option to reactivate the sparse file detection mechanism. Then for merging  --sparse-file-min-size can be used as described above for archive creation. In particular setting --sparse-file-min-size to zero beside -ah during merging, may also be used to convert file saved as sparse file into plain normal files.
+For merging, the sparse file detection mechanism is disabled by default. However if you want to activate it (assuming you have an old archive you want to convert the current archive format taking care of sparse files), you need to use -ah option to reactivate the sparse file detection mechanism. Then for merging  --sparse-file-min-size can be used as described above for archive creation. In addition, you can have files stored as sparse file in the archive of reference be stored as normal files in the merged archive using -ah and passing to --sparse-file-min-size an value larger than all file sizes, for example as of today in year 2018, passing
+.B
+-ah --sparse-file-min-size 1E
+(1E for one exabyte) should be large enough.
 .TP 20
 --nodump
 do not save files which have the 'd' flag set (see chattr(1) lsattr(1) ext2 commands). This option may not be available if the system dar has been compiled on did not provide support for ext2 flags. Note that this option does nothing with -+ option (merging) as no filesystem is used for that operation.
