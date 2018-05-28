@@ -2809,7 +2809,14 @@ namespace libdar
 					fic->set_crc(*val);
 				    else
 				    {
-					if(keep_mode == cat_file::normal && crc_available)
+					if(keep_mode == cat_file::normal
+					   && crc_available
+					   && !fic->get_sparse_file_detection_read())
+						// crc is calculated based on the stored uncompressed data
+						// we can compare only if the data is uncompressed (not
+						// keep_compressed and hole structure inlined in data
+						// is kept as is (not in nomal mode when the source has
+						// a sparse_file layer
 					{
 					    if(original == nullptr)
 						throw SRC_BUG;

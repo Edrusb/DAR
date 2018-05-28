@@ -1,3 +1,7 @@
+from 2.5.15 to 2.5.16
+- bug fix: while rechecking sparse file (-ah option) during a merging
+  operation, dar wrongly reported CRC mismatch for saved plain files
+
 from 2.5.14-bis to 2.5.15
 - fixing self report bug message met when trying to create an isolated
   catalogue into a directory that does not exist
