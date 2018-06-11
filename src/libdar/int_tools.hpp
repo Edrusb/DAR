@@ -22,6 +22,7 @@
     /// \file int_tools.hpp
     /// \brief elementary operation for infinint integers
     /// \ingroup Private
+    /// \note API included module due to dependencies
 
 #ifndef INT_TOOLS_HPP
 #define INT_TOOLS_HPP

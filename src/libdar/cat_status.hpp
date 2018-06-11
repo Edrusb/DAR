@@ -22,6 +22,7 @@
     /// \file cat_status.hpp
     /// \brief the different status of data and EA
     /// \ingroup Private
+    /// \note API included module due to dependencies
 
 #ifndef CAT_STATUS_HPP
 #define CAT_STATUS_HPP

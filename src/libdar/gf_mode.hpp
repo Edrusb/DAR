@@ -22,7 +22,7 @@
     /// \file gf_mode.hpp
     /// \brief generic modes to open file
     /// \ingroup Private
-    ///
+    /// \note API included module due to dependencies
 
 #ifndef GF_MODE_HPP
 #define GF_MODE_HPP

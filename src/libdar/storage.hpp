@@ -22,6 +22,7 @@
     /// \file storage.hpp
     /// \brief contains a class that permits arbitrary large data storage
     /// \ingroup Private
+    /// \note API included module due to dependencies
 
 #ifndef STORAGE_HPP
 #define STORAGE_HPP

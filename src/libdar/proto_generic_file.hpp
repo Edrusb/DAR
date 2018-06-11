@@ -22,6 +22,7 @@
     /// \file proto_generic_file.hpp
     /// \brief precursor class of generic_file used to avoid cyclic dependencies with storage and infinint
     /// \ingroup Private
+    /// \note API included module due to dependencies
 
 #ifndef PROTO_GENERIC_FILE_HPP
 #define PROTO_GENERIC_FILE_HPP
