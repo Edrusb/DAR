@@ -37,6 +37,7 @@
 #include "fsa_family.hpp"
 #include "compile_time_features.hpp"
 #include "archive_aux.hpp"
+#include "compression.hpp"
 
 #include <string>
 #include <vector>

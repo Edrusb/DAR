@@ -25,8 +25,9 @@
 #include "nls_swap.hpp"
 #include "cat_all_entrees.hpp"
 #include "tools.hpp"
-#include "cat_directory.hpp"
+#include "cat_nomme.hpp"
 #include "cat_inode.hpp"
+#include "cat_directory.hpp"
 
 using namespace std;
 
