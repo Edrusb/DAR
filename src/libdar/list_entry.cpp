@@ -300,6 +300,21 @@ namespace libdar
 	get_ea_reset_read();
     }
 
+    void list_entry::set_data_crc(const crc & ptr)
+    {
+	data_crc = ptr.crc2str();
+    }
+
+    void list_entry::set_delta_patch_base_crc(const crc & ptr)
+    {
+	patch_base_crc = ptr.crc2str();
+    }
+
+    void list_entry::set_delta_patch_result_crc(const crc & ptr)
+    {
+	patch_result_crc = ptr.crc2str();
+    }
+
     void list_entry::clear()
     {
 	my_name = "";

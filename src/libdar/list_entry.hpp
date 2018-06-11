@@ -47,6 +47,8 @@ namespace libdar
         /// \addtogroup API
         /// @{
 
+    class crc;
+
 	/// the list_entry class provides mean to get information about a particular entry in the archive
 	///
 	/// it provides methods for libdar to fill up such object and methods for API user
@@ -259,9 +261,9 @@ namespace libdar
 	void set_ea(const ea_attributs & arg);
 	void set_etiquette(const infinint & arg) { etiquette = arg; };
 	void set_fsa_scope(const fsa_scope & arg) { fsa_sc = arg; };
-	void set_data_crc(const crc & ptr) { data_crc = ptr.crc2str(); };
-	void set_delta_patch_base_crc(const crc & ptr) { patch_base_crc = ptr.crc2str(); };
-	void set_delta_patch_result_crc(const crc & ptr) { patch_result_crc = ptr.crc2str(); };
+	void set_data_crc(const crc & ptr);
+	void set_delta_patch_base_crc(const crc & ptr);
+	void set_delta_patch_result_crc(const crc & ptr);
 	void set_empty_dir(bool val) { if(!is_dir()) throw SRC_BUG; empty_dir = val; };
 
 	void clear();

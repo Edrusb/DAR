@@ -30,7 +30,6 @@
 #include <set>
 
 #include "integers.hpp"
-#include "crc.hpp"
 
 namespace libdar
 {
