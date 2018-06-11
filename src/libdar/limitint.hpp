@@ -79,6 +79,10 @@ namespace libdar
 	/// In particular it is assumed that the sizeof() operator gives the amount of
 	/// byte of information that this type can handle, and it is also assumed that
 	/// the bytes of information are contiguous.
+	/// \note if you just want to convert an infinint
+	/// integer to its decimal representation see the
+	/// class libdar::deci
+
 
     template<class B> class limitint
     {

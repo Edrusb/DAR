@@ -21,8 +21,9 @@
 
     /// \file thread_cancellation.hpp
     /// \brief to be able to cancel libdar operation while running in a given thread.
-    /// \ingroup API
-    ///
+    /// \ingroup Private
+    /// \note API included module due to dependencies
+
     /// the class thread_cancellation implemented in this module
     /// permits to define checkpoints where is looked whether the current
     /// thread has been marked as to be canceled by the user
@@ -53,7 +54,7 @@ extern "C"
 namespace libdar
 {
 
-	/// \addtogroup API
+	/// \addtogroup Private
         /// @{
 
 	/// class to be used as parent to provide checkpoints to inherited classes

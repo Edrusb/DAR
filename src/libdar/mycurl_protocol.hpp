@@ -45,7 +45,11 @@ namespace libdar
 	/// feature is not always available with http and https protocols
 	/// and never available with scp protocol
 	/// Thus dar only supports ftp and sftp
-    enum mycurl_protocol { proto_ftp, proto_sftp };
+    enum mycurl_protocol
+    {
+	proto_ftp,  ///< FTP file transfer protocol
+	proto_sftp  ///< SFTP Secure FTP (over ssh)
+    };
 
 	/// extract mycurl_protocol from a given URL
     extern mycurl_protocol string_to_mycurl_protocol(const std::string & arg);

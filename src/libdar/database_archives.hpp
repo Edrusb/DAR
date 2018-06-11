@@ -41,6 +41,10 @@ namespace libdar
 
 	/// datastructure managing a member of the list of archives used by a database
 
+	/// only two methods are useful from API point of view
+	/// - get_path()
+        /// - get_basename()
+
     class database_archives
     {
     public:
@@ -54,7 +58,10 @@ namespace libdar
 	void set_path(const std::string & val) { chemin = val; };
 	void set_basename(const std::string & val) { base = val; };
 
+	    /// this provides the path where is located this archive
 	const std::string & get_path() const { return chemin; };
+
+	    /// this provides the basename of the archive
 	const std::string & get_basename() const { return base; };
 
     private:

@@ -131,7 +131,6 @@ namespace libdar
 
 	/// gives the number of thread running libdar
     extern U_I get_thread_count();
-
 #endif
 
 

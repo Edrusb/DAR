@@ -44,7 +44,8 @@ namespace libdar
 	/// for the API user, it can be used as if it was a std::string object.
 	/// However if the argument is not a valid path, an exception may be thrown
 	/// by libdar
-	/// \ingroup API
+	/// \note the most frequent method you will use from API point of view
+	/// is path::display() which provides a std::string representing the path
     class path
     {
     public :

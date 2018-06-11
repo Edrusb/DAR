@@ -53,6 +53,10 @@ namespace libdar
 	archive_num & operator = (archive_num && ref) = default;
 	~archive_num() = default;
 
+	    /// this operator makes an object of that class convertible to an 16 bits integer
+
+	    /// \note this is the only call you should need, just use an archive_num
+	    /// implictely of explicitely as an integer
 	operator U_16() const { return val; };
 	U_16 operator = (U_16 arg) { set(arg); return arg; };
 	archive_num & operator++() { set(val+1); return *this; };

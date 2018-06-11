@@ -76,6 +76,7 @@ namespace libdar
 
 	    /// this produce a infinint from the decimal stored in the current object
         infinint computer() const;
+
 	    /// this produce a string from the decimal stored in the current object
         std::string human() const;
 

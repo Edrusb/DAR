@@ -30,18 +30,25 @@
     /// - API5 module: contains API v5 symbols as found on release 2.4.x and 2.5.x
     /// .
     ///
-    /// Please not that an API tutorial is also available and should be a starting point for using libdar
-
 
     /// \defgroup API API
     /// \brief APlication Interface
     ///
-    /// This gathers all symbols that may be accessed from an external
+    /// This namespace gathers all symbols that may be accessed from an external
     /// program. Other symbols are not as much documented, and
     /// may change or be removed without any warning or backward
     /// compatibility support. So only use the function, macro, types,
     /// classes... defined as member of the API module in you external programs.
-
+    ///
+    /// Please not that an API tutorial is also available and should be a starting point for using libdar,
+    /// nevertheless, if you want to start from here, there is four main classes consider and several
+    /// datastructures aside that they depend on:
+    /// - class libdar::archive you can create and manipulate dar archive like the dar command-line tool does
+    /// - class libdar::database you can create and manupulate dar_manager database, like the dar_manager CLI tool does
+    /// - class libdar::libdar_xform you have guessed, this is the API for dar_xform
+    /// - class libdar::libdar_slave still logicial, this is the API for dar_slave
+    /// all the CLI command mentionned above do rely on these classes so it might help having a look at the
+    /// CMDLINE namespace for illustration on how to use this classes.
 
     /// \defgroup Private Private
     /// \brief Libdar internal symbols

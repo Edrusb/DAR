@@ -55,6 +55,9 @@ namespace libdar
 	/// the arbitrary large positive integer class
 
 	/// can only handle positive integer numbers
+	/// \note if you just want to convert an infinint
+	/// integer to its decimal representation see the
+	/// class libdar::deci
     class infinint
     {
     public :
