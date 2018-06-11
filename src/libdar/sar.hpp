@@ -36,6 +36,7 @@
 #include "entrepot.hpp"
 #include "slice_layout.hpp"
 #include "contextual.hpp"
+#include "mem_ui.hpp"
 
 namespace libdar
 {

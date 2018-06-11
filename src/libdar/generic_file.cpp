@@ -514,26 +514,4 @@ namespace libdar
 	active_write = move(ref.active_write);
     }
 
-    const char * generic_file_get_name(gf_mode mode)
-    {
-	const char *ret = nullptr;
-
-        switch(mode)
-	{
-	case gf_read_only:
-	    ret = gettext("read only");
-	    break;
-        case gf_write_only:
-            ret = gettext("write only");
-            break;
-        case gf_read_write:
-            ret = gettext("read and write");
-            break;
-        default:
-            throw SRC_BUG;
-        }
-        return ret;
-    }
-
-
 } // end of namespace

@@ -34,6 +34,7 @@
 #include "integers.hpp"
 #include "entrepot.hpp"
 #include "contextual.hpp"
+#include "mem_ui.hpp"
 
 namespace libdar
 {
@@ -49,7 +50,7 @@ namespace libdar
 	/// - in read mode let read a single slice from a named pipe
 	/// - in write mode let write a single sliced archive to an anonymous pipe
 
-    class trivial_sar : public generic_file , public contextual, protected mem_ui
+    class trivial_sar : public generic_file, public contextual, protected mem_ui
     {
     public:
 	    /// constructor to build a new single sliced archive

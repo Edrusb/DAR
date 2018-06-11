@@ -114,6 +114,7 @@ extern "C"
 #include "deci.hpp"
 #include "entrepot.hpp"
 #include "sar_tools.hpp"
+#include "fichier_global.hpp"
 
 using namespace std;
 

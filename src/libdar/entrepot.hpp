@@ -33,7 +33,7 @@
     /// respectively. External applications like webdar can implement entrepot_ftp
     /// and fichier_ftp classes to provide transparent access to dar backup localted on a
     /// remote ftp server. More can follow in the future.
-    /// \ingroup Private
+    /// \ingroup API
 
 #ifndef ENTREPOT_HPP
 #define ENTREPOT_HPP
@@ -41,15 +41,19 @@
 #include "../my_config.h"
 
 #include <string>
+#include <memory>
 #include "user_interaction.hpp"
-#include "fichier_global.hpp"
 #include "path.hpp"
 #include "archive_aux.hpp"
+#include "gf_mode.hpp"
 
 namespace libdar
 {
-	/// \addtogroup Private
+	/// \addtogroup API
 	/// @{
+
+	// no need to dig into this from API header
+    class fichier_global;
 
 	/// the Entrepot interface
 

@@ -50,6 +50,7 @@ extern "C"
 #include "integers.hpp"
 #include "crc.hpp"
 #include "infinint.hpp"
+#include "gf_mode.hpp"
 
 #include <string>
 
@@ -58,17 +59,6 @@ namespace libdar
 
 	/// \addtogroup Private
 	/// @{
-
-	/// generic_file openning modes
-    enum gf_mode
-    {
-	gf_read_only,  ///< read only access
-	gf_write_only, ///< write only access
-	gf_read_write  ///< read and write access
-    };
-
-	/// provides a human readable string defining the gf_mode given in argument
-    extern const char * generic_file_get_name(gf_mode mode);
 
 	/// this is the interface class from which all other data transfer classes inherit
 

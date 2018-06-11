@@ -33,6 +33,7 @@
 #include "path.hpp"
 #include "statistics.hpp"
 #include "archive_options.hpp"
+#include "thread_cancellation.hpp"
 
 namespace libdar
 {

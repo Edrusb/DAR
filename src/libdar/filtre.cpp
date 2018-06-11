@@ -49,6 +49,7 @@ extern "C"
 #include "cat_signature.hpp"
 #include "tools.hpp"
 #include "op_tools.hpp"
+#include "fichier_global.hpp"
 
 using namespace std;
 

@@ -116,6 +116,7 @@ extern "C"
 #include "sar_tools.hpp"
 #include "trivial_sar.hpp"
 #include "tuyau.hpp"
+#include "fichier_global.hpp"
 
 using namespace std;
 
