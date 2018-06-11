@@ -22,7 +22,7 @@
     /// \file database_archives.hpp
     /// \brief this file stores the list of archives a database has been built from.
     /// it is part of the database header
-    /// \ingroup Private
+    /// \ingroup API
 
 
 #ifndef DATABASE_ARCHIVE_HPP
@@ -36,7 +36,7 @@
 namespace libdar
 {
 
-	/// \addtogroup Private
+	/// \addtogroup API
         /// @{
 
 	/// datastructure managing a member of the list of archives used by a database
