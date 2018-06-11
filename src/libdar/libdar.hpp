@@ -24,10 +24,10 @@
     /// \mainpage
     /// You will find here the reference documentation for the dar and libdar source code, split in several "modules".
     /// - API module: contains all information for using libdar within your program
-    /// - Private module: contains all libdar internal documentation, it is not necessary to read it to be able to use libdar
+    /// - Private module: contains all libdar internal documentation, you do not have to read it in order use libdar
     /// - CMDLINE module: contains the documentation for command-line tools,
-    /// you might want to have a look for illustration of library usage.
-    /// - API5 module: contains API v5 symbols as found on release 2.5.x and 2.4.x
+    /// you might want to have a look for illustration of libdar usage.
+    /// - API5 module: contains API v5 symbols as found on release 2.4.x and 2.5.x
     /// .
     ///
     /// Please not that an API tutorial is also available and should be a starting point for using libdar
