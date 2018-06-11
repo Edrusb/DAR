@@ -48,6 +48,7 @@ extern "C"
 #include "integers.hpp"
 #include "fsa_family.hpp"
 #include "datetime.hpp"
+#include "generic_file.hpp"
 
 namespace libdar
 {

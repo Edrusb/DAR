@@ -31,7 +31,6 @@
 #include <map>
 #include <string>
 #include "infinint.hpp"
-#include "generic_file.hpp"
 #include "mask.hpp"
 
 namespace libdar
@@ -42,6 +41,7 @@ namespace libdar
 
 	/// non need to to dig into this class from API
     class archive_version;
+    class generic_file;
 
 	/// the class ea_attributs manages the set of EA that can be associated to an inode
 
