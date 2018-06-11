@@ -23,6 +23,7 @@
 
 
 #include "datetime.hpp"
+#include "archive_version.hpp"
 
 using namespace std;
 
@@ -37,6 +38,11 @@ namespace libdar
     datetime::datetime(time_t second, time_t subsec, time_unit unit)
     {
 	build(infinint(second), infinint(subsec), unit);
+    }
+
+    datetime::datetime(generic_file &x, archive_version ver)
+    {
+	read(x, ver);
     }
 
     bool datetime::operator < (const datetime & ref) const

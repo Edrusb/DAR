@@ -69,6 +69,7 @@ extern "C"
 #include "compile_time_features.hpp"
 #include "capabilities.hpp"
 #include "erreurs.hpp"
+#include "archive_version.hpp"
 
 using namespace std;
 

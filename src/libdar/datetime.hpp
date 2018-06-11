@@ -21,7 +21,7 @@
 
     /// \file datetime.hpp
     /// \brief this file contains the definition of class datetime that stores unix times in a portable way
-    /// \ingroup Private
+    /// \ingroup API
 
 #ifndef DATETIME_HPP
 #define DATETIME_HPP
@@ -44,13 +44,17 @@ extern "C"
 
 #include "../my_config.h"
 #include "infinint.hpp"
-#include "archive_version.hpp"
 
 namespace libdar
 {
-	/// \addtogroup Private
+	/// \addtogroup API
 	/// @{
 
+	/// no need to dig into these classes from the API
+    class archive_version;
+    class generic_file;
+
+	/// stores time information
     class datetime
     {
     public:
@@ -69,7 +73,7 @@ namespace libdar
 	datetime(time_t second, time_t subsec, time_unit unit);
 
 	    /// constructor reading data dump() into a generic_file
-	datetime(generic_file &x, archive_version ver) { read(x, ver); };
+	datetime(generic_file &x, archive_version ver);
 
 	datetime(const datetime & ref) = default;
 	datetime(datetime && ref) noexcept = default;

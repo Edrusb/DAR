@@ -33,13 +33,15 @@
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "mask.hpp"
-#include "archive_version.hpp"
 
 namespace libdar
 {
 
 	/// \addtogroup Private
 	/// @{
+
+	/// non need to to dig into this class from API
+    class archive_version;
 
 	/// the class ea_attributs manages the set of EA that can be associated to an inode
 
