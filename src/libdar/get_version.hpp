@@ -41,7 +41,6 @@ extern "C"
 
 #include <string>
 #include "integers.hpp"
-#include "thread_cancellation.hpp"
 
     /// libdar namespace encapsulate all libdar symbols
 
@@ -115,20 +114,24 @@ namespace libdar
 	/// \param[in] tid is the Thread ID to cancel libdar in
 	/// \param[in] immediate whether to cancel thread immediately or just signal the request to the thread
 	/// \param[in] flag an arbitrary value passed as-is through libdar
-    inline void cancel_thread(pthread_t tid, bool immediate = true, U_64 flag = 0) { thread_cancellation::cancel(tid, immediate, flag); }
+    extern void cancel_thread(pthread_t tid, bool immediate = true, U_64 flag = 0);
 
 	/// consultation of the cancellation status of a given thread
 
 	/// \param[in] tid is the tid of the thread to get status about
 	/// \return false if no cancellation has been requested for the given thread
-    inline bool cancel_status(pthread_t tid) { return thread_cancellation::cancel_status(tid); }
+    extern bool cancel_status(pthread_t tid);
 
 	/// thread cancellation deactivation
 
 	/// abort the thread cancellation for the given thread
 	/// \return false if no thread cancellation was under process for that thread
 	/// or if there is no more pending cancellation (thread has already been canceled).
-    inline bool cancel_clear(pthread_t tid) { return thread_cancellation::clear_pending_request(tid); }
+    extern bool cancel_clear(pthread_t tid);
+
+	/// gives the number of thread running libdar
+    extern U_I get_thread_count();
+
 #endif
 
 

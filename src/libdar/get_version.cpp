@@ -69,6 +69,7 @@ extern "C"
 #include "erreurs.hpp"
 #include "nls_swap.hpp"
 #include "tools.hpp"
+#include "thread_cancellation.hpp"
 
 using namespace std;
 
@@ -217,5 +218,30 @@ namespace libdar
 #endif
 	tools_end();
     }
+
+
+#if MUTEX_WORKS
+    void cancel_thread(pthread_t tid, bool immediate, U_64 flag)
+    {
+	thread_cancellation::cancel(tid, immediate, flag);
+    }
+
+    bool cancel_status(pthread_t tid)
+    {
+	return thread_cancellation::cancel_status(tid);
+    }
+
+    bool cancel_clear(pthread_t tid)
+    {
+	return thread_cancellation::clear_pending_request(tid);
+    }
+
+    U_I get_thread_count()
+    {
+	return thread_cancellation::count();
+    }
+
+#endif
+
 
 } // end of namespace

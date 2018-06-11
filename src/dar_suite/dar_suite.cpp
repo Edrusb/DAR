@@ -257,7 +257,7 @@ int dar_suite_global(int argc,
     }
 
 
-    if(thread_cancellation::count() != 0)
+    if(get_thread_count() != 0)
     {
 	general_report(string(gettext("SANITY CHECK: AT LEAST ONE THREAD_CANCELLATION OBJECT HAS NOT BEEN DESTROYED AND REMAINS IN MEMORY WHILE THE PROGRAM REACHED ITS END")));
     }
