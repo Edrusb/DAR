@@ -30,13 +30,16 @@
 #include "../my_config.h"
 
 #include "integers.hpp"
-#include "generic_file.hpp"
+#include "erreurs.hpp"
 
 namespace libdar
 {
 
 	/// \addtogroup API
 	/// @{
+
+	// no need to dig into this class from the API
+    class generic_file;
 
 	/// class archive_num stores the position of an archive inside a dar_manager database
 

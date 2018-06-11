@@ -39,6 +39,7 @@ extern "C"
 } // end extern "C"
 
 #include "archive_num.hpp"
+#include "generic_file.hpp"
 
 using namespace std;
 
