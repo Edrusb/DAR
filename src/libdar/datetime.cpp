@@ -24,6 +24,7 @@
 
 #include "datetime.hpp"
 #include "archive_version.hpp"
+#include "generic_file.hpp"
 
 using namespace std;
 

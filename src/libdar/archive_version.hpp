@@ -31,13 +31,15 @@
 #include <string>
 
 #include "integers.hpp"
-#include "generic_file.hpp"
 
 namespace libdar
 {
 
 	/// \addtogroup API
 	/// @{
+
+	// no need to dig into this from API
+    class generic_file;
 
 	/// class archive_version manages the version of the archive format
 
