@@ -21,7 +21,7 @@
 
     /// \file archive_version.hpp
     /// \brief class archive_version that rules which archive format to follow
-    /// \ingroup Private
+    /// \ingroup API
 
 #ifndef ARCHIVE_VERSION_HPP
 #define ARCHIVE_VERSION_HPP
@@ -36,7 +36,7 @@
 namespace libdar
 {
 
-	/// \addtogroup Private
+	/// \addtogroup API
 	/// @{
 
 	/// class archive_version manages the version of the archive format
@@ -68,6 +68,8 @@ namespace libdar
 
 	void dump(generic_file & f) const;
 	void read(generic_file & f);
+
+	    /// provides the version information as a human readable string
 	std::string display() const;
 
     private:
