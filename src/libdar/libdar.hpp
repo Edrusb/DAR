@@ -76,5 +76,6 @@
 #include "shell_interaction.hpp"
 #include "user_interaction_callback.hpp"
 #include "user_interaction_blind.hpp"
+#include "shell_interaction_emulator.hpp"
 
 #endif
