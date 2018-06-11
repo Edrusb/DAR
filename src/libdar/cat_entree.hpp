@@ -209,6 +209,9 @@ namespace libdar
 	smart_pointer<pile_descriptor> pdesc;
     };
 
+	/// convert a signature char to a human readable string
+    extern const char *cat_entree_signature2string(unsigned char sign);
+
 	/// @}
 
 } // end of namespace

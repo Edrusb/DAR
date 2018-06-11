@@ -450,4 +450,42 @@ namespace libdar
 	return ret;
     }
 
+
+    const char *cat_entree_signature2string(unsigned char sign)
+    {
+	unsigned char normalized_sig = toupper(sign);
+
+	switch(normalized_sig)
+	{
+	case 'D':
+	    return gettext("directory");
+	case 'Z':
+	    throw SRC_BUG; // EOD should never be considered by overwriting policy
+	case 'M':
+	    return gettext("hard linked inode");
+	case 'F':
+	    return gettext("plain file");
+	case 'L':
+	    return gettext("soft link");
+	case 'C':
+	    return gettext("char device");
+	case 'B':
+	    return gettext("block device");
+	case 'P':
+	    return gettext("named pipe");
+	case 'S':
+	    return gettext("unix socket");
+	case 'X':
+	    return gettext("deleted entry");
+	case 'O':
+	    return gettext("door inode");
+	case 'I':
+	    throw SRC_BUG; // ignored entry should never be found in an archive
+	case 'J':
+	    throw SRC_BUG; // ignored directory entry should never be found in an archive
+	default:
+	    throw SRC_BUG; // unknown entry type
+	}
+    }
+
 } // end of namespace

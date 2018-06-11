@@ -121,6 +121,7 @@ extern "C"
 #include "null_file.hpp"
 #include "cat_signature.hpp"
 #include "compile_time_features.hpp"
+#include "op_tools.hpp"
 
 #ifndef UNIX_PATH_MAX
 #define UNIX_PATH_MAX 104
@@ -528,7 +529,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	if(action == data_ask)
-	    action = crit_ask_user_for_data_action(get_ui(), spot, in_place, to_be_added);
+	    action = op_tools_crit_ask_user_for_data_action(get_ui(), spot, in_place, to_be_added);
 
 	switch(action)
 	{
@@ -590,7 +591,7 @@ namespace libdar
 	    throw SRC_BUG; // must be either a cat_mirage or an inode, not any other cat_nomme object
 
 	if(action == data_ask)
-	    action = crit_ask_user_for_data_action(get_ui(), spot, in_place, to_be_added);
+	    action = op_tools_crit_ask_user_for_data_action(get_ui(), spot, in_place, to_be_added);
 
 	switch(action)
 	{
@@ -780,7 +781,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	if(action == EA_ask)
-	    action = crit_ask_user_for_EA_action(get_ui(), spot, in_place, to_be_added);
+	    action = op_tools_crit_ask_user_for_EA_action(get_ui(), spot, in_place, to_be_added);
 
 
 	    // modifying the EA action when the in place inode has not EA
@@ -929,7 +930,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	if(action == EA_ask)
-	    action = crit_ask_user_for_FSA_action(get_ui(), spot, in_place, to_be_added);
+	    action = op_tools_crit_ask_user_for_FSA_action(get_ui(), spot, in_place, to_be_added);
 
 
 	    // modifying the FSA action when the in place inode has not FSA

@@ -30,7 +30,7 @@
 
 #include <deque>
 
-#include "cat_nomme.hpp"
+#include "user_interaction.hpp"
 #include "criterium.hpp"
 
 namespace libdar
@@ -38,6 +38,9 @@ namespace libdar
 
 	/// \addtogroup API
 	/// @{
+
+	/// no need to dig into class cat_nomme here
+    class cat_nomme;
 
 	/// the possible actions for overwriting data
 
@@ -153,7 +156,7 @@ namespace libdar
 	~testing() { free(); };
 
 
-	    /// the inherited pure virtual method from class action that must be gimplemented
+	    /// the inherited pure virtual method from class crit_action that must be implemented
 	virtual void get_action(const cat_nomme & first, const cat_nomme & second, over_action_data & data, over_action_ea & ea) const override
 	{
 	    if(x_input->evaluate(first, second))
@@ -206,42 +209,6 @@ namespace libdar
 	void destroy();
 	void copy_from(const crit_chain & ref);
     };
-
-	/// ask user for EA action
-
-	/// \param[in] dialog for user interaction
-	/// \param[in] full_name full path to the entry do ask decision for
-	/// \param[in] already_here pointer to the object 'in place'
-	/// \param[in] dolly pointer to the object 'to be added'
-	/// \return the action decided by the user. The user may also choose to abort, which will throw an Euser_abort exception
-    extern over_action_ea crit_ask_user_for_EA_action(user_interaction & dialog, const std::string & full_name, const cat_entree *already_here, const cat_entree *dolly);
-
-	/// ask user for FSA action
-
-	/// \param[in] dialog for user interaction
-	/// \param[in] full_name full path to the entry do ask decision for
-	/// \param[in] already_here pointer to the object 'in place'
-	/// \param[in] dolly pointer to the object 'to be added'
-	/// \return the action decided by the user. The user may also choose to abort, which will throw an Euser_abort exception
-    extern over_action_ea crit_ask_user_for_FSA_action(user_interaction & dialog, const std::string & full_name, const cat_entree *already_here, const cat_entree *dolly);
-
-	/// ask user for Data action
-
-	/// \param[in] dialog for user interaction
-	/// \param[in] full_name full path to the entry do ask decision for
-	/// \param[in] already_here pointer to the object 'in place'
-	/// \param[in] dolly pointer to the object 'to be added'
-	/// \return the action decided by the user. The user may also choose to abort, which will throw an Euser_abort exception
-    extern over_action_data crit_ask_user_for_data_action(user_interaction & dialog, const std::string & full_name, const cat_entree *already_here, const cat_entree *dolly);
-
-
-	/// show information suited for user comparison and decision for entry in conflict
-
-	/// \param[in] dialog for user interaction
-	/// \param[in] full_name path to the entry of the entry to display information
-	/// \param[in] already_here pointer to the object 'in place'
-	/// \param[in] dolly pointer to the object 'to be added'
-    extern void crit_show_entry_info(user_interaction & dialog, const std::string & full_name, const cat_entree *already_here, const cat_entree *dolly);
 
 	/// @}
 

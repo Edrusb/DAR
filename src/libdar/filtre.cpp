@@ -48,6 +48,7 @@ extern "C"
 #include "generic_rsync.hpp"
 #include "cat_signature.hpp"
 #include "tools.hpp"
+#include "op_tools.hpp"
 
 using namespace std;
 
@@ -1920,7 +1921,7 @@ namespace libdar
 					    overwrite->get_action(*already_here, *dolly_nom, act_data, act_ea);
 
 					    if(act_data == data_ask)
-						act_data = crit_ask_user_for_data_action(*dialog, full_name, already_here, dolly);
+						act_data = op_tools_crit_ask_user_for_data_action(*dialog, full_name, already_here, dolly);
 
 						// possibly modifying the resulting action when warning is requested
 
@@ -2045,7 +2046,7 @@ namespace libdar
 							   || dolly_ino->fsa_get_saved_status() != fsa_saved_status::none
 							   || al_ino->fsa_get_saved_status() != fsa_saved_status::none)
 							)
-							act_ea = crit_ask_user_for_EA_action(*dialog, full_name, already_here, dolly);
+							act_ea = op_tools_crit_ask_user_for_EA_action(*dialog, full_name, already_here, dolly);
 						    else
 							act_ea = EA_preserve; // whatever what we want is, as no EA exist for both inplace and to be added objects, there is just no need to ask for that.
 						}
@@ -2183,7 +2184,7 @@ namespace libdar
 							|| al_ino->ea_get_saved_status() != ea_saved_status::none
 							|| dolly_ino->fsa_get_saved_status() != fsa_saved_status::none
 							|| al_ino->fsa_get_saved_status() != fsa_saved_status::none))
-							act_ea = crit_ask_user_for_EA_action(*dialog, full_name, already_here, dolly);
+							act_ea = op_tools_crit_ask_user_for_EA_action(*dialog, full_name, already_here, dolly);
 						    else
 							act_ea = EA_overwrite; // no need to ask here neither as both entries have no EA.
 						}

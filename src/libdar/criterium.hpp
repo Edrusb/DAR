@@ -29,14 +29,17 @@
 #include "../my_config.h"
 
 #include <deque>
-
-#include "cat_nomme.hpp"
+#include "erreurs.hpp"
+#include "infinint.hpp"
 
 namespace libdar
 {
 
 	/// \addtogroup API
 	/// @{
+
+	/// no need ot dig into class cat_nomme here
+    class cat_nomme;
 
 	/// the generic criterium class, parent of all criterium
 
