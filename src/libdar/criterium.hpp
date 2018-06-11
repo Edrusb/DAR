@@ -32,7 +32,6 @@
 
 #include "cat_nomme.hpp"
 #include "cat_inode.hpp"
-#include "cat_directory.hpp"
 
 namespace libdar
 {
@@ -112,7 +111,7 @@ namespace libdar
 	crit_in_place_is_dir & operator = (crit_in_place_is_dir && ref) noexcept = default;
 	~crit_in_place_is_dir() = default;
 
-	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const { return dynamic_cast<const cat_directory *>(&first) != nullptr; };
+	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const;
 	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_is_dir(*this); };
     };
 

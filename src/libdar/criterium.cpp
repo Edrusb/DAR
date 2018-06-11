@@ -25,6 +25,7 @@
 #include "nls_swap.hpp"
 #include "cat_all_entrees.hpp"
 #include "tools.hpp"
+#include "cat_directory.hpp"
 
 using namespace std;
 
@@ -52,6 +53,11 @@ namespace libdar
     {
 	return dynamic_cast<const cat_inode *>(&first) != nullptr
 	    || dynamic_cast<const cat_mirage *>(&first) != nullptr;
+    }
+
+    bool crit_in_place_is_dir::evaluate(const cat_nomme &first, const cat_nomme &second) const
+    {
+	return dynamic_cast<const cat_directory *>(&first) != nullptr;
     }
 
     bool crit_in_place_is_file::evaluate(const cat_nomme &first, const cat_nomme &second) const
