@@ -147,9 +147,6 @@ namespace libdar5
 	// from secu_string.hpp
     using libdar::secu_string;
 
-	// from cat_inode.hpp
-    using libdar::cat_inode;
-
 	// from path.hpp
     using libdar::path;
 

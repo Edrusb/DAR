@@ -31,7 +31,6 @@
 #include <deque>
 
 #include "cat_nomme.hpp"
-#include "cat_inode.hpp"
 
 namespace libdar
 {
@@ -69,9 +68,6 @@ namespace libdar
 	    /// \note this method must be implemented in all the leaf classes of the
 	    /// class hierarchy rooted at the criterium class
 	virtual criterium *clone() const = 0;
-
-    protected:
-	static const cat_inode *get_inode(const cat_nomme * arg);
     };
 
 	// //////////////////////////////////////////////////////////
@@ -320,13 +316,7 @@ namespace libdar
 	crit_in_place_EA_present & operator = (crit_in_place_EA_present && ref) noexcept = default;
 	~crit_in_place_EA_present() = default;
 
-	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override
-	{
-	    const cat_inode *tmp = dynamic_cast<const cat_inode *>(&first);
-	    return tmp != nullptr
-		&& tmp->ea_get_saved_status() != ea_saved_status::none
-		&& tmp->ea_get_saved_status() != ea_saved_status::removed;
-	};
+	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
 	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_EA_present(*this); };
     };
 

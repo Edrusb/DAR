@@ -26,28 +26,19 @@
 #include "cat_all_entrees.hpp"
 #include "tools.hpp"
 #include "cat_directory.hpp"
+#include "cat_inode.hpp"
 
 using namespace std;
 
 namespace libdar
 {
 
+    static const cat_inode *get_inode(const cat_nomme * arg);
+
+
 	/////////////////////////////////////////////////////////////////////
 	//////////// implementation of criterium classes follows ////////////
         /////////////////////////////////////////////////////////////////////
-
-    const cat_inode *criterium::get_inode(const cat_nomme *arg)
-    {
-	const cat_inode *ret;
-	const cat_mirage *arg_m = dynamic_cast<const cat_mirage *>(arg);
-
-	if(arg_m != nullptr)
-	    ret = const_cast<const cat_inode *>(arg_m->get_inode());
-	else
-	    ret = dynamic_cast<const cat_inode *>(arg);
-
-	return ret;
-    }
 
     bool crit_in_place_is_inode::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
@@ -150,6 +141,14 @@ namespace libdar
 	    return first_f->has_delta_signature_available();
 	else
 	    return false;
+    }
+
+    bool crit_in_place_EA_present::evaluate(const cat_nomme &first, const cat_nomme &second) const
+    {
+	const cat_inode *tmp = dynamic_cast<const cat_inode *>(&first);
+	return tmp != nullptr
+	    && tmp->ea_get_saved_status() != ea_saved_status::none
+	    && tmp->ea_get_saved_status() != ea_saved_status::removed;
     }
 
     bool crit_in_place_EA_more_recent::evaluate(const cat_nomme &first, const cat_nomme &second) const
@@ -492,6 +491,25 @@ namespace libdar
 	    throw;
 	}
 	NLS_SWAP_OUT;
+
+	return ret;
+    }
+
+
+	/////////////////////////////////////////////////////////////////////
+	//////////// implementation of private function /////////////////////
+        /////////////////////////////////////////////////////////////////////
+
+
+    static const cat_inode *get_inode(const cat_nomme *arg)
+    {
+	const cat_inode *ret;
+	const cat_mirage *arg_m = dynamic_cast<const cat_mirage *>(arg);
+
+	if(arg_m != nullptr)
+	    ret = const_cast<const cat_inode *>(arg_m->get_inode());
+	else
+	    ret = dynamic_cast<const cat_inode *>(arg);
 
 	return ret;
     }
