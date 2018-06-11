@@ -45,7 +45,6 @@ extern "C"
 #include <deque>
 #include "entrepot.hpp"
 #include "secu_string.hpp"
-#include "mem_ui.hpp"
 #include "mycurl_protocol.hpp"
 
 namespace libdar
