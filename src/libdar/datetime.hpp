@@ -67,9 +67,9 @@ namespace libdar
 
 	    /// general constructor
 
-	    /// \param[in] sec the number of second since the dawn of computer time (1970)
+	    /// \param[in] second the number of second since the dawn of computer time (1970)
 	    /// \param[in] subsec the fraction of the time below 1 second expressed in the time unit given as next argument
-	    /// \param[in] the time unit in which is expressed the previous argument
+	    /// \param[in] unit the time unit in which is expressed the previous argument
 	datetime(time_t second, time_t subsec, time_unit unit);
 
 	    /// constructor reading data dump() into a generic_file
