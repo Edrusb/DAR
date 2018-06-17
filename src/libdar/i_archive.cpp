@@ -1174,7 +1174,12 @@ namespace libdar
 		thread_cancellation thr;
 		defile juillet = FAKE_ROOT;
 		list_entry ent;
-		bool isolated = only_contains_an_isolated_catalogue();
+		bool isolated;
+
+		if(exploitable)
+		    isolated = only_contains_an_isolated_catalogue();
+		else
+		    isolated = false;
 
 		get_cat().reset_read();
 		while(get_cat().read(e))
