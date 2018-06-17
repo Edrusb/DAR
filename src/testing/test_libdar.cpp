@@ -160,6 +160,7 @@ void f2()
     archive_options_create create_options;
 
     create_options.set_subtree(simple_path_mask("/etc", true));
+    create_options.set_warn_over(false);
     archive *toto = nullptr;
 
     try
