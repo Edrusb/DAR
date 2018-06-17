@@ -1637,6 +1637,26 @@ namespace libdar
 
 	if(parent == nullptr)
 	    throw SRC_BUG;
+	else
+	{
+	    try
+	    {
+		U_I sz = 0;
+		infinint i_sz = parent->get_dir_size();
+		i_sz.unstack(sz);
+		    // if i_sz > 0 the requested size is larger than what U_I can hold
+		    // we won't handle this case here as we have not mean to
+		    // ask the stdc++ lib to reserver as much memory
+		    // though, there is chances that the stdc++ library
+		    // will not be able to get as much memory and will
+		    // throw a std::bad_alloc exception when calling reserve()
+		ret.reserve(sz);
+	    }
+	    catch(std::bad_alloc)
+	    {
+		throw Ememory("std::vector<libdar::list_entry>::reserve()");
+	    }
+	}
 
 	parent->reset_read_children();
 	while(parent->read_children(tmp_ptr))

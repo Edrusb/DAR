@@ -111,6 +111,9 @@ namespace libdar
 	    /// ask recursive update for the recursive_has_changed field
 	void recursive_has_changed_update() const;
 
+	    /// get the number of "cat_nomme" entry directly containted in this cat_directory (no recursive call)
+	infinint get_dir_size() const { return ordered_fils.size(); };
+
 	    /// get then number of "cat_nomme" entry contained in this cat_directory and subdirectories (recursive call)
 	infinint get_tree_size() const;
 
