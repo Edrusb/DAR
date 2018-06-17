@@ -1127,6 +1127,9 @@ namespace libdar
 	if(me == nullptr)
 	    throw SRC_BUG;
 
+	if(callback == nullptr)
+	    throw Elibcall("archive::op_listing", "null pointer given as callback function for archive listing");
+
         try
         {
 	    slice_layout used_layout;
