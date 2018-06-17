@@ -129,6 +129,11 @@ string getstring(const string &x, bool echo, void *context)
     throw SRC_BUG;
 }
 
+void listing_callback(const string & the_path, const list_entry & entry, void *context)
+{
+    cout << the_path << " type = " << entry.get_type() << " context = " << (U_I)context << endl;
+}
+
 secu_string getsecustring(const string &x, bool echo, void *context)
 {
     throw SRC_BUG;
@@ -175,7 +180,7 @@ void f2()
 	    options.set_list_mode(archive_options_listing_shell::normal);
 	    options.set_selection(bool_mask(true));
 	    options.set_filter_unsaved(false);
-	    toto->op_listing(nullptr, nullptr, options);
+	    toto->op_listing(listing_callback, (void*)1, options);
 	}
     }
     catch(...)
