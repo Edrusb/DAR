@@ -55,11 +55,18 @@ static shared_ptr<user_interaction> ui(new user_interaction_callback(warning, qu
 
 int main()
 {
-    f1();
-    f2();
-    f3();
-    f4();
-    f5();
+    try
+    {
+	f1();
+	f2();
+	f3();
+	f4();
+	f5();
+    }
+    catch(Egeneric & e)
+    {
+	cout << e.dump_str() << endl;
+    }
 }
 
 #define BOOL2STR(val) ( val ? "yes" : "no" )
