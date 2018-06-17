@@ -128,6 +128,7 @@ namespace libdar
 	virtual void pre_add_fsa_crc(const cat_entree *ref, const pile_descriptor* dest = nullptr) const {};
 	virtual void pre_add_delta_sig(const pile_descriptor* dest = nullptr) const {};
 	virtual escape *get_escape_layer() const { return nullptr; };
+	virtual void drop_escape_layer() {};
 
         void add(cat_entree *ref); // add at end of catalogue (sequential point of view)
 	void re_add_in(const std::string &subdirname); // return into an already existing subdirectory for further addition

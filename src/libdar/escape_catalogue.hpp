@@ -81,7 +81,8 @@ namespace libdar
 	virtual void pre_add_fsa(const cat_entree *ref, const pile_descriptor* dest) const override;
 	virtual void pre_add_fsa_crc(const cat_entree *ref, const pile_descriptor* dest) const override;
 	virtual void pre_add_delta_sig(const pile_descriptor* dest) const override;
-	virtual escape *get_escape_layer() const override { return pdesc->esc; };
+	virtual escape *get_escape_layer() const override { return pdesc.is_null() ? nullptr : pdesc->esc; };
+	virtual void drop_escape_layer() override { pdesc.assign(nullptr); };
 
 	virtual void reset_read() const override;
 	virtual void end_read() const override;

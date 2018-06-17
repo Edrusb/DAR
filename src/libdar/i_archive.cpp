@@ -2447,6 +2447,10 @@ namespace libdar
 			st_ptr->add_to_deleted(cat->update_destroyed_with(*ref_cat1));
 		}
 
+		cat->drop_escape_layer();
+		    // we need to remove pointer to layers
+		    // that are about to be destroyed now
+
 		macro_tools_close_layers(get_pointer(),
 					 stack,
 					 ver,

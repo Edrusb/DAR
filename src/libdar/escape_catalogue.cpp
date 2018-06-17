@@ -130,6 +130,8 @@ namespace libdar
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc)); // pdesc is a smart_pointer not a normal pointer
+	if(where == nullptr)
+	    throw SRC_BUG;
 
 	if(where->esc == nullptr)
 	    throw SRC_BUG;
@@ -144,7 +146,11 @@ namespace libdar
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
 	const cat_inode *ref_ino = dynamic_cast<const cat_inode *>(ref);
-	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc)); // pdesc is a smart_pointer not a normal pointer
+	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc));
+	    // pdesc is a smart_pointer not a normal pointer
+
+	if(where == nullptr)
+	    throw SRC_BUG;
 
 	if(ref_mir != nullptr)
 	    ref_ino = ref_mir->get_inode();
@@ -173,6 +179,9 @@ namespace libdar
 	const cat_file *ref_file = dynamic_cast<const cat_file *>(ref);
 	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc)); // pdesc is a smart_pointer not a normal pointer
 
+	if(where == nullptr)
+	    throw SRC_BUG;
+
 	if(ref_mir != nullptr)
 	    ref_file = dynamic_cast<const cat_file *>(ref_mir->get_inode());
 
@@ -200,7 +209,11 @@ namespace libdar
     void escape_catalogue::pre_add_dirty(const pile_descriptor* dest) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
-	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc)); // pdesc is a smart_pointer not a normal pointer
+	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc));
+	    // pdesc is a smart_pointer not a normal pointer
+
+	if(where == nullptr)
+	    throw SRC_BUG;
 
 	if(where->esc == nullptr)
 	    throw SRC_BUG;
@@ -214,7 +227,11 @@ namespace libdar
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
 	const cat_inode *ref_ino = dynamic_cast<const cat_inode *>(ref);
-	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc)); // pdesc is a smart_pointer not a normal pointer
+	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc));
+	    // pdesc is a smart_pointer not a normal pointer
+
+	if(where == nullptr)
+	    throw SRC_BUG;
 
 	if(ref_mir != nullptr)
 	    ref_ino = ref_mir->get_inode();
@@ -242,7 +259,11 @@ namespace libdar
     void escape_catalogue::pre_add_waste_mark(const pile_descriptor* dest) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
-	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc)); // pdesc is a smart_pointer not a normal pointer
+	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc));
+	    // pdesc is a smart_pointer not a normal pointer
+
+	if(where == nullptr)
+	    throw SRC_BUG;
 
 	if(where->esc == nullptr)
 	    throw SRC_BUG;
@@ -253,7 +274,11 @@ namespace libdar
     void escape_catalogue::pre_add_failed_mark(const pile_descriptor* dest) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
-	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc)); // pdesc is a smart_pointer not a normal pointer
+	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc));
+	    // pdesc is a smart_pointer not a normal pointer
+
+	if(where == nullptr)
+	    throw SRC_BUG;
 
 	if(where->esc == nullptr)
 	    throw SRC_BUG;
@@ -266,7 +291,11 @@ namespace libdar
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
 	const cat_inode *ref_ino = dynamic_cast<const cat_inode *>(ref);
-	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc)); // pdesc is a smart_pointer not a normal pointer
+	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc));
+	    // pdesc is a smart_pointer not a normal pointer
+
+	if(where == nullptr)
+	    throw SRC_BUG;
 
 	if(ref_mir != nullptr)
 	    ref_ino = ref_mir->get_inode();
@@ -293,7 +322,11 @@ namespace libdar
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
 	const cat_inode *ref_ino = dynamic_cast<const cat_inode *>(ref);
-	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc)); // pdesc is a smart_pointer not a normal pointer
+	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc));
+	    // pdesc is a smart_pointer not a normal pointer
+
+	if(where == nullptr)
+	    throw SRC_BUG;
 
 	if(ref_mir != nullptr)
 	    ref_ino = ref_mir->get_inode();
@@ -320,7 +353,11 @@ namespace libdar
     void escape_catalogue::pre_add_delta_sig(const pile_descriptor* dest) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
-	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc)); // pdesc is a smart_pointer not a normal pointer
+	const pile_descriptor *where = (dest != nullptr) ? dest : &(*(ceci->pdesc));
+	    // pdesc is a smart_pointer not a normal pointer
+
+	if(where == nullptr)
+	    throw SRC_BUG;
 
 	if(where->esc == nullptr)
 	    throw SRC_BUG;
@@ -375,14 +412,17 @@ namespace libdar
 	const cat_eod *ref_eod = nullptr;
 	bool stop = false;
 
-	if(pdesc->esc == nullptr)
-	    throw SRC_BUG;
-	ref = nullptr;
-
 	    // if we have already read the whole archive contents (included detruits object),
 	    // we do not need inspect the archive again, we instead use the data in memory
 	if(status == ec_completed)
 	    return catalogue::read(ref);
+
+	if(pdesc.is_null())
+	    throw SRC_BUG;
+
+	if(pdesc->esc == nullptr)
+	    throw SRC_BUG;
+	ref = nullptr;
 
 	pdesc->stack->flush_read_above(pdesc->esc);
 	try
