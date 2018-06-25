@@ -910,7 +910,6 @@ namespace libdar
 	case CURLE_REMOTE_DISK_FULL:
 	case CURLE_UPLOAD_FAILED:
 	    throw Edata(curl_easy_strerror(err));
-	case CURLE_REMOTE_ACCESS_DENIED:
 	case CURLE_FTP_ACCEPT_FAILED:
 	case CURLE_UNSUPPORTED_PROTOCOL:
 	case CURLE_FAILED_INIT:
@@ -936,6 +935,7 @@ namespace libdar
 				      &err_context,
 				      curl_easy_strerror(err)));
 	case CURLE_LOGIN_DENIED:
+	case CURLE_REMOTE_ACCESS_DENIED:
 	case CURLE_PEER_FAILED_VERIFICATION:
 	    throw Enet_auth(tools_printf(gettext("%S: %s, aborting"),
 					 &err_context,
