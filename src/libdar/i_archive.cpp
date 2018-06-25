@@ -522,7 +522,6 @@ namespace libdar
 	shared_ptr<archive> ref_arch2 = options.get_auxiliary_ref();
 	compression algo_kept = compression::none;
 	shared_ptr<entrepot> sauv_path_t = options.get_entrepot();
-	entrepot_local *sauv_path_t_local = dynamic_cast<entrepot_local *>(sauv_path_t.get());
 
 	cat = nullptr;
 
@@ -564,15 +563,14 @@ namespace libdar
 
 		sauv_path_t->set_location(sauv_path);
 
-		if(!options.get_empty() && sauv_path_t_local != nullptr)
-		    tools_avoid_slice_overwriting_regex(get_ui(),
-							*sauv_path_t,
-							filename,
-							extension,
-							options.get_info_details(),
-							options.get_allow_over(),
-							options.get_warn_over(),
-							options.get_empty());
+		tools_avoid_slice_overwriting_regex(get_ui(),
+						    *sauv_path_t,
+						    filename,
+						    extension,
+						    options.get_info_details(),
+						    options.get_allow_over(),
+						    options.get_warn_over(),
+						    options.get_empty());
 
 		if(ref_arch1 == nullptr)
 		    if(!ref_arch2)
@@ -1453,21 +1451,19 @@ namespace libdar
 	shared_ptr<entrepot> sauv_path_t = options.get_entrepot();
 	if(sauv_path_t == nullptr)
 	    throw Ememory("archive::i_archive::archive");
-	const entrepot_local *sauv_path_t_local = dynamic_cast<const entrepot_local *>(sauv_path_t.get());
 
 	sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
 	sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
 	sauv_path_t->set_location(sauv_path);
 
-	if(!options.get_empty() && sauv_path_t_local != nullptr)
-	    tools_avoid_slice_overwriting_regex(get_ui(),
-						*sauv_path_t,
-						filename,
-						extension,
-						options.get_info_details(),
-						options.get_allow_over(),
-						options.get_warn_over(),
-						options.get_empty());
+	tools_avoid_slice_overwriting_regex(get_ui(),
+					    *sauv_path_t,
+					    filename,
+					    extension,
+					    options.get_info_details(),
+					    options.get_allow_over(),
+					    options.get_warn_over(),
+					    options.get_empty());
 
 	try
 	{
@@ -1929,7 +1925,6 @@ namespace libdar
 	catalogue *ref_cat = nullptr;
 	bool initial_pause = false;
 	path sauv_path_abs = sauv_path_t->get_location();
-	const entrepot_local *sauv_path_t_local = dynamic_cast<const entrepot_local *>(sauv_path_t.get());
 	path fs_root_abs = fs_root.is_relative() ? tools_relative2absolute_path(fs_root, tools_getcwd()) : fs_root;
 
 	if(sauv_path_abs.is_relative())
@@ -1952,6 +1947,8 @@ namespace libdar
 	sauv_path_abs.explode_undisclosed();
 
 	    // warning against saving the archive itself
+
+	const entrepot_local *sauv_path_t_local = dynamic_cast<const entrepot_local *>(sauv_path_t.get());
 
 	if(op == oper_create
 	   && sauv_path_t_local != nullptr  // not using a remote storage
