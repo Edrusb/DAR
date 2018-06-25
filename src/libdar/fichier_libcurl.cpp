@@ -706,6 +706,9 @@ namespace libdar
 
     void fichier_libcurl::run_thread()
     {
+	if(is_running())
+	    throw SRC_BUG;
+
 	if(interthread.is_not_empty())
 	{
 	    char *ptr;
@@ -729,12 +732,9 @@ namespace libdar
 		throw SRC_BUG;
 		// interthread should have been purged when
 		// previous thread had ended
-
 	}
 
 	end_data_mode = false;
-	if(is_running())
-	    throw SRC_BUG;
 	run();
 	synchronize.wait(); // waiting for child thread to be ready
     }
