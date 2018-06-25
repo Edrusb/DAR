@@ -141,13 +141,13 @@ namespace libdar
 	    // in metadata mode each method is a simple code execution (no subthread, no callback)
 	    //
 	    // in data mode, a subthread is used to interact with libcurl. It sends or receives
-	    // data through the interthread pipe. A callback is occasionally run bu libcurl in this
+	    // data through the interthread pipe. A callback is occasionally run by libcurl in this
 	    // subthread.
 	    // in read mode, the subthread is run only if the interthread is empty. the subthread may
 	    // survive the inherited_read call and may suspend on writing data to interthread being full
-	    // - "network_offset" is updated by the callback and read by the subthread when libcurl has returned
-	    //   it keeps trace of the amount of data sent to interthread.
-	    // - "network_block" is set by the main thread to define the amount of data to be fetched it
+	    // - "subthread_net_offset" is updated by the callback and read by the subthread when
+	    //   libcurl has returned it keeps trace of the amount of data sent to interthread.
+	    // - "network_block" is set by the main thread to define the amount of data to be fetched. It
 	    //   it used to setup libcurl and is read by the subthread for control/validation purposes
 
 	bool end_data_mode;               ///< true if subthread has been requested to end

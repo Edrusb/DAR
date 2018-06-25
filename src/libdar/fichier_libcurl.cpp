@@ -979,7 +979,7 @@ namespace libdar
 		    network_block = 0;
 		    // because reading by block lead control session to
 		    // be reset when ftp is used, leading a huge amount
-		    // of connection a FTP server might see as DoS atempt
+		    // of connection an FTP server might see as DoS atempt
 		else
 		{
 		    if(has_maxpos && maxpos <= current_offset + needed_bytes)
