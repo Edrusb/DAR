@@ -37,7 +37,7 @@ using namespace std;
 namespace libdar
 {
 
-#if LIBCURL_AVAILABLE
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 
     fichier_libcurl::fichier_libcurl(const shared_ptr<user_interaction> & dialog,
 				     const std::string & chemin,

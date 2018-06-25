@@ -185,7 +185,6 @@ namespace libdar
 	static size_t read_meta_callback(char *bufptr, size_t size, size_t nitems, void *userp);
     };
 
-#ifdef LIBTHREADAR_AVAILABLE
 	/// helper function to handle libcurl error code
 	/// wait or throw an exception depending on error condition
 
@@ -197,15 +196,6 @@ namespace libdar
 						    CURLcode err,
 						    U_I wait_seconds,
 						    const std::string & err_context);
-#else
-#if LIBCURL_AVAILABLE
-    inline void fichier_libcurl_check_wait_or_throw(const std::shared_ptr<user_interaction> & dialog,
-						    CURLcode err,
-						    U_I wait_seconds,
-						    const std::string & err_context)
-    { throw SRC_BUG; }
-#endif
-#endif
 
 #endif
 	/// @}

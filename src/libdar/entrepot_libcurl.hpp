@@ -102,8 +102,10 @@ namespace libdar
 	virtual void read_dir_flush() override;
 
     private:
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	class i_entrepot_libcurl;
 	std::shared_ptr<i_entrepot_libcurl> pimpl;
+#endif
     };
 
 	/// @}

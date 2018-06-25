@@ -103,7 +103,7 @@ namespace libdar
 
     void entrepot_libcurl::i_entrepot_libcurl::read_dir_reset() const
     {
-#if LIBCURL_AVAILABLE
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	CURLcode err = CURLE_OK;
 	long listonly;
 	i_entrepot_libcurl *me = const_cast<i_entrepot_libcurl *>(this);
@@ -201,7 +201,7 @@ namespace libdar
 
     bool entrepot_libcurl::i_entrepot_libcurl::read_dir_next(string & filename) const
     {
-#if LIBCURL_AVAILABLE
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	i_entrepot_libcurl *me = const_cast<i_entrepot_libcurl *>(this);
 
 	if(me == nullptr)
@@ -228,7 +228,7 @@ namespace libdar
 						       bool fail_if_exists,
 						       bool erase) const
     {
-#if LIBCURL_AVAILABLE
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	fichier_global *ret = nullptr;
 	cache_global *rw = nullptr;
 	i_entrepot_libcurl *me = const_cast<i_entrepot_libcurl *>(this);
@@ -254,7 +254,6 @@ namespace libdar
 
 	try
 	{
-#ifdef LIBTHREADAR_AVAILABLE
 	    fichier_libcurl *ret_libcurl = new (nothrow) fichier_libcurl(dialog,
 									 chemin,
 									 x_proto,
@@ -268,10 +267,6 @@ namespace libdar
 
 	    if(ret == nullptr)
 		throw Ememory("entrepot_libcurl::i_entrepot_libcurl::inherited_open");
-
-#else
-	    throw Ecompilation("libthreadar linking");
-#endif
 
 	    switch(mode)
 	    {
@@ -320,7 +315,7 @@ namespace libdar
 
     void entrepot_libcurl::i_entrepot_libcurl::inherited_unlink(const string & filename) const
     {
-#if LIBCURL_AVAILABLE
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	struct curl_slist *headers = nullptr;
 	string order;
 	CURLcode err;
@@ -412,7 +407,7 @@ namespace libdar
 
     void entrepot_libcurl::i_entrepot_libcurl::set_libcurl_URL()
     {
-#if LIBCURL_AVAILABLE
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	CURLcode err;
 	string target = get_url();
 
@@ -440,7 +435,7 @@ namespace libdar
 							const string & sftp_prv_keyfile,
 							const string & sftp_known_hosts)
     {
-#if LIBCURL_AVAILABLE
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	CURLcode err;
 	secu_string real_pass = password;
 	string real_login = login;
@@ -574,6 +569,7 @@ namespace libdar
 
     size_t entrepot_libcurl::i_entrepot_libcurl::get_ftp_listing_callback(void *buffer, size_t size, size_t nmemb, void *userp)
     {
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	i_entrepot_libcurl *me = (i_entrepot_libcurl *)(userp);
 	char *ptr = (char *)buffer;
 
@@ -598,11 +594,14 @@ namespace libdar
 		++ptr;
 	    }
 	return size*nmemb;
+#else
+	throw Ecompilation("libcurl linking");
+#endif
     }
 
     bool entrepot_libcurl::i_entrepot_libcurl::mycurl_is_protocol_available(mycurl_protocol proto)
     {
-#if LIBCURL_AVAILABLE
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	curl_version_info_data *data = curl_version_info(CURLVERSION_NOW);
 	const char **ptr = nullptr;
 	string named_proto = mycurl_protocol2string(proto);

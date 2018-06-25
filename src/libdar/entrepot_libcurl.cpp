@@ -33,7 +33,9 @@ extern "C"
 #include "cache_global.hpp"
 #include "nls_swap.hpp"
 #include "entrepot_libcurl.hpp"
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 #include "i_entrepot_libcurl.hpp"
+#endif
 
 using namespace std;
 
@@ -52,6 +54,8 @@ namespace libdar
 				       const string & sftp_known_hosts,   //< location of the known_hosts file (empty string to disable this security check)
 				       U_I waiting_time)
     {
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
+
 	NLS_SWAP_IN;
         try
         {
@@ -76,10 +80,14 @@ namespace libdar
 	    throw;
 	}
 	NLS_SWAP_OUT;
+#else
+	throw Efeature("libcurl library");
+#endif
     }
 
     string entrepot_libcurl::get_url() const
     {
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	string ret;
 
 	NLS_SWAP_IN;
@@ -95,9 +103,14 @@ namespace libdar
         NLS_SWAP_OUT;
 
 	return ret;
+#else
+	throw Efeature("libcurl library");
+#endif
     }
+
     void entrepot_libcurl::read_dir_reset() const
     {
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	NLS_SWAP_IN;
         try
         {
@@ -109,10 +122,14 @@ namespace libdar
             throw;
         }
         NLS_SWAP_OUT;
+#else
+	throw Efeature("libcurl library");
+#endif
     }
 
     bool entrepot_libcurl::read_dir_next(std::string & filename) const
     {
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	bool ret;
 
 	NLS_SWAP_IN;
@@ -128,6 +145,9 @@ namespace libdar
         NLS_SWAP_OUT;
 
 	return ret;
+#else
+	throw Efeature("libcurl library");
+#endif
     }
 
     fichier_global *entrepot_libcurl::inherited_open(const shared_ptr<user_interaction> & dialog,
@@ -138,6 +158,7 @@ namespace libdar
 						     bool fail_if_exists,
 						     bool erase) const
     {
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	fichier_global* ret;
 
 	NLS_SWAP_IN;
@@ -159,10 +180,14 @@ namespace libdar
         NLS_SWAP_OUT;
 
 	return ret;
+#else
+	throw Efeature("libcurl library");
+#endif
     }
 
     void entrepot_libcurl::inherited_unlink(const string & filename) const
     {
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	NLS_SWAP_IN;
         try
         {
@@ -174,10 +199,14 @@ namespace libdar
             throw;
         }
         NLS_SWAP_OUT;
+#else
+	throw Efeature("libcurl library");
+#endif
     }
 
     void entrepot_libcurl::read_dir_flush()
     {
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	NLS_SWAP_IN;
         try
         {
@@ -189,6 +218,9 @@ namespace libdar
             throw;
         }
         NLS_SWAP_OUT;
+#else
+	throw Efeature("libcurl library");
+#endif
     }
 
 
