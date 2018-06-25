@@ -24,8 +24,10 @@ AM_ICONV
 #   header files are #included in source code if they HAVE_... macro has been defined in config.h
 #
 # libraries:
-#   necessary library flags are stored in the LIBS substituable shell variable and passed to Makefile.in
-#   the AM_PATH_GPGME defiles he GPGME_CFLAGS and GPGME_LIBS variables
+#   necessary library flags are stored in the "output variables" LIBS substituable shell variable and passed to Makefile.in
+#   as well as other like LIBTHREADAR_LIBS/CFLAGS and LIBCURL_LIBSS/CFLAGS due to the use of PKG_CHECK_MODULE macro
+#   that get substitued in Makefiles.in when the @LIBS@ form is met.
+#   In addition, the AM_PATH_GPGME defines he GPGME_CFLAGS and GPGME_LIBS output variable
 #
 
 # have a specific variable for pkgconfig, setting the default value:
@@ -756,7 +758,7 @@ AC_ARG_ENABLE( [librsync-linking],
                 if test "$local_librsync" = "yes" ; then
                 AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                                             #if HAVE_LIBRSYNC_H
-                                                           #include <stdio.h>
+                                                            #include <stdio.h>
                                                             #include <librsync.h>
                                                             #endif
                                                }]],
@@ -786,6 +788,10 @@ AC_ARG_ENABLE( [libcurl-linking],
                           AC_CHECK_LIB(curl, [curl_global_init], [], [AC_MSG_WARN([libcurl library not found])])
                         ])
 
+ 		  CPPFLAGS__cache="$CFLAGS"
+		  CPPFLAGS="$LIBCURL_CFLAGS $CPPFLAGS"
+		  LIBS___cache="$LIBS"
+		  LIBS="$LIBCURL_LIBS $LIBS"
                   AC_CHECK_HEADER(curl/curl.h,
                         [
                                 local_libcurl="yes"
@@ -812,6 +818,10 @@ AC_ARG_ENABLE( [libcurl-linking],
                  else
                         AC_MSG_WARN([remote repository support not available])
                  fi
+		 CPPFLAGS="$CPPFLAGS___cache"
+		 LIBS="$LIBS___cache"
+		 unset CPPFLAGS___cache
+		 unset LIBS___cache
                 ])
 
 AC_ARG_ENABLE(  [fadvise],
@@ -897,10 +907,10 @@ AC_ARG_ENABLE(  [os-bits],
                                                            return a+b+c+d+e+f;
                                                          ])
                                         ],
-                                        [],
-                                        [AC_MSG_ERROR([Cannot find *int*_t type declarations in headerfile, --enable-os-bits=... option must be used])] )
+                                        [ AC_DEFINE(HAVE_INTTYPES_H, 1, inttypes.h header availability) ],
+                                        [ AC_MSG_ERROR([Cannot find *int*_t type declarations in headerfile, --enable-os-bits=... option must be used]) ])
                                 ],
-                                [AC_MSG_ERROR([Cannot find inttypes.h headerfile, --enable-os-bits=... option must be used])]
+                                [ AC_MSG_ERROR([Cannot find inttypes.h headerfile, --enable-os-bits=... option must be used]) ]
                         )
                 ]
              )
@@ -1205,7 +1215,7 @@ AC_ARG_ENABLE( [threadar],
                [
                PKG_CHECK_EXISTS(libthreadar,
                                 [
-                                  PKG_CHECK_MODULES(LIBTHREADAR, libthreadar, [], [])
+                                  PKG_CHECK_MODULES(LIBTHREADAR, libthreadar, [], [AC_MSG_ERROR([libthreadar not found, but reported to exist !?!])])
                                   LIBS="$LIBS $LIBTHREADAR_LIBS"
                                   AC_DEFINE(HAVE_LIBTHREADAR, 1, [libthreadar library availability])
                                 ],
@@ -1213,8 +1223,15 @@ AC_ARG_ENABLE( [threadar],
                                   AC_CHECK_LIB(threadar, [for_autoconf], [], [])
                                 ])
 
-               AC_CHECK_HEADERS(libthreadar/libthreadar.hpp, [], [], [])
-
+	       CPPFLAGS__cache="$CPPFLAGS"
+	       CPPFLAGS="$LIBTHREADAR_CFLAGS $CPPFLAGS"
+	       CXXFLAGS__cache="$CXXFLAGS"
+	       CXXFLAGS="$LIBTHREADAR_CFLAGS $CXXFLAGS"
+	       LIBS___cache="$LIBS"
+	       LIBS="$LIBTHREADAR_LIBS $LIBS"
+               AC_CHECK_HEADER(libthreadar/libthreadar.hpp,
+				[ AC_DEFINE(HAVE_LIBTHREADAR_LIBTHREADAR_HPP, 1, [libthreadar.h header file availability]) ],
+				[ AC_MSG_WARN([Cannot find libthreadar.h header file]) ])
                AC_MSG_CHECKING([for libthreadar() operationality])
                AC_LINK_IFELSE([AC_LANG_PROGRAM(  [[
                                     #if HAVE_LIBTHREADAR_LIBTHREADAR_HPP
@@ -1240,6 +1257,12 @@ AC_ARG_ENABLE( [threadar],
                                ],
                                [ AC_MSG_RESULT(missing) ]
                              )
+	      CPPFLAGS="$CPPFLAGS___cache"
+	      unset CPPFLAGS___cache
+	      CXXFLAGS="$CXXFLAGS___cache"
+	      unset CXXFLAGS___cache
+	      LIBS="$LIBS___cache"
+	      unset LIBS___cache
               ])
 
 
@@ -1297,6 +1320,8 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                ])
 LDFLAGS=$MEM_LDFLAGS
 CXXFLAGS=$MEM_CXXFLAGS
+unset MEM_LDFLAGS
+unset MEM_CXXFLAGS
 
 AM_CONDITIONAL([MAKE_ALL_DIR], [test $examples = "yes"])
 AM_CONDITIONAL([BUILD_DAR_STATIC], [test $build_static = "yes" -a $static_pb = "no"])

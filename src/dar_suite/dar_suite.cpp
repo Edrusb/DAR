@@ -52,7 +52,7 @@ extern "C"
 #include "libdar.hpp"
 #include "line_tools.hpp"
 #include "shell_interaction.hpp"
-#ifdef HAVE_LIBTHREADAR_LIBTHREADAR_HPP
+#if HAVE_LIBTHREADAR_LIBTHREADAR_HPP
 #include <libthreadar/libthreadar.hpp>
 #endif
 #include "memory_check.hpp"
