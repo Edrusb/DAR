@@ -967,10 +967,9 @@ AC_ARG_ENABLE( [furtive-read],
 AC_ARG_ENABLE( [debug],
                 AC_HELP_STRING(--enable-debug, [build targets with debugging option and no optimization]),
                 [
-                # yes we modify user variable here
-                        CXXFLAGS="$CXXFLAGS $CXXSTDFLAGS -g -Wall"
-                        CFLAGS="$CFLAGS -g -Wall"
-                        LDFLAGS="$LDFLAGS -g -Wall"
+		        DEBUG_CXXFLAGS="-g -Wall"
+                        DEBUG_CFLAGS="-g -Wall"
+                        DEBUG_LDFLAGS="-g -Wall"
                         debug_static="yes"
                         AC_DEFINE(LIBDAR_NO_OPTIMIZATION, 1, [if defined, informs the code that no optimization has been used for compilation])
                 ],
@@ -1337,6 +1336,12 @@ AM_CONDITIONAL([WITH_LIBTHREADAR], [test "$local_threadar" = "yes"])
 AC_SUBST([CXXSTDFLAGS], [$CXXSTDFLAGS])
 AC_SUBST(UPX_PROG, [upx])
 AC_SUBST(DOXYGEN_PROG, [doxygen])
+
+if test "$debug_static" = "yes" ; then
+AC_SUBST(DEBUG_CXXFLAGS, [$DEBUG_CXXFLAGS])
+AC_SUBST(DEBUG_CFLAGS, [$DEBUG_CFLAGS])
+AC_SUBST(DEBUG_LDFLAGS, [$LDFLAGS])
+fi
 
 # defaults
 AC_PREFIX_DEFAULT(/usr/local)
