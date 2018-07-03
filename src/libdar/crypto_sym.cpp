@@ -71,7 +71,7 @@ namespace libdar
 	essiv_clef = nullptr;
 
 	if(reading_ver <= 5)
-	    throw Erange("crypto_sym::blowfish", gettext("Current implementation of blowfish encryption is not compatible with old (weak) implementation, use dar-2.3.x software (or other software based on libdar-4.4.x) to read this archive"));
+	    throw Erange("crypto_sym::blowfish", gettext("Current implementation of blowfish encryption is not compatible with old (weak) implementation, use dar-2.3.x software or later (or other software based on libdar-4.4.x or greater) to read this archive"));
 	else
 	{
 	    secu_string hashed_password;

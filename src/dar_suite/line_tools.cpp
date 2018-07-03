@@ -817,7 +817,7 @@ void line_tools_crypto_split_algo_pass(const secu_string & all,
 	else // no ':' using blowfish as default cypher
 	{
 	    no_cipher_given = true;
-	    algo = crypto_algo::blowfish;
+	    algo = crypto_algo::aes256;
 	    pass = all;
 	}
     }
