@@ -34,6 +34,13 @@ extern "C"
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+
+#if HAVE_GCRYPT_H
+#ifndef GCRYPT_NO_DEPRECATED
+#define GCRYPT_NO_DEPRECATED
+#endif
+#include <gcrypt.h>
+#endif
 }
 
 #include "elastic.hpp"
@@ -218,9 +225,15 @@ namespace libdar
 	    U_32 len;
 	    static const unsigned char base = 254;
 	    deque <unsigned char> digits = tools_number_base_decomposition_in_big_endian(taille, (unsigned char)(base));
+	    U_I seed = ::time(nullptr)+getpid();
 
+#if CRYPTO_AVAILABLE
+	    U_I stronger;
+	    gcry_create_nonce((unsigned char*) &stronger, sizeof(stronger));
+	    seed ^= stronger;
+#endif
 		// let's randomize a little more
-	    srand(::time(nullptr)+getpid());
+	    srand(seed);
 
 		////
 		// choosing the location of the first marks and following informations

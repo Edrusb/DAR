@@ -44,6 +44,8 @@ from 2.5.x to 2.6.0
 - slide effect of previous feature due to starvation of free letters
   to add a new command, the -T option with argument is no more
   available, one need to provide explicitely the desired argument
+- security refresh: improving seed randomization for the pseudo-random
+  generator used in elastic buffers
 
 from 2.5.15 to 2.5.16
 - bug fix: while rechecking sparse file (-ah option) during a merging
