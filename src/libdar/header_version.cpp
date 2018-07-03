@@ -32,6 +32,7 @@ extern "C"
 #include "header_version.hpp"
 #include "integers.hpp"
 #include "tools.hpp"
+#include "deci.hpp"
 
 #define LIBDAR_URL_VERSION "http://dar.linux.free.fr/pre-release/doc/Notes.html#Dar_version_naming"
 
@@ -436,6 +437,7 @@ namespace libdar
 	string sym = get_sym_crypto_name();
 	string asym = get_asym_crypto_name();
 	string xsigned = is_signed() ? gettext("yes") : gettext("no");
+	string kdf_iter = deci(iteration_count).human();
 
 	dialog.printf(gettext("Archive version format               : %s"), get_edition().display().c_str());
 	dialog.printf(gettext("Compression algorithm used           : %S"), &algo);
@@ -444,6 +446,12 @@ namespace libdar
 	dialog.printf(gettext("Archive is signed                    : %S"), &xsigned);
 	dialog.printf(gettext("Sequential reading marks             : %s"), (get_tape_marks() ? gettext("present") : gettext("absent")));
 	dialog.printf(gettext("User comment                         : %S"), &(get_command_line()));
+	if(ciphered)
+	{
+	    dialog.printf(gettext("KDF iteration count                  : %S"), &kdf_iter);
+	    if(salt.size() > 0)
+		dialog.printf(gettext("Salt size                            : %d byte%c"), salt.size(), salt.size() > 1 ? 's' : ' ');
+	}
     }
 
     void header_version::clear()

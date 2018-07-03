@@ -109,18 +109,7 @@ namespace libdar
 		    if(!iteration_count.is_zero())
 			throw Erange("crypto_sym::crypto_sym", gettext("Too large value give for key derivation interation count"));
 
-			// hashed_password = hashed_password = pkcs5_pass2key(password, salt, it, max_key_len_libdar(algo));
-
-		    hashed_password.resize(max_key_len_libdar(algo));
-		    gcry_kdf_derive(password.c_str(),
-				    password.get_size(),
-				    GCRY_KDF_PBKDF2,
-				    0,
-				    salt.c_str(),
-				    salt.size(),
-				    it,
-				    hashed_password.get_size(),
-				    hashed_password.get_array());
+		    hashed_password = pkcs5_pass2key(password, salt, it, max_key_len_libdar(algo));
 		}
 		else
 		    hashed_password = password;

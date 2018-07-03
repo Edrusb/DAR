@@ -162,6 +162,7 @@ struct line_param
     bool zeroing_neg_dates;       ///< whether to automatically zeroing negative dates while reading inode from filesystem
     string ignored_as_symlink;    ///< column separated list of absolute paths of links to follow rather to record as such
     modified_data_detection modet;///< how to detect that a file has changed since the archive of reference was done
+    infinint iteration_count;     ///< iteration count used when creating/isolating/merging an encrypted archive (key derivation)
 
 	// constructor for line_param
     line_param()

@@ -83,7 +83,7 @@ extern "C"
 #include "capabilities.hpp"
 #include "fichier_local.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:v::z::y:nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:8:{:}:j:\\:"
+#define OPT_STRING "c:A:x:d:t:l:v::z::y:nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT:E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:8:{:}:j:\\:"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c option"
@@ -326,6 +326,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.zeroing_neg_dates = false;
     p.ignored_as_symlink = "";
     p.modet = modified_data_detection::mtime_size;
+    p.iteration_count = 0; // will not touch the default API value if still set to zero
 
     if(!dialog)
 	throw SRC_BUG;
@@ -1275,18 +1276,41 @@ static bool get_args_recursive(recursive_param & rec,
 
                 break;
             case 'T':
-                if(optarg == nullptr)
-                    p.list_mode = archive_options_listing_shell::tree;
-                else if(strcasecmp("normal", optarg) == 0)
-                    p.list_mode = archive_options_listing_shell::normal;
-                else if(strcasecmp("tree", optarg) == 0)
-                    p.list_mode = archive_options_listing_shell::tree;
-                else if(strcasecmp("xml", optarg) == 0)
-                    p.list_mode = archive_options_listing_shell::xml;
-                else if(strcasecmp("slicing", optarg) == 0 || strcasecmp("slice", optarg) == 0)
-                    p.list_mode = archive_options_listing_shell::slicing;
-                else
-                    throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
+		if(p.op == create
+		   || p.op == merging
+		   || p.op == isolate)
+		{
+			// this is the --kdf-iter-count option
+		    if(optarg == nullptr)
+			throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+
+		    try
+		    {
+			p.iteration_count = tools_get_extended_size(optarg, rec.suffix_base);
+		    }
+                    catch(Edeci &e)
+                    {
+                        rec.dialog->message(tools_printf(gettext(INVALID_SIZE), char(lu)));
+                        return false;
+                    }
+		}
+		else
+		{
+			// using the legacy meaning of 'T' option (--tree-format) in absence of context information
+
+		    if(optarg == nullptr)
+			p.list_mode = archive_options_listing_shell::tree;
+		    else if(strcasecmp("normal", optarg) == 0)
+			p.list_mode = archive_options_listing_shell::normal;
+		    else if(strcasecmp("tree", optarg) == 0)
+			p.list_mode = archive_options_listing_shell::tree;
+		    else if(strcasecmp("xml", optarg) == 0)
+			p.list_mode = archive_options_listing_shell::xml;
+		    else if(strcasecmp("slicing", optarg) == 0 || strcasecmp("slice", optarg) == 0)
+			p.list_mode = archive_options_listing_shell::slicing;
+		    else
+			throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
+		}
                 break;
             case 'E':
                 if(optarg == nullptr)
@@ -2540,6 +2564,7 @@ const struct option *get_long_opt()
 	{"ignored-as-symlink", required_argument, nullptr, '\\'},
 	{"add-missing-catalogue", required_argument, nullptr, 'y'},
 	{"modified-data-detection", required_argument, nullptr, '\''},
+	{"kdf-iter-count", required_argument, nullptr, 'T'},
         { nullptr, 0, nullptr, 0 }
     };
 

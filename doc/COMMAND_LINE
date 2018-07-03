@@ -42,12 +42,12 @@ b - terminal bell                       --bell
 c + create archive                      --create
 d + difference with filesystem          --diff
 e - simulate the operation              --empty (aka dry-run)
-f - do not restore directory structure  --flat
+f - do not restore directory structure                --flat
 g + recurse in this directory           --go-into
 h - help usage                          --help
 i + path of the input pipe              --input
 j + retry delay for networking errors   --network-retry-delay <seconds>
-k + do not deleted files drop between two backups --no-delete / --deleted { ignore | only }
+k + do not deleted files dropped between two backups --no-delete / --deleted { ignore | only }
 l + list archive contents               --list
 m + minimum size below which no compression will occur. --mincompr a default value is used. use -m 0 if you want to compress in any case.
 n - do not allow overwriting            --no-overwrite
@@ -82,7 +82,8 @@ P + prune a directory tree              --prune
 Q + quite on stderr at startup		no long option equivalent
 R + set the root directory              --root
 S + size of the first slice             --first-slice
-T + tree listing format                 --tree-format, --list-format=<normal|tree|xml|slicing>
+T + (listing) tree listing format       --tree-format, --list-format=<normal|tree|xml|slicing>
+T + (create/merge/isolate) interation count for key derirvation --kdf-iter-count
 U + include EA for the operation (mask) --include-ea
 V - version information                 --version
 W - warranty disclosure information (POSIX RESERVED, sorry)

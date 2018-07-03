@@ -37,6 +37,13 @@ from 2.5.x to 2.6.0
 - security refresh: default crypto algo is now AES256. As you do not
   need anymore since 2.5.0 to specify the -K option when reading an
   archive this should not bring any backward compatibility issue
+- security refresh: adding salt per archive (one is still present per
+  block inside an archive)
+- security refresh/new feature: adding option --kdf-ite-count to define
+  the iteration count for key derivation, which defaults to 200,000
+- slide effect of previous feature due to starvation of free letters
+  to add a new command, the -T option with argument is no more
+  available, one need to provide explicitely the desired argument
 
 from 2.5.15 to 2.5.16
 - bug fix: while rechecking sparse file (-ah option) during a merging

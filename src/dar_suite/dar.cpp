@@ -445,6 +445,8 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    }
 		    create_options.set_ignored_as_symlink(ignored_as_symlink_listing);
 		    create_options.set_modified_data_detection(param.modet);
+		    if(param.iteration_count > 0)
+			create_options.set_iteration_count(param.iteration_count);
 
 		    cur.reset(new (nothrow) archive(dialog,
 						    *param.fs_root,
@@ -506,6 +508,8 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 			merge_options.set_delta_sig_min_size(param.delta_sig_min_size);
 		    if(repo)
 			merge_options.set_entrepot(repo);
+		    if(param.iteration_count > 0)
+			merge_options.set_iteration_count(param.iteration_count);
 
 		    cur.reset(new (nothrow) archive(dialog,            // user_interaction &
 						    *param.sauv_root,  //const path &
@@ -634,6 +638,8 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 			    isolate_options.set_delta_signature(false);
 			    if(aux_repo)
 				isolate_options.set_entrepot(aux_repo);
+			    if(param.iteration_count > 0)
+				isolate_options.set_iteration_count(param.iteration_count);
 
 			    cur->op_isolate(*param.aux_root,
 					    *param.aux_filename,
@@ -722,6 +728,8 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    isolate_options.set_entrepot(repo);
 		    // yes this is "ref_repo" where is located the -A-pointed-to archive
 		    // -C-pointed-to archive is located in the "repo" entrepot
+		if(param.iteration_count > 0)
+		    isolate_options.set_iteration_count(param.iteration_count);
 
                 arch->op_isolate(*param.sauv_root,
 				 param.filename,

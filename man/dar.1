@@ -644,7 +644,7 @@ About lzo compression, the compression levels of dar and lzop program do not mat
 Same as -z (see just above). This option is deprecated, please use --compression or -z.
 .TP 20
 -s, --slice <number>
-Size of the slices in bytes. If the number is appended by k (or K), M, G, T, P E, Z or Y the size is in kilobytes, megabytes, gigabytes, terabytes, petabytes, exabytes, zettabytes or yottabytes respectively. Example: "20M" means 20 megabytes, by default, it is the same as giving 20971520 as argument (see also -aSI and -abinary options). If -s is not present the backup will be written to a single slice whatever the size of the backup may be (assuming your operating system can support arbitrarily large files).
+Size of the slices in bytes. If the number is appended by k (or K), M, G, T, P, E, Z or Y the size is in kilobytes, megabytes, gigabytes, terabytes, petabytes, exabytes, zettabytes or yottabytes respectively. Example: "20M" means 20 megabytes, by default, it is the same as giving 20971520 as argument (see also -aSI and -abinary options). If -s is not present the backup will be written to a single slice whatever the size of the backup may be (assuming your operating system can support arbitrarily large files).
 .TP 20
 -S, --first-slice <number>
 -S gives the size of the first slice which may be chosen independently of the size of following slices (either bigger or smaller). This option needs -s option and by default of -S option, the size of the first slice is the same as the one of the following slices.
@@ -1048,6 +1048,9 @@ Before release 2.6.0, during a differential/incremental backup if any part of a 
 --modified-data-detection=any-inode-change
 option.
 Since release 2.6.0 a new entry status ("inode-only") has been added. Dar can now resave only metadata when the inode change does not concern the data. To know whether the data has changed or not, by default (no --modified-data-detection option given) dar looks at mtime and at file's size only. Specifying --modified-data-detection=mtime-and-size (which is the default behavior) can be used to revert the action of --modified-data-detection=any-inode-change for example when playing with included files (DCF files): the latest met takes precedence.
+.TP 20
+-T, --kdf-iter-count <integer>
+At the difference if the listing context (see below), in the context of archive creation, merging and isolation, -T option let you define the interation count used to derive the archive key from the passphrase you provided (archive encryption context). The default value is 200,000 iterations. -T as another older meaning when doing archive listing, but due to the lack of free character to create a new CLI option, there was no other choice than recycling an existing option not used in the context of archive creation/merging/isolation. The consequence is that in that context, the -T option must appear after the -+/-c/-C options for the operational context to be known at the time the -T option is met and its --kdf-iter-count meaning to be taken into account. As --kdf-iter-count is an alias to -f the long form of this option must also be found after the use of either -c, -C or -+ option. The suffixes described for -s option are also available (k, M, G, T, P, ...) however pay attention to the -aSI/-abinary mode which default to binary, in which case "-T 1k" is equivalent to "-T 1024".
 .PP
 .PP
 .B RESTORATION SPECIFIC OPTIONS (to use with -x)
@@ -1091,9 +1094,9 @@ Doing a difference in sequential read mode is possible but hard linked inodes ca
 .B LISTING OPTIONS (to use with -l)
 .PP
 .TP 20
--T, --list-format=<normal | tree | xml | slicing>, --tree-format
+-T, --list-format=<normal | tree | xml | slicing>
 .RS
-By default, listing provides a tar-like output (the 'normal' output). You can however get a tree-like output, an XML structured output or an output focusing on slice(s) where each file's data, EA and FSA is located in. Providing -T without argument gives the same as providing the 'tree' argument to it. The option --tree-format is an alias to --list-format=tree (backward compatibility). Note that the files doc/dar-catalog-*.dtd define the format of the XML output listing (This file is also installed under $PREFIX/share/doc)
+By default, listing provides a tar-like output (the 'normal' output). You can however get a tree-like output, an XML structured output or an output focusing on slice(s) where each file's data, EA and FSA is located in. The option --tree-format is an alias to --list-format=tree (backward compatibility). Note that the files doc/dar-catalog-*.dtd define the format of the XML output listing (This file is also installed under $PREFIX/share/doc)
 .PP
 the -Tslicing option can also be used with isolated catalogue generated with dar 2.5.0 or above, as isolated catalogues now contain a copy of the slicing layout of the archive of reference. However, if the archive of reference has been resliced (using dar_xform) after the isolated catalogue has been built, the slicing information would not be correct. For that corner case, you can use the -s and -S options with -Tslicing to specify what are the new slice sizes of the archive of reference. Last, -Tslicing and --sequential-read options are not compatible except for isolated catalogues.
 .RE
