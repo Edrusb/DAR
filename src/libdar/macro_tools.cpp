@@ -394,6 +394,7 @@ namespace libdar
 #else
 	bool libcurl_repo = false;
 #endif
+	string salt;
 
 	if(!dialog)
 	    throw SRC_BUG; // dialog points to nothing
@@ -657,6 +658,8 @@ namespace libdar
 							     true,
 							     ver.get_edition(),
 							     crypto,
+							     ver.get_salt(),
+							     ver.get_iteration_count(),
 							     ver.get_crypted_key() == nullptr);
 		    if(tmp_ptr != nullptr)
 			tmp_ptr->set_initial_shift(ver.get_initial_offset());
@@ -670,6 +673,8 @@ namespace libdar
 							     false,
 							     ver.get_edition(),
 							     crypto,
+							     ver.get_salt(),
+							     ver.get_iteration_count(),
 							     ver.get_crypted_key() == nullptr);
 
 		    if(tmp_ptr != nullptr)
@@ -1079,11 +1084,13 @@ namespace libdar
 				   const infinint & slice_min_digits,
 				   const label & internal_name,
 				   const label & data_name,
+				   const infinint & iteration_count,
 				   bool multi_threaded)
     {
 #if GPGME_SUPPORT
 	U_I gnupg_key_size;
 #endif
+	string salt;
 
 	try
 	{
@@ -1339,16 +1346,30 @@ namespace libdar
 #endif
 		}
 
-		    // optaining a password on-fly if necessary
 
-		if(crypto != crypto_algo::none && real_pass.get_size() == 0)
+		if(crypto != crypto_algo::none)
 		{
-		    secu_string t1 = dialog->get_secu_string(tools_printf(gettext("Archive %S requires a password: "), &filename), false);
-		    secu_string t2 = dialog->get_secu_string(gettext("Please confirm your password: "), false);
-		    if(t1 == t2)
-			real_pass = t1;
-		    else
-			throw Erange("op_create_in_sub", gettext("The two passwords are not identical. Aborting"));
+			// optaining a password on-fly if necessary
+
+		    if(real_pass.get_size() == 0)
+		    {
+			secu_string t1 = dialog->get_secu_string(tools_printf(gettext("Archive %S requires a password: "), &filename), false);
+			secu_string t2 = dialog->get_secu_string(gettext("Please confirm your password: "), false);
+			if(t1 == t2)
+			    real_pass = t1;
+			else
+			    throw Erange("op_create_in_sub", gettext("The two passwords are not identical. Aborting"));
+		    }
+
+			// generating salt and storing it in the archive version header with iteration_count
+			// when key is a human generated passphrase
+
+		    if(gnupg_recipients.empty())
+		    {
+			salt = crypto_sym::generate_salt(crypto_sym::max_key_len(crypto));
+			ver.set_salt(salt);
+			ver.set_iteration_count(iteration_count);
+		    }
 		}
 
 		if(ref_slicing != nullptr)
@@ -1413,6 +1434,8 @@ namespace libdar
 						   false,
 						   macro_tools_supported_version,
 						   crypto,
+						   salt,
+						   iteration_count,
 						   gnupg_recipients.empty());
 
 #ifdef LIBDAR_NO_OPTIMIZATION

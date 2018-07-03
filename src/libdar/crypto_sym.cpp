@@ -62,6 +62,8 @@ namespace libdar
 			   bool no_initial_shift,
 			   const archive_version & reading_ver,
 			   crypto_algo algo,
+			   const std::string & salt,
+			   infinint iteration_count,
 			   bool use_pkcs5)
 	: tronconneuse(block_size, encrypted_side, no_initial_shift, reading_ver)
     {
@@ -99,7 +101,29 @@ namespace libdar
 
 	    try
 	    {
-		hashed_password = use_pkcs5 ? pkcs5_pass2key(password, "", 2000, max_key_len_libdar(algo)) : password;
+		if(use_pkcs5)
+		{
+		    U_I it = 0;
+
+		    iteration_count.unstack(it);
+		    if(!iteration_count.is_zero())
+			throw Erange("crypto_sym::crypto_sym", gettext("Too large value give for key derivation interation count"));
+
+			// hashed_password = hashed_password = pkcs5_pass2key(password, salt, it, max_key_len_libdar(algo));
+
+		    hashed_password.resize(max_key_len_libdar(algo));
+		    gcry_kdf_derive(password.c_str(),
+				    password.get_size(),
+				    GCRY_KDF_PBKDF2,
+				    0,
+				    salt.c_str(),
+				    salt.size(),
+				    it,
+				    hashed_password.get_size(),
+				    hashed_password.get_array());
+		}
+		else
+		    hashed_password = password;
 
 		    // key handle initialization
 
@@ -210,6 +234,37 @@ namespace libdar
 #endif
     }
 
+    string crypto_sym::generate_salt(U_I size)
+    {
+#if CRYPTO_AVAILABLE
+	string ret;
+	unsigned char* buffer = new (nothrow) unsigned char[size];
+
+	if(buffer == nullptr)
+	    throw Ememory("crypto_sym::generate_salt");
+
+	try
+	{
+	    gcry_create_nonce(buffer, size);
+	    ret.assign((const char *)buffer, size);
+	    delete [] buffer;
+	    buffer = nullptr;
+	}
+	catch(...)
+	{
+	    if(buffer != nullptr)
+	    {
+		delete [] buffer;
+		buffer = nullptr;
+	    }
+	    throw;
+	}
+
+	return ret;
+#else
+	throw Ecompilation("Strong encryption");
+#endif
+    }
 
     void crypto_sym::detruit()
     {

@@ -151,6 +151,9 @@ namespace libdar
 	    /// \note check the "size" method to know how much bytes can be read
 	const char*c_str() const { return mem == nullptr ? throw SRC_BUG : mem; };
 
+	    /// non constant flavor of direct secure memory access
+	char * get_array() { return mem == nullptr ? throw SRC_BUG : mem; };
+
 	    /// get access to the secure string by index
 
 	    /// \note index must be in the range [ 0 - size() [ to avoid throwing an exception

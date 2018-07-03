@@ -210,6 +210,7 @@ namespace libdar
 	/// \param[in]  slice_min_digits minimum number of digits slice number must have
 	/// \param[in]  internal_name common label to all slices
 	/// \param[in]  data_name to use in slice header
+	/// \param[in]  iteration_count used for key derivation when passphrase is human provided
 	/// \param[in]  multi_threaded true if libdar can spawn several thread to work
 	///
 	/// \note the stack has the following contents depending on given options
@@ -267,6 +268,7 @@ namespace libdar
 					  const infinint & slice_min_digits,
 					  const label & internal_name,
 					  const label & data_name,
+					  const infinint & iteration_count,
 					  bool multi_threaded);
 
 	/// dumps the catalogue and close all the archive layers to terminate the archive

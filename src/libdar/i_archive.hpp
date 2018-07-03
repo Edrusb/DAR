@@ -289,6 +289,7 @@ namespace libdar
 				bool zeroing_neg_date,
 				const std::set<std::string> & ignored_symlinks,
 				modified_data_detection mod_data_detect,
+				const infinint & iteration_count,
 				statistics * progressive_report);
 
 	void op_create_in_sub(operation op,                     ///< the filter operation to bind to
@@ -359,6 +360,7 @@ namespace libdar
 			      bool zeroing_neg_date,            ///< if true just warn before zeroing neg date, dont ask user
 			      const std::set<std::string> & ignored_symlinks, ///< list of symlink pointed to directory to recurse into
 			      modified_data_detection mod_data_detect, ///< how to verify data has not changed upon inode metadata change
+			      const infinint & iteration_count, ///< for key derivation
 			      statistics * st_ptr             ///< statistics must not be nullptr !
 	    );
 
