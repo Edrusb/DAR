@@ -56,6 +56,8 @@ namespace libdar
 
 	/// implementation of libcurl_entrepot (pimpl paradigm)
 
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
+
     class entrepot_libcurl::i_entrepot_libcurl : public entrepot, public mem_ui
     {
     public:
@@ -105,9 +107,7 @@ namespace libdar
     private:
 	mycurl_protocol x_proto;
 	std::string base_URL; ///< URL of the repository with only minimum path (login/password is given outside the URL)
-#if LIBCURL_AVAILABLE
 	mycurl_easyhandle_sharing easyh;
-#endif
 	std::deque<std::string> current_dir;
 	std::string reading_dir_tmp;
 	U_I wait_delay;
@@ -134,6 +134,7 @@ namespace libdar
 	friend class entrepot_libcurl;
     };
 
+#endif
 	/// @}
 
 } // end of namespace
