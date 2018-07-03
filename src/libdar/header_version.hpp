@@ -78,6 +78,9 @@ namespace libdar
 	void set_tape_marks(bool presence) { has_tape_marks = presence; };
 	void set_signed(bool is_signed) { arch_signed = is_signed; };
 
+	void set_salt(const std::string & arg) { salt = arg; };
+	void set_iteration_count(const infinint & arg) { iteration_count = arg; };
+
 	    // gettings
 
 	const archive_version & get_edition() const { return edition; };
@@ -93,6 +96,8 @@ namespace libdar
 	memory_file *get_crypted_key() const { return crypted_key; };
 	const slice_layout *get_slice_layout() const { return ref_layout; };
 	bool get_tape_marks() const { return has_tape_marks; };
+	const std::string & get_salt() const { return salt; };
+	const infinint & get_iteration_count() const { return iteration_count; };
 
 	    // display
 
@@ -113,8 +118,10 @@ namespace libdar
 	slice_layout *ref_layout;///< optional field used in isolated catalogues to record the slicing layout of their archive of reference
 	bool has_tape_marks;     ///< whether the archive contains tape marks aka escape marks aka sequence marks
 
-	bool ciphered;   ///< whether the archive is ciphered, even if we do not know its crypto algorithm (old archives)
-	bool arch_signed;     ///< whether the archive is signed
+	bool ciphered;           ///< whether the archive is ciphered, even if we do not know its crypto algorithm (old archives)
+	bool arch_signed;        ///< whether the archive is signed
+	std::string salt;        ///< used for key derivation
+	infinint iteration_count;///< used for key derivation
 
 	void nullifyptr() noexcept { crypted_key = nullptr; ref_layout = nullptr; };
 	void copy_from(const header_version & ref);
@@ -132,7 +139,12 @@ namespace libdar
 	static constexpr U_I FLAG_HAS_REF_SLICING = 0x02;    ///< the header contains the slicing information of the archive of reference (used for isolated catalogue)
 	static constexpr U_I FLAG_HAS_AN_EXTENDED_SIZE = 0x01; ///< the flag is two bytes length
 	static constexpr U_I FLAG_ARCHIVE_IS_SIGNED = 0x0200;  ///< archive is signed
+	static constexpr U_I FLAG_HAS_SALT_INTER = 0x0400;     ///< archive header contains salt and non default interaction count
 	static constexpr U_I FLAG_HAS_AN_SECOND_EXTENDED_SIZE = 0x0101; ///< reserved for future use
+
+	    //
+
+	static constexpr U_I PRE_FORMAT_10_ITERATION = 2000;   ///< fixed value used for key derivation before archive format 10
     };
 
 } // end of namespace

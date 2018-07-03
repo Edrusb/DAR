@@ -51,6 +51,8 @@ namespace libdar
 	ref_layout = nullptr;
 	ciphered = false;
 	arch_signed = false;
+	iteration_count = PRE_FORMAT_10_ITERATION;
+	salt = "";
     }
 
     void header_version::read(generic_file & f, user_interaction & dialog, bool lax_mode)
@@ -247,6 +249,17 @@ namespace libdar
 
 	arch_signed = (flag & FLAG_ARCHIVE_IS_SIGNED) != 0;
 
+	if((flag & FLAG_HAS_SALT_INTER) != 0)
+	{
+	    tools_read_string(f, salt);
+	    iteration_count.read(f);
+	}
+	else
+	{
+	    salt = "";
+	    iteration_count = PRE_FORMAT_10_ITERATION;
+	}
+
 	ctrl = f.get_crc();
 	if(ctrl == nullptr)
 	    throw SRC_BUG;
@@ -342,6 +355,9 @@ namespace libdar
 	if(arch_signed)
 	    flag[1] |= (FLAG_ARCHIVE_IS_SIGNED >> 8);
 
+	if(salt.size() > 0)
+	    flag[1] |= (FLAG_HAS_SALT_INTER >> 8);
+
 	if(flag[1] > 0)
 	    flag[1] |= FLAG_HAS_AN_EXTENDED_SIZE;
 	    // and we will drop two bytes for the flag
@@ -373,6 +389,12 @@ namespace libdar
 
 	if(ref_layout != nullptr)
 	    ref_layout->write(f);
+
+	if(salt.size() > 0)
+	{
+	    tools_write_string(f, salt);
+	    iteration_count.dump(f);
+	}
 
 	ctrl = f.get_crc();
 	if(ctrl == nullptr)
@@ -464,6 +486,8 @@ namespace libdar
 	has_tape_marks = ref.has_tape_marks;
 	ciphered = ref.ciphered;
 	arch_signed = ref.arch_signed;
+	salt = ref.salt;
+	iteration_count = ref.iteration_count;
     }
 
     void header_version::move_from(header_version && ref) noexcept
@@ -478,6 +502,8 @@ namespace libdar
 	has_tape_marks = move(ref.has_tape_marks);
 	ciphered = move(ref.ciphered);
 	arch_signed = move(ref.arch_signed);
+	salt = move(ref.salt);
+	iteration_count = move(ref.iteration_count);
     }
 
     void header_version::detruit()
