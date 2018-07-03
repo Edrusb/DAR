@@ -522,6 +522,9 @@ namespace libdar
 
 	void set_modified_data_detection(modified_data_detection val) { x_modified_data_detection = val; };
 
+	    /// key derivation
+	void set_iteration_count(const infinint & val) { x_iteration_count = val; };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -587,6 +590,7 @@ namespace libdar
 	bool get_auto_zeroing_neg_dates() const { return x_auto_zeroing_neg_dates; };
 	const std::set<std::string> & get_ignored_as_symlink() const { return x_ignored_as_symlink; };
 	modified_data_detection get_modified_data_detection() const { return x_modified_data_detection; };
+	const infinint & get_iteration_count() const { return x_iteration_count; };
 
     private:
 	std::shared_ptr<archive> x_ref_arch; ///< just contains the address of an existing object, no local copy of object is done here
@@ -651,6 +655,7 @@ namespace libdar
 	bool x_auto_zeroing_neg_dates;
 	std::set<std::string> x_ignored_as_symlink;
 	modified_data_detection x_modified_data_detection;
+	infinint x_iteration_count;
 
 	void nullifyptr() noexcept;
 	void destroy() noexcept;
@@ -790,6 +795,9 @@ namespace libdar
 	    /// \note by default a min size of 10 kiB is used
 	void set_delta_sig_min_size(const infinint & val) { x_delta_sig_min_size = val; };
 
+	    /// key derivation
+	void set_iteration_count(const infinint & val) { x_iteration_count = val; };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -822,6 +830,7 @@ namespace libdar
 	const mask & get_delta_mask() const { return *x_delta_mask; }
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
+	const infinint & get_iteration_count() const { return x_iteration_count; };
 
     private:
 	bool x_allow_over;
@@ -852,6 +861,7 @@ namespace libdar
 	mask *x_delta_mask;
 	bool has_delta_mask_been_set;
 	infinint x_delta_sig_min_size;
+	infinint x_iteration_count;
 
 	void copy_from(const archive_options_isolate & ref);
 	void move_from(archive_options_isolate && ref) noexcept;
@@ -1038,6 +1048,9 @@ namespace libdar
 	    /// \note by default a min size of 10 kiB is used
 	void set_delta_sig_min_size(const infinint & val) { x_delta_sig_min_size = val; };
 
+	    /// key derivation
+	void set_iteration_count(const infinint & val) { x_iteration_count = val; };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -1085,6 +1098,7 @@ namespace libdar
 	const mask & get_delta_mask() const { return *x_delta_mask; }
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
+	const infinint & get_iteration_count() const { return x_iteration_count; };
 
     private:
 	std::shared_ptr<archive> x_ref;
@@ -1130,6 +1144,7 @@ namespace libdar
 	mask *x_delta_mask;
 	bool has_delta_mask_been_set;
 	infinint x_delta_sig_min_size;
+	infinint x_iteration_count;
 
 	void destroy() noexcept;
 	void copy_from(const archive_options_merge & ref);
