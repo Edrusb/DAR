@@ -441,15 +441,6 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             throw Erange("get_args", gettext("-S option requires the use of -s"));
         if(p.what_to_check != comparison_fields::all && (p.op == isolate || (p.op == create && p.ref_root == nullptr) || p.op == test || p.op == listing || p.op == merging))
             dialog->message(gettext("ignoring -O option, as it is useless in this situation"));
-        if(p.what_to_check == comparison_fields::all
-           && p.op == extract
-           && capability_CHOWN(*dialog, p.info_details)
-           && getuid() != 0) // uid == 0 for root
-        {
-            p.what_to_check = comparison_fields::ignore_owner;
-            string msg = tools_printf(gettext("File ownership will not be restored as %s has not the CHOWN capability nor is running as root. to avoid this message use -O option"), cmd.c_str());
-            dialog->pause(msg);
-        }
         if(p.furtive_read_mode
            && capability_FOWNER(*dialog, p.info_details) != capa_set
            && getuid() != 0)

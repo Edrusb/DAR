@@ -59,6 +59,7 @@ extern "C"
 #include "escape_catalogue.hpp"
 #include "nls_swap.hpp"
 #include "i_archive.hpp"
+#include "capabilities.hpp"
 
 #define ARCHIVE_NOT_EXPLOITABLE "Archive of reference given is not exploitable"
 
@@ -883,6 +884,7 @@ namespace libdar
     {
         statistics st = false;  // false => no lock for this internal object
 	statistics *st_ptr = progressive_report == nullptr ? &st : progressive_report;
+	comparison_fields wtc = options.get_what_to_check();
 
         try
         {
@@ -898,6 +900,14 @@ namespace libdar
 		// associated with the real plain archive, not alone.
 
 		// end of sanity checks
+
+	    if(wtc == comparison_fields::all
+	       && capability_CHOWN(get_ui(), options.get_info_details()) == capa_clear
+	       && getuid() != 0)
+	    {
+		wtc = comparison_fields::ignore_owner;
+		get_ui().pause(gettext("File ownership will not be restored du to the lack of privilege, you can disable this message my asking not to restore file ownership"));
+	    }
 
 	    fs_root.explode_undisclosed();
 	    enable_natural_destruction();
@@ -923,7 +933,7 @@ namespace libdar
 			       *st_ptr,
 			       options.get_ea_mask(),
 			       options.get_flat(),
-			       options.get_what_to_check(),
+			       wtc,
 			       options.get_warn_remove_no_match(),
 			       options.get_empty(),
 			       options.get_empty_dir(),
