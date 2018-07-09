@@ -80,7 +80,6 @@ extern "C"
 #include "cygwin_adapt.hpp"
 #include "crit_action_cmd_line.hpp"
 #include "libdar.hpp"
-#include "capabilities.hpp"
 #include "fichier_local.hpp"
 
 #define OPT_STRING "c:A:x:d:t:l:v::z::y:nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT:E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:8:{:}:j:\\:"
@@ -441,14 +440,6 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             throw Erange("get_args", gettext("-S option requires the use of -s"));
         if(p.what_to_check != comparison_fields::all && (p.op == isolate || (p.op == create && p.ref_root == nullptr) || p.op == test || p.op == listing || p.op == merging))
             dialog->message(gettext("ignoring -O option, as it is useless in this situation"));
-        if(p.furtive_read_mode
-           && capability_FOWNER(*dialog, p.info_details) != capa_set
-           && getuid() != 0)
-        {
-            if(p.op == create || p.op == diff)
-                dialog->printf(gettext("Furtive read mode has been disabled as %s has not the FOWNER capability nor is running as root"), cmd.c_str());
-            p.furtive_read_mode = false;
-        }
 
         if(p.execute_ref != "" && p.ref_filename == nullptr)
             dialog->message(gettext("-F is only useful with -A option, for the archive of reference"));

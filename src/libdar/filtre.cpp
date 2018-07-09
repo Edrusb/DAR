@@ -50,6 +50,7 @@ extern "C"
 #include "tools.hpp"
 #include "op_tools.hpp"
 #include "fichier_global.hpp"
+#include "capabilities.hpp"
 
 using namespace std;
 
@@ -159,6 +160,9 @@ namespace libdar
 				     bool display_treated,
 				     const catalogue & cat);
 
+    static bool furtive_check(bool furtive,
+			      const shared_ptr<user_interaction> & dialog,
+			      bool verbose);
 
     void filtre_restore(const shared_ptr<user_interaction> & dialog,
 			const mask & filtre,
@@ -580,7 +584,9 @@ namespace libdar
 			     ea_mask,
 			     nodump,
 			     alter_atime,
-			     furtive_read_mode,
+			     furtive_check(furtive_read_mode,
+					   dialog,
+					   info_details),
 			     cache_directory_tagging,
 			     root_fs_device,
 			     ignore_unknown,
@@ -1166,7 +1172,9 @@ namespace libdar
 			   info_details,
 			   ea_mask,
 			   alter_atime,
-			   furtive_read_mode,
+			   furtive_check(furtive_read_mode,
+					 dialog,
+					 info_details),
 			   scope);
 	thread_cancellation thr_cancel;
 
@@ -4509,6 +4517,22 @@ namespace libdar
 	    if(sig != nullptr)
 		delete sig;
 	}
+    }
+
+    static bool furtive_check(bool furtive,
+			      const shared_ptr<user_interaction> & dialog,
+			      bool verbose)
+    {
+	if(furtive
+	   && capability_FOWNER(*dialog, verbose) != capa_set
+	   && getuid() != 0)
+	{
+	    if(verbose)
+		dialog->printf(gettext("Furtive read mode requires either root permission and FOWNER capability, falling back to normal filesystem read"));
+	    furtive = false;
+	}
+
+	return furtive;
     }
 
 } // end of namespace
