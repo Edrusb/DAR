@@ -46,6 +46,11 @@ from 2.5.x to 2.6.0
   available, one need to provide explicitely the desired argument
 - security refresh: improving seed randomization for the pseudo-random
   generator used in elastic buffers
+- feature enhancement: activate needed linux capability in the
+  effective set if it is permitted but not effective. This concerns
+  cap_chown at restoration time, cap_fchown for furtive read mode,
+  cap_linux_immutable to restore the immutable flag, and cap_sys_
+  resource to set some linux FSA
 
 from 2.5.15 to 2.5.16
 - bug fix: while rechecking sparse file (-ah option) during a merging
