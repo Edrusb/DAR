@@ -95,7 +95,7 @@ namespace libdar
 
 	const path & get_location() const { return where; }; //< retreives relative to root path the current location points to
 	const path & get_root() const { return root; };      //< retrieves the given root location
-	path get_full_path() const;
+	path get_full_path() const; //< get_root()/get_location() if get_location() is relative, else get_location()
 	virtual std::string get_url() const = 0; //< defines an URL-like normalized full location of slices
 	const std::string & get_user_ownership() const { return user; };
 	const std::string & get_group_ownership() const { return group; };

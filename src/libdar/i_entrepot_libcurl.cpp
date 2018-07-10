@@ -396,13 +396,13 @@ namespace libdar
     }
 
     void entrepot_libcurl::i_entrepot_libcurl::set_libcurl_authentication(user_interaction & dialog,
-							const string & location,
-							const string & login,
-							const secu_string & password,
-							bool auth_from_file,
-							const string & sftp_pub_keyfile,
-							const string & sftp_prv_keyfile,
-							const string & sftp_known_hosts)
+									  const string & location,
+									  const string & login,
+									  const secu_string & password,
+									  bool auth_from_file,
+									  const string & sftp_pub_keyfile,
+									  const string & sftp_prv_keyfile,
+									  const string & sftp_known_hosts)
     {
 	CURLcode err;
 	secu_string real_pass = password;
