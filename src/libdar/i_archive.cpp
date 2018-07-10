@@ -415,7 +415,7 @@ namespace libdar
 	    cat = nullptr;
 
 	    shared_ptr<entrepot> sauv_path_t = options.get_entrepot();
-	    if(sauv_path_t == nullptr)
+	    if(!sauv_path_t)
 		throw Ememory("archive::i_archive::archive");
 	    sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
 	    sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
