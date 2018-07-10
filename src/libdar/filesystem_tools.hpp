@@ -52,7 +52,7 @@ namespace libdar
     bool filesystem_tools_has_immutable(const cat_inode & arg);
     void filesystem_tools_set_immutable(const std::string & target, bool val, user_interaction &ui);
     void filesystem_tools_supprime(user_interaction & ui, const std::string & ref);
-    void filesystem_tools_make_owner_perm(const std::shared_ptr<user_interaction> & dialog,
+    void filesystem_tools_make_owner_perm(user_interaction & dialog,
 					  const cat_inode & ref,
 					  const std::string & chem,
 					  bool dir_perm,
@@ -66,10 +66,10 @@ namespace libdar
     void filesystem_tools_attach_ea(const std::string &chemin,
 				    cat_inode *ino,
 				    const mask & ea_mask);
-    bool filesystem_tools_is_nodump_flag_set(const std::shared_ptr<user_interaction> & dialog,
+    bool filesystem_tools_is_nodump_flag_set(user_interaction & dialog,
 					     const path & chem, const std::string & filename,
 					     bool info);
-    path *filesystem_tools_get_root_with_symlink(const std::shared_ptr<user_interaction> & dialog,
+    path *filesystem_tools_get_root_with_symlink(user_interaction & dialog,
 						 const path & root,
 						 bool info_details);
     mode_t filesystem_tools_get_file_permission(const std::string & path);

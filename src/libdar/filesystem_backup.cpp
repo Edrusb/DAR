@@ -147,7 +147,7 @@ namespace libdar
 	ea_mask = nullptr;
 	try
 	{
-	    fs_root = filesystem_tools_get_root_with_symlink(dialog, root, x_info_details);
+	    fs_root = filesystem_tools_get_root_with_symlink(*dialog, root, x_info_details);
 	    if(fs_root == nullptr)
 		throw Ememory("filesystem_backup::filesystem_backup");
 	    info_details = x_info_details;
@@ -272,7 +272,7 @@ namespace libdar
                     {
                             // checking the EXT2 nodump flag (if set ignoring the file)
 
-                        if(!no_dump_check || !filesystem_tools_is_nodump_flag_set(get_pointer(), *current_dir, name, info_details))
+                        if(!no_dump_check || !filesystem_tools_is_nodump_flag_set(get_ui(), *current_dir, name, info_details))
                         {
 			    ref = make_read_entree(*current_dir, name, true, *ea_mask);
 

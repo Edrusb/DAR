@@ -151,7 +151,7 @@ namespace libdar
 	overwrite = nullptr;
 	try
 	{
-	    fs_root = filesystem_tools_get_root_with_symlink(dialog, root, x_info_details);
+	    fs_root = filesystem_tools_get_root_with_symlink(*dialog, root, x_info_details);
 	    if(fs_root == nullptr)
 		throw Ememory("filesystem_write::filesystem_write");
 	    ea_mask = x_ea_mask.clone();
@@ -628,7 +628,7 @@ namespace libdar
 	       && tba_ino->same_as(*in_place))
 	    {
 		if(!empty)
-		    filesystem_tools_make_owner_perm(get_pointer(), *tba_ino, spot, false, what_to_check, get_fsa_scope());
+		    filesystem_tools_widen_perm(get_ui(), *tba_ino, spot, what_to_check);
 		data_done = done_data_restored;
 	    }
 	    else // not both in_place and to_be_added are directories, or we can only restore the inode metadata and existing file is of different type
@@ -1070,7 +1070,7 @@ namespace libdar
 	{
 	    string chem = (*current_dir + stack_dir.back().get_name()).display();
 	    if(!empty)
-		filesystem_tools_make_owner_perm(get_pointer(), stack_dir.back(), chem, true, what_to_check, get_fsa_scope());
+		filesystem_tools_make_owner_perm(get_ui(), stack_dir.back(), chem, what_to_check, get_fsa_scope());
 	    stack_dir.pop_back();
 	}
 	if(stack_dir.size() > 0)
