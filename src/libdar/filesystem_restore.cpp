@@ -512,7 +512,7 @@ namespace libdar
 			}
 
 
-			if(act_data == data_remove)
+			if(act_data == data_remove || data_restored == done_data_restored)
 			{
 				// recording that we must set back the mtime of the parent directory
 			    if(!stack_dir.empty())
