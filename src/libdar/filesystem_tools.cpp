@@ -180,29 +180,33 @@ namespace libdar
             tools_unlink(s);
     }
 
-    void filesystem_tools_make_owner_perm(const std::shared_ptr<user_interaction> & dialog,
-                                          const cat_inode & ref,
-                                          const string & chem,
-                                          bool dir_perm,
-                                          comparison_fields what_to_check,
-                                          const fsa_scope & scope)
+    void filesystem_tools_widen_perm(user_interaction & dialog,
+				     const cat_inode & ref,
+				     const string & chem,
+				     comparison_fields what_to_check)
     {
-        const char *name = chem.c_str();
-        const cat_lien *ref_lie = dynamic_cast<const cat_lien *>(&ref);
+	const cat_directory *ref_dir = dynamic_cast<const cat_directory *>(&ref);
         S_I permission;
+	const char *name = chem.c_str();
 
-        if(!dialog)
-            throw SRC_BUG; // dialog points to nothing
+	if(ref_dir == nullptr)
+	    return;
+	    // nothing to do if not a directory
 
-            // if we are not root (geteuid()!=0) and if we are restoring in an already
-            // existing (!dir_perm) directory (dynamic_cast...), we must try, to have a chance to
+	if(what_to_check != comparison_fields::all
+	   && what_to_check == comparison_fields::ignore_owner)
+	    return;
+	    // we do nothing if permission is not to take into account
+	    // for the operation
+
+
+	    // if we are not root (geteuid()!=0), we must try to have a chance to
             // be able to create/modify sub-files or sub-directory, so we set the user write access to
             // that directory. This chmod is allowed only if we own the directory (so
             // we only set the write bit for user). If this cannot be changed we are not the
             // owner of the directory, so we will try to restore as much as our permission
             // allows it (maybe "group" or "other" write bits are set for us).
-
-        if(dynamic_cast<const cat_directory *>(&ref) != nullptr && !dir_perm && geteuid() != 0)
+        if(geteuid() != 0)
         {
             mode_t tmp;
             try
@@ -216,11 +220,45 @@ namespace libdar
             permission =  tmp | 0200; // add user write access to be able to add some subdirectories and files
         }
         else
-            permission = ref.get_perm();
+            permission = ref.get_perm() | 0200;
+
+	(void)chmod(name, permission);
+	    // we ignore if that failed maybe we will be more lucky
+	    // if for example group ownership gives us the right to
+	    // write in this existing directory
+    }
+
+    void filesystem_tools_make_owner_perm(user_interaction & dialog,
+                                          const cat_inode & ref,
+                                          const string & chem,
+                                          comparison_fields what_to_check,
+                                          const fsa_scope & scope)
+    {
+        const char *name = chem.c_str();
+        const cat_lien *ref_lie = dynamic_cast<const cat_lien *>(&ref);
 
             // restoring fields that are defined by "what_to_check"
 
-        if(what_to_check == comparison_fields::all)
+        try
+        {
+            if(what_to_check == comparison_fields::all || what_to_check == comparison_fields::ignore_owner)
+                if(ref_lie == nullptr) // not restoring permission for symbolic links, it would modify the target not the symlink itself
+		{
+                    if(chmod(name, ref.get_perm()) < 0)
+                    {
+                        string tmp = tools_strerror_r(errno);
+                        dialog.message(tools_printf(gettext("Cannot restore permissions of %s : %s"), name, tmp.c_str()));
+                    }
+		}
+	}
+	catch(Egeneric &e)
+        {
+            if(ref_lie == nullptr)
+                throw;
+                // else (the inode is a symlink), we simply ignore this error
+        }
+
+	if(what_to_check == comparison_fields::all)
 	{
 	    uid_t tmp_uid = 0;
 	    gid_t tmp_gid = 0;
@@ -246,22 +284,6 @@ namespace libdar
 #endif
 	}
 
-        try
-        {
-            if(what_to_check == comparison_fields::all || what_to_check == comparison_fields::ignore_owner)
-                if(ref_lie == nullptr) // not restoring permission for symbolic links, it would modify the target not the symlink itself
-                    if(chmod(name, permission) < 0)
-                    {
-                        string tmp = tools_strerror_r(errno);
-                        dialog->message(tools_printf(gettext("Cannot restore permissions of %s : %s"), name, tmp.c_str()));
-                    }
-        }
-        catch(Egeneric &e)
-        {
-            if(ref_lie == nullptr)
-                throw;
-                // else (the inode is a symlink), we simply ignore this error
-        }
     }
 
     void filesystem_tools_make_date(const cat_inode & ref,

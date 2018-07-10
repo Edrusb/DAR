@@ -1479,6 +1479,11 @@ export GNUPGHOME=~myaccount/.gnupg
 dar -K gnupg:...@...,...@... --sign:...@... etc.
 .RE
 
+.SH CAPABILITIES
+.B
+dar
+fully supports the cap_chown capability, but by design, dar only uses this capability to restore files at their original ownership. Dar will thus not use this capability to access files and directories the caller would normally not have access to. In other words, it should be ok to set the cap_chown capability to the dar executable (setcap cap_chown+p dar). Calling dar from a process having the cap_chown in the inheritable set would lead the system to grant this capability to the dar process while other users would not be granted this capability and would not be able to modify ownership of files at restoration time. This can be used for the system account that has the role of restoring data upon user requests, without giving root privilege to this restoration process.
+
 .SH EXAMPLES
 You can find some more examples of use in the tutorial, mini-howto, sample scripts, and other related documentation. All these are available in dar's source package, and are also installed beside dar in the <--prefix>/share/dar directory. This documentation is also available on-line at http://dar.linux.free.fr/doc/index.html
 

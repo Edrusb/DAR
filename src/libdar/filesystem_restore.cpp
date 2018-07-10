@@ -362,9 +362,21 @@ namespace libdar
 
 			    // now that FSA has been read (if sequential mode is used)
 			    // we can restore dates in particular creation date from HFS+ FSA if present
-			if(!empty)
-			    filesystem_tools_make_date(*x_ino, spot_display, what_to_check,
+			    // but this is useless for directory as we may restore files in them
+			    // dates of directories will be restored when the corresponding EOD will
+			    // be met
+			if(!empty && x_dir == nullptr && x_ino != nullptr)
+			{
+			    filesystem_tools_make_date(*x_ino,
+						       spot_display,
+						       what_to_check,
 						       get_fsa_scope());
+			    filesystem_tools_make_owner_perm(get_ui(),
+							     *x_ino,
+							     spot_display,
+							     what_to_check,
+							     get_fsa_scope());
+			}
 		    }
 		    else // no existing inode but no data to restore
 		    {
@@ -421,12 +433,6 @@ namespace libdar
 								  spot_display,
 								  *x_fil,
 								  *current_dir);
-				filesystem_tools_make_owner_perm(get_pointer(),
-								 *x_fil,
-								 spot_display,
-								 true,
-								 what_to_check,
-								 get_fsa_scope());
 				data_restored = done_data_restored;
 			    }
 			    else
@@ -472,25 +478,37 @@ namespace libdar
 				    get_ui().message(tools_printf(gettext("Restoration of FSA for %S aborted: "), &spot_display) + e.get_message());
 				}
 			    }
+			}
 
-			    if(has_fsa_saved || has_ea_saved)
+			if(has_fsa_saved || has_ea_saved || has_patch || has_data_saved || has_just_inode)
+			{
+			    if(data_restored == done_data_restored)
+				    // setting the date, perimssions and ownership to value found in the archive
+				    // this can only be done once the EA and FSA have been restored (mtime)
+				    // and data has been restore (mtime, atome)
 			    {
-				    // to accomodate MacOS X we set again mtime to its expected value
-				    // because restoring EA modifies mtime on this OS.
-				    // Same point but concerning extX FSA, setting them may modify atime
-				    // unless furtive read is available.
-				    // This does not hurt other Unix systems.
-
-				if(data_restored == done_data_restored)
-					// set back the mtime to value found in the archive
-				    filesystem_tools_make_date(*x_ino, spot_display, what_to_check,
+				if(exists_dir == nullptr)
+				{
+				    filesystem_tools_make_date(*x_ino,
+							       spot_display,
+							       what_to_check,
 							       get_fsa_scope());
-				else
-					// set back the mtime to value found in filesystem before restoration
-				    filesystem_tools_make_date(*exists_ino, spot_display, what_to_check,
-							       get_fsa_scope());
+					// setting ownership as last step as it can lead us not
+					// having anymore right on the file
+				    filesystem_tools_make_owner_perm(get_ui(),
+								     *x_ino,
+								     spot_display,
+								     what_to_check,
+								     get_fsa_scope());
+				}
+				    // directory will get their metadata when the correspondant EOD
+				    // will be met, meaning all subfile and directory could be treated
+				    // (successfully or not, but no more change is expected in that dir)
 			    }
-
+			    else
+				    // set back the mtime to value found in filesystem before restoration
+				filesystem_tools_make_date(*exists_ino, spot_display, what_to_check,
+							   get_fsa_scope());
 			}
 
 

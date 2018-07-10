@@ -52,10 +52,13 @@ namespace libdar
     bool filesystem_tools_has_immutable(const cat_inode & arg);
     void filesystem_tools_set_immutable(const std::string & target, bool val, user_interaction &ui);
     void filesystem_tools_supprime(user_interaction & ui, const std::string & ref);
+    void filesystem_tools_widen_perm(user_interaction & dialog,
+				     const cat_inode & ref,
+				     const std::string & chem,
+				     comparison_fields what_to_check);
     void filesystem_tools_make_owner_perm(user_interaction & dialog,
 					  const cat_inode & ref,
 					  const std::string & chem,
-					  bool dir_perm,
 					  comparison_fields what_to_check,
 					  const fsa_scope & scope);
     void filesystem_tools_make_date(const cat_inode & ref,
