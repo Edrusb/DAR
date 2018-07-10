@@ -224,9 +224,8 @@ namespace libdar
 		if(!empty && stack_dir.back().get_restore_date())
 		{
 		    string chem = (*current_dir + stack_dir.back().get_name()).display();
-
-		    filesystem_tools_make_owner_perm(get_pointer(), stack_dir.back(), chem, true, what_to_check, get_fsa_scope());
 		    filesystem_tools_make_date(stack_dir.back(), chem, what_to_check, get_fsa_scope());
+		    filesystem_tools_make_owner_perm(get_ui(), stack_dir.back(), chem, what_to_check, get_fsa_scope());
 		}
 	    }
 	    else
