@@ -243,10 +243,7 @@ namespace libdar
     }
 
     void filesystem_hard_link_write::make_file(const cat_nomme * ref,
-					       const path & ou,
-					       bool dir_perm,
-					       comparison_fields what_to_check,
-					       const fsa_scope & scope)
+					       const path & ou)
     {
         const cat_directory *ref_dir = dynamic_cast<const cat_directory *>(ref);
         const cat_file *ref_fil = dynamic_cast<const cat_file *>(ref);
@@ -482,9 +479,6 @@ namespace libdar
 	    }
 	}
 	while(ret < 0 && errno == ENOSPC);
-
-	if(ref_ino != nullptr && ret >= 0)
-	    filesystem_tools_make_owner_perm(get_pointer(), *ref_ino, display, dir_perm, what_to_check, scope);
     }
 
     void filesystem_hard_link_write::clear_corres_if_pointing_to(const infinint & ligne, const string & path)

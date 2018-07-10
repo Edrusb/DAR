@@ -308,7 +308,7 @@ namespace libdar
 			    get_ui().message(string(gettext("Restoring file's data: ")) + spot_display);
 
 			if(!empty)
-			    make_file(x_nom, *current_dir, false, what_to_check, get_fsa_scope());
+			    make_file(x_nom, *current_dir);
 			data_created = true;
 			data_restored = done_data_restored;
 
@@ -696,7 +696,7 @@ namespace libdar
 			}
 
 			filesystem_tools_supprime(get_ui(), spot); // this destroyes EA, (removes inode, or hard link to inode)
-			make_file(to_be_added, *current_dir, false, what_to_check, get_fsa_scope());
+			make_file(to_be_added, *current_dir);
 			data_done = done_data_restored;
 		    }
 
