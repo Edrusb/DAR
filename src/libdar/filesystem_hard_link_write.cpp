@@ -118,6 +118,7 @@ extern "C"
 #include "fichier_local.hpp"
 #include "generic_rsync.hpp"
 #include "null_file.hpp"
+#include "filesystem_tools.hpp"
 
 #ifndef UNIX_PATH_MAX
 #define UNIX_PATH_MAX 104
@@ -127,13 +128,6 @@ using namespace std;
 
 namespace libdar
 {
-    static void make_owner_perm(user_interaction & dialog,
-				const cat_inode & ref,
-				const string & chem,
-				bool dir_perm,
-				comparison_fields what_to_check,
-				const fsa_scope & scope);
-    static mode_t get_file_permission(const string & path);
 
     bool filesystem_hard_link_write::raw_set_ea(const cat_nomme *e,
 						const ea_attributs & list_ea,
@@ -490,7 +484,7 @@ namespace libdar
 	while(ret < 0 && errno == ENOSPC);
 
 	if(ref_ino != nullptr && ret >= 0)
-	    make_owner_perm(get_ui(), *ref_ino, display, dir_perm, what_to_check, scope);
+	    filesystem_tools_make_owner_perm(get_pointer(), *ref_ino, display, dir_perm, what_to_check, scope);
     }
 
     void filesystem_hard_link_write::clear_corres_if_pointing_to(const infinint & ligne, const string & path)
@@ -501,102 +495,6 @@ namespace libdar
 	    if(it->second.chemin == path)
 		corres_write.erase(it);
 	}
-    }
-
-    static void make_owner_perm(user_interaction & dialog,
-				const cat_inode & ref,
-				const string & chem,
-				bool dir_perm,
-				comparison_fields what_to_check,
-				const fsa_scope & scope)
-    {
-        const char *name = chem.c_str();
-        const cat_lien *ref_lie = dynamic_cast<const cat_lien *>(&ref);
-        S_I permission;
-
-
-	    // if we are not root (geteuid()!=0) and if we are restoring in an already
-	    // existing (!dir_perm) directory (dynamic_cast...), we must try, to have a chance to
-	    // be able to create/modify sub-files or sub-directory, so we set the user write access to
-	    // that directory. This chmod is allowed only if we own the directory (so
-	    // we only set the write bit for user). If this cannot be changed we are not the
-	    // owner of the directory, so we will try to restore as much as our permission
-	    // allows it (maybe "group" or "other" write bits are set for us).
-
-	if(dynamic_cast<const cat_directory *>(&ref) != nullptr && !dir_perm && geteuid() != 0)
-	{
-	    mode_t tmp;
-	    try
-	    {
-		tmp = get_file_permission(name); // the current permission value
-	    }
-	    catch(Egeneric & e)
-	    {
-		tmp = ref.get_perm(); // the value at the time of the backup if we failed reading permission from filesystem
-	    }
-	    permission =  tmp | 0200; // add user write access to be able to add some subdirectories and files
-	}
-	else
-	    permission = ref.get_perm();
-
-	    // restoring fields that are defined by "what_to_check"
-
-	if(what_to_check == comparison_fields::all)
-	    if(ref.get_saved_status() == saved_status::saved)
-	    {
-		uid_t tmp_uid = 0;
-		gid_t tmp_gid = 0;
-		infinint tmp = ref.get_uid();
-		tmp.unstack(tmp_uid);
-		if(!tmp.is_zero())
-		    throw Erange("make_owner_perm", gettext("uid value is too high for this system for libdar be able to restore it properly"));
-		tmp = ref.get_gid();
-		tmp.unstack(tmp_gid);
-		if(!tmp.is_zero())
-		    throw Erange("make_owner_perm", gettext("gid value is too high for this system for libdar be able to restore it properly"));
-
-#if HAVE_LCHOWN
-		if(lchown(name, tmp_uid, tmp_gid) < 0)
-		    dialog.message(chem + string(gettext("Could not restore original file ownership: ")) + tools_strerror_r(errno));
-#else
-		if(dynamic_cast<const cat_lien *>(&ref) == nullptr) // not a symbolic link
-		    if(chown(name, tmp_uid, tmp_gid) < 0)
-			dialog.message(chem + string(gettext("Could not restore original file ownership: ")) + tools_strerror_r(errno));
-		    //
-		    // we don't/can't restore ownership for symbolic links (no system call to do that)
-		    //
-#endif
-	    }
-
-	try
-	{
-	    if(what_to_check == comparison_fields::all || what_to_check == comparison_fields::ignore_owner)
-		if(ref_lie == nullptr) // not restoring permission for symbolic links, it would modify the target not the symlink itself
-		    if(chmod(name, permission) < 0)
-		    {
-			string tmp = tools_strerror_r(errno);
-			dialog.message(tools_printf(gettext("Cannot restore permissions of %s : %s"), name, tmp.c_str()));
-		    }
-	}
-	catch(Egeneric &e)
-	{
-	    if(ref_lie == nullptr)
-		throw;
-		// else (the inode is a symlink), we simply ignore this error
-	}
-    }
-
-    static mode_t get_file_permission(const string & path)
-    {
-	struct stat buf;
-
-	if(lstat(path.c_str(), &buf) < 0)
-	{
-	    string tmp = tools_strerror_r(errno);
-	    throw Erange("filesystem.cpp:get_file_permission", tools_printf("Cannot read file permission for %s: %s",path.c_str(), tmp.c_str()));
-	}
-
-	return buf.st_mode;
     }
 
 } // end of namespace
