@@ -106,6 +106,7 @@ Windows, especially with cyrillic filenames?</a><br>
       <a style="font-weight: bold;" href="#libthreadar"><span style="font-style: italic;">what is libthreadar and why libdar relies on it?</span></a><br>
       <a href="#libssh2"><span style="font-weight: bold; font-style: italic;"></span><span style="font-weight: bold; font-style: italic;">I Cannot get dar to connect to remote server using SFTP</span></a><br>
       <span style="font-weight: bold; font-style: italic;"></span><a href="#too_large"><span style="font-weight: bold; font-style: italic;">"Cannot open catalogue: Cannot handle such a too large integer." What to do?</span></a><br>
+      <a href="#sftppubkey"><span style="font-weight: bold; font-style: italic;">I have sftp pubkey authentication working with ssh/sftp, how to have dar using too this public key authentication for sftp?</span></a><br>
       <h2><span style="text-decoration: underline;">Answers:</span></h2>
       <h1><span style="font-weight: bold; font-style: italic;"> </span></h1>
       <h2> </h2>
@@ -3510,7 +3511,25 @@ welcome of something is not clear, wrong or missing.<br>
       <br>
 libthreadar source code can be found <a href="https://sourceforge.net/projects/libthreadar/">here</a><br>
 documentation is available in source package as well as online <a href="http://libthreadar.sourceforge.net/">here</a> <br>
+      <br>
+</div><br>
+      <span style="font-weight: bold;"><a name="sftppubkey"></a><span style="font-style: italic;">I have sftp pubkey authentication working with ssh/sftp, how to have dar using too this public key authentication for sftp?</span></span><br>
+      <br>
+      <div style="margin-left: 40px;">as simply as adding the following option while calling dar: -afile-auth<br>
+      <br>
+Why not doing pubkey by default and falling back to password authentication? <br>
+First this is by choice, because -afile-auth also uses ~/.netrc even
+when using sftp. Second it could be possible to first try public key
+authentication and falling back to password authentication, but it
+would require libdar to first connect, eventually failing if pubkey is
+not provisionned or wrong then connecting again asking user for
+password on command line. I seems more efficient doing that way, while
+the counterpart is not huge for user (you can add -afile-auth in your
+~/.darrc and forget about it).<br>
       </div>
+      <div style="margin-left: 40px;">
+      </div>
+
       <span style="font-weight: bold; font-style: italic;">
       <p><a name="libssh2"></a>I Cannot get dar to connect to remote server using SFTP<br>
 </p></span>
@@ -3643,8 +3662,8 @@ using public cloud service over Internet.</li>
 
 
       <br>
-      
-      Unless using dar/libdar built in 32 bits mode, you should not meet this error message from dar unless exceeding the 64 bits <a href="Limitations.html#Integers">integer limits</a>.
+Unless using dar/libdar built in 32 bits mode, you should not meet this
+error message from dar unless exceeding the 64 bits <a href="Limitations.html#Integers">integer limits</a>.
 To know which intergers type dar relies on (infinint, 32 bits or 64
 bits) run dar -V and check the line "Integer size used" here below in
 bold.<br>
