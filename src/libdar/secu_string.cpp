@@ -200,7 +200,7 @@ namespace libdar
 	    if(mem == nullptr)
 		throw Esecu_memory("secu_string::secus_string");
 #else
-	    mem = new (nothrow) U_I[*allocated_size];
+	    mem = new (nothrow) char[*allocated_size];
 	    if(mem == nullptr)
 		throw Ememory("secu_string::secus_string");
 #endif
