@@ -131,7 +131,9 @@ namespace libdar
 
     void statistics::move_from(statistics && ref) noexcept
     {
+#if MUTEX_WORKS
 	swap(lock_mutex, ref.lock_mutex);
+#endif
 	swap(locking, ref.locking);
 	treated = move(ref.treated);
 	hard_links = move(ref.hard_links);
