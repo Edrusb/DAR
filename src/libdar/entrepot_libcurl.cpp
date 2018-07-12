@@ -103,6 +103,8 @@ namespace libdar
     {
 #if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	return pimpl->get_full_path();
+#else
+	return path("/");
 #endif
     }
 
