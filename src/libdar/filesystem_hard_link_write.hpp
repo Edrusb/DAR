@@ -85,8 +85,11 @@ namespace libdar
         void corres_reset() { corres_write.clear(); };
 
 	    /// generate inode or make a hard link on an already restored or existing inode.
-        void make_file(const cat_nomme * ref,            ///< object to restore in filesystem
-		       const path & ou);                  ///< where to restore it
+
+	    /// \param[in] ref object to restore in filesystem
+	    /// \param[in] ou  where to restore it
+        void make_file(const cat_nomme * ref,
+		       const path & ou);
 
 	    /// add the given EA matching the given mask to the file pointed to by "e" and spot
 
