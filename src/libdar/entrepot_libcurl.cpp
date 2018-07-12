@@ -81,7 +81,7 @@ namespace libdar
 	}
 	NLS_SWAP_OUT;
 #else
-	throw Efeature("libcurl library");
+	throw Ecompilation("libcurl library");
 #endif
     }
 
