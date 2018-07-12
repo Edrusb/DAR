@@ -137,7 +137,7 @@ namespace libdar
 #if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	return pimpl->get_location();
 #else
-	return path("/");
+	throw Ecompilation("Elibcurl or libthreadar");
 #endif
     }
 
