@@ -85,6 +85,28 @@ namespace libdar
 #endif
     }
 
+    void entrepot_libcurl::set_location(const path & chemin)
+    {
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
+	pimpl->set_location(chemin);
+#endif
+    }
+
+    void entrepot_libcurl::set_root(const path & p_root)
+    {
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
+	pimpl->set_root(p_root);
+#endif
+    }
+
+    path entrepot_libcurl::get_full_path() const
+    {
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
+	return pimpl->get_full_path();
+#endif
+    }
+
+
     string entrepot_libcurl::get_url() const
     {
 #if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
@@ -107,6 +129,21 @@ namespace libdar
 	throw Efeature("libcurl library");
 #endif
     }
+
+    const path & entrepot_libcurl::get_location() const
+    {
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
+	return pimpl->get_location();
+#endif
+    }
+
+    const path & entrepot_libcurl::get_root() const
+    {
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
+	return pimpl->get_root();
+#endif
+    }
+
 
     void entrepot_libcurl::read_dir_reset() const
     {

@@ -84,19 +84,26 @@ namespace libdar
 
 
 	    /// defines the directory where to proceed to future open() -- this is a "chdir" semantics
-	void set_location(const path & chemin);
+	virtual void set_location(const path & chemin);
 
 	    /// defines the root to use if set_location is given a relative path
-	void set_root(const path & p_root) { if(p_root.is_relative()) throw Erange("entrepot::set_root", std::string(gettext("root's entrepot must be an absolute path: ")) + p_root.display()); root = p_root; };
+	virtual void set_root(const path & p_root);
+
+	    /// returns the full path of location
+
+	    /// \note this is equivalent to get_root()/get_location() if get_location() is relative path else get_location()
+	virtual path get_full_path() const;
+
+	    /// full path of current directory + anything necessary to provide URL formated information
+	virtual std::string get_url() const = 0;
 
 	    /// set default ownership for files to be created thanks to the open() methods
 	void set_user_ownership(const std::string & x_user) { user = x_user; };
 	void set_group_ownership(const std::string & x_group) { group = x_group; };
 
-	const path & get_location() const { return where; }; //< retreives relative to root path the current location points to
-	const path & get_root() const { return root; };      //< retrieves the given root location
-	path get_full_path() const; //< get_root()/get_location() if get_location() is relative, else get_location()
-	virtual std::string get_url() const = 0; //< defines an URL-like normalized full location of slices
+	virtual const path & get_location() const { return where; }; //< retreives relative to root path the current location points to
+	virtual const path & get_root() const { return root; };      //< retrieves the given root location
+
 	const std::string & get_user_ownership() const { return user; };
 	const std::string & get_group_ownership() const { return group; };
 

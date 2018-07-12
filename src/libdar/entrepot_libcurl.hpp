@@ -79,9 +79,14 @@ namespace libdar
 
 	    // inherited from class entrepot
 
+	virtual void set_location(const path & chemin) override;
+	virtual void set_root(const path & p_root) override;
+	virtual path get_full_path() const override;
 	    /// \note this is expected to have a double slash after the host:port
-	    /// like ftp://www.some.where:8021//tmp/sub/dir
+	    /// like ftp://www.some.where:8021//tmp/sub/dir5A
 	virtual std::string get_url() const override;
+	virtual const path & get_location() const override;
+	virtual const path & get_root() const override;
 	virtual void read_dir_reset() const override;
 	virtual bool read_dir_next(std::string & filename) const override;
 	virtual entrepot *clone() const override { return new (std::nothrow) entrepot_libcurl(*this); };
