@@ -5,7 +5,9 @@ from 2.5.15 to 2.5.16
   sparse file datastructure during a merging operation you need to
   set --sparse-file-min-size to a valuer larger than all file sizes
   contained in the archive (for example 1E for one exabyte)
-
+- bug fix: met when using compression and creating the archive to
+  dar's standard output (ssh) and leading files to be corrupted in the
+  archive and reported as such.
 
 from 2.5.14-bis to 2.5.15
 - fixing self report bug message met when trying to create an isolated

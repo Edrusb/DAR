@@ -158,6 +158,12 @@ namespace libdar
 	    tmp_next.unstack(next);
 	    if(!tmp_next.is_zero())
 		throw SRC_BUG;
+	    if(first_to_write > next && first_to_write != size)
+	    {
+		ref->skip(buffer_offset + next);
+		first_to_write = next;
+	    }
+
 	    return true;
 	}
 	else // skipping would lead the current position to be outside the buffer
@@ -391,7 +397,7 @@ namespace libdar
 	    if(need_flush_write())
 		first_to_write -= half;
 	    else
-		first_to_write = size;
+		first_to_write = size; // for read/read-write modes
 	    next -= half;
 	    last -= half;
 	}
