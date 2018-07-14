@@ -8,6 +8,9 @@ from 2.5.15 to 2.5.16
 - bug fix: met when using compression and creating the archive to
   dar's standard output (ssh) and leading files to be corrupted in the
   archive and reported as such.
+- optimisation of escape_sequence skippability (avoids trying skipping
+  and failing for some corner cases, when we can detect it does even
+  not worth trying)
 
 from 2.5.14-bis to 2.5.15
 - fixing self report bug message met when trying to create an isolated

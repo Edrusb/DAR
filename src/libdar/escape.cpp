@@ -281,16 +281,30 @@ namespace libdar
 
     bool escape::skippable(skippability direction, const infinint & amount)
     {
+	infinint new_amount = amount;
+
 	switch(get_mode())
 	{
 	case gf_read_only:
-	    return x_below->skippable(direction, amount);
+	    return x_below->skippable(direction, new_amount);
 	case gf_write_only:
 	case gf_read_write:
+	    switch(direction)
+	    {
+	    case skip_backward:
+		new_amount -= ESCAPE_SEQUENCE_LENGTH;
+		    // we read some bytes before to check fo escape sequence
+		break;
+	    case skip_forward:
+		break;
+	    default:
+		throw SRC_BUG;
+	    }
+
 	    if(direction == skip_forward)
 		return false;
 	    else
-		return x_below->skippable(direction, amount);
+		return x_below->skippable(direction, new_amount);
 	default:
 	    throw SRC_BUG;
 	}
