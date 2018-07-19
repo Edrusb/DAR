@@ -6,9 +6,14 @@ proposed patch adapted and integrated in this release (--ignored-as-symlink
 new feature). Big thank too to androlgenhald at sourceforge for feedback
 and security/encryption related hints.
 
+version 2.5.16
+--------------
+Thanks to Steve Bergman for bug report and to Mihai Moldovan for his
+help troubleshooting this issue.
+
 version 2.5.15
 --------------
-Thanks to Marco Falda for bug report
+Thanks to Marco Falda for bug report.
 
 version 2.5.14
 --------------
