@@ -1,7 +1,11 @@
+version 2.5.16
+--------------
+Thanks to Steve Bergman for bug report and to Mihai Moldovan for his
+help troubleshooting this issue.
+
 version 2.5.15
 --------------
-Thanks to Marco Falda for bug report. Thanks to Steve Bergman for bug
-report and to Mihai Moldovan for his help troubleshooting this problem.
+Thanks to Marco Falda for bug report.
 
 version 2.5.14
 --------------

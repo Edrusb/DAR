@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: DAR 2.5.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2018-04-27 23:11+0200\n"
+"POT-Creation-Date: 2018-07-19 09:14+0200\n"
 "PO-Revision-Date: 2018-04-27 23:15+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -6698,15 +6698,15 @@ msgstr "Sauve à nouveau mais sans compression: "
 msgid "Adding %S to archive: %S"
 msgstr "Ajout du %S à l'archive : %S"
 
-#: src/libdar/filtre.cpp:2819
+#: src/libdar/filtre.cpp:2826
 msgid "Copied data does not match CRC"
 msgstr "Les données copiées ne correspondent pas au CRC"
 
-#: src/libdar/filtre.cpp:2940
+#: src/libdar/filtre.cpp:2947
 msgid " : Failed resaving uncompressed the inode data"
 msgstr " : Echec de la sauvegarde sans compression des données de l'inode"
 
-#: src/libdar/filtre.cpp:2950
+#: src/libdar/filtre.cpp:2957
 msgid ""
 " : Resaving uncompressed the inode data to gain space is not possible, "
 "keeping data compressed"
@@ -6714,7 +6714,7 @@ msgstr ""
 "Resauver sans compression les données de l'inode pour gagner de la place "
 "n'est pas possible, on conserve les données compressées"
 
-#: src/libdar/filtre.cpp:2973
+#: src/libdar/filtre.cpp:2980
 #, c-format
 msgid ""
 "File has disappeared while we were reading it, cannot check whether it has "
@@ -6723,13 +6723,13 @@ msgstr ""
 "Le fichier a disparu alors que nous étions en train de le lire, impossible "
 "de vérifier s'il a changé lors de sa sauvegarde : %S"
 
-#: src/libdar/filtre.cpp:3008
+#: src/libdar/filtre.cpp:3015
 #, c-format
 msgid ""
 "WARNING! File modified while reading it for backup. Performing retry %i of %i"
 msgstr "ATTENTION ! Fichier modifié pendant sa sauvegarde. Tentative %i sur %i"
 
-#: src/libdar/filtre.cpp:3024
+#: src/libdar/filtre.cpp:3031
 msgid ""
 "WARNING! File modified while reading it for backup. No more retry for that "
 "file to not exceed the wasted byte limit. File is "
@@ -6738,27 +6738,27 @@ msgstr ""
 "nouvelle tentative pour ce fichier afin de de pas dépasser la taille "
 "maximale de gaspillage autorisée. Le fichier est "
 
-#: src/libdar/filtre.cpp:3031
+#: src/libdar/filtre.cpp:3038
 msgid ""
 "WARNING! File modified while reading it for backup, but no more retry "
 "allowed: "
 msgstr ""
 "ATTENTION ! Fichier modifié pendant sa sauvegarde, plus de nouvelle tentative"
 
-#: src/libdar/filtre.cpp:3091
+#: src/libdar/filtre.cpp:3098
 msgid "Saving Extended Attributes for "
 msgstr "Sauvegarde des Attributs Étendus de "
 
-#: src/libdar/filtre.cpp:3158
+#: src/libdar/filtre.cpp:3165
 msgid "Error saving Extended Attributes for "
 msgstr "Erreur lors de la sauvegarde des Attributs Étendus de "
 
-#: src/libdar/filtre.cpp:3190
+#: src/libdar/filtre.cpp:3197
 msgid "Saving Filesystem Specific Attributes for "
 msgstr ""
 "Sauvegarde des attributs spécifiques au système de fichier Étendus pour "
 
-#: src/libdar/filtre.cpp:3248
+#: src/libdar/filtre.cpp:3255
 msgid "Error saving Filesystem Specific Attributes for "
 msgstr "Erreur lors de la sauvegarde des FSA de "
 
@@ -6773,7 +6773,7 @@ msgstr ""
 "L'ajout explicite d'une séquence d'échappement de type seqt_not_a_sequence "
 "est interdit"
 
-#: src/libdar/escape.cpp:874
+#: src/libdar/escape.cpp:888
 msgid "Unknown escape sequence type"
 msgstr "Type de séquence d'échappement inconnue"
 
