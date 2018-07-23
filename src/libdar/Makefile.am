@@ -17,6 +17,12 @@ clean-local:
 	rm -f libdar.pc
 endif
 
+if WITH_LIBTHREADAR
+    LIBTHREADAR_DEP_MODULES=generic_thread.cpp slave_thread.cpp messaging.cpp
+else
+    LIBTHREADAR_DEP_MODULES=
+endif
+
 if BUILD_MODE32
   MYLIB=libdar32.la
   AM_CPPFLAGS=-DLIBDAR_MODE=32 -DDAR_LOCALEDIR=\"$(localedir)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS) $(DEBUG_CXXFLAGS)
@@ -37,12 +43,6 @@ else
     LIBDAR_SUFFIX=
     LIBDAR_MODE=
 endif
-endif
-
-if WITH_LIBTHREADAR
-    LIBTHREADAR_DEP_MODULES=generic_thread.cpp slave_thread.cpp messaging.cpp
-else
-    LIBTHREADAR_DEP_MODULES=
 endif
 
 AM_LDFLAGS = $(LTLIBINTL) $(LD_PROF) $(GPGME_LIBS) $(LIBCURL_LIBS) $(LIBTHREADAR_LIBS) $(CXXSTDFLAGS) $(DEBUG_LDFLAGS)

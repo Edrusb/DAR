@@ -399,7 +399,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C"
                                      } // externe "C"
                                    ]],
                                    [[
-                                        char *ptr = strerror_r(0, nullptr, 0);
+                                        char *ptr = strerror_r(0, 0, 0);
                                    ]])
                   ],
                   [ AC_DEFINE(HAVE_STRERROR_R_CHAR_PTR, 1, [strerror_r() returns a char *])
@@ -1070,31 +1070,31 @@ AC_ARG_ENABLE(  [thread-safe],
                                                          #endif
                                                 }]],
                                                 [[ #if HAVE_CTIME_R
-                                                     char *val1 = ctime_r(nullptr, nullptr);
+                                                     char *val1 = ctime_r(0, 0);
                                                    #else
                                                      error(); // should not compile as expected
                                                    #endif
 
                                                    #if HAVE_GETGRNAM_R
-                                                     int val2 = getgrnam_r(0, nullptr, nullptr, 0, nullptr);
+                                                     int val2 = getgrnam_r(0, 0, 0, 0, 0);
                                                    #else
                                                      error(); // should not compile as expected
                                                    #endif
 
                                                    #if HAVE_GETPWNAM_R
-                                                     int val3 = getpwnam_r(nullptr, nullptr, nullptr, 0, nullptr);
+                                                     int val3 = getpwnam_r(0, 0, 0, 0, 0);
                                                    #else
                                                      error(); // should not compile as expected
                                                    #endif
 
                                                    #if HAVE_LOCALTIME_R
-                                                     struct tm *val4 = localtime_r(nullptr, nullptr);
+                                                     struct tm *val4 = localtime_r(0, 0);
                                                    #else
                                                      error(); // should not compile as expected
                                                    #endif
 
                                                    #if HAVE_READDIR_R
-                                                     int val5 = readdir_r(nullptr, nullptr, nullptr);
+                                                     int val5 = readdir_r(0, 0, 0);
                                                    #else
                                                      error(); // should not compile as expected
                                                    #endif
@@ -1215,46 +1215,58 @@ AC_ARG_ENABLE( [threadar],
                PKG_CHECK_EXISTS(libthreadar,
                                 [
                                   PKG_CHECK_MODULES(LIBTHREADAR, libthreadar, [], [AC_MSG_ERROR([libthreadar not found, but reported to exist !?!])])
-                                  LIBS="$LIBS $LIBTHREADAR_LIBS"
-                                  AC_DEFINE(HAVE_LIBTHREADAR, 1, [libthreadar library availability])
                                 ],
                                 [
                                   AC_CHECK_LIB(threadar, [for_autoconf], [], [])
                                 ])
-
 	       CPPFLAGS__cache="$CPPFLAGS"
 	       CPPFLAGS="$LIBTHREADAR_CFLAGS $CPPFLAGS"
 	       CXXFLAGS__cache="$CXXFLAGS"
 	       CXXFLAGS="$LIBTHREADAR_CFLAGS $CXXFLAGS"
 	       LIBS___cache="$LIBS"
 	       LIBS="$LIBTHREADAR_LIBS $LIBS"
-               AC_CHECK_HEADER(libthreadar/libthreadar.hpp,
-				[ AC_DEFINE(HAVE_LIBTHREADAR_LIBTHREADAR_HPP, 1, [libthreadar.h header file availability]) ],
-				[ AC_MSG_WARN([Cannot find libthreadar.h header file]) ])
-               AC_MSG_CHECKING([for libthreadar() operationality])
-               AC_LINK_IFELSE([AC_LANG_PROGRAM(  [[
+	       AC_CHECK_HEADER(libthreadar/libthreadar.hpp,
+	                       [ AC_DEFINE(HAVE_LIBTHREADAR_LIBTHREADAR_HPP, 1, [libthreadar.h header file availability]) ],
+			       [ AC_MSG_WARN([Cannot find libthreadar.h header file]) ]
+			      )
+               AC_MSG_CHECKING([for libthreadar() operationability])
+               AC_RUN_IFELSE([AC_LANG_PROGRAM( [[
                                     #if HAVE_LIBTHREADAR_LIBTHREADAR_HPP
                                     #include <libthreadar/libthreadar.hpp>
                                     #endif
+				    #include <iostream>
                                    ]],
                                    [[
                                         class mythread: public libthreadar::thread
                                         {
+					public:
+  					    mythread(int x): myx(x) {};
+					    int getx() const { return myx; };
+
                                         protected:
-                                            virtual void inherited_run() {};
+                                            virtual void inherited_run() { --myx; };
+
+					private:
+					   int myx;
                                         };
 
-                                        mythread toto;
+                                        mythread toto(10);
 
                                         toto.run();
                                         toto.join();
+					toto.getx();
+					std::cout << "ok" << std::endl;
                                    ]])
                                ],
-                               [ AC_DEFINE(LIBTHREADAR_AVAILABLE, 1, [when libthreadar could be found and linked against])
+                               [
                                  local_threadar=yes
-                                 AC_MSG_RESULT(ok)
+				 AC_DEFINE(LIBTHREADAR_AVAILABLE, 1, [when libthreadar could be found and linked against])
+                                 AC_MSG_RESULT(fine)
                                ],
-                               [ AC_MSG_RESULT(missing) ]
+                               [
+			         local_threadar=no
+				 AC_MSG_RESULT(wrong)
+			       ]
                              )
 	      CPPFLAGS="$CPPFLAGS___cache"
 	      unset CPPFLAGS___cache
@@ -1264,11 +1276,12 @@ AC_ARG_ENABLE( [threadar],
 	      unset LIBS___cache
               ])
 
-
-MEM_LDFLAGS=$LDFLAGS
-MEM_CXXFLAGS=$CXXFLAGS
-LDFLAGS="-static $LIBS $MEM_LDFLAGS $GPGME_LIBS"
-CXXFLAGS="$CXXFLAGS $GPGME_CFLAGS"
+CPPFLAGS__cache="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS $GPGME_CFLAGS $LIBCURL_CFLAGS $LIBTHREADAR_CFLAGS $CXXSTDFLAGS"
+CXXFLAGS__cache="$CXXFLAGS"
+CXXFLAGS="$CXXFLAGS"
+LIBS___cache="$LIBS"
+LIBS="$LIBS $GPGME_LIBS $LIBCURL_LIBS $LIBTHREADAR_LIBS $CXXSTDFLAGS $DEBUG_LDFLAGS"
 AC_MSG_CHECKING([static linking])
 AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                                 #if HAVE_STDIO_H
@@ -1292,7 +1305,7 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                   int size = backtrace(buffer, buf_size);
                                   char **symbols = backtrace_symbols(buffer, size);
 
-                                  if(symbols != nullptr)
+                                  if(symbols != 0)
                                     free(symbols);
                                #endif
                                #if MUTEX_WORKS
@@ -1317,10 +1330,12 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                  AC_MSG_RESULT([failed])
                  static_pb="yes"
                ])
-LDFLAGS=$MEM_LDFLAGS
-CXXFLAGS=$MEM_CXXFLAGS
-unset MEM_LDFLAGS
-unset MEM_CXXFLAGS
+CPPFLAGS="$CPPFLAGS___cache"
+unset CPPFLAGS___cache
+CXXFLAGS="$CXXFLAGS___cache"
+unset CXXFLAGS___cache
+LIBS="$LIBS___cache"
+unset LIBS___cache
 
 AM_CONDITIONAL([MAKE_ALL_DIR], [test $examples = "yes"])
 AM_CONDITIONAL([BUILD_DAR_STATIC], [test $build_static = "yes" -a $static_pb = "no"])
