@@ -122,6 +122,9 @@ namespace libdar
 	    /// returns whether libthreadar linking will be done, allowing libdar to span several threads
 	bool libthreadar() noexcept;
 
+	    /// return libthreadar version or empty string libthreadar is not available
+	std::string libthreadar_version() noexcept;
+
 	    /// returns whether delta compression is available and delta diff stuff with it
 	bool librsync() noexcept;
 

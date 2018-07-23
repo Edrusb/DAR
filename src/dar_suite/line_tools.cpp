@@ -1331,6 +1331,7 @@ void line_tools_display_features(user_interaction & dialog)
     {
 	const char *endy = nullptr;
 	string time_accuracy = "";
+	string threadar_version = "";
 
 	dialog.printf(gettext("   Libz compression (gzip)      : %s"), YES_NO(compile_time::libz()));
 	dialog.printf(gettext("   Libbz2 compression (bzip2)   : %s"), YES_NO(compile_time::libbz2()));
@@ -1379,7 +1380,11 @@ void line_tools_display_features(user_interaction & dialog)
 	    time_accuracy = "1 s";
 	dialog.printf(gettext("   Timestamp write accuracy     : %S"), &time_accuracy);
 	dialog.printf(gettext("   Restores dates of symlinks   : %s"), YES_NO(compile_time::symlink_restore_dates()));
-	dialog.printf(gettext("   Can uses multiple threads    : %s"), YES_NO(compile_time::libthreadar()));
+	if(compile_time::libthreadar())
+	    threadar_version = string("(") + compile_time::libthreadar_version() + ")";
+	else
+	    threadar_version = "";
+	dialog.printf(gettext("   Multiple threads (libthreads): %s %s"), YES_NO(compile_time::libthreadar()), threadar_version.c_str());
 	dialog.printf(gettext("   Delta compression support    : %s"), YES_NO(compile_time::librsync()));
 	dialog.printf(gettext("   Remote repository support    : %s"), YES_NO(compile_time::remote_repository()));
     }

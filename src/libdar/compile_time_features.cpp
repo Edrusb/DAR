@@ -23,7 +23,11 @@
 
 #include "integers.hpp"
 #include "infinint.hpp"
+#include "tools.hpp"
 #include "compile_time_features.hpp"
+#if HAVE_LIBTHREADAR_LIBTHREADAR_HPP
+#include <libthreadar/libthreadar.hpp>
+#endif
 
 namespace libdar
 {
@@ -236,6 +240,19 @@ namespace libdar
 	    return false;
 #endif
 	}
+
+	std::string libthreadar_version() noexcept
+	{
+	    std::string ret = "";
+#ifdef LIBTHREADAR_AVAILABLE
+	    unsigned int min, med, maj;
+
+	    libthreadar::get_version(maj, med, min);
+	    ret = tools_printf("%d.%d.%d", maj, med, min);
+#endif
+	    return ret;
+	}
+
 
 	bool librsync() noexcept
 	{
