@@ -20,6 +20,7 @@
 /*********************************************************************/
 
 #include "../my_config.h"
+#include "nls_swap.hpp"
 
 extern "C"
 {
@@ -168,23 +169,46 @@ namespace libdar
 			       const std::string & execute,
 			       const infinint & min_digits)
     {
-	pimpl.reset(new (nothrow) i_libdar_slave(dialog,
-						 folder,
-						 basename,
-						 extension,
-						 input_pipe_is_fd,
-						 input_pipe,
-						 output_pipe_is_fd,
-						 output_pipe,
-						 execute,
-						 min_digits));
+	NLS_SWAP_IN;
+        try
+        {
+	    pimpl.reset(new (nothrow) i_libdar_slave(dialog,
+						     folder,
+						     basename,
+						     extension,
+						     input_pipe_is_fd,
+						     input_pipe,
+						     output_pipe_is_fd,
+						     output_pipe,
+						     execute,
+						     min_digits));
 
-	if(!pimpl)
-	    throw Ememory("libdar_slave::libdar_slave");
+	    if(!pimpl)
+		throw Ememory("libdar_slave::libdar_slave");
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
     }
 
     libdar_slave::~libdar_slave() = default;
 
-    void libdar_slave::run() { pimpl->run(); }
+    void libdar_slave::run()
+    {
+	NLS_SWAP_IN;
+        try
+        {
+	    pimpl->run();
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }
 
 } // end of namespace

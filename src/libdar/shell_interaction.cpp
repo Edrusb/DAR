@@ -112,68 +112,78 @@ namespace libdar
 					 ostream & interact,
 					 bool silent): output(&out), inter(&interact)
     {
-	has_terminal = false;
-	beep = false;
-	at_once = 0;
-	count = 0;
+	NLS_SWAP_IN;
+        try
+        {
+	    has_terminal = false;
+	    beep = false;
+	    at_once = 0;
+	    count = 0;
 
-	    // looking for an input terminal
-	    //
-	    // we do not use anymore standart input but open a new descriptor
-	    // from the controlling terminal. This allow in some case to keep use
-	    // standart input for piping data while still having user interaction
-	    // possible.
+		// looking for an input terminal
+		//
+		// we do not use anymore standart input but open a new descriptor
+		// from the controlling terminal. This allow in some case to keep use
+		// standart input for piping data while still having user interaction
+		// possible.
 
 
-	    // terminal settings
-	try
-	{
-	    char tty[L_ctermid+1];
-	    struct termios term;
-
-	    (void)ctermid(tty);
-	    tty[L_ctermid] = '\0';
-
-	    input = ::open(tty, O_RDONLY|O_TEXT);
-	    if(input < 0)
-		throw Erange("",""); // used locally
-	    else
+		// terminal settings
+	    try
 	    {
-		if(silent)
-		    has_terminal = false; // force non interactive mode
+		char tty[L_ctermid+1];
+		struct termios term;
+
+		(void)ctermid(tty);
+		tty[L_ctermid] = '\0';
+
+		input = ::open(tty, O_RDONLY|O_TEXT);
+		if(input < 0)
+		    throw Erange("",""); // used locally
 		else
-			// preparing input for swaping between char mode and line mode (terminal settings)
-		    if(tcgetattr(input, &term) >= 0)
-		    {
-			initial = term;
-			initial_noecho = term;
-			initial_noecho.c_lflag &= ~ECHO;
-			term.c_lflag &= ~ICANON;
-			term.c_lflag &= ~ECHO;
-			term.c_cc[VTIME] = 0;
-			term.c_cc[VMIN] = 1;
-			interaction = term;
+		{
+		    if(silent)
+			has_terminal = false; // force non interactive mode
+		    else
+			    // preparing input for swaping between char mode and line mode (terminal settings)
+			if(tcgetattr(input, &term) >= 0)
+			{
+			    initial = term;
+			    initial_noecho = term;
+			    initial_noecho.c_lflag &= ~ECHO;
+			    term.c_lflag &= ~ICANON;
+			    term.c_lflag &= ~ECHO;
+			    term.c_cc[VTIME] = 0;
+			    term.c_cc[VMIN] = 1;
+			    interaction = term;
 
-			    // checking now that we can change to character mode
-			set_term_mod(m_inter);
-			set_term_mod(m_initial);
-			    // but we don't need it right now, so swapping back to line mode
-			has_terminal = true;
-		    }
-		    else // failed to retrieve parameters from tty
-			throw Erange("",""); // used locally
+				// checking now that we can change to character mode
+			    set_term_mod(m_inter);
+			    set_term_mod(m_initial);
+				// but we don't need it right now, so swapping back to line mode
+			    has_terminal = true;
+			}
+			else // failed to retrieve parameters from tty
+			    throw Erange("",""); // used locally
+		}
 	    }
-	}
-	catch(Erange & e)
-	{
-	    if(e.get_message() == "")
+	    catch(Erange & e)
 	    {
-		if(!silent)
-		    message(gettext("No terminal found for user interaction. All questions will be assumed a negative answer (less destructive choice), which most of the time will abort the program."));
+		if(e.get_message() == "")
+		{
+		    if(!silent)
+			message(gettext("No terminal found for user interaction. All questions will be assumed a negative answer (less destructive choice), which most of the time will abort the program."));
+		}
+		else
+		    throw;
 	    }
-	    else
-		throw;
 	}
+        catch(...)
+        {
+            NLS_SWAP_OUT;
+            throw;
+        }
+        NLS_SWAP_OUT;
     }
 
 	/// copy constructor
@@ -215,58 +225,77 @@ namespace libdar
 
     void shell_interaction::read_char(char & a)
     {
-	sigset_t old_mask;
+	NLS_SWAP_IN;
+        try
+        {
+	    sigset_t old_mask;
 
-	if(input < 0)
-	    throw SRC_BUG;
+	    if(input < 0)
+		throw SRC_BUG;
 
-	tools_block_all_signals(old_mask);
-	set_term_mod(m_inter);
-	if(read(input, &a, 1) < 0)
-	    throw Erange("shell_interaction_read_char", string(gettext("Error reading character: ")) + strerror(errno));
-	tools_blocking_read(input, true);
-	set_term_mod(m_initial);
-	tools_set_back_blocked_signals(old_mask);
+	    tools_block_all_signals(old_mask);
+	    set_term_mod(m_inter);
+	    if(read(input, &a, 1) < 0)
+		throw Erange("shell_interaction_read_char", string(gettext("Error reading character: ")) + strerror(errno));
+	    tools_blocking_read(input, true);
+	    set_term_mod(m_initial);
+	    tools_set_back_blocked_signals(old_mask);
+	}
+        catch(...)
+        {
+            NLS_SWAP_OUT;
+            throw;
+        }
+        NLS_SWAP_OUT;
     }
-
 
     void shell_interaction::archive_show_contents(const archive & ref, const archive_options_listing_shell & options)
     {
-	archive_listing_sizes_in_bytes = options.get_sizes_in_bytes();
-	archive_listing_display_ea = options.get_display_ea();
-	all_slices.clear();
-	marge = "";
+	NLS_SWAP_IN;
+        try
+        {
+	    archive_listing_sizes_in_bytes = options.get_sizes_in_bytes();
+	    archive_listing_display_ea = options.get_display_ea();
+	    all_slices.clear();
+	    marge = "";
 
-	switch(options.get_list_mode())
-	{
-	case archive_options_listing_shell::normal:
-	    printf(gettext("[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size    |          Date                 |    filename"));
-	    printf(        "--------------------------------+------------+-------+-------+---------+-------------------------------+------------");
-	    ref.op_listing(archive_listing_callback_tar, this, options);
-	    break;
-	case archive_options_listing_shell::tree:
-	    printf(gettext("Access mode    | User | Group | Size   |          Date                 |[Data ][D][ EA  ][FSA][Compr][S]|   Filename"));
-	    printf(        "---------------+------+-------+--------+-------------------------------+--------------------------------+-----------");
-	    ref.op_listing(archive_listing_callback_tree, this, options);
-	    break;
-	case archive_options_listing_shell::xml:
-	    message("<?xml version=\"1.0\" ?>");
-	    message("<!DOCTYPE Catalog SYSTEM \"dar-catalog.dtd\">");
-	    message("<Catalog format=\"1.2\">");
-	    ref.op_listing(archive_listing_callback_xml, this, options);
-	    message("</Catalog>");
-	    break;
-	case archive_options_listing_shell::slicing:
-	    message("Slice(s)|[Data ][D][ EA  ][FSA][Compr][S]|Permission| Filemane");
-	    message("--------+--------------------------------+----------+-----------------------------");
-	    ref.op_listing(archive_listing_callback_slicing, this, options);
-	    message("-----");
-	    message(tools_printf("All displayed files have their data in slice range [%s]", all_slices.display().c_str()));
-	    message("-----");
-	    break;
-	default:
-	    throw SRC_BUG;
+	    switch(options.get_list_mode())
+	    {
+	    case archive_options_listing_shell::normal:
+		printf(gettext("[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size    |          Date                 |    filename"));
+		printf(        "--------------------------------+------------+-------+-------+---------+-------------------------------+------------");
+		ref.op_listing(archive_listing_callback_tar, this, options);
+		break;
+	    case archive_options_listing_shell::tree:
+		printf(gettext("Access mode    | User | Group | Size   |          Date                 |[Data ][D][ EA  ][FSA][Compr][S]|   Filename"));
+		printf(        "---------------+------+-------+--------+-------------------------------+--------------------------------+-----------");
+		ref.op_listing(archive_listing_callback_tree, this, options);
+		break;
+	    case archive_options_listing_shell::xml:
+		message("<?xml version=\"1.0\" ?>");
+		message("<!DOCTYPE Catalog SYSTEM \"dar-catalog.dtd\">");
+		message("<Catalog format=\"1.2\">");
+		ref.op_listing(archive_listing_callback_xml, this, options);
+		message("</Catalog>");
+		break;
+	    case archive_options_listing_shell::slicing:
+		message("Slice(s)|[Data ][D][ EA  ][FSA][Compr][S]|Permission| Filemane");
+		message("--------+--------------------------------+----------+-----------------------------");
+		ref.op_listing(archive_listing_callback_slicing, this, options);
+		message("-----");
+		message(tools_printf("All displayed files have their data in slice range [%s]", all_slices.display().c_str()));
+		message("-----");
+		break;
+	    default:
+		throw SRC_BUG;
+	    }
 	}
+        catch(...)
+        {
+            NLS_SWAP_OUT;
+            throw;
+        }
+        NLS_SWAP_OUT;
     }
 
     void shell_interaction::database_show_contents(const database & ref)
