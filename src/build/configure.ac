@@ -992,7 +992,7 @@ AC_ARG_ENABLE( [build-html],
                  groff="no"
                ],
                [ AC_CHECK_PROG(doxygen, doxygen, [yes], [no], [$PATH])
-                   AC_MSG_CHECKING([for doxygen version])
+                 AC_MSG_CHECKING([for doxygen version])
                    if test "$doxygen" = "yes" ; then
                        n1=`doxygen --version | cut -d '.' -f 1`
                        n2=`doxygen --version | cut -d '.' -f 2`
@@ -1003,6 +1003,7 @@ AC_ARG_ENABLE( [build-html],
                            doxygen="no"
                        fi
                    fi
+		 AC_CHECK_PROG(dot, dot, [YES], [NO], [$PATH])
                  AC_CHECK_PROG(tmp, man, [yes], [no], [$PATH])
                  if test "$tmp" = "yes" ; then
                     AC_CHECK_PROG(groff, groff, [yes], [no], [$PATH])
@@ -1351,6 +1352,7 @@ AM_CONDITIONAL([WITH_LIBTHREADAR], [test "$local_threadar" = "yes"])
 AC_SUBST([CXXSTDFLAGS], [$CXXSTDFLAGS])
 AC_SUBST(UPX_PROG, [upx])
 AC_SUBST(DOXYGEN_PROG, [doxygen])
+AC_SUBST(HAS_DOT, [$dot])
 
 if test "$debug_static" = "yes" ; then
 AC_SUBST(DEBUG_CXXFLAGS, [$DEBUG_CXXFLAGS])
