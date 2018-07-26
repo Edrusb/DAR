@@ -472,9 +472,19 @@ namespace libdar
 	    if(files == nullptr)
 		throw SRC_BUG;
 
+	    if(callback == nullptr)
+		throw Erange("database::i_database::show_most_recent_stats", "nullptr provided as user callback function");
+
 	    files->compute_most_recent_stats(stats_data, stats_ea, total_data, total_ea);
-	    for(archive_num i = 1; i < coordinate.size(); ++i)
-		callback(context, i, stats_data[i], total_data[i], stats_ea[i], total_ea[i]);
+	    try
+	    {
+		for(archive_num i = 1; i < coordinate.size(); ++i)
+		    callback(context, i, stats_data[i], total_data[i], stats_ea[i], total_ea[i]);
+	    }
+	    catch(...)
+	    {
+		throw Elibcall("database::i_database::show_most_recent_stats", "user provided callback should not throw any exception");
+	    }
 	}
 	catch(...)
 	{

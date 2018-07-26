@@ -94,7 +94,7 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    if(x_message_callback == nullptr || x_answer_callback == nullptr)
+	    if(x_message_callback == nullptr || x_answer_callback == nullptr || x_string_callback == nullptr || x_secu_string_callback == nullptr)
 		throw Elibcall("user_interaction_callback::user_interaction_callback", dar_gettext("nullptr given as argument of user_interaction_callback()"));
 	    message_cb = x_message_callback;
 	    pause_cb  = x_answer_callback;
@@ -115,7 +115,16 @@ namespace libdar
         if(message_cb == nullptr)
 	    throw SRC_BUG;
         else
-	    (*message_cb)(message, context_val);
+	{
+	    try
+	    {
+		(*message_cb)(message, context_val);
+	    }
+	    catch(...)
+	    {
+		throw Elibcall("user_interaction_callback::inherited_message", "user provided callback function (user_interaction_callback/message) should not throw any exception");
+	    }
+	}
     }
 
     bool user_interaction_callback::inherited_pause(const string & message)
@@ -123,14 +132,33 @@ namespace libdar
         if(pause_cb == nullptr)
 	    throw SRC_BUG;
         else
-	    return (*pause_cb)(message, context_val);
+	{
+	    try
+	    {
+		return (*pause_cb)(message, context_val);
+	    }
+	    catch(...)
+	    {
+		throw Elibcall("user_interaction_callback::inherited_pause", "user provided callback function (user_interaction_callback/pause) should not throw any exception");
+	    }
+	}
     }
+
     string user_interaction_callback::inherited_get_string(const string & message, bool echo)
     {
 	if(get_string_cb == nullptr)
 	    throw SRC_BUG;
 	else
-	    return (*get_string_cb)(message, echo, context_val);
+	{
+	    try
+	    {
+		return (*get_string_cb)(message, echo, context_val);
+	    }
+	    catch(...)
+	    {
+		throw Elibcall("user_interaction_callback::inherited_get_string", "user provided callback function (user_interaction_callback/get_string) should not throw any exception");
+	    }
+	}
     }
 
     secu_string user_interaction_callback::inherited_get_secu_string(const string & message, bool echo)
@@ -138,7 +166,16 @@ namespace libdar
 	if(get_secu_string_cb == nullptr)
 	    throw SRC_BUG;
 	else
-	    return (*get_secu_string_cb)(message, echo, context_val);
+	{
+	    try
+	    {
+		return (*get_secu_string_cb)(message, echo, context_val);
+	    }
+	    catch(...)
+	    {
+		throw Elibcall("user_interaction_callback::inherited_get_secu_string", "user provided callback function (user_interaction_callback/get_secu_string) should not throw any exception");
+	    }
+	}
     }
 
 } // end of namespace

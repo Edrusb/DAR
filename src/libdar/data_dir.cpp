@@ -409,7 +409,19 @@ namespace libdar
 	    ea = lo_ea == db_lookup::found_present && (ou_ea == num || num == 0);
 	    name = marge + (*it)->get_name();
 	    if(data || ea || num == 0)
-		callback(tag, name, data, ea);
+	    {
+		if(callback == nullptr)
+		    throw Erange("data_dir::show", "nullptr provided as user callback function");
+
+		try
+		{
+		    callback(tag, name, data, ea);
+		}
+		catch(...)
+		{
+		    throw Elibcall("data_dir::show", "user provided callback function should not throw any exception");
+		}
+	    }
 	    if(dir != nullptr)
 		dir->show(callback, tag, num, name + "/");
 	    ++it;

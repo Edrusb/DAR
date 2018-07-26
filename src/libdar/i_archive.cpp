@@ -1621,6 +1621,9 @@ namespace libdar
     {
 	bool ret;
 
+	if(callback == nullptr)
+	    throw Erange("archive::i_archive::get_children_of", "nullptr provided as user callback function");
+
 	if(fetch_ea && sequential_read)
 	    throw Erange("archive::i_archive::get_children_of", gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
 	load_catalogue();
@@ -1631,7 +1634,16 @@ namespace libdar
 
 	ret = (it != tmp.end());
 	while(it != tmp.end())
-	    callback(dir, *it, context);
+	{
+	    try
+	    {
+		callback(dir, *it, context);
+	    }
+	    catch(...)
+	    {
+		throw Elibcall("archive::i_archive::get_children_of", "user provided callback function should not throw any exception");
+	    }
+	}
 
 	return ret;
     }

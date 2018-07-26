@@ -1030,14 +1030,24 @@ namespace libdar
 	if(ea == nullptr)
 	    has_ea_date = false;
 
-	callback(tag,
-		 num,
-		 data_presence,
-		 has_data_date,
-		 has_data_date ? *data : datetime(0),
-		 ea_presence,
-		 has_ea_date,
-		 has_ea_date ? *ea : datetime(0));
+	if(callback == nullptr)
+	    throw Erange("data_tree::display_line", "nullptr given as callback function");
+
+	try
+	{
+	    callback(tag,
+		     num,
+		     data_presence,
+		     has_data_date,
+		     has_data_date ? *data : datetime(0),
+		     ea_presence,
+		     has_ea_date,
+		     has_ea_date ? *ea : datetime(0));
+	}
+	catch(...)
+	{
+	    throw Elibcall("data_tree::display_line", "provided callback function should not throw any exception");
+	}
     }
 
 
