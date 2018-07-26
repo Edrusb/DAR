@@ -806,10 +806,10 @@ EXCLUDE                = doc \
                          misc \
                          po \
                          src/testing \
-			 src/check\
-                         config.h \
+			 src/check \
+                         config\.h \
                          gettext.h \
-                         my_config.h
+                         my_config\.h
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
