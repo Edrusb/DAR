@@ -186,7 +186,7 @@ namespace libdar
 	static const U_32 sizeof_field = sizeof(B); // number of bytes
 
         enum endian { big_endian, little_endian, not_initialized };
-        typedef unsigned char group[TG];
+	using group = unsigned char[TG];
 
         static endian used_endian;
         static const U_I bytesize = sizeof(B);
