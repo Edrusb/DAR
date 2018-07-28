@@ -67,7 +67,7 @@ namespace libdar
     extern std::string fsa_nature_to_string(fsa_nature n);
 
 	/// set of fsa families
-    typedef std::set<fsa_family> fsa_scope;
+    using fsa_scope = std::set<fsa_family>;
 
 	/// provides a scope containing all FSA families
     extern fsa_scope all_fsa_families();
