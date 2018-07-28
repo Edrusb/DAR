@@ -32,7 +32,7 @@ using namespace std;
 namespace libdar
 {
 
-    typedef unsigned char chiffre;
+    using chiffre = unsigned char;
 
     static const U_I PAS = 5;
     static inline chiffre get_left(unsigned char a) { return (a & 0xF0) >> 4; }

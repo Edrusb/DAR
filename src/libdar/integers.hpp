@@ -48,18 +48,18 @@ extern "C"
 
 namespace libdar
 {
-    typedef unsigned char U_8;
-    typedef uint16_t U_16;
-    typedef uint32_t U_32;
-    typedef uint64_t U_64;
-    typedef size_t U_I;
+    using U_8 = unsigned char;
+    using U_16 = uint16_t;
+    using U_32 = uint32_t;
+    using U_64 = uint64_t;
+    using U_I = size_t;
 	// configure will define size_t as "unsigned int" if it not defined by system headers
 	// thus using U_I we are sure we can compare buffer sizes with SSIZE_MAX
-    typedef signed char S_8;
-    typedef int16_t S_16;
-    typedef int32_t S_32;
-    typedef int64_t S_64;
-    typedef signed int S_I;
+    using S_8 =  signed char;
+    using S_16 = int16_t;
+    using S_32 = int32_t;
+    using S_64 = int64_t;
+    using S_I = signed int;
 
 }
 
@@ -72,16 +72,16 @@ namespace libdar
 
 namespace libdar
 {
-    typedef unsigned char U_8;
-    typedef unsigned short U_16;
-    typedef unsigned long U_32;
-    typedef unsigned long long U_64;
-    typedef size_t U_I;
-    typedef signed char S_8;
-    typedef signed short S_16;
-    typedef signed long S_32;
-    typedef signed long long S_64;
-    typedef signed int S_I;
+    using U_8 = unsigned char;
+    using U_16 = unsigned short;
+    using U_32 = unsigned long;
+    using U_64 = unsigned long long;
+    using U_I = size_t;
+    using S_8 = signed char;
+    using S_16 = signed short;
+    using S_32 = signed long;
+    using S_64 = signed long long;
+    using S_I = signed int;
 
 }
 
@@ -90,16 +90,16 @@ namespace libdar
 
 namespace libdar
 {
-    typedef unsigned char U_8;
-    typedef unsigned short U_16;
-    typedef unsigned int U_32;
-    typedef unsigned long long U_64;
-    typedef size_t U_I;
-    typedef signed char S_8;
-    typedef signed short S_16;
-    typedef signed int S_32;
-    typedef signed long long S_64;
-    typedef signed int S_I;
+    using U_8 = unsigned char;
+    using U_16 = unsigned short;
+    using U_32 = unsigned int;
+    using U_64 = unsigned long long;
+    using U_I = size_t;
+    using S_8 = signed char;
+    using S_16 = signed short;
+    using S_32 = signed int;
+    using S_64 = signed long long;
+    using S_I = signed int;
 
 }
 

@@ -43,7 +43,7 @@ namespace libdar
 
     const U_32 SAUV_MAGIC_NUMBER = 123; // Why "SAUV_..." because SAUV was the name of DAR much before its first release :-)
 
-    typedef U_32 magic_number;
+    using magic_number = U_32;
 
     enum flag_type
     {

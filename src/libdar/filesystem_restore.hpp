@@ -89,13 +89,13 @@ namespace libdar
 	    /// reset the writing process for the current object
         void reset_write();
 
-	typedef enum
+	using action_done_for_data = enum
 	{
 	    done_data_restored,     //< data has been restored to filesystem
 	    done_no_change_no_data, //< no change in filesystem because no data present in archive
 	    done_no_change_policy,  //< no change in filesystem because of overwiting policy decision
 	    done_data_removed       //< data (= whole inode) removed from filesystem
-	} action_done_for_data;
+	};
 
 	    /// restore a libdar object to a filesystem entry both data and EA
 

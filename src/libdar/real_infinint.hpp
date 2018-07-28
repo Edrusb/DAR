@@ -147,7 +147,7 @@ namespace libdar
         static constexpr int TG = 4;
 
         enum endian { big_endian, little_endian, not_initialized };
-        typedef unsigned char group[TG];
+	using group = unsigned char[TG];
 
         storage *field;
 

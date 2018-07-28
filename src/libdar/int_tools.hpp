@@ -37,7 +37,7 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-    typedef unsigned char int_tools_bitfield[8];
+    using int_tools_bitfield = unsigned char[8];
 
     extern void int_tools_swap_bytes(unsigned char &a, unsigned char &b);
     extern void int_tools_swap_bytes(unsigned char *a, U_I size);
