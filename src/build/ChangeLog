@@ -1,20 +1,20 @@
 from 2.5.x to 2.6.0
 - new feature: support for binary delta in incremental backup
-- new feature: support ftp/sftp/scp to read an archive from a cloud storage.
+- new feature: support ftp/sftp to read an archive from a cloud storage.
   reading is optimized to not transfer a whole slice but only the needed
   part to proceed to the operation (restoration, listing, and so on)
-- new feature: support ftp/sftp/scp to write an archive eventually with hash
+- new feature: support ftp/sftp to write an archive eventually with hash
   files to a remote cloud storage
 - modified behavior: While creating a single sliced archive, DUC file is
-  executed unless user interrupted dar/libdar. This to stay coherent with
-  multi sliced archive behavior
+  now executed unless user interrupted dar/libdar. This to stay coherent
+  with multi sliced archive behavior
 - new feature: display filters nature (-vmasks option)
 - new feature: follow some symlinks as defined by the --ignored-as-symlink
   option
 - new feature: one can define the compression algorithm a dar_manager
-  database will use. This choice is done at database creation only using
-  new dar_manager's -z option. In particular -z none to avoid using
-  compression
+  database will use. This choice is only available at database creation
+  using the new dar_manager's -z option. In particular -z none to avoid
+  using compression
 - repair mode added to create a completed archive (suitable for direct
   access mode and merging) from an interrupted one
 - modified backup behavior use --modified-data-detection for old behavior
