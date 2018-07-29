@@ -1297,6 +1297,9 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                                 #if HAVE_PTHREAD_H
                                                 #include <pthread.h>
                                                 #endif
+						#if HAVE_LIBRSYNC_H
+						#include <librsync.h>
+						#endif
                                              }
                                ]],
                                [[
@@ -1318,6 +1321,13 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                  }
                                  pthread_mutex_destroy(&test);
                                #endif
+
+			       #if LIBRSYNC_AVAILABLE
+			       #ifdef RS_DEFAULT_STRONG_LEN
+			       	    job = rs_sig_begin(RS_DEFAULT_BLOCK_LEN, RS_DEFAULT_STRONG_LEN);
+			       #else
+				    job = rs_sig_begin(RS_DEFAULT_BLOCK_LEN, 0, RS_MD4_SIG_MAGIC);
+			       #endif
 
                                   printf("Hello World!");
                                   return 0;
