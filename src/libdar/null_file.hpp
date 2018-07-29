@@ -49,7 +49,7 @@ namespace libdar
     class null_file : public generic_file, public thread_cancellation
     {
     public :
-        null_file(gf_mode m) : generic_file(m) {};
+        null_file(gf_mode m) : generic_file(m) { set_offset(0); };
 	null_file(const null_file & ref) = default;
 	null_file(null_file && ref) noexcept = default;
 	null_file & operator = (const null_file & ref) = default;
@@ -57,10 +57,10 @@ namespace libdar
 	~null_file() = default;
 
 	virtual bool skippable(skippability direction, const infinint & amount) override { return true; };
-        virtual bool skip(const infinint &pos) override { return true; };
-        virtual bool skip_to_eof() override { return true; };
-        virtual bool skip_relative(signed int x) override { return false; };
-        virtual infinint get_position() const override { return 0; };
+        virtual bool skip(const infinint &pos) override { set_offset(pos); return true; };
+        virtual bool skip_to_eof() override { offset = max_offset; return true; };
+        virtual bool skip_relative(signed int x) override { return set_rel_offset(x); };
+        virtual infinint get_position() const override { return offset; };
 
     protected :
 	virtual void inherited_read_ahead(const infinint & amount) override {};
@@ -78,11 +78,47 @@ namespace libdar
 #ifdef MUTEX_WORKS
 	    check_self_cancellation();
 #endif
+	    set_offset(offset + siz);
 	};
 
 	virtual void inherited_sync_write() override {};
 	virtual void inherited_flush_read() override {};
 	virtual void inherited_terminate() override {};
+
+    private:
+	infinint offset;
+	infinint max_offset;
+
+	void set_offset(const infinint & x)
+	{
+	    if(x > max_offset)
+		max_offset = x;
+	    offset = x;
+	}
+
+	bool set_rel_offset(signed int x)
+	{
+	    if(x >= 0)
+	    {
+		set_offset(offset + x);
+		return true;
+	    }
+	    else // x < 0
+	    {
+		infinint tmp = -x;
+		if(tmp > offset)
+		{
+		    offset = 0;
+		    return false;
+		}
+		else
+		{
+		    offset -= tmp;
+		    return true;
+		}
+	    }
+	}
+
     };
 
 	/// @}
