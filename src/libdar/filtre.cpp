@@ -2848,7 +2848,8 @@ namespace libdar
 	    if(e_thread == nullptr && e_range == nullptr)
 		throw;
 
-	    cat.tail_catalogue_to_current_read();
+	    if(!repair_mode)
+		cat.tail_catalogue_to_current_read();
 	    cat.change_location(pdesc);
 	    if(pdesc.compr->is_compression_suspended())
 	    {
