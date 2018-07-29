@@ -788,10 +788,10 @@ AC_ARG_ENABLE( [libcurl-linking],
                           AC_CHECK_LIB(curl, [curl_global_init], [], [AC_MSG_WARN([libcurl library not found])])
                         ])
 
- 		  CPPFLAGS__cache="$CFLAGS"
-		  CPPFLAGS="$LIBCURL_CFLAGS $CPPFLAGS"
-		  LIBS___cache="$LIBS"
-		  LIBS="$LIBCURL_LIBS $LIBS"
+                  CPPFLAGS__cache="$CFLAGS"
+                  CPPFLAGS="$LIBCURL_CFLAGS $CPPFLAGS"
+                  LIBS___cache="$LIBS"
+                  LIBS="$LIBCURL_LIBS $LIBS"
                   AC_CHECK_HEADER(curl/curl.h,
                         [
                                 local_libcurl="yes"
@@ -818,10 +818,10 @@ AC_ARG_ENABLE( [libcurl-linking],
                  else
                         AC_MSG_WARN([remote repository support not available])
                  fi
-		 CPPFLAGS="$CPPFLAGS___cache"
-		 LIBS="$LIBS___cache"
-		 unset CPPFLAGS___cache
-		 unset LIBS___cache
+                 CPPFLAGS="$CPPFLAGS___cache"
+                 LIBS="$LIBS___cache"
+                 unset CPPFLAGS___cache
+                 unset LIBS___cache
                 ])
 
 AC_ARG_ENABLE(  [fadvise],
@@ -967,7 +967,7 @@ AC_ARG_ENABLE( [furtive-read],
 AC_ARG_ENABLE( [debug],
                 AC_HELP_STRING(--enable-debug, [build targets with debugging option and no optimization]),
                 [
-		        DEBUG_CXXFLAGS="-g -Wall"
+                        DEBUG_CXXFLAGS="-g -Wall"
                         DEBUG_CFLAGS="-g -Wall"
                         DEBUG_LDFLAGS="-g -Wall"
                         debug_static="yes"
@@ -1003,7 +1003,7 @@ AC_ARG_ENABLE( [build-html],
                            doxygen="no"
                        fi
                    fi
-		 AC_CHECK_PROG(dot, dot, [YES], [NO], [$PATH])
+                 AC_CHECK_PROG(dot, dot, [YES], [NO], [$PATH])
                  AC_CHECK_PROG(tmp, man, [yes], [no], [$PATH])
                  if test "$tmp" = "yes" ; then
                     AC_CHECK_PROG(groff, groff, [yes], [no], [$PATH])
@@ -1220,61 +1220,61 @@ AC_ARG_ENABLE( [threadar],
                                 [
                                   AC_CHECK_LIB(threadar, [for_autoconf], [], [])
                                 ])
-	       CPPFLAGS__cache="$CPPFLAGS"
-	       CPPFLAGS="$LIBTHREADAR_CFLAGS $CPPFLAGS"
-	       CXXFLAGS__cache="$CXXFLAGS"
-	       CXXFLAGS="$LIBTHREADAR_CFLAGS $CXXFLAGS"
-	       LIBS___cache="$LIBS"
-	       LIBS="$LIBTHREADAR_LIBS $LIBS"
-	       AC_CHECK_HEADER(libthreadar/libthreadar.hpp,
-	                       [ AC_DEFINE(HAVE_LIBTHREADAR_LIBTHREADAR_HPP, 1, [libthreadar.h header file availability]) ],
-			       [ AC_MSG_WARN([Cannot find libthreadar.h header file]) ]
-			      )
+               CPPFLAGS__cache="$CPPFLAGS"
+               CPPFLAGS="$LIBTHREADAR_CFLAGS $CPPFLAGS"
+               CXXFLAGS__cache="$CXXFLAGS"
+               CXXFLAGS="$LIBTHREADAR_CFLAGS $CXXFLAGS"
+               LIBS___cache="$LIBS"
+               LIBS="$LIBTHREADAR_LIBS $LIBS"
+               AC_CHECK_HEADER(libthreadar/libthreadar.hpp,
+                               [ AC_DEFINE(HAVE_LIBTHREADAR_LIBTHREADAR_HPP, 1, [libthreadar.h header file availability]) ],
+                               [ AC_MSG_WARN([Cannot find libthreadar.h header file]) ]
+                              )
                AC_MSG_CHECKING([for libthreadar() operationability])
                AC_RUN_IFELSE([AC_LANG_PROGRAM( [[
                                     #if HAVE_LIBTHREADAR_LIBTHREADAR_HPP
                                     #include <libthreadar/libthreadar.hpp>
                                     #endif
-				    #include <iostream>
+                                    #include <iostream>
                                    ]],
                                    [[
                                         class mythread: public libthreadar::thread
                                         {
-					public:
-  					    mythread(int x): myx(x) {};
-					    int getx() const { return myx; };
+                                        public:
+                                            mythread(int x): myx(x) {};
+                                            int getx() const { return myx; };
 
                                         protected:
                                             virtual void inherited_run() { --myx; };
 
-					private:
-					   int myx;
+                                        private:
+                                           int myx;
                                         };
 
                                         mythread toto(10);
 
                                         toto.run();
                                         toto.join();
-					toto.getx();
-					std::cout << "ok" << std::endl;
+                                        toto.getx();
+                                        std::cout << "ok" << std::endl;
                                    ]])
                                ],
                                [
                                  local_threadar=yes
-				 AC_DEFINE(LIBTHREADAR_AVAILABLE, 1, [when libthreadar could be found and linked against])
+                                 AC_DEFINE(LIBTHREADAR_AVAILABLE, 1, [when libthreadar could be found and linked against])
                                  AC_MSG_RESULT(fine)
                                ],
                                [
-			         local_threadar=no
-				 AC_MSG_RESULT(wrong)
-			       ]
+                                 local_threadar=no
+                                 AC_MSG_RESULT(wrong)
+                               ]
                              )
-	      CPPFLAGS="$CPPFLAGS___cache"
-	      unset CPPFLAGS___cache
-	      CXXFLAGS="$CXXFLAGS___cache"
-	      unset CXXFLAGS___cache
-	      LIBS="$LIBS___cache"
-	      unset LIBS___cache
+              CPPFLAGS="$CPPFLAGS___cache"
+              unset CPPFLAGS___cache
+              CXXFLAGS="$CXXFLAGS___cache"
+              unset CXXFLAGS___cache
+              LIBS="$LIBS___cache"
+              unset LIBS___cache
               ])
 
 CPPFLAGS__cache="$CPPFLAGS"
@@ -1297,9 +1297,9 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                                 #if HAVE_PTHREAD_H
                                                 #include <pthread.h>
                                                 #endif
-						#if HAVE_LIBRSYNC_H
-						#include <librsync.h>
-						#endif
+                                                #if HAVE_LIBRSYNC_H
+                                                #include <librsync.h>
+                                                #endif
                                              }
                                ]],
                                [[
@@ -1322,12 +1322,12 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                  pthread_mutex_destroy(&test);
                                #endif
 
-			       #if LIBRSYNC_AVAILABLE
-			       #ifdef RS_DEFAULT_STRONG_LEN
-			       	    job = rs_sig_begin(RS_DEFAULT_BLOCK_LEN, RS_DEFAULT_STRONG_LEN);
-			       #else
-				    job = rs_sig_begin(RS_DEFAULT_BLOCK_LEN, 0, RS_MD4_SIG_MAGIC);
-			       #endif
+                               #if LIBRSYNC_AVAILABLE
+                               #ifdef RS_DEFAULT_STRONG_LEN
+                                    job = rs_sig_begin(RS_DEFAULT_BLOCK_LEN, RS_DEFAULT_STRONG_LEN);
+                               #else
+                                    job = rs_sig_begin(RS_DEFAULT_BLOCK_LEN, 0, RS_MD4_SIG_MAGIC);
+                               #endif
 
                                   printf("Hello World!");
                                   return 0;
