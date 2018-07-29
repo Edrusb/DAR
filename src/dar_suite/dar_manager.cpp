@@ -179,7 +179,7 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
 
     if(!dialog)
 	throw SRC_BUG;
-    if(shelli != nullptr)
+    if(shelli == nullptr)
 	throw SRC_BUG;
 
     shelli->change_non_interactive_output(cout);
