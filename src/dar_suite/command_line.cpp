@@ -589,6 +589,8 @@ bool get_args(shared_ptr<user_interaction> & dialog,
 		dialog->message(gettext("-ah option is useless with -y option"));
 	    if(p.sequential_read)
 		throw Erange("get_args", gettext("--sequential-read is useless with -y option"));
+	    if(!p.use_sequential_marks)
+		throw Erange("get_args", gettext("--alter=tape-marks is impossible with -y option"));
 	}
 
             //////////////////////

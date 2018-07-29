@@ -838,7 +838,7 @@ namespace libdar
 			     0,                   // repeat_count
 			     0,                   // repeat_byte
 			     false,               // decremental
-			     options_repair.get_sequential_marks(),
+			     true,                // tape marks are mandatory in repair mode
 			     false,               // security_check
 			     0,                   // sparse_file_min_size (disabling hole detection)
 			     options_repair.get_user_comment(),

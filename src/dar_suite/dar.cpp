@@ -545,7 +545,6 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    repair_options.set_slice_permission(param.slice_perm);
 		    repair_options.set_slice_user_ownership(param.slice_user);
 		    repair_options.set_slice_group_ownership(param.slice_group);
-		    repair_options.set_sequential_marks(param.use_sequential_marks);
 		    repair_options.set_user_comment(param.user_comment);
 		    repair_options.set_hash_algo(param.hash);
 		    repair_options.set_slice_min_digits(param.num_digits);

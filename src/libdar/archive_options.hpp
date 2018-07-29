@@ -1682,9 +1682,6 @@ namespace libdar
 	    /// if not an empty string set the group ownership of slices accordingly
 	void set_slice_group_ownership(const std::string & slice_group_ownership) { x_slice_group_ownership = slice_group_ownership; };
 
-	    /// whether to add escape sequence aka tape marks to allow sequential reading of the archive
-	void set_sequential_marks(bool sequential) { x_sequential_marks = sequential; };
-
 	    /// specify a user comment in the archive (always in clear text!)
 	void set_user_comment(const std::string & comment) { x_user_comment = comment; };
 
@@ -1726,7 +1723,6 @@ namespace libdar
 	const std::string & get_slice_permission() const { return x_slice_permission; };
 	const std::string & get_slice_user_ownership() const { return x_slice_user_ownership; };
 	const std::string & get_slice_group_ownership() const { return x_slice_group_ownership; };
-	bool get_sequential_marks() const { return x_sequential_marks; };
 	const std::string & get_user_comment() const { return x_user_comment; };
 	hash_algo get_hash_algo() const { return x_hash; };
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
@@ -1754,7 +1750,6 @@ namespace libdar
 	std::string x_slice_permission;
 	std::string x_slice_user_ownership;
 	std::string x_slice_group_ownership;
-	bool x_sequential_marks;
 	std::string x_user_comment;
 	hash_algo x_hash;
 	infinint x_slice_min_digits;

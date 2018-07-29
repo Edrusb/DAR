@@ -1959,7 +1959,6 @@ namespace libdar
             x_slice_permission = "";
             x_slice_user_ownership = "";
             x_slice_group_ownership = "";
-            x_sequential_marks = true;
             x_user_comment = default_user_comment;
             x_hash = hash_algo::none;
             x_slice_min_digits = 0;
@@ -1998,7 +1997,6 @@ namespace libdar
 	x_slice_permission = ref.x_slice_permission;
 	x_slice_user_ownership = ref.x_slice_user_ownership;
 	x_slice_group_ownership = ref.x_slice_group_ownership;
-	x_sequential_marks = ref.x_sequential_marks;
 	x_user_comment = ref.x_user_comment;
 	x_hash = ref.x_hash;
 	x_slice_min_digits = ref.x_slice_min_digits;
@@ -2029,7 +2027,6 @@ namespace libdar
 	x_slice_permission = move(ref.x_slice_permission);
 	x_slice_user_ownership = move(ref.x_slice_user_ownership);
 	x_slice_group_ownership = move(ref.x_slice_group_ownership);
-	x_sequential_marks = move(ref.x_sequential_marks);
 	x_user_comment = move(ref.x_user_comment);
 	x_hash = move(ref.x_hash);
 	x_slice_min_digits = move(ref.x_slice_min_digits);
