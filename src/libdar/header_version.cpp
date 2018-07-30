@@ -530,6 +530,8 @@ namespace libdar
 	has_tape_marks = false;
 	ciphered = false;
 	arch_signed = false;
+	iteration_count = PRE_FORMAT_10_ITERATION;
+	kdf_hash = hash_algo::sha1;
     }
 
     void header_version::copy_from(const header_version & ref)
@@ -560,6 +562,7 @@ namespace libdar
 	arch_signed = ref.arch_signed;
 	salt = ref.salt;
 	iteration_count = ref.iteration_count;
+	kdf_hash = ref.kdf_hash;
     }
 
     void header_version::move_from(header_version && ref) noexcept
@@ -576,6 +579,7 @@ namespace libdar
 	arch_signed = move(ref.arch_signed);
 	salt = move(ref.salt);
 	iteration_count = move(ref.iteration_count);
+	kdf_hash = move(ref.kdf_hash);
     }
 
     void header_version::detruit()
