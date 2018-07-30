@@ -53,6 +53,12 @@ from 2.5.x to 2.6.0
   cap_linux_immutable to restore the immutable flag, and cap_sys_
   resource to set some linux FSA
 
+from 2.5.16 to 2.5.17
+- bug fix: dar failed to restore EA when file permission to restore
+  did not included user write access. Fix consists in temporarily
+  adding user write access in order to restore EA and removing this
+  extra permission afterward if necessary
+
 from 2.5.15 to 2.5.16
 - bug fix: while rechecking sparse file (-ah option) during a merging
   operation, dar wrongly reported CRC mismatch for saved plain files
