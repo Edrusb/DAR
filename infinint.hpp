@@ -27,6 +27,8 @@
 
 #pragma interface
 
+#include <sys/types.h>
+
 #include "storage.hpp"
 class generic_file;
 
