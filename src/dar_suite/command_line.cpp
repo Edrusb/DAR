@@ -326,6 +326,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.ignored_as_symlink = "";
     p.modet = modified_data_detection::mtime_size;
     p.iteration_count = 0; // will not touch the default API value if still set to zero
+    p.kdf_hash = hash_algo::none;
 
     if(!dialog)
 	throw SRC_BUG;
@@ -1268,15 +1269,40 @@ static bool get_args_recursive(recursive_param & rec,
 		    if(optarg == nullptr)
 			throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
 
+		    vector<string> splitted;
+		    string iter_count;
+		    string kdf_hash;
+
+		    line_tools_split(optarg, ':', splitted);
+		    switch(splitted.size())
+		    {
+		    case 1:
+			iter_count = optarg;
+			kdf_hash = "";
+			break;
+		    case 2:
+			iter_count = splitted[0];
+			kdf_hash = splitted[1];
+			break;
+		    default:
+			throw Erange("get_args", tools_printf(gettext("Invalid argument given to -T option, expecting <num>[:<hash_algo>]")));
+		    }
+
 		    try
 		    {
-			p.iteration_count = tools_get_extended_size(optarg, rec.suffix_base);
+			p.iteration_count = tools_get_extended_size(iter_count, rec.suffix_base);
 		    }
                     catch(Edeci &e)
                     {
                         rec.dialog->message(tools_printf(gettext(INVALID_SIZE), char(lu)));
                         return false;
                     }
+
+		    if(kdf_hash != "")
+		    {
+			if(!string_to_hash_algo(kdf_hash, p.kdf_hash) || p.kdf_hash == hash_algo::none)
+			    throw Erange("get_args", tools_printf(gettext("Invalid hash algorithm provided to -T opton: %s"), kdf_hash.c_str()));
+		    }
 		}
 		else
 		{
@@ -2540,7 +2566,7 @@ const struct option *get_long_opt()
 	{"ignored-as-symlink", required_argument, nullptr, '\\'},
 	{"add-missing-catalogue", required_argument, nullptr, 'y'},
 	{"modified-data-detection", required_argument, nullptr, '\''},
-	{"kdf-iter-count", required_argument, nullptr, 'T'},
+	{"kdf-param", required_argument, nullptr, 'T'},
         { nullptr, 0, nullptr, 0 }
     };
 

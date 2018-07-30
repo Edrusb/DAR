@@ -163,6 +163,7 @@ struct line_param
     string ignored_as_symlink;    ///< column separated list of absolute paths of links to follow rather to record as such
     modified_data_detection modet;///< how to detect that a file has changed since the archive of reference was done
     infinint iteration_count;     ///< iteration count used when creating/isolating/merging an encrypted archive (key derivation)
+    hash_algo kdf_hash;           ///< hash algo used for key derivation function
 
 	// constructor for line_param
     line_param()
