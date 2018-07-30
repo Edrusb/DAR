@@ -502,6 +502,7 @@ namespace libdar
 	string asym = get_asym_crypto_name();
 	string xsigned = is_signed() ? gettext("yes") : gettext("no");
 	string kdf_iter = deci(iteration_count).human();
+	string hashing = hash_algo_to_string(kdf_hash);
 
 	dialog.printf(gettext("Archive version format               : %s"), get_edition().display().c_str());
 	dialog.printf(gettext("Compression algorithm used           : %S"), &algo);
@@ -513,6 +514,7 @@ namespace libdar
 	if(ciphered)
 	{
 	    dialog.printf(gettext("KDF iteration count                  : %S"), &kdf_iter);
+	    dialog.printf(gettext("KDF hash algorithme                  : %S"), &hashing);
 	    if(salt.size() > 0)
 		dialog.printf(gettext("Salt size                            : %d byte%c"), salt.size(), salt.size() > 1 ? 's' : ' ');
 	}
