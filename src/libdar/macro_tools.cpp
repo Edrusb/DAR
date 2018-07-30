@@ -660,6 +660,7 @@ namespace libdar
 							     crypto,
 							     ver.get_salt(),
 							     ver.get_iteration_count(),
+							     ver.get_kdf_hash(),
 							     ver.get_crypted_key() == nullptr);
 		    if(tmp_ptr != nullptr)
 			tmp_ptr->set_initial_shift(ver.get_initial_offset());
@@ -675,6 +676,7 @@ namespace libdar
 							     crypto,
 							     ver.get_salt(),
 							     ver.get_iteration_count(),
+							     ver.get_kdf_hash(),
 							     ver.get_crypted_key() == nullptr);
 
 		    if(tmp_ptr != nullptr)
@@ -1085,6 +1087,7 @@ namespace libdar
 				   const label & internal_name,
 				   const label & data_name,
 				   const infinint & iteration_count,
+				   hash_algo kdf_hash,
 				   bool multi_threaded)
     {
 #if GPGME_SUPPORT
@@ -1369,6 +1372,7 @@ namespace libdar
 			salt = crypto_sym::generate_salt(crypto_sym::max_key_len(crypto));
 			ver.set_salt(salt);
 			ver.set_iteration_count(iteration_count);
+			ver.set_kdf_hash(kdf_hash);
 		    }
 		}
 
@@ -1436,6 +1440,7 @@ namespace libdar
 						   crypto,
 						   salt,
 						   iteration_count,
+						   kdf_hash,
 						   gnupg_recipients.empty());
 
 #ifdef LIBDAR_NO_OPTIMIZATION

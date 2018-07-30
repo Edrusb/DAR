@@ -525,6 +525,9 @@ namespace libdar
 	    /// key derivation
 	void set_iteration_count(const infinint & val) { x_iteration_count = val; };
 
+	    /// hash algo used for key derivation
+	void set_kdf_hash(hash_algo algo) { x_kdf_hash = algo; };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -591,6 +594,7 @@ namespace libdar
 	const std::set<std::string> & get_ignored_as_symlink() const { return x_ignored_as_symlink; };
 	modified_data_detection get_modified_data_detection() const { return x_modified_data_detection; };
 	const infinint & get_iteration_count() const { return x_iteration_count; };
+	hash_algo get_kdf_hash() const { return x_kdf_hash; };
 
     private:
 	std::shared_ptr<archive> x_ref_arch; ///< just contains the address of an existing object, no local copy of object is done here
@@ -656,6 +660,7 @@ namespace libdar
 	std::set<std::string> x_ignored_as_symlink;
 	modified_data_detection x_modified_data_detection;
 	infinint x_iteration_count;
+	hash_algo x_kdf_hash;
 
 	void nullifyptr() noexcept;
 	void destroy() noexcept;
@@ -798,6 +803,9 @@ namespace libdar
 	    /// key derivation
 	void set_iteration_count(const infinint & val) { x_iteration_count = val; };
 
+	    /// hash algo used for key derivation
+	void set_kdf_hash(hash_algo algo) { x_kdf_hash = algo; };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -831,6 +839,7 @@ namespace libdar
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
 	const infinint & get_iteration_count() const { return x_iteration_count; };
+	hash_algo get_kdf_hash() const { return x_kdf_hash; };
 
     private:
 	bool x_allow_over;
@@ -862,6 +871,7 @@ namespace libdar
 	bool has_delta_mask_been_set;
 	infinint x_delta_sig_min_size;
 	infinint x_iteration_count;
+	hash_algo x_kdf_hash;
 
 	void copy_from(const archive_options_isolate & ref);
 	void move_from(archive_options_isolate && ref) noexcept;
@@ -1051,6 +1061,10 @@ namespace libdar
 	    /// key derivation
 	void set_iteration_count(const infinint & val) { x_iteration_count = val; };
 
+	    /// hash algo used for key derivation
+	void set_kdf_hash(hash_algo algo) { x_kdf_hash = algo; };
+
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -1099,6 +1113,7 @@ namespace libdar
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
 	const infinint & get_iteration_count() const { return x_iteration_count; };
+	hash_algo get_kdf_hash() const { return x_kdf_hash; };
 
     private:
 	std::shared_ptr<archive> x_ref;
@@ -1145,6 +1160,7 @@ namespace libdar
 	bool has_delta_mask_been_set;
 	infinint x_delta_sig_min_size;
 	infinint x_iteration_count;
+	hash_algo x_kdf_hash;
 
 	void destroy() noexcept;
 	void copy_from(const archive_options_merge & ref);

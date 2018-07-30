@@ -42,6 +42,7 @@ extern "C"
 #include "tronconneuse.hpp"
 #include "secu_string.hpp"
 #include "crypto.hpp"
+#include "archive_aux.hpp"
 
 namespace libdar
 {
@@ -71,6 +72,7 @@ namespace libdar
 		   crypto_algo algo,
 		   const std::string & salt, //< not used is use_pkcs5 below is not set
 		   infinint iteration_count, //< not used if use_pkcs5 is not set
+		   hash_algo kdf_hash,       //< not used if use_pkcs5 is not set
 		   bool use_pkcs5);     //< must be set to true when password is human defined to add a key derivation
 	crypto_sym(const crypto_sym & ref) = delete;
 	crypto_sym(crypto_sym && ref) = delete;
@@ -136,6 +138,7 @@ namespace libdar
 	static secu_string pkcs5_pass2key(const secu_string & password,         ///< human provided password
 					  const std::string & salt,             ///< salt string
 					  U_I iteration_count,                  ///< number of time to shake the melange
+					  U_I hash_gcrypt,                      ///< hashing fonction used for key derivation (SHA1 historically)
 					  U_I output_length);                   ///< length of the string to return
 
 	    /// converts libdar crypto algo designation to index used by libgcrypt

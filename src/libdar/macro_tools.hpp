@@ -269,6 +269,7 @@ namespace libdar
 					  const label & internal_name,
 					  const label & data_name,
 					  const infinint & iteration_count,
+					  hash_algo kdf_hash,
 					  bool multi_threaded);
 
 	/// dumps the catalogue and close all the archive layers to terminate the archive

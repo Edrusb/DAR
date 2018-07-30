@@ -488,6 +488,7 @@ namespace libdar
 				   options.get_ignored_as_symlink(),
 				   options.get_modified_data_detection(),
 				   options.get_iteration_count(),
+				   options.get_kdf_hash(),
 				   progressive_report);
 		exploitable = false;
 		stack.terminate();
@@ -707,6 +708,7 @@ namespace libdar
 				 set<string>(),            // empty list
 				 modified_data_detection::any_inode_change, // not used for merging
 				 options.get_iteration_count(),
+				 options.get_kdf_hash(),
 				 st_ptr);
 
 		exploitable = false;
@@ -858,6 +860,7 @@ namespace libdar
 			     set<string>(),       // ignored_symlinks
 			     modified_data_detection::any_inode_change, // not used for repairing
 			     src.pimpl->ver.get_iteration_count(),
+			     src.pimpl->ver.get_kdf_hash(),
 			     &not_filled);        // statistics
 
 		// stealing src's catalogue, our's is still empty at this step
@@ -1528,6 +1531,7 @@ namespace libdar
 				      internal_name,
 				      isol_data_name,
 				      options.get_iteration_count(),
+				      options.get_kdf_hash(),
 				      options.get_multi_threaded());
 
 	    if(cat == nullptr)
@@ -1924,6 +1928,7 @@ namespace libdar
 						const set<string> & ignored_symlinks,
 						modified_data_detection mod_data_detect,
 						const infinint & iteration_count,
+						hash_algo kdf_hash,
 						statistics * progressive_report)
     {
         statistics st = false;  // false => no lock for this internal object
@@ -2085,6 +2090,7 @@ namespace libdar
 			 ignored_symlinks,
 			 mod_data_detect,
 			 iteration_count,
+			 kdf_hash,
 			 st_ptr);
 
 	return *st_ptr;
@@ -2159,6 +2165,7 @@ namespace libdar
 					      const set<string> & ignored_symlinks,
 					      modified_data_detection mod_data_detect,
 					      const infinint & iteration_count,
+					      hash_algo kdf_hash,
 					      statistics * st_ptr)
     {
 	try
@@ -2218,6 +2225,7 @@ namespace libdar
 					  internal_name,
 					  internal_name, // data_name is equal to internal_name in the current situation
 					  iteration_count,
+					  kdf_hash,
 					  multi_threaded);
 
 		    // ********** building the catalogue (empty for now) ************************* //

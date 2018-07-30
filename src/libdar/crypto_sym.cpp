@@ -64,6 +64,7 @@ namespace libdar
 			   crypto_algo algo,
 			   const std::string & salt,
 			   infinint iteration_count,
+			   hash_algo kdf_hash,
 			   bool use_pkcs5)
 	: tronconneuse(block_size, encrypted_side, no_initial_shift, reading_ver)
     {
@@ -74,6 +75,9 @@ namespace libdar
 
 	if(reading_ver <= 5)
 	    throw Erange("crypto_sym::blowfish", gettext("Current implementation of blowfish encryption is not compatible with old (weak) implementation, use dar-2.3.x software or later (or other software based on libdar-4.4.x or greater) to read this archive"));
+
+	if(kdf_hash == hash_algo::none)
+	    throw Erange("crypto_sym::crypto_sym", gettext("cannot use 'none' as hashing algorithm for key derivation function"));
 	else
 	{
 	    secu_string hashed_password;
@@ -109,7 +113,7 @@ namespace libdar
 		    if(!iteration_count.is_zero())
 			throw Erange("crypto_sym::crypto_sym", gettext("Too large value give for key derivation interation count"));
 
-		    hashed_password = pkcs5_pass2key(password, salt, it, max_key_len_libdar(algo));
+		    hashed_password = pkcs5_pass2key(password, salt, it, hash_algo_to_gcrypt_hash(kdf_hash), max_key_len_libdar(algo));
 		}
 		else
 		    hashed_password = password;
@@ -395,6 +399,7 @@ namespace libdar
     secu_string crypto_sym::pkcs5_pass2key(const secu_string & password,
 					   const string & salt,
 					   U_I iteration_count,
+					   U_I hash_gcrypt,
 					   U_I output_length)
     {
 	    // Password-based key derivation function (PBKDF2) from PKCS#5 v2.0
@@ -410,22 +415,22 @@ namespace libdar
 
 	    // Let l be the number of EVP_MD_size(digest) blocks in the derived key, rounding up.
 	    // Let r be the number of octets in the last block.
-	l = output_length / gcry_md_get_algo_dlen(GCRY_MD_SHA1);
-	r = output_length % gcry_md_get_algo_dlen(GCRY_MD_SHA1);
+	l = output_length / gcry_md_get_algo_dlen(hash_gcrypt);
+	r = output_length % gcry_md_get_algo_dlen(hash_gcrypt);
 	if (r == 0)
-	    r = gcry_md_get_algo_dlen(GCRY_MD_SHA1);
+	    r = gcry_md_get_algo_dlen(hash_gcrypt);
 	else
 	    ++l;    // round up
 
 	    // testing SHA1 availability
 
-	err = gcry_md_test_algo(GCRY_MD_SHA1);
+	err = gcry_md_test_algo(hash_gcrypt);
 	if(err != GPG_ERR_NO_ERROR)
 	    throw Ecompilation(tools_printf(gettext("Error! SHA1 not available in libgcrypt: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
 	    // opening a handle for Message Digest
 
-	err = gcry_md_open(&hmac, GCRY_MD_SHA1, GCRY_MD_FLAG_SECURE|GCRY_MD_FLAG_HMAC);
+	err = gcry_md_open(&hmac, hash_gcrypt, GCRY_MD_FLAG_SECURE|GCRY_MD_FLAG_HMAC);
 	if(err != GPG_ERR_NO_ERROR)
 	    throw Erange("crypto_sym::pkcs5_pass2key",tools_printf(gettext("Error while derivating key from password (HMAC open): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
@@ -439,16 +444,16 @@ namespace libdar
 
 	try
 	{
-	    U_I UjLen = gcry_md_get_algo_dlen(GCRY_MD_SHA1);
+	    U_I UjLen = gcry_md_get_algo_dlen(hash_gcrypt);
 	    char *Ti = nullptr, *Uj = nullptr;
 
 	    retval.resize(output_length);
-	    Ti = (char *)gcry_malloc_secure(gcry_md_get_algo_dlen(GCRY_MD_SHA1));
+	    Ti = (char *)gcry_malloc_secure(gcry_md_get_algo_dlen(hash_gcrypt));
 	    if(Ti == nullptr)
 		throw Ememory("crypto_sym::pkcs5_pass2key");
 	    try
 	    {
-		Uj = (char *)gcry_malloc_secure(gcry_md_get_algo_dlen(GCRY_MD_SHA1));
+		Uj = (char *)gcry_malloc_secure(gcry_md_get_algo_dlen(hash_gcrypt));
 		if(Uj == nullptr)
 		    throw Ememory("crypto_sym::pkcs5_pass2key");
 		try
@@ -468,9 +473,9 @@ namespace libdar
 			gcry_md_reset(hmac);
 			gcry_md_write(hmac, (const unsigned char *) salt.c_str(), salt.size());
 			gcry_md_write(hmac, ii, 4);
-			tmp_md = gcry_md_read(hmac, GCRY_MD_SHA1);
-			(void)memcpy(Uj, tmp_md, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
-			(void)memcpy(Ti, tmp_md, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
+			tmp_md = gcry_md_read(hmac, hash_gcrypt);
+			(void)memcpy(Uj, tmp_md, gcry_md_get_algo_dlen(hash_gcrypt));
+			(void)memcpy(Ti, tmp_md, gcry_md_get_algo_dlen(hash_gcrypt));
 
 			for (U_32 j = 2; j <= iteration_count; ++j)
 			{
@@ -478,13 +483,13 @@ namespace libdar
 
 			    gcry_md_reset(hmac);
 			    gcry_md_write(hmac, (const unsigned char *) Uj, UjLen);
-			    tmp_md = gcry_md_read(hmac, GCRY_MD_SHA1);
-			    (void)memcpy(Uj, tmp_md, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
-			    tools_memxor(Ti, tmp_md, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
+			    tmp_md = gcry_md_read(hmac, hash_gcrypt);
+			    (void)memcpy(Uj, tmp_md, gcry_md_get_algo_dlen(hash_gcrypt));
+			    tools_memxor(Ti, tmp_md, gcry_md_get_algo_dlen(hash_gcrypt));
 			}
 
 			if (i < l)
-			    retval.append(Ti, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
+			    retval.append(Ti, gcry_md_get_algo_dlen(hash_gcrypt));
 			else 	// last block
 			    retval.append(Ti, r);
 
@@ -492,20 +497,20 @@ namespace libdar
 		}
 		catch(...)
 		{
-		    (void)memset(Uj, 0, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
+		    (void)memset(Uj, 0, gcry_md_get_algo_dlen(hash_gcrypt));
 		    gcry_free(Uj);
 		    throw;
 		}
-		(void)memset(Uj, 0, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
+		(void)memset(Uj, 0, gcry_md_get_algo_dlen(hash_gcrypt));
 		gcry_free(Uj);
 	    }
 	    catch(...)
 	    {
-		(void)memset(Ti, 0, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
+		(void)memset(Ti, 0, gcry_md_get_algo_dlen(hash_gcrypt));
 		gcry_free(Ti);
 		throw;
 	    }
-	    (void)memset(Ti, 0, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
+	    (void)memset(Ti, 0, gcry_md_get_algo_dlen(hash_gcrypt));
 	    gcry_free(Ti);
 	}
 	catch(...)
@@ -666,11 +671,11 @@ namespace libdar
 	gcry_cipher_hd_t esivkey;
 
 	pass.append(p1.c_str(), (U_I)p1.size());
-	result = pkcs5_pass2key(pass, "ATHENA.MIT.EDUraeburn", 1, 16);
+	result = pkcs5_pass2key(pass, "ATHENA.MIT.EDUraeburn", 1, GCRY_MD_SHA1, 16);
 	if (result != string("\xcd\xed\xb5\x28\x1b\xb2\xf8\x01\x56\x5a\x11\x22\xb2\x56\x35\x15", 16))
 	    throw Erange("crypto_sym::self_test", gettext("Library used for blowfish encryption does not respect RFC 3962"));
 
-	result = pkcs5_pass2key(pass, "ATHENA.MIT.EDUraeburn", 1200, 32);
+	result = pkcs5_pass2key(pass, "ATHENA.MIT.EDUraeburn", 1200, GCRY_MD_SHA1, 32);
 	if (result !=  string("\x5c\x08\xeb\x61\xfd\xf7\x1e\x4e\x4e\xc3\xcf\x6b\xa1\xf5\x51\x2b"
 			      "\xa7\xe5\x2d\xdb\xc5\xe5\x14\x2f\x70\x8a\x31\xe2\xe6\x2b\x1e\x13", 32)
 	    )
@@ -680,7 +685,7 @@ namespace libdar
 	pass.append(p2.c_str(), (U_I)p2.size());
 
 	result = pkcs5_pass2key(pass,
-				"pass phrase equals block size", 1200, 32);
+				"pass phrase equals block size", 1200, GCRY_MD_SHA1, 32);
 	if (result != string("\x13\x9c\x30\xc0\x96\x6b\xc3\x2b\xa5\x5f\xdb\xf2\x12\x53\x0a\xc9"
 			     "\xc5\xec\x59\xf1\xa4\x52\xf5\xcc\x9a\xd9\x40\xfe\xa0\x59\x8e\xd1", 32))
 	    throw Erange("crypto_sym::self_test", gettext("Library used for blowfish encryption does not respect RFC 3962"));
@@ -688,7 +693,7 @@ namespace libdar
 	pass.resize((U_I)p4.size());
 	pass.append(p4.c_str(), (U_I)p4.size());
 	result = pkcs5_pass2key(pass,
-				"pass phrase exceeds block size", 1200, 32);
+				"pass phrase exceeds block size", 1200, GCRY_MD_SHA1, 32);
 	if (result != string("\x9c\xca\xd6\xd4\x68\x77\x0c\xd5\x1b\x10\xe6\xa6\x87\x21\xbe\x61"
 			     "\x1a\x8b\x4d\x28\x26\x01\xdb\x3b\x36\xbe\x92\x46\x91\x5e\xc8\x2a", 32))
 	    throw Erange("crypto_sym::self_test", gettext("Library used for blowfish encryption does not respect RFC 3962"));

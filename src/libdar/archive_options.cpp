@@ -366,6 +366,7 @@ namespace libdar
 	    x_ignored_as_symlink.clear();
 	    x_modified_data_detection = modified_data_detection::mtime_size;
 	    x_iteration_count = default_iteration_count;
+	    x_kdf_hash = hash_algo::sha1;
 	}
 	catch(...)
 	{
@@ -632,6 +633,7 @@ namespace libdar
 	x_ignored_as_symlink = ref.x_ignored_as_symlink;
 	x_modified_data_detection = ref.x_modified_data_detection;
 	x_iteration_count = ref.x_iteration_count;
+	x_kdf_hash = ref.x_kdf_hash;
     }
 
     void archive_options_create::move_from(archive_options_create && ref) noexcept
@@ -699,6 +701,7 @@ namespace libdar
 	x_ignored_as_symlink = move(ref.x_ignored_as_symlink);
 	x_modified_data_detection = move(ref.x_modified_data_detection);
 	x_iteration_count = move(ref.x_iteration_count);
+	x_kdf_hash = move(ref.x_kdf_hash);
     }
 
 	/////////////////////////////////////////////////////////
@@ -771,6 +774,7 @@ namespace libdar
 	    has_delta_mask_been_set = false;
 	    x_delta_sig_min_size = default_delta_sig_min_size;
 	    x_iteration_count = default_iteration_count;
+	    x_kdf_hash = hash_algo::sha1;
 	}
 	catch(...)
 	{
@@ -844,6 +848,7 @@ namespace libdar
 	has_delta_mask_been_set = ref.has_delta_mask_been_set;
 	x_delta_sig_min_size = ref.x_delta_sig_min_size;
 	x_iteration_count = ref.x_iteration_count;
+	x_kdf_hash = ref.x_kdf_hash;
     }
 
     void archive_options_isolate::move_from(archive_options_isolate && ref) noexcept
@@ -878,6 +883,7 @@ namespace libdar
 	has_delta_mask_been_set = move(ref.has_delta_mask_been_set);
 	x_delta_sig_min_size = move(ref.x_delta_sig_min_size);
 	x_iteration_count = move(ref.x_iteration_count);
+	x_kdf_hash = move(ref.x_kdf_hash);
     }
 
     void archive_options_isolate::nullifyptr() noexcept
@@ -945,6 +951,7 @@ namespace libdar
 	    has_delta_mask_been_set = false;
 	    x_delta_sig_min_size = default_delta_sig_min_size;
 	    x_iteration_count = default_iteration_count;
+	    x_kdf_hash = hash_algo::sha1;
 	}
 	catch(...)
 	{
@@ -1154,6 +1161,7 @@ namespace libdar
 	    has_delta_mask_been_set = ref.has_delta_mask_been_set;
 	    x_delta_sig_min_size = ref.x_delta_sig_min_size;
 	    x_iteration_count = ref.x_iteration_count;
+	    x_kdf_hash = ref.x_kdf_hash;
 	}
 	catch(...)
 	{
@@ -1209,6 +1217,7 @@ namespace libdar
 	has_delta_mask_been_set = move(ref.has_delta_mask_been_set);
 	x_delta_sig_min_size = move(ref.x_delta_sig_min_size);
 	x_iteration_count = move(ref.x_iteration_count);
+	x_kdf_hash = move(ref.x_kdf_hash);
     }
 
     void archive_options_merge::nullifyptr() noexcept
