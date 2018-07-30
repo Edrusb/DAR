@@ -25,7 +25,7 @@
 #ifndef GENERIC_FILE_HPP
 #define GENERIC_FILE_HPP
 
-#pragma interface
+// #pragma interface
 
 #include <unistd.h>
 #include "infinint.hpp"

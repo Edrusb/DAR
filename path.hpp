@@ -25,7 +25,7 @@
 #ifndef PATH_HPP
 #define PATH_HPP
 
-#pragma interface
+// #pragma interface
 
 #include <list>
 #include <string>
