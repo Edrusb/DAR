@@ -73,6 +73,12 @@ namespace libdar
 	/// convert hash value to libgcrypt hash value
     extern U_I hash_algo_to_gcrypt_hash(hash_algo algo);
 
+	/// convert hash value to char value
+    extern unsigned char hash_algo_to_char(hash_algo algo);
+
+	/// convert char to hash_algo
+    extern hash_algo char_to_hash_algo(unsigned char arg);
+
 	/// @}
 
 } // end of namespace

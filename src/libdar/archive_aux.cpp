@@ -33,6 +33,7 @@ extern "C"
 
 #include "archive_aux.hpp"
 #include "erreurs.hpp"
+#include "tools.hpp"
 
 using namespace std;
 
@@ -82,6 +83,41 @@ namespace libdar
 #else
 	throw Ecompile_time("linking with libgcrypt");
 #endif
+    }
+
+
+    unsigned char hash_algo_to_char(hash_algo algo)
+    {
+	switch(algo)
+	{
+	case hash_algo::none:
+	    return 'n';
+	case hash_algo::md5:
+	    return 'm';
+	case hash_algo::sha1:
+	    return '1';
+	case hash_algo::sha512:
+	    return '5';
+	default:
+	    throw SRC_BUG;
+	}
+    }
+
+    hash_algo char_to_hash_algo(unsigned char arg)
+    {
+	switch(arg)
+	{
+	case '1':
+	    return hash_algo::sha1;
+	case '5':
+	    return hash_algo::sha512;
+	case 'm':
+	    return hash_algo::md5;
+	case 'n':
+	    return hash_algo::none;
+	default:
+	    throw Erange("char_to_hash_algo", tools_printf(gettext("unknown hash algorithm corresponding to char `%c'"), arg));
+	}
     }
 
 
