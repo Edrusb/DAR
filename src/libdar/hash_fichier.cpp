@@ -56,22 +56,7 @@ namespace libdar
 #if CRYPTO_AVAILABLE
 	gcry_error_t err;
 
-	switch(algo)
-	{
-	case hash_algo::none:
-	    throw SRC_BUG;
-	case hash_algo::md5:
-	    hash_gcrypt = GCRY_MD_MD5;
-	    break;
-	case hash_algo::sha1:
-	    hash_gcrypt = GCRY_MD_SHA1;
-	    break;
-	case hash_algo::sha512:
-	    hash_gcrypt = GCRY_MD_SHA512;
-	    break;
-	default:
-	    throw SRC_BUG;
-	}
+	hash_gcrypt = hash_algo_to_gcrypt_hash(algo);
 
 	err = gcry_md_test_algo(hash_gcrypt);
 	if(err != GPG_ERR_NO_ERROR)

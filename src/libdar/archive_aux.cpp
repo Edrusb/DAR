@@ -21,6 +21,16 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
+#if HAVE_GCRYPT_H
+#ifndef GCRYPT_NO_DEPRECATED
+#define GCRYPT_NO_DEPRECATED
+#endif
+#include <gcrypt.h>
+#endif
+}
+
 #include "archive_aux.hpp"
 #include "erreurs.hpp"
 
@@ -45,5 +55,34 @@ namespace libdar
 	    throw SRC_BUG;
 	}
     }
+
+    U_I hash_algo_to_gcrypt_hash(hash_algo algo)
+    {
+#if CRYPTO_AVAILABLE
+	U_I hash_gcrypt;
+
+	switch(algo)
+	{
+	case hash_algo::none:
+	    throw SRC_BUG;
+	case hash_algo::md5:
+	    hash_gcrypt = GCRY_MD_MD5;
+	    break;
+	case hash_algo::sha1:
+	    hash_gcrypt = GCRY_MD_SHA1;
+	    break;
+	case hash_algo::sha512:
+	    hash_gcrypt = GCRY_MD_SHA512;
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
+
+	return hash_gcrypt;
+#else
+	throw Ecompile_time("linking with libgcrypt");
+#endif
+    }
+
 
 } // end of namespace

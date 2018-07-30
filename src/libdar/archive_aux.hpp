@@ -29,6 +29,7 @@
 
 #include "../my_config.h"
 
+#include "integers.hpp"
 #include <string>
 
 namespace libdar
@@ -68,6 +69,9 @@ namespace libdar
 
     	/// convert hash value to human readable string
     extern std::string hash_algo_to_string(hash_algo algo);
+
+	/// convert hash value to libgcrypt hash value
+    extern U_I hash_algo_to_gcrypt_hash(hash_algo algo);
 
 	/// @}
 
