@@ -514,7 +514,7 @@ namespace libdar
 	if(ciphered)
 	{
 	    dialog.printf(gettext("KDF iteration count                  : %S"), &kdf_iter);
-	    dialog.printf(gettext("KDF hash algorithme                  : %S"), &hashing);
+	    dialog.printf(gettext("KDF hash algorithm                   : %S"), &hashing);
 	    if(salt.size() > 0)
 		dialog.printf(gettext("Salt size                            : %d byte%c"), salt.size(), salt.size() > 1 ? 's' : ' ');
 	}
