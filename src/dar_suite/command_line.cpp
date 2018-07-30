@@ -1797,16 +1797,8 @@ static bool get_args_recursive(recursive_param & rec,
             case '3':
                 if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext("Missing argument to --hash"), char(lu)));
-                if(strcasecmp(optarg, "md5") == 0)
-                    p.hash = hash_algo::md5;
-                else
-                    if(strcasecmp(optarg, "sha1") == 0)
-                        p.hash = hash_algo::sha1;
-                    else
-			if(strcasecmp(optarg, "sha512") == 0)
-			    p.hash = hash_algo::sha512;
-			else
-			    throw Erange("get_args", string(gettext("Unknown parameter given to --hash option: ")) + optarg);
+		if(!string_to_hash_algo(optarg, p.hash) || p.hash == hash_algo::none)
+		    throw Erange("get_args", string(gettext("Unknown parameter given to --hash option: ")) + optarg);
                 break;
             case '9':
                 if(optarg == nullptr)

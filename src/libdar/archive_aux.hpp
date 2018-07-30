@@ -70,6 +70,13 @@ namespace libdar
     	/// convert hash value to human readable string
     extern std::string hash_algo_to_string(hash_algo algo);
 
+	/// convert string to hash algorithm
+
+	/// \param[in] arg string to cast to a hash algorithm name
+	/// \param[out] val is set to the corresponding hash algorithm if the function returns true
+	/// \return true if provided string matches a valid hash algoritm name and give the hash_algo in argument
+    extern bool string_to_hash_algo(const std::string & arg, hash_algo & val);
+
 	/// convert hash value to libgcrypt hash value
     extern U_I hash_algo_to_gcrypt_hash(hash_algo algo);
 
@@ -77,6 +84,8 @@ namespace libdar
     extern unsigned char hash_algo_to_char(hash_algo algo);
 
 	/// convert char to hash_algo
+
+	/// \note throw Erange exception if provided char is invalid
     extern hash_algo char_to_hash_algo(unsigned char arg);
 
 	/// @}

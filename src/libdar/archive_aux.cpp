@@ -57,6 +57,21 @@ namespace libdar
 	}
     }
 
+    bool string_to_hash_algo(const string & arg, hash_algo & val)
+    {
+	if(strcasecmp(arg.c_str(), "md5") == 0)
+	    val = hash_algo::md5;
+	else if(strcasecmp(arg.c_str(), "sha1") == 0)
+	    val = hash_algo::sha1;
+	else if(strcasecmp(arg.c_str(), "sha512") == 0)
+	    val = hash_algo::sha512;
+	else if(strcasecmp(arg.c_str(), "none") == 0)
+	    val = hash_algo::none;
+	else
+	    return false;
+	return true;
+    }
+
     U_I hash_algo_to_gcrypt_hash(hash_algo algo)
     {
 #if CRYPTO_AVAILABLE
