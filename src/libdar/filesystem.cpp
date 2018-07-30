@@ -1544,6 +1544,15 @@ namespace libdar
 			    }
 			}
 
+			    // now that EA have been set, we can remove the u+w added to restore them
+			    // (dir_perm was set to false when calling make_file earlier)
+
+			if(x_dir == nullptr)
+			    make_owner_perm(get_ui(), *x_ino, spot_display, true, what_to_check, get_fsa_scope());
+			    // for directories, the permission will be set back once all its content will
+			    // restored, thus when meeting an eod object
+
+
 			    // now that FSA has been read (if sequential mode is used)
 			    // we can restore dates in particular creation date from HFS+ FSA if present
 			if(!empty)
@@ -1627,6 +1636,14 @@ namespace libdar
 				    get_ui().warning(tools_printf(gettext("Restoration of FSA for %S aborted: "), &spot_display) + e.get_message());
 				}
 			    }
+
+				// now that all EA and FSA has been restored we can set the
+				// remove the u+w permission that was added when calling action_over_data()
+				// for non directory entries. For directories, this will be done when EOD
+				// will be met (once all its content will be restored)
+
+			    if(data_restored == done_data_restored && x_dir == nullptr)
+				make_owner_perm(get_ui(), *x_ino, spot_display, true, what_to_check, get_fsa_scope());
 
 			    if(has_fsa_saved || has_ea_saved)
 			    {
@@ -2309,7 +2326,10 @@ namespace libdar
 	    // owner of the directory, so we will try to restore as much as our permission
 	    // allows it (maybe "group" or "other" write bits are set for us).
 
-	if(dynamic_cast<const cat_directory *>(&ref) != nullptr && !dir_perm && geteuid() != 0)
+	    // same thing when restoring EA we must have the write permission to file to do so
+	    // so here too we have to temporarily add u+w to the expected permission
+
+	if(!dir_perm && geteuid() != 0)
 	{
 	    mode_t tmp;
 	    try
