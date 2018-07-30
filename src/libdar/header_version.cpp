@@ -53,6 +53,7 @@ namespace libdar
 	ciphered = false;
 	arch_signed = false;
 	iteration_count = PRE_FORMAT_10_ITERATION;
+	kdf_hash = hash_algo::sha1; // used by default
 	salt = "";
     }
 
@@ -252,13 +253,66 @@ namespace libdar
 
 	if((flag & FLAG_HAS_SALT_INTER) != 0)
 	{
+	    unsigned char tmp_hash;
+
 	    tools_read_string(f, salt);
 	    iteration_count.read(f);
+	    f.read((char *)&tmp_hash, 1);
+	    try
+	    {
+		kdf_hash = char_to_hash_algo(tmp_hash);
+		if(kdf_hash == hash_algo::none)
+		    throw Erange("header_version::read", gettext("valid hash algoritm needed for key derivation function"));
+	    }
+	    catch(Erange & e)
+	    {
+		if(lax_mode)
+		{
+		    string msg = e.get_message(); // msg has two roles: 1)display error message to user 2) get answer from user
+		    bool ok = false;
+
+		    do
+		    {
+			dialog.message(msg);
+			msg = dialog.get_string(gettext("please indicate the hash algoritm to use for key derivation function '1' for sha1, '5' for sha512, 'm' for md5, or 'q' to abort: "), true);
+			try
+			{
+			    if(msg.size() == 1)
+			    {
+				tmp_hash = msg.c_str()[0];
+				if(tmp_hash == 'q')
+				{
+				    kdf_hash = hash_algo::none;
+				    ok = true;
+				}
+				else
+				{
+				    kdf_hash = char_to_hash_algo(tmp_hash);
+				    ok = true;
+				}
+			    }
+			    else
+				dialog.message(gettext("please answer with a single character"));
+			}
+			catch(Erange & e)
+			{
+			    msg = e.get_message();
+			}
+		    }
+		    while(!ok);
+
+		    if(kdf_hash == hash_algo::none)
+			throw;
+		}
+		else
+		    throw;
+	    }
 	}
 	else
 	{
 	    salt = "";
 	    iteration_count = PRE_FORMAT_10_ITERATION;
+	    kdf_hash = hash_algo::sha1;
 	}
 
 	ctrl = f.get_crc();
@@ -393,8 +447,11 @@ namespace libdar
 
 	if(salt.size() > 0)
 	{
+	    unsigned char tmp_hash = hash_algo_to_char(kdf_hash);
+
 	    tools_write_string(f, salt);
 	    iteration_count.dump(f);
+	    f.write((char *)&tmp_hash, 1);
 	}
 
 	ctrl = f.get_crc();
@@ -412,6 +469,13 @@ namespace libdar
 	}
 	if(ctrl != nullptr)
 	    delete ctrl;
+    }
+
+    void header_version::set_kdf_hash(hash_algo algo)
+    {
+	if(algo == hash_algo::none)
+	    throw Erange("header_version::set_kdf_hash", gettext("invalid hash algorithm provided for key derivation function"));
+	kdf_hash = algo;
     }
 
     string header_version::get_sym_crypto_name() const
@@ -519,7 +583,6 @@ namespace libdar
 	clear_crypted_key();
 	clear_slice_layout();
     }
-
 
 
 } // end of namespace

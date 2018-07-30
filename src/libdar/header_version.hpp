@@ -35,6 +35,7 @@
 #include "compression.hpp"
 #include "user_interaction.hpp"
 #include "memory_file.hpp"
+#include "archive_aux.hpp"
 
 namespace libdar
 {
@@ -80,6 +81,7 @@ namespace libdar
 
 	void set_salt(const std::string & arg) { salt = arg; };
 	void set_iteration_count(const infinint & arg) { iteration_count = arg; };
+	void set_kdf_hash(hash_algo algo);
 
 	    // gettings
 
@@ -98,6 +100,7 @@ namespace libdar
 	bool get_tape_marks() const { return has_tape_marks; };
 	const std::string & get_salt() const { return salt; };
 	const infinint & get_iteration_count() const { return iteration_count; };
+	hash_algo get_kdf_hash() const { return kdf_hash; };
 
 	    // display
 
@@ -122,6 +125,7 @@ namespace libdar
 	bool arch_signed;        ///< whether the archive is signed
 	std::string salt;        ///< used for key derivation
 	infinint iteration_count;///< used for key derivation
+	hash_algo kdf_hash;      ///< used for key derivation
 
 	void nullifyptr() noexcept { crypted_key = nullptr; ref_layout = nullptr; };
 	void copy_from(const header_version & ref);
