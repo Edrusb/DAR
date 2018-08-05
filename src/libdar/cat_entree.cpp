@@ -412,7 +412,7 @@ namespace libdar
 	if(tmp_lien != nullptr && tmp_lien->get_saved_status() == saved_status::saved)
 	    ent.set_link_target(tmp_lien->get_target());
 
-	if(tmp_device != nullptr)
+	if(tmp_device != nullptr && tmp_device->get_saved_status() == saved_status::saved)
 	{
 	    ent.set_major(tmp_device->get_major());
 	    ent.set_minor(tmp_device->get_minor());
