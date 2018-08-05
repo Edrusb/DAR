@@ -602,7 +602,12 @@ namespace libdar
 			// but first checking the catalogue signature if any
 			// and comparing the internal catalogue to inline catalogue content
 
+			// we only read detruit objects for internal catalogue
+			// if we have sequentially read data
 		    only_detruit = !is_empty();
+
+			// we will compare content if encryption has been used and some data
+			// has been read sequentially
 		    compare_content = x_ver.is_signed() && only_detruit;
 
 			// if the archive is not signed and this is not a isolated catalogue
@@ -658,13 +663,13 @@ namespace libdar
 			}
 
 			cat_det->reset_read();
-			if(only_detruit)
+			if(only_detruit) // some data could be read sequentially
 			{
 			    ceci->status = ec_detruits;
 			    stop = false;
 			    ref = nullptr;
 			}
-			else
+			else // not only_detruit and thus not compare_content (isolated catalogue read)
 			{
 			    ceci->status = ec_completed;
 			    ceci->swap_stuff(*(ceci->cat_det));
