@@ -292,9 +292,12 @@ namespace libdar
 
     void cat_directory::recursive_flag_size_to_update() const
     {
-	updated_sizes = false;
-	if(parent != nullptr)
-	    parent->recursive_flag_size_to_update();
+	if(updated_sizes)
+	{
+	    updated_sizes = false;
+	    if(parent != nullptr)
+		parent->recursive_flag_size_to_update();
+	}
     }
 
     void cat_directory::add_children(cat_nomme *r)
