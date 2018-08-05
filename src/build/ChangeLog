@@ -39,8 +39,9 @@ from 2.5.x to 2.6.0
   archive this should not bring any backward compatibility issue
 - security refresh: adding salt per archive (one is still present per
   block inside an archive)
-- security refresh/new feature: adding option --kdf-ite-count to define
+- security refresh/new feature: adding option --kdf-param to define
   the iteration count for key derivation, which defaults to 200,000
+  and hash algorithm used to derivate key, which defaults to sha1
 - slide effect of previous feature due to starvation of free letters
   to add a new command, the -T option with argument is no more
   available, one need to provide explicitely the desired argument
