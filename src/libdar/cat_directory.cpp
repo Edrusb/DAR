@@ -378,6 +378,8 @@ namespace libdar
     {
 	if(it != ordered_fils.end())
 	{
+	    if(*it == nullptr)
+		throw SRC_BUG;
 	    r = *it;
 	    ++it;
 	    return true;
@@ -466,8 +468,16 @@ namespace libdar
 	    // removed one, if it would have been the next entry to be read
 	if(it == ot)
 	    it = ordered_fils.erase(ot);
-	else
+	else // not removing the next to read object (the one pointed to by 'it')
+	{
 	    (void)ordered_fils.erase(ot);
+
+		// however if we remove the last item of the deque
+		// we must set 'it' to end() to avoid 'it' becoming
+		// a dangling pointer:
+	    if(ordered_fils.empty())
+		it = ordered_fils.end();
+	}
 
 	    // destroying the object itself
 	delete obj;
