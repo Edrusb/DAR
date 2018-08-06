@@ -3,8 +3,8 @@ version 2.6.0
 Many Thanks Gulikoza who helped troubleshooting around the poorly
 documented librsync library. Thanks to "Lademann" at sourceforge for the
 proposed patch adapted and integrated in this release (--ignored-as-symlink
-new feature). Big thank too to androlgenhald at sourceforge for feedback
-and security/encryption related hints.
+new feature). A big thank to Zach Adams for feedback about security and
+encryption related improvements.
 
 version 2.5.16
 --------------
