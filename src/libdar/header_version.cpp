@@ -254,8 +254,9 @@ namespace libdar
 	if((flag & FLAG_HAS_KDF_PARAM) != 0)
 	{
 	    unsigned char tmp_hash;
+	    infinint salt_size(f); // reading salt_size from file
 
-	    tools_read_string(f, salt);
+	    tools_read_string_size(f, salt, salt_size);
 	    iteration_count.read(f);
 	    f.read((char *)&tmp_hash, 1);
 	    try
@@ -448,8 +449,10 @@ namespace libdar
 	if(salt.size() > 0)
 	{
 	    unsigned char tmp_hash = hash_algo_to_char(kdf_hash);
+	    infinint salt_size = salt.size();
 
-	    tools_write_string(f, salt);
+	    salt_size.dump(f);
+	    tools_write_string_all(f, salt);
 	    iteration_count.dump(f);
 	    f.write((char *)&tmp_hash, 1);
 	}
