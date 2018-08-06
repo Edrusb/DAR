@@ -251,7 +251,7 @@ namespace libdar
 
 	arch_signed = (flag & FLAG_ARCHIVE_IS_SIGNED) != 0;
 
-	if((flag & FLAG_HAS_SALT_INTER) != 0)
+	if((flag & FLAG_HAS_KDF_PARAM) != 0)
 	{
 	    unsigned char tmp_hash;
 
@@ -411,7 +411,7 @@ namespace libdar
 	    flag[1] |= (FLAG_ARCHIVE_IS_SIGNED >> 8);
 
 	if(salt.size() > 0)
-	    flag[1] |= (FLAG_HAS_SALT_INTER >> 8);
+	    flag[1] |= (FLAG_HAS_KDF_PARAM >> 8);
 
 	if(flag[1] > 0)
 	    flag[1] |= FLAG_HAS_AN_EXTENDED_SIZE;

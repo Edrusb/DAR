@@ -143,7 +143,7 @@ namespace libdar
 	static constexpr U_I FLAG_HAS_REF_SLICING = 0x02;    ///< the header contains the slicing information of the archive of reference (used for isolated catalogue)
 	static constexpr U_I FLAG_HAS_AN_EXTENDED_SIZE = 0x01; ///< the flag is two bytes length
 	static constexpr U_I FLAG_ARCHIVE_IS_SIGNED = 0x0200;  ///< archive is signed
-	static constexpr U_I FLAG_HAS_SALT_INTER = 0x0400;     ///< archive header contains salt and non default interaction count
+	static constexpr U_I FLAG_HAS_KDF_PARAM = 0x0400;     ///< archive header contains salt and non default interaction count
 	static constexpr U_I FLAG_HAS_AN_SECOND_EXTENDED_SIZE = 0x0101; ///< reserved for future use
 
 	    //
