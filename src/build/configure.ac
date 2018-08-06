@@ -1346,11 +1346,11 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
 
                                #if LIBRSYNC_AVAILABLE
                                #ifdef RS_DEFAULT_STRONG_LEN
-                                    job = rs_sig_begin(RS_DEFAULT_BLOCK_LEN, RS_DEFAULT_STRONG_LEN);
+                                    rs_job_t *job = rs_sig_begin(RS_DEFAULT_BLOCK_LEN, RS_DEFAULT_STRONG_LEN);
                                #else
-                                    job = rs_sig_begin(RS_DEFAULT_BLOCK_LEN, 0, RS_MD4_SIG_MAGIC);
+                                    rs_job_t *job = rs_sig_begin(RS_DEFAULT_BLOCK_LEN, 0, RS_MD4_SIG_MAGIC);
                                #endif
-
+			       #endif
                                   printf("Hello World!");
                                   return 0;
                                ]])
