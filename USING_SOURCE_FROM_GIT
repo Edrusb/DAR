@@ -73,6 +73,7 @@ is a bit simplified.
 
 If you just want to build a fresh tarball simply use:
 
+       misc/init
        ./configure
        make dist
 

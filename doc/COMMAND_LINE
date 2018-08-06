@@ -83,7 +83,7 @@ Q + quite on stderr at startup		no long option equivalent
 R + set the root directory              --root
 S + size of the first slice             --first-slice
 T + (listing) tree listing format       --tree-format, --list-format=<normal|tree|xml|slicing>
-T + (create/merge/isolate) interation count for key derirvation --kdf-iter-count
+T + (create/merge/isolate) interation count for key derirvation --kdf-param
 U + include EA for the operation (mask) --include-ea
 V - version information                 --version
 W - warranty disclosure information (POSIX RESERVED, sorry)

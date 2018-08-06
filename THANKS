@@ -1,10 +1,10 @@
 version 2.6.0
 --------------
-Many Thanks Gulikoza who helped troubleshooting around the poorly
+Many Thanks to Gulikoza who helped troubleshooting around the poorly
 documented librsync library. Thanks to "Lademann" at sourceforge for the
 proposed patch adapted and integrated in this release (--ignored-as-symlink
 new feature). A big thank to Zach Adams for feedback about security and
-encryption related improvements.
+encryption related possible improvements.
 
 version 2.5.16
 --------------

@@ -118,7 +118,7 @@ restoring/saving, all
 files are
 considered by default. But if you specify some files to restore or
 save, all other files are "ignored", this is the case when using -P -X
--I or -g.<br>
+-I, -g -[ or -] options<br>
       </div>
       <br>
       <span style="font-weight: bold; font-style: italic;"><a name="A2" id="A2"></a>Dar hangs when using it with pipes, why?</span><br>
@@ -194,11 +194,11 @@ backup process, when a
 file is ignored due to filter
 exclusion, an "ignored" entry is added to the catalogue. At the
 end of the backup, dar compares both catalogues, the one of reference
-and the new one built during the backup process, and adds a "detruit"
-(destroyed in English) entry, when an entry of the reference is not
+and the new one built during the backup process, and adds a "detruit" entry
+(means destroyed in English), when an entry of the reference is not
 present in the new catalogue. Thus, if an "ignored" is present no
 "detruit" will be added for that name. Then all "ignored" entries are
-removed and the catalogue is dumped in the archive.<br>
+removed and the catalogue is written into the archive.<br>
       </div>
       <br>
       <a name="A7" id="A7"></a><br>
@@ -245,14 +245,12 @@ on you system</li>
         <li>If all that fails, ask for support on the <a href="https://lists.sourceforge.net/lists/listinfo/dar-support">dar-support
 mailing-list</a>.</li>
       </ol>
-      <div style="text-align: justify; margin-left: 40px;">There is
-still a workaround
-which is to make several smaller archives
-of the files to backup. For example, make a backup for all in
-/usr/local another for all in /var and so on. These backup can be full
+      <div style="text-align: justify; margin-left: 40px;">Last, there is always the workaround to make several smaller archives
+of the files to backup. For example, make a backup for all that is in
+/usr/local, another one for all that is in /var and so on. These backup can be full
 or differential. The drawback is not big as you can store these
 archive side by side and use them at will. Moreover, you can feed a
-unique dar_manager database with all these different archives. This
+unique dar_manager database with all these different archives
 which will hide you the fact that there are several full archives and
 several differential archives concerning different set of files.<br>
       </div>
@@ -301,13 +299,15 @@ dar_xform man page for more.<br>
       <br>
       <br>
       <span style="font-weight: bold; font-style: italic;"><a name="A11" id="A11"></a>I have a backup, how can I change its encryption scheme?</span><br>
-      <div style="text-align: justify; margin-left: 40px;">The merging
+      <div style="text-align: justify; margin-left: 40px;">The
+merging
 feature let you do
 that. The merging has two roles, putting
 in one archive the contents of two archives, and at the same time
-filtering file contents to not copy certain files in the resulting
+filtering out some file s you decided not to include into the resulting
 archive. The merging feature can take two but also only one archive as
-input, so we will use it in that special way here:<br>
+input. his is what we will use it in that special way here. I can also
+be run without filtering any file out to the resulting archive:<br>
       </div>
       <ul style="text-align: justify; margin-left: 40px;">
         <li>a single input (our original archive)</li>
@@ -322,12 +322,18 @@ up the process<br>
 original_archive -K "&lt;new_algo&gt;:new pass" -ak</code><br>
       </div>
       <div style="text-align: justify; margin-left: 40px;"><br>
+<br>
 If the original archive was not in clear you need to add the -J option
 to
 provide the encryption key, and if you don't want to have password in
 clear on the command line (command that can be seen with <span style="font-style: italic;">top</span> or <span style="font-style: italic;">ps</span> by other users), simply provide
 "&lt;algo&gt;:" then dar will ask you on the fly the password, if using
-blowfish you can then just provide <code>":"</code> for the keys:<br>
+blowfish you can then just provide <code>":"</code>
+for the keys. Note that since release 2.5.0, -J option is no more
+mandatory, archive format contains information about the encryption
+algorithm and will ask the password interactively. You can still use -J
+option to provide the password of source archive on command-line of
+better from a DCF file.<br>
       <br>
       </div>
       <div style="text-align: justify; margin-left: 80px;"> <code>dar
@@ -349,8 +355,8 @@ original_archive -K ":" -J ":" -ak -s 1G</code><br>
       <span style="font-weight: bold; font-style: italic;"><a name="A12" id="A12"></a>I have a backup, how can I change its compression
 algorithm?</span><br>
       <div style="text-align: justify; margin-left: 40px;">Same thing
-as above : we will
-use the merging feature :<br>
+as above: we will
+use the merging feature:<br>
       <br>
 to use bzip2 compression:<br>
       <br>
@@ -415,11 +421,12 @@ archive</dd>
         <dd>-C&nbsp; to isolate an archive (extract its contents to a
 usually
 small file)</dd>
-        <dd>-+&nbsp;&nbsp; to merge two archives in one or create a sub
-archive from one or two other archives<br>
+        <dd>-+&nbsp; to merge two archives in one or create a sub
+archive from one or two other archives</dd><dd>-y&nbsp; to repair an archive<br>
           <br>
 Follow for each command the available options (those marked OK):<br>
         </dd>
+
       </dl>
       </td>
     </tr>
@@ -449,7 +456,9 @@ option<br>
       <td style="width: 8%; font-weight: bold; text-align: center;">-C<br>
       </td>
       <td style="width: 8%; font-weight: bold; text-align: center;">-+<br>
+      </td><td style="vertical-align: top; width: 8%; text-align: center;">&nbsp;<span style="font-weight: bold;">-y</span><br>
       </td>
+
     </tr>
     <tr>
       <td style="text-align: left; vertical-align: middle;">-v<br>
@@ -469,7 +478,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK<br>
       </td>
       <td style="text-align: center; vertical-align: middle;">OK<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-vs<br>
@@ -488,7 +498,8 @@ option<br>
       </td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-b<br>
@@ -508,7 +519,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK<br>
       </td>
       <td style="text-align: center; vertical-align: middle;">OK<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-n<br>
@@ -525,7 +537,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK<br>
       </td>
       <td style="text-align: center; vertical-align: middle;">OK<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-w<br>
@@ -538,7 +551,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-wa<br>
@@ -551,7 +565,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-A<br>
@@ -565,7 +580,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">OK</td>
       <td style="vertical-align: top; text-align: center;">OK</td>
       <td style="vertical-align: top; text-align: center;">OK</td>
-      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-R<br>
@@ -578,7 +594,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-X<br>
@@ -591,7 +608,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-I<br>
@@ -604,7 +622,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-P<br>
@@ -617,7 +636,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-g<br>
@@ -631,7 +651,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-]<br>
@@ -645,7 +666,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-[<br>
@@ -659,7 +681,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-u<br>
@@ -672,7 +695,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-U<br>
@@ -685,7 +709,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-i<br>
@@ -698,7 +723,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-o<br>
@@ -711,7 +737,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-O<br>
@@ -724,7 +751,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-H<br>
@@ -737,7 +765,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-E<br>
@@ -750,7 +779,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-F<br>
@@ -763,7 +793,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-K<br>
@@ -776,7 +807,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-J<br>
@@ -789,7 +821,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-#<br>
@@ -802,7 +835,9 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-*<br>
@@ -815,7 +850,9 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-B<br>
@@ -828,7 +865,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-N<br>
@@ -841,7 +879,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-e<br>
@@ -854,7 +893,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-aSI<br>
@@ -867,7 +907,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-abinary<br>
@@ -880,7 +921,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-Q<br>
@@ -893,7 +935,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-aa<br>
@@ -906,7 +949,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-ac<br>
@@ -919,7 +963,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-am<br>
@@ -932,7 +977,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-an<br>
@@ -945,7 +991,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-acase<br>
@@ -958,7 +1005,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-ar<br>
@@ -978,7 +1026,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">OK<br>
       </td>
       <td style="vertical-align: top; text-align: center;">OK<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-ag<br>
@@ -998,7 +1047,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">OK<br>
       </td>
       <td style="vertical-align: top; text-align: center;">OK<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-z<br>
@@ -1011,12 +1061,13 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-s<br>
       </td>
-      <td style="vertical-align: top;">se--slice<br>
+      <td style="vertical-align: top;">--slice<br>
       </td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -1024,7 +1075,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-S<br>
@@ -1037,7 +1089,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-p<br>
@@ -1050,7 +1103,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-@<br>
@@ -1063,7 +1117,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-$<br>
@@ -1076,7 +1131,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-~<br>
@@ -1089,7 +1145,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-%<br>
@@ -1102,7 +1159,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-D<br>
@@ -1115,7 +1173,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-Z<br>
@@ -1128,7 +1187,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-Y<br>
@@ -1141,7 +1201,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-m<br>
@@ -1154,7 +1215,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-ak<br>
@@ -1174,7 +1236,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">--<br>
       </td>
       <td style="vertical-align: top; text-align: center;">OK<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-af<br>
@@ -1194,7 +1257,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">--<br>
       </td>
       <td style="vertical-align: top; text-align: center;">--<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;"><br>
@@ -1207,7 +1271,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-M<br>
@@ -1220,7 +1285,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-,<br>
@@ -1233,7 +1299,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-k<br>
@@ -1246,7 +1313,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-r<br>
@@ -1259,7 +1327,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-f<br>
@@ -1272,7 +1341,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-ae<br>
@@ -1285,7 +1355,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-T<br>
@@ -1298,7 +1369,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-as<br>
@@ -1311,7 +1383,8 @@ option<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-ad<br>
@@ -1325,7 +1398,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">--</td>
       <td style="vertical-align: top; text-align: center;">--</td>
       <td style="vertical-align: top; text-align: center;">OK<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-q<br>
@@ -1345,7 +1419,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">OK<br>
       </td>
       <td style="vertical-align: top; text-align: center;">OK<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-/<br>
@@ -1359,7 +1434,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">--</td>
       <td style="vertical-align: top; text-align: center;">--</td>
       <td style="vertical-align: top; text-align: center;">OK<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-&lt;<br>
@@ -1372,7 +1448,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">--</td>
       <td style="vertical-align: top; text-align: center;">--</td>
       <td style="vertical-align: top; text-align: center;">--</td>
-      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-&gt;<br>
@@ -1385,7 +1462,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">--</td>
       <td style="vertical-align: top; text-align: center;">--</td>
       <td style="vertical-align: top; text-align: center;">--</td>
-      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-=<br>
@@ -1398,7 +1476,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">--</td>
       <td style="vertical-align: top; text-align: center;">--</td>
       <td style="vertical-align: top; text-align: center;">--</td>
-      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-ai<br>
@@ -1418,7 +1497,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">--<br>
       </td>
       <td style="vertical-align: top; text-align: center;">--<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-at<br>
@@ -1438,7 +1518,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">--<br>
       </td>
       <td style="vertical-align: top; text-align: center;">OK<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-0<br>
@@ -1458,7 +1539,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">OK<br>
       </td>
       <td style="vertical-align: top; text-align: center;">--<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-;<br>
@@ -1478,7 +1560,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">OK<br>
       </td>
       <td style="vertical-align: top; text-align: center;">OK<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-1<br>
@@ -1498,7 +1581,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">--<br>
       </td>
       <td style="vertical-align: top; text-align: center;">OK<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-ah<br>
@@ -1518,7 +1602,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">--<br>
       </td>
       <td style="vertical-align: top; text-align: center;">OK<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-^<br>
@@ -1538,7 +1623,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">OK<br>
       </td>
       <td style="vertical-align: top; text-align: center;">OK<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-_<br>
@@ -1558,7 +1644,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">--<br>
       </td>
       <td style="vertical-align: top; text-align: center;">--<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-asecu<br>
@@ -1578,7 +1665,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">--<br>
       </td>
       <td style="vertical-align: top; text-align: center;">--<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-.<br>
@@ -1598,7 +1686,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">OK<br>
       </td>
       <td style="vertical-align: top; text-align: center;">OK<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-3<br>
@@ -1618,7 +1707,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">OK<br>
       </td>
       <td style="vertical-align: top; text-align: center;">OK<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-2<br>
@@ -1638,7 +1728,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">--<br>
       </td>
       <td style="vertical-align: top; text-align: center;">--<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-al<br>
@@ -1658,7 +1749,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">--<br>
       </td>
       <td style="vertical-align: top; text-align: center;">--<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">OK</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-alist-ea<br>
@@ -1678,7 +1770,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">--<br>
       </td>
       <td style="vertical-align: top; text-align: center;">--<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-4<br>
@@ -1698,7 +1791,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">--<br>
       </td>
       <td style="vertical-align: top; text-align: center;">OK<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-5<br>
@@ -1718,7 +1812,8 @@ option<br>
       <td style="vertical-align: top; text-align: center;">--<br>
       </td>
       <td style="vertical-align: top; text-align: center;">--<br>
-      </td>
+      </td><td style="vertical-align: top; text-align: center;">--</td>
+
     </tr>
     <tr>
       <td style="vertical-align: top;">-7<br>
@@ -1738,8 +1833,205 @@ option<br>
       <td style="vertical-align: top; text-align: center;">OK<br>
       </td>
       <td style="vertical-align: top; text-align: center;">OK<br>
+      </td><td style="vertical-align: top; text-align: center;">OK</td>
+
+    </tr><tr>
+      <td style="vertical-align: top;">-'<br>
       </td>
+      <td style="vertical-align: top;">--modified-data-detection<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
     </tr>
+    <tr>
+      <td style="vertical-align: top;">-{<br>
+      </td>
+      <td style="vertical-align: top;">--include-delta-sig<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-}<br>
+      </td>
+      <td style="vertical-align: top;">--exclude-delta-sig<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-8<br>
+      </td>
+      <td style="vertical-align: top;">--delta<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-6<br>
+      </td>
+      <td style="vertical-align: top;">--delta-sig-min-size<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-az<br>
+      </td>
+      <td style="vertical-align: top;">--alter=zeroing-negative-dates<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-\<br>
+      </td>
+      <td style="vertical-align: top;">--ignored-as-symlink<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-T<br>
+      </td>
+      <td style="vertical-align: top;">--kdf-param<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">--aduc<br>
+      </td>
+      <td style="vertical-align: top;">--alter=duc<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-G<br>
+      </td>
+      <td style="vertical-align: top;">--multi-thread<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-j<br>
+      </td>
+      <td style="vertical-align: top;">--network-retry-delay<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-afile-auth<br>
+      </td>
+      <td style="vertical-align: top;">--alter=file-authentication<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-ab<br>
+      </td>
+      <td style="vertical-align: top;">--alter=blind-to-signatures<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-aheader<br>
+      </td>
+      <td style="vertical-align: top;">--alter=header<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+    </tr>
+
   </tbody>
 </table>
 <br>
@@ -2186,8 +2478,8 @@ be parallelized. Such an algorithm can either statically (at
 programming time) or dynamically (at execution time) be cut in several
 independent execution threads. These different execution threads must
 be as much autonomous as possible between them, if you don't want to
-have one thread waiting for another (which is not what we want). The
-constraint is this: if you cannot have different threads with no or
+have one thread waiting for another. The
+constraint is this one: if you cannot have different threads with no or
 very little communication and dependence then parallelization does not
 worth it.<br>
       <br>
@@ -2237,6 +2529,11 @@ second, the gain of time will be less than 2 (it will not be twice
 faster, but much less) as for a given amount of data, compression needs
 much more time to proceed than encryption. Thus the encryption thread
 will most of the time wait for compressed data.<br>
+      <br>
+Since release 2.5.0 with -G option is available to active such way of
+using several CPU, but that clearly shows the gain does not worth the
+effort and complexity brought by this feature, this it is not
+recommended to use it and it<br>
       <br>
 OK, you have maybe found also another possibility : having N threads
 for compression and M threads for encryption. Assuming&nbsp; encryption
@@ -2424,17 +2721,9 @@ been exposed and solved. This will first for you be the fastest way to
 get an answer to your problem, and for me a way to preserve time for
 development.<br>
       <br>
-But yes, there is now tones of emails subjects to read to have a chance
-to have a chance to find the answer to your problem. The most simple
-way is to use the <a href="http://news.gmane.org/gmane.comp.sysutils.backup.dar.support">search
-engine at gmane</a><br>
-      <br>
-Dar-support&nbsp; mailing-list is archived at sourceforge *and* at <a href="http://news.gmane.org/gmane.comp.sysutils.backup.dar.support">gmane.org</a>&nbsp;
-Only this second archive owns a search engine (look there for the green
-box at the bottom of the page).<br>
-      <br>
-This search engine is available for <a href="http://news.gmane.org/index.php?prefix=gmane.comp.sysutils.backup.dar">all
-the mailing list archived at gmane</a> used around dar.<br>
+But yes, there is now tones of emails subjects to read to have a chance to find the answer to your problem. The most simple
+way is to use the <a href="https://sourceforge.net/p/dar/mailman/search/?mail_list=dar-support">dar-support mailing-list archive search
+engine</a><br>
       <br>
       </div>
       <a name="open_failed_excluded"></a><span style="font-style: italic; font-weight: bold;">Why dar tells me that
@@ -3125,7 +3414,47 @@ an archive<br>
             </td>
             <td style="vertical-align: top;">yes<br>
             </td>
+          </tr><tr>
+            <td style="vertical-align: top;">can repair a truncated archive (lack of disk space, power failure,...)<br>
+            </td>
+            <td style="vertical-align: top;">no<br>
+            </td>
+            <td style="vertical-align: top;">yes<br>
+            </td>
           </tr>
+          <tr>
+            <td style="vertical-align: top;">can sign an archive<br>
+            </td>
+            <td style="vertical-align: top;">no<br>
+            </td>
+            <td style="vertical-align: top;">yes if archive is also gnupg encrypted<br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">recorded date precision<br>
+            </td>
+            <td style="vertical-align: top;">1 second<br>
+            </td>
+            <td style="vertical-align: top;">1 microsecond<br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">can perform binary delta<br>
+            </td>
+            <td style="vertical-align: top;">no<br>
+            </td>
+            <td style="vertical-align: top;">yes<br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">can efficiently restore a few files from a large archive using ftp or sftp<br>
+            </td>
+            <td style="vertical-align: top;">no<br>
+            </td>
+            <td style="vertical-align: top;">yes<br>
+            </td>
+          </tr>
+
         </tbody>
       </table>
       <br>
@@ -3651,7 +3980,8 @@ with...</li><li>replace the the host key of the ssh/sftp server by an
 ssh-rsa one, OK, this will most probably imply you to have root
 permission on the remote ssh/sftp server... which is not possible when
 using public cloud service over Internet.</li>
-      </ol>
+      </ol><br>
+
 
       
       </div>

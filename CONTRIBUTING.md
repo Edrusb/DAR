@@ -1,18 +1,36 @@
 Hi,
 
-for bug report, source packages dowload, binary packages and documentation please take a little time to read the directives at http://dar.linux.free.fr/
+for bug report, source packages dowload, binary packages and documentation
+please take a little time to read the directives at http://dar.linux.free.fr/
 
-If you wish to submit a patch or want to request a pull using GitHub, Welcome! but please, follow the rules!
-- respect the existing coding style
-- most of dar code has been written long before C++11 was even a project, but new addition should follow C++14 as much as possible (A major code upgrade/review is planed to move toward C++14, though dar/libdar already compiles as C++11 code).
-- comment you code when what it does is not obvious
-- if possible use /// doxygen inline documentation to document your prototypes, arguments and returned values 
-- when a if/then condition does not need an "else" clause, add one anyway with the SRC_BUG; directive in it, this will trigger and exception in case of bug (a so called "self reported bug").
-- same thing whithin a switch{ } directive use the default: condition with a SRC_BUG; directive here too, and enumerate all the other possible values (if that makes sens of course).
-- portability is important, your code should work under Linux, FreeBSD, OpenSolaris, Cygwin/Windows, ...
-- be prepared to justify/defend/argue your proposal, I the case I could not see the value it brings :-)
+If you wish to submit a patch or want to request a pull using GitHub, Welcome!
+But please, follow the rules!
+- respect the existing coding style (4 char margin, { and its corresponding}
+  on the same column, no space between a function name and the parenthesis,
+  spaces and new lines where it makes sens for readability, ...)
+- most of dar code has been written long before C++11 was even a project, but
+  new addition should follow C++14 as much as possible (A major code refresh
+  has taken place for release 2.6.0 to leverage C++11/C++14 constructions
+  though it did not worth doing absolutely all code without trace of C++98
+  constructions... so pay attention to the existing code in dar/libdar)
+- comment you code in particular when it does not obvious things
+- if possible use /// doxygen inline documentation to document your prototypes,
+  arguments and returned values. Doxygen \note are also welcome here.
+- when an if/then condition does not need an "else" clause, add one anyway
+  using a the SRC_BUG directive in this else clause, this will trigger and
+  exception in case of bug (a so called "self reported bug").
+- same thing whithin a switch{ } constructions always use a default: condition
+  with invoking the SRC_BUG directive.
+- portability is important, your code should work under Linux, FreeBSD,
+  OpenSolaris, Cygwin/Windows, ... pay attention not to use system specific
+  things unless escaped by compilation time directive (#if HAVE_...)
+- be prepared to justify/defend/argue your proposal, In the case I could not
+  see the value it brings :-)
 - be patient, I will review your code proposal
 
-In short: readability, robustness, portability, evolutivity, flexibility, completness and documentation are the master keys I've been following since 2001 to design and implement dar/libdar, I just hope you can understand that.
+In short: readability, robustness, portability, evolutivity, flexibility,
+completness and documentation are the master keys I've been following since
+2001 to design and implement dar/libdar. You code should follow these
+criteria to be included into dar/libdar code
 
-Thanks!
+Thanks for comprehension!

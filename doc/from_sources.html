@@ -11,6 +11,7 @@
 
 
 
+
 <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Dar's Documentation - Compiling From Source</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
@@ -74,7 +75,7 @@ gzip compression support
 compression support</li>
         <li style="text-align: justify;"><a href="http://www.oberhumer.com/opensource/lzo/">liblzo2 library</a>
 for lzo compression support</li>
-        <li style="text-align: justify;"><a href="http://tukaani.org/xz/">liblzma5 library</a> for xz/lzma compression support<br>
+        <li style="text-align: justify;"><a href="http://tukaani.org/xz/">libxz library</a> for xz/lzma compression support<br>
         </li>
 
         <li style="text-align: justify;">gnu Getopt support (Linux has
@@ -95,8 +96,12 @@ to generate html version of man pages</li>
         <li><a href="http://e2fsprogs.sourceforge.net">ext2/ext3/ext4 file system libraries</a> for Linux Filesystem Specific Attributes and nodump flag support<br>
         </li>
 
-        <li><a href="http://libthreadar.sourceforge.net/">libthreadar</a> for libdar using several threads (experimental feature, poor performance gain, avoid using it)<br>
+        <li><a href="http://libthreadar.sourceforge.net/">libthreadar</a> for libdar using several threads and remote repository feature (needs libcurl in addition see below)<br>
+</li>
+        <li><a href="http://librsync.sourceforge.net/">librsync</a> for delta binary</li>
+        <li><a href="https://curl.haxx.se/libcurl/">libcurl</a> for remote repository access using ftp or sftp protocols<br>
         </li>
+
 
       </ul>
       <div style="margin-left: 40px;"><br>
@@ -134,8 +139,15 @@ generate man pages in html format</li>
         <li>If you lack <span style="font-weight: bold;">extX file system libraries</span> you will not be able to save and restore Linux FSA, nor to avoid saving files having their nodump flag set<br>
         </li>
 
-        <li>if you lack <span style="font-weight: bold;">libthreadar</span> libdar will execute each action in a single thread<br>
+        <li>if you lack <span style="font-weight: bold;">libthreadar</span> libdar will execute each action in a single thread, nor you will be able to use remote ftp or sftp directly from dar<br>
+</li>
+        <li>if you lack <span style="font-weight: bold;">librsync</span>
+library dar will still compile but you will not be able to create
+archive with binary delta nor to read/restore files stored with binary
+delta</li>
+        <li>if you lack <span style="font-weight: bold;">libcurl</span> you won't be able to remotely read or write a archive stored using ftp or sftp<br>
         </li>
+
 
       </ul>
       <div style="text-align: justify;"><br>
@@ -423,7 +435,19 @@ information on self diagnostic bugs even<br>
     <tr>
       <td style="vertical-align: top; text-align: right;">--disable-birthtime<br>
       </td>
-      <td style="vertical-align: top;">disable the HFS+ Filesystem Specific Attribute support<br>
+      <td style="vertical-align: top;">Disable the HFS+ Filesystem Specific Attribute support<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">--disable-librsync-linking<br>
+      </td>
+      <td style="vertical-align: top;">Disable linking with librsync, thus delta binary will not be available<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right;">--disable-libcurl-linking<br>
+      </td>
+      <td style="vertical-align: top;">Disable linking with libcurl, thus remote repository support using ftp or sftp will not be available<br>
       </td>
     </tr>
 <tr>
@@ -525,8 +549,8 @@ of branches. In dar repository, there are thus a lot of them: the first
 and main one is called "master". It contains current development and
 most probably unstable code. There are other permanent branches that
 hold stable code. They are all named by "<span style="font-weight: bold;">branch_A.B.x</span>" where A and B are the
-numbers corresponding to a released versions family. For example, "<span style="font-weight: bold;">branch_2.5.x</span>" holds the stable code
-for releases 2.5.0, 2.5.1, 2.5.2 and so on. <span style="text-decoration: underline;">It also holds pending fixes for
+numbers corresponding to a released versions family. For example, "<span style="font-weight: bold;">branch_2.6.x</span>" holds the stable code
+for releases 2.6.0, 2.6.1, 2.6.2 and so on. <span style="text-decoration: underline;">It also holds pending fixes for
 the next release on that branch you might be interested in.</span> <br>
       <br>
 The global organisation of the repository is thus the following:<br>
