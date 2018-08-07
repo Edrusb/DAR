@@ -1365,9 +1365,9 @@ namespace libdar
 		    }
 
 			// generating salt and storing it in the archive version header with iteration_count
-			// when key is a human generated passphrase
+			// when key is a human generated passphrase (no gnupg) and when strong encryption is used (no scrambling)
 
-		    if(gnupg_recipients.empty())
+		    if(gnupg_recipients.empty() && crypto != crypto_algo::scrambling)
 		    {
 			salt = crypto_sym::generate_salt(crypto_sym::max_key_len(crypto));
 			ver.set_salt(salt);
