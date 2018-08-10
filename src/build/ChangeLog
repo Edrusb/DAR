@@ -3,6 +3,7 @@ from 2.5.16 to 2.5.17
   did not included user write access. Fix consists in temporarily
   adding user write access in order to restore EA and removing this
   extra permission afterward if necessary
+- updated FAQ
 
 from 2.5.15 to 2.5.16
 - bug fix: while rechecking sparse file (-ah option) during a merging
