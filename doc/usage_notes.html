@@ -47,8 +47,10 @@ remote backup server</a><br>
       <a href="#Parchive">Using data protection with DAR &amp; Parchive</a><br>
       <a href="#filtering">Examples of file filtering</a><br>
       <a href="#Decremental_Backup">Decremental Backup</a><br>
-      <a href="#door">Door inodes (Solaris)</a><br><a href="#delta">
-How to use "delta compression", "binary diff" or "rsync like increment" with dar</a><br>
+      <a href="#door">Door inodes (Solaris)</a><br>
+      <a href="#delta">How to use "delta compression", "binary diff" or
+"rsync like increment" with dar</a><br><a href="#remote">
+Comparing the different way to perform remote backup</a><br>
       <br>
       <br>
       </div>
@@ -63,8 +65,6 @@ How to use "delta compression", "binary diff" or "rsync like increment" with dar
     <tr>
       <td style="vertical-align: top;">
       <h3><a name="dar_remote"></a><span style="text-decoration: underline;">Dar and remote backup server</span></h3>
-      
-      
       <div style="text-align: justify; margin-left: 40px;">In
 the following you will find the three different available ways to have
 dar working with remote repositories (or remote server if you prefer):<br>
@@ -92,13 +92,15 @@ Between
 these two
 hosts, you could also use NFS and nothing more would be necessary
 to use dar as usually. but if for security reasons you don't want to
-use NFS (insecure network, backup over Internet, ...), but prefer to communicate through an encrypted session (using ssh for
+use NFS (insecure network, backup over Internet, ...), but prefer to
+communicate through an encrypted session (using ssh for
 example), then you need to use dar features brought by version 1.1.0: <br>
       </div>
       <div style="margin-left: 40px;"><br>
       <span style="font-weight: bold;">1 - Single pipe</span><br>
-<br>
-dar can output its archive to its standard output instead of a given file. To
+      <br>
+dar can output its archive to its standard output instead of a given
+file. To
 activate it, use "-" as basename. Here is an example :<br>
       <br>
       </div>
@@ -158,9 +160,12 @@ On the remote backup server you would type: <br>
 CAT_backup_name -z</code><br>
       </div>
       <div style="margin-left: 40px;"><br>
-Note that without -z option no compression is used as by default with dar for any operation, use -z option: <span style="font-weight: bold;">it worse compressing an isolated catalogue</span>.<br>
-<br>
-if the isolated catalogue is too big to fit on a floppy [<span style="font-style: italic;">yes, this was written long ago :-)</span>], you can split it as
+Note that without -z option no compression is used as by default with
+dar for any operation, use -z option: <span style="font-weight: bold;">it
+worse compressing an isolated catalogue</span>.<br>
+      <br>
+if the isolated catalogue is too big to fit on a floppy [<span style="font-style: italic;">yes, this was written long ago :-)</span>],
+you can split it as
 usually using dar:<br>
       <br>
       </div>
@@ -213,7 +218,13 @@ backup_diff -z -R /</code><br>
       </div>
       <div style="margin-left: 40px;"><br>
       </div>
-      <div style="text-align: justify; margin-left: 40px;">To read an archive from a remote host using a single pile, you will need to run dar with the <span style="font-weight: bold;">--sequential-read</span> option. In that so called <span style="font-style: italic;">sequential read mode</span>, dar sequentially reads the archive contents from the beginning up to the end. This has some <span style="font-weight: bold;">huge drawback</span>
+      <div style="text-align: justify; margin-left: 40px;">To read an
+archive from a remote host using a single pile, you will need to run
+dar with the <span style="font-weight: bold;">--sequential-read</span>
+option. In that so called <span style="font-style: italic;">sequential
+read mode</span>, dar sequentially reads the archive contents from the
+beginning up to the end. This has some <span style="font-weight: bold;">huge
+drawback</span>
 when it comes to extract few files from a large archive especially when
 such large archive has to be sent over the network. For that reason
 let's see another method:<br>
@@ -230,11 +241,14 @@ For
 differential
 backups instead of isolating the catalogue, it is also possible to read
 an archive or its extracted catalogue through pipes. Yes, <span style="font-weight: bold;">two pipes are
-required</span> for dar to be able to read an archive efficiently. The first goes from dar
-to the external program "<span style="font-weight: bold;">dar_slave</span>" and carries orders (asking some
+required</span> for dar to be able to read an archive efficiently. The
+first goes from dar
+to the external program "<span style="font-weight: bold;">dar_slave</span>"
+and carries orders (asking some
 portions of the archive) while the other pipe goes from "dar_slave"
 back to "dar" and carries the requested data for reading.<br>
-      <br>By
+      <br>
+By
 default, if you specify "-" as basename for -l, -t, -d, -x, or to -A
 (used with -C or -c), dar and dar_slave will use their standard input
 and output to communicate. Thus you need additional program to make the
@@ -386,11 +400,15 @@ you have slices test.1.dar, test.2.dar ... available in the directory
 Archive of an FTP server you could read, extract, list, test, ... that
 archive using the following syntax:<br>
       <br>
-</div>
-      <div style="text-align: left; margin-left: 80px;"><code>dar -t ftp://login@ftp.server.some.where/Archive/test ... &lt;other options&gt;</code><br>
+      </div>
+      <div style="text-align: left; margin-left: 80px;"><code>dar -t
+ftp://login@ftp.server.some.where/Archive/test ... &lt;other options&gt;</code><br>
       </div>
       <div style="margin-left: 40px;"><br>
-Same thing with -l, -x, -A and -@ options. Note that you still need to provide the <span style="text-decoration: underline;">archive base name</span> not a slice name. This option is also compatible with slicing and slice hashing, they will be generated on remote server:<br>
+Same thing with -l, -x, -A and -@ options. Note that you still need to
+provide the <span style="text-decoration: underline;">archive base name</span>
+not a slice name. This option is also compatible with slicing and slice
+hashing, they will be generated on remote server:<br>
       <br>
       <div style="margin-left: 40px;"><code>dar -c
 sftp://login:password@secured.server.some.where/Archive/day2/incremental
@@ -398,20 +416,20 @@ sftp://login:password@secured.server.some.where/Archive/day2/incremental
 sftp://login2:password2@secured.server.some.where/Archive/day2/CAT_incremental
 &lt;other options&gt;</code><br>
       </div>
-
       <br>
 By default if no password is given, dar asks the user interactively. If
 no login is used, dar assumes the login to be "anonymous". When you add
 the -afile-auth option, in absence of password on command-line, dar
 checks for a password in the file ~/.netrc for both FTP and SFTP
 protocols to avoid exposing password on command-line while still have
-non interactive backup. See <span style="font-weight: bold;">man netrc</span> for this common file's syntax.<br>
-<br>&nbsp;In the next paragraph you will find <a href="#netcat_ssh">examples of use with netcat and ssh</a>
+non interactive backup. See <span style="font-weight: bold;">man netrc</span>
+for this common file's syntax.<br>
+      <br>
+&nbsp;In the next paragraph you will find <a href="#netcat_ssh">examples
+of use with netcat and ssh</a>
 relying on the two first options for remote operation, but just before
 find a summary table of the pro and cons of the different remote server
-access methods:
-      </div>
-
+access methods: </div>
       </td>
     </tr>
   </tbody>
@@ -422,16 +440,20 @@ access methods:
     <tr>
       <td style="vertical-align: top; font-weight: bold; width: 20%; text-align: center;">Mode<br>
       </td>
-      <td style="vertical-align: top; font-weight: bold; width: 10%; text-align: center;">network protocol<br>
+      <td style="vertical-align: top; font-weight: bold; width: 10%; text-align: center;">network
+protocol<br>
 supported<br>
       </td>
       <td style="vertical-align: top; font-weight: bold; width: 30%; text-align: center;">slicing<br>
       </td>
-      <td style="vertical-align: top; font-weight: bold; width: 10%; text-align: center;">slice hashing<br>
+      <td style="vertical-align: top; font-weight: bold; width: 10%; text-align: center;">slice
+hashing<br>
       </td>
-      <td style="vertical-align: top; font-weight: bold; width: 10%; text-align: center;">efficient archive reading<br>
+      <td style="vertical-align: top; font-weight: bold; width: 10%; text-align: center;">efficient
+archive reading<br>
       </td>
-      <td style="vertical-align: top; font-weight: bold; width: 20%; text-align: center;">Note <br>
+      <td style="vertical-align: top; font-weight: bold; width: 20%; text-align: center;">Note
+      <br>
       </td>
     </tr>
     <tr>
@@ -439,13 +461,15 @@ supported<br>
       </td>
       <td style="vertical-align: top;">any reliable one (*)<br>
       </td>
-      <td style="vertical-align: top;">using dar_xform for both reading and writing<br>
+      <td style="vertical-align: top;">using dar_xform for both reading
+and writing<br>
       </td>
       <td style="vertical-align: top; text-align: center;">NO<br>
       </td>
       <td style="vertical-align: top; text-align: center;">NO<br>
       </td>
-      <td style="vertical-align: top;">only efficient for archive creation<br>
+      <td style="vertical-align: top;">only efficient for archive
+creation<br>
       </td>
     </tr>
     <tr>
@@ -460,11 +484,13 @@ and dar_slave for reading<br>
       </td>
       <td style="vertical-align: top; text-align: center;">YES<br>
       </td>
-      <td style="vertical-align: top;">efficient for archive reading and using archive as reference<br>
+      <td style="vertical-align: top;">efficient for archive reading
+and using archive as reference<br>
       </td>
     </tr>
     <tr>
-      <td style="vertical-align: top; font-weight: bold;">dar native support<br>
+      <td style="vertical-align: top; font-weight: bold;">dar native
+support<br>
       </td>
       <td style="vertical-align: top;">FTP and SFTP only<br>
       </td>
@@ -475,27 +501,28 @@ and dar_slave for reading<br>
       </td>
       <td style="vertical-align: top; text-align: center;">YES<br>
       </td>
-      <td style="vertical-align: top;">FTP is insecure but less CPU resources<br>
+      <td style="vertical-align: top;">FTP is insecure but less CPU
+resources<br>
       </td>
     </tr>
   </tbody>
 </table>
 <br>
-(*) any protocol that is lossless, keep byte order and do not duplicate data<br>
+(*) any protocol that is lossless, keep byte order and do not duplicate
+data<br>
 <br>
 <hr style="width: 100%; height: 2px;"><br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
-      
       <h3><a name="netcat_ssh"></a><span style="text-decoration: underline;">dar and ssh</span><br>
       </h3>
-
       <div style="text-align: justify; margin-left: 40px;">As reported
 "DrMcCoy" in the historical forum "Dar Technical
 Questions", the netcat program can be very helpful if you plane to
-backup over the network. However netcat does not cipher the data over the network.<br>
+backup over the network. However netcat does not cipher the data over
+the network.<br>
       </div>
       <div style="margin-left: 40px;"><br>
       </div>
@@ -2122,9 +2149,10 @@ archive manipulation, as we would have to generate both decremental and
 new full backup, and we would manipulate at least the same amount of
 data]. Then <span style="text-decoration: underline;">with the two
 full backups</span> the user would have to use
-archive
-      <span style="font-weight: bold;">merging</span> to <span style="text-decoration: underline;">create the
-decremental backup</span> <span style="font-weight: bold;">using</span> <span style="font-weight: bold;">-ad option</span>. Last, once the resulting
+archive <span style="font-weight: bold;">merging</span> to <span style="text-decoration: underline;">create the
+decremental backup</span> <span style="font-weight: bold;">using</span>
+      <span style="font-weight: bold;">-ad option</span>. Last, once
+the resulting
 (decremental) archive have been tested and that the user is sure this
 decremental
 backup is viable, he can <span style="text-decoration: underline;">remove
@@ -2147,7 +2175,6 @@ its extracted catalogue.<br>
 decremental backup is extracted from a discussion with Dan Masson on
 dar-support mailing-list:</span><br>
       </div>
-      
       <div style="text-align: justify; margin-left: 40px;"><span style="font-weight: bold; text-decoration: underline;">Seriously, stop
 that long-winded considerations! Tell me what I need to do!</span><br>
       <br>
@@ -2267,90 +2294,88 @@ You want the command-line for that? sure:<br>
       <span style="font-family: monospace;">dar -x
 /mnt/backup/DECR-2015-04-11 -R / -w</span><br>
       </div>
-      <br><span style="font-weight: bold; text-decoration: underline;">
-Is that serious?</span> <br>
+      <br>
+      <span style="font-weight: bold; text-decoration: underline;">Is
+that serious?</span> <br>
       <br>
       <div style="margin-left: 40px;">Yes! :)<span class="moz-smiley-s1" title=":-)"></span><br>
       </div>
-
       </div>
       <span style="font-family: monospace;"></span><br>
       </div>
       </td>
     </tr>
-</tbody>
+  </tbody>
 </table>
 
-    
 <div style="text-align: justify; text-decoration: underline;">
-    <hr style="width: 100%; height: 2px;"></div>
+<hr style="width: 100%; height: 2px;"></div>
 
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
 
-    <tbody><tr>
+  <tbody>
+    <tr>
       <td>
       <h3>Door inodes (Solaris)<a name="door"></a></h3>
       <div style="text-align: justify; margin-left: 40px;"> </div>
-      
       <div style="margin-left: 40px;">
-      <div style="text-align: justify;">
-      </div>
-      
+      <div style="text-align: justify;"> </div>
       <div style="text-align: justify;">A door inode is a dynamic
 object that is created on top of an empty file, it does exist only when
 a process has a reference to it, it is thus not possible to restore it.
 But the empty file it is mounted on can be restored instead. As such,
 dar restores an door inode with an empty file having the same
 parameters as the door inode.<br>
-
       <br>
-
 If an door inode is hard linked several times in the file system dar
 will restore a plain file having as much hard links to the
 corresponding locations.<br>
-
       <br>
-
 Dar is also able to handle Extended Attributes associated to a door
 file, if any. Last, if you list an archive containing door inodes, you
 will see the 'D' letter as their type (by opposition to 'd' for
 directories), this is conform to what the 'ls' command displays for
 such entries.<br>
       </div>
-
-
-      
       </div>
       <br>
       <br>
-      <h3><a name="delta"></a>How to use "delta compression", "binary diff" or "rsync like increment" with dar</h3>
+      <h3><a name="delta"></a>How to use "delta compression", "binary
+diff" or "rsync like increment" with dar</h3>
       <div style="margin-left: 40px;">
       <h4 style="text-decoration: underline;">Terminology</h4>
       <div style="text-align: justify;">"delta compression", "binary
 diff" or "rsync increment" all point to the same feature: a way to
 avoid resaving a whole file during a differential/incremental backup
-and only save the modified part of it instead. This solution is of course
+and only save the modified part of it instead. This solution is of
+course
 interesting for large files that change often but only for little parts
 of them (Microsoft exchange mailboxes, for example). Dar implements
-this feature relying on <span style="font-weight: bold;">librsync library</span>, feature which we will call
- <span style="font-style: italic; font-weight: bold;">binary delta</span><span style="font-weight: bold;"> </span> in
+this feature relying on <span style="font-weight: bold;">librsync
+library</span>, feature which we will call <span style="font-style: italic; font-weight: bold;">binary delta</span><span style="font-weight: bold;"> </span> in
 the following<br>
       </div>
       <br>
       <h4 style="text-decoration: underline;">Librsync specific concepts</h4>
-Before looking at the way to use dar, several concepts from librsync have to be known:<br>
+Before looking at the way to use dar, several concepts from librsync
+have to be known:<br>
       <br>
       <div style="text-align: justify;">In order to make a binary delta
- of a file "foo" which at time t1 contained data F1 and at
-time t2 containted data F2, librsync requires first that a "<span style="font-weight: bold;">delta signature</span>" be made against F1. 
-Then using that signature and data F2, librsync is able to build a <span style="font-weight: bold;">delta patch</span> P1 that, if applied to F1 will provide 
-content F2:<br>
+of a file "foo" which at time t1 contained data F1 and at
+time t2 containted data F2, librsync requires first that a "<span style="font-weight: bold;">delta signature</span>" be made against F1.
+Then using that signature and data F2, librsync is able to build a <span style="font-weight: bold;">delta patch</span> P1 that, if applied to
+F1 will provide content F2:<br>
       </div>
       <br>
-      <div style="margin-left: 40px;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; backing up file "foo"</span><br>
-      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</span><br>
-      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V</span><br style="font-family: monospace;">
-      <span style="font-family: monospace;"></span><span style="font-family: monospace;">time t1&nbsp; content = F1 &nbsp;&nbsp; ---------&gt; <span style="font-weight: bold;">delta signature</span> of F1</span><br style="font-family: monospace;">
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+backing up file "foo"</span><br>
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</span><br>
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+V</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;"></span><span style="font-family: monospace;">time t1&nbsp; content = F1
+&nbsp;&nbsp; ---------&gt; <span style="font-weight: bold;">delta
+signature</span> of F1</span><br style="font-family: monospace;">
       <span style="font-family: monospace;">&nbsp;
 &nbsp; &nbsp; &nbsp;
 &nbsp; &nbsp; &nbsp;
@@ -2383,16 +2408,21 @@ differential backup, then using librsync applying the patch "P1" to
 modify F1 into F2.<br>
       </div>
       <br>
-      <div style="margin-left: 40px;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; restoring file "foo"</span><br>
-      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</span><br>
-      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V</span><br style="font-family: monospace;">
-      <span style="font-family: monospace;"></span><span style="font-family: monospace;">time t3&nbsp; content = F1 &nbsp;&nbsp; &lt;---&nbsp; from a previous backup</span><br style="font-family: monospace;">
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+restoring file "foo"</span><br>
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</span><br>
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+V</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;"></span><span style="font-family: monospace;">time t3&nbsp; content = F1
+&nbsp;&nbsp; &lt;---&nbsp; from a previous backup</span><br style="font-family: monospace;">
       <span style="font-family: monospace;">&nbsp;
 &nbsp; &nbsp; &nbsp;
 &nbsp; &nbsp; &nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span><br style="font-family: monospace;">
-      <span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; +------&gt;---------------&gt;---</span><span style="font-family: monospace;">-------------+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <span style="font-family: monospace;">&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; +------&gt;---------------&gt;---</span><span style="font-family: monospace;">-------------+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 .
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |<br>
@@ -2409,21 +2439,16 @@ V <br>
 |<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 +-----&lt;---------------&lt;-------------&lt;---+<br style="font-family: monospace;">
-      </span><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V</span><br style="font-family: monospace;">
+      </span><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+V</span><br style="font-family: monospace;">
       <span style="font-family: monospace;">time t4&nbsp; content = F2</span><br style="font-family: monospace;">
       </div>
-
-
-
-
-
-
-
-
       <h4 style="text-decoration: underline;">Usage with dar</h4>
-      <div style="text-align: justify;">First, delta signature is not activated by default, you have to tell dar you want to generate delta signature using the
-      <b>--delta sig</b>
+      <div style="text-align: justify;">First, delta signature is not
+activated by default, you have to tell dar you want to generate delta
+signature using the <b>--delta sig</b>
 option at archive creation/isolation/merging time. Then as soon as a
 file has a delta signature in the archive of reference, dar will
 perform a delta binary if such file has changed since the archive of
@@ -2432,15 +2457,15 @@ reference was done. But better an example than a long explanation:<br>
       <br>
 Case of a <span style="font-weight: bold;">differential backup </span>scheme:<br>
       <br>
-      <div style="text-align: justify; margin-left: 40px;">First, doing a full backup, we add the <span style="font-weight: bold;">--delta sig</span>
+      <div style="text-align: justify; margin-left: 40px;">First, doing
+a full backup, we add the <span style="font-weight: bold;">--delta sig</span>
 option for the resulting archive to contain the necessary signatures to
 be provided to librsync later on in order to setup delta patches. This
 has the drawback of additional space requirement but the advantage of
 space economy at incremental/differential backups:<br>
       </div>
       <div style="margin-left: 40px;"><br>
-      <div style="margin-left: 40px;">&nbsp;<span style="font-family: monospace;">dar -c full -R / -z <span style="font-weight: bold;">--delta sig</span>
-      </span><br>
+      <div style="margin-left: 40px;">&nbsp;<span style="font-family: monospace;">dar -c full -R / -z <span style="font-weight: bold;">--delta sig</span> </span><br>
       </div>
 &nbsp; <br>
       </div>
@@ -2453,33 +2478,34 @@ contain delta patches of modified files since full archive was created,
 but will not contain any delta signature. <br>
       </div>
       <div style="margin-left: 40px;"><br>
-      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c diff1 -A full -R / -z 
-      <br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c diff1 -A full -R / -z <br>
       </span></div>
       <br>
-      <div style="text-align: justify;">The next differential backups will be done the same, based on the full backup:<br>
+      <div style="text-align: justify;">The next differential backups
+will be done the same, based on the full backup:<br>
       </div>
       <br>
-      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c diff<span style="font-weight: bold;">2</span> -A full -R / -z 
-      <br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c diff<span style="font-weight: bold;">2</span> -A full -R / -z <br>
       </span></div>
       <br>
 Looking at archive content, you will see the "[Delta]" flag in place of
 the "[Saved]" flag for files that have been saved as a delta patch
-rather than having their whole data saved in the backup: <br><br>
-      <div style="margin-left: 40px;">
-      <span style="font-family: monospace;">
-      
-      [Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size  |          Date                 |    filename<br>
-      --------------------------------+------------+-------+-------+-------+-------------------------------+------------<br>
-      <b>[Delta]</b>[ ]       [-L-][  99%][X]  -rwxr-xr-x   1000     1000    919 kio Tue Mar 22 20:22:34 2016        bash<br>
-      </span>
-      </div>
+rather than having their whole data saved in the backup: <br>
+      <br>
+      <div style="margin-left: 40px;"> <span style="font-family: monospace;"> [Data ][D][ EA ][FSA][Compr][S]|
+Permission | User | Group | Size | Date | filename<br>
+--------------------------------+------------+-------+-------+-------+-------------------------------+------------<br>
+      <b>[Delta]</b>[ ] [-L-][ 99%][X] -rwxr-xr-x 1000 1000 919 kio Tue
+Mar 22 20:22:34 2016 bash<br>
+      </span> </div>
       </div>
       <br>
-Case of <span style="font-weight: bold;">incremental backup</span> scheme:<br>
+Case of <span style="font-weight: bold;">incremental backup</span>
+scheme:<br>
       <br>
-      <div style="margin-left: 40px;">Doing incremental backups, the first one is always a full backup and is done the same as above for differential backup:<br>
+      <div style="margin-left: 40px;">Doing incremental backups, the
+first one is always a full backup and is done the same as above for
+differential backup:<br>
       <br>
       <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c full -R / -z <span style="font-weight: bold;">--delta sig</span></span><br>
       </div>
@@ -2491,8 +2517,7 @@ signatures must be present beside the delta patch in the resulting
 archives:<br>
       </div>
       <br>
-      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c incr1 -A full -R / -z <span style="font-weight: bold;">--delta sig</span> 
-      <br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c incr1 -A full -R / -z <span style="font-weight: bold;">--delta sig</span> <br>
       </span></div>
       <br>
       <div style="text-align: justify;">Here the <span style="font-weight: bold;">--delta sig</span>
@@ -2513,12 +2538,13 @@ catalogue: If you want to perform a binary difference, the signature of
 reference files must be present in the isolated catalogue:&nbsp;&nbsp; <br>
       </div>
       <br>
-      <div style="margin-left: 40px;">
-      <span style="font-family: monospace;">dar <span style="font-weight: bold;">-C </span>CAT_full -A full -z <span style="font-weight: bold;">--delta sig</span></span><br>
+      <div style="margin-left: 40px;"> <span style="font-family: monospace;">dar <span style="font-weight: bold;">-C
+      </span>CAT_full -A full -z <span style="font-weight: bold;">--delta
+sig</span></span><br>
       </div>
       <br>
-      <div style="text-align: justify;">
-Note that if the archive of reference does not hold any delta
+      <div style="text-align: justify;">Note that if the archive of
+reference does not hold any delta
 signature, the previous command will lead dar to compute on-fly delta
 signature of saved files while performing catalogue isolation. You can
 thus chose not to include delta signature inside full backup while
@@ -2529,8 +2555,9 @@ delta signature computed at isolation time. Same point if a file is
 stored as a delta patch without delta signature associated with it, dar
 will not be able to add a delta signature at isolation time for that
 file. </div>
-      <p>
-      </p><div style="text-align: justify;">Yes, this is as simple as adding <span style="font-weight: bold;">--delta sig</span>
+      <p> </p>
+      <div style="text-align: justify;">Yes, this is as simple as
+adding <span style="font-weight: bold;">--delta sig</span>
 to what you were used to do before. The resulting isolated catalogue
 will be much larger than without delta signatures but still much
 smaller than the full backup itself. The incremental or differential
@@ -2538,12 +2565,10 @@ backup can then be done the same as before but using CAT_full in place
 of full:<br>
       </div>
       <br>
-      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c diff1 -A <span style="font-weight: bold;">CAT_</span>full -R / -z 
-      </span><br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">dar -c diff1 -A <span style="font-weight: bold;">CAT_</span>full -R / -z </span><br>
       <br>
-      <span style="font-family: monospace;">dar -c incr1 -A <span style="font-weight: bold;">CAT_</span>full -R / -z <span style="font-weight: bold;">--delta sig</span>
-      <br>
-		</span></div>
+      <span style="font-family: monospace;">dar -c incr1 -A <span style="font-weight: bold;">CAT_</span>full -R / -z <span style="font-weight: bold;">--delta sig</span> <br>
+      </span></div>
       </div>
       <br>
 Case of <span style="font-weight: bold;">archive merging</span>:<br>
@@ -2557,16 +2582,18 @@ be present in the source archives you will have to use <span style="font-weight:
       </div>
       <br style="font-family: monospace;">
       </div>
-      <div style="margin-left: 80px;"><span style="font-family: monospace;">dar <span style="font-weight: bold;">--merge</span> merged_backup -A archive1 -@archive2 -z </span><span style="font-weight: bold; font-family: monospace;">--delta sig</span><br>
+      <div style="margin-left: 80px;"><span style="font-family: monospace;">dar <span style="font-weight: bold;">--merge</span>
+merged_backup -A archive1 -@archive2 -z </span><span style="font-weight: bold; font-family: monospace;">--delta sig</span><br>
       </div>
       <div style="margin-left: 40px;"><br>
       </div>
       <br>
 Case of <span style="font-weight: bold;">restoration</span>:<br>
       <br>
-      <div style="text-align: justify; margin-left: 40px;">No special option has to be provided at restoration time. Dar will figure out by itself 
-      whether the data for a file is a <span style="font-weight: bold;">plain data</span> and can replace the whole current data when overwriting
-       is allowed <span style="font-weight: bold;">or</span> is a <span style="font-weight: bold;">delta patch</span>
+      <div style="text-align: justify; margin-left: 40px;">No special
+option has to be provided at restoration time. Dar will figure out by
+itself whether the data for a file is a <span style="font-weight: bold;">plain data</span> and can replace the whole
+current data when overwriting is allowed <span style="font-weight: bold;">or</span> is a <span style="font-weight: bold;">delta patch</span>
 that has to be applied to the existing file lying on filesystem. Before
 patching the file dar will calculate and check its CRC. if the CRC is
 the expected one, the file will be patched else a warning will be
@@ -2580,28 +2607,35 @@ can be of great help here as it will know which archive to skip and
 which not to skip in order to restore a particular set of files.<br>
       </div>
       <br>
-Performing <span style="font-weight: bold;">binary difference only for some files</span> and normal backup for others:<br>
+Performing <span style="font-weight: bold;">binary difference only for
+some files</span> and normal backup for others:<br>
       <br>
       <div style="margin-left: 40px;">
-      <div style="text-align: justify;"> You can exclude files from delta difference operation by
+      <div style="text-align: justify;"> You can exclude files from
+delta difference operation by
 avoiding creating a delta signature for them in the archive of
-reference, using&nbsp; the option <span style="font-weight: bold;">--exclude-delta-sig</span>. You can also include only some files for delta signatures by use of <span style="font-weight: bold;">--include-delta-sig</span>
+reference, using&nbsp; the option <span style="font-weight: bold;">--exclude-delta-sig</span>.
+You can also include only some files for delta signatures by use of <span style="font-weight: bold;">--include-delta-sig</span>
 option. Of course as with other masks-related options like -I, -X, -U,
 -u, -Z, -Y, ... it is possible to combine them to have an even greater
 and more accurate definition of files for which you want to have delta
 signature being built for.<br>
       </div>
       <br>
-      <span style="font-family: monospace;">dar -c full -R / -z --delta sig --include-delta-sig "*.opt" --include-delta-sig "*.pst" --exclude-delta-sig "home/joe/*" </span><br>
+      <span style="font-family: monospace;">dar -c full -R / -z --delta
+sig --include-delta-sig "*.opt" --include-delta-sig "*.pst"
+--exclude-delta-sig "home/joe/*" </span><br>
       <br>
       <div style="text-align: justify;">Independently of this filtering
 mechanism based on path+filename, delta signature is never calculated
 for files smaller than 10 kio because it does not
 worse performing delta difference for them. You can change that
-behavior using the option <span style="font-weight: bold;">--delta-sig-min-size</span> &lt;size in byte&gt;<br>
+behavior using the option <span style="font-weight: bold;">--delta-sig-min-size</span>
+&lt;size in byte&gt;<br>
       </div>
       <br>
-      <span style="font-family: monospace;">dar -c full -R / -z --delta sig --delta-sig-min-size 20k</span><br>
+      <span style="font-family: monospace;">dar -c full -R / -z --delta
+sig --delta-sig-min-size 20k</span><br>
       <br>
       </div>
       <br>
@@ -2609,13 +2643,153 @@ Archive <span style="font-weight: bold;">listing</span>:<br>
       <br>
       <div style="margin-left: 40px; text-align: justify;">Archive
 listing received adhoc addition to show which file have delta signature
-and which one have been saved as delta patch. The <span style="font-family: monospace; font-weight: bold;">[Data ]</span><span style="font-weight: bold;"> </span>column shows <span style="font-family: monospace; font-weight: bold;">[Delta] </span>in place of <span style="font-weight: bold; font-family: monospace;">[Saved]</span> when a delta patch is used, and a new column entitled<span style="font-family: monospace;">[D]</span> shows <span style="font-weight: bold; font-family: monospace;">[D]</span> when a delta signature is present for that file.<br>
+and which one have been saved as delta patch. The <span style="font-family: monospace; font-weight: bold;">[Data ]</span><span style="font-weight: bold;"> </span>column shows <span style="font-family: monospace; font-weight: bold;">[Delta] </span>in
+place of <span style="font-weight: bold; font-family: monospace;">[Saved]</span>
+when a delta patch is used, and a new column entitled<span style="font-family: monospace;">[D]</span> shows <span style="font-weight: bold; font-family: monospace;">[D]</span> when a
+delta signature is present for that file.<br>
       </div>
       <br>
-      <div style="text-align: justify;">See man page about --delta related options for even more details.<br>
+      <div style="text-align: justify;">See man page about --delta
+related options for even more details.<br>
       </div>
       </div>
-</td>
+      <br>
+      <a name="remote"></a>
+      <span style="font-weight: bold;">Comparing the different way to perform remote backup<br>
+      <br>
+      </span>
+      <div style="margin-left: 40px;">Since release 2.6.0 dar can directly use ftp or sftp to operate remotely. This new feature has sometime some advantage over the <a href="#netcat_ssh">methods descibed above with ssh or netcat</a> sometimes it has not, the objective here is to clarify this situation.<br>
+      <br>
+      <table style="text-align: left; width: 100%;" border="1" cellpadding="1" cellspacing="1">
+        <tbody>
+          <tr>
+            <td style="vertical-align: top; width: 20%; text-align: center; font-weight: bold;">Operation<br>
+            </td>
+            <td style="vertical-align: top; width: 40%; text-align: center; font-weight: bold;">dar through ssh or netcat<br>
+            </td>
+            <td style="vertical-align: top; width: 40%; text-align: center; font-weight: bold;">sftp/ftp within dar<br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">Backup<br>
+            </td>
+            <td style="vertical-align: top;">
+            <ul>
+              <li>best solution if you want to keep a local copy of the
+backup or if you want to push the resulting archive to several
+destinations</li>
+              <li>workaround if you hit the sftp <a href="Limitations.html">known_hosts limitation</a></li>
+              <li>sftp&nbsp; not available only ssh</li>
+            </ul>
+            </td>
+            <td style="vertical-align: top;">
+            <ul>
+              <li>best solution if you do not have space on local disks to store the resulting backup</li>
+              <li>requires on-fly isolation to local disk if you want to feed a local dar_manager database with the new archive</li>
+              <li>ssh not available only sftp<br>
+ </li>
+            </ul>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">Testing<br>
+Diffing<br>
+Listing<br>
+            </td>
+            <td style="vertical-align: top;">
+            <ul>
+              <li>workaround if you hit the sftp <a href="Limitations.html">known_hosts limitation</a></li>
+              <li>sftp not available only ssh</li>
+              <li>relies on dar &lt;-&gt; dar_slave exchanges which
+protocol is not designed for long latency exchanges and gives slow
+network performances in that situation<br>
+              </li>
+            </ul>
+            </td>
+            <td style="vertical-align: top;">
+            <ul>
+              <li>maybe a simpler command line to execute</li>
+              <li>best solution if filtering a few files from a large archive dar will fetch over the network only the necessary data.</li>
+              <li>ssh not available only sftp</li>
+            </ul>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">Restoration<br>
+            </td>
+            <td style="vertical-align: top;">
+            <ul>
+<li>workaround if you hit the sftp <a href="Limitations.html">known_hosts limitation</a></li><li>sftp not available only ssh</li>
+            </ul>
+            </td>
+            <td style="vertical-align: top;">
+            <ul>
+              <li>efficient and simple</li>
+              <li>ssh not available only sftp</li>
+            </ul>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">Merging<br>
+            <span style="font-style: italic;">(should be done locally rather than over network if possible)</span><br>
+            </td>
+            <td style="vertical-align: top;">
+            <ul>
+              <li>complicated with the many pipes to setup<br>
+              </li>
+            </ul>
+            </td>
+            <td style="vertical-align: top;">
+            <ul>
+              <li>not adapted if you need to feed the merging result to
+a local dar_manager database (on-fly isolation not available with
+merging with dar)<br>
+              </li>
+            </ul>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">Isolation<br>
+            </td>
+            <td style="vertical-align: top;">
+            <ul>
+<li>workaround if you hit the sftp <a href="Limitations.html">known_hosts limitation</a></li><li>sftp not available only ssh</li>
+            </ul>
+
+            </td>
+            <td style="vertical-align: top;">
+            <ul>
+<li>efficient and simple, transfers the less possible data over the network<br>
+</li><li>ssh not available only sftp</li>
+            </ul>
+
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top;">Repairing<br>
+            <span style="font-style: italic;">(should be done locally rather than over network if possible)</span><br>
+            </td>
+            <td style="vertical-align: top;">
+            <ul>
+              <li>propably slighly more efficient as this operation uses sequential reading (to be measured)<br>
+              </li>
+            </ul>
+            </td>
+            <td style="vertical-align: top;">
+            <ul>
+              <li>ssh not available only sftp</li>
+            </ul>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      <br>
+      <br>
+      </div>
+
+      <br>
+      </td>
     </tr>
   </tbody>
 </table>
