@@ -416,7 +416,8 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    create_options.set_delta_signature(param.delta_sig);
 		    if(param.delta_sig_min_size > 0)
 			create_options.set_delta_sig_min_size(param.delta_sig_min_size);
-		    create_options.set_delta_diff(param.delta_diff);
+		    if(compile_time::librsync())
+			create_options.set_delta_diff(param.delta_diff);
 		    create_options.set_auto_zeroing_neg_dates(param.zeroing_neg_dates);
 
 		    if(param.backup_hook_mask != nullptr)

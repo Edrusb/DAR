@@ -3036,15 +3036,14 @@ expressions</span> in masks.<br>
 slice size is around 20 bytes</span>,
 but you will only be able to store 3 to 4 bytes of information per
 slice, due
-to the slice header that need around 15 bytes in each slice. <span style="text-decoration: underline; font-weight: bold;">But there is no
+to the slice header that need around 15 bytes in each slice (this vary
+depending on options used and may increase in future archive version
+format). <span style="text-decoration: underline; font-weight: bold;">But there is no
 maximum slice size!</span> In other words you can give to <span style="font-weight: bold;">-s</span> and <span style="font-weight: bold;">-S options</span>
-a as long as required positive integer, thanks to its internal own
+an as long as required positive integer, thanks to its internal own
 integer type named "<span style="font-weight: bold;">infinint</span>"
 dar is able to handle arbitrarily large
-integers. This has a slightly memory and CPU penalty in regard to using
-native computer
-32 or 64 bits integers, but has the advantage to provide a long term
-implementation in dar.<br>
+integers.<br>
       <br>
 You can make use of suffixes like 'k' for kilo, M for mega, G for giga
 etc... (<a href="usage_notes.html#bytes_bits_kilo">all suffixes are
@@ -3055,7 +3054,7 @@ between ko (= 1000 octets) kio (= 1024 octets).<br>
 Last point dar/libdar can be compiled using the --enable-mode=64 option
 given to ./configure while building dar. This replaces the "infinint"
 type by 64 bits
-integers, for better performances and reduced memory usage. However
+integers, <span style="font-weight: bold;">for better performances and reduced memory usage</span>. However
 this
 has some drawback on archive size and dates. See the <a href="Limitations.html">limitations</a> for more details.<br>
       </div>
