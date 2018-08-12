@@ -51,6 +51,7 @@ remote backup server</a><br>
       <a href="#delta">How to use "delta compression", "binary diff" or
 "rsync like increment" with dar</a><br><a href="#remote">
 Comparing the different way to perform remote backup</a><br>
+      <a href="#Multi_recipient_signed_archive_weakness">Multi recipient signed archive weakness</a><br>
       <br>
       <br>
       </div>
@@ -2789,6 +2790,52 @@ merging with dar)<br>
       </div>
 
       <br>
+      <br>
+      <a style="font-weight: bold;" name="Multi_recipient_signed_archive_weakness"></a><span style="font-weight: bold;">Multi recipient signed archive weakness</span><br>
+      <br>
+      <div style="text-align: justify;">As described in the <a href="Notes.html#asym">usage notes</a> it is possible to encrypt an archive that can be readable by several recipients using their own gnupg private key. <span style="font-weight: bold;">So far, so good</span>!
+It is also possible to embed your gnupg signature within such archive
+for your recipient to have a proof the archive comes from you. But
+there is a known weakness in this signing approach as implemented in
+libdar, weakness that could be exploited by an expert to fake your
+signature with a different archive.<br>
+      </div>
+      <br>
+Well, if this type of attack should be accessible by an expert guy with
+some constraints, it can only take place between a set of friends!
+Exchanging secret data within a group implicitely means having a
+certain trust level of the members of that group for this secret data
+not to become public, this is in that sense I mean "friends". So if you
+do
+not fully trust well one person in a group and want to share data by
+mean of
+signed/gnupg encrypted dar archive you have several options:<br>
+      <ul>
+        <li>encrypt the archive with dar but <span style="text-decoration: underline;">sign it outside dar</span>, by using gpg on the generated slices (the signature should not modify the slices, but be stored in a sperated file) (<code>gpg --sign -b &lt;slice&gt;.x.dar</code>)<br>
+        </li>
+        <li>Use the --hash option while creating your gnupg encrypted
+dar archive, and sign the hash generated files (still the signature
+should not modify the hash for it can be transparently used by
+sha512sum for example, so the store the hash signature in a separated
+file)</li>
+      </ul>
+example of use:<br>
+      <div style="margin-left: 40px;"><code>dar -c my_secret_group_stuff -z -K gnupg:recipents1@group.group,recipient2@group.group -R /home/secret --hash sha512<br>
+      <br>
+# check the archive has not been corrupted<br>
+sha512sum -c my_secret_group_stuff.1.dar.sha512<br>
+      <br>
+#sign the hash file<br>
+gpg --sign -b my_secret_group_stuff.1.dar.sha512<br>
+      <br>
+#send all three files to your recipients:<br>
+      <br>
+      </code><code>my_secret_group_stuff.1.dar<br>
+my_secret_group_stuff.1.dar.sha512<br>
+my_secret_group_stuff.1.dar.sha512.sig<br>
+      </code><br>
+      </div>
+
       </td>
     </tr>
   </tbody>

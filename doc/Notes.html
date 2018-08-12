@@ -196,11 +196,21 @@ archive or whether a trailer is present that contains this info.<br>
         <li>a extension flag, that was used in older archive but which
 now always set to 'T' telling that a TLV list follows</li>
         <li>A
-TLV (Type Length Value) list of item, it contains the slice size, first
-slice size. The TLV list will receive any future new field related to
-slice header.<br>
-        </li>
+TLV (Type Length Value) list of item, it contains:</li>
+        <ul>
+          <li>the slice size</li>
+          <li>first
+slice size</li>
+          <li>the data_name.&nbsp;</li>
+        </ul>
+
       </ul>
+      <div style="margin-left: 80px;">The TLV list will receive any future new field related to
+slice header.<br>
+      <br>
+      </div>
+
+        
       <div style="text-align: justify; margin-left: 80px;"><code>+-------+----------+------+-----------+-------+</code><br>
       <code>| Magic | internal | flag | extension | TLV&nbsp;&nbsp; |<br>
       </code> <code>| Num.&nbsp; | name&nbsp;&nbsp;&nbsp;&nbsp; | byte
@@ -212,24 +222,19 @@ byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | list&nbsp; |</code><br>
       <div style="text-align: justify;">The
 header is the first thing
 to be written, and if the current slice is not the last
-slice (all data to write could not fit in it), the flag field is
-changed indicating that another slice follows. The header is also the
-first part
-to be read. Since archive format 8, the flag is set to a specific value
+slice (all data to write could not fit in it), before format 8, the
+flag field was
+changed indicating that another slice follows. Since archive format 8,
+the flag is set to a specific value
 indicating that the information telling whether the slice is the last
-is placed in a slice trailer.<br>
+or not is placed in a slice trailer, a new "structure" that appeared
+with that format and which is located at the end of each slice.<br>
+      <br>
+The header is also the
+first part
+to be read.<br>
       </div>
       <br>
-The TLV list may contain several fields:<br>
-      <ul>
-        <li>First slice size [type 1]<br>
-        </li>
-        <li>Other slice size / all slice size if no first slice size is
-present [type 2]<br>
-        </li>
-        <li>data_name [type 3] . This field is detailed below.<br>
-        </li>
-      </ul>
 A TLV list is of course a list of TLV:<br>
       <br>
       <div style="margin-left: 40px;"><code>+-------+----------+------+-----------+-
@@ -298,7 +303,7 @@ with the correct information when a new slice had to be created. But,
 keeping this behavior, it would not have been possible to make a digest
 "on the fly" (see --hash
 option). The addition of the trailer was required for that feature: to
-compute a md5 or sha1 hash of each slice. But, this costs one byte per
+compute a md5 or sha1, ... hash for each slice. But, this costs one byte per
 slice, yes.<br>
       </div>
       <h4>Data Name</h4>
@@ -312,9 +317,12 @@ fields, we have among others the three following identifiers:<br>
       </ul>
       </div>
       <div style="margin-left: 40px;">
-      <div style="text-align: justify;">as already said, magic number
+      <div style="text-align: justify;">as
+already said, magic number
 is constant and let dar be (almost) sure a given file is a dar slice
-file. Also briefly explained, the internal_name is a identifier that
+file, this is also based in particular on that field that the common
+unix 'file' command identifies an dar archive. Also briefly explained,
+the internal_name is a identifier that
 let dar be almost sure that several slices are from the same archive
 (problem car arise if two archives of same basename have their slices
 mixed together: dar will see that and report it to the user).<br>
@@ -440,14 +448,19 @@ beginning of the archive in previous archive format) is composed of:<br>
         </li>
         <li>flag, telling:</li>
         <ul>
-          <li>&nbsp;whether the archive is encrypted, <br>
+          <li>whether the archive is encrypted, <br>
           </li>
           <li>whether it has escape sequence marks, <br>
           </li>
-          <li>whether the header/trailier contains an encrypted key</li>
+          <li>whether the header/trailer contains an encrypted key</li>
           <li>whether the header/trailer contains the initial offset
-field<br>
+field</li>
+          <li>whether the archive is signed</li>
+          <li>whether the header/trailer contains the slice layout of the archive of reference<br>
           </li>
+          <li>whether the archive has salt+iteration count+hash algo for key derivation fonction (KDF)<br>
+          </li>
+
         </ul>
         <li>initial offset (telling where starts the data in the
 archive, is only present in the trailer)</li>
@@ -456,22 +469,27 @@ archive is encrypted)</li>
         <li>size of the crypted key that follows (present only if the
 flag tells an encrypted key is present)</li>
         <li>encrypted key (encrypted by mean of GPG asymetric
-algorithm, present only if flag says so)<br>
+algorithm, present only if flag says so)</li>
+        <li>eventually, salt, iteration_count and hash algo for key
+derivation fonction (KDF) (used since version 2.6.0 when strong
+encryption is set)<br>
         </li>
+
         <li>CRC (Cyclic Redundancy Check) computed on the whole version
 header or trailer<br>
         </li>
       </ul>
-      <div style="margin-left: 80px;"><code>+---------+------+---------------+------+--------+--------+</code><br>
+      <div style="margin-left: 80px;"><code>+---------+------+---------------+------+--------+-------+----------+---------------+------------+------+------+-----------+-----+-------+</code><br>
       <code>| edition | algo | command line&nbsp; | flag |
-initial|&nbsp; CRC&nbsp;&nbsp; |<br>
+initial| crypto| crypted&nbsp; | gnupg crypted |&nbsp; reference | salt | salt | iteration |hash | CRC&nbsp;&nbsp; |<br>
       </code><code>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | offset
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
-      <code>+---------+------+---------------+------+--------+--------+<br>
-      </code></div>
+| algo&nbsp; | key size | sym. key &nbsp; &nbsp;&nbsp; |&nbsp; slicing
+&nbsp; | size | (KDF)|
+count(KDF)|(KDF)|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+      <code>+---------+------+---------------+------+--------+-------+-------</code><code>---+---------------+------------+------+------+-----------+-----+-------+</code></div>
       <div style="margin-left: 80px;"> </div>
       <div style="margin-left: 40px;"><br>
       <div style="text-align: justify;">The trailer is used when
@@ -1255,7 +1273,7 @@ to read some data somewhere you need to decrypt the whole block(s) it
 is in.<br>
       <br>
 In consequence, the larger the block size is, the stronger the
-encryption is. But the larger the block size is too, the longer it will
+encryption is. But also the larger the block size is, the longer it will
 take to recover a given file, in particular when the file size to
 restore is much smaller than the encryption block size used.<br>
       <br>
@@ -1275,7 +1293,7 @@ buffer is encrypted with the rest of the data. Typical elastic buffer
 size range from 1 byte to 10 kB, for both initial and terminal elastic
 buffers. <br>
       <br>
-Elastic buffers are also used inside compression blocks. The underlying
+Elastic buffers are also used inside encryption blocks. The underlying
 cypher may not be able to encrypt at the requested block size boundary.
 If necessary a small elastic buffer is appended to the data before
 encryption, to be able, at restoration time, to know the amount of data
@@ -1302,7 +1320,45 @@ This problem tends to disappear when the encryption block size grows,
 so
 this should not be a problem in normal conditions. Encryption block of
 3 bytes is not a good idea to have a strong encryption scheme, for
-information, the default encryption block size is 10kB.<br>
+information, the default encryption block size is 10kB and is user settable to larger values.<br>
+      <br>
+      <h4>Key Derivation Fonction - KDF<br>
+      </h4>
+strong encryption uses secret key, to cipher/uncipher data, we will say "password" to simplify in the following. <br>
+      <br>
+But directly using a human provided password would provide a weak
+encryption. To overcome this weakness, the state of the art is to use a
+key derivation function, which takes in input the human provided
+password plus a "salt" and outputs a stronger key (salt is described
+below). This function is based on a hash algoritm (sha1 by default, but
+this value can be modified since archive format 10/release 2.6.0) and
+an iteration count (2000 before format 10, 200000 since release 2.6.0
+by default and this can be changed), it will mix salt and passphrase
+then hash the result the number of iteration count that is defined,
+taking as hash input the previous hash output at each cycle.<br>
+      <br>
+The <span style="font-weight: bold;">salt</span> is a randomly chosen
+value by libdar that is stored in clear in the archive header, beside
+the iteration count and hash algorithm used for the KDF. Thus even if
+the user has the same password for different archive, the effective key
+used for strong encryption will differ from archive to archive, making
+much more difficult for an attacker to crack an archive using
+statiscical methods over a large number of archives sharing the same
+human provided password, as the effective encryption key used differs
+from archive to archive thanks to the salt. Even knowing the salt
+(which is available in clear for each archive) the attacker should have
+to use the KDF function for each archive, times each password to test
+in order to leverage the fact several archives have been encrypted with
+the same password. In today computer 200,000 iteration of sha1 takes
+almost one second, this is quite unoticeable by the real user, but for
+an attacker wanting to try 100,000 passwords over 8 archives sharing
+the same human passwords, this would cost 800,000 seconds (around 10
+days) just be in order to start cracking user archives...<br>
+      <br>
+As seen above, an archive is encrypted block by block. Independently of
+a salt per archive, a second level of salt per encryption block is used
+inside a give archive, salt which is derived from the block number, <a href="#sym">more details below</a><br>
+<br>
       </div>
       </td>
     </tr>
@@ -1330,7 +1386,7 @@ Several 'configure' options have an impact on thread-safe support:<br>
       <br>
 --enable-test-memory is a debug option that avoid libdar to be
 thread-safe,&nbsp; so don't use it.<br>
---enable-special-alloc (set by default), makes a thread-safe library
+--enable-special-alloc (now disable by default since version 2.5.5), makes a thread-safe library
 only if POSIX mutex are available (pthread_mutex_t type).<br>
 --disable-thread-safe avoid looking for mutex, so unless
 --disable-special-alloc is also used, the generated library will not be
@@ -1683,8 +1739,8 @@ application developer.<br>
       <td style="vertical-align: top; width: 15%; font-weight: bold; text-align: center;">Date<br>
       </td>
       <td style="vertical-align: top; width: 10%; text-align: center; font-weight: bold;">release
-and<br>
-(dar version)<br>
+(and<br>
+dar version)<br>
       </td>
       <td style="vertical-align: top; text-align: center; width: 10px;"><span style="font-weight: bold;">Archive format</span><br>
       </td>
@@ -3544,32 +3600,46 @@ the encrypted password, decrypt it using the user's private key then
 use that password now in clear to decrypt the rest of the archive with
 the adhoc symmetric algorithm.<br>
       <br>
-Why not using only asymmetric encryption from end to end?<br>
+Signing is done on the randomly chosen ciphering key as seen above, but
+also on the catalogue (the table of content located at the end of the
+archive). More precisely the catalogue is sha512-hashed and the
+resulting hash is signed. The catalogue hash and its signature are
+stored encrypted in the archive right after the catalogue.<br>
       <br>
+      <h4>
+Why not using only asymmetric encryption end to end? </h4>
+
+      
 First, for a given fixed amount of data, the resulting ciphered data
 size may vary. Thus sticking ciphered block together in the archive
 would not lead to easily know where a block starts and where is located
 its end. Second, doing that way allows an archive to have several
 different recipients, the password is ciphered for each of them and the
 archive is readable by any specified recipient, while they do not share
-any key. Doing tat way has very little impact of archive size.<br>
-      <br>
-But then, for a multi recipient archive, any recipient has access to
+any key. Doing that way has very little impact of archive size.<br>
+      <br>For
+a multi recipient archive, any recipient has access to
 the signed and encrypted key and could reuses the same encryption key
-which is may also be signed by the original sender to build a new
-archive with totally different content, then sending it to another
-recipient of the original archive, faking this way the original sender
-signature.<br>
+which may also be signed by the original sender to build a new
+archive with totally different content, still it should pay attention
+to the fact the catalogue's hash is signed and modification should not
+touch the catalogue in a way the hash differ. Last the catalogue
+contains CRC of file's data/EA/FSA and the attacker should pay
+attention to here too keep the same CRC for the whole archive content,
+not only the catalogue.<br>
       <br>
-For that reason, a checksum of the internal catalogue is also signed
-during the archive creation process. Any modification of the archive
-content will lead the CRC stored in the catalogue to mismatch the
-modified data or if the CRC is also updated inside the catalogue, the
-CRC of the catalogue will fail, or last, if the CRC of the catalogue is
-also updated the signature will then not match. There is still room to
-modify data in a way that the CRC does not change, but this limits a
-lot of the possibilities of change as there is also a constraint on the
-archive length.<br>
+Well, this type of attach is pretty accessible by an expert guy, but it
+would take place between an expert guy and his friends!&nbsp; See <a href="usage_notes.html#Multi_recipient_signed_archive_weakness">alternatives to avoid this pitfall</a><br>
+      <br><br>
+      <h4>Why not using signing from end to end?</h4>
+First, this can be done without dar, just use gpg on the slices of an
+archive, so there is no advantage in having such feature inside dar.
+The other reason is time, as signing the whole archive would be long.
+it would also be very painful to validate a given archive authenticity
+(time to read a whole arhive), here we can leverage the fact the
+archive is encrypted (thus tampering the archive would be seem when
+unciphering it) and dar uses of several mechanismes (compression, clear
+text CRC) to detect data corruption.<br>
       </div>
       <br>
       </td>

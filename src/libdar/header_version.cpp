@@ -216,7 +216,7 @@ namespace libdar
 
 	if((flag & FLAG_HAS_CRYPTED_KEY) != 0)
 	{
-	    infinint key_size = f;
+	    infinint key_size = f; // reading key_size from the header_version in archive
 
 	    crypted_key = new (nothrow) memory_file();
 	    if(crypted_key == nullptr)

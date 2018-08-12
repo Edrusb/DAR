@@ -95,12 +95,12 @@ documentation<br>
 command-line tools is set of six command-line. Since release 2.0.0, dar
 source code has been split in two parts, one is command-line specific,
 the second is the <span style="font-weight: bold;">libdar</span>
-library with its API (application interface). But both part stay
-released under the same package. The command-line tools rely on libdar
+library with its API (application interface). But both parts stay
+released under the same package. The command-line tools relies on libdar
 to manage dar archives. Some other <a href="presentation.html#external_tools">external tools</a>
 do also use dar or libdar, to provide additional features or other
 interfaces like a Graphical User Interface. Here we will see how to use
-the dar command-line tools, only.<br>
+the dar command-line tools, see external tools respective documentation for more details about their usage.<br>
       <br>
 You are invited to read the following documents:<br>
       </div>
@@ -125,13 +125,9 @@ short Guide</a></li>
       <div style="margin-left: 40px; text-align: justify;">Libdar has (I hope) a well documented interface that let you access dar's features
 from your
 program. Libdar is written in C++ thus you have either to use C or C++
-or use bindings for the language of your choice (bindings you are
-welcome to be make public but cannot be maintained beside libdar due to
-the load overhead it would generate in detriment to dar's evolution.
-You are welcome to inform me about any existing binding for I add a
-link to from dar's homepage).<br>
+or use existing bindings for the language of your choice. <br>
       <br>
-You are invited to read the following documents in order up to the time
+You are invited to read the following documents in order, up to the time
 you get enough information to address your need. Most of the time the
 two first source of information should be enough, but don't hesitate to
 subscribe to libdar-api mailing-list if some points are not clear about
@@ -141,6 +137,9 @@ the API and the way to use it.<br>
 
       <div style="margin-left: 40px; text-align: justify;">
       <ul><li>The <a href="api_tutorial.html">API tutorial</a></li>
+        <li>Dar command-line source code for API usage illustration<br>
+        </li>
+
 
 <li>The <a href="man/index.html">API reference
 documentation</a></li><li>The <a href="https://lists.sourceforge.net/lists/listinfo/dar-libdar_api">libdar-api</a> mailing-list</li>
