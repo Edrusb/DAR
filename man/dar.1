@@ -1,7 +1,7 @@
-.TH DAR 1 "July 19th, 2018"
+.TH DAR 1 "August 13th, 2018"
 .UC 8
 .SH NAME
-dar \- creates, tests, lists, extracts, compares, merges, isolates dar archives
+dar \- creates, tests, lists, extracts, compares, merges, isolates, repairs dar archives
 .SH SYNOPSIS
 dar [-c | -t | -l | -x | -d | -+ | -C | -y] [[<URL>]<path>/]<basename> [<options>] [<user targets>]
 .PP
@@ -10,7 +10,7 @@ dar -h
 dar -V
 .SH DESCRIPTION
 .B dar
-is a full featured backup tool, aimed for disks (floppy, CD-R(W), DVD-R(W), zip, jazz, hard-disks, usb keys, etc.) and since release 2.4.0 also adapted to tapes.
+is a full featured backup tool, aimed for local and remote disks (floppy, CD-R(W), DVD-R(W), zip, jazz, hard-disks, usb keys, etc. and cloud storage by mean of ftp or sftp protocols) and also adapted to tapes.
 
 .PP
 .B dar
@@ -21,11 +21,11 @@ may also use compression, at the difference that compression is used inside the 
 .PP
 But the most important feature of
 .B dar
-is its ability to make differential and decremental backups. In other words, backups that contain only new files or files that have changed from a backup of reference.
+is its ability to make differential, incremental and decremental backups. In other words, backups that contain only new files or files that have changed from a backup of reference. Binary delta is available but not activated by default: in combination with differential, incremental and decremental backups, it leads not only to not save a file that has not changed (thing dar does without binary delta), but also to only save an rsync patch of any modified file, which lead to even smaller backups.
+.P
 Moreover with differential backup,
 .B dar
-also stores files that have been deleted since the backup of reference. Thus, when restoring, first a full backup, then additional differential backups, at each restoration you get the exact state of the filesystem at the time the differential backup was made. And of course, the reference backup may be a full or a differential backup itself, so you can make the same way incremental backups.
-.PP
+also stores files that have been deleted since the backup of reference. Thus, when restoring, first a full backup, then additional differential backups, at each restoration you get the exact state of the filesystem at the time the differential backup was made.
 .B dar
 is the first backup program I know that can also remove files during restoration! By the way, in this document, "archive" and "backup" are used interchangeably, the difference is the purpose you build them for.
 .PP
@@ -33,9 +33,11 @@ Unlike the
 .B tar
 command,
 .B dar
-has not to read a whole archive nor to stick together the different parts (the slices) to get its contents: dar archive contains a table of contents (aka "catalogue") located at the end of the archive, so it seeks into the archive forth and backward to extract only the required files, which is much faster than what tar is used to do. The "catalogue" can be copied out of the archive (operation called isolation) to be used as reference for further backup and as backup of the internal catalogue in case of archive corruption.
+has not to read a whole archive nor to stick together the different parts (the slices) to access its contents: dar archives contain a table of contents (aka "catalogue") located at the end, so dar can seek into the archive to read only the required data to restore files, thing which is much faster than what tar is used to do. The "catalogue" can be copied out of the archive (operation called isolation) to be used as reference for further backup and as backup of the internal catalogue in case of archive corruption.
 .PP
-Dar can also use a sequential reading mode, in which dar acts like tar, just reading byte by byte the whole archive to know its contents and eventually extracting file at each step. In other words, the archive contents is located at both locations, all along the archive used for tar-like behavior suitable for sequential access media (tapes) and at the end for faster access, suitable for random access media (disks).  However note that tar archive and dar archive are not compatible. Dar does not know anything about tar archive structure, neither tar knows anything about dar archive structure. So keep using tar if you are used to it or find no advantage in using dar. Note also that the sequential reading mode let you extract data from a partially written archive (those that failed to complete due to a lack of disk space for example).
+Dar can also use a sequential reading mode, in which dar acts like tar, just reading byte by byte the whole archive to know its contents and eventually extracting file at each step. In other words, the archive contents is located at both locations, a first time all along the archive used for tar-like behavior suitable for sequential access media (tapes) and a second time at the end for faster access, suitable for random access media (disks).  However note that tar archive and dar archive are not compatible. Note also that the sequential reading mode let you extract data from a partially written archive (those that failed to complete due to a lack of disk space for example) and since release 2.6.0 such truncated archive can be repaired to become a normal archive (the "catalogue" is rebuilt from inlined information).
+.PP
+Dar is able to save and restore to a cloud storage by mean of ftp or sftp network protocols. It can also leverage ssh protocol using dar_slave and dar_xform two auxilliary programs provided beside dar.
 .PP
 Dar format is quite robust against corruption: Only the file where the corruption took place in the archive will not be possible to restore. To have the possibility to repair a corrupted archive dar can work with par2 seamlessly just specifying "par2" on command-line (see /etc/darrc). Last a "relax" reading mode is available which let dar to either ignore some incoherence in archive structure, use internal redundant information to overcome data corruption or in last resort asking the user on what to do when some archive structure information is missing (-al option). This relax mode can be used with both sequential and direct access read modes. Note that you should rather use Parchive to protect your data rather than just relying on the "relax" mode, which has to be seen as a the last chance solution.
 .PP
@@ -50,15 +52,19 @@ Sparse files (files with holes that system reports using several hundred gigabyt
 dar:
 they are detected, stored and restored to filesystem properly.
 .PP
+Last,
 .B dar
 is also able to properly save and restore hard-links
 .PP
-A few words about slice before going deeper in detail: a slice is just a simple file which name is composed of a "basename" followed by a dot, then a number, again a dot and the extension (dar) to form the filename of that slice. On the command line you will never have to give the full file name of a slice, just the basename. The number between the dots is the slice number, which starts from 1 and may be arbitrary large (as large as your system can support the corresponding filename).
-.TP 20
-Let's take an example:
-considering the basename "joe", dar will make one or several slices during backup process (depending on your choice). The filenames of these slices will be: joe.1.dar joe.2.dar ... joe.10.dar ... etc.
-If you want to extract, list, or use this backup as reference, you will only have to use the basename, which is the string "joe" in this example.
+.B
 .PP
+.SH WARNING
+This document is to be considered as a full reference of dar/libdar features. It is however not adapted to discover dar, for that purpose some tutorials are provided in dar documentation. Once you have apprehended the basic dar usages you are welcome to read further this document to see all other features you may find useful for your needs.
+.PP
+.PP
+.SH DOCUMENT STRUCTURE
+.PP
+
 The rest of this document is organized that way:
 .RS
 .TP 5
@@ -101,21 +107,21 @@ USER TARGETS
 User can add their own conditions known as user targets. This chapter describes what they are and how to use them
 .TP 5
 ENVIRONMENT
-Dar may rely on environment variables to look for DCF files and DUC files
+Dar may rely on environment variables to look for DCF files and DUC files, SFTP private and public key and so on.
 .RE
 
-.SH OPTIONS
-
-.PP
+.SH COMMANDS AND OPTIONS
 .B COMMANDS:
 .PP
-Only seven commands define what action will be done by dar: Archive creation, archive extraction, archive listing, archive testing, archive comparison with filesystem, catalogue isolation and archive merging. These commands are described here below.
+Only eight commands define what action will be done by dar: Archive creation, archive extraction, archive listing, archive testing, archive comparison with filesystem, catalogue isolation, archive merging and archive repairing. These commands are described here below.
 
 Once defined, a large set of options can be used to modify the way the command is performed. These options are described just after the commands chapter.
 .PP
 .B Important note:
 Not all system actually support long options (Solaris, FreeBSD, ...). For example --create will not be available on these systems, and you will have to use -c instead. In the same way, not all system do support optional arguments (FreeBSD without GNU getopt for example), you then need to explicitly give the argument, for example in place of "-z" you will need to give "-z 9", see "EXPLICIT OPTIONAL ARGUMENTS" paragraph near the end of this document for details on that point.
-
+.PP
+A slice is just a simple file which name is composed of a "basename" followed by a dot, then a number, again a dot and the extension (dar) to form the filename of that slice. On the command line you will never have to give the full file name of a slice, just the basename. The number between the dots is the slice number, which starts from 1 and may be arbitrary large (as large as your system can support the corresponding filename). For example "my_first_archive.42.dar" is the 42th slice of the archive which basename is "my_first_archive".
+.PP
 .TP 20
 -c, --create [[<URL>]<path>/]<basename>
 creates a backup with the name based on <basename>. All the slices will be created in the directory <path> if specified, details about the <URL> syntaxe is explained below at
@@ -150,7 +156,9 @@ create a subset archive from one or two existing archives (the resulting archive
 -y, --add-missing-catalogue [[<URL>]<path>/]<basename>
 create a "repaired" archive based on the archive given with -A option. The repairing only concerns the case where an archive has been interrupted and dar could not cleanly end the archive creation process (lack of disk space, power outage, and so on). This operation consists in reading the tape marks in sequential reading mode to gather the content of the archive and once its end is reached, to recreate the missing table of content (aka catalogue) located at the end of the archive. Note that the damaged archive is not modified but a repaired copy is built beside it. Why not just appending the catalogue to the archive? Because first it was simpler to implement allowing to reuse routines of the merging operation, second by precaution for dar to not mess an existing archive due to a bug and last, it would not be compatible with archive signing and gpg encryption under certains conditions (several recipients or the archive is signed and you are not the one who signed it).
 .P
-During the repairing operation, the repaired archive may have a different slicing (-s and -S options), a different encryption (-K and associated options, including gpg encryption and signing), a different repository slices permissions and ownership (--slice-mode option), user comment (--user-comment), generated hash (--hash) and min digits in slice number (--min-digits), but compression cannot be changed and tape marks cannot be removed (you can do it once reparation has completed using the merging operation). Last file filtering is not allowed during archive repairing.
+.RS
+During the repairing operation, the repaired archive may have a different slicing (-s and -S options), a different encryption (-K and associated options, including gpg encryption and signing), a different repository slices permissions and ownership (--slice-mode option), user comment (--user-comment), generated hash (--hash) and min digits in slice number (--min-digits), but compression cannot be changed and tape marks cannot be removed (you can do it once reparation has completed using the merging operation). Last, file filtering is not allowed during archive repairing.
+.RE
 .TP 20
 -h, --help
 displays help usage.
@@ -1242,7 +1250,7 @@ an error occurred while executing user command (given with -E or -F option). Mai
 an error has occurred when calling a libdar routine. This means the caller (dar program), did not respect the specification of the API (and this can be considered as a particular case of bug).
 .TP 10
 8
-the version of dar used is based in finite length integers (it has been compiled with the option --enable-mode=...). This code is returned when an integer overflow occurred. use the full version (based in the so called "infinint" class) to avoid this error.
+the version of dar used is based on finite length integers (it has been compiled with the option --enable-mode=...). This code is returned when an integer overflow occurred. use the full version (based in the so called "infinint" class) to avoid this error.
 .TP 10
 9
 this code indicates an unknown error. The exception caching code to take care of new exceptions has probably been forgotten to be update ... this is a minor bug you are welcome to report.
@@ -1491,7 +1499,7 @@ You can find some more examples of use in the tutorial, mini-howto, sample scrip
 dar_xform(1), dar_slave(1), dar_manager(1), dar_cp(1), dar_split(1), TUTORIAL and NOTES included in the source package and also available at http://dar.linux.free.fr/doc/index.html
 
 .SH KNOWN LIMITATIONS
-dar saves and restores atime, mtime, birthtime but cannot restore ctime (last inode change), there does not seems to be a standard call to do that under UNIX.
+dar saves and restores atime, mtime, birthtime but cannot restore ctime (last inode change), there does not seems to be a standard call to do that under UNIX. An up to date list of known limitation is at http://dar.linux.free.fr/doc/Limitations.html
 
 .SH KNOWN BUGS
 http://sourceforge.net/p/dar/bugs/
