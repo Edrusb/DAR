@@ -211,6 +211,7 @@ namespace libdar
 	/// \param[in]  internal_name common label to all slices
 	/// \param[in]  data_name to use in slice header
 	/// \param[in]  iteration_count used for key derivation when passphrase is human provided
+	/// \param[in]  kdf_hash hash algorithm used for the key derivation function
 	/// \param[in]  multi_threaded true if libdar can spawn several thread to work
 	///
 	/// \note the stack has the following contents depending on given options
