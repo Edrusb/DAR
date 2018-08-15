@@ -44,7 +44,7 @@ namespace libdar
     {
 	clear();
 
-	patch_base_check = create_crc_from_file(f, nullptr);
+	patch_base_check = create_crc_from_file(f);
 	delta_sig_size.read(f);
 
 	if(delta_sig_size.is_zero())
@@ -61,7 +61,7 @@ namespace libdar
 		delta_sig_offset.read(f);
 	}
 
-	patch_result_check = create_crc_from_file(f, nullptr);
+	patch_result_check = create_crc_from_file(f);
     }
 
     void cat_delta_signature::read_data(generic_file & f)
@@ -93,7 +93,7 @@ namespace libdar
 		    throw SRC_BUG;
 		sig->skip(0);
 
-		delta_sig_crc = create_crc_from_file(f, nullptr);
+		delta_sig_crc = create_crc_from_file(f);
 		if(delta_sig_crc == nullptr)
 		    throw SRC_BUG;
 		if(*delta_sig_crc != *calculated)

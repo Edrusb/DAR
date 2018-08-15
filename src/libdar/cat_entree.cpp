@@ -186,7 +186,7 @@ namespace libdar
 
 	    try
 	    {
-		crc *crc_read = create_crc_from_file(*ptr, nullptr);
+		crc *crc_read = create_crc_from_file(*ptr);
 		if(crc_read == nullptr)
 		    throw SRC_BUG;
 

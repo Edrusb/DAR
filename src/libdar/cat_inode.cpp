@@ -298,7 +298,7 @@ namespace libdar
 		    {
 		    case  fsa_saved_status::full:
 			fsa_offset = new (nothrow) infinint(*ptr);
-			fsa_crc = create_crc_from_file(*ptr, nullptr);
+			fsa_crc = create_crc_from_file(*ptr);
 			if(fsa_offset == nullptr || fsa_crc == nullptr)
 			    throw Ememory("cat_inode::cat_inode(file)");
 			break;

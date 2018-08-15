@@ -197,7 +197,7 @@ namespace libdar
 
 		try
 		{
-		    read_crc = create_crc_from_file(*pdesc.stack, nullptr);
+		    read_crc = create_crc_from_file(*pdesc.stack);
 		}
 		catch(Egeneric & e)
 		{

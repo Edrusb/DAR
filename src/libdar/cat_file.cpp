@@ -193,7 +193,7 @@ namespace libdar
 
                     if(reading_ver >= 8)
                     {
-			check = create_crc_from_file(*ptr, nullptr);
+			check = create_crc_from_file(*ptr);
                         if(check == nullptr)
                             throw Ememory("cat_file::cat_file");
                     }
@@ -842,7 +842,7 @@ namespace libdar
 			    else
 				throw SRC_BUG; // how is this possible ??? it should always be zero in sequential read mode !
 
-			    tmp = create_crc_from_file(*(get_escape_layer()), nullptr);
+			    tmp = create_crc_from_file(*(get_escape_layer()));
 			    if(tmp == nullptr)
 				throw SRC_BUG;
 			    else
