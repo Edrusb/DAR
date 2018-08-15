@@ -253,7 +253,7 @@ namespace libdar
 	}
     }
 
-    void secu_string::clean_and_destroy() noexcept
+    void secu_string::clean_and_destroy()
     {
 	if(string_size != nullptr)
 	{
@@ -286,7 +286,6 @@ namespace libdar
 	    delete allocated_size;
 #endif
 	    allocated_size = nullptr;
-
 	}
     }
 

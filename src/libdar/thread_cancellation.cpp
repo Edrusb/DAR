@@ -102,7 +102,7 @@ namespace libdar
 #endif
     }
 
-    thread_cancellation::~thread_cancellation() throw(Ebug)
+  thread_cancellation::~thread_cancellation() noexcept(false)
     {
 #if MUTEX_WORKS
 	list<thread_cancellation *>::iterator ptr;

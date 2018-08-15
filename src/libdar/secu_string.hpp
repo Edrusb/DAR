@@ -89,7 +89,7 @@ namespace libdar
 	secu_string & operator = (secu_string && ref) noexcept { move_from(std::move(ref)); return *this; };
 
 	    /// the destructor (set memory to zero before releasing it)
-	~secu_string() throw(Ebug) { clean_and_destroy(); };
+        ~secu_string() noexcept(false) { clean_and_destroy(); };
 
 
 	bool operator != (const std::string & ref) const { return ! (*this == ref); };
@@ -179,7 +179,7 @@ namespace libdar
 	void copy_from(const secu_string & ref); //< to be used at creation time or after clean_and_destroy() only
 	void move_from(secu_string && ref) noexcept { std::swap(allocated_size, ref.allocated_size); std::swap(mem, ref.mem); std::swap(string_size, ref.string_size); };
 	bool compare_with(const char *ptr, U_I size) const; // return true if given sequence is the same as the one stored in "this"
-	void clean_and_destroy() noexcept;
+	void clean_and_destroy();
     };
 
 	/// @}

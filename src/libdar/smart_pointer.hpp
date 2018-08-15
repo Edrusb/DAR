@@ -52,7 +52,7 @@ namespace libdar
 	smart_node(smart_node && ref) noexcept = delete;
 	smart_node & operator = (const smart_node & ref) = delete;
 	smart_node & operator = (smart_node && ref) noexcept = delete;
-	~smart_node() { if(ptr != nullptr) delete ptr; if(!count_ref.is_zero()) throw SRC_BUG; };
+        ~smart_node() noexcept(false) { if(ptr != nullptr) delete ptr; if(!count_ref.is_zero()) throw SRC_BUG; };
 
 	void add_ref() { ++count_ref; };
 	void del_ref() { if(count_ref.is_zero()) throw SRC_BUG; --count_ref; if(count_ref.is_zero()) delete this; };

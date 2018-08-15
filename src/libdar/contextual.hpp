@@ -78,7 +78,7 @@ namespace libdar
 	contextual(contextual && ref) noexcept = default;
 	contextual & operator = (const contextual & ref) = default;
 	contextual & operator = (contextual && ref) noexcept = default;
-	virtual ~contextual() throw(Ebug) {};
+        virtual ~contextual() noexcept(false) {};
 
 	    /// defines the new contextual value
 

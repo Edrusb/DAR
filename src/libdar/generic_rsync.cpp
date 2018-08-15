@@ -276,7 +276,7 @@ namespace libdar
     }
 
 
-    generic_rsync::~generic_rsync() throw(Ebug)
+    generic_rsync::~generic_rsync() noexcept(false)
     {
 	terminate();
 	delete [] working_buffer;

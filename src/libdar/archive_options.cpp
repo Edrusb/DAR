@@ -526,22 +526,12 @@ namespace libdar
 
     void archive_options_create::destroy() noexcept
     {
-	NLS_SWAP_IN;
-	try
-	{
-	    archive_option_destroy_mask(x_selection);
-	    archive_option_destroy_mask(x_subtree);
-	    archive_option_destroy_mask(x_ea_mask);
-	    archive_option_destroy_mask(x_compr_mask);
-	    archive_option_destroy_mask(x_backup_hook_file_mask);
-	    archive_option_destroy_mask(x_delta_mask);
-	}
-	catch(...)
-	{
-	    NLS_SWAP_OUT;
-	    throw;
-	}
-	NLS_SWAP_OUT;
+      archive_option_destroy_mask(x_selection);
+      archive_option_destroy_mask(x_subtree);
+      archive_option_destroy_mask(x_ea_mask);
+      archive_option_destroy_mask(x_compr_mask);
+      archive_option_destroy_mask(x_backup_hook_file_mask);
+      archive_option_destroy_mask(x_delta_mask);
     }
 
     void archive_options_create::copy_from(const archive_options_create & ref)

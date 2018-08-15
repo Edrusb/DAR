@@ -56,7 +56,7 @@ namespace libdar
 	criterium(criterium && ref) noexcept = default;
 	criterium & operator = (const criterium & ref) = default;
 	criterium & operator = (criterium && ref) noexcept = default;
-	virtual ~criterium() throw(Ebug) {};
+	virtual ~criterium() noexcept(false) {};
 
 	    /// criterum interface method
 

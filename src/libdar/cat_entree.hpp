@@ -104,7 +104,7 @@ namespace libdar
 	cat_entree & operator = (cat_entree && ref) noexcept = default;
 
 	    /// destructor
-        virtual ~cat_entree() throw(Ebug) {};
+        virtual ~cat_entree() noexcept(false) {};
 
 	    /// returns true if the two object are the same
 	virtual bool operator == (const cat_entree & ref) const = 0;

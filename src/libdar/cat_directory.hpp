@@ -73,7 +73,7 @@ namespace libdar
 	cat_directory(cat_directory && ref) noexcept;
 	cat_directory & operator = (const cat_directory & ref); // set the inode part *only* no subdirectories/subfiles are copies or removed.
 	cat_directory & operator = (cat_directory && ref) noexcept;
-        ~cat_directory() throw(Ebug); // detruit aussi tous les fils et se supprime de son 'parent'
+        ~cat_directory() noexcept(false); // detruit aussi tous les fils et se supprime de son 'parent'
 
 	    /// attention this compares only the directories themselves, not the list of their children
 	virtual bool operator == (const cat_entree & ref) const override;

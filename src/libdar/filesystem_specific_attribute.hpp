@@ -84,7 +84,7 @@ namespace libdar
 	filesystem_specific_attribute & operator = (filesystem_specific_attribute && ref) noexcept = default;
 
 	    /// virtual destructor for inherited classes
-	virtual ~filesystem_specific_attribute() throw(Ebug) {};
+	virtual ~filesystem_specific_attribute() noexcept(false) {};
 
 	    /// provide a mean to compare objects types
 	bool is_same_type_as(const filesystem_specific_attribute & ref) const;

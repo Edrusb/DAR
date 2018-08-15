@@ -71,7 +71,7 @@ namespace libdar
 	    /// virtual destructor
 
 	    /// \note this let inherited destructor to be called even from a proto_generic_file pointer to an inherited class
-	virtual ~proto_generic_file() throw(Ebug) {};
+        virtual ~proto_generic_file() noexcept(false) {};
 
 
 	    /// read data from the proto_generic_file

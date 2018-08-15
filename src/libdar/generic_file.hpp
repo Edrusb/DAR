@@ -94,7 +94,7 @@ namespace libdar
 	    /// virtual destructor,
 
 	    /// \note this let inherited destructor to be called even from a generic_file pointer to an inherited class
-	~generic_file() throw(Ebug) { destroy(); };
+        ~generic_file() noexcept(false) { destroy(); };
 
 	    /// destructor-like call, except that it is allowed to throw exceptions
 	void terminate();
