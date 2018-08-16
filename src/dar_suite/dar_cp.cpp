@@ -1,6 +1,6 @@
 //*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2052 Denis Corbin
+// Copyright (C) 2002-2018 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -141,7 +141,7 @@ static void show_version(user_interaction & dialog, char *argv0)
 	string cmd;
 	line_tools_extract_basename(argv0, cmd);
 	    // never return a nullptr pointer but
-	dialog.message(tools_printf("\n %s version %s Copyright (C) 2002-2052 Denis Corbin\n\n\n", cmd.c_str(), DAR_CP_VERSION));
+	dialog.message(tools_printf("\n %s version %s Copyright (C) 2002-2018 Denis Corbin\n\n\n", cmd.c_str(), DAR_CP_VERSION));
 	dialog.message(tools_printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT,  __VERSION__));
 	dialog.message(tools_printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), cmd.c_str(), PACKAGE_VERSION));
 	dialog.message(tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details type `dar -W'."), cmd.c_str()));
