@@ -32,19 +32,18 @@
     <tr>
       <td style="vertical-align: top;">
       <h2 style="text-align: justify;">Introduction</h2>
-      <div style="margin-left: 40px; text-align: justify;"><span style="font-style: italic;">Note:
+      <div style="margin-left: 40px; text-align: justify;"><span style="font-style: italic;"></span>This tutorial shows you <span style="text-decoration: underline;">how to backup</span>
+your file system (partially or
+totally) on USB key (thing works the same with harddisks or cloud
+storage), but we will keep USB keys for simplicity. Most important, we
+will also see <span style="text-decoration: underline;">how to restore</span> your system from scratch in case of hard disk failure (or other cataclysms).<br>
+<br>
+      <span style="font-style: italic;">Note:
 This document has been initially written circa 2003, so don't pay
 attention to the usage of old hardware it mentions, the dar usage stay
 the same with modern removable media or cloud storage, and the document
 has been updated with recent features as if those old stuffs were still
 of actuality :-)</span><br>
-      <br>
-This tutorial shows you <span style="text-decoration: underline;">how to backup</span>
-your file system (partially or
-totally) on ZIP drives (you can replace Zip by floppies, or USB key or
-even hot swappable hard disks if you prefer, but we will keep "Zip
-drives" for historical reason and clarity) and most important, <span style="text-decoration: underline;">how to restore</span> your system from scratch in case of hard disk failure (or other cataclysms).<br>
-      <br>
 <br>
       </div>
       <div style="text-align: justify;"><br>
@@ -55,29 +54,36 @@ drives" for historical reason and clarity) and most important, <span style="text
       <div style="text-align: justify;">We need first to make a full
 backup, let's go:<br>
       <br>
-The size of a zip drive is 100 MB,<br>
+Let's assume the size of the usb keys is 100 MB,<br>
 *** here comes the option: -s 100M<br>
 This tells dar to not create a single backup file but to split it in
 several files with a size of at most 100 Megabytes.<br>
       <br>
-On your first ZIP drive we want to copy the dar binary outside the
+On your first usb key drive we want to copy the dar binary outside the
 backup to be able to restore it in case of hard disk failure, for
-example. <span style="text-decoration: underline; font-weight: bold;">IMPORTANT:</span>
+example. <span style="text-decoration: underline; font-weight: bold;"><br>
+      <br>
+IMPORTANT:</span>
 dar binary relies on several libraries which must also be available in
 the rescue system or copied with the dar binary. But, if you don't want
 to worry about needed libraries, there is a static version of dar which
-only difference is that it has all required library included in it (thus it is a slightly larger binary). Its name is "<span style="font-weight: bold;">dar_static</span>",
+only difference is that it has all required library included in it (thus it is a larger binary). Its name is "<span style="font-weight: bold;">dar_static</span>",
 and its main reason of existence is to be placed beside backups in case
 something goes wrong in your system. Note that dar_static is useless
 for windows, you will always need the <a href="http://cygwin.com/">Cygwin</a>
 dll. <br>
-      <br>
-(You could also add man pages or a copy of this tutorial, if you are scared not to be able to
+      <br>You
+can also add man pages or a copy of this tutorial, if you are scared
+not to be able to
 remember all the many feature of dar ;-) and find the -h option too
-sparse). Note that all the dar documentation is available on the web. OK you need an
-Internet access to read them.<br>
+sparse. Note that all the dar documentation is available on the web. OK
+you need an
+Internet access to read them, which might not be the case if your
+system is to be restored, though today we have no more a single device
+per house connected to internet (tablets, smartphones, ... can help
+accessing documentation just in case).<br>
       <br>
-This make the free space on the first ZIP floppy a bit smaller, I let
+This make the free space on the first usb key floppy a bit smaller, I let
 you make the substraction because this is subject to change from system
 to system, but let's assume dar_static is less than 5 MB, thus the
 initial slice should not exceed 95 MB <br>
@@ -85,7 +91,7 @@ initial slice should not exceed 95 MB <br>
 (Note that '-s' is lowercase for all the slices, and '-S' is UPPERCASE
 meaning the initial slice only).<br>
       <br>
-We need to pause between slices to change the ZIP floppy when it is
+We need to pause between slices to change the usb key when it is
 full <br>
 *** here comes the option: -p -b<br>
 telling dar to pause before writing a new slice (-p) and to ring the
@@ -93,15 +99,16 @@ terminal bell (-b) when user action is needed.<br>
       <br>
 We will compress data inside the backup <br>
 *** here comes the option: -z<br>by
-default -z option uses gzip compression algorithm (bzip2, lzo, xz and some others are
+default -z option uses gzip compression algorithm (gzip, bzip2, lzo, xz and some others are
 also available). Optionally, if speed is more important than archive
 size, you can degrade compression specifying the compression level :
--z1 for example.&nbsp; <br>
+-z1 for example. By default the maximum compression is used (-z is equivalent to -z9)  <br>
       <br>
 Now, we want to backup the whole file system. <br>
 *** here comes the option: -R /<br>
-This tells dar that no files out of this directory tree will be saved
-(here, it means that no files will be excluded from the backup, if no
+This tells dar that no files out of the provided directory tree will be
+saved. Here, it means that no files will be excluded from the backup,
+if no
 filter is specified, see below) here "R" stands for "Root".<br>
       <br>
 There are some files you probably don't want to backup like backup files
@@ -109,11 +116,11 @@ generated by emacs "*~" and .*~".<br>
 *** here comes the options: -X "*~" -X ".*~"<br>
 Note that you have to quote the mask for it not to be interpreted by
 the shell, the -X options (X for eXclude) do not apply to directories, nor to path, they
-just apply to filenames. (see also -I option (I for Include) in man page for more information)<br>
+just apply to filenames. See also -I option (I for Include) in man page for more information.<br>
       <br>
 Among these files are several sub-trees you must not save: the /proc
 file system for example, as well as the /dev/pts and /sys . These are virtual
-file systems, saving them would only make your backup bigger filled
+filesystems, saving them would only make your backup bigger filled
 with useless stuff.<br>
 *** here come the options: -P dev/pts -P proc -P sys<br>
 Note that path must be relative to -R option (thus no leading '/' must
@@ -125,76 +132,76 @@ for example. Lastly, -P can also be used to exclude a plain file (if
 you don't want to exclude all files of a given name using -X option):
       <code>-P home/joe/.bashrc</code> for example would only exclude joe's .bashrc file
 not any other file, while -<code>X .bashrc </code>would exclude any file of that name
-including joe's file. (see also -g, -[, -] options in man page for more, as well as the "file selection in brief" paragraph)<br>
+including joe's file. See also -g, -[ and -] options in man page for more, as well as the "file selection in brief" paragraph<br>
       <br>
 More importantly we must not save the backup itself:<br>
-*** here comes the option: -P mnt/zip<br>
-assuming that your ZIP is mounted under /mnt/zip . We could also have
+*** here comes the option: -P mnt/usb<br>
+assuming that your usb key is mounted under /mnt/usb. We could also have
 excluded all files of extension "dar" which are backup generated by dar using <code>-X "*.*.dar"</code>, but this would have&nbsp; also exclude other dar archive from the
 backup, which may not always fit your need.<br>
       <br>
-Now, as we previously excluded save the /dev/pts /proc and /mnt/zip directories, we
+Now, as we previously excluded the /dev/pts /proc and /mnt/usb directories, we
 would have to create these directory mount-points by hand at recovery
 time to be able to mount the corresponding filesystems. But we can
 better
-using the -D option: it changes dar's behavior by not totally ignoring excluded directories
+use the -D option: it changes dar's behavior by not totally ignoring excluded directories
 but rather storing them as empty.<br>
 *** here comes the option -D<br>
-thus at recovery time they will be generated automatically<br>
+thus at recovery time excluded directories will be generated automatically as empty directories<br>
       <br>
 Lastly, we have to give a name to this full backup. Let's call it
-"linux_full" and as it is supposed to take place on the ZIP drive, its path
-is /mnt/zip/linux_full<br>
-*** here comes the option: -c /mnt/zip/linux_full<br>
+"linux_full" and as it is supposed to take place on the usb key, its path
+is /mnt/usb/linux_full<br>
+*** here comes the option: -c /mnt/usb/linux_full<br>
 Note that linux_full is not a complete filename, it is a "basename", on
 which dar will add a number and an extension ".dar", this way the first
-slice will be a file of name linux_full.1.dar located in /mnt/zip<br>
+slice will be a file of name linux_full.1.dar located in /mnt/usb<br>
       <br>
-Now, as we will have to mount and umount the /mnt/zip file system, we
+Now, as we will have to mount and umount the /mnt/usb file system, we
 must not have any process using it, in particular, dar current
-directory must no be /mnt/zip so we change to / for example.<br>
+directory must no be /mnt/usb&nbsp; so we change to / for example.<br>
       <br>
 All together we follow this procedure for our example:<br>
       <br>
-Put an empty ZIP floppy in the device, and mount it according to your
+Plug an empty usb key and mount it according to your
 /etc/fstab file.<br>
       <br>
       </div><div style="margin-left: 40px; text-align: justify;"><code>mount
-/mnt/zip</code><br>
+/mnt/usb</code><br>
       </div>
       <div style="text-align: justify;"><br>
-Copy the dar binary to the first zip drive (to be able to restore in case of
+Copy the dar binary to the first usb key (to be able to restore in case of
 big problem, like a hard disk failure) and eventually man pages and/or this tutorial.<br>
       <br>
       </div>
       <div style="margin-left: 40px; text-align: justify;"><code>cp
-`which dar_static` /mnt/zip</code><br>
+`which dar_static` /mnt/usb</code><br>
       </div>
       <div style="text-align: justify;"><br>
 then, type the following:<br>
 <br>
       </div>
       <div style="margin-left: 40px; text-align: justify;"><code>cd /</code><br>
-      <code>dar -c /mnt/zip/linux_full -s 100M -S 95M -p -b -z -R / -X
-"*~" -X ".*~" -P dev/pts -P sys -P proc -P mnt/zip -D</code><br>
+      <code>dar -c /mnt/usb/linux_full -s 100M -S 95M -p -b -z -R / -X
+"*~" -X ".*~" -P dev/pts -P sys -P proc -P mnt/usb -D</code><br>
       <code></code></div>
       <div style="text-align: justify;"><br>Note
 that option order has no importance. Some options may be used
 several times (-X, -I, -P) some others cannot (see man page for more).
-When the first slice will be done, DAR will pause, ring the terminal and display a
-message. You will have to unmount the floppy<br>
+When the first slice will be done, DAR will pause, ring the terminal bell and display a
+message. You will have to unmount the usb key<br>
       <code></code><br>
       <code></code></div>
       <div style="margin-left: 40px; text-align: justify;"><code>umount
-/mnt/zip<br>
+/mnt/usb<br>
       <br>
       </code></div>
-      <div style="text-align: justify;">eject and replace the floppy by
+      <div style="text-align: justify;">and replace it by
 an empty new one and mount it<br>
       <br>
       </div>
       <div style="margin-left: 40px; text-align: justify;"><code>mount
-/mnt/zip</code><br>
+/mnt/usb</code><br>
       </div>
       <div style="text-align: justify;"><br>
 To be able to do that, you can swap to another virtual console pressing
@@ -221,22 +228,26 @@ to run:<br>
       <br>
       </div>
       <div style="margin-left: 40px; text-align: justify;"><code>dar -l
-/mnt/zip/linux_full</code><br>
+/mnt/usb key/linux_full</code><br>
       </div>
-      <div style="text-align: justify;"><br>It is recommended to either check
+      <div style="text-align: justify;"><br>It is recommended to either test
 the archive contents, or compare what's stored in it with the current
 file system before relying on it:<br>
       <br>
       </div>
       <div style="margin-left: 40px; text-align: justify;"><code>dar -t
-/mnt/zip/linux_full</code><br>
+/mnt/usb key/linux_full</code><br>
       </div>
-      <div style="text-align: justify;"><br>This will check the whole archive, while it is recommended to first unmount and remount removable disk, this to flush the
+      <div style="text-align: justify;"><br>This
+will test the whole archive structure and content, while it is
+recommended to first unmount and remount removable disk, this to flush
+the
 cache. Else you may read data from cache (in memory) and do not detect
 an error on you disk. dar -t cannot check a single slice, it checks
-all the archive. If you need to check a single slice (for example after
-burning it on CD) you can use the diff command : for example, you burn
-the last completed slices on CD-R, but have just enough free space to
+all the archive. If you need to check a single slice,(for example after
+burning it on DVD-RW, you can use the diff command: for example, you
+have burnt
+the last completed slices on DVD-RW, but have just enough free space to
 store one slice on disk. You can thus check the slice typing something
 like:<br>
       <br>
@@ -257,38 +268,47 @@ unix standard command "md5sum" you can check the integrity of the slice
       </code></div>
 
       <br>
-If all is ok for the slice on the zip disc (which is when diff does not complain or md5sum returns "OK"), you can delete the
+If all is ok for the slice on the DVD-RW&nbsp; (diff does not complain or md5sum returns "OK"), you can delete the
 slice from the hard disk (/tmp/slice.x.dar), and continue with dar.
-Else, you will have to burn/write the slice on a new disk or retry on the same.<br>
-      <br>
-Instead of testing the whole archive you could also compare it with the just saved system:<br>
+Else, you will have to restart the DVD-RW burning process with the same slice.<br>
+      <br>Just
+above we have "tested" the archive. That's a good habit to do it. But
+instead of testing the whole archive you could also compare it with the
+just saved system:<br>
       <br>
       </div>
       <div style="margin-left: 40px; text-align: justify;"><code>dar -d
-/mnt/zip/linux_full -R /</code><br>
+/mnt/usb key/linux_full -R /</code><br>
       </div>
       <div style="text-align: justify;"><br>
 will compare the archive with filesystem tree located at / . Same
-remark as previously, it is recommended to first unmount and mount the
-floppy to flush the system cache.<br>
+remark as previously, it is recommended to first unmount and mount the removable media to flush the system cache. <br>
+      <br>
+If you backup a live filesystem, you way prefer 'testing' an archive as
+it will not issue errors about files that changed since the backup was
+made, but if you are archiving files, diffing is probably a better idea
+as you really compare the content of the files and you should not
+experiment file changes on data you are archiving as most of the time
+such data about to be archived is old steady data that is not likely to
+change.<br>
       <br>
       </div>
       <h3 style="text-align: justify;">STEP 2: DIFFERENTIAL BACKUP</h3>
       <div style="text-align: justify;">The only thing to add is the
 base name of the backup we take as reference<br>
-*** here comes the option: -A /mnt/zip/linux_full<br>
+*** here comes the option: -A /mnt/usb/linux_full<br>
       <br>
 Of course, we have to choose another name for that new backup, let's call
 it linux_diff1<br>
-*** here comes the option: -c /mnt/zip/linux_diff1<br>
+*** here comes the option: -c /mnt/usb/linux_diff1<br>
       <br>
 Last point: if you want to put the new backup at the end of the full
 backup, you will have to change the -S option according to the
-remaining space on the last disk. suppose the last slice of linux_full takes 34MB
+remaining space on the last usb key. suppose the last slice of linux_full takes 34MB
 you have 76MB available for the first slice of the differential backup
 (and always 100MB for the following ones),<br>
 *** here comes the option: -S 76M<br>
-but if you want to put the backup on a new floppy, just forget the -S
+but if you want to put the backup on a new usb key, just forget the -S
 option.<br>
       <br>
 here we also want to produce a hash file to test each slice integrity before removing it from hard disk:<br>
@@ -298,14 +318,14 @@ All together we get:<br>
       <br>
       </div>
       <div style="margin-left: 40px; text-align: justify;"><code>dar -c
-/mnt/zip/linux_diff1 -A /mnt/zip/linux_full -s 100M -S 76M -p -b -z -R
-/ -X "*~" -X ".*~" -P dev/pts -P proc -P mnt/zip -P sys -D --hash md5</code><br>
+/mnt/usb/linux_diff1 -A /mnt/usb key/linux_full -s 100M -S 76M -p -b -z -R
+/ -X "*~" -X ".*~" -P dev/pts -P proc -P mnt/usb key -P sys -D --hash md5</code><br>
       </div>
       <div style="text-align: justify;"><br>The
 only new point is that, just before effectively starting
 to backup, dar will ask for the last slice of the
 archive of reference (linux_full), then dar will pause (thanks to the
--p option) for you to change the disk and put the one where you want to
+-p option) for you to change the disk if necessary and put the one where you want to
 write the new backup's first slice, then pause again for you to change
 the disk for the second slice and so on.<br>
       <br>
@@ -318,11 +338,10 @@ would change only the following<br>
       <br>
       </div>
       <div style="margin-left: 40px; text-align: justify;"><code>-c
-/mnt/zip/linux_diff2 -A /mnt/zip/linux_diff1</code><br>
+/mnt/usb/linux_diff2 -A /mnt/usb key/linux_diff1</code><br>
       </div>
       <div style="text-align: justify;"><br>You
-could also decide to change of device, taking a 1'44MB floppy or a
-CD-R ... or maybe rather something more recent and bigger if you
+could also decide to change of device, taking 4,4 GiB DVD-RAM ... or maybe rather something more recent and bigger if you
 want,&nbsp; this would not cause any problem at all. After some time
 when
 you get many differential backup for a single full backup, you will
@@ -334,9 +353,9 @@ recent one. This requires more user intervention than restoring a
 single full backup, all is a matter of balance, between the time it
 takes to backup and the time it takes to restore. <br>
       <br>
-Note, that starting release 1.2.0 a new command appeared that helps
+Note, that starting with release 1.2.0 a new command appeared that helps
 restoring <span style="text-decoration: underline;">a small set of file</span> from a lot a differential backup. Its
-name is dar_manager. See at the end of this tutorial and the associated man page for
+name is <span style="font-weight: bold;">dar_manager</span>. See at the end of this tutorial and the associated man page for
 more.<br>
       <br>
 Another solution, is when you have too much differential backup, is to
@@ -352,11 +371,14 @@ Of course, a given backup can be used as reference for several
 differential backup, there is no limitation in number nor in nature
 (the reference can be a full of differential backup).<br>
       <br>
-Yet another solution is to setup <span style="font-weight: bold;">decremental</span> backup, this is let you
+Yet another solution is to setup <span style="font-weight: bold;">decremental</span>
+backup, this is let you
 have the full backup as the most recent one and the older ones as
 difference from the backup done just after them... but nothing is
-perfect, doing so takes much time than doing full backup at each step
-but as less storage space as doing incremental backups. here too all is
+perfect, doing so takes much more time than doing full backup at each
+step
+but as less storage space as doing incremental backups and restoration
+time is as simple as restoring a full backup. here too all is
 a matter of choice, taste and use case.<br>
       <br>
       <br>
@@ -373,19 +395,20 @@ all your system, that was working&nbsp; so well and for so long! <br>
       <br>If
 however the last backup you made is recent, then keep smiling! OK,
 you have installed your new hard disk and configured you BIOS to it
-(well at ancient time it was necessary do do something with the BIOS,
+(well at ancient time it was necessary to manually setup the BIOS with the new disk,
 today you can forget it). <br>
       <br>
-1. You first need to boot your new computer with the empty disk in order to restore your data onto it. For that there is <a href="http://www.knoppix.org/">Knoppix</a> or <a href="http://www.system-rescue-cd.org/">system rescue CD</a>
+1. You first need to boot your new computer with the empty disk in
+order to restore your data onto it. For that I would advise using <a href="http://www.knoppix.org/">Knoppix</a> or better <a href="http://www.system-rescue-cd.org/">system rescue CD</a>
 that let you boot from CD or USB key. You don't
 need to install something on your brand-new disk, just make partitions
 and format them as you want (we will detail that below). You may even
-change the partition layout add new ones or merge several into one:
+change the partition layout add new ones or merge several ones into a single one:
 what is important is that you setup each one with enough space to hold
 the data to be restored in them: We suppose your new disk is /dev/hda
 and
 /dev/sga is your removable media drive (USB key, DVD device, ...) For
-clarity, in the following we will assume it to be a set of USB keys, it
+clarity, in the following we will keep assuming it to be a set of USB keys, it
 could be CD, DVD, or other disk you would do slightly the same.<br>
       <br>
 2. Create the partition table as you wish, using<br>
@@ -580,7 +603,7 @@ archive:<br>
       <code></code><br>
       <code></code></div>
       <div style="margin-left: 40px; text-align: justify;"><code>dar -R
-/ -x /zip/linux_full -g home/denis/my_precious_file</code><br>
+/ -x /usb/linux_full -g home/denis/my_precious_file</code><br>
       </div>
       <div style="text-align: justify;"><br>
 This would restore only the file /home/denis/my_precious_file from the
@@ -592,14 +615,14 @@ backup.<br>
       <br>
       </div>
       <div style="margin-left: 40px; text-align: justify;"><code>dar -R
-/ -x /zip/linux_diff1 -g home/denis/my_precious_file</code><br>
+/ -x /usb/linux_diff1 -g home/denis/my_precious_file</code><br>
       </div>
       <div style="text-align: justify;"><br>
 and so on, up to the last differential archive.<br>
       <br>
       </div>
       <div style="margin-left: 40px; text-align: justify;"><code>dar -R
-/ -x /zip/linux_diff29 -g home/denis/my_precious_file</code><br>
+/ -x /usb/linux_diff29 -g home/denis/my_precious_file</code><br>
       </div>
       <div style="text-align: justify;"><br>
       <br>
@@ -615,7 +638,7 @@ option (verbose):<br>
       <br>
       </div>
       <div style="margin-left: 40px; text-align: justify;"><code>dar -R
-/ -x /zip/linux_diff29 -v -g home/denis/my_precious_file</code><br>
+/ -x /usb/linux_diff29 -v -g home/denis/my_precious_file</code><br>
       </div>
       <div style="text-align: justify;"><br>
 If we can see a line like<br>
@@ -640,7 +663,7 @@ restored in a previous step:<br>
       <code></code><br>
       <code></code></div>
       <div style="margin-left: 40px; text-align: justify;"><code>dar -x
-/zip/linux_diff29 -R / -r -v -g home/denis/my_precious_file -g etc/fstab</code><br>
+/usb key/linux_diff29 -R / -r -v -g home/denis/my_precious_file -g etc/fstab</code><br>
       </div>
       <div style="text-align: justify;"><br>
 Check the output to see if one or both of your files got restored. If
@@ -675,7 +698,7 @@ This small file is quite exactly the same as a differential archive
 that holds no data in it. Let's take an example with the full backup we
 did previously to see how to extract a catalogue:<br>
       <code><br>
-&nbsp;&nbsp;&nbsp; dar -C /root/CAT_linux_full -A /mnt/zip/linux_full</code><br>
+&nbsp;&nbsp;&nbsp; dar -C /root/CAT_linux_full -A /mnt/usb/linux_full -z</code><br>
       <br>
 Note here that we used the UPPERCASE 'C' letter, by opposition the the
 lowercase 'c' which is used for archive creation, here we just created
@@ -691,9 +714,10 @@ So what, now we have our extracted catalogue, what can we do with it? Two things
       <br>
       <span style="text-decoration: underline; font-weight: bold;">First,</span>
 we can use the extracted catalogue in place of the archive, as
-reference for a differential backup. No need to manipulate the old zip
-disks, you can store the last's backup isolated catalogue on your hard
-disk instead. If we had used an isolated catalogue in the previous
+reference for a differential backup. No need to manipulate the old usb
+key, you can store the last's backup isolated catalogue on your hard
+disk instead and use it as reference for the next backup. If we had
+used an isolated catalogue in the previous
 examples, we would have built our first differential backup this way
 (note that here we have chose to use the CAT_ prefix to indicate that
 the archive is an isolated catalogue, but the choice is yours to label
@@ -708,7 +732,7 @@ ever invented is <a href="usage_notes.html#Parchive">Parchive</a>, an autonomous
 file (same mechanism as the one used for RAID disks) for a given file.
 Here we can use Parchive to create a parity file for each slice. So,
 assuming you lack Parchive, and that you failed reading the full backup
-because the zip disk is corrupted in the part used by the internal
+because the usb key is corrupted in the part used to store the internal
 catalogue, you can use an isolated catalogue as rescue:<br>
       <br>
       <code>&nbsp;&nbsp;&nbsp; dar -x linux_full -A /root/CAT_linux_full ... <br>
@@ -722,7 +746,7 @@ catalogue, which I admit is rather useless). You can also create an
 isolated catalogue at the same time you do a backup, thanks to the -@
 option:<br>
       <br>
-      <code>&nbsp;&nbsp;&nbsp; dar -c linux_diff1 -A /mnt/zip/linux_full -@ CAT_linux_diff1 ... (other options...)<br>
+      <code>&nbsp;&nbsp;&nbsp; dar -c linux_diff1 -A /mnt/usb key/linux_full -@ CAT_linux_diff1 ... (other options...)<br>
 &nbsp;&nbsp;&nbsp; dar -c linux_full -@ CAT_linux_full ... (other options see above stay the same for backup)<br>
       </code><br>
 This is know as "on-fly" isolation.<br>
@@ -734,8 +758,8 @@ of all
 your archive contents, to automatically restore the latest versions of
 a given set of files. Dar_manager is not targeted to the restoration a
 whole filesystem, the best ways to restore a whole filesystem has been
-described above and do not use dar_manager. So let's use dar_manager to
-restore a set of files. First, we have to create a "database" file :<br>
+described above and does not rely on dar_manager. So let's use dar_manager to
+restore a set of files or a whole directory. First, we have to create a "database" file:<br>
       <br>
       </div>
       <div style="margin-left: 40px; text-align: justify;"><code>dar_manager
@@ -751,7 +775,7 @@ database using the&nbsp; following command:<br>
       <br>
       </div>
       <div style="margin-left: 40px; text-align: justify;"><code>dar_manager
--B my_base.dmd -A /mnt/zip/linux_full<br>
+-B my_base.dmd -A /mnt/usb/linux_full<br>
       </code></div>
       <div style="text-align: justify;"><br>
 This will add ("A" stands for "add") the archive contents to the base.
@@ -769,9 +793,9 @@ file located in this archive it will try to open the
 archive ~/Catalogue/CAT_linux_full for restoration, which does not contain any
 data because it is just the catalogue of the archive.<br>
       <br>
-No problem if you made this mistake, thanks to the -b option we can
-change the basename of the archive, and thanks to the -p option you can
-change the path at any time. But first we will list the database
+No problem in that case, thanks to the -b option we can
+change afterward the basename of the archive, and thanks to the -p option you can
+change afterward the path at any time. Let's now list the database
 contents:<br>
       <br>
       </div>
@@ -796,11 +820,11 @@ path&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; basename<br>
       </code></div>
       <div style="text-align: justify;"><br>
 We should change the path of archive number 1 for dar_manager looks on
-the zip drive:<br>
+the usb key drive:<br>
       <br>
       </div>
       <div style="margin-left: 40px; text-align: justify;"><code>dar_manager
--B my_base.dmd -p 1 /mnt/zip</code><br>
+-B my_base.dmd -p 1 /mnt/usb</code><br>
       </div>
       <div style="text-align: justify;"><br>
 and also replace the name of the extracted catalogue by the real
@@ -829,22 +853,22 @@ archive #&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;
 path&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; basename<br>
 ------------+--------------+---------------<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /mnt/zip&nbsp;&nbsp;&nbsp;&nbsp;
+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /mnt/usb&nbsp; &nbsp;&nbsp;&nbsp;
 linux_full<br>
       </code></div>
       <div style="text-align: justify;"><br>
       <br>
 In place of using -b and -p options, you can also tell the path and the
-name of the real archive to use at restoration time this way when you add the catalogue to the database:<br>
+name of the real archive to use at restoration time, when you add the catalogue to the database:<br>
       <br>
       </div>
       <div style="margin-left: 40px; text-align: justify;"><code>dar_manager
--B my_base.dmd -A ~/Catalogues/CAT_linux_full <span style="font-weight: bold;">/mnt/zip/linux_full</span></code><br>
+-B my_base.dmd -A ~/Catalogues/CAT_linux_full <span style="font-weight: bold;">/mnt/usb/linux_full</span></code><br>
       </div>
       <br>
       <div style="text-align: justify;">
 This is done adding an optional argument. The first ~/Catalogue... is
-the archive where to read the catalogue from, and the second /mnt/zip... is the name to keep for
+the archive where to read the catalogue from, and the second /mnt/usb/... is the name to keep for
 it. No access is done to this second archive at the time of the addition, thus it may stay unavailable at
 the time the command is typed.<br>
       </div>
@@ -855,7 +879,7 @@ base as you want.<br>
       <br>
       <div style="text-align: justify;">Note that we did not yet gave important options in the database to be
 passed to dar. For example, you will likely restore from the root of
-your filesystem, therefor dar when called from dar_manager must get the
+your filesystem, therefore&nbsp; when called from dar_manager, dar must get the
 "-R /" option. This is done with:<br>
       </div>
 
@@ -868,14 +892,12 @@ your filesystem, therefor dar when called from dar_manager must get the
 All that follows -o is passed to dar as-is. You can see the options
 passed to dar when listing the database contents (-l option).<br>
       <br>
-      <div style="text-align: justify;">Let's suppose that after each backup you took the time to update your database,
-and now you just have removed an important file by error.<br>
+      <div style="text-align: justify;">Let's now suppose that after each backup you took the time to update your database,
+and you now just have removed an important file by mistake.<br>
       </div>
 
 
-      <br>
-      <br>
-Now, we can restore our /home/denis/my/precious/file :<br>
+      <br>&nbsp;We can restore our /home/denis/my/precious/file using dar_manager that way:<br>
       <br>
       <div style="text-align: justify;"> </div>
       <div style="margin-left: 40px; text-align: justify;"><code>dar_manager
@@ -887,7 +909,7 @@ following options:<br>
       <br>
       <div style="text-align: justify;"> </div>
       <div style="margin-left: 40px; text-align: justify;"><code>dar -x
-&lt;archive&gt; -R / home/denis/my/precious/file</code><br>
+&lt;archive&gt; -R / -g home/denis/my/precious/file</code><br>
       </div>
       <div style="text-align: justify;"><br>Which
 in turn will ask you the corresponding slices. If you want to restore
@@ -907,9 +929,9 @@ statistics per archive (-s option). Lastly you can specify which dar
 command to use given its path (-d option), by default, dar_manager uses
 the PATH shell variable to choose the dar command.<br>
       <br>
-A new feature for those that are really very lazy: dar_manager has
-an interactive mode, so you don't have to remeber all these
-command-line switch except one:<br>
+A new feature for those that are really very lazy (still as I am myself): dar_manager has
+an <span style="font-weight: bold;">interactive mode</span>, so you don't have to remeber all these
+command-line switches except one:<br>
       <code><br>
       </code>
       <div style="margin-left: 40px;"><code>dar_manager -B my_base.dmd
