@@ -55,7 +55,6 @@ extern "C"
 #if HAVE_LIBTHREADAR_LIBTHREADAR_HPP
 #include <libthreadar/libthreadar.hpp>
 #endif
-#include "memory_check.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -94,7 +93,6 @@ int dar_suite_global(int argc,
 {
     int ret = EXIT_OK;
 
-    memory_check_snapshot();
     dar_suite_reset_signal_handler();
 
 #ifdef ENABLE_NLS
@@ -264,7 +262,6 @@ int dar_suite_global(int argc,
 #endif
 
     ui.reset();
-    memory_check_snapshot();
     return ret;
 }
 

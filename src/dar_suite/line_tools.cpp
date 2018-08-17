@@ -1342,7 +1342,6 @@ void line_tools_display_features(user_interaction & dialog)
 	dialog.printf(gettext("   Extended Attributes support  : %s"), YES_NO(compile_time::ea()));
 	dialog.printf(gettext("   Large files support (> 2GB)  : %s"), YES_NO(compile_time::largefile()));
 	dialog.printf(gettext("   ext2fs NODUMP flag support   : %s"), YES_NO(compile_time::nodump()));
-	dialog.printf(gettext("   Special allocation scheme    : %s"), YES_NO(compile_time::special_alloc()));
 	if(compile_time::bits() == 0)
 	    dialog.printf(gettext("   Integer size used            : unlimited"));
 	else
