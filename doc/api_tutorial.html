@@ -1088,15 +1088,15 @@ std::string &amp; dir, bool <span style="font-weight: bold;">fetch_ea</span>
 = false) const</code></li>
       </ul>
       <span style="font-weight: bold;">archive::op_listing() </span>makes
-use of a callback function that will be called in turn for each entry
-of the archive even special entries that flag the end of a directory.<br>
+use of a callback function that will be called in turn for <span style="text-decoration: underline;">each entry
+of the archive</span> even special entries that flag the end of a directory and the next entry will be located in the parent directory.<br>
       <span style="font-weight: bold;">archive::get_children_of() </span>use
-the same callback but only for the different entries of a given
-directory, that has to exist in the archive of course. It returns false
-      <br>
+the same callback but only for the different <span style="text-decoration: underline;">entries of a given
+directory</span>, that has to exist in the archive of course. It returns false
+      when the end of the directory has been reached.<br>
       <span style="font-weight: bold;">archive::get_children_in_table()</span>
-is like the previous but return a vector if object <span style="font-weight: bold;">libdar::list_entry</span> that provide
-detailed information about each entry<br>
+is like the previous <span style="text-decoration: underline;">listing a given directory</span> but returns a vector of objects <span style="font-weight: bold;">libdar::list_entry</span> that provide
+detailed information about each entry, no callback is used here.<br>
       <br>
       <span style="font-weight: bold;">For the two first methods</span>
 you have to define a callback function of the following form<br>
@@ -1108,13 +1108,13 @@ const list_entry &amp; entry,</span><br style="font-weight: bold;">
 void *context);</span></code><br>
       </div>
       <br>
-This callback will receive as argument the full path of the object, an <span style="font-weight: bold;">libdar::list_entry</span> object providing
-much details on it and the "context" value passed as argument of <span style="font-weight: bold;">archive::op_listing()</span> or <span style="font-weight: bold;">archive::get_children_of()<br>
+This callback will receive as argument the full path of the object, a <span style="font-weight: bold;">libdar::list_entry</span> object providing
+much details on it <span style="font-weight: bold;">and</span> the "context" value passed as argument of <span style="font-weight: bold;">archive::op_listing()</span> or <span style="font-weight: bold;">archive::get_children_of()<br>
       <span style="font-weight: bold;"><br>
       </span></span>Last point to see before going forward with an
 example is this <span style="font-weight: bold;">libdar::list_entry </span>class,
-but it has so many calls that we let you refer to the API reference, we
-will use and comment some of them in the examples.<br>
+we
+will use here only a few of the rich set of fields/methods this class provides in the following examples:<br>
       <span style="font-weight: bold;"></span><br>
       </td>
     </tr>
@@ -1168,8 +1168,29 @@ entry.get_perm();<br>
 entry.get_slices().display();<br>
 &nbsp;&nbsp;&nbsp; std::cout &lt;&lt; std::endl;<br>
 &nbsp;&nbsp;&nbsp;&nbsp; // yep, we do not need context, this<br>
-&nbsp;&nbsp;&nbsp;&nbsp; // might be different in some other <br>
-&nbsp;&nbsp;&nbsp;&nbsp; // "context" :-)<br>
+&nbsp;&nbsp;&nbsp;&nbsp; // is available if you need it though<br>
+      <br>
+&nbsp;&nbsp;&nbsp; if(entry.is_eod())<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // only op_listing() provides such type of object<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // which occurs when we reached the <span style="font-weight: bold;">E</span>nd <span style="font-weight: bold;">O</span>f <span style="font-weight: bold;">D</span>irectory<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // next entry will be located in the parent directory.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Note for op_listing: when reading a directory we recurs in it,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // meaning that the next entry this callback will be <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // invoked for will be located in that directory<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //<br>
+&nbsp; &nbsp; &nbsp;&nbsp; // for get_children_of() no recursion or eod object is<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // performed about directory. The next entry following<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // a directory is still located in the same parent directory<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // which when fully read stops the get_children_of() routine<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // at the difference of op_listing() which parse the whole<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // directory tree.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // For example, reading a empty directory will provide<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // that directory info, then an eod object a the next<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // callback invocation.<br>
+&nbsp;&nbsp;&nbsp; }<br>
 }<br>
       </code></div>
       </td>
@@ -1294,8 +1315,7 @@ still don't care of context here<br>
 // we read the root directory of the archive<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-true); &nbsp;&nbsp; // and ask for EA retrieval, but as we do not<br>
-&nbsp;&nbsp;&nbsp;
+true); &nbsp;&nbsp; // and ask for EA retrieval, but as we do not<br>&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // use list_entry::get_ea_read_next() in the<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
