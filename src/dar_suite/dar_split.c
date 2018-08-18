@@ -83,7 +83,7 @@
 
 #define KEY_INPUT "split_input"
 #define KEY_OUTPUT "split_output"
-#define DAR_SPLIT_VERSION "1.1.1"
+#define DAR_SPLIT_VERSION "1.1.2"
 
 static void usage(char *a);
 static void show_version(char *a);
