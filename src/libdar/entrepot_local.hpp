@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: entrepot.hpp,v 1.1 2012/04/27 11:24:30 edrusb Exp $
-//
-/*********************************************************************/
-
 
     /// \file entrepot_local.hpp
     /// \brief defines the implementation for local filesystem entrepot
