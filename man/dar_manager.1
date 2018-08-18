@@ -98,6 +98,10 @@ Note that files listed after -r option, must never have an absolute path. They w
 .TP 20
 -w, --when <date>
 alters the -r option behavior: still restores the files in the most recent version available but only before the given date (versions of more recent dates are ignored). The <date> must respect the following format [ [ [year/]month/]day-]hour:minute[:second]. For example "22:10" for 10 PM past 10 or the current day,  "7-22:10" for 10 PM past 10 the 7th of the current month, "3/07-22:10" for the 7th of march at 22:10 of the current year, "2002/03/31-14:00:00" the date of the first dar's release ;-). The given date must be in the past, of course, and is compared to the "last modification" date of the saved files and not to the date at which archives have been done. Thus if a file has been changed long ago but saved in a recent (full) archive, it will be elected for restoration even for dates older than the creation of the archive. In the other way, a file saved long time ago with a mtime that was set to a date in the future will not be elected for restoration when giving the date at which was done the archive.
+.PP
+.RS
+Note that the provided date is relative to the system timezone which is overriden if the TZ environement variable is set (see tzselect(1) for more details)
+.RE
 .TP 20
 -e, --extra <options>
 pass some more options to dar. While the -o options takes all that follows on the command line as argument to pass to dar and write these in the database, the -e option does not alter the database and has only one argument. In other words, if you need to pass several options to dar through the use of the -e option, you need to use quotes (simple quotes ' or double quotes ") to enclose these options. Example:
