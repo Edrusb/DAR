@@ -52,6 +52,11 @@ from 2.5.x to 2.6.0
   cap_chown at restoration time, cap_fchown for furtive read mode,
   cap_linux_immutable to restore the immutable flag, and cap_sys_
   resource to set some linux FSA
+- the ./configure --enable-mode option now defaults to 64, which
+  will setup a libdar64 in place if infinint based libdar by default.
+  You can still build a libdar by passing --enable-mode=infinint
+  to the ./configure script.
+
 
 from 2.5.16 to 2.5.17
 - bug fix: dar failed to restore EA when file permission to restore

@@ -262,13 +262,19 @@ configure script</h3>
     <tr>
       <td style="vertical-align: top; text-align: right; width: 33%;">&nbsp;--enable-mode</td>
       <td style="vertical-align: top;">&nbsp;--enable-mode=32 or
---enable-mode=64<br>
-      <div style="text-align: justify; margin-left: 40px;">if set,
-replace "infinint" integers by 32 or 64 bits integers. This makes a
-faster
-executable and less fond of memory, but with several restrictions
-(about for example ability to handle large files, or high dates. See
-the <a href="Limitations.html#Integers">limitations</a> for more). Note that 64 bits integers are available on 32 bits CPU plateforms.<br>
+--enable-mode=infinint<br>
+      <div style="text-align: justify; margin-left: 40px;">if
+set,
+replace 64 bits integers used by default by 32 bits integers or
+"infinint" integers (limitless integers). Before release 2.6.0 the
+default integer used was infinint and this option was added for speed
+optimization at the cost of some limitations (See
+the <a href="Limitations.html#Integers">limitations</a> for more). <br>
+      <br>
+Since release 2.6.0, the default is 64 bits integers (limitations stay
+the same) instead of infinint. But if you hit the 64 bits integer
+limitations you can still use infinint which overcome this at the cost
+of slower performance and increase memory requirement.<br>
       </div>
       <br>
       </td>

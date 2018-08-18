@@ -7,7 +7,7 @@
 
 For the impatients using a released or pre-release package:
 
-	./configure [--enable-mode=64]
+	./configure
 	make
 	make install-strip
 

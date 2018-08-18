@@ -938,9 +938,14 @@ AC_ARG_ENABLE(  [os-bits],
              )
 
 AC_ARG_ENABLE( [mode],
-                AC_HELP_STRING(--enable-mode=arg, [where arg is 32 or 64. Makes dar internally use 32 bits or 64 bits integers in place of infinint (which is the case if this option is not given)]),
-                [build_mode=$enableval],
-                [])
+                AC_HELP_STRING(--enable-mode=arg, [where arg is either 32 or infinint. Makes dar internally use 32 bits or limitless integers in place of 64 bits integers (which is the case if this option is not given)]),
+                [
+		   build_mode=$enableval
+                   if test "$build_mode" != "32" -a "$build_mode" != "64" -a "$build_mode" != "infinint" ; then
+		      AC_MSG_ERROR([Invalid argument given to --enable-mode option])
+		   fi
+                ],
+                [build_mode=64])
 
 AC_ARG_ENABLE( [furtive-read],
                AC_HELP_STRING(--disable-furtive-read,
@@ -1374,7 +1379,7 @@ AM_CONDITIONAL([MAKE_ALL_DIR], [test $examples = "yes"])
 AM_CONDITIONAL([BUILD_DAR_STATIC], [test $build_static = "yes" -a $static_pb = "no"])
 AM_CONDITIONAL([DEBUG_STATIC], [test $debug_static = "yes" -a $static_pb = "no"])
 AM_CONDITIONAL([BUILD_MODE32], [test "$build_mode" = "32"])
-AM_CONDITIONAL([BUILD_MODE64], [test "$build_mode" = "64"])
+AM_CONDITIONAL([BUILD_MODE64], [test "$build_mode" = "64" -o -z "$build_mode"])
 AM_CONDITIONAL([USE_UPX], [test "$upx" = "yes"])
 AM_CONDITIONAL([USE_DOXYGEN], [test "$doxygen" = "yes"])
 AM_CONDITIONAL([USE_GROFF], [test "$groff" = "yes"])
@@ -1482,9 +1487,12 @@ else
 fi
 
 printf "   Integer size used          : "
-if [ -z "$build_mode" -o \( ! "$build_mode" = "32" -a ! "$build_mode" = "64" \) ] ; then
+if [ "$build_mode" = "infinint" ] ; then
   echo "infinint"
 else
+  if [ -z "$build_mode" ] ; then
+     build_mode=64
+  fi
   echo "$build_mode"
 fi
 
