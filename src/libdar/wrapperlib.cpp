@@ -117,13 +117,13 @@ namespace libdar
 	    throw Ecompilation("libbz2 compression support");
 #endif
 	case xz_mode:
+#if LIBLZMA_AVAILABLE
 #if LIBZ_AVAILABLE
             z_ptr = nullptr;
 #endif
 #if LIBBZ2_AVAILABLE
             bz_ptr = nullptr;
 #endif
-#if LIBLZMA_AVAILABLE
 	    lzma_ptr = new (nothrow) lzma_stream;
 	    if(lzma_ptr == nullptr)
 		throw Ememory("wrapperlib::wrapperlib");
@@ -143,6 +143,8 @@ namespace libdar
             x_set_avail_out = & wrapperlib::lzma_set_avail_out;
             x_get_avail_out = & wrapperlib::lzma_get_avail_out;
             x_get_total_out = & wrapperlib::lzma_get_total_out;
+#else
+	    throw Ecompilation("xz compression support (libxz)");
 #endif
 	    break;
         default:
