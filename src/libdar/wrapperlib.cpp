@@ -81,7 +81,7 @@ namespace libdar
             x_get_total_out = & wrapperlib::z_get_total_out;
             break;
 #else
-	    throw Ecompilation("zlib compression support");
+	    throw Ecompilation("gzip compression support (libz)");
 #endif
         case bzlib_mode:
 #if LIBBZ2_AVAILABLE
@@ -114,7 +114,7 @@ namespace libdar
             x_get_total_out = & wrapperlib::bz_get_total_out;
             break;
 #else
-	    throw Ecompilation("libbz2 compression support");
+	    throw Ecompilation("bzip2 compression support (libbz2)");
 #endif
 	case xz_mode:
 #if LIBLZMA_AVAILABLE

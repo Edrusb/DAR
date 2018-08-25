@@ -265,7 +265,7 @@ namespace libdar
 	    }
 	    break;
 #else
-	    throw Ecompilation("lzo compression support");
+	    throw Ecompilation("lzo compression support (liblzo2)");
 #endif
         default :
             throw SRC_BUG;
