@@ -96,7 +96,7 @@ namespace libdar
 
 	return hash_gcrypt;
 #else
-	throw Ecompile_time("linking with libgcrypt");
+	throw Ecompilation("linking with libgcrypt");
 #endif
     }
 
