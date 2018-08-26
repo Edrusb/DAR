@@ -1308,10 +1308,12 @@ CPPFLAGS__cache="$CPPFLAGS"
 CPPFLAGS="$CPPFLAGS $GPGME_CFLAGS $LIBCURL_CFLAGS $LIBTHREADAR_CFLAGS $CXXSTDFLAGS"
 CXXFLAGS__cache="$CXXFLAGS"
 CXXFLAGS="$CXXFLAGS"
-LIBS___cache="$LIBS"
+LDFLAGS__cache="$LDFLAGS"
+LDFLAGS="$LDFLAGS -static"
+LIBS__cache="$LIBS"
 LIBS="$LIBS $GPGME_LIBS $LIBCURL_LIBS $LIBTHREADAR_LIBS $CXXSTDFLAGS $DEBUG_LDFLAGS"
 AC_MSG_CHECKING([static linking])
-AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                                 #if HAVE_STDIO_H
                                                 #include <stdio.h>
                                                 #endif
@@ -1327,10 +1329,38 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                                 #if HAVE_LIBRSYNC_H
                                                 #include <librsync.h>
                                                 #endif
+                                                #if HAVE_PTHREAD_H
+                                                #include <pthread.h>
+                                                #endif
+                                                #if HAVE_LIBRSYNC_H
+                                                #include <stdio.h>
+                                                #include <librsync.h>
+                                                #endif
+						#if HAVE_ZLIB_H
+                                                #include <zlib.h>
+                                                #endif
+                                                #if HAVE_BZLIB_H
+                                                #include <bzlib.h>
+                                                #endif
+                                                #if HAVE_LZO_LZO1X_H
+                                                #include <lzo/lzo1x.h>
+                                                #endif
+                                                #if HAVE_LZMA_H
+                                                #include <lzma.h>
+                                                #endif
+                                                #if HAVE_GCRYPT_H
+                                                #include <gcrypt.h>
+                                                #endif
+                                                #if HAVE_CURL_CURL_H
+                                                #include <curl/curl.h>
+                                                #endif
+                                                #if HAVE_GPGME_H
+                                                #include <gpgme.h>
+                                                #endif
                                              }
                                ]],
                                [[
-                               #if HAVE_EXECINFO_H
+                               #if BACKTRACE_AVAILABLE
                                   const int buf_size = 20;
                                   void *buffer[buf_size];
                                   int size = backtrace(buffer, buf_size);
@@ -1338,8 +1368,14 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
 
                                   if(symbols != 0)
                                     free(symbols);
+				  printf("testing execinfo info in static linked mode...");
+			       #else
+			          force an compilation error;
                                #endif
+
                                #if MUTEX_WORKS
+			       if(1)
+			       {
                                  pthread_mutex_t test;
                                  if(pthread_mutex_init(&test, NULL) == 0)
                                  {
@@ -1347,17 +1383,83 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                        pthread_mutex_unlock(&test);
                                  }
                                  pthread_mutex_destroy(&test);
+				 printf("testing mutex availability in static linked mode...");
+			       }
                                #endif
 
                                #if LIBRSYNC_AVAILABLE
-                               #ifdef RS_DEFAULT_STRONG_LEN
-                                    rs_job_t *job = rs_sig_begin(RS_DEFAULT_BLOCK_LEN, RS_DEFAULT_STRONG_LEN);
-                               #else
-                                    rs_job_t *job = rs_sig_begin(RS_DEFAULT_BLOCK_LEN, 0, RS_MD4_SIG_MAGIC);
+			       if(1)
+			       {
+			         rs_result err = RS_DONE;
+                                 (void) rs_strerror(err);
+				 printf("testing librsync availability in static linked mode...");
+			       }
                                #endif
+
+                               #if LIBZ_AVAILABLE
+			       if(1)
+			       {
+			          z_stream *ptr = (z_stream *)0;
+                                  deflate(ptr, 0);
+			          printf("testing libz availability in static linked mode...");
+			       }
+                               #endif
+
+                               #if LIBBZ2_AVAILABLE
+			       if(1)
+			       {
+                                  bz_stream *ptr = (bz_stream *)0;
+				  BZ2_bzCompress(ptr, 0);
+			          printf("testing libbz2 availability in static linked mode...");
+			       }
+                               #endif
+
+                               #if LIBLZO2_AVAILABLE
+			       if(1)
+			       {
+			          int x;
+			          printf("testing liblzo2 availability in static linked mode...");
+				  x = lzo1x_1_compress(0, 0, 0, 0, 0);
+			       }
 			       #endif
-                                  printf("Hello World!");
-                                  return 0;
+
+			       #if LIBLZMA_AVAILABLE
+			       if(1)
+			       {
+				  lzma_stream ptr = LZMA_STREAM_INIT;
+                                  lzma_ret tmp = lzma_easy_encoder(&ptr,
+                                                                   2,
+                                                                   LZMA_CHECK_CRC32);
+			          printf("testing libxz/lzma availability in static linked mode...");
+                               }
+			       #endif
+
+			       #if CRYPTO_AVAILABLE
+			          printf("testing gcrypt availability in static linked mode...");
+				  if(!gcry_check_version(MIN_VERSION_GCRYPT))
+				  {
+                                    printf("ligcrypt version too low");
+                                    exit(1);
+                                  }
+                                  else
+                                    exit(0);
+			       #endif
+
+			       #if LIBCURL_AVAILABLE
+			          printf("testing librsync availability in static linked mode...");
+                                  (void) curl_global_init(CURL_GLOBAL_ALL);
+			       #endif
+
+			       #if GPGME_SUPPORT
+			       if(1)
+			       {
+                                 gpgme_ctx_t context;
+                                 gpgme_error_t err = gpgme_new(&context);
+                                 gpgme_release(context);
+                               }
+			       #endif
+
+                                 return 0;
                                ]])
                ],
                [
@@ -1368,12 +1470,14 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                  AC_MSG_RESULT([failed])
                  static_pb="yes"
                ])
-CPPFLAGS="$CPPFLAGS___cache"
-unset CPPFLAGS___cache
-CXXFLAGS="$CXXFLAGS___cache"
-unset CXXFLAGS___cache
-LIBS="$LIBS___cache"
-unset LIBS___cache
+CPPFLAGS="$CPPFLAGS__cache"
+unset CPPFLAGS__cache
+CXXFLAGS="$CXXFLAGS__cache"
+unset CXXFLAGS__cache
+LDFLAGS="$LDFLAGS__cache"
+unset LDFLAGS__cache
+LIBS="$LIBS__cache"
+unset LIBS__cache
 
 AM_CONDITIONAL([MAKE_ALL_DIR], [test $examples = "yes"])
 AM_CONDITIONAL([BUILD_DAR_STATIC], [test $build_static = "yes" -a $static_pb = "no"])
