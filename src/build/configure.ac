@@ -1369,8 +1369,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                   if(symbols != 0)
                                     free(symbols);
 				  printf("testing execinfo info in static linked mode...");
-			       #else
-			          force an compilation error;
                                #endif
 
                                #if MUTEX_WORKS
