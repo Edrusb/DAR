@@ -501,7 +501,7 @@ namespace libdar
     void header_version::display(user_interaction & dialog) const
     {
 	string algo = compression2string(get_compression_algo());
-	string sym = get_sym_crypto_name();
+	string sym_str = get_sym_crypto_name();
 	string asym = get_asym_crypto_name();
 	string xsigned = is_signed() ? gettext("yes") : gettext("no");
 	string kdf_iter = deci(iteration_count).human();
@@ -509,12 +509,12 @@ namespace libdar
 
 	dialog.printf(gettext("Archive version format               : %s"), get_edition().display().c_str());
 	dialog.printf(gettext("Compression algorithm used           : %S"), &algo);
-	dialog.printf(gettext("Symmetric key encryption used        : %S"), &sym);
+	dialog.printf(gettext("Symmetric key encryption used        : %S"), &sym_str);
 	dialog.printf(gettext("Asymmetric key encryption used       : %S"), &asym);
 	dialog.printf(gettext("Archive is signed                    : %S"), &xsigned);
 	dialog.printf(gettext("Sequential reading marks             : %s"), (get_tape_marks() ? gettext("present") : gettext("absent")));
 	dialog.printf(gettext("User comment                         : %S"), &(get_command_line()));
-	if(ciphered)
+	if(ciphered && sym != crypto_algo::scrambling)
 	{
 	    dialog.printf(gettext("KDF iteration count                  : %S"), &kdf_iter);
 	    dialog.printf(gettext("KDF hash algorithm                   : %S"), &hashing);
