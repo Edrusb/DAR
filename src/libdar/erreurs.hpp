@@ -319,7 +319,8 @@ namespace libdar
 	{
 	    io_exist,  //< file already exists (write mode)
 	    io_absent, //< file does not exist (read mode)
-	    io_access  //< permission denied (any mode)
+	    io_access, //< permission denied (any mode)
+	    io_ro_fs   //< read-only filesystem (write mode/read-write mode)
 	};
 
 	Esystem(const std::string & source, const std::string & message, io_error code);

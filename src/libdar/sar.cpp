@@ -718,6 +718,8 @@ namespace libdar
 		case Esystem::io_access:
 		    e.prepend_message(tools_printf(gettext("Failed reading slice %S: "), &fic));
 		    throw; // propagate the exception
+		case Esystem::io_ro_fs:
+		    throw SRC_BUG;
 		default:
 		    throw SRC_BUG;
 		}
@@ -1068,6 +1070,7 @@ namespace libdar
 			case Esystem::io_absent:
 			    throw SRC_BUG;
 			case Esystem::io_access:
+			case Esystem::io_ro_fs:
 			    e.prepend_message(tools_printf(gettext("Failed creating slice %S: "), &fic));
 			    throw;
 			default:
@@ -1138,6 +1141,7 @@ namespace libdar
 		    case Esystem::io_absent:
 			throw SRC_BUG; // not called in read mode
 		    case Esystem::io_access:
+		    case Esystem::io_ro_fs:
 			e.prepend_message(tools_printf(gettext("Failed creating slice %S: "), &fic));
 			throw; // propagate the exception
 		    default:
@@ -1148,6 +1152,7 @@ namespace libdar
 	    case Esystem::io_absent:
 		throw SRC_BUG;
 	    case Esystem::io_access:
+	    case Esystem::io_ro_fs:
 		e.prepend_message(tools_printf(gettext("Failed creating slice %S: "), &fic));
 		throw; // propagate the exception
 	    default:
