@@ -2796,14 +2796,19 @@ static bool update_with_config_files(recursive_param & rec, line_param & p)
     {
         switch(e.get_code())
         {
+        case Esystem::io_exist:
+            throw SRC_BUG;
         case Esystem::io_absent:
                 // failed openning the file,
                 // nothing to do,
                 // we will try the other config file
                 // below
             break;
-        case Esystem::io_exist:
-            throw SRC_BUG;
+	case Esystem::io_access:
+	    e.prepend_message(tools_printf(gettext("Failed reading %S: "), &buffer));
+	    throw;
+	case Esystem::io_ro_fs:
+	    throw SRC_BUG; // should not succeed as we open in read mode
         default:
             throw SRC_BUG;
         }
@@ -2874,12 +2879,17 @@ static bool update_with_config_files(recursive_param & rec, line_param & p)
         {
             switch(e.get_code())
             {
+            case Esystem::io_exist:
+                throw SRC_BUG;
             case Esystem::io_absent:
                     // failed openning the file,
                     // nothing to do,
                 break;
-            case Esystem::io_exist:
-                throw SRC_BUG;
+	    case Esystem::io_access:
+		rec.dialog->printf(gettext("Warning: Failed reading %S: "), &buffer);
+		throw;
+	    case Esystem::io_ro_fs:
+		throw SRC_BUG; // should not succeed as we open in read mode
             default:
                 throw SRC_BUG;
             }

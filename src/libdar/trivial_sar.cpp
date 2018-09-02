@@ -220,6 +220,7 @@ namespace libdar
 			    }
 			    throw;
 			case Esystem::io_access:
+			case Esystem::io_ro_fs:
 			    e.prepend_message(tools_printf(gettext("Failed creating slice %S: "), &filename));
 			    throw; // propagate the exception
 			default:
@@ -237,6 +238,7 @@ namespace libdar
 		    }
 		    throw;
 		case Esystem::io_access:
+		case Esystem::io_ro_fs:
 		    e.prepend_message(tools_printf(gettext("Failed creating slice %S: "), &filename));
 		    throw; // propagate the exception
 		default:
