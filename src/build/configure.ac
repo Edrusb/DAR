@@ -994,9 +994,9 @@ AC_ARG_ENABLE( [furtive-read],
 AC_ARG_ENABLE( [debug],
                 AC_HELP_STRING(--enable-debug, [build targets with debugging option and no optimization]),
                 [
-                        DEBUG_CXXFLAGS="-g -Wall"
-                        DEBUG_CFLAGS="-g -Wall"
-                        DEBUG_LDFLAGS="-g -Wall"
+                        CXXFLAGS="-g -Wall"
+                        CFLAGS="-g -Wall"
+                        LDFLAGS="-g -Wall"
                         debug_static="yes"
                         AC_DEFINE(LIBDAR_NO_OPTIMIZATION, 1, [if defined, informs the code that no optimization has been used for compilation])
                 ],
@@ -1311,7 +1311,7 @@ CXXFLAGS="$CXXFLAGS"
 LDFLAGS__cache="$LDFLAGS"
 LDFLAGS="$LDFLAGS -static"
 LIBS__cache="$LIBS"
-LIBS="$LIBS $GPGME_LIBS $LIBCURL_LIBS $LIBTHREADAR_LIBS $CXXSTDFLAGS $DEBUG_LDFLAGS"
+LIBS="$LIBS $GPGME_LIBS $LIBCURL_LIBS $LIBTHREADAR_LIBS $CXXSTDFLAGS"
 AC_MSG_CHECKING([static linking])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                                 #if HAVE_STDIO_H
@@ -1492,12 +1492,6 @@ AC_SUBST([CXXSTDFLAGS], [$CXXSTDFLAGS])
 AC_SUBST(UPX_PROG, [upx])
 AC_SUBST(DOXYGEN_PROG, [doxygen])
 AC_SUBST(HAS_DOT, [$dot])
-
-if test "$debug_static" = "yes" ; then
-AC_SUBST(DEBUG_CXXFLAGS, [$DEBUG_CXXFLAGS])
-AC_SUBST(DEBUG_CFLAGS, [$DEBUG_CFLAGS])
-AC_SUBST(DEBUG_LDFLAGS, [$LDFLAGS])
-fi
 
 # defaults
 AC_PREFIX_DEFAULT(/usr/local)
