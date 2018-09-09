@@ -71,6 +71,7 @@ namespace libdar
 
 	    /// add more detailed couple of information to the exception
         void stack(const std::string & passage, const std::string & message = "") { pile.push_back(niveau(passage, message)); };
+	void stack(const std::string && passage, const std::string && message = "") { pile.push_back(niveau(std::move(passage), std::move(message))); };
 
 	    /// get the message explaing the nature of the exception
 
@@ -101,7 +102,14 @@ namespace libdar
     private :
         struct niveau
         {
-            niveau(const std::string &ou, const std::string &quoi) { lieu = ou; objet = quoi; };
+            niveau(const std::string & ou, const std::string & quoi) { lieu = ou; objet = quoi; };
+	    niveau(std::string && ou, std::string && quoi) { lieu = std::move(ou); objet = std::move(quoi); };
+	    niveau(const niveau & ref) = default;
+	    niveau(niveau && ref) noexcept = default;
+	    niveau & operator = (const niveau & ref) = default;
+	    niveau & operator = (niveau && ref) noexcept = default;
+	    ~niveau() = default;
+
             std::string lieu, objet;
         };
 
