@@ -1251,7 +1251,7 @@ AC_ARG_ENABLE( [threadar],
                CPPFLAGS="$LIBTHREADAR_CFLAGS $CPPFLAGS"
                CXXFLAGS__cache="$CXXFLAGS"
                CXXFLAGS="$LIBTHREADAR_CFLAGS $CXXFLAGS"
-               LIBS___cache="$LIBS"
+               LIBS__cache="$LIBS"
                LIBS="$LIBTHREADAR_LIBS $LIBS"
                AC_CHECK_HEADER(libthreadar/libthreadar.hpp,
                                [ AC_DEFINE(HAVE_LIBTHREADAR_LIBTHREADAR_HPP, 1, [libthreadar.h header file availability]) ],
@@ -1296,12 +1296,12 @@ AC_ARG_ENABLE( [threadar],
                                  AC_MSG_RESULT(wrong)
                                ]
                              )
-              CPPFLAGS="$CPPFLAGS___cache"
-              unset CPPFLAGS___cache
-              CXXFLAGS="$CXXFLAGS___cache"
-              unset CXXFLAGS___cache
-              LIBS="$LIBS___cache"
-              unset LIBS___cache
+              CPPFLAGS="$CPPFLAGS__cache"
+              unset CPPFLAGS__cache
+              CXXFLAGS="$CXXFLAGS__cache"
+              unset CXXFLAGS__cache
+              LIBS="$LIBS__cache"
+              unset LIBS__cache
               ])
 
 CPPFLAGS__cache="$CPPFLAGS"
