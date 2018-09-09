@@ -67,7 +67,7 @@ static void f1()
     shared_ptr<entrepot> where(new entrepot_local("", "", false));
     if(!where)
 	throw Ememory("f1");
-    where->set_location("./test");
+    where->set_location(path("./test"));
     try
     {
 	sar sar1(ui, gf_write_only, "destination", "txt", 100, 110, true, false, 0, where, internal_name, data_name, false, 0, hash_algo::none, false, 0);
@@ -85,7 +85,7 @@ static void f2()
     shared_ptr<entrepot> where(new entrepot_local("", "", false));
     if(!where)
 	throw Ememory("f2");
-    where->set_location("./test");
+    where->set_location(path("./test"));
     try
     {
         sar sar2(ui, "destination", "txt", where, 0, false);
@@ -104,7 +104,7 @@ static void f3()
     shared_ptr<entrepot> where(new entrepot_local("", "", false));
     if(!where)
 	throw Ememory("f3");
-    where->set_location("./test");
+    where->set_location(path("./test"));
 
     try
     {
@@ -174,7 +174,7 @@ void f4()
     shared_ptr<entrepot> where(new entrepot_local("", "", false));
     if(!where)
 	throw Ememory("f4");
-    where->set_location("./test");
+    where->set_location(path("./test"));
 
     try
     {

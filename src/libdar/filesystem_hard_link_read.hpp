@@ -99,7 +99,7 @@ namespace libdar
 	    /// create and return a libdar object corresponding to one pointed to by its path
 	    /// during this operation, hard linked inode are recorded in a list to be easily pointed
 	    /// to by a new reference to it.
-        cat_nomme *make_read_entree(path & lieu,               ///< path of the file to read
+        cat_nomme *make_read_entree(const path & lieu,         ///< path of the file to read
 				    const std::string & name,  ///< name of the file to read
 				    bool see_hard_link,        ///< whether we want to detect hard_link and eventually return a cat_mirage object (not necessary when diffing an archive with filesystem)
 				    const mask & ea_mask       ///< which EA to consider when creating the object

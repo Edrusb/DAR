@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 
 void f1(const shared_ptr<user_interaction> & dialog, const char *filename)
 {
-    mask_list m = mask_list(filename, true, "/toto/tutu", true);
+    mask_list m = mask_list(filename, true, path("/toto/tutu"), true);
     string tester;
     U_I count = 10;
 
@@ -91,7 +91,7 @@ void f1(const shared_ptr<user_interaction> & dialog, const char *filename)
 	cout << (m.is_covered(tester) ? string("COVERED") : string("not covered")) << endl;
     }
 
-    m = mask_list(filename, false, "/toto/tutu", false);
+    m = mask_list(filename, false, path("/toto/tutu"), false);
     count = 10;
     while(--count)
     {

@@ -34,11 +34,11 @@ int main()
 {
     try
     {
-        path p1 = "/";
-        path p2 = "toto";
-        path p3 = "/titi";
-        path p4 = "toto/titi/tutu/tata";
-        path p5 = "/zozo/zizi/zuzu/zaza";
+        path p1("/");
+        path p2("toto");
+        path p3("/titi");
+        path p4("toto/titi/tutu/tata");
+        path p5("/zozo/zizi/zuzu/zaza");
 
         cout << p2.display() << endl;
 
@@ -80,7 +80,7 @@ int main()
 
     try
     {
-        path tmp = "";
+        path tmp("");
     }
     catch(Egeneric & e)
     {
@@ -89,8 +89,8 @@ int main()
 
     try
     {
-        path t1 = "/toto/tutu";
-        path t2 = "zozo/zuzu";
+        path t1("/toto/tutu");
+	path t2("zozo/zuzu");
         path t3 = t2 + t1;
     }
     catch(Egeneric & e)
@@ -107,7 +107,7 @@ void f2()
 			  "././././toto/././././..", "/././././toto/././././..",
 			  "../../../titi/./tutu", "/../../../../toto/../../tutu",
 			  nullptr };
-    path conv = "/";
+    path conv("/");
 
     for(S_I i = 0; src[i] != nullptr; i++)
     {

@@ -515,7 +515,7 @@ namespace libdar
 	if(contenu == nullptr)
 	    throw SRC_BUG;
 	current_compare = contenu;
-	out_compare = "/";
+	out_compare = path("/");
     }
 
     bool catalogue::compare(const cat_entree * target, const cat_entree * & extracted) const
@@ -1033,7 +1033,7 @@ namespace libdar
 
     void catalogue::reset_all()
     {
-	out_compare = "/";
+	out_compare = path("/");
 	current_compare = contenu;
 	current_add = contenu;
 	current_read = contenu;

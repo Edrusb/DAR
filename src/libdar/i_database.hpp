@@ -151,7 +151,7 @@ namespace libdar
             if(files == nullptr)
                 throw SRC_BUG;
             if(check_order_asked)
-                return files->check_order(get_ui(), ".", initial_warn) && initial_warn;
+                return files->check_order(get_ui(), path("."), initial_warn) && initial_warn;
             else
                 return true;
         }

@@ -214,6 +214,13 @@ namespace libdar
         return *this;
     }
 
+    path & path::operator += (const std::string & sub)
+    {
+	dirs.push_back(sub);
+	reduce();
+	return *this;
+    }
+
     bool path::is_subdir_of(const path & p, bool case_sensit) const
     {
 	string me;

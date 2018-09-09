@@ -36,7 +36,7 @@ namespace libdar
 	// general default values
 
     static const U_32 default_crypto_size = 10240;
-    static const path default_ref_chem = "/";
+    static const path default_ref_chem("/");
     static const U_I default_min_compr_size = 100;
     static const comparison_fields default_comparison_fields = comparison_fields::all;
     static const crit_constant_action default_crit_action = crit_constant_action(data_preserve, EA_preserve);

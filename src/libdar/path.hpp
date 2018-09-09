@@ -60,12 +60,6 @@ namespace libdar
 	    /// allow one to pop() three time, while in the same example setting undisclosed to true, allow one to pop() just once).
         path(const std::string & s, bool x_undisclosed = false);
 
-	    /// constructor from a char *
-
-	    /// this realizes the char * to path convertion function
-	    /// \note empty string is not a valid string (exception thrown)
-        path(const char *s, bool x_undisclosed = false) { *this = path(std::string(s), x_undisclosed); };
-
 	    /// copy constructor
         path(const path & ref);
 
@@ -136,12 +130,17 @@ namespace libdar
 	    /// \note arg can be a string also, which is converted to a path on the fly
         path operator + (const path & arg) const { path tmp = *this; tmp += arg; return tmp; };
 
+	    /// add a single sub-directory to the path
+	path operator + (const std::string & sub) const { path tmp = *this; tmp += sub; return tmp; };
 
 	    /// add a path to the current path. The added path *must* be a relative path
 
 	    /// \param[in] arg the relative path to add
 	    /// \return the value of the current (modified) object: "*this".
         path & operator += (const path & arg);
+
+	    /// add a single sub-directory to the current path object
+	path & operator += (const std::string & sub);
 
 	    /// test whether the current object is a subdir of the method's argument
 
@@ -175,6 +174,7 @@ namespace libdar
 	bool undisclosed;
 
         void reduce();
+	void init(const std::string & chem, bool x_undisclosed);
     };
 
 	/// root name to use when archive operation does not use filesystem (archive testing for example)

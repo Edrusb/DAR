@@ -207,7 +207,7 @@ static void re_test()
 	const cat_entree *e;
 	cat_detruit det1 = cat_detruit("lien", 'l' | 0x80, datetime(129));
 	cat_detruit det2 = cat_detruit("dev1", 'd', datetime(192));
-	path where = "algi";
+	path where("algi");
 	bool_mask all = true;
 	crit_constant_action todo =  crit_constant_action(data_preserve, EA_preserve);
 	fsa_scope sc;

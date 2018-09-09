@@ -176,11 +176,11 @@ namespace libdar
 		    /////////////
 		    // completing relative paths of the list
 
-		if(prefix.is_relative() && !prefix.is_subdir_of("<ROOT>", true))
+		if(prefix.is_relative() && !prefix.is_subdir_of(path("<ROOT>"), true))
 		    throw Erange("mask_list::mask_list", gettext("Mask_list's prefix must be an absolute path or start with \"<ROOT>\" string for archive merging"));
 		else
 		{
-		    path current = "/";
+		    path current("/");
 		    list <string>::iterator it = tmp.begin();
 
 		    while(it != tmp.end())

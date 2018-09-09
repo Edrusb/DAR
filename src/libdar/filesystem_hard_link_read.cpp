@@ -131,9 +131,9 @@ namespace libdar
 			  cat_inode *ino,
 			  const mask & ea_mask);
 
-    cat_nomme *filesystem_hard_link_read::make_read_entree(path & lieu, const string & name, bool see_hard_link, const mask & ea_mask)
+    cat_nomme *filesystem_hard_link_read::make_read_entree(const path & lieu, const string & name, bool see_hard_link, const mask & ea_mask)
     {
-	const string display = name.empty() ? lieu.display() : (lieu + path(name)).display();
+	const string display = name.empty() ? lieu.display() : (lieu + name).display();
         const char *ptr_name = display.c_str();
         cat_nomme *ref = nullptr;
 	struct stat buf;

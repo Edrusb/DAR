@@ -91,8 +91,8 @@ int main()
     display_res(&m13, "/tmp/CrOtte");
     display_res(&m13, "/tMp/cRoTTE/seche");
 
-    simple_path_mask m14 = simple_path_mask("/tmp/crotte", true);
-    simple_path_mask m15 = simple_path_mask("/tmp/croTte", false);
+    simple_path_mask m14 = simple_path_mask(path("/tmp/crotte"), true);
+    simple_path_mask m15 = simple_path_mask(path("/tmp/croTte"), false);
     display_res(&m14, "/tmp/crotte");
     display_res(&m14, "/tmp/crotte/de/bique");
     display_res(&m14, "/tmp");

@@ -113,7 +113,7 @@ namespace libdar
 						   bool erase) const
     {
 	fichier_global *ret = nullptr;
-	string fullname = (get_full_path() + path(filename)).display();
+	string fullname = (get_full_path() + filename).display();
 	U_I perm = force_permission ? permission : 0666;
 
 

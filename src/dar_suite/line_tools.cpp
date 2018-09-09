@@ -448,7 +448,7 @@ string line_tools_get_full_path_from_PATH(const deque<string> & the_path, const 
     {
 	try
 	{
-	    path tmp = filename;
+	    path tmp(filename);
 
 	    if(!tmp.is_relative())
 		no_path = false; // no need to check if file exist using the_path, path is absolute
@@ -1425,7 +1425,7 @@ void line_tools_check_basename(user_interaction & dialog, const path & loc, stri
     NLS_SWAP_IN;
     try
     {
-	regular_mask suspect = regular_mask(string(".+\\.[1-9][0-9]*\\.")+extension, true);
+	regular_mask suspect(string(".+\\.[1-9][0-9]*\\.")+extension, true);
 	string old_path = (loc+base).display();
 
 	    // is basename is suspect ?

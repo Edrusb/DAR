@@ -159,15 +159,15 @@ void f2()
     archive_options_read read_options;
     archive_options_create create_options;
 
-    create_options.set_subtree(simple_path_mask("/etc", true));
+    create_options.set_subtree(simple_path_mask(path("/etc"), true));
     create_options.set_warn_over(false);
     archive *toto = nullptr;
 
     try
     {
 	toto = new (nothrow) archive(ui,
-				     "/",
-				     ".",
+				     path("/"),
+				     path("."),
 				     "toto",
 				     "dar",
 				     create_options,
@@ -198,7 +198,7 @@ void f2()
 
     read_options.clear();
     read_options.set_info_details(true);
-    archive *arch = new (nothrow) archive(ui, ".", "toto", "dar", read_options);
+    archive *arch = new (nothrow) archive(ui, path("."), "toto", "dar", read_options);
     if(arch != nullptr)
     {
 	vector<list_entry> liste = arch->get_children_in_table("");
@@ -214,7 +214,7 @@ void f3()
 	// need to create an archive named "titi" with file recorded as removed since reference backup
     read_options.clear();
     read_options.set_info_details(true);
-    archive *arch = new (nothrow) archive(ui, ".", "toto", "dar", read_options);
+    archive *arch = new (nothrow) archive(ui, path("."), "toto", "dar", read_options);
     if(arch != nullptr)
     {
 	arch->init_catalogue();
