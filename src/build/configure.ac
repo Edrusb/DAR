@@ -520,7 +520,7 @@ AC_ARG_ENABLE( [liblzo2-linking],
                                                        #endif
                                               }]],
                                               [[
-                                                        int x = lzo1x_1_compress(0, 0, 0, 0, 0);
+                                                        (void)lzo1x_1_compress(0, 0, 0, 0, 0);
                                               ]])
                                 ],
                                 [ AC_DEFINE(LIBLZO2_AVAILABLE, 1, [header and linking is available to have lzo functions])],
