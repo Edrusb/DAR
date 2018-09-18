@@ -291,13 +291,15 @@ namespace libdar
 						     buf.st_dev);
 #if HAVE_DOOR
 		else if(S_ISDOOR(buf.st_mode))
-		    ref = new (nothrow) door(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						atime,
-						mtime,
-						ctime,
-						name,
-						lieu,
-						buf.st_dev);
+		    ref = new (nothrow) cat_door(buf.st_uid,
+						 buf.st_gid,
+						 buf.st_mode & 07777,
+						 atime,
+						 mtime,
+						 ctime,
+						 name,
+						 lieu,
+						 buf.st_dev);
 #endif
 		else
 		    throw Edata(string(gettext("Unknown file type! file name is: ")) + string(ptr_name));
