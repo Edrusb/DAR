@@ -2929,7 +2929,13 @@ namespace libdar
 				    try
 				    {
 					if(!pdesc.stack->skip(rewinder))
-					    throw SRC_BUG;
+					    throw Erange("save_inode","skipping was possible in theory but not in reality");
+					    // this situation may arise when some data
+					    // is pending to be written (cache layer) and
+					    // before skipping back leads the cache to flush
+					    // his data to the underlying layer (sar for example)
+					    // which may leads to the creation to a new slice and
+					    // then skipping back is no more possible as it was before
 					if(!resave_uncompressed)
 					    resave_uncompressed = true;
 					else
