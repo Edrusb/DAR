@@ -293,7 +293,7 @@ namespace libdar
 	    switch(direction)
 	    {
 	    case skip_backward:
-		new_amount -= ESCAPE_SEQUENCE_LENGTH;
+		new_amount += ESCAPE_SEQUENCE_LENGTH;
 		    // we read some bytes before to check fo escape sequence
 		break;
 	    case skip_forward:

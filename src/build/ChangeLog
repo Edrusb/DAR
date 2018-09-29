@@ -68,6 +68,12 @@ from 2.5.16 to 2.5.17
 - fixed bug met when writing slices to a read-only filesystem
 - fixed compilation problem under Solaris
 - fixed typos in dar man page
+- bug fix: self reporting bug in filtre.cpp line 2932 or 2925 depending
+  or dar's version (occurs in a normal but rare condition that was not
+  imagined by developer...)
+- bug fix: wrong evaluation of possibility to skip by the escape layer
+  (managing tape marks) which lead to useless but harlmess skip trials
+  in some rare conditions.
 
 from 2.5.15 to 2.5.16
 - bug fix: while rechecking sparse file (-ah option) during a merging
