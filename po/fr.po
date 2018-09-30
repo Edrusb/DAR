@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: DAR 2.5.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2018-10-19 23:27+0200\n"
-"PO-Revision-Date: 2015-09-13 12:27+0200\n"
+"POT-Creation-Date: 2018-09-30 14:26+0200\n"
+"PO-Revision-Date: 2018-09-30 17:44+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "Language: fr\n"
@@ -56,9 +56,8 @@ msgid "-A option is not available with -l"
 msgstr "-A n'est disponible qu'avec l'option -l"
 
 #: src/dar_suite/command_line.cpp:420
-#, fuzzy
 msgid "-T option is only available with -l"
-msgstr "-af n'est disponible qu'avec l'option -c ou -+"
+msgstr "-T n'est disponible qu'avec l'option -l"
 
 #: src/dar_suite/command_line.cpp:422
 msgid "with -C option, -A option is mandatory"
@@ -233,24 +232,20 @@ msgid "-vf is only useful with -c option"
 msgstr "-vf n'est utile qu'avec l'option -c"
 
 #: src/dar_suite/command_line.cpp:538
-#, fuzzy
 msgid "-A option is required with -y option"
-msgstr "l'option -k n'est utile qu'avec l'option -x"
+msgstr "l'option -A est nécessaire avec l'option -y"
 
 #: src/dar_suite/command_line.cpp:540
-#, fuzzy
 msgid "'-A +' is not possible with -y option"
-msgstr "-%% n'est disponible qu'avec l'option -+"
+msgstr "'-A +' est indisponible avec l'option -y"
 
 #: src/dar_suite/command_line.cpp:542
-#, fuzzy
 msgid "-af is not possible with -y option"
-msgstr "-vf n'est utile qu'avec l'option -c"
+msgstr "-af est indisponible avec l'option -y"
 
 #: src/dar_suite/command_line.cpp:544
-#, fuzzy
 msgid "-k option is not possible with -y option"
-msgstr "l'option -k n'est utile qu'avec l'option -x"
+msgstr "l'option -k n'est pas compatible avec l'option -y"
 
 #: src/dar_suite/command_line.cpp:546
 msgid ""
@@ -259,14 +254,12 @@ msgid ""
 msgstr ""
 
 #: src/dar_suite/command_line.cpp:548
-#, fuzzy
 msgid "-D option is useless with -y option"
-msgstr "-w est inutile avec -n"
+msgstr "-D est inutile avec -y"
 
 #: src/dar_suite/command_line.cpp:550
-#, fuzzy
 msgid "-r option is useless with -y option"
-msgstr "-w est inutile avec -n"
+msgstr "-r est inutile avec -y"
 
 #: src/dar_suite/command_line.cpp:552
 msgid ""
@@ -275,104 +268,84 @@ msgid ""
 msgstr ""
 
 #: src/dar_suite/command_line.cpp:554
-#, fuzzy
 msgid "-O option is not possible with -y option"
-msgstr "l'option -k n'est utile qu'avec l'option -x"
+msgstr "l'option -0 est incompatible avec l'option -y"
 
 #: src/dar_suite/command_line.cpp:556
-#, fuzzy
 msgid "-H option is useless with -y option"
-msgstr "-w est inutile avec -n"
+msgstr "-H est inutile avec -y"
 
 #: src/dar_suite/command_line.cpp:558
-#, fuzzy
 msgid "-as option is useless with -y option"
-msgstr "-w est inutile avec -n"
+msgstr "l'option -as est inutile avec -y"
 
 #: src/dar_suite/command_line.cpp:560
-#, fuzzy
 msgid "-ae option is useless with -y option"
-msgstr "-w est inutile avec -n"
+msgstr "l'option -ae est inutile avec -y"
 
 #: src/dar_suite/command_line.cpp:562
-#, fuzzy
 msgid "-ad option is useless with -y option"
-msgstr "-w est inutile avec -n"
+msgstr "l'option -ad est inutile avec -y"
 
 #: src/dar_suite/command_line.cpp:564
-#, fuzzy
 msgid "-asecu option is useless with -y option"
-msgstr "-w est inutile avec -n"
+msgstr "l'option -asecu est inutile avec -y"
 
 #: src/dar_suite/command_line.cpp:566
-#, fuzzy
 msgid "-ai option is useless with -y option"
-msgstr "-w est inutile avec -n"
+msgstr "l'option -ai est inutile avec -y"
 
 #: src/dar_suite/command_line.cpp:568
 msgid "--alter=do-not-compare-symlink-mtime option is useless with -y option"
 msgstr ""
 
 #: src/dar_suite/command_line.cpp:570
-#, fuzzy
 msgid "-M option is useless with -y option"
-msgstr "-w est inutile avec -n"
+msgstr "l'option -M est inutile avec -y"
 
 #: src/dar_suite/command_line.cpp:572
-#, fuzzy
 msgid "-@ option is useless with -y option"
-msgstr "-w est inutile avec -n"
+msgstr "l'option -@ est inutile avec -y"
 
 #: src/dar_suite/command_line.cpp:574
-#, fuzzy
 msgid "-/ option is useless with -y option"
-msgstr "-w est inutile avec -n"
+msgstr "l'option -/ est inutile avec -y"
 
 #: src/dar_suite/command_line.cpp:576
-#, fuzzy
 msgid "-< and -> options are useless with -y option"
-msgstr "l'option -k n'est utile qu'avec l'option -x"
+msgstr "les options -< et -> sont inutiles avec l'option -y"
 
 #: src/dar_suite/command_line.cpp:578
-#, fuzzy
 msgid "-5 option is useless with -y option"
-msgstr "-w est inutile avec -n"
+msgstr "l'option -5 est inutile avec -y"
 
 #: src/dar_suite/command_line.cpp:580
-#, fuzzy
 msgid "-8 option is useless with -y option"
-msgstr "-w est inutile avec -n"
+msgstr "l'option -8 est inutile avec -y"
 
 #: src/dar_suite/command_line.cpp:582
-#, fuzzy
 msgid "-{ and -} options are useless with -y option"
-msgstr "l'option -k n'est utile qu'avec l'option -x"
+msgstr "les options -{ et -} sont inutiles avec l'option -y"
 
 #: src/dar_suite/command_line.cpp:584
-#, fuzzy
 msgid "-\\ option is useless with -y option"
-msgstr "-w est inutile avec -n"
+msgstr "l'option -\\  est inutile avec -y"
 
 #: src/dar_suite/command_line.cpp:586
-#, fuzzy
 msgid "compression (-z option) cannot be changed with -y option"
-msgstr ""
-"La compression (option -z) est inutile et ignorée lorsque -ak est utilisé"
+msgstr "la compression (option -z) ne peut être modifiée avec l'option -y"
 
 #: src/dar_suite/command_line.cpp:588
-#, fuzzy
 msgid "-ak option is useless with -y option"
-msgstr "-w est inutile avec -n"
+msgstr "l'option -ak est inutile avec -y"
 
 #: src/dar_suite/command_line.cpp:590
-#, fuzzy
 msgid "-ah option is useless with -y option"
-msgstr "-w est inutile avec -n"
+msgstr "l'option -ah est inutile avec -y"
 
 #: src/dar_suite/command_line.cpp:592
-#, fuzzy
 msgid "--sequential-read is useless with -y option"
-msgstr "L'option -r est inutile avec -n"
+msgstr "l'option --sequential-read est inutile avec -y"
 
 #: src/dar_suite/command_line.cpp:594
 msgid "--alter=tape-marks is impossible with -y option"
@@ -439,13 +412,10 @@ msgstr ""
 "l'archive : %S"
 
 #: src/dar_suite/command_line.cpp:802
-#, fuzzy
 msgid ""
 "Warning: libdar multi-threading is an experimental and unsupported feature, "
 "read man page about -G option for more information"
-msgstr ""
-"Attentuion: L'option -G est expérimentale et non supportée. Lire la page de "
-"manuel à propos de cette option pour plus d'information"
+msgstr "Attention: L'option -G est expérimentale et non supportée. Lire la page de manuel à propos de cette option pour plus d'information"
 
 #: src/dar_suite/command_line.cpp:807
 msgid "Parse error: "
@@ -512,9 +482,9 @@ msgid "Invalid argument given to -T option, expecting <num>[:<hash_algo>]"
 msgstr ""
 
 #: src/dar_suite/command_line.cpp:1304
-#, fuzzy, c-format
+#, c-format
 msgid "Invalid hash algorithm provided to -T opton: %s"
-msgstr "L'argument fourni à l'option -; est un nombre invalide : %s"
+msgstr "Algorithm de hashage inconnu fourni à l'option -T : %s"
 
 #: src/dar_suite/command_line.cpp:1398
 #, c-format
@@ -633,24 +603,21 @@ msgid "Missing argument to --backup-hook-execute"
 msgstr "Argument manquant pour --backup-hook-execute"
 
 #: src/dar_suite/command_line.cpp:1917
-#, fuzzy
 msgid "Missing argument to --delta"
-msgstr "Il manque un argument à --hash"
+msgstr "Il manque un argument à --delta"
 
 #: src/dar_suite/command_line.cpp:1923
-#, fuzzy
 msgid "Unknown parameter given to --delta option: "
-msgstr "Paramètre inconnu donné à l'option -a : "
+msgstr "Paramètre inconnu donné à l'option --delta : "
 
 #: src/dar_suite/command_line.cpp:1970
-#, fuzzy
 msgid "Unknown parameter given to --modified-data-detection option: "
-msgstr "Paramètre inconnu donné à l'option -a : "
+msgstr "Paramètre inconnu donné à l'option --modified-data-detection : "
 
 #: src/dar_suite/command_line.cpp:1975 src/dar_suite/command_line.cpp:1977
-#, fuzzy, c-format
+#, c-format
 msgid "Unknown option -%c"
-msgstr "Option inconnue -%c ignorée"
+msgstr "Option inconnue -%c"
 
 #: src/dar_suite/command_line.cpp:1994
 #, c-format
@@ -1217,14 +1184,14 @@ msgid "Arguments read from %S :"
 msgstr "Arguments lus depuis %S :"
 
 #: src/dar_suite/command_line.cpp:2808
-#, fuzzy, c-format
+#, c-format
 msgid "Failed reading %S: "
-msgstr "Echec de lecture du CRC pour les Attributs Etendus : "
+msgstr "Echec de lecture pour %S : "
 
 #: src/dar_suite/command_line.cpp:2889
-#, fuzzy, c-format
+#, c-format
 msgid "Warning: Failed reading %S: "
-msgstr "Erreur lors de la lecture des FSA : "
+msgstr "Attention : échec de lecture pour %S : "
 
 #: src/dar_suite/command_line.cpp:3179
 #, c-format
@@ -1385,9 +1352,9 @@ msgstr ""
 "traitement par lot n'est pas autorisée"
 
 #: src/dar_suite/dar_manager.cpp:495
-#, fuzzy, c-format
+#, c-format
 msgid "invalid number given to -9 option: %s"
-msgstr "L'argument fourni à l'option -; est un nombre invalide : %s"
+msgstr "L'argument fourni à l'option -9 est un nombre invalide : %s"
 
 #: src/dar_suite/dar_manager.cpp:514 src/dar_suite/dar_manager.cpp:516
 #: src/dar_suite/dar_slave.cpp:202 src/dar_suite/dar_slave.cpp:204
@@ -1402,16 +1369,12 @@ msgstr ""
 "-e n'est disponible qu'avec l'option -r, abandon de l'opération en cours"
 
 #: src/dar_suite/dar_manager.cpp:552
-#, fuzzy
 msgid "-w option is only valid with -r option, ignoring it"
-msgstr ""
-"l'option -9 n'est valide uniquement qu'après l'option -A et sera ignorée ici"
+msgstr "l'option -w n'est valide uniquement qu'avec l'option -r et sera ignorée ici"
 
 #: src/dar_suite/dar_manager.cpp:559
-#, fuzzy
 msgid "-9 option is only valid with -A option, ignoring it"
-msgstr ""
-"l'option -9 n'est valide uniquement qu'après l'option -A et sera ignorée ici"
+msgstr "l'option -9 n'est valide uniquement qu'avec l'option -A et sera ignorée ici"
 
 #: src/dar_suite/dar_manager.cpp:570
 msgid "No action specified, aborting"
@@ -1462,7 +1425,6 @@ msgstr "Ajout des informations issues du catalogue à la base de donnée..."
 #: src/dar_suite/dar_manager.cpp:684 src/dar_suite/dar_manager.cpp:877
 #: src/dar_suite/dar_manager.cpp:1148 src/dar_suite/dar_manager.cpp:1178
 #: src/dar_suite/dar_manager.cpp:1272
-#, fuzzy
 msgid "Checking date ordering of files between archives..."
 msgstr "Vérification de l'ordonnancement des dates entre les archives ..."
 
@@ -2090,79 +2052,79 @@ msgid "Given date must be in the past"
 msgstr "la date fournie doit être dans le passée"
 
 #: src/dar_suite/line_tools.cpp:1336
-#, fuzzy, c-format
+#, c-format
 msgid "   Libz compression (gzip)      : %s"
-msgstr "   Compression libz (gzip)      : %s\n"
+msgstr "   Compression libz (gzip)      : %s"
 
 #: src/dar_suite/line_tools.cpp:1337
-#, fuzzy, c-format
+#, c-format
 msgid "   Libbz2 compression (bzip2)   : %s"
-msgstr "   Compression libbz2 (bzip2)   : %s\n"
+msgstr "   Compression libbz2 (bzip2)   : %s"
 
 #: src/dar_suite/line_tools.cpp:1338
-#, fuzzy, c-format
+#, c-format
 msgid "   Liblzo2 compression (lzo)    : %s"
-msgstr "   Compression liblzo2 (lzo)    : %s\n"
+msgstr "   Compression liblzo2 (lzo)    : %s"
 
 #: src/dar_suite/line_tools.cpp:1339
-#, fuzzy, c-format
+#, c-format
 msgid "   Liblzma compression (xz)     : %s"
-msgstr "   Compression liblzma (xz)     : %s\n"
+msgstr "   Compression liblzma (xz)     : %s"
 
 #: src/dar_suite/line_tools.cpp:1340
-#, fuzzy, c-format
+#, c-format
 msgid "   Strong encryption (libgcrypt): %s"
-msgstr "   Chiffrement fort (libgcrypt) : %s\n"
+msgstr "   Chiffrement fort (libgcrypt) : %s"
 
 #: src/dar_suite/line_tools.cpp:1341
-#, fuzzy, c-format
+#, c-format
 msgid "   Public key ciphers (gpgme)   : %s"
-msgstr "   Chiffrement clef pub.(gpgme) : %s\n"
+msgstr "   Chiffrement clef pub.(gpgme) : %s"
 
 #: src/dar_suite/line_tools.cpp:1342
-#, fuzzy, c-format
+#, c-format
 msgid "   Extended Attributes support  : %s"
-msgstr "   Support Attributs Étendus    : %s\n"
+msgstr "   Support Attributs Étendus    : %s"
 
 #: src/dar_suite/line_tools.cpp:1343
-#, fuzzy, c-format
+#, c-format
 msgid "   Large files support (> 2GB)  : %s"
-msgstr "   Support fichiers géants      : %s\n"
+msgstr "   Support fichiers géants      : %s"
 
 #: src/dar_suite/line_tools.cpp:1344
-#, fuzzy, c-format
+#, c-format
 msgid "   ext2fs NODUMP flag support   : %s"
-msgstr "   Support drapeau NODUMP       : %s\n"
+msgstr "   Support drapeau NODUMP       : %s"
 
 #: src/dar_suite/line_tools.cpp:1346
-#, fuzzy, c-format
+#, c-format
 msgid "   Integer size used            : unlimited"
-msgstr "   Entiers utilisés             : sans limites\n"
+msgstr "   Entiers utilisés             : sans limite"
 
 #: src/dar_suite/line_tools.cpp:1348
-#, fuzzy, c-format
+#, c-format
 msgid "   Integer size used            : %d bits"
-msgstr "   Entiers utilisés             : %d bits\n"
+msgstr "   Entiers utilisés             : %d bits"
 
 #: src/dar_suite/line_tools.cpp:1349
-#, fuzzy, c-format
+#, c-format
 msgid "   Thread safe support          : %s"
-msgstr "   Compat. environ. multi-tâches: %s\n"
+msgstr "   Support environ. multi-tâches: %s"
 
 #: src/dar_suite/line_tools.cpp:1350
-#, fuzzy, c-format
+#, c-format
 msgid "   Furtive read mode support    : %s"
-msgstr "   Lecture furtive supportée    : %s\n"
+msgstr "   Support de lecture furtive   : %s"
 
 #: src/dar_suite/line_tools.cpp:1351
-#, fuzzy, c-format
+#, c-format
 msgid "   Linux ext2/3/4 FSA support   : %s"
-msgstr "   Support FSA ext2/3/4         : %s\n"
+msgstr "   Support FSA ext2/3/4         : %s"
 
 #: src/dar_suite/line_tools.cpp:1352
-#, fuzzy, c-format
+#, c-format
 msgid "   Mac OS X HFS+ FSA support    : %s"
-msgstr "   Support FSA HFS+ de Mac OS X : %s\n"
+msgstr "   Support FSA HFS+ de Mac OS X : %s"
 
 #: src/dar_suite/line_tools.cpp:1357
 msgid "big"
@@ -2192,34 +2154,34 @@ msgid "   Large dir. speed optimi.     : %s"
 msgstr "   Optim. grands répertoires    : %s"
 
 #: src/dar_suite/line_tools.cpp:1375
-#, fuzzy, c-format
+#, c-format
 msgid "   Timestamp read accuracy      : %S"
-msgstr "   Temps, précision en lecture  : %S\n"
+msgstr "   Précision de lecture du temps: %S"
 
 #: src/dar_suite/line_tools.cpp:1380
-#, fuzzy, c-format
+#, c-format
 msgid "   Timestamp write accuracy     : %S"
-msgstr "   Temps, précision en écriture : %S\n"
+msgstr "   Précision d'écriture du temps: %S"
 
 #: src/dar_suite/line_tools.cpp:1381
-#, fuzzy, c-format
+#, c-format
 msgid "   Restores dates of symlinks   : %s"
-msgstr "   Symlinks, dates restorées    : %s\n"
+msgstr "   Symlinks, dates restorées    : %s"
 
 #: src/dar_suite/line_tools.cpp:1386
-#, fuzzy, c-format
+#, c-format
 msgid "   Multiple threads (libthreads): %s %s"
-msgstr "   Recours à plusieurs threads   : %s\n"
+msgstr "   Plusieurs taches(libthreadar): %s %s"
 
 #: src/dar_suite/line_tools.cpp:1387
-#, fuzzy, c-format
+#, c-format
 msgid "   Delta compression support    : %s"
-msgstr "   Compression liblzma (xz)     : %s\n"
+msgstr "   Compression delta            : %s"
 
 #: src/dar_suite/line_tools.cpp:1388
-#, fuzzy, c-format
+#, c-format
 msgid "   Remote repository support    : %s"
-msgstr "   Lecture furtive supportée    : %s\n"
+msgstr "   Support répertoires distants : %s"
 
 #: src/dar_suite/line_tools.cpp:1448
 #, c-format
@@ -2338,9 +2300,11 @@ msgstr ""
 "sauvegarde de fichiers ayant changés"
 
 #: src/dar_suite/dar.cpp:1119
-#, fuzzy, c-format
+#, c-format
 msgid " %i inode(s) with only metadata changed\n"
-msgstr " %i inode(s) non sauvées (pas de changement)\n"
+msgstr ""
+" %i inode(s) ayant seulement un changement de métadonnées\n"
+" "
 
 #: src/dar_suite/dar.cpp:1120
 #, c-format
@@ -2736,9 +2700,9 @@ msgstr ""
 "source\n"
 
 #: src/libdar/mycurl_protocol.cpp:44
-#, fuzzy, c-format
+#, c-format
 msgid "Unknown protocol: %S"
-msgstr "Choix inconnu : "
+msgstr "Protocole inconnu : %S"
 
 #: src/libdar/tlv.cpp:66
 msgid "Missing data to initiate a TLV object"
@@ -2772,9 +2736,9 @@ msgid "Error reading inode of file %s : %s"
 msgstr "Erreur lors de la lecture de l'inode de %s : %s"
 
 #: src/libdar/filesystem_hard_link_read.cpp:163
-#, fuzzy, c-format
+#, c-format
 msgid "Failed reading inode information for %s: "
-msgstr "Erreur lors de l'obtention d'informations sur l'inode %s : %s"
+msgstr "Echec de lecture des informations d'inode de %s : "
 
 #: src/libdar/filesystem_hard_link_read.cpp:171
 msgid "Cannot read inode for "
@@ -2787,9 +2751,8 @@ msgstr ""
 
 #: src/libdar/filesystem_hard_link_read.cpp:188
 #: src/libdar/filesystem_hard_link_read.cpp:217
-#, fuzzy
 msgid "mtime, data modification time"
-msgstr "Impossible d'obtenir la date de dernière modification : %s"
+msgstr "mtime, heure de modification des données"
 
 #: src/libdar/filesystem_hard_link_read.cpp:194
 #: src/libdar/filesystem_hard_link_read.cpp:223
@@ -2891,9 +2854,8 @@ msgstr ""
 
 #: src/libdar/filesystem_specific_attribute.cpp:1128
 #: src/libdar/filesystem_specific_attribute.cpp:1129
-#, fuzzy
 msgid "invalid FSA family flag"
-msgstr "Famille d'attributs FSA inconnue : "
+msgstr "Drapeau de famille FSA invalide"
 
 #: src/libdar/filesystem_specific_attribute.cpp:1163
 #: src/libdar/filesystem_specific_attribute.cpp:1165
@@ -2949,67 +2911,57 @@ msgid "Error reading character: "
 msgstr "Erreur pendant la lecture d'un caractère : "
 
 #: src/libdar/shell_interaction.cpp:265
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size    "
 "|          Date                 |    filename"
-msgstr ""
-"[Data ][ EA  ][FSA][compr][S]| accès       |proprio |groupe |taille "
-"|          date                 | nom de fichier\n"
+msgstr "[Data ][D][ EA  ][FSA][compr][S]| Accès      |Proprio|Groupe | Taille  |          Date                 | Nom de fichier"
 
 #: src/libdar/shell_interaction.cpp:270
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Access mode    | User | Group | Size   |          Date                 |"
 "[Data ][D][ EA  ][FSA][Compr][S]|   Filename"
-msgstr ""
-"droit d'accès   |propr.|groupe |taille |          date                 | "
-"[donnée][ EA  ][FSA][compr][S]| nom de fichier\n"
+msgstr "Droit d'accès  |Propr.|Groupe | Taille |          Date                 |[Infos][D][ EA  ][FSA][Compr][S]| Nom de fichier"
 
 #: src/libdar/shell_interaction.cpp:315 src/libdar/database5.cpp:78
-#, fuzzy, c-format
+#, c-format
 msgid "dar path        : %S"
-msgstr ""
-"\n"
-"chemin de dar : %S\n"
+msgstr "chemin de dar   : %S"
 
 #: src/libdar/shell_interaction.cpp:316 src/libdar/database5.cpp:79
-#, fuzzy, c-format
+#, c-format
 msgid "dar options     : %S"
-msgstr ""
-"options de dar : %S\n"
-"\n"
+msgstr "options de dar  : %S"
 
 #: src/libdar/shell_interaction.cpp:317 src/libdar/database5.cpp:80
-#, fuzzy, c-format
+#, c-format
 msgid "database version: %S"
-msgstr "Nouveau nom pour la base de données : "
+msgstr "Version B.de D. : %S"
 
 #: src/libdar/shell_interaction.cpp:318 src/libdar/database5.cpp:81
-#, fuzzy, c-format
+#, c-format
 msgid "compression used: %S"
-msgstr "compressé"
+msgstr "compression     : %S"
 
 #: src/libdar/shell_interaction.cpp:320 src/libdar/database5.cpp:83
-#, fuzzy, c-format
+#, c-format
 msgid "archive #   |    path      |    basename"
-msgstr "num archive |    chemin    |   nom d'archive\n"
+msgstr "num archive |    chemin    |   nom d'archive"
 
 #: src/libdar/shell_interaction.cpp:328 src/libdar/database5.cpp:97
 msgid "<empty>"
 msgstr "<vide>"
 
 #: src/libdar/shell_interaction.cpp:378 src/libdar/database5.cpp:148
-#, fuzzy, c-format
+#, c-format
 msgid "  archive #   |  most recent/total data |  most recent/total EA"
-msgstr ""
-" Num. archive | fichier plus récent / total  | EA plus récent / total\n"
+msgstr " Num. archive | derniers fichiers/total | EA plus récent/total"
 
 #: src/libdar/shell_interaction.cpp:379 src/libdar/database5.cpp:149
-#, fuzzy, c-format
+#, c-format
 msgid "--------------+-------------------------+-----------------------"
-msgstr ""
-"--------------+------------------------------+-----------------------\n"
+msgstr "--------------+-------------------------+-----------------------"
 
 #: src/libdar/shell_interaction.cpp:405 src/libdar/user_interaction5.cpp:167
 msgid "Continue? "
@@ -3044,9 +2996,9 @@ msgid "Error while changing user terminal properties: "
 msgstr "Erreur lors du changement des propriétés du terminal : "
 
 #: src/libdar/shell_interaction.cpp:636
-#, fuzzy, c-format
+#, c-format
 msgid "%S [%c] [ REMOVED ENTRY ] (%S)  %S"
-msgstr "%S [%c] [ ENTREÉ SUPPR. ] (%S)  %S\n"
+msgstr "%S [%c] [ ENTREÉ SUPPR. ] (%S)  %S"
 
 #: src/libdar/shell_interaction.cpp:666 src/libdar/shell_interaction.cpp:718
 msgid "      Extended Attribute: ["
@@ -3447,9 +3399,9 @@ msgid "Invalid wide-char found in string: "
 msgstr "Caractère large invalide dans la chaîne : "
 
 #: src/libdar/tools.cpp:2294
-#, fuzzy, c-format
+#, c-format
 msgid "Error unlinking %S: %s"
-msgstr "Erreur d'ouverture de %S : "
+msgstr "Erreur lors de la suppression de %S : %s"
 
 #: src/libdar/tools.cpp:2341
 msgid ""
@@ -3461,21 +3413,21 @@ msgid "listing() method must be given"
 msgstr "la méthode listing() doit être fournie"
 
 #: src/libdar/fichier_libcurl.cpp:75
-#, fuzzy, c-format
+#, c-format
 msgid "Error met while resetting URL to handle: %s"
-msgstr "Erreur lors de la cration du fichier de hashage : "
+msgstr "Erreur lors de la réinitialisation de l'URL: %s"
 
 #: src/libdar/fichier_libcurl.cpp:84 src/libdar/fichier_libcurl.cpp:619
 #: src/libdar/fichier_libcurl.cpp:676
-#, fuzzy, c-format
+#, c-format
 msgid "Error met while setting libcurl for reading data file: %s"
-msgstr "Erreur lors de la récupération de l'heure courante : %S"
+msgstr "Erreur lors du paramétrage de libcurl pour la lecture du fichier : %s"
 
 #: src/libdar/fichier_libcurl.cpp:91 src/libdar/fichier_libcurl.cpp:96
 #: src/libdar/fichier_libcurl.cpp:646 src/libdar/fichier_libcurl.cpp:683
-#, fuzzy, c-format
+#, c-format
 msgid "Error met while setting libcurl for writing data file: %s"
-msgstr "Erreur lors de la récupération de l'heure courante : %S"
+msgstr "Erreur lors du paramétrage de libcurl pour l'écriture du fichier : %s"
 
 #: src/libdar/fichier_libcurl.cpp:139 src/libdar/fichier_libcurl.cpp:148
 #, c-format
@@ -3484,23 +3436,22 @@ msgstr ""
 
 #: src/libdar/fichier_libcurl.cpp:184 src/libdar/fichier_libcurl.cpp:192
 #: src/libdar/fichier_libcurl.cpp:203
-#, fuzzy, c-format
+#, c-format
 msgid "Error met while fetching file size: %s"
-msgstr "Erreur lors de la configuration des droits d'accès : %s"
+msgstr "Erreur lors lors de la récupération de la taille du fichier : %s"
 
 #: src/libdar/fichier_libcurl.cpp:259
 msgid "libcurl does not allow skipping in write mode"
 msgstr ""
 
 #: src/libdar/fichier_libcurl.cpp:491
-#, fuzzy
 msgid "Error met during network transfer: "
-msgstr "Erreur lors de l'execution de  %s : %s"
+msgstr "Erreur lors du transfert réseau : "
 
 #: src/libdar/fichier_libcurl.cpp:514
-#, fuzzy, c-format
+#, c-format
 msgid "Error met while reading a block of data: %s"
-msgstr "Erreur lors de la lecture de l'entrée suivante : "
+msgstr "Erreur lors de la lecture d'un block de données : %s"
 
 #: src/libdar/fichier_libcurl.cpp:590 src/libdar/fichier_libcurl.cpp:598
 #: src/libdar/fichier_libcurl.cpp:636 src/libdar/fichier_libcurl.cpp:776
@@ -5037,7 +4988,8 @@ msgstr ""
 "%S : La politique d'écrasement (Attributs Étendus) reste non définie pour ce "
 "fichier, impossible de savoir si l'écrasement est autorisé ou pas !"
 
-#: src/libdar/filesystem_restore.cpp:976 src/libdar/filesystem_restore.cpp:1022
+#: src/libdar/filesystem_restore.cpp:976
+#: src/libdar/filesystem_restore.cpp:1022
 #, c-format
 msgid "FSA for %S are about to be overwritten, OK?"
 msgstr "Les FSA de %S sont sur le point d'être écrasés, OK ?"
@@ -7051,17 +7003,17 @@ msgstr "Défaut de données lors de la lecture d'un object slice_layout"
 msgid "Error while adding EA %s : %s"
 msgstr "Erreur d'ajout de l'EA %s : %s"
 
-#: src/libdar/ea_filesystem.cpp:217
+#: src/libdar/ea_filesystem.cpp:216
 #, c-format
 msgid "Error while removing %s : %s"
 msgstr "Erreur de suppression de %s : %s"
 
-#: src/libdar/ea_filesystem.cpp:252 src/libdar/ea_filesystem.cpp:276
+#: src/libdar/ea_filesystem.cpp:248 src/libdar/ea_filesystem.cpp:272
 #, c-format
 msgid "Error reading attribute %s of file %s : %s"
 msgstr "Erreur lors de la lecture de l'attribut %s du fichier %s : %s"
 
-#: src/libdar/ea_filesystem.cpp:326 src/libdar/ea_filesystem.cpp:341
+#: src/libdar/ea_filesystem.cpp:322 src/libdar/ea_filesystem.cpp:337
 #, c-format
 msgid "Error retrieving EA list for %s : %s"
 msgstr "Erreur lors de l'inventaire des AE pour %s : %s"
