@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: DAR 2.5.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2018-07-19 09:14+0200\n"
-"PO-Revision-Date: 2018-04-27 23:15+0200\n"
+"POT-Creation-Date: 2018-09-29 19:39+0200\n"
+"PO-Revision-Date: 2018-09-30 10:29+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "Language: fr\n"
@@ -429,7 +429,7 @@ msgid "Error in included file (%s): "
 msgstr "Erreur dans le fichier inclus %s : "
 
 #: src/dar_suite/command_line.cpp:1283 src/dar_suite/command_line.cpp:2529
-#: src/dar_suite/command_line.cpp:2606
+#: src/dar_suite/command_line.cpp:2611
 #, c-format
 msgid "In included file %S: "
 msgstr "Dans le fichier inclus %S : "
@@ -1098,7 +1098,17 @@ msgstr ""
 msgid "Arguments read from %S :"
 msgstr "Arguments lus depuis %S :"
 
-#: src/dar_suite/command_line.cpp:2924
+#: src/dar_suite/command_line.cpp:2563
+#, c-format
+msgid "Failed reading %S: "
+msgstr "Echec de lecture de %S : "
+
+#: src/dar_suite/command_line.cpp:2644
+#, c-format
+msgid "Warning: Failed reading %S: "
+msgstr "Attention: échec de lecture de %S : "
+
+#: src/dar_suite/command_line.cpp:2934
 #, c-format
 msgid ""
 "%s does not name a compression \"[algorithm][:][level]\" , like for examples "
@@ -1109,15 +1119,15 @@ msgstr ""
 "\"gzip\", \"lzo\", \"bzip2\", \"lzo:3\", \"gzip:2\", \"8\" ou \"1\". Merci "
 "de revoir la description de l'option -z dans la page de manuel"
 
-#: src/dar_suite/command_line.cpp:2943
+#: src/dar_suite/command_line.cpp:2953
 msgid "Compression level must be between 1 and 9, included"
 msgstr "le niveau de compression doit être compris entre 1 et 9 inclus"
 
-#: src/dar_suite/command_line.cpp:2971
+#: src/dar_suite/command_line.cpp:2981
 msgid "unknown FSA family: "
 msgstr "Famille d'attributs FSA inconnue : "
 
-#: src/dar_suite/command_line.cpp:3003
+#: src/dar_suite/command_line.cpp:3013
 #, c-format
 msgid ""
 "User target named \"%s\" is not allowed (reserved word for conditional "
@@ -4106,11 +4116,11 @@ msgstr ""
 "Plus d'espace disponibles pour les inodes, vous avez la possibilité d'en "
 "faire maintenant. Quand ce sera fait, pouvons-nous continuer ?"
 
-#: src/libdar/fichier_local.cpp:437
+#: src/libdar/fichier_local.cpp:439
 msgid "Cannot open file : "
 msgstr "Impossible d'ouvrir le fichier : "
 
-#: src/libdar/fichier_local.cpp:460
+#: src/libdar/fichier_local.cpp:462
 #, c-format
 msgid "Cannot dup() filedescriptor while copying \"fichier_local\" object: %s"
 msgstr ""
@@ -5188,12 +5198,12 @@ msgstr ""
 msgid "Failed reading slice %S: "
 msgstr "Impossible de lire la tranche %S : "
 
-#: src/libdar/sar.cpp:756
+#: src/libdar/sar.cpp:758
 #, c-format
 msgid "%S has a bad or corrupted header, please provide the correct file."
 msgstr "%S a un en-tête corrompu ou malformé, merci de fournir le bon fichier."
 
-#: src/libdar/sar.cpp:760
+#: src/libdar/sar.cpp:762
 #, c-format
 msgid ""
 "LAX MODE: %S has a bad or corrupted header, trying to guess original values "
@@ -5202,7 +5212,7 @@ msgstr ""
 "MODE RELAX : %S a un en-tête corrompu, tentative de détermination des "
 "valeurs d'origine puis on continue si c'est possible"
 
-#: src/libdar/sar.cpp:770
+#: src/libdar/sar.cpp:772
 #, c-format
 msgid ""
 "%S is not a valid file (wrong magic number), please provide the good file."
@@ -5210,7 +5220,7 @@ msgstr ""
 "%S n'est pas un fichier valide (mauvais numéro magique), merci de fournir le "
 "bon fichier."
 
-#: src/libdar/sar.cpp:774
+#: src/libdar/sar.cpp:776
 #, c-format
 msgid ""
 "LAX MODE: In spite of its name, %S does not appear to be a dar slice, "
@@ -5219,14 +5229,14 @@ msgstr ""
 "MODE RELAX : En dépit de son nom, %S ne semble pas être une tranche "
 "d'archive, on suppose qu'une corruption des données a eu lieu et on continue"
 
-#: src/libdar/sar.cpp:778
+#: src/libdar/sar.cpp:780
 msgid ""
 "This is an old archive, it can only be opened starting by the first slice"
 msgstr ""
 "Ceci est une ancienne archive, elle doit être ouverte en lisant d'abord la "
 "première tranche"
 
-#: src/libdar/sar.cpp:805
+#: src/libdar/sar.cpp:807
 msgid ""
 "LAX MODE: Due to probable data corruption, dar could not determine the "
 "correct size of slices in this archive. For recent archive, this information "
@@ -5238,55 +5248,55 @@ msgstr ""
 "information est dupliquée dans chaque tranche. Voulez-vous essayer de lire "
 "une autre tranche pour récupérer cette information ?"
 
-#: src/libdar/sar.cpp:809
+#: src/libdar/sar.cpp:811
 msgid "LAX MODE: Please provide the slice number to read: "
 msgstr "MODE RELAX : Merci de fournir le numéro de la tranche à lire : "
 
-#: src/libdar/sar.cpp:817
+#: src/libdar/sar.cpp:819
 msgid "LAX MODE: Please provide an strictly positive integer number"
 msgstr "MODE RELAX : Merci de fournir un nombre entier strictement positif"
 
-#: src/libdar/sar.cpp:823
+#: src/libdar/sar.cpp:825
 #, c-format
 msgid "LAX MODE: opening slice %i to read its slice header"
 msgstr ""
 "MODE RELAX : ouverture de la tranche %i afin de lire l'en-tête de tranche"
 
-#: src/libdar/sar.cpp:825
+#: src/libdar/sar.cpp:827
 #, c-format
 msgid "LAX MODE: closing slice %i, header properly fetched"
 msgstr ""
 "MODE RELAX : fermeture de la tranche %i, l'en-tête a pu être lu correctement"
 
-#: src/libdar/sar.cpp:831
+#: src/libdar/sar.cpp:833
 msgid ""
 "LAX MODE: In spite of a the absence of a known slice size, continuing anyway"
 msgstr ""
 "MODE RELAX : On continue malgré l'absence d'information à propos de la "
 "taille des tranches"
 
-#: src/libdar/sar.cpp:838
+#: src/libdar/sar.cpp:840
 msgid "Incoherent slice header: First slice size too small"
 msgstr "En-tête de tranche incohérent : taille de première tranche trop petite"
 
-#: src/libdar/sar.cpp:840
+#: src/libdar/sar.cpp:842
 msgid "incoherent slice header: Slice size too small"
 msgstr "En-tête de tranche incohérent : taille de tranche trop petite"
 
-#: src/libdar/sar.cpp:846
+#: src/libdar/sar.cpp:848
 #, c-format
 msgid "Error opening %S : "
 msgstr "Erreur d'ouverture de %S : "
 
-#: src/libdar/sar.cpp:846
+#: src/libdar/sar.cpp:848
 msgid " . Retry ?"
 msgstr " . Essayer à nouveau ?"
 
-#: src/libdar/sar.cpp:857
+#: src/libdar/sar.cpp:859
 msgid " is a slice from another backup, please provide the correct slice."
 msgstr " est une tranche d'une autre archive, merci de fournir le bon fichier."
 
-#: src/libdar/sar.cpp:862
+#: src/libdar/sar.cpp:864
 msgid ""
 "LAX MODE: internal name of the slice leads dar to consider it is not member "
 "of the same archive. Assuming data corruption occurred and relying on the "
@@ -5296,18 +5306,18 @@ msgstr ""
 "pas partie de la même archive. On suppose qu'il s'agit d'une corruption de "
 "données et on ignore cette erreur"
 
-#: src/libdar/sar.cpp:887
+#: src/libdar/sar.cpp:889
 msgid ""
 "Data corruption met at end of slice, forbidden flag found at this position"
 msgstr ""
 "Corruption de données rencontré en fin de tranche, drapeau interdit à cet "
 "endroit"
 
-#: src/libdar/sar.cpp:893
+#: src/libdar/sar.cpp:895
 msgid "Data corruption met at end of slice, unknown flag found"
 msgstr "Corruption de données rencontrée en fin de tranche, drapeau inconnu"
 
-#: src/libdar/sar.cpp:908
+#: src/libdar/sar.cpp:910
 #, c-format
 msgid ""
 "Two different slices (%i and %i) are marked as the last slice of the backup!"
@@ -5315,7 +5325,7 @@ msgstr ""
 "Deux tranches différentes %i et %i sont toutes les deux marquées comme la "
 "dernière de l'archive !"
 
-#: src/libdar/sar.cpp:911
+#: src/libdar/sar.cpp:913
 #, c-format
 msgid ""
 "LAX MODE: slices %i and %i are both recorded as last slice of the archive, "
@@ -5325,13 +5335,13 @@ msgstr ""
 "dernière de l'archive, on considère que la dernière est celle de numéro le "
 "plus élevé"
 
-#: src/libdar/sar.cpp:934
+#: src/libdar/sar.cpp:936
 #, c-format
 msgid "Slice %S has an unknown flag (neither terminal nor non_terminal file)."
 msgstr ""
 "La tranche %S possède un drapeau inconnu (ni terminal ni non-terminal)."
 
-#: src/libdar/sar.cpp:944
+#: src/libdar/sar.cpp:946
 #, c-format
 msgid ""
 "Due to data corruption, it is not possible to know if slice %S is the last "
@@ -5346,19 +5356,19 @@ msgstr ""
 "selon la nature de cette tranche (vous pouvez-aussi répondre par \"stop\" "
 "pour arrêter le programme immédiatement) : "
 
-#: src/libdar/sar.cpp:946 src/libdar/sar.cpp:950
+#: src/libdar/sar.cpp:948 src/libdar/sar.cpp:952
 msgid "last"
 msgstr "dernier"
 
-#: src/libdar/sar.cpp:946
+#: src/libdar/sar.cpp:948
 msgid "notlast"
 msgstr "non dernier"
 
-#: src/libdar/sar.cpp:946 src/libdar/sar.cpp:948
+#: src/libdar/sar.cpp:948 src/libdar/sar.cpp:950
 msgid "abort"
 msgstr "stop"
 
-#: src/libdar/sar.cpp:962
+#: src/libdar/sar.cpp:964
 msgid ""
 "LAX MODE: Slice flag corrupted, but a slice of higher number has been seen, "
 "thus the header flag was surely not indicating this slice as the last of the "
@@ -5368,49 +5378,49 @@ msgstr ""
 "numéro supérieur a déjà été vu, ce drapeau ne pouvait pas indiquer cette "
 "tranche comme la dernière de l'archive, on continue"
 
-#: src/libdar/sar.cpp:1006
+#: src/libdar/sar.cpp:1008
 #, c-format
 msgid "failed openning slice %S: %S. Will try to erase it first, if allowed"
 msgstr ""
 "Echec d'ouverture de la tranche %S: %S. Nouvelle tentative avec écrasement "
 "préalable, si autorisé"
 
-#: src/libdar/sar.cpp:1071 src/libdar/sar.cpp:1141 src/libdar/sar.cpp:1151
-#: src/libdar/trivial_sar.cpp:220 src/libdar/trivial_sar.cpp:237
+#: src/libdar/sar.cpp:1074 src/libdar/sar.cpp:1145 src/libdar/sar.cpp:1156
+#: src/libdar/trivial_sar.cpp:221 src/libdar/trivial_sar.cpp:239
 #, c-format
 msgid "Failed creating slice %S: "
 msgstr "Impossible de créer la tranche %S : "
 
-#: src/libdar/sar.cpp:1092
+#: src/libdar/sar.cpp:1095
 msgid "file exists, and DONT_ERASE option is set."
 msgstr "le fichier existe et l'option contre l'écrasement a été activée."
 
-#: src/libdar/sar.cpp:1097
+#: src/libdar/sar.cpp:1100
 msgid " is about to be overwritten."
 msgstr " est sur le point d'être écrasé."
 
-#: src/libdar/sar.cpp:1175
+#: src/libdar/sar.cpp:1180
 msgid ""
 "First slice size is too small to even just be able to drop the slice header"
 msgstr ""
 "La taille de la première tranche est trop petite pour être en mesure "
 "contenir ne serait-ce que l'en-tête de tranche"
 
-#: src/libdar/sar.cpp:1177
+#: src/libdar/sar.cpp:1182
 msgid "Slice size is too small to even just be able to drop the slice header"
 msgstr ""
 "La taille de tranche est trop petite pour être en mesure de contenir ne "
 "serait-ce que l'en-tête de tranche"
 
-#: src/libdar/sar.cpp:1240
+#: src/libdar/sar.cpp:1245
 msgid "Finished writing to file "
 msgstr "Écriture terminée dans le fichier "
 
-#: src/libdar/sar.cpp:1240
+#: src/libdar/sar.cpp:1245
 msgid ", ready to continue ? "
 msgstr ", prêt à continuer ? "
 
-#: src/libdar/sar.cpp:1245
+#: src/libdar/sar.cpp:1250
 msgid ""
 "If you really want to abort the archive creation hit CTRL-C, then press "
 "enter."
@@ -5418,19 +5428,19 @@ msgstr ""
 "Si vous voulez vraiment arrêter la création de l'archive, appuyez sur CTRL+C "
 "puis appuyez sur la touche entrée"
 
-#: src/libdar/sar.cpp:1277
+#: src/libdar/sar.cpp:1282
 msgid "file not open"
 msgstr "Fichier non ouvert"
 
-#: src/libdar/sar.cpp:1311
+#: src/libdar/sar.cpp:1316
 msgid "The last file of the set is not present in "
 msgstr "Le dernier fichier (tranche) de l'archive n'est pas présent dans "
 
-#: src/libdar/sar.cpp:1311
+#: src/libdar/sar.cpp:1316
 msgid " , please provide it."
 msgstr " , veuillez le fournir."
 
-#: src/libdar/sar.cpp:1325
+#: src/libdar/sar.cpp:1330
 #, c-format
 msgid ""
 "No backup file is present in %S for archive %S, please provide the last file "
@@ -6702,11 +6712,11 @@ msgstr "Ajout du %S à l'archive : %S"
 msgid "Copied data does not match CRC"
 msgstr "Les données copiées ne correspondent pas au CRC"
 
-#: src/libdar/filtre.cpp:2947
+#: src/libdar/filtre.cpp:2953
 msgid " : Failed resaving uncompressed the inode data"
 msgstr " : Echec de la sauvegarde sans compression des données de l'inode"
 
-#: src/libdar/filtre.cpp:2957
+#: src/libdar/filtre.cpp:2963
 msgid ""
 " : Resaving uncompressed the inode data to gain space is not possible, "
 "keeping data compressed"
@@ -6714,7 +6724,7 @@ msgstr ""
 "Resauver sans compression les données de l'inode pour gagner de la place "
 "n'est pas possible, on conserve les données compressées"
 
-#: src/libdar/filtre.cpp:2980
+#: src/libdar/filtre.cpp:2986
 #, c-format
 msgid ""
 "File has disappeared while we were reading it, cannot check whether it has "
@@ -6723,13 +6733,13 @@ msgstr ""
 "Le fichier a disparu alors que nous étions en train de le lire, impossible "
 "de vérifier s'il a changé lors de sa sauvegarde : %S"
 
-#: src/libdar/filtre.cpp:3015
+#: src/libdar/filtre.cpp:3021
 #, c-format
 msgid ""
 "WARNING! File modified while reading it for backup. Performing retry %i of %i"
 msgstr "ATTENTION ! Fichier modifié pendant sa sauvegarde. Tentative %i sur %i"
 
-#: src/libdar/filtre.cpp:3031
+#: src/libdar/filtre.cpp:3037
 msgid ""
 "WARNING! File modified while reading it for backup. No more retry for that "
 "file to not exceed the wasted byte limit. File is "
@@ -6738,27 +6748,27 @@ msgstr ""
 "nouvelle tentative pour ce fichier afin de de pas dépasser la taille "
 "maximale de gaspillage autorisée. Le fichier est "
 
-#: src/libdar/filtre.cpp:3038
+#: src/libdar/filtre.cpp:3044
 msgid ""
 "WARNING! File modified while reading it for backup, but no more retry "
 "allowed: "
 msgstr ""
 "ATTENTION ! Fichier modifié pendant sa sauvegarde, plus de nouvelle tentative"
 
-#: src/libdar/filtre.cpp:3098
+#: src/libdar/filtre.cpp:3104
 msgid "Saving Extended Attributes for "
 msgstr "Sauvegarde des Attributs Étendus de "
 
-#: src/libdar/filtre.cpp:3165
+#: src/libdar/filtre.cpp:3171
 msgid "Error saving Extended Attributes for "
 msgstr "Erreur lors de la sauvegarde des Attributs Étendus de "
 
-#: src/libdar/filtre.cpp:3197
+#: src/libdar/filtre.cpp:3203
 msgid "Saving Filesystem Specific Attributes for "
 msgstr ""
 "Sauvegarde des attributs spécifiques au système de fichier Étendus pour "
 
-#: src/libdar/filtre.cpp:3255
+#: src/libdar/filtre.cpp:3261
 msgid "Error saving Filesystem Specific Attributes for "
 msgstr "Erreur lors de la sauvegarde des FSA de "
 
@@ -7172,40 +7182,40 @@ msgstr "mtime, date de modification des données"
 msgid "ctime, inode change time"
 msgstr "ctime, date de modification des méta-données"
 
-#: src/libdar/filesystem.cpp:321
+#: src/libdar/filesystem.cpp:323
 msgid "Unknown file type! file name is: "
 msgstr "Type de fichier inconnu ! Le nom du fichier est : "
 
-#: src/libdar/filesystem.cpp:354
+#: src/libdar/filesystem.cpp:356
 msgid "Error reading EA for "
 msgstr "Erreur lors de la lecture des AE pour "
 
-#: src/libdar/filesystem.cpp:608 src/libdar/filesystem.cpp:845
+#: src/libdar/filesystem.cpp:610 src/libdar/filesystem.cpp:847
 msgid "Non existent file: "
 msgstr "Fichier inexistant : "
 
-#: src/libdar/filesystem.cpp:610 src/libdar/filesystem.cpp:847
+#: src/libdar/filesystem.cpp:612 src/libdar/filesystem.cpp:849
 msgid "File must be a directory: "
 msgstr "Le fichier doit être un répertoire : "
 
-#: src/libdar/filesystem.cpp:695
+#: src/libdar/filesystem.cpp:697
 #, c-format
 msgid "Cannot read directory contents: %s : "
 msgstr "Impossible de lire le contenu du répertoire : %s : "
 
-#: src/libdar/filesystem.cpp:732
+#: src/libdar/filesystem.cpp:734
 msgid "Ignoring file with NODUMP flag set: "
 msgstr "Fichier sans le drapeau NODUMP ignoré : "
 
-#: src/libdar/filesystem.cpp:740 src/libdar/filesystem.cpp:745
+#: src/libdar/filesystem.cpp:742 src/libdar/filesystem.cpp:747
 msgid "Error reading directory contents: "
 msgstr "Erreur lors de la lecture du contenu du répertoire : "
 
-#: src/libdar/filesystem.cpp:740 src/libdar/filesystem.cpp:745
+#: src/libdar/filesystem.cpp:742 src/libdar/filesystem.cpp:747
 msgid " . Ignoring file or directory"
 msgstr " . Fichier ou répertoire ignoré"
 
-#: src/libdar/filesystem.cpp:1125
+#: src/libdar/filesystem.cpp:1127
 #, c-format
 msgid ""
 "Error creating hard link %s : %s\n"
@@ -7214,7 +7224,7 @@ msgstr ""
 "Erreur lors de la création du lien dur %s : %s\n"
 " Tentative de duplication de l'inode"
 
-#: src/libdar/filesystem.cpp:1139
+#: src/libdar/filesystem.cpp:1141
 #, c-format
 msgid ""
 "Error creating hard link : %s , the inode to link with [ %s ] has "
@@ -7223,7 +7233,7 @@ msgstr ""
 "Erreur lors de la création du lien dur : %s , l'inode à lier [ %s ] a "
 "disparue, elle va être recréée"
 
-#: src/libdar/filesystem.cpp:1146
+#: src/libdar/filesystem.cpp:1148
 #, c-format
 msgid ""
 "Error creating hard link : %s , the inode to link with [ %s ] is not "
@@ -7232,67 +7242,67 @@ msgstr ""
 "Erreur lors de la création du lien dur : %s , l'inode à lier [ %s ] n'est "
 "pas présente, le lien dur ne peut pas être restauré"
 
-#: src/libdar/filesystem.cpp:1218
+#: src/libdar/filesystem.cpp:1220
 msgid "Bad CRC, data corruption occurred"
 msgstr "Mauvais CRC, une corruption des données a eu lieu"
 
-#: src/libdar/filesystem.cpp:1268
+#: src/libdar/filesystem.cpp:1270
 msgid "Error creating Unix socket file: "
 msgstr "Erreur lors de la création de la prise Unix : "
 
-#: src/libdar/filesystem.cpp:1288
+#: src/libdar/filesystem.cpp:1290
 msgid "Could not create inode: "
 msgstr "Création d'une inode impossible : "
 
-#: src/libdar/filesystem.cpp:1290
+#: src/libdar/filesystem.cpp:1292
 msgid "Cannot create inode: "
 msgstr "Création d'une inode impossible : "
 
-#: src/libdar/filesystem.cpp:1290
+#: src/libdar/filesystem.cpp:1292
 msgid " Ready to continue ?"
 msgstr " Prêt à continuer ?"
 
-#: src/libdar/filesystem.cpp:1486
+#: src/libdar/filesystem.cpp:1488
 msgid "Cannot remove non-existent file from filesystem: "
 msgstr ""
 "Impossible de supprimer in fichier qui n'existe pas dans le système de "
 "fichier : "
 
-#: src/libdar/filesystem.cpp:1491 src/libdar/filesystem.cpp:1777
+#: src/libdar/filesystem.cpp:1493 src/libdar/filesystem.cpp:1796
 msgid "Restoring file's data: "
 msgstr "Restauration des données du fichier : "
 
-#: src/libdar/filesystem.cpp:1508 src/libdar/filesystem.cpp:1985
+#: src/libdar/filesystem.cpp:1510 src/libdar/filesystem.cpp:2004
 msgid "Restoring file's EA: "
 msgstr "Restauration des Attributs Étendus du fichier : "
 
-#: src/libdar/filesystem.cpp:1519 src/libdar/filesystem.cpp:1615
+#: src/libdar/filesystem.cpp:1521 src/libdar/filesystem.cpp:1626
 #, c-format
 msgid "Restoration of EA for %S aborted: "
 msgstr "Restauration des EA de %S arrêtée : "
 
-#: src/libdar/filesystem.cpp:1529 src/libdar/filesystem.cpp:2128
+#: src/libdar/filesystem.cpp:1531 src/libdar/filesystem.cpp:2147
 msgid "Restoring file's FSA: "
 msgstr "Restauration des FSA du fichier : "
 
-#: src/libdar/filesystem.cpp:1542 src/libdar/filesystem.cpp:1627
+#: src/libdar/filesystem.cpp:1544 src/libdar/filesystem.cpp:1638
 #, c-format
 msgid "Restoration of FSA for %S aborted: "
 msgstr "Restauration des FSA de %S arrêtée : "
 
-#: src/libdar/filesystem.cpp:1696
+#: src/libdar/filesystem.cpp:1715
 #, c-format
 msgid "%S is about to be removed from filesystem, continue?"
 msgstr ""
 "%S est sur le point d'être supprimé du système de fichier, continue t-on ?"
 
-#: src/libdar/filesystem.cpp:1701 src/libdar/filesystem.cpp:1710
+#: src/libdar/filesystem.cpp:1720 src/libdar/filesystem.cpp:1729
 #, c-format
 msgid "Removing file (reason is file recorded as removed in archive): %S"
 msgstr ""
 "Suppressin du fichier (fichier marqué comme supprimé dans l'archive) : %S"
 
-#: src/libdar/filesystem.cpp:1708
+#: src/libdar/filesystem.cpp:1727
 #, c-format
 msgid ""
 "%S must be removed, but does not match expected type, remove it anyway ?"
@@ -7300,7 +7310,7 @@ msgstr ""
 "%S est sur le point d'être supprimé, mais le type de fichier ne correspond "
 "pas avec ce qui est attendu, l'efface t-on ?"
 
-#: src/libdar/filesystem.cpp:1716
+#: src/libdar/filesystem.cpp:1735
 #, c-format
 msgid ""
 "%S: Overwriting policy (Data) is undefined for that file, do not know "
@@ -7309,7 +7319,7 @@ msgstr ""
 "%S : La politique d'écrasement (Données) reste non définie pour ce fichier, "
 "impossible donc de savoir si la suppression est autorisée ou non !"
 
-#: src/libdar/filesystem.cpp:1753
+#: src/libdar/filesystem.cpp:1772
 #, c-format
 msgid ""
 "Directory %S cannot be restored: overwriting not allowed and a non-directory "
@@ -7320,38 +7330,38 @@ msgstr ""
 "inode n'étant pas un répertoire existe déjà sous ce nom. Aucun fichiers de "
 "ce répertoire ne sera restauré : "
 
-#: src/libdar/filesystem.cpp:1762
+#: src/libdar/filesystem.cpp:1781
 #, c-format
 msgid "%S is about to be overwritten, OK?"
 msgstr "%S est sur le point d'être écrasé, OK ?"
 
-#: src/libdar/filesystem.cpp:1808
+#: src/libdar/filesystem.cpp:1827
 #, c-format
 msgid "Existing EA for %S could not be read and preserved: "
 msgstr ""
 "les Attributs Étendus existants de %S n'ont pas pu être lu ni préservé : "
 
-#: src/libdar/filesystem.cpp:1828
+#: src/libdar/filesystem.cpp:1847
 #, c-format
 msgid "Existing FSA for %S could not be read and preserved: "
 msgstr "les FSA existants de %S n'ont pas pu être lu ni préservé : "
 
-#: src/libdar/filesystem.cpp:1842
+#: src/libdar/filesystem.cpp:1861
 #, c-format
 msgid "Removing existing immutable flag in order to restore data for %S"
 msgstr "Suppression du drapeau immuable afin de restaurer les données pour %S"
 
-#: src/libdar/filesystem.cpp:1868
+#: src/libdar/filesystem.cpp:1887
 #, c-format
 msgid "Existing EA for %S could not be preserved : "
 msgstr "les AE existants de %S n'ont pas pu être préservés : "
 
-#: src/libdar/filesystem.cpp:1885
+#: src/libdar/filesystem.cpp:1904
 #, c-format
 msgid "Existing FSA for %S could not be preserved : "
 msgstr "les FSA existants de %S n'ont pas pu être préservés : "
 
-#: src/libdar/filesystem.cpp:1900
+#: src/libdar/filesystem.cpp:1919
 #, c-format
 msgid ""
 "%S is about to be deleted (required by overwriting policy), do you agree?"
@@ -7359,12 +7369,12 @@ msgstr ""
 "%S est sur le point d'être supprimé (action requise par la politique "
 "d'écrasement), OK ?"
 
-#: src/libdar/filesystem.cpp:1902
+#: src/libdar/filesystem.cpp:1921
 #, c-format
 msgid "Removing file (reason is overwriting policy): %S"
 msgstr "Suppression du fichier (politique d'écrasement) : %S"
 
-#: src/libdar/filesystem.cpp:1908
+#: src/libdar/filesystem.cpp:1927
 #, c-format
 msgid ""
 "%S: Overwriting policy (Data) is undefined for that file, do not know "
@@ -7373,12 +7383,12 @@ msgstr ""
 "%S : La politique d'écrasement (Données) reste non définie pour ce fichier, "
 "impossible de savoir si l'écrasement est autorisé ou pas !"
 
-#: src/libdar/filesystem.cpp:1964
+#: src/libdar/filesystem.cpp:1983
 #, c-format
 msgid "EA for %S are about to be overwritten, OK?"
 msgstr "Des Attributs Étendus de %S sont sur le point d'être écrasés, OK ?"
 
-#: src/libdar/filesystem.cpp:1979
+#: src/libdar/filesystem.cpp:1998
 #, c-format
 msgid ""
 "EA for %S have not been overwritten because this file is a hard link "
@@ -7387,12 +7397,12 @@ msgstr ""
 "Les Attributs Étendus pour %S n'ont pas été écrasés à car ce fichier est un "
 "lien dur pointant sur une inode déjà restaurée"
 
-#: src/libdar/filesystem.cpp:1999
+#: src/libdar/filesystem.cpp:2018
 #, c-format
 msgid "EA for %S are about to be removed, OK?"
 msgstr "Les Attributs Étendus de %S sont sur le point d'être supprimés, OK ?"
 
-#: src/libdar/filesystem.cpp:2010
+#: src/libdar/filesystem.cpp:2029
 #, c-format
 msgid ""
 "EA for %S have not been cleared as requested by the overwriting policy "
@@ -7402,17 +7412,17 @@ msgstr ""
 "politique d'écrasement car ce fichier est un lien dur pointant sur une inode "
 "déjà restaurée"
 
-#: src/libdar/filesystem.cpp:2016
+#: src/libdar/filesystem.cpp:2035
 msgid "Clearing file's EA (requested by overwriting policy): "
 msgstr ""
 "Effacement des attributs étendus (requis par la politique d'écrasement) : "
 
-#: src/libdar/filesystem.cpp:2029
+#: src/libdar/filesystem.cpp:2048
 #, c-format
 msgid "EA for %S are about to be merged, OK?"
 msgstr "Les Attributs Étendus de %S sont sur le point d'être fusionnés, OK ?"
 
-#: src/libdar/filesystem.cpp:2055
+#: src/libdar/filesystem.cpp:2074
 #, c-format
 msgid ""
 "%S: Overwriting policy (EA) is undefined for that file, do not know whether "
@@ -7421,12 +7431,12 @@ msgstr ""
 "%S : La politique d'écrasement (Attributs Étendus) reste non définie pour ce "
 "fichier, impossible de savoir si l'écrasement est autorisé ou pas !"
 
-#: src/libdar/filesystem.cpp:2107 src/libdar/filesystem.cpp:2153
+#: src/libdar/filesystem.cpp:2126 src/libdar/filesystem.cpp:2172
 #, c-format
 msgid "FSA for %S are about to be overwritten, OK?"
 msgstr "Les FSA de %S sont sur le point d'être écrasés, OK ?"
 
-#: src/libdar/filesystem.cpp:2122
+#: src/libdar/filesystem.cpp:2141
 #, c-format
 msgid ""
 "FSA for %S have not been overwritten because this file is a hard link "
@@ -7435,7 +7445,7 @@ msgstr ""
 "Les FSA de %S n'ont pas été écrasés car ce fichier est un lien dur pointant "
 "sur une inode déjà restaurée"
 
-#: src/libdar/filesystem.cpp:2179
+#: src/libdar/filesystem.cpp:2198
 #, c-format
 msgid ""
 "%S: Overwriting policy (FSA) is undefined for that file, do not know whether "
@@ -7444,19 +7454,19 @@ msgstr ""
 "%S : La politique d'écrasement (FSA) reste non définie pour ce fichier, "
 "impossible de savoir si l'écrasement est autorisé ou pas !"
 
-#: src/libdar/filesystem.cpp:2272
+#: src/libdar/filesystem.cpp:2291
 msgid "Cannot get inode information about file to remove "
 msgstr "Impossible d'obtenir d'information sur l'inode d'un fichier à effacer "
 
-#: src/libdar/filesystem.cpp:2285
+#: src/libdar/filesystem.cpp:2304
 msgid "Cannot remove directory "
 msgstr "Suppression de répertoire impossible "
 
-#: src/libdar/filesystem.cpp:2289
+#: src/libdar/filesystem.cpp:2308
 msgid "Cannot remove file "
 msgstr "Suppression de fichier impossible "
 
-#: src/libdar/filesystem.cpp:2338
+#: src/libdar/filesystem.cpp:2360
 msgid ""
 "uid value is too high for this system for libdar be able to restore it "
 "properly"
@@ -7464,7 +7474,7 @@ msgstr ""
 "valeur d'UID trop grande pour ce système pour que libdar puisse le restaurer "
 "correctement"
 
-#: src/libdar/filesystem.cpp:2342
+#: src/libdar/filesystem.cpp:2364
 msgid ""
 "gid value is too high for this system for libdar be able to restore it "
 "properly"
@@ -7472,32 +7482,32 @@ msgstr ""
 "valeur de GID trop grande pour ce système pour que libdar puisse le "
 "restaurer correctement"
 
-#: src/libdar/filesystem.cpp:2346 src/libdar/filesystem.cpp:2350
+#: src/libdar/filesystem.cpp:2368 src/libdar/filesystem.cpp:2372
 msgid "Could not restore original file ownership: "
 msgstr "Affection du fichier à son propriétaire d'origine impossible : "
 
-#: src/libdar/filesystem.cpp:2364
+#: src/libdar/filesystem.cpp:2386
 #, c-format
 msgid "Cannot restore permissions of %s : %s"
 msgstr "Restauration des droits d'accès de %s impossible : %s"
 
-#: src/libdar/filesystem.cpp:2450
+#: src/libdar/filesystem.cpp:2472
 #, c-format
 msgid "Failed to open %S while checking for nodump flag: %s"
 msgstr ""
 "Impossible d'ouvrir %S pendant la consultation du drapeau \"nodump\" : %s"
 
-#: src/libdar/filesystem.cpp:2464
+#: src/libdar/filesystem.cpp:2486
 #, c-format
 msgid "Cannot get ext2 attributes (and nodump flag value) for %S : %s"
 msgstr "Impossible d'accéder aux attributs ext2 (drapeau nodump) pour %S : %s"
 
-#: src/libdar/filesystem.cpp:2497
+#: src/libdar/filesystem.cpp:2519
 #, c-format
 msgid "Cannot get inode information for %s : %s"
 msgstr "Impossible d'obtenir des informations sur l'inode %s : %s"
 
-#: src/libdar/filesystem.cpp:2526
+#: src/libdar/filesystem.cpp:2548
 #, c-format
 msgid ""
 "Replacing %s in the -R option by the directory pointed to by this symbolic "
@@ -7506,7 +7516,7 @@ msgstr ""
 "Remplacement de %s dans l'option -R par le répertoire pointé par ce lien "
 "symbolique"
 
-#: src/libdar/filesystem.cpp:2529
+#: src/libdar/filesystem.cpp:2551
 #, c-format
 msgid ""
 "The given path %s must be a directory (or symbolic link to an existing "
@@ -7556,20 +7566,20 @@ msgstr "%S existe déjà et l'écrasement est interdit, j'abandonne"
 msgid "%S is about to be overwritten, continue ?"
 msgstr "%S est sur le point d'être écrasé, on continue ?"
 
-#: src/libdar/trivial_sar.cpp:216 src/libdar/trivial_sar.cpp:233
+#: src/libdar/trivial_sar.cpp:216 src/libdar/trivial_sar.cpp:234
 #, c-format
 msgid ""
 "Directory component in %S does not exist or is a dangling symbolic link: "
 msgstr ""
 "Un répertoire menant à %S n'existe pas ou est un lien symbolinc cassé : "
 
-#: src/libdar/trivial_sar.cpp:460
+#: src/libdar/trivial_sar.cpp:462
 msgid "This archive has slices and is not possible to read from a pipe"
 msgstr ""
 "Cette archive est constituée de plusieurs tranches et ne peut pas être lue "
 "depuis un tube"
 
-#: src/libdar/trivial_sar.cpp:497
+#: src/libdar/trivial_sar.cpp:499
 msgid ""
 "This archive is not single sliced, more data exists in the next slices but "
 "cannot be read from the current pipe, aborting"
@@ -7577,7 +7587,7 @@ msgstr ""
 "Cette archive est constituée de plusieurs tranches et ne peut pas être lue "
 "depuis un tube"
 
-#: src/libdar/trivial_sar.cpp:535
+#: src/libdar/trivial_sar.cpp:537
 msgid "Cannot skip to a valid position in file"
 msgstr "Impossible de se positionner à un endroit valide dans le fichier"
 
