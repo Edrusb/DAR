@@ -1,3 +1,6 @@
+from 2.5.17 to 2.5.18
+- fixed compilation issue in context where EA are not supported
+
 from 2.5.16 to 2.5.17
 - bug fix: dar failed to restore EA when file permission to restore
   did not included user write access. Fix consists in temporarily
