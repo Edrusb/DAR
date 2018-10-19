@@ -807,11 +807,11 @@ AC_ARG_ENABLE( [libcurl-linking],
                [
                   PKG_CHECK_EXISTS(libcurl,
                         [ PKG_CHECK_MODULES(LIBCURL, libcurl, [], [AC_MSG_ERROR([libcurl not found, but reported to exist !?!])])
-                          LIBS="$LIBS $LIBCURL_LIBS"
                           AC_DEFINE(HAVE_LIBCURL, 1, [Libcurl library availability])
                         ],
                         [
                           AC_CHECK_LIB(curl, [curl_global_init], [], [AC_MSG_WARN([libcurl library not found])])
+			  AC_DEFINE(HAVE_LIBCURL, 1, [Libcurl library availability])
                         ])
 
                   CPPFLAGS__cache="$CFLAGS"
@@ -1062,6 +1062,62 @@ AC_ARG_ENABLE( [fast-dir],
                ]
              )
 
+
+AC_ARG_ENABLE(  [gpgme-linking],
+                AC_HELP_STRING(--disable-gpgme-linking, [disable linking with gpgme which disables asymetric crypto algorithms]),
+                [
+                  AC_MSG_WARN([asymetrical encryption support has been disabled by user])
+                  local_gpgme="no"
+                ],
+                [
+                  if test $local_crypto != no ; then
+                    gpgme_min_version="1.2.0"
+                    AC_DEFINE_UNQUOTED(GPGME_MIN_VERSION, "$gpgme_min_version", [minimum version expected of GPGME])
+                    m4_ifdef([AM_PATH_GPGME],
+                        [ AM_PATH_GPGME($gpgme_min_version,
+                                [
+                                  CPPFLAGS___cache="$CPPFLAGS"
+                                  CPPFLAGS="$GPGME_CFLAGS $CPPFLAGS"
+                                  LIBS___cache="$LIBS"
+                                  LIBS="$GPGME_LIBS $LIBS"
+                                  AC_CHECK_HEADERS([gpgme.h])
+                                  AC_CHECK_LIB(gpgme, [gpgme_signers_add], [], [])
+                                  AC_MSG_CHECKING([for libgpgme usability])
+                                  AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+                                                                    #if HAVE_GPGME_H
+                                                                    #include <gpgme.h>
+                                                                    #endif
+                                                                 ]],
+                                                                 [[
+                                                                    gpgme_ctx_t context;
+                                                                    gpgme_error_t err = gpgme_new(&context);
+                                                                    gpgme_release(context);
+                                                                    return err;
+                                                                 ]])
+                                                 ],
+                                                 [
+                                                   local_gpgme="yes"
+                                                   AC_DEFINE(GPGME_SUPPORT, 1, [GPGME is available to support public key based ciphering])
+                                                   AC_MSG_RESULT(ok)
+                                                 ],
+                                                 [
+                                                   local_gpgme="no"
+                                                   AC_MSG_RESULT([not usable! See config.log for details])
+                                                 ])
+                                  CPPFLAGS="$CPPFLAGS___cache"
+                                  unset CPPFLAGS___cache
+                                  LIBS="$LIBS___cache"
+                                  unset LIBS___cache
+                                ],
+                                [ AC_MSG_WARN([Public key support (GPGME linking) requires version greater than $gpgme_min_version]) ]
+                               )
+                        ])
+                 else
+                    AC_MSG_WARN([Public key support (GPGME linking) requires libgcrypt (strong encryption support)])
+                 fi
+                ]
+             )
+
 AC_ARG_ENABLE(  [thread-safe],
                 AC_HELP_STRING(--disable-thread-safe, [libdar is thread safe if POSIX mutex are available, you can manually disable the use of POSIX mutex, the resulting libdar library will not be thread-safe anymore]),
                 [ AC_MSG_NOTICE([thread-safe support disabled])
@@ -1139,62 +1195,6 @@ AC_ARG_ENABLE(  [thread-safe],
                                   AC_MSG_RESULT([some are missing])
                                 ]
                         )
-                ]
-             )
-
-
-AC_ARG_ENABLE(  [gpgme-linking],
-                AC_HELP_STRING(--disable-gpgme-linking, [disable linking with gpgme which disables asymetric crypto algorithms]),
-                [
-                  AC_MSG_WARN([asymetrical encryption support has been disabled by user])
-                  local_gpgme="no"
-                ],
-                [
-                  if test $local_crypto != no ; then
-                    gpgme_min_version="1.2.0"
-                    AC_DEFINE_UNQUOTED(GPGME_MIN_VERSION, "$gpgme_min_version", [minimum version expected of GPGME])
-                    m4_ifdef([AM_PATH_GPGME],
-                        [ AM_PATH_GPGME($gpgme_min_version,
-                                [
-                                  CPPFLAGS___cache="$CPPFLAGS"
-                                  CPPFLAGS="$GPGME_CFLAGS $CPPFLAGS"
-                                  LIBS___cache="$LIBS"
-                                  LIBS="$GPGME_LIBS $LIBS"
-                                  AC_CHECK_HEADERS([gpgme.h])
-                                  AC_CHECK_LIB(gpgme, [gpgme_signers_add], [], [])
-                                  AC_MSG_CHECKING([for libgpgme usability])
-                                  AC_LINK_IFELSE([AC_LANG_PROGRAM([[
-                                                                    #if HAVE_GPGME_H
-                                                                    #include <gpgme.h>
-                                                                    #endif
-                                                                 ]],
-                                                                 [[
-                                                                    gpgme_ctx_t context;
-                                                                    gpgme_error_t err = gpgme_new(&context);
-                                                                    gpgme_release(context);
-                                                                    return err;
-                                                                 ]])
-                                                 ],
-                                                 [
-                                                   local_gpgme="yes"
-                                                   AC_DEFINE(GPGME_SUPPORT, 1, [GPGME is available to support public key based ciphering])
-                                                   AC_MSG_RESULT(ok)
-                                                 ],
-                                                 [
-                                                   local_gpgme="no"
-                                                   AC_MSG_RESULT([not usable! See config.log for details])
-                                                 ])
-                                  CPPFLAGS="$CPPFLAGS___cache"
-                                  unset CPPFLAGS___cache
-                                  LIBS="$LIBS___cache"
-                                  unset LIBS___cache
-                                ],
-                                [ AC_MSG_WARN([Public key support (GPGME linking) requires version greater than $gpgme_min_version]) ]
-                               )
-                        ])
-                 else
-                    AC_MSG_WARN([Public key support (GPGME linking) requires libgcrypt (strong encryption support)])
-                 fi
                 ]
              )
 

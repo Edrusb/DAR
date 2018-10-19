@@ -57,8 +57,8 @@ namespace libdar
 
 	    // initializing the fields from parent class entrepot
 
-	set_root("/");
-	set_location("/");
+	set_root(path("/"));
+	set_location(path("/"));
 	set_user_ownership(""); // not used for this type of entrepot
 	set_group_ownership(""); // not used for this type of entrepot
 

@@ -90,11 +90,11 @@ endif
 #
 
 bin_PROGRAMS = dar dar_xform dar_slave dar_manager dar_cp dar_split $(ALSO_BUILD)
-LDADD = ../libdar/$(MYLIB).la $(GPGME_LIBS)
+LDADD = ../libdar/$(MYLIB).la $(LIBCURL_LIBS) $(GPGME_LIBS) $(LIBTHREADAR_LIBS) $(LTLIBINTL)
 if DEBUG_STATIC
-AM_LDFLAGS = -all-static $(LTLIBINTL) $(LD_PROF) $(GPGME_LIBS) $(LIBCURL_LIBS) $(LIBTHREADAR_LIBS) $(CXXSTDFLAGS)
+AM_LDFLAGS = -all-static $(LD_PROF) $(CXXSTDFLAGS)
 else
-AM_LDFLAGS = $(LTLIBINTL) $(LD_PROF) $(GPGME_LIBS) $(LIBCURL_LIBS) $(LIBTHREADAR_LIBS) $(CXXSTDFLAGS)
+AM_LDFLAGS = $(LD_PROF) $(CXXSTDFLAGS)
 endif
 
 dar_SOURCES =  command_line.cpp command_line.hpp config_file.cpp config_file.hpp dar.cpp dar.hpp dar_suite.cpp dar_suite.hpp hide_file.cpp hide_file.hpp no_comment.cpp no_comment.hpp getopt_decision.h my_getopt_long.h line_tools.hpp line_tools.cpp crit_action_cmd_line.cpp crit_action_cmd_line.hpp
@@ -120,4 +120,4 @@ dar_split_SOURCES = dar_split.c
 
 dar_static_SOURCES =  command_line.cpp command_line.hpp config_file.cpp config_file.hpp dar.cpp dar.hpp dar_suite.cpp dar_suite.hpp hide_file.cpp hide_file.hpp no_comment.cpp no_comment.hpp getopt_decision.h my_getopt_long.h line_tools.hpp line_tools.cpp crit_action_cmd_line.cpp crit_action_cmd_line.hpp
 dar_static_DEPENDENCIES = ../libdar/$(MYLIB).la
-dar_static_LDFLAGS = -all-static $(LTLIBINTL)
+dar_static_LDFLAGS = -all-static $(AM_LDFLAGS)
