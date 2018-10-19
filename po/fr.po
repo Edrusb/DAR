@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: DAR 2.5.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2018-09-30 14:26+0200\n"
-"PO-Revision-Date: 2018-09-30 17:44+0200\n"
+"POT-Creation-Date: 2018-10-19 23:27+0200\n"
+"PO-Revision-Date: 2018-10-20 00:18+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "Language: fr\n"
@@ -415,7 +415,9 @@ msgstr ""
 msgid ""
 "Warning: libdar multi-threading is an experimental and unsupported feature, "
 "read man page about -G option for more information"
-msgstr "Attention: L'option -G est expérimentale et non supportée. Lire la page de manuel à propos de cette option pour plus d'information"
+msgstr ""
+"Attention: L'option -G est expérimentale et non supportée. Lire la page de "
+"manuel à propos de cette option pour plus d'information"
 
 #: src/dar_suite/command_line.cpp:807
 msgid "Parse error: "
@@ -1370,11 +1372,13 @@ msgstr ""
 
 #: src/dar_suite/dar_manager.cpp:552
 msgid "-w option is only valid with -r option, ignoring it"
-msgstr "l'option -w n'est valide uniquement qu'avec l'option -r et sera ignorée ici"
+msgstr ""
+"l'option -w n'est valide uniquement qu'avec l'option -r et sera ignorée ici"
 
 #: src/dar_suite/dar_manager.cpp:559
 msgid "-9 option is only valid with -A option, ignoring it"
-msgstr "l'option -9 n'est valide uniquement qu'avec l'option -A et sera ignorée ici"
+msgstr ""
+"l'option -9 n'est valide uniquement qu'avec l'option -A et sera ignorée ici"
 
 #: src/dar_suite/dar_manager.cpp:570
 msgid "No action specified, aborting"
@@ -2302,9 +2306,7 @@ msgstr ""
 #: src/dar_suite/dar.cpp:1119
 #, c-format
 msgid " %i inode(s) with only metadata changed\n"
-msgstr ""
-" %i inode(s) ayant seulement un changement de métadonnées\n"
-" "
+msgstr " %i inode(s) ayant seulement un changement de métadonnées\n"
 
 #: src/dar_suite/dar.cpp:1120
 #, c-format
@@ -2915,14 +2917,18 @@ msgstr "Erreur pendant la lecture d'un caractère : "
 msgid ""
 "[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size    "
 "|          Date                 |    filename"
-msgstr "[Data ][D][ EA  ][FSA][compr][S]| Accès      |Proprio|Groupe | Taille  |          Date                 | Nom de fichier"
+msgstr ""
+"[Data ][D][ EA  ][FSA][compr][S]| Accès      |Proprio|Groupe | Taille  "
+"|          Date                 | Nom de fichier"
 
 #: src/libdar/shell_interaction.cpp:270
 #, c-format
 msgid ""
 "Access mode    | User | Group | Size   |          Date                 |"
 "[Data ][D][ EA  ][FSA][Compr][S]|   Filename"
-msgstr "Droit d'accès  |Propr.|Groupe | Taille |          Date                 |[Infos][D][ EA  ][FSA][Compr][S]| Nom de fichier"
+msgstr ""
+"Droit d'accès  |Propr.|Groupe | Taille |          Date                 |"
+"[Infos][D][ EA  ][FSA][Compr][S]| Nom de fichier"
 
 #: src/libdar/shell_interaction.cpp:315 src/libdar/database5.cpp:78
 #, c-format
@@ -4988,8 +4994,7 @@ msgstr ""
 "%S : La politique d'écrasement (Attributs Étendus) reste non définie pour ce "
 "fichier, impossible de savoir si l'écrasement est autorisé ou pas !"
 
-#: src/libdar/filesystem_restore.cpp:976
-#: src/libdar/filesystem_restore.cpp:1022
+#: src/libdar/filesystem_restore.cpp:976 src/libdar/filesystem_restore.cpp:1022
 #, c-format
 msgid "FSA for %S are about to be overwritten, OK?"
 msgstr "Les FSA de %S sont sur le point d'être écrasés, OK ?"
@@ -7003,17 +7008,17 @@ msgstr "Défaut de données lors de la lecture d'un object slice_layout"
 msgid "Error while adding EA %s : %s"
 msgstr "Erreur d'ajout de l'EA %s : %s"
 
-#: src/libdar/ea_filesystem.cpp:216
+#: src/libdar/ea_filesystem.cpp:217
 #, c-format
 msgid "Error while removing %s : %s"
 msgstr "Erreur de suppression de %s : %s"
 
-#: src/libdar/ea_filesystem.cpp:248 src/libdar/ea_filesystem.cpp:272
+#: src/libdar/ea_filesystem.cpp:252 src/libdar/ea_filesystem.cpp:276
 #, c-format
 msgid "Error reading attribute %s of file %s : %s"
 msgstr "Erreur lors de la lecture de l'attribut %s du fichier %s : %s"
 
-#: src/libdar/ea_filesystem.cpp:322 src/libdar/ea_filesystem.cpp:337
+#: src/libdar/ea_filesystem.cpp:326 src/libdar/ea_filesystem.cpp:341
 #, c-format
 msgid "Error retrieving EA list for %s : %s"
 msgstr "Erreur lors de l'inventaire des AE pour %s : %s"
