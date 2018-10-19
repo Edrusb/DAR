@@ -194,6 +194,7 @@ namespace libdar
 
     static bool remove_ea(const string & chemin, const ea_attributs & val, const mask & filter)
     {
+#ifdef EA_SUPPORT
         U_I num = 0;
         const char *p_chemin = chemin.c_str();
 	string key, value;
@@ -221,6 +222,9 @@ namespace libdar
 	}
 
         return num > 0;
+#else
+	return true;
+#endif
     }
 
     static ea_attributs * read_ea(const string & name, const mask & filter)

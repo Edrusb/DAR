@@ -57,6 +57,8 @@ from 2.5.x to 2.6.0
   You can still build a libdar by passing --enable-mode=infinint
   to the ./configure script.
 
+from 2.5.17 to 2.5.18
+- fixed compilation issue in context where EA are not supported
 
 from 2.5.16 to 2.5.17
 - bug fix: dar failed to restore EA when file permission to restore
