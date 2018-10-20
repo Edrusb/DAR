@@ -78,6 +78,12 @@ extern "C"
 #include "user_interaction.hpp"
 #include "fichier_local.hpp"
 
+#if defined (__GLIBC__) && (__GLIBC__ >= 2) && (__GLIBC_MINOR__ >= 23)
+#define CAN_USE_READDIR_R 0
+#else
+#define CAN_USE_READDIR_R 1
+#endif
+
 #define CACHE_DIR_TAG_FILENAME "CACHEDIR.TAG"
 #define CACHE_DIR_TAG_FILENAME_CONTENTS "Signature: 8a477f597d28d172789f06886806bc55"
 
@@ -142,7 +148,7 @@ namespace libdar
 
 	    fichier.clear();
 
-#if HAVE_READDIR_R
+#if HAVE_READDIR_R && (CAN_USE_READDIR_R == 1)
     	    U_64 max_alloc_filename;
 	    struct dirent *dbldrt = nullptr;
 
@@ -170,7 +176,7 @@ namespace libdar
 			fichier.push_back(string(ret->d_name));
 		    }
 
-#if HAVE_READDIR_R
+#if HAVE_READDIR_R && (CAN_USE_READDIR_R == 1)
 		}
 	    }
 	    catch(...)
