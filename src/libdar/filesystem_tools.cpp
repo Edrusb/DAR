@@ -239,24 +239,7 @@ namespace libdar
 
             // restoring fields that are defined by "what_to_check"
 
-        try
-        {
-            if(what_to_check == comparison_fields::all || what_to_check == comparison_fields::ignore_owner)
-                if(ref_lie == nullptr) // not restoring permission for symbolic links, it would modify the target not the symlink itself
-		{
-                    if(chmod(name, ref.get_perm()) < 0)
-                    {
-                        string tmp = tools_strerror_r(errno);
-                        dialog.message(tools_printf(gettext("Cannot restore permissions of %s : %s"), name, tmp.c_str()));
-                    }
-		}
-	}
-	catch(Egeneric &e)
-        {
-            if(ref_lie == nullptr)
-                throw;
-                // else (the inode is a symlink), we simply ignore this error
-        }
+	    // do we have to restore ownership?
 
 	if(what_to_check == comparison_fields::all)
 	{
@@ -284,6 +267,31 @@ namespace libdar
 #endif
 	}
 
+	    // do we have to restore permissions?
+
+	    // note! permission must be restored after owner ship:
+	    // in case suid bits would be set, restoring ownership
+	    // would clear the suid bit, leading to improper restored
+	    // permission
+
+	try
+	{
+            if(what_to_check == comparison_fields::all || what_to_check == comparison_fields::ignore_owner)
+                if(ref_lie == nullptr) // not restoring permission for symbolic links, it would modify the target not the symlink itself
+		{
+                    if(chmod(name, ref.get_perm()) < 0)
+                    {
+                        string tmp = tools_strerror_r(errno);
+                        dialog.message(tools_printf(gettext("Cannot restore permissions of %s : %s"), name, tmp.c_str()));
+                    }
+		}
+	}
+	catch(Egeneric &e)
+        {
+            if(ref_lie == nullptr)
+                throw;
+                // else (the inode is a symlink), we simply ignore this error
+        }
     }
 
     void filesystem_tools_make_date(const cat_inode & ref,
