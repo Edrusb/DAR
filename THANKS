@@ -4,7 +4,8 @@ Many Thanks to Gulikoza who helped troubleshooting around the poorly
 documented librsync library. Thanks to "Lademann" at sourceforge for the
 proposed patch adapted and integrated in this release (--ignored-as-symlink
 new feature). A big thank to Zach Adams for feedback about security and
-encryption related possible improvements.
+encryption related possible improvements. Thanks to Tobias Specht for
+feedback and for providing gdar a graphical frontend to libdar
 
 version 2.5.17
 --------------
