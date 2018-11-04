@@ -67,6 +67,12 @@ extern "C"
 
 #define MSG_NO_EA_SUPPORT "Extended Attribute support not activated at compilation time"
 
+#if defined(ENOATTR)
+#define LIBDAR_NOATTR ENOATTR
+#elif defined(ENODATA)
+#define LIBDAR_NOATTR ENODATA
+#endif
+
 using namespace std;
 
 namespace libdar
@@ -212,7 +218,9 @@ namespace libdar
 	    if(my_lremovexattr(p_chemin, k) < 0)
 	    {
 		string tmp = tools_strerror_r(errno);
-		if(errno != ENOATTR)
+#ifdef LIBDAR_NOATTR
+		if(errno != LIBDAR_NOATTR)
+#endif
 		    throw Erange("ea_filesystem write_ea", tools_printf(gettext("Error while removing %s : %s"),
 									k, tmp.c_str()));
 	    }
