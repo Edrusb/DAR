@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: DAR 2.5.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2018-10-19 23:27+0200\n"
+"POT-Creation-Date: 2018-11-04 21:40+0100\n"
 "PO-Revision-Date: 2018-10-20 00:18+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -4439,11 +4439,11 @@ msgstr ""
 "La bibliothèque de chiffrement pour l'algorithme blowfish ne respecte pas la "
 "RFC 3962"
 
-#: src/libdar/etage.cpp:112
+#: src/libdar/etage.cpp:118
 msgid "Error opening directory in furtive read mode: "
 msgstr "Erreur lors de l'ouverture d'un répertoire en mode furtif : "
 
-#: src/libdar/etage.cpp:116
+#: src/libdar/etage.cpp:122
 #, c-format
 msgid ""
 "Could not open directory %s in furtive read mode (%s), using normal mode"
@@ -4451,18 +4451,18 @@ msgstr ""
 "Échec lors de l'ouverture du répertoire %s en mode furtif (%s), ouverture en "
 "mode normal"
 
-#: src/libdar/etage.cpp:141
+#: src/libdar/etage.cpp:147
 msgid "Error opening directory: "
 msgstr "Erreur lors de l'ouverture du répertoire : "
 
-#: src/libdar/etage.cpp:159
+#: src/libdar/etage.cpp:165
 #, c-format
 msgid ""
 "Filename provided by the operating system seems truncated in directory %s "
 "ignoring it: %s"
 msgstr ""
 
-#: src/libdar/etage.cpp:191
+#: src/libdar/etage.cpp:197
 #, c-format
 msgid ""
 "Detected Cache Directory Tagging Standard for %s, the contents of that "
@@ -7003,22 +7003,22 @@ msgstr "Échec de l'allocation mémoire : %s"
 msgid "Missing data while reading slice_layout object"
 msgstr "Défaut de données lors de la lecture d'un object slice_layout"
 
-#: src/libdar/ea_filesystem.cpp:185
+#: src/libdar/ea_filesystem.cpp:191
 #, c-format
 msgid "Error while adding EA %s : %s"
 msgstr "Erreur d'ajout de l'EA %s : %s"
 
-#: src/libdar/ea_filesystem.cpp:217
+#: src/libdar/ea_filesystem.cpp:225
 #, c-format
 msgid "Error while removing %s : %s"
 msgstr "Erreur de suppression de %s : %s"
 
-#: src/libdar/ea_filesystem.cpp:252 src/libdar/ea_filesystem.cpp:276
+#: src/libdar/ea_filesystem.cpp:260 src/libdar/ea_filesystem.cpp:284
 #, c-format
 msgid "Error reading attribute %s of file %s : %s"
 msgstr "Erreur lors de la lecture de l'attribut %s du fichier %s : %s"
 
-#: src/libdar/ea_filesystem.cpp:326 src/libdar/ea_filesystem.cpp:341
+#: src/libdar/ea_filesystem.cpp:334 src/libdar/ea_filesystem.cpp:349
 #, c-format
 msgid "Error retrieving EA list for %s : %s"
 msgstr "Erreur lors de l'inventaire des AE pour %s : %s"
@@ -7727,12 +7727,7 @@ msgstr "Impossible d'obtenir d'information sur l'inode d'un fichier à effacer "
 msgid "Cannot remove directory "
 msgstr "Suppression de répertoire impossible "
 
-#: src/libdar/filesystem_tools.cpp:250
-#, c-format
-msgid "Cannot restore permissions of %s : %s"
-msgstr "Restauration des droits d'accès de %s impossible : %s"
-
-#: src/libdar/filesystem_tools.cpp:268
+#: src/libdar/filesystem_tools.cpp:251
 msgid ""
 "uid value is too high for this system for libdar be able to restore it "
 "properly"
@@ -7740,7 +7735,7 @@ msgstr ""
 "valeur d'UID trop grande pour ce système pour que libdar puisse le restaurer "
 "correctement"
 
-#: src/libdar/filesystem_tools.cpp:272
+#: src/libdar/filesystem_tools.cpp:255
 msgid ""
 "gid value is too high for this system for libdar be able to restore it "
 "properly"
@@ -7748,27 +7743,32 @@ msgstr ""
 "valeur de GID trop grande pour ce système pour que libdar puisse le "
 "restaurer correctement"
 
-#: src/libdar/filesystem_tools.cpp:276 src/libdar/filesystem_tools.cpp:280
+#: src/libdar/filesystem_tools.cpp:259 src/libdar/filesystem_tools.cpp:263
 msgid "Could not restore original file ownership: "
 msgstr "Affection du fichier à son propriétaire d'origine impossible : "
 
-#: src/libdar/filesystem_tools.cpp:364
+#: src/libdar/filesystem_tools.cpp:285
+#, c-format
+msgid "Cannot restore permissions of %s : %s"
+msgstr "Restauration des droits d'accès de %s impossible : %s"
+
+#: src/libdar/filesystem_tools.cpp:372
 #, c-format
 msgid "Failed to open %S while checking for nodump flag: %s"
 msgstr ""
 "Impossible d'ouvrir %S pendant la consultation du drapeau \"nodump\" : %s"
 
-#: src/libdar/filesystem_tools.cpp:378
+#: src/libdar/filesystem_tools.cpp:386
 #, c-format
 msgid "Cannot get ext2 attributes (and nodump flag value) for %S : %s"
 msgstr "Impossible d'accéder aux attributs ext2 (drapeau nodump) pour %S : %s"
 
-#: src/libdar/filesystem_tools.cpp:410
+#: src/libdar/filesystem_tools.cpp:418
 #, c-format
 msgid "Cannot get inode information for %s : %s"
 msgstr "Impossible d'obtenir des informations sur l'inode %s : %s"
 
-#: src/libdar/filesystem_tools.cpp:439
+#: src/libdar/filesystem_tools.cpp:447
 #, c-format
 msgid ""
 "Replacing %s in the -R option by the directory pointed to by this symbolic "
@@ -7777,29 +7777,29 @@ msgstr ""
 "Remplacement de %s dans l'option -R par le répertoire pointé par ce lien "
 "symbolique"
 
-#: src/libdar/filesystem_tools.cpp:442
+#: src/libdar/filesystem_tools.cpp:450
 #, c-format
 msgid ""
 "The given path %s must be a directory (or symbolic link to an existing "
 "directory)"
 msgstr "Le chemin %s doit être un répertoire (ou un lien sur un répertoire)"
 
-#: src/libdar/filesystem_tools.cpp:570
+#: src/libdar/filesystem_tools.cpp:578
 msgid ""
 "File the patch is about to be applied to is not the expected one, aborting "
 "the patch operation"
 msgstr ""
 
-#: src/libdar/filesystem_tools.cpp:587
+#: src/libdar/filesystem_tools.cpp:595
 msgid "Patch data does not match its CRC, archive corruption took place"
 msgstr ""
 
-#: src/libdar/filesystem_tools.cpp:618
+#: src/libdar/filesystem_tools.cpp:626
 #, fuzzy
 msgid "Error met while checking the resulting patched file: "
 msgstr "Erreur lors de la cration du fichier de hashage : "
 
-#: src/libdar/filesystem_tools.cpp:745
+#: src/libdar/filesystem_tools.cpp:753
 #, fuzzy
 msgid "Copied data does not match expected CRC"
 msgstr "Les données copiées ne correspondent pas au CRC"
