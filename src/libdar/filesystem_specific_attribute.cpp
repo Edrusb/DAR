@@ -327,16 +327,34 @@ namespace libdar
 	sort_fsa();
     }
 
+    bool filesystem_specific_attribute_list::has_linux_immutable_set() const
+    {
+
+	const filesystem_specific_attribute *ptr = nullptr;
+	const fsa_bool *bptr = nullptr;
+
+	if(find(fsaf_linux_extX, fsan_immutable, ptr))
+	{
+	    bptr = dynamic_cast<const fsa_bool *>(ptr);
+	    if(bptr == nullptr)
+		throw SRC_BUG; // immutable flag should be a boolean
+	    return bptr->get_value();
+	}
+	else // immutable attribute not present
+	    return false;
+    }
+
     bool filesystem_specific_attribute_list::set_fsa_to_filesystem_for(const string & target,
 								       const fsa_scope & scope,
-								       user_interaction & ui) const
+								       user_interaction & ui,
+								       bool set_linux_immutable) const
     {
 	bool ret = false;
 
 	if(scope.find(fsaf_linux_extX) != scope.end())
-	    ret |= set_extX_FSA_to(ui, target);
+	    ret |= set_extX_FSA_to(ui, target, set_linux_immutable);
 
-	if(scope.find(fsaf_hfs_plus) != scope.end())
+	if(!set_linux_immutable && scope.find(fsaf_hfs_plus) != scope.end())
 	    ret |= set_hfs_FSA_to(ui, target);
 
 	return ret;
@@ -664,7 +682,9 @@ namespace libdar
 #endif
     }
 
-    bool filesystem_specific_attribute_list::set_extX_FSA_to(user_interaction & ui, const std::string & target) const
+    bool filesystem_specific_attribute_list::set_extX_FSA_to(user_interaction & ui,
+							     const std::string & target,
+							     bool set_immutable) const
     {
 	bool ret = false;
 	bool has_extX_FSA = false;
@@ -725,6 +745,8 @@ namespace libdar
 			case fsan_creation_date:
 			    throw SRC_BUG; // unknown nature for this family type
 			case fsan_append_only:
+			    if(set_immutable)
+				continue;
 			    if(it_bool == nullptr)
 				throw SRC_BUG; // should be a boolean
 #ifdef EXT2_APPEND_FL
@@ -740,6 +762,8 @@ namespace libdar
 #endif
 			    break;
 			case fsan_compressed:
+			    if(set_immutable)
+				continue;
 #ifdef EXT2_COMPR_FL
 			    if(it_bool->get_value())
 				f |= EXT2_COMPR_FL;
@@ -753,6 +777,8 @@ namespace libdar
 #endif
 			    break;
 			case fsan_no_dump:
+			    if(set_immutable)
+				continue;
 #ifdef EXT2_NODUMP_FL
 			    if(it_bool->get_value())
 				f |= EXT2_NODUMP_FL;
@@ -766,6 +792,8 @@ namespace libdar
 #endif
 			    break;
 			case fsan_immutable:
+			    if(!set_immutable) // if *NOT* set_immutable, here
+				continue;
 #ifdef EXT2_IMMUTABLE_FL
 			    if(it_bool->get_value())
 				f |= EXT2_IMMUTABLE_FL;
@@ -779,6 +807,8 @@ namespace libdar
 #endif
 			    break;
 			case fsan_data_journaling:
+			    if(set_immutable)
+				continue;
 #ifdef EXT3_JOURNAL_DATA_FL
 			    if(it_bool->get_value())
 				f |= EXT3_JOURNAL_DATA_FL;
@@ -799,6 +829,8 @@ namespace libdar
 #endif
 			    break;
 			case fsan_secure_deletion:
+			    if(set_immutable)
+				continue;
 #ifdef EXT2_SECRM_FL
 			    if(it_bool->get_value())
 				f |= EXT2_SECRM_FL;
@@ -812,6 +844,8 @@ namespace libdar
 #endif
 			    break;
 			case fsan_no_tail_merging:
+			    if(set_immutable)
+				continue;
 #ifdef EXT2_NOTAIL_FL
 			    if(it_bool->get_value())
 				f |= EXT2_NOTAIL_FL;
@@ -825,6 +859,8 @@ namespace libdar
 #endif
 			    break;
 			case fsan_undeletable:
+			    if(set_immutable)
+				continue;
 #ifdef EXT2_UNRM_FL
 			    if(it_bool->get_value())
 				f |= EXT2_UNRM_FL;
@@ -838,6 +874,8 @@ namespace libdar
 #endif
 			    break;
 			case fsan_noatime_update:
+			    if(set_immutable)
+				continue;
 #ifdef EXT2_NOATIME_FL
 			    if(it_bool->get_value())
 				f |= EXT2_NOATIME_FL;
@@ -851,6 +889,8 @@ namespace libdar
 #endif
 			    break;
 			case fsan_synchronous_directory:
+			    if(set_immutable)
+				continue;
 #ifdef EXT2_DIRSYNC_FL
 			    if(it_bool->get_value())
 				f |= EXT2_DIRSYNC_FL;
@@ -864,6 +904,8 @@ namespace libdar
 #endif
 			    break;
 			case fsan_synchronous_update:
+			    if(set_immutable)
+				continue;
 #ifdef EXT2_SYNC_FL
 			    if(it_bool->get_value())
 				f |= EXT2_SYNC_FL;
@@ -877,6 +919,8 @@ namespace libdar
 #endif
 			    break;
 			case fsan_top_of_dir_hierarchy:
+			    if(set_immutable)
+				continue;
 #ifdef EXT2_TOPDIR_FL
 			    if(it_bool->get_value())
 				f |= EXT2_TOPDIR_FL;
@@ -1024,7 +1068,7 @@ namespace libdar
 	    ui.printf(gettext("Birth Time attribute cannot be restored for %s because no FSA familly able to carry that attribute could be activated at compilation time."),
 		      target.c_str());
 	    // here we just warn, the birthtime restoration will be tried (calling twice utime()), even
-	    // if dar has not been compiled with birthtime support. Birthtime support is necessary on ty
+	    // if dar has not been compiled with birthtime support. Birthtime support is necessary only to
 	    // read birthtime value of an inode
 #endif
 

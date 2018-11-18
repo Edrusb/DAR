@@ -167,15 +167,20 @@ namespace libdar
 					 mode_t itype,
 					 bool auto_zeroing_neg_dates);
 
+	    /// return true if this FSA_list contains linux FSA with the immutable attribute set to true
+	bool has_linux_immutable_set() const;
+
 	    /// set FSA list to filesystem
 	    /// \param [in] target path of file to restore FSA to
 	    /// \param [in] scope list of FSA families to only consider
 	    /// \param [in] ui user interaction object
+	    /// \param [in] set_linux_immutable whether to restore the only linux immutable flag or ignore it and restore the rest
 	    /// \return true if some FSA have effectively been set, false if no FSA
 	    /// could be set either because list was empty of all FSA in the list where out of scope
 	bool set_fsa_to_filesystem_for(const std::string & target,
 				       const fsa_scope & scope,
-				       user_interaction & ui) const;
+				       user_interaction & ui,
+				       bool set_linux_immutable) const;
 
 	    /// whether the list has at least one FSA
 	bool empty() const { return fsa.empty(); };
@@ -221,7 +226,13 @@ namespace libdar
 			       bool auto_zeroing_neg_dates);
 
 	    /// \note return true if some FSA could be set
-	bool set_extX_FSA_to(user_interaction & ui, const std::string & target) const;
+
+	    /// \param[in] ui user interaction
+	    /// \param[in] target the target to assign the FSA to
+	    /// \param[in] set_immutable whether to ignore or set the immutable flag when present
+	bool set_extX_FSA_to(user_interaction & ui,
+			     const std::string & target,
+			     bool set_immutable) const;
 
 	    /// \note return true if some FSA could be set
 	bool set_hfs_FSA_to(user_interaction & ui, const std::string & target) const;

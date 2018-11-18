@@ -343,7 +343,6 @@ namespace libdar
 			{
 			    if(info_details)
 				get_ui().message(string(gettext("Restoring file's FSA: ")) + spot_display);
-
 			    if(!empty)
 			    {
 				const filesystem_specific_attribute_list * fsa = x_ino->get_fsa();
@@ -351,7 +350,10 @@ namespace libdar
 				    throw SRC_BUG;
 				try
 				{
-				    fsa_restored = fsa->set_fsa_to_filesystem_for(spot_display, get_fsa_scope(), get_ui());
+					// we must not yet restore linux::immutable flag in order
+					// to restore the permissions and dates that must been
+					// restored first:
+				    fsa_restored = fsa->set_fsa_to_filesystem_for(spot_display, get_fsa_scope(), get_ui(), false);
 				}
 				catch(Erange & e)
 				{
@@ -376,6 +378,25 @@ namespace libdar
 							     spot_display,
 							     what_to_check,
 							     get_fsa_scope());
+			}
+
+			    // Last: setting the linux immutable flag if present
+
+			if(has_fsa_saved)
+			{
+			    const filesystem_specific_attribute_list * fsa = x_ino->get_fsa();
+			    if(fsa == nullptr)
+				throw SRC_BUG;
+			    try
+			    {
+				if(info_details && fsa->has_linux_immutable_set())
+				    get_ui().message(string(gettext("Restoring linux immutable FSA for ")) + spot_display);
+				fsa_restored = fsa->set_fsa_to_filesystem_for(spot_display, get_fsa_scope(), get_ui(), true);
+			    }
+			    catch(Erange & e)
+			    {
+				get_ui().message(tools_printf(gettext("Restoration of linux immutable FSA for %S aborted: "), &spot_display) + e.get_message());
+			    }
 			}
 		    }
 		    else // no existing inode but no data to restore
@@ -485,7 +506,7 @@ namespace libdar
 			    if(data_restored == done_data_restored)
 				    // setting the date, perimssions and ownership to value found in the archive
 				    // this can only be done once the EA and FSA have been restored (mtime)
-				    // and data has been restore (mtime, atome)
+				    // and data has been restore (mtime, atime)
 			    {
 				if(exists_dir == nullptr)
 				{
@@ -511,6 +532,27 @@ namespace libdar
 							   get_fsa_scope());
 			}
 
+			if(fsa_restored)
+			{
+			    if(!empty)
+			    {
+				const cat_mirage *tba_mir = dynamic_cast<const cat_mirage *>(x_nom);
+				const cat_inode *tba_ino = dynamic_cast<const cat_inode *>(x_nom);
+
+				if(tba_mir != nullptr)
+				    tba_ino = tba_mir->get_inode();
+				if(tba_ino == nullptr)
+				    throw SRC_BUG;
+				if(tba_ino->fsa_get_saved_status() != fsa_saved_status::full)
+				    throw SRC_BUG;
+				const filesystem_specific_attribute_list * fsa = tba_ino->get_fsa();
+				if(fsa == nullptr)
+				    throw SRC_BUG;
+				if(info_details && fsa->has_linux_immutable_set())
+				    get_ui().message(string(gettext("Restoring linux immutable FSA for ")) + spot_display);
+				fsa->set_fsa_to_filesystem_for(spot_display, get_fsa_scope(), get_ui(), true);
+			    }
+			}
 
 			if(act_data == data_remove || data_restored == done_data_restored)
 			{
@@ -739,10 +781,10 @@ namespace libdar
 
 			// restoring FSA that were present on filesystem
 
-		    try // if possible and available restoring original FSA
+		    try // if possible and available restoring original FSA (except the possible immutable flag)
 		    {
 			if(got_fsa && !empty)
-			    fsa.set_fsa_to_filesystem_for(spot, all_fsa_families(), get_ui());
+			    fsa.set_fsa_to_filesystem_for(spot, all_fsa_families(), get_ui(), false);
 		    }
 		    catch(Ethread_cancel & e)
 		    {
@@ -1002,7 +1044,7 @@ namespace libdar
 		    if(fsa == nullptr)
 			throw SRC_BUG;
 
-		    ret = fsa->set_fsa_to_filesystem_for(spot, get_fsa_scope(), get_ui());
+		    ret = fsa->set_fsa_to_filesystem_for(spot, get_fsa_scope(), get_ui(), false);
 		}
 		else
 		    ret = true;
@@ -1039,7 +1081,7 @@ namespace libdar
 		    result = *ip_fsa + *tba_fsa; // the + operator on FSA is not reflexive !!!
 
 		if(!empty)
-		    ret = result.set_fsa_to_filesystem_for(spot, get_fsa_scope(), get_ui());
+		    ret = result.set_fsa_to_filesystem_for(spot, get_fsa_scope(), get_ui(), false);
 		else
 		    ret = true;
 	    }

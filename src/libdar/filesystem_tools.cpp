@@ -152,7 +152,7 @@ namespace libdar
         filesystem_specific_attribute_list fsal;
 
         fsal.add(fsa);
-        (void)fsal.set_fsa_to_filesystem_for(target, all_fsa_families(), ui);
+        (void)fsal.set_fsa_to_filesystem_for(target, all_fsa_families(), ui, true);
     }
 
     void filesystem_tools_supprime(user_interaction & ui, const string & ref)
