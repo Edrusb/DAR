@@ -126,7 +126,7 @@ namespace libdar
 	if(!x_entrepot)
 	    throw Ememory("archive_options_read::clear");
 	x_ignore_signature_check_failure = false;
-	x_multi_threaded = true;
+	x_multi_threaded = false;
 
 	    //
 	external_cat = false;
@@ -357,7 +357,7 @@ namespace libdar
 	    if(!x_entrepot)
 		throw Ememory("archive_options_create::clear");
 	    x_scope = all_fsa_families();
-	    x_multi_threaded = true;
+	    x_multi_threaded = false;
 	    x_delta_diff = true;
 	    x_delta_signature = false;
 	    has_delta_mask_been_set = false;
@@ -758,7 +758,7 @@ namespace libdar
 	    x_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local("", "", false)); // never using furtive_mode to read slices
 	    if(!x_entrepot)
 		throw Ememory("archive_options_isolate::clear");
-	    x_multi_threaded = true;
+	    x_multi_threaded = false;
 	    x_delta_signature = false;
 	    archive_option_clean_mask(x_delta_mask);
 	    has_delta_mask_been_set = false;
@@ -936,7 +936,7 @@ namespace libdar
 	    if(x_entrepot == nullptr)
 		throw Ememory("archive_options_merge::clear");
 	    x_scope = all_fsa_families();
-	    x_multi_threaded = true;
+	    x_multi_threaded = false;
 	    x_delta_signature = true;
 	    has_delta_mask_been_set = false;
 	    x_delta_sig_min_size = default_delta_sig_min_size;
@@ -1964,7 +1964,7 @@ namespace libdar
             x_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local( "", "", false)); // never using furtive_mode to read slices
             if(x_entrepot == nullptr)
                 throw Ememory("archive_options_repair::clear");
-            x_multi_threaded = true;
+            x_multi_threaded = false;
         }
         catch(...)
         {
