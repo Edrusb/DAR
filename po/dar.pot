@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: dar 2.6.0.RC10\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2018-11-18 22:49+0100\n"
+"POT-Creation-Date: 2018-11-24 21:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4916,7 +4916,7 @@ msgstr ""
 
 #: src/libdar/mask.cpp:307
 #, c-format
-msgid "%SPath leeds to: %S [%S]"
+msgid "%SPath leads to: %S [%S]"
 msgstr ""
 
 #: src/libdar/mask.cpp:315
@@ -5857,12 +5857,12 @@ msgstr ""
 
 #: src/libdar/i_entrepot_libcurl.cpp:432
 #, c-format
-msgid "Error met while assigning public key fike: %s"
+msgid "Error met while assigning public key file: %s"
 msgstr ""
 
 #: src/libdar/i_entrepot_libcurl.cpp:440
 #, c-format
-msgid "Error met while assigning private key fike: %s"
+msgid "Error met while assigning private key file: %s"
 msgstr ""
 
 #: src/libdar/i_entrepot_libcurl.cpp:448

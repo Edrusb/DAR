@@ -304,7 +304,7 @@ namespace libdar
     {
 	string sensit = bool2_sensitivity(case_s);
 
-	return tools_printf(gettext("%SPath leeds to: %S [%S]"),
+	return tools_printf(gettext("%SPath leads to: %S [%S]"),
 			    &prefix,
 			    &chemin,
 			    &sensit);

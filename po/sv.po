@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2018-11-18 22:49+0100\n"
+"POT-Creation-Date: 2018-11-24 21:11+0100\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -5425,7 +5425,7 @@ msgstr ""
 
 #: src/libdar/mask.cpp:307
 #, c-format
-msgid "%SPath leeds to: %S [%S]"
+msgid "%SPath leads to: %S [%S]"
 msgstr ""
 
 #: src/libdar/mask.cpp:315
@@ -6486,12 +6486,12 @@ msgstr "Fel vid skapande av hash handle: %s/%s"
 
 #: src/libdar/i_entrepot_libcurl.cpp:432
 #, fuzzy, c-format
-msgid "Error met while assigning public key fike: %s"
+msgid "Error met while assigning public key file: %s"
 msgstr "Fel vid tilldelning av nyckel till libgcrypts nyckelhanterare: %s/%s"
 
 #: src/libdar/i_entrepot_libcurl.cpp:440
 #, fuzzy, c-format
-msgid "Error met while assigning private key fike: %s"
+msgid "Error met while assigning private key file: %s"
 msgstr "Fel vid skapande av hash handle: %s/%s"
 
 #: src/libdar/i_entrepot_libcurl.cpp:448
@@ -8092,6 +8092,10 @@ msgstr "'door' inod"
 #: src/check/all_features.cpp:54
 msgid "-"
 msgstr ""
+
+#, fuzzy
+#~ msgid "aborting"
+#~ msgstr "avbryt"
 
 #, fuzzy
 #~ msgid "   Special allocation scheme    : %s\n"

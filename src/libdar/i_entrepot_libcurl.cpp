@@ -429,7 +429,7 @@ namespace libdar
 				   sftp_pub_keyfile.c_str());
 	    if(err != CURLE_OK)
 		throw Erange("entrepot_libcurl::i_entrepot_libcurl::set_libcurl_authentication",
-			     tools_printf(gettext("Error met while assigning public key fike: %s"),
+			     tools_printf(gettext("Error met while assigning public key file: %s"),
 					  curl_easy_strerror(err)));
 
 	    err = curl_easy_setopt(easyh.get_root_handle(),
@@ -437,7 +437,7 @@ namespace libdar
 				   sftp_prv_keyfile.c_str());
 	    if(err != CURLE_OK)
 		throw Erange("entrepot_libcurl::i_entrepot_libcurl::set_libcurl_authentication",
-			     tools_printf(gettext("Error met while assigning private key fike: %s"),
+			     tools_printf(gettext("Error met while assigning private key file: %s"),
 					  curl_easy_strerror(err)));
 
 	    err = curl_easy_setopt(easyh.get_root_handle(),

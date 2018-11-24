@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: DAR 2.5.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2018-11-18 22:49+0100\n"
-"PO-Revision-Date: 2018-10-20 00:18+0200\n"
+"POT-Creation-Date: 2018-11-24 21:11+0100\n"
+"PO-Revision-Date: 2018-11-24 21:07+0100\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "Language: fr\n"
@@ -252,6 +252,8 @@ msgid ""
 "-X, -I, -P, -g, -], -[ and any other file selection relative commands are "
 "not possible with -y option"
 msgstr ""
+"-X, -I -P, -g, -], -[ et autres commandes relatives à la selection de "
+"fichier sont impossibles avec l'option -y"
 
 #: src/dar_suite/command_line.cpp:548
 msgid "-D option is useless with -y option"
@@ -266,6 +268,8 @@ msgid ""
 "-u, -U, -P, -g, -], -[ and any other EA selection relative commands are not "
 "possible with -y option"
 msgstr ""
+"-u, -U, -P, -g, -], -[ et autres commandes relatives à la selection d'EA "
+"n'est impossible avec l'option -y"
 
 #: src/dar_suite/command_line.cpp:554
 msgid "-O option is not possible with -y option"
@@ -298,6 +302,7 @@ msgstr "l'option -ai est inutile avec -y"
 #: src/dar_suite/command_line.cpp:568
 msgid "--alter=do-not-compare-symlink-mtime option is useless with -y option"
 msgstr ""
+"l'option --alter=do-not-compare-symlink-mtime est inutile avec l'option -y"
 
 #: src/dar_suite/command_line.cpp:570
 msgid "-M option is useless with -y option"
@@ -349,7 +354,7 @@ msgstr "l'option --sequential-read est inutile avec -y"
 
 #: src/dar_suite/command_line.cpp:594
 msgid "--alter=tape-marks is impossible with -y option"
-msgstr ""
+msgstr "--alter=tape-marks est impossible avec l'option -y"
 
 #: src/dar_suite/command_line.cpp:639
 msgid ""
@@ -482,6 +487,7 @@ msgstr "L'option -r est inutile avec -n"
 #: src/dar_suite/command_line.cpp:1288
 msgid "Invalid argument given to -T option, expecting <num>[:<hash_algo>]"
 msgstr ""
+"Argument invalide transmis à l'option -T, <num>[:<hash_algo>] est attendu"
 
 #: src/dar_suite/command_line.cpp:1304
 #, c-format
@@ -559,7 +565,7 @@ msgstr "Argument inconnu donné à -a : %s"
 
 #: src/dar_suite/command_line.cpp:1628
 msgid "libthreadar required for multithreaded execution"
-msgstr ""
+msgstr "libthreadar est nécessaire pour une execution en parallèle"
 
 #: src/dar_suite/command_line.cpp:1656
 msgid "Only one -@ option is allowed"
@@ -1550,6 +1556,8 @@ msgstr ""
 msgid ""
 "            \t   date format: [[[year/]month]/day-]hour:minute[:second]\n"
 msgstr ""
+"          \t      format de date: [[[année/]mois]/jour-]heure:minute[:"
+"seconde]\n"
 
 #: src/dar_suite/dar_manager.cpp:920
 #, c-format
@@ -2224,6 +2232,9 @@ msgid ""
 "difference is requested, you need to read the archive of reference in direct "
 "access mode (default mode)"
 msgstr ""
+"La lecture sequentielle d'une archive est impossible quand une comparaison "
+"des deltas binaires est demandée, l'archive doit être lue en mode direct "
+"(mode par defaut)"
 
 #: src/dar_suite/dar.cpp:279 src/dar_suite/dar.cpp:330
 msgid ""
@@ -2749,7 +2760,7 @@ msgstr "Impossible de lire l'inode de "
 #: src/libdar/filesystem_hard_link_read.cpp:182
 #: src/libdar/filesystem_hard_link_read.cpp:211
 msgid "atime, data access time"
-msgstr ""
+msgstr "atime, date d'accès aux données"
 
 #: src/libdar/filesystem_hard_link_read.cpp:188
 #: src/libdar/filesystem_hard_link_read.cpp:217
@@ -2759,7 +2770,7 @@ msgstr "mtime, heure de modification des données"
 #: src/libdar/filesystem_hard_link_read.cpp:194
 #: src/libdar/filesystem_hard_link_read.cpp:223
 msgid "ctime, inode change time"
-msgstr ""
+msgstr "ctime, date de modification des métadonnées d'inode"
 
 #: src/libdar/filesystem_hard_link_read.cpp:305
 msgid "Unknown file type! file name is: "
@@ -2781,11 +2792,11 @@ msgstr "Un chiffre binaire est soit 0 soit 1"
 #: src/libdar/filesystem_specific_attribute.cpp:233
 #: src/libdar/filesystem_specific_attribute.cpp:1166
 msgid "invalid length for FSA family flag"
-msgstr ""
+msgstr "Le champ de famille de FSA a une longueur invalide"
 
 #: src/libdar/filesystem_specific_attribute.cpp:239
 msgid "invalid length for FSA nature flag"
-msgstr ""
+msgstr "le champ de nature de FSA a une longueur invalide"
 
 #: src/libdar/filesystem_specific_attribute.cpp:716
 msgid "Failed setting (opening) extX family FSA: "
@@ -2862,7 +2873,7 @@ msgstr "Drapeau de famille FSA invalide"
 #: src/libdar/filesystem_specific_attribute.cpp:1207
 #: src/libdar/filesystem_specific_attribute.cpp:1209
 msgid "invalid FSA nature flag"
-msgstr ""
+msgstr "nature de FSA invalide"
 
 #: src/libdar/filesystem_specific_attribute.cpp:1233
 msgid "Unexepected value for boolean FSA, data corruption may have occurred"
@@ -3041,15 +3052,15 @@ msgstr "absent  "
 
 #: src/libdar/shell_interaction.cpp:959 src/libdar/database5.cpp:207
 msgid "patch   "
-msgstr ""
+msgstr "patch   "
 
 #: src/libdar/shell_interaction.cpp:960 src/libdar/database5.cpp:208
 msgid "BROKEN  "
-msgstr ""
+msgstr "CASSÉ   "
 
 #: src/libdar/shell_interaction.cpp:961 src/libdar/database5.cpp:209
 msgid "inode   "
-msgstr ""
+msgstr "inode   "
 
 #: src/libdar/hash_fichier.cpp:63
 #, c-format
@@ -3413,6 +3424,8 @@ msgstr "Erreur lors de la suppression de %S : %s"
 msgid ""
 "Cannot convert negative floating point value to unsigned (positive) integer"
 msgstr ""
+"Impossible de convertir un entier flotant négatif en un entier non signé "
+"(positif)"
 
 #: src/libdar/archive5.cpp:57
 msgid "listing() method must be given"
@@ -3438,7 +3451,7 @@ msgstr "Erreur lors du paramétrage de libcurl pour l'écriture du fichier : %s"
 #: src/libdar/fichier_libcurl.cpp:139 src/libdar/fichier_libcurl.cpp:148
 #, c-format
 msgid "%s: %s"
-msgstr ""
+msgstr "%s: %s"
 
 #: src/libdar/fichier_libcurl.cpp:184 src/libdar/fichier_libcurl.cpp:192
 #: src/libdar/fichier_libcurl.cpp:203
@@ -3448,7 +3461,7 @@ msgstr "Erreur lors lors de la récupération de la taille du fichier : %s"
 
 #: src/libdar/fichier_libcurl.cpp:259
 msgid "libcurl does not allow skipping in write mode"
-msgstr ""
+msgstr "libcurl interdit le changement de position en mode écriture"
 
 #: src/libdar/fichier_libcurl.cpp:491
 msgid "Error met during network transfer: "
@@ -3461,35 +3474,37 @@ msgstr "Erreur lors de la lecture d'un block de données : %s"
 
 #: src/libdar/fichier_libcurl.cpp:590 src/libdar/fichier_libcurl.cpp:598
 #: src/libdar/fichier_libcurl.cpp:636 src/libdar/fichier_libcurl.cpp:776
-#, fuzzy, c-format
+#, c-format
 msgid "Error while seeking in file on remote repository: %s"
-msgstr "Erreur lors de la configuration des droits d'accès : %s"
+msgstr "Erreur de positionnement dans un fichier d'un dépot distant : %s"
 
 #: src/libdar/fichier_libcurl.cpp:631
 msgid ""
 "Integer too large for libcurl, cannot skip at the requested offset in the "
 "remote repository"
 msgstr ""
+"Entier trop grand pour libcurl, impossible de placer le curseur à la "
+"position demandée dans le répertoire distant"
 
 #: src/libdar/fichier_libcurl.cpp:654
-#, fuzzy, c-format
+#, c-format
 msgid "Error while setting write append mode for libcurl: %s"
-msgstr "Erreur lors de la changement de propriétaire : %s"
+msgstr "Impossible de passer libcurl en mode ajout en écriture : %s"
 
 #: src/libdar/fichier_libcurl.cpp:934 src/libdar/fichier_libcurl.cpp:940
 #, c-format
 msgid "%S: %s, aborting"
-msgstr ""
+msgstr "%S : %s, abandon"
 
 #: src/libdar/fichier_libcurl.cpp:955
 #, c-format
 msgid "%S: %s, retrying in %d seconds"
-msgstr ""
+msgstr "%S : %s, nouvelle tentative dans %d secondes"
 
 #: src/libdar/fichier_libcurl.cpp:962
 #, c-format
 msgid "%S: %s, do we retry network operation?"
-msgstr ""
+msgstr "%S : %s, retente-t-on l'opération réseau ?"
 
 #: src/libdar/op_tools.cpp:41 src/libdar/op_tools.cpp:113
 #: src/libdar/op_tools.cpp:193 src/libdar/header_version.cpp:489
@@ -3787,7 +3802,6 @@ msgstr ""
 "n'est présent qu'au début de la première tranche ..."
 
 #: src/libdar/macro_tools.cpp:543
-#, fuzzy
 msgid ""
 "Found a correct archive header at the beginning of the archive, which does "
 "not stands to be an old archive, the end of the archive is corrupted and "
@@ -3797,12 +3811,13 @@ msgid ""
 "chance, try both lax and sequential read mode at the same time"
 msgstr ""
 "Un en-tête d'archive a bien été trouvé en début d'archive, il n'indique pas "
-"que l'archive est d'un ancien format, la fin de l'archive est donc bel et "
-"bien corrompue. Si vous avez fourni un catalogue externe en référence pour "
-"cette operation, nous pouvons continuer, OK ?"
+"que l'archive est d'un ancien format, la fin de l'archive est donc belle et "
+"bien corrompue. Vous pouvez soit réessayer en fournissant un catalogue isolé "
+"en complément de cette operation ou tenter de lire l'archive en mode "
+"sequentiel, voire tenter le mode laxiste comme dernier recours, en utilisant "
+"le mode laxiste et le mode sequentiel en même temps"
 
 #: src/libdar/macro_tools.cpp:545
-#, fuzzy
 msgid ""
 "Found a correct archive header at the beginning of the archive, which does "
 "not stands to be an old archive, the end of the archive is thus corrupted. "
@@ -3811,9 +3826,11 @@ msgid ""
 "corrupted archive. Do we continue anyway ?"
 msgstr ""
 "Un en-tête d'archive a bien été trouvé en début d'archive, il n'indique pas "
-"que l'archive est d'un ancien format, la fin de l'archive est donc bel et "
-"bien corrompue. Si vous avez fourni un catalogue externe en référence pour "
-"cette operation, nous pouvons continuer, OK ?"
+"que l'archive est d'un ancien format, la fin de l'archive est donc belle et "
+"bien corrompue. Sans la fourniture d'un catalogue externe et comme nous ne "
+"lisons pas l'archive en mode sequentiel, il n'y a que peu de chances "
+"d'arriver à récupérer quelque chose de cette archive corrompue. Doit-on "
+"continuer malgré tout ?"
 
 #: src/libdar/macro_tools.cpp:556
 #, c-format
@@ -3978,14 +3995,13 @@ msgid "All layers have been created successfully"
 msgstr "Toutes les couches d'abstraction ont été crées avec succès"
 
 #: src/libdar/macro_tools.cpp:866
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Warning, the archive %S has been encrypted. A wrong key is not possible to "
 "detect, it would cause DAR to report the archive as corrupted"
 msgstr ""
 "Attention, l'archive %S a été chiffrée. Une mauvaise clef est impossible à "
-"détecter, cela aura pour conséquence la détection d'une corruption de "
-"l'archive.\n"
+"détecter et conduira libdar a signaler l'archive comme corrumpue"
 
 #: src/libdar/macro_tools.cpp:905
 msgid ""
@@ -4087,9 +4103,8 @@ msgstr ""
 "contient ceci :"
 
 #: src/libdar/macro_tools.cpp:1003
-#, fuzzy
 msgid "Do you want to use it for the operation?"
-msgstr "Voulez-vous l'utiliser pour la restauration ?"
+msgstr "Voulez-vous l'utiliser pour l'opération ?"
 
 #: src/libdar/macro_tools.cpp:1035
 msgid ""
@@ -4283,7 +4298,6 @@ msgstr ""
 "d'application. On essaye quand même lire cette archive ?"
 
 #: src/libdar/crypto_sym.cpp:77
-#, fuzzy
 msgid ""
 "Current implementation of blowfish encryption is not compatible with old "
 "(weak) implementation, use dar-2.3.x software or later (or other software "
@@ -4296,6 +4310,8 @@ msgstr ""
 #: src/libdar/crypto_sym.cpp:80
 msgid "cannot use 'none' as hashing algorithm for key derivation function"
 msgstr ""
+"'none' n'est pas une algorithme de hashage valide pour la fonction de "
+"dérivation de clef"
 
 #: src/libdar/crypto_sym.cpp:91 src/libdar/crypto_sym.cpp:164
 #, c-format
@@ -4313,7 +4329,7 @@ msgstr ""
 
 #: src/libdar/crypto_sym.cpp:114
 msgid "Too large value give for key derivation interation count"
-msgstr ""
+msgstr "Valeur trop grande pour l'intération de dérivation de clef"
 
 #: src/libdar/crypto_sym.cpp:125
 #, c-format
@@ -4461,6 +4477,8 @@ msgid ""
 "Filename provided by the operating system seems truncated in directory %s "
 "ignoring it: %s"
 msgstr ""
+"Le nom de fichier fourni par le système d'exploitation semble coupé au "
+"niveau du répertoire %s et sera ignoré: %s"
 
 #: src/libdar/etage.cpp:197
 #, c-format
@@ -4501,7 +4519,6 @@ msgid "LAX MODE: Using archive format \"%d\"?"
 msgstr "MODE RELAX : Suivre le format d'archive \"%d\" ?"
 
 #: src/libdar/header_version.cpp:122
-#, fuzzy
 msgid ""
 "LAX MODE: Unknown compression algorithm used, assuming data corruption "
 "occurred. Please help me, answering with one of the following words \"none"
@@ -4510,7 +4527,7 @@ msgstr ""
 "MODE RELAX : Un algorithme de compression inconnu a été utilisé, on suppose "
 "qu'une corruption des données a eu lieu. Merci de m'aider à déterminer le "
 "mode de compression qui a été utilisé en saisissant l'un des mots suivants "
-"\"aucun\", \"gzip\", \"bzip2\" ou \"lzo\" : "
+"\"aucun\", \"gzip\", \"bzip2\", \"lzo\" ou \"xz\" : "
 
 #: src/libdar/header_version.cpp:123 src/libdar/header_version.cpp:498
 #: src/libdar/crypto.cpp:42
@@ -4531,7 +4548,7 @@ msgstr "lzo"
 
 #: src/libdar/header_version.cpp:131
 msgid "xz"
-msgstr ""
+msgstr "xz"
 
 #: src/libdar/header_version.cpp:138 src/libdar/header_version.cpp:146
 #: src/libdar/header_version.cpp:157 src/libdar/header_version.cpp:175
@@ -4561,16 +4578,21 @@ msgstr ""
 #: src/libdar/header_version.cpp:266
 msgid "valid hash algoritm needed for key derivation function"
 msgstr ""
+"Un algorithme de hashage valide est requis pour la fonction de dérivation de "
+"clef"
 
 #: src/libdar/header_version.cpp:278
 msgid ""
 "please indicate the hash algoritm to use for key derivation function '1' for "
 "sha1, '5' for sha512, 'm' for md5, or 'q' to abort: "
 msgstr ""
+"Merci d'indiquer l'algorithme de hashage à utiliser pour la fonction de "
+"dérivation de clef '1' pour sha1, '5' pour sha512, 'm' pour md5 ou 'q' pour "
+"interrompre: "
 
 #: src/libdar/header_version.cpp:296
 msgid "please answer with a single character"
-msgstr ""
+msgstr "merci de répondre avec un unique caractère"
 
 #: src/libdar/header_version.cpp:328 src/libdar/header_version.cpp:330
 #: src/libdar/header_version.cpp:352 src/libdar/header_version.cpp:354
@@ -4579,41 +4601,41 @@ msgstr "Échec de la vérification de cohérence pour l'en-tête de l'archive"
 
 #: src/libdar/header_version.cpp:480
 msgid "invalid hash algorithm provided for key derivation function"
-msgstr ""
+msgstr "Algorithme de hashage invalide pour le fonction de dérivation de clef"
 
 #: src/libdar/header_version.cpp:489 src/libdar/header_version.cpp:506
 msgid "no"
 msgstr "non"
 
 #: src/libdar/header_version.cpp:510
-#, fuzzy, c-format
+#, c-format
 msgid "Archive version format               : %s"
-msgstr "Version du format de l'archive       : %s\n"
+msgstr "Version du format de l'archive       : %s"
 
 #: src/libdar/header_version.cpp:511
-#, fuzzy, c-format
+#, c-format
 msgid "Compression algorithm used           : %S"
-msgstr "Algorithme de compression utilisé     : %S\n"
+msgstr "Algorithme de compression utilisé     : %S"
 
 #: src/libdar/header_version.cpp:512
-#, fuzzy, c-format
+#, c-format
 msgid "Symmetric key encryption used        : %S"
-msgstr "Clef de chiffrement symmétrique      : %S\n"
+msgstr "Clef de chiffrement symmétrique      : %S"
 
 #: src/libdar/header_version.cpp:513
-#, fuzzy, c-format
+#, c-format
 msgid "Asymmetric key encryption used       : %S"
-msgstr "Clef de chiffrement asymmétrique     : %S\n"
+msgstr "Clef de chiffrement asymmétrique     : %S"
 
 #: src/libdar/header_version.cpp:514
-#, fuzzy, c-format
+#, c-format
 msgid "Archive is signed                    : %S"
-msgstr "Signature de l'archive               : %S\n"
+msgstr "Signature de l'archive               : %S"
 
 #: src/libdar/header_version.cpp:515
-#, fuzzy, c-format
+#, c-format
 msgid "Sequential reading marks             : %s"
-msgstr "Marques pour lecture séquentielle    : %s\n"
+msgstr "Marques pour lecture séquentielle    : %s"
 
 #: src/libdar/header_version.cpp:515
 msgid "present"
@@ -4624,30 +4646,24 @@ msgid "absent"
 msgstr "absent"
 
 #: src/libdar/header_version.cpp:516
-#, fuzzy, c-format
+#, c-format
 msgid "User comment                         : %S"
-msgstr ""
-"Commentaires de l'utilisateur  : %S\n"
-"\n"
+msgstr "Commentaires de l'utilisateur        : %S"
 
 #: src/libdar/header_version.cpp:519
-#, fuzzy, c-format
+#, c-format
 msgid "KDF iteration count                  : %S"
-msgstr ""
-"Commentaires de l'utilisateur  : %S\n"
-"\n"
+msgstr "itérations pour dérivation de clef   : %S"
 
 #: src/libdar/header_version.cpp:520
-#, fuzzy, c-format
+#, c-format
 msgid "KDF hash algorithm                   : %S"
-msgstr "Algorithme de compression utilisé     : %S\n"
+msgstr "Algorithme de dérivation de clef     : %S"
 
 #: src/libdar/header_version.cpp:522
-#, fuzzy, c-format
+#, c-format
 msgid "Salt size                            : %d byte%c"
-msgstr ""
-"Commentaires de l'utilisateur  : %S\n"
-"\n"
+msgstr "Taille du grain de sel               : %d octet%c"
 
 #: src/libdar/sparse_file.cpp:157
 msgid "Incoherent structure in data carrying sparse files: unknown mark"
@@ -4792,29 +4808,29 @@ msgstr ""
 "Voulez-vous ignorer le même type d'erreur pour les prochains fichiers ?"
 
 #: src/libdar/cat_delta_signature.cpp:100
-#, fuzzy
 msgid "CRC error met while reading delta signature: data corruption."
-msgstr "Erreur lors de la lecture de l'entrée suivante : "
+msgstr ""
+"Erreur de CRC lors de la lecture de la signature de différence binaire : "
+"Corruption de données."
 
 #: src/libdar/filesystem_restore.cpp:277
 msgid ""
 "Cannot restore a delta binary patch without a file to patch on filesystem"
 msgstr ""
+"Impossible de restaurer un batch binaire (delta patch) sans fichier à "
+"patcher dans le système de fichier"
 
 #: src/libdar/filesystem_restore.cpp:285
-#, fuzzy
 msgid ""
 "Cannot restore a inode metadata only without an existing file on filesystem"
 msgstr ""
-"Impossible de supprimer in fichier qui n'existe pas dans le système de "
-"fichier : "
+"Impossible de restaurer les métadonnées d'une inode sans une inode présente "
+"sur le système de fichier"
 
 #: src/libdar/filesystem_restore.cpp:302
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot remove non-existent file from filesystem: %S"
-msgstr ""
-"Impossible de supprimer in fichier qui n'existe pas dans le système de "
-"fichier : "
+msgstr "Impossible de supprimer un fichier qui n'existe pas : %S"
 
 #: src/libdar/filesystem_restore.cpp:307 src/libdar/filesystem_restore.cpp:684
 msgid "Restoring file's data: "
@@ -4839,24 +4855,24 @@ msgid "Restoration of FSA for %S aborted: "
 msgstr "Restauration des FSA de %S arrêtée : "
 
 #: src/libdar/filesystem_restore.cpp:393 src/libdar/filesystem_restore.cpp:552
-#, fuzzy
 msgid "Restoring linux immutable FSA for "
-msgstr "Restauration des FSA du fichier : "
+msgstr "Restauration des FSA du fichier "
 
 #: src/libdar/filesystem_restore.cpp:398
-#, fuzzy, c-format
+#, c-format
 msgid "Restoration of linux immutable FSA for %S aborted: "
-msgstr "Restauration des FSA de %S arrêtée : "
+msgstr "Restauration du FSA immutable pour %S arrêtée : "
 
 #: src/libdar/filesystem_restore.cpp:451
-#, fuzzy
 msgid "Restoring file's data using a delta patching: "
-msgstr "Restauration des données du fichier : "
+msgstr "Restauration des données du fichier à l'aide de delta patch : "
 
 #: src/libdar/filesystem_restore.cpp:462
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot restore delta diff for %S as exsiting inode is not a plain file"
-msgstr "Impossible de connaître la taill de %S: ce n'est pas un fichier plein"
+msgstr ""
+"Impossible de restaurer le patch pour %S car l'inode existante n'est un "
+"fichier normal"
 
 #: src/libdar/filesystem_restore.cpp:603
 #, c-format
@@ -4907,6 +4923,8 @@ msgstr "%S est sur le point d'être écrasé, OK ?"
 msgid ""
 "Existing file is of a different nature, cannot only restore inode metadata"
 msgstr ""
+"Impossible de restaurer les seules métadonnées car le fichier présent est de "
+"nature différente de celui restauré"
 
 #: src/libdar/filesystem_restore.cpp:719
 #, c-format
@@ -4922,7 +4940,7 @@ msgstr "les FSA existants de %S n'ont pas pu être lu ni préservé : "
 #: src/libdar/filesystem_restore.cpp:753
 #, c-format
 msgid "Removing existing immutable flag in order to restore data for %S"
-msgstr ""
+msgstr "Suppression du drapeau immutable afin de restorer les données de %S"
 
 #: src/libdar/filesystem_restore.cpp:779
 #, c-format
@@ -5055,7 +5073,7 @@ msgstr "Ouverture de l'archive %s ..."
 
 #: src/libdar/i_archive.cpp:140
 msgid "header only mode asked"
-msgstr ""
+msgstr "mode en-tête seul demandé"
 
 #: src/libdar/i_archive.cpp:153
 #, c-format
@@ -5215,12 +5233,16 @@ msgstr ""
 msgid ""
 "Cannot calculate delta signature when merging if keep compressed is asked"
 msgstr ""
+"Impossible de calculer les signatures delta lors d'une fusion s'il a été "
+"demandé de garder les fichiers compressés"
 
 #: src/libdar/i_archive.cpp:638
 msgid ""
 "To calculate delta signatures of files saved as sparse files, you need to "
 "activate sparse file detection mechanism with merging operation"
 msgstr ""
+"Afin de calculer les signature delta des fichier creux sauvés, vous devez "
+"activer la redétection des fichiers creux lors de cette opération de fusion"
 
 #: src/libdar/i_archive.cpp:871
 #, c-format
@@ -5228,6 +5250,8 @@ msgid ""
 "Archive repairing completed. WARNING! it is strongly advised to test the "
 "resulting archive before removing the damaged one"
 msgstr ""
+"Réparation d'archive terminée. ATTENTION ! Il est fortement recommandé de "
+"tester l'archive resultante avant de supprimer celle qui est abîmée"
 
 #: src/libdar/i_archive.cpp:898 src/libdar/i_archive.cpp:1305
 msgid "This archive is not exploitable, check documentation for more"
@@ -5240,61 +5264,64 @@ msgid ""
 "File ownership will not be restored du to the lack of privilege, you can "
 "disable this message my asking not to restore file ownership"
 msgstr ""
+"Le propriétaire des fichiers ne sera pas restauré faute de privilège pour ce "
+"faire. Vous pouvez supprimer ce message en demandant à ne pas restaurer ces "
+"propriétés"
 
 #: src/libdar/i_archive.cpp:961
 msgid "Error while restoring data: "
 msgstr "Erreur lors de la restauration de : \""
 
 #: src/libdar/i_archive.cpp:989
-#, fuzzy, c-format
+#, c-format
 msgid "Catalogue size in archive            : %i bytes"
-msgstr "Taille du catalogue dans l'archive   : %i octets\n"
+msgstr "Taille du catalogue dans l'archive   : %i octets"
 
 #: src/libdar/i_archive.cpp:991
-#, fuzzy, c-format
+#, c-format
 msgid "Catalogue size in archive            : N/A"
-msgstr "Taille du catalogue dans l'archive   : NC\n"
+msgstr "Taille du catalogue dans l'archive   : NC"
 
 #: src/libdar/i_archive.cpp:997
-#, fuzzy, c-format
+#, c-format
 msgid "Archive is composed of %i file(s)"
-msgstr "Archive composée de %i fichier(s)\n"
+msgstr "Archive composée de %i fichier(s)"
 
 #: src/libdar/i_archive.cpp:1001
-#, fuzzy, c-format
+#, c-format
 msgid "File size: %i bytes"
-msgstr "Taille du fichier : %i octets\n"
+msgstr "Taille du fichier : %i octets"
 
 #: src/libdar/i_archive.cpp:1010
-#, fuzzy, c-format
+#, c-format
 msgid "First file size       : %i bytes"
-msgstr "Fichier initial       : %i octets\n"
+msgstr "Fichier initial       : %i octets"
 
 #: src/libdar/i_archive.cpp:1011
-#, fuzzy, c-format
+#, c-format
 msgid "File size             : %i bytes"
-msgstr "Taille des fichiers   : %i octets\n"
+msgstr "Taille des fichiers   : %i octets"
 
 #: src/libdar/i_archive.cpp:1012
-#, fuzzy, c-format
+#, c-format
 msgid "Last file size        : %i bytes"
-msgstr "Fichier final         : %i octets\n"
+msgstr "Fichier final         : %i octets"
 
 #: src/libdar/i_archive.cpp:1013
-#, fuzzy, c-format
+#, c-format
 msgid "Archive total size is : %i bytes"
-msgstr "Taille totale         : %i octets\n"
+msgstr "Taille totale         : %i octets"
 
 #: src/libdar/i_archive.cpp:1021
-#, fuzzy, c-format
+#, c-format
 msgid "Archive size is: %i bytes"
-msgstr "Taille de l'archive : %i octets\n"
+msgstr "Taille de l'archive : %i octets"
 
 #: src/libdar/i_archive.cpp:1022
-#, fuzzy, c-format
+#, c-format
 msgid "Previous archive size does not include headers present in each slice"
 msgstr ""
-"La taille de l'archive ne tient pas compte des en-têtes de chaque tranche\n"
+"La taille de l'archive ne tient pas compte des en-têtes de chaque tranche"
 
 #: src/libdar/i_archive.cpp:1025
 #, c-format
@@ -5343,10 +5370,13 @@ msgid ""
 "Fetching EA value while listing an archive is not possible in sequential "
 "read mode"
 msgstr ""
+"La récupération d'EA lors de la lecture d'une archive n'est pas possible en "
+"mode séquentiel"
 
 #: src/libdar/i_archive.cpp:1160
 msgid "slicing focused output is not available in sequential-read mode"
 msgstr ""
+"L'affichage focalisé sur les tranches est impossible en lecture séquentielle"
 
 #: src/libdar/i_archive.cpp:1168
 #, c-format
@@ -5369,11 +5399,11 @@ msgstr ""
 #: src/libdar/i_archive.cpp:1243
 #, c-format
 msgid "Exception caught from archive_listing_callback execution: %s"
-msgstr ""
+msgstr "Exception attrapée depuis l'execution de archive_listing_callback : %s"
 
 #: src/libdar/i_archive.cpp:1248
 msgid "Exception caught from archive_listing_callback execution"
-msgstr ""
+msgstr "Exception attrapée depuis l'execution de archive_listing_callback"
 
 #: src/libdar/i_archive.cpp:1277
 msgid "Error while listing archive contents: "
@@ -5405,6 +5435,8 @@ msgid ""
 "Isolation with delta signature is not possible on a just created archive (on-"
 "fly isolation)"
 msgstr ""
+"L'isolation avec signature delta est impossible en une seule opération "
+"(isolation à la volée)"
 
 #: src/libdar/i_archive.cpp:1948
 msgid ""
@@ -5419,6 +5451,8 @@ msgid ""
 "Cannot sequentially read an archive of reference when delta signature or "
 "delta patch is requested"
 msgstr ""
+"Impossible de lire séquentiellement une archive de référence quand des "
+"signature delta ou des patch sont demandés"
 
 #: src/libdar/i_archive.cpp:2011
 #, c-format
@@ -5456,9 +5490,8 @@ msgid "Processing files for merging..."
 msgstr "Traitement des fichier pour la fusion ..."
 
 #: src/libdar/i_archive.cpp:2405
-#, fuzzy
 msgid "Processing files for fixing..."
-msgstr "Traitement des fichier pour la fusion ..."
+msgstr "Traitement des fichier pour la réparation ..."
 
 #: src/libdar/i_archive.cpp:2486
 msgid ""
@@ -5510,9 +5543,8 @@ msgid "Error while fetching archive properties: "
 msgstr "Erreur lors de la recherche des propriétés de l'archive : "
 
 #: src/libdar/i_archive.cpp:2672
-#, fuzzy
 msgid "Sorry, file size is unknown at this step of the program."
-msgstr "Désolé, la taille du fichier est inconnue à cette étape du programme\n"
+msgstr "Désolé, la taille du fichier est inconnue à cette étape du programme"
 
 #: src/libdar/i_archive.cpp:2771
 #, c-format
@@ -5543,12 +5575,12 @@ msgstr "algorithme de compression inconnue : %S"
 #: src/libdar/mask.cpp:69
 #, c-format
 msgid "%Sglob expression: %S [%S]"
-msgstr ""
+msgstr "%Sexpression glob: %S [%S]"
 
 #: src/libdar/mask.cpp:110
 #, c-format
 msgid "%Sregular expression: %S [%S]"
-msgstr ""
+msgstr "%Sexpression régulière: %S [%S]"
 
 #: src/libdar/mask.cpp:160
 #, c-format
@@ -5557,29 +5589,32 @@ msgid ""
 "%S\n"
 "%S)"
 msgstr ""
+"%Snon(\n"
+"%S\n"
+"%S)"
 
 #: src/libdar/mask.cpp:279
 #, c-format
 msgid "%SIs subdir of: %S [%S]"
-msgstr ""
+msgstr "%SSous-répertoire de : %S [%S]"
 
 #: src/libdar/mask.cpp:297
 #, c-format
 msgid "%SPath is: %S [%S]"
-msgstr ""
+msgstr "%SLe chemin est : %S [%S]"
 
 #: src/libdar/mask.cpp:307
 #, c-format
-msgid "%SPath leeds to: %S [%S]"
-msgstr ""
+msgid "%SPath leads to: %S [%S]"
+msgstr "%SLe chemin mène à : %S [%S]"
 
 #: src/libdar/mask.cpp:315
 msgid "case sensitive"
-msgstr ""
+msgstr "sensible à la casse"
 
 #: src/libdar/mask.cpp:315
 msgid "case in-sensitive"
-msgstr ""
+msgstr "insensible à la casse"
 
 #: src/libdar/crypto.cpp:44
 msgid "scrambling (weak encryption)"
@@ -5599,21 +5634,19 @@ msgstr "[Sauvé]"
 
 #: src/libdar/list_entry.cpp:54
 msgid "[Inode]"
-msgstr ""
+msgstr "[Inode]"
 
 #: src/libdar/list_entry.cpp:56 src/libdar/list_entry.cpp:73
 msgid "[InRef]"
 msgstr "[EnRef]"
 
 #: src/libdar/mycurl_easyhandle_node.cpp:39
-#, fuzzy
 msgid "Error met while creating a libcurl handle"
-msgstr "Erreur lors de la cration du fichier de hashage : "
+msgstr "Erreur lors de la cration d'un objet libcurl"
 
 #: src/libdar/mycurl_easyhandle_node.cpp:51
-#, fuzzy
 msgid "Error met while duplicating libcurl handle"
-msgstr "Erreur lors de la cration du fichier de hashage : "
+msgstr "Erreur lors de la duplication d'un objet libcurl"
 
 #: src/libdar/path.cpp:65 src/libdar/path.cpp:87
 msgid "Empty string is not a valid path"
@@ -5735,6 +5768,8 @@ msgid ""
 "line exceeding the maximum of %d characters in listing file %S, aborting. "
 "Concerned line starts with: %s"
 msgstr ""
+"une ligne excède le maximum de %d caractères lors du listing du fichier %S, "
+"Abandon de l'opération. La ligne concernée commence par : %s"
 
 #: src/libdar/mask_list.cpp:180
 msgid ""
@@ -5761,7 +5796,7 @@ msgid "Too much line in file %S (integer overflow)"
 msgstr "Trop de lignes dans le fichier %S (dépassement d'entiers)"
 
 #: src/libdar/mask_list.cpp:223
-#, fuzzy, c-format
+#, c-format
 msgid "Error met while opening %S: "
 msgstr "Erreur d'ouverture de %S : "
 
@@ -5815,14 +5850,15 @@ msgid "File not found in database: "
 msgstr "Fichier non trouvé dans la base"
 
 #: src/libdar/i_database.cpp:547
-#, fuzzy
 msgid ""
 "File found in database but impossible to restore (only found \"unchanged\" "
 "in differential backups, or delta patch without reference to base it on in "
 "any previous archive of the base): "
 msgstr ""
 "Fichier trouvé dans la base mais impossible à restaurer (n'est présent que "
-"comme \"inchangé\" dans des archives différentielles)"
+"comme \"inchangé\" dans des archives différentielles ou bien comme \"delta "
+"patch\" mais sans la référence sur laquelle le patch s'applique présente "
+"dans une archive de la base):"
 
 #: src/libdar/i_database.cpp:566
 msgid ""
@@ -5949,9 +5985,9 @@ msgstr ""
 "vous l'avez."
 
 #: src/libdar/sar.cpp:694
-#, fuzzy, c-format
+#, c-format
 msgid "Failed reading slice %S: "
-msgstr "Echec de lecture du CRC pour les Attributs Etendus : "
+msgstr "Echec de lecture de la tranche %S : "
 
 #: src/libdar/sar.cpp:737
 #, c-format
@@ -6142,9 +6178,9 @@ msgstr ""
 
 #: src/libdar/sar.cpp:1061 src/libdar/sar.cpp:1132 src/libdar/sar.cpp:1143
 #: src/libdar/trivial_sar.cpp:224 src/libdar/trivial_sar.cpp:242
-#, fuzzy, c-format
+#, c-format
 msgid "Failed creating slice %S: "
-msgstr "Échec de création d'un contexte GPGME : "
+msgstr "Échec de création d'une tranche %S: "
 
 #: src/libdar/sar.cpp:1082
 msgid "file exists, and DONT_ERASE option is set."
@@ -6257,9 +6293,8 @@ msgid "top of directory hierarchy"
 msgstr "sommet de hiérarchie de répertoires"
 
 #: src/libdar/generic_rsync.cpp:209
-#, fuzzy
 msgid "Error met building the rsync hash table: "
-msgstr "Erreur lors de la cration du fichier de hashage : "
+msgstr "Erreur lors de la construction de la table de hashage rsync: "
 
 #: src/libdar/generic_rsync.cpp:487
 msgid "Error met while feeding data to librsync: "
@@ -6599,90 +6634,89 @@ msgstr ""
 #: src/libdar/i_entrepot_libcurl.cpp:69
 #, c-format
 msgid "protocol %S is not supported by libcurl, aborting"
-msgstr ""
+msgstr "le protocole %S n'est pas supporté par libcurl, arrêt de l'opération"
 
 #: src/libdar/i_entrepot_libcurl.cpp:85
-#, fuzzy, c-format
+#, c-format
 msgid "Error met while setting verbosity on handle: %s"
-msgstr ""
-"Erreur lors de la création d'une référence pour générer un somme de "
-"contrôle : %s/%s"
+msgstr "Erreur lors l'activation de la verbosité d'un objet : %s"
 
 #: src/libdar/i_entrepot_libcurl.cpp:125
-#, fuzzy, c-format
+#, c-format
 msgid "Error met while preparing directory listing: %s"
-msgstr "Erreur lors de la récupération de l'heure courante : %S"
+msgstr "Erreur lors de préparation d'un répertoire pour lecture : %s\""
 
 #: src/libdar/i_entrepot_libcurl.cpp:135
-#, fuzzy, c-format
+#, c-format
 msgid "Error met while listing FTP/SFTP directory %s"
-msgstr "Erreur lors de la lecture de l'entrée suivante : "
+msgstr "Erreur lors de lecture du répertoire FTP/SFTP %s"
 
 #: src/libdar/i_entrepot_libcurl.cpp:312 src/libdar/i_entrepot_libcurl.cpp:317
-#, fuzzy, c-format
+#, c-format
 msgid "Error met while setting up connection for file %S removal: %s"
 msgstr ""
-"Erreur lors de la lecture de la ligne\n"
-"\t%S\n"
-"  à partir du fichier %S : %S"
+"Erreur lors de l'établissement de la connexion pour la suppression du "
+"fichier %S : %s"
 
 #: src/libdar/i_entrepot_libcurl.cpp:325
-#, fuzzy, c-format
+#, c-format
 msgid "Error met while removing file %S"
-msgstr "Erreur de suppression de %s : %s"
+msgstr "Erreur lors de la suppression du fichier %S"
 
 #: src/libdar/i_entrepot_libcurl.cpp:332
-#, fuzzy, c-format
+#, c-format
 msgid "Error met while removing file %S: %s"
-msgstr "Erreur de suppression de %s : %s"
+msgstr "Erreur lors de la suppression du fichier %S : %s"
 
 #: src/libdar/i_entrepot_libcurl.cpp:391
-#, fuzzy, c-format
+#, c-format
 msgid "Failed assigning URL to libcurl: %s"
-msgstr ""
-"Erreur lors de l'assignation d'une clef à une référence de libgcrypt : %s/%s"
+msgstr "Impossible d'assigner une URL à libcurl : %s"
 
 #: src/libdar/i_entrepot_libcurl.cpp:421
-#, fuzzy, c-format
+#, c-format
 msgid "Error met while setting known_hosts file: %s"
-msgstr "Erreur lors de la cration du fichier de hashage : "
+msgstr "Erreur lors de la désignation du fichier known_file : %s"
 
 #: src/libdar/i_entrepot_libcurl.cpp:432
-#, fuzzy, c-format
-msgid "Error met while assigning public key fike: %s"
-msgstr ""
-"Erreur lors de l'assignation d'une clef à une référence de libgcrypt : %s/%s"
+#, c-format
+msgid "Error met while assigning public key file: %s"
+msgstr "Erreur lors de la désignation du fichier de clef publique : %s"
 
 #: src/libdar/i_entrepot_libcurl.cpp:440
-#, fuzzy, c-format
-msgid "Error met while assigning private key fike: %s"
-msgstr "Erreur lors de la cration du fichier de hashage : "
+#, c-format
+msgid "Error met while assigning private key file: %s"
+msgstr "Erreur lors de la désignation du fichier de clef privée : %s"
 
 #: src/libdar/i_entrepot_libcurl.cpp:448
-#, fuzzy, c-format
+#, c-format
 msgid "Error met while assigning sftp authentication methods: %s"
-msgstr "Erreur lors du traitement de l'opération : "
+msgstr ""
+"Erreur lors de l'assignation de la méthode d'authentification sftp : %s"
 
 #: src/libdar/i_entrepot_libcurl.cpp:465
-#, fuzzy, c-format
+#, c-format
 msgid "Error met while passing username to libcurl: %s"
-msgstr "Erreur lors du traitement de l'opération : "
+msgstr "Erreur lors du passage du nom d'utilisateur à libcurl : %s"
 
 #: src/libdar/i_entrepot_libcurl.cpp:471
 #, c-format
 msgid ""
 "Error met while asking libcurl to consider ~/.netrc for authentication: %s"
 msgstr ""
+"Erreur lors de la demande à libcurl de considérer ~/.netrc pour "
+"l'authentification : %s"
 
 #: src/libdar/i_entrepot_libcurl.cpp:478
 #, c-format
 msgid "Please provide the password for login %S at host %S: "
-msgstr ""
+msgstr "Merci de fournir le mot de passe pour le login %S sur l'hôte %S : "
 
 #: src/libdar/i_entrepot_libcurl.cpp:493
-#, fuzzy, c-format
+#, c-format
 msgid "Error met while setting libcurl authentication: %s"
-msgstr "Erreur lors de la configuration des droits d'accès : %s"
+msgstr ""
+"Erreur lors de la configuration de l'authentification pour libcurl : %s"
 
 #: src/libdar/database_header.cpp:102
 msgid ""
@@ -6709,7 +6743,7 @@ msgstr "Erreur lors de la lecture de la base %S : "
 #: src/libdar/archive_aux.cpp:134
 #, c-format
 msgid "unknown hash algorithm corresponding to char `%c'"
-msgstr ""
+msgstr "le caractère '%c' ne correspond à aucun algorithme de hashage connu"
 
 #: src/libdar/crypto_asym.cpp:86 src/libdar/crypto_asym.cpp:139
 #: src/libdar/crypto_asym.cpp:175 src/libdar/crypto_asym.cpp:233
@@ -6900,7 +6934,7 @@ msgstr " Prêt à continuer ?"
 
 #: src/libdar/fichier_libcurl.hpp:100
 msgid "user/group ownership not supported for this repository"
-msgstr ""
+msgstr "utilisateur/groupe non supporté pour ce dépôt"
 
 #: src/libdar/header.cpp:103 src/libdar/header.cpp:111
 #: src/libdar/header.cpp:114 src/libdar/header.cpp:116
@@ -6976,10 +7010,10 @@ msgid "Error while activating libgcrypt's memory guard: %s/%s"
 msgstr "Erreur lors de l'activation du garde de mémoire de libgcrypt : %s/%s"
 
 #: src/libdar/get_version.cpp:153 src/libdar/get_version.cpp:171
-#, fuzzy, c-format
+#, c-format
 msgid "Too old version for libgcrypt, minimum required version is %s"
 msgstr ""
-"Version trop ancienne pour libgcrypt, la version minimale requise est %s\n"
+"Version trop ancienne pour libgcrypt, la version minimale requise est %s"
 
 #: src/libdar/get_version.cpp:162
 #, c-format
@@ -7006,9 +7040,9 @@ msgstr "le moteur GPGME n'est pas disponible: %s"
 
 #: src/libdar/get_version.cpp:193 src/libdar/get_version.cpp:197
 #: src/libdar/get_version.cpp:199
-#, fuzzy, c-format
+#, c-format
 msgid "libcurl initialization failed: %s"
-msgstr "Échec de l'allocation mémoire : %s"
+msgstr "Echec d'initialisation de libcurl : %s"
 
 #: src/libdar/slice_layout.cpp:52
 msgid "Missing data while reading slice_layout object"
@@ -7085,16 +7119,17 @@ msgstr ""
 #: src/libdar/tools.hpp:697
 #, c-format
 msgid "Found negative date (%s) for inode %s ."
-msgstr ""
+msgstr "Date négative rencontrée (%s) pour l'inode %s ."
 
 #: src/libdar/tools.hpp:701
 #, c-format
 msgid "%S Can we read it as if it was zero (1st January 1970 at 00:00:00 UTC)?"
 msgstr ""
+"%S Pouvons-nous la considérer nulle (1er janvier 1970 à 00:00:00 UTC) ?"
 
 #: src/libdar/tools.hpp:704
 msgid "Considering date as if it was zero (Jan 1970)"
-msgstr ""
+msgstr "On considère la date comme nulle (Janvier 1970<)"
 
 #: src/libdar/capabilities.cpp:114
 #, c-format
@@ -7102,9 +7137,9 @@ msgid "Error met while checking for capability %S: %s"
 msgstr "Erreur lors de la vérifiation de la capacité %S : %s"
 
 #: src/libdar/capabilities.cpp:144 src/libdar/capabilities.cpp:151
-#, fuzzy, c-format
+#, c-format
 msgid "Error met while setting capability %S: %s"
-msgstr "Erreur lors de la vérifiation de la capacité %S : %s"
+msgstr "Erreur lors de l'assignation de la capacité %S : %s"
 
 #: src/libdar/cat_mirage.cpp:141
 msgid "Incoherent catalogue structure: hard linked inode's data not found"
@@ -7132,107 +7167,101 @@ msgstr ""
 "en dur"
 
 #: src/libdar/entree_stats.cpp:140
-#, fuzzy, c-format
+#, c-format
 msgid "CATALOGUE CONTENTS :"
-msgstr ""
-"\n"
-"CONTENU DU CATALOGUE :\n"
-"\n"
+msgstr "CONTENU DU CATALOGUE :"
 
 #: src/libdar/entree_stats.cpp:142
-#, fuzzy, c-format
+#, c-format
 msgid "total number of inode : %i"
-msgstr "nombre total d'inode  : %i\n"
+msgstr "nombre total d'inode  : %i"
 
 #: src/libdar/entree_stats.cpp:143
-#, fuzzy, c-format
+#, c-format
 msgid "fully saved           : %i"
-msgstr "inode sauvegardée     : %i\n"
+msgstr "inode sauvegardée     : %i"
 
 #: src/libdar/entree_stats.cpp:144
-#, fuzzy, c-format
+#, c-format
 msgid "binay delta patch     : %i"
-msgstr ""
-"\n"
-"chemin de dar : %S\n"
+msgstr "fichiers patchés      : %i"
 
 #: src/libdar/entree_stats.cpp:145
 #, c-format
 msgid "inode metadata only   : %i"
-msgstr ""
+msgstr "métadonnée seulement  : %i"
 
 #: src/libdar/entree_stats.cpp:146
-#, fuzzy, c-format
+#, c-format
 msgid "distribution of inode(s)"
-msgstr "répartition des inodes\n"
+msgstr "répartition des inodes"
 
 #: src/libdar/entree_stats.cpp:147
-#, fuzzy, c-format
+#, c-format
 msgid " - directories        : %i"
-msgstr " - répertoires        : %i\n"
+msgstr " - répertoires        : %i"
 
 #: src/libdar/entree_stats.cpp:148
-#, fuzzy, c-format
+#, c-format
 msgid " - plain files        : %i"
-msgstr " - fichiers normaux   : %i\n"
+msgstr " - fichiers normaux   : %i"
 
 #: src/libdar/entree_stats.cpp:149
-#, fuzzy, c-format
+#, c-format
 msgid " - symbolic links     : %i"
-msgstr " - liens symboliques  : %i\n"
+msgstr " - liens symboliques  : %i"
 
 #: src/libdar/entree_stats.cpp:150
-#, fuzzy, c-format
+#, c-format
 msgid " - named pipes        : %i"
-msgstr " - tubes nommés       : %i\n"
+msgstr " - tubes nommés       : %i"
 
 #: src/libdar/entree_stats.cpp:151
-#, fuzzy, c-format
+#, c-format
 msgid " - unix sockets       : %i"
-msgstr " - prises unix        : %i\n"
+msgstr " - prises unix        : %i"
 
 #: src/libdar/entree_stats.cpp:152
-#, fuzzy, c-format
+#, c-format
 msgid " - character devices  : %i"
-msgstr " - fichiers spéciaux char : %i\n"
+msgstr " - fichiers spéciaux char : %i"
 
 #: src/libdar/entree_stats.cpp:153
-#, fuzzy, c-format
+#, c-format
 msgid " - block devices      : %i"
-msgstr " - fichiers spéciaux bloc : %i\n"
+msgstr " - fichiers spéciaux bloc : %i"
 
 #: src/libdar/entree_stats.cpp:154
-#, fuzzy, c-format
+#, c-format
 msgid " - Door entries       : %i"
-msgstr " - entrées Door       : %i\n"
+msgstr " - entrées Portes (Door)  : %i"
 
 #: src/libdar/entree_stats.cpp:155
-#, fuzzy, c-format
+#, c-format
 msgid "hard links information"
-msgstr "information sur les liens durs\n"
+msgstr "information sur les liens durs"
 
 #: src/libdar/entree_stats.cpp:156
-#, fuzzy, c-format
+#, c-format
 msgid " - number of inode with hard link           : %i"
-msgstr " - nombre d'inode ayant des liens durs      : %i\n"
+msgstr " - nombre d'inode ayant des liens durs      : %i"
 
 #: src/libdar/entree_stats.cpp:157
-#, fuzzy, c-format
+#, c-format
 msgid " - number of reference to hard linked inodes: %i"
-msgstr " - nombre de référence à des inodes ayant des liens durs  : %i\n"
+msgstr " - nombre de référence à des inodes ayant des liens durs  : %i"
 
 #: src/libdar/entree_stats.cpp:158
-#, fuzzy, c-format
+#, c-format
 msgid "destroyed entries information"
-msgstr "information sur les entrées supprimées\n"
+msgstr "information sur les entrées supprimées"
 
 #: src/libdar/entree_stats.cpp:159
-#, fuzzy, c-format
+#, c-format
 msgid "   %i file(s) have been record as destroyed since backup of reference"
 msgstr ""
 "   %i fichier(s) ont été enregistré(s) comme détruit(s) depuis la sauvegarde "
-"de référence\n"
-"\n"
+"de référence"
 
 #: src/libdar/filtre.cpp:256 src/libdar/filtre.cpp:627
 #: src/libdar/filtre.cpp:1217 src/libdar/filtre.cpp:1397
@@ -7554,6 +7583,8 @@ msgid ""
 "Need to activate sparse file detection in order to calculate delta signature "
 "for sparse file %S"
 msgstr ""
+"Il est nécessaire d'activer la détection des fichiers creux afin de calculer "
+"la signature delta pour le fichier creux %S"
 
 #: src/libdar/filtre.cpp:2835
 msgid "Adding Hard link to archive: "
@@ -7564,38 +7595,38 @@ msgid "failed reading CRC from file: "
 msgstr "Echec de lecture du CRC depuis le fichier : "
 
 #: src/libdar/filtre.cpp:2942
-#, fuzzy
 msgid "Failed reading CRC for EA and FSA: "
-msgstr "Echec de lecture du CRC pour les Attributs Etendus : "
+msgstr "Echec de lecture du CRC pour les EA et FSA : "
 
 #: src/libdar/filtre.cpp:2953
 msgid "Error met while reading next entry: "
 msgstr "Erreur lors de la lecture de l'entrée suivante : "
 
 #: src/libdar/filtre.cpp:3063
-#, fuzzy, c-format
+#, c-format
 msgid "Adding only inode metadata to archive: %S"
-msgstr "Ajout du fichier à l'archive : "
+msgstr "Enregistrement uniquement des métadonnées dans l'archive : %S"
 
 #: src/libdar/filtre.cpp:3075
 msgid "Resaving file without compression: "
 msgstr "Sauve à nouveau mais sans compression: "
 
 #: src/libdar/filtre.cpp:3079
-#, fuzzy
 msgid "Delta saving file to archive: "
-msgstr "Ajout du fichier à l'archive : "
+msgstr "Sauvegarde sous forme de batch binaire: "
 
 #: src/libdar/filtre.cpp:3083
-#, fuzzy, c-format
+#, c-format
 msgid "Adding %S to archive: %S"
-msgstr "Ajout du fichier à l'archive : "
+msgstr "Ajout de %S à l'archive : %S"
 
 #: src/libdar/filtre.cpp:3223
 #, c-format
 msgid ""
 "Failed reading data CRC for %S, file may be damaged and will be marked dirty"
 msgstr ""
+"Echec de lecture du CRC de données pour %S, le fichier est probablement "
+"abîmé et sera marqué comme sale"
 
 #: src/libdar/filtre.cpp:3243
 #, c-format
@@ -7603,6 +7634,9 @@ msgid ""
 "Failed setting storage size to zero for this file with missing data CRC, CRC "
 "error will be reported for that file while reading the repaired archive"
 msgstr ""
+"Impossible d'enregistrer une taille de stockage nulle pour ce fichier sans "
+"CRC, une erreur de CRC sera signalée pour ce fichier lors de la lecture de "
+"l'archive réparée"
 
 #: src/libdar/filtre.cpp:3280
 msgid "Copied data does not match CRC"
@@ -7653,7 +7687,7 @@ msgstr ""
 
 #: src/libdar/filtre.cpp:3540
 msgid "Dumping delta signature structure for saved file: "
-msgstr ""
+msgstr "Enregistrement de la signature delta pour le fichier : "
 
 #: src/libdar/filtre.cpp:3686
 msgid "Saving Extended Attributes for "
@@ -7665,6 +7699,8 @@ msgid ""
 "Computed EA CRC for file %S differs from what was stored in the archive, "
 "this file's EA may have been corrupted"
 msgstr ""
+"Le CRC calculé pour sur EA du fichier %S diffère de celui stocké dans "
+"l'archive, les EA de ce fichier sont probablement corrompus"
 
 #: src/libdar/filtre.cpp:3768
 msgid "Error saving Extended Attributes for "
@@ -7675,6 +7711,8 @@ msgid ""
 "be advised that a CRC error will be reported for the EA of that file while "
 "sequentially reading the repaired archive"
 msgstr ""
+"Nota bene : une erreur de CRC sera signalée pour les EA de ce fichier lors "
+"d'une lecture séquentielle de l'archive réparée"
 
 #: src/libdar/filtre.cpp:3807
 msgid "Saving Filesystem Specific Attributes for "
@@ -7687,6 +7725,8 @@ msgid ""
 "Computed FSA CRC for file %S differs from what was stored in the archive, "
 "this file's EA may have been corrupted"
 msgstr ""
+"Le CRC calculé sur les FSA du fichier %S diffère de celui stocké dans "
+"l'archive, les FSA de ce fichier sont probablement corrompus"
 
 #: src/libdar/filtre.cpp:3882
 msgid "Error saving Filesystem Specific Attributes for "
@@ -7697,16 +7737,16 @@ msgid ""
 "be advised that a CRC error will be reported for the FSA of that file while "
 "sequentially reading the repaired archive"
 msgstr ""
+"Nota bene : une erreur de CRC sera signalée pour les FSA de ce fichier lors "
+"d'une lecture séquentielle de l'archive réparée"
 
 #: src/libdar/filtre.cpp:4442
-#, fuzzy
 msgid "Copying delta signature structure from the archive of reference: "
-msgstr "Traitement de la (première) archive de référence :"
+msgstr "Copie des signature delta depuis l'archive de référence : "
 
 #: src/libdar/filtre.cpp:4479
-#, fuzzy
 msgid "Calculating delta signature from filesystem: "
-msgstr "Calcul de la signature du hashage du catalogue ..."
+msgstr "Calcul de signature delta à partir du système de fichiers : "
 
 #: src/libdar/filtre.cpp:4538
 #, c-format
@@ -7714,6 +7754,8 @@ msgid ""
 "Furtive read mode requires either root permission and FOWNER capability, "
 "falling back to normal filesystem read"
 msgstr ""
+"Le mode de lecture furtive requièrt soit les droits root soit la capacité "
+"FOWNER, retour à une un mode lecture normal"
 
 #: src/libdar/cat_detruit.cpp:46
 msgid "missing data to build"
@@ -7800,18 +7842,19 @@ msgid ""
 "File the patch is about to be applied to is not the expected one, aborting "
 "the patch operation"
 msgstr ""
+"Le fichier sur lequel le patch est sur le point d'être appliqué ne "
+"correspond pas à celui attendu, Abandon de l'opération"
 
 #: src/libdar/filesystem_tools.cpp:595
 msgid "Patch data does not match its CRC, archive corruption took place"
-msgstr ""
+msgstr "Le patch ne correspond pas à son CRC, l'archive est corrompue"
 
 #: src/libdar/filesystem_tools.cpp:626
-#, fuzzy
 msgid "Error met while checking the resulting patched file: "
-msgstr "Erreur lors de la cration du fichier de hashage : "
+msgstr ""
+"Erreur lors du contrôle du fichier résultant de l'application du patch : "
 
 #: src/libdar/filesystem_tools.cpp:753
-#, fuzzy
 msgid "Copied data does not match expected CRC"
 msgstr "Les données copiées ne correspondent pas au CRC"
 
@@ -7841,15 +7884,15 @@ msgstr "lecture et écriture"
 
 #: src/libdar/mask.hpp:118
 msgid "TRUE"
-msgstr ""
+msgstr "VRAI"
 
 #: src/libdar/mask.hpp:118
 msgid "FALSE"
-msgstr ""
+msgstr "FAUX"
 
 #: src/libdar/mask.hpp:309
 msgid "AND"
-msgstr ""
+msgstr "ET"
 
 #: src/libdar/mask.hpp:342
 msgid "No mask in the list of mask to operate on"
@@ -7857,7 +7900,7 @@ msgstr "Aucun masque sur lequel opérer dans la liste de masque"
 
 #: src/libdar/mask.hpp:372
 msgid "OR"
-msgstr ""
+msgstr "OU"
 
 #: src/libdar/mask.hpp:382
 msgid "No mask to operate on in the list of mask"
@@ -7971,12 +8014,11 @@ msgstr ""
 
 #: src/libdar/cat_file.cpp:1038
 msgid "can't find mark for delta signature"
-msgstr ""
+msgstr "Marque pour signature delta introuvable"
 
 #: src/libdar/cat_file.cpp:1050
-#, fuzzy
 msgid "Error while retrieving delta signature from the archive: "
-msgstr "Erreur lors de la lecture de la réponse sur le terminal : "
+msgstr "Erreur lors de la récupération de signature delta depuis l'archive : "
 
 #: src/libdar/cat_file.cpp:1144
 #, c-format
@@ -8005,23 +8047,23 @@ msgstr ""
 
 #: src/libdar/cat_file.cpp:1263
 msgid "Delta signature do not match"
-msgstr ""
+msgstr "Les signatures delta ne correspondent pas"
 
 #: src/libdar/cat_file.cpp:1299
-#, fuzzy, c-format
+#, c-format
 msgid "Delta signature do not have the same size: %i <--> %i"
-msgstr "tailles différentes : %i <--> %i"
+msgstr "tailles différentes des signatures delta : %i <--> %i"
 
+#
 #: src/libdar/cat_file.cpp:1301
 msgid "Delta signature have the same size but do not match"
 msgstr ""
+"Les signatures delta ont bien la même taille mais leurs contenus ne "
+"correspondent pas"
 
 #: src/libdar/cat_file.cpp:1346
-#, fuzzy
 msgid "CRC difference concerning file's data"
-msgstr ""
-"Difference de CRC concernant les données du fichier (comparaison depuis un "
-"catalogue isolé)"
+msgstr "Difference de CRC pour les données du fichier"
 
 #: src/libdar/terminateur.cpp:133
 msgid "Badly formatted terminator, cannot extract catalogue location: "
@@ -8036,11 +8078,9 @@ msgstr ""
 "label interne du jeu de données"
 
 #: src/libdar/escape_catalogue.cpp:99
-#, fuzzy
 msgid "Could not find tape mark for the internal catalogue"
 msgstr ""
-"Impossible de trouver la séquence d'échappement pour le label interne du jeu "
-"de données"
+"Impossible de trouver la séquence d'échappement pour le catalogue interne"
 
 #: src/libdar/escape_catalogue.cpp:488
 msgid ""
@@ -8180,6 +8220,7 @@ msgstr "%S est sur le point d'être écrasé, on continue ?"
 msgid ""
 "Directory component in %S does not exist or is a dangling symbolic link: "
 msgstr ""
+"Le répertoire %S n'existe pas ou est un lien symbolic pointant nulle part"
 
 #: src/libdar/trivial_sar.cpp:510
 msgid "This archive has slices and is not possible to read from a pipe"
@@ -8294,7 +8335,10 @@ msgstr "inode Porte"
 
 #: src/check/all_features.cpp:54
 msgid "-"
-msgstr ""
+msgstr "-"
+
+#~ msgid "aborting"
+#~ msgstr "abandon"
 
 #~ msgid ""
 #~ "Using the slice layout of the archive of reference recorded at the time "
