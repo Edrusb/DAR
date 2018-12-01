@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: DAR 2.5.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2018-11-24 21:11+0100\n"
+"POT-Creation-Date: 2018-12-01 11:30+0100\n"
 "PO-Revision-Date: 2018-11-24 21:07+0100\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -4836,7 +4836,7 @@ msgstr "Impossible de supprimer un fichier qui n'existe pas : %S"
 msgid "Restoring file's data: "
 msgstr "Restauration des données du fichier : "
 
-#: src/libdar/filesystem_restore.cpp:324 src/libdar/filesystem_restore.cpp:896
+#: src/libdar/filesystem_restore.cpp:324 src/libdar/filesystem_restore.cpp:903
 msgid "Restoring file's EA: "
 msgstr "Restauration des Attributs Étendus du fichier : "
 
@@ -4845,7 +4845,7 @@ msgstr "Restauration des Attributs Étendus du fichier : "
 msgid "Restoration of EA for %S aborted: "
 msgstr "Restauration des EA de %S arrêtée : "
 
-#: src/libdar/filesystem_restore.cpp:345 src/libdar/filesystem_restore.cpp:1039
+#: src/libdar/filesystem_restore.cpp:345 src/libdar/filesystem_restore.cpp:1053
 msgid "Restoring file's FSA: "
 msgstr "Restauration des FSA du fichier : "
 
@@ -4974,12 +4974,12 @@ msgstr ""
 "%S : La politique d'écrasement (Données) reste non définie pour ce fichier, "
 "impossible de savoir si l'écrasement est autorisé ou pas !"
 
-#: src/libdar/filesystem_restore.cpp:875
+#: src/libdar/filesystem_restore.cpp:882
 #, c-format
 msgid "EA for %S are about to be overwritten, OK?"
 msgstr "Des Attributs Étendus de %S sont sur le point d'être écrasés, OK ?"
 
-#: src/libdar/filesystem_restore.cpp:890
+#: src/libdar/filesystem_restore.cpp:897
 #, c-format
 msgid ""
 "EA for %S have not been overwritten because this file is a hard link "
@@ -4988,12 +4988,12 @@ msgstr ""
 "Les Attributs Étendus pour %S n'ont pas été écrasés à car ce fichier est un "
 "lien dur pointant sur une inode déjà restaurée"
 
-#: src/libdar/filesystem_restore.cpp:910
+#: src/libdar/filesystem_restore.cpp:917
 #, c-format
 msgid "EA for %S are about to be removed, OK?"
 msgstr "Les Attributs Étendus de %S sont sur le point d'être supprimés, OK ?"
 
-#: src/libdar/filesystem_restore.cpp:921
+#: src/libdar/filesystem_restore.cpp:928
 #, c-format
 msgid ""
 "EA for %S have not been cleared as requested by the overwriting policy "
@@ -5003,17 +5003,17 @@ msgstr ""
 "politique d'écrasement car ce fichier est un lien dur pointant sur une inode "
 "déjà restaurée"
 
-#: src/libdar/filesystem_restore.cpp:927
+#: src/libdar/filesystem_restore.cpp:934
 msgid "Clearing file's EA (requested by overwriting policy): "
 msgstr ""
 "Effacement des attributs étendus (requis par la politique d'écrasement) : "
 
-#: src/libdar/filesystem_restore.cpp:940
+#: src/libdar/filesystem_restore.cpp:949
 #, c-format
 msgid "EA for %S are about to be merged, OK?"
 msgstr "Les Attributs Étendus de %S sont sur le point d'être fusionnés, OK ?"
 
-#: src/libdar/filesystem_restore.cpp:966
+#: src/libdar/filesystem_restore.cpp:980
 #, c-format
 msgid ""
 "%S: Overwriting policy (EA) is undefined for that file, do not know whether "
@@ -5022,13 +5022,13 @@ msgstr ""
 "%S : La politique d'écrasement (Attributs Étendus) reste non définie pour ce "
 "fichier, impossible de savoir si l'écrasement est autorisé ou pas !"
 
-#: src/libdar/filesystem_restore.cpp:1018
-#: src/libdar/filesystem_restore.cpp:1064
+#: src/libdar/filesystem_restore.cpp:1032
+#: src/libdar/filesystem_restore.cpp:1078
 #, c-format
 msgid "FSA for %S are about to be overwritten, OK?"
 msgstr "Les FSA de %S sont sur le point d'être écrasés, OK ?"
 
-#: src/libdar/filesystem_restore.cpp:1033
+#: src/libdar/filesystem_restore.cpp:1047
 #, c-format
 msgid ""
 "FSA for %S have not been overwritten because this file is a hard link "
@@ -5037,7 +5037,7 @@ msgstr ""
 "Les FSA de %S n'ont pas été écrasés car ce fichier est un lien dur pointant "
 "sur une inode déjà restaurée"
 
-#: src/libdar/filesystem_restore.cpp:1090
+#: src/libdar/filesystem_restore.cpp:1104
 #, c-format
 msgid ""
 "%S: Overwriting policy (FSA) is undefined for that file, do not know whether "
@@ -7048,22 +7048,22 @@ msgstr "Echec d'initialisation de libcurl : %s"
 msgid "Missing data while reading slice_layout object"
 msgstr "Défaut de données lors de la lecture d'un object slice_layout"
 
-#: src/libdar/ea_filesystem.cpp:191
+#: src/libdar/ea_filesystem.cpp:189
 #, c-format
 msgid "Error while adding EA %s : %s"
 msgstr "Erreur d'ajout de l'EA %s : %s"
 
-#: src/libdar/ea_filesystem.cpp:225
+#: src/libdar/ea_filesystem.cpp:226
 #, c-format
 msgid "Error while removing %s : %s"
 msgstr "Erreur de suppression de %s : %s"
 
-#: src/libdar/ea_filesystem.cpp:260 src/libdar/ea_filesystem.cpp:284
+#: src/libdar/ea_filesystem.cpp:258 src/libdar/ea_filesystem.cpp:282
 #, c-format
 msgid "Error reading attribute %s of file %s : %s"
 msgstr "Erreur lors de la lecture de l'attribut %s du fichier %s : %s"
 
-#: src/libdar/ea_filesystem.cpp:334 src/libdar/ea_filesystem.cpp:349
+#: src/libdar/ea_filesystem.cpp:332 src/libdar/ea_filesystem.cpp:347
 #, c-format
 msgid "Error retrieving EA list for %s : %s"
 msgstr "Erreur lors de l'inventaire des AE pour %s : %s"

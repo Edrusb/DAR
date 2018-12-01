@@ -87,20 +87,15 @@ namespace libdar
     inline static ssize_t my_llistxattr(const char *path, char *list, size_t size);
     inline static int     my_lremovexattr(const char *path, const char *name);
 
-
-    static bool write_ea(const string & chemin, const ea_attributs & val, const mask & filter);
     static bool remove_ea(const string & name, const ea_attributs & val, const mask & filter);
     static ea_attributs * read_ea(const string & name, const mask & filter);
     static deque<string> ea_filesystem_get_ea_list_for(const char *filename);
 #endif
+    static bool write_ea(const string & chemin, const ea_attributs & val, const mask & filter);
 
     bool ea_filesystem_write_ea(const string & chemin, const ea_attributs & val, const mask & filter)
     {
-#ifdef EA_SUPPORT
         return write_ea(chemin, val, filter);
-#else
-        throw Efeature(gettext(MSG_NO_EA_SUPPORT));
-#endif
     }
 
     ea_attributs * ea_filesystem_read_ea(const string & name, const mask & filter)
@@ -167,12 +162,13 @@ namespace libdar
 #endif
     }
 
-#ifdef EA_SUPPORT
-
     static bool write_ea(const string & chemin, const ea_attributs & val, const mask & filter)
     {
         U_I num = 0;
+#ifdef EA_SUPPORT
+	    // avoid unused variable compilation warning when EA_SUPPORT is not set
         const char *p_chemin = chemin.c_str();
+#endif
 	string key, value;
 
 	val.reset_read();
@@ -185,6 +181,8 @@ namespace libdar
 
 		// now, action !
 
+#ifdef EA_SUPPORT
+
 	    if(my_lsetxattr(p_chemin, key.c_str(), value.c_str(), value.size(), 0) < 0)
 	    {
 		string tmp = tools_strerror_r(errno);
@@ -193,14 +191,17 @@ namespace libdar
 	    }
 	    else
 		num++;
+#else
+	    throw Efeature(gettext(MSG_NO_EA_SUPPORT));
+#endif
 	}
 
 	return num > 0;
     }
 
+#ifdef EA_SUPPORT
     static bool remove_ea(const string & chemin, const ea_attributs & val, const mask & filter)
     {
-#ifdef EA_SUPPORT
         U_I num = 0;
         const char *p_chemin = chemin.c_str();
 	string key, value;
@@ -230,9 +231,6 @@ namespace libdar
 	}
 
         return num > 0;
-#else
-	return true;
-#endif
     }
 
     static ea_attributs * read_ea(const string & name, const mask & filter)

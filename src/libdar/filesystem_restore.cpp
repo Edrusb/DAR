@@ -829,6 +829,7 @@ namespace libdar
 	bool ret = false;
 	const cat_inode *tba_ino = dynamic_cast<const cat_inode *>(to_be_added);
 	const cat_mirage *tba_mir = dynamic_cast<const cat_mirage *>(to_be_added);
+	bool real_overwrite = true;
 
 	if(tba_mir != nullptr)
 	    tba_ino = tba_mir->get_inode();
@@ -844,12 +845,18 @@ namespace libdar
 
 
 	    // modifying the EA action when the in place inode has not EA
-
+#ifdef EA_SUPPORT
+	    // but only if EA could be read, which is not the case when EA_SUPPORT is not
+	    // activated at compilation time
 	if(in_place->ea_get_saved_status() != ea_saved_status::full) // no EA in filesystem
 	{
 	    if(action == EA_merge_preserve || action == EA_merge_overwrite)
+	    {
 		action = EA_overwrite; // merging when in_place has no EA is equivalent to overwriting
+		real_overwrite = false;
+	    }
 	}
+#endif
 
 	if(tba_ino->ea_get_saved_status() == ea_saved_status::removed) // EA have been removed since archive of reference
 	{
@@ -868,7 +875,7 @@ namespace libdar
 	case EA_overwrite_mark_already_saved:
 	    if(tba_ino->ea_get_saved_status() != ea_saved_status::full && tba_ino->ea_get_saved_status() != ea_saved_status::removed)
 		throw SRC_BUG;
-	    if(warn_overwrite)
+	    if(warn_overwrite && real_overwrite)
 	    {
 		try
 		{
@@ -930,8 +937,10 @@ namespace libdar
 	    break;
 	case EA_merge_preserve:
 	case EA_merge_overwrite:
+#ifdef EA_SUPPORT
 	    if(in_place->ea_get_saved_status() != ea_saved_status::full)
 		throw SRC_BUG; // should have been redirected to EA_overwrite !
+#endif
 
 	    if(warn_overwrite)
 	    {
@@ -948,7 +957,12 @@ namespace libdar
 	    if(tba_ino->ea_get_saved_status() == ea_saved_status::full) // Note, that ea_saved_status::removed is the other valid value
 	    {
 		const ea_attributs *tba_ea = tba_ino->get_ea();
+#ifdef EA_SUPPORT
 		const ea_attributs *ip_ea = in_place->get_ea();
+#else
+		const ea_attributs faked_ip_ea;
+		const ea_attributs *ip_ea = & faked_ip_ea;
+#endif
 		ea_attributs result;
 
 		if(action == EA_merge_preserve)

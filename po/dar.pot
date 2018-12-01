@@ -6,10 +6,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: dar 2.6.0.RC10\n"
+"Project-Id-Version: dar 2.6.0.RC11\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2018-11-24 21:11+0100\n"
+"POT-Creation-Date: 2018-12-01 11:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4277,7 +4277,7 @@ msgstr ""
 msgid "Restoring file's data: "
 msgstr ""
 
-#: src/libdar/filesystem_restore.cpp:324 src/libdar/filesystem_restore.cpp:896
+#: src/libdar/filesystem_restore.cpp:324 src/libdar/filesystem_restore.cpp:903
 msgid "Restoring file's EA: "
 msgstr ""
 
@@ -4286,7 +4286,7 @@ msgstr ""
 msgid "Restoration of EA for %S aborted: "
 msgstr ""
 
-#: src/libdar/filesystem_restore.cpp:345 src/libdar/filesystem_restore.cpp:1039
+#: src/libdar/filesystem_restore.cpp:345 src/libdar/filesystem_restore.cpp:1053
 msgid "Restoring file's FSA: "
 msgstr ""
 
@@ -4397,60 +4397,60 @@ msgid ""
 "whether overwriting is allowed or not!"
 msgstr ""
 
-#: src/libdar/filesystem_restore.cpp:875
+#: src/libdar/filesystem_restore.cpp:882
 #, c-format
 msgid "EA for %S are about to be overwritten, OK?"
 msgstr ""
 
-#: src/libdar/filesystem_restore.cpp:890
+#: src/libdar/filesystem_restore.cpp:897
 #, c-format
 msgid ""
 "EA for %S have not been overwritten because this file is a hard link "
 "pointing to an already restored inode"
 msgstr ""
 
-#: src/libdar/filesystem_restore.cpp:910
+#: src/libdar/filesystem_restore.cpp:917
 #, c-format
 msgid "EA for %S are about to be removed, OK?"
 msgstr ""
 
-#: src/libdar/filesystem_restore.cpp:921
+#: src/libdar/filesystem_restore.cpp:928
 #, c-format
 msgid ""
 "EA for %S have not been cleared as requested by the overwriting policy "
 "because this file is a hard link pointing to an already restored inode"
 msgstr ""
 
-#: src/libdar/filesystem_restore.cpp:927
+#: src/libdar/filesystem_restore.cpp:934
 msgid "Clearing file's EA (requested by overwriting policy): "
 msgstr ""
 
-#: src/libdar/filesystem_restore.cpp:940
+#: src/libdar/filesystem_restore.cpp:949
 #, c-format
 msgid "EA for %S are about to be merged, OK?"
 msgstr ""
 
-#: src/libdar/filesystem_restore.cpp:966
+#: src/libdar/filesystem_restore.cpp:980
 #, c-format
 msgid ""
 "%S: Overwriting policy (EA) is undefined for that file, do not know whether "
 "overwriting is allowed or not!"
 msgstr ""
 
-#: src/libdar/filesystem_restore.cpp:1018
-#: src/libdar/filesystem_restore.cpp:1064
+#: src/libdar/filesystem_restore.cpp:1032
+#: src/libdar/filesystem_restore.cpp:1078
 #, c-format
 msgid "FSA for %S are about to be overwritten, OK?"
 msgstr ""
 
-#: src/libdar/filesystem_restore.cpp:1033
+#: src/libdar/filesystem_restore.cpp:1047
 #, c-format
 msgid ""
 "FSA for %S have not been overwritten because this file is a hard link "
 "pointing to an already restored inode"
 msgstr ""
 
-#: src/libdar/filesystem_restore.cpp:1090
+#: src/libdar/filesystem_restore.cpp:1104
 #, c-format
 msgid ""
 "%S: Overwriting policy (FSA) is undefined for that file, do not know whether "
@@ -6175,22 +6175,22 @@ msgstr ""
 msgid "Missing data while reading slice_layout object"
 msgstr ""
 
-#: src/libdar/ea_filesystem.cpp:191
+#: src/libdar/ea_filesystem.cpp:189
 #, c-format
 msgid "Error while adding EA %s : %s"
 msgstr ""
 
-#: src/libdar/ea_filesystem.cpp:225
+#: src/libdar/ea_filesystem.cpp:226
 #, c-format
 msgid "Error while removing %s : %s"
 msgstr ""
 
-#: src/libdar/ea_filesystem.cpp:260 src/libdar/ea_filesystem.cpp:284
+#: src/libdar/ea_filesystem.cpp:258 src/libdar/ea_filesystem.cpp:282
 #, c-format
 msgid "Error reading attribute %s of file %s : %s"
 msgstr ""
 
-#: src/libdar/ea_filesystem.cpp:334 src/libdar/ea_filesystem.cpp:349
+#: src/libdar/ea_filesystem.cpp:332 src/libdar/ea_filesystem.cpp:347
 #, c-format
 msgid "Error retrieving EA list for %s : %s"
 msgstr ""
