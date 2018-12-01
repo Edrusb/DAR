@@ -1937,6 +1937,7 @@ namespace libdar
 	bool ret = false;
 	const cat_inode *tba_ino = dynamic_cast<const cat_inode *>(to_be_added);
 	const cat_mirage *tba_mir = dynamic_cast<const cat_mirage *>(to_be_added);
+	bool real_overwrite = true;
 
 	if(tba_mir != nullptr)
 	    tba_ino = tba_mir->get_inode();
@@ -1959,7 +1960,10 @@ namespace libdar
 	if(in_place->ea_get_saved_status() != cat_inode::ea_full) // no EA in filesystem
 	{
 	    if(action == EA_merge_preserve || action == EA_merge_overwrite)
+	    {
 		action = EA_overwrite; // merging when in_place has no EA is equivalent to overwriting
+		real_overwrite = false;
+	    }
 	}
 #endif
 
@@ -1980,7 +1984,7 @@ namespace libdar
 	case EA_overwrite_mark_already_saved:
 	    if(tba_ino->ea_get_saved_status() != cat_inode::ea_full && tba_ino->ea_get_saved_status() != cat_inode::ea_removed)
 		throw SRC_BUG;
-	    if(warn_overwrite)
+	    if(warn_overwrite && real_overwrite)
 	    {
 		try
 		{
