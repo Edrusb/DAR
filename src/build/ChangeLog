@@ -2,6 +2,10 @@ from 2.5.17 to 2.5.18
 - fixed compilation issue in context where EA are not supported
 - fixed typo in dar man page (--sequential-mode in place of
   --sequential-read)
+- moved the "no EA support warning" trigger when restoring an archive
+  later in the EA restoration process, in order to have the possibility
+  thanks to the -u "*" option to restore an archive containing EA using a
+  dar/libdar without EA support activated at compilation time
 
 from 2.5.16 to 2.5.17
 - bug fix: dar failed to restore EA when file permission to restore

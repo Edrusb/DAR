@@ -1952,12 +1952,16 @@ namespace libdar
 
 
 	    // modifying the EA action when the in place inode has not EA
+#ifdef EA_SUPPORT
+	    // but only if EA could be read, which is not the case when EA_SUPPORT is not
+	    // activated at compilation time
 
 	if(in_place->ea_get_saved_status() != cat_inode::ea_full) // no EA in filesystem
 	{
 	    if(action == EA_merge_preserve || action == EA_merge_overwrite)
 		action = EA_overwrite; // merging when in_place has no EA is equivalent to overwriting
 	}
+#endif
 
 	if(tba_ino->ea_get_saved_status() == cat_inode::ea_removed) // EA have been removed since archive of reference
 	{
@@ -2038,8 +2042,10 @@ namespace libdar
 	    break;
 	case EA_merge_preserve:
 	case EA_merge_overwrite:
+#ifdef EA_SUPPORT
 	    if(in_place->ea_get_saved_status() != cat_inode::ea_full)
 		throw SRC_BUG; // should have been redirected to EA_overwrite !
+#endif
 
 	    if(warn_overwrite)
 	    {
@@ -2056,7 +2062,12 @@ namespace libdar
 	    if(tba_ino->ea_get_saved_status() == cat_inode::ea_full) // Note, that cat_inode::ea_removed is the other valid value
 	    {
 		const ea_attributs *tba_ea = tba_ino->get_ea();
+#ifdef EA_SUPPORT
 		const ea_attributs *ip_ea = in_place->get_ea();
+#else
+		const ea_attributs faked_ip_ea;
+		const ea_attributs *ip_ea = & faked_ip_ea;
+#endif
 		ea_attributs result;
 
 		if(action == EA_merge_preserve)
