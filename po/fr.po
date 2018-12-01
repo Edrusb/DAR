@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: DAR 2.5.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2018-09-29 19:39+0200\n"
+"POT-Creation-Date: 2018-12-01 11:09+0100\n"
 "PO-Revision-Date: 2018-09-30 10:29+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -6257,22 +6257,22 @@ msgstr ""
 msgid "Missing data while reading slice_layout object"
 msgstr "Défaut de données lors de la lecture d'un object slice_layout"
 
-#: src/libdar/ea_filesystem.cpp:183
+#: src/libdar/ea_filesystem.cpp:181
 #, c-format
 msgid "Error while adding EA %s : %s"
 msgstr "Erreur d'ajout de l'EA %s : %s"
 
-#: src/libdar/ea_filesystem.cpp:214
+#: src/libdar/ea_filesystem.cpp:216
 #, c-format
 msgid "Error while removing %s : %s"
 msgstr "Erreur de suppression de %s : %s"
 
-#: src/libdar/ea_filesystem.cpp:246 src/libdar/ea_filesystem.cpp:274
+#: src/libdar/ea_filesystem.cpp:248 src/libdar/ea_filesystem.cpp:276
 #, c-format
 msgid "Error reading attribute %s of file %s : %s"
 msgstr "Erreur lors de la lecture de l'attribut %s du fichier %s : %s"
 
-#: src/libdar/ea_filesystem.cpp:330 src/libdar/ea_filesystem.cpp:348
+#: src/libdar/ea_filesystem.cpp:332 src/libdar/ea_filesystem.cpp:350
 #, c-format
 msgid "Error retrieving EA list for %s : %s"
 msgstr "Erreur lors de l'inventaire des AE pour %s : %s"
@@ -7272,7 +7272,7 @@ msgstr ""
 msgid "Restoring file's data: "
 msgstr "Restauration des données du fichier : "
 
-#: src/libdar/filesystem.cpp:1510 src/libdar/filesystem.cpp:2004
+#: src/libdar/filesystem.cpp:1510 src/libdar/filesystem.cpp:2012
 msgid "Restoring file's EA: "
 msgstr "Restauration des Attributs Étendus du fichier : "
 
@@ -7281,7 +7281,7 @@ msgstr "Restauration des Attributs Étendus du fichier : "
 msgid "Restoration of EA for %S aborted: "
 msgstr "Restauration des EA de %S arrêtée : "
 
-#: src/libdar/filesystem.cpp:1531 src/libdar/filesystem.cpp:2147
+#: src/libdar/filesystem.cpp:1531 src/libdar/filesystem.cpp:2162
 msgid "Restoring file's FSA: "
 msgstr "Restauration des FSA du fichier : "
 
@@ -7383,12 +7383,12 @@ msgstr ""
 "%S : La politique d'écrasement (Données) reste non définie pour ce fichier, "
 "impossible de savoir si l'écrasement est autorisé ou pas !"
 
-#: src/libdar/filesystem.cpp:1983
+#: src/libdar/filesystem.cpp:1991
 #, c-format
 msgid "EA for %S are about to be overwritten, OK?"
 msgstr "Des Attributs Étendus de %S sont sur le point d'être écrasés, OK ?"
 
-#: src/libdar/filesystem.cpp:1998
+#: src/libdar/filesystem.cpp:2006
 #, c-format
 msgid ""
 "EA for %S have not been overwritten because this file is a hard link "
@@ -7397,12 +7397,12 @@ msgstr ""
 "Les Attributs Étendus pour %S n'ont pas été écrasés à car ce fichier est un "
 "lien dur pointant sur une inode déjà restaurée"
 
-#: src/libdar/filesystem.cpp:2018
+#: src/libdar/filesystem.cpp:2026
 #, c-format
 msgid "EA for %S are about to be removed, OK?"
 msgstr "Les Attributs Étendus de %S sont sur le point d'être supprimés, OK ?"
 
-#: src/libdar/filesystem.cpp:2029
+#: src/libdar/filesystem.cpp:2037
 #, c-format
 msgid ""
 "EA for %S have not been cleared as requested by the overwriting policy "
@@ -7412,17 +7412,17 @@ msgstr ""
 "politique d'écrasement car ce fichier est un lien dur pointant sur une inode "
 "déjà restaurée"
 
-#: src/libdar/filesystem.cpp:2035
+#: src/libdar/filesystem.cpp:2043
 msgid "Clearing file's EA (requested by overwriting policy): "
 msgstr ""
 "Effacement des attributs étendus (requis par la politique d'écrasement) : "
 
-#: src/libdar/filesystem.cpp:2048
+#: src/libdar/filesystem.cpp:2058
 #, c-format
 msgid "EA for %S are about to be merged, OK?"
 msgstr "Les Attributs Étendus de %S sont sur le point d'être fusionnés, OK ?"
 
-#: src/libdar/filesystem.cpp:2074
+#: src/libdar/filesystem.cpp:2089
 #, c-format
 msgid ""
 "%S: Overwriting policy (EA) is undefined for that file, do not know whether "
@@ -7431,12 +7431,12 @@ msgstr ""
 "%S : La politique d'écrasement (Attributs Étendus) reste non définie pour ce "
 "fichier, impossible de savoir si l'écrasement est autorisé ou pas !"
 
-#: src/libdar/filesystem.cpp:2126 src/libdar/filesystem.cpp:2172
+#: src/libdar/filesystem.cpp:2141 src/libdar/filesystem.cpp:2187
 #, c-format
 msgid "FSA for %S are about to be overwritten, OK?"
 msgstr "Les FSA de %S sont sur le point d'être écrasés, OK ?"
 
-#: src/libdar/filesystem.cpp:2141
+#: src/libdar/filesystem.cpp:2156
 #, c-format
 msgid ""
 "FSA for %S have not been overwritten because this file is a hard link "
@@ -7445,7 +7445,7 @@ msgstr ""
 "Les FSA de %S n'ont pas été écrasés car ce fichier est un lien dur pointant "
 "sur une inode déjà restaurée"
 
-#: src/libdar/filesystem.cpp:2198
+#: src/libdar/filesystem.cpp:2213
 #, c-format
 msgid ""
 "%S: Overwriting policy (FSA) is undefined for that file, do not know whether "
@@ -7454,19 +7454,19 @@ msgstr ""
 "%S : La politique d'écrasement (FSA) reste non définie pour ce fichier, "
 "impossible de savoir si l'écrasement est autorisé ou pas !"
 
-#: src/libdar/filesystem.cpp:2291
+#: src/libdar/filesystem.cpp:2306
 msgid "Cannot get inode information about file to remove "
 msgstr "Impossible d'obtenir d'information sur l'inode d'un fichier à effacer "
 
-#: src/libdar/filesystem.cpp:2304
+#: src/libdar/filesystem.cpp:2319
 msgid "Cannot remove directory "
 msgstr "Suppression de répertoire impossible "
 
-#: src/libdar/filesystem.cpp:2308
+#: src/libdar/filesystem.cpp:2323
 msgid "Cannot remove file "
 msgstr "Suppression de fichier impossible "
 
-#: src/libdar/filesystem.cpp:2360
+#: src/libdar/filesystem.cpp:2375
 msgid ""
 "uid value is too high for this system for libdar be able to restore it "
 "properly"
@@ -7474,7 +7474,7 @@ msgstr ""
 "valeur d'UID trop grande pour ce système pour que libdar puisse le restaurer "
 "correctement"
 
-#: src/libdar/filesystem.cpp:2364
+#: src/libdar/filesystem.cpp:2379
 msgid ""
 "gid value is too high for this system for libdar be able to restore it "
 "properly"
@@ -7482,32 +7482,32 @@ msgstr ""
 "valeur de GID trop grande pour ce système pour que libdar puisse le "
 "restaurer correctement"
 
-#: src/libdar/filesystem.cpp:2368 src/libdar/filesystem.cpp:2372
+#: src/libdar/filesystem.cpp:2383 src/libdar/filesystem.cpp:2387
 msgid "Could not restore original file ownership: "
 msgstr "Affection du fichier à son propriétaire d'origine impossible : "
 
-#: src/libdar/filesystem.cpp:2386
+#: src/libdar/filesystem.cpp:2401
 #, c-format
 msgid "Cannot restore permissions of %s : %s"
 msgstr "Restauration des droits d'accès de %s impossible : %s"
 
-#: src/libdar/filesystem.cpp:2472
+#: src/libdar/filesystem.cpp:2487
 #, c-format
 msgid "Failed to open %S while checking for nodump flag: %s"
 msgstr ""
 "Impossible d'ouvrir %S pendant la consultation du drapeau \"nodump\" : %s"
 
-#: src/libdar/filesystem.cpp:2486
+#: src/libdar/filesystem.cpp:2501
 #, c-format
 msgid "Cannot get ext2 attributes (and nodump flag value) for %S : %s"
 msgstr "Impossible d'accéder aux attributs ext2 (drapeau nodump) pour %S : %s"
 
-#: src/libdar/filesystem.cpp:2519
+#: src/libdar/filesystem.cpp:2534
 #, c-format
 msgid "Cannot get inode information for %s : %s"
 msgstr "Impossible d'obtenir des informations sur l'inode %s : %s"
 
-#: src/libdar/filesystem.cpp:2548
+#: src/libdar/filesystem.cpp:2563
 #, c-format
 msgid ""
 "Replacing %s in the -R option by the directory pointed to by this symbolic "
@@ -7516,7 +7516,7 @@ msgstr ""
 "Remplacement de %s dans l'option -R par le répertoire pointé par ce lien "
 "symbolique"
 
-#: src/libdar/filesystem.cpp:2551
+#: src/libdar/filesystem.cpp:2566
 #, c-format
 msgid ""
 "The given path %s must be a directory (or symbolic link to an existing "

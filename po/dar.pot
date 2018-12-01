@@ -1,15 +1,15 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR Free Software Foundation, Inc.
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the dar package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: dar 2.5.17\n"
+"Project-Id-Version: dar 2.5.18.RC2\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2018-09-29 19:39+0200\n"
+"POT-Creation-Date: 2018-12-01 11:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5448,22 +5448,22 @@ msgstr ""
 msgid "Missing data while reading slice_layout object"
 msgstr ""
 
-#: src/libdar/ea_filesystem.cpp:183
+#: src/libdar/ea_filesystem.cpp:181
 #, c-format
 msgid "Error while adding EA %s : %s"
 msgstr ""
 
-#: src/libdar/ea_filesystem.cpp:214
+#: src/libdar/ea_filesystem.cpp:216
 #, c-format
 msgid "Error while removing %s : %s"
 msgstr ""
 
-#: src/libdar/ea_filesystem.cpp:246 src/libdar/ea_filesystem.cpp:274
+#: src/libdar/ea_filesystem.cpp:248 src/libdar/ea_filesystem.cpp:276
 #, c-format
 msgid "Error reading attribute %s of file %s : %s"
 msgstr ""
 
-#: src/libdar/ea_filesystem.cpp:330 src/libdar/ea_filesystem.cpp:348
+#: src/libdar/ea_filesystem.cpp:332 src/libdar/ea_filesystem.cpp:350
 #, c-format
 msgid "Error retrieving EA list for %s : %s"
 msgstr ""
@@ -6346,7 +6346,7 @@ msgstr ""
 msgid "Restoring file's data: "
 msgstr ""
 
-#: src/libdar/filesystem.cpp:1510 src/libdar/filesystem.cpp:2004
+#: src/libdar/filesystem.cpp:1510 src/libdar/filesystem.cpp:2012
 msgid "Restoring file's EA: "
 msgstr ""
 
@@ -6355,7 +6355,7 @@ msgstr ""
 msgid "Restoration of EA for %S aborted: "
 msgstr ""
 
-#: src/libdar/filesystem.cpp:1531 src/libdar/filesystem.cpp:2147
+#: src/libdar/filesystem.cpp:1531 src/libdar/filesystem.cpp:2162
 msgid "Restoring file's FSA: "
 msgstr ""
 
@@ -6443,121 +6443,121 @@ msgid ""
 "whether overwriting is allowed or not!"
 msgstr ""
 
-#: src/libdar/filesystem.cpp:1983
+#: src/libdar/filesystem.cpp:1991
 #, c-format
 msgid "EA for %S are about to be overwritten, OK?"
 msgstr ""
 
-#: src/libdar/filesystem.cpp:1998
+#: src/libdar/filesystem.cpp:2006
 #, c-format
 msgid ""
 "EA for %S have not been overwritten because this file is a hard link "
 "pointing to an already restored inode"
 msgstr ""
 
-#: src/libdar/filesystem.cpp:2018
+#: src/libdar/filesystem.cpp:2026
 #, c-format
 msgid "EA for %S are about to be removed, OK?"
 msgstr ""
 
-#: src/libdar/filesystem.cpp:2029
+#: src/libdar/filesystem.cpp:2037
 #, c-format
 msgid ""
 "EA for %S have not been cleared as requested by the overwriting policy "
 "because this file is a hard link pointing to an already restored inode"
 msgstr ""
 
-#: src/libdar/filesystem.cpp:2035
+#: src/libdar/filesystem.cpp:2043
 msgid "Clearing file's EA (requested by overwriting policy): "
 msgstr ""
 
-#: src/libdar/filesystem.cpp:2048
+#: src/libdar/filesystem.cpp:2058
 #, c-format
 msgid "EA for %S are about to be merged, OK?"
 msgstr ""
 
-#: src/libdar/filesystem.cpp:2074
+#: src/libdar/filesystem.cpp:2089
 #, c-format
 msgid ""
 "%S: Overwriting policy (EA) is undefined for that file, do not know whether "
 "overwriting is allowed or not!"
 msgstr ""
 
-#: src/libdar/filesystem.cpp:2126 src/libdar/filesystem.cpp:2172
+#: src/libdar/filesystem.cpp:2141 src/libdar/filesystem.cpp:2187
 #, c-format
 msgid "FSA for %S are about to be overwritten, OK?"
 msgstr ""
 
-#: src/libdar/filesystem.cpp:2141
+#: src/libdar/filesystem.cpp:2156
 #, c-format
 msgid ""
 "FSA for %S have not been overwritten because this file is a hard link "
 "pointing to an already restored inode"
 msgstr ""
 
-#: src/libdar/filesystem.cpp:2198
+#: src/libdar/filesystem.cpp:2213
 #, c-format
 msgid ""
 "%S: Overwriting policy (FSA) is undefined for that file, do not know whether "
 "overwriting is allowed or not!"
 msgstr ""
 
-#: src/libdar/filesystem.cpp:2291
+#: src/libdar/filesystem.cpp:2306
 msgid "Cannot get inode information about file to remove "
 msgstr ""
 
-#: src/libdar/filesystem.cpp:2304
+#: src/libdar/filesystem.cpp:2319
 msgid "Cannot remove directory "
 msgstr ""
 
-#: src/libdar/filesystem.cpp:2308
+#: src/libdar/filesystem.cpp:2323
 msgid "Cannot remove file "
 msgstr ""
 
-#: src/libdar/filesystem.cpp:2360
+#: src/libdar/filesystem.cpp:2375
 msgid ""
 "uid value is too high for this system for libdar be able to restore it "
 "properly"
 msgstr ""
 
-#: src/libdar/filesystem.cpp:2364
+#: src/libdar/filesystem.cpp:2379
 msgid ""
 "gid value is too high for this system for libdar be able to restore it "
 "properly"
 msgstr ""
 
-#: src/libdar/filesystem.cpp:2368 src/libdar/filesystem.cpp:2372
+#: src/libdar/filesystem.cpp:2383 src/libdar/filesystem.cpp:2387
 msgid "Could not restore original file ownership: "
 msgstr ""
 
-#: src/libdar/filesystem.cpp:2386
+#: src/libdar/filesystem.cpp:2401
 #, c-format
 msgid "Cannot restore permissions of %s : %s"
 msgstr ""
 
-#: src/libdar/filesystem.cpp:2472
+#: src/libdar/filesystem.cpp:2487
 #, c-format
 msgid "Failed to open %S while checking for nodump flag: %s"
 msgstr ""
 
-#: src/libdar/filesystem.cpp:2486
+#: src/libdar/filesystem.cpp:2501
 #, c-format
 msgid "Cannot get ext2 attributes (and nodump flag value) for %S : %s"
 msgstr ""
 
-#: src/libdar/filesystem.cpp:2519
+#: src/libdar/filesystem.cpp:2534
 #, c-format
 msgid "Cannot get inode information for %s : %s"
 msgstr ""
 
-#: src/libdar/filesystem.cpp:2548
+#: src/libdar/filesystem.cpp:2563
 #, c-format
 msgid ""
 "Replacing %s in the -R option by the directory pointed to by this symbolic "
 "link: "
 msgstr ""
 
-#: src/libdar/filesystem.cpp:2551
+#: src/libdar/filesystem.cpp:2566
 #, c-format
 msgid ""
 "The given path %s must be a directory (or symbolic link to an existing "
