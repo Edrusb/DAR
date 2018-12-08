@@ -64,7 +64,7 @@ from 2.5.17 to 2.5.18
 - moved the "no EA support warning" trigger when restoring an archive
   later in the EA restoration process, in order to have the possibility
   thanks to the -u "*" option to restore an archive containing EA using a
-  dar/libdar without EA support activated at compilation time
+  dar/libdar without EA support activated at compilation time,
 - at restoration time, avoiding issuing an "EA are about to be
   overwritten" warning when the in place file has in fact not only
   one EA set.
