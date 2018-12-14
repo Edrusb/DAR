@@ -49,18 +49,18 @@ compress-exclusion:
 
 # compressed video format
 -Z "*.mpg"
+-Z "*.mpeg"
 -Z "*.avi"
--Z "*.flac"
 -Z "*.cr2"
 -Z "*.vob"
 
 # compressed picture format
 -Z "*.jpg"
 -Z "*.jpeg"
--Z "*.mpeg"
 -Z "*.png"
 
 # compressed audio format
+-Z "*.flac"
 -Z "*.mp3"
 -Z "*.ogg"
 
