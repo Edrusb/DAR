@@ -107,6 +107,9 @@ Windows, especially with cyrillic filenames?</a><br>
       <a href="#libssh2"><span style="font-weight: bold; font-style: italic;"></span><span style="font-weight: bold; font-style: italic;">I Cannot get dar to connect to remote server using SFTP</span></a><br>
       <span style="font-weight: bold; font-style: italic;"></span><a href="#too_large"><span style="font-weight: bold; font-style: italic;">"Cannot open catalogue: Cannot handle such a too large integer." What to do?</span></a><br>
       <a href="#sftppubkey"><span style="font-weight: bold; font-style: italic;">I have sftp pubkey authentication working with ssh/sftp, how to have dar using too this public key authentication for sftp?</span></a><br>
+      <a href="#full-from-diff"><span style="font-weight: bold; font-style: italic;">I have a diff/incremental backup and I want to convert it to a full backup, how to do that?</span></a><br>
+
+
       <h2><span style="text-decoration: underline;">Answers:</span></h2>
       <h1><span style="font-weight: bold; font-style: italic;"> </span></h1>
       <h2> </h2>
@@ -3861,7 +3864,7 @@ the counterpart is not huge for user (you can add -afile-auth in your
       <span style="font-weight: bold; font-style: italic;">
       <p><a name="libssh2"></a>I Cannot get dar to connect to remote server using SFTP<br>
 </p></span>
-      
+
       <div style="margin-left: 40px;">This may be due to several well known reasons:<br>
       <ul>
         <li>dar/libdar cannot find the known_hosts file</li>
@@ -3896,7 +3899,7 @@ if you use csh or tcsh:<br>
 
 
 
-      
+
       <div style="margin-left: 40px;"><code>setenv DAR_SFTP_KNOWNHOSTS_FILE ~/.ssh/known_hosts_alternative<br>
 </code><code># then use dar as expected</code><code><br>
 dar -c sftp://...<br>
@@ -3939,8 +3942,8 @@ The known_hosts file is usually located in your home directory at
 </code>
       </div>
       <div style="margin-left: 40px;">
-      
-      
+
+
       <br>
 Each line concerns a different sftp/ssh server and contains three fields, &lt;hostame or IP&gt; <span style="font-weight: bold;">&lt;host-key
 type&gt;</span> &lt;key&gt;. We will focus on the second field.<br>
@@ -3962,7 +3965,7 @@ ftp and sftp support (and many other network related features) to libdar<br>
 
 Several options are available to workaround that limitation:<br>
 
-      
+
       <ol>
 <li>help libssh2 developpers to enhance libssh2 in order to
 support additional host key types (OK, this is easy to say but maybe
@@ -3982,7 +3985,7 @@ using public cloud service over Internet.</li>
       </ol><br>
 
 
-      
+
       </div>
       <a name="too_large"></a><span style="font-weight: bold; font-style: italic;">"Cannot open catalogue: Cannot handle such a too large integer." What to do?</span>
       <div style="margin-left: 40px;">
@@ -3999,7 +4002,7 @@ bold.<br>
 
       <br>
 
-      
+
       <div style="margin-left: 40px;"><code>&nbsp;dar version 2.5.12, Copyright (C) 2002-2052 Denis Corbin<br>
 &nbsp;&nbsp; Long options support&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : YES<br>
       <br>
@@ -4070,7 +4073,28 @@ the -az option has been added to automatically assume negative dates
 read from filesystem to be equal to zero (January 1st 1970, 00:00 GMT)
 without user interaction<br>
 <span style="font-weight: bold; font-style: italic;"></span></div>
-<br>
+      <br>
+
+      <a  name="full-from-diff"></a><span style="font-weight: bold; font-style: italic;">I have a diff/incremental backup and I want to convert it to a full backup, how to do that?</span><br>
+      <p>
+      <div style="margin-left: 40px;">
+	it is possible to convert a differential backup if you also have the full backup is has been based on, in other words: the archive of reference. This is pretty simple to do:
+	<p>
+	<div style="margin-left: 80px;">
+	  <code>
+	      dar -+ new_full_backup -A archive_of_reference -@ differential_backup full-from-diff [other options]
+	  </code>
+        </div>
+	<br>
+	  where <b>new_full_backup</b> is an archive that will be created according the provided other options (compression, encryption, slicing, hashing and so on as specified on arguments).<br>
+	  <b>archive_of_reference</b> is the full backup that was used as reference for the differential backup<br>
+	  <b>differential_backup</b> is the differential backup you want to convert a full backup<br>
+	  <p>
+	    the important point is the last argument <b>"full-from-diff"</b> which is defined in /etc/darrc and makes the merging operation used here (-+ option) working as expected for the resulting archive be the same as if a full backup had been done instead of a differential backup at the time "differential_backup" was created.
+	  <p>
+	    For incremental backups, (archive which reference is not a full backup) you can also use this method but you first need to create the full backup from the incremental/differential archive that has been used as reference for this incremental backup. Thus the process should follow the same order used to create backups, from the full backup transforming each incremental backup in turn into a full backup and using the latest full backup created this way to transform the next incremental backup into full backup.
+	</div>
+      </div>
       <span style="font-weight: bold; font-style: italic;"></span></td>
     </tr>
   </tbody>
