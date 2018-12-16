@@ -28,7 +28,7 @@ if(! -f configure) then
 endif
 
 if("$1" == "") then
-   echo "usage: $0 <version> {win32|win64}"
+   echo "usage: $0 <version> {win32|win64} [options to dar]"
    exit
 endif
 
@@ -36,6 +36,8 @@ if("$2" != "win32" && "$2" != "win64") then
    echo "unknown windows flavor"
    exit
 endif
+
+setenv MAKE_OPT "$3 $4 $5 $6 $7 $8 $9 ${10}"
 
 # misc/make_cygwin_dist $1 ""
 # misc/make_cygwin_dist $1 $2 "32" --enable-mode=32
