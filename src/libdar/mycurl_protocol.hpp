@@ -23,8 +23,8 @@
     /// \brief datastructure defining the network protocols available for entrepot_libcurl class
     /// \ingroup API
 
-#ifndef MYCURL_PROTOCOL
-#define MYCURL_PROTOCOL
+#ifndef MYCURL_PROTOCOL_HPP
+#define MYCURL_PROTOCOL_HPP
 
 #include "../my_config.h"
 

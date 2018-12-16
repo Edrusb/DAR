@@ -23,8 +23,8 @@
     /// \brief optimization structure to quickly access some commonly used layers of a stack of generic_file
     /// \ingroup Private
 
-#ifndef CAT_PILE_DESCRIPTOR_HPP
-#define CAT_PILE_DESCRIPTOR_HPP
+#ifndef PILE_DESCRIPTOR_HPP
+#define PILE_DESCRIPTOR_HPP
 
 #include "../my_config.h"
 

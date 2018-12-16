@@ -24,8 +24,8 @@
     /// \ingroup API
 
 
-#ifndef CATALOGUE_AUX_HPP
-#define CATALOGUE_AUX_HPP
+#ifndef ARCHIVE_AUX_HPP
+#define ARCHIVE_AUX_HPP
 
 #include "../my_config.h"
 

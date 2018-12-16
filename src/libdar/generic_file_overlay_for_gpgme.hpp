@@ -23,8 +23,8 @@
     /// \brief adaptation class from gpgme data buffer to libdar generic_file interface
     /// \ingroup Private
 
-#ifndef GENERIC_FILE_VERLAY_FOR_GPGME_HPP
-#define GENERIC_FILE_VERLAY_FOR_GPGME_HPP
+#ifndef GENERIC_FILE_OVERLAY_FOR_GPGME_HPP
+#define GENERIC_FILE_OVERLAY_FOR_GPGME_HPP
 
 extern "C"
 {
