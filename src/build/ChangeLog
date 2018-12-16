@@ -1,10 +1,12 @@
 from 2.5.x to 2.6.0
-- new feature: support for binary delta in incremental backup
+- new feature: support for binary delta in incremental/differential backups
+  (relying on librsync)
 - new feature: support ftp/sftp to read an archive from a cloud storage.
+  (relying on libcurl)
   reading is optimized to not transfer a whole slice but only the needed
   part to proceed to the operation (restoration, listing, and so on)
 - new feature: support ftp/sftp to write an archive eventually with hash
-  files to a remote cloud storage
+  files to a remote cloud storage (relying on libcurl)
 - modified behavior: While creating a single sliced archive, DUC file is
   now executed unless user interrupted dar/libdar. This to stay coherent
   with multi sliced archive behavior
@@ -13,22 +15,24 @@ from 2.5.x to 2.6.0
   option
 - new feature: one can define the compression algorithm a dar_manager
   database will use. This choice is only available at database creation
-  using the new dar_manager's -z option. In particular -z none to avoid
-  using compression
-- repair mode added to create a completed archive (suitable for direct
-  access mode and merging) from an interrupted one
-- modified backup behavior use --modified-data-detection for old behavior
-- dar can now only save metadata inode change without resaving the whole
+  using the new dar_manager's -z option. In particular "-z none" can be
+  used to avoid using compression at all
+- repair mode added to re-create a completed archive (suitable for direct
+  access mode and merging) from an interrupted one due to lack of disk
+  space, power outage or other reasons leading to similar problem.
+- Dar can now only save metadata inode change without re-saving the whole
   file if its data has not changed. Dar_manager also handle this by
   restoring the full backup and then the inode metadata only when
   necessary.
+- In regard to previous point, if you want to keep having dar saving the
+  data when only metadata has changed use --modified-data-detection option
 - moved dar_slave code into libdar as class libdar::libdar_slave
-- mived dar_xform code into libdar as class libdar::libdar_xform
+- moved dar_xform code into libdar as class libdar::libdar_xform
 - added libdar_slave and libdar_xform in libdar API
-- modified CLI dar_xform and dar_slave to rely on libdar through the API
+- modified dar_xform and dar_slave to rely on new libdar API
 - API: simplified user_interface class
-- API: using std::shared_ptr and std::unique_ptr to explicitely show the
-  ownership of the given pointed objects
+- API: using std::shared_ptr and std::unique_ptr to explicitly show the
+  ownership of the given pointed objects (C++11 standard)
 - API: simplified class archive to only require user_interaction at
   object construction time
 - API: simplified class database to only require user_interaction at
@@ -40,22 +44,25 @@ from 2.5.x to 2.6.0
 - security refresh: adding salt per archive (one is still present per
   block inside an archive)
 - security refresh/new feature: adding option --kdf-param to define
-  the iteration count for key derivation, which defaults to 200,000
-  and hash algorithm used to derivate key, which defaults to sha1
+  the iteration count for key derivation, which now defaults to 200,000
+  and hash algorithm used to derived key, still using sha1 by default
 - slide effect of previous feature due to starvation of free letters
   to add a new command, the -T option with argument is no more
-  available, one need to provide explicitely the desired argument
+  available, one need to provide explicitly the desired argument
 - security refresh: improving seed randomization for the pseudo-random
   generator used in elastic buffers
-- feature enhancement: activate needed linux capability in the
-  effective set if it is permitted but not effective. This concerns
+- feature enhancement: activate needed Linux capabilities in the
+  "effective" set if it is permitted but not effective. This concerns
   cap_chown at restoration time, cap_fchown for furtive read mode,
   cap_linux_immutable to restore the immutable flag, and cap_sys_
-  resource to set some linux FSA
+  resource to set some linux FSA. This let one set the capabilities
+  for dar binary only in the "permitted" set, capabilities will then be
+  allowed only for users having them in the "inheritable" set of their
+  calling process (usually a shell), without root privilege need.
 - the ./configure --enable-mode option now defaults to 64, which
-  will setup a libdar64 in place if infinint based libdar by default.
-  You can still build a libdar by passing --enable-mode=infinint
-  to the ./configure script.
+  will setup a libdar64 in place of infinint based libdar by default.
+  You can still build a infinint based libdar by passing
+  --enable-mode=infinint to the ./configure script.
 
 from 2.5.17 to 2.5.18
 - fixed compilation issue in context where EA are not supported
