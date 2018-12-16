@@ -686,19 +686,19 @@ void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
 	if(allow_over)
 	{
 	    if(ea_erase)
-		overwrite = new crit_constant_action(data_overwrite, EA_overwrite);
+		overwrite = new (nothrow) crit_constant_action(data_overwrite, EA_overwrite);
 	    else
-		overwrite = new crit_constant_action(data_overwrite, EA_merge_overwrite);
+		overwrite = new (nothrow) crit_constant_action(data_overwrite, EA_merge_overwrite);
 	    if(overwrite == nullptr)
 		throw Ememory("tools_build_compatible_overwriting_policy");
 
-	    tmp1 = new crit_constant_action(data_preserve, EA_preserve);
+	    tmp1 = new (nothrow) crit_constant_action(data_preserve, EA_preserve);
 	    if(tmp1 == nullptr)
 		throw Ememory("tools_build_compatible_overwriting_policy");
 
 	    if(more_recent)
 	    {
-		tmp2 = new testing(crit_in_place_data_more_recent(hourshift), *tmp1, *overwrite);
+		tmp2 = new (nothrow) testing(crit_in_place_data_more_recent(hourshift), *tmp1, *overwrite);
 		if(tmp2 == nullptr)
 		    throw Ememory("tools_build_compatible_overwriting_policy");
 
@@ -709,7 +709,7 @@ void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
 
 	    if(!detruire)
 	    {
-		tmp2 = new testing(crit_invert(crit_in_place_is_inode()), *overwrite, *tmp1);
+		tmp2 = new (nothrow) testing(crit_invert(crit_in_place_is_inode()), *overwrite, *tmp1);
 		if(tmp2 == nullptr)
 		    throw Ememory("tools_build_compatible_overwriting_policy");
 		delete overwrite;
@@ -722,7 +722,7 @@ void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
 	}
 	else
 	{
-	    overwrite = new crit_constant_action(data_preserve, EA_preserve);
+	    overwrite = new (nothrow) crit_constant_action(data_preserve, EA_preserve);
 	    if(overwrite == nullptr)
 		throw Ememory("tools_build_compatible_overwriting_policy");
 	}

@@ -109,7 +109,7 @@ namespace libdar
 	fichier_local::open(chemin, m, permission, fail_if_exists, erase, furtive_mode);
     }
 
-    fichier_local::fichier_local(const string & chemin, bool furtive_mode) : fichier_global(shared_ptr<user_interaction>(new user_interaction_blind()), gf_read_only)
+    fichier_local::fichier_local(const string & chemin, bool furtive_mode) : fichier_global(shared_ptr<user_interaction>(new (nothrow) user_interaction_blind()), gf_read_only)
     {
 	    // in read-only mode the user_interaction is not expected to be used
 	fichier_local::open(chemin, gf_read_only, 0, false, false, furtive_mode);
