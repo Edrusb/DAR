@@ -40,8 +40,9 @@ helpers = build_tree.sh final.sh main.sh modif_tree.sh routine.sh loop.sh make_e
 
 dist_noinst_DATA = $(helpers) Old_format/archive_01.1.dar Old_format/archive_02.1.dar Old_format/archive_03.1.dar Old_format/archive_04.1.dar Old_format/archive_05.1.dar Old_format/archive_06.1.dar Old_format/archive_07.1.dar Old_format/archive_08.1.dar Old_format/archive_08-1.1.dar Old_format/archive_09.1.dar
 noinst_PROGRAMS = all_features padder
-LDADD = -L../libdar ../libdar/$(MYLIB).la $(GPGME_LIBS)
-AM_LDFLAGS = $(LTLIBINTL) $(GPGME_LIBS) $(LIBCURL_LIBS) $(LIBTHREADAR_LIBS) $(CXXSTDFLAGS)
+LDADD = ../libdar/$(MYLIB).la $(LIBCURL_LIBS) $(GPGME_LIBS) $(LIBTHREADAR_LIBS) $(LTLIBINTL)
+AM_LDFLAGS = $(CXXSTDFLAGS)
+
 MY_MAKEFILE=my_makefile
 MY_ENV=my_env
 
@@ -57,7 +58,6 @@ check-local: $(MY_MAKEFILE)
 	@ ./final.sh
 
 all_features_SOURCES = all_features.cpp
-all_features_LDADD = $(LDADD)
 all_features_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 padder_SOURCES = padder.cpp
