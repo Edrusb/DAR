@@ -1,3 +1,6 @@
+from 2.6.0 to 2.6.1
+- fixed error in man page
+
 from 2.5.x to 2.6.0
 - new feature: support for binary delta in incremental/differential backups
   (relying on librsync)

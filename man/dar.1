@@ -21,7 +21,7 @@ may also use compression, at the difference that compression is used inside the 
 .PP
 But the most important feature of
 .B dar
-is its ability to make differential, incremental and decremental backups. In other words, backups that contain only new files or files that have changed from a backup of reference. Binary delta is available but not activated by default: in combination with differential, incremental and decremental backups, it leads not only to not save a file that has not changed (thing dar does without binary delta), but also to only save an rsync patch of any modified file, which lead to even smaller backups.
+is its ability to make differential, incremental and decremental backups. In other words, backups that contain only new files or files that have changed from a backup of reference. Binary delta is available but not activated by default: in combination with differential and incremental backups, it leads not only to not save a file that has not changed (thing dar does without binary delta), but also to only save an rsync patch of any modified file, which lead to even smaller backups.
 .P
 Moreover with differential backup,
 .B dar
