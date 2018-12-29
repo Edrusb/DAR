@@ -47,42 +47,117 @@ compress-exclusion:
 
 # Now follows all the file specification to never try to compress:
 
-# compressed video format
--Z "*.mpg"
--Z "*.mpeg"
+# Compressed video format.
 -Z "*.avi"
 -Z "*.cr2"
+-Z "*.flv"
+-Z "*.jng"
+-Z "*.m4v"
+-Z "*.mkv"
+-Z "*.mov"
+-Z "*.mp4*"
+-Z "*.mpeg"
+-Z "*.mpg"
+-Z "*.oga"
+-Z "*.swf"
 -Z "*.vob"
+-Z "*.webm"
+-Z "*.wmv"
 
-# compressed picture format
--Z "*.jpg"
+# Compressed animation.
+-Z "*.mng"
+
+# Compressed image format.
+-Z "*.bmp"
+-Z "*.gif"
+-Z "*.ico"
+-Z "*.jpe"
 -Z "*.jpeg"
+-Z "*.jpg"
+-Z "*.mmpz"
+-Z "*.mpeg"
 -Z "*.png"
+-Z "*.tif"
+-Z "*.tiff"
+-Z "*.webp"
 
-# compressed audio format
+# Compressed audio format.
+-Z "*.ac3"
+-Z "*.als"
+-Z "*.ape"
+-Z "*.bonk"
 -Z "*.flac"
+-Z "*.m4a"
+-Z "*.mp2"
 -Z "*.mp3"
+-Z "*.mpc"
+-Z "*.nsf"
 -Z "*.ogg"
+-Z "*.speex"
+-Z "*.spx"
+-Z "*.weba"
+-Z "*.wv"
 
-# compressed package
+# Compressed package.
 -Z "*.deb"
--Z "*.tgz"
--Z "*.tbz2"
 -Z "*.rpm"
--Z "*.xpi"
 -Z "*.run"
 -Z "*.sis"
+-Z "*.xpi"
 
-# other compressed data
--Z "*.gz"
+# Compressed data.
+-Z "*.7z"
 -Z "*.Z"
 -Z "*.bz2"
--Z "*.zip"
+-Z "*.cab"
+-Z "*.gz"
 -Z "*.jar"
 -Z "*.rar"
+-Z "*.tbz"
+-Z "*.tbz2"
+-Z "*.tgz"
+-Z "*.txz"
+-Z "*.wsz"
+-Z "*.wz"
 -Z "*.xz"
+# These are zip files. Not all are compressed, but considering that they can
+# get quite large it is probably more prudent to leave this uncommented.
+-Z "*.pk3"
+-Z "*.zip"
+# You can get better compression on these files, but then you should be
+# de/recompressing with an actual program, not dar.
+-Z "*.lz4"
+-Z "*.zoo"
 
-# dar archives (may be compressed)
+# Other, in alphabetical order.
+-Z "*.Po"
+-Z "*.aar"
+-Z "*.bx"
+-Z "*.chm"
+-Z "*.doc"
+-Z "*.epub"
+-Z "*.f3d"
+-Z "*.gpg"
+-Z "*.htmlz"
+-Z "*.iix"
+-Z "*.iso"
+-Z "*.jin"
+-Z "*.ods"
+-Z "*.odt"
+-Z "*.ser"
+-Z "*.svgz"
+-Z "*.swx"
+-Z "*.sxi"
+-Z "*.whl"
+-Z "*.wings"
+
+# These are blender bake files. Compression on these is optional in blender.
+# Blender's compression algorithm is better at compressing these than xz or
+# any other compression program that I have tested.
+# Comment only if you use uncompressed blender bake files.
+-Z "*.bphys"
+
+# Dar archives (may be compressed).
 -Z "*.dar"
 
 # Now we swap back to case sensitive mode for masks which is the default
