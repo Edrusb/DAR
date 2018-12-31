@@ -68,7 +68,7 @@ namespace libdar
 	// this structure is used for all cat_file inode that have
 	// either a delta signature or contain a delta patch (s_delta status)
 	// base_crc is used to check we apply the patch on the good file before proceeding
-	// result_crc is used to store the crc of the file the signature has been compulted on
+	// result_crc is used to store the crc of the file the signature has been computed on
 	// result_crc is also used once a patch has been applied to verify the correctness of the patch result
 
 
@@ -140,6 +140,7 @@ namespace libdar
 	    /// for can_obtain_sig() to return true before the signature is provided
 	void will_have_signature() { just_crc = false; clear_sig(); };
 
+	    /// the object pointed to by ptr must stay available when calling dump_data()/dump_metadata() later on
 	void set_sig_ref(memory_file *ptr);
 
 	    /// variante used when the delta_signature object will only contain CRCs (no delta signature)

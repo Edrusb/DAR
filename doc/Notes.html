@@ -519,7 +519,7 @@ compressed) | sig &nbsp; |&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; |(no EA/FSA)
       <div style="margin-left: 40px;">
       <div style="margin-left: 40px;">in the previous archive example, we find:<br>
       <ul>
-        <li>for file1: his data, a delta signature of this dada, Extended Attributes, and File Specific Attributes</li>
+        <li>for file1: his data, a delta signature of this data, Extended Attributes, and File Specific Attributes</li>
         <li>for file2: only his data, he has no delta signature, no EA no FSA</li>
         <li>for file3: data and EA</li>
         <li>for file4: no data, only a delta signature and FSA</li>
@@ -544,8 +544,7 @@ is mandatory, though if present they always follow this order:<br>
         </li>
       </ul>
       </div>
-</div>
-      <div style="margin-left: 80px;">More precisely about<span style="font-weight: bold;"> delta signature </span>combined with tape marks, there is additional fields present than just the delta sig and its CRC<br>
+      <div style="margin-left: 80px;">More precisely about<span style="font-weight: bold;"> delta signature </span>combined with tape marks, there is additional fields present than just the delta sig and its CRC:<br>
       </div>
       <div style="margin-left: 120px;"><code>+------+------+---------------+----------+--------+</code><br>
       <code>| base | sig&nbsp; | <span style="font-weight: bold;">sig data</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | <span style="font-weight: bold;">data CRC </span>| result |</code><br>
@@ -573,7 +572,7 @@ marks are not set.<br>
         </li>
         <li><span style="font-weight: bold;">result CRC</span> is the CRC of the resulting file once patched&nbsp; (to check the patching was successful)</li>
       </ul>
-
+      </div>
       </div>
 
       <div style="text-align: justify; margin-left: 40px;"><span style="text-decoration: underline; font-weight: bold;">the

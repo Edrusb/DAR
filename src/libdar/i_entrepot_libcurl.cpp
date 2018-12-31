@@ -121,7 +121,7 @@ namespace libdar
 		}
 		catch(Erange & e)
 		{
-		    throw Erange("entrepot_libcurl::i_entrepot_libcurl::inherited_unlink",
+		    throw Erange("entrepot_libcurl::i_entrepot_libcurl::read_dir_reset",
 				 tools_printf(gettext("Error met while preparing directory listing: %s"),
 					      curl_easy_strerror(err)));
 		}

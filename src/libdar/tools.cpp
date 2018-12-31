@@ -1147,10 +1147,14 @@ namespace libdar
 		{
 		    throw;
 		}
+		catch(Erange & e)
+		{
+		    dialog.message(e.get_message());
+		}
 		catch(Egeneric & e)
                 {
-                    string tmp = tools_strerror_r(errno);
-                    dialog.message(tools_printf(dar_gettext("Error removing file %s: %s"), c_entry.c_str(), tmp.c_str()));
+		    string msg = e.get_message();
+                    dialog.message(tools_printf(dar_gettext("Error removing file %s: %S"), c_entry.c_str(), &msg));
                 }
             }
     }

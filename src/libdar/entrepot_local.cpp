@@ -161,10 +161,12 @@ namespace libdar
 
     void entrepot_local::inherited_unlink(const string & filename) const
     {
-	if(::unlink(filename.c_str()) != 0)
+	string target = (get_full_path() + filename).display();
+
+	if(::unlink(target.c_str()) != 0)
 	{
-	    string tmp = tools_strerror_r(errno);
-	    throw Erange("entrepot_local::inherited_unlink", tools_printf(gettext("Cannot remove file %s: "), tmp.c_str()));
+	    string err = tools_strerror_r(errno);
+	    throw Erange("entrepot_local::inherited_unlink", tools_printf(gettext("Cannot remove file %s: %s"), target.c_str(), err.c_str()));
 	}
     }
 

@@ -2845,6 +2845,11 @@ namespace libdar
 	    Ethread_cancel* e_thread = dynamic_cast<Ethread_cancel*>(&e);
 	    Erange* e_range = dynamic_cast<Erange*>(&e);
 
+	    if(info_details)
+	    {
+		string msg = e.get_message();
+		dialog->message(tools_printf(gettext("error met while creating archive: %S"), & msg));
+	    }
 	    if(e_thread == nullptr && e_range == nullptr)
 		throw;
 
@@ -4470,7 +4475,7 @@ namespace libdar
 		else // no ref_file inode, trying to calculate the delta signature from data
 		{
 		    if(e_file->can_get_data()
-		       && e_file->get_saved_status() != saved_status::delta)
+		       && e_file->get_saved_status() != saved_status::delta) // provided data is not a delta signature
 		    {
 			null_file trou_noir(gf_write_only);
 			generic_file *data = nullptr;
@@ -4505,7 +4510,11 @@ namespace libdar
 			    delete data;
 		    }
 		    else
-			throw SRC_BUG;
+		    {
+			if(e_file->get_saved_status() == saved_status::delta)
+			    throw SRC_BUG;
+			e_file->read_delta_signature(sig);
+		    }
 		}
 
 		cat.pre_add_delta_sig(&pdesc);

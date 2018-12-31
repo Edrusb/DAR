@@ -44,24 +44,32 @@ namespace libdar
     {
 	clear();
 
-	patch_base_check = create_crc_from_file(f);
-	delta_sig_size.read(f);
-
-	if(delta_sig_size.is_zero())
-	    just_crc = true;
-	else
+	try
 	{
-	    just_crc = false;
-	    if(sequential_read)
-	    {
-		delta_sig_offset = f.get_position();
-		read_data(f);
-	    }
-	    else
-		delta_sig_offset.read(f);
-	}
+	    patch_base_check = create_crc_from_file(f);
+	    delta_sig_size.read(f);
 
-	patch_result_check = create_crc_from_file(f);
+	    if(delta_sig_size.is_zero())
+		just_crc = true;
+	    else
+	    {
+		just_crc = false;
+		if(sequential_read)
+		{
+		    delta_sig_offset = f.get_position();
+		    read_data(f);
+		}
+		else
+		    delta_sig_offset.read(f);
+	    }
+
+	    patch_result_check = create_crc_from_file(f);
+	}
+	catch(...)
+	{
+	    clear();
+	    throw;
+	}
     }
 
     void cat_delta_signature::read_data(generic_file & f)
@@ -97,7 +105,7 @@ namespace libdar
 		if(delta_sig_crc == nullptr)
 		    throw SRC_BUG;
 		if(*delta_sig_crc != *calculated)
-		    throw Erange("cat_delta_signature::read_delta_signature", gettext("CRC error met while reading delta signature: data corruption."));
+		    throw Erange("cat_delta_signature::read_data", gettext("CRC error met while reading delta signature: data corruption."));
 	    }
 	    catch(...)
 	    {
