@@ -2845,6 +2845,11 @@ namespace libdar
 	    Ethread_cancel* e_thread = dynamic_cast<Ethread_cancel*>(&e);
 	    Erange* e_range = dynamic_cast<Erange*>(&e);
 
+	    if(info_details)
+	    {
+		string msg = e.get_message();
+		dialog->message(tools_printf(gettext("error met while creating archive: %S"), & msg));
+	    }
 	    if(e_thread == nullptr && e_range == nullptr)
 		throw;
 
