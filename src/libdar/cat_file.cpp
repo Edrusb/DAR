@@ -1047,6 +1047,15 @@ namespace libdar
 	}
 	catch(Egeneric & e)
 	{
+	    if(delta_sig != nullptr)
+	    {
+		cat_file *me = const_cast<cat_file *>(this);
+		if(me == nullptr)
+		    throw SRC_BUG;
+
+		delete delta_sig;
+		me->delta_sig = nullptr;
+	    }
 	    e.prepend_message(gettext("Error while retrieving delta signature from the archive: "));
 	    throw;
 	}

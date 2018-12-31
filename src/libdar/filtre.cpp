@@ -4510,7 +4510,11 @@ namespace libdar
 			    delete data;
 		    }
 		    else
-			throw SRC_BUG;
+		    {
+			if(e_file->get_saved_status() == saved_status::delta)
+			    throw SRC_BUG;
+			e_file->read_delta_signature(sig);
+		    }
 		}
 
 		cat.pre_add_delta_sig(&pdesc);
