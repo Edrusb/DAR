@@ -97,7 +97,7 @@ namespace libdar
 		if(delta_sig_crc == nullptr)
 		    throw SRC_BUG;
 		if(*delta_sig_crc != *calculated)
-		    throw Erange("cat_delta_signature::read_delta_signature", gettext("CRC error met while reading delta signature: data corruption."));
+		    throw Erange("cat_delta_signature::read_data", gettext("CRC error met while reading delta signature: data corruption."));
 	    }
 	    catch(...)
 	    {
