@@ -140,6 +140,7 @@ namespace libdar
 	    /// for can_obtain_sig() to return true before the signature is provided
 	void will_have_signature() { just_crc = false; clear_sig(); };
 
+	    /// the object pointed to by ptr must stay available when calling dump_data()/dump_metadata() later on
 	void set_sig_ref(memory_file *ptr);
 
 	    /// variante used when the delta_signature object will only contain CRCs (no delta signature)

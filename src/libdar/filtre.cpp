@@ -4470,7 +4470,7 @@ namespace libdar
 		else // no ref_file inode, trying to calculate the delta signature from data
 		{
 		    if(e_file->can_get_data()
-		       && e_file->get_saved_status() != saved_status::delta)
+		       && e_file->get_saved_status() != saved_status::delta) // provided data is not a delta signature
 		    {
 			null_file trou_noir(gf_write_only);
 			generic_file *data = nullptr;
