@@ -1,3 +1,8 @@
+version 2.6.1
+--------------
+Thanks to David Niklas for contribution upgrading the /etc/darrc list
+of file types that does not worth compressing
+
 version 2.6.0
 --------------
 Many Thanks to Gulikoza who helped troubleshooting around the librsync
