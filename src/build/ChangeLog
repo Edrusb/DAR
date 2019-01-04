@@ -15,6 +15,8 @@ from 2.6.0 to 2.6.1
   not to compress (compress-exclusion defined in /etc/darrc)
 - review cat_delta_signature implementation in order to be able to fix
   memory consumtion problem when delta signature are used
+- fixed missing mark for data CRC when the data is a delta patch, leading
+  sequential reading to fail when a delta patch is encontered
 
 from 2.5.x to 2.6.0
 - new feature: support for binary delta in incremental/differential backups
