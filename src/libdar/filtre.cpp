@@ -4481,22 +4481,35 @@ namespace libdar
 			if(display_treated)
 			    dialog->message(string(gettext("Calculating delta signature from filesystem: "))
 					   + info_quoi);
-			try
+
+			try // protecting data
 			{
 			    infinint crc_size = e_file->get_size();
 			    crc *patch_sig_crc = nullptr;
-			    sig = new (nothrow) memory_file();
-			    if(sig == nullptr)
-				throw Ememory("filtre_sauvegarde");
 
-			    data = e_file->get_data(cat_file::normal, sig, nullptr);
-			    if(data == nullptr)
-				throw Ememory("filtre_sauvegarde");
-			    data->copy_to(trou_noir, crc_size, patch_sig_crc);
-			    if(patch_sig_crc == nullptr)
-				throw SRC_BUG;
-			    e_file->set_patch_base_crc(*patch_sig_crc);
-			    e_file->set_patch_result_crc(*patch_sig_crc);
+			    try // protecting patch_sig_crc
+			    {
+				sig = new (nothrow) memory_file();
+				if(sig == nullptr)
+				    throw Ememory("filtre_sauvegarde");
+
+				data = e_file->get_data(cat_file::normal, sig, nullptr);
+				if(data == nullptr)
+				    throw Ememory("filtre_sauvegarde");
+				data->copy_to(trou_noir, crc_size, patch_sig_crc);
+				if(patch_sig_crc == nullptr)
+				    throw SRC_BUG;
+				e_file->set_patch_base_crc(*patch_sig_crc);
+				e_file->set_patch_result_crc(*patch_sig_crc);
+			    }
+			    catch(...)
+			    {
+				if(patch_sig_crc != nullptr)
+				    delete patch_sig_crc;
+				throw;
+			    }
+			    if(patch_sig_crc != nullptr)
+				delete patch_sig_crc;
 			}
 			catch(...)
 			{
