@@ -146,11 +146,10 @@ namespace libdar
 	    /// variante used when the delta_signature object will only contain CRCs (no delta signature)
 	void set_sig_ref() { just_crc = true; delta_sig_size = 0; };
 
-	    /// write down the data only (only for archive without sequential read mode support)
+	    /// write down the data eventually with sequential read mark and its metadata
 	void dump_data(generic_file & f, bool sequential_mode) const;
 
-	    /// write down the METADATA either in sequential_read mode (data+metadata) or in
-	    /// direct access mode (metadata only)
+	    /// write down the delta_signature metadata for catalogue
 	void dump_metadata(generic_file & f) const;
 
 

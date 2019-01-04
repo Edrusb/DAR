@@ -3026,7 +3026,6 @@ namespace libdar
 			// need to store at least the base CRC and result CRC even if not delta signature is computed:
 		    fic->will_have_delta_signature_structure();
 		}
-		    // else, merging operation, no delta operation performed, we will eventually just copy the delta signature later
 	    }
 
 	    do // loop if resave_uncompressed is set, this is the OUTER LOOP
@@ -3097,7 +3096,7 @@ namespace libdar
 		    if(sem != nullptr)
 			sem->raise(info_quoi, ino, true);
 
-		    try
+		    try // protecting delta_sig and putting "sem" in proper status in any case
 		    {
 			do // while "loop" is true, this is the INNER LOOP
 			{
@@ -3544,7 +3543,7 @@ namespace libdar
 				    if(display_treated)
 					dialog->message(string(gettext("Dumping delta signature structure for saved file: ")) + info_quoi);
 
-				    if(delta_sig == nullptr)
+				    if(delta_sig == nullptr) // no delta_sig go calculated during this save_inode() execution
 				    {
 					if(!delta_diff)
 					{
@@ -3569,7 +3568,6 @@ namespace libdar
 					    throw SRC_BUG;
 					case saved_status::not_saved:
 					    throw SRC_BUG;
-						// we should not reach this statement with this status
 					case saved_status::delta:
 					    if(ref_fic->has_patch_result_crc())
 						ref_fic->get_patch_result_crc(tmp);
@@ -4438,7 +4436,7 @@ namespace libdar
 	{
 	    memory_file * sig = nullptr;
 
-	    try
+	    try // protecting sig
 	    {
 		if(ref_file != nullptr
 		   && ref_file->has_delta_signature_structure())
@@ -4509,7 +4507,7 @@ namespace libdar
 			if(data != nullptr)
 			    delete data;
 		    }
-		    else
+		    else // no data or delta patch is availablle
 		    {
 			if(e_file->get_saved_status() == saved_status::delta)
 			    throw SRC_BUG;
