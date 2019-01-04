@@ -1364,7 +1364,7 @@ namespace libdar
         const cat_eod tmp_eod;
 	thread_cancellation thr_cancel;
 	string perimeter;
-	memory_file *delta_sig = nullptr;
+	shared_ptr<memory_file> delta_sig;
 
 	if(!dialog)
 	    throw SRC_BUG; // dialog points to nothing
@@ -1516,10 +1516,10 @@ namespace libdar
 				// reading the delta signature
 
 			    e_file->read_delta_signature(delta_sig);
-			    if(delta_sig != nullptr)
+			    if(delta_sig)
 			    {
-				delete delta_sig;
-				delta_sig = nullptr;
+				delta_sig.reset();
+				e_file->drop_delta_signature_data();
 			    }
 			    if(perimeter == "")
 				perimeter = "Delta sig";
@@ -2993,7 +2993,7 @@ namespace libdar
 	const cat_file *ref_fic = dynamic_cast<const cat_file *>(ref);
 	bool resave_uncompressed = false;
 	infinint rewinder = pdesc.stack->get_position(); // we skip back here if data must be saved uncompressed
-	memory_file *delta_sig_ref = nullptr; // holds the delta_signature that will be used as reference for delta patch later on
+	shared_ptr<memory_file> delta_sig_ref; // holds the delta_signature that will be used as reference for delta patch later on
 	const crc *result_crc = nullptr;
 
 	if(pdesc.compr == nullptr)
@@ -3007,8 +3007,6 @@ namespace libdar
 	    fic = dynamic_cast<cat_file *>(ino);
 	}
 
-	try // protecting delta_sig_ref
-	{
 
 	    if(fic != nullptr && fic->get_saved_status() == saved_status::delta)
 	    {
@@ -3020,8 +3018,8 @@ namespace libdar
 			// fetching the delta signature to base the patch on
 
 		    ref_fic->read_delta_signature(delta_sig_ref);
-		    if(delta_sig_ref == nullptr)
-			throw Ememory("save_inode");
+		    if(!delta_sig_ref)
+			throw SRC_BUG;
 
 			// need to store at least the base CRC and result CRC even if not delta signature is computed:
 		    fic->will_have_delta_signature_structure();
@@ -3079,7 +3077,7 @@ namespace libdar
 			dialog->message(string(gettext("Resaving file without compression: ")) + info_quoi);
 		    else
 		    {
-			if(delta_sig_ref != nullptr)
+			if(delta_sig_ref)
 			    dialog->message(string(gettext("Delta saving file to archive: ")) + info_quoi);
 			else
 			{
@@ -3091,7 +3089,7 @@ namespace libdar
 
 		if(fic != nullptr)
 		{
-		    memory_file *delta_sig = nullptr;
+		    shared_ptr<memory_file> delta_sig;
 
 		    if(sem != nullptr)
 			sem->raise(info_quoi, ino, true);
@@ -3119,10 +3117,10 @@ namespace libdar
 				case cat_file::keep_hole:
 				    if(delta_signature && !fic->get_sparse_file_detection_read())
 				    {
-					delta_sig = new (nothrow) memory_file();
-					if(delta_sig == nullptr)
+					delta_sig.reset(new (nothrow) memory_file());
+					if(!delta_sig)
 					    throw Ememory("saved_inode");
-					source = fic->get_data(cat_file::normal, delta_sig, nullptr);
+					source = fic->get_data(cat_file::normal, delta_sig, shared_ptr<memory_file>());
 				    }
 				    else
 					source = fic->get_data(keep_mode, nullptr, nullptr);
@@ -3130,8 +3128,8 @@ namespace libdar
 				case cat_file::normal:
 				    if(delta_signature)
 				    {
-					delta_sig = new (nothrow) memory_file();
-					if(delta_sig == nullptr)
+					delta_sig.reset(new (nothrow) memory_file());
+					if(!delta_sig)
 					    throw Ememory("save_inode");
 				    }
 
@@ -3543,7 +3541,7 @@ namespace libdar
 				    if(display_treated)
 					dialog->message(string(gettext("Dumping delta signature structure for saved file: ")) + info_quoi);
 
-				    if(delta_sig == nullptr) // no delta_sig go calculated during this save_inode() execution
+				    if(!delta_sig) // no delta_sig go calculated during this save_inode() execution
 				    {
 					if(!delta_diff)
 					{
@@ -3620,8 +3618,8 @@ namespace libdar
 				    pdesc.compr->suspend_compression();
 
 					// dropping the data to the archive and recording its location in the cat_file object
-				    if(delta_sig != nullptr)
-					fic->dump_delta_signature(*delta_sig, *(pdesc.compr), pdesc.esc != nullptr);
+				    if(delta_sig)
+					fic->dump_delta_signature(delta_sig, *(pdesc.compr), pdesc.esc != nullptr);
 				    else
 					fic->dump_delta_signature(*(pdesc.compr), pdesc.esc != nullptr);
 				}
@@ -3635,14 +3633,10 @@ namespace libdar
 		    {
 			if(sem != nullptr)
 			    sem->lower();
-			if(delta_sig != nullptr)
-			    delete delta_sig;
 			throw;
 		    }
 		    if(sem != nullptr)
 			sem->lower();
-		    if(delta_sig != nullptr)
-			delete delta_sig;
 		}
 		else // fic == nullptr
 		    if(sem != nullptr)
@@ -3652,15 +3646,6 @@ namespace libdar
 		    }
 	    }
 	    while(resave_uncompressed); // OUTER LOOP
-	}
-	catch(...)
-	{
-	    if(delta_sig_ref != nullptr)
-		delete delta_sig_ref;
-	    throw;
-	}
-	if(delta_sig_ref != nullptr)
-	    delete delta_sig_ref;
 
 	return ret;
     }
@@ -4434,10 +4419,8 @@ namespace libdar
 	if(e_file != nullptr
 	   && e_file->has_delta_signature_structure())
 	{
-	    memory_file * sig = nullptr;
+	    shared_ptr<memory_file> sig;
 
-	    try // protecting sig
-	    {
 		if(ref_file != nullptr
 		   && ref_file->has_delta_signature_structure())
 		{
@@ -4447,7 +4430,7 @@ namespace libdar
 		    if(ref_file->has_delta_signature_available())
 		    {
 			ref_file->read_delta_signature(sig);
-			if(sig == nullptr)
+			if(!sig)
 			    throw SRC_BUG;
 		    }
 
@@ -4489,8 +4472,8 @@ namespace libdar
 
 			    try // protecting patch_sig_crc
 			    {
-				sig = new (nothrow) memory_file();
-				if(sig == nullptr)
+				sig.reset(new (nothrow) memory_file());
+				if(!sig)
 				    throw Ememory("filtre_sauvegarde");
 
 				data = e_file->get_data(cat_file::normal, sig, nullptr);
@@ -4530,19 +4513,10 @@ namespace libdar
 
 		cat.pre_add_delta_sig(&pdesc);
 		pdesc.compr->suspend_compression();
-		if(sig != nullptr)
-		    e_file->dump_delta_signature(*sig, *(pdesc.compr), pdesc.esc != nullptr);
+		if(sig)
+		    e_file->dump_delta_signature(sig, *(pdesc.compr), pdesc.esc != nullptr);
 		else
 		    e_file->dump_delta_signature(*(pdesc.compr), pdesc.esc != nullptr);
-	    }
-	    catch(...)
-	    {
-		if(sig != nullptr)
-		    delete sig;
-		throw;
-	    }
-	    if(sig != nullptr)
-		delete sig;
 	}
     }
 

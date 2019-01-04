@@ -37,10 +37,10 @@ namespace libdar
     cat_delta_signature::cat_delta_signature(generic_file & f, bool sequential_read)
     {
 	init();
-	read_metadata(f, sequential_read);
+	read(f, sequential_read);
     }
 
-    void cat_delta_signature::read_metadata(generic_file & f, bool sequential_read)
+    void cat_delta_signature::read(generic_file & f, bool sequential_read)
     {
 	clear();
 
@@ -57,10 +57,13 @@ namespace libdar
 		if(sequential_read)
 		{
 		    delta_sig_offset = f.get_position();
-		    read_data(f);
+		    fetch_data(f);
 		}
 		else
+		{
 		    delta_sig_offset.read(f);
+		    src = &f;
+		}
 	    }
 
 	    patch_result_check = create_crc_from_file(f);
@@ -72,93 +75,52 @@ namespace libdar
 	}
     }
 
-    void cat_delta_signature::read_data(generic_file & f)
+
+    std::shared_ptr<memory_file> cat_delta_signature::obtain_sig()
     {
-	if(!delta_sig_size.is_zero() && delta_sig_offset.is_zero())
-	    throw SRC_BUG;
-
-	if(!delta_sig_size.is_zero() && just_crc)
-	    throw SRC_BUG;
-
-	if(sig == nullptr && !delta_sig_size.is_zero())
-	{
-	    crc *calculated = nullptr;
-	    crc *delta_sig_crc = nullptr;
-
-	    try
-	    {
-		tronc bounded(&f, delta_sig_offset, delta_sig_size, false);
-		infinint crc_size = tools_file_size_to_crc_size(delta_sig_size);
-
-		sig = new (nothrow) memory_file();
-		if(sig == nullptr)
-		    throw Ememory("cat_delta_signature::read");
-		sig_is_ours = true;
-
-		bounded.skip(0);
-		bounded.copy_to(*sig, crc_size, calculated);
-		if(calculated == nullptr)
-		    throw SRC_BUG;
-		sig->skip(0);
-
-		delta_sig_crc = create_crc_from_file(f);
-		if(delta_sig_crc == nullptr)
-		    throw SRC_BUG;
-		if(*delta_sig_crc != *calculated)
-		    throw Erange("cat_delta_signature::read_data", gettext("CRC error met while reading delta signature: data corruption."));
-	    }
-	    catch(...)
-	    {
-		if(calculated != nullptr)
-		    delete calculated;
-		if(delta_sig_crc != nullptr)
-		    delete delta_sig_crc;
-		throw;
-	    }
-	    if(calculated != nullptr)
-		delete calculated;
-	    if(delta_sig_crc != nullptr)
-		delete delta_sig_crc;
-	}
-    }
-
-    memory_file *cat_delta_signature::obtain_sig()
-    {
-	memory_file *ret = sig;
-
 	if(just_crc)
 	    throw SRC_BUG;
-
-	if(sig == nullptr)
-	    throw SRC_BUG;
-	if(!sig_is_ours)
-	    throw SRC_BUG;
-
-	sig_is_ours = false;
-	sig = nullptr;
-
-	return ret;
+	if(!sig)
+	{
+	    if(src == nullptr)
+		throw SRC_BUG;
+	    fetch_data(*src);
+	    if(!sig)
+		throw SRC_BUG; // fetch_data() failed but did not raised any exception
+	}
+	return sig;
     }
 
-    void cat_delta_signature::set_sig_ref(memory_file *ptr)
+    void cat_delta_signature::set_sig(const std::shared_ptr<memory_file> & ptr)
     {
-	if(ptr == nullptr)
+	if(!ptr)
 	    throw SRC_BUG;
-
-	if(sig != nullptr)
-	{
-	    if(sig_is_ours)
-		delete sig;
-	}
-
-	sig_is_ours = false;
 	sig = ptr;
 	just_crc = false;
-	delta_sig_size = ptr->size();
+	delta_sig_size = sig->size();
     }
 
     void cat_delta_signature::dump_data(generic_file & f, bool sequential_mode) const
     {
+	    // sanity check
+
+	if(delta_sig_size.is_zero() ^ just_crc)
+	    throw SRC_BUG;
+
+	    // fetching the data if it is missing
+
+	if(!just_crc)
+	{
+	    if(!sig)
+	    {
+		if(src != nullptr)
+		    fetch_data(*src);
+		else
+		    throw SRC_BUG; // sig should be dumped but is not present and cannot be obtained
+	    }
+	}
+	    // dumping data
+
 	if(sequential_mode)
 	{
 	    if(!has_patch_base_crc())
@@ -173,12 +135,11 @@ namespace libdar
 	    crc *calculated = nullptr;
 	    cat_delta_signature *me = const_cast<cat_delta_signature *>(this);
 
-	    if(sig == nullptr)
-		throw SRC_BUG;
-
 	    try
 	    {
 		me->delta_sig_offset = f.get_position();
+		if(!sig)
+		    throw SRC_BUG;
 		sig->skip(0);
 		sig->copy_to(f, crc_size, calculated);
 		if(calculated == nullptr)
@@ -193,11 +154,6 @@ namespace libdar
 	    }
 	    if(calculated != nullptr)
 		delete calculated;
-
-	    if(sig_is_ours)
-		delete sig;
-	    me->sig = nullptr;
-	    me->sig_is_ours = false;
 	}
 
 	if(sequential_mode)
@@ -269,31 +225,20 @@ namespace libdar
 
     void cat_delta_signature::init() noexcept
     {
-	delta_sig_offset = 0;
-	delta_sig_size = 0;
-	sig = nullptr;
-	sig_is_ours = false;
 	patch_base_check = nullptr;
+	delta_sig_size = 0;
+	delta_sig_offset = 0;
+	sig.reset();
 	patch_result_check = nullptr;
 	just_crc = true;
+	src = nullptr;
     }
 
     void cat_delta_signature::copy_from(const cat_delta_signature & ref)
     {
 	delta_sig_offset = ref.delta_sig_offset;
 	delta_sig_size = ref.delta_sig_size;
-	sig_is_ours = ref.sig_is_ours;
-	if(sig_is_ours)
-	    if(ref.sig != nullptr)
-	    {
-		sig = new (nothrow) memory_file(*ref.sig);
-		if(sig == nullptr)
-		    throw Ememory("cat_delta_signature::copy_from");
-	    }
-	    else
-		sig = nullptr;
-	else
-	    sig = ref.sig;
+	sig = ref.sig;
 	if(ref.patch_base_check != nullptr)
 	{
 	    patch_base_check = ref.patch_base_check->clone();
@@ -311,6 +256,7 @@ namespace libdar
 	else
 	    patch_result_check = nullptr;
 	just_crc = ref.just_crc;
+	src = ref.src;
     }
 
     void cat_delta_signature::move_from(cat_delta_signature && ref) noexcept
@@ -318,42 +264,82 @@ namespace libdar
 	delta_sig_offset = move(ref.delta_sig_offset);
 	delta_sig_size = move(ref.delta_sig_size);
 
-	    // for sig_is_ours field, we cannot assume bool's move operator
-	    // swaps the values (implementation dependant),
-	    // we need to be sure values are swapped:
-	swap(sig_is_ours, ref.sig_is_ours);
-
-	    // we can swap the memory file, because sig_is_ours is swapped
+       	    // we can swap the memory file, because sig_is_ours is swapped
 	    // too and we will known when destroying ref whether we own
 	    // the object pointed to by sig or not
-	swap(sig, ref.sig);
+	sig.swap(ref.sig);
 	swap(patch_base_check, ref.patch_base_check);
 	swap(patch_result_check, ref.patch_result_check);
 	just_crc = move(ref.just_crc);
-    }
-
-    void cat_delta_signature::clear_sig() noexcept
-    {
-	if(sig != nullptr)
-	{
-	    if(sig_is_ours)
-		delete sig;
-	    sig = nullptr;
-	}
+	src = move(ref.src);
     }
 
     void cat_delta_signature::destroy() noexcept
     {
-	clear_sig();
 	if(patch_base_check != nullptr)
 	{
 	    delete patch_base_check;
 	    patch_base_check = nullptr;
 	}
+	sig.reset();
 	if(patch_result_check != nullptr)
 	{
 	    delete patch_result_check;
 	    patch_result_check = nullptr;
+	}
+	src = nullptr;
+    }
+
+    void cat_delta_signature::fetch_data(generic_file & f) const
+    {
+	if(!delta_sig_size.is_zero() && delta_sig_offset.is_zero())
+	    throw SRC_BUG;
+
+	if(just_crc)
+	    return;
+
+	if(delta_sig_size.is_zero())
+	    throw SRC_BUG;
+
+	if(sig == nullptr) // we have to fetch the data
+	{
+	    crc *calculated = nullptr;
+	    crc *delta_sig_crc = nullptr;
+
+	    try
+	    {
+		tronc bounded(&f, delta_sig_offset, delta_sig_size, false);
+		infinint crc_size = tools_file_size_to_crc_size(delta_sig_size);
+
+		sig.reset(new (nothrow) memory_file());
+		if(!sig)
+		    throw Ememory("cat_delta_signature::read");
+
+		bounded.skip(0);
+		bounded.copy_to(*sig, crc_size, calculated);
+		if(calculated == nullptr)
+		    throw SRC_BUG;
+		sig->skip(0);
+
+		delta_sig_crc = create_crc_from_file(f);
+		if(delta_sig_crc == nullptr)
+		    throw Erange("cat_delta_signature::fetch_data", gettext("Error while reading CRC of delta signature data. Data corruption occurred"));
+		if(*delta_sig_crc != *calculated)
+		    throw Erange("cat_delta_signature::read_data", gettext("CRC error met while reading delta signature: data corruption."));
+	    }
+	    catch(...)
+	    {
+		if(calculated != nullptr)
+		    delete calculated;
+		if(delta_sig_crc != nullptr)
+		    delete delta_sig_crc;
+		sig.reset();
+		throw;
+	    }
+	    if(calculated != nullptr)
+		delete calculated;
+	    if(delta_sig_crc != nullptr)
+		delete delta_sig_crc;
 	}
     }
 

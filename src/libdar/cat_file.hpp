@@ -110,8 +110,8 @@ namespace libdar
 	    /// \note when both delta_sig and delta_ref are provided, the delta signature is computed on the
 	    /// file data, then the delta binary is computed.
         virtual generic_file *get_data(get_data_mode mode,
-				       memory_file *delta_sig,
-				       generic_file *delta_ref,
+				       std::shared_ptr<memory_file> delta_sig_mem,
+				       std::shared_ptr<memory_file> delta_ref,
 				       const crc **checksum = nullptr) const;
         void clean_data(); // partially free memory (but get_data() becomes disabled)
         void set_offset(const infinint & r);
@@ -187,17 +187,20 @@ namespace libdar
 	    /// \param[in] sig is the signature to dump
 	    /// \param[in] where is the location where to write down the signature
 	    /// \param[in] small if set to true drop down additional information to allow sequential reading mode
-	void dump_delta_signature(memory_file & sig, generic_file & where, bool small) const;
+	void dump_delta_signature(std::shared_ptr<memory_file> & sig, generic_file & where, bool small) const;
 
 	    /// variant of dump_delta_signature when just CRC have to be dumped
 	void dump_delta_signature(generic_file & where, bool small) const;
 
 	    /// fetch the delta signature from the archive
 
-	    /// \param[in] delta_sig is either nullptr or points to a newly allocated memory_file
-	    /// containing the delta signature. The caller has the duty to destroy this object after use
+	    /// \param[out] delta_sig is either nullptr or points to a shared memory_file
+	    /// containing the delta signature.
 	    /// \note nullptr is returned if the delta_signature only contains CRCs
-	void read_delta_signature(memory_file * & delta_sig) const;
+	void read_delta_signature(std::shared_ptr<memory_file> & delta_sig) const;
+
+	    /// drop the delta signature from memory (will not more be posible to be read, using read_delta_signature)
+	void drop_delta_signature_data() const;
 
 	    /// return true if ref and "this" have both equal delta signatures
 	bool has_same_delta_signature(const cat_file & ref) const;

@@ -44,14 +44,14 @@ namespace libdar
     }
 
     generic_file *cat_door::get_data(get_data_mode mode,
-				     memory_file *delta_sig,
-				     generic_file *delta_ref,
+				     shared_ptr<memory_file> delta_sig,
+				     shared_ptr<memory_file> delta_ref,
 				     const crc**checksum) const
     {
 	generic_file *ret = nullptr;
 
 	    // we never calculate delta signature for door inode
-	if(delta_sig != nullptr)
+	if(delta_sig)
 	    delta_sig->reset();
 
 	if(status == from_path)
