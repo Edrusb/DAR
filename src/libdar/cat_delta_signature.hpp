@@ -89,14 +89,13 @@ namespace libdar
     class cat_delta_signature
     {
     public:
-	    /// constructor reading the object METADATA (and also its DATA when in sequential mode) from an archive
+	    /// constructor to read an object (using read() later on) from filesystem
 
-	    /// \param[in] f where to read the data from
-	    /// \param[in] sequential_read if true read the whole metadata+data as it was dropped in sequential read mode, else only read the metadata (found in a catalogue)
-	cat_delta_signature(generic_file & f, bool sequential_read);
-
-	    /// constructor creating a brand new empty object
-	cat_delta_signature() { init(); };
+	    /// \param[in] f where to read the data from, used when calling read() later on. f may also
+	    /// be set to nullptr when building an object in memory to be dump to file/archive later on,
+	    /// the generic_file will be provided when calling dump*() method
+	    /// \note f must survive the cat_delta_signature object, and not be destroy before it
+	cat_delta_signature(generic_file* f) { init(); src = f; };
 
 	    /// copy constructor
 	cat_delta_signature(const cat_delta_signature & ref) { init(); copy_from(ref); };
@@ -105,7 +104,7 @@ namespace libdar
 	cat_delta_signature(cat_delta_signature && ref) noexcept { init(); move_from(std::move(ref)); };
 
 	    /// assignement operator
-	cat_delta_signature & operator = (const cat_delta_signature & ref) { destroy(); init(); copy_from(ref); return *this; };
+	cat_delta_signature & operator = (const cat_delta_signature & ref) { clear(); copy_from(ref); return *this; };
 
 	    /// move assignment operator
 	cat_delta_signature & operator = (cat_delta_signature && ref) noexcept { move_from(std::move(ref)); return *this; };
@@ -115,20 +114,25 @@ namespace libdar
 
 	    /////////// method for read mode ///////////
 
-	    /// same action as the first constructor but on an existing object
-
-	    /// \note in sequential_read mode the data is also read
-	void read(generic_file & f, bool sequential_read);
+	    /// read the metadata of the object from the generic_file given at construction time
+	    /// \note in sequential read mode, the data is also read at that time and loaded into memory,
+	    /// thing which is done transparently by obtain_sig() when in direct access mode
+	void read(bool sequential_read);
 
 	    /// the cat_delta_signature structure can only hold CRC without delta_signature, this call gives the situation about that point
 	bool can_obtain_sig() { return !just_crc; };
 
 	    /// provide a memory_file object which the caller has the duty to destroy after use
 
-	    /// \note to obtain the sig data a second time, one must call read_data() again, then obtain_sig() should succeed
+	    /// \note while drop_sig has not been called, obtain_sig() can be called any number of time
+	    /// \note in direct mode (not sequential_real mode) the first call to obtain_sig() fetches
+	    /// the data from the archive and loads it to memory.
 	std::shared_ptr<memory_file> obtain_sig();
 
 	    /// drop signature but keep metadata available
+
+	    /// \note there is a lot of chance that a call to obtain_sig() will fail after drop_sig() has been
+	    /// called when in sequential read mode, due to the limited possibility to skip backward in that mode
 	void drop_sig() { sig.reset(); };
 
 	    /////////// method for write mode ///////////

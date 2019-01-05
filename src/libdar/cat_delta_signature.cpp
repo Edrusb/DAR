@@ -34,20 +34,15 @@ using namespace std;
 namespace libdar
 {
 
-    cat_delta_signature::cat_delta_signature(generic_file & f, bool sequential_read)
+    void cat_delta_signature::read(bool sequential_read)
     {
-	init();
-	read(f, sequential_read);
-    }
-
-    void cat_delta_signature::read(generic_file & f, bool sequential_read)
-    {
-	clear();
+	if(src == nullptr)
+	    throw SRC_BUG;
 
 	try
 	{
-	    patch_base_check = create_crc_from_file(f);
-	    delta_sig_size.read(f);
+	    patch_base_check = create_crc_from_file(*src);
+	    delta_sig_size.read(*src);
 
 	    if(delta_sig_size.is_zero())
 		just_crc = true;
@@ -56,17 +51,14 @@ namespace libdar
 		just_crc = false;
 		if(sequential_read)
 		{
-		    delta_sig_offset = f.get_position();
-		    fetch_data(f);
+		    delta_sig_offset = src->get_position();
+		    fetch_data(*src);
 		}
 		else
-		{
-		    delta_sig_offset.read(f);
-		    src = &f;
-		}
+		    delta_sig_offset.read(*src);
 	    }
 
-	    patch_result_check = create_crc_from_file(f);
+	    patch_result_check = create_crc_from_file(*src);
 	}
 	catch(...)
 	{
@@ -80,6 +72,7 @@ namespace libdar
     {
 	if(just_crc)
 	    throw SRC_BUG;
+
 	if(!sig)
 	{
 	    if(src == nullptr)
@@ -88,6 +81,7 @@ namespace libdar
 	    if(!sig)
 		throw SRC_BUG; // fetch_data() failed but did not raised any exception
 	}
+
 	return sig;
     }
 

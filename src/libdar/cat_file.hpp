@@ -177,7 +177,10 @@ namespace libdar
 	void set_patch_result_crc(const crc & c);
 
 	    /// prepare the object to receive a delta signature structure
-	void will_have_delta_signature_structure();
+
+	    /// \param[in] ptr may be nullptr when the cat_file object is setup from memory or non null
+	    /// when reading the object from an archive, ptr points to the object to read the data from
+	void will_have_delta_signature_structure(generic_file *ptr = nullptr);
 
 	    /// prepare the object to receive a delta signature structure including delta signature
 	void will_have_delta_signature_available();
@@ -237,6 +240,7 @@ namespace libdar
 	char file_data_status_read;  ///< defines the datastructure to use when reading the data
 	char file_data_status_write; ///< defines the datastructure to apply when writing down the data
 	cat_delta_signature *delta_sig; ///< delta signature and associated CRC
+	mutable bool delta_sig_read; ///< whether delta sig has been read/initialized from filesystem
 
 	void sub_compare_internal(const cat_inode & other,
 				  bool can_read_my_data,

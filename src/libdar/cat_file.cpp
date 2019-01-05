@@ -67,6 +67,7 @@ namespace libdar
         check = nullptr;
         dirty = false;
 	delta_sig = nullptr;
+	delta_sig_read = false;
 
         try
         {
@@ -117,6 +118,7 @@ namespace libdar
         file_data_status_write = 0; // may be changed later using set_sparse_file_detection_write()
         dirty = false;
 	delta_sig = nullptr;
+	delta_sig_read = false;
 
 	generic_file *ptr = nullptr;
 
@@ -157,7 +159,7 @@ namespace libdar
                             }
 
 			    if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
-				will_have_delta_signature_structure();
+				will_have_delta_signature_structure(ptr);
 			    file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
 
                             file_data_status_write = file_data_status_read;
@@ -208,7 +210,7 @@ namespace libdar
 			ptr->read(&file_data_status_read, sizeof(file_data_status_read));
 
 			if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
-			    will_have_delta_signature_structure();
+			    will_have_delta_signature_structure(ptr);
 			file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
 		    }
 
@@ -240,7 +242,10 @@ namespace libdar
                     check = nullptr;
 
 		if(delta_sig != nullptr)
-		    delta_sig->read(*ptr, false);
+		{
+		    delta_sig->read(false);
+		    delta_sig_read = true;
+		}
             }
             else // partial dump has been done
             {
@@ -253,7 +258,7 @@ namespace libdar
 		    if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
 		    {
 			file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
-			will_have_delta_signature_structure();
+			will_have_delta_signature_structure(ptr);
 		    }
                     file_data_status_write = file_data_status_read;
                     ptr->read(&tmp, sizeof(tmp));
@@ -269,7 +274,7 @@ namespace libdar
 			if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
 			{
 			    file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
-			    will_have_delta_signature_structure();
+			    will_have_delta_signature_structure(ptr);
 			}
 			file_data_status_write = file_data_status_read;
 		    }
@@ -322,6 +327,7 @@ namespace libdar
         file_data_status_read = ref.file_data_status_read;
         file_data_status_write = ref.file_data_status_write;
 	delta_sig = nullptr;
+	delta_sig_read = ref.delta_sig_read;
 
         try
         {
@@ -895,6 +901,7 @@ namespace libdar
 	if(delta_sig == nullptr)
 	    return false;
 	else
+	{
 	    if(delta_sig->has_patch_base_crc())
 	    {
 		delta_sig->get_patch_base_crc(c);
@@ -902,6 +909,7 @@ namespace libdar
 	    }
 	    else
 		return false;
+	}
     }
 
     void cat_file::set_patch_base_crc(const crc & c)
@@ -954,11 +962,11 @@ namespace libdar
 	delta_sig->set_patch_result_crc(c);
     }
 
-    void cat_file::will_have_delta_signature_structure()
+    void cat_file::will_have_delta_signature_structure(generic_file *ptr)
     {
 	if(delta_sig == nullptr)
 	{
-	    delta_sig = new (nothrow) cat_delta_signature();
+	    delta_sig = new (nothrow) cat_delta_signature(ptr);
 	    if(delta_sig == nullptr)
 		throw Ememory("cat_file::will_have_delta_signature()");
 	}
@@ -1006,50 +1014,56 @@ namespace libdar
 
 	if(delta_sig == nullptr)
 	    throw SRC_BUG;
-	try
+
+	if(!delta_sig_read)
 	{
-
-	    switch(status)
+	    try
 	    {
-	    case empty:
-		throw SRC_BUG;
-	    case from_path:
-		throw SRC_BUG; // signature is calculated while reading the data (get_data()) and kept by the caller
-	    case from_cat:
-		from = get_compressor_layer();
-		if(from == nullptr)
+		switch(status)
+		{
+		case empty:
 		    throw SRC_BUG;
-		else
-		    from->suspend_compression();
-		esc = get_escape_layer();
-		if(small && esc == nullptr)
+		case from_path:
+		    throw SRC_BUG; // signature is calculated while reading the data (get_data()) and kept by the caller
+		case from_cat:
+		    from = get_compressor_layer();
+		    if(from == nullptr)
+			throw SRC_BUG;
+		    else
+			from->suspend_compression();
+		    esc = get_escape_layer();
+		    if(small && esc == nullptr)
+			throw SRC_BUG;
+		    break;
+		default:
 		    throw SRC_BUG;
-		break;
-	    default:
-		throw SRC_BUG;
-	    }
+		}
 
-	    if(small)
-	    {
-		if(!esc->skip_to_next_mark(escape::seqt_delta_sig, true))
-		    throw Erange("cat_file::read_delta_signature", gettext("can't find mark for delta signature"));
-	    }
+		if(small)
+		{
+		    if(!esc->skip_to_next_mark(escape::seqt_delta_sig, true))
+			throw Erange("cat_file::read_delta_signature", gettext("can't find mark for delta signature"));
+		}
 
-	    if(delta_sig->can_obtain_sig())
-		delta_sig_ret = me->delta_sig->obtain_sig();
-	    else
-		delta_sig_ret.reset();
-	}
-	catch(Egeneric & e)
-	{
-	    if(delta_sig != nullptr)
-	    {
-		delete delta_sig;
-		me->delta_sig = nullptr;
+		delta_sig->read(small);
+		delta_sig_read = true;
 	    }
-	    e.prepend_message(gettext("Error while retrieving delta signature from the archive: "));
-	    throw;
+	    catch(Egeneric & e)
+	    {
+		if(delta_sig != nullptr)
+		{
+		    delete delta_sig;
+		    me->delta_sig = nullptr;
+		}
+		e.prepend_message(gettext("Error while retrieving delta signature from the archive: "));
+		throw;
+	    }
 	}
+
+	if(delta_sig->can_obtain_sig())
+	    delta_sig_ret = me->delta_sig->obtain_sig();
+	else
+	    delta_sig_ret.reset();
     }
 
     void cat_file::drop_delta_signature_data() const
