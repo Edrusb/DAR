@@ -487,6 +487,14 @@ namespace libdar
 			    if(!only_deleted)
 				st.incr_errored();
 		    }
+
+			// avoiding keeping in memory the delta signature
+			// is is loaded in any case when in sequential read mode
+			// it may be loaded when needed in direct access mode
+			// it is not stored in a catalogue, thus dropping it now
+			// still allows on-fly isolation later on with that catalogue
+		    if(e_file != nullptr)
+			e_file->drop_delta_signature_data();
 		}
 		else // e_nom == nullptr : this should be a CAT_EOD
 		{
@@ -774,7 +782,7 @@ namespace libdar
 					    && delta_diff
 					    && e_file != nullptr
 					    && f_file != nullptr
-					    && f_file->has_delta_signature_available();
+					    && f_file->has_delta_signature_available(); // will fail in sequential read mode as the delta_sig of f_file is not been loaded at that time
 
 					bool avoid_saving_ea =
 					    snapshot
@@ -966,6 +974,11 @@ namespace libdar
 					throw;
 				    }
 				}
+
+				    //  the object is kept in the catalogue, reducing memory footprint
+				    // avoiding keeping in memory the delta signature data
+				if(e_file != nullptr)
+				    e_file->drop_delta_signature_data();
 			    }
 			    else // inode not covered
 			    {
@@ -2724,7 +2737,7 @@ namespace libdar
 
 		    if(e_file != nullptr)
 		    {
-			if(!delta_signature)
+			if(!delta_signature) // instructed to remove all delta signature information
 			{
 			    if(e_file->has_delta_signature_available())
 				e_file->clear_delta_signature_only();
@@ -3007,7 +3020,8 @@ namespace libdar
 	    fic = dynamic_cast<cat_file *>(ino);
 	}
 
-
+	try
+	{
 	    if(fic != nullptr && fic->get_saved_status() == saved_status::delta)
 	    {
 		if(delta_diff) // not a merging operation
@@ -3646,6 +3660,16 @@ namespace libdar
 		    }
 	    }
 	    while(resave_uncompressed); // OUTER LOOP
+
+	}
+	catch(...)
+	{
+	    if(ref_fic != nullptr)
+		ref_fic->drop_delta_signature_data();
+	    throw;
+	}
+	if(ref_fic != nullptr)
+	    ref_fic->drop_delta_signature_data();
 
 	return ret;
     }
