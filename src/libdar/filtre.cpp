@@ -849,16 +849,7 @@ namespace libdar
 					}
 
 					if(make_delta_diff)
-					{
 					    e_ino->set_saved_status(saved_status::delta);
-					    if(e_file != nullptr)
-						e_file->will_have_delta_signature_structure();
-						// this structure is necessary to store base and result CRC
-						// even if no delta_signature will be computed
-						// base CRC is used before patching to check we apply the patch to the good patch
-						// result CRC is used for the next delta diff (if a delta_signature is used)
-						// and also to check after patching that the result of the patch is the expected file
-					}
 
 					if(avoid_saving_ea)
 					{
