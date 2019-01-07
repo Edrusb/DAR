@@ -207,7 +207,7 @@ namespace libdar
 		if(force_crc_failure || read_crc == nullptr || calc_crc == nullptr || read_crc->get_size() != calc_crc->get_size() || *read_crc != *calc_crc)
 		{
 		    if(!lax)
-			throw Erange("catalogue::catalogue(generic_file &)", gettext("CRC failed for table of contents (aka \"catalogue\")"));
+			throw Erange("catalogue::catalogue(generic_file &)", gettext("CRC failed for the catalogue"));
 		    else
 			get_ui().pause(gettext("LAX MODE: CRC failed for catalogue, the archive contents is corrupted. This may even lead dar to see files in the archive that never existed, but this will most probably lead to other failures in restoring files. Shall we proceed anyway?"));
 		}
