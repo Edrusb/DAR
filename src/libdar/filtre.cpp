@@ -2787,7 +2787,7 @@ namespace libdar
 		    if(!save_inode(dialog,
 				   juillet.get_string(),
 				   e_var,
-				   nullptr,
+				   nullptr,   // ref
 				   pdesc,
 				   info_details,
 				   display_treated,
@@ -2800,10 +2800,10 @@ namespace libdar
 				   0,     // repeat_byte
 				   sparse_file_min_size,
 				   nullptr,  // semaphore
-				   calculate_delta_signature,
+				   calculate_delta_signature, // delta_signature
 				   false,    // delta_diff
-				   fake_repeat,
-				   set<string>(), // empty list
+				   fake_repeat,   // current_wasted_bytes
+				   set<string>(), // empty list for ignored_as_symlink
 				   repair_mode))
 			throw SRC_BUG;
 		    else // succeeded saving
