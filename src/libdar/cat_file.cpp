@@ -1003,14 +1003,11 @@ namespace libdar
 	delta_sig->dump_data(where, small);
     }
 
-    void cat_file::read_delta_signature(shared_ptr<memory_file> & delta_sig_ret) const
+    void cat_file::read_delta_signature_metadata() const
     {
 	compressor *from = nullptr;
 	escape *esc = nullptr;
 	bool small = get_small_read();
-	cat_file *me = const_cast<cat_file *>(this);
-	if(me == nullptr)
-	    throw SRC_BUG;
 
 	if(delta_sig == nullptr)
 	    throw SRC_BUG;
@@ -1052,6 +1049,10 @@ namespace libdar
 	    {
 		if(delta_sig != nullptr)
 		{
+		    cat_file *me = const_cast<cat_file *>(this);
+		    if(me == nullptr)
+			throw SRC_BUG;
+
 		    delete delta_sig;
 		    me->delta_sig = nullptr;
 		}
@@ -1059,9 +1060,14 @@ namespace libdar
 		throw;
 	    }
 	}
+    }
+
+    void cat_file::read_delta_signature(shared_ptr<memory_file> & delta_sig_ret) const
+    {
+	read_delta_signature_metadata();
 
 	if(delta_sig->can_obtain_sig())
-	    delta_sig_ret = me->delta_sig->obtain_sig();
+	    delta_sig_ret = delta_sig->obtain_sig();
 	else
 	    delta_sig_ret.reset();
     }

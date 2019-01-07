@@ -153,6 +153,10 @@ namespace libdar
 	bool has_delta_signature_structure() const { return delta_sig != nullptr; };
 
 	    /// return whether the object has an associated delta signature structure including a delta signature data (not just CRC)
+
+	    /// \note when reading file from archive/generic_file if the metadata is not loaded to memory calling
+	    /// either read_delta_signature_metadata() or read_delta_signature() *and* if sequential read mode is used
+	    /// this call will always report false, even if delta signature can be available from filesystem/archive
 	bool has_delta_signature_available() const { return delta_sig != nullptr && delta_sig->can_obtain_sig(); };
 
 
@@ -194,6 +198,12 @@ namespace libdar
 
 	    /// variant of dump_delta_signature when just CRC have to be dumped
 	void dump_delta_signature(generic_file & where, bool small) const;
+
+
+	    /// load metadata (and delta signature when in sequential mode) into memory
+
+	    /// \note call drop_delta_signature_data() subsequently if only the metada is needed (when un sequential read mode or not, it does not hurt)
+	void read_delta_signature_metadata() const;
 
 	    /// fetch the delta signature from the archive
 
