@@ -1118,7 +1118,7 @@ namespace libdar
 			shared_ptr<memory_file> sig_ptr;
 
 			ent_file->read_delta_signature(sig_ptr);
-			if(!sig_ptr)
+			if(sig_ptr)
 			    e_file->dump_delta_signature(sig_ptr, *(destination.compr), false);
 			else
 			    e_file->dump_delta_signature(*(destination.compr), false);
