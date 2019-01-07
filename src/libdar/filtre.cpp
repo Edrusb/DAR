@@ -4482,7 +4482,7 @@ namespace libdar
 
 			try // protecting data
 			{
-			    infinint crc_size = e_file->get_size();
+			    infinint crc_size = tools_file_size_to_crc_size(e_file->get_size());
 			    crc *patch_sig_crc = nullptr;
 
 			    try // protecting patch_sig_crc
