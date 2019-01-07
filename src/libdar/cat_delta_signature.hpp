@@ -120,20 +120,20 @@ namespace libdar
 	void read(bool sequential_read);
 
 	    /// the cat_delta_signature structure can only hold CRC without delta_signature, this call gives the situation about that point
-	bool can_obtain_sig() { return !just_crc; };
+	bool can_obtain_sig() const { return !just_crc; };
 
 	    /// provide a memory_file object which the caller has the duty to destroy after use
 
 	    /// \note while drop_sig has not been called, obtain_sig() can be called any number of time
 	    /// \note in direct mode (not sequential_real mode) the first call to obtain_sig() fetches
 	    /// the data from the archive and loads it to memory.
-	std::shared_ptr<memory_file> obtain_sig();
+	std::shared_ptr<memory_file> obtain_sig() const;
 
 	    /// drop signature but keep metadata available
 
 	    /// \note there is a lot of chance that a call to obtain_sig() will fail after drop_sig() has been
 	    /// called when in sequential read mode, due to the limited possibility to skip backward in that mode
-	void drop_sig() { sig.reset(); };
+	void drop_sig() const { sig.reset(); };
 
 	    /////////// method for write mode ///////////
 

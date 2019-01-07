@@ -68,7 +68,7 @@ namespace libdar
     }
 
 
-    std::shared_ptr<memory_file> cat_delta_signature::obtain_sig()
+    std::shared_ptr<memory_file> cat_delta_signature::obtain_sig() const
     {
 	if(just_crc)
 	    throw SRC_BUG;
