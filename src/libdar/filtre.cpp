@@ -3638,10 +3638,12 @@ namespace libdar
 		    {
 			if(sem != nullptr)
 			    sem->lower();
+			fic->drop_delta_signature_data(); // no more needed delta signature data if present
 			throw;
 		    }
 		    if(sem != nullptr)
 			sem->lower();
+		    fic->drop_delta_signature_data(); // no more needed delta signature data if present
 		}
 		else // fic == nullptr
 		    if(sem != nullptr)
