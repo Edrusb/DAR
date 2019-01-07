@@ -237,7 +237,8 @@ namespace libdar
 		delete crc_calc;
 	}
 
-        stats.add(ret);
+	if(ret != nullptr)
+	    stats.add(ret);
         return ret;
     }
 
