@@ -44,11 +44,8 @@ namespace libdar
 	    patch_base_check = create_crc_from_file(*src);
 	    delta_sig_size.read(*src);
 
-	    if(delta_sig_size.is_zero())
-		just_crc = true;
-	    else
+	    if(!delta_sig_size.is_zero())
 	    {
-		just_crc = false;
 		if(sequential_read)
 		{
 		    delta_sig_offset = src->get_position();
@@ -70,7 +67,7 @@ namespace libdar
 
     std::shared_ptr<memory_file> cat_delta_signature::obtain_sig() const
     {
-	if(just_crc)
+	if(delta_sig_size.is_zero())
 	    throw SRC_BUG;
 
 	if(!sig)
@@ -90,20 +87,17 @@ namespace libdar
 	if(!ptr)
 	    throw SRC_BUG;
 	sig = ptr;
-	just_crc = false;
 	delta_sig_size = sig->size();
+	if(delta_sig_size.is_zero())
+	    throw SRC_BUG;
     }
 
     void cat_delta_signature::dump_data(generic_file & f, bool sequential_mode) const
     {
-	    // sanity check
-
-	if(delta_sig_size.is_zero() ^ just_crc)
-	    throw SRC_BUG;
 
 	    // fetching the data if it is missing
 
-	if(!just_crc)
+	if(!delta_sig_size.is_zero())
 	{
 	    if(!sig)
 	    {
@@ -224,7 +218,6 @@ namespace libdar
 	delta_sig_offset = 0;
 	sig.reset();
 	patch_result_check = nullptr;
-	just_crc = true;
 	src = nullptr;
     }
 
@@ -249,7 +242,6 @@ namespace libdar
 	}
 	else
 	    patch_result_check = nullptr;
-	just_crc = ref.just_crc;
 	src = ref.src;
     }
 
@@ -264,7 +256,6 @@ namespace libdar
 	sig.swap(ref.sig);
 	swap(patch_base_check, ref.patch_base_check);
 	swap(patch_result_check, ref.patch_result_check);
-	just_crc = move(ref.just_crc);
 	src = move(ref.src);
     }
 
@@ -289,7 +280,7 @@ namespace libdar
 	if(!delta_sig_size.is_zero() && delta_sig_offset.is_zero())
 	    throw SRC_BUG;
 
-	if(just_crc)
+	if(delta_sig_size.is_zero())
 	    return;
 
 	if(delta_sig_size.is_zero())

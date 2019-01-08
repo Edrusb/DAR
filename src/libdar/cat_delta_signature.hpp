@@ -120,7 +120,7 @@ namespace libdar
 	void read(bool sequential_read);
 
 	    /// the cat_delta_signature structure can only hold CRC without delta_signature, this call gives the situation about that point
-	bool can_obtain_sig() const { return !just_crc; };
+	bool can_obtain_sig() const { return !delta_sig_size.is_zero(); };
 
 	    /// provide a memory_file object which the caller has the duty to destroy after use
 
@@ -142,13 +142,13 @@ namespace libdar
 	    /// \note seg_sig_ref() must be called each time before invoking dump_data(), normally it is done once...
 
 	    /// for can_obtain_sig() to return true before the signature is provided
-	void will_have_signature() { just_crc = false; };
+	void will_have_signature() { delta_sig_size = 1; };
 
 	    /// the object pointed to by ptr must stay available when calling dump_data()/dump_metadata() later on
 	void set_sig(const std::shared_ptr<memory_file> & ptr);
 
 	    /// variante used when the delta_signature object will only contain CRCs (no delta signature)
-	void set_sig() { just_crc = true; delta_sig_size = 0; delta_sig_offset = 0; sig.reset(); };
+	void set_sig() { delta_sig_size = 0; delta_sig_offset = 0; sig.reset(); };
 
 	    /// write down the data eventually with sequential read mark followed by delta sig metadata
 	void dump_data(generic_file & f, bool sequential_mode) const;
@@ -186,7 +186,6 @@ namespace libdar
 	infinint delta_sig_offset;  ///< where to read data from to setup "sig" (set to zero when read in sequential mode, sig is setup on-fly)
 	mutable std::shared_ptr<memory_file>sig; ///< the signature data, if set nullptr it will be fetched from f in direct access mode only
 	crc *patch_result_check;    ///< associated CRC
-	bool just_crc;              ///< whether a delta signature is present or just checksum are stored
 	generic_file *src;          ///< where to read data from
 
 	void init() noexcept;
