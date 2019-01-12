@@ -188,22 +188,22 @@ void * operator new[] (size_t size, const std::nothrow_t& nothrow_constant) thro
 }
 
 
-void operator delete (void * p) throw()
+void operator delete (void * p)
 {
     desalloc(p);
 }
 
-void operator delete (void * p, const std::nothrow_t& nothrow_constant) throw()
+void operator delete (void * p, const std::nothrow_t& nothrow_constant)
 {
     desalloc(p);
 }
 
-void operator delete[] (void * p) throw()
+void operator delete[] (void * p)
 {
     desalloc(p);
 }
 
-void operator delete[] (void * p, const std::nothrow_t& nothrow_constant) throw()
+void operator delete[] (void * p, const std::nothrow_t& nothrow_constant)
 {
     desalloc(p);
 }

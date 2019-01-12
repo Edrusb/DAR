@@ -44,7 +44,7 @@ namespace libdar
     public:
 	    /// \note the given pointed to object passes under the responsibility of the smart_node
 	smart_node(T *arg): ptr(arg), count_ref(0) { if(arg == nullptr) throw SRC_BUG; };
-	~smart_node() { if(ptr != nullptr) delete ptr; if(!count_ref.is_zero()) throw SRC_BUG; };
+	~smart_node() noexcept(false) { if(ptr != nullptr) delete ptr; if(!count_ref.is_zero()) throw SRC_BUG; };
 
 	void add_ref() { ++count_ref; };
 	void del_ref() { if(count_ref.is_zero()) throw SRC_BUG; --count_ref; if(count_ref.is_zero()) delete this; };

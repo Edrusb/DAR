@@ -80,7 +80,7 @@ namespace libdar
 		  bool small);
         cat_inode(const cat_inode & ref);
 	const cat_inode & operator = (const cat_inode & ref);
-        ~cat_inode() throw(Ebug);
+        ~cat_inode();
 
         const infinint & get_uid() const { return uid; };
         const infinint & get_gid() const { return gid; };

@@ -133,7 +133,7 @@ namespace libdar
     class criterium : public on_pool
     {
     public:
-	virtual ~criterium() throw(Ebug) {};
+	virtual ~criterium() {};
 
 	    /// criterum interface method
 

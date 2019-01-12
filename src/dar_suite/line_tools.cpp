@@ -68,7 +68,7 @@ argc_argv::argc_argv(S_I size)
 	x_argv = nullptr;
 }
 
-argc_argv::~argc_argv() throw(Ebug)
+argc_argv::~argc_argv() noexcept(false)
 {
     if(x_argv == nullptr && x_argc > 0)
 	throw SRC_BUG;

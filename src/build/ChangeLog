@@ -1,5 +1,7 @@
 from 2.5.18 to 2.5.19
 - fixed compilation issue on system that to not have ENOATTR defined
+- fixed compilation warning about deprecated dynamic exception
+  specifications in C++11
 
 from 2.5.17 to 2.5.18
 - fixed compilation issue in context where EA are not supported

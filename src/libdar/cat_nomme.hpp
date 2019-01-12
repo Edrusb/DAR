@@ -48,7 +48,7 @@ namespace libdar
         cat_nomme(const smart_pointer<pile_descriptor> & pdesc, bool small);
 	bool operator == (const cat_entree & ref) const;
 	virtual bool operator < (const cat_nomme & ref) const { return xname < ref.xname; };
-	virtual ~cat_nomme() throw(Ebug) {};
+	virtual ~cat_nomme() {};
 
         const std::string & get_name() const { return xname; };
         void change_name(const std::string & x) { xname = x; };

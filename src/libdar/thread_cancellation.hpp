@@ -69,7 +69,7 @@ namespace libdar
 	thread_cancellation();
 
 	    /// the destructor
-	virtual ~thread_cancellation() throw(Ebug);
+	virtual ~thread_cancellation() noexcept(false);
 
 	    /// Checkpoint test : whether the current libdar call must abort or not
 

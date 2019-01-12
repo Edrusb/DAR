@@ -107,7 +107,7 @@ namespace libdar
 	generic_file(const generic_file &ref) { copy_from(ref); };
 
 	    /// virtual destructor, this let inherited destructor to be called even from a generic_file pointer to an inherited class
-	virtual ~generic_file() throw(Ebug) { destroy(); };
+	virtual ~generic_file() noexcept(false) { destroy(); };
 
 	    /// destructor-like call, except that it is allowed to throw exceptions
 	void terminate() const;
@@ -358,7 +358,7 @@ namespace libdar
     {
     public :
 	contextual() { status = ""; };
-	virtual ~contextual() throw(Ebug) {};
+	virtual ~contextual() noexcept(false) {};
 
 	    /// defines the new contextual value
 	    ///

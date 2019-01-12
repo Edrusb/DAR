@@ -350,7 +350,7 @@ namespace libdar
         return *this;
     }
 
-    cat_inode::~cat_inode() throw(Ebug)
+    cat_inode::~cat_inode()
     {
 	destroy();
     }

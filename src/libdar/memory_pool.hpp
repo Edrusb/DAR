@@ -49,7 +49,7 @@ namespace libdar
 #endif
 	memory_pool(const memory_pool & ref) { throw SRC_BUG ; };
 	const memory_pool & operator = (const memory_pool & ref) { throw SRC_BUG; };
-	~memory_pool() throw(Ebug);
+	~memory_pool() noexcept(false);
 
 
 	    /// allocate a memory block of requested size

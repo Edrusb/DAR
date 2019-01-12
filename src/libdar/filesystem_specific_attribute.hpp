@@ -79,7 +79,7 @@ namespace libdar
 	filesystem_specific_attribute(generic_file & f, fsa_family xfam, fsa_nature xnat) { fam = xfam; nat = xnat; };
 
 	    /// virtual destructor for inherited classes
-	virtual ~filesystem_specific_attribute() throw(Ebug) {};
+	virtual ~filesystem_specific_attribute() {};
 
 	    /// provide a mean to compare objects types
 	bool is_same_type_as(const filesystem_specific_attribute & ref) const;

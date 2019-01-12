@@ -148,7 +148,7 @@ namespace libdar
 	has_one_to_read = false;
     }
 
-    tuyau::~tuyau()
+    tuyau::~tuyau() noexcept(false)
     {
 	try
 	{

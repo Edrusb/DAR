@@ -46,7 +46,7 @@ namespace libdar
     public:
 	static const U_I OLD_CRC_SIZE = 2;
 
-	virtual ~crc() throw(Ebug) {};
+	virtual ~crc() {};
 
 	virtual bool operator == (const crc & ref) const = 0;
 	bool operator != (const crc & ref) const { return ! (*this == ref); };

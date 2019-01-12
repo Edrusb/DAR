@@ -84,7 +84,7 @@ namespace libdar
 	    // read an infinint from a file
 	infinint(generic_file & x);
 
-        ~infinint() throw(Ebug)
+        ~infinint()
 	{ detruit(); };
 
         const infinint & operator = (const infinint & ref)
