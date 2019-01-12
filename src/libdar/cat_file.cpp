@@ -964,7 +964,8 @@ namespace libdar
 
     void cat_file::will_have_delta_signature_structure()
     {
-	compressor *ptr = nullptr;
+	generic_file *ptr = nullptr;
+	compressor *zip = nullptr;
 
 	if(delta_sig == nullptr)
 	{
@@ -973,17 +974,21 @@ namespace libdar
 	    case empty:
 		throw SRC_BUG;
 	    case from_path:
+		delta_sig = new (nothrow) cat_delta_signature();
 		break;
 	    case from_cat:
-		ptr = get_compressor_layer();
+		ptr = get_read_cat_layer(get_small_read());
 		if(ptr == nullptr)
 		    throw SRC_BUG;
+		zip = get_compressor_layer();
+		if(zip == nullptr)
+		    throw SRC_BUG;
+		delta_sig = new (nothrow) cat_delta_signature(ptr, zip);
 		break;
 	    default:
 		throw SRC_BUG;
 	    }
 
-	    delta_sig = new (nothrow) cat_delta_signature(ptr);
 	    if(delta_sig == nullptr)
 		throw Ememory("cat_file::will_have_delta_signature()");
 	}

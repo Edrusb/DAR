@@ -34,6 +34,19 @@ using namespace std;
 namespace libdar
 {
 
+    cat_delta_signature::cat_delta_signature(generic_file *f, compressor *c)
+    {
+	init();
+
+	src = f;
+	zip = c;
+
+	if(src == nullptr)
+	    throw SRC_BUG;
+	if(zip == nullptr)
+	    throw SRC_BUG;
+    }
+
     void cat_delta_signature::read(bool sequential_read)
     {
 	if(src == nullptr)
@@ -49,7 +62,7 @@ namespace libdar
 		if(sequential_read)
 		{
 		    delta_sig_offset = src->get_position();
-		    fetch_data(*src);
+		    fetch_data();
 		}
 		else
 		    delta_sig_offset.read(*src);
@@ -64,7 +77,6 @@ namespace libdar
 	}
     }
 
-
     std::shared_ptr<memory_file> cat_delta_signature::obtain_sig() const
     {
 	if(delta_sig_size.is_zero())
@@ -74,7 +86,7 @@ namespace libdar
 	{
 	    if(src == nullptr)
 		throw SRC_BUG;
-	    fetch_data(*src);
+	    fetch_data();
 	    if(!sig)
 		throw SRC_BUG; // fetch_data() failed but did not raised any exception
 	}
@@ -100,12 +112,7 @@ namespace libdar
 	if(!delta_sig_size.is_zero())
 	{
 	    if(!sig)
-	    {
-		if(src != nullptr)
-		    fetch_data(*src);
-		else
-		    throw SRC_BUG; // sig should be dumped but is not present and cannot be obtained
-	    }
+		fetch_data();
 	}
 	    // dumping data
 
@@ -219,6 +226,7 @@ namespace libdar
 	sig.reset();
 	patch_result_check = nullptr;
 	src = nullptr;
+	zip = nullptr;
     }
 
     void cat_delta_signature::copy_from(const cat_delta_signature & ref)
@@ -243,6 +251,7 @@ namespace libdar
 	else
 	    patch_result_check = nullptr;
 	src = ref.src;
+	zip = ref.zip;
     }
 
     void cat_delta_signature::move_from(cat_delta_signature && ref) noexcept
@@ -257,6 +266,7 @@ namespace libdar
 	swap(patch_base_check, ref.patch_base_check);
 	swap(patch_result_check, ref.patch_result_check);
 	src = move(ref.src);
+	zip = move(ref.zip);
     }
 
     void cat_delta_signature::destroy() noexcept
@@ -273,9 +283,10 @@ namespace libdar
 	    patch_result_check = nullptr;
 	}
 	src = nullptr;
+	zip = nullptr;
     }
 
-    void cat_delta_signature::fetch_data(compressor & f) const
+    void cat_delta_signature::fetch_data() const
     {
 	if(!delta_sig_size.is_zero() && delta_sig_offset.is_zero())
 	    throw SRC_BUG;
@@ -290,11 +301,18 @@ namespace libdar
 	{
 	    crc *calculated = nullptr;
 	    crc *delta_sig_crc = nullptr;
-	    f.suspend_compression();
+
+	    if(src == nullptr)
+		throw SRC_BUG;
+	    if(zip == nullptr)
+		throw SRC_BUG;
+
+		// need to suspend compression before reading the data
+	    zip->suspend_compression();
 
 	    try
 	    {
-		tronc bounded(&f, delta_sig_offset, delta_sig_size, false);
+		tronc bounded(src, delta_sig_offset, delta_sig_size, false);
 		infinint crc_size = tools_file_size_to_crc_size(delta_sig_size);
 
 		sig.reset(new (nothrow) memory_file());
@@ -307,7 +325,7 @@ namespace libdar
 		    throw SRC_BUG;
 		sig->skip(0);
 
-		delta_sig_crc = create_crc_from_file(f);
+		delta_sig_crc = create_crc_from_file(*src);
 		if(delta_sig_crc == nullptr)
 		    throw Erange("cat_delta_signature::fetch_data", gettext("Error while reading CRC of delta signature data. Data corruption occurred"));
 		if(*delta_sig_crc != *calculated)

@@ -96,7 +96,10 @@ namespace libdar
 	    /// be set to nullptr when building an object in memory to be dump to file/archive later on,
 	    /// the generic_file will be provided when calling dump*() method
 	    /// \note f must survive the cat_delta_signature object, and not be destroy before it
-	cat_delta_signature(compressor* f) { init(); src = f; };
+	cat_delta_signature(generic_file *f, compressor* c);
+
+	    /// constructor to write an object to filesytem (using dump_* methods later on)
+	cat_delta_signature() { init(); };
 
 	    /// copy constructor
 	cat_delta_signature(const cat_delta_signature & ref) { init(); copy_from(ref); };
@@ -187,13 +190,14 @@ namespace libdar
 	infinint delta_sig_offset;  ///< where to read data from to setup "sig" (set to zero when read in sequential mode, sig is setup on-fly)
 	mutable std::shared_ptr<memory_file>sig; ///< the signature data, if set nullptr it will be fetched from f in direct access mode only
 	crc *patch_result_check;    ///< associated CRC
-	compressor *src;            ///< where to read data from
+	generic_file *src;          ///< where to read data from
+	compressor *zip;            ///< needed to disable compression when reading delta signature data from an archive
 
 	void init() noexcept;
 	void copy_from(const cat_delta_signature & ref);
 	void move_from(cat_delta_signature && ref) noexcept;
 	void destroy() noexcept;
-	void fetch_data(compressor & f) const;
+	void fetch_data() const;
     };
 
 	/// @}
