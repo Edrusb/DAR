@@ -1118,10 +1118,19 @@ namespace libdar
 			shared_ptr<memory_file> sig_ptr;
 
 			ent_file->read_delta_signature(sig_ptr);
-			if(sig_ptr)
-			    e_file->dump_delta_signature(sig_ptr, *(destination.compr), false);
-			else
-			    e_file->dump_delta_signature(*(destination.compr), false);
+			try
+			{
+			    if(sig_ptr)
+				e_file->dump_delta_signature(sig_ptr, *(destination.compr), false);
+			    else
+				e_file->dump_delta_signature(*(destination.compr), false);
+			}
+			catch(...)
+			{
+			    ent_file->drop_delta_signature_data();
+			    throw;
+			}
+			ent_file->drop_delta_signature_data();
 		    }
 		    else // we need to remove the delta signature, but not the delta signature structure when status is saved_status::delta
 			if(e_file->get_saved_status() == saved_status::delta)
@@ -1189,6 +1198,7 @@ namespace libdar
 				e_file->set_patch_base_crc(*my_crc);
 				e_file->set_patch_result_crc(*my_crc);
 				e_file->dump_delta_signature(mem, *(destination.compr), false);
+				e_file->drop_delta_signature_data(); // now the data has been written to archive we can free up memory
 				break;
 			    case saved_status::fake:
 			    case saved_status::not_saved:

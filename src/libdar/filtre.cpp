@@ -1516,19 +1516,25 @@ namespace libdar
 
 			if(e_file != nullptr && e_file->has_delta_signature_structure())
 			{
-
-				// reading the delta signature
-
-			    e_file->read_delta_signature(delta_sig);
-			    if(delta_sig)
+			    try
 			    {
-				delta_sig.reset();
-				e_file->drop_delta_signature_data();
+				    // reading the delta signature
+
+				e_file->read_delta_signature(delta_sig);
+				if(delta_sig)
+				    delta_sig.reset();
+
+				if(perimeter == "")
+				    perimeter = "Delta sig";
+				else
+				    perimeter += " + Delta sig";
 			    }
-			    if(perimeter == "")
-				perimeter = "Delta sig";
-			    else
-				perimeter += " + Delta sig";
+			    catch(...)
+			    {
+				e_file->drop_delta_signature_data();
+				throw;
+			    }
+			    e_file->drop_delta_signature_data();
 			}
 
 
@@ -1589,7 +1595,7 @@ namespace libdar
 			    st.incr_skipped();
                     }
                 }
-            }
+	    }
             catch(Euser_abort & e)
             {
                 throw;
@@ -3011,7 +3017,7 @@ namespace libdar
 	    fic = dynamic_cast<cat_file *>(ino);
 	}
 
-	try
+	try // to be able to release ref_fic's delta signature in any case
 	{
 	    if(fic != nullptr && fic->get_saved_status() == saved_status::delta)
 	    {
@@ -3623,10 +3629,19 @@ namespace libdar
 				    pdesc.compr->suspend_compression();
 
 					// dropping the data to the archive and recording its location in the cat_file object
-				    if(delta_sig)
-					fic->dump_delta_signature(delta_sig, *(pdesc.compr), pdesc.esc != nullptr);
-				    else
-					fic->dump_delta_signature(*(pdesc.compr), pdesc.esc != nullptr);
+				    try
+				    {
+					if(delta_sig)
+					    fic->dump_delta_signature(delta_sig, *(pdesc.compr), pdesc.esc != nullptr);
+					else
+					    fic->dump_delta_signature(*(pdesc.compr), pdesc.esc != nullptr);
+				    }
+				    catch(...)
+				    {
+					fic->drop_delta_signature_data();
+					throw;
+				    }
+				    fic->drop_delta_signature_data();
 				}
 			    }
 			    else
@@ -4438,6 +4453,8 @@ namespace libdar
 	{
 	    shared_ptr<memory_file> sig;
 
+	    try
+	    {
 		if(ref_file != nullptr
 		   && ref_file->has_delta_signature_structure())
 		{
@@ -4480,7 +4497,7 @@ namespace libdar
 
 			if(display_treated)
 			    dialog->message(string(gettext("Calculating delta signature from filesystem: "))
-					   + info_quoi);
+					    + info_quoi);
 
 			try // protecting data
 			{
@@ -4534,6 +4551,19 @@ namespace libdar
 		    e_file->dump_delta_signature(sig, *(pdesc.compr), pdesc.esc != nullptr);
 		else
 		    e_file->dump_delta_signature(*(pdesc.compr), pdesc.esc != nullptr);
+	    }
+	    catch(...)
+	    {
+		if(ref_file != nullptr)
+		    ref_file->drop_delta_signature_data();
+		if(e_file != nullptr)
+		    e_file->drop_delta_signature_data();
+		throw;
+	    }
+	    if(ref_file != nullptr)
+		ref_file->drop_delta_signature_data();
+	    if(e_file != nullptr)
+		e_file->drop_delta_signature_data();
 	}
     }
 
