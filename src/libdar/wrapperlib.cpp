@@ -579,8 +579,9 @@ namespace libdar
         case LZMA_MEM_ERROR:
             return WR_MEM_ERROR;
         case LZMA_OPTIONS_ERROR:
-	case LZMA_FORMAT_ERROR: // no memory usage limit used from libdar, only file format error can generate this code
             return WR_VERSION_ERROR;
+	case LZMA_FORMAT_ERROR: // no memory usage limit used from libdar, only file format error can generate this code
+	    return WR_DATA_ERROR;
         case LZMA_STREAM_END:
             return WR_STREAM_END;
         case LZMA_DATA_ERROR:
