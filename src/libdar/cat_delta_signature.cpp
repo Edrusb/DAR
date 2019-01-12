@@ -275,7 +275,7 @@ namespace libdar
 	src = nullptr;
     }
 
-    void cat_delta_signature::fetch_data(generic_file & f) const
+    void cat_delta_signature::fetch_data(compressor & f) const
     {
 	if(!delta_sig_size.is_zero() && delta_sig_offset.is_zero())
 	    throw SRC_BUG;
@@ -290,6 +290,7 @@ namespace libdar
 	{
 	    crc *calculated = nullptr;
 	    crc *delta_sig_crc = nullptr;
+	    f.suspend_compression();
 
 	    try
 	    {

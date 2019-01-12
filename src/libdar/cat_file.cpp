@@ -159,7 +159,7 @@ namespace libdar
                             }
 
 			    if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
-				will_have_delta_signature_structure(ptr);
+				will_have_delta_signature_structure();
 			    file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
 
                             file_data_status_write = file_data_status_read;
@@ -210,7 +210,7 @@ namespace libdar
 			ptr->read(&file_data_status_read, sizeof(file_data_status_read));
 
 			if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
-			    will_have_delta_signature_structure(ptr);
+			    will_have_delta_signature_structure();
 			file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
 		    }
 
@@ -258,7 +258,7 @@ namespace libdar
 		    if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
 		    {
 			file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
-			will_have_delta_signature_structure(ptr);
+			will_have_delta_signature_structure();
 		    }
                     file_data_status_write = file_data_status_read;
                     ptr->read(&tmp, sizeof(tmp));
@@ -274,7 +274,7 @@ namespace libdar
 			if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
 			{
 			    file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
-			    will_have_delta_signature_structure(ptr);
+			    will_have_delta_signature_structure();
 			}
 			file_data_status_write = file_data_status_read;
 		    }
@@ -962,10 +962,27 @@ namespace libdar
 	delta_sig->set_patch_result_crc(c);
     }
 
-    void cat_file::will_have_delta_signature_structure(generic_file *ptr)
+    void cat_file::will_have_delta_signature_structure()
     {
+	compressor *ptr = nullptr;
+
 	if(delta_sig == nullptr)
 	{
+	    switch(status)
+	    {
+	    case empty:
+		throw SRC_BUG;
+	    case from_path:
+		break;
+	    case from_cat:
+		ptr = get_compressor_layer();
+		if(ptr == nullptr)
+		    throw SRC_BUG;
+		break;
+	    default:
+		throw SRC_BUG;
+	    }
+
 	    delta_sig = new (nothrow) cat_delta_signature(ptr);
 	    if(delta_sig == nullptr)
 		throw Ememory("cat_file::will_have_delta_signature()");

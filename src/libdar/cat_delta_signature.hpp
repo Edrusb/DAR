@@ -34,6 +34,7 @@ extern "C"
 
 #include "memory_file.hpp"
 #include "crc.hpp"
+#include "compressor.hpp"
 
 #include <memory>
 
@@ -95,7 +96,7 @@ namespace libdar
 	    /// be set to nullptr when building an object in memory to be dump to file/archive later on,
 	    /// the generic_file will be provided when calling dump*() method
 	    /// \note f must survive the cat_delta_signature object, and not be destroy before it
-	cat_delta_signature(generic_file* f) { init(); src = f; };
+	cat_delta_signature(compressor* f) { init(); src = f; };
 
 	    /// copy constructor
 	cat_delta_signature(const cat_delta_signature & ref) { init(); copy_from(ref); };
@@ -186,13 +187,13 @@ namespace libdar
 	infinint delta_sig_offset;  ///< where to read data from to setup "sig" (set to zero when read in sequential mode, sig is setup on-fly)
 	mutable std::shared_ptr<memory_file>sig; ///< the signature data, if set nullptr it will be fetched from f in direct access mode only
 	crc *patch_result_check;    ///< associated CRC
-	generic_file *src;          ///< where to read data from
+	compressor *src;            ///< where to read data from
 
 	void init() noexcept;
 	void copy_from(const cat_delta_signature & ref);
 	void move_from(cat_delta_signature && ref) noexcept;
 	void destroy() noexcept;
-	void fetch_data(generic_file & f) const;
+	void fetch_data(compressor & f) const;
     };
 
 	/// @}

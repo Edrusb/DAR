@@ -181,12 +181,13 @@ namespace libdar
 	void set_patch_result_crc(const crc & c);
 
 	    /// prepare the object to receive a delta signature structure
-
-	    /// \param[in] ptr may be nullptr when the cat_file object is setup from memory or non null
-	    /// when reading the object from an archive, ptr points to the object to read the data from
-	void will_have_delta_signature_structure(generic_file *ptr = nullptr);
+	void will_have_delta_signature_structure();
 
 	    /// prepare the object to receive a delta signature structure including delta signature
+
+	    /// this calls will lead an to error if the delta_signature is written to archive or used while only CRC info
+	    /// has been set (= metadata of delta signature) but no delta signature data has read from the archive or
+	    /// has been provided (by mean of a memory_file when calling dump_delta_signature() method)
 	void will_have_delta_signature_available();
 
 	    /// write down to archive the given delta signature
