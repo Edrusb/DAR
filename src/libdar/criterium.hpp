@@ -110,7 +110,7 @@ namespace libdar
 	crit_in_place_is_dir & operator = (crit_in_place_is_dir && ref) noexcept = default;
 	~crit_in_place_is_dir() = default;
 
-	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const;
+	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
 	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_is_dir(*this); };
     };
 
@@ -482,7 +482,7 @@ namespace libdar
     public:
 	crit_and() { clear(); };
 	crit_and(const crit_and & ref) : criterium(ref) { copy_from(ref); };
-	crit_and(crit_and && ref) noexcept = default; // moving the deque<criterium *> while the pointed to object are untouched
+	crit_and(crit_and && ref) = default; // moving the deque<criterium *> while the pointed to object are untouched
 	crit_and & operator = (const crit_and & ref) { detruit(); copy_from(ref); return *this; };
 	crit_and & operator = (crit_and && ref) noexcept = default; // moving the deque<criterium *> while the pointed to object are untouched
 	~crit_and() { detruit(); };
@@ -509,7 +509,7 @@ namespace libdar
     public:
 	crit_or() { clear(); };
 	crit_or(const crit_or & ref) = default;
-	crit_or(crit_or && ref) noexcept = default;
+	crit_or(crit_or && ref) = default;
 	crit_or & operator = (const crit_or & ref) = default;
 	crit_or & operator = (crit_or && ref) noexcept = default;
 	~crit_or() = default;

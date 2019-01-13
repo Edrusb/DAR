@@ -56,7 +56,7 @@ namespace libdar
 	data_dir(generic_file &f, unsigned char db_version); //< does not read signature
 	data_dir(const data_tree & ref);
 	data_dir(const data_dir & ref);
-	data_dir(data_dir && ref) noexcept = default;
+	data_dir(data_dir && ref) = default;
 	data_dir & operator = (const data_dir & ref) { rejetons.clear(); return *this; };
 	data_dir & operator = (data_dir && ref) noexcept = default;
 	~data_dir();

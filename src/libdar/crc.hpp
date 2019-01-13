@@ -86,7 +86,7 @@ namespace libdar
 	crc_i & operator = (crc_i && ref) noexcept = default;
 	~crc_i() = default;
 
-	bool operator == (const crc & ref) const;
+	bool operator == (const crc & ref) const override;
 
 	virtual void compute(const infinint & offset, const char *buffer, U_I length) override;
 	virtual void compute(const char *buffer, U_I length) override; // for sequential read only
@@ -123,7 +123,7 @@ namespace libdar
 	crc_n & operator = (crc_n && ref) noexcept = default;
 	~crc_n() { destroy(); };
 
-	bool operator == (const crc & ref) const;
+	bool operator == (const crc & ref) const override;
 
 	virtual void compute(const infinint & offset, const char *buffer, U_I length) override;
 	virtual void compute(const char *buffer, U_I length) override; // for sequential read only

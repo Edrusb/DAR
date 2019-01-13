@@ -113,6 +113,7 @@ dar_cp_SOURCES = dar_suite.cpp dar_suite.hpp dar_cp.cpp line_tools.hpp line_tool
 dar_cp_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 dar_split_SOURCES = dar_split.c
+dar_split_CPPFLAGS = -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF)
 
 #
 # dar_static ( --enable-dar-static )

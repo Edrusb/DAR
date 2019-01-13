@@ -133,8 +133,10 @@ test_hash_fichier_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 moving_file_SOURCES = moving_file.cpp
 make_sparse_file_SOURCES = make_sparse_file.c
+make_sparse_file_CPPFLAGS = -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF)
 
 hashsum_SOURCES = hashsum.c
+hashsum_CPPFLAGS = -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF)
 
 test_crypto_asym_SOURCES = test_crypto_asym.cpp
 test_crypto_asym_DEPENDENCIES = ../libdar/$(MYLIB).la

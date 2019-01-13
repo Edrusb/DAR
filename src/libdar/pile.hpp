@@ -150,8 +150,8 @@ namespace libdar
 	virtual bool skip_relative(S_I x) override;
 	virtual infinint get_position() const override;
 
-	void copy_to(generic_file & ref);
-	void copy_to(generic_file & ref, const infinint & crc_size, crc * & value);
+	void copy_to(generic_file & ref) override;
+	void copy_to(generic_file & ref, const infinint & crc_size, crc * & value) override;
 
     protected:
 	virtual void inherited_read_ahead(const infinint & amount) override;
