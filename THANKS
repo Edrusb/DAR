@@ -17,6 +17,10 @@ to libdar. Note that gdar will not yet compile with dar 2.6.0, I will fix
 that with Tobias's help with a next dar/libdar 2.6.x releases in a few
 weeks.
 
+version 2.5.19
+--------------
+Thanks to Tobias Specht for feedback
+
 version 2.5.18
 --------------
 Thanks again to Christoph Anton Mitterer for feedback. Thanks to Michele

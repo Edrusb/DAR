@@ -89,6 +89,13 @@ from 2.5.x to 2.6.0
   You can still build a infinint based libdar by passing
   --enable-mode=infinint to the ./configure script.
 
+from 2.5.18 to 2.5.19
+- fixed compilation issue on system that to not have ENOATTR defined
+- fixed compilation warning about deprecated dynamic exception
+  specifications in C++11
+- fixing bug in xz/lzma routine wrongly reporting internal error when
+  corrupted data was met
+
 from 2.5.17 to 2.5.18
 - fixed compilation issue in context where EA are not supported
 - fixed typo in dar man page (--sequential-mode in place of
