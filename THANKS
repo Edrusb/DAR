@@ -1,8 +1,9 @@
 version 2.6.1
 --------------
 Thanks to David Niklas for contribution upgrading the /etc/darrc list
-of file types that does not worth compressing. Thanks to Gulikosa for
-feedbacks, remarks and improvement suggestions/discussions.
+of file types that does not worth compressing. Big thanks to Gulikosa
+for feedbacks, bug reports, remarks and improvement suggestions and
+discussions.
 
 version 2.6.0
 --------------

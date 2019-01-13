@@ -1085,9 +1085,6 @@ namespace libdar
 	    throw SRC_BUG;
 	}
 
-	if(entry.is_removed_entry())
-	    data = "deleted";
-
 	    // defining "metadata" string
 
 	switch(entry.get_ea_status())
