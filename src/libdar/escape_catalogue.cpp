@@ -187,7 +187,8 @@ namespace libdar
 
 	if(ref_file != nullptr)
 	{
-	    if(ref_file->get_saved_status() == saved_status::saved)
+	    if(ref_file->get_saved_status() == saved_status::saved
+	       || ref_file->get_saved_status() == saved_status::delta)
 	    {
 		const crc * c = nullptr;
 

@@ -1040,7 +1040,7 @@ namespace libdar
 	    }
 
 	    if(only_contains_an_isolated_catalogue())
-		get_ui().printf(gettext("\nWARNING! This archive only contains the contents of another archive, it can only be used as reference for differential backup or as rescue in case of corruption of the original archive's content. You cannot restore any data from this archive alone\n"));
+		get_ui().printf(gettext("\nWARNING! This archive only contains the catalogue of another archive, it can only be used as reference for differential backup or as rescue in case of corruption of the original archive's content. You cannot restore any data from this archive alone\n"));
 
 	    sum.get_contents().listing(get_ui());
 	}

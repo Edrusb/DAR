@@ -237,7 +237,8 @@ namespace libdar
 		delete crc_calc;
 	}
 
-        stats.add(ret);
+	if(ret != nullptr)
+	    stats.add(ret);
         return ret;
     }
 
@@ -394,6 +395,12 @@ namespace libdar
 		ent.set_storage_size_for_data(tmp_file->get_storage_size());
 		if(tmp_file->get_crc(crc_tmp) && crc_tmp != nullptr)
 		    ent.set_data_crc(*crc_tmp);
+	    }
+
+	    if(tmp_file->has_delta_signature_structure())
+	    {
+		tmp_file->read_delta_signature_metadata();
+		tmp_file->drop_delta_signature_data();
 	    }
 	    ent.set_delta_sig(tmp_file->has_delta_signature_available());
 	    if(tmp_file->has_patch_base_crc() && tmp_file->get_patch_base_crc(crc_tmp) && crc_tmp != nullptr)

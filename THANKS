@@ -1,3 +1,10 @@
+version 2.6.1
+--------------
+Thanks to David Niklas for contribution upgrading the /etc/darrc list
+of file types that does not worth compressing. Big thanks to Gulikosa
+for feedbacks, bug reports, remarks and improvement suggestions and
+discussions.
+
 version 2.6.0
 --------------
 Many Thanks to Gulikoza who helped troubleshooting around the librsync
@@ -9,6 +16,10 @@ Tobias Specht for feedback and for providing gdar a graphical frontend
 to libdar. Note that gdar will not yet compile with dar 2.6.0, I will fix
 that with Tobias's help with a next dar/libdar 2.6.x releases in a few
 weeks.
+
+version 2.5.19
+--------------
+Thanks to Tobias Specht for feedback
 
 version 2.5.18
 --------------

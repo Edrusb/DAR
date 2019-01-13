@@ -48,7 +48,7 @@ namespace libdar
 	    /// \param f is the file to take the segment from
 	    /// \param offset is the position of the beginning of the segment
 	    /// \param size is the size of the segment
-	    /// \param own_f is true if this object has to owns and may destroy the 'f' object at tronc's destruction time
+	    /// \param own_f is true if this object has to own and must destroy the 'f' object at tronc's destruction time
         tronc(generic_file *f, const infinint &offset, const infinint &size, bool own_f = false);
         tronc(generic_file *f, const infinint &offset, const infinint &size, gf_mode mode, bool own_f = false);
 

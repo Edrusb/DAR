@@ -56,6 +56,7 @@ namespace libdar
         tuyau(const std::shared_ptr<user_interaction> & dialog, //< for user interaction
 	      const std::string &filename,     //< named pipe to open
 	      gf_mode mode);                   //< forces the mode if possible
+
 	tuyau(const std::shared_ptr<user_interaction> & dialog);//< creates a anonymous pipe and bind itself to the writing end. The reading end can be obtained by get_read_side() method
 	tuyau(const tuyau & ref) = default;
 	tuyau(tuyau && ref) noexcept = default;

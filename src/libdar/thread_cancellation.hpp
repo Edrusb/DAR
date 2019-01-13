@@ -84,7 +84,7 @@ namespace libdar
 	    /// move operator
 	thread_cancellation & operator = (thread_cancellation && ref) noexcept = default;
 
-	    /// the destructor
+            /// the destructor
         virtual ~thread_cancellation() noexcept(false);
 
 	    /// Checkpoint test : whether the current libdar call must abort or not

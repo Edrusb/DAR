@@ -55,15 +55,15 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-    const int WR_OK            = 0;
-    const int WR_MEM_ERROR     = 1;
-    const int WR_VERSION_ERROR = 2;
-    const int WR_STREAM_ERROR  = 3;
-    const int WR_DATA_ERROR    = 4;
-    const int WR_NO_FLUSH      = 5;
-    const int WR_BUF_ERROR     = 6;
-    const int WR_STREAM_END    = 7;
-    const int WR_FINISH        = 8;
+    const int WR_OK            = 0;  // operation successful
+    const int WR_MEM_ERROR     = 1;  // lack of memory
+    const int WR_VERSION_ERROR = 2;  // incompatible version of the compression library with the one expected by libdar
+    const int WR_STREAM_ERROR  = 3;  // not a valid compression level, incoherent data provided to the compression library
+    const int WR_DATA_ERROR    = 4;  // data has been corrupted
+    const int WR_NO_FLUSH      = 5;  // parameter to let the compression library decide at which time to output data (from zlib Z_NO_FLUSH, no other way is done in libdar)
+    const int WR_BUF_ERROR     = 6;  // no possible work to perform for the request action without additional provided data/or storage space to the compression library
+    const int WR_STREAM_END    = 7;  // end of compressed data met
+    const int WR_FINISH        = 8;  // parameter requiring the compression library to cleanly stop the running operation
 
     enum wrapperlib_mode { zlib_mode, bzlib_mode, xz_mode };
 

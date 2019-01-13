@@ -745,7 +745,7 @@ namespace libdar
 
 	    if(entry.is_removed_entry())
 	    {
-		me->xml_listing_attributes(entry);
+		sig = entry.get_removed_type();
 		switch(sig)
 		{
 		case 'd':
@@ -1062,7 +1062,6 @@ namespace libdar
 	string ctime = tools_uint2str(entry.get_last_change_s());
 	string data;
 	string metadata;
-	string ending_data;
 
 	    // defining "data" string
 
@@ -1085,9 +1084,6 @@ namespace libdar
 	    throw SRC_BUG;
 	}
 
-	if(entry.is_removed_entry())
-	    data = "deleted";
-
 	    // defining "metadata" string
 
 	switch(entry.get_ea_status())
@@ -1108,7 +1104,16 @@ namespace libdar
 	}
 
 	if(entry.is_removed_entry())
+	{
+	    data = "deleted";
 	    metadata = "absent";
+	    user = "";
+	    group = "";
+	    permissions = "";
+	    atime = "";
+	    ctime = "";
+	    mtime = tools_uint2str(entry.get_removal_date_s());
+	}
 
 	bool go_ea = archive_listing_display_ea  && entry.has_EA_saved_in_the_archive() && !entry.is_removed_entry();
 	string end_tag = go_ea ? ">" : " />";

@@ -99,7 +99,7 @@ namespace libdar
 	    /// returns a newly allocated object in read_only mode
 
 	    /// \param[in] mode whether to return compressed, with hole or plain file
-	    /// \param[in,out] delta_sig if not nullptr, write to that file the delta signature of the file
+	    /// \param[in,out] delta_sig_mem if not nullptr, write to that file the delta signature of the file
 	    /// \param[in] delta_ref if not nullptr, use the provided signature to generate a delta binary
 	    /// \param[in] checksum if not null will set *checsum to the address of a newly allocated crc object
 	    /// that the caller has the duty to release when no more needed but *not before* the returned generic_file
@@ -110,8 +110,8 @@ namespace libdar
 	    /// \note when both delta_sig and delta_ref are provided, the delta signature is computed on the
 	    /// file data, then the delta binary is computed.
         virtual generic_file *get_data(get_data_mode mode,
-				       memory_file *delta_sig,
-				       generic_file *delta_ref,
+				       std::shared_ptr<memory_file> delta_sig_mem,
+				       std::shared_ptr<memory_file> delta_ref,
 				       const crc **checksum = nullptr) const;
         void clean_data(); // partially free memory (but get_data() becomes disabled)
         void set_offset(const infinint & r);
@@ -153,6 +153,10 @@ namespace libdar
 	bool has_delta_signature_structure() const { return delta_sig != nullptr; };
 
 	    /// return whether the object has an associated delta signature structure including a delta signature data (not just CRC)
+
+	    /// \note when reading file from archive/generic_file if the metadata is not loaded to memory calling
+	    /// either read_delta_signature_metadata() or read_delta_signature() *and* if sequential read mode is used
+	    /// this call will always report false, even if delta signature can be available from filesystem/archive
 	bool has_delta_signature_available() const { return delta_sig != nullptr && delta_sig->can_obtain_sig(); };
 
 
@@ -180,6 +184,10 @@ namespace libdar
 	void will_have_delta_signature_structure();
 
 	    /// prepare the object to receive a delta signature structure including delta signature
+
+	    /// this calls will lead an to error if the delta_signature is written to archive or used while only CRC info
+	    /// has been set (= metadata of delta signature) but no delta signature data has read from the archive or
+	    /// has been provided (by mean of a memory_file when calling dump_delta_signature() method)
 	void will_have_delta_signature_available();
 
 	    /// write down to archive the given delta signature
@@ -187,17 +195,26 @@ namespace libdar
 	    /// \param[in] sig is the signature to dump
 	    /// \param[in] where is the location where to write down the signature
 	    /// \param[in] small if set to true drop down additional information to allow sequential reading mode
-	void dump_delta_signature(memory_file & sig, generic_file & where, bool small) const;
+	void dump_delta_signature(std::shared_ptr<memory_file> & sig, generic_file & where, bool small) const;
 
 	    /// variant of dump_delta_signature when just CRC have to be dumped
 	void dump_delta_signature(generic_file & where, bool small) const;
 
+
+	    /// load metadata (and delta signature when in sequential mode) into memory
+
+	    /// \note call drop_delta_signature_data() subsequently if only the metada is needed (when un sequential read mode or not, it does not hurt)
+	void read_delta_signature_metadata() const;
+
 	    /// fetch the delta signature from the archive
 
-	    /// \param[in] delta_sig is either nullptr or points to a newly allocated memory_file
-	    /// containing the delta signature. The caller has the duty to destroy this object after use
+	    /// \param[out] delta_sig is either nullptr or points to a shared memory_file
+	    /// containing the delta signature.
 	    /// \note nullptr is returned if the delta_signature only contains CRCs
-	void read_delta_signature(memory_file * & delta_sig) const;
+	void read_delta_signature(std::shared_ptr<memory_file> & delta_sig) const;
+
+	    /// drop the delta signature from memory (will not more be posible to be read, using read_delta_signature)
+	void drop_delta_signature_data() const;
 
 	    /// return true if ref and "this" have both equal delta signatures
 	bool has_same_delta_signature(const cat_file & ref) const;
@@ -234,6 +251,7 @@ namespace libdar
 	char file_data_status_read;  ///< defines the datastructure to use when reading the data
 	char file_data_status_write; ///< defines the datastructure to apply when writing down the data
 	cat_delta_signature *delta_sig; ///< delta signature and associated CRC
+	mutable bool delta_sig_read; ///< whether delta sig has been read/initialized from filesystem
 
 	void sub_compare_internal(const cat_inode & other,
 				  bool can_read_my_data,

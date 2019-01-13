@@ -207,7 +207,7 @@ namespace libdar
 		if(force_crc_failure || read_crc == nullptr || calc_crc == nullptr || read_crc->get_size() != calc_crc->get_size() || *read_crc != *calc_crc)
 		{
 		    if(!lax)
-			throw Erange("catalogue::catalogue(generic_file &)", gettext("CRC failed for table of contents (aka \"catalogue\")"));
+			throw Erange("catalogue::catalogue(generic_file &)", gettext("CRC failed for the catalogue"));
 		    else
 			get_ui().pause(gettext("LAX MODE: CRC failed for catalogue, the archive contents is corrupted. This may even lead dar to see files in the archive that never existed, but this will most probably lead to other failures in restoring files. Shall we proceed anyway?"));
 		}
@@ -1054,11 +1054,14 @@ namespace libdar
 	const cat_file *ent_file = nullptr;
 	const cat_inode *ent_inode = nullptr;
 	const cat_mirage *ent_mir = nullptr;
-	memory_file mem;
+	shared_ptr<memory_file> mem(new (nothrow) memory_file());
 	const crc *my_crc = nullptr;
 	defile juillet = FAKE_ROOT;
 	null_file trash = gf_write_only;
 	generic_file *data = nullptr;
+
+	if(!mem)
+	    throw Ememory("catalogue::transfer_delta_signature");
 
 	if(destination.compr == nullptr || destination.stack == nullptr)
 	    throw SRC_BUG;
@@ -1112,37 +1115,27 @@ namespace libdar
 		       (delta_mask.is_covered(juillet.get_string()) // or we have to build/transfer delta sig if they match size and mask criteria
 			&& e_file->get_size() >= delta_sig_min_size))
 		    {
-			memory_file *sig_ptr = nullptr;
+			shared_ptr<memory_file> sig_ptr;
 
+			ent_file->read_delta_signature(sig_ptr);
 			try
 			{
-			    ent_file->read_delta_signature(sig_ptr);
-			    if(sig_ptr != nullptr)
-				e_file->dump_delta_signature(*sig_ptr, *(destination.compr), false);
+			    if(sig_ptr)
+				e_file->dump_delta_signature(sig_ptr, *(destination.compr), false);
 			    else
 				e_file->dump_delta_signature(*(destination.compr), false);
 			}
 			catch(...)
 			{
-			    if(sig_ptr != nullptr)
-				delete sig_ptr;
+			    ent_file->drop_delta_signature_data();
 			    throw;
 			}
-			if(sig_ptr != nullptr)
-			    delete sig_ptr;
+			ent_file->drop_delta_signature_data();
 		    }
 		    else // we need to remove the delta signature, but not the delta signature structure when status is saved_status::delta
 			if(e_file->get_saved_status() == saved_status::delta)
 			{
-			    memory_file *sig_ptr = nullptr;
-
-			    e_file->read_delta_signature(sig_ptr);
-			    if(sig_ptr != nullptr)
-			    {
-				delete sig_ptr;
-				sig_ptr = nullptr;
-				e_file->clear_delta_signature_only();
-			    }
+			    e_file->drop_delta_signature_data();
 				// no need to drop the signature_structure structure outside the catalogue
 				// only the delta_signature_data will stay outside the catalogue not the associated CRC
 				// they will only be kept inside the (isolated) catalogue
@@ -1173,7 +1166,7 @@ namespace libdar
 			    switch(e_file->get_saved_status())
 			    {
 			    case saved_status::saved:
-				data = e_file->get_data(cat_file::plain, &mem, nullptr, checksum);
+				data = e_file->get_data(cat_file::plain, mem, nullptr, checksum);
 
 				if(data == nullptr)
 				    throw SRC_BUG;
@@ -1205,6 +1198,7 @@ namespace libdar
 				e_file->set_patch_base_crc(*my_crc);
 				e_file->set_patch_result_crc(*my_crc);
 				e_file->dump_delta_signature(mem, *(destination.compr), false);
+				e_file->drop_delta_signature_data(); // now the data has been written to archive we can free up memory
 				break;
 			    case saved_status::fake:
 			    case saved_status::not_saved:

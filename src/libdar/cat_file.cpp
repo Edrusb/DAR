@@ -67,6 +67,7 @@ namespace libdar
         check = nullptr;
         dirty = false;
 	delta_sig = nullptr;
+	delta_sig_read = false;
 
         try
         {
@@ -117,6 +118,7 @@ namespace libdar
         file_data_status_write = 0; // may be changed later using set_sparse_file_detection_write()
         dirty = false;
 	delta_sig = nullptr;
+	delta_sig_read = false;
 
 	generic_file *ptr = nullptr;
 
@@ -240,7 +242,10 @@ namespace libdar
                     check = nullptr;
 
 		if(delta_sig != nullptr)
-		    delta_sig->read_metadata(*ptr, false);
+		{
+		    delta_sig->read(false);
+		    delta_sig_read = true;
+		}
             }
             else // partial dump has been done
             {
@@ -322,6 +327,7 @@ namespace libdar
         file_data_status_read = ref.file_data_status_read;
         file_data_status_write = ref.file_data_status_write;
 	delta_sig = nullptr;
+	delta_sig_read = ref.delta_sig_read;
 
         try
         {
@@ -445,8 +451,8 @@ namespace libdar
     }
 
     generic_file *cat_file::get_data(get_data_mode mode,
-				     memory_file *delta_sig_mem,
-				     generic_file *delta_ref,
+				     shared_ptr<memory_file> delta_sig_mem,
+				     shared_ptr<memory_file> delta_ref,
 				     const crc **checksum) const
     {
         generic_file *ret = nullptr;
@@ -458,18 +464,18 @@ namespace libdar
 	    if(!can_get_data())
 		throw Erange("cat_file::get_data", gettext("cannot provide data from a \"not saved\" file object"));
 
-	    if(delta_ref != nullptr
+	    if(delta_ref
 	       && get_saved_status() != saved_status::delta)
 		throw SRC_BUG;
 
-	    if(delta_ref != nullptr
+	    if(delta_ref
 	       && status != from_path)
 		throw Efeature("building an binary difference (rsync) for a file located in an archive");
 
 	    if(status == empty)
 		throw Erange("cat_file::get_data", gettext("data has been cleaned, object is now empty"));
 
-	    if(delta_sig_mem != nullptr)
+	    if(delta_sig_mem)
 	    {
 		if(delta_sig_mem->get_mode() == gf_read_only)
 		    throw SRC_BUG;
@@ -495,7 +501,7 @@ namespace libdar
 		}
 	    }
 
-	    if(delta_ref != nullptr)
+	    if(delta_ref)
 	    {
 		switch(mode)
 		{
@@ -526,7 +532,7 @@ namespace libdar
 			// telling *tmp to flush the data from the cache as soon as possible
 		    tmp->fadvise(fichier_global::advise_dontneed);
 
-		if(delta_sig_mem != nullptr || delta_ref != nullptr)
+		if(delta_sig_mem || delta_ref)
 		{
 		    pile *data = new (nothrow) pile();
 		    if(data == nullptr)
@@ -542,9 +548,9 @@ namespace libdar
 		    }
 		    ret = data;
 
-		    if(delta_sig_mem != nullptr)
+		    if(delta_sig_mem)
 		    {
-			generic_rsync *delta = new (nothrow) generic_rsync(delta_sig_mem, data->top());
+			generic_rsync *delta = new (nothrow) generic_rsync(delta_sig_mem.get(), data->top());
 			if(delta == nullptr)
 			    throw Ememory("cat_file::get_data");
 			try
@@ -558,9 +564,9 @@ namespace libdar
 			}
 		    }
 
-		    if(delta_ref != nullptr)
+		    if(delta_ref)
 		    {
-			generic_rsync *diff = new (nothrow) generic_rsync(delta_ref,
+			generic_rsync *diff = new (nothrow) generic_rsync(delta_ref.get(),
 									  data->top(),
 									  tools_file_size_to_crc_size(get_size()),
 									  checksum);
@@ -690,9 +696,9 @@ namespace libdar
 
 			    parent = data->is_empty() ? get_pile() : data->top();
 
-			    if(delta_sig_mem != nullptr)
+			    if(delta_sig_mem)
 			    {
-				generic_rsync *delta = new (nothrow) generic_rsync(delta_sig_mem, parent);
+				generic_rsync *delta = new (nothrow) generic_rsync(delta_sig_mem.get(), parent);
 				if(delta == nullptr)
 				    throw Ememory("cat_file::get_data");
 				try
@@ -895,6 +901,7 @@ namespace libdar
 	if(delta_sig == nullptr)
 	    return false;
 	else
+	{
 	    if(delta_sig->has_patch_base_crc())
 	    {
 		delta_sig->get_patch_base_crc(c);
@@ -902,6 +909,7 @@ namespace libdar
 	    }
 	    else
 		return false;
+	}
     }
 
     void cat_file::set_patch_base_crc(const crc & c)
@@ -956,9 +964,31 @@ namespace libdar
 
     void cat_file::will_have_delta_signature_structure()
     {
+	generic_file *ptr = nullptr;
+	compressor *zip = nullptr;
+
 	if(delta_sig == nullptr)
 	{
-	    delta_sig = new (nothrow) cat_delta_signature();
+	    switch(status)
+	    {
+	    case empty:
+		throw SRC_BUG;
+	    case from_path:
+		delta_sig = new (nothrow) cat_delta_signature();
+		break;
+	    case from_cat:
+		ptr = get_read_cat_layer(get_small_read());
+		if(ptr == nullptr)
+		    throw SRC_BUG;
+		zip = get_compressor_layer();
+		if(zip == nullptr)
+		    throw SRC_BUG;
+		delta_sig = new (nothrow) cat_delta_signature(ptr, zip);
+		break;
+	    default:
+		throw SRC_BUG;
+	    }
+
 	    if(delta_sig == nullptr)
 		throw Ememory("cat_file::will_have_delta_signature()");
 	}
@@ -973,14 +1003,14 @@ namespace libdar
 	delta_sig->will_have_signature();
     }
 
-    void cat_file::dump_delta_signature(memory_file &sig, generic_file & where, bool small) const
+    void cat_file::dump_delta_signature(shared_ptr<memory_file> & sig, generic_file & where, bool small) const
     {
 	infinint crc_size;
 
 	if(delta_sig == nullptr)
 	    throw SRC_BUG;
 
-	const_cast<cat_delta_signature *>(delta_sig)->set_sig_ref(&sig);
+	const_cast<cat_delta_signature *>(delta_sig)->set_sig(sig);
 	delta_sig->dump_data(where, small);
     }
 
@@ -991,111 +1021,111 @@ namespace libdar
 	if(delta_sig == nullptr)
 	    throw SRC_BUG;
 
-	const_cast<cat_delta_signature *>(delta_sig)->set_sig_ref();
+	const_cast<cat_delta_signature *>(delta_sig)->set_sig();
 	delta_sig->dump_data(where, small);
     }
 
-    void cat_file::read_delta_signature(memory_file * & delta_sig_ret) const
+    void cat_file::read_delta_signature_metadata() const
     {
 	compressor *from = nullptr;
 	escape *esc = nullptr;
 	bool small = get_small_read();
-	cat_file *me = const_cast<cat_file *>(this);
-
-	delta_sig_ret = nullptr;
 
 	if(delta_sig == nullptr)
 	    throw SRC_BUG;
 
-	try
+	if(!delta_sig_read)
 	{
+	    try
+	    {
+		switch(status)
+		{
+		case empty:
+		    throw SRC_BUG;
+		case from_path:
+		    throw SRC_BUG; // signature is calculated while reading the data (get_data()) and kept by the caller
+		case from_cat:
+		    from = get_compressor_layer();
+		    if(from == nullptr)
+			throw SRC_BUG;
+		    else
+			from->suspend_compression();
+		    esc = get_escape_layer();
+		    if(small && esc == nullptr)
+			throw SRC_BUG;
+		    break;
+		default:
+		    throw SRC_BUG;
+		}
+
+		if(small)
+		{
+		    if(!esc->skip_to_next_mark(escape::seqt_delta_sig, true))
+			throw Erange("cat_file::read_delta_signature", gettext("can't find mark for delta signature"));
+		}
+
+		delta_sig->read(small);
+		delta_sig_read = true;
+	    }
+	    catch(Egeneric & e)
+	    {
+		if(delta_sig != nullptr)
+		{
+		    cat_file *me = const_cast<cat_file *>(this);
+		    if(me == nullptr)
+			throw SRC_BUG;
+
+		    delete delta_sig;
+		    me->delta_sig = nullptr;
+		}
+		e.prepend_message(gettext("Error while retrieving delta signature from the archive: "));
+		throw;
+	    }
+	}
+    }
+
+    void cat_file::read_delta_signature(shared_ptr<memory_file> & delta_sig_ret) const
+    {
+	read_delta_signature_metadata();
+
+	if(delta_sig->can_obtain_sig())
+	    delta_sig_ret = delta_sig->obtain_sig();
+	else
+	    delta_sig_ret.reset();
+    }
+
+    void cat_file::drop_delta_signature_data() const
+    {
+	if(delta_sig != nullptr)
+	{
+	    cat_file *me = const_cast<cat_file *>(this);
+
 	    if(me == nullptr)
 		throw SRC_BUG;
-
-	    switch(status)
-	    {
-	    case empty:
-		throw SRC_BUG;
-	    case from_path:
-		throw SRC_BUG; // signature is calculated while reading the data (get_data()) and kept by the caller
-	    case from_cat:
-		from = get_compressor_layer();
-		if(from == nullptr)
-		    throw SRC_BUG;
-		else
-		    from->suspend_compression();
-		esc = get_escape_layer();
-		if(small && esc == nullptr)
-		    throw SRC_BUG;
-		break;
-	    default:
-		throw SRC_BUG;
-	    }
-
-	    if(small)
-	    {
-		if(!esc->skip_to_next_mark(escape::seqt_delta_sig, true))
-		    throw Erange("cat_file::read_delta_signature", gettext("can't find mark for delta signature"));
-		me->delta_sig->read_metadata(*from, small);
-	    }
-	    me->delta_sig->read_data(*from);
-
-	    if(delta_sig->can_obtain_sig())
-		delta_sig_ret = me->delta_sig->obtain_sig();
-	    else
-		delta_sig_ret = nullptr;
-	}
-	catch(Egeneric & e)
-	{
-	    if(delta_sig != nullptr)
-	    {
-		cat_file *me = const_cast<cat_file *>(this);
-		if(me == nullptr)
-		    throw SRC_BUG;
-
-		delete delta_sig;
-		me->delta_sig = nullptr;
-	    }
-	    e.prepend_message(gettext("Error while retrieving delta signature from the archive: "));
-	    throw;
+	    me->delta_sig->drop_sig();
 	}
     }
 
     bool cat_file::has_same_delta_signature(const cat_file & ref) const
     {
-	memory_file *sig_me = nullptr;
-	memory_file *sig_you = nullptr;
+	shared_ptr<memory_file> sig_me;
+	shared_ptr<memory_file> sig_you;
 
-	try
-	{
-	    read_delta_signature(sig_me);
-	    ref.read_delta_signature(sig_you);
+	read_delta_signature(sig_me);
+	ref.read_delta_signature(sig_you);
 
-	    if(sig_me == nullptr)
-		throw SRC_BUG;
-	    if(sig_you == nullptr)
-		throw SRC_BUG;
+	if(!sig_me)
+	    throw SRC_BUG;
+	if(!sig_you)
+	    throw SRC_BUG;
 
-	    infinint size_me = sig_me->size();
-	    infinint size_you = sig_you->size();
+	infinint size_me = sig_me->size();
+	infinint size_you = sig_you->size();
 
-	    if(sig_me->size() != sig_you->size())
-		return false;
-	    else
-		return *sig_me == *sig_you;
-	}
-	catch(...)
-	{
-	    if(sig_me != nullptr)
-		delete sig_me;
-	    if(sig_you != nullptr)
-		delete sig_you;
-	    throw;
-	}
-	if(sig_me != nullptr)
-	    delete sig_me;
-	if(sig_you != nullptr)
-	    delete sig_you;
+	if(sig_me->size() != sig_you->size())
+	    return false;
+	else
+	    return *sig_me == *sig_you;
     }
 
     void cat_file::clear_delta_signature_only()
@@ -1103,7 +1133,7 @@ namespace libdar
 	if(delta_sig != nullptr)
 	{
 	    if(get_saved_status() == saved_status::delta)
-		delta_sig->set_sig_ref();
+		delta_sig->drop_sig();
 	    else
 		clear_delta_signature_structure();
 	}
@@ -1275,10 +1305,15 @@ namespace libdar
 	    {
 		    // we only have signature and you only have data
 
-		memory_file *sig_me = nullptr;
-		memory_file sig_you;
+		shared_ptr<memory_file> sig_me;
+		shared_ptr<memory_file> sig_you(new (nothrow) memory_file());
 		null_file trash = gf_write_only;
-		generic_file *data = f_other->get_data(normal, &sig_you, nullptr);
+		generic_file *data;
+
+		if(!sig_you)
+		    throw Ememory("cat_file::sub_compare_internal");
+
+		data = f_other->get_data(normal, sig_you, shared_ptr<memory_file>());
 
 		if(data == nullptr)
 		    throw SRC_BUG;
@@ -1295,28 +1330,26 @@ namespace libdar
 		delete data;
 		data = nullptr;
 
+		read_delta_signature(sig_me);
+		if(!sig_me)
+		    throw SRC_BUG;
+
 		try
 		{
-		    read_delta_signature(sig_me);
-		    if(sig_me == nullptr)
-			throw SRC_BUG;
-
 		    infinint size_me = sig_me->size();
-		    infinint size_you = sig_you.size();
+		    infinint size_you = sig_you->size();
 
 		    if(size_me != size_you)
 			throw Erange("cat_file::sub_compare", tools_printf(gettext("Delta signature do not have the same size: %i <--> %i"), &size_me, &size_you));
-		    if(*sig_me != sig_you) // comparing file's content
+		    if(*sig_me != *sig_you) // comparing file's content
 			throw Erange("cat_file::sub_compare", gettext("Delta signature have the same size but do not match"));
 		}
 		catch(...)
 		{
-		    if(sig_me != nullptr)
-			delete sig_me;
+		    drop_delta_signature_data();
 		    throw;
 		}
-		if(sig_me != nullptr)
-		    delete sig_me;
+		drop_delta_signature_data();
 	    }
 	}
 	else // isolated_mode and no signature or no data
