@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: DAR 2.5.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2018-12-08 18:27+0100\n"
+"POT-Creation-Date: 2019-01-13 18:05+0100\n"
 "PO-Revision-Date: 2018-09-30 10:29+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -6257,22 +6257,22 @@ msgstr ""
 msgid "Missing data while reading slice_layout object"
 msgstr "Défaut de données lors de la lecture d'un object slice_layout"
 
-#: src/libdar/ea_filesystem.cpp:181
+#: src/libdar/ea_filesystem.cpp:187
 #, c-format
 msgid "Error while adding EA %s : %s"
 msgstr "Erreur d'ajout de l'EA %s : %s"
 
-#: src/libdar/ea_filesystem.cpp:216
+#: src/libdar/ea_filesystem.cpp:224
 #, c-format
 msgid "Error while removing %s : %s"
 msgstr "Erreur de suppression de %s : %s"
 
-#: src/libdar/ea_filesystem.cpp:248 src/libdar/ea_filesystem.cpp:276
+#: src/libdar/ea_filesystem.cpp:256 src/libdar/ea_filesystem.cpp:284
 #, c-format
 msgid "Error reading attribute %s of file %s : %s"
 msgstr "Erreur lors de la lecture de l'attribut %s du fichier %s : %s"
 
-#: src/libdar/ea_filesystem.cpp:332 src/libdar/ea_filesystem.cpp:350
+#: src/libdar/ea_filesystem.cpp:340 src/libdar/ea_filesystem.cpp:358
 #, c-format
 msgid "Error retrieving EA list for %s : %s"
 msgstr "Erreur lors de l'inventaire des AE pour %s : %s"
