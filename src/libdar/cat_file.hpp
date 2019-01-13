@@ -99,7 +99,7 @@ namespace libdar
 	    /// returns a newly allocated object in read_only mode
 
 	    /// \param[in] mode whether to return compressed, with hole or plain file
-	    /// \param[in,out] delta_sig if not nullptr, write to that file the delta signature of the file
+	    /// \param[in,out] delta_sig_mem if not nullptr, write to that file the delta signature of the file
 	    /// \param[in] delta_ref if not nullptr, use the provided signature to generate a delta binary
 	    /// \param[in] checksum if not null will set *checsum to the address of a newly allocated crc object
 	    /// that the caller has the duty to release when no more needed but *not before* the returned generic_file

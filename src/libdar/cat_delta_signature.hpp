@@ -92,10 +92,11 @@ namespace libdar
     public:
 	    /// constructor to read an object (using read() later on) from filesystem
 
-	    /// \param[in] f where to read the data from, used when calling read() later on. f may also
-	    /// be set to nullptr when building an object in memory to be dump to file/archive later on,
-	    /// the generic_file will be provided when calling dump*() method
-	    /// \note f must survive the cat_delta_signature object, and not be destroy before it
+	    /// \param[in] f where to read the data from, used when calling read() later on. f must not
+	    /// be set to nullptr and the pointed to object must survive this cat_delta_signature object
+	    /// \param[in] c points to the compressor layer in order to suspend compression when reading
+	    /// data (metadata will be read compressed or not depending on the its location (in-lined or
+	    /// in the catalogue at end of archive)
 	cat_delta_signature(generic_file *f, compressor* c);
 
 	    /// constructor to write an object to filesytem (using dump_* methods later on)
