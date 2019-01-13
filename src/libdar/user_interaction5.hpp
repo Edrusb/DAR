@@ -256,7 +256,7 @@ namespace libdar5
             /// this is not a virtual method, it has not to be overwritten in inherited classes.
         bool get_use_dar_manager_show_version() const { return use_dar_manager_show_version; };
 
-        virtual void printf(const char *format, ...);
+        virtual void printf(const char *format, ...) override;
 
             /// make a newly allocated object which has the same properties as "this".
 

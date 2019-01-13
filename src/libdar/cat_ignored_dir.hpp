@@ -57,11 +57,11 @@ namespace libdar
 	cat_ignored_dir & operator = (cat_ignored_dir && ref) noexcept = default;
 	~cat_ignored_dir() = default;
 
-	bool operator == (const cat_entree & ref) const;
+	bool operator == (const cat_entree & ref) const override;
 
         virtual unsigned char signature() const override { return 'j'; };
 	virtual std::string get_description() const override { return "ignored directory"; };
-        cat_entree *clone() const { return new (std::nothrow) cat_ignored_dir(*this); };
+        cat_entree *clone() const override { return new (std::nothrow) cat_ignored_dir(*this); };
 
     protected:
         virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override; // behaves like an empty cat_directory

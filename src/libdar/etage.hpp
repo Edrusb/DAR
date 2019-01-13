@@ -56,7 +56,7 @@ namespace libdar
 	      bool cache_directory_tagging,
 	      bool furtive_read_mode);
 	etage(const etage & ref) = default;
-	etage(etage && ref) noexcept = default;
+	etage(etage && ref) = default;
 	etage & operator = (const etage & ref) = default;
 	etage & operator = (etage && ref) noexcept = default;
 	~etage() = default;

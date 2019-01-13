@@ -121,7 +121,7 @@ namespace libdar
 
 	    // inherited from fichier_global parent class
 	virtual U_I fichier_global_inherited_write(const char *a, U_I size) override;
-        virtual bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message);
+        virtual bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message) override;
 
 	    // inherited from thread
 	virtual void inherited_run() override;

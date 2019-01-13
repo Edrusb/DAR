@@ -92,7 +92,7 @@ namespace libdar
 	infinint get_non_first_slice_header_size() const;
 
     protected:
-	virtual void inherited_read_ahead(const infinint & amount) {}; // optimization will be done when zapette will use the messaging_encode/decode exchange format
+	virtual void inherited_read_ahead(const infinint & amount) override {}; // optimization will be done when zapette will use the messaging_encode/decode exchange format
         virtual U_I inherited_read(char *a, U_I size) override;
         virtual void inherited_write(const char *a, U_I size) override;
 	virtual void inherited_sync_write() override {};

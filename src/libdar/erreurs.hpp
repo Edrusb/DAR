@@ -58,7 +58,7 @@ namespace libdar
 	Egeneric(const Egeneric & ref) = default;
 
 	    /// move constructor
-	Egeneric(Egeneric && ref) noexcept = default;
+	Egeneric(Egeneric && ref) = default;
 
 	    /// assignment operator
 	Egeneric & operator = (const Egeneric & ref) = default;

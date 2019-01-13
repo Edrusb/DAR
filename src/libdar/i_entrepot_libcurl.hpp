@@ -70,7 +70,7 @@ namespace libdar
 			   U_I waiting_time                        ///< time in second to wait before retrying in case of network error
 	    );
 	i_entrepot_libcurl(const i_entrepot_libcurl & ref) = default;
-	i_entrepot_libcurl(i_entrepot_libcurl && ref) noexcept = default;
+	i_entrepot_libcurl(i_entrepot_libcurl && ref) = default;
 	i_entrepot_libcurl & operator = (const i_entrepot_libcurl & ref) = default;
 	i_entrepot_libcurl & operator = (i_entrepot_libcurl && ref) noexcept = default;
 	~i_entrepot_libcurl() throw () {};

@@ -49,7 +49,7 @@ namespace libdar
 	trontextual(const trontextual & ref) = default;
 	trontextual(trontextual && ref) noexcept = default;
 	trontextual & operator = (const trontextual & ref) = default;
-	trontextual & operator = (trontextual && ref) noexcept = default;
+	trontextual & operator = (trontextual && ref) = default;
 	~trontextual() = default;
 
 	virtual bool is_an_old_start_end_archive() const override { if(ref == nullptr) throw SRC_BUG; return ref->is_an_old_start_end_archive(); };
