@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2018-12-16 16:04+0100\n"
+"POT-Creation-Date: 2019-01-13 18:08+0100\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -2184,7 +2184,7 @@ msgstr ""
 msgid "OK, keeping %S as basename"
 msgstr "OK, behåller %S som basnamn"
 
-#: src/dar_suite/line_tools.cpp:1488 src/libdar/tools.cpp:2073
+#: src/dar_suite/line_tools.cpp:1488 src/libdar/tools.cpp:2077
 msgid "Cannot get full path of current working directory: "
 msgstr "Kan ej få komplett sökväg till gällande arbetsmapp: "
 
@@ -2848,9 +2848,9 @@ msgstr "Smygläsningsmode"
 msgid "No mask available"
 msgstr ""
 
-#: src/libdar/entrepot_local.cpp:167
+#: src/libdar/entrepot_local.cpp:169
 #, fuzzy, c-format
-msgid "Cannot remove file %s: "
+msgid "Cannot remove file %s: %s"
 msgstr "Kan ej ta bort fil "
 
 #: src/libdar/shell_interaction.cpp:175
@@ -3178,12 +3178,12 @@ msgstr "execvp misslyckades, men gav ingen felkod"
 msgid "Removing file %s"
 msgstr "Tar bort fil %s"
 
-#: src/libdar/tools.cpp:1153
+#: src/libdar/tools.cpp:1157
 #, fuzzy, c-format
-msgid "Error removing file %s: %s"
+msgid "Error removing file %s: %S"
 msgstr "Fel vid filöppning %s : %s"
 
-#: src/libdar/tools.cpp:1187
+#: src/libdar/tools.cpp:1191
 #, c-format
 msgid ""
 "Overwriting not allowed while a slice of a previous archive with the same "
@@ -3192,7 +3192,7 @@ msgstr ""
 "Överskrivning ej tillåten då en del av ett tidigare arkiv med samma basnamn "
 "har hittats i %s-mappen. Åtgärden avbruten"
 
-#: src/libdar/tools.cpp:1193
+#: src/libdar/tools.cpp:1197
 #, fuzzy, c-format
 msgid ""
 "At least one slice of an old archive with the same name remains in the "
@@ -3205,43 +3205,43 @@ msgstr ""
 "kan bli gömd bland delarna i detta gamla arkiv. Skall vi ta bort det gamla "
 "arkivets delar först ?"
 
-#: src/libdar/tools.cpp:1213 src/libdar/tools.cpp:1220
+#: src/libdar/tools.cpp:1217 src/libdar/tools.cpp:1224
 #, fuzzy, c-format
 msgid "Cannot get inode information for %s: %s"
 msgstr "Kan ej få inodinformation för %s : %s"
 
-#: src/libdar/tools.cpp:1230
+#: src/libdar/tools.cpp:1234
 msgid "Current Working Directory cannot be a relative path"
 msgstr "Aktuell arbetsmapp kan ej  vara en relativ sökväg"
 
-#: src/libdar/tools.cpp:1247
+#: src/libdar/tools.cpp:1251
 msgid "Cannot block signals: "
 msgstr "Kan ej blockera signal: "
 
-#: src/libdar/tools.cpp:1257
+#: src/libdar/tools.cpp:1261
 msgid "Cannot unblock signals: "
 msgstr "Kan ej frisläppa signal: "
 
-#: src/libdar/tools.cpp:1288 src/libdar/tools.cpp:1321
+#: src/libdar/tools.cpp:1292 src/libdar/tools.cpp:1325
 #, fuzzy, c-format
 msgid "Cannot get last modification date: %s"
 msgstr "Kan ej sätta senaste tillgångtid och senaste modifieringstid: "
 
-#: src/libdar/tools.cpp:1325
+#: src/libdar/tools.cpp:1329
 #, c-format
 msgid "Cannot get size of %S: not a plain file"
 msgstr ""
 
-#: src/libdar/tools.cpp:1376
+#: src/libdar/tools.cpp:1380
 #, c-format
 msgid "Unknown suffix [%c] in string %S"
 msgstr "Okänt suffix [%c] i sträng %S"
 
-#: src/libdar/tools.cpp:1403
+#: src/libdar/tools.cpp:1407
 msgid "Unknown substitution string: %"
 msgstr "Okänd utbytessträng :%"
 
-#: src/libdar/tools.cpp:1410
+#: src/libdar/tools.cpp:1414
 #, fuzzy
 msgid ""
 "last char of user command-line to execute is '%', (use '%%' instead to avoid "
@@ -3250,117 +3250,117 @@ msgstr ""
 "sista tecknet i användarkommandoraden är '%', (använd '%%' i stället så "
 "undviks detta meddelande). Ignorera det och fortsätta ?"
 
-#: src/libdar/tools.cpp:1466
+#: src/libdar/tools.cpp:1470
 msgid "execve() failed. (process table is full ?)"
 msgstr "execve() misslyckades. (full processtabell ?)"
 
-#: src/libdar/tools.cpp:1468
+#: src/libdar/tools.cpp:1472
 msgid "system() call failed: "
 msgstr "system()-anrop misslyckades: "
 
-#: src/libdar/tools.cpp:1470
+#: src/libdar/tools.cpp:1474
 #, c-format
 msgid "execution of [ %S ] returned error code: %d"
 msgstr "utförande av [ %S ] resulterade i felkod: %d"
 
-#: src/libdar/tools.cpp:1477
+#: src/libdar/tools.cpp:1481
 msgid "Error during user command line execution: "
 msgstr "Fel vid utförande av användarkommandoradsexekvering: "
 
-#: src/libdar/tools.cpp:1477
+#: src/libdar/tools.cpp:1481
 msgid " . Retry command-line ?"
 msgstr " . Försöka med kommandoraden igen ?"
 
-#: src/libdar/tools.cpp:1482
+#: src/libdar/tools.cpp:1486
 msgid "Ignore previous error on user command line and continue ?"
 msgstr "Ignorera föregående fel från användarkommandorad och fortsätta ?"
 
-#: src/libdar/tools.cpp:1524
+#: src/libdar/tools.cpp:1528
 msgid "Fatal error on user command line: "
 msgstr "Ödesdigert fel i användarkommandorad: "
 
-#: src/libdar/tools.cpp:1606 src/libdar/tools.cpp:1612
+#: src/libdar/tools.cpp:1610 src/libdar/tools.cpp:1616
 #, fuzzy
 msgid "Badly formated octal number"
 msgstr "Dåligt formaterad databas"
 
-#: src/libdar/tools.cpp:1717
+#: src/libdar/tools.cpp:1721
 #, fuzzy
 msgid "Cannot get effective permission given a file descriptor: "
 msgstr "Kan ej återställe behörigheter för %s : %s"
 
-#: src/libdar/tools.cpp:1733
+#: src/libdar/tools.cpp:1737
 #, c-format
 msgid "Error while setting file permission: %s"
 msgstr "Fel vid tilldelning av en fils egenskaper:%s"
 
-#: src/libdar/tools.cpp:1754
+#: src/libdar/tools.cpp:1758
 #, fuzzy
 msgid "An empty string is not a valid user name"
 msgstr "En tom sträng är ej en giltig sökväg"
 
-#: src/libdar/tools.cpp:1792 src/libdar/tools.cpp:1814
+#: src/libdar/tools.cpp:1796 src/libdar/tools.cpp:1818
 #, fuzzy
 msgid "Unknown user"
 msgstr "Okänd användare: %S"
 
-#: src/libdar/tools.cpp:1794 src/libdar/tools.cpp:1816
+#: src/libdar/tools.cpp:1798 src/libdar/tools.cpp:1820
 #, fuzzy, c-format
 msgid "Error found while looking for UID of user %s: %S"
 msgstr "Fel vid anrop av fork() för att starta dar: "
 
-#: src/libdar/tools.cpp:1824 src/libdar/tools.cpp:1918
+#: src/libdar/tools.cpp:1828 src/libdar/tools.cpp:1922
 msgid ""
 "Cannot convert username to uid in statically linked binary, either directly "
 "provide the UID or run libdar from a dynamically linked executable"
 msgstr ""
 
-#: src/libdar/tools.cpp:1849
+#: src/libdar/tools.cpp:1853
 #, fuzzy
 msgid "An empty string is not a valid group name"
 msgstr "En tom sträng är ej en giltig sökväg"
 
-#: src/libdar/tools.cpp:1885 src/libdar/tools.cpp:1908
+#: src/libdar/tools.cpp:1889 src/libdar/tools.cpp:1912
 #, fuzzy
 msgid "Unknown group"
 msgstr "Okänd användare: %S"
 
-#: src/libdar/tools.cpp:1887
+#: src/libdar/tools.cpp:1891
 #, c-format
 msgid "Error found while looking fo GID of group %s: %S"
 msgstr ""
 
-#: src/libdar/tools.cpp:1910
+#: src/libdar/tools.cpp:1914
 #, fuzzy, c-format
 msgid "Error found while looking for GID of group %s: %S"
 msgstr "Fel vid anrop av fork() för att starta dar: "
 
-#: src/libdar/tools.cpp:1947
+#: src/libdar/tools.cpp:1951
 #, c-format
 msgid "Error while setting file user ownership: %s"
 msgstr "Fel vid inställning av ägare till fil: %s"
 
-#: src/libdar/tools.cpp:2106
+#: src/libdar/tools.cpp:2110
 #, fuzzy
 msgid "Worse"
 msgstr "[Värre]"
 
-#: src/libdar/tools.cpp:2126
+#: src/libdar/tools.cpp:2130
 #, c-format
 msgid "Error code %d to message conversion failed"
 msgstr ""
 
-#: src/libdar/tools.cpp:2181
+#: src/libdar/tools.cpp:2185
 #, fuzzy
 msgid "Invalid wide-char found in string: "
 msgstr "Ogiltigt tal i sträng: %S"
 
-#: src/libdar/tools.cpp:2294
+#: src/libdar/tools.cpp:2298
 #, fuzzy, c-format
 msgid "Error unlinking %S: %s"
 msgstr "Fel vid öppning av %s : "
 
-#: src/libdar/tools.cpp:2341
+#: src/libdar/tools.cpp:2345
 msgid ""
 "Cannot convert negative floating point value to unsigned (positive) integer"
 msgstr ""
@@ -4684,7 +4684,13 @@ msgstr ""
 msgid "Do you want to ignore the same type of error for other files?"
 msgstr "Vill du ignorera samma feltyp för andra filer?"
 
-#: src/libdar/cat_delta_signature.cpp:100
+#: src/libdar/cat_delta_signature.cpp:330
+#, fuzzy
+msgid ""
+"Error while reading CRC of delta signature data. Data corruption occurred"
+msgstr "Fel uppstått vid bearbetande av åtgärd: "
+
+#: src/libdar/cat_delta_signature.cpp:332
 #, fuzzy
 msgid "CRC error met while reading delta signature: data corruption."
 msgstr "Fel uppstått vid bearbetande av åtgärd: "
@@ -4987,7 +4993,7 @@ msgid "Loading catalogue into memory..."
 msgstr "Katalog saknas i fil."
 
 #: src/libdar/i_archive.cpp:270 src/libdar/i_archive.cpp:304
-#: src/libdar/escape_catalogue.cpp:638
+#: src/libdar/escape_catalogue.cpp:639
 msgid ""
 "Archive internal catalogue is not identically signed as the archive itself, "
 "this might be the sign the archive has been compromised"
@@ -5182,10 +5188,10 @@ msgid "The global data compression ratio is: "
 msgstr ""
 
 #: src/libdar/i_archive.cpp:1043
-#, c-format
+#, fuzzy, c-format
 msgid ""
 "\n"
-"WARNING! This archive only contains the contents of another archive, it can "
+"WARNING! This archive only contains the catalogue of another archive, it can "
 "only be used as reference for differential backup or as rescue in case of "
 "corruption of the original archive's content. You cannot restore any data "
 "from this archive alone\n"
@@ -5521,9 +5527,9 @@ msgstr ""
 "en enkel intern katalog"
 
 #: src/libdar/catalogue.cpp:210
-msgid "CRC failed for table of contents (aka \"catalogue\")"
-msgstr ""
-"CRC misslyckades för innehållsförtäckning (också känts som \"katalog\")"
+#, fuzzy
+msgid "CRC failed for the catalogue"
+msgstr "LAX MODE: Misslyckades med att läsa katalogen"
 
 #: src/libdar/catalogue.cpp:212
 msgid ""
@@ -6259,7 +6265,7 @@ msgstr "annan ägargrupp (gid): %i <--> %i"
 msgid "different permission: %S <--> %S"
 msgstr "andra behörigheter: %S <--> %S"
 
-#: src/libdar/cat_inode.cpp:417 src/libdar/cat_file.cpp:1151
+#: src/libdar/cat_inode.cpp:417 src/libdar/cat_file.cpp:1190
 #, c-format
 msgid "difference of last modification date: %S <--> %S"
 msgstr "skillnad mot senaste ändringsdatum: %S <--> %S"
@@ -7057,9 +7063,9 @@ msgstr ""
 "   %i filer har noterats som förstörda sedan referenssäkerhetskopian\n"
 "\n"
 
-#: src/libdar/filtre.cpp:256 src/libdar/filtre.cpp:627
-#: src/libdar/filtre.cpp:1217 src/libdar/filtre.cpp:1397
-#: src/libdar/filtre.cpp:2669
+#: src/libdar/filtre.cpp:256 src/libdar/filtre.cpp:635
+#: src/libdar/filtre.cpp:1221 src/libdar/filtre.cpp:1401
+#: src/libdar/filtre.cpp:2679
 #, fuzzy
 msgid "Inspecting directory "
 msgstr "Fel vid öppnade av mapp "
@@ -7126,11 +7132,11 @@ msgstr "Fel vid återställning "
 msgid "Warning! No file in that directory will be restored: "
 msgstr "Varning! Ingen fil i den mappen kommer att återställas: "
 
-#: src/libdar/filtre.cpp:668
+#: src/libdar/filtre.cpp:676
 msgid "Recording hard link into the archive: "
 msgstr "Sparar hård länk till arkiv: "
 
-#: src/libdar/filtre.cpp:735
+#: src/libdar/filtre.cpp:743
 #, fuzzy, c-format
 msgid ""
 "SECURITY WARNING! SUSPICIOUS FILE %S: ctime changed since archive of "
@@ -7139,70 +7145,70 @@ msgstr ""
 "SÄKERHETSVARNING %S: ctime har ändrats sedan arkivering av referenser "
 "gjorts, medan ingen inod eller data har ändrats"
 
-#: src/libdar/filtre.cpp:1065
+#: src/libdar/filtre.cpp:1069
 msgid "Error while saving "
 msgstr "Fel vid sparande "
 
-#: src/libdar/filtre.cpp:1080
+#: src/libdar/filtre.cpp:1084
 msgid "NO FILE IN THAT DIRECTORY CAN BE SAVED."
 msgstr "INGEN FIL I DEN MAPPEN KAN SPARAS."
 
-#: src/libdar/filtre.cpp:1085
+#: src/libdar/filtre.cpp:1089
 msgid "Cannot write down the archive: "
 msgstr "Kan ej skriva till arkivet:"
 
-#: src/libdar/filtre.cpp:1102
+#: src/libdar/filtre.cpp:1106
 #, fuzzy
 msgid ", compression ratio "
 msgstr "lzo-komprimering"
 
-#: src/libdar/filtre.cpp:1108
+#: src/libdar/filtre.cpp:1112
 #, c-format
 msgid "Finished Inspecting directory %S , saved %S%S"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1209
+#: src/libdar/filtre.cpp:1213
 msgid "SKIPPED (hard link in sequential read mode): "
 msgstr "ÖVERHOPPAD (hård länk i sekvensiell läsmode): "
 
-#: src/libdar/filtre.cpp:1245
+#: src/libdar/filtre.cpp:1249
 msgid "OK   "
 msgstr "OK   "
 
-#: src/libdar/filtre.cpp:1256 src/libdar/filtre.cpp:1288
+#: src/libdar/filtre.cpp:1260 src/libdar/filtre.cpp:1292
 msgid "DIFF "
 msgstr "DIFF "
 
-#: src/libdar/filtre.cpp:1288
+#: src/libdar/filtre.cpp:1292
 msgid ": file not present in filesystem"
 msgstr ": fil finns inte filsystem"
 
-#: src/libdar/filtre.cpp:1340
+#: src/libdar/filtre.cpp:1344
 msgid "ERR  "
 msgstr "ERR  "
 
-#: src/libdar/filtre.cpp:1422
+#: src/libdar/filtre.cpp:1426
 #, fuzzy
 msgid "Data"
 msgstr "[Data]"
 
-#: src/libdar/filtre.cpp:1431
+#: src/libdar/filtre.cpp:1435
 msgid "Can't read saved data."
 msgstr "Kan ej läsas sparade data."
 
-#: src/libdar/filtre.cpp:1477
+#: src/libdar/filtre.cpp:1481
 msgid "CRC error: data corruption."
 msgstr "CRC-fel: data förstört."
 
-#: src/libdar/filtre.cpp:1572
+#: src/libdar/filtre.cpp:1582
 msgid "OK  "
 msgstr "OK  "
 
-#: src/libdar/filtre.cpp:1607
+#: src/libdar/filtre.cpp:1617
 msgid "ERR "
 msgstr "ERR "
 
-#: src/libdar/filtre.cpp:1727
+#: src/libdar/filtre.cpp:1737
 msgid ""
 "Decremental mode is useless when merging is not applied to both an archive "
 "of reference and an auxiliary archive of reference. Ignore decremental mode "
@@ -7212,58 +7218,58 @@ msgstr ""
 "på både arkivreferens och en extra arkivreferens. Ignorera denna mod och "
 "fortsätta?"
 
-#: src/libdar/filtre.cpp:1861
+#: src/libdar/filtre.cpp:1871
 msgid "first"
 msgstr "första"
 
-#: src/libdar/filtre.cpp:1864
+#: src/libdar/filtre.cpp:1874
 msgid "second"
 msgstr "andra"
 
-#: src/libdar/filtre.cpp:1867
+#: src/libdar/filtre.cpp:1877
 msgid "next"
 msgstr "nästa"
 
-#: src/libdar/filtre.cpp:1870
+#: src/libdar/filtre.cpp:1880
 #, fuzzy, c-format
 msgid "Merging/filtering files from the %s archive..."
 msgstr "Slår ihop/filtrerar filer från %s-arkiv"
 
-#: src/libdar/filtre.cpp:1952
+#: src/libdar/filtre.cpp:1962
 msgid "overwritten"
 msgstr "överskriven"
 
-#: src/libdar/filtre.cpp:1956 src/libdar/filtre.cpp:2000
+#: src/libdar/filtre.cpp:1966 src/libdar/filtre.cpp:2010
 msgid "dropped from the archive and marked as already saved"
 msgstr "släppt från arkivet och markerad som redan sparad"
 
-#: src/libdar/filtre.cpp:1959
+#: src/libdar/filtre.cpp:1969
 msgid "removed"
 msgstr "borttagen"
 
-#: src/libdar/filtre.cpp:1964
+#: src/libdar/filtre.cpp:1974
 #, c-format
 msgid "Data of file %S is about to be %S, proceed?"
 msgstr "Data hos filen %S skall till att bli %S, fortsätta?"
 
-#: src/libdar/filtre.cpp:1993
+#: src/libdar/filtre.cpp:2003
 msgid "replaced"
 msgstr "ersatt"
 
-#: src/libdar/filtre.cpp:1996
+#: src/libdar/filtre.cpp:2006
 msgid "removed from the archive"
 msgstr "borttagen från arkivet"
 
-#: src/libdar/filtre.cpp:2003
+#: src/libdar/filtre.cpp:2013
 msgid "merged with possible overwriting"
 msgstr "ihopslagning med möjlig överskrivning"
 
-#: src/libdar/filtre.cpp:2008
+#: src/libdar/filtre.cpp:2018
 #, fuzzy, c-format
 msgid "EA and FSA of file %S are about to be %S, proceed?"
 msgstr "EA för fil %S skall till att bli %S, fortsätta?"
 
-#: src/libdar/filtre.cpp:2074
+#: src/libdar/filtre.cpp:2084
 #, fuzzy, c-format
 msgid ""
 "EA and FSA of file %S from first archive have been updated with those of "
@@ -7272,7 +7278,7 @@ msgstr ""
 "EA för fil %S från första arkivet har uppdaterats med dessa av samma filnamn "
 "från det extra arkivet"
 
-#: src/libdar/filtre.cpp:2084
+#: src/libdar/filtre.cpp:2094
 #, c-format
 msgid ""
 "EA of file %S from first archive have been dropped and marked as already "
@@ -7280,7 +7286,7 @@ msgid ""
 msgstr ""
 "EA för fil %S från första arkivet har släppts och markerats som redan sparade"
 
-#: src/libdar/filtre.cpp:2090
+#: src/libdar/filtre.cpp:2100
 #, fuzzy, c-format
 msgid ""
 "FSA of file %S from first archive have been dropped and marked as already "
@@ -7288,28 +7294,28 @@ msgid ""
 msgstr ""
 "EA för fil %S från första arkivet har släppts och markerats som redan sparade"
 
-#: src/libdar/filtre.cpp:2100 src/libdar/filtre.cpp:2238
+#: src/libdar/filtre.cpp:2110 src/libdar/filtre.cpp:2248
 #, c-format
 msgid "EA of file %S from first archive have been removed"
 msgstr "EA för fil %S från första arkivet har tagits bort"
 
-#: src/libdar/filtre.cpp:2108
+#: src/libdar/filtre.cpp:2118
 #, fuzzy, c-format
 msgid "FSA of file %S from first archive have been removed"
 msgstr "EA för fil %S från första arkivet har tagits bort"
 
-#: src/libdar/filtre.cpp:2122
+#: src/libdar/filtre.cpp:2132
 #, c-format
 msgid "Data of file %S from first archive has been preserved from overwriting"
 msgstr "Data från fil %S från första arkivet har bevarats från överskrivning"
 
-#: src/libdar/filtre.cpp:2173
+#: src/libdar/filtre.cpp:2183
 #, c-format
 msgid ""
 "Data of file %S taken from the first archive of reference has been removed"
 msgstr "Data från fil %S taget från det första referensarkivet har tagits bort"
 
-#: src/libdar/filtre.cpp:2176
+#: src/libdar/filtre.cpp:2186
 #, c-format
 msgid ""
 "Data of file %S taken from the first archive of reference has been "
@@ -7317,17 +7323,17 @@ msgid ""
 msgstr ""
 "Data från fil %S taget från det första referensarkivet har skrivits över"
 
-#: src/libdar/filtre.cpp:2211
+#: src/libdar/filtre.cpp:2221
 #, c-format
 msgid "EA of file %S has been overwritten"
 msgstr "EA för fil %S har skrivits över"
 
-#: src/libdar/filtre.cpp:2215 src/libdar/filtre.cpp:2231
+#: src/libdar/filtre.cpp:2225 src/libdar/filtre.cpp:2241
 #, c-format
 msgid "EA of file %S has been overwritten and marked as already saved"
 msgstr "EA för fil %S har skrivits över och markerats som redan sparat"
 
-#: src/libdar/filtre.cpp:2221 src/libdar/filtre.cpp:2226
+#: src/libdar/filtre.cpp:2231 src/libdar/filtre.cpp:2236
 #, c-format
 msgid ""
 "EA of file %S from first archive have been updated with those of the same "
@@ -7336,23 +7342,23 @@ msgstr ""
 "EA för fil %S från första arkivet har uppdaterats med dessa med samma "
 "filnamn från det extra arkivet"
 
-#: src/libdar/filtre.cpp:2510
+#: src/libdar/filtre.cpp:2520
 msgid " not merged (user choice)"
 msgstr " ej ihopslagen (användares val)"
 
-#: src/libdar/filtre.cpp:2514
+#: src/libdar/filtre.cpp:2524
 msgid "No file in this directory will be considered for merging."
 msgstr "Ingen fil i denna mapp kommer att tas med vid ihopslagning."
 
-#: src/libdar/filtre.cpp:2534
+#: src/libdar/filtre.cpp:2544
 msgid "Error while considering file "
 msgstr "Fel vid bestämning av fil: "
 
-#: src/libdar/filtre.cpp:2538
+#: src/libdar/filtre.cpp:2548
 msgid "Warning! No file in this directory will be considered for merging: "
 msgstr "Varning! Ingen fil i den mappen kommer att slås ihop: "
 
-#: src/libdar/filtre.cpp:2575
+#: src/libdar/filtre.cpp:2585
 msgid ""
 "File selection has been aborted. Now building the resulting archive with the "
 "already selected files"
@@ -7360,79 +7366,84 @@ msgstr ""
 "Filval har avbrutits. Skapar nu det resulterande arkivet med de redan valda "
 "filerna"
 
-#: src/libdar/filtre.cpp:2752
+#: src/libdar/filtre.cpp:2762
 #, c-format
 msgid ""
 "Need to activate sparse file detection in order to calculate delta signature "
 "for sparse file %S"
 msgstr ""
 
-#: src/libdar/filtre.cpp:2835
+#: src/libdar/filtre.cpp:2845
 msgid "Adding Hard link to archive: "
 msgstr "Lägger till hård länk till arkiv: "
 
-#: src/libdar/filtre.cpp:2914
+#: src/libdar/filtre.cpp:2861
+#, fuzzy, c-format
+msgid "error met while creating archive: %S"
+msgstr "Fel vid arkivtest: "
+
+#: src/libdar/filtre.cpp:2929
 #, fuzzy
 msgid "failed reading CRC from file: "
 msgstr "Fel vid läsning från fil: "
 
-#: src/libdar/filtre.cpp:2942
+#: src/libdar/filtre.cpp:2957
 #, fuzzy
 msgid "Failed reading CRC for EA and FSA: "
 msgstr "Fel vid läsning från fil: "
 
-#: src/libdar/filtre.cpp:2953
+#: src/libdar/filtre.cpp:2968
 #, fuzzy
 msgid "Error met while reading next entry: "
 msgstr "Fel uppstått vid bearbetande av åtgärd: "
 
-#: src/libdar/filtre.cpp:3063
+#: src/libdar/filtre.cpp:3076
 #, fuzzy, c-format
 msgid "Adding only inode metadata to archive: %S"
 msgstr "Lägger till fil till arkiv: "
 
-#: src/libdar/filtre.cpp:3075
+#: src/libdar/filtre.cpp:3088
 msgid "Resaving file without compression: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:3079
+#: src/libdar/filtre.cpp:3092
 #, fuzzy
 msgid "Delta saving file to archive: "
 msgstr "Lägger till fil till arkiv: "
 
-#: src/libdar/filtre.cpp:3083
+#: src/libdar/filtre.cpp:3096
 #, fuzzy, c-format
 msgid "Adding %S to archive: %S"
 msgstr "Lägger till fil till arkiv: "
 
-#: src/libdar/filtre.cpp:3223
+#: src/libdar/filtre.cpp:3236
 #, c-format
 msgid ""
 "Failed reading data CRC for %S, file may be damaged and will be marked dirty"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3243
+#: src/libdar/filtre.cpp:3256
 #, c-format
 msgid ""
 "Failed setting storage size to zero for this file with missing data CRC, CRC "
 "error will be reported for that file while reading the repaired archive"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3280
+#: src/libdar/filtre.cpp:3293
 msgid "Copied data does not match CRC"
 msgstr "Kopierade data matchar inte CRC"
 
-#: src/libdar/filtre.cpp:3427
+#: src/libdar/filtre.cpp:3440
 msgid " : Failed resaving uncompressed the inode data"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3437
+#: src/libdar/filtre.cpp:3450
 msgid ""
 " : Resaving uncompressed the inode data to gain space is not possible, "
 "keeping data compressed"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3461
+#: src/libdar/filtre.cpp:3474
 #, c-format
 msgid ""
 "File has disappeared while we were reading it, cannot check whether it has "
@@ -7441,7 +7452,7 @@ msgstr ""
 "Fil försvann medan den lästes, kan ej kontrollera huruvida den har ändrats "
 "under dess säkerhetskopiering: %S"
 
-#: src/libdar/filtre.cpp:3496
+#: src/libdar/filtre.cpp:3509
 #, c-format
 msgid ""
 "WARNING! File modified while reading it for backup. Performing retry %i of %i"
@@ -7449,7 +7460,7 @@ msgstr ""
 "VARNING! Fil ändrad under läsning för säkerhetskopiering. Genomför nytt "
 "försök %i av %i"
 
-#: src/libdar/filtre.cpp:3513
+#: src/libdar/filtre.cpp:3526
 msgid ""
 "WARNING! File modified while reading it for backup. No more retry for that "
 "file to not exceed the wasted byte limit. File is "
@@ -7457,7 +7468,7 @@ msgstr ""
 "VARNING! Fil ändrad vid läsning för säkerhetskopiering. Inga fler försök för "
 "den filen för att inte överskrida bortkastad byt-gräns. Fil är "
 
-#: src/libdar/filtre.cpp:3520
+#: src/libdar/filtre.cpp:3533
 msgid ""
 "WARNING! File modified while reading it for backup, but no more retry "
 "allowed: "
@@ -7465,64 +7476,64 @@ msgstr ""
 "VARNING! Fil ändrad under läsning för säkerhetskopiering, men inga fler "
 "försök tillåtna: "
 
-#: src/libdar/filtre.cpp:3540
+#: src/libdar/filtre.cpp:3553
 msgid "Dumping delta signature structure for saved file: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:3686
+#: src/libdar/filtre.cpp:3706
 msgid "Saving Extended Attributes for "
 msgstr "Sparar Extended Attribut för "
 
-#: src/libdar/filtre.cpp:3721
+#: src/libdar/filtre.cpp:3741
 #, c-format
 msgid ""
 "Computed EA CRC for file %S differs from what was stored in the archive, "
 "this file's EA may have been corrupted"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3768
+#: src/libdar/filtre.cpp:3788
 msgid "Error saving Extended Attributes for "
 msgstr "Fel vid sparande av Extended Attribut för "
 
-#: src/libdar/filtre.cpp:3772
+#: src/libdar/filtre.cpp:3792
 msgid ""
 "be advised that a CRC error will be reported for the EA of that file while "
 "sequentially reading the repaired archive"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3807
+#: src/libdar/filtre.cpp:3827
 #, fuzzy
 msgid "Saving Filesystem Specific Attributes for "
 msgstr "Sparar Extended Attribut för "
 
-#: src/libdar/filtre.cpp:3837
+#: src/libdar/filtre.cpp:3857
 #, c-format
 msgid ""
 "Computed FSA CRC for file %S differs from what was stored in the archive, "
 "this file's EA may have been corrupted"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3882
+#: src/libdar/filtre.cpp:3902
 #, fuzzy
 msgid "Error saving Filesystem Specific Attributes for "
 msgstr "Fel vid sparande av Extended Attribut för "
 
-#: src/libdar/filtre.cpp:3886
+#: src/libdar/filtre.cpp:3906
 msgid ""
 "be advised that a CRC error will be reported for the FSA of that file while "
 "sequentially reading the repaired archive"
 msgstr ""
 
-#: src/libdar/filtre.cpp:4442
+#: src/libdar/filtre.cpp:4462
 #, fuzzy
 msgid "Copying delta signature structure from the archive of reference: "
 msgstr "Beaktar det (första) referensarkivet:"
 
-#: src/libdar/filtre.cpp:4479
+#: src/libdar/filtre.cpp:4499
 msgid "Calculating delta signature from filesystem: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:4538
+#: src/libdar/filtre.cpp:4579
 #, c-format
 msgid ""
 "Furtive read mode requires either root permission and FOWNER capability, "
@@ -7769,38 +7780,38 @@ msgstr ""
 msgid "false"
 msgstr ""
 
-#: src/libdar/cat_file.cpp:459
+#: src/libdar/cat_file.cpp:465
 msgid "cannot provide data from a \"not saved\" file object"
 msgstr "kan inte förse data från en \"not saved\"-filobjekt"
 
-#: src/libdar/cat_file.cpp:470
+#: src/libdar/cat_file.cpp:476
 msgid "data has been cleaned, object is now empty"
 msgstr "data har rensats, objekt är nu tomt"
 
-#: src/libdar/cat_file.cpp:855
+#: src/libdar/cat_file.cpp:861
 msgid "can't read data CRC: No escape mark found for that file"
 msgstr "kan ej läsa CRC: inget escape-märke hittat för denna fil"
 
-#: src/libdar/cat_file.cpp:1038
+#: src/libdar/cat_file.cpp:1064
 msgid "can't find mark for delta signature"
 msgstr ""
 
-#: src/libdar/cat_file.cpp:1050
+#: src/libdar/cat_file.cpp:1081
 #, fuzzy
 msgid "Error while retrieving delta signature from the archive: "
 msgstr "Fel vid läsning av användarsvar från terminal: "
 
-#: src/libdar/cat_file.cpp:1144
+#: src/libdar/cat_file.cpp:1183
 #, c-format
 msgid "not same size: %i <--> %i"
 msgstr "inte samma storlek: %i <--> %i"
 
-#: src/libdar/cat_file.cpp:1212
+#: src/libdar/cat_file.cpp:1251
 #, c-format
 msgid "different file data, offset of first difference is: %i"
 msgstr ""
 
-#: src/libdar/cat_file.cpp:1220
+#: src/libdar/cat_file.cpp:1259
 msgid ""
 "Same data but CRC value could not be verified because we did not guessed "
 "properly its width (sequential read restriction)"
@@ -7808,24 +7819,24 @@ msgstr ""
 "Samma data men CRC-värdet kunde inte verifieras, ty vi gissade inte korrekt "
 "dess bredd (sekvensiell läsbegränsning)"
 
-#: src/libdar/cat_file.cpp:1222
+#: src/libdar/cat_file.cpp:1261
 msgid "Same data but stored CRC does not match the data!?!"
 msgstr "Samma data men lagrat CRC matchar inte data!?!"
 
-#: src/libdar/cat_file.cpp:1263
+#: src/libdar/cat_file.cpp:1302
 msgid "Delta signature do not match"
 msgstr ""
 
-#: src/libdar/cat_file.cpp:1299
+#: src/libdar/cat_file.cpp:1343
 #, fuzzy, c-format
 msgid "Delta signature do not have the same size: %i <--> %i"
 msgstr "inte samma storlek: %i <--> %i"
 
-#: src/libdar/cat_file.cpp:1301
+#: src/libdar/cat_file.cpp:1345
 msgid "Delta signature have the same size but do not match"
 msgstr ""
 
-#: src/libdar/cat_file.cpp:1346
+#: src/libdar/cat_file.cpp:1388
 #, fuzzy
 msgid "CRC difference concerning file's data"
 msgstr "olika fildata"
@@ -7846,7 +7857,7 @@ msgstr ""
 msgid "Could not find tape mark for the internal catalogue"
 msgstr "kunde inte hitta den interna datamängdsetikettens escape-sekvens "
 
-#: src/libdar/escape_catalogue.cpp:488
+#: src/libdar/escape_catalogue.cpp:489
 msgid ""
 "Escape sequences used for reading lead the archive to place some files out "
 "of the specified root. To overcome this problem, try reading the archive in "
@@ -7860,7 +7871,7 @@ msgstr ""
 "reaparera arkivet med hlälp av Parchive om redundanta data har skapats eller "
 "som sista utväg försök använda lax mode"
 
-#: src/libdar/escape_catalogue.cpp:491
+#: src/libdar/escape_catalogue.cpp:492
 msgid ""
 "LAX MODE: Archive directory structure is corrupted, it would lead to place "
 "some files out of the specified root directory. Restoring different "
@@ -7872,7 +7883,7 @@ msgstr ""
 "innehåll vid roten, ej utanför den, vilket kommer att lägga filer från andra "
 "mappar i den angivna rotmappen."
 
-#: src/libdar/escape_catalogue.cpp:506
+#: src/libdar/escape_catalogue.cpp:507
 msgid ""
 "LAX MODE: found unknown catalogue entry, assuming data corruption occurred. "
 "Skipping to the next entry, this may lead to improper directory structure "
@@ -7882,11 +7893,11 @@ msgstr ""
 "nästa post, detta kan leda till att felaktig mappstruktur återställs om "
 "förstört data var en mapp"
 
-#: src/libdar/escape_catalogue.cpp:513
+#: src/libdar/escape_catalogue.cpp:514
 msgid "Corrupted entry following an escape mark in the archive"
 msgstr "Förstörd post följande ett escape-märke i arkivet"
 
-#: src/libdar/escape_catalogue.cpp:542
+#: src/libdar/escape_catalogue.cpp:543
 msgid ""
 "Uncompleted archive! Assuming it has been interrupted during the backup "
 "process. If an error has been reported just above, simply ignore it, this is "
@@ -7896,13 +7907,13 @@ msgstr ""
 "Om ett fel har precis rapporterats ovan, strunta i det helt enkelt, detta är "
 "om den fil, som sparades vid tidpunkten för avbrottet."
 
-#: src/libdar/escape_catalogue.cpp:577
+#: src/libdar/escape_catalogue.cpp:578
 msgid "Cannot extract from the internal catalogue the list of files to remove"
 msgstr ""
 "Kan ej extrahera från den interna katalogen lista med filer, som skall tas "
 "bort "
 
-#: src/libdar/escape_catalogue.cpp:654
+#: src/libdar/escape_catalogue.cpp:655
 msgid ""
 "Archive internal catalogue is properly signed but its content does not match "
 "the tape marks used so far for sequentially reading. Possible data "
@@ -7912,7 +7923,7 @@ msgid ""
 "has been generated"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:794
+#: src/libdar/escape_catalogue.cpp:795
 msgid ""
 "Resetting the sequential reading process of the archive contents while it is "
 "not finished, will make all data unread so far becoming inaccessible"
@@ -8049,49 +8060,53 @@ msgstr "Inmatad information CRC-misslyckande för %S"
 msgid "Entry information CRC failure"
 msgstr "Inmatad information CRC-misslyckande"
 
-#: src/libdar/cat_entree.cpp:461
+#: src/libdar/cat_entree.cpp:468
 msgid "directory"
 msgstr "mapp"
 
-#: src/libdar/cat_entree.cpp:465
+#: src/libdar/cat_entree.cpp:472
 msgid "hard linked inode"
 msgstr "hårdlänkad inode"
 
-#: src/libdar/cat_entree.cpp:467
+#: src/libdar/cat_entree.cpp:474
 msgid "plain file"
 msgstr "enkel fil"
 
-#: src/libdar/cat_entree.cpp:469
+#: src/libdar/cat_entree.cpp:476
 msgid "soft link"
 msgstr "mjuk länk"
 
-#: src/libdar/cat_entree.cpp:471
+#: src/libdar/cat_entree.cpp:478
 msgid "char device"
 msgstr "teckenenhet"
 
-#: src/libdar/cat_entree.cpp:473
+#: src/libdar/cat_entree.cpp:480
 msgid "block device"
 msgstr "blockenhet"
 
-#: src/libdar/cat_entree.cpp:475
+#: src/libdar/cat_entree.cpp:482
 msgid "named pipe"
 msgstr "namnad pipe"
 
-#: src/libdar/cat_entree.cpp:477
+#: src/libdar/cat_entree.cpp:484
 msgid "unix socket"
 msgstr "unix sockel"
 
-#: src/libdar/cat_entree.cpp:479
+#: src/libdar/cat_entree.cpp:486
 msgid "deleted entry"
 msgstr "fördröjd inmatning"
 
-#: src/libdar/cat_entree.cpp:481
+#: src/libdar/cat_entree.cpp:488
 msgid "door inode"
 msgstr "'door' inod"
 
 #: src/check/all_features.cpp:54
 msgid "-"
 msgstr ""
+
+#~ msgid "CRC failed for table of contents (aka \"catalogue\")"
+#~ msgstr ""
+#~ "CRC misslyckades för innehållsförtäckning (också känts som \"katalog\")"
 
 #, fuzzy
 #~ msgid "aborting"
