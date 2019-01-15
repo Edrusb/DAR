@@ -182,6 +182,9 @@ namespace libdar5
 	// from list_entry.hpp
     using libdar::list_entry;
 
+	// from entree_stats.hpp
+    using libdar::entree_stats;
+
 	// from archive.hpp
 	// using libdar::archive;
 
