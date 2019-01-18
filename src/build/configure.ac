@@ -1111,7 +1111,8 @@ AC_ARG_ENABLE(  [gpgme-linking],
                                 ],
                                 [ AC_MSG_WARN([Public key support (GPGME linking) requires version greater than $gpgme_min_version]) ]
                                )
-                        ])
+                        ],
+                        [AC_MSG_WARN([AM_PATH_GPGME macro not found!])])
                  else
                     AC_MSG_WARN([Public key support (GPGME linking) requires libgcrypt (strong encryption support)])
                  fi
