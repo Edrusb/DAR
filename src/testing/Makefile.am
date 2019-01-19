@@ -1,6 +1,6 @@
 #######################################################################
 # dar - disk archive - a backup/restoration program
-# Copyright (C) 2002-2018 Denis Corbin
+# Copyright (C) 2002-2019 Denis Corbin
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -42,12 +42,12 @@ endif
 
 noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_escape test_hash_fichier moving_file make_sparse_file hashsum test_crypto_asym test_range $(LIBTHREADAR_TEST_MODULES) test_rsync test_smart_pointer test_datetime test_entrepot_libcurl
 
-LDADD = ../libdar/$(MYLIB).la
+LDADD = ../libdar/$(MYLIB).la $(LIBCURL_LIBS) $(GPGME_LIBS) $(LIBTHREADAR_LIBS) $(LTLIBINTL)
 
 if DEBUG_STATIC
-AM_LDFLAGS = -all-static $(LTLIBINTL) $(GPGME_LIBS) $(LIBCURL_LIBS) $(LIBTHREADAR_LIBS) $(CXXSTDFLAGS)
+AM_LDFLAGS = -all-static $(CXXSTDFLAGS)
 else
-AM_LDFLAGS = $(LTLIBINTL)  $(GPGME_LIBS) $(LIBCURL_LIBS) $(LIBTHREADAR_LIBS) $(CXXSTDFLAGS)
+AM_LDFLAGS = $(CXXSTDFLAGS)
 endif
 
 noinst_HEADERS = testtools.hpp

@@ -1,6 +1,6 @@
 #######################################################################
 # dar - disk archive - a backup/restoration program
-# Copyright (C) 2002-2018 Denis Corbin
+# Copyright (C) 2002-2019 Denis Corbin
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -22,7 +22,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.69)
-AC_INIT([DAR], [2.6.1.RC2], [[http://sourceforge.net/tracker/?group_id=65612&atid=511612]])
+AC_INIT([DAR], [2.6.1], [[http://sourceforge.net/tracker/?group_id=65612&atid=511612]])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -1111,7 +1111,8 @@ AC_ARG_ENABLE(  [gpgme-linking],
                                 ],
                                 [ AC_MSG_WARN([Public key support (GPGME linking) requires version greater than $gpgme_min_version]) ]
                                )
-                        ])
+                        ],
+                        [AC_MSG_WARN([AM_PATH_GPGME macro not found!])])
                  else
                     AC_MSG_WARN([Public key support (GPGME linking) requires libgcrypt (strong encryption support)])
                  fi

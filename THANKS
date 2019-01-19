@@ -1,9 +1,13 @@
 version 2.6.1
 --------------
 Thanks to David Niklas for contribution upgrading the /etc/darrc list
-of file types that does not worth compressing. Big thanks to Gulikosa
-for feedbacks, bug reports, remarks and improvement suggestions and
-discussions.
+of file types that do not worth compressing. Big thank to Gulikosa
+for feedback, bug reports, remarks and improvement, suggestions and
+discussions. Thanks to Ryan Schmidt the maintainer of dar in MacPorts
+for his feedback. Last but not least, thanks to Tobias Specht providing
+gdar software and support for years now and for having helped fixing
+the inconsistencies in libdar API that avoided compiling gdar against
+the previous release.
 
 version 2.6.0
 --------------
