@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: DAR 2.5.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2019-01-13 18:05+0100\n"
+"POT-Creation-Date: 2019-01-19 10:21+0100\n"
 "PO-Revision-Date: 2018-09-30 10:29+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -3843,11 +3843,11 @@ msgstr ""
 "La bibliothèque de chiffrement pour l'algorithme blowfish ne respecte pas la "
 "RFC 3962"
 
-#: src/libdar/etage.cpp:112
+#: src/libdar/etage.cpp:118
 msgid "Error opening directory in furtive read mode: "
 msgstr "Erreur lors de l'ouverture d'un répertoire en mode furtif : "
 
-#: src/libdar/etage.cpp:116
+#: src/libdar/etage.cpp:122
 #, c-format
 msgid ""
 "Could not open directory %s in furtive read mode (%s), using normal mode"
@@ -3855,11 +3855,11 @@ msgstr ""
 "Échec lors de l'ouverture du répertoire %s en mode furtif (%s), ouverture en "
 "mode normal"
 
-#: src/libdar/etage.cpp:141
+#: src/libdar/etage.cpp:147
 msgid "Error opening directory: "
 msgstr "Erreur lors de l'ouverture du répertoire : "
 
-#: src/libdar/etage.cpp:159
+#: src/libdar/etage.cpp:165
 #, c-format
 msgid ""
 "Filename provided by the operating system seems truncated in directory %s "
@@ -3868,7 +3868,7 @@ msgstr ""
 "Le nom de fichier fourni par le système d'exploitation semble tronqué dans "
 "le répertoire %s et sera ignoré: %s"
 
-#: src/libdar/etage.cpp:191
+#: src/libdar/etage.cpp:197
 #, c-format
 msgid ""
 "Detected Cache Directory Tagging Standard for %s, the contents of that "
