@@ -6,25 +6,28 @@ from 2.6.0 to 2.6.1
   removed since the archive of reference was done. The file to remove was
   always removed from the current directory (missing the path part), most
   of the time this was leading to the error message "Error removing file
-  ...: Not such file or directory". I could also lead to incorrectly
+  ...: Not such file or directory". It could also lead to incorrectly
   removing files (not directory) located in the directory from which
   dar was run.
-- fixing bug met while reparing an archive containing delta signature
+- fixing bug met while repairing an archive containing delta signature
   for unsaved files
 - merging patch from ballsystemlord updating list of file extension
-  not to compress (compress-exclusion defined in /etc/darrc)
+  not to compress (see compress-exclusion defined in /etc/darrc)
 - review cat_delta_signature implementation in order to be able to fix
-  memory consumtion problem when delta signature are used
+  memory consumption problem when delta signature are used
 - fixed missing mark for data CRC when the data is a delta patch, leading
-  sequential reading to fail when a delta patch is encontered
+  sequential reading to fail when a delta patch was encountered
 - fixed bug in XML output about deleted entries
 - fixed XML output to be identical to the one of dar 2.5.x for deleted
   entries.
-- Showing the deleted date in 'mtime' field for deleted entries in XML
+- Adding the deleted date in 'mtime' field for deleted entries in XML
   output
 - fixing bug in xz/lzma routine wrongly reporting internal error when
   corrupted data was met
-- fixed code for compilation with clang to succeed
+- fixed code for compilation with clang to succeed (it concerns MAC OS X
+  in particular)
+- fixed inconsistencies in libdar API that avoided gdar to compile with
+  libdar released in 2.6.0
 
 from 2.5.x to 2.6.0
 - new feature: support for binary delta in incremental/differential backups
