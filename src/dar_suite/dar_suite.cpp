@@ -273,7 +273,7 @@ string dar_suite_command_line_features()
     const char *long_opt = gettext("NO");
 #endif
 
-    return tools_printf(gettext("Long options support       : %s\n"), long_opt);
+    return tools_printf(gettext("Long options support         : %s\n"), long_opt);
 }
 
 static void signal_abort_delayed(int l)
