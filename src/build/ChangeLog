@@ -1,7 +1,8 @@
 from 2.6.1 to 2.6.2
 - fixed incoherence in documentation
 - updating inlined help information (-h option)
-
+- fixed unexpected behavior of the dar command-line filtering mechanism
+  met when the provided path to -P or -g options was ending with a slash
 
 from 2.6.0 to 2.6.1
 - fixed error in man page
