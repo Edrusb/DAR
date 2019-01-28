@@ -224,7 +224,7 @@ namespace libdar
 		    throw Esystem("i_entrepot_libcurl::inherited_open", "File exists on remote repository" , Esystem::io_exist);
 	}
 
-	string chemin = (path(get_url(), true) + filename).display();
+	string chemin = (path(get_url(), true).append(filename)).display();
 
 	if(hidden_mode == gf_read_write)
 	    hidden_mode = gf_write_only;

@@ -113,7 +113,7 @@ namespace libdar
 						   bool erase) const
     {
 	fichier_global *ret = nullptr;
-	string fullname = (get_full_path() + filename).display();
+	string fullname = (get_full_path().append(filename)).display();
 	U_I perm = force_permission ? permission : 0666;
 
 
@@ -161,7 +161,7 @@ namespace libdar
 
     void entrepot_local::inherited_unlink(const string & filename) const
     {
-	string target = (get_full_path() + filename).display();
+	string target = (get_full_path().append(filename)).display();
 
 	if(::unlink(target.c_str()) != 0)
 	{

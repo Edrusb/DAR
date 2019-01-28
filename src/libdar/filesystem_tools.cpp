@@ -170,7 +170,7 @@ namespace libdar
 
                 // first we destroy directory's children
             while(fils.read(tmp))
-                filesystem_tools_supprime(ui, (path(ref)+tmp).display());
+                filesystem_tools_supprime(ui, (path(ref).append(tmp)).display());
 
                 // then the directory itself
             if(rmdir(s) < 0)
@@ -360,7 +360,7 @@ namespace libdar
     {
 #ifdef LIBDAR_NODUMP_FEATURE
         S_I fd, f = 0;
-        const string display = (chem + filename).display();
+        const string display = (chem.append(filename)).display();
         const char *ptr = display.c_str();
 
         fd = ::open(ptr, O_RDONLY|O_BINARY|O_NONBLOCK);

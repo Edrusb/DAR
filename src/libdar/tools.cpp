@@ -1131,7 +1131,7 @@ namespace libdar
         while(ent.read_dir_next(entry))
             if(my_mask.is_covered(entry))
             {
-		const string c_entry = (chemin + entry).display();
+		const string c_entry = (chemin.append(entry)).display();
                 if(info_details)
                     dialog.message(tools_printf(dar_gettext("Removing file %s"), c_entry.c_str()));
 

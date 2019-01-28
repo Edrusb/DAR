@@ -336,7 +336,7 @@ namespace libdar
                         else // EXT2 nodump flag is set, and we must not consider such file for backup
                         {
                             if(info_details)
-                                get_ui().message(string(gettext("Ignoring file with NODUMP flag set: ")) + (*current_dir + name).display());
+                                get_ui().message(string(gettext("Ignoring file with NODUMP flag set: ")) + (current_dir->append(name)).display());
 			    skipped_dump++;
                             once_again = true;
                         }

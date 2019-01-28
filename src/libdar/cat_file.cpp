@@ -53,7 +53,7 @@ namespace libdar
 		       const infinint & fs_device,
 		       bool x_furtive_read_mode) : cat_inode(xuid, xgid, xperm, last_access, last_modif, last_change, src, fs_device)
     {
-        chemin = (che + src).display();
+        chemin = (che.append(src)).display();
         status = from_path;
         set_saved_status(saved_status::saved);
         offset = nullptr;

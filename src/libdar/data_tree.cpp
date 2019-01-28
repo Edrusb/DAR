@@ -924,7 +924,7 @@ namespace libdar
 		    last_date = rec_it->date;
 		else // order is not respected
 		{
-		    string tmp = current_path.display() == "." ? get_name() : (current_path + get_name()).display();
+		    string tmp = current_path.display() == "." ? get_name() : (current_path.append(get_name())).display();
 		    dialog.printf(gettext("Dates of file's %S are not increasing when database's archive number grows. Concerned file is: %S"), &field_nature, &tmp);
 		    if(initial_warn)
 		    {

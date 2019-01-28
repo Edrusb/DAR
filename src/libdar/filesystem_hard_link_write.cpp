@@ -258,7 +258,7 @@ namespace libdar
         if(ref_ino == nullptr && ref_mir == nullptr)
             throw SRC_BUG; // neither an cat_inode nor a hard link
 
-	const string display = (ou + ref->get_name()).display();
+	const string display = (ou.append(ref->get_name())).display();
 	const char *name = display.c_str();
 
 

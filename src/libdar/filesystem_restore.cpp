@@ -223,7 +223,7 @@ namespace libdar
 	    {
 		if(!empty && stack_dir.back().get_restore_date())
 		{
-		    string chem = (*current_dir + stack_dir.back().get_name()).display();
+		    string chem = (current_dir->append(stack_dir.back().get_name())).display();
 		    filesystem_tools_make_date(stack_dir.back(), chem, what_to_check, get_fsa_scope());
 		    filesystem_tools_make_owner_perm(get_ui(), stack_dir.back(), chem, what_to_check, get_fsa_scope());
 		}
@@ -243,7 +243,7 @@ namespace libdar
 	    bool has_just_inode = x_ino != nullptr && x_ino->get_saved_status() == saved_status::inode_only;
 	    bool has_ea_saved = x_ino != nullptr && (x_ino->ea_get_saved_status() == ea_saved_status::full || x_ino->ea_get_saved_status() == ea_saved_status::removed);
 	    bool has_fsa_saved = x_ino != nullptr && x_ino->fsa_get_saved_status() == fsa_saved_status::full;
-	    path spot = *current_dir + x_nom->get_name();
+	    path spot = current_dir->append(x_nom->get_name());
 	    string spot_display = spot.display();
 
 	    cat_nomme *exists = nullptr;
@@ -1141,7 +1141,7 @@ namespace libdar
 
 	while(!stack_dir.empty() && current_dir->pop(tmp))
 	{
-	    string chem = (*current_dir + stack_dir.back().get_name()).display();
+	    string chem = (current_dir->append(stack_dir.back().get_name())).display();
 	    if(!empty)
 		filesystem_tools_make_owner_perm(get_ui(), stack_dir.back(), chem, what_to_check, get_fsa_scope());
 	    stack_dir.pop_back();

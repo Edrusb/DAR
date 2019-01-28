@@ -2940,8 +2940,8 @@ static mask *make_exclude_path_ordered(const string & x, mask_opt opt)
             if(val == nullptr)
                 throw Ememory("make_exclude_path");
 
-            val->add_mask(simple_mask((opt.prefix + path(x)).display(), opt.case_sensit));
-            val->add_mask(simple_mask((opt.prefix + path(x)).display() + "/*", opt.case_sensit));
+            val->add_mask(simple_mask((opt.prefix + x).display(), opt.case_sensit));
+            val->add_mask(simple_mask((opt.prefix + x).display() + "/*", opt.case_sensit));
             ret = val;
         }
         else // regex
@@ -2965,7 +2965,7 @@ static mask *make_exclude_path_unordered(const string & x, mask_opt opt)
         ret = new (nothrow) mask_list(x, opt.case_sensit, opt.prefix, false);
     else
         if(opt.glob_exp)
-            ret = new (nothrow) simple_mask((opt.prefix + path(x)).display(), opt.case_sensit);
+            ret = new (nothrow) simple_mask((opt.prefix + x).display(), opt.case_sensit);
         else
             ret = new (nothrow) regular_mask(line_tools_build_regex_for_exclude_mask(opt.prefix.display(), x), opt.case_sensit);
     if(ret == nullptr)
@@ -2981,7 +2981,7 @@ static mask *make_include_path(const string & x, mask_opt opt)
     if(opt.file_listing)
         ret = new (nothrow) mask_list(x, opt.case_sensit, opt.prefix, true);
     else
-        ret = new (nothrow) simple_path_mask(opt.prefix + path(x), opt.case_sensit);
+        ret = new (nothrow) simple_path_mask(opt.prefix + x, opt.case_sensit);
     if(ret == nullptr)
         throw Ememory("make_include_path");
 
