@@ -1266,6 +1266,8 @@ namespace libdar
 			{
 			    strncpy(addr.sun_path, name, UNIX_PATH_MAX - 1);
 			    addr.sun_path[UNIX_PATH_MAX - 1] = '\0';
+			    if(strlen(addr.sun_path) < strlen(name))
+				get_ui().pause(tools_printf(gettext("error restoring Unix socket %s, path too long to be stored properly, socket will be created as %s instead, do you confirm?"), name, addr.sun_path));
 			    if(::bind(sd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
 				throw Erange("filesystem_hard_link_write::make_file (socket bind)", string(gettext("Error creating Unix socket file: ")) + name + " : " + tools_strerror_r(errno));
 			}

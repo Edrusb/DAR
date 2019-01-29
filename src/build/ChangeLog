@@ -1,3 +1,7 @@
+from 2.5.19 to 2.5.20
+- adding a warning when restoring a unix socket if the path to that socket
+  is larger than what the sockaddr_un system structure can handle
+
 from 2.5.18 to 2.5.19
 - fixed compilation issue on system that to not have ENOATTR defined
 - fixed compilation warning about deprecated dynamic exception
