@@ -1,0 +1,12 @@
+
+data : before metadata (dates, ownership, permissions, ea, fsa)
+
+dates : after data (atime/mtime), can be before ownership, permission ea and fsa as they only change ctime that cannot be restored anyway
+
+ownership : after data, if not root, but has CHOWN capability may lead to remove write access to the file
+
+permissions : if user not root, need to be done as late as possible (may remove w access)
+
+ea : after ownership do not drop the linux capabilities, but also before ownship and permission to be able to restore them libdar not run as root
+
+fsa : immutable flag need to be restored last, but other fsa before permission to be able to restore when libdar not run as root
