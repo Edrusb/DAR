@@ -1556,12 +1556,30 @@ namespace libdar
 			    // for directories, the permission will be set back once all its content will
 			    // restored, thus when meeting an eod object
 
+			    // re-setting EA after ownership to avoid dropping linux capabilitie
+
+			if(has_ea_saved && !empty)
+			{
+			    const ea_attributs *ea = x_ino->get_ea();
+			    try
+			    {
+				ea_restored = raw_set_ea(x_nom, *ea, spot_display, *ea_mask);
+			    }
+			    catch(Erange & e)
+			    {
+				    // error probably due to permission context,
+				    // as raw_set_ea() has been called earlier
+				    // and either no error met or same error met
+			    }
+			}
 
 			    // now that FSA has been read (if sequential mode is used)
 			    // we can restore dates in particular creation date from HFS+ FSA if present
 			if(!empty)
 			    make_date(*x_ino, spot_display, what_to_check,
 				      get_fsa_scope());
+
+
 		    }
 		    else // no existing inode but no data to restore
 		    {
@@ -1651,6 +1669,21 @@ namespace libdar
 
 			    if(has_fsa_saved || has_ea_saved)
 			    {
+				    // if linux capabilities were restored, changing ownership let them
+				    // been removed by the system. And doing restoration of EA after ownership
+				    // may avoid being able to restore EA due to lack of privilege if
+				    // libdar is not ran as root
+				try
+				{
+				    (void)action_over_ea(exists_ino, x_nom, spot_display, act_ea);
+				}
+				catch(Erange & e)
+				{
+					// ignoring any error here
+					// we already restored EA
+					// previously
+				}
+
 				    // to accomodate MacOS X we set again mtime to its expected value
 				    // because restoring EA modifies mtime on this OS.
 				    // Same point but concerning extX FSA, setting them may modify atime
