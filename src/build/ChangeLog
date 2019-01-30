@@ -10,6 +10,14 @@ from 2.6.1 to 2.6.2
   instead of a filename to an existing path object.
 - adding a warning when restoring a unix socket if the path to that socket
   is larger than what the sockaddr_un system structure can handle
+- fixing bug due to Linux system removing file capabilities (stored as EA)
+  when file ownership is changed. Though restoring EA after ownership
+  may lead to the impossibility to restore them due to lack of permission
+  when dar/libdar is not run as root. Thus we try restoring EA a second
+  time after ownership restoration. This is not efficient but restores
+  the file as close as possible to their original state whatever
+  permission dar has been granted for a restoration operation.
+
 
 from 2.6.0 to 2.6.1
 - fixed error in man page

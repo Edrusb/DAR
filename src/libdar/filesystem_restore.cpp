@@ -380,6 +380,23 @@ namespace libdar
 							     get_fsa_scope());
 			}
 
+			    // re-setting EA after ownership to avoid dropping linux capabilities
+
+			if(has_ea_saved && !empty)
+			{
+			    const ea_attributs *ea = x_ino->get_ea();
+			    try
+			    {
+				raw_set_ea(x_nom, *ea, spot_display, *ea_mask);
+			    }
+			    catch(Erange & e)
+			    {
+				    // error probably due to permission context,
+				    // as raw_set_ea() has been called earlier
+				    // and either no error met or same error met
+			    }
+			}
+
 			    // Last: setting the linux immutable flag if present
 
 			if(has_fsa_saved)
@@ -530,6 +547,25 @@ namespace libdar
 				    // set back the mtime to value found in filesystem before restoration
 				filesystem_tools_make_date(*exists_ino, spot_display, what_to_check,
 							   get_fsa_scope());
+			}
+
+
+			if(ea_restored)
+			{
+				// if linux capabilities were restored, changing ownership let them
+				// been removed by the system. And doing restoration of EA after ownership
+				// may avoid being able to restore EA due to lack of privilege if
+				// libdar is not ran as root
+			    try
+			    {
+				(void)action_over_ea(exists_ino, x_nom, spot_display, act_ea);
+			    }
+			    catch(Erange & e)
+			    {
+				    // ignoring any error here
+				    // we already restored EA
+				    // previously
+			    }
 			}
 
 			if(fsa_restored)
