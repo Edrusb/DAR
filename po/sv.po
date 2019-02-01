@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2019-01-20 11:26+0100\n"
+"POT-Creation-Date: 2019-02-01 21:34+0100\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -4733,66 +4733,66 @@ msgstr "Kan ej ta bort icke befintlig fil från filsystemet: "
 msgid "Cannot remove non-existent file from filesystem: %S"
 msgstr "Kan ej ta bort icke befintlig fil från filsystemet: "
 
-#: src/libdar/filesystem_restore.cpp:307 src/libdar/filesystem_restore.cpp:684
+#: src/libdar/filesystem_restore.cpp:307 src/libdar/filesystem_restore.cpp:720
 msgid "Restoring file's data: "
 msgstr "Återställer fils data: "
 
-#: src/libdar/filesystem_restore.cpp:324 src/libdar/filesystem_restore.cpp:903
+#: src/libdar/filesystem_restore.cpp:324 src/libdar/filesystem_restore.cpp:939
 msgid "Restoring file's EA: "
 msgstr "Återställer fils EA: "
 
-#: src/libdar/filesystem_restore.cpp:335 src/libdar/filesystem_restore.cpp:487
+#: src/libdar/filesystem_restore.cpp:335 src/libdar/filesystem_restore.cpp:504
 #, fuzzy, c-format
 msgid "Restoration of EA for %S aborted: "
 msgstr "Återställer EA för "
 
-#: src/libdar/filesystem_restore.cpp:345 src/libdar/filesystem_restore.cpp:1053
+#: src/libdar/filesystem_restore.cpp:345 src/libdar/filesystem_restore.cpp:1089
 #, fuzzy
 msgid "Restoring file's FSA: "
 msgstr "Återställer fils EA: "
 
-#: src/libdar/filesystem_restore.cpp:360 src/libdar/filesystem_restore.cpp:499
+#: src/libdar/filesystem_restore.cpp:360 src/libdar/filesystem_restore.cpp:516
 #, c-format
 msgid "Restoration of FSA for %S aborted: "
 msgstr ""
 
-#: src/libdar/filesystem_restore.cpp:393 src/libdar/filesystem_restore.cpp:552
+#: src/libdar/filesystem_restore.cpp:410 src/libdar/filesystem_restore.cpp:588
 #, fuzzy
 msgid "Restoring linux immutable FSA for "
 msgstr "Återställer fils EA: "
 
-#: src/libdar/filesystem_restore.cpp:398
+#: src/libdar/filesystem_restore.cpp:415
 #, fuzzy, c-format
 msgid "Restoration of linux immutable FSA for %S aborted: "
 msgstr "Återställer EA för "
 
-#: src/libdar/filesystem_restore.cpp:451
+#: src/libdar/filesystem_restore.cpp:468
 #, fuzzy
 msgid "Restoring file's data using a delta patching: "
 msgstr "Återställer fils data: "
 
-#: src/libdar/filesystem_restore.cpp:462
+#: src/libdar/filesystem_restore.cpp:479
 #, c-format
 msgid "Cannot restore delta diff for %S as exsiting inode is not a plain file"
 msgstr ""
 
-#: src/libdar/filesystem_restore.cpp:603
+#: src/libdar/filesystem_restore.cpp:639
 #, c-format
 msgid "%S is about to be removed from filesystem, continue?"
 msgstr "%S skall till att tas bort från filsystemet, fortsätta ? "
 
-#: src/libdar/filesystem_restore.cpp:608 src/libdar/filesystem_restore.cpp:617
+#: src/libdar/filesystem_restore.cpp:644 src/libdar/filesystem_restore.cpp:653
 #, c-format
 msgid "Removing file (reason is file recorded as removed in archive): %S"
 msgstr "Tar bort fil (orsaken är att fil är noterad som bortagen i arkiv): %S"
 
-#: src/libdar/filesystem_restore.cpp:615
+#: src/libdar/filesystem_restore.cpp:651
 #, c-format
 msgid ""
 "%S must be removed, but does not match expected type, remove it anyway ?"
 msgstr "%S måste tas bort, men matchar inte förvänta typ, ta bort ändå ?"
 
-#: src/libdar/filesystem_restore.cpp:623
+#: src/libdar/filesystem_restore.cpp:659
 #, c-format
 msgid ""
 "%S: Overwriting policy (Data) is undefined for that file, do not know "
@@ -4801,7 +4801,7 @@ msgstr ""
 "%S: Överskrivningspolicy (Data) är odefinierat för denna fil, vet ej "
 "huruvida bortagande är tillåtet eller ej!"
 
-#: src/libdar/filesystem_restore.cpp:660
+#: src/libdar/filesystem_restore.cpp:696
 #, c-format
 msgid ""
 "Directory %S cannot be restored: overwriting not allowed and a non-directory "
@@ -4812,54 +4812,54 @@ msgstr ""
 "inod med det namnet finns redan, alla filer i den mappen kommer att hoppas "
 "över vid återhämtning:"
 
-#: src/libdar/filesystem_restore.cpp:669
+#: src/libdar/filesystem_restore.cpp:705
 #, c-format
 msgid "%S is about to be overwritten, OK?"
 msgstr "%S skall till att överskrivas, OK?"
 
-#: src/libdar/filesystem_restore.cpp:701
+#: src/libdar/filesystem_restore.cpp:737
 msgid ""
 "Existing file is of a different nature, cannot only restore inode metadata"
 msgstr ""
 
-#: src/libdar/filesystem_restore.cpp:719
+#: src/libdar/filesystem_restore.cpp:755
 #, c-format
 msgid "Existing EA for %S could not be read and preserved: "
 msgstr "Befintlig EA för %S kunde inte läsas och bevaras: "
 
-#: src/libdar/filesystem_restore.cpp:739
+#: src/libdar/filesystem_restore.cpp:775
 #, fuzzy, c-format
 msgid "Existing FSA for %S could not be read and preserved: "
 msgstr "Befintlig EA för %S kunde inte läsas och bevaras: "
 
-#: src/libdar/filesystem_restore.cpp:753
+#: src/libdar/filesystem_restore.cpp:789
 #, c-format
 msgid "Removing existing immutable flag in order to restore data for %S"
 msgstr ""
 
-#: src/libdar/filesystem_restore.cpp:779
+#: src/libdar/filesystem_restore.cpp:815
 #, c-format
 msgid "Existing EA for %S could not be preserved : "
 msgstr "Befintlig EA för %S kunde inte bevaras : "
 
-#: src/libdar/filesystem_restore.cpp:796
+#: src/libdar/filesystem_restore.cpp:832
 #, fuzzy, c-format
 msgid "Existing FSA for %S could not be preserved : "
 msgstr "Befintlig EA för %S kunde inte bevaras : "
 
-#: src/libdar/filesystem_restore.cpp:811
+#: src/libdar/filesystem_restore.cpp:847
 #, c-format
 msgid ""
 "%S is about to be deleted (required by overwriting policy), do you agree?"
 msgstr ""
 "%S skall till at tas bort (krav från överskrivningspolicy), är du överens?"
 
-#: src/libdar/filesystem_restore.cpp:813
+#: src/libdar/filesystem_restore.cpp:849
 #, c-format
 msgid "Removing file (reason is overwriting policy): %S"
 msgstr "Tar bort fil (orsak är överskrivningspolicy): %S"
 
-#: src/libdar/filesystem_restore.cpp:819
+#: src/libdar/filesystem_restore.cpp:855
 #, c-format
 msgid ""
 "%S: Overwriting policy (Data) is undefined for that file, do not know "
@@ -4868,12 +4868,12 @@ msgstr ""
 "%S: Överskrivningspolicy är obestämd för denna fil, vet ej huruvida "
 "överskrivning tillåts eller ej!"
 
-#: src/libdar/filesystem_restore.cpp:882
+#: src/libdar/filesystem_restore.cpp:918
 #, c-format
 msgid "EA for %S are about to be overwritten, OK?"
 msgstr "Några EA för %S skall till att skrivas över, OK?"
 
-#: src/libdar/filesystem_restore.cpp:897
+#: src/libdar/filesystem_restore.cpp:933
 #, c-format
 msgid ""
 "EA for %S have not been overwritten because this file is a hard link "
@@ -4882,12 +4882,12 @@ msgstr ""
 "EA för %S har ej skrivits över eftersom denna fil är en hård länk pekande på "
 "en redan återskapad inode."
 
-#: src/libdar/filesystem_restore.cpp:917
+#: src/libdar/filesystem_restore.cpp:953
 #, c-format
 msgid "EA for %S are about to be removed, OK?"
 msgstr "EA för %S skall till att tas bort, OK?"
 
-#: src/libdar/filesystem_restore.cpp:928
+#: src/libdar/filesystem_restore.cpp:964
 #, c-format
 msgid ""
 "EA for %S have not been cleared as requested by the overwriting policy "
@@ -4896,16 +4896,16 @@ msgstr ""
 "EA for %S har ej nollställt enligt begäran från överskrivnngspolicyn "
 "eftersom denna fil är en hård länk pekande på en redan återställd inod"
 
-#: src/libdar/filesystem_restore.cpp:934
+#: src/libdar/filesystem_restore.cpp:970
 msgid "Clearing file's EA (requested by overwriting policy): "
 msgstr "Nollställning av fils EA (begärd av överskrivninsgpolicy): "
 
-#: src/libdar/filesystem_restore.cpp:949
+#: src/libdar/filesystem_restore.cpp:985
 #, c-format
 msgid "EA for %S are about to be merged, OK?"
 msgstr "EA för %S skall till att slås ihop, OK?"
 
-#: src/libdar/filesystem_restore.cpp:980
+#: src/libdar/filesystem_restore.cpp:1016
 #, c-format
 msgid ""
 "%S: Overwriting policy (EA) is undefined for that file, do not know whether "
@@ -4914,13 +4914,13 @@ msgstr ""
 "%S: Överskrivningspolicyn (EA) är obestämd för denna fil, vet ej huruvida "
 "överskrivning är tillåten eller ej!"
 
-#: src/libdar/filesystem_restore.cpp:1032
-#: src/libdar/filesystem_restore.cpp:1078
+#: src/libdar/filesystem_restore.cpp:1068
+#: src/libdar/filesystem_restore.cpp:1114
 #, fuzzy, c-format
 msgid "FSA for %S are about to be overwritten, OK?"
 msgstr "Några EA för %S skall till att skrivas över, OK?"
 
-#: src/libdar/filesystem_restore.cpp:1047
+#: src/libdar/filesystem_restore.cpp:1083
 #, fuzzy, c-format
 msgid ""
 "FSA for %S have not been overwritten because this file is a hard link "
@@ -4929,7 +4929,7 @@ msgstr ""
 "EA för %S har ej skrivits över eftersom denna fil är en hård länk pekande på "
 "en redan återskapad inode."
 
-#: src/libdar/filesystem_restore.cpp:1104
+#: src/libdar/filesystem_restore.cpp:1140
 #, fuzzy, c-format
 msgid ""
 "%S: Overwriting policy (FSA) is undefined for that file, do not know whether "
@@ -6743,18 +6743,25 @@ msgid "Bad CRC, data corruption occurred"
 msgstr "Fel i CRC, data förstört"
 
 #: src/libdar/filesystem_hard_link_write.cpp:435
+#, c-format
+msgid ""
+"error restoring Unix socket %s, path too long to be stored properly, socket "
+"will be created as %s instead, do you confirm?"
+msgstr ""
+
+#: src/libdar/filesystem_hard_link_write.cpp:437
 msgid "Error creating Unix socket file: "
 msgstr "Fel vid skapande av UNIX sockelfil: "
 
-#: src/libdar/filesystem_hard_link_write.cpp:455
+#: src/libdar/filesystem_hard_link_write.cpp:457
 msgid "Could not create inode: "
 msgstr "Kunde ej skapa inod: "
 
-#: src/libdar/filesystem_hard_link_write.cpp:457
+#: src/libdar/filesystem_hard_link_write.cpp:459
 msgid "Cannot create inode: "
 msgstr "Kan ej skapa inod: "
 
-#: src/libdar/filesystem_hard_link_write.cpp:457
+#: src/libdar/filesystem_hard_link_write.cpp:459
 msgid " Ready to continue ?"
 msgstr " Klar att fortsätta ?"
 

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: DAR 2.5.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2019-01-20 11:26+0100\n"
+"POT-Creation-Date: 2019-02-01 21:34+0100\n"
 "PO-Revision-Date: 2019-01-20 11:31+0100\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -914,7 +914,9 @@ msgstr "   -ag\t\t   bascule les masques suivants comme expression glob\n"
 #, c-format
 msgid ""
 "Saving/Isolation/merging/repairing options (to use with -c, -C, -+ or -y):\n"
-msgstr "Options de sauvegarde/d'isolation/fusion/réparation (à utiliser avec -c, -C, -+ ou -y) :\n"
+msgstr ""
+"Options de sauvegarde/d'isolation/fusion/réparation (à utiliser avec -c, -C, "
+"-+ ou -y) :\n"
 
 #: src/dar_suite/command_line.cpp:2050
 #, c-format
@@ -968,7 +970,9 @@ msgstr ""
 #: src/dar_suite/command_line.cpp:2058
 #, c-format
 msgid "   -aSI \t   slice size suffixes k, M, T, G, etc. are powers of 10\n"
-msgstr "   -aSI \t   signification des suffixes k, M, T, G, etc. comme puissances de 10\n"
+msgstr ""
+"   -aSI \t   signification des suffixes k, M, T, G, etc. comme puissances de "
+"10\n"
 
 #: src/dar_suite/command_line.cpp:2059
 #, c-format
@@ -1061,7 +1065,8 @@ msgstr ""
 #, c-format
 msgid ""
 "   -8 sig\t   add delta signature to perform binary delta if used as ref."
-msgstr "   -8 sig          génère signature pour diff binaire si utilisé comme ref."
+msgstr ""
+"   -8 sig          génère signature pour diff binaire si utilisé comme ref."
 
 #: src/dar_suite/command_line.cpp:2075
 #, c-format
@@ -4861,61 +4866,61 @@ msgstr ""
 msgid "Cannot remove non-existent file from filesystem: %S"
 msgstr "Impossible de supprimer un fichier qui n'existe pas : %S"
 
-#: src/libdar/filesystem_restore.cpp:307 src/libdar/filesystem_restore.cpp:684
+#: src/libdar/filesystem_restore.cpp:307 src/libdar/filesystem_restore.cpp:720
 msgid "Restoring file's data: "
 msgstr "Restauration des données du fichier : "
 
-#: src/libdar/filesystem_restore.cpp:324 src/libdar/filesystem_restore.cpp:903
+#: src/libdar/filesystem_restore.cpp:324 src/libdar/filesystem_restore.cpp:939
 msgid "Restoring file's EA: "
 msgstr "Restauration des Attributs Étendus du fichier : "
 
-#: src/libdar/filesystem_restore.cpp:335 src/libdar/filesystem_restore.cpp:487
+#: src/libdar/filesystem_restore.cpp:335 src/libdar/filesystem_restore.cpp:504
 #, c-format
 msgid "Restoration of EA for %S aborted: "
 msgstr "Restauration des EA de %S arrêtée : "
 
-#: src/libdar/filesystem_restore.cpp:345 src/libdar/filesystem_restore.cpp:1053
+#: src/libdar/filesystem_restore.cpp:345 src/libdar/filesystem_restore.cpp:1089
 msgid "Restoring file's FSA: "
 msgstr "Restauration des FSA du fichier : "
 
-#: src/libdar/filesystem_restore.cpp:360 src/libdar/filesystem_restore.cpp:499
+#: src/libdar/filesystem_restore.cpp:360 src/libdar/filesystem_restore.cpp:516
 #, c-format
 msgid "Restoration of FSA for %S aborted: "
 msgstr "Restauration des FSA de %S arrêtée : "
 
-#: src/libdar/filesystem_restore.cpp:393 src/libdar/filesystem_restore.cpp:552
+#: src/libdar/filesystem_restore.cpp:410 src/libdar/filesystem_restore.cpp:588
 msgid "Restoring linux immutable FSA for "
 msgstr "Restauration des FSA du fichier "
 
-#: src/libdar/filesystem_restore.cpp:398
+#: src/libdar/filesystem_restore.cpp:415
 #, c-format
 msgid "Restoration of linux immutable FSA for %S aborted: "
 msgstr "Restauration du FSA immutable pour %S arrêtée : "
 
-#: src/libdar/filesystem_restore.cpp:451
+#: src/libdar/filesystem_restore.cpp:468
 msgid "Restoring file's data using a delta patching: "
 msgstr "Restauration des données du fichier à l'aide de delta patch : "
 
-#: src/libdar/filesystem_restore.cpp:462
+#: src/libdar/filesystem_restore.cpp:479
 #, c-format
 msgid "Cannot restore delta diff for %S as exsiting inode is not a plain file"
 msgstr ""
 "Impossible de restaurer le patch pour %S car l'inode existante n'est un "
 "fichier normal"
 
-#: src/libdar/filesystem_restore.cpp:603
+#: src/libdar/filesystem_restore.cpp:639
 #, c-format
 msgid "%S is about to be removed from filesystem, continue?"
 msgstr ""
 "%S est sur le point d'être supprimé du système de fichier, continue t-on ?"
 
-#: src/libdar/filesystem_restore.cpp:608 src/libdar/filesystem_restore.cpp:617
+#: src/libdar/filesystem_restore.cpp:644 src/libdar/filesystem_restore.cpp:653
 #, c-format
 msgid "Removing file (reason is file recorded as removed in archive): %S"
 msgstr ""
 "Suppressin du fichier (fichier marqué comme supprimé dans l'archive) : %S"
 
-#: src/libdar/filesystem_restore.cpp:615
+#: src/libdar/filesystem_restore.cpp:651
 #, c-format
 msgid ""
 "%S must be removed, but does not match expected type, remove it anyway ?"
@@ -4923,7 +4928,7 @@ msgstr ""
 "%S est sur le point d'être supprimé, mais le type de fichier ne correspond "
 "pas avec ce qui est attendu, l'efface t-on ?"
 
-#: src/libdar/filesystem_restore.cpp:623
+#: src/libdar/filesystem_restore.cpp:659
 #, c-format
 msgid ""
 "%S: Overwriting policy (Data) is undefined for that file, do not know "
@@ -4932,7 +4937,7 @@ msgstr ""
 "%S : La politique d'écrasement (Données) reste non définie pour ce fichier, "
 "impossible donc de savoir si la suppression est autorisée ou non !"
 
-#: src/libdar/filesystem_restore.cpp:660
+#: src/libdar/filesystem_restore.cpp:696
 #, c-format
 msgid ""
 "Directory %S cannot be restored: overwriting not allowed and a non-directory "
@@ -4943,45 +4948,45 @@ msgstr ""
 "inode n'étant pas un répertoire existe déjà sous ce nom. Aucun fichiers de "
 "ce répertoire ne sera restauré : "
 
-#: src/libdar/filesystem_restore.cpp:669
+#: src/libdar/filesystem_restore.cpp:705
 #, c-format
 msgid "%S is about to be overwritten, OK?"
 msgstr "%S est sur le point d'être écrasé, OK ?"
 
-#: src/libdar/filesystem_restore.cpp:701
+#: src/libdar/filesystem_restore.cpp:737
 msgid ""
 "Existing file is of a different nature, cannot only restore inode metadata"
 msgstr ""
 "Impossible de restaurer les seules métadonnées car le fichier présent est de "
 "nature différente de celui restauré"
 
-#: src/libdar/filesystem_restore.cpp:719
+#: src/libdar/filesystem_restore.cpp:755
 #, c-format
 msgid "Existing EA for %S could not be read and preserved: "
 msgstr ""
 "les Attributs Étendus existants de %S n'ont pas pu être lu ni préservé : "
 
-#: src/libdar/filesystem_restore.cpp:739
+#: src/libdar/filesystem_restore.cpp:775
 #, c-format
 msgid "Existing FSA for %S could not be read and preserved: "
 msgstr "les FSA existants de %S n'ont pas pu être lu ni préservé : "
 
-#: src/libdar/filesystem_restore.cpp:753
+#: src/libdar/filesystem_restore.cpp:789
 #, c-format
 msgid "Removing existing immutable flag in order to restore data for %S"
 msgstr "Suppression du drapeau immutable afin de restorer les données de %S"
 
-#: src/libdar/filesystem_restore.cpp:779
+#: src/libdar/filesystem_restore.cpp:815
 #, c-format
 msgid "Existing EA for %S could not be preserved : "
 msgstr "les AE existants de %S n'ont pas pu être préservés : "
 
-#: src/libdar/filesystem_restore.cpp:796
+#: src/libdar/filesystem_restore.cpp:832
 #, c-format
 msgid "Existing FSA for %S could not be preserved : "
 msgstr "les FSA existants de %S n'ont pas pu être préservés : "
 
-#: src/libdar/filesystem_restore.cpp:811
+#: src/libdar/filesystem_restore.cpp:847
 #, c-format
 msgid ""
 "%S is about to be deleted (required by overwriting policy), do you agree?"
@@ -4989,12 +4994,12 @@ msgstr ""
 "%S est sur le point d'être supprimé (action requise par la politique "
 "d'écrasement), OK ?"
 
-#: src/libdar/filesystem_restore.cpp:813
+#: src/libdar/filesystem_restore.cpp:849
 #, c-format
 msgid "Removing file (reason is overwriting policy): %S"
 msgstr "Suppression du fichier (politique d'écrasement) : %S"
 
-#: src/libdar/filesystem_restore.cpp:819
+#: src/libdar/filesystem_restore.cpp:855
 #, c-format
 msgid ""
 "%S: Overwriting policy (Data) is undefined for that file, do not know "
@@ -5003,12 +5008,12 @@ msgstr ""
 "%S : La politique d'écrasement (Données) reste non définie pour ce fichier, "
 "impossible de savoir si l'écrasement est autorisé ou pas !"
 
-#: src/libdar/filesystem_restore.cpp:882
+#: src/libdar/filesystem_restore.cpp:918
 #, c-format
 msgid "EA for %S are about to be overwritten, OK?"
 msgstr "Des Attributs Étendus de %S sont sur le point d'être écrasés, OK ?"
 
-#: src/libdar/filesystem_restore.cpp:897
+#: src/libdar/filesystem_restore.cpp:933
 #, c-format
 msgid ""
 "EA for %S have not been overwritten because this file is a hard link "
@@ -5017,12 +5022,12 @@ msgstr ""
 "Les Attributs Étendus pour %S n'ont pas été écrasés à car ce fichier est un "
 "lien dur pointant sur une inode déjà restaurée"
 
-#: src/libdar/filesystem_restore.cpp:917
+#: src/libdar/filesystem_restore.cpp:953
 #, c-format
 msgid "EA for %S are about to be removed, OK?"
 msgstr "Les Attributs Étendus de %S sont sur le point d'être supprimés, OK ?"
 
-#: src/libdar/filesystem_restore.cpp:928
+#: src/libdar/filesystem_restore.cpp:964
 #, c-format
 msgid ""
 "EA for %S have not been cleared as requested by the overwriting policy "
@@ -5032,17 +5037,17 @@ msgstr ""
 "politique d'écrasement car ce fichier est un lien dur pointant sur une inode "
 "déjà restaurée"
 
-#: src/libdar/filesystem_restore.cpp:934
+#: src/libdar/filesystem_restore.cpp:970
 msgid "Clearing file's EA (requested by overwriting policy): "
 msgstr ""
 "Effacement des attributs étendus (requis par la politique d'écrasement) : "
 
-#: src/libdar/filesystem_restore.cpp:949
+#: src/libdar/filesystem_restore.cpp:985
 #, c-format
 msgid "EA for %S are about to be merged, OK?"
 msgstr "Les Attributs Étendus de %S sont sur le point d'être fusionnés, OK ?"
 
-#: src/libdar/filesystem_restore.cpp:980
+#: src/libdar/filesystem_restore.cpp:1016
 #, c-format
 msgid ""
 "%S: Overwriting policy (EA) is undefined for that file, do not know whether "
@@ -5051,13 +5056,13 @@ msgstr ""
 "%S : La politique d'écrasement (Attributs Étendus) reste non définie pour ce "
 "fichier, impossible de savoir si l'écrasement est autorisé ou pas !"
 
-#: src/libdar/filesystem_restore.cpp:1032
-#: src/libdar/filesystem_restore.cpp:1078
+#: src/libdar/filesystem_restore.cpp:1068
+#: src/libdar/filesystem_restore.cpp:1114
 #, c-format
 msgid "FSA for %S are about to be overwritten, OK?"
 msgstr "Les FSA de %S sont sur le point d'être écrasés, OK ?"
 
-#: src/libdar/filesystem_restore.cpp:1047
+#: src/libdar/filesystem_restore.cpp:1083
 #, c-format
 msgid ""
 "FSA for %S have not been overwritten because this file is a hard link "
@@ -5066,7 +5071,7 @@ msgstr ""
 "Les FSA de %S n'ont pas été écrasés car ce fichier est un lien dur pointant "
 "sur une inode déjà restaurée"
 
-#: src/libdar/filesystem_restore.cpp:1104
+#: src/libdar/filesystem_restore.cpp:1140
 #, c-format
 msgid ""
 "%S: Overwriting policy (FSA) is undefined for that file, do not know whether "
@@ -6946,18 +6951,25 @@ msgid "Bad CRC, data corruption occurred"
 msgstr "Mauvais CRC, une corruption des données a eu lieu"
 
 #: src/libdar/filesystem_hard_link_write.cpp:435
+#, c-format
+msgid ""
+"error restoring Unix socket %s, path too long to be stored properly, socket "
+"will be created as %s instead, do you confirm?"
+msgstr ""
+
+#: src/libdar/filesystem_hard_link_write.cpp:437
 msgid "Error creating Unix socket file: "
 msgstr "Erreur lors de la création de la prise Unix : "
 
-#: src/libdar/filesystem_hard_link_write.cpp:455
+#: src/libdar/filesystem_hard_link_write.cpp:457
 msgid "Could not create inode: "
 msgstr "Création d'une inode impossible : "
 
-#: src/libdar/filesystem_hard_link_write.cpp:457
+#: src/libdar/filesystem_hard_link_write.cpp:459
 msgid "Cannot create inode: "
 msgstr "Création d'une inode impossible : "
 
-#: src/libdar/filesystem_hard_link_write.cpp:457
+#: src/libdar/filesystem_hard_link_write.cpp:459
 msgid " Ready to continue ?"
 msgstr " Prêt à continuer ?"
 
