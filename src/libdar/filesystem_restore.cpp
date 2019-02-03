@@ -306,6 +306,8 @@ namespace libdar
 			if(info_details)
 			    get_ui().message(string(gettext("Restoring file's data: ")) + spot_display);
 
+			    // 1 - restoring data
+
 			if(!empty)
 			    make_file(x_nom, *current_dir);
 			data_created = true;
@@ -317,6 +319,8 @@ namespace libdar
 
 			    // we must try to restore EA or FSA only if data could be restored
 			    // as in the current situation no file existed before
+
+			    // 2 - restoring EA
 
 			if(has_ea_saved)
 			{
@@ -338,6 +342,8 @@ namespace libdar
 			    else
 				ea_restored = true;
 			}
+
+			    // 3 - restoring FSA (including Mac OSX birth date if present)
 
 			if(has_fsa_saved)
 			{
@@ -369,10 +375,18 @@ namespace libdar
 			    // be met
 			if(!empty && x_dir == nullptr && x_ino != nullptr)
 			{
+				// 4 - restoring dates
+
 			    filesystem_tools_make_date(*x_ino,
 						       spot_display,
 						       what_to_check,
 						       get_fsa_scope());
+
+				// 5 - restoring permission and ownership
+				// first system may have removed linux capabilities (part of EA)
+				// due to change of ownership,
+				// second, if dar is not run as root, we may fail any further operation on
+				// this file so we must not report failure if subsenquent action fails
 			    filesystem_tools_make_owner_perm(get_ui(),
 							     *x_ino,
 							     spot_display,
@@ -380,7 +394,7 @@ namespace libdar
 							     get_fsa_scope());
 			}
 
-			    // re-setting EA after ownership to avoid dropping linux capabilities
+			    // 6 - trying re-setting EA after awnership restoration to set back linux capabilities
 
 			if(has_ea_saved && !empty)
 			{
@@ -397,7 +411,7 @@ namespace libdar
 			    }
 			}
 
-			    // Last: setting the linux immutable flag if present
+			    // 7 - setting the linux immutable flag if present
 
 			if(has_fsa_saved)
 			{
@@ -432,6 +446,8 @@ namespace libdar
 
 		    over_action_data act_data = data_undefined;
 		    over_action_ea act_ea = EA_undefined;
+
+			// 1 - restoring data
 
 		    overwrite->get_action(*exists, *x_nom, act_data, act_ea);
 
@@ -493,6 +509,8 @@ namespace libdar
 			    // it will modify EA of the existing file
 			if(act_data != data_remove)
 			{
+				// 2 - restoring EA
+
 			    if(has_ea_saved)
 			    {
 				try
@@ -504,6 +522,8 @@ namespace libdar
 				    get_ui().message(tools_printf(gettext("Restoration of EA for %S aborted: "), &spot_display) + e.get_message());
 				}
 			    }
+
+				// 3 - restoring FSA
 
 			    if(has_fsa_saved)
 			    {
@@ -518,6 +538,8 @@ namespace libdar
 			    }
 			}
 
+			    // if we can restore metadata on something (existing inode)
+
 			if(has_fsa_saved || has_ea_saved || has_patch || has_data_saved || has_just_inode)
 			{
 			    if(data_restored == done_data_restored)
@@ -527,12 +549,18 @@ namespace libdar
 			    {
 				if(exists_dir == nullptr)
 				{
+					// 4 - restoring dates (birthtime has been restored with EA)
+
 				    filesystem_tools_make_date(*x_ino,
 							       spot_display,
 							       what_to_check,
 							       get_fsa_scope());
-					// setting ownership as last step as it can lead us not
-					// having anymore right on the file
+
+					// 5 - restoring owership and permission with two consequences :
+					// - system erased linux capabilites (EA)
+					// - may not be able to restore further and must not propagate failures
+					// for subnsequent steps
+
 				    filesystem_tools_make_owner_perm(get_ui(),
 								     *x_ino,
 								     spot_display,
@@ -549,6 +577,7 @@ namespace libdar
 							   get_fsa_scope());
 			}
 
+			    // 6 - restoring linux capabilities if possible
 
 			if(ea_restored)
 			{
@@ -567,6 +596,8 @@ namespace libdar
 				    // previously
 			    }
 			}
+
+			    // 7 - restoring linux immutable FSA if present
 
 			if(fsa_restored)
 			{
