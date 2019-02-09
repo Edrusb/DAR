@@ -63,7 +63,7 @@ extern "C"
 #include "libdar.hpp"
 #include "thread_cancellation.hpp"
 
-#define DAR_CP_VERSION "1.2.11"
+#define DAR_CP_VERSION "1.2.12"
 
 using namespace libdar;
 using namespace std;

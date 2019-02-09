@@ -68,7 +68,7 @@ extern "C"
 using namespace libdar;
 using namespace std;
 
-#define DAR_SLAVE_VERSION "1.5.0"
+#define DAR_SLAVE_VERSION "1.5.1"
 
 static bool command_line(shell_interaction & dialog,
 			 S_I argc,
