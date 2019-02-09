@@ -1,8 +1,8 @@
 from 2.5.19 to 2.5.20
-- adding a warning when restoring a unix socket if the path to that socket
-  is larger than what the sockaddr_un system structure can handle
-- fixing bug due to Linux system removing file capabilities (stored as EA)
-  when file ownership is changed. Though restoring EA after ownership
+- adding a warning when restoring a unix socket if the path to that
+  socket is larger than what the sockaddr_un system structure can handle
+- fixing bug due to Linux system removing file capabilities (stored as
+  EA) when file ownership is changed. Though restoring EA after ownership
   may lead to the impossibility to restore them due to lack of permission
   when dar/libdar is not run as root. Thus we try restoring EA a second
   time after ownership restoration. This is not efficient but restores
