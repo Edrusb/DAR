@@ -2,5 +2,4 @@
 *.o
 .#*
 *.lo
-Makefile.in
 *.m4
