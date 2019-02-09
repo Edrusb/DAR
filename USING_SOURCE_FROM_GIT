@@ -64,9 +64,10 @@ steps to follow to build the configure script and Makefiles):
 Then you are ready to build dar as detailed in the documentation, in brief,
 the following commands should correspond to most needs:
 
-	./configure --enable-mode=64
+	./configure
 	make
-	make install-strip
+and as root:
+        make install-strip
 
 For your information the following diagram may help you. Be aware that this
 is a bit simplified.
