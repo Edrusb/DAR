@@ -236,7 +236,7 @@ namespace libdar
 	{
 	    try
 	    {
-		path chem = path(cpath)+string(filename);
+		path chem = path(cpath).append(filename);
 		fichier_local fic = fichier_local(chem.display(), false);
 		U_I len = strlen(CACHE_DIR_TAG_FILENAME_CONTENTS);
 		char *buffer = new (nothrow) char[len+1];

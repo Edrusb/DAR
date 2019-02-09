@@ -478,7 +478,7 @@ string line_tools_get_full_path_from_PATH(const deque<string> & the_path, const 
 	{
 	    try
 	    {
-		string where = (path(*it) + filename).display();
+		string where = (path(*it).append(filename)).display();
 
 		fichier_local tmp = fichier_local(where, false);
 		found = true;
@@ -1426,7 +1426,7 @@ void line_tools_check_basename(user_interaction & dialog, const path & loc, stri
     try
     {
 	regular_mask suspect(string(".+\\.[1-9][0-9]*\\.")+extension, true);
-	string old_path = (loc+base).display();
+	string old_path = (loc.append(base)).display();
 
 	    // is basename is suspect ?
 	if(!suspect.is_covered(base))
@@ -1440,7 +1440,7 @@ void line_tools_check_basename(user_interaction & dialog, const path & loc, stri
 	    // and checking the avaibility of such a slice
 
 	string new_base = retreive_basename(base, extension);
-	string new_path = (loc+new_base).display();
+	string new_path = (loc.append(new_base)).display();
 	if(is_a_slice_available(dialog, new_path, extension))
 	{
 	    try

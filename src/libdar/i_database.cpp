@@ -618,7 +618,7 @@ namespace libdar
 
 			fit = fils.begin();
 			while(fit != fils.end())
-			    anneau.push_back((base + *(fit++)).display());
+			    anneau.push_back((base.append(*(fit++))).display());
 		    }
 		}
 		else

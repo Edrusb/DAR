@@ -32,6 +32,7 @@
 #include <list>
 #include <string>
 #include "integers.hpp"
+#include "erreurs.hpp"
 
 namespace libdar
 {
@@ -131,7 +132,7 @@ namespace libdar
         path operator + (const path & arg) const { path tmp = *this; tmp += arg; return tmp; };
 
 	    /// add a single sub-directory to the path
-	path operator + (const std::string & sub) const { path tmp = *this; tmp += sub; return tmp; };
+	path append(const std::string & sub) const { path tmp = *this; if(sub.find_first_of("/") != std::string::npos) throw SRC_BUG; tmp += sub; return tmp; };
 
 	    /// add a path to the current path. The added path *must* be a relative path
 

@@ -1986,7 +1986,7 @@ namespace libdar
 	   && sauv_path_t_local != nullptr  // not using a remote storage
 	   && sauv_path_abs.is_subdir_of(fs_root_abs, true)
 	   && selection.is_covered(filename+".1."+extension)
-	   && subtree.is_covered(sauv_path_abs + string(filename+".1."+extension))
+	   && subtree.is_covered(sauv_path_abs.append(filename+".1."+extension))
 	   && filename!= "-")
 	{
 	    bool cov = true;      // whether the archive is covered by filter (this is saving itself)

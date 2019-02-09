@@ -2003,12 +2003,13 @@ static void usage(user_interaction & dialog, const char *command_name)
     dialog.printf(gettext("   -l  lists the contents of the archive\n"));
     dialog.printf(gettext("   -C  isolates the catalogue from an archive\n"));
     dialog.printf(gettext("   -+  merge two archives / create a sub archive\n"));
+    dialog.printf(gettext("   -y  repair a truncated archive\n"));
     dialog.printf(gettext("\n"));
     dialog.printf(gettext("   -h  displays this help information\n"));
     dialog.printf(gettext("   -V  displays version information\n"));
     dialog.printf(gettext("\n"));
     dialog.printf(gettext("Common options:\n"));
-    dialog.printf(gettext("   -v\t\t   verbose output\n"));
+    dialog.printf(gettext("   -v[s|t|d|m|f|a] verbose output\n"));
     dialog.printf(gettext("   -q\t\t   suppress final statistics report\n"));
     dialog.printf(gettext("   -vs\t\t   display skipped files\n"));
     dialog.printf(gettext("   -R <path>\t   filesystem root directory (current dir by default)\n"));
@@ -2045,7 +2046,7 @@ static void usage(user_interaction & dialog, const char *command_name)
     dialog.printf(gettext("   -ar\t\t   set the following masks to be regex expressions\n"));
     dialog.printf(gettext("   -ag\t\t   set the following masks to be glob expressions\n"));
     dialog.printf(gettext("\n"));
-    dialog.printf(gettext("Saving / Isolation / merging options (to use with -c, -C or -+):\n"));
+    dialog.printf(gettext("Saving/Isolation/merging/repairing options (to use with -c, -C, -+ or -y):\n"));
     dialog.printf(gettext("   -A [path/]<basename> archive to take as reference\n"));
     dialog.printf(gettext("   -@ [path/]<basename> auxiliary archive of reference for merging\n"));
     dialog.printf(gettext("   -$ <string>\t   encryption key for auxiliary archive\n"));
@@ -2054,8 +2055,8 @@ static void usage(user_interaction & dialog, const char *command_name)
     dialog.printf(gettext("      Available algo: gzip,bzip2,lzo,xz. Exemples: -zlzo -zxz:5 -z1 -z\n"));
     dialog.printf(gettext("   -s <integer>    split the archive in several files of size <integer>\n"));
     dialog.printf(gettext("   -S <integer>    first file size (if different from following ones)\n"));
-    dialog.printf(gettext("   -aSI \t   slice size suffixes k, M, T, G, etc. are power of 10\n"));
-    dialog.printf(gettext("   -abinary\t   slice size suffixes k, M, T, G, etc. are power of 2\n"));
+    dialog.printf(gettext("   -aSI \t   slice size suffixes k, M, T, G, etc. are powers of 10\n"));
+    dialog.printf(gettext("   -abinary\t   slice size suffixes k, M, T, G, etc. are powers of 2\n"));
     dialog.printf(gettext("   -p\t\t   pauses before writing to a new file\n"));
     dialog.printf(gettext("   -D\t\t   excluded directories are stored as empty directories\n"));
     dialog.printf(gettext("   -Z <mask>\t   do not compress the matching filenames\n"));
@@ -2069,6 +2070,7 @@ static void usage(user_interaction & dialog, const char *command_name)
     dialog.printf(gettext("   -/ <string>\t   which way dar can overwrite files at archive merging or\n"));
     dialog.printf(gettext("\t\t   extraction time\n"));
     dialog.printf(gettext("   -^ <string>\t   permission[:user[:group]] of created slices\n"));
+    dialog.printf(gettext("   -8 sig\t   add delta signature to perform binary delta if used as ref."));
     dialog.printf(gettext("\n"));
     dialog.printf(gettext("Restoring options (to use with -x) :\n"));
     dialog.printf(gettext("   -k\t\t   do not remove files destroyed since the reference backup\n"));
@@ -2979,7 +2981,7 @@ static mask *make_include_path(const string & x, mask_opt opt)
     if(opt.file_listing)
         ret = new (nothrow) mask_list(x, opt.case_sensit, opt.prefix, true);
     else
-        ret = new (nothrow) simple_path_mask(opt.prefix +x, opt.case_sensit);
+        ret = new (nothrow) simple_path_mask(opt.prefix + x, opt.case_sensit);
     if(ret == nullptr)
         throw Ememory("make_include_path");
 

@@ -295,7 +295,7 @@ namespace libdar
     {
 	deque<data_tree *>::const_iterator it = rejetons.begin();
 	bool ret = data_tree::check_order(dialog, current_path, initial_warn);
-	path subpath = current_path.display() == "." ? get_name() : current_path + get_name();
+	path subpath = current_path.display() == "." ? get_name() : current_path.append(get_name());
 
 	while(it != rejetons.end() && ret)
 	{
