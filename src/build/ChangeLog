@@ -1,13 +1,4 @@
-from 2.6.1 to 2.6.2
-- fixed incoherence in documentation
-- updating inlined help information (-h option)
-- fixed unexpected behavior of the dar command-line filtering mechanism
-  met when the provided path to -P or -g options was ending with a slash
-- renaming 'path opertor + (std::string)' as method append() to avoid
-  compiler using it when a std::string need first to be converted to path
-  before adding it to an existing path.
-- adding check test to detect when path::append() is used to add a path
-  instead of a filename to an existing path object.
+from 2.5.19 to 2.5.20
 - adding a warning when restoring a unix socket if the path to that socket
   is larger than what the sockaddr_un system structure can handle
 - fixing bug due to Linux system removing file capabilities (stored as EA)
@@ -17,108 +8,7 @@ from 2.6.1 to 2.6.2
   time after ownership restoration. This is not efficient but restores
   the file as close as possible to their original state whatever
   permission dar has been granted for a restoration operation.
-
-
-from 2.6.0 to 2.6.1
-- fixed error in man page
-- fixing bug in the routine removing files for local filesystem, used at
-  archive creation time to remove an existing archive (after user
-  confirmation), or at restoration time used to remove file that had been
-  removed since the archive of reference was done. The file to remove was
-  always removed from the current directory (missing the path part), most
-  of the time this was leading to the error message "Error removing file
-  ...: Not such file or directory". It could also lead to incorrectly
-  removing files (not directory) located in the directory from which
-  dar was run.
-- fixing bug met while repairing an archive containing delta signature
-  for unsaved files
-- merging patch from ballsystemlord updating list of file extension
-  not to compress (see compress-exclusion defined in /etc/darrc)
-- review cat_delta_signature implementation in order to be able to fix
-  memory consumption problem when delta signature are used
-- fixed missing mark for data CRC when the data is a delta patch, leading
-  sequential reading to fail when a delta patch was encountered
-- fixed bug in XML output about deleted entries
-- fixed XML output to be identical to the one of dar 2.5.x for deleted
-  entries.
-- Adding the deleted date in 'mtime' field for deleted entries in XML
-  output
-- fixing bug in xz/lzma routine wrongly reporting internal error when
-  corrupted data was met
-- fixed code for compilation with clang to succeed (it concerns MAC OS X
-  in particular)
-- fixed inconsistencies in libdar API that avoided gdar to compile with
-  libdar released in 2.6.0
-
-from 2.5.x to 2.6.0
-- new feature: support for binary delta in incremental/differential backups
-  (relying on librsync)
-- new feature: support ftp/sftp to read an archive from a cloud storage.
-  (relying on libcurl)
-  reading is optimized to not transfer a whole slice but only the needed
-  part to proceed to the operation (restoration, listing, and so on)
-- new feature: support ftp/sftp to write an archive eventually with hash
-  files to a remote cloud storage (relying on libcurl)
-- modified behavior: While creating a single sliced archive, DUC file is
-  now executed unless user interrupted dar/libdar. This to stay coherent
-  with multi sliced archive behavior
-- new feature: display filters nature (-vmasks option)
-- new feature: follow some symlinks as defined by the --ignored-as-symlink
-  option
-- new feature: one can define the compression algorithm a dar_manager
-  database will use. This choice is only available at database creation
-  using the new dar_manager's -z option. In particular "-z none" can be
-  used to avoid using compression at all
-- repair mode added to re-create a completed archive (suitable for direct
-  access mode and merging) from an interrupted one due to lack of disk
-  space, power outage or other reasons leading to similar problem.
-- Dar can now only save metadata inode change without re-saving the whole
-  file if its data has not changed. Dar_manager also handle this by
-  restoring the full backup and then the inode metadata only when
-  necessary.
-- In regard to previous point, if you want to keep having dar saving the
-  data when only metadata has changed use --modified-data-detection option
-- moved dar_slave code into libdar as class libdar::libdar_slave
-- moved dar_xform code into libdar as class libdar::libdar_xform
-- added libdar_slave and libdar_xform in libdar API
-- modified dar_xform and dar_slave to rely on new libdar API
-- API: simplified user_interface class
-- API: using std::shared_ptr and std::unique_ptr to explicitly show the
-  ownership of the given pointed objects (C++11 standard)
-- API: simplified class archive to only require user_interaction at
-  object construction time
-- API: simplified class database to only require user_interaction at
-  object construction time
-- API: making enum crypto_algo an C++11 "enum class" type
-- security refresh: default crypto algo is now AES256. As you do not
-  need anymore since 2.5.0 to specify the -K option when reading an
-  archive this should not bring any backward compatibility issue
-- security refresh: adding salt per archive (one is still present per
-  block inside an archive)
-- security refresh/new feature: adding option --kdf-param to define
-  the iteration count for key derivation, which now defaults to 200,000
-  and hash algorithm used to derived key, still using sha1 by default
-- slide effect of previous feature due to starvation of free letters
-  to add a new command, the -T option with argument is no more
-  available, one need to provide explicitly the desired argument
-- security refresh: improving seed randomization for the pseudo-random
-  generator used in elastic buffers
-- feature enhancement: activate needed Linux capabilities in the
-  "effective" set if it is permitted but not effective. This concerns
-  cap_chown at restoration time, cap_fchown for furtive read mode,
-  cap_linux_immutable to restore the immutable flag, and cap_sys_
-  resource to set some linux FSA. This let one set the capabilities
-  for dar binary only in the "permitted" set, capabilities will then be
-  allowed only for users having them in the "inheritable" set of their
-  calling process (usually a shell), without root privilege need.
-- the ./configure --enable-mode option now defaults to 64, which
-  will setup a libdar64 in place of infinint based libdar by default.
-  You can still build a infinint based libdar by passing
-  --enable-mode=infinint to the ./configure script.
-
-from 2.5.19 to 2.5.20
-- adding a warning when restoring a unix socket if the path to that socket
-  is larger than what the sockaddr_un system structure can handle
+- fixing compilation problem with recent clang++ compiler
 
 from 2.5.18 to 2.5.19
 - fixed compilation issue on system that to not have ENOATTR defined
@@ -128,14 +18,6 @@ from 2.5.18 to 2.5.19
   corrupted data was met
 - fixed compilation warning with gcc about deprecated readdir_r system
   call
-- fixing bug due to Linux system removing file capabilities (stored as EA)
-  when file ownership is changed. Though restoring EA after ownership
-  may lead to the impossibility to restore them due to lack of permission
-  when dar/libdar is not run as root. Thus we try restoring EA a second
-  time after ownership restoration. This is not efficient but restores
-  the file as close as possible to their original state whatever
-  permission dar has been granted for a restoration operation.
-
 
 from 2.5.17 to 2.5.18
 - fixed compilation issue in context where EA are not supported
