@@ -77,9 +77,9 @@ namespace libdar
 
 	/// the cat_delta_signature file class
 
-	/// this class works in to implicit modes
+	/// this class works in two implicit modes
 	/// - read mode
-	/// read the metadata from an archive the caller having knowing where to find it
+	/// read the metadata from an archive the caller having to know where to find it
 	/// read the data and fill the provided memory_file (get_sig()) by the delta signature
 	/// provide access to the associated CRC
 	/// - write mode
