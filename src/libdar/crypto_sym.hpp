@@ -43,7 +43,6 @@ extern "C"
 #include "secu_string.hpp"
 #include "crypto.hpp"
 #include "archive_aux.hpp"
-#include "mem_ui.hpp"
 
 namespace libdar
 {
@@ -62,7 +61,7 @@ namespace libdar
 
 	/// symetrical strong encryption, interface to grypt library
 
-    class crypto_sym : public tronconneuse, public mem_ui
+    class crypto_sym : public tronconneuse
     {
     public:
 	crypto_sym(U_32 block_size,
@@ -74,8 +73,7 @@ namespace libdar
 		   const std::string & salt, //< not used is use_pkcs5 below is not set
 		   infinint iteration_count, //< not used if use_pkcs5 is not set
 		   hash_algo kdf_hash,       //< not used if use_pkcs5 is not set
-		   bool use_pkcs5,           //< must be set to true when password is human defined to add a key derivation
-		   const std::shared_ptr<user_interaction> & dialog);
+		   bool use_pkcs5);     //< must be set to true when password is human defined to add a key derivation
 	crypto_sym(const crypto_sym & ref) = delete;
 	crypto_sym(crypto_sym && ref) = delete;
 	crypto_sym & operator = (const crypto_sym & ref) = delete;

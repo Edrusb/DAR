@@ -65,9 +65,8 @@ namespace libdar
 			   const std::string & salt,
 			   infinint iteration_count,
 			   hash_algo kdf_hash,
-			   bool use_pkcs5,
-			   const std::shared_ptr<user_interaction> & dialog)
-	: tronconneuse(block_size, encrypted_side, no_initial_shift, reading_ver), mem_ui(dialog)
+			   bool use_pkcs5)
+	: tronconneuse(block_size, encrypted_side, no_initial_shift, reading_ver)
     {
 #if CRYPTO_AVAILABLE
 	ivec = nullptr;
