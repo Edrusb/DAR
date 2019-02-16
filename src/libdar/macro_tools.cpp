@@ -661,7 +661,8 @@ namespace libdar
 							     ver.get_salt(),
 							     ver.get_iteration_count(),
 							     ver.get_kdf_hash(),
-							     ver.get_crypted_key() == nullptr);
+							     ver.get_crypted_key() == nullptr,
+							     dialog);
 		    if(tmp_ptr != nullptr)
 			tmp_ptr->set_initial_shift(ver.get_initial_offset());
 		}
@@ -677,7 +678,8 @@ namespace libdar
 							     ver.get_salt(),
 							     ver.get_iteration_count(),
 							     ver.get_kdf_hash(),
-							     ver.get_crypted_key() == nullptr);
+							     ver.get_crypted_key() == nullptr,
+							     dialog);
 
 		    if(tmp_ptr != nullptr)
 		    {
@@ -1441,7 +1443,8 @@ namespace libdar
 						   salt,
 						   iteration_count,
 						   kdf_hash,
-						   gnupg_recipients.empty());
+						   gnupg_recipients.empty(),
+						   dialog);
 
 #ifdef LIBDAR_NO_OPTIMIZATION
 		    tools_secu_string_show(*dialog, string("real_pass used: "), real_pass);
