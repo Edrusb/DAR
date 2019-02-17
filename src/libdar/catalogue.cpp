@@ -1385,6 +1385,7 @@ namespace libdar
 		sub_tree = nullptr;
 	    sub_count = ref.sub_count;
 	    stats = ref.stats;
+	    ref_data_name = ref.ref_data_name;
 	}
 	catch(...)
 	{
