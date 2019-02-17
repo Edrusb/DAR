@@ -35,6 +35,7 @@ extern "C"
 #include "memory_file.hpp"
 #include "crc.hpp"
 #include "compressor.hpp"
+#include "archive_version.hpp"
 
 #include <memory>
 
@@ -47,11 +48,11 @@ namespace libdar
 	// Datastructure in archive (DATA+METADATA)
 	//
 	//    SEQUENTIAL MODE - in the core of the archive
-	// +------+------+---------------+----------+--------+
-	// | base | sig  | sig data      | data CRC | result |
-	// | CRC  | size | (if size > 0) |    if    |  CRC   |
-	// |      |      |               | size > 0 |        |
-	// +------+------+---------------+----------+--------+
+	// +------+------+-----------+--------------+----------+--------+
+	// | base | sig  | sig block |sig data      | data CRC | result |
+	// | CRC  | size | len (if   |(if size > 0) |    if    |  CRC   |
+	// |      |      | size > 0) |              | size > 0 |        |
+	// +------+------+-----------+--------------+----------+--------+
 	//
 	//    DIRECT MODE - in catalogue at end of archive (METADATA)
 	// +------+------+---------------+--------+
@@ -61,11 +62,11 @@ namespace libdar
 	// +------+------+---------------+--------+
 	//
 	//    DIRECT MODE - in the core of the archive (DATA)
-	// +---------------+----------+
-	// | sig data      | data CRC |
-	// | (if size > 0) |    if    |
-	// |               | size > 0 |
-	// +---------------+----------+
+	// +-----------+---------------+----------+
+	// | sig block | sig data      | data CRC |
+	// | len (if   | (if size > 0) |    if    |
+	// | size > 0) |               | size > 0 |
+	// +-----------+---------------+----------+
 	//
 	//
 	// this structure is used for all cat_file inode that have
@@ -122,7 +123,7 @@ namespace libdar
 	    /// read the metadata of the object from the generic_file given at construction time
 	    /// \note in sequential read mode, the data is also read at that time and loaded into memory,
 	    /// thing which is done transparently by obtain_sig() when in direct access mode
-	void read(bool sequential_read);
+	void read(bool sequential_read, const archive_version & ver);
 
 	    /// the cat_delta_signature structure can only hold CRC without delta_signature, this call gives the situation about that point
 	bool can_obtain_sig() const { return !delta_sig_size.is_zero(); };
@@ -132,7 +133,10 @@ namespace libdar
 	    /// \note while drop_sig has not been called, obtain_sig() can be called any number of time
 	    /// \note in direct mode (not sequential_real mode) the first call to obtain_sig() fetches
 	    /// the data from the archive and loads it to memory.
-	std::shared_ptr<memory_file> obtain_sig() const;
+	std::shared_ptr<memory_file> obtain_sig(const archive_version & ver) const;
+
+	    /// provide the block size used for delta signature
+	U_I obtain_sig_block_size() const { return sig_block_len; };
 
 	    /// drop signature but keep metadata available
 
@@ -150,13 +154,19 @@ namespace libdar
 	void will_have_signature() { delta_sig_size = 1; };
 
 	    /// the object pointed to by ptr must stay available when calling dump_data()/dump_metadata() later on
-	void set_sig(const std::shared_ptr<memory_file> & ptr);
+
+	    /// \note sig_block_size is an additional information about the block size used to setup the signature,
+	    /// this is not the size of the signature!
+	void set_sig(const std::shared_ptr<memory_file> & ptr, U_I sig_block_size);
 
 	    /// variante used when the delta_signature object will only contain CRCs (no delta signature)
-	void set_sig() { delta_sig_size = 0; delta_sig_offset = 0; sig.reset(); };
+	void set_sig() { delta_sig_size = 0; delta_sig_offset = 0; sig_block_len = 0; sig.reset(); };
 
 	    /// write down the data eventually with sequential read mark followed by delta sig metadata
-	void dump_data(generic_file & f, bool sequential_mode) const;
+
+	    /// \note ver is only used to know which version to use for reading the data, but it is
+	    /// always written following the most recent supported archive format version
+	void dump_data(generic_file & f, bool sequential_mode, const archive_version & ver) const;
 
 	    /// write down the delta_signature metadata for catalogue
 	void dump_metadata(generic_file & f) const;
@@ -193,12 +203,13 @@ namespace libdar
 	crc *patch_result_check;    ///< associated CRC
 	generic_file *src;          ///< where to read data from
 	compressor *zip;            ///< needed to disable compression when reading delta signature data from an archive
+	mutable U_I sig_block_len;  ///< block lenght used within delta signature
 
 	void init() noexcept;
 	void copy_from(const cat_delta_signature & ref);
 	void move_from(cat_delta_signature && ref) noexcept;
 	void destroy() noexcept;
-	void fetch_data() const;
+	void fetch_data(const archive_version & ver) const;
     };
 
 	/// @}
