@@ -1048,7 +1048,8 @@ namespace libdar
 					      bool sequential_read,
 					      bool build,
 					      const mask & delta_mask,
-					      const infinint & delta_sig_min_size)
+					      const infinint & delta_sig_min_size,
+					      U_I signature_block_size)
     {
 	const cat_entree *ent = nullptr;
 	const cat_file *ent_file = nullptr;
@@ -1116,12 +1117,13 @@ namespace libdar
 			&& e_file->get_size() >= delta_sig_min_size))
 		    {
 			shared_ptr<memory_file> sig_ptr;
+			U_I block_len;
 
-			ent_file->read_delta_signature(sig_ptr);
+			ent_file->read_delta_signature(sig_ptr, block_len);
 			try
 			{
 			    if(sig_ptr)
-				e_file->dump_delta_signature(sig_ptr, *(destination.compr), false);
+				e_file->dump_delta_signature(sig_ptr, block_len, *(destination.compr), false);
 			    else
 				e_file->dump_delta_signature(*(destination.compr), false);
 			}
@@ -1166,7 +1168,7 @@ namespace libdar
 			    switch(e_file->get_saved_status())
 			    {
 			    case saved_status::saved:
-				data = e_file->get_data(cat_file::plain, mem, nullptr, checksum);
+				data = e_file->get_data(cat_file::plain, mem, signature_block_size, nullptr, checksum);
 
 				if(data == nullptr)
 				    throw SRC_BUG;
@@ -1197,7 +1199,7 @@ namespace libdar
 				e_file->will_have_delta_signature_available();
 				e_file->set_patch_base_crc(*my_crc);
 				e_file->set_patch_result_crc(*my_crc);
-				e_file->dump_delta_signature(mem, *(destination.compr), false);
+				e_file->dump_delta_signature(mem, signature_block_size, *(destination.compr), false);
 				e_file->drop_delta_signature_data(); // now the data has been written to archive we can free up memory
 				break;
 			    case saved_status::fake:

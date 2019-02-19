@@ -112,6 +112,7 @@ void go_sig(const string & src_file,
 				      true,
 				      false);
     generic_rsync go(&res,
+		     RS_DEFAULT_BLOCK_LEN,
 		     &src);
     fichier_local control = fichier_local(ui,
 					  src_file + ".bak",

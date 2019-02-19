@@ -528,6 +528,9 @@ namespace libdar
 	    /// hash algo used for key derivation
 	void set_kdf_hash(hash_algo algo) { x_kdf_hash = algo; };
 
+	    /// block size to use to build delta signatures
+	void set_sig_block_len(U_I val) { x_sig_block_len = val; };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -595,6 +598,7 @@ namespace libdar
 	modified_data_detection get_modified_data_detection() const { return x_modified_data_detection; };
 	const infinint & get_iteration_count() const { return x_iteration_count; };
 	hash_algo get_kdf_hash() const { return x_kdf_hash; };
+	U_I get_sig_block_len() const { return x_sig_block_len; };
 
     private:
 	std::shared_ptr<archive> x_ref_arch; ///< just contains the address of an existing object, no local copy of object is done here
@@ -661,6 +665,7 @@ namespace libdar
 	modified_data_detection x_modified_data_detection;
 	infinint x_iteration_count;
 	hash_algo x_kdf_hash;
+	U_I x_sig_block_len;
 
 	void nullifyptr() noexcept;
 	void destroy() noexcept;
@@ -806,6 +811,8 @@ namespace libdar
 	    /// hash algo used for key derivation
 	void set_kdf_hash(hash_algo algo) { x_kdf_hash = algo; };
 
+	    /// block size to use to build delta signatures
+	void set_sig_block_len(U_I val) { x_sig_block_len = val; };
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -840,6 +847,8 @@ namespace libdar
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
 	const infinint & get_iteration_count() const { return x_iteration_count; };
 	hash_algo get_kdf_hash() const { return x_kdf_hash; };
+	bool get_sig_block_len() const { return x_sig_block_len; };
+
 
     private:
 	bool x_allow_over;
@@ -872,6 +881,7 @@ namespace libdar
 	infinint x_delta_sig_min_size;
 	infinint x_iteration_count;
 	hash_algo x_kdf_hash;
+	bool x_sig_block_len;
 
 	void copy_from(const archive_options_isolate & ref);
 	void move_from(archive_options_isolate && ref) noexcept;
@@ -1064,6 +1074,8 @@ namespace libdar
 	    /// hash algo used for key derivation
 	void set_kdf_hash(hash_algo algo) { x_kdf_hash = algo; };
 
+	    /// block size to use to build delta signatures
+	void set_sig_block_len(U_I val) { x_sig_block_len = val; };
 
 
 	    /////////////////////////////////////////////////////////////////////
@@ -1114,6 +1126,8 @@ namespace libdar
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
 	const infinint & get_iteration_count() const { return x_iteration_count; };
 	hash_algo get_kdf_hash() const { return x_kdf_hash; };
+	U_I get_sig_block_len() const { return x_sig_block_len; };
+
 
     private:
 	std::shared_ptr<archive> x_ref;
@@ -1161,6 +1175,7 @@ namespace libdar
 	infinint x_delta_sig_min_size;
 	infinint x_iteration_count;
 	hash_algo x_kdf_hash;
+	U_I x_sig_block_len;
 
 	void destroy() noexcept;
 	void copy_from(const archive_options_merge & ref);

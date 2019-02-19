@@ -519,7 +519,7 @@ namespace libdar
 
                     // obtaining current file
 
-                current = existing.get_data(cat_file::plain, nullptr, nullptr);
+                current = existing.get_data(cat_file::plain, nullptr, 0, nullptr);
                 if(current == nullptr)
                     throw SRC_BUG;
                 else
@@ -540,7 +540,7 @@ namespace libdar
 
                     // obtaining patch
 
-                delta = patcher.get_data(cat_file::plain, nullptr, nullptr);
+                delta = patcher.get_data(cat_file::plain, nullptr, 0, nullptr);
                 if(delta == nullptr)
                     throw SRC_BUG;
                 else

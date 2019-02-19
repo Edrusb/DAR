@@ -77,6 +77,7 @@ namespace libdar
 	    // inherited from class cat_file
         virtual generic_file *get_data(get_data_mode mode,
 				       std::shared_ptr<memory_file> delta_sig,
+				       U_I signature_block_size,
 				       std::shared_ptr<memory_file> delta_ref,
 				       const crc**checksum) const override;
 

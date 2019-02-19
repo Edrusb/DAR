@@ -21,6 +21,14 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
+#if HAVE_LIBRSYNC_H
+#include <stdio.h>
+#include <librsync.h>
+#endif
+} // end extern "C"
+
 #include <vector>
 
 #include "archive_options.hpp"
@@ -43,6 +51,7 @@ namespace libdar
     static const string default_user_comment = "N/A";
     static const U_32 default_delta_sig_min_size = 10240;
     static const infinint default_iteration_count = 200000;
+    static const U_I default_sig_block_len = RS_DEFAULT_BLOCK_LEN;
 
 	// some local helper functions
 
@@ -367,6 +376,7 @@ namespace libdar
 	    x_modified_data_detection = modified_data_detection::mtime_size;
 	    x_iteration_count = default_iteration_count;
 	    x_kdf_hash = hash_algo::sha1;
+	    x_sig_block_len = default_sig_block_len;
 	}
 	catch(...)
 	{
@@ -624,6 +634,7 @@ namespace libdar
 	x_modified_data_detection = ref.x_modified_data_detection;
 	x_iteration_count = ref.x_iteration_count;
 	x_kdf_hash = ref.x_kdf_hash;
+	x_sig_block_len = ref.x_sig_block_len;
     }
 
     void archive_options_create::move_from(archive_options_create && ref) noexcept
@@ -692,6 +703,7 @@ namespace libdar
 	x_modified_data_detection = move(ref.x_modified_data_detection);
 	x_iteration_count = move(ref.x_iteration_count);
 	x_kdf_hash = move(ref.x_kdf_hash);
+	x_sig_block_len = move(ref.x_sig_block_len);
     }
 
 	/////////////////////////////////////////////////////////
@@ -765,6 +777,7 @@ namespace libdar
 	    x_delta_sig_min_size = default_delta_sig_min_size;
 	    x_iteration_count = default_iteration_count;
 	    x_kdf_hash = hash_algo::sha1;
+	    x_sig_block_len = default_sig_block_len;
 	}
 	catch(...)
 	{
@@ -942,6 +955,7 @@ namespace libdar
 	    x_delta_sig_min_size = default_delta_sig_min_size;
 	    x_iteration_count = default_iteration_count;
 	    x_kdf_hash = hash_algo::sha1;
+	    x_sig_block_len = default_sig_block_len;
 	}
 	catch(...)
 	{
@@ -1152,6 +1166,7 @@ namespace libdar
 	    x_delta_sig_min_size = ref.x_delta_sig_min_size;
 	    x_iteration_count = ref.x_iteration_count;
 	    x_kdf_hash = ref.x_kdf_hash;
+	    x_sig_block_len = ref.x_sig_block_len;
 	}
 	catch(...)
 	{
@@ -1208,6 +1223,7 @@ namespace libdar
 	x_delta_sig_min_size = move(ref.x_delta_sig_min_size);
 	x_iteration_count = move(ref.x_iteration_count);
 	x_kdf_hash = move(ref.x_kdf_hash);
+	x_sig_block_len = move(ref.x_sig_block_len);
     }
 
     void archive_options_merge::nullifyptr() noexcept

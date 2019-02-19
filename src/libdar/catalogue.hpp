@@ -223,12 +223,14 @@ namespace libdar
 	    /// \param[in] build if set and delta signature is not present but data is available for a file, calculate the delta sig
 	    /// \param[in] delta_mask defines what files to calculate delta signature for when build is set to true
 	    /// \param[in] delta_sig_min_size minimum size below which to never calculate delta signatures
+	    /// \param[in] signature_block_size block size to use for computing delta signatures
 	    /// \note this method relies on reset_read() and read()
 	void transfer_delta_signatures(const pile_descriptor & destination,
 				       bool sequential_read,
 				       bool build,
 				       const mask & delta_mask,
-				       const infinint & delta_sig_min_size);
+				       const infinint & delta_sig_min_size,
+				       U_I signature_block_size);
 
 	    /// remove delta signature from the catalogue object as if they had never been calculated
 	void drop_delta_signatures();
