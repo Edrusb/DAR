@@ -327,6 +327,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.modet = modified_data_detection::mtime_size;
     p.iteration_count = 0; // will not touch the default API value if still set to zero
     p.kdf_hash = hash_algo::none;
+    p.delta_sig_len = 0;
 
     if(!dialog)
 	throw SRC_BUG;
@@ -825,6 +826,7 @@ static bool get_args_recursive(recursive_param & rec,
     pre_mask tmp_pre_mask;
     U_I tmp;
     string tmp_string, tmp_string2;
+    infinint tmp_infinint;
 
         // fetching first the targets (non optional argument of command line)
     add_non_options(argc, argv, rec.non_options);
@@ -1919,6 +1921,14 @@ static bool get_args_recursive(recursive_param & rec,
 		    p.delta_sig = true;
 		else if(strcasecmp(optarg, "no-patch") == 0)
 		    p.delta_diff = false;
+		else if(strncasecmp(optarg,"sig:",4) == 0)
+		{
+		    tmp_infinint = tools_get_extended_size(optarg+4, rec.suffix_base);
+		    p.delta_sig_len = 0;
+		    tmp_infinint.unstack(p.delta_sig_len);
+		    if(!tmp_infinint.is_zero())
+			throw Erange("get_args", tools_printf(INVALID_SIZE, char(lu)));
+		}
 		else
 		    throw Erange("get_args", string(gettext("Unknown parameter given to --delta option: ")) + optarg);
 		break;

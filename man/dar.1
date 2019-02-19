@@ -980,6 +980,9 @@ or
 option is specified; in that case the delta signatures are transfered/dropped and if not present calculated accordingly to these mask options. However note that it is not possible to calculate delta signature for unsaved files in the archive of reference (because the archive of reference does not hold their data) as well as for fully saved files when merging is performed keeping files compressed (see -ak option). Another restriction while merging concernes sparse files, it is not possible to calculate binary signature for file stored as sparse files, but if sparse file detection mechanism is activated at merging time, delta signature can be calculated for sparse files too even if it is missing in the reference archive. In short: if you want recalculation of delta signature while merging, do not keep file compressed (do not use -ak option) and if you want to avoid having sparse files excluded from the delta signature recalcutation, activate sparse file detection (use -ah option). Delta signature transfer is not possible for on-fly isolation, you need to do normal atchive isolation to obtain an isolated catalogue with delta signatures.
 .RE
 .TP 20
+-8, --delta sig:<num>
+this variant of '--delta sig' option let you specify the block len used to build delta signatures. The default value is taken from librsync's "RS_DEFAULT_BLOCK_LEN" macro which today is equal to 2048 bytes. Larger value reduce CPU load required to build delta signature, but lead to less accuracy when computing delta binary which means larger delta patch and more data saved when a file has changed.
+.TP 20
 -{, --include-delta-sig <mask>
 .RS
 By default when
