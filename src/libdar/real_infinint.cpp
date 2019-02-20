@@ -174,7 +174,7 @@ namespace libdar
         }
         while(tmp > 0);
 
-            // now we write the last byte of the preambule, which as only one bit set
+            // now we write the last byte of the preambule, which has only one bit set
 	x.write((char *)&last_width, 1);
 
             // we need now to write some justification byte to have an informational field multiple of TG
