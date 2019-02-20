@@ -318,18 +318,14 @@ namespace libdar
 
 	    try
 	    {
-		tronc bounded(src, delta_sig_offset, delta_sig_size, false);
-		infinint crc_size = tools_file_size_to_crc_size(delta_sig_size);
-
-		sig.reset(new (nothrow) memory_file());
-		if(!sig)
-		    throw Ememory("cat_delta_signature::read");
-
-		bounded.skip(0);
+		src->skip(delta_sig_offset);
 
 		if(ver >= archive_version(10,1))
 		{
-		    infinint tmp(bounded);
+
+			// we need first to read the block len used to build the signature
+
+		    infinint tmp(*src);
 		    sig_block_len = 0;
 		    tmp.unstack(sig_block_len);
 		    if(!tmp.is_zero())
@@ -338,6 +334,16 @@ namespace libdar
 		else
 		    sig_block_len = 2048; // RS_DEFAULT_BLOCK_LEN from librsync. Using value in case this macro would change in the future
 
+		    // now we can read the delta signature itself
+
+		tronc bounded(src, src->get_position(), delta_sig_size, false);
+		infinint crc_size = tools_file_size_to_crc_size(delta_sig_size);
+
+		sig.reset(new (nothrow) memory_file());
+		if(!sig)
+		    throw Ememory("cat_delta_signature::read");
+
+		bounded.skip(0);
 		bounded.copy_to(*sig, crc_size, calculated);
 		if(calculated == nullptr)
 		    throw SRC_BUG;

@@ -198,7 +198,8 @@ namespace libdar
     private:
 	crc *patch_base_check;      ///< associated CRC for the file this signature has been computed on
 	infinint delta_sig_size;    ///< size of the data to setup "sig" (set to zero when reading in sequential mode, sig is then setup on-fly)
-	infinint delta_sig_offset;  ///< where to read data from to setup "sig" (set to zero when read in sequential mode, sig is setup on-fly)
+	infinint delta_sig_offset;  ///< where to read sig_block_len followed by delta_sig_size bytes of data from which to setup "sig"
+	    ///\note delta_sig_offset is set to zero when read in sequential mode, sig is setup on-fly
 	mutable std::shared_ptr<memory_file>sig; ///< the signature data, if set nullptr it will be fetched from f in direct access mode only
 	crc *patch_result_check;    ///< associated CRC
 	generic_file *src;          ///< where to read data from
