@@ -56,6 +56,7 @@ namespace libdar
 	    /// read from it is fetched unchanged from "below" while the signature is
 	    /// computed. The file signature is output to signature_storage
 	    /// \param[in] signature_storage is write only mode generic_file
+	    /// \param[in] signature_block_size the block len to use to build the signature
 	    /// \param[in] below is read only to fetch data from
 	generic_rsync(generic_file *signature_storage,
 		      U_I signature_block_size,
