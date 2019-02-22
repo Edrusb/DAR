@@ -1924,10 +1924,17 @@ static bool get_args_recursive(recursive_param & rec,
 		else if(strncasecmp(optarg,"sig:",4) == 0)
 		{
 		    tmp_infinint = tools_get_extended_size(optarg+4, rec.suffix_base);
-		    p.delta_sig_len = 0;
-		    tmp_infinint.unstack(p.delta_sig_len);
-		    if(!tmp_infinint.is_zero())
-			throw Erange("get_args", tools_printf(INVALID_SIZE, char(lu)));
+		    if(p.delta_sig_len != 0)
+			rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
+		    else
+		    {
+			    // delta_sig_len is equal to zero we can "unstack" to it
+
+			tmp_infinint.unstack(p.delta_sig_len);
+			if(!tmp_infinint.is_zero())
+			    throw Erange("get_args", tools_printf(INVALID_SIZE, char(lu)));
+			p.delta_sig = true;
+		    }
 		}
 		else
 		    throw Erange("get_args", string(gettext("Unknown parameter given to --delta option: ")) + optarg);
