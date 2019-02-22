@@ -551,8 +551,7 @@ namespace libdar
                     // and checking the current data matches the expected_base_crc (done by generic_rsync)
 
                 rdiffer = new (nothrow) generic_rsync(current,
-                                                      delta,
-                                                      true);
+                                                      delta);
                 if(rdiffer == nullptr)
                     throw Ememory("filesystem_restore::make_delta_patch");
 

@@ -236,8 +236,7 @@ namespace libdar
 	// patch creation
 
     generic_rsync::generic_rsync(generic_file *current_data,
-				 generic_file *delta,
-				 bool not_used): generic_file(gf_read_only)
+				 generic_file *delta): generic_file(gf_read_only)
     {
 #if LIBRSYNC_AVAILABLE
 

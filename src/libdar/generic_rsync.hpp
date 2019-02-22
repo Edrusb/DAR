@@ -89,11 +89,9 @@ namespace libdar
 	    /// \param[in] current_data is a read_only object that contains the data to be used
 	    /// as base for the patch (this data is not modified)
 	    /// \param[in] delta is read only and contains the patch to apply
-	    /// \param[in] not_used is not used but present to make a distinction between this
-	    /// constructor and the constructor used to generate delta signature
 	generic_rsync(generic_file *current_data,
-		      generic_file *delta,
-		      bool not_used);
+		      generic_file *delta);
+
 
 	generic_rsync(const generic_rsync & ref) = delete;
 	generic_rsync(generic_rsync && ref) noexcept = delete;
