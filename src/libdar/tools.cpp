@@ -2351,4 +2351,34 @@ namespace libdar
 	return infinint(tmp);
     }
 
+    infinint tools_upper_rounded_log2(const infinint & ref)
+    {
+	infinint ret = 0;
+	infinint tmp = ref;
+
+	while(!tmp.is_zero())
+	{
+	    tmp >>= 1;
+	    ++ret;
+	}
+
+	return ret;
+    }
+
+    infinint tools_lower_rounded_exp2(const infinint & ref)
+    {
+	return infinint(1) << ref;
+    }
+
+    infinint tools_rounded_square_root(const infinint & ref)
+    {
+	return tools_lower_rounded_exp2(tools_upper_rounded_log2(ref) / 2);
+    }
+
+    infinint tools_rounded_cube_root(const infinint & ref)
+    {
+	return tools_lower_rounded_exp2(tools_upper_rounded_log2(ref) / 3);
+    }
+
+
 } // end of namespace
