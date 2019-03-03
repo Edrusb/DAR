@@ -991,7 +991,7 @@ fixed
 always returns 1, in other terms, the block size is indepent from the file size to build delta signature for
 .TP
 linear
-returns the filesize. You will most of the time use 1 for multiplier and chose divisor as the number of signature block per file you want to have
+returns the filesize. here, you will most of the time use 1 for multiplier and increase divisor to at least 10 for it makes sense
 .TP
 log2
 returns the upper rounded power of 2 to the file size (base 2 logarithm).
