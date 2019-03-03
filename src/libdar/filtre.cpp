@@ -566,7 +566,7 @@ namespace libdar
 			   bool auto_zeroing_neg_dates,
 			   const set<string> & ignored_symlinks,
 			   modified_data_detection mod_data_detect,
-			   U_I delta_sig_block_len)
+			   const delta_sig_block_size & delta_sig_block_len)
     {
 	if(!dialog)
 	    throw SRC_BUG; // dialog points to nothing
@@ -757,6 +757,8 @@ namespace libdar
 
 				    try
 				    {
+					U_I sig_bl; // stores the delta sig block len for this file
+
 					f_ino = snapshot ? nullptr : f_ino;
 					f_file = snapshot ? nullptr : f_file;
 
@@ -894,6 +896,14 @@ namespace libdar
 					    // during small inode dump for that file, the flag telling a delta_sig is present will be set
 
 
+					    // CALCULATING THE SIGNATURE BLOCK SIZE
+
+					if(e_file != nullptr)
+					    sig_bl = delta_sig_block_len.calculate(e_file->get_size());
+					else
+					    sig_bl = 0;
+
+
 					    // PERFORMING ACTION FOR ENTRY (cat_entree dump, eventually data dump)
 
 					if(!save_inode(dialog,
@@ -917,7 +927,7 @@ namespace libdar
 						       wasted_bytes,
 						       ignored_symlinks,
 						       false,
-						       delta_sig_block_len))
+						       sig_bl))
 					    st.incr_tooold(); // counting a new dirty file in archive
 
 					st.set_byte_amount(wasted_bytes);
@@ -1652,7 +1662,7 @@ namespace libdar
 		      bool build_delta_sig,
 		      const infinint & delta_sig_min_size,
 		      const mask & delta_mask,
-		      U_I signature_block_size)
+		      const delta_sig_block_size & signature_block_size)
     {
 	crit_action *decr = nullptr; // will point to a locally allocated crit_action
 	    // for decremental backup (argument overwrite is ignored)
@@ -2631,7 +2641,7 @@ namespace libdar
 			    bool & abort,
 			    thread_cancellation & thr_cancel,
 			    bool repair_mode,
-			    U_I signature_block_size)
+			    const delta_sig_block_size & signature_block_size)
     {
 	compression stock_algo = pdesc.compr->get_algo();
 	defile juillet = FAKE_ROOT;
@@ -2739,6 +2749,7 @@ namespace libdar
 			// deciding whether we calculate (not just transfer) delta signature
 
 		    bool calculate_delta_signature = false;
+		    U_I sig_bl = 0; // stores the signature block len
 
 		    if(e_file != nullptr)
 		    {
@@ -2773,12 +2784,14 @@ namespace libdar
 					    {
 						e_file->will_have_delta_signature_available();
 						calculate_delta_signature = true;
+						sig_bl = signature_block_size.calculate(e_file->get_size());
 					    }
 					    break;
 					case cat_file::normal:
 					case cat_file::plain:
 					    e_file->will_have_delta_signature_available();
 					    calculate_delta_signature = true;
+					    sig_bl = signature_block_size.calculate(e_file->get_size());
 					    break;
 					default:
 					    throw SRC_BUG;
@@ -2819,7 +2832,7 @@ namespace libdar
 				   fake_repeat,   // current_wasted_bytes
 				   set<string>(), // empty list for ignored_as_symlink
 				   repair_mode,
-				   signature_block_size))
+				   sig_bl))
 
 			throw SRC_BUG;
 		    else // succeeded saving
@@ -3145,6 +3158,8 @@ namespace libdar
 					if(!delta_sig)
 					    throw Ememory("saved_inode");
 					source = fic->get_data(cat_file::normal, delta_sig, signature_block_size, shared_ptr<memory_file>());
+					if(display_treated)
+					    dialog->message(tools_printf(gettext("building delta signature with block size of %d bytes"), signature_block_size));
 				    }
 				    else
 					source = fic->get_data(keep_mode, nullptr, signature_block_size, nullptr);
@@ -3162,6 +3177,8 @@ namespace libdar
 					// we must hide the holes for it can be redetected
 				    else
 					source = fic->get_data(cat_file::normal, delta_sig, signature_block_size, delta_sig_ref, & result_crc);
+				    if(display_treated)
+					dialog->message(tools_printf(gettext("building delta signature with block size of %d bytes"), signature_block_size));
 				    break;
 				case cat_file::plain:
 				    throw SRC_BUG; // save_inode must never be called with this value
@@ -3567,7 +3584,7 @@ namespace libdar
 				    if(display_treated)
 					dialog->message(string(gettext("Dumping delta signature structure for saved file: ")) + info_quoi);
 
-				    if(!delta_sig) // no delta_sig go calculated during this save_inode() execution
+				    if(!delta_sig) // no delta_sig got calculated during this save_inode() execution
 				    {
 					if(!delta_diff)
 					{

@@ -450,8 +450,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 			create_options.set_iteration_count(param.iteration_count);
 		    if(param.kdf_hash != hash_algo::none)
 			create_options.set_kdf_hash(param.kdf_hash);
-		    if(param.delta_sig_len != 0)
-			create_options.set_sig_block_len(param.delta_sig_len);
+		    create_options.set_sig_block_len(param.delta_sig_len);
 
 		    cur.reset(new (nothrow) archive(dialog,
 						    *param.fs_root,
@@ -517,8 +516,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 			merge_options.set_iteration_count(param.iteration_count);
 		    if(param.kdf_hash != hash_algo::none)
 			merge_options.set_kdf_hash(param.kdf_hash);
-		    if(param.delta_sig_len != 0)
-			merge_options.set_sig_block_len(param.delta_sig_len);
+		    merge_options.set_sig_block_len(param.delta_sig_len);
 
 		    cur.reset(new (nothrow) archive(dialog,            // user_interaction &
 						    *param.sauv_root,  //const path &
@@ -650,8 +648,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 				isolate_options.set_iteration_count(param.iteration_count);
 			    if(param.kdf_hash != hash_algo::none)
 				isolate_options.set_kdf_hash(param.kdf_hash);
-			    if(param.delta_sig_len != 0)
-				isolate_options.set_sig_block_len(param.delta_sig_len);
+			    isolate_options.set_sig_block_len(param.delta_sig_len);
 
 			    cur->op_isolate(*param.aux_root,
 					    *param.aux_filename,
@@ -744,8 +741,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    isolate_options.set_iteration_count(param.iteration_count);
 		if(param.kdf_hash != hash_algo::none)
 		    isolate_options.set_kdf_hash(param.kdf_hash);
-		if(param.delta_sig_len != 0)
-		    isolate_options.set_sig_block_len(param.delta_sig_len);
+		isolate_options.set_sig_block_len(param.delta_sig_len);
 
                 arch->op_isolate(*param.sauv_root,
 				 param.filename,

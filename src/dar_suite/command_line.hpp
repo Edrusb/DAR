@@ -164,7 +164,7 @@ struct line_param
     modified_data_detection modet;///< how to detect that a file has changed since the archive of reference was done
     infinint iteration_count;     ///< iteration count used when creating/isolating/merging an encrypted archive (key derivation)
     hash_algo kdf_hash;           ///< hash algo used for key derivation function
-    U_I delta_sig_len;            ///< block len to used for delta signature computation
+    delta_sig_block_size delta_sig_len; ///< block len to used for delta signature computation
 
 	// constructor for line_param
     line_param()

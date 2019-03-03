@@ -107,7 +107,7 @@ namespace libdar
 				  bool auto_zeroing_neg_dates,
 				  const std::set<std::string> & ignored_symlinks,
 				  modified_data_detection mod_data_detect,
-				  U_I delta_sig_block_len);
+				  const delta_sig_block_size & delta_sig_block_len);
 
     extern void filtre_difference(const std::shared_ptr<user_interaction> & dialog,
 				  const mask &filtre,
@@ -165,7 +165,7 @@ namespace libdar
 			     bool build_delta_sig,
 			     const infinint & delta_sig_min_size,
 			     const mask & delta_mask,
-			     U_I signature_block_size);
+			     const delta_sig_block_size & signature_block_size);
 
 
 	/// initialize variables used for merging in step1 and step2
@@ -222,7 +222,7 @@ namespace libdar
 				   bool & abort,
 				   thread_cancellation & thr_cancel,
 				   bool repair_mode,
-				   U_I signature_block_size);
+				   const delta_sig_block_size & signature_block_size);
 
 
     void filtre_sequentially_read_all_catalogue(catalogue & cat,

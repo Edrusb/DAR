@@ -1,3 +1,10 @@
+version 2.6.3
+--------------
+Thanks to Graham Cobb for his hint about mathematical approximations of
+square and cube roots functions. Thanks to Andy for his feature
+improvement ideas and testings for binary delta (more precisely delta
+signatures).
+
 version 2.6.2
 --------------
 Thanks to Mike on dar-support mailing list for bug report.

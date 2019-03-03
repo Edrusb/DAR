@@ -291,7 +291,7 @@ namespace libdar
 				modified_data_detection mod_data_detect,
 				const infinint & iteration_count,
 				hash_algo kdf_hash,
-				U_I sig_block_len,
+				const delta_sig_block_size & sig_block_len,
 				statistics * progressive_report);
 
 	void op_create_in_sub(operation op,                     ///< the filter operation to bind to
@@ -364,7 +364,7 @@ namespace libdar
 			      modified_data_detection mod_data_detect, ///< how to verify data has not changed upon inode metadata change
 			      const infinint & iteration_count, ///< for key derivation
 			      hash_algo kdf_hash,               ///< hash used for key derivation
-			      U_I sign_block_len,               ///< block len for signature
+			      const delta_sig_block_size & sign_block_len, ///< block len for signature
 			      statistics * st_ptr             ///< statistics must not be nullptr !
 	    );
 

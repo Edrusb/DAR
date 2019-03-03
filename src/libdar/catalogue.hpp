@@ -48,6 +48,7 @@ extern "C"
 #include "cat_nomme.hpp"
 #include "cat_directory.hpp"
 #include "mem_ui.hpp"
+#include "delta_sig_block_size.hpp"
 
 namespace libdar
 {
@@ -230,7 +231,7 @@ namespace libdar
 				       bool build,
 				       const mask & delta_mask,
 				       const infinint & delta_sig_min_size,
-				       U_I signature_block_size);
+				       const delta_sig_block_size & signature_block_size);
 
 	    /// remove delta signature from the catalogue object as if they had never been calculated
 	void drop_delta_signatures();

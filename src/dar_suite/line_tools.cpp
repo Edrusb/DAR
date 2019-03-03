@@ -1653,6 +1653,21 @@ deque<string> line_tools_substract_from_deque(const deque<string> & a, const deq
     return ret;
 }
 
+delta_sig_block_size::fs_function_t line_tools_string_to_sig_block_size_function(const std::string & funname)
+{
+    if(funname == "fixed")
+	return delta_sig_block_size::fixed;
+    if(funname == "linear")
+	return delta_sig_block_size::linear;
+    if(funname == "log2")
+	return delta_sig_block_size::log2;
+    if(funname == "square2")
+	return delta_sig_block_size::square2;
+    if(funname == "square3")
+	return delta_sig_block_size::square3;
+    throw Erange("line_tools_string_to_sig_block_function", gettext("unknown name give for delta signature block len function"));
+}
+
 ///////////////////
 
 static string build(string::iterator a, string::iterator b)

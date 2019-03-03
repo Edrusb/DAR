@@ -980,8 +980,45 @@ or
 option is specified; in that case the delta signatures are transfered/dropped and if not present calculated accordingly to these mask options. However note that it is not possible to calculate delta signature for unsaved files in the archive of reference (because the archive of reference does not hold their data) as well as for fully saved files when merging is performed keeping files compressed (see -ak option). Another restriction while merging concernes sparse files, it is not possible to calculate binary signature for file stored as sparse files, but if sparse file detection mechanism is activated at merging time, delta signature can be calculated for sparse files too even if it is missing in the reference archive. In short: if you want recalculation of delta signature while merging, do not keep file compressed (do not use -ak option) and if you want to avoid having sparse files excluded from the delta signature recalcutation, activate sparse file detection (use -ah option). Delta signature transfer is not possible for on-fly isolation, you need to do normal atchive isolation to obtain an isolated catalogue with delta signatures.
 .RE
 .TP 20
--8, --delta sig:<num>
-this variant of '--delta sig' option let you specify the block len used to build delta signatures. The default value is taken from librsync's "RS_DEFAULT_BLOCK_LEN" macro which today is equal to 2048 bytes. Larger value reduce CPU load required to build delta signature, but lead to less accuracy when computing delta binary which means larger delta patch and more data saved when a file has changed.
+-8, --delta sig:<function>:<multiplier>[:<divisor>[:<min>[:<max>]]]
+this variant of '--delta sig' option let you specify the block len used to build delta signatures. Larger values reduce CPU load required to build delta signature, but also lead to less accuracy when computing delta binary, which means larger delta patch and more data saved when a file has changed. The block length is calculated following the formula:
+.B
+block_len = function(filesize)*multiplier/divisor
+If this calculated value is lower than "min", it is set to min. If the calculated value is greater than "max" it is set to max unless max is set to zero in which case the value is kept as is. Of course "divisor" cannot be null. The avalaible functions are:
+.RS
+.TP 5
+fixed
+always returns 1, in other terms, the block size is indepent from the file size to build delta signature for
+.TP
+linear
+returns the filesize. You will most of the time use 1 for multiplier and chose divisor as the number of signature block per file you want to have
+.TP
+log2
+returns the upper rounded power of 2 to the file size (base 2 logarithm).
+.TP
+square2
+returns the approximated value of the square root of the file size. Note that for better performance and as accurary is not important here, this function is implemented as exp2(log2(filesize)/2) where exp2 and log2 are based ont the integer left and right bit shift operations.
+.TP
+square3
+returns the approximated value of the cube root of filesize, implemented as exp2(log(filesize)/3)
+.RE
+.BR
+.BR
+.RS
+All numerical fields can receive multiplier suffix (k, M, ...) for more details about these suffixes, see -s option description. If not specified
+.B
+"max"
+defaults to zero (no maximum value defined). If not specified
+.B
+"min"
+defaults to RS_DEFAULT_BLOCK_LEN (see below for details on this symbol). If not specified
+.B
+"divisor"
+defaults to 1. Using "--delta sig" without additional fields is equivalent to using
+.B --delta sig:fixed:RS_DEFAULT_BLOCK_LEN
+where "RS_DEFAULT_BLOCK_LEN" is taken from librsync and is today equal to 2048 bytes (which may well change in the future by the way if librsync maintainers decide to do so).
+.RE
+
 .TP 20
 -{, --include-delta-sig <mask>
 .RS
