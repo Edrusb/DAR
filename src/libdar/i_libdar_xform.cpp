@@ -53,12 +53,12 @@ namespace libdar
 	if(!src_path)
 	    throw Ememory("i_libdar_xform::lidar_xform");
 
-	entrep->set_location(*src_path);
+	entrep_src->set_location(*src_path);
 
 	tmp_sar = new (nothrow) libdar::sar(get_pointer(),
 					    basename,
 					    extension,
-					    entrep,
+					    entrep_src,
 					    false,
 					    min_digits,
 					    false,
@@ -144,11 +144,11 @@ namespace libdar
 
 	if(!dst_path)
 	    throw Ememory("i_libdar_xform::xform_to");
-	entrep->set_location(*dst_path);
-	entrep->set_user_ownership(slice_user);
-	entrep->set_group_ownership(slice_group);
+	entrep_dst->set_location(*dst_path);
+	entrep_dst->set_user_ownership(slice_user);
+	entrep_dst->set_group_ownership(slice_group);
 	tools_avoid_slice_overwriting_regex(get_ui(),
-					    *entrep,
+					    *entrep_dst,
 					    basename,
 					    extension,
 					    false,
@@ -164,7 +164,7 @@ namespace libdar
 								gf_write_only,
 								basename,
 								extension,
-								*entrep,
+								*entrep_dst,
 								internal_name,
 								dataname,
 								execute,
@@ -187,7 +187,7 @@ namespace libdar
 							warn_over,
 							allow_over,
 							pause,
-							entrep,
+							entrep_dst,
 							internal_name,
 							dataname,
 							force_perm,
@@ -226,8 +226,11 @@ namespace libdar
 
     void libdar_xform::i_libdar_xform::init_entrep()
     {
-	entrep.reset(new (nothrow) entrepot_local("", "", false));
-	if(!entrep)
+	entrep_src.reset(new (nothrow) entrepot_local("", "", false));
+	if(!entrep_src)
+	    throw Ememory("i_libdar_xform::lidar_xform");
+	entrep_dst.reset(new (nothrow) entrepot_local("", "", false));
+	if(!entrep_dst)
 	    throw Ememory("i_libdar_xform::lidar_xform");
     }
 
