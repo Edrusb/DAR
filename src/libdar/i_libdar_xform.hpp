@@ -143,7 +143,8 @@ namespace libdar
 	bool can_xform;
 	std::unique_ptr<generic_file> source;
 	std::unique_ptr<path> src_path;        ///< may be null when reading from a pipe
-	std::shared_ptr<entrepot_local> entrep;
+	std::shared_ptr<entrepot_local> entrep_src;
+	std::shared_ptr<entrepot_local> entrep_dst;
 	bool format_07_compatible;
 	label dataname;
 

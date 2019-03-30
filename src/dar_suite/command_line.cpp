@@ -88,6 +88,7 @@ extern "C"
 #define MISSING_ARG "Missing argument to -%c option"
 #define INVALID_ARG "Invalid argument given to -%c option"
 #define INVALID_SIZE "Invalid size given with option -%c"
+#define INVALID_BS_FUNC "Syntax error in delta signature block length specification: %s"
 
 #define DEFAULT_CRYPTO_SIZE 10240
 
@@ -327,6 +328,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.modet = modified_data_detection::mtime_size;
     p.iteration_count = 0; // will not touch the default API value if still set to zero
     p.kdf_hash = hash_algo::none;
+    p.delta_sig_len.reset();
 
     if(!dialog)
 	throw SRC_BUG;
@@ -825,6 +827,7 @@ static bool get_args_recursive(recursive_param & rec,
     pre_mask tmp_pre_mask;
     U_I tmp;
     string tmp_string, tmp_string2;
+    infinint tmp_infinint;
 
         // fetching first the targets (non optional argument of command line)
     add_non_options(argc, argv, rec.non_options);
@@ -1919,6 +1922,68 @@ static bool get_args_recursive(recursive_param & rec,
 		    p.delta_sig = true;
 		else if(strcasecmp(optarg, "no-patch") == 0)
 		    p.delta_diff = false;
+		else if(strncasecmp(optarg,"sig:",4) == 0)
+		{
+		    if(!p.delta_sig_len.equals_default())
+			rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
+		    else
+		    {
+			vector<string> splitted;
+			vector<string>::iterator it;
+
+			line_tools_split(optarg, ':', splitted);
+			it = splitted.begin();
+			if(it == splitted.end())
+			    throw SRC_BUG;
+			++it; // skipping the initial "sig" keyword
+
+			    // reading the function
+			if(it == splitted.end())
+			    throw Erange("get_args", tools_printf(gettext(INVALID_BS_FUNC), gettext("missing function name argument in string")));
+			p.delta_sig_len.fs_function = line_tools_string_to_sig_block_size_function(*it);
+			++it;
+
+			    // reading the multiplier
+			if(it == splitted.end())
+			    throw Erange("get_args", tools_printf(gettext(INVALID_BS_FUNC), gettext("missing multiplier argument in string")));
+			p.delta_sig_len.multiplier = tools_get_extended_size(*it, rec.suffix_base);
+			++it;
+
+			    // eventually reading the divisor
+			if(it != splitted.end())
+			{
+			    p.delta_sig_len.divisor = tools_get_extended_size(*it, rec.suffix_base);
+			    ++it;
+			}
+
+			    // eventually reading the min_block_len
+			if(it != splitted.end())
+			{
+			    tmp_infinint = tools_get_extended_size(*it, rec.suffix_base);
+			    p.delta_sig_len.min_block_len = 0;
+			    tmp_infinint.unstack(p.delta_sig_len.min_block_len);
+			    if(!tmp_infinint.is_zero())
+				throw Erange("get_args", tools_printf(gettext(INVALID_BS_FUNC), gettext("too large value provided for the min block size")));
+			    ++it;
+			}
+
+			    // eventually reading the max_block_len
+			if(it != splitted.end())
+			{
+			    tmp_infinint = tools_get_extended_size(*it, rec.suffix_base);
+			    p.delta_sig_len.max_block_len = 0;
+			    tmp_infinint.unstack(p.delta_sig_len.max_block_len);
+			    if(!tmp_infinint.is_zero())
+				throw Erange("get_args", tools_printf(gettext(INVALID_BS_FUNC), gettext("too large value provided for the min block size")));
+			    ++it;
+			}
+
+			if(it != splitted.end())
+			    throw Erange("get_args", tools_printf(gettext(INVALID_BS_FUNC), gettext("unexpected extra argument in string")));
+
+			p.delta_sig = true;
+		    }
+		}
 		else
 		    throw Erange("get_args", string(gettext("Unknown parameter given to --delta option: ")) + optarg);
 		break;

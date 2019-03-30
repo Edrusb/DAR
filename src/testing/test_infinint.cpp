@@ -51,12 +51,14 @@ extern "C"
 #include "shell_interaction.hpp"
 #include "generic_file.hpp"
 #include "fichier_local.hpp"
+#include "tools.hpp"
 
 using namespace libdar;
 using namespace std;
 
 static void routine1();
 static void routine2();
+static void routine3();
 
 static shared_ptr<user_interaction>ui;
 
@@ -70,6 +72,7 @@ int main()
 	cout << "ERREUR !" << endl;
     routine1();
     routine2();
+    routine3();
     ui.reset();
 }
 
@@ -207,4 +210,17 @@ static void routine2()
     ui->message(libdar::deci(infinint(2).power(infinint(1))).human());
     ui->message(libdar::deci(infinint(2).power((U_I)2)).human());
     ui->message(libdar::deci(infinint(2).power(infinint(2))).human());
+}
+
+static void routine3()
+{
+    infinint a = 5;
+    infinint b = 49; // = 7^2
+    infinint c = 729; // = 9^3
+
+    infinint res = tools_upper_rounded_log2(infinint(5));
+
+    res = tools_rounded_square_root(b);
+    res = tools_rounded_cube_root(c);
+    res = 1;
 }

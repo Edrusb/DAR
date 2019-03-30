@@ -35,6 +35,7 @@ extern "C"
 #include "generic_rsync.hpp"
 #include "compile_time_features.hpp"
 #include "tools.hpp"
+#include "macro_tools.hpp"
 
 using namespace std;
 
@@ -68,6 +69,7 @@ namespace libdar
         dirty = false;
 	delta_sig = nullptr;
 	delta_sig_read = false;
+	read_ver = macro_tools_supported_version;
 
         try
         {
@@ -119,6 +121,7 @@ namespace libdar
         dirty = false;
 	delta_sig = nullptr;
 	delta_sig_read = false;
+	read_ver = reading_ver;
 
 	generic_file *ptr = nullptr;
 
@@ -243,7 +246,7 @@ namespace libdar
 
 		if(delta_sig != nullptr)
 		{
-		    delta_sig->read(false);
+		    delta_sig->read(false, reading_ver);
 		    delta_sig_read = true;
 		}
             }
@@ -328,6 +331,7 @@ namespace libdar
         file_data_status_write = ref.file_data_status_write;
 	delta_sig = nullptr;
 	delta_sig_read = ref.delta_sig_read;
+	read_ver = ref.read_ver;
 
         try
         {
@@ -452,6 +456,7 @@ namespace libdar
 
     generic_file *cat_file::get_data(get_data_mode mode,
 				     shared_ptr<memory_file> delta_sig_mem,
+				     U_I signature_block_size,
 				     shared_ptr<memory_file> delta_ref,
 				     const crc **checksum) const
     {
@@ -550,7 +555,7 @@ namespace libdar
 
 		    if(delta_sig_mem)
 		    {
-			generic_rsync *delta = new (nothrow) generic_rsync(delta_sig_mem.get(), data->top());
+			generic_rsync *delta = new (nothrow) generic_rsync(delta_sig_mem.get(), signature_block_size, data->top());
 			if(delta == nullptr)
 			    throw Ememory("cat_file::get_data");
 			try
@@ -698,7 +703,7 @@ namespace libdar
 
 			    if(delta_sig_mem)
 			    {
-				generic_rsync *delta = new (nothrow) generic_rsync(delta_sig_mem.get(), parent);
+				generic_rsync *delta = new (nothrow) generic_rsync(delta_sig_mem.get(), signature_block_size, parent);
 				if(delta == nullptr)
 				    throw Ememory("cat_file::get_data");
 				try
@@ -1003,15 +1008,15 @@ namespace libdar
 	delta_sig->will_have_signature();
     }
 
-    void cat_file::dump_delta_signature(shared_ptr<memory_file> & sig, generic_file & where, bool small) const
+    void cat_file::dump_delta_signature(shared_ptr<memory_file> & sig, U_I sig_block_size, generic_file & where, bool small) const
     {
 	infinint crc_size;
 
 	if(delta_sig == nullptr)
 	    throw SRC_BUG;
 
-	const_cast<cat_delta_signature *>(delta_sig)->set_sig(sig);
-	delta_sig->dump_data(where, small);
+	const_cast<cat_delta_signature *>(delta_sig)->set_sig(sig, sig_block_size);
+	delta_sig->dump_data(where, small, read_ver);
     }
 
     void cat_file::dump_delta_signature(generic_file & where, bool small) const
@@ -1022,7 +1027,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	const_cast<cat_delta_signature *>(delta_sig)->set_sig();
-	delta_sig->dump_data(where, small);
+	delta_sig->dump_data(where, small, read_ver);
     }
 
     void cat_file::read_delta_signature_metadata() const
@@ -1064,7 +1069,7 @@ namespace libdar
 			throw Erange("cat_file::read_delta_signature", gettext("can't find mark for delta signature"));
 		}
 
-		delta_sig->read(small);
+		delta_sig->read(small, read_ver);
 		delta_sig_read = true;
 	    }
 	    catch(Egeneric & e)
@@ -1084,14 +1089,16 @@ namespace libdar
 	}
     }
 
-    void cat_file::read_delta_signature(shared_ptr<memory_file> & delta_sig_ret) const
+    void cat_file::read_delta_signature(shared_ptr<memory_file> & delta_sig_ret,
+					U_I & block_len) const
     {
 	read_delta_signature_metadata();
 
 	if(delta_sig->can_obtain_sig())
-	    delta_sig_ret = delta_sig->obtain_sig();
+	    delta_sig_ret = delta_sig->obtain_sig(read_ver);
 	else
 	    delta_sig_ret.reset();
+	block_len = delta_sig->obtain_sig_block_size();
     }
 
     void cat_file::drop_delta_signature_data() const
@@ -1110,14 +1117,19 @@ namespace libdar
     {
 	shared_ptr<memory_file> sig_me;
 	shared_ptr<memory_file> sig_you;
+	U_I my_sig_block_len;
+	U_I your_sig_block_len;
 
-	read_delta_signature(sig_me);
-	ref.read_delta_signature(sig_you);
+	read_delta_signature(sig_me, my_sig_block_len);
+	ref.read_delta_signature(sig_you, your_sig_block_len);
 
 	if(!sig_me)
 	    throw SRC_BUG;
 	if(!sig_you)
 	    throw SRC_BUG;
+
+	if(my_sig_block_len != your_sig_block_len)
+	    return false;
 
 	infinint size_me = sig_me->size();
 	infinint size_you = sig_you->size();
@@ -1206,12 +1218,12 @@ namespace libdar
 	{
 		// compare file content and CRC
 
-	    generic_file *me = get_data(normal, nullptr, nullptr);
+	    generic_file *me = get_data(normal, nullptr, 0, nullptr);
 	    if(me == nullptr)
 		throw SRC_BUG;
 	    try
 	    {
-		generic_file *you = f_other->get_data(normal, nullptr, nullptr);
+		generic_file *you = f_other->get_data(normal, nullptr, 0, nullptr);
 		if(you == nullptr)
 		    throw SRC_BUG;
 		    // requesting read_ahead for the peer object
@@ -1309,11 +1321,16 @@ namespace libdar
 		shared_ptr<memory_file> sig_you(new (nothrow) memory_file());
 		null_file trash = gf_write_only;
 		generic_file *data;
+		U_I block_len;
 
 		if(!sig_you)
 		    throw Ememory("cat_file::sub_compare_internal");
 
-		data = f_other->get_data(normal, sig_you, shared_ptr<memory_file>());
+		read_delta_signature(sig_me, block_len);
+		if(!sig_me)
+		    throw SRC_BUG;
+
+		data = f_other->get_data(normal, sig_you, block_len, shared_ptr<memory_file>());
 
 		if(data == nullptr)
 		    throw SRC_BUG;
@@ -1329,10 +1346,6 @@ namespace libdar
 		}
 		delete data;
 		data = nullptr;
-
-		read_delta_signature(sig_me);
-		if(!sig_me)
-		    throw SRC_BUG;
 
 		try
 		{
@@ -1369,7 +1382,7 @@ namespace libdar
 		if(my_crc == nullptr)
 		    throw SRC_BUG;
 
-		generic_file *you = f_other->get_data(normal, nullptr, nullptr);
+		generic_file *you = f_other->get_data(normal, nullptr, 0, nullptr);
 		if(you == nullptr)
 		    throw SRC_BUG;
 

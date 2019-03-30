@@ -45,6 +45,7 @@ namespace libdar
 
     generic_file *cat_door::get_data(get_data_mode mode,
 				     shared_ptr<memory_file> delta_sig,
+				     U_I signature_block_size,
 				     shared_ptr<memory_file> delta_ref,
 				     const crc**checksum) const
     {
@@ -61,7 +62,7 @@ namespace libdar
 		throw Ememory("cat_door::get_data");
 	}
 	else
-	    ret = cat_file::get_data(mode, nullptr, nullptr, checksum);
+	    ret = cat_file::get_data(mode, nullptr, signature_block_size, nullptr, checksum);
 
 	return ret;
     }

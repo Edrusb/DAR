@@ -380,7 +380,7 @@ namespace libdar
 		width = 0;
 	    }
 
-            // now we write the last byte of the preambule, which as only one bit set
+            // now we write the last byte of the preambule, which has only one bit set
 
         x.write((char *)&last_width, 1);
 

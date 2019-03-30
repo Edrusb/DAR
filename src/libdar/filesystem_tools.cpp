@@ -519,7 +519,7 @@ namespace libdar
 
                     // obtaining current file
 
-                current = existing.get_data(cat_file::plain, nullptr, nullptr);
+                current = existing.get_data(cat_file::plain, nullptr, 0, nullptr);
                 if(current == nullptr)
                     throw SRC_BUG;
                 else
@@ -540,7 +540,7 @@ namespace libdar
 
                     // obtaining patch
 
-                delta = patcher.get_data(cat_file::plain, nullptr, nullptr);
+                delta = patcher.get_data(cat_file::plain, nullptr, 0, nullptr);
                 if(delta == nullptr)
                     throw SRC_BUG;
                 else
@@ -551,8 +551,7 @@ namespace libdar
                     // and checking the current data matches the expected_base_crc (done by generic_rsync)
 
                 rdiffer = new (nothrow) generic_rsync(current,
-                                                      delta,
-                                                      true);
+                                                      delta);
                 if(rdiffer == nullptr)
                     throw Ememory("filesystem_restore::make_delta_patch");
 

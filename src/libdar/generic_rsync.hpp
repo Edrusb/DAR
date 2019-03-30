@@ -56,8 +56,10 @@ namespace libdar
 	    /// read from it is fetched unchanged from "below" while the signature is
 	    /// computed. The file signature is output to signature_storage
 	    /// \param[in] signature_storage is write only mode generic_file
+	    /// \param[in] signature_block_size the block len to use to build the signature
 	    /// \param[in] below is read only to fetch data from
 	generic_rsync(generic_file *signature_storage,
+		      U_I signature_block_size,
 		      generic_file *below);
 
 	    /// constructor for "delta" operation
@@ -81,18 +83,16 @@ namespace libdar
 	    /// constructor for "patch" operation
 
 	    /// in this mode the generic_rsync object is read only, the data read from
-	    /// it is built from the current file's data and the delta signature
+	    /// it is built from the current file's data and the delta signature.
 	    /// as a first step the on current data CRC is computed CRC and compared
 	    /// to the original CRC given in argument. If they do not match, an exception
 	    /// Edata is thrown and nothing is modified on filesystem.
 	    /// \param[in] current_data is a read_only object that contains the data to be used
 	    /// as base for the patch (this data is not modified)
 	    /// \param[in] delta is read only and contains the patch to apply
-	    /// \param[in] not_used is not used but present to make a distinction between this
-	    /// constructor and the constructor used to generate delta signature
 	generic_rsync(generic_file *current_data,
-		      generic_file *delta,
-		      bool not_used);
+		      generic_file *delta);
+
 
 	generic_rsync(const generic_rsync & ref) = delete;
 	generic_rsync(generic_rsync && ref) noexcept = delete;

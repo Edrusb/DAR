@@ -107,11 +107,13 @@ if [ -z "$DAR_SFTP_REPO" ] ; then
     exit 1
 fi
 
+password="did7hj&!sksjs#@_/-8<>!sk_ajqwplHYT"
+
 if [ "$crypto" != "none" ]; then
   if [ "$asym" != "y" ]; then
-    crypto_K="-K $crypto:toto"
-    crypto_J="-J $crypto:toto"
-    crypto_A="'-$' $crypto:toto"
+    crypto_K="-K $crypto:$password"
+    crypto_J="-J $crypto:$password"
+    crypto_A="'-$' $crypto:$password"
     sign=""
   else
       if [ "$crypto" != "scram" ] ; then

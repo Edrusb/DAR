@@ -1048,7 +1048,8 @@ namespace libdar
 					      bool sequential_read,
 					      bool build,
 					      const mask & delta_mask,
-					      const infinint & delta_sig_min_size)
+					      const infinint & delta_sig_min_size,
+					      const delta_sig_block_size & signature_block_size)
     {
 	const cat_entree *ent = nullptr;
 	const cat_file *ent_file = nullptr;
@@ -1059,6 +1060,7 @@ namespace libdar
 	defile juillet = FAKE_ROOT;
 	null_file trash = gf_write_only;
 	generic_file *data = nullptr;
+	U_I block_len;
 
 	if(!mem)
 	    throw Ememory("catalogue::transfer_delta_signature");
@@ -1117,11 +1119,11 @@ namespace libdar
 		    {
 			shared_ptr<memory_file> sig_ptr;
 
-			ent_file->read_delta_signature(sig_ptr);
+			ent_file->read_delta_signature(sig_ptr, block_len);
 			try
 			{
 			    if(sig_ptr)
-				e_file->dump_delta_signature(sig_ptr, *(destination.compr), false);
+				e_file->dump_delta_signature(sig_ptr, block_len, *(destination.compr), false);
 			    else
 				e_file->dump_delta_signature(*(destination.compr), false);
 			}
@@ -1150,6 +1152,7 @@ namespace libdar
 		       && e_file->get_size() >= delta_sig_min_size)
 		    {
 			const crc **checksum = nullptr;
+			block_len = signature_block_size.calculate(e_file->get_size());
 
 			if(!e_file->has_crc() && !sequential_read)
 			{
@@ -1166,7 +1169,7 @@ namespace libdar
 			    switch(e_file->get_saved_status())
 			    {
 			    case saved_status::saved:
-				data = e_file->get_data(cat_file::plain, mem, nullptr, checksum);
+				data = e_file->get_data(cat_file::plain, mem, block_len, nullptr, checksum);
 
 				if(data == nullptr)
 				    throw SRC_BUG;
@@ -1197,7 +1200,7 @@ namespace libdar
 				e_file->will_have_delta_signature_available();
 				e_file->set_patch_base_crc(*my_crc);
 				e_file->set_patch_result_crc(*my_crc);
-				e_file->dump_delta_signature(mem, *(destination.compr), false);
+				e_file->dump_delta_signature(mem, block_len, *(destination.compr), false);
 				e_file->drop_delta_signature_data(); // now the data has been written to archive we can free up memory
 				break;
 			    case saved_status::fake:
@@ -1385,6 +1388,7 @@ namespace libdar
 		sub_tree = nullptr;
 	    sub_count = ref.sub_count;
 	    stats = ref.stats;
+	    ref_data_name = ref.ref_data_name;
 	}
 	catch(...)
 	{

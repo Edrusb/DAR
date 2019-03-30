@@ -112,6 +112,7 @@ void go_sig(const string & src_file,
 				      true,
 				      false);
     generic_rsync go(&res,
+		     RS_DEFAULT_BLOCK_LEN,
 		     &src);
     fichier_local control = fichier_local(ui,
 					  src_file + ".bak",
@@ -137,8 +138,7 @@ void go_delta(const string & sig_file,
 				      true,
 				      false);
     generic_rsync go(&sig,
-		     &src,
-		     true);
+		     &src);
     go.copy_to(res);
 }
 
@@ -163,8 +163,7 @@ void go_patch(const string & base_file,
     crc *ori = base.get_crc();
     base.skip(0);
     generic_rsync go(&base,
-		     &sig,
-		     ori);
+		     &sig);
     go.copy_to(res);
     go.terminate();
 }

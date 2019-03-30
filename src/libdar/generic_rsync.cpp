@@ -56,6 +56,7 @@ namespace libdar
 	// signature creation
 
     generic_rsync::generic_rsync(generic_file *signature_storage,
+				 U_I signature_block_size,
 				 generic_file *below): generic_file(gf_read_only)
     {
 #if LIBRSYNC_AVAILABLE
@@ -84,11 +85,11 @@ namespace libdar
 	    patching_completed = false; // not used in sign mode
 	    data_crc = nullptr;
 #ifdef RS_DEFAULT_STRONG_LEN
-	    job = rs_sig_begin(RS_DEFAULT_BLOCK_LEN, RS_DEFAULT_STRONG_LEN);
+	    job = rs_sig_begin(signature_block_size, RS_DEFAULT_STRONG_LEN);
 #else
 		// should use RS_BLAKE2_SIG_MAGIC in place of RS_MD4_SIG_MAGIC
 		// but not compatible with librsync < 1.0
-	    job = rs_sig_begin(RS_DEFAULT_BLOCK_LEN, 0, RS_MD4_SIG_MAGIC);
+	    job = rs_sig_begin(signature_block_size, 0, RS_MD4_SIG_MAGIC);
 #endif
 	}
 	catch(...)
@@ -235,8 +236,7 @@ namespace libdar
 	// patch creation
 
     generic_rsync::generic_rsync(generic_file *current_data,
-				 generic_file *delta,
-				 bool not_used): generic_file(gf_read_only)
+				 generic_file *delta): generic_file(gf_read_only)
     {
 #if LIBRSYNC_AVAILABLE
 

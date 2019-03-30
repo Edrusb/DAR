@@ -430,6 +430,11 @@ extern void line_tools_merge_to_deque(std::deque<std::string> & a, const  std::d
     /// remove from 'a' elements found in 'b' and return the resulting deque
 extern std::deque<std::string> line_tools_substract_from_deque(const std::deque<std::string> & a, const std::deque<std::string> & b);
 
+    /// converts string name to function
+
+    /// \note throws Erange in case of error
+extern delta_sig_block_size::fs_function_t line_tools_string_to_sig_block_size_function(const std::string & funname);
+
     /// @}
 
 #endif

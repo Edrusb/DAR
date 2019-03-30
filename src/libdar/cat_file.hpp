@@ -100,6 +100,7 @@ namespace libdar
 
 	    /// \param[in] mode whether to return compressed, with hole or plain file
 	    /// \param[in,out] delta_sig_mem if not nullptr, write to that file the delta signature of the file
+	    /// \param[in] signature_block_size is the block size to use to build the signature (passed to librsync as is)
 	    /// \param[in] delta_ref if not nullptr, use the provided signature to generate a delta binary
 	    /// \param[in] checksum if not null will set *checsum to the address of a newly allocated crc object
 	    /// that the caller has the duty to release when no more needed but *not before* the returned generic_file
@@ -111,6 +112,7 @@ namespace libdar
 	    /// file data, then the delta binary is computed.
         virtual generic_file *get_data(get_data_mode mode,
 				       std::shared_ptr<memory_file> delta_sig_mem,
+				       U_I signature_block_size,
 				       std::shared_ptr<memory_file> delta_ref,
 				       const crc **checksum = nullptr) const;
         void clean_data(); // partially free memory (but get_data() becomes disabled)
@@ -193,9 +195,10 @@ namespace libdar
 	    /// write down to archive the given delta signature
 
 	    /// \param[in] sig is the signature to dump
+	    /// \param[in] sign_block_size block size to used to build the delta signature
 	    /// \param[in] where is the location where to write down the signature
 	    /// \param[in] small if set to true drop down additional information to allow sequential reading mode
-	void dump_delta_signature(std::shared_ptr<memory_file> & sig, generic_file & where, bool small) const;
+	void dump_delta_signature(std::shared_ptr<memory_file> & sig, U_I sign_block_size, generic_file & where, bool small) const;
 
 	    /// variant of dump_delta_signature when just CRC have to be dumped
 	void dump_delta_signature(generic_file & where, bool small) const;
@@ -210,8 +213,10 @@ namespace libdar
 
 	    /// \param[out] delta_sig is either nullptr or points to a shared memory_file
 	    /// containing the delta signature.
+	    /// \param[out] block_len is the block size that has been used to build the signature
 	    /// \note nullptr is returned if the delta_signature only contains CRCs
-	void read_delta_signature(std::shared_ptr<memory_file> & delta_sig) const;
+	void read_delta_signature(std::shared_ptr<memory_file> & delta_sig,
+				  U_I & block_len) const;
 
 	    /// drop the delta signature from memory (will not more be posible to be read, using read_delta_signature)
 	void drop_delta_signature_data() const;
@@ -252,6 +257,7 @@ namespace libdar
 	char file_data_status_write; ///< defines the datastructure to apply when writing down the data
 	cat_delta_signature *delta_sig; ///< delta signature and associated CRC
 	mutable bool delta_sig_read; ///< whether delta sig has been read/initialized from filesystem
+	archive_version read_ver; ///< archive format used/to use
 
 	void sub_compare_internal(const cat_inode & other,
 				  bool can_read_my_data,

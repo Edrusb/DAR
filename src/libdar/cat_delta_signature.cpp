@@ -47,7 +47,7 @@ namespace libdar
 	    throw SRC_BUG;
     }
 
-    void cat_delta_signature::read(bool sequential_read)
+    void cat_delta_signature::read(bool sequential_read, const archive_version & ver)
     {
 	if(src == nullptr)
 	    throw SRC_BUG;
@@ -62,7 +62,7 @@ namespace libdar
 		if(sequential_read)
 		{
 		    delta_sig_offset = src->get_position();
-		    fetch_data();
+		    fetch_data(ver);
 		}
 		else
 		    delta_sig_offset.read(*src);
@@ -77,7 +77,7 @@ namespace libdar
 	}
     }
 
-    std::shared_ptr<memory_file> cat_delta_signature::obtain_sig() const
+    std::shared_ptr<memory_file> cat_delta_signature::obtain_sig(const archive_version & ver) const
     {
 	if(delta_sig_size.is_zero())
 	    throw SRC_BUG;
@@ -86,7 +86,8 @@ namespace libdar
 	{
 	    if(src == nullptr)
 		throw SRC_BUG;
-	    fetch_data();
+
+	    fetch_data(ver);
 	    if(!sig)
 		throw SRC_BUG; // fetch_data() failed but did not raised any exception
 	}
@@ -94,7 +95,7 @@ namespace libdar
 	return sig;
     }
 
-    void cat_delta_signature::set_sig(const std::shared_ptr<memory_file> & ptr)
+    void cat_delta_signature::set_sig(const std::shared_ptr<memory_file> & ptr, U_I sig_block_size)
     {
 	if(!ptr)
 	    throw SRC_BUG;
@@ -102,9 +103,12 @@ namespace libdar
 	delta_sig_size = sig->size();
 	if(delta_sig_size.is_zero())
 	    throw SRC_BUG;
+	sig_block_len = sig_block_size;
+	if(sig_block_len == 0)
+	    throw SRC_BUG;
     }
 
-    void cat_delta_signature::dump_data(generic_file & f, bool sequential_mode) const
+    void cat_delta_signature::dump_data(generic_file & f, bool sequential_mode, const archive_version & ver) const
     {
 
 	    // fetching the data if it is missing
@@ -112,7 +116,7 @@ namespace libdar
 	if(!delta_sig_size.is_zero())
 	{
 	    if(!sig)
-		fetch_data();
+		fetch_data(ver);
 	}
 	    // dumping data
 
@@ -133,6 +137,7 @@ namespace libdar
 	    try
 	    {
 		me->delta_sig_offset = f.get_position();
+		infinint(sig_block_len).dump(f);
 		if(!sig)
 		    throw SRC_BUG;
 		sig->skip(0);
@@ -227,6 +232,7 @@ namespace libdar
 	patch_result_check = nullptr;
 	src = nullptr;
 	zip = nullptr;
+	sig_block_len = 0;
     }
 
     void cat_delta_signature::copy_from(const cat_delta_signature & ref)
@@ -286,7 +292,7 @@ namespace libdar
 	zip = nullptr;
     }
 
-    void cat_delta_signature::fetch_data() const
+    void cat_delta_signature::fetch_data(const archive_version & ver) const
     {
 	if(!delta_sig_size.is_zero() && delta_sig_offset.is_zero())
 	    throw SRC_BUG;
@@ -312,7 +318,25 @@ namespace libdar
 
 	    try
 	    {
-		tronc bounded(src, delta_sig_offset, delta_sig_size, false);
+		src->skip(delta_sig_offset);
+
+		if(ver >= archive_version(10,1))
+		{
+
+			// we need first to read the block len used to build the signature
+
+		    infinint tmp(*src);
+		    sig_block_len = 0;
+		    tmp.unstack(sig_block_len);
+		    if(!tmp.is_zero())
+			throw Erange("cat_delta_signature::fetch_data", gettext("data corrupted when attempting to read delta signature block size"));
+		}
+		else
+		    sig_block_len = 2048; // RS_DEFAULT_BLOCK_LEN from librsync. Using value in case this macro would change in the future
+
+		    // now we can read the delta signature itself
+
+		tronc bounded(src, src->get_position(), delta_sig_size, false);
 		infinint crc_size = tools_file_size_to_crc_size(delta_sig_size);
 
 		sig.reset(new (nothrow) memory_file());

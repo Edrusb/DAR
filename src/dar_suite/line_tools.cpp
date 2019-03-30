@@ -960,7 +960,7 @@ bool line_tools_split_entrepot_path(const string &all,
     port.clear();
     path_basename.clear();
 
-    enum { s_proto, s_login, s_pass, s_host, s_port, s_path, s_end } state = s_proto;
+    enum { s_proto, s_login, s_login_escape, s_pass, s_host, s_port, s_path, s_end } state = s_proto;
 
     while(state != s_end && cursor < max)
     {
@@ -1019,10 +1019,19 @@ bool line_tools_split_entrepot_path(const string &all,
 		state = s_path;
 		++cursor;
 		break;
+	    case '\\':
+		++cursor;
+		state = s_login_escape;
+		break;
 	    default:
 		login += ch[cursor];
 		++cursor;
 	    }
+	    break;
+	case s_login_escape:
+	    login += ch[cursor];
+	    ++cursor;
+	    state = s_login;
 	    break;
 	case s_pass:
 	    switch(ch[cursor])
@@ -1651,6 +1660,21 @@ deque<string> line_tools_substract_from_deque(const deque<string> & a, const deq
     }
 
     return ret;
+}
+
+delta_sig_block_size::fs_function_t line_tools_string_to_sig_block_size_function(const std::string & funname)
+{
+    if(funname == "fixed")
+	return delta_sig_block_size::fixed;
+    if(funname == "linear")
+	return delta_sig_block_size::linear;
+    if(funname == "log2")
+	return delta_sig_block_size::log2;
+    if(funname == "square2")
+	return delta_sig_block_size::square2;
+    if(funname == "square3")
+	return delta_sig_block_size::square3;
+    throw Erange("line_tools_string_to_sig_block_function", gettext("unknown name give for delta signature block len function"));
 }
 
 ///////////////////

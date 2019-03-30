@@ -1,3 +1,11 @@
+from 2.6.2 to 2.6.3
+- feature enhancement: added option to specify the block size used to
+  create delta signatures.
+- feature enhancement: added the ability to provide login for sftp/ftp
+  remote access, that contain @ and other special characters.
+- fixed bug in dar_xform, leading dar not finding source archive if
+  destination was not placed in the same directory as source
+
 from 2.6.1 to 2.6.2
 - fixed incoherence in documentation
 - updating in-lined help information (-h option)

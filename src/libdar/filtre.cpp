@@ -83,7 +83,8 @@ namespace libdar
 			   bool make_delta_diff,         //< whether delta diff is allowed
 			   infinint & new_wasted_bytes,  //< new amount of wasted bytes to return to the caller.
 			   set<string> ignored_as_symlink, //< list of file to ignore as symlink and fetch the proper mtime
-			   bool repair_mode);        //< if set, try to fix CRC and size problem flagging such fixed files as dirty
+			   bool repair_mode,         //< if set, try to fix CRC and size problem flagging such fixed files as dirty
+			   U_I signature_block_size); //< block size of delta signatures
 
     static bool save_ea(const shared_ptr<user_interaction> & dialog,
 			const string & info_quoi,
@@ -156,6 +157,7 @@ namespace libdar
 				     cat_file * e_file,
 				     const cat_file * ref_file,
 				     const pile_descriptor & pdesc,
+				     U_I signature_block_size,
 				     bool info_details,
 				     bool display_treated,
 				     const catalogue & cat);
@@ -563,7 +565,8 @@ namespace libdar
 			   bool delta_diff,
 			   bool auto_zeroing_neg_dates,
 			   const set<string> & ignored_symlinks,
-			   modified_data_detection mod_data_detect)
+			   modified_data_detection mod_data_detect,
+			   const delta_sig_block_size & delta_sig_block_len)
     {
 	if(!dialog)
 	    throw SRC_BUG; // dialog points to nothing
@@ -754,6 +757,8 @@ namespace libdar
 
 				    try
 				    {
+					U_I sig_bl; // stores the delta sig block len for this file
+
 					f_ino = snapshot ? nullptr : f_ino;
 					f_file = snapshot ? nullptr : f_file;
 
@@ -891,6 +896,14 @@ namespace libdar
 					    // during small inode dump for that file, the flag telling a delta_sig is present will be set
 
 
+					    // CALCULATING THE SIGNATURE BLOCK SIZE
+
+					if(e_file != nullptr)
+					    sig_bl = delta_sig_block_len.calculate(e_file->get_size());
+					else
+					    sig_bl = 0;
+
+
 					    // PERFORMING ACTION FOR ENTRY (cat_entree dump, eventually data dump)
 
 					if(!save_inode(dialog,
@@ -913,7 +926,8 @@ namespace libdar
 						       make_delta_diff,
 						       wasted_bytes,
 						       ignored_symlinks,
-						       false))
+						       false,
+						       sig_bl))
 					    st.incr_tooold(); // counting a new dirty file in archive
 
 					st.set_byte_amount(wasted_bytes);
@@ -1369,6 +1383,7 @@ namespace libdar
 	thread_cancellation thr_cancel;
 	string perimeter;
 	shared_ptr<memory_file> delta_sig;
+	U_I sig_block_len;
 
 	if(!dialog)
 	    throw SRC_BUG; // dialog points to nothing
@@ -1430,7 +1445,7 @@ namespace libdar
 
 				do
 				{
-				    generic_file *dat = e_file->get_data(cat_file::normal, nullptr, nullptr);
+				    generic_file *dat = e_file->get_data(cat_file::normal, nullptr, 0, nullptr);
 				    if(dat == nullptr)
 					throw Erange("filtre_test", gettext("Can't read saved data."));
 
@@ -1520,7 +1535,7 @@ namespace libdar
 			    {
 				    // reading the delta signature
 
-				e_file->read_delta_signature(delta_sig);
+				e_file->read_delta_signature(delta_sig, sig_block_len);
 				if(delta_sig)
 				    delta_sig.reset();
 
@@ -1646,7 +1661,8 @@ namespace libdar
 		      bool delta_signature,
 		      bool build_delta_sig,
 		      const infinint & delta_sig_min_size,
-		      const mask & delta_mask)
+		      const mask & delta_mask,
+		      const delta_sig_block_size & signature_block_size)
     {
 	crit_action *decr = nullptr; // will point to a locally allocated crit_action
 	    // for decremental backup (argument overwrite is ignored)
@@ -1710,7 +1726,8 @@ namespace libdar
 			   delta_mask,
 			   abort,
 			   thr_cancel,
-			   false);
+			   false,
+			   signature_block_size);
     }
 
     void filtre_merge_step0(const shared_ptr<user_interaction> & dialog,
@@ -2623,7 +2640,8 @@ namespace libdar
 			    const mask & delta_mask,
 			    bool & abort,
 			    thread_cancellation & thr_cancel,
-			    bool repair_mode)
+			    bool repair_mode,
+			    const delta_sig_block_size & signature_block_size)
     {
 	compression stock_algo = pdesc.compr->get_algo();
 	defile juillet = FAKE_ROOT;
@@ -2731,6 +2749,7 @@ namespace libdar
 			// deciding whether we calculate (not just transfer) delta signature
 
 		    bool calculate_delta_signature = false;
+		    U_I sig_bl = 0; // stores the signature block len
 
 		    if(e_file != nullptr)
 		    {
@@ -2765,12 +2784,14 @@ namespace libdar
 					    {
 						e_file->will_have_delta_signature_available();
 						calculate_delta_signature = true;
+						sig_bl = signature_block_size.calculate(e_file->get_size());
 					    }
 					    break;
 					case cat_file::normal:
 					case cat_file::plain:
 					    e_file->will_have_delta_signature_available();
 					    calculate_delta_signature = true;
+					    sig_bl = signature_block_size.calculate(e_file->get_size());
 					    break;
 					default:
 					    throw SRC_BUG;
@@ -2810,7 +2831,9 @@ namespace libdar
 				   false,    // delta_diff
 				   fake_repeat,   // current_wasted_bytes
 				   set<string>(), // empty list for ignored_as_symlink
-				   repair_mode))
+				   repair_mode,
+				   sig_bl))
+
 			throw SRC_BUG;
 		    else // succeeded saving
 		    {
@@ -2991,7 +3014,8 @@ namespace libdar
 			   bool delta_diff,
 			   infinint & current_wasted_bytes,
 			   set<string> ignored_as_symlink,
-			   bool repair_mode)
+			   bool repair_mode,
+			   U_I signature_block_size)
     {
 	bool ret = true;
 	infinint current_repeat_count = 0;
@@ -3004,6 +3028,7 @@ namespace libdar
 	bool resave_uncompressed = false;
 	infinint rewinder = pdesc.stack->get_position(); // we skip back here if data must be saved uncompressed
 	shared_ptr<memory_file> delta_sig_ref; // holds the delta_signature that will be used as reference for delta patch later on
+	U_I sig_ref_block_len;
 	const crc *result_crc = nullptr;
 
 	if(pdesc.compr == nullptr)
@@ -3028,7 +3053,7 @@ namespace libdar
 
 			// fetching the delta signature to base the patch on
 
-		    ref_fic->read_delta_signature(delta_sig_ref);
+		    ref_fic->read_delta_signature(delta_sig_ref, sig_ref_block_len);
 		    if(!delta_sig_ref)
 			throw SRC_BUG;
 
@@ -3060,6 +3085,7 @@ namespace libdar
 					 fic,
 					 ref_fic,
 					 pdesc,
+					 signature_block_size,
 					 info_details,
 					 display_treated,
 					 cat);
@@ -3123,7 +3149,7 @@ namespace libdar
 				case cat_file::keep_compressed:
 				    if(fic->get_compression_algo_read() != fic->get_compression_algo_write())
 					keep_mode = cat_file::keep_hole;
-				    source = fic->get_data(keep_mode, nullptr, nullptr);
+				    source = fic->get_data(keep_mode, nullptr, signature_block_size, nullptr);
 				    break;
 				case cat_file::keep_hole:
 				    if(delta_signature && !fic->get_sparse_file_detection_read())
@@ -3131,10 +3157,12 @@ namespace libdar
 					delta_sig.reset(new (nothrow) memory_file());
 					if(!delta_sig)
 					    throw Ememory("saved_inode");
-					source = fic->get_data(cat_file::normal, delta_sig, shared_ptr<memory_file>());
+					source = fic->get_data(cat_file::normal, delta_sig, signature_block_size, shared_ptr<memory_file>());
+					if(display_treated)
+					    dialog->message(tools_printf(gettext("building delta signature with block size of %d bytes"), signature_block_size));
 				    }
 				    else
-					source = fic->get_data(keep_mode, nullptr, nullptr);
+					source = fic->get_data(keep_mode, nullptr, signature_block_size, nullptr);
 				    break;
 				case cat_file::normal:
 				    if(delta_signature)
@@ -3145,10 +3173,12 @@ namespace libdar
 				    }
 
 				    if(fic->get_sparse_file_detection_read()) // source file already holds a sparse_file structure
-					source = fic->get_data(cat_file::plain, delta_sig, delta_sig_ref, & result_crc);
+					source = fic->get_data(cat_file::plain, delta_sig, signature_block_size, delta_sig_ref, & result_crc);
 					// we must hide the holes for it can be redetected
 				    else
-					source = fic->get_data(cat_file::normal, delta_sig, delta_sig_ref, & result_crc);
+					source = fic->get_data(cat_file::normal, delta_sig, signature_block_size, delta_sig_ref, & result_crc);
+				    if(display_treated)
+					dialog->message(tools_printf(gettext("building delta signature with block size of %d bytes"), signature_block_size));
 				    break;
 				case cat_file::plain:
 				    throw SRC_BUG; // save_inode must never be called with this value
@@ -3549,16 +3579,21 @@ namespace libdar
 
 				if(fic->has_delta_signature_structure() && !loop)
 				{
+				    U_I block_size = signature_block_size; // by default signature has been calculated with this given block size
+
 				    if(display_treated)
 					dialog->message(string(gettext("Dumping delta signature structure for saved file: ")) + info_quoi);
 
-				    if(!delta_sig) // no delta_sig go calculated during this save_inode() execution
+				    if(!delta_sig) // no delta_sig got calculated during this save_inode() execution
 				    {
 					if(!delta_diff)
 					{
 						// merging context, signature not calculated here but already existing: we need to transfer it
 					    if(fic->has_delta_signature_available() || repair_mode)
-						fic->read_delta_signature(delta_sig);
+						fic->read_delta_signature(delta_sig, block_size);
+						// overriden block_size by the value of the signature
+						// we have just read. As we won't recalculate it, in the present
+						// case, we have to properly record its block size
 					}
 					    // else delta diff without delta signature, storing en empty zero length signature
 					    // delta_sig stays equal to nullptr
@@ -3632,7 +3667,7 @@ namespace libdar
 				    try
 				    {
 					if(delta_sig)
-					    fic->dump_delta_signature(delta_sig, *(pdesc.compr), pdesc.esc != nullptr);
+					    fic->dump_delta_signature(delta_sig, block_size, *(pdesc.compr), pdesc.esc != nullptr);
 					else
 					    fic->dump_delta_signature(*(pdesc.compr), pdesc.esc != nullptr);
 				    }
@@ -4444,6 +4479,7 @@ namespace libdar
 				     cat_file * e_file,
 				     const cat_file * ref_file,
 				     const pile_descriptor & pdesc,
+				     U_I signature_block_size,
 				     bool info_details,
 				     bool display_treated,
 				     const catalogue & cat)
@@ -4452,6 +4488,7 @@ namespace libdar
 	   && e_file->has_delta_signature_structure())
 	{
 	    shared_ptr<memory_file> sig;
+	    U_I block_size = signature_block_size;
 
 	    try
 	    {
@@ -4463,7 +4500,9 @@ namespace libdar
 
 		    if(ref_file->has_delta_signature_available())
 		    {
-			ref_file->read_delta_signature(sig);
+			ref_file->read_delta_signature(sig, block_size);
+			    // overwriting block size to fit the block
+			    // size used to create this signature
 			if(!sig)
 			    throw SRC_BUG;
 		    }
@@ -4510,7 +4549,7 @@ namespace libdar
 				if(!sig)
 				    throw Ememory("filtre_sauvegarde");
 
-				data = e_file->get_data(cat_file::normal, sig, nullptr);
+				data = e_file->get_data(cat_file::normal, sig, block_size, nullptr);
 				if(data == nullptr)
 				    throw Ememory("filtre_sauvegarde");
 				data->copy_to(trou_noir, crc_size, patch_sig_crc);
@@ -4537,18 +4576,18 @@ namespace libdar
 			if(data != nullptr)
 			    delete data;
 		    }
-		    else // no data or delta patch is availablle
+		    else // no data or delta patch is available
 		    {
 			if(e_file->get_saved_status() == saved_status::delta)
 			    throw SRC_BUG;
-			e_file->read_delta_signature(sig);
+			e_file->read_delta_signature(sig, block_size);
 		    }
 		}
 
 		cat.pre_add_delta_sig(&pdesc);
 		pdesc.compr->suspend_compression();
 		if(sig)
-		    e_file->dump_delta_signature(sig, *(pdesc.compr), pdesc.esc != nullptr);
+		    e_file->dump_delta_signature(sig, block_size, *(pdesc.compr), pdesc.esc != nullptr);
 		else
 		    e_file->dump_delta_signature(*(pdesc.compr), pdesc.esc != nullptr);
 	    }

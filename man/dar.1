@@ -1,4 +1,4 @@
-.TH DAR 1 "January 19th, 2019"
+.TH DAR 1 "March 30th, 2019"
 .UC 8
 .SH NAME
 dar \- creates, tests, lists, extracts, compares, merges, isolates, repairs dar archives
@@ -185,14 +185,15 @@ or
 .TP 3
 login
 is optional, if not provided it defaults to
-.B anonymous
+.B anonymous.
+If the login string comports an @ it need to be escaped by \\\\ (a pair of backshashes) to avoid libdar considering it the hostname starting part. Exemple: login is me@here.com host is www.example.org gives: sftp://me\\\\@here.com@www.example.org/some/file. You may also need to escape the same way any other special characters like for exampl ecolumn (:) slash (/) if they are part of the login string.
 .TP 3
 password
 if login is provided, the associated password may be given after a column (:) but this exposes the secret password to other
 users of the current system having access the table of process (using top, ps, /proc or other ways). If the login is given without password, the password will be asked interactively by dar at run time, which is much more secure. Alternatives are either to rely on ~/.netrc for FTP and also SFTP (!) transfers for that you need to use the --alter=file-authentication option (see below), or for SFTP only on public key authentication (you can also use --alter=file-authentication in that case to avoid a password being asked interactively). Note that passphrase support for sftp key is not (yet) supported.
 .TP 3
 hostname
-is the name or IP address of the host to connect to. For sftp the server's public key is checked against the ~/.ssh/known_host file (or the file pointed to by then environment variable DAR_SFTP_KNOWNHOST_FILE, see more details about that variable at the bottom of this man page), the host must be known and the public key received from the network must match the one in that file, else dar aborts. If thus you want to operate with a new sftp server, first use ssh of sftp commands to do the usual fingerprint verifications which updates the known_hosts file accordingly, then run dar/libdar toward this sftp server.
+is the name or IP address of the host to connect to. For sftp the server's public key is checked against the ~/.ssh/known_hosts file (or the file pointed to by then environment variable DAR_SFTP_KNOWNHOST_FILE, see more details about that variable at the bottom of this man page), the host must be known and the public key received from the network must match the one in that file, else dar aborts. If thus you want to operate with a new sftp server, first use ssh of sftp commands to do the usual fingerprint verifications which updates the known_hosts file accordingly, then run dar/libdar toward this sftp server.
 .TP 3
 port
 if not provided, dar will use the default/standard port in regard to the protocol specified in the "proto" field
@@ -980,6 +981,46 @@ or
 option is specified; in that case the delta signatures are transfered/dropped and if not present calculated accordingly to these mask options. However note that it is not possible to calculate delta signature for unsaved files in the archive of reference (because the archive of reference does not hold their data) as well as for fully saved files when merging is performed keeping files compressed (see -ak option). Another restriction while merging concernes sparse files, it is not possible to calculate binary signature for file stored as sparse files, but if sparse file detection mechanism is activated at merging time, delta signature can be calculated for sparse files too even if it is missing in the reference archive. In short: if you want recalculation of delta signature while merging, do not keep file compressed (do not use -ak option) and if you want to avoid having sparse files excluded from the delta signature recalcutation, activate sparse file detection (use -ah option). Delta signature transfer is not possible for on-fly isolation, you need to do normal atchive isolation to obtain an isolated catalogue with delta signatures.
 .RE
 .TP 20
+-8, --delta sig:<function>:<multiplier>[:<divisor>[:<min>[:<max>]]]
+this variant of '--delta sig' option let you specify the block len used to build delta signatures. Larger values reduce CPU load required to build delta signature, but also lead to less accuracy when computing delta binary, which means larger delta patch and more data saved when a file has changed. The block length is calculated following the formula:
+.B
+block_len = function(filesize)*multiplier/divisor
+If this calculated value is lower than "min", it is set to min. If the calculated value is greater than "max" it is set to max unless max is set to zero in which case the value is kept as is. Of course "divisor" cannot be null. The avalaible functions are:
+.RS
+.TP 5
+fixed
+always returns 1, in other terms, the block size is indepent from the file size to build delta signature for
+.TP
+linear
+returns the filesize. here, you will most of the time use 1 for multiplier and increase divisor to at least 10 for it makes sense
+.TP
+log2
+returns the upper rounded power of 2 to the file size (base 2 logarithm).
+.TP
+square2
+returns the approximated value of the square root of the file size. Note that for better performance and as accurary is not important here, this function is implemented as exp2(log2(filesize)/2) where exp2 and log2 are based ont the integer left and right bit shift operations.
+.TP
+square3
+returns the approximated value of the cube root of filesize, implemented as exp2(log(filesize)/3)
+.RE
+.BR
+.BR
+.RS
+All numerical fields can receive multiplier suffix (k, M, ...) for more details about these suffixes, see -s option description. If not specified
+.B
+"max"
+defaults to zero (no maximum value defined). If not specified
+.B
+"min"
+defaults to RS_DEFAULT_BLOCK_LEN (see below for details on this symbol). If not specified
+.B
+"divisor"
+defaults to 1. Using "--delta sig" without additional fields is equivalent to using
+.B --delta sig:fixed:RS_DEFAULT_BLOCK_LEN
+where "RS_DEFAULT_BLOCK_LEN" is taken from librsync and is today equal to 2048 bytes (which may well change in the future by the way if librsync maintainers decide to do so).
+.RE
+
+.TP 20
 -{, --include-delta-sig <mask>
 .RS
 By default when
@@ -1469,7 +1510,7 @@ DAR_DUC_PATH
 if set, dar looks for Dar User Command (DUC files, see -E, -F, -~, -= options) that do not have a fully qualified path in the directories listed in DAR_DUC_PATH. This variable receives a column (:) separated list of paths and looks in each of them in turn, up to the first file found under the requested name.
 .TP 10
 DAR_SFTP_KNOWNHOSTS_FILE
-if set, dar will not use the $HOME/.ssh/known_hosts file to check sftp remote server authenticity but the file given as value for this environment variable. Note that setting this variable to an empty string completely disable host validation, which is not recommended. Dar the command line interface program for dar archive relies on libdar for archive format management which relies on libcurl for network transfer which in turn relies on libssh2 for all that concerns sftp protocol. In the known_hosts file, libssh2 does not support recent lines like those with "ecdsa-sha2-nistp256" in second argument but only supports "ssh-rsa" lines. Check libssh2 documentations and litterature for more details about that limitation.
+if set, dar will not use the $HOME/.ssh/known_hosts file to check sftp remote server authenticity but the file given as value for this environment variable. Note that setting this variable to an empty string completely disable host validation, which is not recommended. Dar, the command line interface program for dar archive relies on libdar for archive format management which relies on libcurl for network transfer which in turn relies on libssh2 for all that concerns sftp protocol. In the known_hosts file, libssh2 does not support recent lines like those with "ecdsa-sha2-nistp256" in second argument but only supports "ssh-rsa" lines. Check libssh2 documentations and litterature for more details about that limitation. To workaround this limitation you need to disable known hosts validation or set up a restricted known hosts file without any "ecdsa*" entry and have DAR_SFTP_KNOWNHOSTS_FILE pointing to it.
 .TP 10
 DAR_SFTP_PUBLIC_KEYFILE
 by default dar will fetch the public key file in $HOME/.ssh/id_rsa.pub file. If you use the former id_dsa.pub or more recent key types you need to set this environment variable to point to the appropriated filename

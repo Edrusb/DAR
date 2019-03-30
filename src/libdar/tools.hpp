@@ -708,7 +708,27 @@ namespace libdar
 	}
     }
 
-	/// @}
+
+        /// compute an approximate log2 of the argument
+
+    extern infinint tools_upper_rounded_log2(const infinint & ref);
+
+
+        /// compute an approximate exp2 of the argument
+
+    extern infinint tools_lower_rounded_exp2(const infinint & ref);
+
+
+        /// compute an approximate square root of the argument
+
+    extern infinint tools_rounded_square_root(const infinint & ref);
+
+
+        /// compute an approximate cube root of the argument
+
+    extern infinint tools_rounded_cube_root(const infinint & ref);
+
+        /// @}
 
 } /// end of namespace
 

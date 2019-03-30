@@ -167,7 +167,7 @@ static void test()
         cat->add(p);
         if(f != nullptr)
         {
-            generic_file *entree = f->get_data(cat_file::normal, nullptr, nullptr);
+            generic_file *entree = f->get_data(cat_file::normal, nullptr, 0, nullptr);
 
             try
             {

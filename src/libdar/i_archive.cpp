@@ -489,6 +489,7 @@ namespace libdar
 				   options.get_modified_data_detection(),
 				   options.get_iteration_count(),
 				   options.get_kdf_hash(),
+				   options.get_sig_block_len(),
 				   progressive_report);
 		exploitable = false;
 		stack.terminate();
@@ -709,6 +710,7 @@ namespace libdar
 				 modified_data_detection::any_inode_change, // not used for merging
 				 options.get_iteration_count(),
 				 options.get_kdf_hash(),
+				 options.get_sig_block_len(),
 				 st_ptr);
 
 		exploitable = false;
@@ -861,6 +863,7 @@ namespace libdar
 			     modified_data_detection::any_inode_change, // not used for repairing
 			     src.pimpl->ver.get_iteration_count(),
 			     src.pimpl->ver.get_kdf_hash(),
+			     delta_sig_block_size(), // sig block size is not used for repairing, build_delta_sig is set to false above
 			     &not_filled);        // statistics
 
 		// stealing src's catalogue, our's is still empty at this step
@@ -1558,7 +1561,8 @@ namespace libdar
 					       sequential_read,
 					       options.get_has_delta_mask_been_set(),
 					       options.get_delta_mask(),
-					       options.get_delta_sig_min_size());
+					       options.get_delta_sig_min_size(),
+					       options.get_sig_block_len());
 	    }
 	    else
 		    // we drop the delta signature as they will never be used
@@ -1929,6 +1933,7 @@ namespace libdar
 						modified_data_detection mod_data_detect,
 						const infinint & iteration_count,
 						hash_algo kdf_hash,
+						const delta_sig_block_size & sig_block_len,
 						statistics * progressive_report)
     {
         statistics st = false;  // false => no lock for this internal object
@@ -2091,6 +2096,7 @@ namespace libdar
 			 mod_data_detect,
 			 iteration_count,
 			 kdf_hash,
+			 sig_block_len,
 			 st_ptr);
 
 	return *st_ptr;
@@ -2166,6 +2172,7 @@ namespace libdar
 					      modified_data_detection mod_data_detect,
 					      const infinint & iteration_count,
 					      hash_algo kdf_hash,
+					      const delta_sig_block_size & sig_block_len,
 					      statistics * st_ptr)
     {
 	try
@@ -2351,7 +2358,8 @@ namespace libdar
 					      delta_diff,
 					      zeroing_neg_date,
 					      ignored_symlinks,
-					      mod_data_detect);
+					      mod_data_detect,
+					      sig_block_len);
 				// build_delta_sig is not used for archive creation it is always implied when delta_signature is set
 			}
 			catch(...)
@@ -2398,7 +2406,8 @@ namespace libdar
 				     delta_signature,
 				     build_delta_sig,
 				     delta_sig_min_size,
-				     delta_mask);
+				     delta_mask,
+				     sig_block_len);
 			break;
 		    case oper_repair:
 			if(info_details)
@@ -2435,7 +2444,8 @@ namespace libdar
 					       delta_mask,
 					       aborting,
 					       thr_cancel,
-					       true);
+					       true,
+					       delta_sig_block_size()); // we will not recalculate delta signature upon repairing
 
 				// at this step, cat (the current archive's catalogue) is still empty
 				// we will need to add ref_cat1's content at the end of the archive
