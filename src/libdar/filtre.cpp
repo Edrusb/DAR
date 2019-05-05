@@ -3170,6 +3170,8 @@ namespace libdar
 					delta_sig.reset(new (nothrow) memory_file());
 					if(!delta_sig)
 					    throw Ememory("save_inode");
+					if(display_treated)
+					    dialog->message(tools_printf(gettext("building delta signature with block size of %d bytes"), signature_block_size));
 				    }
 
 				    if(fic->get_sparse_file_detection_read()) // source file already holds a sparse_file structure
@@ -3177,8 +3179,6 @@ namespace libdar
 					// we must hide the holes for it can be redetected
 				    else
 					source = fic->get_data(cat_file::normal, delta_sig, signature_block_size, delta_sig_ref, & result_crc);
-				    if(display_treated)
-					dialog->message(tools_printf(gettext("building delta signature with block size of %d bytes"), signature_block_size));
 				    break;
 				case cat_file::plain:
 				    throw SRC_BUG; // save_inode must never be called with this value
