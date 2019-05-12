@@ -1,6 +1,8 @@
 from 2.6.3 to 2.6.4
 - fixed display bug indicating delta signature were about to be
   calculated even when this was not the case.
+- updating dar man page about the fact aes256 replaced blowfish as
+  the default strong encryption algorithm
 
 from 2.6.2 to 2.6.3
 - feature enhancement: added option to specify the block size used to
