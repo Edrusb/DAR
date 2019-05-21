@@ -1034,7 +1034,14 @@ namespace libdar
 					    else
 						tosave = true;
 
+					    if(ignode == nullptr)
+						throw SRC_BUG;
+
 					    ignode->set_saved_status(tosave && !snapshot ? saved_status::saved : saved_status::not_saved);
+
+						// this creates the escape sequence mark
+					    cat.pre_add(ignode);
+					    cat.pre_add(&tmp_eod);
 					}
 					catch(...)
 					{
