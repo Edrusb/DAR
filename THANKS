@@ -1,3 +1,8 @@
+version 2.5.21
+--------------
+Thanks to Mike on dar-support mailing-list for bug report and clear
+scenario to be able to reproduce it.
+
 version 2.5.19
 --------------
 Thanks to Tobias Specht for feedback

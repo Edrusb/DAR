@@ -1,3 +1,9 @@
+from 2.5.20 to 2.5.21
+- bug fix: -D option used at creation time was not adding escape mark
+  of skipped directories. This lead the empty directories that would
+  replace each skipped one to be inaccessible and unable to be restored
+  only in sequential read mode (it worked as expected in direct mode)
+
 from 2.5.19 to 2.5.20
 - adding a warning when restoring a unix socket if the path to that
   socket is larger than what the sockaddr_un system structure can handle
