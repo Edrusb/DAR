@@ -1,3 +1,13 @@
+from 2.6.3 to 2.6.4
+- fixed display bug indicating delta signatures were about to be
+  calculated even when this was not the case.
+- updating dar man page about the fact aes256 replaced blowfish as
+  the default strong encryption algorithm
+- bug fix: -D option used at creation time was not adding escape mark
+  of skipped directories. This lead the empty directories that would
+  replace each skipped one to be inaccessible and unable to be restored
+  only in sequential read mode (it worked as expected in direct mode)
+
 from 2.6.2 to 2.6.3
 - feature enhancement: added option to specify the block size used to
   create delta signatures.
@@ -122,6 +132,13 @@ from 2.5.x to 2.6.0
   will setup a libdar64 in place of infinint based libdar by default.
   You can still build a infinint based libdar by passing
   --enable-mode=infinint to the ./configure script.
+
+from 2.5.20 to 2.5.21
+- bug fix: -D option used at creation time was not adding escape mark
+  of skipped directories. This lead the empty directories that would
+  replace each skipped one to be inaccessible and unable to be restored
+  only in sequential read mode (it worked as expected in direct mode)
+
 
 from 2.5.19 to 2.5.20
 - adding a warning when restoring a unix socket if the path to that
