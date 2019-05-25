@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 version 2.6.4
 --------------
 Thanks to Gulikosa for feedback and bug report and documentation
@@ -37,12 +36,11 @@ Tobias Specht for feedback and for providing gdar a graphical frontend
 to libdar. Note that gdar will not yet compile with dar 2.6.0, I will fix
 that with Tobias's help with a next dar/libdar 2.6.x releases in a few
 weeks.
-=======
+
 version 2.5.21
 --------------
 Thanks to Mike on dar-support mailing-list for bug report and clear
 scenario to be able to reproduce it.
->>>>>>> branch_2.5.x
 
 version 2.5.19
 --------------
