@@ -215,6 +215,9 @@ bell:
 # full backup of reference
 # usage: dar -+ new_full -A old_ref_full -@ diff full-from-diff
 #
+# can also be used to rebuild a full backup from a decremental
+# backup and a full backup
+# usage: dar -+ old_full -A recent_fill -@ decr full-from-diff
 
 full-from-diff:
 -/ '{!(~I)}[Rr] {~S}[O*] P* ; {~s}[*o] *p'
