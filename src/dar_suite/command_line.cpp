@@ -14,7 +14,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
@@ -1887,7 +1887,7 @@ static void show_license(shell_interaction & dialog)
     dialog.printf("                Version 2, June 1991\n");
     dialog.printf("\n");
     dialog.printf(" Copyright (C) 1989, 1991 Free Software Foundation, Inc.\n");
-    dialog.printf("                       59 Temple Place, Suite 330, Boston, MA  02111-1307  USA\n");
+    dialog.printf("                       51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.\n");
     dialog.printf(" Everyone is permitted to copy and distribute verbatim copies\n");
     dialog.printf(" of this license document, but changing it is not allowed.\n");
     dialog.printf("\n");
@@ -2169,7 +2169,7 @@ static void show_license(shell_interaction & dialog)
     dialog.printf("\n");
     dialog.printf("    You should have received a copy of the GNU General Public License\n");
     dialog.printf("    along with this program; if not, write to the Free Software\n");
-    dialog.printf("    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA\n");
+    dialog.printf("    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.\n");
     dialog.printf("\n");
     dialog.printf("\n");
     dialog.printf("Also add information on how to contact you by electronic and paper mail.\n");
