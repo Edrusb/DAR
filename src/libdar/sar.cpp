@@ -653,7 +653,11 @@ namespace libdar
 		    h.write(get_ui(), *of_fd);
 		}
 		else
+		{
+		    if(!of_fd->skip((of_current > 1 ? slicing.other_size : slicing.first_size) - 1))
+			throw SRC_BUG; // cannot skip at end of slice
 		    of_fd->write(&flag, 1);
+		}
 	    }
 
 		// telling the system to free this file from the cache
