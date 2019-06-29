@@ -1,3 +1,6 @@
+from 2.5.21 to 2.5.22
+- removed useless skip() in cache layer
+
 from 2.5.20 to 2.5.21
 - bug fix: -D option used at creation time was not adding escape mark
   of skipped directories. This lead the empty directories that would

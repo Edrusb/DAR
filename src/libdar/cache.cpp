@@ -159,10 +159,7 @@ namespace libdar
 	    if(!tmp_next.is_zero())
 		throw SRC_BUG;
 	    if(first_to_write > next && first_to_write != size)
-	    {
-		ref->skip(buffer_offset + next);
 		first_to_write = next;
-	    }
 
 	    return true;
 	}
