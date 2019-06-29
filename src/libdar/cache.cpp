@@ -418,7 +418,8 @@ namespace libdar
 
 	if(need_flush_write()) // we have something to flush
 	{
-	    ref->skip(buffer_offset + first_to_write);
+	    if(!ref->skip(buffer_offset + first_to_write))
+		throw SRC_BUG; // cannot flush write data !!!
 	    ref->write(buffer + first_to_write, last - first_to_write);
 	}
 	first_to_write = size;
