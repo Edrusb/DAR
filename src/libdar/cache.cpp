@@ -117,6 +117,8 @@ namespace libdar
 			return ref->skippable(skip_forward, forw - backw);
 		}
 	    case skip_backward:
+		if(need_flush_write())
+		    flush_write();
 		if(ref->get_position() >= buffer_offset)
 		{
 		    infinint backw = ref->get_position() - buffer_offset  + amount;
