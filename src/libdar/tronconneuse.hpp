@@ -127,6 +127,9 @@ namespace libdar
 	void inherited_write(const char *a, U_I size);
 
 	    /// this protected inherited method is now private for inherited classes of tronconneuse
+	void inherited_truncate(const infinint & pos) { throw SRC_BUG; }; // no skippability in write mode, so no truncate possibility neither
+
+	    /// this protected inherited method is now private for inherited classes of tronconneuse
 	void inherited_sync_write() { flush(); };
 
 	    /// this protected inherited method is now private for inherited classes of tronconneuse

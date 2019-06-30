@@ -324,6 +324,20 @@ namespace libdar
 	current += wrote;
     }
 
+    void tronc::inherited_truncate(const infinint & pos)
+    {
+	if(limited)
+	{
+	    if(pos < sz)
+		ref->truncate(start + pos);
+		// else there is nothing to do
+	}
+	else
+	    ref->truncate(start + pos);
+
+	set_back_current_position();
+    }
+
     void tronc::set_back_current_position()
     {
 	if(is_terminated())

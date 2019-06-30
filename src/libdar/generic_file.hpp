@@ -181,6 +181,14 @@ namespace libdar
 	    /// skip relatively to the current position
         virtual bool skip_relative(S_I x) = 0;
 
+	    /// truncate file at the given offset
+
+	    /// \param[in] pos is the offset of the eof file, in other word the pos - 1 is the last byte of the
+	    /// file (if its size is greater than 1)
+	    /// \note exception thrown in case of error
+	    /// \note if current file position is after the point to truncate, it is skip back to the new end of file
+	virtual void truncate(const infinint & pos);
+
 	    /// get the current read/write position
         virtual infinint get_position() const = 0;
 
@@ -287,6 +295,16 @@ namespace libdar
 	    /// \param[in] size amount of data to write
 	    /// \note must either write all data or report an error by throwing an exception
         virtual void inherited_write(const char *a, U_I size) = 0;
+
+	    /// truncate file at the give offset
+
+	    /// \note if pos is greater than the current file size, this call may do nothing (not even enlarging the file)
+	    /// \note this call should always fail on a read-only generic_file
+	    /// \note if truncating leads to have position after the new end of file, this call should set the offset
+	    /// to the new end of file
+	    /// \note implementation must throw exception if truncate is not possible for other reason than
+	    /// read/write access mode
+	virtual void inherited_truncate(const infinint & pos) = 0;
 
 
 	    /// write down any pending data

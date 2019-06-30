@@ -76,6 +76,7 @@ namespace libdar
 	};
 
 	void inherited_sync_write() {};
+	void inherited_truncate(const infinint & pos) {};
 	void inherited_flush_read() {};
 	void inherited_terminate() {};
     };

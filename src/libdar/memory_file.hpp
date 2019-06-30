@@ -62,6 +62,7 @@ namespace libdar
 	void inherited_read_ahead(const infinint & amount) {}; // no optimization can be done here, we rely on the OS here
 	U_I inherited_read(char *a, U_I size);
 	void inherited_write(const char *a, U_I size);
+	void inherited_truncate(const infinint & pos);
 	void inherited_sync_write() {};
 	void inherited_flush_read() {};
 	void inherited_terminate() {};

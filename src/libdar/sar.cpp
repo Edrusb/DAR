@@ -599,6 +599,42 @@ namespace libdar
         return lu;
     }
 
+    void sar::inherited_truncate(const infinint & pos)
+    {
+	infinint dest_file, offset;
+	infinint high_num;
+
+	    // locate the slice and relative offset where to cut
+
+	slicing.which_slice(pos,
+			    dest_file,
+			    offset);
+
+	if(of_last_file_known && of_last_file_num < dest_file)
+	    return; // nothing to do
+
+	    // must skip backward if we are in a slice following
+	    // the truncate position because we cannot keep the current slice opened
+	if(of_current > dest_file)
+	    skip(pos);
+
+	    // truncating the current slice to offset
+
+	if(of_fd == nullptr)
+	    throw SRC_BUG;
+
+	of_fd->truncate(offset);
+
+	    // removing slices after the current slice
+
+	sar_tools_remove_higher_slices_than(*entr,
+					    base,
+					    min_digits,
+					    ext,
+					    of_current,
+					    get_ui());
+    }
+
     void sar::inherited_write(const char *a, U_I to_write)
     {
         infinint max_at_once;

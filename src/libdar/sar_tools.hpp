@@ -58,9 +58,16 @@ namespace libdar
 						   const infinint & min_digits,
 						   const std::string & ext, infinint & ret);
 
+    extern void sar_tools_remove_higher_slices_than(entrepot & entr,
+						    const std::string & base_name,
+						    const infinint & min_digits,
+						    const std::string & ext,
+						    const infinint & higher_slice_num_to_keep,
+						    user_interaction & ui);
+
+
     extern std::string sar_tools_make_padded_number(const std::string & num,
 						    const infinint & min_digits);
-
 
 } // end of namespace
 

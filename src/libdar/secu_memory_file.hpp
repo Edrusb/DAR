@@ -72,6 +72,7 @@ namespace libdar
 	void inherited_read_ahead(const infinint & amount) {};
 	U_I inherited_read(char *a, U_I size);
 	void inherited_write(const char *a, U_I size);
+	void inherited_truncate(const infinint & pos) { throw Efeature("truncate a secu_memory_file object"); };
 	void inherited_sync_write() {};
 	void inherited_flush_read() {};
 	void inherited_terminate() {};

@@ -166,6 +166,7 @@ namespace libdar
 	void inherited_read_ahead(const infinint & amount);
         U_I inherited_read(char *a, U_I size);
         void inherited_write(const char *a, U_I size);
+	void inherited_truncate(const infinint & pos);
 	void inherited_sync_write() {}; // nothing to do
 	void inherited_flush_read() {}; // nothing to do
 	void inherited_terminate();
@@ -183,7 +184,7 @@ namespace libdar
             // these following variables are modified by open_file / open_file_init
             // else the are used only for reading
         infinint of_current;         //< number of the open slice
-	infinint size_of_current;    //< size of the current slice (used in reading mode only)
+	infinint size_of_current;    //< size of the current slice (or expected max size in write mode)
         infinint of_max_seen;        //< highest slice number seen so far
         bool of_last_file_known;     //< whether the T terminal slice has been met
         infinint of_last_file_num;   //< number of the last slice (if met)

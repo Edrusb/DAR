@@ -71,6 +71,7 @@ namespace libdar
 
 	    // virtual method inherited from generic_file
 	void inherited_read_ahead(const infinint & amount) {}; // no optimization can be done here, we rely on the OS here
+	void inherited_truncate(const infinint & pos) { data->truncate(pos); };
 	void inherited_sync_write() {};
 	void inherited_flush_read() {};
 	void inherited_terminate() {};

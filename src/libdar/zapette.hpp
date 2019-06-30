@@ -90,6 +90,7 @@ namespace libdar
 	void inherited_read_ahead(const infinint & amount) {}; // optimization will be done when zapette will use the messaging_encode/decode exchange format
         U_I inherited_read(char *a, U_I size);
         void inherited_write(const char *a, U_I size);
+	void inherited_truncate(const infinint & pos) { throw SRC_BUG; }; // read only object
 	void inherited_sync_write() {};
 	void inherited_flush_read() {};
 	void inherited_terminate();

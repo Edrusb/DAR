@@ -263,6 +263,27 @@ namespace libdar
         return ret;
     }
 
+    void fichier_local::inherited_truncate(const infinint & pos)
+    {
+	off_t offset = 0;
+	int ret;
+	infinint tmp_pos = pos;
+
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	tmp_pos.unstack(offset);
+	if(!tmp_pos.is_zero())
+	    throw Erange("fichier_local::inherited_truncate", gettext("File too large for the operating system to be truncate it at the needed position"));
+	ret = ftruncate(filedesc, offset);
+	if(ret != 0)
+	    throw Erange("fichier_local::inherited_truncate", string(dar_gettext("Error while calling system call truncate(): ")) + tools_strerror_r(errno));
+
+	if(get_position() > pos)
+	    skip_to_eof();
+    }
+
+
     bool fichier_local::fichier_global_inherited_read(char *a, U_I size, U_I & read, string & message)
     {
         ssize_t ret = -1;

@@ -93,6 +93,7 @@ namespace libdar
 	void inherited_read_ahead(const infinint & amount) { compressed->read_ahead(amount); };
         U_I inherited_read(char *a, U_I size) { return (this->*read_ptr)(a, size); };
         void inherited_write(const char *a, U_I size) { (this->*write_ptr)(a, size); };
+	void inherited_truncate(const infinint & pos);
 	void inherited_sync_write() { compr_flush_write(); };
 	void inherited_flush_read() { compr_flush_read(); clean_read(); };
 	void inherited_terminate() { local_terminate(); };

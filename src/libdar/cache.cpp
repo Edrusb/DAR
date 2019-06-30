@@ -353,6 +353,41 @@ namespace libdar
 	}
     }
 
+    void cache::inherited_truncate(const infinint & pos)
+    {
+	if(pos >= buffer_offset + last)
+	    ref->truncate(pos); // no impact on the cached data
+	else if(pos < buffer_offset)
+	{
+	    next = 0;   // emptying the cache
+	    last = 0;   // emptying the cache
+	    first_to_write = size; // dropping data pending for writing
+	    ref->truncate(pos);
+	    buffer_offset = ref->get_position();
+	    if(buffer_offset != pos)
+		throw SRC_BUG;
+	}
+	else // truncate in the middle of the cache
+	{
+		// we have: buffer_offset <= pos < buffer_offset + last
+	    infinint max_offset = pos - buffer_offset;
+	    U_I max_off = 0;
+
+	    max_offset.unstack(max_off);
+	    if(!max_offset.is_zero())
+		throw SRC_BUG;
+
+	    if(last > max_off)
+		last = max_off;
+	    if(next > max_off)
+		next = max_off;
+	    if(first_to_write >= last) // there is nothing more pending for writing
+		first_to_write = size;
+
+	    ref->truncate(pos);
+	}
+    }
+
     void cache::alloc_buffer(size_t x_size)
     {
 	if(buffer != nullptr)

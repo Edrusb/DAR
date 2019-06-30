@@ -99,6 +99,7 @@ namespace libdar
         U_I inherited_read(char *a, U_I size);
 	    /// inherited from generic_file
         void inherited_write(const char *a, U_I size);
+	void inherited_truncate(const infinint & pos);
 	void inherited_sync_write() { ref->sync_write(); }
 	void inherited_flush_read() {};
 	void inherited_terminate() {if(own_ref) ref->terminate(); };

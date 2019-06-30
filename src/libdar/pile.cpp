@@ -299,6 +299,18 @@ namespace libdar
 	    throw Erange("pile::skip", "Error: inherited_write() on empty stack");
     }
 
+    void pile::inherited_truncate(const infinint & pos)
+    {
+	if(stack.size() > 0)
+	{
+	    if(stack.back().ptr == nullptr)
+		throw SRC_BUG;
+	    stack.back().ptr->truncate(pos);
+	}
+	else
+	    throw Erange("pile::skip", "Error: inherited_write() on empty stack");
+    }
+
     void pile::sync_write_above(generic_file *ptr)
     {
 	vector<face>::reverse_iterator it = stack.rbegin();

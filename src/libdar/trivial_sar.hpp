@@ -111,6 +111,7 @@ namespace libdar
 	void inherited_read_ahead(const infinint & amount) { reference->read_ahead(amount); };
         U_I inherited_read(char *a, U_I size);
         void inherited_write(const char *a, U_I size);
+	void inherited_truncate(const infinint & pos) { reference->truncate(pos + offset); };
 	void inherited_sync_write() {};
 	void inherited_flush_read() {};
 	void inherited_terminate();
