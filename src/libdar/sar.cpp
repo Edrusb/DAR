@@ -1231,7 +1231,10 @@ namespace libdar
 		    throw Erange("sar::sar", gettext("First slice size is too small to even just be able to drop the slice header"));
 		if(slicing.other_slice_header >= slicing.other_size)
 		    throw Erange("sar::sar", gettext("Slice size is too small to even just be able to drop the slice header"));
+		size_of_current = slicing.first_size;
 	    }
+	    else
+		size_of_current = slicing.other_size;
 	}
 	catch(...)
 	{
