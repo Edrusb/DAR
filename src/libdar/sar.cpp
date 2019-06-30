@@ -1275,8 +1275,6 @@ namespace libdar
 		break;
 	    case gf_write_only:
 	    case gf_read_write:
-		if(num < of_current)
-		    throw Erange("sar::open_file", "Skipping backward would imply accessing/modifying previous slice");
 
 		    // adding the trailing flag
 		if(of_fd != nullptr)
