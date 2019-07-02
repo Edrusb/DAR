@@ -460,6 +460,7 @@ namespace libdar
 	    ref->write(buffer + first_to_write, last - first_to_write);
 	}
 	first_to_write = size;
+	next = last; // we have wrote up to last so we must update next for clear_buffer() to work as expected
 
 	if(shifted_mode)
 	    shift_by_half();
