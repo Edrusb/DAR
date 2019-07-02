@@ -117,6 +117,8 @@ namespace libdar
 			return ref->skippable(skip_forward, forw - backw);
 		}
 	    case skip_backward:
+		if(need_flush_write())
+		    flush_write();
 		if(ref->get_position() >= buffer_offset)
 		{
 		    infinint backw = ref->get_position() - buffer_offset  + amount;
@@ -159,10 +161,7 @@ namespace libdar
 	    if(!tmp_next.is_zero())
 		throw SRC_BUG;
 	    if(first_to_write > next && first_to_write != size)
-	    {
-		ref->skip(buffer_offset + next);
 		first_to_write = next;
-	    }
 
 	    return true;
 	}
@@ -476,10 +475,12 @@ namespace libdar
 
 	if(need_flush_write()) // we have something to flush
 	{
-	    ref->skip(buffer_offset + first_to_write);
+	    if(!ref->skip(buffer_offset + first_to_write))
+		throw SRC_BUG; // cannot flush write data !!!
 	    ref->write(buffer + first_to_write, last - first_to_write);
 	}
 	first_to_write = size;
+	next = last; // we have wrote up to last so we must update next for clear_buffer() to work as expected
 
 	if(shifted_mode)
 	    shift_by_half();

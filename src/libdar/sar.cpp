@@ -628,7 +628,22 @@ namespace libdar
 		    h.write(get_ui(), *of_fd);
 		}
 		else
+		{
+		    if(terminal)
+		    {
+			if(!of_fd->skip_to_eof())
+			    throw SRC_BUG;
+		    }
+		    else
+		    {
+			if(!of_fd->skip((of_current > 1 ? slicing.other_size : slicing.first_size) - 1))
+			    throw SRC_BUG; // cannot skip at end of slice
+		    }
+		    if(of_fd->get_position() > (of_current > 1 ? slicing.other_size : slicing.first_size) - 1)
+			throw SRC_BUG;
+
 		    of_fd->write(&flag, 1);
+		}
 	    }
 
 		// telling the system to free this file from the cache
@@ -1210,8 +1225,6 @@ namespace libdar
 		break;
 	    case gf_write_only:
 	    case gf_read_write:
-		if(num < of_current)
-		    throw Erange("sar::open_file", "Skipping backward would imply accessing/modifying previous slice");
 
 		    // adding the trailing flag
 		if(of_fd != nullptr)
