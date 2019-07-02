@@ -615,7 +615,7 @@ namespace libdar
 
 	    // must skip backward if we are in a slice following
 	    // the truncate position because we cannot keep the current slice opened
-	if(of_current > dest_file)
+	if(pos < get_position())
 	    skip(pos);
 
 	    // truncating the current slice to offset
