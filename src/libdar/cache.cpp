@@ -118,7 +118,8 @@ namespace libdar
 		}
 	    case skip_backward:
 		if(need_flush_write())
-		    flush_write();
+		    flush_write(); // before skipping we would first have to write the pending data so we do int
+		    // now for the underlay provides a coherent answer from skippable now with the effective skip at later time
 		if(ref->get_position() >= buffer_offset)
 		{
 		    infinint backw = ref->get_position() - buffer_offset  + amount;
