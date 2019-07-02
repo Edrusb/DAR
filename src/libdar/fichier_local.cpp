@@ -275,6 +275,10 @@ namespace libdar
 	tmp_pos.unstack(offset);
 	if(!tmp_pos.is_zero())
 	    throw Erange("fichier_local::inherited_truncate", gettext("File too large for the operating system to be truncate it at the needed position"));
+
+	if(offset >= get_eof_offset())
+	    return; // will not expand the file size
+
 	ret = ftruncate(filedesc, offset);
 	if(ret != 0)
 	    throw Erange("fichier_local::inherited_truncate", string(dar_gettext("Error while calling system call truncate(): ")) + tools_strerror_r(errno));
@@ -516,5 +520,26 @@ namespace libdar
 #endif
     }
 
+    off_t fichier_local::get_eof_offset() const
+    {
+	off_t ret;
+	off_t tmp;
+	off_t cur = lseek(filedesc, 0, SEEK_CUR);
+
+	if(cur < 0)
+	    throw Erange("fichier_local::get_eof_offset()", string("Error while reading current file offset: ") + tools_strerror_r(errno));
+
+	ret = lseek(filedesc, 0, SEEK_END);
+	if(ret < 0)
+	    throw Erange("fichier_local::get_eof_offset()", string("Error while reading current file offset: ") + tools_strerror_r(errno));
+
+	tmp = lseek(filedesc, cur, SEEK_SET);
+	if(tmp < 0)
+	    throw Erange("fichier_local::get_eof_offset()", string("Error while seeking back to previous offset: ") + tools_strerror_r(errno));
+	if(tmp != cur)
+	    throw SRC_BUG;
+
+	return ret;
+    }
 
 } // end of namespace

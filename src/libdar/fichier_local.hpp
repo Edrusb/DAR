@@ -139,6 +139,8 @@ namespace libdar
 	    /// would stay in the cache more time than necessary
 	void fsync() const;
 
+	off_t get_eof_offset() const;
+
     };
 
 	/// @}
