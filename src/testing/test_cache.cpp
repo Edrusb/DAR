@@ -144,6 +144,33 @@ void f2()
     buffer[99] = '\0';
     c.skip_to_eof();
     c.write("*",1);
+
+    c.truncate(5);
+    c.skip(3);
+    c.read(buffer, 2);
+    c.write(buf+5,strlen(buf)-5);
+    if(!c.skippable(generic_file::skip_backward, 2))
+	throw SRC_BUG;
+    c.truncate(10);
+    c.skip(8);
+    c.read(buffer, 2);
+    c.write(buf+10, strlen(buf)-10);
+    c.write(" !!", 3);
+    if(!c.skippable(generic_file::skip_backward, 2))
+	throw SRC_BUG;
+    c.truncate(15);
+    c.skip(13);
+    c.read(buffer, 2);
+    c.write(" !?!A<20", 8);
+    c.write("!2345*");
+    c.skip(20);
+    c.read(buffer,2);
+    c.write("coucou");
+    if(!c.skippable(generic_file::skip_backward, 10))
+	throw SRC_BUG;
+    c.truncate(c.get_position() - 12);
+    c.read(buffer, 2);
+    c.write("bye", 3);
 }
 
 
