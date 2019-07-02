@@ -825,9 +825,10 @@ namespace libdar
 
     void escape::inherited_truncate(const infinint & pos)
     {
-	if(pos < get_position())
-	    skip(pos);
 	x_below->truncate(pos);
+	if(pos < get_position())
+	  if(!skip(pos))
+	    throw SRC_BUG;
     }
 
     char escape::type2char(sequence_type x)
