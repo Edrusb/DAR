@@ -618,6 +618,12 @@ namespace libdar
 	if(pos < get_position())
 	    skip(pos);
 
+	if(dest_file < of_current)
+	    throw SRC_BUG; // the previous skip() show
+
+	if(dest_file > of_current)
+	    return; // truncating after eof
+
 	    // truncating the current slice to offset
 
 	if(of_fd == nullptr)
