@@ -42,6 +42,10 @@ to libdar. Note that gdar will not yet compile with dar 2.6.0, I will fix
 that with Tobias's help with a next dar/libdar 2.6.x releases in a few
 weeks.
 
+version 2.5.22
+--------------
+Thanks to Jeremy (jjfaith@sourcefroge) for bug report
+
 version 2.5.21
 --------------
 Thanks to Mike on dar-support mailing-list for bug report and clear

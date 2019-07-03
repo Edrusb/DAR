@@ -1,6 +1,18 @@
 from 2.6.4 to 2.6.5
 - fixed bug: dar crashed when the HOME environment variable was not
   defined (for example running dar from crontab)
+- removed useless skip() in cache layer
+- cache layer improvement flushing write pending data before asking
+  lower layer about skippability
+- fixed bug met when several consecutive compressed files asked to
+  be compressed failed being compressed any further by libdar. In that
+  situation as expected, libdar tries to skip backward and stores the
+  file uncompressed. However the cache layer was introducing an offset
+  of a few bytes leading the next file to be written over the end of the
+  previous one, which dar reported as data corruption when testing the
+  archive.
+- updating licensing information with the new address of the FSF
+
 
 from 2.6.3 to 2.6.4
 - fixed display bug indicating delta signatures were about to be
@@ -136,6 +148,21 @@ from 2.5.x to 2.6.0
   will setup a libdar64 in place of infinint based libdar by default.
   You can still build a infinint based libdar by passing
   --enable-mode=infinint to the ./configure script.
+
+from 2.5.21 to 2.5.22
+- removed useless skip() in cache layer
+- cache layer improvement flushing write pending data before asking
+  lower layer about skippability
+- fixed bug met when several consecutive compressed files asked to
+  be compressed failed being compressed any further by libdar. In that
+  situation as expected, libdar tries to skip backward and stores the
+  file uncompressed. However the cache layer was introducing an offset
+  of a few bytes leading the next file to be written over the end of the
+  previous one, which dar reported as data corruption when testing the
+  archive.
+- updating licensing information with the new address of the FSF
+- fixing bug met when restoring file having FSA but EA and overwriting
+  an existing file in filesystem
 
 from 2.5.20 to 2.5.21
 - bug fix: -D option used at creation time was not adding escape mark
