@@ -1667,7 +1667,7 @@ namespace libdar
 			    if(data_restored == done_data_restored && x_dir == nullptr)
 				make_owner_perm(get_ui(), *x_ino, spot_display, true, what_to_check, get_fsa_scope());
 
-			    if(has_fsa_saved || has_ea_saved)
+			    if(has_ea_saved)
 			    {
 				    // if linux capabilities were restored, changing ownership let them
 				    // been removed by the system. And doing restoration of EA after ownership

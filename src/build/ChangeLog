@@ -10,6 +10,8 @@ from 2.5.21 to 2.5.22
   previous one, which dar reported as data corruption when testing the
   archive.
 - updating licensing information with the new address of the FSF
+- fixing bug met when restoring file having FSA but EA and overwriting
+  an existing file in filesystem
 
 from 2.5.20 to 2.5.21
 - bug fix: -D option used at creation time was not adding escape mark
