@@ -81,6 +81,8 @@ namespace libdar
     protected:
 
 	    // virtual method inherited from generic_file
+
+	virtual void inherited_truncate(const infinint & pos) override { data->truncate(pos); };
 	virtual void inherited_read_ahead(const infinint & amount) override {}; // no optimization can be done here, we rely on the OS here
 	virtual void inherited_sync_write() override {};
 	virtual void inherited_flush_read() override {};

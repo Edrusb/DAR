@@ -64,10 +64,10 @@ protected:
     virtual void inherited_read_ahead(const infinint & amount) override { ref->read_ahead(amount); };
     virtual U_I inherited_read(char *a, U_I size) override;
     virtual void inherited_write(const char *a, size_t size) override;
+    virtual void inherited_truncate(const infinint & pos) override { throw Efeature("truncate a hide file"); };
     virtual void inherited_sync_write() override {};
     virtual void inherited_flush_read() override {};
     virtual void inherited_terminate() override {};
-
     virtual void fill_morceau() = 0;
         // the inherited classes have with this method
         // to fill the "morceau" variable that defines

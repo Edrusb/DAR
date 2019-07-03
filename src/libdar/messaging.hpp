@@ -71,7 +71,9 @@ namespace libdar
 	answr_readahead_stopped,  //< no argument: answer that the readahead has ended or no read ahead was running
 	order_wakeup,             //< no argument: order to continue reading/writing loop (reading suspendend because of pipe full, writing because of pipe was empty)
 	data_partial,             //< + data     : beside data in input/output data pipes
-	data_completed            //< + data     : beside data in output data pipe when EOF has been reached
+        data_completed,           //< + data     : beside data in output data pipe when EOF has been reached
+        order_truncate,           //< + infinint : message is an order to truncate at given position
+        answer_truncate_done      //< no argument: truncate done
     };
 
     extern bool msg_equivalent(msg_type arg1, msg_type arg2);
@@ -106,7 +108,7 @@ namespace libdar
 	    /// get the type of message pointed to at construction time
 	msg_type get_type() const { return msgt; };
 
-	    /// for messages of type order_skip, answr_filesize, order_read_ahead, answr_filesize,
+	    /// for messages of type order_skip, answr_filesize, order_read_ahead, answr_filesize, order_truncate
 	infinint get_infinint() const;
 
 	    /// for messages of type order_read

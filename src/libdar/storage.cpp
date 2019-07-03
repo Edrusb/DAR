@@ -357,6 +357,18 @@ namespace libdar
         }
     }
 
+    void storage::truncate(const infinint & pos)
+    {
+	if(pos < size())
+	{
+	    iterator it;
+	    infinint amount = size() - pos;
+
+	    it.skip_to(*this, pos);
+	    remove_bytes_at_iterator(it, amount);
+	}
+    }
+
     void storage::fusionne(struct cellule *a_first, struct cellule *a_last, struct cellule *b_first, struct cellule *b_last,
                            struct cellule *&res_first, struct cellule * & res_last)
     {

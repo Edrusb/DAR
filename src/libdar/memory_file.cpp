@@ -121,4 +121,11 @@ namespace libdar
 	position += size - ret;
     }
 
+    void memory_file::inherited_truncate(const infinint & pos)
+    {
+	data.truncate(pos);
+	if(position > pos)
+	    position = pos;
+    }
+
 }  // end of namespace

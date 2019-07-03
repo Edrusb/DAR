@@ -354,6 +354,26 @@ namespace libdar
 	while(wrote < size);
     }
 
+    void generic_thread::inherited_truncate(const infinint & pos)
+    {
+	    // rerun the thread if an exception has occured previously
+	my_run();
+
+	    // preparing the order message
+
+	order.clear();
+	order.set_type(msg_type::order_truncate);
+	order.set_infinint(pos);
+
+	    // order completed
+	send_order();
+	read_answer();
+	check_answer(msg_type::answer_truncate_done);
+	release_block_answer();
+
+	purge_data_pipe();
+    }
+
     void generic_thread::inherited_sync_write()
     {
 	    // rerun the thread if an exception has occured previously

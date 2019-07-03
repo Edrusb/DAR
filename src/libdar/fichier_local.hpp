@@ -112,6 +112,7 @@ namespace libdar
 
     protected :
 	    // inherited from generic_file grand-parent class
+	virtual void inherited_truncate(const infinint & pos) override;
 	virtual void inherited_read_ahead(const infinint & amount) override {}; // nothing done, calling readahead(2) could be added in the future
 	virtual void inherited_sync_write() override { fsync(); };
 	virtual void inherited_flush_read() override {}; // nothing stored in transit in this object
@@ -143,6 +144,8 @@ namespace libdar
 	    /// before calling fadvise(advise_dontneed) else write pending blocks
 	    /// would stay in the cache more time than necessary
 	void fsync() const;
+
+	off_t get_eof_offset() const;
 
     };
 

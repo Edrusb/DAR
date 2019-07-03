@@ -158,6 +158,33 @@ namespace libdar
         return somme;
     }
 
+    void sar_tools_remove_higher_slices_than(entrepot & entr,
+					     const string & base_name,
+					     const infinint & min_digits,
+					     const string & ext,
+					     const infinint & higher_slice_num_to_keep,
+					     user_interaction & ui)
+    {
+        infinint cur;
+	string entry;
+
+	try
+	{
+	    entr.read_dir_reset();
+	}
+	catch(Erange & e)
+	{
+	    return;
+	}
+
+	while(entr.read_dir_next(entry))
+	    if(sar_tools_extract_num(entry, base_name, min_digits, ext, cur))
+	    {
+		if(cur > higher_slice_num_to_keep)
+		    entr.unlink(entry);
+	    }
+    }
+
     string sar_tools_make_padded_number(const string & num,
 					const infinint & min_digits)
     {

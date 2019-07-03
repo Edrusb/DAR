@@ -554,7 +554,7 @@ namespace libdar
 		tmp = 0; // simulating an end of slice
 
 	    if(tmp == 0)
-		if(of_flag == flag_type_terminal)
+                if(of_flag == flag_type_terminal || get_mode() != gf_read_only)
 		    loop = false;
 		else
 		    if(is_current_eof_a_normal_end_of_slice())
@@ -581,6 +581,48 @@ namespace libdar
         }
 
         return lu;
+    }
+
+    void sar::inherited_truncate(const infinint & pos)
+    {
+	infinint dest_file, offset;
+	infinint high_num;
+
+	    // locate the slice and relative offset where to cut
+
+	slicing.which_slice(pos,
+			    dest_file,
+			    offset);
+
+	if(of_last_file_known && of_last_file_num < dest_file)
+	    return; // nothing to do
+
+	    // must skip backward if we are in a slice following
+	    // the truncate position because we cannot keep the current slice opened
+	if(pos < get_position())
+	    skip(pos);
+
+	if(dest_file < of_current)
+	    throw SRC_BUG; // the previous skip() show
+
+	if(dest_file > of_current)
+	    return; // truncating after eof
+
+	    // truncating the current slice to offset
+
+	if(of_fd == nullptr)
+	    throw SRC_BUG;
+
+	of_fd->truncate(offset);
+
+	    // removing slices after the current slice
+
+	sar_tools_remove_higher_slices_than(*entr,
+					    base,
+					    min_digits,
+					    ext,
+					    of_current,
+					    get_ui());
     }
 
     void sar::inherited_write(const char *a, U_I to_write)
@@ -1182,7 +1224,10 @@ namespace libdar
 		    throw Erange("sar::sar", gettext("First slice size is too small to even just be able to drop the slice header"));
 		if(slicing.other_slice_header >= slicing.other_size)
 		    throw Erange("sar::sar", gettext("Slice size is too small to even just be able to drop the slice header"));
+		size_of_current = slicing.first_size;
 	    }
+	    else
+		size_of_current = slicing.other_size;
 	}
 	catch(...)
 	{

@@ -113,6 +113,7 @@ namespace libdar
  	virtual bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message) override;
 
 	    // inherited from generic_file
+	virtual void inherited_truncate(const infinint & pos) override { throw SRC_BUG; }; // truncate not supported on hash files
 	virtual void inherited_sync_write() override {};
 	virtual void inherited_flush_read() override {};
 	virtual void inherited_terminate() override;

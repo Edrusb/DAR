@@ -829,6 +829,14 @@ namespace libdar
 	}
     }
 
+    void escape::inherited_truncate(const infinint & pos)
+    {
+	x_below->truncate(pos);
+	if(pos < get_position())
+	  if(!skip(pos))
+	    throw SRC_BUG;
+    }
+
     char escape::type2char(sequence_type x)
     {
 	switch(x)

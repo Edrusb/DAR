@@ -100,6 +100,7 @@ namespace libdar
         virtual U_I inherited_read(char *a, U_I size) override;
 	    /// inherited from generic_file
         virtual void inherited_write(const char *a, U_I size) override;
+	virtual void inherited_truncate(const infinint & pos) override;
 	virtual void inherited_sync_write() override { ref->sync_write(); }
 	virtual void inherited_flush_read() override {};
 	virtual void inherited_terminate() override {if(own_ref) ref->terminate(); };

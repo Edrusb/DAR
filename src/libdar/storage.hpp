@@ -175,6 +175,7 @@ namespace libdar
         void insert_as_much_as_necessary_const_byte_to_be_as_wider_as(const storage & ref, const iterator & it, unsigned char value);
         void remove_bytes_at_iterator(iterator it, U_I number);
         void remove_bytes_at_iterator(iterator it, infinint number);
+	void truncate(const infinint & pos);
 
     private:
         struct cellule *first, *last;

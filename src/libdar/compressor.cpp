@@ -320,6 +320,17 @@ namespace libdar
 	}
     }
 
+    void compressor::inherited_truncate(const infinint & pos)
+    {
+	if(pos < get_position())
+	{
+	    compr_flush_write();
+	    compr_flush_read();
+	    clean_read();
+	}
+	compressed->truncate(pos);
+    }
+
     void compressor::local_terminate()
     {
         if(compr != nullptr)

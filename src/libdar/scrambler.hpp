@@ -63,6 +63,7 @@ namespace libdar
 	virtual void inherited_read_ahead(const infinint & amount) override { ref->read_ahead(amount); };
         virtual U_I inherited_read(char *a, U_I size) override;
         virtual void inherited_write(const char *a, U_I size) override;
+	virtual	void inherited_truncate(const infinint & pos) { ref->truncate(pos); };
 	virtual void inherited_sync_write() override {}; // nothing to do
 	virtual void inherited_flush_read() override {}; // nothing to do
 	virtual void inherited_terminate() override {};  // nothing to do

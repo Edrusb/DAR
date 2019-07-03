@@ -416,6 +416,17 @@ namespace libdar
 	return ret;
     }
 
+    void generic_file::truncate(const infinint & pos)
+    {
+	if(terminated)
+	    throw SRC_BUG;
+
+	if(rw == gf_write_only || rw == gf_read_write)
+	    inherited_truncate(pos);
+	else
+	    throw Erange("generic_file::truncate", gettext("Cannot truncate a read-only generic_file"));
+    }
+
     void generic_file::sync_write()
     {
 	if(terminated)
