@@ -33,12 +33,13 @@ extern "C"
 #include "entrepot_local.hpp"
 #include "sar.hpp"
 #include "trivial_sar.hpp"
+#include "tools.hpp"
 #include <string>
 
 using namespace libdar;
 using namespace std;
 
-static user_interaction *ui = nullptr;
+static shared_ptr<user_interaction> ui;
 static void f1();
 static void f2();
 static void f3();
@@ -51,21 +52,19 @@ int main()
 
     get_version(maj, med, min);
 
-    ui = new (nothrow) shell_interaction(&cout, &cerr, false);
-    if(ui == nullptr)
+    ui.reset(new (nothrow) shell_interaction(cout, cerr, false));
+    if(!ui)
 	cout << "ERREUR !" << endl;
     f1();
     f2();
     f3();
     f4();
     f5();
-    if(ui != nullptr)
-	delete ui;
 }
 
 static void f1()
 {
-    fichier_local fic(*ui, "toto.txt", gf_read_write, 0644, false, true, false);
+    fichier_local fic(ui, "toto.txt", gf_read_write, 0644, false, true, false);
     string message = "bonjour les amis, il fait beau, il fait chaud, le soleil brille et les cailloux fleurissent";
 
     fic.write(message.c_str(), message.size());
@@ -133,11 +132,11 @@ static void f4()
     string message = "0123456789ABCDEF";
     char buffer[100];
     U_I lu = 0;
-    entrepot_local entrep("", "", false);
-    entrep.set_location(tools_getcwd());
+    shared_ptr<entrepot> entrep(new entrepot_local("", "", false));
+    entrep->set_location(tools_getcwd());
     label lab;
     lab.generate_internal_filename();
-    sar puzzle(*ui,
+    sar puzzle(ui,
 	       gf_read_write,
 	       "toto",
 	       "test",
@@ -151,7 +150,7 @@ static void f4()
 	       lab,
 	       false, // force permission
 	       0777,  // permission
-	       hash_none,
+	       hash_algo::none,
 	       2,     // min_digits
 	       false,
 	       "");
@@ -169,11 +168,11 @@ static void f4()
     puzzle.truncate(5);
     puzzle.write(message.c_str(), message.size());
 
-    trivial_sar triv(*ui,
+    trivial_sar triv(ui,
 		     gf_read_write,
 		     "tutu",
 		     "test",
-		     entrep,
+		     *entrep,
 		     lab,
 		     lab,
 		     "",
@@ -181,7 +180,7 @@ static void f4()
 		     false,
 		     false,
 		     0777,
-		     hash_none,
+		     hash_algo::none,
 		     2,
 		     false);
 
