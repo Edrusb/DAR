@@ -162,7 +162,7 @@ namespace libdar
 		    ret->d_name[max_alloc_filename] = '\0'; // yes, one byte is allocated for the terminal zero
 		    if(strlen(ret->d_name) >= max_alloc_filename)
 		    {
-			ui.message(tools_printf(gettext("Filename provided by the operating system seems truncated in directory %s ignoring it: %s"), dirname, ret->d_name));
+			ui.message(tools_printf(gettext("Filename provided by the operating system seems truncated in directory %s, storing filename as is: %s"), dirname, ret->d_name));
 			continue;
 		    }
 #else
