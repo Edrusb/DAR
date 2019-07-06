@@ -12,6 +12,8 @@ from 2.5.21 to 2.5.22
 - updating licensing information with the new address of the FSF
 - fixing bug met when restoring file having FSA but EA and overwriting
   an existing file in filesystem
+- clarifying message about possibily truncated filename returned by the
+  operating system
 
 from 2.5.20 to 2.5.21
 - bug fix: -D option used at creation time was not adding escape mark
