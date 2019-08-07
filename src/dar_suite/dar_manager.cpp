@@ -1298,7 +1298,7 @@ static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const
     compression algozip; // not used here neither
     shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
 
-    if(shelli != nullptr)
+    if(shelli == nullptr)
 	throw SRC_BUG;
 
     if(dat == nullptr)
