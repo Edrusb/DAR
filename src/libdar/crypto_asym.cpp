@@ -99,7 +99,7 @@ namespace libdar
 	    has_signatories = true;
 	}
 #else
-	throw Efeature("Asymetric Strong encryption algorithms using GPGME");
+	throw Ecompilation("Asymetric Strong encryption algorithms using GPGME");
 #endif
     }
 
@@ -146,7 +146,7 @@ namespace libdar
 	}
 	release_key_list(ciphering_keys);
 #else
-	throw Efeature("Asymetric Strong encryption algorithms using GPGME");
+	throw Ecompilation("Asymetric Strong encryption algorithms using GPGME");
 #endif
     }
 
@@ -175,7 +175,7 @@ namespace libdar
 	    throw Erange("crypto_asym::decrypt", string(gettext("Unexpected error reported by GPGME: ")) + tools_gpgme_strerror_r(err));
 	}
 #else
-	throw Efeature("Asymetric Strong encryption algorithms using GPGME");
+	throw Ecompilation("Asymetric Strong encryption algorithms using GPGME");
 #endif
     }
 
