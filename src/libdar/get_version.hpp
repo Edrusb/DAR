@@ -92,7 +92,7 @@ namespace libdar
         /// \param[out] medium the medium number of the version
         /// \param[out] minor the minor number of the version
         /// \param[in] init_libgcrypt whether to initialize libgcrypt if not already done (not used if libcrypt is not linked with libdar)
-        /// \param[in] init_gpgpme whether to initialize gpgme (not used if gpgme is not linked with libdar)
+        /// \param[in] init_gpgme whether to initialize gpgme (not used if gpgme is not linked with libdar)
         /// \note at the difference of the previous version this one allow the caller to
         /// avoid initializing gpgme.
     extern void get_version(U_I & major, U_I & medium, U_I & minor, bool init_libgcrypt, bool init_gpgme);
