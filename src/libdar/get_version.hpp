@@ -53,9 +53,9 @@ namespace libdar
 	///  libdar Major version defined at compilation time
     constexpr U_I LIBDAR_COMPILE_TIME_MAJOR = 6;
 	///  libdar Medium version defined at compilation time
-    constexpr U_I LIBDAR_COMPILE_TIME_MEDIUM = 1;
+    constexpr U_I LIBDAR_COMPILE_TIME_MEDIUM = 2;
 	///  libdar Minor version defined at compilation time
-    constexpr U_I LIBDAR_COMPILE_TIME_MINOR = 2;
+    constexpr U_I LIBDAR_COMPILE_TIME_MINOR = 0;
 
 
 	////////////////////////////////////////////////////////////////////////
@@ -84,6 +84,18 @@ namespace libdar
 	/// is the same as the libdar used at compilation time. See API tutorial for a
 	/// sample code.
     extern void get_version(U_I & major, U_I & medium, U_I & minor, bool init_libgcrypt = true);
+
+
+        /// returns the libdar version and make libdar initialization (may throw Exceptions)
+
+        /// \param[out] major the major number of the version
+        /// \param[out] medium the medium number of the version
+        /// \param[out] minor the minor number of the version
+        /// \param[in] init_libgcrypt whether to initialize libgcrypt if not already done (not used if libcrypt is not linked with libdar)
+        /// \param[in] init_gpgme whether to initialize gpgme (not used if gpgme is not linked with libdar)
+        /// \note at the difference of the previous version this one allow the caller to
+        /// avoid initializing gpgme.
+    extern void get_version(U_I & major, U_I & medium, U_I & minor, bool init_libgcrypt, bool init_gpgme);
 
 	/// this method is to be used when you don't want to bother with major, medium and minor
     extern void get_version(bool init_libgcrypt = true);

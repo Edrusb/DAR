@@ -129,7 +129,18 @@ int dar_suite_global(int argc,
 	if(!ui)
 	    throw Ememory("dar_suite_global");
 
-	get_version(maj, med, min);
+	try
+	{
+	    get_version(maj, med, min);
+	}
+	catch(Erange & e)
+	{
+	    if(e.get_source() == "libdar_init_gpgme")
+		ui->pause("INITIALIZATION FAILED FOR GPGME, missing gpg binary? Retry initializing without gpgme support, which may lead libdar to silently fail reading or writing gpg ciphered archive)?");
+	    close_and_clean();
+	    get_version(maj, med, min, true, false);
+	}
+
 	if(maj != LIBDAR_COMPILE_TIME_MAJOR || med < LIBDAR_COMPILE_TIME_MEDIUM)
 	{
 	    general_report(tools_printf(gettext("We have linked with an incompatible version of libdar. Expecting version %d.%d.x but having linked with version %d.%d.%d"), LIBDAR_COMPILE_TIME_MAJOR, LIBDAR_COMPILE_TIME_MEDIUM, maj, med, min));

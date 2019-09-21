@@ -1,3 +1,17 @@
+from 2.6.5 to 2.6.6
+- fixing script that builds windows binary packages to include missing
+  cygwin libraries
+- fixing bug: dar_manager batch command (-@ option) contains a inverted
+  test in a sanity check, leading the execution to systematically abort
+  reporting an internal error message.
+- fixed message error type when asymmetrical encryption is requested and
+  gpgme has not been activated at compilation time
+- fixed dar/libdar behavior when gpg binary is not available and gpgme
+  has been activated at compilation time. Instead of aborting, dar now
+  signal the gpgme error and proposes to retry initialization without
+  gpgme support. This makes sense for dar_static binary which stays
+  usable in that context when all options have been activated
+
 from 2.6.4 to 2.6.5
 - fixed bug: dar crashed when the HOME environment variable was not
   defined (for example running dar from crontab)

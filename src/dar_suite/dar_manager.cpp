@@ -64,7 +64,7 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_MANAGER_VERSION "1.8.1"
+#define DAR_MANAGER_VERSION "1.8.2"
 
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
@@ -1298,7 +1298,7 @@ static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const
     compression algozip; // not used here neither
     shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
 
-    if(shelli != nullptr)
+    if(shelli == nullptr)
 	throw SRC_BUG;
 
     if(dat == nullptr)
