@@ -4,7 +4,7 @@ from 2.6.5 to 2.6.6
 - fixing bug: dar_manager batch command (-@ option) contains a inverted
   test in a sanity check, leading the execution to systematically abort
   reporting an internal error message.
-- fixed message error type when asymetrical encryption is requested and
+- fixed message error type when asymmetrical encryption is requested and
   gpgme has not been activated at compilation time
 - fixed dar/libdar behavior when gpg binary is not available and gpgme
   has been activated at compilation time. Instead of aborting, dar now
