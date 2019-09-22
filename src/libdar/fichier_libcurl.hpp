@@ -115,6 +115,7 @@ namespace libdar
     protected:
 	    // inherited from generic_file grand-parent class
 	virtual void inherited_read_ahead(const infinint & amount) override;
+	virtual void inherited_truncate(const infinint & pos) override;
 	virtual void inherited_sync_write() override;
 	virtual void inherited_flush_read() override;
 	virtual void inherited_terminate() override;

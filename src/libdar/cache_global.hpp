@@ -97,6 +97,7 @@ namespace libdar
 
 	    // inherted from generic_file
 	virtual void inherited_read_ahead(const infinint & amount) override { buffer->read_ahead(amount); };
+	virtual void inherited_truncate(const infinint & pos) override { buffer->truncate(pos); };
 	virtual void inherited_sync_write() override { buffer->sync_write(); ptr->sync_write(); };
 	virtual void inherited_flush_read() override { buffer->flush_read();  };
 	virtual void inherited_terminate() override { buffer->terminate(); ptr->terminate(); };
