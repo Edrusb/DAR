@@ -309,7 +309,8 @@ namespace libdar
 
     void fichier_libcurl::inherited_truncate(const infinint & pos)
     {
-	throw Erange("fichier_libcurl::inherited_truncate", string(gettext("libcurl does not allow truncating at a given position while uploading files")));
+	if(pos != get_position())
+	    throw Erange("fichier_libcurl::inherited_truncate", string(gettext("libcurl does not allow truncating at a given position while uploading files")));
     }
 
     void fichier_libcurl::inherited_sync_write()
