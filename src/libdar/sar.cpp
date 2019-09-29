@@ -603,10 +603,10 @@ namespace libdar
 	    skip(pos);
 
 	if(dest_file < of_current)
-	    throw SRC_BUG; // the previous skip() show
+	    throw SRC_BUG; // the previous skip() should have avoided this situation
 
 	if(dest_file > of_current)
-	    return; // truncating after eof
+	    return; // truncating after eof, inherited_truncate should not expand a file
 
 	    // truncating the current slice to offset
 

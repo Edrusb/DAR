@@ -165,10 +165,17 @@ namespace libdar
 
 	    /// truncate file at the given offset
 
-	    /// \param[in] pos is the offset of the eof file, in other word the pos - 1 is the last byte of the
-	    /// file (if its size is greater than 1)
-	    /// \note exception thrown in case of error
-	    /// \note if current file position is after the point to truncate, it is skip back to the new end of file
+	    /// \param[in] pos is the offset of the where to cut the file, in other word the pos - 1 will be the last byte of the
+	    /// file (if its size is greater than 1). If pos is greater than EOF the implementation should not enlarge the file
+	    /// and may even no skip the file to its current eof. Though this request is not considered an error implementation
+	    /// can thus do nothing when asked to truncate after EOF.
+	    /// \note running this call on a read-only object will always yeld an exception
+	    /// \note if current file position is after the point to truncate, implementation has to skip back the current writing
+	    /// offset to the new end of file.
+	    /// \note implementation of backward skippability and truncate operation should be coherent: If its not possible to
+	    /// skip backward it should not be possible to truncate the file to this position. If truncate a file to requested
+	    /// position is not possible, it should not be possible to skip backward to that position. This skippable() with the
+	    /// skip_backward direction *should* indicate whether the truncate action will succeed or generate an exception
 	virtual void truncate(const infinint & pos);
 
 	    /// get the current read/write position
@@ -284,8 +291,6 @@ namespace libdar
 
 	    /// \note if pos is greater than the current file size, this call may do nothing (not even enlarging the file)
 	    /// \note this call should always fail on a read-only generic_file
-	    /// \note if truncating leads to have position after the new end of file, this call should set the offset
-	    /// to the new end of file
 	    /// \note implementation must throw exception if truncate is not possible for other reason than
 	    /// read/write access mode
 	virtual void inherited_truncate(const infinint & pos) = 0;
