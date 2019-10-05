@@ -403,6 +403,15 @@ namespace libdar
 	case msg_type::order_wakeup:
 	    wake_me = false;
 	    break;
+	case msg_type::order_truncate:
+	    treat_input_data();
+	    answer.set_type(msg_type::answer_truncate_done);
+	    data->truncate(order.get_infinint());
+	    read_ahead = 0; // all in transit data will be dropped by the master
+	    to_send_ahead = 0;
+	    endless_read_ahead = false;
+	    need_answer = true;
+	    break;
 	default:
 	    throw SRC_BUG;
 	}
