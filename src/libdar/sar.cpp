@@ -497,6 +497,33 @@ namespace libdar
         return true; // when x == 0
     }
 
+    bool sar::truncatable(const infinint & pos) const
+    {
+	infinint dest_file, offset;
+	infinint high_num;
+
+	    // locate the slice and relative offset where to cut
+
+	slicing.which_slice(pos,
+			    dest_file,
+			    offset);
+
+	if(of_last_file_known && of_last_file_num < dest_file)
+	    return true; // truncating after EOF
+
+	if(of_fd == nullptr)
+	    throw SRC_BUG;
+
+	if(dest_file < of_current)
+	    return of_fd->truncatable(0);
+	    // we test the ability to truncate for
+	    // the base objects
+	    // but we should also test the ability
+	    // to unlink()/delete a file from the entrepot
+	else
+	    return of_fd->truncatable(offset);
+    }
+
     infinint sar::get_position() const
     {
 	infinint delta = slicing.older_sar_than_v8 ? 0 : 1; // one byte less per slice with archive format >= 8

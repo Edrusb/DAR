@@ -93,6 +93,8 @@ namespace libdar
 	    /// inherited from generic_file
 	virtual bool skip_relative(S_I x) override;
 	    /// inherited from generic_file
+	virtual bool truncatable(const infinint & pos) const override { return false; };
+	    /// inherited from generic_file
 	virtual infinint get_position() const override { if(is_terminated()) throw SRC_BUG; return current_position; };
 
 	    /// in write_only mode indicate that end of file is reached

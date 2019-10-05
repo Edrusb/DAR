@@ -57,6 +57,7 @@ namespace libdar
         virtual bool skip(const infinint & pos) override { if(ref == nullptr) throw SRC_BUG; return ref->skip(pos); };
         virtual bool skip_to_eof() override { if(ref==nullptr) throw SRC_BUG; return ref->skip_to_eof(); };
         virtual bool skip_relative(S_I x) override { if(ref == nullptr) throw SRC_BUG; return ref->skip_relative(x); };
+	virtual bool truncatable(const infinint & pos) const override { return ref->truncatable(pos); };
         virtual infinint get_position() const override { if(ref == nullptr) throw SRC_BUG; return ref->get_position(); };
 
     protected:

@@ -163,6 +163,10 @@ namespace libdar
 	    /// skip relatively to the current position
         virtual bool skip_relative(S_I x) = 0;
 
+	    /// whether the implementation is able to truncate to the given position
+
+	virtual bool truncatable(const infinint & pos) const = 0;
+
 	    /// truncate file at the given offset
 
 	    /// \param[in] pos is the offset of the where to cut the file, in other word the pos - 1 will be the last byte of the
@@ -174,8 +178,8 @@ namespace libdar
 	    /// offset to the new end of file.
 	    /// \note implementation of backward skippability and truncate operation should be coherent: If its not possible to
 	    /// skip backward it should not be possible to truncate the file to this position. If truncate a file to requested
-	    /// position is not possible, it should not be possible to skip backward to that position. This skippable() with the
-	    /// skip_backward direction *should* indicate whether the truncate action will succeed or generate an exception
+	    /// position is not possible, it should not be possible to skip backward to that position. This truncatable() with the
+	    /// skip_backward direction *should* indicate whether the truncate() action will succeed or generate an exception
 	virtual void truncate(const infinint & pos);
 
 	    /// get the current read/write position

@@ -223,6 +223,34 @@ namespace libdar
 	return ret;
     }
 
+    bool generic_thread::truncatable(const infinint & pos) const
+    {
+	bool ret;
+	generic_thread *me = const_cast<generic_thread *>(this);
+
+	if(me == nullptr)
+	    throw SRC_BUG;
+
+	    // rerun the thread if an exception has occured previously
+	me->my_run();
+
+	    // preparing the order message
+
+	me->order.clear();
+	me->order.set_type(msg_type::order_truncatable);
+	me->order.set_infinint(pos);
+
+	    // order completed
+
+	me->send_order();
+	me->read_answer();
+	me->check_answer(msg_type::answer_truncatable);
+	ret = answer.get_bool();
+	me->release_block_answer();
+
+	return ret;
+    }
+
     infinint generic_thread::get_position() const
     {
 	infinint ret;

@@ -68,6 +68,7 @@ namespace libdar
 	virtual bool skip(const infinint & pos) override { return data->skip(pos); };
 	virtual bool skip_to_eof() override { return data->skip_to_eof(); };
 	virtual bool skip_relative(S_I x) override { return data->skip_relative(x); };
+	virtual bool truncatable(const infinint & pos) const override { return data->truncatable(pos); };
 	virtual infinint get_position() const override { return data->get_position(); };
 
 

@@ -107,6 +107,7 @@ namespace libdar
 	virtual bool skip(const infinint & pos) override {if(pos != 0 || !initial) throw SRC_BUG; else return true; };
 	virtual bool skip_to_eof() override { throw SRC_BUG; };
 	virtual bool skip_relative(S_I x) override { if(x != 0) throw SRC_BUG; else return true; };
+	virtual bool truncatable(const infinint & pos) const override { return pos == get_position(); };
 	virtual infinint get_position() const override { return x_below->get_position(); };
 
     protected:

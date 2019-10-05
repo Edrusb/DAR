@@ -74,6 +74,7 @@ namespace libdar
         virtual bool skip(const infinint &pos) override;
         virtual bool skip_to_eof() override { if(is_terminated()) throw SRC_BUG; position = file_size; return true; };
         virtual bool skip_relative(S_I x) override;
+	virtual bool truncatable(const infinint & pos) const override { return false; };
         virtual infinint get_position() const override { if(is_terminated()) throw SRC_BUG; return position; };
 
 	    // overwritten inherited methods from contextual

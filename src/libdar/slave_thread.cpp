@@ -412,6 +412,12 @@ namespace libdar
 	    endless_read_ahead = false;
 	    need_answer = true;
 	    break;
+	case msg_type::order_truncatable:
+	    treat_input_data();
+	    answer.set_type(msg_type::answer_truncatable);
+	    answer.set_bool(data->truncatable(order.get_infinint()));
+	    need_answer = true;
+	    break;
 	default:
 	    throw SRC_BUG;
 	}

@@ -217,6 +217,21 @@ namespace libdar
 	    throw Erange("pile::skip_relative", "Error: skip_relative() on empty stack");
     }
 
+    bool pile::truncatable(const infinint & pos) const
+    {
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	if(stack.size() > 0)
+	{
+	    if(stack.back().ptr == nullptr)
+		throw SRC_BUG;
+	    return stack.back().ptr->truncatable(pos);
+	}
+	else
+	    throw Erange("pile::truncatable", "Error: truncatable() on empty stack");
+    }
+
     infinint pile::get_position() const
     {
 	if(is_terminated())

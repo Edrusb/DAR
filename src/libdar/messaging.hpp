@@ -45,35 +45,37 @@ namespace libdar
 
     enum class msg_type
     {
-	unset,                    //< no argument: message type is not set (error)
-	order_read_ahead,         //< + infinint : messge is an info that the given amount of data is about to be read
-	order_read_ahead_begin,   //< + infinint : message continues with the next block
-	order_read,               //< + U_I      : message is a read order (with expected size to be read ahead)
-	order_sync_write,         //< no argument: order to flush all pending writes
-	answr_sync_write_done,    //< no argument: answer from the slave that all data have been sync written
-	order_skip,               //< + infinint : message is an order to seek at given position
-	order_skip_begin,         //< + infinint : message is an order to seek but the seek info continues in the next message
-	order_skip_to_eof,        //< no argument: message requesting slave to skip to end of file
-	order_skip_fwd,           //< + U_I      : order to skip foward
-	order_skip_bkd,           //< + U_I      : order to skip backward
-	answr_skip_done,          //< + bool     : answer for all kind of skip orders
-	order_skippable_fwd,      //< + infinint : message from master containing a skippable forward request info
-	order_skippable_fwd_begin,//< + infinint : message continues on the next block
-	order_skippable_bkd,      //< + infinint : message from master containing a skippable backward request info
-	order_skippable_bkd_begin,//< + infinint : message continues on the next block
-	answr_skippable,          //< + bool     : answer from slace to a skippable forward/backward request
-	order_get_position,       //< no argument: order to get the current position in file
-	answr_position,           //< + infinint : answer with the current position
-	answr_position_begin,     //< + infinint : message continues with the next block
-	answr_exception,          //< no argument: last operation generated an exception for at slave side, slave has probably died after that
-	order_end_of_xmit,        //< no argument: message is the last message and implies freedom of the slave
-        order_stop_readahead,     //< no argument: order to stop possibly running read_ahead
-	answr_readahead_stopped,  //< no argument: answer that the readahead has ended or no read ahead was running
-	order_wakeup,             //< no argument: order to continue reading/writing loop (reading suspendend because of pipe full, writing because of pipe was empty)
-	data_partial,             //< + data     : beside data in input/output data pipes
-        data_completed,           //< + data     : beside data in output data pipe when EOF has been reached
-        order_truncate,           //< + infinint : message is an order to truncate at given position
-        answer_truncate_done      //< no argument: truncate done
+	unset,                    ///< no argument: message type is not set (error)
+	order_read_ahead,         ///< + infinint : messge is an info that the given amount of data is about to be read
+	order_read_ahead_begin,   ///< + infinint : message continues with the next block
+	order_read,               ///< + U_I      : message is a read order (with expected size to be read ahead)
+	order_sync_write,         ///< no argument: order to flush all pending writes
+	answr_sync_write_done,    ///< no argument: answer from the slave that all data have been sync written
+	order_skip,               ///< + infinint : message is an order to seek at given position
+	order_skip_begin,         ///< + infinint : message is an order to seek but the seek info continues in the next message
+	order_skip_to_eof,        ///< no argument: message requesting slave to skip to end of file
+	order_skip_fwd,           ///< + U_I      : order to skip foward
+	order_skip_bkd,           ///< + U_I      : order to skip backward
+	answr_skip_done,          ///< + bool     : answer for all kind of skip orders
+	order_skippable_fwd,      ///< + infinint : message from master containing a skippable forward request info
+	order_skippable_fwd_begin,///< + infinint : message continues on the next block
+	order_skippable_bkd,      ///< + infinint : message from master containing a skippable backward request info
+	order_skippable_bkd_begin,///< + infinint : message continues on the next block
+	answr_skippable,          ///< + bool     : answer from slave to a skippable forward/backward request
+	order_get_position,       ///< no argument: order to get the current position in file
+	answr_position,           ///< + infinint : answer with the current position
+	answr_position_begin,     ///< + infinint : message continues with the next block
+	answr_exception,          ///< no argument: last operation generated an exception for at slave side, slave has probably died after that
+	order_end_of_xmit,        ///< no argument: message is the last message and implies freedom of the slave
+        order_stop_readahead,     ///< no argument: order to stop possibly running read_ahead
+	answr_readahead_stopped,  ///< no argument: answer that the readahead has ended or no read ahead was running
+	order_wakeup,             ///< no argument: order to continue reading/writing loop (reading suspendend because of pipe full, writing because of pipe was empty)
+	data_partial,             ///< + data     : beside data in input/output data pipes
+        data_completed,           ///< + data     : beside data in output data pipe when EOF has been reached
+        order_truncate,           ///< + infinint : message is an order to truncate at given position
+        answer_truncate_done,     ///< no argument: truncate done
+        order_truncatable,        ///< + infinint : message from master containing the truncatable offset request
+        answer_truncatable        ///< + bool     : answer from slave to a truncatable request
     };
 
     extern bool msg_equivalent(msg_type arg1, msg_type arg2);

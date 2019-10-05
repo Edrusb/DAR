@@ -60,6 +60,7 @@ namespace libdar
         virtual bool skip(const infinint &pos) override { set_offset(pos); return true; };
         virtual bool skip_to_eof() override { offset = max_offset; return true; };
         virtual bool skip_relative(signed int x) override { return set_rel_offset(x); };
+	virtual bool truncatable(const infinint & pos) const override { return true; };
         virtual infinint get_position() const override { return offset; };
 
     protected :

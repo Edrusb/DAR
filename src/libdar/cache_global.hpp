@@ -82,6 +82,7 @@ namespace libdar
         virtual bool skip(const infinint & pos) override { return buffer->skip(pos); };
         virtual bool skip_to_eof() override { return buffer->skip_to_eof(); };
         virtual bool skip_relative(S_I x) override { return buffer->skip_relative(x); };
+	virtual bool truncatable(const infinint & pos) const override { return buffer->truncatable(pos); };
         virtual infinint get_position() const override { return buffer->get_position(); };
 
 	    // expose cache specific methods

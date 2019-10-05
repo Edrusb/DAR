@@ -81,6 +81,7 @@ namespace libdar
 	    /// inherited from generic_file
         virtual bool skip_relative(S_I x) override;
 	    /// inherited from generic_file
+	virtual bool truncatable(const infinint & pos) const override { return ref->truncatable(start + pos); };
         virtual infinint get_position() const override { return current; };
 
 	    /// when a tronc is used over a compressor, it becomes necessary to disable position check
