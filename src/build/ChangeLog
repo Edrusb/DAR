@@ -1,3 +1,7 @@
+from 2.6.6 to 2.6.7
+- fixing shell_interaction_emulator class declaration to avoid compilation
+  errors and warning under MacOS
+
 from 2.6.5 to 2.6.6
 - fixing script that builds windows binary packages to include missing
   cygwin libraries
