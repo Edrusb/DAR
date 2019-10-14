@@ -1583,7 +1583,7 @@ string line_tools_get_euid()
 {
     string ret;
     uid_t uid = geteuid();
-    deci conv = infinint(uid);
+    libdar::deci conv = infinint(uid);
 
     ret += tools_name_of_uid(uid) + "("+ conv.human() + ")";
 
@@ -1594,7 +1594,7 @@ string line_tools_get_egid()
 {
     string ret;
     uid_t gid = getegid();
-    deci conv = infinint(gid);
+    libdar::deci conv = infinint(gid);
 
     ret += tools_name_of_gid(gid) + "("+ conv.human() + ")";
 

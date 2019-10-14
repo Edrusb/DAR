@@ -46,9 +46,9 @@ namespace libdar
     public:
 	shell_interaction_emulator(user_interaction *emulator);
 	shell_interaction_emulator(const shell_interaction_emulator & ref) = default;
-	shell_interaction_emulator(shell_interaction_emulator && ref) noexcept = default;
-	shell_interaction_emulator & operator = (const shell_interaction_emulator & ref) = default;
-	shell_interaction_emulator & operator = (shell_interaction_emulator && ref) noexcept = default;
+	shell_interaction_emulator(shell_interaction_emulator && ref) noexcept = delete;
+	shell_interaction_emulator & operator = (const shell_interaction_emulator & ref) = delete;
+	shell_interaction_emulator & operator = (shell_interaction_emulator && ref) noexcept = delete;
 	virtual ~shell_interaction_emulator() = default;
 
     protected:
