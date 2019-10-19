@@ -207,15 +207,24 @@ namespace libdar
 		// skipping inside the buffer is possible
 
 	    infinint tmp_next = pos - buffer_offset;
+	    U_I new_next = 0;
+
+	    tmp_next.unstack(new_next);
+	    if(!tmp_next.is_zero())
+		throw SRC_BUG;
 
 		// assigning to next its new value to reflect the skip() operation
 
-	    next = 0;
-	    tmp_next.unstack(next);
-	    if(!tmp_next.is_zero())
-		throw SRC_BUG;
-	    if(first_to_write > next && first_to_write != size)
-		first_to_write = next;
+	    if(first_to_write > new_next && first_to_write != size)
+	    {
+		    // reducing first_to_write means the cached object
+		    // will have to skip backward, this we must check
+		if(ref->skippable(skip_backward, first_to_write - new_next))
+		    first_to_write = new_next;
+		else
+		    return false; // cannot skip
+	    }
+	    next = new_next;
 
 	    return true;
 	}
