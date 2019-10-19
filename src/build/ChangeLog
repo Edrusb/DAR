@@ -1,6 +1,8 @@
 from 2.6.6 to 2.6.7
 - fixing shell_interaction_emulator class declaration to avoid compilation
   errors and warning under MacOS
+- fixed bug: dar failed creating an archive on its standard output reporting
+  the error message "Skipping backward is not possible on a pipe"
 
 from 2.6.5 to 2.6.6
 - fixing script that builds windows binary packages to include missing
