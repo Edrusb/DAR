@@ -63,9 +63,9 @@ namespace libdar
 		 bool small) : cat_file(dialog, pdesc, reading_ver, saved, default_algo, small) {};
 
 	cat_door(const cat_door & ref) = default;
-	cat_door(cat_door && ref) = default;
-	cat_door & operator = (const cat_door & ref) = default;
-	cat_door & operator = (cat_door && ref) = default;
+	cat_door(cat_door && ref) = delete;
+	cat_door & operator = (const cat_door & ref) = delete;
+	cat_door & operator = (cat_door && ref) = delete;
 	~cat_door() = default;
 
 	virtual bool operator == (const cat_entree & ref) const override;
