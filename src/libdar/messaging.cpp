@@ -83,6 +83,10 @@ namespace libdar
 	case msg_type::order_stop_readahead:
 	case msg_type::answr_readahead_stopped:
 	case msg_type::order_wakeup:
+	case msg_type::order_truncate:
+	case msg_type::answer_truncate_done:
+	case msg_type::order_truncatable:
+	case msg_type::answer_truncatable:
 	    ret = (arg1 == arg2);
 	    break;
 	case msg_type::data_partial:
@@ -130,6 +134,10 @@ namespace libdar
 	case msg_type::order_wakeup:
 	case msg_type::data_partial: // this is not an error
 	case msg_type::data_completed:
+	case msg_type::order_truncate:
+	case msg_type::answer_truncate_done:
+	case msg_type::order_truncatable:
+	case msg_type::answer_truncatable:
 	    return false;
 	default:
 	    throw SRC_BUG;
@@ -194,6 +202,14 @@ namespace libdar
 	    return 'd';
 	case msg_type::data_completed:
 	    return 'D';
+	case msg_type::order_truncate:
+	    return 'T';
+	case msg_type::answer_truncate_done:
+	    return 't';
+	case msg_type::order_truncatable:
+	    return 'U';
+	case msg_type::answer_truncatable:
+	    return 'u';
 	default:
 	    throw SRC_BUG;
 	}
@@ -255,6 +271,14 @@ namespace libdar
 	    return msg_type::data_partial;
 	case 'D':
 	    return msg_type::data_completed;
+	case 'T':
+	    return msg_type::order_truncate;
+	case 't':
+	    return msg_type::answer_truncate_done;
+	case 'U':
+	    return msg_type::order_truncatable;
+	case 'u':
+	    return msg_type::answer_truncatable;
 	default:
 	    throw SRC_BUG;
 	}
@@ -318,6 +342,14 @@ namespace libdar
 	    return msg_type::data_partial;
 	case msg_type::data_completed:
 	    return msg_type::data_partial;
+	case msg_type::order_truncate:
+	    throw SRC_BUG;
+	case msg_type::answer_truncate_done:
+	    throw SRC_BUG;
+	case msg_type::order_truncatable:
+	    throw SRC_BUG;
+	case msg_type::answer_truncatable:
+	    throw SRC_BUG;
 	default:
 	    throw SRC_BUG;
 	}
