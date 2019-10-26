@@ -37,6 +37,7 @@ using namespace libdar;
 
 static shared_ptr<shell_interaction> ui(new shell_interaction(cout, cerr, false));
 
+void f0();
 void f1();
 void f2(const string & src, const string & dst);
 
@@ -49,7 +50,8 @@ int main(int argc, char *argv[])
 
     try
     {
-//	f1();
+	f0();
+	f1();
 	if(argc != 3)
 	    cout << "usage: " << argv[0] << " <src file> <dst file>" << endl;
 	else
@@ -74,6 +76,27 @@ int main(int argc, char *argv[])
     }
 
     return 0;
+}
+
+void f0()
+{
+    generic_file *src = new fichier_local("toto.txt");
+    generic_file *dst = new fichier_local(ui,
+					  "titi.txt",
+					  gf_read_write,
+					  0644,
+					  false,
+					  true,
+					  false);
+
+    generic_thread *t1 = new generic_thread(dst);
+
+    src->copy_to(*t1);
+    ui->printf(t1->truncatable(20) ? "truncable":"not truncatable");
+    t1->truncate(20);
+    delete src;
+    delete t1;
+    delete dst;
 }
 
 void f1()
