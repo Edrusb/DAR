@@ -23,9 +23,14 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/operators.h>
 
+// this should be passed from Makefile
+#define LIBDAR_MODE 64
 #define HAVE_CONFIG_H 1
+//
+
 #include "../my_config.h"
 #include "../libdar/libdar.hpp"
+
 
 PYBIND11_MODULE(libdar, mod)
 {
@@ -147,6 +152,44 @@ PYBIND11_MODULE(libdar, mod)
 	.def(pybind11::self += std::string()) // operator += std::string
 	.def("display", &libdar::path::display)
 	.def("display_without_root", &libdar::path::display_without_root);
+
+
+   	///////////////////////////////////////////
+	// infinint (from real_infinint.hpp / limitint.hpp)
+	//
+
+
+#ifndef LIBDAR_MODE
+
+    pybind11::class_<libdar::real_infinint>(mod, "infininit")
+	.def(pybind11::init<off_t>(), pybind11::arg("a") = 0)
+	.def(pybind11::init<time_t>(), pybind11::arg("a") = 0)
+	.def(pybind11::init<size_t>(), pybind11::arg("a") = 0)
+	.def("dump", &libdar::real_infinint::dump)
+	.def("read", &libdar::real_infinint::read)
+	.def("is_zero", &libdar::real_infinint::is_zero);
+
+#else
+
+    pybind11::class_<libdar::limitint<libdar::INFININT_BASE_TYPE> >(mod, "infinint")
+	.def(pybind11::init<off_t>(), pybind11::arg("a") = 0)
+	.def(pybind11::init<time_t>(), pybind11::arg("a") = 0)
+	.def(pybind11::init<size_t>(), pybind11::arg("a") = 0)
+	.def("dump", &libdar::limitint<libdar::INFININT_BASE_TYPE>::dump)
+	.def("read", &libdar::limitint<libdar::INFININT_BASE_TYPE>::read)
+	.def("is_zero", &libdar::limitint<libdar::INFININT_BASE_TYPE>::is_zero);
+
+#endif
+
+       	///////////////////////////////////////////
+	// class deci (from deci.hpp / limitint.hpp)
+	//
+
+    pybind11::class_<libdar::deci>(mod, "deci")
+	.def(pybind11::init<std::string>())
+	.def(pybind11::init<libdar::infinint &>())
+	.def("computer", &libdar::deci::computer)
+	.def("human", &libdar::deci::human);
 
 
 }
