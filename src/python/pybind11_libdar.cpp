@@ -240,6 +240,39 @@ PYBIND11_MODULE(libdar, mod)
 	.def("get_byte_amount_str", &libdar::statistics::get_byte_amount_str)
 	.def("get_fsa_treated_str", &libdar::statistics::get_fsa_treated_str);
 
+
+	///////////////////////////////////////////
+	// archive_options_* classes
+	//
+
+    pybind11::class_<libdar::archive_options_read>(mod, "archive_options_read")
+	.def("clear", &libdar::archive_options_read::clear)
+	.def("set_crypto_algo", &libdar::archive_options_read::set_crypto_algo)
+	.def("set_crypto_pass", &libdar::archive_options_read::set_crypto_pass)
+	.def("set_crypto_size", &libdar::archive_options_read::set_crypto_size)
+	.def("set_default_crypto_size", &libdar::archive_options_read::set_default_crypto_size)
+	.def("set_input_pipe", &libdar::archive_options_read::set_input_pipe)
+	.def("set_output_pipe", &libdar::archive_options_read::set_output_pipe)
+	.def("set_execute", &libdar::archive_options_read::set_execute)
+	.def("set_info_details", &libdar::archive_options_read::set_info_details)
+	.def("set_lax", &libdar::archive_options_read::set_lax)
+	.def("set_sequential_read", &libdar::archive_options_read::set_sequential_read)
+	.def("set_slice_min_digits", &libdar::archive_options_read::set_slice_min_digits)
+	.def("set_entrepot", &libdar::archive_options_read::set_entrepot)
+	.def("set_ignore_signature_check_failure", &libdar::archive_options_read::set_ignore_signature_check_failure)
+	.def("set_multi_threaded", &libdar::archive_options_read::set_multi_threaded)
+	.def("set_external_catalogue", &libdar::archive_options_read::set_external_catalogue)
+	.def("unset_external_catalogue", &libdar::archive_options_read::unset_external_catalogue)
+	.def("set_ref_crypto_algo", &libdar::archive_options_read::set_ref_crypto_algo)
+	.def("set_ref_crypto_pass", &libdar::archive_options_read::set_ref_crypto_pass)
+	.def("set_ref_crypto_size", &libdar::archive_options_read::set_ref_crypto_size)
+	.def("set_ref_execute", &libdar::archive_options_read::set_ref_execute)
+	.def("set_ref_slice_min_digits", &libdar::archive_options_read::set_ref_slice_min_digits)
+	.def("set_ref_entrepot", &libdar::archive_options_read::set_ref_entrepot)
+	.def("set_header_only", &libdar::archive_options_read::set_header_only);
+
+
+
 }
 
 
