@@ -21,6 +21,7 @@
 
 
 #include <pybind11/pybind11.h>
+#include <pybind11/operators.h>
 
 #define HAVE_CONFIG_H 1
 #include "../my_config.h"
@@ -127,4 +128,25 @@ PYBIND11_MODULE(libdar, mod)
 
     pybind11::class_<libdar::Enet_auth>(mod, "Enet_auth", egeneric)
 	.def(pybind11::init<const std::string &>());
+
+
+	///////////////////////////////////////////
+	// class path (from path.hpp)
+	//
+
+    pybind11::class_<libdar::path>(mod, "path")
+	.def(pybind11::init<const std::string &, bool>(), pybind11::arg("s"), pybind11::arg("undisclosed") = false)
+	.def("basename", &libdar::path::basename)
+	.def("reset_read", &libdar::path::reset_read)
+	.def("read_subdir", &libdar::path::read_subdir)
+	.def("is_relative", &libdar::path::is_relative)
+	.def("is_absolute", &libdar::path::is_absolute)
+	.def("append", &libdar::path::append)
+	.def(pybind11::self + pybind11::self) // operator +
+	.def(pybind11::self += pybind11::self) // operator += libdar::path
+	.def(pybind11::self += std::string()) // operator += std::string
+	.def("display", &libdar::path::display)
+	.def("display_without_root", &libdar::path::display_without_root);
+
+
 }
