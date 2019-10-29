@@ -206,4 +206,40 @@ PYBIND11_MODULE(libdar, mod)
     mod.def("tools_get_extended_size", &libdar::tools_get_extended_size,
 	    pybind11::arg("input numerical string with unit suffix"),
 	    pybind11::arg("unit base: 1000 for SI, 1024 for computer science"));
+
+    	///////////////////////////////////////////
+	// class statistics
+	//
+
+
+    pybind11::class_<libdar::statistics>(mod, "statistics")
+	.def(pybind11::init<bool>(), pybind11::arg("lock") = true)
+	.def("clear", &libdar::statistics::clear)
+	.def("total", &libdar::statistics::total)
+	.def("get_treated", &libdar::statistics::get_treated)
+	.def("get_hard_links", &libdar::statistics::get_hard_links)
+	.def("get_skipped", &libdar::statistics::get_skipped)
+	.def("get_inode_only", &libdar::statistics::get_inode_only)
+	.def("get_ignored", &libdar::statistics::get_ignored)
+	.def("get_tooold", &libdar::statistics::get_tooold)
+	.def("get_errored", &libdar::statistics::get_errored)
+	.def("get_deleted", &libdar::statistics::get_deleted)
+	.def("get_ea_treated", &libdar::statistics::get_ea_treated)
+	.def("get_byte_amount", &libdar::statistics::get_byte_amount)
+	.def("get_fsa_treated", &libdar::statistics::get_fsa_treated)
+	    //
+	.def("get_treated_str", &libdar::statistics::get_treated_str)
+	.def("get_hard_links_str", &libdar::statistics::get_hard_links_str)
+	.def("get_skipped_str", &libdar::statistics::get_skipped_str)
+	.def("get_inode_only_str", &libdar::statistics::get_inode_only_str)
+	.def("get_ignored_str", &libdar::statistics::get_ignored_str)
+	.def("get_tooold_str", &libdar::statistics::get_tooold_str)
+	.def("get_errored_str", &libdar::statistics::get_errored_str)
+	.def("get_deleted_str", &libdar::statistics::get_deleted_str)
+	.def("get_ea_treated_str", &libdar::statistics::get_ea_treated_str)
+	.def("get_byte_amount_str", &libdar::statistics::get_byte_amount_str)
+	.def("get_fsa_treated_str", &libdar::statistics::get_fsa_treated_str);
+
 }
+
+
