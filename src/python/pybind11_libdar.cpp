@@ -241,6 +241,49 @@ PYBIND11_MODULE(libdar, mod)
 	.def("get_fsa_treated_str", &libdar::statistics::get_fsa_treated_str);
 
 
+    	///////////////////////////////////////////
+	// data structures in crypto.hpp
+	//
+
+    pybind11::enum_<libdar::crypto_algo>(mod, "crypto_algo")
+	.value("none", libdar::crypto_algo::none)
+	.value("scrambling", libdar::crypto_algo::scrambling)
+	.value("blowfish", libdar::crypto_algo::blowfish)
+	.value("aes256", libdar::crypto_algo::aes256)
+	.value("twofish256", libdar::crypto_algo::twofish256)
+	.value("serpent256", libdar::crypto_algo::serpent256)
+	.value("camellia256", libdar::crypto_algo::camellia256)
+	.export_values();
+
+
+    pybind11::class_<libdar::signator> pysignator(mod, "signator");
+
+    pybind11::enum_<libdar::signator::result_t>(pysignator, "result_t")
+	.value("good", libdar::signator::good)
+	.value("bad", libdar::signator::bad)
+	.value("unknown_key", libdar::signator::unknown_key)
+	.value("error", libdar::signator::error)
+	.export_values();
+
+    pybind11::enum_<libdar::signator::key_validity_t>(pysignator, "key_validity_t")
+	.value("valid", libdar::signator::valid)
+	.value("expired", libdar::signator::expired)
+	.value("revoked", libdar::signator::revoked)
+	.export_values();
+
+    pysignator
+	.def_readonly("result", &libdar::signator::result)
+	.def_readonly("key_validity", &libdar::signator::key_validity)
+	.def_readonly("fingerprint", &libdar::signator::fingerprint)
+	.def_readonly("signing_date", &libdar::signator::signing_date)
+	.def_readonly("signature_expiration_date", &libdar::signator::signature_expiration_date)
+	.def(pybind11::self  < pybind11::self)
+	.def(pybind11::self == pybind11::self);
+
+    mod.def("crypto_algo_2_string", &libdar::crypto_algo_2_string, pybind11::arg("algo"));
+    mod.def("same_signatories", &libdar::same_signatories);
+
+
 	///////////////////////////////////////////
 	// archive_options_* classes
 	//
