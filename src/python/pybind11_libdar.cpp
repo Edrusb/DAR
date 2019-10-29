@@ -30,6 +30,7 @@
 
 #include "../my_config.h"
 #include "../libdar/libdar.hpp"
+#include "../libdar/tools.hpp"
 
 
 PYBIND11_MODULE(libdar, mod)
@@ -181,7 +182,7 @@ PYBIND11_MODULE(libdar, mod)
 
 #endif
 
-       	///////////////////////////////////////////
+	///////////////////////////////////////////
 	// class deci (from deci.hpp / limitint.hpp)
 	//
 
@@ -191,5 +192,18 @@ PYBIND11_MODULE(libdar, mod)
 	.def("computer", &libdar::deci::computer)
 	.def("human", &libdar::deci::human);
 
+	///////////////////////////////////////////
+	// tools routines related to infinint
+	//
 
+
+
+    mod.def("tools_display_interger_in_metric_system", &libdar::tools_display_integer_in_metric_system,
+	    pybind11::arg("number"),
+	    pybind11::arg("unit"),
+	    pybind11::arg("binary Ki (else K)"));
+
+    mod.def("tools_get_extended_size", &libdar::tools_get_extended_size,
+	    pybind11::arg("input numerical string with unit suffix"),
+	    pybind11::arg("unit base: 1000 for SI, 1024 for computer science"));
 }
