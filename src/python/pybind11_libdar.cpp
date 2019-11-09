@@ -284,6 +284,67 @@ PYBIND11_MODULE(libdar, mod)
 
 
 	///////////////////////////////////////////
+	// masks_* classes
+	//
+
+        // trampoline class needed to address pure virtual methods
+	// making a template of the trampoline to be able to derive
+	// inherited class from libdar::mask in python environment
+
+    class pymask : public libdar::mask
+    {
+    public:
+	    // using the same constructors
+	using libdar::mask::mask;
+
+	virtual bool is_covered(const std::string & expression) const override
+	{
+	    PYBIND11_OVERLOAD_PURE(
+		bool,
+		libdar::mask,
+		is_covered,
+		expression);
+	};
+
+	virtual bool is_covered(const libdar::path & chemin) const override
+	{
+	    PYBIND11_OVERLOAD(
+		bool,
+		libdar::mask,
+		is_covered,
+		chemin);
+	};
+
+	virtual std::string dump(const std::string & prefix) const override
+	{
+	    PYBIND11_OVERLOAD_PURE(
+		std::string,
+		libdar::mask,
+		dump,
+		prefix);
+	};
+
+	virtual libdar::mask *clone() const override
+	{
+	    PYBIND11_OVERLOAD_PURE(
+		libdar::mask *,
+		libdar::mask,
+		clone, // trailing comma needed for portability
+		);
+	};
+    };
+
+
+	// the trampoline for libdar::mask
+    pybind11::class_<libdar::mask, pymask>(mod, "mask")
+	.def(pybind11::init<>())
+	.def("is_covered", (bool (libdar::mask::*)(const std::string &) const) &libdar::mask::is_covered, "Mask based on string")
+	.def("is_covered", (bool (libdar::mask::*)(const libdar::path &) const) &libdar::mask::is_covered, "Mask based on libdar::path")
+	.def("dump", &libdar::mask::dump)
+	.def("clone", &libdar::mask::clone);
+
+
+	///////////////////////////////////////////
 	// archive_options_* classes
 	//
 
