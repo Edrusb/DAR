@@ -32,7 +32,6 @@
 #include "../libdar/libdar.hpp"
 #include "../libdar/tools.hpp"
 
-
 PYBIND11_MODULE(libdar, mod)
 {
 	// mod is of type pybind11::module
@@ -62,8 +61,8 @@ PYBIND11_MODULE(libdar, mod)
 	    PYBIND11_OVERLOAD_PURE(
 		std::string,       // return type
 		pyEgeneric_pub,    // parent class
-		exceptionID);      // name of the method in C++ (must match Python name)
-		                   // arguments, (none here)
+		exceptionID,       // name of the method in C++ (must match Python name)
+		);                 // trailing comma needed for portability
 	};
     };
 
