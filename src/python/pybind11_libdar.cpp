@@ -460,6 +460,131 @@ PYBIND11_MODULE(libdar, mod)
 	.def("evaluate", &libdar::criterium::evaluate)
 	.def("clone", &libdar::criterium::clone);
 
+	// inherited class from libdar::criterium
+
+    pybind11::class_<libdar::crit_in_place_is_inode, libdar::criterium>(mod, "crit_in_place_is_inode")
+	.def(pybind11::init<>())
+	.def("evaluate", &libdar::crit_in_place_is_inode::evaluate)
+	.def("clone", &libdar::crit_in_place_is_inode::clone);
+
+    pybind11::class_<libdar::crit_in_place_is_dir, libdar::criterium>(mod, "crit_in_place_is_dir")
+	.def(pybind11::init<>())
+	.def("evaluate", &libdar::crit_in_place_is_dir::evaluate)
+	.def("clone", &libdar::crit_in_place_is_dir::clone);
+
+    pybind11::class_<libdar::crit_in_place_is_file, libdar::criterium>(mod, "crit_in_place_is_file")
+	.def(pybind11::init<>())
+	.def("evaluate", &libdar::crit_in_place_is_file::evaluate)
+	.def("clone", &libdar::crit_in_place_is_file::clone);
+
+    pybind11::class_<libdar::crit_in_place_is_hardlinked_inode, libdar::criterium>(mod, "crit_in_place_is_hardlinked_inode")
+	.def(pybind11::init<>())
+	.def("evaluate", &libdar::crit_in_place_is_hardlinked_inode::evaluate)
+	.def("clone", &libdar::crit_in_place_is_hardlinked_inode::clone);
+
+    pybind11::class_<libdar::crit_in_place_is_new_hardlinked_inode, libdar::criterium>(mod, "crit_in_place_is_new_hardlinked_inode")
+	.def(pybind11::init<>())
+	.def("evaluate", &libdar::crit_in_place_is_new_hardlinked_inode::evaluate)
+	.def("clone", &libdar::crit_in_place_is_new_hardlinked_inode::clone);
+
+    pybind11::class_<libdar::crit_in_place_data_more_recent, libdar::criterium>(mod, "crit_in_place_data_more_recent")
+	.def(pybind11::init<const libdar::infinint &>(), pybind11::arg("hourshift") = 0)
+	.def("evaluate", &libdar::crit_in_place_data_more_recent::evaluate)
+	.def("clone", &libdar::crit_in_place_data_more_recent::clone);
+
+    pybind11::class_<libdar::crit_in_place_data_more_recent_or_equal_to, libdar::criterium>(mod, "crit_in_place_data_more_recent_or_equal_to")
+	.def(pybind11::init<const libdar::infinint &, const libdar::infinint &>(), pybind11::arg("date"), pybind11::arg("hourshift") = 0)
+	.def("evaluate", &libdar::crit_in_place_data_more_recent_or_equal_to::evaluate)
+	.def("clone", &libdar::crit_in_place_data_more_recent_or_equal_to::clone);
+
+    pybind11::class_<libdar::crit_in_place_data_bigger, libdar::criterium>(mod, "crit_in_place_data_bigger")
+	.def(pybind11::init<>())
+	.def("evaluate", &libdar::crit_in_place_data_bigger::evaluate)
+	.def("clone", &libdar::crit_in_place_data_bigger::clone);
+
+    pybind11::class_<libdar::crit_in_place_data_saved, libdar::criterium>(mod, "crit_in_place_data_saved")
+	.def(pybind11::init<>())
+	.def("evaluate", &libdar::crit_in_place_data_saved::evaluate)
+	.def("clone", &libdar::crit_in_place_data_saved::clone);
+
+    pybind11::class_<libdar::crit_in_place_data_dirty, libdar::criterium>(mod, "crit_in_place_data_dirty")
+	.def(pybind11::init<>())
+	.def("evaluate", &libdar::crit_in_place_data_dirty::evaluate)
+	.def("clone", &libdar::crit_in_place_data_dirty::clone);
+
+    pybind11::class_<libdar::crit_in_place_data_sparse, libdar::criterium>(mod, "crit_in_place_data_sparse")
+	.def(pybind11::init<>())
+	.def("evaluate", &libdar::crit_in_place_data_sparse::evaluate)
+	.def("clone", &libdar::crit_in_place_data_sparse::clone);
+
+    pybind11::class_<libdar::crit_in_place_has_delta_sig, libdar::criterium>(mod, "crit_in_place_has_delta_sig")
+	.def(pybind11::init<>())
+	.def("evaluate", &libdar::crit_in_place_has_delta_sig::evaluate)
+	.def("clone", &libdar::crit_in_place_has_delta_sig::clone);
+
+
+    pybind11::class_<libdar::crit_in_place_EA_present, libdar::criterium>(mod, "crit_in_place_EA_present")
+	.def(pybind11::init<>())
+	.def("evaluate", &libdar::crit_in_place_EA_present::evaluate)
+	.def("clone", &libdar::crit_in_place_EA_present::clone);
+
+    pybind11::class_<libdar::crit_in_place_EA_more_recent, libdar::criterium>(mod, "crit_in_place_EA_more_recent")
+	.def(pybind11::init<const libdar::infinint &>(), pybind11::arg("hourshift") = 0)
+	.def("evaluate", &libdar::crit_in_place_EA_more_recent::evaluate)
+	.def("clone", &libdar::crit_in_place_EA_more_recent::clone);
+
+    pybind11::class_<libdar::crit_in_place_EA_more_recent_or_equal_to, libdar::criterium>(mod, "crit_in_place_EA_more_recent_or_equal_to")
+	.def(pybind11::init<const libdar::infinint &, const libdar::infinint &>(), pybind11::arg("date"), pybind11::arg("hourshift") = 0)
+	.def("evaluate", &libdar::crit_in_place_EA_more_recent_or_equal_to::evaluate)
+	.def("clone", &libdar::crit_in_place_EA_more_recent_or_equal_to::clone);
+
+    pybind11::class_<libdar::crit_in_place_more_EA, libdar::criterium>(mod, "crit_in_place_more_EA")
+	.def(pybind11::init<>())
+	.def("evaluate", &libdar::crit_in_place_more_EA::evaluate)
+	.def("clone", &libdar::crit_in_place_more_EA::clone);
+
+    pybind11::class_<libdar::crit_in_place_EA_bigger, libdar::crit_in_place_more_EA>(mod, "crit_in_place_EA_bigger")
+	.def(pybind11::init<>())
+	.def("evaluate", &libdar::crit_in_place_EA_bigger::evaluate)
+	.def("clone", &libdar::crit_in_place_EA_bigger::clone);
+
+    pybind11::class_<libdar::crit_in_place_EA_saved, libdar::criterium>(mod, "crit_in_place_EA_saved")
+	.def(pybind11::init<>())
+	.def("evaluate", &libdar::crit_in_place_EA_saved::evaluate)
+	.def("clone", &libdar::crit_in_place_EA_saved::clone);
+
+    pybind11::class_<libdar::crit_same_type, libdar::criterium>(mod, "crit_same_type")
+	.def(pybind11::init<>())
+	.def("evaluate", &libdar::crit_same_type::evaluate)
+	.def("clone", &libdar::crit_same_type::clone);
+
+    pybind11::class_<libdar::crit_not, libdar::criterium>(mod, "crit_not")
+	.def(pybind11::init<const libdar::criterium &>())
+	.def("evaluate", &libdar::crit_not::evaluate)
+	.def("clone", &libdar::crit_not::clone);
+
+    pybind11::class_<libdar::crit_and, libdar::criterium>(mod, "crit_and")
+	.def(pybind11::init<>())
+	.def("evaluate", &libdar::crit_and::evaluate)
+	.def("clone", &libdar::crit_and::clone)
+	.def("add_crit", &libdar::crit_and::add_crit)
+	.def("clear", &libdar::crit_and::clear)
+	.def("gobe", &libdar::crit_and::gobe);
+
+    pybind11::class_<libdar::crit_or, libdar::crit_and>(mod, "crit_or")
+	.def(pybind11::init<>())
+	.def("evaluate", &libdar::crit_or::evaluate)
+	.def("clone", &libdar::crit_or::clone)
+	.def("add_crit", &libdar::crit_or::add_crit)
+	.def("clear", &libdar::crit_or::clear)
+	.def("gobe", &libdar::crit_or::gobe);
+
+    pybind11::class_<libdar::crit_invert, libdar::crit_not>(mod, "crit_invert")
+	.def(pybind11::init<const libdar::criterium &>())
+	.def("evaluate", &libdar::crit_invert::evaluate)
+	.def("clone", &libdar::crit_invert::clone);
+
+
 	///////////////////////////////////////////
 	// binding for what's in crit_action.hpp
 	//
