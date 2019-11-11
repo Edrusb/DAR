@@ -343,6 +343,81 @@ PYBIND11_MODULE(libdar, mod)
 	.def("dump", &libdar::mask::dump)
 	.def("clone", &libdar::mask::clone);
 
+	// inhertied class from libdar::mask will not have their virtual method overridable in python
+	// only class libdar::mask can be that way inherited.
+	// doing that way is simple. It does not worth effort to make things more complicated as there is no reason
+	// to inherit from existing inherited libdar::mask classes
+
+    pybind11::class_<libdar::bool_mask, libdar::mask>(mod, "bool_mask")
+	.def(pybind11::init<bool>())
+	.def("is_covered", (bool (libdar::bool_mask::*)(const std::string &) const) &libdar::bool_mask::is_covered, "Mask based on string")
+	.def("is_covered", (bool (libdar::bool_mask::*)(const libdar::path &) const) &libdar::bool_mask::is_covered, "Mask based on libdar::path")
+	.def("dump", &libdar::bool_mask::dump)
+	.def("clone", &libdar::bool_mask::clone);
+
+
+    pybind11::class_<libdar::simple_mask, libdar::mask>(mod, "simple_mask")
+	.def(pybind11::init<const std::string &, bool>())
+	.def("is_covered", (bool (libdar::simple_mask::*)(const std::string &) const) &libdar::simple_mask::is_covered, "Mask based on string")
+	.def("is_covered", (bool (libdar::simple_mask::*)(const libdar::path &) const) &libdar::simple_mask::is_covered, "Mask based on libdar::path")
+	.def("dump", &libdar::simple_mask::dump)
+	.def("clone", &libdar::simple_mask::clone);
+
+    pybind11::class_<libdar::regular_mask, libdar::mask>(mod, "regular_mask")
+	.def(pybind11::init<const std::string &, bool>())
+	.def("is_covered", (bool (libdar::regular_mask::*)(const std::string &) const) &libdar::regular_mask::is_covered, "Mask based on string")
+	.def("is_covered", (bool (libdar::regular_mask::*)(const libdar::path &) const) &libdar::regular_mask::is_covered, "Mask based on libdar::path")
+	.def("dump", &libdar::regular_mask::dump)
+	.def("clone", &libdar::regular_mask::clone);
+
+    pybind11::class_<libdar::not_mask, libdar::mask>(mod, "not_mask")
+	.def(pybind11::init<const libdar::mask &>())
+	.def("is_covered", (bool (libdar::not_mask::*)(const std::string &) const) &libdar::not_mask::is_covered, "Mask based on string")
+	.def("is_covered", (bool (libdar::not_mask::*)(const libdar::path &) const) &libdar::not_mask::is_covered, "Mask based on libdar::path")
+	.def("dump", &libdar::not_mask::dump)
+	.def("clone", &libdar::not_mask::clone);
+
+    pybind11::class_<libdar::et_mask, libdar::mask>(mod, "et_mask")
+	.def(pybind11::init<>())
+	.def("is_covered", (bool (libdar::et_mask::*)(const std::string &) const) &libdar::et_mask::is_covered, "Mask based on string")
+	.def("is_covered", (bool (libdar::et_mask::*)(const libdar::path &) const) &libdar::et_mask::is_covered, "Mask based on libdar::path")
+	.def("dump", &libdar::et_mask::dump)
+	.def("clone", &libdar::et_mask::clone)
+	.def("add_mask", &libdar::et_mask::add_mask)
+	.def("size", &libdar::et_mask::size)
+	.def("clear", &libdar::et_mask::clear);
+
+    pybind11::class_<libdar::ou_mask, libdar::mask>(mod, "ou_mask")
+	.def(pybind11::init<>())
+	.def("is_covered", (bool (libdar::ou_mask::*)(const std::string &) const) &libdar::ou_mask::is_covered, "Mask based on string")
+	.def("is_covered", (bool (libdar::ou_mask::*)(const libdar::path &) const) &libdar::ou_mask::is_covered, "Mask based on libdar::path")
+	.def("dump", &libdar::ou_mask::dump)
+	.def("clone", &libdar::ou_mask::clone)
+	.def("add_mask", &libdar::ou_mask::add_mask)
+	.def("size", &libdar::ou_mask::size)
+	.def("clear", &libdar::ou_mask::clear);
+
+    pybind11::class_<libdar::simple_path_mask, libdar::mask>(mod, "simple_path_mask")
+	.def(pybind11::init<const std::string &, bool>())
+	.def("is_covered", (bool (libdar::simple_path_mask::*)(const std::string &) const) &libdar::simple_path_mask::is_covered, "Mask based on string")
+	.def("is_covered", (bool (libdar::simple_path_mask::*)(const libdar::path &) const) &libdar::simple_path_mask::is_covered, "Mask based on libdar::path")
+	.def("dump", &libdar::simple_path_mask::dump)
+	.def("clone", &libdar::simple_path_mask::clone);
+
+    pybind11::class_<libdar::same_path_mask, libdar::mask>(mod, "same_path_mask")
+	.def(pybind11::init<const std::string &, bool>())
+	.def("is_covered", (bool (libdar::same_path_mask::*)(const std::string &) const) &libdar::same_path_mask::is_covered, "Mask based on string")
+	.def("is_covered", (bool (libdar::same_path_mask::*)(const libdar::path &) const) &libdar::same_path_mask::is_covered, "Mask based on libdar::path")
+	.def("dump", &libdar::same_path_mask::dump)
+	.def("clone", &libdar::same_path_mask::clone);
+
+    pybind11::class_<libdar::exclude_dir_mask, libdar::mask>(mod, "exclude_dir_mask")
+	.def(pybind11::init<const std::string &, bool>())
+	.def("is_covered", (bool (libdar::exclude_dir_mask::*)(const std::string &) const) &libdar::exclude_dir_mask::is_covered, "Mask based on string")
+	.def("is_covered", (bool (libdar::exclude_dir_mask::*)(const libdar::path &) const) &libdar::exclude_dir_mask::is_covered, "Mask based on libdar::path")
+	.def("dump", &libdar::exclude_dir_mask::dump)
+	.def("clone", &libdar::exclude_dir_mask::clone);
+
 
 	///////////////////////////////////////////
 	// archive_options_* classes
