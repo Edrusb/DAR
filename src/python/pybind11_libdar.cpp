@@ -431,6 +431,34 @@ PYBIND11_MODULE(libdar, mod)
 	.def("clone", &libdar::mask_list::clone)
 	.def("size", &libdar::mask_list::size);
 
+    	///////////////////////////////////////////
+	// binding for what's criterium.hpp
+	//
+
+    class pycriterium : public libdar::criterium
+    {
+    public:
+	virtual bool evaluate(const libdar::cat_nomme & first, const libdar::cat_nomme & second) const override
+	{
+	    PYBIND11_OVERLOAD_PURE(bool,
+				   libdar::criterium,
+				   evaluate,
+				   first,
+				   second);
+	}
+
+	virtual criterium *clone() const override
+	{
+	    PYBIND11_OVERLOAD_PURE(libdar::criterium *,
+				   libdar::criterium,
+				   clone,); // trailing comma expected as this method has no argument
+	};
+    };
+
+    pybind11::class_<libdar::criterium, pycriterium>(mod, "criterium")
+	.def(pybind11::init<>())
+	.def("evaluate", &libdar::criterium::evaluate)
+	.def("clone", &libdar::criterium::clone);
 
 	///////////////////////////////////////////
 	// binding for what's in crit_action.hpp
