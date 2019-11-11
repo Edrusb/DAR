@@ -30,7 +30,6 @@
 
 #include <deque>
 
-#include "user_interaction.hpp"
 #include "criterium.hpp"
 
 namespace libdar
