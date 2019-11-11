@@ -31,6 +31,7 @@
 #include "../my_config.h"
 #include "../libdar/libdar.hpp"
 #include "../libdar/tools.hpp"
+#include "../libdar/cat_nomme.hpp"
 
 PYBIND11_MODULE(libdar, mod)
 {
@@ -430,6 +431,85 @@ PYBIND11_MODULE(libdar, mod)
 	.def("clone", &libdar::mask_list::clone)
 	.def("size", &libdar::mask_list::size);
 
+
+	///////////////////////////////////////////
+	// binding for what's in crit_action.hpp
+	//
+
+    pybind11::enum_<libdar::saved_status>(mod, "saved_status")
+	.value("saved", libdar::saved_status::saved)
+	.value("inode_only", libdar::saved_status::inode_only)
+	.value("fake", libdar::saved_status::fake)
+	.value("not_saved", libdar::saved_status::not_saved)
+	.value("delta", libdar::saved_status::delta)
+	.export_values();
+
+    pybind11::enum_<libdar::over_action_data>(mod, "over_action_data")
+	.value("data_preserve", libdar::data_preserve)
+	.value("data_overwrite", libdar::data_overwrite)
+	.value("data_preserve_mark_already_saved", libdar::data_preserve_mark_already_saved)
+	.value("data_overwrite_mark_already_saved", libdar::data_overwrite_mark_already_saved)
+	.value("data_remove", libdar::data_remove)
+	.value("data_undefined", libdar::data_undefined)
+	.value("data_ask", libdar::data_ask)
+	.export_values();
+
+    pybind11::enum_<libdar::over_action_ea>(mod, "over_action_ea")
+	.value("EA_preserve", libdar::EA_preserve)
+	.value("EA_overwrite", libdar::EA_overwrite)
+	.value("EA_clear", libdar::EA_clear)
+	.value("EA_preserve_mark_already_saved", libdar::EA_preserve_mark_already_saved)
+	.value("EA_overwrite_mark_already_saved", libdar::EA_overwrite_mark_already_saved)
+	.value("EA_merge_preserve", libdar::EA_merge_preserve)
+	.value("EA_merge_overwrite", libdar::EA_merge_overwrite)
+	.value("EA_undefined", libdar::EA_undefined)
+	.value("EA_ask", libdar::EA_ask)
+	.export_values();
+
+    class pycrit_action : public libdar::crit_action
+    {
+    public:
+	virtual void get_action(const libdar::cat_nomme & first, const libdar::cat_nomme & second, libdar::over_action_data & data, libdar::over_action_ea & ea) const override
+	{
+	    PYBIND11_OVERLOAD_PURE(void,
+				   libdar::crit_action,
+				   get_action,
+				   first,
+				   second,
+				   data,
+				   ea);
+	};
+
+	virtual libdar::crit_action *clone() const override
+	{
+	    PYBIND11_OVERLOAD_PURE(libdar::crit_action *,
+				   libdar::crit_action,
+				   clone,); // training comma is expected as there is no argument to this method
+	};
+    };
+
+    pybind11::class_<libdar::crit_action, pycrit_action>(mod, "crit_action")
+	.def(pybind11::init<>())
+	.def("get_action", &libdar::crit_action::get_action)
+	.def("clone", &libdar::crit_action::clone);
+
+    pybind11::class_<libdar::crit_constant_action, libdar::crit_action>(mod, "crit_constant_action")
+	.def(pybind11::init<libdar::over_action_data, libdar::over_action_ea>())
+	.def("get_action", &libdar::crit_constant_action::get_action)
+	.def("clone", &libdar::crit_constant_action::clone);
+
+    pybind11::class_<libdar::testing, libdar::crit_action>(mod, "testing")
+	.def(pybind11::init<const libdar::criterium &, const libdar::crit_action &, const libdar::crit_action &>())
+	.def("get_action", &libdar::testing::get_action)
+	.def("clone", &libdar::testing::clone);
+
+    pybind11::class_<libdar::crit_chain, libdar::crit_action>(mod, "crit_chain")
+	.def(pybind11::init<>())
+	.def("add", &libdar::crit_chain::add)
+	.def("clear", &libdar::crit_chain::clear)
+	.def("gobe", &libdar::crit_chain::gobe)
+	.def("get_action", &libdar::crit_chain::get_action)
+	.def("clone", &libdar::crit_chain::clone);
 
 	///////////////////////////////////////////
 	// archive_options_* classes
