@@ -418,6 +418,18 @@ PYBIND11_MODULE(libdar, mod)
 	.def("dump", &libdar::exclude_dir_mask::dump)
 	.def("clone", &libdar::exclude_dir_mask::clone);
 
+    	///////////////////////////////////////////
+	// mask_list_* class
+	//
+
+    pybind11::class_<libdar::mask_list, libdar::mask>(mod, "mask_list")
+	.def(pybind11::init<const std::string &, bool, const libdar::path &, bool>())
+	.def("is_covered", (bool (libdar::mask_list::*)(const std::string &) const) &libdar::mask_list::is_covered, "Mask based on string")
+	.def("is_covered", (bool (libdar::mask_list::*)(const libdar::path &) const) &libdar::mask_list::is_covered, "Mask based on libdar::path")
+	.def("dump", &libdar::mask_list::dump)
+	.def("clone", &libdar::mask_list::clone)
+	.def("size", &libdar::mask_list::size);
+
 
 	///////////////////////////////////////////
 	// archive_options_* classes
@@ -513,5 +525,3 @@ PYBIND11_MODULE(libdar, mod)
 	.def("set_sig_block_len", &libdar::archive_options_create::set_sig_block_len);
 
 }
-
-
