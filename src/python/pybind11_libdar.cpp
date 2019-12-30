@@ -664,6 +664,33 @@ PYBIND11_MODULE(libdar, mod)
 	.def("get_action", &libdar::crit_chain::get_action)
 	.def("clone", &libdar::crit_chain::clone);
 
+
+	///////////////////////////////////////////
+	// secu_string classes
+	//
+
+    pybind11::class_<libdar::secu_string>(mod, "secu_string")
+	.def_static("is_string_secured", &libdar::secu_string::is_string_secured)
+	.def(pybind11::init<libdar::U_I>(), pybind11::arg("storage_size") = 0)
+	.def(pybind11::init<const char *, libdar::U_I>())
+	.def(pybind11::self != pybind11::self)
+	.def(pybind11::self == pybind11::self)
+	.def("set", &libdar::secu_string::set)
+	.def("append_at", (void (libdar::secu_string::*)(libdar::U_I, const char *, libdar::U_I))&libdar::secu_string::append_at)
+	.def("append_at", (void (libdar::secu_string::*)(libdar::U_I, int, libdar::U_I))&libdar::secu_string::append_at)
+	.def("append", (void (libdar::secu_string::*)(const char *, libdar::U_I)) &libdar::secu_string::append)
+	.def("append", (void (libdar::secu_string::*)(int, libdar::U_I)) &libdar::secu_string::append)
+	.def("reduce_string_size_to", &libdar::secu_string::reduce_string_size_to)
+	.def("clear", &libdar::secu_string::clear)
+	.def("resize", &libdar::secu_string::resize)
+	.def("randomize", &libdar::secu_string::randomize)
+	.def("c_str", &libdar::secu_string::c_str)
+	.def("get_array", &libdar::secu_string::get_array)
+	.def("get_size", &libdar::secu_string::get_size)
+	.def("empty", &libdar::secu_string::empty)
+	.def("get_allocated_size", &libdar::secu_string::get_allocated_size);
+
+
 	///////////////////////////////////////////
 	// archive_options_* classes
 	//
