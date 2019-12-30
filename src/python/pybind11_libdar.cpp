@@ -876,4 +876,19 @@ PYBIND11_MODULE(libdar, mod)
 	.def("set_user_slicing", &libdar::archive_options_listing::set_user_slicing)
 	.def("set_display_ea", &libdar::archive_options_listing::set_display_ea);
 
+    pybind11::class_<libdar::archive_options_diff>(mod, "archive_options_diff")
+	.def("clear", &libdar::archive_options_diff::clear)
+	.def("set_selection", &libdar::archive_options_diff::set_selection)
+	.def("set_subtree", &libdar::archive_options_diff::set_subtree)
+	.def("set_info_details", &libdar::archive_options_diff::set_info_details)
+	.def("set_display_treated", &libdar::archive_options_diff::set_display_treated)
+	.def("set_display_skipped", &libdar::archive_options_diff::set_display_skipped)
+	.def("set_ea_mask", &libdar::archive_options_diff::set_ea_mask)
+	.def("set_what_to_check", &libdar::archive_options_diff::set_what_to_check)
+	.def("set_alter_atime", &libdar::archive_options_diff::set_alter_atime)
+	.def("set_furtive_read_mode", &libdar::archive_options_diff::set_furtive_read_mode)
+	.def("set_hourshift", &libdar::archive_options_diff::set_hourshift)
+	.def("set_compare_symlink_date", &libdar::archive_options_diff::set_compare_symlink_date)
+	.def("set_fsa_scope", &libdar::archive_options_diff::set_fsa_scope);
+
 }
