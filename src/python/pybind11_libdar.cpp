@@ -866,5 +866,14 @@ PYBIND11_MODULE(libdar, mod)
 	.def("set_fsa_scope", &libdar::archive_options_extract::set_fsa_scope);
 
 
+    pybind11::class_<libdar::archive_options_listing>(mod, "archive_options_listing")
+	.def("clear", &libdar::archive_options_listing::clear)
+	.def("set_info_details", &libdar::archive_options_listing::set_info_details)
+	.def("set_selection", &libdar::archive_options_listing::set_selection)
+	.def("set_subtree", &libdar::archive_options_listing::set_subtree)
+	.def("set_filter_unsaved", &libdar::archive_options_listing::set_filter_unsaved)
+	.def("set_slicing_location", &libdar::archive_options_listing::set_slicing_location)
+	.def("set_user_slicing", &libdar::archive_options_listing::set_user_slicing)
+	.def("set_display_ea", &libdar::archive_options_listing::set_display_ea);
 
 }
