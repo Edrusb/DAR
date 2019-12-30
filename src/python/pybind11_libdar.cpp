@@ -891,4 +891,14 @@ PYBIND11_MODULE(libdar, mod)
 	.def("set_compare_symlink_date", &libdar::archive_options_diff::set_compare_symlink_date)
 	.def("set_fsa_scope", &libdar::archive_options_diff::set_fsa_scope);
 
+
+    pybind11::class_<libdar::archive_options_test>(mod, "archive_options_test")
+	.def("clear", &libdar::archive_options_test::clear)
+	.def("set_selection", &libdar::archive_options_test::set_selection)
+	.def("set_subtree", &libdar::archive_options_test::set_subtree)
+	.def("set_info_details", &libdar::archive_options_test::set_info_details)
+	.def("set_display_skipped", &libdar::archive_options_test::set_display_skipped)
+	.def("set_display_treated", &libdar::archive_options_test::set_display_treated)
+	.def("set_empty", &libdar::archive_options_test::set_empty);
+
 }
