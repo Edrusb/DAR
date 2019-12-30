@@ -901,4 +901,31 @@ PYBIND11_MODULE(libdar, mod)
 	.def("set_display_treated", &libdar::archive_options_test::set_display_treated)
 	.def("set_empty", &libdar::archive_options_test::set_empty);
 
+
+    pybind11::class_<libdar::archive_options_repair>(mod, "archive_options_repair")
+	.def("clear", &libdar::archive_options_repair::clear)
+	.def("set_allow_over", &libdar::archive_options_repair::set_allow_over)
+	.def("set_warn_over", &libdar::archive_options_repair::set_warn_over)
+	.def("set_info_details", &libdar::archive_options_repair::set_info_details)
+	.def("set_display_treated", &libdar::archive_options_repair::set_display_treated)
+	.def("set_display_skipped", &libdar::archive_options_repair::set_display_skipped)
+	.def("set_display_finished", &libdar::archive_options_repair::set_display_finished)
+	.def("set_pause", &libdar::archive_options_repair::set_pause)
+	.def("set_slicing", &libdar::archive_options_repair::set_slicing)
+	.def("set_execute", &libdar::archive_options_repair::set_execute)
+	.def("set_crypto_algo", &libdar::archive_options_repair::set_crypto_algo)
+	.def("set_crypto_pass", &libdar::archive_options_repair::set_crypto_pass)
+	.def("set_crypto_size", &libdar::archive_options_repair::set_crypto_size)
+	.def("set_gnupg_recipients", &libdar::archive_options_repair::set_gnupg_recipients)
+	.def("set_gnupg_signatories", &libdar::archive_options_repair::set_gnupg_signatories)
+	.def("set_empty", &libdar::archive_options_repair::set_empty)
+	.def("set_slice_permission", &libdar::archive_options_repair::set_slice_permission)
+	.def("set_slice_user_ownership", &libdar::archive_options_repair::set_slice_user_ownership)
+	.def("set_slice_group_ownership", &libdar::archive_options_repair::set_slice_group_ownership)
+	.def("set_user_comment", &libdar::archive_options_repair::set_user_comment)
+	.def("set_hash_algo", &libdar::archive_options_repair::set_hash_algo)
+	.def("set_slice_min_digits", &libdar::archive_options_repair::set_slice_min_digits)
+	.def("set_entrepot", &libdar::archive_options_repair::set_entrepot)
+	.def("set_multi_threaded", &libdar::archive_options_repair::set_multi_threaded);
+
 }
