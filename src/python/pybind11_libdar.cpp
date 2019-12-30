@@ -837,5 +837,34 @@ PYBIND11_MODULE(libdar, mod)
 	.def("set_sig_block_len", &libdar::archive_options_merge::set_sig_block_len);
 
 
+    pybind11::class_<libdar::archive_options_extract> py_archive_options_extract(mod, "archive_options_extract");
+
+    pybind11::enum_<libdar::archive_options_extract::t_dirty>(py_archive_options_extract, "t_dirty")
+	.value("dirty_ignore",libdar::archive_options_extract::t_dirty::dirty_ignore)
+	.value("dirty_warn",libdar::archive_options_extract::t_dirty::dirty_warn)
+	.value("dirty_ok", libdar::archive_options_extract::t_dirty::dirty_ok);
+
+    py_archive_options_extract
+	.def("clear", &libdar::archive_options_extract::clear)
+	.def("set_selection", &libdar::archive_options_extract::set_selection)
+	.def("set_subtree", &libdar::archive_options_extract::set_subtree)
+	.def("set_warn_over", &libdar::archive_options_extract::set_warn_over)
+	.def("set_info_details", &libdar::archive_options_extract::set_info_details)
+	.def("set_display_treated", &libdar::archive_options_extract::set_display_treated)
+	.def("set_display_skipped", &libdar::archive_options_extract::set_display_skipped)
+	.def("set_ea_mask", &libdar::archive_options_extract::set_ea_mask)
+	.def("set_flat", &libdar::archive_options_extract::set_flat)
+	.def("set_what_to_check", &libdar::archive_options_extract::set_what_to_check)
+	.def("set_warn_remove_no_match", &libdar::archive_options_extract::set_warn_remove_no_match)
+	.def("set_empty", &libdar::archive_options_extract::set_empty)
+	.def("set_empty_dir", &libdar::archive_options_extract::set_empty_dir)
+	.def("set_dirty_behavior", (void (libdar::archive_options_extract::*)(bool, bool)) &libdar::archive_options_extract::set_dirty_behavior)
+	.def("set_dirty_behavior", (void (libdar::archive_options_extract::*)(libdar::archive_options_extract::t_dirty)) &libdar::archive_options_extract::set_dirty_behavior)
+	.def("set_overwriting_rules", &libdar::archive_options_extract::set_overwriting_rules)
+	.def("set_only_deleted", &libdar::archive_options_extract::set_only_deleted)
+	.def("set_ignore_deleted", &libdar::archive_options_extract::set_ignore_deleted)
+	.def("set_fsa_scope", &libdar::archive_options_extract::set_fsa_scope);
+
+
 
 }
