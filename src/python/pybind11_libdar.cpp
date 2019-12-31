@@ -692,6 +692,92 @@ PYBIND11_MODULE(libdar, mod)
 
 
 	///////////////////////////////////////////
+	// user_interaction classes
+	//
+
+    class py_user_interaction_no_printf: public libdar::user_interaction
+    {
+    public:
+	using user_interaction::user_interaction;
+
+    private:
+	using user_interaction::printf;
+    };
+
+    class py_user_interaction : public py_user_interaction_no_printf
+    {
+    public:
+	using py_user_interaction_no_printf::py_user_interaction_no_printf;
+
+    protected:
+	    // moving as public the protected methods of libdar::user_interaction
+	    // in order for one to derivate a class from python side
+
+	virtual void inherited_message(const std::string & message) override
+	{
+	    PYBIND11_OVERLOAD_PURE(
+		void,
+		libdar::user_interaction,
+		inherited_message,
+		message);
+	};
+
+	virtual bool inherited_pause(const std::string & message) override
+	{
+	    PYBIND11_OVERLOAD_PURE(
+		bool,
+		libdar::user_interaction,
+		inherited_pause,
+		message);
+	};
+
+	virtual std::string inherited_get_string(const std::string & message, bool echo) override
+	{
+	    PYBIND11_OVERLOAD_PURE(
+		std::string,
+		libdar::user_interaction,
+		inherited_get_string,
+		message,
+		echo);
+	}
+
+	virtual libdar::secu_string inherited_get_secu_string(const std::string & message, bool echo) override
+	{
+	    PYBIND11_OVERLOAD_PURE(
+		libdar::secu_string,
+		libdar::user_interaction,
+		inherited_get_secu_string,
+		message,
+		echo);
+	}
+
+    };
+
+    class py_user_interaction_pub : public py_user_interaction
+    {
+    public:
+	using py_user_interaction::py_user_interaction;
+	using py_user_interaction::inherited_message;
+	using py_user_interaction::inherited_pause;
+	using py_user_interaction::inherited_get_string;
+	using py_user_interaction::inherited_get_secu_string;
+    };
+
+
+    pybind11::class_<py_user_interaction, py_user_interaction_no_printf>(mod, "user_interaction")
+	.def("message", &py_user_interaction_no_printf::message)
+	.def("pause", &py_user_interaction_no_printf::pause)
+	.def("get_string", &py_user_interaction_no_printf::get_string)
+	.def("get_secu_string", &py_user_interaction_no_printf::get_secu_string)
+	    // the following point to methods of py_user_interaction (these are protected
+	    // and unaccessibled from python in libdar::user_interaction
+	.def("inherited_message", &py_user_interaction_pub::inherited_message)
+	.def("inherited_pause", &py_user_interaction_pub::inherited_pause)
+	.def("inherited_get_string", &py_user_interaction_pub::inherited_get_string)
+	.def("inherited_get_secu_string", &py_user_interaction_pub::inherited_get_secu_string);
+
+
+    	///////////////////////////////////////////
 	// archive_options_* classes
 	//
 
