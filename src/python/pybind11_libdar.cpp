@@ -924,6 +924,21 @@ PYBIND11_MODULE(libdar, mod)
     mod.def("hash_algo_to_string", &libdar::hash_algo_to_string);
     mod.def("string_to_hash_algo", &libdar::string_to_hash_algo);
 
+    	///////////////////////////////////////////
+	// compression_* structures and routines
+	//
+
+    pybind11::enum_<libdar::compression>(mod, "compression")
+	.value("none", libdar::compression::none)
+	.value("gzip", libdar::compression::gzip)
+	.value("bzip2", libdar::compression::bzip2)
+	.value("lzo", libdar::compression::lzo)
+	.value("xz", libdar::compression::xz)
+	.value("lzo1x_1_15", libdar::compression::lzo1x_1_15)
+	.value("lzo1x_1", libdar::compression::lzo1x_1);
+
+    mod.def("compression2string", &libdar::compression2string);
+    mod.def("string2compression", &libdar::string2compression);
 
     	///////////////////////////////////////////
 	// archive_options_* classes
