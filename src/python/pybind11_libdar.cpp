@@ -1272,4 +1272,53 @@ PYBIND11_MODULE(libdar, mod)
 	.def("set_entrepot", &libdar::archive_options_repair::set_entrepot)
 	.def("set_multi_threaded", &libdar::archive_options_repair::set_multi_threaded);
 
+
+
+	//////////////////////////////////////////
+	// entree_stats classes
+	//
+
+    pybind11::class_<libdar::entree_stats>(mod, "entree_stats")
+	.def_readonly("num_x", &libdar::entree_stats::num_x)
+	.def_readonly("num_d", &libdar::entree_stats::num_d)
+	.def_readonly("num_f", &libdar::entree_stats::num_f)
+	.def_readonly("num_c", &libdar::entree_stats::num_c)
+	.def_readonly("num_b", &libdar::entree_stats::num_b)
+	.def_readonly("num_p", &libdar::entree_stats::num_p)
+	.def_readonly("num_s", &libdar::entree_stats::num_s)
+	.def_readonly("num_l", &libdar::entree_stats::num_l)
+	.def_readonly("num_D", &libdar::entree_stats::num_D)
+	.def_readonly("num_hard_linked_inodes", &libdar::entree_stats::num_hard_linked_inodes)
+	.def_readonly("num_hard_link_entries", &libdar::entree_stats::num_hard_link_entries)
+	.def_readonly("saved", &libdar::entree_stats::saved)
+	.def_readonly("patched", &libdar::entree_stats::patched)
+	.def_readonly("inode_only", &libdar::entree_stats::inode_only)
+	.def_readonly("total", &libdar::entree_stats::total)
+	.def("clear", &libdar::entree_stats::clear)
+	.def("listing", &libdar::entree_stats::listing);
+
+    	///////////////////////////////////////////
+	// archive_summary classes
+	//
+
+    pybind11::class_<libdar::archive_summary>(mod, "aerchive_summary")
+	.def("get_slice_size", &libdar::archive_summary::get_slice_size)
+	.def("get_first_slice_size", &libdar::archive_summary::get_first_slice_size)
+	.def("get_last_slice_size", &libdar::archive_summary::get_last_slice_size)
+	.def("get_slice_number", &libdar::archive_summary::get_slice_number)
+	.def("get_archive_size", &libdar::archive_summary::get_archive_size)
+	.def("get_catalog_size", &libdar::archive_summary::get_catalog_size)
+	.def("get_storage_size", &libdar::archive_summary::get_storage_size)
+	.def("get_data_size", &libdar::archive_summary::get_data_size)
+	.def("get_contents", &libdar::archive_summary::get_contents)
+	.def("get_edition", &libdar::archive_summary::get_edition)
+	.def("get_compression_algo", &libdar::archive_summary::get_compression_algo)
+	.def("get_user_comment", &libdar::archive_summary::get_user_comment)
+	.def("get_cipher", &libdar::archive_summary::get_cipher)
+	.def("get_asym", &libdar::archive_summary::get_asym)
+	.def("get_signed", &libdar::archive_summary::get_signed)
+	.def("get_tape_marks", &libdar::archive_summary::get_tape_marks)
+	.def("clear", &libdar::archive_summary::clear);
+
+
 }
