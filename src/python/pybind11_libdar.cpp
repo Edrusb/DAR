@@ -33,6 +33,7 @@
 #include "../libdar/tools.hpp"
 #include "../libdar/cat_nomme.hpp"
 #include "../libdar/entrepot_local.hpp"
+#include "../libdar/entrepot_libcurl.hpp"
 
 PYBIND11_MODULE(libdar, mod)
 {
@@ -805,6 +806,33 @@ PYBIND11_MODULE(libdar, mod)
 	.def("get_full_path", &libdar::entrepot_local::get_full_path)
 	.def("get_location", &libdar::entrepot_local::get_location)
 	.def("get_root", &libdar::entrepot_local::get_root);
+
+    pybind11::enum_<libdar::mycurl_protocol>(mod, "mycurl_protocol")
+	.value("proto_ftp", libdar::mycurl_protocol::proto_ftp)
+	.value("proto_sftp", libdar::mycurl_protocol::proto_sftp);
+
+    pybind11::class_<libdar::entrepot_libcurl>(mod, "entrepot_libcurl")
+	.def(pybind11::init<
+	     const std::shared_ptr<libdar::user_interaction> &,
+	     libdar::mycurl_protocol,
+	     const std::string &,
+	     const libdar::secu_string &,
+	     const std::string &,
+	     const std::string &,
+	     bool,
+	     const std::string &,
+	     const std::string &,
+	     const std::string &,
+	     libdar::U_I>())
+	.def("get_url", &libdar::entrepot_libcurl::get_url)
+	.def("read_dir_reset", &libdar::entrepot_libcurl::read_dir_reset)
+    	.def("read_dir_next", &libdar::entrepot_libcurl::read_dir_next)
+	.def("clone", &libdar::entrepot_libcurl::clone)
+	.def("set_location", &libdar::entrepot_libcurl::set_location)
+	.def("set_root", &libdar::entrepot_libcurl::set_root)
+	.def("get_full_path", &libdar::entrepot_libcurl::get_full_path)
+	.def("get_location", &libdar::entrepot_libcurl::get_location)
+	.def("get_root", &libdar::entrepot_libcurl::get_root);
 
 
     	///////////////////////////////////////////
