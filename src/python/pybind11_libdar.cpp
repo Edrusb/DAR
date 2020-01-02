@@ -900,6 +900,31 @@ PYBIND11_MODULE(libdar, mod)
     mod.def("compile_time.librsync", &libdar::compile_time::librsync);
     mod.def("compile_time.remote_repository", &libdar::compile_time::remote_repository);
 
+
+	///////////////////////////////////////////
+	// archive_aux_* structures and routines
+	//
+
+    pybind11::enum_<libdar::modified_data_detection>(mod, "modified_data_detection")
+	.value("any_inode_change", libdar::modified_data_detection::any_inode_change)
+	.value("mtime_size", libdar::modified_data_detection::mtime_size);
+
+    pybind11::enum_<libdar::comparison_fields>(mod, "comparison_fields")
+	.value("all", libdar::comparison_fields::all)
+	.value("ignore_owner", libdar::comparison_fields::ignore_owner)
+	.value("mtime", libdar::comparison_fields::mtime)
+	.value("inode_type", libdar::comparison_fields::inode_type);
+
+    pybind11::enum_<libdar::hash_algo>(mod, "hash_algo")
+	.value("none", libdar::hash_algo::none)
+	.value("md5", libdar::hash_algo::md5)
+	.value("sha1", libdar::hash_algo::sha1)
+	.value("sha512", libdar::hash_algo::sha512);
+
+    mod.def("hash_algo_to_string", &libdar::hash_algo_to_string);
+    mod.def("string_to_hash_algo", &libdar::string_to_hash_algo);
+
+
     	///////////////////////////////////////////
 	// archive_options_* classes
 	//
