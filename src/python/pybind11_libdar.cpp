@@ -940,6 +940,32 @@ PYBIND11_MODULE(libdar, mod)
     mod.def("compression2string", &libdar::compression2string);
     mod.def("string2compression", &libdar::string2compression);
 
+	///////////////////////////////////////////
+	// delta_sig_block_size datastructure
+	//
+
+    pybind11::class_<libdar::delta_sig_block_size> dsbs(mod, "delta_sig_block_size");
+
+    pybind11::enum_<libdar::delta_sig_block_size::fs_function_t>(dsbs, "fs_function_t")
+	.value("fixed", libdar::delta_sig_block_size::fixed)
+	.value("linear", libdar::delta_sig_block_size::linear)
+	.value("log2", libdar::delta_sig_block_size::log2)
+	.value("square2", libdar::delta_sig_block_size::square2)
+	.value("square3", libdar::delta_sig_block_size::square3);
+
+    dsbs
+	.def_readwrite("fs_function", &libdar::delta_sig_block_size::fs_function)
+	.def_readwrite("multiplier", &libdar::delta_sig_block_size::multiplier)
+	.def_readwrite("divisor", &libdar::delta_sig_block_size::divisor)
+	.def_readwrite("min_block_len", &libdar::delta_sig_block_size::min_block_len)
+	.def_readwrite("max_block_len", &libdar::delta_sig_block_size::max_block_len)
+	.def(pybind11::self == pybind11::self)
+	.def("reset", &libdar::delta_sig_block_size::reset)
+	.def("equals_defaults", &libdar::delta_sig_block_size::equals_default)
+	.def("check", &libdar::delta_sig_block_size::check)
+	.def("calculate", &libdar::delta_sig_block_size::calculate);
+
+
     	///////////////////////////////////////////
 	// archive_options_* classes
 	//
