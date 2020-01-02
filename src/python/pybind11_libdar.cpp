@@ -1444,4 +1444,38 @@ PYBIND11_MODULE(libdar, mod)
 	.def("init_catalogue", &libdar::archive::init_catalogue)
 	.def("drop_all_filedescriptors", &libdar::archive::drop_all_filedescriptors)
 	.def("set_to_unsaved_data_and_FSA", &libdar::archive::set_to_unsaved_data_and_FSA);
+
+
+
+    	///////////////////////////////////////////
+	// database classes
+	//
+
+    pybind11::class_<libdar::database>(mod, "database")
+	.def(pybind11::init<const std::shared_ptr<libdar::user_interaction> &>())
+	.def(pybind11::init<
+	     const std::shared_ptr<libdar::user_interaction> &,
+	     const std::string &,
+	     const libdar::database_open_options &
+	     >())
+	.def("dump", &libdar::database::dump)
+	.def("add_archive", &libdar::database::add_archive)
+	.def("remove_archive", &libdar::database::remove_archive)
+	.def("set_permutation", &libdar::database::set_permutation)
+	.def("change_name", &libdar::database::change_name)
+	.def("set_path", &libdar::database::set_path)
+	.def("set_options", &libdar::database::set_options)
+	.def("set_dar_path", &libdar::database::set_dar_path)
+	.def("set_compression", &libdar::database::set_compression)
+	.def("get_contents", &libdar::database::get_contents)
+	.def("get_options", &libdar::database::get_options)
+	.def("get_dar_path", &libdar::database::get_dar_path)
+	.def("get_compression", &libdar::database::get_compression)
+	.def("get_database_version", &libdar::database::get_database_version)
+	.def("get_files", &libdar::database::get_files)
+	.def("get_version", &libdar::database::get_version)
+	.def("show_most_recent_stats", &libdar::database::show_most_recent_stats)
+	.def("restore", &libdar::database::restore)
+	.def("check_order", &libdar::database::check_order);
+
 }
