@@ -836,6 +836,37 @@ PYBIND11_MODULE(libdar, mod)
 
 
     	///////////////////////////////////////////
+	// fsa_* classes / enums
+	//
+
+    pybind11::enum_<libdar::fsa_family>(mod, "fsa_family")
+	.value("fsaf_hfs_plus", libdar::fsa_family::fsaf_hfs_plus)
+	.value("fsaf_linux_extX", libdar::fsa_family::fsaf_linux_extX);
+
+    pybind11::enum_<libdar::fsa_nature>(mod, "fsa_nature")
+	.value("fsan_unset", libdar::fsa_nature::fsan_unset)
+	.value("fsan_creation_date", libdar::fsa_nature::fsan_creation_date)
+	.value("fsan_append_only", libdar::fsa_nature::fsan_append_only)
+	.value("fsan_compressed", libdar::fsa_nature::fsan_compressed)
+	.value("fsan_no_dump", libdar::fsa_nature::fsan_no_dump)
+	.value("fsan_immutable", libdar::fsa_nature::fsan_immutable)
+	.value("fsan_data_journaling", libdar::fsa_nature::fsan_data_journaling)
+	.value("fsan_secure_deletion", libdar::fsa_nature::fsan_secure_deletion)
+	.value("fsan_no_tail_merging", libdar::fsa_nature::fsan_no_tail_merging)
+	.value("fsan_undeletable", libdar::fsa_nature::fsan_undeletable)
+	.value("fsan_noatime_update", libdar::fsa_nature::fsan_noatime_update)
+	.value("fsan_sychronous_directory", libdar::fsa_nature::fsan_synchronous_directory)
+	.value("fsan_sychronous_update", libdar::fsa_nature::fsan_synchronous_update)
+	.value("fsan_top_of_dir_hierachy", libdar::fsa_nature::fsan_top_of_dir_hierarchy);
+
+    mod.def("fsa_family_to_string", &libdar::fsa_family_to_string);
+    mod.def("fsa_nature_to_string", &libdar::fsa_nature_to_string);
+    mod.def("all_fsa_families", &libdar::all_fsa_families);
+    mod.def("fsa_scope_to_infinint", &libdar::fsa_scope_to_infinint);
+    mod.def("infinint_to_fsa_scope", &libdar::infinint_to_fsa_scope);
+    mod.def("fsa_scope_to_string", &libdar::fsa_scope_to_string);
+
+    	///////////////////////////////////////////
 	// archive_options_* classes
 	//
 
