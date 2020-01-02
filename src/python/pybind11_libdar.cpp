@@ -1387,4 +1387,61 @@ PYBIND11_MODULE(libdar, mod)
 	.def("get_delta_patch_result_crc", &libdar::list_entry::get_delta_patch_result_crc)
 	.def("clear", &libdar::list_entry::clear);
 
+    	///////////////////////////////////////////
+	// archive classes
+	//
+
+
+    pybind11::class_<libdar::archive>(mod, "archive")
+	.def(pybind11::init<
+	     const std::shared_ptr<libdar::user_interaction> &,
+	     const libdar::path,
+	     const std::string &,
+	     const std::string &,
+	     const libdar::archive_options_read &
+	     >())
+	.def(pybind11::init<
+	     const std::shared_ptr<libdar::user_interaction> &,
+	     const libdar::path &,
+	     const libdar::path &,
+	     const std::string &,
+	     const std::string &,
+	     const libdar::archive_options_create &,
+	     libdar::statistics *
+	     >())
+	.def(pybind11::init<
+	     const std::shared_ptr<libdar::user_interaction> &,
+	     const libdar::path &,
+	     std::shared_ptr<libdar::archive>,
+	     const std::string &,
+	     const std::string &,
+	     const libdar::archive_options_merge &,
+	     libdar::statistics *
+	     >())
+	.def(pybind11::init<
+	     const std::shared_ptr<libdar::user_interaction> &,
+	     const libdar::path &,
+	     const std::string &,
+	     const std::string &,
+	     const libdar::archive_options_read &,
+	     const libdar::path &,
+	     const std::string &,
+	     const std::string &,
+	     const libdar::archive_options_repair &
+	     >())
+
+	.def("op_extract", &libdar::archive::op_extract)
+	.def("summary", &libdar::archive::summary)
+	.def("summary_data", &libdar::archive::summary_data)
+	.def("op_listing", &libdar::archive::op_listing)
+	.def("op_diff", &libdar::archive::op_diff)
+	.def("op_test", &libdar::archive::op_test)
+	.def("op_isolate", &libdar::archive::op_isolate)
+	.def("get_children_in_table", &libdar::archive::get_children_in_table)
+	.def("has_subdirectory", &libdar::archive::has_subdirectory)
+	.def("get_stats", &libdar::archive::get_stats)
+	.def("get_signatories", &libdar::archive::get_signatories)
+	.def("init_catalogue", &libdar::archive::init_catalogue)
+	.def("drop_all_filedescriptors", &libdar::archive::drop_all_filedescriptors)
+	.def("set_to_unsaved_data_and_FSA", &libdar::archive::set_to_unsaved_data_and_FSA);
 }
