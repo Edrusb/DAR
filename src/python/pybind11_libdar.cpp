@@ -22,6 +22,7 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/operators.h>
+#include <tuple>
 
 // this should be passed from Makefile
 #define LIBDAR_MODE 64
@@ -41,6 +42,24 @@ PYBIND11_MODULE(libdar, mod)
 
     mod.doc() = "libdar python binding";
 
+    	///////////////////////////////////////////
+	// get_version
+	//
+
+    mod.def("get_version",
+	    [](bool libgcrypt, bool gpgme){ libdar::U_I maj, med, min; libdar::get_version(maj, med, min, libgcrypt, gpgme); return std::make_tuple(maj,med,min); },
+	    pybind11::arg("init_libgcrypt") = true,
+	    pybind11::arg("init_gpgme") = true);
+
+    mod.def("close_and_clean", &libdar::close_and_clean);
+
+#ifdef MUTEX_WORKS
+    mod
+	.def("cancel_thread", &libdar::cancel_thread)
+	.def("cancel_status", &libdar::cancel_status)
+	.def("cancel_clear", &libdar::cancel_clear)
+	.def("get_thread_count", &libdar::get_thread_count);
+#endif
 
 	///////////////////////////////////////////
 	// exceptions classes (from erreurs.hpp)
