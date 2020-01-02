@@ -1387,10 +1387,10 @@ PYBIND11_MODULE(libdar, mod)
 	.def("get_delta_patch_result_crc", &libdar::list_entry::get_delta_patch_result_crc)
 	.def("clear", &libdar::list_entry::clear);
 
+
     	///////////////////////////////////////////
 	// archive classes
 	//
-
 
     pybind11::class_<libdar::archive>(mod, "archive")
 	.def(pybind11::init<
