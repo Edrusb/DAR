@@ -712,9 +712,6 @@ PYBIND11_MODULE(libdar, mod)
 	using py_user_interaction_no_printf::py_user_interaction_no_printf;
 
     protected:
-	    // moving as public the protected methods of libdar::user_interaction
-	    // in order for one to derivate a class from python side
-
 	virtual void inherited_message(const std::string & message) override
 	{
 	    PYBIND11_OVERLOAD_PURE(
@@ -757,6 +754,8 @@ PYBIND11_MODULE(libdar, mod)
 
     class py_user_interaction_pub : public py_user_interaction
     {
+	    // moving as public the protected methods of libdar::user_interaction
+	    // in order for one to derivate a class from python side
     public:
 	using py_user_interaction::py_user_interaction;
 	using py_user_interaction::inherited_message;
