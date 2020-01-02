@@ -32,6 +32,7 @@
 #include "../libdar/libdar.hpp"
 #include "../libdar/tools.hpp"
 #include "../libdar/cat_nomme.hpp"
+#include "../libdar/entrepot_local.hpp"
 
 PYBIND11_MODULE(libdar, mod)
 {
@@ -787,6 +788,23 @@ PYBIND11_MODULE(libdar, mod)
 	.def("database_show_files", &libdar::shell_interaction::database_show_files)
 	.def("database_show_version", &libdar::shell_interaction::database_show_version)
 	.def("database_show_statistics", &libdar::shell_interaction::database_show_statistics);
+
+
+    	///////////////////////////////////////////
+	// entrepot_* classes
+	//
+
+    pybind11::class_<libdar::entrepot_local>(mod, "entrepot_local")
+	.def(pybind11::init<const std::string &, const std::string &, bool>())
+	.def("get_url", &libdar::entrepot_local::get_url)
+	.def("read_dir_reset", &libdar::entrepot_local::read_dir_reset)
+    	.def("read_dir_next", &libdar::entrepot_local::read_dir_next)
+	.def("clone", &libdar::entrepot_local::clone)
+	.def("set_location", &libdar::entrepot_local::set_location)
+	.def("set_root", &libdar::entrepot_local::set_root)
+	.def("get_full_path", &libdar::entrepot_local::get_full_path)
+	.def("get_location", &libdar::entrepot_local::get_location)
+	.def("get_root", &libdar::entrepot_local::get_root);
 
 
     	///////////////////////////////////////////
