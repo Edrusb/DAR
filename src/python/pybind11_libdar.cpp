@@ -706,6 +706,9 @@ PYBIND11_MODULE(libdar, mod)
 	using user_interaction::printf;
     };
 
+    pybind11::class_<py_user_interaction_no_printf>(mod, "py_user_interaction_no_printf");
+
+
     class py_user_interaction : public py_user_interaction_no_printf
     {
     public:
