@@ -713,8 +713,28 @@ PYBIND11_MODULE(libdar, mod)
 
 
 	///////////////////////////////////////////
+	// archive_options_listing_shell classes
+	//
+
+    pybind11::class_<libdar::archive_options_listing_shell> aols(mod, "archive_options_listing_shell");
+
+    pybind11::enum_<libdar::archive_options_listing_shell::listformat>(aols, "listformat")
+	.value("normal", libdar::archive_options_listing_shell::normal)
+	.value("tree", libdar::archive_options_listing_shell::tree)
+	.value("xml", libdar::archive_options_listing_shell::xml)
+	.value("slicing", libdar::archive_options_listing_shell::slicing);
+
+    aols
+	.def("clear", &libdar::archive_options_listing_shell::clear)
+	.def("set_list_mode", &libdar::archive_options_listing_shell::set_list_mode)
+	.def("set_sizes_in_bytes", &libdar::archive_options_listing_shell::set_sizes_in_bytes)
+	.def("get_list_mode", &libdar::archive_options_listing_shell::get_list_mode)
+	.def("get_sizes_in_bytes", &libdar::archive_options_listing_shell::get_sizes_in_bytes);
+
+	///////////////////////////////////////////
 	// user_interaction classes
 	//
+
 
     class py_user_interaction_no_printf: public libdar::user_interaction
     {
