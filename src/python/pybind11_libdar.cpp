@@ -865,6 +865,41 @@ PYBIND11_MODULE(libdar, mod)
     mod.def("infinint_to_fsa_scope", &libdar::infinint_to_fsa_scope);
     mod.def("fsa_scope_to_string", &libdar::fsa_scope_to_string);
 
+
+	///////////////////////////////////////////
+	// compile_time routines
+	//
+
+    mod.def("compile_time.ea", &libdar::compile_time::ea);
+    mod.def("compile_time.largefile", &libdar::compile_time::largefile);
+    mod.def("compile_time.nodump", &libdar::compile_time::nodump);
+    mod.def("compile_time.special_alloc", &libdar::compile_time::special_alloc);
+    mod.def("compile_time.bits", &libdar::compile_time::bits);
+    mod.def("compile_time.thread_safe", &libdar::compile_time::thread_safe);
+    mod.def("compile_time.libz", &libdar::compile_time::libz);
+    mod.def("compile_time.libbz2", &libdar::compile_time::libbz2);
+    mod.def("compile_time.liblzo", &libdar::compile_time::liblzo);
+    mod.def("compile_time.libxz", &libdar::compile_time::libxz);
+    mod.def("compile_time.libgcrypt", &libdar::compile_time::libgcrypt);
+    mod.def("compile_time.furtive_read", &libdar::compile_time::furtive_read);
+    pybind11::enum_<libdar::compile_time::endian>(mod, "endian")
+	.value("big", libdar::compile_time::big)
+	.value("little", libdar::compile_time::little)
+	.value("error", libdar::compile_time::error);
+    mod.def("compile_time.system_endian", &libdar::compile_time::system_endian);
+    mod.def("compile_time.posix_fadvise", &libdar::compile_time::posix_fadvise);
+    mod.def("compile_time.fast_dir", &libdar::compile_time::fast_dir);
+    mod.def("compile_time.FSA_linux_extX", &libdar::compile_time::FSA_linux_extX);
+    mod.def("compile_time.FSA_birthtime", &libdar::compile_time::FSA_birthtime);
+    mod.def("compile_time.microsecond_read", &libdar::compile_time::microsecond_read);
+    mod.def("compile_time.microsecond_write", &libdar::compile_time::microsecond_write);
+    mod.def("compile_time.symlink_restore_dates", &libdar::compile_time::symlink_restore_dates);
+    mod.def("compile_time.public_key_cipher", &libdar::compile_time::public_key_cipher);
+    mod.def("compile_time.libthreadar", &libdar::compile_time::libthreadar);
+    mod.def("compile_time.libthreadar_version", &libdar::compile_time::libthreadar_version);
+    mod.def("compile_time.librsync", &libdar::compile_time::librsync);
+    mod.def("compile_time.remote_repository", &libdar::compile_time::remote_repository);
+
     	///////////////////////////////////////////
 	// archive_options_* classes
 	//
