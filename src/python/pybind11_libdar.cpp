@@ -1446,6 +1446,14 @@ PYBIND11_MODULE(libdar, mod)
 	.def("set_to_unsaved_data_and_FSA", &libdar::archive::set_to_unsaved_data_and_FSA);
 
 
+    	///////////////////////////////////////////
+	// database_archives classes
+	//
+
+    pybind11::class_<libdar::database_archives>(mod, "database_archives")
+	.def("get_path", &libdar::database_archives::get_path)
+	.def("get_basename", &libdar::database_archives::get_basename);
+
 	///////////////////////////////////////////
 	// database_*_options classes
 	//
