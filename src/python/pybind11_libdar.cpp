@@ -194,9 +194,29 @@ PYBIND11_MODULE(libdar, mod)
 	.def(pybind11::init<off_t>(), pybind11::arg("a") = 0)
 	.def(pybind11::init<time_t>(), pybind11::arg("a") = 0)
 	.def(pybind11::init<size_t>(), pybind11::arg("a") = 0)
+	.def(pybind11::init<const real_infinint &>())
 	.def("dump", &libdar::real_infinint::dump)
 	.def("read", &libdar::real_infinint::read)
+	.def(pybind11::self += pybind11::self)
+	.def(pybind11::self -= pybind11::self)
+	.def(pybind11::self *= pybind11::self)
+	.def(pybind11::self /= pybind11::self)
+	.def(pybind11::self &= pybind11::self)
+	.def(pybind11::self |= pybind11::self)
+	.def(pybind11::self ^= pybind11::self)
+	.def(pybind11::self >>= pybind11::self)
+	.def(pybind11::self <<= pybind11::self)
+	.def(pybind11::self %= pybind11::self)
+	.def(pybind11::self % libdar::U_32())
+	.def(pybind11::self < pybind11::self)
+	.def(pybind11::self == pybind11::self)
+	.def(pybind11::self > pybind11::self)
+	.def(pybind11::self <= pybind11::self)
+	.def(pybind11::self != pybind11::self)
+	.def(pybind11::self >= pybind11::self)
 	.def("is_zero", &libdar::real_infinint::is_zero);
+
+    mod.def("euclide", [](const libdar::infinint & a, const libdar::infinint & b) { libdar::infinint q, r; euclide(a, b, q, r); return std::make_tuple(q, r); });
 
 #else
 
@@ -204,11 +224,33 @@ PYBIND11_MODULE(libdar, mod)
 	.def(pybind11::init<off_t>(), pybind11::arg("a") = 0)
 	.def(pybind11::init<time_t>(), pybind11::arg("a") = 0)
 	.def(pybind11::init<size_t>(), pybind11::arg("a") = 0)
+	.def(pybind11::init<const libdar::limitint<libdar::INFININT_BASE_TYPE> &>())
 	.def("dump", &libdar::limitint<libdar::INFININT_BASE_TYPE>::dump)
 	.def("read", &libdar::limitint<libdar::INFININT_BASE_TYPE>::read)
+	.def(pybind11::self += pybind11::self)
+	.def(pybind11::self -= pybind11::self)
+	.def(pybind11::self *= pybind11::self)
+	.def(pybind11::self /= pybind11::self)
+	.def(pybind11::self &= pybind11::self)
+	.def(pybind11::self |= pybind11::self)
+	.def(pybind11::self ^= pybind11::self)
+	.def(pybind11::self >>= pybind11::self)
+	.def(pybind11::self <<= pybind11::self)
+	.def(pybind11::self %= pybind11::self)
+	.def(pybind11::self % libdar::U_32())
+	.def(pybind11::self < pybind11::self)
+	.def(pybind11::self == pybind11::self)
+	.def(pybind11::self > pybind11::self)
+	.def(pybind11::self <= pybind11::self)
+	.def(pybind11::self != pybind11::self)
+	.def(pybind11::self >= pybind11::self)
 	.def("is_zero", &libdar::limitint<libdar::INFININT_BASE_TYPE>::is_zero);
 
+    mod.def("euclide", [](const libdar::infinint & a, const libdar::infinint & b) { libdar::infinint q, r; euclide(a, b, q, r); return std::make_tuple(q, r); });
+
 #endif
+
+
 
 	///////////////////////////////////////////
 	// class deci (from deci.hpp / limitint.hpp)
