@@ -1446,6 +1446,48 @@ PYBIND11_MODULE(libdar, mod)
 	.def("set_to_unsaved_data_and_FSA", &libdar::archive::set_to_unsaved_data_and_FSA);
 
 
+	///////////////////////////////////////////
+	// database_*_options classes
+	//
+
+    pybind11::class_<libdar::database_open_options>(mod, "database_open_options")
+	.def("clear", &libdar::database_open_options::clear)
+	.def("set_partial", &libdar::database_open_options::set_partial)
+	.def("set_partial_read_only", &libdar::database_open_options::set_partial_read_only)
+	.def("set_warn_order", &libdar::database_open_options::set_warn_order);
+
+    pybind11::class_<libdar::database_dump_options>(mod, "database_dump_options")
+	.def("clear", &libdar::database_dump_options::clear)
+	.def("set_overwrite", &libdar::database_dump_options::set_overwrite);
+
+    pybind11::class_<libdar::database_add_options>(mod, "database_add_options")
+	.def("clear", &libdar::database_add_options::clear);
+
+    pybind11::class_<libdar::database_remove_options>(mod, "database_remove_options")
+	.def("clear", &libdar::database_remove_options::clear)
+	.def("set_revert_archive_numbering", &libdar::database_remove_options::set_revert_archive_numbering);
+
+    pybind11::class_<libdar::database_change_basename_options>(mod, "database_change_basename_options")
+	.def("clear", &libdar::database_change_basename_options::clear)
+	.def("set_revert_archive_numbering", &libdar::database_change_basename_options::set_revert_archive_numbering);
+
+    pybind11::class_<libdar::database_change_path_options>(mod, "database_change_path_options")
+	.def("clear", &libdar::database_change_path_options::clear)
+	.def("set_revert_archive_numbering", &libdar::database_change_path_options::set_revert_archive_numbering);
+
+    pybind11::class_<libdar::database_restore_options>(mod, "database_restore_options")
+	.def("clear", &libdar::database_restore_options::clear)
+	.def("set_early_release", &libdar::database_restore_options::set_early_release)
+	.def("set_info_details", &libdar::database_restore_options::set_info_details)
+	.def("set_extra_options_for_dar", &libdar::database_restore_options::set_extra_options_for_dar)
+	.def("set_ignore_dar_options_in_database", &libdar::database_restore_options::set_ignore_dar_options_in_database)
+	.def("set_date", &libdar::database_restore_options::set_date)
+	.def("set_even_when_removed", &libdar::database_restore_options::set_even_when_removed);
+
+    pybind11::class_<libdar::database_used_options>(mod, "database_used_options")
+	.def("clear", &libdar::database_used_options::clear)
+	.def("set_revert_archive_numbering", &libdar::database_used_options::set_revert_archive_numbering);
+
 
     	///////////////////////////////////////////
 	// database classes
