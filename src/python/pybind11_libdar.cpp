@@ -1446,6 +1446,12 @@ PYBIND11_MODULE(libdar, mod)
 	.def("set_to_unsaved_data_and_FSA", &libdar::archive::set_to_unsaved_data_and_FSA);
 
 
+	///////////////////////////////////////////
+	// archives_num classes
+	//
+    pybind11::class_<libdar::archive_num>(mod, "archive_num")
+	.def(pybind11::init<libdar::U_16>(), pybind11::arg("arg") = 0);
+
     	///////////////////////////////////////////
 	// database_archives classes
 	//
