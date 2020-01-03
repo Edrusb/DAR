@@ -163,17 +163,24 @@ PYBIND11_MODULE(libdar, mod)
 
     pybind11::class_<libdar::path>(mod, "path")
 	.def(pybind11::init<const std::string &, bool>(), pybind11::arg("s"), pybind11::arg("undisclosed") = false)
+	.def(pybind11::init<const libdar::path &>())
 	.def("basename", &libdar::path::basename)
 	.def("reset_read", &libdar::path::reset_read)
-	.def("read_subdir", &libdar::path::read_subdir)
+	.def("read_subdir", [](libdar::path const & self) { std::string val; bool ret = self.read_subdir(val); return std::make_tuple(ret, val);})
 	.def("is_relative", &libdar::path::is_relative)
 	.def("is_absolute", &libdar::path::is_absolute)
+	.def("is_undisclosed", &libdar::path::is_undisclosed)
+	.def("pop", [](libdar::path & self) { std::string x; bool ret = self.pop(x); return make_tuple(ret, x);})
+	.def("pop_front", [](libdar::path & self) { std::string x; bool ret = self.pop_front(x); return make_tuple(ret, x);})
 	.def("append", &libdar::path::append)
 	.def(pybind11::self + pybind11::self) // operator +
 	.def(pybind11::self += pybind11::self) // operator += libdar::path
 	.def(pybind11::self += std::string()) // operator += std::string
+	.def("is_subdir_of", &libdar::path::is_subdir_of)
 	.def("display", &libdar::path::display)
-	.def("display_without_root", &libdar::path::display_without_root);
+	.def("display_without_root", &libdar::path::display_without_root)
+	.def("degre", &libdar::path::degre)
+	.def("explode_undisclosed", &libdar::path::explode_undisclosed);
 
 
    	///////////////////////////////////////////
