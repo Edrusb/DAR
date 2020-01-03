@@ -1534,4 +1534,40 @@ PYBIND11_MODULE(libdar, mod)
 	.def("restore", &libdar::database::restore)
 	.def("check_order", &libdar::database::check_order);
 
+
+    	///////////////////////////////////////////
+	// libdar_xform classes
+	//
+
+    pybind11::class_<libdar::libdar_xform>(mod, "libdar_xform")
+	.def(pybind11::init<
+	     const std::shared_ptr<libdar::user_interaction> &,
+	     const std::string &,
+	     const std::string &,
+	     const std::string &,
+	     const libdar::infinint &,
+	     const std::string &
+	     >())
+	.def(pybind11::init<
+	     const std::shared_ptr<libdar::user_interaction> &,
+	     const std::string &
+	     >())
+	.def("xform_to", (void (libdar::libdar_xform::*)(const std::string &,
+							 const std::string &,
+							 const std::string &,
+							 bool,
+							 bool,
+							 const libdar::infinint &,
+							 const libdar::infinint &,
+							 const libdar::infinint &,
+							 const std::string &,
+							 const std::string &,
+							 const std::string &,
+							 libdar::hash_algo,
+							 const libdar::infinint &,
+							 const std::string &))
+	     &libdar::libdar_xform::xform_to)
+	.def("xform_to", (void (libdar::libdar_xform::*)(int, const std::string &))
+	     &libdar::libdar_xform::xform_to);
+
 }
