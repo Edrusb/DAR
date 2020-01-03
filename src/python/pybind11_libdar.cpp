@@ -1570,4 +1570,24 @@ PYBIND11_MODULE(libdar, mod)
 	.def("xform_to", (void (libdar::libdar_xform::*)(int, const std::string &))
 	     &libdar::libdar_xform::xform_to);
 
+
+	///////////////////////////////////////////
+	// libdar_slave classes
+	//
+
+    pybind11::class_<libdar::libdar_slave>(mod, "libdar_slave")
+	.def(pybind11::init<
+	     std::shared_ptr<libdar::user_interaction> &,
+	     const std::string &,
+	     const std::string &,
+	     const std::string &,
+	     bool,
+	     const std::string &,
+	     bool,
+	     const std::string &,
+	     const std::string &,
+	     const libdar::infinint &
+	     >())
+	.def("run", &libdar::libdar_slave::run);
+
 }
