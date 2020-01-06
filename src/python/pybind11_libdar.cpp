@@ -65,6 +65,16 @@ PYBIND11_MODULE(libdar, mod)
 	// exceptions classes (from erreurs.hpp)
 	//
 
+
+
+	//////
+
+    	// the following is useless as pybind11
+	// cannot provide a class description
+	// when this one is used as exception
+
+/*
+
     class pyEgeneric_pub : public libdar::Egeneric
     {
     public:
@@ -94,6 +104,10 @@ PYBIND11_MODULE(libdar, mod)
 	.def("get_message", &pyEgeneric_pub::get_message)
 	.def("dump_str", &pyEgeneric_pub::dump_str)
 	.def("exceptionID", &pyEgeneric_pub::exceptionID);
+
+	    // the following makes a conflict on symboc Egeneric in python
+	    // as the symbol is already used from the py::class_ directive above
+    // static pybind11::exception<libdar::Egeneric> exc_Egeneric(mod, "Egeneric");
 
     pybind11::class_<libdar::Ememory>(mod, "Ememory", egeneric)
 	.def(pybind11::init<const std::string &>());
@@ -155,6 +169,44 @@ PYBIND11_MODULE(libdar, mod)
 
     pybind11::class_<libdar::Enet_auth>(mod, "Enet_auth", egeneric)
 	.def(pybind11::init<const std::string &>());
+
+*/
+
+	// for the reason stated above we will use
+	// a new class toward which we will translate libdar
+	// exception
+
+    class darexc : public std::exception
+    {
+    public:
+	darexc(const std::string & mesg): x_mesg(mesg) {};
+
+	virtual const char * what() const noexcept override { return x_mesg.c_str(); };
+
+    private:
+	std::string x_mesg;
+
+    };
+
+	// this will only expose the what() method
+	// to python side. This is better than nothing
+    pybind11::register_exception<darexc>(mod, "darexc");
+
+	// now the translation from libdar::Egeneric to darexc
+    pybind11::register_exception_translator([](std::exception_ptr p)
+					    {
+						try
+						{
+						    if(p)
+							std::rethrow_exception(p);
+						}
+						catch(libdar::Egeneric & e)
+						{
+						    throw darexc(e.get_message().c_str());
+						}
+					    }
+	);
+
 
 
 	///////////////////////////////////////////
