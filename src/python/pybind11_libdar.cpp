@@ -754,8 +754,9 @@ PYBIND11_MODULE(libdar, mod)
 	.def("clear", &libdar::secu_string::clear)
 	.def("resize", &libdar::secu_string::resize)
 	.def("randomize", &libdar::secu_string::randomize)
-	.def("c_str", &libdar::secu_string::c_str)
-	.def("get_array", &libdar::secu_string::get_array)
+	.def("c_str", &libdar::secu_string::c_str, pybind11::return_value_policy::reference_internal)
+	.def("get_array", &libdar::secu_string::get_array, pybind11::return_value_policy::reference_internal)
+	.def("at", [](libdar::secu_string & self, libdar::U_I index) { return std::string(1, self[index]); }) // not a temporary secure storage but no char type in python... so
 	.def("get_size", &libdar::secu_string::get_size)
 	.def("empty", &libdar::secu_string::empty)
 	.def("get_allocated_size", &libdar::secu_string::get_allocated_size);
