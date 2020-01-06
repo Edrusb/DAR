@@ -1014,35 +1014,69 @@ PYBIND11_MODULE(libdar, mod)
 	// compile_time routines
 	//
 
-    mod.def("compile_time.ea", &libdar::compile_time::ea);
-    mod.def("compile_time.largefile", &libdar::compile_time::largefile);
-    mod.def("compile_time.nodump", &libdar::compile_time::nodump);
-    mod.def("compile_time.special_alloc", &libdar::compile_time::special_alloc);
-    mod.def("compile_time.bits", &libdar::compile_time::bits);
-    mod.def("compile_time.thread_safe", &libdar::compile_time::thread_safe);
-    mod.def("compile_time.libz", &libdar::compile_time::libz);
-    mod.def("compile_time.libbz2", &libdar::compile_time::libbz2);
-    mod.def("compile_time.liblzo", &libdar::compile_time::liblzo);
-    mod.def("compile_time.libxz", &libdar::compile_time::libxz);
-    mod.def("compile_time.libgcrypt", &libdar::compile_time::libgcrypt);
-    mod.def("compile_time.furtive_read", &libdar::compile_time::furtive_read);
-    pybind11::enum_<libdar::compile_time::endian>(mod, "endian")
+    class compile_time
+    {
+    public:
+	static bool ea() noexcept { return libdar::compile_time::ea(); };
+	static bool largefile() noexcept { return libdar::compile_time::largefile(); };
+	static bool nodump() noexcept { return libdar::compile_time::nodump(); };
+	static bool special_alloc() noexcept { return libdar::compile_time::special_alloc(); };
+	static libdar::U_I bits() noexcept { return libdar::compile_time::bits(); };
+	static bool thread_safe() noexcept { return libdar::compile_time::thread_safe(); };
+	static bool libz() noexcept { return libdar::compile_time::libz(); };
+	static bool libbz2() noexcept { return libdar::compile_time::libbz2(); };
+	static bool liblzo() noexcept { return libdar::compile_time::liblzo(); };
+	static bool libxz() noexcept { return libdar::compile_time::libxz(); };
+	static bool libgcrypt() noexcept { return libdar::compile_time::libgcrypt(); };
+	static bool furtive_read() noexcept { return libdar::compile_time::furtive_read(); };
+	static bool system_endian() noexcept { return libdar::compile_time::system_endian(); };
+	static bool posix_fadvise() noexcept { return libdar::compile_time::posix_fadvise(); };
+	static bool fast_dir() noexcept { return libdar::compile_time::fast_dir(); };
+	static bool FSA_linux_extX() noexcept { return libdar::compile_time::FSA_linux_extX(); };
+	static bool FSA_birthtime() noexcept { return libdar::compile_time::FSA_birthtime(); };
+	static bool microsecond_read() noexcept { return libdar::compile_time::microsecond_read(); };
+	static bool microsecond_write() noexcept { return libdar::compile_time::microsecond_write(); };
+	static bool symlink_restore_dates() noexcept { return libdar::compile_time::symlink_restore_dates(); };
+	static bool public_key_cipher() noexcept { return libdar::compile_time::public_key_cipher(); };
+	static bool libthreadar() noexcept { return libdar::compile_time::libthreadar(); };
+	static std::string libthreadar_version() noexcept { return libdar::compile_time::libthreadar_version(); };
+	static bool librsync() noexcept { return libdar::compile_time::librsync(); };
+	static bool remote_repository() noexcept { return libdar::compile_time::remote_repository(); };
+    };
+
+    pybind11::class_<compile_time> c_t(mod, "compile_time");
+
+    pybind11::enum_<libdar::compile_time::endian>(c_t, "endian")
 	.value("big", libdar::compile_time::big)
 	.value("little", libdar::compile_time::little)
 	.value("error", libdar::compile_time::error);
-    mod.def("compile_time.system_endian", &libdar::compile_time::system_endian);
-    mod.def("compile_time.posix_fadvise", &libdar::compile_time::posix_fadvise);
-    mod.def("compile_time.fast_dir", &libdar::compile_time::fast_dir);
-    mod.def("compile_time.FSA_linux_extX", &libdar::compile_time::FSA_linux_extX);
-    mod.def("compile_time.FSA_birthtime", &libdar::compile_time::FSA_birthtime);
-    mod.def("compile_time.microsecond_read", &libdar::compile_time::microsecond_read);
-    mod.def("compile_time.microsecond_write", &libdar::compile_time::microsecond_write);
-    mod.def("compile_time.symlink_restore_dates", &libdar::compile_time::symlink_restore_dates);
-    mod.def("compile_time.public_key_cipher", &libdar::compile_time::public_key_cipher);
-    mod.def("compile_time.libthreadar", &libdar::compile_time::libthreadar);
-    mod.def("compile_time.libthreadar_version", &libdar::compile_time::libthreadar_version);
-    mod.def("compile_time.librsync", &libdar::compile_time::librsync);
-    mod.def("compile_time.remote_repository", &libdar::compile_time::remote_repository);
+
+    c_t
+	.def_static("ea", &compile_time::ea)
+	.def_static("largefile", &compile_time::largefile)
+	.def_static("nodump", &compile_time::nodump)
+	.def_static("special_alloc", &compile_time::special_alloc)
+	.def_static("bits", &compile_time::bits)
+	.def_static("thread_safe", &compile_time::thread_safe)
+	.def_static("libz", &compile_time::libz)
+	.def_static("libbz2", &compile_time::libbz2)
+	.def_static("liblzo", &compile_time::liblzo)
+	.def_static("libxz", &compile_time::libxz)
+	.def_static("libgcrypt", &compile_time::libgcrypt)
+	.def_static("furtive_read", &compile_time::furtive_read)
+	.def_static("system_endian", &compile_time::system_endian)
+	.def_static("posix_fadvise", &compile_time::posix_fadvise)
+	.def_static("fast_dir", &compile_time::fast_dir)
+	.def_static("FSA_linux_extX", &compile_time::FSA_linux_extX)
+	.def_static("FSA_birthtime", &compile_time::FSA_birthtime)
+	.def_static("microsecond_read", &compile_time::microsecond_read)
+	.def_static("microsecond_write", &compile_time::microsecond_write)
+	.def_static("symlink_restore_dates", &compile_time::symlink_restore_dates)
+	.def_static("public_key_cipher", &compile_time::public_key_cipher)
+	.def_static("libthreadar", &compile_time::libthreadar)
+	.def_static("libthreadar_version", &compile_time::libthreadar_version)
+	.def_static("librsync", &compile_time::librsync)
+	.def_static("remote_repository", &compile_time::remote_repository);
 
 
 	///////////////////////////////////////////
