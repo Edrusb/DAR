@@ -100,7 +100,7 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    throw Elibcall("user_interaction::warning", "ser_interaction::inherited_warnig should not throw an exception toward libdar");
+	    throw Elibcall("user_interaction::warning", "user_interaction::inherited_warning should not throw an exception toward libdar");
 	}
     }
 
