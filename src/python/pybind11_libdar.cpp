@@ -1529,7 +1529,75 @@ class myui(libdar.user_interaction):
 	// archive classes
 	//
 
-    pybind11::class_<libdar::archive>(mod, "archive")
+    class py_archive : public libdar::archive
+    {
+    public:
+	py_archive(const std::shared_ptr<libdar::user_interaction> & dialog,
+		   const libdar::path & chem,
+		   const std::string & basename,
+		   const std::string & extension,
+		   const libdar::archive_options_read & options):
+	    libdar::archive(dialog, chem, basename, extension, options) {};
+
+	    // splitting the create constructor in two flavors
+
+	    // first with progressive report by mean of shared_ptr
+	py_archive(const std::shared_ptr<libdar::user_interaction> & dialog,
+		   const libdar::path & fs_root,
+		   const libdar::path & sauv_path,
+		   const std::string & filename,
+		   const std::string & extension,
+		   const libdar::archive_options_create & options,
+		   std::shared_ptr<libdar::statistics> progressive_report):
+	    libdar::archive(dialog, fs_root, sauv_path, filename, extension, options,
+			    progressive_report.get()) {};
+
+	    // second without progressive report
+	py_archive(const std::shared_ptr<libdar::user_interaction> & dialog,
+		   const libdar::path & fs_root,
+		   const libdar::path & sauv_path,
+		   const std::string & filename,
+		   const std::string & extension,
+		   const libdar::archive_options_create & options):
+	    libdar::archive(dialog, fs_root, sauv_path, filename, extension, options,
+			    nullptr) {};
+
+	    // splitting in two the merge constructor
+
+	    // first with progressive report by mean of a shared_ptr
+	py_archive(const std::shared_ptr<libdar::user_interaction> & dialog,
+		   const libdar::path & sauv_path,
+		   std::shared_ptr<py_archive> ref_arch1,
+		   const std::string & filename,
+		   const std::string & extension,
+		   const libdar::archive_options_merge & options,
+		   std::shared_ptr<libdar::statistics> progressive_report):
+	    libdar::archive(dialog, sauv_path, ref_arch1, filename, extension, options,
+			    progressive_report.get()) {};
+
+	    // second without progressive report
+	py_archive(const std::shared_ptr<libdar::user_interaction> & dialog,
+		   const libdar::path & sauv_path,
+		   std::shared_ptr<py_archive> ref_arch1,
+		   const std::string & filename,
+		   const std::string & extension,
+		   const libdar::archive_options_merge & options):
+	    libdar::archive(dialog, sauv_path, ref_arch1, filename, extension, options, nullptr) {};
+
+	py_archive(const std::shared_ptr<libdar::user_interaction> & dialog,
+		   const libdar::path & chem_src,
+		   const std::string & basename_src,
+		   const std::string & extension_src,
+		   const libdar::archive_options_read & options_read,
+		   const libdar::path & chem_dst,
+		   const std::string & basename_dst,
+		   const std::string & extension_dst,
+		   const libdar::archive_options_repair & options_repair):
+	    libdar::archive(dialog, chem_src, basename_src, extension_src, options_read,
+			    chem_dst, basename_dst, extension_dst, options_repair) {};
+    };
+
+    pybind11::class_<py_archive, std::shared_ptr<py_archive> >(mod, "archive")
 	.def(pybind11::init<
 	     const std::shared_ptr<libdar::user_interaction> &,
 	     const libdar::path,
@@ -1544,16 +1612,32 @@ class myui(libdar.user_interaction):
 	     const std::string &,
 	     const std::string &,
 	     const libdar::archive_options_create &,
-	     libdar::statistics *
+	     std::shared_ptr<libdar::statistics>
 	     >())
 	.def(pybind11::init<
 	     const std::shared_ptr<libdar::user_interaction> &,
 	     const libdar::path &,
-	     std::shared_ptr<libdar::archive>,
+	     const libdar::path &,
+	     const std::string &,
+	     const std::string &,
+	     const libdar::archive_options_create &
+	     >())
+	.def(pybind11::init<
+	     const std::shared_ptr<libdar::user_interaction> &,
+	     const libdar::path &,
+	     std::shared_ptr<py_archive>,
 	     const std::string &,
 	     const std::string &,
 	     const libdar::archive_options_merge &,
-	     libdar::statistics *
+	     std::shared_ptr<libdar::statistics>
+	     >())
+	.def(pybind11::init<
+	     const std::shared_ptr<libdar::user_interaction> &,
+	     const libdar::path &,
+	     std::shared_ptr<py_archive>,
+	     const std::string &,
+	     const std::string &,
+	     const libdar::archive_options_merge &
 	     >())
 	.def(pybind11::init<
 	     const std::shared_ptr<libdar::user_interaction> &,
