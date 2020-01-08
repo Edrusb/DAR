@@ -338,7 +338,7 @@ PYBIND11_MODULE(libdar, mod)
 	//
 
 
-    pybind11::class_<libdar::statistics>(mod, "statistics")
+    pybind11::class_<libdar::statistics, std::shared_ptr<libdar::statistics> >(mod, "statistics")
 	.def(pybind11::init<bool>(), pybind11::arg("lock") = true)
 	.def("clear", &libdar::statistics::clear)
 	.def("total", &libdar::statistics::total)
@@ -889,7 +889,7 @@ PYBIND11_MODULE(libdar, mod)
 	using libdar::user_interaction::printf;
     };
 
-    pybind11::class_<libdar::user_interaction, py_user_interaction>(mod, "user_interaction")
+    pybind11::class_<libdar::user_interaction, std::shared_ptr<libdar::user_interaction>, py_user_interaction>(mod, "user_interaction")
 	.def(pybind11::init<>())
 	.def("message", &libdar::user_interaction::message)
 	.def("pause", &libdar::user_interaction::pause)
@@ -934,7 +934,7 @@ class myui(libdar.user_interaction):
 	// entrepot_* classes
 	//
 
-    pybind11::class_<libdar::entrepot_local>(mod, "entrepot_local")
+    pybind11::class_<libdar::entrepot_local, std::shared_ptr<libdar::entrepot_local> >(mod, "entrepot_local")
 	.def(pybind11::init<const std::string &, const std::string &, bool>())
 	.def("get_url", &libdar::entrepot_local::get_url)
 	.def("read_dir_reset", &libdar::entrepot_local::read_dir_reset)
@@ -950,7 +950,7 @@ class myui(libdar.user_interaction):
 	.value("proto_ftp", libdar::mycurl_protocol::proto_ftp)
 	.value("proto_sftp", libdar::mycurl_protocol::proto_sftp);
 
-    pybind11::class_<libdar::entrepot_libcurl>(mod, "entrepot_libcurl")
+    pybind11::class_<libdar::entrepot_libcurl, std::shared_ptr<libdar::entrepot_libcurl> >(mod, "entrepot_libcurl")
 	.def(pybind11::init<
 	     const std::shared_ptr<libdar::user_interaction> &,
 	     libdar::mycurl_protocol,
