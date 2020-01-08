@@ -841,23 +841,10 @@ PYBIND11_MODULE(libdar, mod)
 	// user_interaction classes
 	//
 
-
-    class py_user_interaction_no_printf: public libdar::user_interaction
+    class py_user_interaction : public libdar::user_interaction
     {
     public:
-	using user_interaction::user_interaction;
-
-    private:
-	using user_interaction::printf;
-    };
-
-    pybind11::class_<py_user_interaction_no_printf>(mod, "py_user_interaction_no_printf");
-
-
-    class py_user_interaction : public py_user_interaction_no_printf
-    {
-    public:
-	using py_user_interaction_no_printf::py_user_interaction_no_printf;
+	using libdar::user_interaction::user_interaction;
 
     protected:
 	virtual void inherited_message(const std::string & message) override
@@ -898,45 +885,50 @@ PYBIND11_MODULE(libdar, mod)
 		echo);
 	}
 
+    private:
+	using libdar::user_interaction::printf;
     };
 
-    class py_user_interaction_pub : public py_user_interaction
-    {
-	    // moving as public the protected methods of libdar::user_interaction
-	    // in order for one to derivate a class from python side
-    public:
-	using py_user_interaction::py_user_interaction;
-	using py_user_interaction::inherited_message;
-	using py_user_interaction::inherited_pause;
-	using py_user_interaction::inherited_get_string;
-	using py_user_interaction::inherited_get_secu_string;
-    };
+    pybind11::class_<libdar::user_interaction, py_user_interaction>(mod, "user_interaction")
+	.def(pybind11::init<>())
+	.def("message", &libdar::user_interaction::message)
+	.def("pause", &libdar::user_interaction::pause)
+	.def("get_string", &libdar::user_interaction::get_string)
+	.def("get_secu_string", &libdar::user_interaction::get_secu_string);
 
+/* example of python class inheriting from libdar::user_interaction
+impoty libdar
 
-    pybind11::class_<py_user_interaction, py_user_interaction_no_printf>(mod, "user_interaction")
-	.def("message", &py_user_interaction_no_printf::message)
-	.def("pause", &py_user_interaction_no_printf::pause)
-	.def("get_string", &py_user_interaction_no_printf::get_string)
-	.def("get_secu_string", &py_user_interaction_no_printf::get_secu_string)
-	    // the following point to methods of py_user_interaction (these are protected
-	    // and unaccessibled from python in libdar::user_interaction
-	.def("inherited_message", &py_user_interaction_pub::inherited_message)
-	.def("inherited_pause", &py_user_interaction_pub::inherited_pause)
-	.def("inherited_get_string", &py_user_interaction_pub::inherited_get_string)
-	.def("inherited_get_secu_string", &py_user_interaction_pub::inherited_get_secu_string);
+class myui(libdar.user_interaction):
+    def __init__(self):
+        libdar.user_interaction.__init__(self)
+	# this is mandatory to initialize the parent class!!!
 
-    pybind11::class_<libdar::shell_interaction>(mod, "shell_interaction")
-	.def(pybind11::init<std::ostream &, std::ostream &, bool>())
-	.def("change_non_interactive_output", &libdar::shell_interaction::change_non_interactive_output)
-	.def("read_char", &libdar::shell_interaction::read_char)
-	.def("set_beep", &libdar::shell_interaction::set_beep)
-	.def("warning_with_more", &libdar::shell_interaction::warning_with_more)
-	.def("archive_show_contents", &libdar::shell_interaction::archive_show_contents)
-	.def("database_show_contents", &libdar::shell_interaction::database_show_contents)
-	.def("database_show_files", &libdar::shell_interaction::database_show_files)
-	.def("database_show_version", &libdar::shell_interaction::database_show_version)
-	.def("database_show_statistics", &libdar::shell_interaction::database_show_statistics);
+	# the following methods are protected in C++
+	# but can defined in python (public scope)
+        # the inner code will be bound to the protected
+	# method of the same name
 
+    def inherited_message(self, msg):
+        print("LIBDAR MESSAGE:{0}".format(msg))
+
+    def inherited_pause(self, msg):
+        while True:
+            res = input("LIBDAR QUESTION:{0} y/n ".format(msg))
+            if res == "y":
+                return True
+            else:
+                if res == "n":
+                    return False
+                else:
+                    print("answer 'y' or 'n'")
+
+    def inherited_get_string(self, msg, echo):
+        return input(msg)
+
+    def inherited_get_secu_string(self, msg, echo):
+        return input(msg)
+*/
 
     	///////////////////////////////////////////
 	// entrepot_* classes
