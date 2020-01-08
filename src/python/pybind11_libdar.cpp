@@ -200,6 +200,10 @@ PYBIND11_MODULE(libdar, mod)
 						    if(p)
 							std::rethrow_exception(p);
 						}
+						catch(libdar::Ebug & e)
+						{
+						    throw darexc(e.dump_str().c_str());
+						}
 						catch(libdar::Egeneric & e)
 						{
 						    throw darexc(e.get_message().c_str());
