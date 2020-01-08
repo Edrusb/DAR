@@ -1096,7 +1096,12 @@ class myui(libdar.user_interaction):
 	.value("sha512", libdar::hash_algo::sha512);
 
     mod.def("hash_algo_to_string", &libdar::hash_algo_to_string);
-    mod.def("string_to_hash_algo", &libdar::string_to_hash_algo);
+    mod.def("string_to_hash_algo", [](const std::string & arg)
+	    {
+		libdar::hash_algo val = libdar::hash_algo::none;
+		bool ret = libdar::string_to_hash_algo(arg, val);
+		return std::make_tuple(ret, val);
+	    });
 
     	///////////////////////////////////////////
 	// compression_* structures and routines
