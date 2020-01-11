@@ -1482,6 +1482,32 @@ unset LDFLAGS__cache
 LIBS="$LIBS__cache"
 unset LIBS__cache
 
+AC_ARG_ENABLE( [python-binding],
+	       AC_HELP_STRING(--disable-python-binding, [ignore python binding even if it is possible to build it]),
+	       [ local_python="no" ],
+	       [
+		  AC_MSG_CHECKING([for python binding])
+		  pyext="python3-config --extension-suffix"
+	          if  $pyext 1> /dev/null 2> /dev/null ; then
+		     PYEXT="`$pyext`"
+		  else
+		      local_python="no"
+		  fi
+
+		  pyflags="python3 -m pybind11 --includes"
+		  if test "$local_python" != "no" && $pyflags 1> /dev/null 2> /dev/null ; then
+		     PYFLAGS="`$pyflags`"
+		     local_python="yes"
+		     AC_MSG_RESULT([ok])
+		     AC_SUBST(PYEXT, [$PYEXT])
+		     AC_SUBST(PYFLAGS, [$PYFLAGS])
+		  else
+		     local_python="no"
+		     AC_MSG_RESULT([failed])
+		  fi
+	       ])
+
+
 AM_CONDITIONAL([MAKE_ALL_DIR], [test $examples = "yes"])
 AM_CONDITIONAL([BUILD_DAR_STATIC], [test $build_static = "yes" -a $static_pb = "no"])
 AM_CONDITIONAL([DEBUG_STATIC], [test $debug_static = "yes" -a $static_pb = "no"])
@@ -1493,6 +1519,7 @@ AM_CONDITIONAL([USE_GROFF], [test "$groff" = "yes"])
 AM_CONDITIONAL([PROFILING], [test "$profiling" = "yes"])
 AM_CONDITIONAL([BSD_SED], [test "$local_sed" = "bsd"])
 AM_CONDITIONAL([WITH_LIBTHREADAR], [test "$local_threadar" = "yes"])
+AM_CONDITIONAL([PYTHON_BINDING], [test "$local_python" = "yes"])
 AC_SUBST([CXXSTDFLAGS], [$CXXSTDFLAGS])
 AC_SUBST(UPX_PROG, [upx])
 AC_SUBST(DOXYGEN_PROG, [doxygen])
@@ -1509,7 +1536,7 @@ AC_CONFIG_COMMANDS([hack-libtool], [
 ])
 
 
-AC_CONFIG_FILES([Makefile man/Makefile src/Makefile src/libdar/Makefile src/dar_suite/Makefile src/testing/Makefile src/examples/Makefile doc/Makefile doc/samples/Makefile misc/Makefile doc/mini-howto/Makefile src/libdar/libdar.pc.tmpl doc/man/Makefile src/check/Makefile])
+AC_CONFIG_FILES([Makefile man/Makefile src/Makefile src/libdar/Makefile src/dar_suite/Makefile src/testing/Makefile src/examples/Makefile doc/Makefile doc/samples/Makefile misc/Makefile doc/mini-howto/Makefile src/libdar/libdar.pc.tmpl doc/man/Makefile src/check/Makefile src/python/Makefile])
 AC_OUTPUT
 [echo ""
 echo "--"
@@ -1706,6 +1733,13 @@ if  [ "$doxygen" = "yes" ] ; then
   echo "YES"
 else
   echo "NO"
+fi
+
+printf "   building python binding: "
+if [ "$local_python" = "yes" ] ; then
+   echo "YES"
+else
+   echo "NO"
 fi
 
 if [ "$static_pb" = "yes" -a "$build_static" = "yes" ] ; then
