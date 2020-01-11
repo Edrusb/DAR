@@ -3,6 +3,7 @@ from 2.6.6 to 2.6.7
   errors and warning under MacOS
 - fixed bug: dar failed creating an archive on its standard output reporting
   the error message "Skipping backward is not possible on a pipe"
+- new feature: added python binding to libdar!
 
 from 2.6.5 to 2.6.6
 - fixing script that builds windows binary packages to include missing
