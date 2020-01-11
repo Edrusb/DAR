@@ -294,7 +294,8 @@ PYBIND11_MODULE(libdar, mod)
 	.def("pop", [](libdar::path & self) { std::string x; bool ret = self.pop(x); return make_tuple(ret, x);})
 	.def("pop_front", [](libdar::path & self) { std::string x; bool ret = self.pop_front(x); return make_tuple(ret, x);})
 	.def("append", &libdar::path::append)
-	.def(pybind11::self + pybind11::self) // operator +
+	.def(pybind11::self + pybind11::self) // operator + libdar::pat
+	.def(pybind11::self + std::string()) // operator + std::string
 	.def(pybind11::self += pybind11::self) // operator += libdar::path
 	.def(pybind11::self += std::string()) // operator += std::string
 	.def("is_subdir_of", &libdar::path::is_subdir_of)
