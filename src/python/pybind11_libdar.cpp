@@ -956,45 +956,9 @@ PYBIND11_MODULE(libdar, mod)
     };
 
     pybind11::class_<libdar::user_interaction, std::shared_ptr<libdar::user_interaction>, py_user_interaction>(mod, "user_interaction")
-	.def(pybind11::init<>())
-	.def("message", &libdar::user_interaction::message)
-	.def("pause", &libdar::user_interaction::pause)
-	.def("get_string", &libdar::user_interaction::get_string)
-	.def("get_secu_string", &libdar::user_interaction::get_secu_string);
+	.def(pybind11::init<>());
 
-/* example of python class inheriting from libdar::user_interaction
-impoty libdar
 
-class myui(libdar.user_interaction):
-    def __init__(self):
-        libdar.user_interaction.__init__(self)
-	# this is mandatory to initialize the parent class!!!
-
-	# the following methods are protected in C++
-	# but can defined in python (public scope)
-        # the inner code will be bound to the protected
-	# method of the same name
-
-    def inherited_message(self, msg):
-        print("LIBDAR MESSAGE:{0}".format(msg))
-
-    def inherited_pause(self, msg):
-        while True:
-            res = input("LIBDAR QUESTION:{0} y/n ".format(msg))
-            if res == "y":
-                return True
-            else:
-                if res == "n":
-                    return False
-                else:
-                    print("answer 'y' or 'n'")
-
-    def inherited_get_string(self, msg, echo):
-        return input(msg)
-
-    def inherited_get_secu_string(self, msg, echo):
-        return input(msg)
-*/
 
     	///////////////////////////////////////////
 	// entrepot_* classes
