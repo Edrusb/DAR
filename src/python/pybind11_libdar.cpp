@@ -201,6 +201,70 @@ PYBIND11_MODULE(libdar, mod)
 						    if(p)
 							std::rethrow_exception(p);
 						}
+						catch(libdar::Efeature & e)
+						{
+						    throw darexc(std::string(gettext("NOT YET IMPLEMENTED FEATURE has been used: ")) + e.get_message());
+						}
+						catch(libdar::Ehardware & e)
+						{
+						    throw darexc(std::string(gettext("SEEMS TO BE A HARDWARE PROBLEM: ")) + e.get_message());
+						}
+						catch(libdar::Esecu_memory & e)
+						{
+						    throw darexc(std::string(gettext("Lack of SECURED memory to achieve the operation, aborting operation")));
+						}
+						catch(libdar::Ememory & e)
+						{
+						    throw darexc(std::string(gettext("Lack of memory to achieve the operation, aborting operation")));
+						}
+						catch(std::bad_alloc & e)
+						{
+						    throw darexc(std::string(gettext("Lack of memory to achieve the operation, aborting operation")));
+						}
+						catch(libdar::Erange & e)
+						{
+						    throw darexc(std::string(gettext("FATAL error, aborting operation: ")) + e.get_message());
+						}
+						catch(libdar::Euser_abort & e)
+						{
+						    throw darexc(std::string(gettext("Aborting program. User refused to continue while asking: ")) + e.get_message());
+						}
+						catch(libdar::Ethread_cancel & e)
+						{
+						    throw darexc(std::string(gettext("Program has been aborted for the following reason: ")) + e.get_message());
+						}
+						catch(libdar::Edata & e)
+						{
+						    throw darexc(e.get_message());
+						}
+						catch(libdar::Escript & e)
+						{
+						    throw darexc(std::string(gettext("Aborting program. An error occurred concerning user command execution: ")) + e.get_message());
+						}
+						catch(libdar::Elibcall & e)
+						{
+						    throw darexc(std::string(gettext("Aborting program. An error occurred while calling libdar: ")) + e.get_message());
+						}
+						catch(libdar::Einfinint & e)
+						{
+						    throw darexc(std::string(gettext("Aborting program. ")) + e.get_message());
+						}
+						catch(libdar::Elimitint & e)
+						{
+						    throw darexc(std::string(gettext("Aborting program. ")) + e.get_message());
+						}
+						catch(libdar::Ecompilation & e)
+						{
+						    throw darexc(std::string(gettext("Aborting program. The requested operation needs a feature that has been disabled at compilation time: ")) + e.get_message());
+						}
+						catch(libdar::Esystem & e)
+						{
+						    throw darexc(std::string(gettext("FATAL error from operating system, aborting operation: ")) + e.get_message());
+						}
+						catch(libdar::Enet_auth & e)
+						{
+						    throw darexc(std::string(gettext("FATAL error during network communication, aborting operation: ")) + e.get_message());
+						}
 						catch(libdar::Ebug & e)
 						{
 						    throw darexc(e.dump_str().c_str());
