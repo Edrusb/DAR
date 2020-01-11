@@ -912,7 +912,7 @@ namespace libdar
 	       && getuid() != 0)
 	    {
 		wtc = comparison_fields::ignore_owner;
-		get_ui().pause(gettext("File ownership will not be restored du to the lack of privilege, you can disable this message my asking not to restore file ownership"));
+		get_ui().pause(gettext("File ownership will not be restored du to the lack of privilege, you can disable this message by asking not to restore file ownership"));
 	    }
 
 	    fs_root.explode_undisclosed();
