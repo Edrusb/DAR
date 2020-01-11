@@ -20,34 +20,33 @@
 #######################################################################
 
 if BUILD_MODE32
-    MYLIB=libdar32
-    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS) $(PYFLAGS)
+    MYLIB=libdar32.so
+    AM_CPPFLAGS=-fPIC -DLIBDAR_MODE=32 -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS) $(PYFLAGS)
 else
 if BUILD_MODE64
-    MYLIB=libdar64
-    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS) $(PYFLAGS)
+    MYLIB=libdar64.so
+    AM_CPPFLAGS=-fPIC -DLIBDAR_MODE=64 -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS) $(PYFLAGS)
 else
-    MYLIB=libdar
-    AM_CPPFLAGS=-I../libdar -DDAR_LOCALEDIR=\"$(localedir)\"  -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS) $(PYFLAGS)
+    MYLIB=libdar.so
+    AM_CPPFLAGS=-fPIC -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\"  -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS) $(PYFLAGS) -fPIC
 endif
 endif
 
 if PYTHON_BINDING
-  TARGET=libdar_python.la
+  TARGET=libdar_python
 else
   TARGET=
 endif
 
-AM_LDFLAGS = $(LTLIBINTL) $(LD_PROF) $(GPGME_LIBS) $(LIBCURL_LIBS) $(LIBTHREADAR_LIBS) $(CXXSTDFLAGS) ../libdar/$(MYLIB).la
-lib_LTLIBRARIES = $(TARGET)
-
-libdar_python_la_SOURCES = pybind11_libdar.cpp
-libdar_python_la_DEPENDENCIES = ../libdar/$(MYLIB).la
+AM_LDFLAGS = -shared $(GPGME_LIBS) $(LIBCURL_LIBS) $(LIBTHREADAR_LIBS) $(CXXSTDFLAGS) ../libdar/.libs/$(MYLIB)
 
 all-local: libdar$(PYEXT)
 
-libdar$(PYEXT):
-	ln -sf libdar_python.la libdar$(PYEXT)
+.cpp.o:
+	$(CXX) -c $(AM_CPPFLAGS) $< -o $@
+
+libdar$(PYEXT): pybind11_libdar.o
+	$(CXX) $(AM_LDFLAGS) $<  -o $@
 
 clean-local:
-	rm -f libdar$(PYEXT)
+	rm -f libdar$(PYEXT) *.o
