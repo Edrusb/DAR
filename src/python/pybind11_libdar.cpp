@@ -1308,6 +1308,7 @@ PYBIND11_MODULE(libdar, mod)
 	//
 
     pybind11::class_<libdar::archive_options_read>(mod, "archive_options_read")
+	.def(pybind11::init<>())
 	.def("clear", &libdar::archive_options_read::clear)
 	.def("set_crypto_algo", &libdar::archive_options_read::set_crypto_algo)
 	.def("set_crypto_pass", &libdar::archive_options_read::set_crypto_pass)
@@ -1335,6 +1336,7 @@ PYBIND11_MODULE(libdar, mod)
 
 
     pybind11::class_<libdar::archive_options_create>(mod, "archive_options_create")
+	.def(pybind11::init<>())
 	.def("clear", &libdar::archive_options_create::clear)
 	.def("set_reference", &libdar::archive_options_create::set_reference)
 	.def("set_selection", &libdar::archive_options_create::set_selection)
@@ -1397,6 +1399,7 @@ PYBIND11_MODULE(libdar, mod)
 	.def("set_sig_block_len", &libdar::archive_options_create::set_sig_block_len);
 
     pybind11::class_<libdar::archive_options_isolate>(mod, "archive_options_isolate")
+	.def(pybind11::init<>())
 	.def("clear", &libdar::archive_options_isolate::clear)
 	.def("set_allow_over", &libdar::archive_options_isolate::set_allow_over)
 	.def("set_warn_over", &libdar::archive_options_isolate::set_warn_over)
@@ -1430,6 +1433,7 @@ PYBIND11_MODULE(libdar, mod)
 
 
     pybind11::class_<libdar::archive_options_merge>(mod, "archive_options_merge")
+	.def(pybind11::init<>())
 	.def("clear", &libdar::archive_options_merge::clear)
 	.def("set_auxiliary_ref", &libdar::archive_options_merge::set_auxiliary_ref)
 	.def("set_selection", &libdar::archive_options_merge::set_selection)
@@ -1484,6 +1488,7 @@ PYBIND11_MODULE(libdar, mod)
 	.value("dirty_ok", libdar::archive_options_extract::t_dirty::dirty_ok);
 
     py_archive_options_extract
+	.def(pybind11::init<>())
 	.def("clear", &libdar::archive_options_extract::clear)
 	.def("set_selection", &libdar::archive_options_extract::set_selection)
 	.def("set_subtree", &libdar::archive_options_extract::set_subtree)
@@ -1506,6 +1511,7 @@ PYBIND11_MODULE(libdar, mod)
 
 
     pybind11::class_<libdar::archive_options_listing>(mod, "archive_options_listing")
+	.def(pybind11::init<>())
 	.def("clear", &libdar::archive_options_listing::clear)
 	.def("set_info_details", &libdar::archive_options_listing::set_info_details)
 	.def("set_selection", &libdar::archive_options_listing::set_selection)
@@ -1516,6 +1522,7 @@ PYBIND11_MODULE(libdar, mod)
 	.def("set_display_ea", &libdar::archive_options_listing::set_display_ea);
 
     pybind11::class_<libdar::archive_options_diff>(mod, "archive_options_diff")
+	.def(pybind11::init<>())
 	.def("clear", &libdar::archive_options_diff::clear)
 	.def("set_selection", &libdar::archive_options_diff::set_selection)
 	.def("set_subtree", &libdar::archive_options_diff::set_subtree)
@@ -1532,6 +1539,7 @@ PYBIND11_MODULE(libdar, mod)
 
 
     pybind11::class_<libdar::archive_options_test>(mod, "archive_options_test")
+	.def(pybind11::init<>())
 	.def("clear", &libdar::archive_options_test::clear)
 	.def("set_selection", &libdar::archive_options_test::set_selection)
 	.def("set_subtree", &libdar::archive_options_test::set_subtree)
@@ -1542,6 +1550,7 @@ PYBIND11_MODULE(libdar, mod)
 
 
     pybind11::class_<libdar::archive_options_repair>(mod, "archive_options_repair")
+	.def(pybind11::init<>())
 	.def("clear", &libdar::archive_options_repair::clear)
 	.def("set_allow_over", &libdar::archive_options_repair::set_allow_over)
 	.def("set_warn_over", &libdar::archive_options_repair::set_warn_over)
