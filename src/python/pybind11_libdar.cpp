@@ -384,11 +384,10 @@ PYBIND11_MODULE(libdar, mod)
 	.def("computer", &libdar::deci::computer)
 	.def("human", &libdar::deci::human);
 
+
 	///////////////////////////////////////////
 	// tools routines related to infinint
 	//
-
-
 
     mod.def("tools_display_interger_in_metric_system", &libdar::tools_display_integer_in_metric_system,
 	    pybind11::arg("number"),
@@ -399,10 +398,10 @@ PYBIND11_MODULE(libdar, mod)
 	    pybind11::arg("input numerical string with unit suffix"),
 	    pybind11::arg("unit base: 1000 for SI, 1024 for computer science"));
 
+
     	///////////////////////////////////////////
 	// class statistics
 	//
-
 
     pybind11::class_<libdar::statistics, std::shared_ptr<libdar::statistics> >(mod, "statistics")
 	.def(pybind11::init<bool>(), pybind11::arg("lock") = true)
@@ -446,7 +445,6 @@ PYBIND11_MODULE(libdar, mod)
 	.value("serpent256", libdar::crypto_algo::serpent256)
 	.value("camellia256", libdar::crypto_algo::camellia256)
 	.export_values();
-
 
     pybind11::class_<libdar::signator> pysignator(mod, "signator");
 
@@ -548,7 +546,6 @@ PYBIND11_MODULE(libdar, mod)
 	.def("dump", &libdar::bool_mask::dump)
 	.def("clone", &libdar::bool_mask::clone);
 
-
     pybind11::class_<libdar::simple_mask, libdar::mask>(mod, "simple_mask")
 	.def(pybind11::init<const std::string &, bool>())
 	.def("is_covered", (bool (libdar::simple_mask::*)(const std::string &) const) &libdar::simple_mask::is_covered, "Mask based on string")
@@ -610,6 +607,7 @@ PYBIND11_MODULE(libdar, mod)
 	.def("is_covered", (bool (libdar::exclude_dir_mask::*)(const libdar::path &) const) &libdar::exclude_dir_mask::is_covered, "Mask based on libdar::path")
 	.def("dump", &libdar::exclude_dir_mask::dump)
 	.def("clone", &libdar::exclude_dir_mask::clone);
+
 
     	///////////////////////////////////////////
 	// mask_list_* class
@@ -902,6 +900,7 @@ PYBIND11_MODULE(libdar, mod)
 	.def("set_sizes_in_bytes", &libdar::archive_options_listing_shell::set_sizes_in_bytes)
 	.def("get_list_mode", &libdar::archive_options_listing_shell::get_list_mode)
 	.def("get_sizes_in_bytes", &libdar::archive_options_listing_shell::get_sizes_in_bytes);
+
 
 	///////////////////////////////////////////
 	// user_interaction classes
