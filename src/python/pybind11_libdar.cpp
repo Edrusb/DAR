@@ -1762,6 +1762,32 @@ PYBIND11_MODULE(libdar, mod)
 		   const libdar::archive_options_repair & options_repair):
 	    libdar::archive(dialog, chem_src, basename_src, extension_src, options_read,
 			    chem_dst, basename_dst, extension_dst, options_repair) {};
+
+	libdar::statistics op_extract(const libdar::path & fs_root,
+				      const libdar::archive_options_extract & options,
+				      std::shared_ptr<libdar::statistics> progressive_report)
+	{ return libdar::archive::op_extract(fs_root, options, progressive_report.get()); };
+
+	libdar::statistics op_extract(const libdar::path & fs_root,
+				      const libdar::archive_options_extract & options)
+	{ return libdar::archive::op_extract(fs_root, options, nullptr); };
+
+	libdar::statistics op_diff(const libdar::path & fs_root,
+				   const libdar::archive_options_diff & options)
+	{ return libdar::archive::op_diff(fs_root, options, nullptr); };
+
+	libdar::statistics op_diff(const libdar::path & fs_root,
+				   const libdar::archive_options_diff & options,
+				   std::shared_ptr<libdar::statistics> progressive_report)
+	{ return libdar::archive::op_diff(fs_root, options, progressive_report.get()); };
+
+	libdar::statistics op_test(const libdar::archive_options_test & options)
+	{ return libdar::archive::op_test(options, nullptr); };
+
+	libdar::statistics op_test(const libdar::archive_options_test & options,
+			   std::shared_ptr<libdar::statistics> progressive_report)
+	{ return libdar::archive::op_test(options, progressive_report.get()); };
+
     };
 
     pybind11::class_<py_archive, std::shared_ptr<py_archive> >(mod, "archive")
@@ -1818,12 +1844,14 @@ PYBIND11_MODULE(libdar, mod)
 	     const libdar::archive_options_repair &
 	     >())
 
-	.def("op_extract", &libdar::archive::op_extract)
+	.def("op_extract", (libdar::statistics (py_archive::*)(const libdar::path &, const libdar::archive_options_extract &)) &py_archive::op_extract)
+	.def("op_extract", (libdar::statistics (py_archive::*)(const libdar::path &, const libdar::archive_options_extract &, std::shared_ptr<libdar::statistics>)) &py_archive::op_extract)
 	.def("summary", &libdar::archive::summary)
 	.def("summary_data", &libdar::archive::summary_data)
-	.def("op_listing", &libdar::archive::op_listing)
-	.def("op_diff", &libdar::archive::op_diff)
-	.def("op_test", &libdar::archive::op_test)
+	.def("op_diff", (libdar::statistics (py_archive::*)(const libdar::path &, const libdar::archive_options_diff &)) &py_archive::op_diff)
+	.def("op_diff", (libdar::statistics (py_archive::*)(const libdar::path &, const libdar::archive_options_diff &, std::shared_ptr<libdar::statistics>))& py_archive::op_diff)
+	.def("op_test", (libdar::statistics (py_archive::*)(const libdar::archive_options_test &))&py_archive::op_test)
+	.def("op_test", (libdar::statistics (py_archive::*)(const libdar::archive_options_test &, std::shared_ptr<libdar::statistics>))&py_archive::op_test)
 	.def("op_isolate", &libdar::archive::op_isolate)
 	.def("get_children_in_table", &libdar::archive::get_children_in_table)
 	.def("has_subdirectory", &libdar::archive::has_subdirectory)
