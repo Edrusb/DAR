@@ -964,7 +964,135 @@ PYBIND11_MODULE(libdar, mod)
 	// entrepot_* classes
 	//
 
-    pybind11::class_<libdar::entrepot_local, std::shared_ptr<libdar::entrepot_local> >(mod, "entrepot_local")
+    class py_entrepot : public libdar::entrepot
+    {
+    public:
+	using libdar::entrepot::entrepot;
+
+	virtual void set_location(const libdar::path & chemin) override
+	{
+	    PYBIND11_OVERLOAD(
+		void,
+		libdar::entrepot,
+		set_location,
+		chemin);
+	};
+
+	virtual void set_root(const libdar::path & p_root) override
+	{
+	    PYBIND11_OVERLOAD(
+		void,
+		libdar::entrepot,
+		set_root,
+		p_root);
+	};
+
+	virtual libdar::path get_full_path() const override
+	{
+	    PYBIND11_OVERLOAD(
+		libdar::path,
+		libdar::entrepot,
+		get_full_path,
+		);
+	};
+
+	virtual std::string get_url() const override
+	{
+	    PYBIND11_OVERLOAD_PURE(
+		std::string,
+		libdar::entrepot,
+		get_url,);
+	};
+
+	virtual const libdar::path & get_location() const override
+	{
+	    PYBIND11_OVERLOAD(
+		const libdar::path &,
+		libdar::entrepot,
+		get_location,
+		);
+	};
+
+	virtual const libdar::path & get_root() const override
+	{
+	    PYBIND11_OVERLOAD(
+		const libdar::path &,
+		libdar::entrepot,
+		get_root,
+		);
+	};
+
+	virtual void read_dir_reset() const override
+	{
+	    PYBIND11_OVERLOAD_PURE(
+		void,
+		libdar::entrepot,
+		read_dir_reset,
+		);
+	};
+
+	virtual bool read_dir_next(std::string & filename) const override
+	{
+	    PYBIND11_OVERLOAD_PURE(
+		bool,
+		libdar::entrepot,
+		read_dir_next,
+		filename);
+	};
+
+	virtual entrepot *clone() const override
+	{
+	    PYBIND11_OVERLOAD_PURE(
+		entrepot *,
+		libdar::entrepot,
+		clone,
+		);
+	};
+
+    protected:
+	virtual libdar::fichier_global *inherited_open(const std::shared_ptr<libdar::user_interaction> & dialog,
+						       const std::string & filename,
+						       libdar::gf_mode mode,
+						       bool force_permission,
+						       libdar::U_I permission,
+						       bool fail_if_exists,
+						       bool erase) const override
+	{
+	    PYBIND11_OVERLOAD_PURE(
+		libdar::fichier_global *,
+		libdar::entrepot,
+		inherited_open,
+		dialog,
+		filename,
+		mode,
+		force_permission,
+		fail_if_exists,
+		erase);
+	};
+
+	virtual void inherited_unlink(const std::string & filename) const override
+	{
+	    PYBIND11_OVERLOAD_PURE(
+		void,
+		libdar::entrepot,
+		inherited_unlink,
+		filename);
+	};
+
+	virtual void read_dir_flush() override
+	{
+	    PYBIND11_OVERLOAD_PURE(
+		void,
+		libdar::entrepot,
+		read_dir_flush,
+		);
+	};
+    };
+
+    pybind11::class_<libdar::entrepot, py_entrepot, std::shared_ptr<libdar::entrepot> >(mod, "entrepot")
+	.def(pybind11::init<>());
+
+    pybind11::class_<libdar::entrepot_local, libdar::entrepot, std::shared_ptr<libdar::entrepot_local> >(mod, "entrepot_local")
 	.def(pybind11::init<const std::string &, const std::string &, bool>())
 	.def("get_url", &libdar::entrepot_local::get_url)
 	.def("read_dir_reset", &libdar::entrepot_local::read_dir_reset)
@@ -980,7 +1108,7 @@ PYBIND11_MODULE(libdar, mod)
 	.value("proto_ftp", libdar::mycurl_protocol::proto_ftp)
 	.value("proto_sftp", libdar::mycurl_protocol::proto_sftp);
 
-    pybind11::class_<libdar::entrepot_libcurl, std::shared_ptr<libdar::entrepot_libcurl> >(mod, "entrepot_libcurl")
+    pybind11::class_<libdar::entrepot_libcurl, libdar::entrepot, std::shared_ptr<libdar::entrepot_libcurl> >(mod, "entrepot_libcurl")
 	.def(pybind11::init<
 	     const std::shared_ptr<libdar::user_interaction> &,
 	     libdar::mycurl_protocol,
