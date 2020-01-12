@@ -43,7 +43,7 @@ install-data-hook: $(TARGET)
 
 uninstall-hook:
 	rm -rf $(DESTDIR)$(libdir)/python3/dist-packages/$(TARGET)
-	rmdir -p $(DESTDIR)$(libdir)/python3/dist-packages 2> /dev/null
+	rmdir -p $(DESTDIR)$(libdir)/python3/dist-packages 2> /dev/null || echo ""
 
 else
   TARGET=
