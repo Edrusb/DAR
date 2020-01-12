@@ -21,6 +21,8 @@ clean-local:
 install-data-hook:
 	./portable_cp html $(DESTDIR)$(pkgdatadir)
 	$(INSTALL_HTML_MAN)
+	$(INSTALL) -d $(DESTDIR)$(pkgdatadir)/python
+	$(INSTALL) -m 0644 python/libdar_test.py $(DESTDIR)$(pkgdatadir)/python
 
 uninstall-hook:
 	rm -rf $(DESTDIR)$(pkgdatadir)/html
