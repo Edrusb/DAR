@@ -336,6 +336,10 @@ PYBIND11_MODULE(libdar, mod)
 	.def(pybind11::self <= pybind11::self)
 	.def(pybind11::self != pybind11::self)
 	.def(pybind11::self >= pybind11::self)
+	.def(pybind11::self + pybind11::self)
+	.def(pybind11::self - pybind11::self)
+	.def(pybind11::self * pybind11::self)
+	.def(pybind11::self / pybind11::self)
 	.def("is_zero", &libdar::real_infinint::is_zero);
 
     mod.def("euclide", [](const libdar::infinint & a, const libdar::infinint & b) { libdar::infinint q, r; euclide(a, b, q, r); return std::make_tuple(q, r); });
@@ -366,6 +370,10 @@ PYBIND11_MODULE(libdar, mod)
 	.def(pybind11::self <= pybind11::self)
 	.def(pybind11::self != pybind11::self)
 	.def(pybind11::self >= pybind11::self)
+	.def(pybind11::self + pybind11::self)
+	.def(pybind11::self - pybind11::self)
+	.def(pybind11::self * pybind11::self)
+	.def(pybind11::self / pybind11::self)
 	.def("is_zero", &libdar::limitint<libdar::INFININT_BASE_TYPE>::is_zero);
 
     mod.def("euclide", [](const libdar::infinint & a, const libdar::infinint & b) { libdar::infinint q, r; euclide(a, b, q, r); return std::make_tuple(q, r); });
