@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2019 Denis Corbin
+// Copyright (C) 2002-2020 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -182,8 +182,7 @@ int dar_suite_global(int argc,
     }
     catch(Erange & e)
     {
-	general_report(string(gettext("FATAL error, aborting operation")));
-	general_report(e.get_message());
+	general_report(string(gettext("FATAL error, aborting operation: ")) + e.get_message());
 	ret = EXIT_ERROR;
     }
     catch(Euser_abort & e)
@@ -228,14 +227,12 @@ int dar_suite_global(int argc,
     }
     catch(Esystem & e)
     {
-	general_report(string(gettext("FATAL error, aborting operation")));
-	general_report(e.get_message());
+	general_report(string(gettext("FATAL error, aborting operation: ")) + e.get_message());
 	ret = EXIT_ERROR;
     }
     catch(Enet_auth & e)
     {
-	general_report(string(gettext("FATAL error, aborting operation")));
-	general_report(e.get_message());
+	general_report(string(gettext("FATAL error during network communication, aborting operation: ")) + e.get_message());
 	ret = EXIT_ERROR;
     }
     catch(Egeneric & e)

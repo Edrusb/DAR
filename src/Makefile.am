@@ -1,6 +1,6 @@
 #######################################################################
 # dar - disk archive - a backup/restoration program
-# Copyright (C) 2002-2019 Denis Corbin
+# Copyright (C) 2002-2020 Denis Corbin
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -23,7 +23,7 @@ if MAKE_ALL_DIR
    OPT_SUBDIR = examples testing
 endif
 
-SUBDIRS = libdar dar_suite check $(OPT_SUBDIR)
+SUBDIRS = libdar dar_suite check python $(OPT_SUBDIR)
 noinst_HEADERS = my_config.h
 dist_noinst_DATA = README gettext.h
 

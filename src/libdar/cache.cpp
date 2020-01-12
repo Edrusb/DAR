@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2019 Denis Corbin
+// Copyright (C) 2002-2020 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -99,7 +99,49 @@ namespace libdar
 	    // calculate the direction and amount to ask to the lower layer (ref)
 
 	if(in_cache >= amount)
+	{
+		// skippability is contained in the cached data
+
+	    switch(direction)
+	    {
+	    case skip_forward:
+		return true;
+
+	    case skip_backward:
+		    // sanity check
+		if(infinint(next) < amount)
+		    throw SRC_BUG;
+
+		if(first_to_write != size)
+		{
+			// some data is pending for writing
+
+			// the cached data before first_to_write has already
+			// been written to the cached layer, if we have to
+			// skip before this position, we have to check the
+			// cached object will allow skipping backward to
+			// overwrite the already written data
+
+		    infinint new_ftw = infinint(next) - amount;
+		    if(infinint(first_to_write) <= new_ftw)
+			    // we don't lead the cached object to skip backward
+			    // in order to overwrite data
+			return true;
+		    else // we must check whether the cached object will allow skipping backward
+		    {
+			infinint backw = infinint(first_to_write) - new_ftw;
+			return ref->skippable(skip_backward, backw);
+		    }
+		}
+		else // no write pending data
+		    return true;
+
+	    default:
+		throw SRC_BUG;
+	    }
+
 	    return true;
+	}
 	else
 	{
 	    switch(direction)
@@ -117,6 +159,18 @@ namespace libdar
 			return ref->skippable(skip_forward, forw - backw);
 		}
 	    case skip_backward:
+		    // if we don't flush write pending data, the cached object can evaluate backward
+		    // skippable possible while it could not be possible once the data pending for
+		    // writing will be flushed (sar object for example)
+		    // But flushing data now, does not remove it all from the cache and some may remain
+		    // which could later be modified from the cache only. Then once time will come to
+		    // flush this data, this would mean for the cached object to skip backward to modify
+		    // the already flushed data. Skipping backward may be impossible at all (tuyau) so the
+		    // data flushing would fail and the global write operation on the cache object
+		    // would also
+		    // so we must flush write pending data
+		    // but control the first_to_write field skippability is contained insde the cache
+		    // for that when it decreases a check is done for backward skippability on the cached object
 		if(need_flush_write())
 		    flush_write(); // before skipping we would first have to write the pending data so we do it
 		    // now for the underlay provides a coherent answer from skippable now with the effective skip at later time
@@ -154,15 +208,24 @@ namespace libdar
 		// skipping inside the buffer is possible
 
 	    infinint tmp_next = pos - buffer_offset;
+	    U_I new_next = 0;
+
+	    tmp_next.unstack(new_next);
+	    if(!tmp_next.is_zero())
+		throw SRC_BUG;
 
 		// assigning to next its new value to reflect the skip() operation
 
-	    next = 0;
-	    tmp_next.unstack(next);
-	    if(!tmp_next.is_zero())
-		throw SRC_BUG;
-	    if(first_to_write > next && first_to_write != size)
-		first_to_write = next;
+	    if(first_to_write > new_next && first_to_write != size)
+	    {
+		    // reducing first_to_write means the cached object
+		    // will have to skip backward, this we must check
+		if(ref->skippable(skip_backward, first_to_write - new_next))
+		    first_to_write = new_next;
+		else
+		    return false; // cannot skip
+	    }
+	    next = new_next;
 
 	    return true;
 	}

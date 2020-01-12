@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2019-09-21 20:14+0200\n"
+"POT-Creation-Date: 2020-01-12 15:27+0100\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -3782,7 +3782,7 @@ msgstr ""
 #: src/libdar/i_archive.cpp:915
 msgid ""
 "File ownership will not be restored du to the lack of privilege, you can "
-"disable this message my asking not to restore file ownership"
+"disable this message by asking not to restore file ownership"
 msgstr ""
 
 #: src/libdar/i_archive.cpp:964
@@ -4339,12 +4339,12 @@ msgstr ""
 " Ditt val? "
 
 #: src/libdar/op_tools.cpp:259 src/dar_suite/line_tools.cpp:58
-#: src/dar_suite/dar_suite.cpp:282
+#: src/dar_suite/dar_suite.cpp:279
 msgid "YES"
 msgstr "JA"
 
 #: src/libdar/op_tools.cpp:260 src/dar_suite/line_tools.cpp:58
-#: src/dar_suite/dar_suite.cpp:284
+#: src/dar_suite/dar_suite.cpp:281
 msgid "NO"
 msgstr "NEJ"
 
@@ -6526,7 +6526,7 @@ msgstr ""
 "Vi har länkats med en inkompatibel version av libdar. Förväntad version %d."
 "%d.x men blev länkad med version %d.%d.%d"
 
-#: src/dar_suite/dar_suite.cpp:158
+#: src/dar_suite/dar_suite.cpp:158 src/python/pybind11_libdar.cpp:206
 msgid "NOT YET IMPLEMENTED FEATURE has been used: "
 msgstr "EN INTE IMPLEMENTERAD FUNKTION har använts: "
 
@@ -6535,7 +6535,7 @@ msgid "Please check documentation or upgrade your software if available"
 msgstr ""
 "Kontrollera dokumentationen eller uppgradera din programvara om tillgänglig"
 
-#: src/dar_suite/dar_suite.cpp:164
+#: src/dar_suite/dar_suite.cpp:164 src/python/pybind11_libdar.cpp:210
 msgid "SEEMS TO BE A HARDWARE PROBLEM: "
 msgstr "VERKAR VARA ETT HÅRDVARUPROBLEM: "
 
@@ -6543,41 +6543,44 @@ msgstr "VERKAR VARA ETT HÅRDVARUPROBLEM: "
 msgid "Please check your hardware"
 msgstr "Kontrollera din hårdvara"
 
-#: src/dar_suite/dar_suite.cpp:170
+#: src/dar_suite/dar_suite.cpp:170 src/python/pybind11_libdar.cpp:214
 msgid "Lack of SECURED memory to achieve the operation, aborting operation"
 msgstr "Brist på SÄKERT minne för att utföra åtgärden, avbryter densamma"
 
 #: src/dar_suite/dar_suite.cpp:175 src/dar_suite/dar_suite.cpp:180
+#: src/python/pybind11_libdar.cpp:218 src/python/pybind11_libdar.cpp:222
 msgid "Lack of memory to achieve the operation, aborting operation"
 msgstr "Minnesbrist för att utföra åtgärden, avbryter densamma"
 
-#: src/dar_suite/dar_suite.cpp:185 src/dar_suite/dar_suite.cpp:231
-#: src/dar_suite/dar_suite.cpp:237
-msgid "FATAL error, aborting operation"
+#: src/dar_suite/dar_suite.cpp:185 src/dar_suite/dar_suite.cpp:230
+#: src/python/pybind11_libdar.cpp:226
+#, fuzzy
+msgid "FATAL error, aborting operation: "
 msgstr "FATALT fel, avbryter åtgärd"
 
-#: src/dar_suite/dar_suite.cpp:191
+#: src/dar_suite/dar_suite.cpp:190 src/python/pybind11_libdar.cpp:230
 msgid "Aborting program. User refused to continue while asking: "
 msgstr "Avbryter program. Användare vägrade fortsätta vid förfrågan: "
 
-#: src/dar_suite/dar_suite.cpp:196
+#: src/dar_suite/dar_suite.cpp:195 src/python/pybind11_libdar.cpp:234
 msgid "Program has been aborted for the following reason: "
 msgstr "Progarmmet har avslutats av följande orsak: "
 
-#: src/dar_suite/dar_suite.cpp:206
+#: src/dar_suite/dar_suite.cpp:205 src/python/pybind11_libdar.cpp:242
 msgid "Aborting program. An error occurred concerning user command execution: "
 msgstr ""
 "Avbryter program. Ett fel inträffade angående utförande av användarkommando: "
 
-#: src/dar_suite/dar_suite.cpp:211
+#: src/dar_suite/dar_suite.cpp:210 src/python/pybind11_libdar.cpp:246
 msgid "Aborting program. An error occurred while calling libdar: "
 msgstr "Avbryter program. Ett fel inträffade vid anrop av libdar: "
 
-#: src/dar_suite/dar_suite.cpp:216 src/dar_suite/dar_suite.cpp:221
+#: src/dar_suite/dar_suite.cpp:215 src/dar_suite/dar_suite.cpp:220
+#: src/python/pybind11_libdar.cpp:250 src/python/pybind11_libdar.cpp:254
 msgid "Aborting program. "
 msgstr "Avbryter program. "
 
-#: src/dar_suite/dar_suite.cpp:226
+#: src/dar_suite/dar_suite.cpp:225 src/python/pybind11_libdar.cpp:258
 msgid ""
 "Aborting program. The requested operation needs a feature that has been "
 "disabled at compilation time: "
@@ -6585,15 +6588,20 @@ msgstr ""
 "Avbryter program. Den begärda åtgärden behöver funktioner, som har "
 "avaktiverats vid kompileringstillfället: "
 
-#: src/dar_suite/dar_suite.cpp:244 src/dar_suite/dar_suite.cpp:264
+#: src/dar_suite/dar_suite.cpp:235 src/python/pybind11_libdar.cpp:266
+#, fuzzy
+msgid "FATAL error during network communication, aborting operation: "
+msgstr "FATALT fel, avbryter åtgärd"
+
+#: src/dar_suite/dar_suite.cpp:241 src/dar_suite/dar_suite.cpp:261
 msgid "INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER"
 msgstr "INTERNT FEL, RAPPORTERA FÖREGÅENDE UTDATA TILL PROGRAMUNDERHÅLLAREN"
 
-#: src/dar_suite/dar_suite.cpp:263
+#: src/dar_suite/dar_suite.cpp:260
 msgid "CAUGHT A NON (LIB)DAR EXCEPTION"
 msgstr "FÅNGADE ETT ICKE- (LIB)DAR-AVBROTT"
 
-#: src/dar_suite/dar_suite.cpp:271
+#: src/dar_suite/dar_suite.cpp:268
 msgid ""
 "SANITY CHECK: AT LEAST ONE THREAD_CANCELLATION OBJECT HAS NOT BEEN DESTROYED "
 "AND REMAINS IN MEMORY WHILE THE PROGRAM REACHED ITS END"
@@ -6601,30 +6609,30 @@ msgstr ""
 "SUNDHETSKONTROLL: ÅTMINSTONE ETT TRÅDAT AVBROTTSOBJEKT HAR INTE FÖRSTÖRTS "
 "OCH FINNS KVAR I MINNE MEDAN PROGRAMMET NÅDDE SITT SLUT"
 
-#: src/dar_suite/dar_suite.cpp:287
+#: src/dar_suite/dar_suite.cpp:284
 #, fuzzy, c-format
 msgid "Long options support         : %s\n"
 msgstr "Stöd för långa alternativ  : %s\n"
 
-#: src/dar_suite/dar_suite.cpp:303
+#: src/dar_suite/dar_suite.cpp:300
 #, c-format
 msgid "Received signal: %s"
 msgstr "Mottagen signal: %s"
 
-#: src/dar_suite/dar_suite.cpp:305
+#: src/dar_suite/dar_suite.cpp:302
 #, c-format
 msgid "Received signal: %d"
 msgstr "Mottagen signal: %d"
 
-#: src/dar_suite/dar_suite.cpp:311
+#: src/dar_suite/dar_suite.cpp:308
 msgid "Archive fast termination engaged"
 msgstr "Snabb avslutning på arkiv inkopplat"
 
-#: src/dar_suite/dar_suite.cpp:315
+#: src/dar_suite/dar_suite.cpp:312
 msgid "Archive delayed termination engaged"
 msgstr "Fördröjd avslutning på arkiv inkopplat"
 
-#: src/dar_suite/dar_suite.cpp:319
+#: src/dar_suite/dar_suite.cpp:316
 #, fuzzy
 msgid ""
 "Disabling signal handler, the next time this signal is received the program "
@@ -6633,7 +6641,7 @@ msgstr ""
 "Kopplar bort signalhanterare, nästa gång denna signal mottages kommer "
 "programmet att avslutas omedelbart"
 
-#: src/dar_suite/dar_suite.cpp:323
+#: src/dar_suite/dar_suite.cpp:320
 msgid ""
 "Cannot cleanly abort the operation, thread-safe support is missing, will "
 "thus abruptly stop the program, generated archive may be unusable"
@@ -8169,6 +8177,11 @@ msgstr "   -aSI \t   delstorlekssuffix k, M, T, G, etc. är tio-potenser\n"
 #, c-format
 msgid "   -abinary\t   slice size suffixes k, M, T, G, etc. are power of 2\n"
 msgstr "   -abinary\t   delstorlekssuffix k, M, T, G, etc. är två-potenser\n"
+
+#: src/python/pybind11_libdar.cpp:262
+#, fuzzy
+msgid "FATAL error from operating system, aborting operation: "
+msgstr "FATALT fel, avbryter åtgärd"
 
 #: src/check/all_features.cpp:54
 msgid "-"

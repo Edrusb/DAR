@@ -1,6 +1,6 @@
 //*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2019 Denis Corbin
+// Copyright (C) 2002-2020 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -61,19 +61,21 @@ namespace libdar
 
     struct signator
     {
-	enum
+	enum result_t
 	{
 	    good,         //< good signature
 	    bad,          //< key correct bug signature tempered
 	    unknown_key,  //< no key found to check the signature
 	    error         //< signature failed to be checked for other error
-	} result;         //< status of the signing
-	enum
+	};
+	enum key_validity_t
 	{
 	    valid,        //< the key we have is neither expired nor revoked
 	    expired,      //< the key we have has expired
 	    revoked       //< the key we have has been revoked
-	} key_validity;   //< validity of the key used to verify the signature
+	};
+	key_validity_t key_validity; //< validity of the key used to verify the signature
+	result_t result;         //< status of the signing
 	std::string fingerprint; //< fingerprint of the key
 	datetime signing_date;   //< date of signature
 	datetime signature_expiration_date; //< date of expiration of this signature

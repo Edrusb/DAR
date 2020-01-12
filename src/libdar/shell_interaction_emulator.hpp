@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2019 Denis Corbin
+// Copyright (C) 2002-2020 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -46,9 +46,9 @@ namespace libdar
     public:
 	shell_interaction_emulator(user_interaction *emulator);
 	shell_interaction_emulator(const shell_interaction_emulator & ref) = default;
-	shell_interaction_emulator(shell_interaction_emulator && ref) noexcept = default;
-	shell_interaction_emulator & operator = (const shell_interaction_emulator & ref) = default;
-	shell_interaction_emulator & operator = (shell_interaction_emulator && ref) noexcept = default;
+	shell_interaction_emulator(shell_interaction_emulator && ref) noexcept = delete;
+	shell_interaction_emulator & operator = (const shell_interaction_emulator & ref) = delete;
+	shell_interaction_emulator & operator = (shell_interaction_emulator && ref) noexcept = delete;
 	virtual ~shell_interaction_emulator() = default;
 
     protected:

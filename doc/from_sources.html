@@ -87,10 +87,8 @@ to generate html version of man pages</li>
         <li><a href="http://libthreadar.sourceforge.net/">libthreadar</a> for libdar using several threads and remote repository feature (needs libcurl in addition see below)<br>
 </li>
         <li><a href="http://librsync.sourceforge.net/">librsync</a> for delta binary</li>
-        <li><a href="https://curl.haxx.se/libcurl/">libcurl</a> for remote repository access using ftp or sftp protocols<br>
-        </li>
-
-
+        <li><a href="https://curl.haxx.se/libcurl/">libcurl</a> for remote repository access using ftp or sftp protocols<br></li>
+	<li><a href="https://www.python.org/">python3</a> (python3-dev) and <a href="https://github.com/pybind/pybind11">pybind11</a> to access libdar from python</li>
       </ul>
       <div style="margin-left: 40px;"><br>
 The consequences of building dar without these optional tools are the
@@ -135,8 +133,8 @@ archive with binary delta nor to read/restore files stored with binary
 delta</li>
         <li>if you lack <span style="font-weight: bold;">libcurl</span> you won't be able to remotely read or write a archive stored using ftp or sftp<br>
         </li>
-
-
+	<li>if you lack <span style="font-weight: bold;">python3</span> or <span style="font-weight: bold;">pybind11</span> you won't be able to access
+	  libdar from python environment</li>
       </ul>
       <div style="text-align: justify;"><br>
       <div style="margin-left: 40px;"> </div>

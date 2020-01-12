@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2019 Denis Corbin
+// Copyright (C) 2002-2020 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -63,9 +63,9 @@ namespace libdar
 		 bool small) : cat_file(dialog, pdesc, reading_ver, saved, default_algo, small) {};
 
 	cat_door(const cat_door & ref) = default;
-	cat_door(cat_door && ref) = default;
-	cat_door & operator = (const cat_door & ref) = default;
-	cat_door & operator = (cat_door && ref) = default;
+	cat_door(cat_door && ref) = delete;
+	cat_door & operator = (const cat_door & ref) = delete;
+	cat_door & operator = (cat_door && ref) = delete;
 	~cat_door() = default;
 
 	virtual bool operator == (const cat_entree & ref) const override;

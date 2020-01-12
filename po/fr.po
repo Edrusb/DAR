@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: DAR 2.6.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2019-09-21 20:14+0200\n"
-"PO-Revision-Date: 2019-07-06 16:26+0200\n"
+"POT-Creation-Date: 2020-01-12 15:27+0100\n"
+"PO-Revision-Date: 2020-01-12 15:30+0100\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "Language: fr\n"
@@ -3911,7 +3911,7 @@ msgstr ""
 #: src/libdar/i_archive.cpp:915
 msgid ""
 "File ownership will not be restored du to the lack of privilege, you can "
-"disable this message my asking not to restore file ownership"
+"disable this message by asking not to restore file ownership"
 msgstr ""
 "Le propriétaire des fichiers ne sera pas restauré faute de privilège pour ce "
 "faire. Vous pouvez supprimer ce message en demandant à ne pas restaurer ces "
@@ -4509,12 +4509,12 @@ msgstr ""
 "  Votre choix ?"
 
 #: src/libdar/op_tools.cpp:259 src/dar_suite/line_tools.cpp:58
-#: src/dar_suite/dar_suite.cpp:282
+#: src/dar_suite/dar_suite.cpp:279
 msgid "YES"
 msgstr "OUI"
 
 #: src/libdar/op_tools.cpp:260 src/dar_suite/line_tools.cpp:58
-#: src/dar_suite/dar_suite.cpp:284
+#: src/dar_suite/dar_suite.cpp:281
 msgid "NO"
 msgstr "NON"
 
@@ -6761,7 +6761,7 @@ msgstr ""
 "Nous utilisons une version incompatible de libdar. La version attendue est "
 "%d.%d.x alors que la version actuellement utilisée est %d.%d.%d"
 
-#: src/dar_suite/dar_suite.cpp:158
+#: src/dar_suite/dar_suite.cpp:158 src/python/pybind11_libdar.cpp:206
 msgid "NOT YET IMPLEMENTED FEATURE has been used: "
 msgstr "une FONCTIONNALITÉ NON ENCORE IMPLÉMENTÉE a été sollicitée :"
 
@@ -6769,7 +6769,7 @@ msgstr "une FONCTIONNALITÉ NON ENCORE IMPLÉMENTÉE a été sollicitée :"
 msgid "Please check documentation or upgrade your software if available"
 msgstr "Merci de vérifier la documentation et/ou de mettre à jour ce logiciel"
 
-#: src/dar_suite/dar_suite.cpp:164
+#: src/dar_suite/dar_suite.cpp:164 src/python/pybind11_libdar.cpp:210
 msgid "SEEMS TO BE A HARDWARE PROBLEM: "
 msgstr "IL SEMBLE QU'IL Y AIT UN PROBLÈME MATÉRIEL :"
 
@@ -6777,42 +6777,44 @@ msgstr "IL SEMBLE QU'IL Y AIT UN PROBLÈME MATÉRIEL :"
 msgid "Please check your hardware"
 msgstr "Merci de vérifier votre matériel"
 
-#: src/dar_suite/dar_suite.cpp:170
+#: src/dar_suite/dar_suite.cpp:170 src/python/pybind11_libdar.cpp:214
 msgid "Lack of SECURED memory to achieve the operation, aborting operation"
 msgstr "Pas assez de mémoire SÉCURISÉE pour terminer l'opération, abandon"
 
 #: src/dar_suite/dar_suite.cpp:175 src/dar_suite/dar_suite.cpp:180
+#: src/python/pybind11_libdar.cpp:218 src/python/pybind11_libdar.cpp:222
 msgid "Lack of memory to achieve the operation, aborting operation"
 msgstr "Pas assez de mémoire pour terminer l'opération, abandon"
 
-#: src/dar_suite/dar_suite.cpp:185 src/dar_suite/dar_suite.cpp:231
-#: src/dar_suite/dar_suite.cpp:237
-msgid "FATAL error, aborting operation"
-msgstr "Erreur FATALE, abandon"
+#: src/dar_suite/dar_suite.cpp:185 src/dar_suite/dar_suite.cpp:230
+#: src/python/pybind11_libdar.cpp:226
+msgid "FATAL error, aborting operation: "
+msgstr "Erreur FATALE, abandon de l'opération : "
 
-#: src/dar_suite/dar_suite.cpp:191
+#: src/dar_suite/dar_suite.cpp:190 src/python/pybind11_libdar.cpp:230
 msgid "Aborting program. User refused to continue while asking: "
 msgstr "Abandon. L'utilisateur a refusé de continuer lors de la question : "
 
-#: src/dar_suite/dar_suite.cpp:196
+#: src/dar_suite/dar_suite.cpp:195 src/python/pybind11_libdar.cpp:234
 msgid "Program has been aborted for the following reason: "
 msgstr "Le programme a été arrêté pour la raison suivante : "
 
-#: src/dar_suite/dar_suite.cpp:206
+#: src/dar_suite/dar_suite.cpp:205 src/python/pybind11_libdar.cpp:242
 msgid "Aborting program. An error occurred concerning user command execution: "
 msgstr ""
 "Abandon. une erreur est survenue lors de l'exécution d'une commande "
 "utilisateur : "
 
-#: src/dar_suite/dar_suite.cpp:211
+#: src/dar_suite/dar_suite.cpp:210 src/python/pybind11_libdar.cpp:246
 msgid "Aborting program. An error occurred while calling libdar: "
 msgstr "Abandon. Une erreur est survenue lors d'un appel à libdar : "
 
-#: src/dar_suite/dar_suite.cpp:216 src/dar_suite/dar_suite.cpp:221
+#: src/dar_suite/dar_suite.cpp:215 src/dar_suite/dar_suite.cpp:220
+#: src/python/pybind11_libdar.cpp:250 src/python/pybind11_libdar.cpp:254
 msgid "Aborting program. "
 msgstr "Arrêt du programme. "
 
-#: src/dar_suite/dar_suite.cpp:226
+#: src/dar_suite/dar_suite.cpp:225 src/python/pybind11_libdar.cpp:258
 msgid ""
 "Aborting program. The requested operation needs a feature that has been "
 "disabled at compilation time: "
@@ -6820,17 +6822,22 @@ msgstr ""
 "Abandon. L'opération demandée nécessite une fonctionnalité qui n'a pas été "
 "activée à la compilation : "
 
-#: src/dar_suite/dar_suite.cpp:244 src/dar_suite/dar_suite.cpp:264
+#: src/dar_suite/dar_suite.cpp:235 src/python/pybind11_libdar.cpp:266
+msgid "FATAL error during network communication, aborting operation: "
+msgstr ""
+"Erreur FATALE lors de la communication réseau, abandon de l'opération : "
+
+#: src/dar_suite/dar_suite.cpp:241 src/dar_suite/dar_suite.cpp:261
 msgid "INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER"
 msgstr ""
 "ERREUR INTERNE, MERCI DE RAPPORTER L'AFFICHAGE PRÉCÉDENT AU MAINTENEUR DU "
 "PROGRAMME"
 
-#: src/dar_suite/dar_suite.cpp:263
+#: src/dar_suite/dar_suite.cpp:260
 msgid "CAUGHT A NON (LIB)DAR EXCEPTION"
 msgstr "EXCEPTION NON (LIB)DAR ATTRAPÉE"
 
-#: src/dar_suite/dar_suite.cpp:271
+#: src/dar_suite/dar_suite.cpp:268
 msgid ""
 "SANITY CHECK: AT LEAST ONE THREAD_CANCELLATION OBJECT HAS NOT BEEN DESTROYED "
 "AND REMAINS IN MEMORY WHILE THE PROGRAM REACHED ITS END"
@@ -6838,30 +6845,30 @@ msgstr ""
 "AUTO-CONTROL : AU MOINS UNE FILE D'EXÉCUTION N'A PAS ÉTÉ DÉTRUITE ET RESTE "
 "EN MÉMOIRE ALORS QUE LE PROGRAMME TOUCHE À SA FIN"
 
-#: src/dar_suite/dar_suite.cpp:287
+#: src/dar_suite/dar_suite.cpp:284
 #, c-format
 msgid "Long options support         : %s\n"
 msgstr "Options longues supportées   : %s\n"
 
-#: src/dar_suite/dar_suite.cpp:303
+#: src/dar_suite/dar_suite.cpp:300
 #, c-format
 msgid "Received signal: %s"
 msgstr "Signal %s reçu"
 
-#: src/dar_suite/dar_suite.cpp:305
+#: src/dar_suite/dar_suite.cpp:302
 #, c-format
 msgid "Received signal: %d"
 msgstr "Signal reçu : %d"
 
-#: src/dar_suite/dar_suite.cpp:311
+#: src/dar_suite/dar_suite.cpp:308
 msgid "Archive fast termination engaged"
 msgstr "Mise en route de la procédure de terminaison rapide de l'archive"
 
-#: src/dar_suite/dar_suite.cpp:315
+#: src/dar_suite/dar_suite.cpp:312
 msgid "Archive delayed termination engaged"
 msgstr "Mise en route de la procédure de terminaison de l'archive"
 
-#: src/dar_suite/dar_suite.cpp:319
+#: src/dar_suite/dar_suite.cpp:316
 msgid ""
 "Disabling signal handler, the next time this signal is received the program "
 "will abort immediately"
@@ -6869,7 +6876,7 @@ msgstr ""
 "Désactivation du gestionnaire de signal. La prochaine réception de ce signal "
 "arrêtera immédiatement le programme"
 
-#: src/dar_suite/dar_suite.cpp:323
+#: src/dar_suite/dar_suite.cpp:320
 msgid ""
 "Cannot cleanly abort the operation, thread-safe support is missing, will "
 "thus abruptly stop the program, generated archive may be unusable"
@@ -8427,6 +8434,11 @@ msgid "   -abinary\t   slice size suffixes k, M, T, G, etc. are power of 2\n"
 msgstr ""
 "   -abinary\t   signification des suffixes k, M, T, G, etc. comme puissances "
 "de 2\n"
+
+#: src/python/pybind11_libdar.cpp:262
+msgid "FATAL error from operating system, aborting operation: "
+msgstr ""
+"Erreur FATALE provenant du système d'exploitation, abandon de l'opération : "
 
 #: src/check/all_features.cpp:54
 msgid "-"

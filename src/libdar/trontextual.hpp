@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2019 Denis Corbin
+// Copyright (C) 2002-2020 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -46,10 +46,10 @@ namespace libdar
     public:
 	trontextual(generic_file *f, const infinint & offset, const infinint & size, bool own_f = false);
 	trontextual(generic_file *f, const infinint & offset, const infinint & size, gf_mode mode, bool own_f = false);
-	trontextual(const trontextual & ref) = default;
-	trontextual(trontextual && ref) noexcept = default;
-	trontextual & operator = (const trontextual & ref) = default;
-	trontextual & operator = (trontextual && ref) = default;
+	trontextual(const trontextual & ref) = delete;
+	trontextual(trontextual && ref) noexcept = delete;
+	trontextual & operator = (const trontextual & ref) = delete;
+	trontextual & operator = (trontextual && ref) = delete;
 	~trontextual() = default;
 
 	virtual bool is_an_old_start_end_archive() const override { if(ref == nullptr) throw SRC_BUG; return ref->is_an_old_start_end_archive(); };
