@@ -32,15 +32,26 @@ else
 endif
 endif
 
+dist_pkgdata_DATA = pybind11_libdar.cpp
+
 if PYTHON_BINDING
-  TARGET=libdar_python
+  TARGET=libdar$(PYEXT)
+
+install-data-hook: $(TARGET)
+	$(INSTALL) -d $(DESTDIR)$(libdir)/python3/dist-packages
+	$(INSTALL) -m 0644 $(TARGET) $(DESTDIR)$(libdir)/python3/dist-packages
+
+uninstall-hook:
+	rm -rf $(DESTDIR)$(libdir)/python3/dist-packages/$(TARGET)
+	rmdir -p $(DESTDIR)$(libdir)/python3/dist-packages 2> /dev/null
+
 else
   TARGET=
 endif
 
 AM_LDFLAGS = -shared $(GPGME_LIBS) $(LIBCURL_LIBS) $(LIBTHREADAR_LIBS) $(CXXSTDFLAGS) ../libdar/.libs/$(MYLIB)
 
-all-local: libdar$(PYEXT)
+all-local: $(TARGET)
 
 .cpp.o:
 	$(CXX) -c $(AM_CPPFLAGS) $< -o $@
