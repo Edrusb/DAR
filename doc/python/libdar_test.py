@@ -3,8 +3,10 @@ import os, sys
 
 # mandatory first action is to initialize libdar
 # by calling libdar.get_version()
+
 u = libdar.get_version()
 print("using libdar version {}.{}.{}".format(u[0],u[1],u[2]))
+
 # libdar.get_version() can be called at will
 
 # now defining a very minimalist class to let libdar
@@ -45,15 +47,13 @@ class myui(libdar.user_interaction):
         # and not show what user type when echo is False
 
 # exceptions from libdar (libdar::Egeneric, Erange, ...) in
-# C++ side are all translated to libdar.darexc class introduces
-# in the python binding. This class has the what() method to
+# C++ side are all translated to libdar.darexc class introduced
+# in the python binding. This class has the __str__() method to
 # get the message string about the cause of the exception
 # it get displayed naturally when you don't catch them from
 # a python shell
 
-# here an example on how to handle libdar.darexc exceptions:
-
-x = libdar.deci("not an integer")
+# here is an example on how to handle libdar.darexc exceptions:
 
 try:
     x = libdar.deci("not an integer")
@@ -62,10 +62,6 @@ except libdar.darexc as obj:
 
 # here follows some helper routines as illustration
 # on how to manage some libdar data structures
-
-# libdar.infinint to string:
-def i2str(infinint):
-    return libdar.deci(infinint).human()
 
 # display libdar.statistics (not all fields are shown, see help(libdar.statistics)
 def display_stats(stats):
@@ -123,6 +119,10 @@ def f0():
                                                     dy.human(),
                                                     libdar.deci(res[0]).human(),
                                                     libdar.deci(res[1]).human()))
+
+# libdar.infinint to string:
+def i2str(infinint):
+    return libdar.deci(infinint).human()
 
 # this is a example of routine that given an open libdar.archive
 # will provide its listing content. This call is recursive but
