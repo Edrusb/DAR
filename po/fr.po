@@ -6824,7 +6824,8 @@ msgstr ""
 
 #: src/dar_suite/dar_suite.cpp:235 src/python/pybind11_libdar.cpp:266
 msgid "FATAL error during network communication, aborting operation: "
-msgstr "Erreur FATALE lors de la communication réseau, abandon de l'opération : "
+msgstr ""
+"Erreur FATALE lors de la communication réseau, abandon de l'opération : "
 
 #: src/dar_suite/dar_suite.cpp:241 src/dar_suite/dar_suite.cpp:261
 msgid "INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER"
@@ -8436,7 +8437,8 @@ msgstr ""
 
 #: src/python/pybind11_libdar.cpp:262
 msgid "FATAL error from operating system, aborting operation: "
-msgstr "Erreur FATALE provenant du système d'exploitation, abandon de l'opération : "
+msgstr ""
+"Erreur FATALE provenant du système d'exploitation, abandon de l'opération : "
 
 #: src/check/all_features.cpp:54
 msgid "-"
