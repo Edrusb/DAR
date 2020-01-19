@@ -3113,7 +3113,7 @@ namespace libdar
 		if(compute_crc && (keep_mode != cat_file::normal && keep_mode != cat_file::plain))
 		    throw SRC_BUG; // cannot compute crc if data is compressed or hole datastructure not interpreted
 
-		    // TREATNG INODE THAT NEED DATA SAVING
+		    // TREATING INODE THAT NEED DATA SAVING
 
 		if(display_treated)
 		{
