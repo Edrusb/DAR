@@ -180,7 +180,8 @@ namespace libdar
 					       file_size,
 					       compression_algo != compression::none
 					       || is_sparse()
-					       || is_dir());
+					       || is_dir()
+					       || get_data_status() == saved_status::delta);
 	else
 	    return "";
     }
