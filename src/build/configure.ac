@@ -1486,25 +1486,29 @@ AC_ARG_ENABLE( [python-binding],
 	       AC_HELP_STRING(--disable-python-binding, [ignore python binding even if it is possible to build it]),
 	       [ local_python="no" ],
 	       [
-		  AC_MSG_CHECKING([for python binding])
-		  pyext="python3-config --extension-suffix"
-	          if  $pyext 1> /dev/null 2> /dev/null ; then
-		     PYEXT="`$pyext`"
-		  else
-		      local_python="no"
-		  fi
+	         if test "$debug_static" != "yes" ; then
+ 		   AC_MSG_CHECKING([for python binding])
+		   pyext="python3-config --extension-suffix"
+	           if  $pyext 1> /dev/null 2> /dev/null ; then
+		      PYEXT="`$pyext`"
+		   else
+		       local_python="no"
+		   fi
 
-		  pyflags="python3 -m pybind11 --includes"
-		  if test "$local_python" != "no" && $pyflags 1> /dev/null 2> /dev/null ; then
-		     PYFLAGS="`$pyflags`"
-		     local_python="yes"
-		     AC_MSG_RESULT([ok])
-		     AC_SUBST(PYEXT, [$PYEXT])
-		     AC_SUBST(PYFLAGS, [$PYFLAGS])
-		  else
-		     local_python="no"
-		     AC_MSG_RESULT([failed])
-		  fi
+		   pyflags="python3 -m pybind11 --includes"
+		   if test "$local_python" != "no" && $pyflags 1> /dev/null 2> /dev/null ; then
+		      PYFLAGS="`$pyflags`"
+		      local_python="yes"
+		      AC_MSG_RESULT([ok])
+		      AC_SUBST(PYEXT, [$PYEXT])
+		      AC_SUBST(PYFLAGS, [$PYFLAGS])
+		   else
+		      local_python="no"
+		      AC_MSG_RESULT([failed])
+		   fi
+		 else
+		    AC_MSG_RESULT([Cannot build python binding when --enable-debug is set])
+		 fi
 	       ])
 
 
