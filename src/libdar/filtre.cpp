@@ -872,7 +872,14 @@ namespace libdar
 					    e_ino->ea_set_saved_status(ea_saved_status::removed);
 
 					if(e_file != nullptr)
-					    e_file->set_sparse_file_detection_write(sparse_file_detection);
+					{
+					    if(make_delta_diff)
+						    // sparse_file layer is not useful
+						    // when performing a delta patch
+						e_file->set_sparse_file_detection_write(false);
+					    else
+						e_file->set_sparse_file_detection_write(sparse_file_detection);
+					}
 
 					    // DECIDING WHETHER FILE DATA WILL BE COMPRESSED OR NOT
 
