@@ -1,6 +1,8 @@
 from 2.6.7 to 2.6.8
 - fixing bug leading binary delta failed to be read from an archive in
   some quite rare condition.
+- fixed bug that was not listing file with delta path when filtering out
+  unsaved inodes
 - updated source package for the python binding tutorial document be
   installed with the rest of the document
 
