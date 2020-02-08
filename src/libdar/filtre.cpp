@@ -872,7 +872,14 @@ namespace libdar
 					    e_ino->ea_set_saved_status(ea_saved_status::removed);
 
 					if(e_file != nullptr)
-					    e_file->set_sparse_file_detection_write(sparse_file_detection);
+					{
+					    if(make_delta_diff)
+						    // sparse_file layer is not useful
+						    // when performing a delta patch
+						e_file->set_sparse_file_detection_write(false);
+					    else
+						e_file->set_sparse_file_detection_write(sparse_file_detection);
+					}
 
 					    // DECIDING WHETHER FILE DATA WILL BE COMPRESSED OR NOT
 
@@ -3113,7 +3120,7 @@ namespace libdar
 		if(compute_crc && (keep_mode != cat_file::normal && keep_mode != cat_file::plain))
 		    throw SRC_BUG; // cannot compute crc if data is compressed or hole datastructure not interpreted
 
-		    // TREATNG INODE THAT NEED DATA SAVING
+		    // TREATING INODE THAT NEED DATA SAVING
 
 		if(display_treated)
 		{

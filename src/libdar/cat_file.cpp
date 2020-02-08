@@ -663,7 +663,18 @@ namespace libdar
 				// returned stack, in order to benefit from the sparse_file::copy_to() specific methods
 				// that can restore holes
 
-			    if(get_sparse_file_detection_read() && mode != keep_compressed && mode != keep_hole)
+			    if(get_sparse_file_detection_read() && mode != keep_compressed && mode != keep_hole
+
+				   // fixing bug in dar up to and including 2.6.7
+				   // where the sparse flag was not removed when
+				   // doing a delta patch, while no sparse file
+				   // detection was done to store the delta batch
+				   // into the archive as expected. the delta patch
+				   // has very little chance to produce holes in
+				   // the resulting data. Version greater than 2.6.7
+				   // will remove the sparse flag when performing delta patch
+				   // which will avoid this extra code
+			       && get_saved_status() != saved_status::delta)
 			    {
 				sparse_file *stmp = new (nothrow) sparse_file(parent);
 				if(stmp == nullptr)

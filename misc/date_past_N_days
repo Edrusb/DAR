@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ -z "$1" ] ; then
+   echo "usage $0: <number of days>"
+   echo "   returns the date it was N days ago expressed as seconds since 1969"
+   echo ""
+   echo "example: dar -c backup -af -A \`$0 3\` <other options to dar...>"
+   echo "   \"backup\" will only contain files that have changed during the"
+   echo "   last 3 days"
+   exit 1
+fi
+
+echo $(( `date +%s` - $1 * 86400 ))

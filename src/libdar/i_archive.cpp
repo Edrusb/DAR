@@ -1221,7 +1221,8 @@ namespace libdar
 
 			if(!options.get_filter_unsaved()        // invoking callback if not filtering unsaved
 			   || e_eod != nullptr                  // invoking callback for all eod
-			   || e->get_saved_status() == saved_status::saved // involing call back for file having data saved
+			   || e->get_saved_status() == saved_status::saved // invoking callback for file having data saved
+			   || e->get_saved_status() == saved_status::delta // invoking callback for file having a delta patch as data
 			   || (e_ino != nullptr && e_ino->ea_get_saved_status() == ea_saved_status::full) // invoking callback for files having EA saved
 			   || (e_ino != nullptr && e_ino->ea_get_saved_status() == ea_saved_status::fake) // invoking callback for saved in recorded in isolated catalogue
 			   || (e_dir != nullptr && e_dir->get_recursive_has_changed()) // invoking callback for directory containing saved files
