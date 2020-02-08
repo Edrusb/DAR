@@ -4,7 +4,10 @@ from 2.6.7 to 2.6.8
 - fixed bug that was not listing file with delta path when filtering out
   unsaved inodes
 - updated source package for the python binding tutorial document be
-  installed with the rest of the document
+  installed with the rest of the documentation
+- adding date_past_N_days helper script to backup only files later than
+  "today minus N days"
+- incorporated the "args" support built script in dar source package
 
 from 2.6.6 to 2.6.7
 - fixing shell_interaction_emulator class declaration to avoid compilation
