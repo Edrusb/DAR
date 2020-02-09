@@ -103,7 +103,8 @@ namespace libdar
 	    // constructors & destructors
 
 	escape(generic_file *below,                           ///< "Below" is the generic file that holds the escaped data
-	       const std::set<sequence_type> & x_unjumpable); ///< a set of marks that can never been jumped over when skipping for the next mark of a any given type.
+	       const std::set<sequence_type> & x_unjumpable   ///< a set of marks that can never been jumped over when skipping for the next mark of a any given type.
+	      );
 	escape(const escape & ref) : generic_file(ref) { copy_from(ref); };
 	escape(escape && ref) noexcept : generic_file(std::move(ref)) { nullifyptr(); move_from(std::move(ref)); };
 	escape & operator = (const escape & ref);
