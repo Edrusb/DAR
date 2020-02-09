@@ -51,14 +51,14 @@
     if(nls_swap_tmp != "")			\
 	textdomain(nls_swap_tmp.c_str())
 
+    /// @}
+
 #else
 
 #define NLS_SWAP_IN //
 #define NLS_SWAP_OUT //
 
 #endif
-
-    /// @}
 
 
 

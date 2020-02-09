@@ -47,6 +47,6 @@ protected:
     virtual void fill_morceau() override;
 };
 
-    // @}
+    /// @}
 
 #endif
