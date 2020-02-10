@@ -23,7 +23,7 @@ But please, follow the rules!
   with invoking the SRC_BUG directive.
 - portability is important, your code should work under Linux, FreeBSD,
   OpenSolaris, Cygwin/Windows, ... pay attention not to use system specific
-  things unless escaped by compilation time directive (#if HAVE_...)
+  things unless escaped by compilation time directive (`#if HAVE_...`)
 - be prepared to justify/defend/argue your proposal, In the case I could not
   see the value it brings :-)
 - be patient, I will review your code proposal

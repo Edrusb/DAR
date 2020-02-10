@@ -168,7 +168,7 @@ namespace libdar
 	    /// \param[in] a pointer to the buffer area
 	    /// \param[in] size size of the buffer to inspect
 	    /// \param[in] min_hole_size minimum size of hole to consider, if set to zero only consider hole at end of buffer
-	    /// \param[out] offset in "a" where starts the found hole
+	    /// \param[out] start in "a" where starts the found hole
 	    /// \param[out] length length of the hole in byte
 	    /// \return true if a hole has been found, false else
 	    /// \note if the buffer ends by zeros, start points to the first zero, and length may be less than min_hole_size

@@ -63,7 +63,8 @@ namespace libdar
 			 const pile_descriptor & x_pdesc,  ///< stack descriptor where to write to
 			 const header_version & ver,       ///< archive header version read
 			 const std::list<signator> & known_signatories, ///< signatories that signed the archive header, to be compared with internal catalogue when reaching the end of the archive
-			 bool lax = false);                ///< whether to use lax mode
+			 bool lax = false                  ///< whether to use lax mode
+			);
         escape_catalogue(const escape_catalogue & ref) : catalogue(ref) { copy_from(ref); };
 	escape_catalogue(escape_catalogue && ref) = delete;
         escape_catalogue & operator = (const escape_catalogue &ref);
