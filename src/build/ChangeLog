@@ -2,6 +2,7 @@ from 2.6.8 to 2.6.9
 - fixed some obvious bug when running doxygen
 - fixing configure.ac to detect xattr.h system header when it is
 located in /usr/include/sys like under Alpine Linux distro (musl libc)
+- fixed typo in symbol name "libdar.archive_summary" in python binding
 
 from 2.6.7 to 2.6.8
 - fixing bug leading binary delta failed to be read from an archive in
