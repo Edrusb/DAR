@@ -1,3 +1,6 @@
+from 2.6.8 to 2.6.9
+- fixed some obvious bug when running doxygen
+
 from 2.6.7 to 2.6.8
 - fixing bug leading binary delta failed to be read from an archive in
   some quite rare condition.
