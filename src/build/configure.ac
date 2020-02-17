@@ -648,7 +648,7 @@ AC_ARG_ENABLE(  [ea-support],
                 [ AC_MSG_CHECKING([for Extended Attribute support])
                   AC_MSG_RESULT([disabled])
                 ],
-                [ AC_CHECK_HEADERS([attr/xattr.h])
+                [ AC_CHECK_HEADERS([attr/xattr.h sys/xattr.h])
                   AC_CHECK_LIB(attr, [lgetxattr], [], [])
                   AC_MSG_CHECKING([for Unix Extended Attribute support])
                   AC_LINK_IFELSE([AC_LANG_PROGRAM([[extern "C" {
@@ -658,6 +658,9 @@ AC_ARG_ENABLE(  [ea-support],
                                                      #if HAVE_ATTR_XATTR_H
                                                      #include <attr/xattr.h>
                                                      #endif
+						     #if HAVE_SYS_XATTR_H
+						     #include <sys/xattr.h>
+						     #endif
                                                     }]],
                                                     [ lgetxattr((char *)0, (char *)0, (void *)0, 0); ])
                                  ],
