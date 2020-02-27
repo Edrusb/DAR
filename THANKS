@@ -3,7 +3,8 @@ version 2.6.9
 Thanks to albert-github at github.com for his pull request fixing
 some obvious bug when running doxygen. Thanks Simon Rupf for providing
 patch for dar to compile under the Alpine Linux distro (available
-at https://alpinelinux.org/ )
+at https://alpinelinux.org/ ) Thanks Graham Cobb for bug report and
+troubleshooting assistance.
 
 version 2.6.8
 --------------
