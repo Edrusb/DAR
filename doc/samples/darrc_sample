@@ -21,6 +21,7 @@ create:
 -Z "*.gz"
 -Z "*.tgz"
 -Z "*.bz2"
+-Z "*.zst"
 -Z "*.tbz"
 -Z "*.mp3"
 -Z "*.mpeg"

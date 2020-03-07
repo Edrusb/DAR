@@ -120,6 +120,7 @@ compress-exclusion:
 -Z "*.wsz"
 -Z "*.wz"
 -Z "*.xz"
+-Z "*.zst"
 # These are zip files. Not all are compressed, but considering that they can
 # get quite large it is probably more prudent to leave this uncommented.
 -Z "*.pk3"
