@@ -1,4 +1,14 @@
-version 2.7.8
+version 2.6.9
+--------------
+Thanks to albert-github at github.com for his pull request fixing
+some obvious bug when running doxygen. Thanks Simon Rupf for providing
+patch for dar to compile under the Alpine Linux distro (available
+at https://alpinelinux.org/ ). Thanks Graham Cobb for bug report and
+troubleshooting assistance. Thanks to Alexei Colin for his patch to
+add *.zst files to the predefined "compress-exclusion" target and
+user scripts distributed with dar.
+
+version 2.6.8
 --------------
 Thanks to Andy Capo for feedback and bug reports
 
