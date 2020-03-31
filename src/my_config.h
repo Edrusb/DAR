@@ -29,7 +29,7 @@
 #if HAVE_CONFIG_H
 #define NODUMP_LINUX 0
 #define NODUMP_EXT2FS 1
-#include "../config.h"
+#include "config.h"
 
     // workaround for autoconf 2.59
 #undef mbstate_t
