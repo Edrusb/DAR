@@ -11,8 +11,8 @@ DOXYGEN = @DOXYGEN_PROG@
 all-local: Doxyfile.tmp
 
 Doxyfile.tmp:
-	sed -e "s%##VERSION##%@PACKAGE_VERSION@%g" -e "s%##HAS_DOT##%@HAS_DOT@%g" '$(srcdir)/Doxyfile' > Doxyfile.tmp
-	cd .. ; $(DOXYGEN) doc/Doxyfile.tmp
+	sed -e "s%##VERSION##%@PACKAGE_VERSION@%g" -e "s%##HAS_DOT##%@HAS_DOT@%g" -e 's%##SRCDIR##%$(abs_top_srcdir)%g' -e 's%##BUILDDIR##%$(abs_top_builddir)%g' '$(srcdir)/Doxyfile' > Doxyfile.tmp
+	cd '$(top_srcdir)' ; $(DOXYGEN) '$(abs_top_builddir)/doc/Doxyfile.tmp'
 	if [ -d html/search ]; then chmod u+x html/search ; fi
 
 clean-local:
