@@ -5,7 +5,7 @@ dist_noinst_DATA = $(NO_EXE_SAMPLES) $(EXE_SAMPLES) dar_par.dcf etc_darrc
 
 install-data-hook:
 	$(INSTALL) -d $(DESTDIR)$(pkgdatadir)/samples
-	sed -e "s%SOMEPATH%$(pkgdatadir)/samples%g" dar_par.dcf > $(DESTDIR)$(pkgdatadir)/samples/dar_par.dcf
+	sed -e "s%SOMEPATH%$(pkgdatadir)/samples%g" '$(srcdir)/dar_par.dcf' > $(DESTDIR)$(pkgdatadir)/samples/dar_par.dcf
 	chmod 0644 $(DESTDIR)$(pkgdatadir)/samples/dar_par.dcf
 	$(INSTALL) -m 0644 $(NO_EXE_SAMPLES) $(DESTDIR)$(pkgdatadir)/samples
 	$(INSTALL) -m 0755 $(EXE_SAMPLES) $(DESTDIR)$(pkgdatadir)/samples
