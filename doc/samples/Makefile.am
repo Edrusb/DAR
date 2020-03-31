@@ -7,8 +7,8 @@ install-data-hook:
 	$(INSTALL) -d $(DESTDIR)$(pkgdatadir)/samples
 	sed -e "s%SOMEPATH%$(pkgdatadir)/samples%g" '$(srcdir)/dar_par.dcf' > $(DESTDIR)$(pkgdatadir)/samples/dar_par.dcf
 	chmod 0644 $(DESTDIR)$(pkgdatadir)/samples/dar_par.dcf
-	$(INSTALL) -m 0644 $(NO_EXE_SAMPLES) $(DESTDIR)$(pkgdatadir)/samples
-	$(INSTALL) -m 0755 $(EXE_SAMPLES) $(DESTDIR)$(pkgdatadir)/samples
+	for f in $(NO_EXE_SAMPLES); do $(INSTALL) -m 0644 '$(srcdir)/'"$${f}" $(DESTDIR)$(pkgdatadir)/samples; done
+	for f in $(EXE_SAMPLES); do $(INSTALL) -m 0755 '$(srcdir)/'"$${f}" $(DESTDIR)$(pkgdatadir)/samples; done
 	$(INSTALL) -d $(DESTDIR)$(sysconfdir)
 	sed -e "s%SOMEPATH%$(pkgdatadir)/samples%g" '$(srcdir)/etc_darrc' > $(DESTDIR)$(sysconfdir)/darrc
 
