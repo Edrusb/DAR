@@ -69,10 +69,10 @@ endif
 AM_LDFLAGS = $(LTLIBINTL) $(LD_PROF) $(GPGME_LIBS) $(LIBCURL_LIBS) $(LIBTHREADAR_LIBS) $(CXXSTDFLAGS)
 lib_LTLIBRARIES = $(MYLIB)
 
-LIBDAR_MAJOR=`grep LIBDAR_COMPILE_TIME_MAJOR get_version.hpp | cut -f 2 -d "=" | cut -f 1 -d ';' | sed -e 's% %%g'`
-LIBDAR_MEDIUM=`grep LIBDAR_COMPILE_TIME_MEDIUM get_version.hpp | cut -f 2 -d "=" | cut -f 1 -d ';' | sed -e 's% %%g'`
-LIBDAR_MEDIUM_000=`grep LIBDAR_COMPILE_TIME_MEDIUM get_version.hpp | cut -f 2 -d "=" | cut -f 1 -d ';' | sed $(SED_REGEX) -e 's% %%g' -e 's%([^0-9]|^)([0-9]{1})([^0-9]|$$)%0\2%' -e 's%([^0-9]|^)([0-9]{2})([^0-9]|$$)%0\2%'`
-LIBDAR_MINOR=`grep LIBDAR_COMPILE_TIME_MINOR get_version.hpp | cut -f 2 -d "=" | cut -f 1 -d ';' | sed -e 's% %%g'`
+LIBDAR_MAJOR=`grep LIBDAR_COMPILE_TIME_MAJOR '$(srcdir)/get_version.hpp' | cut -f 2 -d "=" | cut -f 1 -d ';' | sed -e 's% %%g'`
+LIBDAR_MEDIUM=`grep LIBDAR_COMPILE_TIME_MEDIUM '$(srcdir)/get_version.hpp' | cut -f 2 -d "=" | cut -f 1 -d ';' | sed -e 's% %%g'`
+LIBDAR_MEDIUM_000=`grep LIBDAR_COMPILE_TIME_MEDIUM '$(srcdir)/get_version.hpp' | cut -f 2 -d "=" | cut -f 1 -d ';' | sed $(SED_REGEX) -e 's% %%g' -e 's%([^0-9]|^)([0-9]{1})([^0-9]|$$)%0\2%' -e 's%([^0-9]|^)([0-9]{2})([^0-9]|$$)%0\2%'`
+LIBDAR_MINOR=`grep LIBDAR_COMPILE_TIME_MINOR '$(srcdir)/get_version.hpp' | cut -f 2 -d "=" | cut -f 1 -d ';' | sed -e 's% %%g'`
 LIBDAR_LIBTOOL_CURRENT=$(LIBDAR_MAJOR)$(LIBDAR_MEDIUM_000)
 LIBDAR_LIBTOOL_REVISION=$(LIBDAR_MINOR)
 LIBDAR_LIBTOOL_AGE=$(LIBDAR_MEDIUM)
