@@ -53,18 +53,18 @@ namespace libdar
         ~scrambler() { if(buffer != nullptr) delete [] buffer; };
 
 
-	virtual bool skippable(skippability direction, const infinint & amount) override { return ref->skippable(direction, amount); };
+	virtual bool skippable(skippability direction, const infinint & amount) override { if(ref == nullptr) throw SRC_BUG; return ref->skippable(direction, amount); };
         virtual bool skip(const infinint & pos) override { if(ref == nullptr) throw SRC_BUG; return ref->skip(pos); };
-        virtual bool skip_to_eof() override { if(ref==nullptr) throw SRC_BUG; return ref->skip_to_eof(); };
+        virtual bool skip_to_eof() override { if(ref == nullptr) throw SRC_BUG; return ref->skip_to_eof(); };
         virtual bool skip_relative(S_I x) override { if(ref == nullptr) throw SRC_BUG; return ref->skip_relative(x); };
-	virtual bool truncatable(const infinint & pos) const override { return ref->truncatable(pos); };
+	virtual bool truncatable(const infinint & pos) const override { if(ref == nullptr) throw SRC_BUG; return ref->truncatable(pos); };
         virtual infinint get_position() const override { if(ref == nullptr) throw SRC_BUG; return ref->get_position(); };
 
     protected:
-	virtual void inherited_read_ahead(const infinint & amount) override { ref->read_ahead(amount); };
+	virtual void inherited_read_ahead(const infinint & amount) override { if(ref == nullptr) throw SRC_BUG; ref->read_ahead(amount); };
         virtual U_I inherited_read(char *a, U_I size) override;
         virtual void inherited_write(const char *a, U_I size) override;
-	virtual	void inherited_truncate(const infinint & pos) { ref->truncate(pos); };
+	virtual	void inherited_truncate(const infinint & pos) { if(ref == nullptr) throw SRC_BUG; ref->truncate(pos); };
 	virtual void inherited_sync_write() override {}; // nothing to do
 	virtual void inherited_flush_read() override {}; // nothing to do
 	virtual void inherited_terminate() override {};  // nothing to do
