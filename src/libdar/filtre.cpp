@@ -3273,6 +3273,7 @@ namespace libdar
 					catch(...)
 					{
 					    bool fixed = false;
+					    bool try_skip = false;
 
 					    if(!repair_mode)
 						throw;
@@ -3284,14 +3285,37 @@ namespace libdar
 						// in the following we try to skip backward to set the storage size to zero
 						// in both sequential data and ending generated catalog
 
-					    infinint current_pos = pdesc.stack->get_position();
-					    if(pdesc.stack->skippable(generic_file::skip_backward, current_pos - start))
+					    if(pdesc.stack->truncatable(start))
 					    {
-						if(!pdesc.stack->skip(start))
-						    pdesc.stack->skip(current_pos);
-						else
+						try
+						{
+						    pdesc.stack->truncate(start);
 						    fixed = true;
+						}
+						catch(Ebug & e)
+						{
+						    throw;
+						}
+						catch(Egeneric & e)
+						{
+						    try_skip = true;
+						}
 					    }
+					    else
+						try_skip = true;
+
+					    if(try_skip)
+					    {
+						infinint current_pos = pdesc.stack->get_position();
+						if(pdesc.stack->skippable(generic_file::skip_backward, current_pos - start))
+						{
+						    if(!pdesc.stack->skip(start))
+							pdesc.stack->skip(current_pos);
+						    else
+							fixed = true;
+						}
+					    }
+
 					    val->clear();
 					    fic->set_crc(*val);
 
@@ -3452,10 +3476,36 @@ namespace libdar
 				   && !repair_mode)
 				{
 				    infinint current_pos_tmp = pdesc.stack->get_position();
+				    bool try_skip = false;
 
 				    if(current_pos_tmp <= rewinder)
 					throw SRC_BUG; // we are positionned before the start of the current inode dump!
-				    if(pdesc.stack->skippable(generic_file::skip_backward, current_pos_tmp - rewinder))
+
+				    if(pdesc.stack->truncatable(rewinder))
+				    {
+					try
+					{
+					    pdesc.stack->truncate(rewinder);
+					    if(!resave_uncompressed)
+						resave_uncompressed = true;
+					    else
+						throw SRC_BUG; // should only be tried once per inode
+					    fic->change_compression_algo_write(compression::none);
+					    break; // stop the inner loop
+					}
+					catch(Ebug & e)
+					{
+					    throw;
+					}
+					catch(...)
+					{
+					    try_skip = true;
+					}
+				    }
+				    else
+					try_skip = true;
+
+				    if(try_skip && pdesc.stack->skippable(generic_file::skip_backward, current_pos_tmp - rewinder))
 				    {
 					try
 					{
@@ -3528,7 +3578,27 @@ namespace libdar
 
 					    try
 					    {
-						if(pdesc.stack->skippable(generic_file::skip_backward, storage_size))
+						bool try_skip = false;
+
+						if(pdesc.stack->truncatable(start))
+						{
+						    try
+						    {
+							pdesc.stack->truncate(start);
+						    }
+						    catch(Ebug & e)
+						    {
+							throw;
+						    }
+						    catch(...)
+						    {
+							try_skip = true;
+						    }
+						}
+						else
+						    try_skip = true;
+
+						if(try_skip && pdesc.stack->skippable(generic_file::skip_backward, storage_size))
 						{
 						    if(!pdesc.stack->skip(start))
 						    {
