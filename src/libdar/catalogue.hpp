@@ -105,7 +105,7 @@ namespace libdar
             // the read include the inode leading to the sub_tree as well as the pending cat_eod
 
 	    // return true if the last read entry has already been read
-	    // and has not to be counted again. This is never the case for catalogue but may occure
+	    // and has not to be counted again. This is never the case for catalogue but may occur
 	    // with escape_catalogue (where from the 'virtual').
 	    // last this method gives a valid result only if the last read() entry is a directory as
 	    // only directory may be read() twice.

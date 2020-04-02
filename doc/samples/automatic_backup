@@ -60,7 +60,7 @@ FilesToBackup=""
 FilesToIgnore="*~ .*~ cryptfile0.crypt cryptfile1.crypt"
 #
 # Files that should not to be compressed. No Path. Separate with spaces.
-FilesNotToCompress="*.dar *.crypt *.arj *.bz2 *.bz *.Z *.tgz *.taz *.cpio *.deb\
+FilesNotToCompress="*.dar *.crypt *.arj *.bz2 *.bz *.zst *.Z *.tgz *.taz *.cpio *.deb\
  *.gtar *.gz *.lzh *.lhz *.rar *.rpm *.shar *.sv4cpi *.sv4crc *.tar *.ustar *.zoo\
  *.zip *.jar *.jpg *.gif *.mpg *.mpeg *.avi *.ram *.rm"
 #

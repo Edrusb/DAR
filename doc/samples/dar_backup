@@ -45,7 +45,7 @@ my $PARITY_FILES=("%p/%b.%N.*.par2");
 # list of stuff to be compressed. This must be in the form of
 # -Z \"*.mask\"
 # with -Z repeated for each one
-my $NO_COMPRESS_LIST=("-Z \"*.gz\" -Z \"*.GZ\" -Z \"*.bz2\" -Z \"*.BZ2\" -Z \"*.zip\" -Z \"*.ZIP\" -Z \"*.ogg\" -Z \"*.OGG\" -Z \"*.mp3\" -Z \"*.MP3\" -Z \"*.mpg\" -Z \"*.MPG\" -Z \"*.mpeg\" -Z \"*.MPEG\" -Z \"*.wmv\" -Z \"*.WMV\" -Z \"*.avi\" -Z \"*.AVI\" -Z \"*.jpg\" -Z \"*.JPG\" -Z \"*.jpeg\" -Z \"*.JPEG\" -Z \"*.png\" -Z \"*.PNG\" -Z \"*.gif\" -Z \"*.GIF\"");
+my $NO_COMPRESS_LIST=("-Z \"*.gz\" -Z \"*.GZ\" -Z \"*.bz2\" -Z \"*.BZ2\" -Z \"*.zst\" -Z \"*.ZST\" -Z \"*.zip\" -Z \"*.ZIP\" -Z \"*.ogg\" -Z \"*.OGG\" -Z \"*.mp3\" -Z \"*.MP3\" -Z \"*.mpg\" -Z \"*.MPG\" -Z \"*.mpeg\" -Z \"*.MPEG\" -Z \"*.wmv\" -Z \"*.WMV\" -Z \"*.avi\" -Z \"*.AVI\" -Z \"*.jpg\" -Z \"*.JPG\" -Z \"*.jpeg\" -Z \"*.JPEG\" -Z \"*.png\" -Z \"*.PNG\" -Z \"*.gif\" -Z \"*.GIF\"");
 
 my $PRE_PARITY_MESSAGE=("echo ; echo Caclulating parity information; echo");
 

@@ -1612,7 +1612,7 @@ PYBIND11_MODULE(libdar, mod)
 	// archive_summary classes
 	//
 
-    pybind11::class_<libdar::archive_summary>(mod, "aerchive_summary")
+    pybind11::class_<libdar::archive_summary>(mod, "archive_summary")
 	.def("get_slice_size", &libdar::archive_summary::get_slice_size, pybind11::return_value_policy::reference_internal)
 	.def("get_first_slice_size", &libdar::archive_summary::get_first_slice_size, pybind11::return_value_policy::reference_internal)
 	.def("get_last_slice_size", &libdar::archive_summary::get_last_slice_size, pybind11::return_value_policy::reference_internal)

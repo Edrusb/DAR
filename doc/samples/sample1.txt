@@ -35,7 +35,7 @@
 -Z "*.gif" -Z "*.jpg" -Z "*.jpeg" -Z "*.png"
 
 -Z "*.zip" -Z "*.tgz" -Z "*.gzip" -Z "*.bzip"
--Z "*.bzip2" -Z "*.rar" -Z "*.Z"
+-Z "*.bzip2" -Z '*.zst' -Z "*.rar" -Z "*.Z"
 
 #Define directories to be backed up
 #First give a root

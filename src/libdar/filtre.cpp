@@ -1569,7 +1569,7 @@ namespace libdar
 
 			    // checking inode EA if any
 
-			if(e_ino != nullptr && e_ino->ea_get_saved_status() == ea_saved_status::full)
+			if(e_ino != nullptr && e_ino->ea_get_saved_status() == ea_saved_status::full && !cat.read_second_time_dir())
 			{
 			    if(perimeter == "")
 				perimeter = "EA";
@@ -1584,7 +1584,7 @@ namespace libdar
 			}
 
 			    // checking FSA if any
-			if(e_ino != nullptr && e_ino->fsa_get_saved_status() == fsa_saved_status::full)
+			if(e_ino != nullptr && e_ino->fsa_get_saved_status() == fsa_saved_status::full && !cat.read_second_time_dir())
 			{
 			    if(perimeter == "")
 				perimeter = "FSA";

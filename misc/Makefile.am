@@ -19,7 +19,7 @@
 # to contact the author : http://dar.linux.free.fr/email.html
 #######################################################################
 
-dist_noinst_DATA = make_cygwin_dist batch_cygwin batch_linux batch_linux_ea README batch_solaris date_past_N_days Args/Makefile Args/args.c
+dist_noinst_DATA = make_cygwin_dist batch_cygwin batch_linux batch_linux_ea README batch_solaris Args/Makefile Args/args.c
 
 noinst_PROGRAMS=todos
 

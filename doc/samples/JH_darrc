@@ -13,8 +13,8 @@
 ### Files that shall not be compressed (because they're already)
 ###
 # archives (Note: .tar is archive, but not compressed => do compress it).
--Z "*.bz2" -Z "*.deb" -Z "*.gz" -Z "*.Z" -Z "*.zip" -Z "*.rar" -Z "*.tbz2" -Z "*.tgz" -Z "*.jar" -Z "*.ear" -Z "*.war"
--Z "*.BZ2" -Z "*.DEB" -Z "*.GZ" -Z "*.Z" -Z "*.ZIP" -Z "*.RAR" -Z "*.TBZ2" -Z "*.TGZ" -Z "*.JAR" -Z "*.EAR" -Z "*.WAR"
+-Z "*.bz2" -Z "*.deb" -Z "*.gz" -Z '*.zst' -Z "*.Z" -Z "*.zip" -Z "*.rar" -Z "*.tbz2" -Z "*.tgz" -Z "*.jar" -Z "*.ear" -Z "*.war"
+-Z "*.BZ2" -Z "*.DEB" -Z "*.GZ" -Z '*.ZST' -Z "*.Z" -Z "*.ZIP" -Z "*.RAR" -Z "*.TBZ2" -Z "*.TGZ" -Z "*.JAR" -Z "*.EAR" -Z "*.WAR"
 # media - images
 -Z "*.gif" -Z "*.jpeg" -Z "*.jpg" -Z "*.png" 
 -Z "*.GIF" -Z "*.PNG" -Z "*.JPEG" -Z "*.JPG"
