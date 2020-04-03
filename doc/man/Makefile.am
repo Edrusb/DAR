@@ -6,7 +6,7 @@ TARGET=copyman
 SUFFIXES = .html .1
 
 copyman:
-	cp ../../man/*1 .
+	cp '$(srcdir)/../../man/'*1 .
 	$(MAKE) dar.html dar_slave.html dar_xform.html dar_manager.html dar_cp.html dar_split.html
 	touch copyman
 
