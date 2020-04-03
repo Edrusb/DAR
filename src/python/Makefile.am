@@ -21,14 +21,14 @@
 
 if BUILD_MODE32
     MYLIB=libdar32.so
-    AM_CPPFLAGS=-fPIC -DLIBDAR_MODE=32 -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS) $(PYFLAGS)
+    AM_CPPFLAGS=-fPIC -DLIBDAR_MODE=32 -I'../..' -I'$(srcdir)/..' -I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS) $(PYFLAGS)
 else
 if BUILD_MODE64
     MYLIB=libdar64.so
-    AM_CPPFLAGS=-fPIC -DLIBDAR_MODE=64 -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS) $(PYFLAGS)
+    AM_CPPFLAGS=-fPIC -DLIBDAR_MODE=64 -I'../..' -I'$(srcdir)/..' -I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS) $(PYFLAGS)
 else
     MYLIB=libdar.so
-    AM_CPPFLAGS=-fPIC -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\"  -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS) $(PYFLAGS) -fPIC
+    AM_CPPFLAGS=-fPIC -I'../..' -I'$(srcdir)/..' -I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\"  -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS) $(PYFLAGS) -fPIC
 endif
 endif
 
@@ -54,7 +54,7 @@ AM_LDFLAGS = -shared $(GPGME_LIBS) $(LIBCURL_LIBS) $(LIBTHREADAR_LIBS) $(CXXSTDF
 all-local: $(TARGET)
 
 .cpp.o:
-	$(CXX) -c $(AM_CPPFLAGS) $< -o $@
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(CPPFLAGS) $(AM_CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c $< -o $@
 
 libdar$(PYEXT): pybind11_libdar.o
 	$(CXX) $(AM_LDFLAGS) $<  -o $@
