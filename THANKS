@@ -1,3 +1,9 @@
+version 2.7.0
+--------------
+Thanks to Mihai Moldovan for code adaptation to support compilation
+out of source code directory
+
+
 version 2.6.9
 --------------
 Thanks to albert-github at github.com for his pull request fixing
