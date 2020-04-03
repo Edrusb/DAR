@@ -1,3 +1,9 @@
+from 2.6.x to 2.7.0
+- using the truncate system call whenever possible in place of skipping
+  back in the archive when file need to resave uncompressed, file saved
+  to be read from filesystem or when file has changed while it was read
+  for backup
+
 from 2.6.8 to 2.6.9
 - fixed some obvious bug when running doxygen (inlined documentation)
 - fixing configure.ac to detect xattr.h system header when it is
