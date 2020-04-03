@@ -21,14 +21,14 @@
 
 if BUILD_MODE32
     MYLIB=libdar32
-    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I'$(srcdir)/../libdar' -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS)
+    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I'$(srcdir)/../dar_suite' -I'$(srcdir)/../libdar' -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS)
 else
 if BUILD_MODE64
     MYLIB=libdar64
-    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I'$(srcdir)/../libdar' -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS)
+    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I'$(srcdir)/../dar_suite' -I'$(srcdir)/../libdar' -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS)
 else
     MYLIB=libdar
-    AM_CPPFLAGS=-I'$(srcdir)/../libdar' -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\"  -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS)
+    AM_CPPFLAGS=-I'$(srcdir)/../dar_suite' -I'$(srcdir)/../libdar' -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\"  -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS)
 endif
 endif
 
@@ -109,10 +109,10 @@ test_limitint_DEPENDENCIES = ../libdar/$(MYLIB).la
 test_limitint_CXXFLAGS = -Wno-long-long
 
 test_libdar_SOURCES = test_libdar.cpp
-test_libdar_DEPENDENCIES = ../libdar/$(MYLIB).la '$(srcdir)/../libdar/libdar.hpp' '$(srcdir)/../libdar/tools.hpp'
+test_libdar_DEPENDENCIES = ../libdar/$(MYLIB).la $(srcdir)/../libdar/libdar.hpp $(srcdir)/../libdar/tools.hpp
 
 test_cache_SOURCES = test_cache.cpp
-test_cache_DEPENDENCIES = ../libdar/$(MYLIB).la '$(srcdir)/../libdar/libdar.hpp' '$(srcdir)/../libdar/tools.hpp'
+test_cache_DEPENDENCIES = ../libdar/$(MYLIB).la $(srcdir)/../libdar/libdar.hpp $(srcdir)/../libdar/tools.hpp
 
 test_tronconneuse_SOURCES = test_tronconneuse.cpp
 test_tronconneuse_DEPENDENCIES = ../libdar/$(MYLIB).la
