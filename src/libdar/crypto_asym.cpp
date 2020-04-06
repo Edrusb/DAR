@@ -213,9 +213,10 @@ namespace libdar
 	{
 	    gpgme_error_t err = GPG_ERR_NO_ERROR;
 	    gpgme_user_id_t id = nullptr;
+	    gpgme_subkey_t subk = nullptr;
 	    bool found = false;
 	    bool eof = false;
-	    bool loop = false;
+	    bool search_email = false;
 	    U_I offset = 0;
 
 		// for each recipient, listing all keys to find a match
@@ -233,6 +234,11 @@ namespace libdar
 		    throw Erange("crypto_asym::decrypt", string(gettext("Unexpected error reported by GPGME: ")) + tools_gpgme_strerror_r(err));
 		}
 
+		    // the the recipient string contains an '@' we assume we have
+		    // to look for an email
+		    // else we assume we have to look for an keyid
+		search_email = recipients_email[i].find_first_of('@') != string::npos;
+
 		found = false;
 		eof = false;
 		do
@@ -246,41 +252,57 @@ namespace libdar
 			eof = true;
 			break;
 		    case GPG_ERR_NO_ERROR:
-			id = ciphering_keys[i - offset]->uids;
-			loop = true;
-
-			    // for each key, listing all identies associated with it to find a match
-			do
+			if(search_email)
 			{
-			    found = (strncmp(recipients_email[i].c_str(), id->email, recipients_email[i].size()) == 0);
+				// looking in email field
 
-			    if(found)
+			    id = ciphering_keys[i - offset]->uids;
+			    while(!found && id != nullptr)
 			    {
-				if(ciphering_keys[i - offset]->revoked
-				   || ciphering_keys[i - offset]->expired
-				   || ciphering_keys[i - offset]->disabled
-				   || ciphering_keys[i - offset]->invalid)
-				    found = false;
-				if(signatories)
-				{
-				    if(!ciphering_keys[i - offset]->can_sign)
-					found = false;
-				}
-				else
-				{
-				    if(!ciphering_keys[i - offset]->can_encrypt)
-					found = false;
-				}
-			    }
 
-			    if(!found && id->next != nullptr)
+				    // for each key, listing all emails associated with it to find a match
+
+				found =
+				    (strncmp(recipients_email[i].c_str(), id->email, recipients_email[i].size()) == 0)
+				    && (id->email[recipients_email[i].size()] == '\0');
 				id = id->next;
-			    else
-				loop = false;
+			    }
 			}
-			while(loop);
+			else
+			{
+				// looking in keyid field of all subkeys
 
-			    // if not identity match found for that key deleting the key
+			    subk = ciphering_keys[i - offset]->subkeys;
+			    while(!found && subk != nullptr)
+			    {
+				    // for each key, listing all keyid associated with it to find a match
+				found =
+				    (strncmp(recipients_email[i].c_str(), subk->keyid, recipients_email[i].size()) == 0)
+				    && (subk->keyid[recipients_email[i].size()] == '\0');
+				subk = subk->next;
+			    }
+			}
+
+			    // analysing search result
+
+			if(found)
+			{
+			    if(ciphering_keys[i - offset]->revoked
+			       || ciphering_keys[i - offset]->expired
+			       || ciphering_keys[i - offset]->disabled
+			       || ciphering_keys[i - offset]->invalid)
+				found = false;
+			    if(signatories)
+			    {
+				if(!ciphering_keys[i - offset]->can_sign)
+				    found = false;
+			    }
+			    else
+			    {
+				if(!ciphering_keys[i - offset]->can_encrypt)
+				    found = false;
+			    }
+			}
 
 			if(!found)
 			{

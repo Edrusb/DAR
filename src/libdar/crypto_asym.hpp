@@ -70,12 +70,12 @@ namespace libdar
 	~crypto_asym() { release_context(); };
 
 
-	    /// defines the list of email which associated key will be used for signing
+	    /// defines the list of email *or keyid* which associated key will be used for signing
 	void set_signatories(const std::vector<std::string> & signatories);
 
 	    /// encrypt (and sign if signatures have been given using set_signatories) data for the given recipients
 
-	    /// \param[in] recipients_email list of email of recipient that will be able to read the encrypted data
+	    /// \param[in] recipients_email list of email *or keyid* of recipient that will be able to read the encrypted data
 	    /// \param[in] clear where to read from clear data to be encrypted (the object must be readable)
 	    /// \param[out] ciphered where to write down encrypted data (the object must be writable)
 	    /// \note this assumes the GnuPG keyring has the public keys of the recipient listed
@@ -107,7 +107,8 @@ namespace libdar
 	void release_context() { gpgme_release(context); };
 	void build_key_list(const std::vector<std::string> & recipients_email,  ///< list of email to find a key for
 			    gpgme_key_t * & ciphering_keys,                     ///< resulting nullptr terminated list of keys
-			    bool signatories);                                  ///< false if email key need encryption capability, true for signing
+			    bool signatories                                    ///< false if email key need encryption capability, true for signing
+	    );
 	void release_key_list(gpgme_key_t * & ciphering_keys);
 	void fill_signing_result();
 #else

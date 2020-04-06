@@ -390,10 +390,14 @@ namespace libdar
 	    /// (see above) is not used, but the crypto_algo stays used to encrypt the archive using a randomly generated key
 	    /// which is encrypted using the public keys of the recipients and dropped that way encrypted inside the archive.
 	    /// \note if crypto_algo is not set while a list of recipient is given, the crypto algo will default to blowfish
+	    /// \note since release 2.7.0 if a given std::string in the list contains an '@' the string is assumed to be an
+	    /// email and search is done in the keyring for that field type, else it is assumed to be a keyid.
 	void set_gnupg_recipients(const std::vector<std::string> & gnupg_recipients) { x_gnupg_recipients = gnupg_recipients; };
 
 
-	    /// the private keys matching the email of the provided list are used to sign the archive random key
+	    /// the private keys matching the email or the keyid of the provided list are used to sign the archive random key
+	    /// \note since release 2.7.0 if a given std::string in the list contains an '@' the string is assumed to be an
+	    /// email and search is done in the keyring for that field type, else it is assumed to be a keyid.
 	void set_gnupg_signatories(const std::vector<std::string> & gnupg_signatories) { x_gnupg_signatories = gnupg_signatories; };
 
 	    /// defines files to compress
@@ -760,9 +764,13 @@ namespace libdar
 
 	    /// set the list of recipients that will be able to read the archive
 	    /// \note more details for the same option of archive_options_create
+	    /// \note since release 2.7.0 if a given std::string in the list contains an '@' the string is assumed to be an
+	    /// email and search is done in the keyring for that field type, else it is assumed to be a keyid.
 	void set_gnupg_recipients(const std::vector<std::string> & gnupg_recipients) { x_gnupg_recipients = gnupg_recipients; };
 
 	    /// the private keys matching the email of the provided list are used to sign the archive random key
+	    /// \note since release 2.7.0 if a given std::string in the list contains an '@' the string is assumed to be an
+	    /// email and search is done in the keyring for that field type, else it is assumed to be a keyid.
 	void set_gnupg_signatories(const std::vector<std::string> & gnupg_signatories) { x_gnupg_signatories = gnupg_signatories; };
 
 	    /// whether to make a dry-run operation
@@ -1001,9 +1009,13 @@ namespace libdar
 
 	    /// set the list of recipients that will be able to read the archive
 	    /// \note more details for the same option of archive_options_create
+	    /// \note since release 2.7.0 if a given std::string in the list contains an '@' the string is assumed to be an
+	    /// email and search is done in the keyring for that field type, else it is assumed to be a keyid.
 	void set_gnupg_recipients(const std::vector<std::string> & gnupg_recipients) { x_gnupg_recipients = gnupg_recipients; };
 
 	    /// the private keys matching the email of the provided list are used to sign the archive random key
+	    /// \note since release 2.7.0 if a given std::string in the list contains an '@' the string is assumed to be an
+	    /// email and search is done in the keyring for that field type, else it is assumed to be a keyid.
 	void set_gnupg_signatories(const std::vector<std::string> & gnupg_signatories) { x_gnupg_signatories = gnupg_signatories; };
 
 	    /// defines files to compress
@@ -1696,10 +1708,13 @@ namespace libdar
 	    /// (see above) is not used, but the crypto_algo stays used to encrypt the archive using a randomly generated key
 	    /// which is encrypted using the public keys of the recipients and dropped that way encrypted inside the archive.
 	    /// \note if crypto_algo is not set while a list of recipient is given, the crypto algo will default to blowfish
+	    /// \note since release 2.7.0 if a given std::string in the list contains an '@' the string is assumed to be an
+	    /// email and search is done in the keyring for that field type, else it is assumed to be a keyid.
 	void set_gnupg_recipients(const std::vector<std::string> & gnupg_recipients) { x_gnupg_recipients = gnupg_recipients; };
 
-
 	    /// the private keys matching the email of the provided list are used to sign the archive random key
+	    /// \note since release 2.7.0 if a given std::string in the list contains an '@' the string is assumed to be an
+	    /// email and search is done in the keyring for that field type, else it is assumed to be a keyid.
 	void set_gnupg_signatories(const std::vector<std::string> & gnupg_signatories) { x_gnupg_signatories = gnupg_signatories; };
 
 	    /// whether to make a dry-run operation
