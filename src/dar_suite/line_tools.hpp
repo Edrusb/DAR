@@ -269,11 +269,13 @@ extern const char *line_tools_get_from_env(const char **env, const char *clef);
     /// \param[in] loc the path where resides the slice
     /// \param[in,out] base the basename of the slice
     /// \param[in] extension the extension of dar's slices
+    /// \param[in] create whether this is a new archive that is about to be created by this name
     /// \note if user accepted the change of slice name proposed by libdar through dialog the base argument is changed
 extern void line_tools_check_basename(user_interaction & dialog,
 				      const path & loc,
 				      std::string & base,
-				      const std::string & extension);
+				      const std::string & extension,
+				      bool create);
 
     /// from a string with a range notation (min-max) extract the range values
 

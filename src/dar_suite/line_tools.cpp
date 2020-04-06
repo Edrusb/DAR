@@ -1429,7 +1429,7 @@ const char *line_tools_get_from_env(const char **env, const char *clef)
     return ret;
 }
 
-void line_tools_check_basename(user_interaction & dialog, const path & loc, string & base, const string & extension)
+void line_tools_check_basename(user_interaction & dialog, const path & loc, string & base, const string & extension, bool create)
 {
     NLS_SWAP_IN;
     try
@@ -1452,10 +1452,18 @@ void line_tools_check_basename(user_interaction & dialog, const path & loc, stri
 	string new_path = (loc.append(new_base)).display();
 	if(is_a_slice_available(dialog, new_path, extension))
 	{
+	    dialog.message(tools_printf(gettext("Warning, no archive exist with \"%S\" as basename, however a slice part of an archive which basename is \"%S\" exists. Assuming a shell completion occurred and using that basename instead"), &base, &new_base));
+	    base = new_base;
+	}
+	else // no slice exist neither with that slice name
+	{
 	    try
 	    {
-		dialog.pause(tools_printf(gettext("Warning, %S seems more to be a slice name than a base name. Do you want to replace it by %S ?"), &base, &new_base));
-		base = new_base;
+		if(create)
+		{
+		    dialog.pause(tools_printf(gettext("Warning, the provided basename \"%S\" may lead to confusion as it looks like a slice name. It is advise to rather use \"%S\" as basename instead. Do you want to change the basename accordingly?"), &base, &new_base));
+		    base = new_base;
+		}
 	    }
 	    catch(Euser_abort & e)
 	    {

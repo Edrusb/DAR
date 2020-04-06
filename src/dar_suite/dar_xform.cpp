@@ -374,7 +374,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
         if(string(argv[optind]) != string(""))
 	{
             line_tools_split_path_basename(argv[optind], src_dir, src);
-	    line_tools_check_basename(dialog, *src_dir, src, EXTENSION);
+	    line_tools_check_basename(dialog, *src_dir, src, EXTENSION, false);
 	}
         else
         {
@@ -382,7 +382,10 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
             return false;
         }
         if(string(argv[optind+1]) != string(""))
+	{
             line_tools_split_path_basename(argv[optind+1], dst_dir, dst);
+	    line_tools_check_basename(dialog, *dst_dir, dst, EXTENSION, true);
+	}
         else
         {
             dialog.message(gettext("Invalid argument as destination archive"));

@@ -342,7 +342,7 @@ static bool command_line(shell_interaction & dialog,
 		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		    line_tools_split_path_basename(optarg, chem, filename);
-		    line_tools_check_basename(dialog, chem, filename, EXTENSION);
+		    line_tools_check_basename(dialog, chem, filename, EXTENSION, false);
 		    arg = (path(chem).append(filename)).display();
 		    break;
 		case 'l':

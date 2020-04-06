@@ -3,6 +3,9 @@ from 2.6.x to 2.7.0
   back in the archive when file need to resave uncompressed, file saved
   to be read from filesystem or when file has changed while it was read
   for backup
+- improved slice name versus base name error, now substiting (rather than
+  just asking the user) the first by the later when else it would lead
+  to an execution error.
 
 from 2.6.8 to 2.6.9
 - fixed some obvious bug when running doxygen (inlined documentation)

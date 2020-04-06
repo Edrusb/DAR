@@ -399,13 +399,16 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             if(p.sauv_root == nullptr)
                 throw SRC_BUG;
         if(p.filename != "-")
-            line_tools_check_basename(*dialog, *p.sauv_root, p.filename, EXTENSION);
+	{
+	    bool creation = (p.op == create || p.op == isolate || p.op == merging || p.op == repairing);
+            line_tools_check_basename(*dialog, *p.sauv_root, p.filename, EXTENSION, creation);
+	}
         if((p.op == merging || p.op == create) && p.aux_filename != nullptr)
         {
             if(p.aux_root == nullptr)
                 throw SRC_BUG;
             else
-                line_tools_check_basename(*dialog, *p.aux_root, *p.aux_filename, EXTENSION);
+                line_tools_check_basename(*dialog, *p.aux_root, *p.aux_filename, EXTENSION, false);
         }
 
         if(p.fs_root == nullptr)
@@ -434,7 +437,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             if(p.ref_root == nullptr)
                 throw SRC_BUG;
             else
-                line_tools_check_basename(*dialog, *p.ref_root, *p.ref_filename, EXTENSION);
+                line_tools_check_basename(*dialog, *p.ref_root, *p.ref_filename, EXTENSION, false);
         }
 
         if(p.algo != compression::none && p.op != create && p.op != isolate && p.op != merging)
