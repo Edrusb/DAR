@@ -55,7 +55,7 @@ AM_ICONV
 # have a specific variable for pkgconfig, setting the default value:
 AC_SUBST(pkgconfigdir, [${libdir}/pkgconfig])
 AC_ARG_WITH([pkgconfigdir],
-            AC_HELP_STRING(--with-pkgconfigdir=DIR, [defines an alternative directory to install pkconfig files, default is '${libdir}/pkgconfig']),
+            AS_HELP_STRING(--with-pkgconfigdir=DIR, [defines an alternative directory to install pkconfig files, default is '${libdir}/pkgconfig']),
             [
                 if [ ! -z "$withval" ] ; then
                  AC_SUBST(pkgconfigdir, $withval)
@@ -120,7 +120,7 @@ AC_CHECK_LIB(cap, [cap_get_proc], [], [])
 
 
 AC_ARG_ENABLE( [libdl-linking],
-               AC_HELP_STRING(--disable-libdl-linking, [ignore any libdl and avoid linking against it]),
+               AS_HELP_STRING(--disable-libdl-linking, [ignore any libdl and avoid linking against it]),
                [],
                [
                  AC_CHECK_LIB(dl, [dlsym], [], [])
@@ -439,7 +439,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C"
 # DAR's features
 
 AC_ARG_ENABLE( [libz-linking],
-               AC_HELP_STRING(--disable-libz-linking, [disable linking with libz and disable libz compression support]),
+               AS_HELP_STRING(--disable-libz-linking, [disable linking with libz and disable libz compression support]),
              [
               AC_MSG_WARN([libz compression support has been disabled by user])
               local_libz="no"
@@ -472,7 +472,7 @@ AC_ARG_ENABLE( [libz-linking],
              )
 
 AC_ARG_ENABLE( [libbz2-linking],
-               AC_HELP_STRING(--disable-libbz2-linking, [disable linking with libbz2 and disables libbz2 compression support]),
+               AS_HELP_STRING(--disable-libbz2-linking, [disable linking with libbz2 and disables libbz2 compression support]),
             [
              AC_MSG_WARN([libbz2 compression support has been disabled by user])
              local_libbz2="no"
@@ -504,7 +504,7 @@ AC_ARG_ENABLE( [libbz2-linking],
            ])
 
 AC_ARG_ENABLE( [liblzo2-linking],
-               AC_HELP_STRING(--disable-liblzo2-linking, [disable linking with liblzo2 and disables lzo compression support]),
+               AS_HELP_STRING(--disable-liblzo2-linking, [disable linking with liblzo2 and disables lzo compression support]),
             [
              AC_MSG_WARN([lzo compression support has been disabled by user])
              local_liblzo2="no"
@@ -535,7 +535,7 @@ AC_ARG_ENABLE( [liblzo2-linking],
            ])
 
 AC_ARG_ENABLE( [libxz-linking],
-               AC_HELP_STRING(--disable-libxz-linking, [disable linking with libxz/liblzma and disable libxz compression support]),
+               AS_HELP_STRING(--disable-libxz-linking, [disable linking with libxz/liblzma and disable libxz compression support]),
              [
               AC_MSG_WARN([libxz compression support has been disabled by user])
               local_libxz="no"
@@ -571,7 +571,7 @@ AC_ARG_ENABLE( [libxz-linking],
 
 
 AC_ARG_ENABLE( [libgcrypt-linking],
-               AC_HELP_STRING(--disable-libgcrypt-linking, [disable linking with libgcrypt which disables strong encryption support]),
+               AS_HELP_STRING(--disable-libgcrypt-linking, [disable linking with libgcrypt which disables strong encryption support]),
             [
              AC_MSG_WARN([strong encryption support has been disabled by user])
              local_crypto="no"
@@ -644,7 +644,7 @@ AC_ARG_ENABLE( [libgcrypt-linking],
 
 
 AC_ARG_ENABLE(  [ea-support],
-                AC_HELP_STRING(--disable-ea-support,[disable Extended Attributes support]),
+                AS_HELP_STRING(--disable-ea-support,[disable Extended Attributes support]),
                 [ AC_MSG_CHECKING([for Extended Attribute support])
                   AC_MSG_RESULT([disabled])
                 ],
@@ -694,7 +694,7 @@ AC_ARG_ENABLE(  [ea-support],
 
 AC_MSG_CHECKING([ext2fs.h availability])
 AC_ARG_ENABLE(  [nodump-flag],
-                AC_HELP_STRING(--disable-nodump-flag, [disable the ext2/3/4 Filesystem Specific Attribute support, in particular the --nodump feature]),
+                AS_HELP_STRING(--disable-nodump-flag, [disable the ext2/3/4 Filesystem Specific Attribute support, in particular the --nodump feature]),
                 [AC_MSG_RESULT([extX FSA disabled])],
                 [AC_LINK_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                                                     #include <ext2fs/ext2_fs.h>
@@ -732,7 +732,7 @@ AC_ARG_ENABLE(  [nodump-flag],
 
 AC_MSG_CHECKING([birth time availability])
 AC_ARG_ENABLE( [birthtime],
-               AC_HELP_STRING(--disable-birthtime, [disable the HFS+ Filesystem Specific Attribute support]),
+               AS_HELP_STRING(--disable-birthtime, [disable the HFS+ Filesystem Specific Attribute support]),
                [AC_MSG_RESULT([hfs+ FSA disabled])],
                [AC_LINK_IFELSE([AC_LANG_PROGRAM([[
                                                 extern "C" {
@@ -764,14 +764,14 @@ AC_ARG_ENABLE( [birthtime],
                 ])
 
 AC_ARG_ENABLE(  [gnugetopt],
-                AC_HELP_STRING(--disable-gnugetopt, [avoid linking with libgnugetopt]),
+                AS_HELP_STRING(--disable-gnugetopt, [avoid linking with libgnugetopt]),
                 [],
                 AC_CHECK_LIB(gnugetopt, [getopt_long], [], [])
              )
 
 
 AC_ARG_ENABLE( [librsync-linking],
-                AC_HELP_STRING(--disable-librsync-linking, [disable linking with librsync and disable delta compression support]),
+                AS_HELP_STRING(--disable-librsync-linking, [disable linking with librsync and disable delta compression support]),
               [
                AC_MSG_WARN([librsync delta-compression support has been disabled by user])
                local_librsync="no"
@@ -805,7 +805,7 @@ AC_ARG_ENABLE( [librsync-linking],
               )
 
 AC_ARG_ENABLE( [libcurl-linking],
-               AC_HELP_STRING(--disable-libcurl-linking, [ignore libcurl and avoid linking against it]),
+               AS_HELP_STRING(--disable-libcurl-linking, [ignore libcurl and avoid linking against it]),
                [ local_libcurl="no" ],
                [
                   PKG_CHECK_EXISTS(libcurl,
@@ -854,7 +854,7 @@ AC_ARG_ENABLE( [libcurl-linking],
                 ])
 
 AC_ARG_ENABLE(  [fadvise],
-                AC_HELP_STRING(--disable-fadvise, [avoid using fadvise(2) system call]),
+                AS_HELP_STRING(--disable-fadvise, [avoid using fadvise(2) system call]),
                 [],
                 [
                   AC_MSG_CHECKING([for posix_fadvise support])
@@ -917,12 +917,12 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 
 
 AC_ARG_ENABLE(  [examples],
-                AC_HELP_STRING(--enable-examples, [buld example and testing programs]),
+                AS_HELP_STRING(--enable-examples, [buld example and testing programs]),
                 [examples="yes"],
                 [examples="false"])
 
 AC_ARG_ENABLE(  [os-bits],
-                AC_HELP_STRING(--enable-os-bits=arg, [arg is 32 or 64. If for some reason, one wants to overcome detected system value]),
+                AS_HELP_STRING(--enable-os-bits=arg, [arg is 32 or 64. If for some reason, one wants to overcome detected system value]),
                 [AC_DEFINE_UNQUOTED(OS_BITS, $enableval, [manually set CPU's registers' size])],
                 [
                         AC_CHECK_HEADER(inttypes.h,
@@ -945,7 +945,7 @@ AC_ARG_ENABLE(  [os-bits],
              )
 
 AC_ARG_ENABLE( [mode],
-                AC_HELP_STRING(--enable-mode=arg, [where arg is either 32 or infinint. Makes dar internally use 32 bits or limitless integers in place of 64 bits integers (which is the case if this option is not given)]),
+                AS_HELP_STRING(--enable-mode=arg, [where arg is either 32 or infinint. Makes dar internally use 32 bits or limitless integers in place of 64 bits integers (which is the case if this option is not given)]),
                 [
 		   build_mode=$enableval
                    if test "$build_mode" != "32" -a "$build_mode" != "64" -a "$build_mode" != "infinint" ; then
@@ -955,7 +955,7 @@ AC_ARG_ENABLE( [mode],
                 [build_mode=64])
 
 AC_ARG_ENABLE( [furtive-read],
-               AC_HELP_STRING(--disable-furtive-read,
+               AS_HELP_STRING(--disable-furtive-read,
                               [Ignore furtive read mode availability on systems that support it]),
                [ local_furtive_read_mode="no"
                  AC_MSG_WARN([Furtive read mode disabled])
@@ -999,7 +999,7 @@ AC_ARG_ENABLE( [furtive-read],
 
 
 AC_ARG_ENABLE( [debug],
-                AC_HELP_STRING(--enable-debug, [build targets with debugging option and no optimization]),
+                AS_HELP_STRING(--enable-debug, [build targets with debugging option and no optimization]),
                 [
                         CXXFLAGS="-g -Wall"
                         CFLAGS="-g -Wall"
@@ -1013,7 +1013,7 @@ AC_ARG_ENABLE( [debug],
 
 
 AC_ARG_ENABLE( [pedantic],
-               AC_HELP_STRING(--enable-pedantic, [enable pedantic syntaxical check at compilation, use only for debugging purposes !]),
+               AS_HELP_STRING(--enable-pedantic, [enable pedantic syntaxical check at compilation, use only for debugging purposes !]),
                [
                         CXXFLAGS="$CXXFLAGS -pedantic -Wno-long-long"
                ],
@@ -1021,7 +1021,7 @@ AC_ARG_ENABLE( [pedantic],
 
 
 AC_ARG_ENABLE( [build-html],
-               AC_HELP_STRING(--disable-build-html, [don't build programming documentation (in particular libdar API documentation) and html man page]),
+               AS_HELP_STRING(--disable-build-html, [don't build programming documentation (in particular libdar API documentation) and html man page]),
                [ doxygen="no"
                  groff="no"
                ],
@@ -1048,7 +1048,7 @@ AC_ARG_ENABLE( [build-html],
              )
 
 AC_ARG_ENABLE( [upx],
-                AC_HELP_STRING(--disable-upx, [by default configure looks for UPX and if available make executables compressed at installation time, you can disable this feature]),
+                AS_HELP_STRING(--disable-upx, [by default configure looks for UPX and if available make executables compressed at installation time, you can disable this feature]),
                 [  AC_MSG_NOTICE([ignoring UPX])
                    upx="no"
                 ],
@@ -1058,7 +1058,7 @@ AC_ARG_ENABLE( [upx],
              )
 
 AC_ARG_ENABLE( [fast-dir],
-               AC_HELP_STRING(--disable-fast-dir, [disable optimization for large directories, doing so has a little positive impact on memory requirement but a huge drawback on execution time]),
+               AS_HELP_STRING(--disable-fast-dir, [disable optimization for large directories, doing so has a little positive impact on memory requirement but a huge drawback on execution time]),
                [],
                [AC_DEFINE(LIBDAR_FAST_DIR, 1, [activation of speed optimization for large directories])
                 local_fast_dir="yes"
@@ -1067,7 +1067,7 @@ AC_ARG_ENABLE( [fast-dir],
 
 
 AC_ARG_ENABLE(  [gpgme-linking],
-                AC_HELP_STRING(--disable-gpgme-linking, [disable linking with gpgme which disables asymetric crypto algorithms]),
+                AS_HELP_STRING(--disable-gpgme-linking, [disable linking with gpgme which disables asymetric crypto algorithms]),
                 [
                   AC_MSG_WARN([asymetrical encryption support has been disabled by user])
                   local_gpgme="no"
@@ -1123,7 +1123,7 @@ AC_ARG_ENABLE(  [gpgme-linking],
              )
 
 AC_ARG_ENABLE(  [thread-safe],
-                AC_HELP_STRING(--disable-thread-safe, [libdar is thread safe if POSIX mutex are available, you can manually disable the use of POSIX mutex, the resulting libdar library will not be thread-safe anymore]),
+                AS_HELP_STRING(--disable-thread-safe, [libdar is thread safe if POSIX mutex are available, you can manually disable the use of POSIX mutex, the resulting libdar library will not be thread-safe anymore]),
                 [ AC_MSG_NOTICE([thread-safe support disabled])
                 ],
                 [ AC_CHECK_LIB(pthread, [pthread_mutex_init], [], [])
@@ -1204,7 +1204,7 @@ AC_ARG_ENABLE(  [thread-safe],
 
 
 AC_ARG_ENABLE( [execinfo],
-               AC_HELP_STRING(--disable-execinfo, [disable reporting stack information on self diagnostic bugs even]),
+               AS_HELP_STRING(--disable-execinfo, [disable reporting stack information on self diagnostic bugs even]),
                [AC_MSG_WARN([ignoring execinfo even if available])],
                [
                AC_CHECK_HEADERS([execinfo.h])
@@ -1230,22 +1230,22 @@ AC_ARG_ENABLE( [execinfo],
 
 
 AC_ARG_ENABLE( [profiling],
-               AC_HELP_STRING(--enable-profiling, [enable executable profiling]),
+               AS_HELP_STRING(--enable-profiling, [enable executable profiling]),
                [ profiling="yes" ])
 
 AC_ARG_ENABLE( [debug-memory],
-               AC_HELP_STRING(--enable-debug-memory, [log memory allocations and releases to /tmp/dar_debug_mem_allocation.txt this debugging option lead to a slow executable]),
+               AS_HELP_STRING(--enable-debug-memory, [log memory allocations and releases to /tmp/dar_debug_mem_allocation.txt this debugging option lead to a slow executable]),
                [AC_DEFINE(LIBDAR_DEBUG_MEMORY, 1, [if defined, builds a very slow executable])])
 
 AC_ARG_ENABLE( [dar-static],
-               AC_HELP_STRING(--disable-dar-static, [avoids building dar_static, a dar statically linked version]),
+               AS_HELP_STRING(--disable-dar-static, [avoids building dar_static, a dar statically linked version]),
                [build_static="no"],
                [build_static="yes"])
 
 
 
 AC_ARG_ENABLE( [threadar],
-               AC_HELP_STRING(--disable-threadar, [avoid linking with libthreadar if available to prevent the use several threads inside libdar]),
+               AS_HELP_STRING(--disable-threadar, [avoid linking with libthreadar if available to prevent the use several threads inside libdar]),
                [],
                [
                PKG_CHECK_EXISTS(libthreadar,
@@ -1486,7 +1486,7 @@ LIBS="$LIBS__cache"
 unset LIBS__cache
 
 AC_ARG_ENABLE( [python-binding],
-	       AC_HELP_STRING(--disable-python-binding, [ignore python binding even if it is possible to build it]),
+	       AS_HELP_STRING(--disable-python-binding, [ignore python binding even if it is possible to build it]),
 	       [ local_python="no" ],
 	       [
 	         if test "$debug_static" != "yes" ; then
