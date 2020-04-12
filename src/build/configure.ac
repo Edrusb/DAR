@@ -444,7 +444,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C"
 
 AC_ARG_ENABLE( [libz-linking],
                AS_HELP_STRING(--disable-libz-linking, [disable linking with libz and disable libz compression support]),
-               [],
+               [explicit_libz_linking=yes],
                [enable_libz_linking=yes])
 
 AS_IF(       [test "x$enable_libz_linking" != "xyes"],
@@ -476,12 +476,16 @@ AS_IF(       [test "x$enable_libz_linking" != "xyes"],
                else
                  AC_MSG_WARN([libz compression support not available])
                fi
+
+               AS_IF( [ test "x$explicit_libz_linking" = "xyes" -a "$local_libz" != "yes" ],
+                      [  AC_MSG_ERROR([libz linking failed]) ]
+                    )
              ]
      )
 
 AC_ARG_ENABLE([libbz2-linking],
               AS_HELP_STRING(--disable-libbz2-linking, [disable linking with libbz2 and disables libbz2 compression support]),
-              [],
+              [explicit_libbz2_linking=yes],
               [enable_libbz2_linking=yes])
 
 AS_IF(      [test "x$enable_libbz2_linking" != "xyes"],
@@ -511,14 +515,18 @@ AS_IF(      [test "x$enable_libbz2_linking" != "xyes"],
                                 [ AC_DEFINE(LIBBZ2_AVAILABLE, 1, [header and linking is available to have libbz2 functions])],
                                 [ local_libbz2="no" ])
                else
-                 AC_MSG_WARN([libbz2 compression support not available])
+                  AC_MSG_WARN([libbz2 compression support not available])
                fi
+
+               AS_IF( [ test "x$explicit_libbz2_linking" = "xyes" -a "$local_libbz2" != "yes" ],
+                      [ AC_MSG_ERROR([libbz2 linking failed]) ]
+                    )
            ]
      )
 
 AC_ARG_ENABLE( [liblzo2-linking],
                AS_HELP_STRING(--disable-liblzo2-linking, [disable linking with liblzo2 and disables lzo compression support]),
-               [],
+               [explicit_liblzo2_linking=yes],
                [enable_liblzo2_linking=yes]
              )
 
@@ -548,14 +556,18 @@ AS_IF(      [test "x$enable_liblzo2_linking" != "xyes"],
                                 [ AC_DEFINE(LIBLZO2_AVAILABLE, 1, [header and linking is available to have lzo functions])],
                                 [ local_liblzo2="no" ])
              else
-                AC_MSG_WARN([lzo compression support not available])
+                 AC_MSG_WARN([lzo compression support not available])
              fi
+
+             AS_IF( [ test "x$explicit_liblzo2_linking" = "xyes" -a "$local_liblzo2" != "yes" ],
+                    [ AC_MSG_ERROR([liblzo linking failed]) ]
+                  )
            ]
      )
 
 AC_ARG_ENABLE( [libxz-linking],
                AS_HELP_STRING(--disable-libxz-linking, [disable linking with libxz/liblzma and disable libxz compression support]),
-               [],
+               [explicit_libxz_linking=yes],
                [enable_libxz_linking=yes]
              )
 
@@ -589,13 +601,17 @@ AS_IF(       [test "x$enable_libxz_linking" != "xyes"],
                else
                  AC_MSG_WARN([libxz compression support not available])
                fi
+
+               AS_IF( [ test "x$explicit_libxz_linking" = "xyes" -a "$local_libxz" != "yes" ],
+                      [ AC_MSG_ERROR([libxz linking failed]) ]
+                    )
              ]
      )
 
 
 AC_ARG_ENABLE( [libgcrypt-linking],
                AS_HELP_STRING(--disable-libgcrypt-linking, [disable linking with libgcrypt which disables strong encryption support]),
-               [],
+               [explicit_libgcrypt_linking=yes],
                [enable_libgcrypt_linking=yes])
 
 AS_IF(      [test "x$enable_libgcrypt_linking" != "xyes"],
@@ -667,19 +683,24 @@ AS_IF(      [test "x$enable_libgcrypt_linking" != "xyes"],
              else
                 AC_MSG_WARN([strong encryption support not available])
              fi
+
+             AS_IF( [ test "x$explicit_libgcrypt_linking" = "xyes" -a "$local_crypto" != "yes" ],
+                    [ AC_MSG_ERROR([ligcrypt linking failed]) ]
+                  )
            ]
      )
 
 
 AC_ARG_ENABLE(  [ea-support],
                 AS_HELP_STRING(--disable-ea-support,[disable Extended Attributes support]),
-                [],
+                [explicit_ea_support=yes],
                 [enable_ea_support=yes])
 
 AS_IF(          [test "x$enable_ea_support" != "xyes"],
                 [
                   AC_MSG_CHECKING([for Extended Attribute support])
                   AC_MSG_RESULT([disabled])
+                  local_ea_support="no"
                 ],
                 [ AC_CHECK_HEADERS([attr/xattr.h sys/xattr.h])
                   AC_CHECK_LIB(attr, [lgetxattr], [], [])
@@ -720,15 +741,21 @@ AS_IF(          [test "x$enable_ea_support" != "xyes"],
                                                           local_ea_support="yes"
                                                           AC_MSG_RESULT([yes])
                                                        ],
-                                                       [ AC_MSG_RESULT([no]) ])
+                                                       [
+                                                          local_ea_support="no"
+                                                          AC_MSG_RESULT([no])
+                                                       ])
                                  ])
+                   AS_IF( [ test "x$explicit_ea_support" = "xyes" -a "$local_ea_support" != "yes" ],
+                          [ AC_MSG_ERROR([Failed finding Extended Attribute support]) ]
+                        )
                  ]
      )
 
 AC_MSG_CHECKING([ext2fs.h availability])
 AC_ARG_ENABLE(  [nodump-flag],
                 AS_HELP_STRING(--disable-nodump-flag, [disable the ext2/3/4 Filesystem Specific Attribute support, in particular the --nodump feature]),
-                [],
+                [explicit_nodump_flag=yes],
                 [enable_nodump_flag=yes])
 
 AS_IF(          [test "x$enable_nodump_flag" != "xyes"],
@@ -761,17 +788,20 @@ AS_IF(          [test "x$enable_nodump_flag" != "xyes"],
                                                  ],
                                                  [
                                                    AC_MSG_RESULT([NOT FOUND])
+                                                   local_nodump_feature="no"
                                                    AC_MSG_WARN([cannot find ext2_fs.h header file, nodump-flag and extX FSA features will not be available])
                                                  ])
                                 ])
-
+                  AS_IF( [ test "x$explicit_nodump_flag" = "xyes" -a "$local_nodump_feature" != "yes" ],
+                         [ AC_MSG_ERROR([Failed activating nodump feature]) ]
+                       )
                 ]
      )
 
 AC_MSG_CHECKING([birth time availability])
 AC_ARG_ENABLE( [birthtime],
                AS_HELP_STRING(--disable-birthtime, [disable the HFS+ Filesystem Specific Attribute support]),
-               [],
+               [explicit_birthtime=yes],
                [enable_birthtime=yes])
 
 AS_IF(         [test "x$enable_birthtime" != "xyes"],
@@ -803,22 +833,32 @@ AS_IF(         [test "x$enable_birthtime" != "xyes"],
                                   AC_MSG_RESULT([NOT FOUND])
                                   AC_MSG_WARN([Cannot find support for birthtime, HFS+ FSA support will not be available])
                                 ])
+                  AS_IF( [ test "x$explicit_birthtime" = "xyes" -a "$local_birthtime" != "yes" ],
+                         [ AC_MSG_ERROR([birth time support not available]) ]
+                       )
                 ]
      )
 
 AC_ARG_ENABLE(  [gnugetopt],
                 AS_HELP_STRING(--disable-gnugetopt, [avoid linking with libgnugetopt]),
-                [],
+                [explicit_gnugetopt=yes],
                 [enable_gnugetopt=yes])
 
 AS_IF(          [test "x$enable_gnugetopt" != "xyes"],
                 [],
-                AC_CHECK_LIB(gnugetopt, [getopt_long], [], [])
+                AC_CHECK_LIB(gnugetopt,
+                             [getopt_long],
+                             [],
+                             [
+                               AS_IF( [ test "x$explicit_gnugetopt" = "xyes"],
+                                      [ AC_MSG_ERROR([gnugetopt linking failed]) ]
+                                    )
+                             ])
      )
 
 AC_ARG_ENABLE( [librsync-linking],
                AS_HELP_STRING(--disable-librsync-linking, [disable linking with librsync and disable delta compression support]),
-               [],
+               [explicit_librsync_linking=yes],
                [enable_librsync_linking=yes])
 
 AS_IF(        [test "x$enable_librsync_linking" != "xyes"],
@@ -851,12 +891,16 @@ AS_IF(        [test "x$enable_librsync_linking" != "xyes"],
                 else
                   AC_MSG_WARN([librsync compression support not available])
                 fi
+
+                AS_IF( [ test "x$explicit_librsync_linking" = "xyes" -a "$local_librsync" != "yes" ],
+                       [ AC_MSG_ERROR([librsync linking failed]) ]
+                     )
               ]
      )
 
 AC_ARG_ENABLE( [libcurl-linking],
                AS_HELP_STRING(--disable-libcurl-linking, [ignore libcurl and avoid linking against it]),
-               [],
+               [explicit_libcurl_linking=yes],
                [enable_libcurl_linking=yes])
 
 AS_IF(         [test "x$enable_libcurl_linking" != "xyes"],
@@ -908,12 +952,15 @@ AS_IF(         [test "x$enable_libcurl_linking" != "xyes"],
                  LIBS="$LIBS___cache"
                  unset CPPFLAGS___cache
                  unset LIBS___cache
+                 AS_IF( [ test "x$explicit_libcurl_linking" = "xyes" -a "$local_libcurl" != "yes" ],
+                        [ AC_MSG_ERROR([libcurl linking failed]) ]
+                      )
                 ]
      )
 
 AC_ARG_ENABLE(  [fadvise],
                 AS_HELP_STRING(--disable-fadvise, [avoid using fadvise(2) system call]),
-                [],
+                [explicit_fadvise=yes],
                 [enable_fadvise=yes])
 
 AS_IF(          [test "x$enable_fadvise" != "xyes"],
@@ -932,7 +979,12 @@ AS_IF(          [test "x$enable_fadvise" != "xyes"],
                                       local_posix_fadvise="yes"
                                       AC_MSG_RESULT(available)
                                     ],
-                                    [ AC_MSG_RESULT([not available]) ]
+                                    [
+                                      AC_MSG_RESULT([not available])
+                                      AS_IF( [ test "x$explicit_fadvise" = "xyes" ],
+                                             [ AC_MSG_ERROR([fadvise not available]) ]
+                                           )
+                                    ]
                                    )
                 ]
      )
@@ -981,8 +1033,8 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 AC_ARG_ENABLE(  [examples],
                 AS_HELP_STRING(--enable-examples, [buld example and testing programs]),
                 [
-                   AS_IF([test "x$enable_examples" != "xyes"],
-                         [AC_MSG_ERROR([invalid argument given to --enable-examples])]
+                   AS_IF([ test "x$enable_examples" != "xyes" ],
+                         [ AC_MSG_ERROR([invalid argument given to --enable-examples]) ]
                         )
                    examples="yes"
                 ],
@@ -1024,7 +1076,7 @@ AC_ARG_ENABLE( [mode],
 AC_ARG_ENABLE( [furtive-read],
                AS_HELP_STRING(--disable-furtive-read,
                               [Ignore furtive read mode availability on systems that support it]),
-               [],
+               [explicit_furtive_read=yes],
                [enable_furtive_read=yes])
 
 AS_IF(         [test "x$enable_furtive_read" != "xyes"],
@@ -1065,6 +1117,9 @@ AS_IF(         [test "x$enable_furtive_read" != "xyes"],
                                 [ AC_MSG_RESULT(no available)
                                   local_furtive_read_mode="no"
                                 ])
+                 AS_IF(  [ test "x$explicit_furtive_read" = "xyes" -a "$local_furtive_read_mode" != "yes" ],
+                         [ AC_MSG_ERROR([furtive read mode not available]) ]
+                      )
                ]
      )
 
@@ -1072,8 +1127,8 @@ AS_IF(         [test "x$enable_furtive_read" != "xyes"],
 AC_ARG_ENABLE( [debug],
                 AS_HELP_STRING(--enable-debug, [build targets with debugging option and no optimization]),
                 [
-                        AS_IF([test "x$enable_debug" != "xyes"],
-                              [AC_MSG_ERROR([invalid argument given to --enable-debug])]
+                        AS_IF([ test "x$enable_debug" != "xyes" ],
+                              [ AC_MSG_ERROR([invalid argument given to --enable-debug]) ]
                              )
 
                         CXXFLAGS="-g -Wall"
@@ -1090,8 +1145,8 @@ AC_ARG_ENABLE( [debug],
 AC_ARG_ENABLE( [pedantic],
                AS_HELP_STRING(--enable-pedantic, [enable pedantic syntaxical check at compilation, use only for debugging purposes !]),
                [
-                        AS_IF([test "x$enable_pedantic" != "xyes"],
-                              [AC_MSG_ERROR([invalid argument given to --enable-pedantic])]
+                        AS_IF([ test "x$enable_pedantic" != "xyes" ],
+                              [ AC_MSG_ERROR([invalid argument given to --enable-pedantic]) ]
                              )
 
                         CXXFLAGS="$CXXFLAGS -pedantic -Wno-long-long"
@@ -1101,10 +1156,10 @@ AC_ARG_ENABLE( [pedantic],
 
 AC_ARG_ENABLE( [build-html],
                AS_HELP_STRING(--disable-build-html, [don't build programming documentation (in particular libdar API documentation) and html man page]),
-               [],
+               [explicit_build_html=yes],
                [enable_build_html=yes])
 
-AS_IF(         [test "x$enable_build_html" != "xyes"],
+AS_IF(         [ test "x$enable_build_html" != "xyes"],
                [
                  AC_MSG_WARN([documentation no built per user request])
                  doxygen="no"
@@ -1123,34 +1178,43 @@ AS_IF(         [test "x$enable_build_html" != "xyes"],
                        fi
                    fi
                  AC_CHECK_PROG(dot, dot, [YES], [NO], [$PATH])
+                 # upper case value for dot variable because it goes as is into doxyfile file
+
                  AC_CHECK_PROG(tmp, man, [yes], [no], [$PATH])
                  if test "$tmp" = "yes" ; then
                     AC_CHECK_PROG(groff, groff, [yes], [no], [$PATH])
                  else
                     groff = "no";
                  fi
+                 AS_IF( [ test "x$explicit_build_html" = "xyes" -a \( "$doxygen" != "yes" -o "$groff" != "yes" \) ],
+                        [ AC_MSG_ERROR([lacking prerequisit to build documentation]) ]
+                      )
                ]
      )
 
 AC_ARG_ENABLE( [upx],
                 AS_HELP_STRING(--disable-upx, [by default configure looks for UPX and if available make executables compressed at installation time, you can disable this feature]),
-                [],
+                [explicit_upx=yes],
                 [enable_upx=yes])
 
-AS_IF(          [test "x$enable_upx" != "xyes"],
+AS_IF(          [ test "x$enable_upx" != "xyes" ],
+                [
                    AC_MSG_NOTICE([ignoring UPX])
                    upx="no"
                 ],
                 [
                    AC_CHECK_PROG(upx, upx, [yes], [no], [$PATH])
+                   AS_IF( [ test "x$explicit_upx" = "xyes" -a "$upx" != "yes" ],
+                          [ AC_MSG_ERROR([upx is missing]) ]
+                        )
                 ]
              )
 
 AC_ARG_ENABLE( [fast-dir],
                AS_HELP_STRING(--disable-fast-dir, [disable optimization for large directories, doing so has a little positive impact on memory requirement but a huge drawback on execution time]),
                [
-                    AS_IF([test "x$enable_fast_dir" != "xno"],
-                          [AC_MSG_ERROR([invalid argument given to --disable-fast_dir])]
+                    AS_IF([ test "x$enable_fast_dir" != "xno" ],
+                          [ AC_MSG_ERROR([invalid argument given to --disable-fast_dir]) ]
                          )
                ],
                [AC_DEFINE(LIBDAR_FAST_DIR, 1, [activation of speed optimization for large directories])
@@ -1161,10 +1225,10 @@ AC_ARG_ENABLE( [fast-dir],
 
 AC_ARG_ENABLE(  [gpgme-linking],
                 AS_HELP_STRING(--disable-gpgme-linking, [disable linking with gpgme which disables asymetric crypto algorithms]),
-                [],
+                [explicit_gpgme_linking=yes],
                 [enable_gpgme_linking=yes])
 
-AS_IF(          [test "x$enable_gpgme_linking" != "xyes"],
+AS_IF(          [ test "x$enable_gpgme_linking" != "xyes" ],
                 [
                   AC_MSG_WARN([asymetrical encryption support has been disabled by user])
                   local_gpgme="no"
@@ -1216,15 +1280,19 @@ AS_IF(          [test "x$enable_gpgme_linking" != "xyes"],
                  else
                     AC_MSG_WARN([Public key support (GPGME linking) requires libgcrypt (strong encryption support)])
                  fi
+
+                 AS_IF( [ test "x$explicit_gpgme_linking" = "xyes" -a "$local_gpgme" != "yes" ],
+                        [ AC_MSG_ERROR([gpgme linking failed]) ]
+                      )
                 ]
      )
 
 AC_ARG_ENABLE(  [thread-safe],
                 AS_HELP_STRING(--disable-thread-safe, [libdar is thread safe if POSIX mutex are available, you can manually disable the use of POSIX mutex, the resulting libdar library will not be thread-safe anymore]),
-                [],
+                [explicit_thread_safe=yes],
                 [enable_thread_safe=yes])
 
-AS_IF(          [test "x$enable_thread_safe" != "xyes"],
+AS_IF(          [ test "x$enable_thread_safe" != "xyes" ],
                 [ AC_MSG_NOTICE([thread-safe support disabled])],
                 [ AC_CHECK_LIB(pthread, [pthread_mutex_init], [], [])
                   AC_MSG_CHECKING([for POSIX mutex])
@@ -1295,21 +1363,24 @@ AS_IF(          [test "x$enable_thread_safe" != "xyes"],
                                 [AC_MSG_RESULT([all could be found])],
                                 [
                                   AC_DEFINE(MISSING_REENTRANT_LIBCALL, 1, [Some *_r() stdlib call are missing to permit complete thread-safe support by libdar])
-                                  local_missing_reentrant_libcal="yes"
+                                  local_mutex="no"
                                   AC_MSG_RESULT([some are missing])
                                 ]
                         )
+                  AS_IF( [ test "x$explicit_thread_safe" = "xyes" -a "$local_mutex" != "yes" ],
+                         [ AC_MSG_ERROR([thread safe support not available]) ]
+                       )
                 ]
      )
 
 
 AC_ARG_ENABLE( [execinfo],
                AS_HELP_STRING(--disable-execinfo, [disable reporting stack information on self diagnostic bugs even]),
-               [],
+               [explicit_execinfo=yes],
                [enable_execinfo=yes])
 
-AS_IF(       [test "x$enable_execinfo" != "xyes"],
-             [AC_MSG_WARN([ignoring execinfo even if available])],
+AS_IF(       [ test "x$enable_execinfo" != "xyes" ],
+             [ AC_MSG_WARN([ignoring execinfo even if available]) ],
              [
                AC_CHECK_HEADERS([execinfo.h])
                AC_CHECK_LIB(execinfo, [backtrace], [], [])
@@ -1328,7 +1399,12 @@ AS_IF(       [test "x$enable_execinfo" != "xyes"],
                                [ AC_DEFINE(BACKTRACE_AVAILABLE, 1, [backtrace() call supported])
                                  AC_MSG_RESULT(yes)
                                ],
-                               [ AC_MSG_RESULT(no) ])
+                               [
+                                 AC_MSG_RESULT(no)
+                                 AS_IF( [ test "x$explicit_execinfo" = "xyes" ],
+                                        [ AC_MSG_ERROR([execinfo not found]) ]
+                                      )
+                               ])
              ]
      )
 
@@ -1336,8 +1412,8 @@ AS_IF(       [test "x$enable_execinfo" != "xyes"],
 AC_ARG_ENABLE( [profiling],
                AS_HELP_STRING(--enable-profiling, [enable executable profiling]),
                [
-                 AS_IF([test "x$enable_profiling" != "xyes"],
-                       [AC_MSG_ERROR([invalid argument given to --enable-profiling])]
+                 AS_IF([ test "x$enable_profiling" != "xyes" ],
+                       [ AC_MSG_ERROR([invalid argument given to --enable-profiling]) ]
                       )
                  profiling="yes"
                ])
@@ -1345,8 +1421,8 @@ AC_ARG_ENABLE( [profiling],
 AC_ARG_ENABLE( [debug-memory],
                AS_HELP_STRING(--enable-debug-memory, [log memory allocations and releases to /tmp/dar_debug_mem_allocation.txt this debugging option lead to a slow executable]),
                [
-                 AS_IF([test "x$enable_debug_memory" != "xyes"],
-                       [AC_MSG_ERROR([invalid argument given to --enable-debug-memory])]
+                 AS_IF([ test "x$enable_debug_memory" != "xyes" ],
+                       [ AC_MSG_ERROR([invalid argument given to --enable-debug-memory]) ]
                       )
                  AC_DEFINE(LIBDAR_DEBUG_MEMORY, 1, [if defined, builds a very slow executable
                ])])
@@ -1354,21 +1430,21 @@ AC_ARG_ENABLE( [debug-memory],
 AC_ARG_ENABLE( [dar-static],
                AS_HELP_STRING(--disable-dar-static, [avoids building dar_static, a dar statically linked version]),
                [
-                 AS_IF([test "x$enable_dar_static" != "xno"],
-                       [AC_MSG_ERROR([invalid argument given to --disable-dar-static])]
-                      )
-                 build_static="no"
+                 explicit_dar_static=yes
+                 AS_IF([ test "x$enable_dar_static" != "xyes" ],
+                       [ build_static="no" ],
+                       [ build_static="yes" ])
                ],
                [build_static="yes"])
 
 
 AC_ARG_ENABLE( [threadar],
                AS_HELP_STRING(--disable-threadar, [avoid linking with libthreadar if available to prevent the use several threads inside libdar]),
-               [],
+               [explicit_threadar=yes],
                [enable_threadar=yes])
 
-AS_IF(       [test "x$enable_threadar" != "xno"],
-             [AC_MSG_WARN([libthreadar support has been disabled by user])],
+AS_IF(       [ test "x$enable_threadar" != "xyes" ],
+             [ AC_MSG_WARN([libthreadar support has been disabled by user]) ],
              [
                PKG_CHECK_EXISTS(libthreadar,
                                 [
@@ -1432,6 +1508,9 @@ AS_IF(       [test "x$enable_threadar" != "xno"],
               unset CXXFLAGS__cache
               LIBS="$LIBS__cache"
               unset LIBS__cache
+              AS_IF( [ test "x$explicit_threadar" = "xyes" -a "$local_threadar" != "yes" ],
+                     [ AC_MSG_ERROR([libthreadar linking failed]) ]
+                   )
             ]
      )
 
@@ -1598,6 +1677,9 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                [
                  AC_MSG_RESULT([failed])
                  static_pb="yes"
+                 AS_IF( [ test "x$explicit_dar_static" = "xyes" -a "$build_static" = "yes" ],
+                        [ AC_MSG_ERROR([Cannot build dar-static on this system, check config.log]) ]
+                      )
                ])
 CPPFLAGS="$CPPFLAGS__cache"
 unset CPPFLAGS__cache
@@ -1610,10 +1692,10 @@ unset LIBS__cache
 
 AC_ARG_ENABLE( [python-binding],
                AS_HELP_STRING(--disable-python-binding, [ignore python binding even if it is possible to build it]),
-               [],
+               [explicit_python_binding=yes],
                [enable_python_binding=yes])
 
-AS_IF(         [test "x$enable_python_binding" != "xyes"],
+AS_IF(         [ test "x$enable_python_binding" != "xyes" ],
                [
                  AC_MSG_WARN([python binding disabled per user request])
                  local_python="no"
@@ -1642,6 +1724,9 @@ AS_IF(         [test "x$enable_python_binding" != "xyes"],
                  else
                     AC_MSG_RESULT([Cannot build python binding when --enable-debug is set])
                  fi
+                 AS_IF( [ test "x$explicit_python_binding" = "xyes" -a "$local_python" != "yes" ],
+                        [ AC_MSG_ERROR([prerequisit for python binding not met]) ]
+                      )
                ]
      )
 
@@ -1762,7 +1847,7 @@ else
 fi
 
 printf "   Thread safe support        : "
-if [ "$local_mutex_works" = "yes" -a -z "$local_test_memory" -a "$local_missing_reentrant_libcal" != "yes"  ] ; then
+if [ "$local_mutex_works" = "yes" -a -z "$local_test_memory" ] ; then
   echo "YES"
 else
   echo "NO"
