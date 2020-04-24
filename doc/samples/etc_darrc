@@ -10,7 +10,7 @@
 # you define a .darrc in your home directory or use -N option
 # on command-line.
 # You can continue using this default file even if you use your
-# own .darrc file, by including the following in it or explicitely
+# own .darrc file, by including the following in it or explicitly
 # command-line:
 #
 #     -B /etc/darrc
@@ -37,7 +37,7 @@ par2:
 
 compress-exclusion:
 # here we define some files that have not to be compressed.
-# First setting case insentive mode on:
+# First setting case insensitive mode on:
 -an
 # Then telling dar that the following masks are glob expression
 # which is the default, right, but if sooner on command-line the
@@ -185,14 +185,14 @@ no-emacs-backup:
 
 ##############################################################
 # target: samba
-# take care of daylight saving time for the samba filesystem
+# take care of daylight saving time for the samba file system
 # type
 
 samba:
 -H 1
-# samba filesystem need this to properly report date
+# samba file system need this to properly report date
 # and not lead dar to resave all files when changing
-# from summer to winter time and viceversa.
+# from summer to winter time and vice versa.
 
 ##############################################################
 # target: dry-run
