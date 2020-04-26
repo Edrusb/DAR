@@ -1,3 +1,8 @@
+from 2.6.9 to 2.6.10
+- update the configure script to handle some undocumented --enable-*
+  options that existed but were not expected to be used.
+- fixed spelling in darrc comments
+
 from 2.6.8 to 2.6.9
 - fixed some obvious bug when running doxygen (inlined documentation)
 - fixing configure.ac to detect xattr.h system header when it is
@@ -10,8 +15,6 @@ from 2.6.8 to 2.6.9
   predefined target "compress-exclusion"
 - fixed text diagram alignment in documentation and spelling errors
 - moving date_past_N_days script to doc/sample with other scripts
-- update the configure script to handle some undocumented --enable-*
-  options that existed but were not expected to be used.
 
 from 2.6.7 to 2.6.8
 - fixing bug leading binary delta failed to be read from an archive in
