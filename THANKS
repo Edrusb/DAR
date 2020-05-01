@@ -3,6 +3,11 @@ version 2.7.0
 Thanks to Mihai Moldovan for code adaptation to support compilation
 out of source code directory
 
+=======
+version 2.6.10
+--------------
+Thanks to Mihai Moldovan for simple typo and grammar fixes. Thanks
+to Lars Wendler for feedback.
 
 version 2.6.9
 --------------

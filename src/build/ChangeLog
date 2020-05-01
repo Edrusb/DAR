@@ -10,6 +10,11 @@ from 2.6.x to 2.7.0
   addition to the email address it may be associated to, both for
   asymmetrical encryption and archive signing.
 
+from 2.6.9 to 2.6.10
+- update the configure script to handle some undocumented --enable-*
+  options that existed but were not expected to be used.
+- fixed spelling in darrc comments
+
 from 2.6.8 to 2.6.9
 - fixed some obvious bug when running doxygen (inlined documentation)
 - fixing configure.ac to detect xattr.h system header when it is
