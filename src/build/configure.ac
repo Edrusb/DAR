@@ -566,7 +566,7 @@ AS_IF(      [test "x$enable_liblzo2_linking" != "xyes"],
      )
 
 AC_ARG_ENABLE( [libxz-linking],
-               AS_HELP_STRING(--disable-libxz-linking, [disable linking with libxz/liblzma and disable libxz compression support]),
+               AS_HELP_STRING(--disable-libxz-linking, [disable linking with libxz/liblzma and disable xz compression support]),
                [explicit_libxz_linking=yes],
                [enable_libxz_linking=yes]
              )
