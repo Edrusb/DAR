@@ -27,7 +27,6 @@
 #define CHECK_Z if(z_ptr == nullptr) throw SRC_BUG
 #define CHECK_BZ if(bz_ptr == nullptr) throw SRC_BUG
 #define CHECK_LZMA if(lzma_ptr == nullptr) throw SRC_BUG;
-#define CHECK_ZSTD if(zstd_ptr == nulltpr) throw SRC_BUG;
 
 using namespace std;
 
@@ -45,10 +44,6 @@ namespace libdar
 #if LIBLZMA_AVAILABLE
     static S_I lzma2wrap_code(S_I code);
     static lzma_action wrap2lzma_code(S_I code);
-#endif
-#if LIBZSTD_AVAILABLE
-    static S_I zstd2wrap_code(S_I code);
-    static zstd_action wrap2zstd_code(S_I code);
 #endif
 
     wrapperlib::wrapperlib(wrapperlib_mode mode)
@@ -465,91 +460,6 @@ namespace libdar
     }
 #endif
 
-
-////////////// ZSTD routines /////////////
-
-#if LIBZSTD_AVAILABLE
-    S_I wrapperlib::zstd_compressInit(U_I compression_level)
-    {
-        CHECK_ZSTD;
-	    // a implementer
-    }
-
-    S_I wrapperlib::lzma_decompressInit()
-    {
-        CHECK_ZSTD;
-	    // a implementer
-    }
-
-    S_I wrapperlib::lzma_end()
-    {
-        CHECK_ZSTD;
-	    // a implementer
-    }
-
-    S_I wrapperlib::lzma_encode(S_I flag)
-    {
-        CHECK_ZSTD;
-	    // a implementer
-    }
-
-    void wrapperlib::lzma_set_next_in(const char *x)
-    {
-        CHECK_ZSTD;
-	    // a implementer
-    }
-
-    void wrapperlib::lzma_set_avail_in(U_I x)
-    {
-        CHECK_ZSTD;
-	    // a implementer
-    }
-
-    U_I wrapperlib::lzma_get_avail_in() const
-    {
-        CHECK_ZSTD;
-	    // a implementer
-    }
-
-    U_64 wrapperlib::lzma_get_total_in() const
-    {
-        CHECK_ZSTD;
-	    // a implementer
-    }
-
-    void wrapperlib::lzma_set_next_out(char *x)
-    {
-        CHECK_ZSTD;
-	    // a implementer
-    }
-
-    char *wrapperlib::lzma_get_next_out() const
-    {
-        CHECK_ZSTD;
-	    // a implementer
-    }
-
-    void wrapperlib::lzma_set_avail_out(U_I x)
-    {
-        CHECK_ZSTD;
-	    // a implementer
-    }
-
-    U_I wrapperlib::lzma_get_avail_out() const
-    {
-        CHECK_ZSTD;
-	    // a implementer
-    }
-
-    U_64 wrapperlib::lzma_get_total_out() const
-    {
-        CHECK_ZSTD;
-	    // a implementer
-    }
-#endif
-
-/////////////////////////////////////////
-
     S_I wrapperlib::compressReset()
     {
         S_I ret;
@@ -572,10 +482,6 @@ namespace libdar
         else
             return ret;
     }
-
-//////////////////////////////////////////////////////////////
-//////////////////// STATIC ROUTINES /////////////////////////
-//////////////////////////////////////////////////////////////
 
 #if LIBZ_AVAILABLE
     static S_I zlib2wrap_code(S_I code)
@@ -618,6 +524,8 @@ namespace libdar
             throw SRC_BUG;
         }
     }
+
+
 #endif
 
 #if LIBBZ2_AVAILABLE
@@ -706,30 +614,7 @@ namespace libdar
             throw SRC_BUG;
         }
     }
-#endif
-
-
-#if LIBZSTD_AVAILABLE
-    static S_I zstd2wrap_code(S_I code)
-    {
-	switch(code)
-	{
-
-	default:
-	    throw SRC_BUG;
-	}
-    }
-
-    static zstd_action wrap2zstd_code(S_I code)
-    {
-	switch(code)
-	{
-	default:
-	    throw SRC_BUG;
-	}
-    }
 
 #endif
-
 
 } // end of namespace

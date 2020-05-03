@@ -45,10 +45,6 @@ extern "C"
 #if HAVE_LZMA_H && LIBLZMA_AVAILABLE
 #include <lzma.h>
 #endif
-
-#if HAVE_ZSTD_H
-#include <zstd.h>
-#endif
 } // end extern "C"
 
 #include "integers.hpp"
@@ -69,7 +65,7 @@ namespace libdar
     const int WR_STREAM_END    = 7;  // end of compressed data met
     const int WR_FINISH        = 8;  // parameter requiring the compression library to cleanly stop the running operation
 
-    enum wrapperlib_mode { zlib_mode, bzlib_mode, xz_mode, zstd_mode };
+    enum wrapperlib_mode { zlib_mode, bzlib_mode, xz_mode };
 
 	/// this class encapsulates calls to libz or libbz2
 
@@ -114,10 +110,6 @@ namespace libdar
 #endif
 #if LIBLZMA_AVAILABLE
 	lzma_stream *lzma_ptr;
-#endif
-
-#if LIBZSTD_AVAILABLE
-	ZSTD_CCtxt *zstd_ptr;
 #endif
 
         S_I level;
@@ -194,22 +186,6 @@ namespace libdar
         void lzma_set_avail_out(U_I x);
         U_I lzma_get_avail_out() const;
         U_64 lzma_get_total_out() const;
-#endif
-
-#if LIBSSTD_AVAILABLE
-        S_I zstd_compressInit(U_I compression_level);
-        S_I zstd_decompressInit();
-        S_I zstd_end();
-        S_I zstd_encode(S_I flag);
-        void zstd_set_next_in(const char *x);
-        void zstd_set_avail_in(U_I x);
-        U_I zstd_get_avail_in() const;
-        U_64 zstd_get_total_in() const;
-        void zstd_set_next_out(char *x);
-        char *zstd_get_next_out() const;
-        void zstd_set_avail_out(U_I x);
-        U_I zstd_get_avail_out() const;
-        U_64 zstd_get_total_out() const;
 #endif
 
     };
