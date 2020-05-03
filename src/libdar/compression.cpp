@@ -52,6 +52,8 @@ namespace libdar
 	    return compression::lzo;
 	case 'x':
 	    return compression::xz;
+	case 'd':
+	    return compression::zstd;
         default :
             throw Erange("char2compression", gettext("unknown compression"));
         }
@@ -75,6 +77,8 @@ namespace libdar
 	    return 'j';
 	case compression::lzo1x_1:
 	    return 'k';
+	case compression::zstd:
+	    return 'd';
         default:
             throw Erange("compression2char", gettext("unknown compression"));
         }
@@ -98,6 +102,8 @@ namespace libdar
 	    return "lzop-1";
 	case compression::lzo1x_1:
 	    return "lzop-3";
+	case compression::zstd:
+	    return "zstd";
         default:
             throw Erange("compresion2string", gettext("unknown compression"));
         }
@@ -122,6 +128,9 @@ namespace libdar
 
 	if(a == "xz" || a == "lzma")
 	    return compression::xz;
+
+	if(a == "zstd")
+	    return compression::zstd;
 
 	if(a == "none")
 	    return compression::none;

@@ -50,7 +50,8 @@ namespace libdar
 	lzo = 'l',   ///< lzo compression
 	xz = 'x',     ///< lzma compression
 	lzo1x_1_15 = 'j', ///< lzo degraded algo corresponding to lzop -1
-	lzo1x_1 = 'k' ///< lzo degraded algo corresponding to lzo -2 to lzo -6
+        lzo1x_1 = 'k', ///< lzo degraded algo corresponding to lzo -2 to lzo -6
+        zstd = 'd'  ///< zstd compression
     };
 
 
