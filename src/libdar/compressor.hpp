@@ -33,6 +33,7 @@
 #include "integers.hpp"
 #include "wrapperlib.hpp"
 #include "compression.hpp"
+#include "zstd.hpp"
 
 namespace libdar
 {
@@ -116,6 +117,8 @@ namespace libdar
 	char *lzo_compressed;      ///< compressed data just read or about to be written
 	char *lzo_wrkmem;          ///< work memory for LZO library
 
+	zstd* zstd_ptr;            ///< class that handles libzstd interraction
+
         generic_file *compressed;
         bool compressed_owner;
         compression current_algo;
@@ -131,6 +134,7 @@ namespace libdar
             // U_I zip_read(char *a, U_I size);
             // U_I bzip2_read(char *a, U_I size); // using gzip_read, same code thanks to wrapperlib
 	U_I lzo_read(char *a, U_I size);
+	U_I zstd_read(char *a, U_I size);
 
         void (compressor::*write_ptr) (const char *a, U_I size);
         void none_write(const char *a, U_I size);
@@ -138,6 +142,7 @@ namespace libdar
             // void zip_write(char *a, U_I size);
             // void bzip2_write(char *a, U_I size); // using gzip_write, same code thanks to wrapperlib
 	void lzo_write(const char *a, U_I size);
+	void zstd_write(const char *a, U_I size);
 
 	void lzo_compress_buffer_and_write();
 	void lzo_read_and_uncompress_to_buffer();
