@@ -579,7 +579,7 @@ namespace libdar
 
 	return read;
 #else
-	throw Efeature(gettext("lzo compression"));
+	throw Ecompilation(gettext("lzo compression"));
 #endif
     }
 
@@ -609,7 +609,7 @@ namespace libdar
 	    }
 	}
 #else
-	throw Efeature(gettext("lzo compression"));
+	throw Ecompilation(gettext("lzo compression"));
 #endif
     }
 
@@ -761,7 +761,7 @@ namespace libdar
 
 	lzo_write_size = 0;
 #else
-	throw Efeature(gettext("lzo compression"));
+	throw Ecompilation(gettext("lzo compression"));
 #endif
     }
 
@@ -826,7 +826,7 @@ namespace libdar
 	    }
 	}
 #else
-	throw Efeature(gettext("lzo compression"));
+	throw Ecompilation(gettext("lzo compression"));
 #endif
     }
 
