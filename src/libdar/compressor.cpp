@@ -117,7 +117,7 @@ namespace libdar
 
         if(compressed_side == nullptr)
             throw SRC_BUG;
-        if(compression_level > 9)
+        if(compression_level > 9 && algo != compression::zstd)
             throw SRC_BUG;
 
         compr = decompr = nullptr;
