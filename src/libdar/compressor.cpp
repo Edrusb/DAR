@@ -273,7 +273,7 @@ namespace libdar
 	    write_ptr = & compressor::zstd_write;
 	    zstd_ptr = new (nothrow) zstd(get_mode(),
 					  compression_level,
-					  *compressed);
+					  compressed_side);
 	    if(zstd_ptr == nullptr)
 		throw Ememory("compressor::init");
 	    break;
