@@ -419,6 +419,8 @@ namespace libdar
 
 	if(zstd_ptr != nullptr)
 	{
+	    if(get_mode() != gf_read_only)
+		zstd_ptr->write_eof_and_flush();
 	    delete zstd_ptr;
 	    zstd_ptr = nullptr;
 	}
