@@ -49,6 +49,7 @@ using namespace std;
 
 static shared_ptr<user_interaction> ui;
 static void f1();
+static void f2();
 
 int main()
 {
@@ -60,6 +61,7 @@ int main()
     if(!ui)
 	cout << "ERREUR !" << endl;
     f1();
+    f2();
     ui.reset();
 }
 
@@ -160,4 +162,39 @@ static void f1()
     unlink("tutu.gz.bak");
     unlink("tutu.bz");
     unlink("tutu.bz.bak");
+}
+
+
+static void f2()
+{
+    try
+    {
+	string clearfile = "toto.clear";
+	string zipfile = "toto.zstd";
+	string unzipfile = "toto.unzipped";
+
+	if(true)
+	{
+	    fichier_local src = fichier_local(ui, clearfile, gf_read_only, 0666, false, false, false);
+	    fichier_local dst = fichier_local(ui, zipfile, gf_write_only, 0666, false, true, false);
+
+	    compressor cz(compression::zstd, dst, 22);
+
+	    src.copy_to(cz);
+	}
+
+	if(true)
+	{
+	    fichier_local src = fichier_local(ui, zipfile, gf_read_only, 0666, false, false, false);
+	    fichier_local dst = fichier_local(ui, unzipfile, gf_write_only, 0666, false, true, false);
+
+	    compressor cz(compression::zstd, src);
+
+	    cz.copy_to(dst);
+	}
+    }
+    catch(Egeneric &e)
+    {
+	cerr << e.dump_str();
+    }
 }
