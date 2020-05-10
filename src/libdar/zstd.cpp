@@ -204,7 +204,7 @@ namespace libdar
 #if LIBZSTD_AVAILABLE
 	U_I err;
 
-	if(eof)
+	if(eof || mode == gf_read_only)
 	    return;
 
 	outbuf.dst = below_tampon;
