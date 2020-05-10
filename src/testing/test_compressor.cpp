@@ -171,7 +171,9 @@ static void f2()
     {
 	string clearfile = "toto.clear";
 	string zipfile = "toto.zstd";
-	string unzipfile = "toto.unzipped";
+	string unzipfile1 = "toto.unzipped1";
+	string unzipfile2 = "toto.unzipped2";
+	infinint pos;
 
 	if(true)
 	{
@@ -181,16 +183,24 @@ static void f2()
 	    compressor cz(compression::zstd, dst, 22);
 
 	    src.copy_to(cz);
+	    cz.sync_write();
+	    pos = cz.get_position();
+	    src.skip(0);
+	    src.copy_to(cz);
 	}
 
 	if(true)
 	{
 	    fichier_local src = fichier_local(ui, zipfile, gf_read_only, 0666, false, false, false);
-	    fichier_local dst = fichier_local(ui, unzipfile, gf_write_only, 0666, false, true, false);
+	    fichier_local dst1 = fichier_local(ui, unzipfile1, gf_write_only, 0666, false, true, false);
+	    fichier_local dst2 = fichier_local(ui, unzipfile2, gf_write_only, 0666, false, true, false);
 
 	    compressor cz(compression::zstd, src);
 
-	    cz.copy_to(dst);
+	    cz.copy_to(dst1);
+	    cz.flush_read();
+	    cz.skip(pos);
+	    cz.copy_to(dst2);
 	}
     }
     catch(Egeneric &e)
