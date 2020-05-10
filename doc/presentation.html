@@ -81,9 +81,9 @@ a database</span>, and resuming it afterward).<br>
 Dar code has been split into two parts since its release 2.0.0, a command-line part and a library part called <span style="font-weight: bold;">libdar</span>. Dar is not a Graphical User Interface it is only a command-line tool, but thanks to the libdar library, many <a href="#external_tools">external tool</a> rely on libdar and can manipulate dar archives at a more abstracted level with other interfaces than the shell command-line.<br>
 
       <br>
-libdar may be linked against libz, libz2, liblzo and libxz to provide
+libdar may be linked against libz, libz2, liblzo, libxz and libzstd to provide
       <span style="font-weight: bold;">gzip</span>,
-      <span style="font-weight: bold;">bzip2</span>, <span style="font-weight: bold;">lzo</span> and <span style="font-weight: bold;">xz/lzma</span> <span style="font-weight: bold;">compression</span>. It can also be linked against
+      <span style="font-weight: bold;">bzip2</span>, <span style="font-weight: bold;">lzo</span>, <span style="font-weight: bold;">xz/lzma</span> and <span style="font-weight: bold;">zstd</span> <span style="font-weight: bold;">compression</span>. It can also be linked against
 libgcrypt to
 provide symmetric <span style="font-weight: bold;">strong</span> <span style="font-weight: bold;">encryption</span> (<span style="font-weight: bold;">blowfish</span>, <span style="font-weight: bold;">twofish</span>, <span style="font-weight: bold;">aes256</span>,
       <span style="font-weight: bold;">serpent256</span>,
