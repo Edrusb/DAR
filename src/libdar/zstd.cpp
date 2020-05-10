@@ -29,6 +29,7 @@ extern "C"
 #include "zstd.hpp"
 #include "erreurs.hpp"
 #include "tools.hpp"
+#include "null_file.hpp"
 
 using namespace std;
 
@@ -239,30 +240,43 @@ namespace libdar
 	int err;
 	eof = false;
 
-	switch(mode)
+    void zstd::clean_read()
+    {
+#if LIBZSTD_AVAILABLE
+	if(mode != gf_read_only)
+	    return;
+	eof = false;
+	clear_inbuf();
+	clear_outbuf();
+#else
+	throw Ecompilation(gettext("zstd compression"));
+#endif
+    }
+
+    void zstd::clean_write()
+    {
+#if LIBZSTD_AVAILABLE
+	if(mode == gf_read_only)
+	    return;
+
+	if(!flushed)
 	{
-	case gf_read_only:
-	    if(decomp == nullptr)
-		throw SRC_BUG;
+	    null_file null(gf_write_only);
+	    generic_file *original_compressed = compressed;
 
-	    err = ZSTD_DCtx_reset(decomp, ZSTD_reset_session_only);
-	    if(ZSTD_isError(err))
-		throw Erange("zstd::reset", tools_printf(gettext("Error met while resetting libzstd decompression engine: %s"), ZSTD_getErrorName(err)));
-
-	    break;
-	case gf_write_only:
-	case gf_read_write:
-	    if(comp == nullptr)
-		throw SRC_BUG;
-
-	    err = ZSTD_CCtx_reset(comp, ZSTD_reset_session_only);
-	    if(ZSTD_isError(err))
-		throw Erange("zstd::reset", tools_printf(gettext("Error met while resetting libzstd compression engine: %s"), ZSTD_getErrorName(err)));
-
-	    break;
-	default:
-	    throw SRC_BUG;
+	    compressed = &null;
+	    try
+	    {
+		compr_flush_write();
+	    }
+	    catch(...)
+	    {
+		compressed = original_compressed;
+		throw;
+	    }
 	}
+	clear_inbuf();
+	clear_outbuf();
 #else
 	throw Ecompilation(gettext("zstd compression"));
 #endif
@@ -296,8 +310,8 @@ namespace libdar
 
     void zstd::setup_context(gf_mode mode, U_I compression_level, U_I workers)
     {
-	ZSTD_bounds limites;
 	int err;
+	static const U_I maxcomp = ZSTD_maxCLevel();
 
 	switch(mode)
 	{
@@ -305,73 +319,34 @@ namespace libdar
 	    if(decomp == nullptr)
 		throw SRC_BUG;
 
-		// resetting the decompression context to default parameter
-
-	    err = ZSTD_DCtx_reset(decomp, ZSTD_reset_parameters);
+	    err = ZSTD_initDStream(decomp);
 	    if(ZSTD_isError(err))
-		throw Erange("zstd::setup_context", tools_printf(gettext("Error met while resetting parameters of libzstd decompression context: %s"), ZSTD_getErrorName(err)));
+		throw Erange("zstd::setup_context", tools_printf(gettext("Error while initializing libzstd for decompression: %s"),
+								 ZSTD_getErrorName(err)));
 	    break;
-
 	case gf_write_only:
 	case gf_read_write:
 	    if(comp == nullptr)
 		throw SRC_BUG;
 
-		// resetting the compression context to default parameter
-
-	    err = ZSTD_CCtx_reset(comp, ZSTD_reset_parameters);
-	    if(ZSTD_isError(err))
-		throw Erange("zstd::setup_context", tools_printf(gettext("Error met while resetting parameters of libzstd compression context: %s"), ZSTD_getErrorName(err)));
-
 		// setting ZSTD_c_compressionLevel parameter
 
-	    limites = ZSTD_cParam_getBounds(ZSTD_c_compressionLevel);
+	    if(compression_level > maxcomp)
+		throw Erange("zstd::setup_context", tools_printf(gettext("Compression level requested %d is higher than maximum available for libzstd: %d"),
+								 compression_level,
+								 maxcomp));
 
-	    if(ZSTD_isError(limites.error))
-		throw Erange("zstd::setup_context", tools_printf(gettext("Error returned from libzstd when asking for compression level available range: %s"), ZSTD_getErrorName(limites.error)));
 
-	    if(!check_range(compression_level, limites))
-	       throw Erange("zstd::setup_context", tools_printf(gettext("The requested compression level (%d) is out of range ([%d - %d])"), compression_level, limites.lowerBound, limites.upperBound));
-
-	    err = ZSTD_CCtx_setParameter(comp, ZSTD_c_compressionLevel, compression_level);
+	    err = ZSTD_initCStream(comp, compression_level);
 	    if(ZSTD_isError(err))
-		throw Erange("zstd::setup_context", tools_printf(gettext("Error while setting libzstd compression level to %d (reported valid range is %d - %d): %s"),
-								compression_level,
-								limites.lowerBound,
-								limites.upperBound,
-								ZSTD_getErrorName(err)));
-
-		// setting ZSTD_c_nbWorkers parameter
-
-	    if(workers > 1)
-	    {
-		limites = ZSTD_cParam_getBounds(ZSTD_c_nbWorkers);
-
-		if(!ZSTD_isError(limites.error))
-		{
-		    if(!check_range(workers, limites))
-			throw Erange("zstd::setup_context", tools_printf(gettext("The requested number of libzstd workers (%d) is out of range ([%d - %d])"), workers, limites.lowerBound, limites.upperBound));
-		}
-
-		err = ZSTD_CCtx_setParameter(comp, ZSTD_c_nbWorkers, workers);
-		if(ZSTD_isError(err))
-		    throw Erange("zstd::setup_context", tools_printf(gettext("Error while setting the libzstd number of worker to %d: %s"),
-								     workers,
-								     ZSTD_getErrorName(err)));
-	    }
+		throw Erange("zstd::setup_context", tools_printf(gettext("Error while setting libzstd compression level to %d: %s"),
+								 compression_level,
+								 ZSTD_getErrorName(err)));
 
 	    break;
 	default:
 	    throw SRC_BUG;
 	}
-    }
-
-    bool zstd::check_range(S_I value, const ZSTD_bounds & range)
-    {
-	if(range.lowerBound == 0 && range.upperBound == 0)
-	    return true;
-
-	return range.lowerBound <= value && value <= range.upperBound;
     }
 
 } // end of namespace

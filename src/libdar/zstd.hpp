@@ -31,7 +31,6 @@
 extern "C"
 {
 #if HAVE_ZSTD_H
-#define ZSTD_STATIC_LINKING_ONLY
 #include <zstd.h>
 #endif
 }
@@ -81,7 +80,6 @@ namespace libdar
 	generic_file *compressed;
 	bool eof;
 
-	static bool check_range(S_I value, const ZSTD_bounds & range);
 #endif
 
 	void clear_inbuf();
