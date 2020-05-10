@@ -136,7 +136,7 @@ namespace libdar
 	    if(err == 0)
 		eof = true;
 
-	    if(inbuf.pos < inbuf.size)
+	    if(0 < inbuf.pos && inbuf.pos < inbuf.size)
 	    {
 		(void)memmove(below_tampon, below_tampon + inbuf.pos, inbuf.size - inbuf.pos);
 		inbuf.size -= inbuf.pos;
