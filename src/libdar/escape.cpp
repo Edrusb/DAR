@@ -648,7 +648,7 @@ namespace libdar
 			// not setting yet read_eof, as it could be a false mark (starting like a mark, but not enough data to determin the real nature of the sequence)
 		    (void)memcpy(read_buffer, a + returned, read_buffer_size);
 		    read_eof = false; // because we moved out data from the one ready to be returned
-			// eithet this was not the eof, and thus this call does not change anything
+			// either this was not the eof, and thus this call does not change anything
 			// or it was EOF because data "read" was less than "needed"
 			// but here some data will still be in read_buffer so EOF must be cleaned
 

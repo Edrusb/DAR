@@ -49,6 +49,7 @@ using namespace std;
 
 static shared_ptr<user_interaction> ui;
 static void f1();
+static void f2();
 
 int main()
 {
@@ -60,6 +61,7 @@ int main()
     if(!ui)
 	cout << "ERREUR !" << endl;
     f1();
+    f2();
     ui.reset();
 }
 
@@ -160,4 +162,49 @@ static void f1()
     unlink("tutu.gz.bak");
     unlink("tutu.bz");
     unlink("tutu.bz.bak");
+}
+
+
+static void f2()
+{
+    try
+    {
+	string clearfile = "toto.clear";
+	string zipfile = "toto.zstd";
+	string unzipfile1 = "toto.unzipped1";
+	string unzipfile2 = "toto.unzipped2";
+	infinint pos;
+
+	if(true)
+	{
+	    fichier_local src = fichier_local(ui, clearfile, gf_read_only, 0666, false, false, false);
+	    fichier_local dst = fichier_local(ui, zipfile, gf_write_only, 0666, false, true, false);
+
+	    compressor cz(compression::zstd, dst, 22);
+
+	    src.copy_to(cz);
+	    cz.sync_write();
+	    pos = cz.get_position();
+	    src.skip(0);
+	    src.copy_to(cz);
+	}
+
+	if(true)
+	{
+	    fichier_local src = fichier_local(ui, zipfile, gf_read_only, 0666, false, false, false);
+	    fichier_local dst1 = fichier_local(ui, unzipfile1, gf_write_only, 0666, false, true, false);
+	    fichier_local dst2 = fichier_local(ui, unzipfile2, gf_write_only, 0666, false, true, false);
+
+	    compressor cz(compression::zstd, src);
+
+	    cz.copy_to(dst1);
+	    cz.flush_read();
+	    cz.skip(pos);
+	    cz.copy_to(dst2);
+	}
+    }
+    catch(Egeneric &e)
+    {
+	cerr << e.dump_str();
+    }
 }

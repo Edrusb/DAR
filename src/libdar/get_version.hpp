@@ -53,9 +53,9 @@ namespace libdar
 	///  libdar Major version defined at compilation time
     constexpr U_I LIBDAR_COMPILE_TIME_MAJOR = 6;
 	///  libdar Medium version defined at compilation time
-    constexpr U_I LIBDAR_COMPILE_TIME_MEDIUM = 2;
+    constexpr U_I LIBDAR_COMPILE_TIME_MEDIUM = 3;
 	///  libdar Minor version defined at compilation time
-    constexpr U_I LIBDAR_COMPILE_TIME_MINOR = 3;
+    constexpr U_I LIBDAR_COMPILE_TIME_MINOR = 0;
 
 
 	////////////////////////////////////////////////////////////////////////

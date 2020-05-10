@@ -1188,6 +1188,7 @@ PYBIND11_MODULE(libdar, mod)
 	static bool libbz2() noexcept { return libdar::compile_time::libbz2(); };
 	static bool liblzo() noexcept { return libdar::compile_time::liblzo(); };
 	static bool libxz() noexcept { return libdar::compile_time::libxz(); };
+	static bool libzstd() noexcept { return libdar::compile_time::libzstd(); };
 	static bool libgcrypt() noexcept { return libdar::compile_time::libgcrypt(); };
 	static bool furtive_read() noexcept { return libdar::compile_time::furtive_read(); };
 	static bool system_endian() noexcept { return libdar::compile_time::system_endian(); };
@@ -1223,6 +1224,7 @@ PYBIND11_MODULE(libdar, mod)
 	.def_static("libbz2", &compile_time::libbz2)
 	.def_static("liblzo", &compile_time::liblzo)
 	.def_static("libxz", &compile_time::libxz)
+	.def_static("libzstd", &compile_time::libzstd)
 	.def_static("libgcrypt", &compile_time::libgcrypt)
 	.def_static("furtive_read", &compile_time::furtive_read)
 	.def_static("system_endian", &compile_time::system_endian)

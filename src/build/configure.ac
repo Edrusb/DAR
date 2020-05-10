@@ -566,7 +566,7 @@ AS_IF(      [test "x$enable_liblzo2_linking" != "xyes"],
      )
 
 AC_ARG_ENABLE( [libxz-linking],
-               AS_HELP_STRING(--disable-libxz-linking, [disable linking with libxz/liblzma and disable libxz compression support]),
+               AS_HELP_STRING(--disable-libxz-linking, [disable linking with libxz/liblzma and disable xz compression support]),
                [explicit_libxz_linking=yes],
                [enable_libxz_linking=yes]
              )
@@ -608,6 +608,46 @@ AS_IF(       [test "x$enable_libxz_linking" != "xyes"],
              ]
      )
 
+AC_ARG_ENABLE( [libzstd-linking],
+               AS_HELP_STRING(--disable-libzstd-linking, [disable linking with libzstd and disable zstd compression support]),
+               [explicit_libzstd_linking=yes],
+               [enable_libzstd_linking=yes]
+             )
+
+AS_IF(       [test "x$enable_libzstd_linking" != "xyes"],
+               AC_MSG_WARN([libzstd compression support has been disabled by user])
+               local_libzstd="no"
+             ],
+             [
+               AC_CHECK_LIB(zstd, [ZSTD_createCStream], [], [AC_MSG_WARN([library libzstd not found])])
+               AC_CHECK_HEADER(zstd.h, [local_libzstd="yes"
+                                        AC_DEFINE(HAVE_ZSTD_H, 1, [zstd.h header file is available])
+                                       ],
+                                       [AC_MSG_WARN([Cannot find zstd.h header file])
+                                        local_libzstd="no"
+                                       ])
+               if test "$local_libzstd" = "yes" ; then
+               AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
+                                                           #if HAVE_ZSTD_H
+                                                           #include <zstd.h>
+                                                           #endif
+                                              }]],
+                                              [[
+                                                         ZSTD_CStream *zs = ZSTD_createCStream();
+							 (void)ZSTD_freeCStream(zs);
+                                              ]])
+                              ],
+                              [ AC_DEFINE(LIBZSTD_AVAILABLE, 1, [header and linking is available to have libzstd functions])],
+                              [ local_libzstd="no" ])
+               else
+                 AC_MSG_WARN([libzstd compression support not available])
+               fi
+
+               AS_IF( [ test "x$explicit_libzstd_linking" = "xyes" -a "$local_libzstd" != "yes" ],
+                      [ AC_MSG_ERROR([libzstd linking failed]) ]
+                    )
+             ]
+     )
 
 AC_ARG_ENABLE( [libgcrypt-linking],
                AS_HELP_STRING(--disable-libgcrypt-linking, [disable linking with libgcrypt which disables strong encryption support]),
@@ -1789,6 +1829,13 @@ fi
 
 printf "   Liblxz compression (xz)    : "
 if [ "$local_libxz" = "yes" ] ; then
+  echo "YES"
+else
+  echo "NO"
+fi
+
+printf "   Liblzstd compression (zstd): "
+if [ "$local_libzstd" = "yes" ] ; then
   echo "YES"
 else
   echo "NO"
