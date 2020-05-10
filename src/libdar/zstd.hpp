@@ -62,8 +62,12 @@ namespace libdar
 
 	U_I read(char *a, U_I size);
 	void write(const char *a, U_I size);
-	void write_eof_and_flush();
-	void reset();
+	void compr_flush_write();
+	void compr_flush_read();
+	void compr_flush() { mode == gf_read_only? compr_flush_read(): compr_flush_write(); };
+	void clean_read();
+	void clean_write();
+	void clean() { mode == gf_read_only? clean_read(): clean_write(); };
 
     private:
 #if LIBZSTD_AVAILABLE
@@ -78,8 +82,7 @@ namespace libdar
 
 	gf_mode mode;
 	generic_file *compressed;
-	bool eof;
-
+	bool flueof;  //< is EOF in read mode and flushed in write mode
 #endif
 
 	void clear_inbuf();

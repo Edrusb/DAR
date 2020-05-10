@@ -420,7 +420,10 @@ namespace libdar
 	if(zstd_ptr != nullptr)
 	{
 	    if(get_mode() != gf_read_only)
-		zstd_ptr->write_eof_and_flush();
+	    {
+		zstd_ptr->compr_flush();
+		zstd_ptr->clean();
+	    }
 	    delete zstd_ptr;
 	    zstd_ptr = nullptr;
 	}
@@ -701,7 +704,7 @@ namespace libdar
 	}
 
 	if(zstd_ptr != nullptr)
-	    zstd_ptr->write_eof_and_flush();
+	    zstd_ptr->compr_flush_write();
     }
 
     void compressor::compr_flush_read()
@@ -716,7 +719,7 @@ namespace libdar
 	lzo_read_reached_eof = false;
 
 	if(zstd_ptr!= nullptr)
-	    zstd_ptr->reset();
+	    zstd_ptr->compr_flush_read();
     }
 
     void compressor::clean_read()
@@ -734,7 +737,7 @@ namespace libdar
 	}
 
 	if(zstd_ptr!= nullptr)
-	    zstd_ptr->reset();
+	    zstd_ptr->clean_read();
     }
 
     void compressor::clean_write()
@@ -761,7 +764,7 @@ namespace libdar
 	    lzo_write_size = 0;
 
 	if(zstd_ptr!= nullptr)
-	    zstd_ptr->reset();
+	    zstd_ptr->clean_write();
     }
 
 

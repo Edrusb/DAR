@@ -47,7 +47,6 @@ namespace libdar
 	clear_inbuf();
 	clear_outbuf();
 	below_tampon = nullptr;
-	eof = false;
 
 	try
 	{
@@ -59,6 +58,7 @@ namespace libdar
 		    throw Ememory("zstd::zstd");
 		below_tampon_size = ZSTD_DStreamInSize();
 		above_tampon_size = ZSTD_DStreamOutSize();
+		flueof = false;
 		break;
 	    case gf_write_only:
 	    case gf_read_write: // but read operation will fail
@@ -67,6 +67,7 @@ namespace libdar
 		    throw Ememory("zsts::zstd");
 		below_tampon_size = ZSTD_CStreamOutSize();
 		above_tampon_size = ZSTD_CStreamInSize();
+		flueof = true;
 		break;
 	    default:
 		throw SRC_BUG;
@@ -99,8 +100,17 @@ namespace libdar
 	U_I wrote = 0;
 	bool no_comp_data = false;
 
-	if(mode == gf_read_write)
+	switch(mode)
+	{
+	case gf_read_only:
+	    break;
+	case gf_read_write:
 	    throw Efeature("read-write mode for zstd class");
+	case gf_write_only:
+	    throw SRC_BUG;
+	default:
+	    throw SRC_BUG;
+	}
 
 	if(decomp == nullptr)
 	    throw SRC_BUG;
@@ -114,7 +124,7 @@ namespace libdar
 	    inbuf.pos = 0;
 	}
 
-	while(!eof && wrote < size)
+	while(!flueof && wrote < size)
 	{
 	    U_I delta_in = below_tampon_size - inbuf.size;
 
@@ -135,23 +145,32 @@ namespace libdar
 		throw Erange("zstd::read", tools_printf(gettext("Error returned by libzstd while uncompressing data: %s"), ZSTD_getErrorName(err)));
 
 	    if(err == 0)
-		eof = true;
+		flueof = true;
 
-	    if(0 < inbuf.pos && inbuf.pos < inbuf.size)
+	    if(inbuf.pos > 0)
 	    {
-		(void)memmove(below_tampon, below_tampon + inbuf.pos, inbuf.size - inbuf.pos);
-		inbuf.size -= inbuf.pos;
-		inbuf.pos = 0;
-	    }
-	    else
-	    {
-		inbuf.pos = 0;
-		inbuf.size = 0;
+		    // some input data has been consumed
+
+		if(inbuf.pos < inbuf.size)
+		{
+			// only a part of the data has been consumed
+
+		    (void)memmove(below_tampon, below_tampon + inbuf.pos, inbuf.size - inbuf.pos);
+		    inbuf.size -= inbuf.pos;
+		    inbuf.pos = 0;
+		}
+		else
+		{
+			// all data has been consumed
+
+		    inbuf.pos = 0;
+		    inbuf.size = 0;
+		}
 	    }
 
 	    wrote += outbuf.pos;
 
-	    if(no_comp_data && outbuf.pos == 0 && wrote < size && !eof)
+	    if(no_comp_data && outbuf.pos == 0 && wrote < size && !flueof)
 		throw Erange("zstd::read", gettext("uncompleted compressed stream, some compressed data is missing or corruption occured"));
 	}
 
@@ -172,6 +191,9 @@ namespace libdar
 	    throw SRC_BUG;
 	if(below_tampon == nullptr)
 	    throw SRC_BUG;
+
+	    // we need that to be able to flush_write later on
+	flueof = false;
 
 	outbuf.dst = below_tampon;
 	outbuf.size = below_tampon_size;
@@ -200,12 +222,12 @@ namespace libdar
 #endif
     }
 
-    void zstd::write_eof_and_flush()
+    void zstd::compr_flush_write()
     {
 #if LIBZSTD_AVAILABLE
 	U_I err;
 
-	if(eof || mode == gf_read_only)
+	if(flueof || mode == gf_read_only)
 	    return;
 
 	outbuf.dst = below_tampon;
@@ -214,7 +236,7 @@ namespace libdar
 
 	err = ZSTD_endStream(comp, &outbuf);
 	if(ZSTD_isError(err))
-	    throw Erange("zstd::write_eof_and_flush", tools_printf(gettext("Error met while asking libzstd for compression end: %s"), ZSTD_getErrorName(err)));
+	    throw Erange("zstd::compr_flush_write", tools_printf(gettext("Error met while asking libzstd for compression end: %s"), ZSTD_getErrorName(err)));
 
 	compressed->write((char *)outbuf.dst, outbuf.pos);
 
@@ -224,28 +246,33 @@ namespace libdar
 
 	    err = ZSTD_flushStream(comp, &outbuf);
 	    if(ZSTD_isError(err))
-		throw Erange("zstd::write_eof_and_flush", tools_printf(gettext("Error met while asking libzstd to flush data once compression end has been asked: %s"), ZSTD_getErrorName(err)));
+		throw Erange("zstd::compr_flush_write", tools_printf(gettext("Error met while asking libzstd to flush data once compression end has been asked: %s"), ZSTD_getErrorName(err)));
 
 	    compressed->write((char *)outbuf.dst, outbuf.pos);
 	}
-	eof = true;
+	flueof = true;
 #else
 	throw Ecompilation(gettext("zstd compression"));
 #endif
     }
 
-    void zstd::reset()
+    void zstd::compr_flush_read()
     {
 #if LIBZSTD_AVAILABLE
-	int err;
-	eof = false;
+	if(mode != gf_read_only)
+	    return;
+	flueof = false;
+#else
+	throw Ecompilation(gettext("zstd compression"));
+#endif
+    }
 
     void zstd::clean_read()
     {
 #if LIBZSTD_AVAILABLE
 	if(mode != gf_read_only)
 	    return;
-	eof = false;
+	flueof = false;
 	clear_inbuf();
 	clear_outbuf();
 #else
@@ -259,7 +286,7 @@ namespace libdar
 	if(mode == gf_read_only)
 	    return;
 
-	if(!flushed)
+	if(!flueof)
 	{
 	    null_file null(gf_write_only);
 	    generic_file *original_compressed = compressed;
@@ -268,6 +295,8 @@ namespace libdar
 	    try
 	    {
 		compr_flush_write();
+		    // flushing to reset the libzstd engine
+		    // but sending compressed data to /dev/null
 	    }
 	    catch(...)
 	    {
