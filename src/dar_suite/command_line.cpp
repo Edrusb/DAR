@@ -3264,7 +3264,7 @@ static void split_compression_algo(const char *arg, compression & algo, U_I & le
 
             if(second_part != "")
             {
-                if(!tools_my_atoi(second_part.c_str(), level) || level > 9 || level < 1)
+                if(!tools_my_atoi(second_part.c_str(), level) || (level > 9 && algo != compression::zstd) || level < 1)
                     throw Erange("split_compression_algo", gettext("Compression level must be between 1 and 9, included"));
             }
             else
