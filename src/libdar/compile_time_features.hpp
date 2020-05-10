@@ -78,6 +78,9 @@ namespace libdar
 	    /// returns whether libdar is dependent on liblxz/liblzma and if so has xz compression/decompression available
 	bool libxz() noexcept;
 
+	    /// returns whether libdar is dependent on libzstd and if so has zstd compression/decompression available
+	bool libzstd() noexcept;
+
 	    /// returns whether libdar is dependent on libgcrypt and if so has strong encryption and hashing features available
 	bool libgcrypt() noexcept;
 

@@ -123,6 +123,15 @@ namespace libdar
 #endif
 	}
 
+	bool libzstd() noexcept
+	{
+#if LIBZSTD_AVAILABLE
+	    return true;
+#else
+	    return false;
+#endif
+	}
+
 	bool libgcrypt() noexcept
 	{
 #if CRYPTO_AVAILABLE

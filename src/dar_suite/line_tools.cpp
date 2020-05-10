@@ -1346,6 +1346,7 @@ void line_tools_display_features(user_interaction & dialog)
 	dialog.printf(gettext("   Libbz2 compression (bzip2)   : %s"), YES_NO(compile_time::libbz2()));
 	dialog.printf(gettext("   Liblzo2 compression (lzo)    : %s"), YES_NO(compile_time::liblzo()));
 	dialog.printf(gettext("   Liblzma compression (xz)     : %s"), YES_NO(compile_time::libxz()));
+	dialog.printf(gettext("   Liblzstd compression (zstd)  : %s"), YES_NO(compile_time::libzstd()));
 	dialog.printf(gettext("   Strong encryption (libgcrypt): %s"), YES_NO(compile_time::libgcrypt()));
 	dialog.printf(gettext("   Public key ciphers (gpgme)   : %s"), YES_NO(compile_time::public_key_cipher()));
 	dialog.printf(gettext("   Extended Attributes support  : %s"), YES_NO(compile_time::ea()));
