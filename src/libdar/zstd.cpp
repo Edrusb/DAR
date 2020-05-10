@@ -370,7 +370,7 @@ namespace libdar
 		// setting ZSTD_c_compressionLevel parameter
 
 	    if(compression_level > maxcomp)
-		throw Erange("zstd::setup_context", tools_printf(gettext("Compression level requested %d is higher than maximum available for libzstd: %d"),
+		throw Erange("zstd::setup_context", tools_printf(gettext("the requested compression level (%d) is higher than the maximum available for libzstd: %d"),
 								 compression_level,
 								 maxcomp));
 
