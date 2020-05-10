@@ -60,14 +60,13 @@ namespace libdar
 		above_tampon_size = ZSTD_DStreamOutSize();
 		break;
 	    case gf_write_only:
+	    case gf_read_write: // but read operation will fail
 		comp = ZSTD_createCStream();
 		if(comp == nullptr)
 		    throw Ememory("zsts::zstd");
 		below_tampon_size = ZSTD_CStreamOutSize();
 		above_tampon_size = ZSTD_CStreamInSize();
 		break;
-	    case gf_read_write:
-		throw SRC_BUG;
 	    default:
 		throw SRC_BUG;
 	    }
@@ -98,6 +97,9 @@ namespace libdar
 	U_I err = 0;
 	U_I wrote = 0;
 	bool no_comp_data = false;
+
+	if(mode == gf_read_write)
+	    throw Efeature("read-write mode for zstd class");
 
 	if(decomp == nullptr)
 	    throw SRC_BUG;
@@ -249,6 +251,7 @@ namespace libdar
 
 	    break;
 	case gf_write_only:
+	case gf_read_write:
 	    if(comp == nullptr)
 		throw SRC_BUG;
 
@@ -257,8 +260,6 @@ namespace libdar
 		throw Erange("zstd::reset", tools_printf(gettext("Error met while resetting libzstd compression engine: %s"), ZSTD_getErrorName(err)));
 
 	    break;
-	case gf_read_write:
-	    throw SRC_BUG;
 	default:
 	    throw SRC_BUG;
 	}
@@ -312,6 +313,7 @@ namespace libdar
 	    break;
 
 	case gf_write_only:
+	case gf_read_write:
 	    if(comp == nullptr)
 		throw SRC_BUG;
 
@@ -359,8 +361,6 @@ namespace libdar
 	    }
 
 	    break;
-	case gf_read_write:
-	    throw SRC_BUG;
 	default:
 	    throw SRC_BUG;
 	}
