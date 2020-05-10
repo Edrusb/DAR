@@ -313,16 +313,24 @@ namespace libdar
 
     void zstd::clear_inbuf()
     {
+#if LIBZSTD_AVAILABLE
 	inbuf.src = nullptr;
 	inbuf.size = 0;
 	inbuf.pos = 0;
+#else
+	throw Ecompilation(gettext("zstd compression"));
+#endif
     }
 
     void zstd::clear_outbuf()
     {
+#if LIBZSTD_AVAILABLE
 	outbuf.dst = nullptr;
 	outbuf.size = 0;
 	outbuf.pos = 0;
+#else
+	throw Ecompilation(gettext("zstd compression"));
+#endif
     }
 
     void zstd::release_mem()
@@ -339,6 +347,7 @@ namespace libdar
 
     void zstd::setup_context(gf_mode mode, U_I compression_level, U_I workers)
     {
+#if LIBZSTD_AVAILABLE
 	int err;
 	static const U_I maxcomp = ZSTD_maxCLevel();
 
@@ -376,6 +385,9 @@ namespace libdar
 	default:
 	    throw SRC_BUG;
 	}
+#else
+	throw Ecompilation(gettext("zstd compression"));
+#endif
     }
 
 } // end of namespace

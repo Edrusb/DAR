@@ -70,6 +70,9 @@ namespace libdar
 	void clean() { mode == gf_read_only? clean_read(): clean_write(); };
 
     private:
+	gf_mode mode;
+	generic_file *compressed;
+
 #if LIBZSTD_AVAILABLE
 	ZSTD_CStream *comp;
 	ZSTD_DStream *decomp;
@@ -80,8 +83,6 @@ namespace libdar
 	U_I below_tampon_size; // allocated size of tampon
 	U_I above_tampon_size; // max size of input data
 
-	gf_mode mode;
-	generic_file *compressed;
 	bool flueof;  //< is EOF in read mode and flushed in write mode
 #endif
 
