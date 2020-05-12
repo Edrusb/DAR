@@ -47,6 +47,7 @@ namespace libdar
 	clear_inbuf();
 	clear_outbuf();
 	below_tampon = nullptr;
+	no_comp_data = false;
 
 	try
 	{
@@ -98,7 +99,6 @@ namespace libdar
 #if LIBZSTD_AVAILABLE
 	U_I err = 0;
 	U_I wrote = 0;
-	bool no_comp_data = false;
 
 	switch(mode)
 	{
@@ -262,6 +262,7 @@ namespace libdar
 	if(mode != gf_read_only)
 	    return;
 	flueof = false;
+	no_comp_data = false;
 #else
 	throw Ecompilation(gettext("zstd compression"));
 #endif
@@ -273,6 +274,7 @@ namespace libdar
 	if(mode != gf_read_only)
 	    return;
 	flueof = false;
+	no_comp_data = false;
 	clear_inbuf();
 	clear_outbuf();
 #else

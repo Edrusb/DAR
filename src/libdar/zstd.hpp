@@ -84,6 +84,7 @@ namespace libdar
 	U_I above_tampon_size; // max size of input data
 
 	bool flueof;  //< is EOF in read mode and flushed in write mode
+	bool no_comp_data; //< EOF in underlying layer in read mode
 #endif
 
 	void clear_inbuf();
