@@ -84,7 +84,6 @@ namespace libdar
 	if(below == nullptr)
 	    throw SRC_BUG;
 	write_buffer_size = 0;
-	read_buffer_size = 0;
 	read_eof = false;
 	already_read = 0;
 	escape_seq_offset_in_buffer = 0;
@@ -93,7 +92,11 @@ namespace libdar
 	unjumpable = x_unjumpable;
 	for(U_I i = 0 ; i < ESCAPE_SEQUENCE_LENGTH; ++i)
 	    fixed_sequence[i] = usual_fixed_sequence[i];
-
+	read_buffer_size = 0;
+	read_buffer_alloc = INITIAL_READ_BUFFER_SIZE;
+	read_buffer = new (nothrow) char[read_buffer_alloc];
+	if(read_buffer == nullptr)
+	    throw Ememory("escape::escape");
     }
 
     escape::~escape()
@@ -105,6 +108,12 @@ namespace libdar
 	catch(...)
 	{
 		// ignore all exceptions
+	}
+
+	if(read_buffer != nullptr)
+	{
+	    delete [] read_buffer;
+	    read_buffer = nullptr;
 	}
     }
 
@@ -208,7 +217,7 @@ namespace libdar
 	    else // no mark in current data
 	    {
 		    // dropping all data in read_buffer, and filling it again with some new data
-		read_buffer_size = x_below->read(read_buffer, READ_BUFFER_SIZE);
+		read_buffer_size = x_below->read(read_buffer, read_buffer_alloc);
 		below_position += read_buffer_size;
 		if(read_buffer_size == 0)
 		    read_eof = true;
@@ -372,7 +381,7 @@ namespace libdar
 		throw Efeature("Skipping forward not implemented in write mode for escape class");
 	    else
 	    {
-		char tmp_buffer[WRITE_BUFFER_SIZE];
+		char tmp_buffer[INITIAL_WRITE_BUFFER_SIZE];
 		infinint cur_below = below_position;
 		U_I trouve;
 
@@ -640,8 +649,20 @@ namespace libdar
 
 			// copy back the remaining data to read_buffer
 
-		    if(READ_BUFFER_SIZE < read - escape_seq_offset_in_buffer)
-			throw SRC_BUG; // read_buffer too small to store all in-transit data
+		    if(read_buffer_alloc < read - escape_seq_offset_in_buffer)
+		    {
+			    // reallocating a larger read_buffer
+
+			if(read_buffer != nullptr)
+			{
+			    delete [] read_buffer;
+			    read_buffer = nullptr;
+			}
+			read_buffer_alloc = read;
+			read_buffer = new (nothrow) char[read_buffer_alloc];
+			if(read_buffer == nullptr)
+			    throw Ememory("escape::inherited_read");
+		    }
 		    read_buffer_size = read - escape_seq_offset_in_buffer;
 		    escape_seq_offset_in_buffer = 0;
 		    already_read = 0;
@@ -703,7 +724,7 @@ namespace libdar
 
 		    // filling the buffer
 
-		U_I delta = WRITE_BUFFER_SIZE - write_buffer_size; // available room in write_buffer
+		U_I delta = INITIAL_WRITE_BUFFER_SIZE - write_buffer_size; // available room in write_buffer
 		delta = delta > size ? size : delta;
 		(void)memcpy(write_buffer + write_buffer_size, a, delta);
 		write_buffer_size += delta;
@@ -740,7 +761,7 @@ namespace libdar
 			U_I yet_in_a = size - written;
 			U_I missing_for_sequence = trouve + (ESCAPE_SEQUENCE_LENGTH - 1) - write_buffer_size;
 
-			if(write_buffer_size < WRITE_BUFFER_SIZE && yet_in_a > 0)
+			if(write_buffer_size < INITIAL_WRITE_BUFFER_SIZE && yet_in_a > 0)
 			    throw SRC_BUG; // write_buffer_size not filled while remains available data in "a" !
 
 			    // either the escape sequence is entirely in "a" (and partially copied in write_buffer)
@@ -764,7 +785,7 @@ namespace libdar
 			    write_buffer_size -= trouve;
 			    if(write_buffer_size >= ESCAPE_SEQUENCE_LENGTH - 1)
 				throw SRC_BUG; // should never seen this if() condition
-			    if(write_buffer_size + yet_in_a > WRITE_BUFFER_SIZE)
+			    if(write_buffer_size + yet_in_a > INITIAL_WRITE_BUFFER_SIZE)
 				throw SRC_BUG; // not possible to reach normally, because yet_in_a < missing_for_sequence < SEQUENCE_LENGTH
 			    (void)memcpy(write_buffer + write_buffer_size, a+written, yet_in_a);
 			    written = size;
@@ -930,12 +951,21 @@ namespace libdar
     {
 	x_below = ref.x_below;
 	write_buffer_size = ref.write_buffer_size;
-	if(write_buffer_size > WRITE_BUFFER_SIZE)
+	if(write_buffer_size > INITIAL_WRITE_BUFFER_SIZE)
 	    throw SRC_BUG;
 	(void)memcpy(write_buffer, ref.write_buffer, write_buffer_size);
 	read_buffer_size = ref.read_buffer_size;
-	if(read_buffer_size > READ_BUFFER_SIZE)
+	read_buffer_alloc = ref.read_buffer_alloc;
+	if(read_buffer_size > read_buffer_alloc)
 	    throw SRC_BUG;
+	if(read_buffer != nullptr)
+	{
+	    delete [] read_buffer;
+	    read_buffer = nullptr;
+	}
+	read_buffer = new (nothrow) char[read_buffer_alloc];
+	if(read_buffer == nullptr)
+	    throw Ememory("escape::copy_from");
 	(void)memcpy(read_buffer, ref.read_buffer, read_buffer_size);
 	already_read = ref.already_read;
 	read_eof = ref.read_eof;
@@ -951,10 +981,11 @@ namespace libdar
 	write_buffer_size = move(ref.write_buffer_size);
 	swap(write_buffer, ref.write_buffer);
 	read_buffer_size = move(ref.read_buffer_size);
+	read_buffer_alloc = move(ref.read_buffer_alloc);
+	swap(read_buffer, ref.read_buffer);
 	already_read = move(ref.already_read);
 	read_eof = move(ref.read_eof);
 	escape_seq_offset_in_buffer = move(ref.escape_seq_offset_in_buffer);
-	swap(read_buffer, ref.read_buffer);
 	unjumpable = move(ref.unjumpable);
 	swap(fixed_sequence, ref.fixed_sequence);
 	escaped_data_count_since_last_skip = move(ref.escaped_data_count_since_last_skip);
@@ -969,13 +1000,13 @@ namespace libdar
 	{
 		// we need more data
 
-	    if(already_read + ESCAPE_SEQUENCE_LENGTH >= READ_BUFFER_SIZE)
+	    if(already_read + ESCAPE_SEQUENCE_LENGTH >= read_buffer_alloc)
 	    {
 
 		    // we need room to place more data, so we skip data at the beginning of the read_buffer
 
 		if(already_read < ESCAPE_SEQUENCE_LENGTH)
-		    throw SRC_BUG; // READ_BUFFER_SIZE is expected to be (much) larger than twice the escape sequence length,
+		    throw SRC_BUG; // read_buffer_alloc is expected to be (much) larger than twice the escape sequence length,
 		    // so now, we never have to use memmove in place of memcpy:
 		(void)memcpy(read_buffer, read_buffer + already_read, avail);
 

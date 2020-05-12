@@ -1943,7 +1943,7 @@ namespace libdar
             // sanity checks as much as possible to avoid libdar crashing due to bad arguments
             // useless arguments are not reported.
 
-        if(compression_level > 9 || compression_level < 1)
+        if((compression_level > 9 && algo != compression::zstd) || compression_level < 1)
             throw Elibcall("op_create_in", gettext("Compression_level must be between 1 and 9 included"));
         if(file_size.is_zero() && !first_file_size.is_zero())
             throw Elibcall("op_create_in", gettext("\"first_file_size\" cannot be different from zero if \"file_size\" is equal to zero"));
