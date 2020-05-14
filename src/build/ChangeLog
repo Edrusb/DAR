@@ -9,6 +9,8 @@ from 2.6.x to 2.7.0
 - added the possibility to specify a gnupg key by mean of its keyid in
   addition to the email address it may be associated to, both for
   asymmetrical encryption and archive signing.
+- added -b option to dar_split to set the I/O block size
+- added -r option to dar_split to limit the transfer rate
 
 from 2.6.9 to 2.6.10
 - update the configure script to handle some undocumented --enable-*
