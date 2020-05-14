@@ -11,6 +11,7 @@ from 2.6.x to 2.7.0
   asymmetrical encryption and archive signing.
 - added -b option to dar_split to set the I/O block size
 - added -r option to dar_split to limit the transfer rate
+- added -c option to dar_split to limit the number of tape to read
 
 from 2.6.9 to 2.6.10
 - update the configure script to handle some undocumented --enable-*

@@ -107,7 +107,7 @@ static void pipe_handle_pause(int x);
 static void pipe_handle_end(int x);
 static void alarm_handle(int x);
 static void normal_read_to_multiple_write(char *filename, int sync_mode, unsigned int bs, unsigned int rate);
-static void multi_read_to_normal_write(char *filename, unsigned int bs, unsigned int rate);
+static void multi_read_to_normal_write(char *filename, unsigned int bs, unsigned int rate, unsigned int count);
 static int open_read(char *filemane);  /* returns the filedescriptor */
 static int open_write(char *filename, int sync_mode); /* returns the filedescriptor */
 static void init_timer(unsigned int bufsize, unsigned int rate);
@@ -127,10 +127,11 @@ int main(int argc, char *argv[])
     int sync_mode = 0;
     unsigned int bs = 0;
     unsigned int rate = 0;
+    unsigned int count = 0;
 
 	/* command line parsing */
 
-    while((lu = getopt(argc, argv, "-sb:hvr:")) != EOF)
+    while((lu = getopt(argc, argv, "-sb:hvr:c:")) != EOF)
     {
 	switch(lu)
 	{
@@ -162,6 +163,9 @@ int main(int argc, char *argv[])
 	case 'r':
 	    rate = atoi(optarg);
 	    break;
+	case 'c':
+	    count = atoi(optarg);
+	    break;
 	case 'h':
 	    usage(argv[0]);
 	    return 0;
@@ -183,6 +187,18 @@ int main(int argc, char *argv[])
 	return ERR_SYNTAX;
     }
 
+    if(count > 0 && split_mode != 2)
+    {
+	fprintf(stderr, "-c option is only available in split_input mode\n");
+	return ERR_SYNTAX;
+    }
+
+    if(sync_mode == 1 && split_mode != 1)
+    {
+	fprintf(stderr, "-s option is only available in split_output mode\n");
+	return ERR_SYNTAX;
+    }
+
 	/* initialization */
 
     if(!init())
@@ -196,7 +212,7 @@ int main(int argc, char *argv[])
 	normal_read_to_multiple_write(splitted_file, sync_mode, bs, rate);
 	break;
     case 2:
-	multi_read_to_normal_write(splitted_file, bs, rate);
+	multi_read_to_normal_write(splitted_file, bs, rate, count);
 	break;
     default:
 	fprintf(stderr, "missing read mode argument. Please user either %s or %s\n",
@@ -212,12 +228,13 @@ int main(int argc, char *argv[])
 
 static void usage(char *a)
 {
-    fprintf(stderr, "\nusage: %s { %s | [-s] %s } [-b <block size>] [-r <rate>] <filename>\n\n", a, KEY_INPUT, KEY_OUTPUT);
+    fprintf(stderr, "\nusage: %s [-b <block size>] [-r <rate>] { [-c <count>] %s | [-s] %s } <filename>\n\n", a, KEY_INPUT, KEY_OUTPUT);
     fprintf(stderr, "- in %s mode, the data sent to %s's input is copied to the given filename\n  which may possibly be a non permanent output (retrying to write in case of failure)\n", KEY_OUTPUT, a);
     fprintf(stderr, "- in %s mode, the data is read from the given filename which may possibly\n  be non permanent input (retrying to read in case of failure) and copied to\n  %s's output\n", KEY_INPUT, a);
     fprintf(stderr, "\nThe -s option for %s mode leads %s to make SYNC writes, this avoid\n  operating system's caching to wrongly report a write as successful. This flag\n  reduces write performances but may be necessary when the end of tape is not\n  properly detected by %s\n", KEY_OUTPUT, a, a);
     fprintf(stderr, "With -b option the amount of bytes sent per read or write system call does\n  not exceed this amount in byte\n");
     fprintf(stderr, "With -r option the transfer is limited to the given byte/second rate\n");
+    fprintf(stderr, "With -c option dar_split will assume there is at most <count> tape and not ask\n   for further \n");
 }
 
 static void show_version(char *a)
@@ -420,7 +437,7 @@ static void normal_read_to_multiple_write(char *filename, int sync_mode, unsigne
 }
 
 
-static void multi_read_to_normal_write(char *filename, unsigned int bs, unsigned int rate)
+static void multi_read_to_normal_write(char *filename, unsigned int bs, unsigned int rate, unsigned int count)
 {
     unsigned int bufsize = (bs == 0 ? BUFSIZE: bs);
     char* buffer = (char*)malloc(BUFSIZE);
@@ -429,6 +446,7 @@ static void multi_read_to_normal_write(char *filename, unsigned int bs, unsigned
     int offset;
     int fd = buffer == NULL ? -1 : open_read(filename);
     int run = 1;
+    int iter = 0;
 
     if(buffer == NULL)
     {
@@ -446,10 +464,19 @@ static void multi_read_to_normal_write(char *filename, unsigned int bs, unsigned
 	if(lu == 0) // EOF
 	{
 	    close(fd);
-	    fprintf(stderr, "No more data available from source, please do something!\n");
-	    stop_and_wait();
-	    open_read(filename);
-	    continue; /* start over the while loop */
+	    ++iter;
+	    if(count == 0 || iter < count)
+	    {
+		if(count == 0)
+		    fprintf(stderr, "No more data available from source, please do something!\n");
+		else
+		    fprintf(stderr, "No more data available from source number %d, please do something!\n", iter);
+		stop_and_wait();
+		open_read(filename);
+		continue; /* start over the while loop */
+	    }
+	    else
+		break; // we have done all tapes, ending the process
 	}
 	else
 	{

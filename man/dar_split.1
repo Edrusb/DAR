@@ -3,7 +3,7 @@
 .SH NAME
 dar_split \- dar helper to split an archive over several tapes
 .SH SYNOPSIS
-dar_split { split_input | [-s] split_output } [-b <bytes>] [-r <rate>] <filename>
+dar_split [-b <bytes>] [-r <rate>] { [-c <count>] split_input | [-s] split_output } <filename>
 .P
 dar_split -v
 .P
@@ -17,20 +17,27 @@ is to be used with dar to read or write a large archive from or to several tapes
 has two modes of operation: split_input and split_output
 .TP 20
 split_input
-in this mode dar_split copies <filename> to its standard output. <filename> may be a special device like /dev/tape or any other inode that has the ability to access removeable volumes. When dar_split reaches the end of <filename> it suspends and waits for the user to press the return key in order to continue. In the meanwhile the user can rewind and change the tape. When dar_split is awaken again, it reopens <filename> and sends its content to its standard output as if it was the continuation of what was read so far before reaching the end of file.
+in this mode, dar_split copies <filename> to its standard output. <filename> may be a special device like /dev/tape or any other inode that has the ability to access removable volumes. When dar_split reaches the end of <filename> it suspends and waits for the user to press the return key in order to continue. In the meanwhile the user can rewind and change the tape. When dar_split is awaken again, it reopens <filename> and sends its content to its standard output as if it was the continuation of what was read so far before reaching the end of file.
 .TP 20
 split_output
-in this mode dar_split copies its standard input to <filename>. However if <filename> is full, dar_split suspends and waits for the user to press the return key in order to continue. In the meanwhile, the user can rewind and change the tape. When dar_split is awaken again, it reopens <filename> and continues to copy to <filename> what was not yet written previously.
+in this mode dar_split copies its standard input to <filename>. However if <filename> is full, dar_split suspends and waits for the user to press the return key in order to continue. In the meanwhile, the user can rewind and change the tape. When dar_split is awaken again, it reopens <filename> and continues to copy to <filename> what was not yet written previously. Pay attention to the fact that if you don't change the destination media, the continuation of data copy may erase what was written so far depending on the type of media.
 
 .SH OPTIONS
-.B -s
-is only available for split_output mode an leads dar_split to perform sync writes in place of normal writes. This has the drawback to drastically reduce performances but may be necessary under certain circumstances where the operating system cache reports a write operation as successful while the cache underlying medium is already full.
+.TP 20
+-s
+this option is only available in split_output mode an leads dar_split to perform sync writes in place of normal writes. This has the drawback to drastically reduce performances but may be necessary under certain circumstances where the operating system cache reports a write operation as successful while the cache underlying medium is already full.
 
-.B -b
-option makes read and write system call not exceed the given amount of bytes instead of by default using the maximum amount the system permits. This may reduce performances but can cope with some devices that accept only limited buffer size per system call.
+.TP 20
+-b <bytes>
+this option makes read and write system call not exceeding the given amount of bytes instead of by default using the maximum amount the system permits. This may reduce performances as it will require dar_split to make more system call to achieve the same operation, but can cope this way with some devices that accept only limited buffer size per system call.
 
-.B -r
-option limites the transfer rate a the given amount of bytes per second.
+.TP 20
+-r <rate>
+this option limits the transfer rate to the given value in bytes per second.
+
+.TP 20
+-c <count>
+this option limit the number of tape dar_split will read data from. If you know by advance this number, this avoid you having to stop by hand dar_split once the archive has been fully read. It will stop once the end of file of the <count> last file will be reached. This option is of course only available in split_input mode.
 
 .SH EXAMPLES OF USE
 creating an archive over several tapes
