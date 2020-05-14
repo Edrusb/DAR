@@ -2,6 +2,7 @@ from 2.6.9 to 2.6.10
 - update the configure script to handle some undocumented --enable-*
   options that existed but were not expected to be used.
 - fixed spelling in darrc comments
+- fixed bug in dar_split that could occur in very rare conditions
 
 from 2.6.8 to 2.6.9
 - fixed some obvious bug when running doxygen (inlined documentation)
