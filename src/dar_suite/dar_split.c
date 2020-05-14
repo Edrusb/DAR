@@ -70,6 +70,10 @@
 #include <getopt.h>
 #endif
 
+#if HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+
 /// the compiler Nature MACRO
 #ifdef __GNUC__
 #define CC_NAT "GNUC"
@@ -90,6 +94,7 @@
 #define DAR_SPLIT_VERSION "1.2.0"
 
 #define ERR_SYNTAX 1
+#define ERR_TIMER 2
 
 static void usage(char *a);
 static void show_version(char *a);
@@ -99,12 +104,16 @@ static void purge_fd(int fd);
 static void stop_and_wait();
 static void pipe_handle_pause(int x);
 static void pipe_handle_end(int x);
-static void normal_read_to_multiple_write(char *filename, int sync_mode, unsigned int bs);
-static void multi_read_to_normal_write(char *filename, unsigned int bs);
+static void alarm_handle(int x);
+static void normal_read_to_multiple_write(char *filename, int sync_mode, unsigned int bs, unsigned int rate);
+static void multi_read_to_normal_write(char *filename, unsigned int bs, unsigned int rate);
 static int open_read(char *filemane);  /* returns the filedescriptor */
 static int open_write(char *filename, int sync_mode); /* returns the filedescriptor */
+static void init_timer(unsigned int bufsize, unsigned int rate);
+static void rate_limit(unsigned int rate);
 
 static int fd_inter = -1;
+static int can_go = 0;
 
 int main(int argc, char *argv[])
 {
@@ -112,15 +121,15 @@ int main(int argc, char *argv[])
 
 	/* variables used to carry arguments */
 
-    unsigned int bs = 0;
-    int sync_mode = 0;
     int split_mode = 0; /* 0 : unset, 1 = normal_read , 2 = normal_write */
     char *splitted_file = NULL;
-
+    int sync_mode = 0;
+    unsigned int bs = 0;
+    unsigned int rate = 0;
 
 	/* command line parsing */
 
-    while((lu = getopt(argc, argv, "-sb:hv")) != EOF)
+    while((lu = getopt(argc, argv, "-sb:hvr:")) != EOF)
     {
 	switch(lu)
 	{
@@ -148,6 +157,9 @@ int main(int argc, char *argv[])
 	    break;
 	case 'b':
 	    bs = atoi(optarg);
+	    break;
+	case 'r':
+	    rate = atoi(optarg);
 	    break;
 	case 'h':
 	    usage(argv[0]);
@@ -180,10 +192,10 @@ int main(int argc, char *argv[])
     switch(split_mode)
     {
     case 1:
-	normal_read_to_multiple_write(splitted_file, sync_mode, bs);
+	normal_read_to_multiple_write(splitted_file, sync_mode, bs, rate);
 	break;
     case 2:
-	multi_read_to_normal_write(splitted_file, bs);
+	multi_read_to_normal_write(splitted_file, bs, rate);
 	break;
     default:
 	fprintf(stderr, "missing read mode argument. Please user either %s or %s\n",
@@ -199,7 +211,7 @@ int main(int argc, char *argv[])
 
 static void usage(char *a)
 {
-    fprintf(stderr, "\nusage: %s { %s | [-s] %s } [-b <block size>] <filename>\n\n", a, KEY_INPUT, KEY_OUTPUT);
+    fprintf(stderr, "\nusage: %s { %s | [-s] %s } [-b <block size>] [-r <rate>] <filename>\n\n", a, KEY_INPUT, KEY_OUTPUT);
     fprintf(stderr, "- in %s mode, the data sent to %s's input is copied to the given filename\n  which may possibly be a non permanent output (retrying to write in case of failure)\n", KEY_OUTPUT, a);
     fprintf(stderr, "- in %s mode, the data is read from the given filename which may possibly\n  be non permanent input (retrying to read in case of failure) and copied to\n  %s's output\n", KEY_INPUT, a);
     fprintf(stderr, "\nThe -s option for %s mode leads %s to make SYNC writes, this avoid\n  operating system's caching to wrongly report a write as successful. This flag\n  reduces write performances but may be necessary when the end of tape is not\n  properly detected by %s\n", KEY_OUTPUT, a, a);
@@ -283,8 +295,12 @@ static void pipe_handle_end(int x)
     exit(0);
 }
 
+static void alarm_handle(int x)
+{
+    can_go = 1;
+}
 
-static void normal_read_to_multiple_write(char *filename, int sync_mode, unsigned int bs)
+static void normal_read_to_multiple_write(char *filename, int sync_mode, unsigned int bs, unsigned int rate)
 {
     unsigned int bufsize = (bs == 0 ? BUFSIZE : bs);
     char* buffer = (char*) malloc(bufsize);
@@ -303,9 +319,11 @@ static void normal_read_to_multiple_write(char *filename, int sync_mode, unsigne
     }
 
     signal(SIGPIPE, pipe_handle_pause); /* handling case when writing to pipe that has no reader */
+    init_timer(bufsize, rate);
 
     while(run)
     {
+	rate_limit(rate);
 	lu = read(0, buffer, bufsize);
 	if(lu == 0) /* reached EOF */
 	    break; /* exiting the while loop, end of processing */
@@ -398,7 +416,7 @@ static void normal_read_to_multiple_write(char *filename, int sync_mode, unsigne
 }
 
 
-static void multi_read_to_normal_write(char *filename, unsigned int bs)
+static void multi_read_to_normal_write(char *filename, unsigned int bs, unsigned int rate)
 {
     unsigned int bufsize = (bs == 0 ? BUFSIZE: bs);
     char* buffer = (char*)malloc(BUFSIZE);
@@ -415,9 +433,11 @@ static void multi_read_to_normal_write(char *filename, unsigned int bs)
     }
 
     signal(SIGPIPE, pipe_handle_end); /* handling case when writing to pipe that has no reader */
+    init_timer(bufsize, rate);
 
     while(run)
     {
+	rate_limit(rate);
 	lu = read(fd, buffer, bufsize);
 	if(lu == 0) // EOF
 	{
@@ -532,4 +552,47 @@ static int open_read(char *filename)
     while(fd < 0);
 
     return fd;
+}
+
+static void init_timer(unsigned int bufsize, unsigned int rate)
+{
+    if(rate > 0)
+    {
+	struct timeval tm_int;
+	struct itimerval timer;
+
+		    /* program alarm() at correct rate */
+
+	signal(SIGALRM, alarm_handle);
+
+	tm_int.tv_sec = bufsize / rate ; /* integer division */
+	tm_int.tv_usec =  (bufsize % rate) * 1000000 / rate; /* remaining of the integer division expressed in microseconds */
+	timer.it_interval = tm_int;
+	timer.it_value = tm_int;
+
+	if(setitimer(ITIMER_REAL, &timer, NULL) != 0)
+	{
+	    fprintf(stderr, "Cannot set timer to control transfer rate: %s\n", strerror(errno));
+	    exit(ERR_TIMER);
+	}
+	can_go = 1;
+    }
+}
+
+static void rate_limit(unsigned int rate)
+{
+    if(rate > 0)
+    {
+	if(!can_go)
+	    pause();
+	    /* waiting for a signal (ALARM) some time fraction of time to
+	       not exceed the expected transfer rate
+	       if the incoming flow is faster, the input buffer will fill up to
+	       a time the OS will suspend the writer, dar_split will have enough
+	       data to write and continue at its pace. The OS may awake the writer
+	       at a later time for before the dar_split input get empty
+	    */
+
+	can_go = 0; // will be set to 1 by the timer handle
+    }
 }
