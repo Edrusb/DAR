@@ -95,6 +95,7 @@
 
 #define ERR_SYNTAX 1
 #define ERR_TIMER 2
+#define ERR_BUG 3
 
 static void usage(char *a);
 static void show_version(char *a);
@@ -383,7 +384,7 @@ static void normal_read_to_multiple_write(char *filename, int sync_mode, unsigne
 		if(ecru > lu)
 		{
 		    fprintf(stderr, "BUG MET at line %d\n", __LINE__);
-		    break; /* end or processing */
+		    exit(ERR_BUG); /* end or processing */
 		}
 		else
 		{
@@ -497,7 +498,7 @@ static void multi_read_to_normal_write(char *filename, unsigned int bs, unsigned
 	    if(ecru > lu)
 	    {
 		fprintf(stderr, "BUG MET at line %d\n", __LINE__);
-		break; /* end or processing */
+		exit(ERR_BUG); /* end or processing */
 	    }
 
 		/* starting from here no error occurred and lu >= ecru >= 0 */
