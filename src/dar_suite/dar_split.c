@@ -215,7 +215,8 @@ static void usage(char *a)
     fprintf(stderr, "- in %s mode, the data sent to %s's input is copied to the given filename\n  which may possibly be a non permanent output (retrying to write in case of failure)\n", KEY_OUTPUT, a);
     fprintf(stderr, "- in %s mode, the data is read from the given filename which may possibly\n  be non permanent input (retrying to read in case of failure) and copied to\n  %s's output\n", KEY_INPUT, a);
     fprintf(stderr, "\nThe -s option for %s mode leads %s to make SYNC writes, this avoid\n  operating system's caching to wrongly report a write as successful. This flag\n  reduces write performances but may be necessary when the end of tape is not\n  properly detected by %s\n", KEY_OUTPUT, a, a);
-    fprintf(stderr, " - with -b otpion the amount of data sent per read or write system call does not exceed this amount in byte\n");
+    fprintf(stderr, "With -b option the amount of bytes sent per read or write system call does\n  not exceed this amount in byte\n");
+    fprintf(stderr, "With -r option the transfer is limited to the given byte/second rate\n");
 }
 
 static void show_version(char *a)

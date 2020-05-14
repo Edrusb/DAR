@@ -3,7 +3,7 @@
 .SH NAME
 dar_split \- dar helper to split an archive over several tapes
 .SH SYNOPSIS
-dar_split { split_input | [-s] split_output } <filename>
+dar_split { split_input | [-s] split_output } [-b <bytes>] [-r <rate>] <filename>
 .P
 dar_split -v
 .P
@@ -25,6 +25,12 @@ in this mode dar_split copies its standard input to <filename>. However if <file
 .SH OPTIONS
 .B -s
 is only available for split_output mode an leads dar_split to perform sync writes in place of normal writes. This has the drawback to drastically reduce performances but may be necessary under certain circumstances where the operating system cache reports a write operation as successful while the cache underlying medium is already full.
+
+.B -b
+option makes read and write system call not exceed the given amount of bytes instead of by default using the maximum amount the system permits. This may reduce performances but can cope with some devices that accept only limited buffer size per system call.
+
+.B -r
+option limites the transfer rate a the given amount of bytes per second.
 
 .SH EXAMPLES OF USE
 creating an archive over several tapes
