@@ -164,6 +164,12 @@ int main(int argc, char *argv[])
 	}
     }
 
+    if(splitted_file == NULL)
+    {
+	fprintf(stderr, "Missing filename argument\n");
+	return ERR_SYNTAX;
+    }
+
 	/* initialization */
 
     if(!init())
