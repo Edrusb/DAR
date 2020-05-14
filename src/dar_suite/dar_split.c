@@ -66,6 +66,10 @@
 #include <limits.h>
 #endif
 
+#if HAVE_GETOPT_H
+#include <getopt.h>
+#endif
+
 /// the compiler Nature MACRO
 #ifdef __GNUC__
 #define CC_NAT "GNUC"
@@ -83,7 +87,9 @@
 
 #define KEY_INPUT "split_input"
 #define KEY_OUTPUT "split_output"
-#define DAR_SPLIT_VERSION "1.1.2"
+#define DAR_SPLIT_VERSION "1.2.0"
+
+#define ERR_SYNTAX 1
 
 static void usage(char *a);
 static void show_version(char *a);
@@ -93,8 +99,8 @@ static void purge_fd(int fd);
 static void stop_and_wait();
 static void pipe_handle_pause(int x);
 static void pipe_handle_end(int x);
-static void normal_read_to_multiple_write(char *filename, int sync_mode);
-static void multi_read_to_normal_write(char *filename);
+static void normal_read_to_multiple_write(char *filename, int sync_mode, unsigned int bs);
+static void multi_read_to_normal_write(char *filename, unsigned int bs);
 static int open_read(char *filemane);  /* returns the filedescriptor */
 static int open_write(char *filename, int sync_mode); /* returns the filedescriptor */
 
@@ -102,39 +108,60 @@ static int fd_inter = -1;
 
 int main(int argc, char *argv[])
 {
-    int key_index = 1; /* the expected position of the command */
+    signed int lu;
+
+	/* variables used to carry arguments */
+
+    unsigned int bs = 0;
+    int sync_mode = 0;
+    int split_mode = 0; /* 0 : unset, 1 = normal_read , 2 = normal_write */
+    char *splitted_file = NULL;
+
 
 	/* command line parsing */
 
-    switch(argc)
+    while((lu = getopt(argc, argv, "-sb:hv")) != EOF)
     {
-    case 2:
-	if(strcmp("-v", argv[1]) == 0
-	   || strcmp("--version", argv[1]) == 0
-	   || strcmp("-V", argv[1]) == 0)
+	switch(lu)
 	{
+	case 1: /* non option argument due to the initial '-' in getopt string */
+	    if(split_mode == 0)
+	    {
+		if(strcmp(KEY_OUTPUT, optarg) == 0)
+		    split_mode = 1;
+		else if(strcmp(KEY_INPUT, optarg) == 0)
+		    split_mode = 2;
+		else
+		{
+		    fprintf(stderr, "Unknown mode %s. Please use either %s or %s\n",
+			    optarg,
+			    KEY_OUTPUT,
+			    KEY_INPUT);
+		    return ERR_SYNTAX;
+		}
+	    }
+	    else /* now reading the filename */
+		splitted_file = optarg;
+	    break;
+	case 's':
+	    sync_mode = 1;
+	    break;
+	case 'b':
+	    bs = atoi(optarg);
+	    break;
+	case 'h':
+	    usage(argv[0]);
+	    return 0;
+	case 'v':
 	    show_version(argv[0]);
 	    return 0;
+	case ':':
+	    fprintf(stderr, "Missing parameter to option -%c\n", (char)optopt);
+	    return ERR_SYNTAX;
+	case '?':
+	    fprintf(stderr, "Ignoring unknown option -%c\n", (char)optopt);
+	    return ERR_SYNTAX;
 	}
-	else
-	{
-	    usage(argv[0]);
-	    return 1;
-	}
-    case 3:
-	break;
-    case 4:
-	if(strcmp(argv[1], "-s") != 0)
-	{
-	    usage(argv[0]);
-	    return 1;
-	}
-	else /* -s option has been given */
-	    key_index = 2;
-	break;
-    default:
-	usage(argv[0]);
-	return 1;
     }
 
 	/* initialization */
@@ -144,16 +171,20 @@ int main(int argc, char *argv[])
 
 	/* execution */
 
-    if(strcmp(KEY_OUTPUT, argv[key_index]) == 0)
-	normal_read_to_multiple_write(argv[key_index + 1], key_index == 2);
-    else
-	if(strcmp(KEY_INPUT, argv[key_index]) == 0)
-	    if(key_index == 1)
-		multi_read_to_normal_write(argv[key_index + 1]);
-	    else
-		usage(argv[0]); /* -s option not available with KEY_INPUT */
-	else
-	    usage(argv[0]);
+    switch(split_mode)
+    {
+    case 1:
+	normal_read_to_multiple_write(splitted_file, sync_mode, bs);
+	break;
+    case 2:
+	multi_read_to_normal_write(splitted_file, bs);
+	break;
+    default:
+	fprintf(stderr, "missing read mode argument. Please user either %s or %s\n",
+		KEY_OUTPUT,
+		KEY_INPUT);
+	return ERR_SYNTAX;
+    }
 
 	/* normal exit */
 
@@ -162,10 +193,11 @@ int main(int argc, char *argv[])
 
 static void usage(char *a)
 {
-    fprintf(stderr, "usage: %s { %s | [-s] %s } <filename>\n", a, KEY_INPUT, KEY_OUTPUT);
+    fprintf(stderr, "\nusage: %s { %s | [-s] %s } [-b <block size>] <filename>\n\n", a, KEY_INPUT, KEY_OUTPUT);
     fprintf(stderr, "- in %s mode, the data sent to %s's input is copied to the given filename\n  which may possibly be a non permanent output (retrying to write in case of failure)\n", KEY_OUTPUT, a);
     fprintf(stderr, "- in %s mode, the data is read from the given filename which may possibly\n  be non permanent input (retrying to read in case of failure) and copied to\n  %s's output\n", KEY_INPUT, a);
     fprintf(stderr, "\nThe -s option for %s mode leads %s to make SYNC writes, this avoid\n  operating system's caching to wrongly report a write as successful. This flag\n  reduces write performances but may be necessary when the end of tape is not\n  properly detected by %s\n", KEY_OUTPUT, a, a);
+    fprintf(stderr, " - with -b otpion the amount of data sent per read or write system call does not exceed this amount in byte\n");
 }
 
 static void show_version(char *a)
@@ -246,9 +278,10 @@ static void pipe_handle_end(int x)
 }
 
 
-static void normal_read_to_multiple_write(char *filename, int sync_mode)
+static void normal_read_to_multiple_write(char *filename, int sync_mode, unsigned int bs)
 {
-    char* buffer = (char*) malloc(BUFSIZE);
+    unsigned int bufsize = (bs == 0 ? BUFSIZE : bs);
+    char* buffer = (char*) malloc(bufsize);
     int lu;
     int ecru;
     int offset;
@@ -267,7 +300,7 @@ static void normal_read_to_multiple_write(char *filename, int sync_mode)
 
     while(run)
     {
-	lu = read(0, buffer, BUFSIZE);
+	lu = read(0, buffer, bufsize);
 	if(lu == 0) /* reached EOF */
 	    break; /* exiting the while loop, end of processing */
 
@@ -359,8 +392,9 @@ static void normal_read_to_multiple_write(char *filename, int sync_mode)
 }
 
 
-static void multi_read_to_normal_write(char *filename)
+static void multi_read_to_normal_write(char *filename, unsigned int bs)
 {
+    unsigned int bufsize = (bs == 0 ? BUFSIZE: bs);
     char* buffer = (char*)malloc(BUFSIZE);
     int lu;
     int ecru;
@@ -378,7 +412,7 @@ static void multi_read_to_normal_write(char *filename)
 
     while(run)
     {
-	lu = read(fd, buffer, BUFSIZE);
+	lu = read(fd, buffer, bufsize);
 	if(lu == 0) // EOF
 	{
 	    close(fd);
