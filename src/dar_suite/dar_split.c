@@ -391,6 +391,8 @@ static void normal_read_to_multiple_write(char *filename, int sync_mode, unsigne
 
 		    offset += ecru;
 		    lu -= ecru;
+		    if(step > lu)
+			step = lu;
 		    tape_size += ecru;
 		}
 	    }
