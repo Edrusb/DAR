@@ -106,6 +106,12 @@ int main()
 	    throw Efeature("libxz");
 	}
 
+	if(!compile_time::libzstd())
+	{
+	    cerr << "MISSING ZSTD COMPRESSION SUPPORT TO BE ABLE TO PERFORM ALL TESTS, ABORTING" << endl;
+	    throw Efeature("libxz");
+	}
+
 	if(!compile_time::libgcrypt())
 	{
 	    cerr << "MISSING STRONG ENCRYPTION SUPPORT TO BE ABLE TO PERFORM ALL TESTS, ABORTING" << endl;
