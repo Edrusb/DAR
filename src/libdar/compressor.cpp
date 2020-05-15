@@ -107,6 +107,54 @@ namespace libdar
         compressed_owner = true;
     }
 
+        compressor::~compressor()
+    {
+	try
+	{
+	    terminate();
+	}
+	catch(...)
+	{
+		// ignore all exceptions
+	}
+	if(compr != nullptr)
+	    delete compr;
+	if(decompr != nullptr)
+	    delete decompr;
+	if(lzo_read_buffer != nullptr)
+	    delete [] lzo_read_buffer;
+	if(lzo_write_buffer != nullptr)
+	    delete [] lzo_write_buffer;
+	if(lzo_compressed != nullptr)
+	    delete [] lzo_compressed;
+	if(lzo_wrkmem != nullptr)
+	    delete [] lzo_wrkmem;
+	if(compressed_owner)
+	    if(compressed != nullptr)
+		delete compressed;
+	if(zstd_ptr != nullptr)
+	    delete zstd_ptr;
+    }
+
+    void compressor::suspend_compression()
+    {
+	if(!suspended)
+	{
+	    suspended_compr = current_algo;
+	    change_algo(compression::none);
+	    suspended = true;
+	}
+    }
+
+    void compressor::resume_compression()
+    {
+	if(suspended)
+	{
+	    change_algo(suspended_compr);
+	    suspended = false;
+	}
+    }
+
     void compressor::init(compression algo, generic_file *compressed_side, U_I compression_level)
     {
             // these are eventually overwritten below
@@ -286,53 +334,6 @@ namespace libdar
         compressed = compressed_side;
     }
 
-    compressor::~compressor()
-    {
-	try
-	{
-	    terminate();
-	}
-	catch(...)
-	{
-		// ignore all exceptions
-	}
-	if(compr != nullptr)
-	    delete compr;
-	if(decompr != nullptr)
-	    delete decompr;
-	if(lzo_read_buffer != nullptr)
-	    delete [] lzo_read_buffer;
-	if(lzo_write_buffer != nullptr)
-	    delete [] lzo_write_buffer;
-	if(lzo_compressed != nullptr)
-	    delete [] lzo_compressed;
-	if(lzo_wrkmem != nullptr)
-	    delete [] lzo_wrkmem;
-	if(compressed_owner)
-	    if(compressed != nullptr)
-		delete compressed;
-	if(zstd_ptr != nullptr)
-	    delete zstd_ptr;
-    }
-
-    void compressor::suspend_compression()
-    {
-	if(!suspended)
-	{
-	    suspended_compr = current_algo;
-	    change_algo(compression::none);
-	    suspended = true;
-	}
-    }
-
-    void compressor::resume_compression()
-    {
-	if(suspended)
-	{
-	    change_algo(suspended_compr);
-	    suspended = false;
-	}
-    }
 
     void compressor::inherited_truncate(const infinint & pos)
     {
