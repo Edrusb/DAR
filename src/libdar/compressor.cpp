@@ -140,8 +140,8 @@ namespace libdar
     {
 	if(!suspended)
 	{
-	    suspended_compr = current_algo;
-	    change_algo(compression::none);
+	    flush_and_reset_compr_engine();
+	    hijacking_compr_method(compression::none);
 	    suspended = true;
 	}
     }
@@ -150,7 +150,7 @@ namespace libdar
     {
 	if(suspended)
 	{
-	    change_algo(suspended_compr);
+	    hijacking_compr_method(current_algo);
 	    suspended = false;
 	}
     }
@@ -176,11 +176,11 @@ namespace libdar
 	lzo_wrkmem = nullptr;
 	zstd_ptr = nullptr;
 
+	hijacking_compr_method(algo);
+
         switch(algo)
         {
         case compression::none:
-            read_ptr = &compressor::none_read;
-            write_ptr = &compressor::none_write;
             break;
         case compression::bzip2:
 	case compression::xz:
@@ -191,8 +191,6 @@ namespace libdar
 
                 // NO BREAK !
         case compression::gzip:
-            read_ptr = &compressor::gzip_read;
-            write_ptr = &compressor::gzip_write;
             compr = new (nothrow) xfer(BUFFER_SIZE, wr_mode);
             if(compr == nullptr)
                 throw Ememory("compressor::compressor");
@@ -262,8 +260,6 @@ namespace libdar
 	case compression::lzo1x_1_15:
 	case compression::lzo1x_1:
 #if LIBLZO2_AVAILABLE
-	    read_ptr = &compressor::lzo_read;
-	    write_ptr = &compressor::lzo_write;
 	    lzo_read_size = lzo_write_size = 0;
 	    lzo_read_start = 0;
 	    lzo_write_flushed = true;
@@ -319,8 +315,6 @@ namespace libdar
 	    throw Ecompilation("lzo compression support (liblzo2)");
 #endif
 	case compression::zstd:
-	    read_ptr = &compressor::zstd_read;
-	    write_ptr = & compressor::zstd_write;
 	    zstd_ptr = new (nothrow) zstd(get_mode(),
 					  compression_level,
 					  compressed_side);
@@ -334,6 +328,53 @@ namespace libdar
         compressed = compressed_side;
     }
 
+    void compressor::flush_and_reset_compr_engine()
+    {
+	switch(get_mode())
+	{
+	case gf_read_only:
+	    flush_read();
+	    break;
+	case gf_write_only:
+	    sync_write();
+	    break;
+	case gf_read_write:
+	    flush_read();
+	    sync_write();
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
+    }
+
+    void compressor::hijacking_compr_method(compression algo)
+    {
+	switch(algo)
+	{
+	case compression::none:
+	    read_ptr = &compressor::none_read;
+            write_ptr = &compressor::none_write;
+            break;
+	case compression::gzip:
+	case compression::bzip2:
+	case compression::xz:
+	    read_ptr = &compressor::gzip_read;
+            write_ptr = &compressor::gzip_write;
+	    break;
+	case compression::lzo:
+	case compression::lzo1x_1_15:
+	case compression::lzo1x_1:
+	    read_ptr = &compressor::lzo_read;
+	    write_ptr = &compressor::lzo_write;
+	    break;
+	case compression::zstd:
+	    read_ptr = &compressor::zstd_read;
+	    write_ptr = & compressor::zstd_write;
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
+    }
 
     void compressor::inherited_truncate(const infinint & pos)
     {
