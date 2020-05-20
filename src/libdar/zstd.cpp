@@ -277,6 +277,7 @@ namespace libdar
 	no_comp_data = false;
 	clear_inbuf();
 	clear_outbuf();
+	(void)ZSTD_initDStream(decomp);
 #else
 	throw Ecompilation(gettext("zstd compression"));
 #endif
