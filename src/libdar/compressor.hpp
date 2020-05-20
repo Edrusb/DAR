@@ -105,7 +105,7 @@ namespace libdar
 	};
 
 
-        xfer *compr, *decompr;     ///< datastructure for bzip2 an gzip compression
+        xfer *compr, *decompr;     ///< datastructure for bzip2, gzip and zx compression
 
 	char *lzo_read_buffer;     ///< stores clear data (uncompressed) read from the compressed generic_file
 	char *lzo_write_buffer;    ///< stores the clear data to be compressed and written to the compressed generic_file
@@ -117,7 +117,7 @@ namespace libdar
 	char *lzo_compressed;      ///< compressed data just read or about to be written
 	char *lzo_wrkmem;          ///< work memory for LZO library
 
-	zstd* zstd_ptr;            ///< class that handles libzstd interraction
+	zstd* zstd_ptr;            ///< class that handles libzstd interaction
 
         generic_file *compressed;
         bool compressed_owner;
