@@ -62,12 +62,12 @@ namespace libdar
 
 	U_I read(char *a, U_I size);
 	void write(const char *a, U_I size);
-	void compr_flush_write();
-	void compr_flush_read();
+	void compr_flush_write(); ///< flush data but does not reset the engine
+	void compr_flush_read(); ///< flush data but does not reset the engine
 	void compr_flush() { mode == gf_read_only? compr_flush_read(): compr_flush_write(); };
-	void clean_read();
-	void clean_write();
-	void clean() { mode == gf_read_only? clean_read(): clean_write(); };
+	void clean_read(); ///< reset the engine, drop anything pending
+	void clean_write(); ///< reset the engine, drop anything pending
+	void clean() { clean_read(); clean_write(); };
 
     private:
 	gf_mode mode;
@@ -83,8 +83,8 @@ namespace libdar
 	U_I below_tampon_size; // allocated size of tampon
 	U_I above_tampon_size; // max size of input data
 
-	bool flueof;  //< is EOF in read mode and flushed in write mode
-	bool no_comp_data; //< EOF in underlying layer in read mode
+	bool flueof;  ///< is EOF in read mode and flushed in write mode
+	bool no_comp_data; ///< EOF in underlying layer in read mode
 #endif
 
 	void clear_inbuf();
