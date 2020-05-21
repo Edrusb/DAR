@@ -60,7 +60,7 @@ namespace libdar
 	compressor & operator = (compressor && ref) = delete;
         ~compressor();
 
-        compression get_algo() const { return (current_algo == compression::lzo1x_1_15 || current_algo == compression::lzo1x_1) ? compression::lzo : current_algo; };
+        compression get_algo() const;
 
 	void suspend_compression();
 	void resume_compression();

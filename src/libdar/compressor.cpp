@@ -136,6 +136,14 @@ namespace libdar
 	    delete zstd_ptr;
     }
 
+    compression compressor::get_algo() const
+    {
+	if(suspended)
+	    return compression::none;
+	else
+	    return (current_algo == compression::lzo1x_1_15 || current_algo == compression::lzo1x_1) ? compression::lzo : current_algo;
+    }
+
     void compressor::suspend_compression()
     {
 	if(!suspended)
