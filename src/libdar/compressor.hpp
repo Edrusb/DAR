@@ -147,6 +147,7 @@ namespace libdar
 
 	void lzo_compress_buffer_and_write();
 	void lzo_read_and_uncompress_to_buffer();
+	void lzo_clear_fields();
 
 	    /// changes compression algorithm used by the compressor
 

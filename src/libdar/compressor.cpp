@@ -260,10 +260,7 @@ namespace libdar
 	case compression::lzo1x_1_15:
 	case compression::lzo1x_1:
 #if LIBLZO2_AVAILABLE
-	    lzo_read_size = lzo_write_size = 0;
-	    lzo_read_start = 0;
-	    lzo_write_flushed = true;
-	    lzo_read_reached_eof = false;
+	    lzo_clear_fields();
 	    try
 	    {
 		lzo_read_buffer = new (nothrow) char[LZO_CLEAR_BUFFER_SIZE];
@@ -921,6 +918,17 @@ namespace libdar
 #else
 	throw Ecompilation(gettext("lzo compression"));
 #endif
+    }
+
+    void compressor::lzo_clear_fields()
+    {
+	    // read
+	lzo_read_start = 0;
+	lzo_read_size = 0;
+	lzo_read_reached_eof = false;
+	    // write
+	lzo_write_size = 0;
+	lzo_write_flushed = true;
     }
 
     void compressor::lzo_block_header::dump(generic_file & f)
