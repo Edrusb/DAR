@@ -709,7 +709,7 @@ AS_IF(          [test "x$enable_ea_support" != "xyes"],
                                                      #if HAVE_SYS_TYPES_H
                                                      #include <sys/types.h>
                                                      #endif
-                                                     #if HAVE_ATTR_XATTR_H
+                                                     #if HAVE_ATTR_XATTR_H && ! HAVE_SYS_XATTR_H
                                                      #include <attr/xattr.h>
                                                      #endif
                                                      #if HAVE_SYS_XATTR_H
