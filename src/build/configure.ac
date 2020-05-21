@@ -627,14 +627,26 @@ AS_IF(       [test "x$enable_libzstd_linking" != "xyes"],
                                         local_libzstd="no"
                                        ])
                if test "$local_libzstd" = "yes" ; then
-               AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
+	       min_maj_version_zstd=1
+	       min_min_version_zstd=3
+	       AC_DEFINE_UNQUOTED(MIN_MAJ_VERSION_ZSTD, "$min_maj_version_zstd", [libzstd minimum major version])
+	       AC_DEFINE_UNQUOTED(MIN_MIN_VERSION_ZSTD, "$min_min_version_zstd", [libzstd minimum minor version])
+               AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                                            #if HAVE_ZSTD_H
                                                            #include <zstd.h>
                                                            #endif
+							   #if HAVE_STDLIB_H
+							   #include <stdlib.h>
+							   #endif
                                               }]],
                                               [[
                                                          ZSTD_CStream *zs = ZSTD_createCStream();
 							 (void)ZSTD_freeCStream(zs);
+							 if(ZSTD_VERSION_MAJOR < atoi(MIN_MAJ_VERSION_ZSTD)
+							    || ZSTD_VERSION_MINOR < atoi(MIN_MIN_VERSION_ZSTD))
+							    return 1;
+							 else
+							    return 0;
                                               ]])
                               ],
                               [ AC_DEFINE(LIBZSTD_AVAILABLE, 1, [header and linking is available to have libzstd functions])],
