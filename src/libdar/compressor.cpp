@@ -140,7 +140,7 @@ namespace libdar
     {
 	if(!suspended)
 	{
-	    flush_and_reset_compr_engine();
+	    reset_compr_engine();
 	    hijacking_compr_method(compression::none);
 	    suspended = true;
 	}
@@ -328,7 +328,7 @@ namespace libdar
         compressed = compressed_side;
     }
 
-    void compressor::flush_and_reset_compr_engine()
+    void compressor::reset_compr_engine()
     {
 	switch(get_mode())
 	{

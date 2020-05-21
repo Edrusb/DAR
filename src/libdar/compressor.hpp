@@ -126,7 +126,7 @@ namespace libdar
 	U_I current_level;
 
         void init(compression algo, generic_file *compressed_side, U_I compression_level);
-	void flush_and_reset_compr_engine();    ///< reset the compression engine ready for use
+	void reset_compr_engine();    ///< reset the compression engine ready for use
 	void hijacking_compr_method(compression algo); ///< set compression method without touching the compression engine
         void local_terminate();
         U_I (compressor::*read_ptr) (char *a, U_I size);
