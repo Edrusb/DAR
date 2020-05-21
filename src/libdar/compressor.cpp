@@ -327,17 +327,27 @@ namespace libdar
 
     void compressor::reset_compr_engine()
     {
-	switch(get_mode())
-	{
-	case gf_read_only:
-	    flush_read();
+	switch(current_algo)
+        {
+        case compression::none:
+            break;
+        case compression::bzip2:
+	case compression::xz:
+        case compression::gzip:
+	    if(compr != nullptr)
+		compr->wrap.compressReset();
+	    if(decompr != nullptr)
+		decompr->wrap.decompressReset();
 	    break;
-	case gf_write_only:
-	    sync_write();
+	case compression::lzo:
+	case compression::lzo1x_1_15:
+	case compression::lzo1x_1:
+	    lzo_clear_fields();
 	    break;
-	case gf_read_write:
-	    flush_read();
-	    sync_write();
+	case compression::zstd:
+	    if(zstd_ptr == nullptr)
+	 	throw SRC_BUG;
+	    zstd_ptr->clean();
 	    break;
 	default:
 	    throw SRC_BUG;
