@@ -49,6 +49,11 @@ namespace libdar
 	below_tampon = nullptr;
 	no_comp_data = false;
 
+	U_I min_version = atoi(MIN_MAJ_VERSION_ZSTD)*100*100 + atoi(MIN_MIN_VERSION_ZSTD)*100 + 0;
+	if(ZSTD_versionNumber() < min_version)
+	    throw Ecompilation(tools_printf(gettext("need libzstd version greater or equal to %d (current version is %d)"),
+					    min_version,
+					    ZSTD_versionNumber()));
 	try
 	{
 	    switch(mode)
