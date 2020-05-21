@@ -795,7 +795,7 @@ namespace libdar
 	    lzo_read_size = 0;
 	}
 
-	if(zstd_ptr!= nullptr)
+	if(zstd_ptr != nullptr)
 	    zstd_ptr->clean_read();
     }
 
