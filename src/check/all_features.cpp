@@ -135,6 +135,12 @@ int main()
 	    cerr << "MISSING LIBCURL SUPPORT TO BE ABLE TO PERFORM ALL TESTS, ABORTING" << endl;
 	    throw Efeature("libcurl");
 	}
+
+	if(!compile_time::ea())
+	{
+	    cerr << "MISSING EA SUPPORT TO BE ABLE TO PERFORM ALL TESTS, ABORTING" << endl;
+	    throw Efeature("libcurl");
+	}
     }
     catch(...)
     {

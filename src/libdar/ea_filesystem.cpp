@@ -52,7 +52,7 @@ extern "C"
 #if HAVE_ERRNO_H
 #include <errno.h>
 #endif
-#if HAVE_ATTR_XATTR_H
+#if HAVE_ATTR_XATTR_H && ! HAVE_SYS_XATTR_H
 #include <attr/xattr.h>
 #endif
 #if HAVE_SYS_XATTR_H
