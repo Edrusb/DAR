@@ -960,7 +960,7 @@ bool line_tools_split_entrepot_path(const string &all,
     port.clear();
     path_basename.clear();
 
-    enum { s_proto, s_login, s_login_escape, s_pass, s_host, s_port, s_path, s_end } state = s_proto;
+    enum { s_proto, s_login, s_login_escape, s_pass, s_hote, s_port, s_path, s_end } state = s_proto;
 
     while(state != s_end && cursor < max)
     {
@@ -1005,7 +1005,7 @@ bool line_tools_split_entrepot_path(const string &all,
 	    switch(ch[cursor])
 	    {
 	    case '@':
-		state = s_host;
+		state = s_hote;
 		++cursor;
 		break;
 	    case ':':
@@ -1037,7 +1037,7 @@ bool line_tools_split_entrepot_path(const string &all,
 	    switch(ch[cursor])
 	    {
 	    case '@':
-		state = s_host;
+		state = s_hote;
 		if(ref_cur > cursor)
 		    throw SRC_BUG;
 		tmp = cursor - ref_cur;
@@ -1061,7 +1061,7 @@ bool line_tools_split_entrepot_path(const string &all,
 		++cursor;
 	    }
 	    break;
-	case s_host:
+	case s_hote:
 	    switch(ch[cursor])
 	    {
 	    case '@':
