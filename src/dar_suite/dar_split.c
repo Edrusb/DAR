@@ -231,7 +231,7 @@ static void stop_and_wait()
 
     purge_fd(fd_inter);
     fprintf(stderr, "Press return when ready to continue or hit CTRL-C to abort\n");
-    read(fd_inter, tmp, 3);
+    (void)read(fd_inter, tmp, 3);
 }
 
 static void pipe_handle_pause(int x)
