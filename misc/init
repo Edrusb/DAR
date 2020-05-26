@@ -42,16 +42,16 @@ export NLSPATH
 cp src/build/configure.ac .
 cp src/build/Makefile.am .
 
-libtoolize --automake
-gettextize --force
-po/generate_POTFILES.in
-aclocal -I m4
-autoconf
-autoheader
-automake --add-missing --gnu
+libtoolize --automake || (echo "libtoolize failed" && exit 1)
+gettextize --force    || (echo "gettextize failed" && exit 1)
+po/generate_POTFILES.in || (echo "generate_POTFILES.in failed" && exit 1)
+aclocal -I m4  || (echo "aclocal failed" && exit 1)
+autoconf || (echo "autoconf failed" && exit 1)
+autoheader || (echo "autoheader failed" && exit 1)
+automake --add-missing --gnu || (echo "automake failed" && exit 1)
 
-cp src/build/ChangeLog .
-chmod a-w configure.ac Makefile.am ChangeLog
+cp src/build/ChangeLog . || (echo "cp failed" && exit 1)
+chmod a-w configure.ac Makefile.am ChangeLog || (echo "chmod failed" && exit 1)
 if [ ! -e mkinstalldirs ]; then
 cp src/build/mkinstalldirs .
 fi
