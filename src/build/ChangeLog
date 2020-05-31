@@ -20,7 +20,7 @@ from 2.6.9 to 2.6.10
 - fixed bug in dar_split that could occur in very rare conditions
 - fixed EA support build failure due to what seems to be a change
   in Linux kernel header
-- fixed symbol conflict with s_host of in.h on omniOS plateform
+- fixed symbol conflict with s_host of in.h on omniOS platform
 
 from 2.6.8 to 2.6.9
 - fixed some obvious bug when running doxygen (inlined documentation)
