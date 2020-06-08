@@ -54,7 +54,7 @@ namespace libdar
 	    void set_the_set(std::set<archive_num> & archive) const;
 
 	private:
-	    bool ewr;
+	    bool ewr; ///< even when removed, ignore removed status
 	    std::deque<archive_num> num;
 	    std::deque<db_etat> status;
 	};
