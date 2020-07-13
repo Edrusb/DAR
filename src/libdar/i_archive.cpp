@@ -1691,7 +1691,7 @@ namespace libdar
 		    // throw a std::bad_alloc exception when calling reserve()
 		ret.reserve(sz);
 	    }
-	    catch(std::bad_alloc)
+	    catch(std::bad_alloc &)
 	    {
 		throw Ememory("std::vector<libdar::list_entry>::reserve()");
 	    }
