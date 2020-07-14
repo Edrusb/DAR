@@ -60,7 +60,7 @@ namespace libdar
     public:
 	    /// This is the constructor
 
-	    /// \param[in] block_size is the size of block encryption (the size of clear data encrypted toghether).
+	    /// \param[in] block_size is the size of block encryption (the size of clear data encrypted together).
 	    /// \param[in] encrypted_side where encrypted data are read from or written to.
   	    /// \param[in] no_initial_shift assume that no unencrypted data is located at the begining of the underlying file, else this is the
 	    /// position of the encrypted_side at the time of this call that is used as initial_shift
