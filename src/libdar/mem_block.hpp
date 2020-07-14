@@ -41,22 +41,30 @@ namespace libdar
     class mem_block
     {
     public:
-	mem_block(U_I size);
+	mem_block(U_I size = 0);
 	mem_block(const mem_block &ref) = delete;
 	mem_block(mem_block && ref) noexcept = default;
 	mem_block & operator = (const mem_block & ref) = delete;
 	mem_block & operator = (mem_block && ref) noexcept = default;
 	virtual ~mem_block();
 
+
+	void resize(U_I size);
+
 	U_I read(char *a, U_I size);            ///< read data from the mem_block, returns the amount read
 	U_I write(const char *a, U_I size);     ///< write data to the mem_block, returns the amount wrote
-	void reset_read() { read_cursor = 0; }; ///< reset read cursor
-	void clear() { data_size = 0; read_cursor = 0; write_cursor = 0; };
+	void rewind_read(U_I offset = 0); ///< reset read cursor
+	void reset() { data_size = 0; read_cursor = 0; write_cursor = 0; };
+	U_I get_data_size() const { return data_size; };
+	U_I get_max_size() const { return alloc_size; };
+	U_I get_read_offset() const { return read_cursor; };
+	bool is_full() const { return data_size == alloc_size; };
+	bool is_empty() const { return data_size == 0; };
 
     private:
 	char *data;
-	U_I data_size;
 	U_I alloc_size;
+	U_I data_size;
 	U_I read_cursor;
 	U_I write_cursor;
     };

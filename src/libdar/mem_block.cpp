@@ -38,19 +38,32 @@ namespace libdar
 
     mem_block::mem_block(U_I size)
     {
-	data = new (nothrow) char[size];
-	if(data == nullptr)
-	    throw Ememory("mem_block::mem_block");
-	data_size = 0;
-	alloc_size = size;
-	read_cursor = 0;
-	write_cursor = 0;
+	data = nullptr;
+	resize(size);
     }
 
     mem_block::~mem_block()
     {
 	if(data != nullptr)
 	    delete [] data;
+    }
+
+    void mem_block::resize(U_I size)
+    {
+	if(data != nullptr)
+	    delete [] data;
+	data = nullptr;
+
+	if(size > 0)
+	{
+	    data = new (nothrow) char[size];
+	    if(data == nullptr)
+		throw Ememory("mem_block::mem_block");
+	}
+	alloc_size = size;
+	data_size = 0;
+	read_cursor = 0;
+	write_cursor = 0;
     }
 
     U_I mem_block::read(char *a, U_I size)
@@ -76,5 +89,11 @@ namespace libdar
 	return amount;
     }
 
+    void mem_block::rewind_read(U_I offset)
+    {
+	if(offset > data_size)
+	    throw Erange("mem_block::reset_read", "offset out of range for mem_block");
+	read_cursor = offset;
+    }
 
 } // end of namespace
