@@ -66,8 +66,11 @@ int main()
 
 void f1()
 {
-    heap<U_I, U_I> montas(10, 5);
+    heap<U_I> montas;
     unique_ptr<U_I> ptr;
+
+    for(unsigned int i = 0; i < 10; ++i)
+	montas.put(std::unique_ptr<U_I>(new U_I(5)));
 
     cout << montas.get_size() << endl;
     ptr = montas.get();

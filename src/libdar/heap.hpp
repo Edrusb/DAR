@@ -40,10 +40,10 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-    template <class T, class ARG> class heap
+    template <class T> class heap
     {
     public:
-	heap(U_I size, const ARG & val);
+	heap() {}; // start with an empty heap
 	heap(const heap & ref) = delete;
 	heap(heap && ref) noexcept = default;
 	heap & operator = (const heap & ref) = delete;
@@ -57,20 +57,7 @@ namespace libdar
 	std::deque<std::unique_ptr<T> > tas;
     };
 
-    template <class T, class ARG> heap<T,ARG>::heap(U_I size, const ARG & val)
-    {
-	for(U_I i = 0; i < size; ++i)
-	{
-	    tas.push_back(std::unique_ptr<T>(new T(val)));
-	    if(!tas.back()) // the unique_ptr we just added to 'tas' points to no object
-	    {
-		tas.clear();
-		throw Ememory("hear::heap");
-	    }
-	}
-    }
-
-    template <class T, class ARG> std::unique_ptr<T> heap<T,ARG>::get()
+    template <class T> std::unique_ptr<T> heap<T>::get()
     {
 	std::unique_ptr<T> ret;
 
@@ -83,7 +70,7 @@ namespace libdar
 	return ret;
     }
 
-    template <class T, class ARG> void heap<T, ARG>::put(std::unique_ptr<T> && obj)
+    template <class T> void heap<T>::put(std::unique_ptr<T> && obj)
     {
 	tas.push_back(std::move(obj));
     }
