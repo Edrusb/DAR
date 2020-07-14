@@ -96,4 +96,11 @@ namespace libdar
 	read_cursor = offset;
     }
 
+    void mem_block::set_data_size(U_I size)
+    {
+	if(size > alloc_size)
+	    throw SRC_BUG;
+	data_size = size;
+    }
+
 } // end of namespace

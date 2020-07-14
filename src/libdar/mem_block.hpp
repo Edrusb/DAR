@@ -61,6 +61,9 @@ namespace libdar
 	bool is_full() const { return data_size == alloc_size; };
 	bool is_empty() const { return data_size == 0; };
 
+	char *get_addr() { return data; };
+	vois set_data_size(U_I size);
+
     private:
 	char *data;
 	U_I alloc_size;
