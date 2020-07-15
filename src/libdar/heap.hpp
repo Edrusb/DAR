@@ -33,6 +33,9 @@
 #include "integers.hpp"
 #include <memory>
 #include <deque>
+#if HAVE_LIBTHREADAR_LIBTHREADAR_HPP
+#include <libthreadar/libthreadar.hpp>
+#endif
 
 namespace libdar
 {
@@ -55,24 +58,45 @@ namespace libdar
 
     private:
 	std::deque<std::unique_ptr<T> > tas;
+	libthreadar::mutex access;
     };
 
     template <class T> std::unique_ptr<T> heap<T>::get()
     {
 	std::unique_ptr<T> ret;
 
-	if(tas.empty())
-	    throw Erange("heap::get", "heap is empty, it should have be set larger");
+	access.lock();
+	try
+	{
+	    if(tas.empty())
+		throw Erange("heap::get", "heap is empty, it should have be set larger");
 
-	ret = std::move(tas.back()); // moving the object pointed to by tas.back() to ret
-	tas.pop_back(); // removing the now empty pointer at the end of back
+	    ret = std::move(tas.back()); // moving the object pointed to by tas.back() to ret
+	    tas.pop_back(); // removing the now empty pointer at the end of 'tas'
+	}
+	catch(...)
+	{
+	    access.unlock();
+	    throw;
+	}
+	access.unlock();
 
 	return ret;
     }
 
     template <class T> void heap<T>::put(std::unique_ptr<T> && obj)
     {
-	tas.push_back(std::move(obj));
+	access.lock();
+	try
+	{
+	    tas.push_back(std::move(obj));
+	}
+	catch(...)
+	{
+	    access.unlock();
+	    throw;
+	}
+	access.unlock();
     }
 
 	/// @}
