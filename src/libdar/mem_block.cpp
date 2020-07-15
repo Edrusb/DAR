@@ -84,7 +84,8 @@ namespace libdar
 
 	memcpy(data + write_cursor, a, amount);
 	write_cursor += amount;
-	data_size += amount;
+	if(data_size < write_cursor)
+	    data_size = write_cursor;
 
 	return amount;
     }
