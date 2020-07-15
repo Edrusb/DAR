@@ -62,7 +62,7 @@ namespace libdar
 	bool is_empty() const { return data_size == 0; };
 
 	char *get_addr() { return data; };
-	vois set_data_size(U_I size);
+	void set_data_size(U_I size);
 
     private:
 	char *data;
