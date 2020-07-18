@@ -75,7 +75,7 @@ displays the information about the archives compiled in the database. In particu
 -D, --delete <number>[-<number>]
 removes an archive (or a range of archive) from the database. The number of the archive (or the min and max number or the archive range) is correspond to those given by the -l option. Note that all archive number greater than the one(s) to be delete will be decremented to keep continuous numbering of the archive inside the database. If a single number is given (not a range), it may be also a negative number, by which it means counting from the end. For example, -1 means the last archive of the base, -2 the penultimate, etc.
 .TP 20
--b, --base <number> <new_archive_basename>
+-b, --basename <number> <new_archive_basename>
 this option allows you to rename the archive basename (used when restoring files from it). Here too, the number may be also a negative number.
 .TP 20
 -p, --path <number> <path>
