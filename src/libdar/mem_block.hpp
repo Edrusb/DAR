@@ -55,9 +55,10 @@ namespace libdar
 	U_I write(const char *a, U_I size);     ///< write data to the mem_block, returns the amount wrote
 	void rewind_read(U_I offset = 0); ///< reset read cursor
 	void reset() { data_size = 0; read_cursor = 0; write_cursor = 0; };
-	U_I get_data_size() const { return data_size; };
 	U_I get_max_size() const { return alloc_size; };
+	U_I get_data_size() const { return data_size; };
 	U_I get_read_offset() const { return read_cursor; };
+	bool all_is_read() const { return read_cursor == data_size; };
 	bool is_full() const { return data_size == alloc_size; };
 	bool is_empty() const { return data_size == 0; };
 
