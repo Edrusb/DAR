@@ -26,12 +26,12 @@ extern "C"
 #if HAVE_STRING_H
 #include <string.h>
 #endif
-
-
 }
 
 #include "libdar.hpp"
 #include "../libdar/heap.hpp"
+
+#include <deque>
 
 using namespace libdar;
 using namespace std;
@@ -68,9 +68,13 @@ void f1()
 {
     heap<U_I> montas;
     unique_ptr<U_I> ptr;
+    deque<unique_ptr<U_I> > list;
 
     for(unsigned int i = 0; i < 10; ++i)
+    {
 	montas.put(std::unique_ptr<U_I>(new U_I(5)));
+	list.push_back(make_unique<U_I>(8));
+    }
 
     cout << montas.get_size() << endl;
     ptr = montas.get();
@@ -82,6 +86,9 @@ void f1()
     ptr = montas.get();
     cout << bool(ptr) << endl;
     cout << *ptr << endl;
+    cout << montas.get_size() << endl;
+    montas.put(list);
+    cout << montas.get_size() << endl;
 }
 
 
