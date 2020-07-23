@@ -54,6 +54,7 @@ namespace libdar
 
 	std::unique_ptr<T> get();
 	void put(std::unique_ptr<T> && obj);
+	void put(std::deque<std::unique_ptr<T> > & list);
 	U_I get_size() const { return tas.size(); };
 
     private:
@@ -90,6 +91,27 @@ namespace libdar
 	try
 	{
 	    tas.push_back(std::move(obj));
+	}
+	catch(...)
+	{
+	    access.unlock();
+	    throw;
+	}
+	access.unlock();
+    }
+
+    template <class T> void heap<T>::put(std::deque<std::unique_ptr<T> > & list)
+    {
+	typename std::deque<std::unique_ptr<T> >::iterator it = list.begin();
+
+	access.lock();
+	try
+	{
+	    while(it != list.end())
+	    {
+		tas.push_back(std::move(*it));
+		++it;
+	    }
 	}
 	catch(...)
 	{
