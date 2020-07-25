@@ -39,10 +39,12 @@ extern "C"
 #include "../my_config.h"
 #include <string>
 
-#include "tronconneuse.hpp"
+#include "crypto_module.hpp"
 #include "secu_string.hpp"
 #include "crypto.hpp"
 #include "archive_aux.hpp"
+#include "archive_version.hpp"
+
 
 namespace libdar
 {
@@ -61,24 +63,38 @@ namespace libdar
 
 	/// symetrical strong encryption, interface to grypt library
 
-    class crypto_sym : public tronconneuse
+    class crypto_sym : public crypto_module
     {
     public:
-	crypto_sym(U_32 block_size,
-		   const secu_string & password,
-		   generic_file & encrypted_side,
-		   bool no_initial_shift,
+	crypto_sym(const secu_string & password,
 		   const archive_version & reading_ver,
 		   crypto_algo algo,
 		   const std::string & salt, //< not used is use_pkcs5 below is not set
-		   infinint iteration_count, //< not used if use_pkcs5 is not set
+		   const infinint & iteration_count, //< not used if use_pkcs5 is not set
 		   hash_algo kdf_hash,       //< not used if use_pkcs5 is not set
 		   bool use_pkcs5);          //< must be set to true when password is human defined to add a key derivation
-	crypto_sym(const crypto_sym & ref) = delete;
-	crypto_sym(crypto_sym && ref) = delete;
-	crypto_sym & operator = (const crypto_sym & ref) = delete;
-	crypto_sym & operator = (crypto_sym && ref) = delete;
-	~crypto_sym() { detruit(); };
+	crypto_sym(const crypto_sym & ref) { copy_from(ref); };
+	crypto_sym(crypto_sym && ref) noexcept { try { move_from(std::move(ref)); } catch(...) {} };
+	crypto_sym & operator = (const crypto_sym & ref) { detruit(); copy_from(ref); return *this; };
+	crypto_sym & operator = (crypto_sym && ref) noexcept { try { detruit(); move_from(std::move(ref)); } catch(...) {} return *this; };
+	virtual ~crypto_sym() noexcept { try { detruit(); } catch(...) {} };
+
+	    // inherited from class crypto_module
+
+	virtual U_32 encrypted_block_size_for(U_32 clear_block_size) override;
+	virtual U_32 clear_block_allocated_size_for(U_32 clear_block_size) override;
+	virtual U_32 encrypt_data(const infinint & block_num,
+				  const char *clear_buf,
+				  const U_32 clear_size,
+				  const U_32 clear_allocated,
+				  char *crypt_buf, U_32 crypt_size) override;
+	virtual U_32 decrypt_data(const infinint & block_num,
+				  const char *crypt_buf,
+				  const U_32 crypt_size,
+				  char *clear_buf,
+				  U_32 clear_size) override;
+	virtual std::unique_ptr<crypto_module> clone() const override { return std::make_unique<crypto_sym>(*this); };
+
 
 	    /// returns the max key length in octets for the given algorithm
 	static size_t max_key_len(crypto_algo algo);
@@ -92,26 +108,28 @@ namespace libdar
 	    /// generates a random salt of given size
 	static std::string generate_salt(U_I size);
 
-    protected:
-	virtual U_32 encrypted_block_size_for(U_32 clear_block_size) override;
-	virtual U_32 clear_block_allocated_size_for(U_32 clear_block_size) override;
-	virtual U_32 encrypt_data(const infinint & block_num,
-			  const char *clear_buf, const U_32 clear_size, const U_32 clear_allocated,
-			  char *crypt_buf, U_32 crypt_size) override;
-	virtual U_32 decrypt_data(const infinint & block_num,
-			  const char *crypt_buf, const U_32 crypt_size,
-			  char *clear_buf, U_32 clear_size) override;
-
     private:
+	size_t algo_block_size;         ///< the block size of the algorithm (main key)
+	U_I algo_id;                    ///< algo ID in libgcrypt
+	archive_version reading_ver;
+
 #if CRYPTO_AVAILABLE
 	gcry_cipher_hd_t clef;       ///< used to encrypt/decrypt the data
 	gcry_cipher_hd_t essiv_clef; ///< used to build the Initialization Vector
 #endif
-	size_t algo_block_size;         ///< the block size of the algorithm (main key)
-	unsigned char *ivec;            ///< algo_block_size allocated in secure memory to be used as Initial Vector
-	U_I algo_id;                    ///< algo ID in libgcrypt
+	secu_string hashed_password;
+	unsigned char *ivec;         ///< algo_block_size allocated in secure memory to be used as Initial Vector
 
 	void detruit();
+	void make_keys_hashpass_and_ivec(const secu_string & password,
+					 crypto_algo algo,         ///< only use when use_pkcs5
+					 const std::string & salt, ///< only use when use_pkcs5
+					 infinint iteration_count, ///< only use when use_pkcs5
+					 hash_algo kdf_hash,       ///< only use when use_pkcs5
+					 bool use_pkcs5);
+
+	void copy_from(const crypto_sym & ref);
+	void move_from(crypto_sym && ref);
 
 	    /// creates a blowfish key using as key a SHA1 of the given string (no IV assigned)
 

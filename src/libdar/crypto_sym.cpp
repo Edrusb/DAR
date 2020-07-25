@@ -56,22 +56,19 @@ using namespace std;
 namespace libdar
 {
 
-    crypto_sym::crypto_sym(U_32 block_size,
-			   const secu_string & password,
-			   generic_file & encrypted_side,
-			   bool no_initial_shift,
-			   const archive_version & reading_ver,
+    crypto_sym::crypto_sym(const secu_string & password,
+			   const archive_version & reading_version,
 			   crypto_algo algo,
 			   const std::string & salt,
-			   infinint iteration_count,
+			   const infinint & iteration_count,
 			   hash_algo kdf_hash,
 			   bool use_pkcs5)
-	: tronconneuse(block_size, encrypted_side, no_initial_shift, reading_ver)
     {
 #if CRYPTO_AVAILABLE
-	ivec = nullptr;
 	clef = nullptr;
 	essiv_clef = nullptr;
+	ivec = nullptr;
+	reading_ver = reading_version;
 
 	if(reading_ver <= 5)
 	    throw Erange("crypto_sym::blowfish", gettext("Current implementation of blowfish encryption is not compatible with old (weak) implementation, use dar-2.3.x software or later (or other software based on libdar-4.4.x or greater) to read this archive"));
@@ -80,7 +77,6 @@ namespace libdar
 	    throw Erange("crypto_sym::crypto_sym", gettext("cannot use 'none' as hashing algorithm for key derivation function"));
 	else
 	{
-	    secu_string hashed_password;
 	    gcry_error_t err;
 
 	    algo_id = get_algo_id(algo);
@@ -98,49 +94,12 @@ namespace libdar
 	    if(algo_block_size == 0)
 		throw SRC_BUG;
 
-		// initializing ivec in secure memory
-	    ivec = (unsigned char *)gcry_malloc_secure(algo_block_size);
-	    if(ivec == nullptr)
-		throw Esecu_memory("crypto_sym::crypto_sym");
-
-	    try
-	    {
-		if(use_pkcs5)
-		{
-		    U_I it = 0;
-
-		    iteration_count.unstack(it);
-		    if(!iteration_count.is_zero())
-			throw Erange("crypto_sym::crypto_sym", gettext("Too large value give for key derivation interation count"));
-
-		    hashed_password = pkcs5_pass2key(password, salt, it, hash_algo_to_gcrypt_hash(kdf_hash), max_key_len_libdar(algo));
-		}
-		else
-		    hashed_password = password;
-
-		    // key handle initialization
-
-		err = gcry_cipher_open(&clef, algo_id, GCRY_CIPHER_MODE_CBC, GCRY_CIPHER_SECURE);
-		if(err != GPG_ERR_NO_ERROR)
-		    throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Error while opening libgcrypt key handle: %s/%s"),
-								       gcry_strsource(err),
-								       gcry_strerror(err)));
-
-		    // assigning key to the handle
-
-		err = gcry_cipher_setkey(clef, (const void *)hashed_password.c_str(), hashed_password.get_size());
-		if(err != GPG_ERR_NO_ERROR)
-		    throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Error while assigning key to libgcrypt key handle: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-
-		    // essiv initialization
-
-		dar_set_essiv(hashed_password, essiv_clef, get_reading_version(), algo);
-	    }
-	    catch(...)
-	    {
-		detruit();
-		throw;
-	    };
+	    make_keys_hashpass_and_ivec(password,
+					algo,
+					salt,
+					iteration_count,
+					kdf_hash,
+					use_pkcs5);
 
 #ifdef LIBDAR_NO_OPTIMIZATION
 	    self_test();
@@ -150,6 +109,7 @@ namespace libdar
 	throw Ecompilation(gettext("Missing strong encryption support (libgcrypt)"));
 #endif
     }
+
 
     size_t crypto_sym::max_key_len(crypto_algo algo)
     {
@@ -274,6 +234,92 @@ namespace libdar
 #endif
     }
 
+    void crypto_sym::make_keys_hashpass_and_ivec(const secu_string & password,
+						 crypto_algo algo,
+						 const std::string & salt,
+						 infinint iteration_count,
+						 hash_algo kdf_hash,
+						 bool use_pkcs5)
+    {
+	    // initializing ivec in secure memory
+	ivec = (unsigned char *)gcry_malloc_secure(algo_block_size);
+	if(ivec == nullptr)
+	    throw Esecu_memory("crypto_sym::crypto_sym");
+
+	try
+	{
+	    gcry_error_t err;
+
+	    if(use_pkcs5)
+	    {
+		U_I it = 0;
+
+		iteration_count.unstack(it);
+		if(!iteration_count.is_zero())
+		    throw Erange("crypto_sym::crypto_sym", gettext("Too large value give for key derivation interation count"));
+
+		hashed_password = pkcs5_pass2key(password, salt, it, hash_algo_to_gcrypt_hash(kdf_hash), max_key_len_libdar(algo));
+	    }
+	    else
+		hashed_password = password;
+
+		// key handle initialization
+
+	    err = gcry_cipher_open(&clef, algo_id, GCRY_CIPHER_MODE_CBC, GCRY_CIPHER_SECURE);
+	    if(err != GPG_ERR_NO_ERROR)
+		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Error while opening libgcrypt key handle: %s/%s"),
+								   gcry_strsource(err),
+								   gcry_strerror(err)));
+
+		// assigning key to the handle
+
+	    err = gcry_cipher_setkey(clef, (const void *)hashed_password.c_str(), hashed_password.get_size());
+	    if(err != GPG_ERR_NO_ERROR)
+		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Error while assigning key to libgcrypt key handle: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+
+		// essiv initialization
+
+	    dar_set_essiv(hashed_password, essiv_clef, reading_ver, algo);
+	}
+	catch(...)
+	{
+	    detruit();
+	    throw;
+	};
+    }
+
+    void crypto_sym::copy_from(const crypto_sym & ref)
+    {
+	algo_block_size = ref.algo_block_size;
+	algo_id = ref.algo_id;
+	reading_ver = ref.reading_ver;
+
+	make_keys_hashpass_and_ivec(ref.hashed_password,
+				    crypto_algo::none,
+				    "",
+				    0,
+				    hash_algo::none,
+				    false);
+	    // never use pkcs5 as the password
+	    // has already been hashed by the constructor
+	    // of the object we make a copy of
+
+    }
+
+    void crypto_sym::move_from(crypto_sym && ref)
+    {
+	    // we assume the current object has not field assiged
+	    // same as for copy_from():
+	algo_block_size = move(ref.algo_block_size);
+	algo_id = move(ref.algo_id);
+	clef = move(ref.clef);
+	ref.clef = nullptr;
+	essiv_clef = move(ref.essiv_clef);
+	ref.essiv_clef = nullptr;
+	hashed_password = move(ref.hashed_password);
+	ivec = move(ref.ivec);
+	ref.ivec = nullptr;
+    }
 
     U_32 crypto_sym::encrypted_block_size_for(U_32 clear_block_size)
     {
@@ -289,7 +335,9 @@ namespace libdar
     }
 
     U_32 crypto_sym::encrypt_data(const infinint & block_num,
-				  const char *clear_buf, const U_32 clear_size, const U_32 clear_allocated,
+				  const char *clear_buf,
+				  const U_32 clear_size,
+				  const U_32 clear_allocated,
 				  char *crypt_buf, U_32 crypt_size)
     {
 #if CRYPTO_AVAILABLE
@@ -329,7 +377,11 @@ namespace libdar
 #endif
     }
 
-    U_32 crypto_sym::decrypt_data(const infinint & block_num, const char *crypt_buf, const U_32 crypt_size, char *clear_buf, U_32 clear_size)
+    U_32 crypto_sym::decrypt_data(const infinint & block_num,
+				  const char *crypt_buf,
+				  const U_32 crypt_size,
+				  char *clear_buf,
+				  U_32 clear_size)
     {
 #if CRYPTO_AVAILABLE
 	gcry_error_t err;
@@ -344,7 +396,7 @@ namespace libdar
 	err = gcry_cipher_decrypt(clef, (unsigned char *)clear_buf, crypt_size, (const unsigned char *)crypt_buf, crypt_size);
 	if(err != GPG_ERR_NO_ERROR)
 	    throw Erange("crypto_sym::crypto_encrypt_data",tools_printf(gettext("Error while decyphering data: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-	elastic stoc = elastic((unsigned char *)clear_buf, crypt_size, elastic_backward, get_reading_version());
+	elastic stoc = elastic((unsigned char *)clear_buf, crypt_size, elastic_backward, reading_ver);
 	if(stoc.get_size() > crypt_size)
 	    throw Erange("crypto_sym::crypto_encrypt_data",gettext("Data corruption may have occurred, cannot decrypt data"));
 	return crypt_size - stoc.get_size();
