@@ -626,8 +626,15 @@ namespace libdar
 
 	    initialized = true;
 
-	    for(U_I i = 0; i < heap_size; ++i)
-		tas->put(make_unique<crypto_segment>(crypted_block_size, clear_block_size));
+	    try
+	    {
+		for(U_I i = 0; i < heap_size; ++i)
+		    tas->put(make_unique<crypto_segment>(crypted_block_size, clear_block_size));
+	    }
+	    catch(std::bad_alloc &)
+	    {
+		throw Ememory("tronconneuse::post_constructor_init");
+	    }
 
 		// launching all subthreads
 	    if(!crypto_reader)
