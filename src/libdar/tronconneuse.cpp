@@ -55,7 +55,11 @@ using namespace std;
 namespace libdar
 {
 
-    tronconneuse::tronconneuse(U_32 block_size, generic_file & encrypted_side, bool no_initial_shift, const archive_version & x_reading_ver) : generic_file(encrypted_side.get_mode() == gf_read_only ? gf_read_only : gf_write_only)
+    tronconneuse::tronconneuse(U_32 block_size,
+			       generic_file & encrypted_side,
+			       bool no_initial_shift,
+			       const archive_version & x_reading_ver,
+			       std::unique_ptr<crypto_module> & ptr) : generic_file(encrypted_side.get_mode() == gf_read_only ? gf_read_only : gf_write_only)
     {
 	if(block_size == 0)
 	    throw Erange("tronconneuse::tronconneuse", tools_printf(gettext("%d is not a valid block size"), block_size));
@@ -80,21 +84,15 @@ namespace libdar
 	weof = false;
 	reof = false;
 	reading_ver = x_reading_ver;
+	crypto = move(ptr);
+	if(!crypto)
+	    throw Erange("tronconneuse::tronconneuse", "null pointer given as crypto_module to tronconneuse");
 	trailing_clear_data = nullptr;
 
 	    // buffers cannot be initialized here as they need result from pure virtual methods
 	    // the inherited class constructor part has not yet been initialized
 	    // for this reason C++ forbids us to call virtual methods (they may rely on data that
 	    // has not been initialized.
-    }
-
-
-    tronconneuse & tronconneuse::operator = (const tronconneuse & ref)
-    {
-	detruit();
-	generic_file::operator = (ref);
-
-	return *this;
     }
 
     bool tronconneuse::skippable(skippability direction, const infinint & amount)
@@ -223,7 +221,7 @@ namespace libdar
 	{
 	    interim = 0;
 	    x_amount.unstack(interim);
-	    new_amount += encrypted_block_size_for(interim);
+	    new_amount += crypto->encrypted_block_size_for(interim);
 	}
 
 	encrypted->read_ahead(new_amount);
@@ -312,6 +310,7 @@ namespace libdar
 	encrypted_buf_size = 0;
 	encrypted_buf_data = 0;
 	extra_buf_size = 0;
+	crypto.reset();
 	extra_buf_data = 0;
     }
 
@@ -363,6 +362,10 @@ namespace libdar
 	    weof = ref.weof;
 	    reof = ref.reof;
 	    reading_ver = ref.reading_ver;
+	    if(ref.crypto)
+		crypto = ref.crypto->clone();
+	    else
+		crypto.reset();
 	    trailing_clear_data = ref.trailing_clear_data;
 	}
 	catch(...)
@@ -392,6 +395,7 @@ namespace libdar
 	weof = move(ref.weof);
 	reof = move(ref.reof);
 	reading_ver = move(ref.reading_ver);
+	crypto = move(ref.crypto);
 	trailing_clear_data = move(ref.trailing_clear_data);
     }
 
@@ -436,7 +440,7 @@ namespace libdar
 
 		try
 		{
-		    buf_byte_data = decrypt_data(block_num, encrypted_buf, encrypted_buf_data, buf, clear_block_size);
+		    buf_byte_data = crypto->decrypt_data(block_num, encrypted_buf, encrypted_buf_data, buf, clear_block_size);
 		}
 		catch(Erange & e)
 		{
@@ -447,7 +451,7 @@ namespace libdar
 			    remove_trailing_clear_data_from_encrypted_buf(crypt_offset);
 
 				// retrying but without trailing cleared data
-			    buf_byte_data = decrypt_data(block_num, encrypted_buf, encrypted_buf_data, buf, clear_block_size);
+			    buf_byte_data = crypto->decrypt_data(block_num, encrypted_buf, encrypted_buf_data, buf, clear_block_size);
 			}
 			catch(Egeneric & f)
 			{
@@ -489,7 +493,7 @@ namespace libdar
 	if(buf_byte_data > 0)
 	{
 	    init_buf();
-	    encrypted_buf_data = encrypt_data(block_num, buf, buf_byte_data, buf_size, encrypted_buf, encrypted_buf_size);
+	    encrypted_buf_data = crypto->encrypt_data(block_num, buf, buf_byte_data, buf_size, encrypted_buf, encrypted_buf_size);
 	    try
 	    {
 		encrypted->write(encrypted_buf, encrypted_buf_data);
@@ -525,7 +529,7 @@ namespace libdar
 	if(encrypted_buf == nullptr)
 	{
 	    encrypted_buf_data = 0;
-	    encrypted_buf_size = encrypted_block_size_for(clear_block_size);
+	    encrypted_buf_size = crypto->encrypted_block_size_for(clear_block_size);
 	    encrypted_buf = new (nothrow) char[encrypted_buf_size];
 	    if(encrypted_buf == nullptr)
 	    {
@@ -536,7 +540,7 @@ namespace libdar
 	if(buf == nullptr)
 	{
 	    buf_byte_data = 0;
-	    buf_size = clear_block_allocated_size_for(clear_block_size);
+	    buf_size = crypto->clear_block_allocated_size_for(clear_block_size);
 	    if(buf_size < clear_block_size)
 		throw SRC_BUG; // buf_size must be larger than or equal to clear_block_size
 	    buf = new (nothrow) char[buf_size];

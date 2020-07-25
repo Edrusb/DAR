@@ -34,6 +34,7 @@
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "archive_version.hpp"
+#include "crypto_module.hpp"
 
 namespace libdar
 {
@@ -44,12 +45,6 @@ namespace libdar
 
 	/// this is a partial implementation of the generic_file interface to cypher/decypher data block by block.
 
-	/// This class is a pure virtual one, as several calls have to be defined by inherited classes
-	/// - encrypted_block_size_for
-	/// - clear_block_allocated_size_for
-	/// - encrypt_data
-	/// - decrypt_data
-	/// .
 	/// tronconneuse is either read_only or write_only, read_write is not allowed.
 	/// The openning mode is defined by encrypted_side's mode.
 	/// In write_only no skip() is allowed, writing is sequential from the beginning of the file to the end
@@ -67,7 +62,11 @@ namespace libdar
 	    /// \param[in] reading_ver version of the archive format
 	    /// \note that encrypted_side is not owned and destroyed by tronconneuse, it must exist during all the life of the
 	    /// tronconneuse object, and is not destroyed by the tronconneuse's destructor
-	tronconneuse(U_32 block_size, generic_file & encrypted_side, bool no_initial_shift, const archive_version & reading_ver);
+	tronconneuse(U_32 block_size,
+		     generic_file & encrypted_side,
+		     bool no_initial_shift,
+		     const archive_version & reading_ver,
+		     std::unique_ptr<crypto_module> & ptr);
 
 	    /// copy constructor
 	tronconneuse(const tronconneuse & ref) : generic_file(ref) { copy_from(ref); };
@@ -76,7 +75,7 @@ namespace libdar
 	tronconneuse(tronconneuse && ref) noexcept: generic_file(std::move(ref)) { nullifyptr(); move_from(std::move(ref)); };
 
 	    /// assignment operator
-	tronconneuse & operator = (const tronconneuse & ref);
+	tronconneuse & operator = (const tronconneuse & ref) { detruit(); generic_file::operator = (ref); copy_from(ref); return *this; };
 
 	    /// move operator
 	tronconneuse & operator = (tronconneuse && ref) noexcept { generic_file::operator = (std::move(ref)); move_from(std::move(ref)); return *this; };
@@ -147,52 +146,6 @@ namespace libdar
 	virtual void inherited_terminate() override {};
 
     protected:
-	    /// defines the size necessary to encrypt a given amount of clear data
-
-	    /// \param[in] clear_block_size is the size of the clear block to encrypt.
-	    /// \return the size of the memory to allocate to receive corresponding encrypted data.
-	    /// \note this implies that encryption algorithm must always generate a fixed size encrypted block of data for
-	    /// a given fixed size block of data. However, the size of the encrypted block of data may differ from
-	    /// the size of the clear block of data
-	virtual U_32 encrypted_block_size_for(U_32 clear_block_size) = 0;
-
-	    /// it may be necessary by the inherited class have few more bytes allocated after the clear data given for encryption
-
-	    /// \param[in] clear_block_size is the size in byte of the clear data that will be asked to encrypt.
-	    /// \return the requested allocated buffer size (at least the size of the clear data).
-	    /// \note when giving clear buffer of data of size "clear_block_size" some inherited class may requested
-	    /// that a bit more of data must be allocated.
-	    /// this is to avoid copying data when the algorithm needs to add some data after the
-	    /// clear data before encryption.
-	virtual U_32 clear_block_allocated_size_for(U_32 clear_block_size) = 0;
-
-	    /// this method encrypts the clear data given
-
-	    /// \param block_num is the number of the block to which correspond the given data, This is an informational field for inherited classes.
-	    /// \param[in] clear_buf points to the first byte of clear data to encrypt.
-	    /// \param[in] clear_size is the length in byte of data to encrypt.
-	    /// \param[in] clear_allocated is the size of the allocated memory (modifiable bytes) in clear_buf: clear_block_allocated_size_for(clear_size)
-	    /// \param[in,out] crypt_buf is the area where to put corresponding encrypted data.
-	    /// \param[in] crypt_size is the allocated memory size for crypt_buf: encrypted_block_size_for(clear_size)
-	    /// \return is the amount of data put in crypt_buf (<= crypt_size).
-	    /// \note it must respect that : returned value = encrypted_block_size_for(clear_size argument)
-	virtual U_32 encrypt_data(const infinint & block_num,
-				  const char *clear_buf, const U_32 clear_size, const U_32 clear_allocated,
-				  char *crypt_buf, U_32 crypt_size) = 0;
-
-	    /// this method decyphers data
-
-	    /// \param[in] block_num block number of the data to decrypt.
-	    /// \param[in] crypt_buf pointer to the first byte of encrypted data.
-	    /// \param[in] crypt_size size of encrypted data to decrypt.
-	    /// \param[in,out] clear_buf pointer where to put clear data.
-	    /// \param[in] clear_size allocated size of clear_buf.
-	    /// \return is the amount of data put in clear_buf (<= clear_size)
-	virtual U_32 decrypt_data(const infinint & block_num,
-				  const char *crypt_buf, const U_32 crypt_size,
-				  char *clear_buf, U_32 clear_size) = 0;
-
-    protected:
 	const archive_version & get_reading_version() const { return reading_ver; };
 
 
@@ -221,6 +174,7 @@ namespace libdar
 	bool weof;                 ///< whether write_end_of_file() has been called
 	bool reof;                 ///< whether we reached eof while reading
 	archive_version reading_ver; ///< archive format we currently read
+	std::unique_ptr<crypto_module> crypto; ///< wraps the per block encryption/decryption routines
 	infinint (*trailing_clear_data)(generic_file & below, const archive_version & reading_ver); ///< callback function that gives the amount of clear data found at the end of the given file
 
 
