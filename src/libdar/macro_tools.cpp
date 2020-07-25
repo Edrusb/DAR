@@ -55,6 +55,7 @@ extern "C"
 #include "generic_to_global_file.hpp"
 #include "tlv.hpp"
 #include "crypto_sym.hpp"
+#include "tronconneuse.hpp"
 #include "crypto_asym.hpp"
 #include "cat_all_entrees.hpp"
 #include "crc.hpp"
@@ -647,48 +648,55 @@ namespace libdar
 #ifdef LIBDAR_NO_OPTIMIZATION
 		tools_secu_string_show(*dialog, string("Used clear key: "), real_pass);
 #endif
-		if(!second_terminateur_offset.is_zero()
-		   || tmp_ctxt->is_an_old_start_end_archive()) // we have openned the archive by the end
-		{
-		    crypto_sym *tmp_ptr = nullptr;
 
-		    tmp = tmp_ptr = new (nothrow) crypto_sym(crypto_size,
-							     real_pass,
-							     *(stack.top()),
-							     true,
-							     ver.get_edition(),
-							     crypto,
-							     ver.get_salt(),
-							     ver.get_iteration_count(),
-							     ver.get_kdf_hash(),
-							     ver.get_crypted_key() == nullptr);
-		    if(tmp_ptr != nullptr)
-			tmp_ptr->set_initial_shift(ver.get_initial_offset());
-		}
-		else // archive openned by the beginning
+		try
 		{
-		    crypto_sym *tmp_ptr;
-		    tmp = tmp_ptr = new (nothrow) crypto_sym(crypto_size,
-							     real_pass,
-							     *(stack.top()),
-							     false,
-							     ver.get_edition(),
-							     crypto,
-							     ver.get_salt(),
-							     ver.get_iteration_count(),
-							     ver.get_kdf_hash(),
-							     ver.get_crypted_key() == nullptr);
+		    tronconneuse *tmp_ptr = nullptr;
+		    unique_ptr<crypto_module> ptr = make_unique<crypto_sym>(real_pass,
+									    ver.get_edition(),
+									    crypto,
+									    ver.get_salt(),
+									    ver.get_iteration_count(),
+									    ver.get_kdf_hash(),
+									    ver.get_crypted_key() == nullptr);
 
-		    if(tmp_ptr != nullptr)
+		    if(!ptr) // this should never occur as make_unique would throw a std::bad_alloc exception
+			throw Ememory("macro_tools_open_archive");
+
+		    if(!second_terminateur_offset.is_zero()
+		       || tmp_ctxt->is_an_old_start_end_archive()) // we have openned the archive by the end
 		    {
-			tmp_ptr->set_callback_trailing_clear_data(&macro_tools_get_terminator_start);
+			tmp = tmp_ptr = new (nothrow) tronconneuse(crypto_size,
+								   *(stack.top()),
+								   true,
+								   ver.get_edition(),
+								   ptr);
 
-			if(sequential_read)
-			    elastic(*tmp_ptr, elastic_forward, ver.get_edition()); // this is line creates a temporary anonymous object and destroys it just afterward
-			    // this is necessary to skip the reading of the initial elastic buffer
-			    // nothing prevents the elastic buffer from carrying what could
-			    // be considered an escape mark.
+			if(tmp_ptr != nullptr)
+			    tmp_ptr->set_initial_shift(ver.get_initial_offset());
 		    }
+		    else // archive openned by the beginning
+		    {
+			tmp = tmp_ptr = new (nothrow) tronconneuse(crypto_size,
+								   *(stack.top()),
+								   false,
+								   ver.get_edition(),
+								   ptr);
+			if(tmp_ptr != nullptr)
+			{
+			    tmp_ptr->set_callback_trailing_clear_data(&macro_tools_get_terminator_start);
+
+			    if(sequential_read)
+				elastic(*tmp_ptr, elastic_forward, ver.get_edition()); // this is line creates a temporary anonymous object and destroys it just afterward
+				// this is necessary to skip the reading of the initial elastic buffer
+				// nothing prevents the elastic buffer from carrying what could
+				// be considered an escape mark.
+			}
+		    }
+		}
+		catch(std::bad_alloc &)
+		{
+		    throw Ememory("macro_tools_open_archive");
 		}
 		break;
 	    case crypto_algo::scrambling:
@@ -1432,16 +1440,28 @@ namespace libdar
 		case crypto_algo::camellia256:
 		    if(info_details)
 			dialog->message(gettext("Adding a new layer on top: Strong encryption object..."));
-		    tmp = new (nothrow) crypto_sym(crypto_size,
-						   real_pass,
-						   *(layers.top()),
-						   false,
-						   macro_tools_supported_version,
-						   crypto,
-						   salt,
-						   iteration_count,
-						   kdf_hash,
-						   gnupg_recipients.empty());
+		    try
+		    {
+			unique_ptr<crypto_module> ptr = make_unique<crypto_sym>(real_pass,
+										macro_tools_supported_version,
+										crypto,
+										salt,
+										iteration_count,
+										kdf_hash,
+										gnupg_recipients.empty());
+			if(!ptr)
+			    throw Ememory("macro_tools_create_layers");
+
+			tmp = new (nothrow) tronconneuse(crypto_size,
+							 *(layers.top()),
+							 false,
+							 macro_tools_supported_version,
+							 ptr);
+		    }
+		    catch(std::bad_alloc &)
+		    {
+			throw Ememory("macro_tools_create_layers");
+		    }
 
 #ifdef LIBDAR_NO_OPTIMIZATION
 		    tools_secu_string_show(*dialog, string("real_pass used: "), real_pass);
