@@ -58,6 +58,7 @@ extern "C"
 
 #include "libdar.hpp"
 #include "tronconneuse.hpp"
+#include "crypto_module.hpp"
 #include "shell_interaction.hpp"
 #include "deci.hpp"
 #include "cygwin_adapt.hpp"
@@ -67,17 +68,15 @@ extern "C"
 using namespace std;
 using namespace libdar;
 
-class test : public tronconneuse
+class test : public crypto_module
 {
 public:
-    test(user_interaction & dialog, U_32 block_size, generic_file & encrypted_size, bool no_is = false): tronconneuse(block_size, encrypted_size, no_is, macro_tools_supported_version)
-    {};
+    virtual U_32 encrypted_block_size_for(U_32 clear_block_size) override { return clear_block_size + 1; };
+    virtual U_32 clear_block_allocated_size_for(U_32 clear_block_size) override { return clear_block_size + 2; };
+    virtual U_32 encrypt_data(const infinint & block_num, const char *clear_buf, const U_32 clear_size, const U_32 clear_allocated, char *crypt_buf, U_32 crypt_size) override;
+    virtual U_32 decrypt_data(const infinint & block_num, const char *crypt_buf, const U_32 crypt_size, char *clear_buf, U_32 clear_size) override;
 
-protected:
-    U_32 encrypted_block_size_for(U_32 clear_block_size) { return clear_block_size + 1; };
-    U_32 clear_block_allocated_size_for(U_32 clear_block_size) { return clear_block_size + 2; };
-    U_32 encrypt_data(const infinint & block_num, const char *clear_buf, const U_32 clear_size, const U_32 clear_allocated, char *crypt_buf, U_32 crypt_size);
-    U_32 decrypt_data(const infinint & block_num, const char *crypt_buf, const U_32 crypt_size, char *clear_buf, U_32 clear_size);
+    virtual unique_ptr<crypto_module> clone() const override { return unique_ptr<test>(new test()); };
 };
 
 U_32 test::encrypt_data(const infinint & block_num, const char *clear_buf, const U_32 clear_size, const U_32 clear_allocated, char *crypt_buf, U_32 crypt_size)
@@ -132,8 +131,14 @@ int main()
 void f1(const shared_ptr<user_interaction> & dialog)
 {
     fichier_local fic = fichier_local(dialog, "toto", gf_write_only, 0666, false, true, false);
-
-    test *toto = new test(*dialog, 10, fic);
+    unique_ptr<crypto_module> ptr(new test());
+    if(!ptr)
+	throw Ememory("test");
+    tronconneuse* toto = new tronconneuse(10,
+					  fic,
+					  false,
+					  macro_tools_supported_version,
+					  ptr);
     if(toto == nullptr)
 	throw Ememory("test");
 
@@ -155,7 +160,14 @@ void f2(const shared_ptr<user_interaction> & dialog)
 {
     fichier_local fic = fichier_local(dialog, "toto", gf_read_only, 0666, false, false, false);
 
-    test *toto = new test(*dialog, 10, fic);
+    unique_ptr<crypto_module> ptr(new test());
+    if(!ptr)
+	throw Ememory("test");
+    tronconneuse *toto = new tronconneuse(10,
+					  fic,
+					  false,
+					  macro_tools_supported_version,
+					  ptr);
     if(toto == nullptr)
 	throw Ememory("test");
 
@@ -206,7 +218,14 @@ void f3(const shared_ptr<user_interaction> & dialog)
     cout << "pos = " << fic.get_position() << endl;
     cout << "pos = " << foc.get_position() << endl;
 
-    test fuc = test(*dialog, 10, fic);
+    unique_ptr<crypto_module> ptr(new test());
+    if(!ptr)
+	throw Ememory("test");
+    tronconneuse fuc(10,
+		    fic,
+		    false,
+		    macro_tools_supported_version,
+		    ptr);
     cout << "pos = " << fuc.get_position() << endl;
 
     WRITE_TO(foc, "Il fait chaud il fait beau les mouches pettent et les cailloux fleurissent");
