@@ -51,7 +51,7 @@ namespace libdar
 	crypto_module & operator = (crypto_module && ref) noexcept = default;
 	virtual ~crypto_module() noexcept = default;
 
-		    /// defines the size necessary to encrypt a given amount of clear data
+	    /// defines the size necessary to encrypt a given amount of clear data
 
 	    /// \param[in] clear_block_size is the size of the clear block to encrypt.
 	    /// \return the size of the memory to allocate to receive corresponding encrypted data.
