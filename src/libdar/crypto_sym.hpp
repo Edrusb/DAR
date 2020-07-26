@@ -121,12 +121,13 @@ namespace libdar
 	unsigned char *ivec;         ///< algo_block_size allocated in secure memory to be used as Initial Vector
 
 	void detruit();
-	void make_keys_hashpass_and_ivec(const secu_string & password,
+	void make_keys_hashpass_and_ivec(const secu_string & password, ///< key password
 					 crypto_algo algo,         ///< only use when use_pkcs5
 					 const std::string & salt, ///< only use when use_pkcs5
 					 infinint iteration_count, ///< only use when use_pkcs5
 					 hash_algo kdf_hash,       ///< only use when use_pkcs5
-					 bool use_pkcs5);
+					 bool use_pkcs5            ///< whether to hash the password following pkcs5 method
+	    );
 
 	void copy_from(const crypto_sym & ref);
 	void move_from(crypto_sym && ref);
