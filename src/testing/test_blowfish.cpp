@@ -45,6 +45,7 @@ extern "C"
 #include "libdar.hpp"
 #include "erreurs.hpp"
 #include "crypto_sym.hpp"
+#include "tronconneuse.hpp"
 #include "shell_interaction.hpp"
 #include "deci.hpp"
 #include "cygwin_adapt.hpp"
@@ -87,7 +88,16 @@ void f1(const shared_ptr<user_interaction> & dialog)
 {
     fichier_local fic = fichier_local(dialog, "toto", gf_write_only, 0666, false, true, false);
     string pass = "bonjour";
-    crypto_sym bf(10, secu_string(pass.c_str(), pass.size()), fic, false, macro_tools_supported_version, crypto_algo::blowfish, "", 2000, hash_algo::sha1, true);
+    unique_ptr<crypto_module> ptr(new crypto_sym(secu_string(pass.c_str(), pass.size()),
+						 macro_tools_supported_version,
+						 crypto_algo::blowfish,
+						 "",
+						 2000,
+						 hash_algo::sha1,
+						 true));
+    if(!ptr)
+	throw Ememory("crypto_sym");
+    tronconneuse bf(10, fic, false, macro_tools_supported_version, ptr);
     char buffer[100] = "bonjour les amis il fait chaud il fait beau ! ";
 
     bf.write(buffer, strlen(buffer));
@@ -100,7 +110,17 @@ void f2(const shared_ptr<user_interaction> & dialog)
 {
     fichier_local fic = fichier_local(dialog, "toto", gf_read_only, 0666, false, false, false);
     string pass = "bonjour";
-    crypto_sym bf(10, secu_string(pass.c_str(), pass.size()), fic, false, macro_tools_supported_version, crypto_algo::blowfish, "", 2000, hash_algo::sha1, true);
+    unique_ptr<crypto_module> ptr(new crypto_sym(secu_string(pass.c_str(), pass.size()),
+						 macro_tools_supported_version,
+						 crypto_algo::blowfish,
+						 "",
+						 2000,
+						 hash_algo::sha1,
+						 true));
+    if(!ptr)
+	throw Ememory("crypto_sym");
+
+    tronconneuse bf(10, fic, false, macro_tools_supported_version, ptr);
     char buffer[100];
     S_I lu;
     bool ret;
