@@ -34,7 +34,7 @@ endif
 
 
 if WITH_LIBTHREADAR
-    LIBTHREADAR_TEST_MODULES=test_generic_thread test_heap
+    LIBTHREADAR_TEST_MODULES=test_generic_thread test_heap test_parallel_tronconneuse
 else
     LIBTHREADAR_TEST_MODULES=
 endif
@@ -165,3 +165,6 @@ test_truncate_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 test_heap_SOURCES = test_heap.cpp
 test_heap_DEPENDENCIES = ../libdar/$(MYLIB).la
+
+test_parallel_tronconneuse_SOURCES = test_parallel_tronconneuse.cpp
+test_parallel_tronconneuse_DEPENDENCIES = ../libdar/$(MYLIB).la
