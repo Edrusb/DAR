@@ -233,9 +233,10 @@ namespace libdar
 		break;
 	    case tronco_flags::die:
 		end = true;
+		writer->worker_push_one(slot, ptr, static_cast<int>(flag));
 		break;
 	    case tronco_flags::data_error:
-		break;
+		throw SRC_BUG; // should not receive a block with that flag
 	    default:
 		throw SRC_BUG;
 	    }
@@ -605,12 +606,20 @@ namespace libdar
 
 	post_constructor_init();
 	send_order(tronco_flags::die);
+
+	    // waiting for the end of all subthreads
+
 	crypto_reader->join(); // may propagate exception thrown in child thread
 	while(it != travailleur.end())
 	{
 	    it->join(); // may propagate exception thrown in child thread
 	    ++it;
 	}
+
+	    // sanity checks
+
+	if(tas->get_size() != get_heap_size(num_workers))
+	    throw SRC_BUG;
     }
 
     void parallel_tronconneuse::post_constructor_init()
@@ -618,12 +627,7 @@ namespace libdar
 	if(!initialized)
 	{
 	    U_32 crypted_block_size = crypto->encrypted_block_size_for(clear_block_size);
-	    U_I heap_size = num_workers * 3 + 3;
-		// each ratelier can be full of crypto_segment and at the same
-		// time, each worker could hold a crypto_segment the below thread
-		// as well and the main thread for parallel_tronconneuse could hold
-		// 2 more crypto_segments
-
+	    U_I heap_size = get_heap_size(num_workers);
 	    initialized = true;
 
 	    try
@@ -723,14 +727,13 @@ namespace libdar
 	switch(order)
 	{
 	case tronco_flags::normal:
-	    throw SRC_BUG;
+	    throw SRC_BUG;  // not an order at all!
 	case tronco_flags::stop:
 	case tronco_flags::eof:
-	    break; // OK
 	case tronco_flags::die:
-	    throw SRC_BUG;
+	    break; // OK
 	case tronco_flags::data_error:
-	    throw SRC_BUG;
+	    throw SRC_BUG; // not an order that drives purging
 	default:
 	    break; // expected cases
 	}
@@ -749,6 +752,17 @@ namespace libdar
 	    }
 	}
 	while(num > 0);
+    }
+
+    U_I parallel_tronconneuse::get_heap_size(U_I num_workers)
+    {
+	    U_I ratelier_size = num_workers;
+	    U_I heap_size = ratelier_size * 2 + num_workers + 1 + ratelier_size + 2;
+		// each ratelier can be full of crypto_segment and at the same
+		// time, each worker could hold a crypto_segment, the below thread
+		// as well and the main thread for parallel_tronconneuse could hold
+		// a deque of the size of the ratelier plus 2 more crypto_segments
+	    return heap_size;
     }
 
     	/////////////////////////////////////////////////////

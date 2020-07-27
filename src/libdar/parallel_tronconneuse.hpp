@@ -336,6 +336,8 @@ namespace libdar
 	void go_read();
 	void read_refill();
 	void purge_ratelier_up_to(tronco_flags order);
+
+	static U_I get_heap_size(U_I num_worker);
     };
 
 	/// @}
