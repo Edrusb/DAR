@@ -3,6 +3,7 @@ from 2.6.10 to 2.6.11
 - fixing bug in dar_manager libdar part, met when the two oldest entries
   for a file are recoreded as unchanged (differential backup).
 - fixed typo in dar_manager man page
+- updated lax mode to ignore encryption flag found in header and trailter
 
 from 2.6.9 to 2.6.10
 - update the configure script to handle some undocumented --enable-*
