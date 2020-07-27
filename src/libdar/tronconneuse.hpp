@@ -143,7 +143,7 @@ namespace libdar
 	virtual void inherited_flush_read() override { buf_byte_data = 0; };
 
 	    /// this protected inherited method is now private for inherited classes of tronconneuse
-	virtual void inherited_terminate() override {};
+	virtual void inherited_terminate() override { flush(); };
 
     protected:
 	const archive_version & get_reading_version() const { return reading_ver; };
