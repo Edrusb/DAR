@@ -26,6 +26,9 @@ extern "C"
 #if HAVE_STRING_H
 #include <string.h>
 #endif
+#if HAVE_TIME_H
+#include <time.h>
+#endif
 }
 
 #include "libdar.hpp"
@@ -208,6 +211,8 @@ void f1()
 							       macro_tools_supported_version,
 							       ptr1);
 
+    time_t temp = time(NULL);
+    cout << "ciphering... " << ctime(&temp) << endl;
     src->copy_to(*encry);
     src->terminate();
     encry->terminate();
@@ -223,7 +228,7 @@ void f1()
     bool single = false;
 
     if(!single)
-	decry = make_unique<parallel_tronconneuse>(10, // worker
+	decry = make_unique<parallel_tronconneuse>(2, // worker
 						   25, // block size
 						   *src,
 						   true,
@@ -236,6 +241,8 @@ void f1()
 					  macro_tools_supported_version,
 					  ptr2);
 
+    temp = time(NULL);
+    cout << "unciphering..." << ctime(&temp) << endl;
     decry->copy_to(*dst);
     decry->terminate();
     src->terminate();
@@ -243,4 +250,6 @@ void f1()
     decry.reset();
     src.reset();
     dst.reset();
+    temp = time(NULL);
+    cout << "finished! " << ctime(&temp) << endl;
 }
