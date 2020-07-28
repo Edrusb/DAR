@@ -34,6 +34,7 @@ extern "C"
 #include "parallel_tronconneuse.hpp"
 #include "fichier_local.hpp"
 #include "macro_tools.hpp"
+#include "crypto_sym.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -179,8 +180,22 @@ void f1()
 {
     unique_ptr<fichier_local> src = make_unique<fichier_local>(CLEAR, false);
     unique_ptr<fichier_local> dst = make_unique<fichier_local>(ui, CRYPT, gf_write_only, 0644, false, true, false);
+    const char *pass = "zero plus zero egale la tete a toto";
+    secu_string secu_pass(pass, sizeof(pass));
+    unique_ptr<crypto_module> ptr1;
+    bool simple = false;
 
-    unique_ptr<crypto_module> ptr1(new pseudo_crypto());
+    if(simple)
+	ptr1 = make_unique<pseudo_crypto>();
+    else
+	ptr1 = make_unique<crypto_sym>(secu_pass,
+				       macro_tools_supported_version,
+				       crypto_algo::aes256,
+				       "sans sel c'est fade",
+				       2000,
+				       hash_algo::sha512,
+				       true);
+
     if(!ptr1)
 	throw Ememory("pseudo_crypto");
     unique_ptr<crypto_module> ptr2 = ptr1->clone();
@@ -205,10 +220,10 @@ void f1()
     dst = make_unique<fichier_local>(ui, BACK, gf_write_only, 0644, false, true, false);
 
     unique_ptr<generic_file> decry;
-    bool single = true;
+    bool single = false;
 
     if(!single)
-	decry = make_unique<parallel_tronconneuse>(1, // worker
+	decry = make_unique<parallel_tronconneuse>(10, // worker
 						   25, // block size
 						   *src,
 						   true,
