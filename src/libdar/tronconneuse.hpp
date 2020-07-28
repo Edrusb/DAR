@@ -60,6 +60,7 @@ namespace libdar
   	    /// \param[in] no_initial_shift assume that no unencrypted data is located at the begining of the underlying file, else this is the
 	    /// position of the encrypted_side at the time of this call that is used as initial_shift
 	    /// \param[in] reading_ver version of the archive format
+	    /// \param[in] ptr pointer to a crypto_module object that will be passed to the tronconneuse object
 	    /// \note that encrypted_side is not owned and destroyed by tronconneuse, it must exist during all the life of the
 	    /// tronconneuse object, and is not destroyed by the tronconneuse's destructor
 	tronconneuse(U_32 block_size,
