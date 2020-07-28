@@ -109,26 +109,35 @@ namespace libdar
 	static std::string generate_salt(U_I size);
 
     private:
-	size_t algo_block_size;         ///< the block size of the algorithm (main key)
-	U_I algo_id;                    ///< algo ID in libgcrypt
-	archive_version reading_ver;
 
 #if CRYPTO_AVAILABLE
-	gcry_cipher_hd_t clef;       ///< used to encrypt/decrypt the data
+	archive_version reading_ver;    ///< the currently followed archive format
+	crypto_algo algo;               ///< algo ID in libgcrypt
+	secu_string hashed_password;    ///< pkcs5 hashed password or provided password if pkcs5 is not needed
+	secu_string essiv_password;     ///< password for essiv
+	gcry_cipher_hd_t main_clef;  ///< used to encrypt/decrypt the data
 	gcry_cipher_hd_t essiv_clef; ///< used to build the Initialization Vector
-#endif
-	secu_string hashed_password;
-	unsigned char *ivec;         ///< algo_block_size allocated in secure memory to be used as Initial Vector
+	size_t algo_block_size;      ///< the block size of the algorithm (main key)
+	unsigned char *ivec;         ///< algo_block_size allocated in secure memory to be used as Initial Vector for main_clef
+
+	void init_hashed_password(const secu_string & password,
+				  bool use_pkcs5,
+				  const std::string & salt,
+				  infinint iteration_count,
+				  hash_algo kdf_hash,
+				  crypto_algo algo);
+	void init_essiv_password(const secu_string & key,
+				 unsigned int IV_hashing);
+	void init_main_clef(const secu_string & password, ///< key password
+			    crypto_algo algo              ///< only use when use_pkcs5
+	    );
+	void init_essiv_clef(const secu_string & essiv_password,
+			     U_I IV_cipher,
+			     U_I main_cipher_algo_block_size);
+	void init_algo_block_size(crypto_algo algo);
+	void init_ivec(crypto_algo algo, size_t algo_block_size);
 
 	void detruit();
-	void make_keys_hashpass_and_ivec(const secu_string & password, ///< key password
-					 crypto_algo algo,         ///< only use when use_pkcs5
-					 const std::string & salt, ///< only use when use_pkcs5
-					 infinint iteration_count, ///< only use when use_pkcs5
-					 hash_algo kdf_hash,       ///< only use when use_pkcs5
-					 bool use_pkcs5            ///< whether to hash the password following pkcs5 method
-	    );
-
 	void copy_from(const crypto_sym & ref);
 	void move_from(crypto_sym && ref);
 
@@ -136,11 +145,8 @@ namespace libdar
 
 	    /// \note such key is intended to be used to generate IV for the main key
 
-#if CRYPTO_AVAILABLE
-	static void dar_set_essiv(const secu_string & key,       ///< the key to base the essiv on
-				  gcry_cipher_hd_t & IVkey,      ///< assign essiv from the given (hash) string
-				  const archive_version & ver,   ///< archive format we read or write
-				  crypto_algo main_cipher);      ///< the choice of the algo for essiv depends on the cipher used for the main key
+	static void get_IV_cipher_and_hashing(const archive_version & ver, U_I main_cipher, U_I & cipher, U_I & hashing);
+
 	    /// Fills up a new initial vector based on a reference and and a encryption key
 
 	    /// \param[in] ref is the reference to base the IV on
@@ -162,10 +168,12 @@ namespace libdar
 
 	    /// converts libdar crypto algo designation to index used by libgcrypt
 	static U_I get_algo_id(crypto_algo algo);
-#endif
 
 #ifdef LIBDAR_NO_OPTIMIZATION
+	static bool self_tested;
 	static void self_test(void);
+#endif
+
 #endif
     };
 

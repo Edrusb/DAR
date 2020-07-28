@@ -58,267 +58,83 @@ namespace libdar
 
     crypto_sym::crypto_sym(const secu_string & password,
 			   const archive_version & reading_version,
-			   crypto_algo algo,
+			   crypto_algo xalgo,
 			   const std::string & salt,
 			   const infinint & iteration_count,
 			   hash_algo kdf_hash,
 			   bool use_pkcs5)
     {
 #if CRYPTO_AVAILABLE
-	clef = nullptr;
+	U_I algo_id;
+
+	main_clef = nullptr;
 	essiv_clef = nullptr;
 	ivec = nullptr;
-	reading_ver = reading_version;
 
-	if(reading_ver <= 5)
-	    throw Erange("crypto_sym::blowfish", gettext("Current implementation of blowfish encryption is not compatible with old (weak) implementation, use dar-2.3.x software or later (or other software based on libdar-4.4.x or greater) to read this archive"));
-
-	if(kdf_hash == hash_algo::none)
-	    throw Erange("crypto_sym::crypto_sym", gettext("cannot use 'none' as hashing algorithm for key derivation function"));
-	else
+	try
 	{
-	    gcry_error_t err;
-
+	    reading_ver = reading_version;
+	    algo = xalgo;
 	    algo_id = get_algo_id(algo);
 
-		// checking for algorithm availability
-	    err = gcry_cipher_algo_info(algo_id, GCRYCTL_TEST_ALGO, nullptr, nullptr);
+	    if(reading_ver <= 5 && algo == crypto_algo::blowfish)
+		throw Erange("crypto_sym::crypto_sym", gettext("Current implementation of blowfish encryption is not compatible with old (weak) implementation, use dar-2.3.x software or later (or other software based on libdar-4.4.x or greater) to read this archive"));
+
+	    if(kdf_hash == hash_algo::none && use_pkcs5)
+		throw Erange("crypto_sym::crypto_sym", gettext("cannot use 'none' as hashing algorithm for key derivation function"));
+
+
+		// checking for algorithm availability in libgcrypt
+
+	    gcry_error_t err = gcry_cipher_algo_info(algo_id, GCRYCTL_TEST_ALGO, nullptr, nullptr);
 	    if(err != GPG_ERR_NO_ERROR)
 		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Cyphering algorithm not available in libgcrypt: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
-		// obtaining the block length
+		// building the hashed_password
 
-	    err = gcry_cipher_algo_info(algo_id, GCRYCTL_GET_BLKLEN, nullptr, &algo_block_size);
-	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Failed retrieving from libgcrypt the block size used by the cyphering algorithm: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-	    if(algo_block_size == 0)
-		throw SRC_BUG;
+	    init_hashed_password(password,
+				 use_pkcs5,
+				 salt,
+				 iteration_count,
+				 kdf_hash,
+				 algo);
 
-	    make_keys_hashpass_and_ivec(password,
-					algo,
-					salt,
-					iteration_count,
-					kdf_hash,
-					use_pkcs5);
+
+		// building the main key for this object
+
+	    init_main_clef(hashed_password,
+			   algo);
+
+		// building the Initial Vector structure that will be
+		// used with the main key
+
+	    init_algo_block_size(algo);
+	    init_ivec(algo, algo_block_size);
+
+	    U_I IV_cipher;
+	    U_I IV_hashing;
+
+	    get_IV_cipher_and_hashing(reading_ver, algo_id, IV_cipher, IV_hashing);
+
+		// making a hash of the provided password into the digest variable
+	    init_essiv_password(hashed_password, IV_hashing);
+
+		// building the auxilliary key that will be used
+		// to derive the IV value from the block number
+	    init_essiv_clef(essiv_password, IV_cipher, algo_block_size);
 
 #ifdef LIBDAR_NO_OPTIMIZATION
 	    self_test();
 #endif
 	}
-#else
-	throw Ecompilation(gettext("Missing strong encryption support (libgcrypt)"));
-#endif
-    }
-
-
-    size_t crypto_sym::max_key_len(crypto_algo algo)
-    {
-#if CRYPTO_AVAILABLE
-	size_t key_len;
-	U_I algo_id = get_algo_id(algo);
-	gcry_error_t err;
-
-	    // checking for algorithm availability
-	err = gcry_cipher_algo_info(algo_id, GCRYCTL_TEST_ALGO, nullptr, nullptr);
-	if(err != GPG_ERR_NO_ERROR)
-	    throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Cyphering algorithm not available in libgcrypt: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-
-	    // obtaining the maximum key length
-	key_len = gcry_cipher_get_algo_keylen(algo_id);
-	if(key_len == 0)
-	    throw Erange("crypto_sym::crypto_sym",gettext("Failed retrieving from libgcrypt the maximum key length"));
-
-	return key_len;
-#else
-	throw Ecompilation("Strong encryption");
-#endif
-
-    }
-
-    size_t crypto_sym::max_key_len_libdar(crypto_algo algo)
-    {
-#if CRYPTO_AVAILABLE
-	size_t key_len = max_key_len(algo);
-
-	if(algo == crypto_algo::blowfish)
-	    key_len = 56; // for historical reasons
-
-	return key_len;
-#else
-	throw Ecompilation("Strong encryption");
-#endif
-    }
-
-    bool crypto_sym::is_a_strong_password(crypto_algo algo, const secu_string & password)
-    {
-#if CRYPTO_AVAILABLE
-	bool ret = true;
-	gcry_error_t err;
-	gcry_cipher_hd_t clef;
-	U_I algo_id = get_algo_id(algo);
-
-	err = gcry_cipher_open(&clef, algo_id, GCRY_CIPHER_MODE_CBC, GCRY_CIPHER_SECURE);
-	if(err != GPG_ERR_NO_ERROR)
-	    throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Error while opening libgcrypt key handle to check password strength: %s/%s"),
-							       gcry_strsource(err),
-							       gcry_strerror(err)));
-
-	try
-	{
-	    err = gcry_cipher_setkey(clef, (const void *)password.c_str(), password.get_size());
-	    if(err != GPG_ERR_NO_ERROR)
-	    {
-		if(gcry_err_code(err) == GPG_ERR_WEAK_KEY)
-		    ret = false;
-		else
-		    throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Error while assigning key to libgcrypt key handle to check password strength: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-	    }
-	}
-	catch(...)
-	{
-	    gcry_cipher_close(clef);
-	    throw;
-	}
-	gcry_cipher_close(clef);
-
-	return ret;
-#else
-	throw Ecompilation("Strong encryption");
-#endif
-    }
-
-    string crypto_sym::generate_salt(U_I size)
-    {
-#if CRYPTO_AVAILABLE
-	string ret;
-	unsigned char* buffer = new (nothrow) unsigned char[size];
-
-	if(buffer == nullptr)
-	    throw Ememory("crypto_sym::generate_salt");
-
-	try
-	{
-	    gcry_create_nonce(buffer, size);
-	    ret.assign((const char *)buffer, size);
-	    delete [] buffer;
-	    buffer = nullptr;
-	}
-	catch(...)
-	{
-	    if(buffer != nullptr)
-	    {
-		delete [] buffer;
-		buffer = nullptr;
-	    }
-	    throw;
-	}
-
-	return ret;
-#else
-	throw Ecompilation("Strong encryption");
-#endif
-    }
-
-    void crypto_sym::detruit()
-    {
-#if CRYPTO_AVAILABLE
-	if(clef != nullptr)
-	    gcry_cipher_close(clef);
-	if(essiv_clef != nullptr)
-	    gcry_cipher_close(essiv_clef);
-	if(ivec != nullptr)
-	{
-	    (void)memset(ivec, 0, algo_block_size);
-	    gcry_free(ivec);
-	}
-#endif
-    }
-
-    void crypto_sym::make_keys_hashpass_and_ivec(const secu_string & password,
-						 crypto_algo algo,
-						 const std::string & salt,
-						 infinint iteration_count,
-						 hash_algo kdf_hash,
-						 bool use_pkcs5)
-    {
-	    // initializing ivec in secure memory
-	ivec = (unsigned char *)gcry_malloc_secure(algo_block_size);
-	if(ivec == nullptr)
-	    throw Esecu_memory("crypto_sym::crypto_sym");
-
-	try
-	{
-	    gcry_error_t err;
-
-	    if(use_pkcs5)
-	    {
-		U_I it = 0;
-
-		iteration_count.unstack(it);
-		if(!iteration_count.is_zero())
-		    throw Erange("crypto_sym::crypto_sym", gettext("Too large value give for key derivation interation count"));
-
-		hashed_password = pkcs5_pass2key(password, salt, it, hash_algo_to_gcrypt_hash(kdf_hash), max_key_len_libdar(algo));
-	    }
-	    else
-		hashed_password = password;
-
-		// key handle initialization
-
-	    err = gcry_cipher_open(&clef, algo_id, GCRY_CIPHER_MODE_CBC, GCRY_CIPHER_SECURE);
-	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Error while opening libgcrypt key handle: %s/%s"),
-								   gcry_strsource(err),
-								   gcry_strerror(err)));
-
-		// assigning key to the handle
-
-	    err = gcry_cipher_setkey(clef, (const void *)hashed_password.c_str(), hashed_password.get_size());
-	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Error while assigning key to libgcrypt key handle: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-
-		// essiv initialization
-
-	    dar_set_essiv(hashed_password, essiv_clef, reading_ver, algo);
-	}
 	catch(...)
 	{
 	    detruit();
 	    throw;
-	};
-    }
-
-    void crypto_sym::copy_from(const crypto_sym & ref)
-    {
-	algo_block_size = ref.algo_block_size;
-	algo_id = ref.algo_id;
-	reading_ver = ref.reading_ver;
-
-	make_keys_hashpass_and_ivec(ref.hashed_password,
-				    crypto_algo::none,
-				    "",
-				    0,
-				    hash_algo::none,
-				    false);
-	    // never use pkcs5 as the password
-	    // has already been hashed by the constructor
-	    // of the object we make a copy of
-
-    }
-
-    void crypto_sym::move_from(crypto_sym && ref)
-    {
-	    // we assume the current object has not field assiged
-	    // same as for copy_from():
-	algo_block_size = move(ref.algo_block_size);
-	algo_id = move(ref.algo_id);
-	clef = move(ref.clef);
-	ref.clef = nullptr;
-	essiv_clef = move(ref.essiv_clef);
-	ref.essiv_clef = nullptr;
-	hashed_password = move(ref.hashed_password);
-	ivec = move(ref.ivec);
-	ref.ivec = nullptr;
+	}
+#else
+	throw Ecompilation(gettext("Strong encryption support (libgcrypt)"));
+#endif
     }
 
     U_32 crypto_sym::encrypted_block_size_for(U_32 clear_block_size)
@@ -358,22 +174,22 @@ namespace libdar
 	    gcry_error_t err;
 
 	    stic.dump((unsigned char *)(const_cast<char *>(clear_buf + clear_size)), (U_32)(clear_allocated - clear_size));
-	    err = gcry_cipher_reset(clef);
+	    err = gcry_cipher_reset(main_clef);
 	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("crypto_sym::crypto_encrypt_data",tools_printf(gettext("Error while resetting encryption key for a new block: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+		throw Erange("crypto_sym::encrypt_data",tools_printf(gettext("Error while resetting encryption key for a new block: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 	    make_ivec(block_num, ivec, algo_block_size, essiv_clef);
-	    err = gcry_cipher_setiv(clef, (const void *)ivec, algo_block_size);
+	    err = gcry_cipher_setiv(main_clef, (const void *)ivec, algo_block_size);
 	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("crypto_sym::crypto_encrypt_data",tools_printf(gettext("Error while setting IV for current block: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-	    err = gcry_cipher_encrypt(clef, (unsigned char *)crypt_buf, size_to_fill, (const unsigned char *)clear_buf, size_to_fill);
+		throw Erange("crypto_sym::encrypt_data",tools_printf(gettext("Error while setting IV for current block: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	    err = gcry_cipher_encrypt(main_clef, (unsigned char *)crypt_buf, size_to_fill, (const unsigned char *)clear_buf, size_to_fill);
 	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("crypto_sym::crypto_encrypt_data",tools_printf(gettext("Error while cyphering data: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+		throw Erange("crypto_sym::encrypt_data",tools_printf(gettext("Error while cyphering data: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 	    return size_to_fill;
 	}
 	else
 	    throw SRC_BUG;
 #else
-	throw Ecompilation(gettext("blowfish strong encryption support"));
+	throw Ecompilation(gettext("Strong encryption support (libgcrypt)"));
 #endif
     }
 
@@ -390,22 +206,359 @@ namespace libdar
 	    return 0; // nothing to decipher
 
 	make_ivec(block_num, ivec, algo_block_size, essiv_clef);
-	err = gcry_cipher_setiv(clef, (const void *)ivec, algo_block_size);
+	err = gcry_cipher_setiv(main_clef, (const void *)ivec, algo_block_size);
 	if(err != GPG_ERR_NO_ERROR)
-	    throw Erange("crypto_sym::crypto_encrypt_data",tools_printf(gettext("Error while setting IV for current block: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-	err = gcry_cipher_decrypt(clef, (unsigned char *)clear_buf, crypt_size, (const unsigned char *)crypt_buf, crypt_size);
+	    throw Erange("crypto_sym::decrypt_data",tools_printf(gettext("Error while setting IV for current block: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	err = gcry_cipher_decrypt(main_clef, (unsigned char *)clear_buf, crypt_size, (const unsigned char *)crypt_buf, crypt_size);
 	if(err != GPG_ERR_NO_ERROR)
-	    throw Erange("crypto_sym::crypto_encrypt_data",tools_printf(gettext("Error while decyphering data: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	    throw Erange("crypto_sym::decrypt_data",tools_printf(gettext("Error while decyphering data: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 	elastic stoc = elastic((unsigned char *)clear_buf, crypt_size, elastic_backward, reading_ver);
 	if(stoc.get_size() > crypt_size)
-	    throw Erange("crypto_sym::crypto_encrypt_data",gettext("Data corruption may have occurred, cannot decrypt data"));
+	    throw Erange("crypto_sym::decrypt_data",gettext("Data corruption may have occurred, cannot decrypt data"));
 	return crypt_size - stoc.get_size();
 #else
-	throw Ecompilation(gettext("blowfish strong encryption support"));
+	throw Ecompilation(gettext("Strong encryption support (libgcrypt)"));
+#endif
+    }
+
+    size_t crypto_sym::max_key_len(crypto_algo algo)
+    {
+#if CRYPTO_AVAILABLE
+	size_t key_len;
+	U_I algo_id = get_algo_id(algo);
+	gcry_error_t err;
+
+	    // checking for algorithm availability
+	err = gcry_cipher_algo_info(algo_id, GCRYCTL_TEST_ALGO, nullptr, nullptr);
+	if(err != GPG_ERR_NO_ERROR)
+	    throw Erange("crypto_sym::max_key_len",tools_printf(gettext("Cyphering algorithm not available in libgcrypt: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+
+	    // obtaining the maximum key length
+	key_len = gcry_cipher_get_algo_keylen(algo_id);
+	if(key_len == 0)
+	    throw Erange("crypto_sym::max_key_len",gettext("Failed retrieving from libgcrypt the maximum key length"));
+
+	return key_len;
+#else
+	throw Ecompilation("Strong encryption support (libgcrypt)");
+#endif
+
+    }
+
+    size_t crypto_sym::max_key_len_libdar(crypto_algo algo)
+    {
+#if CRYPTO_AVAILABLE
+	size_t key_len = max_key_len(algo);
+
+	if(algo == crypto_algo::blowfish)
+	    key_len = 56; // for historical reasons
+
+	return key_len;
+#else
+	throw Ecompilation("Strong encryption support (libgcrypt)");
+#endif
+    }
+
+    bool crypto_sym::is_a_strong_password(crypto_algo algo, const secu_string & password)
+    {
+#if CRYPTO_AVAILABLE
+	bool ret = true;
+	gcry_error_t err;
+	gcry_cipher_hd_t main_clef;
+	U_I algo_id = get_algo_id(algo);
+
+	err = gcry_cipher_open(&main_clef, algo_id, GCRY_CIPHER_MODE_CBC, GCRY_CIPHER_SECURE);
+	if(err != GPG_ERR_NO_ERROR)
+	    throw Erange("crypto_sym::is_a_strong_password",tools_printf(gettext("Error while opening libgcrypt key handle to check password strength: %s/%s"),
+									 gcry_strsource(err),
+									 gcry_strerror(err)));
+
+	try
+	{
+	    err = gcry_cipher_setkey(main_clef, (const void *)password.c_str(), password.get_size());
+	    if(err != GPG_ERR_NO_ERROR)
+	    {
+		if(gcry_err_code(err) == GPG_ERR_WEAK_KEY)
+		    ret = false;
+		else
+		    throw Erange("crypto_sym::is_a_strong_password",tools_printf(gettext("Error while assigning key to libgcrypt key handle to check password strength: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	    }
+	}
+	catch(...)
+	{
+	    gcry_cipher_close(main_clef);
+	    throw;
+	}
+	gcry_cipher_close(main_clef);
+
+	return ret;
+#else
+	throw Ecompilation("Strong encryption support (libgcrypt)");
+#endif
+    }
+
+    string crypto_sym::generate_salt(U_I size)
+    {
+#if CRYPTO_AVAILABLE
+	string ret;
+	unsigned char* buffer = new (nothrow) unsigned char[size];
+
+	if(buffer == nullptr)
+	    throw Ememory("crypto_sym::generate_salt");
+
+	try
+	{
+	    gcry_create_nonce(buffer, size);
+	    ret.assign((const char *)buffer, size);
+	    delete [] buffer;
+	    buffer = nullptr;
+	}
+	catch(...)
+	{
+	    if(buffer != nullptr)
+	    {
+		delete [] buffer;
+		buffer = nullptr;
+	    }
+	    throw;
+	}
+
+	return ret;
+#else
+	throw Ecompilation("Strong encryption support (libgcrypt)");
 #endif
     }
 
 #if CRYPTO_AVAILABLE
+
+    void crypto_sym::init_hashed_password(const secu_string & password,
+					  bool use_pkcs5,
+					  const std::string & salt,
+					  infinint iteration_count,
+					  hash_algo kdf_hash,
+					  crypto_algo algo)
+    {
+	if(use_pkcs5)
+	{
+	    U_I it = 0;
+
+	    iteration_count.unstack(it);
+	    if(!iteration_count.is_zero())
+		throw Erange("crypto_sym::init_hashed_password", gettext("Too large value give for key derivation interation count"));
+
+	    hashed_password = pkcs5_pass2key(password, salt, it, hash_algo_to_gcrypt_hash(kdf_hash), max_key_len_libdar(algo));
+	}
+	else
+	    hashed_password = password;
+    }
+
+    void crypto_sym::init_essiv_password(const secu_string & key,
+					 unsigned int IV_hashing)
+    {
+	U_I digest_len = gcry_md_get_algo_dlen(IV_hashing);
+
+	if(digest_len == 0)
+	    throw SRC_BUG;
+	essiv_password.resize(digest_len);
+	essiv_password.expand_string_size_to(digest_len);
+
+	    // making a hash of the provided password into the digest variable
+
+	gcry_md_hash_buffer(IV_hashing, essiv_password.get_array(), (const void *)key.c_str(), key.get_size());
+    }
+
+    void crypto_sym::init_main_clef(const secu_string & password,
+				    crypto_algo algo)
+    {
+	try
+	{
+	    gcry_error_t err;
+
+
+		// key handle initialization
+
+	    err = gcry_cipher_open(&main_clef, get_algo_id(algo), GCRY_CIPHER_MODE_CBC, GCRY_CIPHER_SECURE);
+	    if(err != GPG_ERR_NO_ERROR)
+		throw Erange("crypto_sym::init_main_clef",tools_printf(gettext("Error while opening libgcrypt key handle: %s/%s"),
+								   gcry_strsource(err),
+								   gcry_strerror(err)));
+
+		// assigning key to the handle
+
+	    err = gcry_cipher_setkey(main_clef, (const void *)hashed_password.c_str(), hashed_password.get_size());
+	    if(err != GPG_ERR_NO_ERROR)
+		throw Erange("crypto_sym::init_main_clef",tools_printf(gettext("Error while assigning key to libgcrypt key handle: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+
+	}
+	catch(...)
+	{
+	    detruit();
+	    throw;
+	};
+    }
+
+    void crypto_sym::init_essiv_clef(const secu_string & essiv_password,
+				     U_I IV_cipher,
+				     U_I main_cipher_algo_block_size)
+    {
+	gcry_error_t err;
+
+	    // creating a handle for a new handle with algo equal to "IV_cipher"
+	err = gcry_cipher_open(&essiv_clef,
+			       IV_cipher,
+			       GCRY_CIPHER_MODE_ECB,
+			       GCRY_CIPHER_SECURE);
+	if(err != GPG_ERR_NO_ERROR)
+	    throw Erange("crypto_sym::init_essiv_clef",tools_printf(gettext("Error while creating ESSIV handle: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+
+
+	    // obtaining key len for IV_cipher
+
+	size_t essiv_key_len;
+	err = gcry_cipher_algo_info(IV_cipher, GCRYCTL_GET_KEYLEN, nullptr, &essiv_key_len);
+	if(err != GPG_ERR_NO_ERROR)
+	    throw Erange("crypto_sym::init_essiv_clef",tools_printf(gettext("Failed retrieving from libgcrypt the key length to use (essiv key): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+
+	    // failing if the digest size is larger than key size for IV_cipher
+
+	if(essiv_password.get_size() > essiv_key_len
+	   && IV_cipher != GCRY_CIPHER_BLOWFISH)
+	    throw SRC_BUG;
+	    // IV_cipher and IV_hashing must be chosen in coherence!
+	    // we do not complain for older format archive... its done now and worked so far.
+	    // This bug report is rather to signal possible problem when time will come
+	    // to update the cipher and digest algorithms
+
+	    // assiging the essiv_password to the new handle
+
+	err = gcry_cipher_setkey(essiv_clef,
+				 essiv_password.c_str(),
+				 essiv_password.get_size());
+	if(err != GPG_ERR_NO_ERROR)
+	{
+		// tolerating WEAK key here, we use that key to fill the IV of the real strong key
+	    if(gpg_err_code(err) != GPG_ERR_WEAK_KEY)
+		throw Erange("crypto_sym::init_essiv_clef",tools_printf(gettext("Error while assigning key to libgcrypt key handle (essiv): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	}
+
+	    // obtaining the block size of the essiv cipher
+
+	size_t algo_block_size_essiv;
+
+	err = gcry_cipher_algo_info(IV_cipher, GCRYCTL_GET_BLKLEN, nullptr, &algo_block_size_essiv);
+	if(err != GPG_ERR_NO_ERROR)
+	    throw Erange("crypto_sym::init_essiv_clef",tools_printf(gettext("Failed retrieving from libgcrypt the block size used by the cyphering algorithm (essiv): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	if(algo_block_size_essiv == 0)
+	    throw SRC_BUG;
+
+	if(main_cipher_algo_block_size == 0)
+	    throw SRC_BUG;
+
+	    // testing the coherence of block size between main cipher key
+	    // and cipher key used to generate IV for the main cipher key
+
+	if(main_cipher_algo_block_size < algo_block_size_essiv)
+	    throw SRC_BUG; // cannot cipher less data (IV for main key) than block size of IV key
+	else
+	    if(main_cipher_algo_block_size % algo_block_size_essiv != 0)
+		throw SRC_BUG;
+	    // in ECB mode we should encrypt an integer number of blocks according
+	    // to IV key block size
+    }
+
+    void crypto_sym::init_algo_block_size(crypto_algo algo)
+    {
+	gcry_error_t err;
+
+	    // obtaining the block length
+
+	err = gcry_cipher_algo_info(get_algo_id(algo), GCRYCTL_GET_BLKLEN, nullptr, &algo_block_size);
+	if(err != GPG_ERR_NO_ERROR)
+	    throw Erange("crypto_sym::init_algo_block_size",tools_printf(gettext("Failed retrieving from libgcrypt the block size used by the cyphering algorithm: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	if(algo_block_size == 0)
+	    throw SRC_BUG;
+    }
+
+    void crypto_sym::init_ivec(crypto_algo algo, size_t algo_block_size)
+    {
+
+	    // initializing ivec in secure memory
+
+	ivec = (unsigned char *)gcry_malloc_secure(algo_block_size);
+	if(ivec == nullptr)
+	    throw Esecu_memory("crypto_sym::init_ivec");
+    }
+
+    void crypto_sym::detruit()
+    {
+	if(main_clef != nullptr)
+	    gcry_cipher_close(main_clef);
+	if(essiv_clef != nullptr)
+	    gcry_cipher_close(essiv_clef);
+	if(ivec != nullptr)
+	{
+	    (void)memset(ivec, 0, algo_block_size);
+	    gcry_free(ivec);
+	}
+    }
+
+    void crypto_sym::copy_from(const crypto_sym & ref)
+    {
+	reading_ver = ref.reading_ver;
+	algo = ref.algo;
+	hashed_password = ref.hashed_password;
+	essiv_password = ref.essiv_password;
+	init_main_clef(hashed_password, algo);
+	init_algo_block_size(algo);
+	init_ivec(algo, algo_block_size);
+	U_I IV_cipher;
+	U_I IV_hashing;
+	get_IV_cipher_and_hashing(reading_ver, get_algo_id(algo), IV_cipher, IV_hashing);
+	init_essiv_clef(essiv_password, IV_cipher, algo_block_size);
+    }
+
+    void crypto_sym::move_from(crypto_sym && ref)
+    {
+	    // we assume the current object has no field assigned
+	    // same as for copy_from():
+	reading_ver = move(ref.reading_ver);
+	algo = move(ref.algo);
+	hashed_password = move(ref.hashed_password);
+	essiv_password = move(ref.essiv_password);
+	main_clef = move(ref.main_clef);
+	essiv_clef = move(ref.essiv_clef);
+	algo_block_size = move(ref.algo_block_size);
+	ivec = move(ref.ivec);
+	ref.main_clef = nullptr;
+	ref.essiv_clef = nullptr;
+	ivec = nullptr;
+    }
+
+    void crypto_sym::get_IV_cipher_and_hashing(const archive_version & ver, U_I main_cipher, U_I & cipher, U_I & hashing)
+    {
+	if(ver >= archive_version(8,1)
+	   && main_cipher != get_algo_id(crypto_algo::blowfish))
+	{
+	    cipher = GCRY_CIPHER_AES256; // to have an algorithm available when ligcrypt is used in FIPS mode
+	    hashing = GCRY_MD_SHA256; // SHA224 was also ok but as time passes, it would get sooner unsave
+	}
+	else
+	{
+	    // due to 8 bytes block_size we keep using
+	    // blowfish for the essiv key: other cipher have 16 bytes block size
+	    // and generating an IV of eight bytes would require doubling the size
+	    // of the data to encrypt and skinking the encrypted data afterward to
+	    // the 8 requested bytes of the IV for the main key...
+	    //
+	    // in the other side, the replacement of blowfish by aes256 starting format 8.1
+	    // was requested to have libdar working when libgcrypt is in FIPS mode, which
+	    // forbids the use of blowfish... we stay here compatible with FIPS mode.
+
+	    cipher = GCRY_CIPHER_BLOWFISH;
+	    hashing = GCRY_MD_SHA1;
+	}
+    }
+
     void crypto_sym::make_ivec(const infinint & ref, unsigned char *ivec, U_I size, const gcry_cipher_hd_t & IVkey)
     {
 
@@ -436,7 +589,7 @@ namespace libdar
 		// IV(sector) = E_salt(sector)
 	    err = gcry_cipher_encrypt(IVkey, (unsigned char *)ivec, size, (const unsigned char *)sect, size);
 	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("crypto_sym::crypto_encrypt_data",tools_printf(gettext("Error while generating IV: %s/%s"), gcry_strsource(err), gcry_strerror(err)));
+		throw Erange("crypto_sym::make_ivec",tools_printf(gettext("Error while generating IV: %s/%s"), gcry_strsource(err), gcry_strerror(err)));
 	}
 	catch(...)
 	{
@@ -445,9 +598,7 @@ namespace libdar
 	}
 	delete [] sect;
     }
-#endif
 
-#if CRYPTO_AVAILABLE
     secu_string crypto_sym::pkcs5_pass2key(const secu_string & password,
 					   const string & salt,
 					   U_I iteration_count,
@@ -574,144 +725,46 @@ namespace libdar
 
 	return retval;
     }
-#endif
 
-#if CRYPTO_AVAILABLE
-    void crypto_sym::dar_set_essiv(const secu_string & key,
-				   gcry_cipher_hd_t & IVkey,
-				   const archive_version & ver,
-				   crypto_algo main_cipher)
+    U_I crypto_sym::get_algo_id(crypto_algo algo)
     {
-	    // Calculate the ESSIV salt.
-	    // Recall that ESSIV(sector) = E_salt(sector); salt = H(key).
+	U_I algo_id;
 
-	unsigned int IV_cipher;
-	unsigned int IV_hashing;
-
-	if(ver >= archive_version(8,1)
-	    && main_cipher != crypto_algo::blowfish)
+	switch(algo)
 	{
-	    IV_cipher = GCRY_CIPHER_AES256; // to have an algorithm available when ligcrypt is used in FIPS mode
-	    IV_hashing = GCRY_MD_SHA256; // SHA224 was also ok but as time passes, it would get sooner unsave
-	}
-	else
-	{
-	    // due to 8 bytes block_size we keep using
-	    // blowfish for the essiv key: other cipher have 16 bytes block size
-	    // and generating an IV of eight bytes would require doubling the size
-	    // of the data to encrypt and skinking the encrypted data afterward to
-	    // the 8 requested bytes of the IV for the main key...
-	    //
-	    // in the other side, the replacement of blowfish by aes256 starting format 8.1
-	    // was requested to have libdar working when libgcrypt is in FIPS mode, which
-	    // forbids the use of blowfish... we stay here compatible with FIPS mode.
-
-	    IV_cipher = GCRY_CIPHER_BLOWFISH;
-	    IV_hashing = GCRY_MD_SHA1;
-	}
-
-	void *digest = nullptr;
-	U_I digest_len = gcry_md_get_algo_dlen(IV_hashing);
-	gcry_error_t err;
-
-	if(digest_len == 0)
+	case crypto_algo::blowfish:
+	    algo_id = GCRY_CIPHER_BLOWFISH;
+	    break;
+	case crypto_algo::aes256:
+	    algo_id = GCRY_CIPHER_AES256;
+	    break;
+	case crypto_algo::twofish256:
+	    algo_id = GCRY_CIPHER_TWOFISH;
+	    break;
+	case crypto_algo::serpent256:
+	    algo_id = GCRY_CIPHER_SERPENT256;
+	    break;
+	case crypto_algo::camellia256:
+	    algo_id = GCRY_CIPHER_CAMELLIA256;
+	    break;
+	default:
 	    throw SRC_BUG;
-	digest = gcry_malloc_secure(digest_len);
-	if(digest == nullptr)
-	    throw Ememory("crypto_sym::dar_set_essiv");
-
-	try
-	{
-		// making a hash of the provided password into the digest variable
-
-	    gcry_md_hash_buffer(IV_hashing, digest, (const void *)key.c_str(), key.get_size());
-
-		// creating a handle for a new handle with algo equal to "IV_cipher"
-	    err = gcry_cipher_open(&IVkey,
-				   IV_cipher,
-				   GCRY_CIPHER_MODE_ECB,
-				   GCRY_CIPHER_SECURE);
-	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("crypto_sym::dar_set_essiv",tools_printf(gettext("Error while creating ESSIV handle: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-
-
-		// obtaining key len for IV_cipher
-
-	    size_t essiv_key_len;
-	    err = gcry_cipher_algo_info(IV_cipher, GCRYCTL_GET_KEYLEN, nullptr, &essiv_key_len);
-	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Failed retrieving from libgcrypt the key length to use (essiv key): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-
-		// failing if the digest size is larger than key size for IV_cipher
-
-	    if(digest_len > essiv_key_len
-	       && IV_cipher != GCRY_CIPHER_BLOWFISH)
-		throw SRC_BUG;
-		// IV_cipher and IV_hashing must be chosen in coherence!
-		// we do not complain for older format archive... its done now and worked so far.
-		// This bug report is rather to signal possible problem when time will come
-		// to update the cipher and digest algorithms
-
-		// assiging the digest as key for the new handle
-
-	    err = gcry_cipher_setkey(IVkey,
-				     digest,
-				     digest_len);
-	    if(err != GPG_ERR_NO_ERROR)
-	    {
-		    // tolerating WEAK key here, we use that key to fill the IV of the real strong key
-		if(gpg_err_code(err) != GPG_ERR_WEAK_KEY)
-		    throw Erange("crypto_sym::dar_set_essiv",tools_printf(gettext("Error while assigning key to libgcrypt key handle (essiv): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-	    }
-
-		// obtaining the block size of the essiv cipher
-
-	    size_t algo_block_size_essiv;
-
-	    err = gcry_cipher_algo_info(IV_cipher, GCRYCTL_GET_BLKLEN, nullptr, &algo_block_size_essiv);
-	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Failed retrieving from libgcrypt the block size used by the cyphering algorithm (essiv): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-	    if(algo_block_size_essiv == 0)
-		throw SRC_BUG;
-
-		// obtaining the block size of the main cipher
-
-	    size_t local_algo_block_size;
-
-	    err = gcry_cipher_algo_info(get_algo_id(main_cipher), GCRYCTL_GET_BLKLEN, nullptr, &local_algo_block_size);
-	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Failed retrieving from libgcrypt the block size used by the cyphering algorithm: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-	    if(local_algo_block_size == 0)
-		throw SRC_BUG;
-
-		// testing the coherence of block size between main cipher key
-		// and cipher key used to generate IV for the main cipher key
-
-	    if(local_algo_block_size < algo_block_size_essiv)
-		throw SRC_BUG; // cannot cipher less data (IV for main key) than block size of IV key
-	    else
-		if(local_algo_block_size % algo_block_size_essiv != 0)
-		    throw SRC_BUG;
-		// in ECB mode we should encrypt an integer number of blocks according
-		// to IV key block size
-
 	}
-	catch(...)
-	{
-	    (void)memset(digest, 0, digest_len); // attempt to scrub memory
-	    gcry_free(digest);
-	    throw;
-	}
-	(void)memset(digest, 0, digest_len); // attempt to scrub memory
-	gcry_free(digest);
+
+	return algo_id;
     }
-#endif
-
 
 #ifdef LIBDAR_NO_OPTIMIZATION
+
+    bool crypto_sym::self_tested = false;
+
     void crypto_sym::self_test(void)
     {
-#if CRYPTO_AVAILABLE
+	if(self_tested)
+	    return;
+	else
+	    self_tested = true;
+
 	    //
 	    // Test PBKDF2 (test vectors are from RFC 3962.)
 	    //
@@ -720,7 +773,7 @@ namespace libdar
 	string p2 = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"; // 64 characters
 	string p4 = p2 + "X"; // 65 characters
 	secu_string pass = secu_string(100);
-	gcry_cipher_hd_t esivkey;
+
 
 	pass.append(p1.c_str(), (U_I)p1.size());
 	result = pkcs5_pass2key(pass, "ATHENA.MIT.EDUraeburn", 1, GCRY_MD_SHA1, 16);
@@ -769,59 +822,41 @@ namespace libdar
 	string p3 = string("\0\0\0\0", 4);
 	pass.clear();
 	pass.append(p3.c_str(), (U_I)p3.size());
-	dar_set_essiv(pass, esivkey, 1, crypto_algo::blowfish);
 
-	try
-	{
+	    // temporary object used to build the key to
+	    // generate IV
+	crypto_sym tester(pass,
+			  6,
+			  crypto_algo::blowfish,
+			  "",
+			  0,
+			  hash_algo::md5,
+			  false);
 
-	    for (i = 0; tests[i].sector != 0xdeadbeef; ++i)
-	    {
-		make_ivec(tests[i].sector, (unsigned char *) ivec, 8, esivkey);
-		if (memcmp(ivec, tests[i].iv, 8) != 0)
-			//cerr << "sector = " << tests[i].sector << endl;
-			//cerr << "ivec = @@" << string(ivec, 8) << "@@" << endl;
-			//cerr << "should be @@" << string(tests[i].iv, 8) << "@@" << endl;
-		    throw Erange("crypto_sym::self_test", gettext("Library used for blowfish encryption does not respect RFC 3962"));
-	    }
-	}
-	catch(...)
+	    // the following is ugly, we make a reference
+	    // in the local block to the field of the tester
+	    // object. We can do that because self_test()
+	    // is a member (yet a static one) of the crypto_sym
+	    // class.
+	    // this is done to reduce change in this testing
+	    // routine that was getting a gcry_cipher_hd_t key
+	    // from another static method of class crpto_sym
+	    // in the past. Since then this routine has been
+	    // moved and split in several non static methods
+	gcry_cipher_hd_t & esivkey = tester.essiv_clef;
+
+	for (i = 0; tests[i].sector != 0xdeadbeef; ++i)
 	{
-	    gcry_cipher_close(esivkey);
-	    throw;
+	    make_ivec(tests[i].sector, (unsigned char *) ivec, 8, esivkey);
+	    if (memcmp(ivec, tests[i].iv, 8) != 0)
+		    //cerr << "sector = " << tests[i].sector << endl;
+		    //cerr << "ivec = @@" << string(ivec, 8) << "@@" << endl;
+		    //cerr << "should be @@" << string(tests[i].iv, 8) << "@@" << endl;
+		throw Erange("crypto_sym::self_test", gettext("Library used for blowfish encryption does not respect RFC 3962"));
 	}
-	gcry_cipher_close(esivkey);
-#endif
     }
 #endif
 
-#if CRYPTO_AVAILABLE
-    U_I crypto_sym::get_algo_id(crypto_algo algo)
-    {
-	U_I algo_id;
-
-	switch(algo)
-	{
-	case crypto_algo::blowfish:
-	    algo_id = GCRY_CIPHER_BLOWFISH;
-	    break;
-	case crypto_algo::aes256:
-	    algo_id = GCRY_CIPHER_AES256;
-	    break;
-	case crypto_algo::twofish256:
-	    algo_id = GCRY_CIPHER_TWOFISH;
-	    break;
-	case crypto_algo::serpent256:
-	    algo_id = GCRY_CIPHER_SERPENT256;
-	    break;
-	case crypto_algo::camellia256:
-	    algo_id = GCRY_CIPHER_CAMELLIA256;
-	    break;
-	default:
-	    throw SRC_BUG;
-	}
-
-	return algo_id;
-    }
 #endif
 
 } // end of namespace
