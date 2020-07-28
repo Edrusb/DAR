@@ -139,10 +139,16 @@ namespace libdar
 
     U_32 crypto_sym::encrypted_block_size_for(U_32 clear_block_size)
     {
+#if CRYPTO_AVAILABLE
+
 	return ((clear_block_size / algo_block_size) + 1) * algo_block_size;
 	    // round to the upper "algo_block_size" byte block of data.
 	    // and add an additional "algo_block_size" block if no rounding is necessary.
 	    // (we need some place to add the elastic buffer at the end of the block)
+
+#else
+	throw Ecompilation(gettext("Strong encryption support (libgcrypt)"));
+#endif
     }
 
     U_32 crypto_sym::clear_block_allocated_size_for(U_32 clear_block_size)

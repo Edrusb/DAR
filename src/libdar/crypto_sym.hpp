@@ -174,6 +174,10 @@ namespace libdar
 	static void self_test(void);
 #endif
 
+#else
+	void detruit() { throw Ecompilation(gettext("Strong encryption support (libgcrypt)")); };
+	void copy_from(const crypto_sym & ref) { throw Ecompilation(gettext("Strong encryption support (libgcrypt)")); };
+	void move_from(crypto_sym && ref) { throw Ecompilation(gettext("Strong encryption support (libgcrypt)")); };
 #endif
     };
 
