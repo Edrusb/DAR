@@ -157,6 +157,17 @@ namespace libdar
 	mem[*string_size] = '\0';
     }
 
+    void secu_string::expand_string_size_to(U_I size)
+    {
+	if(size > get_allocated_size())
+	    throw Erange("secu_string::expand_string_size_to", gettext("Cannot expand secu_string size past its allocation size"));
+	if(size < *string_size)
+	    throw Erange("secu_stering::expand_string_size_to", gettext("Cannot expand a secu_string below its current size"));
+
+	memset(mem + *string_size, '\0', size - *string_size);
+	*string_size = size;
+    }
+
     void secu_string::randomize(U_I size)
     {
 #if CRYPTO_AVAILABLE

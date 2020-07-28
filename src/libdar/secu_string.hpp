@@ -132,6 +132,10 @@ namespace libdar
 	    /// \param[in] pos is the length of the string to set, it must be smaller or equal to the current size
 	void reduce_string_size_to(U_I pos);
 
+	    /// set the string size within the allocated secure memory
+	void expand_string_size_to(U_I size);
+
+
 	    /// clear the string (set to an empty string)
 	void clear() { *string_size = 0; };
 
