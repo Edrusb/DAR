@@ -130,7 +130,7 @@ namespace libdar
 
 		    ptr->block_index = index_num++;
 		    crypt_offset += ptr->crypted_data.get_data_size();
-		    workers->scatter(ptr, static_cast<int>(flag));
+		    workers->scatter(move(ptr), static_cast<int>(flag));
 		}
 		else
 		    flag = tronco_flags::eof;
@@ -169,7 +169,7 @@ namespace libdar
 	{
 	    ptr = tas->get();
 	    ptr->reset();
-	    workers->scatter(ptr, static_cast<int>(flag));
+	    workers->scatter(move(ptr), static_cast<int>(flag));
 	}
     }
 
@@ -219,21 +219,21 @@ namespace libdar
 								       ptr->clear_data.get_addr(),
 								       ptr->clear_data.get_max_size()));
 		    ptr->clear_data.rewind_read();
-		    writer->worker_push_one(slot, ptr, static_cast<int>(flag));
+		    writer->worker_push_one(slot, move(ptr), static_cast<int>(flag));
 		}
 		catch(Erange & e)
 		{
-		    writer->worker_push_one(slot, ptr, static_cast<int>(tronco_flags::data_error));
+		    writer->worker_push_one(slot, move(ptr), static_cast<int>(tronco_flags::data_error));
 		}
 		break;
 	    case tronco_flags::stop:
 	    case tronco_flags::eof:
-		writer->worker_push_one(slot, ptr, static_cast<int>(flag));
+		writer->worker_push_one(slot, move(ptr), static_cast<int>(flag));
 		waiting->wait();
 		break;
 	    case tronco_flags::die:
 		end = true;
-		writer->worker_push_one(slot, ptr, static_cast<int>(flag));
+		writer->worker_push_one(slot, move(ptr), static_cast<int>(flag));
 		break;
 	    case tronco_flags::data_error:
 		throw SRC_BUG; // should not receive a block with that flag

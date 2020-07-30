@@ -115,10 +115,10 @@ public:
 	while(cryoff < crypt_size)
 	{
 	    remain = crypt_size - cryoff;
-	    if(remain > chunk + 1)
-		remain = chunk;
 	    if(remain < chunk)
 		throw SRC_BUG;
+	    if(remain > chunk)
+		remain = chunk;
 
 	    switch(crypt_buf[cryoff + chunk]) // end of chunk to read
 	    {
