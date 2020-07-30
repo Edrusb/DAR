@@ -795,8 +795,9 @@ namespace libdar
 	tmp.write(first->crypted_data.get_addr(), first->crypted_data.get_data_size());
 	if(opt_next)
 	    tmp.write(opt_next->crypted_data.get_addr(), opt_next->crypted_data.get_data_size());
+	if(callback == nullptr)
+	    throw SRC_BUG;
 	clear_offset = (*callback)(tmp, reading_ver);
-
 
 	if(clear_offset >= initial_shift)
 	    clear_offset -= initial_shift;

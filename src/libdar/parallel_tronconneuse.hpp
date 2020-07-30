@@ -68,7 +68,8 @@ namespace libdar
 	    version(reading_ver),
 	    tas(xtas),
 	    initial_shift(init_shift),
-	    reof(false)
+	    reof(false),
+	    trailing_clear_data(nullptr)
 	{ flag = tronco_flags::normal; };
 
 	    /// let the caller give a callback function that given a generic_file with mixed cyphered and clear data, is able
@@ -132,7 +133,6 @@ namespace libdar
 	std::shared_ptr<heap<crypto_segment> >tas; ///< where to fetch from blocks of data
 	infinint initial_shift;                    ///< initial shift
 	bool reof;                                 ///< whether we reached eof while reading
-
 	infinint (*trailing_clear_data)(generic_file & below, const archive_version & reading_ver); ///< callback function that gives the amount of clear data found at the end of the given file
 
 	    // initialized by inherited_run() / get_ready_for_new_offset()

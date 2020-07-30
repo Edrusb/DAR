@@ -135,6 +135,8 @@ public:
 	    };
 	    memcpy(clear_buf + wrote, crypt_buf + cryoff, remain);
 	    wrote += remain;
+	    if(wrote > clear_size)
+		throw SRC_BUG;
 	    cryoff += chunk + 1;
 	}
 	return wrote;
