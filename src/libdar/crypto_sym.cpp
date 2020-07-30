@@ -160,7 +160,8 @@ namespace libdar
 				  const char *clear_buf,
 				  const U_32 clear_size,
 				  const U_32 clear_allocated,
-				  char *crypt_buf, U_32 crypt_size)
+				  char *crypt_buf,
+				  U_32 crypt_size)
     {
 #if CRYPTO_AVAILABLE
 	U_32 size_to_fill = encrypted_block_size_for(clear_size);
