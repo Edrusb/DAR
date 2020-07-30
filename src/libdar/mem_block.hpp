@@ -62,15 +62,17 @@ namespace libdar
 	bool is_full() const { return data_size == alloc_size; };
 	bool is_empty() const { return data_size == 0; };
 
-	char *get_addr() { return data; };
+	char* get_addr() { return data; };
 	void set_data_size(U_I size);
 
     private:
-	char *data;
+	char* data;
 	U_I alloc_size;
 	U_I data_size;
 	U_I read_cursor;
 	U_I write_cursor;
+
+	void move_from(mem_block && ref);
     };
 
 

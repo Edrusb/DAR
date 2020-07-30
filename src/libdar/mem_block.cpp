@@ -78,8 +78,10 @@ namespace libdar
     void mem_block::resize(U_I size)
     {
 	if(data != nullptr)
+	{
 	    delete [] data;
-	data = nullptr;
+	    data = nullptr;
+	}
 
 	if(size > 0)
 	{
@@ -95,26 +97,36 @@ namespace libdar
 
     U_I mem_block::read(char *a, U_I size)
     {
-	U_I remains = data_size - read_cursor;
-	U_I amount = size < remains ? size : remains;
+	if(data_size < read_cursor)
+	    throw SRC_BUG;
+	else
+	{
+	    U_I remains = data_size - read_cursor;
+	    U_I amount = size < remains ? size : remains;
 
-	memcpy(a, data, amount);
-	read_cursor += amount;
+	    memcpy(a, data, amount);
+	    read_cursor += amount;
 
-	return amount;
+	    return amount;
+	}
     }
 
     U_I mem_block::write(const char *a, U_I size)
     {
-	U_I remains = alloc_size - write_cursor;
-	U_I amount = size < remains ? size : remains;
+	if(alloc_size < write_cursor)
+	    throw SRC_BUG;
+	else
+	{
+	    U_I remains = alloc_size - write_cursor;
+	    U_I amount = size < remains ? size : remains;
 
-	memcpy(data + write_cursor, a, amount);
-	write_cursor += amount;
-	if(data_size < write_cursor)
-	    data_size = write_cursor;
+	    memcpy(data + write_cursor, a, amount);
+	    write_cursor += amount;
+	    if(data_size < write_cursor)
+		data_size = write_cursor;
 
-	return amount;
+	    return amount;
+	}
     }
 
     void mem_block::rewind_read(U_I offset)
@@ -129,6 +141,12 @@ namespace libdar
 	if(size > alloc_size)
 	    throw SRC_BUG;
 	data_size = size;
+	if(read_cursor < size)
+	    read_cursor = size;
+	if(write_cursor < size)
+	    write_cursor = size;
+    }
+
     void mem_block::move_from(mem_block && ref)
     {
 	swap(data, ref.data);
