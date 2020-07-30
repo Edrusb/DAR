@@ -42,10 +42,10 @@ namespace libdar
     {
     public:
 	mem_block(U_I size = 0);
-	mem_block(const mem_block &ref) = delete;
-	mem_block(mem_block && ref) noexcept = default;
+	mem_block(const mem_block & ref) = delete;
+	mem_block(mem_block && ref) noexcept;
 	mem_block & operator = (const mem_block & ref) = delete;
-	mem_block & operator = (mem_block && ref) noexcept = default;
+	mem_block & operator = (mem_block && ref) noexcept;
 	virtual ~mem_block();
 
 

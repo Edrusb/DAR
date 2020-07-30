@@ -42,10 +42,37 @@ namespace libdar
 	resize(size);
     }
 
+    mem_block::mem_block(mem_block && ref) noexcept
+    {
+	try
+	{
+	    data = nullptr;
+	    move_from(move(ref));
+	}
+	catch(...)
+	{
+		// noexcept
+	}
+    }
+
     mem_block::~mem_block()
     {
 	if(data != nullptr)
 	    delete [] data;
+    }
+
+    mem_block & mem_block::operator = (mem_block && ref) noexcept
+    {
+	try
+	{
+	    move_from(move(ref));
+	}
+	catch(...)
+	{
+		// noexcept
+	}
+
+	return *this;
     }
 
     void mem_block::resize(U_I size)
@@ -102,6 +129,13 @@ namespace libdar
 	if(size > alloc_size)
 	    throw SRC_BUG;
 	data_size = size;
+    void mem_block::move_from(mem_block && ref)
+    {
+	swap(data, ref.data);
+	alloc_size = move(ref.alloc_size);
+	data_size = move(ref.data_size);
+	read_cursor = move(ref.read_cursor);
+	write_cursor = move(ref.write_cursor);
     }
 
 } // end of namespace
