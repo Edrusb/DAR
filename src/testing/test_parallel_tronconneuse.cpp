@@ -189,10 +189,16 @@ void f1()
     secu_string secu_pass(pass, sizeof(pass));
     unique_ptr<crypto_module> ptr1;
     bool simple = false;
+    time_t temp;
+    U_32 chain_size;
 
     if(simple)
+    {
 	ptr1 = make_unique<pseudo_crypto>();
+	chain_size = 10240;
+    }
     else
+    {
 	ptr1 = make_unique<crypto_sym>(secu_pass,
 				       macro_tools_supported_version,
 				       crypto_algo::aes256,
@@ -200,20 +206,21 @@ void f1()
 				       2000,
 				       hash_algo::sha512,
 				       true);
+	chain_size = 10240;
+    }
 
     if(!ptr1)
 	throw Ememory("pseudo_crypto");
     unique_ptr<crypto_module> ptr2 = ptr1->clone();
     if(!ptr2)
 	throw Ememory("pseudo_crypto");
-
-    unique_ptr<tronconneuse> encry = make_unique<tronconneuse>(25, // block size
+    unique_ptr<tronconneuse> encry = make_unique<tronconneuse>(chain_size,
 							       *dst,
 							       true,
 							       macro_tools_supported_version,
 							       ptr1);
 
-    time_t temp = time(NULL);
+    temp = time(NULL);
     cout << "ciphering... " << ctime(&temp) << endl;
     src->copy_to(*encry);
     src->terminate();
@@ -223,6 +230,7 @@ void f1()
     encry.reset();
     dst.reset();
 
+
     src = make_unique<fichier_local>(CRYPT, false);
     dst = make_unique<fichier_local>(ui, BACK, gf_write_only, 0644, false, true, false);
 
@@ -231,13 +239,13 @@ void f1()
 
     if(!single)
 	decry = make_unique<parallel_tronconneuse>(2, // worker
-						   25, // block size
+						   chain_size,
 						   *src,
 						   true,
 						   macro_tools_supported_version,
 						   ptr2);
     else
-	decry = make_unique<tronconneuse>(25,
+	decry = make_unique<tronconneuse>(chain_size,
 					  *src,
 					  true,
 					  macro_tools_supported_version,
