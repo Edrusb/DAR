@@ -635,7 +635,7 @@ namespace libdar
 	    try
 	    {
 		for(U_I i = 0; i < heap_size; ++i)
-		    tas->put(make_unique<crypto_segment>(crypted_block_size, clear_block_size));
+		    tas->put(make_unique<crypto_segment>(crypted_block_size, crypto->clear_block_allocated_size_for(clear_block_size)));
 	    }
 	    catch(std::bad_alloc &)
 	    {

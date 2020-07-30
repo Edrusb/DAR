@@ -216,7 +216,7 @@ namespace libdar
 	err = gcry_cipher_setiv(main_clef, (const void *)ivec, algo_block_size);
 	if(err != GPG_ERR_NO_ERROR)
 	    throw Erange("crypto_sym::decrypt_data",tools_printf(gettext("Error while setting IV for current block: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-	err = gcry_cipher_decrypt(main_clef, (unsigned char *)clear_buf, crypt_size, (const unsigned char *)crypt_buf, crypt_size);
+	err = gcry_cipher_decrypt(main_clef, (unsigned char *)clear_buf, clear_size, (const unsigned char *)crypt_buf, crypt_size);
 	if(err != GPG_ERR_NO_ERROR)
 	    throw Erange("crypto_sym::decrypt_data",tools_printf(gettext("Error while decyphering data: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 	elastic stoc = elastic((unsigned char *)clear_buf, crypt_size, elastic_backward, reading_ver);

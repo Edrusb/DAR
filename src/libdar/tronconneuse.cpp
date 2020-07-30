@@ -440,7 +440,7 @@ namespace libdar
 
 		try
 		{
-		    buf_byte_data = crypto->decrypt_data(block_num, encrypted_buf, encrypted_buf_data, buf, clear_block_size);
+		    buf_byte_data = crypto->decrypt_data(block_num, encrypted_buf, encrypted_buf_data, buf, buf_size);
 		}
 		catch(Erange & e)
 		{
@@ -451,7 +451,7 @@ namespace libdar
 			    remove_trailing_clear_data_from_encrypted_buf(crypt_offset);
 
 				// retrying but without trailing cleared data
-			    buf_byte_data = crypto->decrypt_data(block_num, encrypted_buf, encrypted_buf_data, buf, clear_block_size);
+			    buf_byte_data = crypto->decrypt_data(block_num, encrypted_buf, encrypted_buf_data, buf, buf_size);
 			}
 			catch(Egeneric & f)
 			{
