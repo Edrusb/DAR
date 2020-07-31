@@ -359,7 +359,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	post_constructor_init();
-	send_order(tronco_flags::stop);
+	send_read_order(tronco_flags::stop);
 	return encrypted->skippable(direction, amount);
     }
 
@@ -373,7 +373,7 @@ namespace libdar
 	if(get_mode() != gf_read_only)
 	    throw SRC_BUG;
 
-	send_order(tronco_flags::stop);
+	send_read_order(tronco_flags::stop);
 	current_position = pos;
 	lus_eof = false;
 	return true;
@@ -391,7 +391,7 @@ namespace libdar
 	if(get_mode() != gf_read_only)
 	    throw SRC_BUG;
 
-	send_order(tronco_flags::stop);
+	send_read_order(tronco_flags::stop);
 
 	ret = encrypted->skip_to_eof();
 	if(ret)
@@ -460,7 +460,7 @@ namespace libdar
 	    post_constructor_init();
 
 	if(!suspended)
-	    send_order(tronco_flags::stop);
+	    send_read_order(tronco_flags::stop);
 	initial_shift = x;
 	crypto_reader->set_initial_shift(x);
     }
@@ -648,7 +648,7 @@ namespace libdar
 	if(get_mode() == gf_read_only)
 	{
 	    post_constructor_init();
-	    send_order(tronco_flags::stop);
+	    send_read_order(tronco_flags::stop);
 	    purge_ratelier_up_to(tronco_flags::stop);
 	}
     }
@@ -663,7 +663,7 @@ namespace libdar
 
 	if(get_mode() == gf_read_only)
 	{
-	    send_order(tronco_flags::die);
+	    send_read_order(tronco_flags::die);
 
 	    // waiting for the end of all subthreads
 
@@ -718,7 +718,7 @@ namespace libdar
 	}
     }
 
-    void parallel_tronconneuse::send_order(tronco_flags order)
+    void parallel_tronconneuse::send_read_order(tronco_flags order)
     {
 	if(get_mode() != gf_read_only)
 	    throw SRC_BUG;
@@ -728,6 +728,34 @@ namespace libdar
 	    waiter->wait();
 	purge_ratelier_up_to(order);
 	suspended = true;
+    }
+
+    void parallel_tronconneuse::send_write_order(tronco_flags order)
+    {
+	switch(order)
+	{
+	case tronco_flags::normal:
+	case tronco_flags::stop:
+	case tronco_flags::eof:
+	case tronco_flags::data_error:
+	    throw SRC_BUG;
+	case tronco_flags::die:
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
+
+	sync_write();
+	if(tempo_write)
+	    throw SRC_BUG;
+
+	for(U_I i = 0; i < num_workers; ++i)
+	{
+	    tempo_write = tas->get();
+	    scatter->scatter(move(tempo_write), static_cast<int>(order));
+	}
+	if(order != tronco_flags::die) // OK OK, today only "die" is expected
+	    waiter->wait(); // to release threads once order has been received
     }
 
     void parallel_tronconneuse::go_read()

@@ -335,11 +335,13 @@ namespace libdar
 	    // the child threads
 	std::deque<crypto_worker> travailleur;
 	std::unique_ptr<read_below> crypto_reader;
+//	std::unique_ptr<write_below> crypto_writer;
 
 	    /// initialize fields that could be not be from constructor
 	    /// then run the child threads
 	void post_constructor_init();
-	void send_order(tronco_flags order);
+	void send_read_order(tronco_flags order);
+	void send_write_order(tronco_flags order);
 	void go_read();
 	void read_refill();
 	void purge_ratelier_up_to(tronco_flags order);
