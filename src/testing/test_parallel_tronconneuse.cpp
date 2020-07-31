@@ -261,6 +261,8 @@ void f1()
     decry->read(buf, bufsize);
     decry->skip(1);
     decry->read(buf, bufsize);
+    decry->skip_to_eof();
+    infinint x = decry->get_position();
 
     decry->terminate();
     src->terminate();
