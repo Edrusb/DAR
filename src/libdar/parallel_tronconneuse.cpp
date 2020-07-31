@@ -645,9 +645,12 @@ namespace libdar
 
     void parallel_tronconneuse::inherited_flush_read()
     {
-	post_constructor_init();
-	send_order(tronco_flags::stop);
-	purge_ratelier_up_to(tronco_flags::stop);
+	if(get_mode() == gf_read_only)
+	{
+	    post_constructor_init();
+	    send_order(tronco_flags::stop);
+	    purge_ratelier_up_to(tronco_flags::stop);
+	}
     }
 
     void parallel_tronconneuse::inherited_terminate()
@@ -655,11 +658,20 @@ namespace libdar
 	deque<crypto_worker>::iterator it = travailleur.begin();
 
 	post_constructor_init();
-	send_order(tronco_flags::die);
+	sync_write();
+	flush_read();
+
+	if(get_mode() == gf_read_only)
+	{
+	    send_order(tronco_flags::die);
 
 	    // waiting for the end of all subthreads
 
-	crypto_reader->join(); // may propagate exception thrown in child thread
+	    crypto_reader->join(); // may propagate exception thrown in child thread
+	}
+	else
+	    throw SRC_BUG; // a implementer
+
 	while(it != travailleur.end())
 	{
 	    it->join(); // may propagate exception thrown in child thread
@@ -690,19 +702,27 @@ namespace libdar
 		throw Ememory("tronconneuse::post_constructor_init");
 	    }
 
-		// launching all subthreads
-	    if(!crypto_reader)
-		throw SRC_BUG;
+	    if(get_mode() == gf_read_only)
+	    {
+		    // launching all subthreads
+		if(!crypto_reader)
+		    throw SRC_BUG;
+		else
+		    crypto_reader->run();
+	    }
 	    else
-		crypto_reader->run();
+		throw SRC_BUG; // a implementer
 
-	    for(deque<read_worker>::iterator it = travailleur.begin(); it != travailleur.end(); ++it)
+	    for(deque<crypto_worker>::iterator it = travailleur.begin(); it != travailleur.end(); ++it)
 		it->run();
 	}
     }
 
     void parallel_tronconneuse::send_order(tronco_flags order)
     {
+	if(get_mode() != gf_read_only)
+	    throw SRC_BUG;
+
 	crypto_reader->set_flag(order);
 	if(suspended)
 	    waiter->wait();
