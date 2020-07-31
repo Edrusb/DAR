@@ -188,12 +188,12 @@ namespace libdar
 
     	/////////////////////////////////////////////////////
 	//
-	// read_worker implementation
+	// crypto_worker implementation
 	//
 	//
 
 
-    void read_worker::inherited_run()
+    void crypto_worker::inherited_run()
     {
 	unique_ptr<crypto_segment> ptr;
 	bool end = false;
@@ -213,12 +213,25 @@ namespace libdar
 
 		try
 		{
-		    ptr->clear_data.set_data_size(crypto->decrypt_data(ptr->block_index,
-								       ptr->crypted_data.get_addr(),
-								       ptr->crypted_data.get_data_size(),
-								       ptr->clear_data.get_addr(),
-								       ptr->clear_data.get_max_size()));
-		    ptr->clear_data.rewind_read();
+		    if(do_encrypt)
+		    {
+			ptr->crypted_data.set_data_size(crypto->encrypt_data(ptr->block_index,
+									     ptr->clear_data.get_addr(),
+									     ptr->clear_data.get_data_size(),
+									     ptr->clear_data.get_max_size(),
+									     ptr->crypted_data.get_addr(),
+									     ptr->crypted_data.get_max_size()));
+			ptr->crypted_data.rewind_read();
+		    }
+		    else
+		    {
+			ptr->clear_data.set_data_size(crypto->decrypt_data(ptr->block_index,
+									   ptr->crypted_data.get_addr(),
+									   ptr->crypted_data.get_data_size(),
+									   ptr->clear_data.get_addr(),
+									   ptr->clear_data.get_max_size()));
+			ptr->clear_data.rewind_read();
+		    }
 		    writer->worker_push_one(slot, move(ptr), static_cast<int>(flag));
 		}
 		catch(Erange & e)
@@ -305,10 +318,12 @@ namespace libdar
 		throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
 
 	    for(U_I i = 0; i < workers; ++i)
-		travailleur.push_back(read_worker(scatter,
-						  gather,
-						  waiter,
-						  crypto->clone()));
+		travailleur.push_back(crypto_worker(scatter,
+						    gather,
+						    waiter,
+						    crypto->clone(),
+						    get_mode() == gf_write_only)
+		    );
 
 	    crypto_reader = make_unique<read_below>(scatter,
 						    waiter,

@@ -160,15 +160,16 @@ namespace libdar
     };
 
 
-    class read_worker: public libthreadar::thread
+    class crypto_worker: public libthreadar::thread
     {
     public:
-	read_worker(std::shared_ptr<libthreadar::ratelier_scatter <crypto_segment> > & read_crypted,
-		    std::shared_ptr<libthreadar::ratelier_gather <crypto_segment> > & write_clear,
+	crypto_worker(std::shared_ptr<libthreadar::ratelier_scatter <crypto_segment> > & read_side,
+		    std::shared_ptr<libthreadar::ratelier_gather <crypto_segment> > & write_side,
 		    std::shared_ptr<libthreadar::barrier> waiter,
-		    std::unique_ptr<crypto_module> && ptr):
-	    reader(read_crypted),
-	    writer(write_clear),
+		    std::unique_ptr<crypto_module> && ptr,
+		    bool encrypt):
+	    reader(read_side),
+	    writer(write_side),
 	    waiting(waiter),
 	    crypto(move(ptr))
 	{ if(!reader || !writer || !waiting || !crypto) throw SRC_BUG; };
@@ -181,6 +182,7 @@ namespace libdar
 	std::shared_ptr<libthreadar::ratelier_gather <crypto_segment> > & writer;
 	std::shared_ptr<libthreadar::barrier> waiting;
 	std::unique_ptr<crypto_module> crypto;
+	bool do_encrypt; // if false do decrypt
     };
 
 	/// this is a partial implementation of the generic_file interface to cypher/decypher data block by block.
@@ -327,7 +329,7 @@ namespace libdar
 	std::shared_ptr<heap<crypto_segment> > tas;
 
 	    // the child threads
-	std::deque<read_worker> travailleur;
+	std::deque<crypto_worker> travailleur;
 	std::unique_ptr<read_below> crypto_reader;
 
 	    /// initialize fields that could be not be from constructor
