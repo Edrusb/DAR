@@ -612,12 +612,35 @@ namespace libdar
 
     void parallel_tronconneuse::inherited_write(const char *a, U_I size)
     {
-	throw Efeature("To be implemented soon");
+	U_I wrote = 0;
+
+	if(get_mode() != gf_write_only)
+	    throw SRC_BUG;
+
+	while(wrote < size)
+	{
+	    if(!tempo_write) // no crypto_segment pointed to by tempo_write
+	    {
+		tempo_write = tas->get();
+		tempo_write->reset();
+		tempo_write->block_index = block_num++;
+	    }
+
+	    wrote += tempo_write->clear_data.write(a + wrote, size - wrote);
+	    if(tempo_write->clear_data.is_full())
+		scatter->scatter(move(tempo_write), static_cast<int>(tronco_flags::normal));
+	}
+
+	current_position += wrote;
     }
 
     void parallel_tronconneuse::inherited_sync_write()
     {
-	throw Efeature("To be implemented soon");
+	if(get_mode() == gf_write_only)
+	{
+	    if(tempo_write)
+		scatter->scatter(move(tempo_write), static_cast<int>(tronco_flags::normal));
+	}
     }
 
     void parallel_tronconneuse::inherited_flush_read()
@@ -629,7 +652,7 @@ namespace libdar
 
     void parallel_tronconneuse::inherited_terminate()
     {
-	deque<read_worker>::iterator it = travailleur.begin();
+	deque<crypto_worker>::iterator it = travailleur.begin();
 
 	post_constructor_init();
 	send_order(tronco_flags::die);

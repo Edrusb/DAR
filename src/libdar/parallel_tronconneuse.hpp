@@ -322,6 +322,10 @@ namespace libdar
 	bool lus_eof;
 	bool check_bytes_to_skip; ///< whether to check for bytes to skip
 
+	    // the following stores data going to ratelier_scatter for the write() operation
+	std::unique_ptr<crypto_segment> tempo_write;
+	infinint block_num;
+
 	    // the datastructures shared among threads
 	std::shared_ptr<libthreadar::ratelier_scatter<crypto_segment> > scatter;
 	std::shared_ptr<libthreadar::ratelier_gather<crypto_segment> > gather;
