@@ -355,6 +355,9 @@ namespace libdar
 
     bool parallel_tronconneuse::skippable(skippability direction, const infinint & amount)
     {
+	if(get_mode() != gf_read_only)
+	    throw SRC_BUG;
+
 	post_constructor_init();
 	send_order(tronco_flags::stop);
 	return encrypted->skippable(direction, amount);
@@ -367,7 +370,7 @@ namespace libdar
 	else
 	    post_constructor_init();
 
-	if(encrypted->get_mode() != gf_read_only)
+	if(get_mode() != gf_read_only)
 	    throw SRC_BUG;
 
 	send_order(tronco_flags::stop);
@@ -385,7 +388,7 @@ namespace libdar
 	else
 	    post_constructor_init();
 
-	if(encrypted->get_mode() != gf_read_only)
+	if(get_mode() != gf_read_only)
 	    throw SRC_BUG;
 
 	send_order(tronco_flags::stop);
@@ -431,7 +434,7 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	if(encrypted->get_mode() != gf_read_only)
+	if(get_mode() != gf_read_only)
 	    throw SRC_BUG;
 	if(x >= 0)
 	    ret = skip(current_position + x);
@@ -464,6 +467,9 @@ namespace libdar
 
     void parallel_tronconneuse::inherited_read_ahead(const infinint & amount)
     {
+	if(get_mode() != gf_read_only)
+	    throw SRC_BUG;
+
 	    // nothing special to do, the below thread
 	    // will read as much as possible until it
 	    // reaches eof or is interrupted by the
@@ -481,6 +487,9 @@ namespace libdar
     U_I parallel_tronconneuse::inherited_read(char *a, U_I size)
     {
 	U_I ret = 0;
+
+	if(get_mode() != gf_read_only)
+	    throw SRC_BUG;
 
 	post_constructor_init();
 	if(lus_eof)
