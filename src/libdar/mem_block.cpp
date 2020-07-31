@@ -104,7 +104,7 @@ namespace libdar
 	    U_I remains = data_size - read_cursor;
 	    U_I amount = size < remains ? size : remains;
 
-	    memcpy(a, data, amount);
+	    memcpy(a, data + read_cursor, amount);
 	    read_cursor += amount;
 
 	    return amount;
