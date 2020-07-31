@@ -188,9 +188,11 @@ void f1()
     const char *pass = "zero plus zero egale la tete a toto";
     secu_string secu_pass(pass, sizeof(pass));
     unique_ptr<crypto_module> ptr1;
-    bool simple = false;
+    bool simple = true;
     time_t temp;
     U_32 chain_size;
+    const U_I bufsize = 200;
+    char buf[bufsize];
 
     if(simple)
     {
@@ -231,6 +233,7 @@ void f1()
     dst.reset();
 
 
+
     src = make_unique<fichier_local>(CRYPT, false);
     dst = make_unique<fichier_local>(ui, BACK, gf_write_only, 0644, false, true, false);
 
@@ -254,6 +257,11 @@ void f1()
     temp = time(NULL);
     cout << "unciphering..." << ctime(&temp) << endl;
     decry->copy_to(*dst);
+    decry->skip(0);
+    decry->read(buf, bufsize);
+    decry->skip(1);
+    decry->read(buf, bufsize);
+
     decry->terminate();
     src->terminate();
     dst->terminate();
