@@ -125,7 +125,7 @@ public:
 	    case '#':
 		break;
 	    case '%':
-		for(U_32 i = 0; i < chunk && crypt_buf[cryoff + chunk - i] == '%'; ++i)
+		for(U_32 i = 1; i < chunk && crypt_buf[cryoff + chunk - i] == '%'; ++i)
 		    --remain;
 		if(remain == 0)
 		    throw SRC_BUG; // no data to copy
