@@ -329,7 +329,6 @@ namespace libdar
 						    waiter,
 						    num_workers,
 						    encrypted,
-						    reading_ver,
 						    tas,
 						    initial_shift);
 	    if(!crypto_reader)

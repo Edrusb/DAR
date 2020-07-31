@@ -58,14 +58,12 @@ namespace libdar
 		   const std::shared_ptr<libthreadar::barrier> & waiter, ///< barrier used for synchronization with workers and the thread that called us
 		   U_I num_workers,              ///< how much workers have to be informed when special condition occurs
 		   generic_file* encrypted_side, ///< the encrypted file we fetch data from and slice in chunks for the workers
-		   const archive_version & reading_ver, ///< archive version format
 		   const std::shared_ptr<heap<crypto_segment> > xtas, ///< heap of pre-allocated memory for the chunks
 		   infinint init_shift):         ///< the offset at which the encrypted data is expected to start
 	    workers(to_workers),
 	    waiting(waiter),
 	    num_w(num_workers),
 	    encrypted(encrypted_side),
-	    version(reading_ver),
 	    tas(xtas),
 	    initial_shift(init_shift),
 	    reof(false),
