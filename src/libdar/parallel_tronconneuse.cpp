@@ -582,6 +582,7 @@ namespace libdar
 	    }
 	}
 
+	current_position += ret;
 	return ret;
     }
 
