@@ -746,8 +746,40 @@ namespace libdar
 
 	    while(!lus_flags.empty() && num > 0)
 	    {
-		if(static_cast<tronco_flags>(lus_flags.front()) == order)
-		    --num;
+		switch(static_cast<tronco_flags>(lus_flags.front()))
+		{
+		case tronco_flags::stop:
+		case tronco_flags::die:
+		case tronco_flags::eof:
+		    if(static_cast<tronco_flags>(lus_flags.front()) == order)
+			--num;
+		    else
+			if(static_cast<tronco_flags>(lus_flags.front()) == tronco_flags::eof)
+			{
+			    if(num < travailleur.size())
+				throw SRC_BUG; // order and eof feedback are melted!
+			    purge_ratelier_up_to(tronco_flags::eof);
+
+				// sub-threads are in stopped status
+			    if(order == tronco_flags::die)
+				waiter->wait(); // we must awake process for they read the "die" order
+			    else
+				num = 0;
+				// order is stop sent but process were already stopped
+				// while we thought they were not and did not tried (hopefully) to awake them
+				// so we are all set
+			    continue; // restart the loop
+			}
+			else
+			    throw SRC_BUG; // unexpected order
+		    break;
+		case tronco_flags::normal:
+		case tronco_flags::data_error:
+		    break;
+		default:
+		    throw SRC_BUG;
+		}
+
 		lus_flags.pop_front();
 		tas->put(move(lus_data.front()));
 		lus_data.pop_front();
