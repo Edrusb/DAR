@@ -363,6 +363,7 @@ namespace libdar
 	lus_flags.clear();
 	lus_eof = false;
 	check_bytes_to_skip = true;
+	block_num = 0;
 
 	if(!crypto)
 	    throw SRC_BUG;
@@ -706,6 +707,8 @@ namespace libdar
 
 	if(get_mode() != gf_write_only)
 	    throw SRC_BUG;
+	else
+	    post_constructor_init();
 
 	while(wrote < size)
 	{
@@ -792,24 +795,33 @@ namespace libdar
 		throw Ememory("tronconneuse::post_constructor_init");
 	    }
 
-	    if(get_mode() == gf_read_only)
+	    for(deque<crypto_worker>::iterator it = travailleur.begin(); it != travailleur.end(); ++it)
+		it->run();
+
+	    switch(get_mode())
 	    {
+	    case gf_read_only:
 		    // launching all subthreads
 		if(!crypto_reader)
 		    throw SRC_BUG;
 		else
 		    crypto_reader->run();
-	    }
-	    else
-	    {
+		break;
+	    case gf_write_only:
 		if(!crypto_writer)
 		    throw SRC_BUG;
 		else
 		    crypto_writer->run();
+		waiter->wait(); // release all threads
+		    // in write mode sub-threads
+		    // are not pending for an order
+		    // but for data to come and tread
+		break;
+	    case gf_read_write:
+		throw SRC_BUG;
+	    default:
+		throw SRC_BUG;
 	    }
-
-	    for(deque<crypto_worker>::iterator it = travailleur.begin(); it != travailleur.end(); ++it)
-		it->run();
 	}
     }
 

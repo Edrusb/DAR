@@ -196,7 +196,8 @@ namespace libdar
 	    reader(read_side),
 	    writer(write_side),
 	    waiting(waiter),
-	    crypto(move(ptr))
+	    crypto(move(ptr)),
+	    do_encrypt(encrypt)
 	{ if(!reader || !writer || !waiting || !crypto) throw SRC_BUG; };
 
     protected:
