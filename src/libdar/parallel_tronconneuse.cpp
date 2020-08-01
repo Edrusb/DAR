@@ -751,8 +751,8 @@ namespace libdar
 	if(get_mode() == gf_read_only)
 	{
 	    post_constructor_init();
-	    send_read_order(tronco_flags::stop);
-	    purge_ratelier_up_to(tronco_flags::stop);
+	    if(!suspended)
+		send_read_order(tronco_flags::stop);
 	}
     }
 
