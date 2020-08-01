@@ -235,16 +235,19 @@ namespace libdar
 		if(num_w == 0)
 		{
 		    end = true;
-		    while(!ones.empty())
+		    if(!ones.empty())
 		    {
 			tas->put(ones);
 			ones.clear();
 			flags.clear();
 		    }
 		}
-		tas->put(move(ones.front()));
-		ones.pop_front();
-		flags.pop_front();
+		else
+		{
+		    tas->put(move(ones.front()));
+		    ones.pop_front();
+		    flags.pop_front();
+		}
 		break;
 	    default:
 		throw SRC_BUG;
