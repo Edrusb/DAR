@@ -707,6 +707,7 @@ namespace libdar
     void parallel_tronconneuse::inherited_write(const char *a, U_I size)
     {
 	U_I wrote = 0;
+	U_I remain;
 
 	if(get_mode() != gf_write_only)
 	    throw SRC_BUG;
@@ -720,10 +721,16 @@ namespace libdar
 		tempo_write = tas->get();
 		tempo_write->reset();
 		tempo_write->block_index = block_num++;
+		if(tempo_write->clear_data.get_max_size() < clear_block_size)
+		    throw SRC_BUG;
 	    }
 
-	    wrote += tempo_write->clear_data.write(a + wrote, size - wrote);
-	    if(tempo_write->clear_data.is_full())
+	    remain = size - wrote;
+	    if(remain + tempo_write->clear_data.get_data_size() > clear_block_size)
+		remain = clear_block_size - tempo_write->clear_data.get_data_size();
+
+	    wrote += tempo_write->clear_data.write(a + wrote, remain);
+	    if(tempo_write->clear_data.get_data_size() == clear_block_size)
 		scatter->scatter(move(tempo_write), static_cast<int>(tronco_flags::normal));
 	}
 
