@@ -761,8 +761,10 @@ namespace libdar
 	deque<crypto_worker>::iterator it = travailleur.begin();
 
 	post_constructor_init();
-	sync_write();
-	flush_read();
+	if(get_mode() == gf_write_only)
+	    sync_write();
+	if(get_mode() == gf_read_only)
+	    flush_read();
 
 	if(get_mode() == gf_read_only)
 	{
