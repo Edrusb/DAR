@@ -900,7 +900,7 @@ namespace libdar
 	    if(lus_flags.empty() || lus_data.empty())
 		throw SRC_BUG; // show receive some blocks with either flag eof, error or data
 
-	    if(check_bytes_to_skip)
+	    if(check_bytes_to_skip && static_cast<tronco_flags>(lus_flags.front()) == tronco_flags::normal)
 	    {
 		infinint bytes_to_skip = crypto_reader->get_pos_in_flow();
 		check_bytes_to_skip = false;
