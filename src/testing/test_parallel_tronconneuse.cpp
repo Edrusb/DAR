@@ -188,11 +188,15 @@ void f1()
     const char *pass = "zero plus zero egale la tete a toto";
     secu_string secu_pass(pass, sizeof(pass));
     unique_ptr<crypto_module> ptr1;
-    bool simple = true;
     time_t temp;
     U_32 chain_size;
     const U_I bufsize = 200;
     char buf[bufsize];
+    unique_ptr<generic_file> encry;
+    unique_ptr<generic_file> decry;
+    bool single_encr = false; // whether to use tronconneuse (true) of parallel_tronconneuse (false) for encryption
+    bool single_decr = false;  // whether to use tronconneuse (true) of parallel_tronconneuse (false) for decryption
+    bool simple = false;       // whether to use pseudo_crypto crypto_module (true) or crypto_sym crypto_module (false)
 
     if(simple)
     {
@@ -216,11 +220,21 @@ void f1()
     unique_ptr<crypto_module> ptr2 = ptr1->clone();
     if(!ptr2)
 	throw Ememory("pseudo_crypto");
-    unique_ptr<tronconneuse> encry = make_unique<tronconneuse>(chain_size,
-							       *dst,
-							       true,
-							       macro_tools_supported_version,
-							       ptr1);
+
+    if(single_encr)
+	encry = make_unique<tronconneuse>(chain_size,
+					  *dst,
+					  true,
+					  macro_tools_supported_version,
+					  ptr1);
+    else
+	encry = make_unique<parallel_tronconneuse>(2, // workers
+						   chain_size,
+						   *dst,
+						   true,
+						   macro_tools_supported_version,
+						   ptr1);
+
 
     temp = time(NULL);
     cout << "ciphering... " << ctime(&temp) << endl;
@@ -237,10 +251,7 @@ void f1()
     src = make_unique<fichier_local>(CRYPT, false);
     dst = make_unique<fichier_local>(ui, BACK, gf_write_only, 0644, false, true, false);
 
-    unique_ptr<generic_file> decry;
-    bool single = false;
-
-    if(!single)
+    if(!single_decr)
 	decry = make_unique<parallel_tronconneuse>(2, // worker
 						   chain_size,
 						   *src,
