@@ -128,9 +128,9 @@ namespace libdar
 	U_I num_w;            ///< number of worker thread we are feeding through the ratelier_scatter
 	generic_file* encrypted; ///< the encrypted data
 	archive_version version; ///< archive version format
-	std::shared_ptr<heap<crypto_segment> >tas; ///< where to fetch from blocks of data
-	infinint initial_shift;                    ///< initial shift
-	bool reof;                                 ///< whether we reached eof while reading
+	std::shared_ptr<heap<crypto_segment> > tas; ///< where to fetch from blocks of data
+	infinint initial_shift;                     ///< initial shift
+	bool reof;                                  ///< whether we reached eof while reading
 	infinint (*trailing_clear_data)(generic_file & below, const archive_version & reading_ver); ///< callback function that gives the amount of clear data found at the end of the given file
 
 	    // initialized by inherited_run() / get_ready_for_new_offset()
@@ -157,6 +157,33 @@ namespace libdar
 
     };
 
+
+    class write_below: public libthreadar::thread
+    {
+    public:
+	write_below(const std::shared_ptr<libthreadar::ratelier_gather<crypto_segment> > & from_workers,
+		    const std::shared_ptr<libthreadar::barrier> & waiter,
+		    U_I num_workers,
+		    generic_file* encrypted_side,
+		    const std::shared_ptr<heap<crypto_segment> > xtas):
+	    workers(from_workers),
+	    waiting(waiter),
+	    num_w(num_workers),
+	    encrypted(encrypted_side),
+	    tas(xtas) { if(encrypted == nullptr) throw SRC_BUG; };
+
+    protected:
+	virtual void inherited_run() override;
+
+    private:
+	std::shared_ptr<libthreadar::ratelier_gather<crypto_segment> > workers;
+	std::shared_ptr<libthreadar::barrier> waiting;
+	U_I num_w;
+	generic_file* encrypted; ///< the encrypted data
+	std::shared_ptr<heap<crypto_segment> > tas;
+
+
+    };
 
     class crypto_worker: public libthreadar::thread
     {
@@ -333,7 +360,7 @@ namespace libdar
 	    // the child threads
 	std::deque<crypto_worker> travailleur;
 	std::unique_ptr<read_below> crypto_reader;
-//	std::unique_ptr<write_below> crypto_writer;
+	std::unique_ptr<write_below> crypto_writer;
 
 	    /// initialize fields that could be not be from constructor
 	    /// then run the child threads

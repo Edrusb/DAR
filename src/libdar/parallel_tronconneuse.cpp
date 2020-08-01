@@ -185,6 +185,75 @@ namespace libdar
     }
 
 
+	/////////////////////////////////////////////////////
+	//
+	// below_writer implementation
+	//
+	//
+
+
+
+    void write_below::inherited_run()
+    {
+	bool end = false;
+	deque<unique_ptr<crypto_segment> >ones;
+	deque<signed int> flags;
+
+	if(!waiting || !workers)
+	    throw SRC_BUG;
+	else
+	    waiting->wait(); // initial sync with other threads
+
+	do
+	{
+	    if(ones.empty())
+	    {
+		if(!flags.empty())
+		    throw SRC_BUG;
+		workers->gather(ones, flags);
+	    }
+
+	    if(ones.empty() || flags.empty())
+		throw SRC_BUG;
+
+	    switch(static_cast<tronco_flags>(flags.front()))
+	    {
+	    case tronco_flags::normal:
+		encrypted->write(ones.front()->crypted_data.get_addr(),
+				 ones.front()->crypted_data.get_data_size());
+		tas->put(move(ones.front()));
+		ones.pop_front();
+		flags.pop_front();
+		break;
+	    case tronco_flags::stop:
+	    case tronco_flags::eof:
+	    case tronco_flags::data_error:
+		throw SRC_BUG;
+	    case tronco_flags::die:
+		    // read num dies and push them back to tas
+		--num_w;
+		if(num_w == 0)
+		{
+		    end = true;
+		    while(!ones.empty())
+		    {
+			tas->put(ones);
+			ones.clear();
+			flags.clear();
+		    }
+		}
+		tas->put(move(ones.front()));
+		ones.pop_front();
+		flags.pop_front();
+		break;
+	    default:
+		throw SRC_BUG;
+	    }
+	}
+	while(!end);
+
+    }
+
 
     	/////////////////////////////////////////////////////
 	//
@@ -325,14 +394,33 @@ namespace libdar
 						    get_mode() == gf_write_only)
 		    );
 
-	    crypto_reader = make_unique<read_below>(scatter,
-						    waiter,
-						    num_workers,
-						    encrypted,
-						    tas,
-						    initial_shift);
-	    if(!crypto_reader)
-		throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
+	    switch(get_mode())
+	    {
+	    case gf_read_only:
+		crypto_reader = make_unique<read_below>(scatter,
+							waiter,
+							num_workers,
+							encrypted,
+							tas,
+							initial_shift);
+		if(!crypto_reader)
+		    throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
+		break;
+	    case gf_write_only:
+		crypto_writer = make_unique<write_below>(gather,
+							 waiter,
+							 num_workers,
+							 encrypted,
+							 tas);
+
+		if(!crypto_writer)
+		    throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
+		break;
+	    case gf_read_write:
+		throw SRC_BUG;
+	    default:
+		throw SRC_BUG;
+	    }
 	}
 	catch(std::bad_alloc &)
 	{
@@ -457,6 +545,9 @@ namespace libdar
 	    throw SRC_BUG;
 	else
 	    post_constructor_init();
+
+	if(get_mode() != gf_read_only)
+	    throw SRC_BUG;
 
 	if(!suspended)
 	    send_read_order(tronco_flags::stop);
@@ -663,13 +754,13 @@ namespace libdar
 	if(get_mode() == gf_read_only)
 	{
 	    send_read_order(tronco_flags::die);
-
-	    // waiting for the end of all subthreads
-
 	    crypto_reader->join(); // may propagate exception thrown in child thread
 	}
 	else
-	    throw SRC_BUG; // a implementer
+	{
+	    send_write_order(tronco_flags::die);
+	    crypto_writer->join(); // may propagate exception thrown in child thread
+	}
 
 	while(it != travailleur.end())
 	{
@@ -710,7 +801,12 @@ namespace libdar
 		    crypto_reader->run();
 	    }
 	    else
-		throw SRC_BUG; // a implementer
+	    {
+		if(!crypto_writer)
+		    throw SRC_BUG;
+		else
+		    crypto_writer->run();
+	    }
 
 	    for(deque<crypto_worker>::iterator it = travailleur.begin(); it != travailleur.end(); ++it)
 		it->run();
