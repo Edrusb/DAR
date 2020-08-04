@@ -130,7 +130,7 @@ namespace libdar
 
 		    ptr->block_index = index_num++;
 		    crypt_offset += ptr->crypted_data.get_data_size();
-		    workers->scatter(move(ptr), static_cast<int>(flag));
+		    workers->scatter(ptr, static_cast<int>(tronco_flags::normal));
 		}
 		else
 		    flag = tronco_flags::eof;
@@ -169,7 +169,7 @@ namespace libdar
 	{
 	    ptr = tas->get();
 	    ptr->reset();
-	    workers->scatter(move(ptr), static_cast<int>(flag));
+	    workers->scatter(ptr, static_cast<int>(theflag));
 	}
     }
 
@@ -304,21 +304,21 @@ namespace libdar
 									   ptr->clear_data.get_max_size()));
 			ptr->clear_data.rewind_read();
 		    }
-		    writer->worker_push_one(slot, move(ptr), static_cast<int>(flag));
+		    writer->worker_push_one(slot, ptr, static_cast<int>(flag));
 		}
 		catch(Erange & e)
 		{
-		    writer->worker_push_one(slot, move(ptr), static_cast<int>(tronco_flags::data_error));
+		    writer->worker_push_one(slot, ptr, static_cast<int>(tronco_flags::data_error));
 		}
 		break;
 	    case tronco_flags::stop:
 	    case tronco_flags::eof:
-		writer->worker_push_one(slot, move(ptr), static_cast<int>(flag));
+		writer->worker_push_one(slot, ptr, static_cast<int>(flag));
 		waiting->wait();
 		break;
 	    case tronco_flags::die:
 		end = true;
-		writer->worker_push_one(slot, move(ptr), static_cast<int>(flag));
+		writer->worker_push_one(slot, ptr, static_cast<int>(flag));
 		break;
 	    case tronco_flags::data_error:
 		throw SRC_BUG; // should not receive a block with that flag
@@ -731,7 +731,7 @@ namespace libdar
 
 	    wrote += tempo_write->clear_data.write(a + wrote, remain);
 	    if(tempo_write->clear_data.get_data_size() == clear_block_size)
-		scatter->scatter(move(tempo_write), static_cast<int>(tronco_flags::normal));
+		scatter->scatter(tempo_write, static_cast<int>(tronco_flags::normal));
 	}
 
 	current_position += wrote;
@@ -742,7 +742,7 @@ namespace libdar
 	if(get_mode() == gf_write_only)
 	{
 	    if(tempo_write)
-		scatter->scatter(move(tempo_write), static_cast<int>(tronco_flags::normal));
+		scatter->scatter(tempo_write, static_cast<int>(tronco_flags::normal));
 	}
     }
 
@@ -871,7 +871,7 @@ namespace libdar
 	for(U_I i = 0; i < num_workers; ++i)
 	{
 	    tempo_write = tas->get();
-	    scatter->scatter(move(tempo_write), static_cast<int>(order));
+	    scatter->scatter(tempo_write, static_cast<int>(order));
 	}
 	if(order != tronco_flags::die) // OK OK, today only "die" is expected
 	    waiter->wait(); // to release threads once order has been received
