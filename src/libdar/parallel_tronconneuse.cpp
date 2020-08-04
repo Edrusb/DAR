@@ -81,27 +81,43 @@ namespace libdar
 	{
 	    switch(flag)
 	    {
+
+		    // flag can be modifed anytime by the main thread, we must not assume
+		    // its value in a give case to be equal to the what the switch directive
+		    // pointed to
+
 	    case tronco_flags::die:
-		send_flag_to_workers();
-		end = true;
+		if(reof) // eof collided with a received order, continuing the eof process
+		    flag = tronco_flags::eof;
+		else
+		{
+		    send_flag_to_workers(tronco_flags::die);
+		    end = true;
+		}
 		break;
 	    case tronco_flags::eof:
-		send_flag_to_workers();
+		send_flag_to_workers(tronco_flags::eof);
 		waiting->wait();
 		if(flag == tronco_flags::eof)
 		    throw SRC_BUG; // new order has not been set
 		if(flag == tronco_flags::normal)
 		    index_num = get_ready_for_new_offset();
+		reof = false; // assuming condition has changed
 		break;
 	    case tronco_flags::stop:
-		send_flag_to_workers();
-		waiting->wait(); // We are suspended here until the caller has set new orders
-		if(flag == tronco_flags::die)
-		    break;
-		if(flag == tronco_flags::normal)
-		    index_num = get_ready_for_new_offset();
+		if(reof) // eof collided with a received order, continuing the eof process
+		    flag = tronco_flags::eof;
 		else
-		    throw SRC_BUG;
+		{
+		    send_flag_to_workers(tronco_flags::stop);
+		    waiting->wait(); // We are suspended here until the caller has set new orders
+		    if(flag == tronco_flags::die)
+			break;
+		    if(flag == tronco_flags::normal)
+			index_num = get_ready_for_new_offset();
+		    else
+			throw SRC_BUG;
+		}
 		break;
 	    case tronco_flags::normal:
 		if(ptr)
@@ -139,6 +155,8 @@ namespace libdar
 		else
 		    flag = tronco_flags::eof;
 		break;
+	    case tronco_flags::data_error:
+		throw SRC_BUG;
 	    default:
 		throw SRC_BUG;
 	    }
@@ -165,7 +183,7 @@ namespace libdar
 	return ret;
     }
 
-    void read_below::send_flag_to_workers()
+    void read_below::send_flag_to_workers(tronco_flags theflag)
     {
 	unique_ptr<crypto_segment> ptr;
 
@@ -558,8 +576,7 @@ namespace libdar
 	if(get_mode() != gf_read_only)
 	    throw SRC_BUG;
 
-	if(!suspended)
-	    send_read_order(tronco_flags::stop);
+	send_read_order(tronco_flags::stop);
 	initial_shift = x;
 	crypto_reader->set_initial_shift(x);
     }
@@ -618,7 +635,8 @@ namespace libdar
 		throw SRC_BUG; // should receive a stop flag only upon stop request
 	    case tronco_flags::eof:
 		lus_eof = true;
-		purge_ratelier_up_to(tronco_flags::eof);
+		if(purge_ratelier_from_next_order() != tronco_flags::eof)
+		    throw SRC_BUG;
 		tas->put(lus_data);
 		lus_data.clear();
 		lus_flags.clear();
@@ -756,8 +774,7 @@ namespace libdar
 	if(get_mode() == gf_read_only)
 	{
 	    post_constructor_init();
-	    if(!suspended)
-		send_read_order(tronco_flags::stop);
+	    send_read_order(tronco_flags::stop);
 	}
     }
 
@@ -844,14 +861,50 @@ namespace libdar
 
     void parallel_tronconneuse::send_read_order(tronco_flags order)
     {
+	tronco_flags val;
+
 	if(get_mode() != gf_read_only)
 	    throw SRC_BUG;
 
-	crypto_reader->set_flag(order);
-	if(suspended)
-	    waiter->wait();
-	purge_ratelier_up_to(order);
-	suspended = true;
+	switch(order)
+	{
+	case tronco_flags::die:
+	    crypto_reader->set_flag(order);
+	    if(suspended)
+		waiter->wait();
+	    val = purge_ratelier_from_next_order();
+	    if(val != order)
+	    {
+		if(val == tronco_flags::eof)
+		{
+		    crypto_reader->set_flag(order);
+		    waiter->wait(); // awaking thread pending on waiter for they take the order into account
+		    val = purge_ratelier_from_next_order();
+		    if(val != order)
+			throw SRC_BUG;
+		}
+		else
+		    throw SRC_BUG;
+	    }
+	    break;
+	case tronco_flags::eof:
+	    throw SRC_BUG;
+	case tronco_flags::stop:
+	    if(suspended)
+		return; // nothing to do
+	    crypto_reader->set_flag(order);
+	    val = purge_ratelier_from_next_order();
+	    if(val != order && val != tronco_flags::eof)
+		throw SRC_BUG;
+	    suspended = true;
+	    break;
+	case tronco_flags::normal:
+	    throw SRC_BUG;
+	case tronco_flags::data_error:
+	    throw SRC_BUG;
+	default:
+	    throw SRC_BUG;
+	}
     }
 
     void parallel_tronconneuse::send_write_order(tronco_flags order)
@@ -941,24 +994,11 @@ namespace libdar
 	}
     }
 
-    void parallel_tronconneuse::purge_ratelier_up_to(tronco_flags order)
+    tronco_flags parallel_tronconneuse::purge_ratelier_from_next_order()
     {
 	U_I num = travailleur.size(); // the number of worker
 	deque<signed int>::iterator it;
-
-	switch(order)
-	{
-	case tronco_flags::normal:
-	    throw SRC_BUG;  // not an order at all!
-	case tronco_flags::stop:
-	case tronco_flags::eof:
-	case tronco_flags::die:
-	    break; // OK
-	case tronco_flags::data_error:
-	    throw SRC_BUG; // not an order that drives purging
-	default:
-	    break; // expected cases
-	}
+	tronco_flags ret = tronco_flags::normal;
 
 	do
 	{
@@ -971,27 +1011,10 @@ namespace libdar
 		case tronco_flags::stop:
 		case tronco_flags::die:
 		case tronco_flags::eof:
-		    if(static_cast<tronco_flags>(lus_flags.front()) == order)
+		    if(ret == tronco_flags::normal) // first order found
+			ret = static_cast<tronco_flags>(lus_flags.front());
+		    if(static_cast<tronco_flags>(lus_flags.front()) == ret)
 			--num;
-		    else
-			if(static_cast<tronco_flags>(lus_flags.front()) == tronco_flags::eof)
-			{
-			    if(num < travailleur.size())
-				throw SRC_BUG; // order and eof feedback are melted!
-			    purge_ratelier_up_to(tronco_flags::eof);
-
-				// sub-threads are in stopped status
-			    if(order == tronco_flags::die)
-				waiter->wait(); // we must awake process for they read the "die" order
-			    else
-				num = 0;
-				// order is stop sent but process were already stopped
-				// while we thought they were not and did not tried (hopefully) to awake them
-				// so we are all set
-			    continue; // restart the loop
-			}
-			else
-			    throw SRC_BUG; // unexpected order
 		    break;
 		case tronco_flags::normal:
 		case tronco_flags::data_error:
@@ -1006,6 +1029,8 @@ namespace libdar
 	    }
 	}
 	while(num > 0);
+
+	return ret;
     }
 
     U_I parallel_tronconneuse::get_heap_size(U_I num_workers)

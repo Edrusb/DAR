@@ -139,7 +139,6 @@ namespace libdar
 	    // initialized by inherited_run() / get_ready_for_new_offset()
 	infinint crypt_offset;                     ///< position to skip to in 'below' to start reading crypted data
 	U_I encrypted_buf_size;                    ///< size of the encrypted chunk of data
-	U_I clear_buf_size;                        ///< amount of clear data per encrypted chunk
 
 	    // fields accessible by both the caller and the running thread
 
@@ -149,7 +148,7 @@ namespace libdar
 	infinint pos_in_flow; // modification of this field is only done by this thread a at time the parent thread does not read it
 
 	infinint get_ready_for_new_offset();
-	void send_flag_to_workers();
+	void send_flag_to_workers(tronco_flags theflag);
 
 	    // same function as the tronconneuse::position_clear2crypt
 	void position_clear2crypt(const infinint & pos,
@@ -373,7 +372,7 @@ namespace libdar
 	void send_write_order(tronco_flags order);
 	void go_read();
 	void read_refill();
-	void purge_ratelier_up_to(tronco_flags order);
+	tronco_flags purge_ratelier_from_next_order();
 
 	static U_I get_heap_size(U_I num_worker);
     };
