@@ -69,7 +69,11 @@ namespace libdar
 	    // needed by get_ready_for_new_offset
 	ptr = tas->get();
 	encrypted_buf_size = ptr->crypted_data.get_max_size();
-	clear_buf_size = ptr->clear_data.get_max_size();
+	if(ptr->clear_data.get_max_size() < clear_buf_size)
+	{
+	    tas->put(move(ptr));
+	    throw SRC_BUG;
+	}
 	tas->put(move(ptr));
 	index_num = get_ready_for_new_offset();
 
@@ -404,6 +408,7 @@ namespace libdar
 		crypto_reader = make_unique<read_below>(scatter,
 							waiter,
 							num_workers,
+							clear_block_size,
 							encrypted,
 							tas,
 							initial_shift);

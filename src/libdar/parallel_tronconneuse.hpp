@@ -57,12 +57,14 @@ namespace libdar
 	read_below(const std::shared_ptr<libthreadar::ratelier_scatter<crypto_segment> > & to_workers, ///< where to send chunk of crypted data
 		   const std::shared_ptr<libthreadar::barrier> & waiter, ///< barrier used for synchronization with workers and the thread that called us
 		   U_I num_workers,              ///< how much workers have to be informed when special condition occurs
+		   U_I clear_block_size,         ///< clear block size used
 		   generic_file* encrypted_side, ///< the encrypted file we fetch data from and slice in chunks for the workers
 		   const std::shared_ptr<heap<crypto_segment> > xtas, ///< heap of pre-allocated memory for the chunks
 		   infinint init_shift):         ///< the offset at which the encrypted data is expected to start
 	    workers(to_workers),
 	    waiting(waiter),
 	    num_w(num_workers),
+	    clear_buf_size(clear_block_size),
 	    encrypted(encrypted_side),
 	    tas(xtas),
 	    initial_shift(init_shift),
@@ -126,6 +128,7 @@ namespace libdar
 	std::shared_ptr<libthreadar::ratelier_scatter <crypto_segment> > workers; ///< object used to scatter data to workers
 	std::shared_ptr<libthreadar::barrier> waiting;  ///< barrier used to synchronize with worker and parent thread
 	U_I num_w;            ///< number of worker thread we are feeding through the ratelier_scatter
+	U_I clear_buf_size;   ///< amount of clear data per encrypted chunk
 	generic_file* encrypted; ///< the encrypted data
 	archive_version version; ///< archive version format
 	std::shared_ptr<heap<crypto_segment> > tas; ///< where to fetch from blocks of data
