@@ -286,7 +286,7 @@ namespace libdar
 	    /// internal cache before deleting the object (else some data may be lost)
 	    /// no further write call is allowed
 	    /// \note this call cannot be used from the destructor, because it relies on pure virtual methods
-	void write_end_of_file() { if(is_terminated()) throw SRC_BUG; sync_write(); };
+	virtual void write_end_of_file() override { if(is_terminated()) throw SRC_BUG; sync_write(); };
 
 
 	    /// this method to modify the initial shift. This overrides the constructor "no_initial_shift" of the constructor
