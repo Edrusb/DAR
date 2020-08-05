@@ -82,7 +82,7 @@ namespace libdar
 	tronconneuse & operator = (tronconneuse && ref) noexcept { generic_file::operator = (std::move(ref)); move_from(std::move(ref)); return *this; };
 
 	    /// destructor
-	virtual ~tronconneuse() override { detruit(); }; // must not write pure virtual method from here, directly or not
+	virtual ~tronconneuse() noexcept override { detruit(); }; // must not write pure virtual method from here, directly or not
 
 	    /// inherited from generic_file
 	virtual bool skippable(skippability direction, const infinint & amount) override;
