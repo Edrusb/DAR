@@ -807,7 +807,7 @@ namespace libdar
 	    else
 	    {
 #ifdef LIBTHREADAR_AVAILABLE
-		if(!multi_threaded_crypto > 1)
+		if(multi_threaded_crypto > 1)
 		    tmp->ignore_read_ahead(!libcurl_repo);
 #else
 		tmp->ignore_read_ahead(!libcurl_repo);
