@@ -39,7 +39,6 @@
 #include <string>
 
 #include "infinint.hpp"
-#include "generic_file.hpp"
 #include "archive_version.hpp"
 #include "crypto_segment.hpp"
 #include "heap.hpp"
@@ -232,7 +231,7 @@ namespace libdar
 	/// (like writing to a pipe).
 	/// In read_only all skip() functions are available.
 
-    class parallel_tronconneuse : public generic_file, public proto_tronco
+    class parallel_tronconneuse : public proto_tronco
     {
     public:
 	    /// This is the constructor

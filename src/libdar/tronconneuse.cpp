@@ -59,7 +59,7 @@ namespace libdar
 			       generic_file & encrypted_side,
 			       bool no_initial_shift,
 			       const archive_version & x_reading_ver,
-			       std::unique_ptr<crypto_module> & ptr) : generic_file(encrypted_side.get_mode() == gf_read_only ? gf_read_only : gf_write_only)
+			       std::unique_ptr<crypto_module> & ptr) : proto_tronco(encrypted_side.get_mode() == gf_read_only ? gf_read_only : gf_write_only)
     {
 	if(block_size == 0)
 	    throw Erange("tronconneuse::tronconneuse", tools_printf(gettext("%d is not a valid block size"), block_size));

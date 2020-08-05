@@ -32,7 +32,6 @@
 #include <string>
 
 #include "infinint.hpp"
-#include "generic_file.hpp"
 #include "archive_version.hpp"
 #include "crypto_module.hpp"
 #include "proto_tronco.hpp"
@@ -51,7 +50,7 @@ namespace libdar
 	/// In write_only no skip() is allowed, writing is sequential from the beginning of the file to the end
 	/// (like writing to a pipe).
 	/// In read_only all skip() functions are available.
-    class tronconneuse : public generic_file, public proto_tronco
+    class tronconneuse : public proto_tronco
     {
     public:
 	    /// This is the constructor
@@ -71,16 +70,16 @@ namespace libdar
 		     std::unique_ptr<crypto_module> & ptr);
 
 	    /// copy constructor
-	tronconneuse(const tronconneuse & ref) : generic_file(ref) { copy_from(ref); };
+	tronconneuse(const tronconneuse & ref) : proto_tronco(ref) { copy_from(ref); };
 
 	    /// move constructor
-	tronconneuse(tronconneuse && ref) noexcept: generic_file(std::move(ref)) { nullifyptr(); move_from(std::move(ref)); };
+	tronconneuse(tronconneuse && ref) noexcept: proto_tronco(std::move(ref)) { nullifyptr(); move_from(std::move(ref)); };
 
 	    /// assignment operator
-	tronconneuse & operator = (const tronconneuse & ref) { detruit(); generic_file::operator = (ref); copy_from(ref); return *this; };
+	tronconneuse & operator = (const tronconneuse & ref) { detruit(); proto_tronco::operator = (ref); copy_from(ref); return *this; };
 
 	    /// move operator
-	tronconneuse & operator = (tronconneuse && ref) noexcept { generic_file::operator = (std::move(ref)); move_from(std::move(ref)); return *this; };
+	tronconneuse & operator = (tronconneuse && ref) noexcept { proto_tronco::operator = (std::move(ref)); move_from(std::move(ref)); return *this; };
 
 	    /// destructor
 	virtual ~tronconneuse() noexcept override { detruit(); }; // must not write pure virtual method from here, directly or not
