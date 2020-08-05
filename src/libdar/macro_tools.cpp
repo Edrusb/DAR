@@ -65,7 +65,7 @@ extern "C"
 #include "tools.hpp"
 
 #ifdef LIBTHREADAR_AVAILABLE
-
+#include "parallel_tronconneuse.hpp"
 #endif
 
 using namespace std;
@@ -651,7 +651,7 @@ namespace libdar
 
 		try
 		{
-		    tronconneuse *tmp_ptr = nullptr;
+		    proto_tronco *tmp_ptr = nullptr;
 		    unique_ptr<crypto_module> ptr;
 		    try
 		    {
@@ -671,22 +671,50 @@ namespace libdar
 		    if(!second_terminateur_offset.is_zero()
 		       || tmp_ctxt->is_an_old_start_end_archive()) // we have openned the archive by the end
 		    {
-			tmp = tmp_ptr = new (nothrow) tronconneuse(crypto_size,
-								   *(stack.top()),
-								   true,
-								   ver.get_edition(),
-								   ptr);
+			if(multi_threaded_crypto > 1)
+			{
+#if LIBTHREADAR_AVAILABLE
+			    tmp = tmp_ptr = new (nothrow) parallel_tronconneuse(multi_threaded_crypto,
+										crypto_size,
+										*(stack.top()),
+										true,
+										ver.get_edition(),
+										ptr);
+#else
+			    throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for cryptography"));
+#endif
+			}
+			else
+			    tmp = tmp_ptr = new (nothrow) tronconneuse(crypto_size,
+								       *(stack.top()),
+								       true,
+								       ver.get_edition(),
+								       ptr);
 
 			if(tmp_ptr != nullptr)
 			    tmp_ptr->set_initial_shift(ver.get_initial_offset());
 		    }
 		    else // archive openned by the beginning
 		    {
-			tmp = tmp_ptr = new (nothrow) tronconneuse(crypto_size,
-								   *(stack.top()),
-								   false,
-								   ver.get_edition(),
-								   ptr);
+			if(multi_threaded_crypto > 1)
+			{
+#if LIBTHREADAR_AVAILABLE
+			    tmp = tmp_ptr = new (nothrow) parallel_tronconneuse(multi_threaded_crypto,
+										crypto_size,
+										*(stack.top()),
+										false,
+										ver.get_edition(),
+										ptr);
+#else
+			    throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for cryptography"));
+#endif
+			}
+			else
+			    tmp = tmp_ptr = new (nothrow) tronconneuse(crypto_size,
+								       *(stack.top()),
+								       false,
+								       ver.get_edition(),
+								       ptr);
 			if(tmp_ptr != nullptr)
 			{
 			    tmp_ptr->set_callback_trailing_clear_data(&macro_tools_get_terminator_start);
@@ -1403,11 +1431,25 @@ namespace libdar
 			if(!ptr)
 			    throw Ememory("macro_tools_create_layers");
 
-			tmp = new (nothrow) tronconneuse(crypto_size,
-							 *(layers.top()),
-							 false,
-							 macro_tools_supported_version,
-							 ptr);
+			if(multi_threaded_crypto > 1)
+			{
+#if LIBTHREADAR_AVAILABLE
+			    tmp = new (nothrow) parallel_tronconneuse(multi_threaded_crypto,
+								      crypto_size,
+								      *(layers.top()),
+								      false,
+								      macro_tools_supported_version,
+								      ptr);
+#else
+			    throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for cryptography"));
+#endif
+			}
+			else
+			    tmp = new (nothrow) tronconneuse(crypto_size,
+							     *(layers.top()),
+							     false,
+							     macro_tools_supported_version,
+							     ptr);
 		    }
 		    catch(std::bad_alloc &)
 		    {
@@ -1522,7 +1564,7 @@ namespace libdar
     {
 	terminateur coord;
 	pile_descriptor pdesc(&layers);
-	tronconneuse *tronco_ptr = nullptr;
+	proto_tronco *tronco_ptr = nullptr;
 	scrambler *scram_ptr = nullptr;
 	memory_file *hash_to_sign = nullptr;
 	tlv *signed_hash = nullptr;
@@ -1719,7 +1761,7 @@ namespace libdar
 
 	    // *********** writing down the first terminator at the end of the archive  *************** //
 
-	tronco_ptr = dynamic_cast<tronconneuse *>(layers.top());
+	tronco_ptr = dynamic_cast<proto_tronco *>(layers.top());
 	scram_ptr = dynamic_cast<scrambler *>(layers.top());
 
 	if(info_details)
