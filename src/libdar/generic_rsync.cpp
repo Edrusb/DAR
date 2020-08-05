@@ -532,6 +532,6 @@ namespace libdar
 	while(working_size > 0 && !finished);
     }
 
-} // end of generic_thread::namespace
+} // end of namespace
 
 

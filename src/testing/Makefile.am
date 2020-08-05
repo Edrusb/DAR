@@ -34,7 +34,7 @@ endif
 
 
 if WITH_LIBTHREADAR
-    LIBTHREADAR_TEST_MODULES=test_generic_thread test_heap test_parallel_tronconneuse
+    LIBTHREADAR_TEST_MODULES=test_heap test_parallel_tronconneuse
 else
     LIBTHREADAR_TEST_MODULES=
 endif
@@ -144,9 +144,6 @@ test_crypto_asym_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 test_range_SOURCES = test_range.cpp
 test_range_DEPENDENCIES = ../libdar/$(MYLIB).la
-
-test_generic_thread_SOURCES = test_generic_thread.cpp
-test_generic_thread_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 test_rsync_SOURCES = test_rsync.cpp
 test_rsync_DEPENDENCIES = ../libdar/$(MYLIB).la

@@ -88,22 +88,18 @@ namespace libdar
 
 	/// \note the stack has the following contents depending on given options
 	///
-	/// +-top                                           LIBDAR_STACK_LABEL_
-	/// +----------------------------------------------+---------------------+
-	/// | [ generic_thread ]                           |_UNCOMPRESSED        |
-	/// | compressor                                   |v    v    v          |
-	/// +----------------------------------------------+---------------------+
-	/// | [ generic_thread ]                           |_CLEAR               |
-	/// | [ escape ]                                   |v   v   v            |
-	/// +----------------------------------------------+v---v---v------------+
-	/// | [ generic_thread ]                           |_UNCYPHERED          |
-	/// | [ cache ]  |  crypto_sym  |  scrambler       |v   v   v            |
-	/// | [ tronc ]                                    |LEVEL 1              |
-	/// | trivial_sar  |  zapette  |  sar              |v   v   v            |
-	/// +----------------------------------------------+---------------------+
+	/// +-top                                                     LIBDAR_STACK_LABEL_
+	/// +-------------------------------------------------------+---------------------+
+	/// | compressor                                            |v   v   v            |
+	/// +-------------------------------------------------------+---------------------+
+	/// | [ escape ]                                            |v   v   v            |
+	/// +-------------------------------------------------------+v---v---v------------+
+	/// | [ cache ]  | (parallel_)tronconneuse | scrambler      |v   v   v            |
+	/// | [ tronc ]                                             |LEVEL 1              |
+	/// | trivial_sar  |  zapette  |  sar                       |v   v   v            |
+	/// +-------------------------------------------------------+---------------------+
 	/// +-bottom
 	///
-	/// \note generic_thread objects are only present in the stack if multi-thread is active
 	/// \note escape is present unless tape mark have been disabled at archive creation time
 	/// \note tronc is not present in sequential read mode
 	/// \note cache layer is present only in absence of encryption and when no escape layer is above
@@ -131,7 +127,7 @@ namespace libdar
 					 bool info_details,    ///< be or not verbose about the archive openning
 					 std::list<signator> & gnupg_signed, ///< list of existing signature found for that archive (valid or not)
 					 slice_layout & sl,    ///< slicing layout of the archive
-					 bool multi_threaded,  ///< true if several thread shall be run concurrently by libdar
+					 U_I multi_threaded_crypto,  ///< number of worker thread to run for cryptography (1 -> tronconneuse object, more -> parallel_tronconneuse object)
 					 bool header_only      ///< if true, stop the process before openning the encryption layer
 	);
         // all allocated objects (ret1, ret2, scram), must be deleted when no more needed by the caller of this routine
@@ -212,23 +208,20 @@ namespace libdar
 	/// \param[in]  data_name to use in slice header
 	/// \param[in]  iteration_count used for key derivation when passphrase is human provided
 	/// \param[in]  kdf_hash hash algorithm used for the key derivation function
-	/// \param[in]  multi_threaded true if libdar can spawn several thread to work
+	/// \param[in]  multi_threaded_crypto number of worker thread to handle cryptography stuff
 	///
 	/// \note the stack has the following contents depending on given options
 	///
-	/// +-top                                          LIBDAR_STACK_LABEL_
-	/// +----------------------------------------------+---------------------+
-	/// | [ generic_thread ]                           |                     |
-	/// | compressor                                   |                     |
-	/// +----------------------------------------------+---------------------+
-	/// | [ generic_thread ]                           |                     |
-	/// | [ escape ]                                   |                     |
-	/// +-- - - - - - - - - - - - - - - - - - - - - - -+---------------------+
-	/// | [ generic_thread (if crypt or scam is used) ]|                     |
-	/// | cache  |  crypto_sym  |  scrambler           |                     |
-	/// | [ cache ]                                    |_CACHE_PIPE          |
-	/// | trivial_sar  |  null_file  |  sar            |                     |
-	/// +----------------------------------------------+---------------------+
+	/// +-top                                                       LIBDAR_STACK_LABEL_
+	/// +---------------------------------------------------------+---------------------+
+	/// | compressor                                              |                     |
+	/// +---------------------------------------------------------+---------------------+
+	/// | [ escape ]                                              |                     |
+	/// +-- - - - - - - - - - - - - - - - - - - - - - - - - - - - +---------------------+
+	/// | cache  |  (paralle_)tronconneuse |  scrambler           |                     |
+	/// | [ cache ]                                               |_CACHE_PIPE          |
+	/// | trivial_sar  |  null_file  |  sar                       |                     |
+	/// +-------------------------------------------+++++++++++---+---------------------+
 	/// +-bottom
 	///
 	/// \note the bottom cache layer is only present when trivial_sar is used to write on a pipe.
@@ -271,7 +264,7 @@ namespace libdar
 					  const label & data_name,
 					  const infinint & iteration_count,
 					  hash_algo kdf_hash,
-					  bool multi_threaded);
+					  U_I multi_threaded_crypto);
 
 	/// dumps the catalogue and close all the archive layers to terminate the archive
 

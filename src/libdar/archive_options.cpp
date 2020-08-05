@@ -130,7 +130,7 @@ namespace libdar
 	if(!x_entrepot)
 	    throw Ememory("archive_options_read::clear");
 	x_ignore_signature_check_failure = false;
-	x_multi_threaded = false;
+	x_multi_threaded_crypto = 1;
 
 	    //
 	external_cat = false;
@@ -213,7 +213,7 @@ namespace libdar
 	    throw SRC_BUG;
 	x_entrepot = ref.x_entrepot;
 	x_ignore_signature_check_failure = ref.x_ignore_signature_check_failure;
-	x_multi_threaded = ref.x_multi_threaded;
+	x_multi_threaded_crypto = ref.x_multi_threaded_crypto;
 	    //
 
 	external_cat = ref.external_cat;
@@ -244,7 +244,7 @@ namespace libdar
 	x_slice_min_digits = move(ref.x_slice_min_digits);
 	x_entrepot = move(ref.x_entrepot);
 	x_ignore_signature_check_failure = move(ref.x_ignore_signature_check_failure);
-	x_multi_threaded = move(ref.x_multi_threaded);
+	x_multi_threaded_crypto = move(ref.x_multi_threaded_crypto);
 
 	external_cat = move(ref.external_cat);
 	x_ref_chem = move(ref.x_ref_chem);
@@ -361,7 +361,7 @@ namespace libdar
 	    if(!x_entrepot)
 		throw Ememory("archive_options_create::clear");
 	    x_scope = all_fsa_families();
-	    x_multi_threaded = false;
+	    x_multi_threaded_crypto = 1;
 	    x_delta_diff = true;
 	    x_delta_signature = false;
 	    has_delta_mask_been_set = false;
@@ -618,7 +618,7 @@ namespace libdar
 	if(!x_entrepot)
 	    throw Ememory("archive_options_create::copy_from");
 	x_scope = ref.x_scope;
-	x_multi_threaded = ref.x_multi_threaded;
+	x_multi_threaded_crypto = ref.x_multi_threaded_crypto;
 	x_delta_diff = ref.x_delta_diff;
 	x_delta_signature = ref.x_delta_signature;
 	x_delta_mask = ref.x_delta_mask->clone();
@@ -687,7 +687,7 @@ namespace libdar
 	x_backup_hook_file_execute = move(ref.x_backup_hook_file_execute);
 	x_ignore_unknown = move(ref.x_ignore_unknown);
 	x_scope = move(ref.x_scope);
-	x_multi_threaded = move(ref.x_multi_threaded);
+	x_multi_threaded_crypto = move(ref.x_multi_threaded_crypto);
 	x_delta_diff = move(ref.x_delta_diff);
 	x_delta_signature = move(ref.x_delta_signature);
 	x_delta_mask = move(ref.x_delta_mask->clone());
@@ -765,7 +765,7 @@ namespace libdar
 	    x_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local("", "", false)); // never using furtive_mode to read slices
 	    if(!x_entrepot)
 		throw Ememory("archive_options_isolate::clear");
-	    x_multi_threaded = false;
+	    x_multi_threaded_crypto = 1;
 	    x_delta_signature = false;
 	    archive_option_clean_mask(x_delta_mask);
 	    has_delta_mask_been_set = false;
@@ -840,7 +840,7 @@ namespace libdar
 	x_entrepot = ref.x_entrepot;
 	if(x_entrepot == nullptr)
 	    throw Ememory("archive_options_isolate::copy_from");
-	x_multi_threaded = ref.x_multi_threaded;
+	x_multi_threaded_crypto = ref.x_multi_threaded_crypto;
 	x_delta_signature = ref.x_delta_signature;
 	x_delta_mask = ref.x_delta_mask->clone();
 	has_delta_mask_been_set = ref.has_delta_mask_been_set;
@@ -876,7 +876,7 @@ namespace libdar
 	x_hash = move(ref.x_hash);
 	x_slice_min_digits = move(ref.x_slice_min_digits);
 	x_sequential_marks = move(ref.x_sequential_marks);
-	x_multi_threaded = move(ref.x_multi_threaded);
+	x_multi_threaded_crypto = move(ref.x_multi_threaded_crypto);
 	x_delta_signature = move(ref.x_delta_signature);
 	has_delta_mask_been_set = move(ref.has_delta_mask_been_set);
 	x_delta_sig_min_size = move(ref.x_delta_sig_min_size);
@@ -944,7 +944,7 @@ namespace libdar
 	    if(x_entrepot == nullptr)
 		throw Ememory("archive_options_merge::clear");
 	    x_scope = all_fsa_families();
-	    x_multi_threaded = false;
+	    x_multi_threaded_crypto = 1;
 	    x_delta_signature = true;
 	    has_delta_mask_been_set = false;
 	    x_delta_sig_min_size = default_delta_sig_min_size;
@@ -1155,7 +1155,7 @@ namespace libdar
 	    x_hash = ref.x_hash;
 	    x_slice_min_digits = ref.x_slice_min_digits;
 	    x_scope = ref.x_scope;
-	    x_multi_threaded = ref.x_multi_threaded;
+	    x_multi_threaded_crypto = ref.x_multi_threaded_crypto;
 	    x_delta_signature = ref.x_delta_signature;
 	    has_delta_mask_been_set = ref.has_delta_mask_been_set;
 	    x_delta_sig_min_size = ref.x_delta_sig_min_size;
@@ -1212,7 +1212,7 @@ namespace libdar
 	x_hash = move(ref.x_hash);
 	x_slice_min_digits = move(ref.x_slice_min_digits);
 	x_scope = move(ref.x_scope);
-	x_multi_threaded = move(ref.x_multi_threaded);
+	x_multi_threaded_crypto = move(ref.x_multi_threaded_crypto);
 	x_delta_signature = move(ref.x_delta_signature);
 	has_delta_mask_been_set = move(ref.has_delta_mask_been_set);
 	x_delta_sig_min_size = move(ref.x_delta_sig_min_size);
@@ -1975,7 +1975,7 @@ namespace libdar
             x_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local( "", "", false)); // never using furtive_mode to read slices
             if(x_entrepot == nullptr)
                 throw Ememory("archive_options_repair::clear");
-            x_multi_threaded = false;
+            x_multi_threaded_crypto = 1;
         }
         catch(...)
         {
@@ -2011,7 +2011,7 @@ namespace libdar
 	x_hash = ref.x_hash;
 	x_slice_min_digits = ref.x_slice_min_digits;
 	x_entrepot = ref.x_entrepot;
-	x_multi_threaded = ref.x_multi_threaded;
+	x_multi_threaded_crypto = ref.x_multi_threaded_crypto;
     }
 
     void archive_options_repair::move_from(archive_options_repair && ref) noexcept
@@ -2040,7 +2040,7 @@ namespace libdar
 	x_user_comment = move(ref.x_user_comment);
 	x_hash = move(ref.x_hash);
 	x_slice_min_digits = move(ref.x_slice_min_digits);
-	x_multi_threaded = move(ref.x_multi_threaded);
+	x_multi_threaded_crypto = move(ref.x_multi_threaded_crypto);
     }
 
 } // end of namespace

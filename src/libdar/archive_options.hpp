@@ -156,8 +156,14 @@ namespace libdar
 	    /// whether to warn (true) or ignore (false) signature failure (default is true)
 	void set_ignore_signature_check_failure(bool val) { x_ignore_signature_check_failure = val; };
 
-	    /// whether libdar is allowed to create several thread to work possilbiy faster on multicore CPU (need libthreadar to be effective)
-	void set_multi_threaded(bool val) { x_multi_threaded = val; };
+	    /// whether libdar is allowed to create several thread to work possibly faster on multicore CPU (need libthreadar to be effective)
+
+	    /// \deprecated this call is deprecated, see set_multi_threaded_*() more specific calls
+	    /// \note setting this to true is equivalent to calling set_mutli_threaded_crypto(2)
+	void set_multi_threaded(bool val) { x_multi_threaded_crypto = 2; };
+
+	    /// how much thread libdar will use for cryptography (need libthreadar to be effective)
+	void set_multi_threaded_crypto(U_I num) { x_multi_threaded_crypto = num; };
 
 
 	    //////// what follows concerne the use of an external catalogue instead of the archive's internal one
@@ -218,7 +224,7 @@ namespace libdar
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
 	const std::shared_ptr<entrepot> & get_entrepot() const { return x_entrepot; };
 	bool get_ignore_signature_check_failure() const { return x_ignore_signature_check_failure; };
-	bool get_multi_threaded() const { return x_multi_threaded; };
+	U_I get_multi_threaded_crypto() const { return x_multi_threaded_crypto; };
 
 	    // All methods that follow concern the archive where to fetch the (isolated) catalogue from
 	bool is_external_catalogue_set() const { return external_cat; };
@@ -246,7 +252,7 @@ namespace libdar
 	infinint x_slice_min_digits;
 	std::shared_ptr<entrepot> x_entrepot;
 	bool x_ignore_signature_check_failure;
-	bool x_multi_threaded;
+	U_I x_multi_threaded_crypto;
 
 
 	    // external catalogue relative fields
@@ -496,7 +502,13 @@ namespace libdar
 	void set_fsa_scope(const fsa_scope & scope) { x_scope = scope; };
 
 	    /// whether libdar is allowed to spawn several threads to possibily work faster on multicore CPU (requires libthreadar)
-	void set_multi_threaded(bool val) { x_multi_threaded = val; };
+
+	    /// \deprecated this call is deprecated, see set_multi_threaded_*() more specific calls
+	    /// \note setting this to true is equivalent to calling set_mutli_threaded_crypto(2)
+	void set_multi_threaded(bool val) { x_multi_threaded_crypto = 2; };
+
+	    /// how much thread libdar will use for cryptography (need libthreadar to be effective)
+	void set_multi_threaded_crypto(U_I num) { x_multi_threaded_crypto = num; };
 
 	    /// whether binary delta has to be computed for differential/incremental backup
 
@@ -592,7 +604,7 @@ namespace libdar
 	bool get_ignore_unknown_inode_type() const { return x_ignore_unknown; };
 	const std::shared_ptr<entrepot> & get_entrepot() const { return x_entrepot; };
 	const fsa_scope & get_fsa_scope() const { return x_scope; };
-	bool get_multi_threaded() const { return x_multi_threaded; };
+	U_I get_multi_threaded_crypto() const { return x_multi_threaded_crypto; };
 	bool get_delta_diff() const { return x_delta_diff; };
 	bool get_delta_signature() const { return x_delta_signature; };
 	const mask & get_delta_mask() const { return *x_delta_mask; }
@@ -659,7 +671,7 @@ namespace libdar
 	bool x_ignore_unknown;
 	std::shared_ptr<entrepot> x_entrepot;
 	fsa_scope x_scope;
-	bool x_multi_threaded;
+	U_I x_multi_threaded_crypto;
 	bool x_delta_diff;
 	bool x_delta_signature;
 	mask *x_delta_mask;
@@ -801,7 +813,14 @@ namespace libdar
 	void set_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("archive_options_isolated::set_entrepot", "null entrepot pointer given in argument"); x_entrepot = entr; };
 
 	    /// whether libdar is allowed to created several thread to work possibily faster on multicore CPU (require libthreadar)
-	void set_multi_threaded(bool val) { x_multi_threaded = val; };
+
+	    /// \deprecated this call is deprecated, see set_multi_threaded_*() more specific calls
+	    /// \note setting this to true is equivalent to calling set_mutli_threaded_crypto(2)
+	void set_multi_threaded(bool val) { x_multi_threaded_crypto = 2; };
+
+	    /// how much thread libdar will use for cryptography (need libthreadar to be effective)
+	void set_multi_threaded_crypto(U_I num) { x_multi_threaded_crypto = num; };
+
 
 	    /// whether signature to base binary delta on the future has to be calculated and stored beside saved files
 	void set_delta_signature(bool val) { x_delta_signature = val; };
@@ -849,7 +868,7 @@ namespace libdar
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
 	bool get_sequential_marks() const { return x_sequential_marks; };
 	const std::shared_ptr<entrepot> & get_entrepot() const { return x_entrepot; };
-	bool get_multi_threaded() const { return x_multi_threaded; };
+	U_I get_multi_threaded_crypto() const { return x_multi_threaded_crypto; };
 	bool get_delta_signature() const { return x_delta_signature; };
 	const mask & get_delta_mask() const { return *x_delta_mask; }
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
@@ -883,7 +902,7 @@ namespace libdar
 	infinint x_slice_min_digits;
 	bool x_sequential_marks;
 	std::shared_ptr<entrepot> x_entrepot;
-	bool x_multi_threaded;
+	U_I x_multi_threaded_crypto;
 	bool x_delta_signature;
 	mask *x_delta_mask;
 	bool has_delta_mask_been_set;
@@ -1064,7 +1083,14 @@ namespace libdar
 	void set_fsa_scope(const fsa_scope & scope) { x_scope = scope; };
 
 	    /// whether libdar is allowed to spawn several threads to possibily work faster on multicore CPU (requires libthreadar)
-	void set_multi_threaded(bool val) { x_multi_threaded = val; };
+
+	    /// \deprecated this call is deprecated, see set_multi_threaded_*() more specific calls
+	    /// \note setting this to true is equivalent to calling set_mutli_threaded_crypto(2)
+	void set_multi_threaded(bool val) { x_multi_threaded_crypto = 2; };
+
+	    /// how much thread libdar will use for cryptography (need libthreadar to be effective)
+	void set_multi_threaded_crypto(U_I num) { x_multi_threaded_crypto = num; };
+
 
 	    /// whether signature to base binary delta on the future has to be calculated and stored beside saved files
 	    /// \note the default is true, which lead to preserve delta signature over merging, but not to calculate new ones
@@ -1132,7 +1158,7 @@ namespace libdar
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
 	const std::shared_ptr<entrepot> & get_entrepot() const { return x_entrepot; };
 	const fsa_scope & get_fsa_scope() const { return x_scope; };
-	bool get_multi_threaded() const { return x_multi_threaded; };
+	U_I get_multi_threaded_crypto() const { return x_multi_threaded_crypto; };
 	bool get_delta_signature() const { return x_delta_signature; };
 	const mask & get_delta_mask() const { return *x_delta_mask; }
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
@@ -1181,7 +1207,7 @@ namespace libdar
 	infinint x_slice_min_digits;
 	std::shared_ptr<entrepot> x_entrepot;
 	fsa_scope x_scope;
-	bool x_multi_threaded;
+	bool x_multi_threaded_crypto;
 	bool x_delta_signature;
 	mask *x_delta_mask;
 	bool has_delta_mask_been_set;
@@ -1744,7 +1770,14 @@ namespace libdar
 	void set_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("archive_options_repair::set_entrepot", "null entrepot pointer given in argument"); x_entrepot = entr; };
 
 	    /// whether libdar is allowed to spawn several threads to possibily work faster on multicore CPU (requires libthreadar)
-	void set_multi_threaded(bool val) { x_multi_threaded = val; };
+
+	    /// \deprecated this call is deprecated, see set_multi_threaded_*() more specific calls
+	    /// \note setting this to true is equivalent to calling set_mutli_threaded_crypto(2)
+	void set_multi_threaded(bool val) { x_multi_threaded_crypto = 2; };
+
+	    /// how much thread libdar will use for cryptography (need libthreadar to be effective)
+	void set_multi_threaded_crypto(U_I num) { x_multi_threaded_crypto = num; };
+
 
 
 	    /////////////////////////////////////////////////////////////////////
@@ -1774,7 +1807,7 @@ namespace libdar
 	hash_algo get_hash_algo() const { return x_hash; };
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
 	const std::shared_ptr<entrepot> & get_entrepot() const { return x_entrepot; };
-	bool get_multi_threaded() const { return x_multi_threaded; };
+	U_I get_multi_threaded_crypto() const { return x_multi_threaded_crypto; };
 
     private:
 	bool x_allow_over;
@@ -1801,7 +1834,7 @@ namespace libdar
 	hash_algo x_hash;
 	infinint x_slice_min_digits;
 	std::shared_ptr<entrepot> x_entrepot;
-	bool x_multi_threaded;
+	U_I x_multi_threaded_crypto;
 
 	void nullifyptr() noexcept {};
 	void copy_from(const archive_options_repair & ref);

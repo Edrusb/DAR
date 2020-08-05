@@ -65,7 +65,7 @@ extern "C"
 #include "tools.hpp"
 
 #ifdef LIBTHREADAR_AVAILABLE
-#include "generic_thread.hpp"
+
 #endif
 
 using namespace std;
@@ -383,7 +383,7 @@ namespace libdar
 				  bool info_details,
 				  list<signator> & gnupg_signed,
 				  slice_layout & sl,
-				  bool multi_threaded,
+				  U_I multi_threaded_crypto,
 				  bool header_only)
     {
 	secu_string real_pass = pass;
@@ -402,7 +402,7 @@ namespace libdar
 
 	stack.clear();
 #ifdef LIBTHREADAR_AVAILABLE
-	if(!multi_threaded && !libcurl_repo)
+	if(multi_threaded_crypto < 2 && !libcurl_repo)
 	    stack.ignore_read_ahead(true);
 	else
 	    stack.ignore_read_ahead(false);
@@ -652,16 +652,21 @@ namespace libdar
 		try
 		{
 		    tronconneuse *tmp_ptr = nullptr;
-		    unique_ptr<crypto_module> ptr = make_unique<crypto_sym>(real_pass,
-									    ver.get_edition(),
-									    crypto,
-									    ver.get_salt(),
-									    ver.get_iteration_count(),
-									    ver.get_kdf_hash(),
-									    ver.get_crypted_key() == nullptr);
-
-		    if(!ptr) // this should never occur as make_unique would throw a std::bad_alloc exception
+		    unique_ptr<crypto_module> ptr;
+		    try
+		    {
+			ptr = make_unique<crypto_sym>(real_pass,
+						      ver.get_edition(),
+						      crypto,
+						      ver.get_salt(),
+						      ver.get_iteration_count(),
+						      ver.get_kdf_hash(),
+						      ver.get_crypted_key() == nullptr);
+		    }
+		    catch(bad_alloc &)
+		    {
 			throw Ememory("macro_tools_open_archive");
+		    }
 
 		    if(!second_terminateur_offset.is_zero()
 		       || tmp_ctxt->is_an_old_start_end_archive()) // we have openned the archive by the end
@@ -724,21 +729,6 @@ namespace libdar
 		tmp = nullptr;
 	    }
 
-#ifdef LIBTHREADAR_AVAILABLE
-	    if(multi_threaded && crypto != crypto_algo::none)
-	    {
-		if(info_details)
-		    dialog->message(gettext("Creating a new thread to run the previously created layers..."));
-		tmp = new (nothrow) generic_thread(stack.top());
-		if(tmp == nullptr)
-		    throw Ememory("op_create_in_sub");
-		if(sequential_read)
-		    tmp->read_ahead(0); // the generic_thread above encryption will read asynchronously as much data as possible
-		stack.push(tmp);
-		tmp = nullptr;
-	    }
-#endif
-
 	    stack.add_label(LIBDAR_STACK_LABEL_UNCYPHERED);
 
 		// *************** building the escape layer if necessary ************ //
@@ -790,34 +780,9 @@ namespace libdar
 		tmp = new (nothrow) escape(stack.top(), unjump);
 		if(tmp == nullptr)
 		    throw Ememory("open_archive");
-#ifdef LIBTHREADAR_AVAILABLE
-		if(!multi_threaded)
-		    tmp->ignore_read_ahead(!libcurl_repo);
-		else
-		{
-		    if(second_terminateur_offset.is_zero()) // archive read from the beginning (sequential read)
-			tmp->ignore_read_ahead(!libcurl_repo);  // we avoid transmitting read_ahead request to the below thread
-			// which has been configured with an endless read ahead, new read_ahead would abort configured
-			// endlessly read_ahead.
-		}
-#else
 		tmp->ignore_read_ahead(!libcurl_repo);
-#endif
 		stack.push(tmp);
 		tmp = nullptr;
-
-#ifdef LIBTHREADAR_AVAILABLE
-		if(multi_threaded)
-		{
-		    if(info_details)
-			dialog->message(gettext("Creating a new thread to run the escape layer..."));
-		    generic_thread *tmp = new (nothrow) generic_thread(stack.top());
-		    if(tmp == nullptr)
-			throw Ememory("op_create_in_sub");
-		    stack.push(tmp);
-		    tmp = nullptr;
-		}
-#endif
 	    }
 
 	    stack.add_label(LIBDAR_STACK_LABEL_CLEAR);
@@ -842,27 +807,13 @@ namespace libdar
 	    else
 	    {
 #ifdef LIBTHREADAR_AVAILABLE
-		if(!multi_threaded)
+		if(!multi_threaded_crypto > 1)
 		    tmp->ignore_read_ahead(!libcurl_repo);
 #else
 		tmp->ignore_read_ahead(!libcurl_repo);
 #endif
 		stack.push(tmp, LIBDAR_STACK_LABEL_UNCOMPRESSED);
 		tmp = nullptr;
-
-#ifdef LIBTHREADAR_AVAILABLE
-		if(multi_threaded && ver.get_compression_algo() != compression::none)
-		{
-		    if(info_details)
-			dialog->message(gettext("Creating a new thread to run the compression layer..."));
-		    tmp = new (nothrow) generic_thread(stack.top());
-		    if(tmp == nullptr)
-			throw Ememory("op_create_in_sub");
-		    stack.clear_label(LIBDAR_STACK_LABEL_UNCOMPRESSED);
-		    stack.push(tmp, LIBDAR_STACK_LABEL_UNCOMPRESSED);
-		    tmp = nullptr;
-		}
-#endif
 	    }
 
 		// ************* warning info ************************ //
@@ -1096,7 +1047,7 @@ namespace libdar
 				   const label & data_name,
 				   const infinint & iteration_count,
 				   hash_algo kdf_hash,
-				   bool multi_threaded)
+				   U_I multi_threaded_crypto)
     {
 #if GPGME_SUPPORT
 	U_I gnupg_key_size;
@@ -1490,22 +1441,6 @@ namespace libdar
 			layers.push(tmp);
 			tmp = nullptr;
 		    }
-#ifdef LIBTHREADAR_AVAILABLE
-
-			// adding a generic_thread object in the stack for
-			// a separated thread proceed to read/write to the object pushed on the stack
-
-		    if(multi_threaded && crypto != crypto_algo::none)
-		    {
-			if(info_details)
-			    dialog->message(gettext("Creating a new thread to run the previously created layers..."));
-			tmp = new (nothrow) generic_thread(layers.top());
-			if(tmp == nullptr)
-			    throw Ememory("op_create_in_sub");
-			layers.push(tmp);
-			tmp = nullptr;
-		    }
-#endif
 		}
 		else
 		{
@@ -1537,21 +1472,6 @@ namespace libdar
 		    {
 			layers.push(tmp);
 			tmp = nullptr;
-#ifdef LIBTHREADAR_AVAILABLE
-
-			    // adding a generic_thread object in the stack for
-			    // a separated thread proceed to read/write to the object pushed on the stack
-			if(multi_threaded)
-			{
-			    if(info_details)
-				dialog->message(gettext("Creating a new thread to run the escape layer..."));
-			    tmp = new (nothrow) generic_thread(layers.top());
-			    if(tmp == nullptr)
-				throw Ememory("op_create_in_sub");
-			    layers.push(tmp);
-			    tmp = nullptr;
-			}
-#endif
 		    }
 		}
 
@@ -1567,23 +1487,6 @@ namespace libdar
 		    layers.push(tmp);
 		    tmp = nullptr;
 		}
-
-#ifdef LIBTHREADAR_AVAILABLE
-
-		    // adding a generic_thread object in the stack for
-		    // a separated thread proceed to read/write to the object pushed on the stack
-
-		if(multi_threaded && algo != compression::none)
-		{
-		    if(info_details)
-			dialog->message(gettext("Creating a new thread to run the compression layer..."));
-		    tmp = new (nothrow) generic_thread(layers.top());
-		    if(tmp == nullptr)
-			throw Ememory("op_create_in_sub");
-		    layers.push(tmp);
-		    tmp = nullptr;
-		}
-#endif
 
 		if(info_details)
 		    dialog->message(gettext("All layers have been created successfully"));
@@ -1621,9 +1524,6 @@ namespace libdar
 	pile_descriptor pdesc(&layers);
 	tronconneuse *tronco_ptr = nullptr;
 	scrambler *scram_ptr = nullptr;
-#ifdef LIBTHREADAR_AVAILABLE
-	generic_thread *thread_ptr = nullptr;
-#endif
 	memory_file *hash_to_sign = nullptr;
 	tlv *signed_hash = nullptr;
 	hash_fichier *hasher = nullptr;
@@ -1801,9 +1701,6 @@ namespace libdar
 	if(info_details && algo != compression::none)
 	    dialog->message(gettext("Closing the compression layer..."));
 
-#ifdef LIBTHREADAR_AVAILABLE
-	(void)layers.pop_and_close_if_type_is(thread_ptr);
-#endif
 	if(!layers.pop_and_close_if_type_is(pdesc.compr))
 	    throw SRC_BUG;
 	else
@@ -1815,20 +1712,12 @@ namespace libdar
 	{
 	    if(info_details)
 		dialog->message(gettext("Closing the escape layer..."));
-#ifdef LIBTHREADAR_AVAILABLE
-	    (void)layers.pop_and_close_if_type_is(thread_ptr);
-#endif
 	    if(!layers.pop_and_close_if_type_is(pdesc.esc))
 		throw SRC_BUG;
 	    pdesc.esc = nullptr;
 	}
 
 	    // *********** writing down the first terminator at the end of the archive  *************** //
-
-#ifdef LIBTHREADAR_AVAILABLE
-	    // a generic_thread is only added over scrambler and crypto_sym, not when no crypto is used
-	(void)layers.pop_and_close_if_type_is(thread_ptr);
-#endif
 
 	tronco_ptr = dynamic_cast<tronconneuse *>(layers.top());
 	scram_ptr = dynamic_cast<scrambler *>(layers.top());

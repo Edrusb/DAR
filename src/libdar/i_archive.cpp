@@ -130,7 +130,7 @@ namespace libdar
 					 options.get_info_details(),
 					 gnupg_signed,
 					 slices,
-					 options.get_multi_threaded(),
+					 options.get_multi_threaded_crypto(),
 					 options.get_header_only());
 
 		if(options.get_header_only())
@@ -186,7 +186,7 @@ namespace libdar
 						     options.get_info_details(),
 						     tmp1_signatories,
 						     ignored,
-						     options.get_multi_threaded(),
+						     options.get_multi_threaded_crypto(),
 						     false);
 				// we do not comparing the signatories of the archive of reference with the current archive
 				// for example the isolated catalogue might be unencrypted and thus not signed
@@ -478,7 +478,7 @@ namespace libdar
 				   options.get_backup_hook_file_mask(),
 				   options.get_ignore_unknown_inode_type(),
 				   options.get_fsa_scope(),
-				   options.get_multi_threaded(),
+				   options.get_multi_threaded_crypto(),
 				   options.get_delta_signature(),
 				   options.get_has_delta_mask_been_set(),
 				   options.get_delta_mask(),
@@ -699,7 +699,7 @@ namespace libdar
 				 bool_mask(false),         // backup_hook_file_mask
 				 false,   // ignore_unknown
 				 options.get_fsa_scope(),
-				 options.get_multi_threaded(),
+				 options.get_multi_threaded_crypto(),
 				 options.get_delta_signature(),
 				 options.get_has_delta_mask_been_set(), // build delta sig
 				 options.get_delta_mask(), // delta_mask
@@ -852,7 +852,7 @@ namespace libdar
 			     bool_mask(true),     // backup_hook_file_mask
 			     false,               // ignore_unknown
 			     all_fsa_families(),  // fsa_scope
-			     options_repair.get_multi_threaded(),
+			     options_repair.get_multi_threaded_crypto(),
 			     true,                // delta_signature
 			     false,               // build_delta_signature
 			     bool_mask(true),     // delta_mask
@@ -1536,7 +1536,7 @@ namespace libdar
 				      isol_data_name,
 				      options.get_iteration_count(),
 				      options.get_kdf_hash(),
-				      options.get_multi_threaded());
+				      options.get_multi_threaded_crypto());
 
 	    if(cat == nullptr)
 		throw SRC_BUG;
@@ -1923,7 +1923,7 @@ namespace libdar
 						const mask & backup_hook_file_mask,
 						bool ignore_unknown,
 						const fsa_scope & scope,
-						bool multi_threaded,
+						U_I multi_threaded_crypto,
 						bool delta_signature,
 						bool build_delta_sig,
 						const mask & delta_mask,
@@ -2086,7 +2086,7 @@ namespace libdar
 			 backup_hook_file_mask,
 			 ignore_unknown,
 			 scope,
-			 multi_threaded,
+			 multi_threaded_crypto,
 			 delta_signature,
 			 build_delta_sig,
 			 delta_mask,
@@ -2162,7 +2162,7 @@ namespace libdar
 					      const mask & backup_hook_file_mask,
 					      bool ignore_unknown,
 					      const fsa_scope & scope,
-					      bool multi_threaded,
+					      U_I multi_threaded_crypto,
 					      bool delta_signature,
 					      bool build_delta_sig,
 					      const mask & delta_mask,
@@ -2234,7 +2234,7 @@ namespace libdar
 					  internal_name, // data_name is equal to internal_name in the current situation
 					  iteration_count,
 					  kdf_hash,
-					  multi_threaded);
+					  multi_threaded_crypto);
 
 		    // ********** building the catalogue (empty for now) ************************* //
 		datetime root_mtime;
