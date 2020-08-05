@@ -44,6 +44,7 @@
 #include "crypto_segment.hpp"
 #include "heap.hpp"
 #include "crypto_module.hpp"
+#include "proto_tronco.hpp"
 
 #include <libthreadar/libthreadar.hpp>
 
@@ -231,7 +232,7 @@ namespace libdar
 	/// (like writing to a pipe).
 	/// In read_only all skip() functions are available.
 
-    class parallel_tronconneuse : public generic_file
+    class parallel_tronconneuse : public generic_file, public proto_tronco
     {
     public:
 	    /// This is the constructor
@@ -291,16 +292,16 @@ namespace libdar
 
 	    /// this method to modify the initial shift. This overrides the constructor "no_initial_shift" of the constructor
 
-	void set_initial_shift(const infinint & x);
+	virtual void set_initial_shift(const infinint & x) override;
 
 	    /// let the caller give a callback function that given a generic_file with cyphered data, is able
 	    /// to return the offset of the first clear byte located *after* all the cyphered data, this
 	    /// callback function is used (if defined by the following method), when reaching End of File.
-	void set_callback_trailing_clear_data(infinint (*call_back)(generic_file & below, const archive_version & reading_ver))
+	virtual void set_callback_trailing_clear_data(infinint (*call_back)(generic_file & below, const archive_version & reading_ver)) override
 	{ if(crypto_reader) { mycallback = call_back; crypto_reader->set_callback_trailing_clear_data(call_back); } else throw SRC_BUG; };
 
 	    /// returns the block size given to constructor
-	U_32 get_clear_block_size() const { return clear_block_size; };
+	virtual U_32 get_clear_block_size() const override { return clear_block_size; };
 
     private:
 

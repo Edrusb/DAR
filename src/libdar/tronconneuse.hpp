@@ -35,6 +35,7 @@
 #include "generic_file.hpp"
 #include "archive_version.hpp"
 #include "crypto_module.hpp"
+#include "proto_tronco.hpp"
 
 namespace libdar
 {
@@ -50,7 +51,7 @@ namespace libdar
 	/// In write_only no skip() is allowed, writing is sequential from the beginning of the file to the end
 	/// (like writing to a pipe).
 	/// In read_only all skip() functions are available.
-    class tronconneuse : public generic_file
+    class tronconneuse : public generic_file, public proto_tronco
     {
     public:
 	    /// This is the constructor
@@ -108,15 +109,15 @@ namespace libdar
 
 	    /// this method to modify the initial shift. This overrides the constructor "no_initial_shift" of the constructor
 
-	void set_initial_shift(const infinint & x) { initial_shift = x; };
+	virtual void set_initial_shift(const infinint & x) override { initial_shift = x; };
 
 	    /// let the caller give a callback function that given a generic_file with cyphered data, is able
 	    /// to return the offset of the first clear byte located *after* all the cyphered data, this
 	    /// callback function is used (if defined by the following method), when reaching End of File.
-	void set_callback_trailing_clear_data(infinint (*call_back)(generic_file & below, const archive_version & reading_ver)) { trailing_clear_data = call_back; };
+	virtual void set_callback_trailing_clear_data(trailing_clear_data_callback callback) override { trailing_clear_data = callback; };
 
 	    /// returns the block size give to constructor
-	U_32 get_clear_block_size() const { return clear_block_size; };
+	virtual U_32 get_clear_block_size() const override { return clear_block_size; };
 
     private:
 
@@ -176,7 +177,7 @@ namespace libdar
 	bool reof;                 ///< whether we reached eof while reading
 	archive_version reading_ver; ///< archive format we currently read
 	std::unique_ptr<crypto_module> crypto; ///< wraps the per block encryption/decryption routines
-	infinint (*trailing_clear_data)(generic_file & below, const archive_version & reading_ver); ///< callback function that gives the amount of clear data found at the end of the given file
+	trailing_clear_data_callback trailing_clear_data; ///< callback function that gives the amount of clear data found at the end of the given file
 
 
 	void nullifyptr() noexcept;
