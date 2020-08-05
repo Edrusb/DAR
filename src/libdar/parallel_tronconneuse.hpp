@@ -22,8 +22,15 @@
     /// \file parallel_tronconneuse.hpp
     /// \brief defines a block structured file.
     /// \ingroup Private
-    ///
-    /// Mainly used for strong encryption.
+
+    /// Several classes are defined here
+    /// - class parallel_tronconneuse, which has similar interface and behavior as class tronconneuse
+    /// - class read_below, is used internally by parallel_tronconneuse in read-only mode to workers from data of the underlay
+    /// - class write_below, is used internally by parallel_tronconneuse in write-only mode to write down the data produced by the workers
+    /// - class crypto_workers, that transform data between parallel_tronconneuse and the read_below class or the write_below class
+    /// depending on the context. Several objects of this class executes in parallel the crypto_module routine, but there is
+    /// only one read_below or write_below thread, the class parallel_tronconneuse stays executed by the main/original/calling thread
+    /// .
 
 #ifndef PARALLEL_TRONCONNEUSE_HPP
 #define PARALLEL_TRONCONNEUSE_HPP
@@ -38,10 +45,7 @@
 #include "heap.hpp"
 #include "crypto_module.hpp"
 
-#if HAVE_LIBTHREADAR_LIBTHREADAR_HPP
 #include <libthreadar/libthreadar.hpp>
-#endif
-
 
 namespace libdar
 {
@@ -261,7 +265,7 @@ namespace libdar
 	parallel_tronconneuse & operator = (parallel_tronconneuse && ref) noexcept = default;
 
 	    /// destructor
-	~parallel_tronconneuse();
+	~parallel_tronconneuse() noexcept;
 
 	    /// inherited from generic_file
 	virtual bool skippable(skippability direction, const infinint & amount) override;

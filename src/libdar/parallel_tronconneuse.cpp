@@ -455,7 +455,7 @@ namespace libdar
 	}
     }
 
-    parallel_tronconneuse::~parallel_tronconneuse()
+    parallel_tronconneuse::~parallel_tronconneuse() noexcept
     {
 	try
 	{
