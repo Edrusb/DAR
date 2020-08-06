@@ -149,7 +149,7 @@ struct line_param
     bool ignore_unknown_inode;    ///< whether to ignore unknown inode types
     bool no_compare_symlink_date; ///< whether to report difference in dates of symlinks while diffing an archive with filesystem
     fsa_scope scope;              ///< FSA scope to consider for the operation
-    bool multi_threaded;          ///< allows libdar to use multiple threads (requires libthreadar)
+    U_I multi_threaded_crypto;    ///< number of crypto worker threads (requires libthreadar)
     bool delta_sig;               ///< whether to calculate rsync signature of files
     mask *delta_mask;             ///< which file to calculate delta sig when not using the default mask
     bool delta_diff;              ///< whether to save binary diff or whole file's data during a differential backup

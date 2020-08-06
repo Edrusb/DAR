@@ -285,7 +285,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    read_options.set_lax(param.lax);
 		    read_options.set_slice_min_digits(param.ref_num_digits);
 		    read_options.set_ignore_signature_check_failure(param.blind_signatures);
-		    read_options.set_multi_threaded(param.multi_threaded);
+		    read_options.set_multi_threaded_crypto(param.multi_threaded_crypto);
 		    if(param.sequential_read)
 		    {
 			if(param.op == merging)
@@ -338,7 +338,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 			read_options.set_lax(param.lax);
 			read_options.set_slice_min_digits(param.aux_num_digits);
 			read_options.set_ignore_signature_check_failure(param.blind_signatures);
-			read_options.set_multi_threaded(param.multi_threaded);
+			read_options.set_multi_threaded_crypto(param.multi_threaded_crypto);
 			if(param.sequential_read)
 			    throw Erange("little_main", gettext("Using sequential reading mode for archive source is not possible for merging operation"));
 			if(aux_repo)
@@ -425,7 +425,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    create_options.set_hash_algo(param.hash);
 		    create_options.set_slice_min_digits(param.num_digits);
 		    create_options.set_fsa_scope(param.scope);
-		    create_options.set_multi_threaded(param.multi_threaded);
+		    create_options.set_multi_threaded_crypto(param.multi_threaded_crypto);
 		    create_options.set_delta_signature(param.delta_sig);
 		    if(param.delta_sig_min_size > 0)
 			create_options.set_delta_sig_min_size(param.delta_sig_min_size);
@@ -517,7 +517,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    merge_options.set_hash_algo(param.hash);
 		    merge_options.set_slice_min_digits(param.num_digits);
 		    merge_options.set_fsa_scope(param.scope);
-		    merge_options.set_multi_threaded(param.multi_threaded);
+		    merge_options.set_multi_threaded_crypto(param.multi_threaded_crypto);
 		    merge_options.set_delta_signature(param.delta_sig);
 		    if(param.delta_mask != nullptr)
 			merge_options.set_delta_mask(*param.delta_mask);
@@ -568,7 +568,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    repair_options.set_user_comment(param.user_comment);
 		    repair_options.set_hash_algo(param.hash);
 		    repair_options.set_slice_min_digits(param.num_digits);
-		    repair_options.set_multi_threaded(param.multi_threaded);
+		    repair_options.set_multi_threaded_crypto(param.multi_threaded_crypto);
 		    if(repo)
 			repair_options.set_entrepot(repo);
 
@@ -649,7 +649,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 			    isolate_options.set_slice_min_digits(param.aux_num_digits);
 			    isolate_options.set_user_comment(param.user_comment);
 			    isolate_options.set_sequential_marks(param.use_sequential_marks);
-			    isolate_options.set_multi_threaded(param.multi_threaded);
+			    isolate_options.set_multi_threaded_crypto(param.multi_threaded_crypto);
 
 				// copying delta sig is not possible in on-fly isolation,
 				// archive must be closed and re-open in read mode to be able
@@ -694,7 +694,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		read_options.set_sequential_read(param.sequential_read);
 		read_options.set_slice_min_digits(param.ref_num_digits);
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
-		read_options.set_multi_threaded(param.multi_threaded);
+		read_options.set_multi_threaded_crypto(param.multi_threaded_crypto);
 		if(ref_repo)
 		    read_options.set_entrepot(ref_repo);
 		    // yes this is "ref_repo" where is located the -A-pointed-to archive
@@ -740,7 +740,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		isolate_options.set_hash_algo(param.hash);
 		isolate_options.set_slice_min_digits(param.num_digits);
 		isolate_options.set_sequential_marks(param.use_sequential_marks);
-		isolate_options.set_multi_threaded(param.multi_threaded);
+		isolate_options.set_multi_threaded_crypto(param.multi_threaded_crypto);
 		isolate_options.set_delta_signature(param.delta_sig);
 		if(param.delta_mask != nullptr)
 		    isolate_options.set_delta_mask(*param.delta_mask);
@@ -785,7 +785,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		read_options.set_sequential_read(param.sequential_read);
 		read_options.set_slice_min_digits(param.num_digits);
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
-		read_options.set_multi_threaded(param.multi_threaded);
+		read_options.set_multi_threaded_crypto(param.multi_threaded_crypto);
 		if(repo)
 		    read_options.set_entrepot(repo);
 
@@ -894,7 +894,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		read_options.set_sequential_read(param.sequential_read);
 		read_options.set_slice_min_digits(param.num_digits);
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
-		read_options.set_multi_threaded(param.multi_threaded);
+		read_options.set_multi_threaded_crypto(param.multi_threaded_crypto);
 		if(repo)
 		    read_options.set_entrepot(repo);
 
@@ -977,7 +977,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		read_options.set_sequential_read(param.sequential_read);
 		read_options.set_slice_min_digits(param.num_digits);
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
-		read_options.set_multi_threaded(param.multi_threaded);
+		read_options.set_multi_threaded_crypto(param.multi_threaded_crypto);
 		if(repo)
 		    read_options.set_entrepot(repo);
 
@@ -1053,7 +1053,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		read_options.set_sequential_read(param.sequential_read);
 		read_options.set_slice_min_digits(param.num_digits);
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
-		read_options.set_multi_threaded(param.multi_threaded);
+		read_options.set_multi_threaded_crypto(param.multi_threaded_crypto);
 		if(repo)
 		    read_options.set_entrepot(repo);
 		read_options.set_header_only(param.header_only);

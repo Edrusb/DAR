@@ -82,7 +82,7 @@ extern "C"
 #include "libdar.hpp"
 #include "fichier_local.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:v::z::y:nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT:E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:8:{:}:j:\\:"
+#define OPT_STRING "c:A:x:d:t:l:v::z::y:nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT:E:F:K:J:Y:Z:B:fm:NH::a::eQG:Mg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:8:{:}:j:\\:"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c option"
@@ -313,7 +313,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.ignore_unknown_inode = false;
     p.no_compare_symlink_date = true;
     p.scope = all_fsa_families();
-    p.multi_threaded = false;
+    p.multi_threaded_crypto = 1;
     p.delta_sig = false;
     p.delta_mask = nullptr;
     p.delta_diff = true;
@@ -797,14 +797,6 @@ bool get_args(shared_ptr<user_interaction> & dialog,
 
         if(!p.alter_atime)
             p.security_check = false;
-
-	    ////////////////////////////////
-            // multi threading
-            //
-            //
-
-	if(p.multi_threaded && !rec.no_inter)
-	    rec.dialog->pause(gettext("Warning: libdar multi-threading is an experimental and unsupported feature, read man page about -G option for more information"));
 
     }
     catch(Erange & e)
@@ -1626,10 +1618,15 @@ static bool get_args_recursive(recursive_param & rec,
                 rec.no_inter = true;
                 break;
             case 'G':
-                if(optarg != nullptr)
+                if(optarg == nullptr)
                     throw Erange("command_line.cpp:get_arg_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
 		if(compile_time::libthreadar())
-		    p.multi_threaded = true;
+		{
+		    if(! tools_my_atoi(optarg, tmp))
+			throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+		    else
+			p.multi_threaded_crypto = (U_I)tmp;
+		}
 		else
 		    throw Ecompilation(gettext("libthreadar required for multithreaded execution"));
                 break;
@@ -2627,7 +2624,7 @@ const struct option *get_long_opt()
         {"fsa-scope", required_argument, nullptr, '4'},
         {"exclude-by-ea", optional_argument, nullptr, '5'},
         {"sign", required_argument, nullptr, '7'},
-        {"multi-thread", no_argument, nullptr, 'G'},
+        {"multi-thread", required_argument, nullptr, 'G'},
 	{"delta", required_argument, nullptr, '8'},
 	{"include-delta-sig", required_argument, nullptr, '{'},
 	{"exclude-delta-sig", required_argument, nullptr, '}'},

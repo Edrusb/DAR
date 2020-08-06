@@ -12,6 +12,10 @@ from 2.6.x to 2.7.0
 - added -b option to dar_split to set the I/O block size
 - added -r option to dar_split to limit the transfer rate
 - added -c option to dar_split to limit the number of tape to read
+- replaced old and experimental multi-threaded implementation, -G option
+  now needs an argument on command line. New methods added in libdar API
+  accordingly.
+
 
 from 2.6.9 to 2.6.10
 - update the configure script to handle some undocumented --enable-*
