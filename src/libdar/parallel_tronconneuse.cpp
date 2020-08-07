@@ -479,6 +479,9 @@ namespace libdar
 
     bool parallel_tronconneuse::skip(const infinint & pos)
     {
+	bool search = true;
+	bool found = false;
+
 	if(is_terminated())
 	    throw SRC_BUG;
 	else
@@ -487,7 +490,82 @@ namespace libdar
 	if(get_mode() != gf_read_only)
 	    throw SRC_BUG;
 
-	send_read_order(tronco_flags::stop);
+	if(pos == current_position)
+	    return true;
+
+	    // checking first whether we do not already have the requested data
+
+	while(search && !found)
+	{
+	    if(lus_data.empty())
+	    {
+		search = false;
+		continue;
+	    }
+
+	    if(lus_flags.empty())
+		throw SRC_BUG;
+
+	    if(static_cast<tronco_flags>(lus_flags.front()) != tronco_flags::normal)
+	    {
+		search = false;
+		continue;
+	    }
+
+	    if(pos < current_position)
+	    {
+		infinint lu = lus_data.front()->clear_data.get_read_offset();
+
+		if(current_position <= pos + lu)
+		{
+		    U_I lu_tmp = 0;
+
+		    lu -= current_position - pos;
+		    lu.unstack(lu_tmp);
+		    if(!lu.is_zero())
+			throw SRC_BUG; // we should be in the range of a U_I
+		    lus_data.front()->clear_data.rewind_read(lu_tmp);
+		    found = true;
+		}
+		else
+		    search = false;
+		    // else we need to send_read_order()
+		    // requested offset is further before
+		    // the earliest data we have in lus_data
+	    }
+	    else // pos > current_position (the case pos == current_position has alread been seen)
+	    {
+		infinint alire = lus_data.front()->clear_data.get_data_size()
+		    - lus_data.front()->clear_data.get_read_offset();
+
+		if(pos < current_position + alire)
+		{
+		    U_I alire_tmp = 0;
+
+		    alire = infinint(lus_data.front()->clear_data.get_read_offset()) + pos - current_position;
+		    alire.unstack(alire_tmp);
+		    if(!alire.is_zero())
+			throw SRC_BUG; // we should be in the range of a U_I
+		    lus_data.front()->clear_data.rewind_read(alire_tmp);
+		    found = true;
+		}
+		else
+		{
+		    current_position += alire;
+		    tas->put(move(lus_data.front()));
+		    lus_data.pop_front();
+		    lus_flags.pop_front();
+		    if(current_position == pos && !lus_data.empty())
+			found = true;
+		}
+	    }
+	}
+
+	    // expected offset not found in lus_data
+
+	if(!found)
+	    send_read_order(tronco_flags::stop);
+
 	current_position = pos;
 	lus_eof = false;
 	return true;
