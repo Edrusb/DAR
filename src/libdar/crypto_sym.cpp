@@ -223,6 +223,9 @@ namespace libdar
 	if(stoc.get_size() > crypt_size)
 	    throw Erange("crypto_sym::decrypt_data",gettext("Data corruption may have occurred, cannot decrypt data"));
 	return crypt_size - stoc.get_size();
+	    // this is crypt_size to be used here as the clear data has the same length
+	    // gcry_cipher_decrypt does not provide any mean to know the amount of clear bytes produced
+
 #else
 	throw Ecompilation(gettext("Strong encryption support (libgcrypt)"));
 #endif
