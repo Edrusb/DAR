@@ -368,7 +368,7 @@ namespace libdar
 						 std::unique_ptr<crypto_module> & crypto_ptr):
 	proto_tronco(encrypted_side.get_mode() == gf_read_only ? gf_read_only : gf_write_only)
     {
-	if(clear_block_size == 0)
+	if(block_size == 0)
 	    throw Erange("parallel_tronconneuse::parallel_tronconneuse", tools_printf(gettext("%d is not a valid block size"), block_size));
 
 	initialized = false;
