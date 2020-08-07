@@ -219,10 +219,10 @@ namespace libdar
 	err = gcry_cipher_decrypt(main_clef, (unsigned char *)clear_buf, clear_size, (const unsigned char *)crypt_buf, crypt_size);
 	if(err != GPG_ERR_NO_ERROR)
 	    throw Erange("crypto_sym::decrypt_data",tools_printf(gettext("Error while decyphering data: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-	elastic stoc = elastic((unsigned char *)clear_buf, clear_size, elastic_backward, reading_ver);
-	if(stoc.get_size() > clear_size)
+	elastic stoc = elastic((unsigned char *)clear_buf, crypt_size, elastic_backward, reading_ver);
+	if(stoc.get_size() > crypt_size)
 	    throw Erange("crypto_sym::decrypt_data",gettext("Data corruption may have occurred, cannot decrypt data"));
-	return clear_size - stoc.get_size();
+	return crypt_size - stoc.get_size();
 #else
 	throw Ecompilation(gettext("Strong encryption support (libgcrypt)"));
 #endif
