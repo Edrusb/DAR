@@ -470,7 +470,7 @@ namespace libdar
     bool parallel_tronconneuse::skippable(skippability direction, const infinint & amount)
     {
 	if(get_mode() != gf_read_only)
-	    throw SRC_BUG;
+	    return false;
 
 	post_constructor_init();
 	send_read_order(tronco_flags::stop);
