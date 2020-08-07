@@ -38,6 +38,7 @@ extern "C"
 #include "fichier_local.hpp"
 #include "macro_tools.hpp"
 #include "crypto_sym.hpp"
+#include "tools.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -151,10 +152,12 @@ private:
 
 
 void f1();
+void f2(const char *src, const char *dst, bool encrypt, U_I num, const char *pass);
+
 
 static shared_ptr<user_interaction>ui;
 
-int main()
+int main(int argc, char* argv[])
 {
     U_I maj, med, min;
 
@@ -164,7 +167,17 @@ int main()
 	cout << "ERREUR !" << endl;
     try
     {
-	f1();
+	    // f1();
+
+	if(argc < 6)
+	    ui->message(tools_printf("usage: %s { -e | -d } <src> <dst> <num> <pass>", argv[0]));
+	else
+	{
+	    if(strcmp(argv[1], "-d") != 0 && strcmp(argv[1], "-e") != 0)
+		ui->message("use -d to decrypt or -e to encrypt");
+	    else
+		f2(argv[2], argv[3], strcmp(argv[1], "-e") == 0, atoi(argv[4]), argv[5]);
+	}
     }
     catch(Ebug & e)
     {
@@ -283,4 +296,67 @@ void f1()
     dst.reset();
     temp = time(NULL);
     cout << "finished! " << ctime(&temp) << endl;
+}
+
+void f2(const char *src, const char *dst, bool encrypt, U_I num, const char *pass)
+{
+    static const U_I block_size = 10240;
+
+    unique_ptr<fichier_local> src_f = make_unique<fichier_local>(src, false);
+    unique_ptr<fichier_local> dst_f = make_unique<fichier_local>(ui, dst, gf_write_only, 0644, true, false, false);
+    unique_ptr<proto_tronco> tronco;
+    unique_ptr<crypto_module> crypto = make_unique<crypto_sym>(secu_string(pass, strlen(pass)),
+							       macro_tools_supported_version,
+							       crypto_algo::aes256,
+							       "sans sel c'est fade",
+							       100,
+							       hash_algo::sha512,
+							       true);
+
+    if(encrypt)
+	if(num > 1)
+	    tronco = make_unique<parallel_tronconneuse>(num,
+							block_size,
+							*dst_f,
+							false,
+							macro_tools_supported_version,
+							crypto);
+	else
+	    tronco = make_unique<tronconneuse>(block_size,
+					       *dst_f,
+					       false,
+					       macro_tools_supported_version,
+					       crypto);
+    else
+	if(num > 1)
+	    tronco = make_unique<parallel_tronconneuse>(num,
+							block_size,
+							*src_f,
+							false,
+							macro_tools_supported_version,
+							crypto);
+	else
+	    tronco = make_unique<tronconneuse>(block_size,
+					       *src_f,
+					       false,
+					       macro_tools_supported_version,
+					       crypto);
+
+    if(encrypt)
+    {
+	src_f->copy_to(*tronco);
+	tronco->write_end_of_file();
+	tronco->sync_write();
+	src_f->terminate();
+	tronco->terminate();
+	dst_f->terminate();
+    }
+    else
+    {
+	tronco->copy_to(*dst_f);
+	dst_f->sync_write();
+	tronco->terminate();
+	src_f->terminate();
+	dst_f->terminate();
+    }
 }
