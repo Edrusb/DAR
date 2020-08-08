@@ -1548,12 +1548,14 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
 					  || med < atoi(MIN_MED_VERSION_THREADAR)
 					  || (med == atoi(MIN_MED_VERSION_THREADAR)
 					     && min < atoi(MIN_MIN_VERSION_THREADAR)))
+					{
 					     std::cout << "libthreadar version " << maj << "." << med << "." << min
 					               << " is too old, use at least version "
 					               << EXPECTED_MAJ_VERSION_THREADAR << "."
 						       << MIN_MED_VERSION_THREADAR << "."
 						       << MIN_MIN_VERSION_THREADAR << std::endl;
-					  return 1;
+					     return 1;
+					}
 
                                         mythread toto(10);
 
