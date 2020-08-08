@@ -214,10 +214,10 @@ else
   hash=""
 fi
 
-if [ "$multi_thread" != "y" ]; then
-  multi_thread=""
+if [ "$multi_thread" != "1" ]; then
+    multi_thread="-G $multi_thread"
 else
-  multi_thread="-G"
+    multi_thread=""
 fi
 
 if [ ! -z "$keepcompressed" -a ! -z "$recheck_hole" ] ; then
