@@ -1516,6 +1516,12 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
                                [ AC_MSG_WARN([Cannot find libthreadar.h header file]) ]
                               )
                AC_MSG_CHECKING([for libthreadar() operationability])
+	       exp_maj_version_threadar=1
+	       min_med_version_threadar=3
+	       min_min_version_threadar=0
+	       AC_DEFINE_UNQUOTED(EXPECTED_MAJ_VERSION_THREADAR, "$exp_maj_version_threadar", [libthreadar expected major version])
+	       AC_DEFINE_UNQUOTED(MIN_MED_VERSION_THREADAR, "$min_med_version_threadar", [libthreadar minimal medium version])
+       	       AC_DEFINE_UNQUOTED(MIN_MIN_VERSION_THREADAR, "$min_min_version_threadar", [libthreadar minimal minor version])
                AC_RUN_IFELSE([AC_LANG_PROGRAM( [[
                                     #if HAVE_LIBTHREADAR_LIBTHREADAR_HPP
                                     #include <libthreadar/libthreadar.hpp>
@@ -1523,7 +1529,7 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
                                     #include <iostream>
                                    ]],
                                    [[
-                                        class mythread: public libthreadar::thread
+				        class mythread: public libthreadar::thread
                                         {
                                         public:
                                             mythread(int x): myx(x) {};
@@ -1536,12 +1542,27 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
                                            int myx;
                                         };
 
+					unsigned int maj, med, min;
+					libthreadar::get_version(maj, med, min);
+					if(maj != atoi(EXPECTED_MAJ_VERSION_THREADAR)
+					  || med < atoi(MIN_MED_VERSION_THREADAR)
+					  || (med == atoi(MIN_MED_VERSION_THREADAR)
+					     && min < atoi(MIN_MIN_VERSION_THREADAR)))
+					     std::cout << "libthreadar version " << maj << "." << med << "." << min
+					               << " is too old, use at least version "
+					               << EXPECTED_MAJ_VERSION_THREADAR << "."
+						       << MIN_MED_VERSION_THREADAR << "."
+						       << MIN_MIN_VERSION_THREADAR << std::endl;
+					  return 1;
+
                                         mythread toto(10);
 
                                         toto.run();
                                         toto.join();
                                         toto.getx();
                                         std::cout << "ok" << std::endl;
+
+					return 0;
                                    ]])
                                ],
                                [
