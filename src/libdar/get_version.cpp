@@ -71,6 +71,10 @@ extern "C"
 #include "tools.hpp"
 #include "thread_cancellation.hpp"
 
+#ifdef LIBTHREADAR_AVAILABLE
+#include "parallel_tronconneuse.hpp"
+#endif
+
 using namespace std;
 
 namespace libdar
@@ -209,9 +213,27 @@ namespace libdar
 	    }
 	    const curl_version_info_data *cvers = curl_version_info(CURLVERSION_FOURTH);
 	    if(cvers->age < CURLVERSION_FOURTH)
-		throw Erange(gettext("libcurl initialization failed: %s"), "libcurl version not available");
+		throw Erange("libdar_init_libcurl", tools_printf(gettext("libcurl initialization failed: %s"), "libcurl version not available"));
 	    if(cvers->version_num < 0x072600)
-		throw Erange(gettext("libcurl initialization failed: %s"), "libcurl version is too old");
+		throw Erange("libdar_init_libcurl", tools_printf(gettext("libcurl initialization failed: %s"), "libcurl version is too old"));
+#endif
+
+		// checking libthreadar version
+
+#if LIBTHREADAR_AVAILABLE
+	    unsigned int maj, med, min;
+	    libthreadar::get_version(maj, med, min);
+
+	    if(maj != atoi(EXPECTED_MAJ_VERSION_THREADAR)
+	       || med < atoi(MIN_MED_VERSION_THREADAR)
+	       || (med == atoi(MIN_MED_VERSION_THREADAR)
+		   && min < atoi(MIN_MIN_VERSION_THREADAR)))
+		throw Erange("libdar_init_libthreadar",
+			     tools_printf(gettext("libthreader version %d.%d.%d is too old, need version %s.%s.%s or more recent"),
+					  maj,med,min,
+					  EXPECTED_MAJ_VERSION_THREADAR,
+					  MIN_MED_VERSION_THREADAR,
+				 	  MIN_MIN_VERSION_THREADAR));
 #endif
 
 	    tools_init();
