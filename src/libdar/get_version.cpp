@@ -224,10 +224,10 @@ namespace libdar
 	    unsigned int maj, med, min;
 	    libthreadar::get_version(maj, med, min);
 
-	    if(maj != atoi(EXPECTED_MAJ_VERSION_THREADAR)
-	       || med < atoi(MIN_MED_VERSION_THREADAR)
-	       || (med == atoi(MIN_MED_VERSION_THREADAR)
-		   && min < atoi(MIN_MIN_VERSION_THREADAR)))
+	    if((signed int)maj != atoi(EXPECTED_MAJ_VERSION_THREADAR)
+	       || (signed int)med < atoi(MIN_MED_VERSION_THREADAR)
+	       || ((signed int)med == atoi(MIN_MED_VERSION_THREADAR)
+		   && (signed int)min < atoi(MIN_MIN_VERSION_THREADAR)))
 		throw Erange("libdar_init_libthreadar",
 			     tools_printf(gettext("libthreader version %d.%d.%d is too old, need version %s.%s.%s or more recent"),
 					  maj,med,min,

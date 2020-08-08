@@ -231,6 +231,18 @@ namespace libdar
 #endif
     }
 
+    std::unique_ptr<crypto_module> crypto_sym::clone() const
+    {
+	try
+	{
+	    return std::make_unique<crypto_sym>(*this);
+	}
+	catch(bad_alloc &)
+	{
+	    throw Ememory("crypto_sym::clone");
+	}
+    }
+
     size_t crypto_sym::max_key_len(crypto_algo algo)
     {
 #if CRYPTO_AVAILABLE

@@ -93,7 +93,7 @@ namespace libdar
 				  const U_32 crypt_size,
 				  char *clear_buf,
 				  U_32 clear_size) override;
-	virtual std::unique_ptr<crypto_module> clone() const override { return std::make_unique<crypto_sym>(*this); };
+	virtual std::unique_ptr<crypto_module> clone() const override;
 
 
 	    /// returns the max key length in octets for the given algorithm
