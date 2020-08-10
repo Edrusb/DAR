@@ -532,8 +532,6 @@ namespace libdar
 			// pending stop found or eof found
 		    current_position = pos;
 		    lus_eof = false;
-			// we know now that all thread are stopped
-		    suspended = true;
 		}
 	    }
 	}
@@ -687,7 +685,7 @@ namespace libdar
 		    if(ignore_stop_acks == 0)
 		    {
 			suspended = true;
-			go_read(); // awake
+			go_read(); // awake threads to continue the reading
 		    }
 		}
 		else
@@ -700,7 +698,6 @@ namespace libdar
 		tas->put(lus_data);
 		lus_data.clear();
 		lus_flags.clear();
-		suspended = true;
 		break;
 	    case tronco_flags::die:
 		throw SRC_BUG; // should never receive a die flag without a first sollicition
@@ -855,8 +852,6 @@ namespace libdar
 		// we just need to remove the stop pending order
 		// to be sure the threads are stop and in condition
 		// to receive the die order
-	    suspended = true;
-		// threads are now suspended for sure
 	}
 
 	if(get_mode() == gf_read_only)
@@ -943,7 +938,10 @@ namespace libdar
 	case tronco_flags::die:
 	    crypto_reader->set_flag(order);
 	    if(suspended)
+	    {
 		waiter->wait();
+		suspended = false;
+	    }
 	    val = purge_ratelier_from_next_order();
 	    switch(val)
 	    {
@@ -958,7 +956,10 @@ namespace libdar
 		    // send the order again
 		crypto_reader->set_flag(order);
 		if(suspended)
+		{
 		    waiter->wait(); // awaking thread pending on waiter for they take the order into account
+		    suspended = false;
+		}
 		val = purge_ratelier_from_next_order();
 		if(val != order)
 		    throw SRC_BUG;
@@ -985,9 +986,6 @@ namespace libdar
 		ret = false;
 		// order not purged, not yet subthreaded will be considered suspended
 		// after the order completion (ignore_stop_order back to zero)
-	    else
-		suspended = true;
-		// order executed (returned true and subthreaded known to be suspended)
 	    break;
 	case tronco_flags::normal:
 	    throw SRC_BUG;
@@ -1168,7 +1166,13 @@ namespace libdar
 			    }
 			}
 			else
+			{
 			    --num;
+			    if(num == 0)
+				suspended = (ret != tronco_flags::die);
+				// we do not have to synchronize with the barrier
+				// when the thread are about to die or are already dead
+			}
 		    }
 		    break;
 		case tronco_flags::normal:
@@ -1188,9 +1192,6 @@ namespace libdar
 	    }
 	}
 	while(num > 0);
-
-	if(ret == tronco_flags::eof)
-	    suspended = true;
 
 	return ret;
     }
@@ -1252,6 +1253,9 @@ namespace libdar
 		}
 	    }
 	}
+
+	if(ret)
+	    suspended = true;
 
 	return ret;
     }

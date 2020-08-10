@@ -338,41 +338,52 @@ namespace libdar
 
 	    // the fields
 
-	bool initialized;          ///< whether post_constructor_init() has been run
-	U_I num_workers;
-	U_32 clear_block_size;
-	infinint current_position;
-	infinint initial_shift;
-	archive_version reading_ver;
-	std::unique_ptr<crypto_module> crypto;
-	bool suspended;              ///< wehther child thread are waiting us on the barrier
+	bool initialized;              ///< whether post_constructor_init() has been run
+	U_I num_workers;               ///< number of worker threads
+	U_32 clear_block_size;         ///< size of a clear block
+	infinint current_position;     ///< current position for the upper layer perspective (modified by skip*, inherited_read/write, find_offset_in_lus_data)
+	infinint initial_shift;        ///< the offset in the "encrypted" below layer at which starts the encrypted data
+	archive_version reading_ver;   ///< archive format we follow
+	std::unique_ptr<crypto_module> crypto;  ///< the crypto module use to cipher / uncipher block of data
 	infinint (*mycallback)(generic_file & below, const archive_version & reading_ver);
 	generic_file* encrypted;
-	U_I ignore_stop_acks;
+
+	    // fields used to represent possible status of subthreads and communication channel (the pipe)
+
+	U_I ignore_stop_acks;          ///< how much stop ack still to be read (aborted stop order context)
+	bool suspended;                ///< wehther child thread are waiting us on the barrier
+
 
 	    // the following stores data from the ratelier_gather to be provided for read() operation
+	    // the lus_data/lus_flags is what is extracted from the ratelier_gather, both constitue
+	    // the feedback channel from sub-threads to provide order acks and normal data
+
 	std::deque<std::unique_ptr<crypto_segment> > lus_data;
 	std::deque<signed int> lus_flags;
 	bool lus_eof;
 	bool check_bytes_to_skip; ///< whether to check for bytes to skip
 
 	    // the following stores data going to ratelier_scatter for the write() operation
+
 	std::unique_ptr<crypto_segment> tempo_write;
 	infinint block_num;
 
 	    // the datastructures shared among threads
+
 	std::shared_ptr<libthreadar::ratelier_scatter<crypto_segment> > scatter;
 	std::shared_ptr<libthreadar::ratelier_gather<crypto_segment> > gather;
 	std::shared_ptr<libthreadar::barrier> waiter;
 	std::shared_ptr<heap<crypto_segment> > tas;
 
 	    // the child threads
+
 	std::deque<crypto_worker> travailleur;
 	std::unique_ptr<read_below> crypto_reader;
 	std::unique_ptr<write_below> crypto_writer;
 
 	    /// initialize fields that could be not be from constructor
 	    /// then run the child threads
+
 	void post_constructor_init();
 
 	    /// send and order to subthreads and gather acks from them
@@ -388,8 +399,14 @@ namespace libdar
 	    /// acknolegements will be met. In any other case true is returned,
 	    /// the subthreaded got the order and the ratelier has been purged.
 	bool send_read_order(tronco_flags order, const infinint & for_offset = 0);
+
+	    /// send order in write mode
 	void send_write_order(tronco_flags order);
+
+	    /// wake up threads in read mode when necessary
 	void go_read();
+
+	    /// fill lus_data/lus_flags from ratelier_gather if these are empty
 	void read_refill();
 
 	    /// purge the ratelier from the next order which is provided as returned value
