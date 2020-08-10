@@ -382,6 +382,7 @@ namespace libdar
 	reading_ver = ver;
 	crypto = move(crypto_ptr);
 	suspended = true; // child threads are waiting us on the barrier
+	ignore_stop_acks = 0;
 	mycallback = nullptr;
 	encrypted = &encrypted_side; // used for further reference, thus the encrypted object must survive "this"
 	lus_data.clear();
