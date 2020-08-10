@@ -79,7 +79,7 @@ namespace libdar
 	    /// let the caller give a callback function that given a generic_file with mixed cyphered and clear data, is able
 	    /// to return the offset of the first clear byte located *after* all the cyphered data, this
 	    /// callback function is used (if defined by the following method), when reaching End of File.
-	void set_callback_trailing_clear_data(infinint (*call_back)(generic_file & below, const archive_version & reading_ver)) { trailing_clear_data = call_back; };
+	void set_callback_trailing_clear_data(trailing_clear_data_callback call_back) { trailing_clear_data = call_back; };
 
 	    // *** //
 	    // *** the method above should not be used anymore once the thread is running *** //
@@ -138,7 +138,7 @@ namespace libdar
 	std::shared_ptr<heap<crypto_segment> > tas; ///< where to fetch from blocks of data
 	infinint initial_shift;                     ///< initial shift
 	bool reof;                                  ///< whether we reached eof while reading
-	infinint (*trailing_clear_data)(generic_file & below, const archive_version & reading_ver); ///< callback function that gives the amount of clear data found at the end of the given file
+	trailing_clear_data_callback trailing_clear_data;                         ///< callback function that gives the amount of clear data found at the end of the given file
 
 	    // initialized by inherited_run() / get_ready_for_new_offset()
 	infinint crypt_offset;                     ///< position to skip to in 'below' to start reading crypted data

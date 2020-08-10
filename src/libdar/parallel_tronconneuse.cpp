@@ -732,7 +732,7 @@ namespace libdar
 		suspended = true;
 		break;
 	    case tronco_flags::die:
-		throw SRC_BUG; // should never receive a die flag
+		throw SRC_BUG; // should never receive a die flag without a first sollicition
 	    case tronco_flags::data_error:
 		if(lus_data.empty())
 		    throw SRC_BUG; // not the same amount of item in lus_data than in lus_flags!
