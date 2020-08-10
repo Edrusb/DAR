@@ -682,6 +682,9 @@ namespace libdar
 		if(ignore_stop_acks > 0)
 		{
 		    --ignore_stop_acks;
+		    tas->put(move(lus_data.front()));
+		    lus_data.pop_front();
+		    lus_flags.pop_front();
 		    if(ignore_stop_acks == 0)
 		    {
 			suspended = true;
@@ -1124,7 +1127,6 @@ namespace libdar
 			if(ret != tronco_flags::stop && ignore_stop_acks > 0)
 			{
 			    ignore_stop_acks = 0;
-			    suspended = true;
 				// this situation occurs when skip triggered
 				// a stop order which was not purged because
 				// the requested data was found in the pipe
