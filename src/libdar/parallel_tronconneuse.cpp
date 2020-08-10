@@ -111,12 +111,22 @@ namespace libdar
 		{
 		    send_flag_to_workers(tronco_flags::stop);
 		    waiting->wait(); // We are suspended here until the caller has set new orders
-		    if(flag == tronco_flags::die)
+		    switch(flag)
+		    {
+		    case tronco_flags::die:
 			break;
-		    if(flag == tronco_flags::normal)
+		    case tronco_flags::normal:
 			index_num = get_ready_for_new_offset();
-		    else
+			break;
+		    case tronco_flags::stop:
+			break; // possible if partial purging the lus_data by the main thread
+		    case tronco_flags::data_error:
 			throw SRC_BUG;
+		    case tronco_flags::eof:
+			throw SRC_BUG;
+		    default:
+			throw SRC_BUG;
+		    }
 		}
 		break;
 	    case tronco_flags::normal:
