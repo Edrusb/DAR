@@ -490,9 +490,6 @@ namespace libdar
 
     bool parallel_tronconneuse::skip(const infinint & pos)
     {
-	bool search = true;
-	bool found = false;
-
 	if(is_terminated())
 	    throw SRC_BUG;
 	else
@@ -504,81 +501,44 @@ namespace libdar
 	if(pos == current_position)
 	    return true;
 
-	    // checking first whether we do not already have the requested data
+	    // looking in lus_data for the offset
+	    // before sending the stop order
 
-	while(search && !found)
+	if(!find_offset_in_lus_data(pos))
 	{
-	    if(lus_data.empty())
+	    if(ignore_stop_acks == 0)
 	    {
-		search = false;
-		continue;
-	    }
-
-	    if(lus_flags.empty())
-		throw SRC_BUG;
-
-	    if(static_cast<tronco_flags>(lus_flags.front()) != tronco_flags::normal)
-	    {
-		search = false;
-		continue;
-	    }
-
-	    if(pos < current_position)
-	    {
-		infinint lu = lus_data.front()->clear_data.get_read_offset();
-
-		if(current_position <= pos + lu)
+		if(send_read_order(tronco_flags::stop, pos))
 		{
-		    U_I lu_tmp = 0;
-
-		    lu -= current_position - pos;
-		    lu.unstack(lu_tmp);
-		    if(!lu.is_zero())
-			throw SRC_BUG; // we should be in the range of a U_I
-		    lus_data.front()->clear_data.rewind_read(lu_tmp);
-		    found = true;
+			// the stop order completed and
+			// threads are now stopped
+		    current_position = pos;
+		    lus_eof = false;
 		}
-		else
-		    search = false;
-		    // else we need to send_read_order()
-		    // requested offset is further before
-		    // the earliest data we have in lus_data
+		    // else we are in the same situation as
+		    // if the offset was found in lus_data
+		    // but a stop ack order are pending in
+		    // the ratelier_gather, for that reason
+		    // ignore_stop field has been set to true
+		    // by send_read_order() to ignore these acks
+		    // during further readings
+
 	    }
-	    else // pos > current_position (the case pos == current_position has alread been seen)
+	    else // some unacknowledged stop order are pending in the pipe, we can read further up to them, subthreads are *maybe* already suspended
 	    {
-		infinint alire = lus_data.front()->clear_data.get_data_size()
-		    - lus_data.front()->clear_data.get_read_offset();
-
-		if(pos < current_position + alire)
+		    // we do not need to send a stop order
+		if(purge_unack_stop_order(pos))
 		{
-		    U_I alire_tmp = 0;
-
-		    alire = infinint(lus_data.front()->clear_data.get_read_offset()) + pos - current_position;
-		    alire.unstack(alire_tmp);
-		    if(!alire.is_zero())
-			throw SRC_BUG; // we should be in the range of a U_I
-		    lus_data.front()->clear_data.rewind_read(alire_tmp);
-		    found = true;
-		}
-		else
-		{
-		    current_position += alire;
-		    tas->put(move(lus_data.front()));
-		    lus_data.pop_front();
-		    lus_flags.pop_front();
-		    if(current_position == pos && !lus_data.empty())
-			found = true;
+			// pending stop found or eof found
+		    current_position = pos;
+		    lus_eof = false;
+			// we know now that all thread are stopped
+		    suspended = true;
 		}
 	    }
 	}
+	    // offset has been found in lus_data, no stop order needed to be sent to skip()
 
-	    // expected offset not found in lus_data
-
-	if(!found)
-	    send_read_order(tronco_flags::stop);
-
-	current_position = pos;
-	lus_eof = false;
 	return true;
     }
 
@@ -721,7 +681,18 @@ namespace libdar
 		}
 		break;
 	    case tronco_flags::stop:
-		throw SRC_BUG; // should receive a stop flag only upon stop request
+		if(ignore_stop_acks > 0)
+		{
+		    --ignore_stop_acks;
+		    if(ignore_stop_acks == 0)
+		    {
+			suspended = true;
+			go_read(); // awake
+		    }
+		}
+		else
+		    throw SRC_BUG;
+		break;
 	    case tronco_flags::eof:
 		lus_eof = true;
 		if(purge_ratelier_from_next_order() != tronco_flags::eof)
@@ -877,6 +848,17 @@ namespace libdar
 	if(get_mode() == gf_read_only)
 	    flush_read();
 
+	if(ignore_stop_acks > 0)
+	{
+	    if(!purge_unack_stop_order())
+		throw SRC_BUG;
+		// we just need to remove the stop pending order
+		// to be sure the threads are stop and in condition
+		// to receive the die order
+	    suspended = true;
+		// threads are now suspended for sure
+	}
+
 	if(get_mode() == gf_read_only)
 	{
 	    send_read_order(tronco_flags::die);
@@ -948,8 +930,9 @@ namespace libdar
 	}
     }
 
-    void parallel_tronconneuse::send_read_order(tronco_flags order)
+    bool parallel_tronconneuse::send_read_order(tronco_flags order, const infinint & for_offset)
     {
+	bool ret = true;
 	tronco_flags val;
 
 	if(get_mode() != gf_read_only)
@@ -962,30 +945,49 @@ namespace libdar
 	    if(suspended)
 		waiter->wait();
 	    val = purge_ratelier_from_next_order();
-	    if(val != order)
+	    switch(val)
 	    {
-		if(val == tronco_flags::eof)
-		{
-		    crypto_reader->set_flag(order);
+	    case tronco_flags::die:
+		    // expected normal condition
+		break;
+	    case tronco_flags::eof:
+		    // eof met threads are stopped
+	    case tronco_flags::stop:
+		    // pending stop was not yet read
+		    // now that threads are suspended we can
+		    // send the order again
+		crypto_reader->set_flag(order);
+		if(suspended)
 		    waiter->wait(); // awaking thread pending on waiter for they take the order into account
-		    val = purge_ratelier_from_next_order();
-		    if(val != order)
-			throw SRC_BUG;
-		}
-		else
+		val = purge_ratelier_from_next_order();
+		if(val != order)
 		    throw SRC_BUG;
+	    case tronco_flags::normal:
+		throw SRC_BUG;
+	    case tronco_flags::data_error:
+		throw SRC_BUG;
+	    default:
+		throw SRC_BUG;
 	    }
 	    break;
 	case tronco_flags::eof:
 	    throw SRC_BUG;
 	case tronco_flags::stop:
 	    if(suspended)
-		return; // nothing to do
+		return ret; // nothing to do
 	    crypto_reader->set_flag(order);
-	    val = purge_ratelier_from_next_order();
-	    if(val != order && val != tronco_flags::eof)
+	    val = purge_ratelier_from_next_order(for_offset);
+	    if(val != tronco_flags::stop
+	       && val != tronco_flags::eof
+	       && (val != tronco_flags::normal || for_offset.is_zero()))
 		throw SRC_BUG;
-	    suspended = true;
+	    if(!for_offset.is_zero() && val == tronco_flags::normal)
+		ret = false;
+		// order not purged, not yet subthreaded will be considered suspended
+		// after the order completion (ignore_stop_order back to zero)
+	    else
+		suspended = true;
+		// order executed (returned true and subthreaded known to be suspended)
 	    break;
 	case tronco_flags::normal:
 	    throw SRC_BUG;
@@ -994,6 +996,8 @@ namespace libdar
 	default:
 	    throw SRC_BUG;
 	}
+
+	return ret;
     }
 
     void parallel_tronconneuse::send_write_order(tronco_flags order)
@@ -1083,7 +1087,7 @@ namespace libdar
 	}
     }
 
-    tronco_flags parallel_tronconneuse::purge_ratelier_from_next_order()
+    tronco_flags parallel_tronconneuse::purge_ratelier_from_next_order(infinint pos)
     {
 	U_I num = travailleur.size(); // the number of worker
 	deque<signed int>::iterator it;
@@ -1093,6 +1097,22 @@ namespace libdar
 	{
 	    read_refill();
 
+		// only if no order block has been found, if pos is given
+
+	    if(!pos.is_zero() && ret == tronco_flags::normal)
+	    {
+		if(find_offset_in_lus_data(pos))
+		{
+		    ignore_stop_acks = num;
+		    num = 0; // current method will return tronco_flags::normal
+			// when reading further
+			// data we will met the order acks we were
+			// cleaning here, but doing that we've found
+			// the data we were looking for too, so the
+			// order has not been purged from the ratelier
+		}
+	    }
+
 	    while(!lus_flags.empty() && num > 0)
 	    {
 		switch(static_cast<tronco_flags>(lus_flags.front()))
@@ -1101,11 +1121,61 @@ namespace libdar
 		case tronco_flags::die:
 		case tronco_flags::eof:
 		    if(ret == tronco_flags::normal) // first order found
+		    {
 			ret = static_cast<tronco_flags>(lus_flags.front());
+			if(ret != tronco_flags::stop && ignore_stop_acks > 0)
+			{
+			    ignore_stop_acks = 0;
+			    suspended = true;
+				// this situation occurs when skip triggered
+				// a stop order which was not purged because
+				// the requested data was found in the pipe
+				// from subthreads while the subthreads reached
+				// eof and were thus suspended. In that case
+				// the stop order did not triggered any ack
+				// we just have to consider that the subthreads
+				// are actually suspended (which status would
+				// else have been set after the purge of the pending
+				// stop orders)
+			}
+		    }
+
 		    if(static_cast<tronco_flags>(lus_flags.front()) == ret)
-			--num;
+		    {
+			if(ignore_stop_acks > 0) // only when ret == tronco_flags::stop we can have this
+				// (ignore_stop_acks is reset to zero in the code just above for other cases)
+			{
+			    --ignore_stop_acks; // first purging aborted stop acks
+			    if(ignore_stop_acks == 0)
+			    {
+				    // now that all stop acks have been purged we set the current thread status
+				suspended = true;
+				go_read();
+				    // yes we trigger the sub thread to push their data
+				    // to the ratelier up to the current order acknolegment
+
+				ret = tronco_flags::normal;
+				    // getting ready to read the "first" order
+				    // now that all aborted stop order have been purged
+
+				pos = 0;
+				    // but we must ignore the pos lookup
+				    // as this ending purge of stop order
+				    // may have dropped some interleaved data
+				    // (normal) blocks, thus the offset of
+				    // data from the pipe is now unknown
+
+			    }
+			}
+			else
+			    --num;
+		    }
 		    break;
 		case tronco_flags::normal:
+			// we get here only if a order block
+			// has been found or if pos equals zero
+			// and we drop any further data block now
+		    break;
 		case tronco_flags::data_error:
 		    break;
 		default:
@@ -1119,7 +1189,147 @@ namespace libdar
 	}
 	while(num > 0);
 
+	if(ret == tronco_flags::eof)
+	    suspended = true;
+
 	return ret;
+    }
+
+    bool parallel_tronconneuse::purge_unack_stop_order(const infinint & pos)
+    {
+	bool ret = pos.is_zero() || !find_offset_in_lus_data(pos);
+	bool loop = ignore_stop_acks > 0 && ret;
+	    // we loop only if there is some pending acks to purge
+	    // and if either we have not to look for a given offset
+	    // or we could not find the pos position in lus_data
+
+	while(loop)
+	{
+	    read_refill();
+
+	    while(!lus_flags.empty() && loop)
+	    {
+		switch(static_cast<tronco_flags>(lus_flags.front()))
+		{
+		case tronco_flags::stop:
+		case tronco_flags::eof: // eof can be found
+		    if(ignore_stop_acks == 0)
+			throw SRC_BUG;
+		    else
+			--ignore_stop_acks;
+
+		    if(ignore_stop_acks == 0)
+			loop = false;
+			// some data block could be present in lus_data
+			// after this last stop block and could match
+			// the expected offset, but we would have to retur
+			// true as purge order completed but would
+			// also to return false at the same time as the
+			// expected offset has been found... so we
+			// ignore any data past the last stop block
+			// even if it is accessible and could match
+			// our lookup
+		    break;
+		case tronco_flags::die:
+		    throw SRC_BUG;
+		case tronco_flags::normal:
+		case tronco_flags::data_error:
+		    if(!pos.is_zero() && find_offset_in_lus_data(pos))
+		    {
+			loop = false;
+			ret = false;
+		    }
+		    break;
+		default:
+		    throw SRC_BUG;
+		}
+
+		if(loop || ret)
+		{
+		    lus_flags.pop_front();
+		    tas->put(move(lus_data.front()));
+		    lus_data.pop_front();
+		}
+	    }
+	}
+
+	return ret;
+    }
+
+    bool parallel_tronconneuse::find_offset_in_lus_data(const infinint & pos)
+    {
+	bool search = true;
+	bool found = false;
+
+		    // checking first whether we do not already have the requested data
+
+	while(search && !found)
+	{
+	    if(lus_data.empty())
+	    {
+		search = false;
+		continue;
+	    }
+
+	    if(lus_flags.empty())
+		throw SRC_BUG;
+
+	    if(static_cast<tronco_flags>(lus_flags.front()) != tronco_flags::normal)
+	    {
+		search = false;
+		continue;
+	    }
+
+	    if(pos < current_position)
+	    {
+		infinint lu = lus_data.front()->clear_data.get_read_offset();
+
+		if(current_position <= pos + lu)
+		{
+		    U_I lu_tmp = 0;
+
+		    lu -= current_position - pos;
+		    lu.unstack(lu_tmp);
+		    if(!lu.is_zero())
+			throw SRC_BUG; // we should be in the range of a U_I
+		    lus_data.front()->clear_data.rewind_read(lu_tmp);
+		    found = true;
+		}
+		else
+		    search = false;
+		    // else we need to send_read_order()
+		    // requested offset is further before
+		    // the earliest data we have in lus_data
+	    }
+	    else // pos > current_position (the case pos == current_position has alread been seen)
+	    {
+		infinint alire = lus_data.front()->clear_data.get_data_size()
+		    - lus_data.front()->clear_data.get_read_offset();
+
+		if(pos < current_position + alire)
+		{
+		    U_I alire_tmp = 0;
+
+		    alire = infinint(lus_data.front()->clear_data.get_read_offset()) + pos - current_position;
+		    alire.unstack(alire_tmp);
+		    if(!alire.is_zero())
+			throw SRC_BUG; // we should be in the range of a U_I
+		    lus_data.front()->clear_data.rewind_read(alire_tmp);
+		    found = true;
+		}
+		else
+		{
+		    current_position += alire;
+		    tas->put(move(lus_data.front()));
+		    lus_data.pop_front();
+		    lus_flags.pop_front();
+		    if(current_position == pos && !lus_data.empty())
+			found = true;
+		}
+	    }
+	}
+
+	return found;
     }
 
     U_I parallel_tronconneuse::get_heap_size(U_I num_workers)

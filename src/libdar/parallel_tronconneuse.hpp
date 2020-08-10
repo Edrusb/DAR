@@ -130,26 +130,27 @@ namespace libdar
 
     private:
 	std::shared_ptr<libthreadar::ratelier_scatter <crypto_segment> > workers; ///< object used to scatter data to workers
-	std::shared_ptr<libthreadar::barrier> waiting;  ///< barrier used to synchronize with worker and parent thread
-	U_I num_w;            ///< number of worker thread we are feeding through the ratelier_scatter
-	U_I clear_buf_size;   ///< amount of clear data per encrypted chunk
-	generic_file* encrypted; ///< the encrypted data
-	archive_version version; ///< archive version format
-	std::shared_ptr<heap<crypto_segment> > tas; ///< where to fetch from blocks of data
-	infinint initial_shift;                     ///< initial shift
-	bool reof;                                  ///< whether we reached eof while reading
+	std::shared_ptr<libthreadar::barrier> waiting;                            ///< barrier used to synchronize with worker and parent thread
+	U_I num_w;                                                                ///< number of worker thread we are feeding through the ratelier_scatter
+	U_I clear_buf_size;                                                       ///< amount of clear data per encrypted chunk
+	generic_file* encrypted;                                                  ///< the encrypted data
+	archive_version version;                                                  ///< archive version format
+	std::shared_ptr<heap<crypto_segment> > tas;                               ///< where to fetch from blocks of data
+	infinint initial_shift;                                                   ///< initial shift
+	bool reof;                                                                ///< whether we reached eof while reading
 	trailing_clear_data_callback trailing_clear_data;                         ///< callback function that gives the amount of clear data found at the end of the given file
 
 	    // initialized by inherited_run() / get_ready_for_new_offset()
-	infinint crypt_offset;                     ///< position to skip to in 'below' to start reading crypted data
-	U_I encrypted_buf_size;                    ///< size of the encrypted chunk of data
 
-	    // fields accessible by both the caller and the running thread
+	infinint crypt_offset;                                                    ///< position to skip to in 'below' to start reading crypted data
+	U_I encrypted_buf_size;                                                   ///< size of the encrypted chunk of data
 
-	infinint skip_to;  // modification to this field is only done by the parent thread at a time it is not read by this thread
-	tronco_flags flag; // modification to this type is atomic so we do not use mutex
-	infinint clear_flow_start; // modification of this field is only done by this thread a at time the parent thread does not read it
-	infinint pos_in_flow; // modification of this field is only done by this thread a at time the parent thread does not read it
+	    // fields accessible by both the caller and the read_below thread
+
+	infinint skip_to;          ///< modification to this field is only done by the parent thread at a time it is not read by this thread
+	tronco_flags flag;         ///< modification to this type is atomic so we do not use mutex
+	infinint clear_flow_start; ///< modification of this field is only done by this thread a at time the parent thread does not read it
+	infinint pos_in_flow;      ///< modification of this field is only done by this thread a at time the parent thread does not read it
 
 	infinint get_ready_for_new_offset();
 	void send_flag_to_workers(tronco_flags theflag);
@@ -347,6 +348,7 @@ namespace libdar
 	bool suspended;              ///< wehther child thread are waiting us on the barrier
 	infinint (*mycallback)(generic_file & below, const archive_version & reading_ver);
 	generic_file* encrypted;
+	U_I ignore_stop_acks;
 
 	    // the following stores data from the ratelier_gather to be provided for read() operation
 	std::deque<std::unique_ptr<crypto_segment> > lus_data;
@@ -372,11 +374,53 @@ namespace libdar
 	    /// initialize fields that could be not be from constructor
 	    /// then run the child threads
 	void post_constructor_init();
-	void send_read_order(tronco_flags order);
+
+	    /// send and order to subthreads and gather acks from them
+
+	    /// \param[in] order is the order to send to the subthreads
+	    /// \param[in] for_offset is not zero is the offset we want to skip to
+	    /// (it is only taken into account when order is stop)
+	    /// \note with order stop and non zero for_offset, if the
+	    /// data at for_offset is found while purging the
+	    /// ratelier_gather, the purge is stopped, false is returned and
+	    /// the ignore_stop field is set to true, meaning that a stop order
+	    /// has not been purged from the pipe and should be ignored when its
+	    /// acknolegements will be met. In any other case true is returned,
+	    /// the subthreaded got the order and the ratelier has been purged.
+	bool send_read_order(tronco_flags order, const infinint & for_offset = 0);
 	void send_write_order(tronco_flags order);
 	void go_read();
 	void read_refill();
-	tronco_flags purge_ratelier_from_next_order();
+
+	    /// purge the ratelier from the next order which is provided as returned value
+
+	    /// \param[in] pos if pos is not zero, the normal data located at
+	    /// pos offset is also looked for. If it is found before any order
+	    /// the call returns tronco_flags::normal and the order is not purged
+	    /// but the ignore_stop_acks fields is set to true for further
+	    /// reading to skip over this order acknolegments.
+	tronco_flags purge_ratelier_from_next_order(infinint pos = 0);
+
+	    /// removing the ignore_stop_acks pending on the pipe
+
+	    /// \param[in] pos if pos is not zero and normal data is found at
+	    /// pos offset before all stop acks could get read, the call stops
+	    /// and return false. Else true is returned meaning all stop acks
+	    /// has been read and removed from the pope
+	    /// \note this method acts the same pas purge_ratelier_from_next_order but fetch
+	    /// from ratelier up to data offset met of the pending ack to be all read
+	    /// but it then stops, it does not look for a real order after
+	    /// the pending stop acks of an aborted stop order
+	bool purge_unack_stop_order(const infinint & pos = 0);
+
+	    /// flush lus_data/lus_flags up to requested pos offset to be found or all data has been removed
+
+	    /// \param[in] pos the data offset we look for
+	    /// \return true if the offset has been found and is
+	    /// ready for next inherited_read() call, false else
+	    /// and lus_data/lus_flags have been empties of
+	    /// the first non-order blocks found (data blocks)
+	bool find_offset_in_lus_data(const infinint & pos);
 
 	static U_I get_heap_size(U_I num_worker);
     };
