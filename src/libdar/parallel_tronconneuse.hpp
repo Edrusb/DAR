@@ -437,6 +437,9 @@ namespace libdar
 	    /// ready for next inherited_read() call, false else
 	    /// and lus_data/lus_flags have been empties of
 	    /// the first non-order blocks found (data blocks)
+	    /// \note current_position is set upon success else
+	    /// it is unchanged but will not match what may still
+	    /// remain in the pipe
 	bool find_offset_in_lus_data(const infinint & pos);
 
 	static U_I get_heap_size(U_I num_worker);

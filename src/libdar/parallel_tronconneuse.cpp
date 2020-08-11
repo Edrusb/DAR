@@ -523,6 +523,8 @@ namespace libdar
 		    // by send_read_order() to ignore these acks
 		    // during further readings
 
+		    // current_position has been set by send_read_order() (calling find_offset_in_lus_data())
+
 	    }
 	    else // some unacknowledged stop order are pending in the pipe, we can read further up to them, subthreads are *maybe* already suspended
 	    {
@@ -533,8 +535,12 @@ namespace libdar
 		    current_position = pos;
 		    lus_eof = false;
 		}
+
+		    // current_position has been set by purge_unack_stop_order (calling find_offset_in_lus_data())
 	    }
 	}
+	    // else current_position has been set by find_offset_in_lus_data
+
 	    // offset has been found in lus_data, no stop order needed to be sent to skip()
 
 	return true;
@@ -650,6 +656,7 @@ namespace libdar
     U_I parallel_tronconneuse::inherited_read(char *a, U_I size)
     {
 	U_I ret = 0;
+	U_I added_to_current_pos = 0;
 
 	if(get_mode() != gf_read_only)
 	    throw SRC_BUG;
@@ -688,7 +695,9 @@ namespace libdar
 		    if(ignore_stop_acks == 0)
 		    {
 			suspended = true;
-			go_read(); // awake threads to continue the reading
+			current_position += (ret - added_to_current_pos);
+			added_to_current_pos = ret;
+			go_read();
 		    }
 		}
 		else
@@ -783,7 +792,7 @@ namespace libdar
 	    }
 	}
 
-	current_position += ret;
+	current_position += (ret - added_to_current_pos);
 	return ret;
     }
 
@@ -1299,6 +1308,7 @@ namespace libdar
 		    if(!lu.is_zero())
 			throw SRC_BUG; // we should be in the range of a U_I
 		    lus_data.front()->clear_data.rewind_read(lu_tmp);
+		    current_position = pos;
 		    found = true;
 		}
 		else
@@ -1321,6 +1331,7 @@ namespace libdar
 		    if(!alire.is_zero())
 			throw SRC_BUG; // we should be in the range of a U_I
 		    lus_data.front()->clear_data.rewind_read(alire_tmp);
+		    current_position = pos;
 		    found = true;
 		}
 		else
