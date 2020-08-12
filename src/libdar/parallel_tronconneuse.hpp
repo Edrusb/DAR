@@ -55,6 +55,13 @@ namespace libdar
 
     enum class tronco_flags { normal = 0, stop = 1, eof = 2, die = 3, data_error = 4 };
 
+
+    	/////////////////////////////////////////////////////
+	//
+	// read_below subthread used by parallel_tronconneuse
+	// to dispatch chunk of encrypted data to the workers
+	//
+
     class read_below: public libthreadar::thread
     {
     public:
@@ -165,6 +172,12 @@ namespace libdar
     };
 
 
+	/////////////////////////////////////////////////////
+	//
+	// write_below subthread used by parallel_tronconneuse
+	// to gather and write down encrypted data work from workers
+	//
+
     class write_below: public libthreadar::thread
     {
     public:
@@ -188,9 +201,15 @@ namespace libdar
 	U_I num_w;
 	generic_file* encrypted; ///< the encrypted data
 	std::shared_ptr<heap<crypto_segment> > tas;
-
-
     };
+
+
+    	/////////////////////////////////////////////////////
+	//
+	// the crypto_worker threads performing ciphering/deciphering
+	// of many data blocks in parallel
+	//
+
 
     class crypto_worker: public libthreadar::thread
     {
@@ -217,6 +236,14 @@ namespace libdar
 	std::unique_ptr<crypto_module> crypto;
 	bool do_encrypt; // if false do decrypt
     };
+
+
+	/////////////////////////////////////////////////////
+	//
+	// the parallel_tronconneuse class that orchestrate all that
+	//
+	//
+
 
 	/// this is a partial implementation of the generic_file interface to cypher/decypher data block by block.
 
@@ -338,7 +365,6 @@ namespace libdar
 
 	    // the fields
 
-	bool initialized;              ///< whether post_constructor_init() has been run
 	U_I num_workers;               ///< number of worker threads
 	U_32 clear_block_size;         ///< size of a clear block
 	infinint current_position;     ///< current position for the upper layer perspective (modified by skip*, inherited_read/write, find_offset_in_lus_data)
@@ -381,10 +407,6 @@ namespace libdar
 	std::unique_ptr<read_below> crypto_reader;
 	std::unique_ptr<write_below> crypto_writer;
 
-	    /// initialize fields that could be not be from constructor
-	    /// then run the child threads
-
-	void post_constructor_init();
 
 	    /// send and order to subthreads and gather acks from them
 

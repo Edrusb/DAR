@@ -379,7 +379,6 @@ namespace libdar
 	if(block_size == 0)
 	    throw Erange("parallel_tronconneuse::parallel_tronconneuse", tools_printf(gettext("%d is not a valid block size"), block_size));
 
-	initialized = false;
 	num_workers = workers;
 	clear_block_size = block_size;
 	current_position = 0;
@@ -402,6 +401,8 @@ namespace libdar
 	if(!crypto)
 	    throw SRC_BUG;
 
+	    // creating the inter-thread communication structures
+
 	try
 	{
 	    scatter = make_shared<libthreadar::ratelier_scatter<crypto_segment> >(get_ratelier_size(num_workers));
@@ -416,18 +417,31 @@ namespace libdar
 	    if(!waiter)
 		throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
 
-		// tas is created empty, it will be filled by post_constructor_init()
+		// tas is created empty
+
 	    tas = make_shared<heap<crypto_segment> >();
 	    if(!tas)
 		throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
 
+		// filling the heap (tas) with preallocated crypto_segments
+
+	    for(U_I i = 0; i < get_heap_size(num_workers); ++i)
+		tas->put(make_unique<crypto_segment>(crypto->encrypted_block_size_for(clear_block_size),
+						     crypto->clear_block_allocated_size_for(clear_block_size)));
+
+
+		// creating and running the sub-thread objects
+
 	    for(U_I i = 0; i < workers; ++i)
+	    {
 		travailleur.push_back(crypto_worker(scatter,
 						    gather,
 						    waiter,
 						    crypto->clone(),
 						    get_mode() == gf_write_only)
 		    );
+		travailleur.back().run();
+	    }
 
 	    switch(get_mode())
 	    {
@@ -441,6 +455,8 @@ namespace libdar
 							initial_shift);
 		if(!crypto_reader)
 		    throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
+		else
+		    crypto_reader->run();
 		break;
 	    case gf_write_only:
 		crypto_writer = make_unique<write_below>(gather,
@@ -448,15 +464,21 @@ namespace libdar
 							 num_workers,
 							 encrypted,
 							 tas);
-
 		if(!crypto_writer)
 		    throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
+		else
+		    crypto_writer->run();
 		break;
 	    case gf_read_write:
 		throw SRC_BUG;
 	    default:
 		throw SRC_BUG;
 	    }
+
+		// all subthreads are pending on waiter barrier
+
+	    waiter->wait(); // release all threads
+
 	}
 	catch(std::bad_alloc &)
 	{
@@ -481,7 +503,6 @@ namespace libdar
 	if(get_mode() != gf_read_only)
 	    return false;
 
-	post_constructor_init();
 	send_read_order(tronco_flags::stop);
 	return encrypted->skippable(direction, amount);
     }
@@ -490,8 +511,6 @@ namespace libdar
     {
 	if(is_terminated())
 	    throw SRC_BUG;
-	else
-	    post_constructor_init();
 
 	if(get_mode() != gf_read_only)
 	    throw SRC_BUG;
@@ -550,8 +569,6 @@ namespace libdar
 
 	if(is_terminated())
 	    throw SRC_BUG;
-	else
-	    post_constructor_init();
 
 	if(get_mode() != gf_read_only)
 	    throw SRC_BUG;
@@ -621,8 +638,6 @@ namespace libdar
     {
 	if(is_terminated())
 	    throw SRC_BUG;
-	else
-	    post_constructor_init();
 
 	if(get_mode() != gf_read_only)
 	    throw SRC_BUG;
@@ -645,10 +660,7 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 	else
-	{
-	    post_constructor_init();
 	    go_read();
-	}
     }
 
     U_I parallel_tronconneuse::inherited_read(char *a, U_I size)
@@ -659,7 +671,6 @@ namespace libdar
 	if(get_mode() != gf_read_only)
 	    throw SRC_BUG;
 
-	post_constructor_init();
 	if(lus_eof)
 	    return ret;
 
@@ -801,8 +812,6 @@ namespace libdar
 
 	if(get_mode() != gf_write_only)
 	    throw SRC_BUG;
-	else
-	    post_constructor_init();
 
 	while(wrote < size)
 	{
@@ -839,17 +848,13 @@ namespace libdar
     void parallel_tronconneuse::inherited_flush_read()
     {
 	if(get_mode() == gf_read_only)
-	{
-	    post_constructor_init();
 	    send_read_order(tronco_flags::stop);
-	}
     }
 
     void parallel_tronconneuse::inherited_terminate()
     {
 	deque<crypto_worker>::iterator it = travailleur.begin();
 
-	post_constructor_init();
 	if(get_mode() == gf_write_only)
 	    sync_write();
 	if(get_mode() == gf_read_only)
@@ -885,54 +890,6 @@ namespace libdar
 
 	if(tas->get_size() != get_heap_size(num_workers))
 	    throw SRC_BUG;
-    }
-
-    void parallel_tronconneuse::post_constructor_init()
-    {
-	if(!initialized)
-	{
-	    U_32 crypted_block_size = crypto->encrypted_block_size_for(clear_block_size);
-	    U_I heap_size = get_heap_size(num_workers);
-	    initialized = true;
-
-	    try
-	    {
-		for(U_I i = 0; i < heap_size; ++i)
-		    tas->put(make_unique<crypto_segment>(crypted_block_size, crypto->clear_block_allocated_size_for(clear_block_size)));
-	    }
-	    catch(std::bad_alloc &)
-	    {
-		throw Ememory("tronconneuse::post_constructor_init");
-	    }
-
-	    for(deque<crypto_worker>::iterator it = travailleur.begin(); it != travailleur.end(); ++it)
-		it->run();
-
-	    switch(get_mode())
-	    {
-	    case gf_read_only:
-		    // launching all subthreads
-		if(!crypto_reader)
-		    throw SRC_BUG;
-		else
-		    crypto_reader->run();
-		break;
-	    case gf_write_only:
-		if(!crypto_writer)
-		    throw SRC_BUG;
-		else
-		    crypto_writer->run();
-		waiter->wait(); // release all threads
-		    // in write mode sub-threads
-		    // are not pending for an order
-		    // but for data to come and tread
-		break;
-	    case gf_read_write:
-		throw SRC_BUG;
-	    default:
-		throw SRC_BUG;
-	    }
-	}
     }
 
     bool parallel_tronconneuse::send_read_order(tronco_flags order, const infinint & for_offset)
