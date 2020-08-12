@@ -442,6 +442,7 @@ namespace libdar
 	    /// remain in the pipe
 	bool find_offset_in_lus_data(const infinint & pos);
 
+	static U_I get_ratelier_size(U_I num_worker) { return num_worker + num_worker/2; };
 	static U_I get_heap_size(U_I num_worker);
     };
 

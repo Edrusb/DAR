@@ -368,8 +368,6 @@ namespace libdar
 	//
 	//
 
-#define RATELIER_SIZE (num_workers + num_workers / 2)
-
     parallel_tronconneuse::parallel_tronconneuse(U_I workers,
 						 U_32 block_size,
 						 generic_file & encrypted_side,
@@ -406,11 +404,11 @@ namespace libdar
 
 	try
 	{
-	    scatter = make_shared<libthreadar::ratelier_scatter<crypto_segment> >(RATELIER_SIZE);
+	    scatter = make_shared<libthreadar::ratelier_scatter<crypto_segment> >(get_ratelier_size(num_workers));
 	    if(!scatter)
 		throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
 
-	    gather = make_shared<libthreadar::ratelier_gather<crypto_segment> >(RATELIER_SIZE);
+	    gather = make_shared<libthreadar::ratelier_gather<crypto_segment> >(get_ratelier_size(num_workers));
 	    if(!gather)
 		throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
 
@@ -1351,13 +1349,13 @@ namespace libdar
 
     U_I parallel_tronconneuse::get_heap_size(U_I num_workers)
     {
-	    U_I ratelier_size = RATELIER_SIZE;
-	    U_I heap_size = ratelier_size * 2 + num_workers + 1 + ratelier_size + 2;
-		// each ratelier can be full of crypto_segment and at the same
-		// time, each worker could hold a crypto_segment, the below thread
-		// as well and the main thread for parallel_tronconneuse could hold
-		// a deque of the size of the ratelier plus 2 more crypto_segments
-	    return heap_size;
+	U_I ratelier_size = get_ratelier_size(num_workers);
+	U_I heap_size = ratelier_size * 2 + num_workers + 1 + ratelier_size + 2;
+	    // each ratelier can be full of crypto_segment and at the same
+	    // time, each worker could hold a crypto_segment, the below thread
+	    // as well and the main thread for parallel_tronconneuse could hold
+	    // a deque of the size of the ratelier plus 2 more crypto_segments
+	return heap_size;
     }
 
     	/////////////////////////////////////////////////////
