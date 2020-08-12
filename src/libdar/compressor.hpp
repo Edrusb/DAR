@@ -29,11 +29,10 @@
 #include "../my_config.h"
 
 #include "infinint.hpp"
-#include "generic_file.hpp"
 #include "integers.hpp"
 #include "wrapperlib.hpp"
-#include "compression.hpp"
 #include "zstd.hpp"
+#include "proto_compressor.hpp"
 
 namespace libdar
 {
@@ -43,7 +42,7 @@ namespace libdar
 	/// @{
 
 	/// compression class for gzip and bzip2 algorithms
-    class compressor : public generic_file
+    class compressor : public proto_compressor
     {
     public :
         compressor(compression algo, generic_file & compressed_side, U_I compression_level = 9);
@@ -55,16 +54,16 @@ namespace libdar
             // deleted a destructor time
 
 	compressor(const compressor & ref) = delete;
-	compressor(compressor && ref) = delete;
+	compressor(compressor && ref) noexcept = delete;
 	compressor & operator = (const compressor & ref) = delete;
-	compressor & operator = (compressor && ref) = delete;
+	compressor & operator = (compressor && ref) noexcept = delete;
         ~compressor();
 
-        compression get_algo() const;
+        virtual compression get_algo() const override;
 
-	void suspend_compression();
-	void resume_compression();
-	bool is_compression_suspended() const { return suspended; };
+	virtual void suspend_compression() override;
+	virtual void resume_compression() override;
+	virtual bool is_compression_suspended() const override { return suspended; };
 
 
             // inherited from generic file

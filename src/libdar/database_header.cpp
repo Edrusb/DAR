@@ -142,7 +142,7 @@ namespace libdar
 
 	struct stat buf;
 	database_header h;
-	compressor *comp;
+	proto_compressor *comp;
 
 	if(stat(filename.c_str(), &buf) >= 0 && !overwrite)
 	    throw Erange("database_header_create", gettext("Cannot create database, file exists"));
@@ -180,7 +180,7 @@ namespace libdar
 	try
 	{
 	    database_header h;
-	    compressor *comp;
+	    proto_compressor *comp;
 
 	    try
 	    {

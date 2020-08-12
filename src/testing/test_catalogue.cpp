@@ -43,6 +43,7 @@ extern "C"
 #include "fichier_local.hpp"
 #include "pile.hpp"
 #include "tools.hpp"
+#include "compressor.hpp"
 
 using namespace libdar;
 using namespace std;

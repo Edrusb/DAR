@@ -37,7 +37,7 @@ extern "C"
 #include "pile.hpp"
 #include "escape.hpp"
 #include "archive_version.hpp"
-#include "compressor.hpp"
+#include "proto_compressor.hpp"
 #include "pile_descriptor.hpp"
 #include "smart_pointer.hpp"
 #include "entree_stats.hpp"
@@ -189,8 +189,8 @@ namespace libdar
 
 	    /// \note CAUTION: the pointer to object is member of the get_pile() stack and may be managed by another thread
 	    /// all precaution like get_pile()->flush_read_above(get_compressor_layer() shall be take to avoid
-	    /// concurrent access to the compressor object by the current thread and the thread managing this object
-	compressor *get_compressor_layer() const { return pdesc.is_null() ? nullptr : pdesc->compr; };
+	    /// concurrent access to the proto_compressor object by the current thread and the thread managing this object
+	proto_compressor *get_compressor_layer() const { return pdesc.is_null() ? nullptr : pdesc->compr; };
 
 	    /// escape generic_file relative methods
 

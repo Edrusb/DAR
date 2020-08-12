@@ -95,13 +95,13 @@ using namespace std;
 namespace libdar
 {
 
-    compressor::compressor(compression algo, generic_file & compressed_side, U_I compression_level) : generic_file(compressed_side.get_mode())
+    compressor::compressor(compression algo, generic_file & compressed_side, U_I compression_level) : proto_compressor(compressed_side.get_mode())
     {
         init(algo, &compressed_side, compression_level);
         compressed_owner = false;
     }
 
-    compressor::compressor(compression algo, generic_file *compressed_side, U_I compression_level) : generic_file(compressed_side->get_mode())
+    compressor::compressor(compression algo, generic_file *compressed_side, U_I compression_level) : proto_compressor(compressed_side->get_mode())
     {
         init(algo, compressed_side, compression_level);
         compressed_owner = true;

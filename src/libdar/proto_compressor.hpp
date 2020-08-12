@@ -19,38 +19,43 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \file pile_descriptor.hpp
-    /// \brief optimization structure to quickly access some commonly used layers of a stack of generic_file
+    /// \file proto_compressor.hpp
+    /// \brief abstracted ancestor class for compressor and parallel_compressor classes
     /// \ingroup Private
 
-#ifndef PILE_DESCRIPTOR_HPP
-#define PILE_DESCRIPTOR_HPP
+#ifndef PROTO_COMPRESSOR_HPP
+#define PROTO_COMPRESSOR_HPP
 
 #include "../my_config.h"
 
-extern "C"
-{
-} // end extern "C"
-
-#include "pile.hpp"
-#include "escape.hpp"
-#include "proto_compressor.hpp"
+#include "infinint.hpp"
+#include "generic_file.hpp"
+#include "compression.hpp"
 
 namespace libdar
 {
 
+
 	/// \addtogroup Private
 	/// @{
 
-    struct pile_descriptor
+    class proto_compressor : public generic_file
     {
-	pile *stack;       ///< the stack to read from or write to (should never be equal to nullptr)
-	escape *esc;       ///< an escape layer in stack (may be nullptr)
-	proto_compressor *compr; ///< a compressor layer in stack (should never be equal to nullptr)
-	pile_descriptor() { stack = nullptr; esc = nullptr; compr = nullptr; };
-	pile_descriptor(pile *ptr);
-	void check(bool small) const; ///< check structure coherence with expected read/write mode (small or normal)
+    public :
+	using generic_file::generic_file;
+
+	proto_compressor(const proto_compressor & ref) = default;
+	proto_compressor(proto_compressor && ref) noexcept = default;
+	proto_compressor & operator = (const proto_compressor & ref) = default;
+	proto_compressor & operator = (proto_compressor && ref) noexcept = default;
+        virtual ~proto_compressor() = default;
+
+        virtual compression get_algo() const = 0;
+	virtual void suspend_compression() = 0;
+	virtual void resume_compression() = 0;
+	virtual bool is_compression_suspended() const = 0;
     };
+
 	/// @}
 
 } // end of namespace

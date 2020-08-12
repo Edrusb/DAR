@@ -34,7 +34,7 @@ extern "C"
 
 #include "memory_file.hpp"
 #include "crc.hpp"
-#include "compressor.hpp"
+#include "proto_compressor.hpp"
 #include "archive_version.hpp"
 
 #include <memory>
@@ -98,7 +98,7 @@ namespace libdar
 	    /// \param[in] c points to the compressor layer in order to suspend compression when reading
 	    /// data (metadata will be read compressed or not depending on the its location (in-lined or
 	    /// in the catalogue at end of archive)
-	cat_delta_signature(generic_file *f, compressor* c);
+	cat_delta_signature(generic_file *f, proto_compressor* c);
 
 	    /// constructor to write an object to filesytem (using dump_* methods later on)
 	cat_delta_signature() { init(); };
@@ -203,7 +203,7 @@ namespace libdar
 	mutable std::shared_ptr<memory_file>sig; ///< the signature data, if set nullptr it will be fetched from f in direct access mode only
 	crc *patch_result_check;    ///< associated CRC
 	generic_file *src;          ///< where to read data from
-	compressor *zip;            ///< needed to disable compression when reading delta signature data from an archive
+	proto_compressor *zip;      ///< needed to disable compression when reading delta signature data from an archive
 	mutable U_I sig_block_len;  ///< block lenght used within delta signature
 
 	void init() noexcept;

@@ -29,7 +29,7 @@ extern "C"
 #include "fichier_local.hpp"
 #include "pile.hpp"
 #include "tronc.hpp"
-#include "compressor.hpp"
+#include "proto_compressor.hpp"
 #include "sparse_file.hpp"
 #include "null_file.hpp"
 #include "generic_rsync.hpp"
@@ -981,7 +981,7 @@ namespace libdar
     void cat_file::will_have_delta_signature_structure()
     {
 	generic_file *ptr = nullptr;
-	compressor *zip = nullptr;
+	proto_compressor *zip = nullptr;
 
 	if(delta_sig == nullptr)
 	{
@@ -1043,7 +1043,7 @@ namespace libdar
 
     void cat_file::read_delta_signature_metadata() const
     {
-	compressor *from = nullptr;
+	proto_compressor *from = nullptr;
 	escape *esc = nullptr;
 	bool small = get_small_read();
 

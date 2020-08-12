@@ -63,6 +63,7 @@ extern "C"
 #include "scrambler.hpp"
 #include "hash_fichier.hpp"
 #include "tools.hpp"
+#include "compressor.hpp"
 
 #ifdef LIBTHREADAR_AVAILABLE
 #include "parallel_tronconneuse.hpp"

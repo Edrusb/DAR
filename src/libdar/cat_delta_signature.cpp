@@ -34,7 +34,7 @@ using namespace std;
 namespace libdar
 {
 
-    cat_delta_signature::cat_delta_signature(generic_file *f, compressor *c)
+    cat_delta_signature::cat_delta_signature(generic_file *f, proto_compressor *c)
     {
 	init();
 
