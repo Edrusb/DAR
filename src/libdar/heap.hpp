@@ -43,6 +43,8 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
+	/// the class heap is nothing related to the common heap datastructure this is just a "heap" in the sense of a pool of preallocated objects
+
     template <class T> class heap
     {
     public:

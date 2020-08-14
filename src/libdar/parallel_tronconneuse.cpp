@@ -29,6 +29,7 @@ extern "C"
 #include "tools.hpp"
 
 using namespace std;
+using namespace libthreadar;
 
 namespace libdar
 {
@@ -57,25 +58,38 @@ namespace libdar
 
     void read_below::inherited_run()
     {
-	bool end = false;
-	unique_ptr<crypto_segment> ptr;
-	infinint index_num;
-	if(!waiting)
-	    throw SRC_BUG;
-	else
-	    waiting->wait(); // initial sync before starting reading data
-
-	    // initializing clear and encryted buf size
-	    // needed by get_ready_for_new_offset
-	ptr = tas->get();
-	encrypted_buf_size = ptr->crypted_data.get_max_size();
-	if(ptr->clear_data.get_max_size() < clear_buf_size)
+	try
 	{
+	    if(!waiting)
+		throw SRC_BUG;
+	    else
+		waiting->wait(); // initial sync before starting reading data
+
+		// initializing clear and encryted buf size
+		// needed by get_ready_for_new_offset
+
+	    ptr = tas->get();
+	    if(ptr->clear_data.get_max_size() < clear_buf_size)
+	    {
+		tas->put(move(ptr));
+		throw SRC_BUG;
+	    }
+	    encrypted_buf_size = ptr->crypted_data.get_max_size();
 	    tas->put(move(ptr));
-	    throw SRC_BUG;
+	    index_num = get_ready_for_new_offset();
+
+	    work();
 	}
-	tas->put(move(ptr));
-	index_num = get_ready_for_new_offset();
+	catch(...)
+	{
+	    send_flag_to_workers(tronco_flags::exception_below);
+	    throw; // this will end the current thread with an exception
+	}
+    }
+
+    void read_below::work()
+    {
+	bool end = false;
 
 	do
 	{
@@ -158,14 +172,23 @@ namespace libdar
 			    // so we are at end of file, reof should be set to true in any case
 		    }
 
-		    ptr->block_index = index_num++;
-		    crypt_offset += ptr->crypted_data.get_data_size();
-		    workers->scatter(ptr, static_cast<int>(tronco_flags::normal));
+		    if(ptr->crypted_data.get_data_size() > 0)
+		    {
+			ptr->block_index = index_num++;
+			crypt_offset += ptr->crypted_data.get_data_size();
+			workers->scatter(ptr, static_cast<int>(tronco_flags::normal));
+		    }
+		    else
+			tas->put(move(ptr));
 		}
 		else
 		    flag = tronco_flags::eof;
 		break;
 	    case tronco_flags::data_error:
+		throw SRC_BUG;
+	    case tronco_flags::exception_below:
+		throw SRC_BUG;
+	    case tronco_flags::exception_worker:
 		throw SRC_BUG;
 	    default:
 		throw SRC_BUG;
@@ -281,6 +304,10 @@ namespace libdar
 		    flags.pop_front();
 		}
 		break;
+	    case tronco_flags::exception_below:
+		throw SRC_BUG;
+	    case tronco_flags::exception_worker:
+		throw SRC_BUG;
 	    default:
 		throw SRC_BUG;
 	    }
@@ -299,12 +326,32 @@ namespace libdar
 
     void crypto_worker::inherited_run()
     {
-	unique_ptr<crypto_segment> ptr;
+	try
+	{
+	    waiting->wait(); // initial sync before starting working
+	    work();
+	}
+	catch(...)
+	{
+	    try
+	    {
+		abort = status::inform;
+		work();
+	    }
+	    catch(...)
+	    {
+		    // we ignore exception here
+	    }
+
+	    throw; // propagating the original exception
+	}
+    }
+
+    void crypto_worker::work()
+    {
 	bool end = false;
-	unsigned int slot;
 	signed int flag;
 
-	waiting->wait(); // initial sync before starting working
 	do
 	{
 	    ptr = reader->worker_get_one(slot, flag);
@@ -312,54 +359,80 @@ namespace libdar
 	    switch(static_cast<tronco_flags>(flag))
 	    {
 	    case tronco_flags::normal:
-		if(!ptr)
-		    throw SRC_BUG;
+		switch(abort)
+		{
+		case status::fine:
+		    if(!ptr)
+			throw SRC_BUG;
 
-		try
-		{
-		    if(do_encrypt)
+		    try
 		    {
-			ptr->crypted_data.set_data_size(crypto->encrypt_data(ptr->block_index,
-									     ptr->clear_data.get_addr(),
-									     ptr->clear_data.get_data_size(),
-									     ptr->clear_data.get_max_size(),
-									     ptr->crypted_data.get_addr(),
-									     ptr->crypted_data.get_max_size()));
-			ptr->crypted_data.rewind_read();
+			if(do_encrypt)
+			{
+			    ptr->crypted_data.set_data_size(crypto->encrypt_data(ptr->block_index,
+										 ptr->clear_data.get_addr(),
+										 ptr->clear_data.get_data_size(),
+										 ptr->clear_data.get_max_size(),
+										 ptr->crypted_data.get_addr(),
+										 ptr->crypted_data.get_max_size()));
+			    ptr->crypted_data.rewind_read();
+			}
+			else
+			{
+			    ptr->clear_data.set_data_size(crypto->decrypt_data(ptr->block_index,
+									       ptr->crypted_data.get_addr(),
+									       ptr->crypted_data.get_data_size(),
+									       ptr->clear_data.get_addr(),
+									       ptr->clear_data.get_max_size()));
+			    ptr->clear_data.rewind_read();
+			}
 		    }
-		    else
+		    catch(Erange & e)
 		    {
-			ptr->clear_data.set_data_size(crypto->decrypt_data(ptr->block_index,
-									   ptr->crypted_data.get_addr(),
-									   ptr->crypted_data.get_data_size(),
-									   ptr->clear_data.get_addr(),
-									   ptr->clear_data.get_max_size()));
-			ptr->clear_data.rewind_read();
+			flag = static_cast<int>(tronco_flags::data_error);
+			    // we will push the block with this flag data_error
 		    }
-		    writer->worker_push_one(slot, ptr, static_cast<int>(flag));
+		    break;
+		case status::inform:
+		    flag = static_cast<int>(tronco_flags::exception_worker);
+		    abort = status::sent;
+		    break;
+		case status::sent:
+		    break;
+		default:
+			// we can't report this problem
+			// because we can trigger an exception
+			// only when abort equals status fine
+		    break;
 		}
-		catch(Erange & e)
-		{
-		    writer->worker_push_one(slot, ptr, static_cast<int>(tronco_flags::data_error));
-		}
+		writer->worker_push_one(slot, ptr, flag);
 		break;
 	    case tronco_flags::stop:
 	    case tronco_flags::eof:
-		writer->worker_push_one(slot, ptr, static_cast<int>(flag));
+		writer->worker_push_one(slot, ptr, flag);
 		waiting->wait();
 		break;
 	    case tronco_flags::die:
 		end = true;
-		writer->worker_push_one(slot, ptr, static_cast<int>(flag));
+		writer->worker_push_one(slot, ptr, flag);
 		break;
 	    case tronco_flags::data_error:
-		throw SRC_BUG; // should not receive a block with that flag
+		if(abort == status::fine)
+		    throw SRC_BUG; // should not receive a block with that flag
+		break;
+	    case tronco_flags::exception_below:
+		end = true;
+		writer->worker_push_one(slot, ptr, flag);
+		break;
+	    case tronco_flags::exception_worker:
+		if(abort == status::fine)
+		    throw SRC_BUG;
+		break;
 	    default:
 		throw SRC_BUG;
 	    }
 	}
 	while(!end);
-
     }
 
     	/////////////////////////////////////////////////////
@@ -388,7 +461,7 @@ namespace libdar
 	    initial_shift = 0;
 	reading_ver = ver;
 	crypto = move(crypto_ptr);
-	suspended = true; // child threads are waiting us on the barrier
+	t_status = thread_status::dead;
 	ignore_stop_acks = 0;
 	mycallback = nullptr;
 	encrypted = &encrypted_side; // used for further reference, thus the encrypted object must survive "this"
@@ -405,15 +478,17 @@ namespace libdar
 
 	try
 	{
-	    scatter = make_shared<libthreadar::ratelier_scatter<crypto_segment> >(get_ratelier_size(num_workers));
+	    U_I tmp_bs1, tmp_bs2;
+
+	    scatter = make_shared<ratelier_scatter<crypto_segment> >(get_ratelier_size(num_workers));
 	    if(!scatter)
 		throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
 
-	    gather = make_shared<libthreadar::ratelier_gather<crypto_segment> >(get_ratelier_size(num_workers));
+	    gather = make_shared<ratelier_gather<crypto_segment> >(get_ratelier_size(num_workers));
 	    if(!gather)
 		throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
 
-	    waiter = make_shared<libthreadar::barrier>(num_workers + 2); // +1 for crypto_reade thread, +1 this thread
+	    waiter = make_shared<barrier>(num_workers + 2); // +1 for crypto_reade thread, +1 this thread
 	    if(!waiter)
 		throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
 
@@ -425,23 +500,21 @@ namespace libdar
 
 		// filling the heap (tas) with preallocated crypto_segments
 
+	    tmp_bs1 = crypto->encrypted_block_size_for(clear_block_size);
+	    tmp_bs2 = crypto->clear_block_allocated_size_for(clear_block_size);
 	    for(U_I i = 0; i < get_heap_size(num_workers); ++i)
-		tas->put(make_unique<crypto_segment>(crypto->encrypted_block_size_for(clear_block_size),
-						     crypto->clear_block_allocated_size_for(clear_block_size)));
+		tas->put(make_unique<crypto_segment>(tmp_bs1,tmp_bs2));
 
 
 		// creating and running the sub-thread objects
 
 	    for(U_I i = 0; i < workers; ++i)
-	    {
 		travailleur.push_back(crypto_worker(scatter,
 						    gather,
 						    waiter,
 						    crypto->clone(),
 						    get_mode() == gf_write_only)
 		    );
-		travailleur.back().run();
-	    }
 
 	    switch(get_mode())
 	    {
@@ -455,8 +528,6 @@ namespace libdar
 							initial_shift);
 		if(!crypto_reader)
 		    throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
-		else
-		    crypto_reader->run();
 		break;
 	    case gf_write_only:
 		crypto_writer = make_unique<write_below>(gather,
@@ -466,8 +537,6 @@ namespace libdar
 							 tas);
 		if(!crypto_writer)
 		    throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
-		else
-		    crypto_writer->run();
 		break;
 	    case gf_read_write:
 		throw SRC_BUG;
@@ -475,9 +544,7 @@ namespace libdar
 		throw SRC_BUG;
 	    }
 
-		// all subthreads are pending on waiter barrier
-
-	    waiter->wait(); // release all threads
+	    run_threads(); // threads starts in a suspended state (pending on the waiter barrier)
 
 	}
 	catch(std::bad_alloc &)
@@ -703,7 +770,7 @@ namespace libdar
 		    lus_flags.pop_front();
 		    if(ignore_stop_acks == 0)
 		    {
-			suspended = true;
+			t_status = thread_status::suspended;
 			current_position += (ret - added_to_current_pos);
 			added_to_current_pos = ret;
 			go_read();
@@ -796,6 +863,16 @@ namespace libdar
 		    current->clear_data.rewind_read();
 		}
 		break;
+	    case tronco_flags::exception_below:
+		join_threads();
+		throw SRC_BUG; // the previous call should throw an exception if not this is a bug
+	    case tronco_flags::exception_worker:
+		    // a worker has a problem, the other as well as the below thread are not
+		    // aware of that, for that reason the faulty worker is still alive just
+		    // waiting for the order to die, which purge_ratelier will do on purpose
+		    // when cleaning up this exception_worker block and throw the worker exception
+		(void)purge_ratelier_from_next_order();
+		throw SRC_BUG; // else this is a bug condition
 	    default:
 		throw SRC_BUG;
 	    }
@@ -811,6 +888,9 @@ namespace libdar
 	U_I remain;
 
 	if(get_mode() != gf_write_only)
+	    throw SRC_BUG;
+
+	if(t_status == thread_status::dead)
 	    throw SRC_BUG;
 
 	while(wrote < size)
@@ -853,37 +933,21 @@ namespace libdar
 
     void parallel_tronconneuse::inherited_terminate()
     {
-	deque<crypto_worker>::iterator it = travailleur.begin();
-
 	if(get_mode() == gf_write_only)
 	    sync_write();
 	if(get_mode() == gf_read_only)
 	    flush_read();
 
-	if(ignore_stop_acks > 0)
+	switch(t_status)
 	{
-	    if(!purge_unack_stop_order())
-		throw SRC_BUG;
-		// we just need to remove the stop pending order
-		// to be sure the threads are stop and in condition
-		// to receive the die order
-	}
-
-	if(get_mode() == gf_read_only)
-	{
-	    send_read_order(tronco_flags::die);
-	    crypto_reader->join(); // may propagate exception thrown in child thread
-	}
-	else
-	{
-	    send_write_order(tronco_flags::die);
-	    crypto_writer->join(); // may propagate exception thrown in child thread
-	}
-
-	while(it != travailleur.end())
-	{
-	    it->join(); // may propagate exception thrown in child thread
-	    ++it;
+	case thread_status::running:
+	case thread_status::suspended:
+	    stop_threads(); // stop threads first if relevant
+		/* no break */
+	case thread_status::dead:
+	    join_threads(); // may throw exception
+	default:
+	    throw SRC_BUG;
 	}
 
 	    // sanity checks
@@ -900,16 +964,21 @@ namespace libdar
 	if(get_mode() != gf_read_only)
 	    throw SRC_BUG;
 
+	if(t_status == thread_status::dead)
+	    throw SRC_BUG;
+
 	switch(order)
 	{
 	case tronco_flags::die:
 	    crypto_reader->set_flag(order);
-	    if(suspended)
+	    if(t_status == thread_status::suspended)
 	    {
 		waiter->wait();
-		suspended = false;
+		t_status = thread_status::running;
 	    }
+
 	    val = purge_ratelier_from_next_order();
+
 	    switch(val)
 	    {
 	    case tronco_flags::die:
@@ -917,23 +986,32 @@ namespace libdar
 		break;
 	    case tronco_flags::eof:
 		    // eof met threads are stopped
+		    /* no break */
 	    case tronco_flags::stop:
 		    // pending stop was not yet read
 		    // now that threads are suspended we can
 		    // send the order again
 		crypto_reader->set_flag(order);
-		if(suspended)
+		if(t_status == thread_status::suspended)
 		{
 		    waiter->wait(); // awaking thread pending on waiter for they take the order into account
-		    suspended = false;
+		    t_status = thread_status::running;
 		}
 		val = purge_ratelier_from_next_order();
 		if(val != order)
 		    throw SRC_BUG;
+		break;
 	    case tronco_flags::normal:
-		throw SRC_BUG;
+		throw SRC_BUG; // purge_ratelier_from_next_order() should have drop those
 	    case tronco_flags::data_error:
+		throw SRC_BUG; // purge_ratelier_from_next_order() should have drop those
+	    case tronco_flags::exception_below:
+		    // unexpected but possible, has the same outcome as "die", so we are good
+		break;
+	    case tronco_flags::exception_worker:
 		throw SRC_BUG;
+		    // purge_ratelier_from_next_order() should handle that
+		    // an trigger the launch of worker exception
 	    default:
 		throw SRC_BUG;
 	    }
@@ -941,7 +1019,7 @@ namespace libdar
 	case tronco_flags::eof:
 	    throw SRC_BUG;
 	case tronco_flags::stop:
-	    if(suspended)
+	    if(t_status == thread_status::suspended)
 		return ret; // nothing to do
 	    crypto_reader->set_flag(order);
 	    val = purge_ratelier_from_next_order(for_offset);
@@ -958,6 +1036,10 @@ namespace libdar
 	    throw SRC_BUG;
 	case tronco_flags::data_error:
 	    throw SRC_BUG;
+	case tronco_flags::exception_below:
+	    throw SRC_BUG;
+	case tronco_flags::exception_worker:
+	    throw SRC_BUG;
 	default:
 	    throw SRC_BUG;
 	}
@@ -967,12 +1049,17 @@ namespace libdar
 
     void parallel_tronconneuse::send_write_order(tronco_flags order)
     {
+	if(t_status == thread_status::dead)
+	    throw SRC_BUG;
+
 	switch(order)
 	{
 	case tronco_flags::normal:
 	case tronco_flags::stop:
 	case tronco_flags::eof:
 	case tronco_flags::data_error:
+	case tronco_flags::exception_below:
+	case tronco_flags::exception_worker:
 	    throw SRC_BUG;
 	case tronco_flags::die:
 	    break;
@@ -995,19 +1082,22 @@ namespace libdar
 
     void parallel_tronconneuse::go_read()
     {
-	if(suspended)
+	if(t_status == thread_status::dead)
+	    run_threads();
+
+	if(t_status == thread_status::suspended)
 	{
 	    crypto_reader->set_pos(current_position);
 	    crypto_reader->set_flag(tronco_flags::normal);
 	    waiter->wait(); // this should release the workers and the crypto_reader thread
-	    suspended = false;
+	    t_status = thread_status::running;
 	    check_bytes_to_skip = true;
 	}
     }
 
     void parallel_tronconneuse::read_refill()
     {
-	if(lus_data.empty())
+	if(lus_data.empty() && t_status != thread_status::dead)
 	{
 	    if(!lus_flags.empty())
 		throw SRC_BUG;
@@ -1044,6 +1134,10 @@ namespace libdar
 			throw SRC_BUG;
 		    case tronco_flags::data_error:
 			break;
+		    case tronco_flags::exception_below:
+			throw SRC_BUG;
+		    case tronco_flags::exception_worker:
+			throw SRC_BUG;
 		    default:
 			throw SRC_BUG;
 		    }
@@ -1057,6 +1151,9 @@ namespace libdar
 	U_I num = travailleur.size(); // the number of worker
 	deque<signed int>::iterator it;
 	tronco_flags ret = tronco_flags::normal;
+
+	if(t_status == thread_status::dead)
+	    throw SRC_BUG;
 
 	do
 	{
@@ -1085,6 +1182,7 @@ namespace libdar
 		case tronco_flags::stop:
 		case tronco_flags::die:
 		case tronco_flags::eof:
+		case tronco_flags::exception_below:
 		    if(ret == tronco_flags::normal) // first order found
 		    {
 			ret = static_cast<tronco_flags>(lus_flags.front());
@@ -1113,7 +1211,7 @@ namespace libdar
 			    if(ignore_stop_acks == 0)
 			    {
 				    // now that all stop acks have been purged we set the current thread status
-				suspended = true;
+				t_status = thread_status::suspended;
 				go_read();
 				    // yes we trigger the sub thread to push their data
 				    // to the ratelier up to the current order acknolegment
@@ -1135,12 +1233,37 @@ namespace libdar
 			{
 			    --num;
 			    if(num == 0)
-				suspended = (ret != tronco_flags::die);
-				// we do not have to synchronize with the barrier
-				// when the thread are about to die or are already dead
+			    {
+				if(ret == tronco_flags::die)
+				    t_status = thread_status::dead;
+				else
+				    t_status = thread_status::suspended;
+
+				if(ret == tronco_flags::exception_below)
+				{
+				    t_status = thread_status::dead;
+					// all threads should have ended
+					// below thread ended with an exception
+				    join_threads();
+					// we thus relaunch the exception in the curren thread
+					// else this is a bug:
+				    throw SRC_BUG;
+				}
+			    }
+
 			}
 		    }
 		    break;
+		case tronco_flags::exception_worker:
+			// unlike other orders this one could be single in the pipe
+			// we just have to drive the threads to die to
+			// get the worker exception thrown in the current thread
+		    lus_flags.pop_front();
+		    tas->put(move(lus_data.front()));
+		    lus_data.pop_front();
+		    send_read_order(tronco_flags::die);	// this leads to a recursive call !!!
+		    join_threads(); // this should propagate the worker exception
+		    throw SRC_BUG; // else this is a bug condition
 		case tronco_flags::normal:
 			// we get here only if a order block
 			// has been found or if pos equals zero
@@ -1169,6 +1292,9 @@ namespace libdar
 	    // we loop only if there is some pending acks to purge
 	    // and if either we have not to look for a given offset
 	    // or we could not find the pos position in lus_data
+
+	if(t_status == thread_status::dead)
+	    throw SRC_BUG;
 
 	while(loop)
 	{
@@ -1207,6 +1333,12 @@ namespace libdar
 			ret = false;
 		    }
 		    break;
+		case tronco_flags::exception_below:
+		    join_threads();
+		    throw SRC_BUG;
+		case tronco_flags::exception_worker:
+		    purge_ratelier_from_next_order();
+		    throw SRC_BUG;
 		default:
 		    throw SRC_BUG;
 		}
@@ -1221,7 +1353,7 @@ namespace libdar
 	}
 
 	if(ret)
-	    suspended = true;
+	    t_status = thread_status::suspended;
 
 	return ret;
     }
@@ -1302,6 +1434,96 @@ namespace libdar
 	}
 
 	return found;
+    }
+
+    void parallel_tronconneuse::run_threads()
+    {
+	if(t_status != thread_status::dead)
+	    throw SRC_BUG;
+
+	if(!scatter)
+	    throw SRC_BUG;
+	scatter->reset();
+
+	if(!gather)
+	    throw SRC_BUG;
+	gather->reset();
+
+	tas->put(lus_data);
+	lus_data.clear();
+	lus_flags.clear();
+	lus_eof = false;
+	check_bytes_to_skip = true;
+
+	deque<crypto_worker>::iterator it = travailleur.begin();
+	while(it != travailleur.end())
+	{
+	    it->run();
+	    ++it;
+	}
+
+	switch(get_mode())
+	{
+	case gf_read_only:
+	    if(!crypto_reader)
+		throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
+	    else
+		crypto_reader->run();
+	    break;
+	case gf_write_only:
+	    if(!crypto_writer)
+		throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
+	    else
+		crypto_writer->run();
+	    break;
+	case gf_read_write:
+	    throw SRC_BUG;
+	default:
+	    throw SRC_BUG;
+	}
+
+	    // all subthreads are pending on waiter barrier
+
+	t_status = thread_status::suspended;
+    }
+
+    void parallel_tronconneuse::stop_threads()
+    {
+	if(t_status == thread_status::dead)
+	    return;
+
+	if(ignore_stop_acks > 0)
+	{
+	    if(!purge_unack_stop_order())
+		throw SRC_BUG;
+		// we just need to remove the stop pending order
+		// to be sure the threads are stop and in condition
+		// to receive the die order
+	}
+
+	if(get_mode() == gf_read_only)
+	    send_read_order(tronco_flags::die);
+	else
+	    send_write_order(tronco_flags::die);
+    }
+
+
+    void parallel_tronconneuse::join_threads()
+    {
+	deque<crypto_worker>::iterator it = travailleur.begin();
+
+	if(get_mode() == gf_read_only)
+	    crypto_reader->join(); // may propagate exception thrown in child thread
+	else
+	    crypto_writer->join(); // may propagate exception thrown in child thread
+
+	while(it != travailleur.end())
+	{
+	    it->join(); // may propagate exception thrown in child thread
+	    ++it;
+	}
+
+	t_status = thread_status::dead;
     }
 
     U_I parallel_tronconneuse::get_heap_size(U_I num_workers)

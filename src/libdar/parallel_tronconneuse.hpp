@@ -53,7 +53,7 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-    enum class tronco_flags { normal = 0, stop = 1, eof = 2, die = 3, data_error = 4 };
+    enum class tronco_flags { normal = 0, stop = 1, eof = 2, die = 3, data_error = 4, exception_below = 5, exception_worker = 6, exception_error = 7 };
 
 
     	/////////////////////////////////////////////////////
@@ -82,6 +82,8 @@ namespace libdar
 	    reof(false),
 	    trailing_clear_data(nullptr)
 	{ flag = tronco_flags::normal; };
+
+	~read_below() { if(ptr) tas->put(move(ptr)); };
 
 	    /// let the caller give a callback function that given a generic_file with mixed cyphered and clear data, is able
 	    /// to return the offset of the first clear byte located *after* all the cyphered data, this
@@ -146,6 +148,9 @@ namespace libdar
 	infinint initial_shift;                                                   ///< initial shift
 	bool reof;                                                                ///< whether we reached eof while reading
 	trailing_clear_data_callback trailing_clear_data;                         ///< callback function that gives the amount of clear data found at the end of the given file
+	std::unique_ptr<crypto_segment> ptr;                                      ///< current segment we are setting up
+	infinint index_num;                                                       ///< current crypto block index
+
 
 	    // initialized by inherited_run() / get_ready_for_new_offset()
 
@@ -159,6 +164,7 @@ namespace libdar
 	infinint clear_flow_start; ///< modification of this field is only done by this thread a at time the parent thread does not read it
 	infinint pos_in_flow;      ///< modification of this field is only done by this thread a at time the parent thread does not read it
 
+	void work();
 	infinint get_ready_for_new_offset();
 	void send_flag_to_workers(tronco_flags theflag);
 
@@ -223,18 +229,26 @@ namespace libdar
 	    writer(write_side),
 	    waiting(waiter),
 	    crypto(move(ptr)),
-	    do_encrypt(encrypt)
+	    do_encrypt(encrypt),
+	    abort(status::fine)
 	{ if(!reader || !writer || !waiting || !crypto) throw SRC_BUG; };
 
     protected:
 	virtual void inherited_run() override;
 
     private:
+	enum class status { fine, inform, sent };
+
 	std::shared_ptr<libthreadar::ratelier_scatter <crypto_segment> > & reader;
 	std::shared_ptr<libthreadar::ratelier_gather <crypto_segment> > & writer;
 	std::shared_ptr<libthreadar::barrier> waiting;
 	std::unique_ptr<crypto_module> crypto;
 	bool do_encrypt; // if false do decrypt
+	std::unique_ptr<crypto_segment> ptr;
+	unsigned int slot;
+	status abort;
+
+	void work();
     };
 
 
@@ -363,6 +377,9 @@ namespace libdar
 
 	const archive_version & get_reading_version() const { return reading_ver; };
 
+	    // internal data structure
+	enum class thread_status { running, suspended, dead };
+
 	    // the fields
 
 	U_I num_workers;               ///< number of worker threads
@@ -377,7 +394,7 @@ namespace libdar
 	    // fields used to represent possible status of subthreads and communication channel (the pipe)
 
 	U_I ignore_stop_acks;          ///< how much stop ack still to be read (aborted stop order context)
-	bool suspended;                ///< wehther child thread are waiting us on the barrier
+	thread_status t_status;        ///< wehther child thread are waiting us on the barrier
 
 
 	    // the following stores data from the ratelier_gather to be provided for read() operation
@@ -406,6 +423,7 @@ namespace libdar
 	std::deque<crypto_worker> travailleur;
 	std::unique_ptr<read_below> crypto_reader;
 	std::unique_ptr<write_below> crypto_writer;
+
 
 
 	    /// send and order to subthreads and gather acks from them
@@ -463,6 +481,16 @@ namespace libdar
 	    /// it is unchanged but will not match what may still
 	    /// remain in the pipe
 	bool find_offset_in_lus_data(const infinint & pos);
+
+	    /// reset the interthread datastructure and launch the threads
+	void run_threads();
+
+	    /// end threads taking into account the fact they may be suspended on the barrier
+	void stop_threads();
+
+	    /// wait for threads to finish and eventually rethrow their exceptions in current thread
+	void join_threads();
+
 
 	static U_I get_ratelier_size(U_I num_worker) { return num_worker + num_worker/2; };
 	static U_I get_heap_size(U_I num_worker);
