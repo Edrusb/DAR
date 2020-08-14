@@ -196,7 +196,11 @@ namespace libdar
 	    waiting(waiter),
 	    num_w(num_workers),
 	    encrypted(encrypted_side),
-	    tas(xtas) { if(encrypted == nullptr) throw SRC_BUG; };
+	    tas(xtas),
+	    error(false)
+	{ if(encrypted == nullptr) throw SRC_BUG; };
+
+	bool exception_pending() const { return error; };
 
     protected:
 	virtual void inherited_run() override;
@@ -207,6 +211,11 @@ namespace libdar
 	U_I num_w;
 	generic_file* encrypted; ///< the encrypted data
 	std::shared_ptr<heap<crypto_segment> > tas;
+	bool error;
+	std::deque<std::unique_ptr<crypto_segment> >ones;
+	std::deque<signed int> flags;
+
+	void work();
     };
 
 

@@ -250,14 +250,34 @@ namespace libdar
 
     void write_below::inherited_run()
     {
-	bool end = false;
-	deque<unique_ptr<crypto_segment> >ones;
-	deque<signed int> flags;
+	error = false;
+	try
+	{
+	    if(!waiting || !workers)
+		throw SRC_BUG;
+	    else
+		waiting->wait(); // initial sync with other threads
 
-	if(!waiting || !workers)
-	    throw SRC_BUG;
-	else
-	    waiting->wait(); // initial sync with other threads
+	    work();
+	}
+	catch(...)
+	{
+	    error = true;
+	    try
+	    {
+		work();
+	    }
+	    catch(...)
+	    {
+		    // ignore further exceptions
+	    }
+	    throw;
+	}
+    }
+
+    void write_below::work()
+    {
+	bool end = false;
 
 	do
 	{
@@ -268,14 +288,18 @@ namespace libdar
 		workers->gather(ones, flags);
 	    }
 
-	    if(ones.empty() || flags.empty())
+
+	    if((ones.empty() || flags.empty()) && !error)
 		throw SRC_BUG;
 
 	    switch(static_cast<tronco_flags>(flags.front()))
 	    {
 	    case tronco_flags::normal:
-		encrypted->write(ones.front()->crypted_data.get_addr(),
-				 ones.front()->crypted_data.get_data_size());
+		if(!error)
+		{
+		    encrypted->write(ones.front()->crypted_data.get_addr(),
+				     ones.front()->crypted_data.get_data_size());
+		}
 		tas->put(move(ones.front()));
 		ones.pop_front();
 		flags.pop_front();
@@ -283,7 +307,9 @@ namespace libdar
 	    case tronco_flags::stop:
 	    case tronco_flags::eof:
 	    case tronco_flags::data_error:
-		throw SRC_BUG;
+		if(!error)
+		    throw SRC_BUG; // all data should be able to be compressed (even with no gain)
+		break;
 	    case tronco_flags::die:
 		    // read num dies and push them back to tas
 		--num_w;
@@ -305,15 +331,18 @@ namespace libdar
 		}
 		break;
 	    case tronco_flags::exception_below:
-		throw SRC_BUG;
+		if(!error)
+		    throw SRC_BUG;
+		break;
 	    case tronco_flags::exception_worker:
-		throw SRC_BUG;
+		error = true;
+		break;
 	    default:
-		throw SRC_BUG;
+		if(!error)
+		    throw SRC_BUG;
 	    }
 	}
 	while(!end);
-
     }
 
 
@@ -893,8 +922,16 @@ namespace libdar
 	if(t_status == thread_status::dead)
 	    throw SRC_BUG;
 
+
 	while(wrote < size)
 	{
+	    if(crypto_writer->exception_pending())
+	    {
+		stop_threads();
+		join_threads();
+		throw SRC_BUG; // if join did not through an exception
+	    }
+
 	    if(!tempo_write) // no crypto_segment pointed to by tempo_write
 	    {
 		tempo_write = tas->get();
@@ -946,6 +983,7 @@ namespace libdar
 		/* no break */
 	case thread_status::dead:
 	    join_threads(); // may throw exception
+	    break;
 	default:
 	    throw SRC_BUG;
 	}
@@ -1475,6 +1513,10 @@ namespace libdar
 		throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
 	    else
 		crypto_writer->run();
+	    waiter->wait(); // release all threads
+		// in write mode sub-threads
+		// are not pending for an order
+		// but for data to come and tread
 	    break;
 	case gf_read_write:
 	    throw SRC_BUG;
