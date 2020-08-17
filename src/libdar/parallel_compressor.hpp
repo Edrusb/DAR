@@ -23,6 +23,17 @@
     /// \brief provide per block and parallel compression/decompression
     /// \ingroup Private
 
+    /// Several classes are defined here:
+    /// - class parallel_compressor, which has similar interface and behavior as class compressor but compresses a
+    ///   data of a file per block of given size which allows parallel compression of a given file's data at the
+    ///   cost of memory requirement and probably a less good compression ratio (depends on the size of the blocks)
+    /// - class zip_below_write which gather the compressed data works of workers toward the filesystem
+    /// - class zip_below_read which provides block of compressed data to workers comming from the filesystem
+    /// - class zip_worker which instanciates worker objects to compute in parallel the compression of block of data
+    /// .
+
+
+
 #ifndef PARALLEL_COMPRESSOR_HPP
 #define PARALLEL_COMPRESSOR_HPP
 
