@@ -509,8 +509,6 @@ namespace libdar
 
     bool parallel_compressor::skippable(skippability direction, const infinint & amount)
     {
-	bool ret;
-
 	if(is_terminated())
 	    throw SRC_BUG;
 
@@ -518,54 +516,33 @@ namespace libdar
 	{
 	    if(reader && reader->is_running())
 		stop_read_threads();
-		// not restarting threads
-
-	    ret = compressed->skippable(direction, amount);
 	}
 	else
 	{
 	    if(writer && writer->is_running())
 		stop_write_threads();
-		    // not restarting threads
-
-	    ret = compressed->skippable(direction, amount);
 	}
 
-	return ret;
+	return compressed->skippable(direction, amount);
     }
 
     bool parallel_compressor::skip(const infinint & pos)
     {
-	bool ret;
-
 	if(is_terminated())
 	    throw SRC_BUG;
 
 	if(get_mode() == gf_read_only)
 	{
 	    if(reader && reader->is_running())
-	    {
 		stop_read_threads();
-		ret = compressed->skip(pos);
-		    // not restarting threads
-	    }
-	    else
-		ret = compressed->skip(pos);
-
 	}
 	else
 	{
 	    if(writer && writer->is_running())
-	    {
 		stop_write_threads();
-		ret = compressed->skip(pos);
-		    // not restarting threads
-	    }
-	    else
-		ret = compressed->skip(pos);
 	}
 
-	return ret;
+	return compressed->skip(pos);
     }
 
     bool parallel_compressor::skip_to_eof()
