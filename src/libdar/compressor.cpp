@@ -148,6 +148,7 @@ namespace libdar
     {
 	if(!suspended)
 	{
+	    compr_flush_write();
 	    reset_compr_engine();
 	    hijacking_compr_method(compression::none);
 	    suspended = true;
