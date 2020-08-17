@@ -23,7 +23,7 @@
     /// \brief defines a block structured file.
     /// \ingroup Private
 
-    /// Several classes are defined here
+    /// Several classes are defined here:
     /// - class parallel_tronconneuse, which has similar interface and behavior as class tronconneuse
     /// - class read_below, is used internally by parallel_tronconneuse in read-only mode to workers from data of the underlay
     /// - class write_below, is used internally by parallel_tronconneuse in write-only mode to write down the data produced by the workers
