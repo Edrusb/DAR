@@ -457,6 +457,9 @@ namespace libdar
 		    throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
 		else
 		    crypto_reader->run();
+
+		    // in read mode the threads are released when
+		    // necessary by the go_read() subcall
 		break;
 	    case gf_write_only:
 		crypto_writer = make_unique<write_below>(gather,
@@ -468,6 +471,11 @@ namespace libdar
 		    throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
 		else
 		    crypto_writer->run();
+
+		    // all subthreads are pending on waiter barrier
+
+		waiter->wait(); // release all threads here in write mode
+
 		break;
 	    case gf_read_write:
 		throw SRC_BUG;
@@ -475,9 +483,7 @@ namespace libdar
 		throw SRC_BUG;
 	    }
 
-		// all subthreads are pending on waiter barrier
 
-	    waiter->wait(); // release all threads
 
 	}
 	catch(std::bad_alloc &)
