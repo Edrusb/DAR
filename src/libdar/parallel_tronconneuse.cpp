@@ -1300,6 +1300,10 @@ namespace libdar
 
 			}
 		    }
+		    else
+			throw SRC_BUG; // melted orders in the pipe!
+			// the N order should follow each other before and
+			// not be mixed with other orders
 		    break;
 		case tronco_flags::exception_worker:
 			// unlike other orders this one could be single in the pipe
