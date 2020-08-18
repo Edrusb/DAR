@@ -812,9 +812,6 @@ namespace libdar
 		lus_eof = true;
 		if(purge_ratelier_from_next_order() != tronco_flags::eof)
 		    throw SRC_BUG;
-		tas->put(lus_data);
-		lus_data.clear();
-		lus_flags.clear();
 		break;
 	    case tronco_flags::die:
 		throw SRC_BUG; // should never receive a die flag without a first sollicition
@@ -1224,7 +1221,10 @@ namespace libdar
 		    if(ret == tronco_flags::normal) // first order found
 		    {
 			ret = static_cast<tronco_flags>(lus_flags.front());
-			if(ret != tronco_flags::stop && ignore_stop_acks > 0)
+
+			if(ret != tronco_flags::stop
+			   && ret != tronco_flags::eof
+			   && ignore_stop_acks > 0)
 			{
 			    ignore_stop_acks = 0;
 				// this situation occurs when skip triggered
@@ -1242,28 +1242,35 @@ namespace libdar
 
 		    if(static_cast<tronco_flags>(lus_flags.front()) == ret)
 		    {
-			if(ignore_stop_acks > 0) // only when ret == tronco_flags::stop we can have this
+			if(ignore_stop_acks > 0)
+				// only when ret is tronco_flags::stop or tronco_flags::eof we can have this condition
 				// (ignore_stop_acks is reset to zero in the code just above for other cases)
 			{
 			    --ignore_stop_acks; // first purging aborted stop acks
 			    if(ignore_stop_acks == 0)
 			    {
-				    // now that all stop acks have been purged we set the current thread status
+				    // now that all stop/eof acks have been purged we set the current thread status
 				t_status = thread_status::suspended;
-				go_read();
-				    // yes we trigger the sub thread to push their data
-				    // to the ratelier up to the current order acknolegment
 
-				ret = tronco_flags::normal;
-				    // getting ready to read the "first" order
-				    // now that all aborted stop order have been purged
+				if(ret != tronco_flags::eof)
+				{
+				    go_read();
+					// yes we trigger the sub thread to push their data
+					// to the ratelier up to the current order acknolegment
 
-				pos = 0;
-				    // but we must ignore the pos lookup
-				    // as this ending purge of stop order
-				    // may have dropped some interleaved data
-				    // (normal) blocks, thus the offset of
-				    // data from the pipe is now unknown
+				    ret = tronco_flags::normal;
+					// getting ready to read the "first" order
+					// now that all aborted stop order have been purged
+
+				    pos = 0;
+					// but we must ignore the pos lookup
+					// as this ending purge of stop order
+					// may have dropped some interleaved data
+					// (normal) blocks, thus the offset of
+					// data from the pipe is now unknown
+				}
+				else // we are done
+				    num = 0;
 
 			    }
 			}
