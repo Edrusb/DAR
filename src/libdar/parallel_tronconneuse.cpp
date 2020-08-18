@@ -632,7 +632,8 @@ namespace libdar
 		    // if the offset was found in lus_data
 		    // but a stop ack order are pending in
 		    // the ratelier_gather, for that reason
-		    // ignore_stop field has been set to true
+		    // ignore_stop_acks field has been set the number
+		    // workers which is the number of expected pending stop orders
 		    // by send_read_order() to ignore these acks
 		    // during further readings
 
@@ -1249,7 +1250,8 @@ namespace libdar
 			    --ignore_stop_acks; // first purging aborted stop acks
 			    if(ignore_stop_acks == 0)
 			    {
-				    // now that all stop/eof acks have been purged we set the current thread status
+				    // now that the last stop/eof pending acks
+				    // is about to be purged we can set the current thread status
 				t_status = thread_status::suspended;
 
 				if(ret != tronco_flags::eof)
@@ -1335,7 +1337,7 @@ namespace libdar
 	bool ret = pos.is_zero() || !find_offset_in_lus_data(pos);
 	bool loop = ignore_stop_acks > 0 && ret;
 	    // we loop only if there is some pending acks to purge
-	    // and if either we have not to look for a given offset
+	    // and if either we do not have to look for a given offset
 	    // or we could not find the pos position in lus_data
 
 	if(t_status == thread_status::dead)
