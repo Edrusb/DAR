@@ -46,6 +46,7 @@ extern "C"
 #include <string>
 #include <memory>
 
+#include "compress_module.hpp"
 #include "infinint.hpp"
 #include "integers.hpp"
 
@@ -55,34 +56,39 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-    class lz4_module: public crypto_module
+    class lz4_module: public compress_module
     {
     public:
-	lz4_module(U_I compression_level, U_I block_size) {};
-	lz4_module(const lz4_module & ref) = default;
-	lz4_module(lz4_module && ref) noexcept = default;
-	lz4_module & operator = (const lz4_module & ref) = default;
-	lz4_module & operator = (lz4_module && ref) noexcept = default;
-	virtual ~lz4_module() noexcept = default;
+	lz4_module(U_I compression_level);
+	lz4_module(const lz4_module & ref);
+	lz4_module(lz4_module && ref) noexcept;
+	lz4_module & operator = (const lz4_module & ref);
+	lz4_module & operator = (lz4_module && ref) noexcept;
+	virtual ~lz4_module() noexcept;
 
-	virtual U_32 encrypted_block_size_for(U_32 clear_block_size) override { return LZ4_compressBound(clear_block_size); };
-	virtual U_32 clear_block_allocated_size_for(U_32 clear_block_size) override { return clear_block_size; };
+	    // inherited from compress_module interface
 
-	virtual U_32 encrypt_data(const infinint & block_num,
-				  const char *clear_buf,
-				  const U_32 clear_size,
-				  const U_32 clear_allocated,
-				  char *crypt_buf,
-				  U_32 crypt_size) override;
+	virtual U_I get_max_compressing_size() const override;
 
-	virtual U_32 decrypt_data(const infinint & block_num,
-				  const char *crypt_buf,
-				  const U_32 crypt_size,
-				  char *clear_buf,
-				  U_32 clear_size) override;
+	virtual U_I get_min_size_to_compress(U_I clear_size) const override;
+
+	virtual U_I compress_data(const char *normal,
+				   const U_I normal_size,
+				   char *zip_buf,
+				   U_I zip_buf_size) const override;
+
+	virtual U_I uncompress_data(const char *zip_buf,
+				     const U_I zip_buf_size,
+				     char *normal,
+				     U_I normal_size) const override;
 
 
-	virtual std::unique_ptr<crypto_module> clone() const override { return std::make_unique<lz4_module>(*this); };
+	virtual std::unique_ptr<compress_module> clone() const override;
+
+    private:
+	U_I acceleration;
+	char *state;
+
     };
 	/// @}
 
