@@ -1383,6 +1383,11 @@ namespace libdar
 			loop = false;
 			ret = false;
 		    }
+		    else
+			continue;
+			// find_offset_in_lus_data has purged the data entry
+			// we must restart not purge again below but restart
+			// the while loop from the beginning
 		    break;
 		case tronco_flags::exception_below:
 		    join_threads();
