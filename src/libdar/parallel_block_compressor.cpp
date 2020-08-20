@@ -45,8 +45,7 @@ namespace libdar
     zip_below_write::zip_below_write(const shared_ptr<ratelier_gather<crypto_segment> > & source,
 				     generic_file *dest,
 				     const shared_ptr<heap<crypto_segment> > & xtas,
-				     U_I num_workers,
-				     const infinint & uncompressed_block_size):
+				     U_I num_workers):
 	src(source),
 	dst(dest),
 	tas(xtas),
@@ -63,16 +62,16 @@ namespace libdar
 
 	    // dropping the initial uncompressed_block_size info
 
-	reset(uncompressed_block_size);
+	reset();
     }
 
-    void zip_below_write::reset(const infinint & uncompressed_block_size)
+    void zip_below_write::reset()
     {
 	error = false;
 	ending = num_w;
+	tas->put(data);
 	data.clear();
 	flags.clear();
-	uncompressed_block_size.dump(*dst);
     }
 
     void zip_below_write::inherited_run()
@@ -200,7 +199,6 @@ namespace libdar
 	should_i_stop = false;
 	if(ptr)
 	    tas->put(move(ptr));
-	uncomp_block_size.read(*src);
     }
 
     void zip_below_read::inherited_run()
@@ -454,6 +452,7 @@ namespace libdar
 							 generic_file & compressed_side,
 							 U_I uncompressed_bs):
 	proto_compressor(compressed_side.get_mode()),
+	num_w(num_workers),
 	zipper(move(block_zipper)),
 	compressed(&compressed_side),
 	we_own_compressed_side(false),
@@ -468,6 +467,7 @@ namespace libdar
 							 generic_file *compressed_side,
 							 U_I uncompressed_bs):
 	proto_compressor(compressed_side->get_mode()),
+	num_w(num_workers),
 	zipper(move(block_zipper)),
 	compressed(compressed_side),
 	we_own_compressed_side(true),
@@ -856,6 +856,11 @@ namespace libdar
 	rassemble = make_shared<ratelier_gather<crypto_segment> >(get_ratelier_size(num_w));
 	tas = make_shared<heap<crypto_segment> >(); // created empty
 
+	    // now filling the head that was created empty
+
+	for(U_I i = 0 ; i < get_heap_size(num_w) ; ++i)
+	    tas->put(make_unique<crypto_segment>(uncompressed_block_size,
+						 uncompressed_block_size));
 
 	    // creating the zip_below_* thread object
 
@@ -864,8 +869,7 @@ namespace libdar
 	    writer = make_unique<zip_below_write>(rassemble,
 						  compressed,
 						  tas,
-						  num_w,
-						  uncompressed_block_size);
+						  num_w);
 	}
 	else
 	{
@@ -873,24 +877,7 @@ namespace libdar
 						 disperse,
 						 tas,
 						 num_w);
-	    if(reader)
-	    {
-		infinint tmp = reader->get_uncomp_block_size();
-
-		uncompressed_block_size = 0;
-		tmp.unstack(uncompressed_block_size);
-		if(!tmp.is_zero())
-		    throw Edata("uncompressed block size too large for, data corruption occurred?");
-	    }
 	}
-
-
-	    // filling the head that was created empty now we know the block size
-
-	for(U_I i = 0 ; i < get_heap_size(num_w) ; ++i)
-	    tas->put(make_unique<crypto_segment>(uncompressed_block_size,
-						 uncompressed_block_size));
-
 
 	    // creating the worker threads objects
 
@@ -972,7 +959,7 @@ namespace libdar
 		throw SRC_BUG;
 	    if(writer->is_running())
 		throw SRC_BUG;
-	    writer->reset(uncompressed_block_size);
+	    writer->reset();
 	    writer->run();
 	    for(deque<zip_worker>::iterator it = travailleurs.begin(); it !=travailleurs.end(); ++it)
 		it->run();

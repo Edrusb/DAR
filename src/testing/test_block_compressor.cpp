@@ -93,9 +93,9 @@ void f1()
 	unique_ptr<compress_module> lz4 = make_unique<lz4_module>();
 	parallel_block_compressor comp(2,
 				       lz4,
-				       dst.get());
+				       *dst);
 
-	src.copy_to(dst);
+	src->copy_to(comp);
     }
 
     if(true)
@@ -105,9 +105,9 @@ void f1()
 	unique_ptr<compress_module> lz4 = make_unique<lz4_module>();
 	parallel_block_compressor decomp(2,
 					 lz4,
-					 src.get());
+					 *src);
 
-	decomp->copy_to(dst);
+	decomp.copy_to(*dst);
     }
 }
 

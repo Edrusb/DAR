@@ -55,8 +55,7 @@ namespace libdar
 
     enum class compressor_block_flags { data = 0, eof_die = 1, error = 2, worker_error = 3 };
 
-	/// the compressed block structure is a sequence of 3 types of data
-	/// - uncompressed block size
+	/// the compressed block structure is a sequence of 2 types of data
 	/// - data to compress/uncompress
 	/// - eof
 	/// .
@@ -65,20 +64,24 @@ namespace libdar
 	///
 	/// *** in the archive:
 	///
-	/// the block streams starts with the uncompressed block size, followed by any
-	/// number of data blocks, completed by an single eof block. Each data block is
-	/// structured with a infinint field followed by a array of random (compresssed) bytes which
-	/// lenght is the value of the first field.
+	/// the block stream is an arbitrary length sequence of data blocks followed by an eof.
+	/// Each data block consists of an infinint determining the length of following field
+	/// that stores the compressed data of variable length
+	/// the compressed data comes from block of uncompressed data of constant size (except the
+	/// last one that is smaller. THis information is needed to prepare memory allocation
+	/// and is stored in the archive header (archive reading) or provided by the user
+	/// (archive creation). Providing 0 for the block size leads to the classical/historical
+	/// but impossible to parallelize compression algorithm (gzip, bzip2, etc.)
+	///
+	///
 	///
 	/// *** between threads:
 	///
-	/// when compressing, the parallel_block_compressor class's sends gives the uncompressed
-	/// block size at constructor time to the zip_below_write thread which drops the
-	/// the information to the archive at that time.
-	/// then the inherited_write call produces a set of data block to the ratelier_scatter
-	/// treated by a set of zip_workers which are in turn passed to the zip_below_write
-	/// thread.
-	/// last when eof is reached or during terminate() method, the N eof blocks are sent
+	/// when compressing, the inherited_write call produces a set of data block to the ratelier_scatter
+	/// treated by a set of zip_workers which in turn passe the resulting compressed
+	/// data blocks to the zip_below_write thread.
+	///
+	/// last when eof is reached or during terminate() method,  N eof blocks are sent
 	/// where N is the number of zip_workers, either with flag eof, or die (termination).
 	/// the eof flag is just passed by the workers but the zip_below_write thread collects
 	/// them and awakes the main thread once all are collected and thus all data written.
@@ -134,8 +137,8 @@ namespace libdar
 	zip_below_write(const std::shared_ptr<libthreadar::ratelier_gather<crypto_segment> > & source,
 			generic_file *dest,
 			const std::shared_ptr<heap<crypto_segment> > & xtas,
-			U_I num_workers,
-			const infinint & uncompressed_block_size);
+			U_I num_workers);
+
 
 	    /// consulted by the main thread, set to true by the zip_below_write thread
 	    /// when an exception has been caught or an error flag has been seen from a
@@ -143,7 +146,7 @@ namespace libdar
 	bool exception_pending() const { return error; };
 
 	    /// reset the thread objet ready for a new compression run, but does not launch it
-	void reset(const infinint & uncompressed_block_size);
+	void reset();
 
     protected:
 	virtual void inherited_run() override;
@@ -181,8 +184,6 @@ namespace libdar
 		       const std::shared_ptr<heap<crypto_segment> > & xtas,
 		       U_I num_workers);
 
-	const infinint & get_uncomp_block_size() const { return uncomp_block_size; };
-
 	    /// this will trigger the sending of N eof_die blocks and thread termination
 	void do_stop() { should_i_stop = true; };
 
@@ -197,7 +198,6 @@ namespace libdar
 	const std::shared_ptr<libthreadar::ratelier_scatter<crypto_segment> > & dst;
 	const std::shared_ptr<heap<crypto_segment> > & tas;
 	U_I num_w;
-	infinint uncomp_block_size;
 	std::unique_ptr<crypto_segment> ptr;
 	bool should_i_stop;
 
@@ -254,8 +254,11 @@ namespace libdar
     public:
 	static constexpr const U_I default_uncompressed_block_size = 102400;
 
-	    /// \note uncompressed_bs is not used in read mode,
-	    /// the block size is fetched from the compressed data
+	    /// \note if uncompressed_bs is too small the uncompressed data
+	    /// will not be able to be stored in the datastructure and decompression
+	    /// wil fail. This metadata should be stored in the archive header
+	    /// and passed to the parallel_block_compressor object at
+	    /// construction time both while reading and writing an archive
 
 	parallel_block_compressor(U_I num_workers,
 				  std::unique_ptr<compress_module> & block_zipper,
