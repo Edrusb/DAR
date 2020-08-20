@@ -44,14 +44,23 @@ namespace libdar
 	/// any backward compatibility.
     enum class compression
     {
-	none = 'n',  ///< no compression
-	gzip = 'z',  ///< gzip compression
-	bzip2 = 'y', ///< bzip2 compression
-	lzo = 'l',   ///< lzo compression
-	xz = 'x',     ///< lzma compression
-	lzo1x_1_15 = 'j', ///< lzo degraded algo corresponding to lzop -1
-        lzo1x_1 = 'k', ///< lzo degraded algo corresponding to lzo -2 to lzo -6
-        zstd = 'd'  ///< zstd compression
+	none = 'n',        ///< no compression
+	gzip = 'z',        ///< gzip compression (streamed)
+	b_gzip = 'Z',      ///< gzip compression per block
+	bzip2 = 'y',       ///< bzip2 compression (streamed)
+	b_bzip2 = 'Y',     ///< bzip2 compression per block
+	lzo = 'l',         ///< lzo compression (streamed)
+	b_lzo = 'L',       ///< lzo compression per block
+	xz = 'x',          ///< lzma compression (streamed)
+	b_xz = 'X',        ///< lzma compression per block
+	lzo1x_1_15 = 'j',  ///< lzo degraded algo corresponding to lzop -1
+	b_lzo1x_1_15 ='J', ///< lzo degraded algo per block
+        lzo1x_1 = 'k',     ///< lzo degraded algo corresponding to lzo -2 to lzo -6
+	b_lzo1x_1 = 'K',   ///< lzo degraded algo per block
+        zstd = 'd',        ///< zstd compression
+	b_zstd = 'D',      ///< zstd per block
+	lz4 = 'q',         ///< lz4 (streamed)
+	b_lz4 = 'Q'        ///< lz4 per block ('Q' from quattuor, quarter, quad, quatre, ...)
     };
 
 
@@ -66,6 +75,12 @@ namespace libdar
 
 	/// convert a string representing a compression algorithm to its enum compression value
     extern compression string2compression(const std::string & a); // throw Erange if an unknown string is given
+
+	/// return the corresponding per block algorithm to the given streamed compression algoritm
+    extern compression equivalent_with_block(compression c);
+
+	/// return the corresponding streamed algorithm to the given per block compression algorithm
+    extern compression equivalent_streamed(compression c);
 
 	/// @}
 
