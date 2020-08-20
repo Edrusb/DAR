@@ -25,7 +25,7 @@ extern "C"
 {
 }
 
-#include "parallel_compressor.hpp"
+#include "parallel_block_compressor.hpp"
 #include "erreurs.hpp"
 
 using namespace std;
@@ -84,7 +84,7 @@ namespace libdar
 	catch(...)
 	{
 	    error = true;
-		// this should trigger the parallel_compressor
+		// this should trigger the parallel_block_compressor
 		// to push eof_die flag leading work() and zip_workers threads
 		// to complete as properly as possible (minimizing dead-lock
 		// situation).
@@ -244,7 +244,7 @@ namespace libdar
 		    end = true;
 		}
 	    }
-	    else // we are asked to stop by the parallel_compressor thread
+	    else // we are asked to stop by the parallel_block_compressor thread
 		aux = 0; // simulating an end of file
 
 	    if(aux == 0)
@@ -339,7 +339,7 @@ namespace libdar
 	catch(...)
 	{
 	    error = true;
-		// this should trigger the parallel_compressor
+		// this should trigger the parallel_block_compressor
 		// to push eof_die flag leading work() and zip_workers threads
 		// to complete as properly as possible (minimizing dead-lock
 		// situation).
@@ -420,9 +420,9 @@ namespace libdar
 			// exception raised in our code (managed by inherited_run()
 			// that called us
 			// this will set the error field in the  zip_below_read thread
-			// that will be notified by the parallel_compressor which will
+			// that will be notified by the parallel_block_compressor which will
 			// trigger eof_die message, then we inherited_run() will relaunch
-			// the exception to be caught while parallel_compressor will join()
+			// the exception to be caught while parallel_block_compressor will join()
 			// on us.
 		}
 		break;
@@ -444,15 +444,15 @@ namespace libdar
 
     	/////////////////////////////////////////////////////
 	//
-	// parallel_compressor class implementation
+	// parallel_block_compressor class implementation
 	//
 	//
 
 
-    parallel_compressor::parallel_compressor(U_I num_workers,
-					     unique_ptr<compress_module> & block_zipper,
-					     generic_file & compressed_side,
-					     U_I uncompressed_bs):
+    parallel_block_compressor::parallel_block_compressor(U_I num_workers,
+							 unique_ptr<compress_module> & block_zipper,
+							 generic_file & compressed_side,
+							 U_I uncompressed_bs):
 	proto_compressor(compressed_side.get_mode()),
 	zipper(move(block_zipper)),
 	compressed(&compressed_side),
@@ -463,10 +463,10 @@ namespace libdar
     }
 
 
-    parallel_compressor::parallel_compressor(U_I num_workers,
-					     unique_ptr<compress_module> & block_zipper,
-					     generic_file *compressed_side,
-					     U_I uncompressed_bs):
+    parallel_block_compressor::parallel_block_compressor(U_I num_workers,
+							 unique_ptr<compress_module> & block_zipper,
+							 generic_file *compressed_side,
+							 U_I uncompressed_bs):
 	proto_compressor(compressed_side->get_mode()),
 	zipper(move(block_zipper)),
 	compressed(compressed_side),
@@ -476,7 +476,7 @@ namespace libdar
 	init_fields();
     }
 
-    parallel_compressor::~parallel_compressor()
+    parallel_block_compressor::~parallel_block_compressor()
     {
 	try
 	{
@@ -491,7 +491,7 @@ namespace libdar
 	    delete compressed;
     }
 
-    void parallel_compressor::suspend_compression()
+    void parallel_block_compressor::suspend_compression()
     {
 	if(get_mode() == gf_read_only)
 	    stop_read_threads();
@@ -499,7 +499,7 @@ namespace libdar
 	    stop_write_threads();
     }
 
-    void parallel_compressor::resume_compression()
+    void parallel_block_compressor::resume_compression()
     {
 	if(get_mode() == gf_read_only)
 	    run_read_threads();
@@ -507,7 +507,7 @@ namespace libdar
 	    run_write_threads();
     }
 
-    bool parallel_compressor::skippable(skippability direction, const infinint & amount)
+    bool parallel_block_compressor::skippable(skippability direction, const infinint & amount)
     {
 	if(is_terminated())
 	    throw SRC_BUG;
@@ -526,7 +526,7 @@ namespace libdar
 	return compressed->skippable(direction, amount);
     }
 
-    bool parallel_compressor::skip(const infinint & pos)
+    bool parallel_block_compressor::skip(const infinint & pos)
     {
 	if(is_terminated())
 	    throw SRC_BUG;
@@ -545,7 +545,7 @@ namespace libdar
 	return compressed->skip(pos);
     }
 
-    bool parallel_compressor::skip_to_eof()
+    bool parallel_block_compressor::skip_to_eof()
     {
 	bool ret;
 
@@ -579,7 +579,7 @@ namespace libdar
 	return ret;
     }
 
-        bool parallel_compressor::skip_relative(S_I x)
+    bool parallel_block_compressor::skip_relative(S_I x)
     {
 	bool ret;
 
@@ -605,10 +605,10 @@ namespace libdar
     }
 
 
-    bool parallel_compressor::truncatable(const infinint & pos) const
+    bool parallel_block_compressor::truncatable(const infinint & pos) const
     {
 	bool ret;
-	parallel_compressor *me = const_cast<parallel_compressor *>(this);
+	parallel_block_compressor *me = const_cast<parallel_block_compressor *>(this);
 	if(me == nullptr)
 	    throw SRC_BUG;
 
@@ -643,9 +643,9 @@ namespace libdar
     }
 
 
-    infinint parallel_compressor::get_position() const
+    infinint parallel_block_compressor::get_position() const
     {
-	parallel_compressor *me = const_cast<parallel_compressor *>(this);
+	parallel_block_compressor *me = const_cast<parallel_block_compressor *>(this);
 	if(me == nullptr)
 	    throw SRC_BUG;
 
@@ -679,7 +679,7 @@ namespace libdar
     }
 
 
-    U_I parallel_compressor::inherited_read(char *a, U_I size)
+    U_I parallel_block_compressor::inherited_read(char *a, U_I size)
     {
 	if(is_terminated())
 	    throw SRC_BUG;
@@ -743,7 +743,7 @@ namespace libdar
 	}
     }
 
-    void parallel_compressor::inherited_write(const char *a, U_I size)
+    void parallel_block_compressor::inherited_write(const char *a, U_I size)
     {
 	U_I wrote = 0;
 
@@ -786,7 +786,7 @@ namespace libdar
 	}
     }
 
-    void parallel_compressor::inherited_truncate(const infinint & pos)
+    void parallel_block_compressor::inherited_truncate(const infinint & pos)
     {
 	if(is_terminated())
 	    throw SRC_BUG;
@@ -795,7 +795,7 @@ namespace libdar
 	compressed->truncate(pos);
     }
 
-    void parallel_compressor::inherited_sync_write()
+    void parallel_block_compressor::inherited_sync_write()
     {
 	if(is_terminated())
 	    throw SRC_BUG;
@@ -807,7 +807,7 @@ namespace libdar
 	}
     }
 
-    void parallel_compressor::inherited_terminate()
+    void parallel_block_compressor::inherited_terminate()
     {
 	switch(get_mode())
 	{
@@ -825,7 +825,7 @@ namespace libdar
 	}
     }
 
-    void parallel_compressor::init_fields()
+    void parallel_block_compressor::init_fields()
     {
 
 
@@ -903,7 +903,7 @@ namespace libdar
 	    // no other thread than the one executing this code is running at this point!!!
     }
 
-    void parallel_compressor::send_flag_to_workers(compressor_block_flags flag)
+    void parallel_block_compressor::send_flag_to_workers(compressor_block_flags flag)
     {
 	unique_ptr<crypto_segment> ptr;
 
@@ -917,7 +917,7 @@ namespace libdar
 	}
     }
 
-    void parallel_compressor::stop_read_threads()
+    void parallel_block_compressor::stop_read_threads()
     {
 	if(!suspended)
 	{
@@ -933,7 +933,7 @@ namespace libdar
 	}
     }
 
-    void parallel_compressor::stop_write_threads()
+    void parallel_block_compressor::stop_write_threads()
     {
 	if(!suspended)
 	{
@@ -948,7 +948,7 @@ namespace libdar
 	}
     }
 
-    void parallel_compressor::run_read_threads()
+    void parallel_block_compressor::run_read_threads()
     {
 	if(suspended)
 	{
@@ -964,7 +964,7 @@ namespace libdar
 	}
     }
 
-    void parallel_compressor::run_write_threads()
+    void parallel_block_compressor::run_write_threads()
     {
 	if(suspended)
 	{
@@ -980,7 +980,7 @@ namespace libdar
 	}
     }
 
-    void parallel_compressor::purge_ratelier_for(compressor_block_flags flag)
+    void parallel_block_compressor::purge_ratelier_for(compressor_block_flags flag)
     {
 	S_I expected = num_w;
 	tas->put(lus_data);
@@ -1007,13 +1007,13 @@ namespace libdar
     }
 
 
-    U_I parallel_compressor::get_heap_size(U_I num_workers)
+    U_I parallel_block_compressor::get_heap_size(U_I num_workers)
     {
 	U_I ratelier_size = get_ratelier_size(num_workers);
 	U_I heap_size = ratelier_size * 2 + num_workers + 1 + ratelier_size + 2;
 	    // each ratelier can be full of crypto_segment and at the same
 	    // time, each worker could hold a crypto_segment, the below thread
-	    // as well and the main thread for parallel_compressor could hold
+	    // as well and the main thread for parallel_block_compressor could hold
 	    // a deque of the size of the ratelier plus 2 more crypto_segments
 	return heap_size;
     }

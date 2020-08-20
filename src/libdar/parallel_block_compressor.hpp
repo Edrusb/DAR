@@ -19,12 +19,12 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \file parallel_compressor.hpp
+    /// \file parallel_block_compressor.hpp
     /// \brief provide per block and parallel compression/decompression
     /// \ingroup Private
 
     /// Several classes are defined here:
-    /// - class parallel_compressor, which has similar interface and behavior as class compressor but compresses a
+    /// - class parallel_block_compressor, which has similar interface and behavior as class compressor but compresses a
     ///   data of a file per block of given size which allows parallel compression of a given file's data at the
     ///   cost of memory requirement and probably a less good compression ratio (depends on the size of the blocks)
     /// - class zip_below_write which gather the compressed data works of workers toward the filesystem
@@ -34,8 +34,8 @@
 
 
 
-#ifndef PARALLEL_COMPRESSOR_HPP
-#define PARALLEL_COMPRESSOR_HPP
+#ifndef PARALLEL_BLOCK_COMPRESSOR_HPP
+#define PARALLEL_BLOCK_COMPRESSOR_HPP
 
 #include "../my_config.h"
 
@@ -72,7 +72,7 @@ namespace libdar
 	///
 	/// *** between threads:
 	///
-	/// when compressing, the parallel_compressor class's sends gives the uncompressed
+	/// when compressing, the parallel_block_compressor class's sends gives the uncompressed
 	/// block size at constructor time to the zip_below_write thread which drops the
 	/// the information to the archive at that time.
 	/// then the inherited_write call produces a set of data block to the ratelier_scatter
@@ -97,7 +97,7 @@ namespace libdar
 	/// UNCOMPRESSON PROCESS
 	///
 	/// the zip_below_read expectes to find the clear_block size at construction time and
-	/// provides a method to read it by the parallel_compressor thread which allocate the
+	/// provides a method to read it by the parallel_block_compressor thread which allocate the
 	/// mem_blocks accordingly in a pool (same as parallel_tronconneuse). The zip_below
 	/// thread once started reading the blocks and push them into the ratelier_scatter
 	/// (without the initial U_32 telling the size of the compressed data that follows).
@@ -112,7 +112,7 @@ namespace libdar
 	/// Upon reception of the error flag from the ratelier_gather the parallel_compression
 	/// thread invoke a method of the zip_below_read that triggers the thread to terminate
 	/// after having pushed N error blocks to the ratelier_scatter which in turns triggers
-	/// the termination of the zip_workers. The parallel_compressor thread can then gather
+	/// the termination of the zip_workers. The parallel_block_compressor thread can then gather
 	/// the N error block from the ratelier_gather, join() the threads and report the
 	/// compression error
 
@@ -249,7 +249,7 @@ namespace libdar
 
 
 
-    class parallel_compressor: public proto_compressor
+    class parallel_block_compressor: public proto_compressor
     {
     public:
 	static constexpr const U_I default_uncompressed_block_size = 102400;
@@ -257,25 +257,25 @@ namespace libdar
 	    /// \note uncompressed_bs is not used in read mode,
 	    /// the block size is fetched from the compressed data
 
-	parallel_compressor(U_I num_workers,
-			    std::unique_ptr<compress_module> & block_zipper,
-			    generic_file & compressed_side,
-			    U_I uncompressed_bs = default_uncompressed_block_size);
+	parallel_block_compressor(U_I num_workers,
+				  std::unique_ptr<compress_module> & block_zipper,
+				  generic_file & compressed_side,
+				  U_I uncompressed_bs = default_uncompressed_block_size);
 	    // compressed_side is not owned by the object and will remains
             // after the objet destruction
 
-	parallel_compressor(U_I num_workers,
-			    std::unique_ptr<compress_module> & block_zipper,
-			    generic_file *compressed_side,
-			    U_I uncompressed_bs = default_uncompressed_block_size);
+	parallel_block_compressor(U_I num_workers,
+				  std::unique_ptr<compress_module> & block_zipper,
+				  generic_file *compressed_side,
+				  U_I uncompressed_bs = default_uncompressed_block_size);
             // compressed_side is owned by the object and will be
             // deleted a destructor time
 
-	parallel_compressor(const parallel_compressor & ref) = delete;
-	parallel_compressor(parallel_compressor && ref) noexcept = delete;
-	parallel_compressor & operator = (const parallel_compressor & ref) = delete;
-	parallel_compressor & operator = (parallel_compressor && ref) noexcept = delete;
-	~parallel_compressor();
+	parallel_block_compressor(const parallel_block_compressor & ref) = delete;
+	parallel_block_compressor(parallel_block_compressor && ref) noexcept = delete;
+	parallel_block_compressor & operator = (const parallel_block_compressor & ref) = delete;
+	parallel_block_compressor & operator = (parallel_block_compressor && ref) noexcept = delete;
+	~parallel_block_compressor();
 
 	    // inherited from proto_compressor
 
