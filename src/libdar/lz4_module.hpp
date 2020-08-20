@@ -59,7 +59,7 @@ namespace libdar
     class lz4_module: public compress_module
     {
     public:
-	lz4_module(U_I compression_level);
+	lz4_module(U_I compression_level = 9);
 	lz4_module(const lz4_module & ref);
 	lz4_module(lz4_module && ref) noexcept;
 	lz4_module & operator = (const lz4_module & ref);
@@ -67,6 +67,8 @@ namespace libdar
 	virtual ~lz4_module() noexcept;
 
 	    // inherited from compress_module interface
+
+	virtual compression get_algo() const override { return compression::b_lz4; };
 
 	virtual U_I get_max_compressing_size() const override;
 

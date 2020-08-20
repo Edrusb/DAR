@@ -29,6 +29,7 @@
 
 #include "../my_config.h"
 #include "integers.hpp"
+#include "compression.hpp"
 
 namespace libdar
 {
@@ -46,7 +47,10 @@ namespace libdar
 	compress_module & operator = (compress_module && ref) noexcept = default;
 	virtual ~compress_module() = default;
 
+	    /// return the compression algorithm used by the module
+	virtual compression get_algo() const = 0;
 
+	    /// returns the maximum size of data to be compressed as a single block
 	virtual U_I get_max_compressing_size() const = 0;
 
 	    /// minimal buffer size to compress clear_size of data for compression to be guaranteed to succeed
