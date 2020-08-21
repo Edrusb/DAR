@@ -313,21 +313,27 @@ namespace libdar
     private:
 	static constexpr const U_I min_uncompressed_block_size = 100;
 
-	    // initialized from constructors
+
+	    // initialized directly in constructors
+
 	U_I num_w;
 	std::unique_ptr<compress_module> zipper;
 	generic_file *compressed;
 	bool we_own_compressed_side;
 	U_I uncompressed_block_size;
 
-	    // initialized by init_fields method
 
-	bool suspended;
-	std::unique_ptr<crypto_segment> curwrite;
-	std::deque<std::unique_ptr<crypto_segment> > lus_data;
-	std::deque<signed int> lus_flags;
-	bool reof;
-	infinint current_position;
+	    // initialized by the init_fields() method
+
+	bool suspended;                                        ///< whether compression is suspended or not
+	bool running_threads;                                  ///< whether subthreads are running
+	std::unique_ptr<crypto_segment> curwrite;              ///< aggregates a block before compression and writing
+	std::deque<std::unique_ptr<crypto_segment> > lus_data; ///< uncompressed data from workers in read mode
+	std::deque<signed int> lus_flags;                      ///< uncompressed data flags from workers in read mode
+	bool reof;                                             ///< whether we have hit the end of file while reading
+
+
+	    // inter-thread data structure
 
 	std::shared_ptr<libthreadar::ratelier_scatter<crypto_segment> > disperse;
 	std::shared_ptr<libthreadar::ratelier_gather<crypto_segment> > rassemble;
@@ -340,13 +346,21 @@ namespace libdar
 	std::unique_ptr<zip_below_write> writer;
 	std::deque<zip_worker> travailleurs;
 
+
+	    // private methods
+
 	void init_fields();
 	void send_flag_to_workers(compressor_block_flags flag);
+	void stop_threads();
 	void stop_read_threads();
 	void stop_write_threads();
+	void run_threads();
 	void run_read_threads();
 	void run_write_threads();
 	void purge_ratelier_for(compressor_block_flags flag);
+
+
+	    // static methods
 
 	static U_I get_ratelier_size(U_I num_workers) { return num_workers + num_workers/2; };
 	static U_I get_heap_size(U_I num_workers);
