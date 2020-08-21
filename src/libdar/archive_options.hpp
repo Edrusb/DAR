@@ -348,6 +348,18 @@ namespace libdar
 	    /// set the compression level (from 1 to 9)
 	void set_compression_level(U_I compression_level) { x_compression_level = compression_level; };
 
+	    /// set the compression block size
+
+	    /// \param[in] compression_bs if set to zero (which is the default value)
+	    /// compression is performed without block in one single stream per file.
+	    /// This is the historical way used by libdar, it gives the best result
+	    /// and the lowest compute overhead, though it cannot be parallelized.
+	    /// At the opposite using compresion per block reduce the compression ratio
+	    /// but allows the block to be compressed/decompressed in parallel and thus
+	    /// leverage multi-core systems. When the block size increase you tend to the
+	    /// same compression ratio as compression ration without block
+	void set_compression_block_size(U_I compression_block_size) { x_compression_block_size = compression_block_size; };
+
 	    /// define the archive slicing
 
 	    /// \param[in] file_size set the slice size in byte (0 for a single slice whatever its size is)
@@ -566,6 +578,7 @@ namespace libdar
 	bool get_empty_dir() const { return x_empty_dir; };
 	compression get_compression() const { return x_compr_algo; };
 	U_I get_compression_level() const { return x_compression_level; };
+	U_I get_compression_block_size() const { return x_compression_block_size; };
 	const infinint & get_slice_size() const { return x_file_size; };
 	const infinint & get_first_slice_size() const { return x_first_file_size; };
 	const mask & get_ea_mask() const { if(x_ea_mask == nullptr) throw SRC_BUG; return *x_ea_mask; };
@@ -632,6 +645,7 @@ namespace libdar
 	bool x_empty_dir;
 	compression x_compr_algo;
 	U_I x_compression_level;
+	U_I x_compression_block_size;
 	infinint x_file_size;
 	infinint x_first_file_size;
 	mask * x_ea_mask;    ///< points to a local copy of mask (must be allocated / releases by the archive_option_create objects)
@@ -737,6 +751,10 @@ namespace libdar
 
 	    /// the compression level (from 1 to 9)
 	void set_compression_level(U_I compression_level) { x_compression_level = compression_level; };
+
+		    /// set the compression block size
+
+	void set_compression_block_size(U_I compression_block_size) { x_compression_block_size = compression_block_size; };
 
 	    /// define the archive slicing
 
@@ -851,6 +869,7 @@ namespace libdar
 	const infinint & get_pause() const { return x_pause; };
 	compression get_compression() const { return x_algo; };
 	U_I get_compression_level() const { return x_compression_level; };
+	U_I get_compression_block_size() const { return x_compression_block_size; };
 	const infinint & get_slice_size() const { return x_file_size; };
 	const infinint & get_first_slice_size() const { return x_first_file_size; };
 	const std::string & get_execute() const { return x_execute; };
@@ -885,6 +904,7 @@ namespace libdar
 	infinint x_pause;
 	compression x_algo;
 	U_I x_compression_level;
+	U_I x_compression_block_size;
 	infinint x_file_size;
 	infinint x_first_file_size;
 	std::string x_execute;
@@ -985,6 +1005,9 @@ namespace libdar
 
 	    /// set the compression level (from 1 to 9)
 	void set_compression_level(U_I compression_level) { x_compression_level = compression_level; };
+
+	    /// set the compression block size (0 for streamed compression)
+	void set_compression_block_size(U_I compression_block_size) { x_compression_block_size = compression_block_size; };
 
 	    /// define the archive slicing
 
@@ -1134,6 +1157,7 @@ namespace libdar
 	bool get_empty_dir() const { return x_empty_dir; };
 	compression get_compression() const { return x_compr_algo; };
 	U_I get_compression_level() const { return x_compression_level; };
+	U_I get_compression_block_size() const { return x_compression_block_size; };
 	const infinint & get_slice_size() const { return x_file_size; };
 	const infinint & get_first_slice_size() const { return x_first_file_size; };
 	const mask & get_ea_mask() const { if(x_ea_mask == nullptr) throw SRC_BUG; return *x_ea_mask; };
@@ -1183,6 +1207,7 @@ namespace libdar
 	bool x_empty_dir;
 	compression x_compr_algo;
 	U_I x_compression_level;
+	U_I x_compression_block_size;
 	infinint x_file_size;
 	infinint x_first_file_size;
 	mask * x_ea_mask;

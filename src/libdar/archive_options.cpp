@@ -319,6 +319,7 @@ namespace libdar
 	    x_empty_dir = false;
 	    x_compr_algo = compression::none;
 	    x_compression_level = 9;
+	    x_compression_block_size = 0;
 	    x_file_size = 0;
 	    x_first_file_size = 0;
 	    x_execute = "";
@@ -579,6 +580,7 @@ namespace libdar
 	x_empty_dir = ref.x_empty_dir;
 	x_compr_algo = ref.x_compr_algo;
 	x_compression_level = ref.x_compression_level;
+	x_compression_block_size = ref.x_compression_block_size;
 	x_file_size = ref.x_file_size;
 	x_first_file_size = ref.x_first_file_size;
 	x_execute = ref.x_execute;
@@ -653,6 +655,7 @@ namespace libdar
 	x_empty_dir = move(ref.x_empty_dir);
 	x_compr_algo = move(ref.x_compr_algo);
 	x_compression_level = move(ref.x_compression_level);
+	x_compression_block_size = move(ref.x_compression_block_size);
 	x_file_size = move(ref.x_file_size);
 	x_first_file_size = move(ref.x_first_file_size);
 	x_execute = move(ref.x_execute);
@@ -746,6 +749,7 @@ namespace libdar
 	    x_pause = 0;
 	    x_algo = compression::none;
 	    x_compression_level = 9;
+	    x_compression_block_size = 0;
 	    x_file_size = 0;
 	    x_first_file_size = 0;
 	    x_execute = "";
@@ -819,6 +823,7 @@ namespace libdar
 	x_pause = ref.x_pause;
 	x_algo = ref.x_algo;
 	x_compression_level = ref.x_compression_level;
+	x_compression_block_size = ref.x_compression_block_size;
 	x_file_size = ref.x_file_size;
 	x_first_file_size = ref.x_first_file_size;
 	x_execute = ref.x_execute;
@@ -860,6 +865,7 @@ namespace libdar
 	x_pause = move(ref.x_pause);
 	x_algo = move(ref.x_algo);
 	x_compression_level = move(ref.x_compression_level);
+	x_compression_block_size = move(ref.x_compression_block_size);
 	x_file_size = move(ref.x_file_size);
 	x_first_file_size = move(ref.x_first_file_size);
 	x_execute = move(ref.x_execute);
@@ -920,6 +926,7 @@ namespace libdar
 	    x_empty_dir = false;
 	    x_compr_algo = compression::none;
 	    x_compression_level = 9;
+	    x_compression_block_size = 0;
 	    x_file_size = 0;
 	    x_first_file_size = 0;
 	    x_execute = "";
@@ -1134,6 +1141,7 @@ namespace libdar
 	    x_empty_dir = ref.x_empty_dir;
 	    x_compr_algo = ref.x_compr_algo;
 	    x_compression_level = ref.x_compression_level;
+	    x_compression_block_size = ref.x_compression_block_size;
 	    x_file_size = ref.x_file_size;
 	    x_first_file_size = ref.x_first_file_size;
 	    x_execute = ref.x_execute;
@@ -1191,6 +1199,7 @@ namespace libdar
 	x_empty_dir = move(ref.x_empty_dir);
 	x_compr_algo = move(ref.x_compr_algo);
 	x_compression_level = move(ref.x_compression_level);
+	x_compression_block_size = move(ref.x_compression_block_size);
 	x_file_size = move(ref.x_file_size);
 	x_first_file_size = move(ref.x_first_file_size);
 	x_execute = move(ref.x_execute);
