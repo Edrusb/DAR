@@ -357,7 +357,7 @@ namespace libdar
 	void run_threads();
 	void run_read_threads();
 	void run_write_threads();
-	void purge_ratelier_for(compressor_block_flags flag);
+	compressor_block_flags purge_ratelier_up_to_non_data();
 
 
 	    // static methods

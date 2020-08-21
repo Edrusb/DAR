@@ -145,6 +145,11 @@ namespace libdar
 		    case compressor_block_flags::eof_die:
 			--ending;
 			pop_front();
+			if(ending == 0)
+			{
+			    aux = 0;
+			    aux.dump(*dst);
+			}
 			break;
 		    case compressor_block_flags::worker_error: // error received from a zip_worker
 			error = true; // this will trigger the main thread to terminate all threads
@@ -621,9 +626,13 @@ namespace libdar
 		    case compressor_block_flags::error: // error received from the zip_below_read thread
 			    // the thread has terminated and all worker have been
 			    // asked to terminate by the zip_below_read thread
+			purge_ratelier_up_to_non_data();
 			stop_threads(); // this should relaunch the exception from the worker
 			throw SRC_BUG; // if not this is a bug
 		    case compressor_block_flags::worker_error:
+			tas->put(move(lus_data.front()));
+			lus_data.pop_front();
+			lus_flags.pop_front();
 			    // a single worker have reported an error and is till alive
 			stop_threads(); // we stop all threads which will relaunch the worker exception
 			throw SRC_BUG; // if not this is a bug
@@ -704,6 +713,10 @@ namespace libdar
 	    run_threads();
 	    disperse->scatter(curwrite, static_cast<signed int>(compressor_block_flags::data));
 	}
+
+	    // adding eof mark
+
+	send_flag_to_workers(compressor_block_flags::eof_die);
     }
 
     void parallel_block_compressor::inherited_terminate()
@@ -830,11 +843,12 @@ namespace libdar
 	    if(reader->is_running())
 	    {
 		reader->do_stop();
-		purge_ratelier_for(compressor_block_flags::eof_die);
-		reader->join();
-		for(deque<zip_worker>::iterator it = travailleurs.begin(); it !=travailleurs.end(); ++it)
-		    it->join();
+		(void)purge_ratelier_up_to_non_data();
 	    }
+
+	    reader->join();
+	    for(deque<zip_worker>::iterator it = travailleurs.begin(); it !=travailleurs.end(); ++it)
+		it->join();
 
 	    running_threads = false;
 	}
@@ -910,30 +924,39 @@ namespace libdar
 	}
     }
 
-    void parallel_block_compressor::purge_ratelier_for(compressor_block_flags flag)
+    compressor_block_flags parallel_block_compressor::purge_ratelier_up_to_non_data()
     {
 	S_I expected = num_w;
-	tas->put(lus_data);
-	lus_data.clear();
-	lus_flags.clear();
+	compressor_block_flags ret = compressor_block_flags::data;
 
 	if(get_mode() != gf_read_only)
 	    throw SRC_BUG;
 
 	while(expected > 0)
 	{
-	    rassemble->gather(lus_data, lus_flags);
-	    while(!lus_flags.empty())
+	    if(lus_data.empty())
+	    {
+		if(!lus_flags.empty())
+		    throw SRC_BUG;
+		rassemble->gather(lus_data, lus_flags);
+	    }
+
+	    while(!lus_flags.empty() && expected > 0)
 	    {
 		if(lus_data.empty())
 		    throw SRC_BUG;
-		if(lus_flags.front() == static_cast<signed int>(flag))
+		if(ret == compressor_block_flags::data
+		   && lus_flags.front() != static_cast<signed int>(compressor_block_flags::data))
+		    ret = static_cast<compressor_block_flags>(lus_flags.front());
+		if(lus_flags.front() == static_cast<signed int>(ret))
 		    --expected;
 		tas->put(move(lus_data.front()));
 		lus_data.pop_front();
 		lus_flags.pop_front();
 	    }
 	}
+
+	return ret;
     }
 
 
