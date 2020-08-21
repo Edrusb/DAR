@@ -68,7 +68,7 @@ namespace libdar
 
 	    // inherited from compress_module interface
 
-	virtual compression get_algo() const override { return compression::b_lz4; };
+	virtual compression get_algo() const override { return compression::lz4; };
 
 	virtual U_I get_max_compressing_size() const override;
 
