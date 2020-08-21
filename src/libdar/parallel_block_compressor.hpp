@@ -230,7 +230,7 @@ namespace libdar
     private:
 	std::shared_ptr<libthreadar::ratelier_scatter <crypto_segment> > & reader;
 	std::shared_ptr<libthreadar::ratelier_gather <crypto_segment> > & writer;
-	std::unique_ptr<compress_module> && compr;
+	std::unique_ptr<compress_module> compr;
 	bool do_compress;
 	bool error;
 	std::unique_ptr<crypto_segment> transit;
