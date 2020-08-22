@@ -1340,8 +1340,8 @@ namespace libdar
 	    return false;
 	switch(s[len-1])
 	{
-	case 'K':
-	case 'k': // kilobyte
+	case 'K': // 'K' is the Kelvin symbol (temperature unit) though many make the confusion
+	case 'k': // kilobyte the official/correct symbol
 	    factor = base;
 	    break;
 	case 'M': // megabyte

@@ -84,6 +84,7 @@ struct line_param
     bool display_masks;           ///< whether to display masks value
     compression algo;             ///< compression algorithm to use when generating an archive
     U_I compression_level;        ///< compression level to use when generating an archive
+    U_I compression_block_size;   ///< compression block size (0 for legacy compression method)
     infinint pause;               ///< whether to pause between slices
     bool beep;                    ///< whether to ring the terminal upon user interaction request
     bool empty_dir;               ///< whether to store skipped directories as empty, whether to avoid restoring directory where no data is to be restored
@@ -150,6 +151,7 @@ struct line_param
     bool no_compare_symlink_date; ///< whether to report difference in dates of symlinks while diffing an archive with filesystem
     fsa_scope scope;              ///< FSA scope to consider for the operation
     U_I multi_threaded_crypto;    ///< number of crypto worker threads (requires libthreadar)
+    U_I multi_threaded_compress;  ///< number of compress worker threads (requires libthreadar and per block compression)
     bool delta_sig;               ///< whether to calculate rsync signature of files
     mask *delta_mask;             ///< which file to calculate delta sig when not using the default mask
     bool delta_diff;              ///< whether to save binary diff or whole file's data during a differential backup
