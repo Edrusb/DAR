@@ -2124,6 +2124,7 @@ namespace libdar
 		throw Efeature("zstd per block compression");
 	    case compression::lz4:
 		ret = make_unique<lz4_module>(compression_level);
+		break;
 	    default:
 		throw SRC_BUG;
 	    }
