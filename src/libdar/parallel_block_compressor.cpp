@@ -708,15 +708,14 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	if(curwrite)
+	if(curwrite && curwrite->clear_data.get_data_size() > 0)
 	{
 	    run_threads();
 	    disperse->scatter(curwrite, static_cast<signed int>(compressor_block_flags::data));
 	}
 
 	    // adding eof mark
-
-	send_flag_to_workers(compressor_block_flags::eof_die);
+	stop_threads();
     }
 
     void parallel_block_compressor::inherited_terminate()
