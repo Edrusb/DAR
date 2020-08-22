@@ -456,7 +456,7 @@ namespace libdar
 							 unique_ptr<compress_module> block_zipper,
 							 generic_file & compressed_side,
 							 U_I uncompressed_bs):
-	proto_compressor(compressed_side.get_mode()),
+	proto_compressor((compressed_side.get_mode() == gf_read_only)? gf_read_only: gf_write_only),
 	num_w(num_workers),
 	zipper(move(block_zipper)),
 	compressed(&compressed_side),
@@ -471,7 +471,7 @@ namespace libdar
 							 unique_ptr<compress_module> block_zipper,
 							 generic_file *compressed_side,
 							 U_I uncompressed_bs):
-	proto_compressor(compressed_side->get_mode()),
+	proto_compressor((compressed_side->get_mode() == gf_read_only)? gf_read_only: gf_write_only),
 	num_w(num_workers),
 	zipper(move(block_zipper)),
 	compressed(compressed_side),

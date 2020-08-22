@@ -2133,6 +2133,7 @@ namespace libdar
 	{
 	    throw Ememory("make_compress_module_ptr");
 	}
+
 	if(!ret)
 	    throw SRC_BUG; // we would return a null pointer!
 
