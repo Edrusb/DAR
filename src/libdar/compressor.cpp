@@ -387,6 +387,8 @@ namespace libdar
 	    read_ptr = &compressor::zstd_read;
 	    write_ptr = & compressor::zstd_write;
 	    break;
+	case compression::lz4:
+	    throw Efeature("lz4 streaming compression mode, please define a compression block size greater than zero");
 	default:
 	    throw SRC_BUG;
 	}
