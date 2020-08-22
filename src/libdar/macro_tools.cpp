@@ -115,6 +115,9 @@ namespace libdar
 					       U_32 modulo,
 					       U_32 offset);
 
+	/// create a compress_module based on the provided arguments
+    static unique_ptr<compress_module> make_compress_module_ptr(compression algo, U_I compression_level);
+
     catalogue *macro_tools_get_catalogue_from(const shared_ptr<user_interaction> & dialog,
 					      pile & stack,
 					      const header_version & ver,
@@ -832,7 +835,22 @@ namespace libdar
 
 	    version_check(*dialog, ver);
 
-	    tmp = new (nothrow) compressor(ver.get_compression_algo(), *(stack.top()));
+	    if(ver.get_compression_block_size().is_zero())
+		tmp = new (nothrow) compressor(ver.get_compression_algo(), *(stack.top()));
+	    else
+	    {
+		U_I compr_bs = 0;
+		infinint ibs = ver.get_compression_block_size();
+
+		ibs.unstack(compr_bs);
+		if(!ibs.is_zero())
+		    throw Erange("macro_tools_open_layers", gettext("compression block size used in the archive exceed integer capacity of the current system"));
+
+		tmp = new (nothrow) parallel_block_compressor(multi_threaded_compress,
+							      move(make_compress_module_ptr(ver.get_compression_algo(), 9)), // compression level is not used here
+							      *(stack.top()),
+							      compr_bs);
+	    }
 
 	    if(tmp == nullptr)
 		throw Ememory("open_archive");
@@ -1528,7 +1546,14 @@ namespace libdar
 
 		if(info_details && algo != compression::none)
 		    dialog->message(gettext("Adding a new layer on top: compression..."));
-		tmp = new (nothrow) compressor(algo, *(layers.top()), compression_level);
+		if(compression_block_size == 0)
+		    tmp = new (nothrow) compressor(algo, *(layers.top()), compression_level);
+		else
+		    tmp = new (nothrow) parallel_block_compressor(multi_threaded_compress,
+								  move(make_compress_module_ptr(algo, compression_level)),
+								  *(layers.top()),
+								  compression_block_size);
+
 		if(tmp == nullptr)
 		    throw Ememory("op_create_in_sub");
 		else
@@ -2071,6 +2096,46 @@ namespace libdar
             throw;
         }
         delete [] buffer;
+    }
+
+    static unique_ptr<compress_module> make_compress_module_ptr(compression algo, U_I compression_level)
+    {
+	unique_ptr<compress_module> ret;
+
+	try
+	{
+	    switch(algo)
+	    {
+	    case compression::none:
+		throw SRC_BUG;
+	    case compression::gzip:
+		throw Efeature("gzip per block compression");
+	    case compression::bzip2:
+		throw Efeature("bzip2 per block compression");
+	    case compression::lzo:
+		throw Efeature("lzo per block compression");
+	    case compression::xz:
+		throw Efeature("xz per block compression");
+	    case compression::lzo1x_1_15:
+		throw Efeature("lzo1x_1_15 per block compression");
+	    case compression::lzo1x_1:
+		throw Efeature("lzo1x_1 per block compression");
+	    case compression::zstd:
+		throw Efeature("zstd per block compression");
+	    case compression::lz4:
+		ret = make_unique<lz4_module>(compression_level);
+	    default:
+		throw SRC_BUG;
+	    }
+	}
+	catch(bad_alloc &)
+	{
+	    throw Ememory("make_compress_module_ptr");
+	}
+	if(!ret)
+	    throw SRC_BUG; // we would return a null pointer!
+
+	return ret;
     }
 
 
