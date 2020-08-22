@@ -64,6 +64,8 @@ extern "C"
 #include "hash_fichier.hpp"
 #include "tools.hpp"
 #include "compressor.hpp"
+#include "lz4_module.hpp"
+#include "parallel_block_compressor.hpp"
 
 #ifdef LIBTHREADAR_AVAILABLE
 #include "parallel_tronconneuse.hpp"
@@ -385,6 +387,7 @@ namespace libdar
 				  list<signator> & gnupg_signed,
 				  slice_layout & sl,
 				  U_I multi_threaded_crypto,
+				  U_I multi_threaded_compress,
 				  bool header_only)
     {
 	secu_string real_pass = pass;
@@ -1058,6 +1061,7 @@ namespace libdar
 				   const infinint & pause,
 				   compression algo,
 				   U_I compression_level,
+				   U_I compression_block_size,
 				   const infinint & file_size,
 				   const infinint & first_file_size,
 				   const string & execute,
@@ -1076,7 +1080,8 @@ namespace libdar
 				   const label & data_name,
 				   const infinint & iteration_count,
 				   hash_algo kdf_hash,
-				   U_I multi_threaded_crypto)
+				   U_I multi_threaded_crypto,
+				   U_I multi_threaded_compress)
     {
 #if GPGME_SUPPORT
 	U_I gnupg_key_size;
@@ -1222,6 +1227,7 @@ namespace libdar
 		ver.set_sym_crypto_algo(crypto);
 		ver.set_tape_marks(add_marks_for_sequential_reading);
 		ver.set_signed(!gnupg_signatories.empty());
+		ver.set_compression_block_size(compression_block_size);
 
 		if(crypto != crypto_algo::none || !gnupg_recipients.empty())
 		{

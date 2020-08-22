@@ -130,6 +130,7 @@ namespace libdar
 					 gnupg_signed,
 					 slices,
 					 options.get_multi_threaded_crypto(),
+					 options.get_multi_threaded_compress(),
 					 options.get_header_only());
 
 		if(options.get_header_only())
@@ -186,6 +187,7 @@ namespace libdar
 						     tmp1_signatories,
 						     ignored,
 						     options.get_multi_threaded_crypto(),
+						     options.get_multi_threaded_compress(),
 						     false);
 				// we do not comparing the signatories of the archive of reference with the current archive
 				// for example the isolated catalogue might be unencrypted and thus not signed
@@ -442,6 +444,7 @@ namespace libdar
 				   options.get_empty_dir(),
 				   options.get_compression(),
 				   options.get_compression_level(),
+				   options.get_compression_block_size(),
 				   options.get_slice_size(),
 				   options.get_first_slice_size(),
 				   options.get_ea_mask(),
@@ -478,6 +481,7 @@ namespace libdar
 				   options.get_ignore_unknown_inode_type(),
 				   options.get_fsa_scope(),
 				   options.get_multi_threaded_crypto(),
+				   options.get_multi_threaded_compress(),
 				   options.get_delta_signature(),
 				   options.get_has_delta_mask_been_set(),
 				   options.get_delta_mask(),
@@ -661,6 +665,7 @@ namespace libdar
 				 options.get_empty_dir(),
 				 options.get_keep_compressed() ? algo_kept : options.get_compression(),
 				 options.get_compression_level(),
+				 options.get_compression_block_size(),
 				 options.get_slice_size(),
 				 options.get_first_slice_size(),
 				 options.get_ea_mask(),
@@ -699,6 +704,7 @@ namespace libdar
 				 false,   // ignore_unknown
 				 options.get_fsa_scope(),
 				 options.get_multi_threaded_crypto(),
+				 options.get_multi_threaded_compress(),
 				 options.get_delta_signature(),
 				 options.get_has_delta_mask_been_set(), // build delta sig
 				 options.get_delta_mask(), // delta_mask
@@ -814,6 +820,7 @@ namespace libdar
 			     false,               // empty_dir
 			     src.pimpl->ver.get_compression_algo(),
 			     9,                   // we keep the data compressed this parameter has no importance
+			     0,                   // we keep the compression block size, this parameter has no importance
 			     options_repair.get_slice_size(),
 			     options_repair.get_first_slice_size(),
 			     bool_mask(true),     // ea_mask
@@ -852,6 +859,7 @@ namespace libdar
 			     false,               // ignore_unknown
 			     all_fsa_families(),  // fsa_scope
 			     options_repair.get_multi_threaded_crypto(),
+			     options_repair.get_multi_threaded_compress(),
 			     true,                // delta_signature
 			     false,               // build_delta_signature
 			     bool_mask(true),     // delta_mask
@@ -1517,6 +1525,7 @@ namespace libdar
 				      options.get_pause(),
 				      options.get_compression(),
 				      options.get_compression_level(),
+				      options.get_compression_block_size(),
 				      options.get_slice_size(),
 				      options.get_first_slice_size(),
 				      options.get_execute(),
@@ -1535,7 +1544,8 @@ namespace libdar
 				      isol_data_name,
 				      options.get_iteration_count(),
 				      options.get_kdf_hash(),
-				      options.get_multi_threaded_crypto());
+				      options.get_multi_threaded_crypto(),
+				      options.get_multi_threaded_crypto()); /* must be changed with dedicated field for compression */
 
 	    if(cat == nullptr)
 		throw SRC_BUG;
@@ -1887,6 +1897,7 @@ namespace libdar
 						bool empty_dir,
 						compression algo,
 						U_I compression_level,
+						U_I compression_block_size,
 						const infinint & file_size,
 						const infinint & first_file_size,
 						const mask & ea_mask,
@@ -1923,6 +1934,7 @@ namespace libdar
 						bool ignore_unknown,
 						const fsa_scope & scope,
 						U_I multi_threaded_crypto,
+						U_I multi_threaded_compress,
 						bool delta_signature,
 						bool build_delta_sig,
 						const mask & delta_mask,
@@ -2048,6 +2060,7 @@ namespace libdar
 			 empty_dir,
 			 algo,
 			 compression_level,
+			 compression_block_size,
 			 file_size,
 			 first_file_size,
 			 ea_mask,
@@ -2086,6 +2099,7 @@ namespace libdar
 			 ignore_unknown,
 			 scope,
 			 multi_threaded_crypto,
+			 multi_threaded_compress,
 			 delta_signature,
 			 build_delta_sig,
 			 delta_mask,
@@ -2124,6 +2138,7 @@ namespace libdar
 					      bool empty_dir,
 					      compression algo,
 					      U_I compression_level,
+					      U_I compression_block_size,
 					      const infinint & file_size,
 					      const infinint & first_file_size,
 					      const mask & ea_mask,
@@ -2162,6 +2177,7 @@ namespace libdar
 					      bool ignore_unknown,
 					      const fsa_scope & scope,
 					      U_I multi_threaded_crypto,
+					      U_I multi_threaded_compress,
 					      bool delta_signature,
 					      bool build_delta_sig,
 					      const mask & delta_mask,
@@ -2215,6 +2231,7 @@ namespace libdar
 					  pause,
 					  algo,
 					  compression_level,
+					  compression_block_size,
 					  file_size,
 					  first_file_size,
 					  execute,
@@ -2233,7 +2250,8 @@ namespace libdar
 					  internal_name, // data_name is equal to internal_name in the current situation
 					  iteration_count,
 					  kdf_hash,
-					  multi_threaded_crypto);
+					  multi_threaded_crypto,
+					  multi_threaded_compress);
 
 		    // ********** building the catalogue (empty for now) ************************* //
 		datetime root_mtime;
