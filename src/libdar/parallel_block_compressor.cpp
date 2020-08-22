@@ -453,7 +453,7 @@ namespace libdar
 
 
     parallel_block_compressor::parallel_block_compressor(U_I num_workers,
-							 unique_ptr<compress_module> & block_zipper,
+							 unique_ptr<compress_module> block_zipper,
 							 generic_file & compressed_side,
 							 U_I uncompressed_bs):
 	proto_compressor(compressed_side.get_mode()),
@@ -468,7 +468,7 @@ namespace libdar
 
 
     parallel_block_compressor::parallel_block_compressor(U_I num_workers,
-							 unique_ptr<compress_module> & block_zipper,
+							 unique_ptr<compress_module> block_zipper,
 							 generic_file *compressed_side,
 							 U_I uncompressed_bs):
 	proto_compressor(compressed_side->get_mode()),

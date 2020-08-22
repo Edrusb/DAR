@@ -261,14 +261,14 @@ namespace libdar
 	    /// construction time both while reading and writing an archive
 
 	parallel_block_compressor(U_I num_workers,
-				  std::unique_ptr<compress_module> & block_zipper,
+				  std::unique_ptr<compress_module> block_zipper,
 				  generic_file & compressed_side,
 				  U_I uncompressed_bs = default_uncompressed_block_size);
 	    // compressed_side is not owned by the object and will remains
             // after the objet destruction
 
 	parallel_block_compressor(U_I num_workers,
-				  std::unique_ptr<compress_module> & block_zipper,
+				  std::unique_ptr<compress_module> block_zipper,
 				  generic_file *compressed_side,
 				  U_I uncompressed_bs = default_uncompressed_block_size);
             // compressed_side is owned by the object and will be
