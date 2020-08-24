@@ -847,7 +847,23 @@ namespace libdar
 		throw SRC_BUG;
 
 	    reader->do_stop();
-	    (void)purge_ratelier_up_to_non_data();
+	    switch(purge_ratelier_up_to_non_data())
+	    {
+	    case compressor_block_flags::data:
+		throw SRC_BUG;
+	    case compressor_block_flags::eof_die:
+		break;
+	    case compressor_block_flags::error:
+		break;
+	    case compressor_block_flags::worker_error:
+		(void)purge_ratelier_up_to_non_data();
+		    // need to purge further as this is
+		    // not a global order that equals the
+		    // number of workers
+		break;
+	    default:
+		throw SRC_BUG;
+	    }
 
 	    running_threads = false;
 		// we must set this before join()
@@ -958,7 +974,11 @@ namespace libdar
 		   && lus_flags.front() != static_cast<signed int>(compressor_block_flags::data))
 		    ret = static_cast<compressor_block_flags>(lus_flags.front());
 		if(lus_flags.front() == static_cast<signed int>(ret) && ret != compressor_block_flags::data)
+		{
 		    --expected;
+		    if(ret == compressor_block_flags::worker_error)
+			expected = 0;
+		}
 		tas->put(move(lus_data.front()));
 		lus_data.pop_front();
 		lus_flags.pop_front();
