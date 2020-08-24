@@ -302,7 +302,7 @@ namespace libdar
 	void change_uncompressed_block_size(U_I bs) { uncompressed_block_size = bs; };
 
     protected :
-	virtual void inherited_read_ahead(const infinint & amount) override { run_read_threads(); };
+	virtual void inherited_read_ahead(const infinint & amount) override { if(!suspended) run_read_threads(); };
         virtual U_I inherited_read(char *a, U_I size) override;
         virtual void inherited_write(const char *a, U_I size) override;
 	virtual void inherited_truncate(const infinint & pos) override;
