@@ -246,8 +246,7 @@ namespace libdar
 			// the read infinint does not hold in an a U_I assuming
 			// data corruption occured
 
-		    push_flag_to_all_workers(compressor_block_flags::error);
-		    end = true;
+		    throw Erange("zip_below_read::work", gettext("incoherent compressed block structure, compressed data corruption"));
 		}
 	    }
 	    else // we are asked to stop by the parallel_block_compressor thread
