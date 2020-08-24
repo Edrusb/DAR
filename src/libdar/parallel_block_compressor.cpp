@@ -745,7 +745,7 @@ namespace libdar
 
     void parallel_block_compressor::init_fields()
     {
-
+	U_I compr_bs = zipper->get_min_size_to_compress(uncompressed_block_size);
 
 	    // sanity checks on fields set by constructors
 
@@ -776,9 +776,9 @@ namespace libdar
 
 	    // now filling the head that was created empty
 
+
 	for(U_I i = 0 ; i < get_heap_size(num_w) ; ++i)
-	    tas->put(make_unique<crypto_segment>(uncompressed_block_size,
-						 uncompressed_block_size));
+	    tas->put(make_unique<crypto_segment>(compr_bs, uncompressed_block_size));
 
 	    // creating the zip_below_* thread object
 
