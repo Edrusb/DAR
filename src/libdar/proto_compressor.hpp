@@ -63,6 +63,12 @@ namespace libdar
 	virtual bool is_compression_suspended() const = 0;
     };
 
+
+	// used only for block compression
+
+    constexpr const U_I default_uncompressed_block_size = 102400;
+    constexpr const U_I min_uncompressed_block_size = 100;
+
 	/// @}
 
 } // end of namespace

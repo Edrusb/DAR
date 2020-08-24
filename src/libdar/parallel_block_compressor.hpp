@@ -252,8 +252,6 @@ namespace libdar
     class parallel_block_compressor: public proto_compressor
     {
     public:
-	static constexpr const U_I default_uncompressed_block_size = 102400;
-
 	    /// \note if uncompressed_bs is too small the uncompressed data
 	    /// will not be able to be stored in the datastructure and decompression
 	    /// wil fail. This metadata should be stored in the archive header
@@ -306,8 +304,6 @@ namespace libdar
 	virtual void inherited_terminate() override;
 
     private:
-	static constexpr const U_I min_uncompressed_block_size = 100;
-
 
 	    // initialized directly in constructors
 
