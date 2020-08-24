@@ -954,7 +954,7 @@ namespace libdar
 		if(ret == compressor_block_flags::data
 		   && lus_flags.front() != static_cast<signed int>(compressor_block_flags::data))
 		    ret = static_cast<compressor_block_flags>(lus_flags.front());
-		if(lus_flags.front() == static_cast<signed int>(ret))
+		if(lus_flags.front() == static_cast<signed int>(ret) && ret != compressor_block_flags::data)
 		    --expected;
 		tas->put(move(lus_data.front()));
 		lus_data.pop_front();
