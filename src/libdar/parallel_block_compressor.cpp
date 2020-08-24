@@ -596,7 +596,8 @@ namespace libdar
 	{
 	    U_I ret = 0;
 
-	    run_threads();
+	    if(! reof)
+		run_threads();
 
 	    while(ret < size && ! reof)
 	    {
