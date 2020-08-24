@@ -137,10 +137,9 @@ namespace libdar
 			    aux.dump(*dst);
 			    dst->write(data.front()->crypted_data.get_addr(),
 				       data.front()->crypted_data.get_data_size());
-			    pop_front();
 			}
-			else // do nothing (avoid generating a new exception)
-			    pop_front();
+			// else do nothing (avoid generating a new exception)
+			pop_front();
 			break;
 		    case compressor_block_flags::eof_die:
 			--ending;
@@ -153,15 +152,19 @@ namespace libdar
 			break;
 		    case compressor_block_flags::worker_error: // error received from a zip_worker
 			error = true; // this will trigger the main thread to terminate all threads
+			pop_front();
 			break;
 		    case compressor_block_flags::error:
+			pop_front();
 			if(!error)
 			    throw SRC_BUG;
 			break;
 		    default:
+			pop_front();
 			if(!error)
 			    throw SRC_BUG;
 		    }
+
 		}
 	    }
 	}
