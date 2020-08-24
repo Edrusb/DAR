@@ -109,7 +109,13 @@ int main()
 	if(!compile_time::libzstd())
 	{
 	    cerr << "MISSING ZSTD COMPRESSION SUPPORT TO BE ABLE TO PERFORM ALL TESTS, ABORTING" << endl;
-	    throw Efeature("libxz");
+	    throw Efeature("libzstd");
+	}
+
+	if(!compile_time::liblz4())
+	{
+	    cerr << "MISSING LZ4 COMPRESSION SUPPORT TO BE ABLE TO PERFORM ALL TESTS, ABORTING" << endl;
+	    throw Efeature("liblz4");
 	}
 
 	if(!compile_time::libgcrypt())
