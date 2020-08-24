@@ -50,9 +50,16 @@ namespace libdar
 	proto_compressor & operator = (proto_compressor && ref) noexcept = default;
         virtual ~proto_compressor() = default;
 
+	    /// give the compression algo at the current time (must return compression:none is suspended)
         virtual compression get_algo() const = 0;
+
+	    /// temporary disable compression (reading or writing is just copy to/from the below layer)
 	virtual void suspend_compression() = 0;
+
+	    /// reactivate the compression
 	virtual void resume_compression() = 0;
+
+	    /// whether compression is currently suspended
 	virtual bool is_compression_suspended() const = 0;
     };
 

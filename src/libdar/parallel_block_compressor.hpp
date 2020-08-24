@@ -282,7 +282,7 @@ namespace libdar
 
 	    // inherited from proto_compressor
 
-	virtual compression get_algo() const override { return zipper->get_algo(); };
+	virtual compression get_algo() const override { return suspended? compression::none : zipper->get_algo(); };
 	virtual void suspend_compression() override;
 	virtual void resume_compression() override;
 	virtual bool is_compression_suspended() const override { return suspended; };
