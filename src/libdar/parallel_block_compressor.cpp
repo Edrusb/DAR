@@ -623,19 +623,22 @@ namespace libdar
 			reof = true;
 			stop_threads(); // this may throw a pending exception
 			break;
-		    case compressor_block_flags::error: // error received from the zip_below_read thread
+		    case compressor_block_flags::error:
+			    // error received from the zip_below_read thread
 			    // the thread has terminated and all worker have been
 			    // asked to terminate by the zip_below_read thread
-			purge_ratelier_up_to_non_data();
 			stop_threads(); // this should relaunch the exception from the worker
 			throw SRC_BUG; // if not this is a bug
 		    case compressor_block_flags::worker_error:
+			    // a single worker have reported an error and is till alive
+			    // we drop this single order
+			    // to cleanly stop threads
 			tas->put(move(lus_data.front()));
 			lus_data.pop_front();
 			lus_flags.pop_front();
-			    // a single worker have reported an error and is till alive
+			    // no we can stop the threads poperly
 			stop_threads(); // we stop all threads which will relaunch the worker exception
-			throw SRC_BUG; // if not this is a bug
+			throw SRC_BUG;  // if not this is a bug
 		    default:
 			throw SRC_BUG;
 		    }
@@ -714,7 +717,7 @@ namespace libdar
 	    disperse->scatter(curwrite, static_cast<signed int>(compressor_block_flags::data));
 	}
 
-	    // adding eof mark
+	    // this adds the eof mark (zero block size)
 	stop_threads();
     }
 
@@ -851,7 +854,6 @@ namespace libdar
 	    reader->join();
 	    for(deque<zip_worker>::iterator it = travailleurs.begin(); it !=travailleurs.end(); ++it)
 		it->join();
-
 	}
     }
 
