@@ -61,21 +61,28 @@ namespace libdar
 
     private:
 	std::deque<std::unique_ptr<T> > tas;
+#ifdef LIBTHREADAR_AVAILABLE
 	libthreadar::mutex access;
+#endif
     };
 
     template <class T> std::unique_ptr<T> heap<T>::get()
     {
 	std::unique_ptr<T> ret;
 
+#ifdef LIBTHREADAR_AVAILABLE
 	access.lock();
 	try
 	{
+#endif
+
 	    if(tas.empty())
 		throw Erange("heap::get", "heap is empty, it should have be set larger");
 
 	    ret = std::move(tas.back()); // moving the object pointed to by tas.back() to ret
 	    tas.pop_back(); // removing the now empty pointer at the end of 'tas'
+
+#ifdef LIBTHREADAR_AVAILABLE
 	}
 	catch(...)
 	{
@@ -83,16 +90,22 @@ namespace libdar
 	    throw;
 	}
 	access.unlock();
+#endif
 
 	return ret;
     }
 
     template <class T> void heap<T>::put(std::unique_ptr<T> && obj)
     {
+#ifdef LIBTHREADAR_AVAILABLE
 	access.lock();
 	try
 	{
+#endif
+
 	    tas.push_back(std::move(obj));
+
+#ifdef LIBTHREADAR_AVAILABLE
 	}
 	catch(...)
 	{
@@ -100,20 +113,26 @@ namespace libdar
 	    throw;
 	}
 	access.unlock();
+#endif
     }
 
     template <class T> void heap<T>::put(std::deque<std::unique_ptr<T> > & list)
     {
 	typename std::deque<std::unique_ptr<T> >::iterator it = list.begin();
 
+#ifdef LIBTHREADAR_AVAILABLE
 	access.lock();
 	try
 	{
+#endif
+
 	    while(it != list.end())
 	    {
 		tas.push_back(std::move(*it));
 		++it;
 	    }
+
+#ifdef LIBTHREADAR_AVAILABLE
 	}
 	catch(...)
 	{
@@ -121,6 +140,7 @@ namespace libdar
 	    throw;
 	}
 	access.unlock();
+#endif
     }
 
 	/// @}
