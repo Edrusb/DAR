@@ -688,16 +688,23 @@ namespace libdar
 										true,
 										ver.get_edition(),
 										ptr);
+			    if(info_details)
+				dialog->message(tools_printf(gettext("multi-threaded cyphering layer open, with %d worker thread(s)"), multi_threaded_crypto));
+
 #else
 			    throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for cryptography"));
 #endif
 			}
 			else
+			{
 			    tmp = tmp_ptr = new (nothrow) tronconneuse(crypto_size,
 								       *(stack.top()),
 								       true,
 								       ver.get_edition(),
 								       ptr);
+			    if(info_details)
+				dialog->message(tools_printf(gettext("single-threaded cyphering layer open")));
+			}
 
 			if(tmp_ptr != nullptr)
 			    tmp_ptr->set_initial_shift(ver.get_initial_offset());
@@ -713,16 +720,24 @@ namespace libdar
 										false,
 										ver.get_edition(),
 										ptr);
+			    if(info_details)
+				dialog->message(tools_printf(gettext("multi-threaded cyphering layer open, with %d worker thread(s)"), multi_threaded_crypto));
+
 #else
 			    throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for cryptography"));
 #endif
 			}
 			else
+			{
 			    tmp = tmp_ptr = new (nothrow) tronconneuse(crypto_size,
 								       *(stack.top()),
 								       false,
 								       ver.get_edition(),
 								       ptr);
+			    if(info_details)
+				dialog->message(tools_printf(gettext("single-threaded cyphering layer open")));
+			}
+
 			if(tmp_ptr != nullptr)
 			{
 			    tmp_ptr->set_callback_trailing_clear_data(&macro_tools_get_terminator_start);
@@ -837,7 +852,12 @@ namespace libdar
 	    version_check(*dialog, ver);
 
 	    if(ver.get_compression_block_size().is_zero())
+	    {
 		tmp = new (nothrow) compressor(ver.get_compression_algo(), *(stack.top()));
+
+		if(info_details)
+		    dialog->message(tools_printf(gettext("streamed compression layer open (single threaded)")));
+	    }
 	    else
 	    {
 		U_I compr_bs = 0;
@@ -854,14 +874,23 @@ namespace libdar
 								  move(make_compress_module_ptr(ver.get_compression_algo(), 9)), // compression level is not used here
 								  *(stack.top()),
 								  compr_bs);
+
+		    if(info_details)
+			dialog->message(tools_printf(gettext("multi-threaded block compression layer open with %d worker thread(s)"), multi_threaded_compress));
+
 #else
 		    throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for block compression"));
 #endif
 		}
 		else
+		{
 		    tmp = new (nothrow) block_compressor(move(make_compress_module_ptr(ver.get_compression_algo(), 9)), // compression level is not used here
 							 *(stack.top()),
 							 compr_bs);
+		    if(info_details)
+			dialog->message(tools_printf(gettext("single-threaded block compression layer open")));
+		}
+
 	    }
 
 	    if(tmp == nullptr)
@@ -1477,16 +1506,23 @@ namespace libdar
 								      false,
 								      macro_tools_supported_version,
 								      ptr);
+
+			    if(info_details)
+				dialog->message(tools_printf(gettext("multi-threaded cyphering layer open, with %d worker thread(s)"), multi_threaded_crypto));
 #else
 			    throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for cryptography"));
 #endif
 			}
 			else
+			{
 			    tmp = new (nothrow) tronconneuse(crypto_size,
 							     *(layers.top()),
 							     false,
 							     macro_tools_supported_version,
 							     ptr);
+			    if(info_details)
+				dialog->message(tools_printf(gettext("single-threaded cyphering layer open")));
+			}
 		    }
 		    catch(std::bad_alloc &)
 		    {
@@ -1569,14 +1605,23 @@ namespace libdar
 								      move(make_compress_module_ptr(algo, compression_level)),
 								      *(layers.top()),
 								      compression_block_size);
+
+			if(info_details)
+			    dialog->message(tools_printf(gettext("multi-threaded compression layer open, with %d worker thread(s)"), multi_threaded_compress));
+
 #else
 			throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for block compression"));
 #endif
 		    }
 		    else
+		    {
 			tmp = new (nothrow) block_compressor(move(make_compress_module_ptr(algo, compression_level)), // compression level is not used here
 							     *(layers.top()),
 							     compression_block_size);
+
+			if(info_details)
+			    dialog->message(tools_printf(gettext("single-threaded compression layer open")));
+		    }
 		}
 
 		if(tmp == nullptr)
