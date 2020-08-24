@@ -407,26 +407,20 @@ namespace libdar
 		writer->worker_push_one(transit_slot, transit, flag);
 		break;
 	    case compressor_block_flags::error:
-		if(!error)
-		    writer->worker_push_one(transit_slot, transit, flag);
 		if(!do_compress)
+		{
+		    writer->worker_push_one(transit_slot, transit, flag);
 		    ending = true;
-		    // in read mode (uncompressing) in case the zip_below_write
-		    // thread sends an error message, it ends, so we propagate
-		    // and terminate too, but we do not throw exception ourselves
+			// in read mode (uncompressing) in case the zip_below_write
+			// thread sends an error message, it ends, so we propagate
+			// and terminate too, but we do not throw exception ourselves
+		}
 		else
 		{
 		    if(!error)
 			throw SRC_BUG;
 			// in write mode (compressing) we should never receive a error
-			// flag from the main thread, but could generate one and upon
-			// exception raised in our code (managed by inherited_run()
-			// that called us
-			// this will set the error field in the  zip_below_read thread
-			// that will be notified by the parallel_block_compressor which will
-			// trigger eof_die message, then we inherited_run() will relaunch
-			// the exception to be caught while parallel_block_compressor will join()
-			// on us.
+			// flag from the main thread
 		}
 		break;
 	    case compressor_block_flags::worker_error:
@@ -434,10 +428,16 @@ namespace libdar
 		    throw SRC_BUG;
 		    // only a worker should set this error and we
 		    // do not communicate with other workers
+		else
+		    writer->worker_push_one(transit_slot, transit, flag);
+		    // we now stay as much transparent as possible
 		break;
 	    default:
 		if(!error)
 		    throw SRC_BUG;
+		else
+		    writer->worker_push_one(transit_slot, transit, flag);
+		    // we now stay as much transparent as possible
 		break;
 	    }
 	}
@@ -839,17 +839,19 @@ namespace libdar
 	    if(!reader)
 		throw SRC_BUG;
 
-	    if(reader->is_running())
-	    {
-		reader->do_stop();
-		(void)purge_ratelier_up_to_non_data();
-	    }
+	    reader->do_stop();
+	    (void)purge_ratelier_up_to_non_data();
+
+	    running_threads = false;
+		// we must set this before join()
+		// to avoid purging a second time
+		// in case join() would throw an
+		// exception
 
 	    reader->join();
 	    for(deque<zip_worker>::iterator it = travailleurs.begin(); it !=travailleurs.end(); ++it)
 		it->join();
 
-	    running_threads = false;
 	}
     }
 
