@@ -124,7 +124,7 @@ namespace libdar
 
     {
 #if LIBLZ4_AVAILABLE
-	U_I ret;
+	S_I ret;
 
 	if(normal_size > get_max_compressing_size())
 	    throw Erange("lz4_module::compress_data", "oversized uncompressed data given to LZ4 compression engine");
@@ -150,7 +150,7 @@ namespace libdar
 				    U_I normal_size) const
     {
 #if LIBLZ4_AVAILABLE
-	U_I ret = LZ4_decompress_safe(zip_buf, normal, zip_buf_size, normal_size);
+	S_I ret = LZ4_decompress_safe(zip_buf, normal, zip_buf_size, normal_size);
 
 	if(ret < 0)
 	    throw Erange("lz4_module::uncompress_data", "compressed data corruption reported by LZ4 decompression engine");
