@@ -1644,6 +1644,8 @@ static bool get_args_recursive(recursive_param & rec,
 			    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
 			else
 			{
+			    if(tmp < 1)
+				throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
 			    p.multi_threaded_crypto = (U_I)tmp;
 			    p.multi_threaded_compress = (U_I)tmp;
 			}
@@ -1652,11 +1654,20 @@ static bool get_args_recursive(recursive_param & rec,
 			if(! tools_my_atoi(split[0].c_str(), tmp))
 			    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
 			else
+			{
+			    if(tmp < 1)
+				throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
 			    p.multi_threaded_crypto = (U_I)tmp;
+			}
+
 			if(! tools_my_atoi(split[1].c_str(), tmp))
 			    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
 			else
+			{
+			    if(tmp < 1)
+				throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
 			    p.multi_threaded_compress = (U_I)tmp;
+			}
 			break;
 		    default:
 			throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
