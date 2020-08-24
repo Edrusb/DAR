@@ -296,11 +296,6 @@ namespace libdar
 	virtual bool truncatable(const infinint & pos) const override;
         virtual infinint get_position() const override;
 
-	    // my own methods
-
-	U_I get_uncompressed_block_size() const { return uncompressed_block_size; };
-	void change_uncompressed_block_size(U_I bs) { uncompressed_block_size = bs; };
-
     protected :
 	virtual void inherited_read_ahead(const infinint & amount) override { if(!suspended) run_read_threads(); };
         virtual U_I inherited_read(char *a, U_I size) override;
