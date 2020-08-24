@@ -146,6 +146,7 @@ namespace libdar
 	case gf_write_only:
 	    if(!current->clear_data.is_empty())
 		throw SRC_BUG;
+	    break;
 	case gf_read_write:
 	    throw SRC_BUG;
 	default:
