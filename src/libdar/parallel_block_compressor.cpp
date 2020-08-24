@@ -865,6 +865,10 @@ namespace libdar
 	    if(!writer)
 		throw SRC_BUG;
 
+	    running_threads = false;
+		// change the flag before calling join()
+		// as they may trigger an exception
+
 	    if(writer->is_running())
 	    {
 
@@ -874,8 +878,6 @@ namespace libdar
 		for(deque<zip_worker>::iterator it = travailleurs.begin(); it !=travailleurs.end(); ++it)
 		    it->join();
 	    }
-
-	    running_threads = false;
 	}
     }
 
