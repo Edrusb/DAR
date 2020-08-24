@@ -20,12 +20,8 @@
 /*********************************************************************/
 
     /// \file block_compressor.hpp
-    /// \brief provide per block compression/decompression (single thread)
+    /// \brief provide per block compression/decompression independant from libthreadar but single threaded
     /// \ingroup Private
-
-    /// Several classes are defined here:
-    /// - class block_compressor, which has similar interface and behavior as class compressor but compresses a
-    ///   data of a file per block of given size
 
 
 #ifndef BLOCK_COMPRESSOR_HPP
