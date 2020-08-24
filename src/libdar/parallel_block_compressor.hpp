@@ -44,6 +44,7 @@
 #include "heap.hpp"
 #include "compress_module.hpp"
 #include "proto_compressor.hpp"
+
 #include <libthreadar/libthreadar.hpp>
 
 namespace libdar

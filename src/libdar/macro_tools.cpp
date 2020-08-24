@@ -65,9 +65,10 @@ extern "C"
 #include "tools.hpp"
 #include "compressor.hpp"
 #include "lz4_module.hpp"
-#include "parallel_block_compressor.hpp"
+#include "block_compressor.hpp"
 
 #ifdef LIBTHREADAR_AVAILABLE
+#include "parallel_block_compressor.hpp"
 #include "parallel_tronconneuse.hpp"
 #endif
 
@@ -846,10 +847,21 @@ namespace libdar
 		if(!ibs.is_zero())
 		    throw Erange("macro_tools_open_layers", gettext("compression block size used in the archive exceed integer capacity of the current system"));
 
-		tmp = new (nothrow) parallel_block_compressor(multi_threaded_compress,
-							      move(make_compress_module_ptr(ver.get_compression_algo(), 9)), // compression level is not used here
-							      *(stack.top()),
-							      compr_bs);
+		if(multi_threaded_compress > 1)
+		{
+#if LIBTHREADAR_AVAILABLE
+		    tmp = new (nothrow) parallel_block_compressor(multi_threaded_compress,
+								  move(make_compress_module_ptr(ver.get_compression_algo(), 9)), // compression level is not used here
+								  *(stack.top()),
+								  compr_bs);
+#else
+		    throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for block compression"));
+#endif
+		}
+		else
+		    tmp = new (nothrow) block_compressor(move(make_compress_module_ptr(ver.get_compression_algo(), 9)), // compression level is not used here
+							 *(stack.top()),
+							 compr_bs);
 	    }
 
 	    if(tmp == nullptr)
@@ -1549,10 +1561,23 @@ namespace libdar
 		if(compression_block_size == 0)
 		    tmp = new (nothrow) compressor(algo, *(layers.top()), compression_level);
 		else
-		    tmp = new (nothrow) parallel_block_compressor(multi_threaded_compress,
-								  move(make_compress_module_ptr(algo, compression_level)),
-								  *(layers.top()),
-								  compression_block_size);
+		{
+		    if(multi_threaded_compress > 1)
+		    {
+#if LIBTHREADAR_AVAILABLE
+			tmp = new (nothrow) parallel_block_compressor(multi_threaded_compress,
+								      move(make_compress_module_ptr(algo, compression_level)),
+								      *(layers.top()),
+								      compression_block_size);
+#else
+			throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for block compression"));
+#endif
+		    }
+		    else
+			tmp = new (nothrow) block_compressor(move(make_compress_module_ptr(algo, compression_level)), // compression level is not used here
+							     *(layers.top()),
+							     compression_block_size);
+		}
 
 		if(tmp == nullptr)
 		    throw Ememory("op_create_in_sub");
