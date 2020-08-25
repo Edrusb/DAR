@@ -171,7 +171,7 @@ namespace libdar
 	}
 	else
 	{
-	    U_I ret;
+	    U_I ret = 0;
 
 	    while(ret < size && ! reof)
 	    {
