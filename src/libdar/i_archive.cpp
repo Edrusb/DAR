@@ -528,6 +528,8 @@ namespace libdar
 	catalogue *ref_cat2 = nullptr;
 	shared_ptr<archive> ref_arch2 = options.get_auxiliary_ref();
 	compression algo_kept = compression::none;
+	U_I comp_bs_kept = 0;
+	infinint i_comp_bs_kept;
 	shared_ptr<entrepot> sauv_path_t = options.get_entrepot();
 
 	cat = nullptr;
@@ -609,7 +611,8 @@ namespace libdar
 			    throw SRC_BUG;
 			ref_cat1 = ref_arch1->pimpl->cat;
 			ref_cat2 = ref_arch2->pimpl->cat;
-			if(ref_arch1->pimpl->ver.get_compression_algo() != ref_arch2->pimpl->ver.get_compression_algo()
+			if((ref_arch1->pimpl->ver.get_compression_algo() != ref_arch2->pimpl->ver.get_compression_algo()
+			    || ref_arch1->pimpl->ver.get_compression_block_size() != ref_arch2->pimpl->ver.get_compression_block_size())
 			   && ref_arch1->pimpl->ver.get_compression_algo() != compression::none
 			   && ref_arch2->pimpl->ver.get_compression_algo() != compression::none
 			   && options.get_keep_compressed())
@@ -622,13 +625,22 @@ namespace libdar
 			throw SRC_BUG;
 
 		    algo_kept = ref_arch1->pimpl->ver.get_compression_algo();
+		    i_comp_bs_kept = ref_arch1->pimpl->ver.get_compression_block_size();
 		    if(algo_kept == compression::none && ref_cat2 != nullptr)
 		    {
 			if(!ref_arch2)
 			    throw SRC_BUG;
 			else
+			{
 			    algo_kept = ref_arch2->pimpl->ver.get_compression_algo();
+			    i_comp_bs_kept = ref_arch2->pimpl->ver.get_compression_block_size();
+			}
 		    }
+
+		    comp_bs_kept = 0;
+		    i_comp_bs_kept.unstack(comp_bs_kept);
+		    if(!i_comp_bs_kept.is_zero())
+			throw Erange("archive::i_archive::i_archive(merge)", gettext("compression block size used in the archive exceed integer capacity of the current system"));
 		}
 
 		if(ref_cat1 == nullptr)
@@ -665,7 +677,7 @@ namespace libdar
 				 options.get_empty_dir(),
 				 options.get_keep_compressed() ? algo_kept : options.get_compression(),
 				 options.get_compression_level(),
-				 options.get_compression_block_size(),
+				 options.get_keep_compressed() ? comp_bs_kept : options.get_compression_block_size(),
 				 options.get_slice_size(),
 				 options.get_first_slice_size(),
 				 options.get_ea_mask(),
