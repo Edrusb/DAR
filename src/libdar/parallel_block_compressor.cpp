@@ -878,6 +878,9 @@ namespace libdar
 
     void parallel_block_compressor::stop_write_threads()
     {
+	if(curwrite && curwrite->clear_data.get_data_size() > 0)
+	    inherited_sync_write();
+
 	if(running_threads)
 	{
 	    if(!writer)
@@ -889,7 +892,6 @@ namespace libdar
 
 	    if(writer->is_running())
 	    {
-
 		send_flag_to_workers(compressor_block_flags::eof_die);
 
 		writer->join();
