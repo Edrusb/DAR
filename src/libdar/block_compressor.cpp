@@ -96,7 +96,7 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	return compressed->skippable(direction, amount);
+	return suspended ? compressed->skippable(direction, amount) : throw SRC_BUG;
     }
 
     bool block_compressor::skip(const infinint & pos)
