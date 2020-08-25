@@ -6,6 +6,9 @@ from 2.6.10 to 2.6.11
 - updated lax mode to ignore encryption flag found in header and trailter
 - fixed two opposite bugs in strong encryption code that anihiliate
   each other, by chance
+- fixing bug met when merging an archive an recompressing the data
+  with another algorithm that gives a less good result, this condition
+  lead the merging operation to fail reporting a CRC mismatch
 
 from 2.6.9 to 2.6.10
 - update the configure script to handle some undocumented --enable-*
