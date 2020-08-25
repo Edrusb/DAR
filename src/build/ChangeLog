@@ -16,6 +16,10 @@ from 2.6.x to 2.7.0
 - replaced old and experimental multi-threaded implementation, -G option
   now needs an argument on command line. New methods added in libdar API
   accordingly.
+- added multi-threaded compression when using the new per block
+  compression mode, the legacy streaming compression mode is still
+  available (see both -G and -z option extended syntax).
+- added lz4 compression algorithm.
 
 
 from 2.6.9 to 2.6.10
