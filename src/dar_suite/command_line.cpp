@@ -320,7 +320,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.no_compare_symlink_date = true;
     p.scope = all_fsa_families();
     p.multi_threaded_crypto = 1;
-    p.multi_threaded_compress = 1;
+    p.multi_threaded_compress = 0;
     p.delta_sig = false;
     p.delta_mask = nullptr;
     p.delta_diff = true;
@@ -804,6 +804,23 @@ bool get_args(shared_ptr<user_interaction> & dialog,
 
         if(!p.alter_atime)
             p.security_check = false;
+
+	    ////////////////////////////////
+            // multi-thread helpers
+            //
+            //
+
+	if(p.compression_block_size > 0 && p.multi_threaded_compress == 0)
+	{
+	    if(!compile_time::libthreadar())
+		p.multi_threaded_compress = 1;
+	    else
+	    {
+		dialog->message(gettext("block compression will use 2 worker threads by default, use -G option remove this message and set the number of threads you want"));
+		p.multi_threaded_compress = 2;
+	    }
+	}
+
 
     }
     catch(Erange & e)
