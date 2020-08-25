@@ -102,9 +102,10 @@ namespace libdar
 
 	    // initialized by the init_fields() method
 
-	bool suspended;                                        ///< whether compression is suspended or not
-	std::unique_ptr<crypto_segment> current;               ///< current block under construction or exploitation
-	bool reof;                                             ///< whether we have hit the end of file while reading
+	bool suspended;                           ///< whether compression is suspended or not
+	bool need_eof;                            ///< whether a zero size block need to be added
+	std::unique_ptr<crypto_segment> current;  ///< current block under construction or exploitation
+	bool reof;                                ///< whether we have hit the end of file while reading
 
 	    // private methods
 

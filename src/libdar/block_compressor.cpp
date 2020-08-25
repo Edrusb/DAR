@@ -106,6 +106,7 @@ namespace libdar
 
 	current->reset();
 	reof = false;
+	need_eof = false;
 	return compressed->skip(pos);
     }
 
@@ -116,6 +117,7 @@ namespace libdar
 
 	current->reset();
 	reof = false;
+	need_eof = false;
 	return compressed->skip_to_eof();
     }
 
@@ -126,6 +128,7 @@ namespace libdar
 
 	current->reset();
 	reof = false;
+	need_eof = false;
 	return skip_relative(x);
     }
 
@@ -204,6 +207,8 @@ namespace libdar
 		if(current->clear_data.is_full())
 		    compress_and_write_current();
 	    }
+	    if(size > 0)
+		need_eof = true;
 	}
     }
 
@@ -223,8 +228,12 @@ namespace libdar
 	    throw SRC_BUG;
 
 	compress_and_write_current();
-	tmp = 0;
-	tmp.dump(*compressed); // adding EOF null block size
+	if(need_eof)
+	{
+	    tmp = 0;
+	    tmp.dump(*compressed); // adding EOF null block size
+	    need_eof = false;
+	}
     }
 
     void block_compressor::inherited_terminate()
@@ -262,6 +271,7 @@ namespace libdar
 	    // initializing simple fields not set by constructors
 
 	suspended = false;
+	need_eof = false;
 	current = make_unique<crypto_segment>(compr_bs, uncompressed_block_size);
 	reof = false;
     }
