@@ -44,22 +44,27 @@ namespace libdar
 	/// any backward compatibility.
     enum class compression
     {
-	none = 'n',  ///< no compression
-	gzip = 'z',  ///< gzip compression
-	bzip2 = 'y', ///< bzip2 compression
-	lzo = 'l',   ///< lzo compression
-	xz = 'x',     ///< lzma compression
-	lzo1x_1_15 = 'j', ///< lzo degraded algo corresponding to lzop -1
-        lzo1x_1 = 'k', ///< lzo degraded algo corresponding to lzo -2 to lzo -6
-        zstd = 'd'  ///< zstd compression
+	none = 'n',        ///< no compression
+	gzip = 'z',        ///< gzip compression (streamed)
+	bzip2 = 'y',       ///< bzip2 compression (streamed)
+	lzo = 'l',         ///< lzo compression (streamed)
+	xz = 'x',          ///< lzma compression (streamed)
+	lzo1x_1_15 = 'j',  ///< lzo degraded algo corresponding to lzop -1
+        lzo1x_1 = 'k',     ///< lzo degraded algo corresponding to lzo -2 to lzo -6
+        zstd = 'd',        ///< zstd compression
+	lz4 = 'q',         ///< lz4 (streamed)
     };
 
 
 	/// convert a char as stored in archive to its compression value
     extern compression char2compression(char a);
 
+	/// return true if compression mode is per_block or false if
+	/// this is a streamed compression
+    extern bool char2compression_mode(char a);
+
 	/// convert a compression value to a char for storing in archive
-    extern char compression2char(compression c);
+    extern char compression2char(compression c, bool per_block = false);
 
 	/// convert a compression to its string representation
     extern std::string compression2string(compression c);

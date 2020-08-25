@@ -132,6 +132,17 @@ namespace libdar
 #endif
 	}
 
+
+	bool liblz4() noexcept
+	{
+#if LIBLZ4_AVAILABLE
+	    return true;
+#else
+	    return false;
+#endif
+	}
+
+
 	bool libgcrypt() noexcept
 	{
 #if CRYPTO_AVAILABLE

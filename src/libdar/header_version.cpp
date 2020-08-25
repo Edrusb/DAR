@@ -55,6 +55,7 @@ namespace libdar
 	iteration_count = PRE_FORMAT_10_ITERATION;
 	kdf_hash = hash_algo::sha1; // used by default
 	salt = "";
+	compr_bs = 0;
     }
 
     void header_version::read(generic_file & f, user_interaction & dialog, bool lax_mode)
@@ -316,6 +317,11 @@ namespace libdar
 	    kdf_hash = hash_algo::sha1;
 	}
 
+	if((flag & FLAG_HAS_COMPRESS_BS) != 0)
+	    compr_bs.read(f);
+	else
+	    compr_bs = 0;
+
 	ctrl = f.get_crc();
 	if(ctrl == nullptr)
 	    throw SRC_BUG;
@@ -414,6 +420,9 @@ namespace libdar
 	if(salt.size() > 0)
 	    flag[1] |= (FLAG_HAS_KDF_PARAM >> 8);
 
+	if(compr_bs > 0)
+	    flag[1] |= (FLAG_HAS_COMPRESS_BS >> 8);
+
 	if(flag[1] > 0)
 	    flag[1] |= FLAG_HAS_AN_EXTENDED_SIZE;
 	    // and we will drop two bytes for the flag
@@ -456,6 +465,9 @@ namespace libdar
 	    iteration_count.dump(f);
 	    f.write((char *)&tmp_hash, 1);
 	}
+
+	if(compr_bs > 0)
+	    compr_bs.dump(f);
 
 	ctrl = f.get_crc();
 	if(ctrl == nullptr)
@@ -509,6 +521,7 @@ namespace libdar
 
 	dialog.printf(gettext("Archive version format               : %s"), get_edition().display().c_str());
 	dialog.printf(gettext("Compression algorithm used           : %S"), &algo);
+	dialog.printf(gettext("Compression block size used          : %i"), &compr_bs);
 	dialog.printf(gettext("Symmetric key encryption used        : %S"), &sym_str);
 	dialog.printf(gettext("Asymmetric key encryption used       : %S"), &asym);
 	dialog.printf(gettext("Archive is signed                    : %S"), &xsigned);
@@ -537,6 +550,7 @@ namespace libdar
 	arch_signed = false;
 	iteration_count = PRE_FORMAT_10_ITERATION;
 	kdf_hash = hash_algo::sha1;
+	compr_bs = 0;
     }
 
     void header_version::copy_from(const header_version & ref)
@@ -568,6 +582,7 @@ namespace libdar
 	salt = ref.salt;
 	iteration_count = ref.iteration_count;
 	kdf_hash = ref.kdf_hash;
+	compr_bs = ref.compr_bs;
     }
 
     void header_version::move_from(header_version && ref) noexcept
@@ -585,6 +600,7 @@ namespace libdar
 	salt = move(ref.salt);
 	iteration_count = move(ref.iteration_count);
 	kdf_hash = move(ref.kdf_hash);
+	compr_bs = move(ref.compr_bs);
     }
 
     void header_version::detruit()

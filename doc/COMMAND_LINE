@@ -69,7 +69,7 @@ C + extract catalogue in separated file --isolate
 D - store excluded dir as empty dir     --empty-dir
 E + shell command to launch with slices --execute
 F + shell command to launch with slices of archive of reference   --execute-ref
-G - forbid the use of multi threads when compiled against libthreadar --single-thread
+G + multi-thread management             --multi-thread
 H * if a file for differential backup or diff differs from exactly one hour it is assumed as identical (no change).
 I + include mask                        --include
 J + key for unscrambling the reference catalogue --key-ref

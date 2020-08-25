@@ -29,6 +29,7 @@
 
 #include "../my_config.h"
 #include "integers.hpp"
+#include "compression.hpp"
 
 namespace libdar
 {
@@ -46,6 +47,18 @@ namespace libdar
 	compress_module & operator = (compress_module && ref) noexcept = default;
 	virtual ~compress_module() = default;
 
+	    /// return the compression algorithm used by the module
+	virtual compression get_algo() const = 0;
+
+	    /// returns the maximum size of data to be compressed as a single block
+	virtual U_I get_max_compressing_size() const = 0;
+
+	    /// minimal buffer size to compress clear_size of data for compression to be guaranteed to succeed
+
+	    /// \param[in] clear_size is the size of the data buffer to compress
+	    /// \return the minimal size of the destination buffer for compression to be garanteed to succeed
+	virtual U_I get_min_size_to_compress(U_I clear_size) const = 0;
+
 	    /// compress a block of data
 
 	    /// \param[in] normal points to the first byte of the data block to compress
@@ -53,10 +66,11 @@ namespace libdar
 	    /// \param[in] zip_buf is where to put the resulting compressed data
 	    /// \param[in] zip_buf_size is the allocated bytes at zip_buf address
 	    /// \return the number of bytes effectively used in zip_buf by the compressed data
-	virtual U_32 compress_data(const char *normal,
-				   const U_32 normal_size,
+	    /// \note in case of error a Egeneric based exception should be thrown
+	virtual U_I compress_data(const char *normal,
+				   const U_I normal_size,
 				   char *zip_buf,
-				   U_32 zip_buf_size) = 0;
+				   U_I zip_buf_size) const = 0;
 
 	    /// uncompress a block of data
 
@@ -67,12 +81,14 @@ namespace libdar
 	    /// \return the number of bytes written at normal address that constitute the uncompressed data
 	    /// \note it is expected that the implementation would throw an libdar::Edata() exception
 	    /// on error, like corrupted compressed data submitted for decompression
-	virtual U_32 uncompress_data(const char *zip_buf,
-				     const U_32 zip_buf_size,
+	virtual U_I uncompress_data(const char *zip_buf,
+				     const U_I zip_buf_size,
 				     char *normal,
-				     U_32 normal_size) = 0;
+				     U_I normal_size) const = 0;
 
 	    /// used to duplicate a inherited class of compress_module when it is pointed by a compress_module pointer
+
+	    /// \note this call should provide a pointer to a valid object or throw an exception (Ememory, ...)
 	virtual std::unique_ptr<compress_module> clone() const = 0;
 
     };

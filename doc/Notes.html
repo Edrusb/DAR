@@ -5,15 +5,15 @@
     <title>DAR/LIBDAR Internals - Notes</title>
   </head>
   <body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" vlink="#000055"
-    link="#0000ff" alink="#ff0000">
+	link="#0000ff" alink="#ff0000">
     <center>
       <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
-        cellspacing="2" cellpadding="2" border="0">
+             cellspacing="2" cellpadding="2" border="0">
         <tbody>
           <tr>
             <td style="vertical-align: top; width: 161px;"><a href="index.html"><img
-                  style="border: 0px solid ; width: 160px; height: 120px;" alt="Dar Documentation"
-                  src="dar_s_doc.jpg"></a><br>
+										  style="border: 0px solid ; width: 160px; height: 120px;" alt="Dar Documentation"
+										  src="dar_s_doc.jpg"></a><br>
             </td>
             <td style="vertical-align: top;">
               <h1 style="text-align: center;"><br>
@@ -30,7 +30,7 @@
         <hr style="width: 100%; height: 2px;"></div>
       <br>
       <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
-        cellspacing="2" cellpadding="2" border="0">
+             cellspacing="2" cellpadding="2" border="0">
         <tbody>
           <tr>
             <td style="vertical-align: top;">
@@ -50,21 +50,21 @@
               <h2>Contents</h2>
               <div style="margin-left: 40px;"><a href="#EA_and_diff">EA &amp;
                   differential backup</a><span style="font-weight: bold;"></span><span
-                  style="font-weight: bold;"></span><span style="font-weight: bold;"></span><br>
+										   style="font-weight: bold;"></span><span style="font-weight: bold;"></span><br>
                 <span style="font-weight: bold;"></span><a href="#archive_structure">Archive
-structure
+		  structure
                   in brief</a><br>
                 <span style="font-weight: bold;"></span><a href="#scrambling">Scrambling</a><br>
                 <span style="font-weight: bold;"></span><a href="#overflow">Overflow
-in
+		  in
                   arithmetic integer operations</a><span style="font-weight: bold;"></span><br>
                 <span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span
-                  style="font-weight: bold;"></span><a href="#strong_encryption">Strong
+												  style="font-weight: bold;"></span><a href="#strong_encryption">Strong
                   encryption</a><br>
                 <a href="#thread_safe">libdar and thread-safe requirement</a><span
-                  style="font-weight: bold;"></span><br>
+									       style="font-weight: bold;"></span><br>
                 <span style="font-weight: bold;"></span><a href="#dar_manager_deleted">Dar_manager
-and
+		  and
                   delete files</a><span style="font-weight: bold;"></span><br>
                 <span style="font-weight: bold;"></span><a href="#NLS">Native
                   Language Support / gettext / libintl</a><br>
@@ -74,6 +74,7 @@ and
                   dar/libdar</a><br>
                 <a href="#asym">How asymmetric encryption is performed in
                   dar/libdar</a><br>
+		<a href="#multi-threaded">Multi-threading considerations</a><br/>
                 <br>
               </div>
             </td>
@@ -84,7 +85,7 @@ and
       <hr style="width: 100%; height: 2px;">
       <h3><a name="EA_and_diff"></a></h3>
       <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
-        cellspacing="2" cellpadding="2" border="0">
+             cellspacing="2" cellpadding="2" border="0">
         <tbody>
           <tr>
             <td style="vertical-align: top;">
@@ -175,7 +176,7 @@ and
       <br>
       <hr style="width: 100%; height: 2px;"><a name="archive_structure"></a><br>
       <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
-        cellspacing="2" cellpadding="2" border="0">
+             cellspacing="2" cellpadding="2" border="0">
         <tbody>
           <tr>
             <td style="vertical-align: top;">
@@ -193,7 +194,7 @@ and
                   |Trailer|</code><br>
                 <code>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   |</code><br>
                 <code>+--------+-------------------------------------------+-------+</code><br>
               </div>
@@ -259,7 +260,7 @@ and
                     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
                   <code>+-------+----------+------+-----------+--...-----+-------+<br>
                     <br>
-                  </code></div>
+                </code></div>
               </div>
               <div style="text-align: justify;">
                 <div style="margin-left: 40px;">Each TLV item is, as commonly,
@@ -361,7 +362,7 @@ and
               </div>
               <br>
               <table style="text-align: left; width: 1038px; height: 124px; margin-left: auto; margin-right: 0px;"
-                cellspacing="2" cellpadding="2" border="1">
+                     cellspacing="2" cellpadding="2" border="1">
                 <tbody>
                   <tr>
                     <td style="vertical-align: top; text-align: center; width: 20%; font-weight: bold;">Fields</td>
@@ -369,21 +370,21 @@ and
                       Archive<br>
                     </td>
                     <td style="vertical-align: top; width: 20%; text-align: center; font-weight: bold;">Resliced
-Using
+		      Using
                       dar_xform<br>
                     </td>
                     <td style="vertical-align: top; width: 20%; text-align: center; font-weight: bold;">Resulting
-From
+		      From
                       Isolation<br>
                     </td>
                     <td style="vertical-align: top; text-align: center; width: 20%;">&nbsp;<span
-                        style="font-weight: bold;">isolated archive <br>
+											     style="font-weight: bold;">isolated archive <br>
                         resliced with dar_xform</span><br>
                     </td>
                   </tr>
                   <tr>
                     <td style="vertical-align: top; font-weight: bold;">internal_name
-(slice
+		      (slice
                       header)<br>
                     </td>
                     <td style="vertical-align: top; text-align: center;">A<br>
@@ -397,7 +398,7 @@ From
                   </tr>
                   <tr>
                     <td style="vertical-align: top; font-weight: bold;">data_name
-(slice
+		      (slice
                       header)<br>
                     </td>
                     <td style="vertical-align: top; text-align: center;">A<br>
@@ -411,7 +412,7 @@ From
                   </tr>
                   <tr>
                     <td style="vertical-align: top; font-weight: bold;">data_name
-(archive
+		      (archive
                       catalogue)<br>
                     </td>
                     <td style="vertical-align: top; text-align: center;">A<br>
@@ -438,12 +439,12 @@ From
               <div style="margin-left: 80px;"><code>+---------+----------------------------+-----------+--------+---------+--------+</code><br>
                 <code>| version |&nbsp;&nbsp; Data&nbsp; &nbsp;
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|
+		  |
                   catalogue | term 1 | version | term 2 |<br>
                   | header&nbsp; </code><code>|
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   | trailer |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
                 <code>+---------+----------------------------+-----------+--------+---------+--------+</code><br>
               </div>
@@ -507,7 +508,7 @@ From
                 </code><code>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   | offset | algo&nbsp; | key size | sym. key &nbsp;
                   &nbsp;&nbsp; |&nbsp; slicing &nbsp; | size | (KDF)|
                   count(KDF)|(KDF)|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
@@ -543,7 +544,7 @@ From
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;
                   |&nbsp;&nbsp;&nbsp; | delta sig |&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
                 <code>&nbsp;
-....--+---------------------+-------+----+----+------------+------------+----+-----------+-----+-....</code><br>
+		  ....--+---------------------+-------+----+----+------------+------------+----+-----------+-----+-....</code><br>
                 <code></code></div>
               <div style="margin-left: 40px;">
                 <div style="margin-left: 40px;">in the previous archive example,
@@ -595,7 +596,7 @@ From
                   <code>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|
+		    |
                     size &gt; 0 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
                   <code>+------+------+---------------+----------+--------+</code><br>
                 </div>
@@ -687,7 +688,7 @@ From
                   EA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |Tr|</code><br>
                 <code>| header | header
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;
+		  |&nbsp;
                   |</code><br>
                 <code>+--------+--------+------------------------+--+</code><br>
               </div>
@@ -705,7 +706,7 @@ From
                   &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp; |Tr|</code><br>
                 <code>| header
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;
+		  &nbsp;
                   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
                   &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   |&nbsp; |</code><br>
@@ -718,12 +719,12 @@ From
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   file data +
                   EA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;
+		  &nbsp;
                   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
                   &nbsp; &nbsp; |Tr|</code><br>
                 <code>| header
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;
+		  &nbsp;
                   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
                   &nbsp; &nbsp; |&nbsp; |</code><br>
                 <code>+--------+-----------------------------------------------------------------+--+</code><br>
@@ -735,13 +736,13 @@ From
                   |Tr|</code><br>
                 <code>| header
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   | trailer |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;
                   |</code><br>
                 <code>+--------+---------------------+-----------+-------+---------+--------+--+<br>
                   <br>
-                </code></div>
+              </code></div>
               <div style="text-align: justify; margin-left: 40px;">the last
                 slice is smaller because there was not enough data to make it
                 full.<br>
@@ -755,7 +756,7 @@ From
                 bit more complicated if we consider compression and encryption.
                 The way the problem is addressed in dar's code is a bit like
                 networks are designed in computer science, using the notion of <span
-                  style="text-decoration: underline;">layers</span>. Here, there
+										 style="text-decoration: underline;">layers</span>. Here, there
                 is a additional constraint, a given layer may or may not be
                 present (encryption, compression, slicing for example). So all
                 layer must have the same interface for serving the layer above
@@ -798,13 +799,13 @@ From
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   +----+--+----+-...........+---------+</code><br>
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;
                   | &nbsp;&nbsp;&nbsp;&nbsp;
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   |<br>
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-+-----+
+		  +-----+
                   | +-------+
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   |<br>
@@ -826,7 +827,7 @@ From
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   |</code><br>
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-V
+		  V
                   &nbsp; V&nbsp;&nbsp;&nbsp; V &nbsp; &nbsp;&nbsp;
                   V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   V</code><br>
@@ -839,10 +840,10 @@ V
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   +-----------------------------------+</code><br>
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   |<br>
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   |<br>
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   V
@@ -855,41 +856,41 @@ V
                 </code><code>(optional)&nbsp;&nbsp;&nbsp;
                   +-----------------------------------+</code><br>
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   / First Terminateur</code><br>
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   |</code><br>
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   V</code><br>
                 <code>elastic&nbsp; +---+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   +----+---+</code><br>
                 <code>buffers&nbsp; |EEE|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   | T1 |EEE|</code><br>
                 <code>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
                   +---+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   +----+---+</code><br>
                 <code>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   Second </code><br>
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   Terminator</code><br>
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   +--------------------------------------------------+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -903,23 +904,23 @@ V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   +--------------------------------------------------+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   V</code><br>
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  </code><code>+---------+----+</code><br>
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </code><code>+---------+----+</code><br>
                 <code>+-------+&nbsp;
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  </code><code>| trailer | T2 |</code><br>
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </code><code>| trailer | T2 |</code><br>
                 <code>|
                   header|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  </code><code>+---------+----+<br>
+		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </code><code>+---------+----+<br>
                   +-------+
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;
+		  |&nbsp;&nbsp;&nbsp;
                   &nbsp;
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
@@ -931,13 +932,13 @@ V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 </code> <code>&nbsp;&nbsp;&nbsp; V
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-V
+		  V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  V
                   &nbsp;&nbsp;&nbsp;&nbsp; v<br>
                 </code><code>+-----------------------------------------------------------------------------+</code><br>
                 <code>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;
+		  data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  &nbsp;
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
                 <span style="font-family: monospace;">+</span><code>-----------------------------------------------------------------------------+</code><br>
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -982,13 +983,13 @@ data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs
                   V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V</code><br>
                 <code>+---------+&nbsp; +---------+&nbsp; +---------+&nbsp;
                   +---------+&nbsp; +-------+&nbsp; </code><code>+-------+&nbsp;
-                  </code><code>+----+</code><br>
+                </code><code>+----+</code><br>
                 <code>|HH| data |&nbsp; |HH| data |&nbsp; |HH| data |&nbsp; |HH|
                   data |&nbsp; |HH|data|&nbsp; </code><code>|HH|data|&nbsp; </code><code>|HH|
                   |</code><br>
                 <code>+---------+&nbsp; +---------+&nbsp; +---------+&nbsp;
                   +---------+&nbsp; +-------+&nbsp; </code><code>+-------+&nbsp;
-                  </code><code>+----+</code><br>
+                </code><code>+----+</code><br>
                 <code>&nbsp; slice 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; slice
                   2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; slice
                   3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; slice
@@ -1024,7 +1025,7 @@ data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs
                 <div style="margin-left: 40px;"><code>972037219&gt;20&lt;8172839</code><br>
                   <code><br>
                     <br>
-                  </code></div>
+                </code></div>
               </div>
               <div style="margin-left: 40px; text-align: justify;">For clarity,
                 the size field between '&gt;' and '&lt;' has been written in
@@ -1050,7 +1051,7 @@ data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs
       <br>
       <hr style="width: 100%; height: 2px;"><a name="scrambling"></a>
       <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
-        cellspacing="2" cellpadding="2" border="0">
+             cellspacing="2" cellpadding="2" border="0">
         <tbody>
           <tr>
             <td style="vertical-align: top;">
@@ -1147,7 +1148,7 @@ data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs
       <br>
       <hr style="width: 100%; height: 2px;"><br>
       <table style="text-align: left; width: 90%;" cellspacing="2" cellpadding="2"
-        border="0">
+             border="0">
         <tbody>
           <tr>
             <td style="vertical-align: top;">
@@ -1220,7 +1221,7 @@ data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs
       </table>
       <hr style="width: 100%; height: 2px;"><a name="overflow"></a><br>
       <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
-        cellspacing="2" cellpadding="2" border="0">
+             cellspacing="2" cellpadding="2" border="0">
         <tbody>
           <tr>
             <td style="vertical-align: top;">
@@ -1310,7 +1311,7 @@ data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs
       <br>
       <hr style="width: 100%; height: 2px;"><a name="strong_encryption"></a><br>
       <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
-        cellspacing="2" cellpadding="2" border="0">
+             cellspacing="2" cellpadding="2" border="0">
         <tbody>
           <tr>
             <td style="vertical-align: top;">
@@ -1448,7 +1449,7 @@ data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs
       <br>
       <hr style="width: 100%; height: 2px;"><a name="thread_safe"></a><br>
       <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
-        cellspacing="2" cellpadding="2" border="0">
+             cellspacing="2" cellpadding="2" border="0">
         <tbody>
           <tr>
             <td style="vertical-align: top;">
@@ -1499,7 +1500,7 @@ data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs
       </table>
       <hr style="width: 100%; height: 2px;"><a name="dar_manager_deleted"></a>
       <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
-        cellspacing="2" cellpadding="2" border="0">
+             cellspacing="2" cellpadding="2" border="0">
         <tbody>
           <tr>
             <td style="vertical-align: top;">
@@ -1634,7 +1635,7 @@ data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs
       <br>
       <hr style="width: 100%; height: 2px;"><a name="NLS"></a><br>
       <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
-        cellspacing="2" cellpadding="2" border="0">
+             cellspacing="2" cellpadding="2" border="0">
         <tbody>
           <tr>
             <td style="vertical-align: top;">
@@ -1687,15 +1688,15 @@ data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs
       <hr style="width: 100%; height: 2px;"><br>
     </center>
     <table style="width: 90%; margin-right: auto; margin-left: auto; text-align: left;"
-      cellspacing="2" cellpadding="2" border="0">
+	   cellspacing="2" cellpadding="2" border="0">
       <tbody>
         <tr>
           <td style="vertical-align: top;">
             <h3><span style="font-weight: bold;"><a name="Dar_relase_Process_in_brief"></a>Dar
                 Release Process<br>
-              </span></h3>
+            </span></h3>
             <div style="text-align: justify;"><span style="font-weight: bold;"></span><span
-                style="text-decoration: underline;">Development Phase:</span><br>
+											style="text-decoration: underline;">Development Phase:</span><br>
               Dar receive new features during the development phase, at this
               stage sources are modified and tested after each feature addition.
               The development sources are stored in a <a href="http://sourceforge.net/p/dar/code/">GIT
@@ -1716,7 +1717,7 @@ data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs
               phase, this phase starts and ends by a email to the dar-news
               mailing-list. At this period intensive test is done on the
               pre-release source, feedback and information about <a href="http://dar.linux.free.fr/pre-release">new
-pre-release
+		pre-release
                 packages</a> are exchanged through the <a href="http://lists.sourceforge.net/lists/listinfo/dar-pre-release">pre-release
                 mailing-list</a>, this mailing-list lives only during the
               pre-release phases and is not archived, nor visible through a mail
@@ -1727,7 +1728,7 @@ pre-release
               <span style="text-decoration: underline;">Release Phase:</span><br>
               Some little time after pre-release has ended, a first package is
               released (last number version is zero) and <a href="http://sourceforge.net/project/showfiles.php?group_id=65612">available
-at
+		at
                 sourceforge</a> for download. This phase also begins by an email
               to dar-news mailing-list. During that phase, users may report
               bugs/problem about the released software,&nbsp; depending on the
@@ -1745,7 +1746,7 @@ at
             </span>
             <h3><span style="font-weight: bold;"><a name="Dar_version_naming"></a>Dar's
                 Versions<br>
-              </span></h3>
+            </span></h3>
             <span style="font-weight: bold;"></span>
             <h4>package release version</h4>
             <div style="text-align: justify;">Dar packages are release during
@@ -1830,7 +1831,7 @@ at
     </table>
     <br>
     <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
-      cellspacing="2" cellpadding="2" border="1">
+	   cellspacing="2" cellpadding="2" border="1">
       <tbody>
         <tr>
           <td style="vertical-align: top; width: 15%; font-weight: bold; text-align: center;">Date<br>
@@ -1840,10 +1841,10 @@ at
             dar version)<br>
           </td>
           <td style="vertical-align: top; text-align: center; width: 10px;"><span
-              style="font-weight: bold;">Archive format</span><br>
+									      style="font-weight: bold;">Archive format</span><br>
           </td>
           <td style="vertical-align: top; text-align: center; width: 10px;"><span
-              style="font-weight: bold;">Database</span><br style="font-weight: bold;">
+									      style="font-weight: bold;">Database</span><br style="font-weight: bold;">
             <span style="font-weight: bold;">Format</span><br>
           </td>
           <td style="vertical-align: top; width: 10%; font-weight: bold; text-align: center;">libdar
@@ -3699,7 +3700,7 @@ at
     <br>
     <hr style="width: 100%; height: 2px;"><br>
     <table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;"
-      cellspacing="2" cellpadding="2" border="0">
+	   cellspacing="2" cellpadding="2" border="0">
       <tbody>
         <tr>
           <td style="vertical-align: top;">
@@ -3799,7 +3800,7 @@ at
                 -----------------------------&gt; main key handle<br>
                 algorithm
                 -+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-^&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		^&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 +---&gt; max key
@@ -3807,16 +3808,16 @@ at
                 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 password ------&gt; [ pkcs5 ] --&gt; hashed_password
                 ------------+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -3827,80 +3828,80 @@ v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&
                 |<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 salt
                 ----------------+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 ^&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-[
+		[
                 SHA1/SHA256
                 ]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 hash algo
                 -----------+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 ^&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-essiv_password&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		essiv_password&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 iteration count
                 -----+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-[
+		[
                 Blowfish/AES256 in ECB mode
                 ]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-essiv
+		essiv
                 key
                 handle&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;
+		|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		|&nbsp;&nbsp;&nbsp;&nbsp;
                 Initialization<br>
                 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .|. .
                 . . . . . . . . . . . . . | . . . . . . . . . .<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 block_number_in_archive ----------------------------&gt; [
                 encrypt ] ------&gt; IV
                 -----+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 |<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 v<br>
                 data
                 ------------------------------------------------------------------------&gt;
@@ -3917,7 +3918,7 @@ v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     <br>
     <hr style="width: 100%; height: 2px;"><br>
     <table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;"
-      cellspacing="2" cellpadding="2" border="0">
+	   cellspacing="2" cellpadding="2" border="0">
       <tbody>
         <tr>
           <td style="vertical-align: top;">
@@ -3987,5 +3988,94 @@ v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     </table>
     <br>
     <br>
+    <hr style="width: 100%; height: 2px;"><br>
+    <table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;"
+	   cellspacing="2" cellpadding="2" border="0">
+      <tbody>
+        <tr>
+          <td style="vertical-align: top;">
+	    <h3><a name="multi-threaded">Multi-threading considerations</a></h3>
+	    <h4>Ciphering</h4>
+	    <div style="text-align: justify;">
+	      The ciphering in dar/libdar is performed by large block of data (see -# option
+	      and consorts), it was
+	      thus possible to parallelize the ciphering/deciphering operation assigning
+	      different blocks to different threads without changing the archive format.
+	      The measured performance gain is quite good, but usually hidden by the compression load. To assign blocks
+	      to worker threads (those that compute the ciphering algorithm), two helper
+	      threads are needed: one that copy data into block of memory and scatters it to
+	      workers for they can work in total autonomy, and another one that gather the resulting block of
+	      memory in the correct order.
+	      <p/>
+	      If performance gain is present and no change in the archive format was necessary to leverage multi-threading
+	      for ciphering/deciphering, however, this has some impact on memory usage
+	      required by dar. Each thread will need a pair of blocks (one for the clear
+	      data, one for the ciphered equivalent). In addition, the gathering
+	      and scattering structures of blocks to/from the workers (which we will globally
+	      design under the term <i>ratelier</i> can hold each N block of memory
+	      (N being the number of workers) in fact the size of these
+	      structures has been chosen a bit wider: N+N/2. Last the helper thread that
+	      feeds data to the worker may hold one pair of block under construction,
+	      and the gathering thread may obtain from the ratelier_gather a whole structure (N+N/2 blocks)
+	      to work with. For N worker, the number of memory block is N+N/2 for each ratelier
+	      plus N for each worker, plus N+N/2 for the gathering thread and one for the scattering thread,
+	      which makes around 7*N blocks of additional memory requirement. Concretely, having 5 threads with
+	      encryption block of 10240 bytes (10 KiB) leads dar to allocate 350 KiB (7x5x10) of additional
+	      memory compared to the single threaded implementation.
+	    </div>
+	    <h4>Compression</h4>
+	    <div style="text-align: justify;">
+	      For compression, things have been more complicated, as before release 2.7.0 compression was done
+	      per file in streaming mode. That's to say dar has to provide a sequential flow of bytes to the compression
+	      library and at the same time retrieve the compression/decompression counterpart. The API provided
+	      by the different libraries (libz, libbzip2, liblzo2, liblzma5, libzstd, liblz4) do not provide
+	      multi-threaded approach for this mode of compressing data, however this gives the best compression
+	      ratio you can expect for a given file and a given compression algorithm and compression level.
+	      <p/>
+	      Before 2.7.0 parallelization had been tried but with little success by running compression and
+	      encryption in different threads. Usually one of the thread spends most of its time waiting for
+	      the other and the overall performance gain is little due to the added overhead. This scheme
+	      has been completely abandoned to the one exposed above for encryption. To extend this method
+	      to compression, we have to change the mode of compression, from the legacy streaming one to a
+	      block approach. Note that with release 2.7.0 both mode will coexist, and you will still be able
+	      to read old archive and generate new one with old single thread/streaming approach.
+	      <p/>
+	      The result is quite similar to the encryption approach, a set of worker proceed to the compression
+	      or decompression of one block at a time and two helper threads feed on one side and gather the
+	      result on the other side. In block compression mode, the compressed file's content is no more
+	      a flow of unstructured data that would be fed to the decompression engine, but a sequence of compressed
+	      block proceeded by the size of the compressed block:
+	    </div>
+	    <code>
+	      +------------+---------------------+------------+-----------------+-----+----------------------+<br/>
+              | block size | compressed data ... | block size | compressed data | ... | block size = 0 (EOF) |<br/>
+	      +------------+---------------------+------------+-----------------+-----+----------------------+<br/>
+	    </code>
+	    <p/>
+	    <div style="text-align: justify;">
+	      The consequence is a less good compression ratio when the block size is chosen too small and a memory
+	      requirement increase as described above for the parallel encryption. Choosing a block size
+	      of 102400 bytes (see extended syntax of -z option) with 4 threads (see -G option) will lead libdar to
+	      allocated 2800 KiB (~ 2.7 GiB) in addition
+	      to what libdar already uses for single thread approach. If you use both parallel encryption and parallel
+	      compression at the same time you have to sum the additional memory requirements of each feature.
+	    </div>
+
+	    <h4>Command-line</h4>
+	    <div style="text-align: justify;">
+	      The thread number for both encryption and compression is driven by the -G option. See man page
+	      for details. Note that, as described above, multi-threaded compression/decompression is only
+	      possible with the new compression per block method, which means you have to specify a compression block
+	      size (see -z option).
+	    </div>
+	    <p/>
+	    <br/>
+	    <br/>
+	  </td>
+	</tr>
+      </tbody>
+    </table>
+
+
   </body>
 </html>

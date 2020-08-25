@@ -129,7 +129,12 @@ static void show_license(user_interaction & dialog);
 static void show_warranty(user_interaction & dialog);
 static void show_version(user_interaction & dialog, const char *command_name);
 static void usage(user_interaction & dialog, const char *command_name);
-static void split_compression_algo(const char *arg, compression & algo, U_I & level);
+static void split_compression_algo(const char *arg,     ///< input string to analyse
+				   U_I base,            ///< base value for number suffix
+				   compression & algo,  ///< returned compression algorithm
+				   U_I & level,         ///< returned compression level
+				   U_I & block_size     ///< returned compression block size
+    );
 static fsa_scope string_to_fsa(const string & arg);
 
 #if HAVE_GETOPT_LONG
@@ -249,6 +254,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.display_masks = false;
     p.algo = compression::none;
     p.compression_level = 9;
+    p.compression_block_size = 0;
     p.pause = 0;
     p.beep = false;
     p.empty_dir = false;
@@ -313,7 +319,8 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.ignore_unknown_inode = false;
     p.no_compare_symlink_date = true;
     p.scope = all_fsa_families();
-    p.multi_threaded_crypto = 1;
+    p.multi_threaded_crypto = 0;
+    p.multi_threaded_compress = 0;
     p.delta_sig = false;
     p.delta_mask = nullptr;
     p.delta_diff = true;
@@ -798,6 +805,30 @@ bool get_args(shared_ptr<user_interaction> & dialog,
         if(!p.alter_atime)
             p.security_check = false;
 
+	    ////////////////////////////////
+            // multi-thread helpers
+            //
+            //
+
+	if(p.compression_block_size > 0 && p.multi_threaded_compress == 0)
+	{
+	    if(!compile_time::libthreadar())
+		p.multi_threaded_compress = 1;
+	    else
+	    {
+		dialog->message(gettext("block compression will use 2 worker threads by default, use -G option remove this message and set the number of threads you want"));
+		p.multi_threaded_compress = 2;
+	    }
+	}
+
+	if(p.multi_threaded_crypto == 0)
+	{
+	    if(!compile_time::libthreadar())
+		p.multi_threaded_crypto = 1;
+	    else
+		p.multi_threaded_crypto = 2;
+	}
+
     }
     catch(Erange & e)
     {
@@ -1002,7 +1033,11 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'z':
                 if(optarg != nullptr)
-                    split_compression_algo(optarg, p.algo, p.compression_level);
+                    split_compression_algo(optarg,
+					   rec.suffix_base,
+					   p.algo,
+					   p.compression_level,
+					   p.compression_block_size);
                 else
                     if(p.algo == compression::none)
                         p.algo = compression::gzip;
@@ -1620,15 +1655,51 @@ static bool get_args_recursive(recursive_param & rec,
             case 'G':
                 if(optarg == nullptr)
                     throw Erange("command_line.cpp:get_arg_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
+
 		if(compile_time::libthreadar())
 		{
-		    if(! tools_my_atoi(optarg, tmp))
+		    deque<string> split;
+		    line_tools_split(string(optarg), ',' , split);
+
+		    switch(split.size())
+		    {
+		    case 1:
+			if(! tools_my_atoi(optarg, tmp))
+			    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+			else
+			{
+			    if(tmp < 1)
+				throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+			    p.multi_threaded_crypto = (U_I)tmp;
+			    p.multi_threaded_compress = (U_I)tmp;
+			}
+			break;
+		    case 2:
+			if(! tools_my_atoi(split[0].c_str(), tmp))
+			    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+			else
+			{
+			    if(tmp < 1)
+				throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+			    p.multi_threaded_crypto = (U_I)tmp;
+			}
+
+			if(! tools_my_atoi(split[1].c_str(), tmp))
+			    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+			else
+			{
+			    if(tmp < 1)
+				throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+			    p.multi_threaded_compress = (U_I)tmp;
+			}
+			break;
+		    default:
 			throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
-		    else
-			p.multi_threaded_crypto = (U_I)tmp;
+		    }
 		}
 		else
-		    throw Ecompilation(gettext("libthreadar required for multithreaded execution"));
+		    throw Ecompilation(gettext("libthreadar is required for multithreaded execution"));
+
                 break;
             case 'M':
                 if(p.same_fs)
@@ -3218,24 +3289,24 @@ static mask *make_unordered_mask(deque<pre_mask> & listing, mask *(*make_include
     return ret_mask;
 }
 
-static void split_compression_algo(const char *arg, compression & algo, U_I & level)
+static void split_compression_algo(const char *arg, U_I base, compression & algo, U_I & level, U_I & block_size)
 {
     if(arg == nullptr)
         throw SRC_BUG;
     else
     {
         string working = arg;
-        string::iterator it = working.begin();
+	deque<string> split;
+	infinint tmp;
 
-        while(it != working.end() && *it != ':')
-            it++;
+	line_tools_split(working, ':', split);
 
-        if(it == working.end()) // no ':' found in string
-        {
-            if(!tools_my_atoi(working.c_str(), level))
+	switch(split.size())
+	{
+	case 1:
+	    if(!tools_my_atoi(working.c_str(), level))
             {
                     // argument to -z is not an integer, testing whether this is an algorithm
-
                 try
                 {
                     algo = string2compression(working.c_str());
@@ -3248,25 +3319,48 @@ static void split_compression_algo(const char *arg, compression & algo, U_I & le
             }
             else // argument is a compression level, algorithm is gzip by default
                 algo = compression::gzip;
-        }
-        else // a ':' has been found and "it" points to it
-        {
-            string first_part = string(working.begin(), it);
-            string second_part = string(it+1, working.end());
 
-            if(first_part != "")
-                algo = string2compression(first_part);
-            else
-                algo = compression::gzip; // default algorithm
+	    block_size = 0;
+	    break;
+	case 2:
+	    if(split[0] != "")
+		algo = string2compression(split[0]);
+	    else
+		algo = compression::gzip; // default algorithm
 
-            if(second_part != "")
-            {
-                if(!tools_my_atoi(second_part.c_str(), level) || (level > 9 && algo != compression::zstd) || level < 1)
-                    throw Erange("split_compression_algo", gettext("Compression level must be between 1 and 9, included"));
-            }
-            else
-                level = 9; // default compression level
-        }
+	     if(split[1] != "")
+	    {
+		if(!tools_my_atoi(split[1].c_str(), level) || (level > 9 && algo != compression::zstd) || level < 1)
+		    throw Erange("split_compression_algo", gettext("Compression level must be between 1 and 9, included"));
+	    }
+	    else
+		level = 9; // default compression level
+
+	    block_size = 0;
+	    break;
+	case 3:
+	    if(split[0] != "")
+		algo = string2compression(split[0]);
+	    else
+		algo = compression::gzip;
+
+	    if(split[1] != "")
+	    {
+		if(!tools_my_atoi(split[1].c_str(), level) || (level > 9 && algo != compression::zstd) || level < 1)
+		    throw Erange("split_compression_algo", gettext("Compression level must be between 1 and 9, included"));
+	    }
+	    else
+		level = 9;
+
+	    tmp = tools_get_extended_size(split[2], base);
+	    block_size = 0;
+	    tmp.unstack(block_size);
+	    if(!tmp.is_zero())
+		throw Erange("split_compression_algo", gettext("Compression block size too large for this operating system"));
+	    break;
+	default:
+	    throw Erange("split_compression_algo", gettext("invalid argument given for compression scheme"));
+	}
     }
 }
 

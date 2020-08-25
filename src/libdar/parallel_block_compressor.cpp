@@ -25,7 +25,7 @@ extern "C"
 {
 }
 
-#include "parallel_compressor.hpp"
+#include "parallel_block_compressor.hpp"
 #include "erreurs.hpp"
 
 using namespace std;
@@ -45,8 +45,7 @@ namespace libdar
     zip_below_write::zip_below_write(const shared_ptr<ratelier_gather<crypto_segment> > & source,
 				     generic_file *dest,
 				     const shared_ptr<heap<crypto_segment> > & xtas,
-				     U_I num_workers,
-				     const infinint & uncompressed_block_size):
+				     U_I num_workers):
 	src(source),
 	dst(dest),
 	tas(xtas),
@@ -63,16 +62,16 @@ namespace libdar
 
 	    // dropping the initial uncompressed_block_size info
 
-	reset(uncompressed_block_size);
+	reset();
     }
 
-    void zip_below_write::reset(const infinint & uncompressed_block_size)
+    void zip_below_write::reset()
     {
 	error = false;
 	ending = num_w;
+	tas->put(data);
 	data.clear();
 	flags.clear();
-	uncompressed_block_size.dump(*dst);
     }
 
     void zip_below_write::inherited_run()
@@ -84,7 +83,7 @@ namespace libdar
 	catch(...)
 	{
 	    error = true;
-		// this should trigger the parallel_compressor
+		// this should trigger the parallel_block_compressor
 		// to push eof_die flag leading work() and zip_workers threads
 		// to complete as properly as possible (minimizing dead-lock
 		// situation).
@@ -138,26 +137,34 @@ namespace libdar
 			    aux.dump(*dst);
 			    dst->write(data.front()->crypted_data.get_addr(),
 				       data.front()->crypted_data.get_data_size());
-			    pop_front();
 			}
-			else // do nothing (avoid generating a new exception)
-			    pop_front();
+			// else do nothing (avoid generating a new exception)
+			pop_front();
 			break;
 		    case compressor_block_flags::eof_die:
 			--ending;
 			pop_front();
+			if(ending == 0)
+			{
+			    aux = 0;
+			    aux.dump(*dst);
+			}
 			break;
 		    case compressor_block_flags::worker_error: // error received from a zip_worker
 			error = true; // this will trigger the main thread to terminate all threads
+			pop_front();
 			break;
 		    case compressor_block_flags::error:
+			pop_front();
 			if(!error)
 			    throw SRC_BUG;
 			break;
 		    default:
+			pop_front();
 			if(!error)
 			    throw SRC_BUG;
 		    }
+
 		}
 	    }
 	}
@@ -200,7 +207,6 @@ namespace libdar
 	should_i_stop = false;
 	if(ptr)
 	    tas->put(move(ptr));
-	uncomp_block_size.read(*src);
     }
 
     void zip_below_read::inherited_run()
@@ -240,11 +246,10 @@ namespace libdar
 			// the read infinint does not hold in an a U_I assuming
 			// data corruption occured
 
-		    push_flag_to_all_workers(compressor_block_flags::error);
-		    end = true;
+		    throw Erange("zip_below_read::work", gettext("incoherent compressed block structure, compressed data corruption"));
 		}
 	    }
-	    else // we are asked to stop by the parallel_compressor thread
+	    else // we are asked to stop by the parallel_block_compressor thread
 		aux = 0; // simulating an end of file
 
 	    if(aux == 0)
@@ -339,7 +344,7 @@ namespace libdar
 	catch(...)
 	{
 	    error = true;
-		// this should trigger the parallel_compressor
+		// this should trigger the parallel_block_compressor
 		// to push eof_die flag leading work() and zip_workers threads
 		// to complete as properly as possible (minimizing dead-lock
 		// situation).
@@ -404,26 +409,20 @@ namespace libdar
 		writer->worker_push_one(transit_slot, transit, flag);
 		break;
 	    case compressor_block_flags::error:
-		if(!error)
-		    writer->worker_push_one(transit_slot, transit, flag);
 		if(!do_compress)
+		{
+		    writer->worker_push_one(transit_slot, transit, flag);
 		    ending = true;
-		    // in read mode (uncompressing) in case the zip_below_write
-		    // thread sends an error message, it ends, so we propagate
-		    // and terminate too, but we do not throw exception ourselves
+			// in read mode (uncompressing) in case the zip_below_write
+			// thread sends an error message, it ends, so we propagate
+			// and terminate too, but we do not throw exception ourselves
+		}
 		else
 		{
 		    if(!error)
 			throw SRC_BUG;
 			// in write mode (compressing) we should never receive a error
-			// flag from the main thread, but could generate one and upon
-			// exception raised in our code (managed by inherited_run()
-			// that called us
-			// this will set the error field in the  zip_below_read thread
-			// that will be notified by the parallel_compressor which will
-			// trigger eof_die message, then we inherited_run() will relaunch
-			// the exception to be caught while parallel_compressor will join()
-			// on us.
+			// flag from the main thread
 		}
 		break;
 	    case compressor_block_flags::worker_error:
@@ -431,10 +430,16 @@ namespace libdar
 		    throw SRC_BUG;
 		    // only a worker should set this error and we
 		    // do not communicate with other workers
+		else
+		    writer->worker_push_one(transit_slot, transit, flag);
+		    // we now stay as much transparent as possible
 		break;
 	    default:
 		if(!error)
 		    throw SRC_BUG;
+		else
+		    writer->worker_push_one(transit_slot, transit, flag);
+		    // we now stay as much transparent as possible
 		break;
 	    }
 	}
@@ -444,16 +449,17 @@ namespace libdar
 
     	/////////////////////////////////////////////////////
 	//
-	// parallel_compressor class implementation
+	// parallel_block_compressor class implementation
 	//
 	//
 
 
-    parallel_compressor::parallel_compressor(U_I num_workers,
-					     unique_ptr<compress_module> & block_zipper,
-					     generic_file & compressed_side,
-					     U_I uncompressed_bs):
-	proto_compressor(compressed_side.get_mode()),
+    parallel_block_compressor::parallel_block_compressor(U_I num_workers,
+							 unique_ptr<compress_module> block_zipper,
+							 generic_file & compressed_side,
+							 U_I uncompressed_bs):
+	proto_compressor((compressed_side.get_mode() == gf_read_only)? gf_read_only: gf_write_only),
+	num_w(num_workers),
 	zipper(move(block_zipper)),
 	compressed(&compressed_side),
 	we_own_compressed_side(false),
@@ -463,11 +469,12 @@ namespace libdar
     }
 
 
-    parallel_compressor::parallel_compressor(U_I num_workers,
-					     unique_ptr<compress_module> & block_zipper,
-					     generic_file *compressed_side,
-					     U_I uncompressed_bs):
-	proto_compressor(compressed_side->get_mode()),
+    parallel_block_compressor::parallel_block_compressor(U_I num_workers,
+							 unique_ptr<compress_module> block_zipper,
+							 generic_file *compressed_side,
+							 U_I uncompressed_bs):
+	proto_compressor((compressed_side->get_mode() == gf_read_only)? gf_read_only: gf_write_only),
+	num_w(num_workers),
 	zipper(move(block_zipper)),
 	compressed(compressed_side),
 	we_own_compressed_side(true),
@@ -476,7 +483,7 @@ namespace libdar
 	init_fields();
     }
 
-    parallel_compressor::~parallel_compressor()
+    parallel_block_compressor::~parallel_block_compressor()
     {
 	try
 	{
@@ -491,224 +498,97 @@ namespace libdar
 	    delete compressed;
     }
 
-    void parallel_compressor::suspend_compression()
+    void parallel_block_compressor::suspend_compression()
     {
-	if(get_mode() == gf_read_only)
-	    stop_read_threads();
-	else
-	    stop_write_threads();
-    }
-
-    void parallel_compressor::resume_compression()
-    {
-	if(get_mode() == gf_read_only)
-	    run_read_threads();
-	else
-	    run_write_threads();
-    }
-
-    bool parallel_compressor::skippable(skippability direction, const infinint & amount)
-    {
-	bool ret;
-
-	if(is_terminated())
-	    throw SRC_BUG;
-
-	if(get_mode() == gf_read_only)
-	{
-	    if(reader && reader->is_running())
-		stop_read_threads();
-		// not restarting threads
-
-	    ret = compressed->skippable(direction, amount);
-	}
-	else
-	{
-	    if(writer && writer->is_running())
-		stop_write_threads();
-		    // not restarting threads
-
-	    ret = compressed->skippable(direction, amount);
-	}
-
-	return ret;
-    }
-
-    bool parallel_compressor::skip(const infinint & pos)
-    {
-	bool ret;
-
-	if(is_terminated())
-	    throw SRC_BUG;
-
-	if(get_mode() == gf_read_only)
-	{
-	    if(reader && reader->is_running())
-	    {
-		stop_read_threads();
-		ret = compressed->skip(pos);
-		    // not restarting threads
-	    }
-	    else
-		ret = compressed->skip(pos);
-
-	}
-	else
-	{
-	    if(writer && writer->is_running())
-	    {
-		stop_write_threads();
-		ret = compressed->skip(pos);
-		    // not restarting threads
-	    }
-	    else
-		ret = compressed->skip(pos);
-	}
-
-	return ret;
-    }
-
-    bool parallel_compressor::skip_to_eof()
-    {
-	bool ret;
-
-	if(is_terminated())
-	    throw SRC_BUG;
-
-	if(get_mode() == gf_read_only)
-	{
-	    if(reader && reader->is_running())
-	    {
-		stop_read_threads();
-		ret = compressed->skip_to_eof();
-		    // not restarting threads
-	    }
-	    else
-		ret = compressed->skip_to_eof();
-
-	}
-	else
-	{
-	    if(writer && writer->is_running())
-	    {
-		stop_write_threads();
-		ret = compressed->skip_to_eof();
-		    // not restarting threads
-	    }
-	    else
-		ret = compressed->skip_to_eof();
-	}
-
-	return ret;
-    }
-
-        bool parallel_compressor::skip_relative(S_I x)
-    {
-	bool ret;
-
-	if(is_terminated())
-	    throw SRC_BUG;
-
 	if(get_mode() != gf_read_only)
+	    inherited_sync_write();
+
+	suspended = true;
+    }
+
+    void parallel_block_compressor::resume_compression()
+    {
+	suspended = false;
+    }
+
+    bool parallel_block_compressor::skippable(skippability direction, const infinint & amount)
+    {
+	if(is_terminated())
 	    throw SRC_BUG;
-	if(x >= 0)
-	    ret = skip(current_position + x);
-	else
-	{
-	    x = -x;
-	    if(current_position >= x)
-		ret = skip(current_position - infinint(x));
-	    else
-	    {
-		skip(0);
-		ret = false;
-	    }
-	}
-	return ret;
+
+	stop_threads();
+
+	return compressed->skippable(direction, amount);
+    }
+
+    bool parallel_block_compressor::skip(const infinint & pos)
+    {
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	stop_threads();
+	reof = false;
+	return compressed->skip(pos);
+    }
+
+    bool parallel_block_compressor::skip_to_eof()
+    {
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	stop_threads();
+	reof = false;
+	return compressed->skip_to_eof();
+    }
+
+    bool parallel_block_compressor::skip_relative(S_I x)
+    {
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	stop_threads();
+	reof = false;
+	return skip_relative(x);
     }
 
 
-    bool parallel_compressor::truncatable(const infinint & pos) const
+    bool parallel_block_compressor::truncatable(const infinint & pos) const
     {
-	bool ret;
-	parallel_compressor *me = const_cast<parallel_compressor *>(this);
+	parallel_block_compressor *me = const_cast<parallel_block_compressor *>(this);
 	if(me == nullptr)
 	    throw SRC_BUG;
 
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	if(get_mode() == gf_read_only)
-	{
-	    if(reader && reader->is_running())
-	    {
-		me->stop_read_threads();
-		ret = compressed->truncatable(pos);
-		me->run_read_threads();
-	    }
-	    else
-		ret = compressed->truncatable(pos);
-
-	}
-	else
-	{
-	    if(writer && writer->is_running())
-	    {
-		me->stop_write_threads();
-		ret = compressed->truncatable(pos);
-		me->run_write_threads();
-	    }
-	    else
-		ret = compressed->truncatable(pos);
-	}
-
-	return ret;
+	me->stop_threads();
+	return compressed->truncatable(pos);
     }
 
 
-    infinint parallel_compressor::get_position() const
+    infinint parallel_block_compressor::get_position() const
     {
-	parallel_compressor *me = const_cast<parallel_compressor *>(this);
+	parallel_block_compressor *me = const_cast<parallel_block_compressor *>(this);
 	if(me == nullptr)
 	    throw SRC_BUG;
 
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	if(get_mode() == gf_read_only)
-	    return current_position;
-	else
-	    if(writer && writer->is_running())
-	    {
-		infinint ret;
-
-		    // this situation when one needs to
-		    // get the current position (= current position of the compressed side)
-		    // durung a compression process should not occur
-		    // frequently of not at all in libdar, thus stopping the
-		    // threads and restarting them afterward to read the position
-		    // has been found a good compromise compared to more complex
-		    // interaction with the zip_below_write thread and the required
-		    // use of mutex to access the position information
-
-		me->stop_write_threads();
-		ret = compressed->get_position();
-		me->run_write_threads();
-
-		return ret;
-	    }
-	    else
-		return compressed->get_position();
+	me->stop_threads();
+	return compressed->get_position();
     }
 
 
-    U_I parallel_compressor::inherited_read(char *a, U_I size)
+    U_I parallel_block_compressor::inherited_read(char *a, U_I size)
     {
 	if(is_terminated())
 	    throw SRC_BUG;
 
 	if(suspended)
 	{
+	    stop_threads();
+
 	    if(!reof)
 		return compressed->read(a, size);
 	    else
@@ -718,7 +598,8 @@ namespace libdar
 	{
 	    U_I ret = 0;
 
-	    run_read_threads();
+	    if(! reof)
+		run_threads();
 
 	    while(ret < size && ! reof)
 	    {
@@ -743,17 +624,24 @@ namespace libdar
 			break;
 		    case compressor_block_flags::eof_die:
 			reof = true;
-			stop_read_threads(); // this may throw a pending exception
+			stop_threads(); // this may throw a pending exception
 			break;
-		    case compressor_block_flags::error: // error received from the zip_below_read thread
+		    case compressor_block_flags::error:
+			    // error received from the zip_below_read thread
 			    // the thread has terminated and all worker have been
 			    // asked to terminate by the zip_below_read thread
-			stop_read_threads(); // this should relaunch the exception from the worker
+			stop_threads(); // this should relaunch the exception from the worker
 			throw SRC_BUG; // if not this is a bug
 		    case compressor_block_flags::worker_error:
 			    // a single worker have reported an error and is till alive
-			stop_read_threads(); // we stop all threads which will relaunch the worker exception
-			throw SRC_BUG; // if not this is a bug
+			    // we drop this single order
+			    // to cleanly stop threads
+			tas->put(move(lus_data.front()));
+			lus_data.pop_front();
+			lus_flags.pop_front();
+			    // no we can stop the threads poperly
+			stop_threads(); // we stop all threads which will relaunch the worker exception
+			throw SRC_BUG;  // if not this is a bug
 		    default:
 			throw SRC_BUG;
 		    }
@@ -766,7 +654,7 @@ namespace libdar
 	}
     }
 
-    void parallel_compressor::inherited_write(const char *a, U_I size)
+    void parallel_block_compressor::inherited_write(const char *a, U_I size)
     {
 	U_I wrote = 0;
 
@@ -774,10 +662,13 @@ namespace libdar
 	    throw SRC_BUG;
 
 	if(suspended)
+	{
+	    stop_threads();
 	    compressed->write(a, size);
+	}
 	else
 	{
-	    run_write_threads();
+	    run_threads();
 
 	    while(wrote < size && !writer->exception_pending())
 	    {
@@ -801,7 +692,7 @@ namespace libdar
 
 	    if(writer->exception_pending())
 	    {
-		stop_write_threads();
+		stop_threads();
 		    // this should throw an exception
 		    // else we do it now:
 		throw SRC_BUG;
@@ -809,48 +700,51 @@ namespace libdar
 	}
     }
 
-    void parallel_compressor::inherited_truncate(const infinint & pos)
+    void parallel_block_compressor::inherited_truncate(const infinint & pos)
     {
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	stop_write_threads();
+	stop_threads();
 	compressed->truncate(pos);
     }
 
-    void parallel_compressor::inherited_sync_write()
+    void parallel_block_compressor::inherited_sync_write()
     {
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	if(suspended && curwrite)
+	if(curwrite && curwrite->clear_data.get_data_size() > 0)
 	{
-	    run_write_threads();
+	    run_threads();
 	    disperse->scatter(curwrite, static_cast<signed int>(compressor_block_flags::data));
 	}
+
+	    // this adds the eof mark (zero block size)
+	stop_threads();
     }
 
-    void parallel_compressor::inherited_terminate()
+    void parallel_block_compressor::inherited_terminate()
     {
 	switch(get_mode())
 	{
 	case gf_read_only:
-	    stop_read_threads();
 	    break;
 	case gf_write_only:
 	    inherited_sync_write();
-	    stop_write_threads();
 	    break;
 	case gf_read_write:
 	    throw SRC_BUG;
 	default:
 	    throw SRC_BUG;
 	}
+
+	stop_threads();
     }
 
-    void parallel_compressor::init_fields()
+    void parallel_block_compressor::init_fields()
     {
-
+	U_I compr_bs = zipper->get_min_size_to_compress(uncompressed_block_size);
 
 	    // sanity checks on fields set by constructors
 
@@ -869,8 +763,8 @@ namespace libdar
 	    // initializing simple fields not set by constructors
 
 	suspended = false;
+	running_threads = false;
 	reof = false;
-	current_position = compressed->get_position();
 
 
 	    // creating inter thread communication structures
@@ -879,6 +773,11 @@ namespace libdar
 	rassemble = make_shared<ratelier_gather<crypto_segment> >(get_ratelier_size(num_w));
 	tas = make_shared<heap<crypto_segment> >(); // created empty
 
+	    // now filling the head that was created empty
+
+
+	for(U_I i = 0 ; i < get_heap_size(num_w) ; ++i)
+	    tas->put(make_unique<crypto_segment>(compr_bs, uncompressed_block_size));
 
 	    // creating the zip_below_* thread object
 
@@ -887,8 +786,7 @@ namespace libdar
 	    writer = make_unique<zip_below_write>(rassemble,
 						  compressed,
 						  tas,
-						  num_w,
-						  uncompressed_block_size);
+						  num_w);
 	}
 	else
 	{
@@ -896,24 +794,7 @@ namespace libdar
 						 disperse,
 						 tas,
 						 num_w);
-	    if(reader)
-	    {
-		infinint tmp = reader->get_uncomp_block_size();
-
-		uncompressed_block_size = 0;
-		tmp.unstack(uncompressed_block_size);
-		if(!tmp.is_zero())
-		    throw Edata("uncompressed block size too large for, data corruption occurred?");
-	    }
 	}
-
-
-	    // filling the head that was created empty now we know the block size
-
-	for(U_I i = 0 ; i < get_heap_size(num_w) ; ++i)
-	    tas->put(make_unique<crypto_segment>(uncompressed_block_size,
-						 uncompressed_block_size));
-
 
 	    // creating the worker threads objects
 
@@ -926,7 +807,7 @@ namespace libdar
 	    // no other thread than the one executing this code is running at this point!!!
     }
 
-    void parallel_compressor::send_flag_to_workers(compressor_block_flags flag)
+    void parallel_block_compressor::send_flag_to_workers(compressor_block_flags flag)
     {
 	unique_ptr<crypto_segment> ptr;
 
@@ -940,40 +821,106 @@ namespace libdar
 	}
     }
 
-    void parallel_compressor::stop_read_threads()
+    void parallel_block_compressor::stop_threads()
     {
-	if(!suspended)
+	switch(get_mode())
+	{
+	case gf_read_only:
+	    stop_read_threads();
+	    break;
+	case gf_write_only:
+	    stop_write_threads();
+	    break;
+	case gf_read_write:
+	    throw SRC_BUG;
+	default:
+	    throw SRC_BUG;
+	}
+    }
+
+    void parallel_block_compressor::stop_read_threads()
+    {
+	if(running_threads)
 	{
 	    if(!reader)
 		throw SRC_BUG;
 
 	    reader->do_stop();
-	    purge_ratelier_for(compressor_block_flags::eof_die);
+	    switch(purge_ratelier_up_to_non_data())
+	    {
+	    case compressor_block_flags::data:
+		throw SRC_BUG;
+	    case compressor_block_flags::eof_die:
+		break;
+	    case compressor_block_flags::error:
+		break;
+	    case compressor_block_flags::worker_error:
+		(void)purge_ratelier_up_to_non_data();
+		    // need to purge further as this is
+		    // not a global order that equals the
+		    // number of workers
+		break;
+	    default:
+		throw SRC_BUG;
+	    }
+
+	    running_threads = false;
+		// we must set this before join()
+		// to avoid purging a second time
+		// in case join() would throw an
+		// exception
+
 	    reader->join();
 	    for(deque<zip_worker>::iterator it = travailleurs.begin(); it !=travailleurs.end(); ++it)
 		it->join();
-	    suspended = true;
 	}
     }
 
-    void parallel_compressor::stop_write_threads()
+    void parallel_block_compressor::stop_write_threads()
     {
-	if(!suspended)
-	{
-	    send_flag_to_workers(compressor_block_flags::eof_die);
+	if(curwrite && curwrite->clear_data.get_data_size() > 0)
+	    inherited_sync_write();
 
+	if(running_threads)
+	{
 	    if(!writer)
 		throw SRC_BUG;
-	    writer->join();
-	    for(deque<zip_worker>::iterator it = travailleurs.begin(); it !=travailleurs.end(); ++it)
-		it->join();
-	    suspended = true;
+
+	    running_threads = false;
+		// change the flag before calling join()
+		// as they may trigger an exception
+
+	    if(writer->is_running())
+	    {
+		send_flag_to_workers(compressor_block_flags::eof_die);
+
+		writer->join();
+		for(deque<zip_worker>::iterator it = travailleurs.begin(); it !=travailleurs.end(); ++it)
+		    it->join();
+	    }
 	}
     }
 
-    void parallel_compressor::run_read_threads()
+    void parallel_block_compressor::run_threads()
     {
-	if(suspended)
+	switch(get_mode())
+	{
+	case gf_read_only:
+	    run_read_threads();
+	    break;
+	case gf_write_only:
+	    run_write_threads();
+	    break;
+	case gf_read_write:
+	    throw SRC_BUG;
+	default:
+	    throw SRC_BUG;
+	}
+    }
+
+    void parallel_block_compressor::run_read_threads()
+    {
+	if(!running_threads)
 	{
 	    if(!reader)
 		throw SRC_BUG;
@@ -983,60 +930,73 @@ namespace libdar
 	    reader->run();
 	    for(deque<zip_worker>::iterator it = travailleurs.begin(); it !=travailleurs.end(); ++it)
 		it->run();
-	    suspended = false;
+	    running_threads = true;
 	}
     }
 
-    void parallel_compressor::run_write_threads()
+    void parallel_block_compressor::run_write_threads()
     {
-	if(suspended)
+	if(!running_threads)
 	{
 	    if(!writer)
 		throw SRC_BUG;
 	    if(writer->is_running())
 		throw SRC_BUG;
-	    writer->reset(uncompressed_block_size);
+	    writer->reset();
 	    writer->run();
 	    for(deque<zip_worker>::iterator it = travailleurs.begin(); it !=travailleurs.end(); ++it)
 		it->run();
-	    suspended = false;
+	    running_threads = true;
 	}
     }
 
-    void parallel_compressor::purge_ratelier_for(compressor_block_flags flag)
+    compressor_block_flags parallel_block_compressor::purge_ratelier_up_to_non_data()
     {
 	S_I expected = num_w;
-	tas->put(lus_data);
-	lus_data.clear();
-	lus_flags.clear();
+	compressor_block_flags ret = compressor_block_flags::data;
 
 	if(get_mode() != gf_read_only)
 	    throw SRC_BUG;
 
 	while(expected > 0)
 	{
-	    rassemble->gather(lus_data, lus_flags);
-	    while(!lus_flags.empty())
+	    if(lus_data.empty())
+	    {
+		if(!lus_flags.empty())
+		    throw SRC_BUG;
+		rassemble->gather(lus_data, lus_flags);
+	    }
+
+	    while(!lus_flags.empty() && expected > 0)
 	    {
 		if(lus_data.empty())
 		    throw SRC_BUG;
-		if(lus_flags.front() == static_cast<signed int>(flag))
+		if(ret == compressor_block_flags::data
+		   && lus_flags.front() != static_cast<signed int>(compressor_block_flags::data))
+		    ret = static_cast<compressor_block_flags>(lus_flags.front());
+		if(lus_flags.front() == static_cast<signed int>(ret) && ret != compressor_block_flags::data)
+		{
 		    --expected;
+		    if(ret == compressor_block_flags::worker_error)
+			expected = 0;
+		}
 		tas->put(move(lus_data.front()));
 		lus_data.pop_front();
 		lus_flags.pop_front();
 	    }
 	}
+
+	return ret;
     }
 
 
-    U_I parallel_compressor::get_heap_size(U_I num_workers)
+    U_I parallel_block_compressor::get_heap_size(U_I num_workers)
     {
 	U_I ratelier_size = get_ratelier_size(num_workers);
 	U_I heap_size = ratelier_size * 2 + num_workers + 1 + ratelier_size + 2;
 	    // each ratelier can be full of crypto_segment and at the same
 	    // time, each worker could hold a crypto_segment, the below thread
-	    // as well and the main thread for parallel_compressor could hold
+	    // as well and the main thread for parallel_block_compressor could hold
 	    // a deque of the size of the ratelier plus 2 more crypto_segments
 	return heap_size;
     }

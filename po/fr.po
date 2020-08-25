@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
 "POT-Creation-Date: 2020-05-31 11:38+0200\n"
-"PO-Revision-Date: 2020-01-12 15:30+0100\n"
+"PO-Revision-Date: 2020-08-22 15:24+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "Language: fr\n"
@@ -2429,7 +2429,7 @@ msgstr "Version du format de l'archive       : %s"
 #: src/libdar/header_version.cpp:511
 #, c-format
 msgid "Compression algorithm used           : %S"
-msgstr "Algorithme de compression utilisé     : %S"
+msgstr "Algorithme de compression utilisé    : %S"
 
 #: src/libdar/header_version.cpp:512
 #, c-format

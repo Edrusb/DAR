@@ -19,12 +19,23 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \file parallel_compressor.hpp
+    /// \file parallel_block_compressor.hpp
     /// \brief provide per block and parallel compression/decompression
     /// \ingroup Private
 
-#ifndef PARALLEL_COMPRESSOR_HPP
-#define PARALLEL_COMPRESSOR_HPP
+    /// Several classes are defined here:
+    /// - class parallel_block_compressor, which has similar interface and behavior as class compressor but compresses a
+    ///   data of a file per block of given size which allows parallel compression of a given file's data at the
+    ///   cost of memory requirement and probably a less good compression ratio (depends on the size of the blocks)
+    /// - class zip_below_write which gather the compressed data works of workers toward the filesystem
+    /// - class zip_below_read which provides block of compressed data to workers comming from the filesystem
+    /// - class zip_worker which instanciates worker objects to compute in parallel the compression of block of data
+    /// .
+
+
+
+#ifndef PARALLEL_BLOCK_COMPRESSOR_HPP
+#define PARALLEL_BLOCK_COMPRESSOR_HPP
 
 #include "../my_config.h"
 
@@ -33,6 +44,7 @@
 #include "heap.hpp"
 #include "compress_module.hpp"
 #include "proto_compressor.hpp"
+
 #include <libthreadar/libthreadar.hpp>
 
 namespace libdar
@@ -44,8 +56,7 @@ namespace libdar
 
     enum class compressor_block_flags { data = 0, eof_die = 1, error = 2, worker_error = 3 };
 
-	/// the compressed block structure is a sequence of 3 types of data
-	/// - uncompressed block size
+	/// the compressed block structure is a sequence of 2 types of data
 	/// - data to compress/uncompress
 	/// - eof
 	/// .
@@ -54,20 +65,24 @@ namespace libdar
 	///
 	/// *** in the archive:
 	///
-	/// the block streams starts with the uncompressed block size, followed by any
-	/// number of data blocks, completed by an single eof block. Each data block is
-	/// structured with a infinint field followed by a array of random (compresssed) bytes which
-	/// lenght is the value of the first field.
+	/// the block stream is an arbitrary length sequence of data blocks followed by an eof.
+	/// Each data block consists of an infinint determining the length of following field
+	/// that stores the compressed data of variable length
+	/// the compressed data comes from block of uncompressed data of constant size (except the
+	/// last one that is smaller. THis information is needed to prepare memory allocation
+	/// and is stored in the archive header (archive reading) or provided by the user
+	/// (archive creation). Providing 0 for the block size leads to the classical/historical
+	/// but impossible to parallelize compression algorithm (gzip, bzip2, etc.)
+	///
+	///
 	///
 	/// *** between threads:
 	///
-	/// when compressing, the parallel_compressor class's sends gives the uncompressed
-	/// block size at constructor time to the zip_below_write thread which drops the
-	/// the information to the archive at that time.
-	/// then the inherited_write call produces a set of data block to the ratelier_scatter
-	/// treated by a set of zip_workers which are in turn passed to the zip_below_write
-	/// thread.
-	/// last when eof is reached or during terminate() method, the N eof blocks are sent
+	/// when compressing, the inherited_write call produces a set of data block to the ratelier_scatter
+	/// treated by a set of zip_workers which in turn passe the resulting compressed
+	/// data blocks to the zip_below_write thread.
+	///
+	/// last when eof is reached or during terminate() method,  N eof blocks are sent
 	/// where N is the number of zip_workers, either with flag eof, or die (termination).
 	/// the eof flag is just passed by the workers but the zip_below_write thread collects
 	/// them and awakes the main thread once all are collected and thus all data written.
@@ -86,7 +101,7 @@ namespace libdar
 	/// UNCOMPRESSON PROCESS
 	///
 	/// the zip_below_read expectes to find the clear_block size at construction time and
-	/// provides a method to read it by the parallel_compressor thread which allocate the
+	/// provides a method to read it by the parallel_block_compressor thread which allocate the
 	/// mem_blocks accordingly in a pool (same as parallel_tronconneuse). The zip_below
 	/// thread once started reading the blocks and push them into the ratelier_scatter
 	/// (without the initial U_32 telling the size of the compressed data that follows).
@@ -101,7 +116,7 @@ namespace libdar
 	/// Upon reception of the error flag from the ratelier_gather the parallel_compression
 	/// thread invoke a method of the zip_below_read that triggers the thread to terminate
 	/// after having pushed N error blocks to the ratelier_scatter which in turns triggers
-	/// the termination of the zip_workers. The parallel_compressor thread can then gather
+	/// the termination of the zip_workers. The parallel_block_compressor thread can then gather
 	/// the N error block from the ratelier_gather, join() the threads and report the
 	/// compression error
 
@@ -123,8 +138,8 @@ namespace libdar
 	zip_below_write(const std::shared_ptr<libthreadar::ratelier_gather<crypto_segment> > & source,
 			generic_file *dest,
 			const std::shared_ptr<heap<crypto_segment> > & xtas,
-			U_I num_workers,
-			const infinint & uncompressed_block_size);
+			U_I num_workers);
+
 
 	    /// consulted by the main thread, set to true by the zip_below_write thread
 	    /// when an exception has been caught or an error flag has been seen from a
@@ -132,7 +147,7 @@ namespace libdar
 	bool exception_pending() const { return error; };
 
 	    /// reset the thread objet ready for a new compression run, but does not launch it
-	void reset(const infinint & uncompressed_block_size);
+	void reset();
 
     protected:
 	virtual void inherited_run() override;
@@ -170,8 +185,6 @@ namespace libdar
 		       const std::shared_ptr<heap<crypto_segment> > & xtas,
 		       U_I num_workers);
 
-	const infinint & get_uncomp_block_size() const { return uncomp_block_size; };
-
 	    /// this will trigger the sending of N eof_die blocks and thread termination
 	void do_stop() { should_i_stop = true; };
 
@@ -186,7 +199,6 @@ namespace libdar
 	const std::shared_ptr<libthreadar::ratelier_scatter<crypto_segment> > & dst;
 	const std::shared_ptr<heap<crypto_segment> > & tas;
 	U_I num_w;
-	infinint uncomp_block_size;
 	std::unique_ptr<crypto_segment> ptr;
 	bool should_i_stop;
 
@@ -219,7 +231,7 @@ namespace libdar
     private:
 	std::shared_ptr<libthreadar::ratelier_scatter <crypto_segment> > & reader;
 	std::shared_ptr<libthreadar::ratelier_gather <crypto_segment> > & writer;
-	std::unique_ptr<compress_module> && compr;
+	std::unique_ptr<compress_module> compr;
 	bool do_compress;
 	bool error;
 	std::unique_ptr<crypto_segment> transit;
@@ -238,36 +250,38 @@ namespace libdar
 
 
 
-    class parallel_compressor: public proto_compressor
+    class parallel_block_compressor: public proto_compressor
     {
     public:
-	static constexpr const U_I default_uncompressed_block_size = 102400;
+	    /// \note if uncompressed_bs is too small the uncompressed data
+	    /// will not be able to be stored in the datastructure and decompression
+	    /// wil fail. This metadata should be stored in the archive header
+	    /// and passed to the parallel_block_compressor object at
+	    /// construction time both while reading and writing an archive
 
-	    /// \note uncompressed_bs is not used in read mode,
-	    /// the block size is fetched from the compressed data
-
-	parallel_compressor(U_I num_workers,
-			    std::unique_ptr<compress_module> & block_zipper,
-			    generic_file & compressed_side,
-			    U_I uncompressed_bs = default_uncompressed_block_size);
+	parallel_block_compressor(U_I num_workers,
+				  std::unique_ptr<compress_module> block_zipper,
+				  generic_file & compressed_side,
+				  U_I uncompressed_bs = default_uncompressed_block_size);
 	    // compressed_side is not owned by the object and will remains
             // after the objet destruction
 
-	parallel_compressor(U_I num_workers,
-			    std::unique_ptr<compress_module> & block_zipper,
-			    generic_file *compressed_side,
-			    U_I uncompressed_bs = default_uncompressed_block_size);
+	parallel_block_compressor(U_I num_workers,
+				  std::unique_ptr<compress_module> block_zipper,
+				  generic_file *compressed_side,
+				  U_I uncompressed_bs = default_uncompressed_block_size);
             // compressed_side is owned by the object and will be
             // deleted a destructor time
 
-	parallel_compressor(const parallel_compressor & ref) = delete;
-	parallel_compressor(parallel_compressor && ref) noexcept = delete;
-	parallel_compressor & operator = (const parallel_compressor & ref) = delete;
-	parallel_compressor & operator = (parallel_compressor && ref) noexcept = delete;
-	~parallel_compressor();
+	parallel_block_compressor(const parallel_block_compressor & ref) = delete;
+	parallel_block_compressor(parallel_block_compressor && ref) noexcept = delete;
+	parallel_block_compressor & operator = (const parallel_block_compressor & ref) = delete;
+	parallel_block_compressor & operator = (parallel_block_compressor && ref) noexcept = delete;
+	~parallel_block_compressor();
 
 	    // inherited from proto_compressor
 
+	virtual compression get_algo() const override { return suspended? compression::none : zipper->get_algo(); };
 	virtual void suspend_compression() override;
 	virtual void resume_compression() override;
 	virtual bool is_compression_suspended() const override { return suspended; };
@@ -281,13 +295,8 @@ namespace libdar
 	virtual bool truncatable(const infinint & pos) const override;
         virtual infinint get_position() const override;
 
-	    // my own methods
-
-	U_I get_uncompressed_block_size() const { return uncompressed_block_size; };
-	void change_uncompressed_block_size(U_I bs) { uncompressed_block_size = bs; };
-
     protected :
-	virtual void inherited_read_ahead(const infinint & amount) override { run_read_threads(); };
+	virtual void inherited_read_ahead(const infinint & amount) override { if(!suspended) run_read_threads(); };
         virtual U_I inherited_read(char *a, U_I size) override;
         virtual void inherited_write(const char *a, U_I size) override;
 	virtual void inherited_truncate(const infinint & pos) override;
@@ -296,23 +305,27 @@ namespace libdar
 	virtual void inherited_terminate() override;
 
     private:
-	static constexpr const U_I min_uncompressed_block_size = 100;
 
-	    // initialized from constructors
+	    // initialized directly in constructors
+
 	U_I num_w;
 	std::unique_ptr<compress_module> zipper;
 	generic_file *compressed;
 	bool we_own_compressed_side;
 	U_I uncompressed_block_size;
 
-	    // initialized by init_fields method
 
-	bool suspended;
-	std::unique_ptr<crypto_segment> curwrite;
-	std::deque<std::unique_ptr<crypto_segment> > lus_data;
-	std::deque<signed int> lus_flags;
-	bool reof;
-	infinint current_position;
+	    // initialized by the init_fields() method
+
+	bool suspended;                                        ///< whether compression is suspended or not
+	bool running_threads;                                  ///< whether subthreads are running
+	std::unique_ptr<crypto_segment> curwrite;              ///< aggregates a block before compression and writing
+	std::deque<std::unique_ptr<crypto_segment> > lus_data; ///< uncompressed data from workers in read mode
+	std::deque<signed int> lus_flags;                      ///< uncompressed data flags from workers in read mode
+	bool reof;                                             ///< whether we have hit the end of file while reading
+
+
+	    // inter-thread data structure
 
 	std::shared_ptr<libthreadar::ratelier_scatter<crypto_segment> > disperse;
 	std::shared_ptr<libthreadar::ratelier_gather<crypto_segment> > rassemble;
@@ -325,13 +338,21 @@ namespace libdar
 	std::unique_ptr<zip_below_write> writer;
 	std::deque<zip_worker> travailleurs;
 
+
+	    // private methods
+
 	void init_fields();
 	void send_flag_to_workers(compressor_block_flags flag);
+	void stop_threads();
 	void stop_read_threads();
 	void stop_write_threads();
+	void run_threads();
 	void run_read_threads();
 	void run_write_threads();
-	void purge_ratelier_for(compressor_block_flags flag);
+	compressor_block_flags purge_ratelier_up_to_non_data();
+
+
+	    // static methods
 
 	static U_I get_ratelier_size(U_I num_workers) { return num_workers + num_workers/2; };
 	static U_I get_heap_size(U_I num_workers);

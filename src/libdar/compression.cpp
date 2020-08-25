@@ -23,6 +23,9 @@
 
 extern "C"
 {
+#if HAVE_CTYPE_H
+#include <ctype.h>
+#endif
 } // end extern "C"
 
 #include "compression.hpp"
@@ -41,44 +44,61 @@ namespace libdar
         case 'n':
             return compression::none;
         case 'z':
+	case 'Z':
             return compression::gzip;
         case 'y':
+	case 'Y':
             return compression::bzip2;
 	case 'j':
+	case 'J':
 	    return compression::lzo1x_1_15;
 	case 'k':
+	case 'K':
 	    return compression::lzo1x_1;
 	case 'l':
+	case 'L':
 	    return compression::lzo;
 	case 'x':
+	case 'X':
 	    return compression::xz;
 	case 'd':
+	case 'D':
 	    return compression::zstd;
+	case 'q':
+	case 'Q':
+	    return compression::lz4;
         default :
             throw Erange("char2compression", gettext("unknown compression"));
         }
     }
 
-    char compression2char(compression c)
+    bool char2compression_mode(char a)
+    {
+    	return isupper(a);
+    }
+
+    char compression2char(compression c, bool per_block)
     {
         switch(c)
         {
         case compression::none:
-            return 'n';
+            return per_block ? 'N': 'n';
         case compression::gzip:
-            return 'z';
+            return per_block ? 'Z': 'z';
         case compression::bzip2:
-            return 'y';
+            return per_block ? 'Y': 'y';
 	case compression::lzo:
-	    return 'l';
+	    return per_block ? 'L': 'l';
 	case compression::xz:
-	    return 'x';
+	    return per_block ? 'X': 'x';
 	case compression::lzo1x_1_15:
-	    return 'j';
+	    return per_block ? 'J': 'j';
 	case compression::lzo1x_1:
-	    return 'k';
+	    return per_block ? 'K': 'k';
 	case compression::zstd:
-	    return 'd';
+	    return per_block ? 'D': 'd';
+	case compression::lz4:
+	    return per_block ? 'Q': 'q';
         default:
             throw Erange("compression2char", gettext("unknown compression"));
         }
@@ -104,6 +124,8 @@ namespace libdar
 	    return "lzop-3";
 	case compression::zstd:
 	    return "zstd";
+	case compression::lz4:
+	    return "lz4";
         default:
             throw Erange("compresion2string", gettext("unknown compression"));
         }
@@ -132,10 +154,14 @@ namespace libdar
 	if(a == "zstd")
 	    return compression::zstd;
 
+	if(a == "lz4")
+	    return compression::lz4;
+
 	if(a == "none")
 	    return compression::none;
 
 	throw Erange("string2compression", tools_printf(gettext("unknown compression algorithm: %S"), &a));
     }
+
 
 } // end of namespace

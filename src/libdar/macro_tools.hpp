@@ -128,6 +128,7 @@ namespace libdar
 					 std::list<signator> & gnupg_signed, ///< list of existing signature found for that archive (valid or not)
 					 slice_layout & sl,    ///< slicing layout of the archive
 					 U_I multi_threaded_crypto,  ///< number of worker thread to run for cryptography (1 -> tronconneuse object, more -> parallel_tronconneuse object)
+					 U_I multi_threaded_compress,  ///< number of worker threads to compress/decompress (need compression_block_size > 0)
 					 bool header_only      ///< if true, stop the process before openning the encryption layer
 	);
         // all allocated objects (ret1, ret2, scram), must be deleted when no more needed by the caller of this routine
@@ -246,6 +247,7 @@ namespace libdar
 					  const infinint & pause,
 					  compression algo,
 					  U_I compression_level,
+					  U_I compression_block_size,
 					  const infinint & file_size,
 					  const infinint & first_file_size,
 					  const std::string & execute,
@@ -264,7 +266,8 @@ namespace libdar
 					  const label & data_name,
 					  const infinint & iteration_count,
 					  hash_algo kdf_hash,
-					  U_I multi_threaded_crypto);
+					  U_I multi_threaded_crypto,
+					  U_I multi_threaded_compress);
 
 	/// dumps the catalogue and close all the archive layers to terminate the archive
 

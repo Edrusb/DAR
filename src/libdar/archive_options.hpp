@@ -160,10 +160,13 @@ namespace libdar
 
 	    /// \deprecated this call is deprecated, see set_multi_threaded_*() more specific calls
 	    /// \note setting this to true is equivalent to calling set_mutli_threaded_crypto(2)
-	void set_multi_threaded(bool val) { x_multi_threaded_crypto = 2; };
+	void set_multi_threaded(bool val) { x_multi_threaded_crypto = 2; x_multi_threaded_compress = 2; };
 
 	    /// how much thread libdar will use for cryptography (need libthreadar to be effective)
 	void set_multi_threaded_crypto(U_I num) { x_multi_threaded_crypto = num; };
+
+	    /// how much thread libdar will use for compression (need libthreadar too and compression_block_size > 0)
+	void set_multi_threaded_compress(U_I num) { x_multi_threaded_compress = num; };
 
 
 	    //////// what follows concerne the use of an external catalogue instead of the archive's internal one
@@ -225,6 +228,7 @@ namespace libdar
 	const std::shared_ptr<entrepot> & get_entrepot() const { return x_entrepot; };
 	bool get_ignore_signature_check_failure() const { return x_ignore_signature_check_failure; };
 	U_I get_multi_threaded_crypto() const { return x_multi_threaded_crypto; };
+	U_I get_multi_threaded_compress() const { return x_multi_threaded_compress; };
 
 	    // All methods that follow concern the archive where to fetch the (isolated) catalogue from
 	bool is_external_catalogue_set() const { return external_cat; };
@@ -253,6 +257,7 @@ namespace libdar
 	std::shared_ptr<entrepot> x_entrepot;
 	bool x_ignore_signature_check_failure;
 	U_I x_multi_threaded_crypto;
+	U_I x_multi_threaded_compress;
 
 
 	    // external catalogue relative fields
@@ -347,6 +352,18 @@ namespace libdar
 
 	    /// set the compression level (from 1 to 9)
 	void set_compression_level(U_I compression_level) { x_compression_level = compression_level; };
+
+	    /// set the compression block size
+
+	    /// \param[in] compression_bs if set to zero (which is the default value)
+	    /// compression is performed without block in one single stream per file.
+	    /// This is the historical way used by libdar, it gives the best result
+	    /// and the lowest compute overhead, though it cannot be parallelized.
+	    /// At the opposite using compresion per block reduce the compression ratio
+	    /// but allows the block to be compressed/decompressed in parallel and thus
+	    /// leverage multi-core systems. When the block size increase you tend to the
+	    /// same compression ratio as compression ration without block
+	void set_compression_block_size(U_I compression_block_size) { x_compression_block_size = compression_block_size; };
 
 	    /// define the archive slicing
 
@@ -505,10 +522,13 @@ namespace libdar
 
 	    /// \deprecated this call is deprecated, see set_multi_threaded_*() more specific calls
 	    /// \note setting this to true is equivalent to calling set_mutli_threaded_crypto(2)
-	void set_multi_threaded(bool val) { x_multi_threaded_crypto = 2; };
+	void set_multi_threaded(bool val) { x_multi_threaded_crypto = 2; x_multi_threaded_compress = 2; };
 
 	    /// how much thread libdar will use for cryptography (need libthreadar to be effective)
 	void set_multi_threaded_crypto(U_I num) { x_multi_threaded_crypto = num; };
+
+		    /// how much thread libdar will use for compression (need libthreadar too and compression_block_size > 0)
+	void set_multi_threaded_compress(U_I num) { x_multi_threaded_compress = num; };
 
 	    /// whether binary delta has to be computed for differential/incremental backup
 
@@ -566,6 +586,7 @@ namespace libdar
 	bool get_empty_dir() const { return x_empty_dir; };
 	compression get_compression() const { return x_compr_algo; };
 	U_I get_compression_level() const { return x_compression_level; };
+	U_I get_compression_block_size() const { return x_compression_block_size; };
 	const infinint & get_slice_size() const { return x_file_size; };
 	const infinint & get_first_slice_size() const { return x_first_file_size; };
 	const mask & get_ea_mask() const { if(x_ea_mask == nullptr) throw SRC_BUG; return *x_ea_mask; };
@@ -605,6 +626,7 @@ namespace libdar
 	const std::shared_ptr<entrepot> & get_entrepot() const { return x_entrepot; };
 	const fsa_scope & get_fsa_scope() const { return x_scope; };
 	U_I get_multi_threaded_crypto() const { return x_multi_threaded_crypto; };
+	U_I get_multi_threaded_compress() const { return x_multi_threaded_compress; };
 	bool get_delta_diff() const { return x_delta_diff; };
 	bool get_delta_signature() const { return x_delta_signature; };
 	const mask & get_delta_mask() const { return *x_delta_mask; }
@@ -632,6 +654,7 @@ namespace libdar
 	bool x_empty_dir;
 	compression x_compr_algo;
 	U_I x_compression_level;
+	U_I x_compression_block_size;
 	infinint x_file_size;
 	infinint x_first_file_size;
 	mask * x_ea_mask;    ///< points to a local copy of mask (must be allocated / releases by the archive_option_create objects)
@@ -672,6 +695,7 @@ namespace libdar
 	std::shared_ptr<entrepot> x_entrepot;
 	fsa_scope x_scope;
 	U_I x_multi_threaded_crypto;
+	U_I x_multi_threaded_compress;
 	bool x_delta_diff;
 	bool x_delta_signature;
 	mask *x_delta_mask;
@@ -737,6 +761,10 @@ namespace libdar
 
 	    /// the compression level (from 1 to 9)
 	void set_compression_level(U_I compression_level) { x_compression_level = compression_level; };
+
+		    /// set the compression block size
+
+	void set_compression_block_size(U_I compression_block_size) { x_compression_block_size = compression_block_size; };
 
 	    /// define the archive slicing
 
@@ -816,10 +844,13 @@ namespace libdar
 
 	    /// \deprecated this call is deprecated, see set_multi_threaded_*() more specific calls
 	    /// \note setting this to true is equivalent to calling set_mutli_threaded_crypto(2)
-	void set_multi_threaded(bool val) { x_multi_threaded_crypto = 2; };
+	void set_multi_threaded(bool val) { x_multi_threaded_crypto = 2; x_multi_threaded_compress = 2; };
 
 	    /// how much thread libdar will use for cryptography (need libthreadar to be effective)
 	void set_multi_threaded_crypto(U_I num) { x_multi_threaded_crypto = num; };
+
+	    /// how much thread libdar will use for compression (need libthreadar too and compression_block_size > 0)
+	void set_multi_threaded_compress(U_I num) { x_multi_threaded_compress = num; };
 
 
 	    /// whether signature to base binary delta on the future has to be calculated and stored beside saved files
@@ -851,6 +882,7 @@ namespace libdar
 	const infinint & get_pause() const { return x_pause; };
 	compression get_compression() const { return x_algo; };
 	U_I get_compression_level() const { return x_compression_level; };
+	U_I get_compression_block_size() const { return x_compression_block_size; };
 	const infinint & get_slice_size() const { return x_file_size; };
 	const infinint & get_first_slice_size() const { return x_first_file_size; };
 	const std::string & get_execute() const { return x_execute; };
@@ -869,6 +901,7 @@ namespace libdar
 	bool get_sequential_marks() const { return x_sequential_marks; };
 	const std::shared_ptr<entrepot> & get_entrepot() const { return x_entrepot; };
 	U_I get_multi_threaded_crypto() const { return x_multi_threaded_crypto; };
+	U_I get_multi_threaded_compress() const { return x_multi_threaded_compress; };
 	bool get_delta_signature() const { return x_delta_signature; };
 	const mask & get_delta_mask() const { return *x_delta_mask; }
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
@@ -885,6 +918,7 @@ namespace libdar
 	infinint x_pause;
 	compression x_algo;
 	U_I x_compression_level;
+	U_I x_compression_block_size;
 	infinint x_file_size;
 	infinint x_first_file_size;
 	std::string x_execute;
@@ -903,6 +937,7 @@ namespace libdar
 	bool x_sequential_marks;
 	std::shared_ptr<entrepot> x_entrepot;
 	U_I x_multi_threaded_crypto;
+	U_I x_multi_threaded_compress;
 	bool x_delta_signature;
 	mask *x_delta_mask;
 	bool has_delta_mask_been_set;
@@ -985,6 +1020,9 @@ namespace libdar
 
 	    /// set the compression level (from 1 to 9)
 	void set_compression_level(U_I compression_level) { x_compression_level = compression_level; };
+
+	    /// set the compression block size (0 for streamed compression)
+	void set_compression_block_size(U_I compression_block_size) { x_compression_block_size = compression_block_size; };
 
 	    /// define the archive slicing
 
@@ -1086,11 +1124,13 @@ namespace libdar
 
 	    /// \deprecated this call is deprecated, see set_multi_threaded_*() more specific calls
 	    /// \note setting this to true is equivalent to calling set_mutli_threaded_crypto(2)
-	void set_multi_threaded(bool val) { x_multi_threaded_crypto = 2; };
+	void set_multi_threaded(bool val) { x_multi_threaded_crypto = 2; x_multi_threaded_compress = 2; };
 
 	    /// how much thread libdar will use for cryptography (need libthreadar to be effective)
 	void set_multi_threaded_crypto(U_I num) { x_multi_threaded_crypto = num; };
 
+	    /// how much thread libdar will use for compression (need libthreadar too and compression_block_size > 0)
+	void set_multi_threaded_compress(U_I num) { x_multi_threaded_compress = num; };
 
 	    /// whether signature to base binary delta on the future has to be calculated and stored beside saved files
 	    /// \note the default is true, which lead to preserve delta signature over merging, but not to calculate new ones
@@ -1134,6 +1174,7 @@ namespace libdar
 	bool get_empty_dir() const { return x_empty_dir; };
 	compression get_compression() const { return x_compr_algo; };
 	U_I get_compression_level() const { return x_compression_level; };
+	U_I get_compression_block_size() const { return x_compression_block_size; };
 	const infinint & get_slice_size() const { return x_file_size; };
 	const infinint & get_first_slice_size() const { return x_first_file_size; };
 	const mask & get_ea_mask() const { if(x_ea_mask == nullptr) throw SRC_BUG; return *x_ea_mask; };
@@ -1159,6 +1200,7 @@ namespace libdar
 	const std::shared_ptr<entrepot> & get_entrepot() const { return x_entrepot; };
 	const fsa_scope & get_fsa_scope() const { return x_scope; };
 	U_I get_multi_threaded_crypto() const { return x_multi_threaded_crypto; };
+	U_I get_multi_threaded_compress() const { return x_multi_threaded_compress; };
 	bool get_delta_signature() const { return x_delta_signature; };
 	const mask & get_delta_mask() const { return *x_delta_mask; }
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
@@ -1183,6 +1225,7 @@ namespace libdar
 	bool x_empty_dir;
 	compression x_compr_algo;
 	U_I x_compression_level;
+	U_I x_compression_block_size;
 	infinint x_file_size;
 	infinint x_first_file_size;
 	mask * x_ea_mask;
@@ -1207,7 +1250,8 @@ namespace libdar
 	infinint x_slice_min_digits;
 	std::shared_ptr<entrepot> x_entrepot;
 	fsa_scope x_scope;
-	bool x_multi_threaded_crypto;
+	U_I x_multi_threaded_crypto;
+	U_I x_multi_threaded_compress;
 	bool x_delta_signature;
 	mask *x_delta_mask;
 	bool has_delta_mask_been_set;
@@ -1773,11 +1817,13 @@ namespace libdar
 
 	    /// \deprecated this call is deprecated, see set_multi_threaded_*() more specific calls
 	    /// \note setting this to true is equivalent to calling set_mutli_threaded_crypto(2)
-	void set_multi_threaded(bool val) { x_multi_threaded_crypto = 2; };
+	void set_multi_threaded(bool val) { x_multi_threaded_crypto = 2; x_multi_threaded_compress = 2; };
 
 	    /// how much thread libdar will use for cryptography (need libthreadar to be effective)
 	void set_multi_threaded_crypto(U_I num) { x_multi_threaded_crypto = num; };
 
+	    /// how much thread libdar will use for compression (need libthreadar too and compression_block_size > 0)
+	void set_multi_threaded_compress(U_I num) { x_multi_threaded_compress = num; };
 
 
 	    /////////////////////////////////////////////////////////////////////
@@ -1808,6 +1854,7 @@ namespace libdar
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
 	const std::shared_ptr<entrepot> & get_entrepot() const { return x_entrepot; };
 	U_I get_multi_threaded_crypto() const { return x_multi_threaded_crypto; };
+	U_I get_multi_threaded_compress() const { return x_multi_threaded_compress; };
 
     private:
 	bool x_allow_over;
@@ -1835,6 +1882,7 @@ namespace libdar
 	infinint x_slice_min_digits;
 	std::shared_ptr<entrepot> x_entrepot;
 	U_I x_multi_threaded_crypto;
+	U_I x_multi_threaded_compress;
 
 	void nullifyptr() noexcept {};
 	void copy_from(const archive_options_repair & ref);

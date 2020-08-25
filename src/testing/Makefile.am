@@ -34,7 +34,7 @@ endif
 
 
 if WITH_LIBTHREADAR
-    LIBTHREADAR_TEST_MODULES=test_heap test_parallel_tronconneuse
+    LIBTHREADAR_TEST_MODULES=test_heap test_parallel_tronconneuse test_block_compressor
 else
     LIBTHREADAR_TEST_MODULES=
 endif
@@ -165,3 +165,6 @@ test_heap_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 test_parallel_tronconneuse_SOURCES = test_parallel_tronconneuse.cpp
 test_parallel_tronconneuse_DEPENDENCIES = ../libdar/$(MYLIB).la
+
+test_block_compressor_SOURCES = test_block_compressor.cpp
+test_block_compressor_DEPENDENCIES = ../libdar/$(MYLIB).la

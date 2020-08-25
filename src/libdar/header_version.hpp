@@ -83,6 +83,8 @@ namespace libdar
 	void set_iteration_count(const infinint & arg) { iteration_count = arg; };
 	void set_kdf_hash(hash_algo algo);
 
+	void set_compression_block_size(const infinint & bs) { compr_bs = bs; };
+
 	    // gettings
 
 	const archive_version & get_edition() const { return edition; };
@@ -101,6 +103,7 @@ namespace libdar
 	const std::string & get_salt() const { return salt; };
 	const infinint & get_iteration_count() const { return iteration_count; };
 	hash_algo get_kdf_hash() const { return kdf_hash; };
+	const infinint & get_compression_block_size() const { return compr_bs; };
 
 	    // display
 
@@ -126,6 +129,7 @@ namespace libdar
 	std::string salt;        ///< used for key derivation
 	infinint iteration_count;///< used for key derivation
 	hash_algo kdf_hash;      ///< used for key derivation
+	infinint compr_bs;       ///< the compression block size (0 for legacy compression mode)
 
 	void nullifyptr() noexcept { crypted_key = nullptr; ref_layout = nullptr; };
 	void copy_from(const header_version & ref);
@@ -144,6 +148,7 @@ namespace libdar
 	static constexpr U_I FLAG_HAS_AN_EXTENDED_SIZE = 0x01; ///< the flag is two bytes length
 	static constexpr U_I FLAG_ARCHIVE_IS_SIGNED = 0x0200;  ///< archive is signed
 	static constexpr U_I FLAG_HAS_KDF_PARAM = 0x0400;     ///< archive header contains salt and non default interaction count
+	static constexpr U_I FLAG_HAS_COMPRESS_BS = 0x0800;   ///< archive header contains a compression block size (else it is assumed equal to zero)
 	static constexpr U_I FLAG_HAS_AN_SECOND_EXTENDED_SIZE = 0x0101; ///< reserved for future use
 
 	    //

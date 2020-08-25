@@ -155,7 +155,7 @@ int dar_suite_global(int argc,
     }
     catch(Efeature & e)
     {
-	general_report(string(gettext("NOT YET IMPLEMENTED FEATURE has been used: ")) + e.get_message());
+	general_report(string(gettext("NOT YET IMPLEMENTED FEATURE has been asked: ")) + e.get_message());
 	general_report(string(gettext("Please check documentation or upgrade your software if available")));
 	ret = EXIT_SYNTAX;
     }

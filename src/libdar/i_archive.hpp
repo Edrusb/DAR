@@ -245,6 +245,7 @@ namespace libdar
 				bool empty_dir,
 				compression algo,
 				U_I compression_level,
+				U_I compression_block_size,
 				const infinint & file_size,
 				const infinint & first_file_size,
 				const mask & ea_mask,
@@ -281,6 +282,7 @@ namespace libdar
 				bool ignore_unknown,
 				const fsa_scope & scope,
 				U_I multi_threaded_crypto,
+				U_I multi_threaded_compress,
 				bool delta_signature,
 				bool build_delta_sig,
 				const mask & delta_mask,
@@ -316,6 +318,7 @@ namespace libdar
 			      bool empty_dir,                   ///< whether to store excluded dir as empty directories
 			      compression algo,                 ///< compression algorithm
 			      U_I compression_level,            ///< compression level (range 1 to 9)
+			      U_I compression_block_size,       ///< compression block size (0 for normal/legacy compression mode)
 			      const infinint & file_size,       ///< slice size
 			      const infinint & first_file_size, ///< first slice size
 			      const mask & ea_mask,             ///< Extended Attribute to consider
@@ -353,7 +356,8 @@ namespace libdar
 			      const mask & backup_hook_file_mask,         ///< files elected to have a command executed before and after their backup
 			      bool ignore_unknown,                        ///< whether to warn when an unknown inode type is met
 			      const fsa_scope & scope,                    ///< FSA scope for the operation
-			      U_I multi_threaded_crypto,              ///< whether libdar is allowed to spawn several thread to possibily work faster on multicore CPU
+			      U_I multi_threaded_crypto,        ///< whether libdar is allowed to spawn several thread to possibily work faster on multicore CPU
+			      U_I multi_threaded_compress,      ///< neeed compression_block_size > 0 to use several threads for compression/decompression
 			      bool delta_signature,             ///< whether to calculate and store binary delta signature for each saved file
 			      bool build_delta_sig,             ///< whether to rebuild delta sig accordingly to delta_mask
 			      const mask & delta_mask,          ///< which files to consider delta signature for

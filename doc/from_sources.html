@@ -67,6 +67,8 @@ for lzo compression support</li>
         </li>
         <li style="text-align: justify;"><a href="https://facebook.github.io/zstd/">Zstandard library</a> (version greater or equal to 1.3.0) for xz/lzma compression support<br>
         </li>
+        <li style="text-align: justify;"><a href="https://github.com/lz4/lz4">LZ4 library</a> for lz4 compression support<br>
+        </li>
         <li style="text-align: justify;">gnu Getopt support (Linux has
 it for all distro thanks to
 its glibc, this is not true for FreeBSD for example)</li>
@@ -109,6 +111,8 @@ an archive using the lzo algorithm</li>
         <li>if you lack <span style="font-weight: bold;">liblzma5 </span>library dar will compile but will not be able to compress or uncompress an archive using the xz algorithm<br>
         </li>
 	<li>if you lack <span style="font-weight: bold;">libzstd</span> library dar will compile but will not be able to compress or uncompress an archive using the zstd algorithm<br>
+	</li>
+	<li>if you lack <span style="font-weight: bold;">liblz4</span> library dar will compile but will not be able to compress or uncompress an archive using the lz4 algorithm<br>
 	</li>
         <li>If you lack <span style="font-weight: bold;">libgcrypt </span>dar
 will still compile but you will not be able to use strong encryption

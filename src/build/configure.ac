@@ -615,6 +615,7 @@ AC_ARG_ENABLE( [libzstd-linking],
              )
 
 AS_IF(       [test "x$enable_libzstd_linking" != "xyes"],
+	     [
                AC_MSG_WARN([libzstd compression support has been disabled by user])
                local_libzstd="no"
              ],
@@ -658,6 +659,87 @@ AS_IF(       [test "x$enable_libzstd_linking" != "xyes"],
                AS_IF( [ test "x$explicit_libzstd_linking" = "xyes" -a "$local_libzstd" != "yes" ],
                       [ AC_MSG_ERROR([libzstd linking failed]) ]
                     )
+             ]
+     )
+
+AC_ARG_ENABLE( [liblz4-linking],
+	       AC_HELP_STRING(--disable-liblz4-linking, [disable linking with liblz4 and disable lz4 compression support]),
+	       [explicit_liblz4_linking=yes],
+	       [enable_liblz4_linking=yes]
+	     )
+
+
+AS_IF(	     [ test "x$enable_liblz4_linking" != "xyes" ],
+             [
+	       AC_MSG_WARN([liblz4 compression support has been disabled by user])
+	       local_liblz4="no"
+	     ],
+	     [
+		AC_CHECK_LIB(lz4, [LZ4_decompress_safe], [], [AC_MSG_WARN([library liblz4 not found])])
+		AC_CHECK_HEADER(lz4.h, [
+				        local_liblz4="yes"
+				        AC_DEFINE(HAVE_LZ4_H, 1, [lz4.h header file is available])
+				       ],
+				       [
+				        AC_MSG_WARN([Cannot find lz4.h header file])
+				        local_liblz4="no"
+				       ])
+
+		if test "$local_liblz4" = "yes" ; then
+		   AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C"
+		                                     {
+						        #if HAVE_LZ4_H
+							#include <lz4.h>
+							#endif
+							#if HAVE_STRING_H
+							#include <string.h>
+							#endif
+							#if HAVE_STDLIB_H
+							#include <stdlib.h>
+							#endif
+							#if HAVE_STDIO_H
+							#include <stdio.h>
+							#endif
+						     }
+						  ]],
+						  [[
+							const char *src = "Quand on lui marche sur les pieds, le serpent hausse les epaules.";
+							unsigned int src_sz = strlen(src);
+							unsigned int zip_sz = LZ4_compressBound(src_sz);
+							char *zip = (char *)malloc(zip_sz);
+							char *unzip = (char *)malloc(src_sz + 1);
+
+							if(zip == 0 || unzip == 0)
+							    return 1;  /* allocation problem */
+
+							zip_sz = LZ4_compress_default(src, zip, src_sz, zip_sz);
+
+							if(zip_sz <= 0)
+						            return 1; /* compression problem */
+
+							if(LZ4_decompress_safe(zip, unzip, zip_sz, src_sz) != src_sz)
+							    return 1; /* decompression problem */
+
+							unzip[src_sz] = '\0';
+							if(strncmp(src, unzip, src_sz) != 0)
+							    return 1; /* decompression result does not match the original data */
+
+							free(zip);
+							free(unzip);
+
+							return 0;
+						]])
+				],
+				[ AC_DEFINE(LIBLZ4_AVAILABLE, 1, [headar and linking is available to have liblz4 fonctions]) ],
+				[ local_liblz4="no" ])
+
+		else
+		   AC_MSG_WARN([liblz4 compression support not available])
+		fi
+
+		AS_IF( [ test "x$explicit_liblz4_linking" = "xyes" -a "$local_liblz4" != "yes" ],
+		       [ AC_MSG_ERROR([liblz4 linking failed]) ]
+		     )
              ]
      )
 
@@ -1871,6 +1953,13 @@ fi
 
 printf "   Liblzstd compression (zstd): "
 if [ "$local_libzstd" = "yes" ] ; then
+  echo "YES"
+else
+  echo "NO"
+fi
+
+printf "   Liblz4 compression (lz4)   : "
+if [ "$local_liblz4" = "yes" ] ; then
   echo "YES"
 else
   echo "NO"
