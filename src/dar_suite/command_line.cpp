@@ -319,7 +319,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.ignore_unknown_inode = false;
     p.no_compare_symlink_date = true;
     p.scope = all_fsa_families();
-    p.multi_threaded_crypto = 1;
+    p.multi_threaded_crypto = 0;
     p.multi_threaded_compress = 0;
     p.delta_sig = false;
     p.delta_mask = nullptr;
@@ -821,6 +821,13 @@ bool get_args(shared_ptr<user_interaction> & dialog,
 	    }
 	}
 
+	if(p.multi_threaded_crypto == 0)
+	{
+	    if(!compile_time::libthreadar())
+		p.multi_threaded_crypto = 1;
+	    else
+		p.multi_threaded_crypto = 2;
+	}
 
     }
     catch(Erange & e)
