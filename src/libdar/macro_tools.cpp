@@ -593,13 +593,24 @@ namespace libdar
 		dialog->message(gettext("Considering cyphering layer..."));
 
 	    if(ver.is_ciphered() && ver.get_edition() >= 9 && crypto == crypto_algo::none && ver.get_sym_crypto_algo() != crypto_algo::none)
-		crypto = ver.get_sym_crypto_algo(); // using the crypto algorithm recorded in the archive
+	    {
+		try
+		{
+		    if(lax)
+			dialog->pause("LAX MODE: Do we use the encryption algorithm stored in the archive header/trailer?");
+		    crypto = ver.get_sym_crypto_algo(); // using the crypto algorithm recorded in the archive
+		}
+		catch(Euser_abort &)
+		{
+		    crypto = crypto_algo::none;
+		}
+	    }
 
 	    if(ver.is_ciphered() && crypto == crypto_algo::none)
 	    {
 		if(lax)
 		{
-		    dialog->message(gettext("LAX MODE: Archive seems to be ciphered, but you did not have provided any encryption algorithm, assuming data corruption and considering that the archive is not ciphered"));
+		    dialog->message(gettext("LAX MODE: Archive is flagged as being ciphered, assuming data corruption occurred and considering the archive is not ciphered"));
 		}
 		else
 		    throw Erange("macro_tools_open_archive", tools_printf(gettext("The archive %S is encrypted and no encryption cipher has been given, cannot open archive."), &basename));

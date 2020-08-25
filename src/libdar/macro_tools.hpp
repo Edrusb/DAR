@@ -191,6 +191,7 @@ namespace libdar
 	/// \param[in]  pause how many slices to wait before pausing (0 to never wait)
 	/// \param[in]  algo compression algorithm
 	/// \param[in]  compression_level compression level
+	/// \param[in]  compression_block_size if set to zero use streaming compression else use block compression of the given size
 	/// \param[in]  file_size size of the slices
 	/// \param[in]  first_file_size size of the first slice
 	/// \param[in]  execute command to execute after each slice creation
@@ -209,7 +210,8 @@ namespace libdar
 	/// \param[in]  data_name to use in slice header
 	/// \param[in]  iteration_count used for key derivation when passphrase is human provided
 	/// \param[in]  kdf_hash hash algorithm used for the key derivation function
-	/// \param[in]  multi_threaded_crypto number of worker thread to handle cryptography stuff
+	/// \param[in]  multi_threaded_crypto number of worker threads to handle cryptography stuff
+	/// \param[in]  multi_threaded_compress number of worker threads to handle compression (block mode only)
 	///
 	/// \note the stack has the following contents depending on given options
 	///

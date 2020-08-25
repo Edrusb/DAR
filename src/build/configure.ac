@@ -1858,7 +1858,10 @@ AS_IF(         [ test "x$enable_python_binding" != "xyes" ],
                  local_python="no"
                ],
                [
-                 if test "$debug_static" != "yes" ; then
+	         if test "x$enable_shared" != "xyes" -o "$debug_static" == "yes" ; then
+		   AC_MSG_WARN([Cannot build python binding without shared library support])
+		   local_python="no"
+		 else
                    AC_MSG_CHECKING([for python binding])
                    pyext="python3-config --extension-suffix"
                    if  $pyext 1> /dev/null 2> /dev/null ; then
@@ -1878,8 +1881,6 @@ AS_IF(         [ test "x$enable_python_binding" != "xyes" ],
                       local_python="no"
                       AC_MSG_RESULT([failed])
                    fi
-                 else
-                    AC_MSG_RESULT([Cannot build python binding when --enable-debug is set])
                  fi
                  AS_IF( [ test "x$explicit_python_binding" = "xyes" -a "$local_python" != "yes" ],
                         [ AC_MSG_ERROR([prerequisit for python binding not met]) ]

@@ -346,7 +346,7 @@ namespace libdar
 
 		// we will pass each element of the last_mod map, following the order used by std::map
 		// which is based on the order of the first element, here archive_num, thus "it" will
-		// be pointing at the each entry, from the smallest to the highest archive number
+		// be pointing at each entry, from the smallest to the highest archive number
 
 	datetime max_seen_date = datetime(0);
 	archive_num last_archive_seen = 0; //< last archive number (in the order of the database) in which a valid entry has been found (any state)

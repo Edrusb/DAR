@@ -355,7 +355,7 @@ namespace libdar
 
 	    /// set the compression block size
 
-	    /// \param[in] compression_bs if set to zero (which is the default value)
+	    /// \param[in] compression_block_size if set to zero (which is the default value)
 	    /// compression is performed without block in one single stream per file.
 	    /// This is the historical way used by libdar, it gives the best result
 	    /// and the lowest compute overhead, though it cannot be parallelized.

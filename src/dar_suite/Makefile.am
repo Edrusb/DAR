@@ -76,7 +76,9 @@ else
 endif
 
 install-exec-hook :
-	cd $(DESTDIR)$(bindir) ; $(UPX_PROG) -9 dar$(EXEEXT) dar_xform$(EXEEXT) dar_slave$(EXEEXT) dar_manager$(EXEEXT) dar_cp$(EXEEXT) $(ALSO_BUILD_INST)
+	cd $(DESTDIR)$(bindir) ; $(UPX_PROG) -9 dar$(EXEEXT) dar_xform$(EXEEXT) dar_slave$(EXEEXT) dar_manager$(EXEEXT) dar_cp$(EXEEXT) dar_split$(EXEEXT) $(ALSO_BUILD_INST) || exit 0
+
+# exit 0 because dar_split for example is today too small to be upx-compressed 
 
 else
 install-exec-hook:

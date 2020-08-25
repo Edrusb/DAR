@@ -73,7 +73,11 @@ namespace libdar
 	    case db_etat::et_patch:
 		break;
 	    case db_etat::et_present:
-		throw SRC_BUG;
+		if(status.size() > 1) // et_present only allowed in status if it is the first entry
+		    throw SRC_BUG;
+		else
+		    clear();
+		break;
 	    case db_etat::et_inode:
 		num.pop_back();    // removing the top of the stack
 		status.pop_back(); // removing the top of the stack

@@ -439,7 +439,7 @@ namespace libdar
 	size_t essiv_key_len;
 	err = gcry_cipher_algo_info(IV_cipher, GCRYCTL_GET_KEYLEN, nullptr, &essiv_key_len);
 	if(err != GPG_ERR_NO_ERROR)
-	    throw Erange("crypto_sym::init_essiv_clef",tools_printf(gettext("Failed retrieving from libgcrypt the key length to use (essiv key): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	    throw Erange("crypto_sym::init_essiv_clef", tools_printf(gettext("Error while setting IV for current block: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
 	    // failing if the digest size is larger than key size for IV_cipher
 
