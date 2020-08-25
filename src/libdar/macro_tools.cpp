@@ -202,6 +202,17 @@ namespace libdar
 	    if(ret == nullptr)
 		throw Ememory("get_catalogue_from");
 
+		// the following is necessary in multi-threaded context
+		// where the data_ctxt is a tuyau object:
+		// both read data and orders (to change the context value)
+		// use the same channel
+		// and having this thread changing the contextual
+		// info without first stopping subthreads would
+		// conflict the thread that may still be reading ahead
+		// data from the archive
+	    data_stack.flush_read_above(dynamic_cast<generic_file*>(data_ctxt));
+	    cata_stack.flush_read_above(dynamic_cast<generic_file*>(cata_ctxt));
+
 	    try
 	    {
 		data_ctxt->set_info_status(CONTEXT_OP);
