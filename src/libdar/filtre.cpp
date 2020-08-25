@@ -3305,13 +3305,6 @@ namespace libdar
 						fic->clear_delta_signature_only();
 					}
 
-					    // in repair_mode, the file offset points to the data
-					    // in the damaged archive, it must not be set before the
-					    // data is read at which time it record the offset in the
-					    // repaired archive, the offset may change espetially when
-					    // encryption is used, due to variable sized elastic buffers
-					fic->set_offset(start);
-
 
 					    //////////////////////////////
 					    // checking crc value and storing it in catalogue
@@ -3320,7 +3313,7 @@ namespace libdar
 					    fic->set_crc(*val);
 					else
 					{
-					    if(keep_mode == cat_file::normal && crc_available
+					    if(keep_mode == cat_file::normal
 					       && crc_available
 					       && !fic->get_sparse_file_detection_read())
 						    // crc is calculated based on the stored uncompressed data
@@ -3420,7 +3413,6 @@ namespace libdar
 					    storage_size = 0;
 					else
 					    storage_size = pdesc.stack->get_position() - start;
-					fic->set_storage_size(storage_size);
 				    }
 				    else
 					throw SRC_BUG;
@@ -3496,6 +3488,26 @@ namespace libdar
 				}
 				else
 				    resave_uncompressed = false;
+
+
+				if(!resave_uncompressed)
+				{
+					// in repair_mode, the file offset points to the data
+					// in the damaged archive, it must not be set before the
+					// data is read at which time it records the offset in the
+					// repaired archive, the offset may change espetially when
+					// encryption is used, due to variable sized elastic buffers
+					//
+					// another situation is while merging an recompressing
+					// data, if the new compression gives less good result than
+					// the actual, resave_uncompressed will be tried and
+					// need to set back the source data (fic->get_offset())
+					// to the position in the source archive so we must
+					// not overwrite this value until we know we won't need it
+					// anymore
+				    fic->set_offset(start);
+				    fic->set_storage_size(storage_size);
+				}
 
 
 				    //////////////////////////////
