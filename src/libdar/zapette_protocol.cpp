@@ -118,11 +118,20 @@ namespace libdar
             while(pas < sizeof(tmp))
                 pas += f->read((char *)&tmp+pas, sizeof(tmp)-pas);
             size = ntohs(tmp);
-            pas = 0;
-            while(pas < size)
-                pas += f->read(data+pas, size-pas);
 
-            if(size > max) // need to drop the remaining data
+		// recycling tmp to carry the max data to store in the data arg of this method
+	    if(size > max)
+		tmp = max;
+	    else
+		tmp = size;
+
+		// recycling pas to follow the steps of data fullfilment
+            pas = 0;
+            while(pas < tmp)
+                pas += f->read(data+pas, tmp - pas);
+
+		// need to drop the remaining data
+            if(size > max)
             {
                 char black_hole;
 
