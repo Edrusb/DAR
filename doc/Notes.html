@@ -74,6 +74,7 @@
                   dar/libdar</a><br>
                 <a href="#asym">How asymmetric encryption is performed in
                   dar/libdar</a><br>
+		<a href="#multi-threaded">Multi-threading considerations</a><br/>
                 <br>
               </div>
             </td>
@@ -3987,5 +3988,94 @@
     </table>
     <br>
     <br>
+    <hr style="width: 100%; height: 2px;"><br>
+    <table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;"
+	   cellspacing="2" cellpadding="2" border="0">
+      <tbody>
+        <tr>
+          <td style="vertical-align: top;">
+	    <h3><a name="multi-threaded">Multi-threading considerations</a></h3>
+	    <h4>Ciphering</h4>
+	    <div style="text-align: justify;">
+	      The ciphering in dar/libdar is performed by large block of data (see -# option
+	      and consorts), it was
+	      thus possible to parallelize the ciphering/deciphering operation assigning
+	      different blocks to different threads without changing the archive format.
+	      The measured performance gain is quite good, but usually hidden by the compression load. To assign blocks
+	      to worker threads (those that compute the ciphering algorithm), two helper
+	      threads are needed: one that copy data into block of memory and scatters it to
+	      workers for they can work in total autonomy, and another one that gather the resulting block of
+	      memory in the correct order.
+	      <p/>
+	      If performance gain is present and no change in the archive format was necessary to leverage multi-threading
+	      for ciphering/deciphering, however, this has some impact on memory usage
+	      required by dar. Each thread will need a pair of blocks (one for the clear
+	      data, one for the ciphered equivalent). In addition, the gathering
+	      and scattering structures of blocks to/from the workers (which we will globally
+	      design under the term <i>ratelier</i> can hold each N block of memory
+	      (N being the number of workers) in fact the size of these
+	      structures has been chosen a bit wider: N+N/2. Last the helper thread that
+	      feeds data to the worker may hold one pair of block under construction,
+	      and the gathering thread may obtain from the ratelier_gather a whole structure (N+N/2 blocks)
+	      to work with. For N worker, the number of memory block is N+N/2 for each ratelier
+	      plus N for each worker, plus N+N/2 for the gathering thread and one for the scattering thread,
+	      which makes around 7*N blocks of additional memory requirement. Concretely, having 5 threads with
+	      encryption block of 10240 bytes (10 KiB) leads dar to allocate 350 KiB (7x5x10) of additional
+	      memory compared to the single threaded implementation.
+	    </div>
+	    <h4>Compression</h4>
+	    <div style="text-align: justify;">
+	      For compression, things have been more complicated, as before release 2.7.0 compression was done
+	      per file in streaming mode. That's to say dar has to provide a sequential flow of bytes to the compression
+	      library and at the same time retrieve the compression/decompression counterpart. The API provided
+	      by the different libraries (libz, libbzip2, liblzo2, liblzma5, libzstd, liblz4) do not provide
+	      multi-threaded approach for this mode of compressing data, however this gives the best compression
+	      ratio you can expect for a given file and a given compression algorithm and compression level.
+	      <p/>
+	      Before 2.7.0 parallelization had been tried but with little success by running compression and
+	      encryption in different threads. Usually one of the thread spends most of its time waiting for
+	      the other and the overall performance gain is little due to the added overhead. This scheme
+	      has been completely abandoned to the one exposed above for encryption. To extend this method
+	      to compression, we have to change the mode of compression, from the legacy streaming one to a
+	      block approach. Note that with release 2.7.0 both mode will coexist, and you will still be able
+	      to read old archive and generate new one with old single thread/streaming approach.
+	      <p/>
+	      The result is quite similar to the encryption approach, a set of worker proceed to the compression
+	      or decompression of one block at a time and two helper threads feed on one side and gather the
+	      result on the other side. In block compression mode, the compressed file's content is no more
+	      a flow of unstructured data that would be fed to the decompression engine, but a sequence of compressed
+	      block proceeded by the size of the compressed block:
+	    </div>
+	    <code>
+	      +------------+---------------------+------------+-----------------+-----+----------------------+<br/>
+              | block size | compressed data ... | block size | compressed data | ... | block size = 0 (EOF) |<br/>
+	      +------------+---------------------+------------+-----------------+-----+----------------------+<br/>
+	    </code>
+	    <p/>
+	    <div style="text-align: justify;">
+	      The consequence is a less good compression ratio when the block size is chosen too small and a memory
+	      requirement increase as described above for the parallel encryption. Choosing a block size
+	      of 102400 bytes (see extended syntax of -z option) with 4 threads (see -G option) will lead libdar to
+	      allocated 2800 KiB (~ 2.7 GiB) in addition
+	      to what libdar already uses for single thread approach. If you use both parallel encryption and parallel
+	      compression at the same time you have to sum the additional memory requirements of each feature.
+	    </div>
+
+	    <h4>Command-line</h4>
+	    <div style="text-align: justify;">
+	      The thread number for both encryption and compression is driven by the -G option. See man page
+	      for details. Note that, as described above, multi-threaded compression/decompression is only
+	      possible with the new compression per block method, which means you have to specify a compression block
+	      size (see -z option).
+	    </div>
+	    <p/>
+	    <br/>
+	    <br/>
+	  </td>
+	</tr>
+      </tbody>
+    </table>
+
+
   </body>
 </html>
