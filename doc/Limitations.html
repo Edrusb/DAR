@@ -1,241 +1,277 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head>
-
-
-
-
-  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR's Limitations</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
-<center>
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><a href="index.html"><img style="border: 0px solid ; width: 160px; height: 120px;" alt="Dar Documentation" src="dar_s_doc.jpg"></a><br>
-      </td>
-      <td style="vertical-align: top;">
-      <h1 style="text-align: center;"><br>
-      </h1>
-      <h1 style="text-align: center;">DAR's Limitations</h1>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top;">Here follows a description of
-the known limitation you should consult before creating a bug report
-for dar:<br>
+<html>
+  <head>
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+    <title>DAR's Limitations</title>
+  </head>
+  <body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
+    <center>
+      <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+	<tbody>
+	  <tr>
+	    <td style="vertical-align: top; width: 161px;"><a href="index.html"><img style="border: 0px solid ; width: 160px; height: 120px;" alt="Dar Documentation" src="dar_s_doc.jpg"></a><br>
+	    </td>
+	    <td style="vertical-align: top;">
+	      <h1 style="text-align: center;"><br>
+	      </h1>
+	      <h1 style="text-align: center;">DAR's Limitations</h1>
+	    </td>
+	  </tr>
+	</tbody>
+      </table>
       <br>
-      <h2 style="text-align: justify;">Fixed Limits</h2>
-      <ul style="text-align: justify;">
-        <ul>
-          <li>The size of SLICES may be limited by the file system or
-kernel (maximum file size is 2 GB with Linux kernel 2.2.x), other
-limits may exist depending on the filesystem used.<br>
-          </li>
-          <li>the number of SLICES is only limited by the size of the
-filenames, thus using a basename of 10 chars, considering your file
-system can support 256 char per filename at most, you could already get
-up to&nbsp; 10^241 SLICES, 1 followed by 241 zero. But as soon as your
-file
-system will support bigger files or longer filename, dar will follow
-without change.</li>
-          <li>dar_manager can gather up to 65534 different backups, not
-more. This
-limit should be high enough to not be a problem. <br>
-          </li>
-          <li>when using a listing file to define which file to operate
-on (-[ and -] option when using dar), each line of the listing file must not be longer than 20479 bytes
-else a new line is considered at the 20480th byte. </li>
-        </ul>
-      </ul>
       <br>
-      <h2 style="text-align: justify;">System variable limits</h2>
-      <h3 style="text-align: justify;">Memory</h3>
-      <div style="text-align: justify; margin-left: 40px;">Dar uses
-virtual memory (=
-RAM+swap) to be able to add the list of file
-saved at the end of each archive. Dar uses its own integer type (called
-"infinint") that do not have limit (unlike 32 bits or 64 bits
-integers). This makes dar already able to manage Zettabytes volumes and
-above even if the systems cannot yet manage such file sizes.
-Nevertheless, this has an overhead with memory and&nbsp; CPU usage,
-added to
-the C++ overhead for the datastructure. All together dar needs a
-average of 650 bytes of virtual memory by saved file with dar-2.1.0 and
-around 850 with dar-2.4.x
-(that's the price to pay for new features). Thus, for example
-if you have 110,000 files to save, whatever is the total amount of data
-to save, dar will require around 67 MB of virtual memory.<br>
-      </div>
-      <div style="margin-left: 40px;"><br>
-      </div>
-      <div style="text-align: justify; margin-left: 40px;">Now, when
-doing catalogue
-extraction or differential backup, dar has in
-memory two catalogues, thus the amount of memory space needed is the
-double (134 MB in the example). Why ? Because for differential backup,
-dar starts with the catalogue of the archive of reference which is
-needed to know which files to save and which not to save, and in
-another hand, builds the catalogue of the new archive all along the
-process. Now, for catalogue extraction, the process is equivalent to
-making a differential backup just after a full backup.<br>
-      <br>
-As you guess merging two archives into a third one requires even more
-memory (memory to store the first archive to merge, the second archive
-to merge and the resulting archive to produce).<br>
-      </div>
-      <div style="margin-left: 40px;"><br>
-      </div>
-      <div style="text-align: justify; margin-left: 40px;">This memory
-issue, is not a
-limit by itself, but you need enough virtual memory to be able to save
-your data (if necessary you can still
-add swap space, as partition or as a plain file).<br>
-      </div>
-      <br>
-      <h3 style="text-align: justify;"><a name="Integers"></a>Integers</h3>
-      <div style="text-align: justify; margin-left: 40px;">To overcome
-the previously
-explained
-memory issue, dar can be built in an other mode. In this other mode,
-"infinint" is replaced by 32 bits or 64 bits integers, as defined by
-the use of --enable-mode=32 or --enable-mode=64 options given to
-configure script. The executables built this way (dar, dar_xform,
-dar_slave and dar_manager) run faster and use much less memory than the
-"full" versions using "infinint". But yes, there are drawbacks:&nbsp;
-slice
-size, file size, dates, number of files to backup, total archive size
-(sum of all slices), etc, are bounded by the maximum value of the used
-integer, which is 4,294,967,296 for 32 bits and
-18,446,744,073,709,551,616 for 64 bits integers.&nbsp; In clear the 32
-bits
-version cannot handle dates after year 2106 and file sizes over 4 GB.
-While the 64 bits version cannot handle dates after around 500 billion
-years (which is longer than the estimated age of the Universe: 15
-billion years) and file larger than around 18 EB (18 <a href="usage_notes.html#bytes_bits_kilo">exa bytes</a>). <br>
-      <br>
-Since version 2.5.4 another parameter depends on the maximum supported
-integer number: the number of entries in a given archive. In other
-words, you will not be able to&nbsp; have more than 4 giga files (4
-billion files) in a single archive when using libdar32, 18 exa file
-with libdar64 and no limitation with libdar based on infinint.<br>
-      </div>
-      <div style="margin-left: 40px;"><br>
-      </div>
-      <div style="text-align: justify; margin-left: 40px;">What the
-comportment when such
-a
-limit is reached ? For compatibility with the rest of the code, limited
-length integers (32 or 64 for now) cannot be used as-is, they are
-enclosed in a C++ class, which will report overflow in arithmetic
-operations. Archives generated with all the different version of dar
-will stay compatible between them, but the 32 bits or 64 bits will not
-be able to read or produce all possible archives. In that case, dar
-suite program will abort with an error message asking you to use the
-"full" version of dar program.<br>
-      </div>
-      <div style="margin-left: 40px;"><br>
-</div>
-      <h3 style="text-align: justify;">Command line</h3>
-      <div style="text-align: justify; margin-left: 40px;">On several
-systems,
-command-line long
-options are not available. This is due to the fact that dar relies on
-GNU getopt. Systems like FreeBSD do not have by default GNU getopt,
-instead the getopt function proposed from the standard library does not
-support long options, nor optional arguments. On such system you will
-have to use short options only, and to overcome the lack of optional
-argument you need to explicitly set the argument. For example in place
-of "-z" use "-z 9" and so on (see <a href="man/index.html">dar's man
-page</a> section "EXPLICIT OPTIONAL ARGUMENTS"). All options for dar's
-features are
-available with FreeBSD's getopt, just using short options and explicit
-arguments.<br>
-      </div>
-      <div style="margin-left: 40px;"><br>
-      </div>
-      <div style="text-align: justify; margin-left: 40px;">Else you can
-install GNU getopt
-as a
-separated library called libgnugetopt. If the include file
-&lt;getopt.h&gt; is also available, the configure script will detect it
-and use this library. This way you can have long options on FreeBSD for
-example.<br>
-      <br>
-Another point concerns the comand line length limitation. All system
-(correct me if I am wrong) do limit the size of the command line. If
-you want to add more options to dar than your system can afford, you
-can use the -B option instead an put all dar's arguments (or just some
-of them) in the file pointed to by this -B option. -B can be used
-several times on command line and is recursive (you can use -B from a
-file read by -B option).<br>
-      </div>
-      <h3 style="text-align: justify;">Dates</h3>
-      <div style="margin-left: 40px;">Unix files have up to four dates :<br>
-      </div>
-      <ul style="text-align: justify; margin-left: 40px;">
-        <li>last modification date (mtime)</li>
-        <li>last access date (atime)</li>
-        
-        <li>last inode change (ctime)</li>
-        <li>creation date (birthtime) [not all Unix system support this date, Linux does not for example]<br>
-        </li>
+      <hr style="width: 100%; height: 2px;"><br>
+      <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+	<tbody>
+	  <tr>
+	    <td style="vertical-align: top;">Here follows a description of
+	      the known limitation you should consult before creating a bug report
+	      for dar:<br>
+	      <br>
+	      <h2 style="text-align: justify;">Fixed Limits</h2>
+	      <ul style="text-align: justify;">
+		<ul>
+		  <li>The size of SLICES may be limited by the file system or
+		    kernel (maximum file size is 2 GB with Linux kernel 2.2.x), other
+		    limits may exist depending on the filesystem used.<br>
+		  </li>
+		  <li>the number of SLICES is only limited by the size of the
+		    filenames, thus using a basename of 10 chars, considering your file
+		    system can support 256 char per filename at most, you could already get
+		    up to&nbsp; 10^241 SLICES, 1 followed by 241 zero. But as soon as your
+		    file
+		    system will support bigger files or longer filename, dar will follow
+		    without change.</li>
+		  <li>dar_manager can gather up to 65534 different backups, not
+		    more. This
+		    limit should be high enough to not be a problem. <br>
+		  </li>
+		  <li>when using a listing file to define which file to operate
+		    on (-[ and -] option when using dar), each line of the listing file must not be longer than 20479 bytes
+		    else a new line is considered at the 20480th byte. </li>
+		</ul>
+	      </ul>
+	      <br>
+	      <h2 style="text-align: justify;">System variable limits</h2>
+	      <h3 style="text-align: justify;">Memory</h3>
+	      <div style="text-align: justify; margin-left: 40px;">Dar uses
+		virtual memory (=
+		RAM+swap) to be able to add the list of file
+		saved at the end of each archive. Dar uses its own integer type (called
+		"infinint") that do not have limit (unlike 32 bits or 64 bits
+		integers). This makes dar already able to manage Zettabytes volumes and
+		above even if the systems cannot yet manage such file sizes.
+		Nevertheless, this has an overhead with memory and&nbsp; CPU usage,
+		added to
+		the C++ overhead for the datastructure. All together dar needs a
+		average of 650 bytes of virtual memory by saved file with dar-2.1.0 and
+		around 850 with dar-2.4.x
+		(that's the price to pay for new features). Thus, for example
+		if you have 110,000 files to save, whatever is the total amount of data
+		to save, dar will require around 67 MB of virtual memory.<br>
+	      </div>
+	      <div style="margin-left: 40px;"><br>
+	      </div>
+	      <div style="text-align: justify; margin-left: 40px;">Now, when
+		doing catalogue
+		extraction or differential backup, dar has in
+		memory two catalogues, thus the amount of memory space needed is the
+		double (134 MB in the example). Why ? Because for differential backup,
+		dar starts with the catalogue of the archive of reference which is
+		needed to know which files to save and which not to save, and in
+		another hand, builds the catalogue of the new archive all along the
+		process. Now, for catalogue extraction, the process is equivalent to
+		making a differential backup just after a full backup.<br>
+		<br>
+		As you guess merging two archives into a third one requires even more
+		memory (memory to store the first archive to merge, the second archive
+		to merge and the resulting archive to produce).<br>
+	      </div>
+	      <div style="margin-left: 40px;"><br>
+	      </div>
+	      <div style="text-align: justify; margin-left: 40px;">This memory
+		issue, is not a
+		limit by itself, but you need enough virtual memory to be able to save
+		your data (if necessary you can still
+		add swap space, as partition or as a plain file).<br>
+	      </div>
+	      <br>
+	      <h3 style="text-align: justify;"><a name="Integers"></a>Integers</h3>
+	      <div style="text-align: justify; margin-left: 40px;">To overcome
+		the previously
+		explained
+		memory issue, dar can be built in an other mode. In this other mode,
+		"infinint" is replaced by 32 bits or 64 bits integers, as defined by
+		the use of --enable-mode=32 or --enable-mode=64 options given to
+		configure script. The executables built this way (dar, dar_xform,
+		dar_slave and dar_manager) run faster and use much less memory than the
+		"full" versions using "infinint". But yes, there are drawbacks:&nbsp;
+		slice
+		size, file size, dates, number of files to backup, total archive size
+		(sum of all slices), etc, are bounded by the maximum value of the used
+		integer, which is 4,294,967,296 for 32 bits and
+		18,446,744,073,709,551,616 for 64 bits integers.&nbsp; In clear the 32
+		bits
+		version cannot handle dates after year 2106 and file sizes over 4 GB.
+		While the 64 bits version cannot handle dates after around 500 billion
+		years (which is longer than the estimated age of the Universe: 15
+		billion years) and file larger than around 18 EB (18 <a href="usage_notes.html#bytes_bits_kilo">exa bytes</a>). <br>
+		<br>
+		Since version 2.5.4 another parameter depends on the maximum supported
+		integer number: the number of entries in a given archive. In other
+		words, you will not be able to&nbsp; have more than 4 giga files (4
+		billion files) in a single archive when using libdar32, 18 exa file
+		with libdar64 and no limitation with libdar based on infinint.<br>
+	      </div>
+	      <div style="margin-left: 40px;"><br>
+	      </div>
+	      <div style="text-align: justify; margin-left: 40px;">What the
+		comportment when such
+		a
+		limit is reached ? For compatibility with the rest of the code, limited
+		length integers (32 or 64 for now) cannot be used as-is, they are
+		enclosed in a C++ class, which will report overflow in arithmetic
+		operations. Archives generated with all the different version of dar
+		will stay compatible between them, but the 32 bits or 64 bits will not
+		be able to read or produce all possible archives. In that case, dar
+		suite program will abort with an error message asking you to use the
+		"full" version of dar program.<br>
+	      </div>
+	      <div style="margin-left: 40px;"><br>
+	      </div>
+	      <h3 style="text-align: justify;">Command line</h3>
+	      <div style="text-align: justify; margin-left: 40px;">On several
+		systems,
+		command-line long
+		options are not available. This is due to the fact that dar relies on
+		GNU getopt. Systems like FreeBSD do not have by default GNU getopt,
+		instead the getopt function proposed from the standard library does not
+		support long options, nor optional arguments. On such system you will
+		have to use short options only, and to overcome the lack of optional
+		argument you need to explicitly set the argument. For example in place
+		of "-z" use "-z 9" and so on (see <a href="man/index.html">dar's man
+		  page</a> section "EXPLICIT OPTIONAL ARGUMENTS"). All options for dar's
+		features are
+		available with FreeBSD's getopt, just using short options and explicit
+		arguments.<br>
+	      </div>
+	      <div style="margin-left: 40px;"><br>
+	      </div>
+	      <div style="text-align: justify; margin-left: 40px;">Else you can
+		install GNU getopt
+		as a
+		separated library called libgnugetopt. If the include file
+		&lt;getopt.h&gt; is also available, the configure script will detect it
+		and use this library. This way you can have long options on FreeBSD for
+		example.<br>
+		<br>
+		Another point concerns the comand line length limitation. All system
+		(correct me if I am wrong) do limit the size of the command line. If
+		you want to add more options to dar than your system can afford, you
+		can use the -B option instead an put all dar's arguments (or just some
+		of them) in the file pointed to by this -B option. -B can be used
+		several times on command line and is recursive (you can use -B from a
+		file read by -B option).<br>
+	      </div>
+	      <h3 style="text-align: justify;">Dates</h3>
+	      <div style="margin-left: 40px;">Unix files have up to four dates :<br>
+	      </div>
+	      <ul style="text-align: justify; margin-left: 40px;">
+		<li>last modification date (mtime)</li>
+		<li>last access date (atime)</li>
 
-      </ul>
-      <div style="text-align: justify; margin-left: 40px;">In
-dar, these dates are stored as
-integers (the number of seconds elapsed
-since Jan 1st, 1970) as Unix systems do, since release 2.5.0 it can
-also save, store and restore the microsecond part of these dates on
-system that support it. As seen above, the limitation
-is not due to dar
-but on the integer used, so if you use infinint, you should be able to
-store any date as far in the future as you want. Of course dar cannot
-stores dates before Jan the 1st of 1970, but it should not be a very
-big problem as there should not be surviving files older than that
-epoch ;-) <br>
-      </div>
-      <div style="margin-left: 40px;"><br>
-      </div>
-      <div style="text-align: justify; margin-left: 40px;">There is no
-standard way under
-Unix
-to change the ctime. So Dar is not able to restore the ctime date of
-files.<br>
-      </div><br>
-      <h3>Symlinks</h3>
-      <div style="margin-left: 40px; text-align: justify;">On system that provide the lutimes() system call, the dates of a symlink can be restored. On systems
-that do not provide that system call, if you modify the mtime of an existing
-symlink, you end modifying the mtime of the file targeted by that
-symlink, keeping untouched the mtime of the symlink itself! For that
-reason, without lutimes() support, dar is avoids restoring mtime of symlink.<br>
-      </div>
+		<li>last inode change (ctime)</li>
+		<li>creation date (birthtime) [not all Unix system support this date, Linux does not for example]<br>
+		</li>
+
+	      </ul>
+	      <div style="text-align: justify; margin-left: 40px;">In
+		dar, these dates are stored as
+		integers (the number of seconds elapsed
+		since Jan 1st, 1970) as Unix systems do, since release 2.5.0 it can
+		also save, store and restore the microsecond part of these dates on
+		system that support it. As seen above, the limitation
+		is not due to dar
+		but on the integer used, so if you use infinint, you should be able to
+		store any date as far in the future as you want. Of course dar cannot
+		stores dates before Jan the 1st of 1970, but it should not be a very
+		big problem as there should not be surviving files older than that
+		epoch ;-) <br>
+	      </div>
+	      <div style="margin-left: 40px;"><br>
+	      </div>
+	      <div style="text-align: justify; margin-left: 40px;">There is no
+		standard way under
+		Unix
+		to change the ctime. So Dar is not able to restore the ctime date of
+		files.<br>
+	      </div><br>
+	      <h3>Symlinks</h3>
+	      <div style="margin-left: 40px; text-align: justify;">On system that provide the lutimes() system call, the dates of a symlink can be restored. On systems
+		that do not provide that system call, if you modify the mtime of an existing
+		symlink, you end modifying the mtime of the file targeted by that
+		symlink, keeping untouched the mtime of the symlink itself! For that
+		reason, without lutimes() support, dar is avoids restoring mtime of symlink.<br>
+	      </div>
+	      <br>
+	      <h3>SFTP protocol</h3>
+	      <div style="margin-left: 40px; text-align: justify;">dar/libdar cannot read an
+		.ssh/known_hosts containing "ecdsa-sha2-nistp256" lines, even if the
+		host you are connected to known by an "ssh-rsa" key, as soon as one
+		host in the known_hosts file is not "ssh-rsa" dar/libdar will fail the
+		host validation and abort. This is restriction comes from libssh that
+		seems used by libcurl which libdar relies on for network related
+		features. There is some workaround decribed in the man page about the
+		DAR_SFTP_KNOWNHOSTS_FILE environment variable.
+	      </div>
+	      <br>
+	      <br>
+	      <h3>Multi-threading performance and memory requirement</h3>
+	      <div style="margin-left: 40px; text-align: justify;">
+		Don't expect the execution time to be exactly divided by the number of
+		threads you will use, when comparing with the equivalent single threaded
+		execution. There is first an overhead to have several
+		threads working in the same process (protocols, synchronization
+		on shared memory). There is also the nature of the work that is
+		not always possible to process with threads, only the two most
+		CPU intensive tasks involved in the building and use of a dar
+		archive (compression and encryption) have been enhanced to support
+		multiple threads. Still remains some light tasks (CRC calculation,
+		escape sequence/tape marks, sparse file detection/reconstruction),
+		that are difficult to parallelize while they require much less CPU
+		than these first two tasks, so the multi-threading investement
+		(processing, but also software developement) does not worth it.
+		Third, the ciphering/deciphering process may be interrupted when
+		seeking in the archive for a particular file, this slightly reduces
+		performances of multi-threading. For compression even when multi-threading is used,
+		the process stays per file, and is thus reset after
+		each new file. The gain is very interesting for large files and you
+		have better not to select a too small block size for compression,
+		having several tens of kilobytes or even a megabyte is
+		interesting as small files will be handeled
+		by a single thread with little overhead and large files will
+		leverage multiple threads.
+		Last, you disk access may become the bottleneck that drives the
+		total execution time of the operation.
+		<br>
+		The drawback of the multi-threading used within libbdar is the
+		memory requirement. Each worker thread will work with a block
+		in memory (in fact two: one for compressed/ciphered data, the other
+		for their decompressed/deciphered counterpart). In addition
+		to the worker threads you specify, two helper threads are needed,
+		one to feed the workers with blocks, the other to gather resulting
+		blocks of data toghether. These are not CPU intensive but may
+		hold memory block while the worker threads do also.
+	      </div>
+	      <br>
+	    </td>
+	  </tr>
+	</tbody>
+      </table>
       <br>
-      <h3>SFTP protocol</h3>
-      <div style="margin-left: 40px;">dar/libdar cannot read an
-.ssh/known_hosts containing "ecdsa-sha2-nistp256" lines, even if the
-host you are connected to known by an "ssh-rsa" key, as soon as one
-host in the known_hosts file is not "ssh-rsa" dar/libdar will fail the
-host validation and abort. This is restriction comes from libssh that
-seems used by libcurl which libdar relies on for network related
-features. There is some workaround decribed in the man page about the
-DAR_SFTP_KNOWNHOSTS_FILE environment variable.<br>
       <br>
-      </div>
-<br>
-
-      </td>
- </tr>
-  </tbody>
-</table>
-<br>
-<br>
-<br>
-</center>
-
-
-</body></html>
+      <br>
+    </center>
+  </body>
+</html>
