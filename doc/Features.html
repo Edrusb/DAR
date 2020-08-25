@@ -519,7 +519,7 @@ or before reading a slice.<br>
     <tr>
       <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;">dar</span>
 can use compression. By default
-no compression is used. Actually gzip, bzip2, lzo, xz/lzma, zstd algorithms
+no compression is used. Actually gzip, bzip2, lzo, xz/lzma, zstd, lz4 algorithms
 are available, and there is still room available for any other
 compression
 algorithm. Note that, compression is made before slicing, which means
@@ -1331,5 +1331,32 @@ archive.002.dar, ... archive.010.dar.<br>
   </tbody>
 </table>
 <br>
+<br>
+<br>
+<table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; font-weight: bold; width: 33%;">MULTI-THREADING<br>
+      </td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a> </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">keywords: --multi-thread<br>
+      </td>
+    </tr>
+    <tr align="justify">
+      <td colspan="2" rowspan="1" style="vertical-align: top;">
+	Since release 2.7.0, compression can use several threads when the new compression per block
+	is used (by opposition to the streaming compression used so far, which is still available).
+	Encryption can also be processed with multiple threads even for old archives (no change
+	at encryption level). The user defines the number of threads he wants for each process,
+	compression/decompression as well as ciphering/deciphering.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
 </center>
 </body></html>
