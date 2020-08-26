@@ -23,6 +23,9 @@
 
 extern "C"
 {
+#if HAVE_ZLIB_H
+#include <zlib.h>
+#endif
 }
 
 #include "gzip_module.hpp"

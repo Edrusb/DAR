@@ -29,9 +29,6 @@
 
 extern "C"
 {
-#if HAVE_ZLIB_H
-#include <zlib.h>
-#endif
 }
 
 #include "../my_config.h"
@@ -39,8 +36,6 @@ extern "C"
 #include <memory>
 
 #include "compress_module.hpp"
-#include "infinint.hpp"
-#include "integers.hpp"
 
 namespace libdar
 {
