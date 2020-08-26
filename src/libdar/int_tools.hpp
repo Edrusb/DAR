@@ -57,7 +57,7 @@ namespace libdar
         return v;
     }
 
-    template <class T> extern T int_tools_maxof_agregate(T unused) { unused = 0; unused = ~unused; unused = unused > 0 ? unused : ~int_tools_rotate_right_one_bit(T(1)); return unused; }
+    template <class T> extern T int_tools_maxof_aggregate(T unused) { unused = 0; unused = ~unused; unused = unused > 0 ? unused : ~int_tools_rotate_right_one_bit(T(1)); return unused; }
 
     template <class B> static B int_tools_higher_power_of_2(B val)
     {

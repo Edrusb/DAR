@@ -433,7 +433,7 @@ namespace libdar
 	bool eof = false;
 
 
-	max_i_step = int_tools_maxof_agregate(max_i_step);
+	max_i_step = int_tools_maxof_aggregate(max_i_step);
 	if(max_i_step <= 0)
 	    throw SRC_BUG; // error in max positive value calculation, just above
 

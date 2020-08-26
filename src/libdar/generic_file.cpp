@@ -177,7 +177,7 @@ namespace libdar
 	if(terminated)
 	    throw SRC_BUG;
 
-        if(arg.size() > int_tools_maxof_agregate(U_I(0)))
+        if(arg.size() > int_tools_maxof_aggregate(U_I(0)))
             throw SRC_BUG;
 
         write(arg.c_str(), arg.size());
