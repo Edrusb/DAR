@@ -43,6 +43,18 @@ namespace libdar
 	/// @{
 
 
+	/// the trailing_clear_data_callback call back is a mean by which the upper layer cat tell when encrypted data ends
+
+	/// \param[in] below is the generic_file containing the encrypted data that the proto_tronco inherited
+	/// class is willing to decipher.
+	/// \param[in] reading_ver is the archive format version of the archive under operation
+	/// \return the callback returns the offset of the first non encrypted data at the end of the provided generic_file.
+	/// \note this method should be invoked when decryption failed at or near end of file.
+	/// \note the libdar archive format is ended by a clear trailier which is expected
+	/// to be read backward, by the end of the archive. The last part of this trailer (see terminateur class) records the offset of the
+	/// beginning of this trailier (which are all clear clear), it is thus possible outside of the
+	/// encrypted layer to tail the clear data from the encrypted one and avoid trying to decipher
+	/// data that is not encrypted. This is the reason of existence for this callback.
     typedef infinint (*trailing_clear_data_callback)(generic_file & below, const archive_version & reading_ver);
 
     class proto_tronco: public generic_file
