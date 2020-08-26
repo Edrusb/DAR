@@ -67,6 +67,7 @@ extern "C"
 #include "lz4_module.hpp"
 #include "gzip_module.hpp"
 #include "bzip2_module.hpp"
+#include "lzo_module.hpp"
 #include "block_compressor.hpp"
 
 #ifdef LIBTHREADAR_AVAILABLE
@@ -2209,13 +2210,12 @@ namespace libdar
 		ret = make_unique<bzip2_module>(compression_level);
 		break;
 	    case compression::lzo:
-		throw Efeature("lzo per block compression");
+	    case compression::lzo1x_1_15:
+	    case compression::lzo1x_1:
+		ret = make_unique<lzo_module>(algo, compression_level);
+		break;
 	    case compression::xz:
 		throw Efeature("xz per block compression");
-	    case compression::lzo1x_1_15:
-		throw Efeature("lzo1x_1_15 per block compression");
-	    case compression::lzo1x_1:
-		throw Efeature("lzo1x_1 per block compression");
 	    case compression::zstd:
 		throw Efeature("zstd per block compression");
 	    case compression::lz4:
