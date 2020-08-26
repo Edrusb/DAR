@@ -32,8 +32,6 @@ extern "C"
 }
 
 #include "../my_config.h"
-#include <string>
-#include <memory>
 
 #include "compress_module.hpp"
 #include "infinint.hpp"

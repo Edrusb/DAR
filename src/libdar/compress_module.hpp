@@ -30,6 +30,7 @@
 #include "../my_config.h"
 #include "integers.hpp"
 #include "compression.hpp"
+#include <memory>
 
 namespace libdar
 {
