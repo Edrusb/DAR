@@ -46,12 +46,8 @@ namespace libdar
     {
     public :
         compressor(compression algo, generic_file & compressed_side, U_I compression_level = 9);
-            // compressed_side is not owned by the object and will remains
+            // compressed_side is not owned by the object and will remains (must survive)
             // after the objet destruction
-
-        compressor(compression algo, generic_file *compressed_side, U_I compression_level = 9);
-            // compressed_side is owned by the object and will be
-            // deleted a destructor time
 
 	compressor(const compressor & ref) = delete;
 	compressor(compressor && ref) noexcept = delete;
@@ -119,7 +115,6 @@ namespace libdar
 	zstd* zstd_ptr;            ///< class that handles libzstd interaction
 
         generic_file *compressed;
-        bool compressed_owner;
         compression current_algo;
 	bool suspended;
 	U_I current_level;

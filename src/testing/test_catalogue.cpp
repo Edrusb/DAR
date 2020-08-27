@@ -235,7 +235,7 @@ void f2()
 
         unlink(FIC1);
         fichier_local *f = new fichier_local(ui, FIC1, gf_read_write, 0644, false, true, false);
-	compressor *comp = new compressor(compression::none, f, 1);
+	compressor *comp = new compressor(compression::none, *f, 1);
 	pile stack;
 	pile_descriptor pdesc;
 

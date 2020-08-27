@@ -56,6 +56,7 @@ extern "C"
 #include "cygwin_adapt.hpp"
 #include "fichier_local.hpp"
 #include "compressor.hpp"
+#include "pile.hpp"
 
 using namespace std;
 
@@ -138,36 +139,43 @@ namespace libdar
 					 bool overwrite,
 					 compression algozip)
     {
-	generic_file *ret = nullptr;
+	pile* stack = new (nothrow) pile();
+	generic_file *tmp = nullptr;
 
 	struct stat buf;
 	database_header h;
 	proto_compressor *comp;
 
-	if(stat(filename.c_str(), &buf) >= 0 && !overwrite)
-	    throw Erange("database_header_create", gettext("Cannot create database, file exists"));
-	ret = new (nothrow) fichier_local(dialog, filename, gf_write_only, 0666, !overwrite, overwrite, false);
-	if(ret == nullptr)
+	if(stack == nullptr)
 	    throw Ememory("database_header_create");
 
 	try
 	{
-	    h.set_compression(algozip);
-	    h.write(*ret);
 
-	    comp = new (nothrow) compressor(algozip, ret); // upon success, ret is owned by compr
+	    if(stat(filename.c_str(), &buf) >= 0 && !overwrite)
+		throw Erange("database_header_create", gettext("Cannot create database, file exists"));
+	    tmp = new (nothrow) fichier_local(dialog, filename, gf_write_only, 0666, !overwrite, overwrite, false);
+	    if(tmp == nullptr)
+		throw Ememory("database_header_create");
+
+	    stack->push(tmp); // now the fichier_local is managed by stack
+
+	    h.set_compression(algozip);
+	    h.write(*stack);
+
+	    comp = new (nothrow) compressor(algozip, *(stack->top()));
 	    if(comp == nullptr)
 		throw Ememory("database_header_create");
-	    else
-		ret = comp;
+
+	    stack->push(comp);
 	}
 	catch(...)
 	{
-	    delete ret;
+	    delete stack;
 	    throw;
 	}
 
-	return ret;
+	return stack;
     }
 
     generic_file *database_header_open(const shared_ptr<user_interaction> & dialog,
@@ -175,42 +183,46 @@ namespace libdar
 				       unsigned char & db_version,
 				       compression & algozip)
     {
-	generic_file *ret = nullptr;
+	pile *stack = new (nothrow) pile();
+	generic_file *tmp = nullptr;
+
+	if(stack == nullptr)
+	    throw Ememory("database_header_open");
 
 	try
 	{
 	    database_header h;
-	    proto_compressor *comp;
 
 	    try
 	    {
-		ret = new (nothrow) fichier_local(filename, false);
+		tmp = new (nothrow) fichier_local(filename, false);
 	    }
 	    catch(Erange & e)
 	    {
 		throw Erange("database_header_open", tools_printf(gettext("Error reading database %S : "), &filename) + e.get_message());
 	    }
-	    if(ret == nullptr)
+	    if(tmp == nullptr)
 		throw Ememory("database_header_open");
 
-	    h.read(*ret);
+	    stack->push(tmp);
+
+	    h.read(*stack);
 	    db_version = h.get_version();
 	    algozip = h.get_compression();
 
-	    comp = new (nothrow) compressor(h.get_compression(), ret);
-	    if(comp == nullptr)
+	    tmp = new (nothrow) compressor(h.get_compression(), *(stack->top()));
+	    if(tmp == nullptr)
 		throw Ememory("database_header_open");
-	    else
-		ret = comp;
+
+	    stack->push(tmp);
 	}
 	catch(...)
 	{
-	    if(ret != nullptr)
-		delete ret;
+	    delete stack;
 	    throw;
 	}
 
-	return ret;
+	return stack;
     }
 
     extern const unsigned char database_header_get_supported_version()

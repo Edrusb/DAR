@@ -98,16 +98,9 @@ namespace libdar
     compressor::compressor(compression algo, generic_file & compressed_side, U_I compression_level) : proto_compressor(compressed_side.get_mode())
     {
         init(algo, &compressed_side, compression_level);
-        compressed_owner = false;
     }
 
-    compressor::compressor(compression algo, generic_file *compressed_side, U_I compression_level) : proto_compressor(compressed_side->get_mode())
-    {
-        init(algo, compressed_side, compression_level);
-        compressed_owner = true;
-    }
-
-        compressor::~compressor()
+    compressor::~compressor()
     {
 	try
 	{
@@ -129,9 +122,6 @@ namespace libdar
 	    delete [] lzo_compressed;
 	if(lzo_wrkmem != nullptr)
 	    delete [] lzo_wrkmem;
-	if(compressed_owner)
-	    if(compressed != nullptr)
-		delete compressed;
 	if(zstd_ptr != nullptr)
 	    delete zstd_ptr;
     }
