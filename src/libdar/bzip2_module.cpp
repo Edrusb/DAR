@@ -154,7 +154,7 @@ namespace libdar
 	case BZ_DATA_ERROR:
 	case BZ_DATA_ERROR_MAGIC:
 	case BZ_UNEXPECTED_EOF:
-	    throw Erange("bzip2_module::uncompress_data", gettext("corrupted compressed data met"));
+	    throw Edata(gettext("corrupted compressed data met"));
 	default:
 	    throw SRC_BUG;
 	}

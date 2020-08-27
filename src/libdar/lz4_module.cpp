@@ -153,7 +153,7 @@ namespace libdar
 	S_I ret = LZ4_decompress_safe(zip_buf, normal, zip_buf_size, normal_size);
 
 	if(ret < 0)
-	    throw Erange("lz4_module::uncompress_data", "compressed data corruption reported by LZ4 decompression engine");
+	    throw Edata(gettext("corrupted compressed data met"));
 
 	return ret;
 #else

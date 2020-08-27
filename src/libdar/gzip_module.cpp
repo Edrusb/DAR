@@ -126,7 +126,7 @@ namespace libdar
 	case Z_BUF_ERROR:
 	    throw Erange("gzip_module::uncompress_data", "too small buffer provided to receive decompressed data");
 	case Z_DATA_ERROR:
-	    throw Erange("gzip_module::uncompress_data", gettext("corrupted compressed data met"));
+	    throw Edata(gettext("corrupted compressed data met"));
 	default:
 	    throw SRC_BUG;
 	}

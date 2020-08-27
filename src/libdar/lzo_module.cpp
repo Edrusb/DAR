@@ -113,9 +113,9 @@ namespace libdar
 	case LZO_E_INPUT_NOT_CONSUMED:
 	case LZO_E_INPUT_OVERRUN:
 	case LZO_E_LOOKBEHIND_OVERRUN:
-	    throw Erange("lzo_module::uncompress_data", gettext("corrupted compressed data met"));
+	    throw Edata(gettext("corrupted compressed data met"));
 	default:
-	    throw Erange("lzo_module::uncompress_data", gettext("compressed data corruption detected"));
+	    throw Edata(gettext("Corrupted compressed data met"));
 	}
 
 	return normal_size;
