@@ -122,8 +122,6 @@ namespace libdar
 	    delete [] lzo_compressed;
 	if(lzo_wrkmem != nullptr)
 	    delete [] lzo_wrkmem;
-	if(zstd_ptr != nullptr)
-	    delete zstd_ptr;
     }
 
     compression compressor::get_algo() const
@@ -164,16 +162,13 @@ namespace libdar
 
         if(compressed_side == nullptr)
             throw SRC_BUG;
-        if(compression_level > 9
-	   && algo != compression::zstd
-	   && algo != compression::none)
+        if(compression_level > 9)
             throw SRC_BUG;
 
         compr = decompr = nullptr;
 	lzo_read_buffer = lzo_write_buffer = nullptr;
 	lzo_compressed = nullptr;
 	lzo_wrkmem = nullptr;
-	zstd_ptr = nullptr;
 
 	hijacking_compr_method(algo);
 
@@ -311,12 +306,8 @@ namespace libdar
 	    throw Ecompilation("lzo compression support (liblzo2)");
 #endif
 	case compression::zstd:
-	    zstd_ptr = new (nothrow) zstd(get_mode(),
-					  compression_level,
-					  compressed_side);
-	    if(zstd_ptr == nullptr)
-		throw Ememory("compressor::init");
-	    break;
+	    throw SRC_BUG;
+		// zstd is now handled by class compressor_zstd
         default :
             throw SRC_BUG;
         }
@@ -344,10 +335,8 @@ namespace libdar
 	    lzo_clear_fields();
 	    break;
 	case compression::zstd:
-	    if(zstd_ptr == nullptr)
-	 	throw SRC_BUG;
-	    zstd_ptr->clean();
-	    break;
+	    throw SRC_BUG;
+		// zstd is now handled by class compressor_zstd
 	default:
 	    throw SRC_BUG;
 	}
@@ -374,9 +363,8 @@ namespace libdar
 	    write_ptr = &compressor::lzo_write;
 	    break;
 	case compression::zstd:
-	    read_ptr = &compressor::zstd_read;
-	    write_ptr = & compressor::zstd_write;
-	    break;
+	    throw SRC_BUG;
+		// zstd is now handled by class compressor_zstd
 	case compression::lz4:
 	    throw Efeature("lz4 streaming compression mode, please define a compression block size greater than zero");
 	default:
@@ -469,16 +457,6 @@ namespace libdar
 	    lzo_wrkmem = nullptr;
 	}
 
-	if(zstd_ptr != nullptr)
-	{
-	    if(get_mode() != gf_read_only)
-	    {
-		zstd_ptr->compr_flush();
-		zstd_ptr->clean();
-	    }
-	    delete zstd_ptr;
-	    zstd_ptr = nullptr;
-	}
     }
 
     compressor::xfer::xfer(U_I sz, wrapperlib_mode mode) : wrap(mode)
@@ -673,20 +651,6 @@ namespace libdar
 #endif
     }
 
-    U_I compressor::zstd_read(char *a, U_I size)
-    {
-	if(zstd_ptr == nullptr)
-	    throw SRC_BUG;
-	return zstd_ptr->read(a, size);
-    }
-
-    void compressor::zstd_write(const char *a, U_I size)
-    {
-	if(zstd_ptr == nullptr)
-	    throw SRC_BUG;
-	return zstd_ptr->write(a, size);
-    }
-
     void compressor::compr_flush_write()
     {
         S_I ret;
@@ -740,8 +704,6 @@ namespace libdar
 	    lzo_write_flushed = true;
 	}
 
-	if(zstd_ptr != nullptr)
-	    zstd_ptr->compr_flush_write();
     }
 
     void compressor::compr_flush_read()
@@ -755,8 +717,6 @@ namespace libdar
             // keep in the buffer the bytes already read, these are discarded in case of a call to skip
 	lzo_read_reached_eof = false;
 
-	if(zstd_ptr!= nullptr)
-	    zstd_ptr->compr_flush_read();
     }
 
     void compressor::clean_read()
@@ -773,8 +733,6 @@ namespace libdar
 	    lzo_read_size = 0;
 	}
 
-	if(zstd_ptr != nullptr)
-	    zstd_ptr->clean_read();
     }
 
     void compressor::clean_write()
@@ -800,8 +758,6 @@ namespace libdar
 	if(lzo_write_buffer != nullptr) // lzo
 	    lzo_write_size = 0;
 
-	if(zstd_ptr!= nullptr)
-	    zstd_ptr->clean_write();
     }
 
 

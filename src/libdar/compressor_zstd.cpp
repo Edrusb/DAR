@@ -26,7 +26,7 @@ extern "C"
 
 } // end extern "C"
 
-#include "zstd.hpp"
+#include "compressor_zstd.hpp"
 #include "erreurs.hpp"
 #include "tools.hpp"
 #include "null_file.hpp"
@@ -36,12 +36,12 @@ using namespace std;
 namespace libdar
 {
 
-    zstd::zstd(gf_mode x_mode,
-	       U_I compression_level,
-	       generic_file* x_compressed,
-	       U_I workers): mode(x_mode), compressed(x_compressed)
+    compressor_zstd::compressor_zstd(generic_file & compressed_side, U_I compression_level) : proto_compressor(compressed_side.get_mode())
     {
 #if LIBZSTD_AVAILABLE
+        compressed = & compressed_side;
+	suspended = false;
+
 	comp = nullptr;
 	decomp = nullptr;
 	clear_inbuf();
@@ -56,7 +56,7 @@ namespace libdar
 					    ZSTD_versionNumber()));
 	try
 	{
-	    switch(mode)
+	    switch(get_mode())
 	    {
 	    case gf_read_only:
 		decomp = ZSTD_createDStream();
@@ -78,7 +78,7 @@ namespace libdar
 	    default:
 		throw SRC_BUG;
 	    }
-	    setup_context(mode, compression_level, workers);
+	    setup_context(compression_level);
 
 	    below_tampon = new (nothrow) char[below_tampon_size];
 	    if(below_tampon == nullptr)
@@ -94,23 +94,57 @@ namespace libdar
 #endif
     }
 
-    zstd::~zstd()
+    compressor_zstd::~compressor_zstd()
     {
-	release_mem();
+	try
+	{
+	    terminate();
+	}
+	catch(...)
+	{
+		// ignore all exceptions
+	}
     }
 
-    U_I zstd::read(char *a, U_I size)
+    compression compressor_zstd::get_algo() const
+    {
+	if(suspended)
+	    return compression::none;
+	else
+	    return compression::zstd;
+    }
+
+    void compressor_zstd::suspend_compression()
+    {
+	if(!suspended)
+	{
+	    compr_flush_write();
+	    reset_compr_engine();
+	    suspended = true;
+	}
+    }
+
+    void compressor_zstd::resume_compression()
+    {
+	if(suspended)
+	    suspended = false;
+    }
+
+    U_I compressor_zstd::inherited_read(char *a, U_I size)
     {
 #if LIBZSTD_AVAILABLE
 	U_I err = 0;
 	U_I wrote = 0;
 
-	switch(mode)
+	if(suspended)
+	    return compressed->read(a, size);
+
+	switch(get_mode())
 	{
 	case gf_read_only:
 	    break;
 	case gf_read_write:
-	    throw Efeature("read-write mode for zstd class");
+	    throw Efeature("read-write mode for class compressor_zstd");
 	case gf_write_only:
 	    throw SRC_BUG;
 	default:
@@ -185,54 +219,96 @@ namespace libdar
 #endif
     }
 
-    void zstd::write(const char *a, U_I size)
+    void compressor_zstd::inherited_write(const char *a, U_I size)
     {
 #if LIBZSTD_AVAILABLE
 	U_I err;
 	U_I lu = 0;
 	U_I next_bs = above_tampon_size;
 
-	if(comp == nullptr)
-	    throw SRC_BUG;
-	if(below_tampon == nullptr)
-	    throw SRC_BUG;
-
-	    // we need that to be able to flush_write later on
-	flueof = false;
-
-	outbuf.dst = below_tampon;
-	outbuf.size = below_tampon_size;
-
-	while(lu < size)
+	if(suspended)
+	    compressed->write(a, size);
+	else
 	{
-	    inbuf.src = (const void *)(a + lu);
-	    inbuf.size = size-lu < next_bs ? size-lu : next_bs;
-	    inbuf.pos = 0;
 
-	    outbuf.pos = 0;
+	    if(comp == nullptr)
+		throw SRC_BUG;
+	    if(below_tampon == nullptr)
+		throw SRC_BUG;
 
-	    err = ZSTD_compressStream(comp, &outbuf, &inbuf);
-	    if(ZSTD_isError(err))
-		throw Erange("zstd::write", tools_printf(gettext("Error met while sending data for compression to libzstd: %s"), ZSTD_getErrorName(err)));
+		// we need that to be able to flush_write later on
+	    flueof = false;
 
-	    next_bs = err;
+	    outbuf.dst = below_tampon;
+	    outbuf.size = below_tampon_size;
 
-	    if(outbuf.pos > 0)
-		compressed->write((char *)outbuf.dst, outbuf.pos); // generic::write never does partial writes
-	    lu += inbuf.pos;
+	    while(lu < size)
+	    {
+		inbuf.src = (const void *)(a + lu);
+		inbuf.size = size-lu < next_bs ? size-lu : next_bs;
+		inbuf.pos = 0;
+
+		outbuf.pos = 0;
+
+		err = ZSTD_compressStream(comp, &outbuf, &inbuf);
+		if(ZSTD_isError(err))
+		    throw Erange("zstd::write", tools_printf(gettext("Error met while sending data for compression to libzstd: %s"), ZSTD_getErrorName(err)));
+
+		next_bs = err;
+
+		if(outbuf.pos > 0)
+		    compressed->write((char *)outbuf.dst, outbuf.pos); // generic::write never does partial writes
+		lu += inbuf.pos;
+	    }
 	}
-
 #else
 	throw Ecompilation(gettext("zstd compression"));
 #endif
     }
 
-    void zstd::compr_flush_write()
+
+    void compressor_zstd::reset_compr_engine()
+    {
+	clean_read();
+	clean_write();
+    }
+
+    void compressor_zstd::inherited_truncate(const infinint & pos)
+    {
+	if(pos < get_position())
+	{
+	    compr_flush_write();
+	    compr_flush_read();
+	    clean_read();
+	}
+	compressed->truncate(pos);
+    }
+
+    void compressor_zstd::inherited_terminate()
+    {
+	if(get_mode() != gf_read_only)
+	{
+	    compr_flush_write();
+	    clean_write();
+	}
+	else
+	{
+	    compr_flush_read();
+	    clean_read();
+	}
+
+	release_mem();
+    }
+
+    void compressor_zstd::compr_flush_write()
     {
 #if LIBZSTD_AVAILABLE
+	if(is_terminated())
+	    throw SRC_BUG;
+
 	U_I err;
 
-	if(flueof || mode == gf_read_only)
+	if(flueof || get_mode() == gf_read_only)
 	    return;
 
 	outbuf.dst = below_tampon;
@@ -261,10 +337,14 @@ namespace libdar
 #endif
     }
 
-    void zstd::compr_flush_read()
+
+    void compressor_zstd::compr_flush_read()
     {
 #if LIBZSTD_AVAILABLE
-	if(mode != gf_read_only)
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	if(get_mode() != gf_read_only)
 	    return;
 	flueof = false;
 	no_comp_data = false;
@@ -273,10 +353,13 @@ namespace libdar
 #endif
     }
 
-    void zstd::clean_read()
+    void compressor_zstd::clean_read()
     {
 #if LIBZSTD_AVAILABLE
-	if(mode != gf_read_only)
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	if(get_mode() != gf_read_only)
 	    return;
 	flueof = false;
 	no_comp_data = false;
@@ -288,10 +371,13 @@ namespace libdar
 #endif
     }
 
-    void zstd::clean_write()
+    void compressor_zstd::clean_write()
     {
 #if LIBZSTD_AVAILABLE
-	if(mode == gf_read_only)
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	if(get_mode() == gf_read_only)
 	    return;
 
 	if(!flueof)
@@ -319,7 +405,8 @@ namespace libdar
 #endif
     }
 
-    void zstd::clear_inbuf()
+
+    void compressor_zstd::clear_inbuf()
     {
 #if LIBZSTD_AVAILABLE
 	inbuf.src = nullptr;
@@ -330,7 +417,7 @@ namespace libdar
 #endif
     }
 
-    void zstd::clear_outbuf()
+    void compressor_zstd::clear_outbuf()
     {
 #if LIBZSTD_AVAILABLE
 	outbuf.dst = nullptr;
@@ -341,7 +428,7 @@ namespace libdar
 #endif
     }
 
-    void zstd::release_mem()
+    void compressor_zstd::release_mem()
     {
 #if LIBZSTD_AVAILABLE
 	if(decomp != nullptr)
@@ -353,13 +440,13 @@ namespace libdar
 #endif
     }
 
-    void zstd::setup_context(gf_mode mode, U_I compression_level, U_I workers)
+    void compressor_zstd::setup_context(U_I compression_level)
     {
 #if LIBZSTD_AVAILABLE
 	int err;
 	static const U_I maxcomp = ZSTD_maxCLevel();
 
-	switch(mode)
+	switch(get_mode())
 	{
 	case gf_read_only:
 	    if(decomp == nullptr)
@@ -397,5 +484,6 @@ namespace libdar
 	throw Ecompilation(gettext("zstd compression"));
 #endif
     }
+
 
 } // end of namespace

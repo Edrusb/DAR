@@ -43,6 +43,7 @@ extern "C"
 #include "cygwin_adapt.hpp"
 #include "shell_interaction.hpp"
 #include "fichier_local.hpp"
+#include "compressor_zstd.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -60,7 +61,7 @@ int main()
     ui.reset(new (nothrow) shell_interaction(cout, cerr, false));
     if(!ui)
 	cout << "ERREUR !" << endl;
-    f1();
+//    f1();
     f2();
     ui.reset();
 }
@@ -180,7 +181,7 @@ static void f2()
 	    fichier_local src = fichier_local(ui, clearfile, gf_read_only, 0666, false, false, false);
 	    fichier_local dst = fichier_local(ui, zipfile, gf_write_only, 0666, false, true, false);
 
-	    compressor cz(compression::zstd, dst, 22);
+	    compressor_zstd cz(dst, 22);
 
 	    src.copy_to(cz);
 	    cz.sync_write();
@@ -195,7 +196,7 @@ static void f2()
 	    fichier_local dst1 = fichier_local(ui, unzipfile1, gf_write_only, 0666, false, true, false);
 	    fichier_local dst2 = fichier_local(ui, unzipfile2, gf_write_only, 0666, false, true, false);
 
-	    compressor cz(compression::zstd, src);
+	    compressor_zstd cz(src);
 
 	    cz.copy_to(dst1);
 	    cz.flush_read();

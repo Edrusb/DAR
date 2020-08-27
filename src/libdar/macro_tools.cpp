@@ -64,6 +64,7 @@ extern "C"
 #include "hash_fichier.hpp"
 #include "tools.hpp"
 #include "compressor.hpp"
+#include "compressor_zstd.hpp"
 #include "lz4_module.hpp"
 #include "gzip_module.hpp"
 #include "bzip2_module.hpp"
@@ -123,6 +124,9 @@ namespace libdar
 
 	/// create a compress_module based on the provided arguments
     static unique_ptr<compress_module> make_compress_module_ptr(compression algo, U_I compression_level);
+
+	/// create a compressor* (streaming compression) based on the provided arguments
+    static proto_compressor* build_streaming_compressor(compression algo, generic_file & base, U_I compression_level = 9);
 
     catalogue *macro_tools_get_catalogue_from(const shared_ptr<user_interaction> & dialog,
 					      pile & stack,
@@ -880,7 +884,7 @@ namespace libdar
 
 	    if(ver.get_compression_block_size().is_zero())
 	    {
-		tmp = new (nothrow) compressor(ver.get_compression_algo(), *(stack.top()));
+		tmp = build_streaming_compressor(ver.get_compression_algo(), *(stack.top()));
 
 		if(info_details)
 		    dialog->message(tools_printf(gettext("streamed compression layer open (single threaded)")));
@@ -898,7 +902,7 @@ namespace libdar
 		{
 #if LIBTHREADAR_AVAILABLE
 		    tmp = new (nothrow) parallel_block_compressor(multi_threaded_compress,
-								  move(make_compress_module_ptr(ver.get_compression_algo(), 9)), // compression level is not used here
+								  move(make_compress_module_ptr(ver.get_compression_algo(), 9)), // compression level is not used for decompression
 								  *(stack.top()),
 								  compr_bs);
 
@@ -1622,7 +1626,7 @@ namespace libdar
 		if(info_details && algo != compression::none)
 		    dialog->message(gettext("Adding a new layer on top: compression..."));
 		if(compression_block_size == 0)
-		    tmp = new (nothrow) compressor(algo, *(layers.top()), compression_level);
+		    tmp = build_streaming_compressor(algo, *(layers.top()), compression_level);
 		else
 		{
 		    if(multi_threaded_compress > 1)
@@ -2236,6 +2240,39 @@ namespace libdar
 
 	if(!ret)
 	    throw SRC_BUG; // we would return a null pointer!
+
+	return ret;
+    }
+
+
+    static proto_compressor* build_streaming_compressor(compression algo, generic_file & base, U_I compression_level)
+    {
+	proto_compressor* ret;
+
+	switch(algo)
+	{
+	case compression::none:
+	case compression::gzip:
+	case compression::bzip2:
+	case compression::lzo:
+	case compression::lzo1x_1_15:
+	case compression::lzo1x_1:
+	case compression::xz:
+	    ret = new (nothrow) compressor(algo, base, compression_level);
+	    if(ret == nullptr)
+		throw Ememory("build_compressor");
+	    break;
+	case compression::zstd:
+	    ret = new (nothrow) compressor_zstd(base, compression_level);
+	    if(ret == nullptr)
+		throw Ememory("build_compressor");
+	    break;
+	case compression::lz4:
+	    throw Efeature("lz4 streaming compression");
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
 
 	return ret;
     }
