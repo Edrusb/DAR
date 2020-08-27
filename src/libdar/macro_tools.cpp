@@ -67,6 +67,7 @@ extern "C"
 #include "lz4_module.hpp"
 #include "gzip_module.hpp"
 #include "bzip2_module.hpp"
+#include "xz_module.hpp"
 #include "lzo_module.hpp"
 #include "zstd_module.hpp"
 #include "block_compressor.hpp"
@@ -2216,7 +2217,8 @@ namespace libdar
 		ret = make_unique<lzo_module>(algo, compression_level);
 		break;
 	    case compression::xz:
-		throw Efeature("xz per block compression");
+		ret = make_unique<xz_module>(compression_level);
+		break;
 	    case compression::zstd:
 		ret = make_unique<zstd_module>(compression_level);
 		break;
