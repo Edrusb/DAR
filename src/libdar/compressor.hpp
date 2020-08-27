@@ -143,21 +143,6 @@ namespace libdar
 	void lzo_read_and_uncompress_to_buffer();
 	void lzo_clear_fields();
 
-	    /// changes compression algorithm used by the compressor
-
-	    /// \param[in] new_algo defines the new algorithm to use
-	    /// \param[in] new_compression_level defines the new compression level to use.
-            /// \note valid value for new_compression_level range from 0 (no compression) to
-	    /// 9 (maximum compression).
-        void change_algo(compression new_algo, U_I new_compression_level);
-
-
-	    /// changes the compression algorithm keeping the same compression level
-
-        void change_algo(compression new_algo)
-	{ change_algo(new_algo, current_level);	};
-
-
         void compr_flush_write(); // flush all data to compressed_side, and reset the compressor
             // for that additional write can be uncompresssed starting at this point.
         void compr_flush_read(); // reset decompression engine to be able to read the next block of compressed data

@@ -481,21 +481,6 @@ namespace libdar
 	}
     }
 
-    void compressor::change_algo(compression new_algo, U_I new_compression_level)
-    {
-        if(new_algo == get_algo() && new_compression_level == current_level)
-            return;
-
-	if(is_terminated())
-	    throw SRC_BUG;
-
-            // flush data and release zlib memory structures
-        local_terminate();
-
-            // change to new algorithm
-        init(new_algo, compressed, new_compression_level);
-    }
-
     compressor::xfer::xfer(U_I sz, wrapperlib_mode mode) : wrap(mode)
     {
         buffer = new (nothrow) char[sz];
