@@ -71,18 +71,47 @@
 
 #include "../my_config.h"
 
-#include "archive.hpp"
-#include "database.hpp"
-#include "libdar_xform.hpp"
-#include "libdar_slave.hpp"
-#include "erreurs.hpp"
-#include "compile_time_features.hpp"
-#include "entrepot_libcurl.hpp"
+    // the mandatory libdar initialization routine
 #include "get_version.hpp"
+
+    // archive class abstraction, this is a good starting point to create and read dar archives
+#include "archive.hpp"
+
+    // dar_manager API
+#include "database.hpp"
+
+    //  dar_xform API
+#include "libdar_xform.hpp"
+
+    // dar_slave API
+#include "libdar_slave.hpp"
+
+    // common set of exception used within libdar
+#include "erreurs.hpp"
+
+    // if you want to know which feature has been activated at compilation time
+#include "compile_time_features.hpp"
+
+    // for remote reposity you will need to create such object and pass it where needed
+#include "entrepot_libcurl.hpp"
+
+    // the options class to give non default parameter to the archive class
 #include "archive_options_listing_shell.hpp"
+
+    // if you want to bind user input/output to shell command line
 #include "shell_interaction.hpp"
+
+    // if you want to bind user intput/output to your own provided callback functions
 #include "user_interaction_callback.hpp"
+
+    // this is a trivial way to ignore user input/output
 #include "user_interaction_blind.hpp"
+
+    // to redirect to a shell_interaction user I/O object any type of user interaction
 #include "shell_interaction_emulator.hpp"
+
+    // for even more flexibility you can create your own class inherited from class user_interaction
+    // (see user_interaction.hpp include file)
+
 
 #endif
