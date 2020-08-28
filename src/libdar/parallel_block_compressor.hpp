@@ -299,13 +299,12 @@ namespace libdar
 
     private:
 
-	    // initialized directly in constructors
+	    // the local fields
 
-	U_I num_w;
-	std::unique_ptr<compress_module> zipper;
-	generic_file *compressed;
-	U_I uncompressed_block_size;
-
+	U_I num_w;                                             ///< number of worker threads
+	std::unique_ptr<compress_module> zipper;               ///< compress_module for the requested compression algo
+	generic_file *compressed;                              ///< where to read from / write to, compressed data
+	U_I uncompressed_block_size;                           ///< the max block size of un compressed data used
 	bool suspended;                                        ///< whether compression is suspended or not
 	bool running_threads;                                  ///< whether subthreads are running
 	std::unique_ptr<crypto_segment> curwrite;              ///< aggregates a block before compression and writing
