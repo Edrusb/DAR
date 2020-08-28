@@ -48,6 +48,7 @@ extern "C"
 #include "tools.hpp"
 #include "compressor_lzo.hpp"
 #include "lzo_module.hpp"
+#include "compress_block_header.hpp"
 
     // value found in lzop source code p_lzo.c
 #define LZO_COMPRESSED_BUFFER_SIZE 256*1024l
@@ -336,7 +337,7 @@ namespace libdar
 
 	if(lzo_write_buffer != nullptr && ! lzo_write_flushed) // lzo
 	{
-	    lzo_block_header lzo_bh;
+	    compress_block_header lzo_bh;
 
 	    lzo_compress_buffer_and_write();
 	    lzo_bh.type = BLOCK_HEADER_EOF;
@@ -378,7 +379,7 @@ namespace libdar
     void compressor_lzo::lzo_compress_buffer_and_write()
     {
 #if LIBLZO2_AVAILABLE
-	lzo_block_header lzo_bh;
+	compress_block_header lzo_bh;
 	lzo_uint compr_size = LZO_COMPRESSED_BUFFER_SIZE;
 
 	    //compressing data to lzo_compress buffer
@@ -403,7 +404,7 @@ namespace libdar
     void compressor_lzo::lzo_read_and_uncompress_to_buffer()
     {
 #if LIBLZO2_AVAILABLE
-	lzo_block_header lzo_bh;
+	compress_block_header lzo_bh;
 	U_I compr_size;
 	U_I read;
 
@@ -461,18 +462,6 @@ namespace libdar
 	    // write
 	lzo_write_size = 0;
 	lzo_write_flushed = true;
-    }
-
-    void compressor_lzo::lzo_block_header::dump(generic_file & f)
-    {
-	f.write(&type, 1);
-	size.dump(f);
-    }
-
-    void compressor_lzo::lzo_block_header::set_from(generic_file & f)
-    {
-	f.read(&type, 1);
-	size.read(f);
     }
 
 } // end of namespace

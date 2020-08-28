@@ -77,15 +77,6 @@ namespace libdar
 	virtual void inherited_terminate() override;
 
     private :
-	struct lzo_block_header
-	{
-	    char type;             ///< let the possibility to extend this architecture (for now type is fixed)
-	    infinint size;         ///< size of the following compressed block of data
-
-	    void dump(generic_file & f);
-	    void set_from(generic_file & f);
-	};
-
 	char *lzo_read_buffer;     ///< stores clear data (uncompressed) read from the compressed generic_file
 	U_I lzo_read_size;         ///< number of available bytes in the read buffer for lzo decompression
 	U_I lzo_read_start;        ///< location of the next byte to read out from the read buffer
