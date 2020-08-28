@@ -266,13 +266,6 @@ namespace libdar
 	    // compressed_side is not owned by the object and will remains
             // after the objet destruction
 
-	parallel_block_compressor(U_I num_workers,
-				  std::unique_ptr<compress_module> block_zipper,
-				  generic_file *compressed_side,
-				  U_I uncompressed_bs = default_uncompressed_block_size);
-            // compressed_side is owned by the object and will be
-            // deleted a destructor time
-
 	parallel_block_compressor(const parallel_block_compressor & ref) = delete;
 	parallel_block_compressor(parallel_block_compressor && ref) noexcept = delete;
 	parallel_block_compressor & operator = (const parallel_block_compressor & ref) = delete;
@@ -311,11 +304,7 @@ namespace libdar
 	U_I num_w;
 	std::unique_ptr<compress_module> zipper;
 	generic_file *compressed;
-	bool we_own_compressed_side;
 	U_I uncompressed_block_size;
-
-
-	    // initialized by the init_fields() method
 
 	bool suspended;                                        ///< whether compression is suspended or not
 	bool running_threads;                                  ///< whether subthreads are running
@@ -341,7 +330,6 @@ namespace libdar
 
 	    // private methods
 
-	void init_fields();
 	void send_flag_to_workers(compressor_block_flags flag);
 	void stop_threads();
 	void stop_read_threads();

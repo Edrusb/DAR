@@ -471,25 +471,69 @@ namespace libdar
 	num_w(num_workers),
 	zipper(move(block_zipper)),
 	compressed(&compressed_side),
-	we_own_compressed_side(false),
 	uncompressed_block_size(uncompressed_bs)
     {
-	init_fields();
-    }
+	U_I compr_bs = zipper->get_min_size_to_compress(uncompressed_block_size);
+
+	    // sanity checks on fields set by constructors
+
+	if(get_mode() == gf_read_write)
+	    throw SRC_BUG; // mode not suported for this type of object
+	if(num_w < 1)
+	    throw SRC_BUG;
+	if(!zipper)
+	    throw SRC_BUG;
+	if(compressed == nullptr)
+	    throw SRC_BUG;
+	if(uncompressed_block_size < min_uncompressed_block_size)
+	    throw SRC_BUG;
 
 
-    parallel_block_compressor::parallel_block_compressor(U_I num_workers,
-							 unique_ptr<compress_module> block_zipper,
-							 generic_file *compressed_side,
-							 U_I uncompressed_bs):
-	proto_compressor((compressed_side->get_mode() == gf_read_only)? gf_read_only: gf_write_only),
-	num_w(num_workers),
-	zipper(move(block_zipper)),
-	compressed(compressed_side),
-	we_own_compressed_side(true),
-	uncompressed_block_size(uncompressed_bs)
-    {
-	init_fields();
+	    // initializing simple fields not set by constructors
+
+	suspended = false;
+	running_threads = false;
+	reof = false;
+
+
+	    // creating inter thread communication structures
+
+	disperse = make_shared<ratelier_scatter<crypto_segment> >(get_ratelier_size(num_w));
+	rassemble = make_shared<ratelier_gather<crypto_segment> >(get_ratelier_size(num_w));
+	tas = make_shared<heap<crypto_segment> >(); // created empty
+
+	    // now filling the head that was created empty
+
+
+	for(U_I i = 0 ; i < get_heap_size(num_w) ; ++i)
+	    tas->put(make_unique<crypto_segment>(compr_bs, uncompressed_block_size));
+
+	    // creating the zip_below_* thread object
+
+	if(get_mode() == gf_write_only)
+	{
+	    writer = make_unique<zip_below_write>(rassemble,
+						  compressed,
+						  tas,
+						  num_w);
+	}
+	else
+	{
+	    reader = make_unique<zip_below_read>(compressed,
+						 disperse,
+						 tas,
+						 num_w);
+	}
+
+	    // creating the worker threads objects
+
+	for(U_I i = 0 ; i < num_w ; ++i)
+	    travailleurs.push_back(zip_worker(disperse,
+					      rassemble,
+					      zipper->clone(),
+					      get_mode() == gf_write_only));
+
+	    // no other thread than the one executing this code is running at this point!!!
     }
 
     parallel_block_compressor::~parallel_block_compressor()
@@ -502,9 +546,6 @@ namespace libdar
 	{
 		// ignore all exceptions
 	}
-
-	if(we_own_compressed_side && compressed != nullptr)
-	    delete compressed;
     }
 
     void parallel_block_compressor::suspend_compression()
@@ -749,71 +790,6 @@ namespace libdar
 	}
 
 	stop_threads();
-    }
-
-    void parallel_block_compressor::init_fields()
-    {
-	U_I compr_bs = zipper->get_min_size_to_compress(uncompressed_block_size);
-
-	    // sanity checks on fields set by constructors
-
-	if(get_mode() == gf_read_write)
-	    throw SRC_BUG; // mode not suported for this type of object
-	if(num_w < 1)
-	    throw SRC_BUG;
-	if(!zipper)
-	    throw SRC_BUG;
-	if(compressed == nullptr)
-	    throw SRC_BUG;
-	if(uncompressed_block_size < min_uncompressed_block_size)
-	    throw SRC_BUG;
-
-
-	    // initializing simple fields not set by constructors
-
-	suspended = false;
-	running_threads = false;
-	reof = false;
-
-
-	    // creating inter thread communication structures
-
-	disperse = make_shared<ratelier_scatter<crypto_segment> >(get_ratelier_size(num_w));
-	rassemble = make_shared<ratelier_gather<crypto_segment> >(get_ratelier_size(num_w));
-	tas = make_shared<heap<crypto_segment> >(); // created empty
-
-	    // now filling the head that was created empty
-
-
-	for(U_I i = 0 ; i < get_heap_size(num_w) ; ++i)
-	    tas->put(make_unique<crypto_segment>(compr_bs, uncompressed_block_size));
-
-	    // creating the zip_below_* thread object
-
-	if(get_mode() == gf_write_only)
-	{
-	    writer = make_unique<zip_below_write>(rassemble,
-						  compressed,
-						  tas,
-						  num_w);
-	}
-	else
-	{
-	    reader = make_unique<zip_below_read>(compressed,
-						 disperse,
-						 tas,
-						 num_w);
-	}
-
-	    // creating the worker threads objects
-
-	for(U_I i = 0 ; i < num_w ; ++i)
-	    travailleurs.push_back(zip_worker(disperse,
-					      rassemble,
-					      zipper->clone(),
-					      get_mode() == gf_write_only));
-
-	    // no other thread than the one executing this code is running at this point!!!
     }
 
     void parallel_block_compressor::send_flag_to_workers(compressor_block_flags flag)
