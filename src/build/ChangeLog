@@ -20,6 +20,7 @@ from 2.6.x to 2.7.0
   compression mode, the legacy streaming compression mode is still
   available (see both -G and -z option extended syntax).
 - added lz4 compression algorithm.
+- removed some deprecaded old options (--gzip,...)
 
 from 2.6.10 to 2.6.11
 - dar_split was not upx compressed when upx is used to build binaries

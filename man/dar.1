@@ -643,16 +643,33 @@ do not check whether an encrypted archive with public key that has also been sig
 .PP
 .B SAVING, ISOLATION, MERGING AND REPAIRING SPECIFIC OPTIONS (to use with -c, -C or -+)
 .PP
-.TP 20
--z, --compression={ algo | level | algo:level | algo:level:block-size }
-add compression within slices using gzip, bzip2, lzo, xz, zstd or lz4 algorithm. If -z is not specified, no compression is performed, but if -z is specified without algorithm gzip will be assumed, the following values are available "gzip", "bzip2", "lzo", "xz", "zstd" or "lz4". The compression level (an integer from 1 to 9 except for zstd which ranges from 1 to 22) is optional, and is 9 by default. Be careful when using xz algorithm better specify a compression ratio less than or equal to 6 to avoid important memory requirements. A ratio of 1 means less compression and faster processing, while at the opposite a ratio of 9 gives the best compression but longest procesing time. Valid usage of -z option is for example: -z, -z9, -zlzo, -zgzip, -zbzip2, -zlzo:6, -zbzip2:2, -zgzip:1, -zxz:6, -zlz4::10k -z::12000 -zbzip2:8:10k and so on. Usage for long option is the same: --compression, --compression=9, --compression=lzo, --compression=gzip, --compression=bzip2, --compression=lzo:6, --compression=bzip2:2, --compression=gzip:1 --compression=xz:9 and so on.
+.TP 5
+-z, --compression={ [algo] | level | algo:level | algo:level:block-size }
+add compression within slices. If -z is not specified, no compression is performed, but if -z is specified without algorithm gzip will be assumed.
+.RS
+.TP 5
+algo:
+the following values are available "gzip", "bzip2", "lzo", "xz", "zstd" or "lz4".
+.TP 5
+level:
+The compression level (an integer from 1 to 9 except for zstd which ranges from 1 to 22) is optional, and is 9 by default. Be careful when using xz algorithm better specify a compression ratio less than or equal to 6 to avoid important memory requirements. A ratio of 1 means less compression and faster processing, while at the opposite a ratio of 9 gives the best compression but longest procesing time.
+.TP 5
+block-size:
+if set to zero, you will get the legacy (and performant) "streaming compression" mode that was the only mode available up to release 2.7.0. Since then, the "block compression" mode gives the ability to
+leverage multi-threading (see -G option) by compressing per block and giving different blocks to different threads. The larger the block is, the better the compression ratio will be (it tends to be
+as good as the one of the streaming compression mode, when block size increases).
+The memory requirement also increases by the product of the block size times the number of threads. Last, too small block-size will cost more CPU cycle (the multi-threading management overhead CPU time
+will become important compared to the effective compression task CPU time) and independenly short blocks reduce compression rate. It is advised to use values at least greater than 50 ~ 100 KiB
+(you can use the k,M,G,... suffixes described for the -s option).
+.RE
+.PP
+.RS
+Valid usage of -z option is for example: -z, -z9, -zlzo, -zgzip, -zbzip2, -zlzo:6, -zbzip2:2, -zgzip:1, -zxz:6, -zlz4::10k -z::12000 -zbzip2:8:10k and so on. Usage for long option is the same: --compression, --compression=9, --compression=lzo, --compression=gzip, --compression=bzip2, --compression=lzo:6, --compression=bzip2:2, --compression=gzip:1 --compression=xz:9 and so on.
+.RE
 .PP
 .RS
 About lzo compression, the compression levels of dar and lzop program do not match. If you want to get the behavior of compression level 1 of lzop, use the lzop-1 algorithm in place of lzo with dar/libdar. If you want to get the behavior of lzop compression level 3, use the lzop-3 algorithm in place of the lzo algorithm. Lzop compression levels 2, 4, 5 and 6 are the same as level 3. last, there is no difference about compression level 7, 8 and 9 between dar and lzop. The lzop-1 and lzop-3 algorithms do not make use of any compression level (compression level is ignored with these algorithms).
 .RE
-.TP 20
---gzip[=level]
-Same as -z (see just above). This option is deprecated, please use --compression or -z.
 .TP 20
 -s, --slice <number>
 Size of the slices in bytes. If the number is appended by k (or K), M, G, T, P, E, Z or Y the size is in kilobytes, megabytes, gigabytes, terabytes, petabytes, exabytes, zettabytes or yottabytes respectively. Example: "20M" means 20 megabytes, by default, it is the same as giving 20971520 as argument (see also -aSI and -abinary options). If -s is not present the backup will be written to a single slice whatever the size of the backup may be (assuming your operating system can support arbitrarily large files).

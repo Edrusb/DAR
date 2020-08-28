@@ -2630,7 +2630,6 @@ const struct option *get_long_opt()
         {"verbose", optional_argument, nullptr, 'v'},
         {"no-warn", optional_argument, nullptr, 'w'},
         {"extract", required_argument, nullptr, 'x'},
-        {"gzip", optional_argument, nullptr, 'z'},   // backward compatibility
         {"compression", required_argument, nullptr, 'z'},
         {"ref", required_argument, nullptr, 'A'},
         {"isolate", required_argument, nullptr, 'C'},
