@@ -27,6 +27,7 @@ extern "C"
 
 #include "block_compressor.hpp"
 #include "erreurs.hpp"
+#include "compress_block_header.hpp"
 
 using namespace std;
 
@@ -222,16 +223,17 @@ namespace libdar
 
     void block_compressor::inherited_sync_write()
     {
-	infinint tmp;
-
 	if(is_terminated())
 	    throw SRC_BUG;
 
 	compress_and_write_current();
 	if(need_eof)
 	{
-	    tmp = 0;
-	    tmp.dump(*compressed); // adding EOF null block size
+	    compress_block_header bh;
+
+	    bh.type = compress_block_header::H_EOF;
+	    bh.size = 0;
+	    bh.dump(*compressed); // adding EOF null block size
 	    need_eof = false;
 	}
     }
@@ -278,7 +280,7 @@ namespace libdar
 
     void block_compressor::compress_and_write_current()
     {
-	infinint tmp;
+	compress_block_header bh;
 
 	if(current->clear_data.get_data_size() > 0)
 	{
@@ -286,8 +288,17 @@ namespace libdar
 								      current->clear_data.get_data_size(),
 								      current->crypted_data.get_addr(),
 								      current->crypted_data.get_max_size()));
-	    tmp = current->crypted_data.get_data_size();
-	    tmp.dump(*compressed);
+	    if(current->crypted_data.get_data_size() > 0)
+	    {
+		bh.type = compress_block_header::H_DATA;
+		bh.size = current->crypted_data.get_data_size();
+	    }
+	    else
+		throw SRC_BUG;
+		// it is not expected that compressed data, that to say some information
+		// get compressed as a result of no information at all
+
+	    bh.dump(*compressed);
 	    compressed->write(current->crypted_data.get_addr(), current->crypted_data.get_data_size());
 	    current->reset();
 	}
@@ -295,28 +306,42 @@ namespace libdar
 
     void block_compressor::read_and_uncompress_current()
     {
-	infinint tmp;
 	U_I bs;
+	compress_block_header bh;
 
-	tmp.read(*compressed);
-	bs = 0;
-	tmp.unstack(bs);
-	if(!tmp.is_zero())
-	    throw Erange("zip_below_read::work", gettext("incoherent compressed block structure, compressed data corruption"));
+	bh.set_from(*compressed);
 
-	if(bs > 0)
+	switch(bh.type)
 	{
-	    current->crypted_data.set_data_size(compressed->read(current->crypted_data.get_addr(), bs));
-	    current->clear_data.set_data_size(zipper->uncompress_data(current->crypted_data.get_addr(),
-								      current->crypted_data.get_data_size(),
-								      current->clear_data.get_addr(),
-								      current->clear_data.get_max_size()));
-	    current->clear_data.rewind_read();
-	}
-	else
-	{
+	case compress_block_header::H_DATA:
+	    bs = 0;
+	    bh.size.unstack(bs);
+	    if(!bh.size.is_zero())
+		throw Erange("zip_below_read::work", gettext("incoherent compressed block structure, compressed data corruption"));
+
+	    if(bs > current->crypted_data.get_max_size())
+		throw Erange("zip_below_read::work", gettext("incoherent compressed block structure, compressed block size in archive too large"));
+
+	    if(bs > 0)
+	    {
+		current->crypted_data.set_data_size(compressed->read(current->crypted_data.get_addr(), bs));
+		current->clear_data.set_data_size(zipper->uncompress_data(current->crypted_data.get_addr(),
+									  current->crypted_data.get_data_size(),
+									  current->clear_data.get_addr(),
+									  current->clear_data.get_max_size()));
+		current->clear_data.rewind_read();
+	    }
+	    else
+	    	throw Erange("zip_below_read::work", gettext("incoherent compressed block structure, compressed data corruption"));
+	    break;
+	case compress_block_header::H_EOF:
+	    if(!bh.size.is_zero())
+		throw Erange("zip_below_read::work", gettext("incoherent compressed block structure, compressed data corruption"));
 	    current->reset();
 	    reof = true;
+	    break;
+	default:
+	    throw Erange("zip_below_read::work", gettext("incoherent compressed block structure, compressed data corruption"));
 	}
     }
 

@@ -27,6 +27,7 @@ extern "C"
 
 #include "parallel_block_compressor.hpp"
 #include "erreurs.hpp"
+#include "compress_block_header.hpp"
 
 using namespace std;
 using namespace libthreadar;
@@ -103,8 +104,6 @@ namespace libdar
 
     void zip_below_write::work()
     {
-	infinint aux;
-
 	do
 	{
 	    if(data.empty())
@@ -128,13 +127,16 @@ namespace libdar
 		}
 		else
 		{
+		    compress_block_header bh;
+
 		    switch(static_cast<compressor_block_flags>(flags.front()))
 		    {
 		    case compressor_block_flags::data:
 			if(!error)
 			{
-			    aux = data.front()->crypted_data.get_data_size();
-			    aux.dump(*dst);
+			    bh.type = compress_block_header::H_DATA;
+			    bh.size = data.front()->crypted_data.get_data_size();
+			    bh.dump(*dst);
 			    dst->write(data.front()->crypted_data.get_addr(),
 				       data.front()->crypted_data.get_data_size());
 			}
@@ -146,8 +148,9 @@ namespace libdar
 			pop_front();
 			if(ending == 0)
 			{
-			    aux = 0;
-			    aux.dump(*dst);
+			    bh.type = compress_block_header::H_EOF;
+			    bh.size = 0;
+			    bh.dump(*dst);
 			}
 			break;
 		    case compressor_block_flags::worker_error: // error received from a zip_worker
@@ -229,19 +232,19 @@ namespace libdar
     void zip_below_read::work()
     {
 	bool end = false;
-	infinint aux_i;
 	U_I aux;
+	compress_block_header bh;
 
 	do
 	{
-		// reading the compressed block size
+		// reading compressed block's header
 
 	    if(!should_i_stop)
 	    {
-		aux_i.read(*src);
+		bh.set_from(*src);
 		aux = 0;
-		aux_i.unstack(aux);
-		if(!aux_i.is_zero())
+		bh.size.unstack(aux);
+		if(!bh.size.is_zero())
 		{
 			// the read infinint does not hold in an a U_I assuming
 			// data corruption occured
@@ -250,17 +253,20 @@ namespace libdar
 		}
 	    }
 	    else // we are asked to stop by the parallel_block_compressor thread
+	    {
 		aux = 0; // simulating an end of file
-
-	    if(aux == 0)
-	    {
-		    // eof
-
-		push_flag_to_all_workers(compressor_block_flags::eof_die);
-		end = true;
+		bh.type = compress_block_header::H_EOF;
 	    }
-	    else
+
+	    switch(bh.type)
 	    {
+	    case compress_block_header::H_EOF:
+		push_flag_to_all_workers(compressor_block_flags::eof_die);
+		if(aux != 0)
+		    throw Erange("zip_below_read::work", gettext("incoherent compressed block structure, compressed data corruption"));
+		end = true;
+		break;
+	    case compress_block_header::H_DATA:
 		if(!ptr)
 		{
 		    ptr = tas->get();
@@ -291,6 +297,9 @@ namespace libdar
 			dst->scatter(ptr, static_cast<signed int>(compressor_block_flags::data));
 		    }
 		}
+		break;
+	    default:
+		throw Erange("zip_below_read::work", gettext("incoherent compressed block structure, compressed data corruption"));
 	    }
 	}
 	while(!end);
