@@ -65,7 +65,6 @@ extern "C"
 #include "tools.hpp"
 #include "compressor.hpp"
 #include "compressor_zstd.hpp"
-#include "compressor_lzo.hpp"
 #include "lz4_module.hpp"
 #include "gzip_module.hpp"
 #include "bzip2_module.hpp"
@@ -78,6 +77,8 @@ extern "C"
 #include "parallel_block_compressor.hpp"
 #include "parallel_tronconneuse.hpp"
 #endif
+
+#define PRE_2_7_0_LZO_BLOCK_SIZE 246660
 
 using namespace std;
 
@@ -2263,7 +2264,9 @@ namespace libdar
 	case compression::lzo:
 	case compression::lzo1x_1_15:
 	case compression::lzo1x_1:
-	    ret = new (nothrow) compressor_lzo(algo, base, compression_level);
+	    ret = new (nothrow) block_compressor(make_compress_module_ptr(algo, compression_level),
+						 base,
+						 PRE_2_7_0_LZO_BLOCK_SIZE);
 	    if(ret == nullptr)
 		throw Ememory("build_compressor");
 	    break;
