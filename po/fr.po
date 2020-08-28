@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
 "POT-Creation-Date: 2020-05-31 11:38+0200\n"
-"PO-Revision-Date: 2020-08-22 15:24+0200\n"
+"PO-Revision-Date: 2020-08-28 13:59+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "Language: fr\n"
@@ -3988,7 +3988,7 @@ msgstr ""
 
 #: src/libdar/i_archive.cpp:1039
 msgid "The global data compression ratio is: "
-msgstr "La taux de compression global est : "
+msgstr "Le taux de compression global est : "
 
 #: src/libdar/i_archive.cpp:1046
 #, c-format
