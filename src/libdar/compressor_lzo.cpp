@@ -47,6 +47,7 @@ extern "C"
 
 #include "tools.hpp"
 #include "compressor_lzo.hpp"
+#include "lzo_module.hpp"
 
     // value found in lzop source code p_lzo.c
 #define LZO_COMPRESSED_BUFFER_SIZE 256*1024l
@@ -97,6 +98,14 @@ namespace libdar
 	case compression::lzo1x_1_15:
 	case compression::lzo1x_1:
 #if LIBLZO2_AVAILABLE
+	    try
+	    {
+		module = make_unique<lzo_module>(algo, compression_level);
+	    }
+	    catch(bad_alloc &)
+	    {
+		throw Ememory("compressor_lzo::compressor_lzo");
+	    }
 	    reset_compr_engine();
 	    try
 	    {
@@ -371,31 +380,10 @@ namespace libdar
 #if LIBLZO2_AVAILABLE
 	lzo_block_header lzo_bh;
 	lzo_uint compr_size = LZO_COMPRESSED_BUFFER_SIZE;
-	S_I status;
 
 	    //compressing data to lzo_compress buffer
-	switch(current_algo)
-	{
-	case compression::lzo:
-	    status = lzo1x_999_compress_level((lzo_bytep)lzo_write_buffer, lzo_write_size, (lzo_bytep)lzo_compressed, &compr_size, lzo_wrkmem, nullptr, 0, 0, current_level);
-	    break;
-	case compression::lzo1x_1_15:
-	    status = lzo1x_1_15_compress((lzo_bytep)lzo_write_buffer, lzo_write_size, (lzo_bytep)lzo_compressed, &compr_size, lzo_wrkmem);
-	    break;
-	case compression::lzo1x_1:
-	    status = lzo1x_1_compress((lzo_bytep)lzo_write_buffer, lzo_write_size, (lzo_bytep)lzo_compressed, &compr_size, lzo_wrkmem);
-	    break;
-	default:
-	    throw SRC_BUG;
-	}
 
-	switch(status)
-	{
-	case LZO_E_OK:
-	    break; // all is fine
-	default:
-	    throw Erange("compressor_lzo::lzo_compress_buffer_and_write", tools_printf(gettext("Probable bug in liblzo2: lzo1x_*_compress returned unexpected code %d"), status));
-	}
+	compr_size = module->compress_data(lzo_write_buffer, lzo_write_size, lzo_compressed, compr_size);
 
 	    // writing down the TL(V) before the compressed data
 	lzo_bh.type = BLOCK_HEADER_LZO;
@@ -416,30 +404,18 @@ namespace libdar
     {
 #if LIBLZO2_AVAILABLE
 	lzo_block_header lzo_bh;
-	lzo_uint compr_size;
-	int status;
-#if LZO1X_MEM_DECOMPRESS > 0
-	char wrkmem[LZO1X_MEM_DECOMPRESS];
-#else
-	char *wrkmem = nullptr;
-#endif
+	U_I compr_size;
+	U_I read;
 
 	if(compressed == nullptr)
 	    throw SRC_BUG;
 
+	    // reading the next block header
+
 	lzo_bh.set_from(*compressed);
-	if(lzo_bh.type != BLOCK_HEADER_LZO && lzo_bh.type != BLOCK_HEADER_EOF)
-	    throw Erange("compressor_lzo::lzo_read_and_uncompress_to_buffer", gettext("data corruption detected: Incoherence in LZO compressed data"));
-	if(lzo_bh.type == BLOCK_HEADER_EOF)
+	switch(lzo_bh.type)
 	{
-	    if(lzo_bh.size != 0)
-		throw Erange("compressor_lzo::lzo_read_and_uncompress_to_buffer", gettext("compressed data corruption detected"));
-	    lzo_read_size = 0;
-	    lzo_read_start = 0;
-	}
-	else
-	{
-	    lzo_uint read;
+	case BLOCK_HEADER_LZO:
 
 	    if(lzo_bh.size > LZO_COMPRESSED_BUFFER_SIZE)
 #if !defined(SSIZE_MAX) || SSIZE_MAX > BUFFER_SIZE
@@ -456,21 +432,18 @@ namespace libdar
 	    read = compressed->read(lzo_compressed, compr_size);
 	    if(read != compr_size)
 		Erange("compressor_lzo::lzo_read_and_uncompress_to_buffer", gettext("compressed data corruption detected"));
-	    read = LZO_CLEAR_BUFFER_SIZE;
-	    status = lzo1x_decompress_safe((lzo_bytep)lzo_compressed, compr_size, (lzo_bytep)lzo_read_buffer, &read, wrkmem);
-	    lzo_read_size = read;
-	    lzo_read_start = 0;
 
-	    switch(status)
-	    {
-	    case LZO_E_OK:
-		break; // all is fine
-	    case LZO_E_INPUT_NOT_CONSUMED:
-		throw SRC_BUG;
-	    default:
-		lzo_read_size = 0;
+	    lzo_read_start = 0;
+	    lzo_read_size = module->uncompress_data(lzo_compressed, compr_size, lzo_read_buffer, LZO_CLEAR_BUFFER_SIZE);
+	    break;
+	case BLOCK_HEADER_EOF:
+	    if(lzo_bh.size != 0)
 		throw Erange("compressor_lzo::lzo_read_and_uncompress_to_buffer", gettext("compressed data corruption detected"));
-	    }
+	    lzo_read_size = 0;
+	    lzo_read_start = 0;
+	    break;
+	default:
+	    throw Erange("compressor_lzo::lzo_read_and_uncompress_to_buffer", gettext("data corruption detected: Incoherence in LZO compressed data"));
 	}
 #else
 	throw Ecompilation(gettext("lzo compression"));
