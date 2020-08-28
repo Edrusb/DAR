@@ -51,12 +51,6 @@ namespace libdar
 	    // compressed_side is not owned by the object and will remains
             // after the objet destruction
 
-	block_compressor(std::unique_ptr<compress_module> block_zipper,
-			 generic_file *compressed_side,
-			 U_I uncompressed_bs = default_uncompressed_block_size);
-            // compressed_side is owned by the object and will be
-            // deleted a destructor time
-
 	block_compressor(const block_compressor & ref) = delete;
 	block_compressor(block_compressor && ref) noexcept = delete;
 	block_compressor & operator = (const block_compressor & ref) = delete;
@@ -92,16 +86,11 @@ namespace libdar
 	static constexpr const U_I min_uncompressed_block_size = 100;
 
 
-	    // initialized directly in constructors
+	    // the local fields
 
-	std::unique_ptr<compress_module> zipper;
-	generic_file *compressed;
-	bool we_own_compressed_side;
-	U_I uncompressed_block_size;
-
-
-	    // initialized by the init_fields() method
-
+	std::unique_ptr<compress_module> zipper;  ///< compress_module for the requested compression algo
+	generic_file *compressed;                 ///< where to read from / write to, compressed data
+	U_I uncompressed_block_size;              ///< the max block size of un compressed data used
 	bool suspended;                           ///< whether compression is suspended or not
 	bool need_eof;                            ///< whether a zero size block need to be added
 	std::unique_ptr<crypto_segment> current;  ///< current block under construction or exploitation
@@ -109,7 +98,6 @@ namespace libdar
 
 	    // private methods
 
-	void init_fields();
 	void compress_and_write_current();
 	void read_and_uncompress_current();
 

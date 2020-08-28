@@ -41,24 +41,30 @@ namespace libdar
 	proto_compressor((compressed_side.get_mode() == gf_read_only)? gf_read_only: gf_write_only),
 	zipper(move(block_zipper)),
 	compressed(&compressed_side),
-	we_own_compressed_side(false),
 	uncompressed_block_size(uncompressed_bs)
     {
-	init_fields();
-    }
+	U_I compr_bs = zipper->get_min_size_to_compress(uncompressed_block_size);
+
+	    // sanity checks on fields set by constructors
+
+	if(get_mode() == gf_read_write)
+	    throw SRC_BUG; // mode not suported for this type of object
+	if(!zipper)
+	    throw SRC_BUG;
+	if(compressed == nullptr)
+	    throw SRC_BUG;
+	if(uncompressed_block_size < min_uncompressed_block_size)
+	    throw SRC_BUG;
 
 
-    block_compressor::block_compressor(unique_ptr<compress_module> block_zipper,
-							 generic_file *compressed_side,
-							 U_I uncompressed_bs):
-	proto_compressor((compressed_side->get_mode() == gf_read_only)? gf_read_only: gf_write_only),
-	zipper(move(block_zipper)),
-	compressed(compressed_side),
-	we_own_compressed_side(true),
-	uncompressed_block_size(uncompressed_bs)
-    {
-	init_fields();
+	    // initializing simple fields not set by constructors
+
+	suspended = false;
+	need_eof = false;
+	current = make_unique<crypto_segment>(compr_bs, uncompressed_block_size);
+	reof = false;
     }
+
 
     block_compressor::~block_compressor()
     {
@@ -70,9 +76,6 @@ namespace libdar
 	{
 		// ignore all exceptions
 	}
-
-	if(we_own_compressed_side && compressed != nullptr)
-	    delete compressed;
     }
 
     void block_compressor::suspend_compression()
@@ -252,30 +255,6 @@ namespace libdar
 	default:
 	    throw SRC_BUG;
 	}
-    }
-
-    void block_compressor::init_fields()
-    {
-	U_I compr_bs = zipper->get_min_size_to_compress(uncompressed_block_size);
-
-	    // sanity checks on fields set by constructors
-
-	if(get_mode() == gf_read_write)
-	    throw SRC_BUG; // mode not suported for this type of object
-	if(!zipper)
-	    throw SRC_BUG;
-	if(compressed == nullptr)
-	    throw SRC_BUG;
-	if(uncompressed_block_size < min_uncompressed_block_size)
-	    throw SRC_BUG;
-
-
-	    // initializing simple fields not set by constructors
-
-	suspended = false;
-	need_eof = false;
-	current = make_unique<crypto_segment>(compr_bs, uncompressed_block_size);
-	reof = false;
     }
 
     void block_compressor::compress_and_write_current()
