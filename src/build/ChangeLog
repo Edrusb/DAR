@@ -9,6 +9,7 @@ from 2.6.10 to 2.6.11
 - fixing bug met when merging an archive an recompressing the data
   with another algorithm that gives a less good result, this condition
   lead the merging operation to fail reporting a CRC mismatch
+- improving archive header code to cope with unknown flags
 
 from 2.6.9 to 2.6.10
 - update the configure script to handle some undocumented --enable-*

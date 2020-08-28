@@ -149,6 +149,10 @@ namespace libdar
 	    //
 
 	static constexpr U_I PRE_FORMAT_10_ITERATION = 2000;   ///< fixed value used for key derivation before archive format 10
+
+	    // check we are not facing a more recent format than what we know, this would fail CRC calculation before reporting the real reason of the issue
+	static bool all_flags_known(U_I flag);
+
     };
 
 } // end of namespace
