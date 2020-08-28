@@ -89,27 +89,7 @@ namespace libdar
             ~xfer();
         };
 
-	struct lzo_block_header
-	{
-	    char type;             ///< let the possibility to extend this architecture (for now type is fixed)
-	    infinint size;         ///< size of the following compressed block of data
-
-	    void dump(generic_file & f);
-	    void set_from(generic_file & f);
-	};
-
-
         xfer *compr, *decompr;     ///< datastructure for bzip2, gzip and zx compression
-
-	char *lzo_read_buffer;     ///< stores clear data (uncompressed) read from the compressed generic_file
-	char *lzo_write_buffer;    ///< stores the clear data to be compressed and written to the compressed generic_file
-	U_I lzo_read_size;         ///< number of available bytes in the read buffer for lzo decompression
-	U_I lzo_write_size;        ///< number of available bytes to compress and next place where to add more data in the wite buffer
-	U_I lzo_read_start;        ///< location of the next byte to read out from the read buffer
-	bool lzo_write_flushed;    ///< whether write flushing has been done
-	bool lzo_read_reached_eof; ///< whether reading reached end of file and the lzo engine has to be reset to uncompress further data
-	char *lzo_compressed;      ///< compressed data just read or about to be written
-	char *lzo_wrkmem;          ///< work memory for LZO library
 
         generic_file *compressed;
         compression current_algo;
@@ -125,18 +105,12 @@ namespace libdar
         U_I gzip_read(char *a, U_I size);
             // U_I zip_read(char *a, U_I size);
             // U_I bzip2_read(char *a, U_I size); // using gzip_read, same code thanks to wrapperlib
-	U_I lzo_read(char *a, U_I size);
 
         void (compressor::*write_ptr) (const char *a, U_I size);
         void none_write(const char *a, U_I size);
         void gzip_write(const char *a, U_I size);
             // void zip_write(char *a, U_I size);
             // void bzip2_write(char *a, U_I size); // using gzip_write, same code thanks to wrapperlib
-	void lzo_write(const char *a, U_I size);
-
-	void lzo_compress_buffer_and_write();
-	void lzo_read_and_uncompress_to_buffer();
-	void lzo_clear_fields();
 
         void compr_flush_write(); // flush all data to compressed_side, and reset the compressor
             // for that additional write can be uncompresssed starting at this point.

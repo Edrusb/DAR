@@ -65,6 +65,7 @@ extern "C"
 #include "tools.hpp"
 #include "compressor.hpp"
 #include "compressor_zstd.hpp"
+#include "compressor_lzo.hpp"
 #include "lz4_module.hpp"
 #include "gzip_module.hpp"
 #include "bzip2_module.hpp"
@@ -2254,11 +2255,15 @@ namespace libdar
 	case compression::none:
 	case compression::gzip:
 	case compression::bzip2:
+	case compression::xz:
+	    ret = new (nothrow) compressor(algo, base, compression_level);
+	    if(ret == nullptr)
+		throw Ememory("build_compressor");
+	    break;
 	case compression::lzo:
 	case compression::lzo1x_1_15:
 	case compression::lzo1x_1:
-	case compression::xz:
-	    ret = new (nothrow) compressor(algo, base, compression_level);
+	    ret = new (nothrow) compressor_lzo(algo, base, compression_level);
 	    if(ret == nullptr)
 		throw Ememory("build_compressor");
 	    break;

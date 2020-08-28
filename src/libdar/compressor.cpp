@@ -30,12 +30,6 @@ extern "C"
 #include <limits.h>
 #endif
 
-#if LIBLZO2_AVAILABLE
-#if HAVE_LZO_LZO1X_H
-#include <lzo/lzo1x.h>
-#endif
-#endif
-
 #if HAVE_STRING_H
 #include <string.h>
 #endif
@@ -71,25 +65,6 @@ extern "C"
 #endif
 #endif
 
-    // value found in lzop source code p_lzo.c
-#define LZO_COMPRESSED_BUFFER_SIZE 256*1024l
-#ifdef SSIZE_MAX
-#if SSIZE_MAX < LZO_COMPRESSED_BUFFER_SIZE
-#undef LZO_COMPRESSED_BUFFER_SIZE
-#define LZO_COMPRESSED_BUFFER_SIZE SSIZE_MAX
-#endif
-#endif
-
-#define LZO_CLEAR_BUFFER_SIZE ((LZO_COMPRESSED_BUFFER_SIZE - 64 - 3)*16/17)
-    // value calculated with information found in LZO's FAQ
-
-#if LZO_CLEAR_BUFFER_SIZE < 1
-#error "System's SSIZE_MAX too small to handle LZO compression"
-#endif
-
-#define BLOCK_HEADER_LZO 1
-#define BLOCK_HEADER_EOF 2
-
 using namespace std;
 
 namespace libdar
@@ -114,14 +89,6 @@ namespace libdar
 	    delete compr;
 	if(decompr != nullptr)
 	    delete decompr;
-	if(lzo_read_buffer != nullptr)
-	    delete [] lzo_read_buffer;
-	if(lzo_write_buffer != nullptr)
-	    delete [] lzo_write_buffer;
-	if(lzo_compressed != nullptr)
-	    delete [] lzo_compressed;
-	if(lzo_wrkmem != nullptr)
-	    delete [] lzo_wrkmem;
     }
 
     compression compressor::get_algo() const
@@ -129,7 +96,7 @@ namespace libdar
 	if(suspended)
 	    return compression::none;
 	else
-	    return (current_algo == compression::lzo1x_1_15 || current_algo == compression::lzo1x_1) ? compression::lzo : current_algo;
+	    return current_algo;
     }
 
     void compressor::suspend_compression()
@@ -166,9 +133,6 @@ namespace libdar
             throw SRC_BUG;
 
         compr = decompr = nullptr;
-	lzo_read_buffer = lzo_write_buffer = nullptr;
-	lzo_compressed = nullptr;
-	lzo_wrkmem = nullptr;
 
 	hijacking_compr_method(algo);
 
@@ -253,58 +217,8 @@ namespace libdar
 	case compression::lzo:
 	case compression::lzo1x_1_15:
 	case compression::lzo1x_1:
-#if LIBLZO2_AVAILABLE
-	    lzo_clear_fields();
-	    try
-	    {
-		lzo_read_buffer = new (nothrow) char[LZO_CLEAR_BUFFER_SIZE];
-		lzo_write_buffer = new (nothrow) char[LZO_CLEAR_BUFFER_SIZE];
-		lzo_compressed = new (nothrow) char[LZO_COMPRESSED_BUFFER_SIZE];
-		switch(algo)
-		{
-		case compression::lzo:
-		    lzo_wrkmem = new (nothrow) char[LZO1X_999_MEM_COMPRESS];
-		    break;
-		case compression::lzo1x_1_15:
-		    lzo_wrkmem = new (nothrow) char[LZO1X_1_15_MEM_COMPRESS];
-		    break;
-		case compression::lzo1x_1:
-		    lzo_wrkmem = new (nothrow) char[LZO1X_1_MEM_COMPRESS];
-		    break;
-		default:
-		    throw SRC_BUG;
-		}
-		if(lzo_read_buffer == nullptr || lzo_write_buffer == nullptr || lzo_compressed == nullptr || lzo_wrkmem == nullptr)
-		    throw Ememory("compressor::init");
-	    }
-	    catch(...)
-	    {
-		if(lzo_read_buffer != nullptr)
-		{
-		    delete [] lzo_read_buffer;
-		    lzo_read_buffer = nullptr;
-		}
-		if(lzo_write_buffer != nullptr)
-		{
-		    delete [] lzo_write_buffer;
-		    lzo_write_buffer = nullptr;
-		}
-		if(lzo_compressed != nullptr)
-		{
-		    delete [] lzo_compressed;
-		    lzo_compressed = nullptr;
-		}
-		if(lzo_wrkmem != nullptr)
-		{
-		    delete [] lzo_wrkmem;
-		    lzo_wrkmem = nullptr;
-		}
-		throw;
-	    }
-	    break;
-#else
-	    throw Ecompilation("lzo compression support (liblzo2)");
-#endif
+	    throw SRC_BUG;
+		// lzo is now handled by class compressor_lzo
 	case compression::zstd:
 	    throw SRC_BUG;
 		// zstd is now handled by class compressor_zstd
@@ -332,8 +246,8 @@ namespace libdar
 	case compression::lzo:
 	case compression::lzo1x_1_15:
 	case compression::lzo1x_1:
-	    lzo_clear_fields();
-	    break;
+	    throw SRC_BUG;
+		// lzo is now handled by class compressor_lzo
 	case compression::zstd:
 	    throw SRC_BUG;
 		// zstd is now handled by class compressor_zstd
@@ -359,9 +273,8 @@ namespace libdar
 	case compression::lzo:
 	case compression::lzo1x_1_15:
 	case compression::lzo1x_1:
-	    read_ptr = &compressor::lzo_read;
-	    write_ptr = &compressor::lzo_write;
-	    break;
+	    throw SRC_BUG;
+		// lzo is now handled by class compressor_lzo
 	case compression::zstd:
 	    throw SRC_BUG;
 		// zstd is now handled by class compressor_zstd
@@ -428,35 +341,6 @@ namespace libdar
                 throw SRC_BUG;
             }
         }
-
-	if(lzo_read_buffer != nullptr)
-	{
-	    compr_flush_read();
-	    clean_read();
-	    delete [] lzo_read_buffer;
-	    lzo_read_buffer = nullptr;
-	}
-
-	if(lzo_write_buffer != nullptr)
-	{
-	    compr_flush_write();
-	    clean_write();
-	    delete [] lzo_write_buffer;
-	    lzo_write_buffer = nullptr;
-	}
-
-	if(lzo_compressed != nullptr)
-	{
-	    delete [] lzo_compressed;
-	    lzo_compressed = nullptr;
-	}
-
-	if(lzo_wrkmem != nullptr)
-	{
-	    delete [] lzo_wrkmem;
-	    lzo_wrkmem = nullptr;
-	}
-
     }
 
     compressor::xfer::xfer(U_I sz, wrapperlib_mode mode) : wrap(mode)
@@ -584,73 +468,6 @@ namespace libdar
         }
     }
 
-    U_I compressor::lzo_read(char *a, U_I size)
-    {
-#if LIBLZO2_AVAILABLE
-	U_I read = 0;
-
-	while(read < size && !lzo_read_reached_eof)
-	{
-	    U_I available = lzo_read_size - lzo_read_start;
-	    U_I to_read = size - read;
-
-	    if(available > to_read)
-	    {
-		(void)memcpy(a+read, lzo_read_buffer+lzo_read_start, to_read);
-		lzo_read_start += to_read;
-		read += to_read;
-	    }
-	    else
-	    {
-		if(available > 0)
-		{
-		    (void)memcpy(a+read, lzo_read_buffer+lzo_read_start, available);
-		    lzo_read_start += available;
-		    read += available;
-		}
-		if(lzo_read_start < lzo_read_size)
-		    throw SRC_BUG;
-		lzo_read_and_uncompress_to_buffer();
-		lzo_read_reached_eof = (lzo_read_size == 0); // either true or false
-	    }
-	}
-
-	return read;
-#else
-	throw Ecompilation(gettext("lzo compression"));
-#endif
-    }
-
-    void compressor::lzo_write(const char *a, U_I size)
-    {
-#if LIBLZO2_AVAILABLE
-	U_I wrote = 0;
-	lzo_write_flushed = false;
-
-	while(wrote < size)
-	{
-	    U_I to_write = size - wrote;
-	    U_I space = LZO_CLEAR_BUFFER_SIZE - lzo_write_size;
-
-	    if(to_write < space)
-	    {
-		(void)memcpy(lzo_write_buffer + lzo_write_size, a + wrote, to_write);
-		wrote += to_write;
-		lzo_write_size += to_write;
-	    }
-	    else
-	    {
-		(void)memcpy(lzo_write_buffer + lzo_write_size, a + wrote, space);
-		wrote += space;
-		lzo_write_size += space;
-		lzo_compress_buffer_and_write();
-	    }
-	}
-#else
-	throw Ecompilation(gettext("lzo compression"));
-#endif
-    }
-
     void compressor::compr_flush_write()
     {
         S_I ret;
@@ -691,19 +508,6 @@ namespace libdar
                 throw SRC_BUG;
         }
 
-	if(lzo_write_buffer != nullptr && ! lzo_write_flushed) // lzo
-	{
-	    lzo_block_header lzo_bh;
-
-	    lzo_compress_buffer_and_write();
-	    lzo_bh.type = BLOCK_HEADER_EOF;
-	    lzo_bh.size = 0;
-	    if(compressed == nullptr)
-		throw SRC_BUG;
-	    lzo_bh.dump(*compressed);
-	    lzo_write_flushed = true;
-	}
-
     }
 
     void compressor::compr_flush_read()
@@ -715,8 +519,6 @@ namespace libdar
             if(decompr->wrap.decompressReset() != WR_OK)
                 throw SRC_BUG;
             // keep in the buffer the bytes already read, these are discarded in case of a call to skip
-	lzo_read_reached_eof = false;
-
     }
 
     void compressor::clean_read()
@@ -726,13 +528,6 @@ namespace libdar
 
         if(decompr != nullptr)
             decompr->wrap.set_avail_in(0);
-
-	if(lzo_read_buffer != nullptr) // lzo
-	{
-	    lzo_read_start = 0;
-	    lzo_read_size = 0;
-	}
-
     }
 
     void compressor::clean_write()
@@ -754,145 +549,6 @@ namespace libdar
             }
             while(ret == WR_OK);
         }
-
-	if(lzo_write_buffer != nullptr) // lzo
-	    lzo_write_size = 0;
-
-    }
-
-
-    void compressor::lzo_compress_buffer_and_write()
-    {
-#if LIBLZO2_AVAILABLE
-	lzo_block_header lzo_bh;
-	lzo_uint compr_size = LZO_COMPRESSED_BUFFER_SIZE;
-	S_I status;
-
-	    //compressing data to lzo_compress buffer
-	switch(current_algo)
-	{
-	case compression::lzo:
-	    status = lzo1x_999_compress_level((lzo_bytep)lzo_write_buffer, lzo_write_size, (lzo_bytep)lzo_compressed, &compr_size, lzo_wrkmem, nullptr, 0, 0, current_level);
-	    break;
-	case compression::lzo1x_1_15:
-	    status = lzo1x_1_15_compress((lzo_bytep)lzo_write_buffer, lzo_write_size, (lzo_bytep)lzo_compressed, &compr_size, lzo_wrkmem);
-	    break;
-	case compression::lzo1x_1:
-	    status = lzo1x_1_compress((lzo_bytep)lzo_write_buffer, lzo_write_size, (lzo_bytep)lzo_compressed, &compr_size, lzo_wrkmem);
-	    break;
-	default:
-	    throw SRC_BUG;
-	}
-
-	switch(status)
-	{
-	case LZO_E_OK:
-	    break; // all is fine
-	default:
-	    throw Erange("compressor::lzo_compress_buffer_and_write", tools_printf(gettext("Probable bug in liblzo2: lzo1x_*_compress returned unexpected code %d"), status));
-	}
-
-	    // writing down the TL(V) before the compressed data
-	lzo_bh.type = BLOCK_HEADER_LZO;
-	lzo_bh.size = compr_size;
-	if(compressed == nullptr)
-	    throw SRC_BUG;
-
-	lzo_bh.dump(*compressed);
-	compressed->write(lzo_compressed, compr_size);
-
-	lzo_write_size = 0;
-#else
-	throw Ecompilation(gettext("lzo compression"));
-#endif
-    }
-
-    void compressor::lzo_read_and_uncompress_to_buffer()
-    {
-#if LIBLZO2_AVAILABLE
-	lzo_block_header lzo_bh;
-	lzo_uint compr_size;
-	int status;
-#if LZO1X_MEM_DECOMPRESS > 0
-	char wrkmem[LZO1X_MEM_DECOMPRESS];
-#else
-	char *wrkmem = nullptr;
-#endif
-
-	if(compressed == nullptr)
-	    throw SRC_BUG;
-
-	lzo_bh.set_from(*compressed);
-	if(lzo_bh.type != BLOCK_HEADER_LZO && lzo_bh.type != BLOCK_HEADER_EOF)
-	    throw Erange("compressor::lzo_read_and_uncompress_to_buffer", gettext("data corruption detected: Incoherence in LZO compressed data"));
-	if(lzo_bh.type == BLOCK_HEADER_EOF)
-	{
-	    if(lzo_bh.size != 0)
-		throw Erange("compressor::lzo_read_and_uncompress_to_buffer", gettext("compressed data corruption detected"));
-	    lzo_read_size = 0;
-	    lzo_read_start = 0;
-	}
-	else
-	{
-	    lzo_uint read;
-
-	    if(lzo_bh.size > LZO_COMPRESSED_BUFFER_SIZE)
-#if !defined(SSIZE_MAX) || SSIZE_MAX > BUFFER_SIZE
-		throw Erange("compressor::lzo_read_and_uncompress_to_buffer", gettext("data corruption detected: Too large block of compressed data"));
-#else
-	    throw Erange("compressor::lzo_read_and_uncompress_to_buffer", gettext("Too large block of compressed data: Either due to data corruption or current system limitation where SSIZE_MAX value implied smaller buffers than required"));
-#endif
-
-	    compr_size = 0;
-	    lzo_bh.size.unstack(compr_size);
-	    if(lzo_bh.size != 0)
-		throw SRC_BUG;
-
-	    read = compressed->read(lzo_compressed, compr_size);
-	    if(read != compr_size)
-		Erange("compressor::lzo_read_and_uncompress_to_buffer", gettext("compressed data corruption detected"));
-	    read = LZO_CLEAR_BUFFER_SIZE;
-	    status = lzo1x_decompress_safe((lzo_bytep)lzo_compressed, compr_size, (lzo_bytep)lzo_read_buffer, &read, wrkmem);
-	    lzo_read_size = read;
-	    lzo_read_start = 0;
-
-	    switch(status)
-	    {
-	    case LZO_E_OK:
-		break; // all is fine
-	    case LZO_E_INPUT_NOT_CONSUMED:
-		throw SRC_BUG;
-	    default:
-		lzo_read_size = 0;
-		throw Erange("compressor::lzo_read_and_uncompress_to_buffer", gettext("compressed data corruption detected"));
-	    }
-	}
-#else
-	throw Ecompilation(gettext("lzo compression"));
-#endif
-    }
-
-    void compressor::lzo_clear_fields()
-    {
-	    // read
-	lzo_read_start = 0;
-	lzo_read_size = 0;
-	lzo_read_reached_eof = false;
-	    // write
-	lzo_write_size = 0;
-	lzo_write_flushed = true;
-    }
-
-    void compressor::lzo_block_header::dump(generic_file & f)
-    {
-	f.write(&type, 1);
-	size.dump(f);
-    }
-
-    void compressor::lzo_block_header::set_from(generic_file & f)
-    {
-	f.read(&type, 1);
-	size.read(f);
     }
 
 } // end of namespace
