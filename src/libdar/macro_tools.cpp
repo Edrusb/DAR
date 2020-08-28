@@ -886,7 +886,10 @@ namespace libdar
 
 	    if(ver.get_compression_block_size().is_zero())
 	    {
-		tmp = build_streaming_compressor(ver.get_compression_algo(), *(stack.top()), multi_threaded_compress);
+		tmp = build_streaming_compressor(ver.get_compression_algo(),
+						 *(stack.top()),
+						 9, // not used for decompression
+						 multi_threaded_compress);
 
 		if(info_details)
 		    dialog->message(tools_printf(gettext("streamed compression layer open (single threaded)")));
