@@ -4030,34 +4030,32 @@
 	      library and at the same time retrieve the compression/decompression counterpart. The API provided
 	      by the different libraries (libz, libbzip2, liblzo2, liblzma5, libzstd, liblz4) do not provide
 	      multi-threaded approach for this mode of compressing data, however this gives the best compression
-	      ratio you can expect for a given file and a given compression algorithm and compression level.
+	      ratio you can expect for a given file, given compression algorithm and compression level.
 	      <p/>
 	      Before 2.7.0 parallelization had been tried but with little success by running compression and
-	      encryption in different threads. Usually one of the thread spends most of its time waiting for
-	      the other and the overall performance gain is little due to the added overhead. This scheme
+	      encryption in different threads. Usually one of the threads spended most of its time waiting for
+	      the other and the overall performance gain was little due to the added thread management and
+	      synchronization overhead. This scheme
 	      has been completely abandoned to the one exposed above for encryption. To extend this method
-	      to compression, we have to change the mode of compression, from the legacy streaming one to a
-	      block approach. Note that with release 2.7.0 both mode will coexist, and you will still be able
-	      to read old archive and generate new one with old single thread/streaming approach.
+	      to compression, we had to change the mode of compression, from the legacy streaming one to a
+	      block approach, which is described below. Note that with release 2.7.0 both mode will coexist,
+	      and you will still be able to read old archive and generate new one with old single thread/streaming approach.
 	      <p/>
 	      The result is quite similar to the encryption approach, a set of worker proceed to the compression
-	      or decompression of one block at a time and two helper threads feed on one side and gather the
-	      result on the other side. In block compression mode, the compressed file's content is no more
-	      a flow of unstructured data that would be fed to the decompression engine, but a sequence of compressed
-	      block proceeded by the size of the compressed block:
+	      or decompression of one block at a time and two helper threads are used, one feed on one side and the
+	      other gather the results on the other side.
+	      <p/>
 	    </div>
-	    <code>
-	      +------------+---------------------+------------+-----------------+-----+----------------------+<br/>
-              | block size | compressed data ... | block size | compressed data | ... | block size = 0 (EOF) |<br/>
-	      +------------+---------------------+------------+-----------------+-----+----------------------+<br/>
-	    </code>
-	    <p/>
 	    <div style="text-align: justify;">
-	      The consequence is a less good compression ratio when the block size is chosen too small and a memory
-	      requirement increase as described above for the parallel encryption. Choosing a block size
+	      The consequence is a degraded compression ratio when the block size is chosen too small. But larger
+	      blocks have an impact on the memory usage, that's a balance to find between what memory mean you have
+	      and want to use, how much time you have and want to spend for the compression and how much space you
+	      have want to use to store the resulting archive.
+	      Choosing a block size
 	      of 102400 bytes (see extended syntax of -z option) with 4 threads (see -G option) will lead libdar to
 	      allocated 2800 KiB (~ 2.7 GiB) in addition
-	      to what libdar already uses for single thread approach. If you use both parallel encryption and parallel
+	      to what libdar already uses for single thread approach (same formula as what is described above for
+	      encryption). If you use both parallel encryption and parallel
 	      compression at the same time you have to sum the additional memory requirements of each feature.
 	    </div>
 
@@ -4075,6 +4073,142 @@
 	</tr>
       </tbody>
     </table>
+
+    <br>
+    <br>
+    <hr style="width: 100%; height: 2px;"><br>
+    <table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;"
+	   cellspacing="2" cellpadding="2" border="0">
+      <tbody>
+        <tr>
+          <td style="vertical-align: top;">
+	    <h3><a name="multi-threaded">Streaming and block Compression modes</a></h3>
+	    <h4>Streaming compression</h4>
+
+	    <div style="text-align: justify;">
+	      Since its first day with version 1.0.0, dar/libdar provides streaming compression. It started with <b>gzip</b>
+	      algorithm, has been extended later to <b>bzip2</b>, then <b>lzo</b>, <b>xz/lzma</b>, and since release 2.7.0
+	      two new algorithms have been added: <b>zstd</b> and <b>lz4</b>.
+	    </div>
+	    <br/>
+	    <div style="text-align: justify;">
+	      Streaming compression let libdar provide new decompress data bytes and in return from time
+	      to time get back some compressed data bytes from the compression engine. There is no limitation in size: a stream
+	      of uncompressed data enters the compression engine from which exists another stream of compressed data.
+	      You do not need very large memory buffers to feed and gather data to/from the engine,
+	      and can obtain very good compression ratio. Though the process cannot be parallelized as
+	      the stream of incoming data must be provided to this single engine in the expected order.
+	      The process is similar for decompression, you give back to the engine the compressed data.
+	      It does not matter if you feed the engine by smaller or larger groups of bytes than what
+	      the engine provided when compressing, as long as you keep the byte sequence order, the resulting uncompressed stream will be the original
+	      one you gave for compression.
+	    </div>
+	    <br/>
+	    <div style="text-align: justify;">
+	      Such streaming compression is natively provided by libz, libbz2, libxz/lzma and libzstd. So
+	      dar store these compressed data as provided: an unstructured and arbitrarily long sequence
+	      of bytes corresponding to the (compressed) data of a given file. Yes, dar compress file per
+	      file: a new file, a new stream.
+	    </div>
+
+
+	    <h4>Block compression</h4>
+
+	    <div style="text-align: justify;">
+	      For lzo algorithm (added with 2.4.0 release) the liblzo2 library does not provide such streaming
+	      interface, only a per buffer compression is available.
+	      That is to say, you have to provide block of uncompressed
+	      data from which you get a variable amount of compressed bytes. To decompress the data
+	      you have to provide back this exact block to the decompression engine. If you sticked the
+	      blocks together and do not provide them back at their original boundaries, the decompression
+	      will fail.
+	    </div>
+	    <br/>
+	    <div style="text-align: justify;">
+	      For that reason dar use a structure inside the compressed file's data to record where
+	      each block starts and ends, this way it is possible to feed the decompressing engine with coherent
+	      compressed data and get back the original clear data.
+	    </div>
+	    <br/>
+	    <div style="text-align: justify;">
+	      The structure used is made of an arbitrary long sequence of blocks. Each block is constitued
+	      of three fields:
+	      <ul>
+		<li><b>a Type</b> which has two values, either <i><b>D</b>ata</i> or <i><b>E</b>nd of file</i></li>
+		<li>an <b>block size</b> which is zero for <i>end of file</i> block types</li>
+		<li><b>a sequence of compressed bytes</b> which length is given by the <i>block size</i> field</li>
+	      </ul>
+	    </div>
+	    <br/>
+	    <div>
+	      <code>
+		+--------+-----------+---------------------+--------+------------+-----------------+-----+--------+----------------------+<br/>
+		| Type=D |block size | compressed data ... | Type=D | block size | compressed data | ... | type=E | block size = 0 (EOF) |<br/>
+		+--------+-----------+---------------------+--------+------------+-----------------+-----+--------+----------------------+<br/>
+	      </code>
+	    </div>
+	    <br/>
+	    <div style="text-align: justify;">
+	      One thing you cannot guess from a given compressed data is how much uncompressed data it will
+	      generate, while you have to prepare and allocate in memory a buffer large enough to receive it.
+	      It has been decided to slice the file's data in uncompressed block <b>not larger than</b> the maximum
+	      liblzo2 can handle, which is 240 kiB. So at decompression time, whatever is the size of the
+	      compressed block we can provide a 240 kiB buffer to receive the decompressed data and repeat
+	      the process as much time as necessary to process the whole compressed data of a given file.
+	    </div>
+	    <br/>
+	    <div style="text-align: justify;">
+	      With release 2.7.0 when adding lz4 compression algorithm, it has been found that the
+	      "streaming API" of lz4 library was not really a streaming API as it requested to provide back
+	      the exact compressed block and not a stream of bytes for the decompression to be possible. For that
+	      reason, lz4 streaming is done the exact same way as what has been implemented for lzo streaming:
+	      This is a block compression with 240 kiB block size.
+	    </div>
+	    <br/>
+	    <div style="text-align: justify;">
+	      The <b>block compression new feature</b> you have starting release 2.7.0 is thus just an extension of this method
+	      by providing to the user the ability to select the maximum size of the uncompressed data block that
+	      will be compressed at a time. The -z option has been extended to allow one to specify that block size.
+	      If set to zero we stick to the streaming mode, else we use block compression.
+	    </div>
+	    <br/>
+	    <div style="text-align: justify;">
+	      But for a given algorithm (except lzo and lz4) streaming mode and block mode are not compatible,
+	      the first has no structure (no block and cannot thus be processed in parallel) the second adds some
+	      non-compressed bytes beside the compressed data (the block headers). For that reason the new archive
+	      format contains the block size used at creation time in the archive header and trailer, which first
+	      let libdar allocate buffer large enough to receive decompressed data and second use the correct
+	      mode to retrive the
+	      original data.
+	    </div>
+	    <h4>Multi threading</h4>
+
+	    <div style="text-align: justify;">
+	      As mentionned earlier, to provide multi-threading support for compression (added
+	      at release 2.7.0) the use of per block compression is necessary. In the dar archive, this mode
+	      of compression provides the same structured data of compressed blocks as described above for
+	      lzo, but with the additional freedom to choose the block size (which stay fixed at 240 kiB for lzo and lz4
+	      pseudo-streaming mode) and any compression algorithm supported by libdar.
+	    </div>
+	    <br/>
+	    <div style="text-align: justify;">
+	      But that is not enough to have per block structure in archive to have multi-threaded processing:
+	      you have also to setup the code that read in advance, feed block in parallel to different threads,
+	      having each their own compression/decompression engine set and ready for use, gather the
+	      resulting work, reordering them if necessary before writing down to filesystem. The method used here is very similar to what was used
+	      to add multi-threading suppor for encryption/decryption (see previous chapter)
+	    </div>
+	    <br/>
+	    <div style="text-align: justify;">
+	      Last, if multi-threading is not possible for real streaming compression, it is available in dar/libdar
+	      for lz4 and lzo algorithm that are implemented as 240 KiB block compression. For other algorithm,
+	      streaming compression use different API of the libraries libdar relies on from the block compression,
+	      and is not possible to parallelize.
+	    </div>
+	  </td>
+	</tr>
+      </tbody>
+     </table>
 
 
   </body>
