@@ -30,6 +30,7 @@
 #include "infinint.hpp"
 #include "generic_file.hpp"
 
+
 namespace libdar
 {
 
@@ -40,6 +41,12 @@ namespace libdar
 
 	struct compress_block_header
 	{
+		// type values
+	    static constexpr const char H_DATA = 1;
+	    static constexpr const char H_EOF = 2;
+
+		// fields
+
 	    char type;             ///< let the possibility to extend this architecture (for now type is fixed)
 	    infinint size;         ///< size of the following compressed block of data
 

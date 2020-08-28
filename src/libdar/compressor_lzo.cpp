@@ -66,8 +66,6 @@ extern "C"
 #error "System's SSIZE_MAX too small to handle LZO compression"
 #endif
 
-#define BLOCK_HEADER_LZO 1
-#define BLOCK_HEADER_EOF 2
 
 using namespace std;
 
@@ -340,7 +338,7 @@ namespace libdar
 	    compress_block_header lzo_bh;
 
 	    lzo_compress_buffer_and_write();
-	    lzo_bh.type = BLOCK_HEADER_EOF;
+	    lzo_bh.type = compress_block_header::H_EOF;
 	    lzo_bh.size = 0;
 	    if(compressed == nullptr)
 		throw SRC_BUG;
@@ -387,7 +385,7 @@ namespace libdar
 	compr_size = module->compress_data(lzo_write_buffer, lzo_write_size, lzo_compressed, compr_size);
 
 	    // writing down the TL(V) before the compressed data
-	lzo_bh.type = BLOCK_HEADER_LZO;
+	lzo_bh.type = compress_block_header::H_DATA;
 	lzo_bh.size = compr_size;
 	if(compressed == nullptr)
 	    throw SRC_BUG;
@@ -419,7 +417,7 @@ namespace libdar
 
 	switch(lzo_bh.type)
 	{
-	case BLOCK_HEADER_LZO:
+	case compress_block_header::H_DATA:
 	    if(lzo_bh.size > LZO_COMPRESSED_BUFFER_SIZE)
 #if !defined(SSIZE_MAX) || SSIZE_MAX > BUFFER_SIZE
 		throw Erange("compressor_lzo::lzo_read_and_uncompress_to_buffer", gettext("data corruption detected: Too large block of compressed data"));
@@ -439,7 +437,7 @@ namespace libdar
 	    lzo_read_start = 0;
 	    lzo_read_size = module->uncompress_data(lzo_compressed, compr_size, lzo_read_buffer, LZO_CLEAR_BUFFER_SIZE);
 	    break;
-	case BLOCK_HEADER_EOF:
+	case compress_block_header::H_EOF:
 	    if( ! lzo_bh.size.is_zero())
 		throw Erange("compressor_lzo::lzo_read_and_uncompress_to_buffer", gettext("compressed data corruption detected"));
 	    lzo_read_size = 0;
