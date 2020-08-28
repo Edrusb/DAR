@@ -269,7 +269,7 @@ namespace libdar
 
 	    if(available > to_read)
 	    {
-		(void)memcpy(a+read, lzo_read_buffer+lzo_read_start, to_read);
+		(void)memcpy(a + read, lzo_read_buffer + lzo_read_start, to_read);
 		lzo_read_start += to_read;
 		read += to_read;
 	    }
@@ -277,7 +277,7 @@ namespace libdar
 	    {
 		if(available > 0)
 		{
-		    (void)memcpy(a+read, lzo_read_buffer+lzo_read_start, available);
+		    (void)memcpy(a + read, lzo_read_buffer + lzo_read_start, available);
 		    lzo_read_start += available;
 		    read += available;
 		}
@@ -413,10 +413,12 @@ namespace libdar
 	    // reading the next block header
 
 	lzo_bh.set_from(*compressed);
+
+	    // depending on the type of block do:
+
 	switch(lzo_bh.type)
 	{
 	case BLOCK_HEADER_LZO:
-
 	    if(lzo_bh.size > LZO_COMPRESSED_BUFFER_SIZE)
 #if !defined(SSIZE_MAX) || SSIZE_MAX > BUFFER_SIZE
 		throw Erange("compressor_lzo::lzo_read_and_uncompress_to_buffer", gettext("data corruption detected: Too large block of compressed data"));
@@ -437,7 +439,7 @@ namespace libdar
 	    lzo_read_size = module->uncompress_data(lzo_compressed, compr_size, lzo_read_buffer, LZO_CLEAR_BUFFER_SIZE);
 	    break;
 	case BLOCK_HEADER_EOF:
-	    if(lzo_bh.size != 0)
+	    if( ! lzo_bh.size.is_zero())
 		throw Erange("compressor_lzo::lzo_read_and_uncompress_to_buffer", gettext("compressed data corruption detected"));
 	    lzo_read_size = 0;
 	    lzo_read_start = 0;
