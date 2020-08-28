@@ -252,7 +252,7 @@ namespace libdar
 
 		err = ZSTD_compressStream(comp, &outbuf, &inbuf);
 		if(ZSTD_isError(err))
-		    throw Erange("zstd::write", tools_printf(gettext("Error met while sending data for compression to libzstd: %s"), ZSTD_getErrorName(err)));
+		    throw Erange("zstd::write", tools_printf(gettext("Error met while giving data for compression to libzstd: %s"), ZSTD_getErrorName(err)));
 
 		next_bs = err;
 

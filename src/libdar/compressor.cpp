@@ -72,7 +72,120 @@ namespace libdar
 
     compressor::compressor(compression algo, generic_file & compressed_side, U_I compression_level) : proto_compressor(compressed_side.get_mode())
     {
-        init(algo, &compressed_side, compression_level);
+
+        wrapperlib_mode wr_mode;
+        current_algo = algo;
+	suspended = false;
+	current_level = compression_level;
+        compr = decompr = nullptr;
+
+        if(compression_level > 9)
+            throw SRC_BUG;
+
+	switch(algo)
+	{
+	case compression::none:
+	    break;
+	case compression::gzip:
+	    wr_mode = zlib_mode;
+	    break;
+	case compression::bzip2:
+	    wr_mode = bzlib_mode;
+	    break;
+	case compression::lzo:
+	    throw SRC_BUG;
+	case compression::xz:
+	    wr_mode = xz_mode;
+	    break;
+	case compression::lzo1x_1_15:
+	    throw SRC_BUG;
+	case compression::lzo1x_1:
+	    throw SRC_BUG;
+	case compression::zstd:
+	    throw SRC_BUG;
+	case compression::lz4:
+	    throw SRC_BUG;
+	default:
+	    throw SRC_BUG;
+	}
+
+	try
+	{
+
+	    compr = new (nothrow) xfer(BUFFER_SIZE, wr_mode);
+	    if(compr == nullptr)
+		throw Ememory("compressor::compressor");
+
+	    decompr = new (nothrow) xfer(BUFFER_SIZE, wr_mode);
+	    if(decompr == nullptr)
+		throw Ememory("compressor::compressor");
+
+	    switch(compr->wrap.compressInit(compression_level))
+	    {
+	    case WR_OK:
+		break;
+	    case WR_MEM_ERROR:
+		delete compr;
+		compr = nullptr;
+		delete decompr;
+		decompr = nullptr;
+		throw Ememory("compressor::compressor");
+	    case WR_VERSION_ERROR:
+		delete compr;
+		compr = nullptr;
+		delete decompr;
+		decompr = nullptr;
+		throw Erange("compressor::compressor", gettext("incompatible compression library version or unsupported feature required from compression library"));
+	    case WR_STREAM_ERROR:
+	    default:
+		delete compr;
+		compr = nullptr;
+		delete decompr;
+		decompr = nullptr;
+		throw SRC_BUG;
+	    }
+
+	    switch(decompr->wrap.decompressInit())
+	    {
+	    case WR_OK:
+		decompr->wrap.set_avail_in(0);
+		break;
+	    case WR_MEM_ERROR:
+		compr->wrap.compressEnd();
+		delete compr;
+		compr = nullptr;
+		delete decompr;
+		decompr = nullptr;
+		throw Ememory("compressor::compressor");
+	    case WR_VERSION_ERROR:
+		compr->wrap.compressEnd();
+		delete compr;
+		compr = nullptr;
+		delete decompr;
+		decompr = nullptr;
+		throw Erange("compressor::compressor", gettext("incompatible compression library version or unsupported feature required from compression library"));
+	    case WR_STREAM_ERROR:
+	    default:
+		compr->wrap.compressEnd();
+		delete compr;
+		compr = nullptr;
+		delete decompr;
+		decompr = nullptr;
+		throw SRC_BUG;
+	    }
+
+
+	    compressed = & compressed_side;
+	}
+	catch(...)
+	{
+	    if(compr != nullptr)
+		delete compr;
+	    if(decompr != nullptr)
+		delete decompr;
+	    throw;
+	}
+
     }
 
     compressor::~compressor()
@@ -103,9 +216,8 @@ namespace libdar
     {
 	if(!suspended)
 	{
-	    compr_flush_write();
+	    inherited_sync_write();
 	    reset_compr_engine();
-	    hijacking_compr_method(compression::none);
 	    suspended = true;
 	}
     }
@@ -113,197 +225,35 @@ namespace libdar
     void compressor::resume_compression()
     {
 	if(suspended)
-	{
-	    hijacking_compr_method(current_algo);
 	    suspended = false;
-	}
-    }
-
-    void compressor::init(compression algo, generic_file *compressed_side, U_I compression_level)
-    {
-            // these are eventually overwritten below
-        wrapperlib_mode wr_mode = zlib_mode;
-        current_algo = algo;
-	suspended = false;
-	current_level = compression_level;
-
-        if(compressed_side == nullptr)
-            throw SRC_BUG;
-        if(compression_level > 9)
-            throw SRC_BUG;
-
-        compr = decompr = nullptr;
-
-	hijacking_compr_method(algo);
-
-        switch(algo)
-        {
-        case compression::none:
-            break;
-        case compression::bzip2:
-	case compression::xz:
-	    if(algo == compression::bzip2)
-		wr_mode = bzlib_mode;
-	    if(algo == compression::xz)
-		wr_mode = xz_mode;
-
-                // NO BREAK !
-        case compression::gzip:
-            compr = new (nothrow) xfer(BUFFER_SIZE, wr_mode);
-            if(compr == nullptr)
-                throw Ememory("compressor::compressor");
-            decompr = new (nothrow) xfer(BUFFER_SIZE, wr_mode);
-            if(decompr == nullptr)
-            {
-                delete compr;
-		compr = nullptr;
-                throw Ememory("compressor::compressor");
-            }
-
-            switch(compr->wrap.compressInit(compression_level))
-            {
-            case WR_OK:
-                break;
-            case WR_MEM_ERROR:
-                delete compr;
-		compr = nullptr;
-                delete decompr;
-		decompr = nullptr;
-                throw Ememory("compressor::compressor");
-            case WR_VERSION_ERROR:
-                delete compr;
-		compr = nullptr;
-                delete decompr;
-		decompr = nullptr;
-                throw Erange("compressor::compressor", gettext("incompatible compression library version or unsupported feature required from compression library"));
-            case WR_STREAM_ERROR:
-            default:
-                delete compr;
-		compr = nullptr;
-                delete decompr;
-		decompr = nullptr;
-                throw SRC_BUG;
-            }
-
-            switch(decompr->wrap.decompressInit())
-            {
-            case WR_OK:
-                decompr->wrap.set_avail_in(0);
-                break;
-            case WR_MEM_ERROR:
-                compr->wrap.compressEnd();
-                delete compr;
-		compr = nullptr;
-                delete decompr;
-		decompr = nullptr;
-                throw Ememory("compressor::compressor");
-            case WR_VERSION_ERROR:
-                compr->wrap.compressEnd();
-                delete compr;
-		compr = nullptr;
-                delete decompr;
-		decompr = nullptr;
-                throw Erange("compressor::compressor", gettext("incompatible compression library version or unsupported feature required from compression library"));
-            case WR_STREAM_ERROR:
-            default:
-                compr->wrap.compressEnd();
-                delete compr;
-		compr = nullptr;
-                delete decompr;
-		decompr = nullptr;
-                throw SRC_BUG;
-            }
-            break;
-	case compression::lzo:
-	case compression::lzo1x_1_15:
-	case compression::lzo1x_1:
-	    throw SRC_BUG;
-		// lzo is now handled by class compressor_lzo
-	case compression::zstd:
-	    throw SRC_BUG;
-		// zstd is now handled by class compressor_zstd
-        default :
-            throw SRC_BUG;
-        }
-
-        compressed = compressed_side;
     }
 
     void compressor::reset_compr_engine()
     {
-	switch(current_algo)
-        {
-        case compression::none:
-            break;
-        case compression::bzip2:
-	case compression::xz:
-        case compression::gzip:
-	    if(compr != nullptr)
-		compr->wrap.compressReset();
-	    if(decompr != nullptr)
-		decompr->wrap.decompressReset();
-	    break;
-	case compression::lzo:
-	case compression::lzo1x_1_15:
-	case compression::lzo1x_1:
-	    throw SRC_BUG;
-		// lzo is now handled by class compressor_lzo
-	case compression::zstd:
-	    throw SRC_BUG;
-		// zstd is now handled by class compressor_zstd
-	default:
-	    throw SRC_BUG;
-	}
-    }
-
-    void compressor::hijacking_compr_method(compression algo)
-    {
-	switch(algo)
-	{
-	case compression::none:
-	    read_ptr = &compressor::none_read;
-            write_ptr = &compressor::none_write;
-            break;
-	case compression::gzip:
-	case compression::bzip2:
-	case compression::xz:
-	    read_ptr = &compressor::gzip_read;
-            write_ptr = &compressor::gzip_write;
-	    break;
-	case compression::lzo:
-	case compression::lzo1x_1_15:
-	case compression::lzo1x_1:
-	    throw SRC_BUG;
-		// lzo is now handled by class compressor_lzo
-	case compression::zstd:
-	    throw SRC_BUG;
-		// zstd is now handled by class compressor_zstd
-	case compression::lz4:
-	    throw Efeature("lz4 streaming compression mode, please define a compression block size greater than zero");
-	default:
-	    throw SRC_BUG;
-	}
+	if(compr != nullptr)
+	    compr->wrap.compressReset();
+	if(decompr != nullptr)
+	    decompr->wrap.decompressReset();
     }
 
     void compressor::inherited_truncate(const infinint & pos)
     {
 	if(pos < get_position())
 	{
-	    compr_flush_write();
-	    compr_flush_read();
-	    clean_read();
+	    inherited_sync_write();
+	    inherited_flush_read();
 	}
 	compressed->truncate(pos);
     }
 
-    void compressor::local_terminate()
+    void compressor::inherited_terminate()
     {
         if(compr != nullptr)
         {
             S_I ret;
 
                 // flushing the pending data
-	    compr_flush_write();
+	    inherited_sync_write();
             clean_write();
 
             ret = compr->wrap.compressEnd();
@@ -326,8 +276,7 @@ namespace libdar
         if(decompr != nullptr)
         {
                 // flushing data
-            compr_flush_read();
-            clean_read();
+            inherited_flush_read();
 
             S_I ret = decompr->wrap.decompressEnd();
             delete decompr;
@@ -360,17 +309,7 @@ namespace libdar
 	}
     }
 
-    U_I compressor::none_read(char *a, U_I size)
-    {
-        return compressed->read(a, size);
-    }
-
-    void compressor::none_write(const char *a, U_I size)
-    {
-        compressed->write(a, size);
-    }
-
-    U_I compressor::gzip_read(char *a, U_I size)
+    U_I compressor::inherited_read(char *a, U_I size)
     {
         S_I ret;
         S_I flag = WR_NO_FLUSH;
@@ -379,6 +318,9 @@ namespace libdar
 
         if(size == 0)
             return 0;
+
+	if(suspended)
+	    return compressed->read(a, size);
 
         decompr->wrap.set_next_out(a);
         decompr->wrap.set_avail_out(size);
@@ -436,7 +378,7 @@ namespace libdar
         return decompr->wrap.get_next_out() - a;
     }
 
-    void compressor::gzip_write(const char *a, U_I size)
+    void compressor::inherited_write(const char *a, U_I size)
     {
         compr->wrap.set_next_in(a);
         compr->wrap.set_avail_in(size);
@@ -444,73 +386,75 @@ namespace libdar
         if(a == nullptr)
             throw SRC_BUG;
 
-        while(compr->wrap.get_avail_in() > 0)
-        {
-                // making room for output
-            compr->wrap.set_next_out(compr->buffer);
-            compr->wrap.set_avail_out(compr->size);
+	if(suspended)
+	    compressed->write(a, size);
+	else
+	{
+	    while(compr->wrap.get_avail_in() > 0)
+	    {
+		    // making room for output
+		compr->wrap.set_next_out(compr->buffer);
+		compr->wrap.set_avail_out(compr->size);
 
-            switch(compr->wrap.compress(WR_NO_FLUSH))
-            {
-            case WR_OK:
-            case WR_STREAM_END:
-                break;
-            case WR_STREAM_ERROR:
-                throw SRC_BUG;
-            case WR_BUF_ERROR:
-                throw SRC_BUG;
-            default :
-                throw SRC_BUG;
-            }
+		switch(compr->wrap.compress(WR_NO_FLUSH))
+		{
+		case WR_OK:
+		case WR_STREAM_END:
+		    break;
+		case WR_STREAM_ERROR:
+		    throw SRC_BUG;
+		case WR_BUF_ERROR:
+		    throw SRC_BUG;
+		default :
+		    throw SRC_BUG;
+		}
 
-            if(compr->wrap.get_next_out() != compr->buffer)
-                compressed->write(compr->buffer, (char *)compr->wrap.get_next_out() - compr->buffer);
-        }
+		if(compr->wrap.get_next_out() != compr->buffer)
+		    compressed->write(compr->buffer, (char *)compr->wrap.get_next_out() - compr->buffer);
+	    }
+	}
     }
 
-    void compressor::compr_flush_write()
+    void compressor::inherited_sync_write()
     {
         S_I ret;
 
 	if(is_terminated())
 	    throw SRC_BUG;
 
-        if(compr != nullptr && compr->wrap.get_total_in() != 0)  // (z/bz)lib
-        {
-                // no more input
-            compr->wrap.set_avail_in(0);
-            do
-            {
-                    // setting the buffer for reception of data
-                compr->wrap.set_next_out(compr->buffer);
-                compr->wrap.set_avail_out(compr->size);
+	    // no more input
+	compr->wrap.set_avail_in(0);
+	do
+	{
+		// setting the buffer for reception of data
+	    compr->wrap.set_next_out(compr->buffer);
+	    compr->wrap.set_avail_out(compr->size);
 
-                ret = compr->wrap.compress(WR_FINISH);
+	    ret = compr->wrap.compress(WR_FINISH);
 
-                switch(ret)
-                {
-                case WR_OK:
-                case WR_STREAM_END:
-                    if(compr->wrap.get_next_out() != compr->buffer)
-                        compressed->write(compr->buffer, (char *)compr->wrap.get_next_out() - compr->buffer);
-                    break;
-                case WR_BUF_ERROR :
-                    throw SRC_BUG;
-                case WR_STREAM_ERROR :
-                    throw SRC_BUG;
-                default :
-                    throw SRC_BUG;
-                }
-            }
-            while(ret != WR_STREAM_END);
+	    switch(ret)
+	    {
+	    case WR_OK:
+	    case WR_STREAM_END:
+		if(compr->wrap.get_next_out() != compr->buffer)
+		    compressed->write(compr->buffer, (char *)compr->wrap.get_next_out() - compr->buffer);
+		break;
+	    case WR_BUF_ERROR :
+		throw SRC_BUG;
+	    case WR_STREAM_ERROR :
+		throw SRC_BUG;
+	    default :
+		throw SRC_BUG;
+	    }
+	}
+	while(ret != WR_STREAM_END);
 
-            if(compr->wrap.compressReset() != WR_OK)
-                throw SRC_BUG;
-        }
+	if(compr->wrap.compressReset() != WR_OK)
+	    throw SRC_BUG;
 
     }
 
-    void compressor::compr_flush_read()
+    void compressor::inherited_flush_read()
     {
 	if(is_terminated())
 	    throw SRC_BUG;
@@ -519,12 +463,6 @@ namespace libdar
             if(decompr->wrap.decompressReset() != WR_OK)
                 throw SRC_BUG;
             // keep in the buffer the bytes already read, these are discarded in case of a call to skip
-    }
-
-    void compressor::clean_read()
-    {
-	if(is_terminated())
-	    throw SRC_BUG;
 
         if(decompr != nullptr)
             decompr->wrap.set_avail_in(0);

@@ -55,7 +55,6 @@ namespace libdar
         ~compressor();
 
         virtual compression get_algo() const override;
-
 	virtual void suspend_compression() override;
 	virtual void resume_compression() override;
 	virtual bool is_compression_suspended() const override { return suspended; };
@@ -63,20 +62,20 @@ namespace libdar
 
             // inherited from generic file
 	virtual bool skippable(skippability direction, const infinint & amount) override { return compressed->skippable(direction, amount); };
-        virtual bool skip(const infinint & pos) override { compr_flush_write(); compr_flush_read(); clean_read(); return compressed->skip(pos); };
-        virtual bool skip_to_eof() override { compr_flush_write(); compr_flush_read(); clean_read(); return compressed->skip_to_eof(); };
-        virtual bool skip_relative(S_I x) override { compr_flush_write(); compr_flush_read(); clean_read(); return compressed->skip_relative(x); };
+        virtual bool skip(const infinint & pos) override { inherited_sync_write(); inherited_flush_read(); return compressed->skip(pos); };
+        virtual bool skip_to_eof() override { inherited_sync_write(); inherited_flush_read(); return compressed->skip_to_eof(); };
+        virtual bool skip_relative(S_I x) override { inherited_sync_write(); inherited_flush_read(); return compressed->skip_relative(x); };
 	virtual bool truncatable(const infinint & pos) const override { return compressed->truncatable(pos); };
         virtual infinint get_position() const override { return compressed->get_position(); };
 
     protected :
 	virtual void inherited_read_ahead(const infinint & amount) override { compressed->read_ahead(amount); };
-        virtual U_I inherited_read(char *a, U_I size) override { return (this->*read_ptr)(a, size); };
-        virtual void inherited_write(const char *a, U_I size) override { (this->*write_ptr)(a, size); };
+        virtual U_I inherited_read(char *a, U_I size) override;
+        virtual void inherited_write(const char *a, U_I size) override;
 	virtual void inherited_truncate(const infinint & pos) override;
-	virtual void inherited_sync_write() override { compr_flush_write(); };
-	virtual void inherited_flush_read() override { compr_flush_read(); clean_read(); };
-	virtual void inherited_terminate() override { local_terminate(); };
+	virtual void inherited_sync_write() override;
+	virtual void inherited_flush_read() override;
+	virtual void inherited_terminate() override;
 
     private :
         struct xfer
@@ -98,25 +97,6 @@ namespace libdar
 
         void init(compression algo, generic_file *compressed_side, U_I compression_level);
 	void reset_compr_engine();    ///< reset the compression engine ready for use
-	void hijacking_compr_method(compression algo); ///< set compression method without touching the compression engine
-        void local_terminate();
-        U_I (compressor::*read_ptr) (char *a, U_I size);
-        U_I none_read(char *a, U_I size);
-        U_I gzip_read(char *a, U_I size);
-            // U_I zip_read(char *a, U_I size);
-            // U_I bzip2_read(char *a, U_I size); // using gzip_read, same code thanks to wrapperlib
-
-        void (compressor::*write_ptr) (const char *a, U_I size);
-        void none_write(const char *a, U_I size);
-        void gzip_write(const char *a, U_I size);
-            // void zip_write(char *a, U_I size);
-            // void bzip2_write(char *a, U_I size); // using gzip_write, same code thanks to wrapperlib
-
-        void compr_flush_write(); // flush all data to compressed_side, and reset the compressor
-            // for that additional write can be uncompresssed starting at this point.
-        void compr_flush_read(); // reset decompression engine to be able to read the next block of compressed data
-            // if not called, furthur read return EOF
-        void clean_read(); // discard any byte buffered and not yet returned by read()
         void clean_write(); // discard any byte buffered and not yet wrote to compressed_side;
     };
 
