@@ -65,7 +65,6 @@ namespace libdar
 	    /// tronconneuse object, and is not destroyed by the tronconneuse's destructor
 	tronconneuse(U_32 block_size,
 		     generic_file & encrypted_side,
-		     bool no_initial_shift,
 		     const archive_version & reading_ver,
 		     std::unique_ptr<crypto_module> & ptr);
 

@@ -473,7 +473,6 @@ namespace libdar
     parallel_tronconneuse::parallel_tronconneuse(U_I workers,
 						 U_32 block_size,
 						 generic_file & encrypted_side,
-						 bool no_initial_shift,
 						 const archive_version & ver,
 						 std::unique_ptr<crypto_module> & crypto_ptr):
 	proto_tronco(encrypted_side.get_mode() == gf_read_only ? gf_read_only : gf_write_only)
@@ -484,10 +483,7 @@ namespace libdar
 	num_workers = workers;
 	clear_block_size = block_size;
 	current_position = 0;
-	if(! no_initial_shift)
-	    initial_shift = encrypted_side.get_position();
-	else
-	    initial_shift = 0;
+	initial_shift = 0;
 	reading_ver = ver;
 	crypto = move(crypto_ptr);
 	t_status = thread_status::dead;
@@ -736,12 +732,12 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	if(get_mode() != gf_read_only)
-	    throw SRC_BUG;
-
-	send_read_order(tronco_flags::stop);
 	initial_shift = x;
-	crypto_reader->set_initial_shift(x);
+	if(get_mode() == gf_read_only)
+	{
+	    send_read_order(tronco_flags::stop);
+	    crypto_reader->set_initial_shift(x);
+	}
     }
 
     void parallel_tronconneuse::inherited_read_ahead(const infinint & amount)

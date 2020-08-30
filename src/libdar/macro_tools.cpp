@@ -718,7 +718,6 @@ namespace libdar
 			    tmp = tmp_ptr = new (nothrow) parallel_tronconneuse(multi_threaded_crypto,
 										crypto_size,
 										*(stack.top()),
-										true,
 										ver.get_edition(),
 										ptr);
 			    if(info_details)
@@ -732,7 +731,6 @@ namespace libdar
 			{
 			    tmp = tmp_ptr = new (nothrow) tronconneuse(crypto_size,
 								       *(stack.top()),
-								       true,
 								       ver.get_edition(),
 								       ptr);
 			    if(info_details)
@@ -750,7 +748,6 @@ namespace libdar
 			    tmp = tmp_ptr = new (nothrow) parallel_tronconneuse(multi_threaded_crypto,
 										crypto_size,
 										*(stack.top()),
-										false,
 										ver.get_edition(),
 										ptr);
 			    if(info_details)
@@ -764,7 +761,6 @@ namespace libdar
 			{
 			    tmp = tmp_ptr = new (nothrow) tronconneuse(crypto_size,
 								       *(stack.top()),
-								       false,
 								       ver.get_edition(),
 								       ptr);
 			    if(info_details)
@@ -774,6 +770,7 @@ namespace libdar
 			if(tmp_ptr != nullptr)
 			{
 			    tmp_ptr->set_callback_trailing_clear_data(&macro_tools_get_terminator_start);
+			    tmp_ptr->set_initial_shift((stack.top())->get_position());
 
 			    if(sequential_read)
 				elastic(*tmp_ptr, elastic_forward, ver.get_edition()); // this is line creates a temporary anonymous object and destroys it just afterward
@@ -1504,6 +1501,8 @@ namespace libdar
 
 		    // ************ building the encryption layer if required ****** //
 
+		proto_tronco *tmp_tronco;
+
 		switch(crypto)
 		{
 		case crypto_algo::scrambling:
@@ -1530,18 +1529,18 @@ namespace libdar
 										iteration_count,
 										kdf_hash,
 										gnupg_recipients.empty());
+
 			if(!ptr)
 			    throw Ememory("macro_tools_create_layers");
 
 			if(multi_threaded_crypto > 1)
 			{
 #if LIBTHREADAR_AVAILABLE
-			    tmp = new (nothrow) parallel_tronconneuse(multi_threaded_crypto,
-								      crypto_size,
-								      *(layers.top()),
-								      false,
-								      macro_tools_supported_version,
-								      ptr);
+			    tmp = tmp_tronco = new (nothrow) parallel_tronconneuse(multi_threaded_crypto,
+										   crypto_size,
+										   *(layers.top()),
+										   macro_tools_supported_version,
+										   ptr);
 
 			    if(info_details)
 				dialog->message(tools_printf(gettext("multi-threaded cyphering layer open, with %d worker thread(s)"), multi_threaded_crypto));
@@ -1551,11 +1550,10 @@ namespace libdar
 			}
 			else
 			{
-			    tmp = new (nothrow) tronconneuse(crypto_size,
-							     *(layers.top()),
-							     false,
-							     macro_tools_supported_version,
-							     ptr);
+			    tmp = tmp_tronco = new (nothrow) tronconneuse(crypto_size,
+									  *(layers.top()),
+									  macro_tools_supported_version,
+									  ptr);
 			    if(info_details)
 				dialog->message(tools_printf(gettext("single-threaded cyphering layer open")));
 			}
@@ -1582,6 +1580,9 @@ namespace libdar
 		default:
 		    throw SRC_BUG; // cryto value should have been checked before
 		}
+
+		if(tmp_tronco != nullptr)
+		    tmp_tronco->set_initial_shift(ver.get_initial_offset());
 
 		if(!writing_to_pipe || crypto != crypto_algo::none)
 		{

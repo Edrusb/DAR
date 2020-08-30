@@ -57,7 +57,6 @@ namespace libdar
 
     tronconneuse::tronconneuse(U_32 block_size,
 			       generic_file & encrypted_side,
-			       bool no_initial_shift,
 			       const archive_version & x_reading_ver,
 			       std::unique_ptr<crypto_module> & ptr) : proto_tronco(encrypted_side.get_mode() == gf_read_only ? gf_read_only : gf_write_only)
     {
@@ -69,10 +68,7 @@ namespace libdar
 	buf = nullptr;  // cannot invoke pure virtual methods from constructor
 	clear_block_size = block_size;
 	current_position = 0;
-	if(no_initial_shift)
-	    initial_shift = 0;
-	else
-	    initial_shift = encrypted_side.get_position();
+	initial_shift = 0;
 	block_num = 0;
 	encrypted = & encrypted_side;
 	encrypted_buf = nullptr; // cannot invoke pure virtual methods from constructor

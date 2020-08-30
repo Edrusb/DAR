@@ -299,7 +299,6 @@ namespace libdar
 	parallel_tronconneuse(U_I workers,
 			      U_32 block_size,
 			      generic_file & encrypted_side,
-			      bool no_initial_shift,
 			      const archive_version & reading_ver,
 			      std::unique_ptr<crypto_module> & ptr);
 
