@@ -1178,7 +1178,6 @@ namespace libdar
 #if GPGME_SUPPORT
 	U_I gnupg_key_size;
 #endif
-	string salt;
 
 	try
 	{
@@ -1308,123 +1307,7 @@ namespace libdar
 		    }
 		}
 
-		    // ************ building the encryption layer if required ****** //
-
-		proto_tronco *tmp_tronco;
-
-		switch(crypto)
-		{
-		case crypto_algo::scrambling:
-		    if(info_details)
-			dialog->message(gettext("Adding a new layer on top: scrambler object..."));
-		    tmp = new (nothrow) scrambler(real_pass, *(layers.top()));
-#ifdef LIBDAR_NO_OPTIMIZATION
-		    tools_secu_string_show(*dialog, string("real_pass used: "), real_pass);
-#endif
-		    break;
-		case crypto_algo::blowfish:
-		case crypto_algo::aes256:
-		case crypto_algo::twofish256:
-		case crypto_algo::serpent256:
-		case crypto_algo::camellia256:
-		    if(info_details)
-			dialog->message(gettext("Adding a new layer on top: Strong encryption object..."));
-		    try
-		    {
-			unique_ptr<crypto_module> ptr = make_unique<crypto_sym>(real_pass,
-										macro_tools_supported_version,
-										crypto,
-										salt,
-										iteration_count,
-										kdf_hash,
-										gnupg_recipients.empty());
-
-			if(!ptr)
-			    throw Ememory("macro_tools_create_layers");
-
-			if(multi_threaded_crypto > 1)
-			{
-#if LIBTHREADAR_AVAILABLE
-			    tmp = tmp_tronco = new (nothrow) parallel_tronconneuse(multi_threaded_crypto,
-										   crypto_size,
-										   *(layers.top()),
-										   macro_tools_supported_version,
-										   ptr);
-
-			    if(info_details)
-				dialog->message(tools_printf(gettext("multi-threaded cyphering layer open, with %d worker thread(s)"), multi_threaded_crypto));
-#else
-			    throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for cryptography"));
-#endif
-			}
-			else
-			{
-			    tmp = tmp_tronco = new (nothrow) tronconneuse(crypto_size,
-									  *(layers.top()),
-									  macro_tools_supported_version,
-									  ptr);
-			    if(info_details)
-				dialog->message(tools_printf(gettext("single-threaded cyphering layer open")));
-			}
-		    }
-		    catch(std::bad_alloc &)
-		    {
-			throw Ememory("macro_tools_create_layers");
-		    }
-
-#ifdef LIBDAR_NO_OPTIMIZATION
-		    tools_secu_string_show(*dialog, string("real_pass used: "), real_pass);
-#endif
-		    break;
-		case crypto_algo::none:
-		    if(!writing_to_pipe)
-		    {
-			if(info_details)
-			    dialog->message(gettext("Adding a new layer on top: Caching layer for better performances..."));
-			tmp = new (nothrow) cache(*(layers.top()), false);
-		    }
-		    else
-			tmp = nullptr; // a cache is already present just below
-		    break;
-		default:
-		    throw SRC_BUG; // cryto value should have been checked before
-		}
-
-		if(!writing_to_pipe || crypto != crypto_algo::none)
-		{
-		    if(tmp == nullptr)
-			throw Ememory("op_create_in_sub");
-		    else
-		    {
-			layers.push(tmp);
-			tmp = nullptr;
-		    }
-		}
-		else
-		{
-		    if(tmp != nullptr)
-			throw SRC_BUG;
-		}
-
-		if(crypto != crypto_algo::none) // initial elastic buffer
-		{
-		    if(info_details)
-			dialog->message(gettext("Writing down the initial elastic buffer through the encryption layer..."));
-		    macro_tools_add_elastic_buffer(layers, GLOBAL_ELASTIC_BUFFER_SIZE, 0, 0);
-		}
-
-
-		    // ******** creating and writing down the archive header ******************* //
-
-		ver.set_edition(macro_tools_supported_version);
-		ver.set_compression_algo(algo);
-		if(algo == compression::lzo1x_1_15 || algo == compression::lzo1x_1)
-		    ver.set_compression_algo(compression::lzo);
-		ver.set_command_line(user_comment);
-		ver.set_sym_crypto_algo(crypto);
-		ver.set_tape_marks(add_marks_for_sequential_reading);
-		ver.set_signed(!gnupg_signatories.empty());
-		ver.set_compression_block_size(compression_block_size);
+		    // ***** preparing the keys for encryption ********************* //
 
 		if(crypto != crypto_algo::none || !gnupg_recipients.empty())
 		{
@@ -1519,6 +1402,8 @@ namespace libdar
 			if(clear.get_size().is_zero())
 			    throw SRC_BUG;
 			engine.encrypt(gnupg_recipients, clear, *key);
+
+			    // using the generated key for the crypto layer that will be setup below
 			real_pass = clear.get_contents();
 			if(real_pass.get_size() == 0)
 			    throw SRC_BUG;
@@ -1526,6 +1411,7 @@ namespace libdar
 			if(crypto == crypto_algo::none)
 			    crypto = crypto_algo::blowfish;
 
+			    // updating the hader version with the symmetric key encrypted with the asymmetrical algorithm
 			ver.set_crypted_key(key);
 			key = nullptr; // now the pointed to object is under the responsibility of ver object
 		    }
@@ -1540,7 +1426,6 @@ namespace libdar
 #endif
 		}
 
-
 		if(crypto != crypto_algo::none)
 		{
 			// optaining a password on-fly if necessary
@@ -1554,18 +1439,121 @@ namespace libdar
 			else
 			    throw Erange("op_create_in_sub", gettext("The two passwords are not identical. Aborting"));
 		    }
-
-			// generating salt and storing it in the archive version header with iteration_count
-			// when key is a human generated passphrase (no gnupg) and when strong encryption is used (no scrambling)
-
-		    if(gnupg_recipients.empty() && crypto != crypto_algo::scrambling)
-		    {
-			salt = crypto_sym::generate_salt(crypto_sym::max_key_len(crypto));
-			ver.set_salt(salt);
-			ver.set_iteration_count(iteration_count);
-			ver.set_kdf_hash(kdf_hash);
-		    }
 		}
+
+		    // ************ building the encryption layer if required ****** //
+
+		proto_tronco *tmp_tronco;
+
+		switch(crypto)
+		{
+		case crypto_algo::scrambling:
+		    if(info_details)
+			dialog->message(gettext("Adding a new layer on top: scrambler object..."));
+		    tmp = new (nothrow) scrambler(real_pass, *(layers.top()));
+#ifdef LIBDAR_NO_OPTIMIZATION
+		    tools_secu_string_show(*dialog, string("real_pass used: "), real_pass);
+#endif
+		    break;
+		case crypto_algo::blowfish:
+		case crypto_algo::aes256:
+		case crypto_algo::twofish256:
+		case crypto_algo::serpent256:
+		case crypto_algo::camellia256:
+		    if(info_details)
+			dialog->message(gettext("Adding a new layer on top: Strong encryption object..."));
+		    try
+		    {
+			unique_ptr<crypto_module> ptr = make_unique<crypto_sym>(real_pass,
+										macro_tools_supported_version,
+										crypto,
+										"",   // the salt, will be generated by the crypto_module
+										iteration_count,
+										kdf_hash,
+										gnupg_recipients.empty());
+
+			if(!ptr)
+			    throw Ememory("macro_tools_create_layers");
+
+			    // updating the archive_header with the KDF parameters
+			crypto_sym* sym_ptr = dynamic_cast<crypto_sym*>(ptr.get());
+			if(sym_ptr != nullptr)
+			{
+			    ver.set_salt(sym_ptr->get_salt());
+			    ver.set_iteration_count(iteration_count);
+			    ver.set_kdf_hash(kdf_hash);
+			}
+			else
+			    throw SRC_BUG;
+			    // today only crypto_sym is used, the
+			    // dynamic_cast should thus always succeed
+
+
+			if(multi_threaded_crypto > 1)
+			{
+#if LIBTHREADAR_AVAILABLE
+			    tmp = tmp_tronco = new (nothrow) parallel_tronconneuse(multi_threaded_crypto,
+										   crypto_size,
+										   *(layers.top()),
+										   macro_tools_supported_version,
+										   ptr);
+
+			    if(info_details)
+				dialog->message(tools_printf(gettext("multi-threaded cyphering layer open, with %d worker thread(s)"), multi_threaded_crypto));
+#else
+			    throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for cryptography"));
+#endif
+			}
+			else
+			{
+			    tmp = tmp_tronco = new (nothrow) tronconneuse(crypto_size,
+									  *(layers.top()),
+									  macro_tools_supported_version,
+									  ptr);
+			    if(info_details)
+				dialog->message(tools_printf(gettext("single-threaded cyphering layer open")));
+			}
+		    }
+		    catch(std::bad_alloc &)
+		    {
+			throw Ememory("macro_tools_create_layers");
+		    }
+
+#ifdef LIBDAR_NO_OPTIMIZATION
+		    tools_secu_string_show(*dialog, string("real_pass used: "), real_pass);
+#endif
+		    break;
+		case crypto_algo::none:
+		    if(!writing_to_pipe)
+		    {
+			if(info_details)
+			    dialog->message(gettext("Adding a new layer on top: Caching layer for better performances..."));
+			tmp = new (nothrow) cache(*(layers.top()), false);
+		    }
+		    else
+			tmp = nullptr; // a cache is already present just below
+		    break;
+		default:
+		    throw SRC_BUG; // cryto value should have been checked before
+		}
+
+		    /// !!!!!
+		    // the crypto engine will be added to the stack once
+		    // the archive header will have been written
+		    /// !!!!!
+
+		    // ******** finishing the creation of the archive header and writing it down (in clear!) at the beginning of the archive *** //
+
+		ver.set_edition(macro_tools_supported_version);
+		ver.set_compression_algo(algo);
+		if(algo == compression::lzo1x_1_15 || algo == compression::lzo1x_1)
+		    ver.set_compression_algo(compression::lzo);
+		ver.set_command_line(user_comment);
+		ver.set_sym_crypto_algo(crypto);
+		ver.set_tape_marks(add_marks_for_sequential_reading);
+		ver.set_signed(!gnupg_signatories.empty());
+		ver.set_compression_block_size(compression_block_size);
+
 
 		if(ref_slicing != nullptr)
 		{
@@ -1590,7 +1578,7 @@ namespace libdar
 		    // we drop the header at the beginning of the archive in any case (to be able to
 		    // know whether sequential reading is possible or not, and if sequential reading
 		    // is asked, be able to get the required parameter to read the archive.
-		    // It also serves of backup copy for normal reading if the end of the archive
+		    // It also serves as a backup copy for normal reading if the end of the archive
 		    // is corrupted.
 
 		if(info_details)
@@ -1604,11 +1592,37 @@ namespace libdar
 		ver.set_initial_offset(layers.get_position());
 
 
-
 		    // ********** now that the archive header has been wrote down, we can set the initial_shift for the encryption layer ***** //
 
 		if(tmp_tronco != nullptr)
 		    tmp_tronco->set_initial_shift(ver.get_initial_offset());
+
+		    // ****** we can now add the crypto layer to the stack ****** //
+
+		if(!writing_to_pipe || crypto != crypto_algo::none)
+		{
+		    if(tmp == nullptr)
+			throw Ememory("op_create_in_sub");
+		    else
+		    {
+			layers.push(tmp);
+			tmp = nullptr;
+		    }
+		}
+		else
+		{
+		    if(tmp != nullptr)
+			throw SRC_BUG;
+		}
+
+		    // ***** adding a elastic buffer as first ciphered data after the clear archive header ****** //
+
+		if(crypto != crypto_algo::none)
+		{
+		    if(info_details)
+			dialog->message(gettext("Writing down the initial elastic buffer through the encryption layer..."));
+		    macro_tools_add_elastic_buffer(layers, GLOBAL_ELASTIC_BUFFER_SIZE, 0, 0);
+		}
 
 		    // ********** if required building the escape layer  ***** //
 

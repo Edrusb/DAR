@@ -90,11 +90,17 @@ namespace libdar
 	    if(err != GPG_ERR_NO_ERROR)
 		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Cyphering algorithm not available in libgcrypt: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
+		// generate a salt if not provided and pkcs5 is needed
+	    if(salt.empty() && use_pkcs5)
+		sel = generate_salt(max_key_len(xalgo));
+	    else
+		sel = salt;
+
 		// building the hashed_password
 
 	    init_hashed_password(password,
 				 use_pkcs5,
-				 salt,
+				 sel,
 				 iteration_count,
 				 kdf_hash,
 				 algo);
@@ -537,6 +543,7 @@ namespace libdar
 	U_I IV_hashing;
 	get_IV_cipher_and_hashing(reading_ver, get_algo_id(algo), IV_cipher, IV_hashing);
 	init_essiv_clef(essiv_password, IV_cipher, algo_block_size);
+	sel = ref.sel;
     }
 
     void crypto_sym::move_from(crypto_sym && ref)
@@ -551,6 +558,7 @@ namespace libdar
 	essiv_clef = move(ref.essiv_clef);
 	algo_block_size = move(ref.algo_block_size);
 	ivec = move(ref.ivec);
+	sel = move(ref.sel);
 	ref.main_clef = nullptr;
 	ref.essiv_clef = nullptr;
 	ivec = nullptr;
