@@ -56,6 +56,8 @@ using namespace std;
 namespace libdar
 {
 
+    constexpr const U_I MAX_RETRY_IF_WEAK_PASSWORD = 5;
+
     crypto_sym::crypto_sym(const secu_string & password,
 			   const archive_version & reading_version,
 			   crypto_algo xalgo,
@@ -66,6 +68,7 @@ namespace libdar
     {
 #if CRYPTO_AVAILABLE
 	U_I algo_id;
+	S_I retry = use_pkcs5? MAX_RETRY_IF_WEAK_PASSWORD: 0;
 
 	main_clef = nullptr;
 	essiv_clef = nullptr;
@@ -90,20 +93,29 @@ namespace libdar
 	    if(err != GPG_ERR_NO_ERROR)
 		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Cyphering algorithm not available in libgcrypt: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
-		// generate a salt if not provided and pkcs5 is needed
-	    if(salt.empty() && use_pkcs5)
-		sel = generate_salt(max_key_len(xalgo));
-	    else
-		sel = salt;
+	    do
+	    {
+		    // generate a salt if not provided and pkcs5 is needed
 
-		// building the hashed_password
+		if(salt.empty() && use_pkcs5)
+		    sel = generate_salt(max_key_len(xalgo));
+		else
+		    sel = salt;
 
-	    init_hashed_password(password,
-				 use_pkcs5,
-				 sel,
-				 iteration_count,
-				 kdf_hash,
-				 algo);
+		    // building the hashed_password
+
+		init_hashed_password(password,
+				     use_pkcs5,
+				     sel,
+				     iteration_count,
+				     kdf_hash,
+				     algo);
+
+	    }
+	    while(! is_a_strong_password(algo, hashed_password) && --retry >= 0);
+
+	    if(retry < 0)
+		throw Erange("crypto_sym::crypto_sym", tools_printf(gettext("Failed to obtain a strong hashed password after %d retries with pkcs5 and different salt values, aborting"), MAX_RETRY_IF_WEAK_PASSWORD));
 
 
 		// building the main key for this object
@@ -122,7 +134,7 @@ namespace libdar
 
 	    get_IV_cipher_and_hashing(reading_ver, algo_id, IV_cipher, IV_hashing);
 
-		// making a hash of the provided password into the digest variable
+		// making an hash of the provided password into the digest variable
 	    init_essiv_password(hashed_password, IV_hashing);
 
 		// building the auxilliary key that will be used
@@ -465,6 +477,7 @@ namespace libdar
 	if(err != GPG_ERR_NO_ERROR)
 	{
 		// tolerating WEAK key here, we use that key to fill the IV of the real strong key
+		// (the encrypted data by this key --- the IV values for each block --- are not stored in the archive)
 	    if(gpg_err_code(err) != GPG_ERR_WEAK_KEY)
 		throw Erange("crypto_sym::init_essiv_clef",tools_printf(gettext("Error while assigning key to libgcrypt key handle (essiv): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 	}
