@@ -118,20 +118,54 @@ namespace libdar
 		}
 		catch(Erange & e)
 		{
+		    bool loop = false;
+
 		    if(!lax_mode)
 			throw;
 
-		    string answ = dialog.get_string(gettext("LAX MODE: Unknown compression algorithm used, assuming data corruption occurred. Please help me, answering with one of the following words \"none\", \"gzip\", \"bzip2\", \"lzo\" or \"xz\" at the next prompt:"), true);
-		    if(answ == gettext("none"))
-			tmp = compression2char(compression::none);
-		    else if(answ == gettext("gzip"))
-			tmp = compression2char(compression::gzip);
-		    else if(answ == gettext("bzip2"))
-			tmp = compression2char(compression::bzip2);
-		    else if(answ == gettext("lzo"))
-			tmp = compression2char(compression::lzo);
-		    else if(answ == gettext("xz"))
-			tmp = compression2char(compression::xz);
+		    do
+		    {
+		    string answ = dialog.get_string(gettext("LAX MODE: Unknown compression algorithm used, assuming data corruption occurred. Please help me, answering with one of the following words \"none\", \"gzip\", \"bzip2\", \"lzo\", \"xz\", \"zstd\" or \"lz4\" at the next prompt:"), true);
+
+			if(answ == gettext("none"))
+			{
+			    tmp = compression2char(compression::none);
+			    loop = false;
+			}
+			else if(answ == gettext("gzip"))
+			{
+			    tmp = compression2char(compression::gzip);
+			    loop = false;
+			}
+			else if(answ == gettext("bzip2"))
+			{
+			    tmp = compression2char(compression::bzip2);
+			    loop = false;
+			}
+			else if(answ == gettext("lzo"))
+			{
+			    tmp = compression2char(compression::lzo);
+			    loop = false;
+			}
+			else if(answ == gettext("xz"))
+			{
+			    tmp = compression2char(compression::xz);
+			    loop = false;
+			}
+			else if(answ == gettext("zstd"))
+			{
+			    tmp = compression2char(compression::zstd);
+			    loop = false;
+			}
+			else if(answ == gettext("lz4"))
+			{
+			    tmp = compression2char(compression::lz4);
+			    loop = false;
+			}
+			else
+			    loop = true;
+		    }
+		    while(loop);
 		}
 	    }
 	    while(!ok);
