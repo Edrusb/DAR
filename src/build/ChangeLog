@@ -1,5 +1,4 @@
 from 2.6.10 to 2.6.11
-- dar_split was not upx compressed when upx is used to build binaries
 - fixing bug in dar_manager libdar part, met when the two oldest entries
   for a file are recoreded as unchanged (differential backup).
 - fixed typo in dar_manager man page
