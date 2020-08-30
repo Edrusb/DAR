@@ -31,8 +31,70 @@
     /// - class zip_below_read which provides block of compressed data to workers comming from the filesystem
     /// - class zip_worker which instanciates worker objects to compute in parallel the compression of block of data
     /// .
-
-
+    ///
+    /// the compressed block structure is a sequence of 2 types of data
+    /// - data to compress/uncompress
+    /// - eof
+    /// .
+    ///
+    /// COMPRESSION PROCESS
+    ///
+    /// *** in the archive:
+    ///
+    /// the block stream is an arbitrary length sequence of data blocks followed by an eof.
+    /// Each data block consists of an infinint determining the length of following field
+    /// that stores the compressed data of variable length
+    /// the compressed data comes from block of uncompressed data of constant size (except the
+    /// last one that is smaller. THis information is needed to prepare memory allocation
+    /// and is stored in the archive header (archive reading) or provided by the user
+    /// (archive creation). Providing 0 for the block size leads to the classical/historical
+    /// but impossible to parallelize compression algorithm (gzip, bzip2, etc.)
+    ///
+    ///
+    ///
+    /// *** between threads:
+    ///
+    /// when compressing, the inherited_write call produces a set of data block to the ratelier_scatter
+    /// treated by a set of zip_workers which in turn passe the resulting compressed
+    /// data blocks to the zip_below_write thread.
+    ///
+    /// last when eof is reached or during terminate() method,  N eof blocks are sent
+    /// where N is the number of zip_workers, either with flag eof, or die (termination).
+    /// the eof flag is just passed by the workers but the zip_below_write thread collects
+    /// them and awakes the main thread once all are collected and thus all data written.
+    /// the die flag drives the thread termination, worker first pass them to the
+    /// zip_below_thread which collect them and terminates too.
+    ///
+    /// blocks used are of type crypto_segment the clear_data containes the uncompressed
+    /// data, the crypted_data block contains the compressed data. The block_index is not used.
+    ///
+    /// upon receiption of data blocks, each zip_workers read the clear_data and produce the
+    /// compressed data to the crypted_data mem_block and pushes that to the ratelier_gather
+    /// which passed to and write down by the zip_below_write.
+    ///
+    ///
+    ///
+    /// UNCOMPRESSON PROCESS
+    ///
+    /// the zip_below_read expectes to find the clear_block size at construction time and
+    /// provides a method to read it by the parallel_block_compressor thread which allocate the
+    /// mem_blocks accordingly in a pool (same as parallel_tronconneuse). The zip_below
+    /// thread once started reading the blocks and push them into the ratelier_scatter
+    /// (without the initial U_32 telling the size of the compressed data that follows).
+    /// Upon error (incoherent strucuture ....) the thread pushes N error block in the
+    /// ratelier_scatter and terminates
+    ///
+    /// the zip_workers fetch a block and put the corresponding uncompressed data to the
+    /// clear_data mem_block then push the crypto_segment to the ratelier_gather. Upon
+    /// uncompression error, the error flag is set with the crypto_segment, the zip_worker
+    /// continues to work anyway until it reads a crypto_segment with the eof_die flag from
+    /// the ratelier_scatter.
+    /// Upon reception of the error flag from the ratelier_gather the parallel_compression
+    /// thread invoke a method of the zip_below_read that triggers the thread to terminate
+    /// after having pushed N error blocks to the ratelier_scatter which in turns triggers
+    /// the termination of the zip_workers. The parallel_block_compressor thread can then gather
+    /// the N error block from the ratelier_gather, join() the threads and report the
+    /// compression error
 
 #ifndef PARALLEL_BLOCK_COMPRESSOR_HPP
 #define PARALLEL_BLOCK_COMPRESSOR_HPP
@@ -54,201 +116,23 @@ namespace libdar
 	/// @{
 
 
+	/// the different flags used to communicate between threads hold by parallel_block_compressor class
+
     enum class compressor_block_flags { data = 0, eof_die = 1, error = 2, worker_error = 3 };
 
-	/// the compressed block structure is a sequence of 2 types of data
-	/// - data to compress/uncompress
-	/// - eof
-	/// .
-	///
-	/// COMPRESSION PROCESS
-	///
-	/// *** in the archive:
-	///
-	/// the block stream is an arbitrary length sequence of data blocks followed by an eof.
-	/// Each data block consists of an infinint determining the length of following field
-	/// that stores the compressed data of variable length
-	/// the compressed data comes from block of uncompressed data of constant size (except the
-	/// last one that is smaller. THis information is needed to prepare memory allocation
-	/// and is stored in the archive header (archive reading) or provided by the user
-	/// (archive creation). Providing 0 for the block size leads to the classical/historical
-	/// but impossible to parallelize compression algorithm (gzip, bzip2, etc.)
-	///
-	///
-	///
-	/// *** between threads:
-	///
-	/// when compressing, the inherited_write call produces a set of data block to the ratelier_scatter
-	/// treated by a set of zip_workers which in turn passe the resulting compressed
-	/// data blocks to the zip_below_write thread.
-	///
-	/// last when eof is reached or during terminate() method,  N eof blocks are sent
-	/// where N is the number of zip_workers, either with flag eof, or die (termination).
-	/// the eof flag is just passed by the workers but the zip_below_write thread collects
-	/// them and awakes the main thread once all are collected and thus all data written.
-	/// the die flag drives the thread termination, worker first pass them to the
-	/// zip_below_thread which collect them and terminates too.
-	///
-	/// blocks used are of type crypto_segment the clear_data containes the uncompressed
-	/// data, the crypted_data block contains the compressed data. The block_index is not used.
-	///
-	/// upon receiption of data blocks, each zip_workers read the clear_data and produce the
-	/// compressed data to the crypted_data mem_block and pushes that to the ratelier_gather
-	/// which passed to and write down by the zip_below_write.
-	///
-	///
-	///
-	/// UNCOMPRESSON PROCESS
-	///
-	/// the zip_below_read expectes to find the clear_block size at construction time and
-	/// provides a method to read it by the parallel_block_compressor thread which allocate the
-	/// mem_blocks accordingly in a pool (same as parallel_tronconneuse). The zip_below
-	/// thread once started reading the blocks and push them into the ratelier_scatter
-	/// (without the initial U_32 telling the size of the compressed data that follows).
-	/// Upon error (incoherent strucuture ....) the thread pushes N error block in the
-	/// ratelier_scatter and terminates
-	///
-	/// the zip_workers fetch a block and put the corresponding uncompressed data to the
-	/// clear_data mem_block then push the crypto_segment to the ratelier_gather. Upon
-	/// uncompression error, the error flag is set with the crypto_segment, the zip_worker
-	/// continues to work anyway until it reads a crypto_segment with the eof_die flag from
-	/// the ratelier_scatter.
-	/// Upon reception of the error flag from the ratelier_gather the parallel_compression
-	/// thread invoke a method of the zip_below_read that triggers the thread to terminate
-	/// after having pushed N error blocks to the ratelier_scatter which in turns triggers
-	/// the termination of the zip_workers. The parallel_block_compressor thread can then gather
-	/// the N error block from the ratelier_gather, join() the threads and report the
-	/// compression error
+	// the following classes hold the subthreads of class parallel_block_compressor
+	// and are defined just after it below
 
-
-	/// the below_feed_workers class read the compressed block structure and
-	/// feed it per block to the ratelier_scatter
+    class zip_below_read;
+    class zip_below_write;
+    class zip_worker;
 
 
 	/////////////////////////////////////////////////////
 	//
-	// zip_below_write class/sub-thread
-	//
-	//
-
-
-    class zip_below_write: public libthreadar::thread
-    {
-    public:
-	zip_below_write(const std::shared_ptr<libthreadar::ratelier_gather<crypto_segment> > & source,
-			generic_file *dest,
-			const std::shared_ptr<heap<crypto_segment> > & xtas,
-			U_I num_workers);
-
-
-	    /// consulted by the main thread, set to true by the zip_below_write thread
-	    /// when an exception has been caught or an error flag has been seen from a
-	    /// worker
-	bool exception_pending() const { return error; };
-
-	    /// reset the thread objet ready for a new compression run, but does not launch it
-	void reset();
-
-    protected:
-	virtual void inherited_run() override;
-
-    private:
-	std::shared_ptr<libthreadar::ratelier_gather<crypto_segment> > src;
-	generic_file *dst;
-	std::shared_ptr<heap<crypto_segment> > tas;
-	U_I num_w;
-	bool error;
-	U_I ending;
-	std::deque<std::unique_ptr<crypto_segment> > data;
-	std::deque<signed int> flags;
-	libthreadar::mutex get_pos; ///< to manage concurrent access to current_position
-	infinint current_position;
-
-	void work();
-	void pop_front() { tas->put(std::move(data.front())); data.pop_front(); flags.pop_front(); };
-    };
-
-
-    	/////////////////////////////////////////////////////
-	//
-	// zip_below_read class/sub-thread
-	//
-	//
-
-
-
-    class zip_below_read: public libthreadar::thread
-    {
-    public:
-	zip_below_read(generic_file *source,
-		       const std::shared_ptr<libthreadar::ratelier_scatter<crypto_segment> > & dest,
-		       const std::shared_ptr<heap<crypto_segment> > & xtas,
-		       U_I num_workers);
-
-	    /// this will trigger the sending of N eof_die blocks and thread termination
-	void do_stop() { should_i_stop = true; };
-
-	    /// will read the uncompr block from the source generic_file but will not launch the thread
-	void reset();
-
-    protected:
-	virtual void inherited_run() override;
-
-    private:
-	generic_file *src;
-	const std::shared_ptr<libthreadar::ratelier_scatter<crypto_segment> > & dst;
-	const std::shared_ptr<heap<crypto_segment> > & tas;
-	U_I num_w;
-	std::unique_ptr<crypto_segment> ptr;
-	bool should_i_stop;
-
-
-	void work();
-	void push_flag_to_all_workers(compressor_block_flags flag);
-    };
-
-
-
-     	/////////////////////////////////////////////////////
-	//
-	// zip_worker class/sub-thread
-	//
-	//
-
-
-
-    class zip_worker: public libthreadar::thread
-    {
-    public:
-	zip_worker(std::shared_ptr<libthreadar::ratelier_scatter <crypto_segment> > & read_side,
-		   std::shared_ptr<libthreadar::ratelier_gather <crypto_segment> > & write_size,
-		   std::unique_ptr<compress_module> && ptr,
-		   bool compress);
-
-    protected:
-	virtual void inherited_run() override;
-
-    private:
-	std::shared_ptr<libthreadar::ratelier_scatter <crypto_segment> > & reader;
-	std::shared_ptr<libthreadar::ratelier_gather <crypto_segment> > & writer;
-	std::unique_ptr<compress_module> compr;
-	bool do_compress;
-	bool error;
-	std::unique_ptr<crypto_segment> transit;
-	unsigned int transit_slot;
-
-	void work();
-    };
-
-
-
-    	/////////////////////////////////////////////////////
-	//
 	// paralle_compressor class, which holds the sub-threads
 	//
 	//
-
-
 
     class parallel_block_compressor: public proto_compressor
     {
@@ -344,6 +228,126 @@ namespace libdar
 	static U_I get_ratelier_size(U_I num_workers) { return num_workers + num_workers/2; };
 	static U_I get_heap_size(U_I num_workers);
     };
+
+
+
+	/////////////////////////////////////////////////////
+	//
+	// zip_below_write class/sub-thread
+	//
+	//
+
+    class zip_below_write: public libthreadar::thread
+    {
+    public:
+	zip_below_write(const std::shared_ptr<libthreadar::ratelier_gather<crypto_segment> > & source,
+			generic_file *dest,
+			const std::shared_ptr<heap<crypto_segment> > & xtas,
+			U_I num_workers);
+
+
+	    /// consulted by the main thread, set to true by the zip_below_write thread
+	    /// when an exception has been caught or an error flag has been seen from a
+	    /// worker
+	bool exception_pending() const { return error; };
+
+	    /// reset the thread objet ready for a new compression run, but does not launch it
+	void reset();
+
+    protected:
+	virtual void inherited_run() override;
+
+    private:
+	std::shared_ptr<libthreadar::ratelier_gather<crypto_segment> > src;
+	generic_file *dst;
+	std::shared_ptr<heap<crypto_segment> > tas;
+	U_I num_w;
+	bool error;
+	U_I ending;
+	std::deque<std::unique_ptr<crypto_segment> > data;
+	std::deque<signed int> flags;
+	libthreadar::mutex get_pos; ///< to manage concurrent access to current_position
+	infinint current_position;
+
+	void work();
+	void pop_front() { tas->put(std::move(data.front())); data.pop_front(); flags.pop_front(); };
+    };
+
+
+
+
+    	/////////////////////////////////////////////////////
+	//
+	// zip_below_read class/sub-thread
+	//
+	//
+
+
+
+    class zip_below_read: public libthreadar::thread
+    {
+    public:
+	zip_below_read(generic_file *source,
+		       const std::shared_ptr<libthreadar::ratelier_scatter<crypto_segment> > & dest,
+		       const std::shared_ptr<heap<crypto_segment> > & xtas,
+		       U_I num_workers);
+
+	    /// this will trigger the sending of N eof_die blocks and thread termination
+	void do_stop() { should_i_stop = true; };
+
+	    /// will read the uncompr block from the source generic_file but will not launch the thread
+	void reset();
+
+    protected:
+	virtual void inherited_run() override;
+
+    private:
+	generic_file *src;
+	const std::shared_ptr<libthreadar::ratelier_scatter<crypto_segment> > & dst;
+	const std::shared_ptr<heap<crypto_segment> > & tas;
+	U_I num_w;
+	std::unique_ptr<crypto_segment> ptr;
+	bool should_i_stop;
+
+
+	void work();
+	void push_flag_to_all_workers(compressor_block_flags flag);
+    };
+
+
+
+
+     	/////////////////////////////////////////////////////
+	//
+	// zip_worker class/sub-thread
+	//
+	//
+
+
+
+    class zip_worker: public libthreadar::thread
+    {
+    public:
+	zip_worker(std::shared_ptr<libthreadar::ratelier_scatter <crypto_segment> > & read_side,
+		   std::shared_ptr<libthreadar::ratelier_gather <crypto_segment> > & write_size,
+		   std::unique_ptr<compress_module> && ptr,
+		   bool compress);
+
+    protected:
+	virtual void inherited_run() override;
+
+    private:
+	std::shared_ptr<libthreadar::ratelier_scatter <crypto_segment> > & reader;
+	std::shared_ptr<libthreadar::ratelier_gather <crypto_segment> > & writer;
+	std::unique_ptr<compress_module> compr;
+	bool do_compress;
+	bool error;
+	std::unique_ptr<crypto_segment> transit;
+	unsigned int transit_slot;
+
+	void work();
+    };
+
 
 	/// @}
 

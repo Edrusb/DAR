@@ -50,420 +50,6 @@ namespace libdar
 							      bool & reof);
 
 
-	/////////////////////////////////////////////////////
-	//
-	// read_blow class implementation
-	//
-	//
-
-    void read_below::inherited_run()
-    {
-	try
-	{
-	    if(!waiting)
-		throw SRC_BUG;
-	    else
-		waiting->wait(); // initial sync before starting reading data
-
-		// initializing clear and encryted buf size
-		// needed by get_ready_for_new_offset
-
-	    ptr = tas->get();
-	    if(ptr->clear_data.get_max_size() < clear_buf_size)
-	    {
-		tas->put(move(ptr));
-		throw SRC_BUG;
-	    }
-	    encrypted_buf_size = ptr->crypted_data.get_max_size();
-	    tas->put(move(ptr));
-	    index_num = get_ready_for_new_offset();
-
-	    work();
-	}
-	catch(...)
-	{
-	    send_flag_to_workers(tronco_flags::exception_below);
-	    throw; // this will end the current thread with an exception
-	}
-    }
-
-    void read_below::work()
-    {
-	bool end = false;
-
-	do
-	{
-	    switch(flag)
-	    {
-
-		    // flag can be modifed anytime by the main thread, we must not assume
-		    // its value in a give case to be equal to the what the switch directive
-		    // pointed to
-
-	    case tronco_flags::die:
-		if(reof) // eof collided with a received order, continuing the eof process
-		    flag = tronco_flags::eof;
-		else
-		{
-		    send_flag_to_workers(tronco_flags::die);
-		    end = true;
-		}
-		break;
-	    case tronco_flags::eof:
-		send_flag_to_workers(tronco_flags::eof);
-		waiting->wait();
-		if(flag == tronco_flags::eof)
-		    throw SRC_BUG; // new order has not been set
-		if(flag == tronco_flags::normal)
-		    index_num = get_ready_for_new_offset();
-		reof = false; // assuming condition has changed
-		break;
-	    case tronco_flags::stop:
-		if(reof) // eof collided with a received order, continuing the eof process
-		    flag = tronco_flags::eof;
-		else
-		{
-		    send_flag_to_workers(tronco_flags::stop);
-		    waiting->wait(); // We are suspended here until the caller has set new orders
-		    switch(flag)
-		    {
-		    case tronco_flags::die:
-			break;
-		    case tronco_flags::normal:
-			index_num = get_ready_for_new_offset();
-			break;
-		    case tronco_flags::stop:
-			break; // possible if partial purging the lus_data by the main thread
-		    case tronco_flags::data_error:
-			throw SRC_BUG;
-		    case tronco_flags::eof:
-			throw SRC_BUG;
-		    default:
-			throw SRC_BUG;
-		    }
-		}
-		break;
-	    case tronco_flags::normal:
-		if(ptr)
-		    throw SRC_BUG; // show not have a block at this stage
-
-		if(!reof)
-		{
-		    ptr = tas->get(); // obtaining a new segment from the heap
-		    ptr->reset();
-
-		    ptr->crypted_data.set_data_size(encrypted->read(ptr->crypted_data.get_addr(), ptr->crypted_data.get_max_size()));
-		    if( ! ptr->crypted_data.is_full())  // we have reached eof
-		    {
-			if(trailing_clear_data != nullptr) // and we have a callback to remove clear data at eof
-			{
-			    unique_ptr<crypto_segment> tmp = nullptr;
-
-			    remove_trailing_clear_data_from_encrypted_buf(crypt_offset,
-									  version,
-									  initial_shift,
-									  trailing_clear_data,
-									  ptr,
-									  tmp,
-									  reof);
-			}
-			reof = true;
-			    // whatever the callback modified, we could not read the whole block
-			    // so we are at end of file, reof should be set to true in any case
-		    }
-
-		    if(ptr->crypted_data.get_data_size() > 0)
-		    {
-			ptr->block_index = index_num++;
-			crypt_offset += ptr->crypted_data.get_data_size();
-			workers->scatter(ptr, static_cast<int>(tronco_flags::normal));
-		    }
-		    else
-			tas->put(move(ptr));
-		}
-		else
-		    flag = tronco_flags::eof;
-		break;
-	    case tronco_flags::data_error:
-		throw SRC_BUG;
-	    case tronco_flags::exception_below:
-		throw SRC_BUG;
-	    case tronco_flags::exception_worker:
-		throw SRC_BUG;
-	    default:
-		throw SRC_BUG;
-	    }
-
-	}
-	while(!end);
-    }
-
-    infinint read_below::get_ready_for_new_offset()
-    {
-	infinint ret;
-
-	position_clear2crypt(skip_to,
-			     crypt_offset,
-			     clear_flow_start,
-			     pos_in_flow,
-			     ret);
-
-	if(!encrypted->skip(crypt_offset + initial_shift))
-	    reof = true;
-	else
-	    reof = false;
-
-	return ret;
-    }
-
-    void read_below::send_flag_to_workers(tronco_flags theflag)
-    {
-	unique_ptr<crypto_segment> ptr;
-
-	for(unsigned int i = 0; i < num_w; ++i)
-	{
-	    ptr = tas->get();
-	    ptr->reset();
-	    workers->scatter(ptr, static_cast<int>(theflag));
-	}
-    }
-
-    void read_below::position_clear2crypt(const infinint & pos,
-					  infinint & file_buf_start,
-					  infinint & clear_buf_start,
-					  infinint & pos_in_buf,
-					  infinint & block_num)
-    {
-	euclide(pos, clear_buf_size, block_num, pos_in_buf);
-	file_buf_start = block_num * infinint(encrypted_buf_size);
-	clear_buf_start = block_num * infinint(clear_buf_size);
-    }
-
-
-	/////////////////////////////////////////////////////
-	//
-	// below_writer implementation
-	//
-	//
-
-
-
-    void write_below::inherited_run()
-    {
-	error = false;
-	try
-	{
-	    if(!waiting || !workers)
-		throw SRC_BUG;
-	    else
-		waiting->wait(); // initial sync with other threads
-
-	    work();
-	}
-	catch(...)
-	{
-	    error = true;
-	    try
-	    {
-		work();
-	    }
-	    catch(...)
-	    {
-		    // ignore further exceptions
-	    }
-	    throw;
-	}
-    }
-
-    void write_below::work()
-    {
-	bool end = false;
-
-	do
-	{
-	    if(ones.empty())
-	    {
-		if(!flags.empty())
-		    throw SRC_BUG;
-		workers->gather(ones, flags);
-	    }
-
-
-	    if((ones.empty() || flags.empty()) && !error)
-		throw SRC_BUG;
-
-	    switch(static_cast<tronco_flags>(flags.front()))
-	    {
-	    case tronco_flags::normal:
-		if(!error)
-		{
-		    encrypted->write(ones.front()->crypted_data.get_addr(),
-				     ones.front()->crypted_data.get_data_size());
-		}
-		tas->put(move(ones.front()));
-		ones.pop_front();
-		flags.pop_front();
-		break;
-	    case tronco_flags::stop:
-	    case tronco_flags::eof:
-	    case tronco_flags::data_error:
-		if(!error)
-		    throw SRC_BUG; // all data should be able to be compressed (even with no gain)
-		break;
-	    case tronco_flags::die:
-		    // read num dies and push them back to tas
-		--num_w;
-		if(num_w == 0)
-		{
-		    end = true;
-		    if(!ones.empty())
-		    {
-			tas->put(ones);
-			ones.clear();
-			flags.clear();
-		    }
-		}
-		else
-		{
-		    tas->put(move(ones.front()));
-		    ones.pop_front();
-		    flags.pop_front();
-		}
-		break;
-	    case tronco_flags::exception_below:
-		if(!error)
-		    throw SRC_BUG;
-		break;
-	    case tronco_flags::exception_worker:
-		error = true;
-		break;
-	    default:
-		if(!error)
-		    throw SRC_BUG;
-	    }
-	}
-	while(!end);
-    }
-
-
-    	/////////////////////////////////////////////////////
-	//
-	// crypto_worker implementation
-	//
-	//
-
-
-    void crypto_worker::inherited_run()
-    {
-	try
-	{
-	    waiting->wait(); // initial sync before starting working
-	    work();
-	}
-	catch(...)
-	{
-	    try
-	    {
-		abort = status::inform;
-		work();
-	    }
-	    catch(...)
-	    {
-		    // we ignore exception here
-	    }
-
-	    throw; // propagating the original exception
-	}
-    }
-
-    void crypto_worker::work()
-    {
-	bool end = false;
-	signed int flag;
-
-	do
-	{
-	    ptr = reader->worker_get_one(slot, flag);
-
-	    switch(static_cast<tronco_flags>(flag))
-	    {
-	    case tronco_flags::normal:
-		switch(abort)
-		{
-		case status::fine:
-		    if(!ptr)
-			throw SRC_BUG;
-
-		    try
-		    {
-			if(do_encrypt)
-			{
-			    ptr->crypted_data.set_data_size(crypto->encrypt_data(ptr->block_index,
-										 ptr->clear_data.get_addr(),
-										 ptr->clear_data.get_data_size(),
-										 ptr->clear_data.get_max_size(),
-										 ptr->crypted_data.get_addr(),
-										 ptr->crypted_data.get_max_size()));
-			    ptr->crypted_data.rewind_read();
-			}
-			else
-			{
-			    ptr->clear_data.set_data_size(crypto->decrypt_data(ptr->block_index,
-									       ptr->crypted_data.get_addr(),
-									       ptr->crypted_data.get_data_size(),
-									       ptr->clear_data.get_addr(),
-									       ptr->clear_data.get_max_size()));
-			    ptr->clear_data.rewind_read();
-			}
-		    }
-		    catch(Erange & e)
-		    {
-			flag = static_cast<int>(tronco_flags::data_error);
-			    // we will push the block with this flag data_error
-		    }
-		    break;
-		case status::inform:
-		    flag = static_cast<int>(tronco_flags::exception_worker);
-		    abort = status::sent;
-		    break;
-		case status::sent:
-		    break;
-		default:
-			// we can't report this problem
-			// because we can trigger an exception
-			// only when abort equals status fine
-		    break;
-		}
-		writer->worker_push_one(slot, ptr, flag);
-		break;
-	    case tronco_flags::stop:
-	    case tronco_flags::eof:
-		writer->worker_push_one(slot, ptr, flag);
-		waiting->wait();
-		break;
-	    case tronco_flags::die:
-		end = true;
-		writer->worker_push_one(slot, ptr, flag);
-		break;
-	    case tronco_flags::data_error:
-		if(abort == status::fine)
-		    throw SRC_BUG; // should not receive a block with that flag
-		break;
-	    case tronco_flags::exception_below:
-		end = true;
-		writer->worker_push_one(slot, ptr, flag);
-		break;
-	    case tronco_flags::exception_worker:
-		if(abort == status::fine)
-		    throw SRC_BUG;
-		break;
-	    default:
-		throw SRC_BUG;
-	    }
-	}
-	while(!end);
-    }
-
     	/////////////////////////////////////////////////////
 	//
 	// parallel_tronconneuse implementation
@@ -739,6 +325,18 @@ namespace libdar
 	    crypto_reader->set_initial_shift(x);
 	}
     }
+
+    void parallel_tronconneuse::set_callback_trailing_clear_data(trailing_clear_data_callback call_back)
+    {
+        if(crypto_reader)
+        {
+            mycallback = call_back;
+            crypto_reader->set_callback_trailing_clear_data(call_back);
+        }
+        else
+	    throw SRC_BUG;
+    }
+
 
     void parallel_tronconneuse::inherited_read_ahead(const infinint & amount)
     {
@@ -1621,6 +1219,422 @@ namespace libdar
 	    // as well and the main thread for parallel_tronconneuse could hold
 	    // a deque of the size of the ratelier plus 2 more crypto_segments
 	return heap_size;
+    }
+
+
+
+	/////////////////////////////////////////////////////
+	//
+	// read_blow class implementation
+	//
+	//
+
+    void read_below::inherited_run()
+    {
+	try
+	{
+	    if(!waiting)
+		throw SRC_BUG;
+	    else
+		waiting->wait(); // initial sync before starting reading data
+
+		// initializing clear and encryted buf size
+		// needed by get_ready_for_new_offset
+
+	    ptr = tas->get();
+	    if(ptr->clear_data.get_max_size() < clear_buf_size)
+	    {
+		tas->put(move(ptr));
+		throw SRC_BUG;
+	    }
+	    encrypted_buf_size = ptr->crypted_data.get_max_size();
+	    tas->put(move(ptr));
+	    index_num = get_ready_for_new_offset();
+
+	    work();
+	}
+	catch(...)
+	{
+	    send_flag_to_workers(tronco_flags::exception_below);
+	    throw; // this will end the current thread with an exception
+	}
+    }
+
+    void read_below::work()
+    {
+	bool end = false;
+
+	do
+	{
+	    switch(flag)
+	    {
+
+		    // flag can be modifed anytime by the main thread, we must not assume
+		    // its value in a give case to be equal to the what the switch directive
+		    // pointed to
+
+	    case tronco_flags::die:
+		if(reof) // eof collided with a received order, continuing the eof process
+		    flag = tronco_flags::eof;
+		else
+		{
+		    send_flag_to_workers(tronco_flags::die);
+		    end = true;
+		}
+		break;
+	    case tronco_flags::eof:
+		send_flag_to_workers(tronco_flags::eof);
+		waiting->wait();
+		if(flag == tronco_flags::eof)
+		    throw SRC_BUG; // new order has not been set
+		if(flag == tronco_flags::normal)
+		    index_num = get_ready_for_new_offset();
+		reof = false; // assuming condition has changed
+		break;
+	    case tronco_flags::stop:
+		if(reof) // eof collided with a received order, continuing the eof process
+		    flag = tronco_flags::eof;
+		else
+		{
+		    send_flag_to_workers(tronco_flags::stop);
+		    waiting->wait(); // We are suspended here until the caller has set new orders
+		    switch(flag)
+		    {
+		    case tronco_flags::die:
+			break;
+		    case tronco_flags::normal:
+			index_num = get_ready_for_new_offset();
+			break;
+		    case tronco_flags::stop:
+			break; // possible if partial purging the lus_data by the main thread
+		    case tronco_flags::data_error:
+			throw SRC_BUG;
+		    case tronco_flags::eof:
+			throw SRC_BUG;
+		    default:
+			throw SRC_BUG;
+		    }
+		}
+		break;
+	    case tronco_flags::normal:
+		if(ptr)
+		    throw SRC_BUG; // show not have a block at this stage
+
+		if(!reof)
+		{
+		    ptr = tas->get(); // obtaining a new segment from the heap
+		    ptr->reset();
+
+		    ptr->crypted_data.set_data_size(encrypted->read(ptr->crypted_data.get_addr(), ptr->crypted_data.get_max_size()));
+		    if( ! ptr->crypted_data.is_full())  // we have reached eof
+		    {
+			if(trailing_clear_data != nullptr) // and we have a callback to remove clear data at eof
+			{
+			    unique_ptr<crypto_segment> tmp = nullptr;
+
+			    remove_trailing_clear_data_from_encrypted_buf(crypt_offset,
+									  version,
+									  initial_shift,
+									  trailing_clear_data,
+									  ptr,
+									  tmp,
+									  reof);
+			}
+			reof = true;
+			    // whatever the callback modified, we could not read the whole block
+			    // so we are at end of file, reof should be set to true in any case
+		    }
+
+		    if(ptr->crypted_data.get_data_size() > 0)
+		    {
+			ptr->block_index = index_num++;
+			crypt_offset += ptr->crypted_data.get_data_size();
+			workers->scatter(ptr, static_cast<int>(tronco_flags::normal));
+		    }
+		    else
+			tas->put(move(ptr));
+		}
+		else
+		    flag = tronco_flags::eof;
+		break;
+	    case tronco_flags::data_error:
+		throw SRC_BUG;
+	    case tronco_flags::exception_below:
+		throw SRC_BUG;
+	    case tronco_flags::exception_worker:
+		throw SRC_BUG;
+	    default:
+		throw SRC_BUG;
+	    }
+
+	}
+	while(!end);
+    }
+
+    infinint read_below::get_ready_for_new_offset()
+    {
+	infinint ret;
+
+	position_clear2crypt(skip_to,
+			     crypt_offset,
+			     clear_flow_start,
+			     pos_in_flow,
+			     ret);
+
+	if(!encrypted->skip(crypt_offset + initial_shift))
+	    reof = true;
+	else
+	    reof = false;
+
+	return ret;
+    }
+
+    void read_below::send_flag_to_workers(tronco_flags theflag)
+    {
+	unique_ptr<crypto_segment> ptr;
+
+	for(unsigned int i = 0; i < num_w; ++i)
+	{
+	    ptr = tas->get();
+	    ptr->reset();
+	    workers->scatter(ptr, static_cast<int>(theflag));
+	}
+    }
+
+    void read_below::position_clear2crypt(const infinint & pos,
+					  infinint & file_buf_start,
+					  infinint & clear_buf_start,
+					  infinint & pos_in_buf,
+					  infinint & block_num)
+    {
+	euclide(pos, clear_buf_size, block_num, pos_in_buf);
+	file_buf_start = block_num * infinint(encrypted_buf_size);
+	clear_buf_start = block_num * infinint(clear_buf_size);
+    }
+
+
+	/////////////////////////////////////////////////////
+	//
+	// below_writer implementation
+	//
+	//
+
+
+
+    void write_below::inherited_run()
+    {
+	error = false;
+	try
+	{
+	    if(!waiting || !workers)
+		throw SRC_BUG;
+	    else
+		waiting->wait(); // initial sync with other threads
+
+	    work();
+	}
+	catch(...)
+	{
+	    error = true;
+	    try
+	    {
+		work();
+	    }
+	    catch(...)
+	    {
+		    // ignore further exceptions
+	    }
+	    throw;
+	}
+    }
+
+    void write_below::work()
+    {
+	bool end = false;
+
+	do
+	{
+	    if(ones.empty())
+	    {
+		if(!flags.empty())
+		    throw SRC_BUG;
+		workers->gather(ones, flags);
+	    }
+
+
+	    if((ones.empty() || flags.empty()) && !error)
+		throw SRC_BUG;
+
+	    switch(static_cast<tronco_flags>(flags.front()))
+	    {
+	    case tronco_flags::normal:
+		if(!error)
+		{
+		    encrypted->write(ones.front()->crypted_data.get_addr(),
+				     ones.front()->crypted_data.get_data_size());
+		}
+		tas->put(move(ones.front()));
+		ones.pop_front();
+		flags.pop_front();
+		break;
+	    case tronco_flags::stop:
+	    case tronco_flags::eof:
+	    case tronco_flags::data_error:
+		if(!error)
+		    throw SRC_BUG; // all data should be able to be compressed (even with no gain)
+		break;
+	    case tronco_flags::die:
+		    // read num dies and push them back to tas
+		--num_w;
+		if(num_w == 0)
+		{
+		    end = true;
+		    if(!ones.empty())
+		    {
+			tas->put(ones);
+			ones.clear();
+			flags.clear();
+		    }
+		}
+		else
+		{
+		    tas->put(move(ones.front()));
+		    ones.pop_front();
+		    flags.pop_front();
+		}
+		break;
+	    case tronco_flags::exception_below:
+		if(!error)
+		    throw SRC_BUG;
+		break;
+	    case tronco_flags::exception_worker:
+		error = true;
+		break;
+	    default:
+		if(!error)
+		    throw SRC_BUG;
+	    }
+	}
+	while(!end);
+    }
+
+
+    	/////////////////////////////////////////////////////
+	//
+	// crypto_worker implementation
+	//
+	//
+
+
+    void crypto_worker::inherited_run()
+    {
+	try
+	{
+	    waiting->wait(); // initial sync before starting working
+	    work();
+	}
+	catch(...)
+	{
+	    try
+	    {
+		abort = status::inform;
+		work();
+	    }
+	    catch(...)
+	    {
+		    // we ignore exception here
+	    }
+
+	    throw; // propagating the original exception
+	}
+    }
+
+    void crypto_worker::work()
+    {
+	bool end = false;
+	signed int flag;
+
+	do
+	{
+	    ptr = reader->worker_get_one(slot, flag);
+
+	    switch(static_cast<tronco_flags>(flag))
+	    {
+	    case tronco_flags::normal:
+		switch(abort)
+		{
+		case status::fine:
+		    if(!ptr)
+			throw SRC_BUG;
+
+		    try
+		    {
+			if(do_encrypt)
+			{
+			    ptr->crypted_data.set_data_size(crypto->encrypt_data(ptr->block_index,
+										 ptr->clear_data.get_addr(),
+										 ptr->clear_data.get_data_size(),
+										 ptr->clear_data.get_max_size(),
+										 ptr->crypted_data.get_addr(),
+										 ptr->crypted_data.get_max_size()));
+			    ptr->crypted_data.rewind_read();
+			}
+			else
+			{
+			    ptr->clear_data.set_data_size(crypto->decrypt_data(ptr->block_index,
+									       ptr->crypted_data.get_addr(),
+									       ptr->crypted_data.get_data_size(),
+									       ptr->clear_data.get_addr(),
+									       ptr->clear_data.get_max_size()));
+			    ptr->clear_data.rewind_read();
+			}
+		    }
+		    catch(Erange & e)
+		    {
+			flag = static_cast<int>(tronco_flags::data_error);
+			    // we will push the block with this flag data_error
+		    }
+		    break;
+		case status::inform:
+		    flag = static_cast<int>(tronco_flags::exception_worker);
+		    abort = status::sent;
+		    break;
+		case status::sent:
+		    break;
+		default:
+			// we can't report this problem
+			// because we can trigger an exception
+			// only when abort equals status fine
+		    break;
+		}
+		writer->worker_push_one(slot, ptr, flag);
+		break;
+	    case tronco_flags::stop:
+	    case tronco_flags::eof:
+		writer->worker_push_one(slot, ptr, flag);
+		waiting->wait();
+		break;
+	    case tronco_flags::die:
+		end = true;
+		writer->worker_push_one(slot, ptr, flag);
+		break;
+	    case tronco_flags::data_error:
+		if(abort == status::fine)
+		    throw SRC_BUG; // should not receive a block with that flag
+		break;
+	    case tronco_flags::exception_below:
+		end = true;
+		writer->worker_push_one(slot, ptr, flag);
+		break;
+	    case tronco_flags::exception_worker:
+		if(abort == status::fine)
+		    throw SRC_BUG;
+		break;
+	    default:
+		throw SRC_BUG;
+	    }
+	}
+	while(!end);
     }
 
     	/////////////////////////////////////////////////////

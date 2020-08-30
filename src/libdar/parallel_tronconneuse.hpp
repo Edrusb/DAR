@@ -50,71 +50,322 @@
 namespace libdar
 {
 
-	/// \addtogroup Private
-	/// @{
+        /// \addtogroup Private
+        /// @{
+
+        // those class are used the parallel_tronconneuse class to wrap the different
+        // type of threads. They are defined after the parallel_tronconneuse definition
+    class read_below;
+    class write_below;
+    class crypto_worker;
+
+        /// status flags used between parallel_tronconneuse and its sub-threads
 
     enum class tronco_flags { normal = 0, stop = 1, eof = 2, die = 3, data_error = 4, exception_below = 5, exception_worker = 6, exception_error = 7 };
 
 
-    	/////////////////////////////////////////////////////
-	//
-	// read_below subthread used by parallel_tronconneuse
-	// to dispatch chunk of encrypted data to the workers
-	//
+        /////////////////////////////////////////////////////
+        //
+        // the parallel_tronconneuse class that orchestrate all that
+        //
+        //
+
+
+        /// this is a partial implementation of the generic_file interface to cypher/decypher data block by block.
+
+        /// This class is a pure virtual one, as several calls have to be defined by inherited classes
+        /// - encrypted_block_size_for
+        /// - clear_block_allocated_size_for
+        /// - encrypt_data
+        /// - decrypt_data
+        /// .
+        /// parallel_tronconneuse is either read_only or write_only, read_write is not allowed.
+        /// The openning mode is defined by encrypted_side's mode.
+        /// In write_only no skip() is allowed, writing is sequential from the beginning of the file to the end
+        /// (like writing to a pipe).
+        /// In read_only all skip() functions are available.
+
+    class parallel_tronconneuse : public proto_tronco
+    {
+    public:
+            /// This is the constructor
+
+            /// \param[in] workers is the number of worker threads
+            /// \param[in] block_size is the size of block encryption (the size of clear data encrypted toghether).
+            /// \param[in] encrypted_side where encrypted data are read from or written to.
+            /// \param[in] no_initial_shift assume that no unencrypted data is located at the begining of the underlying file, else this is the
+            /// position of the encrypted_side at the time of this call that is used as initial_shift
+            /// \param[in] reading_ver version of the archive format
+            /// \param[in] ptr pointer to an crypto_module object that will be passed to the parallel_tronconneuse
+            /// \note that encrypted_side is not owned and destroyed by tronconneuse, it must exist during all the life of the
+            /// tronconneuse object, and is not destroyed by the tronconneuse's destructor
+        parallel_tronconneuse(U_I workers,
+                              U_32 block_size,
+                              generic_file & encrypted_side,
+                              const archive_version & reading_ver,
+                              std::unique_ptr<crypto_module> & ptr);
+
+            /// copy constructor
+        parallel_tronconneuse(const parallel_tronconneuse & ref) = delete;
+
+            /// move constructor
+        parallel_tronconneuse(parallel_tronconneuse && ref) noexcept = default;
+
+            /// assignment operator
+        parallel_tronconneuse & operator = (const parallel_tronconneuse & ref) = delete;
+
+            /// move operator
+        parallel_tronconneuse & operator = (parallel_tronconneuse && ref) noexcept = default;
+
+            /// destructor
+        ~parallel_tronconneuse() noexcept;
+
+            /// inherited from generic_file
+        virtual bool skippable(skippability direction, const infinint & amount) override;
+            /// inherited from generic_file
+        virtual bool skip(const infinint & pos) override;
+            /// inherited from generic_file
+        virtual bool skip_to_eof() override;
+            /// inherited from generic_file
+        virtual bool skip_relative(S_I x) override;
+            /// inherited from generic_file
+        virtual bool truncatable(const infinint & pos) const override { return false; };
+            /// inherited from generic_file
+        virtual infinint get_position() const override { if(is_terminated()) throw SRC_BUG; return current_position; };
+
+            /// in write_only mode indicate that end of file is reached
+
+            /// this call must be called in write mode to purge the
+            /// internal cache before deleting the object (else some data may be lost)
+            /// no further write call is allowed
+            /// \note this call cannot be used from the destructor, because it relies on pure virtual methods
+        virtual void write_end_of_file() override { if(is_terminated()) throw SRC_BUG; sync_write(); };
+
+
+            /// this method to modify the initial shift. This overrides the constructor "no_initial_shift" of the constructor
+
+        virtual void set_initial_shift(const infinint & x) override;
+
+            /// let the caller give a callback function that given a generic_file with cyphered data, is able
+            /// to return the offset of the first clear byte located *after* all the cyphered data, this
+            /// callback function is used (if defined by the following method), when reaching End of File.
+        virtual void set_callback_trailing_clear_data(trailing_clear_data_callback call_back) override;
+
+            /// returns the block size given to constructor
+        virtual U_32 get_clear_block_size() const override { return clear_block_size; };
+
+    private:
+
+            // inherited from generic_file
+
+            /// this protected inherited method is now private for inherited classes of tronconneuse
+        virtual void inherited_read_ahead(const infinint & amount) override;
+
+            /// this protected inherited method is now private for inherited classes of tronconneuse
+        virtual U_I inherited_read(char *a, U_I size) override;
+
+            /// inherited from generic_file
+
+            /// this protected inherited method is now private for inherited classes of tronconneuse
+        virtual void inherited_write(const char *a, U_I size) override;
+
+            /// this prorected inherited method is now private for inherited classed of tronconneuse
+
+            /// \note no skippability in write mode, so no truncate possibility neither, this call
+            /// will always throw a bug exception
+        virtual void inherited_truncate(const infinint & pos) override { throw SRC_BUG; };
+
+            /// this protected inherited method is now private for inherited classes of tronconneuse
+        virtual void inherited_sync_write() override;
+
+
+            /// this protected inherited method is now private for inherited classes of tronconneuse
+        virtual void inherited_flush_read() override;
+
+            /// this protected inherited method is now private for inherited classes of tronconneuse
+        virtual void inherited_terminate() override;
+
+        const archive_version & get_reading_version() const { return reading_ver; };
+
+            // internal data structure
+        enum class thread_status { running, suspended, dead };
+
+            // the fields
+
+        U_I num_workers;               ///< number of worker threads
+        U_32 clear_block_size;         ///< size of a clear block
+        infinint current_position;     ///< current position for the upper layer perspective (modified by skip*, inherited_read/write, find_offset_in_lus_data)
+        infinint initial_shift;        ///< the offset in the "encrypted" below layer at which starts the encrypted data
+        archive_version reading_ver;   ///< archive format we follow
+        std::unique_ptr<crypto_module> crypto;  ///< the crypto module use to cipher / uncipher block of data
+        infinint (*mycallback)(generic_file & below, const archive_version & reading_ver);
+        generic_file* encrypted;
+
+            // fields used to represent possible status of subthreads and communication channel (the pipe)
+
+        U_I ignore_stop_acks;          ///< how much stop ack still to be read (aborted stop order context)
+        thread_status t_status;        ///< wehther child thread are waiting us on the barrier
+
+
+            // the following stores data from the ratelier_gather to be provided for read() operation
+            // the lus_data/lus_flags is what is extracted from the ratelier_gather, both constitue
+            // the feedback channel from sub-threads to provide order acks and normal data
+
+        std::deque<std::unique_ptr<crypto_segment> > lus_data;
+        std::deque<signed int> lus_flags;
+        bool lus_eof;
+        bool check_bytes_to_skip; ///< whether to check for bytes to skip
+
+            // the following stores data going to ratelier_scatter for the write() operation
+
+        std::unique_ptr<crypto_segment> tempo_write;
+        infinint block_num;
+
+            // the datastructures shared among threads
+
+        std::shared_ptr<libthreadar::ratelier_scatter<crypto_segment> > scatter;
+        std::shared_ptr<libthreadar::ratelier_gather<crypto_segment> > gather;
+        std::shared_ptr<libthreadar::barrier> waiter;
+        std::shared_ptr<heap<crypto_segment> > tas;
+
+            // the child threads
+
+        std::deque<crypto_worker> travailleur;
+        std::unique_ptr<read_below> crypto_reader;
+        std::unique_ptr<write_below> crypto_writer;
+
+
+
+            /// send and order to subthreads and gather acks from them
+
+            /// \param[in] order is the order to send to the subthreads
+            /// \param[in] for_offset is not zero is the offset we want to skip to
+            /// (it is only taken into account when order is stop)
+            /// \note with order stop and non zero for_offset, if the
+            /// data at for_offset is found while purging the
+            /// ratelier_gather, the purge is stopped, false is returned and
+            /// the ignore_stop field is set to true, meaning that a stop order
+            /// has not been purged from the pipe and should be ignored when its
+            /// acknolegements will be met. In any other case true is returned,
+            /// the subthreaded got the order and the ratelier has been purged.
+        bool send_read_order(tronco_flags order, const infinint & for_offset = 0);
+
+            /// send order in write mode
+        void send_write_order(tronco_flags order);
+
+            /// wake up threads in read mode when necessary
+        void go_read();
+
+            /// fill lus_data/lus_flags from ratelier_gather if these are empty
+        void read_refill();
+
+            /// purge the ratelier from the next order which is provided as returned value
+
+            /// \param[in] pos if pos is not zero, the normal data located at
+            /// pos offset is also looked for. If it is found before any order
+            /// the call returns tronco_flags::normal and the order is not purged
+            /// but the ignore_stop_acks fields is set to true for further
+            /// reading to skip over this order acknolegments.
+        tronco_flags purge_ratelier_from_next_order(infinint pos = 0);
+
+            /// removing the ignore_stop_acks pending on the pipe
+
+            /// \param[in] pos if pos is not zero and normal data is found at
+            /// pos offset before all stop acks could get read, the call stops
+            /// and return false. Else true is returned meaning all stop acks
+            /// has been read and removed from the pope
+            /// \note this method acts the same pas purge_ratelier_from_next_order but fetch
+            /// from ratelier up to data offset met of the pending ack to be all read
+            /// but it then stops, it does not look for a real order after
+            /// the pending stop acks of an aborted stop order
+        bool purge_unack_stop_order(const infinint & pos = 0);
+
+            /// flush lus_data/lus_flags up to requested pos offset to be found or all data has been removed
+
+            /// \param[in] pos the data offset we look for
+            /// \return true if the offset has been found and is
+            /// ready for next inherited_read() call, false else
+            /// and lus_data/lus_flags have been empties of
+            /// the first non-order blocks found (data blocks)
+            /// \note current_position is set upon success else
+            /// it is unchanged but will not match what may still
+            /// remain in the pipe
+        bool find_offset_in_lus_data(const infinint & pos);
+
+            /// reset the interthread datastructure and launch the threads
+        void run_threads();
+
+            /// end threads taking into account the fact they may be suspended on the barrier
+        void stop_threads();
+
+            /// wait for threads to finish and eventually rethrow their exceptions in current thread
+        void join_threads();
+
+
+        static U_I get_ratelier_size(U_I num_worker) { return num_worker + num_worker/2; };
+        static U_I get_heap_size(U_I num_worker);
+    };
+
+
+        /////////////////////////////////////////////////////
+        //
+        // read_below subthread used by parallel_tronconneuse
+        // to dispatch chunk of encrypted data to the workers
+        //
 
     class read_below: public libthreadar::thread
     {
     public:
-	read_below(const std::shared_ptr<libthreadar::ratelier_scatter<crypto_segment> > & to_workers, ///< where to send chunk of crypted data
-		   const std::shared_ptr<libthreadar::barrier> & waiter, ///< barrier used for synchronization with workers and the thread that called us
-		   U_I num_workers,              ///< how much workers have to be informed when special condition occurs
-		   U_I clear_block_size,         ///< clear block size used
-		   generic_file* encrypted_side, ///< the encrypted file we fetch data from and slice in chunks for the workers
-		   const std::shared_ptr<heap<crypto_segment> > xtas, ///< heap of pre-allocated memory for the chunks
-		   infinint init_shift):         ///< the offset at which the encrypted data is expected to start
-	    workers(to_workers),
-	    waiting(waiter),
-	    num_w(num_workers),
-	    clear_buf_size(clear_block_size),
-	    encrypted(encrypted_side),
-	    tas(xtas),
-	    initial_shift(init_shift),
-	    reof(false),
-	    trailing_clear_data(nullptr)
-	{ flag = tronco_flags::normal; };
+        read_below(const std::shared_ptr<libthreadar::ratelier_scatter<crypto_segment> > & to_workers, ///< where to send chunk of crypted data
+                   const std::shared_ptr<libthreadar::barrier> & waiter, ///< barrier used for synchronization with workers and the thread that called us
+                   U_I num_workers,              ///< how much workers have to be informed when special condition occurs
+                   U_I clear_block_size,         ///< clear block size used
+                   generic_file* encrypted_side, ///< the encrypted file we fetch data from and slice in chunks for the workers
+                   const std::shared_ptr<heap<crypto_segment> > xtas, ///< heap of pre-allocated memory for the chunks
+                   infinint init_shift):         ///< the offset at which the encrypted data is expected to start
+            workers(to_workers),
+            waiting(waiter),
+            num_w(num_workers),
+            clear_buf_size(clear_block_size),
+            encrypted(encrypted_side),
+            tas(xtas),
+            initial_shift(init_shift),
+            reof(false),
+            trailing_clear_data(nullptr)
+        { flag = tronco_flags::normal; };
 
-	~read_below() { if(ptr) tas->put(move(ptr)); };
+        ~read_below() { if(ptr) tas->put(move(ptr)); };
 
-	    /// let the caller give a callback function that given a generic_file with mixed cyphered and clear data, is able
-	    /// to return the offset of the first clear byte located *after* all the cyphered data, this
-	    /// callback function is used (if defined by the following method), when reaching End of File.
-	void set_callback_trailing_clear_data(trailing_clear_data_callback call_back) { trailing_clear_data = call_back; };
+            /// let the caller give a callback function that given a generic_file with mixed cyphered and clear data, is able
+            /// to return the offset of the first clear byte located *after* all the cyphered data, this
+            /// callback function is used (if defined by the following method), when reaching End of File.
+        void set_callback_trailing_clear_data(trailing_clear_data_callback call_back) { trailing_clear_data = call_back; };
 
-	    // *** //
-	    // *** the method above should not be used anymore once the thread is running *** //
-	    // *** //
+            // *** //
+            // *** the method above should not be used anymore once the thread is running *** //
+            // *** //
 
-	    /// set the initial shift must be called right after set_flag(stop) to take effect
-	void set_initial_shift(const infinint & x) { initial_shift = x; };
+            /// set the initial shift must be called right after set_flag(stop) to take effect
+        void set_initial_shift(const infinint & x) { initial_shift = x; };
 
-	    /// available for the parent thread to skip at another positon (read mode)
+            /// available for the parent thread to skip at another positon (read mode)
 
-	    /// \param[in] pos is the offset (from the upper layer / clear data point
-	    /// of view) at which we should seek
-	    /// \note changes asked by this call do not take effect until set_flag(stop)
-	    /// is invoked
-	void set_pos(const infinint & pos) { skip_to = pos; };
+            /// \param[in] pos is the offset (from the upper layer / clear data point
+            /// of view) at which we should seek
+            /// \note changes asked by this call do not take effect until set_flag(stop)
+            /// is invoked
+        void set_pos(const infinint & pos) { skip_to = pos; };
 
-	    /// method for the parent thread to send a control order
+            /// method for the parent thread to send a control order
 
-	    /// \note the parent thread must cleanup the gather object, it should
-	    /// expect to receive N block with the flag given to set_flag (N being
-	    /// the number of workers. Then this parent thread by a call the the
-	    /// waiter.Wait() barrier method will
-	    /// release all the worker and this below thread that will feed the
-	    /// pipe with new data taken at the requested offset provided by
-	    /// mean of the above set_pos() method.
-	    /// \note example: ask to stop before skipping
+            /// \note the parent thread must cleanup the gather object, it should
+            /// expect to receive N block with the flag given to set_flag (N being
+            /// the number of workers. Then this parent thread by a call the the
+            /// waiter.Wait() barrier method will
+            /// release all the worker and this below thread that will feed the
+            /// pipe with new data taken at the requested offset provided by
+            /// mean of the above set_pos() method.
+            /// \note example: ask to stop before skipping
         void set_flag(tronco_flags val) { flag = val; };
 
 	    /// method available for the parent thread to know the clear offset of the new flow
@@ -260,249 +511,6 @@ namespace libdar
 	void work();
     };
 
-
-	/////////////////////////////////////////////////////
-	//
-	// the parallel_tronconneuse class that orchestrate all that
-	//
-	//
-
-
-	/// this is a partial implementation of the generic_file interface to cypher/decypher data block by block.
-
-	/// This class is a pure virtual one, as several calls have to be defined by inherited classes
-	/// - encrypted_block_size_for
-	/// - clear_block_allocated_size_for
-	/// - encrypt_data
-	/// - decrypt_data
-	/// .
-	/// parallel_tronconneuse is either read_only or write_only, read_write is not allowed.
-	/// The openning mode is defined by encrypted_side's mode.
-	/// In write_only no skip() is allowed, writing is sequential from the beginning of the file to the end
-	/// (like writing to a pipe).
-	/// In read_only all skip() functions are available.
-
-    class parallel_tronconneuse : public proto_tronco
-    {
-    public:
-	    /// This is the constructor
-
-	    /// \param[in] workers is the number of worker threads
-	    /// \param[in] block_size is the size of block encryption (the size of clear data encrypted toghether).
-	    /// \param[in] encrypted_side where encrypted data are read from or written to.
-  	    /// \param[in] no_initial_shift assume that no unencrypted data is located at the begining of the underlying file, else this is the
-	    /// position of the encrypted_side at the time of this call that is used as initial_shift
-	    /// \param[in] reading_ver version of the archive format
-	    /// \param[in] ptr pointer to an crypto_module object that will be passed to the parallel_tronconneuse
-	    /// \note that encrypted_side is not owned and destroyed by tronconneuse, it must exist during all the life of the
-	    /// tronconneuse object, and is not destroyed by the tronconneuse's destructor
-	parallel_tronconneuse(U_I workers,
-			      U_32 block_size,
-			      generic_file & encrypted_side,
-			      const archive_version & reading_ver,
-			      std::unique_ptr<crypto_module> & ptr);
-
-	    /// copy constructor
-	parallel_tronconneuse(const parallel_tronconneuse & ref) = delete;
-
-	    /// move constructor
-	parallel_tronconneuse(parallel_tronconneuse && ref) noexcept = default;
-
-	    /// assignment operator
- 	parallel_tronconneuse & operator = (const parallel_tronconneuse & ref) = delete;
-
-	    /// move operator
-	parallel_tronconneuse & operator = (parallel_tronconneuse && ref) noexcept = default;
-
-	    /// destructor
-	~parallel_tronconneuse() noexcept;
-
-	    /// inherited from generic_file
-	virtual bool skippable(skippability direction, const infinint & amount) override;
-	    /// inherited from generic_file
-	virtual bool skip(const infinint & pos) override;
-	    /// inherited from generic_file
-	virtual bool skip_to_eof() override;
-	    /// inherited from generic_file
-	virtual bool skip_relative(S_I x) override;
-	    /// inherited from generic_file
-	virtual bool truncatable(const infinint & pos) const override { return false; };
-	    /// inherited from generic_file
-	virtual infinint get_position() const override { if(is_terminated()) throw SRC_BUG; return current_position; };
-
-	    /// in write_only mode indicate that end of file is reached
-
-	    /// this call must be called in write mode to purge the
-	    /// internal cache before deleting the object (else some data may be lost)
-	    /// no further write call is allowed
-	    /// \note this call cannot be used from the destructor, because it relies on pure virtual methods
-	virtual void write_end_of_file() override { if(is_terminated()) throw SRC_BUG; sync_write(); };
-
-
-	    /// this method to modify the initial shift. This overrides the constructor "no_initial_shift" of the constructor
-
-	virtual void set_initial_shift(const infinint & x) override;
-
-	    /// let the caller give a callback function that given a generic_file with cyphered data, is able
-	    /// to return the offset of the first clear byte located *after* all the cyphered data, this
-	    /// callback function is used (if defined by the following method), when reaching End of File.
-	virtual void set_callback_trailing_clear_data(infinint (*call_back)(generic_file & below, const archive_version & reading_ver)) override
-	{ if(crypto_reader) { mycallback = call_back; crypto_reader->set_callback_trailing_clear_data(call_back); } else throw SRC_BUG; };
-
-	    /// returns the block size given to constructor
-	virtual U_32 get_clear_block_size() const override { return clear_block_size; };
-
-    private:
-
-	    // inherited from generic_file
-
-	    /// this protected inherited method is now private for inherited classes of tronconneuse
-	virtual void inherited_read_ahead(const infinint & amount) override;
-
-	    /// this protected inherited method is now private for inherited classes of tronconneuse
-	virtual U_I inherited_read(char *a, U_I size) override;
-
-	    /// inherited from generic_file
-
-	    /// this protected inherited method is now private for inherited classes of tronconneuse
-	virtual void inherited_write(const char *a, U_I size) override;
-
-	    /// this prorected inherited method is now private for inherited classed of tronconneuse
-
-	    /// \note no skippability in write mode, so no truncate possibility neither, this call
-	    /// will always throw a bug exception
-	virtual void inherited_truncate(const infinint & pos) override { throw SRC_BUG; };
-
-	    /// this protected inherited method is now private for inherited classes of tronconneuse
-	virtual void inherited_sync_write() override;
-
-
-	    /// this protected inherited method is now private for inherited classes of tronconneuse
-	virtual void inherited_flush_read() override;
-
-	    /// this protected inherited method is now private for inherited classes of tronconneuse
-	virtual void inherited_terminate() override;
-
-	const archive_version & get_reading_version() const { return reading_ver; };
-
-	    // internal data structure
-	enum class thread_status { running, suspended, dead };
-
-	    // the fields
-
-	U_I num_workers;               ///< number of worker threads
-	U_32 clear_block_size;         ///< size of a clear block
-	infinint current_position;     ///< current position for the upper layer perspective (modified by skip*, inherited_read/write, find_offset_in_lus_data)
-	infinint initial_shift;        ///< the offset in the "encrypted" below layer at which starts the encrypted data
-	archive_version reading_ver;   ///< archive format we follow
-	std::unique_ptr<crypto_module> crypto;  ///< the crypto module use to cipher / uncipher block of data
-	infinint (*mycallback)(generic_file & below, const archive_version & reading_ver);
-	generic_file* encrypted;
-
-	    // fields used to represent possible status of subthreads and communication channel (the pipe)
-
-	U_I ignore_stop_acks;          ///< how much stop ack still to be read (aborted stop order context)
-	thread_status t_status;        ///< wehther child thread are waiting us on the barrier
-
-
-	    // the following stores data from the ratelier_gather to be provided for read() operation
-	    // the lus_data/lus_flags is what is extracted from the ratelier_gather, both constitue
-	    // the feedback channel from sub-threads to provide order acks and normal data
-
-	std::deque<std::unique_ptr<crypto_segment> > lus_data;
-	std::deque<signed int> lus_flags;
-	bool lus_eof;
-	bool check_bytes_to_skip; ///< whether to check for bytes to skip
-
-	    // the following stores data going to ratelier_scatter for the write() operation
-
-	std::unique_ptr<crypto_segment> tempo_write;
-	infinint block_num;
-
-	    // the datastructures shared among threads
-
-	std::shared_ptr<libthreadar::ratelier_scatter<crypto_segment> > scatter;
-	std::shared_ptr<libthreadar::ratelier_gather<crypto_segment> > gather;
-	std::shared_ptr<libthreadar::barrier> waiter;
-	std::shared_ptr<heap<crypto_segment> > tas;
-
-	    // the child threads
-
-	std::deque<crypto_worker> travailleur;
-	std::unique_ptr<read_below> crypto_reader;
-	std::unique_ptr<write_below> crypto_writer;
-
-
-
-	    /// send and order to subthreads and gather acks from them
-
-	    /// \param[in] order is the order to send to the subthreads
-	    /// \param[in] for_offset is not zero is the offset we want to skip to
-	    /// (it is only taken into account when order is stop)
-	    /// \note with order stop and non zero for_offset, if the
-	    /// data at for_offset is found while purging the
-	    /// ratelier_gather, the purge is stopped, false is returned and
-	    /// the ignore_stop field is set to true, meaning that a stop order
-	    /// has not been purged from the pipe and should be ignored when its
-	    /// acknolegements will be met. In any other case true is returned,
-	    /// the subthreaded got the order and the ratelier has been purged.
-	bool send_read_order(tronco_flags order, const infinint & for_offset = 0);
-
-	    /// send order in write mode
-	void send_write_order(tronco_flags order);
-
-	    /// wake up threads in read mode when necessary
-	void go_read();
-
-	    /// fill lus_data/lus_flags from ratelier_gather if these are empty
-	void read_refill();
-
-	    /// purge the ratelier from the next order which is provided as returned value
-
-	    /// \param[in] pos if pos is not zero, the normal data located at
-	    /// pos offset is also looked for. If it is found before any order
-	    /// the call returns tronco_flags::normal and the order is not purged
-	    /// but the ignore_stop_acks fields is set to true for further
-	    /// reading to skip over this order acknolegments.
-	tronco_flags purge_ratelier_from_next_order(infinint pos = 0);
-
-	    /// removing the ignore_stop_acks pending on the pipe
-
-	    /// \param[in] pos if pos is not zero and normal data is found at
-	    /// pos offset before all stop acks could get read, the call stops
-	    /// and return false. Else true is returned meaning all stop acks
-	    /// has been read and removed from the pope
-	    /// \note this method acts the same pas purge_ratelier_from_next_order but fetch
-	    /// from ratelier up to data offset met of the pending ack to be all read
-	    /// but it then stops, it does not look for a real order after
-	    /// the pending stop acks of an aborted stop order
-	bool purge_unack_stop_order(const infinint & pos = 0);
-
-	    /// flush lus_data/lus_flags up to requested pos offset to be found or all data has been removed
-
-	    /// \param[in] pos the data offset we look for
-	    /// \return true if the offset has been found and is
-	    /// ready for next inherited_read() call, false else
-	    /// and lus_data/lus_flags have been empties of
-	    /// the first non-order blocks found (data blocks)
-	    /// \note current_position is set upon success else
-	    /// it is unchanged but will not match what may still
-	    /// remain in the pipe
-	bool find_offset_in_lus_data(const infinint & pos);
-
-	    /// reset the interthread datastructure and launch the threads
-	void run_threads();
-
-	    /// end threads taking into account the fact they may be suspended on the barrier
-	void stop_threads();
-
-	    /// wait for threads to finish and eventually rethrow their exceptions in current thread
-	void join_threads();
-
-
-	static U_I get_ratelier_size(U_I num_worker) { return num_worker + num_worker/2; };
-	static U_I get_heap_size(U_I num_worker);
-    };
 
 	/// @}
 
