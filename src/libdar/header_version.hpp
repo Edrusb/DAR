@@ -79,8 +79,8 @@ namespace libdar
 	void set_tape_marks(bool presence) { has_tape_marks = presence; };
 	void set_signed(bool is_signed) { arch_signed = is_signed; };
 
-	void set_salt(const std::string & arg) { salt = arg; };
-	void set_iteration_count(const infinint & arg) { iteration_count = arg; };
+	void set_salt(const std::string & arg) { salt = arg; has_kdf_params = true; };
+	void set_iteration_count(const infinint & arg) { iteration_count = arg; has_kdf_params = true; };
 	void set_kdf_hash(hash_algo algo);
 
 	void set_compression_block_size(const infinint & bs) { compr_bs = bs; };
@@ -126,6 +126,7 @@ namespace libdar
 
 	bool ciphered;           ///< whether the archive is ciphered, even if we do not know its crypto algorithm (old archives)
 	bool arch_signed;        ///< whether the archive is signed
+	bool has_kdf_params;     ///< has salt/ineration/kdf_hash fields valid
 	std::string salt;        ///< used for key derivation
 	infinint iteration_count;///< used for key derivation
 	hash_algo kdf_hash;      ///< used for key derivation

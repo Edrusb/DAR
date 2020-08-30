@@ -56,6 +56,7 @@ namespace libdar
 	kdf_hash = hash_algo::sha1; // used by default
 	salt = "";
 	compr_bs = 0;
+	has_kdf_params = false;
     }
 
     void header_version::read(generic_file & f, user_interaction & dialog, bool lax_mode)
@@ -257,6 +258,7 @@ namespace libdar
 	    unsigned char tmp_hash;
 	    infinint salt_size(f); // reading salt_size from file
 
+	    has_kdf_params = true;
 	    tools_read_string_size(f, salt, salt_size);
 	    iteration_count.read(f);
 	    f.read((char *)&tmp_hash, 1);
@@ -491,6 +493,7 @@ namespace libdar
 	if(algo == hash_algo::none)
 	    throw Erange("header_version::set_kdf_hash", gettext("invalid hash algorithm provided for key derivation function"));
 	kdf_hash = algo;
+	has_kdf_params = true;
     }
 
     string header_version::get_sym_crypto_name() const
@@ -527,12 +530,11 @@ namespace libdar
 	dialog.printf(gettext("Archive is signed                    : %S"), &xsigned);
 	dialog.printf(gettext("Sequential reading marks             : %s"), (get_tape_marks() ? gettext("present") : gettext("absent")));
 	dialog.printf(gettext("User comment                         : %S"), &(get_command_line()));
-	if(ciphered && sym != crypto_algo::scrambling)
+	if(has_kdf_params)
 	{
 	    dialog.printf(gettext("KDF iteration count                  : %S"), &kdf_iter);
 	    dialog.printf(gettext("KDF hash algorithm                   : %S"), &hashing);
-	    if(salt.size() > 0)
-		dialog.printf(gettext("Salt size                            : %d byte%c"), salt.size(), salt.size() > 1 ? 's' : ' ');
+	    dialog.printf(gettext("Salt size                            : %d byte%c"), salt.size(), salt.size() > 1 ? 's' : ' ');
 	}
     }
 
@@ -579,6 +581,7 @@ namespace libdar
 	has_tape_marks = ref.has_tape_marks;
 	ciphered = ref.ciphered;
 	arch_signed = ref.arch_signed;
+	has_kdf_params = ref.has_kdf_params;
 	salt = ref.salt;
 	iteration_count = ref.iteration_count;
 	kdf_hash = ref.kdf_hash;
@@ -597,6 +600,7 @@ namespace libdar
 	has_tape_marks = move(ref.has_tape_marks);
 	ciphered = move(ref.ciphered);
 	arch_signed = move(ref.arch_signed);
+	has_kdf_params = move(ref.has_kdf_params);
 	salt = move(ref.salt);
 	iteration_count = move(ref.iteration_count);
 	kdf_hash = move(ref.kdf_hash);
