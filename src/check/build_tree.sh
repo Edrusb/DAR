@@ -77,5 +77,5 @@ ln chardev chardev_hard
 ln blockdev blockdev_hard
 echo "another simple plain file" > plain_file2.txt
 chgrp root plain_file2.txt
-
-
+# need a bigger file to test compression, assuming bash is now present on any Unix system
+cp /bin/bash .

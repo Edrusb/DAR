@@ -22,7 +22,7 @@
 #######################################################################
 
 if [ "$1" = "" ] ; then
-  echo "usage $0 <prefix> <multi-thread> <hash> <crypto> <zip> <slice> <Slice> <tape mark[y|n]> <sequential read[y|n]> <min-digit> <sparse-size> <keepcompressed[y|n]> <recheck-hole[y|n]> <asym[y|n]>"
+  echo "usage $0 <prefix> <multi-thread> <hash> <crypto> <zip> <zip block size> <slice> <Slice> <tape mark[y|n]> <sequential read[y|n]> <min-digit> <sparse-size> <keepcompressed[y|n]> <recheck-hole[y|n]> <asym[y|n]>"
   exit 1
 fi
 
@@ -35,18 +35,21 @@ multi_thread="$2"
 hash="$3"
 crypto="$4"
 zip="$5"
-slice="$6"
-Slice="$7"
-tape_mark="$8"
-seq_read="$9"
-digit="${10}"
-sparse="${11}"
-keep_compr="${12}"
-re_hole="${13}"
-asym="${14}"
+zipbs="$6"
+slice="$7"
+Slice="$8"
+tape_mark="$9"
+seq_read="$10"
+digit="${11}"
+sparse="${12}"
+keep_compr="${13}"
+re_hole="${14}"
+asym="${15}"
+
 
 #echo "crypto = $crypto"
 #echo "zip = $zip"
+#echo "zipbs = $zipbs"
 #echo "slice = $slice"
 #echo "Slice = $Slice"
 #echo "tape_mark = $tape_mark"
@@ -141,7 +144,7 @@ else
 fi
 
 if [ "$zip" != "none" ]; then
-  zip=-z$zip:1
+  zip=-z$zip:1:$zipbs
 else
   zip=""
 fi
