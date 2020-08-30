@@ -61,7 +61,7 @@ int main()
     ui.reset(new (nothrow) shell_interaction(cout, cerr, false));
     if(!ui)
 	cout << "ERREUR !" << endl;
-//    f1();
+    f1();
     f2();
     ui.reset();
 }

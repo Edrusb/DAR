@@ -44,15 +44,21 @@ namespace libdar
     class compressor : public proto_compressor
     {
     public :
-        compressor(compression algo, generic_file & compressed_side, U_I compression_level = 9);
-            // compressed_side is not owned by the object and will remains (must survive)
-            // after the objet destruction
+        compressor(compression x_algo,              ///< only gzip, bzip2, xz and none are supported by this class
+		   generic_file & compressed_side,  ///< where to read from/write to compressed data
+		   U_I compression_level = 9        ///< compression level 1..9
+	    );
+            /// \note compressed_side is not owned by the object and will remains (and must survive)
+            /// upt to this compressor objet destruction
 
 	compressor(const compressor & ref) = delete;
 	compressor(compressor && ref) noexcept = delete;
 	compressor & operator = (const compressor & ref) = delete;
 	compressor & operator = (compressor && ref) noexcept = delete;
-        ~compressor();
+        virtual ~compressor();
+
+
+	    // inherited from proto_compressor
 
         virtual compression get_algo() const override;
 	virtual void suspend_compression() override;
@@ -61,6 +67,7 @@ namespace libdar
 
 
             // inherited from generic file
+
 	virtual bool skippable(skippability direction, const infinint & amount) override { return compressed->skippable(direction, amount); };
         virtual bool skip(const infinint & pos) override { inherited_sync_write(); inherited_flush_read(); return compressed->skip(pos); };
         virtual bool skip_to_eof() override { inherited_sync_write(); inherited_flush_read(); return compressed->skip_to_eof(); };
@@ -88,16 +95,11 @@ namespace libdar
             ~xfer();
         };
 
-        xfer *compr, *decompr;     ///< datastructure for bzip2, gzip and zx compression
-
-        generic_file *compressed;
-        compression current_algo;
-	bool suspended;
-	U_I current_level;
-
-        void init(compression algo, generic_file *compressed_side, U_I compression_level);
-	void reset_compr_engine();    ///< reset the compression engine ready for use
-        void clean_write(); // discard any byte buffered and not yet wrote to compressed_side;
+        xfer *compr;               ///< datastructure for bzip2, gzip and zx compression (not use with compression::none
+	bool read_mode;            ///< read-only mode or write-only mode, read-write is write-only mode
+        generic_file *compressed;  ///< where to read from/write to compressed data
+        compression algo;          ///< compression algorithm used
+	bool suspended;            ///< whether compression is temporary suspended
     };
 
 	/// @}
