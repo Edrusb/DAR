@@ -1478,11 +1478,14 @@ namespace libdar
 
 			    // updating the archive_header with the KDF parameters
 			crypto_sym* sym_ptr = dynamic_cast<crypto_sym*>(ptr.get());
-			if(sym_ptr != nullptr && use_pkcs5)
+			if(sym_ptr != nullptr)
 			{
-			    ver.set_salt(sym_ptr->get_salt());
-			    ver.set_iteration_count(iteration_count);
-			    ver.set_kdf_hash(kdf_hash);
+			    if(use_pkcs5)
+			    {
+				ver.set_salt(sym_ptr->get_salt());
+				ver.set_iteration_count(iteration_count);
+				ver.set_kdf_hash(kdf_hash);
+			    }
 			}
 			else
 			    throw SRC_BUG;
