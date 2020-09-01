@@ -1183,6 +1183,7 @@ namespace libdar
 	{
 	    generic_file *tmp = nullptr;
 	    escape *esc = nullptr;
+	    generic_file *level1 = nullptr;
 	    bool force_permission = (slice_permission != "");
 	    U_I permission = force_permission ? tools_octal2int(slice_permission) : 0; // 0 or anything else, this does not matter
 	    gf_mode open_mode = gf_read_write; // by default first layer is read-write except in case of hashing or encryption
@@ -1284,6 +1285,7 @@ namespace libdar
 		else
 		{
 		    layers.push(tmp);
+		    level1 = tmp; // recorded to know where to drop the archive header while the encryption layer will already be added on top
 		    tmp = nullptr;
 		}
 
@@ -1303,6 +1305,7 @@ namespace libdar
 			if(open_mode == gf_read_write)
 			    c_tmp->change_to_read_write();
 			layers.push(c_tmp, LIBDAR_STACK_LABEL_CACHE_PIPE, true);
+			level1 = tmp; // we will use the cache as layer where to write down the archive header
 			tmp = nullptr;
 		    }
 		}
@@ -1442,8 +1445,15 @@ namespace libdar
 		}
 
 		    // ************ building the encryption layer if required ****** //
+		    // the encryption layer need to be setup now, for the salt to be determined,
+		    // it will be recorded in the archive header which has to be wrote down at the
+		    // beginning of the archive.
+		    // Once the archvie header has been wrote the initial_shift (offset of the first
+		    // encrypted data) will be possible to be given to the encryption layer
+		    //
+		    // this info is necessary to determine the encryption block boundaries.
 
-		proto_tronco *tmp_tronco;
+		proto_tronco *tmp_tronco = nullptr;
 		bool use_pkcs5 = gnupg_recipients.empty();
 
 		switch(crypto)
@@ -1533,6 +1543,8 @@ namespace libdar
 			if(info_details)
 			    dialog->message(gettext("Adding a new layer on top: Caching layer for better performances..."));
 			tmp = new (nothrow) cache(*(layers.top()), false);
+			if(tmp != nullptr)
+			    level1 = tmp; // new level where to write down the archive header, this is not an encryption layer
 		    }
 		    else
 			tmp = nullptr; // a cache is already present just below
@@ -1541,10 +1553,24 @@ namespace libdar
 		    throw SRC_BUG; // cryto value should have been checked before
 		}
 
-		    /// !!!!!
-		    // the crypto engine will be added to the stack once
-		    // the archive header will have been written
-		    /// !!!!!
+				    // ****** we can now add the crypto layer to the stack ****** //
+
+		if(!writing_to_pipe || crypto != crypto_algo::none)
+		{
+		    if(tmp == nullptr)
+			throw Ememory("op_create_in_sub");
+		    else
+		    {
+			layers.push(tmp);
+			tmp = nullptr;
+		    }
+		}
+		else
+		{
+		    if(tmp != nullptr)
+			throw SRC_BUG;
+		}
+
 
 		    // ******** finishing the creation of the archive header and writing it down (in clear!) at the beginning of the archive *** //
 
@@ -1587,7 +1613,10 @@ namespace libdar
 
 		if(info_details)
 		    dialog->message(gettext("Writing down the archive header..."));
-		ver.write(layers);
+		if(level1 != nullptr)
+		    ver.write(*level1); // we write to the level1 which is just below the encryption layer, thus the header is wrote unciphered
+		else
+		    throw SRC_BUG;
 
 		    // now we can add the initial offset in the archive_header datastructure, which will be written
 		    // a second time, but at the end of the archive. If we start reading the archive from the end
@@ -1600,24 +1629,6 @@ namespace libdar
 
 		if(tmp_tronco != nullptr)
 		    tmp_tronco->set_initial_shift(ver.get_initial_offset());
-
-		    // ****** we can now add the crypto layer to the stack ****** //
-
-		if(!writing_to_pipe || crypto != crypto_algo::none)
-		{
-		    if(tmp == nullptr)
-			throw Ememory("op_create_in_sub");
-		    else
-		    {
-			layers.push(tmp);
-			tmp = nullptr;
-		    }
-		}
-		else
-		{
-		    if(tmp != nullptr)
-			throw SRC_BUG;
-		}
 
 		    // ***** adding a elastic buffer as first ciphered data after the clear archive header ****** //
 
