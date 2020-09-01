@@ -432,7 +432,7 @@ namespace libdar
 
 	stack.clear();
 #ifdef LIBTHREADAR_AVAILABLE
-	if(multi_threaded_crypto < 2 && !libcurl_repo)
+	if(multi_threaded_crypto < 2 && multi_threaded_compress < 2 && !libcurl_repo)
 	    stack.ignore_read_ahead(true);
 	else
 	    stack.ignore_read_ahead(false);
@@ -1622,7 +1622,7 @@ namespace libdar
 		    // a second time, but at the end of the archive. If we start reading the archive from the end
 		    // we must know where ended the initial archive header.
 
-		ver.set_initial_offset(layers.get_position());
+		ver.set_initial_offset(level1->get_position());
 
 
 		    // ********** now that the archive header has been wrote down, we can set the initial_shift for the encryption layer ***** //

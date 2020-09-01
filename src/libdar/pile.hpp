@@ -64,7 +64,7 @@ namespace libdar
 	    /// the pile is responsible of destroying this object if its destructor is called
 	    /// however, the pile object releases its responsibility about any object that
 	    /// will be poped (see pop() below) from the stack.
-	    /// \note empty label (empty string) is the only value that can be used for several objects of the stack
+	    /// \note empty label (empty string) is the only identical value that can be used for several objects of the stack
 	void push(generic_file *f, const std::string & label = "", bool extend_mode = false);
 
 	    /// remove the top generic_file from the top

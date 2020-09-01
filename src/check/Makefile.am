@@ -71,4 +71,5 @@ clean-local:
 all-local: compressible_file
 
 compressible_file: bnonzero
+	rm -f compressible_file
 	./bnonzero compressible_file 1 2048
