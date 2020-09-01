@@ -66,7 +66,7 @@ bnonzero_SOURCES = bnonzero.c
 clean-local:
 	rm -rf target_*
 	rm -f $(MY_MAKEFILE) $(MY_ENV)
-	rm compressible_file
+	rm -f compressible_file
 
 all-local: compressible_file
 
