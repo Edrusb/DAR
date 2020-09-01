@@ -39,7 +39,7 @@ endif
 helpers = build_tree.sh final.sh main.sh modif_tree.sh routine.sh loop.sh make_env.sh
 
 dist_noinst_DATA = $(helpers) Old_format/archive_01.1.dar Old_format/archive_02.1.dar Old_format/archive_03.1.dar Old_format/archive_04.1.dar Old_format/archive_05.1.dar Old_format/archive_06.1.dar Old_format/archive_07.1.dar Old_format/archive_08.1.dar Old_format/archive_08-1.1.dar Old_format/archive_09.1.dar Old_format/archive_10.1.dar Old_format/archive_10-1.1.dar
-noinst_PROGRAMS = all_features padder
+noinst_PROGRAMS = all_features padder bnonzero
 LDADD = ../libdar/$(MYLIB).la $(LIBCURL_LIBS) $(GPGME_LIBS) $(LIBTHREADAR_LIBS) $(LTLIBINTL)
 AM_LDFLAGS = $(CXXSTDFLAGS)
 
@@ -61,8 +61,14 @@ all_features_SOURCES = all_features.cpp
 all_features_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 padder_SOURCES = padder.cpp
+bnonzero_SOURCES = bnonzero.c
 
 clean-local:
 	rm -rf target_*
 	rm -f $(MY_MAKEFILE) $(MY_ENV)
+	rm compressible_file
 
+all-local: compressible_file
+
+compressible_file: bnonzero
+	./bnonzero compressible_file 1 2048

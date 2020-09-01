@@ -26,6 +26,15 @@ if [ $# -ne 2 ] ; then
   exit 1
 fi
 
+COMP_FILE="`dirname $0`/compressible_file"
+
+if [ ! -f $COMP_FILE ] ; then
+    echo "missing file: $COMP_FILE"
+    exit 2
+fi
+
+
+
 SUB1=S"$2"B1
 SUB2=S"$2"B2
 SUB3=S"$2"B3
@@ -77,5 +86,6 @@ ln chardev chardev_hard
 ln blockdev blockdev_hard
 echo "another simple plain file" > plain_file2.txt
 chgrp root plain_file2.txt
-# need a bigger file to test compression, assuming bash is now present on any Unix system
-cp /bin/bash .
+# need a bigger file to test compression, and a easy one but non-sparse to compress
+cp $COMP_FILE .
+

@@ -39,7 +39,7 @@ rm -f $TMP_FILE $MY_MAKEFILE
 
 printf "Building the Makefile (patience, this takes some minutes)... "
 
-  for multi_thread in 8 1 ; do
+  for multi_thread in 2 1 ; do
     for hash in md5 none sha1 ; do
       for crypto in bf none scram aes twofish serpent camellia ; do
         for zip in zstd lz4 xz gzip none bzip2 lzo ; do
