@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2020-05-31 11:38+0200\n"
+"POT-Creation-Date: 2020-09-05 12:07+0200\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -894,17 +894,17 @@ msgstr "Öppnar konstruktionsnivå..."
 msgid "Considering cyphering layer..."
 msgstr "Funderar på chiffreringsnivå..."
 
-#: src/libdar/macro_tools.cpp:582
+#: src/libdar/macro_tools.cpp:593
+#, fuzzy
 msgid ""
-"LAX MODE: Archive seems to be ciphered, but you did not have provided any "
-"encryption algorithm, assuming data corruption and considering that the "
-"archive is not ciphered"
+"LAX MODE: Archive is flagged as being ciphered, assuming data corruption "
+"occurred and considering the archive is not ciphered"
 msgstr ""
 "LAX MODE: Arkivet verkar vara chiffrerat, men du har ej angett någon "
 "chifferalgoritm, antar dataförstörelse och betraktar arkivet som ej "
 "chiffrerat"
 
-#: src/libdar/macro_tools.cpp:585
+#: src/libdar/macro_tools.cpp:596
 #, c-format
 msgid ""
 "The archive %S is encrypted and no encryption cipher has been given, cannot "
@@ -913,7 +913,7 @@ msgstr ""
 "Arkivet %S är krypterat och ingen krypteringschiffer har getts, kan ej öppna "
 "arkivet."
 
-#: src/libdar/macro_tools.cpp:616
+#: src/libdar/macro_tools.cpp:627
 msgid ""
 "WARNING: support for secure memory was not available at compilation time, in "
 "case of heavy memory load, this may lead the password you are about to "
@@ -924,17 +924,17 @@ msgstr ""
 "det lösenord du skall till och lämna kan skrivas till disk (växlingsutrymme) "
 "i klartext. Du har härmed varnats!"
 
-#: src/libdar/macro_tools.cpp:617 src/libdar/macro_tools.cpp:1359
+#: src/libdar/macro_tools.cpp:628 src/libdar/macro_tools.cpp:1370
 #, c-format
 msgid "Archive %S requires a password: "
 msgstr "Arkiv %S kräver ett lösenord: "
 
-#: src/libdar/macro_tools.cpp:626
+#: src/libdar/macro_tools.cpp:637
 #, fuzzy
 msgid "No cyphering layer opened, adding cache layer for better performance"
 msgstr "Öppnar \"cache\"-nivån för bättre prestanda..."
 
-#: src/libdar/macro_tools.cpp:632
+#: src/libdar/macro_tools.cpp:643
 msgid ""
 "Failed opening the cache layer, lack of memory, archive read performances "
 "will not be optimized"
@@ -942,27 +942,27 @@ msgstr ""
 "Misslyckades med att öppna \"cache\"-nivån, minnesbrist, arkivläsförmåga "
 "blir ej optimal"
 
-#: src/libdar/macro_tools.cpp:637
+#: src/libdar/macro_tools.cpp:648
 msgid "No cyphering layer opened"
 msgstr "Ingen chiffreringslager öppnat..."
 
-#: src/libdar/macro_tools.cpp:646 src/libdar/macro_tools.cpp:696
+#: src/libdar/macro_tools.cpp:657 src/libdar/macro_tools.cpp:707
 msgid "Opening cyphering layer..."
 msgstr "Öppnar chiffreringslager..."
 
-#: src/libdar/macro_tools.cpp:703
+#: src/libdar/macro_tools.cpp:714
 msgid "Unknown encryption algorithm"
 msgstr "Okänd krypteringsalgoritm"
 
-#: src/libdar/macro_tools.cpp:723 src/libdar/macro_tools.cpp:1481
+#: src/libdar/macro_tools.cpp:734 src/libdar/macro_tools.cpp:1492
 msgid "Creating a new thread to run the previously created layers..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:743
+#: src/libdar/macro_tools.cpp:754
 msgid "Opening escape sequence abstraction layer..."
 msgstr "Öppnar escape-sekvensabstraktionslagret"
 
-#: src/libdar/macro_tools.cpp:748
+#: src/libdar/macro_tools.cpp:759
 msgid ""
 "LAX MODE: Archive is flagged as having escape sequence (which is normal in "
 "recent archive versions). However if this is not expected, shall I assume a "
@@ -974,7 +974,7 @@ msgstr ""
 "förväntat, skall jag antaga att data förstörts i detta fält och att denna "
 "flagga skall ignoreras? (Om osäker, vägra)"
 
-#: src/libdar/macro_tools.cpp:763
+#: src/libdar/macro_tools.cpp:774
 msgid ""
 "Sequential read asked, but this archive is flagged to not have the necessary "
 "embedded escape sequences for that operation, aborting"
@@ -982,7 +982,7 @@ msgstr ""
 "Sekvensiell läsning begärd, men detta arkiv är flaggat för att inte ha "
 "nödvändiga escepsekvenser för denna åtgärd, avbryter"
 
-#: src/libdar/macro_tools.cpp:768
+#: src/libdar/macro_tools.cpp:779
 msgid ""
 "LAX MODE: the requested sequential read mode relies on escape sequence which "
 "seem to be absent from this archive. Assuming data corruption occurred. "
@@ -996,7 +996,7 @@ msgstr ""
 "läget sekvensiell läsning för att undersöka detta arkiv du får inget "
 "matnyttigt av det"
 
-#: src/libdar/macro_tools.cpp:774
+#: src/libdar/macro_tools.cpp:785
 #, fuzzy
 msgid ""
 "LAX MODE: Archive is flagged to not have escape sequence which is not the "
@@ -1013,11 +1013,11 @@ msgstr ""
 "till en escape-sekvens-nivå trots arkivflaggan. Vill du fortsätta som "
 "förslagits av arkivflaggan, sålunda utan escape-sekvens-nivå?"
 
-#: src/libdar/macro_tools.cpp:805 src/libdar/macro_tools.cpp:1527
+#: src/libdar/macro_tools.cpp:816 src/libdar/macro_tools.cpp:1538
 msgid "Creating a new thread to run the escape layer..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:823
+#: src/libdar/macro_tools.cpp:834
 msgid ""
 "Opening the compression abstraction layer (compression algorithm used is "
 "none)..."
@@ -1025,20 +1025,20 @@ msgstr ""
 "Öppnar kompressionsabstraktionslagret ( ingen kompressionsalgoritm "
 "används)..."
 
-#: src/libdar/macro_tools.cpp:825
+#: src/libdar/macro_tools.cpp:836
 msgid "Opening the compression layer..."
 msgstr "Öppnar kompressionslagret..."
 
-#: src/libdar/macro_tools.cpp:849 src/libdar/macro_tools.cpp:1559
+#: src/libdar/macro_tools.cpp:860 src/libdar/macro_tools.cpp:1570
 #, fuzzy
 msgid "Creating a new thread to run the compression layer..."
 msgstr "Öppnar kompressionslagret..."
 
-#: src/libdar/macro_tools.cpp:863 src/libdar/macro_tools.cpp:1569
+#: src/libdar/macro_tools.cpp:874 src/libdar/macro_tools.cpp:1580
 msgid "All layers have been created successfully"
 msgstr "Alla lager har skapats korrekt"
 
-#: src/libdar/macro_tools.cpp:866
+#: src/libdar/macro_tools.cpp:877
 #, fuzzy, c-format
 msgid ""
 "Warning, the archive %S has been encrypted. A wrong key is not possible to "
@@ -1048,7 +1048,7 @@ msgstr ""
 "detektera, det skulle leda till att DAR rapporterar att arkivet var "
 "förstört\n"
 
-#: src/libdar/macro_tools.cpp:905
+#: src/libdar/macro_tools.cpp:916
 msgid ""
 "LAX MODE: The catalogue (table of contents) usually takes a few percents of "
 "the archive at its end, which percentage do you want me to scan (answer by "
@@ -1058,17 +1058,17 @@ msgstr ""
 "arkivet i dess slut. Hur stor del procentuellt, vill du att jag skall avsöka "
 "(svara med ett heltal mellan 0 och 100)?"
 
-#: src/libdar/macro_tools.cpp:911
+#: src/libdar/macro_tools.cpp:922
 #, c-format
 msgid "LAX MODE: %i is not a valid percent value"
 msgstr "LAX MODE: %i är ej giltigt procentvärde"
 
-#: src/libdar/macro_tools.cpp:915
+#: src/libdar/macro_tools.cpp:926
 #, c-format
 msgid "%S is not a valid number"
 msgstr "%S är inte ett giltigt tal"
 
-#: src/libdar/macro_tools.cpp:921
+#: src/libdar/macro_tools.cpp:932
 #, c-format
 msgid ""
 "LAX MODE: Beginning search of the catalogue (from the end toward the "
@@ -1077,7 +1077,7 @@ msgstr ""
 "LAX MODE: Börjar med att avsöka katalogen (från slutet mot början av arkivet "
 "%i %% av arkivet), detta kan ta ett bra tag..."
 
-#: src/libdar/macro_tools.cpp:930
+#: src/libdar/macro_tools.cpp:941
 msgid ""
 "LAX MODE: Cannot skip at the end of the archive! Using current position to "
 "start the catalogue search"
@@ -1085,12 +1085,12 @@ msgstr ""
 "LAX MODE: Kan ej hoppa över i slutet av arkivet! Amvänder aktuell position "
 "till att börja katalogsökningen"
 
-#: src/libdar/macro_tools.cpp:935
+#: src/libdar/macro_tools.cpp:946
 msgid "LAX MODE: Failed to read the catalogue (no data to inspect)"
 msgstr ""
 "LAX MODE: Misslyckades med att läsa katalogen (inga data att inspektera)"
 
-#: src/libdar/macro_tools.cpp:938
+#: src/libdar/macro_tools.cpp:949
 msgid ""
 "LAX MODE: Failed to read the catalogue (0 bytes of the archive length asked "
 "to look for the catalogue)"
@@ -1098,7 +1098,7 @@ msgstr ""
 "LAX MODE: Misslyckades med att läsa katalogen (0 byte hos arkivlängden "
 "medförde att leta efter katalogen)"
 
-#: src/libdar/macro_tools.cpp:949
+#: src/libdar/macro_tools.cpp:960
 msgid ""
 "LAX MODE: Escape sequence seems present in this archive. I have thus two "
 "different methods, either I look for the escape sequence indicating the "
@@ -1110,11 +1110,11 @@ msgstr ""
 "katalogbörjan eller så försöker jag vid varje position i ordning i hopp om "
 "att det inte är data, som ser ut som en katalog."
 
-#: src/libdar/macro_tools.cpp:952
+#: src/libdar/macro_tools.cpp:963
 msgid "LAX MODE: Trying to locate the escape sequence (safer choice) ?"
 msgstr "LAX MODE: Försöker hitta escape-sekvensen (säkrare val) ?"
 
-#: src/libdar/macro_tools.cpp:957
+#: src/libdar/macro_tools.cpp:968
 msgid ""
 "LAX MODE: Good point! I could find the escape sequence marking the beginning "
 "of the catalogue, now trying to read it..."
@@ -1122,7 +1122,7 @@ msgstr ""
 "LAX MODE: Bra ide! kunde hitta escape-sekvensen markerande katalogbörjan, "
 "försöker nu läsa den..."
 
-#: src/libdar/macro_tools.cpp:966
+#: src/libdar/macro_tools.cpp:977
 msgid ""
 "LAX MODE: Escape sequence could not be found, it may have been corrupted or "
 "out of the scanned portion of the archive, trying to find the catalogue the "
@@ -1131,12 +1131,12 @@ msgstr ""
 "LAX MODE: Escape-sekvens kunde inte hittas, den kan ha blivit förstörd or "
 "utanför avsökt del av arkivet, försöker hitta katalogen den andra vägen..."
 
-#: src/libdar/macro_tools.cpp:989
+#: src/libdar/macro_tools.cpp:1000
 #, c-format
 msgid "LAX MODE: %i %% remaining"
 msgstr "LAX MODE: %i %% återstår"
 
-#: src/libdar/macro_tools.cpp:1001
+#: src/libdar/macro_tools.cpp:1012
 #, c-format
 msgid ""
 "Could read a catalogue data structure at offset %i, it contains the "
@@ -1145,47 +1145,47 @@ msgstr ""
 "Kunde inte läsa en katalogdatastruktur med offset %i, det innehåller "
 "följande:"
 
-#: src/libdar/macro_tools.cpp:1003
+#: src/libdar/macro_tools.cpp:1014
 #, fuzzy
 msgid "Do you want to use it for the operation?"
 msgstr "Vill du använda det för återhämtning?"
 
-#: src/libdar/macro_tools.cpp:1035
+#: src/libdar/macro_tools.cpp:1046
 msgid ""
 "LAX MODE: Reached the end of the area to scan, FAILED to find any catalogue"
 msgstr ""
 "LAX MODE: Nådde slutet på avsökt område, misslyckades med att hitta någon "
 "katalog"
 
-#: src/libdar/macro_tools.cpp:1045
+#: src/libdar/macro_tools.cpp:1056
 msgid "LAX MODE: Failed to read the catalogue"
 msgstr "LAX MODE: Misslyckades med att läsa katalogen"
 
-#: src/libdar/macro_tools.cpp:1130
+#: src/libdar/macro_tools.cpp:1141
 msgid ""
 "Creating low layer: Writing archive into a black hole object (equivalent to /"
 "dev/null)..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1139
+#: src/libdar/macro_tools.cpp:1150
 msgid "Creating low layer: Writing archive into standard output object..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1152
+#: src/libdar/macro_tools.cpp:1163
 msgid "Creating low layer: Writing archive into a plain file object..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1173
+#: src/libdar/macro_tools.cpp:1184
 msgid ""
 "Creating low layer: Writing archive into a sar object (Segmentation and "
 "Reassembly) for slicing..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1211
+#: src/libdar/macro_tools.cpp:1222
 msgid "Adding cache layer over pipe to provide limited skippability..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1241
+#: src/libdar/macro_tools.cpp:1252
 #, fuzzy
 msgid ""
 "WARNING: support for secure memory was not available at compilation time, in "
@@ -1197,17 +1197,17 @@ msgstr ""
 "det lösenord du skall till och lämna kan skrivas till disk (växlingsutrymme) "
 "i klartext. Du har härmed varnats!"
 
-#: src/libdar/macro_tools.cpp:1256
+#: src/libdar/macro_tools.cpp:1267
 msgid "Generating random key for symmetric encryption..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1264
+#: src/libdar/macro_tools.cpp:1275
 msgid ""
 "Scrambling is a very weak encryption algorithm, this is a non-sens to use "
 "with asymmetric encryption"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1304
+#: src/libdar/macro_tools.cpp:1315
 #, c-format
 msgid ""
 "For your information, this is the iteration %d for which the randomly "
@@ -1215,118 +1215,118 @@ msgid ""
 "another random key... patience"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1308
+#: src/libdar/macro_tools.cpp:1319
 #, c-format
 msgid ""
 "... A strong randomly generated key could be found after %d iteration(s)"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1315
+#: src/libdar/macro_tools.cpp:1326
 msgid "Key generated"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1360
+#: src/libdar/macro_tools.cpp:1371
 msgid "Please confirm your password: "
 msgstr "Bekräfta lösenordet: "
 
-#: src/libdar/macro_tools.cpp:1364
+#: src/libdar/macro_tools.cpp:1375
 msgid "The two passwords are not identical. Aborting"
 msgstr "De två lösenorden är olika. Avbryter"
 
-#: src/libdar/macro_tools.cpp:1406
+#: src/libdar/macro_tools.cpp:1417
 #, fuzzy
 msgid "Writing down the archive header..."
 msgstr "Läser arkivhuvud..."
 
-#: src/libdar/macro_tools.cpp:1422
+#: src/libdar/macro_tools.cpp:1433
 msgid "Adding a new layer on top: scrambler object..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1434
+#: src/libdar/macro_tools.cpp:1445
 msgid "Adding a new layer on top: Strong encryption object..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1454
+#: src/libdar/macro_tools.cpp:1465
 #, fuzzy
 msgid "Adding a new layer on top: Caching layer for better performances..."
 msgstr "Öppnar \"cache\"-nivån för bättre prestanda..."
 
-#: src/libdar/macro_tools.cpp:1499
+#: src/libdar/macro_tools.cpp:1510
 msgid "Writing down the initial elastic buffer through the encryption layer..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1511
+#: src/libdar/macro_tools.cpp:1522
 msgid "Adding a new layer on top: Escape layer to allow sequential reading..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1541
+#: src/libdar/macro_tools.cpp:1552
 msgid "Adding a new layer on top: compression..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1583
+#: src/libdar/macro_tools.cpp:1594
 #, fuzzy
 msgid "Error creating archive layers: "
 msgstr "Fel vid läsning av tecken: "
 
-#: src/libdar/macro_tools.cpp:1692
+#: src/libdar/macro_tools.cpp:1703
 #, fuzzy
 msgid "Writing down archive contents..."
 msgstr "Skriver arkivinnehåll..."
 
-#: src/libdar/macro_tools.cpp:1716
+#: src/libdar/macro_tools.cpp:1727
 msgid "Calculating the signature of the catalogue hash..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1732
+#: src/libdar/macro_tools.cpp:1743
 #, fuzzy
 msgid "Writing down the signed hash of the catalogue..."
 msgstr "Uppdaterar databas med katalog..."
 
-#: src/libdar/macro_tools.cpp:1782
+#: src/libdar/macro_tools.cpp:1793
 #, fuzzy
 msgid "Closing the compression layer..."
 msgstr "Öppnar kompressionslagret..."
 
-#: src/libdar/macro_tools.cpp:1797
+#: src/libdar/macro_tools.cpp:1808
 #, fuzzy
 msgid "Closing the escape layer..."
 msgstr "Öppnar kompressionslagret..."
 
-#: src/libdar/macro_tools.cpp:1817
+#: src/libdar/macro_tools.cpp:1828
 #, fuzzy
 msgid "Writing down the first archive terminator..."
 msgstr "Skriver arkivinnehåll..."
 
-#: src/libdar/macro_tools.cpp:1823
+#: src/libdar/macro_tools.cpp:1834
 msgid "writing down the final elastic buffer through the encryption layer..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:1862
+#: src/libdar/macro_tools.cpp:1873
 #, fuzzy
 msgid "Closing the encryption layer..."
 msgstr "Öppnar kompressionslagret..."
 
-#: src/libdar/macro_tools.cpp:1884
+#: src/libdar/macro_tools.cpp:1895
 #, fuzzy
 msgid "Writing down archive trailer..."
 msgstr "Skriver arkivinnehåll..."
 
-#: src/libdar/macro_tools.cpp:1889
+#: src/libdar/macro_tools.cpp:1900
 #, fuzzy
 msgid "Writing down the second archive terminator..."
 msgstr "Skriver arkivinnehåll..."
 
-#: src/libdar/macro_tools.cpp:1900
+#: src/libdar/macro_tools.cpp:1911
 #, fuzzy
 msgid "Closing archive low layer..."
 msgstr "Funderar på chiffreringsnivå..."
 
-#: src/libdar/macro_tools.cpp:1917
+#: src/libdar/macro_tools.cpp:1928
 #, fuzzy
 msgid "Archive is closed."
 msgstr "Arkivet består av %i fil(er)\n"
 
-#: src/libdar/macro_tools.cpp:2084
+#: src/libdar/macro_tools.cpp:2095
 msgid ""
 "The format version of the archive is too high for that software version, try "
 "reading anyway?"
@@ -2288,7 +2288,7 @@ msgstr ""
 "mig genom att svara med ett av orden \"none\", \"gzip\", \"bzip2\" or \"lzo"
 "\" på frågan:"
 
-#: src/libdar/header_version.cpp:123 src/libdar/header_version.cpp:498
+#: src/libdar/header_version.cpp:123 src/libdar/header_version.cpp:512
 #: src/libdar/crypto.cpp:42
 msgid "none"
 msgstr "inget"
@@ -2344,82 +2344,88 @@ msgid "please answer with a single character"
 msgstr ""
 
 #: src/libdar/header_version.cpp:328 src/libdar/header_version.cpp:330
-#: src/libdar/header_version.cpp:352 src/libdar/header_version.cpp:354
+#: src/libdar/header_version.cpp:354 src/libdar/header_version.cpp:356
 msgid "Consistency check failed for archive header"
 msgstr "Sundhetskontroll misslyckades för arkivhuvud"
 
-#: src/libdar/header_version.cpp:480
+#: src/libdar/header_version.cpp:371
+msgid ""
+"Unknown flag found in archive header/trailer, ignoring the CRC mismatch "
+"possibly due to the unknown corresponding field"
+msgstr ""
+
+#: src/libdar/header_version.cpp:494
 msgid "invalid hash algorithm provided for key derivation function"
 msgstr ""
 
-#: src/libdar/header_version.cpp:489 src/libdar/header_version.cpp:506
+#: src/libdar/header_version.cpp:503 src/libdar/header_version.cpp:520
 #: src/libdar/op_tools.cpp:41 src/libdar/op_tools.cpp:113
 #: src/libdar/op_tools.cpp:193
 msgid "yes"
 msgstr "ja"
 
-#: src/libdar/header_version.cpp:489 src/libdar/header_version.cpp:506
+#: src/libdar/header_version.cpp:503 src/libdar/header_version.cpp:520
 msgid "no"
 msgstr "nej"
 
-#: src/libdar/header_version.cpp:510
+#: src/libdar/header_version.cpp:524
 #, fuzzy, c-format
 msgid "Archive version format               : %s"
 msgstr "Arkivets versionsformat              : %s\n"
 
-#: src/libdar/header_version.cpp:511
+#: src/libdar/header_version.cpp:525
 #, fuzzy, c-format
 msgid "Compression algorithm used           : %S"
 msgstr "Utnyttjad kompressionsalgoritm        : %S\n"
 
-#: src/libdar/header_version.cpp:512
+#: src/libdar/header_version.cpp:526
 #, fuzzy, c-format
 msgid "Symmetric key encryption used        : %S"
 msgstr "   Stark kryptering           : %s\n"
 
-#: src/libdar/header_version.cpp:513
+#: src/libdar/header_version.cpp:527
 #, fuzzy, c-format
 msgid "Asymmetric key encryption used       : %S"
 msgstr "   Stark kryptering           : %s\n"
 
-#: src/libdar/header_version.cpp:514
+#: src/libdar/header_version.cpp:528
 #, fuzzy, c-format
 msgid "Archive is signed                    : %S"
 msgstr "Arkivets versionsformat              : %s\n"
 
-#: src/libdar/header_version.cpp:515
+#: src/libdar/header_version.cpp:529
 #, fuzzy, c-format
 msgid "Sequential reading marks             : %s"
 msgstr "Sekvensiell läsnings markeringar  : %s\n"
 
-#: src/libdar/header_version.cpp:515
+#: src/libdar/header_version.cpp:529
 msgid "present"
 msgstr "befintlig"
 
-#: src/libdar/header_version.cpp:515
+#: src/libdar/header_version.cpp:529
 msgid "absent"
 msgstr "frånvarande"
 
-#: src/libdar/header_version.cpp:516
+#: src/libdar/header_version.cpp:530
 #, fuzzy, c-format
 msgid "User comment                         : %S"
 msgstr ""
 "Användar kommentar               : %S\n"
 "\n"
 
-#: src/libdar/header_version.cpp:519
+#: src/libdar/header_version.cpp:533
 #, fuzzy, c-format
 msgid "KDF iteration count                  : %S"
 msgstr ""
 "Användar kommentar               : %S\n"
 "\n"
 
-#: src/libdar/header_version.cpp:520
+#: src/libdar/header_version.cpp:534
 #, fuzzy, c-format
 msgid "KDF hash algorithm                   : %S"
 msgstr "Utnyttjad kompressionsalgoritm        : %S\n"
 
-#: src/libdar/header_version.cpp:522
+#: src/libdar/header_version.cpp:536
 #, fuzzy, c-format
 msgid "Salt size                            : %d byte%c"
 msgstr ""
@@ -3007,7 +3013,7 @@ msgstr ""
 "cyphering algoritmen: %s/%s"
 
 #: src/libdar/crypto_sym.cpp:114
-msgid "Too large value give for key derivation interation count"
+msgid "Too large value given for key derivation interation count"
 msgstr ""
 
 #: src/libdar/crypto_sym.cpp:125
@@ -5352,21 +5358,21 @@ msgid ""
 "error will be reported for that file while reading the repaired archive"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3337
+#: src/libdar/filtre.cpp:3330
 msgid "Copied data does not match CRC"
 msgstr "Kopierade data matchar inte CRC"
 
-#: src/libdar/filtre.cpp:3484
+#: src/libdar/filtre.cpp:3476
 msgid " : Failed resaving uncompressed the inode data"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3494
+#: src/libdar/filtre.cpp:3486
 msgid ""
 " : Resaving uncompressed the inode data to gain space is not possible, "
 "keeping data compressed"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3518
+#: src/libdar/filtre.cpp:3530
 #, c-format
 msgid ""
 "File has disappeared while we were reading it, cannot check whether it has "
@@ -5375,7 +5381,7 @@ msgstr ""
 "Fil försvann medan den lästes, kan ej kontrollera huruvida den har ändrats "
 "under dess säkerhetskopiering: %S"
 
-#: src/libdar/filtre.cpp:3553
+#: src/libdar/filtre.cpp:3565
 #, c-format
 msgid ""
 "WARNING! File modified while reading it for backup. Performing retry %i of %i"
@@ -5383,7 +5389,7 @@ msgstr ""
 "VARNING! Fil ändrad under läsning för säkerhetskopiering. Genomför nytt "
 "försök %i av %i"
 
-#: src/libdar/filtre.cpp:3570
+#: src/libdar/filtre.cpp:3582
 msgid ""
 "WARNING! File modified while reading it for backup. No more retry for that "
 "file to not exceed the wasted byte limit. File is "
@@ -5391,7 +5397,7 @@ msgstr ""
 "VARNING! Fil ändrad vid läsning för säkerhetskopiering. Inga fler försök för "
 "den filen för att inte överskrida bortkastad byt-gräns. Fil är "
 
-#: src/libdar/filtre.cpp:3577
+#: src/libdar/filtre.cpp:3589
 msgid ""
 "WARNING! File modified while reading it for backup, but no more retry "
 "allowed: "
@@ -5399,64 +5405,64 @@ msgstr ""
 "VARNING! Fil ändrad under läsning för säkerhetskopiering, men inga fler "
 "försök tillåtna: "
 
-#: src/libdar/filtre.cpp:3599
+#: src/libdar/filtre.cpp:3611
 msgid "Dumping delta signature structure for saved file: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:3755
+#: src/libdar/filtre.cpp:3767
 msgid "Saving Extended Attributes for "
 msgstr "Sparar Extended Attribut för "
 
-#: src/libdar/filtre.cpp:3790
+#: src/libdar/filtre.cpp:3802
 #, c-format
 msgid ""
 "Computed EA CRC for file %S differs from what was stored in the archive, "
 "this file's EA may have been corrupted"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3837
+#: src/libdar/filtre.cpp:3849
 msgid "Error saving Extended Attributes for "
 msgstr "Fel vid sparande av Extended Attribut för "
 
-#: src/libdar/filtre.cpp:3841
+#: src/libdar/filtre.cpp:3853
 msgid ""
 "be advised that a CRC error will be reported for the EA of that file while "
 "sequentially reading the repaired archive"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3876
+#: src/libdar/filtre.cpp:3888
 #, fuzzy
 msgid "Saving Filesystem Specific Attributes for "
 msgstr "Sparar Extended Attribut för "
 
-#: src/libdar/filtre.cpp:3906
+#: src/libdar/filtre.cpp:3918
 #, c-format
 msgid ""
 "Computed FSA CRC for file %S differs from what was stored in the archive, "
 "this file's EA may have been corrupted"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3951
+#: src/libdar/filtre.cpp:3963
 #, fuzzy
 msgid "Error saving Filesystem Specific Attributes for "
 msgstr "Fel vid sparande av Extended Attribut för "
 
-#: src/libdar/filtre.cpp:3955
+#: src/libdar/filtre.cpp:3967
 msgid ""
 "be advised that a CRC error will be reported for the FSA of that file while "
 "sequentially reading the repaired archive"
 msgstr ""
 
-#: src/libdar/filtre.cpp:4513
+#: src/libdar/filtre.cpp:4525
 #, fuzzy
 msgid "Copying delta signature structure from the archive of reference: "
 msgstr "Beaktar det (första) referensarkivet:"
 
-#: src/libdar/filtre.cpp:4552
+#: src/libdar/filtre.cpp:4564
 msgid "Calculating delta signature from filesystem: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:4632
+#: src/libdar/filtre.cpp:4644
 #, c-format
 msgid ""
 "Furtive read mode requires either root permission and FOWNER capability, "

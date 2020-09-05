@@ -374,36 +374,47 @@ namespace libdar
 
 	    if(edition > 7)
 	    {
-		crc *coh = create_crc_from_file(f);
-
-		if(coh == nullptr)
-		    throw SRC_BUG;
 		try
 		{
-		    if(typeid(*coh) != typeid(*ctrl))
-		    {
-			if(coh->get_size() != ctrl->get_size())
-			    throw SRC_BUG;
-			else
-			    throw SRC_BUG; // both case lead to a bug, but we need to know which one is met
-		    }
+		    crc *coh = create_crc_from_file(f);
 
-		    if(*coh != *ctrl)
+		    if(coh == nullptr)
+			throw SRC_BUG;
+		    try
 		    {
-			if(lax_mode)
-			    dialog.message(gettext("Consistency check failed for archive header"));
-			else
-			    throw Erange("header_version::read", gettext("Consistency check failed for archive header"));
+			if(typeid(*coh) != typeid(*ctrl))
+			{
+			    if(coh->get_size() != ctrl->get_size())
+				throw SRC_BUG;
+			    else
+				throw SRC_BUG; // both case lead to a bug, but we need to know which one is met
+			}
+
+			if(*coh != *ctrl)
+			{
+			    if(lax_mode)
+				dialog.message(gettext("Consistency check failed for archive header"));
+			    else
+				throw Erange("header_version::read", gettext("Consistency check failed for archive header"));
+			}
 		    }
+		    catch(...)
+		    {
+			if(coh != nullptr)
+			    delete coh;
+			throw;
+		    }
+		    if(coh != nullptr)
+			delete coh;
 		}
 		catch(...)
 		{
-		    if(coh != nullptr)
-			delete coh;
-		    throw;
+		    if(!all_flags_known(flag))
+			dialog.message(gettext("Unknown flag found in archive header/trailer, ignoring the CRC mismatch possibly due to the unknown corresponding field"));
+		    else
+			throw;
 		}
-		if(coh != nullptr)
-		    delete coh;
+
 	    }
 	    if(initial_offset.is_zero())
 		initial_offset = f.get_position();
@@ -462,6 +473,9 @@ namespace libdar
 	if(flag[1] > 0)
 	    flag[1] |= FLAG_HAS_AN_EXTENDED_SIZE;
 	    // and we will drop two bytes for the flag
+
+	if(!all_flags_known( ( (U_I)(flag[1]) << 8 ) + flag[0]))
+	    throw SRC_BUG; // all_flag_known has not been updated with new flags
 
 	    // writing down the data
 
@@ -647,5 +661,20 @@ namespace libdar
 	clear_slice_layout();
     }
 
+
+    bool header_version::all_flags_known(U_I flag)
+    {
+	flag &= ~FLAG_SAVED_EA_ROOT;
+	flag &= ~FLAG_SAVED_EA_USER;
+	flag &= ~FLAG_SCRAMBLED;
+	flag &= ~FLAG_SEQUENCE_MARK;
+	flag &= ~FLAG_INITIAL_OFFSET;
+	flag &= ~FLAG_HAS_CRYPTED_KEY;
+	flag &= ~FLAG_HAS_REF_SLICING;
+	flag &= ~FLAG_HAS_AN_EXTENDED_SIZE;
+	flag &= ~FLAG_ARCHIVE_IS_SIGNED;
+	flag &= ~FLAG_HAS_KDF_PARAM;
+	return flag == 0;
+    }
 
 } // end of namespace
