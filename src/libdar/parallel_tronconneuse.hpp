@@ -93,8 +93,6 @@ namespace libdar
             /// \param[in] workers is the number of worker threads
             /// \param[in] block_size is the size of block encryption (the size of clear data encrypted toghether).
             /// \param[in] encrypted_side where encrypted data are read from or written to.
-            /// \param[in] no_initial_shift assume that no unencrypted data is located at the begining of the underlying file, else this is the
-            /// position of the encrypted_side at the time of this call that is used as initial_shift
             /// \param[in] reading_ver version of the archive format
             /// \param[in] ptr pointer to an crypto_module object that will be passed to the parallel_tronconneuse
             /// \note that encrypted_side is not owned and destroyed by tronconneuse, it must exist during all the life of the

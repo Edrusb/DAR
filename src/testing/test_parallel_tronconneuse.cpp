@@ -237,14 +237,12 @@ void f1()
     if(single_encr)
 	encry = make_unique<tronconneuse>(chain_size,
 					  *dst,
-					  true,
 					  macro_tools_supported_version,
 					  ptr1);
     else
 	encry = make_unique<parallel_tronconneuse>(2, // workers
 						   chain_size,
 						   *dst,
-						   true,
 						   macro_tools_supported_version,
 						   ptr1);
 
@@ -268,13 +266,11 @@ void f1()
 	decry = make_unique<parallel_tronconneuse>(2, // worker
 						   chain_size,
 						   *src,
-						   true,
 						   macro_tools_supported_version,
 						   ptr2);
     else
 	decry = make_unique<tronconneuse>(chain_size,
 					  *src,
-					  true,
 					  macro_tools_supported_version,
 					  ptr2);
 
@@ -318,13 +314,11 @@ void f2(const char *src, const char *dst, bool encrypt, U_I num, const char *pas
 	    tronco = make_unique<parallel_tronconneuse>(num,
 							block_size,
 							*dst_f,
-							false,
 							macro_tools_supported_version,
 							crypto);
 	else
 	    tronco = make_unique<tronconneuse>(block_size,
 					       *dst_f,
-					       false,
 					       macro_tools_supported_version,
 					       crypto);
     else
@@ -332,13 +326,11 @@ void f2(const char *src, const char *dst, bool encrypt, U_I num, const char *pas
 	    tronco = make_unique<parallel_tronconneuse>(num,
 							block_size,
 							*src_f,
-							false,
 							macro_tools_supported_version,
 							crypto);
 	else
 	    tronco = make_unique<tronconneuse>(block_size,
 					       *src_f,
-					       false,
 					       macro_tools_supported_version,
 					       crypto);
 
