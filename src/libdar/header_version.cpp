@@ -429,6 +429,9 @@ namespace libdar
 	    flag[1] |= FLAG_HAS_AN_EXTENDED_SIZE;
 	    // and we will drop two bytes for the flag
 
+	if(!all_flags_known( ( (U_I)(flag[1]) << 8 ) + flag[0]))
+	    throw SRC_BUG; // all_flag_known has not been updated with new flags
+
 	    // writing down the data
 
 	f.reset_crc(HEADER_CRC_SIZE);
