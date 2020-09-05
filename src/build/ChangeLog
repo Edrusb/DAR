@@ -1,11 +1,11 @@
 from 2.6.10 to 2.6.11
 - fixing bug in dar_manager libdar part, met when the two oldest entries
-  for a file are recoreded as unchanged (differential backup).
+  for a file are recorded as unchanged (differential backup).
 - fixed typo in dar_manager man page
-- updated lax mode to ignore encryption flag found in header and trailter
-- fixed two opposite bugs in strong encryption code that anihiliate
+- updated lax mode to ignore encryption flag found in header and trailer
+- fixed two opposite bugs in strong encryption code that annihilated
   each other, by chance
-- fixing bug met when merging an archive an recompressing the data
+- fixing bug met when merging an archive an re-compressing the data
   with another algorithm that gives a less good result, this condition
   lead the merging operation to fail reporting a CRC mismatch
 - improving archive header code to cope with unknown flags
