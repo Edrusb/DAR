@@ -1461,9 +1461,11 @@ namespace libdar
 		workers->gather(ones, flags);
 	    }
 
-
-	    if((ones.empty() || flags.empty()) && !error)
-		throw SRC_BUG;
+	    if(ones.empty() || flags.empty())
+	       if(!error)
+		   throw SRC_BUG;
+	       else
+		   end = true; // avoiding endless loop
 
 	    switch(static_cast<tronco_flags>(flags.front()))
 	    {
@@ -1473,9 +1475,6 @@ namespace libdar
 		    encrypted->write(ones.front()->crypted_data.get_addr(),
 				     ones.front()->crypted_data.get_data_size());
 		}
-		tas->put(move(ones.front()));
-		ones.pop_front();
-		flags.pop_front();
 		break;
 	    case tronco_flags::stop:
 	    case tronco_flags::eof:
@@ -1487,21 +1486,7 @@ namespace libdar
 		    // read num dies and push them back to tas
 		--num_w;
 		if(num_w == 0)
-		{
 		    end = true;
-		    if(!ones.empty())
-		    {
-			tas->put(ones);
-			ones.clear();
-			flags.clear();
-		    }
-		}
-		else
-		{
-		    tas->put(move(ones.front()));
-		    ones.pop_front();
-		    flags.pop_front();
-		}
 		break;
 	    case tronco_flags::exception_below:
 		if(!error)
@@ -1514,6 +1499,10 @@ namespace libdar
 		if(!error)
 		    throw SRC_BUG;
 	    }
+
+	    tas->put(move(ones.front()));
+	    ones.pop_front();
+	    flags.pop_front();
 	}
 	while(!end);
     }
