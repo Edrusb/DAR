@@ -1462,10 +1462,12 @@ namespace libdar
 	    }
 
 	    if(ones.empty() || flags.empty())
+	    {
 	       if(!error)
 		   throw SRC_BUG;
 	       else
 		   end = true; // avoiding endless loop
+	    }
 
 	    switch(static_cast<tronco_flags>(flags.front()))
 	    {
