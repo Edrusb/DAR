@@ -97,7 +97,7 @@ void f1(const shared_ptr<user_interaction> & dialog)
 						 true));
     if(!ptr)
 	throw Ememory("crypto_sym");
-    tronconneuse bf(10, fic, false, macro_tools_supported_version, ptr);
+    tronconneuse bf(10, fic, macro_tools_supported_version, ptr);
     char buffer[100] = "bonjour les amis il fait chaud il fait beau ! ";
 
     bf.write(buffer, strlen(buffer));
@@ -120,7 +120,7 @@ void f2(const shared_ptr<user_interaction> & dialog)
     if(!ptr)
 	throw Ememory("crypto_sym");
 
-    tronconneuse bf(10, fic, false, macro_tools_supported_version, ptr);
+    tronconneuse bf(10, fic, macro_tools_supported_version, ptr);
     char buffer[100];
     S_I lu;
     bool ret;

@@ -1477,10 +1477,17 @@ namespace libdar
 		}
 		break;
 	    case tronco_flags::stop:
-	    case tronco_flags::eof:
-	    case tronco_flags::data_error:
 		if(!error)
 		    throw SRC_BUG; // all data should be able to be compressed (even with no gain)
+		break;
+	    case tronco_flags::eof:
+		if(!error)
+		    throw SRC_BUG; // all data should be able to be compressed (even with no gain)
+		break;
+	    case tronco_flags::data_error:
+		    // error reported by a worker while encrypting
+		    // we ignore it and set the flag
+		error = true;
 		break;
 	    case tronco_flags::die:
 		    // read num dies and push them back to tas
