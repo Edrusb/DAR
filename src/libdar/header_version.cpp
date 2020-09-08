@@ -618,6 +618,7 @@ namespace libdar
 	flag &= ~FLAG_HAS_CRYPTED_KEY;
 	flag &= ~FLAG_HAS_REF_SLICING;
 	flag &= ~FLAG_HAS_AN_EXTENDED_SIZE;
+	flag &= ~(FLAG_HAS_AN_EXTENDED_SIZE << 8);
 	flag &= ~FLAG_ARCHIVE_IS_SIGNED;
 	flag &= ~FLAG_HAS_KDF_PARAM;
 	return flag == 0;

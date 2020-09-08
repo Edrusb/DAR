@@ -1,3 +1,6 @@
+from 2.6.11 to 2.6.12
+- fixed regression met in 2.6.11 when generating encrypted archives
+
 from 2.6.10 to 2.6.11
 - fixing bug in dar_manager libdar part, met when the two oldest entries
   for a file are recorded as unchanged (differential backup).
