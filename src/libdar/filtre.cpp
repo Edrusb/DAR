@@ -3569,11 +3569,11 @@ namespace libdar
 
 				    try
 				    {
-					changed = fic->get_last_modif() != tools_get_mtime(*dialog,
-											   info_quoi,
-											   true,
-											   true, // silently set to zero negative dates
-											   ignored_as_symlink);
+					changed = (fic->get_last_modif() != tools_get_mtime(*dialog,
+											    info_quoi,
+											    true,
+											    true, // silently set to zero negative dates
+											    ignored_as_symlink));
 				    }
 				    catch(Erange & e)
 				    {
