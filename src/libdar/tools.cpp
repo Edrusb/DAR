@@ -828,16 +828,24 @@ namespace libdar
 
     void tools_make_date(const std::string & chemin, bool symlink, const datetime & access, const datetime & modif, const datetime & birth)
     {
-#ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
-        struct timeval temps[2];
-#else
-        struct utimbuf temps;
-#endif
-        time_t tmp = 0;
-        time_t usec = 0;
         int ret;
+        time_t tmp = 0;
+        time_t frac = 0;
+	datetime::time_unit tunit;
 
-        if(!access.get_value(tmp, usec, datetime::tu_microsecond))
+#if LIBDAR_TIME_WRITE_ACCURACY == LIBDAR_TIME_ACCURACY_NANOSECOND
+	struct timespec nano[2];
+	tunit = datetime::tu_nanosecond;
+#else
+#if LIBDAR_TIME_WRITE_ACCURACY == LIBDAR_TIME_ACCURACY_MICROSECOND
+        struct timeval micro[2];
+	tunit = datetime::tu_microsecond;
+#else
+        struct utimbuf secs;
+	tunit = datetime::tu_second;
+#endif
+#endif
+        if(!access.get_value(tmp, frac, tunit))
             throw Erange("tools_make_date", "cannot set atime of file, value too high for the system integer type");
 
             // the first time, setting modification time to the value of birth time
@@ -847,70 +855,93 @@ namespace libdar
             // one is as expected older than mtime.
         else
         {
-#ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
-            temps[0].tv_sec = tmp;
-            temps[0].tv_usec = usec;
+#if LIBDAR_TIME_WRITE_ACCURACY == LIBDAR_TIME_ACCURACY_NANOSECOND
+	    nano[0].tv_sec = tmp;
+	    nano[0].tv_nsec = frac;
 #else
-            temps.actime = tmp;
+#if LIBDAR_TIME_WRITE_ACCURACY == LIBDAR_TIME_ACCURACY_MICROSECOND
+            micro[0].tv_sec = tmp;
+            micro[0].tv_usec = frac;
+#else
+            secs.actime = tmp;
+#endif
 #endif
         }
 
         if(birth != modif)
         {
-            if(!birth.get_value(tmp, usec, datetime::tu_microsecond))
+            if(!birth.get_value(tmp, frac, tunit))
                 throw Erange("tools_make_date", "cannot set birth time of file, value too high for the system integer type");
             else
             {
-#ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
-                temps[1].tv_sec = tmp;
-                temps[1].tv_usec = usec;
+#if LIBDAR_TIME_WRITE_ACCURACY == LIBDAR_TIME_ACCURACY_NANOSECOND
+		nano[1].tv_sec = tmp;
+		nano[1].tv_nsec = frac;
 #else
-                temps.modtime = tmp;
+#if LIBDAR_TIME_WRITE_ACCURACY == LIBDAR_TIME_ACCURACY_MICROSECOND
+                micro[1].tv_sec = tmp;
+                micro[1].tv_usec = frac;
+#else
+                secs.modtime = tmp;
+#endif
 #endif
             }
 
-#ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
+#if LIBDAR_TIME_WRITE_ACCURACY == LIBDAR_TIME_ACCURACY_NANOSECOND
+	    ret = utimensat(0, chemin.c_str(), nano, AT_SYMLINK_NOFOLLOW);
+#else
+#if LIBDAR_TIME_WRITE_ACCURACY == LIBDAR_TIME_ACCURACY_MICROSECOND
 #ifdef HAVE_LUTIMES
-            ret = lutimes(chemin.c_str(), temps);
+            ret = lutimes(chemin.c_str(), micro);
 #else
             if(symlink)
                 return; // not able to restore dates of symlinks
-            ret = utimes(chemin.c_str(), temps);
+            ret = utimes(chemin.c_str(), micro);
 #endif
 #else
             if(symlink)
                 return; // not able to restore dates of symlinks
-            ret = utime(chemin.c_str() , &temps);
+            ret = utime(chemin.c_str() , &secs);
+#endif
 #endif
             if(ret < 0)
                 Erange("tools_make_date", string(dar_gettext("Cannot set birth time: ")) + tools_strerror_r(errno));
         }
 
             // we set atime and mtime here
-        if(!modif.get_value(tmp, usec, datetime::tu_microsecond))
+        if(!modif.get_value(tmp, frac, tunit))
             throw Erange("tools_make_date", "cannot set last modification time of file, value too high for the system integer type");
         else
         {
-#ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
-            temps[1].tv_sec = tmp;
-            temps[1].tv_usec = usec;
+#if LIBDAR_TIME_WRITE_ACCURACY == LIBDAR_TIME_ACCURACY_NANOSECOND
+	    nano[1].tv_sec = tmp;
+	    nano[1].tv_nsec = frac;
 #else
-            temps.modtime = tmp;
+#if LIBDAR_TIME_WRITE_ACCURACY == LIBDAR_TIME_ACCURACY_MICROSECOND
+            micro[1].tv_sec = tmp;
+            micro[1].tv_usec = frac;
+#else
+            secs.modtime = tmp;
+#endif
 #endif
         }
 
-#ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
+#if LIBDAR_TIME_WRITE_ACCURACY == LIBDAR_TIME_ACCURACY_NANOSECOND
+	ret = utimensat(0, chemin.c_str(), nano, AT_SYMLINK_NOFOLLOW);
+#else
+#if LIBDAR_TIME_WRITE_ACCURACY == LIBDAR_TIME_ACCURACY_MICROSECOND
 #ifdef HAVE_LUTIMES
-        ret = lutimes(chemin.c_str(), temps);
+        ret = lutimes(chemin.c_str(), micro);
 #else
         if(symlink)
             return; // not able to restore dates of symlinks
-        ret = utimes(chemin.c_str(), temps);
+        ret = utimes(chemin.c_str(),m icro);
 #endif
 #else
         if(symlink)
             return; // not able to restore dates of symlinks
-        ret = utime(chemin.c_str() , &temps);
+        ret = utime(chemin.c_str() , &secs);
+#endif
 #endif
         if(ret < 0)
             throw Erange("tools_make_date", string(dar_gettext("Cannot set last access and last modification time: ")) + tools_strerror_r(errno));
@@ -1292,14 +1323,18 @@ namespace libdar
             throw Erange("tools_get_mtime", tools_printf(dar_gettext("Cannot get last modification date: %s"), tmp.c_str()));
         }
 
-#ifdef LIBDAR_MICROSECOND_READ_ACCURACY
+#if LIBDAR_TIME_READ_ACCURACY == LIBDAR_TIME_ACCURACY_MICROSECOND || LIBDAR_TIME_READ_ACCURACY == LIBDAR_TIME_ACCURACY_NANOSECOND
 	tools_check_negative_date(buf.st_mtim.tv_sec,
 				  dialog,
 				  s.c_str(),
 				  "mtime",
 				  auto_zeroing,
 				  silent);
-        datetime val = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec/1000, datetime::tu_microsecond);
+#if LIBDAR_TIME_READ_ACCURACY == LIBDAR_TIME_ACCURACY_MICROSECOND
+	datetime val = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec/1000, datetime::tu_microsecond);
+#else
+        datetime val = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec, datetime::tu_nanosecond);
+#endif
         if(val.is_null() && !auto_zeroing) // assuming an error avoids getting time that way
             val = datetime(buf.st_mtime, 0, datetime::tu_second);
 #else
