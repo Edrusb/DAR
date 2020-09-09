@@ -1436,7 +1436,7 @@ void line_tools_check_basename(user_interaction & dialog, const path & loc, stri
     NLS_SWAP_IN;
     try
     {
-	regular_mask suspect(string(".+\\.[1-9][0-9]*\\.")+extension, true);
+	regular_mask suspect(string(".+\\.[0-9][0-9]*\\.")+extension, true);
 	string old_path = (loc.append(base)).display();
 
 	    // is basename is suspect ?
