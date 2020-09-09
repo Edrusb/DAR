@@ -3610,17 +3610,20 @@ namespace libdar
 						else
 						    try_skip = true;
 
-						if(try_skip && pdesc.stack->skippable(generic_file::skip_backward, storage_size))
+						if(try_skip)
 						{
-						    if(!pdesc.stack->skip(start))
+						    if(pdesc.stack->skippable(generic_file::skip_backward, storage_size))
 						    {
-							if(!pdesc.stack->skip(current_repeat_count))
-							    throw SRC_BUG;
-							throw Erange("",""); // used locally
+							if(!pdesc.stack->skip(start))
+							{
+							    if(!pdesc.stack->skip(start))
+								throw SRC_BUG;
+							    throw Erange("",""); // used locally
+							}
 						    }
+						    else
+							throw Erange("",""); // used locally, not propagated over this try / catch block
 						}
-						else
-						    throw Erange("",""); // used locally, not propagated over this try / catch block
 					    }
 					    catch(...)
 					    {
