@@ -175,7 +175,7 @@ namespace libdar
 	    }
 	    else
 	    {
-#ifdef LIBDAR_MICROSECOND_READ_ACCURACY
+#if LIBDAR_TIME_READ_ACCURACY == LIBDAR_TIME_ACCURACY_MICROSECOND || LIBDAR_TIME_READ_ACCURACY == LIBDAR_TIME_ACCURACY_NANOSECOND
 		tools_check_negative_date(buf.st_atim.tv_sec,
 					  get_ui(),
 					  ptr_name,
@@ -194,9 +194,16 @@ namespace libdar
 					  gettext("ctime, inode change time"),
 					  ask_before_zeroing_neg_dates,
 					  false); // not silent
+#if LIBDAR_TIME_READ_ACCURACY == LIBDAR_TIME_ACCURACY_MICROSECOND
+		    /* saving some place in archive not recording nanosecond time fraction */
 		datetime atime = datetime(buf.st_atim.tv_sec, buf.st_atim.tv_nsec/1000, datetime::tu_microsecond);
 		datetime mtime = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec/1000, datetime::tu_microsecond);
 		datetime ctime = datetime(buf.st_ctim.tv_sec, buf.st_ctim.tv_nsec/1000, datetime::tu_microsecond);
+#else
+		datetime atime = datetime(buf.st_atim.tv_sec, buf.st_atim.tv_nsec, datetime::tu_nanosecond);
+		datetime mtime = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec, datetime::tu_nanosecond);
+		datetime ctime = datetime(buf.st_ctim.tv_sec, buf.st_ctim.tv_nsec, datetime::tu_nanosecond);
+#endif
 
 		if(atime.is_null()) // assuming an error avoids getting time that way
 		    atime = datetime(buf.st_atime, 0, datetime::tu_second);

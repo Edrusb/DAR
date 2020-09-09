@@ -655,14 +655,18 @@ namespace libdar
 	else
 	{
 	    fsa_time * ptr = nullptr;
-#ifdef LIBDAR_MICROSECOND_READ_ACCURACY
+#if LIBDAR_TIME_READ_ACCURACY == LIBDAR_TIME_ACCURACY_MICROSECOND || LIBDAR_TIME_READ_ACCURACY == LIBDAR_TIME_ACCURACY_NANOSECOND
 	    tools_check_negative_date(tmp.st_birthtim.tv_sec,
 				      ui,
 				      target.c_str(),
 				      "birthtime",
 				      !auto_zeroing_neg_dates,
 				      auto_zeroing_neg_dates);
+#if LIBDAR_TIME_READ_ACCURACY == LIBDAR_TIME_ACCURACY_MICROSECOND
 	    datetime birthtime = datetime(tmp.st_birthtim.tv_sec, tmp.st_birthtim.tv_nsec/1000, datetime::tu_microsecond);
+#else
+	    datetime birthtime = datetime(tmp.st_birthtim.tv_sec, tmp.st_birthtim.tv_nsec, datetime::tu_nanosecond);
+#endif
 	    if(birthtime.is_null()) // assuming an error avoids getting time that way
 		birthtime = datetime(tmp.st_birthtime, 0, datetime::tu_second);
 #else
