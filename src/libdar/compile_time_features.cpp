@@ -217,7 +217,7 @@ namespace libdar
 
 	bool microsecond_read() noexcept
 	{
-#if LIBDAR_TIME_READ_ACCURACY == US || LIBDAR_TIME_READ_ACCURACY == NS
+#if LIBDAR_TIME_READ_ACCURACY == LIBDAR_TIME_ACCURACY_MICROSECOND || LIBDAR_TIME_READ_ACCURACY == LIBDAR_TIME_ACCURACY_NANOSECOND
 	    return true;
 #else
 	    return false;
@@ -226,7 +226,7 @@ namespace libdar
 
 	bool nanosecond_read() noexcept
 	{
-#if LIBDAR_TIME_READ_ACCURACY == NS
+#if LIBDAR_TIME_READ_ACCURACY == LIBDAR_TIME_ACCURACY_NANOSECOND
 	    return true;
 #else
 	    return false;
@@ -236,7 +236,7 @@ namespace libdar
 
 	bool microsecond_write() noexcept
 	{
-#if LIBDAR_TIME_WRITE_ACCURACY == US || LIBDAR_TIME_WRITE_ACCURACY == NS
+#if LIBDAR_TIME_WRITE_ACCURACY == LIBDAR_TIME_ACCURACY_MICROSECOND || LIBDAR_TIME_WRITE_ACCURACY == LIBDAR_TIME_ACCURACY_NANOSECOND
 	    return true;
 #else
 	    return false;
@@ -245,7 +245,7 @@ namespace libdar
 
 	bool nanosecond_write() noexcept
 	{
-#if LIBDAR_TIME_WRITE_ACCURACY == NS
+#if LIBDAR_TIME_WRITE_ACCURACY == LIBDAR_TIME_ACCURACY_NANOSECOND
 	    return true;
 #else
 	    return false;
