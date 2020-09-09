@@ -1197,7 +1197,9 @@ PYBIND11_MODULE(libdar, mod)
 	static bool FSA_linux_extX() noexcept { return libdar::compile_time::FSA_linux_extX(); };
 	static bool FSA_birthtime() noexcept { return libdar::compile_time::FSA_birthtime(); };
 	static bool microsecond_read() noexcept { return libdar::compile_time::microsecond_read(); };
+	static bool nanosecond_read() noexcept { return libdar::compile_time::nanosecond_read(); };
 	static bool microsecond_write() noexcept { return libdar::compile_time::microsecond_write(); };
+	static bool nanosecond_write() noexcept { return libdar::compile_time::nanosecond_write(); };
 	static bool symlink_restore_dates() noexcept { return libdar::compile_time::symlink_restore_dates(); };
 	static bool public_key_cipher() noexcept { return libdar::compile_time::public_key_cipher(); };
 	static bool libthreadar() noexcept { return libdar::compile_time::libthreadar(); };
