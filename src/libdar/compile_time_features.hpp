@@ -113,11 +113,17 @@ namespace libdar
 	    /// returns whether libdar has been built with support for HFS+ FSA
 	bool FSA_birthtime() noexcept;
 
-	    /// returns whether libdar is able to read timestamps at a microsecond accuracy
+	    /// returns whether libdar is able to read timestamps at least at microsecond accuracy
 	bool microsecond_read() noexcept;
 
-	    /// returns whether libdar is able to write timestamps at a microsecond accuracy
+	    /// returns whether libdar is able to read timestamps at least at nanosecond accuracy
+	bool nanosecond_read() noexcept;
+
+	    /// returns whether libdar is able to write timestamps at least at microsecond accuracy
 	bool microsecond_write() noexcept;
+
+	    /// returns whether libdar is able to write timestamps at least at nanosecond accuracy
+	bool nanosecond_write() noexcept;
 
 	    /// returns whether libdar is able to restore dates of symlinks
 	bool symlink_restore_dates() noexcept;
