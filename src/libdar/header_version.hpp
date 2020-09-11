@@ -134,6 +134,7 @@ namespace libdar
 
 	    // FLAG VALUES
 
+	    // flags of the historical bytes (oldest), read/wrote last (or alone if no extra bits are set)
 	static constexpr U_I FLAG_SAVED_EA_ROOT = 0x80;      ///< no more used since version "05"
 	static constexpr U_I FLAG_SAVED_EA_USER = 0x40;      ///< no more used since version "05"
 	static constexpr U_I FLAG_SCRAMBLED     = 0x20;      ///< scrambled or strong encryption used
@@ -141,9 +142,15 @@ namespace libdar
 	static constexpr U_I FLAG_INITIAL_OFFSET = 0x08;     ///< whether the header contains the initial offset (size of clear data before encrypted) NOTE : This value is set internally by header_version, no need to set flag with it! But that's OK to set it or not, it will be updated according to initial_offset's value.
 	static constexpr U_I FLAG_HAS_CRYPTED_KEY = 0x04;    ///< the header contains a symmetrical key encrypted with asymmetrical algorithm
 	static constexpr U_I FLAG_HAS_REF_SLICING = 0x02;    ///< the header contains the slicing information of the archive of reference (used for isolated catalogue)
+
+	    // if flag is two bytes long, the first byte read/wrote has this bit set
 	static constexpr U_I FLAG_HAS_AN_EXTENDED_SIZE = 0x01; ///< the flag is two bytes length
-	static constexpr U_I FLAG_ARCHIVE_IS_SIGNED = 0x0200;  ///< archive is signed
+
+	    // flags of the new byte (read/wrote before the historical byte)
+	static constexpr U_I FLAG_ARCHIVE_IS_SIGNED = 0x0200; ///< archive is signed
 	static constexpr U_I FLAG_HAS_KDF_PARAM = 0x0400;     ///< archive header contains salt and non default interaction count
+
+	    // if the flag is three or more bytes long, these bits are set in the first and second bytes
 	static constexpr U_I FLAG_HAS_AN_SECOND_EXTENDED_SIZE = 0x0101; ///< reserved for future use
 
 	    //
