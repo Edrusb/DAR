@@ -25,3 +25,11 @@ a helper script to get the date past N dates
 - date_past_N_days
 and can be used as dar -c <backup> -af -A `date_past_N_days 3` ...
 this will only save file that have changed in the last 3 days
+
+a script building a script to ease dar/libdar removal out of any
+package maintenance.
+- make_uninstall_script
+
+a script that build both a tar.gz of dar binary and corresponding
+script to cleanly remove it from the system:
+- build_tar_and_uninstall

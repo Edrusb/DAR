@@ -1,0 +1,36 @@
+#!/bin/bash
+
+if [ -z "$1" -o -z "$2" ] ; then
+    echo "usage: $0 <DESTDIR installed software> <script name>"
+    echo ""
+    echo "builds a scripts to remove later the files"
+    echo "that are installed by the dar extracted file"
+    echo "located at the provided path"
+    echo ""
+    echo "the target is a distro-agnostic way to installation"
+    echo "and remove the dar/libdar software on a customized"
+    echo "system. Note that this can apply to any software"
+    echo "supporting the DESTDIR make variable with the install"
+    echo "or install-strip targets."
+    echo ""
+    echo "example of use with dar:"
+    echo "    mkdir tmp/build"
+    echo "    make DESTDIR=/tmp/build install-strip"
+    echo "    $0 /tmp/build uninstall_script.sh"
+    echo "    cd /tmp/build"
+    echo "    tar -czf ../dar.binary.tar.gz usr"
+    echo "On an host where not dev tools are present:"
+    echo "    cd /"
+    echo "    tar -xf dar.binary.tar.gz"
+    echo "this will install the dar software"
+    echo "    cd /"
+    echo "    source uninstall_script.sh"
+    echo "this will remove the previously installed software"
+    echo ""
+    exit 1
+fi
+
+target=`realpath "$2"`
+
+cd "$1"
+exec find . -depth -name "." -o \( -type d -exec echo rmdir --ignore-fail-on-non-empty {} \; \) -o -exec echo rm -f {} \; > "$target"
