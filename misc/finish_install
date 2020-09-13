@@ -1,0 +1,65 @@
+#!/bin/bash
+
+if [ -z "$1" -o -z "$2" -o -z "$3" -o -z "$4" ] ; then
+    echo "usage: $0 <path to dar_static> <dar archive> <temporary directory> <name of the uninstall script to build> [<target install dir>]"
+    exit 1
+fi
+
+dar_static=`realpath "$1"`
+source=`realpath "$2"`
+tmpdir=`realpath "$3"`
+uninst=`realpath "$4"`
+destin="$5"
+
+if [ -z "$destin" ] ; then
+    destin="/"
+    destprefix=""
+else
+    destin=`realpath "$destin"`
+    destprefix="$destin"
+fi
+
+inst="$uninst.tmp"
+
+if [ -e "$tmpdir" ] ; then
+    echo "$tmpdir already exists, aborting"
+    exit 2
+else
+    mkdir -p "$tmpdir"
+fi
+
+if ! $dar_static -x "$source" -R "$tmpdir" -O -w -q -Q -u "system.nfs4_acl" ; then
+    echo "failed restoring $source to $tmpdir, $dar_static returned $?"
+    exit 2
+fi
+
+cat < /dev/null > "$uninst"
+cat < /dev/null > "$inst"
+
+cd "$tmpdir"
+for f in `find . -depth | sed -r 's#^./##'` ; do
+    if [ ! -e "$desprefix/$f" ] ; then
+	if [ -d "./$f" ] ; then
+	    echo "rmdir --ignore-fail-on-non-empty \"$destprefix/$f\"" >> "$uninst"
+	else
+	    echo "rm -f \"$destprefix/$f\"" >> "$uninst"
+	    echo "$destprefix/$f" >> "$inst"
+	fi
+    else
+	if [ ! -d "$destprefix/$f" ] ; then
+	    echo "File to install $destprefix/$f already exists, aborting"
+	    exit 2
+	fi
+    fi
+done
+
+if ! $dar_static -x "$source" "-[" "$inst" -R "$destin" -O -n -q -Q -u "system.nfs4_acl" ; then
+    echo "failed restoring $source with filter to $destin, $dar_static returned $?"
+    rm -f "$inst" "$uninst"
+    rm -rf "$tmpdir"
+else
+    rm -f "$inst"
+    rm -rf "$tmpdir"
+fi
+
+ldconfig

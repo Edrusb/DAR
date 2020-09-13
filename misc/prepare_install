@@ -1,0 +1,60 @@
+#!/bin/bash
+
+if [ -z "$1" ] ; then
+    echo "usage: <tmpdir>"
+    exit 1
+fi
+
+tmpdir=`realpath "$1"`
+curdir=`pwd`
+parentdirname=`basename "$curdir"`
+suffix=`uname -m`
+
+if [ `dirname "$0"` != "misc" ] ; then
+    echo "$0 should be run from the root directory of the dar/libdar source extracted package"
+    echo "example: misc/`basename $0`"
+    exit 2
+fi
+
+if [ ! src/dar_suite/dar ] ; then
+    echo "dar within this package must first be built with ./configure and make"
+    exit 2
+fi
+
+if [ -e "$tmpdir" ] ; then
+    echo "temporary build dir $tmpdir already exists, aborting"
+    exit 2
+else
+    mkdir "$tmpdir"
+fi
+
+umask 022
+if ! make DESTDIR="$tmpdir" install-strip ; then
+    echo "failed installing dar in $tmpdir"
+    exit 2
+fi
+
+target="$parentdirname-binary-$suffix"
+
+if src/dar_suite/dar -c "$curdir/$target" -N -R "$tmpdir" -q -Q ; then
+    echo ""
+    echo ""
+    echo "you can now copy:"
+    echo "  - $target.1.dar file"
+    echo "  - dar_static binary"
+    echo "  - and the misc/finish_install script"
+    echo "to a host that has no dev tools and no specific package management tool."
+    echo ""
+    echo "there you can run:"
+    echo ""
+    echo "   ./finish_install ./dar_static ./$target /tmp uninstall-$target"
+    echo ""
+    echo "keep the uninstall-$target file that will then be generated for you can"
+    echo "later remove what has been installed (software upgrade), running the"
+    echo "following command:"
+    echo ""
+    echo "   source ./uninstall-$target"
+    echo ""
+fi
+
+rm -rf "$tmpdir"
