@@ -1,0 +1,25 @@
+#!/bin/bash
+
+if [ -z "$1" ] ; then
+    echo "usage <temporary build dir>"
+    exit 1
+fi
+
+if [ `dirname "$0"` != "misc" ] ; then
+    echo "$0 should be run from the root directory of the dar/libdar source extracted package"
+    echo "example: misc/`basename $0`"
+    exit 2
+fi
+
+tmpdir="$1"
+curdir=`pwd`
+parentdirname=`basename "$curdir"`
+suffix=`uname -m`
+
+if [ -e "$tmdir" ] ; then
+    echo "temporary build dir $tmpdir already exists, aborting"
+    exit 3
+fi
+
+mkdir -p "$tmpdir" && make DESTDIR="$tmpdir" install-strip && cd "$tmpdir" && tar -czf "$curdir/${parentdirname}-binary-$suffix.tar.gz" . && $curdir/misc/make_uninstall_script $tmpdir $curdir/${parentdirname}-uninstall-binary-$suffix.sh && cd "$curdir" && rm -rf "$tmpdir" && echo "Building completed, see current directory" || echo "Building failed..."
+

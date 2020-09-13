@@ -27,3 +27,11 @@ problem is under investigation...
 - dar_check
 and an helper script to test dar_check
 - failer
+
+a script building a script to ease dar/libdar removal out of any
+package maintenance.
+- make_uninstall_script
+
+a script that build both a tar.gz of dar binary and corresponding
+script to cleanly remove it from the system:
+- build_tar_and_uninstall
