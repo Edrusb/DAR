@@ -1,0 +1,29 @@
+#!/bin/bash
+
+if [ -z "$1" ] ; then
+    echo "usage: $0 <command>"
+    echo ""
+    echo "example: $0 ./failer 3"
+    exit 1
+fi
+
+loopit=0
+sleeptime=10
+
+while ! $* ; do
+    loopit=$(( $loopit + 1 ))
+    echo "Failure number $loopit. Sleeping $sleeptime seconds and retring"
+    sleep $sleeptime
+done
+
+reset
+if [ $loopit -eq 0 ] ; then
+    echo "The command [$*] has completed without retry"
+else
+    printf "The command [$*] has completed but needed $loopit retr"
+    if [ $loopit -gt 1 ] ; then
+	echo "ies"
+    else
+	echo "y"
+    fi
+fi

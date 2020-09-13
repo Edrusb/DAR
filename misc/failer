@@ -1,0 +1,34 @@
+#!/bin/bash
+
+tmpfile=./tmp.failure.file
+
+if [ -z "$1" ] ; then
+    echo "usage: $0 <number>"
+    echo ""
+    echo "will create $tmpfile and store <number> in it, then fail."
+    echo "If $tmpfile is already created the <number> in it"
+    echo "will be decremented by one and $0 will fail again,"
+    echo "up to the time the stored value reaches zero,"
+    echo "at which time $tmpfile will be removed and $0"
+    echo "will succeed"
+    exit 1
+fi
+
+if [ ! -f "$tmpfile" ] ; then
+    if [ $1 -gt 0 ] ; then
+	echo $1 > "$tmpfile"
+	exit 1
+    else
+	exit 0
+    fi
+else
+    val=$(( `cat "$tmpfile"` - 1 ))
+    if [ $val -gt 0 ] ; then
+	echo $val > "$tmpfile"
+	exit 1
+    else
+	rm -f "$tmpfile"
+	exit 0
+    fi
+fi
+

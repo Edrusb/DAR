@@ -10,7 +10,7 @@ What will you find in this directory?
 many script that help(ed) build the releases:
 - batch_cygwin
 - batch_linux
-- match_linux_ea
+- batch_linux_ea
 - make_cygwin_dist
 
 a helper program to translate documentation to DOS/Windows text format
@@ -21,7 +21,9 @@ a helper program to list argument passed to a given command
 This one was used on dar-support mailing-list to troubleshoot
 arguments passed to dar from a user defined script
 
-a helper script to get the date past N dates
-- date_past_N_days
-and can be used as dar -c <backup> -af -A `date_past_N_days 3` ...
-this will only save file that have changed in the last 3 days
+a heler script to run make check, which failes from time to time
+for some reason related to libgcrypt at archive creating time,
+problem is under investigation...
+- dar_check
+and an helper script to test dar_check
+- failer
