@@ -28,7 +28,7 @@ else
     mkdir -p "$tmpdir"
 fi
 
-if ! $dar_static -x "$source" -R "$tmpdir" -O -w -q -Q -u "system.nfs4_acl" ; then
+if ! $dar_static -x "$source" -R "$tmpdir" -O -w -q -Q -u "system.nfs4_acl" -N ; then
     echo "failed restoring $source to $tmpdir, $dar_static returned $?"
     exit 2
 fi
@@ -53,7 +53,7 @@ for f in `find . -depth | sed -r 's#^./##'` ; do
     fi
 done
 
-if ! $dar_static -x "$source" "-[" "$inst" -R "$destin" -O -n -q -Q -u "system.nfs4_acl" ; then
+if ! $dar_static -x "$source" "-[" "$inst" -R "$destin" -O -n -q -Q -u "system.nfs4_acl" -N ; then
     echo "failed restoring $source with filter to $destin, $dar_static returned $?"
     rm -f "$inst" "$uninst"
     rm -rf "$tmpdir"
