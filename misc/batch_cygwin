@@ -28,7 +28,7 @@ if(! -f configure) then
 endif
 
 if("$1" == "") then
-   echo "usage: $0 <version> {win32|win64} [options to dar]"
+   echo "usage: $0 <version> {win32|win64} [options to make]"
    exit
 endif
 
