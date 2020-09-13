@@ -21,11 +21,6 @@ a helper program to list argument passed to a given command
 This one was used on dar-support mailing-list to troubleshoot
 arguments passed to dar from a user defined script
 
-a helper script to get the date past N dates
-- date_past_N_days
-and can be used as dar -c <backup> -af -A `date_past_N_days 3` ...
-this will only save file that have changed in the last 3 days
-
 a script building a script to ease dar/libdar removal out of any
 package maintenance.
 - make_uninstall_script
