@@ -21,6 +21,10 @@ from 2.6.x to 2.7.0
   available (see both -G and -z option extended syntax).
 - added lz4 compression algorithm.
 - removed some deprecaded old options (--gzip,...)
+- increased timestamp precision from microsecond to nanosecond when the
+  operating system supports it. It is still possible to use configure's
+  --enable-limit-time-accuracy=us at compilation time to use microsecond
+  or even second accuracy even if the OS can support finer precision.
 
 from 2.6.11 to 2.6.12
 - fixed regression met in 2.6.11 when generating encrypted archives
