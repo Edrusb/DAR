@@ -69,7 +69,7 @@ int main(S_I argc, char *argv[])
     }
 
     fichier_local f1 = fichier_local(ui, argv[1], gf_read_only, 0, false, false, false);
-    S_I fd = ::open(argv[2], O_WRONLY|O_CREAT|O_TRUNC|O_BINARY);
+    S_I fd = ::open(argv[2], O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
     if(fd < 0)
     {
         cout << "cannot open "<< argv[2] << endl;
