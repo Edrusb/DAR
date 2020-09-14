@@ -794,7 +794,7 @@ namespace libdar
 						// don't backup if doing a snapshot
 					    || (!fixed_date.is_zero() && e_ino != nullptr &&  e_ino->ea_get_saved_status() != ea_saved_status::none && e_ino->get_last_change() < fixed_date)
 						// don't backup if older than given date (if reference date given)
-					    || (fixed_date.is_zero() && e_ino != nullptr && e_ino->ea_get_saved_status() == ea_saved_status::full && f_ino != nullptr && f_ino->ea_get_saved_status() != ea_saved_status::none && e_ino->get_last_change() <= f_ino->get_last_change())
+					    || (fixed_date.is_zero() && e_ino != nullptr && e_ino->ea_get_saved_status() == ea_saved_status::full && f_ino != nullptr && f_ino->ea_get_saved_status() != ea_saved_status::none && (e_ino->get_last_change() <= f_ino->get_last_change() || e_ino->get_last_change().loose_equal(f_ino->get_last_change())) )
 						// don't backup if doing differential backup and entry is the same as the one in the archive of reference
 					    ;
 
@@ -803,7 +803,7 @@ namespace libdar
 						// don't backup if doing a snapshot
 					    || (!fixed_date.is_zero() && e_ino != nullptr && e_ino->fsa_get_saved_status() != fsa_saved_status::none && e_ino->get_last_change() < fixed_date)
 						// don't backup if older than given date (if reference date given)
-					    || (fixed_date.is_zero() && e_ino != nullptr && e_ino->fsa_get_saved_status() == fsa_saved_status::full && f_ino != nullptr && f_ino->fsa_get_saved_status() != fsa_saved_status::none && e_ino->get_last_change() <= f_ino->get_last_change())
+						|| (fixed_date.is_zero() && e_ino != nullptr && e_ino->fsa_get_saved_status() == fsa_saved_status::full && f_ino != nullptr && f_ino->fsa_get_saved_status() != fsa_saved_status::none && (e_ino->get_last_change() <= f_ino->get_last_change() || e_ino->get_last_change().loose_equal(f_ino->get_last_change())) )
 						// don't backup if doing differential backup and entry is the same as the one in the archive of reference
 					    ;
 
