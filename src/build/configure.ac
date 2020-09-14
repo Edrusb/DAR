@@ -330,7 +330,58 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                    [ AC_MSG_RESULT([not available])
                    ])
 
-AC_MSG_CHECKING([for the possibility to set timestamps at a microsecond precision])
+
+local_time_accuracy_second=0;
+local_time_accuracy_microsecond=6
+local_time_accuracy_nanosecond=9
+AC_DEFINE_UNQUOTED(LIBDAR_TIME_ACCURACY_SECOND, $local_time_accuracy_second, [value for time accuracy representing an accuracy of 1 second])
+AC_DEFINE_UNQUOTED(LIBDAR_TIME_ACCURACY_MICROSECOND, $local_time_accuracy_microsecond, [value for time accuracy representing an accuracy of 1 microsecond])
+AC_DEFINE_UNQUOTED(LIBDAR_TIME_ACCURACY_NANOSECOND, $local_time_accuracy_nanosecond, [value for time accuracy representing an accuracy of 1 nanosecond])
+
+
+AC_ARG_ENABLE( [limit-time-accuracy],
+	       AS_HELP_STRING(--enable-limit-time-accuracy, [limit time accuracy to nanosecond (ns) microsecond (us) or second (s)]),
+	       [
+		AS_IF(  [ test "x$enable_limit_time_accuracy" != "xs" -a "x$enable_limit_time_accuracy" != "xus" -a "x$enable_limit_time_accuracy" != "xns" ],
+			[ AC_MSG_ERROR([invalid argument given to --enable-limit-time-accuracy, valide values are : s, us, ns])],
+			[ AC_MSG_WARN([limiting time accuracy to $enable_limit_time_accuracy])]
+			)
+	       ],
+	       [ enable_limit_time_accuracy=no ])
+
+
+AC_MSG_CHECKING([for the timestamps write precision])
+
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
+				     #if HAVE_FCNTL_H
+				     #include <fcntl.h>
+				     #endif
+			             #if HAVE_SYS_STAT_H
+                                     #include <sys/stat.h>
+                                     #endif
+				   }]],
+				   [[
+					struct timespec a[2];
+					a[0].tv_sec = 0;
+					a[1].tv_nsec = 1;
+					(void)utimensat(0, "/tmp/testfile", a,  0);
+					/* not that this test program is only compiled+lined not executed */
+				   ]])
+	          ],
+		  [
+			AS_IF([ test "x$enable_limit_time_accuracy" = "xs" -o "x$enable_limit_time_accuracy" = "xus" ],
+			      [
+			        local_time_write_accuracy=-1
+			      ],
+			      [
+   			        local_time_write_accuracy=$local_time_accuracy_nanosecond
+    			        AC_MSG_RESULT([1 nanosecond])
+			      ])
+	          ],
+		  [
+		        local_time_write_accuracy=-1
+		  ])
+
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                                      #if HAVE_SYS_TYPES_H
                                      #include <sys/types.h>
@@ -359,14 +410,31 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                                      ]])
                   ],
                   [
-                    AC_DEFINE(LIBDAR_MICROSECOND_WRITE_ACCURACY, 1, [support for timestamps microsecond write accuracy])
-                    local_microsecond_write=yes
-                    AC_MSG_RESULT(available)
+		    AS_IF([ test $local_time_write_accuracy -eq -1 ],
+		    	  AS_IF([ test "x$enable_limit_time_accuracy" != "xs" ],
+		                [
+			            local_time_write_accuracy=$local_time_accuracy_microsecond
+                    	            AC_MSG_RESULT([1 microsecond])
+			        ],
+			        [
+		    	            local_time_write_accuracy=$local_time_accuracy_second
+			            AC_MSG_RESULT([1 second])
+			        ])
+			)
                   ],
-                  [ AC_MSG_RESULT([not available])
+                  [
+		    AS_IF([ test $local_time_write_accuracy -eq -1 ],
+		          [
+			      local_time_write_accuracy=$local_time_accuracy_second
+			      AC_MSG_RESULT([1 second])
+			  ])
                   ])
 
-AC_MSG_CHECKING([for the possibility to read timestamps at a microsecond precision])
+
+AC_DEFINE_UNQUOTED(LIBDAR_TIME_WRITE_ACCURACY, $local_time_write_accuracy, [timestamps write accuracy])
+
+AC_MSG_CHECKING([for the timestamps read precision])
+
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                                      #if HAVE_SYS_TYPES_H
                                      #include <sys/types.h>
@@ -380,11 +448,6 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                                      }]],
                                      [[
                                        struct stat st;
-                                        /* tv_nsec is nanosecond, but for now we
-                                           do not keep more precised timing than microseconds
-                                           because we have not portable way to restore nanoseconds
-                                           but only seconds and microsecond
-                                        */
                                        if(st.st_atim.tv_nsec != 0)
                                          return 0;
                                        else
@@ -393,12 +456,29 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                                      ]])
                  ],
                  [
-                    AC_DEFINE(LIBDAR_MICROSECOND_READ_ACCURACY, 1, [support for timestamps microsecond read accuracy])
-                    local_microsecond_read=yes
-                    AC_MSG_RESULT(available)
+			AS_IF([ test "x$enable_limit_time_accuracy" = "xus" ],
+			      [
+			          local_time_read_accuracy=$local_time_accuracy_microsecond
+				  AC_MSG_RESULT([1 microsecond])
+			      ],
+			      [
+			         AS_IF([ test "x$enable_limit_time_accuracy" = "xs" ],
+				       [
+					    local_time_read_accuracy=$local_time_accuracy_second
+				            AC_MSG_RESULT([1 second])
+				       ],
+				       [
+				            local_time_read_accuracy=$local_time_accuracy_nanosecond
+					    AC_MSG_RESULT([1 nanosecond])
+				       ])
+			      ])
                   ],
-                  [ AC_MSG_RESULT([not available])
+                  [
+		    local_time_read_accuracy=$local_time_accuracy_second
+		    AC_MSG_RESULT([1 second])
                   ])
+
+AC_DEFINE_UNQUOTED(LIBDAR_TIME_READ_ACCURACY, $local_time_read_accuracy, [timestamps read accuracy])
 
 
 AC_MSG_CHECKING([for lutimes() availability])
@@ -2046,18 +2126,28 @@ else
     echo "NO"
 fi
 
-printf "   microsecond read accuracy  : "
-if [ "$local_microsecond_read" = "yes" ] ; then
-    echo "YES"
+printf "   timepstamps write accuracy : "
+
+if [ $local_time_write_accuracy -eq $local_time_accuracy_nanosecond ] ; then
+   echo "1 nanosecond"
 else
-    echo "NO"
+   if [ $local_time_write_accuracy -eq $local_time_accuracy_microsecond ] ; then
+       echo "1 microsecond"
+   else
+       echo "1 second"
+   fi
 fi
 
-printf "   microsecond write accuracy : "
-if [ "$local_microsecond_write" = "yes" ] ; then
-    echo "YES"
+printf "   timestamps read accuracy   : "
+
+if [ $local_time_read_accuracy -eq $local_time_accuracy_nanosecond ] ; then
+   echo "1 nanosecond"
 else
-    echo "NO"
+   if [ $local_time_read_accuracy -eq $local_time_accuracy_microsecond ] ; then
+       echo "1 microsecond"
+   else
+       echo "1 second"
+   fi
 fi
 
 printf "   can restore symlink dates  : "

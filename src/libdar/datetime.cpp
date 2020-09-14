@@ -145,10 +145,14 @@ namespace libdar
 
     datetime datetime::loose_diff(const datetime & ref) const
     {
-#if LIBDAR_MICROSECOND_READ_ACCURACY && LIBDAR_MICROSECOND_WRITE_ACCURACY
+#if LIBDAR_TIME_READ_ACCURACY >= LIBDAR_TIME_ACCURACY_NANOSECOND && LIBDAR_TIME_WRITE_ACCURACY >= LIBDAR_TIME_ACCURACY_NANOSECOND
+	static const time_unit max_capa = tu_nanosecond;
+#else
+#if LIBDAR_TIME_READ_ACCURACY >= LIBDAR_TIME_ACCURACY_MICROSECOND && LIBDAR_TIME_WRITE_ACCURACY >= LIBDAR_TIME_ACCURACY_MICROSECOND
 	static const time_unit max_capa = tu_microsecond;
 #else
 	static const time_unit max_capa = tu_second;
+#endif
 #endif
 	datetime ret;
 	infinint aux;

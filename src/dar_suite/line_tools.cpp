@@ -1379,15 +1379,25 @@ void line_tools_display_features(user_interaction & dialog)
 	dialog.printf(gettext("   Detected system/CPU endian   : %s"), endy);
 	dialog.printf(gettext("   Posix fadvise support        : %s"), YES_NO(compile_time::posix_fadvise()));
 	dialog.printf(gettext("   Large dir. speed optimi.     : %s"), YES_NO(compile_time::fast_dir()));
-	if(compile_time::microsecond_read())
-	    time_accuracy = "1 microsecond";
+	if(compile_time::nanosecond_read())
+	    time_accuracy = "1 nanosecond";
 	else
-	    time_accuracy = "1 s";
+	{
+	    if(compile_time::microsecond_read())
+		time_accuracy = "1 microsecond";
+	    else
+		time_accuracy = "1 second";
+	}
 	dialog.printf(gettext("   Timestamp read accuracy      : %S"), &time_accuracy);
-	if(compile_time::microsecond_write())
-	    time_accuracy = "1 microsecond";
+	if(compile_time::nanosecond_write())
+	    time_accuracy = "1 nanosecond";
 	else
-	    time_accuracy = "1 s";
+	{
+	    if(compile_time::microsecond_write())
+		time_accuracy = "1 microsecond";
+	    else
+		time_accuracy = "1 second";
+	}
 	dialog.printf(gettext("   Timestamp write accuracy     : %S"), &time_accuracy);
 	dialog.printf(gettext("   Restores dates of symlinks   : %s"), YES_NO(compile_time::symlink_restore_dates()));
 	if(compile_time::libthreadar())
