@@ -338,8 +338,19 @@ AC_DEFINE_UNQUOTED(LIBDAR_TIME_ACCURACY_SECOND, $local_time_accuracy_second, [va
 AC_DEFINE_UNQUOTED(LIBDAR_TIME_ACCURACY_MICROSECOND, $local_time_accuracy_microsecond, [value for time accuracy representing an accuracy of 1 microsecond])
 AC_DEFINE_UNQUOTED(LIBDAR_TIME_ACCURACY_NANOSECOND, $local_time_accuracy_nanosecond, [value for time accuracy representing an accuracy of 1 nanosecond])
 
-AC_MSG_CHECKING([for the timestamps write precision])
 
+AC_ARG_ENABLE( [limit-time-accuracy],
+	       AS_HELP_STRING(--enable-limit-time-accuracy, [limit time accuracy to nanosecond (ns) microsecond (us) or second (s)]),
+	       [
+		AS_IF(  [ test "x$enable_limit_time_accuracy" != "xs" -a "x$enable_limit_time_accuracy" != "xus" -a "x$enable_limit_time_accuracy" != "xns" ],
+			[ AC_MSG_ERROR([invalid argument given to --enable-limit-time-accuracy, valide values are : s, us, ns])],
+			[ AC_MSG_WARN([limiting time accuracy to $enable_limit_time_accuracy])]
+			)
+	       ],
+	       [ enable_limit_time_accuracy=no ])
+
+
+AC_MSG_CHECKING([for the timestamps write precision])
 
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 				     #if HAVE_FCNTL_H
@@ -358,10 +369,18 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 				   ]])
 	          ],
 		  [
-			local_time_write_accuracy=$local_time_accuracy_nanosecond
-			AC_MSG_RESULT([1 nanosecond])
+			AS_IF([ test "x$enable_limit_time_accuracy" = "xs" -o "x$enable_limit_time_accuracy" = "xus" ],
+			      [
+			        local_time_write_accuracy=-1
+			      ],
+			      [
+   			        local_time_write_accuracy=$local_time_accuracy_nanosecond
+    			        AC_MSG_RESULT([1 nanosecond])
+			      ])
 	          ],
 		  [
+		        local_time_write_accuracy=-1
+		  ])
 
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                                      #if HAVE_SYS_TYPES_H
@@ -391,15 +410,26 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                                      ]])
                   ],
                   [
-                    local_time_write_accuracy=$local_time_accuracy_microsecond
-                    AC_MSG_RESULT([1 microsecond])
+		    AS_IF([ test $local_time_write_accuracy -eq -1 ],
+		    	  AS_IF([ test "x$enable_limit_time_accuracy" != "xs" ],
+		                [
+			            local_time_write_accuracy=$local_time_accuracy_microsecond
+                    	            AC_MSG_RESULT([1 microsecond])
+			        ],
+			        [
+		    	            local_time_write_accuracy=$local_time_accuracy_second
+			            AC_MSG_RESULT([1 second])
+			        ])
+			)
                   ],
                   [
-		    AC_MSG_RESULT([1 second])
-		    local_time_write_accuracy=$local_time_accuracy_second
+		    AS_IF([ test $local_time_write_accuracy -eq -1 ],
+		          [
+			      local_time_write_accuracy=$local_time_accuracy_second
+			      AC_MSG_RESULT([1 second])
+			  ])
                   ])
 
-                  ])
 
 AC_DEFINE_UNQUOTED(LIBDAR_TIME_WRITE_ACCURACY, $local_time_write_accuracy, [timestamps write accuracy])
 
@@ -426,11 +456,26 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                                      ]])
                  ],
                  [
-                    local_time_read_accuracy=$local_time_accuracy_nanosecond
-                    AC_MSG_RESULT([1 nanosecond])
+			AS_IF([ test "x$enable_limit_time_accuracy" = "xus" ],
+			      [
+			          local_time_read_accuracy=$local_time_accuracy_microsecond
+				  AC_MSG_RESULT([1 microsecond])
+			      ],
+			      [
+			         AS_IF([ test "x$enable_limit_time_accuracy" = "xs" ],
+				       [
+					    local_time_read_accuracy=$local_time_accuracy_second
+				            AC_MSG_RESULT([1 second])
+				       ],
+				       [
+				            local_time_read_accuracy=$local_time_accuracy_nanosecond
+					    AC_MSG_RESULT([1 nanosecond])
+				       ])
+			      ])
                   ],
-                  [ AC_MSG_RESULT([1 second])
+                  [
 		    local_time_read_accuracy=$local_time_accuracy_second
+		    AC_MSG_RESULT([1 second])
                   ])
 
 AC_DEFINE_UNQUOTED(LIBDAR_TIME_READ_ACCURACY, $local_time_read_accuracy, [timestamps read accuracy])
@@ -2081,6 +2126,17 @@ else
     echo "NO"
 fi
 
+printf "   timepstamps write accuracy : "
+
+if [ $local_time_write_accuracy -eq $local_time_accuracy_nanosecond ] ; then
+   echo "1 nanosecond"
+else
+   if [ $local_time_write_accuracy -eq $local_time_accuracy_microsecond ] ; then
+       echo "1 microsecond"
+   else
+       echo "1 second"
+   fi
+fi
 
 printf "   timestamps read accuracy   : "
 
@@ -2088,18 +2144,6 @@ if [ $local_time_read_accuracy -eq $local_time_accuracy_nanosecond ] ; then
    echo "1 nanosecond"
 else
    if [ $local_time_read_accuracy -eq $local_time_accuracy_microsecond ] ; then
-       echo "1 microsecond"
-   else
-       echo "1 second"
-   fi
-fi
-
-printf "   timepstamps write accuracy : "
-
-if [ $local_time_write_accuracy -eq $local_time_accuracy_nanosecond ] ; then
-   echo "1 nanosecond"
-else
-   if [ $local_time_write_accuracy -eq $local_time_accuracy_microsecond ] ; then
        echo "1 microsecond"
    else
        echo "1 second"
