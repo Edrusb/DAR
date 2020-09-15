@@ -33,6 +33,8 @@ extern "C"
 #include "integers.hpp"
 #include "tools.hpp"
 #include "deci.hpp"
+#include "header_flags.hpp"
+
 
 #define LIBDAR_URL_VERSION "http://dar.linux.free.fr/pre-release/doc/Notes.html#Dar_version_naming"
 
@@ -40,7 +42,31 @@ using namespace std;
 
 namespace libdar
 {
+
+    	    // FLAG VALUES
+
+	    // flags of the historical bytes (oldest), read/wrote last (or alone if no extra bits are set)
+    static constexpr U_I FLAG_SAVED_EA_ROOT = 0x80;       ///< no more used since version "05"
+    static constexpr U_I FLAG_SAVED_EA_USER = 0x40;       ///< no more used since version "05"
+    static constexpr U_I FLAG_SCRAMBLED     = 0x20;       ///< scrambled or strong encryption used
+    static constexpr U_I FLAG_SEQUENCE_MARK = 0x10;       ///< escape sequence marks present for sequential reading
+    static constexpr U_I FLAG_INITIAL_OFFSET = 0x08;      ///< whether the header contains the initial offset (size of clear data before encrypted)
+    static constexpr U_I FLAG_HAS_CRYPTED_KEY = 0x04;     ///< the header contains a symmetrical key encrypted with asymmetrical algorithm
+    static constexpr U_I FLAG_HAS_REF_SLICING = 0x02;     ///< the header contains the slicing information of the archive of reference (used for isolated catalogue)
+    static constexpr U_I FLAG_IS_RESERVED_1 = 0x01;       ///< this flag is reserved meaning two bytes length bitfield
+    static constexpr U_I FLAG_IS_RESERVED_2 = 0x0100;     ///< reserved for future use
+    static constexpr U_I FLAG_ARCHIVE_IS_SIGNED = 0x0200; ///< archive is signed
+    static constexpr U_I FLAG_HAS_KDF_PARAM = 0x0400;     ///< archive header contains salt and non default interaction count
+    static constexpr U_I FLAG_HAS_COMPRESS_BS = 0x0800;   ///< archive header contains a compression block size (else it is assumed equal to zero)
+	// when adding a new flag, all_flags_known() must be updated to pass sanity checks
+
     static const U_I HEADER_CRC_SIZE = 2; //< CRC width (deprecated, now only used when reading old archives)
+
+	// check we are not facing a more recent format than what we know, this would fail CRC calculation before reporting the real reason of the issue
+    static bool all_flags_known(header_flags flag);
+
+	//
+
 
     header_version::header_version()
     {
@@ -63,7 +89,7 @@ namespace libdar
     {
 	crc *ctrl = nullptr;
 	char tmp;
-        U_I flag;
+        header_flags flag;
 
 	f.reset_crc(HEADER_CRC_SIZE);
 	try
@@ -176,33 +202,18 @@ namespace libdar
 	tools_read_string(f, cmd_line);
 
 	if(edition > 1)
-	{
-	    unsigned char tomp;
-	    if(f.read((char *)&tomp, 1) != 1)
-		throw Erange("header_version::read", gettext("Reached End of File while reading archive header_version data structure"));
-		// even in lax mode, because reading further is vain
-	    flag = tomp;
-	}
+	    flag.read(f);
 	else
-	    flag = 0; // flag has been at edition 2
-	if((flag & FLAG_HAS_AN_EXTENDED_SIZE) != 0)
-	{
-	    unsigned char tomp;
+	    flag.clear(); // flag has been at edition 2
 
-	    if(f.read((char *)&tomp, 1) != 1)
-		throw Erange("header_version::read", gettext("Reached End of File while reading archive header_version data structure"));
-	    flag <<= 8;
-	    flag += tomp;
-	}
-
-	if((flag & FLAG_INITIAL_OFFSET) != 0)
+	if(flag.is_set(FLAG_INITIAL_OFFSET))
 	{
 	    initial_offset.read(f);
 	}
 	else
 	    initial_offset = 0;
 
-	if((flag & FLAG_SCRAMBLED) != 0)
+	if(flag.is_set(FLAG_SCRAMBLED))
 	{
 	    ciphered = true;
 	    if(edition >= 9)
@@ -235,7 +246,7 @@ namespace libdar
 	    sym = crypto_algo::none; // no crypto used, coherent with flag
 	}
 
-	has_tape_marks = (flag & FLAG_SEQUENCE_MARK) != 0;
+	has_tape_marks = flag.is_set(FLAG_SEQUENCE_MARK);
 	if(edition < 8 && has_tape_marks)
 	{
 	    if(lax_mode)
@@ -250,7 +261,7 @@ namespace libdar
 	    crypted_key = nullptr;
 	}
 
-	if((flag & FLAG_HAS_CRYPTED_KEY) != 0)
+	if(flag.is_set(FLAG_HAS_CRYPTED_KEY))
 	{
 	    infinint key_size = f; // reading key_size from the header_version in archive
 
@@ -261,7 +272,7 @@ namespace libdar
 		throw Erange("header_version::read", gettext("Missing data for encrypted symmetrical key"));
 	}
 
-	if((flag & FLAG_HAS_REF_SLICING) != 0)
+	if(flag.is_set(FLAG_HAS_REF_SLICING))
 	{
 	    try
 	    {
@@ -285,9 +296,9 @@ namespace libdar
 	else
 	    clear_slice_layout();
 
-	arch_signed = (flag & FLAG_ARCHIVE_IS_SIGNED) != 0;
+	arch_signed = flag.is_set(FLAG_ARCHIVE_IS_SIGNED);
 
-	if((flag & FLAG_HAS_KDF_PARAM) != 0)
+	if(flag.is_set(FLAG_HAS_KDF_PARAM))
 	{
 	    unsigned char tmp_hash;
 	    infinint salt_size(f); // reading salt_size from file
@@ -353,7 +364,7 @@ namespace libdar
 	    kdf_hash = hash_algo::sha1;
 	}
 
-	if((flag & FLAG_HAS_COMPRESS_BS) != 0)
+	if(flag.is_set(FLAG_HAS_COMPRESS_BS))
 	    compr_bs.read(f);
 	else
 	    compr_bs = 0;
@@ -434,27 +445,24 @@ namespace libdar
     {
 	crc *ctrl = nullptr;
 	char tmp;
-        unsigned char flag[2];
+        header_flags flag;
 
 	    // preparing the data
 
-	flag[0] = 0;
-	flag[1] = 0;
-
 	if(!initial_offset.is_zero())
-	    flag[0] |= FLAG_INITIAL_OFFSET; // adding it to the flag
+	    flag.set_bits(FLAG_INITIAL_OFFSET); // adding it to the flag
 
 	if(crypted_key != nullptr)
-	    flag[0] |= FLAG_HAS_CRYPTED_KEY;
+	    flag.set_bits(FLAG_HAS_CRYPTED_KEY);
 
 	if(ref_layout != nullptr)
-	    flag[0] |= FLAG_HAS_REF_SLICING;
+	    flag.set_bits(FLAG_HAS_REF_SLICING);
 
 	if(has_tape_marks)
-	    flag[0] |= FLAG_SEQUENCE_MARK;
+	    flag.set_bits(FLAG_SEQUENCE_MARK);
 
 	if(sym != crypto_algo::none)
-	    flag[0] |= FLAG_SCRAMBLED;
+	    flag.set_bits(FLAG_SCRAMBLED);
 	    // Note: we cannot set this flag (even if ciphered is true) if we do not know the crypto algo
 	    // as since version 9 the presence of this flag implies the existence
 	    // of the crypto algorithm in the header/trailer and we will always
@@ -462,19 +470,15 @@ namespace libdar
 	    // equal to 9).
 
 	if(arch_signed)
-	    flag[1] |= (FLAG_ARCHIVE_IS_SIGNED >> 8);
+	    flag.set_bits(FLAG_ARCHIVE_IS_SIGNED);
 
 	if(salt.size() > 0)
-	    flag[1] |= (FLAG_HAS_KDF_PARAM >> 8);
+	    flag.set_bits(FLAG_HAS_KDF_PARAM);
 
 	if(compr_bs > 0)
-	    flag[1] |= (FLAG_HAS_COMPRESS_BS >> 8);
+	    flag.set_bits(FLAG_HAS_COMPRESS_BS);
 
-	if(flag[1] > 0)
-	    flag[1] |= FLAG_HAS_AN_EXTENDED_SIZE;
-	    // and we will drop two bytes for the flag
-
-	if(!all_flags_known( ( (U_I)(flag[1]) << 8 ) + flag[0]))
+	if(!all_flags_known(flag))
 	    throw SRC_BUG; // all_flag_known has not been updated with new flags
 
 	    // writing down the data
@@ -484,9 +488,7 @@ namespace libdar
 	tmp = compression2char(algo_zip);
 	f.write(&tmp, sizeof(tmp));
 	tools_write_string(f, cmd_line);
-	if(flag[1] != 0)
-	    f.write((char *)&(flag[1]), sizeof(unsigned char));
-	f.write((char *)&(flag[0]), sizeof(unsigned char));
+	flag.dump(f);
 	if(initial_offset != 0)
 	    initial_offset.dump(f);
 	if(sym != crypto_algo::none)
@@ -661,22 +663,23 @@ namespace libdar
 	clear_slice_layout();
     }
 
-
-    bool header_version::all_flags_known(U_I flag)
+    static bool all_flags_known(header_flags flag)
     {
-	flag &= ~FLAG_SAVED_EA_ROOT;
-	flag &= ~FLAG_SAVED_EA_USER;
-	flag &= ~FLAG_SCRAMBLED;
-	flag &= ~FLAG_SEQUENCE_MARK;
-	flag &= ~FLAG_INITIAL_OFFSET;
-	flag &= ~FLAG_HAS_CRYPTED_KEY;
-	flag &= ~FLAG_HAS_REF_SLICING;
-	flag &= ~(FLAG_HAS_AN_EXTENDED_SIZE << 8);
-	flag &= ~FLAG_ARCHIVE_IS_SIGNED;
-	flag &= ~FLAG_HAS_KDF_PARAM;
-	flag &= ~FLAG_HAS_COMPRESS_BS;
+	U_I bf = 0;
 
-	return flag == 0;
+	bf |= FLAG_SAVED_EA_ROOT;
+	bf |= FLAG_SAVED_EA_USER;
+	bf |= FLAG_SCRAMBLED;
+	bf |= FLAG_SEQUENCE_MARK;
+	bf |= FLAG_INITIAL_OFFSET;
+	bf |= FLAG_HAS_CRYPTED_KEY;
+	bf |= FLAG_HAS_REF_SLICING;
+	bf |= FLAG_ARCHIVE_IS_SIGNED;
+	bf |= FLAG_HAS_KDF_PARAM;
+	bf |= FLAG_HAS_COMPRESS_BS;
+	flag.unset_bits(bf);
+
+	return flag.is_all_cleared();
     }
 
 } // end of namespace
