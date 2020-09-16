@@ -87,6 +87,9 @@ namespace libdar
 	    /// returns whether libdar is dependent on libgcrypt and if so has strong encryption and hashing features available
 	bool libgcrypt() noexcept;
 
+	    /// returns whether libdar is dependent on libargon2 and if it has thus argon2 hash algorithm feature available
+	bool libargon2() noexcept;
+
 	    /// returns whether libdar can support furtive read mode when run by privileged user
 	bool furtive_read() noexcept;
 

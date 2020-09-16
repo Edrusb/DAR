@@ -153,6 +153,15 @@ namespace libdar
 	}
 
 
+	bool libargon2() noexcept
+	{
+#if LIBARGON2_AVAILABLE
+	    return true;
+#else
+	    return false;
+#endif
+	}
+
 	bool furtive_read() noexcept
 	{
 #if FURTIVE_READ_MODE_AVAILABLE

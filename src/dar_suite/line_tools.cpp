@@ -1407,6 +1407,7 @@ void line_tools_display_features(user_interaction & dialog)
 	dialog.printf(gettext("   Multiple threads (libthreads): %s %s"), YES_NO(compile_time::libthreadar()), threadar_version.c_str());
 	dialog.printf(gettext("   Delta compression support    : %s"), YES_NO(compile_time::librsync()));
 	dialog.printf(gettext("   Remote repository support    : %s"), YES_NO(compile_time::remote_repository()));
+	dialog.printf(gettext("   Libargon2 hashing (argon2)   : %s"), YES_NO(compile_time::libargon2()));
     }
     catch(...)
     {
