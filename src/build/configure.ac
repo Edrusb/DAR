@@ -1677,7 +1677,7 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
                                [ AC_DEFINE(HAVE_LIBTHREADAR_LIBTHREADAR_HPP, 1, [libthreadar.h header file availability]) ],
                                [ AC_MSG_WARN([Cannot find libthreadar.h header file]) ]
                               )
-               AC_MSG_CHECKING([for libthreadar() operationability])
+               AC_MSG_CHECKING([for libthreadar operationability])
 	       exp_maj_version_threadar=1
 	       min_med_version_threadar=3
 	       min_min_version_threadar=0
@@ -1750,6 +1750,66 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
                    )
             ]
      )
+
+
+AC_ARG_ENABLE([libargon2-linking],
+	      AC_HELP_STRING(--disable-libargon2-linking, [avoid linking with libargon2 if available to prevent the argon2 hashing algorithm to be used]),
+	      [explicit_argon2=yes],
+	      [enable_argon2=yes])
+
+AS_IF(
+	      [ test "x$enable_argon2" != "xyes" ],
+	      [
+		AC_MSG_WARN([libargon2 support has been disabled by user])
+		local_argon2=no
+	      ],
+	      [
+		AC_CHECK_HEADER(argon2.h,
+				[ AC_DEFINE(HAVE_ARGON2_H, 1, [argon2.h header file availability]) ],
+				[ AC_MSG_WARN([Cannot find argon2.h header file]) ]
+			       )
+		AC_CHECK_LIB(argon2, [argon2id_hash_raw], [], [AC_MSG_WARN([library libargon2 not found])])
+ 	        AC_MSG_CHECKING([for libargon2 usability])
+		AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C"
+						  {
+						       #if HAVE_ARGON2_H
+						       #include <argon2.h>
+						       #endif
+						       #if HAVE_STRING_H
+						       #include <string.h>
+						       #endif
+						   }
+					       ]],
+					       [[
+						    char pass[] = "mot de passe";
+						    char salt[] = "sel fin de cuisine";
+						    constexpr unsigned int hash_size = 40;
+						    char hash[hash_size];
+
+						    if(argon2id_hash_raw(2000,
+									 100,
+									 1,
+									 pass, strlen(pass),
+									 salt, strlen(salt),
+									 hash, hash_size) != ARGON2_OK)
+							return 1;
+						     else
+						        return 0;
+					        ]])
+				],
+				[
+				    local_argon2=yes
+				    AC_DEFINE(LIBARGON2_AVAILABLE, 1, [when libargon2 could be found and linked against])
+				    AC_MSG_RESULT(ok)
+				],
+				[
+				    local_argon2=no
+				    AC_MSG_RESULT([not usable! See config.log for details])
+				]
+			)
+		]
+     )
+
 
 CPPFLAGS__cache="$CPPFLAGS"
 CPPFLAGS="$CPPFLAGS $GPGME_CFLAGS $LIBCURL_CFLAGS $LIBTHREADAR_CFLAGS $CXXSTDFLAGS"
@@ -2173,6 +2233,13 @@ fi
 
 printf "   Remote repository support  : "
 if [ "$local_libcurl" = "yes" -a "$local_threadar" = "yes" ] ; then
+  echo "YES"
+else
+  echo "NO"
+fi
+
+printf "   Argon2 hashing algorithm   : "
+if [ "$local_argon2" = "yes" ] ; then
   echo "YES"
 else
   echo "NO"
