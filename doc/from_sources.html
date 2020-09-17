@@ -93,58 +93,93 @@ to generate html version of man pages</li>
         <li><a href="http://librsync.sourceforge.net/">librsync</a> for delta binary</li>
         <li><a href="https://curl.haxx.se/libcurl/">libcurl</a> for remote repository access using ftp or sftp protocols<br></li>
 	<li><a href="https://www.python.org/">python3</a> (python3-dev) and <a href="https://github.com/pybind/pybind11">pybind11</a> to access libdar from python</li>
+	<li><a href="https://github.com/P-H-C/phc-winner-argon2.git">libargon2</a> provides a security enhancement for key derivation fonction (strong encryption)</li>
       </ul>
-      <div style="margin-left: 40px;"><br>
-The consequences of building dar without these optional tools are the
-following:<br>
+      <div style="margin-left: 40px;">
+	<br>
+	The consequences of building dar without these optional tools are the
+	following:
+	<br>
       </div>
-      <ul style="margin-left: 40px; text-align: justify;">
+      <div style="margin-left: 40px; text-align: justify;">
+      <ul>
         <li>If you lack <span style="font-weight: bold;">libz</span>
-library, dar will compile but will not be able to compress or
-uncompress an archive using the gzip algorithm</li>
+	  library, dar will compile but will not be able to compress or
+	  uncompress an archive using the gzip algorithm</li>
         <li>If you lack <span style="font-weight: bold;">libbzip2</span>
-library dar will compile but will not be able to compress or uncompress
-an archive using the bzip2 algorithm</li>
+	  library dar will compile but will not be able to compress or uncompress
+	  an archive using the bzip2 algorithm</li>
         <li>If you lack <span style="font-weight: bold;">liblzo2</span>
-library dar will compile but will not be able to compress or uncompress
-an archive using the lzo algorithm</li>
-        <li>if you lack <span style="font-weight: bold;">liblzma5 </span>library dar will compile but will not be able to compress or uncompress an archive using the xz algorithm<br>
+	  library dar will compile but will not be able to compress or uncompress
+	  an archive using the lzo algorithm</li>
+        <li>if you lack <span style="font-weight: bold;">liblzma5 </span>library dar
+	  will compile but will not be able to compress or uncompress an archive using the xz algorithm
+	  <br>
         </li>
-	<li>if you lack <span style="font-weight: bold;">libzstd</span> library dar will compile but will not be able to compress or uncompress an archive using the zstd algorithm<br>
+	<li>
+	  if you lack <span style="font-weight: bold;">libzstd</span> library dar
+	  will compile but will not be able to compress or uncompress an archive using
+	  the zstd algorithm
+	  <br>
 	</li>
-	<li>if you lack <span style="font-weight: bold;">liblz4</span> library dar will compile but will not be able to compress or uncompress an archive using the lz4 algorithm<br>
+	<li>
+	  if you lack <span style="font-weight: bold;">liblz4</span> library dar
+	  will compile but will not be able to compress or uncompress an archive
+	  using the lz4 algorithm<br>
 	</li>
-        <li>If you lack <span style="font-weight: bold;">libgcrypt </span>dar
-will still compile but you will not be able to use strong encryption
-nor hash file generation for each slice</li>
-
-
-        <li>if you lack <span style="font-weight: bold;">gpgme</span> dar will still compile but you will not be able to use strong encryption and signature with public keys<br>
-        </li><li>If you lack <span style="font-weight: bold;">Doxygen</span>
-dar will still compile but you will not have the reference
-documentation for libdar after calling <span style="font-style: italic;">make</span></li>
-        <li>If you lack <span style="font-weight: bold;">upx</span>
-dar will still compile but the resulting binary will not be compressed
-after calling <span style="font-style: italic;">make install-strip</span></li>
-        <li><span style="font-style: italic;"><span style="font-style: italic;"><span style="font-style: italic;"></span></span></span>If
-you lack <span style="font-weight: bold;">groff</span> dar will not
-generate man pages in html format</li>
-        <li>If you lack <span style="font-weight: bold;">extX file system libraries</span> you will not be able to save and restore Linux FSA, nor to avoid saving files having their nodump flag set<br>
-        </li>
-
-        <li>if you lack <span style="font-weight: bold;">libthreadar</span> libdar will execute each action in a single thread, nor you will be able to use remote ftp or sftp embedded in libdar<br>
-</li>
-        <li>if you lack <span style="font-weight: bold;">librsync</span>
-library dar will still compile but you will not be able to create
-archive with binary delta nor to read/restore files stored with binary
-delta</li>
-        <li>if you lack <span style="font-weight: bold;">libcurl</span> you won't be able to remotely read or write a archive stored using ftp or sftp<br>
-        </li>
-	<li>if you lack <span style="font-weight: bold;">python3</span> or <span style="font-weight: bold;">pybind11</span> you won't be able to access
+        <li>
+	  If you lack <span style="font-weight: bold;">libgcrypt </span>dar
+	  will still compile but you will not be able to use strong encryption
+	  nor hash file generation for each slice
+	</li>
+	<li>if you lack <span style="font-weight: bold;">gpgme</span> dar
+	  will still compile but you will not be able to use strong encryption
+	  and signature with public keys
+	</li>
+	<li>
+	  If you lack <span style="font-weight: bold;">Doxygen</span>
+	  dar will still compile but you will not have the reference
+	  documentation for libdar after calling
+	  <span style="font-style: italic;">make</span>
+	</li>
+	<li>
+	  If you lack <span style="font-weight: bold;">upx</span>
+	  dar will still compile but the resulting binary will not be compressed
+	  after calling <span style="font-style: italic;">make install-strip</span>
+	</li>
+	<li>
+	  If you lack <span style="font-weight: bold;">groff</span> dar will not
+	  generate man pages in html format
+	</li>
+	<li>
+	  If you lack <span style="font-weight: bold;">extX file system libraries
+	  </span> you will not be able to save and restore Linux FSA, nor to avoid
+	  saving files having their nodump flag set<br>
+	</li>
+	<li>
+	  if you lack <span style="font-weight: bold;">libthreadar</span> libdar
+	  will execute each action in a single thread,
+	  nor you will be able to use remote ftp or sftp embedded in libdar<br>
+	</li>
+	<li>
+	  if you lack <span style="font-weight: bold;">librsync</span>
+	  library dar will still compile but you will not be able to create
+	  archive with binary delta nor to read/restore files stored with binary
+	  delta
+	</li>
+	<li>
+	  if you lack <span style="font-weight: bold;">libcurl</span> you won't
+	  be able to remotely read or write a archive stored using ftp or sftp
+	</li>
+	<li>
+	  if you lack <span style="font-weight: bold;">python3</span> or
+	  <span style="font-weight: bold;">pybind11</span> you won't be able to access
 	  libdar from python environment</li>
+	<li>
+	  if you lack <span style="font-weight: bold;">libargon2</span> you will only have md5, sha1 and sha512 algorithms to generate
+	  a strong key based on a random salt and the password you provide.
+	</li>
       </ul>
-      <div style="text-align: justify;"><br>
-      <div style="margin-left: 40px;"> </div>
       </div>
       </td>
     </tr>
@@ -453,7 +488,7 @@ information on self diagnostic bugs even<br>
       <td style="vertical-align: top; text-align: right;">--enable-limit-time-accuracy={s|us|ns}<br>
       </td>
       <td style="vertical-align: top;">
-	Limit the timestamp precision of files to seconds, microseconds and nanoseconds respectively,
+	Limit the timestamp precision of files to seconds, microseconds (lowercase U not the &mu; greek letter for &mu;s)  and nanoseconds respectively,
 	by default dar uses the maximum time precision supported by the operating system.
 	<br>
       </td>
