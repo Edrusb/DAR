@@ -44,6 +44,10 @@ extern "C"
 #  define memmove(d, s, n) bcopy ((s), (d), (n))
 # endif
 #endif
+
+#if HAVE_ARGON2_H
+#include <argon2.h>
+#endif
 }
 
 #include "crypto_sym.hpp"
@@ -386,7 +390,21 @@ namespace libdar
 	    if(!iteration_count.is_zero())
 		throw Erange("crypto_sym::init_hashed_password", gettext("Too large value give for key derivation interation count"));
 
-	    hashed_password = pkcs5_pass2key(password, salt, it, hash_algo_to_gcrypt_hash(kdf_hash), max_key_len_libdar(algo));
+	    switch(kdf_hash)
+	    {
+	    case hash_algo::none:
+		throw SRC_BUG;
+	    case hash_algo::md5:
+	    case hash_algo::sha1:
+	    case hash_algo::sha512:
+		hashed_password = pkcs5_pass2key(password, salt, it, hash_algo_to_gcrypt_hash(kdf_hash), max_key_len_libdar(algo));
+		break;
+	    case hash_algo::argon2:
+		hashed_password = argon2_pass2key(password, salt, it, max_key_len_libdar(algo));
+		break;
+	    default:
+		throw SRC_BUG;
+	    }
 	}
 	else
 	    hashed_password = password;
@@ -796,6 +814,36 @@ namespace libdar
 
 	return algo_id;
     }
+
+    secu_string crypto_sym::argon2_pass2key(const secu_string & password,
+					    const std::string & salt,
+					    U_I iteration_count,
+					    U_I output_length)
+    {
+#if LIBARGON2_AVAILABLE
+	secu_string ret(output_length);
+	S_I err = argon2id_hash_raw(iteration_count,
+				    100, // 100 kiB memory used at max
+				    1,   // assuming less parallelization leads to longer hash time and thus more difficult dictionnary attack (?)
+				    password.c_str(), password.get_size(),
+				    salt.c_str(), salt.size(),
+				    ret.c_str(), ret.get_allocated_size());
+
+	if(err != ARGON2_OK)
+	{
+	    throw Erange("crypto_sym::argon2_pas2key",
+			 tools_printf(gettext("Error while computing KDF with argon2 algorithm: %d"),
+				      err));
+	}
+	else
+	    ret.set_size(output_length);
+
+	return ret;
+#else
+	throw Efeature("libargon2");
+#endif
+    }
+
 
 #ifdef LIBDAR_NO_OPTIMIZATION
 

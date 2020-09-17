@@ -168,6 +168,12 @@ namespace libdar
 					  U_I hash_gcrypt,                      ///< hashing fonction used for key derivation (SHA1 historically)
 					  U_I output_length);                   ///< length of the string to return
 
+	    /// create a hash using argon2 key derivation algorithm
+	static secu_string argon2_pass2key(const secu_string & password,
+					   const std::string & salt,
+					   U_I iteration_count,
+					   U_I output_length);
+
 	    /// converts libdar crypto algo designation to index used by libgcrypt
 	static U_I get_algo_id(crypto_algo algo);
 
