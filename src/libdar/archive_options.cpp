@@ -47,6 +47,7 @@ namespace libdar
     static const string default_user_comment = "N/A";
     static const U_32 default_delta_sig_min_size = 10240;
     static const infinint default_iteration_count = 200000;
+    static const infinint default_iteration_count_argon2 = 10000;
 
 	// some local helper functions
 
@@ -374,8 +375,16 @@ namespace libdar
 	    x_auto_zeroing_neg_dates = false;
 	    x_ignored_as_symlink.clear();
 	    x_modified_data_detection = modified_data_detection::mtime_size;
-	    x_iteration_count = default_iteration_count;
-	    x_kdf_hash = hash_algo::sha1;
+	    if(compile_time::libargon2())
+	    {
+		x_iteration_count = default_iteration_count_argon2;
+		x_kdf_hash = hash_algo::argon2;
+	    }
+	    else
+	    {
+		x_kdf_hash = hash_algo::sha1;
+		x_iteration_count = default_iteration_count;
+	    }
 	    x_sig_block_len.reset();
 	}
 	catch(...)
@@ -527,6 +536,13 @@ namespace libdar
 	    throw;
 	}
 	NLS_SWAP_OUT;
+    }
+
+    void archive_options_create::set_hash_algo(hash_algo hash)
+    {
+	if(hash == hash_algo::argon2)
+	    throw Erange("archive_options_create", gettext("argon2 hash algorithm is only used for key derivation function, it is not adapted to file or slice hashing"));
+	x_hash = hash;
     }
 
     void archive_options_create::nullifyptr() noexcept
@@ -781,8 +797,16 @@ namespace libdar
 	    archive_option_clean_mask(x_delta_mask);
 	    has_delta_mask_been_set = false;
 	    x_delta_sig_min_size = default_delta_sig_min_size;
-	    x_iteration_count = default_iteration_count;
-	    x_kdf_hash = hash_algo::sha1;
+	    if(compile_time::libargon2())
+	    {
+		x_iteration_count = default_iteration_count_argon2;
+		x_kdf_hash = hash_algo::argon2;
+	    }
+	    else
+	    {
+		x_kdf_hash = hash_algo::sha1;
+		x_iteration_count = default_iteration_count;
+	    }
 	    x_sig_block_len.reset();
 	}
 	catch(...)
@@ -816,6 +840,14 @@ namespace libdar
 	}
 	NLS_SWAP_OUT;
     }
+
+    void archive_options_isolate::set_hash_algo(hash_algo hash)
+    {
+	if(hash == hash_algo::argon2)
+	    throw Erange("archive_options_isolate", gettext("argon2 hash algorithm is only used for key derivation function, it is not adapted to file or slice hashing"));
+	x_hash = hash;
+    }
+
 
     void archive_options_isolate::destroy() noexcept
     {
@@ -965,8 +997,16 @@ namespace libdar
 	    x_delta_signature = true;
 	    has_delta_mask_been_set = false;
 	    x_delta_sig_min_size = default_delta_sig_min_size;
-	    x_iteration_count = default_iteration_count;
-	    x_kdf_hash = hash_algo::sha1;
+	    if(compile_time::libargon2())
+	    {
+		x_iteration_count = default_iteration_count_argon2;
+		x_kdf_hash = hash_algo::argon2;
+	    }
+	    else
+	    {
+		x_kdf_hash = hash_algo::sha1;
+		x_iteration_count = default_iteration_count;
+	    }
 	    x_sig_block_len.reset();
 	}
 	catch(...)
@@ -1091,6 +1131,14 @@ namespace libdar
 	}
 	NLS_SWAP_OUT;
     }
+
+    void archive_options_merge::set_hash_algo(hash_algo hash)
+    {
+	if(hash == hash_algo::argon2)
+	    throw Erange("archive_options_merge", gettext("argon2 hash algorithm is only used for key derivation function, it is not adapted to file or slice hashing"));
+	x_hash = hash;
+    }
+
 
     void archive_options_merge::destroy() noexcept
     {
@@ -2007,6 +2055,13 @@ namespace libdar
         NLS_SWAP_OUT;
     }
 
+    void archive_options_repair::set_hash_algo(hash_algo hash)
+    {
+	if(hash == hash_algo::argon2)
+	    throw Erange("archive_options_repair", gettext("argon2 hash algorithm is only used for key derivation function, it is not adapted to file or slice hashing"));
+	x_hash = hash;
+    }
+
     void archive_options_repair::copy_from(const archive_options_repair & ref)
     {
 	x_allow_over = ref.x_allow_over;
@@ -2068,4 +2123,3 @@ namespace libdar
     }
 
 } // end of namespace
-
