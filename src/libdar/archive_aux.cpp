@@ -52,6 +52,8 @@ namespace libdar
 	    return "sha1";
 	case hash_algo::sha512:
 	    return "sha512";
+	case hash_algo::argon2:
+	    return "argon2";
 	default:
 	    throw SRC_BUG;
 	}
@@ -67,6 +69,8 @@ namespace libdar
 	    val = hash_algo::sha512;
 	else if(strcasecmp(arg.c_str(), "none") == 0)
 	    val = hash_algo::none;
+	else if(strcasecmp(arg.c_str(), "argon2") == 0)
+	    val = hash_algo::argon2;
 	else
 	    return false;
 	return true;
@@ -90,6 +94,8 @@ namespace libdar
 	case hash_algo::sha512:
 	    hash_gcrypt = GCRY_MD_SHA512;
 	    break;
+	case hash_algo::argon2:
+	    throw SRC_BUG; // not a gcrypt_hash
 	default:
 	    throw SRC_BUG;
 	}
@@ -113,6 +119,8 @@ namespace libdar
 	    return '1';
 	case hash_algo::sha512:
 	    return '5';
+	case hash_algo::argon2:
+	    return 'a';
 	default:
 	    throw SRC_BUG;
 	}
@@ -130,6 +138,8 @@ namespace libdar
 	    return hash_algo::md5;
 	case 'n':
 	    return hash_algo::none;
+	case 'a':
+	    return hash_algo::argon2;
 	default:
 	    throw Erange("char_to_hash_algo", tools_printf(gettext("unknown hash algorithm corresponding to char `%c'"), arg));
 	}

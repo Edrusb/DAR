@@ -64,7 +64,8 @@ namespace libdar
 	none,  ///< no hashing algorithm
 	md5,   ///< MD5 algorithm
 	sha1,  ///< SHA1 algorithm
-	sha512 ///< SHA-512 algorithm
+	sha512,///< SHA-512 algorithm
+	argon2 ///< argon2 hash algo
     };
 
     	/// convert hash value to human readable string
