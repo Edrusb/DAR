@@ -47,12 +47,8 @@ namespace libdar
 	/// class secu_string
 
 	/// it manages the allocation/release of a given size block of memory
-	/// and let the user feed it from a filedescriptor
-	/// and access to it under with a char* pointer.
-	/// if more constructor are needed (espetially toward API), tell me, but
-	/// this is a non-sens to build a secure string from another data structure which is
-	/// not yet secured, where from the set() method that fetches data directly from a
-	/// filedescriptor (set() low-level system call) which might be a tty for example
+	/// the memory block is forbidden to be swapped (if is_strin_secured() is true)
+	/// and is zeroed before being released
 
     class secu_string
     {
@@ -154,6 +150,7 @@ namespace libdar
 	    /// \return the address of the first byte of the string
 	    /// \note check the "size" method to know how much bytes can be read
 	const char*c_str() const { return mem == nullptr ? throw SRC_BUG : mem; };
+	void set_size(U_I size);
 
 	    /// non constant flavor of direct secure memory access
 	char * get_array() { return mem == nullptr ? throw SRC_BUG : mem; };

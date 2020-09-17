@@ -171,13 +171,18 @@ namespace libdar
     void secu_string::randomize(U_I size)
     {
 #if CRYPTO_AVAILABLE
-	if(size > get_allocated_size())
-	    throw Erange("secu_string::randomize", gettext("secu_string randomization requested exceeds storage capacity"));
-	*string_size = size;
+	set_size(size);
 	gcry_randomize(mem, *string_size, GCRY_STRONG_RANDOM);
 #else
 	throw Efeature("string randomization lacks libgcrypt");
 #endif
+    }
+
+    void secu_string::set_size(U_I size)
+    {
+	if(size > get_allocated_size())
+	    throw Erange("secu_string::set_size", gettext("secu_string set_size() exceeds storage capacity"));
+	*string_size = size;
     }
 
     char & secu_string::operator[] (U_I index)
