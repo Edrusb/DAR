@@ -25,6 +25,11 @@ from 2.6.x to 2.7.0
   operating system supports it. It is still possible to use configure's
   --enable-limit-time-accuracy=us at compilation time to use microsecond
   or even second accuracy even if the OS can support finer precision.
+- added argon2 hashing algorithm for key derivation function (kdf) which
+  becomes the default if libargon2 is available, else it defaults to sha1
+  as for 2.6.x. When argon2 is used and kdf default iteration count is
+  reduced to 10,000 (and stays 200,000 with sha1). This can be tuned
+  as usual with --kdf-param option.
 
 from 2.6.11 to 2.6.12
 - fixed regression met in 2.6.11 when generating encrypted archives
