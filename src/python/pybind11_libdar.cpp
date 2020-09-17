@@ -882,7 +882,8 @@ PYBIND11_MODULE(libdar, mod)
 	.def("clear", &libdar::secu_string::clear)
 	.def("resize", &libdar::secu_string::resize)
 	.def("randomize", &libdar::secu_string::randomize)
-	.def("c_str", &libdar::secu_string::c_str, pybind11::return_value_policy::reference_internal)
+	.def("c_str", (char* (libdar::secu_string::*)()) &libdar::secu_string::c_str, pybind11::return_value_policy::reference_internal)
+	.def("c_str", (const char* (libdar::secu_string::*)() const) &libdar::secu_string::c_str, pybind11::return_value_policy::reference_internal)
 	.def("get_array", &libdar::secu_string::get_array, pybind11::return_value_policy::reference_internal)
 	.def("at", [](libdar::secu_string & self, libdar::U_I index) { return std::string(1, self[index]); }) // not a temporary secure storage but no char type in python... so
 	.def("get_size", &libdar::secu_string::get_size)
@@ -1262,7 +1263,8 @@ PYBIND11_MODULE(libdar, mod)
 	.value("none", libdar::hash_algo::none)
 	.value("md5", libdar::hash_algo::md5)
 	.value("sha1", libdar::hash_algo::sha1)
-	.value("sha512", libdar::hash_algo::sha512);
+	.value("sha512", libdar::hash_algo::sha512)
+	.value("argon2", libdar::hash_algo::argon2);
 
     mod.def("hash_algo_to_string", &libdar::hash_algo_to_string);
     mod.def("string_to_hash_algo", [](const std::string & arg)
