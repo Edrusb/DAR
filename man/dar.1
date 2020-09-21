@@ -240,7 +240,7 @@ makes the terminal ring when user action is required (like for example the creat
 In the file which name is given in argument to this option, You can put any option or argument as used on command line, that will be parsed as if they were in place of the "-B <filename>" option. This way you can overcome the command line size limitation. Commands in the file may be disposed on several lines, and -B option can also be used inside files, leading a file to include other files. But an error occurs in case of loop (a file that includes itself directly or not) and DAR aborts immediately. Comments are allowed, and must start by a hash `#' character on each line. Note that for a line to be considered as a comment the hash character must be the first character of the line (space or tab can still precede the hash). See
 .B Conditional Syntax
 below for a richer syntax in this type of configuration files known as DCF file (Dar Configuration File). See also the environment variable DAR_DCF_PATH in the ENVIRONMENT section at the end of this document.
-.PP
+.IP
 Note that you can use quotes simple (\'arg\') double ("arg") and back-quotes (`arg`) inside such file, but they need to be balanced (have an ending one). To use such character without the meaning of a quote, for example as an apostrophe, you need to escape it using a back-slack ("That\\'s an example"). Of course to add a single back-slash as a normal character in the file you will have to double it ("c:\\\\windows" for example)
 .TP 20
 -N, --noconf
@@ -300,23 +300,32 @@ Modify the -A option behavior, making it receiving a <date> as argument in place
 .PP
 <date> must be a date in the two following possible formats:
 .RS
-.TP 30
+.br
 - a number of second since Jan 1st, 1970
-.TP 30
+.br
 - a date in the following form [[[year/]month/]day-]hour:minute[:second]
 .RE
 .PP
 Here are some examples of date:
 .RS
+.B
 91836383927108078
-.PP
-2005/11/19-19:38:48 Which is 38 past 7 PM and 48 seconds, the 19th of November 2005
-.PP
-20:20 Which is 8 PM of the current day
-.PP
-2-00:08 Which is 8 past noon, the second day of the current month
-.PP
-2/2-14:59 Which is 1 to 3 PM, the 2nd of February in the current year
+.br
+.B 1
+2005/11/19-19:38:48
+Which is 38 past 7 PM and 48 seconds, the 19th of November 2005
+.br
+.B
+20:20
+Which is 8 PM of the current day
+.br
+.B
+2-00:08
+Which is 8 past noon, the second day of the current month
+.br
+.B
+2/2-14:59
+Which is 1 to 3 PM, the 2nd of February in the current year
 .RE
 .PP
 Note that the provided date is relative to the system timezone which is overriden if the TZ environement variable is set (see tzselect(1) for more details)
@@ -433,7 +442,7 @@ paragraph above for a detailed explanation of this option. It has also an incide
 .TP 20
 -an, --alter=no-case
 set the filters in case insensitive mode. This concerns only masks specified after this option (see also -acase option below). This changes the behavior of -I, -X, -g, -P, -Z, -Y, -u and -U options.
-.PP
+.IP
 Warning: case insensitivity requires interpreting filenames which depends on the locale with which dar is run (defined by the LANG environment variable). For example if you create files with LANG set to fr_FR.UTF-8 and use non plain ASCII characters in filename, there is chances that these non ASCII characters will be stored over several bytes in that filename: so called "wide characters". If then you run dar with LANG set to another value like ru_RU.koi8r, there is much chances that these wide characters do not correspond to the same letter or worse, that they do not match any valid wide character for that locale. A filename is always a sequence of bytes and always saved as such, but using --alter=no-case implies interpreting that sequence in a way that depends on the given locale (as defined by the LANG environment variable). As such, dar cannot know if a given file has to be read with fr_FR.UTF-8 locale or with it_IT.iso88591 or ru_RU.koi8r and so on, because this information is not stored in filenames. In consequence, if different locales are used on your system and you are doing a system wide backup, using --alter=no-case option may lead dar to detect invalid wide character, in that case it falls back to a byte by byte case sensitivity comparison (ASCII characters), which may not be what you would expect at first sight: Most of the time, an upper case wide character (stored on several bytes) does not match the equivalent lower case wide character (several bytes too), when case sensitivity comparison is performed byte by byte.
 .TP 20
 -acase, --alter=case
@@ -461,7 +470,7 @@ When comparing with the archive of reference (-c -A) during a differential backu
 .TP 15
 ignore-owner
 all fields are considered except ownership.
-.BR
+.br
 This is useful when dar is used by a non-privileged user. It will not consider a file has changed just because of a uid or gid mismatch and at restoration dar will not even try to set the file ownership.
 .TP 15
 mtime
@@ -470,7 +479,7 @@ only inode type and last modification date is considered as well as inode specif
 inode-type
 Only the inode type is considered. Ownership, permission and dates are ignored. Inode specific attributes are still considered (like file size for plain files). Thus comparison will ignore differences for ownership, permission, and dates and at restoration dar will not try to set the ownership, permission and dates.
 .RE
-.PP
+.IP
 When no flag is provided to this option, -O option acts as if the "ignore-owner" flag was set, which is the behavior in older releases (< 2.3.0). Note also that for backward compatibility, --ignore-owner option still exists and since version 2.3.0 is just an alias to the --comparison-field=ignore-owner option. Of course if this option is not used, all fields are used for comparison or restoration.
 .TP 20
 -H[num], --hour[=num]
@@ -505,8 +514,8 @@ will be replaced by the context. Actually three possible values exist: "init", "
 .TP 10
 %u
 will be replaced by the full URL of path where the slice is stored
-.P
 .RE
+.IP
 Several -E option can be given, given commands will then be called in the order they appear on the command line and -B included files. Note that having '-E script1 -E script2' is totally equivalent to '-E "script1 ; script2"'. In other words if script1 fails, script2 fill still be executed and dar will only be notified of the exit status of the last -E option. Exit status of previous -E given commands will be ignored. If this does not match your need, consider using a single -aduc option (see below). More generally you can use any shell construction in the argument to -E, including parenthesis, || and &&. Such files given to -E option are known as DUC files (Dar User Command). See also the environment variable DAR_DUC_PATH in the ENVIRONMENT section at the end of this document.
 .TP 20
 -aduc, --alter=duc
@@ -571,7 +580,7 @@ when using k M G T E Z Y prefixes to define a size, use the SI meaning: multiple
 .TP 20
 -abinary, --alter=binary[-unit[s]]
 when using k M G T E Z Y prefixes to define a size, use the historical computer science meaning: multiple of 2^10  (a Mega is 1,048,576).
-.PP
+.IP
 The --alter=SI and --alter=binary options can be used several times on the command line. They affect all prefixes which follow, even those found in files included by the -B option, up to the next --alter=binary or --alter=SI occurrence. Note that if in a file included by the -B option, an --alter=binary or --alter=SI is encountered, it affects all the following prefixes, even those outside the included files. For example, when running with the parameters "-B some.dcf -s 1K", 1K may be equal to 1000 or 1024, depending on --alter=binary or --alter=SI being present in the some.dcf file. By default (before any --alter=SI/binary option is reached), binary interpretation of prefixes is done, for compatibility with older versions.
 .TP 20
 -ac, --alter=ctime
@@ -662,14 +671,10 @@ The memory requirement also increases by the product of the block size times the
 will become important compared to the effective compression task CPU time) and independenly short blocks reduce compression rate. It is advised to use values at least greater than 50 ~ 100 KiB
 (you can use the k,M,G,... suffixes described for the -s option).
 .RE
-.PP
-.RS
+.IP
 Valid usage of -z option is for example: -z, -z9, -zlzo, -zgzip, -zbzip2, -zlzo:6, -zbzip2:2, -zgzip:1, -zxz:6, -zlz4::10k -z::12000 -zbzip2:8:10k and so on. Usage for long option is the same: --compression, --compression=9, --compression=lzo, --compression=gzip, --compression=bzip2, --compression=lzo:6, --compression=bzip2:2, --compression=gzip:1 --compression=xz:9 and so on.
-.RE
-.PP
-.RS
+.IP
 About lzo compression, the compression levels of dar and lzop program do not match. If you want to get the behavior of compression level 1 of lzop, use the lzop-1 algorithm in place of lzo with dar/libdar. If you want to get the behavior of lzop compression level 3, use the lzop-3 algorithm in place of the lzo algorithm. Lzop compression levels 2, 4, 5 and 6 are the same as level 3. last, there is no difference about compression level 7, 8 and 9 between dar and lzop. The lzop-1 and lzop-3 algorithms do not make use of any compression level (compression level is ignored with these algorithms).
-.RE
 .TP 20
 -s, --slice <number>
 Size of the slices in bytes. If the number is appended by k (or K), M, G, T, P, E, Z or Y the size is in kilobytes, megabytes, gigabytes, terabytes, petabytes, exabytes, zettabytes or yottabytes respectively. Example: "20M" means 20 megabytes, by default, it is the same as giving 20971520 as argument (see also -aSI and -abinary options). If -s is not present the backup will be written to a single slice whatever the size of the backup may be (assuming your operating system can support arbitrarily large files).
@@ -716,7 +721,7 @@ do not save files which have the 'd' flag set (see chattr(1) lsattr(1) ext2 comm
 -5, --exclude-by-ea[=<extended attribute name>]
 exclude inodes from backup that have been set with the EA given in argument. If not argument is given to that option the default EA used to exclude files from backup is "user.libdar_no_backup". To set this attribute to a given file, use the following command: "setfattr -n user.libdar_no_backup <filename>", to remove it: "setfattr -x user.libdar_no_backup <filename>". Last, to check the presence this EA: "getfattr <filename>"
 .TP 20
--M, --mount-points { I:<path to fs> | E:<path to fs> }
+-M, --mount-points={ I:<path to fs> | E:<path to fs> }
 If the argument is of the
 .B
 I:<path to fs>
@@ -1029,8 +1034,8 @@ returns the approximated value of the square root of the file size. Note that fo
 square3
 returns the approximated value of the cube root of filesize, implemented as exp2(log(filesize)/3)
 .RE
-.BR
-.BR
+.br
+.br
 .RS
 All numerical fields can receive multiplier suffix (k, M, ...) for more details about these suffixes, see -s option description. If not specified
 .B
