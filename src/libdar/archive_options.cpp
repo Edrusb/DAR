@@ -346,6 +346,8 @@ namespace libdar
 	    x_furtive_read = false;
 #endif
 	    x_same_fs = false;
+	    x_same_fs_include.clear();
+	    x_same_fs_exclude.clear();
 	    x_snapshot = false;
 	    x_cache_directory_tagging = false;
 	    x_fixed_date = 0;
@@ -618,6 +620,8 @@ namespace libdar
 	x_old_alter_atime = ref.x_old_alter_atime;
 	x_furtive_read = ref.x_furtive_read;
 	x_same_fs = ref.x_same_fs;
+	x_same_fs_include = ref.x_same_fs_include;
+	x_same_fs_exclude = ref.x_same_fs_exclude;
 	x_snapshot = ref.x_snapshot;
 	x_cache_directory_tagging = ref.x_cache_directory_tagging;
 	x_fixed_date = ref.x_fixed_date;
@@ -694,6 +698,8 @@ namespace libdar
 	x_old_alter_atime = move(ref.x_old_alter_atime);
 	x_furtive_read = move(ref.x_furtive_read);
 	x_same_fs = move(ref.x_same_fs);
+	x_same_fs_include = move(ref.x_same_fs_include);
+	x_same_fs_exclude = move(ref.x_same_fs_exclude);
 	x_snapshot = move(ref.x_snapshot);
 	x_cache_directory_tagging = move(ref.x_cache_directory_tagging);
 	x_fixed_date = move(ref.x_fixed_date);

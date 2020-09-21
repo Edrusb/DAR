@@ -39,6 +39,7 @@
 #include "archive_aux.hpp"
 #include "compression.hpp"
 #include "delta_sig_block_size.hpp"
+#include "filesystem_ids.hpp"
 
 #include <string>
 #include <vector>
@@ -462,7 +463,20 @@ namespace libdar
 	void set_furtive_read_mode(bool furtive_read);
 
 	    /// whether to limit the backup to files located on the same filesystem as the directory taken as root of the backup
-	void set_same_fs(bool same_fs) { x_same_fs = same_fs; };
+
+	    /// \note if using this method, all value set using set_same_fs_include and set_same_fs_exclude so far are
+	    /// forgotten and ignored.
+	void set_same_fs(bool same_fs) { x_same_fs = same_fs; x_same_fs_include.clear(); x_same_fs_exclude.clear(); };
+
+	    /// files on the filesystem pointed to by the given path will be considered for the backup operation if not excluded by set_same_fs_exclude()
+
+	    /// \note if using this method any previous call to the legacy set_same_fs(bool) invocation is ignored
+	void set_same_fs_include(const std::string & included_path_to_fs) { x_same_fs_include.push_back(included_path_to_fs); };
+
+	    /// files on the filesystem pointed to by the given path will not be considered for backup operation
+
+	    /// \note if using this method any previous call to the legacy set_same_fs(bool) invocation is ignored
+	void set_same_fs_exclude(const std::string & excluded_path_to_fs) { x_same_fs_exclude.push_back(excluded_path_to_fs); };
 
 	    /// whether to make an emtpy archive only referencing the current state of files in the filesystem
 	void set_snapshot(bool snapshot) { x_snapshot = snapshot; };
@@ -606,6 +620,8 @@ namespace libdar
 	bool get_alter_atime() const { return x_alter_atime; };
 	bool get_furtive_read_mode() const { return x_furtive_read; };
 	bool get_same_fs() const { return x_same_fs; };
+	std::deque<std::string> get_same_fs_include() const { return x_same_fs_include; };
+	std::deque<std::string> get_same_fs_exclude() const { return x_same_fs_exclude; };
 	bool get_snapshot() const { return x_snapshot; };
 	bool get_cache_directory_tagging() const { return x_cache_directory_tagging; };
 	const infinint & get_fixed_date() const { return x_fixed_date; };
@@ -675,6 +691,8 @@ namespace libdar
 	bool x_old_alter_atime; ///< used to backup origina alter_atime value when activating furtive read mode
 	bool x_furtive_read;
 	bool x_same_fs;
+	std::deque<std::string> x_same_fs_include;
+	std::deque<std::string> x_same_fs_exclude;
 	bool x_snapshot;
 	bool x_cache_directory_tagging;
 	infinint x_fixed_date;
