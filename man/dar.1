@@ -1301,6 +1301,9 @@ must be replaced by -k ignore
 .TP 20
 -5
 must be replaced by -5 user.libdar_no_backup
+.TP 20
+-M
+must be replaced by -M I:/
 .PP
 .B important !
 When using GNU getopt(), optional arguments are available by sticking the argument to the short option: "-z" for example is available as well as "-z9". But "-z 9" is wrong, it will be read as "-z" option and "9", a command line argument (not an argument to the -z option). In the other side, when using a non GNU getopt this time, "-z" becomes an option that always requires an argument, and thus "-z 9" is read as "-z" option with "9" as argument, while "-z9" will be rejected as a unknown option, and "-z" alone will generate an error as no argument is provided. In consequences, you
