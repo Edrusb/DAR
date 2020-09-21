@@ -417,7 +417,27 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    create_options.set_empty(param.empty);
 		    create_options.set_alter_atime(param.alter_atime);
 		    create_options.set_furtive_read_mode(param.furtive_read_mode);
-		    create_options.set_same_fs(param.same_fs);
+
+		    if(param.same_fs_incl.empty() && param.same_fs_excl.empty()) // legacy -M option
+			create_options.set_same_fs(param.same_fs);
+		    else // new 2.7.0 -M option syntax
+		    {
+			deque<string>::iterator it = param.same_fs_incl.begin();
+
+			while(it != param.same_fs_incl.end())
+			{
+			    create_options.set_same_fs_include(*it);
+			    ++it;
+			}
+
+			it = param.same_fs_excl.begin();
+			while(it != param.same_fs_excl.end())
+			{
+			    create_options.set_same_fs_exclude(*it);
+			    ++it;
+			}
+		    }
+
 		    create_options.set_snapshot(param.snapshot);
 		    create_options.set_cache_directory_tagging(param.cache_directory_tagging);
 		    create_options.set_fixed_date(param.fixed_date);
