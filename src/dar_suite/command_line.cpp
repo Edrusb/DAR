@@ -82,7 +82,7 @@ extern "C"
 #include "libdar.hpp"
 #include "fichier_local.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:v::z::y:nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT:E:F:K:J:Y:Z:B:fm:NH::a::eQG:Mg:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:8:{:}:j:\\:"
+#define OPT_STRING "c:A:x:d:t:l:v::z::y:nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT:E:F:K:J:Y:Z:B:fm:NH::a::eQG:M::g:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:8:{:}:j:\\:"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c option"
@@ -278,6 +278,8 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.empty = false;
     p.alter_atime = true;
     p.same_fs = false;
+    p.same_fs_incl.clear();
+    p.same_fs_excl.clear();
     p.snapshot = false;
     p.cache_directory_tagging = false;
     p.crypto_size = DEFAULT_CRYPTO_SIZE;
@@ -488,8 +490,11 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             dialog->message(gettext("-e is only useful with -x, -c or -+ options"));
         if(!p.alter_atime && p.op != create && p.op != diff)
             dialog->message(gettext("-ac is only useful with -c or -d"));
-        if(p.same_fs && p.op != create)
-            dialog->message(gettext("-M is only useful with -c"));
+        if(p.same_fs || ! p.same_fs_incl.empty() || ! p.same_fs_excl.empty())
+	{
+	    if(p.op != create)
+		dialog->message(gettext("-M is only useful with -c"));
+	}
         if(p.snapshot && p.op != create)
             dialog->message(gettext("The snapshot backup (-A +) is only available with -c option, ignoring"));
         if(p.cache_directory_tagging && p.op != create)
@@ -578,7 +583,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
 		dialog->message(gettext("-ai option is useless with -y option"));
 	    if(!p.no_compare_symlink_date)
 		dialog->message(gettext("--alter=do-not-compare-symlink-mtime option is useless with -y option"));
-	    if(p.same_fs)
+	    if(p.same_fs || ! p.same_fs_incl.empty() || ! p.same_fs_excl.empty())
 		dialog->message(gettext("-M option is useless with -y option"));
 	    if(p.aux_filename != nullptr)
 		dialog->message(gettext("-@ option is useless with -y option"));
@@ -1702,11 +1707,26 @@ static bool get_args_recursive(recursive_param & rec,
 
                 break;
             case 'M':
-                if(p.same_fs)
-                    rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
-                else
-                    p.same_fs = true;
-                break;
+		if(optarg == nullptr) // the legacy -M option
+		{
+		    if(p.same_fs)
+			rec.dialog->message(tools_printf(gettext(ONLY_ONCE), char(lu)));
+		    else
+			p.same_fs = true;
+		}
+		else  // the 2.7.0 new option form
+		{
+		    deque<string> splitted;
+		    line_tools_split(string(optarg), ':', splitted);
+		    if(splitted.size() != 2 ||
+		       (splitted[0] != "E" && splitted[0] != "I"))
+			throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+		    if(splitted[0] == "I")
+			p.same_fs_incl.push_back(splitted[1]);
+		    else
+			p.same_fs_excl.push_back(splitted[1]);
+		}
+		break;
             case '#':
                 if(! tools_my_atoi(optarg, tmp))
                     throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
@@ -2663,7 +2683,8 @@ const struct option *get_long_opt()
         {"empty", no_argument, nullptr, 'e'},
         {"dry-run", no_argument, nullptr, 'e'},
         {"on-fly-isolate", required_argument, nullptr, '@'},
-        {"no-mount-points", no_argument, nullptr, 'M'},
+        {"no-mount-points", optional_argument, nullptr, 'M'},
+	{"mount-points", optional_argument, nullptr, 'M'},
         {"go-into", required_argument, nullptr, 'g'},
         {"crypto-block", required_argument, nullptr, '#'},
         {"ref-crypto-block", required_argument, nullptr, '*'},

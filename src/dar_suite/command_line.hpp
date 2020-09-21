@@ -110,6 +110,8 @@ struct line_param
     bool empty;                   ///< whether to do a dry-run execution
     bool alter_atime;             ///< whether to reset the atime of file read during backup to their original value (resetting atime does modify ctime)
     bool same_fs;                 ///< whether to stick to a same filesystem
+    deque<string> same_fs_incl;   ///< optional list of path to filesystems to stick to (for backup operation)
+    deque<string> same_fs_excl;   ///< optional list of path to filesystems to not consider (for backup operation)
     bool snapshot;                ///< whether to perform a snapshot backup
     bool cache_directory_tagging; ///< whether to ignore directory contents where a the cache directory tagging files is found
     U_32 crypto_size;             ///< block size by which to cypher data
