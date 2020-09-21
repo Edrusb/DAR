@@ -422,6 +422,29 @@ namespace libdar
 	    sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
 	    sauv_path_t->set_location(sauv_path);
 
+	    filesystem_ids same_fs(options.get_same_fs(), fs_root);
+	    deque<string> same_fs_inc = options.get_same_fs_include();
+	    deque<string> same_fs_exc = options.get_same_fs_exclude();
+	    if(!same_fs_inc.empty() || !same_fs_exc.empty())
+	    {
+		deque<string>::iterator it = same_fs_inc.begin();
+		same_fs.clear();
+
+		while(it != same_fs_inc.end())
+		{
+		    same_fs.include_fs_at(*it);
+		    ++it;
+		}
+
+		it = same_fs_exc.begin();
+		while(it != same_fs_exc.end())
+		{
+		    same_fs.exclude_fs_at(*it);
+		    ++it;
+		}
+	    }
+
+
 	    try
 	    {
 		sequential_read = false; // updating the archive field
@@ -462,7 +485,7 @@ namespace libdar
 				   options.get_empty(),
 				   options.get_alter_atime(),
 				   options.get_furtive_read_mode(),
-				   options.get_same_fs(),
+				   same_fs,
 				   options.get_comparison_fields(),
 				   options.get_snapshot(),
 				   options.get_cache_directory_tagging(),
@@ -695,7 +718,7 @@ namespace libdar
 				 options.get_empty(),
 				 true,    // alter_atime
 				 false,   // furtive_read_mode
-				 false,   // same_fs
+				 filesystem_ids(false, path("/")),    // same_fs
 				 comparison_fields::all,        // what_to_check
 				 false,   // snapshot
 				 false,   // cache_directory_tagging
@@ -850,7 +873,7 @@ namespace libdar
 			     options_repair.get_empty(),
 			     false,               // alter_atime
 			     false,               // furtive_read_mode
-			     false,               // same_fs
+			     filesystem_ids(false, path("/")), // same_fs
 			     comparison_fields::all,   // comparison_fields
 			     false,               // snapshot
 			     false,               // cache_directory_tagging,
@@ -1927,7 +1950,7 @@ namespace libdar
 						bool empty,
 						bool alter_atime,
 						bool furtive_read_mode,
-						bool same_fs,
+						const filesystem_ids & same_fs,
 						comparison_fields what_to_check,
 						bool snapshot,
 						bool cache_directory_tagging,
@@ -2023,7 +2046,7 @@ namespace libdar
 
 		// checking for exclusion due to different filesystem
 
-	    if(same_fs && !tools_are_on_same_filesystem(sauv_path_abs.display(), fs_root.display()))
+	    if(same_fs.is_covered(sauv_path_abs))
 		cov = false;
 
 	    if(snapshot)     // if we do a snapshot we dont create an archive this no risk to save ourselves
@@ -2168,7 +2191,7 @@ namespace libdar
 					      bool empty,
 					      bool alter_atime,
 					      bool furtive_read_mode,
-					      bool same_fs,
+					      const filesystem_ids & same_fs,
 					      comparison_fields what_to_check,
 					      bool snapshot,
 					      bool cache_directory_tagging,

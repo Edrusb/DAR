@@ -34,6 +34,7 @@
 #include "statistics.hpp"
 #include "archive_options.hpp"
 #include "thread_cancellation.hpp"
+#include "filesystem_ids.hpp"
 
 namespace libdar
 {
@@ -86,7 +87,7 @@ namespace libdar
                                   const infinint & hourshift,
 				  bool alter_time,
 				  bool furtive_read_mode,
-				  bool same_fs,
+				  const filesystem_ids & same_fs,
 				  comparison_fields what_to_check,
 				  bool snapshot,
 				  bool cache_directory_tagging,

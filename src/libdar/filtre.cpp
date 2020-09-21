@@ -545,7 +545,7 @@ namespace libdar
                            const infinint & hourshift,
 			   bool alter_atime,
 			   bool furtive_read_mode,
-			   bool same_fs,
+			   const filesystem_ids & same_fs,
 			   comparison_fields what_to_check,
 			   bool snapshot,
 			   bool cache_directory_tagging,
@@ -659,7 +659,7 @@ namespace libdar
 
 			    if(subtree.is_covered(juillet.get_path())
 			       && (dir != nullptr || filtre.is_covered(nom->get_name()))
-			       && (! same_fs || e_ino == nullptr || e_ino->get_device() == root_fs_device)
+			       && (e_ino == nullptr || same_fs.is_covered(e_ino->get_device()))
 			       && (e_ino == nullptr || exclude_by_ea == "" || e_ino->ea_get_saved_status() != ea_saved_status::full || e_ino->get_ea() == nullptr || !e_ino->get_ea()->find(exclude_by_ea, tmp_val)))
 			    {
 				if(known_hard_link)

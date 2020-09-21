@@ -263,7 +263,7 @@ namespace libdar
 				bool empty,
 				bool alter_atime,
 				bool furtive_read_mode,
-				bool same_fs,
+				const filesystem_ids & same_fs,
 				comparison_fields what_to_check,
 				bool snapshot,
 				bool cache_directory_tagging,
@@ -336,7 +336,7 @@ namespace libdar
 			      bool empty,                       ///< whether to make an "dry-run" execution
 			      bool alter_atime,                 ///< whether to alter atime date (by opposition to ctime) when reading files
 			      bool furtive_read_mode,           ///< whether to neither alter atime nor ctome (if true alter_atime is ignored)
-			      bool same_fs,                     ///< confin the files consideration to a single filesystem
+			      const filesystem_ids & same_fs,   ///< confin the files consideration to the given set of filesystem
 			      comparison_fields what_to_check,  ///< fields to consider wien comparing inodes (see comparison_fields enumeration)
 			      bool snapshot,                    ///< make as if all file had not changed
 			      bool cache_directory_tagging,     ///< avoid saving directory which follow the cache directory tagging
