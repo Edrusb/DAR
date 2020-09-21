@@ -49,6 +49,42 @@ using namespace std;
 
 namespace libdar
 {
+
+    filesystem_ids::filesystem_ids(const path & root)
+    {
+	change_root_fs(root);
+    }
+
+    filesystem_ids::filesystem_ids(bool same_fs, const path & root)
+    {
+	change_root_fs(root);
+	if(same_fs)
+	    included.insert(root_fs);
+	else
+	    excluded.insert(root_fs);
+    }
+
+    void filesystem_ids::change_root_fs(const path & root)
+    {
+	if(root.is_relative())
+	    throw Erange("filesystem_ids::set_root_fs","path to a filesystem must be an absolute path");
+	root_fs = path2fs_id(root.display());
+    }
+
+    void filesystem_ids::include_fs_at(const path & chem)
+    {
+	if(chem.is_relative())
+	    throw Erange("filesystem_ids::set_root_fs","path to a filesystem must be an absolute path");
+	included.insert(path2fs_id(chem.display()));
+    }
+
+    void filesystem_ids::exclude_fs_at(const path & chem)
+    {
+	if(chem.is_relative())
+	    throw Erange("filesystem_ids::set_root_fs","path to a filesystem must be an absolute path");
+	excluded.insert(path2fs_id(chem.display()));
+    }
+
     bool filesystem_ids::is_covered(const infinint & fs_id) const
     {
 	set<infinint>::iterator it;
@@ -85,6 +121,13 @@ namespace libdar
 		    return false;
 	    }
 	}
+    }
+
+    bool filesystem_ids::is_covered(const path & chem) const
+    {
+	if(chem.is_relative())
+	    throw Erange("filesystem_ids::set_root_fs","path to a filesystem must be an absolute path");
+	return is_covered(path2fs_id(chem.display()));
     }
 
     infinint filesystem_ids::path2fs_id(const std::string & path)
