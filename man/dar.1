@@ -716,8 +716,17 @@ do not save files which have the 'd' flag set (see chattr(1) lsattr(1) ext2 comm
 -5, --exclude-by-ea[=<extended attribute name>]
 exclude inodes from backup that have been set with the EA given in argument. If not argument is given to that option the default EA used to exclude files from backup is "user.libdar_no_backup". To set this attribute to a given file, use the following command: "setfattr -n user.libdar_no_backup <filename>", to remove it: "setfattr -x user.libdar_no_backup <filename>". Last, to check the presence this EA: "getfattr <filename>"
 .TP 20
+-M, --mount-points { I:<path to fs> | E:<path to fs> }
+If the argument is of the
+.B
+I:<path to fs>
+form, the filesystem in which this path points to is considered for the backup operation, that's to say, other file filtering mechanism will be applied and some or all files of that filesystem will be saved for backup. While with the
+.B
+E:<path to fs>
+form, no file in that filesystem will even be considered for backup. both E: and I: forms must be provided with an absolute path. -M option can be used several times on the command-line. If only I: forms are used, the filesystem based filtering mechanism behaves as a white list (only those listed paths are included). If only E: form is used, the filesystem based filtering mechanism behaves as a black list (everything is considered except those listed paths). Last, while a mix of I: and E: forms are used, filsystems that will be considered for backup will be those given with an I: form and not also given with an E: form. Note that this is filesystem based filtering, not path based: If for example a filesystem is mounted under /var directory and you specify I:/var/log all /var filesystem will be considered for backup. If you rather want to only save what is in /var/log use the -P/-g/-X/-I/-[/-] options that realise the file filtering by name and path+name. You cannot exclude the filesystem which contains the path given to -R option. The use of -M option with argument erases any previous configuration done with -M option without argument (see below), and vice versa. By default (no -M option specified), no filtering based on filesystem is performed, in other worlds all files are considered for file filtering mechanism and eventually backup.
+.TP 20
 -M, --no-mount-points
-stay in the same filesystem as the root directory (see -R option), subdirectory that are mounting points for other filesystems will not be saved (or saved empty if -D option is used). This option is useless and ignored for merging operation.
+This is the legacy form of the option described just above, that existed before release 2.7.0. When -M option is provided without argument, only files located on the filesystem pointed to by the path given to -R option will be considered for backup. Subdirectory that are mounting points for other filesystems will not be saved (or saved empty if -D option is used). This option is useless and ignored for merging operation. The use of -M without option lead dar to ignore any previous -M I:<path> and -M E:<path> options that could have been given on command-line or -B included file so far.
 .TP 20
 -, ,  --cache-directory-tagging
 don't save contents of directories that use the Cache Directory Tagging Standard. See http://www.brynosaurus.com/cachedir/spec.html for details. (this option is useless with -+ option)
