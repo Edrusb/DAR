@@ -1342,12 +1342,12 @@ void line_tools_display_features(user_interaction & dialog)
 	string time_accuracy = "";
 	string threadar_version = "";
 
-	dialog.printf(gettext("   Libz compression (gzip)      : %s"), YES_NO(compile_time::libz()));
-	dialog.printf(gettext("   Libbz2 compression (bzip2)   : %s"), YES_NO(compile_time::libbz2()));
-	dialog.printf(gettext("   Liblzo2 compression (lzo)    : %s"), YES_NO(compile_time::liblzo()));
-	dialog.printf(gettext("   Liblzma compression (xz)     : %s"), YES_NO(compile_time::libxz()));
-	dialog.printf(gettext("   Liblzstd compression (zstd)  : %s"), YES_NO(compile_time::libzstd()));
-	dialog.printf(gettext("   Liblzstd compression (lz4)   : %s"), YES_NO(compile_time::liblz4()));
+	dialog.printf(gettext("   gzip compression (libz)      : %s"), YES_NO(compile_time::libz()));
+	dialog.printf(gettext("   bzip2 compression (libbzip2) : %s"), YES_NO(compile_time::libbz2()));
+	dialog.printf(gettext("   lzo compression (liblzo2)    : %s"), YES_NO(compile_time::liblzo()));
+	dialog.printf(gettext("   xz compression (liblzma)     : %s"), YES_NO(compile_time::libxz()));
+	dialog.printf(gettext("   zstd compression (libzstd)   : %s"), YES_NO(compile_time::libzstd()));
+	dialog.printf(gettext("   lz4 compression (liblz4)     : %s"), YES_NO(compile_time::liblz4()));
 	dialog.printf(gettext("   Strong encryption (libgcrypt): %s"), YES_NO(compile_time::libgcrypt()));
 	dialog.printf(gettext("   Public key ciphers (gpgme)   : %s"), YES_NO(compile_time::public_key_cipher()));
 	dialog.printf(gettext("   Extended Attributes support  : %s"), YES_NO(compile_time::ea()));
@@ -1405,9 +1405,9 @@ void line_tools_display_features(user_interaction & dialog)
 	else
 	    threadar_version = "";
 	dialog.printf(gettext("   Multiple threads (libthreads): %s %s"), YES_NO(compile_time::libthreadar()), threadar_version.c_str());
-	dialog.printf(gettext("   Delta compression support    : %s"), YES_NO(compile_time::librsync()));
-	dialog.printf(gettext("   Remote repository support    : %s"), YES_NO(compile_time::remote_repository()));
-	dialog.printf(gettext("   Libargon2 hashing (argon2)   : %s"), YES_NO(compile_time::libargon2()));
+	dialog.printf(gettext("   Delta compression (librsync) : %s"), YES_NO(compile_time::librsync()));
+	dialog.printf(gettext("   Remote repository (libcurl)  : %s"), YES_NO(compile_time::remote_repository()));
+	dialog.printf(gettext("   argon2 hashing (libargon2)   : %s"), YES_NO(compile_time::libargon2()));
     }
     catch(...)
     {
