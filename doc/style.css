@@ -1,0 +1,93 @@
+html
+{
+    font-family: 'Open Sans', serif;
+    text-align: justify;
+    color: Black;
+    margin: 5%;
+}
+
+body
+{
+    margin: auto;
+    background-color: rgb(221, 221, 221);
+    color: rgb(0, 0, 170);
+}
+
+div
+{
+    color: #333333;
+    margin-left: 5%;
+    text-align: left;
+    border: 1px solid #333333;
+}
+
+code
+{
+    white-space: pre;
+}
+
+e
+{
+    background-color: #EEEEEE;
+}
+
+a:link
+{
+    color: #0000ff;
+}
+
+a:visited
+{
+    color: #000055;
+}
+a:hover
+{
+    color: #550055;
+    text-shadow: 3px 3px 3px Yellow;
+}
+
+a:active
+{
+    color: #ff0000;
+}
+
+h1,h2,h3,h4,h5,h6,h7,h8
+{
+    text-shadow: 3px 3px 2px Grey;
+    color: DarkBlue;
+}
+
+body
+{
+    counter-reset: h2c;
+}
+
+
+h2::before
+{
+    counter-increment: h2c;
+    content: counter(h2c) "\0000a0-\0000a0\0000a0";
+}
+
+h2
+{
+    counter-reset: h3c;
+    text-decoration: underline;
+}
+
+h3::before
+{
+    counter-increment: h3c;
+    content: counter(h2c) "." counter(h3c) "\0000a0-\0000a0\0000a0";
+}
+
+h3
+{
+    counter-reset: h4c;
+}
+
+h4::before
+{
+    counter-increment: h4c;
+    content: counter(h2c) "." counter(h3c) "." counter(h4c) "\0000a0-\0000a0\0000a0";
+}

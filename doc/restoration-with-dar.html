@@ -1,0 +1,1240 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <link href="style.css" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+    <title>Restoration with dar</title>
+  </head>
+  <body>
+    <center><h1>Restoring a whole system with dar</h1></center>
+
+    <h2>Introduction</h2>
+    <p>
+      Restoration is usually the most tricky part of a backup process. By <i>backup process</i> is designed the whole
+      process of creating backups, storing them in a secured place, protecting backup data against unauthorized access,
+      and rebuilding a whole system from scratch upon major failure/system corruption/security breach/...
+      (or a set of systems, hypervisor, virtual machines, local storage, activating remote
+      storage, and making the restored system bootable).
+    </p>
+    <p>
+      No backup process matches the need of all. For example, syncing your local files in the cloud
+      is easy and may be suitable for personal use, but as it also exposes all your data, values, proprietary software, patents,
+      to the eye of the cloud provider, it may thus not be suitable for companies having production secrets, secret recipes that
+      constitute the source of their revenue. It may neither be suitable for a individual fighting for human
+      rights and for freedom in a country where these natural rights are banished. And last, it does not let you
+      rebuild your whole system: you will have to reinstall all applications and configurations you had done for them, as well
+      as eventually find the license keys to active the proprietary software you were using.
+    </p>
+    <p>
+      At the opposite, restoring a whole system with not only the user data but also the application binaries, configurations,
+      operating system,... in the state it had at the time of the backup requires some skills and knowledge. The objective
+      of this document is to provide this type of information to help anyone new to this operation, using <b>Disk ARchive</b> (dar)
+      as backup tool under Linux and more generally Unixes (including MaCOS X).
+    </p>
+    <p>
+      In the following we will describe how to restore a whole system with:
+      <ul>
+	<li>data encryption,</li>
+	<li>local or remote storage,</li>
+	<li>data parity,</li>
+	<li>legacy MBR or UEFI boot,</li>
+	<li>For a single system to a complete <i>Proxmox</i> hypervisor, its containers and VMs</li>
+      </ul>
+    </p>
+    <p>
+      <b><u>Some notes about Dar software:</u></b><br/>
+      At the opposite of backup tools that copy bytes verbatim from the disk to a file, <i>dar</i> keeps traces of files inside
+      the file-system, it stores every possible thing related to these files (metadata, attributes, Extended Attributes, data, sparse nature of files).<br/><br/>
+      <b>The advantages</b> are that you save much less data (not the free block space of a file-system), can perform differential and incremental
+      backups (so the new backup is very small and processing time very fast), and even use rsync-based binary delta per saved file between two
+      backups (so you do not re-save a whole large binary file when it has changed). The other advantage is that you can restore
+      on any disk size (if large enough to hold the data), change the partition layout, use a different file-system, and so on.
+      Added to that <i>dar</i> can compress specific files and avoid trying compressing some others during the backup process and use strong encryption at the same time. Last
+      the backup format is very robust against corruption and can both detect corruption affecting a file and still recover
+      the rest of the backup. But if using parity data with dar (thanks to <a href="http://parchive.sourceforge.net/">Parchive</a> software as we will show here), the backup can
+      even be repaired upon corruption.<br/><br/>
+      <b>The drawbacks</b> are that you will have to manually recreate the disk partitions and format the file-system as you want,
+      in order to restore files into them.
+    </p>
+    <h2>Backup creation</h2>
+    <h3>What to backup</h3>
+    <p>
+      Do I have to backup Everything? Well, in fact no. You can exclude all virtual file-systems like /dev /proc and /sys (see dar's -P option)
+      as well as any temporary and cache directory (/tmp /var/tmp /var/cache/apt/archives /var/backups /home/*cache*/*...) and the directories
+      named "lost+found" that will be recreated at restoration time while formatting the target file-system.
+      If you use LVM to store you system, you might be interested, just for reference, in recording within the backup the output of
+      the <b>lsblk</b> command, that gives the current partitions, Virtual Group name, Logical Volume names and their usage in the running
+      system at the time of the backup (see -&lt; and -= options below).
+    </p>
+    <p>
+      Here is an example of configuration I use for myself on a <i>Proxmox</i> system (Debian based kvm hypervisor):
+    </p>
+    <div><code>
+
+	root@soleil:~# cat .darrc
+	all:
+	-R /
+
+	create:
+	-am
+	-D
+	-P dev
+	-P run
+	-P sys
+	-P proc
+	-P tmp
+	-P var/lib/vz
+	# this is where proxmox stores VM backups so we save the directory:
+	-g var/lib/vz/dump
+	-P var/lib/lxcfs
+	-P var/cache/apt/archives
+	-P etc/pve
+	-P var/backups
+	-P lost+found
+	-P */lost+found
+	-P root/tmp
+	-P mnt
+	-zbzip2
+	-s 1G
+	--nodump
+	--cache-directory-tagging
+	-B /etc/darrc
+	compress-exclusion
+	no-emacs-backup
+	bell
+	# will calculate the parity file of each generated slices
+	-E "/usr/share/dar/samples/dar_par_create.duc %p %b %N %e %c 1"
+	--slice-mode 0640
+	--retry-on-change 3:1024000
+	# when entering the /root directory, dar will run lsblk and store its
+	# output into /root/lsblk.txt then this file will be part of the backup
+	# as we have not excluded it (by mean of -P, -X, -] and similar options)
+	-&lt; root
+	-= "/bin/lsblk &gt; %p/lsblk.txt"
+
+    </code></div>
+
+    <h3>Dar_static</h3>
+    <p>
+      We will copy <b>dar_static</b> binary beside the backup to not rely on anything else for restoration.
+      Some user also add a bit of dar documentation (including this document), that's up to you to decide.
+    </p>
+
+    <h3>Ciphering</h3>
+    <p>
+      If backup has been ciphered (-K option), with symmetric encryption algorithm you will be asked for the passphrases
+      to decipher it and restore your data, while with asymmetrical encryption, this is the private key and the knowledge of the
+      passphrase used to unlock it (if used) that will be needed. In consequences this needed information must <b>not</b> only
+      be stored in the backup, but also outside of it (in your head for a passphrase, or in a removable media for a private
+      key, for example).
+      <br/><br/>
+      The interest of ciphering backups is especially strong when using a cloud provider to store them.
+    </p>
+    <h3>Direct Attached Storage (DAS)</h3>
+    <p>
+      For direct attached storage (DAS), like local disk, key, or legacy DVDs, there is no difficulties, just the risk
+      to erase the backup by formatting the wrong disk by mistake.
+    </p>
+    <h3>Network Attached Storage (NAS)</h3>
+    <p>
+      you will of course need to setup a network access before being able to restore your data. The rescue system must also support
+      one of the network protocol available with your NAS to access your backups. For protocols other than FTP and SFTP,
+      a temporary local storage may be needed and thus slicing dar backups (see -s option) will be very useful to be able
+      to perform a restoration without consuming a lot of disk. But, when using FTP or SFTP instead dar can read
+      the backup directly from the NAS and thus no local temporary storage is required.
+    </p>
+    <h3>Partitions</h3>
+    <p>
+      Dar is partitions independent so we will have to recreate them before restoration starts: Either the exactly same layout of
+      partitions with the same size or or not if you realize some partitions are nearly saturated or oversized. Or a completely different
+      partition/disk layout (splitting /var from / in a separated partition for example, or putting some partitions together if
+      it makes better sense).
+    </p>
+    <h3>UEFI Boot</h3>
+    <p>
+      UEFI boot uses an EFI partition (vfat formatted) where are stored binaries for the different operating systems
+      present in the host. Under Debian and many other systems, this partition is only used before
+      the Linux system is started but it is mounted afterward under /boot/efi when the system has booted, so it can
+      be saved by dar without effort. We will see the little trick to do about that before restoring dar.
+    </p>
+    <h3>Legacy MBR boot</h3>
+    <p>
+      Nothing too complicated here: it will just be necessary re-install the boot loader from the restored system, we
+      will describe that too.
+    </p>
+    <h2>Restoration Process</h2>
+    <h3>Booting a pristine system</h3>
+    <p>
+      So you have done and tested your backup as usually and today you need to restore them on a brand-new computer.
+      The proposition is to use <a href="https://www.system-rescue.org/">System-rescueCD</a> for that. Do not be
+      confused by this name, it be used not only CD bootable based OS, but is also available as bootable USB key.
+      <a href="https://www.knopper.net/knoppix/index-en.html">Knoppix</a> is also an option.
+    </p>
+    <p>
+      Once systemRescueCD has booted, you get to a shell prompt ready to interpret your commands.
+      For those not having US native keyboards, you can change its layout thanks to the <b>loadkeys</b> command:<br/>
+    </p>
+    <div><code>
+
+	[root@sysresccd ~]# loadkeys fr
+	[root@sysresccd ~]#
+
+    </code></div>
+    <h3>Accessing the backup from the host</h3>
+    <h4>Accessing the backup (DAS context)</h4>
+    <p>
+      In the case of DAS, we can use <b>lsblk</b> to identify the backup partition and or LVM volume, then we can <b>mount</b> it
+    </p>
+    <div><code>
+
+	<b>[root@sysresccd ~]# lsblk -i</b>
+	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+	loop0    7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
+	sda      8:0    0   100G  0 disk
+	sdb      8:16   0    32G  0 disk
+	<e>`-sdb1   8:17   0    32G  0 <b>part</b></e>
+	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
+	<b>[root@sysresccd ~]# cd /mnt</b>
+	<b>[root@sysresccd /mnt]# mkdir Backup</b>
+	<b>[root@sysresccd /mnt]# mount /dev/sdb1 Backup</b>
+	[root@sysresccd /mnt]# lsblk -i
+	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+	loop0    7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
+	sda      8:0    0   100G  0 disk
+	sdb      8:16   0    32G  0 disk
+	<e>`-sdb1   8:17   0    32G  0 part /mnt/Backup</e>
+	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
+	<b>[root@sysresccd /mnt]#</b>
+
+    </code></div>
+
+
+    <h4>Creating a local temporary storage (NAS context without (S)FTP access)</h4>
+    <p>
+      In the case of Network Storage (NAS) and not FTP or SFTP protocol
+      available, we need a local temporary file-system (removed at the end of the restoration
+      process). Here we use <b>lsblk</b> to list all disks,
+      then <b>gdisk</b> to create partitions and finally <b>mkfs</b> to format the file-system
+      and <b>mount</b> it to have it ready for use.<br/><br/>
+      In the below example we use a 32 GB USB key for temporary storage:
+    </p>
+    <div><code>
+
+	<b>[root@sysresccd ~]# lsblk</b>
+	NAME  MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+	loop0   7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
+	sda     8:0    0   100G  0 disk
+	sdb     8:16   0    32G  0 disk
+	sr0    11:0    1   841M  0 rom  /run/archiso/bootmnt
+	<b>[root@sysresccd ~]# gdisk /dev/sdb</b>
+	GPT fdisk (gdisk) version 1.0.4
+
+	Partition table scan:
+	MBR: not present
+	BSD: not present
+	APM: not present
+	GPT: not present
+
+	Creating new GPT entries in memory.
+
+	<b>Command (? for help): n</b>
+	Partition number (1-128, default 1):
+	First sector (34-67108830, default = 2048) or {+-}size{KMGTP}:
+	Last sector (2048-67108830, default = 67108830) or {+-}size{KMGTP}:
+	Current type is 'Linux filesystem'
+	Hex code or GUID (L to show codes, Enter = 8300):
+	Changed type of partition to 'Linux filesystem'
+
+	<b>Command (? for help): p</b>
+	Disk /dev/sdb: 67108864 sectors, 32.0 GiB
+	Model: QEMU HARDDISK
+	Sector size (logical/physical): 512/512 bytes
+	Disk identifier (GUID): 89112323-E1B3-42D7-BB61-8084C1D359F9
+	Partition table holds up to 128 entries
+	Main partition table begins at sector 2 and ends at sector 33
+	First usable sector is 34, last usable sector is 67108830
+	Partitions will be aligned on 2048-sector boundaries
+	Total free space is 2014 sectors (1007.0 KiB)
+
+	Number  Start (sector)    End (sector)  Size       Code  Name
+	<e>1            2048        67108830   32.0 GiB    8300  Linux filesystem</e>
+
+	<b>Command (? for help): w</b>
+
+	Final checks complete. About to write GPT data. THIS WILL OVERWRITE EXISTING
+	PARTITIONS!!
+
+	<b>Do you want to proceed? (Y/N): y</b>
+	OK; writing new GUID partition table (GPT) to /dev/sdb.
+	The operation has completed successfully.
+	<b>[root@sysresccd /mnt]# mkfs.ext4 /dev/sdb1</b>
+	mke2fs 1.45.0 (6-Mar-2019)
+	Discarding device blocks: done
+	Creating filesystem with 8388347 4k blocks and 2097152 inodes
+	Filesystem UUID: c7ee69b8-89f4-4ae3-92cb-b0a9e41a5fa8
+	Superblock backups stored on blocks:
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208,
+	4096000, 7962624
+
+	Allocating group tables: done
+	Writing inode tables: done
+	Creating journal (32768 blocks): done
+	Writing superblocks and filesystem accounting information: done
+
+	<b>[root@sysresccd ~]# cd /mnt</b>
+	<b>[root@sysresccd /mnt]# mkdir Backup</b>
+	<b>[root@sysresccd /mnt]# mount /dev/sdb1 Backup</b>
+	[root@sysresccd /mnt]# lsblk -i
+	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+	loop0    7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
+	sda      8:0    0   100G  0 disk
+	sdb      8:16   0    32G  0 disk
+	<e>`-sdb1   8:17   0    32G  0 part /mnt/Backup</e>
+	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
+	<b>[root@sysresccd /mnt]#</b>
+
+    </code></div>
+    <p>
+      you can now fetch each slice dar would request into that /mnt/Backup directory and remove it afterward. Dar's -E option
+      may be of some use it to automate the process. Assuming you use sftp outside of dar to fetch the slices, you could use
+      the following to instruct <i>dar</i> where how to obtain the slices.
+    </p>
+    <div>
+      <code>
+
+	<b>[root@sysresccd /mnt]# cat ~/.darrc &lt;&lt;EOF</b>
+	-E "rm -f /mnt/Backup/%b.*.%e ; sftp user@backup-host:/some/where/%b.%N.%e /mnt/Backup"
+	EOF
+	<b>[root@sysresccd /mnt]#</b>
+
+      </code>
+    </div>
+    <p>
+      If you do not have or want to use a disk for this temporary storage, you can rely on your host memory thanks to a tmpfs file-system:
+    </p>
+    <div>
+      <code>
+
+	<b>[root@sysresccd /mnt]# mkdir /mnt/Backup</b>
+	<b>[root@sysresccd /mnt]# mount -t tmpfs -o size=2G tmpfs /mnt/Backup</b>
+	<b>[root@sysresccd /mnt]# mkdir /mnt/Backup</b>
+
+      </code>
+    </div>
+
+    <h4>NAS with FTP or SFTP</h4>
+    <p>
+      If you plan to use FTP or SFTP embedded within <i>dar</i> you do not need to prepare any local temporary storage, just remains the network access
+      to the NAS to validate:
+    </p>
+    <div><code>
+
+	<b>[root@sysresccd ~]# ping 192.168.6.6</b>
+	PING 192.168.6.6 (192.168.6.6) 56(84) bytes of data.
+	64 bytes from 192.168.6.6: icmp_seq=1 ttl=64 time=1.33 ms
+	64 bytes from 192.168.6.6: icmp_seq=2 ttl=64 time=0.667 ms
+	^C
+	--- 192.168.6.6 ping statistics ---
+	2 packets transmitted, 2 received, 0% packet loss, time 3ms
+	rtt min/avg/max/mdev = 0.667/0.999/1.332/0.334 ms
+	<b>[root@sysresccd ~]#</b>
+
+    </code></div>
+    <p>
+      you may also validate the FTP or SFTP access availability with the associated credentials, using the CLI <b>ftp</b> and
+      <b>sftp</b> commands.
+    </p>
+
+    <h3>Preparing partitions</h3>
+    <p>
+      You have a total freedom to create the same or a different partition layout,
+      it will not reduce or impact the ability to restore with dar. This may be
+      the opportunity to use LVM of RAID or SAN, or at the opposite to get back to a plain old partition,
+      that's up to you to decide. In the
+      following we will first use plain partition with UEFI boot (and MBR boot), then revisit
+      the process using LVM and UEFI.
+    </p>
+    <h4>the EFI partition</h4>
+    <p>
+      To boot in UEFI a small EFI partition has to be created and vfat formatted. Here we used a size of 1 MiB which is
+      large enough for a single Linux boot host (using grub), but you can find it having sometimes a size of 512 MiB.
+    </p>
+    <div><code>
+
+	<b>[root@sysresccd ~]# lsblk -i</b>
+	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+	loop0    7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
+	<e>sda      8:0    0   100G  0 disk</e>
+	sdb      8:16   0    32G  0 disk
+	`-sdb1   8:17   0    32G  0 part /mnt/Backup
+	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
+	<b>[root@sysresccd ~]# gdisk /dev/sda</b>
+	GPT fdisk (gdisk) version 1.0.4
+
+	Partition table scan:
+	MBR: not present
+	BSD: not present
+	APM: not present
+	GPT: not present
+
+	Creating new GPT entries in memory.
+
+	<b>Command (? for help): n</b>
+	Partition number (1-128, default 1):
+	First sector (34-209715166, default = 2048) or {+-}size{KMGTP}:
+	Last sector (2048-209715166, default = 209715166) or {+-}size{KMGTP}: <b>4095</b>
+	Current type is 'Linux filesystem'
+	Hex code or GUID (L to show codes, Enter = 8300): <b>ef00</b>
+	<e>Changed type of partition to 'EFI System'</e>
+
+	<b>Command (? for help): p</b>
+	Disk /dev/sda: 209715200 sectors, 100.0 GiB
+	Model: QEMU HARDDISK
+	Sector size (logical/physical): 512/512 bytes
+	Disk identifier (GUID): F19B9BC1-4DA0-4213-97AD-2E8A4172ADDF
+	Partition table holds up to 128 entries
+	Main partition table begins at sector 2 and ends at sector 33
+	First usable sector is 34, last usable sector is 209715166
+	Partitions will be aligned on 2048-sector boundaries
+	Total free space is 209713085 sectors (100.0 GiB)
+
+	Number  Start (sector)    End (sector)  Size       Code  Name
+	<e>1            2048            4095   1024.0 KiB  EF00  EFI System</e>
+
+	    <b>Command (? for help): w</b>
+
+	    Final checks complete. About to write GPT data. THIS WILL OVERWRITE EXISTING
+	    PARTITIONS!!
+
+	    <b>Do you want to proceed? (Y/N): y</b>
+	    OK; writing new GUID partition table (GPT) to /dev/sda.
+	    The operation has completed successfully.
+	    <b>[root@sysresccd ~]# lsblk -i</b>
+	    NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+	    loop0    7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
+	    sda      8:0    0   100G  0 disk
+	    <e>`-sda1   8:1    0     1M  0 part</e>
+	    sdb      8:16   0    32G  0 disk
+	    `-sdb1   8:17   0    32G  0 part /mnt/Backup
+	    sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
+	    <b>[root@sysresccd ~]#</b>
+
+    </code></div>
+    <h4>the root partition</h4>
+    <p>
+      Here we will use a single partition to restore the system to, but you are free
+      to use as many as you want, you will have to format them to the file-system of
+      your choice (not mandatorily the one of the original system) create the mount points
+      and mounts them accordingly to your need. We will see how below, taking the EFI partition
+      as an example.
+    </p>
+    <div><code>
+
+	<b>[root@sysresccd ~]# gdisk /dev/sda</b>
+	GPT fdisk (gdisk) version 1.0.4
+
+	Partition table scan:
+	MBR: protective
+	BSD: not present
+	APM: not present
+	GPT: present
+
+	Found valid GPT with protective MBR; using GPT.
+
+	<b>Command (? for help): n</b>
+	Partition number (2-128, default 2):
+	First sector (34-209715166, default = 4096) or {+-}size{KMGTP}:
+	Last sector (4096-209715166, default = 209715166) or {+-}size{KMGTP}: <b>+80G</b>
+	<e>Current type is 'Linux filesystem'</e>
+	Hex code or GUID (L to show codes, Enter = 8300):
+	Changed type of partition to 'Linux filesystem'
+
+	<b>Command (? for help): p</b>
+	Disk /dev/sda: 209715200 sectors, 100.0 GiB
+	Model: QEMU HARDDISK
+	Sector size (logical/physical): 512/512 bytes
+	Disk identifier (GUID): F19B9BC1-4DA0-4213-97AD-2E8A4172ADDF
+	Partition table holds up to 128 entries
+	Main partition table begins at sector 2 and ends at sector 33
+	First usable sector is 34, last usable sector is 209715166
+	Partitions will be aligned on 2048-sector boundaries
+	Total free space is 41940925 sectors (20.0 GiB)
+
+	Number  Start (sector)    End (sector)  Size       Code  Name
+	1            2048            4095   1024.0 KiB  EF00  EFI System
+	<e>2            4096       167776255   80.0 GiB    8300  Linux filesystem</e>
+
+	<b>Command (? for help): w</b>
+
+	Final checks complete. About to write GPT data. THIS WILL OVERWRITE EXISTING
+	PARTITIONS!!
+
+	Do you want to proceed? (Y/N): y
+	OK; writing new GUID partition table (GPT) to /dev/sda.
+	The operation has completed successfully.
+	<b>[root@sysresccd ~]# lsblk -i</b>
+	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+	loop0    7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
+	sda      8:0    0   100G  0 disk
+	|-sda1   8:1    0     1M  0 part
+	<e>`-sda2   8:2    0    80G  0 part</e>
+	sdb      8:16   0    32G  0 disk
+	`-sdb1   8:17   0    32G  0 part /mnt/Backup
+	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
+	<b>[root@sysresccd ~]#</b>
+
+    </code></div>
+    <h4>A swap space</h4>
+    <p>
+      It is always a good idea to have a swap space, either as a swap file or
+      better as a swap partition (not especially a big one, depending on your needs).
+      Follows the creation of a 1&nbsp;GiB swap partition:
+    </p>
+    <div><code>
+
+	<b>[root@sysresccd ~]# lsblk -i</b>
+	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+	loop0    7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
+	<e>sda      8:0    0   100G  0 disk</e>
+	|-sda1   8:1    0     1M  0 part
+	`-sda2   8:2    0    80G  0 part
+	sdb      8:16   0    32G  0 disk
+	`-sdb1   8:17   0    32G  0 part /mnt/Backup
+	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
+	<b>[root@sysresccd ~]# gdisk /dev/sda</b>
+	GPT fdisk (gdisk) version 1.0.4
+
+	Partition table scan:
+	MBR: protective
+	BSD: not present
+	APM: not present
+	GPT: present
+
+	Found valid GPT with protective MBR; using GPT.
+
+	<b>Command (? for help): n</b>
+	Partition number (3-128, default 3):
+	First sector (34-209715166, default = 167776256) or {+-}size{KMGTP}:
+	Last sector (167776256-209715166, default = 209715166) or {+-}size{KMGTP}: <b>+1G</b>
+	Current type is 'Linux filesystem'
+	Hex code or GUID (L to show codes, Enter = 8300): <b>8200</b>
+	<e>Changed type of partition to 'Linux swap'</e>
+
+
+	<b>Command (? for help): p</b>
+	Disk /dev/sda: 209715200 sectors, 100.0 GiB
+	Model: QEMU HARDDISK
+	Sector size (logical/physical): 512/512 bytes
+	Disk identifier (GUID): F19B9BC1-4DA0-4213-97AD-2E8A4172ADDF
+	Partition table holds up to 128 entries
+	Main partition table begins at sector 2 and ends at sector 33
+	First usable sector is 34, last usable sector is 209715166
+	Partitions will be aligned on 2048-sector boundaries
+	Total free space is 39843773 sectors (19.0 GiB)
+
+	Number  Start (sector)    End (sector)  Size       Code  Name
+	1            2048            4095   1024.0 KiB  EF00  EFI System
+	2            4096       167776255   80.0 GiB    8300  Linux filesystem
+	<e>3       167776256       169873407   1024.0 MiB  8200  Linux swap</e>
+
+	<b>Command (? for help): w</b>
+
+	Final checks complete. About to write GPT data. THIS WILL OVERWRITE EXISTING
+	PARTITIONS!!
+
+	<b>Do you want to proceed? (Y/N): y</b>
+	OK; writing new GUID partition table (GPT) to /dev/sda.
+	The operation has completed successfully.
+	<b>[root@sysresccd ~]# lsblk -i</b>
+	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+	loop0    7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
+	sda      8:0    0   100G  0 disk
+	|-sda1   8:1    0     1M  0 part
+	|-sda2   8:2    0    80G  0 part
+	<e>`-sda3   8:3    0     1G  0 part</e>
+	sdb      8:16   0    32G  0 disk
+	`-sdb1   8:17   0    32G  0 part /mnt/Backup
+	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
+	<b>[root@sysresccd ~]#</b>
+
+    </code></div>
+
+    <h3>Formatting File-systems</h3>
+    <h4>swap partition</h4>
+    <p>
+      In order to be usable we have to format the swap partition:
+    </p>
+    <div><code>
+
+	<b>[root@sysresccd ~]# gdisk -l /dev/sda</b>
+	GPT fdisk (gdisk) version 1.0.4
+
+	Partition table scan:
+	MBR: protective
+	BSD: not present
+	APM: not present
+	GPT: present
+
+	Found valid GPT with protective MBR; using GPT.
+	Disk /dev/sda: 209715200 sectors, 100.0 GiB
+	Model: QEMU HARDDISK
+	Sector size (logical/physical): 512/512 bytes
+	Disk identifier (GUID): F19B9BC1-4DA0-4213-97AD-2E8A4172ADDF
+	Partition table holds up to 128 entries
+	Main partition table begins at sector 2 and ends at sector 33
+	First usable sector is 34, last usable sector is 209715166
+	Partitions will be aligned on 2048-sector boundaries
+	Total free space is 39843773 sectors (19.0 GiB)
+
+	Number  Start (sector)    End (sector)  Size       Code  Name
+	1            2048            4095   1024.0 KiB  EF00  EFI System
+	2            4096       167776255   80.0 GiB    8300  Linux filesystem
+	<e>3       167776256       169873407   1024.0 MiB  8200  Linux swap</e>
+	<b>[root@sysresccd ~]# mkswap /dev/sda3</b>
+	Setting up swapspace version 1, size = 1024 MiB (1073737728 bytes)
+	no label, UUID=51f75caa-6cf3-421f-a18a-c58e77f61795
+	<b>[root@sysresccd ~]#</b>
+
+    </code></div>
+    <p>
+      In option we can even use this swap partition right now for the current rescue system, this may be interesting
+      especially if you used a <i>tmpfs</i> file-system as temporary local storage.
+    </p>
+    <div><code>
+
+	<b>[root@sysresccd ~]# free</b>
+	total        used        free      shared  buff/cache   available
+	Mem:        8165684       84432      139112       95864     7942140     7680632
+	Swap:             0           0           0
+	<b>[root@sysresccd ~]# swapon /dev/sda3</b>
+	<b>[root@sysresccd ~]# free</b>
+	total        used        free      shared  buff/cache   available
+	Mem:        8165684       85372      137976       95864     7942336     7679804
+	<e>Swap:       1048572           0     1048572</e>
+	<b>[root@sysresccd ~]#</b>
+
+    </code></div>
+
+    <h4>Root file-system</h4>
+    <p>
+      Nothing tricky here:
+    </p>
+    <div><code>
+
+	<b>[root@sysresccd ~]# gdisk -l /dev/sda</b>
+	GPT fdisk (gdisk) version 1.0.4
+
+	Partition table scan:
+	MBR: protective
+	BSD: not present
+	APM: not present
+	GPT: present
+
+	Found valid GPT with protective MBR; using GPT.
+	Disk /dev/sda: 209715200 sectors, 100.0 GiB
+	Model: QEMU HARDDISK
+	Sector size (logical/physical): 512/512 bytes
+	Disk identifier (GUID): F19B9BC1-4DA0-4213-97AD-2E8A4172ADDF
+	Partition table holds up to 128 entries
+	Main partition table begins at sector 2 and ends at sector 33
+	First usable sector is 34, last usable sector is 209715166
+	Partitions will be aligned on 2048-sector boundaries
+	Total free space is 39843773 sectors (19.0 GiB)
+
+	Number  Start (sector)    End (sector)  Size       Code  Name
+	1            2048            4095   1024.0 KiB  EF00  EFI System
+	<e>2            4096       167776255   80.0 GiB    8300  Linux filesystem</e>
+	3       167776256       169873407   1024.0 MiB  8200  Linux swap
+	<b>[root@sysresccd ~]# mkfs.ext4 /dev/sda2</b>
+	mke2fs 1.45.0 (6-Mar-2019)
+	Discarding device blocks: done
+	Creating filesystem with 20971520 4k blocks and 5242880 inodes
+	Filesystem UUID: ec6319f3-789f-433d-a983-01d577e3e862
+	Superblock backups stored on blocks:
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208,
+	4096000, 7962624, 11239424, 20480000
+
+	Allocating group tables: done
+	Writing inode tables: done
+	Creating journal (131072 blocks): done
+	Writing superblocks and filesystem accounting information: done
+
+	<b>[root@sysresccd ~]#</b>
+
+    </code></div>
+    <p>
+      We will mount this partition to be able to restore into it
+    </p>
+    <div><code>
+
+	<b>[root@sysresccd ~]# mkdir /mnt/R</b>
+	<b>[root@sysresccd ~]# mount /dev/sda2 /mnt/R</b>
+	<b>[root@sysresccd ~]# lsblk -i</b>
+	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+	loop0    7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
+	sda      8:0    0   100G  0 disk
+	|-sda1   8:1    0     1M  0 part
+	<e>|-sda2   8:2    0    80G  0 part /mnt/R</e>
+	`-sda3   8:3    0     1G  0 part [SWAP]
+	sdb      8:16   0    32G  0 disk
+	`-sdb1   8:17   0    32G  0 part /mnt/Backup
+	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
+	<b>[root@sysresccd ~]#</b>
+
+    </code></div>
+
+    <h4>EFI Partition</h4>
+    <p>
+      the EFI partition is a vfat partition that is usually mounted under /boot/efi
+      after the system has booted. So we will
+      format it and mount it there under /mnt/R, where we have now mounted the root file-system.
+    </p>
+    <p>
+      If you use the legacy MBR booting process in your original system, you just have to skip this
+      EFI partition step: when reinstalling grub, the MBR will be setup as expected.
+    </p>
+    <div><code>
+
+	<b>[root@sysresccd ~]# mkfs.vfat -n UEFI /dev/sda1</b>
+	mkfs.fat 4.1 (2017-01-24)
+	<b>[root@sysresccd ~]# cd /mnt/R</b>
+	<b>[root@sysresccd /mnt/R]# mkdir -p boot/efi</b>
+	<b>[root@sysresccd /mnt/R]# mount /dev/sda1 boot/efi</b>
+	<b>[root@sysresccd /mnt/R]# lsblk -i</b>
+	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+	loop0    7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
+	sda      8:0    0   100G  0 disk
+	<e>|-sda1   8:1    0     1M  0 part /mnt/R/boot/efi</e>
+	|-sda2   8:2    0    80G  0 part /mnt/R
+	`-sda3   8:3    0     1G  0 part [SWAP]
+	sdb      8:16   0    32G  0 disk
+	`-sdb1   8:17   0    32G  0 part /mnt/Backup
+	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
+	<b>[root@sysresccd /mnt/R]#</b>
+
+    </code></div>
+
+    <h3>Restoring data with dar</h3>
+    <p>
+      All is ready to receive the data, so we run <i>dar</i>, here below in the case of a DAS
+      or NAS without (S)FTP protocols:
+    </p>
+    <div><code>
+
+	<b>root@sysresccd ~]# cd /mnt/Backup</b>
+	<b>root@sysresccd /mnt/Backup]# ls -al</b>
+	total 3948
+	drwxr-xr-x 4 root root    4096 Oct  4 14:49 .
+	drwxr-xr-x 1 root root      80 Oct  4 15:35 ..
+	-rwxr-xr-x 1 root root 4017928 Oct  4 14:49 dar_static
+	drwx------ 2 root root   16384 Oct  4 13:49 lost+found
+	drwxr-xr-x 2 root root    4096 Oct  4 15:00 soleil-full-2020-09-16
+	<b>[root@sysresccd /mnt/Backup]# ./dar_static -x soleil-full-2020-09-16/soleil-full-2020-09-16 -R /mnt/R -X "lost+found" -w</b>
+	Archive soleil-full-2020-09-16 requires a password:
+	Warning, the archive soleil-full-2020-09-16 has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
+
+
+	--------------------------------------------
+	62845 inode(s) restored
+	including 11 hard link(s)
+	0 inode(s) not restored (not saved in archive)
+	0 inode(s) not restored (overwriting policy decision)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) failed to restore (filesystem error)
+	0 inode(s) deleted
+	--------------------------------------------
+	Total number of inode(s) considered: 62845
+	--------------------------------------------
+	EA restored for 1 inode(s)
+	FSA restored for 0 inode(s)
+	--------------------------------------------
+	<b>[root@sysresccd /mnt/Backup]#</b>
+
+    </code></div>
+    <p>
+      For a NAS with SFTP or FTP this is even simpler, though we have to download dar_static first
+    </p>
+    <div><code>
+
+	<b>[root@sysresccd ~]# scp denis@192.168.6.6:/mnt/Backup/dar_static .</b>
+	The authenticity of host '192.168.6.6 (192.168.6.6)' can't be established.
+	ECDSA key fingerprint is SHA256:6l+YisP2V2l82LWXvWb1DFFYEkzxRex6xmSoY/KY2YU.
+	Are you sure you want to continue connecting (yes/no)? yes
+	Warning: Permanently added '192.168.6.6' (ECDSA) to the list of known hosts.
+	denis@192.168.6.6's password:
+	dar_static                                     100% 3924KB  72.7MB/s   00:00
+	<b>[root@sysresccd ~]# ./dar_static -x sftp://denis@192.168.6.6/mnt/Backup/Soleil/soleil-full-2020-09-16/soleil-full-2020-09-16 -R /mnt/R -X "lost+found" -w</b>
+	Please provide the password for login denis at host 192.168.6.6:
+	Archive soleil-full-2020-09-16 requires a password:
+	Warning, the archive soleil-full-2020-09-16 has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
+
+
+	--------------------------------------------
+	62845 inode(s) restored
+	including 11 hard link(s)
+	0 inode(s) not restored (not saved in archive)
+	0 inode(s) not restored (overwriting policy decision)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) failed to restore (filesystem error)
+	0 inode(s) deleted
+	--------------------------------------------
+	Total number of inode(s) considered: 62845
+	--------------------------------------------
+	EA restored for 1 inode(s)
+	FSA restored for 0 inode(s)
+	--------------------------------------------
+	<b>[root@sysresccd /mnt/Backup]#</b>
+
+    </code></div>
+
+    <h3>Adaptation of the restored data</h3>
+    <p>
+      The UUID have been recreated, if /etc/fstab points to file-system
+      based on their UUID we have to adapt it to their new UUID. The
+      <b>blkid</b> let you grab the UUID of file-system we created including
+      the swap partition, so we can edit /mnt/R/etc/fstab
+      (using <b>vi</b> or <b>joe</b> both available from systemrescueCD).
+    </p>
+    <p>
+      If, like me, you like none of these editors but prefer <b>emacs</b> for example
+      for its ability to run a shell and copy&past between the shell running <i>blkid</i>
+      and the fstab file you are editing,
+      assuming you have it ready for use in the system under restoration, you can
+      delay this edition to the time we will have chrooted, see below.
+    </p>
+    <p>
+      Note that the root file-system UUID has no importance as we will regenerate
+      the ramdisk and grub configuration file based on the new UUID. However if you
+      have more partitions than the few we had in this example, /mnt/R/etc/fstab
+      should be updated with their new UUID or /dev/ path accordingly
+    </p>
+    <div><code>
+
+	<b>[root@sysresccd ~]# blkid</b>
+	/dev/sda1: SEC_TYPE="msdos" LABEL_FATBOOT="UEFI" LABEL="UEFI" <e>UUID="CB52-4920"</e> TYPE="vfat" PARTLABEL="<e>EFI System</e>" PARTUUID="edb894df-e58f-4590-a167-bf5b9025a691"
+	/dev/sda2: UUID="ec6319f3-789f-433d-a983-01d577e3e862" TYPE="ext4" PARTLABEL="Linux filesystem" PARTUUID="8f707306-e1b5-4019-aabb-0d39da9057be"
+	/dev/sda3: <e>UUID="51f75caa-6cf3-421f-a18a-c58e77f61795"</e> TYPE="swap" PARTLABEL="<e>Linux swap</e>" PARTUUID="d0e52f52-3cd3-4396-8e03-972d9f76af49"
+	/dev/sdb1: UUID="c7ee69b8-89f4-4ae3-92cb-b0a9e41a5fa8" TYPE="ext4" PARTLABEL="Linux filesystem" PARTUUID="15e0fb22-7de7-487c-8a68-ecaa2bb19dd0"
+	/dev/sr0: UUID="2019-04-14-11-35-22-00" LABEL="SYSRCD603" TYPE="iso9660" PTUUID="0d4f1b4a" PTTYPE="dos"
+	/dev/loop0: TYPE="squashfs"
+	<b>[root@sysresccd ~]# vi /mnt/R/etc/fstab </b>
+
+    </code></div>
+    <p>
+      We will have to reinstall the boot loader (grub in our case). Do achieve this goal
+      we will <b>chroot</b> into /mnt/R, but
+      first we need to access the /dev /proc and /sys and if using UEFI boot
+      /sys/firmware/efi/efivars file-system from within the chrooted environment:
+    </p>
+    <div><code>
+
+	<b>[root@sysresccd ~]# mount</b>
+	<e>proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)</e>
+	<e>sys on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)</e>
+	<e>dev on /dev type devtmpfs (rw,nosuid,relatime,size=4060004k,nr_inodes=1015001,mode=755)</e>
+	run on /run type tmpfs (rw,nosuid,nodev,relatime,mode=755)
+	<e>efivarfs on /sys/firmware/efi/efivars type efivarfs (rw,nosuid,nodev,noexec,relatime)</e>
+	/dev/sr0 on /run/archiso/bootmnt type iso9660 (ro,relatime,nojoliet,check=s,map=n,blocksize=2048)
+	cowspace on /run/archiso/cowspace type tmpfs (rw,relatime,size=262144k,mode=755)
+	/dev/loop0 on /run/archiso/sfs/airootfs type squashfs (ro,relatime)
+	airootfs on / type overlay (rw,relatime,lowerdir=/run/archiso/sfs/airootfs,upperdir=/run/archiso/cowspace/persistent_SYSRCD603/x86_64/upperdir,workdir=/run/archiso/cowspace/persistent_SYSRCD603/x86_64/workdir,index=off)
+	securityfs on /sys/kernel/security type securityfs (rw,nosuid,nodev,noexec,relatime)
+	tmpfs on /dev/shm type tmpfs (rw,nosuid,nodev)
+	devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000)
+	tmpfs on /sys/fs/cgroup type tmpfs (ro,nosuid,nodev,noexec,mode=755)
+	cgroup2 on /sys/fs/cgroup/unified type cgroup2 (rw,nosuid,nodev,noexec,relatime,nsdelegate)
+	cgroup on /sys/fs/cgroup/systemd type cgroup (rw,nosuid,nodev,noexec,relatime,xattr,name=systemd)
+	pstore on /sys/fs/pstore type pstore (rw,nosuid,nodev,noexec,relatime)
+	bpf on /sys/fs/bpf type bpf (rw,nosuid,nodev,noexec,relatime,mode=700)
+	cgroup on /sys/fs/cgroup/cpu,cpuacct type cgroup (rw,nosuid,nodev,noexec,relatime,cpu,cpuacct)
+	cgroup on /sys/fs/cgroup/rdma type cgroup (rw,nosuid,nodev,noexec,relatime,rdma)
+	cgroup on /sys/fs/cgroup/devices type cgroup (rw,nosuid,nodev,noexec,relatime,devices)
+	cgroup on /sys/fs/cgroup/cpuset type cgroup (rw,nosuid,nodev,noexec,relatime,cpuset)
+	cgroup on /sys/fs/cgroup/net_cls,net_prio type cgroup (rw,nosuid,nodev,noexec,relatime,net_cls,net_prio)
+	cgroup on /sys/fs/cgroup/blkio type cgroup (rw,nosuid,nodev,noexec,relatime,blkio)
+	cgroup on /sys/fs/cgroup/memory type cgroup (rw,nosuid,nodev,noexec,relatime,memory)
+	cgroup on /sys/fs/cgroup/freezer type cgroup (rw,nosuid,nodev,noexec,relatime,freezer)
+	cgroup on /sys/fs/cgroup/pids type cgroup (rw,nosuid,nodev,noexec,relatime,pids)
+	systemd-1 on /proc/sys/fs/binfmt_misc type autofs (rw,relatime,fd=35,pgrp=1,timeout=0,minproto=5,maxproto=5,direct)
+	debugfs on /sys/kernel/debug type debugfs (rw,relatime)
+	hugetlbfs on /dev/hugepages type hugetlbfs (rw,relatime,pagesize=2M)
+	tmpfs on /tmp type tmpfs (rw,nosuid,nodev)
+	configfs on /sys/kernel/config type configfs (rw,relatime)
+	mqueue on /dev/mqueue type mqueue (rw,relatime)
+	tmpfs on /etc/pacman.d/gnupg type tmpfs (rw,relatime,mode=755)
+	tmpfs on /run/user/0 type tmpfs (rw,nosuid,nodev,relatime,size=816568k,mode=700)
+	/dev/sdb1 on /mnt/Backup type ext4 (rw,relatime)
+	/dev/sda2 on /mnt/R type ext4 (rw,relatime)
+	/dev/sda1 on /mnt/R/boot/efi type vfat (rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,utf8,errors=remount-ro)
+	<b>[root@sysresccd ~]#[root@sysresccd ~]# cd /mnt/R</b>
+	<b>[root@sysresccd /mnt/R]# mount --bind /proc proc</b>
+	<b>[root@sysresccd /mnt/R]# mount --bind /sys sys</b>
+	<b>[root@sysresccd /mnt/R]# mount --bind /dev dev</b>
+	<b>[root@sysresccd /mnt/R]# mount --bind /sys/firmware/efi/efivars sys/firmware/efi/efivars</b>
+	<b>[root@sysresccd /mnt/R]# chroot . /bin/bash</b>
+	<b>root@sysresccd:/#</b>
+
+    </code></div>
+    <p>
+      If not done previously you can now edit /etc/fstab with your favorite text editor available in the system under restoration. Then we can reinstall grub,
+      and exit the chroot environment:
+    </p>
+    <div><code>
+
+	<b>root@sysresccd:/# export PATH=/sbin:/usr/sbin:/bin:$PATH</b>
+	<b>root@sysresccd:/# update-grub</b>
+	Generating grub configuration file ...
+	Found linux image: /boot/vmlinuz-4.15.18-21-pve
+	Found initrd image: /boot/initrd.img-4.15.18-21-pve
+	Found linux image: /boot/vmlinuz-4.15.18-12-pve
+	Found initrd image: /boot/initrd.img-4.15.18-12-pve
+	Found memtest86+ image: /boot/memtest86+.bin
+	Found memtest86+ multiboot image: /boot/memtest86+_multiboot.bin
+	done
+	<b>root@sysresccd:/# grub-install</b>
+	Installing for x86_64-efi platform.
+	Installation finished. No error reported.
+	<b>root@sysresccd:/#</b>
+	<b>root@sysresccd:~# exit</b>
+	exit
+	<b>[root@sysresccd /mnt/R]#</b>
+
+    </code></div>
+    <h3>Checking the motherboard when rebooting</h3>
+    <p>
+      You can restart the host and remove the systemrescueCD boot device to be sure the hard disk
+      we restored will be used for booting. At the first boot, make a halt in the "BIOS" (Press F2
+      or "Del" key depending on the hardware) to check that the motherboard points to the correct
+      binary inside the EFI partition of the hard disk, or if using MBR booting process, that the
+      hard disk is in a correct place of boot device list.
+      <div><code>
+
+	  <b>root@sysresccd /mnt/R]# shutdown -r now</b>
+
+      </code></div>
+    </p>
+    <h3>Networking Interfaces</h3>
+    <p>
+      Now that the system is back running, the network interface name may have changed
+      depending on the nature of the hardware. You may have to edit <b>/etc/network/interfaces</b>
+      or equivalent configuration file (/etc/sysconfig/network-scripts/...) if not using
+      automatic tools like network-manager and DHCP protocol for example.
+    </p>
+    <center>
+      <b>
+      THIS ENDS THE RESTORATION PROCESS. WE WILL NOW SEE SOME VARIATIONS OF THIS PROCESS FOR
+      SOME MORE SPECIFIC CONTEXTS.
+      </b>
+    </center>
+    <hr/>
+    <br/>
+    <br/>
+    <br/>
+    <h2>Restoring to LVM volumes</h2>
+    <p>
+      You might prefer especially when using <a href="https://www.proxmox.com/en/proxmox-ve">Proxmox Virtual Environment</a> to restore
+      to an LVM file-system, having a Logical Volume for the root file-system (the proxmox
+      system) and its swap partition and allocating the rest of the space to a thin-pool
+      for VM to have their block storage.
+    </p>
+    <p>
+      Note that if you save the proxmox VE as a a normal Debian system, this is fine, but
+      this will not save the VM and containers you had running under <i>Proxmox</i>. However you can save the
+      <b>/var/lib/vz/dump</b> directory where resides the backups of your VM. This assumes
+      you have scheduled a backup process within proxmox VE for these VMs and containers.
+    </p>
+    <h3>Creating partitions and Logical Volumes</h3>
+    <p>
+      Compared to the previous restoration steps, what changes is that you will create only
+      two partitions, the EFI partition and a LVM partition:
+    </p>
+    <div><code>
+
+	<b>[root@sysresccd ~]# gdisk /dev/sda</b>
+	GPT fdisk (gdisk) version 1.0.4
+
+	Partition table scan:
+	MBR: protective
+	BSD: not present
+	APM: not present
+	GPT: present
+
+	Found valid GPT with protective MBR; using GPT.
+
+	<b>Command (? for help): n</b>
+	Partition number (1-128, default 1):
+	First sector (34-209715166, default = 2048) or {+-}size{KMGTP}:
+	Last sector (2048-209715166, default = 209715166) or {+-}size{KMGTP}: <b>4095</b>
+	Current type is 'Linux filesystem'
+	Hex code or GUID (L to show codes, Enter = 8300): <b>ef00</b>
+	<e>Changed type of partition to 'EFI System'</e>
+	<br/>
+
+	<b>Command (? for help): n</b>
+	Partition number (2-128, default 2):
+	First sector (34-209715166, default = 4096) or {+-}size{KMGTP}:
+	Last sector (4096-209715166, default = 209715166) or {+-}size{KMGTP}:
+	Current type is 'Linux filesystem'
+	Hex code or GUID (L to show codes, Enter = 8300): <b>8e00</b>
+	<e>Changed type of partition to 'Linux LVM'</e>
+	<br/>
+
+	<b>Command (? for help): w</b>
+
+	Final checks complete. About to write GPT data. THIS WILL OVERWRITE EXISTING
+	PARTITIONS!!
+
+	<b>Do you want to proceed? (Y/N): y</b>
+	OK; writing new GUID partition table (GPT) to /dev/sda.
+	The operation has completed successfully.
+	<b>[root@sysresccd ~]# gdisk -l /dev/sda</b>
+	GPT fdisk (gdisk) version 1.0.4
+
+	Partition table scan:
+	MBR: protective
+	BSD: not present
+	APM: not present
+	GPT: present
+
+	Found valid GPT with protective MBR; using GPT.
+	Disk /dev/sda: 209715200 sectors, 100.0 GiB
+	Model: QEMU HARDDISK
+	Sector size (logical/physical): 512/512 bytes
+	Disk identifier (GUID): F19B9BC1-4DA0-4213-97AD-2E8A4172ADDF
+	Partition table holds up to 128 entries
+	Main partition table begins at sector 2 and ends at sector 33
+	First usable sector is 34, last usable sector is 209715166
+	Partitions will be aligned on 2048-sector boundaries
+	Total free space is 2014 sectors (1007.0 KiB)
+
+	Number  Start (sector)    End (sector)  Size       Code  Name
+	<e>1            2048            4095   1024.0 KiB  EF00  EFI System</e>
+	<e>2            4096       209715166   100.0 GiB   8E00  Linux LVM</e>
+
+	<b>[root@sysresccd ~]#</b>
+
+    </code></div>
+    <h3>formatting the partitions and volumes</h3>
+    <p>
+      The formatting of the EFI partition has been seen, so we will not detail
+      it here, but it has to be done now for the following steps to succeed.
+    </p>
+    <p>
+      Remains the LVM related stuff to setup:
+    </p>
+    <ul>
+      <li>Physical Volume</li>
+      <li>Virtual Groups </li>
+      <li>Logical Volume (which corresponds to the partitions we created in the
+	non LVM context)</li>
+      <li>format these volumes as we did for partitions</li>
+    </ul>
+    </p>
+    <div><code>
+
+	<b>[root@sysresccd ~]# lsblk -i</b>
+	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+	loop0    7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
+	sda      8:0    0   100G  0 disk
+	|-sda1   8:1    0     1M  0 part
+	<e>`-sda2   8:2    0   100G  0 part</e>
+	sdb      8:16   0    32G  0 disk
+	`-sdb1   8:17   0    32G  0 part
+	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
+	<b>[root@sysresccd ~]# pvcreate /dev/sda2</b>
+	<e>Physical volume</e> "/dev/sda2" successfully created.
+	<b>[root@sysresccd ~]# vgcreate soleil /dev/sda2</b>
+	<e>Volume group</e> "soleil" successfully created
+	<b>[root@sysresccd ~]# lvcreate -L 9G soleil -n rootfs</b>
+	<e>Logical volume</e> "rootfs" created.
+	<b>[root@sysresccd ~]# lvcreate -L 1G soleil -n swap</b>
+	<e>Logical volume</e> "swap" created.
+	<b>[root@sysresccd ~]# mkswap /dev/mapper/soleil-swap</b>
+	Setting up swapspace version 1, size = 1024 MiB (1073737728 bytes)
+	no label, UUID=8aa8e971-3aea-4357-8723-dbc9392bacf8
+	<b>[root@sysresccd ~]# swapon /dev/mapper/soleil-swap</b>
+	<b>[root@sysresccd ~]# mkfs.ext4 /dev/mapper/soleil-rootfs</b>
+	mke2fs 1.45.0 (6-Mar-2019)
+	Discarding device blocks: done
+	Creating filesystem with 2359296 4k blocks and 589824 inodes
+	Filesystem UUID: 65561197-1e85-498d-9127-bb8f4bc142ac
+	Superblock backups stored on blocks:
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632
+
+	Allocating group tables: done
+	Writing inode tables: done
+	Creating journal (16384 blocks): done
+	Writing superblocks and filesystem accounting information: done
+
+	<b>[root@sysresccd ~]#</b>
+
+    </code></div>
+    <p>
+      Now that all partitions are created as previously, we can mount them
+      to get ready for dar restoration:
+    </p>
+    <div><code>
+
+	<b>[root@sysresccd ~]# cd /mnt</b>
+	<b>[root@sysresccd /mnt]# mkdir R</b>
+	<b>[root@sysresccd /mnt]# mount /dev/mapper/soleil-rootfs R</b>
+	<b>[root@sysresccd /mnt]# cd R</b>
+	<b>[root@sysresccd /mnt/R]# mkdir -p boot/efi</b>
+	<b>[root@sysresccd /mnt/R]# mount /dev/sda1 boot/efi</b>
+	<b>[root@sysresccd /mnt/R]# lsblk -i</b>
+	NAME              MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+	loop0               7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
+	sda                 8:0    0   100G  0 disk
+	<e>|-sda1              8:1    0     1M  0 part /mnt/R/boot/efi</e>
+	`-sda2              8:2    0   100G  0 part
+	<e>|-soleil-rootfs 254:0    0     9G  0 lvm  /mnt/R</e>
+	<e>`-soleil-swap   254:1    0     1G  0 lvm  [SWAP]</e>
+	sdb                 8:16   0    32G  0 disk
+	`-sdb1              8:17   0    32G  0 part
+	sr0                11:0    1   841M  0 rom  /run/archiso/bootmnt
+	<b>[root@sysresccd /mnt/R]#</b>
+
+    </code></div>
+    <h3>Restoring the data with dar</h3>
+    <p>
+      we can proceed as previously, but we will make differently
+      by creating a thing-pool and using a thin volume inside it for /var/lib/vz
+      in order to not saturate the proxmox system with backups while not
+      blocking its free space only for backups, but sharing it with VM volumes.
+    </p>
+    <h3>Creating a thin-pool</h3>
+    <p>
+      Creating a thin pool is done in three steps.
+      <ul>
+	<li>create a small Logical Volume for metadata</li>
+	<li>create a large Logical Volume for data</li>
+	<li>convert both Volumes as a thin-pool</li>
+      </ul>
+    </p>
+    <div><code>
+
+	<b>[root@sysresccd /mnt/R]# lvcreate -n metadata -L 300M soleil</b>
+	<e>Logical volume</e> "metadata" created.
+	<b>[root@sysresccd /mnt/R]# lvcreate -n pooldata -L 80G soleil</b>
+	<e>Logical volume</e> "pooldata" created.
+	<b>[root@sysresccd /mnt/R]# lvconvert --type thin-pool --poolmetadata soleil/metadata soleil/pooldata</b>
+	Thin pool volume with chunk size 64.00 KiB can address at most 15.81 TiB of data.
+	WARNING: Converting soleil/pooldata and soleil/metadata to thin pool's data and metadata volumes with metadata wiping.
+	THIS WILL DESTROY CONTENT OF LOGICAL VOLUME (filesystem etc.)
+	Do you really want to convert soleil/pooldata and soleil/metadata? [y/n]: y
+	<e>Converted soleil/pooldata and soleil/metadata to thin pool.</e>
+	<b>[root@sysresccd /mnt/R]# lsblk -i</b>
+	NAME                      MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+	loop0                       7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
+	sda                         8:0    0   100G  0 disk
+	|-sda1                      8:1    0     1M  0 part /mnt/R/boot/efi
+	`-sda2                      8:2    0   100G  0 part
+	|-soleil-rootfs         254:0    0     9G  0 lvm  /mnt/R
+	|-soleil-swap           254:1    0     1G  0 lvm  [SWAP]
+	<e>|-soleil-pooldata_tmeta 254:2    0   300M  0 lvm</e>
+	<e>| `-soleil-pooldata     254:4    0    80G  0 lvm</e>
+	<e>`-soleil-pooldata_tdata 254:3    0    80G  0 lvm</e>
+	<e>  `-soleil-pooldata     254:4    0    80G  0 lvm</e>
+	sdb                         8:16   0    32G  0 disk
+	`-sdb1                      8:17   0    32G  0 part
+	sr0                        11:0    1   841M  0 rom  /run/archiso/bootmnt
+	<b>[root@sysresccd /mnt/R]#</b>
+
+    </code></div>
+    <h3>Using the thin-pool for /var/lib/vz</h3>
+    <p>
+      The thin-pool is created we can thus now use it to store a
+      <b>Virtual Logical Volume</b>, in other words a volume that consumes of the thin-pool data only what
+      it really needs and thus shares its free space with other thin volumes of the this
+      thin-pool (see also <b>discard</b> directive while mounting file-systems or the <b>fstrim</b>
+      system command).
+    </p>
+    <div><code>
+
+	<b>[root@sysresccd /mnt/R]# lvcreate -n vz -V 20G --thinpool pooldata soleil</b>
+	<e>Logical volume</e> "vz" created.
+	<b>[root@sysresccd /mnt/R]# mkfs.ext4 /dev/mapper/soleil-vz</b>
+	mke2fs 1.45.0 (6-Mar-2019)
+	Discarding device blocks: done
+	Creating filesystem with 5242880 4k blocks and 1310720 inodes
+	Filesystem UUID: a2284c87-a0c9-419f-ba19-19cb5df46d4a
+	Superblock backups stored on blocks:
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208,
+	4096000
+
+	Allocating group tables: done
+	Writing inode tables: done
+	Creating journal (32768 blocks): done
+	Writing superblocks and filesystem accounting information: done
+
+	<b>[root@sysresccd /mnt/R]# mkdir -p var/lib/vz</b>
+	[root@sysresccd /mnt/R]# mount /dev/mapper/soleil-vz var/lib/vz
+	<b>[root@sysresccd /mnt/R]# lsblk -i</b>
+	NAME                        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+	loop0                         7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
+	sda                           8:0    0   100G  0 disk
+	|-sda1                        8:1    0     1M  0 part /mnt/R/boot/efi
+	`-sda2                        8:2    0   100G  0 part
+	|-soleil-rootfs           254:0    0     9G  0 lvm  /mnt/R
+	|-soleil-swap             254:1    0     1G  0 lvm  [SWAP]
+	|-soleil-pooldata_tmeta   254:2    0   300M  0 lvm
+	| `-soleil-pooldata-tpool 254:4    0    80G  0 lvm
+	|   |-soleil-pooldata     254:5    0    80G  0 lvm
+	|   `-soleil-vz           254:6    0    20G  0 lvm  /mnt/R/var/lib/vz
+	`-soleil-pooldata_tdata   254:3    0    80G  0 lvm
+	`-soleil-pooldata-tpool 254:4    0    80G  0 lvm
+	|-soleil-pooldata     254:5    0    80G  0 lvm
+	<e>`-soleil-vz           254:6    0    20G  0 lvm  /mnt/R/var/lib/vz</e>
+	sdb                           8:16   0    32G  0 disk
+	`-sdb1                        8:17   0    32G  0 part
+	sr0                          11:0    1   841M  0 rom  /run/archiso/bootmnt
+	<b>[root@sysresccd /mnt/R]#</b>
+
+    </code></div>
+    <p>
+      Now we can restore using <b>dar</b> as we did above without LVM. The VM backup will go into the
+      thin volume and the rest of the proxmox system will be preserved in its logical
+      volume from the activity of the VM and their backups.
+    </p>
+    <p>
+      Once dar has completed you will have to adapt /mnt/R/etc/fstab for both UUID
+      if they were used, and /dev/sdX that may become /dev/mapper/&lt;vgname&gt;-&lt;volume-name&gt;,
+      if moving several partitions to LVM volumes.
+      Here we will also have to add a new line here for /var/lib/vz to be mounted at
+      system startup:
+    </p>
+    <div><code>
+
+	<b>[root@sysresccd /mnt/R]# echo "/dev/mapper/soleil-vz /var/lib/vz ext4 default 0 2" >> /mnt/R/etc/fstab</b>
+
+    </code></div>
+    <p>
+      The end of the process is the same as above, by chrooting and reinstalling grub.
+    </p>
+
+    <h2>Proxmox Specific</h2>
+    <p>
+      As we did not saved nor restored the block devices of VM but just have their backup restored in /var/lib/vz/dump
+      we need to remove the VM referred in the proxmox database (but which do not exist anymore) and restore them from their backup
+    </p>
+    <div><code>
+
+	<b>root@soleil:~# for vm in `qm list | sed -rn 's/\s+([0-9]+).*/\1/p'` ; do qm set $vm --protect no ; qm destroy $vm ; done</b>
+	...
+	<b>root@soleil:~# qm list</b>
+	<b>root@soleil:~#</b>
+
+    </code></div>
+    <p>
+      Now from the proxmox GUI you can restore all the VM and containers from their Backups. If not using LVM but Ceph or other shared
+      and distributed file-system, this task vanishes as the block storage of VM is still present in the distributed storage cluster.
+      How now to add the local storage to this Ceph cluster is out of the scope of this document.
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+    </p>
+  </body>
+</html>
