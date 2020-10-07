@@ -55,12 +55,16 @@ namespace libdar
 
     lz4_module::lz4_module(const lz4_module & ref)
     {
+#if LIBLZ4_AVAILABLE
 	state = new(nothrow) char[LZ4_sizeofState()];
 	if(state == nullptr)
 	    throw Ememory("lz4_module::lz4_module");
 	    // no need to copy the content of state
 
 	acceleration = ref.acceleration;
+#else
+	throw Ecompilation(gettext("lz4 compression"));
+#endif
     }
 
     lz4_module::lz4_module(lz4_module && ref) noexcept

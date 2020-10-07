@@ -179,13 +179,17 @@ namespace libdar
 
     void xz_module::setup(U_I compression_level)
     {
+#if LIBLZMA_AVAILABLE
 	level = compression_level;
 	lzma_str = LZMA_STREAM_INIT;
+#else
+	throw Ecompilation(gettext("lz4 compression"));
+#endif
     }
 
     void xz_module::init_decompr() const
     {
-
+#if LIBLZMA_AVAILABLE
 	switch(lzma_auto_decoder(& lzma_str,
 				 UINT64_MAX,
 				 0))
@@ -201,10 +205,14 @@ namespace libdar
 	default:
 	    throw SRC_BUG;
 	}
+#else
+	throw Ecompilation(gettext("lz4 compression"));
+#endif
     }
 
     void xz_module::init_compr() const
     {
+#if LIBLZMA_AVAILABLE
     	switch(lzma_easy_encoder(& lzma_str,
 				 level,
 				 LZMA_CHECK_CRC32))
@@ -222,11 +230,18 @@ namespace libdar
 	default:
 	    throw SRC_BUG; // undocumented possible return code
 	}
+#else
+	throw Ecompilation(gettext("lz4 compression"));
+#endif
     }
 
     void xz_module::end_process() const
     {
+#if LIBLZMA_AVAILABLE
 	lzma_end(& lzma_str);
+#else
+	throw Ecompilation(gettext("lz4 compression"));
+#endif
     }
 
 

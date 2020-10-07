@@ -110,7 +110,7 @@ namespace libdar
 	static bool is_a_strong_password(crypto_algo algo, const secu_string & password);
 
     private:
-
+	std::string sel;               ///< the salt
 #if CRYPTO_AVAILABLE
 	archive_version reading_ver;   ///< the currently followed archive format
 	crypto_algo algo;              ///< algo ID in libgcrypt
@@ -120,7 +120,6 @@ namespace libdar
 	gcry_cipher_hd_t essiv_clef;   ///< used to build the Initialization Vector
 	size_t algo_block_size;        ///< the block size of the algorithm (main key)
 	unsigned char *ivec;           ///< algo_block_size allocated in secure memory to be used as Initial Vector for main_clef
-	std::string sel;               ///< the salt
 
 	void init_hashed_password(const secu_string & password,
 				  bool use_pkcs5,

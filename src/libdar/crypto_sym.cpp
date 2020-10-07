@@ -341,9 +341,9 @@ namespace libdar
 #endif
     }
 
+#if CRYPTO_AVAILABLE
     string crypto_sym::generate_salt(U_I size)
     {
-#if CRYPTO_AVAILABLE
 	string ret;
 	unsigned char* buffer = new (nothrow) unsigned char[size];
 
@@ -368,12 +368,7 @@ namespace libdar
 	}
 
 	return ret;
-#else
-	throw Ecompilation("Strong encryption support (libgcrypt)");
-#endif
     }
-
-#if CRYPTO_AVAILABLE
 
     void crypto_sym::init_hashed_password(const secu_string & password,
 					  bool use_pkcs5,
