@@ -1719,7 +1719,7 @@ static bool get_args_recursive(recursive_param & rec,
 		    deque<string> splitted;
 		    line_tools_split(string(optarg), ':', splitted);
 		    if(splitted.size() != 2 ||
-		       (splitted[0] != "E" && splitted[0] != "I"))
+		       (splitted[0] != "X" && splitted[0] != "I"))
 			throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
 		    if(splitted[0] == "I")
 			p.same_fs_incl.push_back(splitted[1]);
