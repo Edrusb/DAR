@@ -66,8 +66,6 @@ namespace libdar
 
     void filesystem_ids::change_root_fs(const path & root)
     {
-	if(root.is_relative())
-	    throw Erange("filesystem_ids::set_root_fs","path to a filesystem must be an absolute path");
 	root_fs = path2fs_id(root.display());
     }
 
