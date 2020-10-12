@@ -45,19 +45,19 @@ namespace libdar
     {
     public:
 
-	    /// set or replace the filesystem to be taken as root filesystem
+	    /// set the filesystem to be taken as root filesystem
 
 	    /// \param[in] root the filesystem which will always be covered
 	filesystem_ids(const path & root);
 
 	    /// mimics the old boolean flag,
 
-	    /// \param[in] same_fs if set to true: is_cocvered() returns true only for
+	    /// \param[in] same_fs if set to false is_covered() always returns true
 	    /// \param[in] root_fs the filesystem in which the given path points to is
 	    /// considered as the root filesystem, if same_fs is set to true, no file
-	    /// outside this filesystem will be saved.
-	    /// \note If same_fs is set to false, is_covered() always return true
-	    /// anf root_fs is not used
+	    /// outside this filesystem will be saved
+	    /// \note if same_fs is set to false, is_covered() always return true
+	    /// and root_fs is not used
 	filesystem_ids(bool same_fs, const path & root_fs);
 
 	filesystem_ids(const filesystem_ids & ref) = default;
