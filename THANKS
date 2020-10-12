@@ -4,6 +4,11 @@ Thanks to Mihai Moldovan for code adaptation to support compilation
 out of source code directory. Thanks again to Zach Adams for security
 enhancement suggestions.
 
+version 2.6.13
+--------------
+Thanks to Sean Loony for feedbacks and bug report. Thanks to Rafael Kooi
+for bug report.
+
 version 2.6.12
 --------------
 Thanks to Simon Rupf for bug report and feedback

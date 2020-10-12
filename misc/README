@@ -9,9 +9,9 @@ What will you find in this directory?
 
 many script that help(ed) build the releases:
 - batch_cygwin
-- batch_linux
-- batch_linux_ea
-- make_cygwin_dist
+- batch_linux  (deprecated)
+- match_linux_ea (deprecated)
+- make_cygwin_dist (invoked by batch_cygwin)
 
 a helper program to translate documentation to DOS/Windows text format
 - todos.c
@@ -28,10 +28,16 @@ problem is under investigation...
 and an helper script to test dar_check
 - failer
 
-a script building a script to ease dar/libdar removal out of any
-package maintenance.
-- make_uninstall_script
+A complementary pair of scripts to install a package (main target software
+being dar) and ease its removal, into an environement without package management
+and without developement tools (else "make install-strip/uninstall" would have
+done the job).
+- prepare_install
+- finish_install
 
-a script that build both a tar.gz of dar binary and corresponding
-script to cleanly remove it from the system:
-- build_tar_and_uninstall
+The first installs the software into a temp directory and builds a dar archive
+of it. The second with the assitance of dar_static first extract the archive
+into a temporary directory, compares the generated tree to setup a removal
+script and then proceed to a restricted restoration of the archive to not
+touch path leading to the restored files. The generated script can be sourced
+from a bash shell at a later time to only remove what has been installed.

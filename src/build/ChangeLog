@@ -31,6 +31,12 @@ from 2.6.x to 2.7.0
   reduced to 10,000 (and stays 200,000 with sha1). This can be tuned
   as usual with --kdf-param option.
 
+from 2.6.12 to 2.6.13
+- fixed compilation warning in testing routine (outside libdar and dar)
+- due to change in autoconf, the --sysconfdir path (which defaults to
+${prefix}/etc) was read as an empty string, leading dar to look for
+darrc system file at the root of the filesystem (/darrc)
+
 from 2.6.11 to 2.6.12
 - fixed regression met in 2.6.11 when generating encrypted archives
 

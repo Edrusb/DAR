@@ -52,14 +52,14 @@ endif
 
 if BUILD_MODE32
     MYLIB=libdar32
-    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS)
+    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(sysconfdir)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS)
 else
 if BUILD_MODE64
     MYLIB=libdar64
-    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS)
+    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(sysconfdir)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS)
 else
     MYLIB=libdar
-    AM_CPPFLAGS=-I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS)
+    AM_CPPFLAGS=-I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(sysconfdir)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS) $(CXXSTDFLAGS)
 endif
 endif
 
@@ -78,7 +78,7 @@ endif
 install-exec-hook :
 	cd $(DESTDIR)$(bindir) ; $(UPX_PROG) -9 dar$(EXEEXT) dar_xform$(EXEEXT) dar_slave$(EXEEXT) dar_manager$(EXEEXT) dar_cp$(EXEEXT) dar_split$(EXEEXT) $(ALSO_BUILD_INST) || exit 0
 
-# exit 0 because dar_split for example is today too small to be upx-compressed 
+# exit 0 because dar_split for example is today too small to be upx-compressed
 
 else
 install-exec-hook:
@@ -115,7 +115,7 @@ dar_cp_SOURCES = dar_suite.cpp dar_suite.hpp dar_cp.cpp line_tools.hpp line_tool
 dar_cp_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 dar_split_SOURCES = dar_split.c
-dar_split_CPPFLAGS = -I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF)
+dar_split_CPPFLAGS = -I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(sysconfdir)\" $(CPP_PROF)
 
 #
 # dar_static ( --enable-dar-static )
