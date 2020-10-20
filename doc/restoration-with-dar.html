@@ -350,10 +350,10 @@
     <p>
       You have a total freedom to create the same or a different partition layout,
       it will not reduce or impact the ability to restore with dar. This may be
-      the opportunity to use LVM of RAID or SAN, or at the opposite to get back to a plain old partition,
-      that's up to you to decide. In the
+      the opportunity to use LVM of RAID or SAN, LUKS ciphered volume, or at the opposite to get back to a plain old partition.
+      That's up to you to decide. In the
       following we will first use plain partition with UEFI boot (and MBR boot), then revisit
-      the process using LVM and UEFI.
+      the process using LVM and UEFI, then again with even more stuff: LUKS, LVM and UEFI.
     </p>
     <h4>the EFI partition</h4>
     <p>
@@ -1243,11 +1243,233 @@
       Now from the proxmox GUI you can restore all the VM and containers from their Backups. If not using LVM but Ceph or other shared
       and distributed file-system, this task vanishes as the block storage of VM is still present in the distributed storage cluster.
       How now to add the local storage to this Ceph cluster is out of the scope of this document.
-      <br/>
-      <br/>
-      <br/>
-      <br/>
-      <br/>
     </p>
+
+    <h2>Restoring to a LUKS ciphered disk</h2>
+    <p>
+      When restoring with dar, you may take the opportunity to restore to a ciphered disk, even if the original system was not.
+      You may also have backed up a ciphered system so we end to the same point we will have to restore the system into a ciphered disk.
+    <p>
+      For simplicity we will restore an LVM inside a ciphered system, but the exercice is pretty similar to restore an LVM and have
+      some Logical Volume being LUKS ciphered "devices". The advantage of LVM inside LUKS is simplicity, the advantage of LUKS inside
+      LVM is performance when you do not want to have all volumes ciphered (for example a /var/spool/proxy holds public data it does not worth
+      ciphering it).
+    </p>
+    <p>
+      As seen previously the EFI partition cannot be part of an LVM, it cannot thus be neither ciphered as to uncipher the kernel must be loaded
+      and running. The second consequence is that the kernel and the mandatory initramfs must not reside in a ciphered partition. LUKS can thus
+      prevent your data from be exposed to a thief, however if one has a physical access to your computer and if this one is not running
+      24/7, LUKS alone cannot prevent one to modify the kernel and ramdisk image used to boot, introducing some keylogger or other spying
+      tool that will catch the secret key you need to enter at boot time to uncipher your LUKS disk. This is the role of the secure boot process,
+      which we will not describe here today (maybe in a future revision of this document) to detect such type of attack.
+    </p>
+    <p>
+      So we have to create an EFI partition, an unciphered <b>boot</b> partition and an partition that will be ciphered and which will contain
+      the LVM (root, home, swap space for example). Using the same way we did before here what we should end to:
+    </p>
+    <div><code>
+
+	<b>root@sysresccd ~]# gdisk /dev/sda</b>
+	GPT fdisk (gdisk) version 1.0.4
+
+	Partition table scan:
+	MBR: protective
+	BSD: not present
+	APM: not present
+	GPT: present
+
+	Found valid GPT with protective MBR; using GPT.
+
+	<b>Command (? for help): p</b>
+	Disk /dev/sda: 67108864 sectors, 32.0 GiB
+	Model: QEMU HARDDISK
+	Sector size (logical/physical): 512/512 bytes
+	Disk identifier (GUID): 23033D82-7166-4282-AEF9-F2CC18453F1C
+	Partition table holds up to 128 entries
+	Main partition table begins at sector 2 and ends at sector 33
+	First usable sector is 34, last usable sector is 67108830
+	Partitions will be aligned on 2048-sector boundaries
+	Total free space is 4029 sectors (2.0 MiB)
+
+	Number  Start (sector)    End (sector)  Size       Code  Name
+	<e>1            2048         1050623   512.0 MiB   EF00  EFI Partition</e>
+	<e>2         1050624         1550335   244.0 MiB   8300  Linux Boot</e>
+	<e>3         1550336        67106815   31.3 GiB    8300  LUKS Device</e>
+
+	Command (? for help): q
+	<b>[root@sysresccd ~]#</b>
+
+    </code></div>
+    <p>
+      We will format the EFI partition the same way we did above, format the Linux boot with an ext4 filesystem as we also did above.
+      What is new is the LUKS Device we have first to initialize as a LUKS volume. The volume contains some metadata (ciphered keys, token,...)
+      that have to be created first:
+    </p>
+    <code><div>
+	<b>[root@sysresccd ~]# <e>cryptsetup luksFormat /dev/sda3</e></b>
+
+	WARNING!
+	========
+	This will overwrite data on /dev/sda3 irrevocably.
+
+	Are you sure? (Type uppercase yes): <b>YES</b>
+	<e>Enter passphrase for /dev/sda3:</e>
+	<e>Verify passphrase:</e>
+	<b>[root@sysresccd ~]#</b>
+
+    </div></code>
+    <p>
+      of course if you forget the provided passphrase, you will lose all data stored in that volume. Note that this key can be changed
+      without having to rebuild of recipher the whole volume, we will see that further. Now we can <i>open</i> the volume, which mean
+      have the Linux kernel aware of the master key and able to cipher/uncipher data write to or read from this device:
+    </p>
+
+    <code><div>
+	<b>[root@sysresccd ~]# lsblk -i</b>
+	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+	loop0    7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
+	sda      8:0    0    32G  0 disk
+	|-sda1   8:1    0   512M  0 part
+	|-sda2   8:2    0   244M  0 part
+	<e>`-sda3   8:3    0  31.3G  0 part</e>
+	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
+	<b>[root@sysresccd ~]# cryptsetup open /dev/sdb1 crypted_part</b>
+	<e>Enter passphrase for /dev/sda3:</e>
+	<b>[root@sysresccd ~]# lsblk -i</b>
+	NAME             MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
+	loop0              7:0    0 788.8M  1 loop  /run/archiso/sfs/airootfs
+	sda                8:0    0    32G  0 disk
+	|-sda1             8:1    0   512M  0 part
+	|-sda2             8:2    0   244M  0 part
+	`-sda3             8:3    0  31.3G  0 part
+ 	<e> `-crypted_part  254:0    0    32G  0 crypt</e>
+	sr0               11:0    1   841M  0 rom   /run/archiso/bootmnt
+	<b>[root@sysresccd ~]#</b>
+
+    </div></code>
+
+    <p>
+      The rest is straight forward, we have now a /dev/mapper/crypted_part we can use as Physical Volume for LVM
+    </p>
+
+    <code><div>
+	<b>[root@sysresccd ~]# pvcreate /dev/mapper/crypted_part</b>
+	Physical volume "/dev/mapper/crypted_part" successfully created.
+	<b>[root@sysresccd ~]# vgcreate vgname /dev/mapper/crypted_part</b>
+	Volume group "vgname" successfully created
+	<b>[root@sysresccd ~]# lvcreate -n root -L 10G vgname</b>
+	Logical volume "root" created.
+	<b>[root@sysresccd ~]# lvcreate -n home -L 8G vgname</b>
+	Logical volume "home" created.
+	<b>[root@sysresccd ~]# lvcreate -n swap -L 1G vgname</b>
+	Logical volume "swap" created.
+	<b>[root@sysresccd ~]# lvs</b>
+	LV   VG     Attr       LSize  Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+	home vgname -wi-a-----  8.00g
+	root vgname -wi-a----- 10.00g
+	swap vgname -wi-a-----  1.00g
+	<b>[root@sysresccd ~]# lsblk -i</b>
+	NAME              MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
+	loop0               7:0    0 788.8M  1 loop  /run/archiso/sfs/airootfs
+	sda                 8:0    0    32G  0 disk
+	|-sda1              8:1    0   512M  0 part
+	|-sda2              8:2    0   244M  0 part
+	`-sda3              8:3    0  31.3G  0 part
+	<e> `-crypted_part  254:0    0    32G  0 crypt</e>
+	<e>  |-vgname-root 254:1    0    10G  0 lvm</e>
+	<e>  |-vgname-home 254:2    0     8G  0 lvm</e>
+	<e>  `-vgname-swap 254:3    0     1G  0 lvm</e>
+	sr0                11:0    1   841M  0 rom   /run/archiso/bootmnt
+	<b>[root@sysresccd ~]#</b>
+
+    </div></code>
+
+    <p>
+      The following steps are almost identical to what we did earlier:
+    </p>
+    <ul>
+      <li>format the LVM with the filesystem of your choice, and use <b>mkswap</b> for the swap volume</li>
+      <li>mount <b>/dev/mapper/vgname-root</b> to /mnt/R directory</li>
+      <li>mount <b>/dev/sda2</b> to /mnt/R/boot</li>
+      <li>mount <b>/dev/sda1</b> to /mnt/R/boot/efi</li>
+      <li>mount <b>/dev/mapper/vgname-home</b> to /mnt/R/home</li>
+      <li>restore the data with <b>dar -R /mnt/R ....</b> as we did above</li>
+      <li>
+	edit <b>/mnt/R/etc/fstab</b> and <b>/mnt/R/etc/initramfs-tools/conf.d/resume</b> with the UUID
+	of the filesystem we created (get them using <b>blkid</b>)
+      </li>
+      <li>edit or create the /mnt/R/etc/crypttab file, we will zoom on that now:</li>
+    </ul>
+
+    <p>
+      in a linux system, the /etc/crypttab is read at startup (from the initramfs) to know
+      which volume should be "open" (<i>cryptsetup open <device></i> as we did above). This
+      will lead the system to ask the passphrase to access the ciphered volume. It contains
+      on each line 4 fields separated by space:
+    </p>
+    <ul>
+      <li>the name we will use for the unciphered volume (here we used crypted_part)</li>
+      <li>the UUID of the LUKS volume (here the UUID of /dev/sda3)</li>
+      <li>the passphrase, for root device we must use "none" for you get prompted for it</li>
+      <li>some flags, we will use "luks,discard" here (see crypttab man page for more).</li>
+    </ul>
+
+    <code><div>
+	<b>[root@sysresccd /mnt/R/etc]#</b> echo "crypted_part UUID=4d76e357-f136-4f7e-addc-030436f37682 none luks,discard" > /tmp/R/etc/crypttab
+	<b>[root@sysresccd /mnt/R/etc]#</b>
+    </div></code>
+
+    <p>
+      the rest is exactly the same as we did
+    </p>
+
+    <ul>
+      <li>resinstall grub using <b>update-grub</b> and <b>grub_install</b></li>
+      <li>regenerate the initramfs using <b>update-initramfs -u</b></li>
+    </ul>
+
+    <p>
+      Last, before rebooting you may want to close all that properly, there
+      is a pitfall about LVM on LUKS you have to be aware. To close the LUKS
+      volume the LVM must be disabled inside it else as the LUKS is busy by
+      LVM you won't be able to close it:
+    </p>
+
+    <code><div>
+	<b>root@sysresccd:~# exit</b>    <u><i>exiting the chroot environment</i></u>
+	exit
+	<b>[root@sysresccd /mnt/R]#</b>
+	<b>[root@sysresccd /mnt/R]# umount /mnt/R/boot/efi</b>
+	<b>[root@sysresccd /mnt/R]# umount /mnt/R/boot</b>
+	<b>[root@sysresccd /mnt/R]# umount /mnt/R/home</b>
+	<b>[root@sysresccd /mnt/R]# swapoff /dev/mapper/vgname-swap</b> <u><i>if we activated this swap volume</i></u>
+	<b>[root@sysresccd /mnt/R]# umount /mnt/R/dev</b>
+	<b>[root@sysresccd /mnt/R]# umount /mnt/R/proc</b>
+	<b>[root@sysresccd /mnt/R]# umount /mnt/R/sys/firmware/efi/efivars</b>
+	<b>[root@sysresccd /mnt/R]# umount /mnt/R/sys</b>
+	<b>[root@sysresccd /mnt/R]# cd /</b>
+	<b>[root@sysresccd /]# umount /mnt/R</b>
+	<b>[root@sysresccd ~]# cryptsetup close crypted_part</b>
+	<e>Device sda3_crypt is still in use.</e>        <u><i>LVM still uses the crypted_part volume</i></u>
+	<b>[root@sysresccd ~]# <e>vgchange -a n vgname</e></b>
+	0 logical volume(s) in volume group "vgname" now active
+	<b>[root@sysresccd ~]# cryptsetup close crypted_part</b>
+	<b>[root@sysresccd ~]# lsblk -i</b>
+	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+	loop0    7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
+	sda      8:0    0    32G  0 disk
+	|-sda1   8:1    0   512M  0 part
+	|-sda2   8:2    0   244M  0 part
+	`-sda3   8:3    0  31.3G  0 part
+	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
+	<b>[root@sysresccd ~]# shutdown -r now</b>
+
+    </div></code>
+
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
   </body>
 </html>
