@@ -212,7 +212,7 @@
 
     <h4>Creating a local temporary storage (NAS context without (S)FTP access)</h4>
     <p>
-      In the case of Network Storage (NAS) and not FTP or SFTP protocol
+      In the case of Network Storage (NAS) and not FTP or SFTP protocol is
       available, we need a local temporary file-system (removed at the end of the restoration
       process). Here we use <b>lsblk</b> to list all disks,
       then <b>gdisk</b> to create partitions and finally <b>mkfs</b> to format the file-system
@@ -424,7 +424,8 @@
     <h4>the root partition</h4>
     <p>
       Here we will use a single partition to restore the system to, but you are free
-      to use as many as you want, you will have to format them to the file-system of
+      to use as many as you want (and also use LVM instead of partitions if you prefer, see at the end of this document,
+      though the EFI partition cannot be made of an LVM, but only of a partition), you will have to format them to the file-system of
       your choice (not mandatorily the one of the original system) create the mount points
       and mounts them accordingly to your need. We will see how below, taking the EFI partition
       as an example.
@@ -664,7 +665,7 @@
 
     </code></div>
     <p>
-      We will mount this partition to be able to restore into it
+      We will mount this partition to be able to restore data into it
     </p>
     <div><code>
 
@@ -688,7 +689,7 @@
     <p>
       the EFI partition is a vfat partition that is usually mounted under /boot/efi
       after the system has booted. So we will
-      format it and mount it there under /mnt/R, where we have now mounted the root file-system.
+      format it and mount it there under /mnt/R, where we have now mounted the future root file-system.
     </p>
     <p>
       If you use the legacy MBR booting process in your original system, you just have to skip this
@@ -790,10 +791,10 @@
 
     <h3>Adaptation of the restored data</h3>
     <p>
-      The UUID have been recreated, if /etc/fstab points to file-system
+      The UUID have been recreated, if the restored /etc/fstab points to file-system
       based on their UUID we have to adapt it to their new UUID. The
       <b>blkid</b> let you grab the UUID of file-system we created including
-      the swap partition, so we can edit /mnt/R/etc/fstab
+      the swap partition, so we can edit <b>/mnt/R/etc/fstab</b>
       (using <b>vi</b> or <b>joe</b> both available from systemrescueCD).
     </p>
     <p>
@@ -877,8 +878,8 @@
 
     </code></div>
     <p>
-      If not done previously you can now edit /etc/fstab with your favorite text editor available in the system under restoration. Then we can reinstall grub,
-      and exit the chroot environment:
+      If not done previously you can now edit /etc/fstab with your favorite text editor available in the system under restoration.
+      Then we can reinstall grub and rebuild the initram (if used), and exit the chrooted environment.
     </p>
     <div><code>
 
@@ -1030,7 +1031,6 @@
 	non LVM context)</li>
       <li>format these volumes as we did for partitions</li>
     </ul>
-    </p>
     <div><code>
 
 	<b>[root@sysresccd ~]# lsblk -i</b>
