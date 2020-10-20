@@ -798,6 +798,19 @@
       (using <b>vi</b> or <b>joe</b> both available from systemrescueCD).
     </p>
     <p>
+      If your system is booting by mean of an initramfs, you should also check and eventually
+      edit the restored <b>/mnt/R/etc/initramfs-tools/conf.d/resume</b> with the new
+      UUID of the swap partition.
+    </p>
+    <p>
+      <i>
+	<u>Note:</u> that we can also look for the original UUID and when creating filesystems
+	(formating them) provide the same UUID as the one used on the backed up system for each of them.
+	This implies you have saved the information provided by <b>blkid</b> within the backup.
+ 	See -i option of mkfs program to provide the UUID the filesystem should be created with.
+      </i>
+    </p>
+    <p>
       If, like me, you like none of these editors but prefer <b>emacs</b> for example
       for its ability to run a shell and copy&past between the shell running <i>blkid</i>
       and the fstab file you are editing,
@@ -806,7 +819,7 @@
     </p>
     <p>
       Note that the root file-system UUID has no importance as we will regenerate
-      the ramdisk and grub configuration file based on the new UUID. However if you
+      the ramdisk and grub configuration file based on its new UUID. However if you
       have more partitions than the few we had in this example, /mnt/R/etc/fstab
       should be updated with their new UUID or /dev/ path accordingly
     </p>
@@ -820,6 +833,7 @@
 	/dev/sr0: UUID="2019-04-14-11-35-22-00" LABEL="SYSRCD603" TYPE="iso9660" PTUUID="0d4f1b4a" PTTYPE="dos"
 	/dev/loop0: TYPE="squashfs"
 	<b>[root@sysresccd ~]# vi /mnt/R/etc/fstab </b>
+	<b>[root@sysresccd ~]# vi /mnt/R/etc/initramfs-tools/conf.d/resume </b>
 
     </code></div>
     <p>
@@ -888,15 +902,14 @@
 	Generating grub configuration file ...
 	Found linux image: /boot/vmlinuz-4.15.18-21-pve
 	Found initrd image: /boot/initrd.img-4.15.18-21-pve
-	Found linux image: /boot/vmlinuz-4.15.18-12-pve
-	Found initrd image: /boot/initrd.img-4.15.18-12-pve
 	Found memtest86+ image: /boot/memtest86+.bin
 	Found memtest86+ multiboot image: /boot/memtest86+_multiboot.bin
 	done
 	<b>root@sysresccd:/# grub-install</b>
 	Installing for x86_64-efi platform.
 	Installation finished. No error reported.
-	<b>root@sysresccd:/#</b>
+	<b>root@sysresccd:/#update-initramfs -u</b>
+	update-initramfs: Generating /boot/initrd.img-4.15.18-21-pve
 	<b>root@sysresccd:~# exit</b>
 	exit
 	<b>[root@sysresccd /mnt/R]#</b>
