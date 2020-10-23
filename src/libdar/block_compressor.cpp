@@ -80,14 +80,12 @@ namespace libdar
 
     void block_compressor::suspend_compression()
     {
-	if(get_mode() != gf_read_only)
+	if(!suspended)
+	{
 	    inherited_sync_write();
-
-	suspended = true;
-	if(get_mode() == gf_write_only)
-	    sync_write();
-	else
-	    current->reset();
+	    inherited_flush_read();
+	    suspended = true;
+	}
     }
 
     void block_compressor::resume_compression()
@@ -228,6 +226,9 @@ namespace libdar
     {
 	if(is_terminated())
 	    throw SRC_BUG;
+
+	if(get_mode() == gf_read_only)
+	    return;
 
 	compress_and_write_current();
 	if(need_eof)
