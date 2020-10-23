@@ -3,6 +3,13 @@ from 2.6.12 to 2.6.13
 - due to change in autoconf, the --sysconfdir path (which defaults to
 ${prefix}/etc) was read as an empty string, leading dar to look for
 darrc system file at the root of the filesystem (/darrc)
+- fixed bug occuring in extremely rare conditions (compression used,
+  no ciphering, no hashing, file changed at backup time or had a poor
+  compression ratio, was not saved at slice boundary, the previous
+  entry had an EA saved but no FSA or unchanged FSA. In such conditions,
+  dar tries to resave the file in place, but partially or totally
+  overwites the EAs of the previous entry leading to archive testing
+  to fail for these EA.
 
 from 2.6.11 to 2.6.12
 - fixed regression met in 2.6.11 when generating encrypted archives
