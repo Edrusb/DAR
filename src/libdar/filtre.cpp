@@ -3969,7 +3969,7 @@ namespace libdar
 			if(pdesc.compr->get_algo() != compression::none)
 			{
 			    pdesc.stack->sync_write_above(pdesc.compr);
-			    pdesc.compr->suspend_compression(); // never compress EA (no size or filename consideration)
+			    pdesc.compr->suspend_compression(); // never compress FSA (no size or filename consideration)
 			}
 
 			start = pdesc.stack->get_position();
