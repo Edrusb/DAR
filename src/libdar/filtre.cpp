@@ -3040,13 +3040,20 @@ namespace libdar
 	cat_file *fic = dynamic_cast<cat_file *>(ino);
 	const cat_file *ref_fic = dynamic_cast<const cat_file *>(ref);
 	bool resave_uncompressed = false;
-	infinint rewinder = pdesc.stack->get_position(); // we skip back here if data must be saved uncompressed
+	infinint rewinder; // we skip back here if data must be saved uncompressed
 	shared_ptr<memory_file> delta_sig_ref; // holds the delta_signature that will be used as reference for delta patch later on
 	U_I sig_ref_block_len;
 	const crc *result_crc = nullptr;
 
 	if(pdesc.compr == nullptr)
 	    throw SRC_BUG;
+
+	    // recording the position where to skip back upon
+	    // poor compression or if file changed while we were
+	    // saving it:
+	pdesc.stack->sync_write_above(pdesc.compr);
+	pdesc.compr->sync_write();
+	rewinder = pdesc.stack->get_position();
 
 	if(mir != nullptr)
 	{
