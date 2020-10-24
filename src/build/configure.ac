@@ -520,6 +520,37 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C"
                   ])
 
 
+AC_MSG_CHECKING([for linux's statx() availability])
+AC_RUN_IFELSE([AC_LANG_PROGRAM([[extern "C" {
+				     #if HAVE_SYS_TYPES_H
+				     #include <sys/types.h>
+				     #endif
+				     #if HAVE_SYS_STAT_H
+				     #include <sys/stat.h>
+				     #endif
+				     #if HAVE_UNISTD_H
+				     #include <unistd.h>
+				     #endif
+				     #if HAVE_FCNTL_H
+				     #include <fcntl.h>
+				     #endif
+			       }]],
+			       [
+			           struct statx val;
+
+			           int ret = statx(0, "/", 0, STATX_BTIME, &val);
+				   if(ret != 0)
+				      return 1; /* will not use statx */
+				   else
+				      return 0; /* possible to go furhter with statx */
+			       ])
+	     ],
+	     [
+		AC_DEFINE(HAVE_STATX_SYSCALL, 1, [system provides statx() system call, will be used to get inode birthtime on Linux])
+		local_statx=yes
+	     ],
+	     [  local_statx=no ])
+
 # DAR's features
 
 AC_ARG_ENABLE( [libz-linking],
@@ -2143,6 +2174,13 @@ fi
 
 printf "   HFS+ FSA support           : "
 if [ "$local_birthtime" = "yes" ] ; then
+  echo "YES"
+else
+  echo "NO"
+fi
+
+printf "   statx() support            : "
+if [ "$local_statx" = "yes" ] ; then
   echo "YES"
 else
   echo "NO"

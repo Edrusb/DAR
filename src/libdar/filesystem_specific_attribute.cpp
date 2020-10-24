@@ -62,6 +62,7 @@ extern "C"
 #include "integers.hpp"
 #include "erreurs.hpp"
 #include "tools.hpp"
+#include "filesystem_tools.hpp"
 #include "filesystem_specific_attribute.hpp"
 #include "cygwin_adapt.hpp"
 #include "deci.hpp"
@@ -635,6 +636,16 @@ namespace libdar
 		throw;
 	    }
 	    close(fd);
+
+	    datetime linux_birthtime;
+	    if(filesystem_tools_read_linux_birthtime(target, linux_birthtime))
+	    {
+		fsa_time *date_ptr = nullptr;
+		create_or_throw(date_ptr, fsaf_linux_extX, fsan_creation_date, linux_birthtime);
+		fsa.push_back(date_ptr);
+		date_ptr = nullptr;
+	    }
+
 	}
 #else
 	    // nothing to do, as this FSA has not been activated at compilation time
@@ -747,7 +758,7 @@ namespace libdar
 			case fsan_unset:
 			    throw SRC_BUG;
 			case fsan_creation_date:
-			    throw SRC_BUG; // unknown nature for this family type
+			    break; // nothing to do here, this attribute will be set by tools_make_date()
 			case fsan_append_only:
 			    if(set_immutable)
 				continue;
@@ -1068,12 +1079,29 @@ namespace libdar
 
 	ret = find(fsaf_hfs_plus, fsan_creation_date, tmp);
 #ifndef LIBDAR_BIRTHTIME
+/* #if ! defined LIBDAR_BIRTHTIME && ! defined HAVE_STATX_SYSCALL */
+	    /*
+	      once utimensat() / utimes() / utime() under Linux
+	      will behave the same about birth_time as under BSD systems
+	      it will be possible to restore the birthime under Linux,
+	      today, birthtime saved under Linux can only be restored
+	      under BSD systems (FreeBSD, butterflyBSD, MACOS X, ...)
+	      -> no change will be required on libdar's side, except
+	      removing the warning below.
+	    */
+
 	if(ret)
-	    ui.printf(gettext("Birth Time attribute cannot be restored for %s because no FSA familly able to carry that attribute could be activated at compilation time."),
+#if HAVE_STATX_SYSCALL
+	    ui.printf(gettext("Birth Time attribute cannot be restored for %s under Linux because utimensat()/utimes()/utime() do not set the birthime to always stay less than or equal to mtime, as is done under BSD systems like MACOS X. You can thus restore birthtime of Linux files only under BSD systems!"),
 		      target.c_str());
+#else
+	ui.printf(gettext("Birth Time attribute cannot be restored for %s because no FSA familly able to carry that attribute could be activated at compilation time."),
+		      target.c_str());
+#endif
 	    // here we just warn, the birthtime restoration will be tried (calling twice utime()), even
 	    // if dar has not been compiled with birthtime support. Birthtime support is necessary only to
 	    // read birthtime value of an inode
+	    // birthtime restoration is done by tools_make_date() called from filesystem_tools_make_date()
 #endif
 
 	return ret;
