@@ -1361,6 +1361,7 @@ void line_tools_display_features(user_interaction & dialog)
 	dialog.printf(gettext("   Furtive read mode support    : %s"), YES_NO(compile_time::furtive_read()));
 	dialog.printf(gettext("   Linux ext2/3/4 FSA support   : %s"), YES_NO(compile_time::FSA_linux_extX()));
 	dialog.printf(gettext("   Mac OS X HFS+ FSA support    : %s"), YES_NO(compile_time::FSA_birthtime()));
+	dialog.printf(gettext("   Linux statx() support        : %s"), YES_NO(compile_time::Linux_statx()));
 
 	switch(compile_time::system_endian())
 	{
