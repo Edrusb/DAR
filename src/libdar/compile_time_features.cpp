@@ -224,6 +224,15 @@ namespace libdar
 #endif
 	}
 
+	bool Linux_statx() noexcept
+	{
+#ifdef HAVE_STATX_SYSCALL
+	    return true;
+#else
+	    return false;
+#endif
+	}
+
 	bool microsecond_read() noexcept
 	{
 #if LIBDAR_TIME_READ_ACCURACY == LIBDAR_TIME_ACCURACY_MICROSECOND || LIBDAR_TIME_READ_ACCURACY == LIBDAR_TIME_ACCURACY_NANOSECOND
