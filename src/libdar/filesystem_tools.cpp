@@ -782,7 +782,8 @@ namespace libdar
 			       datetime::tu_nanosecond);
 		return true;
 	    }
-	    else return false;
+	    else
+		return false;
 	else
 	    return false;
 #else
