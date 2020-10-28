@@ -116,6 +116,9 @@ namespace libdar
 	    /// returns whether libdar has been built with support for HFS+ FSA
 	bool FSA_birthtime() noexcept;
 
+	    /// returns whether libdar has been built with support for Linux statx()
+	bool Linux_statx() noexcept;
+
 	    /// returns whether libdar is able to read timestamps at least at microsecond accuracy
 	bool microsecond_read() noexcept;
 

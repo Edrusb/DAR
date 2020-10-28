@@ -62,6 +62,7 @@ extern "C"
 #include "integers.hpp"
 #include "erreurs.hpp"
 #include "tools.hpp"
+#include "filesystem_tools.hpp"
 #include "filesystem_specific_attribute.hpp"
 #include "cygwin_adapt.hpp"
 #include "deci.hpp"
@@ -635,6 +636,16 @@ namespace libdar
 		throw;
 	    }
 	    close(fd);
+
+	    datetime linux_birthtime;
+	    if(filesystem_tools_read_linux_birthtime(target, linux_birthtime))
+	    {
+		fsa_time *date_ptr = nullptr;
+		create_or_throw(date_ptr, fsaf_linux_extX, fsan_creation_date, linux_birthtime);
+		fsa.push_back(date_ptr);
+		date_ptr = nullptr;
+	    }
+
 	}
 #else
 	    // nothing to do, as this FSA has not been activated at compilation time
@@ -747,7 +758,10 @@ namespace libdar
 			case fsan_unset:
 			    throw SRC_BUG;
 			case fsan_creation_date:
-			    throw SRC_BUG; // unknown nature for this family type
+#if HAVE_STATX_SYSCALL
+			    ui.printf(gettext("Warning: birthtime for %s is not possible to restore under Linux (today), but can be restored by libdar under BSD systems like MACOS X"), target.c_str());
+#endif
+			    break; // nothing to do here, this attribute will be set by tools_make_date()
 			case fsan_append_only:
 			    if(set_immutable)
 				continue;
@@ -1068,12 +1082,14 @@ namespace libdar
 
 	ret = find(fsaf_hfs_plus, fsan_creation_date, tmp);
 #ifndef LIBDAR_BIRTHTIME
+
 	if(ret)
 	    ui.printf(gettext("Birth Time attribute cannot be restored for %s because no FSA familly able to carry that attribute could be activated at compilation time."),
 		      target.c_str());
 	    // here we just warn, the birthtime restoration will be tried (calling twice utime()), even
 	    // if dar has not been compiled with birthtime support. Birthtime support is necessary only to
 	    // read birthtime value of an inode
+	    // birthtime restoration is done by tools_make_date() called from filesystem_tools_make_date()
 #endif
 
 	return ret;

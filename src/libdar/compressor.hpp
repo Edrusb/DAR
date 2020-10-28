@@ -73,7 +73,7 @@ namespace libdar
         virtual bool skip_to_eof() override { inherited_sync_write(); inherited_flush_read(); return compressed->skip_to_eof(); };
         virtual bool skip_relative(S_I x) override { inherited_sync_write(); inherited_flush_read(); return compressed->skip_relative(x); };
 	virtual bool truncatable(const infinint & pos) const override { return compressed->truncatable(pos); };
-        virtual infinint get_position() const override { if(compr->wrap.get_total_in() != 0) throw SRC_BUG; return compressed->get_position(); };
+        virtual infinint get_position() const override { if(compr != nullptr && compr->wrap.get_total_in() != 0) throw SRC_BUG; return compressed->get_position(); };
 
     protected :
 	virtual void inherited_read_ahead(const infinint & amount) override { compressed->read_ahead(amount); };

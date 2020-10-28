@@ -61,6 +61,10 @@ extern "C"
 #include <sys/types.h>
 #endif
 
+#if HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
+
 #if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
@@ -313,7 +317,8 @@ namespace libdar
 
                 if(fsa == nullptr)
                     throw SRC_BUG;
-                if(fsa->find(fsaf_hfs_plus, fsan_creation_date, ptr))
+                if(fsa->find(fsaf_hfs_plus, fsan_creation_date, ptr)
+		   || fsa->find(fsaf_linux_extX, fsan_creation_date, ptr))
                 {
                     const fsa_time *ptr_time = dynamic_cast<const fsa_time *>(ptr);
                     if(ptr_time != nullptr)
@@ -760,6 +765,30 @@ namespace libdar
             if(calculated_crc != nullptr)
                 delete calculated_crc;
         }
+    }
+
+
+    bool filesystem_tools_read_linux_birthtime(const std::string & target, datetime & val)
+    {
+#ifdef HAVE_STATX_SYSCALL
+	struct statx value;
+
+	int ret = statx(0, target.c_str(), 0, STATX_BTIME, &value);
+	if(ret == 0)
+	    if((value.stx_mask & STATX_BTIME) != 0)
+	    {
+		val = datetime(value.stx_btime.tv_sec,
+			       value.stx_btime.tv_nsec,
+			       datetime::tu_nanosecond);
+		return true;
+	    }
+	    else
+		return false;
+	else
+	    return false;
+#else
+	return false;
+#endif
     }
 
 } // end of namespace

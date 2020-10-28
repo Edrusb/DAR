@@ -332,8 +332,18 @@ paragraphs<a href="Notes.html#I"> I</a> and <a href="Notes.html#V">V</a>)<br>
       <td style="vertical-align: top; text-align: right; width: 33%;">--disable-nodump-flag<br>
       </td>
       <td style="vertical-align: top;">Whatever your system is, dar
-will not be able to take care of the nodump-flag (thanks to the
---nodump option)<br>
+	will not be able to take care of the nodump-flag (thanks to the
+	--nodump option)<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: right; width: 33%;">--disable-linux-statx<br>
+      </td>
+      <td style="vertical-align: top;">Even if your system provides the statx() system call, dar
+	will ignore it and will not save birthtime of files as Linux FSA. At restoration time you will
+	not be bothered by the warning telling you that birthime is not possible to be restored
+	under Linux, if you still want to restore other Linux FSA.
+	<br>
       </td>
     </tr>
     <tr>
