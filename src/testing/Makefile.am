@@ -41,7 +41,7 @@ endif
 
 
 
-noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_escape test_hash_fichier moving_file make_sparse_file hashsum test_crypto_asym test_range $(LIBTHREADAR_TEST_MODULES) test_rsync test_smart_pointer test_datetime test_entrepot_libcurl test_truncate
+noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_escape test_hash_fichier moving_file hashsum test_crypto_asym test_range $(LIBTHREADAR_TEST_MODULES) test_rsync test_smart_pointer test_datetime test_entrepot_libcurl test_truncate
 
 LDADD = ../libdar/$(MYLIB).la $(LIBCURL_LIBS) $(GPGME_LIBS) $(LIBTHREADAR_LIBS) $(LTLIBINTL)
 
@@ -133,8 +133,6 @@ test_hash_fichier_SOURCES = test_hash_fichier.cpp
 test_hash_fichier_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 moving_file_SOURCES = moving_file.cpp
-make_sparse_file_SOURCES = make_sparse_file.c
-make_sparse_file_CPPFLAGS = -I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF)
 
 hashsum_SOURCES = hashsum.c
 hashsum_CPPFLAGS = -I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF)

@@ -1,0 +1,1037 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <link href="style.css" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+    <title>Benchmarking backup tools</title>
+  </head>
+  <body>
+    <center><h1>Benchmarking backup tools</h1></center>
+
+    <h2>Introduction</h2>
+    <p>
+      This document has for objective to compare <b>dar</b> to other common backup tools under Unix
+      (Linux, FreeBSD, MACOS X...), among
+      the most commonly available today. The <b>first target</b> is being able to restore a whole system
+      from a minimal environment without assistance of an already existing local server (disaster context).
+      The <b>second target</b> evaluating the security of archived data, when time passes.
+    </p>
+    <p>
+      For that reason we have excluded complex softwares that requires servers already running
+      on the local network (<i>Bacula</i>, <i>Amanda</i>, <i>Bareos</i>, <i>UrBackup</i>, <i>Burp</i>...) assuming you have first to reconstruct such server in
+      case of disaster in order to be able to use this type of software backup. We have also filtered out softwares
+      that only provide a Graphical User Interface (GUI) to still be able to face situation
+      where even graphical environment is not available.
+    </p>
+    <p>
+      We also had to exclude partition cloning systems (<i>clonezilla</i>, <i>MondoRescue</i>, <i>RescueZilla</i>,
+      <i>partclone</i> and consorts) as they are targetted at block copy and as such cannot backup a live system:
+      you have to shutdown and boot on a CD/USB key to proceed or run in single user-mode. This cannot
+      be automated and is impacting for the user as he has to interrupt his work and perform the operation by
+      hand, wait for its completion to be able to use back again the system.
+    <p>
+      The comparison will thus concerns the following tools:
+    </p>
+    <ul>
+      <li><b>dar</b> and software based on it: gdar, DarGUI, Baras, Darbup, Darbrrd, HUbackup, SaraB...</li>
+      <li><b>rsync</b> and software based on it: TimeShift, rsnapshot... </li>
+      <li><b>tar</b> and software based on it: BackupPC, Duplicity, fwbackups... </li>
+
+    </ul>
+
+    <h2>Tests Famillies</h2>
+    <p>
+      Several aspects are interesting to consider:
+    </p>
+    <h3>For Backups</h3>
+    <lu>
+      <li><b>completness</b> of the restoration: file permissions, dates precision, hardlinks, file attributes, Extended Attributes, sparse files...</li>
+      <li><b>execution performance</b>: execution time, memory consumption, multi-threading support...</li>
+      <li><b>disk space efficiency</b>: this mainly depend on the compression algorithm used so we will chose one and compare with that one</li>
+      <li><b>robustness</b> of the backup: data corruption impact</li>
+      <li>main <b>features</b> around backup: differential backup, snapshot, deduplication, file's history...</li>
+      <li><b>cloud storage compatibility</b>: data ciphering, network protocol suported...</li>
+      <li><b>ease of restoration</b> of a whole system</li>
+    </lu>
+
+    <h3>For Archiving</h3>
+    <p>
+      For the second target (archiving) a subset of the previous points are interesting but with
+      more emphasis and a different context:
+    </p>
+    <lu>
+      <li><b>disk space efficiency</b></li>
+      <li><b>robustness</b> of the archive</li>
+      <li><b>ease of restoration</b> of archived data: speed and operation</li>
+    </lu>
+
+    <h2>Testing Methodology</h2>
+
+    <p>
+      We will not work on random data, but on an adapted sets of data to stress the most crutial aspect of each test:
+    </p>
+    <lu>
+      <li>to measure <b>completness</b> we will generate a small set of file with the script defined below</li>
+      <li>to measure <b>performance</b> we will use first the linux kernel prestine source tree (kernel 5.9.1) which contains a lot of small files and a few large ISO files in a second time</li>
+    </lu>
+    <p>
+      When measuring time performance and not to measure disk (low) performances,
+      we will use <b>tmpfs</b> filesystem for the data to backup and for the place to store the resulting backup to.
+    </p>
+
+    <p>
+      The following script (also available with dar source code) is used to build a
+      directory tree to evaluate the completness of the backup tools.
+    </p>
+    <div><code>
+	#!/bin/bash
+
+	if [ -z "$1" ] ; then
+	echo "usage: $0 &lt;directory&gt;"
+	exit 1
+	fi
+
+	if [ -e "$1" ] ; then
+	echo "$1 already exists, remove it or use another directory name"
+	exit 1
+	fi
+
+	if ! dar -V &gt; /dev/null ; then
+	echo "need dar to copy unix socket to the test tree"
+	exit 1
+	fi
+
+	mkdir "$1"
+	cd "$1"
+
+	# creating
+	mkdir "SUB"
+	dd if=/dev/zero of=plain_zeroed bs=1024 count=1024
+	dd if=/dev/urandom of=random bs=1024 count=1024
+	dd if=/dev/zero of=sparse_file bs=1 count=1 seek=10239999
+	ln -s random SUB/symlink-broken
+	ln -s ../random SUB/symlink-valid
+	mkfifo pipe
+	mknod null c 3 1
+	mknod fd1 b 2 1
+	dar -c - -R / -g dev/log -N -Q -q | dar -x - --sequential-read -N -q -Q
+	ln sparse_file SUB/hard_linked_sparse_file
+	ln dev/log SUB/hard_linked_socket
+	ln pipe SUB/hard_linked_pipe
+
+	# modifying dates and permissions
+	sleep 2
+	chown nobody random
+	chown -h bin SUB/symlink-valid
+	chgrp -h daemon SUB/symlink-valid
+	sleep 2
+	echo hello &gt;&gt; random
+	sleep 2
+	cat &lt; random &gt; /dev/null
+
+	# adding Extend Attributes, assuming the filesystem as user_xattr and acl option set
+	setfacl -m u:nobody:rwx plain_zeroed && setfattr -n "user.hello" -v "hello world!!!" plain_zeroed || (echo "FAILED TO CREATE EXTENDED ATTRIBUTES" && exit 1)
+
+	# adding filesystem specific attributes
+	chattr +dis plain_zeroed
+
+    </code></div>
+
+    <p>
+      <b><u>Testing hardware</u></b>
+    </p>
+
+    <p>
+      Tests results that follow come from the execution inside a proxmox VE virtual machine, running a Devuan beowulf system on a Intel Core i5-7400 (3 GHz) processor.
+      The VM is allocated 12 GiB or RAM and the 4 CPU cores of the system. Testing on baremetal would give better performances, but comparison stay interesting.
+    </p>
+
+    <h2>Test Results</h2>
+
+    <h3>Completness of backup and restoration</h3>
+
+    <table border="0" style="text-align: center;">
+      <tr>
+	<td class="title">Software</td>
+	<td class="title">plain file</td>
+	<td class="title">symlink</td>
+	<td class="title">hardlinked files</td>
+	<td class="title">hardlinked sockets</td>
+	<td class="title">hardlinked pipes</td>
+	<td class="title">user</td>
+	<td class="title">group</td>
+	<td class="title">perm.</td>
+	<td class="title">ACL</td>
+	<td class="title">Extended Attributes</td>
+	<td class="title">FS Attributes</td>
+	<td class="title">atime</td>
+	<td class="title">mtime</td>
+	<td class="title">ctime</td>
+	<td class="title">btime</td>
+	<td class="title">Spares File</td>
+	<td class="title">Disk usage optimization</td>
+      </tr>
+      <tr>
+	<td>Dar</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>-</td>
+	<td>yes(1)</td>
+	<td>yes</td>
+	<td>yes</td>
+      </tr>
+      <tr>
+	<td>Rsync</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>-</td>
+	<td>-</td>
+	<td>yes</td>
+	<td>-</td>
+	<td>yes(1)</td>
+	<td>-</td>
+	<td>-</td>
+      </tr>
+      <tr>
+	<td>Tar</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>-</td>
+	<td>-</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>yes</td>
+	<td>-</td>
+	<td>-</td>
+	<td>-</td>
+	<td>-</td>
+	<td>yes(3)</td>
+	<td>-</td>
+	<td>yes(1)</td>
+	<td>-</td>
+	<td>-</td>
+      </tr>
+    </table>
+    <ul>
+      <li>(1) under MACoS X, FreeBSD and BSD systems. As of today (year 2020), Linux has not way to set the <i>btime</i> aka birthtime or creation time</li>
+      <li>(2) <i>tar</i> does even not save plain normal sockets</li>
+      <li>(3) <i>mtime</i> is saved by <i>tar</i> but with an accuracy of only 1 second, while today's systems provide nanosecond precision</li>
+    </p>
+    <h4>Sparse File impact</h4>
+    <p>
+      One could argue that sparse file is never used, this is wrong! <code>/var/log/lastlog</code>, <code>/var/log/faillog</code>
+      are two examples of sparse file that <b>any</b> Unix filesystem has. Depending on the installed applications, your system may
+      have virtually huge sparse files that would not be a good idea to save as plain file (you could fail restoring your data even onto a larger
+      disk).
+    </p>
+    <h4>Space optimization</h4>
+    <p>
+      What the impact of space optimization brought my <i>dar</i> at restoration time? Let's take an example with <code>/usr/bin</code> directory under Linux:
+    </p>
+    <div><code>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# rm -rf DST</b>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# du -s /usr/bin</b>
+	<e>431132</e>  /usr/bin
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# dar -c backup -R /usr/bin -q</b>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# mkdir DST</b>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# dar -x backup -R DST</b>
+
+
+	--------------------------------------------
+	2593 inode(s) restored
+	including 5 hard link(s)
+	0 inode(s) not restored (not saved in archive)
+	0 inode(s) not restored (overwriting policy decision)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) failed to restore (filesystem error)
+	0 inode(s) deleted
+	--------------------------------------------
+	Total number of inode(s) considered: 2593
+	--------------------------------------------
+	EA restored for 3 inode(s)
+	FSA restored for 0 inode(s)
+	--------------------------------------------
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# du -s DST</b>
+	<e>398144</e>  DST
+	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
+
+    </code></div>
+    <p>
+      Here, we get a disk space saving of <b>7.6 %</b>, this also means faster
+      file reading operation and better disk life preservation in the same ratio (less disk I/O),
+      and of course you get 7.6 % more disk space available to store some other data.
+    </p>
+
+    <h3>Execution Performance</h3>
+
+    <h3>Disk Space Efficiency</h3>
+
+    <h3>Robustness</h3>
+
+    <h3>Features</h3>
+    history, recover a deleted file, restore a whole system
+
+    <h3>Cloud storage Compatibility</h3>
+
+    <h3>Ease of restoration</h3>
+
+
+    <h2>Conclusion</h2>
+
+
+    <h2>Test logs</h2>
+    <h3>Software used for the tests</h3>
+    <ul>
+      <li><b>dar</b> version 2.7.0</li>
+      <li><b>rsync</b> version 3.1.3</li>
+      <li><b>tar</b> GNU tar 1.30 under Linux and GNU tar (gdar) 1.32 under FreeBSD</li>
+    </ul>
+
+    <h3>Completness of backup and restoration</h3>
+    <h4>Dar</h4>
+    <div><code>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# ./build_test_tree.bash  SRC</b>
+	1024+0 records in
+	1024+0 records out
+	1048576 bytes (1.0 MB, 1.0 MiB) copied, 0.00395381 s, 265 MB/s
+	1024+0 records in
+	1024+0 records out
+	1048576 bytes (1.0 MB, 1.0 MiB) copied, 0.00621889 s, 169 MB/s
+	1+0 records in
+	1+0 records out
+	1 byte copied, 0.000386102 s, 2.6 kB/s
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# dar -c backup -R SRC</b>
+
+
+	--------------------------------------------
+	14 inode(s) saved
+	including 3 hard link(s) treated
+	0 inode(s) changed at the moment of the backup and could not be saved properly
+	0 byte(s) have been wasted in the archive to resave changing files
+	0 inode(s) with only metadata changed
+	0 inode(s) not saved (no inode/file change)
+	0 inode(s) failed to be saved (filesystem error)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) recorded as deleted from reference backup
+	--------------------------------------------
+	Total number of inode(s) considered: 14
+	--------------------------------------------
+	EA saved for 1 inode(s)
+	FSA saved for 5 inode(s)
+	--------------------------------------------
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# mkdir DST</b>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# dar -x backup -R DST</b>
+
+
+	--------------------------------------------
+	14 inode(s) restored
+	including 3 hard link(s)
+	0 inode(s) not restored (not saved in archive)
+	0 inode(s) not restored (overwriting policy decision)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) failed to restore (filesystem error)
+	0 inode(s) deleted
+	--------------------------------------------
+	Total number of inode(s) considered: 14
+	--------------------------------------------
+	EA restored for 1 inode(s)
+	FSA restored for 1 inode(s)
+	--------------------------------------------
+	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
+    </code></div>
+    <p>
+      We simply performed backup of <code>SRC</code> directory with dar's default options, then
+      restore this backup into the <code>DST</code> directory, let's now compare <code>SRC</code> and <code>DST</code> contents:
+    </p>
+    <div><code>
+	<b>root@terre:/mnt/localdisk# du -s SRC DST</b>
+	2068    SRC
+	<e>1048</e>    DST
+	<b>root@terre:/mnt/localdisk#</b>
+    </code></div>
+    <p>
+      The space used by <code>DST</code> is less than the space used by <code>SRC</code>! At first
+      we could beleive that not all data could be restored, let's looking for the explanation:
+    </p>
+    <div><code>
+	<b>root@terre:/mnt/localdisk#ls -iRl SRC DST</b>
+	DST:
+	total 1044
+	414844 drwxr-xr-x  2 root   root     4096 Oct 28 11:09 SUB
+	414850 drwxr-xr-x  2 root   root     4096 Oct 22 11:09 dev
+	414848 brw-r--r--  1 root   root     2, 1 Oct 28 11:09 fd1
+	414842 crw-r--r--  1 root   root     3, 1 Oct 28 11:09 null
+	<e class="red">414841</e> prw-r--r--  2 root   root        0 Oct 28 11:09 pipe
+	414840 -rw-rwxr--+ 1 root   root  1048576 Oct 28 11:09 plain_zeroed
+	414849 -rw-r--r--  1 nobody root  1048582 Oct 28 11:09 random
+	<e>414843</e> -rw-r--r--  2 root   root 10240000 Oct 28 11:09 sparse_file
+
+	DST/SUB:
+	total 4
+	<e class="red">414841</e> prw-r--r-- 2 root root          0 Oct 28 11:09 hard_linked_pipe
+	<e class="blue">414846</e> srw-rw-rw- 2 root root          0 Oct 12 23:00 hard_linked_socket
+	<e>414843</e> -rw-r--r-- 2 root root   10240000 Oct 28 11:09 hard_linked_sparse_file
+	414845 lrwxrwxrwx 1 root root          6 Oct 28 11:09 symlink-broken -> random
+	414847 lrwxrwxrwx 1 bin  daemon        9 Oct 28 11:09 symlink-valid -> ../random
+
+	DST/dev:
+	total 0
+	<e class="blue">414846</e> srw-rw-rw- 2 root root 0 Oct 12 23:00 log
+
+	SRC:
+	total 2064
+	411386 drwxr-xr-x  2 root   root     4096 Oct 28 11:09 SUB
+	414836 drwxr-xr-x  2 root   root     4096 Oct 22 11:09 dev
+	414835 brw-r--r--  1 root   root     2, 1 Oct 28 11:09 fd1
+	414834 crw-r--r--  1 root   root     3, 1 Oct 28 11:09 null
+	414832 prw-r--r--  2 root   root        0 Oct 28 11:09 pipe
+	414826 -rw-rwxr--+ 1 root   root  1048576 Oct 28 11:09 plain_zeroed
+	414827 -rw-r--r--  1 nobody root  1048582 Oct 28 11:09 random
+	414828 -rw-r--r--  2 root   root 10240000 Oct 28 11:09 sparse_file
+
+	SRC/SUB:
+	total 4
+	414832 prw-r--r-- 2 root root          0 Oct 28 11:09 hard_linked_pipe
+	414837 srw-rw-rw- 2 root root          0 Oct 12 23:00 hard_linked_socket
+	414828 -rw-r--r-- 2 root root   10240000 Oct 28 11:09 hard_linked_sparse_file
+	414830 lrwxrwxrwx 1 root root          6 Oct 28 11:09 symlink-broken -> random
+	414831 lrwxrwxrwx 1 bin  daemon        9 Oct 28 11:09 symlink-valid -> ../random
+
+	SRC/dev:
+	total 0
+	414837 srw-rw-rw- 2 root root 0 Oct 12 23:00 log
+	<b>root@terre:/mnt/localdisk#</b>
+    </code></div>
+    <p>
+      All files are present in <code>DST</code> and use the expected space usage, as reported by the <code>ls</code> command.
+      We can also see that the hard linked inode were properly restored for plain file, named pipe and unix socket: the
+      inode number in first column is the same (see colorized output above).
+    </p>
+    <p>
+      Maybe something is missing elsewhere?
+    </p>
+    <div><code>
+	<b>root@terre:/mnt/localdisk# getfacl SRC/plain_zeroed DST/plain_zeroed</b>
+	# file: SRC/plain_zeroed
+	# owner: root
+	# group: root
+	user::rw-
+	<e>user:nobody:rwx</e>
+	group::r--
+	mask::rwx
+	other::r--
+
+	# file: DST/plain_zeroed
+	# owner: root
+	# group: root
+	user::rw-
+	<e>user:nobody:rwx</e>
+	group::r--
+	mask::rwx
+	other::r--
+
+	<b>root@terre:/mnt/localdisk# getfattr -d SRC/plain_zeroed DST/plain_zeroed</b>
+	# file: SRC/plain_zeroed
+	<e>user.hello="hello world!!!"</e>
+
+	# file: DST/plain_zeroed
+	<e>user.hello="hello world!!!"</e>
+
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# lsattr SRC/plain_zeroed DST/plain_zeroed</b>
+	<e>s---i-d-------e----</e> SRC/plain_zeroed
+	<e>s---i-d-------e----</e> DST/plain_zeroed
+	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
+    </code></div>
+    <p>
+      To summarize:
+    </p>
+    <ul>
+      <li>user and group ownership are restored</li>
+      <li>permission are set correctly</li>
+      <li>ACL are preperly restored</li>
+      <li>Extended Attributes also</li>
+      <li>file system specific attributes are too</li>
+      <li>hard links are restored</li>
+    </ul>
+    <p>
+      So what? Let's rerun <code>du</code> file by file:
+    </p>
+    <div><code>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# du -B1 SRC/* DST/*</b>
+	8192    SRC/SUB
+	4096    SRC/dev
+	0       SRC/fd1
+	0       SRC/null
+	<e>1048576 SRC/plain_zeroed</e>
+	1052672 SRC/random
+	8192    DST/SUB
+	4096    DST/dev
+	0       DST/fd1
+	0       DST/null
+	<e>4096    DST/plain_zeroed</e>
+	1052672 DST/random
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# ls -l SRC/plain_zeroed DST/plain_zeroed</b>
+	-rw-rwxr--+ 1 root root <e>1048576</e> Oct 21 18:40 DST/plain_zeroed
+	-rw-rwxr--+ 1 root root <e>1048576</e> Oct 21 18:40 SRC/plain_zeroed
+	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
+    </code></div>
+    <p>
+      OK here is the explanation: <code>plain_zeroed</code> file was using 1048576 bytes of disk space in SRC
+      but consumes only 4096 bytes in DST, but as its file size is still officially 1048576, it has become now a sparse file.
+    </p>
+    <div><code>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# diff -s SRC/plain_zeroed DST/plain_zeroed</b>
+	Files SRC/plain_zeroed and DST/plain_zeroed are <e>identical</e>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
+    </code></div>
+
+    <p>
+      But nothing changes from the user point of view, the restoration process with dar just optimized
+      the space usage.
+    </p>
+    <p>
+      Let's continue checking the inode dates. As you know, Unix inode have several dates:
+      </p>
+    <ul>
+      <li><b>atime</b>, the access time, gives the last time the file's data has been accessed (read)</li>
+      <li><b>mtime</b>, the modification time, gives the last time the file's data has been modified (wrote)</li>
+      <li><b>ctime</b>, the change time, gives the last time the file's metadata in other word the inode properties (ownership, ACL, permissions, dates, ...) have been modified</li>
+      <li><b>btime</b>, the birth time or yet creation time, gives the time the file has been created on the current filesystem, this date is not present on all Unix system</li>
+    </ul>
+
+    <p>
+      The <code>ls -iRl</code> command we used so far does only show the <i>mtime</i> date moreover with
+      a time accuracy of only one minute, while modern systems provide nanosecond precision. For that
+      reason we will use the <code>stat</code> command instead to have all dates at the system time accuracy:
+    </p>
+
+    <div><code>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# stat SRC/random DST/random</b>
+	File: SRC/random
+	Size: 1048576         Blocks: 2048       IO Block: 4096   regular file
+	Device: 802h/2050d      Inode: 414840      Links: 1
+	Access: (0644/-rw-r--r--)  Uid: (65534/  nobody)   Gid: (    0/    root)
+	<e>Access: 2020-10-22 12:13:01.813319506 +0200</e>
+	<e>Modify: 2020-10-22 12:12:57.765328555 +0200</e>
+	<e class=red>Change: 2020-10-22 12:12:59.805323991 +0200</e>
+	Birth: -
+	File: DST/random
+	Size: 1048576         Blocks: 2048       IO Block: 4096   regular file
+	Device: 802h/2050d      Inode: 414889      Links: 1
+	Access: (0644/-rw-r--r--)  Uid: (65534/  nobody)   Gid: (    0/    root)
+	<e>Access: 2020-10-22 12:13:01.813319506 +0200</e>
+	<e>Modify: 2020-10-22 12:12:57.765328555 +0200</e>
+	<e class=red>Change: 2020-10-22 12:14:34.877131738 +0200</e>
+	Birth: -
+	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
+    </code></div>
+
+    <p>
+      From the above output we see that:
+    </p>
+    <ul>
+      <li>atime is restored</li>
+      <li>mtime is restored</li>
+      <li>ctime is not restored</li>
+    </ul>
+
+    <p>
+      As we targeted this benchmark mainly for Linux which has not yet the <code>btime</code> available
+      (Well some Linux <a href="https://en.wikipedia.org/wiki/Comparison_of_file_systems#Metadata">file systems</a> support
+      <i>btime</i> but its access is not yet fully available to applications), we will thus momentarily change to a BSD system
+      to play with <code>btime</code>. BSD systems include MACOS X, FreeBSD, NetBSD, butterflyBSD,... we will use FreeBSD here.
+      Under FreeBSD, the <code>stat</code> command is not as easy to read as under Linux, however it is
+      very flexible which we will leverage to mimic the Linux output:
+    </p>
+
+    <div><code>
+	<b>root@FreeBSD:~denis # which mystat</b>
+	mystat:          aliased to <e>stat -f "%N%nAccess: %Sa%nModify: %Sm%nChange: %Sc%nBirth: %SB%n" !*</e>
+	<b>root@FreeBSD:~denis # mystat SRC/random</b>
+	SRC/random
+	Access: Oct 27 13:28:41 2020
+	Modify: Oct 22 15:34:07 2020
+	Change: Oct 22 15:34:09 2020
+	<e>Birth: Oct 22 15:34:07 2020</e>
+	<b>root@FreeBSD:~denis # dar -c backup -R SRC -q</b>
+	<b>root@FreeBSD:~denis # mkdir DST</b>
+	<b>root@FreeBSD:~denis # dar -x backup -R DST -q</b>
+	<b>root@FreeBSD:~denis # mystat DST/random</b>
+	DST/random
+	Access: Oct 27 13:28:41 2020
+	Modify: Oct 22 15:34:07 2020
+	Change: Oct 27 13:31:50 2020
+	<e>Birth: Oct 22 15:34:07 2020</e>
+	<b>root@FreeBSD:~denis #</b>
+    </code></div>
+
+    <p>
+      In conclusion <i>dar</i> also saves and restores properly <code>btime</code>
+    </p>
+
+
+    <h4>Rsync</h4>
+    <p>
+      Let's do the same we did previously using <b>rsync</b>. We start by copying <code>SRC</code> directory to <code>DST</code>:
+    </p>
+    <div><code>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# chattr -i DST/plain_zeroed</b>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# rm -rf DST</b>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# mkdir DST</b>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# rsync -arvHAX SRC/* DST</b>
+	sending incremental file list
+	fd1
+	null
+	pipe
+	plain_zeroed
+	random
+	SUB/
+	SUB/hard_linked_pipe => pipe
+	SUB/hard_linked_socket
+	SUB/hard_linked_sparse_file
+	SUB/symlink-broken -> random
+	SUB/symlink-valid -> ../random
+	dev/
+	dev/log => SUB/hard_linked_socket
+	sparse_file => SUB/hard_linked_sparse_file
+
+	sent 12,340,909 bytes  received 173 bytes  24,682,164.00 bytes/sec
+	total size is 22,577,173  speedup is 1.83
+	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
+    </code></div>
+    <p>
+      First note, the backup and restoration is done in one step, where <i>dar</i> was decorelating the backup operation
+      from the restoration operation. The resulting backup needs not software to be restored (<code>DST</code>
+      is a copy of <code>SRC</code>). For dar to reach the same result (without using storage for the backup) this
+      implies two dar commands: <code> dar -c - -R SRC | dar -x - --sequential-read -R DSR</code>. The situation is
+      similar with <code>tar</code>, you need two commands to performe the same task: <code>tar -cf - | tar -xf -</code>
+    </p>
+    <div><code>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# du -s SRC DST</b>
+	2068    SRC
+	<e>12064</e>   DST
+	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
+    </code></div>
+    <p>
+      Here, the space used in the restored backup is six time bigger than the original content! Let's continue
+      as we did with dar:
+    </p>
+    <div><code>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# ls -iRl SRC DST</b>
+	DST:
+	total 12060
+	414843 drwxr-xr-x  2 root   root     4096 Oct 28 11:09 SUB
+	414844 drwxr-xr-x  2 root   root     4096 Oct 22 11:09 dev
+	414840 brw-r--r--  1 root   root     2, 1 Oct 28 11:09 fd1
+	414841 crw-r--r--  1 root   root     3, 1 Oct 28 11:09 null
+	<e class=red>414842</e> prw-r--r--  2 root   root        0 Oct 28 11:09 pipe
+	414848 -rw-rwxr--+ 1 root   root  1048576 Oct 28 11:09 plain_zeroed
+	414849 -rw-r--r--  1 nobody root  1048582 Oct 28 11:09 random
+	<e>414850</e> -rw-r--r--  2 root   root 10240000 Oct 28 11:09 sparse_file
+
+	DST/SUB:
+	total 10000
+	<e class=red>414842</e> prw-r--r-- 2 root root          0 Oct 28 11:09 hard_linked_pipe
+	<e class=blue>414845</e> srw-rw-rw- 2 root root          0 Oct 12 23:00 hard_linked_socket
+	<e>414850</e> -rw-r--r-- 2 root root   10240000 Oct 28 11:09 hard_linked_sparse_file
+	414846 lrwxrwxrwx 1 root root          6 Oct 28 11:09 symlink-broken -> random
+	414847 lrwxrwxrwx 1 bin  daemon        9 Oct 28 11:09 symlink-valid -> ../random
+
+	DST/dev:
+	total 0
+	<e class=blue>414845</e> srw-rw-rw- 2 root root 0 Oct 12 23:00 log
+
+	SRC:
+	total 2064
+	411386 drwxr-xr-x  2 root   root     4096 Oct 28 11:09 SUB
+	414836 drwxr-xr-x  2 root   root     4096 Oct 22 11:09 dev
+	414835 brw-r--r--  1 root   root     2, 1 Oct 28 11:09 fd1
+	414834 crw-r--r--  1 root   root     3, 1 Oct 28 11:09 null
+	414832 prw-r--r--  2 root   root        0 Oct 28 11:09 pipe
+	414826 -rw-rwxr--+ 1 root   root  1048576 Oct 28 11:09 plain_zeroed
+	414827 -rw-r--r--  1 nobody root  1048582 Oct 28 11:09 random
+	414828 -rw-r--r--  2 root   root 10240000 Oct 28 11:09 sparse_file
+
+	SRC/SUB:
+	total 4
+	414832 prw-r--r-- 2 root root          0 Oct 28 11:09 hard_linked_pipe
+	414837 srw-rw-rw- 2 root root          0 Oct 12 23:00 hard_linked_socket
+	414828 -rw-r--r-- 2 root root   10240000 Oct 28 11:09 hard_linked_sparse_file
+	414830 lrwxrwxrwx 1 root root          6 Oct 28 11:09 symlink-broken -> random
+	414831 lrwxrwxrwx 1 bin  daemon        9 Oct 28 11:09 symlink-valid -> ../random
+
+	SRC/dev:
+	total 0
+	414837 srw-rw-rw- 2 root root 0 Oct 12 23:00 log
+	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
+    </code></div>
+    <p>
+      All files are present in <code>DST</code> and use the expected space usage, as reported by the <code>ls</code>.
+      We can also see that all three hard linked inode (plain file, socket and named pipe) are restored properly.
+      So we can suspect the cause of the size difference to be linked with sparse files:
+    </p>
+    <div><code>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# du SRC/sparse_file DST/sparse_file</b>
+	4       SRC/sparse_file
+	<e>10000</e>   DST/sparse_file
+	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
+    </code></div>
+    <p>
+      That's it, rsync restores sparse file as plain files.
+    </p>
+    <p>
+      Let's now check file's metadata:
+    </p>
+    <div><code>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# getfacl SRC/plain_zeroed DST/plain_zeroed</b>
+	# file: SRC/plain_zeroed
+	# owner: root
+	# group: root
+	user::rw-
+	<e>user:nobody:rwx</e>
+	group::r--
+	mask::rwx
+	other::r--
+
+	# file: DST/plain_zeroed
+	# owner: root
+	# group: root
+	user::rw-
+	<e>user:nobody:rwx</e>
+	group::r--
+	group::rwx
+	other::r--
+
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# getfattr -d SRC/plain_zeroed DST/plain_zeroed</b>
+	# file: SRC/plain_zeroed
+	<e>user.hello="hello world!!!"</e>
+
+	# file: DST/plain_zeroed
+	<e>user.hello="hello world!!!"</e>
+	<br/>
+
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# lsattr SRC/plain_zeroed DST/plain_zeroed</b>
+	<e class=red>s---i-d-------e----</e> SRC/plain_zeroed
+	<e class=red>--------------e----</e> DST/plain_zeroed
+	<b>root@terre:/mnt/localdisk/Benchmark_tools#stat SRC/random DST/random</b>
+	File: SRC/random
+	Size: 1048582         Blocks: 2056       IO Block: 4096   regular file
+	Device: 802h/2050d      Inode: 414827      Links: 1
+	Access: (0644/-rw-r--r--)  Uid: (65534/  nobody)   Gid: (    0/    root)
+	<e class=red>Access: 2020-10-28 11:09:59.977926733 +0100</e>
+	<e>Modify: 2020-10-28 11:09:57.973931318 +0100</e>
+	<e class=red>Change: 2020-10-28 11:09:57.973931318 +0100</e>
+	Birth: -
+	File: DST/random
+	Size: 1048582         Blocks: 2056       IO Block: 4096   regular file
+	Device: 802h/2050d      Inode: 414849      Links: 1
+	Access: (0644/-rw-r--r--)  Uid: (65534/  nobody)   Gid: (    0/    root)
+	<e class=red>Access: 2020-10-28 12:07:53.622841733 +0100</e>
+	<e>Modify: 2020-10-28 11:09:57.973931318 +0100</e>
+	<e class=red>Change: 2020-10-28 12:07:53.622841733 +0100</e>
+	Birth: -
+	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
+    </code></div>
+    <p>
+      So in summary:
+    </p>
+    <ul>
+      <li>Permission are restored,</li>
+      <li>user and group ownership are restored too,</li>
+      <li>mtime is restored,</li>
+      <li>File ACL are restored,</li>
+      <li>Extended Attributes are restored</li>
+    </ul>
+    <p>
+      But
+    </p>
+    <ul>
+      <li>filesystem specific attributes are not restored,</li>
+      <li>atime is not restored,</li>
+      <li>ctime is not restored</li>
+    </ul>
+
+    <p>
+      For <b>btime</b> as we did before, let's test under a FreeBSD system:
+    </p>
+
+    <div><code>
+	<b>root@FreeBSD:~denis # rm -rf DST</b>
+	<b>root@FreeBSD:/home/denis # which mystat</b>
+	mystat:          aliased to stat -f "%N%nAccess: %Sa%nModify: %Sm%nChange: %Sc%nBirth: %SB%n" !*
+	<b>root@FreeBSD:/home/denis # mystat SRC/random</b>
+	SRC/random
+	Access: Oct 27 14:27:59 2020
+	Modify: Oct 22 15:34:07 2020
+	Change: Oct 22 15:34:09 2020
+	<e>Birth: Oct 22 15:34:07 2020</e>
+	root@FreeBSD:/home/denis # mkdir DST
+	root@FreeBSD:/home/denis # rsync -arv SRC/* DST
+	sending incremental file list
+	fd1
+	null
+	pipe
+	plain_zeroed
+	random
+	sparse_file
+	SUB/
+	SUB/hard_linked_socket
+	SUB/hard_linked_sparse_file
+	SUB/symlink-broken -> random
+	SUB/symlink-valid -> ../random
+	dev/
+	dev/log -> /var/run/log
+
+	sent 22,583,283 bytes  received 129 bytes  45,166,824.00 bytes/sec
+	total size is 22,577,179  speedup is 1.00
+	root@FreeBSD:/home/denis # mystat DST/random
+	DST/random
+	Access: Oct 27 14:28:53 2020
+	Modify: Oct 22 15:34:07 2020
+	Change: Oct 27 14:28:53 2020
+	<e>Birth: Oct 22 15:34:07 2020</e>
+	<b>root@FreeBSD:/home/denis #</b>
+    </code></div>
+    <p>
+      So, birthtime is properly restored.
+    </p>
+
+    <h4>Tar</h4>
+
+    <p>
+      As done with previously, let's save and restore the <code>SRC</code> directory to <code>DST</code>...
+    </p>
+
+    <div><code>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# rm -rf DST</b>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# cd SRC</b>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools/SRC# tar -cf ../backup.tar *</b>
+	tar: SUB/hard_linked_socket: socket ignored
+	tar: dev/log: socket ignored
+	<b>root@terre:/mnt/localdisk/Benchmark_tools/SRC# cd ../</b>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# mkdir DST</b>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# cd DST</b>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools/DST# tar -xf ../backup.tar</b>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools/DST# cd ..</b>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
+    </code></div>
+
+    <p>
+      ...and compare the restored data with the original:
+    </p>
+
+    <div><code>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# du -s SRC DST</b>
+	2068    SRC
+	12064   DST
+	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
+    </code></div>
+
+    <p>
+      So we have here the same issue as with <i>rsync</i>, the restored data uses six time more space than the original data,
+      most probable because of the sparse file not having been taken into account. But first we can check the warning
+      <i>tar</i> issued at backup time:
+    </p>
+
+    <div><code>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# ls -iRl SRC DST</b>
+	DST:
+	total 12060
+	414841 drwxr-xr-x 2 root   root     4096 Oct 28 11:09 SUB
+	414846 drwxr-xr-x 2 root   root     4096 Oct 22 11:09 dev
+	414847 brw-r--r-- 1 root   root     2, 1 Oct 28 11:09 fd1
+	414848 crw-r--r-- 1 root   root     3, 1 Oct 28 11:09 null
+	414849 prw-r--r-- <e class=red>1</e> root   root        0 Oct 28 11:09 pipe
+	414850 -rw-rwxr-- 1 root   root  1048576 Oct 28 11:09 plain_zeroed
+	414852 -rw-r--r-- 1 nobody root  1048582 Oct 28 11:09 random
+	<e>414843</e> -rw-r--r-- 2 root   root 10240000 Oct 28 11:09 sparse_file
+
+	DST/SUB:
+	total 10000
+	414845 prw-r--r-- 1 root root          0 Oct 28 11:09 hard_linked_pipe
+	<e>414843</e> -rw-r--r-- 2 root root   10240000 Oct 28 11:09 hard_linked_sparse_file
+	414842 lrwxrwxrwx 1 root root          6 Oct 28 11:09 symlink-broken -> random
+	414844 lrwxrwxrwx 1 bin  daemon        9 Oct 28 11:09 symlink-valid -> ../random
+
+	DST/dev:
+	total 0
+
+	SRC:
+	total 2064
+	411386 drwxr-xr-x  2 root   root     4096 Oct 28 11:09 SUB
+	414836 drwxr-xr-x  2 root   root     4096 Oct 22 11:09 dev
+	414835 brw-r--r--  1 root   root     2, 1 Oct 28 11:09 fd1
+	414834 crw-r--r--  1 root   root     3, 1 Oct 28 11:09 null
+	414832 prw-r--r--  <e class=red>2</e> root   root        0 Oct 28 11:09 pipe
+	414826 -rw-rwxr--+ 1 root   root  1048576 Oct 28 11:09 plain_zeroed
+	414827 -rw-r--r--  1 nobody root  1048582 Oct 28 11:09 random
+	414828 -rw-r--r--  2 root   root 10240000 Oct 28 11:09 sparse_file
+
+	SRC/SUB:
+	total 4
+	414832 prw-r--r-- 2 root root          0 Oct 28 11:09 hard_linked_pipe
+	<e class=red>414837 srw-rw-rw- 2 root root          0 Oct 12 23:00 hard_linked_socket</e>
+	414828 -rw-r--r-- 2 root root   10240000 Oct 28 11:09 hard_linked_sparse_file
+	414830 lrwxrwxrwx 1 root root          6 Oct 28 11:09 symlink-broken -> random
+	414831 lrwxrwxrwx 1 bin  daemon        9 Oct 28 11:09 symlink-valid -> ../random
+
+	SRC/dev:
+	total 0
+	<e class=red>414837 srw-rw-rw- 2 root root 0 Oct 12 23:00 log</e>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
+    </code></div>
+
+    <p>
+      The warning was not vain, <code>SUB/hard_linked_socket</code> and <code>log</code> are missing in <code>DST</code>.
+      This is however a minor problem as usually unix sockets get recreated by the process using them. However
+      we might have some permission and ownership to set back, by hand. A possile use case is <code>syslog</code> daemon,
+      when let available for a chrooted process or container (MTA, or other network service).
+    </p>
+    <p>
+      The second problem is a bit more annoying: the hard linked fifo (aka named pipe)
+      is silently restored as two independent named pipes (the inode number are different in the first column
+      for <code>pipe</code> and <code>SUB/hard_linked_pipe</code> and their respective link count was <code>2</code>
+      in <code>SRC</code> but is now <code>1</code> in <code>DST</code>. If two processes in different namespaces or
+      chrooted environment, exchange data by mean of such hardlinked pipe, after restoration, if you are not
+      aware of this restriction, it will be difficult to identify why the two process are just locked out, one
+      waiting for data that will never come from the pipe, the other stuck for the pipe to be read.
+    </p>
+
+    <div><code>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# du SRC/sparse_file DST/sparse_file</b>
+	4       SRC/sparse_file
+	<e>10000</e>   DST/sparse_file
+	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
+    </code></div>
+    <p>
+      The reason of the size increase of the restored data finds its root in the absence of
+      sparse file consideration. Let's continue by checking the file's metadata:
+    </p>
+
+    <div><code>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# getfacl SRC/plain_zeroed DST/plain_zeroed</b>
+	# file: SRC/plain_zeroed
+	# owner: root
+	# group: root
+	user::rw-
+	<e class=red>user:nobody:rwx</e>
+	group::r--
+	mask::rwx
+	other::r--
+
+	# file: DST/plain_zeroed
+	# owner: root
+	# group: root
+	user::rw-
+	group::rwx
+	other::r--
+
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# getfattr -d SRC/plain_zeroed DST/plain_zeroed</b>
+	# file: SRC/plain_zeroed
+	<e class=red>user.hello="hello world!!!"</e>
+
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# lsattr SRC/plain_zeroed DST/plain_zeroed</b>
+	<e class=red>s---i-d-------e----</e> SRC/plain_zeroed
+	<e class=red>--------------e----</e> DST/plain_zeroed
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# stat SRC/random DST/random</b>
+	File: SRC/random
+	Size: 1048576         Blocks: 2048       IO Block: 4096   regular file
+	Device: 802h/2050d      Inode: 414841      Links: 1
+	Access: (0644/-rw-r--r--)  Uid: (65534/  nobody)   Gid: (    0/    root)
+	<e class=red>Access: 2020-10-27 14:03:46.064046436 +0100</e>
+	<e>Modify: 2020-10-27 14:03:42.016050420 +0100</e>
+	<e class=red>Change: 2020-10-27 14:03:44.048048418 +0100</e>
+	Birth: -
+	File: DST/random
+	Size: 1048576         Blocks: 2048       IO Block: 4096   regular file
+	Device: 802h/2050d      Inode: 414890      Links: 1
+	Access: (0644/-rw-r--r--)  Uid: (65534/  nobody)   Gid: (    0/    root)
+	<e class=red>Access: 2020-10-27 19:08:14.932424226 +0100</e>
+	<e>Modify: 2020-10-27 14:03:42</e>.<e class=red>000000000 +0100</e>
+	<e class=red>Change: 2020-10-27 19:08:14.932424226 +0100</e>
+	Birth: -
+	root@terre:/mnt/localdisk/Benchmark_tools#
+    </code></div>
+
+    <p>
+      From the above output we see that:
+    </p>
+    <ul>
+      <li>permission are restored,</li>
+      <li>user and group ownership are restored too,</li>
+      <li>mtime is restored but rounded at the nearest second while today's system time accuracy is the nanosecond</li>
+    </ul>
+
+    <p>
+      But
+    </p>
+
+    <ul>
+      <li>ACL are not restored,</li>
+      <li>Extended Attributes are not restored,</li>
+      <li>filesystem attributes are not restored,<li>
+      <li>atime is not restored,</li>
+      <li>ctime is not restored</li>
+    </ul>
+
+    <p>
+      For the last date, <b>birthtime</b> again we will perform the test under FreeBSD:
+    </p>
+
+    <div><code>
+	<b>root@FreeBSD:~denis # which mystat</b>
+	mystat:          aliased to stat -f "%N%nAccess: %Sa%nModify: %Sm%nChange: %Sc%nBirth: %SB%n" !*
+	<b>root@FreeBSD:~denis # mystat SRC/random</b>
+	SRC/random
+	Access: Oct 27 19:40:13 2020
+	Modify: Oct 22 15:34:07 2020
+	Change: Oct 22 15:34:09 2020
+	<e>Birth: Oct 22 15:34:07 2020</e>
+	<b>root@FreeBSD:~denis # cd SRC</b>
+	<b>root@FreeBSD:~denis/SRC # gtar -cf ../backup.tar random</b>
+	<b>root@FreeBSD:~denis/SRC # cd ..</b>
+	<b>root@FreeBSD:~denis # mkdir DST</b>
+	<b>root@FreeBSD:~denis # cd DST</b>
+	<b>root@FreeBSD:~denis/DST # tar -xf ../backup.tar</b>
+	<b>root@FreeBSD:~denis/DST # cd ..</b>
+	<b>root@FreeBSD:~denis # mystat DST/random</b>
+	DST/random
+	Access: Oct 28 15:43:30 2020
+	Modify: Oct 22 15:34:07 2020
+	Change: Oct 28 15:43:30 2020
+	<e>Birth: Oct 22 15:34:07 2020</e>
+	<b>root@FreeBSD:~denis #</b>
+    </code></div>
+
+    <p>
+      gtar saved and restored the birthtime
+    </p>
+
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+  </body>
+</html>

@@ -9,31 +9,53 @@ html
 body
 {
     margin: auto;
-    background-color: rgb(221, 221, 221);
+    background-color: White;
     color: rgb(0, 0, 170);
 }
 
 div
 {
+    white-space: pre;
     color: #333333;
-    margin-left: 5%;
+    margin-left: 2%;
     text-align: left;
     border: 1px solid #333333;
+    background-color:#EEEEEE;
 }
 
 code
 {
     white-space: pre;
+    color: #111111;
+    background-color:#EEEEEE;
 }
 
 e
 {
-    background-color: #EEEEEE;
+    background-color: Yellow;
+}
+
+e.red
+{
+    background-color: Red;
+}
+
+e.blue
+{
+    background-color: LightBlue;
+}
+
+td.title
+{
+    background-color: DarkBlue;
+    text-shadow: 0px 0px 5px LightBlue;
+    color: White;
+/*    font-weight: bold; */
 }
 
 a:link
 {
-    color: #0000ff;
+    color: #006677;
 }
 
 a:visited
@@ -42,8 +64,8 @@ a:visited
 }
 a:hover
 {
-    color: #550055;
-    text-shadow: 3px 3px 3px Yellow;
+    color: Purple;
+    text-shadow: 0px 0px 4px Red;
 }
 
 a:active
