@@ -1,8 +1,8 @@
 from 2.6.12 to 2.6.13
 - fixed compilation warning in testing routine (outside libdar and dar)
 - due to change in autoconf, the --sysconfdir path (which defaults to
-${prefix}/etc) was read as an empty string, leading dar to look for
-darrc system file at the root of the filesystem (/darrc)
+  ${prefix}/etc) was read as an empty string, leading dar to look for
+  darrc system file at the root of the filesystem (/darrc)
 - fixed bug occuring in extremely rare conditions (compression used,
   no ciphering, no hashing, file changed at backup time or had a poor
   compression ratio, was not saved at slice boundary, the previous
@@ -10,6 +10,9 @@ darrc system file at the root of the filesystem (/darrc)
   dar tries to resave the file in place, but partially or totally
   overwites the EAs of the previous entry leading to archive testing
   to fail for these EA.
+- fixed bug met when case insensitive mask is requested (-an option)
+  and locale of file to restore or backup is not the one the dar binary
+  is run with.
 
 from 2.6.11 to 2.6.12
 - fixed regression met in 2.6.11 when generating encrypted archives
