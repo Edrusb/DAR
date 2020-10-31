@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ -z "$1" -o -z "$2" ] ; then
+   echo "usage: $0 <offset in bit> <file>"
+   echo "flip the bit of the file located at the provided offset"
+   exit 1
+fi
+
+offbit=$1
+file="$2"
+
+offbyte=$(( $offbit / 8 ))
+bitinbyte=$(( $offbit - ($offbyte * 8) ))
+readbyte=`xxd -s $offbyte -p -l 1 "$file"`
+mask=$(( 1 << $bitinbyte ))
+newbyte=$(( 0x$readbyte ^ $mask ))
+hexanewbyte=`printf "%.2x" $newbyte`
+
+echo $hexanewbyte | xxd -p -l 1 -s $offbyte -r - "$file"
