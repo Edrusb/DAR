@@ -13,7 +13,14 @@ body
     color: rgb(0, 0, 170);
 }
 
-div
+code
+{
+    white-space: pre;
+    color: #111111;
+    background-color:#EEEEEE;
+}
+
+div.code
 {
     white-space: pre;
     color: #333333;
@@ -23,12 +30,52 @@ div
     background-color:#EEEEEE;
 }
 
-code
+/* gauge */
+
+div.cadre
 {
-    white-space: pre;
-    color: #111111;
-    background-color:#EEEEEE;
+    border-style: solid;
+    border-color: #AAAAAA;
+    border-width: 1px;
+    border-radius: 14px 1px 14px 1px;
+    background-color: #EEEEEE;
+    padding-top: 2px;
+    padding-right: 5px;
+    padding-bottom:2px;
+    padding-left: 2px;
+    box-sizing: border-box;
 }
+
+div.gauge
+{
+    border-radius: 14px 1px 14px 1px;
+    box-shadow: 5px 5px Grey;
+    color: #CCCCCC;
+    text-shadow: 2px 2px 0px Black;
+    padding-left: 1%;
+    box-sizing: border-box;
+    margin-top: 1px;
+    margin-bottom: 2px;
+    margin-left: 1px;
+    margin-right: 1px;
+}
+
+div.best
+{
+    background-color: DarkGreen;
+}
+
+div.normal
+{
+    background-color: Blue;
+}
+
+div.ref
+{
+    background-color: #555555;
+}
+
+/* code emphasis */
 
 e
 {
@@ -45,18 +92,14 @@ e.blue
     background-color: LightBlue;
 }
 
-td.title
-{
-    background-color: DarkBlue;
-    text-shadow: 0px 0px 5px LightBlue;
-    color: White;
-/*    font-weight: bold; */
-}
+
+/* hyperlinks appearance */
 
 a:link
 {
     color: #006677;
 }
+
 
 a:visited
 {
@@ -73,17 +116,20 @@ a:active
     color: #ff0000;
 }
 
+/* title appearance */
+
 h1,h2,h3,h4,h5,h6,h7,h8
 {
     text-shadow: 3px 3px 2px Grey;
     color: DarkBlue;
 }
 
+/* numbering the titles */
+
 body
 {
     counter-reset: h2c;
 }
-
 
 h2::before
 {
@@ -112,4 +158,20 @@ h4::before
 {
     counter-increment: h4c;
     content: counter(h2c) "." counter(h3c) "." counter(h4c) "\0000a0-\0000a0\0000a0";
+}
+
+/* table view */
+
+table, th, td
+{
+    border: 1px solid;
+    border-collapse: collapse;
+    background-color: #EEEEEE;
+}
+
+th
+{
+    background-color: DarkBlue;
+    text-shadow: 0px 0px 2px LightBlue;
+    color: White;
 }
