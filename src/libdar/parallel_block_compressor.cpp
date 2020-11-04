@@ -435,7 +435,7 @@ namespace libdar
                 // exception
 
             reader->join();
-            for(deque<zip_worker>::iterator it = travailleurs.begin(); it !=travailleurs.end(); ++it)
+            for(deque<zip_worker>::iterator it = travailleurs.begin(); it != travailleurs.end(); ++it)
                 it->join();
         }
     }
