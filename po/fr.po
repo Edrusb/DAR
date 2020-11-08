@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: DAR 2.6.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2020-09-26 12:25+0200\n"
+"POT-Creation-Date: 2020-11-08 15:58+0100\n"
 "PO-Revision-Date: 2020-09-11 15:55+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -3664,6 +3664,11 @@ msgstr "Erreur lors de la conversion du code %d en message"
 msgid "Invalid wide-char found in string: "
 msgstr "Caractère large invalide dans la chaîne : "
 
+#: src/libdar/tools.cpp:2214
+#, fuzzy
+msgid "Invalid wide-char found in string:"
+msgstr "Caractère large invalide dans la chaîne : "
+
 #: src/libdar/tools.cpp:2298
 #, c-format
 msgid "Error unlinking %S: %s"
@@ -5512,30 +5517,30 @@ msgstr "Echec de lecture du CRC pour les EA et FSA : "
 msgid "Error met while reading next entry: "
 msgstr "Erreur lors de la lecture de l'entrée suivante : "
 
-#: src/libdar/filtre.cpp:3116
+#: src/libdar/filtre.cpp:3123
 #, c-format
 msgid "Adding only inode metadata to archive: %S"
 msgstr "Enregistrement uniquement des métadonnées dans l'archive : %S"
 
-#: src/libdar/filtre.cpp:3128
+#: src/libdar/filtre.cpp:3135
 msgid "Resaving file without compression: "
 msgstr "Sauve à nouveau mais sans compression: "
 
-#: src/libdar/filtre.cpp:3132
+#: src/libdar/filtre.cpp:3139
 msgid "Delta saving file to archive: "
 msgstr "Sauvegarde sous forme de batch binaire: "
 
-#: src/libdar/filtre.cpp:3136
+#: src/libdar/filtre.cpp:3143
 #, c-format
 msgid "Adding %S to archive: %S"
 msgstr "Ajout de %S à l'archive : %S"
 
-#: src/libdar/filtre.cpp:3176 src/libdar/filtre.cpp:3188
+#: src/libdar/filtre.cpp:3183 src/libdar/filtre.cpp:3195
 #, c-format
 msgid "building delta signature with block size of %d bytes"
 msgstr "construction de signature delta avec des blocks de %d octets"
 
-#: src/libdar/filtre.cpp:3280
+#: src/libdar/filtre.cpp:3287
 #, c-format
 msgid ""
 "Failed reading data CRC for %S, file may be damaged and will be marked dirty"
@@ -5543,7 +5548,7 @@ msgstr ""
 "Echec de lecture du CRC de données pour %S, le fichier est probablement "
 "abîmé et sera marqué comme sale"
 
-#: src/libdar/filtre.cpp:3300
+#: src/libdar/filtre.cpp:3307
 #, c-format
 msgid ""
 "Failed setting storage size to zero for this file with missing data CRC, CRC "
@@ -5553,15 +5558,15 @@ msgstr ""
 "CRC, une erreur de CRC sera signalée pour ce fichier lors de la lecture de "
 "l'archive réparée"
 
-#: src/libdar/filtre.cpp:3330
+#: src/libdar/filtre.cpp:3337
 msgid "Copied data does not match CRC"
 msgstr "Les données copiées ne correspondent pas au CRC"
 
-#: src/libdar/filtre.cpp:3476
+#: src/libdar/filtre.cpp:3483
 msgid " : Failed resaving uncompressed the inode data"
 msgstr " : Echec de la sauvegarde sans compression des données de l'inode"
 
-#: src/libdar/filtre.cpp:3486
+#: src/libdar/filtre.cpp:3493
 msgid ""
 " : Resaving uncompressed the inode data to gain space is not possible, "
 "keeping data compressed"
@@ -5569,7 +5574,7 @@ msgstr ""
 " : Resauver sans compression les données de l'inode pour gagner de la place "
 "n'est pas possible, on conserve les données compressées"
 
-#: src/libdar/filtre.cpp:3530
+#: src/libdar/filtre.cpp:3537
 #, c-format
 msgid ""
 "File has disappeared while we were reading it, cannot check whether it has "
@@ -5578,13 +5583,13 @@ msgstr ""
 "Le fichier a disparu alors que nous étions en train de le lire, impossible "
 "de vérifier s'il a changé lors de sa sauvegarde : %S"
 
-#: src/libdar/filtre.cpp:3565
+#: src/libdar/filtre.cpp:3572
 #, c-format
 msgid ""
 "WARNING! File modified while reading it for backup. Performing retry %i of %i"
 msgstr "ATTENTION ! Fichier modifié pendant sa sauvegarde. Tentative %i sur %i"
 
-#: src/libdar/filtre.cpp:3582
+#: src/libdar/filtre.cpp:3589
 msgid ""
 "WARNING! File modified while reading it for backup. No more retry for that "
 "file to not exceed the wasted byte limit. File is "
@@ -5593,22 +5598,22 @@ msgstr ""
 "nouvelle tentative pour ce fichier afin de de pas dépasser la taille "
 "maximale de gaspillage autorisée. Le fichier est "
 
-#: src/libdar/filtre.cpp:3589
+#: src/libdar/filtre.cpp:3596
 msgid ""
 "WARNING! File modified while reading it for backup, but no more retry "
 "allowed: "
 msgstr ""
 "ATTENTION ! Fichier modifié pendant sa sauvegarde, plus de nouvelle tentative"
 
-#: src/libdar/filtre.cpp:3611
+#: src/libdar/filtre.cpp:3618
 msgid "Dumping delta signature structure for saved file: "
 msgstr "Enregistrement de la signature delta pour le fichier : "
 
-#: src/libdar/filtre.cpp:3767
+#: src/libdar/filtre.cpp:3774
 msgid "Saving Extended Attributes for "
 msgstr "Sauvegarde des Attributs Étendus de "
 
-#: src/libdar/filtre.cpp:3802
+#: src/libdar/filtre.cpp:3809
 #, c-format
 msgid ""
 "Computed EA CRC for file %S differs from what was stored in the archive, "
@@ -5617,11 +5622,11 @@ msgstr ""
 "Le CRC calculé pour sur EA du fichier %S diffère de celui stocké dans "
 "l'archive, les EA de ce fichier sont probablement corrompus"
 
-#: src/libdar/filtre.cpp:3849
+#: src/libdar/filtre.cpp:3856
 msgid "Error saving Extended Attributes for "
 msgstr "Erreur lors de la sauvegarde des Attributs Étendus de "
 
-#: src/libdar/filtre.cpp:3853
+#: src/libdar/filtre.cpp:3860
 msgid ""
 "be advised that a CRC error will be reported for the EA of that file while "
 "sequentially reading the repaired archive"
@@ -5629,12 +5634,12 @@ msgstr ""
 "Nota bene : une erreur de CRC sera signalée pour les EA de ce fichier lors "
 "d'une lecture séquentielle de l'archive réparée"
 
-#: src/libdar/filtre.cpp:3888
+#: src/libdar/filtre.cpp:3895
 msgid "Saving Filesystem Specific Attributes for "
 msgstr ""
 "Sauvegarde des attributs spécifiques au système de fichier Étendus pour "
 
-#: src/libdar/filtre.cpp:3918
+#: src/libdar/filtre.cpp:3925
 #, c-format
 msgid ""
 "Computed FSA CRC for file %S differs from what was stored in the archive, "
@@ -5643,11 +5648,11 @@ msgstr ""
 "Le CRC calculé sur les FSA du fichier %S diffère de celui stocké dans "
 "l'archive, les FSA de ce fichier sont probablement corrompus"
 
-#: src/libdar/filtre.cpp:3963
+#: src/libdar/filtre.cpp:3970
 msgid "Error saving Filesystem Specific Attributes for "
 msgstr "Erreur lors de la sauvegarde des FSA de "
 
-#: src/libdar/filtre.cpp:3967
+#: src/libdar/filtre.cpp:3974
 msgid ""
 "be advised that a CRC error will be reported for the FSA of that file while "
 "sequentially reading the repaired archive"
@@ -5655,15 +5660,15 @@ msgstr ""
 "Nota bene : une erreur de CRC sera signalée pour les FSA de ce fichier lors "
 "d'une lecture séquentielle de l'archive réparée"
 
-#: src/libdar/filtre.cpp:4525
+#: src/libdar/filtre.cpp:4532
 msgid "Copying delta signature structure from the archive of reference: "
 msgstr "Copie des signature delta depuis l'archive de référence : "
 
-#: src/libdar/filtre.cpp:4564
+#: src/libdar/filtre.cpp:4571
 msgid "Calculating delta signature from filesystem: "
 msgstr "Calcul de signature delta à partir du système de fichiers : "
 
-#: src/libdar/filtre.cpp:4644
+#: src/libdar/filtre.cpp:4651
 #, c-format
 msgid ""
 "Furtive read mode requires either root permission and FOWNER capability, "

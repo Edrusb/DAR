@@ -3,13 +3,15 @@ from 2.6.12 to 2.6.13
 - due to change in autoconf, the --sysconfdir path (which defaults to
   ${prefix}/etc) was read as an empty string, leading dar to look for
   darrc system file at the root of the filesystem (/darrc)
-- fixed bug occuring in extremely rare conditions (compression used,
+- fixed bug that should occur in extremely rare conditions (it has been
+  discover during 2.7.0 validation process): compression must be used,
   no ciphering, no hashing, file changed at backup time or had a poor
   compression ratio, was not saved at slice boundary, the previous
-  entry had an EA saved but no FSA or unchanged FSA. In such conditions,
-  dar tries to resave the file in place, but partially or totally
-  overwites the EAs of the previous entry leading to archive testing
-  to fail for these EA.
+  entry had an EA saved but no FSA or an unchanged FSA. In such
+  conditions are all met, dar tries to resave the file in place, but
+  partially or totally overwites the EAs of the previous entry leading
+  to archive testing to fail for these EA (though the archive could be
+  finished without error).
 - fixed bug met when case insensitive mask is requested (-an option)
   and locale of file to restore or backup is not the one the dar binary
   is run with.
