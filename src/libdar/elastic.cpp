@@ -243,7 +243,7 @@ namespace libdar
 
 	    if(len + 2 > taille) // +2 marks
 		throw SRC_BUG;
-		// a value takes more bytes to be stored as its own value !!!
+		// a value takes more bytes to be stored than its own value !!!
 		// (is only true for zero, which is an invalid "taille").
 
 	    if(len + 2 < taille)
