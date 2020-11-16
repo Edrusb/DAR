@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ -z "$1" ] ; then
+    echo "usage: $0 <filename>"
+    echo "modify one bit and hide the change"
+    exit 1
+fi
+
+atime=`stat "$1" | sed -rn -s 's/^Access:\s+(.*)\+.*/\1/p'`
+mtime=`stat "$1" | sed -rn -s 's/^Modify:\s+(.*)\+.*/\1/p'`
+
+./bitflip 2 "$1"
+
+touch -d "$mtime" "$1"
+touch -a -d "$atime" "$1"

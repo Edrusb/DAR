@@ -1,0 +1,36 @@
+#!/bin/bash
+
+if [ -z "$1" -o -z "$2" ] ; then
+    echo "usage: $0 <dir> {phase1 | phase2}"
+    exit 1
+fi
+
+dir="$1"
+phase="$2"
+
+case "$phase" in
+    phase1)
+	if [ -e "$dir" ] ; then
+	    echo "$dir exists, remove it first"
+	    exit 2
+	fi
+	mkdir "$dir"
+	echo "Hello World!" > "$dir/A.txt"
+	echo "Bonjour tout le monde !" > "$dir/B.txt"
+    ;;
+    phase2)
+	if [ ! -d "$dir" ] ; then
+	    echo "$dir does not exist or is not a directory, run phase1 first"
+	    exit 2
+	fi
+
+	rm -f "$dir/A.txt"
+	echo "Buongiorno a tutti !" > "$dir/C.txt"
+    ;;
+    *)
+	echo "unknown phase"
+	exit 2
+	;;
+esac
+
+
