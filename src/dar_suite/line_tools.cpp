@@ -789,11 +789,11 @@ void line_tools_crypto_split_algo_pass(const secu_string & all,
 		if(tmp == "none")
 		    algo = crypto_algo::none;
 		else
-		    if(tmp == "blowfish" || tmp == "bf" || tmp == "")
-			algo = crypto_algo::blowfish; // blowfish is the default cypher ("")
+		    if(tmp == "blowfish" || tmp == "bf")
+			algo = crypto_algo::blowfish;
 		    else
-			if(tmp == "aes" || tmp == "aes256")
-			    algo = crypto_algo::aes256;
+			if(tmp == "aes" || tmp == "aes256" || tmp == "")
+			    algo = crypto_algo::aes256; // AES is the default cypher ("")
 			else
 			    if(tmp == "twofish" || tmp == "twofish256")
 				algo = crypto_algo::twofish256;
