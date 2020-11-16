@@ -35,6 +35,8 @@ from 2.6.x to 2.7.0
   and so on), the utime/utimes/timensat call do not set birthtime, so
   you can restore birthtime of Linux's file only under BSD systems
   today.
+- AES becomes the default when gnupg is used without additional
+  algorithm.
 
 from 2.6.12 to 2.6.13
 - fixed compilation warning in testing routine (outside libdar and dar)
