@@ -27,6 +27,7 @@ install-data-hook:
 uninstall-hook:
 	rm -rf $(DESTDIR)$(pkgdatadir)/html
 	$(UNINSTALL_HTML_MAN)
+	rm -rf $(DESTDIR)$(pkgdatadir)/python
 	rmdir $(DESTDIR)$(pkgdatadir) || true
 
 else
