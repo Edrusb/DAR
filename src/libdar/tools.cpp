@@ -2246,7 +2246,7 @@ namespace libdar
         memset(&state_wc, '\0', sizeof(state_wc)); // initializing the shift structure
         len = wcsrtombs(nullptr, &src, 0, &state_wc);
         if(len == (size_t)-1)
-            throw SRC_BUG; // all components of wstring should be valid
+            throw Erange("tools_wstring_to_string", string(gettext("Invalid wide-char found in string:")) + tools_strerror_r(errno));
 
         char *dst = new (nothrow) char[len + 1];
         if(dst == nullptr)

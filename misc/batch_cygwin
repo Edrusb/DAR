@@ -28,7 +28,7 @@ if(! -f configure) then
 endif
 
 if("$1" == "") then
-   echo "usage: $0 <version> {win32|win64} [options to make]"
+   echo "usage: $0 <version> {win32|win64} [options for the make program like '-j 8']"
    exit
 endif
 

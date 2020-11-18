@@ -104,7 +104,7 @@ Windows, especially with cyrillic filenames?</a><br>
 </span><a href="#win32"><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;">I have a 32 bits windows system, which binary </span><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;">package </span></span><span style="font-weight: bold; font-style: italic;">can I to use?</span></span></a><br>
       <a style="font-style: italic; font-weight: bold;" href="#lzop_vs_dar">lzo compression is slower with dar than with lzop, why?</a><br>
       <a style="font-weight: bold;" href="#libthreadar"><span style="font-style: italic;">what is libthreadar and why libdar relies on it?</span></a><br>
-      <a href="#libssh2"><span style="font-weight: bold; font-style: italic;"></span><span style="font-weight: bold; font-style: italic;">I Cannot get dar to connect to remote server using SFTP</span></a><br>
+      <a href="#libssh2"><span style="font-weight: bold; font-style: italic;"></span><span style="font-weight: bold; font-style: italic;">I Cannot get dar to connect to remote server using SFTP, it fails with "<em>SSL peer certificate or SSH remote key was not OK</em>"</span></a><br>
       <span style="font-weight: bold; font-style: italic;"></span><a href="#too_large"><span style="font-weight: bold; font-style: italic;">"Cannot open catalogue: Cannot handle such a too large integer." What to do?</span></a><br>
       <a href="#sftppubkey"><span style="font-weight: bold; font-style: italic;">I have sftp pubkey authentication working with ssh/sftp, how to have dar using too this public key authentication for sftp?</span></a><br>
       <a href="#full-from-diff"><span style="font-weight: bold; font-style: italic;">I have a diff/incremental backup and I want to convert it to a full backup, how to do that?</span></a><br>
@@ -3862,19 +3862,19 @@ the counterpart is not huge for user (you can add -afile-auth in your
       </div>
 
       <span style="font-weight: bold; font-style: italic;">
-      <p><a name="libssh2"></a>I Cannot get dar to connect to remote server using SFTP<br>
+	<p><a name="libssh2"></a>I Cannot get dar to connect to remote server using SFTP, it fails with "<em>SSL peer certificate or SSH remote key was not OK</em>"
+	  <br>
 </p></span>
 
       <div style="margin-left: 40px;">This may be due to several well known reasons:<br>
       <ul>
+	<li>You have an outdate version of libssh2, you need version 1.9.0 or greater to support <i>ecdsa</i> host certificates, see dar's man page
+	about DAR_SFTP_KNOWNHOSTS_FILE for a workaround</li>
         <li>dar/libdar cannot find the known_hosts file</li>
         <li>if using key authentifcation instead of password, dar/libdar cannot find the private key file</li>
         <li>if using key authentifcation instead of password, dar/libdar cannot find the public key file</li>
-        <li>libssh2 cannot read the known_hosts (libssh2 is used by
-libcurl which is used in turn by libdar to handle network
-communications).</li>
       </ul>
-For the<span style="font-weight: bold;"> three first cases</span>,&nbsp; you can make use of environment variable to change the default behavior:<br>
+      For the<b> three later cases</b>,&nbsp; you can make use of environment variable to change the default behavior:<br>
       <div style="margin-left: 40px;"><span style="font-weight: bold;">DAR_SFTP_KNOWNHOSTS_FILE</span><br style="font-weight: bold;">
       <span style="font-weight: bold;">DAR_SFTP_PUBLIC_KEYFILE</span><br style="font-weight: bold;">
       <span style="font-weight: bold;">DAR_SFTP_PRIVATE_KEYFILE</span><br>
