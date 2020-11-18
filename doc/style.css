@@ -2,13 +2,13 @@ html
 {
     font-family: 'Open Sans', serif;
     text-align: justify;
-    color: Black;
     margin: 5%;
 }
 
 body
 {
     margin: auto;
+    margin-bottom: 10%;
     background-color: White;
     color: rgb(0, 0, 170);
 }
@@ -17,7 +17,6 @@ code
 {
     white-space: pre;
     color: #111111;
-    background-color:#EEEEEE;
 }
 
 div.code
@@ -28,6 +27,11 @@ div.code
     text-align: left;
     border: 1px solid #333333;
     background-color:#EEEEEE;
+}
+
+div.code:hover
+{
+    background-color:inherit;
 }
 
 /* gauge */
@@ -58,6 +62,7 @@ div.gauge
     margin-bottom: 2px;
     margin-left: 1px;
     margin-right: 1px;
+    white-space: pre;
 }
 
 div.best
@@ -91,6 +96,12 @@ e.blue
 {
     background-color: LightBlue;
 }
+
+e.green
+{
+    background-color: Teal;
+}
+
 
 
 /* hyperlinks appearance */
@@ -174,4 +185,31 @@ th
     background-color: DarkBlue;
     text-shadow: 0px 0px 2px LightBlue;
     color: White;
+}
+
+table
+{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.left
+{
+    text-align: left;
+}
+
+.center
+{
+    text-align: center;
+}
+
+dt
+{
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+dt::before
+{
+    content: '- ';
 }

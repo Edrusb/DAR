@@ -12,180 +12,67 @@
 
     <h2>Introduction</h2>
     <p>
-      This document has for objective to compare <b>dar</b> to other common backup tools under Unix
-      (Linux, FreeBSD, MACOS X...), among
-      the most commonly available today. The <b>first target</b> is being able to restore a whole system
+      This document has for objective to compare common backup tools under Unix
+      (Linux, FreeBSD, MACOS X...), among the most commonly available today.
+      The <b>first target</b> we want to address is being able to restore a whole system
       from a minimal environment without assistance of an already existing local server (disaster context).
-      The <b>second target</b> evaluating the security of archived data, when time passes.
+      The <b>second target</b> concerns the security of archived data, when time passes.
     </p>
     <p>
-      For that reason we have excluded complex softwares that requires servers already running
-      on the local network (<i>Bacula</i>, <i>Amanda</i>, <i>Bareos</i>, <i>UrBackup</i>, <i>Burp</i>...) assuming you have first to reconstruct such server in
-      case of disaster in order to be able to use this type of software backup. We have also filtered out softwares
-      that only provide a Graphical User Interface (GUI) to still be able to face situation
-      where even graphical environment is not available.
+      Backup softwares that requires servers already running
+      on the local network (<i>Bacula</i>, <i>Amanda</i>, <i>Bareos</i>, <i>UrBackup</i>, <i>Burp</i>...) cannot
+      adress our first target as you have first to reconstruct such server in
+      case of disaster in order to be able to use this type of software backup.
     </p>
     <p>
-      We also had to exclude partition cloning systems (<i>clonezilla</i>, <i>MondoRescue</i>, <i>RescueZilla</i>,
-      <i>partclone</i> and consorts) as they are targetted at block copy and as such cannot backup a live system:
-      you have to shutdown and boot on a CD/USB key to proceed or run in single user-mode. This cannot
-      be automated and is impacting for the user as he has to interrupt his work and perform the operation by
-      hand, wait for its completion to be able to use back again the system.
+      Partition cloning systems (<i>clonezilla</i>, <i>MondoRescue</i>, <i>RescueZilla</i>,
+      <i>partclone</i> and consorts) are targetted at block copy and as such cannot backup a live system:
+      you have to shutdown and boot on a CD/USB key or run in single user-mode in order to backup. This cannot
+      be automated and has a strongly impact on the user as she/he has to interrupt her/his work for the
+      backup operation to take place, wait for its completion and only then be able to use again the system.
     <p>
-      The comparison will thus concerns the following tools:
+      Looking at the remaining backup tools, with or without Graphical User Interface, most of them
+      rely on one of the three backend softwares, <i>tar</i>, <i>rsync</i> and <i>dar</i>:
     </p>
     <ul>
-      <li><b>dar</b> and software based on it: gdar, DarGUI, Baras, Darbup, Darbrrd, HUbackup, SaraB...</li>
-      <li><b>rsync</b> and software based on it: TimeShift, rsnapshot... </li>
-      <li><b>tar</b> and software based on it: BackupPC, Duplicity, fwbackups... </li>
-
+      <li>Software based on <b>dar</b>: gdar, DarGUI, Baras, Darbup, Darbrrd, HUbackup, SaraB...</li>
+      <li>Software based on <b>rsync</b>: TimeShift, rsnapshot... </li>
+      <li>Software based on <b>tar</b>: BackupPC, Duplicity, fwbackups... </li>
     </ul>
+    <p>
+      We will thus compare these three softwares for the different test famillies described below.
+    </p>
 
     <h2>Tests Famillies</h2>
     <p>
       Several aspects are interesting to consider:
     </p>
-    <h3>For Backups</h3>
     <lu>
       <li><b>completness</b> of the restoration: file permissions, dates precision, hardlinks, file attributes, Extended Attributes, sparse files...</li>
+      <li><b>main features</b> around backup: differential backup, snapshot, deduplication, file's history...</li>
+      <li><b>robustness</b> of the backup: data corruption impact...</li>
       <li><b>execution performance</b>: execution time, memory consumption, multi-threading support...</li>
-      <li><b>disk space efficiency</b>: this mainly depend on the compression algorithm used so we will chose one and compare with that one</li>
-      <li><b>robustness</b> of the backup: data corruption impact</li>
-      <li>main <b>features</b> around backup: differential backup, snapshot, deduplication, file's history...</li>
-      <li><b>cloud storage compatibility</b>: data ciphering, network protocol suported...</li>
-      <li><b>ease of restoration</b> of a whole system</li>
     </lu>
-
-    <h3>For Archiving</h3>
     <p>
-      For the second target (archiving) a subset of the previous points are interesting but with
-      more emphasis and a different context:
-    </p>
-    <lu>
-      <li><b>disk space efficiency</b></li>
-      <li><b>robustness</b> of the archive</li>
-      <li><b>ease of restoration</b> of archived data: speed and operation</li>
-    </lu>
-
-    <h2>Testing Methodology</h2>
-
-    <p>
-      We will not work on random data, but on an adapted sets of data to stress the most crutial aspect of each test:
-    </p>
-    <ul>
-      <li>to measure <b>completness</b> we will generate a small set of file with the script defined below</li>
-      <li>to measure <b>performance</b> we will use first two data sets:
-	<ul>
-	  <li>A single large ISO file</li>
-	  <li>The linux kernel source tree (kernel 5.9.2) which contains a lot of small files</li>
-	</ul>
-    </ul>
-    <p>
-      When measuring time performance and not to measure disk (low) performances,
-      we will use <b>tmpfs</b> filesystem for the data to backup and for the place to store the resulting backup to.
+      <b><u>Hardware used for Testing</u></b>
     </p>
 
     <p>
-      The following script (also available with dar source code) is used to build a
-      directory tree to evaluate the completness of the backup tools.
+      Performance tests has been performed on an <a href="https://www.hpe.com">HPE</a> Proliant server
+      (a <i>ProLiant XL230a Gen9</i> running two <i>Intel(R) Xeon(R) CPU E5-2690 v3 @ 2.60GHz</i> processors) running
+      a Devuan beowulf Linux system. Some features have been done in a <a href="https://www.proxmox.com/en/">Proxmox</a>
+      Virtual Machine running a FreeBSD 12.1 on an <i>Intel Core i5-7400 (3 GHz)</i> based computer.
     </p>
-    <div class=code><code>
-	#!/bin/bash
 
-	if [ -z "$1" ] ; then
-	echo "usage: $0 &lt;directory&gt;"
-	exit 1
-	fi
-
-	if [ -e "$1" ] ; then
-	echo "$1 already exists, remove it or use another directory name"
-	exit 1
-	fi
-
-	if ! dar -V &gt; /dev/null ; then
-	echo "need dar to copy unix socket to the test tree"
-	exit 1
-	fi
-
-	mkdir "$1"
-	cd "$1"
-
-	# creating
-	mkdir "SUB"
-	dd if=/dev/zero of=plain_zeroed bs=1024 count=1024
-	dd if=/dev/urandom of=random bs=1024 count=1024
-	dd if=/dev/zero of=sparse_file bs=1 count=1 seek=10239999
-	ln -s random SUB/symlink-broken
-	ln -s ../random SUB/symlink-valid
-	mkfifo pipe
-	mknod null c 3 1
-	mknod fd1 b 2 1
-	dar -c - -R / -g dev/log -N -Q -q | dar -x - --sequential-read -N -q -Q
-	ln sparse_file SUB/hard_linked_sparse_file
-	ln dev/log SUB/hard_linked_socket
-	ln pipe SUB/hard_linked_pipe
-
-	# modifying dates and permissions
-	sleep 2
-	chown nobody random
-	chown -h bin SUB/symlink-valid
-	chgrp -h daemon SUB/symlink-valid
-	sleep 2
-	echo hello &gt;&gt; random
-	sleep 2
-	cat &lt; random &gt; /dev/null
-
-	# adding Extend Attributes, assuming the filesystem as user_xattr and acl option set
-	setfacl -m u:nobody:rwx plain_zeroed && setfattr -n "user.hello" -v "hello world!!!" plain_zeroed || (echo "FAILED TO CREATE EXTENDED ATTRIBUTES" && exit 1)
-
-	# adding filesystem specific attributes
-	chattr +dis plain_zeroed
-
-    </code></div>
+    <h2>Benchmark Results</h2>
 
     <p>
-      Another tool is used to modify a file to backup or emulate archive corruption. It flips a bit
-      an a given offset in a file
+      The results presented here are a synthesis of the test logs provided in appendix.
     </p>
-
-    <div class=code><code>
-	root@devuan:~# cat bitflip
-	#!/bin/bash
-
-	if [ -z "$1" -o -z "$2" ] ; then
-	  echo "usage: $0 &lt;offset in bit&gt; &lt;file&gt;"
-	  echo "flip the bit of the file located at the provided offset"
-	  exit 1
-	fi
-
-	offbit=$1
-	file="$2"
-
-	offbyte=$(( $offbit / 8 ))
-	bitinbyte=$(( $offbit - ($offbyte * 8) ))
-	readbyte=`xxd -s $offbyte -p -l 1 "$file"`
-	mask=$(( 1 &lt;&lt; $bitinbyte ))
-	newbyte=$(( 0x$readbyte ^ $mask ))
-	hexanewbyte=`printf "%.2x" $newbyte`
-
-	echo $hexanewbyte | xxd -p -l 1 -s $offbyte -r - "$file"
-	root@devuan:~#
-    </code></div>
-
-    <p>
-      <b><u>Testing hardware</u></b>
-    </p>
-
-    <p>
-      Tests results that follow come from the execution inside a proxmox VE virtual machine, running a Devuan beowulf system on a Intel Core i5-7400 (3 GHz) processor.
-      The VM is allocated 12 GiB or RAM and the 4 CPU cores of the system. Testing on baremetal would give better performances, but comparison stay interesting.
-    </p>
-
-    <h2>Test Results</h2>
 
     <h3>Completness of backup and restoration</h3>
 
-    <table style="text-align: center;">
+    <table class=center>
       <tr>
 	<th>Software</th>
 	<th>plain file</th>
@@ -236,22 +123,22 @@
 	<td>yes</td>
 	<td>yes</td>
 	<td>yes</td>
-	<td>yes</td>
-	<td>yes</td>
+	<td>yes(4)</td>
+	<td>yes(5)</td>
 	<td>-</td>
 	<td>-</td>
 	<td>yes</td>
 	<td>-</td>
 	<td>yes(1)</td>
-	<td>-</td>
-	<td>-</td>
+	<td>yes(6)</td>
+	<td>yes(6)</td>
       </tr>
       <tr>
 	<td>Tar</td>
 	<td>yes</td>
 	<td>yes</td>
 	<td>yes</td>
-	<td>-</td>
+	<td>- <i>(2)</i></td>
 	<td>-</td>
 	<td>yes</td>
 	<td>yes</td>
@@ -263,7 +150,7 @@
 	<td>yes(3)</td>
 	<td>-</td>
 	<td>yes(1)</td>
-	<td>-</td>
+	<td>yes</td>
 	<td>-</td>
       </tr>
     </table>
@@ -271,6 +158,10 @@
       <li>(1) under MACoS X, FreeBSD and BSD systems. As of today (year 2020), Linux has not way to set the <i>btime</i> aka birthtime or creation time</li>
       <li>(2) <i>tar</i> does even not save plain normal sockets</li>
       <li>(3) <i>mtime</i> is saved by <i>tar</i> but with an accuracy of only 1 second, while today's systems provide nanosecond precision</li>
+      <li>(4) need -A option</li>
+      <li>(5) need -X option</li>
+      <li>(6) need -S option</li>
+    </ul>
     </p>
     <h4>Sparse File impact</h4>
     <p>
@@ -281,7 +172,7 @@
     </p>
     <h4>Space optimization</h4>
     <p>
-      What the impact of space optimization brought my <i>dar</i> at restoration time? Let's take an example with <code>/usr/bin</code> directory under Linux:
+      What is the impact of space optimization at restoration time? Let's take an example with <code>/usr/bin</code> directory under Linux:
     </p>
     <div class=code><code>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# rm -rf DST</b>
@@ -318,11 +209,461 @@
     </p>
 
     <h3>Feature set</h3>
-    history, recover a deleted file, restore a whole system
+
+    <p>
+      Independently from the exhaustivity of data restoration (seen above), several Features are a
+      <i>must have</i>. You will find below their description and what they bring to a backup process
+      followed by a table of how they are supported on the software under test:
+    </p>
+
+    <dl>
+      <dt>Historization</dt><dd>
+	It gives the ability to restore a deleted file even long after the mistake, thanks
+	to the possibility to rotate a backup set. Having associated tools
+	to quickly locate the backup where resided a particular file's version becomes important
+	when the history increases. Historization can be done with full backups, but can of course
+	leverage differential and incremental backups.
+      </dd>
+      <br/>
+
+      <dt>Define the data to backup</dt><dd>
+	Not all files need to backup:
+	<ul>
+	  <li>
+	    some directories (like <code>/tmp, /proc, /sys, /dev, /home/*/.cache</code>) are useless to save
+	  </li>
+	  <li>
+	    you may want to ignore some files based on the name or part of their name --- their extension for
+	    example, (like emacs's backup files <code>*~</code> or your music files<code>*.mp3</code> you already
+	    have archives somewhere, and so on).
+	  </li>
+	  <li>
+	    You may wish to ignore files located one or more particular volume/disk/mounted filesystem, or the
+	    opposite, only consider certains volume/disk/mounted filesystem and ignore all others.
+	  </li>
+	  <li>
+	    You may also find better to <i>tag</i> files one by one (manually by mean of an automated process of
+	    your own), to be excluded from or included in the backup
+	  </li>
+	  <li>
+	    Instead of tagging you could also let a process define a long list of file to backup and/or to ignore.
+	  </li>
+	  <li>
+	    But usually you may need a mix of several of these mechanisms at the same time
+	  </li>
+      </dd>
+      <dt>Slicing (or multi-volume)</dt><dd>
+	Having a backup split into several files of given max size is useful to either:
+	<ul>
+	  <li>hold the backup on several removal media (CD, DVD, USB keys...) smaller than the backup itself</li>
+	  <li>transfer the backup from a large space to another by mean of a smaller removable media</li>
+	  <li>transfer the backup over the network and recover at the last transmitted slice rather than restarting the whole
+	    transfer in case of network issue</li>
+	  <li>store the backup int the cloud where the provider limits the file size</li>
+	  <li>be able to restore a backup where the remaing expected free space after restoration will be very limited</li>
+	  <li>transfer back from the cloud only a few slices to restore some files, when cloud provider only provides a web based interface</li>
+	</ul>
+	Of course, this is interesting only if you don't have to concatenate all the slices to be able to have a usable backup, and
+	as seen above all identified use cases turn around limited storage space, thus compression will have to be possible when
+	multi-volume is used.
+      </dd>
+      <br/>
+
+      <dt>Symmetric strong encryption</dt><dd>
+	Symettric strong encryption is the ability to cipher a backup with a password or passphrase as key to decipher it. Some
+	well known algorithms in this area are AES, Blowfish, serpent...
+	<br/>
+	Symmetric strong encryption is interesting for the following reasons:
+	<ul>
+	  <li>if your disk is ciphered, would you store your backup in clear on the cloud?</li>
+	  <li>you do not trust your cloud provider to not inspect your data in order to consolidate with it the marketing profile he has of yourself</li>
+	  <li>You want to prevent your patented data, industrial recipies from the competition eyes, or even some goverment agencies could clone your work without fear of being prosecuted</li>
+	  <li>Simply because in your country, you have the right and the freedom to have privacy</li>
+	  <li>Because your today democratic country could tomorrow verse into a dictatorship and based on some arbitrary criteria,
+	    belief, political opinion, sexual orientation... you could suffer from having this information being accessible
+	    to the authorities or even publicly released, while you still need backup and arbitrary backup storage.
+	  </li>
+	</ul>
+      </dd>
+      <br/>
+
+      <dt>Asymmetric strong encryption</dt><dd>
+	Asymmetrical strong encryption is the ability to cipher a backup with a public key and having the corresponding private key for deciphering it (PGP, GnuPG...).
+	<br/>
+	Asymmetric encrypion is interesting when exchanging data over Internet, or for archiving data in the cloud. You can also use it
+	the same way as symmetrical encryption, with the point of attention
+	that the private key must be stored outside the backup itself. You can still protect the private key with a password or a passphrase
+	but this gives the same feature level as symmetrical encryption with more complexity and not much more security.
+      </dd>
+      <br/>
+
+      <dt>Protection against plain-text attack</dt>
+      <dd>Ciphering data must be done with a minimum level of protection, in particular, when the ciphered data has well defined
+	structure and patterns, like a backup file format is expected to have. Knowing such expected structure of the clear data
+	can lead to undisclose the whole ciphered data. This is known as <i>plain-text attack</i>.
+      </dd>
+      <br/>
+
+      <dt>Key derivation function</dt><dd>
+	<ul>
+	  <li>
+	    Using the same password/passphrase for different backups is convenient but not secure. Having a key derivation function
+	    using a <i>salt</i> let you use the same password/passphrase while the data will be encrypted with a different key each time,
+	    this is the role of the <i>Key Derivation Function (KDF)</i> (PKCS5/PBKDF2, Argon2...).
+	  </li>
+	  <li>
+	    Another need for a KDF is that usually the human provided
+	    password/passphrase are weak: Even when we use letters, digits and some special characters, passwords and passphrases are still located in a
+	    small area of possible keys that a <i>dictionnary attack</i> can leverage. As the KDF is also by design CPU intensive,
+	    it costs a lot of effort and time to an attacker to derive each word of a dictionnary to its resulting KDF transformed words.
+	    The required time to perform a dictionnary attack can thus be multiplied by several hundred thousand times,
+	    leading to an effective time of tens of years and even centuries rather than hours or days.
+	  </li>
+      </dd>
+      <br/>
+
+      <dt>File change detection</dt><dd>
+	When backing up a live system, it is important to detect, retry saving or flag files that changed during the time
+	they were read for backup. In such situation, the backed file could be recorded in a state it never had: As the backup process
+	reads sequentially from the beginning to the end, if a modification <i>A</i> is done at the end of file then a
+	modification <i>B</i> is made at its beginning during this file's backup, the backup may contain <i>B</i> and not <i>A</i>
+	while at not time
+	the file contained <i>B</i> without <i>A</i>. Seen the short time a file can be read, time accuracy of micro or nanoseconds
+	is mandatory to detect such file change during a backup process, else you will screw up your data in the backup and have nothing
+	to rely on in the occurence of a deleted file by mistake, disk crash or disaster.
+	<br/>
+	At restoration time, if the file has been saved anyway, it should be good to know the such file was not saved properly, maybe
+	restoring a older version but a sane one would be better, thing the user cannot know if he is not informed at restoration time.
+      </dd>
+      <br/>
+
+      <dt>Multi-level backup</dt><dd>
+	Multi-level backup is the ability to make use of full backups, differential backups and/or eventually incremental backups.
+	<br/>
+	The advantage of differential and incremental backups compared to full ones is the much shorter time they require to complete
+	and the reduces storage space they imply.
+      </dd>
+      <br/>
+
+      <dt>Binary delta</dt>
+      <dd>Without binary delta, when performing a differential or incremental backup, if a file has changed since the previous
+	backup, it will be resaved entirely. Some huge files made by some well know applications (mailboxes for example) would consume
+	a lot of storage space and lead to long backup time even when performing incremental or differential backups. Binary delta is
+	the ability to only store of a file the part that changed since a reference state, this lead to important space gain and reduction
+	of the backup duration.
+      </dd>
+      <br/>
+
+      <dt>Detecting suspicious modifications</dt>
+      <dd>When performing backup based on a previous one (differential, incremental, decremental backups), it is possible
+	to check the way the metadata of files have changed. Some patterns are uncommon and may be the trace of a
+	rootkit, virus, ransomware trying to hide its presence and activity.
+      </dd>
+      <br/>
+
+      <dt>Snapshot</dt><dd>
+	A snapshot is like a differential backup made right after the full backup (no file has changed): it is a minimal
+	set of information that can be used to:
+	<ul>
+	  <li>
+	    create an incremental or differential backup without having the full backup around
+	    or more generally the backup of reference. When backup are stored remotely, snapshot is a must.
+	  </li>
+	  <li>
+	    compare the current living filesystem with a status it had at the time the snapshot was made
+	  </li>
+	</ul>
+      </dd>
+      <br/>
+
+      <dt>On-fly hashing</dt><dd>
+	On-fly hashing is the ability to generate a hashing of the backup at the same time it is generated and before it is written
+	to storage. Hash can be used to:
+	<ul>
+	  <li>validate a backup has been properly transfered to a public storage cloud</li>
+	  <li>if the backup is written to local disk, check that no data corruption has occured (doubt about disk or memory)</li>
+	</ul>
+	Hashing validation is usually faster than backup testing or backup comparison, though it does not validate your ability
+	to rely on the backup as deeply as these later operations. Hashing can be made after the backup has been completed but
+	it will need to re-read the whole backup and you will to wait for the necessary storage I/O for the operation to complete.
+	On-fly hashing should leverage the fact the data is in memory so it saves the corresponding disk I/O and corresponding
+	latency, thus it is much faster. As it is also done in memory it can help detect file corruption on the media
+	(like USB keys or poor quality hardware).
+      </dd>
+      <br/>
+
+      <dt>Run custom command during operation</dt><dd>
+	For an automated backup process, it is often necessary to run commands before and after the backup operation itself.
+	But also during the backup process. For example, when entering a directory, one could need to run an arbitrary command
+	generating a file that will be included in the backup. Or while exiting such directory performing some cleanup operation in that directory.
+	Another aspect is when slicing the backup, the ability to perform after each slice generation an custom operation like uploading the
+	slice to cloud, burning to DVD-/+RW, loading a tape from a tape library...
+      </dd>
+      <br/>
+
+      <dt>Dry-run execution</dt><dd>
+	When tuning a backup process, it is often necessary to verify quickly that all will work flawlessly without having
+	to wait for a backup to complete, consume storage resource and network bandwidth. Dry-run operation fakes the requested
+	operation but does not produce anything.
+      </dd>
+      <br/>
+
+      <dt>user message within backup</dt><dd>
+	allowing the user to add an arbitrary message within the backup may be useful when the filename is too small for
+	to hold the needed information (like the context the backup or archive was made, hint for the passphrase... and so on).
+      </dd>
+      <br/>
+
+      <dt>Backup sanity test</dt><dd>
+	It is crutial in a backup process to validate that the generated
+	backup is usable. There are many reasons it could not be the case, from
+	a data corruption in memory, on disk or over the network ; a disk space saturation
+	leading to truncated backup, down to a software bug.
+      </dd>
+      <br/>
+
+      <dt>comparing with original data</dt><dd>
+	one step further than than the previous sanity testing, compairing file content and metadata with a life system
+	is a more complete alternative to backup validation.
+      </dd>
+      <br/>
+
+      <dt>Tunable verbosity</dt><dd>
+	When a backup process is in production and works nicely, it is usually interesting to have the minimal output possible
+	for that any error still be possible to log. While when setting up a backup process, having more detailed
+	information is required to understand and validate that the backup process follows the expected path.
+      </dd>
+      <br/>
+
+      <dt>Modify a backup content</dt><dd>
+	Once a backup has been completed, you might notice that you have saved extra files you ought not to save and could drop
+	from the backup to save some space. You might also need to add some extra files that were outside the backup scope. Of
+	course you could also drop the whole backup, modify parameters and restart the backup, but when the modification is little,
+	this may end costly in time and network bandwidth.
+      </dd>
+      <br/>
+
+      <dt>Stdin/stdout backup read/write</dt><dd>
+	Having the ability to pipe the generated backup to an arbitrary command is on of the ultimate key of
+	backup software flexibility.
+      </dd>
+      <br/>
+
+      <dt>Remote network storage</dt><dd>
+	This is the ability to produce directly a backup to a network storage without using local disk, and to
+	be able to restore directly reading an backup from the such remote storage still without using local storage.
+	<i>Network/Remote storage</i> is to be understood as remote network storage like public cloud, private cloud
+	or at home a NAS, that are accesible from the network by mean of a file transfer protocols (scp, sftp, ftp,
+	rcp, http, https...)
+      </dd>
+      <br/>
+
+    </dl>
+
+    <table class=center>
+      <tr class=center>
+	<th width="40%">Feature</th>
+	<th width="20%">Dar</th>
+	<th width="20%">Rsync</th>
+	<th width="20%">Tar</th>
+      <tr>
+      <tr>
+	<th class=left>Historization</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>Yes</td>
+      </tr>
+      <tr>
+	<th class=left>Define the data to backup</th>
+	<td>Yes</td>
+	<td>?</td>
+	<td>?</td>
+      </tr>
+      <tr>
+	<th class=left>Slicing</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>limited</td>
+      </tr>
+      <tr>
+	<th class=left>Symmetric encryption</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>-</td>
+      </tr>
+      <tr>
+	<th class=left>Asymmetric encryption</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>-</td>
+      </tr>
+      <tr>
+	<th class=left>Plain-text attack protection</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>-</td>
+      </tr>
+      <tr>
+	<th class=left>PBKDF2 Key Derivation Function</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>-</td>
+      </tr>
+      <tr>
+	<th class=left>ARGON2 Key Derivation Function</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>-</td>
+      </tr>
+      <tr>
+	<th class=left>File change detection</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>Yes</td>
+      </tr>
+      <tr>
+	<th class=left>Recording changed files during backup</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>-</td>
+      </tr>
+      <tr>
+	<th class=left>Multi-level backup</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>Yes</td>
+      </tr>
+      <tr>
+	<th class=left>Binary delta</th>
+	<td>Yes</td>
+	<td>Yes</td>
+	<td>-</td>
+      </tr>
+      <tr>
+	<th class=left>Detecting suspicious modifications</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>-</td>
+      </tr>
+      <tr>
+	<th class=left>Snapshot</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>Yes</td>
+      </tr>
+      <tr>
+	<th class=left>On-fly hashing</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>-</td>
+      </tr>
+      <tr>
+	<th class=left>Run custom command during operation</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>limited</td>
+      </tr>
+      <tr>
+	<th class=left>Dry-run execution</th>
+	<td>Yes</td>
+	<td>Yes</td>
+	<td>-</td>
+      </tr>
+      <tr>
+	<th class=left>User message within backup</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>-</td>
+      </tr>
+      <tr>
+	<th class=left>Backup sanity test</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>Yes</td>
+      </tr>
+      <tr>
+	<th class=left>Comparing with original data</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>Yes</td>
+      </tr>
+      <tr>
+	<th class=left>Tunable verbosity</th>
+	<td>Yes</td>
+	<td>Yes</td>
+	<td>Yes</td>
+      </tr>
+      <tr>
+	<th class=left>Modify backup content</th>
+	<td>Yes</td>
+	<td>Yes</td>
+	<td>limited</td>
+      </tr>
+      <tr>
+	<th class=left>Stdin/stdout backup read/write</th>
+	<td>Yes</td>
+	<td>?</td>
+	<td>Yes</td>
+      </tr>
+      <tr>
+	<th class=left>Remote network storage</th>
+	<td>Yes</td>
+	<td>limited</td>
+	<td>Yes</td>
+      </tr>
+    </table>
+
+    <p>
+      The presented results above is a synthesis of the tests detailed in appendix.
+    </p>
 
     <h3>Robustness</h3>
 
-    <h3>Remote and Cloud storage Compatibility</h3>
+    <p>
+      The objectif here is to see how a minor data corruption can impacts the backup. Such type of
+      corruption (a single bit invertion) can be caused by network transfert, cosmic particle hitting
+      the memory bank, or simply due to the time passing for some type of media. Several point have been measured:
+    </p>
+
+    <ul>
+      <li>A - DOes the software detect a corruption in a backup</li>
+      <li>B - Does the software restore all other files that are not impacted by a corruption</li>
+      <li>C - Does the software avoid or warn when restoring a corrupted saved file</li>
+    </ul>
+
+
+    <table class=center>
+      <tr>
+	<th>Software</th>
+	<th>A</th>
+	<th>B</th>
+	<th>C</th>
+      </tr>
+      <tr>
+	<td class=left>Dar</td>
+	<td>Yes</td>
+	<td>Yes</td>
+	<td>Yes</td>
+      </tr>
+      <tr>
+	<td class=left>Rsync</td>
+	<td>-</td>
+	<td>Yes</td>
+	<td>-</td>
+      <tr>
+      <tr>
+	<td class=left>Tar with compression</td>
+	<td>Yes</td>
+	<td>-</td>
+	<td>Yes</td>
+      </tr>
+      <tr>
+	<td class=left>Tar witout compression</td>
+	<td>-</td>
+	<td>Yes</td>
+	<td>-</td>
+      </tr>
+    </table>
 
 
     <h3>Performance</h3>
@@ -357,6 +698,11 @@
 	<li>a single large file (a debian ISO image, which does not compress well)</li>
 	<li>a set of many small files (a linux kernel source tree)</li>
       </ul>
+    <p>
+    <p>
+      Last, when it comes to cloud storage, patented data or just personal data, ciphering the backup
+      has also its impact on performance.
+    </p>
     </p>
 
     <h4>Full backup and restoration without compression</h4>
@@ -366,18 +712,10 @@
     </p>
 
     <div class="cadre">
-      <div class="gauge best" style="width: 18.3%;">
-	cp: 2.8 s
-      </div>
-      <div class="gauge normal" style="width: 61%;">
-	Dar: 9.34 s
-      </div>
-      <div class="gauge normal" style="width: 100%">
-	Rsync: 15.30 s
-      </div>
-      <div class="gauge normal" style="width: 43.6%">
-	Tar: 6.68 s
-      </div>
+      <div class="gauge ref" style="width: 18.3%;">cp: 2.8 s</div>
+      <div class="gauge normal" style="width: 61%;">Dar: 9.34 s</div>
+      <div class="gauge normal" style="width: 100%">Rsync: 15.30 s</div>
+      <div class="gauge best" style="width: 43.6%">Tar: 6.68 s</div>
     </div>
 
     <p>
@@ -385,33 +723,21 @@
     </p>
 
     <div class="cadre">
-      <div class="gauge best" style="width: 23.38%;">
-	cp: 1.48 s
-      </div>
-      <div class="gauge normal" style="width: 100%;">
-	Dar: 6.33 s
-      </div>
-      <div class="gauge normal" style="width: 89%">
-	Rsync: 5.64 s
-      </div>
-      <div class="gauge normal" style="width: 45.18%">
-	Tar: 2.86 s
-      </div>
+      <div class="gauge ref" style="width: 23.38%;">cp: 1.48 s</div>
+      <div class="gauge normal" style="width: 100%;">Dar: 6.33 s</div>
+      <div class="gauge normal" style="width: 89%">Rsync: 5.64 s</div>
+      <div class="gauge best" style="width: 45.18%">Tar: 2.86 s</div>
     </div>
 
     <p>
       <u>In conclusion</u>, Without compression, <i>rsync </i> and <i>dar</i> depending on the
       nature file size used are the slowest. At the opposite, <i>tar</i> is faster but far from being
-      as fast as <i>cp</i>.
-      <br/>
-      In this scenario without compression, the use case is either:
+      as fast as <i>cp</i>. Thus in this scenario without compression, the use case are:
       <ul>
 	<li>
 	  local copy for a full backup: <b><i>cp</i></b> gives the best performance but, as <i>tar</i>,
 	  it does not take into account the rich metadata a file can have (Extended Attributes, ACL, ...)
-	  in that case <i>rsync</i> or <i>dar</i> are more adapted, and if sparse file
-	  have to be taken into account on top, <i>dar</i> is necessary but the sparse file detection,
-	  and restoration significantly increases the execution time.
+	  in that case <i>rsync</i> or <i>dar</i> are more adapted.
 	</li>
 	<li>
 	  or a remote copy over a large bandwidth network: the best is <i>tar</i> with usual network
@@ -428,18 +754,10 @@
     </p>
 
     <div class="cadre">
-      <div class="gauge normal" style="width: 89.74%;">
-	Dar: 140.37 s
-      </div>
-      <div class="gauge best" style="width: 83.77%">
-	Rsync: 131.04 s
-      </div>
-      <div class="gauge normal" style="width: 100%">
-	Tar: 156.41 s
-      </div>
-      <div class="gauge ref" style="width: 14.17%">
-	Dar 8 proc: 22.17 s
-      </div>
+      <div class="gauge normal" style="width: 89.74%;">Dar: 140.37 s</div>
+      <div class="gauge best" style="width: 83.77%">Rsync: 131.04 s</div>
+      <div class="gauge normal" style="width: 100%">Tar: 156.41 s</div>
+      <div class="gauge ref" style="width: 14.17%">Dar with 8 threads: 22.17 s</div>
     </div>
 
     <p>
@@ -447,15 +765,9 @@
     </p>
 
     <div class="cadre">
-      <div class="gauge normal" style="width: 99.5%;">
-	Dar: 29.17 s
-      </div>
-      <div class="gauge best" style="width: 77.12%">
-	Rsync: 22.59 s
-      </div>
-      <div class="gauge normal" style="width: 100%">
-	Tar: 29.29 s
-      </div>
+      <div class="gauge normal" style="width: 99.5%;">Dar: 29.17 s</div>
+      <div class="gauge best" style="width: 77.12%">Rsync: 22.59 s</div>
+      <div class="gauge normal" style="width: 100%">Tar: 29.29 s</div>
     </div>
 
     <p>
@@ -467,15 +779,9 @@
     </p>
 
     <div class="cadre">
-      <div class="gauge normal" style="width: 99.78%">
-	Dar: 99.78 %
-      </div>
-      <div class="gauge normal" style="width: 100%">
-	Rsync: 100.00 %
-      </div>
-      <div class="gauge best" style="width: 99.77%">
-	Tar: 99.77 %
-      </div>
+      <div class="gauge normal" style="width: 99.78%">Dar: 99.78 %</div>
+      <div class="gauge normal" style="width: 100%">Rsync: 100.00 %</div>
+      <div class="gauge best" style="width: 99.77%">Tar: 99.77 %</div>
     </div>
 
     <p>
@@ -488,30 +794,18 @@
     </p>
 
     <div class="cadre">
-      <div class="gauge normal" style="width: 18.94%">
-	Dar: 18.94 %
-      </div>
-      <div class="gauge normal" style="width: 100%">
-	Rsync: 100.00 %
-      </div>
-      <div class="gauge best" style="width: 16.37%">
-	Tar: 16.37 %
-      </div>
+      <div class="gauge normal" style="width: 18.94%">Dar: 18.94 %</div>
+      <div class="gauge normal" style="width: 100%">Rsync: 100.00 %</div>
+      <div class="gauge best" style="width: 16.37%">Tar: 16.37 %</div>
     </div>
 
     <p>
       Restoration of a single file
     </p>
     <div class="cadre">
-      <div class="gauge normal" style="width: 13.33%">
-	Dar: 0,66 s
-      </div>
-      <div class="gauge best" style="width: 2%">
-	Rsync:0,01s
-      </div>
-      <div class="gauge normal" style="width: 100%">
-	Tar: 4,95 %
-      </div>
+      <div class="gauge normal" style="width: 13.33%">Dar: 0,66 s</div>
+      <div class="gauge best" style="width: 2%">Rsync: 0,01s</div>
+      <div class="gauge normal" style="width: 100%">Tar: 4,95 s</div>
     </div>
 
 
@@ -532,6 +826,123 @@
     </p>
 
     <h4>Differential Backup</h4>
+
+    <p>
+      differential backup is interesting to save storage space when backup history is necessary.
+      When backup history is not needed (a thus the ability to recover a deleted file even long
+      after the mistake) the differential backup is still interesting as it saves a lot of execution
+      time compared to making a new full backup. So we have to evaluate two things:
+      <ul>
+	<li>storage space usage</li>
+	<li>execution time of backup and restoration</li>
+      </ul>
+    </p>
+
+    <h5>Modification of 1 bit in a file of 4,36 GiB</h5>
+    <p>
+      The resulting storage used (gzip level 6 was used) of to store the differential backup
+      (not replacing the full backup else this is just an update to the full backup):
+    </p>
+    <div class="cadre">
+      <div class="gauge best" style="width: 1%">Dar: 643 bytes</div>
+      <div class="gauge normal" style="width: 100%">Rsync: 4,35 GiB</div>
+      <div class="gauge normal" style="width: 100%">Tar: 4,35 GiB</div>
+    </div>
+    <p>
+      The resulting data transfered over the network to a remote repository:
+    </p>
+    <div class="cadre">
+      <div class="gauge best" style="width: 1%">Dar: 643 bytes</div>
+      <div class="gauge best" style="width: 1%">Rsync: 643 bytes</div>
+      <div class="gauge normal" style="width: 100%">Tar: 4,35 GiB</div>
+    </div>
+    <p>
+      The execution time of the differential backup+restoration:
+    </p>
+    <div class="cadre">
+      <div class="gauge best" style="width: 12.2%">Dar: 23.40 s</div>
+      <div class="gauge normal" style="width: 90.5%">Rsync: 140.11 s</div>
+      <div class="gauge normal" style="width: 100%">Tar: 154.77 s</div>
+    </div>
+
+    <h5>New an removed files</h5>
+
+    <p>
+      The resulting storage used (gzip level 6 was used) to store the differential backup
+      (not replacing the full backup else this would just an updated to the full backup):
+    </p>
+    <div class="cadre">
+      <div class="gauge normal" style="width: 1%">Dar: 11.6 MiB</div>
+      <div class="gauge normal" style="width: 100%">Rsync: 1069 MiB</div>
+      <div class="gauge best" style="width: 0.9">Tar: 9.2 MiB</div>
+    </div>
+    <p>
+      The resulting data transfered over the network to a remote repository:
+    </p>
+    <div class="cadre">
+      <div class="gauge normal" style="width: 100%">Dar: 11.6 MiB</div>
+      <div class="gauge normal" style="width: 79.3%">Rsync: 9.2 MiB (estimated)</div>
+      <div class="gauge best" style="width: 79.3%">Tar: 9.2 MiB</div>
+    </div>
+    <p>
+      The execution time of the differential backup+restoration:
+    </p>
+    <div class="cadre">
+      <div class="gauge normal" style="width: 100%">Dar: 5.18 s</div>
+      <div class="gauge normal" style="width: 55.2%">Rsync: 2.86 s</div>
+      <div class="gauge best" style="width: 44.9%">Tar: 2.33 s</div>
+    </div>
+
+    <p>
+      <u>In conclusion:</u> In a mixed environement when some files
+      are modified, some removed and some other are added, <i>dar</i>
+      provides the best storage usage, and network bandwidth saving
+      when storing backup on a remote repository. while for execution time
+      depending on the proportion and size of modified files,
+      the fastest is either <i>tar</i> or <i>dar</i>.
+    </p>
+
+
+    <h4>Ciphering/deciphering</h4>
+    <p>
+      There is many reason that implies the need of ciphering data:
+      <ul>
+	<li>if your disk is ciphered, would you store your backup in clear on the cloud?</li>
+	<li>do you trust you cloud provider to not inspect your data for marketing profiling?</li>
+	<li>Are you sure your patented data, secret industrial recipies will not be used by competition?</li>
+	<li>and so on</li>
+      </ul>
+      The ciphering execution time is independent on the nature of the backup, full or differential, compressed
+      or not. To evaluate the ciphering performance we will use the same data sets as previously, both compressed
+      and uncompressed. However not all software under test are able to cipher the resulting backup. <i>rsync</i>
+      is not able to do so.
+    </p>
+
+    <h5>Full backup+restoration execution time</h5>
+
+    <div class="cadre">
+      <div class="gauge normal" style="width: 100%">Dar: 9.13 s</div>
+      <div class="gauge ref" style="width: 100%">Rsync: N/A</div>
+      <div class="gauge best" style="width: 80.9%">Tar: 7.39 s</div>
+    </div>
+
+    <h5>Execution time for the restoration of a single file</h5>
+
+    <div class="cadre">
+      <div class="gauge best" style="width: 23.4%">Dar: 0.42 s</div>
+      <div class="gauge ref" style="width: 100%">Rsync: N/A</div>
+      <div class="gauge normal" style="width: 100%">Tar: 1.79 s</div>
+    </div>
+
+    <h5>Storage requirement ciphered without compression</h5>
+
+    <div class="cadre">
+      <div class="gauge best" style="width: 97.9%">Dar: 1.46 GiB</div>
+      <div class="gauge ref" style="width: 100%">Rsync: N/A</div>
+      <div class="gauge normal" style="width: 100%">Tar: 1.49 GiB</div>
+    </div>
+
+
 
     <h3>Ease of restoration</h3>
 
@@ -626,7 +1037,7 @@
     </p>
 
 
-    <h2>Test logs</h2>
+    <h2>Appendix 1 - Test logs</h2>
     <h3>Software used for the tests</h3>
     <ul>
       <li><b>dar</b> version 2.7.0</li>
@@ -925,8 +1336,9 @@
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# chattr -i DST/plain_zeroed</b>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# rm -rf DST</b>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# mkdir DST</b>
-	<b>root@terre:/mnt/localdisk/Benchmark_tools# rsync -arvHAX SRC/* DST</b>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools# rsync -arvHAXS SRC/* DST</b>
 	sending incremental file list
+	created directory DST
 	fd1
 	null
 	pipe
@@ -942,7 +1354,7 @@
 	dev/log => SUB/hard_linked_socket
 	sparse_file => SUB/hard_linked_sparse_file
 
-	sent 12,340,909 bytes  received 173 bytes  24,682,164.00 bytes/sec
+	sent 12,340,852 bytes  received 198 bytes  24,682,100.00 bytes/sec
 	total size is 22,577,173  speedup is 1.83
 	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
     </code></div>
@@ -955,13 +1367,13 @@
     </p>
     <div class=code><code>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# du -s SRC DST</b>
-	2068    SRC
-	<e>12064</e>   DST
+	2056    SRC
+	<e>1028</e>    DST
 	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
     </code></div>
     <p>
-      Here, the space used in the restored backup is six time bigger than the original content! Let's continue
-      as we did with dar:
+      Here too, the restored data uses less space than the original data, sparse file have been taken into
+      account (need specifying -S option) and space optimization of non sparse file is performed.
     </p>
     <div class=code><code>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# ls -iRl SRC DST</b>
@@ -1016,15 +1428,6 @@
       All files are present in <code>DST</code> and use the expected space usage, as reported by the <code>ls</code>.
       We can also see that all three hard linked inode (plain file, socket and named pipe) are restored properly.
       So we can suspect the cause of the size difference to be linked with sparse files:
-    </p>
-    <div class=code><code>
-	<b>root@terre:/mnt/localdisk/Benchmark_tools# du SRC/sparse_file DST/sparse_file</b>
-	4       SRC/sparse_file
-	<e>10000</e>   DST/sparse_file
-	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
-    </code></div>
-    <p>
-      That's it, rsync restores sparse file as plain files.
     </p>
     <p>
       Let's now check file's metadata:
@@ -1152,13 +1555,13 @@
     <div class=code><code>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# rm -rf DST</b>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# cd SRC</b>
-	<b>root@terre:/mnt/localdisk/Benchmark_tools/SRC# tar -cf ../backup.tar *</b>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools/SRC# tar -cSf ../backup.tar *</b>
 	tar: SUB/hard_linked_socket: socket ignored
 	tar: dev/log: socket ignored
 	<b>root@terre:/mnt/localdisk/Benchmark_tools/SRC# cd ../</b>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# mkdir DST</b>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# cd DST</b>
-	<b>root@terre:/mnt/localdisk/Benchmark_tools/DST# tar -xf ../backup.tar</b>
+	<b>root@terre:/mnt/localdisk/Benchmark_tools/DST# tar -xSf ../backup.tar</b>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools/DST# cd ..</b>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
     </code></div>
@@ -1170,14 +1573,13 @@
     <div class=code><code>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# du -s SRC DST</b>
 	2068    SRC
-	12064   DST
+	<e>2068</e>    DST
 	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
     </code></div>
 
     <p>
-      So we have here the same issue as with <i>rsync</i>, the restored data uses six time more space than the original data,
-      most probable because of the sparse file not having been taken into account. But first we can check the warning
-      <i>tar</i> issued at backup time:
+      The sparse file has been properly restored (need the -S option for that) but not space optimization
+      has been performed.
     </p>
 
     <div class=code><code>
@@ -1356,6 +1758,2605 @@
 
 
 
+
+
+    <h3>Feature set</h3>
+
+    <h4>Historization</h4>
+    <p>
+      For this feature in a first time we will create two files <i>A.txt</i> and <i>B.txt</i>
+      and make a first backup. Then we will remove <i>A.txt</i> and add <i>C.txt</i> and make
+      a second backup. We should be able to restore the data in both states. To do that, we
+      will use the following script.
+    </p>
+
+    <div class=code><code>
+	#!/bin/bash
+
+	if [ -z "$1" -o -z "$2" ] ; then
+	echo "usage: $0 &lt;dir&gt; {phase1 | phase2}"
+	exit 1
+	fi
+
+	dir="$1"
+	phase="$2"
+
+	case "$phase" in
+	phase1)
+	if [ -e "$dir" ] ; then
+	echo "$dir exists, remove it first"
+	exit 2
+	fi
+	mkdir "$dir"
+	echo "Hello World!" &gt; "$dir/A.txt"
+	echo "Bonjour tout le monde !" &gt; "$dir/B.txt"
+	;;
+	phase2)
+	if [ ! -d "$dir" ] ; then
+	echo "$dir does not exist or is not a directory, run phase1 first"
+	exit 2
+	fi
+
+	rm -f "$dir/A.txt"
+	echo "Buongiorno a tutti !" &gt; "$dir/C.txt"
+	;;
+	*)
+	echo "unknown phase"
+	exit 2
+	;;
+	esac
+    </code></div>
+
+    <h5>Dar</h5>
+
+    <div class=code><code>
+	root@terre:/mnt/memdisk# rm -rf SRC
+	root@terre:/mnt/memdisk# ./historization_feature SRC phase1
+	root@terre:/mnt/memdisk# dar -c full -g SRC -q
+	root@terre:/mnt/memdisk# ./historization_feature SRC phase2
+	root@terre:/mnt/memdisk# dar -c diff -A full -g SRC -q
+	root@terre:/mnt/memdisk# mkdir DST
+	root@terre:/mnt/memdisk# dar -x full -R DST -q
+	root@terre:/mnt/memdisk# ls -lR DST
+	DST:
+	total 0
+	drwxr-xr-x 2 root root 80 Nov  6 18:37 SRC
+
+	DST/SRC:
+	total 8
+	-rw-r--r-- 1 root root 13 Nov  6 18:37 <e>A.txt</e>
+	-rw-r--r-- 1 root root 24 Nov  6 18:37 <e>B.txt</e>
+	root@terre:/mnt/memdisk# dar -x diff -R DST -w -q
+	root@terre:/mnt/memdisk# ls -lR DST
+	DST:
+	total 0
+	drwxr-xr-x 2 root root 80 Nov  6 18:38 SRC
+
+	DST/SRC:
+	total 8
+	-rw-r--r-- 1 root root 24 Nov  6 18:37 <e>B.txt</e>
+	-rw-r--r-- 1 root root 21 Nov  6 18:38 <e>C.txt</e>
+	root@terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      Historization is present, we can get back from backup both saved states
+    </p>
+    <p>
+      <i>dar</i> proposes a manager <i>dar_manager</i> to easily locate file's status between the archives
+      the database has been feeded with, as well as the file's data present in each archive:
+    </p>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# dar_manager -C base.dmd
+	root@terre:/mnt/memdisk# dar_manager -B base.dmd -A full
+	root@terre:/mnt/memdisk# dar_manager -B base.dmd -A diff
+	root@terre:/mnt/memdisk# dar_manager -B base.dmd -f SRC/A.txt
+        1       Fri Nov  6 18:37:51 2020  saved                                 absent
+        2       Fri Nov  6 18:38:04 2020  removed                               absent
+	root@terre:/mnt/memdisk# dar_manager -B base.dmd -f SRC/B.txt
+        1       Fri Nov  6 18:37:51 2020  saved                                 absent
+        2       Fri Nov  6 18:37:51 2020  present                               absent
+	root@terre:/mnt/memdisk# dar_manager -B base.dmd -f SRC/C.txt
+        2       Fri Nov  6 18:38:04 2020  saved                                 absent
+	root@terre:/mnt/memdisk# dar_manager -B base.dmd -l
+
+	dar path        :
+	dar options     :
+	database version: 5
+	compression used: gzip
+
+	archive #   |    path      |    basename
+	------------+--------------+---------------
+        1       .       full
+        2       .       diff
+	root@terre:/mnt/memdisk# dar_manager -B base.dmd -u 1
+	[ Saved ][       ]  SRC/B.txt
+	[ Saved ][       ]  SRC/A.txt
+	root@terre:/mnt/memdisk# dar_manager -B base.dmd -u 2
+	[ Saved ][       ]  SRC
+	[ Saved ][       ]  SRC/C.txt
+	root@terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      <i>dar_manager</i> can even take for you the actions to invoke <i>dar</i> as many time as necessary
+      get the file's status of a given date for a given set of subset of the saved files:
+    </p>
+
+    <div class=code><code>
+	root@terre:/mnt/memdisk# dar_manager -v -B base.dmd -e "-R DST -w" -r SRC
+	Decompressing and loading database to memory...
+	Looking in archives for requested files, classifying files archive by archive...
+	Checking chronological ordering of files between the archives...
+	File recorded as removed at this date in database: SRC/A.txt
+	CALLING DAR: restoring 1 files from archive ./full using anonymous pipe to transmit configuration to the dar process
+	Arguments sent through anonymous pipe are:
+	dar -x ./full -R DST -w -g SRC/B.txt
+
+
+	--------------------------------------------
+	2 inode(s) restored
+	including 0 hard link(s)
+	0 inode(s) not restored (not saved in archive)
+	0 inode(s) not restored (overwriting policy decision)
+	1 inode(s) ignored (excluded by filters)
+	0 inode(s) failed to restore (filesystem error)
+	0 inode(s) deleted
+	--------------------------------------------
+	Total number of inode(s) considered: 3
+	--------------------------------------------
+	EA restored for 0 inode(s)
+	FSA restored for 0 inode(s)
+	--------------------------------------------
+	CALLING DAR: restoring 2 files from archive ./diff using anonymous pipe to transmit configuration to the dar process
+	Arguments sent through anonymous pipe are:
+	dar -x ./diff -R DST -w -g SRC -g SRC/C.txt
+	Error while restoring /mnt/memdisk/DST/SRC/A.txt : Cannot remove non-existent file from filesystem: /mnt/memdisk/DST/SRC/A.txt
+
+
+	--------------------------------------------
+	2 inode(s) restored
+	including 0 hard link(s)
+	1 inode(s) not restored (not saved in archive)
+	0 inode(s) not restored (overwriting policy decision)
+	0 inode(s) ignored (excluded by filters)
+	1 inode(s) failed to restore (filesystem error)
+	0 inode(s) deleted
+	--------------------------------------------
+	Total number of inode(s) considered: 4
+	--------------------------------------------
+	EA restored for 0 inode(s)
+	FSA restored for 0 inode(s)
+	--------------------------------------------
+	Final memory cleanup...
+	All files asked could not be restored
+	DAR sub-process has terminated with exit code 5 Continue anyway ? [return = YES | Esc = NO]
+	Continuing...
+	root@terre:/mnt/memdisk# ls -lR DST
+	DST:
+	total 0
+	drwxr-xr-x 2 root root 80 Nov  6 18:38 SRC
+
+	DST/SRC:
+	total 8
+	-rw-r--r-- 1 root root 24 Nov  6 18:37 <e>B.txt</e>
+	-rw-r--r-- 1 root root 21 Nov  6 18:38 <e>C.txt</e>
+	root@terre:/mnt/memdisk#
+    </code></div>
+
+    <h5>Rsync</h5>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# ./historization_feature SRC phase1
+	root@terre:/mnt/memdisk# rsync -arvHAX SRC DST
+	sending incremental file list
+	created directory DST
+	SRC/
+	SRC/A.txt
+	SRC/B.txt
+
+	sent 229 bytes  received 84 bytes  626.00 bytes/sec
+	total size is 37  speedup is 0.12
+	root@terre:/mnt/memdisk# ./historization_feature SRC phase2
+	root@terre:/mnt/memdisk# rsync -arvHAX SRC DST
+	sending incremental file list
+	SRC/
+	SRC/C.txt
+
+	sent 172 bytes  received 39 bytes  422.00 bytes/sec
+	total size is 45  speedup is 0.21
+	root@terre:/mnt/memdisk# ls -l
+	total 4
+	drwxr-xr-x 3 root root  60 Nov  6 17:06 DST
+	drwxr-xr-x 2 root root  80 Nov  6 17:06 SRC
+	-rwxr--r-- 1 root root 589 Nov  6 16:32 historization_feature
+	root@terre:/mnt/memdisk# ls -l DST
+	total 0
+	drwxr-xr-x 2 root root 100 Nov  6 17:06 SRC
+	root@terre:/mnt/memdisk# ls -l DST/SRC
+	total 12
+	<e>-rw-r--r-- 1 root root 13 Nov  6 17:05 A.txt</e>
+	<e>-rw-r--r-- 1 root root 24 Nov  6 17:05 B.txt</e>
+	<e>-rw-r--r-- 1 root root 21 Nov  6 17:06 C.txt</e>
+	root@terre:/mnt/memdisk# rsync -arvHAX --delete SRC DST
+	sending incremental file list
+	deleting SRC/A.txt
+
+	sent 101 bytes  received 26 bytes  254.00 bytes/sec
+	total size is 45  speedup is 0.35
+	root@terre:/mnt/memdisk# ls -l DST/SRC
+	total 8
+	-rw-r--r-- 1 root root 24 Nov  6 17:05 B.txt
+	-rw-r--r-- 1 root root 21 Nov  6 17:06 C.txt
+	root@terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      the "backup" contains all three files, <i>A.txt</i>, <i>B.txt</i>
+      and <i>C.txt</i> while the first and the later never existed at the
+      same time. Such backup does not allow to have neither the state of
+      the <i>phase1</i> nor the state of the <i>phase2</i>.
+    </p>
+    <p>
+      We added the <code>--delete</code> option and as result we get
+      to be the<i>phase2</i> state, we cannot have the <i>phase1</i> state as the
+      file <i>A.txt</i> has been deleted from the backup.
+    </p>
+    <p>
+      To have both states with <i>rsync</i>, we should call rsync to a different destination directory
+      at each new backup, which would consume a lot of space and would also defeats one the main
+      feature of <i>rsync</i> which is its ability to synchronize two directories exchanging only
+      the minimal information that was modified.
+    </p>
+
+    <h5>Tar</h5>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# rmdir SRC
+	root@terre:/mnt/memdisk# ./historization_feature SRC phase1
+	root@terre:/mnt/memdisk# tar --listed-incremental=snapshot.file -cf full.tar SRC
+	root@terre:/mnt/memdisk# ./historization_feature SRC phase2
+	root@terre:/mnt/memdisk# tar --listed-incremental=snapshot.file -cf diff.tar SRC
+	root@terre:/mnt/memdisk# mkdir DST
+	root@terre:/mnt/memdisk# cd DST
+	root@terre:/mnt/memdisk/DST# tar --listed-incremental=snapshot.file -xf ../full.tar
+	root@terre:/mnt/memdisk/DST# ls -l SRC
+	total 8
+	-rw-r--r-- 1 root root 13 Nov  6 18:20 A.txt
+	-rw-r--r-- 1 root root 24 Nov  6 18:20 B.txt
+	root@terre:/mnt/memdisk/DST# tar --listed-incremental=snapshot.file -xf ../diff.tar
+	root@terre:/mnt/memdisk/DST# ls -l SRC
+	total 8
+	-rw-r--r-- 1 root root 24 Nov  6 18:20 B.txt
+	-rw-r--r-- 1 root root 21 Nov  6 18:21 C.txt
+	root@terre:/mnt/memdisk/DST#
+    </code></div>
+
+    <p>
+      We could restore from backup both the phase1 and phase2 status
+    </p>
+
+
+    <h4>Define the data to backup</h4>
+
+    <h5>Dar</h5>
+    <div class=code><code>
+    </code></div>
+
+    <h5>Rsync</h5>
+    <div class=code><code>
+    </code></div>
+
+    <h5>Tar</h5>
+    <div class=code><code>
+    </code></div>
+
+    <h4>Slicing</h4>
+
+    <p>
+      For this test we will backup the content of /usr/bin of the running system.
+      We choosing slice size smaller than the biggest file present. The use case for
+      slicing implies compression (remote storage, cloud storage, limited removable
+      media storage...).
+    </p>
+
+    <div class=code><code>
+	root@terre:/mnt/memdisk# ls -lh --sort=size /usr/bin | tac | tail
+	-rwxr-xr-x 1 root   root       8.0M Dec 18  2018 luajittex
+	-rwxr-xr-x 1 root   root       8.1M Dec 18  2018 luatex53
+	-rwxr-xr-x 1 root   root       8.1M Dec 18  2018 luatex
+	-rwxr-xr-x 1 root   root       8.2M May 27  2019 wireshark
+	-rwxr-xr-x 1 root   root        12M Dec 21  2018 kstars
+	-rwxr-xr-x 1 root   root        15M Mar 12  2018 doxygen
+	-rwxr-xr-x 1 root   root        16M Jan  4  2019 stellarium
+	-rwxr-xr-x 1 root   root        19M Oct 12 19:46 mysql_embedded
+	-rwxr-xr-x 1 root   root        <e>39M</e> Sep  5  2019 emacs-gtk
+	total 430M
+	root@terre:/mnt/memdisk#
+    </div></code>
+
+    <h5>Dar</h5>
+
+    <div class=code><code>
+	terre:/mnt/memdisk# dar -c backup -R /usr/bin -z6 <e>-s 20M</e> -q
+	terre:/mnt/memdisk# ls -lh backup.*
+	-rw-r--r-- 1 root root  <e>20M</e> Nov 13 11:30 backup.1.dar
+	-rw-r--r-- 1 root root  20M Nov 13 11:30 backup.2.dar
+	-rw-r--r-- 1 root root  20M Nov 13 11:30 backup.3.dar
+	-rw-r--r-- 1 root root  20M Nov 13 11:30 backup.4.dar
+	-rw-r--r-- 1 root root  20M Nov 13 11:30 backup.5.dar
+	-rw-r--r-- 1 root root  20M Nov 13 11:30 backup.6.dar
+	-rw-r--r-- 1 root root  20M Nov 13 11:30 backup.7.dar
+	-rw-r--r-- 1 root root <e>7.7M</e> Nov 13 11:30 backup.8.dar
+	terre:/mnt/memdisk# mkdir DST
+	terre:/mnt/memdisk# dar -x backup -R DST -g emacs-gtk <e>-E "echo openning slice %p/%b.%N.%e"</e>
+	<e>openning slice /mnt/memdisk/backup.8.dar</e>
+	<e>openning slice /mnt/memdisk/backup.4.dar</e>
+	<e>openning slice /mnt/memdisk/backup.5.dar</e>
+	Restoration of FSA for /mnt/memdisk/DST/emacs-gtk aborted: Failed reading existing extX family FSA: Inappropriate ioctl for device
+	Restoration of linux immutable FSA for /mnt/memdisk/DST/emacs-gtk aborted: Failed reading existing extX family FSA: Inappropriate ioctl for device
+
+
+	--------------------------------------------
+	1 inode(s) restored
+	including 0 hard link(s)
+	0 inode(s) not restored (not saved in archive)
+	0 inode(s) not restored (overwriting policy decision)
+	2591 inode(s) ignored (excluded by filters)
+	0 inode(s) failed to restore (filesystem error)
+	0 inode(s) deleted
+	--------------------------------------------
+	Total number of inode(s) considered: 2592
+	--------------------------------------------
+	EA restored for 0 inode(s)
+	FSA restored for 0 inode(s)
+	--------------------------------------------
+	terre:/mnt/memdisk# diff DST/emacs-gtk /usr/bin/emacs-gtk
+	memdiskerre:/mnt/memdisk# echo $?
+	0
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      We can also specify a different size for the first slice, this was used in the past
+      to fulfill a disk partially filled by a previous incremental backup when saving onto CD-RW
+      and DVD-RW, but that may still make sense when using USB keys or any other removable media.
+    </p>
+
+    <div class=code><code>
+	root@terre:/mnt/memdisk# dar -c backup -R /usr/bin <e class=blue>-s 20M</e> <e>-S 1M</e> -q --min-digit 3
+	root@terre:/mnt/memdisk# ls -lh
+	total 361M
+	-rw-r--r-- 1 root root <e>1.0M</e> Nov  6 18:57 backup.001.dar
+	-rw-r--r-- 1 root root  <e class=blue>20M</e> Nov  6 18:57 backup.002.dar
+	-rw-r--r-- 1 root root  <e class=blue>20M</e> Nov  6 18:57 backup.003.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:57 backup.004.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:57 backup.005.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:57 backup.006.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:57 backup.007.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:57 backup.008.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:57 backup.009.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:57 backup.010.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:57 backup.011.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:57 backup.012.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:57 backup.013.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:57 backup.014.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:57 backup.015.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:57 backup.016.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:57 backup.017.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:57 backup.018.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:57 backup.019.dar
+	root@terre:/mnt/memdisk# dar -c backup -R /usr/bin -s 20M <e>-S 200M</e> -q --min-digit 3
+	root@terre:/mnt/memdisk# ls -lh
+	total 361M
+	-rw-r--r-- 1 root root <e>200M</e> Nov  6 18:58 backup.001.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:59 backup.002.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:59 backup.003.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:59 backup.004.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:59 backup.005.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:59 backup.006.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:59 backup.007.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:59 backup.008.dar
+	-rw-r--r-- 1 root root  20M Nov  6 18:59 backup.009.dar
+	-rw-r--r-- 1 root root 913K Nov  6 18:59 backup.010.dar
+	root@terre:/mnt/memdisk#
+    </code></div>
+
+    <h5>Rsync</h5>
+    <p>
+      rsync cannot split any file in slices, and it does not generate any backup, but it copies files.
+      You cannot thus split in slices an tar archive in the hope to not download all of them to restore
+      a particular file.
+    </p>
+
+    <h5>Tar</h5>
+
+    <div class=code><code>
+    	terre:/mnt/memdisk# tar -czf backup.tar -M -L 20480 /usr/bin
+	<e class=red>tar: Cannot use multi-volume compressed archives</e>
+	Try 'tar --help' or 'tar --usage' for more information.
+	root@terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      As reported by <i>tar</i> above, if a multi-volume support exists, it is quite restrictive as
+      one cannot use compression at the same time.
+    </p>
+
+    <div class=code><code>
+	terre:/mnt/memdisk# tar -cf backup -M -L 20480 /usr/bin
+	tar: Removing leading `/' from member names
+	<e class=red>Prepare volume #2 for 'backup' and hit return:</e>
+	tar: Removing leading `/' from hard link targets
+	<e class=red>Prepare volume #3 for 'backup' and hit return:</e>
+	<e class=red>Prepare volume #4 for 'backup' and hit return:</e>
+	<e class=red>Prepare volume #5 for 'backup' and hit return:</e>
+	<e class=red>Prepare volume #6 for 'backup' and hit return:</e>
+	<e class=red>Prepare volume #7 for 'backup' and hit return:</e>
+	<e class=red>Prepare volume #8 for 'backup' and hit return:</e>
+	<e class=red>Prepare volume #9 for 'backup' and hit return:</e>
+	<e class=red>Prepare volume #10 for 'backup' and hit return:</e>
+	<e class=red>Prepare volume #11 for 'backup' and hit return:</e>
+	<e class=red>Prepare volume #12 for 'backup' and hit return:</e>
+	<e class=red>Prepare volume #13 for 'backup' and hit return:</e>
+	<e class=red>Prepare volume #14 for 'backup' and hit return:</e>
+	<e class=red>Prepare volume #15 for 'backup' and hit return:</e>
+	<e class=red>Prepare volume #16 for 'backup' and hit return:</e>
+	<e class=red>Prepare volume #17 for 'backup' and hit return:</e>
+	<e class=red>Prepare volume #18 for 'backup' and hit return:</e>
+	<e class=red>Prepare volume #19 for 'backup' and hit return:</e>
+	<e class=red>Prepare volume #20 for 'backup' and hit return:</e>
+	<e class=red>Prepare volume #21 for 'backup' and hit return:</e>
+	terre:/mnt/memdisk#
+	terre:/mnt/memdisk# ls -l backup*
+	-rw-r--r-- 1 root root 19527680 Nov 13 11:40 backup
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      But even without compression, <i>tar</i> is still restricive: it does not produce
+      different files, you have each new volume around and <code>hit return</code> at each time.
+      <br/>
+      Note also that without compression, the space required passes
+      from 8 volumes with <i>dar</i> to 21 volumes with <i>tar</i>.
+    </p>
+    <p>
+      The multi-volume support for <i>tar</i> seems well defined for
+      local tape removable devices, but will cost more than twice more
+      tape than what you can do with <i>dar</i> even if tape media
+      is your only target. Here is an example with <i>dar</i> on how
+      to write to mutli-volume and compressed backup to tape and pause
+      between each volume:
+    </p>
+    <div class=code><code>
+	terre:/mnt/memdisk# <e>dar</e> -c backup -R /usr/bin -z6 -s 20M <e class=green>-E "echo writing volume %N to tape"</e> <e>-E "cat < %p/%b.%N.%e > /dev/mt"</e> <e class=blue>-p</e>
+	class=green>writing volume 1 to tape
+	Finished writing to file 1, ready to continue ?  [return = YES | Esc = NO]
+	Continuing...
+	writing volume 2 to tape
+	Finished writing to file 2, ready to continue ?  [return = YES | Esc = NO]
+	Continuing...
+	writing volume 3 to tape
+	Finished writing to file 3, ready to continue ?  [return = YES | Esc = NO]
+	Continuing...
+	writing volume 4 to tape
+	Finished writing to file 4, ready to continue ?  [return = YES | Esc = NO]
+	Continuing...
+	writing volume 5 to tape
+	Finished writing to file 5, ready to continue ?  [return = YES | Esc = NO]
+	Continuing...
+	writing volume 6 to tape
+	Finished writing to file 6, ready to continue ?  [return = YES | Esc = NO]
+	Continuing...
+	writing volume 7 to tape
+	Finished writing to file 7, ready to continue ?  [return = YES | Esc = NO]
+	Continuing...
+	writing volume 8 to tape
+
+
+	--------------------------------------------
+	2592 inode(s) saved
+	including 5 hard link(s) treated
+	0 inode(s) changed at the moment of the backup and could not be saved properly
+	0 byte(s) have been wasted in the archive to resave changing files
+	0 inode(s) with only metadata changed
+	0 inode(s) not saved (no inode/file change)
+	0 inode(s) failed to be saved (filesystem error)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) recorded as deleted from reference backup
+	--------------------------------------------
+	Total number of inode(s) considered: 2592
+	--------------------------------------------
+	EA saved for 3 inode(s)
+	FSA saved for 2152 inode(s)
+	--------------------------------------------
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <h4>Symmetric encryption</h4>
+
+    <p>
+      Encryption has for target relatively long term lifetime, having compression at the same
+      time is logical, so we will use both in our tests (gzip with a compresion level of 6).
+    </p>
+    <p>
+      A point to pay attention concerns the way the password/passphrase can be provided. Putting this
+      to the command-line could let other users on this same system reading it. Having interactive
+      prompt and/or password set in a access restricted file allows both secure human interaction
+      and automation.
+    </p>
+
+    <h5>Dar</h5>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# dar -c backup -R / -g usr/bin -K aes256: -q -z6
+	Archive backup requires a password:
+	Please confirm your password:
+	root@terre:/mnt/memdisk# dar -l backup -q
+	Archive backup requires a password:
+	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
+	Archive version format               : 11
+	Compression algorithm used           : <e>gzip</e>
+	Compression block size used          : 0
+	Symmetric key encryption used        : <e>AES 256</e>
+	Asymmetric key encryption used       : none
+	Archive is signed                    : no
+	Sequential reading marks             : present
+	User comment                         : N/A
+	KDF iteration count                  : <e>10000</e>
+	KDF hash algorithm                   : <e>argon2</e>
+	<e>Salt</e> size                            : 32 bytes
+	Catalogue size in archive            : 101907 bytes
+
+	Archive is composed of 1 file(s)
+	File size: 155070897 bytes
+	The global data compression ratio is:   64%
+
+	CATALOGUE CONTENTS :
+
+	total number of inode : 2589
+	fully saved           : 2589
+	binay delta patch     : 0
+	inode metadata only   : 0
+	distribution of inode(s)
+	- directories        : 2
+	- plain files        : 2152
+	- symbolic links     : 435
+	- named pipes        : 0
+	- unix sockets       : 0
+	- character devices  : 0
+	- block devices      : 0
+	- Door entries       : 0
+	hard links information
+	- number of inode with hard link           : 5
+	- number of reference to hard linked inodes: 10
+	destroyed entries information
+	0 file(s) have been record as destroyed since backup of reference
+
+	root@terre:/mnt/memdisk# touch pass.dcf
+	root@terre:/mnt/memdisk# chmod go-rwx pass.dcf
+	root@terre:/mnt/memdisk# cat >> pass.dcf
+	-K "aes256:hello world!"
+	root@terre:/mnt/memdisk# ls -l pass.dcf
+	-rw------- 1 root root 25 Nov  9 11:37 pass.dcf
+	root@terre:/mnt/memdisk# rm backup.1.dar
+	rm: remove regular file 'backup.1.dar'? y
+	root@terre:/mnt/memdisk# dar -c backup -R / -g usr/bin -B pass.dcf -q -z6
+	root@terre:/mnt/memdisk# dar -l backup -q -B pass.dcf
+	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
+	Archive version format               : 11
+	Compression algorithm used           : gzip
+	Compression block size used          : 0
+	Symmetric key encryption used        : AES 256
+	Asymmetric key encryption used       : none
+	Archive is signed                    : no
+	Sequential reading marks             : present
+	User comment                         : N/A
+	KDF iteration count                  : 10000
+	KDF hash algorithm                   : argon2
+	Salt size                            : 32 bytes
+	Catalogue size in archive            : 102310 bytes
+
+	Archive is composed of 1 file(s)
+	File size: 155132433 bytes
+	The global data compression ratio is:   64%
+
+	CATALOGUE CONTENTS :
+
+	total number of inode : 2589
+	fully saved           : 2589
+	binay delta patch     : 0
+	inode metadata only   : 0
+	distribution of inode(s)
+	- directories        : 2
+	- plain files        : 2152
+	- symbolic links     : 435
+	- named pipes        : 0
+	- unix sockets       : 0
+	- character devices  : 0
+	- block devices      : 0
+	- Door entries       : 0
+	hard links information
+	- number of inode with hard link           : 5
+	- number of reference to hard linked inodes: 10
+	destroyed entries information
+	0 file(s) have been record as destroyed since backup of reference
+
+	root@terre:/mnt/memdisk#
+
+    </code></div>
+    <p>
+      We can provide password either on command-line (not recommanded), prompted by dar once launched
+      or from a protected configuration file. In the following we add slicing to encryption to see
+      whether or not <i>dar</i> deciphers the whole backup to recover a single file:
+    </p>
+
+    <div class=code><code>
+	root@terre:/mnt/localdisk# rm -rf backup.*
+	root@terre:/mnt/localdisk# dar -c backup -R / -g usr/bin -K aes256: -s 1M -q -z6
+	Archive backup requires a password:
+	Please confirm your password:
+	root@terre:/mnt/localdisk# ls -l backup.* | wc -l
+	<e>148</e>
+	root@terre:/mnt/localdisk# dar -x backup -g usr/bin/emacs-gtk -E "echo openning slice %b.%N.%e" -q
+	openning slice backup.148.dar
+	Archive backup requires a password:
+	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
+	<e>openning slice backup.1.dar</e>
+	<e>openning slice backup.80.dar</e>
+	<e>openning slice backup.81.dar</e>
+	<e>openning slice backup.82.dar</e>
+	<e>openning slice backup.83.dar</e>
+	<e>openning slice backup.84.dar</e>
+	root@terre:/mnt/localdisk#
+    </code></div>
+    <p>
+      As seen above, dar does not need to uncipher nor uncompress the whole backup to recover a single file, the use
+      of slicing let us see which slice it accessed to, but the behavior is the same without
+      slicing and can be measure by the execution time (see the performance tests logs).
+    </p>
+
+    <h5>Rsync</h5>
+    <p>
+      <i>rsync</i> cannot cipher the data, it can rely on ssh to cipher the data over the network
+      but data is finally always stored in clear text.
+    </p>
+
+    <h5>Tar</h5>
+
+    <p>
+      There is no native support for ciphering with <i>tar</i>. You can however pipe <i>tar</i>'s output
+      to openssl to cipher the generated backup on fly as a whole.
+    </p>
+    <div class=code><code>
+	root@terre:/mnt/memdisk#  tar -czf - /usr/bin | openssl enc -e -aes256 -out backup.tar.gz.crypted
+	tar: Removing leading `/' from member names
+	enter aes-256-cbc encryption password:
+	Verifying - enter aes-256-cbc encryption password:
+	<e>*** WARNING : deprecated key derivation used.</e>
+	<e>Using -iter or -pbkdf2 would be better.</e>
+	tar: Removing leading `/' from hard link targets
+	root@terre:/mnt/memdisk# openssl enc -d -aes256 -in backup.tar.gz.crypted | tar -xz
+	enter aes-256-cbc decryption password:
+	<e>*** WARNING : deprecated key derivation used.</e>
+	<e>Using -iter or -pbkdf2 would be better.</e>
+	root@terre:/mnt/memdisk# tar -czf - /usr/bin | openssl enc -e -aes256 -out backup.tar.gz.crypted -pass file:pass.txt
+	tar: Removing leading `/' from member names
+	<e>*** WARNING : deprecated key derivation used.</e>
+	<e>Using -iter or -pbkdf2 would be better.</e>
+	tar: Removing leading `/' from hard link targets
+	root@terre:/mnt/memdisk# openssl enc -d -aes256 -in backup.tar.gz.crypted -pass file:pass.txt | tar -xz
+	<e>*** WARNING : deprecated key derivation used.</e>
+	<e>Using -iter or -pbkdf2 would be better.</e>
+	root@terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      with openssl, <i>tar</i> has both the ability to provide the password/passphrase from an interactive prompt and from a protected file.
+      However you will have to remember which algorithm you used in adition to the passphrase. The ciphering being done
+      as a whole, you will have to decipher the whole backup even to just restore a single file.
+      If the backup is large, this may take a long time and may require to download a lot of stuff from a remote storage.
+    </p>
+    <p>
+      We see that ciphering with <i>tar</i> is possible at the cost of some complex command-line. But this is
+      error-prone as we see the shown warning that the key derivation function is deprecated and we should switch to
+      another one. Moreover you will have to remember which key derivation function and its parameters in addition to the
+      passphrase you provided and in addition to the ciphering algorithm used.
+    </p>
+    <p>
+      <u>Note:</u> you can also use <i>openssl</i> with <i>dar</i> as we did for <i>tar</i> but it brings all the drawbacks we saw with <i>tar</i>
+    </p>
+
+    <h4>Asymmetric encryption</h4>
+
+    <p>
+      The objective is create a backup ciphered using GnuPG public/private key pair, restore it as a whole and
+      restore a single file from it. We will also use compression (gzip level 6) as it may make sense for the corresponding use cases:
+      data exchange over Internet for example.
+    </p>
+    <h5>Dar</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# dar -c backup -K gnupg::root@terre.systeme-solaire.espace -R SRC -z6 -q
+	terre:/mnt/memdisk# dar -l backup -q
+	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
+	Archive version format               : 11
+	Compression algorithm used           : <e>gzip</e>
+	Compression block size used          : 0
+	Symmetric key encryption used        : <e>AES 256</e>
+	Asymmetric key encryption used       : <e>gnupg</e>
+	Archive is signed                    : no
+	Sequential reading marks             : present
+	User comment                         : N/A
+	Catalogue size in archive            : 68669 bytes
+
+	Archive is composed of 1 file(s)
+	File size: 158261425 bytes
+	The global data compression ratio is:   64%
+
+	CATALOGUE CONTENTS :
+
+	total number of inode : 2593
+	fully saved           : 2593
+	binay delta patch     : 0
+	inode metadata only   : 0
+	distribution of inode(s)
+	- directories        : 1
+	- plain files        : 2157
+	- symbolic links     : 435
+	- named pipes        : 0
+	- unix sockets       : 0
+	- character devices  : 0
+	- block devices      : 0
+	- Door entries       : 0
+	hard links information
+	- number of inode with hard link           : 0
+	- number of reference to hard linked inodes: 0
+	destroyed entries information
+	0 file(s) have been record as destroyed since backup of reference
+
+	terre:/mnt/memdisk# ls -l backup.1.dar
+	-rw-r--r-- 1 root root 158261425 Nov  9 16:04 backup.1.dar
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      As displayed in the backup header output (stored in clear both at the beginning and at the end of the archive),
+      the underlying encryption is a symmetric encryption (AES 256 by default), but the AES key is stored
+      ciphered using the private key of the backup recipient which email address is provided (or email adresses, if more than one
+      recipient is expected). This key is randomly chosen by dar and stored ciphered in the archive header.
+      Thus the overall behavior and performance and security of GnuPG withing dar is equivalent
+      to the one of the symmetrical algorithm, with the ability to quickly restore some or all files from an archive, not
+      waiting first for the archive to be unciphered.
+    </p>
+    <p>
+      Seen above no password or passphrase is asked as the recipient email is ourselves (root@terre.systeme-solaire.espace). Let's
+      cipher for another recipient:
+    </p>
+
+    <div class=code><code>
+	terre:/mnt/memdisk# dar -c backup -K gnupg::dar.linux@free.fr -R SRC -z6 -q -w
+	terre:/mnt/memdisk# ls -l backup.1.dar
+	-rw-r--r-- 1 root root <e>158230913</e> Nov  9 16:22 backup.1.dar
+	terre:/mnt/memdisk# dar -l backup -q
+	FATAL error, aborting operation: Unexpected error reported by GPGME: <e>No secret key</e>
+	terre:/mnt/memdisk# dar -c backup -K gnupg::dar.linux@free.fr,root@terre.systeme-solaire.espace -R SRC -z6 -q -w
+	terre:/mnt/memdisk# dar -l backup -q
+	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
+	Archive version format               : 11
+	Compression algorithm used           : gzip
+	Compression block size used          : 0
+	Symmetric key encryption used        : AES 256
+	Asymmetric key encryption used       : gnupg
+	Archive is signed                    : no
+	Sequential reading marks             : present
+	User comment                         : N/A
+	Catalogue size in archive            : 68624 bytes
+
+	Archive is composed of 1 file(s)
+	File size: 158252223 bytes
+	The global data compression ratio is:   64%
+
+	CATALOGUE CONTENTS :
+
+	total number of inode : 2593
+	fully saved           : 2593
+	binay delta patch     : 0
+	inode metadata only   : 0
+	distribution of inode(s)
+	- directories        : 1
+	- plain files        : 2157
+	- symbolic links     : 435
+	- named pipes        : 0
+	- unix sockets       : 0
+	- character devices  : 0
+	- block devices      : 0
+	- Door entries       : 0
+	hard links information
+	- number of inode with hard link           : 0
+	- number of reference to hard linked inodes: 0
+	destroyed entries information
+	0 file(s) have been record as destroyed since backup of reference
+
+	terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      here we saw that ciphering for a recipient different than ourself does not allow us to read the resulting backup,
+      however we can have several recipients, and if we add ourself, we can read the backup as well as the other
+      recipients.
+    </p>
+
+    <h5>Rsync</h5>
+
+    <i>rsync</i> is not able to perform asymmetric encryption of backed up files.
+
+    <h5>Tar</h5>
+    <p>
+      <i>Tar</i> cannot hold asymmetrical encryption alone, as for symmetrical encryption we must use an external tool
+      that performes the ciphering operation outside the backup.
+    </p>
+    <div class=code><code>
+	terre:/mnt/memdisk# tar -czf - SRC | gpg --encrypt --recipient root@terre.systeme-solaire.espace --output backup.tar.gz.gpg
+	terre:/mnt/memdisk# ls -l backup.tar.gz.gpg
+	-rw-r--r-- 1 root root <e>155337814</e> Nov  9 16:45 backup.tar.gz.gpg
+	terre:/mnt/memdisk#
+	terre:/mnt/memdisk# gpg --decrypt backup.tar.gz.gpg | tar -xzf -
+	gpg: encrypted with 3072-bit RSA key, ID 97E13D38B007DF30, created 2020-08-08
+	"root@terre &lt;root@terre.systeme-solaire.espace&gt;"
+	terre:/mnt/memdisk#
+	terre:/mnt/memdisk# tar -czf - SRC | gpg --encrypt --recipient dar.linux@free.fr --output backup.tar.gz.gpg
+	terre:/mnt/memdisk#  gpg --decrypt backup.tar.gz.gpg | tar -xzf -
+	gpg: encrypted with 4096-bit RSA key, ID DB0A2141A4D96ECA, created 2012-09-13
+	"Denis Corbin (http://dar.linux.free.fr/) &lt;dar.linux@free.fr&gt;"
+	gpg: decryption failed: <e>No secret key</e>
+
+	gzip: stdin: unexpected end of file
+	tar: Child returned status 1
+	tar: Error is not recoverable: exiting now
+	terre:/mnt/memdisk#terre:/mnt/memdisk# tar -czf - SRC | gpg --encrypt --recipient dar.linux@free.fr \
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--recipient root@terre.systeme-solaire.espace --output backup.tar.gz.gpg
+	terre:/mnt/memdisk#  gpg --decrypt backup.tar.gz.gpg | tar -xzf -
+	gpg: encrypted with 4096-bit RSA key, ID DB0A2141A4D96ECA, created 2012-09-13
+	"Denis Corbin (http://dar.linux.free.fr/) &lt;dar.linux@free.fr&gt;"
+	gpg: encrypted with 3072-bit RSA key, ID 97E13D38B007DF30, created 2020-08-08
+	"root@terre &lt;root@terre.systeme-solaire.espace&gt;"
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      Same as for symmetric encryption, the fact that the whole backup is ciphered at once implies to download
+      back the whole backup even to recover just one file.
+    </p>
+
+
+
+    <h4>Protection against plain-text attack</h4>
+
+    <h5>Dar</h5>
+
+    <p>
+      When ciphering the same datz several times (with symmetric or asymmetric encryption),
+      the resulting backup size changed each time. This is due to the garbage (the elastic
+      buffer) dar adds at the beginnning and at the end of the data to cipher. This way,
+      even if a dar backup has well known structure it is not easy to know precisely where
+      they are positionned in the archive, which makes plain-text attack much more difficult
+      to succeed.
+    </p>
+
+    <div class=code><code>
+	devuan:/mnt/memdisk# time dar -c backup -K "aes256:hello world!" -at -1 0 -R SRC -q -w
+	9.782u 3.413s <e>0:06.28</e> 210.0%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# la backup.1.dar
+	-rw-r--r-- 1 root root 1572<e>706497</e> Nov  9 14:50 backup.1.dar
+	devuan:/mnt/memdisk# time dar -c backup -K "aes256:hello world!" -at -1 0 -R SRC -q -w
+	9.173u 2.845s <e>0:05.50</e> 218.3%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# la backup.1.dar
+	-rw-r--r-- 1 root root 1572<e>655217</e> Nov  9 14:50 backup.1.dar
+	devuan:/mnt/memdisk#
+    </code></div>
+
+    <h5>Rsync</h5>
+    <p>
+      <i>rsync</i> is not providing any way to cipher the backup, it is not concerned by
+      protecting against plain-text attack.
+    </p>
+
+    <h5>Tar</h5>
+    <p>
+      <i>tar</i> by itself does not provide any ciphering mechanism, however you can
+      cipher the dar generated backups with external tool (for example <i>openssl</i>
+      for symmetric encryption or <i>gpg</i> for asymmetric encryption). However none
+      of these mechanism protect against plain-text attack, while tar backup have somehow
+      predictable header contents.
+    </p>
+    <div class=code><code>
+      devuan:/mnt/memdisk/SRC# time ../tar.backup ../backup.tar.crypted usr
+      4.112u 2.343s 0:04.72 136.6%    0+0k 0+0io 0pf+0w
+      devuan:/mnt/memdisk/SRC# ls -l ../bac
+      backup.1.dar        backup.tar.crypted
+      devuan:/mnt/memdisk/SRC# ls -l ../backup.tar.crypted
+      -rw-r--r-- 1 root root <e>1603594272</e> Nov  9 14:56 ../backup.tar.crypted
+      devuan:/mnt/memdisk/SRC# time ../tar.backup ../backup.tar.crypted usr
+      3.952u 2.564s 0:04.79 135.9%    0+0k 0+0io 0pf+0w
+      devuan:/mnt/memdisk/SRC# ls -l ../backup.tar.crypted
+      -rw-r--r-- 1 root root <e>1603594272</e> Nov  9 14:56 ../backup.tar.crypted
+      devuan:/mnt/memdisk/SRC#
+    </code></div>
+
+    <h4>Key Derivation Function</h4>
+
+    <h5>Dar</h5>
+
+    <p>
+      <i>dar</i> uses <code>argon2</code> by default, with 10,000 iterations. It can
+      also use pkcs5 v2 (pbkdf2) with md5, sha1 or sha512 algorithm. The user
+      is able to set the KDF function and iteration count, so we are able to measure
+      the execution time variation added by the iteration count:
+    </p>
+    <div class=code><code>
+	terre:/mnt/memdisk# time dar -c backup -R SRC -K aes:hello --kdf-param <e>100k</e>:<e class=blue>sha1</e> -w -q
+	4.904u 0.572s <e>0:05.49</e> 99.6%     0+0k 0+0io 0pf+0w
+	terre:/mnt/memdisk# time dar -c backup -R SRC -K aes:hello --kdf-param <e>500k</e>:sha1 -w -q
+	5.805u 0.272s <e>0:06.08</e> 99.8%     0+0k 0+0io 0pf+0w
+	terre:/mnt/memdisk# time dar -c backup -R SRC -K aes:hello --kdf-param <e>1M</e>:sha1 -w -q
+	6.852u 0.308s <e>0:07.18</e> 99.5%     0+0k 0+0io 0pf+0w
+	time dar -c backup -R SRC -K aes:hello --kdf-param 10k:argon2 -w -q
+	5.092u 0.870s 0:03.50 170.2%    0+0k 0+0io 0pf+0w
+	terre:/mnt/memdisk# time dar -c backup -R SRC -K aes:hello --kdf-param <e>10k</e>:<e class=blue>argon2</e> -w -q
+	5.232u 0.760s <e>0:03.54</e> 169.2%    0+0k 0+0io 0pf+0w
+	terre:/mnt/memdisk# time dar -c backup -R SRC -K aes:hello --kdf-param <e>20k</e>:argon2 -w -q
+	5.778u 0.822s <e>0:04.14</e> 159.1%    0+0k 0+0io 0pf+0w
+	terre:/mnt/memdisk# time dar -c backup -R SRC -K aes:hello --kdf-param <e>100k</e>:argon2 -w -q
+	10.613u 0.831s <e>0:09.00</e> 127.1%   0+0k 0+0io 0pf+0w
+	terre:/mnt/memdisk# time dar -c backup -R SRC -K aes:hello --kdf-param <e>1M:</e>argon2 -w -q
+	66.862u 0.666s <e>1:05.14</e> 103.6%   0+0k 0+0io 0pf+0w
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <h5>Rsync</h5>
+
+    <p>
+      <i>rsync</i> is not providing any way to cipher the backup, it is not concerned by KDF.
+    </p>
+
+    <h5>Tar</h5>
+
+    <p>
+      As of today (year 2020) <i>openssl</i> only supports PBKDF2: no support for argon2 is available.
+      <a href="https://en.wikipedia.org/wiki/Argon2">Argon2</a> was the winner of the Password Hashing
+      Competition in July 2015. <a href="https://en.wikipedia.org/wiki/PBKDF2">PBKDF2</a> has been
+      published by the IETF in September 2000 with the
+      <a href="https://tools.ietf.org/html/rfc2898">RCF 2898</a>
+
+    </p>
+
+    <h4>File change detection</h4>
+
+    <p>
+      In order stress each backup software on that aspect, we will do use an ugly
+      script that loops forever permanently invoking <code>touch</code> on a given file:
+    </p>
+
+    <div class=code><code>
+	terre:/mnt/memdisk# cat always_change
+	#!/bin/bash
+
+	if [ -z "$1" ] ; then
+	echo "usage: $0 &lt;filename&gt;"
+	exit 1
+	fi
+
+	while /bin/true ; do  touch "$1" ; done
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      We now create a source tree for backup containing a file of 1 MiB on which we will
+      apply this script:
+    </p>
+
+    <div class=code><code>
+	terre:/mnt/memdisk# mkdir SRC
+	terre:/mnt/memdisk# dd if=/dev/zero of=SRC/hello_world bs=10240 count=1024
+	1024+0 records in
+	1024+0 records out
+	10485760 bytes (10 MB, 10 MiB) copied, 0.0107294 s, 977 MB/s
+	terre:/mnt/memdisk# ./always_change SRC/hello_world &
+	[1] 7433
+	terre:/mnt/memdisk# stat SRC/hello_world
+	File: SRC/hello_world
+	Size: 10485760        Blocks: 20480      IO Block: 4096   regular file
+	Device: 1bh/27d Inode: 375588      Links: 1
+	Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+	Access: 2020-11-10 16:34:13.806106695 +0100
+	Modify: 2020-11-10 16:34:13.806106695 +0100
+	Change: 2020-11-10 16:34:13.806106695 +0100
+	Birth: -
+	terre:/mnt/memdisk# stat SRC/hello_world
+	File: SRC/hello_world
+	Size: 10485760        Blocks: 20480      IO Block: 4096   regular file
+	Device: 1bh/27d Inode: 375588      Links: 1
+	Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+	Access: 2020-11-10 16:34:14.838104981 +0100
+	Modify: 2020-11-10 16:34:14.838104981 +0100
+	Change: 2020-11-10 16:34:14.838104981 +0100
+	Birth: -
+	terre:/mnt/memdisk# jobs
+	[1]  + Running                       ./always_change SRC/hello_world
+	terre:/mnt/memdisk# ls -l SRC
+	total 10240
+	-rw-r--r-- 1 root root 10485760 Nov 10 16:34 hello_world
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <h5>Dar</h5>
+
+    <div class=code><code>
+	terre:/mnt/memdisk# dar -c backup -R SRC -q
+	<e>WARNING! File modified while reading it for backup, but no more retry allowed: /mnt/memdisk/SRC/hello_world</e>
+	terre:/mnt/memdisk# dar -l backup
+	[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size    |          Date                 |    filename
+	--------------------------------+------------+-------+-------+---------+-------------------------------+------------
+	[<e>DIRTY</e>][ ]       [---][  99%][X]  -rw-r--r--   0        0       10 Mio  Tue Nov 10 16:34:55 2020        hello_world
+	terre:/mnt/memdisk# dar -x backup -R DST
+	<e>File /mnt/memdisk/DST/hello_world has changed during backup and is probably not saved in a valid state ("dirty file"),</e>
+	<e>do you want to consider it for restoration anyway? [return = YES | Esc = NO]</e>
+	Continuing...
+
+
+	--------------------------------------------
+	1 inode(s) restored
+	including 0 hard link(s)
+	0 inode(s) not restored (not saved in archive)
+	0 inode(s) not restored (overwriting policy decision)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) failed to restore (filesystem error)
+	0 inode(s) deleted
+	--------------------------------------------
+	Total number of inode(s) considered: 1
+	--------------------------------------------
+	EA restored for 0 inode(s)
+	FSA restored for 0 inode(s)
+	--------------------------------------------
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      <ul>
+	<li>
+	  <i>dar</i> detects properly the file change and issues a warning during the backup.
+	</li>
+	<li>
+	  It even retries to save the file several times (3 times by default).
+	</li>
+	<li>
+	  the resulting backup keeps trace of this context by flagging the file as <code>DIRTY</code>
+	</li>
+	<li>
+	  When restoring the data, a warning shows and the user and requested for confirmation (default behavior)
+	</li>
+      </ul>
+    </p>
+
+    <h5>Rsync</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# rsync -arvHAXqz --delete SRC DST
+	terre:/mnt/memdisk#
+    </code></div>
+    <p>
+     <i>rsync</i> does not shows anything not behaves differently (no retry).
+    </p>
+
+    <h5>Tar</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# tar -cf backup.tar SRC
+	tar: SRC/hello_world: file changed as we read it
+	terre:/mnt/memdisk# tar -tvf backup.tar
+	drwxr-xr-x root/root         0 2020-11-10 16:33 SRC/
+	-rw-r--r-- root/root  10485760 2020-11-10 16:41 SRC/hello_world
+	terre:/mnt/memdisk# rm -rf DST
+	terre:/mnt/memdisk# mkdir DST
+	terre:/mnt/memdisk# cd DST
+	terre:/mnt/memdisk/DST# tar -xf ../backup.tar
+	terre:/mnt/memdisk/DST# ls -l SRC
+	total 10240
+	-rw-r--r-- 1 root root 10485760 Nov 10 16:41 hello_world
+	terre:/mnt/memdisk/DST#
+    </code></div>
+
+    <p>
+      <ul>
+	<li><i>tar</i> detects properly the file change and issues a warning during the backup.
+	</li>
+	<li>
+	  it does not tries to save the file
+	</li>
+	<li>
+	  the resulting backup keeps no visible trace of this context
+	</li>
+	<li>
+	  When restoring the data, no warning issued and the restoration proceed as if the file was saved properly
+	</li>
+      </ul>
+
+    <h4>Multi-level backup</h4>
+
+    <p>
+      This test is addressed with in the <a href="#diffbackup">performance section</a>
+      under the <i>Differential backup and restoration</i> chapter. We see there that
+      if <i>dar</i> and <i>tar</i> are able to create full differential and incremental backup,
+      <i>rsync</i> is only able to create full backups, thus fails to provide multi-level backups.
+    </p>
+
+    <h4>Binary Delta</h4>
+
+    <p>
+      This test is also addressed with in the <a href="#diffbackup">performance section</a>
+      under the <i>Differential backup and restoration</i> chapter. We see there that <i>rsync</i>
+      and <i>dar</i> are able to save only a portion of a big modified file and patch it upon restoration.
+      This reduces the size of differential and incremental backup (for <i>dar</i>) and the
+      network transfer time of the changes (for both <i>rsync</i> and <i>dar</i>).
+      <br/>
+      <i>tar</i> on its side, always resaved a file as a whole when it changes.
+    </p>
+
+
+    <h4>Detection suspicious modifications</h4>
+
+    <p>For this test we will use the following script that rely on the <i>bitflip</i> script
+      seen above, and tend to hide the modification performed, as a virus, keylogger or rootkit would
+      tend to do. We will make a full backup before
+      the modification and a differential backup after, then observe the behavior
+
+      <div class=code><code>
+	  terre:/mnt/memdisk# cat hide_change
+	  #!/bin/bash
+
+	  if [ -z "$1" ] ; then
+	  echo "usage: $0 &lt;filename&gt;"
+	  echo "modify one bit and hide the change"
+	  exit 1
+	  fi
+
+	  atime=`stat "$1" | sed -rn -s 's/^Access:\s+(.*)\+.*/\1/p'`
+	  mtime=`stat "$1" | sed -rn -s 's/^Modify:\s+(.*)\+.*/\1/p'`
+
+	  ./bitflip 2 "$1"
+
+	  touch -d "$mtime" "$1"
+	  touch -a -d "$atime" "$1"
+	  terre:/mnt/memdisk#
+      </code></div>
+
+    <p>
+      Here follows the script in action, we see no change using <code>ls -l</code>
+      while <code>stat</code> shows the exact same information:
+      <ul>
+	<li>file size</li>
+	<li>block used</li>
+	<li>Inode number</li>
+	<li>permissions</li>
+	<li>user and group ownership</li>
+	<li>last access time</li>
+	<li>last modification time</li>
+      </ul>
+      There only the last date, the inode change time that cannot be set manually
+      that shows that some inode properties (but not file content) has changed. This
+      condition occurs, when changing the file permission, ownership, extended
+      attributes and so on, but should not occur when only file's data has changed.
+    </p>
+
+    </p>
+    <div class=code><code>
+	terre:/mnt/memdisk# mkdir SRC
+	terre:/mnt/memdisk# echo "Hello World!" > SRC/file.txt
+	terre:/mnt/memdisk# cat SRC/file.txt
+	Hello World!
+	terre:/mnt/memdisk# ls -l SRC/file.txt
+	-rw-r--r-- 1 root root 13 Nov 12 13:13 SRC/file.txt
+	terre:/mnt/memdisk# stat SRC/file.txt
+	File: SRC/file.txt
+	Size: 13              Blocks: 8          IO Block: 4096   regular file
+	Device: 1bh/27d Inode: 424690      Links: 1
+	Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+	Access: 2020-11-12 13:13:19.021978762 +0100
+	Modify: 2020-11-12 13:13:09.213998852 +0100
+	Change: 2020-11-12 13:13:<e>09.213998852</e> +0100
+	Birth: -
+	terre:/mnt/memdisk# ./hide_change SRC/file.txt
+	terre:/mnt/memdisk# ls -l SRC/file.txt
+	-rw-r--r-- 1 root root 13 Nov 12 13:13 SRC/file.txt
+	terre:/mnt/memdisk# stat SRC/file.txt
+	File: SRC/file.txt
+	Size: 13              Blocks: 8          IO Block: 4096   regular file
+	Device: 1bh/27d Inode: 424690      Links: 1
+	Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+	Access: 2020-11-12 13:13:19.021978762 +0100
+	Modify: 2020-11-12 13:13:09.213998852 +0100
+	Change: 2020-11-12 13:13:<e>39.549936636</e> +0100
+	Birth: -
+	terre:/mnt/memdisk# cat SRC/file.txt
+	Lello World!
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <h5>Dar</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# mkdir SRC
+	terre:/mnt/memdisk# echo "Hello World!" > SRC/file.txt
+	terre:/mnt/memdisk# dar -c full -R SRC -N
+
+
+	--------------------------------------------
+	1 inode(s) saved
+	including 0 hard link(s) treated
+	0 inode(s) changed at the moment of the backup and could not be saved properly
+	0 byte(s) have been wasted in the archive to resave changing files
+	0 inode(s) with only metadata changed
+	0 inode(s) not saved (no inode/file change)
+	0 inode(s) failed to be saved (filesystem error)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) recorded as deleted from reference backup
+	--------------------------------------------
+	Total number of inode(s) considered: 1
+	--------------------------------------------
+	EA saved for 0 inode(s)
+	FSA saved for 0 inode(s)
+	--------------------------------------------
+	terre:/mnt/memdisk# ./hide_change SRC/file.txt
+	terre:/mnt/memdisk# dar -c diff -A full -R SRC -N -q
+	<e>SECURITY WARNING! SUSPICIOUS FILE /mnt/memdisk/SRC/file.txt: ctime changed since archive of reference was done, while no other inode information changed</e>
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      <i>dar</i> issues a warning because of this suspicious condition. Note that we still have the sane file in the full backup, in case of doubt,
+      we can compare it with this modified version:
+    </p>
+
+    <div class=code><code>
+	terre:/mnt/memdisk# dar -d full -R SRC -q
+	DIFF /mnt/memdisk/SRC/file.txt: <e>different file data, offset of first difference is: 0</e>
+	Some file comparisons failed
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      The previous test reports that the first byte to have changed is at offset 0, thus this is not just a metadata change
+      that lead to this warning. We can if necessary restore the sane data from the full backup.
+    </p>
+
+    <h5>Rsync</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# rm -rf SRC
+	terre:/mnt/memdisk# mkdir SRC
+	terre:/mnt/memdisk# echo "Hello World!" > SRC/file.txt
+	terre:/mnt/memdisk# rsync -arvHAX SRC DST
+	sending incremental file list
+	created directory DST
+	SRC/
+	SRC/file.txt
+
+	sent 146 bytes  received 65 bytes  422.00 bytes/sec
+	total size is 13  speedup is 0.06
+	terre:/mnt/memdisk# ./hide_change SRC/file.txt
+	terre:/mnt/memdisk# rsync -arvHAX SRC DST
+	sending incremental file list
+
+	sent 83 bytes  received 13 bytes  192.00 bytes/sec
+	total size is 13  speedup is 0.14
+	terre:/mnt/memdisk# cat SRC/file.txt
+	<e>Lello World!</e>
+	terre:/mnt/memdisk# cat DST/SRC/file.txt
+	<e>Hello World!</e>
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      rsync has not reported the problem, but hopefully it has not synchronized the backup,
+      thus we end in a sane version in the DST backup directory though as user is not aware
+      of this potential risk the virus/ransomware can spread silently.
+    </p>
+
+    <h5>Tar</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# rm -rf SRC
+	terre:/mnt/memdisk# rm -rf DST
+	terre:/mnt/memdisk# mkdir SRC
+	terre:/mnt/memdisk# echo "Hello World!" > SRC/file.txt
+	terre:/mnt/memdisk# tar --listed-incremental=snapshot.file -cf full.tar SRC
+	terre:/mnt/memdisk# ./hide_change SRC/file.txt
+	terre:/mnt/memdisk# tar --listed-incremental=snapshot.file -cvf diff.tar SRC
+	SRC/
+	SRC/file.txt
+	terre:/mnt/memdisk# mkdir DST
+	terre:/mnt/memdisk# cd DST
+	terre:/mnt/memdisk/DST# tar -xf ../full.tar
+	terre:/mnt/memdisk/DST# cat SRC/file.txt
+	<e>Hello World!</e>
+	terre:/mnt/memdisk/DST# tar -xf ../diff.tar
+	terre:/mnt/memdisk/DST# cat SRC/file.txt
+	<e>Lello World!</e>
+	terre:/mnt/memdisk/DST#
+    </code></div>
+
+    <p>
+      As seen above <i>tar</i> does not see any problem, thought the file has been resaved
+      as a whole (while its last modification time was unchanged) and lead to corrupt the
+      new backup with potential harmful data. The good point is that you have still the
+      full backup with the sane data, but at a next backup cycle as you were not notified of the
+      risk, you will lose it and retain only the corrupted version of the file.
+    </p>
+
+    <h4>Snapshot</h4>
+
+    <h5>Dar</h5>
+    <p>With <i>dar</i> snapshot can be created:
+      <ul>
+	<li>alone as a dedicated operation</li>
+	<li>as part of a backup process (full, differential, incremental or even decremental backup)</li>
+	<li>from a existing backup</li>
+      </ul>
+    </p>
+    <div class=code><code>
+	terre:/mnt/memdisk# dar -c full -z6 -R /usr <e>--on-fly-isolate snapshot</e>
+
+
+	--------------------------------------------
+	267245 inode(s) saved
+	including 23 hard link(s) treated
+	0 inode(s) changed at the moment of the backup and could not be saved properly
+	0 byte(s) have been wasted in the archive to resave changing files
+	0 inode(s) with only metadata changed
+	0 inode(s) not saved (no inode/file change)
+	0 inode(s) failed to be saved (filesystem error)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) recorded as deleted from reference backup
+	--------------------------------------------
+	Total number of inode(s) considered: 267245
+	--------------------------------------------
+	EA saved for 5 inode(s)
+	FSA saved for 237962 inode(s)
+	--------------------------------------------
+	Now performing on-fly isolation...
+	terre:/mnt/memdisk# ls -l *.dar
+	-rw-r--r-- 1 root root 4006060941 Nov 12 15:34 full.1.dar
+	-rw-r--r-- 1 root root    6662595 Nov 12 15:34 <e>snapshot.1.dar</e>
+	terre:/mnt/memdisk# dar -C recreated_snapshot -A full -z6 -q
+	terre:/mnt/memdisk# ls -al *.dar
+	-rw-r--r-- 1 root root 4006060941 Nov 12 15:34 full.1.dar
+	-rw-r--r-- 1 root root    7907094 Nov 12 16:33 <e>recreated_snapshot.1.dar</e>
+	-rw-r--r-- 1 root root    6662595 Nov 12 15:34 snapshot.1.dar
+	terre:/mnt/memdisk# dar -c diff -A snapshot -R /usr -z
+
+
+	--------------------------------------------
+	23 inode(s) saved
+	including 23 hard link(s) treated
+	0 inode(s) changed at the moment of the backup and could not be saved properly
+	0 byte(s) have been wasted in the archive to resave changing files
+	0 inode(s) with only metadata changed
+	<e>267222 inode(s) not saved (no inode/file change)</e>
+	0 inode(s) failed to be saved (filesystem error)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) recorded as deleted from reference backup
+	--------------------------------------------
+	Total number of inode(s) considered: 267245
+	--------------------------------------------
+	EA saved for 0 inode(s)
+	FSA saved for 0 inode(s)
+	--------------------------------------------
+	terre:/mnt/memdisk#
+	terre:/mnt/memdisk# ls -lh *.dar
+	-rw-r--r-- 1 root root  25M Nov 12 16:37 diff.1.dar
+	-rw-r--r-- 1 root root 3.8G Nov 12 15:34 full.1.dar
+	-rw-r--r-- 1 root root 7.6M Nov 12 16:33 recreated_snapshot.1.dar
+	-rw-r--r-- 1 root root 6.4M Nov 12 15:34 snapshot.1.dar
+	terre:/mnt/memdisk# dar -c diff2 -A recreated_snapshot -R /usr -z
+
+
+	--------------------------------------------
+	23 inode(s) saved
+	including 23 hard link(s) treated
+	0 inode(s) changed at the moment of the backup and could not be saved properly
+	0 byte(s) have been wasted in the archive to resave changing files
+	0 inode(s) with only metadata changed
+	<e>267222 inode(s) not saved (no inode/file change)</e>
+	0 inode(s) failed to be saved (filesystem error)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) recorded as deleted from reference backup
+	--------------------------------------------
+	Total number of inode(s) considered: 267245
+	--------------------------------------------
+	EA saved for 0 inode(s)
+	FSA saved for 0 inode(s)
+	--------------------------------------------
+	terre:/mnt/memdisk# dar -c snapshot_alone -A + -R /usr -z
+
+
+	--------------------------------------------
+	23 inode(s) saved
+	including 23 hard link(s) treated
+	0 inode(s) changed at the moment of the backup and could not be saved properly
+	0 byte(s) have been wasted in the archive to resave changing files
+	0 inode(s) with only metadata changed
+	267222 inode(s) not saved (no inode/file change)
+	0 inode(s) failed to be saved (filesystem error)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) recorded as deleted from reference backup
+	--------------------------------------------
+	Total number of inode(s) considered: 267245
+	--------------------------------------------
+	EA saved for 0 inode(s)
+	FSA saved for 0 inode(s)
+	--------------------------------------------
+	terre:/mnt/memdisk# touch /usr/local/src
+	terre:/mnt/memdisk# dar -c faked_diff -A snapshot -R /usr -e -q -vt
+	Adding folder to archive: /usr/local/src
+	Saving Filesystem Specific Attributes for /usr/local/src
+	terre:/mnt/memdisk# ls -l *.dar
+	-rw-r--r-- 1 root root   25537139 Nov 12 16:37 diff.1.dar
+	-rw-r--r-- 1 root root   25537139 Nov 12 16:39 diff2.1.dar
+	-rw-r--r-- 1 root root 4006060941 Nov 12 15:34 full.1.dar
+	-rw-r--r-- 1 root root    7907094 Nov 12 16:33 recreated_snapshot.1.dar
+	-rw-r--r-- 1 root root    6662595 Nov 12 15:34 snapshot.1.dar
+	-rw-r--r-- 1 root root   25537142 Nov 12 16:44 snapshot_alone.1.dar
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      As seen above, a snapshot can be created with a backup process (full, differential, incremental...) thanks to the <code>--on-fly-isolate</code>
+      option, it can even be recreated afterward from the backup if you forgot to create at the same time, last it can be created alone without
+      any backup thanks to the <code>-A +</code> option.
+    </p>
+    <p>
+      Once created whatever the method used, a snapshot can be used to create a differential or incremental backup,
+      or using the <code>-e</code> option (dry-run) to list the file that would be saved (thus which have changed, were added or removed)
+      thus files that changed since the time the snapshot was made.
+    </p>
+
+    <h5>Rsync</h5>
+    <p>
+      This feature is not supported by <i>rsync</i>.
+    </p>
+
+    <h5>Tar</h5>
+    <p>
+      <i>tar</i> can generate snapshot:
+      <ul>
+	<li>alone redirecting the backup output to /dev/null</li>
+	<li>as part of a backup process (in fact <i>tar</i> cannot do else)</li>
+      </ul>
+    </p>
+    <div class=code><code>
+	terre:/mnt/memdisk# tar --listed-incremental=snapshot.file -czf full.tar.gz /usr
+	tar: Removing leading `/' from member names
+	tar: Removing leading `/' from hard link targets
+	terre:/mnt/memdisk# ls -l snapshot.file
+	-rw-r--r-- 1 root root 6288644 Nov 12 15:12 snapshot.file
+	terre:/mnt/memdisk# cp snapshot.file snapshot.file.ref
+	tar --listed-incremental=snapshot.file -cvf /dev/null /usr
+	/usr/
+	/usr/bin/
+	/usr/games/
+	/usr/include/
+	/usr/include/X11/
+	/usr/include/X11/bitmaps/
+	/usr/include/arpa/
+	/usr/include/asm-generic/
+	/usr/include/attr/
+	/usr/include/c++/
+	/usr/include/c++/
+	<e>[...]</e>
+	/usr/share/zoneinfo/right/Canada/
+	/usr/share/zoneinfo/right/Chile/
+	/usr/share/zoneinfo/right/Etc/
+	/usr/share/zoneinfo/right/Europe/
+	/usr/share/zoneinfo/right/Indian/
+	/usr/share/zoneinfo/right/Mexico/
+	/usr/share/zoneinfo/right/Pacific/
+	/usr/share/zoneinfo/right/SystemV/
+	/usr/share/zoneinfo/right/US/
+	/usr/share/zsh/
+	/usr/share/zsh/site-functions/
+	/usr/share/zsh/vendor-completions/
+	/usr/src/
+	terre:/mnt/memdisk# ls -l sna
+	snapshot.file      snapshot.file.ref
+	terre:/mnt/memdisk# ls -l snapshot.file*
+	-rw-r--r-- 1 root root 6288644 Nov 12 15:20 snapshot.file
+	-rw-r--r-- 1 root root 6288644 Nov 12 15:18 snapshot.file.ref
+	terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      If a snapshot can be used (and is in fact required) to make a differential backup, it
+      cannot really be used to see the difference a current living filesystem has with a given
+      snapshot. Worse, doing so modifies the snapshot, so you have first to make a copy
+      to not screw up your backup process. Worse, if incremental backup fails and you have
+      not created a copy of the backup, your snapshot being modified you will mostly have to
+      remake the whole backup process from the full backup to be sure to not miss backing up
+      some modified files. Same thing if you lose by mistake the snapshot file.
+    </p>
+
+    <h4>On-fly hashing</h4>
+    <h5>Dar</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# dar -c backup -R /usr -g usr/bin -z6 <e>--hash sha1</e>
+
+
+	--------------------------------------------
+	0 inode(s) saved
+	including 0 hard link(s) treated
+	0 inode(s) changed at the moment of the backup and could not be saved properly
+	0 byte(s) have been wasted in the archive to resave changing files
+	0 inode(s) with only metadata changed
+	0 inode(s) not saved (no inode/file change)
+	0 inode(s) failed to be saved (filesystem error)
+	8 inode(s) ignored (excluded by filters)
+	0 inode(s) recorded as deleted from reference backup
+	--------------------------------------------
+	Total number of inode(s) considered: 8
+	--------------------------------------------
+	EA saved for 0 inode(s)
+	FSA saved for 0 inode(s)
+	--------------------------------------------
+	terre:/mnt/memdisk# ls -l *.dar*
+	-rw-r--r-- 1 root root 171 Nov 12 17:22 backup.1.dar
+	-rw-r--r-- 1 root root  55 Nov 12 17:22 <e>backup.1.dar.sha1</e>
+	terre:/mnt/memdisk# sha1sum -c backup.1.dar.sha1
+	<e>backup.1.dar: OK</e>
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <h5>Rsync</h5>
+    <p>
+      not supported by <i>rsync</i>
+    </p>
+
+    <h5>Tar</h5>
+
+    <p>
+      not supported by <i>tar</i>
+    </p>
+
+
+    <h4>Custom command during operation</h4>
+
+    <p>
+      As an example (but there is much more thing that can be done), we take the case
+      of a automounted directory. Such type of volume is mounted only when used, if not
+      used no mount point directory shows and unless you know it exists, no backup of
+      its content is performed. The idea, is when entering the parent directory at backup
+      process to trigger the mount point for the backup to include them.
+    <p>
+
+    <h5>Dar</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# cat /etc/auto.mnt
+	Espace  -defaults,relatime,acl,bg,rsize=8192,wsize=8192       nfs.systeme-solaire.espace:/mnt/Externe/Espace
+	Commun  -defaults,relatime,acl,bg,rsize=8192,wsize=8192,ro    nfs.systeme-solaire.espace:/mnt/Externe/Commun
+	Backup  -defaults,relatime,acl,bg,rsize=8192,wsize=8192,ro    nfs.systeme-solaire.espace:/mnt/Backup
+	terre:/mnt/memdisk# ls -l /mnt/Externe/
+	total 4
+	drwxr-xr-x 7 root root 4096 Jul 14 17:58 Espace
+	terre:/mnt/memdisk# dar -c backup -R / -g /mnt -q
+	terre:/mnt/memdisk# dar -l backup
+	[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size    |          Date                 |    filename
+	--------------------------------+------------+-------+-------+---------+-------------------------------+------------
+	[Saved][-]       [-L-][     ][ ]  drwxr-xr-x   0        0       0       Wed Oct 21 18:17:07 2020        mnt
+	[Saved][-]       [-L-][     ][ ]  drwxr-xr-x   1000     1002    0       Mon Nov  9 11:56:54 2020        mnt/localdisk
+	[Saved][-]       [---][-----][ ]  lrwxrwxrwx   0        0       0       Thu Aug 15 23:29:46 2019        mnt/Backup
+	[Saved][-]       [---][     ][ ]  drwxr-xr-x   0        0       0       Thu Nov 12 17:42:11 2020        mnt/Externe
+	[Saved][-][Saved][---][     ][ ]  drwxr-xr-x   0        0       0       Tue Jul 14 17:58:57 2020        <e class=blue>mnt/Externe/Espace</e>
+	terre:/mnt/memdisk#
+	terre:/mnt/memdisk# rm backup.1.dar
+	terre:/mnt/memdisk# dar -c backup -R / -g mnt -q '-&lt;' mnt '-=' 'file %p/Externe/Backup %p/Externe/Commun'
+	/mnt/Externe/Backup: directory
+	/mnt/Externe/Commun: directory
+	terre:/mnt/memdisk# dar -l backup
+	[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size    |          Date                 |    filename
+	--------------------------------+------------+-------+-------+---------+-------------------------------+------------
+	[Saved][-]       [-L-][     ][ ]  drwxr-xr-x   0        0       0       Wed Oct 21 18:17:07 2020        mnt
+	[Saved][-]       [-L-][     ][ ]  drwxr-xr-x   1000     1002    0       Mon Nov  9 11:56:54 2020        mnt/localdisk
+	[Saved][-]       [---][-----][ ]  lrwxrwxrwx   0        0       0       Thu Aug 15 23:29:46 2019        mnt/Backup
+	[Saved][-]       [---][     ][ ]  drwxr-xr-x   0        0       0       Thu Nov 12 18:01:41 2020        mnt/Externe
+	[Saved][-][Saved][---][     ][ ]  drwxr-x---   993      1002    0       Wed Nov 11 10:21:55 2015        <e>mnt/Externe/Commun</e>
+	[Saved][-][Saved][---][     ][ ]  drwxr-xr-x   0        0       0       Sun Sep 13 12:22:24 2020        <e>mnt/Externe/Backup</e>
+	[Saved][-][Saved][---][     ][ ]  drwxr-xr-x   0        0       0       Tue Jul 14 17:58:57 2020        <e class=blue>mnt/Externe/Espace</e>
+	terre:/mnt/memdisk# ls -l /mnt/Externe/
+	total 12
+	drwxr-xr-x 9 root   root   4096 Sep 13 12:22 Backup
+	drwxr-x--- 4 commun maison 4096 Nov 11  2015 Commun
+	drwxr-xr-x 7 root   root   4096 Jul 14 17:58 Espace
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      In the previous example we see that the /mnt/Externe directory is a mount point containing three auto-mounted
+      volumes: <code>Espace</code>, <code>Commun</code> and <code>Backup</code>. At that time only <code>Espace</code> is mounted.
+      Performing a first backup without care will skip the two other directories.
+    </p>
+    <p>
+      In a second time thanks to the <code>-&lt;</code> and <code>-=</code> options we instruct <i>dar</i> when
+      entering <code>/mnt</code> to operate the <code>file</code> command on the two missing directories. As a result
+      we now see them in the backup. We could do that before executing the backup, but as the backup may include many other
+      directory the time between such operation done before starting the backup and the time the backup finally saves
+      the automount point at <code>/mnt/Externe</code> may exceed the automount timeout leading them to disappear backup
+      if not used.
+    </p>
+    <div class=code><code>
+	terre:/mnt/memdisk# dar -c backup -R / -g usr/bin --hash sha512 -s 100M -q
+	terre:/mnt/memdisk# ls -l backup.*
+	-rw-r--r-- 1 root root 104857600 Nov 12 18:30 backup.1.dar
+	-rw-r--r-- 1 root root       143 Nov 12 18:30 backup.1.dar.sha512
+	-rw-r--r-- 1 root root 104857600 Nov 12 18:30 backup.2.dar
+	-rw-r--r-- 1 root root       143 Nov 12 18:30 backup.2.dar.sha512
+	-rw-r--r-- 1 root root 104857600 Nov 12 18:30 backup.3.dar
+	-rw-r--r-- 1 root root       143 Nov 12 18:30 backup.3.dar.sha512
+	-rw-r--r-- 1 root root  63577207 Nov 12 18:30 backup.4.dar
+	-rw-r--r-- 1 root root       143 Nov 12 18:30 backup.4.dar.sha512
+	terre:/mnt/memdisk# dar -t backup -E 'sha512sum -c %p/%b.%N.%e.sha512'
+	backup.4.dar: OK
+	backup.1.dar: OK
+	backup.2.dar: OK
+	backup.3.dar: OK
+	backup.4.dar: OK
+
+
+	--------------------------------------------
+	2594 item(s) treated
+	0 item(s) with error
+	0 item(s) ignored (excluded by filters)
+	--------------------------------------------
+	Total number of items considered: 2594
+	--------------------------------------------
+	terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      in the previous example, this we used slicing with on-fly hashing which generated for each slice
+      the corresponding sha512 hash file. Then we tested the archive content and also the hash
+      files thanks to the <code>-E</code> option. Of course any user command or shell or python script,
+      can be used instead, and for backup, restoration, testing, snashotting,...
+    </p>
+
+    <h5>Rsync</h5>
+    <p>
+      not supported by <i>rsync</i>
+    </p>
+
+    <h5>Tar</h5>
+    <p>
+      not supported by <i>tar</i>
+    </p>
+
+    <h4>Dry-run execution</h4>
+    <h5>Dar</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk/A# ls -l
+	<e>total 0</e>
+	terre:/mnt/memdisk/A# dar -c backup -R / -g usr/bin --dry-run
+
+
+	--------------------------------------------
+	2594 inode(s) saved
+	including 5 hard link(s) treated
+	0 inode(s) changed at the moment of the backup and could not be saved properly
+	0 byte(s) have been wasted in the archive to resave changing files
+	0 inode(s) with only metadata changed
+	0 inode(s) not saved (no inode/file change)
+	0 inode(s) failed to be saved (filesystem error)
+	34 inode(s) ignored (excluded by filters)
+	0 inode(s) recorded as deleted from reference backup
+	--------------------------------------------
+	Total number of inode(s) considered: 2628
+	--------------------------------------------
+	EA saved for 3 inode(s)
+	FSA saved for 2154 inode(s)
+	--------------------------------------------
+	terre:/mnt/memdisk/A# ls -l
+	<e>total 0</e>
+	terre:/mnt/memdisk/A#
+    </code></div>
+
+    <h5>Rsync</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# rsync -arHAX --dry-run /usr/bin DST
+	terre:/mnt/memdisk# ls -l DST
+	<e>ls: cannot access 'DST': No such file or directory</e>
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <h5>Tar</h5>
+    <p>
+      does not seem supported by <i>tar</i>
+    </p>
+
+
+    <h4>User message within backup</h4>
+
+    <h5>Dar</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# dar -c backup <e>--user-comment "passphrase is the usual one. Archive was made on %d on host %h"</e> -R / -g usr/bin -K camellia: -zxz -s 100M
+	Archive backup requires a password:
+	Please confirm your password:
+
+
+	--------------------------------------------
+	2594 inode(s) saved
+	including 5 hard link(s) treated
+	0 inode(s) changed at the moment of the backup and could not be saved properly
+	0 byte(s) have been wasted in the archive to resave changing files
+	0 inode(s) with only metadata changed
+	0 inode(s) not saved (no inode/file change)
+	0 inode(s) failed to be saved (filesystem error)
+	34 inode(s) ignored (excluded by filters)
+	0 inode(s) recorded as deleted from reference backup
+	--------------------------------------------
+	Total number of inode(s) considered: 2628
+	--------------------------------------------
+	EA saved for 3 inode(s)
+	FSA saved for 2154 inode(s)
+	--------------------------------------------
+	terre:/mnt/memdisk# dar -l backup <e>-aheader</e>
+	Archive version format               : 11
+	Compression algorithm used           : xz
+	Compression block size used          : 0
+	Symmetric key encryption used        : camellia 256
+	Asymmetric key encryption used       : none
+	Archive is signed                    : no
+	Sequential reading marks             : present
+	User comment                         : <e>passphrase is the usual one. Archive was made on Thu Nov 12 18:57:35 2020 on host terre</e>
+	KDF iteration count                  : 10000
+	KDF hash algorithm                   : argon2
+	Salt size                            : 32 bytes
+	Final memory cleanup...
+	FATAL error, aborting operation: header only mode asked
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      The use of the <code>-aheader</code> let one see the archive header that is always in clear-text. The usual listing
+      operation provides some additional informations from which are ciphered and thus in that context requires the passphrase:
+    </p>
+    <div class=code><code>
+	terre:/mnt/memdisk# dar <e>-l</e> backup <e>-q</e>
+	<e>Archive backup requires a password:</e>
+	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
+	Archive version format               : 11
+	Compression algorithm used           : xz
+	Compression block size used          : 0
+	Symmetric key encryption used        : camellia 256
+	Asymmetric key encryption used       : none
+	Archive is signed                    : no
+	Sequential reading marks             : present
+	User comment                         : <e>passphrase is the usual one. Archive was made on Thu Nov 12 18:57:35 2020 on host terre</e>
+	KDF iteration count                  : 10000
+	KDF hash algorithm                   : argon2
+	Salt size                            : 32 bytes
+	Catalogue size in archive            : 78268 bytes
+
+	Archive is composed of 2 file(s)
+	File size             : 104857600 bytes
+	Last file size        : 17168696 bytes
+	Archive total size is : 122026296 bytes
+	<e>The global data compression ratio is:   72%</e>
+
+	<e>CATALOGUE CONTENTS :</e>
+
+	total number of inode : 2589
+	fully saved           : 2589
+	binay delta patch     : 0
+	inode metadata only   : 0
+	distribution of inode(s)
+	- directories        : 2
+	- plain files        : 2152
+	- symbolic links     : 435
+	- named pipes        : 0
+	- unix sockets       : 0
+	- character devices  : 0
+	- block devices      : 0
+	- Door entries       : 0
+	hard links information
+	- number of inode with hard link           : 5
+	- number of reference to hard linked inodes: 10
+	destroyed entries information
+	0 file(s) have been record as destroyed since backup of reference
+
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <h5>Rsync</h5>
+    <p>
+      not supported by <i>rsync</i>
+    </p>
+
+    <h5>Tar</h5>
+    <p>
+      not supported by <i>tar</i>
+    </p>
+
+    <h4>backup sanity test</h4>
+
+
+    <h5>Dar</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# dar -c backup -R / -g usr/bin -zlz4
+
+
+	--------------------------------------------
+	2594 inode(s) saved
+	including 5 hard link(s) treated
+	0 inode(s) changed at the moment of the backup and could not be saved properly
+	0 byte(s) have been wasted in the archive to resave changing files
+	0 inode(s) with only metadata changed
+	0 inode(s) not saved (no inode/file change)
+	0 inode(s) failed to be saved (filesystem error)
+	34 inode(s) ignored (excluded by filters)
+	0 inode(s) recorded as deleted from reference backup
+	--------------------------------------------
+	Total number of inode(s) considered: 2628
+	--------------------------------------------
+	EA saved for 3 inode(s)
+	FSA saved for 2154 inode(s)
+	--------------------------------------------
+	terre:/mnt/memdisk# dar -t backup
+
+
+	--------------------------------------------
+	2594 item(s) treated
+	0 item(s) with error
+	0 item(s) ignored (excluded by filters)
+	--------------------------------------------
+	Total number of items considered: 2594
+	--------------------------------------------
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <h5>Rsync</h5>
+    <p>
+      I could not see no way that let <i>rsync</i> check that the target or destination
+      directory is sane and usuable. All operation modify the destination file or save
+      modified files in either the destination directory (the backup) or an alternate directory
+      (<code>--compare-dest</code> option).
+    </p>
+
+    <h5>Tar</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# rm -rf backup.tar.gz
+	terre:/mnt/memdisk# tar -czf backup.tar.gz /usr/bin
+	tar: Removing leading `/' from member names
+	tar: Removing leading `/' from hard link targets
+	terre:/mnt/memdisk# tar -tzf backup.tar.gz
+	usr/bin/
+	usr/bin/bitmap
+	usr/bin/dot
+	usr/bin/indi_usbdewpoint
+	usr/bin/ruby2.5
+	usr/bin/pod2man
+	usr/bin/iptables-xml
+	usr/bin/knotify4
+	usr/bin/fakeroot
+	usr/bin/xclock
+	<e>[...]</e>
+	/bin/traceproto
+	usr/bin/ofm2opl
+	usr/bin/akonadi_archivemail_agent
+	usr/bin/resizecons
+	usr/bin/rletopnm
+	usr/bin/dh_install
+	usr/bin/updvitomp
+	usr/bin/h2xs
+	usr/bin/xmessage
+	terre:/mnt/memdisk# echo $?
+	0
+	terre:/mnt/memdisk#
+    </code></div>
+
+
+    <h4>Comparing with original data</h4>
+
+    <h5>Dar</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# dar -c backup -R SRC -q
+	terre:/mnt/memdisk# dar -d backup -R SRC
+
+
+	--------------------------------------------
+	2594 item(s) treated
+	0 item(s) do not match those on filesystem
+	0 item(s) ignored (excluded by filters)
+	--------------------------------------------
+	Total number of items considered: 2594
+	--------------------------------------------
+	terre:/mnt/memdisk# echo $?
+	0
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <h5>Rsync</h5>
+    <p>
+      Does not seems supported by <i>rsync</i>
+    </p>
+
+    <h5>Tar</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk/SRC# tar -czf ../backup.tar.gz .
+	terre:/mnt/memdisk/SRC# tar -dzf ../backup.tar.gz
+	terre:/mnt/memdisk/SRC# echo $?
+	0
+	terre:/mnt/memdisk/SRC#
+    </code></div>
+
+    <h4>Tunable verbosity</h4>
+
+    <h5>Dar</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# dar -c backup -R / -g usr/bin <e>-q</e>
+	terre:/mnt/memdisk# rm backup.1.dar
+	terre:/mnt/memdisk# dar -c backup -R / -g usr/bin
+
+
+	--------------------------------------------
+	2594 inode(s) saved
+	including 5 hard link(s) treated
+	0 inode(s) changed at the moment of the backup and could not be saved properly
+	0 byte(s) have been wasted in the archive to resave changing files
+	0 inode(s) with only metadata changed
+	0 inode(s) not saved (no inode/file change)
+	0 inode(s) failed to be saved (filesystem error)
+	34 inode(s) ignored (excluded by filters)
+	0 inode(s) recorded as deleted from reference backup
+	--------------------------------------------
+	Total number of inode(s) considered: 2628
+	--------------------------------------------
+	EA saved for 3 inode(s)
+	FSA saved for 2154 inode(s)
+	--------------------------------------------
+	terre:/mnt/memdisk# dar -c backup -R / -g usr/bin <e>-vm</e>
+	Arguments read from /usr/local/etc/darrc :
+
+	Creating low layer: Writing archive into a plain file object...
+	Adding a new layer on top: Caching layer for better performances...
+	Writing down the archive header...
+	Adding a new layer on top: Escape layer to allow sequential reading...
+	All layers have been created successfully
+	Building the catalog object...
+	Processing files for backup...
+	Writing down archive contents...
+	Closing the escape layer...
+	Writing down the first archive terminator...
+	Writing down archive trailer...
+	Writing down the second archive terminator...
+	Closing archive low layer...
+	Archive is closed.
+
+
+	--------------------------------------------
+	2594 inode(s) saved
+	including 5 hard link(s) treated
+	0 inode(s) changed at the moment of the backup and could not be saved properly
+	0 byte(s) have been wasted in the archive to resave changing files
+	0 inode(s) with only metadata changed
+	0 inode(s) not saved (no inode/file change)
+	0 inode(s) failed to be saved (filesystem error)
+	34 inode(s) ignored (excluded by filters)
+	0 inode(s) recorded as deleted from reference backup
+	--------------------------------------------
+	Total number of inode(s) considered: 2628
+	--------------------------------------------
+	EA saved for 3 inode(s)
+	FSA saved for 2154 inode(s)
+	--------------------------------------------
+	Making room in memory (releasing memory used by archive of reference)...
+	Final memory cleanup...
+	terre:/mnt/memdisk# rm -f backup*
+	terre:/mnt/memdisk# dar -c backup -R / -g usr/bin <e>-vt</e> -q
+	Adding folder to archive: /usr
+	Saving Filesystem Specific Attributes for /usr
+	Adding folder to archive: /usr/bin
+	Saving Filesystem Specific Attributes for /usr/bin
+	Adding file to archive: /usr/bin/bitmap
+	Saving Filesystem Specific Attributes for /usr/bin/bitmap
+	<e>[...]</e>
+	Saving Filesystem Specific Attributes for /usr/bin/dh_install
+	Adding symlink to archive: /usr/bin/updvitomp
+	Adding file to archive: /usr/bin/h2xs
+	Saving Filesystem Specific Attributes for /usr/bin/h2xs
+	Adding file to archive: /usr/bin/xmessage
+	Saving Filesystem Specific Attributes for /usr/bin/xmessage
+	terre:/mnt/memdisk# rm -f backup*
+	terre:/mnt/memdisk# dar -c backup -R / -g usr/bin -vd
+	Inspecting directory /root
+	Inspecting directory /bin
+	Inspecting directory /sbin
+	Inspecting directory /tmp
+	Inspecting directory /sys
+	Inspecting directory /lib
+	<e>[...]</e>
+	Inspecting directory /var
+	Inspecting directory /proc
+	Inspecting directory /dev
+	Inspecting directory /etc
+	Inspecting directory /media
+	Inspecting directory /run
+	terre:/mnt/memdisk#
+	terre:/mnt/memdisk# rm -f backup.*
+	terre:/mnt/memdisk# dar -c backup -R / -g usr/bin <e>-vf</e> -q
+	Finished Inspecting directory /usr/bin , saved 408 Mio, compression ratio   13%
+	Finished Inspecting directory /usr , saved 408 Mio, compression ratio   13%
+	terre:/mnt/memdisk#
+	terre:/mnt/memdisk# dar -c backup -R / -g usr/bin <e>-vmasks</e> -q
+	directory tree filter:
+	AND
+	| OR
+	|   | Is subdir of: /usr/bin [case sensitive]
+	|   +--
+	+--
+
+	filename filter:
+	AND
+	| TRUE
+	+--
+
+	EA filter:
+	AND
+	| TRUE
+	+--
+
+	Compression filter:
+	TRUE
+
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      <i>dar</i> has several options to define which type of message to show or not to show:
+      <code> -v, -vs, -vt, -vd, -vf, -vm, -vmasks, -q</code>. They can be combined.
+    </p>
+
+    <h5>Rsync</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# rsync -arHAX /usr/bin DST
+	terre:/mnt/memdisk# rm -rf DST
+	terre:/mnt/memdisk# rsync -arHAX <e>-v</e> /usr/bin DST
+	sending incremental file list
+	created directory DST
+	bin/
+	bin/2to3-2.7
+	bin/411toppm
+	bin/7z
+	bin/7za
+	bin/7zr
+	bin/FvwmCommand
+	<e>[...]</e>
+	bin/zstdmt -> zstd
+	bin/perl => bin/perl5.28.1
+	bin/perlbug => bin/perlthanks
+	bin/python3.7 => bin/python3.7m
+	bin/pkg-config => bin/x86_64-pc-linux-gnu-pkg-config
+	bin/unzip => bin/zipinfo
+
+	sent 437,298,617 bytes  received 42,381 bytes  174,936,399.20 bytes/sec
+	total size is 445,394,557  speedup is 1.02
+	terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      <code>-v</code> gives leads to a more verbose output, while <code>-q</code>
+      remove the non error messages. Using both at the same time seems not to
+      be different than using <code>-q</code> alone.
+    </p>
+
+    <h5>Tar</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# tar -czf backup.tar.gz /usr/bin
+	tar: Removing leading `/' from member names
+	tar: Removing leading `/' from hard link targets
+	terre:/mnt/memdisk# rm backup.tar.gz
+	terre:/mnt/memdisk# tar <e>-v</e> -czf backup.tar.gz /usr/bin
+	tar: Removing leading `/' from member names
+	/usr/bin/
+	/usr/bin/bitmap
+	/usr/bin/dot
+	/usr/bin/indi_usbdewpoint
+	/usr/bin/ruby2.5
+	/usr/bin/pod2man
+	/usr/bin/iptables-xml
+	/usr/bin/knotify4
+	<e>[...]</e>
+	/usr/bin/traceproto
+	/usr/bin/ofm2opl
+	/usr/bin/akonadi_archivemail_agent
+	/usr/bin/resizecons
+	/usr/bin/rletopnm
+	/usr/bin/dh_install
+	/usr/bin/updvitomp
+	/usr/bin/h2xs
+	/usr/bin/xmessage
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      <i>tar</i> provides the <code>-v</code> option to increase
+      verbosity.
+    </p>
+
+
+    <h4>Modify Backup content</h4>
+    <p>
+      We will perform two types of tests:
+      <ul>
+	<li>remove one or several files from an existing backup without having to make a new backup process</li>
+	<li>add forgotten files to an existing bakcup without performing a new full backup process</li>
+      </ul>
+    </p>
+
+    <h5>Dar</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# dar -c backup -R / -g usr/bin -z6 -q
+	terre:/mnt/memdisk# dar -l backup -g usr/bin/emacs-gtk
+	[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size    |          Date                 |    filename
+	--------------------------------+------------+-------+-------+---------+-------------------------------+------------
+	[Saved][-]       [-L-][  64%][ ]  drwxr-xr-x   root     root    408 Mio Sun Jun  2 23:25:09 2019        usr
+	[Saved][-]       [-L-][  64%][ ]  drwxr-xr-x   root     root    408 Mio Sun Nov  8 13:43:58 2020        usr/bin
+	[Saved][ ]       [-L-][  90%][X]  -rwxr-xr-x   root     root    38 Mio  Thu Sep  5 04:35:24 2019        <e>usr/bin/emacs-gtk</e>
+	terre:/mnt/memdisk# dar -A backup -+ without-emacs -ak -P usr/bin/emacs-gtk -vs -q
+	Skipping file: &lt;ROOT&gt;/usr/bin/emacs-gtk
+	terre:/mnt/memdisk# dar -l without-emacs -g usr/bin/emacs-gtk
+	[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size    |          Date                 |    filename
+	--------------------------------+------------+-------+-------+---------+-------------------------------+------------
+	[Saved][-]       [-L-][  62%][ ]  drwxr-xr-x   root     root    370 Mio Sun Jun  2 23:25:09 2019        usr
+	[Saved][-]       [-L-][  62%][ ]  drwxr-xr-x   root     root    370 Mio Sun Nov  8 13:43:58 2020        usr/bin
+	terre:/mnt/memdisk#rm backup.*
+	terre:/mnt/memdisk#mv without-emacs.1.dar backup.1.dar
+	terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      <i>dar</i> does not modify a existing archive but creates a copy of it with the requested files or directory removed. The
+      process can be quick even with compression thanks to the <code>-ak</code> option that avoid uncompressing and recompressing
+      file that are kept. Before removing the old backup you can test the sanity of the new generated one.
+    </p>
+    <div class=code><code>
+	terre:/mnt/memdisk# dar -c emacs -R / -g usr/bin/emacs-gtk -z6 -q
+	terre:/mnt/memdisk# dar -l emacs
+	[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size    |          Date                 |    filename
+	--------------------------------+------------+-------+-------+---------+-------------------------------+------------
+	[Saved][-]       [-L-][  90%][ ]  drwxr-xr-x   root     root    38 Mio  Sun Jun  2 23:25:09 2019        usr
+	[Saved][-]       [-L-][  90%][ ]  drwxr-xr-x   root     root    38 Mio  Sun Nov  8 13:43:58 2020        usr/bin
+	[Saved][ ]       [-L-][  90%][X]  -rwxr-xr-x   root     root    38 Mio  Thu Sep  5 04:35:24 2019        usr/bin/emacs-gtk
+	terre:/mnt/memdisk# dar -A backup -@ emacs -+ with-emacs -ak
+
+
+	--------------------------------------------
+	2594 inode(s) added to archive
+	with 10 hard link(s) recorded
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) recorded as deleted
+	--------------------------------------------
+	EA saved for 3 inode(s)
+	FSA saved for 2159 inode(s)
+	--------------------------------------------
+	Total number of inode(s) considered: 2594
+	--------------------------------------------
+	terre:/mnt/memdisk# dar -l with-emacs -g usr/bin/emacs-gtk
+	[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size    |          Date                 |    filename
+	--------------------------------+------------+-------+-------+---------+-------------------------------+------------
+	[Saved][-]       [-L-][  64%][ ]  drwxr-xr-x   root     root    408 Mio Sun Jun  2 23:25:09 2019        usr
+	[Saved][-]       [-L-][  64%][ ]  drwxr-xr-x   root     root    408 Mio Sun Nov  8 13:43:58 2020        usr/bin
+	[Saved][ ]       [-L-][  90%][X]  -rwxr-xr-x   root     root    38 Mio  Thu Sep  5 04:35:24 2019        usr/bin/emacs-gtk
+	terre:/mnt/memdisk# rm emacs.* backup.*
+	terre:/mnt/memdisk# mv with-emacs.1.dar backup.1.dar
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      Here to add files to a existing backup we must make a small backup of these files only and merge
+      this backup with the backup we modify. Nothing of the source data is touched in this operation,
+      is something get wrong or if you made an error, you can fix and restart without taking the risk
+      to lose data.
+    </p>
+
+    <h5>Rsync</h5>
+    <p>
+      The backup made by <i>rsync</i> is just a copy of the save files, removing a file from the backup
+      is as simple as calling <code>rm</code> on that file in the repository that is considered the backup.
+    </p>
+    <p>
+      While adding a new file in the backup can be done by using <i>rsync</i> as usual including the directory
+      tree where this file resides.
+    </p>
+
+    <h5>Tar</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# tar -czf backup.tar.gz /usr/bin
+	tar: Removing leading `/' from member names
+	tar: Removing leading `/' from hard link targets
+	terre:/mnt/memdisk# tar -tvf backup.tar.gz | grep emacs-gtk
+	-rwxr-xr-x root/root    39926024 2019-09-05 04:35 usr/bin/emacs-gtk
+	terre:/mnt/memdisk# tar -tvf backup.tar.gz | grep emacs-gtk
+	-rwxr-xr-x root/root    39926024 2019-09-05 04:35 usr/bin/emacs-gtk
+	terre:/mnt/memdisk# tar --delete usr/bin/emacs-gtk -f backup.tar.gz
+	<e>tar: Cannot update compressed archives</e>
+	tar: Error is not recoverable: exiting now
+	terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      Well, <i>tar</i> cannot manipulate compressed archives. What the point then to remove a
+      file from a backup if storage space is not an issue, else compression would be used?
+    </p>
+
+    <h4>stdin/stdout backup read/write</h4>
+
+    <h5>Dar</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# dar -c - -z6 -R SRC &gt; backup.file
+
+
+	--------------------------------------------
+	2594 inode(s) saved
+	including 5 hard link(s) treated
+	0 inode(s) changed at the moment of the backup and could not be saved properly
+	0 byte(s) have been wasted in the archive to resave changing files
+	0 inode(s) with only metadata changed
+	0 inode(s) not saved (no inode/file change)
+	0 inode(s) failed to be saved (filesystem error)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) recorded as deleted from reference backup
+	--------------------------------------------
+	Total number of inode(s) considered: 2594
+	--------------------------------------------
+	EA saved for 3 inode(s)
+	FSA saved for 0 inode(s)
+	--------------------------------------------
+	terre:/mnt/memdisk# rm -rf DST
+	terre:/mnt/memdisk# mkdir DST
+	terre:/mnt/memdisk# dar -x - --sequential-read -R DST &lt; backup.file
+
+
+	--------------------------------------------
+	2594 inode(s) restored
+	including 5 hard link(s)
+	0 inode(s) not restored (not saved in archive)
+	0 inode(s) not restored (overwriting policy decision)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) failed to restore (filesystem error)
+	0 inode(s) deleted
+	--------------------------------------------
+	Total number of inode(s) considered: 2594
+	--------------------------------------------
+	EA restored for 3 inode(s)
+	FSA restored for 0 inode(s)
+	--------------------------------------------
+	terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      <i>dar</i> can read a backup from stdin and write a backup to stdout.
+    </p>
+
+    <h5>Rsync</h5>
+    <p>
+      Using stdin/stdout to send to or read from backed up data does not seems possible with <i>rsync</i>
+    </p>
+
+    <h5>Tar</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# tar -czf - SRC &gt; backup.file
+	terre:/mnt/memdisk# mkdir DST
+	terre:/mnt/memdisk# cd DST
+	terre:/mnt/memdisk/DST# tar -xzf - &lt; ../backup.file
+	terre:/mnt/memdisk/DST#
+    </code></div>
+
+    <p>
+      <i>tar</i> can read a backup from stdin and write a backup to stdout.
+    </p>
+
+    <h4>Remote network storage</h4>
+
+    <p>
+      The remote network feature is the ability to make a backup or a restoration without
+      using local storage to write to or read from that backup.
+    </p>
+    <div class=code><code>
+	terre:/mnt/memdisk# sftp denis@dar
+	The authenticity of host 'dar (192.168.6.32)' can't be established.
+	ECDSA key fingerprint is SHA256:Mit90Q6wKU/1HcvTiGNqEUP6pWDJzUJ/qS4iy2Yy6+0.
+	Are you sure you want to continue connecting (yes/no)? yes
+	Warning: Permanently added 'dar,192.168.6.32' (ECDSA) to the list of known hosts.
+	denis@dar's password:
+	Connected to denis@dar.
+	sftp> bye
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <h5>Dar</h5>
+    <div class=code><code>
+
+
+    </code></div>
+
+    <h5>Rsync</h5>
+    <div class=code><code>
+    </code></div>
+
+    <h5>Tar</h5>
+    <div class=code><code>
+    </code></div>
+
+    <h3>Backup Robustness</h3>
+
+
+    <h5>Dar</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# dar -c backup -R SRC -z6
+
+
+	--------------------------------------------
+	74725 inode(s) saved
+	including 0 hard link(s) treated
+	0 inode(s) changed at the moment of the backup and could not be saved properly
+	0 byte(s) have been wasted in the archive to resave changing files
+	0 inode(s) with only metadata changed
+	0 inode(s) not saved (no inode/file change)
+	0 inode(s) failed to be saved (filesystem error)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) recorded as deleted from reference backup
+	--------------------------------------------
+	Total number of inode(s) considered: 74725
+	--------------------------------------------
+	EA saved for 0 inode(s)
+	FSA saved for 0 inode(s)
+	--------------------------------------------
+	terre:/mnt/memdisk# ls -al backup*
+	-rw-r--r-- 1 root root 219088536 Nov 17 17:45 backup.1.dar
+	terre:/mnt/memdisk# ./hide_change backup.1.dar 1
+	terre:/mnt/memdisk# mkdir DST
+	terre:/mnt/memdisk# dar -x backup -R DST
+	backup.1.dar is not a valid file (wrong magic number), please provide the good file. [return = YES | Esc = NO]
+	Escaping...
+	Final memory cleanup...
+	Aborting program. User refused to continue while asking: backup.1.dar is not a valid file (wrong magic number), please provide the good file.
+	terre:/mnt/memdisk# dar -x backup -R DST <e>-alax</e>
+	LAX MODE: In spite of its name, backup.1.dar does not appear to be a dar slice, assuming a data corruption took place and continuing
+	LAX MODE: Archive is flagged as having escape sequence (which is normal in recent archive versions). However if this is not expected, shall I assume a data corruption occurred in this field and that this flag should be ignored? (If unsure, refuse) [return = YES | Esc = NO]
+	Escaping...
+
+
+	--------------------------------------------
+	74725 inode(s) restored
+	including 0 hard link(s)
+	0 inode(s) not restored (not saved in archive)
+	0 inode(s) not restored (overwriting policy decision)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) failed to restore (filesystem error)
+	0 inode(s) deleted
+	--------------------------------------------
+	Total number of inode(s) considered: 74725
+	--------------------------------------------
+	EA restored for 0 inode(s)
+	FSA restored for 0 inode(s)
+	--------------------------------------------
+	terre:/mnt/memdisk# diff -r SRC DST
+	terre:/mnt/memdisk# echo $?
+	0
+	terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      modifying the first bit <i>dar/</i> has seen the corruption. We need the lax mode (<code>-alax</code> option) to bypass this
+      corruption, but then the restoration proceeds normally. We can try a bit further for example somewhere in the middle of the archive,
+      thus at offset 876354144 (half of the size expressed in bit, not byte):
+    </p>
+    <div class=code><code>
+	terre:/mnt/memdisk# ls -l backup*
+	-rw-r--r-- 1 root  root   219088536 Nov 17 17:45 backup.1.dar
+	terre:/mnt/memdisk# hide_change backup.1.dar 876354144
+	terre:/mnt/memdisk# rm -rf DST
+	terre:/mnt/memdisk# mkdir DST
+	terre:/mnt/memdisk# dar -x backup -R DST
+	<e>Error while restoring /mnt/memdisk/DST/linux-5.9.8/drivers/mtd/spi-nor/core.c : compressed data CRC error</e>
+
+
+	--------------------------------------------
+	74724 inode(s) restored
+	including 0 hard link(s)
+	0 inode(s) not restored (not saved in archive)
+	0 inode(s) not restored (overwriting policy decision)
+	0 inode(s) ignored (excluded by filters)
+	<e>1</e> inode(s) failed to restore (filesystem error)
+	0 inode(s) deleted
+	--------------------------------------------
+	Total number of inode(s) considered: 74725
+	--------------------------------------------
+	EA restored for 0 inode(s)
+	FSA restored for 0 inode(s)
+	--------------------------------------------
+	Final memory cleanup...
+	All files asked could not be restored
+	terre:/mnt/memdisk# diff -rq SRC DST
+	<e>Files SRC/linux-5.9.8/drivers/mtd/spi-nor/core.c and DST/linux-5.9.8/drivers/mtd/spi-nor/core.c differ</e>
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      One file could not be restored properly as reported by dar, but all other files could be and are identical to its respective
+      original. Let's modifying the last bit for completness:
+    </p>
+
+    <div class=code><code>
+	terre:/mnt/memdisk# ls -al *.dar
+	-rw-r--r-- 1 root root 219088537 Nov 17 17:45 backup.1.dar
+	terre:/mnt/memdisk# cp backup.1.dar backop.1.dar
+	terre:/mnt/memdisk# hide_change backup.1.dar 1752708287
+	terre:/mnt/memdisk# ls -al *.dar
+	-rw-r--r-- 1 root root 219088536 Nov 17 17:58 backop.1.dar
+	-rw-r--r-- 1 root root 219088536 Nov 17 17:58 backup.1.dar
+	terre:/mnt/memdisk# diff backup.1.dar backop.1.dar
+	Binary files backup.1.dar and backop.1.dar differ
+	terre:/mnt/memdisk# rm -rf DST
+	terre:/mnt/memdisk# mkdir DST
+	terre:/mnt/memdisk# dar -x backup -R DST
+
+
+	--------------------------------------------
+	74725 inode(s) restored
+	including 0 hard link(s)
+	0 inode(s) not restored (not saved in archive)
+	0 inode(s) not restored (overwriting policy decision)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) failed to restore (filesystem error)
+	0 inode(s) deleted
+	--------------------------------------------
+	Total number of inode(s) considered: 74725
+	--------------------------------------------
+	EA restored for 0 inode(s)
+	FSA restored for 0 inode(s)
+	--------------------------------------------
+	terre:/mnt/memdisk#
+	terre:/mnt/memdisk# diff -rq SRC DST
+	terre:/mnt/memdisk# echo $?
+	0
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <h5>Rsync</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# rm -rf DST
+	terre:/mnt/memdisk# rsync -arHAXS SRC/* DST
+	terre:/mnt/memdisk# ls -al DST
+	total 0
+	drwxr-xr-x  3 root root  60 Nov 17 18:07 .
+	drwxrwxrwt  4 root root 140 Nov 17 18:07 ..
+	drwxrwxr-x 24 root root 740 Nov 10 21:16 linux-5.9.8
+	terre:/mnt/memdisk# diff -rq SRC DST
+	terre:/mnt/memdisk# ./hide_change DST/linux-5.9.8/README 10
+	terre:/mnt/memdisk# diff -rq SRC DST
+	Files SRC/linux-5.9.8/README and DST/linux-5.9.8/README differ
+	terre:/mnt/memdisk# rsync -arvHAXS SRC/* DST
+	sending incremental file list
+
+	sent 1,254,054 bytes  received 5,215 bytes  839,512.67 bytes/sec
+	total size is 954,980,692  speedup is 758.36
+	terre:/mnt/memdisk# diff -rq SRC DST
+	<e>Files SRC/linux-5.9.8/README and DST/linux-5.9.8/README differ</e>
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      modifying the backup (the directory we sync with), <i>rsync</i> does not
+      report any difference and the backup stay corrupted.
+    </p>
+
+    <h5>Tar</h5>
+    <div class=code><code>
+	terre:/mnt/memdisk# rm -rf DST
+	terre:/mnt/memdisk# tar -czf backup.tar.gz SRC
+	terre:/mnt/memdisk# ls -l backup*
+	-rw-r--r-- 1 root root 183659664 Nov 17 18:11 backup.tar.gz
+	terre:/mnt/memdisk# ./hide_change backup.tar.gz 1
+	terre:/mnt/memdisk# mkdir DST
+	terre:/mnt/memdisk# cd DST
+	terre:/mnt/memdisk/DST# tar -xzf ../backup.tar.gz
+
+	gzip: stdin: not in gzip format
+	tar: Child returned status 1
+	<e class=red>tar: Error is not recoverable: exiting now</e>
+	terre:/mnt/memdisk/DST#
+	terre:/mnt/memdisk/DST# find . -ls
+	1720964      0 drwxr-xr-x   2 root     root           40 Nov 17 18:56 .
+	terre:/mnt/memdisk/DST#
+    </code></div>
+
+    <p>
+      Modifying the first bit leads to a completely unusable backup. Nothing got restored at all.
+      Let's see what going on when modifying a single bit in the middle of the backup:
+    </p>
+
+    <div class=code><code>
+	terre:/mnt/memdisk# ls -l backup*
+	-rw-r--r-- 1 root root 183659664 Nov 17 18:11 backup.tar.gz
+	terre:/mnt/memdisk# ./hide_change backup.tar.gz 734638656
+	terre:/mnt/memdisk# cd DST
+	terre:/mnt/memdisk/DST# tar -xf ../backup.tar.gz
+	tar: Skipping to next header
+
+	gzip: stdin: invalid compressed data--crc error
+
+	gzip: stdin: invalid compressed data--length error
+	tar: Child returned status 1
+	tar: Error is not recoverable: exiting now
+	terre:/mnt/memdisk/DST#
+	terre:/mnt/memdisk/DST# diff -rq ../SRC SRC | wc -l
+	diff: SRC/linux-5.9.8/scripts/dtc/include-prefixes/arc: No such file or directory
+	diff: SRC/linux-5.9.8/scripts/dtc/include-prefixes/arm: No such file or directory
+	diff: SRC/linux-5.9.8/scripts/dtc/include-prefixes/arm64: No such file or directory
+	diff: SRC/linux-5.9.8/scripts/dtc/include-prefixes/c6x: No such file or directory
+	diff: SRC/linux-5.9.8/scripts/dtc/include-prefixes/h8300: No such file or directory
+	diff: SRC/linux-5.9.8/scripts/dtc/include-prefixes/microblaze: No such file or directory
+	diff: SRC/linux-5.9.8/scripts/dtc/include-prefixes/mips: No such file or directory
+	diff: SRC/linux-5.9.8/scripts/dtc/include-prefixes/nios2: No such file or directory
+	diff: SRC/linux-5.9.8/scripts/dtc/include-prefixes/openrisc: No such file or directory
+	diff: SRC/linux-5.9.8/scripts/dtc/include-prefixes/powerpc: No such file or directory
+	diff: SRC/linux-5.9.8/scripts/dtc/include-prefixes/sh: No such file or directory
+	diff: SRC/linux-5.9.8/scripts/dtc/include-prefixes/xtensa: No such file or directory
+	diff: SRC/linux-5.9.8/tools/testing/selftests/powerpc/copyloops/copy_mc_64.S: No such file or directory
+	diff: SRC/linux-5.9.8/tools/testing/selftests/powerpc/copyloops/copyuser_64.S: No such file or directory
+	diff: SRC/linux-5.9.8/tools/testing/selftests/powerpc/copyloops/copyuser_power7.S: No such file or directory
+	diff: SRC/linux-5.9.8/tools/testing/selftests/powerpc/copyloops/memcpy_64.S: No such file or directory
+	diff: SRC/linux-5.9.8/tools/testing/selftests/powerpc/copyloops/memcpy_power7.S: No such file or directory
+	diff: SRC/linux-5.9.8/tools/testing/selftests/powerpc/nx-gzip/include/vas-api.h: No such file or directory
+	diff: SRC/linux-5.9.8/tools/testing/selftests/powerpc/primitives/asm/asm-compat.h: No such file or directory
+	diff: SRC/linux-5.9.8/tools/testing/selftests/powerpc/primitives/asm/asm-const.h: No such file or directory
+	diff: SRC/linux-5.9.8/tools/testing/selftests/powerpc/primitives/asm/feature-fixups.h: No such file or directory
+	diff: SRC/linux-5.9.8/tools/testing/selftests/powerpc/primitives/asm/ppc_asm.h: No such file or directory
+	diff: SRC/linux-5.9.8/tools/testing/selftests/powerpc/primitives/word-at-a-time.h: No such file or directory
+	diff: SRC/linux-5.9.8/tools/testing/selftests/powerpc/stringloops/memcmp_32.S: No such file or directory
+	diff: SRC/linux-5.9.8/tools/testing/selftests/powerpc/stringloops/memcmp_64.S: No such file or directory
+	diff: SRC/linux-5.9.8/tools/testing/selftests/powerpc/stringloops/strlen_32.S: No such file or directory
+	diff: SRC/linux-5.9.8/tools/testing/selftests/powerpc/vphn/asm/lppaca.h: No such file or directory
+	diff: SRC/linux-5.9.8/tools/testing/selftests/powerpc/vphn/vphn.c: No such file or directory
+	<e>150</e>
+	terre:/mnt/memdisk/DST# find ../SRC | wc -l
+	<e class=blue>74726</e>
+	terre:/mnt/memdisk/DST# find SRC | wc -l
+	<e class=red>32615</e>
+	terre:/mnt/memdisk/DST#
+    </code></div>
+    <p>
+      Only 32615 files on the 74726 that were saved could be restored. Assuming the problem is due to
+      the fact the backup is compressed, let's see tar without compression:
+    </p>
+
+    <div class=code><code>
+	terre:/mnt/memdisk# tar -cf backup.tar SRC
+	terre:/mnt/memdisk# ls -l backup*
+	-rw-r--r-- 1 root root 1011312640 Nov 17 19:28 backup.tar
+	terre:/mnt/memdisk# ./hide_change backup.tar 1
+	terre:/mnt/memdisk# rm -rf DST
+	terre:/mnt/memdisk# mkdir DST
+	terre:/mnt/memdisk# cd DST
+	terre:/mnt/memdisk/DST# tar -xf ../backup.tar
+	tar: This does not look like a tar archive
+	<e>tar: Skipping to next header</e>
+	tar: Exiting with failure status due to previous errors
+	terre:/mnt/memdisk/DST# diff -rq ../SRC SRC
+	terre:/mnt/memdisk/DST# echo $?
+	0
+	terre:/mnt/memdisk/DST#
+    </code></div>
+    <p>
+      without compression, a <i>tar</i> backup is much more reliable, however we now need more than 5 times
+      storage space to hold the backup. Let's see what happens when we modify a single bit in the midle of the backup:
+    </p>
+
+    <div class=code><code>
+	terre:/mnt/memdisk# ./hide_change backup.tar 4045250560
+	terre:/mnt/memdisk# rm -rf DST
+	mterre:/mnt/memdisk# mkdir DST
+	terre:/mnt/memdisk# cd DST
+	terre:/mnt/memdisk/DST# tar -xf ../backup.tar
+	terre:/mnt/memdisk/DST#
+	terre:/mnt/memdisk/DST# diff -rq ../SRC SRC
+	Files ../SRC/linux-5.9.8/drivers/media/pci/bt8xx/bttv-cards.c and SRC/linux-5.9.8/drivers/media/pci/bt8xx/bttv-cards.c differ
+	terre:/mnt/memdisk/DST#
+    </code></div>
+
+    <p>
+      the backup restoration suceeded according to <i>tar</i> but the corruption has been completely ignored. The result
+      is both a corrupted backup and a corrupted restored data
+    </p>
+
     <h3>Execution Performance</h3>
 
     <p>
@@ -1364,7 +4365,8 @@
       one to backup rich metadata like Exended Attributes, ACL, ...) we will provide measures for
       <i>dar</i> in <u>normal mode</u> and in <u>fast mode</u>. In this later mode, the inlined metadata
       redundancy and the sparse file detection are disabled to have a similar features set as
-      <i>rsync</i> and closer to <i>tar</i> feature level.
+      <i>rsync</i>, <i>tar</i> will still be a level below regarding feature set, but we assume
+      this impact to be be negligible.
     </p>
 
     <h4>Performance test on an debian iso file</h4>
@@ -1580,14 +4582,6 @@
       <li>131.04 seconds for combined backup-restoration</li>
       <li>compression used does not result in any gain in disk space</li>
     </ul>
-    <p>
-      <u>In conclusion</u> for this part, we have similar execution time, and similar compression
-      ratio for all. <i>rsync</i> is slightly faster than <i>dar</i> when this one is used in fast mode,
-      and <i>tar</i> is slightly faster than dar when this one is used in normal mode (but without
-      taking care of rich metadata and sparse files). For remote copy over a slow network,
-      <i>rsync</i> seems the best choice, while for storage of compressed backup
-      <i>dar</i> is the best choice in all cases.
-    </p>
 
     <h5>Full backup and restoration with compression using multiple threads</h5>
 
@@ -1625,8 +4619,7 @@
       The HPE server I had the chance to access to do these performance tests on
       (a <i>ProLiant XL230a Gen9</i>
       running two <i>Intel(R) Xeon(R) CPU E5-2690 v3 @ 2.60GHz</i> processors)
-      has a lot of cores, so I could test multi-threading with 16 and even 24 worker and
-      threads:
+      has a lot of cores, so I could test multi-threading with 16 and even 24 threads:
     </p>
 
     <div class=code><code>
@@ -1645,7 +4638,11 @@
 	devuan | /mnt/memdisk >
     </code></div>
     <p>
-      The time gain rawly follows by the number of thread, the process overhead is thus very
+      With 16 threads backup+restoration took 20,97 seconds and 13,94 seconds
+      in <u>fast mode</u>
+    </p>
+    <p>
+      The time gain is rawly the number of thread, the process overhead is thus very
       little. However when sparse file detection is active the backup execution time took
       11,59 seconds instead of the 9 expected ones: Thanks to parallelization the compression
       cost start to become negligible compared to the sparse file detection operation (which is
@@ -1670,14 +4667,10 @@
 	devuan | /mnt/memdisk >
     </code></div>
     <p>
-      <u>In conclusion</u> for this test, if compression ratio <b>and</b> and execution time is
-      the target,
-      <i>dar</i> provides the best solution: it is the only one in between the software tested
-      that seem able to leverage multicore processor, which are very common today. This is true
-      in particular
-      when there is a good portion of big files, because small files compression cannot leveral
-      multi-thread (compression block size used here is 1 MiB, reducing it will degrade overall
-      compression ratio).
+      With 24 threads, the compressed backup+restoration took 22.05 s and 11.48 s
+      in <u>fast mode</u>. This is yet better in <u>fast mode</u> but not in
+      normal mode where the sparse file detection algorithm becomes the
+      execution bottleneck (compression has became faster than sparse file detection)
     </p>
 
     <h4>Performance test on linux kernel pristine source code tree</h4>
@@ -1694,8 +4687,9 @@
 	devuan:/mnt/memdisk/SRC# cd ..
 	devuan:/mnt/memdisk# du -B1 -s SRC
 	<e>1121144832</e>      SRC
+	devuan:/mnt/memdisk# find SRC | wc -l
+	<e>74725</e>
 	devuan:/mnt/memdisk#
-
     </code></div>
 
     <h5>Full backup and restoration without compression</h5>
@@ -1886,10 +4880,10 @@
       </li>
     </ul>
 
-    <h4>Differential backup and restoration</h4>
+    <a name="diffbackup"></a><h4>Differential backup and restoration</h4>
 
     <p>
-      Three even can lead to requiring a new backup:
+      Three events can lead to requiring a new backup:
     </p>
     <ul>
       <li>new file has been added</li>
@@ -1904,9 +4898,9 @@
     <p>
       We will also use compression as it makes sense for relatively long term
       backup (short term backup are destroyed thus differential backup does not
-      makes sense in that context, we should thus discard <i>rsync</i> from this
-      test as it does not store saved data compressed. We will keep it in the
-      test for reference).
+      makes sense in that context), we should thus discard <i>rsync</i> from this
+      test as it does not store saved data compressed, but we will keep it
+      for reference of execution time (not of backup compression ratio).
     </p>
 
     <h5>Modified file</h5>
@@ -2010,28 +5004,21 @@
       <li>130.62 seconds for full backup+restoration</li>
       <li>140.11 seconds for differential backup+restoration</li>
       <li>4.3 GiB for the full backup (compression ratio 0%)</li>
-      <li>0 GiB for the differential backup (it has replaced the full backup)</li>
+      <li>
+	4.3 GiB for the differential backup (it has replaced the full backup, we can assume
+	a copy has been done locally to keep the original repository unchanged beside this
+	differential backup
+	</li>
     </ul>
 
-    <p>
-      <u>In conclusion:</u> The storage requirement for <i>rsync</i> and <i>dar</i> is the best,
-      with the advantage for <i>dar</i> to provide backup history, or the ability to restore a
-      file that has been removed by mistake even long ago, or a whole system in a previous state. But
-      in term of execution time,
-      <i>dar</i> is the slowest of all for the full backup, but the fastest and far before the others
-      for any further differential backup. Thus, unless you make just a single incremental or
-      differential backup after each full backup, <i>dar</i> surpasses both <i>tar</i>
-      and <i>rsync</i> in both storage requirement, network usage, transfer time and
-      execution time.
-    </p>
 
     <h5>Added and removed files</h5>
 
     <p>
       The test here is to make a full backup of the linux source tree, then
       rename the <i>Documentation</i> directory as <i>doc</i> and make a
-      differential backup on it. Renaming moves files, but for most software
-      this is the removal of a directory and the creation of a new one.
+      differential backup off the whole. Renaming files is expected to do the same
+      as removing some and adding new ones.
     </p>
     <div class=code><code>
 	devuan:/mnt/memdisk# du -B1 -s SRC
@@ -2071,23 +5058,28 @@
     <p>
       Above we did a full backup without <i>--delta sig</i> because
       it does not worth calculating delta signature for each file as these
-      are a lot of small files. But just for checking, we did a second backup
-      <i>full2</i> with delta signatures. The execution is slightly longer
-      (5 % more) and the resulting backup is 2.7 % larger, which does not
-      make a big difference. We also checked the <u>fast mode</u> which brings
-      a slight better performance.
+      are a lot of small files, we could also make use of <i>--delta-sig-min-size</i> option
+      to define the starting size at which delta signature would be computed, this
+      would have lead to the same result.
+      But just for checking, we did a second backup
+      <i>full2</i> with delta signatures (26 seconds instead of 24: 5 % execution
+      time, with a resulting backup is 2.7 % larger.
+      For reference we measured normal and <u>fast mode</u>, the later being retained
+      for comparison for its equivalent feature set as provided by <i>rsync</i> and
+      <i>tar</i>.
     </p>
+    <p>
       for <i>dar</i> the operation took:
     </p>
     <ul>
-      <li>24.98 seconds for full backup (22,87 in <u>fast mode</u>)</li>
-      <li>3.53 seconds for differential backup (3,21 in <u>fast mode</u>)</li>
-      <li>208 MiB for the full backup (202 MiB in <u>fast mode</u>)</li>
-      <li>17.03 MiB for the differential backup (11,6 MiB in <u>fast mode</u>)</li>
-      <li>6.16 seconds to restore the full backup (6.98 in <u>fast mode</u>)</li>
-      <li>2.06 second to restore the differential backup (1.97 in <u>fast mode</u>)</li>
-      <li>making a total of 31,14 seconds for the full backup+restoration (29,85 in <u>fast mode</u>)</li>
-      <li>and a total of 5,59 seconds for the differential backup+restoration (5,18 in <u>fast mode</u>)</li>
+      <li>22.87 seconds for full backup (24.98 in normal mode)</li>
+      <li>3.21 seconds for differential backup (3.53 in normal mode)</li>
+      <li>202 MiB for the full backup (209 MiB in normal)</li>
+      <li>11.6 MiB for the differential backup (17.03 MiB in normal mode)</li>
+      <li>9.98 seconds to restore the full backup (6.16 in normal mode)</li>
+      <li>1,97 second to restore the differential backup (2.06 in normal mode)</li>
+      <li>making a total of 32,85 seconds for the full backup+restoration (42.01 in normal mode)</li>
+      <li>and 5,18 seconds for the differential backup+restoration (5,59 in normal mode)</li>
     </ul>
     <br/>
     <div class=code><code>
@@ -2150,18 +5142,166 @@
       <li>2,86 seconds for the differential backup+restoration</li>
       <li>1069 MiB for the backup size (no compression)</li>
     </ul>
+
+    <h4>Ciphering performance</h4>
+
     <p>
-      <u>In conclusion</u> For backup operation <i>dar</i> is faster that <i>tar</i> but provides
-      less good compression ratio: compression is performed per file, not globally, which let <i>dar</i>
-      recover any file passed a corrupted one, and allow quick restoration of a single file among a
-      larged compressed file, this is the cost of the robustness compared to <i>tar</i>.
-      But overall, <i>tar</i> is not much faster than <i>dar</i> to justify a non exhaustive backup (rich
-      metadata and sparse are ignored by <i>tar</i>). If backup history is expected <i>dar</i> is a good
-      choice, else <i>rsync</i> is better adapted.
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
+      We evaluate here ciphering and deciphering performance. To compare on the same base we use the following
+      parameters:
+      <ul>
+	<li>AES-256 algorithm with CBC mode</li>
+	<li>pkcs5 v2 (pbkdf2) key derivation function (KDF) algorithm</li>
+	<li>KDF with 100,000 iterations</li>
+	<li>salt</li>
+	<li>password provided on command-line (insecure) to not depend on user or disk access</li>
+	<li>local system to backup and backup repository on a tmpfs filesystem</li>
+	<li>swap has been disabled to avoid tmpfs latency in case it would have been swapped out</li>
+      </ul>
+
+      To measure the ciphering time only, we will not use compression, though most of the time compression
+      should be used due to the use case encryption matches: relatively long time storage and/or costing
+      cloud space and network transfer time or limited removable media storage.
+    </p>
+    <p>
+      The content that will be backed up is a copy of <code> /usr</code> directory tree. We will measure:
+      <ul>
+	<li>the time to backup</li>
+	<li>the time to restore the whole backup</li>
+	<li>and the time to restore just the "diff" binary</li>
+      </ul>
+    </p>
+
+    <div class=code><code>
+	devuan:/mnt/memdisk# mkdir SRC
+	devuan:/mnt/memdisk# cp --preserve -r /usr SRC
+	devuan:/mnt/memdisk# time dar -c backup -K "aes256:hello world!" --kdf-param 100000:sha1 -R SRC -q -at -1 0
+	9.213u 3.245s <e>0:05.38</e> 231.4%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# mkdir DST
+	devuan:/mnt/memdisk# time dar -x backup -K "hello world!" -R DST -q
+	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
+	4.481u 2.628s <e>0:03.75</e> 189.3%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# rm -rf DST/usr
+	evuan:/mnt/memdisk# time dar -x backup -K "hello world!" -R DST -q -g usr/bin/diff
+	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
+	0.419u 0.025s <e>0:00.42</e> 102.3%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk#
+    </code></div>
+    <p>
+      For <i>dar</i> the operation took:
+    </p>
+    <ul>
+      <li>5.38 seconds to backup with encryption</li>
+      <li>3.75 seconds to restore the whole ciphered backup</li>
+      <li>0.42 seconds to restore a single file from the ciphered backup</li>
+    </ul>
+    <p>
+      <i>dar</i> is twice quicker to uncipher than to cipher the whole archive, but restoring a particular file is quite immediate.
+      By default, <i>dar</i> uses argon2 for KDF, which is the most secure algorithm as of year 2020 to derive a key, but we had to
+      adapt to openssl used with <i>tar</i> that does not (yet) support this algorithm.
+    </p>
+    <p>
+      To avoid plain-text attack a variable length elastic buffer containing random data is encrypted with the rest of the backed up files
+      at the beginning and at the end of the backup, this has some performance penalties (time to generate and time to cipher/decipher).
+      This explains why two identical invocations of <i>dar</i> produce backups of different sizes and execution times:
+    </p>
+    <div class=code><code>
+	devuan:/mnt/memdisk# time dar -c backup -K "aes256:hello world!" -at -1 0 -R SRC -q -w
+	9.782u 3.413s <e>0:06.28</e> 210.0%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# la backup.1.dar
+	-rw-r--r-- 1 root root 1572<e>706497</e> Nov  9 14:50 backup.1.dar
+	devuan:/mnt/memdisk# time dar -c backup -K "aes256:hello world!" -at -1 0 -R SRC -q -w
+	9.173u 2.845s <e>0:05.50</e> 218.3%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# la backup.1.dar
+	-rw-r--r-- 1 root root 1572<e>655217</e> Nov  9 14:50 backup.1.dar
+	devuan:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      <i>rsync</i> has no way to store the backup ciphered. Testing directly <i>tar</i> now:
+    </p>
+    <p>
+      <i>tar</i> has not support for ciphering. Though it seems the some use openssl workaround
+      this restriction. To measure the execution time we have to create as script that pipes <i>tar</i>
+      and <i>openssl</i> so we can measure the execution time of this script as a whole. There is thus one
+      script for backup and one for the restoration of <i>tar</i>+<i>openssl</i>.
+    </p>
+    <div class=code><code>
+	devuan:/mnt/memdisk# cat > tar.backup
+	#!/bin/bash
+
+	if [ -z "$1" ] ; then
+	&nbsp;&nbsp;echo "usage: $0 &lt;backup name&gt; [ &ltfile or dir&gt; ]"
+	&nbsp;&nbsp;exit 1
+	fi
+
+	tar -cf - "$2" | openssl enc -e -aes256 -out "$1" -pbkdf2 -iter 100000 -salt -pass pass:"hello world!"
+	devuan:/mnt/memdisk#
+	devuan:/mnt/memdisk# chmod u+x tar.backup
+	devuan:/mnt/memdisk# cd SRC
+	devuan:/mnt/memdisk/SRC# time ../tar.backup ../backup.tar.crypted usr
+	3.954u 2.498s <e>0:04.69</e> 137.3%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk/SRC# cd ..
+	devuan:/mnt/memdisk# ls -l backup.tar.crypted
+	-rw-r--r-- 1 root root 1603594272 Nov  9 13:33 backup.tar.crypted
+	devuan:/mnt/memdisk#
+	devuan:/mnt/memdisk# cat > tar.restore
+	#!/bin/bash
+
+	if [ -z "$1" ] ; then
+	&nbsp;&nbsp;echo "usage: $0 &lt;tar.crypted file&gt; [&lt;file or dir&gt;]"
+	&nbsp;&nbsp;exit 1
+	fi
+
+	openssl enc -d -aes256 -in "$1" -pbkdf2 -iter 100000 -salt -pass pass:"hello world!" | tar -x "$2"
+	devuan:/mnt/memdisk# chmod u+x tar.restore
+	devuan:/mnt/memdisk# rm -rf DST
+	devuan:/mnt/memdisk# mkdir DST
+	devuan:/mnt/memdisk# cd DST
+	devuan:/mnt/memdisk/DST# time ../tar.restore ../backup.tar.crypted
+	1.807u 2.821s <e>0:02.70</e> 171.1%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk/DST#
+	devuan:/mnt/memdisk/DST# rm -rf usr
+	devuan:/mnt/memdisk/DST# time ../tar.restore ../backup.tar.crypted usr/bin/diff
+	1.336u 1.428s <e>0:01.79</e> 153.6%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk/DST# find
+	.
+	./usr
+	./usr/bin
+	./usr/bin/diff
+	devuan:/mnt/memdisk/DST#
+
+    </code></div>
+
+    <p>
+      For <i>tar</i> the operation took:
+    </p>
+    <ul>
+      <li>4.69 seconds for backup</li>
+      <li>2.70 seconds to restore the whole backup</li>
+      <li>1.79 seconds to restore a single file</li>
+    </ul>
+    <p>
+      <i>tar</i> as <i>dar</i> is also twice longer to cipher than to decipher, this seems to be related to the algorithm itself.
+      Though <i>tar</i> is a bit faster than <i>dar</i> but lacks protection against clear-text: the generated encrypted backup
+      have the exact same sizes at one byte precision, this means the blocks boundaries and tar file internal structure always
+      lay at the same file offset for a given content:
+    </p>
+    <div class=code><code>
+      devuan:/mnt/memdisk/SRC# time ../tar.backup ../backup.tar.crypted usr
+      4.112u 2.343s 0:04.72 136.6%    0+0k 0+0io 0pf+0w
+      devuan:/mnt/memdisk/SRC# ls -l ../bac
+      backup.1.dar        backup.tar.crypted
+      devuan:/mnt/memdisk/SRC# ls -l ../backup.tar.crypted
+      -rw-r--r-- 1 root root <e>1603594272</e> Nov  9 14:56 ../backup.tar.crypted
+      devuan:/mnt/memdisk/SRC# time ../tar.backup ../backup.tar.crypted usr
+      3.952u 2.564s 0:04.79 135.9%    0+0k 0+0io 0pf+0w
+      devuan:/mnt/memdisk/SRC# ls -l ../backup.tar.crypted
+      -rw-r--r-- 1 root root <e>1603594272</e> Nov  9 14:56 ../backup.tar.crypted
+      devuan:/mnt/memdisk/SRC#
+    </code></div>
+
+
+    <h2>Appendix 2 - Scripts used for testing</h2>
+
   </body>
 </html>
