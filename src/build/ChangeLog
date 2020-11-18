@@ -1,3 +1,7 @@
+from 2.6.13 to 2.6.14
+- script used to build dar windows binary have been fixed to have the
+  provided etc/darrc usable and used out of the box.
+
 from 2.6.12 to 2.6.13
 - fixed compilation warning in testing routine (outside libdar and dar)
 - due to change in autoconf, the --sysconfdir path (which defaults to
