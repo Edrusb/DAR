@@ -263,8 +263,8 @@ namespace libdar
 
 	if(buffer_offset + last < eof_offset)
 	{
-	    buffer_offset = eof_offset;
 	    clear_buffer();
+	    buffer_offset = eof_offset;
 	}
 	else
 	{
