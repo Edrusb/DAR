@@ -304,7 +304,10 @@ namespace libdar
 	    {
 	    case proto_ftp:
 	    case proto_sftp:
-		order = "DELE " + filename;
+		if(x_proto == proto_ftp)
+		    order = "DELE " + filename;
+		else
+		    order = "rm " + filename;
 		headers = curl_slist_append(headers, order.c_str());
 		err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_QUOTE, headers);
 		if(err != CURLE_OK)

@@ -41,6 +41,8 @@ from 2.6.x to 2.7.0
 from 2.6.13 to 2.6.14
 - script used to build dar windows binary have been fixed to have the
   provided etc/darrc usable and used out of the box.
+- fixed bug when met when removing slices of an old backup located on
+  a remote sftp server
 
 from 2.6.12 to 2.6.13
 - fixed compilation warning in testing routine (outside libdar and dar)
