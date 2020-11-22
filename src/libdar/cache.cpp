@@ -474,6 +474,8 @@ namespace libdar
 		    last = next;
 	    }
 	}
+	if(wrote > 0 && !eof_offset.is_zero())
+	    eof_offset = 0;
     }
 
     void cache::inherited_truncate(const infinint & pos)

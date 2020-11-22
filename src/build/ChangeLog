@@ -43,6 +43,8 @@ from 2.6.13 to 2.6.14
   provided etc/darrc usable and used out of the box.
 - fixed bug when met when removing slices of an old backup located on
   a remote sftp server
+- fixed bug in cache layer met when writing sliced backup to a remote
+ftp or sftp repository
 
 from 2.6.12 to 2.6.13
 - fixed compilation warning in testing routine (outside libdar and dar)
