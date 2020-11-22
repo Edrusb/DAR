@@ -523,6 +523,7 @@ namespace libdar
 	    else
 	    {
 		    // we always ignore read_ahead as no slave thread will exist for LEVEL1 layer
+		    // except for libcurl which can leverage it
 		tmp->ignore_read_ahead(!libcurl_repo);
 		stack.push(tmp, LIBDAR_STACK_LABEL_LEVEL1);
 		tmp = nullptr;
