@@ -65,17 +65,17 @@ div.gauge
     white-space: pre;
 }
 
-div.best
+.best
 {
     background-color: DarkGreen;
 }
 
-div.normal
+.normal
 {
     background-color: Blue;
 }
 
-div.ref
+.ref
 {
     background-color: #555555;
 }

@@ -14,22 +14,29 @@
     <p>
       This document has for objective to compare common backup tools under Unix
       (Linux, FreeBSD, MACOS X...), among the most commonly available today.
-      The <b>first target</b> we want to address is being able to restore a whole system
-      from a minimal environment without assistance of an already existing local server (disaster context).
-      The <b>second target</b> concerns the security of archived data, when time passes.
+      <ul>
+	<li>
+	  The <b>first target</b> we want to address is being able to backup and restore a whole system
+	  from a minimal environment without assistance of an already existing local server (disaster context).
+	</li>
+	<li>
+	  The <b>second target</b> is being able to securely keep for the long term an archived data. Securely here means having the ability to detect data corruption and limit its impact on the rest of the archive.
+	</li>
+      </ul>
+      Both targets may need compression and ciphering inside backup depending on the context (public cloud storage, removable media, ...), limited storage space.
     </p>
     <p>
       Backup softwares that requires servers already running
-      on the local network (<i>Bacula</i>, <i>Amanda</i>, <i>Bareos</i>, <i>UrBackup</i>, <i>Burp</i>...) cannot
-      adress our first target as you have first to reconstruct such server in
-      case of disaster in order to be able to use this type of software backup.
+      on the local network (For examples <i>Bacula</i>, <i>Amanda</i>, <i>Bareos</i>, <i>UrBackup</i>, <i>Burp</i>...) cannot
+      adress our first target as we would have first to reconstruct such server in
+      case of disaster (from what then?) in order be able to restore our system and its data.
     </p>
     <p>
       Partition cloning systems (<i>clonezilla</i>, <i>MondoRescue</i>, <i>RescueZilla</i>,
-      <i>partclone</i> and consorts) are targetted at block copy and as such cannot backup a live system:
-      you have to shutdown and boot on a CD/USB key or run in single user-mode in order to backup. This cannot
-      be automated and has a strongly impact on the user as she/he has to interrupt her/his work for the
-      backup operation to take place, wait for its completion and only then be able to use again the system.
+      <i>partclone</i>, <i>dump</i> and consorts) are targetted at block copy and as such cannot backup a live system:
+      you have to shutdown and boot on a CD/USB key or run in single user-mode in order to "backup". This cannot
+      be automated and has a strongly impact on the user as she/he has to interrupt her/his work during the whole
+      backup operation.
     <p>
       Looking at the remaining backup tools, with or without Graphical User Interface, most of them
       rely on one of the three backend softwares, <i>tar</i>, <i>rsync</i> and <i>dar</i>:
@@ -45,12 +52,12 @@
 
     <h2>Tests Famillies</h2>
     <p>
-      Several aspects are interesting to consider:
+      Several aspects need to consider:
     </p>
     <lu>
       <li><b>completness</b> of the restoration: file permissions, dates precision, hardlinks, file attributes, Extended Attributes, sparse files...</li>
-      <li><b>main features</b> around backup: differential backup, snapshot, deduplication, file's history...</li>
-      <li><b>robustness</b> of the backup: data corruption impact...</li>
+      <li><b>main features</b> around backup: differential backup, snapshot, deduplication, compression, encrytion, file's history...</li>
+      <li><b>robustness</b> of the backup: how data corruption impact the backup, how it is reported...</li>
       <li><b>execution performance</b>: execution time, memory consumption, multi-threading support...</li>
     </lu>
     <p>
@@ -60,7 +67,7 @@
     <p>
       Performance tests has been performed on an <a href="https://www.hpe.com">HPE</a> Proliant server
       (a <i>ProLiant XL230a Gen9</i> running two <i>Intel(R) Xeon(R) CPU E5-2690 v3 @ 2.60GHz</i> processors) running
-      a Devuan beowulf Linux system. Some features have been done in a <a href="https://www.proxmox.com/en/">Proxmox</a>
+      a Devuan beowulf Linux system and also on a <a href="https://www.proxmox.com/en/">Proxmox</a>
       Virtual Machine running a FreeBSD 12.1 on an <i>Intel Core i5-7400 (3 GHz)</i> based computer.
     </p>
 
@@ -155,133 +162,94 @@
       </tr>
     </table>
     <ul>
-      <li>(1) under MACoS X, FreeBSD and BSD systems. As of today (year 2020), Linux has not way to set the <i>btime</i> aka birthtime or creation time</li>
-      <li>(2) <i>tar</i> does even not save plain normal sockets</li>
+      <li>(1) "Yes" under MACoS X, FreeBSD and BSD systems. As of today (year 2020), Linux has no way to set the <i>btime</i> aka birthtime or yet creation time</li>
+      <li>(2) <i>tar</i> does even not save and restore plain normal sockets</li>
       <li>(3) <i>mtime</i> is saved by <i>tar</i> but with an accuracy of only 1 second, while today's systems provide nanosecond precision</li>
       <li>(4) need -A option</li>
       <li>(5) need -X option</li>
       <li>(6) need -S option</li>
     </ul>
     </p>
-    <h4>Sparse File impact</h4>
-    <p>
-      One could argue that sparse file is never used, this is wrong! <code>/var/log/lastlog</code>, <code>/var/log/faillog</code>
-      are two examples of sparse file that <b>any</b> Unix filesystem has. Depending on the installed applications, your system may
-      have virtually huge sparse files that would not be a good idea to save as plain file (you could fail restoring your data even onto a larger
-      disk).
-    </p>
-    <h4>Space optimization</h4>
-    <p>
-      What is the impact of space optimization at restoration time? Let's take an example with <code>/usr/bin</code> directory under Linux:
-    </p>
-    <div class=code><code>
-	<b>root@terre:/mnt/localdisk/Benchmark_tools# rm -rf DST</b>
-	<b>root@terre:/mnt/localdisk/Benchmark_tools# du -s /usr/bin</b>
-	<e>431132</e>  /usr/bin
-	<b>root@terre:/mnt/localdisk/Benchmark_tools# dar -c backup -R /usr/bin -q</b>
-	<b>root@terre:/mnt/localdisk/Benchmark_tools# mkdir DST</b>
-	<b>root@terre:/mnt/localdisk/Benchmark_tools# dar -x backup -R DST</b>
-
-
-	--------------------------------------------
-	2593 inode(s) restored
-	including 5 hard link(s)
-	0 inode(s) not restored (not saved in archive)
-	0 inode(s) not restored (overwriting policy decision)
-	0 inode(s) ignored (excluded by filters)
-	0 inode(s) failed to restore (filesystem error)
-	0 inode(s) deleted
-	--------------------------------------------
-	Total number of inode(s) considered: 2593
-	--------------------------------------------
-	EA restored for 3 inode(s)
-	FSA restored for 0 inode(s)
-	--------------------------------------------
-	<b>root@terre:/mnt/localdisk/Benchmark_tools# du -s DST</b>
-	<e>398144</e>  DST
-	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
-
-    </code></div>
-    <p>
-      Here, we get a disk space saving of <b>7.6 %</b>, this also means faster
-      file reading operation and better disk life preservation in the same ratio (less disk I/O),
-      and of course you get 7.6 % more disk space available to store some other data.
-    </p>
 
     <h3>Feature set</h3>
 
     <p>
-      Independently from the exhaustivity of data restoration (seen above), several Features are a
-      <i>must have</i>. You will find below their description and what they bring to a backup process
-      followed by a table of how they are supported on the software under test:
+      In addition to the exhaustivity of data restoration (seen above), several Features are a
+      <i>must have</i> when creating backups. Their description and what they bring to a backup process
+      is described below, followed by a table of how they are supported on the different ssoftware under test:
     </p>
 
     <dl>
       <dt>Historization</dt><dd>
-	It gives the ability to restore a deleted file even long after the mistake, thanks
-	to the possibility to rotate a backup set. Having associated tools
-	to quickly locate the backup where resided a particular file's version becomes important
-	when the history increases. Historization can be done with full backups, but can of course
-	leverage differential and incremental backups.
+	Historization is the ability to restore a deleted file even long after the mistake has been made by
+	rotating backups over an arbitrary large number of backup set. Having associated tools
+	to quickly locate the backup where resides a particular file's version becomes important
+	when the history increases. Historization can be done with only full backups, but of course better
+	leverages differential and incremental backups.
       </dd>
       <br/>
 
-      <dt>Define the data to backup</dt><dd>
+      <dt>Data filtering</dt><dd>
 	Not all files need to backup:
 	<ul>
 	  <li>
-	    some directories (like <code>/tmp, /proc, /sys, /dev, /home/*/.cache</code>) are useless to save
+	    some <b>directories</b> (like <code>/tmp, /proc, /sys, /dev, /home/*/.cache</code>) are useless to save
 	  </li>
 	  <li>
-	    you may want to ignore some files based on the name or part of their name --- their extension for
+	    some <b>files</b> based on their name or part of their name --- their extension for
 	    example, (like emacs's backup files <code>*~</code> or your music files<code>*.mp3</code> you already
-	    have archives somewhere, and so on).
+	    have archives somewhere, and so on) need not to be saved neither.
 	  </li>
 	  <li>
-	    You may wish to ignore files located one or more particular volume/disk/mounted filesystem, or the
-	    opposite, only consider certains volume/disk/mounted filesystem and ignore all others.
+	    You may wish to ignore files located one or more particular <b>mounted filesystem</b>, or at the
+	    opposite, only consider certains volume/disk/mounted filesystem and ignore all others, and have different
+	    backup rotation cycles for those.
 	  </li>
 	  <li>
-	    You may also find better to <i>tag</i> files one by one (manually by mean of an automated process of
+	    You may also find better to <b>tag</b> files one by one (manually by mean of an automated process of
 	    your own), to be excluded from or included in the backup
 	  </li>
 	  <li>
-	    Instead of tagging you could also let a process define a long list of file to backup and/or to ignore.
+	    Instead of tagging you could also let a process define a long <b>file listing</b> to backup and/or to ignore.
 	  </li>
 	  <li>
-	    But usually you may need a mix of several of these mechanisms at the same time
+	    Last, you may well need a mix of several of these mechanisms at the same time
 	  </li>
       </dd>
+      <br/>
+
       <dt>Slicing (or multi-volume)</dt><dd>
-	Having a backup split into several files of given max size is useful to either:
+	Having a backup split into several files of given max size can address several needs:
 	<ul>
 	  <li>hold the backup on several removal media (CD, DVD, USB keys...) smaller than the backup itself</li>
 	  <li>transfer the backup from a large space to another by mean of a smaller removable media</li>
 	  <li>transfer the backup over the network and recover at the last transmitted slice rather than restarting the whole
 	    transfer in case of network issue</li>
 	  <li>store the backup int the cloud where the provider limits the file size</li>
-	  <li>be able to restore a backup where the remaing expected free space after restoration will be very limited</li>
-	  <li>transfer back from the cloud only a few slices to restore some files, when cloud provider only provides a web based interface</li>
+	  <li>be able to restore a backup on a system where storage space cannot hold both the backup and the restored system</li>
+	  <li>transfer back from the cloud only a few slices to restore some files, when cloud provider does not provide adhoc protocols (sftp, ftp, ...) but only a user web based interface</li>
 	</ul>
-	Of course, this is interesting only if you don't have to concatenate all the slices to be able to have a usable backup, and
-	as seen above all identified use cases turn around limited storage space, thus compression will have to be possible when
-	multi-volume is used.
+	Of course, multi-volume is really interesting if you don't have to concatenate all the slices to be able to have a usable backup.
+	<br/>
+	<br/>
+	Last the previously identified use cases for backup slicing turn around limited storage space, thus having compression available when
+	multi-volume is used is a key point here.
       </dd>
       <br/>
 
       <dt>Symmetric strong encryption</dt><dd>
-	Symettric strong encryption is the ability to cipher a backup with a password or passphrase as key to decipher it. Some
-	well known algorithms in this area are AES, Blowfish, serpent...
+	Symmetric strong encryption is the ability to cipher a backup with a password or passphrase and use that same key to decipher it. Some
+	well known algorithms in this area are AES, blowfish, camellia...
 	<br/>
-	Symmetric strong encryption is interesting for the following reasons:
+	Symmetric strong encryption is interesting for the following cases:
 	<ul>
 	  <li>if your disk is ciphered, would you store your backup in clear on the cloud?</li>
-	  <li>you do not trust your cloud provider to not inspect your data in order to consolidate with it the marketing profile he has of yourself</li>
-	  <li>You want to prevent your patented data, industrial recipies from the competition eyes, or even some goverment agencies could clone your work without fear of being prosecuted</li>
-	  <li>Simply because in your country, you have the right and the freedom to have privacy</li>
+	  <li>you do not trust your cloud provider to not inspect your data and make marketing profile of yourself with it.</li>
+	  <li>You want to prevent your patented data or industrial secret recipies from falling into the competition's hands or goverment agencies that could clone it without fear of being prosecuted. This use case applies whether your backup is stored on local disk, removable media or public cloud.</li>
+	  <li>Simply because in your country, you have the right and the freedom to have privacy.</li>
 	  <li>Because your today democratic country could tomorrow verse into a dictatorship and based on some arbitrary criteria,
-	    belief, political opinion, sexual orientation... you could suffer from having this information being accessible
-	    to the authorities or even publicly released, while you still need backup and arbitrary backup storage.
+	    (belief, political opinion, sexual orientation...) you could suffer tomorrow from having this information having been accessible
+	    today to the authorities or even having been publicly released, while you still need backup using arbitrary storage medium.
 	  </li>
 	</ul>
       </dd>
@@ -290,17 +258,18 @@
       <dt>Asymmetric strong encryption</dt><dd>
 	Asymmetrical strong encryption is the ability to cipher a backup with a public key and having the corresponding private key for deciphering it (PGP, GnuPG...).
 	<br/>
-	Asymmetric encrypion is interesting when exchanging data over Internet, or for archiving data in the cloud. You can also use it
-	the same way as symmetrical encryption, with the point of attention
-	that the private key must be stored outside the backup itself. You can still protect the private key with a password or a passphrase
-	but this gives the same feature level as symmetrical encryption with more complexity and not much more security.
+	Asymmetric encrypion is mainly interesting when exchanging data over Internet between different persons, or eventually for archiving data in the public cloud.
+	Having it for backup seems not appropriate and is more complex than symmetric strong encryption, as restoration requires
+	the private key, which thus must be stored outside the backup itself still be protected from unauthorized access.
+	The private key use can still be protected with a password or a passphrase
+	but this gives the same feature level as symmetrical encryption with a more complex process and not much more security.
       </dd>
       <br/>
 
       <dt>Protection against plain-text attack</dt>
-      <dd>Ciphering data must be done with a minimum level of protection, in particular, when the ciphered data has well defined
+      <dd>Ciphering data must be done with a minimum level of security, in particular when the ciphered data has well defined
 	structure and patterns, like a backup file format is expected to have. Knowing such expected structure of the clear data
-	can lead to undisclose the whole ciphered data. This is known as <i>plain-text attack</i>.
+	may lead an attacker to undisclose the whole ciphered data. This is known as <i>plain-text attack</i>.
       </dd>
       <br/>
 
@@ -333,31 +302,32 @@
 	to rely on in the occurence of a deleted file by mistake, disk crash or disaster.
 	<br/>
 	At restoration time, if the file has been saved anyway, it should be good to know the such file was not saved properly, maybe
-	restoring a older version but a sane one would be better, thing the user cannot know if he is not informed at restoration time.
+	restoring a older version but a sane one would be better. Something the user/sysadmin cannot guess if the backup does not hold
+	such type of information.
       </dd>
       <br/>
 
       <dt>Multi-level backup</dt><dd>
-	Multi-level backup is the ability to make use of full backups, differential backups and/or eventually incremental backups.
+	Multi-level backup is the ability to make use of <b>full</b> backups, <b>differential</b> backups and/or eventually <b>incremental</b> backups.
 	<br/>
 	The advantage of differential and incremental backups compared to full ones is the much shorter time they require to complete
-	and the reduces storage space they imply.
+	and the reduces storage space and/or bandwidth they imply when transfered over the network.
       </dd>
       <br/>
 
       <dt>Binary delta</dt>
       <dd>Without binary delta, when performing a differential or incremental backup, if a file has changed since the previous
 	backup, it will be resaved entirely. Some huge files made by some well know applications (mailboxes for example) would consume
-	a lot of storage space and lead to long backup time even when performing incremental or differential backups. Binary delta is
-	the ability to only store of a file the part that changed since a reference state, this lead to important space gain and reduction
+	a lot of storage space and lead to a long backup time even when performing incremental or differential backups. Binary delta is
+	the ability to only store the part of a file that changed since a reference state, this lead to important space gain and reduction
 	of the backup duration.
       </dd>
       <br/>
 
       <dt>Detecting suspicious modifications</dt>
-      <dd>When performing backup based on a previous one (differential, incremental, decremental backups), it is possible
-	to check the way the metadata of files have changed. Some patterns are uncommon and may be the trace of a
-	rootkit, virus, ransomware trying to hide its presence and activity.
+      <dd>When performing a backup based on a previous one (differential, incremental, decremental backups), it is possible
+	to check the way the metadata of saved files have changed until then and warn the user when some uncommon pattens are met.
+	Those may be the trace of a rootkit, virus, ransomware or trojan, trying to hide its presence and activities.
       </dd>
       <br/>
 
@@ -367,10 +337,13 @@
 	<ul>
 	  <li>
 	    create an incremental or differential backup without having the full backup around
-	    or more generally the backup of reference. When backup are stored remotely, snapshot is a must.
+	    or more generally the backup of reference: When backup are stored remotely, snapshot is a must.
 	  </li>
 	  <li>
 	    compare the current living filesystem with a status it had at the time the snapshot was made
+	  </li>
+	  <li>
+	    bring some metadata redundancy and repairing mean to face a corrupted backup
 	  </li>
 	</ul>
       </dd>
@@ -378,16 +351,16 @@
 
       <dt>On-fly hashing</dt><dd>
 	On-fly hashing is the ability to generate a hashing of the backup at the same time it is generated and before it is written
-	to storage. Hash can be used to:
+	to storage. Such hash can be used to:
 	<ul>
-	  <li>validate a backup has been properly transfered to a public storage cloud</li>
-	  <li>if the backup is written to local disk, check that no data corruption has occured (doubt about disk or memory)</li>
+	  <li>validate a backup has been properly transfered to a public storage cloud having hash computation done in parallel</li>
+	  <li>check that no data corruption has occured (doubt about disk or memory) even when the backup is written to local disk</li>
 	</ul>
 	Hashing validation is usually faster than backup testing or backup comparison, though it does not validate your ability
 	to rely on the backup as deeply as these later operations. Hashing can be made after the backup has been completed but
-	it will need to re-read the whole backup and you will to wait for the necessary storage I/O for the operation to complete.
+	it will need to re-read the whole backup and you will have to wait for the necessary storage I/O for the operation to complete.
 	On-fly hashing should leverage the fact the data is in memory so it saves the corresponding disk I/O and corresponding
-	latency, thus it is much faster. As it is also done in memory it can help detect file corruption on the media
+	latency, thus it is much faster. As it is also done in memory it can help detect file corruption on the backup destination media
 	(like USB keys or poor quality hardware).
       </dd>
       <br/>
@@ -395,21 +368,20 @@
       <dt>Run custom command during operation</dt><dd>
 	For an automated backup process, it is often necessary to run commands before and after the backup operation itself.
 	But also during the backup process. For example, when entering a directory, one could need to run an arbitrary command
-	generating a file that will be included in the backup. Or while exiting such directory performing some cleanup operation in that directory.
-	Another aspect is when slicing the backup, the ability to perform after each slice generation an custom operation like uploading the
+	generating a file that will be included in the backup. Or while exiting such directory performing some cleanup operation in that same directory.
+	Another use case is found when slicing the backup, by the ability to perform after each slice generation a custom operation like uploading the
 	slice to cloud, burning to DVD-/+RW, loading a tape from a tape library...
       </dd>
       <br/>
 
       <dt>Dry-run execution</dt><dd>
 	When tuning a backup process, it is often necessary to verify quickly that all will work flawlessly without having
-	to wait for a backup to complete, consume storage resource and network bandwidth. Dry-run operation fakes the requested
-	operation but does not produce anything.
+	to wait for a backup to complete, consume storage resource and network bandwidth.
       </dd>
       <br/>
 
-      <dt>user message within backup</dt><dd>
-	allowing the user to add an arbitrary message within the backup may be useful when the filename is too small for
+      <dt>User message within backup</dt><dd>
+	Allowing the user to add an arbitrary message within the backup may be useful when the filename is too small
 	to hold the needed information (like the context the backup or archive was made, hint for the passphrase... and so on).
       </dd>
       <br/>
@@ -422,9 +394,8 @@
       </dd>
       <br/>
 
-      <dt>comparing with original data</dt><dd>
-	one step further than than the previous sanity testing, compairing file content and metadata with a life system
-	is a more complete alternative to backup validation.
+      <dt>Comparing with original data</dt><dd>
+	One step further for backup and archiving validation is compairing file content and metadata with the system it has.
       </dd>
       <br/>
 
@@ -435,11 +406,13 @@
       </dd>
       <br/>
 
-      <dt>Modify a backup content</dt><dd>
-	Once a backup has been completed, you might notice that you have saved extra files you ought not to save and could drop
-	from the backup to save some space. You might also need to add some extra files that were outside the backup scope. Of
-	course you could also drop the whole backup, modify parameters and restart the backup, but when the modification is little,
-	this may end costly in time and network bandwidth.
+      <dt>Modify the backup's content</dt><dd>
+	Once a backup has been completed, you might notice that you have saved extra files you ought not to save. Being able to drop
+	them from the backup to save some space without having to restart the whole backup may lead to a huge time saving.
+	<br/>
+	<br/>
+	You might also need to add some extra files that were outside the backup scope, having the possibility to add them
+	without restarting the whole backup process may also lead to a huge time saving.
       </dd>
       <br/>
 
@@ -451,9 +424,9 @@
 
       <dt>Remote network storage</dt><dd>
 	This is the ability to produce directly a backup to a network storage without using local disk, and to
-	be able to restore directly reading an backup from the such remote storage still without using local storage.
-	<i>Network/Remote storage</i> is to be understood as remote network storage like public cloud, private cloud
-	or at home a NAS, that are accesible from the network by mean of a file transfer protocols (scp, sftp, ftp,
+	be able to restore directly reading a backup from the such remote storage still without using local storage.
+	<i>Network/Remote storage</i> is to be understood as remote network storage like public cloud, private cloud,
+	personal NAS... that are accesible from the network by mean of a file transfer protocols (scp, sftp, ftp,
 	rcp, http, https...)
       </dd>
       <br/>
@@ -472,6 +445,36 @@
 	<td>Yes</td>
 	<td>-</td>
 	<td>Yes</td>
+      </tr>
+      <tr>
+	<th class=left>Data filtering by directory</th>
+	<td>Yes</td>
+	<td>Yes</td>
+	<td>Yes</td>
+      </tr>
+      <tr>
+	<th class=left>Data filtering by filename</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>-</td>
+      </tr>
+      <tr>
+	<th class=left>Data filtering by filesystem</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>-</td>
+      </tr>
+      <tr>
+	<th class=left>Data filtering by tag</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>?</td>
+      </tr>
+      <tr>
+	<th class=left>Data filtering by listing files</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>?</td>
       </tr>
       <tr>
 	<th class=left>Define the data to backup</th>
@@ -546,10 +549,22 @@
 	<td>-</td>
       </tr>
       <tr>
-	<th class=left>Snapshot</th>
+	<th class=left>Snapshot for diff/incr. backup</th>
 	<td>Yes</td>
 	<td>-</td>
 	<td>Yes</td>
+      </tr>
+      <tr>
+	<th class=left>Snapshot for comparing</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>Yes</td>
+      </tr>
+      <tr>
+	<th class=left>Snapshot for redundancy</th>
+	<td>Yes</td>
+	<td>-</td>
+	<td>-</td>
       </tr>
       <tr>
 	<th class=left>On-fly hashing</th>
@@ -594,7 +609,7 @@
 	<td>Yes</td>
       </tr>
       <tr>
-	<th class=left>Modify backup content</th>
+	<th class=left>Modify the backup's content</th>
 	<td>Yes</td>
 	<td>Yes</td>
 	<td>limited</td>
@@ -622,49 +637,43 @@
     <p>
       The objectif here is to see how a minor data corruption can impacts the backup. Such type of
       corruption (a single bit invertion) can be caused by network transfert, cosmic particle hitting
-      the memory bank, or simply due to the time passing for some type of media. Several point have been measured:
+      the memory bank, or simply due to the time passing for some type of media
     </p>
-
-    <ul>
-      <li>A - DOes the software detect a corruption in a backup</li>
-      <li>B - Does the software restore all other files that are not impacted by a corruption</li>
-      <li>C - Does the software avoid or warn when restoring a corrupted saved file</li>
-    </ul>
-
 
     <table class=center>
       <tr>
-	<th>Software</th>
-	<th>A</th>
-	<th>B</th>
-	<th>C</th>
+	<th>Behavior</th>
+	<th>Dar</th>
+	<th>Rsync</th>
+	<th>Tar</th>
+	<th>Tar+gzip</th>
       </tr>
       <tr>
-	<td class=left>Dar</td>
-	<td>Yes</td>
-	<td>Yes</td>
-	<td>Yes</td>
-      </tr>
-      <tr>
-	<td class=left>Rsync</td>
-	<td>-</td>
+	<th class=left>Detects backup corruption</th>
 	<td>Yes</td>
 	<td>-</td>
-      <tr>
-      <tr>
-	<td class=left>Tar with compression</td>
-	<td>Yes</td>
 	<td>-</td>
 	<td>Yes</td>
       </tr>
       <tr>
-	<td class=left>Tar witout compression</td>
+	<th class=left>Warn or avoid restoring corrupted data</th>
+	<td>Yes</td>
 	<td>-</td>
+	<td>-</td>
+	<td>Yes</td>
+      <tr>
+      <tr>
+	<th class=left>Able to restore all files not concerned by the corruption</th>
+	<td>Yes</td>
+	<td>Yes</td>
 	<td>Yes</td>
 	<td>-</td>
       </tr>
     </table>
 
+    <p>
+      The presented results above is a synthesis of the tests detailed in appendix.
+    </p>
 
     <h3>Performance</h3>
     <p>
@@ -750,7 +759,7 @@
     <h4>Full backup and restoration with compression</h4>
 
     <p>
-      Execution time for a compressed copy a large file:
+      Execution time for a compressed copy of a large file:
     </p>
 
     <div class="cadre">
@@ -761,7 +770,7 @@
     </div>
 
     <p>
-      Execution time for a compressed copy many small files:
+      Execution time for a compressed copy of many small files:
     </p>
 
     <div class="cadre">
@@ -943,98 +952,88 @@
     </div>
 
 
-
-    <h3>Ease of restoration</h3>
-
-
     <h2>Conclusion</h2>
 
     <p>
-      We could see that there is not a single backup tool that match all need. We could identify
-      different use cases for which however a tool is better than the other:
+      In summary regarding the different use cases we have considered and the
+      <ul>
+	<li>exhasitivity of backed up data</li>
+	<li>available features around backup</li>
+	<li>backup robustness facing to media corruption</li>
+	<li>overall performance</li>
+      </ul>
+      We can summarize the key points for each software to put in front and propose a best candidate to address each particular need:
     </p>
-    <ul>
-      <li>Backup
-	<ul>
-	  <li>
-	    Without backup history
-	    <ul>
-	      <li>
-		Only full backups
-		<ul>
-		  <li>for user data with no specific filesystem features (EA, filesystem attribute, ACL, ...)
-		    <ul>
-		      <li>reduced storage backup -> tar (or dar eventually)</li>
-		      <li>copy-like backup -> rsync, (or cp if local backup)</li>
-		    </ul>
-		  </li>
-		  <li>for system data rich metadata (EA, filesystem attributes, ACL...)
-		    <ul>
-		      <li>reduced storage backup -> dar</li>
-		      <li>copy-like backup -> rsync</li>
-		    </ul>
-		  </li>
-		  <li>for system data with rich metadata and sparse files -> dar</li>
-		</ul>
-	      </li>
-	      <li>
-		Differential backup
-		<ul>
-		  <li>for data with poor metadates (EA, filesystem attribute, ACL, ...) -> rsync, dar
-		    <ul>
-		      <li>reduced storage backup -> dar, tar</li>
-		      <li>copy-like backup -> rsync</li>
-		    </ul>
-		  </li>
-		  <li>for data with rich metadata (EA, filesystem attributes, ACL...)
-		    <ul>
-		      <li>reduced storage backup -> dar</li>
-		      <li>copy-like backup -> rsync, dar</li>
-		    </ul>
-		  </li>
-		  <li>for data with rich metadata and spares files -> dar</li>
-		</ul>
-	      </li>
-	      <li>
-		more complex backup rotation scheme
-		<ul>
-		  <li>for user data with no specific filesystem features (EA, filesystem attribute, ACL, ...) -> dar, tar</li>
-		  <li>for data with rich metadata and/or sparse files... -> dar</li>
-		</ul>
-	    </ul>
-	  </li>
-	  <li>With backup history
-	    <ul>
-	      <li>
-		Only full backups
-		<ul>
-		  <li>for user data with no specific filesystem features (EA, filesystem attribute, ACL, ...) -> tar, dar</li>
-		  <li>for system data with sparse files, EA, filesystem attributes, ACL...-> dar</li>
-		</ul>
-	      </li>
-	      <li>
-		Differential backup and more complex backup rotation scheme
-		<ul>
-		  <li>for user data with no specific filesystem features (EA, filesystem attribute, ACL, ...) -> dar</li>
-		  <li>for system data with sparse files, EA, filesystem attributes, ACL...-> dar</li>
-		</ul>
-	      </li>
-	    </ul>
-	  </li>
-	</ul>
-      </li>
-      <li>
-	Archiving
-	<ul>
-	  <li>On low quality media -> dar</li>
-	  <li>On high quality media -> tar, dar</li>
-	</ul>
-      </li>
-    </ul>
 
-    <p>
-      Depending on your objective, I hope this document gives you a better view of what software best match your need.
-    </p>
+    <table>
+      <tr>
+	<th>Use Case</th>
+	<th>Dar</th>
+	<th>Rsync</th>
+	<th>Tar</th>
+      </tr>
+      <tr>
+	<th>Local directory copy</th>
+	<td>slightly more complete but slower</td>
+	<td class=best>complete and fastest</td>
+	<td>not better and still slower than 'cp'</td>
+      </tr>
+      <tr>
+	<th>remote directory copy</th>
+	<td>more complex process and slower</td>
+	<td class=best>efficient and simple</td>
+	<td>more complex process and uncompleted metdata</td>
+      </tr>
+      <tr>
+	<th>Single full backup</th>
+	<td class=best>fine file selection, flexible compression</td>
+	<td>complete but sensible to data corruption</td>
+	<td>uncompletely saved metadata</td>
+      </tr>
+      <tr>
+	<th>full+diff/incr. backup</th>
+	<td class=best>Best space efficiency</td>
+	<td>not supported</td>
+	<td>uncompletely saved metadata</td>
+      </tr>
+      <tr>
+	<th>Backup to public cloud</th>
+	<td class=best>integrated and robust ciphering, slicing, hashing, sftp/ssh</td>
+	<td>no ciphering on storage</td>
+	<td>complex process with ciphering</td>
+      </tr>
+      <tr>
+	<th>Backup to removable media (incl. tapes)</th>
+	<td class=best>integrated and robust ciphering, slicing, hashing</td>
+	<td>no ciphering on storage, no slicing</td>
+	<td>complex process with ciphering, no slicing or no compression</td>
+      </tr>
+      <tr>
+	<th>Archiving of private data</th>
+	<td class=best>integrated ciphering, slicing, metadata redundancy</td>
+	<td>no compression, no ciphering, complex data protection</td>
+	<td>no corruption detection, several forked archive formats</td>
+      </tr>
+      <tr>
+	<th>Archiving of public data</th>
+	<td>over featured</td>
+	<td>not easy to handle</td>
+	<td class=best>easy to use and standard</td>
+      </tr>
+      <tr>
+	<th>Private data exchange over Internet</th>
+	<td class=best>emmbedded asymmetric encryption and signing</td>
+	<td>need public IP with human synchronization or permanent network access</td>
+	<td>complex process and sensible to clear-text attack</td>
+      </tr>
+      <tr>
+	<th>Public data exchange over Internet</th>
+	<td>over featured</td>
+	<td>need public IP with human synchronization or permanent network access</td>
+	<td class=best>easy to use and standard</td>
+      </tr>
+
+    </table>
 
 
     <h2>Appendix 1 - Test logs</h2>
@@ -4046,15 +4045,41 @@
     <h4>Remote network storage</h4>
 
     <p>
-      The remote network feature is the ability to make a backup or a restoration without
-      using local storage to write to or read from that backup.
+      For Remote Network storage, if you use a personal NAS you may avoid generating
+      ciphered backup, though you still should transfer
+      it using a secured protocol if the underlaying network is not your own from end to end
+      (for example a part of the path goes over internet without IPSec or equivalent).
+    </p>
+    <p>
+      Why ciphering backup if using secure transfer protocol?
+      <ul>
+	<li>
+	  Secure transfer avoids one to
+	  read your data in transit in particular your crendential to the remote site, but at the
+	  end the transfered data is stored in clear at the other end.
+	</li>
+	<li>
+	  ciphered data avoids the owner of the remote storage to access to your data
+	  without your consent, though it does not protect one to intercept your transfer and
+	  read the credentials you used to connected to the remote storage. This one could
+	  then connect later and delete all your backup... which is surely not what you want.
+	</li>
+      </ul>
+    </p>
+    <p>
+      In the following we will use both: <b>secure protocol</b> and <b>ciphered backup</b>, without using
+      local storage. We will also need <b>compression</b> to save precious space (usually you pay for the
+      cloud storage you use) and <b>maybe slicing</b> depending on the constraints
+      imposed by the remote storage (some provider ask you to pay a extra amount to store large files,
+      having slicing let you avoid you paying for the size of files in addition to the total
+      amount of disk space you use.
     </p>
     <div class=code><code>
 	terre:/mnt/memdisk# sftp denis@dar
 	The authenticity of host 'dar (192.168.6.32)' can't be established.
-	ECDSA key fingerprint is SHA256:Mit90Q6wKU/1HcvTiGNqEUP6pWDJzUJ/qS4iy2Yy6+0.
+	RSA key fingerprint is SHA256:KN3o/psWC512grcZ5/J5dTSg9PzIXbZAHiig/hqfkc8.
 	Are you sure you want to continue connecting (yes/no)? yes
-	Warning: Permanently added 'dar,192.168.6.32' (ECDSA) to the list of known hosts.
+	Warning: Permanently added 'dar,192.168.6.32' (RSA) to the list of known hosts.
 	denis@dar's password:
 	Connected to denis@dar.
 	sftp> bye
@@ -4062,18 +4087,154 @@
     </code></div>
 
     <h5>Dar</h5>
+
     <div class=code><code>
+	terre:/mnt/memdisk# dar -c sftp://denis@dar/home/denis/backup -R / -g etc -K aes: -zlz4 -s 1M
+	Please provide the password for login denis at host dar:
+	Archive backup requires a password:
+	Please confirm your password:
 
 
+	--------------------------------------------
+	2360 inode(s) saved
+	including 0 hard link(s) treated
+	0 inode(s) changed at the moment of the backup and could not be saved properly
+	0 byte(s) have been wasted in the archive to resave changing files
+	0 inode(s) with only metadata changed
+	0 inode(s) not saved (no inode/file change)
+	0 inode(s) failed to be saved (filesystem error)
+	27 inode(s) ignored (excluded by filters)
+	0 inode(s) recorded as deleted from reference backup
+	--------------------------------------------
+	Total number of inode(s) considered: 2387
+	--------------------------------------------
+	EA saved for 0 inode(s)
+	FSA saved for 1523 inode(s)
+	--------------------------------------------
+	terre:/mnt/memdisk# sftp denis@dar
+	denis@dar's password:
+	Connected to denis@dar.
+	sftp> ls -l
+	-rw-r--r--    1 denis    denis     1048576 Nov 26 17:15 backup.1.dar
+	-rw-r--r--    1 denis    denis     1048576 Nov 26 17:15 backup.2.dar
+	-rw-r--r--    1 denis    denis     1048576 Nov 26 17:15 backup.3.dar
+	-rw-r--r--    1 denis    denis      474982 Nov 26 17:15 backup.4.dar
+	sftp> bye
+	terre:/mnt/memdisk#
     </code></div>
+    <p>
+      The backup results in four ciphered slices located on the remote sftp server. Let's add
+      a <code>-E option</code> to see which slice are being read while testing the archive.
+    </p>
+
+    <div class=code><code>
+	terre:/mnt/memdisk# dar -t sftp://denis@dar/home/denis/backup -E "echo 'openning slice %p/%b.%N.%e'"
+	Please provide the password for login denis at host dar:
+	openning slice /home/denis/backup.4.dar
+	Archive backup requires a password:
+	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
+	openning slice /home/denis/backup.1.dar
+	openning slice /home/denis/backup.2.dar
+	openning slice /home/denis/backup.3.dar
+	openning slice /home/denis/backup.4.dar
+
+
+	--------------------------------------------
+	2360 item(s) treated
+	0 item(s) with error
+	0 item(s) ignored (excluded by filters)
+	--------------------------------------------
+	Total number of items considered: 2360
+	--------------------------------------------
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      We see that all slices have been read as expected, now let's restore /etc/fstab in the current directory
+      and compare the restored files with the real /etc/fstab
+    </p>
+    <div class=code><code>
+	terre:/mnt/memdisk# dar -x sftp://denis@dar/home/denis/backup -E "echo 'openning slice %p/%b.%N.%e'" -g etc/fstab --flat
+	Please provide the password for login denis at host dar:
+	<e>openning slice /home/denis/backup.4.dar</e>
+	Archive backup requires a password:
+	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
+	1 inode(s) restored
+	including 0 hard link(s)
+	0 inode(s) not restored (not saved in archive)
+	0 inode(s) not restored (overwriting policy decision)
+	269 inode(s) ignored (excluded by filters)
+	0 inode(s) failed to restore (filesystem error)
+	0 inode(s) deleted
+	--------------------------------------------
+	Total number of inode(s) considered: 270
+	--------------------------------------------
+	EA restored for 0 inode(s)
+	FSA restored for 0 inode(s)
+	--------------------------------------------
+	terre:/mnt/memdisk# diff fstab /etc/fstab
+	terre:/mnt/memdisk# echo $?
+	0
+	terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      As seen above only the slice 4 has been necessary to restore /etc/fstab. But let's save two files,
+      a huge one and a small one into a single sliced backup and measure the transfer time of backup
+      and restoration of this ciphered an compressed backup through sftp. We added public key authentification
+      for precise time measurement:
+    </p>
+
+    <div class=code><code>
+	terre:/mnt/memdisk# sftp denis@dar
+	Connected to denis@dar.
+	sftp> bye
+	terre:/mnt/memdisk# ls -l SRC
+	total 315396
+	-rw------- 1 root root 322961408 Nov 26 17:28 devuan_beowulf_3.0.0_amd64-netinstall.iso
+	-rw-r--r-- 1 root root       994 Nov 26 17:29 fstab
+	terre:/mnt/memdisk#
+	terre:/mnt/memdisk# time dar -c sftp://denis@dar/home/denis/backup -R SRC -z6 -K aes:hello -afile-auth -q
+	20.769u 2.445s <e>0:22.77</e> 101.8%   0+0k 0+0io 0pf+0w
+	terre:/mnt/memdisk# mkdir DST
+	terre:/mnt/memdisk# time dar -x sftp://denis@dar/home/denis/backup -R DST -K hello -afile-auth -q
+	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
+	11.826u 4.211s <e>0:15.88</e> 100.9%   0+0k 0+0io 0pf+0w
+	terre:/mnt/memdisk# diff -rs SRC DST
+	Files SRC/devuan_beowulf_3.0.0_amd64-netinstall.iso and DST/devuan_beowulf_3.0.0_amd64-netinstall.iso are identical
+	Files SRC/fstab and DST/fstab are identical
+	terre:/mnt/memdisk# rm DST/fstab
+	terre:/mnt/memdisk# time dar -x sftp://denis@dar/home/denis/backup -R DST -K hello -afile-auth -q -g fstab
+	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
+	0.680u 0.012s <e>0:00.87</e> 79.3%     0+0k 0+0io 0pf+0w
+	terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      While restoring the whole backup needs 15 seconds of transfer time, restoring <code>fstab</code> alone requires only 0.87 second,
+      as there is only one slice, this shows that dar is reading only the necessary part of the archive even within a slice to
+      perform the operation.
+    </p>
 
     <h5>Rsync</h5>
     <div class=code><code>
+	terre:/mnt/memdisk# rsync -arHAXSzq /etc denis@dar:/home/denis
+	terre:/mnt/memdisk# mkdir DST
+	terre:/mnt/memdisk# rsync -arHAXSzq denis@dar:/home/denis/etc/fstab .
+	terre:/mnt/memdisk# diff fstab /etc/fstab
+	terre:/mnt/memdisk# echo $?
+	0
+	terre:/mnt/memdisk#
     </code></div>
+    <p>
+      We can backup to a remote sftp server, we can compress the data on-fly but it is not stored compressed nor ciphered.
+      Restoration operation is possible per file or for the whole backup
+    </p>
 
     <h5>Tar</h5>
-    <div class=code><code>
-    </code></div>
+    <p>
+      tar has no way to perform sftp or other secured transfer protocol, nor encryption by itself. When time comes to
+      restore a particular file, the whole backup has to be retrived, un ciphered and uncompressed.
+    </p>
 
     <h3>Backup Robustness</h3>
 
