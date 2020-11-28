@@ -815,25 +815,11 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             //
             //
 
-	if(p.compression_block_size > 0 && p.multi_threaded_compress == 0)
-	{
-	    if(!compile_time::libthreadar())
-		p.multi_threaded_compress = 1;
-	    else
-	    {
-		dialog->message(gettext("block compression will use 2 worker threads by default, use -G option remove this message and set the number of threads you want"));
-		p.multi_threaded_compress = 2;
-	    }
-	}
+	if(p.compression_block_size == 0 && p.multi_threaded_compress > 1)
+	    p.compression_block_size = 240 * 1024;
 
-	if(p.multi_threaded_crypto == 0)
-	{
-	    if(!compile_time::libthreadar())
-		p.multi_threaded_crypto = 1;
-	    else
-		p.multi_threaded_crypto = 2;
-	}
-
+	if(compile_time::libthreadar() && p.multi_threaded_crypto == 0)
+	    p.multi_threaded_crypto = 2;
     }
     catch(Erange & e)
     {
@@ -1675,7 +1661,7 @@ static bool get_args_recursive(recursive_param & rec,
 			{
 			    if(tmp < 1)
 				throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
-			    p.multi_threaded_crypto = (U_I)tmp;
+			    p.multi_threaded_crypto = 2;
 			    p.multi_threaded_compress = (U_I)tmp;
 			}
 			break;
