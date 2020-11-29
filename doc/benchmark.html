@@ -455,32 +455,26 @@
       <tr>
 	<th class=left>Data filtering by filename</th>
 	<td>Yes</td>
-	<td>-</td>
-	<td>-</td>
+	<td>Yes</td>
+	<td>limited</td>
       </tr>
       <tr>
 	<th class=left>Data filtering by filesystem</th>
 	<td>Yes</td>
-	<td>-</td>
-	<td>-</td>
+	<td>limited</td>
+	<td>limited</td>
       </tr>
       <tr>
 	<th class=left>Data filtering by tag</th>
-	<td>Yes</td>
+	<td>limited</td>
 	<td>-</td>
-	<td>?</td>
+	<td>-</td>
       </tr>
       <tr>
-	<th class=left>Data filtering by listing files</th>
+	<th class=left>Data filtering by files listing</th>
 	<td>Yes</td>
-	<td>-</td>
-	<td>?</td>
-      </tr>
-      <tr>
-	<th class=left>Define the data to backup</th>
-	<td>Yes</td>
-	<td>?</td>
-	<td>?</td>
+	<td>yes</td>
+	<td>limited</td>
       </tr>
       <tr>
 	<th class=left>Slicing</th>
@@ -492,13 +486,13 @@
 	<th class=left>Symmetric encryption</th>
 	<td>Yes</td>
 	<td>-</td>
-	<td>-</td>
+	<td>Yes</td>
       </tr>
       <tr>
 	<th class=left>Asymmetric encryption</th>
 	<td>Yes</td>
 	<td>-</td>
-	<td>-</td>
+	<td>Yes</td>
       </tr>
       <tr>
 	<th class=left>Plain-text attack protection</th>
@@ -522,13 +516,7 @@
 	<th class=left>File change detection</th>
 	<td>Yes</td>
 	<td>-</td>
-	<td>Yes</td>
-      </tr>
-      <tr>
-	<th class=left>Recording changed files during backup</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>-</td>
+	<td>limited</td>
       </tr>
       <tr>
 	<th class=left>Multi-level backup</th>
@@ -558,7 +546,7 @@
 	<th class=left>Snapshot for comparing</th>
 	<td>Yes</td>
 	<td>-</td>
-	<td>Yes</td>
+	<td>-</td>
       </tr>
       <tr>
 	<th class=left>Snapshot for redundancy</th>
@@ -617,7 +605,7 @@
       <tr>
 	<th class=left>Stdin/stdout backup read/write</th>
 	<td>Yes</td>
-	<td>?</td>
+	<td>-</td>
 	<td>Yes</td>
       </tr>
       <tr>
@@ -1763,9 +1751,9 @@
 
     <h4>Historization</h4>
     <p>
-      For this feature in a first time we will create two files <i>A.txt</i> and <i>B.txt</i>
+      To evaluate this feature, in a first time we will create two files <i>A.txt</i> and <i>B.txt</i>
       and make a first backup. Then we will remove <i>A.txt</i> and add <i>C.txt</i> and make
-      a second backup. We should be able to restore the data in both states. To do that, we
+      a second backup. We should be able to restore the data in both states (A+B and B+C). To do that, we
       will use the following script.
     </p>
 
@@ -1773,35 +1761,37 @@
 	#!/bin/bash
 
 	if [ -z "$1" -o -z "$2" ] ; then
-	echo "usage: $0 &lt;dir&gt; {phase1 | phase2}"
-	exit 1
+	  echo "usage: $0 &lt;dir&gt; {phase1 | phase2}"
+	  exit 1
 	fi
 
 	dir="$1"
 	phase="$2"
 
 	case "$phase" in
-	phase1)
-	if [ -e "$dir" ] ; then
-	echo "$dir exists, remove it first"
-	exit 2
-	fi
-	mkdir "$dir"
-	echo "Hello World!" &gt; "$dir/A.txt"
-	echo "Bonjour tout le monde !" &gt; "$dir/B.txt"
-	;;
-	phase2)
-	if [ ! -d "$dir" ] ; then
-	echo "$dir does not exist or is not a directory, run phase1 first"
-	exit 2
-	fi
 
-	rm -f "$dir/A.txt"
-	echo "Buongiorno a tutti !" &gt; "$dir/C.txt"
+	phase1)
+	  if [ -e "$dir" ] ; then
+	    echo "$dir exists, remove it first"
+	    exit 2
+	  fi
+	  mkdir "$dir"
+	  echo "Hello World!" &gt; "$dir/A.txt"
+	  echo "Bonjour tout le monde !" &gt; "$dir/B.txt"
 	;;
+
+	phase2)
+	  if [ ! -d "$dir" ] ; then
+	    echo "$dir does not exist or is not a directory, run phase1 first"
+	    exit 2
+	  fi
+  	  rm -f "$dir/A.txt"
+	  echo "Buongiorno a tutti !" &gt; "$dir/C.txt"
+	;;
+
 	*)
-	echo "unknown phase"
-	exit 2
+	  echo "unknown phase"
+	  exit 2
 	;;
 	esac
     </code></div>
@@ -1841,7 +1831,7 @@
       Historization is present, we can get back from backup both saved states
     </p>
     <p>
-      <i>dar</i> proposes a manager <i>dar_manager</i> to easily locate file's status between the archives
+      In complement <i>dar</i> proposes a manager <i>dar_manager</i> to easily locate file's status between the archives
       the database has been feeded with, as well as the file's data present in each archive:
     </p>
     <div class=code><code>
@@ -1982,8 +1972,8 @@
 	total size is 45  speedup is 0.35
 	root@terre:/mnt/memdisk# ls -l DST/SRC
 	total 8
-	-rw-r--r-- 1 root root 24 Nov  6 17:05 B.txt
-	-rw-r--r-- 1 root root 21 Nov  6 17:06 C.txt
+	<e>-rw-r--r-- 1 root root 24 Nov  6 17:05 B.txt</e>
+	<e>-rw-r--r-- 1 root root 21 Nov  6 17:06 C.txt</e>
 	root@terre:/mnt/memdisk#
     </code></div>
 
@@ -1994,8 +1984,8 @@
       the <i>phase1</i> nor the state of the <i>phase2</i>.
     </p>
     <p>
-      We added the <code>--delete</code> option and as result we get
-      to be the<i>phase2</i> state, we cannot have the <i>phase1</i> state as the
+      We added the <code>--delete</code> option and as result we got
+      to be the <i>phase2</i> state. But then we cannot restore to the <i>phase1</i> state as the
       file <i>A.txt</i> has been deleted from the backup.
     </p>
     <p>
@@ -2017,40 +2007,541 @@
 	root@terre:/mnt/memdisk/DST# tar --listed-incremental=snapshot.file -xf ../full.tar
 	root@terre:/mnt/memdisk/DST# ls -l SRC
 	total 8
-	-rw-r--r-- 1 root root 13 Nov  6 18:20 A.txt
-	-rw-r--r-- 1 root root 24 Nov  6 18:20 B.txt
+	<e>-rw-r--r-- 1 root root 13 Nov  6 18:20 A.txt</e>
+	<e>-rw-r--r-- 1 root root 24 Nov  6 18:20 B.txt</e>
 	root@terre:/mnt/memdisk/DST# tar --listed-incremental=snapshot.file -xf ../diff.tar
 	root@terre:/mnt/memdisk/DST# ls -l SRC
 	total 8
-	-rw-r--r-- 1 root root 24 Nov  6 18:20 B.txt
-	-rw-r--r-- 1 root root 21 Nov  6 18:21 C.txt
+	<e>-rw-r--r-- 1 root root 24 Nov  6 18:20 B.txt</e>
+	<e>-rw-r--r-- 1 root root 21 Nov  6 18:21 C.txt</e>
 	root@terre:/mnt/memdisk/DST#
     </code></div>
 
     <p>
-      We could restore from backup both the phase1 and phase2 status
+      We could restore from backup both the phase1 and phase2 status, historization is available with tar.
     </p>
 
 
-    <h4>Define the data to backup</h4>
+    <h4>Data filtering by directory</h4>
+
+    <h5>Dar</h5>
+    <p>
+      We want to save <code>/lib</code> except the content of <code>/lib/modules</code>:
+    </p>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# dar -c backup -R /lib -P modules -vs -q
+	<e>Skipping file: /lib/modules</e>
+	root@terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      What if we want to exclude all of to exclude <code>/lib/module</code> except
+      <code>/lib/module/4.19.0-12-amd64</code>?
+    </p>
+
+    <div class=code><code>
+	root@terre:/mnt/memdisk# rm backup.1.dar
+	rm: remove regular file 'backup.1.dar'? y
+	root@terre:/mnt/memdisk# dar -c backup -R /lib -am -P modules -g modules/4.19.0-12-amd64 -vs -q
+	<e>Skipping file: /lib/modules/4.19.0-11-amd64</e>
+	<e>Skipping file: /lib/modules/4.19.0-10-amd64</e>
+	root@terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      OK, we can mix included directories and excluded directories
+    </p>
+
+    <h5>Rsync</h5>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# rm -rf DST
+	root@terre:/mnt/memdisk# mkdir DST
+	root@terre:/mnt/memdisk# rsync -arHAXS --exclude /lib/modules /lib DST
+	root@terre:/mnt/memdisk# ls -ld DST/lib/m*
+	drwxr-xr-x 2 root root 80 Jun 11 23:33 DST/lib/modprobe.d
+	root@terre:/mnt/memdisk#
+	root@terre:/mnt/memdisk# ls -l DST/lib/modules
+	ls: cannot access <e>'DST/lib/modules': No such file or directory</e>
+	root@terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      We could exclude <code>/lib/modules</code> as expected. As previously, let's exclude it
+      except <code>/lib/modules/4.19.0-12-amd64</code>:
+    </p>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# rm -rf DST
+	root@terre:/mnt/memdisk# rsync -arHAXS -f "+ /lib/modules" -f "- /lib/modules/4.19.0-12-amd64"  /lib DST
+	root@terre:/mnt/memdisk# la DST/lib/modules/
+	total 0
+	drwxr-xr-x  4 root root  80 Oct 22 10:33 .
+	drwxr-xr-x 19 root root 420 Oct 22 11:20 ..
+	<e>drwxr-xr-x  3 root root 280 Aug  8 12:58 4.19.0-10-amd64</e>
+	<e>drwxr-xr-x  3 root root 280 Oct 12 11:25 4.19.0-11-amd64</e>
+	root@terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      OK, we can mix included directories and excluded directories
+    </p>
+
+    <h5>Tar</h5>
+    <p>
+      Let's save /lib and excluding /lib/module again:
+    </p>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# tar --exclude /lib/modules -cf backup.tar /lib
+	tar: Removing leading `/' from member names
+	root@terre:/mnt/memdisk# tar -tf backup.tar | grep modules
+	root@terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      Now let's exclude <code>/lib/modules</code> except <code>/lib/modules/4.19.0-12-amd64</code>:
+    <p>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# tar -cf backup.tar /lib/modules/4.19.0-12-amd64/ --exclude /lib/modules /lib
+	tar: Removing leading `/' from member names
+	tar: Removing leading `/' from hard link targets
+	root@terre:/mnt/memdisk# tar -tf backup.tar | wc -l
+	6017
+	root@terre:/mnt/memdisk# tar -tf backup.tar | grep -v "lib/modules/4.19.0-12-amd64" | wc -l
+	1626
+	root@terre:/mnt/memdisk# tar -tf backup.tar | grep "lib/modules/4.19.0-12-amd64" | wc -l
+	4391
+	root@terre:/mnt/memdisk# tar -tf backup.tar | grep "lib/modules" | wc -l
+	4391
+	root@terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      The backup contains a total of 6017 entries, 1626 are out of the <code>lib/modules/4.19.0-12-amd64</code>
+      directory, the rest is all in that previous directory, nothing else is found in <code>lib/modules</code>
+      while there was <code>lib/modules/4.19.0-11-amd64</code> and <code>lib/modules/4.19.0-10-amd64</code>
+      subdirectory. We can thus mix included and included directories.
+    </p>
+
+    <h4>Data filtering by filename</h4>
 
     <h5>Dar</h5>
     <div class=code><code>
+	root@terre:/mnt/memdisk# dar -c backup -R /lib -X "*.ko"
+
+
+	--------------------------------------------
+	4122 inode(s) saved
+	including 0 hard link(s) treated
+	0 inode(s) changed at the moment of the backup and could not be saved properly
+	0 byte(s) have been wasted in the archive to resave changing files
+	0 inode(s) with only metadata changed
+	0 inode(s) not saved (no inode/file change)
+	0 inode(s) failed to be saved (filesystem error)
+	<e>10677 inode(s) ignored (excluded by filters)</e>
+	0 inode(s) recorded as deleted from reference backup
+	--------------------------------------------
+	Total number of inode(s) considered: 14799
+	--------------------------------------------
+	EA saved for 0 inode(s)
+	FSA saved for 3945 inode(s)
+	--------------------------------------------
+	root@terre:/mnt/memdisk# mkdir DST
+	root@terre:/mnt/memdisk# dar -x backup -R DST --fsa-scope none
+
+
+	--------------------------------------------
+	4122 inode(s) restored
+	including 0 hard link(s)
+	0 inode(s) not restored (not saved in archive)
+	0 inode(s) not restored (overwriting policy decision)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) failed to restore (filesystem error)
+	0 inode(s) deleted
+	--------------------------------------------
+	Total number of inode(s) considered: 4122
+	--------------------------------------------
+	EA restored for 0 inode(s)
+	FSA restored for 0 inode(s)
+	--------------------------------------------
+	root@terre:/mnt/memdisk# find DST -name "*.ko" -ls
+	root@terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      we would exclude all file having the <code>ko</code> extension, what if we do not
+      want to exclude those that start with <code>ext</code>?
+    </p>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# dar -c backup -R /lib -am -X "*.ko" -I "ext*"
+
+
+	--------------------------------------------
+	4128 inode(s) saved
+	including 0 hard link(s) treated
+	0 inode(s) changed at the moment of the backup and could not be saved properly
+	0 byte(s) have been wasted in the archive to resave changing files
+	0 inode(s) with only metadata changed
+	0 inode(s) not saved (no inode/file change)
+	0 inode(s) failed to be saved (filesystem error)
+	10671 inode(s) ignored (excluded by filters)
+	0 inode(s) recorded as deleted from reference backup
+	--------------------------------------------
+	Total number of inode(s) considered: 14799
+	--------------------------------------------
+	EA saved for 0 inode(s)
+	FSA saved for 3951 inode(s)
+	--------------------------------------------
+	root@terre:/mnt/memdisk# rm -rf DST
+	root@terre:/mnt/memdisk# mkdir DST
+	root@terre:/mnt/memdisk# dar -x backup -R DST --fsa-scope none -q
+	root@terre:/mnt/memdisk# find DST -name "*.ko" -print
+	DST/modules/4.19.0-10-amd64/kernel/fs/ext4/ext4.ko
+	DST/modules/4.19.0-10-amd64/kernel/drivers/extcon/extcon-core.ko
+	DST/modules/4.19.0-11-amd64/kernel/fs/ext4/ext4.ko
+	DST/modules/4.19.0-11-amd64/kernel/drivers/extcon/extcon-core.ko
+	DST/modules/4.19.0-12-amd64/kernel/fs/ext4/ext4.ko
+	DST/modules/4.19.0-12-amd64/kernel/drivers/extcon/extcon-core.ko
+	root@terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      OK, we got what we wanted
+    </p>
+
+    <h5>Rsync</h5>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# rm -rf DST
+	root@terre:/mnt/memdisk# rsync -arHAXS -f "- *.ko"  /lib DST
+	root@terre:/mnt/memdisk# find DST -name "*.ko" -print
+	root@terre:/mnt/memdisk# ls DST
+	lib
+	root@terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      Same as previously, we don't want to exclude <code>ko</code> files starting by <code>ext</code>:
+    </p>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# rm -rf DST
+	root@terre:/mnt/memdisk# rsync -arHAXS -f "+ ext*" -f "- *.ko" /lib DST
+	root@terre:/mnt/memdisk# find DST -name "*.ko" -print
+	DST/lib/modules/4.19.0-12-amd64/kernel/fs/ext4/ext4.ko
+	DST/lib/modules/4.19.0-12-amd64/kernel/drivers/extcon/extcon-core.ko
+	DST/lib/modules/4.19.0-11-amd64/kernel/fs/ext4/ext4.ko
+	DST/lib/modules/4.19.0-11-amd64/kernel/drivers/extcon/extcon-core.ko
+	DST/lib/modules/4.19.0-10-amd64/kernel/fs/ext4/ext4.ko
+	DST/lib/modules/4.19.0-10-amd64/kernel/drivers/extcon/extcon-core.ko
+	root@terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      OK, we got what we wanted
+    </p>
+
+    <h5>Tar</h5>
+    <p>Same as previously, let's filter out kernel object files</p>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# tar -cf backup.tar --exclude "*.ko" /lib
+	tar: Removing leading `/' from member names
+	root@terre:/mnt/memdisk# rm -rf DST
+	root@terre:/mnt/memdisk# mkdir DST
+	root@terre:/mnt/memdisk# cd DST
+	root@terre:/mnt/memdisk/DST# tar -xf ../backup.tar
+	root@terre:/mnt/memdisk/DST# find . -name "*.ko" -print
+	root@terre:/mnt/memdisk/DST#
+    </code></div>
+    <p>Now, we want to keep only those kernel object files starting with <code>ext</code></p>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# tar -cf backup.tar "ext*" --exclude "*.ko" /lib
+	tar: ext*: Cannot stat: No such file or directory
+	tar: Removing leading `/' from member names
+	tar: Removing leading `/' from hard link targets
+	tar: Exiting with failure status due to previous errors
+	root@terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      Well, argument passed out of option do not seem expanded by tar thus using mask is not
+      possible to include some pattern. It seems the only option is to use file listing, thing
+      we will evaluate below.
+    </p>
+
+    <h4>Data filtering by filesystem</h4>
+
+    <p>
+      We will use a tmpfs filesystem mounted twice thanks to mount's --bind option. The objective
+      is first to save every thing except a few given filesystems, or only one or save inside a few
+      given filesystems. Here is the preparation phase:
+    </p>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# mkdir SRC
+	root@terre:/mnt/memdisk# mkdir SRC/D1 SRC/D2 SRC/D3
+	root@terre:/mnt/memdisk# mount -t tmpfs tmpfs SRC/D1
+	root@terre:/mnt/memdisk# mount --bind SRC/D1 SRC/D2
+	root@terre:/mnt/memdisk# mount -t tmpfs tmpfs SRC/D3
+	root@terre:/mnt/memdisk# ls SRC/D1 SRC/D2
+	SRC/D1:
+
+	SRC/D2:
+	root@terre:/mnt/memdisk# echo "Hello World" > SRC/D1/file.txt
+	root@terre:/mnt/memdisk# ls SRC/D1 SRC/D2
+	SRC/D1:
+	file.txt
+
+	SRC/D2:
+	file.txt
+	root@terre:/mnt/memdisk# echo "give me your data, I'll tell your needs and what to buy" > SRC/gafam.com
+	root@terre:/mnt/memdisk# echo "sight" > SRC/D3/democracy.org
+	root@terre:/mnt/memdisk#
+    </code></div>
+
+    <h5>Dar</h5>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# dar -c backup -R SRC -MX:/mnt/memdisk/SRC/D1 -vs -vt -q
+	Adding folder to archive: /mnt/memdisk/SRC/D3
+	Adding file to archive: /mnt/memdisk/SRC/D3/democracy.org
+	Adding file to archive: /mnt/memdisk/SRC/gafam.com
+	Skipping file: /mnt/memdisk/SRC/D2
+	Skipping file: /mnt/memdisk/SRC/D1
+	root@terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      We could exclude a filesystem, and its second appearance in D2 was also excluded,
+      whithout having to mention it. Let's include only <code>D1</code> now:
+    </p>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# rm -f backup.1.dar
+	root@terre:/mnt/memdisk# dar -c backup -R SRC -MI:/mnt/memdisk/SRC/D1 -vs -vt -q
+	Skipping file: /mnt/memdisk/SRC/D3
+	Adding file to archive: /mnt/memdisk/SRC/gafam.com
+	Adding folder to archive: /mnt/memdisk/SRC/D2
+	Adding file to archive: /mnt/memdisk/SRC/D2/file.txt
+	Adding folder to archive: /mnt/memdisk/SRC/D1
+	Adding file to archive: /mnt/memdisk/SRC/D1/file.txt
+	root@terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      OK, we got what we wanted
+    </p>
+
+    <h5>Rsync</h5>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# rsync -arvHAXS --one-file-system SRC DST
+	sending incremental file list
+	created directory DST
+	SRC/
+	SRC/gafam.com
+	SRC/D1/
+	SRC/D2/
+	SRC/D3/
+
+	sent 283 bytes  received 77 bytes  720.00 bytes/sec
+	total size is 56  speedup is 0.16
+	root@terre:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      <i>rsync</i> has ony one option about filesystems, it sticks recursion to the filesystem
+      of the source directory, we cannot exclude specifically some filesystems, they are all excluded,
+      and we cannot include specifically some filesystems, none is excluded (default behavior without this option)
+    </p>
+
+    <h5>Tar</h5>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# tar -cvf backup.tar --one-file-system SRC
+	SRC/
+	SRC/D3/
+	tar: SRC/D3/: file is on a different filesystem; not dumped
+	SRC/gafam.com
+	SRC/D2/
+	tar: SRC/D2/: file is on a different filesystem; not dumped
+	SRC/D1/
+	tar: SRC/D1/: file is on a different filesystem; not dumped
+	root@terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      <i>tar</i> does not behaves better than rsync on that topic
+    </p>
+
+    <h4>Data filtering by tag</h4>
+    <p>
+      by tag we mean any mark the user can add to a file that will drive its fate when backup will be done.
+      The most common is the <i>dump</i> flag, but it is not always available, using some other mechanisms
+      (Extended Attributes,...) can be an interesting alternative.
+    </p>
+
+    <h5>Dar</h5>
+    <div class=code><code>
+	root@terre:/var/tmp# mkdir SRC
+	root@terre:/var/tmp# echo "Hello" > file1.txt
+	root@terre:/var/tmp# echo "World" > file2.txt
+	root@terre:/var/tmp# chattr <e class=blue>+d</e> file1.txt
+	root@terre:/var/tmp# setfattr -n <e>user.no_dump</e> file2.txt
+	root@terre:/var/tmp# mv file1.txt file2.txt SRC
+	root@terre:/var/tmp# dar -c backup -w -R SRC  <e class=blue>--nodump</e> -vt -q
+	<e>Adding file to archive: /var/tmp/SRC/file2.txt</e>
+	Saving Extended Attributes for /var/tmp/SRC/file2.txt
+	Saving Filesystem Specific Attributes for /var/tmp/SRC/file2.txt
+	root@terre:/var/tmp# dar -c backup -w -R SRC  <e>--exclude-by-ea=user.no_dump</e> -vt -q
+	<e class=blue>Adding file to archive: /var/tmp/SRC/file1.txt</e>
+	Saving Filesystem Specific Attributes for /var/tmp/SRC/file1.txt
+	root@terre:/var/tmp#
+    </code></div>
+    <p>
+      We have two mechanisms, one based on the <i>dump</i> flag and an arbitrary extended attribute.
+      However <i>dar</i> only supports exclusion of file, not inclusion for backup based on a tag.
+    </p>
+
+    <h5>Rsync</h5>
+    <p>
+      <i>rsync</i> does not seem to be able to filter based on an arbitrary mark
+    </p>
+
+    <h5>Tar</h5>
+    <p>
+      <i>rsync</i> does not seem to be able to filter based on an arbitrary mark
+    </p>
+
+    <h4>Data filtering by files listing</h4>
+
+    <p>
+      We build a file listing and expect to either have only those file saved
+      or excluded from the performed backup. Here is the listing preparation:
+    </p>
+
+    <div class=code><code>
+	root@terre:/mnt/memdisk# find /lib -name "*.ko" -o -print  > include.txt
+	root@terre:/mnt/memdisk# wc -l include.txt
+	4123 include.txt
+	root@terre:/mnt/memdisk# find /lib -name "*.ko" -print  > exclude.txt
+	root@terre:/mnt/memdisk# wc -l exclude.txt
+	10677 exclude.txt
+	root@terre:/mnt/memdisk#
+    </code></div>
+
+    <h5>Dar</h5>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# dar -c backup -R /lib -[ include.txt
+
+
+	--------------------------------------------
+	<e>4122 inode(s) saved</e>
+	including 0 hard link(s) treated
+	0 inode(s) changed at the moment of the backup and could not be saved properly
+	0 byte(s) have been wasted in the archive to resave changing files
+	0 inode(s) with only metadata changed
+	0 inode(s) not saved (no inode/file change)
+	0 inode(s) failed to be saved (filesystem error)
+	<e>10677 inode(s) ignored (excluded by filters)</e>
+	0 inode(s) recorded as deleted from reference backup
+	--------------------------------------------
+	Total number of inode(s) considered: 14799
+	--------------------------------------------
+	EA saved for 0 inode(s)
+	FSA saved for 3945 inode(s)
+	--------------------------------------------
+	root@terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      file inclusion is available, let's see file exclusion:
+    </p>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# dar -c backup -R /lib -] exclude.txt
+
+
+	--------------------------------------------
+	<e>4122 inode(s) saved</e>
+	including 0 hard link(s) treated
+	0 inode(s) changed at the moment of the backup and could not be saved properly
+	0 byte(s) have been wasted in the archive to resave changing files
+	0 inode(s) with only metadata changed
+	0 inode(s) not saved (no inode/file change)
+	0 inode(s) failed to be saved (filesystem error)
+	<e>10677 inode(s) ignored (excluded by filters)</e>
+	0 inode(s) recorded as deleted from reference backup
+	--------------------------------------------
+	Total number of inode(s) considered: 14799
+	--------------------------------------------
+	EA saved for 0 inode(s)
+	FSA saved for 3945 inode(s)
+	--------------------------------------------
+	root@terre:/mnt/memdisk#
     </code></div>
 
     <h5>Rsync</h5>
     <div class=code><code>
+	root@terre:/mnt/memdisk# rsync -aHAXS --files-from=include.txt / DST
+	root@terre:/mnt/memdisk# find DST -print | wc -l
+	4124
+	root@terre:/mnt/memdisk# find DST -name "*.ko" -print
+	root@terre:/mnt/memdisk#
     </code></div>
+    <p>
+      file inclusion is available. However if we can exclude a list of pattern
+      defined in a file, we cannot exclude a list of files. We should prepend each
+      entry by "- " seen the filtering syntax of rsync:
+    </p>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# sed -r 's/^/- /' exclude.txt  > rsync-exclude.txt
+	root@terre:/mnt/memdisk# rm -rf DST
+	root@terre:/mnt/memdisk# rsync -aHAXS --exclude-from=rsync-exclude.txt /lib DST
+	root@terre:/mnt/memdisk# find DST -print | wc -l
+	4124
+	root@terre:/mnt/memdisk# find DST -name "*.ko" -print | wc -l
+	0
+	root@terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      So we are good
+    </p>
 
     <h5>Tar</h5>
     <div class=code><code>
+	root@terre:/mnt/memdisk# tar -cvf backup.tar --files-from=include.txt | wc -l
+	tar: Removing leading `/' from member names
+	98017
+	root@terre:/mnt/memdisk# tar -tf backup.tar | grep .ko | wc -l
+	73392
+	root@terre:/mnt/memdisk# grep .ko include.txt | wc -l
+	3
+	root@terre:/mnt/memdisk# grep .ko include.txt
+	/lib/modules/4.19.0-12-amd64/kernel/sound/pci/korg1212
+	/lib/modules/4.19.0-11-amd64/kernel/sound/pci/korg1212
+	/lib/modules/4.19.0-10-amd64/kernel/sound/pci/korg1212
+	root@terre:/mnt/memdisk#
     </code></div>
+    <p>
+      the include.txt file does not contain any file with the ko extension, however <i>tar</i>
+      saved all of them. Reading back the man page concerning this --files-from option
+      <i>The names read are handled the same way as command line arguments</i> explains that
+      in the listing where all <code>"*.ko"</code> files have been removed, remain their parent
+      directory, which implies saving all its content. In consequence we must not list
+      directories only their content (which will drop not allow saving empty directories).
+      Let's modify the include.txt file that way:
+    </p>
+    <div class=code><code>
+	find /lib -type d -o -name "*.ko" -o -print  > tar-include.txt
+	root@terre:/mnt/memdisk# tar -cvf backup.tar --files-from=tar-include.txt | wc -l
+	tar: Removing leading `/' from member names
+	1532
+	root@terre:/mnt/memdisk# tar -tvf backup.tar | grep "*.ko"
+	root@terre:/mnt/memdisk# wc -l tar-include.txt
+	1532 tar-include.txt
+	root@terre:/mnt/memdisk# wc -l include.txt
+	4123 include.txt
+    </code></div>
+    <p>
+      the difference if between 1532 entries saved by <i>tar</i> compared to the
+      4123 saved by <i>rsync</i> or <i>dar</i> comes from the many empty directories
+      that have cannot be saved as such by <i>tar</i> using this method
+    </p>
+    <div class=code><code>
+	root@terre:/mnt/memdisk# tar -cvf backup.tar --exclude-from=exclude.txt /lib | wc -l
+	tar: Removing leading `/' from member names
+	4123
+	root@terre:/mnt/memdisk# wc -l exclude.txt
+	10677 exclude.txt
+	root@terre:/mnt/memdisk# tar -tf backup.tar | egrep "\.ko$"
+	root@terre:/mnt/memdisk#
+    </code></div>
+    <p>
+      The file listing exclusion works as expected
+    </p>
 
     <h4>Slicing</h4>
 
     <p>
       For this test we will backup the content of /usr/bin of the running system.
-      We choosing slice size smaller than the biggest file present. The use case for
+      We select a slice size smaller than the biggest file under backup. The use case for
       slicing implies compression (remote storage, cloud storage, limited removable
       media storage...).
     </p>
@@ -2209,7 +2700,7 @@
     </code></div>
 
     <p>
-      But even without compression, <i>tar</i> is still restricive: it does not produce
+      But even without compression, <i>tar</i> is still restrictive: it does not produce
       different files, you have each new volume around and <code>hit return</code> at each time.
       <br/>
       Note also that without compression, the space required passes
@@ -2272,22 +2763,22 @@
 
     <p>
       Encryption has for target relatively long term lifetime, having compression at the same
-      time is logical, so we will use both in our tests (gzip with a compresion level of 6).
+      time to increase security as it increases data "randomness" of the data to cipher. So we will use both in our tests (gzip with a compresion level of 6).
     </p>
     <p>
       A point to pay attention concerns the way the password/passphrase can be provided. Putting this
-      to the command-line could let other users on this same system reading it. Having interactive
-      prompt and/or password set in a access restricted file allows both secure human interaction
-      and automation.
+      to the command-line could let other users on this same system read it. Having interactive
+      prompt is better as well as having the password set in a read access restricted file, which
+      in addition allows automation.
     </p>
 
     <h5>Dar</h5>
     <div class=code><code>
 	root@terre:/mnt/memdisk# dar -c backup -R / -g usr/bin -K aes256: -q -z6
-	Archive backup requires a password:
-	Please confirm your password:
+	Archive backup <e>requires a password:</e>
+	Please <e>confirm your password:</e>
 	root@terre:/mnt/memdisk# dar -l backup -q
-	Archive backup requires a password:
+	Archive backup <e>requires a password:</e>
 	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
 	Archive version format               : 11
 	Compression algorithm used           : <e>gzip</e>
@@ -2380,7 +2871,7 @@
 
     </code></div>
     <p>
-      We can provide password either on command-line (not recommanded), prompted by dar once launched
+      We can provide password either on command-line (not recommended), prompted by dar once launched
       or from a protected configuration file. In the following we add slicing to encryption to see
       whether or not <i>dar</i> deciphers the whole backup to recover a single file:
     </p>
@@ -2412,7 +2903,7 @@
 
     <h5>Rsync</h5>
     <p>
-      <i>rsync</i> cannot cipher the data, it can rely on ssh to cipher the data over the network
+      <i>rsync</i> cannot cipher data, it can rely on ssh to cipher the data over the network
       but data is finally always stored in clear text.
     </p>
 
@@ -2463,9 +2954,9 @@
     <h4>Asymmetric encryption</h4>
 
     <p>
-      The objective is create a backup ciphered using GnuPG public/private key pair, restore it as a whole and
-      restore a single file from it. We will also use compression (gzip level 6) as it may make sense for the corresponding use cases:
-      data exchange over Internet for example.
+      The objective is to create a backup ciphered using GnuPG public/private key pair, restore the whole backup and
+      restore a single file from it. We will also use compression (gzip level 6) as it may make sense for the
+      corresponding use cases (data exchange over Internet for example).
     </p>
     <h5>Dar</h5>
     <div class=code><code>
@@ -2513,26 +3004,26 @@
     </code></div>
 
     <p>
-      As displayed in the backup header output (stored in clear both at the beginning and at the end of the archive),
-      the underlying encryption is a symmetric encryption (AES 256 by default), but the AES key is stored
-      ciphered using the private key of the backup recipient which email address is provided (or email adresses, if more than one
+      As displayed in the backup header output above the underlying encryption is a symmetric encryption
+      (AES 256 by default), but the AES key is stored ciphered using the private key of the backup recipient
+      which email address is provided (or email adresses, if more than one
       recipient is expected). This key is randomly chosen by dar and stored ciphered in the archive header.
-      Thus the overall behavior and performance and security of GnuPG withing dar is equivalent
-      to the one of the symmetrical algorithm, with the ability to quickly restore some or all files from an archive, not
-      waiting first for the archive to be unciphered.
+      Thus the overall behavior, performance and security of GnuPG withing dar is equivalent
+      to the one of the symmetrical algorithm chosen, with the ability to quickly restore some or all files
+      from an archive, and not waiting/downloading first the whole backup to unciphered it.
     </p>
     <p>
-      Seen above no password or passphrase is asked as the recipient email is ourselves (root@terre.systeme-solaire.espace). Let's
-      cipher for another recipient:
+      Seen above no password or passphrase is asked as the recipient email is ourselves
+      (root@terre.systeme-solaire.espace). Let's cipher for another recipient:
     </p>
 
     <div class=code><code>
-	terre:/mnt/memdisk# dar -c backup -K gnupg::dar.linux@free.fr -R SRC -z6 -q -w
+	terre:/mnt/memdisk# dar -c backup -K <e class=blue>gnupg::dar.linux@free.fr</e> -R SRC -z6 -q -w
 	terre:/mnt/memdisk# ls -l backup.1.dar
 	-rw-r--r-- 1 root root <e>158230913</e> Nov  9 16:22 backup.1.dar
 	terre:/mnt/memdisk# dar -l backup -q
 	FATAL error, aborting operation: Unexpected error reported by GPGME: <e>No secret key</e>
-	terre:/mnt/memdisk# dar -c backup -K gnupg::dar.linux@free.fr,root@terre.systeme-solaire.espace -R SRC -z6 -q -w
+	terre:/mnt/memdisk# dar -c backup -K <e class=blue>gnupg::dar.linux@free.fr,root@terre.systeme-solaire.espace</e> -R SRC -z6 -q -w
 	terre:/mnt/memdisk# dar -l backup -q
 	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
 	Archive version format               : 11
@@ -2573,8 +3064,8 @@
 	terre:/mnt/memdisk#
     </code></div>
     <p>
-      here we saw that ciphering for a recipient different than ourself does not allow us to read the resulting backup,
-      however we can have several recipients, and if we add ourself, we can read the backup as well as the other
+      Here we saw that ciphering for a recipient different than ourself does not allow us to read the resulting backup,
+      however we can define several recipients and if we add ourself, we can read the backup as well as our primary
       recipients.
     </p>
 
@@ -2588,7 +3079,7 @@
       that performes the ciphering operation outside the backup.
     </p>
     <div class=code><code>
-	terre:/mnt/memdisk# tar -czf - SRC | gpg --encrypt --recipient root@terre.systeme-solaire.espace --output backup.tar.gz.gpg
+	terre:/mnt/memdisk# tar -czf - SRC | gpg --encrypt --recipient <e class=blue>root@terre.systeme-solaire.espace</e> --output backup.tar.gz.gpg
 	terre:/mnt/memdisk# ls -l backup.tar.gz.gpg
 	-rw-r--r-- 1 root root <e>155337814</e> Nov  9 16:45 backup.tar.gz.gpg
 	terre:/mnt/memdisk#
@@ -2596,7 +3087,7 @@
 	gpg: encrypted with 3072-bit RSA key, ID 97E13D38B007DF30, created 2020-08-08
 	"root@terre &lt;root@terre.systeme-solaire.espace&gt;"
 	terre:/mnt/memdisk#
-	terre:/mnt/memdisk# tar -czf - SRC | gpg --encrypt --recipient dar.linux@free.fr --output backup.tar.gz.gpg
+	terre:/mnt/memdisk# tar -czf - SRC | gpg --encrypt --recipient <e class=blue>dar.linux@free.fr</e> --output backup.tar.gz.gpg
 	terre:/mnt/memdisk#  gpg --decrypt backup.tar.gz.gpg | tar -xzf -
 	gpg: encrypted with 4096-bit RSA key, ID DB0A2141A4D96ECA, created 2012-09-13
 	"Denis Corbin (http://dar.linux.free.fr/) &lt;dar.linux@free.fr&gt;"
@@ -2605,8 +3096,8 @@
 	gzip: stdin: unexpected end of file
 	tar: Child returned status 1
 	tar: Error is not recoverable: exiting now
-	terre:/mnt/memdisk#terre:/mnt/memdisk# tar -czf - SRC | gpg --encrypt --recipient dar.linux@free.fr \
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--recipient root@terre.systeme-solaire.espace --output backup.tar.gz.gpg
+	terre:/mnt/memdisk#terre:/mnt/memdisk# tar -czf - SRC | gpg --encrypt --recipient <e class=blue>dar.linux@free.fr</e> \
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--recipient <e class=blue>root@terre.systeme-solaire.espace</e> --output backup.tar.gz.gpg
 	terre:/mnt/memdisk#  gpg --decrypt backup.tar.gz.gpg | tar -xzf -
 	gpg: encrypted with 4096-bit RSA key, ID DB0A2141A4D96ECA, created 2012-09-13
 	"Denis Corbin (http://dar.linux.free.fr/) &lt;dar.linux@free.fr&gt;"
@@ -2626,15 +3117,6 @@
 
     <h5>Dar</h5>
 
-    <p>
-      When ciphering the same datz several times (with symmetric or asymmetric encryption),
-      the resulting backup size changed each time. This is due to the garbage (the elastic
-      buffer) dar adds at the beginnning and at the end of the data to cipher. This way,
-      even if a dar backup has well known structure it is not easy to know precisely where
-      they are positionned in the archive, which makes plain-text attack much more difficult
-      to succeed.
-    </p>
-
     <div class=code><code>
 	devuan:/mnt/memdisk# time dar -c backup -K "aes256:hello world!" -at -1 0 -R SRC -q -w
 	9.782u 3.413s <e>0:06.28</e> 210.0%    0+0k 0+0io 0pf+0w
@@ -2647,20 +3129,23 @@
 	devuan:/mnt/memdisk#
     </code></div>
 
+    <p>
+      When ciphering the same data several times (with symmetric or asymmetric encryption),
+      the resulting backup size changes each time. This is due to the garbage (the elastic
+      buffer) dar adds at the beginnning and at the end of the data to cipher. This way,
+      even if a dar backup has well known structure it is not easy to know precisely where
+      they are positionned in the backup file, which makes plain-text attack much more difficult
+      to succeed if even possible in a reasonable time.
+    </p>
+
+
     <h5>Rsync</h5>
     <p>
-      <i>rsync</i> is not providing any way to cipher the backup, it is not concerned by
+      <i>rsync</i> does not provide any way to cipher the backup, it is thus not concerned by
       protecting against plain-text attack.
     </p>
 
     <h5>Tar</h5>
-    <p>
-      <i>tar</i> by itself does not provide any ciphering mechanism, however you can
-      cipher the dar generated backups with external tool (for example <i>openssl</i>
-      for symmetric encryption or <i>gpg</i> for asymmetric encryption). However none
-      of these mechanism protect against plain-text attack, while tar backup have somehow
-      predictable header contents.
-    </p>
     <div class=code><code>
       devuan:/mnt/memdisk/SRC# time ../tar.backup ../backup.tar.crypted usr
       4.112u 2.343s 0:04.72 136.6%    0+0k 0+0io 0pf+0w
@@ -2674,6 +3159,13 @@
       -rw-r--r-- 1 root root <e>1603594272</e> Nov  9 14:56 ../backup.tar.crypted
       devuan:/mnt/memdisk/SRC#
     </code></div>
+    <p>
+      <i>tar</i> by itself does not provide any ciphering mechanism, however you can
+      cipher the <i>tar</i> generated backups with external tool (for example <i>openssl</i>
+      for symmetric encryption or <i>gpg</i> for asymmetric encryption). However none
+      of these mechanism protect against plain-text attack: tar backup have somehow
+      predictable header contents.
+    </p>
 
     <h4>Key Derivation Function</h4>
 
@@ -2683,7 +3175,8 @@
       <i>dar</i> uses <code>argon2</code> by default, with 10,000 iterations. It can
       also use pkcs5 v2 (pbkdf2) with md5, sha1 or sha512 algorithm. The user
       is able to set the KDF function and iteration count, so we are able to measure
-      the execution time variation added by the iteration count:
+      the execution time variation added by the iteration count (taking into account that the data to cipher also
+      changes depending on the amount of random garbage <i>dar</i> wraps it with):
     </p>
     <div class=code><code>
 	terre:/mnt/memdisk# time dar -c backup -R SRC -K aes:hello --kdf-param <e>100k</e>:<e class=blue>sha1</e> -w -q
@@ -2708,7 +3201,7 @@
     <h5>Rsync</h5>
 
     <p>
-      <i>rsync</i> is not providing any way to cipher the backup, it is not concerned by KDF.
+      <i>rsync</i> does not provide any way to cipher the backup, it is not concerned by KDF.
     </p>
 
     <h5>Tar</h5>
@@ -2725,7 +3218,7 @@
     <h4>File change detection</h4>
 
     <p>
-      In order stress each backup software on that aspect, we will do use an ugly
+      In order stress each backup software on that aspect, we will use an ugly
       script that loops forever permanently invoking <code>touch</code> on a given file:
     </p>
 
@@ -2734,8 +3227,8 @@
 	#!/bin/bash
 
 	if [ -z "$1" ] ; then
-	echo "usage: $0 &lt;filename&gt;"
-	exit 1
+	  echo "usage: $0 &lt;filename&gt;"
+	  exit 1
 	fi
 
 	while /bin/true ; do  touch "$1" ; done
@@ -2743,7 +3236,7 @@
     </code></div>
 
     <p>
-      We now create a source tree for backup containing a file of 1 MiB on which we will
+      We create a source tree to backup, containing a file of 1 MiB on which we will
       apply this script:
     </p>
 
@@ -2761,7 +3254,7 @@
 	Device: 1bh/27d Inode: 375588      Links: 1
 	Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
 	Access: 2020-11-10 16:34:13.806106695 +0100
-	Modify: 2020-11-10 16:34:13.806106695 +0100
+	<e>Modify: 2020-11-10 16:34:13.806106695 +0100</e>
 	Change: 2020-11-10 16:34:13.806106695 +0100
 	Birth: -
 	terre:/mnt/memdisk# stat SRC/hello_world
@@ -2770,7 +3263,7 @@
 	Device: 1bh/27d Inode: 375588      Links: 1
 	Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
 	Access: 2020-11-10 16:34:14.838104981 +0100
-	Modify: 2020-11-10 16:34:14.838104981 +0100
+	<e>Modify: 2020-11-10 16:34:14.838104981 +0100</e>
 	Change: 2020-11-10 16:34:14.838104981 +0100
 	Birth: -
 	terre:/mnt/memdisk# jobs
@@ -2825,7 +3318,7 @@
 	  the resulting backup keeps trace of this context by flagging the file as <code>DIRTY</code>
 	</li>
 	<li>
-	  When restoring the data, a warning shows and the user and requested for confirmation (default behavior)
+	  When restoring the data, a warning shows (by default) and the user is requested for confirmation (default behavior)
 	</li>
       </ul>
     </p>
@@ -2864,7 +3357,7 @@
 	  it does not tries to save the file
 	</li>
 	<li>
-	  the resulting backup keeps no visible trace of this context
+	  the resulting backup keeps no visible trace of this possible data corruption
 	</li>
 	<li>
 	  When restoring the data, no warning issued and the restoration proceed as if the file was saved properly
@@ -2874,7 +3367,7 @@
     <h4>Multi-level backup</h4>
 
     <p>
-      This test is addressed with in the <a href="#diffbackup">performance section</a>
+      This test is addressed within the <a href="#diffbackup">performance section</a>
       under the <i>Differential backup and restoration</i> chapter. We see there that
       if <i>dar</i> and <i>tar</i> are able to create full differential and incremental backup,
       <i>rsync</i> is only able to create full backups, thus fails to provide multi-level backups.
@@ -2883,7 +3376,7 @@
     <h4>Binary Delta</h4>
 
     <p>
-      This test is also addressed with in the <a href="#diffbackup">performance section</a>
+      This test is also addressed within the <a href="#diffbackup">performance section</a>
       under the <i>Differential backup and restoration</i> chapter. We see there that <i>rsync</i>
       and <i>dar</i> are able to save only a portion of a big modified file and patch it upon restoration.
       This reduces the size of differential and incremental backup (for <i>dar</i>) and the
@@ -2896,9 +3389,9 @@
     <h4>Detection suspicious modifications</h4>
 
     <p>For this test we will use the following script that rely on the <i>bitflip</i> script
-      seen above, and tend to hide the modification performed, as a virus, keylogger or rootkit would
+      seen above and try to hide the modifications performed, as a virus, keylogger or rootkit would
       tend to do. We will make a full backup before
-      the modification and a differential backup after, then observe the behavior
+      the modification and a differential backup after, then observe the behavior.
 
       <div class=code><code>
 	  terre:/mnt/memdisk# cat hide_change
@@ -2932,8 +3425,8 @@
 	<li>last access time</li>
 	<li>last modification time</li>
       </ul>
-      There only the last date, the inode change time that cannot be set manually
-      that shows that some inode properties (but not file content) has changed. This
+      The only change concerns the inode change time (ctime) that cannot be set manually
+      and signals that some inode properties (but no file content) has changed. This
       condition occurs, when changing the file permission, ownership, extended
       attributes and so on, but should not occur when only file's data has changed.
     </p>
@@ -3046,8 +3539,8 @@
 
     <p>
       rsync has not reported the problem, but hopefully it has not synchronized the backup,
-      thus we end in a sane version in the DST backup directory though as user is not aware
-      of this potential risk the virus/ransomware can spread silently.
+      thus we end in a sane version in the DST backup directory though, as user is not aware
+      of this potential risk, the virus/ransomware can spread silently.
     </p>
 
     <h5>Tar</h5>
@@ -3073,23 +3566,16 @@
     </code></div>
 
     <p>
-      As seen above <i>tar</i> does not see any problem, thought the file has been resaved
-      as a whole (while its last modification time was unchanged) and lead to corrupt the
+      As seen above <i>tar</i> does not see any problem, but the file has been resaved
+      as a whole (while its last modification time was unchanged) which lead to corrupt the
       new backup with potential harmful data. The good point is that you have still the
-      full backup with the sane data, but at a next backup cycle as you were not notified of the
-      risk, you will lose it and retain only the corrupted version of the file.
+      full backup with the sane data. But at a next backup cycle, as you were not notified of the
+      risk, you will lose it and keep only the corrupted version of this file.
     </p>
 
     <h4>Snapshot</h4>
 
     <h5>Dar</h5>
-    <p>With <i>dar</i> snapshot can be created:
-      <ul>
-	<li>alone as a dedicated operation</li>
-	<li>as part of a backup process (full, differential, incremental or even decremental backup)</li>
-	<li>from a existing backup</li>
-      </ul>
-    </p>
     <div class=code><code>
 	terre:/mnt/memdisk# dar -c full -z6 -R /usr <e>--on-fly-isolate snapshot</e>
 
@@ -3113,11 +3599,11 @@
 	Now performing on-fly isolation...
 	terre:/mnt/memdisk# ls -l *.dar
 	-rw-r--r-- 1 root root 4006060941 Nov 12 15:34 full.1.dar
-	-rw-r--r-- 1 root root    6662595 Nov 12 15:34 <e>snapshot.1.dar</e>
-	terre:/mnt/memdisk# dar -C recreated_snapshot -A full -z6 -q
+	-rw-r--r-- 1 root root    6662595 Nov 12 15:34 <e class=blue>snapshot.1.dar</e>
+	terre:/mnt/memdisk# dar <e>-C recreated_snapshot</e> -A full -z6 -q
 	terre:/mnt/memdisk# ls -al *.dar
 	-rw-r--r-- 1 root root 4006060941 Nov 12 15:34 full.1.dar
-	-rw-r--r-- 1 root root    7907094 Nov 12 16:33 <e>recreated_snapshot.1.dar</e>
+	-rw-r--r-- 1 root root    7907094 Nov 12 16:33 <e class=blue>recreated_snapshot.1.dar</e>
 	-rw-r--r-- 1 root root    6662595 Nov 12 15:34 snapshot.1.dar
 	terre:/mnt/memdisk# dar -c diff -A snapshot -R /usr -z
 
@@ -3163,7 +3649,7 @@
 	EA saved for 0 inode(s)
 	FSA saved for 0 inode(s)
 	--------------------------------------------
-	terre:/mnt/memdisk# dar -c snapshot_alone -A + -R /usr -z
+	terre:/mnt/memdisk# dar -c snapshot_alone <e>-A +</e> -R /usr -z
 
 
 	--------------------------------------------
@@ -3182,9 +3668,9 @@
 	EA saved for 0 inode(s)
 	FSA saved for 0 inode(s)
 	--------------------------------------------
-	terre:/mnt/memdisk# touch /usr/local/src
-	terre:/mnt/memdisk# dar -c faked_diff -A snapshot -R /usr -e -q -vt
-	Adding folder to archive: /usr/local/src
+	terre:/mnt/memdisk# <e>touch /usr/local/src</e>
+	terre:/mnt/memdisk# dar -c faked_diff -A snapshot -R /usr <e class=blue>--dry-run</e> -q -vt
+	<e>Adding folder to archive: /usr/local/src</e>
 	Saving Filesystem Specific Attributes for /usr/local/src
 	terre:/mnt/memdisk# ls -l *.dar
 	-rw-r--r-- 1 root root   25537139 Nov 12 16:37 diff.1.dar
@@ -3192,19 +3678,108 @@
 	-rw-r--r-- 1 root root 4006060941 Nov 12 15:34 full.1.dar
 	-rw-r--r-- 1 root root    7907094 Nov 12 16:33 recreated_snapshot.1.dar
 	-rw-r--r-- 1 root root    6662595 Nov 12 15:34 snapshot.1.dar
-	-rw-r--r-- 1 root root   25537142 Nov 12 16:44 snapshot_alone.1.dar
+	-rw-r--r-- 1 root root   25537142 Nov 12 16:44 <e class=blue>snapshot_alone.1.dar</e>
 	terre:/mnt/memdisk#
     </code></div>
 
-    <p>
-      As seen above, a snapshot can be created with a backup process (full, differential, incremental...) thanks to the <code>--on-fly-isolate</code>
-      option, it can even be recreated afterward from the backup if you forgot to create at the same time, last it can be created alone without
-      any backup thanks to the <code>-A +</code> option.
+    <p>As seen above,a snapshot can be created:
+      <ul>
+	<li>as part of a backup process (full, differential, incremental or even decremental backup) (<code>--on-fly-isolate</code>)</li>
+	<li>from a existing backup(<code>-C</code>)</li>
+	<li>alone by a dedicated operation (<code>-A +</code>)</li>
+      </ul>
     </p>
+
+    <div class=code><code>
+	root@terre:/mnt/memdisk# ls -l full.1.dar
+	-rw-r--r-- 1 root root <e>3895581703</e> Nov 29 21:53 full.1.dar
+	root@terre:/mnt/memdisk# dar -l full -q
+	FATAL error, aborting operation: Cannot open catalogue: unknown compression
+	root@terre:/mnt/memdisk# !bitflip
+	bitflip 31124653000 full.1.dar
+	root@terre:/mnt/memdisk# dar -l full -q
+	Archive version format               : 11
+	Compression algorithm used           : gzip
+	Compression block size used          : 0
+	Symmetric key encryption used        : none
+	Asymmetric key encryption used       : none
+	Archive is signed                    : no
+	Sequential reading marks             : present
+	User comment                         : N/A
+	<e>Catalogue size in archive            : 7799028 bytes</e>
+
+	Archive is composed of 1 file(s)
+	File size: 3895581703 bytes
+	The global data compression ratio is:   51%
+
+	CATALOGUE CONTENTS :
+
+	total number of inode : 263480
+	fully saved           : 263480
+	binay delta patch     : 0
+	inode metadata only   : 0
+	distribution of inode(s)
+	- directories        : 18080
+	- plain files        : 216142
+	- symbolic links     : 29258
+	- named pipes        : 0
+	- unix sockets       : 0
+	- character devices  : 0
+	- block devices      : 0
+	- Door entries       : 0
+	hard links information
+	- number of inode with hard link           : 11
+	- number of reference to hard linked inodes: 34
+	destroyed entries information
+	0 file(s) have been record as destroyed since backup of reference
+
+	root@terre:/mnt/memdisk# <e>bitflip 31124653000 full.1.dar</e>
+	root@terre:/mnt/memdisk# dar -t full
+	Final memory cleanup...
+	<e class=red>FATAL error, aborting operation: Cannot open catalogue: unknown compression</e>
+	root@terre:/mnt/memdisk# dar -t full <e>-A snapshot</e>
+
+
+	--------------------------------------------
+	263503 item(s) treated
+	0 item(s) with error
+	0 item(s) ignored (excluded by filters)
+	--------------------------------------------
+	Total number of items considered: 263503
+	--------------------------------------------
+	root@terre:/mnt/memdisk#
+	root@terre:/mnt/memdisk# dar -t full <e>--sequential-read</e>
+	A problem occurred while reading this archive contents: <e>Cannot open catalogue: unknown compression</e>
+
+
+	--------------------------------------------
+	263503 item(s) treated
+	0 item(s) with error
+	0 item(s) ignored (excluded by filters)
+	--------------------------------------------
+	Total number of items considered: 263503
+	--------------------------------------------
+	root@terre:/mnt/memdisk#
+
+    </code></div>
+
     <p>
-      Once created whatever the method used, a snapshot can be used to create a differential or incremental backup,
-      or using the <code>-e</code> option (dry-run) to list the file that would be saved (thus which have changed, were added or removed)
-      thus files that changed since the time the snapshot was made.
+      Once created a snapshot can be used:
+      <ul>
+	<li>to create a differential or incremental backup</li>
+	<li>to list the files that would be saved (thus which have changed,
+	  were added or have been removed) thus all changes since the time the snapshot was made (using the <code>--dry-run</code> option)</li>
+	<li>
+	  rescue a corrupted backup when the corruption falled into the
+	  backup table of content located at the end of the <i>dar</i>
+	  backup (only if it has been created based on the backup to rescue
+	  either using <code>-C option</code> maybe long after the backup was made
+	  or using <code>--on-fly-isolate</code> at the same time the backup was created.
+	</li>
+      </ul>
+      Note, as shown above, a table of content (aka "catalogue") corruption, can also partially be recovered
+      using the <code>--sequential-read</code> mode, it will just not let <i>dar</i> remove files that
+      were removed since the reference backup was made (this does thus not concern full backups, as here).
     </p>
 
     <h5>Rsync</h5>
@@ -3365,16 +3940,17 @@
 
     <p>
       In the previous example we see that the /mnt/Externe directory is a mount point containing three auto-mounted
-      volumes: <code>Espace</code>, <code>Commun</code> and <code>Backup</code>. At that time only <code>Espace</code> is mounted.
-      Performing a first backup without care will skip the two other directories.
+      volumes: <code>Espace</code>, <code>Commun</code> and <code>Backup</code>. At first only <code>Espace</code>
+      was mounted. Performing a backup without care will skip the two other directories.
     </p>
     <p>
-      In a second time thanks to the <code>-&lt;</code> and <code>-=</code> options we instruct <i>dar</i> when
-      entering <code>/mnt</code> to operate the <code>file</code> command on the two missing directories. As a result
-      we now see them in the backup. We could do that before executing the backup, but as the backup may include many other
-      directory the time between such operation done before starting the backup and the time the backup finally saves
-      the automount point at <code>/mnt/Externe</code> may exceed the automount timeout leading them to disappear backup
-      if not used.
+      In a second time, thanks to the <code>-&lt;</code> and <code>-=</code> options, we instructed <i>dar</i> to
+      run the <code>file</code> command on the two missing directories when entering <code>/mnt</code>.
+      As a result, we now see both of them in the backup. We could do that before executing the backup, but as
+      the backup may include many other
+      directories the time between such operation done before starting the backup and the time the backup finally
+      saves the automount point at <code>/mnt/Externe</code> may exceed the automount timeout leading them to be
+      unmounted and disappear before the backup process reaches them.
     </p>
     <div class=code><code>
 	terre:/mnt/memdisk# dar -c backup -R / -g usr/bin --hash sha512 -s 100M -q
@@ -3387,7 +3963,7 @@
 	-rw-r--r-- 1 root root       143 Nov 12 18:30 backup.3.dar.sha512
 	-rw-r--r-- 1 root root  63577207 Nov 12 18:30 backup.4.dar
 	-rw-r--r-- 1 root root       143 Nov 12 18:30 backup.4.dar.sha512
-	terre:/mnt/memdisk# dar -t backup -E 'sha512sum -c %p/%b.%N.%e.sha512'
+	terre:/mnt/memdisk# dar -t backup <e>-E 'sha512sum -c %p/%b.%N.%e.sha512'</e>
 	backup.4.dar: OK
 	backup.1.dar: OK
 	backup.2.dar: OK
@@ -3405,8 +3981,8 @@
 	terre:/mnt/memdisk#
     </code></div>
     <p>
-      in the previous example, this we used slicing with on-fly hashing which generated for each slice
-      the corresponding sha512 hash file. Then we tested the archive content and also the hash
+      In this example, this we used slicing with on-fly hashing which generated for each slice
+      the corresponding sha512 hash file. Then we tested the archive content and at the same time the hash
       files thanks to the <code>-E</code> option. Of course any user command or shell or python script,
       can be used instead, and for backup, restoration, testing, snashotting,...
     </p>
@@ -3418,7 +3994,10 @@
 
     <h5>Tar</h5>
     <p>
-      not supported by <i>tar</i>
+      <i>tar</i> has the <code>-F option</code> to launch a command after each tape,
+      but it is only available with multi-volume tar archive, which in turn
+      cannot be used with compression. Thus we won't test it quite restrictive and
+      does not march very common use cases.
     </p>
 
     <h4>Dry-run execution</h4>
@@ -3508,7 +4087,7 @@
 
     <p>
       The use of the <code>-aheader</code> let one see the archive header that is always in clear-text. The usual listing
-      operation provides some additional informations from which are ciphered and thus in that context requires the passphrase:
+      operation provides some additional informations from the ciphered table of content and thus in that context requires the passphrase:
     </p>
     <div class=code><code>
 	terre:/mnt/memdisk# dar <e>-l</e> backup <e>-q</e>
@@ -3606,7 +4185,7 @@
 
     <h5>Rsync</h5>
     <p>
-      I could not see no way that let <i>rsync</i> check that the target or destination
+      It does not seems possible to let <i>rsync</i> check that the target or destination
       directory is sane and usuable. All operation modify the destination file or save
       modified files in either the destination directory (the backup) or an alternate directory
       (<code>--compare-dest</code> option).
@@ -3830,12 +4409,17 @@
 
 	sent 437,298,617 bytes  received 42,381 bytes  174,936,399.20 bytes/sec
 	total size is 445,394,557  speedup is 1.02
-	terre:/mnt/memdisk#
+	root@terre:/mnt/memdisk# rsync -arHAX <e>--info=progress2</e> /usr/bin DST
+	437,083,500  98%  128.42MB/s    0:00:03 (xfr#2152, to-chk=0/2593)
+	root@terre:/mnt/memdisk#
+
     </code></div>
     <p>
-      <code>-v</code> gives leads to a more verbose output, while <code>-q</code>
+      <code>-v option</code> leads to a more verbose output, while <code>-q</code>
       remove the non error messages. Using both at the same time seems not to
-      be different than using <code>-q</code> alone.
+      be different than using <code>-q</code> alone. <i>rsync</i> has a very rich
+      set of additional options like <code>--info</code>, <code>--debug</code>
+      that can be added on top.
     </p>
 
     <h5>Tar</h5>
@@ -3878,7 +4462,7 @@
       We will perform two types of tests:
       <ul>
 	<li>remove one or several files from an existing backup without having to make a new backup process</li>
-	<li>add forgotten files to an existing bakcup without performing a new full backup process</li>
+	<li>add some forgotten files to an existing backup without performing a new full backup process</li>
       </ul>
     </p>
 
@@ -3891,7 +4475,7 @@
 	[Saved][-]       [-L-][  64%][ ]  drwxr-xr-x   root     root    408 Mio Sun Jun  2 23:25:09 2019        usr
 	[Saved][-]       [-L-][  64%][ ]  drwxr-xr-x   root     root    408 Mio Sun Nov  8 13:43:58 2020        usr/bin
 	[Saved][ ]       [-L-][  90%][X]  -rwxr-xr-x   root     root    38 Mio  Thu Sep  5 04:35:24 2019        <e>usr/bin/emacs-gtk</e>
-	terre:/mnt/memdisk# dar -A backup -+ without-emacs -ak -P usr/bin/emacs-gtk -vs -q
+	terre:/mnt/memdisk# dar -A backup <e>-+ without-emacs</e> <e class=blue>-ak</e> <e>-P usr/bin/emacs-gtk</e> -vs -q
 	Skipping file: &lt;ROOT&gt;/usr/bin/emacs-gtk
 	terre:/mnt/memdisk# dar -l without-emacs -g usr/bin/emacs-gtk
 	[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size    |          Date                 |    filename
@@ -3903,8 +4487,9 @@
 	terre:/mnt/memdisk#
     </code></div>
     <p>
-      <i>dar</i> does not modify a existing archive but creates a copy of it with the requested files or directory removed. The
-      process can be quick even with compression thanks to the <code>-ak</code> option that avoid uncompressing and recompressing
+      <i>dar</i> does not modify a existing backup but creates a copy of it with the requested files or
+      directory removed. The process can be quick even with compression thanks to the <code>-ak</code>
+      option that avoid uncompressing and recompressing
       file that are kept. Before removing the old backup you can test the sanity of the new generated one.
     </p>
     <div class=code><code>
@@ -3915,7 +4500,7 @@
 	[Saved][-]       [-L-][  90%][ ]  drwxr-xr-x   root     root    38 Mio  Sun Jun  2 23:25:09 2019        usr
 	[Saved][-]       [-L-][  90%][ ]  drwxr-xr-x   root     root    38 Mio  Sun Nov  8 13:43:58 2020        usr/bin
 	[Saved][ ]       [-L-][  90%][X]  -rwxr-xr-x   root     root    38 Mio  Thu Sep  5 04:35:24 2019        usr/bin/emacs-gtk
-	terre:/mnt/memdisk# dar -A backup -@ emacs -+ with-emacs -ak
+	terre:/mnt/memdisk# <e>dar -A backup -@ emacs -+ with-emacs</e> <e class=blue>-ak</e>
 
 
 	--------------------------------------------
@@ -3941,9 +4526,9 @@
     </code></div>
 
     <p>
-      Here to add files to a existing backup we must make a small backup of these files only and merge
-      this backup with the backup we modify. Nothing of the source data is touched in this operation,
-      is something get wrong or if you made an error, you can fix and restart without taking the risk
+      Here to add files to a existing backup we must make a small backup of these files only, then merge
+      this backup with the backup we want to modify. Nothing of the source data is touched in this operation,
+      is something goes wrong or if you made an error, you can fix and restart without taking the risk
       to lose data.
     </p>
 
@@ -3973,7 +4558,7 @@
     </code></div>
     <p>
       Well, <i>tar</i> cannot manipulate compressed archives. What the point then to remove a
-      file from a backup if storage space is not an issue, else compression would be used?
+      file from a backup if storage space is not an issue, else, would compression be used?
     </p>
 
     <h4>stdin/stdout backup read/write</h4>
@@ -4048,15 +4633,15 @@
       For Remote Network storage, if you use a personal NAS you may avoid generating
       ciphered backup, though you still should transfer
       it using a secured protocol if the underlaying network is not your own from end to end
-      (for example a part of the path goes over internet without IPSec or equivalent).
+      (for example a part of the path goes over Internet without IPSec or equivalent).
     </p>
     <p>
       Why ciphering backup if using secure transfer protocol?
       <ul>
 	<li>
 	  Secure transfer avoids one to
-	  read your data in transit in particular your crendential to the remote site, but at the
-	  end the transfered data is stored in clear at the other end.
+	  read your data in transit in particular your credentials to the remote site, but at the
+	  end the transferred data is stored in clear at the other end.
 	</li>
 	<li>
 	  ciphered data avoids the owner of the remote storage to access to your data
@@ -4070,8 +4655,8 @@
       In the following we will use both: <b>secure protocol</b> and <b>ciphered backup</b>, without using
       local storage. We will also need <b>compression</b> to save precious space (usually you pay for the
       cloud storage you use) and <b>maybe slicing</b> depending on the constraints
-      imposed by the remote storage (some provider ask you to pay a extra amount to store large files,
-      having slicing let you avoid you paying for the size of files in addition to the total
+      imposed by the remote storage (some provider ask you to pay an extra amount to store larger files,
+      having slicing avoids you having to pay for the size of files in addition to the total
       amount of disk space you use.
     </p>
     <div class=code><code>
@@ -4090,9 +4675,9 @@
 
     <div class=code><code>
 	terre:/mnt/memdisk# dar -c sftp://denis@dar/home/denis/backup -R / -g etc -K aes: -zlz4 -s 1M
-	Please provide the password for login denis at host dar:
-	Archive backup requires a password:
-	Please confirm your password:
+	<e class=blue>Please provide the password for login denis at host dar:</e>
+	<e>Archive backup requires a password:</e>
+	<e>Please confirm your password:</e>
 
 
 	--------------------------------------------
@@ -4128,10 +4713,10 @@
     </p>
 
     <div class=code><code>
-	terre:/mnt/memdisk# dar -t sftp://denis@dar/home/denis/backup -E "echo 'openning slice %p/%b.%N.%e'"
-	Please provide the password for login denis at host dar:
+	terre:/mnt/memdisk# dar -t sftp://denis@dar/home/denis/backup <e class=blue>-E "echo 'openning slice %p/%b.%N.%e'"</e>
+	<e class=blue>Please provide the password for login denis at host dar:</e>
 	openning slice /home/denis/backup.4.dar
-	Archive backup requires a password:
+	<e>Archive backup requires a password:</e>
 	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
 	openning slice /home/denis/backup.1.dar
 	openning slice /home/denis/backup.2.dar
@@ -4159,7 +4744,7 @@
 	<e>openning slice /home/denis/backup.4.dar</e>
 	Archive backup requires a password:
 	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
-	1 inode(s) restored
+	<e>1 inode(s) restored</e>
 	including 0 hard link(s)
 	0 inode(s) not restored (not saved in archive)
 	0 inode(s) not restored (overwriting policy decision)
@@ -4172,15 +4757,15 @@
 	EA restored for 0 inode(s)
 	FSA restored for 0 inode(s)
 	--------------------------------------------
-	terre:/mnt/memdisk# diff fstab /etc/fstab
+	terre:/mnt/memdisk# <e>diff fstab /etc/fstab</e>
 	terre:/mnt/memdisk# echo $?
-	0
+	<e>0</e>
 	terre:/mnt/memdisk#
     </code></div>
     <p>
       As seen above only the slice 4 has been necessary to restore /etc/fstab. But let's save two files,
       a huge one and a small one into a single sliced backup and measure the transfer time of backup
-      and restoration of this ciphered an compressed backup through sftp. We added public key authentification
+      and restoration of this ciphered an compressed backup through sftp. We have added public key authentification
       for precise time measurement:
     </p>
 
@@ -4200,9 +4785,9 @@
 	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
 	11.826u 4.211s <e>0:15.88</e> 100.9%   0+0k 0+0io 0pf+0w
 	terre:/mnt/memdisk# diff -rs SRC DST
-	Files SRC/devuan_beowulf_3.0.0_amd64-netinstall.iso and DST/devuan_beowulf_3.0.0_amd64-netinstall.iso are identical
-	Files SRC/fstab and DST/fstab are identical
-	terre:/mnt/memdisk# rm DST/fstab
+	<e>Files SRC/devuan_beowulf_3.0.0_amd64-netinstall.iso and DST/devuan_beowulf_3.0.0_amd64-netinstall.iso are identical</e>
+	<e>Files SRC/fstab and DST/fstab are identical</e>
+	terre:/mnt/memdisk# <e class=red>rm DST/fstab</e>
 	terre:/mnt/memdisk# time dar -x sftp://denis@dar/home/denis/backup -R DST -K hello -afile-auth -q -g fstab
 	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
 	0.680u 0.012s <e>0:00.87</e> 79.3%     0+0k 0+0io 0pf+0w
@@ -4211,7 +4796,7 @@
 
     <p>
       While restoring the whole backup needs 15 seconds of transfer time, restoring <code>fstab</code> alone requires only 0.87 second,
-      as there is only one slice, this shows that dar is reading only the necessary part of the archive even within a slice to
+      as there is only one slice, this shows that <i>dar</i> is reading only the necessary part of the archive even within a slice to
       perform the operation.
     </p>
 
@@ -4233,8 +4818,8 @@
     <h5>Tar</h5>
     <p>
       tar has no way to perform sftp or other secured transfer protocol, nor encryption by itself. When time comes to
-      restore a particular file, the whole backup has to be retrived, un ciphered and uncompressed.
-    </p>
+      restore a particular file, the whole backup has to be retrieved, unciphered and uncompressed to restore even
+      just a sigle file</p>
 
     <h3>Backup Robustness</h3>
 
@@ -4265,7 +4850,7 @@
 	terre:/mnt/memdisk# ./hide_change backup.1.dar 1
 	terre:/mnt/memdisk# mkdir DST
 	terre:/mnt/memdisk# dar -x backup -R DST
-	backup.1.dar is not a valid file (wrong magic number), please provide the good file. [return = YES | Esc = NO]
+	<e>backup.1.dar is not a valid file (wrong magic number), please provide the good file. [return = YES | Esc = NO]</e>
 	Escaping...
 	Final memory cleanup...
 	Aborting program. User refused to continue while asking: backup.1.dar is not a valid file (wrong magic number), please provide the good file.
@@ -4276,7 +4861,7 @@
 
 
 	--------------------------------------------
-	74725 inode(s) restored
+	<e>74725 inode(s) restored</e>
 	including 0 hard link(s)
 	0 inode(s) not restored (not saved in archive)
 	0 inode(s) not restored (overwriting policy decision)
@@ -4284,7 +4869,7 @@
 	0 inode(s) failed to restore (filesystem error)
 	0 inode(s) deleted
 	--------------------------------------------
-	Total number of inode(s) considered: 74725
+	<e>Total number of inode(s) considered: 74725</e>
 	--------------------------------------------
 	EA restored for 0 inode(s)
 	FSA restored for 0 inode(s)
@@ -4295,8 +4880,8 @@
 	terre:/mnt/memdisk#
     </code></div>
     <p>
-      modifying the first bit <i>dar/</i> has seen the corruption. We need the lax mode (<code>-alax</code> option) to bypass this
-      corruption, but then the restoration proceeds normally. We can try a bit further for example somewhere in the middle of the archive,
+      Modifying the first bit <i>dar/</i> has seen the corruption. We can use the lax mode (<code>-alax</code> option) to bypass this
+      corruption and then the restoration proceeds normally. We can try a bit further for example somewhere in the middle of the archive,
       thus at offset 876354144 (half of the size expressed in bit, not byte):
     </p>
     <div class=code><code>
@@ -4315,7 +4900,7 @@
 	0 inode(s) not restored (not saved in archive)
 	0 inode(s) not restored (overwriting policy decision)
 	0 inode(s) ignored (excluded by filters)
-	<e>1</e> inode(s) failed to restore (filesystem error)
+	<e class=red>1 inode(s) failed to restore (filesystem error)</e>
 	0 inode(s) deleted
 	--------------------------------------------
 	Total number of inode(s) considered: 74725
@@ -4331,8 +4916,9 @@
     </code></div>
 
     <p>
-      One file could not be restored properly as reported by dar, but all other files could be and are identical to its respective
-      original. Let's modifying the last bit for completness:
+      One file could not be restored properly as reported by <i>dar</i>,
+      but all other files could be and are identical to their respective
+      originals. Let's modifying the last bit for completness:
     </p>
 
     <div class=code><code>
@@ -4370,6 +4956,13 @@
 	0
 	terre:/mnt/memdisk#
     </code></div>
+    <p>
+      By chance it did not affected the ability to restore the backup. However if it ever had,
+      we could have fall back to the <code>--sequential-read</code> mode, use a already created
+      snapshot (aka isolated catalogue) as seen about the snapshot feature, or as last resort
+      use the <code>-alax option</code> eventually combined with the <code>--sequential-read</code>
+      mode.
+    </p>
 
     <h5>Rsync</h5>
     <div class=code><code>
@@ -4420,7 +5013,7 @@
     </code></div>
 
     <p>
-      Modifying the first bit leads to a completely unusable backup. Nothing got restored at all.
+      Modifying the first byte leads to a completely unusable backup. Nothing got restored at all.
       Let's see what going on when modifying a single bit in the middle of the backup:
     </p>
 
@@ -4432,11 +5025,11 @@
 	terre:/mnt/memdisk/DST# tar -xf ../backup.tar.gz
 	tar: Skipping to next header
 
-	gzip: stdin: invalid compressed data--crc error
+	<e class=red>gzip: stdin: invalid compressed data--crc error</e>
 
 	gzip: stdin: invalid compressed data--length error
 	tar: Child returned status 1
-	tar: Error is not recoverable: exiting now
+	<e>tar: Error is not recoverable: exiting now</e>
 	terre:/mnt/memdisk/DST#
 	terre:/mnt/memdisk/DST# diff -rq ../SRC SRC | wc -l
 	diff: SRC/linux-5.9.8/scripts/dtc/include-prefixes/arc: No such file or directory
@@ -4497,7 +5090,7 @@
 	terre:/mnt/memdisk/DST#
     </code></div>
     <p>
-      without compression, a <i>tar</i> backup is much more reliable, however we now need more than 5 times
+      Without compression, a <i>tar</i> backup is much more reliable, however we now need more than 5 times
       storage space to hold the backup. Let's see what happens when we modify a single bit in the midle of the backup:
     </p>
 
@@ -4509,21 +5102,21 @@
 	terre:/mnt/memdisk/DST# tar -xf ../backup.tar
 	terre:/mnt/memdisk/DST#
 	terre:/mnt/memdisk/DST# diff -rq ../SRC SRC
-	Files ../SRC/linux-5.9.8/drivers/media/pci/bt8xx/bttv-cards.c and SRC/linux-5.9.8/drivers/media/pci/bt8xx/bttv-cards.c differ
+	<e class=red>Files ../SRC/linux-5.9.8/drivers/media/pci/bt8xx/bttv-cards.c and SRC/linux-5.9.8/drivers/media/pci/bt8xx/bttv-cards.c differ</e>
 	terre:/mnt/memdisk/DST#
     </code></div>
 
     <p>
-      the backup restoration suceeded according to <i>tar</i> but the corruption has been completely ignored. The result
-      is both a corrupted backup and a corrupted restored data
+      the backup restoration suceeded according to <i>tar</i> but the corruption has been completely ignored!!!
+      The result is both a corrupted backup and a corrupted restored data, with no notification at all...
     </p>
 
     <h3>Execution Performance</h3>
 
     <p>
-      In the following to compare software while they have different level of feature (<i>dar</i>
-      is the only one to take into account sparse files, <i>dar</i> and <i>rsync</i> are the only
-      one to backup rich metadata like Exended Attributes, ACL, ...) we will provide measures for
+      In the following to compare software disabling feature that consume CPU when one other
+      software does not support it.
+      we will provide measures for
       <i>dar</i> in <u>normal mode</u> and in <u>fast mode</u>. In this later mode, the inlined metadata
       redundancy and the sparse file detection are disabled to have a similar features set as
       <i>rsync</i>, <i>tar</i> will still be a level below regarding feature set, but we assume
