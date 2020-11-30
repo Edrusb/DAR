@@ -213,3 +213,8 @@ dt::before
 {
     content: '- ';
 }
+
+dt.void::before
+{
+    content: ' ';
+}

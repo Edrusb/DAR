@@ -4,22 +4,22 @@
     <link href="style.css" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
-    <title>Restoration with dar</title>
+    <title>Flexible Restoration with dar</title>
   </head>
   <body>
-    <center><h1>Restoring a whole system with dar</h1></center>
+    <center><h1>Flexibly Restoring a whole system with dar</h1></center>
 
     <h2>Introduction</h2>
     <p>
       Restoration is usually the most tricky part of a backup process. By <i>backup process</i> is designed the whole
       process of creating backups, storing them in a secured place, protecting backup data against unauthorized access,
       and rebuilding a whole system from scratch upon major failure/system corruption/security breach/...
-      (or a set of systems, hypervisor, virtual machines, local storage, activating remote
+      (a single system or a set of systems, hypervisor, virtual machines, local storage, activating remote
       storage, and making the restored system bootable).
     </p>
     <p>
       No backup process matches the need of all. For example, syncing your local files in the cloud
-      is easy and may be suitable for personal use, but as it also exposes all your data, values, proprietary software, patents,
+      is easy and may be suitable for personal use. But as it also exposes all your data, values, proprietary software, patents,
       to the eye of the cloud provider, it may thus not be suitable for companies having production secrets, secret recipes that
       constitute the source of their revenue. It may neither be suitable for a individual fighting for human
       rights and for freedom in a country where these natural rights are banished. And last, it does not let you
@@ -33,29 +33,63 @@
       as backup tool under Linux and more generally Unixes (including MaCOS X).
     </p>
     <p>
-      In the following we will describe how to restore a whole system with:
+      Because its easy, you might consider for your backup process, the use of some well designed disk cloning tools that operate
+      at block level but this has several constraints:
+    <ul>
+      <li>
+	As all block level tools, to avoid data corruption it requires the copied
+	system to be off. In other terms, you should not clone a disk if it is under use. Block level tools are thus not adapted
+	for a day to day invisible backup process, running in background at low priority or automated at nightly hours, preserving
+	this way your workload from being impacted by backup maintenance tasks.
+      </li>
+      <li>
+	block copy/backup is is inefficient, as it saves all data, including free space on the disk and takes a lot of time to
+	complete, time during which you cannot use the system.
+      </li>
+      <li>
+	Restoring the system on a different disk size and numbers (smaller disks, more disks, different partitionning)
+	is not possible, while most of the time, the disks you will find on the market when restoration is need,
+	differ from the ones you were using so far: larger disks or smaller storage but relying
+	on a more recent technology that you would like to leverage (SSD, NVMe...).
+      </li>
+      <li>
+	Restoring your data to an encrypted disk (LUKS) while it was not encrypted is not possible and viceversa.
+      </li>
+    </ul>
+    To avoid all these pitfalls we prefer filesystem agnostic tools, that backup the content of disks rather than
+    the disks as a whole. In the following we will describe how to restore a whole system with or without:
       <ul>
 	<li>data encryption,</li>
 	<li>local or remote storage,</li>
 	<li>data parity,</li>
 	<li>legacy MBR or UEFI boot,</li>
-	<li>For a single system to a complete <i>Proxmox</i> hypervisor, its containers and VMs</li>
+	<li>For a single system to a complete <i>Proxmox</i> hypervisor, its containers and its VMs</li>
       </ul>
     </p>
     <p>
       <b><u>Some notes about Dar software:</u></b><br/>
       At the opposite of backup tools that copy bytes verbatim from the disk to a file, <i>dar</i> keeps traces of files inside
       the file-system, it stores every possible thing related to these files (metadata, attributes, Extended Attributes, data, sparse nature of files).<br/><br/>
-      <b>The advantages</b> are that you save much less data (not the free block space of a file-system), can perform differential and incremental
-      backups (so the new backup is very small and processing time very fast), and even use rsync-based binary delta per saved file between two
-      backups (so you do not re-save a whole large binary file when it has changed). The other advantage is that you can restore
-      on any disk size (if large enough to hold the data), change the partition layout, use a different file-system, and so on.
-      Added to that <i>dar</i> can compress specific files and avoid trying compressing some others during the backup process and use strong encryption at the same time. Last
-      the backup format is very robust against corruption and can both detect corruption affecting a file and still recover
-      the rest of the backup. But if using parity data with dar (thanks to <a href="http://parchive.sourceforge.net/">Parchive</a> software as we will show here), the backup can
+      <b>The advantages</b> are
+      <ul>
+	<li>much less data (not the free block space of a file-system),</li>
+	<li>can perform differential and incremental backups (so the new backup is very small and processing time very fast),</li>
+	<li>can even use rsync-based binary delta per saved file between two backups (so you do not re-save a whole large binary file when it has changed),</li>
+	<li> The other advantage is that you can restore on any disk size (if large enough to hold the data),</li>
+	<li>change the partition layout,</li>
+	<li>use a different file-system,</li>
+	<li>can compress specific files and avoid trying compressing some others during the backup process</li>
+	<li>use strong encryption efficiently</li>
+	<li>the backup format is very robust against corruption and can both detect corruption affecting
+	  a file and still recover the rest of the backup</li>
+	<li>the use of parity data can be integrated with dar (thanks to <a href="http://parchive.sourceforge.net/">Parchive</a> software
+	  as we will show here), can even allow the repairing of the backup</li>
       even be repaired upon corruption.<br/><br/>
+	<li>and so on.</li>
+      </ul>
       <b>The drawbacks</b> are that you will have to manually recreate the disk partitions and format the file-system as you want,
-      in order to restore files into them.
+      in order to restore files into them. The objective of this document is thus to explain how to do that and let you see that this task
+      is not complex and brings a lot of freedom.
     </p>
     <h2>Backup creation</h2>
     <h3>What to backup</h3>
@@ -68,8 +102,48 @@
       system at the time of the backup (see -&lt; and -= options below).
     </p>
     <p>
-      Here is an example of configuration I use for myself on a <i>Proxmox</i> system (Debian based kvm hypervisor):
+      Here is an example of configuration I use for myself on a <i>Proxmox</i> system (Debian based kvm hypervisor). For more details refer to the
+      man page but in summary here is the options unsed and their meaning:
     </p>
+    <dl>
+      <dt class=void>-R option</dt><dd>
+	Defines the root of the data to backup. Here the backup scope is system wide so we give it "/" as argument</dd>
+      <dt class=void>-am</dt><dd>
+	Let using the ordered and natural mask combinaison</dd>
+      <dt class=void>-D</dt><dd>
+	When excluding a directory (like /sys for example) store the directory as empty in the backup, this way at restoration
+	time the mount-point will be recreated</dd>
+      <dt class=void>-P</dt><dd>
+	prunes the directory given in argument (which is relative to the -R root, so <code>-P dev</code> excludes /dev here). It can be used
+	multiple times.</dd>
+      <dt class=void>-g</dt><dd>
+	derogate to a previous -P option by including the directory given in argument</dd>
+      <dt class=void>-z/-zbzip2</dt><dd>
+	compress the backup here with bzip2 algorithm</dd>
+      <dt class=void>-s</dt><dd>
+	split backup in several files (called slices) to avoid having a possibily huge file</dd>
+      <dt class=void>-B</dt><dd>
+	includes other options defined in the file given in argument</dd>
+      <dt class=void>compress-exclusion</dt><dd>
+	is a set of options (a so called "target") defined in /etc/darrc that provides a long list
+	of files types that do not worth trying to compress (already compressed files, for example)</dd>
+      <dt class=void>no-emacs-backup</dt><dd>
+	is another target avoiding to save emacs temporary backup files</dd>
+      <dt class=void>bell</dt><dd>
+	yet another target still defined in /etc/darrc that makes the terminal ring upon user interaction request</dd>
+      <dt class=void>-E</dt><dd>
+	execute the provided command after each created slice, here we run a script that lead par2 to
+	generate parity data for each slice</dd>
+      <dt class=void>--slice-mode</dt><dd>
+	defines the permission of the backup slices that will be created</dd>
+      <dt class=void>--retry-on-change</dt><dd>
+	as we perform the backup of a live system, we need retry saving up to 3 times
+	any file that changed at the time it was read for backup.</dd>
+      <dt class=void>-&lt;</dt><dd>
+	when entering the /root directory execute the command provided with -= option</dd>
+      <dt class=void>-=</dt><dd>
+	execute the provided command when saving a directory or file referred by -&lt; option</dd>
+    </dl>
     <div><code>
 
 	root@soleil:~# cat .darrc
@@ -123,13 +197,14 @@
 
     <h3>Ciphering</h3>
     <p>
-      If backup has been ciphered (-K option), with symmetric encryption algorithm you will be asked for the passphrases
-      to decipher it and restore your data, while with asymmetrical encryption, this is the private key and the knowledge of the
-      passphrase used to unlock it (if used) that will be needed. In consequences this needed information must <b>not</b> only
-      be stored in the backup, but also outside of it (in your head for a passphrase, or in a removable media for a private
+      If backup has to be ciphered (-K option), better use symmetric encryption algorithm, than assymmetrical:
+      For the first, you will be asked for the passphrases to decipher the backup and restore your data,
+      while with asymmetrical encryption, this is the private key and the knowledge of the
+      passphrase used to unlock it (if used) that will be needed. In consequences this needed information
+      be stored <u>outside the backup</u> (in your head for a passphrase, or in a removable media for a private
       key, for example).
       <br/><br/>
-      The interest of ciphering backups is especially strong when using a cloud provider to store them.
+      The interest of ciphering backups is especially strong when using a public cloud provider to store them.
     </p>
     <h3>Direct Attached Storage (DAS)</h3>
     <p>
@@ -168,8 +243,8 @@
     <p>
       So you have done and tested your backup as usually and today you need to restore them on a brand-new computer.
       The proposition is to use <a href="https://www.system-rescue.org/">System-rescueCD</a> for that. Do not be
-      confused by this name, it be used not only CD bootable based OS, but is also available as bootable USB key.
-      <a href="https://www.knopper.net/knoppix/index-en.html">Knoppix</a> is also an option.
+      confused by this name, it can not only make bootabe CD/DVD, but is also bootable USB key.
+      <a href="https://www.knopper.net/knoppix/index-en.html">Knoppix</a> is also an good option.
     </p>
     <p>
       Once systemRescueCD has booted, you get to a shell prompt ready to interpret your commands.
@@ -212,8 +287,8 @@
 
     <h4>Creating a local temporary storage (NAS context without (S)FTP access)</h4>
     <p>
-      In the case of Network Storage (NAS) and not FTP or SFTP protocol is
-      available, we need a local temporary file-system (removed at the end of the restoration
+      In the case of Network Storage (NAS) without FTP or SFTP protocol support,
+      we need a local temporary file-system (removed at the end of the restoration
       process). Here we use <b>lsblk</b> to list all disks,
       then <b>gdisk</b> to create partitions and finally <b>mkfs</b> to format the file-system
       and <b>mount</b> it to have it ready for use.<br/><br/>
@@ -298,7 +373,8 @@
     <p>
       you can now fetch each slice dar would request into that /mnt/Backup directory and remove it afterward. Dar's -E option
       may be of some use it to automate the process. Assuming you use sftp outside of dar to fetch the slices, you could use
-      the following to instruct <i>dar</i> where how to obtain the slices.
+      the following to instruct <i>dar</i> where to obtain the slices from (for http or https you could usr curl to do
+      something equivalent):
     </p>
     <div>
       <code>
@@ -325,7 +401,8 @@
 
     <h4>NAS with FTP or SFTP</h4>
     <p>
-      If you plan to use FTP or SFTP embedded within <i>dar</i> you do not need to prepare any local temporary storage, just remains the network access
+      During the system-rescueCD boot process, you have been asked to provide network information, so we assume you did well and this volatile system
+      has an operational network access. If you plan to use FTP or SFTP embedded within <i>dar</i> you do not need to prepare any local temporary storage, just remains the network access
       to the NAS to validate:
     </p>
     <div><code>
@@ -791,7 +868,8 @@
 
     <h3>Adaptation of the restored data</h3>
     <p>
-      The UUID have been recreated, if the restored /etc/fstab points to file-system
+      The UUID of the different filesystem and swap space have been recreated,
+      if the restored /etc/fstab points to file-system
       based on their UUID we have to adapt it to their new UUID. The
       <b>blkid</b> let you grab the UUID of file-system we created including
       the swap partition, so we can edit <b>/mnt/R/etc/fstab</b>
@@ -837,9 +915,9 @@
 
     </code></div>
     <p>
-      We will have to reinstall the boot loader (grub in our case). Do achieve this goal
+      We will have to reinstall the boot loader (grub in our case). To achieve this goal
       we will <b>chroot</b> into /mnt/R, but
-      first we need to access the /dev /proc and /sys and if using UEFI boot
+      first we need to access the /dev /proc and /sys and if using UEFI boot, the
       /sys/firmware/efi/efivars file-system from within the chrooted environment:
     </p>
     <div><code>
@@ -1032,7 +1110,7 @@
     <h3>formatting the partitions and volumes</h3>
     <p>
       The formatting of the EFI partition has been seen, so we will not detail
-      it here, but it has to be done now for the following steps to succeed.
+      it here, but it must be done now, in order for the following steps to succeed.
     </p>
     <p>
       Remains the LVM related stuff to setup:
@@ -1111,10 +1189,11 @@
     </code></div>
     <h3>Restoring the data with dar</h3>
     <p>
-      we can proceed as previously, but we will make differently
+      By default in proxmox the /var/liv/vz is in the root filesystem.
+      we could restore as described above, but we will make differently here,
       by creating a thing-pool and using a thin volume inside it for /var/lib/vz
       in order to not saturate the proxmox system with backups while not
-      blocking its free space only for backups, but sharing it with VM volumes.
+      dedicating a whole partition for it, but sharing this space with VM volumes.
     </p>
     <h3>Creating a thin-pool</h3>
     <p>
@@ -1252,20 +1331,20 @@
     <p>
       For simplicity we will restore an LVM inside a ciphered system, but the exercice is pretty similar to restore an LVM and have
       some Logical Volume being LUKS ciphered "devices". The advantage of LVM inside LUKS is simplicity, the advantage of LUKS inside
-      LVM is performance when you do not want to have all volumes ciphered (for example a /var/spool/proxy holds public data it does not worth
-      ciphering it).
+      LVM is performance when you do not want to have all volumes ciphered (for example a /var/spool/proxy which holds public data, does not worth
+      ciphering).
     </p>
     <p>
-      As seen previously the EFI partition cannot be part of an LVM, it cannot thus be neither ciphered as to uncipher the kernel must be loaded
-      and running. The second consequence is that the kernel and the mandatory initramfs must not reside in a ciphered partition. LUKS can thus
-      prevent your data from be exposed to a thief, however if one has a physical access to your computer and if this one is not running
+      As seen previously, the EFI partition cannot be part of an LVM, it cannot thus be neither ciphered as to read a cipher volume, the kernel must
+      be loaded and running. The second consequence is that the kernel and the mandatory initramfs must not reside in a ciphered partition. If LUKS can
+      prevent your data from be exposed to a thief, however if someone has a physical access to your computer and if this later one is not running
       24/7, LUKS alone cannot prevent one to modify the kernel and ramdisk image used to boot, introducing some keylogger or other spying
-      tool that will catch the secret key you need to enter at boot time to uncipher your LUKS disk. This is the role of the secure boot process,
-      which we will not describe here today (maybe in a future revision of this document) to detect such type of attack.
+      tool that will catch the secret key you need to enter at boot time and uncipher your LUKS disk. This is the role of the secure boot process,
+      which we will not describe here today (maybe in a future revision of this document) to detect and prevent such type of attack.
     </p>
     <p>
       So we have to create an EFI partition, an unciphered <b>boot</b> partition and an partition that will be ciphered and which will contain
-      the LVM (root, home, swap space for example). Using the same way we did before here what we should end to:
+      the LVM (root, home, swap space for example). With the same commands we usd above, here is what partitionning we should get:
     </p>
     <div><code>
 
@@ -1320,8 +1399,8 @@
     </div></code>
     <p>
       of course if you forget the provided passphrase, you will lose all data stored in that volume. Note that this key can be changed
-      without having to rebuild of recipher the whole volume, we will see that further. Now we can <i>open</i> the volume, which mean
-      have the Linux kernel aware of the master key and able to cipher/uncipher data write to or read from this device:
+      without having to rebuild or recipher the whole volume, we will see that further. Now we can <i>open</i> the volume, which mean
+      have the Linux kernel aware of the master key and able to cipher/uncipher data written to or read from this device:
     </p>
 
     <code><div>
@@ -1402,7 +1481,7 @@
     </ul>
 
     <p>
-      in a linux system, the /etc/crypttab is read at startup (from the initramfs) to know
+      In a linux system, the /etc/crypttab is read at startup (from the initramfs) to know
       which volume should be "open" (<i>cryptsetup open <device></i> as we did above). This
       will lead the system to ask the passphrase to access the ciphered volume. It contains
       on each line 4 fields separated by space:
