@@ -625,7 +625,7 @@
     <p>
       The objectif here is to see how a minor data corruption can impacts the backup. Such type of
       corruption (a single bit invertion) can be caused by network transfert, cosmic particle hitting
-      the memory bank, or simply due to the time passing for some type of media
+      the memory bank, or simply due to the time passing stored on a particular medium.
     </p>
 
     <table class=center>
@@ -658,6 +658,27 @@
 	<td>-</td>
       </tr>
     </table>
+
+    <p>
+      To protect your data, you can go one step further computing data redundancy with <a href="https://github.com/Parchive/par2cmdline">Parchive</a>
+      on top of your backup or archives. This will allow you to repair them in case of corruption.
+      <ul>
+	<li>
+	  Though, <i>rsync</i> is not adapted to that process as creating a global redundancy of a directory tree is much more complex and error-prone,
+	  or inneficient if doing per backed up file redundancy. At the opposite, <i>tar</i> and <i>dar</i> are pretty well adapted as a backup is
+	  a single file (or a few big files if using slicing or multi-volume backup).
+	</li>
+	<li>
+	  Second, whatever is the redundancy level you select, if the data corruption exceed this level, you will not be able to repair your backup and
+	  archives. Thus, better relying on a robust and redundant backup file structure, and here <i>dar</i> has some big advantages.
+	</li>
+	<li>
+	  Last, if execution time is important for you, having a sliced backup with a slice size smaller than the available RAM
+	  and running <i>Parchive</i> right after each slice created, will save a lot of disk I/O and can speed up the overall process
+	  by more than 40%. But here too, only <i>dar</i> provides this possibility.
+	</li>
+      </ul>
+    </p>
 
     <p>
       The presented results above is a synthesis of the tests detailed in appendix.
@@ -955,16 +976,16 @@
 
     <table>
       <tr>
-	<th>Use Case</th>
+	<th>Use Cases</th>
 	<th>Dar</th>
 	<th>Rsync</th>
 	<th>Tar</th>
       </tr>
       <tr>
 	<th>Local directory copy</th>
-	<td>slightly more complete but slower</td>
+	<td>complete but slower</td>
 	<td class=best>complete and fastest</td>
-	<td>not better and still slower than 'cp'</td>
+	<td>loses some metadata during copy, 'cp' does as well and is much faster</td>
       </tr>
       <tr>
 	<th>remote directory copy</th>
@@ -974,7 +995,7 @@
       </tr>
       <tr>
 	<th>Single full backup</th>
-	<td class=best>fine file selection, flexible compression</td>
+	<td class=best>fine file selection, flexible compression, rich feature set</td>
 	<td>complete but sensible to data corruption</td>
 	<td>uncompletely saved metadata</td>
       </tr>
@@ -986,27 +1007,36 @@
       </tr>
       <tr>
 	<th>Backup to public cloud</th>
-	<td class=best>integrated and robust ciphering, slicing, hashing, sftp/ssh</td>
-	<td>no ciphering on storage</td>
+	<td class=best>integrated and robust ciphering, slicing, hashing, network
+	  protocols</td>
+	<td>no ciphering and no compression on storage</td>
 	<td>complex process with ciphering</td>
       </tr>
       <tr>
+	<th>Backup to private NAS</th>
+	<td class=best>slicing, hashing, integrated network protocols</td>
+	<td>no compression on storage</td>
+	<td>no network integration, uncompletely saved metadata</td>
+      </tr>
+      <tr>
 	<th>Backup to removable media (incl. tapes)</th>
-	<td class=best>integrated and robust ciphering, slicing, hashing</td>
-	<td>no ciphering on storage, no slicing</td>
-	<td>complex process with ciphering, no slicing or no compression</td>
+	<td class=best>slicing, hashing, compression, ciphering</td>
+	<td>no slicing/multi-volume support, no compression, no ciphering</td>
+	<td>multi-volume and compression are incompatible, complex if
+	  ciphering is needed
+	</td>
       </tr>
       <tr>
 	<th>Archiving of private data</th>
 	<td class=best>integrated ciphering, slicing, metadata redundancy</td>
-	<td>no compression, no ciphering, complex data protection</td>
-	<td>no corruption detection, several forked archive formats</td>
+	<td>no compression, no ciphering, complex to add on top data protection and redundancy</td>
+	<td>no data corruption detected, several forked archive formats</td>
       </tr>
       <tr>
 	<th>Archiving of public data</th>
 	<td>over featured</td>
-	<td>not easy to handle</td>
-	<td class=best>easy to use and standard</td>
+	<td>no compression on storage, hash and signature complex for a large file set</td>
+	<td class=best>fast and standard</td>
       </tr>
       <tr>
 	<th>Private data exchange over Internet</th>
@@ -1020,7 +1050,6 @@
 	<td>need public IP with human synchronization or permanent network access</td>
 	<td class=best>easy to use and standard</td>
       </tr>
-
     </table>
 
 
@@ -5110,6 +5139,115 @@
       the backup restoration suceeded according to <i>tar</i> but the corruption has been completely ignored!!!
       The result is both a corrupted backup and a corrupted restored data, with no notification at all...
     </p>
+
+    <h5>Parchive</h5>
+
+    <p>
+      We can increase the robustness of any file or set of files by mean of <i>Parchive</i> software. If its use
+      is adapted to <i>tar</i> and <i>dar</i> it is not adapted to <i>rsync</i> due to the directory tree structure it uses for its backup.
+      We will thus here measure the par2create (<i>Parchive</i>) execution time compared to backup time of <i>tar</i> and <i>dar</i>.
+    </p>
+
+    <div class=code><code>
+	devuan:/mnt/memdisk# mkdir SRC
+	devuan:/mnt/memdisk# cp --preserve -r /usr SRC
+	devuan:/mnt/memdisk# time <e class=blue>tar</e> -czf backup.tar.gz SRC
+	62.550u 3.148s <e>1:01.75</e> 106.3%   0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# time <e class=blue>dar</e> -c backup -z6 -1 0 -at -R SRC -q
+	60.287u 1.152s <e>1:01.45</e> 99.9%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# ls -l backup.*
+	-rw-r--r-- 1 root root <e>601976990</e> Dec  1 10:48 backup.1.dar
+	-rw-r--r-- 1 root root <e>588260243</e> Dec  1 10:47 backup.tar.gz
+	devuan:/mnt/memdisk# time <e class=blue>par2create</e> -r5 -n1 -q backup.tar.gz
+
+	Opening: backup.tar.gz
+	Done
+	94.465u 0.535s <e>0:05.74</e> 1654.8%  0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# time <e class=blue>par2create</e> -r5 -n1 -q backup.1.dar
+
+	Opening: backup.1.dar
+	Done
+	110.048u 0.364s <e>0:06.19<e> 1783.5% 0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk#
+    </code></div>
+    <p>
+      We see that the redundancy process is not negligible: for 5% of data redundancy,
+      we need around 10% of extra CPU time. Things get worse when the size of the
+      data to process by <i>Parchive</i> increases and when the disk I/O comes to play
+      (here the /mnt/memdisk was an in-memory tmpfs filesystem). This is the
+      case when the amount of data to backup is larger than the available RAM space, which
+      is a quite frequent situation:
+    </p>
+
+    <div class=code><code>
+	devuan:~/tmp# du -sh SRC
+	<e>27G</e>     SRC
+	devuan:~/tmp# free -m
+	.             total        used        free      shared  buff/cache   available
+	Mem:          <e>15776</e>         560         433           1       14782       14823
+	Swap:             0           0           0
+	devuan:~/tmp#
+    </code></div>
+    <p>
+      We are now placed in this context, having a 27 GiB data to backup on a machine having only around 16 GiB of
+      RAM.
+    </p>
+
+    <div class=code><code>
+	devuan:~/tmp# time dar -c backup -z6 -at -1 0 -R SRC -q <e class=blue>-E 'par2create -r5 -n1 -q %b.%N.%e'</e>
+
+	Opening: backup.1.dar
+	Done
+	15237.777u 105.379s <e>36:48.53</e> 694.7%     0+0k 158854544+57572120io 158pf+0w
+	devuan:~/tmp#
+    </code></div>
+    <p>
+      This execution time of around 36 mn above can be improved by using multiple slices. Choosing a slice size smaller than the available RAM
+      let <i>Parchive</i> compute parity data right after each slice has been generated, while it is still in the disk cache (RAM),
+      bypassing the corresponding disks I/O we had previously in a second time:
+    </p>
+    <div class=code><code>
+	devuan:~/tmp# time dar -c backup_splitted -z6 -at -1 0 -R SRC -q <e class=blue>-E 'par2create -r5 -n1 -q %b.%N.%e'</e> <e>-s 1G</e>
+
+	Opening: backup_splitted.1.dar
+	Done
+
+	Opening: backup_splitted.2.dar
+	Done
+	<i>[...]</i>
+	Opening: backup_splitted.26.dar
+	Done
+
+	Opening: backup_splitted.27.dar
+	Done
+	6040.106u 49.201s <e>21:58.73</e> 461.7%       0+0k 61862640+57567104io 123pf+0w
+	devuan:~/tmp#
+    </code></div>
+    <p>
+      The total execution time dropped to around 22 mn! Which makes a 40% time reduction.
+      By the way, having here 27 files of 1 GiB is also easier to manipulate (file transfer,
+      copy to removable media,...) than a huge equivalent file of 27 GiB.
+    </p>
+    <div class=code><code>
+	devuan:~/tmp# time tar -czf backup.tar.gz SRC
+	837.662u 80.776s <e>18:26.08</e> 83.0% 0+0k 54926128+54799696io 6pf+0w
+	devuan:~/tmp# time par2create -r5 -n1 -q backup.tar.gz
+	Opening: backup.tar.gz
+	Done
+	13352.393u 71.390s <e>18:24.34</e> 1215.5%     0+0k 95000064+2772144io 9pf+0w
+	devuan:~/tmp#
+
+    </code></div>
+    <p>
+      We get the same execution time (18 mn) for <i>tar</i> and <i>par2</i> for thus a total of 36 mn.
+      This same time for both software clearly states that the slowest operation is the disk I/O
+      (par2 is much more CPU intensive than gzip/tar). Else the overall time of the operation
+      is similar to what we say with <i>dar</i> above, except that we cannot use multi-volume
+      to speed up the operation as we did with <i>dar</i>: <i>tar</i> is not able to compress
+      *and* produce multi-volume backup. What we would gain on one side would be lost on the
+      other side...
+    </p>
+
 
     <h3>Execution Performance</h3>
 
