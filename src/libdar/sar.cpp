@@ -715,9 +715,6 @@ namespace libdar
 		}
 	    }
 
-		// telling the system to free this file from the cache
-	    of_fd->fadvise(fichier_global::advise_dontneed);
-
 	    of_fd->terminate();
             delete of_fd;
             of_fd = nullptr;

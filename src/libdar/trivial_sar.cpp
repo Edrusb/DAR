@@ -425,11 +425,6 @@ namespace libdar
 		throw SRC_BUG;
 	    }
 
-		// telling the system to free this file from the cache, when relying on a plain file
-	    fichier_global *ref_fic = dynamic_cast<fichier_global *>(reference);
-	    if(ref_fic != nullptr)
-		ref_fic->fadvise(fichier_global::advise_dontneed);
-
 	    reference->terminate();
 	    delete reference; // this closes the slice so we can now eventually play with it:
 	    reference = nullptr;
