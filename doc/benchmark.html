@@ -157,7 +157,7 @@
 	<td>yes(3)</td>
 	<td>-</td>
 	<td>yes(1)</td>
-	<td>yes</td>
+	<td>yes(6)</td>
 	<td>-</td>
       </tr>
     </table>
@@ -176,9 +176,9 @@
     <h3>Feature set</h3>
 
     <p>
-      In addition to the exhaustivity of data restoration (seen above), several Features are a
+      In addition to the exhaustivity of data restoration (seen above), several features are a
       <i>must have</i> when creating backups. Their description and what they bring to a backup process
-      is described below, followed by a table of how they are supported on the different ssoftware under test:
+      is provided below, followed by a table of how they are supported on the different software under test:
     </p>
 
     <dl>
@@ -192,7 +192,7 @@
       <br/>
 
       <dt>Data filtering</dt><dd>
-	Not all files need to backup:
+	Not all files need to be saved:
 	<ul>
 	  <li>
 	    some <b>directories</b> (like <code>/tmp, /proc, /sys, /dev, /home/*/.cache</code>) are useless to save
@@ -687,70 +687,103 @@
     </p>
 
     <h3>Performance</h3>
-    <p>
-      By performance we means measuring how computer resources are used for
-      a given task by the different software under test. Several tasks have been identified, they match
-      common use case:
-      <ul>
-	<li>The short term backup to move or copy files from a place to another, locally or over the network. The main
-	  point is speed, compression is not wanted in that context.
-	</li>
-	<li>
-	  Copying data remotely over a slow network, when the overhead time to compress/decompress is
-	  less important than the gain in transfer time due to the data reduction. Ciphering data in transit is often
-	  needed when data is transported out of private network (Internet, non-corporate network, operator MPLS...).
-	</li>
-	<li>
-	  Backup data for much longer duration than the extra compression time effort. In that context, the execution time
-	  is much less important that the storage space optimization and is usually associated with
-	  background/automated process and differential/incremental backups or more complex backup rotation
-	  scheme, to save space one step further.
-	</li>
-	<li>
-	  Long time archiving, the robusness and sustainability is a key point here
-	  espetially on some low end removable media, as it they may corrupt data more or less easily
-	  over time.
-	</li>
-      </ul>
-      We can then decline these previous main needs with the nature of the backup storage:
-      <ul>
-	<li>Direct Attached Disks (DAS) or Storage Area Network (SAN), performant and RAID based storage, where no redundancy is needed</li>
-	<li>local removable media, usually less performant, less sustainble and with limited space, where adding redundancy data is a good idea</li>
-	<li>public cloud storage, where ciphering is needed for privacy</li>
-	<li>personal Network Area Storage, that may or may not need ciphering depending on the physical context but that should leverage compression</li>
-      </ul>
-      last the audience implies different constraints:
-      <ul>
-	<li>personnal data, may require ciphering even on removable media</li>
-	<li>exchanged with peers over Internet, may require assymmetric ciphering (public/private keys)</li>
-	<li>public data, may no require backup up all metadata associated with modern filesystems</li>
-      </ul>
 
-      For each of these three use case, we will work on two different data sets:
-      <ul>
-	<li>a single large file (a debian ISO image, which does not compress well)</li>
-	<li>a set of many small files (a linux kernel source tree)</li>
-	<li>
-	  public data where chosing an algorithm providing very good compression ratio and fast decrompression will be appreciated,
-	  both for storage requirement for the hosts and network transfer time for the users, though here
-	  no ciphering and usually no filesystem specific metadata is needed, thus a simple and universal
-	  archive format is a key.
-	</li>
-      </ul>
-    </p>
-    <p>
-      From these use cases, we have focuses:
-      <ul>
-	<li>on execution time when compression was not used</li>
-	<li>
-    </p>
-
-    <h4>Full backup and restoration without compression</h4>
+    <h4>Performance aspects for local or remote file copy</h4>
 
     <p>
-      Execution time to copy a large file:
+      The performance aspect to consider for this target is exclusively the execution speed, this may imply data reduction
+      on the wire only if the bandwidth is low enough for the compression processing time added does not ruine the reduced
+      transfer time. As this complete depends on the compressibility of the data in regard to the compression algorithm
+      and compression level selected on one side and on the available bandwith on the other side, we will only consider here
+      local copy or remote copy over a wide bandwidth network not requiring compression processing to speed up the execution.
+      So in brief: here the criterium is execution speed, period.
     </p>
 
+    <h5>single huge file</h5>
+
+    <div class="cadre">
+      <div class="gauge best" style="width: 17%;">cp: 2.58 s</div>
+      <div class="gauge normal" style="width: 61%;">Dar: 9.18 s</div>
+      <div class="gauge normal" style="width: 100%">Rsync: 15.28 s</div>
+      <div class="gauge normal" style="width: 43%">Tar: 6.51 s</div>
+    </div>
+
+    <h5>Linux system</h5>
+
+	    <div class="cadre">
+      <div class="gauge best" style="width: 31%;">cp: 5.15 s</div>
+      <div class="gauge normal" style="width: 100%;">Dar: 16.78 s</div>
+      <div class="gauge normal" style="width: 99%">Rsync: 16.59 s</div>
+      <div class="gauge normal" style="width: 48%">Tar: 8.04 s</div>
+    </div>
+
+    <p>
+      for local copy <i>cp</i> is the fastest but unusable for remote copy <i>cp</i>. At first sight one could think
+      <i>tar</i> would be the best alternative but that would not take into account the fact you will probably have
+      to use secured connection once the <i>tar</i> tar backup is generated, thus extra user operation which is not
+      aken into account here while both <i>rsync</i> and <i>dar</i> have it integrated and can copy and transfer at the
+      same time.
+    </p>
+    <p>
+      If this is unique/manual remote copy <b><i>dar</i></b> may still be a good choice, but for
+      recurring/automated copy (directory synchronization) <b><i>rsync</i></b> is, by design, the best choice for that
+      task.
+    </p>
+
+
+    <h4>Performance aspects for Backup</h4>
+    <p>
+      For backup we consider the following by order of importance:
+    </p>
+    <ol>
+      <li>data reduction on backup storage</li>
+      <li>data reduction transmitted over the network</li>
+      <li>execution time to restore a few file</li>
+      <li>execution time to restore a full and differential backup</li>
+      <li>execution time to create a full and differential backup</li>
+    </ol>
+    <p>
+      Why this order? Because usually backup creation is done at low priority in background, and
+      on a day to day basis, this is the storage used that will let larger file history and the ability
+      to recover much more older accidentically removed files. Next, if backup storage can be low cost and dedicated, if using
+      backup to the cloud, you don't want your backup to drain all the bandwidth and slow down your business or
+      Internet access. Or, if rate limiting the bandwidth, you don't want the backup process to complete before the
+      next backup scheduled time. Next, it is much more frequent to have
+      to restore a few files (corrupted or deleted by mistake) and we hope this to be quick because this is interactive and that the
+      data is missing to go forward in one's work. The least frequent operation (hopefully) is the restoration of a whole system
+      in case of disaster, and having it performing quick is of course important, but less than having a complete, accurate and
+      recent backups somewhere to restore from.
+    </p>
+    <p>
+      Note that the following result do not take into account the performance penalty implied by the
+      <b>network latency</b>. Several reasons to that:
+    </p>
+    <ul>
+      <li>
+	it would not measure the software performance but the network latency which is not the object
+	of this benchmark and may vary with distance, link layer technology and number of devices crossed
+      </li>
+      <li>
+	As all the data that would be transported over the network would be compressed with the same algorithm,
+	the same compression level and over the same type of protocol (TCP based, like sftp/ssh), we can assume
+	the network penalty to be proportional to data processed by each software. As we only rely on tmpfs
+	filesystems to avoid dependency on disk I/O latency, we may approximate that the network latency would
+	just inflate the execution time in a linear manner. Adding networking should thus not modify the relative
+	performances of the softwares under test.
+      </li>
+    </ul>
+    <p>
+      However, as <i>tar</i> is not network aware it would require running a <code>scp</code> command or equivalent
+      right after the backup completion, while <i>rsync</i> and <i>dar</i> can process data and send it over the
+      network at the same time. This will here again give an advantage to <i>tar</i> as its overall execution speed
+      would most probably degrade comparatively to the two others upon network latency increase.
+    </p>
+
+    <h4>Data reduction on backup storage</h4>
+
+    <p>
+      diagramme avec : common features dar/rsync/tar + sparse file + incrmental + binary delta
+    </p>
     <div class="cadre">
       <div class="gauge ref" style="width: 18.3%;">cp: 2.8 s</div>
       <div class="gauge normal" style="width: 61%;">Dar: 9.34 s</div>
@@ -758,200 +791,70 @@
       <div class="gauge best" style="width: 43.6%">Tar: 6.68 s</div>
     </div>
 
-    <p>
-      Execution time to copy many small files:
-    </p>
 
-    <div class="cadre">
-      <div class="gauge ref" style="width: 23.38%;">cp: 1.48 s</div>
-      <div class="gauge normal" style="width: 100%;">Dar: 6.33 s</div>
-      <div class="gauge normal" style="width: 89%">Rsync: 5.64 s</div>
-      <div class="gauge best" style="width: 45.18%">Tar: 2.86 s</div>
-    </div>
+    <h4>Data reduction over network</h4>
 
     <p>
-      <u>In conclusion</u>, Without compression, <i>rsync </i> and <i>dar</i> depending on the
-      nature file size used are the slowest. At the opposite, <i>tar</i> is faster but far from being
-      as fast as <i>cp</i>. Thus in this scenario without compression, the use case are:
-      <ul>
-	<li>
-	  local copy for a full backup: <b><i>cp</i></b> gives the best performance but, as <i>tar</i>,
-	  it does not take into account the rich metadata a file can have (Extended Attributes, ACL, ...)
-	  in that case <i>rsync</i> or <i>dar</i> are more adapted.
-	</li>
-	<li>
-	  or a remote copy over a large bandwidth network: the best is <i>tar</i> with usual network
-	  protocol tool (sftp, ftp, ...) if this has to be done once, but if synchronization has to
-	  be performed regularly <b><i>rsync</i></b> is *the* solution.
-	</li>
-      </ul>
-    </p>
-
-    <h4>Full backup and restoration with compression</h4>
-
-    <p>
-      Execution time for a compressed copy of a large file:
-    </p>
-
-    <div class="cadre">
-      <div class="gauge normal" style="width: 89.74%;">Dar: 140.37 s</div>
-      <div class="gauge best" style="width: 83.77%">Rsync: 131.04 s</div>
-      <div class="gauge normal" style="width: 100%">Tar: 156.41 s</div>
-      <div class="gauge ref" style="width: 14.17%">Dar with 8 threads: 22.17 s</div>
-    </div>
-
-    <p>
-      Execution time for a compressed copy of many small files:
-    </p>
-
-    <div class="cadre">
-      <div class="gauge normal" style="width: 99.5%;">Dar: 29.17 s</div>
-      <div class="gauge best" style="width: 77.12%">Rsync: 22.59 s</div>
-      <div class="gauge normal" style="width: 100%">Tar: 29.29 s</div>
-    </div>
-
-    <p>
-      <u>Compressed size ratio for a single large file</u>. Note
-      that the performance of <i>dar</i> and <i>tar</i> is fully
-      dependent on the nature of the data to compress --- here the
-      data is difficult compress --- while for
-      <i>rsync</i> the result is always 100% - no compression at all).
-    </p>
-
-    <div class="cadre">
-      <div class="gauge normal" style="width: 99.78%">Dar: 99.78 %</div>
-      <div class="gauge normal" style="width: 100%">Rsync: 100.00 %</div>
-      <div class="gauge best" style="width: 99.77%">Tar: 99.77 %</div>
-    </div>
-
-    <p>
-      <u>Compressed size ratio for many small files</u>. Here the data
-      is easier to compress and we clearly see the difference between
-      <i>tar</i> and <i>dar</i> on one side and <i>rsync</i> on the other
-      side. But the test is not to measure the compression ratio per se,
-      but the compare execution performance between the different softwares
-      in the same conditions.
-    </p>
-
-    <div class="cadre">
-      <div class="gauge normal" style="width: 18.94%">Dar: 18.94 %</div>
-      <div class="gauge normal" style="width: 100%">Rsync: 100.00 %</div>
-      <div class="gauge best" style="width: 16.37%">Tar: 16.37 %</div>
-    </div>
-
-    <p>
-      Restoration of a single file
+      diagramme avec les meme mais changement pour rsync
     </p>
     <div class="cadre">
-      <div class="gauge normal" style="width: 13.33%">Dar: 0,66 s</div>
-      <div class="gauge best" style="width: 2%">Rsync: 0,01s</div>
-      <div class="gauge normal" style="width: 100%">Tar: 4,95 s</div>
+      <div class="gauge ref" style="width: 18.3%;">cp: 2.8 s</div>
+      <div class="gauge normal" style="width: 61%;">Dar: 9.34 s</div>
+      <div class="gauge normal" style="width: 100%">Rsync: 15.30 s</div>
+      <div class="gauge best" style="width: 43.6%">Tar: 6.68 s</div>
     </div>
 
 
-    <p>
-      <u>In conclusion</u> for this test, we have two use cases:
-      <ul>
-	<li>
-	  For relatively long term storage (compared to the
-	  execution time of the operation), <b><i>tar</i></b> and <b><i>dar</i></b> perform quite equivalently in
-	  term of compression ratio, however <i>dar</i> is very quick for the
-	  restoration of a few files. <i>rsync</i> at the opposite is not adapted here,
-	  as compression does not last and the resulting data is uncompressed.
-	</li>
-	<li>
-	  For transfer over slow network, <i>rsync</i> is the best option.
-	</li>
-      </ul>
-    </p>
-
-    <h4>Differential Backup</h4>
-
-    <p>
-      differential backup is interesting to save storage space when backup history is necessary.
-      When backup history is not needed (a thus the ability to recover a deleted file even long
-      after the mistake) the differential backup is still interesting as it saves a lot of execution
-      time compared to making a new full backup. So we have to evaluate two things:
-      <ul>
-	<li>storage space usage</li>
-	<li>execution time of backup and restoration</li>
-      </ul>
-    </p>
-
-    <h5>Modification of 1 bit in a file of 4,36 GiB</h5>
-    <p>
-      The resulting storage used (gzip level 6 was used) of to store the differential backup
-      (not replacing the full backup else this is just an update to the full backup):
-    </p>
+    <h4>Execution time to restore a few files</h4>
     <div class="cadre">
-      <div class="gauge best" style="width: 1%">Dar: 643 bytes</div>
-      <div class="gauge normal" style="width: 100%">Rsync: 4,35 GiB</div>
-      <div class="gauge normal" style="width: 100%">Tar: 4,35 GiB</div>
-    </div>
-    <p>
-      The resulting data transfered over the network to a remote repository:
-    </p>
-    <div class="cadre">
-      <div class="gauge best" style="width: 1%">Dar: 643 bytes</div>
-      <div class="gauge best" style="width: 1%">Rsync: 643 bytes</div>
-      <div class="gauge normal" style="width: 100%">Tar: 4,35 GiB</div>
-    </div>
-    <p>
-      The execution time of the differential backup+restoration:
-    </p>
-    <div class="cadre">
-      <div class="gauge best" style="width: 12.2%">Dar: 23.40 s</div>
-      <div class="gauge normal" style="width: 90.5%">Rsync: 140.11 s</div>
-      <div class="gauge normal" style="width: 100%">Tar: 154.77 s</div>
+      <div class="gauge ref" style="width: 18.3%;">cp: 2.8 s</div>
+      <div class="gauge normal" style="width: 61%;">Dar: 9.34 s</div>
+      <div class="gauge normal" style="width: 100%">Rsync: 15.30 s</div>
+      <div class="gauge best" style="width: 43.6%">Tar: 6.68 s</div>
     </div>
 
-    <h5>New an removed files</h5>
 
-    <p>
-      The resulting storage used (gzip level 6 was used) to store the differential backup
-      (not replacing the full backup else this would just an updated to the full backup):
-    </p>
+    <h4>Execution time to restore a whole system</h4>
     <div class="cadre">
-      <div class="gauge normal" style="width: 1%">Dar: 11.6 MiB</div>
-      <div class="gauge normal" style="width: 100%">Rsync: 1069 MiB</div>
-      <div class="gauge best" style="width: 0.9">Tar: 9.2 MiB</div>
-    </div>
-    <p>
-      The resulting data transfered over the network to a remote repository:
-    </p>
-    <div class="cadre">
-      <div class="gauge normal" style="width: 100%">Dar: 11.6 MiB</div>
-      <div class="gauge normal" style="width: 79.3%">Rsync: 9.2 MiB (estimated)</div>
-      <div class="gauge best" style="width: 79.3%">Tar: 9.2 MiB</div>
-    </div>
-    <p>
-      The execution time of the differential backup+restoration:
-    </p>
-    <div class="cadre">
-      <div class="gauge normal" style="width: 100%">Dar: 5.18 s</div>
-      <div class="gauge normal" style="width: 55.2%">Rsync: 2.86 s</div>
-      <div class="gauge best" style="width: 44.9%">Tar: 2.33 s</div>
+      <div class="gauge ref" style="width: 18.3%;">cp: 2.8 s</div>
+      <div class="gauge normal" style="width: 61%;">Dar: 9.34 s</div>
+      <div class="gauge normal" style="width: 100%">Rsync: 15.30 s</div>
+      <div class="gauge best" style="width: 43.6%">Tar: 6.68 s</div>
     </div>
 
-    <p>
-      <u>In conclusion:</u> In a mixed environement when some files
-      are modified, some removed and some other are added, <i>dar</i>
-      provides the best storage usage, and network bandwidth saving
-      when storing backup on a remote repository. while for execution time
-      depending on the proportion and size of modified files,
-      the fastest is either <i>tar</i> or <i>dar</i>.
-    </p>
 
+    <h4>Execution time to create a backup</h4>
+    <div class="cadre">
+      <div class="gauge ref" style="width: 18.3%;">cp: 2.8 s</div>
+      <div class="gauge normal" style="width: 61%;">Dar: 9.34 s</div>
+      <div class="gauge normal" style="width: 100%">Rsync: 15.30 s</div>
+      <div class="gauge best" style="width: 43.6%">Tar: 6.68 s</div>
+    </div>
+
+
+    <h4>copy of a directory</h4>
+
+    <div class="cadre">
+      <div class="gauge ref" style="width: 18.3%;">cp: 2.8 s</div>
+      <div class="gauge normal" style="width: 61%;">Dar: 9.34 s</div>
+      <div class="gauge normal" style="width: 100%">Rsync: 15.30 s</div>
+      <div class="gauge best" style="width: 43.6%">Tar: 6.68 s</div>
+    </div>
+    <p>
+      notes
+    </p>
 
     <h4>Ciphering/deciphering</h4>
     <p>
       There is many reason that implies the need of ciphering data:
-      <ul>
-	<li>if your disk is ciphered, would you store your backup in clear on the cloud?</li>
-	<li>do you trust you cloud provider to not inspect your data for marketing profiling?</li>
-	<li>Are you sure your patented data, secret industrial recipies will not be used by competition?</li>
-	<li>and so on</li>
-      </ul>
+    </p>
+    <ul>
+      <li>if your disk is ciphered, would you store your backup in clear on the cloud?</li>
+      <li>do you trust you cloud provider to not inspect your data for marketing profiling?</li>
+      <li>Are you sure your patented data, secret industrial recipies will not be used by competition?</li>
+      <li>and so on</li>
+    </ul>
+    <p>
       The ciphering execution time is independent on the nature of the backup, full or differential, compressed
       or not. To evaluate the ciphering performance we will use the same data sets as previously, both compressed
       and uncompressed. However not all software under test are able to cipher the resulting backup. <i>rsync</i>
@@ -1188,14 +1091,16 @@
     </table>
 
 
-
+    <p>
       In summary regarding the different use cases we have considered and the
-      <ul>
-	<li>exhasitivity of backed up data</li>
-	<li>available features around backup</li>
-	<li>backup robustness facing to media corruption</li>
-	<li>overall performance</li>
-      </ul>
+    </p>
+    <ul>
+      <li>exhasitivity of backed up data</li>
+      <li>available features around backup</li>
+      <li>backup robustness facing to media corruption</li>
+      <li>overall performance</li>
+    </ul>
+    <p>
       We can summarize the key points for each software to put in front and propose a best candidate to address each particular need:
     </p>
 
@@ -5641,562 +5546,674 @@
     </p>
     <div class=code><code>
 	devuan:~/tmp# time tar -czf backup.tar.gz SRC
-	837.662u 80.776s <e>18:26.08</e> 83.0% 0+0k 54926128+54799696io 6pf+0w
+	<e class=blue>837.662u</e> 80.776s <e>18:26.08</e> 83.0% 0+0k 54926128+54799696io 6pf+0w
 	devuan:~/tmp# time par2create -r5 -n1 -q backup.tar.gz
 	Opening: backup.tar.gz
 	Done
-	13352.393u 71.390s <e>18:24.34</e> 1215.5%     0+0k 95000064+2772144io 9pf+0w
+	<e class=blue>13352.393u</e> 71.390s <e>18:24.34</e> 1215.5%     0+0k 95000064+2772144io 9pf+0w
 	devuan:~/tmp#
 
     </code></div>
     <p>
-      We get the same execution time (18 mn) for <i>tar</i> and <i>par2</i> for thus a total of 36 mn.
-      This same time for both software clearly states that the slowest operation is the disk I/O
-      (par2 is much more CPU intensive than gzip/tar). Else the overall time of the operation
+      We get the same execution time (18 mn) for both <i>tar</i> and <i>par2</i> for thus a total of 36 mn.
+      This same time for both software while the real CPU usage is much more important for <i>par2</i>,
+      clearly shows that the slowest operation was the disk I/O. Else the overall time of the operation
       is similar to what we say with <i>dar</i> above, except that we cannot use multi-volume
       to speed up the operation as we did with <i>dar</i>: <i>tar</i> is not able to compress
-      *and* produce multi-volume backup. What we would gain on one side would be lost on the
+      *and* produce multi-volume backup: What we would gain on one side would be lost on the
       other side...
     </p>
 
 
     <h3>Execution Performance</h3>
 
+    </p>
     <p>
-      Several performances aspects are to be considered:
-      <ul>
-	<li>execution time</li>
-	<li>compression ratio</li>
-      </ul>
       For the first point, in order to compare performance in a fair manner, we have to take into
       consideration that some CPU intensive features are not implement by all softwares or have
       different default values:
-      <ul>
-	<li>
-	  The default compression level differs: <i>dar</i> uses level 9 by default while <i>rsync</i>
-	  and <i>tar</i> use level 6 which is faster. Only <i>dar</i> and <i>rsync</i> seems able
-	  let the user set this value, so we will have to manually set <i>dar</i> to use level 6 too:
-	  <code>-z6 option</code>
-	</li>
-	<li>
-	  the disk usage optimization is not supported by <i>tar</i> so we will not activate
-	  sparse file detection and optimization (for <i>rsync</i> no <code>-S option</code>)
-	  and disable it for <i>dar</i>
-	  (activated by default): <code>-1 0 option</code>
-	</li>
-	<li>
-	  <i>dar</i> spends non negligible CPU cycle to duplicate metadata along the backup, this
-	  is one of the root of exclusive robusness brought by <i>dar</i> backups, but this is an
-	  optional feature. We will disable it using the
-	  <code>-at option</code>
-	</li>
-	<li>
-	  <i>rsync</i> and <i>dar</i> calculate checksum on the saved data, while tar completely skips
-	  this data protection. Unfortunately this is not possible to disable for both,
-	  thus <i>tar</i> will have keep a small speed advantage about thanks to this difference.
-	</li>
-      </ul>
-      For the second point we will activate all features each software can leverage to provide the best data
-      reduction, may it about the backup storage or network bandwidth usage.
+    </p>
+    <ul>
+      <li>
+	The default compression level differs: <i>dar</i> uses level 9 by default while <i>rsync</i>
+	and <i>tar</i> use level 6 which is faster. Only <i>dar</i> and <i>rsync</i> seems able
+	let the user set this value, so we will have to manually set <i>dar</i> to use level 6 too:
+	<code>-z6 option</code>
+      </li>
+      <li>
+	the disk usage optimization is not supported by <i>tar</i> so we will not activate
+	sparse file detection and optimization (for <i>rsync</i> no <code>-S option</code>)
+	and disable it for <i>dar</i>
+	(activated by default): <code>-1 0 option</code>
+      </li>
+      <li>
+	<i>dar</i> spends non negligible CPU cycle to duplicate metadata along the backup, this
+	is one of the root of exclusive robusness brought by <i>dar</i> backups, but this is an
+	optional feature. We will disable it using the
+	<code>-at option</code>
+      </li>
+      <li>
+	<i>rsync</i> and <i>dar</i> calculate checksum on the saved data, while tar completely skips
+	this data protection. Unfortunately this is not possible to disable for both,
+	thus <i>tar</i> will have keep a small speed advantage about thanks to this difference.
+      </li>
+    </ul>
+    </p>
+    For the data reduction, we will first compare with the same feature set, then activate all specific
+    features each software can leverage to improve data reduction, and will measure the execution
+    time impact.
     </p>
 
     <p>
-      If using <i>rsync</i> as a backup tool (at the opposite of a copy operation), we assume the remote
+      All performance aspects are not interesting in all <b>use cases</b>. We can distinguish two main
+      types of use cases:
+    </p>
+    <ul>
+      <li>
+	A first set of tests will cover the <b>copy operations</b>, they will not use any compression, focusing
+	only on execution time.
+      </li>
+      <li>
+	A second set of tests will cover the <b>backup operations</b>, use compression and focus on the data
+	reduction mainly but also on the execution time.
+      </li>
+    </ul>
+
+    <p>
+      When using <i>rsync</i> as a backup tool (at the opposite of a copy operation), we assume the remote
       (or local) copy <i>is</i> the backup, and thus restoring implies syncing back this remote (or local)
       copy to the place the original was and has been lost.
     </p>
 
     <p>
-      The performance penalty implied by the network latency is not taken into account in these performance
-      tests for several reasons:
-      <ul>
-	<li>
-	  it would not measure the software performance but the network latency which is not the object
-	  of this benchmark and may vary with distance, link layer technology and number of devices crossed
-	</li>
-	<li>
-	  As all the data that would be transported over the network would be compressed with the same algorithm,
-	  the same compression level and over the same type of protocol (TCP based, like sftp/ssh), we can assume
-	  the network penalty to be proportional to data processed by each software. As we will only rely on tmpfs
-	  filesystems to avoid depending on disk I/O latency, we may approximate that the network latency would
-	  just inflate the execution time in a linear manner. Adding networking should thus not modify the relative
-	  performances of the softwares under test.
-	  <br/>
-	  <br/>
-	  However, as <i>tar</i> is not network aware it would require running a <code>scp</code> command or equivalent
-	  right after the backup completion, while <i>rsync</i> and <i>dar</i> can process data and send it over the
-	  network at the same time. This will here again give an advantage to <i>tar</i> as its performances would
-	  probably degrade compartively to the two others upon network latency increase.
-	</li>
-      </ul>
+      To prepare the data under test we used:
+    </p>
+    <ul>
+      <li>a big ISO file</li>
+      <li>a full linux system</li>
+    </ul>
+
+    <p>
+      All data to backup or to copy has been stored in a tmpfs also destination of the created backups and
+      restored data. The swap has been disabled to avoid any disk I/O penalty and we hope provide a fair
+      comparison environment.
     </p>
 
-    <h4>Performance test on an debian iso file</h4>
-    <p>
-      This first test's goal is to measure the performance of treatment for a huge file
-    </p>
-    <p>
-      After having created a tmpfs filesystem mounted at /mnt/memdisk, we have
-      disabled swapping with <code>swapoff -a</code> and setup an <code>SRC</code>
-      directory with the ISO image in it:
-      </p>
     <div class=code><code>
-	devuan | /mnt/memdisk >mkdir SRC
-	devuan | /mnt/memdisk >cp ~denis/tmp/debian-10.6.0-amd64-DVD-2.iso SRC
-	devuan | /mnt/memdisk >ls -l SRC
-	total 4577072
-	-rw-r--r-- 1 denis denis <e>4686921728</e> Oct 29 17:56 debian-10.6.0-amd64-DVD-2.iso
-	devuan | /mnt/memdisk >
-    </code></div>
-
-    <h5>Copy without compression</h5>
-
-    <p>
-      The main use case of backup without compression is to copy data locally,
-      sort of equivalent of the linux <i>cp</i> which execution time is given below for reference.
-      For backup that you want to keep some time, you will most
-      probably use compression to save disk space because the compression time is
-      negligeable compared to the backup retention time.
-      For <i>rsync</i> (which finally does a file copy) compression
-      is only interesting when performing the backup+restoration
-      operation over a low bandwidth network (which is the first target of this
-      software as its name <i>remote sync</i> states). In that context,
-      the compression time is less important than the data transfert delay reduction,
-      the slowest operation stays then the data transfer over the network.
-    </p>
-    <div class=code><code>
-	devuan:/mnt/memdisk# time cp --preserve -R SRC DST
-	0.040u 2.840s <e>0:02.88</e> 100.0%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# free
+	total        used        free      shared  buff/cache   available
+	Mem:       16155172      691764      151608     8780152    15311800     6299316
+	<e>Swap:             0           0           0</e>
+	devuan:/mnt/memdisk# df -h .
+	Filesystem      Size  Used Avail Use% Mounted on
+	<e>tmpfs</e>            14G  4.0K   14G   1% /mnt/memdisk
 	devuan:/mnt/memdisk#
     </code></div>
     <p>
-      The <i>cp</i> operation which can be seen as the fastest possible operation
-      of the backup+restoration cycle is of 2.88 seconds only.
+      To prepare the Linux system under backup we installed the <i>Devuan</i> system a few days before in a VM. On day D,
+      a full backup has been executed, then a distro package manager has upgraded the system and we made a differential
+      backup based on the first one, both backup being wrote to the testing machine (bare-metal server):
     </p>
 
     <div class=code><code>
-	devuan | /mnt/memdisk >time dar -c backup -R SRC -q -at -1 0
-	1.658u 2.910s <e>0:04.58</e> 99.5%     0+0k 0+0io 0pf+0w
-	devuan | /mnt/memdisk >ls -l backup*.dar
-	-rw-r--r-- 1 root root <e>4686922021</e> Oct 29 16:05 backup.1.dar
-	devuan | /mnt/memdisk >mkdir DST
-	devuan | /mnt/memdisk >time dar -x backup -R DST -q
-	1.617u 2.793s <e>0:04.68</e> 94.0%     0+0k 7760+0io 45pf+0w
-	devuan | /mnt/memdisk >
-    </code></div>
-    <p>
-      For <i>dar</i> the operation took:
-    </p>
-    <ul>
-      <li>4.66  seconds for backup</li>
-      <li>4.68  seconds to restore</li>
-      <li>thus 9.34 seconds for the overall operation</li>
-    </ul>
-    <br/>
-    <div class=code><code>
-	devuan | /mnt/memdisk >rm -rf DST
-	devuan | /mnt/memdisk >time rsync -arvHAXq SRC/* DST
-	22.837u 5.597s <e>0:15.30</e> 185.7%   0+0k 0+0io 0pf+0w
-	devuan | /mnt/memdisk >
+	root@Georges:~# dar -c sftp://denis@10.13.30.163/home/denis/tmp/full -zlz4 -R / -M -D --hash sha1 -afile-auth -G cat_full
+	root@Georges:~# apt-get upgrade
+	<i>[...]</i>
+	root@Georges:~# dar -c sftp://denis@10.13.30.163/home/denis/tmp/diff -A cat_full -zlz4 -R / -M -D --hash sha1 -afile-auth
+	root@Georges:~#
     </code></div>
 
     <p>
-      For <i>rsync</i> the operation took:
-    </p>
-    <ul>
-      <li>near 15.30 seconds for backup and restoration equivalent operation</li>
-      <li>
-	the backup size is a exactly 100% of the size of the saved data
-	(1 to 1 copied files)
-      </li>
-    </ul>
-    <p>
-      Interesting point, <i>rsync</i> used several threads (185.7% of execution time)
-      while just below 100% (1 thread).
-    </p>
-    <br/>
-    <div class=code><code>
-	devuan | /mnt/memdisk >time tar -cf backup.tar SRC
-	0.419u 2.909s <e>0:03.36</e> 98.5%     0+0k 1000+0io 3pf+0w
-	devuan | /mnt/memdisk >rm -rf DST
-	devuan | /mnt/memdisk >mkdir DST
-	devuan | /mnt/memdisk >cd DST
-	devuan | /mnt/memdisk/DST >time tar -xf ../backup.tar
-	0.335u 2.987s <e>0:03.32</e> 99.6%     0+0k 0+0io 0pf+0w
-	devuan | /mnt/memdisk >cd ..
-	devuan | /mnt/memdisk >ls -l backup.tar
-	-rw-r--r-- 1 denis denis <e>4686929920</e> oct.  29 16:00 backup.tar
-	devuan | /mnt/memdisk >
-    </code></div>
-    <p>
-      For <i>tar</i> the operation took:
-    </p>
-    <ul>
-      <li>near 3.36 seconds for backup</li>
-      <li>and  3.32 seconds for restoration</li>
-      <li>thus 6.68 seconds for the backup + restoration</li>
-    </ul>
-
-    <h5>Copy with compression</h5>
-
-    <p>
-      If using compression the space resulting space gain is the objective, beside the
-      fact to store for data for a relatively long term compared to the backup operation itself.
-      The other use of compression is the remote copy over a reduced bandwidth network. We use
-      the <i>gzip</i> compression algorithm because it is widely available with its default
-      compression level of 6.
+      And back on the <i>devuan</i> machine (at 10.13.30.163) we prepared the data
+      to test this way excluding FSA and EA to avoid a tone of warning as those are not
+      supported on tmpfs filesystem:
     </p>
 
     <div class=code><code>
-	devuan | /mnt/memdisk >time dar -c backup -z:6 -R SRC -q -at -1 0
-	130.247u 2.879s <e>2:13.14</e> 99.9%   0+0k 0+0io 0pf+0w
-	devuan | /mnt/memdisk >ls -l
-	total 9134704
-	drwxr-xr-x 2 denis denis         60 Nov  1 15:42 SRC
-	-rw-r--r-- 1 denis denis <e>4677038814</e> Nov  1 16:13 backup.1.dar
-	devuan | /mnt/memdisk >mkdir DST
-	devuan | /mnt/memdisk >time dar -x backup -R DST -q
-	4.535u 2.690s <e>0:07.23</e> 99.8%     0+0k 0+0io 0pf+0w
-	devuan | /mnt/memdisk >
-    </code></div>
-    <p>
-      For <i>dar</i> the operation took:
-    </p>
-    <ul>
-      <li>133.14 seconds for backup</li>
-      <li>7.23 seconds for restoration</li>
-      <li>which makes a total of 140,37 seconds for the copy operation</li>
-      <li>the backup size is 99.78% of the saved data (compression ratio is 0,22%)</li>
-    </ul>
-    <br/>
-    <br/>
+	devuan:/mnt/memdisk# mkdir state-1
+	devuan:/mnt/memdisk# mkdir state-2
+	devuan:/mnt/memdisk# dar -x ~denis/tmp/full -R state-1 --fsa-scope none -u "*"
 
-    <div class=code><code>
-	devuan | /mnt/memdisk >rmdir DST
-	devuan | /mnt/memdisk >mkdir DST
-	devuan | /mnt/memdisk >time rsync -arvHAXqz SRC/* DST
-	157.086u 8.448s <e>2:11.10</e> 126.2%  0+0k 0+0io 0pf+0w
-	devuan | /mnt/memdisk >
-    </code></div>
-    <p>
-      It may sound strange to use compression with rsync for local copy: we just compare here
-      the performance variation on how these softwares leverage compression. Network latency will
-      add some delay that may lead the compression time to become negligeable, or, if network is
-      faster, to be the weak link.
-    </p>
-    <p>
-      For <i>rsync</i> the operation took:
-    </p>
-    <ul>
-      <li>131.10 seconds for combined backup-restoration</li>
-      <li>compression used does not result in any gain in disk space though we assume
-	compressed data in transit was equivalent to what <i>dar</i> and <i>tar</i> did,
-	as the underlying algorithm an compression level is the same.</li>
-    </ul>
-    <br/>
-    <div class=code><code>
-	devuan | /mnt/memdisk >time tar -czf backup.tar.gz SRC
-	132.220u 10.926s <e>2:13.27</e> 107.4% 0+0k 192+0io 1pf+0w
-	devuan | /mnt/memdisk >ls -l backup.tar.gz
-	-rw-r--r-- 1 denis denis <e>4676242880</e> Oct 29 16:18 backup.tar.gz
-	devuan | /mnt/memdisk >rm -rf SRC
-	devuan | /mnt/memdisk >time tar -xzf backup.tar.gz SRC
-	21.993u 7.478s <e>0:23.14</e> 127.3%   0+0k 0+0io 0pf+0w
-	devuan | /mnt/memdisk >
+
+	--------------------------------------------
+	136836 inode(s) restored
+	including 27 hard link(s)
+	0 inode(s) not restored (not saved in archive)
+	0 inode(s) not restored (overwriting policy decision)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) failed to restore (filesystem error)
+	0 inode(s) deleted
+	--------------------------------------------
+	Total number of inode(s) considered: 136836
+	--------------------------------------------
+	EA restored for 3 inode(s)
+	FSA restored for 0 inode(s)
+	--------------------------------------------
+	devuan:/mnt/memdisk# dar -x ~denis/tmp/full -R state-2 --fsa-scope none -u "*"
+
+
+	--------------------------------------------
+	136836 inode(s) restored
+	including 27 hard link(s)
+	0 inode(s) not restored (not saved in archive)
+	0 inode(s) not restored (overwriting policy decision)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) failed to restore (filesystem error)
+	0 inode(s) deleted
+	--------------------------------------------
+	Total number of inode(s) considered: 136836
+	--------------------------------------------
+	EA restored for 3 inode(s)
+	FSA restored for 0 inode(s)
+	--------------------------------------------
+	devuan:/mnt/memdisk# dar -x ~denis/tmp/diff -R state-2 --fsa-scope none -u "*" -w
+
+
+	--------------------------------------------
+	568 inode(s) restored
+	including 0 hard link(s)
+	136670 inode(s) not restored (not saved in archive)
+	0 inode(s) not restored (overwriting policy decision)
+	0 inode(s) ignored (excluded by filters)
+	0 inode(s) failed to restore (filesystem error)
+	0 inode(s) deleted
+	--------------------------------------------
+	Total number of inode(s) considered: 137238
+	--------------------------------------------
+	EA restored for 0 inode(s)
+	FSA restored for 0 inode(s)
+	--------------------------------------------
+	devuan:/mnt/memdisk#
+
     </code></div>
 
-    <p>
-      For <i>tar</i> the operation took:
-    </p>
-    <ul>
-      <li>133.27 seconds for backup</li>
-      <li>23.14 seconds for restoration</li>
-      <li>which makes a total time of 156.41 seconds</li>
-      <li>the backup size is 99,77% of the saved data (compression ratio is 0,23%)
-    </ul>
 
-    <h5>Copy with compression using multiple threads</h5>
 
-    <p>
-      This test is just for fun, as no comparison is possible because only <i>dar</i>
-      between these tools is able to leverage
-      multiple cores to boost any compression algorithm execution time operation (not the compression
-      ratio which depends on the data to compress).
-    </p>
-    <p>
-      Setting compression block of 1 MiB with 8 worker threads we get the following:
-    </p>
+    <h4>Performance of copy operations</h4>
+
+    <h5>Dar</h5>
     <div class=code><code>
-	devuan | /mnt/memdisk >rm -rf DST
-	devuan | /mnt/memdisk >time dar -c backup -R SRC -q -z:6:1M -G 8 -at -1 0
-	145.621u 4.616s <e>0:17.75</e> 846.3%  0+0k 0+0io 0pf+0w
-	devuan | /mnt/memdisk >mkdir DST
-	devuan | /mnt/memdisk >time dar -x backup -R DST -q -G 8
-	11.981u 4.249s <e>0:04.42</e> 366.9%   0+0k 0+0io 0pf+0w
-	devuan | /mnt/memdisk >
-    </code></div>
-    <p>
-      The backup+restoration has reduced from 133.14 seconds as seen before
-      to 27,46 seconds and down to 22,17 seconds.
-    </p>
-    <p>
-      The HPE server I had the chance to access to do these performance tests on
-      (a <i>ProLiant XL230a Gen9</i>
-      running two <i>Intel(R) Xeon(R) CPU E5-2690 v3 @ 2.60GHz</i> processors)
-      has a lot of cores, so I could test multi-threading with 16 and even 24 threads:
-    </p>
-
-    <div class=code><code>
-	devuan | /mnt/memdisk >rm -rf DST backup.*
-	devuan | /mnt/memdisk >time dar -c backup -R SRC -q -z:6:1M -G 16 -at -1 0
-	154.029u 3.723s <e>0:09.50</e> 1660.4% 0+0k 0+0io 0pf+0w
-	devuan | /mnt/memdisk >mkdir DST
-	devuan | /mnt/memdisk >time dar -x backup -R DST -G 16 -q
-	16.476u 4.478s <e>0:04.44</e> 471.6%   0+0k 0+0io 0pf+0w
-	devuan | /mnt/memdisk >
-    </code></div>
-    <p>
-      With 16 threads, the backup+restoration took 13,94 seconds (9.6 time faster than
-      in single thread mode).
-    </p>
-    <p>
-      The time gain is a bit less than the number of thread, the process overhead exist but is
-      not very important.
-    </p>
-    <p>
-      For reference the same operation with 24 threads:
-    </p>
-    <div class=code><code>
-	devuan | /mnt/memdisk >rm -rf backup.1.dar DST
-	devuan | /mnt/memdisk >mkdir DST
-	devuan | /mnt/memdisk >time dar -c backup -R SRC -q -z:6:1M -G 24 -at -1 0
-	169.115u 4.160s <e>0:07.05</e> 2457.7% 0+0k 0+0io 0pf+0w
-	devuan | /mnt/memdisk >time dar -x backup -R DST -G 24 -q
-	19.244u 4.793s <e>0:04.43</e> 542.4%   0+0k 0+0io 0pf+0w
-	devuan | /mnt/memdisk >
-    </code></div>
-    <p>
-      With 24 threads, the compressed backup+restoration took 11.48 seconds (11,6 time faster).
-      We start reaching the limit of multi-threading in that context: the muti-threading overhead
-      or I/O memory access seems having drained quite all the extra CPU power.
-    </p>
-
-    <h4>Performance test on linux kernel pristine source code tree</h4>
-
-    <p>
-      For this test, we perform a backup and restoration of a lot of small files.
-      Then we will also measure the time to restore only a few files.
-    </p>
-
-    <div class=code><code>
-	devuan:/mnt/memdisk# mkdir SRC
-	devuan:/mnt/memdisk# cd SRC
-	devuan:/mnt/memdisk/SRC# tar -xf ~denis/tmp/linux-5.9.2.tar.xz
-	devuan:/mnt/memdisk/SRC# cd ..
-	devuan:/mnt/memdisk# du -B1 -s SRC
-	<e>1121144832</e>      SRC
-	devuan:/mnt/memdisk# find SRC | wc -l
-	<e>74725</e>
+	devuan:/mnt/memdisk# time dar -c copy -1 0 -at -R SRC1 -q
+	1.834u 2.909s <e>0:04.87</e> 97.1%     0+0k 744+0io 12pf+0w
+	devuan:/mnt/memdisk# mkdir DST
+	devuan:/mnt/memdisk# time dar -x copy -R DST -q
+	1.563u 2.836s <e>0:04.41</e> 99.5%     0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# du -sh SRC1 DST
+	4.4G    SRC1
+	4.4G    DST
+	devuan:/mnt/memdisk# diff -r SRC1 DST
+	devuan:/mnt/memdisk# echo $?
+	0
+	devuan:/mnt/memdisk# rm -rf DST copy.1.dar
+	devuan:/mnt/memdisk# time dar -c copy -1 0 -at -R SRC2 -q
+	4.739u 3.683s <e>0:08.44</e> 99.6%     0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# mkdir DST
+	devuan:/mnt/memdisk# time dar -x copy -R DST -q
+	4.449u 3.872s <e>0:08.34</e> 99.6%     0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# du -sh SRC2 DST
+	4.1G    SRC2
+	4.1G    DST
+	devuan:/mnt/memdisk# find DST | wc -l
+	136837
 	devuan:/mnt/memdisk#
     </code></div>
-
-    <h5>Full backup and restoration without compression</h5>
-
     <p>
-      As stated in the previous test, the use case of backup without compression
-      is short term backup or file copy. Below is, for reference, the execution
-      of the <i>cp</i> command:
+      The overall copy time for <i>dar</i> is:
     </p>
+    <ul>
+      <li>9.18 seconds for the big file in <code>SRC1</code></li>
+      <li>16.78 seconds for the full linux system in <code>SRC2</code></li>
+    </ul>
+
+    <h5>Rsync</h5>
     <div class=code><code>
 	devuan:/mnt/memdisk# mkdir DST
-	devuan:/mnt/memdisk# time cp --preserve -R SRC DST
-	0.364u <e>1.487s</e> 0:01.87 98.3%     0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# time rsync -arH SRC1 DST
+	23.088u 5.420s <e>0:15.28</e> 186.5%   0+0k 168+0io 4pf+0w
+	devuan:/mnt/memdisk# diff -r SRC1/ DST/SRC1/
+	devuan:/mnt/memdisk# echo $?
+	0
+	devuan:/mnt/memdisk# rm -rf DST
+	devuan:/mnt/memdisk# time rsync -arH SRC2 DST
+	22.408u 8.560s <e>0:16.59</e> 186.6%   0+0k 1224+0io 6pf+0w
+	devuan:/mnt/memdisk# du -sh SRC2 DST
+	4.1G    SRC2
+	4.1G    DST
+	devuan:/mnt/memdisk# find DST | wc -l
+	136838
 	devuan:/mnt/memdisk#
     </code></div>
     <p>
-      <i>cp</i> performs the copy of the Linux source tree in 1.48 seconds
-    </p>
-
-    <div class=code><code>
-      devuan:/mnt/memdisk# time dar -c backup -R SRC -q
-      4.687u 1.335s <e>0:06.04</e> 99.5%     0+0k 0+0io 0pf+0w
-      devuan:/mnt/memdisk# ls -l backup.1.dar
-      -rw-r--r-- 1 root root <e>967464861</e> Oct 30 18:23 backup.1.dar
-      devuan:/mnt/memdisk# mkdir DST
-      devuan:/mnt/memdisk# time dar -x backup -R DST -q
-      3.525u 1.834s <e>0:05.37</e> 99.6%     0+0k 0+0io 0pf+0w
-      devuan:/mnt/memdisk# time dar -x backup -R DST -q -w -g SRC/linux-5.9.2/CREDITS
-      1.156u 0.553s <e>0:01.71</e> 99.4%     0+0k 0+0io 0pf+0w
-      devuan:/mnt/memdisk#
-    </code></div>
-    <p>
-      and in fast mode:
-    </p>
-    <div class=code><code>
-	devuan:/mnt/memdisk# rm -rf backup* DST ; mkdir DST
-	devuan:/mnt/memdisk# time dar -c backup -R SRC -q -at -1 0
-	1.951u 1.391s <e>0:03.36</e> 99.4%     0+0k 0+0io 0pf+0w
-	devuan:/mnt/memdisk# ls -l backup.1.dar
-	-rw-r--r-- 1 root root <e>960787709</e> Oct 30 18:27 backup.1.dar
-	devuan:/mnt/memdisk# time dar -x backup -R DST -q
-	1.659u 1.294s <e>0:02.97</e> 98.9%     0+0k 0+0io 0pf+0w
-	devuan:/mnt/memdisk# time dar -x backup -R DST -q -w -g SRC/linux-5.9.2/CREDITS
-	0.409u 0.044s <e>0:00.46</e> 95.6%     0+0k 0+0io 0pf+0w
-	devuan:/mnt/memdisk#
-    </code></div>
-    <p>
-      For <i>dar</i> the operation took:
+      The overall copy time for <i>rsync</i> is:
     </p>
     <ul>
-      <li>6.04 seconds for backup</li>
-      <li>3.36 seconds for backup in <u>fast mode</u></li>
-      <li>5.37 seconds for full restoration</li>
-      <li>2.97 seconfs for full restoration in <u>fast mode</u></li>
-      <li>11.41 s for the full backup and restoration</li>
-      <li>6.33 seconds for full backup+restoration in <u>fast mode</u></li>
-      <li>1.71 second to restore a single file</li>
-      <li>0.44 second to restore a single file in <u>fast mode</u></li>
-      <li>the resulting backup space is 86,3 % of the original data</li>
-      <li>and 85,7 % of the original data in <u>fast mode</u></li>
+      <li>15.28 seconds for the big file in <code>SRC1</code></li>
+      <li>16.59 seconds for the full linux system in <code>SRC2</code></li>
     </ul>
-    <br/>
+
+
+    <h5>Tar</h5>
     <div class=code><code>
-	devuan:/mnt/memdisk# time tar -cf backup.tar SRC
-	0.337u 0.967s <e>0:01.31</e> 98.4%     0+0k 0+0io 0pf+0w
-	devuan:/mnt/memdisk# ls -l backup.tar
-	-rw-r--r-- 1 root root <e>1011200000</e> Oct 30 18:25 backup.tar
-	devuan:/mnt/memdisk# rm -rf DST
+	devuan:/mnt/memdisk# cd SRC1
+	devuan:/mnt/memdisk/SRC1# time tar -cf ../copy.tar *
+	0.343u 2.756s <e>0:03.10</e> 99.6%     0+0k 104+0io 1pf+0w
+	devuan:/mnt/memdisk/SRC1# cd ../
 	devuan:/mnt/memdisk# mkdir DST
 	devuan:/mnt/memdisk# cd DST
-	devuan:/mnt/memdisk/DST# time tar -xf ../backup.tar
-	0.362u 1.182s <e>0:01.55</e> 99.3%     0+0k 0+0io 0pf+0w
-	devuan:/mnt/memdisk/DST# time tar -xf ../backup.tar SRC/linux-5.9.2/CREDITS
-	0.178u 0.095s <e>0:00.27</e> 96.2%     0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk/DST# time tar -xf ../copy.tar
+	0.339u 3.071s <e>0:03.41</e> 99.7%     0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk/DST# cd ..
+	devuan:/mnt/memdisk# diff -r SRC1/ DST/
+	devuan:/mnt/memdisk# echo $?
+	0
+	devuan:/mnt/memdisk# rm -rf DST copy.tar
+	devuan:/mnt/memdisk# cd SRC2
+	devuan:/mnt/memdisk/SRC2# time tar -cf ../copy.tar *
+	<e class=red>tar: tmp/.ICE-unix/19789: socket ignored</e>
+	<e class=red>tar: tmp/.X11-unix/X0: socket ignored</e>
+	0.760u 2.887s <e>0:03.66</e> 99.4%     0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk/SRC2# cd ..
+	devuan:/mnt/memdisk# mkdir DST
+	devuan:/mnt/memdisk# cd DST
+	devuan:/mnt/memdisk/DST# time tar -xf ../copy.tar
+	0.814u 3.556s <e>0:04.38</e> 99.5%     0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk/DST# cd ..
+	devuan:/mnt/memdisk# du -sh SRC2 DST
+	4.1G    SRC2
+	4.1G    DST
+	devuan:/mnt/memdisk# find DST | wc -l
+	136834
+	devuan:/mnt/memdisk#
+    </code></div>
+    <p>
+      the overall copy time for <i>tar</i> is:
+    </p>
+    <ul>
+      <li>6.51 seconds for the big file in <code>SRC1</code></li>
+      <li>8.04 seconds for the full Linux system in <code>SRC2</code></li>
+    </ul>
+
+    <h5>Cp</h5>
+    <div class=code><code>
+	devuan:/mnt/memdisk# time cp --preserve -r SRC1 DST
+	0.051u 2.514s <e>0:02.58</e> 99.2%     0+0k 8+0io 1pf+0w
+	devuan:/mnt/memdisk# diff -r SRC1 DST
+	devuan:/mnt/memdisk# echo $?
+	0
+	devuan:/mnt/memdisk# rm -rf DST
+	devuan:/mnt/memdisk# time cp --preserve -r SRC2 DST
+	0.910u 4.194s <e>0:05.15</e> 99.0%     0+0k 288+0io 1pf+0w
+	devuan:/mnt/memdisk# du -sh SRC2 DST
+	<e>4.1G</e>    SRC2
+	<e class=red>4.2G</e>    DST
+	devuan:/mnt/memdisk# find DST | wc -l
+	136838
+	devuan:/mnt/memdisk# find DST/SRC2/tmp/ -ls
+	2315983      0 drwxrwxrwt   4 root     root          100 Dec  3 10:32 DST/SRC2/tmp/
+	2315987      0 drwxrwxrwt   2 root     root           60 Dec  3 10:27 DST/SRC2/tmp/.ICE-unix
+	2315988      0 srwxrwxrwx   1 denis    denis           0 Dec  3 10:27 DST/SRC2/tmp/.ICE-unix/19789
+	2315985      0 drwxrwxrwt   2 root     root           60 Dec  3 10:32 DST/SRC2/tmp/.X11-unix
+	2315986      0 srwxrwxrwx   1 root     root            0 Dec  3 10:32 DST/SRC2/tmp/.X11-unix/X0
+	2315984      4 -r--r--r--   1 root     root           11 Dec  3 10:32 DST/SRC2/tmp/.X0-lock
+	devuan:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      The overall copy time for <i>cp</i> is:
+    </p>
+    <ul>
+      <li>2.58 seconds for the big file in <code>SRC1</code></li>
+      <li>5.15 seconds for the full Linux system in <code>SRC2</code></li>
+    </ul>
+    <p>
+      <i>cp</i> is always the fastest and does reject the unix sockets as <i>tar</i> does.
+      However it requires slightly more storage than all other softwares tested here. And if
+      metadata (ACL, Extended Attributes, filesystem specific attributes, ...) need to be copied
+      with data, it does not match the need.
+    </p>
+
+    <h4>Performance of Backup operations</h4>
+
+    <p>
+      for reference:
+    </p>
+
+    <div class=code><code>
+	devuan:/mnt/memdisk# du -sb state-*
+	<e>4095931349</e>      state-1
+	<e>4136318367</e>      state-2
+	devuan:/mnt/memdisk# find state-1 | wc -l
+	136837
+	devuan:/mnt/memdisk# find state-2 | wc -l
+	137239
+	devuan:/mnt/memdisk#
+    </code></div>
+
+    <h5>Dar</h5>
+    <h6>Minimal features</h6>
+    <div class=code><code>
+	devuan:/mnt/memdisk# time dar -c dar-full -R state-1 -at -1 0 -z6 -q
+	145.970u 3.263s <e>2:29.73</e> 99.6%   0+0k 12344+0io 71pf+0w
+	devuan:/mnt/memdisk# time dar -c dar-diff -R state-2 -A dar-full -at -1 0 -z6 -q -asecu
+	8.957u 0.959s <e>0:09.93</e> 99.6%     0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# ls -l *.dar
+	-rw-r--r-- 1 root root   <e>49498524</e> Dec  3 16:17 dar-diff.1.dar
+	-rw-r--r-- 1 root root <e>1580562224</e> Dec  3 16:16 dar-full.1.dar
+	devuan:/mnt/memdisk# mkdir DST
+	devuan:/mnt/memdisk# time dar -x dar-full -R DST -q
+	18.677u 4.244s <e>0:22.94</e> 99.8%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# time dar -x dar-diff -R DST -q -w
+	2.585u 0.780s <e>0:03.48</e> 96.5%     0+0k 1856+0io 20pf+0w
+	devuan:/mnt/memdisk#
+	devuan:/mnt/memdisk# time dar -x dar-full -R DST -q -w -g etc/fstab
+	0.934u 0.036s <e>0:00.98</e> 97.9%     0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk#
+    </code></div>
+    <p>
+      for <i>dar</i> with minimal features (metadata no redundancy <code>-at</code>, no sparse file consideration <code>-1 0</code>):
+    </p>
+    <ul>
+      <li>data reduction on storage for the full backup is: 61.41%</li>
+      <li>data reduction on storage for the diff backup is: 98.80%</li>
+      <li>data reduction over the network is the same as on storage</li>
+      <li>execution time to restore a single file is: 0.98 s</li>
+      <li>execution time to restore the full backup: 22.94 s</li>
+      <li>execution time ot restore the diff backup: 3.48 s </li>
+      <li>full backup time: 149.73 s</li>
+      <li>diff backup time: 9.93 s</li>
+    </ul>
+
+    <h6>sparse file</h6>
+
+    <div class=code><code>
+	devuan:/mnt/memdisk# rm -rf DST *.dar
+	devuan:/mnt/memdisk# time dar -c dar-full -R state-1 -at -z6 -q
+	154.971u 3.000s <e>2:37.99</e> 99.9%   0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# time dar -c dar-diff -R state-2 -A dar-full -at -z6 -q -asecu
+	9.488u 0.871s <e>0:10.37</e> 99.8%     0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# ls -l *.dar
+	-rw-r--r-- 1 root root   <e>49505251</e> Dec  3 16:27 dar-diff.1.dar
+	-rw-r--r-- 1 root root <e>1578428790</e> Dec  3 16:25 dar-full.1.dar
+	devuan:/mnt/memdisk# mkdir DST
+	devuan:/mnt/memdisk# time dar -x dar-full -R DST -q
+	24.231u 6.110s <e>0:30.36</e> 99.9%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# time dar -x dar-diff -R DST -q -w
+	2.677u 0.793s <e>0:03.48</e> 99.4%     0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# time dar -x dar-full -R DST -q -w -g etc/fstab
+	1.067u 0.053s <e>0:01.13</e> 98.2%     0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      for <i>dar</i> with default features (metadata no redundancy <code>-at</code>, with sparse file consideration (activated by default))
+    </p>
+    <ul>
+      <li>data reduction on storage for the full backup is: 61.46%</li>
+      <li>data reduction on storage for the diff backup is: 98.80%</li>
+      <li>data reduction over the network is the same as on storage</li>
+      <li>execution time to restore a single file is: 1.13 s</li>
+      <li>execution time to restore the full backup: 30.36 s</li>
+      <li>execution time ot restore the diff backup: 3.48 s </li>
+      <li>full backup time: 157.99 s</li>
+      <li>diff backup time: 10.37 s</li>
+    </ul>
+
+
+    <h6>Sparse file and binary delta</h6>
+    <div class=code><code>
+	devuan:/mnt/memdisk# rm -rf DST *.dar
+	devuan:/mnt/memdisk# time dar -c dar-full -R state-1 -at -z6 --delta sig -q
+	159.262u 3.332s <e>2:42.62</e> 99.9%   0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# time dar -c dar-diff -R state-2 -A dar-full -at -z6 -q -asecu
+	6.149u 0.950s <e>0:07.11</e> 99.7%     0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# ls -l *.dar
+	-rw-r--r-- 1 root root   <e>23883368</e> Dec  3 16:39 dar-diff.1.dar
+	-rw-r--r-- 1 root root <e>1602481058</e> Dec  3 16:38 dar-full.1.dar
+	devuan:/mnt/memdisk# mkdir DST
+	devuan:/mnt/memdisk# time dar -x dar-full -R DST -q
+	24.169u 6.163s <e>0:30.35</e> 99.9%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# time dar -x dar-diff -R DST -q -w
+	2.481u 0.942s <e>0:03.44</e> 99.4%     0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# time dar -x dar-full -R DST -q -w -g etc/fstab
+	1.205u 0.059s <e>0:01.27</e> 98.4%     0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      for <i>dar</i> with advanced features (metadata no redundancy <code>-at</code>, with binary delta computation <code>--delta sig</code>):
+    </p>
+    <ul>
+      <li>data reduction on storage for the full backup is: 60,87%</li>
+      <li>data reduction on storage for the diff backup is: 99.42%</li>
+      <li>data reduction over the network is the same as on storage</li>
+      <li>execution time to restore a single file is: 1.27 s</li>
+      <li>execution time to restore the full backup: 30.35 s</li>
+      <li>execution time ot restore the diff backup: 1.27 s </li>
+      <li>full backup time: 162.62 s</li>
+      <li>diff backup time: 7.11 s</li>
+    </ul>
+
+    <h5>Rsync</h5>
+    <h6>minimal features</h6>
+
+    <div class=code><code>
+	devuan:/mnt/memdisk# mkdir rsync-backup
+	devuan:/mnt/memdisk# time rsync -arHz --info=stats state-1/* rsync-backup
+
+	sent <e>1,585,540,014 bytes  received 2,174,472 bytes</e>  10,080,726.90 bytes/sec
+	total size is 4,260,538,564  speedup is 2.68
+	202.640u 8.503s <e>2:36.98</e> 134.5%  0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk#
+	devuan:/mnt/memdisk# time rsync -arHz --info=stats <e class=blue>--no-whole-file</e> state-2/* rsync-backup
+
+	<e>sent 29,077,377 bytes  received 216,581 bytes</e>  3,446,348.00 bytes/sec
+	total size is 4,300,916,222  speedup is 146.82
+	7.555u 1.115s <e>0:07.33</e> 118.1%    0+0k 1784+0io 7pf+0w
+	devuan:/mnt/memdisk# du -sb rsync-backup
+	<e>4136318307</e>      rsync-backup
+	devuan:/mnt/memdisk#
+	devuan:/mnt/memdisk# rm -rf state-1
+	devuan:/mnt/memdisk# mkdir DST
+	devuan:/mnt/memdisk# time rsync -arHz --info=stats <e class=blue>--no-whole-file</e> rsync-backup/* DST
+
+	<e>sent 1,599,585,756 bytes  received 2,181,147 bytes</e>  10,105,784.88 bytes/sec
+	total size is 4,300,916,222  speedup is 2.69
+	204.192u 8.306s <e>2:37.81</e> 134.6%  0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# time rsync -arHz --info=stats rsync-backup/etc/fstab DST/etc
+
+	sent 44 bytes  received 12 bytes  112.00 bytes/sec
+	total size is 664  speedup is 11.86
+	<e>0.001u 0.002s</e> 0:00.00 0.0%      0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      for <i>rsync</i> with minimal features (no sparse file consideration):
+    </p>
+    <ul>
+      <li>data reduction on storage for the full backup is: 0%</li>
+      <li>data reduction on storage for the diff backup is: 0%</li>
+      <li>data reduction over the network for the full backup is: 61.23%</li>
+      <li>data reduction over the network for the diff backup is: 99.29%</li>
+      <li>execution time to restore a single file is: 0.003 s</li>
+      <li>execution time ot restore the full+diff backup: 157.81 s (this is not due to the <code>--no-whole-file</code> see next text)</li>
+      <li>full backup time: 156.98 s</li>
+      <li>diff backup time: 7.33 s</li>
+    </ul>
+
+    <h6>sparse file + binary delta</h6>
+
+    <div class=code><code>
+	devuan:/mnt/memdisk# mkdir rsync-backup
+	devuan:/mnt/memdisk# time rsync -arHSz --info=stats state-1/* rsync-backup
+
+	<e>sent 1,585,540,014 bytes  received 2,174,460 bytes</e>  8,605,498.50 bytes/sec
+	total size is 4,260,538,564  speedup is 2.68
+	232.038u 13.137s <e>3:03.44</e> 133.6% 0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# time rsync -arHSz --info=stats <e class=blue>--no-whole-file</e> state-2/* rsync-backup
+
+	<e>sent 29,077,381 bytes  received 216,577 bytes</e>  3,446,348.00 bytes/sec
+	total size is 4,300,916,222  speedup is 146.82
+	7.305u 1.275s <e>0:07.04</e> 121.7%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk# du -sb rsync-backup
+	<e>4136318307</e>      rsync-backup
+	devuan:/mnt/memdisk# rm -rf state-1
+	devuan:/mnt/memdisk# mkdir DST
+	devuan:/mnt/memdisk# time rsync -arHSz --info=stats rsync-backup/* DST
+
+	sent 1,599,585,756 bytes  received 2,181,219 bytes  10,042,426.18 bytes/sec
+	total size is 4,300,916,222  speedup is 2.69
+	205.089u 12.354s <e>2:38.39</e> 137.2% 0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk#
+	devuan:/mnt/memdisk# time rsync -arHSz --info=stats rsync-backup/etc/fstab DST/etc
+
+	sent 44 bytes  received 12 bytes  112.00 bytes/sec
+	total size is 664  speedup is 11.86
+	0.001u 0.002s 0:00.00 0.0%      0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk#
+    </code></div>
+
+    <p>
+      for <i>rsync</i> with advanced features (sparse file consideration <code>-S option</code>, binary delta <code>--no-whole-file</code>)
+    </p>
+    <ul>
+      <li>data reduction on storage for the full backup is: 0%</li>
+      <li>data reduction on storage for the diff backup is: 0%</li>
+      <li>data reduction over the network for the full backup is: 60.64%</li>
+      <li>data reduction over the network for the diff backup is: 99.28%</li>
+      <li>execution time to restore a single file is: 0.003 s</li>
+      <li>execution time to restore the full+diff backup: 158.39 s</li>
+      <li>full backup time: 183.44 s</li>
+      <li>diff backup time: 7.04 s</li>
+
+    </ul>
+
+
+    <h5>Tar</h5>
+    <h6>minimal features</h6>
+    <div class=code><code>
+	devuan:/mnt/memdisk# cd state-1
+	devuan:/mnt/memdisk/state-1# time tar --listed-incremental=../snapshot.file -czf ../tar-full.tar.gz *
+	<e class=red>tar: tmp/.ICE-unix/19789: socket ignored</e>
+	<e class=red>tar: tmp/.X11-unix/X0: socket ignored</e>
+	153.624u 8.676s 2:31.71 106.9%  0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk/state-1# time tar --listed-incremental=../snapshot.file -czf ../tar-diff.tar.gz *
+	0.809u 0.369s 0:00.98 118.3%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk/state-1# cd ..
+	devuan:/mnt/memdisk# ls -l tar*
+	-rw-r--r-- 1 root root     765425 Dec  3 16:49 tar-diff.tar.gz
+	-rw-r--r-- 1 root root 1546464033 Dec  3 16:48 tar-full.tar.gz
+	devuan:/mnt/memdisk# mkdir DST
+	devuan:/mnt/memdisk# cd DST
+	devuan:/mnt/memdisk/DST# time tar -xzf ../tar-full.tar.gz
+	27.106u 6.756s 0:26.72 126.6%   0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk/DST# cd ..
+	devuan:/mnt/memdisk# diff --no-dereference -r state-1 DST
+	Only in state-1: .cache
+	Only in state-1/tmp/.ICE-unix: 19789
+	Only in state-1/tmp/.X11-unix: X0
+	devuan:/mnt/memdisk# cd DST
+	devuan:/mnt/memdisk/DST# time tar -xzf ../tar-diff.tar.gz
+	0.183u 0.085s <e class=red>0:00.18</e> 144.4%    0+0k 0+0io 0pf+0w
 	devuan:/mnt/memdisk/DST#
     </code></div>
     <p>
-      For <i>tar</i> the operation took:
+      Doing that way, the <i>tar</i> differential backup is empty: it only contains empty directories, no file data.
+      We will apply the changes over <code>state-1</code> rather than already setup changes at <code>state-2</code>.
+      This seems to mean that if the system clock is wrong or was wrong at the time a file was modified
+      (like daylight saving? or before NTP synchronization at system startup), which is
+      the same as here, were the changes have been brought before full backup was done, <b><u>those changes will not be
+      backed up by <i>tar</i></u></b>, while the file's attributes (file size, last modification date,...) changed.
     </p>
-    <ul>
-      <li>1.31 second for backup</li>
-      <li>1.55 second for the restoration</li>
-      <li>2.86 seconds for the full backup and restoration</li>
-      <li>0.27 second for the restoration of a single file</li>
-      <li>the resulting backup uses 90.2 % of the original data</li>
-    </ul>
-    <br/>
     <div class=code><code>
-	devuan:/mnt/memdisk# rm -rf DST
+	devuan:/mnt/memdisk# cd state-1
+	devuan:/mnt/memdisk/state-1# time tar --listed-incremental=../snapshot.file -czf ../tar-full.tar.gz *
+	<e class=red>tar: tmp/.ICE-unix/19789: socket ignored</e>
+	<e class=red>tar: tmp/.X11-unix/X0: socket ignored</e>
+	150.751u 8.299s <e>2:28.59</e> 107.0%  0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk/state-1# cd ..
+	devuan:/mnt/memdisk# dar -x ~denis/tmp/diff -R state-1 --fsa-scope none -u "*" -w -q
+	devuan:/mnt/memdisk# cd state-1
+	devuan:/mnt/memdisk/state-1# time tar --listed-incremental=../snapshot.file -czf ../tar-diff.tar.gz *
+	6.147u 0.559s <e>0:06.40</e> 104.5%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk/state-1# cd ..
+	devuan:/mnt/memdisk# ls -l tar* snapshot.file
+	-rw-r--r-- 1 root root    <e>3350869</e> Dec  3 17:08 snapshot.file
+	-rw-r--r-- 1 root root   <e>44607904</e> Dec  3 17:08 tar-diff.tar.gz
+	-rw-r--r-- 1 root root <e>1546448179</e> Dec  3 17:04 tar-full.tar.gz
 	devuan:/mnt/memdisk# mkdir DST
-	devuan:/mnt/memdisk# time rsync -arvHAXq SRC/* DST
-	6.480u 3.683s <e>0:05.64</e> 180.1%    0+0k 0+0io 0pf+0w
-	devuan:/mnt/memdisk# rm DST/linux-5.9.2/CREDITS
-	devuan:/mnt/memdisk# time rsync -arvHAXq SRC/linux-5.9.2/CREDITS DST
-	0.001u 0.004s <e>0:00.00</e> 0.0%      0+0k 0+0io 0pf+0w
-	devuan:/mnt/memdisk#
+	devuan:/mnt/memdisk# cd dst
+	dst: No such file or directory.
+	devuan:/mnt/memdisk# cd DST
+	devuan:/mnt/memdisk/DST# time tar -xzf ../tar-full.tar.gz
+	26.807u 7.020s <e>0:26.72</e> 126.5%   0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk/DST# time tar -xzf ../tar-diff.tar.gz
+	1.492u 0.381s <e>0:01.48</e> 126.3%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk/DST# time tar -xzf ../tar-full.tar.gz etc/fstab
+	25.219u 2.581s <e>0:25.15</e> 110.4%   0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk/DST#
     </code></div>
+
     <p>
-      For <i>rsync</i> the operation took:
+      for <i>tar</i> with minimal features (no sparse file consideration):
     </p>
     <ul>
-      <li>5.64 seconds for the equivalent of a full backup and restoration</li>
-      <li>0.005 seconds for the restoration of a single file(!)</li>
-      <li>the resulting backup uses 100 % of the original data</li>
+      <li>data reduction on storage for the full backup is: 62.16%</li>
+      <li>data reduction on storage for the diff backup is: 98.92%</li>
+      <li>data reduction over the network is the same as on storage</li>
+      <li>execution time to restore a single file is: 25.15 s</li>
+      <li>execution time to restore the full backup: 26.72 s</li>
+      <li>execution time ot restore the diff backup: 1.48 s</li>
+      <li>full backup time: 148.59 s</li>
+      <li>diff backup time: 6.40 s</li>
     </ul>
 
-    <h5>Full backup and restoration with compression</h5>
+
+    <h6>sparse file</h6>
 
     <p>
-      As stated for on the first data set, using compression makes sense for space disk
-      preservation and somehow long term retention and/or backup over a low bandwidth network. In
-      this scenario, the execution time is less important.
+      Whe had to recreate <code>state-1</code> as we needed modifying it at previous test
     </p>
 
     <div class=code><code>
-	devuan:/mnt/memdisk# time dar -c backup -R SRC -q -z6
-	23.890u 1.125s <e>0:25.03</e> 99.9%    0+0k 0+0io 0pf+0w
-	devuan:/mnt/memdisk# time dar -c backup-at-1-0 -R SRC -q -z6 -at -1 0
-	21.800u 1.039s <e>0:22.85</e> 99.9%    0+0k 0+0io 0pf+0w
-	devuan:/mnt/memdisk# ls -l backup*
-	-rw-r--r-- 1 root root <e>212368008</e> Nov  1 17:41 backup-at-1-0.1.dar
-	-rw-r--r-- 1 root root <e>219047659</e> Nov  1 17:39 backup.1.dar
-	devuan:/mnt/memdisk# mkdir DST
-	devuan:/mnt/memdisk# time dar -x backup -R DST -q
-	4.995u 1.179s <e>0:06.19</e> 99.5%     0+0k 0+0io 0pf+0w
-	devuan:/mnt/memdisk# time dar -x backup -R DST -q -w -g SRC/linux-5.9.2/CREDITS
-	0.632u 0.020s <e>0:00.66</e> 98.4%     0+0k 0+0io 0pf+0w
-	devuan:/mnt/memdisk#
-    </code></div>
-    <p>
-      For <i>dar</i> the operation took:
-    </p>
-    <ul>
-      <li>25.03 seconds for backup</li>
-      <li>22.85 seconds for backup in <u>fast mode</u></li>
-      <li>6.32 seconds for restoration (same time in fast mode)</li>
-      <li>which makes 31.35 seconds for the full backup+restoration cycle</li>
-      <li> and only 29,17 seconds in <u>fast mode</u></li>
-      <li>0.65 seconds for the restoration of a single file</li>
-      <li>the backup size is 19.5 % of the original data</li>
-      <li> and 18.9 % in <u>fast mode</u></li>
-    </ul>
-    <br/>
-    <div class=code><code>
-	devuan:/mnt/memdisk# time tar -czf backup.tar.gz SRC
-	25.394u 2.135s <e>0:24.34</e> 113.0%   0+0k 0+0io 0pf+0w
-	devuan:/mnt/memdisk# ls -l backup.tar.gz
-	-rw-r--r-- 1 root root <e>183630552</e> Oct 30 18:48 backup.tar.gz
+	devuan:/mnt/memdisk# rm tar* snapshot.file
+	devuan:/mnt/memdisk# cd state-1
+	devuan:/mnt/memdisk/state-1# time tar --listed-incremental=../snapshot.file -czSf ../tar-full.tar.gz *
+	<e class=red>tar: tmp/.ICE-unix/19789: socket ignored</e>
+	<e class=red>tar: tmp/.X11-unix/X0: socket ignored</e>
+	152.878u 10.155s <e>2:29.38</e> 109.1% 0+0k 1520+0io 18pf+0w
+	devuan:/mnt/memdisk/state-1# dar -x ~denis/tmp/diff --fsa-scope none -u "*" -w -q
+	devuan:/mnt/memdisk/state-1# time tar --listed-incremental=../snapshot.file -czSf ../tar-diff.tar.gz *
+	6.369u 0.752s <e>0:06.55</e> 108.5%    0+0k 3992+0io 16pf+0w
+	devuan:/mnt/memdisk/state-1# cd ..
+	devuan:/mnt/memdisk# ls -l tar* snap*
+	-rw-r--r-- 1 root root    <e>3350870</e> Dec  3 17:29 snapshot.file
+	-rw-r--r-- 1 root root   <e>44604194</e> Dec  3 17:29 tar-diff.tar.gz
+	-rw-r--r-- 1 root root <e>1546226992</e> Dec  3 17:27 tar-full.tar.gz
 	devuan:/mnt/memdisk# rm -rf DST
 	devuan:/mnt/memdisk# mkdir DST
 	devuan:/mnt/memdisk# cd DST
-	devuan:/mnt/memdisk/DST# time tar -xf ../backup.tar.gz
-	5.228u 1.771s <e>0:04.95</e> 141.2%    0+0k 0+0io 0pf+0w
-	devuan:/mnt/memdisk/DST# time tar -xf ../backup.tar.gz SRC/linux-5.9.2/CREDITS
-	5.069u 0.554s <e>0:04.90</e> 114.4%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk/DST# time tar -xzSf ../tar-full.tar.gz
+	27.331u 7.774s <e>0:26.27</e> 133.6%   0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk/DST# time tar -xzSf ../tar-diff.tar.gz
+	1.547u 0.487s <e>0:01.50</e> 134.6%    0+0k 0+0io 0pf+0w
+	devuan:/mnt/memdisk/DST# time tar -xzSf ../tar-full.tar.gz etc/fstab
+	25.068u 2.565s <e>0:25.00</e> 110.4%   0+0k 0+0io 0pf+0w
 	devuan:/mnt/memdisk/DST#
     </code></div>
-    <p>
-      For <i>tar</i> the operation took:
-    </p>
-    <ul>
-      <li>24.34 seconds for backup</li>
-      <li>4.95 seconds for restoration</li>
-      <li>which makes 29.29 seconds for the full backup+restoration cycle</li>
-      <li>4.95 seconds for the restoration of a single file</li>
-      <li>the backup size is 16,37 % of the original data</li>
-    </ul>
-    <br/>
-    <div class=code><code>
-	devuan:/mnt/memdisk# rm -rf DST
-	devuan:/mnt/memdisk# time rsync -arvHAXqz SRC/* DST
-	30.719u 3.195s <e>0:22.59</e> 150.0%   0+0k 0+0io 0pf+0w
-	devuan:/mnt/memdisk# rm DST/linux-5.9.2/CREDITS
-	devuan:/mnt/memdisk# time rsync -arvHAXqz SRC/linux-5.9.2/CREDITS  DST
-	0.014u 0.003s <e>0:00.01</e> 100.0%    0+0k 0+0io 0pf+0w
-	devuan:/mnt/memdisk#
-    </code></div>
-    <p>
-      For <i>rsync</i> the operation took:
-    </p>
-    <ul>
-      <li>22.59 seconds for the full backup+restoration cycle</li>
-      <li>0.01 for the restoration of a single file</li>
-      <li>
-	the backup size is 100 % of the original data (no compression as the
-	compression is used in flight for the data transfer, but what remains
-	is a plain copy of the backed up data)
-      </li>
-    </ul>
-
-    <a name="diffbackup"></a><h4>Differential backup and restoration</h4>
 
     <p>
-      Three events can lead to requiring a new backup:
+      for <i>tar</i> with advanced features (sparse file consideration <code>-S option</code>):
     </p>
     <ul>
-      <li>new file has been added</li>
-      <li>an existing file has been modified</li>
-      <li>a file has been removed</li>
+      <li>data reduction on storage for the full backup is: 62.16%</li>
+      <li>data reduction on storage for the diff backup is: 98.92%</li>
+      <li>data reduction over the network is the same as on storage</li>
+      <li>execution time to restore a single file is: 25.0 s</li>
+      <li>execution time to restore the full backup: 26.27 s</li>
+      <li>execution time ot restore the diff backup: 1.50 s</li>
+      <li>full backup time: 149.38 s</li>
+      <li>diff backup time: 6.55 s</li>
     </ul>
 
 
