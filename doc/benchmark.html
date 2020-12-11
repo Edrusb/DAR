@@ -692,14 +692,14 @@
 
     <p>
       The performance aspect to consider for this target is exclusively the execution speed, this may imply data reduction
-      on the wire only if the bandwidth is low enough for the compression processing time added does not ruine the reduced
-      transfer time. As this complete depends on the compressibility of the data in regard to the compression algorithm
-      and compression level selected on one side and on the available bandwith on the other side, we will only consider here
-      local copy or remote copy over a wide bandwidth network not requiring compression processing to speed up the execution.
-      So in brief: here the criterium is execution speed, period.
+      on the wire only if the bandwidth is low enough for the compression processing time added does not ruine the gain on
+      transfer time. Compression time is not dependent on the backup tool but on the data, and we will see in the backup
+      performances the way the different backup tools reduce data on the wire. For the execution time we get the following
+      results:
     </p>
 
-    <h5>single huge file</h5>
+    <h5>Single huge file</h5>
+    <p>The copied data was a Linux distro installation ISO file</p>
 
     <div class="cadre">
       <div class="gauge best" style="width: 17%;">cp: 2.58 s</div>
@@ -710,50 +710,90 @@
 
     <h5>Linux system</h5>
 
-	    <div class="cadre">
+    <p>The copied data was a fresh fully featured Linux installed system</p>
+
+    <div class="cadre">
       <div class="gauge best" style="width: 31%;">cp: 5.15 s</div>
       <div class="gauge normal" style="width: 100%;">Dar: 16.78 s</div>
       <div class="gauge normal" style="width: 99%">Rsync: 16.59 s</div>
       <div class="gauge normal" style="width: 48%">Tar: 8.04 s</div>
     </div>
 
+    <h5>Conclusion</h5>
     <p>
-      for local copy <i>cp</i> is the fastest but unusable for remote copy <i>cp</i>. At first sight one could think
-      <i>tar</i> would be the best alternative but that would not take into account the fact you will probably have
-      to use secured connection once the <i>tar</i> tar backup is generated, thus extra user operation which is not
-      aken into account here while both <i>rsync</i> and <i>dar</i> have it integrated and can copy and transfer at the
-      same time.
+      for local copy <i>cp</i> is the fastest but totally unusable for remote copy <i>cp</i>. At first sight one could think
+      <i>tar</i> would be the best alternative for remote copy, but that would not take into account the fact you will probably have
+      to use secured connection once the <i>tar</i> backup will be generated, thus requiring an extra user operation and time to
+      transfer the data while both alternatves, <i>rsync</i> and <i>dar</i>, have it integrated and can copy and transfer at the
+      same time, with both gain time and do not make the user task more complex.
     </p>
     <p>
-      If this is unique/manual remote copy <b><i>dar</i></b> may still be a good choice, but for
-      recurring/automated copy (directory synchronization) <b><i>rsync</i></b> is, by design, the best choice for that
-      task.
+      If this is unique/manual remote copy <b><i>dar</i></b> may still be faster (even when using compression to cope with low bandwidth,
+      see the backup test results, below). But for recurring/automated remote copy <b><i>rsync</i></b> if not always faster has the advantage
+      of simplicity of use.
     </p>
 
+    <table class=center>
+      <tr>
+	<th>Operation</th>
+	<th>Best Choice</th>
+	<th>Alternative</th>
+      </tr>
+      <tr>
+	<th class=left>Local copy</th>
+	<td>cp</td>
+	<td>tar</td>
+      </tr>
+      <tr>
+	<th class=left>One-time remote copy</th>
+	<td>dar</td>
+	<td>rsync</td>
+      </tr>
+      <tr>
+	<th class=left>recurrent remote copy</th>
+	<td>rsync</td>
+	<td>dar</td>
+      </tr>
+    </table>
 
     <h4>Performance aspects for Backup</h4>
     <p>
-      For backup we consider the following by order of importance:
+      For backup we consider the following criteria by order of importance:
     </p>
     <ol>
       <li>data reduction on backup storage</li>
-      <li>data reduction transmitted over the network</li>
-      <li>execution time to restore a few file</li>
-      <li>execution time to restore a full and differential backup</li>
-      <li>execution time to create a full and differential backup</li>
+      <li>data reduction when transmitted over the network</li>
+      <li>execution time to restore a few files</li>
+      <li>execution time to restore a full and differential backups</li>
+      <li>execution time to create a full and differential backups</li>
     </ol>
     <p>
-      Why this order? Because usually backup creation is done at low priority in background, and
-      on a day to day basis, this is the storage used that will let larger file history and the ability
-      to recover much more older accidentically removed files. Next, if backup storage can be low cost and dedicated, if using
-      backup to the cloud, you don't want your backup to drain all the bandwidth and slow down your business or
-      Internet access. Or, if rate limiting the bandwidth, you don't want the backup process to complete before the
-      next backup scheduled time. Next, it is much more frequent to have
-      to restore a few files (corrupted or deleted by mistake) and we hope this to be quick because this is interactive and that the
-      data is missing to go forward in one's work. The least frequent operation (hopefully) is the restoration of a whole system
-      in case of disaster, and having it performing quick is of course important, but less than having a complete, accurate and
-      recent backups somewhere to restore from.
+      Why this order?
     </p>
+    <ul>
+      <li>
+	Because usually backup creation is done at low priority in background, and
+	on a day to day basis, this is the storage used that will let larger file history and the ability
+	to recover much more older accidentically removed files.
+      </li>
+      <li>
+	Next, while your backup storage can be anything,
+	including low cost and dedicated one, more and more it may also be a backup to the cloud, which offer
+	cheap disaster tolerance. In that case, you don't want your backup to drain all the bandwidth and slow down your business or
+	Internet access. Or, if rate limiting the bandwidth, you want the backup process to complete before the
+	next backup scheduled time.
+      </li>
+      <li>
+	Next, it is much more frequent to have
+	to restore a few files (corrupted or deleted by mistake) and we hope this to be quick because this is interactive and that the
+	data is missing to go forward in one's work.
+      </li>
+      <li>
+	The least frequent operation (hopefully) is the restoration of a whole system
+	in case of disaster, and having it performing quick is of course important, but less than having a complete, accurate and
+	recent backups somewhere to restore from that can restored flawlessly.
+      </li>
+    </ul>
     <p>
       Note that the following result do not take into account the performance penalty implied by the
       <b>network latency</b>. Several reasons to that:
@@ -772,23 +812,18 @@
 	performances of the softwares under test.
       </li>
     </ul>
-    <p>
-      However, as <i>tar</i> is not network aware it would require running a <code>scp</code> command or equivalent
-      right after the backup completion, while <i>rsync</i> and <i>dar</i> can process data and send it over the
-      network at the same time. This will here again give an advantage to <i>tar</i> as its overall execution speed
-      would most probably degrade comparatively to the two others upon network latency increase.
-    </p>
 
     <h4>Data reduction on backup storage</h4>
 
     <p>
-      diagramme avec : common features dar/rsync/tar + sparse file + incrmental + binary delta
+      For all these tests compression has been used (using the most commonly supported algorithm: gzip at level 6, other algo will provide
+      better performances or better compression but this is linked to algorithm and data, not to the backup tools tested here).
     </p>
     <div class="cadre">
-      <div class="gauge ref" style="width: 18.3%;">cp: 2.8 s</div>
-      <div class="gauge normal" style="width: 61%;">Dar: 9.34 s</div>
-      <div class="gauge normal" style="width: 100%">Rsync: 15.30 s</div>
-      <div class="gauge best" style="width: 43.6%">Tar: 6.68 s</div>
+      <div class="gauge normal" style="width: 38%;">Dar: 1.47 GiB</div>
+      <div class="gauge normal" style="width: 39%">Dar+binary delta: 1.49 GiB</div>
+      <div class="gauge normal" style="width: 100%">Rsync: 3.85 GiB</div>
+      <div class="gauge best" style="width: 37%">tar: 1.44 GiB</div>
     </div>
 
 
@@ -5664,8 +5699,8 @@
     </code></div>
 
     <p>
-      And back on the <i>devuan</i> machine (at 10.13.30.163) we prepared the data
-      to test this way excluding FSA and EA to avoid a tone of warning as those are not
+      And back on the <i>devuan</i> machine (the bare-metal server at 10.13.30.163) we restored the data
+      for the performance test, the following way: excluding FSA and EA to avoid a tone of warning as those are not
       supported on tmpfs filesystem:
     </p>
 
