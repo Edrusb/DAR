@@ -87,17 +87,22 @@ e
     background-color: Yellow;
 }
 
-e.red
+.yellow
+{
+    background-color: Yellow;
+}
+
+.red
 {
     background-color: Red;
 }
 
-e.blue
+.blue
 {
     background-color: LightBlue;
 }
 
-e.green
+.green
 {
     background-color: Teal;
 }

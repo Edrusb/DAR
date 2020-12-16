@@ -178,7 +178,7 @@
     <p>
       In addition to the exhaustivity of data restoration (seen above), several features are a
       <i>must have</i> when creating backups. Their description and what they bring to a backup process
-      is provided below, followed by a table of how they are supported on the different software under test:
+      is provided below, followed by a table of how they are supported on the different softwares under test:
     </p>
 
     <dl>
@@ -479,7 +479,7 @@
 	<td>limited</td>
       </tr>
       <tr>
-	<th class=left>Slicing</th>
+	<th class=left>Slicing/multi-volume</th>
 	<td>Yes</td>
 	<td>-</td>
 	<td>limited</td>
@@ -636,7 +636,7 @@
 	<th style="min-width:10%">Dar</th>
 	<th style="min-width:10%">Rsync</th>
 	<th style="min-width:10%">Tar alone</th>
-	<th style="min-width:10%">Tar compressed</th>
+	<th style="min-width:10%">Tar + gzip</th>
       </tr>
       <tr>
 	<th class=left>Detects backup corruption</th>
@@ -666,9 +666,9 @@
       on top of your backup or archives. This will allow you to repair them in case of corruption.
       <ul>
 	<li>
-	  Though, <i>rsync</i> is not adapted to that process as creating a global redundancy of a directory tree is much more complex and error-prone,
-	  or inneficient if doing per backed up file redundancy. At the opposite, <i>tar</i> and <i>dar</i> are pretty well adapted as a backup is
-	  a single file (or a few big files if using slicing or multi-volume backup).
+	  Though, <i>rsync</i> is not adapted to that process as creating a global redundancy of a directory tree is much more complex, error-prone,
+	  and inneficient as parity files have to be done per each backed up file. At the opposite, <i>tar</i> and <i>dar</i> are pretty well adapted as a backup may
+	  be is a single file or a few big files if using slicing or multi-volume backup.
 	</li>
 	<li>
 	  Second, whatever is the redundancy level you select, if the data corruption exceed this level, you will not be able to repair your backup and
@@ -688,13 +688,18 @@
 
     <h3>Performance</h3>
 
-    <h4>Performance aspects for local or remote file copy</h4>
+    <p>
+      In the following, we have distinguished two purpose of backup tools: the "identical" copy of a set of files and directories (short term operation) and the
+      usual backup operation (long term storage and historization).
+    </p>
+
+    <h4>Performance of file copy operation</h4>
 
     <p>
       The performance aspect to consider for this target is exclusively the execution speed, this may imply data reduction
       on the wire only if the bandwidth is low enough for the compression processing time added does not ruine the gain on
       transfer time. Compression time is not dependent on the backup tool but on the data, and we will see in the backup
-      performances the way the different backup tools reduce data on the wire. For the execution time we get the following
+      performances tests, the way the different backup tools do reduce data on the wire. For the execution time we get the following
       results:
     </p>
 
@@ -721,16 +726,20 @@
 
     <h5>Conclusion</h5>
     <p>
-      for local copy <i>cp</i> is the fastest but totally unusable for remote copy <i>cp</i>. At first sight one could think
-      <i>tar</i> would be the best alternative for remote copy, but that would not take into account the fact you will probably have
-      to use secured connection once the <i>tar</i> backup will be generated, thus requiring an extra user operation and time to
-      transfer the data while both alternatves, <i>rsync</i> and <i>dar</i>, have it integrated and can copy and transfer at the
-      same time, with both gain time and do not make the user task more complex.
+      for local copy <b><i>cp</i></b> is the fastest but totally unusable for remote copy. At first sight one could think
+      <i>tar</i> would be the best alternative for remote copy, but that would not take into account the fact you will probably want
+      to use secured connection (unless all segments of the underlying network are physically yours, end to end). Thus once the
+      backup will be generated, using <i>tar</i> will requiring an extra user operation, extra computing time to cipher/decipher and time to
+      transfer the data while both alternatives, <i>rsync</i> and <i>dar</i>, have it integrated: they can copy and transfer at the
+      same time, with both the gain of time and the absence of added operations for the user. Last, <i>tar</i> does not check for data integrity and
+      upon network data corruption or memory problem on the path from the source or the destination host (including intermediate
+      switches and routers), <i>tar</i> will not let you know that your data has been corrupted (see robustness tests above).
     </p>
     <p>
-      If this is unique/manual remote copy <b><i>dar</i></b> may still be faster (even when using compression to cope with low bandwidth,
-      see the backup test results, below). But for recurring/automated remote copy <b><i>rsync</i></b> if not always faster has the advantage
-      of simplicity of use.
+      In consequence, for remote copy, if this is for a unique/single remote copy, <b><i>dar</i></b> will be faster than <i>rsync</i> most of the time
+      (even when using compression to cope with low bandwidth, see the backup test results, below). But for recurring remote copy even if <b><i>rsync</i></b> is not faster that
+      <i>dar</i>, it has the advantage  of being designed espetially for this task, and because in that context we do not need to store the data compressed nor ciphered.
+      Things we can summarize as follows:
     </p>
 
     <table class=center>
@@ -756,7 +765,7 @@
       </tr>
     </table>
 
-    <h4>Performance aspects for Backup</h4>
+    <h4>Performance of backup operation</h4>
     <p>
       For backup we consider the following criteria by order of importance:
     </p>
@@ -772,26 +781,31 @@
     </p>
     <ul>
       <li>
-	Because usually backup creation is done at low priority in background, and
-	on a day to day basis, this is the storage used that will let larger file history and the ability
-	to recover much more older accidentically removed files.
+	Because usually backup creation is done at low priority in background and
+	on a day to day basis, this is reducing the storage usage that will let larger backup history and increase the ability
+	to recover accidentically removed files much later after the mistake has been done (which may be detected
+	weeks or months afteward).
       </li>
       <li>
 	Next, while your backup storage can be anything,
-	including low cost and dedicated one, more and more it may also be a backup to the cloud, which offer
-	cheap disaster tolerance. In that case, you don't want your backup to drain all the bandwidth and slow down your business or
-	Internet access. Or, if rate limiting the bandwidth, you want the backup process to complete before the
-	next backup scheduled time.
+	including low cost or high end dedicated one, we see more and more frequently externalized backups, which main declinaison
+	is based on public cloud storage, leading to relatively cheap disaster recovery solution. However, your WAN/Internet acces will
+	be drained by the backup volumes flying away and you probably don't want them to consume too much of this bandwidth which could
+	slow down your business or Internet access. As a workaround, one could rate-limit the bandwidth for backup exchanges only.
+	Else you should reduce the backup frequency leading you to lose saved data accuracy: A too low backup frequency will only allow you
+	to restore your systems in the state they had several days instead of several hours or several tens of minutes, before the disaster
+	occured. For that reason data reduction on the wire is the second criterium. Note that data reduction on storage
+	usually implies data reduction on the wire, but the opposite is not always true, depending on the backup tool.
       </li>
       <li>
 	Next, it is much more frequent to have
-	to restore a few files (corrupted or deleted by mistake) and we hope this to be quick because this is interactive and that the
-	data is missing to go forward in one's work.
+	to restore a few files (corrupted or deleted by mistake) and we need this to be quick because this is an interactive operation and
+	that the missing data is mandatory to go forward for one's work, which may impact several other services.
       </li>
       <li>
 	The least frequent operation (hopefully) is the restoration of a whole system
-	in case of disaster, and having it performing quick is of course important, but less than having a complete, accurate and
-	recent backups somewhere to restore from that can restored flawlessly.
+	in case of disaster. Having it performing quick is of course important, but less than having a complete, robust, accurate and
+	recent backup somewhere, that you can count on to restore your systems in the most recent possible state.
       </li>
     </ul>
     <p>
@@ -800,88 +814,228 @@
     </p>
     <ul>
       <li>
-	it would not measure the software performance but the network latency which is not the object
-	of this benchmark and may vary with distance, link layer technology and number of devices crossed
+	it would not measure the software performance but the network bandwidth and latency which is not the object
+	of this benchmark and may vary with distance, link layer technology and number of devices crossed,
       </li>
       <li>
-	As all the data that would be transported over the network would be compressed with the same algorithm,
-	the same compression level and over the same type of protocol (TCP based, like sftp/ssh), we can assume
-	the network penalty to be proportional to data processed by each software. As we only rely on tmpfs
-	filesystems to avoid dependency on disk I/O latency, we may approximate that the network latency would
-	just inflate the execution time in a linear manner. Adding networking should thus not modify the relative
-	performances of the softwares under test.
+	We can assume the network penalty to be proportional to data processed by each software, as all protocol used are usually TCP based
+	(ftp, sftp, scp, ssh, ...), which performance is related to the system parameters (window size, MTU, etc.) not to the backup software
+	itself. As we only rely on tmpfs
+	filesystems to avoid dependency on disk I/O latency, we may approximate that the network latency or reducing network bandwidth would
+	just inflate the relative execution time of the different tested softwares in a linear manner. In other words, adding network between
+	system and backup storage should thus not modify the relative performances of the softwares under test.
       </li>
     </ul>
+    <p>
+      For all the backup performance tests that follow (but not for file copy performance tests seen above),
+      compression has been used using the same and most commonly
+      supported algorithm: gzip at level 6. Other algorithm can complete faster or provide better compression ratio, but this is linked to
+      chosen compression algorithm and data to compress, not to the backup tools tested here.
+    </p>
+
 
     <h4>Data reduction on backup storage</h4>
 
-    <p>
-      For all these tests compression has been used (using the most commonly supported algorithm: gzip at level 6, other algo will provide
-      better performances or better compression but this is linked to algorithm and data, not to the backup tools tested here).
-    </p>
+    <h5>Full backup</h5>
+
     <div class="cadre">
-      <div class="gauge normal" style="width: 38%;">Dar: 1.47 GiB</div>
-      <div class="gauge normal" style="width: 39%">Dar+binary delta: 1.49 GiB</div>
-      <div class="gauge normal" style="width: 100%">Rsync: 3.85 GiB</div>
-      <div class="gauge best" style="width: 37%">tar: 1.44 GiB</div>
+      <div class="gauge normal" style="width: 38%;">Dar: 1580562224 bytes</div>
+      <div class="gauge normal" style="width: 38%">Dar+sparse: 1578428790 bytes</div>
+      <div class="gauge normal" style="width: 39%">Dar+sparse+binary delta: 1602481058 bytes</div>
+      <div class="gauge normal" style="width: 100%">Rsync: 4136318307 bytes</div>
+      <div class="gauge normal" style="width: 100%">Rsync+sparse: 4136318307 bytes</div>
+      <div class="gauge normal" style="width: 37%">tar: 1549799048 bytes</div>
+      <div class="gauge best" style="width: 37%">tar+sparse: 1549577862 bytes</div>
     </div>
+
+    <h5>Differential backup</h5>
+
+    <div class="cadre">
+      <div class="gauge normal" style="width: 100%;">Dar: 49498524 bytes</div>
+      <div class="gauge normal" style="width: 100%">Dar+sparse: 49505251 bytes</div>
+      <div class="gauge best" style="width: 48%">Dar+sparse+binary delta: 23883368 bytes</div>
+      <div class="gauge ref" style="width: 100%">Rsync: not supported</div>
+      <div class="gauge ref" style="width: 100%">Rsync+sparse: not supported</div>
+      <div class="gauge normal" style="width: 90%">tar: 44607904 bytes</div>
+      <div class="gauge normal" style="width: 90%">tar+sparse: 44604194 bytes</div>
+    </div>
+
+    <h5>Full + Differential backup</h5>
+    <p>
+      This is a extrapolation of the required volume for backup, after one week of daily backup of the Linux system
+      under test, assuming the activity is as minimal each day as it was here between the initial day of the
+      full backup and the day of the first differential backup (a few package upgrade and no user activity).
+    </p>
+
+    <div class="cadre">
+      <div class="gauge normal" style="width: 100%;">Dar: 1927051892 bytes</div>
+      <div class="gauge normal" style="width: 100%">Dar+sparse: 1924965547 bytes</div>
+      <div class="gauge best" style="width: 92%">Dar+sparse+binary delta: 1769664634 bytes</div>
+      <div class="gauge ref" style="width: 100%">Rsync: not supported</div>
+      <div class="gauge ref" style="width: 100%">Rsync+sparse: not supported</div>
+      <div class="gauge normal" style="width: 97%">tar: 1862054376 bytes</div>
+      <div class="gauge normal" style="width: 97%">tar+sparse: 1861807220 bytes</div>
+    </div>
+
+    <p>
+      This previous results concerns the backup of a steady Linux system, relative difference of data reduction might favorize both <i>rsync</i>
+      and <i>dar+binary delta</i> when the proportion of large files being slightly modified increases (like mailboxe files).
+    </p>
 
 
     <h4>Data reduction over network</h4>
 
-    <p>
-      diagramme avec les meme mais changement pour rsync
-    </p>
+    <h5>Full backup</h5>
+
     <div class="cadre">
-      <div class="gauge ref" style="width: 18.3%;">cp: 2.8 s</div>
-      <div class="gauge normal" style="width: 61%;">Dar: 9.34 s</div>
-      <div class="gauge normal" style="width: 100%">Rsync: 15.30 s</div>
-      <div class="gauge best" style="width: 43.6%">Tar: 6.68 s</div>
+      <div class="gauge normal" style="width: 99%;">Dar: 1580562224 bytes</div>
+      <div class="gauge normal" style="width: 98%">Dar+sparse: 1578428790 bytes</div>
+      <div class="gauge normal" style="width: 100%">Dar+sparse+binary delta: 1602481058 bytes</div>
+      <div class="gauge normal" style="width: 99%">Rsync: 1587714486 bytes</div>
+      <div class="gauge normal" style="width: 99%">Rsync+sparse: 1587714474 bytes</div>
+      <div class="gauge normal" style="width: 97%">tar: 1549799048 bytes</div>
+      <div class="gauge best" style="width: 97%">tar+sparse: 1549577862 bytes</div>
     </div>
 
+    <h5>Differential backup</h5>
+
+    <div class="cadre">
+      <div class="gauge normal" style="width: 100%;">Dar: 49498524 bytes</div>
+      <div class="gauge normal" style="width: 100%">Dar+sparse: 49505251 bytes</div>
+      <div class="gauge best" style="width: 48%">Dar+sparse+binary delta: 23883368 bytes</div>
+      <div class="gauge normal" style="width: 59%">Rsync: 29293958 bytes</div>
+      <div class="gauge normal" style="width: 59%">Rsync+sparse: 29293958 bytes</div>
+      <div class="gauge normal" style="width: 90%">tar: 44607904 bytes</div>
+      <div class="gauge normal" style="width: 90%">tar+sparse: 44604194 bytes</div>
+    </div>
+
+    <h5>Full + Differential backup</h5>
+    <p>
+      This is the same extrapolation done above (one week of daily backup), but for the volume of data transmitted over the network instead of the backup volume on storage.
+    </p>
+
+    <div class="cadre">
+      <div class="gauge normal" style="width: 100%;">Dar: 1927051892 bytes</div>
+      <div class="gauge normal" style="width: 100%">Dar+sparse: 1924965547 bytes</div>
+      <div class="gauge best" style="width: 92%">Dar+sparse+binary delta: 1769664634 bytes</div>
+      <div class="gauge normal" style="width: 93%">Rsync: 1792772192 bytes</div>
+      <div class="gauge normal" style="width: 93%">Rsync+sparse: 1792772180 bytes</div>
+      <div class="gauge normal" style="width: 97%">tar: 1862054376 bytes</div>
+      <div class="gauge normal" style="width: 97%">tar+sparse: 1861807220 bytes</div>
+    </div>
 
     <h4>Execution time to restore a few files</h4>
     <div class="cadre">
-      <div class="gauge ref" style="width: 18.3%;">cp: 2.8 s</div>
-      <div class="gauge normal" style="width: 61%;">Dar: 9.34 s</div>
-      <div class="gauge normal" style="width: 100%">Rsync: 15.30 s</div>
-      <div class="gauge best" style="width: 43.6%">Tar: 6.68 s</div>
+      <div class="gauge normal" style="width: 3.9%;">Dar: 0.98 s</div>
+      <div class="gauge normal" style="width: 4.49%">Dar+sparse: 1.13 s</div>
+      <div class="gauge normal" style="width: 5.05%">Dar+sparse+binary delta: 1.27 s</div>
+      <div class="gauge best" style="width: 0.01%">Rsync: 3 ms</div>
+      <div class="gauge best" style="width: 1%">Rsync+sparse: 3 ms</div>
+      <div class="gauge normal" style="width: 100%">tar: 25.15 s </div>
+      <div class="gauge normal" style="width: 99%">tar+sparse: 25 s</div>
     </div>
+    <p>
+      Here the phenomenum is even more important when the file to restore is located near the end of the <i>tar</i> backup,
+      as <i>tar</i> reads the whole backup up to the requested filed.
+    </p>
 
 
-    <h4>Execution time to restore a whole system</h4>
+    <h4>Execution time to restore a whole system - full backup</h4>
     <div class="cadre">
-      <div class="gauge ref" style="width: 18.3%;">cp: 2.8 s</div>
-      <div class="gauge normal" style="width: 61%;">Dar: 9.34 s</div>
-      <div class="gauge normal" style="width: 100%">Rsync: 15.30 s</div>
-      <div class="gauge best" style="width: 43.6%">Tar: 6.68 s</div>
+      <div class="gauge best" style="width: 14.48%;">Dar: 22.94 s</div>
+      <div class="gauge normal" style="width: 19.17%">Dar+sparse: 30.36 s</div>
+      <div class="gauge normal" style="width: 19.16%">Dar+sparse+binary delta: 30.35 s</div>
+      <div class="gauge normal" style="width: 99.63%">Rsync: 157.81 s</div>
+      <div class="gauge normal" style="width: 100%">Rsync+sparse: 158.39 s</div>
+      <div class="gauge normal" style="width: 16.87%">tar: 26.72 s </div>
+      <div class="gauge normal" style="width: 16.59%">tar+sparse: 26.27 s</div>
     </div>
+
+    <h4>Execution time to restore a single differential backup</h4>
+    <div class="cadre">
+      <div class="gauge normal" style="width: 100%;">Dar: 3.48 s</div>
+      <div class="gauge normal" style="width: 100%">Dar+sparse: 3.48 s</div>
+      <div class="gauge normal" style="width: 98.85%">Dar+sparse+binary delta: 3.44 s</div>
+      <div class="gauge ref" style="width: 100%">Rsync: not supported</div>
+      <div class="gauge ref" style="width: 100%">Rsync+sparse: not supported</div>
+      <div class="gauge normal" style="width: 42.53%">tar: 1.48 s </div>
+      <div class="gauge normal" style="width: 43.1%">tar+sparse: 1.5 s</div>
+    </div>
+
+    <h4>Execution time to restore a whole system - full + differential backup</h4>
+    <p>
+      We use here the same extrapolation a week of daily backup done above: the first backup being a full backup
+      and differential/incremental backups done the next days.
+    </p>
+
+    <p>
+      <u>Clarifying the terms used:</u> the <u>differential</u> backup saves only what has changed since the full backup
+      was made. The consequence is that each day the backup is slightlty bigger to process, depending on the
+      way data changed (if all files change every day, like mailboxes, user files, ...) each new differential backup will have the same size
+      and take the same processing time to complete.
+      At the opposite, if new data is added each day, the differential backup size will be each day the sum of the <i>incremental</i>
+      backups that could be done instead since the full backup.
+    </p>
+    <p>
+      At the difference of the differential backup, the <u>incremental</u> backup saves only what has changed
+      since the last backup (full or incremental). For constant activity like the steady Linux system we used here, the incremental
+      backup size should be the same along the time (and equivalent to the size of the first differential backup), thus the extrapolation is easy
+      and not questionable: the restoration time is the time to restore the full and the time to restore the first differential backup times
+      the number of days that passed.
+    </p>
+
+    <h4>Execution time to restore a whole system - lower bound</h4>
+
+    <p>
+      The lower bound, is the sum of the execution time of the restoration of the full backup and one differential backup
+      seen just above. It corresponds the minimum execution time restoring a whole system from full+differnential backup.
+    </p>
+    <div class="cadre">
+      <div class="gauge best" style="width: 16.68%;">Dar: 26.42 s</div>
+      <div class="gauge normal" style="width: 21.36%">Dar+sparse: 33.84 s</div>
+      <div class="gauge normal" style="width: 21.33%">Dar+sparse+binary delta: 33.79 s</div>
+      <div class="gauge ref" style="width: 99.63%">Rsync: full backup only 157.81 s</div>
+      <div class="gauge ref" style="width: 100%">Rsync+sparse: full backup only 158.39</div>
+      <div class="gauge normal" style="width: 17.80%">tar: 28.2 s</div>
+      <div class="gauge normal" style="width: 17.53%">tar+sparse: 27.77 s</div>
+    </div>
+
+    <h4>Execution time to restore a whole system - higher bound</h4>
+
+    <p>
+      The higher bound, is the sum of the execution time of the restoration plus seven times the execution time of the differential
+      backup. It corresponds the worse case scenario where each day new data is added (still using a steady Linux system with constant activity).
+      It also corresponds the scenario of restoring a whole system from a full+incremental backups (7 incremental backup have to be restored, in
+      that week span scenario):
+
+    </p>
+    <div class="cadre">
+      <div class="gauge normal" style="width: 29.86%;">Dar: 47.3 s</div>
+      <div class="gauge normal" style="width: 34.55%">Dar+sparse: 54.72 s</div>
+      <div class="gauge normal" style="width: 34.36%">Dar+sparse+binary delta: 54.43 s</div>
+      <div class="gauge ref" style="width: 99.63%">Rsync: full backup only 157.81 s</div>
+      <div class="gauge ref" style="width: 100%">Rsync+sparse: full backup only 158.39</div>
+      <div class="gauge normal" style="width: 23.41%">tar: 37.08 s </div>
+      <div class="gauge best" style="width: 23.21%">tar+sparse: 36.77 s</div>
+    </div>
+
 
 
     <h4>Execution time to create a backup</h4>
-    <div class="cadre">
-      <div class="gauge ref" style="width: 18.3%;">cp: 2.8 s</div>
-      <div class="gauge normal" style="width: 61%;">Dar: 9.34 s</div>
-      <div class="gauge normal" style="width: 100%">Rsync: 15.30 s</div>
-      <div class="gauge best" style="width: 43.6%">Tar: 6.68 s</div>
-    </div>
-
-
-    <h4>copy of a directory</h4>
 
     <div class="cadre">
-      <div class="gauge ref" style="width: 18.3%;">cp: 2.8 s</div>
-      <div class="gauge normal" style="width: 61%;">Dar: 9.34 s</div>
-      <div class="gauge normal" style="width: 100%">Rsync: 15.30 s</div>
-      <div class="gauge best" style="width: 43.6%">Tar: 6.68 s</div>
+      <div class="gauge normal" style="width: 81.62%;">Dar: 149.73 s</div>
+      <div class="gauge normal" style="width: 86.13%">Dar+sparse: 157.99 s</div>
+      <div class="gauge normal" style="width: 88.65%">Dar+sparse+binary delta: 162.62 s</div>
+      <div class="gauge normal" style="width: 85.58%">Rsync: 156.98 s</div>
+      <div class="gauge normal" style="width: 100%">Rsync+sparse: 183.44 s</div>
+      <div class="gauge best" style="width: 81%">tar: 148.59 s </div>
+      <div class="gauge normal" style="width: 81.43%">tar+sparse: 149.38 s</div>
     </div>
-    <p>
-      notes
-    </p>
 
-    <h4>Ciphering/deciphering</h4>
+    <h4>Ciphering/deciphering performance</h4>
     <p>
-      There is many reason that implies the need of ciphering data:
+      There is several reasons that implies the need of ciphering data:
     </p>
     <ul>
       <li>if your disk is ciphered, would you store your backup in clear on the cloud?</li>
@@ -901,7 +1055,7 @@
     <div class="cadre">
       <div class="gauge normal" style="width: 100%">Dar: 9.13 s</div>
       <div class="gauge ref" style="width: 100%">Rsync: N/A</div>
-      <div class="gauge best" style="width: 80.9%">Tar: 7.39 s</div>
+      <div class="gauge best" style="width: 80.9%">Tar (openssl): 7.39 s</div>
     </div>
 
     <h5>Execution time for the restoration of a single file</h5>
@@ -909,7 +1063,7 @@
     <div class="cadre">
       <div class="gauge best" style="width: 23.4%">Dar: 0.42 s</div>
       <div class="gauge ref" style="width: 100%">Rsync: N/A</div>
-      <div class="gauge normal" style="width: 100%">Tar: 1.79 s</div>
+      <div class="gauge normal" style="width: 100%">Tar (openssl): 1.79 s</div>
     </div>
 
     <h5>Storage requirement ciphered without compression</h5>
@@ -917,7 +1071,7 @@
     <div class="cadre">
       <div class="gauge best" style="width: 97.9%">Dar: 1.46 GiB</div>
       <div class="gauge ref" style="width: 100%">Rsync: N/A</div>
-      <div class="gauge normal" style="width: 100%">Tar: 1.49 GiB</div>
+      <div class="gauge normal" style="width: 100%">Tar (openssl): 1.49 GiB</div>
     </div>
 
 
@@ -925,12 +1079,15 @@
 
     <p>
       So far we have measured perfomance, evaluated features, robusness and completness of the operation. We get a lot of
-      results, but it would not be of a greate use to anyone reading this document or jumping to its conclusion to not
-      get back to use cases.
+      results, but it would not be of a greate use to anyone reading this document or the one just jumping to its conclusion to not
+      get back to use cases and put these results in front:
     </p>
     <p>
-      We can identify may uses cases around backup tools, we will focus on the following ones:
+      We can identify may uses cases around backup tools and each one has its one contraints and performance criteria:
     </p>
+
+    <h3>Criteria for file copy use cases</h3>
+
     <table>
       <tr>
 	<th>Use Cases</th>
@@ -979,6 +1136,16 @@
 	  </ul>
 	</td>
       </tr>
+    </table>
+
+    <h3>Criteria for backup use cases</h3>
+
+    <table>
+      <tr>
+	<th>Use Cases</th>
+	<th>Key Point</th>
+	<th>Optional interesting features</th>
+      </tr>
       <tr>
 	<th>Single full backup</th>
 	<td>
@@ -990,6 +1157,7 @@
 	<td>
 	  <ul>
 	    <li>fast restoration of a few files</li>
+	    <li>fast restoration of a whole backup</li>
 	  </ul>
 	</td>
       </tr>
@@ -1004,6 +1172,7 @@
 	<td>
 	  <ul>
 	    <li>fast restoration of a few files</li>
+	    <li>fast restoration of a whole backup</li>
 	    <li>managing tool of backups rotation</li>
 	  </ul>
 	</td>
@@ -1012,7 +1181,7 @@
 	<th>Archiving of private data</th>
 	<td>
 	  <ul>
-	    <li>data reduction on storage and on wire</li>
+	    <li>data reduction on storage</li>
 	    <li>robustness of the archive</li>
 	  </ul>
 	</td>
@@ -1027,14 +1196,14 @@
 	<th>Archiving of public data</th>
 	<td>
 	  <ul>
-	    <li>data reduction on storage and on wire</li>
+	    <li>data reduction on storage</li>
 	    <li>robustness of the archive</li>
 	  </ul>
 	</td>
 	<td>
 	  <ul>
 	    <li>signing</li>
-	    <li>fast uncompressing algorithm</li>
+	    <li>fast decompression algorithm</li>
 	  </ul>
 	</td>
       </tr>
@@ -1042,7 +1211,7 @@
 	<th>Private data exchange over Internet</th>
 	<td>
 	  <ul>
-	    <li>data reduction on wire</li>
+	    <li>data reduction</li>
 	    <li>asymmetric encryption and signing</li>
 	  </ul>
 	</td>
@@ -1058,7 +1227,7 @@
 	<th>Public data exchange over Internet</th>
 	<td>
 	  <ul>
-	    <li>data reduction on wire</li>
+	    <li>data reduction</li>
 	    <li>hashing</li>
 	  </ul>
 	</td>
@@ -1072,26 +1241,30 @@
       </tr>
     </table>
 
+
+    <h3>Complementary criteria depending on the storage type</h3>
     <p>
       And depending on the target storage, the following adds on top:
     </p>
 
     <table>
       <tr>
-	<th>Data stored on public cloud</th>
-	<td>
-	  <ul>
-	    <li>data reduction on storage and on wire</li>
-	    <li>ciphering</li>
-	  </ul>
-	</td>
-	<td>
-	  <ul>
-	    <li>multi-volumes backup</li>
-	    <li>integrated network protocols in backup tool</li>
-	  </ul>
-	</td>
+	<th>Use Cases</th>
+	<th>Key Point</th>
+	<th>Optional interesting features</th>
       </tr>
+      <th>Local disk</th>
+      <td>
+	<ul>
+	  <li>execution speed</li>
+	  <li>data reduction</li>
+	</ul>
+      </td>
+      <td>
+	<ul>
+	  <li>hashing</li>
+	</ul>
+      </td>
       <tr>
 	<th>Data stored on private NAS</th>
 	<td>
@@ -1104,6 +1277,21 @@
 	    <li>multi-volume backup</li>
 	    <li>integrated network protocols in backup tool</li>
 	    <li>ciphering</li>
+	  </ul>
+	</td>
+      </tr>
+      <tr>
+	<th>Data stored on public cloud</th>
+	<td>
+	  <ul>
+	    <li>data reduction on storage and on wire</li>
+	    <li>ciphering</li>
+	  </ul>
+	</td>
+	<td>
+	  <ul>
+	    <li>multi-volumes backup</li>
+	    <li>integrated network protocols in backup tool</li>
 	  </ul>
 	</td>
       </tr>
@@ -1126,8 +1314,9 @@
     </table>
 
 
+    <h3>Essential oil drop</h3>
     <p>
-      In summary regarding the different use cases we have considered and the
+      In summary regarding the different use cases we have considered and the different caracteristics we tended to measure amont the backup tools we tested:
     </p>
     <ul>
       <li>exhasitivity of backed up data</li>
@@ -1136,90 +1325,217 @@
       <li>overall performance</li>
     </ul>
     <p>
-      We can summarize the key points for each software to put in front and propose a best candidate to address each particular need:
+      We can summarize the best software to put in front each particular use case:
     </p>
 
-    <table>
+    <table class=center>
       <tr>
 	<th>Use Cases</th>
-	<th>Dar</th>
-	<th>Rsync</th>
-	<th>Tar</th>
+	<th>Local disk storage</th>
+	<th>Private NAS</th>
+	<th>Public Cloud</th>
+	<th>Removable media</th>
       </tr>
       <tr>
 	<th>Local directory copy</th>
-	<td>complete but slower</td>
-	<td class=best>complete and fastest</td>
-	<td>loses some metadata during copy, 'cp' does as well and is much faster</td>
+	<td>
+	  <div class=best>cp</div>
+	  <div class=yellow>dar</div>
+	  <div class=yellow>rsync</div>
+	  <div class=best>tar</div>
+	</td>
+	<td>
+	  -
+	</td>
+	<td>
+	  -
+	</td>
+	<td>
+	  -
+	</td>
       </tr>
       <tr>
-	<th>remote directory copy - wide network</th>
-	<td>more complex process and slower</td>
-	<td class=best>quick, efficient and simple</td>
-	<td>more complex process and uncompleted metdata</td>
+	<th>One time remote directory copy</th>
+	<td>
+	  -
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=best>rsync</div>
+	  <div class=yellow>tar<br/>
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=best>rsync</div>
+	  <div class=yellow>tar<br/>
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=best>rsync</div>
+	  <div class=yellow>tar<br/>
+	</td>
       </tr>
       <tr>
-	<th>remote directory copy - narrow network</th>
-	<td>acceptable alternative</td>
-	<td class=best>efficient and simple</td>
-	<td>more complex process and uncompleted metdata</td>
+	<th>Recurrent remote directory copy</th>
+	<td>
+	  -
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=best>rsync</div>
+	  <div class=yellow>tar</div>
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=best>rsync</div>
+	  <div class=yellow>tar</div>
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=best>rsync</div>
+	  <div class=yellow>tar</div>
+	</td>
       </tr>
       <tr>
-	<th>Single full backup</th>
-	<td class=best>fine file selection, flexible compression, rich feature set</td>
-	<td>data stored uncompressed and sensible to data corruption</td>
-	<td>uncompletely saved metadata</td>
+	<th>Full backups only<br/>
+	(private data)</th>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=best>rsync</div>
+	  <div class=best>tar<br/>
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=yellow>rsync<br/>
+	  <div class=best>tar</div>
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=red>rsync<br/>
+	  <div class=yellow>tar</div>
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=red>rsync</div>
+	  <div class=yellow>tar</div>
+	</td>
       </tr>
       <tr>
-	<th>full+diff/incr. backup</th>
-	<td class=best>Best space efficiency</td>
-	<td>not supported</td>
-	<td>uncompletely saved metadata</td>
-      </tr>
-      <tr>
-	<th>Backup to public cloud</th>
-	<td class=best>integrated and robust ciphering, slicing, hashing, network
-	  protocols</td>
-	<td>no ciphering and no compression on storage</td>
-	<td>complex process with ciphering</td>
-      </tr>
-      <tr>
-	<th>Backup to private NAS</th>
-	<td class=best>slicing, hashing, integrated network protocols</td>
-	<td>no compression on storage</td>
-	<td>no network integration, uncompletely saved metadata</td>
-      </tr>
-      <tr>
-	<th>Backup to removable media (incl. tapes)</th>
-	<td class=best>slicing, hashing, compression, ciphering</td>
-	<td>no slicing/multi-volume support, no compression, no ciphering</td>
-	<td>multi-volume and compression are incompatible, complex if
-	  ciphering is needed
+	<th>full+diff/incr. backups<br/>
+	  (priate data)
+	</th>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=red>rsync</div>
+	  <div class=best>tar</div>
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=red>rsync</div>
+	  <div class=best>tar</div>
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=red>rsync</div>
+	  <div class=best>tar</div>
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=red>rsync</div>
+	  <div class=yellow>tar</div>
 	</td>
       </tr>
       <tr>
 	<th>Archiving of private data</th>
-	<td class=best>integrated ciphering, slicing, metadata redundancy</td>
-	<td>no compression, no ciphering, complex to add on top data protection and redundancy</td>
-	<td>no data corruption detected, several forked archive formats</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=red>rsync</div>
+	  <div class=best>tar</div>
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=red>rsync</div>
+	  <div class=best>tar</div>
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=red>rsync</div>
+	  <div class=yellow>tar</div>
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=red>rsync</div>
+	  <div class=red>tar</div>
+	</td>
       </tr>
       <tr>
 	<th>Archiving of public data</th>
-	<td>over featured</td>
-	<td>no compression on storage, hash and signature complex for a large file set</td>
-	<td class=best>fast and standard</td>
+	<td>
+	  <div class=yellow>dar</div>
+	  <div class=yellow>rsync</div>
+	  <div class=best>tar</div>
+	</td>
+	<td>
+	  <div class=yellow>dar</div>
+	  <div class=yellow>rsync</div>
+	  <div class=best>tar</div>
+	</td>
+	<td>
+	  <div class=yellow>dar</div>
+	  <div class=yellow>rsync</div>
+	  <div class=best>tar</div>
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=red>rsync</div>
+	  <div class=yellow>tar</div>
+	</td>
       </tr>
       <tr>
 	<th>Private data exchange over Internet</th>
-	<td class=best>emmbedded asymmetric encryption and signing</td>
-	<td>need public IP with human synchronization or permanent network access</td>
-	<td>complex process and sensible to clear-text attack</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=best>rsync</div>
+	  <div class=yellow>tar</div>
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=yellow>rsync</div>
+	  <div class=yellow>tar</div>
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=red>rsync</div>
+	  <div class=yellow>tar</div>
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=red>rsync</div>
+	  <div class=yellow>tar</div>
+	</td>
       </tr>
       <tr>
 	<th>Public data exchange over Internet</th>
-	<td>over featured</td>
-	<td>need public IP with human synchronization or permanent network access</td>
-	<td class=best>easy to use and standard</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=best>rsync</div>
+	  <div class=best>tar</div>
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=yellow>rsync</div>
+	  <div class=best>tar</div>
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=yellow>rsync</div>
+	  <div class=best>tar</div>
+	</td>
+	<td>
+	  <div class=best>dar</div>
+	  <div class=red>rsync</div>
+	  <div class=yellow>tar</div>
+	</td>
       </tr>
     </table>
 
@@ -5604,7 +5920,7 @@
 
     </p>
     <p>
-      For the first point, in order to compare performance in a fair manner, we have to take into
+      In order to compare performance in a fair manner, we have to take into
       consideration that some CPU intensive features are not implement by all softwares or have
       different default values:
     </p>
@@ -5630,7 +5946,7 @@
       <li>
 	<i>rsync</i> and <i>dar</i> calculate checksum on the saved data, while tar completely skips
 	this data protection. Unfortunately this is not possible to disable for both,
-	thus <i>tar</i> will have keep a small speed advantage about thanks to this difference.
+	thus <i>tar</i> will have a speed advantage thanks to this difference.
       </li>
     </ul>
     </p>
@@ -5657,7 +5973,7 @@
     <p>
       When using <i>rsync</i> as a backup tool (at the opposite of a copy operation), we assume the remote
       (or local) copy <i>is</i> the backup, and thus restoring implies syncing back this remote (or local)
-      copy to the place the original was and has been lost.
+      copy to the place the original data was located and has been lost.
     </p>
 
     <p>
@@ -5669,9 +5985,9 @@
     </ul>
 
     <p>
-      All data to backup or to copy has been stored in a tmpfs also destination of the created backups and
-      restored data. The swap has been disabled to avoid any disk I/O penalty and we hope provide a fair
-      comparison environment.
+      All data to backup or to copy has been stored in a tmpfs, which is also the destination of the created backups and
+      restored data. The swap has been disabled to avoid any disk I/O penalty, in the intention to provide a fair
+      comparison environment (avoiding disk cache variable performance).
     </p>
 
     <div class=code><code>
@@ -5686,12 +6002,14 @@
     </code></div>
     <p>
       To prepare the Linux system under backup we installed the <i>Devuan</i> system a few days before in a VM. On day D,
-      a full backup has been executed, then a distro package manager has upgraded the system and we made a differential
-      backup based on the first one, both backup being wrote to the testing machine (bare-metal server):
+      a full backup has been executed, we updated/upgraded the system using the disto package manager and we made a differential
+      backup based on the first one, both backup being wrote to the testing machine (bare-metal server) that was used for the performance tests:
     </p>
 
     <div class=code><code>
 	root@Georges:~# dar -c sftp://denis@10.13.30.163/home/denis/tmp/full -zlz4 -R / -M -D --hash sha1 -afile-auth -G cat_full
+	root@Georges:~# apt-get update
+	<i>[...]</i>
 	root@Georges:~# apt-get upgrade
 	<i>[...]</i>
 	root@Georges:~# dar -c sftp://denis@10.13.30.163/home/denis/tmp/diff -A cat_full -zlz4 -R / -M -D --hash sha1 -afile-auth
@@ -5699,7 +6017,7 @@
     </code></div>
 
     <p>
-      And back on the <i>devuan</i> machine (the bare-metal server at 10.13.30.163) we restored the data
+      Back on the testing host (the bare-metal server at 10.13.30.163) we restored the data
       for the performance test, the following way: excluding FSA and EA to avoid a tone of warning as those are not
       supported on tmpfs filesystem:
     </p>
@@ -5761,10 +6079,18 @@
 	devuan:/mnt/memdisk#
 
     </code></div>
-
+    <p>
+      This leads us to have two directories <code>state-1</code> and <code>state-2</code> corresponding to the state of the <i>Devuan</i> machine has two days ago and today respectively.
+    </p>
 
 
     <h4>Performance of copy operations</h4>
+
+    <p>
+      To perform the copy operation, we have decomposed the operations to precisely measure the execution time. We could have decided to pipe the backup to a second instance of the
+      backup tool restoring the data (<i>tar</i> and <i>dar</i> only would benefit from this). But the time measurement was less easy to obtain and doing that way does not seem to
+      provide any noticable speed improvement. The data used here in <code>SRC1</code> is a single big ISO file (a <i>Devuan</i> installation DVD image).
+    </p>
 
     <h5>Dar</h5>
     <div class=code><code>
@@ -5910,7 +6236,7 @@
     <h4>Performance of Backup operations</h4>
 
     <p>
-      for reference:
+      For reference:
     </p>
 
     <div class=code><code>
