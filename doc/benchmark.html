@@ -74,7 +74,7 @@
     <h2>Benchmark Results</h2>
 
     <p>
-      The results presented here are a synthesis of the test logs provided in appendix.
+      The results presented here are a synthesis of the test logs provided in appendix. They are in turn summarized in conclusion of this document.
     </p>
 
     <h3>Completness of backup and restoration</h3>
@@ -162,8 +162,8 @@
       </tr>
     </table>
     <ul>
-      <li>(1) "Yes" under MACoS X, FreeBSD and BSD systems. As of today (year 2020), Linux has no way to set the <i>btime</i> aka birthtime or yet creation time</li>
-      <li>(2) <i>tar</i> does even not save and restore plain normal sockets</li>
+      <li>(1) "Yes" under MACoS X, FreeBSD and BSD systems. As of today (year 2020), Linux has no way to set the <i>btime</i> aka <i>birthtime</i> or yet <i>creation time</i></li>
+      <li>(2) <i>tar</i> does even not save and restore plain normal sockets, but that's not a big issue in fact as Unix sockets should be recreated by the applications that provide corresponding service</li>
       <li>(3) unless <code>--xattrs</code> is provided, <i>mtime</i> is saved by <i>tar</i> but with an accuracy of only 1 second, while today's systems provide nanosecond precision</li>
       <li>(4) needs -A option</li>
       <li>(5) needs -X option</li>
@@ -176,7 +176,7 @@
     <h3>Feature set</h3>
 
     <p>
-      In addition to the exhaustivity of data restoration (seen above), several features are a
+      In addition to the exhaustivity of the restored data (seen above), several features are a
       <i>must have</i> when creating backups. Their description and what they bring to a backup process
       is provided below, followed by a table of how they are supported on the different softwares under test:
     </p>
@@ -627,7 +627,11 @@
     <p>
       The objectif here is to see how a minor data corruption can impacts the backup. Such type of
       corruption (a single bit invertion) can be caused by network transfert, cosmic particle hitting
-      the memory bank, or simply due to the time passing stored on a particular medium.
+      the memory bank, or simply due to the time passing stored on a particular medium. In real life
+      data corruption may impact more than one bit, right. But if the ability to workaround the corruption of a
+      single bit does not bring any information about the ability to recover larger volume
+      of data corruption, the <u>inability</u> to recover a single bit, is enough to know that the same software
+      will behave even worse when larger portion of data corruption will be met.
     </p>
 
     <table class=center>
@@ -666,18 +670,18 @@
       on top of your backup or archives. This will allow you to repair them in case of corruption.
       <ul>
 	<li>
-	  Though, <i>rsync</i> is not adapted to that process as creating a global redundancy of a directory tree is much more complex, error-prone,
-	  and inneficient as parity files have to be done per each backed up file. At the opposite, <i>tar</i> and <i>dar</i> are pretty well adapted as a backup may
+	  Though, <i>rsync</i> is not adapted to that process as creating a global redundancy of a directory tree is much more complex, error-prone.
+	  At the opposite, <i>tar</i> and <i>dar</i> are pretty well adapted as a backup may
 	  be is a single file or a few big files if using slicing or multi-volume backup.
 	</li>
 	<li>
-	  Second, whatever is the redundancy level you select, if the data corruption exceed this level, you will not be able to repair your backup and
+	  Second, whatever is the redundancy level you select, if the data corruption exceed this level, you will not be able to repair your backups and
 	  archives. Thus, better relying on a robust and redundant backup file structure, and here <i>dar</i> has some big advantages.
 	</li>
 	<li>
 	  Last, if execution time is important for you, having a sliced backup with a slice size smaller than the available RAM
-	  and running <i>Parchive</i> right after each slice created, will save a lot of disk I/O and can speed up the overall process
-	  by more than 40%. But here too, only <i>dar</i> provides this possibility.
+	  and running <i>Parchive</i> right after each slice created, will save a lot of disk I/O and can <b>speed up the overall process
+	  by more than 40%</b>. But here too, only <i>dar</i> provides this possibility.
 	</li>
       </ul>
     </p>
@@ -729,16 +733,14 @@
       for local copy <b><i>cp</i></b> is the fastest but totally unusable for remote copy. At first sight one could think
       <i>tar</i> would be the best alternative for remote copy, but that would not take into account the fact you will probably want
       to use secured connection (unless all segments of the underlying network are physically yours, end to end). Thus once the
-      backup will be generated, using <i>tar</i> will requiring an extra user operation, extra computing time to cipher/decipher and time to
+      backup will be generated, using <i>tar</i> will require an extra user operation, extra computing time to cipher/decipher and time to
       transfer the data while both alternatives, <i>rsync</i> and <i>dar</i>, have it integrated: they can copy and transfer at the
-      same time, with both the gain of time and the absence of added operations for the user. Last, <i>tar</i> does not check for data integrity and
-      upon network data corruption or memory problem on the path from the source or the destination host (including intermediate
-      switches and routers), <i>tar</i> will not let you know that your data has been corrupted (see robustness tests above).
+      same time, with both the gain of time and the absence of added operations for the user.
     </p>
     <p>
       In consequence, for remote copy, if this is for a unique/single remote copy, <b><i>dar</i></b> will be faster than <i>rsync</i> most of the time
       (even when using compression to cope with low bandwidth, see the backup test results, below). But for recurring remote copy even if <b><i>rsync</i></b> is not faster that
-      <i>dar</i>, it has the advantage  of being designed espetially for this task, and because in that context we do not need to store the data compressed nor ciphered.
+      <i>dar</i>, it has the advantage  of being designed espetially for this task as in that context we do not need to store the data compressed nor ciphered.
       Things we can summarize as follows:
     </p>
 
@@ -782,7 +784,8 @@
     <ul>
       <li>
 	Because usually backup creation is done at low priority in background and
-	on a day to day basis, this is reducing the storage usage that will let larger backup history and increase the ability
+	on a day to day basis, the execution time is less important than reducing the storage usage: reducing storage usage gives longer
+	backup history and increases the ability
 	to recover accidentically removed files much later after the mistake has been done (which may be detected
 	weeks or months afteward).
       </li>
@@ -791,8 +794,9 @@
 	including low cost or high end dedicated one, we see more and more frequently externalized backups, which main declinaison
 	is based on public cloud storage, leading to relatively cheap disaster recovery solution. However, your WAN/Internet acces will
 	be drained by the backup volumes flying away and you probably don't want them to consume too much of this bandwidth which could
-	slow down your business or Internet access. As a workaround, one could rate-limit the bandwidth for backup exchanges only.
-	Else you should reduce the backup frequency leading you to lose saved data accuracy: A too low backup frequency will only allow you
+	slow down your business or Internet access. As a workaround, one could rate-limit the bandwidth for backup exchanges only. But doing
+	so will extend the backup transfer time so much that you may have to reduce the backup frequency to not have two backup
+	transfered at the same time. This would lead you to lose data accuracy of saved data: A too low backup frequency will only allow you
 	to restore your systems in the state they had several days instead of several hours or several tens of minutes, before the disaster
 	occured. For that reason data reduction on the wire is the second criterium. Note that data reduction on storage
 	usually implies data reduction on the wire, but the opposite is not always true, depending on the backup tool.
@@ -800,7 +804,7 @@
       <li>
 	Next, it is much more frequent to have
 	to restore a few files (corrupted or deleted by mistake) and we need this to be quick because this is an interactive operation and
-	that the missing data is mandatory to go forward for one's work, which may impact several other services.
+	that the missing data is mandatory to go forward for one's work, which workflow may impact several other persons.
       </li>
       <li>
 	The least frequent operation (hopefully) is the restoration of a whole system
@@ -821,7 +825,7 @@
 	We can assume the network penalty to be proportional to data processed by each software, as all protocol used are usually TCP based
 	(ftp, sftp, scp, ssh, ...), which performance is related to the system parameters (window size, MTU, etc.) not to the backup software
 	itself. As we only rely on tmpfs
-	filesystems to avoid dependency on disk I/O latency, we may approximate that the network latency or reducing network bandwidth would
+	filesystems to avoid dependency on disk I/O latency, we may approximate that the network latency or a reduction of network bandwidth would
 	just inflate the relative execution time of the different tested softwares in a linear manner. In other words, adding network between
 	system and backup storage should thus not modify the relative performances of the softwares under test.
       </li>
@@ -936,7 +940,7 @@
     </div>
     <p>
       Here the phenomenum is even more important when the file to restore is located near the end of the <i>tar</i> backup,
-      as <i>tar</i> reads the whole backup up to the requested filed.
+      as <i>tar</i> sequentially reads the whole backup up to the requested file.
     </p>
 
 
@@ -1147,7 +1151,7 @@
 	<th>Optional interesting features</th>
       </tr>
       <tr>
-	<th>Single full backup</th>
+	<th>Full backups only</th>
 	<td>
 	  <ul>
 	    <li>completness of backed up data and metadata</li>
@@ -1211,7 +1215,7 @@
 	<th>Private data exchange over Internet</th>
 	<td>
 	  <ul>
-	    <li>data reduction</li>
+	    <li>data reduction over the network</li>
 	    <li>asymmetric encryption and signing</li>
 	  </ul>
 	</td>
@@ -1227,14 +1231,13 @@
 	<th>Public data exchange over Internet</th>
 	<td>
 	  <ul>
-	    <li>data reduction</li>
-	    <li>hashing</li>
+	    <li>data reduction over the network</li>
 	  </ul>
 	</td>
 	<td>
 	  <ul>
+	    <li>hashing</li>
 	    <li>sigining</li>
-	    <li>ciphering</li>
 	    <li>integrated network protocols in backup tool</li>
 	  </ul>
 	</td>
@@ -1257,7 +1260,6 @@
       <td>
 	<ul>
 	  <li>execution speed</li>
-	  <li>data reduction</li>
 	</ul>
       </td>
       <td>
@@ -1339,10 +1341,10 @@
       <tr>
 	<th>Local directory copy</th>
 	<td>
-	  <div class=best>cp</div>
-	  <div class=yellow>dar</div>
-	  <div class=yellow>rsync</div>
-	  <div class=best>tar</div>
+	  <div class=top>cp</div>
+	  <div class="limited tooltip">dar <span class=text>not the fastest</span></div>
+	  <div class="limited tooltip">rsync <span class=text>not the fastest</span></div>
+	  <div class="ideal tooltip">tar <span class=text>not the fastest</span></div>
 	</td>
 	<td>
 	  -
@@ -1360,19 +1362,19 @@
 	  -
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=best>rsync</div>
-	  <div class=yellow>tar<br/>
+	  <div class=top>dar</div>
+	  <div class="ideal tooltip">rsync<span class=text>not the fastest</wwspan></div>
+	  <div class="limited tooltip">tar<span class=text>no network protocol embedded</span><br/>
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=best>rsync</div>
-	  <div class=yellow>tar<br/>
+	  <div class=top>dar</div>
+	  <div class="ideal tooltip">rsync<span class=text>not the fastest</span></div>
+	  <div class="limited tooltip">tar<span class=text>no network protocol embedded</span></div>
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=best>rsync</div>
-	  <div class=yellow>tar<br/>
+	    <div class=top>dar</div>
+	    <div class="ideal tooltip">rsync<span class=text>not the fastest</span></div>
+	    <div class="limited tooltip">tar<span class=text>no network protocol embedded</div>
 	</td>
       </tr>
       <tr>
@@ -1381,43 +1383,43 @@
 	  -
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=best>rsync</div>
-	  <div class=yellow>tar</div>
+	  <div class="ideal tooltip">dar<span class=text>fastest but automation is a bit less straight forward than using <i>rsync</i></span></div>
+	  <div class="top">rsync</div>
+	  <div class="limited tooltip">tar<span class=text>no network protocol embedded</span></div>
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=best>rsync</div>
-	  <div class=yellow>tar</div>
+	  <div class="ideal tooltip">dar<span class=text>fastest but automation is a bit less straight forward than using <i>rsync</i></span></div>
+	  <div class=top>rsync</div>
+	  <div class="limited tooltip">tar<span class=text>no network protocol embedded</span></div>
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=best>rsync</div>
-	  <div class=yellow>tar</div>
+	  <div class="ideal tooltip">dar<span class=text>fastest but automation is a bit less straight forward than using <i>rsync</i></span></div>
+	  <div class=top>rsync</div>
+	  <div class="limited tooltip">tar<span class=text>no network protocol embedded</span></div>
 	</td>
       </tr>
       <tr>
 	<th>Full backups only<br/>
-	(private data)</th>
+	  (private data)</th>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=best>rsync</div>
-	  <div class=best>tar<br/>
+	  <div class="top tooltip">dar<span class=text>has the advantage to provide long historization of backups</span></div>
+	  <div class="ideal tooltip">rsync<span class=text>no data reduction on storage, slow to restore a whole filesystem</span></div>
+	  <div class="ideal tooltip">tar<span class=text>not saving all file attributes and inode types, slow to restore a few files</span><br/>
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=yellow>rsync<br/>
-	  <div class=best>tar</div>
+	  <div class=top>dar</div>
+	  <div class="limited tooltip">rsync<span class=text>no data reduction on storage</span></div>
+	  <div class="ideal tooltip">tar<span class=text>not saving all file attributes and inode types, slow to restore a few files, no network protocol embedded</span></div>
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=red>rsync<br/>
-	  <div class=yellow>tar</div>
+	  <div class=top>dar</div>
+	  <div class="noway tooltip">rsync<span class=text>no data ciphering and no reduction on storage</span></div>
+	  <div class="limited tooltip">tar<span class=text>not embedded ciphering, not the strongest data encryption, not saving all file attributes and inode types, slow to restore a few files, no network protocol embedded</wwspan></div>
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=red>rsync</div>
-	  <div class=yellow>tar</div>
+	  <div class=top>dar</div>
+	  <div class="limited tooltip">rsync<span class=text>no multi-volume support, no data ciphering and no reduction on storage</span></div>
+	  <div class="limited tooltip">tar<span class=text>compression and multi-volume are not supported at the same time, not saving all file attributes and inode types, not embedded ciphering, not the strongest data encryption, </span></div>
 	</td>
       </tr>
       <tr>
@@ -1425,119 +1427,130 @@
 	  (priate data)
 	</th>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=red>rsync</div>
-	  <div class=best>tar</div>
+	  <div class=top>dar</div>
+	  <div class="noway tooltip">rsync<span class=text>differential backup not supported, full backup is overwritten</span></div>
+	  <div class="ideal tooltip">tar<span class=text>not saving all file attributes and inode types, slow to restore a few files</span></div>
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=red>rsync</div>
-	  <div class=best>tar</div>
+	  <div class=top>dar</div>
+	  <div class="noway tooltip">rsync<span class=text>differential backup not supported, full backup is overwritten</span></div>
+	  <div class="ideal tooltip">tar<span class=text>not saving all file attributes and inode types, slow to restore a few files, no network protocol embedded</span></div>
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=red>rsync</div>
-	  <div class=best>tar</div>
+	  <div class=top>dar</div>
+	  <div class="noway tooltip">rsync<span class=text>differential backup not supported, full backup is overwritten</span></div>
+	  <div class="limited tooltip">tar<span class=text>not embedded ciphering, not the strongest data encryption, not saving all file attributes and inode types, slow to restore a few files, no network protocol embedded</span></div>
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=red>rsync</div>
-	  <div class=yellow>tar</div>
+	  <div class=top>dar</div>
+	  <div class="noway tooltip">rsync<span class=text>differential backup not supported, full backup is overwritten, no support for multi-volime, no data reduction, no ciphering</span></div>
+	  <div class="limited tooltip">tar<span class=text>compression and multi-volume are not supported at the same time, not saving all file attributes and inode types, not embedded ciphering, not the strongest data encryption, </span></div>
 	</td>
       </tr>
       <tr>
 	<th>Archiving of private data</th>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=red>rsync</div>
-	  <div class=best>tar</div>
+	  <div class=top>dar</div>
+	  <div class="limited tooltip">rsync<span class=text>no data reduction on storage, no detection of data corruption, complex parity data addition</span></div>
+	  <div class="ideal tooltip">tar<span class=text>no detection of data corruption or loss of all data after the first corruption met</span></div>
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=red>rsync</div>
-	  <div class=best>tar</div>
+	  <div class=top>dar</div>
+	  <div class="limited tooltip">rsync<span class=text>no data reduction, no detection of data corruption, complex parity data addition</span></div>
+	  <div class="ideal tooltip">tar<span class=text>no detection of data corruption or loss of all data after the first corruption met</span></div>
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=red>rsync</div>
-	  <div class=yellow>tar</div>
+	  <div class=top>dar</div>
+	  <div class="noway tooltip">rsync<span class=text>no ciphering, no data reduction, no detection of data corruption, complex parity data addition</span></div>
+	  <div class="limited tooltip">tar<span class=text>no detection of data corruption or loss of all data after the first corruption met, no embedded ciphering, no protection against plain-text attack</span></div>
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=red>rsync</div>
-	  <div class=red>tar</div>
+	  <div class=top>dar</div>
+	  <div class="noway tooltip">rsync<span class=text>no data reduction, no multi-volume, no ciphering, no detection of data corruption, complex parity data addition</span></div>
+	  <div class="noway tooltip">tar<span class=text>compression and multi-volume are not supported at the same time, no detection of data corruption or loss of all data after the first corruption met, no ciphering</span></div>
 	</td>
       </tr>
       <tr>
 	<th>Archiving of public data</th>
 	<td>
-	  <div class=yellow>dar</div>
-	  <div class=yellow>rsync</div>
-	  <div class=best>tar</div>
+	  <div class="ideal tooltip">dar<span class=text>most robust format but not as standard as <i>tar</i>'s</span></div>
+	  <div class="limited tooltip">rsync<span class=text>no reduction on storage</span></div>
+	  <div class=top>tar</div>
 	</td>
 	<td>
-	  <div class=yellow>dar</div>
-	  <div class=yellow>rsync</div>
-	  <div class=best>tar</div>
+	  <div class="ideal tooltip">dar<span class=text>most robust archive format but not as standard as <i>tar</i>'s</span></div>
+	  <div class="noway tooltip">rsync<span class=text>no reduction on storage, complicated to download a directory tree and files from other protocols than rsync</span></div>
+	  <div class=top>tar</div>
 	</td>
 	<td>
-	  <div class=yellow>dar</div>
-	  <div class=yellow>rsync</div>
-	  <div class=best>tar</div>
+	  <div class="ideal tooltip">dar<span class=text>most robust archive format but not as standard as <i>tar</i></span></div>
+	  <div class="noway tooltip">rsync<span class=text>no reduction on storage, complicated to download a directory tree and files from other protocols than rsync</span></div>
+	  <div class=top>tar</div>
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=red>rsync</div>
-	  <div class=yellow>tar</div>
+	  <div class=top>dar</div>
+	  <div class="noway tooltip">rsync<span class=text>no reduction on storage, no multi-volume, no detection of data corruption, complex parity data addition</span></div>
+	  <div class="limited tooltip">tar<span class=text>compression and multi-volume are not supported at the same time</span></div>
 	</td>
       </tr>
       <tr>
 	<th>Private data exchange over Internet</th>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=best>rsync</div>
-	  <div class=yellow>tar</div>
+	  <div class=top>dar</div>
+	  <div class="limited tooltip">rsync<span class=text>not the best data reduction over the network</span></div>
+	  <div class="ideal tooltip">tar<span class=text>best data reduction on network but no embedded ciphering, no integrated network protocols</span></div>
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=yellow>rsync</div>
-	  <div class=yellow>tar</div>
+	  <div class=top>dar</div>
+	  <div class="limited tooltip">rsync<span class=text>no data reduction on storage, not the best data reduction over the network</span></div>
+	  <div class="ideal tooltip">tar<span class=text>best data reduction on network, but lack of embedded ciphering, lack of integrated network protocols</span></div>
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=red>rsync</div>
-	  <div class=yellow>tar</div>
+	  <div class=top>dar</div>
+	  <div class="noway tooltip">rsync<span class=text>no ciphering and no data reduction on storage</span></div>
+	  <div class="limited tooltip">tar<span class=text>no embedded ciphering, no integrated network protocols, no protection against plain-text attack, only old KDF functions supported, complex and error prone use of openssl to cipher the archive</span></div>
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=red>rsync</div>
-	  <div class=yellow>tar</div>
+	  -
 	</td>
       </tr>
       <tr>
 	<th>Public data exchange over Internet</th>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=best>rsync</div>
-	  <div class=best>tar</div>
+	  <div class="ideal tooltip">dar<span class=text>not the best data reduction over the network<i>tar</i></span></div>
+	  <div class="ideal tooltip">rsync<span class=text>not the best data reduction over the network<i>tar</i></span></div>
+	  <div class=top>tar</div>
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=yellow>rsync</div>
-	  <div class=best>tar</div>
+	  <div class="ideal tooltip">dar<span class=text>not the best data reduction over the network<i>tar</i></span></div>
+	  <div class="limited tooltip">rsync<span class=text>no data reduction on storage, not the best data reduction over the network<i>tar</i></span></div>
+	  <div class=top>tar</div>
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=yellow>rsync</div>
-	  <div class=best>tar</div>
+	  <div class="ideal tooltip">dar<span class=text>not the best data reduction over the network<i>tar</i></span></div>
+	  <div class="limited tooltip">rsync<span class=text>no data reduction on storage, not the best data reduction over the network<i>tar</i></span></div>
+	  <div class=top>tar</div>
 	</td>
 	<td>
-	  <div class=best>dar</div>
-	  <div class=red>rsync</div>
-	  <div class=yellow>tar</div>
+	  -
 	</td>
       </tr>
     </table>
+
+    <p>
+      In the previous table, the different software are listed in alphabetical order, see the details in the previous paragraphs for
+      finer classification
+    </p>
+    <table class=center>
+      <tr>
+	<th style="width: 20%">Color codes</th>
+	<td style="width: 10%"><div class=top>best solution</div></td>
+	<td style="width: 10%"><div class=ideal>good solution</div></td>
+	<td style="width: 10%"><div class=limited>not optimal</div></td>
+	<td style="width: 10%"><div class=noway>not adapted</div></td>
+      </tr>
+    </table>
+
 
 
     <h2>Appendix 1 - Test logs</h2>
