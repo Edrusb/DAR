@@ -41,7 +41,7 @@ endif
 
 
 
-noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_escape test_hash_fichier moving_file hashsum test_crypto_asym test_range $(LIBTHREADAR_TEST_MODULES) test_rsync test_smart_pointer test_datetime test_entrepot_libcurl test_truncate
+noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_escape test_hash_fichier moving_file hashsum test_crypto_asym test_range $(LIBTHREADAR_TEST_MODULES) test_rsync test_smart_pointer test_datetime test_entrepot_libcurl test_truncate test_mycurl_param_list
 
 LDADD = ../libdar/$(MYLIB).la $(LIBCURL_LIBS) $(GPGME_LIBS) $(LIBTHREADAR_LIBS) $(LTLIBINTL)
 
@@ -166,3 +166,6 @@ test_parallel_tronconneuse_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 test_block_compressor_SOURCES = test_block_compressor.cpp
 test_block_compressor_DEPENDENCIES = ../libdar/$(MYLIB).la
+
+test_mycurl_param_list_SOURCES = test_mycurl_param_list.cpp
+test_mycurl_param_list_DEPENDENCIES = ../libdar/$(MYLIB).la
