@@ -40,13 +40,21 @@ namespace libdar
 	    element_list.erase(it);
     }
 
-    list<CURLoption> mycurl_param_list::update_with(mycurl_param_list wanted, mycurl_param_list defaults)
+    bool mycurl_param_list::read_next(CURLoption & opt)
+    {
+	if(cursor == element_list.end())
+	    return false;
+
+	opt = cursor->first;
+	return true;
+    }
+
+    list<CURLoption> mycurl_param_list::update_with(const mycurl_param_list & wanted)
     {
 	list<CURLoption> ret;
 
-	std::map<CURLoption, unique_ptr<mycurl_param_element_generic> >::iterator wit; // <ill be used on wanted
+	std::map<CURLoption, unique_ptr<mycurl_param_element_generic> >::const_iterator wit; // will be used on wanted
 	std::map<CURLoption, unique_ptr<mycurl_param_element_generic> >::iterator mit; // will be used on "this"
-	std::map<CURLoption, unique_ptr<mycurl_param_element_generic> >::iterator dit; // will be used on defaults
 
 	    // adding changed parameters
 
@@ -67,25 +75,6 @@ namespace libdar
 	    }
 
 	    ++wit;
-	}
-
-	    // setting back to default parameter that are in the current list but not the wanted one
-
-	mit = element_list.begin();
-
-	while(mit != element_list.end())
-	{
-	    dit = defaults.element_list.find(mit->first);
-	    if(dit == defaults.element_list.end() || !dit->second)
-		throw Erange("mycurl_param_list", tools_printf("There is no default value provided for mycurl_param_list option %d", mit->first));
-
-	    wit = wanted.element_list.find(mit->first);
-	    if(wit == wanted.element_list.end())
-	    {
-		add_clone(mit->first, *(dit->second));
-		ret.push_back(mit->first);
-	    }
-	    ++mit;
 	}
 
 	return ret;

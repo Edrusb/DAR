@@ -131,14 +131,7 @@ namespace libdar
 	void reset() { element_list.clear(); };
 	U_I size() const { return element_list.size(); };
 	void reset_read() const { cursor = element_list.begin(); };
-	bool read_next(CURLoption & opt)
-	{
-	    if(cursor == element_list.end())
-		return false;
-
-	    opt = cursor->first;
-	    return true;
-	}
+	bool read_next(CURLoption & opt);
 
 	template<class T> void read_opt(const T* & val) const
 	{
@@ -187,13 +180,12 @@ namespace libdar
 
 	    /// this method update the current object with parameters from wanted and returns the list of modified options
 
-	    /// \note if a CURLoption in wanted is not present in 'this' its is added with the associated value and the CURLoption is
-	    /// added to the returned list. If a CURLoption in present in both wanted and "this" if it is different the value
-	    /// is updated and the option is added to the returned list, else nothing is changed and the option is not added to the
-	    /// returned list. Last if an option is not present in wanted but is present in "this", the associated value from the
-	    /// defaults map is set to "this" and the CURLoption is added to the returned list.
+	    /// \note if a CURLoption in wanted is not present in 'this' it is added with the associated value and the CURLoption is
+	    /// added to the returned list. If a CURLoption is present in both wanted and "this" and its value differ between the two lists
+	    /// it is updated in "this" and the option is added to the returned list, else nothing is changed and the option is not added to the
+	    /// returned list.
 
-	std::list<CURLoption> update_with(mycurl_param_list wanted, mycurl_param_list defaults);
+	std::list<CURLoption> update_with(const mycurl_param_list & wanted);
 
     private:
 	std::map<CURLoption, std::unique_ptr<mycurl_param_element_generic> > element_list;
