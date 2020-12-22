@@ -21,7 +21,7 @@
 
 #include "../my_config.h"
 
-#include "mycurl_param_element.hpp"
+#include "mycurl_param_list.hpp"
 
 #include <typeinfo>
 #include "erreurs.hpp"

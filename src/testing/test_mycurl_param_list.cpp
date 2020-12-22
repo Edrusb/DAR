@@ -25,7 +25,7 @@ extern "C"
 {
 } // end extern "C"
 
-#include "mycurl_param_element.hpp"
+#include "mycurl_param_list.hpp"
 #include "libdar.hpp"
 
 using namespace libdar;

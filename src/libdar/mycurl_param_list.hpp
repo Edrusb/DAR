@@ -20,7 +20,7 @@
 /*********************************************************************/
 
     /// \file mycurl_param_element
-    /// \brief element a CURL* object can receive as parameter
+    /// \brief wrapper for element a CURL* object can receive as parameter in order to be put in etherogeneous list
     /// \ingroup Private
 
 #ifndef MYCURL_PARAM_ELEMENT_HPP
@@ -60,6 +60,8 @@ namespace libdar
 	// This is implemented by a ancestor type (mycurl_param_element_generic) which is an pure abstracted
 	// class, from which derives many template based classes: mycurl_param_element<T>.
 
+
+
 	/// the ancestor class of etherogeneous list/map
 
     class mycurl_param_element_generic
@@ -72,6 +74,9 @@ namespace libdar
 
 	virtual std::unique_ptr<mycurl_param_element_generic> clone() const = 0;
     };
+
+
+
 
 	/// the implemented inherited classes of the abstracted class for etherogeneous list/map
 
