@@ -106,6 +106,18 @@ namespace libdar
 	}
     }
 
+    void mycurl_easyhandle_node::setopt_all_default()
+    {
+	const opt_asso *asso = association;
+
+	while(asso != nullptr && asso->cast != eolist)
+	{
+	    setopt_default(asso->opt);
+	    ++asso;
+	}
+    }
+
+
     void mycurl_easyhandle_node::apply(const std::shared_ptr<user_interaction> & dialog,
 				       U_I wait_seconds)
     {

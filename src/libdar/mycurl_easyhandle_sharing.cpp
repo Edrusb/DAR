@@ -55,6 +55,7 @@ namespace libdar
 	    }
 	}
 
+	ret->setopt_all_default();
 	ret->setopt_list(global_params);
 	return ret;
     }

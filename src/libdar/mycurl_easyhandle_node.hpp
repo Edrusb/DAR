@@ -82,6 +82,8 @@ namespace libdar
 	    /// set back to default
 	void setopt_default(CURLoption opt);
 
+	    /// set back all options to their default
+	void setopt_all_default();
 
 	    /// apply changed options since last call to apply, then execute curl_perform()
 	void apply(const std::shared_ptr<user_interaction> & dialog, U_I wait_seconds);
