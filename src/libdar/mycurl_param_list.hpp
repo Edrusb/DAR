@@ -144,7 +144,7 @@ namespace libdar
 
 	template<class T> void add(CURLoption opt, const T & val) { element_list[opt] = std::make_unique<mycurl_param_element<T> >(val); }
 	void clear(CURLoption opt);
-	void reset() { element_list.clear(); reset_read(); };
+	void clear() { element_list.clear(); reset_read(); };
 	U_I size() const { return element_list.size(); };
 	void reset_read() const { cursor = element_list.begin(); };
 	bool read_next(CURLoption & opt);
