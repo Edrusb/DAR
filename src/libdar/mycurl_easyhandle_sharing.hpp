@@ -39,7 +39,7 @@ extern "C"
 
 #include <deque>
 #include "erreurs.hpp"
-#include "mycurl_shared_handle.hpp"
+#include "mycurl_easyhandle_node.hpp"
 
 namespace libdar
 {
@@ -54,19 +54,25 @@ namespace libdar
     {
     public:
 	mycurl_easyhandle_sharing() = default;
-	mycurl_easyhandle_sharing(const mycurl_easyhandle_sharing & ref): root(ref.root) { clone_table.clear(); };
-	mycurl_easyhandle_sharing(mycurl_easyhandle_sharing && ref) noexcept: root(std::move(ref.root)) { std::swap(clone_table, ref.clone_table); };
+	mycurl_easyhandle_sharing(const mycurl_easyhandle_sharing & ref) = delete;
+	mycurl_easyhandle_sharing(mycurl_easyhandle_sharing && ref) noexcept = delete;
 	mycurl_easyhandle_sharing & operator = (const mycurl_easyhandle_sharing & ref) = delete;
 	mycurl_easyhandle_sharing & operator = (mycurl_easyhandle_sharing && ref) noexcept = delete;
 	~mycurl_easyhandle_sharing() = default;
 
-	CURL *get_root_handle() const { return root.get_handle(); };
 
-	mycurl_shared_handle alloc_instance() const;
+	    /// global options are applied to all mycurl_easyhandle_node provided by this object
+	template<class T> void setopt_global(CURLoption opt, const T & val) { global_params.add(opt, val); };
+
+	    /// obtain a libcurl handle wrapped in the adhoc classes to allow copy and cloning
+
+	    /// \note once no more needed reset() the shared_ptr to have this object recycled
+	std::shared_ptr<mycurl_easyhandle_node> alloc_instance();
+
 
     private:
-	mycurl_easyhandle_node root;
-	std::deque<smart_pointer<mycurl_easyhandle_node> > clone_table;
+	std::deque<std::shared_ptr<mycurl_easyhandle_node> > table;
+	mycurl_param_list global_params;
     };
 
 #else

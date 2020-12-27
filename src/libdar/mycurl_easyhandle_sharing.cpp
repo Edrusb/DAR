@@ -29,24 +29,38 @@ namespace libdar
 {
 #if LIBCURL_AVAILABLE
 
-    mycurl_shared_handle mycurl_easyhandle_sharing::alloc_instance() const
+    shared_ptr<mycurl_easyhandle_node> mycurl_easyhandle_sharing::alloc_instance()
     {
-	deque<smart_pointer<mycurl_easyhandle_node> >::const_iterator it = clone_table.begin();
+	shared_ptr<mycurl_easyhandle_node> ret;
+	deque<shared_ptr<mycurl_easyhandle_node> >::const_iterator it = table.begin();
 
-	while(it != clone_table.end() && (*it)->get_used_mode())
+	while(it != table.end() && it->use_count() > 1)
 	    ++it;
 
-	if(it != clone_table.end())
-	    return mycurl_shared_handle(*it);
-	else // need to create a new clone in the clone_table
+	if(it != table.end())
+	    ret = *it;
+	else
 	{
-	    smart_pointer<mycurl_easyhandle_node> ptr = new (nothrow) mycurl_easyhandle_node(root);
-	    if(ptr.is_null())
+	    try
+	    {
+		table.push_back(make_shared<mycurl_easyhandle_node>());
+		if(table.back().use_count() != 1)
+		    throw SRC_BUG;
+		else
+		    ret = table.back();
+	    }
+	    catch(bad_alloc & e)
+	    {
 		throw Ememory("mycurl_easyhandle_sharing::alloc_instance");
-	    const_cast<mycurl_easyhandle_sharing *>(this)->clone_table.push_back(ptr);
-	    return mycurl_shared_handle(ptr);
+	    }
 	}
+
+	ret->setopt_list(global_params);
+	return ret;
     }
+
+
+
 
 #endif
 } // end of namespace
