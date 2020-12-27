@@ -165,3 +165,17 @@ void f2()
 	++modit;
     }
 }
+
+void f3()
+{
+    mycurl_param_list source;
+
+    source.add(CURLOPT_VERBOSE, foo(1));
+
+    mycurl_param_list dst(source);
+    mycurl_param_list dst2(move(source));
+
+    cout << source.size() << endl;
+    cout << dst.size() << endl;
+    cout << dst2.size() << endl;
+}

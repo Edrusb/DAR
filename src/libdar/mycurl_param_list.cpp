@@ -32,12 +32,14 @@ using namespace std;
 namespace libdar
 {
 
+
     void mycurl_param_list::clear(CURLoption opt)
     {
 	map<CURLoption, unique_ptr<mycurl_param_element_generic> >::iterator it = element_list.find(opt);
 
 	if(it != element_list.end())
 	    element_list.erase(it);
+	reset_read();
     }
 
     bool mycurl_param_list::read_next(CURLoption & opt)
@@ -79,5 +81,22 @@ namespace libdar
 
 	return ret;
     }
+
+    void mycurl_param_list::copy_from(const mycurl_param_list & ref)
+    {
+	map<CURLoption, unique_ptr<mycurl_param_element_generic> >::const_iterator it = ref.element_list.begin();
+
+	while(it != ref.element_list.end())
+	{
+	    if(it->second)
+		element_list[it->first] = it->second->clone();
+	    else
+		throw SRC_BUG;
+
+	    ++it;
+	}
+	reset_read();
+    }
+
 
 } // end of namespace

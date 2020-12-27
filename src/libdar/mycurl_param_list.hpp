@@ -105,7 +105,18 @@ namespace libdar
 	virtual std::unique_ptr<mycurl_param_element_generic> clone() const override
 	{
 	    std::unique_ptr<mycurl_param_element_generic> ret;
-	    ret = std::make_unique<mycurl_param_element<T> >(val);
+
+	    try
+	    {
+		ret = std::make_unique<mycurl_param_element<T> >(val);
+		if(ret == nullptr)
+		    throw Ememory("mycurl_param_list::clone");
+	    }
+	    catch(...)
+	    {
+		throw Ememory("mycurl_param_list::clone");
+	    }
+
 	    return ret;
 	};
 
@@ -121,9 +132,9 @@ namespace libdar
     {
     public:
 	mycurl_param_list() {};
-	mycurl_param_list(const mycurl_param_list & ref) = default;
+	mycurl_param_list(const mycurl_param_list & ref) { copy_from(ref); };
 	mycurl_param_list(mycurl_param_list && ref) noexcept = default;
-	mycurl_param_list & operator = (const mycurl_param_list & ref) = default;
+	mycurl_param_list & operator = (const mycurl_param_list & ref) { element_list.clear(); copy_from(ref); return *this; };
 	mycurl_param_list & operator = (mycurl_param_list && ref) = default;
 	~mycurl_param_list() = default;
 
@@ -133,7 +144,7 @@ namespace libdar
 
 	template<class T> void add(CURLoption opt, const T & val) { element_list[opt] = std::make_unique<mycurl_param_element<T> >(val); }
 	void clear(CURLoption opt);
-	void reset() { element_list.clear(); };
+	void reset() { element_list.clear(); reset_read(); };
 	U_I size() const { return element_list.size(); };
 	void reset_read() const { cursor = element_list.begin(); };
 	bool read_next(CURLoption & opt);
@@ -158,9 +169,9 @@ namespace libdar
 	    ++cursor;
 	}
 
-	template<class T>bool get_val(CURLoption opt, const T* & val)
+	template<class T>bool get_val(CURLoption opt, const T* & val) const
 	{
-	    std::map<CURLoption, std::unique_ptr<mycurl_param_element_generic> >::iterator it = element_list.find(opt);
+	    std::map<CURLoption, std::unique_ptr<mycurl_param_element_generic> >::const_iterator it = element_list.find(opt);
 
 	    if(it == element_list.end())
 		return false;
@@ -183,21 +194,27 @@ namespace libdar
 	    // operations between lists
 
 
-	    /// this method update the current object with parameters from wanted and returns the list of modified options
+	    /// this method update the current object with parameters from wanted and returns
+	    /// the list of modified options
 
-	    /// \note if a CURLoption in wanted is not present in 'this' it is added with the associated value and the CURLoption is
-	    /// added to the returned list. If a CURLoption is present in both wanted and "this" and its value differ between the two lists
-	    /// it is updated in "this" and the option is added to the returned list, else nothing is changed and the option is not added to the
+	    /// \note if a CURLoption in wanted is not present in 'this' it is added with the
+	    /// associated value and the CURLoption is
+	    /// added to the returned list. If a CURLoption is present in both wanted and
+	    /// "this" and its value differ between the two lists
+	    /// it is updated in "this" and the option is added to the returned list, else
+	    /// nothing is changed and the option is not added to the
 	    /// returned list.
 
 	std::list<CURLoption> update_with(const mycurl_param_list & wanted);
 
     private:
 	std::map<CURLoption, std::unique_ptr<mycurl_param_element_generic> > element_list;
-#endif
 	mutable std::map<CURLoption, std::unique_ptr<mycurl_param_element_generic> >::const_iterator cursor;
 
 	void add_clone(CURLoption opt, const mycurl_param_element_generic & val) { element_list[opt] = val.clone(); }
+	void copy_from(const mycurl_param_list & ref);
+
+#endif
     };
 
 
