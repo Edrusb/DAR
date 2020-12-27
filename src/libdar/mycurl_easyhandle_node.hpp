@@ -76,8 +76,12 @@ namespace libdar
 	    /// set options
 	template<class T> void setopt(CURLoption opt, const T & val) { wanted.add(opt, val); }
 
+	    /// adds a set of options
+	void setopt_list(const mycurl_param_list & listing) { (void) wanted.update_with(listing); };
+
 	    /// set back to default
 	void setopt_default(CURLoption opt);
+
 
 	    /// apply changed options since last call to apply, then execute curl_perform()
 	void apply(const std::shared_ptr<user_interaction> & dialog, U_I wait_seconds);
