@@ -187,17 +187,6 @@ namespace libdar
 	static size_t read_meta_callback(char *bufptr, size_t size, size_t nitems, void *userp);
     };
 
-	/// helper function to handle libcurl error code
-	/// wait or throw an exception depending on error condition
-
-	/// \param[in] dialog used to report the reason we are waiting for and how much time we wait
-	/// \param[in] err is the curl easy code to examin
-	/// \param[in] wait_seconds is the time to wait for recoverable error
-	/// \param[in] err_context is the error context message use to prepend waiting message or exception throw
-    extern void fichier_libcurl_check_wait_or_throw(const std::shared_ptr<user_interaction> & dialog,
-						    CURLcode err,
-						    U_I wait_seconds,
-						    const std::string & err_context);
 
 #endif
 	/// @}

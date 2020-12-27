@@ -38,6 +38,9 @@ extern "C"
 } // end extern "C"
 
 #include <string>
+#include "mycurl_param_list.hpp"
+#include "user_interaction.hpp"
+#include "mycurl_slist.hpp"
 
 namespace libdar
 {
@@ -53,7 +56,7 @@ namespace libdar
     {
     public:
 	    /// create a new easyhandle
-	mycurl_easyhandle_node();
+	mycurl_easyhandle_node() { init_defaults(); init(); };
 
 	    /// copy constructor
 	mycurl_easyhandle_node(const mycurl_easyhandle_node & ref);
@@ -62,22 +65,101 @@ namespace libdar
 	mycurl_easyhandle_node(mycurl_easyhandle_node && ref) noexcept;
 
 	    /// assignment operator
-	mycurl_easyhandle_node & operator = (const mycurl_easyhandle_node & ref) = delete;
+	mycurl_easyhandle_node & operator = (const mycurl_easyhandle_node & ref);
 
 	    /// move operator
-	mycurl_easyhandle_node & operator = (mycurl_easyhandle_node && ref) noexcept = delete;
+	mycurl_easyhandle_node & operator = (mycurl_easyhandle_node && ref) noexcept;
 
 	    /// destructor
 	~mycurl_easyhandle_node() { if(handle != nullptr) curl_easy_cleanup(handle); };
 
-	void set_used_mode(bool mode) { used = mode; };
-	bool get_used_mode() const { return used; };
+	    /// set options
+	template<class T> void setopt(CURLoption opt, const T & val) { wanted.add(opt, val); }
 
-	CURL *get_handle() const { return handle; };
+	    /// set back to default
+	void setopt_default(CURLoption opt);
+
+	    /// apply changed options since last call to apply, then execute curl_perform()
+	void apply(const std::shared_ptr<user_interaction> & dialog, U_I wait_seconds);
 
     private:
+
+	    ////////////////////////////////////
+	    // object level fields and methods
+	    //
+
+	enum opttype
+	{
+	    type_string,
+	    type_pointer,
+	    type_long,
+	    type_mycurl_slist,
+	    type_curl_off_t,
+	    eolist ///< this is not a type just for flagging the end of a list
+	};
+
 	CURL *handle;
-	bool used;
+	mycurl_param_list current;
+	mycurl_param_list wanted;
+
+	void init();
+	template<class T>void set_to_default(CURLoption opt)
+	{
+	    const T* ptr;
+
+	    if(current.get_val(opt, ptr))
+	    {
+		if(defaults.get_val(opt, ptr))
+		    wanted.add(opt, *ptr);
+		else
+		    throw SRC_BUG;
+	    }
+	    else
+		wanted.clear(opt);
+	}
+
+
+	    ////////////////////////////////////
+	    // class level fields and methods
+	    //
+
+	struct opt_asso
+	{
+	    CURLoption opt;
+	    opttype cast;
+	};
+
+	static constexpr const opt_asso association[] =
+	{
+	  { CURLOPT_APPEND, type_long },
+	  { CURLOPT_DIRLISTONLY, type_long },
+	  { CURLOPT_NETRC, type_long },
+	  { CURLOPT_NOBODY, type_long },
+	  { CURLOPT_SSH_KNOWNHOSTS, type_string },
+	  { CURLOPT_SSH_PUBLIC_KEYFILE, type_string },
+	  { CURLOPT_SSH_PRIVATE_KEYFILE, type_string },
+	  { CURLOPT_SSH_AUTH_TYPES, type_long },
+	  { CURLOPT_QUOTE, type_mycurl_slist },
+	  { CURLOPT_RANGE, type_string },
+	  { CURLOPT_READDATA, type_pointer },
+	  { CURLOPT_READFUNCTION, type_pointer },
+	  { CURLOPT_RESUME_FROM_LARGE, type_curl_off_t },
+	  { CURLOPT_UPLOAD, type_long },
+	  { CURLOPT_URL, type_string },
+	  { CURLOPT_USERNAME, type_string },
+	  { CURLOPT_USERPWD, type_string },
+	  { CURLOPT_VERBOSE, type_long },
+	  { CURLOPT_WRITEDATA, type_pointer },
+	  { CURLOPT_WRITEFUNCTION, type_pointer },
+	      // eolist is needed to flag the end of list, option type does not matter
+	  { CURLOPT_APPEND, eolist }
+	};
+
+	static void init_defaults();
+	static opttype get_opt_type(CURLoption opt);
+
+	static bool defaults_initialized;
+	static mycurl_param_list defaults;
     };
 
 #endif
