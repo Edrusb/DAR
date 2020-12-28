@@ -47,7 +47,7 @@ extern "C"
 #include "user_interaction.hpp"
 #include "fichier_global.hpp"
 #include "mycurl_protocol.hpp"
-#include "mycurl_shared_handle.hpp"
+#include "mycurl_easyhandle_node.hpp"
 
 namespace libdar
 {
@@ -67,7 +67,7 @@ namespace libdar
 	fichier_libcurl(const std::shared_ptr<user_interaction> & dialog,      //< for user interaction requested by fichier_global
 			const std::string & chemin,     //< full path of the file to open
 			mycurl_protocol proto,          //< to workaround some libcurl strange behavior for some protocols
-			mycurl_shared_handle && handle, //< the easy handle wrapper object
+			const std::shared_ptr<mycurl_easyhandle_node> & handle, //< the easy handle wrapper object
 			gf_mode m,                      //< open mode
 			U_I waiting,                    //< retry timeout in case of network error
 			bool force_permission,          //< whether file permission should be modified
@@ -154,7 +154,7 @@ namespace libdar
 
 	bool end_data_mode;               ///< true if subthread has been requested to end
 	bool sub_is_dying;                ///< is set by subthread when about to end
-	mycurl_shared_handle ehandle;     ///< easy handle (wrapped in C++ object) that we modify when necessary
+	const std::shared_ptr<mycurl_easyhandle_node> & ehandle; ///< easy handle (wrapped in C++ object) that we modify when necessary
 	bool metadatamode;                ///< wether we are acting on metadata rather than file's data
 	infinint current_offset;          ///< current offset we are reading / writing at
 	bool has_maxpos;                  ///< true if maxpos is set

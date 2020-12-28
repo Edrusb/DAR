@@ -41,6 +41,7 @@ extern "C"
 #include "mycurl_param_list.hpp"
 #include "user_interaction.hpp"
 #include "mycurl_slist.hpp"
+#include "tools.hpp"
 
 namespace libdar
 {
@@ -86,7 +87,21 @@ namespace libdar
 	void setopt_all_default();
 
 	    /// apply changed options since last call to apply, then execute curl_perform()
-	void apply(const std::shared_ptr<user_interaction> & dialog, U_I wait_seconds);
+	void apply(const std::shared_ptr<user_interaction> & dialog,
+		   U_I wait_seconds,
+		   const bool & end_anyway = false);
+
+	    /// get informations on the previous apply
+
+	template<class T> void getinfo(CURLINFO info, T* val)
+	{
+	    CURLcode err = curl_easy_getinfo(handle, info, val);
+	    if(err != CURLE_OK)
+		throw Erange("mycurl_easyhandle_node::getinfo",
+			     tools_printf(gettext("Error met while fetching info %d: %s"),
+					  (S_I)info,
+					  curl_easy_strerror(err)));
+	};
 
     private:
 

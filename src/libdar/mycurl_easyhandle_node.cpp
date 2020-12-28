@@ -24,6 +24,7 @@
 #include "mycurl_easyhandle_node.hpp"
 #include "erreurs.hpp"
 #include "tools.hpp"
+#include "secu_string.hpp"
 
 using namespace std;
 
@@ -46,6 +47,8 @@ namespace libdar
 
 
     bool mycurl_easyhandle_node::defaults_initialized = false;
+    mycurl_param_list mycurl_easyhandle_node::defaults;
+    constexpr const mycurl_easyhandle_node::opt_asso mycurl_easyhandle_node::association[];
 
 
     mycurl_easyhandle_node::mycurl_easyhandle_node(const mycurl_easyhandle_node & ref)
@@ -119,7 +122,8 @@ namespace libdar
 
 
     void mycurl_easyhandle_node::apply(const std::shared_ptr<user_interaction> & dialog,
-				       U_I wait_seconds)
+				       U_I wait_seconds,
+				       const bool & end_anyway)
     {
 	list<CURLoption> changed = current.update_with(wanted);
 	list<CURLoption>::iterator it = changed.begin();
@@ -197,12 +201,13 @@ namespace libdar
 	do
 	{
 	    err = curl_easy_perform(handle);
-	    fichier_libcurl_check_wait_or_throw(dialog,
-						err,
-						wait_seconds,
-						"Error met while performing action on libcurl handle");
+	    if(!end_anyway)
+		fichier_libcurl_check_wait_or_throw(dialog,
+						    err,
+						    wait_seconds,
+						    "Error met while performing action on libcurl handle");
 	}
-	while(err != CURLE_OK);
+	while(err != CURLE_OK && !end_anyway);
     }
 
     void mycurl_easyhandle_node::init()

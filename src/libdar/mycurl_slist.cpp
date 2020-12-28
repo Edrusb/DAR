@@ -32,9 +32,9 @@ namespace libdar
 #if LIBCURL_AVAILABLE
 
 
-    bool mycurl_slist::operator = (const mycurl_slist & ref) const
+    bool mycurl_slist::operator == (const mycurl_slist & ref) const
     {
-	if(append.size() != ref.append.size())
+	if(appended.size() != ref.appended.size())
 	    return false;
 	else
 	{
@@ -46,7 +46,7 @@ namespace libdar
 		  && *itref == *itme)
 	    {
 		++itref;
-		++itme
+		++itme;
 	    }
 
 	    return itref == ref.appended.end() && itme == appended.end();

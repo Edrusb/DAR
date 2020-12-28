@@ -54,8 +54,8 @@ namespace libdar
     {
     public:
 	mycurl_easyhandle_sharing() = default;
-	mycurl_easyhandle_sharing(const mycurl_easyhandle_sharing & ref) = delete;
-	mycurl_easyhandle_sharing(mycurl_easyhandle_sharing && ref) noexcept = delete;
+	mycurl_easyhandle_sharing(const mycurl_easyhandle_sharing & ref): global_params(ref.global_params) { table.clear(); };
+	mycurl_easyhandle_sharing(mycurl_easyhandle_sharing && ref) noexcept: table(std::move(ref.table)), global_params(std::move(ref.global_params)) {};
 	mycurl_easyhandle_sharing & operator = (const mycurl_easyhandle_sharing & ref) = delete;
 	mycurl_easyhandle_sharing & operator = (mycurl_easyhandle_sharing && ref) noexcept = delete;
 	~mycurl_easyhandle_sharing() = default;

@@ -19,12 +19,12 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \file mycurl_param_element
+    /// \file mycurl_param_list.hpp
     /// \brief wrapper for element a CURL* object can receive as parameter in order to be put in etherogeneous list
     /// \ingroup Private
 
-#ifndef MYCURL_PARAM_ELEMENT_HPP
-#define MYCURL_PARAM_ELEMENT_HPP
+#ifndef MYCURL_PARAM_LIST_HPP
+#define MYCURL_PARAM_LIST_HPP
 
 #include "../my_config.h"
 

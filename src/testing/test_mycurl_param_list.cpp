@@ -127,7 +127,7 @@ void f1(int argc, char *argv[])
     if(mylist.get_val(CURLOPT_HEADER, type2_ptr))
 	cout << "val(HEADER) = " << *type2_ptr << endl;
     cout << "size = " << mylist.size() << endl;
-    mylist.reset();
+    mylist.clear();
     cout << "size = " << mylist.size() << endl;
     if(mylist.get_val(CURLOPT_HEADER, type2_ptr))
 	cout << "val(HEADER) = " << *type2_ptr << endl;
