@@ -85,7 +85,7 @@ namespace libdar
 	secu_string & operator = (secu_string && ref) noexcept { move_from(std::move(ref)); return *this; };
 
 	    /// the destructor (set memory to zero before releasing it)
-        ~secu_string() noexcept(false) { clean_and_destroy(); };
+        ~secu_string() noexcept { clean_and_destroy(); };
 
 
 	bool operator != (const std::string & ref) const { return ! (*this == ref); };

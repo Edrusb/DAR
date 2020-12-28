@@ -90,6 +90,9 @@ namespace libdar
 	case type_string:
 	    set_to_default<string>(opt);
 	    break;
+	case type_secu_string:
+	    set_to_default<secu_string>(opt);
+	    break;
 	case type_pointer:
 	    set_to_default<void*>(opt);
 	    break;
@@ -129,6 +132,7 @@ namespace libdar
 	list<CURLoption>::iterator it = changed.begin();
 	CURLcode err = CURLE_OK;
 	const string* t_string;
+	const secu_string *t_secu_string;
 	const void* const* t_pointer;
 	const long* t_long;
 	const mycurl_slist* t_mycurl_slist;
@@ -145,6 +149,16 @@ namespace libdar
 		if(err != CURLE_OK)
 		    throw Erange("mycurl_easyhandle_node::apply",
 				 tools_printf(gettext("Error met while setting string option %d on libcurl handle: %s"),
+					      *it,
+					      curl_easy_strerror(err)));
+		break;
+	    case type_secu_string:
+		if(!current.get_val(*it, t_secu_string) || t_secu_string == nullptr)
+		    throw SRC_BUG;
+		err = curl_easy_setopt(handle, *it, t_secu_string->empty() ? nullptr : t_secu_string->c_str());
+		if(err != CURLE_OK)
+		    throw Erange("mycurl_easyhandle_node::apply",
+				 tools_printf(gettext("Error met while setting secu_string option %d on libcurl handle: %s"),
 					      *it,
 					      curl_easy_strerror(err)));
 		break;
@@ -224,6 +238,7 @@ namespace libdar
 	{
 	    defaults_initialized = true;
 	    string arg_string("");
+	    secu_string arg_secu_string;
 	    void *arg_ptr = nullptr;
 	    long arg_long = 0;
 	    mycurl_slist arg_mycurl_slist;
@@ -237,6 +252,9 @@ namespace libdar
 		{
 		case type_string:
 		    defaults.add(cursor->opt, arg_string); // a string (thus char*), a nullptr else
+		    break;
+		case type_secu_string:
+		    defaults.add(cursor->opt, arg_secu_string);
 		    break;
 		case type_pointer:
 		    defaults.add(cursor->opt, arg_ptr);

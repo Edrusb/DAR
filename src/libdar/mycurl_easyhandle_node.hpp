@@ -112,6 +112,7 @@ namespace libdar
 	enum opttype
 	{
 	    type_string,
+	    type_secu_string,
 	    type_pointer,
 	    type_long,
 	    type_mycurl_slist,
@@ -168,7 +169,7 @@ namespace libdar
 	  { CURLOPT_UPLOAD, type_long },
 	  { CURLOPT_URL, type_string },
 	  { CURLOPT_USERNAME, type_string },
-	  { CURLOPT_USERPWD, type_string },
+	  { CURLOPT_USERPWD, type_secu_string },
 	  { CURLOPT_VERBOSE, type_long },
 	  { CURLOPT_WRITEDATA, type_pointer },
 	  { CURLOPT_WRITEFUNCTION, type_pointer },
