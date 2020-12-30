@@ -534,7 +534,7 @@ AS_IF(	       [test "x$enable_linux_statx" != "xyes"],
 	       ],
 	       [
 	         AC_MSG_CHECKING([for linux's statx() availability])
-		 AC_RUN_IFELSE([AC_LANG_PROGRAM(
+		 AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
 		                 [[extern "C" {
 				     #if HAVE_SYS_TYPES_H
 				     #include <sys/types.h>
@@ -757,7 +757,7 @@ AS_IF(       [test "x$enable_libzstd_linking" != "xyes"],
                min_min_version_zstd=3
                AC_DEFINE_UNQUOTED(MIN_MAJ_VERSION_ZSTD, "$min_maj_version_zstd", [libzstd minimum major version])
                AC_DEFINE_UNQUOTED(MIN_MIN_VERSION_ZSTD, "$min_min_version_zstd", [libzstd minimum minor version])
-               AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
+               AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                                            #if HAVE_ZSTD_H
                                                            #include <zstd.h>
                                                            #endif
@@ -811,7 +811,7 @@ AS_IF(	     [ test "x$enable_liblz4_linking" != "xyes" ],
 				       ])
 
 		if test "$local_liblz4" = "yes" ; then
-		   AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C"
+		   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[ extern "C"
 		                                     {
 						        #if HAVE_LZ4_H
 							#include <lz4.h>
@@ -893,7 +893,7 @@ AS_IF(      [test "x$enable_libgcrypt_linking" != "xyes"],
                  min_version_gcrypt_hash_bug="1.6.0"
                  AC_DEFINE_UNQUOTED(MIN_VERSION_GCRYPT_HASH_BUG, "$min_version_gcrypt_hash_bug", [ligcrypt minimum version without hash bug])
                  AC_MSG_CHECKING([for libgcrypt usability])
-                 AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C"
+                 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[ extern "C"
                                                   {
                                                        #if HAVE_GCRYPT_H
                                                        #include <gcrypt.h>
@@ -914,7 +914,7 @@ AS_IF(      [test "x$enable_libgcrypt_linking" != "xyes"],
                                 ],
                                 [ AC_DEFINE(CRYPTO_AVAILABLE, 1, [header and linking is available to have strong encryption works])
                                   AC_MSG_RESULT([ok])
-                                  AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C"
+                                  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[ extern "C"
                                                                     {
                                                                      #if HAVE_GCRYPT_H
                                                                      #include <gcrypt.h>
@@ -1729,7 +1729,7 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
 	       AC_DEFINE_UNQUOTED(EXPECTED_MAJ_VERSION_THREADAR, "$exp_maj_version_threadar", [libthreadar expected major version])
 	       AC_DEFINE_UNQUOTED(MIN_MED_VERSION_THREADAR, "$min_med_version_threadar", [libthreadar minimal medium version])
        	       AC_DEFINE_UNQUOTED(MIN_MIN_VERSION_THREADAR, "$min_min_version_threadar", [libthreadar minimal minor version])
-               AC_RUN_IFELSE([AC_LANG_PROGRAM( [[
+               AC_COMPILE_IFELSE([AC_LANG_PROGRAM( [[
                                     #if HAVE_LIBTHREADAR_LIBTHREADAR_HPP
                                     #include <libthreadar/libthreadar.hpp>
                                     #endif
@@ -1815,7 +1815,7 @@ AS_IF(
 			       )
 		AC_CHECK_LIB(argon2, [argon2id_hash_raw], [], [AC_MSG_WARN([library libargon2 not found])])
  	        AC_MSG_CHECKING([for libargon2 usability])
-		AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C"
+		AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[ extern "C"
 						  {
 						       #if HAVE_ARGON2_H
 						       #include <argon2.h>
