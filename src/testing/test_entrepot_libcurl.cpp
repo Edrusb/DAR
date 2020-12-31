@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     }
     catch(Egeneric & e)
     {
-	cout << "Execption caught: " << e.get_message() << endl;
+	cout << "Execption caught: " << e.dump_str() << endl;
     }
 }
 
@@ -202,6 +202,7 @@ void f1(int argc, char *argv[])
 	try
 	{
 	    readme.copy_to(*remotew);
+	    remotew->terminate();
 	}
 	catch(...)
 	{

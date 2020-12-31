@@ -133,7 +133,7 @@ namespace libdar
 	CURLcode err = CURLE_OK;
 	const string* t_string;
 	const secu_string *t_secu_string;
-	const void* const* t_pointer;
+	void * const * t_pointer;
 	const long* t_long;
 	const mycurl_slist* t_mycurl_slist;
 	const curl_off_t* t_curl_off_t;
@@ -185,7 +185,7 @@ namespace libdar
 	    case type_mycurl_slist:
 		if(!current.get_val(*it, t_mycurl_slist) || t_mycurl_slist == nullptr)
 		    throw SRC_BUG;
-		err = curl_easy_setopt(handle, *it, t_mycurl_slist->get_address());
+		err = curl_easy_setopt(handle, *it, t_mycurl_slist->empty() ? nullptr: t_mycurl_slist->get_address());
 		if(err != CURLE_OK)
 		    throw Erange("mycurl_easyhandle_node::apply",
 				 tools_printf(gettext("Error met while setting curl_slist option %d on libcurl handle: %s"),

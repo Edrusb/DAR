@@ -74,10 +74,10 @@ namespace libdar
 	    switch(get_mode())
 	    {
 	    case gf_read_only:
-		ehandle->setopt(CURLOPT_WRITEDATA, this);
+		ehandle->setopt(CURLOPT_WRITEDATA, (void *)this);
 		break;
 	    case gf_write_only:
-		ehandle->setopt(CURLOPT_READDATA, this);
+		ehandle->setopt(CURLOPT_READDATA, (void *)this);
 		ehandle->setopt(CURLOPT_UPLOAD, 1L);
 		break;
 	    case gf_read_write:
@@ -662,7 +662,7 @@ namespace libdar
     {
 	if(is_running())
 	{
-	    char *ptr;
+	    char *ptr = nullptr;
 	    unsigned int ptr_size;
 
 	    end_data_mode = true;

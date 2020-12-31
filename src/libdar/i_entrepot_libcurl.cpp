@@ -79,7 +79,7 @@ namespace libdar
 				   sftp_known_hosts);
 
 #ifdef LIBDAR_NO_OPTIMIZATION
-	easyh.setopt_global(CURLOPT_VERBOSE, 1);
+	easyh.setopt_global(CURLOPT_VERBOSE,(long)1);
 #endif
     }
 
@@ -107,7 +107,7 @@ namespace libdar
 	    node->setopt(CURLOPT_URL, get_libcurl_URL());
 	    node->setopt(CURLOPT_DIRLISTONLY, listonly);
 	    node->setopt(CURLOPT_WRITEFUNCTION, (void*)get_ftp_listing_callback);
-	    node->setopt(CURLOPT_WRITEDATA, this);
+	    node->setopt(CURLOPT_WRITEDATA, (void*)(this));
 	    node->apply(get_pointer(), wait_delay);
 
 	    if(!reading_dir_tmp.empty())
@@ -252,7 +252,7 @@ namespace libdar
 	    headers.append(order);
 	    node->setopt(CURLOPT_QUOTE, headers);
 	    node->setopt(CURLOPT_URL, get_libcurl_URL());
-	    node->setopt(CURLOPT_NOBODY, 1);
+	    node->setopt(CURLOPT_NOBODY, (long)1);
 	    node->apply(get_pointer(), wait_delay);
 	    break;
 	default:
@@ -305,7 +305,7 @@ namespace libdar
 
 	    easyh.setopt_global(CURLOPT_SSH_PUBLIC_KEYFILE, sftp_pub_keyfile);
 	    easyh.setopt_global(CURLOPT_SSH_PRIVATE_KEYFILE, sftp_prv_keyfile);
-	    easyh.setopt_global(CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PUBLICKEY|CURLSSH_AUTH_PASSWORD);
+	    easyh.setopt_global(CURLOPT_SSH_AUTH_TYPES, (long)(CURLSSH_AUTH_PUBLICKEY|CURLSSH_AUTH_PASSWORD));
 	    break;
 	default:
 	    throw SRC_BUG;

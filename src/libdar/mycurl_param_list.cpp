@@ -78,6 +78,7 @@ namespace libdar
 
 	    ++wit;
 	}
+	reset_read();
 
 	return ret;
     }

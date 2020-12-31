@@ -76,7 +76,7 @@ namespace libdar
 
 	    /// no copy constructor available
 
-	    /// \note because we inherit from libthreadar::thread that has not copy constructor
+	    /// \note because we inherit from libthreadar::thread we has no copy constructor
 	fichier_libcurl(const fichier_libcurl & ref) = delete;
 
 	    /// no move constructor
@@ -154,7 +154,7 @@ namespace libdar
 
 	bool end_data_mode;               ///< true if subthread has been requested to end
 	bool sub_is_dying;                ///< is set by subthread when about to end
-	const std::shared_ptr<mycurl_easyhandle_node> & ehandle; ///< easy handle (wrapped in C++ object) that we modify when necessary
+	std::shared_ptr<mycurl_easyhandle_node> ehandle; ///< easy handle (wrapped in C++ object) that we modify when necessary
 	bool metadatamode;                ///< wether we are acting on metadata rather than file's data
 	infinint current_offset;          ///< current offset we are reading / writing at
 	bool has_maxpos;                  ///< true if maxpos is set
@@ -171,7 +171,7 @@ namespace libdar
 	mycurl_protocol x_proto;          ///< used to workaround some libcurl strange behavoir for some protocols
 
 	void set_range(const infinint & begin, const infinint & range_size); ///< set range in easyhandle
-	void unset_range();  ///< unset range in easyhandler
+	void unset_range();  ///< unset range in easyhandle
 	void switch_to_metadata(bool mode);///< set to true to get or set file's metadata, false to read/write file's data
 	void detruit();     ///< get ready for object destruction
 	void run_thread();  ///< run subthread with the previously defined parameters

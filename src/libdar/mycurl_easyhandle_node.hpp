@@ -38,6 +38,7 @@ extern "C"
 } // end extern "C"
 
 #include <string>
+#include <typeinfo>
 #include "mycurl_param_list.hpp"
 #include "user_interaction.hpp"
 #include "mycurl_slist.hpp"
@@ -75,7 +76,7 @@ namespace libdar
 	~mycurl_easyhandle_node() { if(handle != nullptr) curl_easy_cleanup(handle); };
 
 	    /// set options
-	template<class T> void setopt(CURLoption opt, const T & val) { wanted.add(opt, val); }
+	template<class T> void setopt(CURLoption opt, const T & val) { check_for_type(opt, val); wanted.add(opt, val); }
 
 	    /// adds a set of options
 	void setopt_list(const mycurl_param_list & listing) { (void) wanted.update_with(listing); };
@@ -182,6 +183,41 @@ namespace libdar
 
 	static bool defaults_initialized;
 	static mycurl_param_list defaults;
+
+	template <class T> void check_for_type(CURLoption opt, const T & val)
+	{
+	    switch(get_opt_type(opt))
+	    {
+	    case type_string:
+		if(typeid(val) != typeid(std::string))
+		    throw SRC_BUG;
+		break;
+	    case type_secu_string:
+		if(typeid(val) != typeid(secu_string))
+		    throw SRC_BUG;
+		break;
+	    case type_pointer:
+		if(typeid(val) != typeid(void *))
+		    throw SRC_BUG;
+		break;
+	    case type_long:
+		if(typeid(val) != typeid(long))
+		    throw SRC_BUG;
+		break;
+	    case type_mycurl_slist:
+		if(typeid(val) != typeid(mycurl_slist))
+		    throw SRC_BUG;
+		break;
+	    case type_curl_off_t:
+		if(typeid(val) != typeid(curl_off_t))
+		    throw SRC_BUG;
+		break;
+	    case eolist:
+		throw SRC_BUG;
+	    default:
+		throw SRC_BUG;
+	    }
+       	}
     };
 
 #endif

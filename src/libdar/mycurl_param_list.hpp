@@ -134,7 +134,7 @@ namespace libdar
 	mycurl_param_list() {};
 	mycurl_param_list(const mycurl_param_list & ref) { copy_from(ref); };
 	mycurl_param_list(mycurl_param_list && ref) noexcept = default;
-	mycurl_param_list & operator = (const mycurl_param_list & ref) { element_list.clear(); copy_from(ref); return *this; };
+	mycurl_param_list & operator = (const mycurl_param_list & ref) { element_list.clear(); copy_from(ref); reset_read(); return *this; };
 	mycurl_param_list & operator = (mycurl_param_list && ref) = default;
 	~mycurl_param_list() = default;
 
@@ -142,7 +142,7 @@ namespace libdar
 
 	    // operations with the list
 
-	template<class T> void add(CURLoption opt, const T & val) { element_list[opt] = std::make_unique<mycurl_param_element<T> >(val); }
+	template<class T> void add(CURLoption opt, const T & val) { element_list[opt] = std::make_unique<mycurl_param_element<T> >(val); reset_read(); }
 	void clear(CURLoption opt);
 	void clear() { element_list.clear(); reset_read(); };
 	U_I size() const { return element_list.size(); };

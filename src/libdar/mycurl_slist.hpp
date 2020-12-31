@@ -66,6 +66,7 @@ namespace libdar
 	void append(const std::string & s);
 	const curl_slist *get_address() const { return header; };
 	void clear() { release(header); appended.clear(); };
+	bool empty() const { return appended.empty(); };
 
     private:
 	struct curl_slist* header;
