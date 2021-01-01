@@ -200,18 +200,7 @@ namespace libdar
 	case gf_read_only:
 	    switch_to_metadata(true); // necessary to stop current subthread and change easy_handle offset
 	    current_offset = pos;
-	    if(get_mode() == gf_write_only)
-	    {
-		if(has_maxpos)
-		{
-		    if(maxpos < pos)
-			maxpos = pos;
-		}
-		else
-		    maxpos = pos;
-	    }
-	    if(get_mode() != gf_write_only)
-		flush_read();
+	    flush_read();
 	    break;
 	case gf_write_only:
 	    throw Erange("fichier_libcurl::skip", string(gettext("libcurl does not allow skipping in write mode")));
