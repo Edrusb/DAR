@@ -146,7 +146,7 @@ namespace libdar
 		{
 		    me->ehandle->apply(get_pointer(), wait_delay);
 		    me->ehandle->getinfo(CURLINFO_CONTENT_LENGTH_DOWNLOAD, &filesize);
-		    if(filesize == -1) // file does not exist
+		    if(filesize == -1) // file does not exist (or filesize is not known)
 			filesize = 0;
 		    me->maxpos = tools_double2infinint(filesize);
 		    me->has_maxpos = true;
