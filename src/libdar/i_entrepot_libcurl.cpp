@@ -204,13 +204,20 @@ namespace libdar
 		rw = new (nothrow) cache_global(dialog, ret, false);
 		if(rw != nullptr)
 		{
-		    ret = nullptr;  // the former object pointed to by ret is now managed by rw
-		    ret = rw;
+		    ret = rw;  // the former object pointed to by ret is now managed by rw
 		    rw = nullptr;
 		}
 		break;
 	    case gf_write_only:
-		break; // no cache in write only mode
+		    // small cache to avoid trailer and header writes byte per byte
+		    // (1000 bytes ~ payload of an classical ethernet non-jumbo frame)
+		rw = new (nothrow) cache_global(dialog, ret, false, 1000);
+		if(rw != nullptr)
+		{
+		    ret = rw;
+		    rw = nullptr;
+		}
+		break;
 	    default:
 		throw SRC_BUG;
 	    }

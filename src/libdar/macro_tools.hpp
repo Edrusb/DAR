@@ -224,7 +224,7 @@ namespace libdar
 	/// | cache  |  (paralle_)tronconneuse |  scrambler           |                     |
 	/// | [ cache ]                                               |_CACHE_PIPE          |
 	/// | trivial_sar  |  null_file  |  sar                       |                     |
-	/// +-------------------------------------------+++++++++++---+---------------------+
+	/// +---------------------------------------------------------+---------------------+
 	/// +-bottom
 	///
 	/// \note the bottom cache layer is only present when trivial_sar is used to write on a pipe.
