@@ -437,34 +437,26 @@ namespace libdar
 	    }
 	    else // reading by block to avoid having interrupting libcurl
 	    {
-		infinint cycle_subthread_net_offset;
-
 		do
 		{
-		    cycle_subthread_net_offset = 0; // how many bytes have will we read in the next do/while loop
-		    do
+		    subthread_net_offset = 0; // keeps trace of the amount of bytes sent to main thread by callback
+		    set_range(subthread_cur_offset, local_network_block);
+		    try
 		    {
-			subthread_net_offset = 0; // keeps trace of the amount of bytes sent to main thread by callback
-			set_range(subthread_cur_offset, local_network_block);
-			try
-			{
-			    ehandle->apply(thread_ui, wait_delay);
-			    subthread_cur_offset += subthread_net_offset;
-			    if(local_network_block < subthread_net_offset)
-				throw SRC_BUG; // we acquired more data from libcurl than expected!
-			    local_network_block -= subthread_net_offset;
-			    cycle_subthread_net_offset += subthread_net_offset;
-			}
-			catch(...)
-			{
-			    unset_range();
-			    throw;
-			}
-			unset_range();
+			ehandle->apply(thread_ui, wait_delay);
+			subthread_cur_offset += subthread_net_offset;
+			if(local_network_block < subthread_net_offset)
+			    throw SRC_BUG; // we acquired more data from libcurl than expected!
+			local_network_block -= subthread_net_offset;
 		    }
-		    while(!end_data_mode);
+		    catch(...)
+		    {
+			unset_range();
+			throw;
+		    }
+		    unset_range();
 		}
-		while(!cycle_subthread_net_offset.is_zero()     // we just grabbed some data in this ending cycle (not reached eof)
+		while(!subthread_net_offset.is_zero()     // we just grabbed some data in this ending cycle (not reached eof)
 		      && !end_data_mode                   // the current thread has not been asked to stop
 		      && !local_network_block.is_zero()); // whe still not have gathered all the requested data
 	    }
