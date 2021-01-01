@@ -70,6 +70,7 @@ extern "C"
 #include "nls_swap.hpp"
 #include "tools.hpp"
 #include "thread_cancellation.hpp"
+#include "mycurl_easyhandle_node.hpp"
 
 #ifdef LIBTHREADAR_AVAILABLE
 #include "parallel_tronconneuse.hpp"
@@ -216,6 +217,11 @@ namespace libdar
 		throw Erange("libdar_init_libcurl", tools_printf(gettext("libcurl initialization failed: %s"), "libcurl version not available"));
 	    if(cvers->version_num < 0x072600)
 		throw Erange("libdar_init_libcurl", tools_printf(gettext("libcurl initialization failed: %s"), "libcurl version is too old"));
+
+		// now that libgcrypt is eventually initialized (as well as libcurl, but it does not matter here)
+		// we can initialize the default values for mycurl_easyhandle_node::defaults static field
+
+	    mycurl_easyhandle_node::init_defaults();
 #endif
 
 		// checking libthreadar version
@@ -246,6 +252,11 @@ namespace libdar
 
     extern void close_and_clean()
     {
+#ifdef LIBCURL_AVAILABLE
+	    // mycurl_easyhandle_node::efaults static field, may contain secu_string that rely on libgcrypt secured memory
+	mycurl_easyhandle_node::release_defaults();
+	    // it must thus be released before released libgcrypt below
+#endif
 #ifdef CRYPTO_AVAILABLE
 	if(libdar_initialized_gcrypt)
 	    gcry_control(GCRYCTL_TERM_SECMEM, 0); // by precaution if not already done by libgcrypt itself

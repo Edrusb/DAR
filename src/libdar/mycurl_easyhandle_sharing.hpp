@@ -62,7 +62,7 @@ namespace libdar
 
 
 	    /// global options are applied to all mycurl_easyhandle_node provided by this object
-	template<class T> void setopt_global(CURLoption opt, const T & val) { global_params.add(opt, val); };
+	template<class T> void setopt_global(CURLoption opt, const T & val) { global_params.add(opt, val); }
 
 	    /// obtain a libcurl handle wrapped in the adhoc classes to allow copy and cloning
 

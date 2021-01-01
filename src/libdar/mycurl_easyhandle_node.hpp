@@ -58,7 +58,7 @@ namespace libdar
     {
     public:
 	    /// create a new easyhandle
-	mycurl_easyhandle_node() { init_defaults(); init(); };
+	mycurl_easyhandle_node() { init(); };
 
 	    /// copy constructor
 	mycurl_easyhandle_node(const mycurl_easyhandle_node & ref);
@@ -102,7 +102,10 @@ namespace libdar
 			     tools_printf(gettext("Error met while fetching info %d: %s"),
 					  (S_I)info,
 					  curl_easy_strerror(err)));
-	};
+	}
+
+	static void init_defaults(); // must be called once libgcrypt has been initialized (due to secu_string presence in the defaults)
+	static void release_defaults() { defaults.clear(); }; // must be called before libgcrypt is cleaned up
 
     private:
 
@@ -178,7 +181,6 @@ namespace libdar
 	  { CURLOPT_APPEND, eolist }
 	};
 
-	static void init_defaults();
 	static opttype get_opt_type(CURLoption opt);
 
 	static bool defaults_initialized;

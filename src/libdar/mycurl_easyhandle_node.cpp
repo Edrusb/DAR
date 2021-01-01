@@ -56,7 +56,6 @@ namespace libdar
 	    // we avoid curl_easy_duphandle to postpone the operation
 	    // to the time apply() will be called
 	init();
-	    // init_defaults() has already called once, when the object in arg was initialized,
 	wanted = ref.current;
 	(void) wanted.update_with(ref.wanted);
     }
