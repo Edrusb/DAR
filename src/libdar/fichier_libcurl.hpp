@@ -180,6 +180,7 @@ namespace libdar
 	void initialize_subthread(); ///< subthread routine to init itself
 	void finalize_subthread();   ///< subthread routine to end itself
 	void set_subthread(U_I & needed_bytes); ///< set parameters and run subthtread if necessary
+	bool still_data_to_write(); /// return true when in write mode and there is data pending to writing in interthread
 
 	static size_t write_data_callback(char *buffer, size_t size, size_t nmemb, void *userp);
 	static size_t read_data_callback(char *bufptr, size_t size, size_t nitems, void *userp);

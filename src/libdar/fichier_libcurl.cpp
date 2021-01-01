@@ -428,12 +428,15 @@ namespace libdar
 	    }
 
 		// after next call, the parent thread will be running
-
 	    initialize_subthread();
 
 	    if(local_network_block.is_zero()) // network_block may be non null only in read-only mode
 	    {
-		ehandle->apply(thread_ui, wait_delay, end_data_mode);
+		do
+		{
+		    ehandle->apply(thread_ui, wait_delay, end_data_mode);
+		}
+		while(!end_data_mode || still_data_to_write());
 	    }
 	    else // reading by block to avoid having interrupting libcurl
 	    {
@@ -832,6 +835,34 @@ namespace libdar
 		    relaunch_thread(needed_bytes);
 	    }
 	}
+    }
+
+    bool fichier_libcurl::still_data_to_write()
+    {
+	if(get_mode() == gf_write_only)
+	{
+	    if(interthread.is_empty())
+		return false;
+	    else
+	    {
+		char *ptr;
+		unsigned int size;
+
+		interthread.fetch(ptr, size);
+		if(size == 0)
+		{
+		    interthread.fetch_recycle(ptr);
+		    return false;
+		}
+		else
+		{
+		    interthread.fetch_push_back(ptr, size);
+		    return true;
+		}
+	    }
+	}
+	else
+	    return false;
     }
 
 #endif
