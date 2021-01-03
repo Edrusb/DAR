@@ -47,7 +47,7 @@ extern "C"
 #include "user_interaction.hpp"
 #include "fichier_global.hpp"
 #include "mycurl_protocol.hpp"
-#include "mycurl_shared_handle.hpp"
+#include "mycurl_easyhandle_node.hpp"
 
 namespace libdar
 {
@@ -67,7 +67,7 @@ namespace libdar
 	fichier_libcurl(const std::shared_ptr<user_interaction> & dialog,      //< for user interaction requested by fichier_global
 			const std::string & chemin,     //< full path of the file to open
 			mycurl_protocol proto,          //< to workaround some libcurl strange behavior for some protocols
-			mycurl_shared_handle && handle, //< the easy handle wrapper object
+			const std::shared_ptr<mycurl_easyhandle_node> & handle, //< the easy handle wrapper object
 			gf_mode m,                      //< open mode
 			U_I waiting,                    //< retry timeout in case of network error
 			bool force_permission,          //< whether file permission should be modified
@@ -76,7 +76,7 @@ namespace libdar
 
 	    /// no copy constructor available
 
-	    /// \note because we inherit from libthreadar::thread that has not copy constructor
+	    /// \note because we inherit from libthreadar::thread we has no copy constructor
 	fichier_libcurl(const fichier_libcurl & ref) = delete;
 
 	    /// no move constructor
@@ -152,7 +152,7 @@ namespace libdar
 
 	bool end_data_mode;               ///< true if subthread has been requested to end
 	bool sub_is_dying;                ///< is set by subthread when about to end
-	mycurl_shared_handle ehandle;     ///< easy handle (wrapped in C++ object) that we modify when necessary
+	std::shared_ptr<mycurl_easyhandle_node> ehandle; ///< easy handle (wrapped in C++ object) that we modify when necessary
 	bool metadatamode;                ///< wether we are acting on metadata rather than file's data
 	infinint current_offset;          ///< current offset we are reading / writing at
 	bool has_maxpos;                  ///< true if maxpos is set
@@ -169,7 +169,7 @@ namespace libdar
 	mycurl_protocol x_proto;          ///< used to workaround some libcurl strange behavoir for some protocols
 
 	void set_range(const infinint & begin, const infinint & range_size); ///< set range in easyhandle
-	void unset_range();  ///< unset range in easyhandler
+	void unset_range();  ///< unset range in easyhandle
 	void switch_to_metadata(bool mode);///< set to true to get or set file's metadata, false to read/write file's data
 	void detruit();     ///< get ready for object destruction
 	void run_thread();  ///< run subthread with the previously defined parameters
@@ -178,6 +178,7 @@ namespace libdar
 	void initialize_subthread(); ///< subthread routine to init itself
 	void finalize_subthread();   ///< subthread routine to end itself
 	void set_subthread(U_I & needed_bytes); ///< set parameters and run subthtread if necessary
+	bool still_data_to_write(); /// return true when in write mode and there is data pending to writing in interthread
 
 	static size_t write_data_callback(char *buffer, size_t size, size_t nmemb, void *userp);
 	static size_t read_data_callback(char *bufptr, size_t size, size_t nitems, void *userp);
@@ -185,17 +186,6 @@ namespace libdar
 	static size_t read_meta_callback(char *bufptr, size_t size, size_t nitems, void *userp);
     };
 
-	/// helper function to handle libcurl error code
-	/// wait or throw an exception depending on error condition
-
-	/// \param[in] dialog used to report the reason we are waiting for and how much time we wait
-	/// \param[in] err is the curl easy code to examin
-	/// \param[in] wait_seconds is the time to wait for recoverable error
-	/// \param[in] err_context is the error context message use to prepend waiting message or exception throw
-    extern void fichier_libcurl_check_wait_or_throw(const std::shared_ptr<user_interaction> & dialog,
-						    CURLcode err,
-						    U_I wait_seconds,
-						    const std::string & err_context);
 
 #endif
 	/// @}

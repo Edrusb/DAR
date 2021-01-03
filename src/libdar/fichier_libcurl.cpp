@@ -42,7 +42,7 @@ namespace libdar
     fichier_libcurl::fichier_libcurl(const shared_ptr<user_interaction> & dialog,
 				     const std::string & chemin,
 				     mycurl_protocol proto,
-				     mycurl_shared_handle && handle,
+				     const shared_ptr<mycurl_easyhandle_node> & handle,
 				     gf_mode m,
 				     U_I waiting,
 				     bool force_permission,
@@ -50,7 +50,7 @@ namespace libdar
 				     bool erase): fichier_global(dialog, m),
 						  end_data_mode(false),
 						  sub_is_dying(false),
-						  ehandle(std::move(handle)),
+						  ehandle(handle),
 						  metadatamode(false),
 						  current_offset(0),
 						  has_maxpos(false),
@@ -62,39 +62,23 @@ namespace libdar
 						  synchronize(2),
 						  x_proto(proto)
     {
-	CURLcode err;
-
 	try
 	{
+	    if(!ehandle)
+		throw SRC_BUG;
 
 		// setting x_ref_handle to carry all options that will always be present for this object
 
-	    err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_URL, chemin.c_str());
-	    if(err != CURLE_OK)
-		throw Erange("fichier_libcurl::fichier_libcurl",
-			     tools_printf(gettext("Error met while resetting URL to handle: %s"),
-					  curl_easy_strerror(err)));
+	    ehandle->setopt(CURLOPT_URL, chemin);
 
 	    switch(get_mode())
 	    {
 	    case gf_read_only:
-		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_WRITEDATA, this);
-		if(err != CURLE_OK)
-		    throw Erange("fichier_libcurl::fichier_libcurl",
-				 tools_printf(gettext("Error met while setting libcurl for reading data file: %s"),
-					      curl_easy_strerror(err)));
+		ehandle->setopt(CURLOPT_WRITEDATA, (void *)this);
 		break;
 	    case gf_write_only:
-		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_READDATA, this);
-		if(err != CURLE_OK)
-		    throw Erange("fichier_libcurl::fichier_libcurl",
-				 tools_printf(gettext("Error met while setting libcurl for writing data file: %s"),
-					      curl_easy_strerror(err)));
-		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_UPLOAD, 1L);
-		if(err != CURLE_OK)
-		    throw Erange("fichier_libcurl::fichier_libcurl",
-				 tools_printf(gettext("Error met while setting libcurl for writing data file: %s"),
-					      curl_easy_strerror(err)));
+		ehandle->setopt(CURLOPT_READDATA, (void *)this);
+		ehandle->setopt(CURLOPT_UPLOAD, 1L);
 		break;
 	    case gf_read_write:
 		throw Efeature("read-write mode for fichier libcurl");
@@ -115,59 +99,37 @@ namespace libdar
 
     void fichier_libcurl::change_permission(U_I perm)
     {
-	const char * errmsg = "Error while changing file permission on remote repository";
-	CURLcode err = CURLE_OK;
-	struct curl_slist *headers = nullptr;
+	struct mycurl_slist headers;
 	string order = tools_printf("site CHMOD %o", perm);
 
 	switch_to_metadata(true);
 	try
 	{
+	    headers.append(order);
+	    ehandle->setopt(CURLOPT_QUOTE, headers);
+	    ehandle->setopt(CURLOPT_NOBODY, (long)1);
 	    try
 	    {
-		headers = curl_slist_append(headers, order.c_str());
-		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_QUOTE, headers);
-		if(err != CURLE_OK)
-		    throw Erange("","");
-		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_NOBODY, 1);
-		if(err != CURLE_OK)
-		    throw Erange("","");
+		ehandle->apply(get_pointer(), wait_delay);
 	    }
-	    catch(Erange & e)
+	    catch(...)
 	    {
-		throw Erange("fichier_libcurl::change_permission",
-			     tools_printf(gettext("%s: %s"), errmsg, curl_easy_strerror(err)));
+		ehandle->setopt_default(CURLOPT_QUOTE);
+		ehandle->setopt_default(CURLOPT_NOBODY);
+		throw;
 	    }
-
-	    do
-	    {
-		err = curl_easy_perform(ehandle.get_handle());
-		fichier_libcurl_check_wait_or_throw(get_pointer(),
-						    err,
-						    wait_delay,
-						    tools_printf(gettext("%s: %s"),
-								 errmsg,
-								 curl_easy_strerror(err)));
-	    }
-	    while(err != CURLE_OK);
+	    ehandle->setopt_default(CURLOPT_QUOTE);
+	    ehandle->setopt_default(CURLOPT_NOBODY);
 	}
-	catch(...)
+	catch(Egeneric & e)
 	{
-	    (void)curl_easy_setopt(ehandle.get_handle(), CURLOPT_QUOTE, nullptr);
-	    (void)curl_easy_setopt(ehandle.get_handle(), CURLOPT_NOBODY, 0);
-	    if(headers != nullptr)
-		curl_slist_free_all(headers);
+	    e.prepend_message("Error while changing file permission on remote repository");
 	    throw;
 	}
-	(void)curl_easy_setopt(ehandle.get_handle(), CURLOPT_QUOTE, nullptr);
-	(void)curl_easy_setopt(ehandle.get_handle(), CURLOPT_NOBODY, 0);
-	if(headers != nullptr)
-	    curl_slist_free_all(headers);
     }
 
     infinint fichier_libcurl::get_size() const
     {
-	CURLcode err;
 	double filesize;
 	fichier_libcurl *me = const_cast<fichier_libcurl *>(this);
 
@@ -176,35 +138,31 @@ namespace libdar
 
 	if(!has_maxpos || get_mode() != gf_read_only)
 	{
-	    me->switch_to_metadata(true);
-
-	    err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_NOBODY, 1);
-	    if(err != CURLE_OK)
-		throw Erange("fichier_libcurl::get_size()",
-			     tools_printf(gettext("Error met while fetching file size: %s"),
-					  curl_easy_strerror(err)));
-	    do
+	    try
 	    {
-		err = curl_easy_perform(ehandle.get_handle());
-		fichier_libcurl_check_wait_or_throw(get_pointer(),
-						    err,
-						    wait_delay,
-						    tools_printf(gettext("Error met while fetching file size: %s"),
-								 curl_easy_strerror(err)));
+		me->switch_to_metadata(true);
+		me->ehandle->setopt(CURLOPT_NOBODY, (long)1);
+		try
+		{
+		    me->ehandle->apply(get_pointer(), wait_delay);
+		    me->ehandle->getinfo(CURLINFO_CONTENT_LENGTH_DOWNLOAD, &filesize);
+		    if(filesize == -1) // file does not exist (or filesize is not known)
+			filesize = 0;
+		    me->maxpos = tools_double2infinint(filesize);
+		    me->has_maxpos = true;
+		}
+		catch(...)
+		{
+		    me->ehandle->setopt_default(CURLOPT_NOBODY);
+		    throw;
+		}
+		me->ehandle->setopt_default(CURLOPT_NOBODY);
 	    }
-	    while(err != CURLE_OK);
-
-	    err = curl_easy_getinfo(ehandle.get_handle(), CURLINFO_CONTENT_LENGTH_DOWNLOAD, &filesize);
-	    if(filesize == -1) // file does not exist
-		filesize = 0;
-
-	    if(err != CURLE_OK)
-		throw Erange("fichier_libcurl::get_size()",
-			     tools_printf(gettext("Error met while fetching file size: %s"),
-					  curl_easy_strerror(err)));
-	    me->maxpos = tools_double2infinint(filesize);
-	    me->has_maxpos = true;
-	    (void)curl_easy_setopt(ehandle.get_handle(), CURLOPT_NOBODY, 0);
+	    catch(Egeneric & e)
+	    {
+		e.prepend_message("Error while reading file size on a remote repository");
+		throw;
+	    }
 	}
 
 	return maxpos;
@@ -242,18 +200,7 @@ namespace libdar
 	case gf_read_only:
 	    switch_to_metadata(true); // necessary to stop current subthread and change easy_handle offset
 	    current_offset = pos;
-	    if(get_mode() == gf_write_only)
-	    {
-		if(has_maxpos)
-		{
-		    if(maxpos < pos)
-			maxpos = pos;
-		}
-		else
-		    maxpos = pos;
-	    }
-	    if(get_mode() != gf_write_only)
-		flush_read();
+	    flush_read();
 	    break;
 	case gf_write_only:
 	    throw Erange("fichier_libcurl::skip", string(gettext("libcurl does not allow skipping in write mode")));
@@ -459,7 +406,6 @@ namespace libdar
 	{
 		// parent thread is still suspended
 
-	    CURLcode err;
 	    shared_ptr<user_interaction> thread_ui = get_pointer();
 	    infinint local_network_block = network_block; // set before unlocking parent thread
 
@@ -476,59 +422,38 @@ namespace libdar
 	    }
 
 		// after next call, the parent thread will be running
-
 	    initialize_subthread();
 
 	    if(local_network_block.is_zero()) // network_block may be non null only in read-only mode
 	    {
 		do
 		{
-		    err = curl_easy_perform(ehandle.get_handle());
-		    if(!end_data_mode)
-			fichier_libcurl_check_wait_or_throw(thread_ui,
-							    err,
-							    wait_delay,
-							    gettext("Error met during network transfer: "));
+		    ehandle->apply(thread_ui, wait_delay, end_data_mode);
 		}
-		while(err != CURLE_OK && !end_data_mode);
+		while(!end_data_mode || still_data_to_write());
 	    }
 	    else // reading by block to avoid having interrupting libcurl
 	    {
-		infinint cycle_subthread_net_offset;
-
 		do
 		{
-		    cycle_subthread_net_offset = 0; // how many bytes have will we read in the next do/while loop
-		    do
+		    subthread_net_offset = 0; // keeps trace of the amount of bytes sent to main thread by callback
+		    set_range(subthread_cur_offset, local_network_block);
+		    try
 		    {
-			subthread_net_offset = 0; // keeps trace of the amount of bytes sent to main thread by callback
-			set_range(subthread_cur_offset, local_network_block);
-			try
-			{
-			    err = curl_easy_perform(ehandle.get_handle());
-			    if(err == CURLE_BAD_DOWNLOAD_RESUME)
-				err = CURLE_OK;
-			    fichier_libcurl_check_wait_or_throw(thread_ui,
-								err,
-								wait_delay,
-								tools_printf(gettext("Error met while reading a block of data: %s"),
-									     curl_easy_strerror(err)));
-			    subthread_cur_offset += subthread_net_offset;
-			    if(local_network_block < subthread_net_offset)
-				throw SRC_BUG; // we acquired more data from libcurl than expected!
-			    local_network_block -= subthread_net_offset;
-			    cycle_subthread_net_offset += subthread_net_offset;
-			}
-			catch(...)
-			{
-			    unset_range();
-			    throw;
-			}
-			unset_range();
+			ehandle->apply(thread_ui, wait_delay);
+			subthread_cur_offset += subthread_net_offset;
+			if(local_network_block < subthread_net_offset)
+			    throw SRC_BUG; // we acquired more data from libcurl than expected!
+			local_network_block -= subthread_net_offset;
 		    }
-		    while(err != CURLE_OK && !end_data_mode);
+		    catch(...)
+		    {
+			unset_range();
+			throw;
+		    }
+		    unset_range();
 		}
-		while(!cycle_subthread_net_offset.is_zero()     // we just grabbed some data in this ending cycle (not reached eof)
+		while(!subthread_net_offset.is_zero()     // we just grabbed some data in this ending cycle (not reached eof)
 		      && !end_data_mode                   // the current thread has not been asked to stop
 		      && !local_network_block.is_zero()); // whe still not have gathered all the requested data
 	    }
@@ -584,24 +509,16 @@ namespace libdar
 
 	    // setting the block size if necessary
 
-	CURLcode err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_RANGE, range.c_str());
-	if(err != CURLE_OK)
-	    throw Erange("fichier_libcurl::set_range",
-			 tools_printf(gettext("Error while seeking in file on remote repository: %s"), curl_easy_strerror(err)));
+	ehandle->setopt(CURLOPT_RANGE, range);
     }
 
     void fichier_libcurl::unset_range()
     {
-	CURLcode err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_RANGE, nullptr);
-	if(err != CURLE_OK)
-	    throw Erange("fichier_libcurl::unset_range",
-			 tools_printf(gettext("Error while seeking in file on remote repository: %s"), curl_easy_strerror(err)));
+	ehandle->setopt_default(CURLOPT_RANGE);
     }
 
     void fichier_libcurl::switch_to_metadata(bool mode)
     {
-	CURLcode err;
-
 	if(mode == metadatamode)
 	    return;
 
@@ -609,15 +526,12 @@ namespace libdar
 	{
 	    infinint resume;
 	    curl_off_t cur_pos = 0;
+	    long do_append;
 
 	    switch(get_mode())
 	    {
 	    case gf_read_only:
-		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_WRITEFUNCTION, write_data_callback);
-		if(err != CURLE_OK)
-		    throw Erange("fichier_libcurl::switch_to_metadata",
-				 tools_printf(gettext("Error met while setting libcurl for reading data file: %s"),
-					      curl_easy_strerror(err)));
+		ehandle->setopt(CURLOPT_WRITEFUNCTION, (void*)write_data_callback);
 
 		if(network_block.is_zero())
 		{
@@ -630,28 +544,19 @@ namespace libdar
 			throw Erange("fichier_libcurl::switch_to_metadata",
 				     gettext("Integer too large for libcurl, cannot skip at the requested offset in the remote repository"));
 
-		    err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_RESUME_FROM_LARGE, cur_pos);
-		    if(err != CURLE_OK)
-			throw Erange("fichier_libcurl::switch_to_metadata",
-				     tools_printf(gettext("Error while seeking in file on remote repository: %s"), curl_easy_strerror(err)));
+		    ehandle->setopt(CURLOPT_RESUME_FROM_LARGE, cur_pos);
 		}
 		    // else (network_block != 0) the subthread will make use of range
 		    // this parameter is set back to its default in stop_thread()
 
 		break;
 	    case gf_write_only:
-		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_READFUNCTION, read_data_callback);
-		if(err != CURLE_OK)
-		    throw Erange("fichier_libcurl::switch_to_metadata",
-				 tools_printf(gettext("Error met while setting libcurl for writing data file: %s"),
-					      curl_easy_strerror(err)));
+		ehandle->setopt(CURLOPT_READFUNCTION, (void*)read_data_callback);
 
 		    // setting the offset of the next byte to read / write
 
-		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_APPEND, append_write ? 1 : 0);
-		if(err != CURLE_OK)
-		    throw Erange("fichier_libcur::switch_to_metadata",
-				 tools_printf(gettext("Error while setting write append mode for libcurl: %s"), curl_easy_strerror(err)));
+		do_append = (append_write ? 1 : 0);
+		ehandle->setopt(CURLOPT_APPEND, do_append);
 
 		    // should also set the CURLOPT_INFILESIZE_LARGE option but file size is not known at this time
 		break;
@@ -670,18 +575,10 @@ namespace libdar
 	    switch(get_mode())
 	    {
 	    case gf_read_only:
-		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_WRITEFUNCTION, write_meta_callback);
-		if(err != CURLE_OK)
-		    throw Erange("fichier_libcurl::switch_to_metadata",
-				 tools_printf(gettext("Error met while setting libcurl for reading data file: %s"),
-					      curl_easy_strerror(err)));
+		ehandle->setopt(CURLOPT_WRITEFUNCTION, (void*)write_meta_callback);
 		break;
 	    case gf_write_only:
-		err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_READFUNCTION, read_meta_callback);
-		if(err != CURLE_OK)
-		    throw Erange("fichier_libcurl::switch_to_metadata",
-				 tools_printf(gettext("Error met while setting libcurl for writing data file: %s"),
-					      curl_easy_strerror(err)));
+		ehandle->setopt(CURLOPT_READFUNCTION, (void*)read_meta_callback);
 		break;
 	    case gf_read_write:
 		throw SRC_BUG;
@@ -743,7 +640,7 @@ namespace libdar
     {
 	if(is_running())
 	{
-	    char *ptr;
+	    char *ptr = nullptr;
 	    unsigned int ptr_size;
 
 	    end_data_mode = true;
@@ -768,12 +665,7 @@ namespace libdar
 	}
 	join();
 
-	CURLcode err;
-	curl_off_t cur_pos = 0;
-	err = curl_easy_setopt(ehandle.get_handle(), CURLOPT_RESUME_FROM_LARGE, cur_pos);
-	if(err != CURLE_OK)
-	    throw Erange("fichier_libcurl::switch_to_metadata",
-			 tools_printf(gettext("Error while seeking in file on remote repository: %s"), curl_easy_strerror(err)));
+	ehandle->setopt_default(CURLOPT_RESUME_FROM_LARGE);
     }
 
     void fichier_libcurl::relaunch_thread(const infinint & block_size)
@@ -897,74 +789,6 @@ namespace libdar
 	return 0;
     }
 
-    void fichier_libcurl_check_wait_or_throw(const shared_ptr<user_interaction> & dialog,
-					     CURLcode err,
-					     U_I wait_seconds,
-					     const string & err_context)
-    {
-	switch(err)
-	{
-	case CURLE_OK:
-	case CURLE_BAD_DOWNLOAD_RESUME:
-	    break;
-	case CURLE_REMOTE_DISK_FULL:
-	case CURLE_UPLOAD_FAILED:
-	    throw Edata(curl_easy_strerror(err));
-	case CURLE_FTP_ACCEPT_FAILED:
-	case CURLE_UNSUPPORTED_PROTOCOL:
-	case CURLE_FAILED_INIT:
-	case CURLE_URL_MALFORMAT:
-	case CURLE_NOT_BUILT_IN:
-	case CURLE_WRITE_ERROR:
-	case CURLE_READ_ERROR:
-	case CURLE_OUT_OF_MEMORY:
-	case CURLE_RANGE_ERROR:
-	case CURLE_FILE_COULDNT_READ_FILE:
-	case CURLE_FUNCTION_NOT_FOUND:
-	case CURLE_ABORTED_BY_CALLBACK:
-	case CURLE_BAD_FUNCTION_ARGUMENT:
-	case CURLE_TOO_MANY_REDIRECTS:
-	case CURLE_UNKNOWN_OPTION:
-	case CURLE_FILESIZE_EXCEEDED:
-	case CURLE_REMOTE_FILE_EXISTS:
-	case CURLE_REMOTE_FILE_NOT_FOUND:
-	case CURLE_PARTIAL_FILE:
-	case CURLE_QUOTE_ERROR:
-	    throw Erange("entrepot_libcurl::check_wait_or_throw",
-			 tools_printf(gettext("%S: %s, aborting"),
-				      &err_context,
-				      curl_easy_strerror(err)));
-	case CURLE_LOGIN_DENIED:
-	case CURLE_REMOTE_ACCESS_DENIED:
-	case CURLE_PEER_FAILED_VERIFICATION:
-	    throw Enet_auth(tools_printf(gettext("%S: %s, aborting"),
-					 &err_context,
-					 curl_easy_strerror(err)));
-	case CURLE_COULDNT_RESOLVE_PROXY:
-	case CURLE_COULDNT_RESOLVE_HOST:
-	case CURLE_COULDNT_CONNECT:
-	case CURLE_FTP_ACCEPT_TIMEOUT:
-	case CURLE_FTP_CANT_GET_HOST:
-	case CURLE_OPERATION_TIMEDOUT:
-	case CURLE_SEND_ERROR:
-	case CURLE_RECV_ERROR:
-	case CURLE_AGAIN:
-	default:
-	    if(wait_seconds > 0)
-	    {
-		dialog->printf(gettext("%S: %s, retrying in %d seconds"),
-			      &err_context,
-			      curl_easy_strerror(err),
-			      wait_seconds);
-		sleep(wait_seconds);
-	    }
-	    else
-		dialog->pause(tools_printf(gettext("%S: %s, do we retry network operation?"),
-					   &err_context,
-					   curl_easy_strerror(err)));
-	    break;
-	}
-    }
 
     void fichier_libcurl::set_subthread(U_I & needed_bytes)
     {
@@ -1005,6 +829,34 @@ namespace libdar
 		    relaunch_thread(needed_bytes);
 	    }
 	}
+    }
+
+    bool fichier_libcurl::still_data_to_write()
+    {
+	if(get_mode() == gf_write_only)
+	{
+	    if(interthread.is_empty())
+		return false;
+	    else
+	    {
+		char *ptr;
+		unsigned int size;
+
+		interthread.fetch(ptr, size);
+		if(size == 0)
+		{
+		    interthread.fetch_recycle(ptr);
+		    return false;
+		}
+		else
+		{
+		    interthread.fetch_push_back(ptr, size);
+		    return true;
+		}
+	    }
+	}
+	else
+	    return false;
     }
 
 #endif
