@@ -267,9 +267,8 @@ namespace libdar
 	}
 	if(mem != nullptr)
 	{
-	    if(allocated_size == nullptr)
-		throw SRC_BUG;
-	    (void)memset(mem, 0, *allocated_size);
+	    if(allocated_size != nullptr)
+		(void)memset(mem, 0, *allocated_size);
 #if CRYPTO_AVAILABLE
 	    gcry_free(mem);
 #else

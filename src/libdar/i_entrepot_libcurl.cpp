@@ -79,102 +79,42 @@ namespace libdar
 				   sftp_known_hosts);
 
 #ifdef LIBDAR_NO_OPTIMIZATION
-	CURLcode err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_VERBOSE, 1);
-	if(err != CURLE_OK)
-	    throw Erange("entrepot_libcurl::i_entrepot_libcurl::i_entrepot_libcurl",
-			 tools_printf(gettext("Error met while setting verbosity on handle: %s"),
-				      curl_easy_strerror(err)));
+	easyh.setopt_global(CURLOPT_VERBOSE,(long)1);
 #endif
     }
 
     void entrepot_libcurl::i_entrepot_libcurl::read_dir_reset() const
     {
-	CURLcode err = CURLE_OK;
 	long listonly;
 	i_entrepot_libcurl *me = const_cast<i_entrepot_libcurl *>(this);
+	shared_ptr<mycurl_easyhandle_node> node;
 
 	if(me == nullptr)
 	    throw SRC_BUG;
 
+	node = me->easyh.alloc_instance();
+	if(!node)
+	    throw SRC_BUG;
+
 	me->current_dir.clear();
 	me->reading_dir_tmp = "";
-	me->set_libcurl_URL();
-
-	try
-	{
-	    switch(x_proto)
-	    {
-	    case proto_ftp:
-	    case proto_sftp:
-		try
-		{
-		    listonly = 1;
-		    err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_DIRLISTONLY, listonly);
-		    if(err != CURLE_OK)
-			throw Erange("","");
-		    err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_WRITEFUNCTION, get_ftp_listing_callback);
-		    if(err != CURLE_OK)
-			throw Erange("","");
-		    err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_WRITEDATA, this);
-		    if(err != CURLE_OK)
-			throw Erange("","");
-		}
-		catch(Erange & e)
-		{
-		    throw Erange("entrepot_libcurl::i_entrepot_libcurl::read_dir_reset",
-				 tools_printf(gettext("Error met while preparing directory listing: %s"),
-					      curl_easy_strerror(err)));
-		}
-
-		do
-		{
-		    err = curl_easy_perform(easyh.get_root_handle());
-		    fichier_libcurl_check_wait_or_throw(get_pointer(),
-							err,
-							wait_delay,
-							tools_printf(gettext("Error met while listing FTP/SFTP directory %s"),
-								     get_url().c_str()));
-		}
-		while(err != CURLE_OK);
-
-		if(!reading_dir_tmp.empty())
-		{
-		    me->current_dir.push_back(reading_dir_tmp);
-		    me->reading_dir_tmp.clear();
-		}
-		break;
-	    default:
-		throw SRC_BUG;
-	    }
-	}
-	catch(...)
-	{
-		// putting back handle in its default state
-
-	    switch(x_proto)
-	    {
-	    case proto_ftp:
-	    case proto_sftp:
-		listonly = 0;
-		(void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_DIRLISTONLY, listonly);
-		(void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_WRITEFUNCTION, null_callback);
-		break;
-	    default:
-		break; // exception thrown in the try block
-	    }
-
-	    throw;
-	}
-
-	    // putting back handle in its default state
 
 	switch(x_proto)
 	{
 	case proto_ftp:
 	case proto_sftp:
-	    listonly = 0;
-	    (void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_DIRLISTONLY, listonly);
-	    (void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_WRITEFUNCTION, null_callback);
+	    listonly = 1;
+	    node->setopt(CURLOPT_URL, get_libcurl_URL());
+	    node->setopt(CURLOPT_DIRLISTONLY, listonly);
+	    node->setopt(CURLOPT_WRITEFUNCTION, (void*)get_ftp_listing_callback);
+	    node->setopt(CURLOPT_WRITEDATA, (void*)(this));
+	    node->apply(get_pointer(), wait_delay);
+
+	    if(!reading_dir_tmp.empty())
+	    {
+		me->current_dir.push_back(reading_dir_tmp);
+		me->reading_dir_tmp.clear();
+	    }
 	    break;
 	default:
 	    throw SRC_BUG;
@@ -234,7 +174,7 @@ namespace libdar
 	    fichier_libcurl *ret_libcurl = new (nothrow) fichier_libcurl(dialog,
 									 chemin,
 									 x_proto,
-									 easyh.alloc_instance(),
+									 me->easyh.alloc_instance(),
 									 hidden_mode,
 									 wait_delay,
 									 force_permission,
@@ -264,13 +204,20 @@ namespace libdar
 		rw = new (nothrow) cache_global(dialog, ret, false);
 		if(rw != nullptr)
 		{
-		    ret = nullptr;  // the former object pointed to by ret is now managed by rw
-		    ret = rw;
+		    ret = rw;  // the former object pointed to by ret is now managed by rw
 		    rw = nullptr;
 		}
 		break;
 	    case gf_write_only:
-		break; // no cache in write only mode
+		    // small cache to avoid trailer and header writes byte per byte
+		    // (1000 bytes ~ payload of an classical ethernet non-jumbo frame)
+		rw = new (nothrow) cache_global(dialog, ret, false, 1000);
+		if(rw != nullptr)
+		{
+		    ret = rw;
+		    rw = nullptr;
+		}
+		break;
 	    default:
 		throw SRC_BUG;
 	    }
@@ -289,88 +236,35 @@ namespace libdar
 
     void entrepot_libcurl::i_entrepot_libcurl::inherited_unlink(const string & filename) const
     {
-	struct curl_slist *headers = nullptr;
+	mycurl_slist headers;
+	shared_ptr<mycurl_easyhandle_node> node;
 	string order;
-	CURLcode err;
 	i_entrepot_libcurl *me = const_cast<i_entrepot_libcurl *>(this);
 
 	if(me == nullptr)
 	    throw SRC_BUG;
-	me->set_libcurl_URL();
 
-	try
-	{
-	    switch(x_proto)
-	    {
-	    case proto_ftp:
-	    case proto_sftp:
-		if(x_proto == proto_ftp)
-		    order = "DELE " + filename;
-		else
-		    order = "rm " + filename;
-		headers = curl_slist_append(headers, order.c_str());
-		err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_QUOTE, headers);
-		if(err != CURLE_OK)
-		    throw Erange("entrepot_libcurl::i_entrepot_libcurl::inherited_unlink",
-				 tools_printf(gettext("Error met while setting up connection for file %S removal: %s"),
-					      &filename, curl_easy_strerror(err)));
-		err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_NOBODY, 1);
-		if(err != CURLE_OK)
-		    throw Erange("entrepot_libcurl::i_entrepot_libcurl::inherited_unlink",
-				 tools_printf(gettext("Error met while setting up connection for file %S removal: %s"),
-					      &filename, curl_easy_strerror(err)));
-		do
-		{
-		    err = curl_easy_perform(easyh.get_root_handle());
-		    fichier_libcurl_check_wait_or_throw(get_pointer(),
-							err,
-							wait_delay,
-							tools_printf(gettext("Error met while removing file %S"),
-								     &filename));
-		}
-		while(err != CURLE_OK);
-
-		if(err != CURLE_OK)
-		    throw Erange("entrepot_libcurl::i_entrepot_libcurl::inherited_unlink",
-				 tools_printf(gettext("Error met while removing file %S: %s"),
-					      &filename, curl_easy_strerror(err)));
-		break;
-	    default:
-		throw SRC_BUG;
-	    }
-	}
-	catch(...)
-	{
-	    switch(x_proto)
-	    {
-	    case proto_ftp:
-	    case proto_sftp:
-		(void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_QUOTE, nullptr);
-		(void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_NOBODY, 0);
-		break;
-	    default:
-    		break;
-	    }
-
-	    if(headers != nullptr)
-		curl_slist_free_all(headers);
-
-	    throw;
-	}
+	node = me->easyh.alloc_instance();
+	if(!node)
+	    throw SRC_BUG;
 
 	switch(x_proto)
 	{
 	case proto_ftp:
 	case proto_sftp:
-	    (void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_QUOTE, nullptr);
-	    (void)curl_easy_setopt(easyh.get_root_handle(), CURLOPT_NOBODY, 0);
+	    if(x_proto == proto_ftp)
+		order = "DELE " + filename;
+	    else
+		order = "rm " + filename;
+	    headers.append(order);
+	    node->setopt(CURLOPT_QUOTE, headers);
+	    node->setopt(CURLOPT_URL, get_libcurl_URL());
+	    node->setopt(CURLOPT_NOBODY, (long)1);
+	    node->apply(get_pointer(), wait_delay);
 	    break;
 	default:
-	    break;
+	    throw SRC_BUG;
 	}
-
-	if(headers != nullptr)
-	    curl_slist_free_all(headers);
     }
 
     void entrepot_libcurl::i_entrepot_libcurl::read_dir_flush()
@@ -378,9 +272,8 @@ namespace libdar
 	current_dir.clear();
     }
 
-    void entrepot_libcurl::i_entrepot_libcurl::set_libcurl_URL()
+    string entrepot_libcurl::i_entrepot_libcurl::get_libcurl_URL() const
     {
-	CURLcode err;
 	string target = get_url();
 
 	if(target.size() == 0)
@@ -389,10 +282,7 @@ namespace libdar
 	    if(target[target.size() - 1] != '/')
 		target += "/";
 
-	err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_URL, target.c_str());
-	if(err != CURLE_OK)
-	    throw Erange("entrepot_libcurl::i_entrepot_libcurl::set_libcurl_URL",tools_printf(gettext("Failed assigning URL to libcurl: %s"),
-									    curl_easy_strerror(err)));
+	return target;
     }
 
     void entrepot_libcurl::i_entrepot_libcurl::set_libcurl_authentication(user_interaction & dialog,
@@ -404,7 +294,6 @@ namespace libdar
 									  const string & sftp_prv_keyfile,
 									  const string & sftp_known_hosts)
     {
-	CURLcode err;
 	secu_string real_pass = password;
 	string real_login = login;
 
@@ -417,39 +306,13 @@ namespace libdar
 	    break;
 	case proto_sftp:
 	    if(!sftp_known_hosts.empty())
-	    {
-		err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_SSH_KNOWNHOSTS, sftp_known_hosts.c_str());
-		if(err != CURLE_OK)
-		    throw Erange("entrepot_libcurl::i_entrepot_libcurl::set_libcurl_authentication",
-				 tools_printf(gettext("Error met while setting known_hosts file: %s"),
-					      curl_easy_strerror(err)));
-	    }
+		easyh.setopt_global(CURLOPT_SSH_KNOWNHOSTS, sftp_known_hosts);
 	    else
 		dialog.message("Warning: known_hosts file check has been disabled, connecting to remote host is subjet to man-in-the-middle attack and login/password credential for remote sftp server to be stolen");
 
-	    err = curl_easy_setopt(easyh.get_root_handle(),
-				   CURLOPT_SSH_PUBLIC_KEYFILE,
-				   sftp_pub_keyfile.c_str());
-	    if(err != CURLE_OK)
-		throw Erange("entrepot_libcurl::i_entrepot_libcurl::set_libcurl_authentication",
-			     tools_printf(gettext("Error met while assigning public key file: %s"),
-					  curl_easy_strerror(err)));
-
-	    err = curl_easy_setopt(easyh.get_root_handle(),
-				   CURLOPT_SSH_PRIVATE_KEYFILE,
-				   sftp_prv_keyfile.c_str());
-	    if(err != CURLE_OK)
-		throw Erange("entrepot_libcurl::i_entrepot_libcurl::set_libcurl_authentication",
-			     tools_printf(gettext("Error met while assigning private key file: %s"),
-					  curl_easy_strerror(err)));
-
-	    err = curl_easy_setopt(easyh.get_root_handle(),
-				   CURLOPT_SSH_AUTH_TYPES,
-				   CURLSSH_AUTH_PUBLICKEY|CURLSSH_AUTH_PASSWORD);
-	    if(err != CURLE_OK)
-		throw Erange("entrepot_libcurl::i_entrepot_libcurl::set_libcurl_authentication",
-			     tools_printf(gettext("Error met while assigning sftp authentication methods: %s"),
-					  curl_easy_strerror(err)));
+	    easyh.setopt_global(CURLOPT_SSH_PUBLIC_KEYFILE, sftp_pub_keyfile);
+	    easyh.setopt_global(CURLOPT_SSH_PRIVATE_KEYFILE, sftp_prv_keyfile);
+	    easyh.setopt_global(CURLOPT_SSH_AUTH_TYPES, (long)(CURLSSH_AUTH_PUBLICKEY|CURLSSH_AUTH_PASSWORD));
 	    break;
 	default:
 	    throw SRC_BUG;
@@ -462,17 +325,8 @@ namespace libdar
 
 	if(auth_from_file)
 	{
-	    err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_USERNAME, real_login.c_str());
-	    if(err != CURLE_OK)
-		throw Erange("entrepot_libcurl::i_entrepot_libcurl::set_libcurl_authentication",
-			     tools_printf(gettext("Error met while passing username to libcurl: %s"),
-					  curl_easy_strerror(err)));
-
-	    err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_NETRC, CURL_NETRC_OPTIONAL);
-	    if(err != CURLE_OK)
-		throw Erange("entrepot_libcurl::i_entrepot_libcurl::set_libcurl_authentication",
-			     tools_printf(gettext("Error met while asking libcurl to consider ~/.netrc for authentication: %s"),
-					  curl_easy_strerror(err)));
+	    easyh.setopt_global(CURLOPT_USERNAME, real_login);
+	    easyh.setopt_global(CURLOPT_NETRC, CURL_NETRC_OPTIONAL);
 	}
 	else // login + password authentication
 	{
@@ -490,11 +344,7 @@ namespace libdar
 	    auth.append(":", 1);
 	    auth.append(real_pass.c_str(), real_pass.get_size());
 
-	    err = curl_easy_setopt(easyh.get_root_handle(), CURLOPT_USERPWD, auth.c_str());
-	    if(err != CURLE_OK)
-		throw Erange("entrepot_libcurl::i_entrepot_libcurl::set_libcurl_authentication",
-			     tools_printf(gettext("Error met while setting libcurl authentication: %s"),
-					  curl_easy_strerror(err)));
+	    easyh.setopt_global(CURLOPT_USERPWD, auth);
 	}
 
     }

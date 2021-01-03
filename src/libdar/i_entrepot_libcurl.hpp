@@ -108,7 +108,7 @@ namespace libdar
 	std::string reading_dir_tmp;
 	U_I wait_delay;
 
-	void set_libcurl_URL();
+	std::string get_libcurl_URL() const;
 	void set_libcurl_authentication(user_interaction & dialog,         ///< for user interaction
 					const std::string & location,      ///< server to authenticate with
 					const std::string & login,         ///< login to use
