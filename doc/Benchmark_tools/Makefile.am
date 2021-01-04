@@ -19,7 +19,5 @@
 # to contact the author : http://dar.linux.free.fr/email.html
 #######################################################################
 
-noinst_PROGRAMS = make_sparse_file
+noinst_PROGRAMS =
 
-make_sparse_file_SOURCES = make_sparse_file.c
-make_sparse_file_CPPFLAGS =

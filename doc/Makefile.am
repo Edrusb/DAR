@@ -1,6 +1,6 @@
 SUBDIRS = samples mini-howto man Benchmark_tools
 dist_noinst_DATA = COMMAND_LINE Doxyfile portable_cp
-dist_pkgdata_DATA = README Features.html Limitations.html Notes.html Tutorial.html Good_Backup_Practice.html FAQ.html api_tutorial.html dar_doc.jpg dar_s_doc.jpg index.html dar-catalog.dtd Known_Bugs.html authentification.html dar_key.txt old_dar_key.txt from_sources.html downloading.html presentation.html usage_notes.html python/libdar_test.py style.css restoration-with-dar.html benchmark.html
+dist_pkgdata_DATA = README Features.html Limitations.html Notes.html Tutorial.html Good_Backup_Practice.html FAQ.html api_tutorial.html dar_doc.jpg dar_s_doc.jpg index.html dar-catalog.dtd Known_Bugs.html authentification.html dar_key.txt old_dar_key.txt from_sources.html downloading.html presentation.html usage_notes.html python/libdar_test.py style.css restoration-with-dar.html benchmark.html benchmark_logs.html
 
 INSTALL_HTML_MAN = $(INSTALL) -d $(DESTDIR)$(pkgdatadir)/man ; $(INSTALL) -m 0644 man/*.html $(DESTDIR)$(pkgdatadir)/man
 UNINSTALL_HTML_MAN = rm -rf $(DESTDIR)$(pkgdatadir)/man
