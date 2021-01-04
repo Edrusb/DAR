@@ -189,7 +189,7 @@
     <ul>
       <li>user and group ownership are restored</li>
       <li>permission are set correctly</li>
-      <li>ACL are preperly restored</li>
+      <li>ACL are properly restored</li>
       <li>Extended Attributes also</li>
       <li>file system specific attributes are too</li>
       <li>hard links are restored</li>
@@ -218,7 +218,8 @@
     </code></div>
     <p>
       OK here is the explanation: <code>plain_zeroed</code> file was using 1048576 bytes of disk space in SRC
-      but consumes only 4096 bytes in DST, but as its file size is still officially 1048576, it has become now a sparse file.
+      and consumes only 4096 bytes in DST, but it has its file size is still officially 1048576, it has thus become
+      now a sparse file (not all zeroed bytes are stored).
     </p>
     <div class=code><code>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# diff -s SRC/plain_zeroed DST/plain_zeroed</b>
@@ -307,7 +308,7 @@
     </code></div>
 
     <p>
-      In conclusion <i>dar</i> also saves and restores properly <code>btime</code>
+      In conclusion <i>dar</i> also saves and restores <code>btime</code> properly.
     </p>
 
 
@@ -345,8 +346,8 @@
       First note, the backup and restoration is done in one step, where <i>dar</i> was decorelating the backup operation
       from the restoration operation. The resulting backup needs not software to be restored (<code>DST</code>
       is a copy of <code>SRC</code>). For dar to reach the same result (without using storage for the backup) this
-      implies two dar commands: <code> dar -c - -R SRC | dar -x - --sequential-read -R DSR</code>. The situation is
-      similar with <code>tar</code>, you need two commands to performe the same task: <code>tar -cf - | tar -xf -</code>
+      implies two dar commands: <code> dar -c - -R SRC | dar -x - --sequential-read -R DST</code>. The situation is
+      similar with <code>tar</code>, you need two commands to perform the same task: <code>tar -cf - | tar -xf -</code>
     </p>
     <div class=code><code>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# du -s SRC DST</b>
@@ -533,9 +534,9 @@
 
     <p>
       As done with previously, let's save and restore the <code>SRC</code> directory to <code>DST</code>... Note that by default
-      no sparse file is taken into account (where from the <code>-S option</code>), no acl (<code>--acl</code>) no Extended Attributes
-      (<code>--xattrs</code>). The
-      <i>tar</i> command-line is thus long for these reasons.
+      no sparse file is taken into account (this is why we added the <code>-S option</code>), same with acl (so we added
+      the <code>--acl</code> option) and Extended Attributes (unless <code>--xattrs</code> is added). The
+      <i>tar</i> command-line becomes thus a bit longer:
     </p>
 
     <div class=code><code>
@@ -553,7 +554,7 @@
     </code></div>
 
     <p>
-      ...and compare the restored data with the original:
+     Now let's compare the restored data with the original:
     </p>
 
     <div class=code><code>
@@ -628,7 +629,7 @@
       for <code>pipe</code> and <code>SUB/hard_linked_pipe</code> and their respective link count was <code>2</code>
       in <code>SRC</code> but is now <code>1</code> in <code>DST</code>. If two processes in different namespaces or
       chrooted environment, exchange data by mean of such hardlinked pipe, after restoration, if you are not
-      aware of this restriction, it will be difficult to identify why the two process are just locked out, one
+      aware of this failure, it will thus be difficult to identify why the two processes are just locked out, one
       waiting for data that will never come from the pipe, the other stuck for the pipe to be read.
     </p>
 
@@ -708,7 +709,7 @@
     </p>
 
     <ul>
-      <li>filesystem attributes are not restored,<li>
+      <li>filesystem attributes are not restored,</li>
       <li>atime is not restored,</li>
       <li>ctime is not restored</li>
     </ul>
@@ -951,13 +952,13 @@
     </p>
     <p>
       We added the <code>--delete</code> option and as result we got
-      to be the <i>phase2</i> state. But then we cannot restore to the <i>phase1</i> state as the
+      to be the <i>phase2</i> state only. But then we cannot restore to the <i>phase1</i> state as the
       file <i>A.txt</i> has been deleted from the backup.
     </p>
     <p>
       To have both states with <i>rsync</i>, we should call rsync to a different destination directory
-      at each new backup, which would consume a lot of space and would also defeats one the main
-      feature of <i>rsync</i> which is its ability to synchronize two directories exchanging only
+      at each new backup time, which would consume a lot of space and would also defeat one of the main
+      features of <i>rsync</i> which is its ability to synchronize two directories exchanging only
       the minimal information that was modified.
     </p>
 
@@ -1446,7 +1447,7 @@
 	<b>root@terre:/mnt/memdisk#</b>
     </code></div>
     <p>
-      So we are good
+      So we are good with this <i>sed</i> additional listing adaptation.
     </p>
 
     <h5>Tar</h5>
@@ -1470,7 +1471,7 @@
       <i>The names read are handled the same way as command line arguments</i> explains that
       in the listing where all <code>"*.ko"</code> files have been removed, remain their parent
       directory, which implies saving all its content. In consequence we must not list
-      directories only their content (which will drop not allow saving empty directories).
+      directories only their content (which will restrict us saving empty directories as such).
       Let's modify the include.txt file that way:
     </p>
     <div class=code><code>
@@ -1485,9 +1486,9 @@
 	4123 include.txt
     </code></div>
     <p>
-      the difference if between 1532 entries saved by <i>tar</i> compared to the
+      the difference between the 1532 entries saved by <i>tar</i> and the
       4123 saved by <i>rsync</i> or <i>dar</i> comes from the many empty directories
-      that have cannot be saved as such by <i>tar</i> using this method
+      that cannot be saved as such by <i>tar</i> using this method.
     </p>
     <div class=code><code>
 	<b>root@terre:/mnt/memdisk# tar -cvf backup.tar --exclude-from=exclude.txt /lib | wc -l</b>
@@ -1569,7 +1570,7 @@
     </code></div>
 
     <p>
-      We can also specify a different size for the first slice, this was used in the past
+      We can also specify a different size for the first slice when using <i>dar</i>, this was used in the past
       to fulfill a disk partially filled by a previous incremental backup when saving onto CD-RW
       and DVD-RW, but that may still make sense when using USB keys or any other removable media.
     </p>
@@ -1615,9 +1616,8 @@
 
     <h5>Rsync</h5>
     <p>
-      rsync cannot split any file in slices, and it does not generate any backup, but it copies files.
-      You cannot thus split in slices an tar archive in the hope to not download all of them to restore
-      a particular file.
+      <i>rsync</i> cannot split any file in slices, and it does not generate any backup, but it copies files.
+      You cannot thus split data into slices to fit a particular restricted storage space.
     </p>
 
     <h5>Tar</h5>
@@ -1677,7 +1677,7 @@
       tape than what you can do with <i>dar</i> even if tape media
       is your only target. Here is an example with <i>dar</i> on how
       to write to mutli-volume and compressed backup to tape and pause
-      between each volume:
+      between each volume as <i>tar</i> does:
     </p>
     <div class=code><code>
 	<b>terre:/mnt/memdisk# <e>dar</e> -c backup -R /usr/bin -z6 -s 20M <e class=green>-E "echo writing volume %N to tape"</e> <e>-E "cat < %p/%b.%N.%e > /dev/mt"</e> <e class=blue>-p</e></b>
@@ -1731,7 +1731,7 @@
       time to increase security as it increases data "randomness" of the data to cipher. So we will use both in our tests (gzip with a compresion level of 6).
     </p>
     <p>
-      A point to pay attention concerns the way the password/passphrase can be provided. Putting this
+      A point to pay attention to concerns the way the password/passphrase can be provided. Putting this
       to the command-line could let other users on this same system read it. Having interactive
       prompt is better as well as having the password set in a read access restricted file, which
       in addition allows automation.
@@ -2184,24 +2184,9 @@
 
     <p>
       In order stress each backup software on that aspect, we will use an ugly
-      script that loops forever permanently invoking <code>touch</code> on a given file:
-    </p>
-
-    <div class=code><code>
-	<b>terre:/mnt/memdisk# cat always_change</b>
-	#!/bin/bash
-
-	if [ -z "$1" ] ; then
-	  echo "usage: $0 &lt;filename&gt;"
-	  exit 1
-	fi
-
-	while /bin/true ; do  touch "$1" ; done
-	<b>terre:/mnt/memdisk#</b>
-    </code></div>
-
-    <p>
-      We create a source tree to backup, containing a file of 1 MiB on which we will
+      script <a href="#always_change">always_change</a> that loops forever permanently
+      invoking <code>touch</code> on a given file. For the test, we create a source
+      tree to backup, containing a file of 1 MiB on which we will
       apply this script:
     </p>
 
@@ -2283,7 +2268,7 @@
 	  the resulting backup keeps trace of this context by flagging the file as <code>DIRTY</code>
 	</li>
 	<li>
-	  When restoring the data, a warning shows (by default) and the user is requested for confirmation (default behavior)
+	  When restoring the data, a warning shows (default behavior) and the user is requested for confirmation.
 	</li>
       </ul>
     </p>
@@ -2294,13 +2279,13 @@
 	<b>terre:/mnt/memdisk#</b>
     </code></div>
     <p>
-     <i>rsync</i> does not shows anything not behaves differently (no retry).
+     <i>rsync</i> does not shows anything nor behaves differently (no retry, no change notification).
     </p>
 
     <h5>Tar</h5>
     <div class=code><code>
 	<b>terre:/mnt/memdisk# tar -cf backup.tar SRC</b>
-	tar: SRC/hello_world: file changed as we read it
+	<e>tar: SRC/hello_world: file changed as we read it</e>
 	<b>terre:/mnt/memdisk# tar -tvf backup.tar</b>
 	drwxr-xr-x root/root         0 2020-11-10 16:33 SRC/
 	-rw-r--r-- root/root  10485760 2020-11-10 16:41 SRC/hello_world
@@ -2325,7 +2310,7 @@
 	  the resulting backup keeps no visible trace of this possible data corruption
 	</li>
 	<li>
-	  When restoring the data, no warning issued and the restoration proceed as if the file was saved properly
+	  When restoring the data, no warning is issued and the restoration proceed as if the file was saved properly
 	</li>
       </ul>
 
@@ -2425,7 +2410,8 @@
 
     <p>
       To evaluate the ability the support for binary delta, we will make a first
-      backup of a Debian ISO image, which we will modify by one bit and then
+      backup of a Debian ISO image, of which we will modify one bit using the
+      <a href="#bitflip">bitflip</a> script, then
       make a differential backup of it. We expect to see the differential backup not
       resaving the whole file, and though the restoration of the full and differential
       backup matching the modified file.
@@ -2517,39 +2503,19 @@
       <li>4.3 GiB for full backup (compression ratio of 0,22 %)</li>
       <li>4.3 GiB for the differential backup (compression ratio of 0,22 %)</li>
     </ul>
-    <br/>
     <p>
       Binary delta is not supported by <i>tar</i>
     </p>
 
     <h4>Detection suspicious modifications</h4>
 
-    <p>For this test we will use the following script that rely on the <i>bitflip</i> script
+    <p>For this test we will use the <a href="#hide_change">hide_change</a> script that rely
+      on the <a href="#bitflip">bitflip</a> script
       seen above and try to hide the modifications performed, as a virus, keylogger or rootkit would
       tend to do. We will make a full backup before
       the modification and a differential backup after, then observe the behavior.
 
-      <div class=code><code>
-	  <b>terre:/mnt/memdisk# cat hide_change</b>
-	  #!/bin/bash
-
-	  if [ -z "$1" ] ; then
-	  echo "usage: $0 &lt;filename&gt;"
-	  echo "modify one bit and hide the change"
-	  exit 1
-	  fi
-
-	  atime=`stat "$1" | sed -rn -s 's/^Access:\s+(.*)\+.*/\1/p'`
-	  mtime=`stat "$1" | sed -rn -s 's/^Modify:\s+(.*)\+.*/\1/p'`
-
-	  ./bitflip 2 "$1"
-
-	  touch -d "$mtime" "$1"
-	  touch -a -d "$atime" "$1"
-	  <b>terre:/mnt/memdisk#</b>
-      </code></div>
-
-    <p>
+     <p>
       Here follows the script in action, we see no change using <code>ls -l</code>
       while <code>stat</code> shows the exact same information:
       <ul>
@@ -2597,7 +2563,7 @@
 	Change: 2020-11-12 13:13:<e>39.549936636</e> +0100
 	Birth: -
 	<b>terre:/mnt/memdisk# cat SRC/file.txt</b>
-	Lello World!
+	<e class=red>L</e>ello World!
 	<b>terre:/mnt/memdisk#</b>
     </code></div>
 
@@ -2669,7 +2635,7 @@
 	<b>terre:/mnt/memdisk# cat SRC/file.txt</b>
 	<e>Lello World!</e>
 	<b>terre:/mnt/memdisk# cat DST/SRC/file.txt</b>
-	<e>Hello World!</e>
+	<e class=red>Hello World!</e>
 	<b>terre:/mnt/memdisk#</b>
     </code></div>
 
@@ -2697,7 +2663,7 @@
 	<e>Hello World!</e>
 	<b>terre:/mnt/memdisk/DST# tar -xf ../diff.tar</b>
 	<b>terre:/mnt/memdisk/DST# cat SRC/file.txt</b>
-	<e>Lello World!</e>
+	<e class=red>Lello World!</e>
 	<b>terre:/mnt/memdisk/DST#</b>
     </code></div>
 
@@ -2821,7 +2787,7 @@
     <p>As seen above,a snapshot can be created:
       <ul>
 	<li>as part of a backup process (full, differential, incremental or even decremental backup) (<code>--on-fly-isolate</code>)</li>
-	<li>from a existing backup(<code>-C</code>)</li>
+	<li>from a existing backup (<code>-C</code>)</li>
 	<li>alone by a dedicated operation (<code>-A +</code>)</li>
       </ul>
     </p>
@@ -3134,8 +3100,8 @@
     <p>
       <i>tar</i> has the <code>-F option</code> to launch a command after each tape,
       but it is only available with multi-volume tar archive, which in turn
-      cannot be used with compression. Thus we won't test it quite restrictive and
-      does not march very common use cases.
+      cannot be used with compression. Thus we won't test it, as it is quite
+      restrictive and does not match any common use cases.
     </p>
 
     <h4>Dry-run execution</h4>
@@ -3555,7 +3521,7 @@
     <p>
       <code>-v option</code> leads to a more verbose output, while <code>-q</code>
       remove the non error messages. Using both at the same time seems not to
-      be different than using <code>-q</code> alone. <i>rsync</i> has a very rich
+      be different than using <code>-q</code> alone. However <i>rsync</i> has a very rich
       set of additional options like <code>--info</code>, <code>--debug</code>
       that can be added on top.
     </p>
@@ -3590,7 +3556,7 @@
     </code></div>
 
     <p>
-      <i>tar</i> provides the <code>-v</code> option to increase
+      <i>tar</i> only provides the <code>-v</code> option to increase
       verbosity.
     </p>
 
@@ -3690,7 +3656,7 @@
 	<b>terre:/mnt/memdisk# tar -tvf backup.tar.gz | grep emacs-gtk</b>
 	-rwxr-xr-x root/root    39926024 2019-09-05 04:35 usr/bin/emacs-gtk
 	<b>terre:/mnt/memdisk# tar --delete usr/bin/emacs-gtk -f backup.tar.gz</b>
-	<e>tar: Cannot update compressed archives</e>
+	<e class=red>tar: Cannot update compressed archives</e>
 	tar: Error is not recoverable: exiting now
 	<b>terre:/mnt/memdisk#</b>
     </code></div>
@@ -3794,8 +3760,9 @@
       local storage. We will also need <b>compression</b> to save precious space (usually you pay for the
       cloud storage you use) and <b>maybe slicing</b> depending on the constraints
       imposed by the remote storage (some provider ask you to pay an extra amount to store larger files,
-      having slicing avoids you having to pay for the size of files in addition to the total
-      amount of disk space you use.
+      having slicing avoids you paying extra cost in such context). Another use case of slicing is when
+      the file transfer protocol is not able to continue an interrupted transfer,
+      you will then only need to restart it for the last slice, not the whole backup.
     </p>
     <div class=code><code>
 	<b>terre:/mnt/memdisk# sftp denis@dar</b>
@@ -3901,7 +3868,7 @@
 	<b>terre:/mnt/memdisk#</b>
     </code></div>
     <p>
-      As seen above only the slice 4 has been necessary to restore /etc/fstab. But let's save two files,
+      As seen above only one slice (slice #4) has been necessary to restore /etc/fstab. But let's save two files,
       a huge one and a small one into a single sliced backup and measure the transfer time of backup
       and restoration of this ciphered an compressed backup through sftp. We have added public key authentification
       for precise time measurement:
@@ -3961,6 +3928,11 @@
 
     <h3>Backup Robustness</h3>
 
+    <p>
+      The objective of this test is to measure the way the backup tools under test behave when the backup has been corrupted.
+      We will here just flip one byte of the backup, at the beginning, in the middle or at the end of the backup and
+      observe the consequences in term of ability to restore the backup.
+    </p>
 
     <h5>Dar</h5>
     <div class=code><code>
@@ -4018,7 +3990,7 @@
 	<b>terre:/mnt/memdisk#</b>
     </code></div>
     <p>
-      Modifying the first bit <i>dar/</i> has seen the corruption. We can use the lax mode (<code>-alax</code> option) to bypass this
+      Modifying the first bit <i>dar</i> has seen the corruption. We can use the lax mode (<code>-alax</code> option) to bypass this
       corruption and then the restoration proceeds normally. We can try a bit further for example somewhere in the middle of the archive,
       thus at offset 876354144 (half of the size expressed in bit, not byte):
     </p>
@@ -4096,10 +4068,11 @@
     </code></div>
     <p>
       By chance it did not affected the ability to restore the backup. However if it ever had,
-      we could have fall back to the <code>--sequential-read</code> mode, use a already created
-      snapshot (aka isolated catalogue) as seen about the snapshot feature, or as last resort
-      use the <code>-alax option</code> eventually combined with the <code>--sequential-read</code>
-      mode.
+      we have several fallbacks: the <code>--sequential-read</code> mode, the use a already created
+      snapshot (aka isolated catalogue) as seen about the snapshot feature to backup the internal
+      table of content, or as last resort
+      the <code>-alax option</code> eventually combined with the <code>--sequential-read</code>
+      mode and a backup snapshot.
     </p>
 
     <h5>Rsync</h5>
@@ -5178,7 +5151,7 @@
     </code></div>
 
 
-    <h2>Scripts used for testing</h2>
+    <h2>Scripts used in this benchmark</h2>
 
     <h3><a name="historization_feature"><i>historization_feature</i></a> script</h3>
     <div class=code><code>
