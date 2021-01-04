@@ -16,20 +16,26 @@
       (Linux, FreeBSD, MACOS X...), among the most commonly available today.
       <ul>
 	<li>
-	  The <b>first target</b> we want to address is being able to backup and restore a whole system
+	  The <b>first target</b> we want to address is being able to copy a directory tree and files
+	  with the best fidelity,
+	</li>
+	<li>
+	  The <b>second target</b> is being able to backup and restore a whole system
 	  from a minimal environment without assistance of an already existing local server (disaster context).
 	</li>
 	<li>
-	  The <b>second target</b> is being able to securely keep for the long term an archived data. Securely here means having the ability to detect data corruption and limit its impact on the rest of the archive.
+	  The <b>third target</b> is being able to securely keep for the long term an archived data. Securely here means having the ability to detect data corruption and limit its impact on the rest of the archive.
 	</li>
       </ul>
-      Both targets may need compression and ciphering inside backup depending on the context (public cloud storage, removable media, ...), limited storage space.
+      Depending on the targets we may need compression and/or ciphering inside backup,
+      but also dending on the context (public cloud storage, removable media, ...), limited storage space.
     </p>
     <p>
       Backup softwares that requires servers already running
       on the local network (For examples <i>Bacula</i>, <i>Amanda</i>, <i>Bareos</i>, <i>UrBackup</i>, <i>Burp</i>...) cannot
-      adress our first target as we would have first to reconstruct such server in
-      case of disaster (from what then?) in order be able to restore our system and its data.
+      adress our second target as we would have first to reconstruct such server in
+      case of disaster (from what then?) in order be able to restore our system and its data. They are
+      over complex for the first target and are not suitable for the third.
     </p>
     <p>
       Partition cloning systems (<i>clonezilla</i>, <i>MondoRescue</i>, <i>RescueZilla</i>,
@@ -52,7 +58,7 @@
 
     <h2>Tests Famillies</h2>
     <p>
-      Several aspects need to consider:
+      Several aspects are to be considered:
     </p>
     <lu>
       <li><b>completness</b> of the restoration: file permissions, dates precision, hardlinks, file attributes, Extended Attributes, sparse files...</li>
@@ -60,21 +66,12 @@
       <li><b>robustness</b> of the backup: how data corruption impact the backup, how it is reported...</li>
       <li><b>execution performance</b>: execution time, memory consumption, multi-threading support...</li>
     </lu>
-    <p>
-      <b><u>Hardware used for Testing</u></b>
-    </p>
-
-    <p>
-      Performance tests has been performed on an <a href="https://www.hpe.com">HPE</a> Proliant server
-      (a <i>ProLiant XL230a Gen9</i> running two <i>Intel(R) Xeon(R) CPU E5-2690 v3 @ 2.60GHz</i> processors) running
-      a Devuan beowulf Linux system and also on a <a href="https://www.proxmox.com/en/">Proxmox</a>
-      Virtual Machine running a FreeBSD 12.1 on an <i>Intel Core i5-7400 (3 GHz)</i> based computer.
-    </p>
 
     <h2>Benchmark Results</h2>
 
     <p>
-      The results presented here are a synthesis of the test logs provided in appendix. They are in turn summarized in conclusion of this document.
+      The results presented here are a synthesis of the <a href="benchmark_logs.html">test logs</a>. This synthesis
+      is in turn summarized one step further in conclusion of this document.
     </p>
 
     <h3>Completness of backup and restoration</h3>
@@ -171,6 +168,9 @@
       <li>(7) needs --acl option</li>
       <li>(8) needs --xattrs option</li>
     </ul>
+    </p>
+    <p>
+      See <a href="benchmark_logs.html#completness">the test logs</a> for all the details.
     </p>
 
     <h3>Feature set</h3>
@@ -619,7 +619,7 @@
     </table>
 
     <p>
-      The presented results above is a synthesis of the tests detailed in appendix.
+      The presented results above is a synthesis of the <a href="benchmark_logs.html#features">test logs</a>
     </p>
 
     <h3>Robustness</h3>
@@ -687,7 +687,7 @@
     </p>
 
     <p>
-      The presented results above is a synthesis of the tests detailed in appendix.
+      The presented results above is a synthesis of the <a href="benchmark_logs.html#robustness">test logs</a>.
     </p>
 
     <h3>Performance</h3>
@@ -767,7 +767,11 @@
       </tr>
     </table>
 
-    <h4>Performance of backup operation</h4>
+    <p>
+      See the corresponding <a href="benchmark_logs.html#copy_perf">test logs</a> for more details
+    </p>
+
+    <h4>Performance of <a name="backup_perf">backup</a> operation</h4>
     <p>
       For backup we consider the following criteria by order of importance:
     </p>
@@ -1078,19 +1082,21 @@
       <div class="gauge normal" style="width: 100%">Tar (openssl): 1.49 GiB</div>
     </div>
 
+    <p>
+      See the corresponding <a href="benchmark_logs.html#backup_perf">test logs</a> for more details.
+    </p>
 
     <h2>Conclusion</h2>
 
     <p>
-      So far we have measured perfomance, evaluated features, robusness and completness of the operation. We get a lot of
-      results, but it would not be of a great use to anyone reading this document or the one just jumping to its conclusion to not
-      get back to use cases and put these results in front:
-    </p>
-    <p>
-      We can identify may uses cases around backup tools and each one has its one contraints and performance criteria:
+      So far we have measured different perfomance aspects, evaluated available features, tested backup robusness and observed backup exhaustivity
+      of the different backup softwares under test. This gives a lot of
+      information already summarized above. But it would still not be of a great use to anyone reading this document
+      (espetially the one jumping to its conclusion ;^) ) so we have to get backup to use cases and their requirements
+      which will give below the <a href="#oil">essential oil drop</a> anyone can use immediately:
     </p>
 
-    <h3>Criteria for file copy use cases</h3>
+    <h3>Criteria for the different use cases</h3>
 
     <table>
       <tr>
@@ -1139,16 +1145,6 @@
 	    <li>on wire ciphering</li>
 	  </ul>
 	</td>
-      </tr>
-    </table>
-
-    <h3>Criteria for backup use cases</h3>
-
-    <table>
-      <tr>
-	<th>Use Cases</th>
-	<th>Key Point</th>
-	<th>Optional interesting features</th>
       </tr>
       <tr>
 	<th>Full backups only</th>
@@ -1316,9 +1312,9 @@
     </table>
 
 
-    <h3>Essential oil drop</h3>
+    <h3>Essential <a name="oil">oil</a> drop</h3>
     <p>
-      In summary regarding the different use cases we have considered and the different caracteristics we tended to measure amont the backup tools we tested:
+      In summary, putting in front of these requirements the different measures we did:
     </p>
     <ul>
       <li>exhasitivity of backed up data</li>
@@ -1538,8 +1534,7 @@
     </table>
 
     <p>
-      In the previous table, the different software are listed in alphabetical order. This table results from the criteria detailed in the previous tables
-      in regard to benchmark results obtained and summarized in the previous paragraph.
+      In each cell of the previous table, the different softwares are listed in alphabetical order, they get colorized according to the following code:
     </p>
     <table class=center>
       <tr>

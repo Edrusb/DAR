@@ -15,20 +15,34 @@
 
     <h2>Introduction</h2>
     <p>
-      The benchmark detailed tests and output are provided below. They rely on several helper
-      scripts that are detailed at the end of this document.
+      This document keep trace of the tests performed that lead to the summarized results presented in the
+      <a href="benchmark.html">benchmark document</a>. Several <a href="#scripts">helper scripts</a>
+      detailed at the end of this document have been necessary to obtain these results.
     </p>
 
 
-    <h2>Test logs</h2>
-    <h3>Software used for these tests</h3>
+    <h2>Testing Context</h2>
+    <h3>Software under test</h3>
     <ul>
       <li><b>dar</b> version 2.7.0</li>
       <li><b>rsync</b> version 3.1.3</li>
       <li><b>tar</b> GNU tar 1.30 under Linux and GNU tar (gdar) 1.32 under FreeBSD</li>
     </ul>
 
-    <h3>Completness of backup and restoration</h3>
+    <h3>Hardware used for testing</h3>
+
+    <p>
+      Performance tests has been performed on an <a href="https://www.hpe.com">HPE</a> Proliant server
+      (a <i>ProLiant XL230a Gen9</i> running two <i>Intel(R) Xeon(R) CPU E5-2690 v3 @ 2.60GHz</i> processors) running
+      a Devuan beowulf Linux system. Other tests have been run from Virtual Machines (<a href="https://www.freebsd.org">FreeBSD</a> 12.1,
+      <a href="https://www.devuan.org">Devuan</a> 3.0.0)
+      of a <a href="https://www.proxmox.com/en/">Proxmox</a> hypervisor running one on an
+      <i>Intel Core i5-7400 (3 GHz)</i> based computer.
+    </p>
+
+    <h2>Test logs</h2>
+
+    <h3><a name"completness">Completness</a> of backup and restoration</h3>
     <h4>Dar</h4>
     <div class=code><code>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# ./build_test_tree.bash  SRC</b>
@@ -751,7 +765,7 @@
 
 
 
-    <h3>Feature set</h3>
+    <h3><a name="features">Feature</a> set</h3>
 
     <h4>Historization</h4>
     <p>
@@ -3926,7 +3940,7 @@
       restore a particular file, the whole backup has to be retrieved, unciphered and uncompressed to restore even
       just a sigle file</p>
 
-    <h3>Backup Robustness</h3>
+    <h3>Backup <a name="robustness">Robustness</a></h3>
 
     <p>
       The objective of this test is to measure the way the backup tools under test behave when the backup has been corrupted.
@@ -4331,7 +4345,7 @@
     </p>
 
 
-    <h3>Execution Performance</h3>
+    <h3>Execution <a name="performance">Performance</a></h3>
 
     </p>
     <p>
@@ -4499,7 +4513,7 @@
     </p>
 
 
-    <h4>Performance of copy operations</h4>
+    <h4>Performance of <a name="copy_perf">copy</a> operations</h4>
 
     <p>
       To perform the copy operation, we have decomposed the operations to precisely measure the execution time. We could have decided to pipe the backup to a second instance of the
@@ -4648,7 +4662,7 @@
       with data, it does not match the need.
     </p>
 
-    <h4>Performance of Backup operations</h4>
+    <h4>Performance of <a name="backup_perf">Backup</a> operations</h4>
 
     <p>
       For reference:
@@ -5151,7 +5165,7 @@
     </code></div>
 
 
-    <h2>Scripts used in this benchmark</h2>
+    <h2><a name="scripts">Scripts</a> used in this benchmark</h2>
 
     <h3><a name="historization_feature"><i>historization_feature</i></a> script</h3>
     <div class=code><code>
