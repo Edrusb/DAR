@@ -556,7 +556,7 @@ AS_IF(	       [test "x$enable_linux_statx" != "xyes"],
 				   if(ret != 0)
 				      return 1; /* will not use statx */
 				   else
-				      return 0; /* possible to go furhter with statx */
+				      return 0; /* possible to go further with statx */
 			         ])
 	                      ],
 	                      [
