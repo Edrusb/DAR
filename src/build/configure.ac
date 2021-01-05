@@ -340,47 +340,47 @@ AC_DEFINE_UNQUOTED(LIBDAR_TIME_ACCURACY_NANOSECOND, $local_time_accuracy_nanosec
 
 
 AC_ARG_ENABLE( [limit-time-accuracy],
-	       AS_HELP_STRING(--enable-limit-time-accuracy, [limit time accuracy to nanosecond (ns) microsecond (us) or second (s)]),
-	       [
-		AS_IF(  [ test "x$enable_limit_time_accuracy" != "xs" -a "x$enable_limit_time_accuracy" != "xus" -a "x$enable_limit_time_accuracy" != "xns" ],
-			[ AC_MSG_ERROR([invalid argument given to --enable-limit-time-accuracy, valide values are : s, us, ns])],
-			[ AC_MSG_WARN([limiting time accuracy to $enable_limit_time_accuracy])]
-			)
-	       ],
-	       [ enable_limit_time_accuracy=no ])
+               AS_HELP_STRING(--enable-limit-time-accuracy, [limit time accuracy to nanosecond (ns) microsecond (us) or second (s)]),
+               [
+                AS_IF(  [ test "x$enable_limit_time_accuracy" != "xs" -a "x$enable_limit_time_accuracy" != "xus" -a "x$enable_limit_time_accuracy" != "xns" ],
+                        [ AC_MSG_ERROR([invalid argument given to --enable-limit-time-accuracy, valide values are : s, us, ns])],
+                        [ AC_MSG_WARN([limiting time accuracy to $enable_limit_time_accuracy])]
+                        )
+               ],
+               [ enable_limit_time_accuracy=no ])
 
 
 AC_MSG_CHECKING([for the timestamps write precision])
 
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
-				     #if HAVE_FCNTL_H
-				     #include <fcntl.h>
-				     #endif
-			             #if HAVE_SYS_STAT_H
+                                     #if HAVE_FCNTL_H
+                                     #include <fcntl.h>
+                                     #endif
+                                     #if HAVE_SYS_STAT_H
                                      #include <sys/stat.h>
                                      #endif
-				   }]],
-				   [[
-					struct timespec a[2];
-					a[0].tv_sec = 0;
-					a[1].tv_nsec = 1;
-					(void)utimensat(0, "/tmp/testfile", a,  0);
-					/* not that this test program is only compiled+lined not executed */
-				   ]])
-	          ],
-		  [
-			AS_IF([ test "x$enable_limit_time_accuracy" = "xs" -o "x$enable_limit_time_accuracy" = "xus" ],
-			      [
-			        local_time_write_accuracy=-1
-			      ],
-			      [
-   			        local_time_write_accuracy=$local_time_accuracy_nanosecond
-    			        AC_MSG_RESULT([1 nanosecond])
-			      ])
-	          ],
-		  [
-		        local_time_write_accuracy=-1
-		  ])
+                                   }]],
+                                   [[
+                                        struct timespec a[2];
+                                        a[0].tv_sec = 0;
+                                        a[1].tv_nsec = 1;
+                                        (void)utimensat(0, "/tmp/testfile", a,  0);
+                                        /* not that this test program is only compiled+lined not executed */
+                                   ]])
+                  ],
+                  [
+                        AS_IF([ test "x$enable_limit_time_accuracy" = "xs" -o "x$enable_limit_time_accuracy" = "xus" ],
+                              [
+                                local_time_write_accuracy=-1
+                              ],
+                              [
+                                local_time_write_accuracy=$local_time_accuracy_nanosecond
+                                AC_MSG_RESULT([1 nanosecond])
+                              ])
+                  ],
+                  [
+                        local_time_write_accuracy=-1
+                  ])
 
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                                      #if HAVE_SYS_TYPES_H
@@ -410,24 +410,24 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                                      ]])
                   ],
                   [
-		    AS_IF([ test $local_time_write_accuracy -eq -1 ],
-		    	  AS_IF([ test "x$enable_limit_time_accuracy" != "xs" ],
-		                [
-			            local_time_write_accuracy=$local_time_accuracy_microsecond
-                    	            AC_MSG_RESULT([1 microsecond])
-			        ],
-			        [
-		    	            local_time_write_accuracy=$local_time_accuracy_second
-			            AC_MSG_RESULT([1 second])
-			        ])
-			)
+                    AS_IF([ test $local_time_write_accuracy -eq -1 ],
+                          AS_IF([ test "x$enable_limit_time_accuracy" != "xs" ],
+                                [
+                                    local_time_write_accuracy=$local_time_accuracy_microsecond
+                                    AC_MSG_RESULT([1 microsecond])
+                                ],
+                                [
+                                    local_time_write_accuracy=$local_time_accuracy_second
+                                    AC_MSG_RESULT([1 second])
+                                ])
+                        )
                   ],
                   [
-		    AS_IF([ test $local_time_write_accuracy -eq -1 ],
-		          [
-			      local_time_write_accuracy=$local_time_accuracy_second
-			      AC_MSG_RESULT([1 second])
-			  ])
+                    AS_IF([ test $local_time_write_accuracy -eq -1 ],
+                          [
+                              local_time_write_accuracy=$local_time_accuracy_second
+                              AC_MSG_RESULT([1 second])
+                          ])
                   ])
 
 
@@ -456,26 +456,26 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                                      ]])
                  ],
                  [
-			AS_IF([ test "x$enable_limit_time_accuracy" = "xus" ],
-			      [
-			          local_time_read_accuracy=$local_time_accuracy_microsecond
-				  AC_MSG_RESULT([1 microsecond])
-			      ],
-			      [
-			         AS_IF([ test "x$enable_limit_time_accuracy" = "xs" ],
-				       [
-					    local_time_read_accuracy=$local_time_accuracy_second
-				            AC_MSG_RESULT([1 second])
-				       ],
-				       [
-				            local_time_read_accuracy=$local_time_accuracy_nanosecond
-					    AC_MSG_RESULT([1 nanosecond])
-				       ])
-			      ])
+                        AS_IF([ test "x$enable_limit_time_accuracy" = "xus" ],
+                              [
+                                  local_time_read_accuracy=$local_time_accuracy_microsecond
+                                  AC_MSG_RESULT([1 microsecond])
+                              ],
+                              [
+                                 AS_IF([ test "x$enable_limit_time_accuracy" = "xs" ],
+                                       [
+                                            local_time_read_accuracy=$local_time_accuracy_second
+                                            AC_MSG_RESULT([1 second])
+                                       ],
+                                       [
+                                            local_time_read_accuracy=$local_time_accuracy_nanosecond
+                                            AC_MSG_RESULT([1 nanosecond])
+                                       ])
+                              ])
                   ],
                   [
-		    local_time_read_accuracy=$local_time_accuracy_second
-		    AC_MSG_RESULT([1 second])
+                    local_time_read_accuracy=$local_time_accuracy_second
+                    AC_MSG_RESULT([1 second])
                   ])
 
 AC_DEFINE_UNQUOTED(LIBDAR_TIME_READ_ACCURACY, $local_time_read_accuracy, [timestamps read accuracy])
@@ -523,48 +523,81 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C"
 # DAR's features
 
 AC_ARG_ENABLE( [linux-statx],
-	       AC_HELP_STRING(--disable-linux-statx, [ignore linux's statx() system call and do not save birthtime of files under Linux because it is only possible to set and thus restore it under BSD systems like MACOS X, no under Linux today]),
-	       [explicit_linux_statx=yes],
-	       [enable_linux_statx=yes])
+               AC_HELP_STRING(--disable-linux-statx, [ignore linux's statx() system call and do not save birthtime of files under Linux because it is only possible to set and thus restore it under BSD systems like MACOS X, no under Linux today]),
+               [explicit_linux_statx=yes],
+               [enable_linux_statx=yes])
 
-AS_IF(	       [test "x$enable_linux_statx" != "xyes"],
-	       [
-		 AC_MSG_WARN([Linux statx() system call not used if present])
-		 local_statx="no"
-	       ],
-	       [
-	         AC_MSG_CHECKING([for linux's statx() availability])
-		 AC_RUN_IFELSE([AC_LANG_PROGRAM(
-		                 [[extern "C" {
-				     #if HAVE_SYS_TYPES_H
-				     #include <sys/types.h>
-				     #endif
-				     #if HAVE_SYS_STAT_H
-				     #include <sys/stat.h>
-				     #endif
-				     #if HAVE_UNISTD_H
-				     #include <unistd.h>
-				     #endif
-				     #if HAVE_FCNTL_H
-				     #include <fcntl.h>
-				     #endif
-			         }]],
-			         [
-			           struct statx val;
+AS_IF(         [test "x$enable_linux_statx" != "xyes"],
+               [
+                 AC_MSG_WARN([Linux statx() system call not used if present])
+                 local_statx="no"
+               ],
+               [
+                 AC_MSG_CHECKING([for linux's statx() availability])
+                 AC_RUN_IFELSE([AC_LANG_PROGRAM(
+                                 [[extern "C" {
+                                     #if HAVE_SYS_TYPES_H
+                                     #include <sys/types.h>
+                                     #endif
+                                     #if HAVE_SYS_STAT_H
+                                     #include <sys/stat.h>
+                                     #endif
+                                     #if HAVE_UNISTD_H
+                                     #include <unistd.h>
+                                     #endif
+                                     #if HAVE_FCNTL_H
+                                     #include <fcntl.h>
+                                     #endif
+                                 }]],
+                                 [
+                                   struct statx val;
 
-			           int ret = statx(0, "/", 0, STATX_BTIME, &val);
-				   if(ret != 0)
-				      return 1; /* will not use statx */
-				   else
-				      return 0; /* possible to go further with statx */
-			         ])
-	                      ],
-	                      [
-		                 AC_DEFINE(HAVE_STATX_SYSCALL, 1, [system provides statx() system call, will be used to get inode birthtime on Linux])
-		                 local_statx=yes
-	                      ],
-	                      [  local_statx=no ])
-	       ])
+                                   int ret = statx(0, "/", 0, STATX_BTIME, &val);
+                                   if(ret != 0)
+                                      return 1; /* will not use statx */
+                                   else
+                                      return 0; /* possible to go further with statx */
+                                 ])
+                              ],
+                              [
+                                 AC_DEFINE(HAVE_STATX_SYSCALL, 1, [system provides statx() system call, will be used to get inode birthtime on Linux])
+                                 local_statx=yes
+                              ],
+                              [  local_statx=no ],
+                              [
+
+                              # if cross compiling
+
+                                AC_LINK_IFELSE(
+                                [AC_LANG_PROGRAM(
+                                 [[extern "C" {
+                                     #if HAVE_SYS_TYPES_H
+                                     #include <sys/types.h>
+                                     #endif
+                                     #if HAVE_SYS_STAT_H
+                                     #include <sys/stat.h>
+                                     #endif
+                                     #if HAVE_UNISTD_H
+                                     #include <unistd.h>
+                                     #endif
+                                     #if HAVE_FCNTL_H
+                                     #include <fcntl.h>
+                                     #endif
+                                 }]],
+                                 [
+                                   struct statx val;
+
+                                   (void) statx(0, "/", 0, STATX_BTIME, &val);
+                                 ])
+                              ],
+                              [
+                                 AC_DEFINE(HAVE_STATX_SYSCALL, 1, [system provides statx() system call, will be used to get inode birthtime on Linux])
+                                 local_statx=yes
+                              ],
+                              [  local_statx=no ])
+                             ]
+                             )
+               ])
 
 
 AC_ARG_ENABLE( [libz-linking],
@@ -740,7 +773,7 @@ AC_ARG_ENABLE( [libzstd-linking],
              )
 
 AS_IF(       [test "x$enable_libzstd_linking" != "xyes"],
-	     [
+             [
                AC_MSG_WARN([libzstd compression support has been disabled by user])
                local_libzstd="no"
              ],
@@ -776,7 +809,31 @@ AS_IF(       [test "x$enable_libzstd_linking" != "xyes"],
                                               ]])
                               ],
                               [ AC_DEFINE(LIBZSTD_AVAILABLE, 1, [header and linking is available to have libzstd functions])],
-                              [ local_libzstd="no" ])
+                              [ local_libzstd="no" ],
+                              [
+                                 # if cross compiling
+
+                                 AC_LINK_IFELSE([AC_LANG_PROGRAM(
+                                                        [[ extern "C" {
+                                                           #if HAVE_ZSTD_H
+                                                           #include <zstd.h>
+                                                           #endif
+                                                           #if HAVE_STDLIB_H
+                                                           #include <stdlib.h>
+                                                           #endif
+                                                        }]],
+                                                        [[
+                                                        ZSTD_CStream *zs = ZSTD_createCStream();
+                                                        (void)ZSTD_versionNumber();
+                                                        (void)ZSTD_freeCStream(zs);
+                                                        return 0;
+                                                        ]])
+                                                ],
+                                                [ AC_DEFINE(LIBZSTD_AVAILABLE, 1, [header and linking is available to have libzstd functions])],
+                                                [ local_libzstd="no" ]
+                                        )
+                              ]
+                              )
                else
                  AC_MSG_WARN([libzstd compression support not available])
                fi
@@ -788,83 +845,119 @@ AS_IF(       [test "x$enable_libzstd_linking" != "xyes"],
      )
 
 AC_ARG_ENABLE( [liblz4-linking],
-	       AC_HELP_STRING(--disable-liblz4-linking, [disable linking with liblz4 and disable lz4 compression support]),
-	       [explicit_liblz4_linking=yes],
-	       [enable_liblz4_linking=yes]
-	     )
+               AC_HELP_STRING(--disable-liblz4-linking, [disable linking with liblz4 and disable lz4 compression support]),
+               [explicit_liblz4_linking=yes],
+               [enable_liblz4_linking=yes]
+             )
 
 
-AS_IF(	     [ test "x$enable_liblz4_linking" != "xyes" ],
+AS_IF(       [ test "x$enable_liblz4_linking" != "xyes" ],
              [
-	       AC_MSG_WARN([liblz4 compression support has been disabled by user])
-	       local_liblz4="no"
-	     ],
-	     [
-		AC_CHECK_LIB(lz4, [LZ4_decompress_safe], [], [AC_MSG_WARN([library liblz4 not found])])
-		AC_CHECK_HEADER(lz4.h, [
-				        local_liblz4="yes"
-				        AC_DEFINE(HAVE_LZ4_H, 1, [lz4.h header file is available])
-				       ],
-				       [
-				        AC_MSG_WARN([Cannot find lz4.h header file])
-				        local_liblz4="no"
-				       ])
+               AC_MSG_WARN([liblz4 compression support has been disabled by user])
+               local_liblz4="no"
+             ],
+             [
+                AC_CHECK_LIB(lz4, [LZ4_decompress_safe], [], [AC_MSG_WARN([library liblz4 not found])])
+                AC_CHECK_HEADER(lz4.h, [
+                                        local_liblz4="yes"
+                                        AC_DEFINE(HAVE_LZ4_H, 1, [lz4.h header file is available])
+                                       ],
+                                       [
+                                        AC_MSG_WARN([Cannot find lz4.h header file])
+                                        local_liblz4="no"
+                                       ])
 
-		if test "$local_liblz4" = "yes" ; then
-		   AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C"
-		                                     {
-						        #if HAVE_LZ4_H
-							#include <lz4.h>
-							#endif
-							#if HAVE_STRING_H
-							#include <string.h>
-							#endif
-							#if HAVE_STDLIB_H
-							#include <stdlib.h>
-							#endif
-							#if HAVE_STDIO_H
-							#include <stdio.h>
-							#endif
-						     }
-						  ]],
-						  [[
-							const char *src = "Quand on lui marche sur les pieds, le serpent hausse les epaules.";
-							unsigned int src_sz = strlen(src);
-							unsigned int zip_sz = LZ4_compressBound(src_sz);
-							char *zip = (char *)malloc(zip_sz);
-							char *unzip = (char *)malloc(src_sz + 1);
+                if test "$local_liblz4" = "yes" ; then
+                   AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C"
+                                                     {
+                                                        #if HAVE_LZ4_H
+                                                        #include <lz4.h>
+                                                        #endif
+                                                        #if HAVE_STRING_H
+                                                        #include <string.h>
+                                                        #endif
+                                                        #if HAVE_STDLIB_H
+                                                        #include <stdlib.h>
+                                                        #endif
+                                                        #if HAVE_STDIO_H
+                                                        #include <stdio.h>
+                                                        #endif
+                                                     }
+                                                  ]],
+                                                  [[
+                                                        const char *src = "Quand on lui marche sur les pieds, le serpent hausse les epaules.";
+                                                        unsigned int src_sz = strlen(src);
+                                                        unsigned int zip_sz = LZ4_compressBound(src_sz);
+                                                        char *zip = (char *)malloc(zip_sz);
+                                                        char *unzip = (char *)malloc(src_sz + 1);
 
-							if(zip == 0 || unzip == 0)
-							    return 1;  /* allocation problem */
+                                                        if(zip == 0 || unzip == 0)
+                                                            return 1;  /* allocation problem */
 
-							zip_sz = LZ4_compress_default(src, zip, src_sz, zip_sz);
+                                                        zip_sz = LZ4_compress_default(src, zip, src_sz, zip_sz);
 
-							if(zip_sz <= 0)
-						            return 1; /* compression problem */
+                                                        if(zip_sz <= 0)
+                                                            return 1; /* compression problem */
 
-							if(LZ4_decompress_safe(zip, unzip, zip_sz, src_sz) != src_sz)
-							    return 1; /* decompression problem */
+                                                        if(LZ4_decompress_safe(zip, unzip, zip_sz, src_sz) != src_sz)
+                                                            return 1; /* decompression problem */
 
-							unzip[src_sz] = '\0';
-							if(strncmp(src, unzip, src_sz) != 0)
-							    return 1; /* decompression result does not match the original data */
+                                                        unzip[src_sz] = '\0';
+                                                        if(strncmp(src, unzip, src_sz) != 0)
+                                                            return 1; /* decompression result does not match the original data */
 
-							free(zip);
-							free(unzip);
+                                                        free(zip);
+                                                        free(unzip);
 
-							return 0;
-						]])
-				],
-				[ AC_DEFINE(LIBLZ4_AVAILABLE, 1, [headar and linking is available to have liblz4 fonctions]) ],
-				[ local_liblz4="no" ])
+                                                        return 0;
+                                                ]])
+                                ],
+                                [ AC_DEFINE(LIBLZ4_AVAILABLE, 1, [headar and linking is available to have liblz4 fonctions]) ],
+                                [ local_liblz4="no" ],
+                                [
+                                    #if cross compiling
 
-		else
-		   AC_MSG_WARN([liblz4 compression support not available])
-		fi
+                                    AC_LINK_IFELSE([AC_LANG_PROGRAM(
+                                                        [[ extern "C"
+                                                        {
+                                                        #if HAVE_LZ4_H
+                                                        #include <lz4.h>
+                                                        #endif
+                                                        #if HAVE_STRING_H
+                                                        #include <string.h>
+                                                        #endif
+                                                        #if HAVE_STDLIB_H
+                                                        #include <stdlib.h>
+                                                        #endif
+                                                        #if HAVE_STDIO_H
+                                                        #include <stdio.h>
+                                                        #endif
+                                                        }
+                                                        ]],
+                                                        [[
+                                                        /* the following is not expected to be executed just compiled and linked */
+                                                        const char *src = "Quand on lui marche sur les pieds, le serpent hausse les epaules.";
+                                                        unsigned int src_sz = strlen(src);
+                                                        unsigned int zip_sz = LZ4_compressBound(src_sz);
+                                                        char *zip = (char *)malloc(zip_sz);
+                                                        char *unzip = (char *)malloc(src_sz + 1);
+                                                        zip_sz = LZ4_compress_default(src, zip, src_sz, zip_sz);
+                                                        (void)LZ4_decompress_safe(zip, unzip, zip_sz, src_sz);
+                                                        return 0;
+                                                        ]])
+                                                ],
+                                                [ AC_DEFINE(LIBLZ4_AVAILABLE, 1, [headar and linking is available to have liblz4 fonctions]) ],
+                                                [ local_liblz4="no" ])
+                                ]
+                        )
 
-		AS_IF( [ test "x$explicit_liblz4_linking" = "xyes" -a "$local_liblz4" != "yes" ],
-		       [ AC_MSG_ERROR([liblz4 linking failed]) ]
-		     )
+                else
+                   AC_MSG_WARN([liblz4 compression support not available])
+                fi
+
+                AS_IF( [ test "x$explicit_liblz4_linking" = "xyes" -a "$local_liblz4" != "yes" ],
+                       [ AC_MSG_ERROR([liblz4 linking failed]) ]
+                     )
              ]
      )
 
@@ -938,6 +1031,30 @@ AS_IF(      [test "x$enable_libgcrypt_linking" != "xyes"],
                                     AC_MSG_RESULT([failed: libgcrypt is unusable, cannot even call gcry_check_version(). Disabling strong encryption support])
                                   fi
                                   local_crypto="no"
+                                ],
+                                [
+                                  # if cross compiling
+
+                                   AC_LINK_IFELSE([AC_LANG_PROGRAM(
+                                                   [[ extern "C"
+                                                    {
+                                                       #if HAVE_GCRYPT_H
+                                                       #include <gcrypt.h>
+                                                       #endif
+                                                    }
+                                                    #include <iostream>
+                                                    using namespace std;
+                                                   ]],
+                                                   [[
+                                                     (void)gcry_check_version(MIN_VERSION_GCRYPT);
+                                                   ]])
+                                                  ],
+                                                  [ AC_DEFINE(CRYPTO_AVAILABLE, 1, [header and linking is available to have strong encryption works])
+                                                    AC_MSG_RESULT([ok])
+                                                    # libgcrypt_hash_bug="yes"
+                                                    # we assume with time version with that bug will vanish
+                                                  ],
+                                                  [])
                                 ])
              else
                 AC_MSG_WARN([strong encryption support not available])
@@ -1723,20 +1840,21 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
                                [ AC_MSG_WARN([Cannot find libthreadar.h header file]) ]
                               )
                AC_MSG_CHECKING([for libthreadar operationability])
-	       exp_maj_version_threadar=1
-	       min_med_version_threadar=3
-	       min_min_version_threadar=0
-	       AC_DEFINE_UNQUOTED(EXPECTED_MAJ_VERSION_THREADAR, "$exp_maj_version_threadar", [libthreadar expected major version])
-	       AC_DEFINE_UNQUOTED(MIN_MED_VERSION_THREADAR, "$min_med_version_threadar", [libthreadar minimal medium version])
-       	       AC_DEFINE_UNQUOTED(MIN_MIN_VERSION_THREADAR, "$min_min_version_threadar", [libthreadar minimal minor version])
-               AC_RUN_IFELSE([AC_LANG_PROGRAM( [[
+               exp_maj_version_threadar=1
+               min_med_version_threadar=3
+               min_min_version_threadar=0
+               AC_DEFINE_UNQUOTED(EXPECTED_MAJ_VERSION_THREADAR, "$exp_maj_version_threadar", [libthreadar expected major version])
+               AC_DEFINE_UNQUOTED(MIN_MED_VERSION_THREADAR, "$min_med_version_threadar", [libthreadar minimal medium version])
+               AC_DEFINE_UNQUOTED(MIN_MIN_VERSION_THREADAR, "$min_min_version_threadar", [libthreadar minimal minor version])
+               AC_RUN_IFELSE([AC_LANG_PROGRAM(
+                                   [[
                                     #if HAVE_LIBTHREADAR_LIBTHREADAR_HPP
                                     #include <libthreadar/libthreadar.hpp>
                                     #endif
                                     #include <iostream>
                                    ]],
                                    [[
-				        class mythread: public libthreadar::thread
+                                        class mythread: public libthreadar::thread
                                         {
                                         public:
                                             mythread(int x): myx(x) {};
@@ -1749,20 +1867,20 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
                                            int myx;
                                         };
 
-					unsigned int maj, med, min;
-					libthreadar::get_version(maj, med, min);
-					if(maj != atoi(EXPECTED_MAJ_VERSION_THREADAR)
-					  || med < atoi(MIN_MED_VERSION_THREADAR)
-					  || (med == atoi(MIN_MED_VERSION_THREADAR)
-					     && min < atoi(MIN_MIN_VERSION_THREADAR)))
-					{
-					     std::cout << "libthreadar version " << maj << "." << med << "." << min
-					               << " is too old, use at least version "
-					               << EXPECTED_MAJ_VERSION_THREADAR << "."
-						       << MIN_MED_VERSION_THREADAR << "."
-						       << MIN_MIN_VERSION_THREADAR << std::endl;
-					     return 1;
-					}
+                                        unsigned int maj, med, min;
+                                        libthreadar::get_version(maj, med, min);
+                                        if(maj != atoi(EXPECTED_MAJ_VERSION_THREADAR)
+                                          || med < atoi(MIN_MED_VERSION_THREADAR)
+                                          || (med == atoi(MIN_MED_VERSION_THREADAR)
+                                             && min < atoi(MIN_MIN_VERSION_THREADAR)))
+                                        {
+                                             std::cout << "libthreadar version " << maj << "." << med << "." << min
+                                                       << " is too old, use at least version "
+                                                       << EXPECTED_MAJ_VERSION_THREADAR << "."
+                                                       << MIN_MED_VERSION_THREADAR << "."
+                                                       << MIN_MIN_VERSION_THREADAR << std::endl;
+                                             return 1;
+                                        }
 
                                         mythread toto(10);
 
@@ -1771,7 +1889,7 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
                                         toto.getx();
                                         std::cout << "ok" << std::endl;
 
-					return 0;
+                                        return 0;
                                    ]])
                                ],
                                [
@@ -1782,6 +1900,49 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
                                [
                                  local_threadar=no
                                  AC_MSG_RESULT(wrong)
+                               ],
+                               [
+                                 # if cross compiling
+
+                                 AC_LINK_IFELSE(
+                                  [AC_LANG_PROGRAM(
+                                   [[
+                                    #if HAVE_LIBTHREADAR_LIBTHREADAR_HPP
+                                    #include <libthreadar/libthreadar.hpp>
+                                    #endif
+                                    #include <iostream>
+                                   ]],
+                                   [[
+                                        class mythread: public libthreadar::thread
+                                        {
+                                        public:
+                                            mythread(int x): myx(x) {};
+                                            int getx() const { return myx; };
+
+                                        protected:
+                                            virtual void inherited_run() { --myx; };
+
+                                        private:
+                                           int myx;
+                                        };
+
+                                        mythread toto(10);
+
+                                        toto.run();
+                                        toto.join();
+                                        toto.getx();
+                                        std::cout << "ok" << std::endl;
+                                   ]])
+                                 ],
+                                 [
+                                   local_threadar=yes
+                                   AC_DEFINE(LIBTHREADAR_AVAILABLE, 1, [when libthreadar could be found and linked against])
+                                   AC_MSG_RESULT(fine)
+                                 ],
+                                 [
+                                   local_threadar=no
+                                   AC_MSG_RESULT(wrong)
+                                 ])
                                ]
                              )
               CPPFLAGS="$CPPFLAGS__cache"
@@ -1798,61 +1959,102 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
 
 
 AC_ARG_ENABLE([libargon2-linking],
-	      AC_HELP_STRING(--disable-libargon2-linking, [avoid linking with libargon2 if available to prevent the argon2 hashing algorithm to be used]),
-	      [explicit_argon2=yes],
-	      [enable_argon2=yes])
+              AC_HELP_STRING(--disable-libargon2-linking, [avoid linking with libargon2 if available to prevent the argon2 hashing algorithm to be used]),
+              [explicit_argon2=yes],
+              [enable_argon2=yes])
 
 AS_IF(
-	      [ test "x$enable_argon2" != "xyes" ],
-	      [
-		AC_MSG_WARN([libargon2 support has been disabled by user])
-		local_argon2=no
-	      ],
-	      [
-		AC_CHECK_HEADER(argon2.h,
-				[ AC_DEFINE(HAVE_ARGON2_H, 1, [argon2.h header file availability]) ],
-				[ AC_MSG_WARN([Cannot find argon2.h header file]) ]
-			       )
-		AC_CHECK_LIB(argon2, [argon2id_hash_raw], [], [AC_MSG_WARN([library libargon2 not found])])
- 	        AC_MSG_CHECKING([for libargon2 usability])
-		AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C"
-						  {
-						       #if HAVE_ARGON2_H
-						       #include <argon2.h>
-						       #endif
-						       #if HAVE_STRING_H
-						       #include <string.h>
-						       #endif
-						   }
-					       ]],
-					       [[
-						    char pass[] = "mot de passe";
-						    char salt[] = "sel fin de cuisine";
-						    constexpr unsigned int hash_size = 40;
-						    char hash[hash_size];
+              [ test "x$enable_argon2" != "xyes" ],
+              [
+                AC_MSG_WARN([libargon2 support has been disabled by user])
+                local_argon2=no
+              ],
+              [
+                AC_CHECK_HEADER(argon2.h,
+                                [ AC_DEFINE(HAVE_ARGON2_H, 1, [argon2.h header file availability]) ],
+                                [ AC_MSG_WARN([Cannot find argon2.h header file]) ]
+                               )
+                AC_CHECK_LIB(argon2, [argon2id_hash_raw], [], [AC_MSG_WARN([library libargon2 not found])])
+                AC_MSG_CHECKING([for libargon2 usability])
+                AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C"
+                                                  {
+                                                       #if HAVE_ARGON2_H
+                                                       #include <argon2.h>
+                                                       #endif
+                                                       #if HAVE_STRING_H
+                                                       #include <string.h>
+                                                       #endif
+                                                   }
+                                               ]],
+                                               [[
+                                                    char pass[] = "mot de passe";
+                                                    char salt[] = "sel fin de cuisine";
+                                                    constexpr unsigned int hash_size = 40;
+                                                    char hash[hash_size];
 
-						    if(argon2id_hash_raw(2000,
-									 100,
-									 1,
-									 pass, strlen(pass),
-									 salt, strlen(salt),
-									 hash, hash_size) != ARGON2_OK)
-							return 1;
-						     else
-						        return 0;
-					        ]])
-				],
-				[
-				    local_argon2=yes
-				    AC_DEFINE(LIBARGON2_AVAILABLE, 1, [when libargon2 could be found and linked against])
-				    AC_MSG_RESULT(ok)
-				],
-				[
-				    local_argon2=no
-				    AC_MSG_RESULT([not usable! See config.log for details])
-				]
-			)
-		]
+                                                    if(argon2id_hash_raw(2000,
+                                                                         100,
+                                                                         1,
+                                                                         pass, strlen(pass),
+                                                                         salt, strlen(salt),
+                                                                         hash, hash_size) != ARGON2_OK)
+                                                        return 1;
+                                                     else
+                                                        return 0;
+                                                ]])
+                                ],
+                                [
+                                    local_argon2=yes
+                                    AC_DEFINE(LIBARGON2_AVAILABLE, 1, [when libargon2 could be found and linked against])
+                                    AC_MSG_RESULT(ok)
+                                ],
+                                [
+                                    local_argon2=no
+                                    AC_MSG_RESULT([not usable! See config.log for details])
+                                ],
+                                [
+                                   # if cross compiling
+
+                                     AC_LINK_IFELSE([AC_LANG_PROGRAM(
+                                                        [[ extern "C"
+                                                        {
+                                                        #if HAVE_ARGON2_H
+                                                        #include <argon2.h>
+                                                        #endif
+                                                        #if HAVE_STRING_H
+                                                        #include <string.h>
+                                                        #endif
+                                                        }
+                                                        ]],
+                                                        [[
+                                                        char pass[] = "mot de passe";
+                                                        char salt[] = "sel fin de cuisine";
+                                                        constexpr unsigned int hash_size = 40;
+                                                        char hash[hash_size];
+
+                                                        if(argon2id_hash_raw(2000,
+                                                                         100,
+                                                                         1,
+                                                                         pass, strlen(pass),
+                                                                         salt, strlen(salt),
+                                                                         hash, hash_size) != ARGON2_OK)
+                                                          return 1;
+                                                        else
+                                                          return 0;
+                                                        ]])
+                                                   ],
+                                                   [
+                                                     local_argon2=yes
+                                                     AC_DEFINE(LIBARGON2_AVAILABLE, 1, [when libargon2 could be found and linked against])
+                                                     AC_MSG_RESULT(ok)
+                                                   ],
+                                                   [
+                                                     local_argon2=no
+                                                     AC_MSG_RESULT([not usable! See config.log for details])
+                                                   ])
+                                ]
+                        )
+                ]
      )
 
 
@@ -2043,10 +2245,10 @@ AS_IF(         [ test "x$enable_python_binding" != "xyes" ],
                  local_python="no"
                ],
                [
-	         if test "x$enable_shared" != "xyes" -o "$debug_static" == "yes" ; then
-		   AC_MSG_WARN([Cannot build python binding without shared library support])
-		   local_python="no"
-		 else
+                 if test "x$enable_shared" != "xyes" -o "$debug_static" == "yes" ; then
+                   AC_MSG_WARN([Cannot build python binding without shared library support])
+                   local_python="no"
+                 else
                    AC_MSG_CHECKING([for python binding])
                    pyext="python3-config --extension-suffix"
                    if  $pyext 1> /dev/null 2> /dev/null ; then
