@@ -44,7 +44,7 @@
 
     <h3><a name"completness">Completness</a> of backup and restoration</h3>
     <h4>Dar</h4>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# ./build_test_tree.bash  SRC</b>
 	1024+0 records in
 	1024+0 records out
@@ -93,22 +93,22 @@
 	FSA restored for 1 inode(s)
 	--------------------------------------------
 	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
-    </code></div>
+    </code>
     <p>
       We simply performed backup of <code>SRC</code> directory with dar's default options, then
       restore this backup into the <code>DST</code> directory, let's now compare <code>SRC</code> and <code>DST</code> contents:
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/localdisk# du -s SRC DST</b>
 	2068    SRC
 	<e>1048</e>    DST
 	<b>root@terre:/mnt/localdisk#</b>
-    </code></div>
+    </code>
     <p>
       The space used by <code>DST</code> is less than the space used by <code>SRC</code>! At first
       we could beleive that not all data could be restored, let's looking for the explanation:
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/localdisk#ls -iRl SRC DST</b>
 	DST:
 	total 1044
@@ -156,7 +156,7 @@
 	total 0
 	414837 srw-rw-rw- 2 root root 0 Oct 12 23:00 log
 	<b>root@terre:/mnt/localdisk#</b>
-    </code></div>
+    </code>
     <p>
       All files are present in <code>DST</code> and use the expected space usage, as reported by the <code>ls</code> command.
       We can also see that the hard linked inode were properly restored for plain file, named pipe and unix socket: the
@@ -165,7 +165,7 @@
     <p>
       Maybe something is missing elsewhere?
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/localdisk# getfacl SRC/plain_zeroed DST/plain_zeroed</b>
 	# file: SRC/plain_zeroed
 	# owner: root
@@ -196,7 +196,7 @@
 	<e>s---i-d-------e----</e> SRC/plain_zeroed
 	<e>s---i-d-------e----</e> DST/plain_zeroed
 	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
-    </code></div>
+    </code>
     <p>
       To summarize:
     </p>
@@ -211,7 +211,7 @@
     <p>
       So what? Let's rerun <code>du</code> file by file:
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# du -B1 SRC/* DST/*</b>
 	8192    SRC/SUB
 	4096    SRC/dev
@@ -229,17 +229,17 @@
 	-rw-rwxr--+ 1 root root <e>1048576</e> Oct 21 18:40 DST/plain_zeroed
 	-rw-rwxr--+ 1 root root <e>1048576</e> Oct 21 18:40 SRC/plain_zeroed
 	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
-    </code></div>
+    </code>
     <p>
       OK here is the explanation: <code>plain_zeroed</code> file was using 1048576 bytes of disk space in SRC
       and consumes only 4096 bytes in DST, but it has its file size is still officially 1048576, it has thus become
       now a sparse file (not all zeroed bytes are stored).
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# diff -s SRC/plain_zeroed DST/plain_zeroed</b>
 	Files SRC/plain_zeroed and DST/plain_zeroed are <e>identical</e>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
-    </code></div>
+    </code>
 
     <p>
       But nothing changes from the user point of view, the restoration process with dar just optimized
@@ -261,7 +261,7 @@
       reason we will use the <code>stat</code> command instead to have all dates at the system time accuracy:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# stat SRC/random DST/random</b>
 	File: SRC/random
 	Size: 1048576         Blocks: 2048       IO Block: 4096   regular file
@@ -280,7 +280,7 @@
 	<e class=red>Change: 2020-10-22 12:14:34.877131738 +0200</e>
 	Birth: -
 	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
-    </code></div>
+    </code>
 
     <p>
       From the above output we see that:
@@ -300,7 +300,7 @@
       very flexible which we will leverage to mimic the Linux output:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>root@FreeBSD:~denis # which mystat</b>
 	mystat:          aliased to <e>stat -f "%N%nAccess: %Sa%nModify: %Sm%nChange: %Sc%nBirth: %SB%n" !*</e>
 	<b>root@FreeBSD:~denis # mystat SRC/random</b>
@@ -319,7 +319,7 @@
 	Change: Oct 27 13:31:50 2020
 	<e>Birth: Oct 22 15:34:07 2020</e>
 	<b>root@FreeBSD:~denis #</b>
-    </code></div>
+    </code>
 
     <p>
       In conclusion <i>dar</i> also saves and restores <code>btime</code> properly.
@@ -330,7 +330,7 @@
     <p>
       Let's do the same we did previously using <b>rsync</b>. We start by copying <code>SRC</code> directory to <code>DST</code>:
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# chattr -i DST/plain_zeroed</b>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# rm -rf DST</b>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# mkdir DST</b>
@@ -355,7 +355,7 @@
 	sent 12,340,852 bytes  received 198 bytes  24,682,100.00 bytes/sec
 	total size is 22,577,173  speedup is 1.83
 	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
-    </code></div>
+    </code>
     <p>
       First note, the backup and restoration is done in one step, where <i>dar</i> was decorelating the backup operation
       from the restoration operation. The resulting backup needs not software to be restored (<code>DST</code>
@@ -363,17 +363,17 @@
       implies two dar commands: <code> dar -c - -R SRC | dar -x - --sequential-read -R DST</code>. The situation is
       similar with <code>tar</code>, you need two commands to perform the same task: <code>tar -cf - | tar -xf -</code>
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# du -s SRC DST</b>
 	2056    SRC
 	<e>1028</e>    DST
 	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
-    </code></div>
+    </code>
     <p>
       Here too, the restored data uses less space than the original data, sparse file have been taken into
       account (need specifying -S option) and space optimization of non sparse file is performed.
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# ls -iRl SRC DST</b>
 	DST:
 	total 12060
@@ -421,7 +421,7 @@
 	total 0
 	414837 srw-rw-rw- 2 root root 0 Oct 12 23:00 log
 	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
-    </code></div>
+    </code>
     <p>
       All files are present in <code>DST</code> and use the expected space usage, as reported by the <code>ls</code>.
       We can also see that all three hard linked inode (plain file, socket and named pipe) are restored properly.
@@ -430,7 +430,7 @@
     <p>
       Let's now check file's metadata:
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# getfacl SRC/plain_zeroed DST/plain_zeroed</b>
 	# file: SRC/plain_zeroed
 	# owner: root
@@ -479,7 +479,7 @@
 	<e class=red>Change: 2020-10-28 12:07:53.622841733 +0100</e>
 	Birth: -
 	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
-    </code></div>
+    </code>
     <p>
       So in summary:
     </p>
@@ -503,7 +503,7 @@
       For <b>btime</b> as we did before, let's test under a FreeBSD system:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>root@FreeBSD:~denis # rm -rf DST</b>
 	<b>root@FreeBSD:/home/denis # which mystat</b>
 	mystat:          aliased to stat -f "%N%nAccess: %Sa%nModify: %Sm%nChange: %Sc%nBirth: %SB%n" !*
@@ -539,7 +539,7 @@
 	Change: Oct 27 14:28:53 2020
 	<e>Birth: Oct 22 15:34:07 2020</e>
 	<b>root@FreeBSD:/home/denis #</b>
-    </code></div>
+    </code>
     <p>
       So, birthtime is properly restored.
     </p>
@@ -553,7 +553,7 @@
       <i>tar</i> command-line becomes thus a bit longer:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# rm -rf DST</b>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# cd SRC</b>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools/SRC# tar --acl --xattrs -cSf ../backup.tar *</b>
@@ -565,25 +565,25 @@
 	<b>root@terre:/mnt/localdisk/Benchmark_tools/DST# tar --acl --xattrs -xSf ../backup.tar</b>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools/DST# cd ..</b>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
-    </code></div>
+    </code>
 
     <p>
      Now let's compare the restored data with the original:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# du -s SRC DST</b>
 	2068    SRC
 	<e>2068</e>    DST
 	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
-    </code></div>
+    </code>
 
     <p>
       The sparse file has been properly restored (thanks to the <code>-S option</code> for that) but not space optimization
       has been performed.
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# ls -iRl SRC DST</b>
 	DST:
 	total 12060
@@ -629,7 +629,7 @@
 	total 0
 	<e class=red>414837 srw-rw-rw- 2 root root 0 Oct 12 23:00 log</e>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
-    </code></div>
+    </code>
 
     <p>
       The warning was not vain, <code>SUB/hard_linked_socket</code> and <code>log</code> are missing in <code>DST</code>.
@@ -651,7 +651,7 @@
       Let's continue by checking the file's metadata:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# getfacl SRC/plain_zeroed DST/plain_zeroed</b>
 	# file: SRC/plain_zeroed
 	# owner: root
@@ -682,11 +682,11 @@
 	<e class=red>s---i-d-------e----</e> SRC/plain_zeroed
 	<e class=red>--------------e----</e> DST/plain_zeroed
 	<b>root@terre:/mnt/localdisk/Benchmark_tools#</b>
-    </code></div>
+    </code>
     <p>
       Note that without <code>--xattrs</code> at creation time the timestamp accuracy of <i>tar</i>
       is 1 second:
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/localdisk/Benchmark_tools# stat SRC/random DST/random</b>
 	File: SRC/random
 	Size: 1048576         Blocks: 2048       IO Block: 4096   regular file
@@ -705,7 +705,7 @@
 	<e class=red>Change: 2020-10-27 19:08:14.932424226 +0100</e>
 	Birth: -
 	root@terre:/mnt/localdisk/Benchmark_tools#
-    </code></div>
+    </code>
 
     <p>
       From the above output we see that:
@@ -732,7 +732,7 @@
       For the last date, <b>birthtime</b> again we will perform the test under FreeBSD:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>root@FreeBSD:~denis # which mystat</b>
 	mystat:          aliased to stat -f "%N%nAccess: %Sa%nModify: %Sm%nChange: %Sc%nBirth: %SB%n" !*
 	<b>root@FreeBSD:~denis # mystat SRC/random</b>
@@ -755,7 +755,7 @@
 	Change: Oct 28 15:43:30 2020
 	<e>Birth: Oct 22 15:34:07 2020</e>
 	<b>root@FreeBSD:~denis #</b>
-    </code></div>
+    </code>
 
     <p>
       <i>gtar</i> saved and restored the birthtime
@@ -779,7 +779,7 @@
 
     <h5>Dar</h5>
 
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# rm -rf SRC</b>
 	<b>root@terre:/mnt/memdisk# ./historization_feature SRC phase1</b>
 	<b>root@terre:/mnt/memdisk# dar -c full -g SRC -q</b>
@@ -807,7 +807,7 @@
 	-rw-r--r-- 1 root root 24 Nov  6 18:37 <e>B.txt</e>
 	-rw-r--r-- 1 root root 21 Nov  6 18:38 <e>C.txt</e>
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       Historization is present, we can get back from backup both saved states
     </p>
@@ -815,7 +815,7 @@
       In complement <i>dar</i> proposes a manager <i>dar_manager</i> to easily locate file's status between the archives
       the database has been feeded with, as well as the file's data present in each archive:
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# dar_manager -C base.dmd</b>
 	<b>root@terre:/mnt/memdisk# dar_manager -B base.dmd -A full</b>
 	<b>root@terre:/mnt/memdisk# dar_manager -B base.dmd -A diff</b>
@@ -845,13 +845,13 @@
 	[ Saved ][       ]  SRC
 	[ Saved ][       ]  SRC/C.txt
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       <i>dar_manager</i> can even take for you the actions to invoke <i>dar</i> as many time as necessary
       get the file's status of a given date for a given set of subset of the saved files:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# dar_manager -v -B base.dmd -e "-R DST -w" -r SRC</b>
 	Decompressing and loading database to memory...
 	Looking in archives for requested files, classifying files archive by archive...
@@ -910,10 +910,10 @@
 	-rw-r--r-- 1 root root 24 Nov  6 18:37 <e>B.txt</e>
 	-rw-r--r-- 1 root root 21 Nov  6 18:38 <e>C.txt</e>
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <h5>Rsync</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# ./historization_feature SRC phase1</b>
 	<b>root@terre:/mnt/memdisk# rsync -arvHAX SRC DST</b>
 	sending incremental file list
@@ -956,7 +956,7 @@
 	<e>-rw-r--r-- 1 root root 24 Nov  6 17:05 B.txt</e>
 	<e>-rw-r--r-- 1 root root 21 Nov  6 17:06 C.txt</e>
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       the "backup" contains all three files, <i>A.txt</i>, <i>B.txt</i>
@@ -977,7 +977,7 @@
     </p>
 
     <h5>Tar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# rmdir SRC</b>
 	<b>root@terre:/mnt/memdisk# ./historization_feature SRC phase1</b>
 	<b>root@terre:/mnt/memdisk# tar --listed-incremental=snapshot.file -cf full.tar SRC</b>
@@ -996,7 +996,7 @@
 	<e>-rw-r--r-- 1 root root 24 Nov  6 18:20 B.txt</e>
 	<e>-rw-r--r-- 1 root root 21 Nov  6 18:21 C.txt</e>
 	<b>root@terre:/mnt/memdisk/DST#</b>
-    </code></div>
+    </code>
 
     <p>
       We could restore from backup both the phase1 and phase2 status, historization is available with tar.
@@ -1009,30 +1009,30 @@
     <p>
       We want to save <code>/lib</code> except the content of <code>/lib/modules</code>:
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# dar -c backup -R /lib -P modules -vs -q</b>
 	<e>Skipping file: /lib/modules</e>
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       What if we want to exclude all of to exclude <code>/lib/module</code> except
       <code>/lib/module/4.19.0-12-amd64</code>?
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# rm backup.1.dar</b>
 	rm: remove regular file 'backup.1.dar'? y
 	<b>root@terre:/mnt/memdisk# dar -c backup -R /lib -am -P modules -g modules/4.19.0-12-amd64 -vs -q</b>
 	<e>Skipping file: /lib/modules/4.19.0-11-amd64</e>
 	<e>Skipping file: /lib/modules/4.19.0-10-amd64</e>
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       OK, we can mix included directories and excluded directories
     </p>
 
     <h5>Rsync</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# rm -rf DST</b>
 	<b>root@terre:/mnt/memdisk# mkdir DST</b>
 	<b>root@terre:/mnt/memdisk# rsync -arHAXS --exclude /lib/modules /lib DST</b>
@@ -1042,12 +1042,12 @@
 	<b>root@terre:/mnt/memdisk# ls -l DST/lib/modules</b>
 	ls: cannot access <e>'DST/lib/modules': No such file or directory</e>
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       We could exclude <code>/lib/modules</code> as expected. As previously, let's exclude it
       except <code>/lib/modules/4.19.0-12-amd64</code>:
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# rm -rf DST</b>
 	<b>root@terre:/mnt/memdisk# rsync -arHAXS -f "+ /lib/modules" -f "- /lib/modules/4.19.0-12-amd64"  /lib DST</b>
 	<b>root@terre:/mnt/memdisk# la DST/lib/modules/</b>
@@ -1057,7 +1057,7 @@
 	<e>drwxr-xr-x  3 root root 280 Aug  8 12:58 4.19.0-10-amd64</e>
 	<e>drwxr-xr-x  3 root root 280 Oct 12 11:25 4.19.0-11-amd64</e>
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       OK, we can mix included directories and excluded directories
     </p>
@@ -1066,16 +1066,16 @@
     <p>
       Let's save /lib and excluding /lib/module again:
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# tar --exclude /lib/modules -cf backup.tar /lib</b>
 	tar: Removing leading `/' from member names
 	<b>root@terre:/mnt/memdisk# tar -tf backup.tar | grep modules</b>
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       Now let's exclude <code>/lib/modules</code> except <code>/lib/modules/4.19.0-12-amd64</code>:
     <p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# tar -cf backup.tar /lib/modules/4.19.0-12-amd64/ --exclude /lib/modules /lib</b>
 	tar: Removing leading `/' from member names
 	tar: Removing leading `/' from hard link targets
@@ -1088,7 +1088,7 @@
 	<b>root@terre:/mnt/memdisk# tar -tf backup.tar | grep "lib/modules" | wc -l</b>
 	4391
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       The backup contains a total of 6017 entries, 1626 are out of the <code>lib/modules/4.19.0-12-amd64</code>
       directory, the rest is all in that previous directory, nothing else is found in <code>lib/modules</code>
@@ -1099,7 +1099,7 @@
     <h4>Data filtering by filename</h4>
 
     <h5>Dar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# dar -c backup -R /lib -X "*.ko"</b>
 
 
@@ -1139,13 +1139,13 @@
 	--------------------------------------------
 	<b>root@terre:/mnt/memdisk# find DST -name "*.ko" -ls</b>
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       we would exclude all file having the <code>ko</code> extension, what if we do not
       want to exclude those that start with <code>ext</code>?
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# dar -c backup -R /lib -am -X "*.ko" -I "ext*"</b>
 
 
@@ -1176,24 +1176,24 @@
 	DST/modules/4.19.0-12-amd64/kernel/fs/ext4/ext4.ko
 	DST/modules/4.19.0-12-amd64/kernel/drivers/extcon/extcon-core.ko
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       OK, we got what we wanted
     </p>
 
     <h5>Rsync</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# rm -rf DST</b>
 	<b>root@terre:/mnt/memdisk# rsync -arHAXS -f "- *.ko"  /lib DST</b>
 	<b>root@terre:/mnt/memdisk# find DST -name "*.ko" -print</b>
 	<b>root@terre:/mnt/memdisk# ls DST</b>
 	lib
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       Same as previously, we don't want to exclude <code>ko</code> files starting by <code>ext</code>:
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# rm -rf DST</b>
 	<b>root@terre:/mnt/memdisk# rsync -arHAXS -f "+ ext*" -f "- *.ko" /lib DST</b>
 	<b>root@terre:/mnt/memdisk# find DST -name "*.ko" -print</b>
@@ -1204,14 +1204,14 @@
 	DST/lib/modules/4.19.0-10-amd64/kernel/fs/ext4/ext4.ko
 	DST/lib/modules/4.19.0-10-amd64/kernel/drivers/extcon/extcon-core.ko
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       OK, we got what we wanted
     </p>
 
     <h5>Tar</h5>
     <p>Same as previously, let's filter out kernel object files</p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# tar -cf backup.tar --exclude "*.ko" /lib</b>
 	tar: Removing leading `/' from member names
 	<b>root@terre:/mnt/memdisk# rm -rf DST</b>
@@ -1220,16 +1220,16 @@
 	<b>root@terre:/mnt/memdisk/DST# tar -xf ../backup.tar</b>
 	<b>root@terre:/mnt/memdisk/DST# find . -name "*.ko" -print</b>
 	<b>root@terre:/mnt/memdisk/DST#</b>
-    </code></div>
+    </code>
     <p>Now, we want to keep only those kernel object files starting with <code>ext</code></p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# tar -cf backup.tar "ext*" --exclude "*.ko" /lib</b>
 	tar: ext*: Cannot stat: No such file or directory
 	tar: Removing leading `/' from member names
 	tar: Removing leading `/' from hard link targets
 	tar: Exiting with failure status due to previous errors
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       Well, argument passed out of option do not seem expanded by tar thus using mask is not
       possible to include some pattern. It seems the only option is to use file listing, thing
@@ -1243,7 +1243,7 @@
       is first to save every thing except a few given filesystems, or only one or save inside a few
       given filesystems. Here is the preparation phase:
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# mkdir SRC</b>
 	<b>root@terre:/mnt/memdisk# mkdir SRC/D1 SRC/D2 SRC/D3</b>
 	<b>root@terre:/mnt/memdisk# mount -t tmpfs tmpfs SRC/D1</b>
@@ -1263,10 +1263,10 @@
 	<b>root@terre:/mnt/memdisk# echo "give me your data, I'll tell your needs and what to buy" > SRC/gafam.com</b>
 	<b>root@terre:/mnt/memdisk# echo "sight" > SRC/D3/democracy.org</b>
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <h5>Dar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# dar -c backup -R SRC -MX:/mnt/memdisk/SRC/D1 -vs -vt -q</b>
 	Adding folder to archive: /mnt/memdisk/SRC/D3
 	Adding file to archive: /mnt/memdisk/SRC/D3/democracy.org
@@ -1274,12 +1274,12 @@
 	Skipping file: /mnt/memdisk/SRC/D2
 	Skipping file: /mnt/memdisk/SRC/D1
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       We could exclude a filesystem, and its second appearance in D2 was also excluded,
       whithout having to mention it. Let's include only <code>D1</code> now:
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# rm -f backup.1.dar</b>
 	<b>root@terre:/mnt/memdisk# dar -c backup -R SRC -MI:/mnt/memdisk/SRC/D1 -vs -vt -q</b>
 	Skipping file: /mnt/memdisk/SRC/D3
@@ -1289,13 +1289,13 @@
 	Adding folder to archive: /mnt/memdisk/SRC/D1
 	Adding file to archive: /mnt/memdisk/SRC/D1/file.txt
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       OK, we got what we wanted
     </p>
 
     <h5>Rsync</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# rsync -arvHAXS --one-file-system SRC DST</b>
 	sending incremental file list
 	created directory DST
@@ -1308,7 +1308,7 @@
 	sent 283 bytes  received 77 bytes  720.00 bytes/sec
 	total size is 56  speedup is 0.16
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       <i>rsync</i> has ony one option about filesystems, it sticks recursion to the filesystem
@@ -1317,7 +1317,7 @@
     </p>
 
     <h5>Tar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# tar -cvf backup.tar --one-file-system SRC</b>
 	SRC/
 	SRC/D3/
@@ -1328,7 +1328,7 @@
 	SRC/D1/
 	tar: SRC/D1/: file is on a different filesystem; not dumped
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       <i>tar</i> does not behaves better than rsync on that topic
     </p>
@@ -1341,7 +1341,7 @@
     </p>
 
     <h5>Dar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/var/tmp# mkdir SRC</b>
 	<b>root@terre:/var/tmp# echo "Hello" > file1.txt</b>
 	<b>root@terre:/var/tmp# echo "World" > file2.txt</b>
@@ -1356,7 +1356,7 @@
 	<e class=blue>Adding file to archive: /var/tmp/SRC/file1.txt</e>
 	Saving Filesystem Specific Attributes for /var/tmp/SRC/file1.txt
 	<b>root@terre:/var/tmp#</b>
-    </code></div>
+    </code>
     <p>
       We have two mechanisms, one based on the <i>dump</i> flag and an arbitrary extended attribute.
       However <i>dar</i> only supports exclusion of file, not inclusion for backup based on a tag.
@@ -1379,7 +1379,7 @@
       or excluded from the performed backup. Here is the listing preparation:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# find /lib -name "*.ko" -o -print  > include.txt</b>
 	<b>root@terre:/mnt/memdisk# wc -l include.txt</b>
 	4123 include.txt
@@ -1387,10 +1387,10 @@
 	<b>root@terre:/mnt/memdisk# wc -l exclude.txt</b>
 	10677 exclude.txt
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <h5>Dar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# dar -c backup -R /lib -[ include.txt</b>
 
 	--------------------------------------------
@@ -1410,11 +1410,11 @@
 	FSA saved for 3945 inode(s)
 	--------------------------------------------
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       file inclusion is available, let's see file exclusion:
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# dar -c backup -R /lib -] exclude.txt</b>
 
 
@@ -1435,22 +1435,22 @@
 	FSA saved for 3945 inode(s)
 	--------------------------------------------
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <h5>Rsync</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# rsync -aHAXS --files-from=include.txt / DST</b>
 	<b>root@terre:/mnt/memdisk# find DST -print | wc -l</b>
 	4124
 	<b>root@terre:/mnt/memdisk# find DST -name "*.ko" -print</b>
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       file inclusion is available. However if we can exclude a list of pattern
       defined in a file, we cannot exclude a list of files. We should prepend each
       entry by "- " seen the filtering syntax of rsync:
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# sed -r 's/^/- /' exclude.txt  > rsync-exclude.txt</b>
 	<b>root@terre:/mnt/memdisk# rm -rf DST</b>
 	<b>root@terre:/mnt/memdisk# rsync -aHAXS --exclude-from=rsync-exclude.txt /lib DST</b>
@@ -1459,13 +1459,13 @@
 	<b>root@terre:/mnt/memdisk# find DST -name "*.ko" -print | wc -l</b>
 	0
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       So we are good with this <i>sed</i> additional listing adaptation.
     </p>
 
     <h5>Tar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# tar -cvf backup.tar --files-from=include.txt | wc -l</b>
 	tar: Removing leading `/' from member names
 	98017
@@ -1478,7 +1478,7 @@
 	/lib/modules/4.19.0-11-amd64/kernel/sound/pci/korg1212
 	/lib/modules/4.19.0-10-amd64/kernel/sound/pci/korg1212
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       the include.txt file does not contain any file with the ko extension, however <i>tar</i>
       saved all of them. Reading back the man page concerning this --files-from option
@@ -1488,7 +1488,7 @@
       directories only their content (which will restrict us saving empty directories as such).
       Let's modify the include.txt file that way:
     </p>
-    <div class=code><code>
+    <code class=block>
 	find /lib -type d -o -name "*.ko" -o -print  > tar-include.txt
 	<b>root@terre:/mnt/memdisk# tar -cvf backup.tar --files-from=tar-include.txt | wc -l</b>
 	tar: Removing leading `/' from member names
@@ -1498,13 +1498,13 @@
 	1532 tar-include.txt
 	<b>root@terre:/mnt/memdisk# wc -l include.txt</b>
 	4123 include.txt
-    </code></div>
+    </code>
     <p>
       the difference between the 1532 entries saved by <i>tar</i> and the
       4123 saved by <i>rsync</i> or <i>dar</i> comes from the many empty directories
       that cannot be saved as such by <i>tar</i> using this method.
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# tar -cvf backup.tar --exclude-from=exclude.txt /lib | wc -l</b>
 	tar: Removing leading `/' from member names
 	4123
@@ -1512,7 +1512,7 @@
 	10677 exclude.txt
 	<b>root@terre:/mnt/memdisk# tar -tf backup.tar | egrep "\.ko$"</b>
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       The file listing exclusion works as expected
     </p>
@@ -1526,7 +1526,7 @@
       media storage...).
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# ls -lh --sort=size /usr/bin | tac | tail</b>
 	-rwxr-xr-x 1 root   root       8.0M Dec 18  2018 luajittex
 	-rwxr-xr-x 1 root   root       8.1M Dec 18  2018 luatex53
@@ -1543,7 +1543,7 @@
 
     <h5>Dar</h5>
 
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# dar -c backup -R /usr/bin -z6 <e>-s 20M</e> -q</b>
 	<b>terre:/mnt/memdisk# ls -lh backup.*</b>
 	-rw-r--r-- 1 root root  <e>20M</e> Nov 13 11:30 backup.1.dar
@@ -1581,7 +1581,7 @@
 	memdiskerre:/mnt/memdisk# echo $?
 	0
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       We can also specify a different size for the first slice when using <i>dar</i>, this was used in the past
@@ -1589,7 +1589,7 @@
       and DVD-RW, but that may still make sense when using USB keys or any other removable media.
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# dar -c backup -R /usr/bin <e class=blue>-s 20M</e> <e>-S 1M</e> -q --min-digit 3</b>
 	<b>root@terre:/mnt/memdisk# ls -lh</b>
 	total 361M
@@ -1626,7 +1626,7 @@
 	-rw-r--r-- 1 root root  20M Nov  6 18:59 backup.009.dar
 	-rw-r--r-- 1 root root 913K Nov  6 18:59 backup.010.dar
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <h5>Rsync</h5>
     <p>
@@ -1636,19 +1636,19 @@
 
     <h5>Tar</h5>
 
-    <div class=code><code>
+    <code class=block>
     	<b>root@terre:/mnt/memdisk# tar -czf backup.tar -M -L 20480 /usr/bin</b>
 	<e class=red>tar: Cannot use multi-volume compressed archives</e>
 	Try 'tar --help' or 'tar --usage' for more information.
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       As reported by <i>tar</i> above, if a multi-volume support exists, it is quite restrictive as
       one cannot use compression at the same time.
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# tar -cf backup -M -L 20480 /usr/bin</b>
 	tar: Removing leading `/' from member names
 	<e class=red>Prepare volume #2 for 'backup' and hit return:</e>
@@ -1676,7 +1676,7 @@
 	<b>terre:/mnt/memdisk# ls -l backup*</b>
 	-rw-r--r-- 1 root root 19527680 Nov 13 11:40 backup
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       But even without compression, <i>tar</i> is still restrictive: it does not produce
@@ -1693,7 +1693,7 @@
       to write to mutli-volume and compressed backup to tape and pause
       between each volume as <i>tar</i> does:
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# <e>dar</e> -c backup -R /usr/bin -z6 -s 20M <e class=green>-E "echo writing volume %N to tape"</e> <e>-E "cat < %p/%b.%N.%e > /dev/mt"</e> <e class=blue>-p</e></b>
 	class=green>writing volume 1 to tape
 	Finished writing to file 1, ready to continue ?  [return = YES | Esc = NO]
@@ -1736,7 +1736,7 @@
 	FSA saved for 2152 inode(s)
 	--------------------------------------------
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <h4>Symmetric encryption</h4>
 
@@ -1752,7 +1752,7 @@
     </p>
 
     <h5>Dar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# dar -c backup -R / -g usr/bin -K aes256: -q -z6</b>
 	Archive backup <e>requires a password:</e>
 	Please <e>confirm your password:</e>
@@ -1848,14 +1848,14 @@
 
 	<b>root@terre:/mnt/memdisk#</b>
 
-    </code></div>
+    </code>
     <p>
       We can provide password either on command-line (not recommended), prompted by dar once launched
       or from a protected configuration file. In the following we add slicing to encryption to see
       whether or not <i>dar</i> deciphers the whole backup to recover a single file:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/localdisk# rm -rf backup.*</b>
 	<b>root@terre:/mnt/localdisk# dar -c backup -R / -g usr/bin -K aes256: -s 1M -q -z6</b>
 	Archive backup requires a password:
@@ -1873,7 +1873,7 @@
 	<e>openning slice backup.83.dar</e>
 	<e>openning slice backup.84.dar</e>
 	<b>root@terre:/mnt/localdisk#</b>
-    </code></div>
+    </code>
     <p>
       As seen above, dar does not need to uncipher nor uncompress the whole backup to recover a single file, the use
       of slicing let us see which slice it accessed to, but the behavior is the same without
@@ -1892,7 +1892,7 @@
       There is no native support for ciphering with <i>tar</i>. You can however pipe <i>tar</i>'s output
       to openssl to cipher the generated backup on fly as a whole.
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk#  tar -czf - /usr/bin | openssl enc -e -aes256 -out backup.tar.gz.crypted</b>
 	tar: Removing leading `/' from member names
 	enter aes-256-cbc encryption password:
@@ -1913,7 +1913,7 @@
 	<e>*** WARNING : deprecated key derivation used.</e>
 	<e>Using -iter or -pbkdf2 would be better.</e>
 	<b>root@terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       with openssl, <i>tar</i> has both the ability to provide the password/passphrase from an interactive prompt and from a protected file.
       However you will have to remember which algorithm you used in adition to the passphrase. The ciphering being done
@@ -1938,7 +1938,7 @@
       corresponding use cases (data exchange over Internet for example).
     </p>
     <h5>Dar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# dar -c backup -K gnupg::root@terre.systeme-solaire.espace -R SRC -z6 -q</b>
 	<b>terre:/mnt/memdisk# dar -l backup -q</b>
 	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
@@ -1980,7 +1980,7 @@
 	<b>terre:/mnt/memdisk# ls -l backup.1.dar</b>
 	-rw-r--r-- 1 root root 158261425 Nov  9 16:04 backup.1.dar
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       As displayed in the backup header output above the underlying encryption is a symmetric encryption
@@ -1996,7 +1996,7 @@
       (root@terre.systeme-solaire.espace). Let's cipher for another recipient:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# dar -c backup -K <e class=blue>gnupg::dar.linux@free.fr</e> -R SRC -z6 -q -w</b>
 	<b>terre:/mnt/memdisk# ls -l backup.1.dar</b>
 	-rw-r--r-- 1 root root <e>158230913</e> Nov  9 16:22 backup.1.dar
@@ -2041,7 +2041,7 @@
 	0 file(s) have been record as destroyed since backup of reference
 
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       Here we saw that ciphering for a recipient different than ourself does not allow us to read the resulting backup,
       however we can define several recipients and if we add ourself, we can read the backup as well as our primary
@@ -2057,7 +2057,7 @@
       <i>Tar</i> cannot hold asymmetrical encryption alone, as for symmetrical encryption we must use an external tool
       that performes the ciphering operation outside the backup.
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# tar -czf - SRC | gpg --encrypt --recipient <e class=blue>root@terre.systeme-solaire.espace</e> --output backup.tar.gz.gpg</b>
 	<b>terre:/mnt/memdisk# ls -l backup.tar.gz.gpg</b>
 	-rw-r--r-- 1 root root <e>155337814</e> Nov  9 16:45 backup.tar.gz.gpg
@@ -2083,7 +2083,7 @@
 	gpg: encrypted with 3072-bit RSA key, ID 97E13D38B007DF30, created 2020-08-08
 	"root@terre &lt;root@terre.systeme-solaire.espace&gt;"
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       Same as for symmetric encryption, the fact that the whole backup is ciphered at once implies to download
@@ -2096,7 +2096,7 @@
 
     <h5>Dar</h5>
 
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# time dar -c backup -K "aes256:hello world!" -at -1 0 -R SRC -q -w</b>
 	9.782u 3.413s <e>0:06.28</e> 210.0%    0+0k 0+0io 0pf+0w
 	<b>devuan:/mnt/memdisk# la backup.1.dar</b>
@@ -2106,7 +2106,7 @@
 	<b>devuan:/mnt/memdisk# la backup.1.dar</b>
 	-rw-r--r-- 1 root root 1572<e>655217</e> Nov  9 14:50 backup.1.dar
 	<b>devuan:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       When ciphering the same data several times (with symmetric or asymmetric encryption),
@@ -2125,7 +2125,7 @@
     </p>
 
     <h5>Tar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk/SRC# time ../tar.backup ../backup.tar.crypted usr</b>
       4.112u 2.343s 0:04.72 136.6%    0+0k 0+0io 0pf+0w
 	<b>devuan:/mnt/memdisk/SRC# ls -l ../bac</b>
@@ -2137,7 +2137,7 @@
 	<b>devuan:/mnt/memdisk/SRC# ls -l ../backup.tar.crypted</b>
       -rw-r--r-- 1 root root <e>1603594272</e> Nov  9 14:56 ../backup.tar.crypted
 	<b>devuan:/mnt/memdisk/SRC#</b>
-    </code></div>
+    </code>
     <p>
       <i>tar</i> by itself does not provide any ciphering mechanism, however you can
       cipher the <i>tar</i> generated backups with external tool (for example <i>openssl</i>
@@ -2157,7 +2157,7 @@
       the execution time variation added by the iteration count (taking into account that the data to cipher also
       changes depending on the amount of random garbage <i>dar</i> wraps it with):
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# time dar -c backup -R SRC -K aes:hello --kdf-param <e>100k</e>:<e class=blue>sha1</e> -w -q</b>
 	4.904u 0.572s <e>0:05.49</e> 99.6%     0+0k 0+0io 0pf+0w
 	<b>terre:/mnt/memdisk# time dar -c backup -R SRC -K aes:hello --kdf-param <e>500k</e>:sha1 -w -q</b>
@@ -2175,7 +2175,7 @@
 	<b>terre:/mnt/memdisk# time dar -c backup -R SRC -K aes:hello --kdf-param <e>1M:</e>argon2 -w -q</b>
 	66.862u 0.666s <e>1:05.14</e> 103.6%   0+0k 0+0io 0pf+0w
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <h5>Rsync</h5>
 
@@ -2204,7 +2204,7 @@
       apply this script:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# mkdir SRC</b>
 	<b>terre:/mnt/memdisk# dd if=/dev/zero of=SRC/hello_world bs=10240 count=1024</b>
 	1024+0 records in
@@ -2236,11 +2236,11 @@
 	total 10240
 	-rw-r--r-- 1 root root 10485760 Nov 10 16:34 hello_world
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <h5>Dar</h5>
 
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# dar -c backup -R SRC -q</b>
 	<e>WARNING! File modified while reading it for backup, but no more retry allowed: /mnt/memdisk/SRC/hello_world</e>
 	<b>terre:/mnt/memdisk# dar -l backup</b>
@@ -2268,7 +2268,7 @@
 	FSA restored for 0 inode(s)
 	--------------------------------------------
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       <ul>
@@ -2288,16 +2288,16 @@
     </p>
 
     <h5>Rsync</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# rsync -arvHAXqz --delete SRC DST</b>
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
      <i>rsync</i> does not shows anything nor behaves differently (no retry, no change notification).
     </p>
 
     <h5>Tar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# tar -cf backup.tar SRC</b>
 	<e>tar: SRC/hello_world: file changed as we read it</e>
 	<b>terre:/mnt/memdisk# tar -tvf backup.tar</b>
@@ -2311,7 +2311,7 @@
 	total 10240
 	-rw-r--r-- 1 root root 10485760 Nov 10 16:41 hello_world
 	<b>terre:/mnt/memdisk/DST#</b>
-    </code></div>
+    </code>
 
     <p>
       <ul>
@@ -2340,7 +2340,7 @@
 
     <h5>Dar</h5>
 
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# du -B1 -s SRC</b>
 	<e>1121144832</e>      SRC
 	<b>devuan:/mnt/memdisk# dar -c full -R SRC -z6 -q</b>
@@ -2357,14 +2357,14 @@
 	<b>devuan:/mnt/memdisk# diff -r SRC DST && echo "same data" || echo "different data"</b>
 	same data
 	<b>devuan:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       We can see that the restoration of the full and differential backup over it
       lead to the exact same directory tree as the source saved files.
     </p>
 
     <h5>Rsync</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# mkdir DST</b>
 	<b>devuan:/mnt/memdisk# rsync -arHAXz --delete --info=stats SRC/* BACKUP</b>
 
@@ -2383,7 +2383,7 @@
 	<e class=blue>sent 214,371,610 bytes  received 1,359,603 bytes  9,180,051.62 bytes/sec</e>
 	total size is 954,869,250  speedup is 4.43
 	<b>devuan:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       We see that after the modification the amount of data pushed to the backup by <i>rsync</i>
       passes from 214 MiB to only 12 MiB we can consider this as a differential backup, thus this
@@ -2393,7 +2393,7 @@
 
     <h5>Tar</h5>
 
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# tar --listed-incremental=snapshot.file -czf full.tar.gz SRC</b>
 	<b>devuan:/mnt/memdisk# cd SRC/linux-5.9.2/</b>
 	<b>devuan:/mnt/memdisk/SRC/linux-5.9.2# mv Documentation/ doc</b>
@@ -2413,7 +2413,7 @@
 	<b>devuan:/mnt/memdisk# diff -r SRC DST/SRC && echo "same data" || echo "different data"</b>
 	same data
 	<b>devuan:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       Here too, we got the exact same directory as original and modified data
@@ -2433,7 +2433,7 @@
 
     <h5>Dar</h5>
 
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# dar -c full -z6 -R SRC --delta sig -q</b>
 	<b>devuan:/mnt/memdisk# ./bitflip 100000 SRC/debian-10.6.0-amd64-DVD-2.iso</b>
 	<b>devuan:/mnt/memdisk# dar -c diff -A full -z6 -R SRC -q</b>
@@ -2446,7 +2446,7 @@
 	<b>devuan:/mnt/memdisk# diff -s SRC/debian-10.6.0-amd64-DVD-2.iso DST/debian-10.6.0-amd64-DVD-2.iso</b>
 	Files SRC/debian-10.6.0-amd64-DVD-2.iso and DST/debian-10.6.0-amd64-DVD-2.iso are identical
 	<b>devuan:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       For <i>dar</i> the backup we used:
@@ -2458,7 +2458,7 @@
 
     <h5>Rsync</h5>
 
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# mkdir DST</b>
 	<b>devuan:/mnt/memdisk# rsync -arHAX --info=stats SRC/* DST</b>
 
@@ -2476,7 +2476,7 @@
 	<b>devuan:/mnt/memdisk# diff -s SRC/debian-10.6.0-amd64-DVD-2.iso DST/debian-10.6.0-amd64-DVD-2.iso</b>
 	Files SRC/debian-10.6.0-amd64-DVD-2.iso and DST/debian-10.6.0-amd64-DVD-2.iso are identical
 	<b>devuan:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       We had to use <code>--no-whole-file</code> to see the binary delta in action with
@@ -2489,7 +2489,7 @@
 
     <h5>Tar</h5>
 
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# tar --listed-incremental=snapshot.file -czf full.tar.gz SRC</b>
 	<b>devuan:/mnt/memdisk#  ./bitflip 100000 SRC/debian-10.6.0-amd64-DVD-2.iso</b>
 	<b>devuan:/mnt/memdisk# tar --listed-incremental=snapshot.file -czf diff.tar.gz SRC</b>
@@ -2507,7 +2507,7 @@
 	<b>devuan:/mnt/memdisk/DST# diff -s ../SRC/debian-10.6.0-amd64-DVD-2.iso SRC/debian-10.6.0-amd64-DVD-2.iso</b>
 	Files ../SRC/debian-10.6.0-amd64-DVD-2.iso and SRC/debian-10.6.0-amd64-DVD-2.iso are identical
 	<b>devuan:/mnt/memdisk/DST#</b>
-    </code></div>
+    </code>
 
     <p>
       For <i>tar</i> the backup used:
@@ -2548,7 +2548,7 @@
     </p>
 
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# mkdir SRC</b>
 	<b>terre:/mnt/memdisk# echo "Hello World!" > SRC/file.txt</b>
 	<b>terre:/mnt/memdisk# cat SRC/file.txt</b>
@@ -2579,10 +2579,10 @@
 	<b>terre:/mnt/memdisk# cat SRC/file.txt</b>
 	<e class=red>L</e>ello World!
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <h5>Dar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# mkdir SRC</b>
 	<b>terre:/mnt/memdisk# echo "Hello World!" > SRC/file.txt</b>
 	<b>terre:/mnt/memdisk# dar -c full -R SRC -N</b>
@@ -2608,19 +2608,19 @@
 	<b>terre:/mnt/memdisk# dar -c diff -A full -R SRC -N -q</b>
 	<e>SECURITY WARNING! SUSPICIOUS FILE /mnt/memdisk/SRC/file.txt: ctime changed since archive of reference was done, while no other inode information changed</e>
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       <i>dar</i> issues a warning because of this suspicious condition. Note that we still have the sane file in the full backup, in case of doubt,
       we can compare it with this modified version:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# dar -d full -R SRC -q</b>
 	DIFF /mnt/memdisk/SRC/file.txt: <e>different file data, offset of first difference is: 0</e>
 	Some file comparisons failed
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       The previous test reports that the first byte to have changed is at offset 0, thus this is not just a metadata change
@@ -2628,7 +2628,7 @@
     </p>
 
     <h5>Rsync</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# rm -rf SRC</b>
 	<b>terre:/mnt/memdisk# mkdir SRC</b>
 	<b>terre:/mnt/memdisk# echo "Hello World!" > SRC/file.txt</b>
@@ -2651,7 +2651,7 @@
 	<b>terre:/mnt/memdisk# cat DST/SRC/file.txt</b>
 	<e class=red>Hello World!</e>
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       rsync has not reported the problem, but hopefully it has not synchronized the backup,
@@ -2660,7 +2660,7 @@
     </p>
 
     <h5>Tar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# rm -rf SRC</b>
 	<b>terre:/mnt/memdisk# rm -rf DST</b>
 	<b>terre:/mnt/memdisk# mkdir SRC</b>
@@ -2679,7 +2679,7 @@
 	<b>terre:/mnt/memdisk/DST# cat SRC/file.txt</b>
 	<e class=red>Lello World!</e>
 	<b>terre:/mnt/memdisk/DST#</b>
-    </code></div>
+    </code>
 
     <p>
       As seen above <i>tar</i> does not see any problem, but the file has been resaved
@@ -2692,7 +2692,7 @@
     <h4>Snapshot</h4>
 
     <h5>Dar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# dar -c full -z6 -R /usr <e>--on-fly-isolate snapshot</e></b>
 
 
@@ -2796,7 +2796,7 @@
 	-rw-r--r-- 1 root root    6662595 Nov 12 15:34 snapshot.1.dar
 	-rw-r--r-- 1 root root   25537142 Nov 12 16:44 <e class=blue>snapshot_alone.1.dar</e>
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>As seen above,a snapshot can be created:
       <ul>
@@ -2806,7 +2806,7 @@
       </ul>
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>root@terre:/mnt/memdisk# ls -l full.1.dar</b>
 	-rw-r--r-- 1 root root <e>3895581703</e> Nov 29 21:53 full.1.dar
 	<b>root@terre:/mnt/memdisk# dar -l full -q</b>
@@ -2877,7 +2877,7 @@
 	--------------------------------------------
 	<b>root@terre:/mnt/memdisk#</b>
 
-    </code></div>
+    </code>
 
     <p>
       Once created a snapshot can be used:
@@ -2911,7 +2911,7 @@
 	<li>as part of a backup process (in fact <i>tar</i> cannot do else)</li>
       </ul>
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# tar --listed-incremental=snapshot.file -czf full.tar.gz /usr</b>
 	tar: Removing leading `/' from member names
 	tar: Removing leading `/' from hard link targets
@@ -2950,7 +2950,7 @@
 	-rw-r--r-- 1 root root 6288644 Nov 12 15:20 snapshot.file
 	-rw-r--r-- 1 root root 6288644 Nov 12 15:18 snapshot.file.ref
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       If a snapshot can be used (and is in fact required) to make a differential backup, it
       cannot really be used to see the difference a current living filesystem has with a given
@@ -2965,7 +2965,7 @@
     <h4>On-fly hashing</h4>
 
     <h5>Dar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# dar -c backup -R /usr -g usr/bin -z6 <e>--hash sha1</e></b>
 
 
@@ -2991,7 +2991,7 @@
 	<b>terre:/mnt/memdisk# sha1sum -c backup.1.dar.sha1</b>
 	<e>backup.1.dar: OK</e>
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <h5>Rsync</h5>
     <p>
@@ -3016,7 +3016,7 @@
     <p>
 
     <h5>Dar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# cat /etc/auto.mnt</b>
 	Espace  -defaults,relatime,acl,bg,rsize=8192,wsize=8192       nfs.systeme-solaire.espace:/mnt/Externe/Espace
 	Commun  -defaults,relatime,acl,bg,rsize=8192,wsize=8192,ro    nfs.systeme-solaire.espace:/mnt/Externe/Commun
@@ -3054,7 +3054,7 @@
 	drwxr-x--- 4 commun maison 4096 Nov 11  2015 Commun
 	drwxr-xr-x 7 root   root   4096 Jul 14 17:58 Espace
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       In the previous example we see that the /mnt/Externe directory is a mount point containing three auto-mounted
@@ -3070,7 +3070,7 @@
       saves the automount point at <code>/mnt/Externe</code> may exceed the automount timeout leading them to be
       unmounted and disappear before the backup process reaches them.
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# dar -c backup -R / -g usr/bin --hash sha512 -s 100M -q</b>
 	<b>terre:/mnt/memdisk# ls -l backup.*</b>
 	-rw-r--r-- 1 root root 104857600 Nov 12 18:30 backup.1.dar
@@ -3097,7 +3097,7 @@
 	Total number of items considered: 2594
 	--------------------------------------------
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       In this example, this we used slicing with on-fly hashing which generated for each slice
       the corresponding sha512 hash file. Then we tested the archive content and at the same time the hash
@@ -3120,7 +3120,7 @@
 
     <h4>Dry-run execution</h4>
     <h5>Dar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk/A# ls -l</b>
 	<e>total 0</e>
 	<b>terre:/mnt/memdisk/A# dar -c backup -R / -g usr/bin --dry-run</b>
@@ -3145,15 +3145,15 @@
 	<b>terre:/mnt/memdisk/A# ls -l</b>
 	<e>total 0</e>
 	<b>terre:/mnt/memdisk/A#</b>
-    </code></div>
+    </code>
 
     <h5>Rsync</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# rsync -arHAX --dry-run /usr/bin DST</b>
 	<b>terre:/mnt/memdisk# ls -l DST</b>
 	<e>ls: cannot access 'DST': No such file or directory</e>
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <h5>Tar</h5>
     <p>
@@ -3164,7 +3164,7 @@
     <h4>User message within backup</h4>
 
     <h5>Dar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# dar -c backup <e>--user-comment "passphrase is the usual one. Archive was made on %d on host %h"</e> -R / -g usr/bin -K camellia: -zxz -s 100M</b>
 	Archive backup requires a password:
 	Please confirm your password:
@@ -3201,13 +3201,13 @@
 	Final memory cleanup...
 	FATAL error, aborting operation: header only mode asked
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       The use of the <code>-aheader</code> let one see the archive header that is always in clear-text. The usual listing
       operation provides some additional informations from the ciphered table of content and thus in that context requires the passphrase:
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# dar <e>-l</e> backup <e>-q</e></b>
 	<e>Archive backup requires a password:</e>
 	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
@@ -3252,7 +3252,7 @@
 	0 file(s) have been record as destroyed since backup of reference
 
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <h5>Rsync</h5>
     <p>
@@ -3268,7 +3268,7 @@
 
 
     <h5>Dar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# dar -c backup -R / -g usr/bin -zlz4</b>
 
 
@@ -3299,7 +3299,7 @@
 	Total number of items considered: 2594
 	--------------------------------------------
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <h5>Rsync</h5>
     <p>
@@ -3310,7 +3310,7 @@
     </p>
 
     <h5>Tar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# rm -rf backup.tar.gz</b>
 	<b>terre:/mnt/memdisk# tar -czf backup.tar.gz /usr/bin</b>
 	tar: Removing leading `/' from member names
@@ -3339,13 +3339,13 @@
 	<b>terre:/mnt/memdisk# echo $?</b>
 	0
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
 
     <h4>Comparing with original data</h4>
 
     <h5>Dar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# dar -c backup -R SRC -q</b>
 	<b>terre:/mnt/memdisk# dar -d backup -R SRC</b>
 
@@ -3360,7 +3360,7 @@
 	<b>terre:/mnt/memdisk# echo $?</b>
 	0
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <h5>Rsync</h5>
     <p>
@@ -3368,18 +3368,18 @@
     </p>
 
     <h5>Tar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk/SRC# tar -czf ../backup.tar.gz .</b>
 	<b>terre:/mnt/memdisk/SRC# tar -dzf ../backup.tar.gz</b>
 	<b>terre:/mnt/memdisk/SRC# echo $?</b>
 	0
 	<b>terre:/mnt/memdisk/SRC#</b>
-    </code></div>
+    </code>
 
     <h4>Tunable verbosity</h4>
 
     <h5>Dar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# dar -c backup -R / -g usr/bin <e>-q</e></b>
 	<b>terre:/mnt/memdisk# rm backup.1.dar</b>
 	<b>terre:/mnt/memdisk# dar -c backup -R / -g usr/bin</b>
@@ -3496,7 +3496,7 @@
 	TRUE
 
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       <i>dar</i> has several options to define which type of message to show or not to show:
@@ -3504,7 +3504,7 @@
     </p>
 
     <h5>Rsync</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# rsync -arHAX /usr/bin DST</b>
 	<b>terre:/mnt/memdisk# rm -rf DST</b>
 	<b>terre:/mnt/memdisk# rsync -arHAX <e>-v</e> /usr/bin DST</b>
@@ -3531,7 +3531,7 @@
 	437,083,500  98%  128.42MB/s    0:00:03 (xfr#2152, to-chk=0/2593)
 	<b>root@terre:/mnt/memdisk#</b>
 
-    </code></div>
+    </code>
     <p>
       <code>-v option</code> leads to a more verbose output, while <code>-q</code>
       remove the non error messages. Using both at the same time seems not to
@@ -3541,7 +3541,7 @@
     </p>
 
     <h5>Tar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# tar -czf backup.tar.gz /usr/bin</b>
 	tar: Removing leading `/' from member names
 	tar: Removing leading `/' from hard link targets
@@ -3567,7 +3567,7 @@
 	/usr/bin/h2xs
 	/usr/bin/xmessage
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       <i>tar</i> only provides the <code>-v</code> option to increase
@@ -3585,7 +3585,7 @@
     </p>
 
     <h5>Dar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# dar -c backup -R / -g usr/bin -z6 -q</b>
 	<b>terre:/mnt/memdisk# dar -l backup -g usr/bin/emacs-gtk</b>
 	[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size    |          Date                 |    filename
@@ -3603,14 +3603,14 @@
 	<b>terre:/mnt/memdisk#rm backup.*</b>
 	<b>terre:/mnt/memdisk#mv without-emacs.1.dar backup.1.dar</b>
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       <i>dar</i> does not modify a existing backup but creates a copy of it with the requested files or
       directory removed. The process can be quick even with compression thanks to the <code>-ak</code>
       option that avoid uncompressing and recompressing
       file that are kept. Before removing the old backup you can test the sanity of the new generated one.
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# dar -c emacs -R / -g usr/bin/emacs-gtk -z6 -q</b>
 	<b>terre:/mnt/memdisk# dar -l emacs</b>
 	[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size    |          Date                 |    filename
@@ -3641,7 +3641,7 @@
 	<b>terre:/mnt/memdisk# rm emacs.* backup.*</b>
 	<b>terre:/mnt/memdisk# mv with-emacs.1.dar backup.1.dar</b>
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       Here to add files to a existing backup we must make a small backup of these files only, then merge
@@ -3661,7 +3661,7 @@
     </p>
 
     <h5>Tar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# tar -czf backup.tar.gz /usr/bin</b>
 	tar: Removing leading `/' from member names
 	tar: Removing leading `/' from hard link targets
@@ -3673,7 +3673,7 @@
 	<e class=red>tar: Cannot update compressed archives</e>
 	tar: Error is not recoverable: exiting now
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       Well, <i>tar</i> cannot manipulate compressed archives. What the point then to remove a
       file from a backup if storage space is not an issue, else, would compression be used?
@@ -3682,7 +3682,7 @@
     <h4>stdin/stdout backup read/write</h4>
 
     <h5>Dar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# dar -c - -z6 -R SRC &gt; backup.file</b>
 
 
@@ -3722,7 +3722,7 @@
 	FSA restored for 0 inode(s)
 	--------------------------------------------
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       <i>dar</i> can read a backup from stdin and write a backup to stdout.
     </p>
@@ -3733,13 +3733,13 @@
     </p>
 
     <h5>Tar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# tar -czf - SRC &gt; backup.file</b>
 	<b>terre:/mnt/memdisk# mkdir DST</b>
 	<b>terre:/mnt/memdisk# cd DST</b>
 	<b>terre:/mnt/memdisk/DST# tar -xzf - &lt; ../backup.file</b>
 	<b>terre:/mnt/memdisk/DST#</b>
-    </code></div>
+    </code>
 
     <p>
       <i>tar</i> can read a backup from stdin and write a backup to stdout.
@@ -3778,7 +3778,7 @@
       the file transfer protocol is not able to continue an interrupted transfer,
       you will then only need to restart it for the last slice, not the whole backup.
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# sftp denis@dar</b>
 	The authenticity of host 'dar (192.168.6.32)' can't be established.
 	RSA key fingerprint is SHA256:KN3o/psWC512grcZ5/J5dTSg9PzIXbZAHiig/hqfkc8.
@@ -3788,11 +3788,11 @@
 	Connected to denis@dar.
 	sftp> bye
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <h5>Dar</h5>
 
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# dar -c sftp://denis@dar/home/denis/backup -R / -g etc -K aes: -zlz4 -s 1M</b>
 	<e class=blue>Please provide the password for login denis at host dar:</e>
 	<e>Archive backup requires a password:</e>
@@ -3825,13 +3825,13 @@
 	-rw-r--r--    1 denis    denis      474982 Nov 26 17:15 backup.4.dar
 	sftp> bye
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       The backup results in four ciphered slices located on the remote sftp server. Let's add
       a <code>-E option</code> to see which slice are being read while testing the archive.
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# dar -t sftp://denis@dar/home/denis/backup <e class=blue>-E "echo 'openning slice %p/%b.%N.%e'"</e></b>
 	<e class=blue>Please provide the password for login denis at host dar:</e>
 	openning slice /home/denis/backup.4.dar
@@ -3851,13 +3851,13 @@
 	Total number of items considered: 2360
 	--------------------------------------------
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       We see that all slices have been read as expected, now let's restore /etc/fstab in the current directory
       and compare the restored files with the real /etc/fstab
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# dar -x sftp://denis@dar/home/denis/backup -E "echo 'openning slice %p/%b.%N.%e'" -g etc/fstab --flat</b>
 	Please provide the password for login denis at host dar:
 	<e>openning slice /home/denis/backup.4.dar</e>
@@ -3880,7 +3880,7 @@
 	<b>terre:/mnt/memdisk# echo $?</b>
 	<e>0</e>
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       As seen above only one slice (slice #4) has been necessary to restore /etc/fstab. But let's save two files,
       a huge one and a small one into a single sliced backup and measure the transfer time of backup
@@ -3888,7 +3888,7 @@
       for precise time measurement:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# sftp denis@dar</b>
 	Connected to denis@dar.
 	sftp> bye
@@ -3911,7 +3911,7 @@
 	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
 	0.680u 0.012s <e>0:00.87</e> 79.3%     0+0k 0+0io 0pf+0w
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       While restoring the whole backup needs 15 seconds of transfer time, restoring <code>fstab</code> alone requires only 0.87 second,
@@ -3920,7 +3920,7 @@
     </p>
 
     <h5>Rsync</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# rsync -arHAXSzq /etc denis@dar:/home/denis</b>
 	<b>terre:/mnt/memdisk# mkdir DST</b>
 	<b>terre:/mnt/memdisk# rsync -arHAXSzq denis@dar:/home/denis/etc/fstab .</b>
@@ -3928,7 +3928,7 @@
 	<b>terre:/mnt/memdisk# echo $?</b>
 	0
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       We can backup to a remote sftp server, we can compress the data on-fly but it is not stored compressed nor ciphered.
       Restoration operation is possible per file or for the whole backup
@@ -3949,7 +3949,7 @@
     </p>
 
     <h5>Dar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# dar -c backup -R SRC -z6</b>
 
 
@@ -4002,13 +4002,13 @@
 	<b>terre:/mnt/memdisk# echo $?</b>
 	0
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       Modifying the first bit <i>dar</i> has seen the corruption. We can use the lax mode (<code>-alax</code> option) to bypass this
       corruption and then the restoration proceeds normally. We can try a bit further for example somewhere in the middle of the archive,
       thus at offset 876354144 (half of the size expressed in bit, not byte):
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# ls -l backup*</b>
 	-rw-r--r-- 1 root  root   219088536 Nov 17 17:45 backup.1.dar
 	<b>terre:/mnt/memdisk# hide_change backup.1.dar 876354144</b>
@@ -4037,7 +4037,7 @@
 	<b>terre:/mnt/memdisk# diff -rq SRC DST</b>
 	<e>Files SRC/linux-5.9.8/drivers/mtd/spi-nor/core.c and DST/linux-5.9.8/drivers/mtd/spi-nor/core.c differ</e>
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       One file could not be restored properly as reported by <i>dar</i>,
@@ -4045,7 +4045,7 @@
       originals. Let's modifying the last bit for completness:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# ls -al *.dar</b>
 	-rw-r--r-- 1 root root 219088537 Nov 17 17:45 backup.1.dar
 	<b>terre:/mnt/memdisk# cp backup.1.dar backop.1.dar</b>
@@ -4079,7 +4079,7 @@
 	<b>terre:/mnt/memdisk# echo $?</b>
 	0
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       By chance it did not affected the ability to restore the backup. However if it ever had,
       we have several fallbacks: the <code>--sequential-read</code> mode, the use a already created
@@ -4090,7 +4090,7 @@
     </p>
 
     <h5>Rsync</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# rm -rf DST</b>
 	<b>terre:/mnt/memdisk# rsync -arHAXS SRC/* DST</b>
 	<b>terre:/mnt/memdisk# ls -al DST</b>
@@ -4110,7 +4110,7 @@
 	<b>terre:/mnt/memdisk# diff -rq SRC DST</b>
 	<e>Files SRC/linux-5.9.8/README and DST/linux-5.9.8/README differ</e>
 	<b>terre:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       modifying the backup (the directory we sync with), <i>rsync</i> does not
@@ -4118,7 +4118,7 @@
     </p>
 
     <h5>Tar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# rm -rf DST</b>
 	<b>terre:/mnt/memdisk# tar -czf backup.tar.gz SRC</b>
 	<b>terre:/mnt/memdisk# ls -l backup*</b>
@@ -4135,14 +4135,14 @@
 	<b>terre:/mnt/memdisk/DST# find . -ls</b>
 	1720964      0 drwxr-xr-x   2 root     root           40 Nov 17 18:56 .
 	<b>terre:/mnt/memdisk/DST#</b>
-    </code></div>
+    </code>
 
     <p>
       Modifying the first byte leads to a completely unusable backup. Nothing got restored at all.
       Let's see what going on when modifying a single bit in the middle of the backup:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# ls -l backup*</b>
 	-rw-r--r-- 1 root root 183659664 Nov 17 18:11 backup.tar.gz
 	<b>terre:/mnt/memdisk# ./hide_change backup.tar.gz 734638656</b>
@@ -4191,13 +4191,13 @@
 	<b>terre:/mnt/memdisk/DST# find SRC | wc -l</b>
 	<e class=red>32615</e>
 	<b>terre:/mnt/memdisk/DST#</b>
-    </code></div>
+    </code>
     <p>
       Only 32615 files on the 74726 that were saved could be restored. Assuming the problem is due to
       the fact the backup is compressed, let's see tar without compression:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# tar -cf backup.tar SRC</b>
 	<b>terre:/mnt/memdisk# ls -l backup*</b>
 	-rw-r--r-- 1 root root 1011312640 Nov 17 19:28 backup.tar
@@ -4213,13 +4213,13 @@
 	<b>terre:/mnt/memdisk/DST# echo $?</b>
 	0
 	<b>terre:/mnt/memdisk/DST#</b>
-    </code></div>
+    </code>
     <p>
       Without compression, a <i>tar</i> backup is much more reliable, however we now need more than 5 times
       storage space to hold the backup. Let's see what happens when we modify a single bit in the midle of the backup:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>terre:/mnt/memdisk# ./hide_change backup.tar 4045250560</b>
 	<b>terre:/mnt/memdisk# rm -rf DST</b>
 	<b>terre:/mnt/memdisk# mkdir DST</b>
@@ -4229,7 +4229,7 @@
 	<b>terre:/mnt/memdisk/DST# diff -rq ../SRC SRC</b>
 	<e class=red>Files ../SRC/linux-5.9.8/drivers/media/pci/bt8xx/bttv-cards.c and SRC/linux-5.9.8/drivers/media/pci/bt8xx/bttv-cards.c differ</e>
 	<b>terre:/mnt/memdisk/DST#</b>
-    </code></div>
+    </code>
 
     <p>
       the backup restoration suceeded according to <i>tar</i> but the corruption has been completely ignored!!!
@@ -4244,7 +4244,7 @@
       We will thus here measure the par2create (<i>Parchive</i>) execution time compared to backup time of <i>tar</i> and <i>dar</i>.
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# mkdir SRC</b>
 	<b>devuan:/mnt/memdisk# cp --preserve -r /usr SRC</b>
 	<b>devuan:/mnt/memdisk# time <e class=blue>tar</e> -czf backup.tar.gz SRC</b>
@@ -4265,7 +4265,7 @@
 	Done
 	110.048u 0.364s <e>0:06.19</e> 1783.5% 0+0k 0+0io 0pf+0w
 	<b>devuan:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       We see that the redundancy process is not negligible: for 5% of data redundancy,
       we need around 10% of extra CPU time. Things get worse when the size of the
@@ -4275,7 +4275,7 @@
       is a quite frequent situation:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:~/tmp# du -sh SRC</b>
 	<e>27G</e>     SRC
 	<b>devuan:~/tmp# free -m</b>
@@ -4283,26 +4283,26 @@
 	Mem:          <e>15776</e>         560         433           1       14782       14823
 	Swap:             0           0           0
 	<b>devuan:~/tmp#</b>
-    </code></div>
+    </code>
     <p>
       We are now placed in this context, having a 27 GiB data to backup on a machine having only around 16 GiB of
       RAM.
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:~/tmp# time dar -c backup -z6 -at -1 0 -R SRC -q <e class=blue>-E 'par2create -r5 -n1 -q %b.%N.%e'</e></b>
 
 	Opening: backup.1.dar
 	Done
 	15237.777u 105.379s <e>36:48.53</e> 694.7%     0+0k 158854544+57572120io 158pf+0w
 	<b>devuan:~/tmp#</b>
-    </code></div>
+    </code>
     <p>
       This execution time of around 36 mn above can be improved by using multiple slices. Choosing a slice size smaller than the available RAM
       let <i>Parchive</i> compute parity data right after each slice has been generated, while it is still in the disk cache (RAM),
       bypassing the corresponding disks I/O we had previously in a second time:
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:~/tmp# time dar -c backup_splitted -z6 -at -1 0 -R SRC -q <e class=blue>-E 'par2create -r5 -n1 -q %b.%N.%e'</e> <e>-s 1G</e></b>
 
 	Opening: backup_splitted.1.dar
@@ -4318,13 +4318,13 @@
 	Done
 	6040.106u 49.201s <e>21:58.73</e> 461.7%       0+0k 61862640+57567104io 123pf+0w
 	<b>devuan:~/tmp#</b>
-    </code></div>
+    </code>
     <p>
       The total execution time dropped to around 22 mn! Which makes a 40% time reduction.
       By the way, having here 27 files of 1 GiB is also easier to manipulate (file transfer,
       copy to removable media,...) than a huge equivalent file of 27 GiB.
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:~/tmp# time tar -czf backup.tar.gz SRC</b>
 	<e class=blue>837.662u</e> 80.776s <e>18:26.08</e> 83.0% 0+0k 54926128+54799696io 6pf+0w
 	<b>devuan:~/tmp# time par2create -r5 -n1 -q backup.tar.gz</b>
@@ -4333,7 +4333,7 @@
 	<e class=blue>13352.393u</e> 71.390s <e>18:24.34</e> 1215.5%     0+0k 95000064+2772144io 9pf+0w
 	<b>devuan:~/tmp#</b>
 
-    </code></div>
+    </code>
     <p>
       We get the same execution time (18 mn) for both <i>tar</i> and <i>par2</i> for thus a total of 36 mn.
       This same time for both software while the real CPU usage is much more important for <i>par2</i>,
@@ -4419,7 +4419,7 @@
       comparison environment (avoiding disk cache variable performance).
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# free</b>
 	total        used        free      shared  buff/cache   available
 	Mem:       16155172      691764      151608     8780152    15311800     6299316
@@ -4428,14 +4428,14 @@
 	Filesystem      Size  Used Avail Use% Mounted on
 	<e>tmpfs</e>            14G  4.0K   14G   1% /mnt/memdisk
 	<b>devuan:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       To prepare the Linux system under backup we installed the <i>Devuan</i> system a few days before in a VM. On day D,
       a full backup has been executed, we updated/upgraded the system using the disto package manager and we made a differential
       backup based on the first one, both backup being wrote to the testing machine (bare-metal server) that was used for the performance tests:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>root@Georges:~# dar -c sftp://denis@10.13.30.163/home/denis/tmp/full -zlz4 -R / -M -D --hash sha1 -afile-auth -G cat_full</b>
 	<b>root@Georges:~# apt-get update</b>
 	<i>[...]</i>
@@ -4443,7 +4443,7 @@
 	<i>[...]</i>
 	<b>root@Georges:~# dar -c sftp://denis@10.13.30.163/home/denis/tmp/diff -A cat_full -zlz4 -R / -M -D --hash sha1 -afile-auth</b>
 	<b>root@Georges:~#</b>
-    </code></div>
+    </code>
 
     <p>
       Back on the testing host (the bare-metal server at 10.13.30.163) we restored the data
@@ -4451,7 +4451,7 @@
       supported on tmpfs filesystem:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# mkdir state-1</b>
 	<b>devuan:/mnt/memdisk# mkdir state-2</b>
 	<b>devuan:/mnt/memdisk# dar -x ~denis/tmp/full -R state-1 --fsa-scope none -u "*"</b>
@@ -4507,7 +4507,7 @@
 	--------------------------------------------
 	<b>devuan:/mnt/memdisk#</b>
 
-    </code></div>
+    </code>
     <p>
       This leads us to have two directories <code>state-1</code> and <code>state-2</code> corresponding to the state of the <i>Devuan</i> machine has two days ago and today respectively.
     </p>
@@ -4522,7 +4522,7 @@
     </p>
 
     <h5>Dar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# time dar -c copy -1 0 -at -R SRC1 -q</b>
 	1.834u 2.909s <e>0:04.87</e> 97.1%     0+0k 744+0io 12pf+0w
 	<b>devuan:/mnt/memdisk# mkdir DST</b>
@@ -4546,7 +4546,7 @@
 	<b>devuan:/mnt/memdisk# find DST | wc -l</b>
 	136837
 	<b>devuan:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       The overall copy time for <i>dar</i> is:
     </p>
@@ -4556,7 +4556,7 @@
     </ul>
 
     <h5>Rsync</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# mkdir DST</b>
 	<b>devuan:/mnt/memdisk# time rsync -arH SRC1 DST</b>
 	23.088u 5.420s <e>0:15.28</e> 186.5%   0+0k 168+0io 4pf+0w
@@ -4572,7 +4572,7 @@
 	<b>devuan:/mnt/memdisk# find DST | wc -l</b>
 	136838
 	<b>devuan:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       The overall copy time for <i>rsync</i> is:
     </p>
@@ -4583,7 +4583,7 @@
 
 
     <h5>Tar</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# cd SRC1</b>
 	<b>devuan:/mnt/memdisk/SRC1# time tar -cf ../copy.tar *</b>
 	0.343u 2.756s <e>0:03.10</e> 99.6%     0+0k 104+0io 1pf+0w
@@ -4614,7 +4614,7 @@
 	<b>devuan:/mnt/memdisk# find DST | wc -l</b>
 	136834
 	<b>devuan:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       the overall copy time for <i>tar</i> is:
     </p>
@@ -4624,7 +4624,7 @@
     </ul>
 
     <h5>Cp</h5>
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# time cp --preserve -r SRC1 DST</b>
 	0.051u 2.514s <e>0:02.58</e> 99.2%     0+0k 8+0io 1pf+0w
 	<b>devuan:/mnt/memdisk# diff -r SRC1 DST</b>
@@ -4646,7 +4646,7 @@
 	2315986      0 srwxrwxrwx   1 root     root            0 Dec  3 10:32 DST/SRC2/tmp/.X11-unix/X0
 	2315984      4 -r--r--r--   1 root     root           11 Dec  3 10:32 DST/SRC2/tmp/.X0-lock
 	<b>devuan:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       The overall copy time for <i>cp</i> is:
@@ -4668,7 +4668,7 @@
       For reference:
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# du -sb state-*</b>
 	<e>4095931349</e>      state-1
 	<e>4136318367</e>      state-2
@@ -4677,11 +4677,11 @@
 	<b>devuan:/mnt/memdisk# find state-2 | wc -l</b>
 	137239
 	<b>devuan:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <h5>Dar</h5>
     <h6>Minimal features</h6>
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# time dar -c dar-full -R state-1 -at -1 0 -z6 -q</b>
 	145.970u 3.263s <e>2:29.73</e> 99.6%   0+0k 12344+0io 71pf+0w
 	<b>devuan:/mnt/memdisk# time dar -c dar-diff -R state-2 -A dar-full -at -1 0 -z6 -q -asecu</b>
@@ -4698,7 +4698,7 @@
 	<b>devuan:/mnt/memdisk# time dar -x dar-full -R DST -q -w -g etc/fstab</b>
 	0.934u 0.036s <e>0:00.98</e> 97.9%     0+0k 0+0io 0pf+0w
 	<b>devuan:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       for <i>dar</i> with minimal features (metadata no redundancy <code>-at</code>, no sparse file consideration <code>-1 0</code>):
     </p>
@@ -4715,7 +4715,7 @@
 
     <h6>sparse file</h6>
 
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# rm -rf DST *.dar</b>
 	<b>devuan:/mnt/memdisk# time dar -c dar-full -R state-1 -at -z6 -q</b>
 	154.971u 3.000s <e>2:37.99</e> 99.9%   0+0k 0+0io 0pf+0w
@@ -4732,7 +4732,7 @@
 	<b>devuan:/mnt/memdisk# time dar -x dar-full -R DST -q -w -g etc/fstab</b>
 	1.067u 0.053s <e>0:01.13</e> 98.2%     0+0k 0+0io 0pf+0w
 	<b>devuan:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       for <i>dar</i> with default features (metadata no redundancy <code>-at</code>, with sparse file consideration (activated by default))
@@ -4750,7 +4750,7 @@
 
 
     <h6>Sparse file and binary delta</h6>
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# rm -rf DST *.dar</b>
 	<b>devuan:/mnt/memdisk# time dar -c dar-full -R state-1 -at -z6 --delta sig -q</b>
 	159.262u 3.332s <e>2:42.62</e> 99.9%   0+0k 0+0io 0pf+0w
@@ -4767,7 +4767,7 @@
 	<b>devuan:/mnt/memdisk# time dar -x dar-full -R DST -q -w -g etc/fstab</b>
 	1.205u 0.059s <e>0:01.27</e> 98.4%     0+0k 0+0io 0pf+0w
 	<b>devuan:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       for <i>dar</i> with advanced features (metadata no redundancy <code>-at</code>, with binary delta computation <code>--delta sig</code>):
@@ -4786,7 +4786,7 @@
     <h5>Rsync</h5>
     <h6>minimal features</h6>
 
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# mkdir rsync-backup</b>
 	<b>devuan:/mnt/memdisk# time rsync -arHz --info=stats state-1/* rsync-backup</b>
 
@@ -4815,7 +4815,7 @@
 	total size is 664  speedup is 11.86
 	<e>0.001u 0.002s</e> 0:00.00 0.0%      0+0k 0+0io 0pf+0w
 	<b>devuan:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       for <i>rsync</i> with minimal features (no sparse file consideration):
@@ -4833,7 +4833,7 @@
 
     <h6>sparse file + binary delta</h6>
 
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# mkdir rsync-backup</b>
 	<b>devuan:/mnt/memdisk# time rsync -arHSz --info=stats state-1/* rsync-backup</b>
 
@@ -4861,7 +4861,7 @@
 	total size is 664  speedup is 11.86
 	0.001u 0.002s 0:00.00 0.0%      0+0k 0+0io 0pf+0w
 	<b>devuan:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       for <i>rsync</i> with advanced features (sparse file consideration <code>-S option</code>, binary delta <code>--no-whole-file</code>)
@@ -4881,7 +4881,7 @@
 
     <h5>Tar</h5>
     <h6>minimal features</h6>
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# cd state-1</b>
 	<b>devuan:/mnt/memdisk/state-1# time tar --listed-incremental=../snapshot.file -czf ../tar-full.tar.gz *</b>
 	<e class=red>tar: tmp/.ICE-unix/19789: socket ignored</e>
@@ -4906,7 +4906,7 @@
 	<b>devuan:/mnt/memdisk/DST# time tar -xzf ../tar-diff.tar.gz</b>
 	0.183u 0.085s <e class=red>0:00.18</e> 144.4%    0+0k 0+0io 0pf+0w
 	<b>devuan:/mnt/memdisk/DST#</b>
-    </code></div>
+    </code>
     <p>
       Doing that way, the <i>tar</i> differential backup is empty: it only contains empty directories, no file data.
       We will apply the changes over <code>state-1</code> rather than already setup changes at <code>state-2</code>.
@@ -4915,7 +4915,7 @@
       the same as here, were the changes have been brought before full backup was done, <b><u>those changes will not be
       backed up by <i>tar</i></u></b>, while the file's attributes (file size, last modification date,...) changed.
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# cd state-1</b>
 	<b>devuan:/mnt/memdisk/state-1# time tar --listed-incremental=../snapshot.file -czf ../tar-full.tar.gz *</b>
 	<e class=red>tar: tmp/.ICE-unix/19789: socket ignored</e>
@@ -4942,7 +4942,7 @@
 	<b>devuan:/mnt/memdisk/DST# time tar -xzf ../tar-full.tar.gz etc/fstab</b>
 	25.219u 2.581s <e>0:25.15</e> 110.4%   0+0k 0+0io 0pf+0w
 	<b>devuan:/mnt/memdisk/DST#</b>
-    </code></div>
+    </code>
 
     <p>
       for <i>tar</i> with minimal features (no sparse file consideration):
@@ -4965,7 +4965,7 @@
       Whe had to recreate <code>state-1</code> as we needed modifying it at previous test
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# rm tar* snapshot.file</b>
 	<b>devuan:/mnt/memdisk# cd state-1</b>
 	<b>devuan:/mnt/memdisk/state-1# time tar --listed-incremental=../snapshot.file -czSf ../tar-full.tar.gz *</b>
@@ -4990,7 +4990,7 @@
 	<b>devuan:/mnt/memdisk/DST# time tar -xzSf ../tar-full.tar.gz etc/fstab</b>
 	25.068u 2.565s <e>0:25.00</e> 110.4%   0+0k 0+0io 0pf+0w
 	<b>devuan:/mnt/memdisk/DST#</b>
-    </code></div>
+    </code>
 
     <p>
       for <i>tar</i> with advanced features (sparse file consideration <code>-S option</code>):
@@ -5035,7 +5035,7 @@
       </ul>
     </p>
 
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# mkdir SRC</b>
 	<b>devuan:/mnt/memdisk# cp --preserve -r /usr SRC</b>
 	<b>devuan:/mnt/memdisk# time dar -c backup -K "aes256:hello world!" --kdf-param 100000:sha1 -R SRC -q -at -1 0</b>
@@ -5049,7 +5049,7 @@
 	Warning, the archive backup has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
 	0.419u 0.025s <e>0:00.42</e> 102.3%    0+0k 0+0io 0pf+0w
 	<b>devuan:/mnt/memdisk#</b>
-    </code></div>
+    </code>
     <p>
       For <i>dar</i> the operation took:
     </p>
@@ -5068,7 +5068,7 @@
       at the beginning and at the end of the backup, this has some performance penalties (time to generate and time to cipher/decipher).
       This explains why two identical invocations of <i>dar</i> produce backups of different sizes and execution times:
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# time dar -c backup -K "aes256:hello world!" -at -1 0 -R SRC -q -w</b>
 	9.782u 3.413s <e>0:06.28</e> 210.0%    0+0k 0+0io 0pf+0w
 	<b>devuan:/mnt/memdisk# la backup.1.dar</b>
@@ -5078,7 +5078,7 @@
 	<b>devuan:/mnt/memdisk# la backup.1.dar</b>
 	-rw-r--r-- 1 root root 1572<e>655217</e> Nov  9 14:50 backup.1.dar
 	<b>devuan:/mnt/memdisk#</b>
-    </code></div>
+    </code>
 
     <p>
       <i>rsync</i> has no way to store the backup ciphered. Testing directly <i>tar</i> now:
@@ -5089,7 +5089,7 @@
       and <i>openssl</i> so we can measure the execution time of this script as a whole. There is thus one
       script for backup and one for the restoration of <i>tar</i>+<i>openssl</i>.
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk# cat &gt; tar.backup</b>
 	#!/bin/bash
 
@@ -5134,7 +5134,7 @@
 	./usr/bin/diff
 	<b>devuan:/mnt/memdisk/DST#</b>
 
-    </code></div>
+    </code>
 
     <p>
       For <i>tar</i> the operation took:
@@ -5150,7 +5150,7 @@
       have the exact same sizes at one byte precision, this means the blocks boundaries and tar file internal structure always
       lay at the same file offset for a given content:
     </p>
-    <div class=code><code>
+    <code class=block>
 	<b>devuan:/mnt/memdisk/SRC# time ../tar.backup ../backup.tar.crypted usr</b>
 	4.112u 2.343s 0:04.72 136.6%    0+0k 0+0io 0pf+0w
 	<b>devuan:/mnt/memdisk/SRC# ls -l ../bac</b>
@@ -5162,13 +5162,13 @@
 	<b>devuan:/mnt/memdisk/SRC# ls -l ../backup.tar.crypted</b>
 	-rw-r--r-- 1 root root <e>1603594272</e> Nov  9 14:56 ../backup.tar.crypted
 	<b>devuan:/mnt/memdisk/SRC#</b>
-    </code></div>
+    </code>
 
 
     <h2><a name="scripts">Scripts</a> used in this benchmark</h2>
 
     <h3><a name="historization_feature"><i>historization_feature</i></a> script</h3>
-    <div class=code><code>
+    <code class=block>
 	#!/bin/bash
 
 	if [ -z "$1" -o -z "$2" ] ; then
@@ -5204,10 +5204,10 @@
 	  ;;
 	esac
 
-    </code></div>
+    </code>
 
     <h3><a name="always_change"><i>always_change</i></a> script</h3>
-    <div class=code><code>
+    <code class=block>
 	#!/bin/bash
 
 	if [ -z "$1" ] ; then
@@ -5216,10 +5216,10 @@
 	fi
 
 	while /bin/true ; do  touch "$1" ; done
-    </code></div>
+    </code>
 
     <h3><a name="bitflip"><i>bitflip</i></a> script</h3>
-    <div class=code><code>
+    <code class=block>
 	#!/bin/bash
 
 	if [ -z "$1" -o -z "$2" ] ; then
@@ -5239,10 +5239,10 @@
 	hexanewbyte=`printf "%.2x" $newbyte`
 
 	echo $hexanewbyte | xxd -p -l 1 -s $offbyte -r - "$file"
-    </code></div>
+    </code>
 
     <h3><a name="build_test_tree.bash"><i>build_test_tree.bash</i></a> script</h3>
-    <div class=code><code>
+    <code class=block>
 	#!/bin/bash
 
 	if [ -z "$1" ] ; then
@@ -5293,10 +5293,10 @@
 
 	# adding filesystem specific attributes
 	chattr +dis plain_zeroed
-    </code></div>
+    </code>
 
     <h3><a name="hide_change"><i>hide_change</i></a> script</h3>
-    <div class=code><code>
+    <code class=block>
 	#!/bin/bash
 
 	if [ -z "$1" ] ; then
@@ -5318,7 +5318,7 @@
 
 	touch -d "$mtime" "$1"
 	touch -a -d "$atime" "$1"
-    </code></div>
+    </code>
 
   </body>
 </html>

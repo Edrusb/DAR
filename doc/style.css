@@ -13,23 +13,24 @@ body
     color: rgb(0, 0, 170);
 }
 
+/* code display */
+
 code
 {
     white-space: pre;
     color: #111111;
 }
 
-div.code
+code.block
 {
-    white-space: pre;
-    color: #333333;
     margin-left: 2%;
-    text-align: left;
+    display: block;
     border: 1px solid #333333;
+    text-align: left;
     background-color:#EEEEEE;
 }
 
-div.code:hover
+code.block:hover
 {
     background-color:inherit;
 }
