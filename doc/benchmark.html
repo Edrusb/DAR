@@ -670,9 +670,9 @@
       on top of your backup or archives. This will allow you to repair them in case of corruption.
       <ul>
 	<li>
-	  Though, <i>rsync</i> is not adapted to that process as creating a global redundancy of a directory tree is much more complex, error-prone.
-	  At the opposite, <i>tar</i> and <i>dar</i> are pretty well adapted as a backup may
-	  be is a single file or a few big files if using slicing or multi-volume backup.
+	  Though, <i>rsync</i> is not adapted to that process as creating a global redundancy of a directory tree is much more complex and error-prone.
+	  At the opposite, <i>tar</i> and <i>dar</i> are pretty well adapted as a backup may be
+	  a single file or a few big files if using slicing or multi-volume backup.
 	</li>
 	<li>
 	  Second, whatever is the redundancy level you select, if the data corruption exceed this level, you will not be able to repair your backups and
@@ -693,7 +693,7 @@
     <h3>Performance</h3>
 
     <p>
-      In the following, we have distinguished two purpose of backup tools: the "identical" copy of a set of files and directories (short term operation) and the
+      In the following, we have distinguished two purposes of backup tools: the "identical" copy of a set of files and directories (short term operation) and the
       usual backup operation (long term storage and historization).
     </p>
 
@@ -800,10 +800,10 @@
 	be drained by the backup volumes flying away and you probably don't want them to consume too much of this bandwidth which could
 	slow down your business or Internet access. As a workaround, one could rate-limit the bandwidth for backup exchanges only. But doing
 	so will extend the backup transfer time so much that you may have to reduce the backup frequency to not have two backup
-	transfered at the same time. This would lead you to lose data accuracy of saved data: A too low backup frequency will only allow you
+	transfered at the same time. This would lead you to lose accuracy of saved data: A too low backup frequency will only allow you
 	to restore your systems in the state they had several days instead of several hours or several tens of minutes, before the disaster
 	occured. For that reason data reduction on the wire is the second criterium. Note that data reduction on storage
-	usually implies data reduction on the wire, but the opposite is not always true, depending on the backup tool.
+	usually implies data reduction on the wire, but the opposite is not always true, depending on the backup tool used.
       </li>
       <li>
 	Next, it is much more frequent to have
@@ -829,7 +829,7 @@
 	We can assume the network penalty to be proportional to data processed by each software, as all protocol used are usually TCP based
 	(ftp, sftp, scp, ssh, ...), which performance is related to the system parameters (window size, MTU, etc.) not to the backup software
 	itself. As we only rely on tmpfs
-	filesystems to avoid dependency on disk I/O latency, we may approximate that the network latency or a reduction of network bandwidth would
+	filesystems for this benchmark to avoid mesuring the disk I/O performance, we may approximate that a network latency increase or a reduction of network bandwidth would
 	just inflate the relative execution time of the different tested softwares in a linear manner. In other words, adding network between
 	system and backup storage should thus not modify the relative performances of the softwares under test.
       </li>
@@ -972,7 +972,7 @@
 
     <h4>Execution time to restore a whole system - full + differential backup</h4>
     <p>
-      We use here the same extrapolation a week of daily backup done above: the first backup being a full backup
+      We use here the same extrapolation of a week of daily backup done above: the first backup being a full backup
       and differential/incremental backups done the next days.
     </p>
 
@@ -982,7 +982,7 @@
       way data changed (if all files change every day, like mailboxes, user files, ...) each new differential backup will have the same size
       and take the same processing time to complete.
       At the opposite, if new data is added each day, the differential backup size will be each day the sum of the <i>incremental</i>
-      backups that could be done instead since the full backup.
+      backups that could be done instead since the full backup was made.
     </p>
     <p>
       At the difference of the differential backup, the <u>incremental</u> backup saves only what has changed
