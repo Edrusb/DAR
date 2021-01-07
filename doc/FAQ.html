@@ -46,13 +46,13 @@
       <a href="#A11">I have a backup, how can I change its encryption scheme?</a><br>
       <a href="#A12">I have a backup, how can I change its compression algorithm?</a><br>
       <a href="#A13">Which options can I use with which options?</a><br>
-      <a href="#A14">Why dar reports corruption for the archive I have transfered with FTP?</a><br>
+      <a href="#A14">Why dar reports corruption for the backup I have transfered with FTP?</a><br>
       <a href="#UIDGID">Why DAR does save UID/GID instead of plain usernames and usergroups?</a><br>
-      <a href="#Dar_Manager_encrypted">Dar_Manager does not accept encrypted archives, how to workaround this?</a><br>
+      <a href="#Dar_Manager_encrypted">Dar_Manager does not accept encrypted backups, how to workaround this?</a><br>
       <a href="#staticOSX">How to overcome the lack of static linking on MacOS X?</a><br>
-      <a href="#single_slice">Why cannot I test, extract file, list the contents of a given slice from an archive?</a><br>
+      <a href="#single_slice">Why cannot I test, extract file, list the contents of a given slice from a backup?</a><br>
       <a href="#merge_two_isolated">Why cannot I merge two isolated catalogues?</a><br>
-      <a href="#parallel">Why cannot dar use the full power of my multi-processor computer?</a><br>
+      <a href="#parallel">How to use the full power of my multi-processor computer?</a><br>
       <a href="#threadsafe">Is libdar thread-safe, which way do you mean it is?</a><br>
       <a href="#How_to_solve_configure:_error:_Cannot">How to solve <code>configure: error: Cannot find size_t type</code>"?</a><br>
       <a href="#slow_2_4_0">Why dar became much slower since release 2.4.0?</a><br>
@@ -61,11 +61,11 @@
       <a href="#open_failed_excluded">Why dar tells me that he failed to open a directory, while I have excluded this directory?</a><br>
       <a href="#security">Dar reports a <code>SECURITY WARNING! SUSPICIOUS FILE</code> what does that mean!?</a><br>
       <a href="#copy">Can dar help copy a large directory tree?</a><br>
-      <a href="#compression">Does dar compress per file or the whole archive?</a><br>
+      <a href="#compression">Does dar compress per file or the whole backup?</a><br>
       <a href="#sizes">What slice size can I use with dar?</a><br>
       <a href="#fuse">Is there a dar fuse filesystem?</a><br>
       <a href="#tar">how dar compares to tar or rsync?</a><br>
-      <a href="#diff">Why when comparing an archive with filesystem, dar does not report new files found on filesystem?</a><br>
+      <a href="#diff">Why when comparing a backup with filesystem, dar does not report new files found on filesystem?</a><br>
       <a href="#delta">Why dar does not automatically perform delta difference (aka rsync increment)?</a><br>
       <a href="#cyrillic">Why do dar reports truncated filenames under Windows, especially with cyrillic filenames?</a><br>
       <a href="#win32">I have a 32 bits windows system, which binary package can I to use?</a><br>
@@ -88,13 +88,13 @@
 
     <a name="A2" id="A2"><b>Dar hangs when using it with pipes, why?</b></a><br>
     <p>
-      Dar can produce archive on its
+      Dar can produce backups on its
       standard output, if you give '-' as
-      basename. But it cannot read an archive from its standard input in
+      basename. But it cannot read a backup from its standard input in
       direct access mode. To
-      feed an archive to dar through pipes, you need dar_slave and two pipes
-      or use the sequential mode (--sequential-mode option, which is very
-      slow compared to the default direct access mode).
+      feed a backup to dar through pipes, you either need <code>dar_slave</code> and two pipes
+      or use the sequential mode (<code>--sequential-mode</code> option, which gives
+      slow restoration of a few files compared to the (default) direct access mode).
       To use dar with dar_slave over pipes in direct access mode (which is
       the&nbsp; more efficient way to proceed), see the <a href="usage_notes.html#dar_remote">detailed notes</a> or more
       precisely <a href="usage_notes.html#netcat_ssh">dar and ssh note</a>.
@@ -104,7 +104,8 @@
     <p>
       if you restore for example the file usr/bin/emacs dar will first
       restore usr (if the directory already exists, it will get its date and
-      ownership restored, all existing files will be preserved), then
+      ownership restored, all existing files in that directory will however stay
+      preserved), then
       /usr/bin will be restored, and last usr/bin/emacs will be restored.
       Thus 3 inodes have been
       restored or modified while only one file has been asked for restoration.
@@ -152,10 +153,10 @@
       exclusion, an "ignored" entry is added to the catalogue. At the
       end of the backup, dar compares both catalogues, the one of reference
       and the new one built during the backup process, and adds a "detruit" entry
-      (means destroyed in English), when an entry of the reference is not
+      (which means "destroyed" in French), when an entry of the reference is not
       present in the new catalogue. Thus, if an "ignored" is present no
       "detruit" will be added for that name. Then all "ignored" entries are
-      removed and the catalogue is written into the archive.
+      removed and the catalogue is written at the end of the backup or archive.
     </p>
 
     <a name="A7" id="A7"><b>Once in action, dar makes all the system slower and slower, then it stops with the message
@@ -168,10 +169,10 @@
       with the amount of data saved. If you have a few huge files you will
       have little chance to see any memory limitation problem. At the
       opposite, saving a plethora of files (either big or small), will make
-      dar request a lot of virtual memory. Dar needs this memory to build the
-      catalogue (the contents) of the archive it creates. Same thing, for
+      dar request an increasing amount of virtual memory. Dar needs this memory to build the
+      <i>catalogue</i> (the contents) of the backup it creates. Same thing, for
       differential backup, except it also needs to load in memory the
-      catalogue of the archive of reference, which most of the time will make
+      <i>catalogue</i> of the backup of reference, which most of the time will make
       dar using twice more memory when doing a differential backup than a
       full backup.
     <p/>
@@ -192,11 +193,11 @@
 	  (<a href="samples/index.html">doc/samples/dar_rqck.bash</a>).
 	</li>
         <li>
-	  If this is not enough, or if you don't want/can add swap
+	  If this is not enough, or if you don't want/cannot add swap
 	  space, recompile dar giving --enable-mode=64 argument to the configure script.
 	</li>
         <li>
-	  If this not enough, and you have some money, you can add
+	  If this is not enough, and you have some money, you can add
 	  some RAM on you system
 	</li>
         <li>If all that fails, ask for support on the
@@ -204,14 +205,14 @@
 	</li>
       </ol>
     <p>
-      Last, there is always the workaround to make several smaller archives
-      of the files to backup. For example, make a backup for all that is in
+      Last, there is always the workaround to make several smaller backups
+      of the files to save. For example, making a backup for all that is in
       /usr/local, another one for all that is in /var and so on. These backup can be full
       or differential. The drawback is not big as you can store these
-      archive side by side and use them at will. Moreover, you can feed a
-      unique dar_manager database with all these different archives
-      which will hide you the fact that there are several full archives and
-      several differential archives concerning different set of files.
+      backups side by side and use them at will. Moreover, you can feed a
+      unique dar_manager database with all these different backups
+      which will hide you the fact that there are several full and
+      several differential backups concerning different set of files.
     </p>
 
     <a name="A8" id="A8"><b>I have a backup I want to change the size of slices?</b></a><br>
@@ -219,16 +220,15 @@
       <code>dar_xform</code> is your friend!
     </p>
     <code class=block>
-      dar_xform -s &lt;size&gt; original_archive new_archive
+      dar_xform -s &lt;size&gt; original_backup new_backup
     </code>
 
     <p><code>dar_xform</code>
-      will create a new
-      archive with the slices of the requested
+      will create a new backup file with the slices of the requested
       size, (you can also make use of -S option for the first slice). Note
-      that you don't need to decrypt the archive, not dar will uncompress it,
+      that you don't need to decrypt the backup, not dar will uncompress it,
       this is thus a very fast processing. See <a href="man/index.html">dar_xform
-	man page for more</a>.
+	man page</a> for more.
       </p>
 
     <a name="A9" id="A9"><b>I have a backup in one slice, how can I split it in several slices?</b></a><br>
@@ -244,51 +244,50 @@
       <code>dar_xform</code> is your friend!
       </p>
     <code class=block>
-      dar_xform original_archive new_archive
+      dar_xform original_backup new_backup
     </code>
     <p>
-      dar_xform without -s option creates a single sliced archive. See
-      dar_xform man page for more.
+      dar_xform without <code>-s</code> option creates a single sliced backup.
+      See <a href="man/index.html">dar_xform man page</a> for more.
     </p>
 
     <a name="A11" id="A11"><b>I have a backup, how can I change its encryption scheme?</b></a><br>
     <p>
       The merging feature let you do
       that. The merging has two roles, putting
-      in one archive the contents of two archives, and at the same time
-      filtering out some file s you decided not to include into the resulting
-      archive. The merging feature can take two but also only one archive as
-      input. his is what we will use it in that special way here. I can also
-      be run without filtering any file out to the resulting archive:
+      in one backup the contents of two different backups, and at the same time
+      filtering out some files you decided not to include into the resulting
+      backup. The merging feature can take two but also only one backup as
+      input. This is what we will use and without any filter to keep all saved files.
       <p>
 	<ul>
-          <li>a single input (our original archive)</li>
+          <li>a single input (our original backup)</li>
           <li>no file filtering (so we keep all the files)</li>
           <li>
 	    keeping files compressed (no decompression/re compression) to
-	    speed up the process
+	    speed up the process (<code>-ak</code> option)
         </li>
       </ul>
 	<code class=block>
-	  dar -+ new_archive -A original_archive -K "&lt;new_algo&gt;:new pass" -ak
+	  dar -+ new_backup -A original_backup -K "&lt;new_algo&gt;:new pass" -ak
 	</code>
 	<p>
 	  If you don't want to have password in
-	  clear on the command line (command that can be seen with <i>top</i>
+	  clear on the command line (command that can be seen for example with <i>top</i>
 	  or <i>ps</i> by other users), simply provide
-	  <code>"&lt;algo&gt;:"</code> then dar will ask you on the fly the password, if using
+	  <code>"&lt;algo&gt;:"</code> then dar will ask you on the fly for the password. If using
 	  blowfish you can then just provide <code>":"</code>
 	  for the keys. Note that before release 2.5.0, -J option was needed to provide
-	  the password of the source backup. Since then without -J option dar will ask interactively
-	  for the password of the archive transform. You can still use -J
-	  option to provide the password from a DCF file.
+	  the password of the source backup. Since then, without -J option, dar will ask interactively
+	  for the password of the backup to read. You can still use -J
+	  option to provide the password from a DCF file and this way avoid dar interactively asking for it.
       </p>
     <p>
-      Note that you can also change slicing of the archive at the same time
+      Note that you can also change slicing of the backup at the same time
       thanks to -s and -S options:
     </p>
     <code class=block>
-      dar -+ new_archive -A original_archive -K ":" -ak -s 1G
+      dar -+ new_backup -A original_backup -K ":" -ak -s 1G
     </code>
     <br>
 
@@ -301,25 +300,25 @@
       to use bzip2 compression:
     </p>
     <code class=block>
-      dar -+ new_archive -A original_archive -zbzip2
+      dar -+ new_backup -A original_backup -zbzip2
     </code>
 
     <p>
       to use gzip compression
     </p>
     <code class=block>
-      dar -+ new_archive -A original_archive -zgzip
+      dar -+ new_backup -A original_backup -zgzip
     </code>
 
     <p>
       to use lzo compression, use <code>-zlzo</code>, for LZ4 use
-      <code>-zlz4</code>, for <code>zstd</code> use <code>-lzstd</code> and so on.
+      <code>-zlz4</code>, for zstd use <code>-lzstd</code> and so on.
     </p>
     <p>
-      To use no compression at all:
+      To use no compression at all, do no add any -z option or exclude all files from compression (<code>-Z "*"</code>):
     </p>
     <code class=block>
-      dar -+ new_archive -A original_archive
+      dar -+ new_backup -A original_backup
     </code>
     <br>
 
@@ -329,7 +328,7 @@
     </p>
 
     <code class=block>
-      dar -+ new_archive -A original_archive -zbzip2 -K ":" -J ":" -s 1G
+      dar -+ new_backup -A original_backup -zbzip2 -K ":" -J ":" -s 1G
     </code>
     <br>
 
@@ -339,18 +338,18 @@
       DAR provides seven commands:
     </p>
     <dl>
-      <dd><code>-c</code> to create a new archive</dd>
-      <dd><code>-x</code> to extract files from a given archive</dd>
-      <dd><code>-l</code> to list the contents of a given archive</dd>
-      <dd><code>-d</code> to compare the contents of an archive with filesystem</dd>
-      <dd><code>-t</code> to test the coherence of a given archive</dd>
-      <dd><code>-C</code> to isolate an archive (extract its contents to a usually small file)</dd>
-      <dd><code>-+</code> to merge two archives in one or create a sub
-	archive from one or two other archives</dd>
-      <dd><code>-y</code> to repair an archive</dd>
+      <dd><code>-c</code> to create a new backup</dd>
+      <dd><code>-x</code> to extract files from a given backup</dd>
+      <dd><code>-l</code> to list the contents of a given backup</dd>
+      <dd><code>-d</code> to compare the contents of a backup with filesystem</dd>
+      <dd><code>-t</code> to test the internal coherence of a given backup</dd>
+      <dd><code>-C</code> to isolate a backup (extract its contents to a usually small file) or make a snapshot of the current filesystem</dd>
+      <dd><code>-+</code> to merge two backups in one or create a sub
+	backup from one or two other ones</dd>
+      <dd><code>-y</code> to repair a backup</dd>
     </dl>
     <p>
-      Follow for each command the available options (those marked OK):
+      For each command listed above, here follows the available options (those marked OK):
     </p>
     <table class=center>
       <tr>
@@ -1655,9 +1654,9 @@
     </table>
     <br>
 
-    <a name="A14"><b><span>Why dar reports corruption of the archive I have transfered with FTP?</b></a><br>
+    <a name="A14"><b><span>Why dar reports corruption of the backup I have transfered with FTP?</b></a><br>
     <p>
-      Dar archive
+      Dar backups
       are binary files,
       they must be transfered in
       binary mode
@@ -1675,11 +1674,11 @@
     </code>
 
     <p>
-      If you transfer an archive (or
+      If you transfer a backup (or
       any other binary file) in ascii mode (the opposite of binary mode), the
-      8th bit of each byte will be lost and the archive will become
+      8th bit of each byte will be lost and the backup will become
       impossible to recover (due to the destruction of this information). Be
-      very careful to test your archive after transferring back to you host
+      very careful to test your backup after transferring back to you host
       to be sure you can delete the original file.
     </p>
 
@@ -1689,10 +1688,9 @@
     <p>In each file property is
       not present the name of the owner nor the name of the group owner, but
       instead are present two numbers, the user ID and the group ID (UID
-      &amp; GID in short). In the /etc/password file these numbers are
-      associated to names and other properties, like the login shell, the
-      home
-      directory, the password (see also /etc/shadow).
+      &amp; GID in short). The /etc/password file associates to these numbers
+      a names and some other properties (like the login shell, the
+      home directory, the password, see also /etc/shadow).
       Thus, when you do a directory list (with the 'ls' command for example
       or with any GUI program for another example), the listing application
       used
@@ -1707,15 +1705,15 @@
       system, [this way applications have not to bother with the many system
       configuration possible, the same API interface is used whatever is the
       system], then lookup returns the name if it exist and the listing
-      application display for each
+      application displays for each
       file found in a directory the attributes and the user name and group
-      name as returned by the system.
+      name as returned by the system instead of the UID and GID.
     </p>
     <p>
       As you can see, the user name and
       group name are not part of any file attribute, but UID and GID *are*
-      instead. Dar is a backup tool mainly, it does preserve at much as
-      possible the files property to be able to restore them as close as
+      instead. Dar is a backup tool mainly, it does preserve as much as
+      possible the file properties to be able to restore them as close as
       possible
       to their original state. Thus a file saved with UID=3 will be restored
       with UID=3. The name corresponding the UID 3 may exist or not,&nbsp;
@@ -1789,19 +1787,19 @@
 	From the root account in the destination live system do the
 	following:
       </li>
-      <li>restore the archive in a empty directory</li>
+      <li>restore the backup content in a empty directory</li>
       <li>
 	change the UID of files according to the one used by the
 	destination filesystem with the command:
 	    <code class=block>
-	      find /path/to/restored/archive -uid &lt;old UID&gt; -print -exec chown &lt;new name&gt; {} \;
-	      find /path/to/restored/archive -gid &lt;old GID&gt; -print -exec chgrp &lt;new name&gt; {} \;
+	      find /path/to/restored/backup -uid &lt;old UID&gt; -print -exec chown &lt;new name&gt; {} \;
+	      find /path/to/restored/backup -gid &lt;old GID&gt; -print -exec chgrp &lt;new name&gt; {} \;
 	    </code>
 	    The first command will let you
 	    remap an UID to another for all files
-	    under the /path/to/restored/archive directory<br>
+	    under the /path/to/restored/backup directory<br>
 	    The second command will let you remap a GID to another for all files
-	    under the /path/to/restored/archive directory
+	    under the /path/to/restored/backup directory
       </li>
     </ul>
 
@@ -1817,7 +1815,7 @@
     </p>
     <p>
       We temporary need an unused UID on the destination system, we will
-      assume UID 680 is not used. Then after the archive restoration in the
+      assume UID 680 is not used. Then after the backup restoration in the
       directory /tmp/A we will do the following:
     </p>
     <code class=block>
@@ -1852,49 +1850,33 @@
     <p>
       You can then move the modified
       files to appropriated destination or
-      make a new dar archive to be restored in appropriated place if you want
+      make a new dar backup to be restored in appropriated place if you want
       to use some of dar's feature like for example only restore files that
       are more recent than those present on filesystem.
     </p>
-    <a name="Dar_Manager_encrypted"><b>Dar_Manager does not accept encrypted archives, how to workaround this?</b></a><br>
+    <a name="Dar_Manager_encrypted"><b>Dar_Manager does not accept encrypted backups, how to workaround this?</b></a><br>
     <p>
       Yes, that's true, dar_manager
-      does not accept encrypted archives. The
+      does not accept encrypted backups. The
       first reason is that while dar_manager database cannot be encrypted
-      this is not very fair to add to them encrypted archives. The second
+      this is not very fair to add to them encrypted backups. The second
       reason is because the dar_manager database should hold the key for each
-      encrypted archive making this archive the weakest point in your data
+      encrypted backup making this backup the weakest point in your data
       security: Breaking the database encryption would then provide
-      access to any encryption key, and with original archive access it would
-      bring access to data of any of the archive added to the database.
+      access to any encryption key, and with original backup access it would
+      bring access to data of any of the backup added to the database.
     <p>
-    <p>
-      OK, there is however a feature in the pipe to provide to dar_manager
-      the support to encrypt its archives, then next another feature to
-      provide dar_manager the possibility to store the different archive
-      keys, then is needed another feature to have key being passed from
-      dar_manager to dar out of command-line (which would expose the keys to
-      the sight of other users on your multi-user system), then yet another
-      feature to be able to feed the database with the archive keys also
-      without using the command-line. ... well there is a lot of feature to
-      add and test before you can expect finding it in a released version of
-      dar.
-    </p>
-    <p>
-      In the meanwhile, you can proceed as follows:
+      To workaround this, you can proceed as follows:
     </p>
     <ul>
       <li>
-	isolate your encrypted archive to unencrypted 'extracted
-	catalogue': Do not use the -K option while isolating, you will however
-	need to use the -J option to let dar able to read the encrypted
-	archive. Note that still for key protection, you are encouraged to use
-	a DCF (Dar Command File, which is a plain file with a list of
-	options to be passed to dar) file with restricted permissions and
-	containing the '-J &lt;key&gt;' option to be passed for dar. The dar's
-	-B option would then receive this filename. this will avoid other users
-	of your system to have a chance to read the key you have used for your
-	archives,
+	isolate your encrypted backup into an unencrypted 'isolated
+	catalogue': Do not use the -K option while isolating.
+	Without -J option dar will prompt for the password of the encrypted
+	archive. For automated process, you are encouraged to use
+	a DCF file with restricted permissions and
+	containing the '-J &lt;key&gt;' option to be passed for dar. The instruct
+	dar to read that file thanks to -B option.
       </li>
       <li>
 	add these extracted catalogue to the dar_manager database
@@ -1902,20 +1884,20 @@
       </li>
       <li>
 	change the name and path of the added catalogue to point to
-	your real encrypted archives (-b and -p options of dar_manager).</li>
+	your real encrypted backups (-b and -p options of dar_manager).</li>
     </ul>
 
     <p>
-      Note that the database is not
-      encrypted this will expose the archive
-      file listing (not the file's contents) of your encrypted archives to
+      Note that as the database is not
+      encrypted this will expose the backup
+      file listing (not the file's contents) of your encrypted backups to
       anyone able to read the database, thus it is recommended to set
       restrictive permission to this database file.
     </p>
     <p>
       When will come the time to use dar_manager to restore some file, you
       will have to make dar_manager pass the key to dar for it be able to
-      restore the needed files from the archive. This can be done in several
+      restore the needed files from the backup. This can be done in several
       ways: dar_manager's command-line, dar_manager database or dar.dcf file.
     </p>
 
@@ -1931,38 +1913,25 @@ on dar_manager's command-line and on dar's command-line.
 	-i option. The -o option exposes the arguments you want to be passed to
 	dar because they are on dar_manager command-line. While the -i option,
 	let you do the same thing but in an interactive manner, this is a
-	better choice. However, if -i option it is a safe way to feed the
-	dar_manager database with the '-K &lt;key&gt;' option to be passed to
-	dar, this option will be received by dar on command-line. Thus still
-	the key will be visible by other users on your same system.
+	better choice.
       </li>
       <li>
 	A better way is to use a DCF file with restrictive
 	permission. This one will receive the '-K &lt;key&gt;' option for dar
-	to be able to read the encrypted archives. And dar_manager will ask dar
+	to be able to read the encrypted backups. And dar_manager will ask dar
 	to read this file thanks to the '-B &lt;filename&gt;' option you will
-	have give either on dar_manager's command-line (-e -B &lt;filename&gt;
+	have given either on dar_manager's command-line (-e -B &lt;filename&gt;
 	...) or from the stored option in the database (-o -B &lt;filename&gt;).
       </li>
       <li>
 	The best way is let dar_manager pass the -K option to dar,
 	but without password : simply passing the -e "-K :" option to
 	dar_manager. When dar will get the -K option with the ":" argument, it
-	will dynamically ask for the password and store it in secured memory.
+	will dynamically ask for the password and store it in a secured memory.
       </li>
     </ol>
 
-    <p>
-      note that you must prevent other
-      users reading any file holding the
-      archive key, this covers the dar_manager database as well as the DCF
-      files you could temporarily use. Second note, in this workaround
-      approach we have assumed that all encrypted archive do share the same
-      key.
-      </p>
-      <br>
-
-      <a name="staticOSX"><b>How to overcome the lack of static linking on MacOS X?</b></a><br>
+    <a name="staticOSX"><b>How to overcome the lack of static linking on MacOS X?</b></a><br>
 
     <p>
       The answer comes from Dave
@@ -2023,190 +1992,68 @@ on dar_manager's command-line and on dar's command-line.
 	</li>
     </div>
 
-    <a name="single_slice"><b>Why cannot I test, extract file, list the contents of a given slice from an archive?</b></a><br>
+    <a name="single_slice"><b>Why cannot I test, extract file, list the contents of a given slice from a backup?</b></a><br>
 
     <p>
-      Well this is due to dar's design. Since release 2.4.0 two feature can help
-      you be close to that point, namely <b>--sequential-reading</b>
-      which asks dar to read the archive sequentially and <b>-al</b>
-      option which asks dar to be
-      relaxed on sanity and coherence checks. You can put a single slice into
-      a given directory, and create as much empty files as necessary to
-      simulate slices of that archive which has lower numbers than the real
-      slice(s) that remains of a partially lost archive. Then using
-      sequential-reading (--sequential-read option) and laxist mode (-al
-      option) you will get to the
-      requested information:
+      Well this is due to dar's design. However you can list a whole backup and see
+      in which slice(s) a file is located:
     </p>
 
     <code class=block>
-      mkdir tempo
-      cd tempo
-      ln -s ../sowhere/backup.3.dar
-      touch backup.1.dar
-      touch backup.2.dar
-      dar -l backup --sequential-reading -al
-    </code>
-
-    <p>
-      Note however that using the
-      laxist mode skips a lot a sanity checks. This method is to be used as
-      last ressort method upon heavy archive corruption. It is still a good
-      option to test your archive once on destination medium and if possible
-      in addition to add redundancy data using
-      <a href="usage_notes.html#Parchive">Parchive</a> to be able to repair
-      an archive corrupted due to media problem.
-    </p>
-
-    <p><b><u>Alternative:</u></b></p>
-
-    <p>
-      Once missing slices have been replaced by empty files (using the touch
-      command for example),
-    </p>
-    <p>
-      if you have the last slice of the archive, you can avoid using
-      --sequential-read mode and only use the lax mode (-al option). You can
-      then use the testing operation to known what file can be retrieved from
-      the archive. if you have not the last slice, you must use
-      --sequential-read mode in addition to lax mode (-al option)
-    </p>
-    <p>
-      If you want to know what particular files a slice contains, you can add
-      the following option:
-    </p>
-    <code class=block>
-      -E "echo '************* Opening slice %N **********'"
-    </code>
-    <p>
-      all in one:
-    </p>
-    <code class=block>
-      touch &lt;archive&gt;.&lt;missing slice&gt;.dar
-      dar -t &lt;archive&gt; -al -E "echo '****** Opening slice %N ******'" -v &gt; result.txt
-      less result.txt
+      <b># dar -l test <e>-Tslice</e> -g etc/passwd</b>
+      <e>Slice(s)</e>|[Data ][D][ EA  ][FSA][Compr][S]|Permission| Filemane
+      --------+--------------------------------+----------+-----------------------------
+      <e>1</e>        [Saved][-]       [-L-][  69%][ ] drwxr-xr-x etc
+      <e>2</e>        [Saved][ ]       [-L-][  63%][ ] -rw-r--r-- etc/passwd
+      -----
+      All displayed files have their data in slice range [1-2]
+      -----
+      <b>#</b>
     </code>
     <br>
 
     <a name="merge_two_isolated"><b>Why cannot I merge two isolated catalogues?</b></a><br>
     <p>
       Since version 2.4.0, isolated catalogues can also be used to rescue an
-      corrupted internal catalogue of the archive it has been isolated from.
+      corrupted internal catalogue of the backup it has been isolated from.
       For that feature be possible, a mecanism let dar know if an given
-      isolated catalogue and a given archive correspond to the same contents.
+      isolated catalogue and a given backup correspond to the same contents.
       Merging two isolated catalogues would break this feature as the
-      resulting archive would not match any real archive an could only be
+      resulting backup would not match any real backup an could only be
       used as reference for a differential backup.
     </p>
 
-    <a name="parallel"><b>Why cannot dar use the full power of my multi-processor computer?</b></a><br>
+    <a name="parallel"><b>How to use the full power of my multi-processor computer?</b></a><br>
     <p>
-      Parallel computing programming is
-      a science by itself. For having done a specialization in that area
-      during my studies, I can explain briefly here the constraints. A
-      program can use several processor if the algorithm it uses is able to
-      be parallelized. Such an algorithm can either statically (at
-      programming time) or dynamically (at execution time) be cut in several
-      independent execution threads. These different execution threads must
-      be as much autonomous as possible between them, if you don't want to
-      have one thread waiting for another. The
-      constraint is this one: if you cannot have different threads with no or
-      very little communication and dependence then parallelization does not
-      worth it.
-      </p>
-      <p>
-	Back to dar. From a very abstracted point of view, dar works by
-	fetching files from the filesystem and by appending their data in a
-	single file (the archive). For each file, dar records in memory the
-	location of the data and once all files have been treated, this
-	location information (contained in the so called "catalogue") is added
-	at the end of the archive.
-      </p>
-      One could say that to parallelize file treatment, instead of proceeding
-      file by file, let's do all file at the same time (or rather let's say N
-      files at the same time). OK, but first you would have an important loss
-      of performance at disk level as the disk heads would spend most of the
-      time seeking from one of the N file's data to another of the N file's
-      data. The second point would be that to add a file to the archive you
-      must know the position of the end of the last added file, which is not
-      possible to know in advance because of compression and/or
-      encryption.&nbsp; thus a given thread would have to wait that another
-      has finished to be able to drop in turn the data of the file it owns...
-      As you can guess, parallelizing this way would bring worse performance
-      than the sequential algorithm.
+      Since release 2.7.0 it is possible to have dar efficiently using many threads at two independent levels:
     </p>
+    <dl>
+      <dt class=void>encryption</dt><dd>
+	You can specify the number of thread to use to cipher/decipher a backup. Note however
+	that during tests done for 2.7.0 validation, it was observed that having more
+	than two threads for encryption does not gives better results than using only two threads
+	when compression is used, because most of the time compression is more CPU intensive
+	than encryption (well all depends on the chosen algorithms, that's right).
+      </dd>
+      <dt class=void>compression</dt><dd>
+	Before release 2.7.0 compression was done per file in streaming mode. In this
+	mode to compress data you need to know the result of the compression of the data that
+	is located before it, this brings good compression ratio but is impossible to
+	parallelize. To be able to compress in parallel one need to split data in block,
+	and compress blocks independently. There you can use a lot of threads up to the time
+	when this is the disk I/O that is the slowest process. Adding more compression
+	thread will not change the result. The drawback of compressing per thread is less
+	the compression ratio that is slightly less good than in stream compression mode, than
+	the memory requirement to hold a data block of clear data per thread and the compressed
+	resulting data, times the number of threads. To avoid having any thread waiting for
+	disk I/O, you even have to store a bit more memory block than the number of threads,
+	this is managed by libdar.
+      </dd>
+    </dl>
     <p>
-      Another possibility is to have several thread doing :
-    </p>
-    <ul>
-      <li>file lookup (report which file are present on filesystem)</li>
-      <li>file filtering (determine which file to save, which file to
-	compress, and so on)</li>
-      <li>file compression</li>
-      <li>file encryption</li>
-    </ul>
-    <p>
-      This would be a bit better, but : File lookup is very fast and does not
-      consume much CPU, as well as file filtering.&nbsp; Instead, file
-      compression or file encryption are very CPU intensive. Thus, first, if
-      you only use compression OR encryption parallelizing this way will not
-      bring you much extra power as the encryption or the compression are not
-      possible to parallelize (compressing a file is done sequentially, same
-      thing when encrypting it). Rawly you will get the same execution time
-      as
-      the sequential execution. Second if you use no compression and no
-      encryption, your CPU will stay idle most of the time and the time to
-      execute dar will only depend on the speed of your hard disk, so you
-      will not get any improvement here. Last, only if you use both
-      encryption and compression you could gain some performance having
-      parallelization, but dar could only use at most two CPU! no more! And
-      second, the gain of time will be less than 2 (it will not be twice
-      faster, but much less) as for a given amount of data, compression needs
-      much more time to proceed than encryption. Thus the encryption thread
-      will most of the time wait for compressed data.
-      </p>
-      <p>
-	Since release 2.5.0 with -G option is available to active such way of
-	using several CPU, but that clearly shows the gain does not worth the
-	effort and complexity brought by this feature, this it is not
-	recommended to use it and it
-      </p>
-      OK, you have maybe found also another possibility : having N threads
-      for compression and M threads for encryption. Assuming&nbsp; encryption
-      is faster than compression, we could choose N &gt; M.&nbsp; We could
-      also have a fixed value for N and a dynamic value for M depending on
-      how fast compression is running. Well, this would let dar be able to
-      compress and encrypt several files at the same time, assuming that
-      reading data and data writing time is negligible compared to
-      compression time (which must be demonstrated as several files have
-      potentially to be read at the same time), we could maybe have a real
-      performance gain. But, ... while several files can now be compressed at
-      the same time, only one can be written to disk at a given time. Thus,
-      during the time the compression of a file has started and the time it
-      has finished all other threads have to keep their compressed data in
-      memory. Then a next thread can drop its data to the archive while all
-      other keep compressing to memory (RAM). We will quickly lack of RAM! Or
-      your computer will start to swap, or you have to store the data back to
-      disk in a temporary file, which file will have to be read again and
-      wrote back to archive. So, doing so will bring huge disk performance
-      degradation, as disk will server for read file's data, writing its
-      compressed data to temporary file, reading back its compressed data,
-      writing its compressed data to archive.
-    </p>
-    <p>
-      Last, when using parallelization there is a always a cost due to
-      inter-process communication and concurrent I/O operations on the
-      hardware (here, hard disk are used at the same time to read files to
-      backup and to write them into the archive). This cost becomes
-      negligible when the number of parallel thread increase, assuming all
-      thread are well busy ... here there is a bottleneck, which is the
-      archive creation that seems to avoid a real impressive parallelization.
-    </p>
-    <p>
-      Conclusion, unless you can find another way to parallelize dar, it will
-      not bring noticeable improvement to have a parallelized version of dar.
-      Parallelization is strongly related to the algorithm used, some
-      algorithms are well adapted to this operation some others are not.
+      To activate multi-threading with dar, use the <code>-G</code> option, read the dar man page
+      for all details about the way to define the number of encryption thread and the number of
+      compression thread, as well as the compression block size to use.
     </p>
 
     <a name="threadsafe"><b>Is libdar thread-safe, which way do you mean it is?</b></a><br>
@@ -2220,63 +2067,15 @@ on dar_manager's command-line and on dar's command-line.
       precautions in your programs while using libdar (or any other library).
     </p>
     <p>
-      Let's take an example, considering a simple library that provides two
-      functions that both receive the address of an integer as argument. The
-      first increments the given integer up to an specific user key pressed,
-      while the second decrements the given integer up to another user key
-      pressed. This library is thread-safe in the way that there is no static
-      variable in it nor it has any given state at a particular time. It is
-      just a set of two functions.
-    </p>
-    <p>
-      Now, your multi-threaded program is the following: at a given time you
-      have one thread running the first library function while another runs
-      the other library function. All will work fine unless you provided to
-      both threads the same integer. One thread would then increment it while
-      the other would decrement it, and you would not have the expected
-      behavior you could get if you were not using multi-threaded
-      environment. The problem would be the same if instead of using an
-      external library you were accessing this same integer from two
-      different threads at the same time.
-    </p>
-    <p>
       Care must thus be taken for two different threads
-      <b>not acting on the same variables at the same time</b>.
+      <b>not acting on the same variables/objects at the same time</b>.
       This is however possible with the use of posix mutex, which would
       define a portion of code (known as a critical section) that cannot be
-      entered by a thread while another one is accessing it (such a thread is
-      suspended until the other thread exits the critical section).
+      entered by more than one thread at a time.
     </p>
     <p>
-      For libdar, this is the same, you must pay attention not having two or
-      more different threads acting on the same data. Libdar provides a set
-      of classes, which can be seen as a set of type (like a C struct) with
-      associated functions (known as methods in the object oriented world).
-      From these classes, your program will create objects: each object *is*
-      a variable. Technically, invoking a method on an object is exactly the
-      same as invoking a function giving it as hidden argument a pointer to
-      the object ; while semantically, invoking a method is a way to read or
-      modify this variable (= the object). Thus, if you plan to act on a
-      given object from several threads at the same time, you must use posix
-      mutex or any other mean to mutually exclude the access to this object
-      between all your threads, this way only one thread may read or modify
-      this variable (=this object) at a given time.
-    </p>
-    <p>
-      Note that internally libdar uses some static variables. By static
-      variables, I mean variable that exist even when no thread is running a
-      libdar function or method. These variables are enclosed in critical
-      sections for libdar's user may use it normally. In other words, this is
-      transparent to you. For example, to cancel a libdar call, the mechanism
-      uses an array in which the tid (thread id) by which a call is ran must
-      be canceled: If you wish to cancel a libdar call ran by thread 10,
-      another thread will add the tid 10 to this list. At regular
-      checkpoints, all libdar function check that this same list does not
-      contain the tid the call is ran from. If so, the call aborts/returns
-      and the thread can continue its execution out of libdar code. As you
-      see, several thread may read or write this array of tid at the same
-      time. thanks to a set of mutex this is transparent to you and for this
-      reason, libdar can be said to be thread-safe.
+      A few objects provided by libdar API supports the concurrent access
+      from several threads, read the API documentation for more.
     </p>
 
     <a name="How_to_solve_configure:_error:_Cannot"><b>How to solve
@@ -2295,27 +2094,27 @@ on dar_manager's command-line and on dar's command-line.
     </p>
     <ul>
       <li>
-	Espetially	to be able to read dar archive through pipes in
+	Espetially	to be able to read dar backup through pipes in
 	sequential mode, dar inserts so-called "escape sequence" to know
 	for example when a new file starts. This way dar can skip to the next
-	mark upon archive corruption or if the given file has not to be
+	mark upon backup corruption or if the given file has not to be
 	restored. However, if such a sequence of byte is found into a file's
 	data, it must be modified not to collide with real escape sequences.
-	This leads dar to inspect all data added to an archive for
-	such sequence of byte, instead of just copying the data to the archive
+	This leads dar to inspect all data added to a backup for
+	such sequence of byte, instead of just copying the data to the backup
 	(eventually compressing and cyphering it).
       </li>
       <li>
 	The other feature that brings an important overhead is the
 	sparse file detection mechanism. To be able to detect a hole in a file
-	and store it into the archive, dar needs here too, to inspect each
+	and store it into the backup, dar needs here too, to inspect each
 	file's data.
       </li>
     </ul>
     <p>
       You can disable both of these features, using respectively the options <code><b>-at</b></code>
       option, which suppress "tape marks" (just another name for escape
-      sequences), but does not allow the generated archive to be used in
+      sequences), but does not allow the generated backup to be used in
       sequential read mode, and <b><code>-1 0</b></code>
       option, which completely disables the sparse file detection. The
       execution time becomes back the same as the one of dar 2.3.x releases.
@@ -2362,17 +2161,8 @@ on dar_manager's command-line and on dar's command-line.
     <a name="search_for_questions"><b>How to search for questions (and their answers) about known problems similar to mines?</b></a><br>
 
     <p>
-      Before
-      sending an email to the dar-support mailing-list, you are welcome
-      to first look in the already sent email if your problem has not yet
-      been exposed and solved. This will first for you be the fastest way to
-      get an answer to your problem, and for me a way to preserve time for
-      development.
-    </p>
-    <p>
-      But yes, there is now tones of emails subjects to read to have a chance to find
-      the answer to your problem. The most simple way is to use the
-      <a href="https://sourceforge.net/p/dar/mailman/search/?mail_list=dar-support">dar-support mailing-list archive searchengine</a>
+      Have a look a the <a href="https://sourceforge.net/p/dar/mailman/search/?mail_list=dar-support">dar-support mailing-list archive</a>
+      and if you cannot find any answer to your problem feel free to send an email to this mailing-list describing your problem/need.
     </p>
 
     <a name="open_failed_excluded"><b>Why dar tells me that he failed to open a directory, while I have excluded this directory?</b></a><br>
@@ -2415,13 +2205,13 @@ on dar_manager's command-line and on dar's command-line.
       When dar reports the following message:
     </p>
     <code class=block>
-      SECURITY WARNING! SUSPICIOUS FILE &lt;filepath&gt;: ctime changed since archive of reference was done, while no inode or data changed
+      SECURITY WARNING! SUSPICIOUS FILE &lt;filepath&gt;: ctime changed since backup of reference was done, while no inode or data changed
     </code>
 
     <p>
       You should be concerned by finding an explanation to the root cause
       that triggered dar to ring this alarm. As you probably know, a unix
-      file has three dates:
+      file has three (sometimes four) dates:
     </p>
 
     <ol>
@@ -2434,6 +2224,8 @@ on dar_manager's command-line and on dar's command-line.
       <li><b>ctime</b> is changed
 	anythime ou modify the file's attributes (the is the last <b>c</b>hange time)
       </li>
+      <li><b>btime</b> is never changed once a file has been created (this is the <b>b</b>irth time or creation time),
+	not all filesystem do provide it.
     </ol>
 
     <p>
@@ -2475,7 +2267,7 @@ on dar_manager's command-line and on dar's command-line.
       </li>
       <li>
 	have you recently restored your data and are now performing
-	a differential backup taking as reference the archive used to restore
+	a differential backup taking as reference the backup used to restore
 	that same data? Or in other words, does that particular file has just
 	been restored from a backup (was removed by accident for example)?
       </li>
@@ -2495,6 +2287,7 @@ on dar_manager's command-line and on dar's command-line.
       <li>mtime is provided by the command: <code>ls -l</code></li>
       <li>atime is provided by the command : <code>ls -l --time=atime</code></li>
       <li>ctime is provided by the command : <code>ls -l --time=ctime</code></li>
+      <li>the <code>stat</code> command provides all dates of a given file: <code>stat &lt;filename&gt;</code></li>
     </ul>
     <dl>
       <dt class=void>Note:</dt>
@@ -2512,7 +2305,7 @@ on dar_manager's command-line and on dar's command-line.
 	backup, if that same file has not been modified since, dar will see
 	that the ctime has changed while no other metadata did (user,
 	ownership, group, mtime), thus this alarm message will show for all
-	saved files in the last 2.3.11 archive made. The next differential
+	saved files in the last 2.3.11 backup made. The next differential
 	backup made using dar 2.4.0 (or more recent), the problem will not show
 	anymore.
       </dd>
@@ -2531,7 +2324,7 @@ on dar_manager's command-line and on dar's command-line.
       </ul>
       <p>
 	Last point, if you can explain the cause of the alarm and are annoyed
-	by it (you have hundred of files concerned for example ) <b>you can
+	by it (you have hundred of files concerned for example) <b>you can
 	  disable this feature</b> adding the <code><b>-asecu</b></code>
 	switch to the command-line.
       </p>
@@ -2569,7 +2362,7 @@ on dar_manager's command-line and on dar's command-line.
       </ol>
       <p>
 	Using the following command will
-	do the trick without relying on temporary file or archive:
+	do the trick without relying on temporary file or backup:
       </p>
       <code class=block>
 	dar -c - -R &lt;srcdir&gt; --retry-on-change 3 -N | dar -x - --sequential-read -N -R &lt;dstdir&gt;
@@ -2616,36 +2409,36 @@ be done using:
     <p>
       But, no, diff will not check extended Attributes, File Forks or Posix
       ACL, hard linked inodes, etc. If you want a more controlable way of
-      copying a large directory, simply use dar with a real archive file,
-      compare the archive toward the original filesystem, restore the archive
+      copying a large directory, simply use dar with a real backup file,
+      compare the backup toward the original filesystem, restore the backup
       contents to its new place, and compare the restored filesystem toward
-      the original archive.
+      the original backup.
     </p>
     <p>
       Any better idea? Feel free to contact dar's author for an update of
       this documentation!
     </p>
 
-    <a name="compression"><b>Does dar compress per file or the whole archive?</b></a><br>
+    <a name="compression"><b>Does dar compress per file or the whole backup?</b></a><br>
     <p>
       Dar uses compression (gzip, lzo, bzip2, xz/lzma, zstd, lz4, ...) with different level of
       compression (1 for quick but
       low compression up to 9 for best
       compression but slower execution) on <u>a file by file basis</u>.
       I other words, the compression engine is reset for each new file added
-      into the archive. When a corruption occurs in a
+      into the backup. When a corruption occurs in a
       file like a compressed <i>tar</i>
-      archive, it is not possible to decompress the data passed
+      backup, it is not possible to decompress the data passed
       that corruption, with tar you loose all files stored after such data
       corruption.
     </p>
     <p>
       Having compression per file has instead the <u>advantage</u>
-      to only impact one file inside the archive and all files that are
+      to only impact one file inside the backup and all files that are
       stored before or after such data corruption can still be restored from
-      that corrupted archive. Compressing per file opens the possibility to
+      that corrupted backup. Compressing per file opens the possibility to
       not compress all files in the
-      archive, in particular already compressed files (like *.jpeg, *.mpeg, some *.avi
+      backup, in particular already compressed files (like *.jpeg, *.mpeg, some *.avi
       files and of course the *.gz, *.bz2 or *.lzo files). Avoiding
       compressing already compressed files save CPU cycles (in other words
       it speeds up backup process time). And while compressing an already
@@ -2697,7 +2490,7 @@ be done using:
       The <b>minimum slice size is around 20 bytes</b>,
       but you will only be able to store 3 to 4 bytes of information per
       slice, due to the slice header that need around 15 bytes in each slice (this vary
-      depending on options used and may increase in future archive version
+      depending on options used and may increase in future backup version
       format). <b>But there is no maximum slice size!</b>
       In other words you can give to <code>-s</code> and <code>-S</code> options
       an as long as required positive integer, thanks to its internal own
@@ -2716,7 +2509,7 @@ be done using:
       Last point dar/libdar can be compiled using the --enable-mode=64 option
       given to ./configure while building dar (this is the default since release 2.6.0).
       This replaces the "infinint" type by 64 bits integers, for better performances and reduced memory usage.
-      However this has some drawback on archive size and dates. See the <a href="Limitations.html">limitations</a> for more details.<br>
+      However this has some drawback on backup size and dates. See the <a href="Limitations.html">limitations</a> for more details.<br>
       Since release 2.6.0 the default being the 64 bits mode, to have dar/libdar using <i>infinint</i>
       one need to use the following option <code>./configure --enable-mode=infinint</code>.
     </p>
@@ -2726,12 +2519,12 @@ be done using:
     <p>
       You can find several applications
       relying on dar or directly on libdar
-      to manage dar archive, these are referred here as <a href="presentation.html#external_tools">external software</a>
+      to manage dar backup, these are referred here as <a href="presentation.html#external_tools">external software</a>
       because they are not maintained nor have been created by the author of
       dar and libdar. <a href="http://www.boomerangsworld.de/cms/avfs/extfs?lang=en">AVFS</a>
       is such external software that provides a virtual file system layer for
       transparently accessing the content
-      of archives and remote directories just like local files.
+      of backups and remote directories just like local files.
     </p>
 
     <a name="tar"><b>how dar compares to tar or rsync</b></a><br>
@@ -2742,35 +2535,35 @@ be done using:
       regard to a set of common use cases. Hopefully this will help you answer this question.
     </p>
 
-    <a name="diff"><b>Why when comparing an archive with filesystem, dar does not report new files found on filesystem?</b></a><br>
+    <a name="diff"><b>Why when comparing a backup with filesystem, dar does not report new files found on filesystem?</b></a><br>
 
     <p>
-      Archive comparison (<code>-d</code> option) is
+      Backup comparison (<code>-d</code> option) is
       to be seen as a step further than
-      archive testing (<code>-t</code> option) where dar checks the archive internal
+      backup testing (<code>-t</code> option) where dar checks the backup internal
       structure and usability. The step further here is not only to check
-      that each part of the archive is readable and has a correct associated
+      that each part of the backup is readable and has a correct associated
       CRC but also that it matches what is present on filesystem. So yes, if
       new files are present on filesystem, nothing has to be reported. If a
       file changed, dar reports that the file does not match what's in the
-      archive, if a file is missing dar cannot compare it with filesystem
+      backup, if a file is missing dar cannot compare it with filesystem
       and reports an error too.
     </p>
     <p>
       So you want to know what has changed on your filesystem?
       No problem, <b>do a differential backup!</b>
       OK, you don't want to have a new backup or do not have the space for
-      that, just output the archive to /dev/null and request on-fly isolation
+      that, just output the backup to /dev/null and request on-fly isolation
       as follows:
     </p>
     <code class=block>
-      dar -c - -A &lt;ref archive&gt; -@ &lt;isolated&gt; ... other options ... &gt; /dev/null</span><br>
+      dar -c - -A &lt;ref backup&gt; -@ &lt;isolated&gt; ... other options ... &gt; /dev/null</span><br>
     </code>
 
     <p>
       <dl>
-	<dt class=void><code>&lt;ref archive&gt;</code></dt>
-	<dd>is the archive of reference or an isolated
+	<dt class=void><code>&lt;ref backup&gt;</code></dt>
+	<dd>is the backup of reference or an isolated
 	  catalogue
 	</dd>
 	<dt class=void><code>&lt;isolated&gt;</code></dt>
@@ -2788,7 +2581,7 @@ be done using:
     </code>
     <p>
       It will give you the exact difference between your current filesystem
-      and the filesystem at the time the <code>&lt;ref archive&gt;</code> was done:
+      and the filesystem at the time the <code>&lt;ref backup&gt;</code> was done:
       modified files and new files are reported with <code>[inref]</code> for either data EA or both,
       while deleted files are reported by <code>[--- REMOVED ENTRY ----]</code>
       information, followed by the estimated removal date and the type of the
@@ -2800,8 +2593,7 @@ be done using:
     <a name="delta"><b>Why dar does not automatically perform delta difference (aka rsync increment)?</b></a><br>
 
     <p>
-      Because delta difference provided by librsync to support
-      this feature is subject in theory to checksum collision (but it is very
+      Because delta different is subject in theory to checksum collision (but it is very
       unprobable though), which could lead a new version of a file being seen
       the same as an older one while some changes took place in it. A second
       reason is to take care of users preference, that do not want
@@ -2935,14 +2727,14 @@ be done using:
       compression/speed levels with lzo.
     </p>
     <p>
-      On the other side as of today (2017) <i>lzop</i> command line tool
+      In the other hand, as of today (2017) <i>lzop</i>, the command line tool,
       uses the very degradated lzo algorithm known as <i>lzo1x_1_15</i>
       for level 1 and  the intermediate <i>lzo1x_1</i> algorithm
       for levels from 2 to 6, which makes levels 2 to 6
-      totally equivalent from <i>lzop</i> program point of view.
-      Last, compression levels 7 to 9 for <i>lzop</i> is the same <i>lzo1x_999</i>
-      algorithm as what dar/libdar uses, only algorithm that provides a compression level.
-      In total lzop only provides 5 different
+      totally equivalent from the <i>lzop</i> program point of view.
+      Last, compression levels 7 to 9 for <i>lzop</i> uses the same <i>lzo1x_999</i>
+      algorithm as what dar/libdar uses, which is the only algorithm of the lzo family
+      that makes use of a compression levels. In total lzop only provides 5 different
       compression levels/algorithms only.
     </p>
     <p>
@@ -2952,9 +2744,9 @@ be done using:
       and <code><b>lzop-3</b></code>. As
       you guess, <code>lzop-1</code> uses the <i>lzo1x_1_15</i> algorithm as lzop does for
       its compression level 1, and <code>lzop-3</code> uses the <i>lzo1x_1</i> algorithm as lzop does
-      for its compression level 2 to 6. For both lzop-1 and lzop-3 algorithms,
+      for its compression levels 2 to 6. For both lzop-1 and lzop-3 algorithms,
       the compression level is not used, you can keep the default or change its value this
-      will not change dar behavior
+      will not change dar behavior.
     </p>
 
     <table class=center>
@@ -3181,10 +2973,11 @@ be done using:
       First this is by choice, because -afile-auth also uses ~/.netrc even
       when using sftp. Second it could be possible to first try public key
       authentication and falling back to password authentication, but it
-      would require libdar to first connect, eventually failing if pubkey is
+      would require libdar to first connect, eventually failing if pubkey was
       not provisionned or wrong then connecting again asking user for
-      password on command line. I seems more efficient doing that way, while
-      the counterpart is not huge for user (you can add -afile-auth in your
+      password on command line. I seems more efficient doing else: file authentication
+      when user ask to to so, password authentication else.
+      The counterpart is not huge for user (you can add -afile-auth in your
       ~/.darrc and forget about it).
     </p>
 
@@ -3281,7 +3074,7 @@ be done using:
 	  this is the server we have already connected to
 	</dd>
 	<dt class=void><code>&lt;host-key type&gt;</code></dt><dd>
-	  this is the type of key, and there resides the problem
+	  this is the type of key
 	</dd>
 	<dt class=void><code>&lt;key&gt;</code></dt><dd>
 	  this is the public key the server has sent the first time we connected
@@ -3291,10 +3084,11 @@ be done using:
       We will focus on the second field.
     </p>
     <p>
-      dar/libdar relies on <i>libcurl</i> relies for networking protocol interaction, which
+      dar/libdar relies on <i>libcurl</i> for networking protocol interaction, which
       in turn relies on <i>libssh2</i>. Before <i>libssh2</i> 1.9.0 only <i>rsa</i>
       host key were supported leading to this message as soon as the <i>known_hosts</i>
-      file contained a non-rsa host key (even another host than the one we tend to connect).
+      file contained a non-rsa host key (even another host listed in the <i>known_hosts</i>
+      file than the one we tend to connect).
       As of December 2020, if 1.9.0 has now support for addition host key types (<i>ecdsa</i> and
       <i>ed25519</i>) libcurl does not yet leverage this support and the problem persists.
       I'm confident that things will be updated soon for this problem to be solved in a few months.
@@ -3307,7 +3101,7 @@ be done using:
 	disable known_hosts checking, by setting the environment
 	variable <code>DAR_SFTP_KNOWNHOSTS_FILE</code> to an empty string. Libdar will then
 	not ask libcurl/libssh2 to check for known hosts validity,
-	<b>but this is not a recommend this option!</b>,
+	<b>but this is not a recommend option!</b>
 	because it opens the door to man-in-the-middle attacks.
       </li>
       <li>
@@ -3372,7 +3166,7 @@ be done using:
       argon2 hashing (libargon2)   : YES
 
       compiled the Jan  7 2021 with GNUC version 8.3.0
-      dar is part of the Disk ARchive suite (Release 2.7.0_dev)
+      dar is part of the Disk Backup suite (Release 2.7.0_dev)
       dar comes with ABSOLUTELY NO WARRANTY; for details
       type `dar -W'. This is free software, and you are welcome
       to redistribute it under certain conditions; type `dar -L | more'
@@ -3382,9 +3176,9 @@ be done using:
       If you read "infinint" and see the above error message from dar, thanks to
       <a href="index.html#reporting_a_bug">report a bug</a> this should never occur.
       Else the problem appear when
-      using dar before release 2.5.13 either at archive creation time when
-      dar met a file with a negative date, or at archive reading time,
-      reading an archive generated by dar 2.4.x or older and containing a
+      using dar before release 2.5.13 either at backup creation time when
+      dar met a file with a negative date, or at backup reading time,
+      reading a backup generated by dar 2.4.x or older and containing a
       file with a very distant date in the future thing dar 2.4.x and below
       recorded when the system returned a negative date for a file to save.
     </p>
@@ -3417,40 +3211,38 @@ be done using:
 
     <p>
       it is possible to convert a differential backup if you also have the full
-      backup is has been based on, in other words: the archive of reference.
+      backup is has been based on, in other words: the backup of reference.
       This is pretty simple to do:
     </p>
 
     <code class=block>
-      dar -+ new_full_backup -A archive_of_reference -@ differential_backup full-from-diff [other options]
+      dar -+ new_full_backup -A backup_of_reference -@ differential_backup full-from-diff [other options]
     </code>
 
     <dl>
       <dt class=void><b>new_full_backup</b></dt><dd>
-	is an archive that will be created according the provided other options
+	is a backup that will be created according the provided other options
 	(compression, encryption, slicing, hashing and so on as specified on arguments).
       </dd>
-      <dt class=void><b>archive_of_reference</b></dt><dd>
+      <dt class=void><b>backup_of_reference</b></dt><dd>
 	is the full backup that was used as reference for the differential backup
       </dd>
       <dt class=void><b>differential_backup</b></dt><dd>
-	is the differential backup you want to convert a full backup
+	is the differential backup you want to convert into a full backup
       </dd>
     </dl>
 
     <p>
       the important point is the last argument <code>"full-from-diff"</code> which is defined in
       /etc/darrc and makes the merging operation used here (-+ option) working as expected for
-      the resulting archive be the same as if a full backup had been done instead of a differential
+      the resulting backup be the same as if a full backup had been done instead of a differential
       backup at the time "differential_backup" was created.
     </p>
     <p>
-      For incremental backups, (archive which reference is not a full backup) you can also use
+      For incremental backups, (backup which reference is not a full backup) you can also use
       this method but you first need to create the full backup from the incremental/differential
-      archive that has been used as reference for this incremental backup. Thus the process should
-      follow the same order used to create backups, from the full backup transforming each incremental
-      backup in turn into a full backup and using the latest full backup created this way to transform
-      the next incremental backup into full backup.
+      backup that has been used as reference for this incremental backup. Thus the process should
+      follow the same order used to create backups.
     </p>
 
   </body>
