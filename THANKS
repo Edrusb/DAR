@@ -2,7 +2,8 @@ version 2.7.0
 --------------
 Thanks to Mihai Moldovan for code adaptation to support compilation
 out of source code directory. Thanks again to Zach Adams for security
-enhancement suggestions.
+enhancement suggestions. Thanks to Andrea Vai for his review of the
+the benchmark document.
 
 version 2.6.14
 --------------
