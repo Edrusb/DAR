@@ -13,12 +13,13 @@ body
     color: rgb(0, 0, 170);
 }
 
-/* code display */
+/* displaying code */
 
 code
 {
     white-space: pre;
     color: #111111;
+    background-color:#EEEEEE;
 }
 
 code.block
@@ -27,15 +28,14 @@ code.block
     display: block;
     border: 1px solid #333333;
     text-align: left;
-    background-color:#EEEEEE;
 }
 
-code.block:hover
+code:hover
 {
     background-color:inherit;
 }
 
-/* gauge */
+/* displaying gauge */
 
 div.cadre
 {
@@ -109,8 +109,12 @@ e
 }
 
 
-
 /* hyperlinks appearance */
+
+a
+{
+    font-style: italic
+}
 
 a:link
 {
@@ -122,6 +126,7 @@ a:visited
 {
     color: #000055;
 }
+
 a:hover
 {
     color: Purple;
@@ -218,6 +223,11 @@ dt
 dt::before
 {
     content: '- ';
+}
+
+dt.void::before
+{
+    content: '';
 }
 
 dt.void::before
