@@ -173,8 +173,12 @@ namespace libdar
 		buffer = nullptr;
 
 
+
+
 		    /////////////
-		    // completing relative paths of the list
+		    // - completing relative paths of the list
+		    // - removing the ending part of the possible ending \r when DOS formatting is used
+		    //
 
 		if(prefix.is_relative() && !prefix.is_subdir_of(path("<ROOT>"), true))
 		    throw Erange("mask_list::mask_list", gettext("Mask_list's prefix must be an absolute path or start with \"<ROOT>\" string for archive merging"));
@@ -187,6 +191,25 @@ namespace libdar
 		    {
 			try
 			{
+
+				// checking for trailing \r
+
+			    if(it->size() < 1)
+				throw SRC_BUG; // we should not have empty string in the list
+			    if((*it)[it->size() - 1] == '\r') // last char of the string is a '\r'
+			    {
+				it->erase(it->size() - 1, 1); // removing the last char (thus removing \r here)
+				if(it->empty())
+				{
+				    it = tmp.erase(it);
+					// removing the string if "it" got empty
+					// and having "it" pointing to the next string in the list
+				    continue;  // and looping back
+				}
+			    }
+
+				// adding prefix path
+
 			    current = *it;
 			    if(current.is_relative())
 			    {
