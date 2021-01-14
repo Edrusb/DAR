@@ -13,6 +13,11 @@ body
     color: rgb(0, 0, 170);
 }
 
+p, ul, ol, dl
+{
+    text-align: justify;
+}
+
 /* displaying code */
 
 code
@@ -184,11 +189,17 @@ h4::before
 
 /* table view */
 
-table, th, td
+table, td
 {
     border: 1px solid;
     border-collapse: collapse;
+}
+
+table
+{
     background-color: #EEEEEE;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 th
@@ -196,12 +207,6 @@ th
     background-color: DarkBlue;
     text-shadow: 0px 0px 2px LightBlue;
     color: White;
-}
-
-table
-{
-    margin-left: auto;
-    margin-right: auto;
 }
 
 .left
@@ -213,6 +218,21 @@ table
 {
     text-align: center;
 }
+
+table.lean
+{
+    border: 0px;
+    background-color: inherit;
+    width: 100%;
+}
+
+table.lean td, th, tr
+{
+    border: 0px;
+}
+
+
+ /* description lists */
 
 dt
 {
@@ -274,13 +294,14 @@ dt.void::before
 {
     visibility: hidden;
     width: 120px;
-    background-color: black;
+    background-color: DarkBlue;
     color: white;
     text-align:center;
     border-radius: 5px;
     padding: 5px 0;
     position: absolute;
     z-index: 1;
+    box-shadow: 5px 5px Grey;
 }
 
 .tooltip:hover .text
