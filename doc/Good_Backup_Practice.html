@@ -1,351 +1,426 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head>
-  <meta name="generator" content="HTML Tidy for Linux/x86 (vers 1 July 2005), see www.w3.org">
-  <meta content="text/html; charset=us-ascii" http-equiv="content-type"><title>Good Backup Practice Short Guide</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
-<center>
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; width: 161px;"><a href="index.html"><img style="border: 0px solid ; width: 160px; height: 120px;" alt="Dar Documentation" src="dar_s_doc.jpg"></a><br>
-      </td>
-      <td style="vertical-align: top;">
-      <h1 style="text-align: center;"><br>
-      </h1>
-      <h1 style="text-align: center;">Good Backup Practice Short Guide</h1>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<h1 style="text-align: center;"></h1>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top;">
-      <h2 style="text-align: justify;">Presentation<br>
-      </h2>
-      <div style="text-align: justify;">
-      <div style="margin-left: 40px;">This short guide is here to
-gather important (and somehow obvious)
-techniques about computer backups. It also explains the risks you take
-not following these principles. I thought this was obvious and well
-known by anyone, up to recently when I started getting feedback of
-people complaining about their lost data because of bad media or other
-reasons. To the question "have you tested your archive?", I was
-surprised to get the negative answers.
-      </div>
-<p style="margin-left: 40px;">This guide is not especially linked to <a href="http://dar.linux.free.fr/">Disk ARchive (aka dar)</a> no more than to any
-other tool, thus, you can take advantage of reading this document if
-you are not sure of your backup procedure, whatever is the backup
-software you use.</p>
-      </div>
-      <h2 style="text-align: justify;">Notions</h2>
-      <div style="text-align: justify; margin-left: 40px;"> In the following we will speak
-about backup and archive: </div>
-      <ul style="text-align: justify; margin-left: 40px;">
-        <li>by backup, is meant a copy of some data that remains in
-place in an operational system</li>
-        <li>by
-archive, is meant a copy of data that is removed afterward from an
-operational system. It stays available but is no more used frequently.</li>
-      </ul>
-      <div style="text-align: justify; margin-left: 40px;"> With the previous meaning of
-an archive you can also make a backup of an archive (for example a
-clone copy of your archive). </div>
-      <h2 style="text-align: justify;">Archives</h2>
+<html>
+  <head>
+    <link href="style.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+    <title>Good Backup Practice Short Guide</title>
+  </head>
+  <body>
 
-      <div style="text-align: justify; margin-left: 40px;"> <span style="font-weight: bold; text-decoration: underline;">1.</span> The
-first think to do just after making an archive is testing it on its
-definitive medium. There are several reasons that
-make this testing important:<br>
-      </div>
-      <ul style="margin-left: 40px;">
-        <li>any medium may have a surface error, which in some case
-cannot be detected at writing time.</li>
-        <li>the software you use may have bugs (also <span style="font-style: italic;">dar</span> can, yes. ;-)
-... ).</li>
-        <li>you
-may have done a wrong operation or missed an error message (no space
-left to write the whole archive ad so on), especially when using poorly
-written scripts.</li>
-      </ul>
-      <div style="text-align: justify; margin-left: 40px;"> Of
-course the archive testing must be done when the backup has been put on
-its definitive place (CD-R, floppy, tape, etc.), if you have to move it
-(copy to another media), then you need to test it again on the new
-medium. The testing operation, must read/test all the data, not just
-list the archive contents (-t option instead of -l option for <span style="font-style: italic;">dar</span>). And
-of course the archive must have a minimum mechanism to detect errors
-(<span style="font-style: italic;">dar</span> has one without compression, and two when using compression). </div>
-      <div style="text-align: justify; margin-left: 40px;"> <br>
-      <span style="font-weight: bold; text-decoration: underline;">2.</span>
-As a replacement for testing, a better operation is to compare the
-files in the archive with those on the original files on the disk (-d
-option for <span style="font-style: italic;">dar</span>). This makes the same as testing archive readability and
-coherence, while also checking that the data is really identical
-whatever the corruption detection<br>
-mechanisms used are. This
-operation is not suited for a set of data that changes (like a active
-system backup), but is probably what you need when creating an archive.
-      <p><span style="font-weight: bold; text-decoration: underline;">3.</span>
-Increasing the degree of security, the next thing to try is to restore
-the archive in a temporary place or better on another computer. This
-will let you check that from end to end, you have a good usable backup,
-on which you can rely. Once you have restored, you will need to compare
-the result, the <span style="font-style: italic;">diff</span> command can help you here, moreover, this is a
-program that has no link with <span style="font-style: italic;">dar</span> so it would be very improbable to
-have a common bug to both <span style="font-style: italic;">dar</span> and <span style="font-style: italic;">diff</span> that let you think both original
-and restored data are identical while they are not!</p>
-      <p><span style="text-decoration: underline; font-weight: bold;">4.</span>
-Unfortunately, many (all) media do alter with time, and an archive
-that was properly written on a correct media may become unreadable with
-time and/or bad environment conditions. Thus of course, take care not
-to store magnetic storages near magnetic sources (like HiFi speakers)
-or enclosed in metallic boxes, as well as avoid having sun directly
-lighting your CD-R(W) DVD-R(W), etc. Also mentioned for many media is
-humidity: respect the acceptable humidity range for each medium (don't
-store your data in your bathroom, kitchen, cave, ...). Same thing about
-the temperature. More generally have a look at the safe environmental
-conditions described in the documentation, even just once for each
-media type.</p>
-      <p>The problem with archive is that usually you
-need them for a long time, while the media has a limited lifetime. A
-solution is to make one (or several) copy (i.e.: backup of archive) of
-the data when the original support has arrived its half expected life.</p>
-      <p>Another
-solution, is to use <a style="font-style: italic;" href="usage_notes.html#Parchive">Parchive</a>,
-it works in the principle of <span style="font-style: italic;">RAID</span> disk
-systems, creating beside each file a <span style="font-style: italic;">par</span> file which can be used later
-to recover missing part or corrupted part of the original file. Of
-course, <span style="font-style: italic;">Parchive</span> can work on <span style="font-style: italic;">dar</span>'s slices. But, it requires more
-storage, thus you will have to choose smaller slice size to have place
-to put <span style="font-style: italic;">Parchive</span> data on your CD-R or DVD-R for example. The amount of data
-generated by <span style="font-style: italic;">Parchive</span> depends on the redundancy level (<span style="font-style: italic;">Parchive</span>'s -r
-option). Check the <a href="usage_notes.html#Parchive">notes</a> for more informations about using
-      <span style="font-style: italic;">Parchive</span> with <span style="font-style: italic;">dar</span>. When using read-only medium, you will need to copy
-the corrupted file to a read-write medium for <span style="font-style: italic;">Parchive</span> can repair it.
-Unfortunately the usual '<span style="font-style: italic;">cp</span>' command will stop when the first I/O error
-will be met, making you unable to get the sane data *after* the
-corruption. In most case you will not have enough sane data for
-      <span style="font-style: italic;">Parchive</span> to repair you file. For that reason thje "<span style="font-style: italic;">dar_cp</span>" tool has been created (it is available included in <span style="font-style: italic;">dar</span>'s package). It is a cp-like
-command that skips over the corruptions (replacing it by a field of zeored bytes, which can be repaired afterward by <span style="font-style: italic;">Parchive</span>) and can copy sane data after the
-corrupted part.</p>
-      <p><span style="font-weight: bold; text-decoration: underline;">5.</span>
-another problem arrives when an archive is often read. Depending on the medium, the fact to
-read, often degrades the media little by little, and makes the media's
-lifetime shorter. A possible solution is to have two copies, one for
-reading and one to keep as backup, copy which should be never read
-except for making a new copy. Chances are that the often read copy will
-"die" before the backup copy, you then could be able to make a new
-backup copy from the original backup copy, which in turn could become
-the new "often read" medium.</p>
-      <p><span style="font-weight: bold; text-decoration: underline;">6.</span>
-Of course, if you want to have an often read archive and also want to
-keep it forever, you could combine the two of the previous techniques,
-making two copies, one for storage and one for backup. Once you have
-spent a certain time (medium half lifetime for example), you could make
-a new copy, and keep them beside the original backup copy in case of.</p>
-      <p><span style="font-weight: bold; text-decoration: underline;">7.</span>
-Another problem, is safety of your data. In some case, the archive you
-have does not need to be kept a very long time nor it needs to be read
-often, but instead is very "precious". in that case a solution could be
-to make several copies that you could store in very different
-locations. This could prevent data lost in case of fire disaster, or
-other cataclysms.</p>
-      <p><span style="font-weight: bold; text-decoration: underline;">8.</span>
-Yet another aspect is the privacy of your data. An archive may not have to
-be accessible to anyone. Several directions could be possible to answer this
-problem:</p>
-      </div>
-      <ul style="text-align: justify; margin-left: 40px;">
-        <li>Physical restriction to the access of the archive (stored
-in a bank or locked place, for example)</li>
-        <li>Hid the archive (in your garden ;-) ) or hide the data
-among other data (Edgar Poe's hidden letter technique)</li>
-        <li>Encrypting your archive<span style="font-style: italic;"></span><br>
-</li>
-        <li>And probably some other ways I am&nbsp; not aware about.</li>
-      </ul>
-      <div style="text-align: justify;">
-      <div style="margin-left: 40px;">For encryption, <span style="font-style: italic;">dar</span> provides strong encryption inside the archive
-(blowfish, aes, etc.), it does preserve the direct access feature that
-avoid you having decrypt the whole the whole archive to restore just one file.
-But you can also use an external encryption mechanism, like <a style="font-style: italic;" href="http://www.gnupg.org/">GnuPG</a>
-to
-encrypt slice by slice for example, the drawback is that you will have
-to decrypt each slice at a whole to be able to recover a single file in
-it. </div>
-<h2>Backup</h2>
-      <div style="margin-left: 40px;">Backups act a bit like an
-archive, except that
-they are a copy of a changing set of data, which is moreover expected
-to stay on the original location (the system). But, as an archive, it
-is a good practice to at least test the resulting backups, and once a
-year if possible to test the overall backup process by doing a
-restoration of your system into a new virtual machine or a spare
-computer, checking that the recovered system is fully operational.<br>
- </div>
-<p style="margin-left: 40px;">The fact that the data is changing introduces two problems:<br>
-      </p>
-      <ul style="margin-left: 40px;">
-        <li>A backup is quite never up to date, and you will probably
-loose data if you have to rely on it</li>
-        <li>A backup becomes soon obsolete.</li>
-      </ul>
-      <div style="margin-left: 40px;">
-The
-backup has also the role of keeping a recent history of changes. For
-example, you may have deleted a precious data from your system. And it
-is quite possible that you notice this mistake long ago after deletion.
-In that case, an old backup stays useful, in spite of many more recent
-backups.
-      </div>
-<p style="margin-left: 40px;">In consequences, backup need to be done often for having a
-minimum delta in case of crash disk. But, having new backup do not mean
-that older can be removed. A usual way of doing that, is to have a set
-of media, over which you rotate the backups. The new backup is done
-over the oldest backup of the set. This way you keep a certain history
-of your system changes. It is your choice to decide how much archive
-you want to keep, and how often you will make a backup of your system.<br>
-</p>
-      <h3>Differential / incremental backup<br>
-      </h3>
 
-      <p style="margin-left: 40px;">A
-point that can increase the history while saving media space required
-by each backup is the differential backup. A differential backup is a
-backup done only of what have changed since a previous backup (the
-"backup of reference"). The drawback is that it is not autonomous and
-cannot be used alone to restore a full system. Thus there is no problem
-to keep the differential backup on the same medium as the one where is
-located the backup of reference.</p>
-      <p style="margin-left: 40px;">Doing
-a lot of consecutive
-differential backup (taking the last backup as reference for the next
-differential backup, which some are used to call "incremental"
-backups), will reduce your storage requirement, but will&nbsp; extra
-timecost at
-restoration in case of computer accident. You will have to restore the
-full backup (of reference), then you will have to restore all the many
-backup you have done up to the last. This implies that you must keep
-all the differential backups you have done since the backup of
-reference, if you wish to restore the exact state of the filesystem at
-the time of the last differential backup. </p>
-      <p style="margin-left: 40px;">It is thus up to
-you to decide how much differential backup you do, and how much often
-you make a full backup. A common scheme, is to make a full backup once
-a week and make differential backup each day of the week. The backup
-done in a week are kept together. You could then have ten sets of
-full+differential backups, and a new full backup would erase the oldest
-full backup as well as its associated differential backups, this way
-you keep a ten week history of backup with a backup every day, but this
-is just an example.</p>
-      <p style="margin-left: 40px;">An interesting protection suggested by
-George Foot on the <a href="https://lists.sourceforge.net/lists/listinfo/dar-support">dar-support mailing-list</a>: once you make a new full
-backup, the idea is to make an additional differential backup based on
-the previous full backup (the one just older than the one we have just
-built), which would "acts as a substitute for the actual
-full backup in case something does go wrong with it later on".<br>
-</p>
+    <img alt="Dar Documentation" src="dar_s_doc.jpg" style="float:left;">
+    <h1 style="text-align: center;"><br>Good Backup Practice Short Guide</h1>
+    <div style="clear:both;"></div>
 
-      <h3>Decremental Backup</h3>
-      <div style="margin-left: 40px;">Based on a feature request for <span style="font-style: italic;">dar</span>
-made by "Yuraukar" on dar-support mailing-list, the decremental backup
-provides an interesting approach where the disk requirement is
-optimized as for the incremental backup, while the latest backup is
-always a full backup (while this is the oldest that is full, in the
-incremental backup approach). The drawback here is that there is some
-extra work at each new backup creation to transform the former more
-recent backup from a full backup to a so called "decremental" backup.<br>
-      <br>
-The decremental backup only contains the difference between the state
-of the current system&nbsp; and the state the system had at a more
-ancient date (the date of the full backup corresponding the decremental
-backup was made).<br>
-      <br>
-In other words, the building of decremental backups is the following :<br>
+
+    <h2>Presentation</h2>
+
+    <p>
+      This short guide is here to
+      gather important (and somehow obvious)
+      techniques about computer backups. It also explains the risks you take
+      not following these principles. I thought this was obvious and well
+      known by anyone, up to recently when I started getting feedback of
+      people complaining about their lost data because of bad media or other
+      reasons. To the question "have you tested your archive?", I was
+      surprised to get the negative answers.
+    </p>
+
+    <p>
+      This guide is not especially linked to
+      <a href="http://dar.linux.free.fr/">Disk ARchive (aka dar)</a> no more than to any
+      other tool, thus, you can take advantage of reading this document if
+      you are not sure of your backup procedure, whatever is the backup
+      software you use.
+    </p>
+
+    <h2>Notions</h2>
+    <p>
+      In the following we will speak
+      about backup and archive:
       <ul>
-        <li>Each time (each day for example), a new full backup is made<br>
-        </li>
-        <li>The full backup is tested, parity control is eventually built, and so on.<br>
-        </li>
-        <li>From the previous full backup and the new full backup, a decremental backup is made</li>
-        <li>The decremental backup is tested, parity control is eventually built, an so on.<br>
-        </li>
-        <li>The oldest full backup can then be removed</li>
+        <li>
+	  by backup, is meant a copy of some data that remains in
+	  place in an operational system
+	</li>
+        <li>
+	  by archive, is meant a copy of data that is removed afterward from an
+	  operational system. It stays available but is no more used frequently.
+	</li>
       </ul>
-This way you always have a full backup as the lastest backup, and decremental backups as the older ones.<br>
-      <br>
-You may still have several sets of backup (one for each week, for
-example, containing at the end of a week a full backup and 6
-decremental backups), but you also may just keep one set (a full
-backup, and a lot of decremental backups), when you will need more
-space, you will just have to delete the oldest decremental backups,
-thing you cannot do with the incremental approach, where deleting the
-oldest backup, means deleting the full backup that all others following
-incremental backup are based upon.<br>
-      <br>
-At the difference of the incremental backup approach, it is very easy
-to restore a whole system : just&nbsp; restore the latest backup (by
-opposition to restoring the more recent full backup, then the as many
-incremental backup that follow). If now you need to recover a file that
-has been erased by error, just use a the adequate decremental backup.
-And it is still possible to restore a whole system globally in a state
-it had long ago before the lastest backup was done : you will for that
-restore the full backup (latest backup), then in turn each decremental
-backup up to the one that correspond to the epoch of you wish. The
-probability that you have to use all decremental backup is thin
-compared to the probability you have to use all the incremental
-backups: there is effectively much more probability to restore a system
-in a recent state than to restore it in a very old state.<br>
-      <br>
-There is however several drawbacks:<br>
-      <div style="margin-left: 40px;">time<br>
-      <div style="margin-left: 40px;">Doing each time a full backup is
-time consumming and creating a decremental backup from two full backups
-is even more time consuming... <br>
-      </div>
-      </div>
-      <div style="margin-left: 40px;">temporary disk space<br>
-      <div style="margin-left: 40px;">Each time you create a new
-backup, you temporarily need more space than using the incremental
-backup, you need to keep two full backups during a short period, plus a
-decremental backup (usually much smaller than a full backup), even if
-at then end you remove the oldest full backup.<br>
-      <br>
-      </div>
-      </div>
-      </div>
-      <div style="margin-left: 40px;">In conclusion, I would not tell
-that decremental backup is the panacea, however it exists and may be of
-interest to some of you. More information about <span style="font-style: italic;">dar</span>'s implementation of decremental backup can be found <a href="usage_notes.html#Decremental_Backup">here</a>.<br>
-      </div>
-      <div style="margin-left: 40px;"><br>
-      </div>
+      <p>
+	With the previous meaning of
+	an archive you can also make a backup of an archive (for example a
+	clone copy of your archive).
+      </p>
 
-      </div>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top;">
-      <p>Any other trick/idea/improvement/correction/evidences are
-welcome!</p>
-      <p>Denis.</p>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-<br>
-<br>
-<br>
-</center>
-</body></html>
+      <h2>Archives</h2>
+
+      <ol>
+	<li>
+	  <p>
+	    The
+	    first think to do just after making an archive is testing it on its
+	    definitive medium. There are several reasons that
+	    make this testing important:
+	  </p>
+	  <ul>
+            <li>
+	      any medium may have a surface error, which in some case
+	      cannot be detected at writing time.
+	    </li>
+            <li>
+	      the software you use may have bugs
+	      (also <i>dar</i> can, yes. ;-)
+	      ... ).
+	    </li>
+            <li>
+	      you may have done a wrong operation or missed an error message (no space
+	      left to write the whole archive ad so on), especially when using poorly
+	      written scripts.
+	    </li>
+	  </ul>
+	  <p>
+	    Of course the archive testing must be done when the backup has been put on
+	    its definitive place (CD-R, floppy, tape, etc.), if you have to move it
+	    (copy to another media), then you need to test it again on the new
+	    medium. The testing operation, must read/test all the data, not just
+	    list the archive contents (-t option instead of -l option for
+	    <i>dar</i>). And
+	    of course the archive must have a minimum mechanism to detect errors
+	    (<i>dar</i> has one without compression, and two when using compression).
+	  </p>
+	</li>
+
+	<li>
+	  <p>
+	    As a replacement for testing, a better operation is to compare the
+	    files in the archive with those on the original files on the disk (-d
+	    option for <i>dar</i>). This makes the same as testing archive readability and
+	    coherence, while also checking that the data is really identical
+	    whatever the corruption detection<br>
+	    mechanisms used are. This
+	    operation is not suited for a set of data that changes (like a active
+	    system backup), but is probably what you need when creating an archive.
+	  </p>
+	</li>
+
+	<li>
+	  <p>
+	    Increasing the degree of security, the next thing to try is to restore
+	    the archive in a temporary place or better on another computer. This
+	    will let you check that from end to end, you have a good usable backup,
+	    on which you can rely. Once you have restored, you will need to compare
+	    the result, the <i>diff</i> command can help you here, moreover, this is a
+	    program that has no link with <i>dar</i> so it would be very improbable to
+	    have a common bug to both <i>dar</i> and <i>diff</i> that let you think
+	    both original and restored data are identical while they are not!
+	  </p>
+	</li>
+
+	<li>
+	  <p>
+	    Unfortunately, many (all) media do alter with time, and an archive
+	    that was properly written on a correct media may become unreadable with
+	    time and/or bad environment conditions. Thus of course, take care not
+	    to store magnetic storages near magnetic sources (like HiFi speakers)
+	    or enclosed in metallic boxes, as well as avoid having sun directly
+	    lighting your CD-R(W) DVD-R(W), etc. Also mentioned for many media is
+	    humidity: respect the acceptable humidity range for each medium (don't
+	    store your data in your bathroom, kitchen, cave, ...). Same thing about
+	    the temperature. More generally have a look at the safe environmental
+	    conditions described in the documentation, even just once for each
+	    media type.
+	  </p>
+	  <p>
+	    The problem with archive is that usually you
+	    need them for a long time, while the media has a limited lifetime. A
+	    solution is to make one (or several) copy (i.e.: backup of archive) of
+	    the data when the original support has arrived its half expected life.
+	  </p>
+	  <p>
+	    Another solution, is to use <a href="usage_notes.html#Parchive">Parchive</a>,
+	    it works in the principle of <i>RAID</i> disk
+	    systems, creating beside each file a <i>par</i> file which can be used later
+	    to recover missing part or corrupted part of the original file. Of
+	    course, <i>Parchive</i> can work on <i>dar</i>'s slices. But, it requires more
+	    storage, thus you will have to choose smaller slice size to have place
+	    to put <i>Parchive</i> data on your CD-R or DVD-R for example. The amount of data
+	    generated by <i>Parchive</i> depends on the redundancy level
+	    (<i>Parchive</i>'s -r option). Check the
+	    <a href="usage_notes.html#Parchive">notes</a> for more informations about using
+	    <i>Parchive</i> with <i>dar</i>. When using read-only medium, you will need to copy
+	    the corrupted file to a read-write medium for <i>Parchive</i> can repair it.
+	    Unfortunately the usual '<i>cp</i>' command will stop when the first I/O error
+	    will be met, making you unable to get the sane data *after* the
+	    corruption. In most case you will not have enough sane data for
+	    <i>Parchive</i> to repair you file. For that reason the "<i>dar_cp</i>"
+	    tool has been created (it is available included in <i>dar</i>'s package).
+	    It is a cp-like
+	    command that skips over the corruptions (replacing it by a field of zeored bytes,
+	    which can be repaired afterward by <i>Parchive</i>) and can copy sane data after the
+	    corrupted part.
+	  </p>
+	</li>
+	<li>
+	  <p>
+	    another problem arrives when an archive is often read. Depending on the medium, the fact to
+	    read, often degrades the media little by little, and makes the media's
+	    lifetime shorter. A possible solution is to have two copies, one for
+	    reading and one to keep as backup, copy which should be never read
+	    except for making a new copy. Chances are that the often read copy will
+	    "die" before the backup copy, you then could be able to make a new
+	    backup copy from the original backup copy, which in turn could become
+	    the new "often read" medium.
+	  </p>
+	</li>
+	<li>
+	  <p>
+	    Of course, if you want to have an often read archive and also want to
+	    keep it forever, you could combine the two of the previous techniques,
+	    making two copies, one for storage and one for backup. Once you have
+	    spent a certain time (medium half lifetime for example), you could make
+	    a new copy, and keep them beside the original backup copy in case of.
+	  </p>
+	</li>
+	<li>
+	  <p>
+	    Another problem, is safety of your data. In some case, the archive you
+	    have does not need to be kept a very long time nor it needs to be read
+	    often, but instead is very "precious". in that case a solution could be
+	    to make several copies that you could store in very different
+	    locations. This could prevent data lost in case of fire disaster, or
+	    other cataclysms.
+	  </p>
+	</li>
+	<li>
+	  <p>
+	    Yet another aspect is the privacy of your data. An archive may not have to
+	    be accessible to anyone. Several directions could be possible to answer this
+	    problem:
+	  </p>
+	  <ul>
+            <li>
+	      Physical restriction to the access of the archive (stored
+	      in a bank or locked place, for example)
+	    </li>
+            <li>
+	      Hid the archive (in your garden ;-) ) or hide the data
+	      among other data (Edgar Poe's hidden letter technique)
+	    </li>
+            <li>
+	      Encrypting your archive
+	    </li>
+            <li>
+	      And probably some other ways I am not aware about.
+	    </li>
+	  </ul>
+	  <p>
+	    For encryption, <i>dar</i> provides strong encryption inside the archive
+	    (blowfish, aes, etc.), it does preserve the direct access feature that
+	    avoid you having decrypt the whole the whole archive to restore just one file.
+	    But you can also use an external encryption mechanism, like
+	    <a href="http://www.gnupg.org/">GnuPG</a> to
+	    encrypt slice by slice for example, the drawback is that you will have
+	    to decrypt each slice at a whole to be able to recover a single file in
+	    it.
+	  </p>
+	</li>
+      </ol>
+
+      <h2>Backup</h2>
+
+    <p>
+      Backups act a bit like an
+      archive, except that
+      they are a copy of a changing set of data, which is moreover expected
+      to stay on the original location (the system). But, as an archive, it
+      is a good practice to at least test the resulting backups, and once a
+      year if possible to test the overall backup process by doing a
+      restoration of your system into a new virtual machine or a spare
+      computer, checking that the recovered system is fully operational.
+    </p>
+    <p>
+      The fact that the data is changing introduces two problems:<br>
+    </p>
+    <ul>
+      <li>
+	A backup is quite never up to date, and you will probably
+	loose data if you have to rely on it
+      </li>
+      <li>
+	A backup becomes soon obsolete.
+      </li>
+    </ul>
+    <p>
+      The backup has also the role of keeping a recent history of changes. For
+      example, you may have deleted a precious data from your system. And it
+      is quite possible that you notice this mistake long ago after deletion.
+      In that case, an old backup stays useful, in spite of many more recent
+      backups.
+    </p>
+    <p>
+      In consequences, backup need to be done often for having a
+      minimum delta in case of crash disk. But, having new backup do not mean
+      that older can be removed. A usual way of doing that, is to have a set
+      of media, over which you rotate the backups. The new backup is done
+      over the oldest backup of the set. This way you keep a certain history
+      of your system changes. It is your choice to decide how much archive
+      you want to keep, and how often you will make a backup of your system.
+    </p>
+
+    <h3>Differential / incremental backup</h3>
+
+    <p>
+      A point that can increase the history while saving media space required
+      by each backup is the differential backup. A differential backup is a
+      backup done only of what have changed since a previous backup (the
+      "backup of reference"). The drawback is that it is not autonomous and
+      cannot be used alone to restore a full system. Thus there is no problem
+      to keep the differential backup on the same medium as the one where is
+      located the backup of reference.
+    </p>
+    <p>
+      Doing a lot of consecutive
+      differential backup (taking the last backup as reference for the next
+      differential backup, which some are used to call "incremental"
+      backups), will reduce your storage requirement, but will extra
+      timecost at
+      restoration in case of computer accident. You will have to restore the
+      full backup (of reference), then you will have to restore all the many
+      backup you have done up to the last. This implies that you must keep
+      all the differential backups you have done since the backup of
+      reference, if you wish to restore the exact state of the filesystem at
+      the time of the last differential backup.
+    </p>
+    <p>
+      It is thus up to
+      you to decide how much differential backup you do, and how much often
+      you make a full backup. A common scheme, is to make a full backup once
+      a week and make differential backup each day of the week. The backup
+      done in a week are kept together. You could then have ten sets of
+      full+differential backups, and a new full backup would erase the oldest
+      full backup as well as its associated differential backups, this way
+      you keep a ten week history of backup with a backup every day, but this
+      is just an example.
+    </p>
+    <p>
+      An interesting protection suggested by George Foot on the
+      <a href="https://lists.sourceforge.net/lists/listinfo/dar-support">dar-support mailing-list</a>:
+      once you make a new full backup, the idea is to make an additional
+      differential backup based on
+      the previous full backup (the one just older than the one we have just
+      built), which would
+      <i>
+	acts as a substitute for the actual
+	full backup in case something does go wrong with it later on.
+      </i>
+    </p>
+
+    <h3>Decremental Backup</h3>
+
+    <p>
+      Based on a feature request for <i>dar</i>
+      made by "Yuraukar" on dar-support mailing-list, the decremental backup
+      provides an interesting approach where the disk requirement is
+      optimized as for the incremental backup, while the latest backup is
+      always a full backup (while this is the oldest that is full, in the
+      incremental backup approach). The drawback here is that there is some
+      extra work at each new backup creation to transform the former more
+      recent backup from a full backup to a so called
+      "<i>decremental</i>" backup.
+    </p>
+    <p>
+      The decremental backup only contains the difference between the state
+      of the current system and the state the system had at a more
+      ancient date (the date of the full backup corresponding the decremental
+      backup was made).
+    </p>
+    <p>
+      In other words, the building of decremental backups is the following:
+    </p>
+    <ul>
+      <li>Each time (each day for example), a new full backup is made</li>
+      <li>
+	The full backup is tested, parity control is eventually built,
+	and so on.
+      </li>
+      <li>
+	From the previous full backup and the new full backup, a decremental
+	backup is made
+      </li>
+      <li>
+	The decremental backup is tested, parity control is eventually built,
+	an so on.
+      </li>
+      <li>
+	The oldest full backup can then be removed
+      </li>
+    </ul>
+    <p>
+      This way you always have a full backup as the lastest backup,
+      and decremental backups as the older ones.
+    </p>
+    <p>
+      You may still have several sets of backup (one for each week, for
+      example, containing at the end of a week a full backup and 6
+      decremental backups), but you also may just keep one set (a full
+      backup, and a lot of decremental backups), when you will need more
+      space, you will just have to delete the oldest decremental backups,
+      thing you cannot do with the incremental approach, where deleting the
+      oldest backup, means deleting the full backup that all others following
+      incremental backup are based upon.
+    </p>
+    <p>
+      At the difference of the incremental backup approach, it is very easy
+      to restore a whole system: just restore the latest backup (by
+      opposition to restoring the more recent full backup, then the as many
+      incremental backup that follow). If now you need to recover a file that
+      has been erased by error, just use a the adequate decremental backup.
+      And it is still possible to restore a whole system globally in a state
+      it had long ago before the lastest backup was done: you will for that
+      restore the full backup (latest backup), then in turn each decremental
+      backup up to the one that correspond to the epoch of you wish. The
+      probability that you have to use all decremental backup is thin
+      compared to the probability you have to use all the incremental
+      backups: there is effectively much more probability to restore a system
+      in a recent state than to restore it in a very old state.
+    </p>
+    <p>
+      There is however several drawbacks:
+    </p>
+    <dl>
+      <dt class=void>time</dt><dd>
+	Doing each time a full backup is
+	time consumming and creating a decremental backup
+	from two full backups
+	is even more time consuming...
+      </dd>
+      <dt class=void>temporary disk space</dt><dd>
+	Each time you create a new
+	backup, you temporarily need more space than using the incremental
+	backup, you need to keep two full backups during a short period, plus a
+	decremental backup (usually much smaller than a full backup), even if
+	at then end you remove the oldest full backup.
+      </dd>
+    </dl>
+
+    <p>
+      In conclusion, I would not tell
+      that decremental backup is the panacea, however it exists and may be of
+      interest to some of you. More information about <i>dar</i>'s
+      implementation of decremental backup can be found
+      <a href="usage_notes.html#Decremental_Backup">here</a>.
+    </p>
+
+
+    <hr>
+
+    <p>
+      Any other trick/idea/improvement/correction/evidences are
+      welcome!
+    </p>
+    <p>Denis.</p>
+  </body>
+</html>
