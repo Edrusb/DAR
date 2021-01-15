@@ -1,3 +1,5 @@
+/* general pages style */
+
 html
 {
     font-family: 'Open Sans', serif;
@@ -214,6 +216,11 @@ th
     text-align: left;
 }
 
+.right
+{
+    text-align: right;
+}
+
 .center
 {
     text-align: center;
@@ -231,6 +238,12 @@ table.lean td, th, tr
     border: 0px;
 }
 
+td.desc
+{
+    vertical-align: top;
+    text-align: right;
+    padding-right: 25px;
+}
 
  /* description lists */
 
